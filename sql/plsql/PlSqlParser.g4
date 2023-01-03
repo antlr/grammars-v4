@@ -253,7 +253,7 @@ drop_rollback_segment
 drop_role
     : DROP ROLE role_name ';'
     ;
- 
+
 create_rollback_segment
     : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
@@ -4392,7 +4392,11 @@ table_alias
     ;
 
 where_clause
-    : WHERE (CURRENT OF cursor_name | expression)
+    : WHERE (CURRENT OF cursor_name | expression | quantitative_where_stmt)
+    ;
+
+quantitative_where_stmt
+    : expression relational_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
     ;
 
 into_clause

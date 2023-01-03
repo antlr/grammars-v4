@@ -1,5 +1,5 @@
 /*
-Ada 2012 grammar.
+Ada 2005 grammar.
 The MIT License (MIT).
 
 Copyright (c) 2022, Michał Lorek.
@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar AdaLexer;
+lexer grammar Ada2005Lexer;
 
 options { caseInsensitive = true; }
 
@@ -80,6 +80,7 @@ OR                : 'or';
 OTHERS            : 'others';
 OUT               : 'out';
 OVERRIDING        : 'overriding';
+
 PACKAGE           : 'package';
 PRAGMA            : 'pragma';
 PRIVATE           : 'private';
@@ -97,7 +98,6 @@ REVERSE           : 'reverse';
 
 SELECT            : 'select';
 SEPARATE          : 'separate';
-SOME              : 'some';
 SUBTYPE           : 'subtype';
 SYNCHRONIZED      : 'synchronized';
 
@@ -116,18 +116,17 @@ WITH              : 'with';
 
 XOR               : 'xor';
 
-CLASS__    options { caseInsensitive = false; }         : 'Class';
-ACCESS__   options { caseInsensitive = false; }         : 'Access';
-DELTA__    options { caseInsensitive = false; }         : 'Delta';
-DIGITS__   options { caseInsensitive = false; }         : 'Digits';
-MOD__      options { caseInsensitive = false; }         : 'Mod';
+Range__    options { caseInsensitive = false; }         : 'Range';
+Access__   options { caseInsensitive = false; }         : 'Access';
+Delta__    options { caseInsensitive = false; }         : 'Delta';
+Digits__   options { caseInsensitive = false; }         : 'Digits';
 
 WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
 LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
 
 IDENTIFIER_       : LETTER+ [A-Z_0-9]*;
-NUMERIC_LITERAL_  : DECIMAL_LITERAL_ | BASED_LITERAL;
-DECIMAL_LITERAL_  : NUMERAL ('.' NUMERAL)? EXPONENT?;
+NUMERIC_LITERAL_  : DECIMAL_LITERAL | BASED_LITERAL;
+DECIMAL_LITERAL   : NUMERAL ('.' NUMERAL)? EXPONENT?;
 NUMERAL           : DIGIT+ ('_'? DIGIT)*;
 EXPONENT          : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
 BASED_LITERAL     : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
