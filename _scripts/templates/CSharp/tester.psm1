@@ -1,5 +1,4 @@
 # Template generated code from trgen <version>
-# Template generated code from trgen <version>
 function Build-Grammar {
     $msg = dotnet build -o CSharp
     return @{
@@ -38,7 +37,7 @@ function Test-Case {
             } else {
                 Write-Host "Expected error list match." -ForegroundColor Red
             }
-        }
+    }
     } else {
         if ($parseOk -and (Test-Path $TreeFile)) {
             # Confirm that the parse tree we received is the one we expected.

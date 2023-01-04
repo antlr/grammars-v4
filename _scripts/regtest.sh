@@ -97,7 +97,7 @@ add() {
     fi
 }
 
-rm -rf `find . -name Generated -type d`
+rm -rf `find . -name 'Generated*' -type d`
 
 build()
 {
@@ -108,7 +108,7 @@ build()
     echo Building $testname
     echo ""
     # Assert(cwd is valid)
-    pushd "$x/Generated"
+    pushd "$x/Generated-$target"
     if [[ $? != "0" ]]
     then
         echo "$1 is not a valid directory"
@@ -136,7 +136,7 @@ test()
     echo Testing $testname
     echo ""
     # Assert(cwd is valid)
-    pushd "$x/Generated"
+    pushd "$x/Generated-$target"
     if [[ $? != "0" ]]
     then
         echo "$1 is not a valid directory"
@@ -185,7 +185,7 @@ part1()
 {
     date
     # 1) Generate driver source code from poms.
-    rm -rf `find . -name Generated -type d`
+    rm -rf `find . -name Generated-$target -type d`
     echo "Generating drivers."
     if [[ "$invert" == "" ]]
     then
@@ -208,7 +208,7 @@ part2()
     esac
     echo prefix $prefix
     echo bft $build_file_type
-    build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+    build_files=`find $prefix -type f -name $build_file_type | grep Generated-$target`
     echo bf $build_files
     for build_file in $build_files
     do
@@ -229,7 +229,7 @@ part3()
     # 3) Test generated parser on examples.
     echo "Parsing."
     date
-    build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+    build_files=`find $prefix -type f -name $build_file_type | grep Generated-$target`
     echo bf $build_files
     for build_file in $build_files
     do

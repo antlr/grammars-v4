@@ -4,9 +4,10 @@ default:
 	dotnet restore
 	dotnet build
 run:
-	trwdog dotnet run $(RUNARGS)
+	@trwdog dotnet run $(RUNARGS)
 clean:
 	dotnet clean
 	rm -rf bin obj
+	rm -f parse_out.*
 test:
 	bash test.sh
