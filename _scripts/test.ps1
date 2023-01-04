@@ -71,8 +71,9 @@ function Test-Grammar {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
-    if (Test-Path 'Generated') {
-        Set-Location 'Generated'
+    $targetgenerated = "Generated-$Target"
+    if (Test-Path $targetgenerated) {
+        Set-Location $targetgenerated
     }
     else {
         $failStage = [FailStage]::CodeGeneration
