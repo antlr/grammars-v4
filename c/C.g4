@@ -29,6 +29,13 @@
 /** C 2011 grammar built from the C11 Spec */
 grammar C;
 
+compilationUnit
+    :   translationUnit? EOF
+    ;
+
+translationUnit
+    :   externalDeclaration+
+    ;
 
 primaryExpression
     :   Identifier
@@ -484,13 +491,7 @@ jumpStatement
     ';'
     ;
 
-compilationUnit
-    :   translationUnit? EOF
-    ;
 
-translationUnit
-    :   externalDeclaration+
-    ;
 
 externalDeclaration
     :   functionDefinition
