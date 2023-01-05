@@ -261,7 +261,7 @@ public class Program
         if (show_trace)
         {
             parser.Trace = true;
-            ParserATNSimulator.trace_atn_sim = true;
+//            ParserATNSimulator.trace_atn_sim = true;
         }
         var tree = parser.<start_symbol>();
         DateTime after = DateTime.Now;
