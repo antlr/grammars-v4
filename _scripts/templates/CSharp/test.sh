@@ -3,8 +3,12 @@ err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 files=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+before_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
+
+# Parse
 echo "$files" | trwdog ./bin/Debug/net6.0/<exec_name> -x -shunt -tree
 status=$?
+
 # rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -24,18 +28,33 @@ then
 fi
 old=`pwd`
 cd ../<example_files_unix>
+# Notes: If the .tree and .errors files are not checked in,
+# then git won't complain. The trick here is to make sure we
+# don't have any new .errors files. Check the count again and
+# make sure that hasn't changed.
 git diff --exit-code --name-only . > $old/temp-output.txt 2>&1
 diffs=$?
+after_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
 if [ "$diffs" = "129" ]
 then
+  echo "Grammar outside a git repository."
+  echo "Defaulting to exit code of group parse."
   err=$status
 elif [ "$diffs" = "1" ]
 then
   cat $old/temp-output.txt
-  echo Output difference--failed test.
+  echo "Difference in output. Failed."
+  err=1
+elif [ "$before_parse_errors" != "$after_parse_errors" ]
+then
+  for f in $after_parse_errors
+  do
+	cat $f
+  done
+  echo "Difference in output. Failed."
   err=1
 else
-  err=$status
+  err=0
 fi
 rm -f $old/temp-output.txt
 exit $err
