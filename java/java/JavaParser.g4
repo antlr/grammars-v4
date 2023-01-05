@@ -178,6 +178,10 @@ constructorDeclaration
     : identifier formalParameters (THROWS qualifiedNameList)? constructorBody=block
     ;
 
+compactConstructorDeclaration
+    : modifier* identifier constructorBody=block
+    ;
+
 fieldDeclaration
     : typeType variableDeclarators ';'
     ;
@@ -435,7 +439,7 @@ recordComponent
     ;
 
 recordBody
-    : '{' classBodyDeclaration* '}'
+    : '{' (classBodyDeclaration | compactConstructorDeclaration)*  '}'
     ;
 
 // STATEMENTS / BLOCKS
@@ -493,7 +497,6 @@ typeIdentifier  // Identifiers that are not restricted for type declarations
 localTypeDeclaration
     : classOrInterfaceModifier*
       (classDeclaration | interfaceDeclaration | recordDeclaration)
-    | ';'
     ;
 
 statement

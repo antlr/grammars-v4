@@ -4392,7 +4392,11 @@ table_alias
     ;
 
 where_clause
-    : WHERE (CURRENT OF cursor_name | expression)
+    : WHERE (CURRENT OF cursor_name | expression | quantitative_where_stmt)
+    ;
+
+quantitative_where_stmt
+    : expression relational_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
     ;
 
 into_clause
