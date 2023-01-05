@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 public class Program
 {
@@ -31,9 +32,9 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>(quiet);
+        var listener_lexer = new ErrorListener\<int>(false, System.Console.Out);
+        var listener_parser = new ErrorListener\<IToken>(false, System.Console.Out);
         LexerErrorListener = listener_lexer;
-        var listener_parser = new ErrorListener\<IToken>(quiet);
         ParserErrorListener = listener_parser;
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
@@ -65,8 +66,8 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>();
-        var listener_parser = new ErrorListener\<IToken>();
+        var listener_lexer = new ErrorListener\<int>(false, System.Console.Out);
+        var listener_parser = new ErrorListener\<IToken>(false, System.Console.Out);
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
@@ -78,6 +79,7 @@ public class Program
         return tree;
     }
 
+    static bool shunt_output = false;
     static bool show_profile = false;
     static bool show_tree = false;
     static bool show_tokens = false;
@@ -129,6 +131,11 @@ public class Program
             {
                 inputs.Add(args[++i]);
                 is_fns.Add(false);
+            }
+            else if (args[i].Equals("-shunt"))
+            {
+                shunt_output = true;
+                continue;
             }
             else if (args[i].Equals("-encoding"))
             {
@@ -239,8 +246,9 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new <parser_name>(tokens);
-        var listener_lexer = new ErrorListener\<int>();
-        var listener_parser = new ErrorListener\<IToken>();
+        var output = shunt_output ? new StreamWriter(input_name + ".errors") : System.Console.Out;
+        var listener_lexer = new ErrorListener\<int>(quiet, output);
+        var listener_parser = new ErrorListener\<IToken>(quiet, output);
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
@@ -253,7 +261,7 @@ public class Program
         if (show_trace)
         {
             parser.Trace = true;
-//            ParserATNSimulator.trace_atn_sim = true;
+            ParserATNSimulator.trace_atn_sim = true;
         }
         var tree = parser.<start_symbol>();
         DateTime after = DateTime.Now;
@@ -269,12 +277,22 @@ public class Program
         }
         if (show_tree)
         {
+            if (shunt_output)
+            {
+                System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
+            } else
+            {
             System.Console.Out.WriteLine(tree.ToStringTree(parser));
+        }
         }
         if (show_profile)
         {
             System.Console.Out.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
         }
-        if (!quiet) System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
+        if (!quiet)
+        {
+            System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
+        }
+        if (shunt_output) output.Close();
     }
 }
