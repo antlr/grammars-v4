@@ -52,6 +52,7 @@ function Test-Case {
             Write-Host "Expected."
             # Confirm that the errors we received are the ones we expected.
             # (Skip because it's done in other testers.)
+            $parseOK = $true
         }
     } else {
         if ($parseOk -and (Test-Path $TreeFile)) {
