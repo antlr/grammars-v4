@@ -30,7 +30,7 @@ options {
 }
 
 sql_script
-    : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
+    : ((sql_plus_command | unit_statement) SEMICOLON?)* EOF
     ;
 
 unit_statement
