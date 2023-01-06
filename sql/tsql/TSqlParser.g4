@@ -4202,7 +4202,7 @@ built_in_functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/round-transact-sql?view=sql-server-ver16
     | ROUND '(' numeric_expression=expression ',' length=expression (',' function=expression)? ')' #ROUND
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/sign-transact-sql?view=sql-server-ver16
-    | SIGN '(' numeric_expression=expression ')' #SIGN
+    | SIGN '(' numeric_expression=expression ')' #MATH_SIGN
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/sin-transact-sql?view=sql-server-ver16
     | SIN '(' float_expression=expression ')' #SIN
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/sqrt-transact-sql?view=sql-server-ver16
