@@ -39,14 +39,7 @@ function Test-Case {
         if (!$parseOk) {
             Write-Host "Expected."
             # Confirm that the errors we received are the ones we expected.
-            $expectedData = (Get-Content $errorFile -Encoding UTF8) -join "" -replace "\r\n",""
-            $actualData = (Get-Content $parseOutFile -Encoding UTF8) -join "" -replace "\r\n",""
-            $parseOk = ($actualData -eq $expectedData)
-            if ($parseOk) {
-                Write-Host "Error list match succeeded."
-            } else {
-                Write-Host "Expected error list match." -ForegroundColor Red
-            }
+            # (Skip because it's done in other testers.)
         }
     } else {
         if ($parseOk -and (Test-Path $TreeFile)) {
