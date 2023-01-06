@@ -4367,8 +4367,8 @@ sql_plus_command
 
 whenever_command
     : WHENEVER (SQLERROR | OSERROR)
-         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name) (COMMIT | ROLLBACK)
-         | CONTINUE (COMMIT | ROLLBACK | NONE))
+         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name) (COMMIT | ROLLBACK)?
+         | CONTINUE (COMMIT | ROLLBACK | NONE)?)
     ;
 
 set_command
