@@ -2869,17 +2869,18 @@ execute_body_batch
 
 //https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
-    : (return_status=LOCAL_ID '=')? (default_execute_procedures | func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
+    : (return_status=LOCAL_ID '=')? (database_engine_stored_procedures | func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
     | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
     ;
 
- default_execute_procedures
-     : (server=id_ '.')? (database=id_ '.')? (schema=id_ '.')? procedure=default_execute_procedures_names
-     ;
+// https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/database-engine-stored-procedures-transact-sql?view=sql-server-ver16
+database_engine_stored_procedures
+    : (server=id_ '.')? (database=id_ '.')? (schema=id_ '.')? procedure=database_engine_stored_procedures_names
+    ;
 
- default_execute_procedures_names
-     : SP_EXECUTESQL
-     ;
+database_engine_stored_procedures_names
+    : SP_EXECUTESQL
+    ;
 
 execute_statement_arg
     :
