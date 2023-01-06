@@ -2869,9 +2869,17 @@ execute_body_batch
 
 //https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
-    : (return_status=LOCAL_ID '=')? (func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
+    : (return_status=LOCAL_ID '=')? (default_execute_procedures | func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
     | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
     ;
+
+ default_execute_procedures
+     : (server=id_ '.')? (database=id_ '.')? (schema=id_ '.')? procedure=default_execute_procedures_names
+     ;
+
+ default_execute_procedures_names
+     : SP_EXECUTESQL
+     ;
 
 execute_statement_arg
     :
@@ -3710,7 +3718,13 @@ select_list_elem
     ;
 
 table_sources
-    : source+=table_source (',' source+=table_source)*
+    : non_ansi_join
+    | source+=table_source (',' source+=table_source)*
+    ;
+
+// https://sqlenlight.com/support/help/sa0006/
+non_ansi_join
+    : source+=table_source (',' source+=table_source)+
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql
@@ -4070,30 +4084,73 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Date functions
     //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
-    | CURRENT_DATE '(' ')'                                     #CURRENT_DATE
+    | CURRENT_DATE '(' ')'                              #CURRENT_DATE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
     | CURRENT_TIMESTAMP                                 #CURRENT_TIMESTAMP
-    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER                                      #CURRENT_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/current-timezone-transact-sql?view=sql-server-ver16
+    | CURRENT_TIMEZONE '(' ')'                          #CURRENT_TIMEZONE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/current-timezone-id-transact-sql?view=sql-server-ver16
+    | CURRENT_TIMEZONE_ID '(' ')'                       #CURRENT_TIMEZONE_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/date-bucket-transact-sql?view=sql-server-ver16
+    | DATE_BUCKET '(' datepart=ID ',' number=expression ',' date=expression (',' origin=expression)? ')' #DATE_BUCKET
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
     | DATEADD '(' datepart=ID ',' number=expression ',' date=expression ')'  #DATEADD
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
     | DATEDIFF '(' datepart=ID ',' date_first=expression ',' date_second=expression ')' #DATEDIFF
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datediff-big-transact-sql?view=sql-server-ver16
+    | DATEDIFF_BIG '(' datepart=ID ',' startdate=expression ',' enddate=expression ')' #DATEDIFF_BIG
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datefromparts-transact-sql?view=sql-server-ver16
+    | DATEFROMPARTS '(' year=expression ',' month=expression ',' day=expression ')'#DATEFROMPARTS
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
     | DATENAME '(' datepart=ID ',' date=expression ')'                #DATENAME
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
     | DATEPART '(' datepart=ID ',' date=expression ')'                #DATEPART
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetime2fromparts-transact-sql?view=sql-server-ver16
+    | DATETIME2FROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ',' seconds=expression ',' fractions=expression ',' precision=expression ')' #DATETIME2FROMPARTS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetimefromparts-transact-sql?view=sql-server-ver16
+    | DATETIMEFROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ',' seconds=expression ',' milliseconds=expression ')' #DATETIMEFROMPARTS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetimeoffsetfromparts-transact-sql?view=sql-server-ver16
+    | DATETIMEOFFSETFROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ',' seconds=expression ',' fractions=expression ',' hour_offset=expression ',' minute_offset=expression ',' precision=DECIMAL ')' #DATETIMEOFFSETFROMPARTS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetrunc-transact-sql?view=sql-server-ver16
+    | DATETRUNC '(' datepart=ID ',' date=expression ')' #DATETRUNC
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/day-transact-sql?view=sql-server-ver16
+    | DAY '(' date=expression ')' #DAY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/eomonth-transact-sql?view=sql-server-ver16
+    | EOMONTH '(' start_date=expression (',' month_to_add=expression)? ')'#EOMONTH
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
     | GETDATE '(' ')'                                   #GETDATE
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
     | GETUTCDATE '(' ')'                                #GETUTCDATE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/isdate-transact-sql?view=sql-server-ver16
+    | ISDATE '(' expression ')' #ISDATE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/month-transact-sql?view=sql-server-ver16
+    | MONTH '(' date=expression ')' #MONTH
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/smalldatetimefromparts-transact-sql?view=sql-server-ver16
+    | SMALLDATETIMEFROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ')' #SMALLDATETIMEFROMPARTS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/switchoffset-transact-sql?view=sql-server-ver16
+    | SWITCHOFFSET '(' datetimeoffset_expression=expression ',' timezoneoffset_expression=expression ')' #SWITCHOFFSET
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sysdatetime-transact-sql?view=sql-server-ver16
+    | SYSDATETIME '(' ')' #SYSDATETIME
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sysdatetimeoffset-transact-sql?view=sql-server-ver16
+    | SYSDATETIMEOFFSET '(' ')' #SYSDATETIMEOFFSET
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sysutcdatetime-transact-sql?view=sql-server-ver16
+    | SYSUTCDATETIME '(' ')' #SYSUTCDATETIME
+    //https://learn.microsoft.com/en-us/sql/t-sql/functions/timefromparts-transact-sql?view=sql-server-ver16
+    | TIMEFROMPARTS '(' hour=expression ',' minute=expression ',' seconds=expression ',' fractions=expression ',' precision=DECIMAL ')' #TIMEFROMPARTS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/todatetimeoffset-transact-sql?view=sql-server-ver16
+    | TODATETIMEOFFSET '(' datetime_expression=expression ',' timezoneoffset_expression=expression ')' #TODATETIMEOFFSET
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/year-transact-sql?view=sql-server-ver16
+    | YEAR '(' date=expression ')' #YEAR
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
     | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'                                                           #IDENTITY
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
     | MIN_ACTIVE_ROWVERSION '(' ')'                     #MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' left=expression ',' right=expression ')'          #NULLIF
+    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
+    | CURRENT_USER                                      #CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER                                      #SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
@@ -4106,6 +4163,53 @@ built_in_functions
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
+    // Math functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/abs-transact-sql?view=sql-server-ver16
+    | ABS '(' numeric_expression=expression ')' #ABS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/acos-transact-sql?view=sql-server-ver16
+    | ACOS '(' float_expression=expression ')' #ACOS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/asin-transact-sql?view=sql-server-ver16
+    | ASIN '(' float_expression=expression ')' #ASIN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/atan-transact-sql?view=sql-server-ver16
+    | ATAN '(' float_expression=expression ')' #ATAN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/atn2-transact-sql?view=sql-server-ver16
+    | ATN2 '(' float_expression=expression ',' float_expression=expression ')' #ATN2
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ceiling-transact-sql?view=sql-server-ver16
+    | CEILING '(' numeric_expression=expression ')' #CEILING
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cos-transact-sql?view=sql-server-ver16
+    | COS '(' float_expression=expression ')' #COS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cot-transact-sql?view=sql-server-ver16
+    | COT '(' float_expression=expression ')' #COT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/degrees-transact-sql?view=sql-server-ver16
+    | DEGREES '(' numeric_expression=expression ')' #DEGREES
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/exp-transact-sql?view=sql-server-ver16
+    | EXP '(' float_expression=expression ')' #EXP
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/floor-transact-sql?view=sql-server-ver16
+    | FLOOR '(' numeric_expression=expression ')' #FLOOR
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/log-transact-sql?view=sql-server-ver16
+    | LOG '(' float_expression=expression (',' base=expression)? ')' #LOG
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/log10-transact-sql?view=sql-server-ver16
+    | LOG10 '(' float_expression=expression ')' #LOG10
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/pi-transact-sql?view=sql-server-ver16
+    | PI '(' ')' #PI
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/power-transact-sql?view=sql-server-ver16
+    | POWER '(' float_expression=expression ',' y=expression ')' #POWER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/radians-transact-sql?view=sql-server-ver16
+    | RADIANS '(' numeric_expression=expression ')' #RADIANS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/rand-transact-sql?view=sql-server-ver16
+    | RAND '(' (seed=expression)? ')' #RAND
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/round-transact-sql?view=sql-server-ver16
+    | ROUND '(' numeric_expression=expression ',' length=expression (',' function=expression)? ')' #ROUND
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sign-transact-sql?view=sql-server-ver16
+    | SIGN '(' numeric_expression=expression ')' #SIGN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sin-transact-sql?view=sql-server-ver16
+    | SIN '(' float_expression=expression ')' #SIN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sqrt-transact-sql?view=sql-server-ver16
+    | SQRT '(' float_expression=expression ')' #SQRT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/square-transact-sql?view=sql-server-ver16
+    | SQUARE '(' float_expression=expression ')' #SQUARE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/tan-transact-sql?view=sql-server-ver16
+    | TAN '(' float_expression=expression ')' #TAN
     ;
 
 xml_data_type_methods
@@ -4386,14 +4490,38 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
+    : temp_full_table_name
+    | persist_full_table_name
+    ;
+
+persist_full_table_name
     : (linkedServer=id_ '.' '.' schema=id_   '.'
     |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
     |                                         database=id_ '.' (schema=id_)? '.'
     |                                                           schema=id_    '.')? table=id_
     ;
 
+// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
+temp_full_table_name
+    : (linkedServer=id_ '.' '.' schema=id_   '.'
+    |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
+    |                                         database=id_ '.' (schema=id_)? '.'
+    |                                                           schema=id_    '.')? table=TEMP_ID
+    ;
+
 table_name
+    : temp_table_name
+    | persist_table_name
+    ;
+
+persist_table_name
     : (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? table=id_
+    | (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? blocking_hierarchy=BLOCKING_HIERARCHY
+    ;
+
+// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
+temp_table_name
+    : (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? table=TEMP_ID
     | (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? blocking_hierarchy=BLOCKING_HIERARCHY
     ;
 
@@ -5374,6 +5502,53 @@ keyword
     | WITNESS
     | XACT_ABORT
     | XACT_STATE
+    //
+    | ABS
+    | ACOS
+    | ASIN
+    | ATAN
+    | ATN2
+    | CEILING
+    | COS
+    | COT
+    | DEGREES
+    | EXP
+    | FLOOR
+    | LOG10
+    | PI
+    | POWER
+    | RADIANS
+    | RAND
+    | ROUND
+    | SIGN
+    | SIN
+    | SQRT
+    | SQUARE
+    | TAN
+    //
+    | CURRENT_TIMEZONE
+    | CURRENT_TIMEZONE_ID
+    | DATE_BUCKET
+    | DATEDIFF_BIG
+    | DATEFROMPARTS
+    | DATETIME2FROMPARTS
+    | DATETIMEFROMPARTS
+    | DATETIMEOFFSETFROMPARTS
+    | DATETRUNC
+    | DAY
+    | EOMONTH
+    | ISDATE
+    | MONTH
+    | SMALLDATETIMEFROMPARTS
+    | SWITCHOFFSET
+    | SYSDATETIME
+    | SYSDATETIMEOFFSET
+    | SYSUTCDATETIME
+    | TIMEFROMPARTS
+    | TODATETIMEOFFSET
+    | YEAR
+    //
+    | SP_EXECUTESQL
     //Build-ins:
     | VARCHAR
     | NVARCHAR
@@ -5383,6 +5558,7 @@ keyword
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
 id_
     : ID
+    | TEMP_ID
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | SQUARE_BRACKET_ID
