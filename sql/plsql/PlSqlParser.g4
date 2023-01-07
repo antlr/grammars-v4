@@ -92,6 +92,7 @@ unit_statement
     | drop_library
     | drop_package
     | drop_procedure
+    | drop_materialized_view
     | drop_materialized_zonemap
     | drop_rollback_segment
     | drop_role
@@ -1827,6 +1828,11 @@ create_mv_refresh
          | USING (ENFORCED | TRUSTED) CONSTRAINTS
          )+
       )
+    ;
+
+drop_materialized_view
+    : DROP MATERIALIZED VIEW tableview_name (PRESERVE TABLE)?
+        ';'
     ;
 
 create_context
