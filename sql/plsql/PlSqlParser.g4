@@ -30,7 +30,7 @@ options {
 }
 
 sql_script
-    : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
+    : ((sql_plus_command | unit_statement) SEMICOLON?)* EOF
     ;
 
 unit_statement
@@ -4373,8 +4373,8 @@ sql_plus_command
 
 whenever_command
     : WHENEVER (SQLERROR | OSERROR)
-         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name) (COMMIT | ROLLBACK)
-         | CONTINUE (COMMIT | ROLLBACK | NONE))
+         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name | numeric) (COMMIT | ROLLBACK)?
+         | CONTINUE (COMMIT | ROLLBACK | NONE)?)
     ;
 
 set_command
