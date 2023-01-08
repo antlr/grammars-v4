@@ -5,19 +5,19 @@ CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) \
-    cli.dart
+    Test.dart
 default: setup classes
 setup:
 	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	dart pub get
-	dart compile exe cli.dart
+	dart compile exe Test.dart
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 	rm -f pubspec.lock
 run:
-	trwdog <if(os_win)>dart.bat<else>dart<endif> run cli.dart $(RUNARGS)
+	@trwdog Test.exe $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Dart <antlr_tool_args:{y | <y> } > $\<
 } >
