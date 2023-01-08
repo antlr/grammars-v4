@@ -56,10 +56,6 @@ function Test-Grammar {
     Set-Location $Directory
 
     $failStage = [FailStage]::Success
-    $hasTest = Test-Path "./examples"
-    if ($hasTest) {
-        $testDir = Resolve-Path "./examples"
-    }
     
     $success = $true
     $start = Get-Date
@@ -95,19 +91,16 @@ function Test-Grammar {
     # build
 
     # see _scripts/templates/*/tester.psm1
-    Import-Module ./tester.psm1
+    ./builder.ps1
+    $buildResult = $LASTEXITCODE
 
-    $buildResult = Build-Grammar
-
-    if (!$buildResult.Success) {
+    if ($buildResult -ne 0) {
         $failStage = [FailStage]::Compile
         Write-Host "Build failed" -ForegroundColor Red
-        Write-Host $buildResult.Message
     }
 
     Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     if ($failStage -ne [FailStage]::Success) {
-        Remove-Module tester
         Set-Location $cwd
         return @{
             Success     = $false
@@ -118,77 +111,22 @@ function Test-Grammar {
 
     # test
     $start2 = Get-Date
-    Write-Host "Testing"
-    $failedList = @()
-    if ($hasTest) {
-        $failedList = Test-GrammarTestCases -TestDirectory $testDir
-        if ($failedList.Length -gt 0) {
-            $success = $false
-            $failStage = [FailStage]::Test
-        }
+    Write-Host "--- Testing files ---"
+    ./tester.ps1
+    $passed = $LASTEXITCODE -eq 0
+
+    if (! $passed) {
+        $success = $false
+        $failStage = [FailStage]::Test
     }
 
     Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
-    Remove-Module tester
     Set-Location $cwd
     return @{
         Success     = $success
         Stage       = $failStage
         FailedCases = $failedList
     }
-}
-
-function Test-GrammarTestCases {
-    param (
-        $TestDirectory
-    )
-    $failedList = @()
-    Write-Host "Test cases here: $TestDirectory"
-    foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-
-        Write-Host "Test case: $item"
-
-        $case = $item.fullname
-        $ext = $item.Extension
-        if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
-            continue
-        }
-        if (Test-Path $case -PathType Container) {
-            continue
-        }
-
-        $errorFile = "$case.errors"
-        $shouldFail = Test-Path $errorFile
-        if (!$shouldFail) {
-            $errorFile = ""
-        }
-        $treeFile = "$case.tree"
-        Write-Host "--- Testing file $item ---"
-        $parseOk, $treeMatch = Test-Case -InputFile $case -ErrorFile $errorFile -TreeFile $treeFile
-
-        if (!$parseOk) {
-            if ($shouldFail) {
-                Write-Host "Test case should return error"
-                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
-                $failedList += $case
-                continue
-            }
-            else { 
-                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
-                $failedList += $case
-                continue
-            }
-        }
-        if (Test-Path $treeFile) {
-			if ($treeMatch) {
-				Write-Host "Parse tree match succeeded"
-			} else {
-				Write-Host "$TestDirectory test $case parse tree match failed" -ForegroundColor Red
-				$failedList += $case
-			}
-        }
-    }
-    return $failedList
 }
 
 function Get-Grammars {
