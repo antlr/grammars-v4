@@ -91,7 +91,7 @@ function Test-Grammar {
     # build
 
     # see _scripts/templates/*/tester.psm1
-    ./builder.ps1
+    ./build.ps1
     $buildResult = $LASTEXITCODE
 
     if ($buildResult -ne 0) {
@@ -112,7 +112,7 @@ function Test-Grammar {
     # test
     $start2 = Get-Date
     Write-Host "--- Testing files ---"
-    ./tester.ps1
+    ./test.ps1
     $passed = $LASTEXITCODE -eq 0
 
     if (! $passed) {

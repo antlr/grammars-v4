@@ -37,6 +37,7 @@ function Test-Case {
     }
     if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
         Write-Host "No test cases provided."
+        $err = 0
     } else {
 
         # Parse
