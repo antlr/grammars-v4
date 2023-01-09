@@ -103,27 +103,22 @@ public class Program
             if (args[i].Equals("-profile"))
             {
                 show_profile = true;
-                continue;
             }
             else if (args[i].Equals("-tokens"))
             {
                 show_tokens = true;
-                continue;
             }
             else if (args[i].Equals("-two-byte"))
             {
                 two_byte = true;
-                continue;
             }
             else if (args[i].Equals("-old"))
             {
                 old = true;
-                continue;
             }
             else if (args[i].Equals("-tree"))
             {
                 show_tree = true;
-                continue;
             }
             else if (args[i].Equals("-prefix"))
             {
@@ -137,7 +132,6 @@ public class Program
             else if (args[i].Equals("-shunt"))
             {
                 shunt_output = true;
-                continue;
             }
             else if (args[i].Equals("-encoding"))
             {

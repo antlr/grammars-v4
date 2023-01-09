@@ -41,8 +41,7 @@ function Test-Case {
     } else {
 
         # Parse
-        get-content "tests.txt" | trwdog dotnet run -x -shunt -tree
-        $status = $LASTEXITCODE
+        $(& get-content "tests.txt" | trwdog dotnet run -x -shunt -tree ; $parse_exit = $statis ) | Write-Host
 
         Write-Host "exit code $status"
 
@@ -87,13 +86,16 @@ function Test-Case {
             $err = 1
         } else {
             $err = 0
+            Write-Host "OK. $err"
         }
     }
+    Write-Host "err $err"
     return $err
 }
 
 $ret = Test-Case
-if ("$ret" -eq "0")
+Write-Host "ret $ret"
+if ($ret -eq 0)
 {
     Write-Host "Test succeeded."
     exit 0

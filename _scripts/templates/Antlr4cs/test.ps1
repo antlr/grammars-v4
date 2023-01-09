@@ -19,11 +19,11 @@ function Test-Case {
         if (Test-Path $file -PathType Container) {
             continue
         } elseif ($ext -eq ".errors") {
-			$text = Get-content $file
-			if ( [String]::IsNullOrWhiteSpace($text)) {
-			} else {
-				$before_parse_errors.Add($item)
-			}
+                        $text = Get-content $file
+                        if ( [String]::IsNullOrWhiteSpace($text)) {
+                        } else {
+                                $before_parse_errors.Add($item)
+                        }
             continue
         } elseif ($ext -eq ".tree") {
             continue
@@ -41,8 +41,7 @@ function Test-Case {
     } else {
 
         # Parse
-        get-content "tests.txt" | trwdog dotnet run -x -shunt -tree
-        $status = $LASTEXITCODE
+        $(& get-content "tests.txt" | trwdog dotnet run -x -shunt -tree ; $parse_exit = $statis ) | Write-Host
 
         Write-Host "exit code $status"
 
@@ -53,7 +52,7 @@ function Test-Case {
             if ($ext -eq ".errors") {
                 $text = Get-content $file
                 if ( [String]::IsNullOrWhiteSpace($text)) {
-				} else {
+                                } else {
                     $after_parse_errors.Add($item)
                     ((Get-Content $file) -join "`n") + "`n" | Set-Content -NoNewline $file
                 }
@@ -63,12 +62,12 @@ function Test-Case {
 
         $message = git diff --exit-code --name-only .
         $diffs = $LASTEXITCODE
-		Write-Host "git exited $diffs"
+                Write-Host "git exited $diffs"
 
-		Write-Host "Before $before_parse_errors"
-		Write-Host "After $after_parse_errors"
-		$b = -join $before_parse_errors.ToArray()
-		$a = -join $before_parse_errors.ToArray()
+                Write-Host "Before $before_parse_errors"
+                Write-Host "After $after_parse_errors"
+                $b = -join $before_parse_errors.ToArray()
+                $a = -join $before_parse_errors.ToArray()
 
         if ( $diffs -eq 129 ) {
             Write-Host "Grammar outside a git repository."
@@ -87,13 +86,16 @@ function Test-Case {
             $err = 1
         } else {
             $err = 0
+            Write-Host "OK. $err"
         }
     }
+    Write-Host "err $err"
     return $err
 }
 
 $ret = Test-Case
-if ("$ret" -eq "0")
+Write-Host "ret $ret"
+if ($ret -eq 0)
 {
     Write-Host "Test succeeded."
     exit 0

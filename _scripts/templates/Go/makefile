@@ -18,7 +18,7 @@ clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 run:
-	trwdog ./<exec_name> $(RUNARGS)
+	@trwdog ./<exec_name> $(RUNARGS)
 test: FORCE
 	bash test.sh
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>

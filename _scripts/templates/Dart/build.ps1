@@ -1,6 +1,6 @@
 # Template generated code from trgen <version>
 <tool_grammar_files:{x |
-$(& antlr <x> -Dlanguage=Dart <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& java -jar <antlr_tool_path> <x> -encoding <antlr_encoding> -Dlanguage=Dart <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

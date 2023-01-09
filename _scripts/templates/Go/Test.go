@@ -6,23 +6,31 @@ import (
     "os"
     "io"
     "time"
+    "strconv"
+    "bufio"
     "github.com/antlr/antlr4/runtime/Go/antlr/v4"
     "example.com/myparser/<package_name>"
-<if (case_insensitive_type)>
-    "example.com/myparser/antlr_resource"
-<endif>
 )
 type CustomErrorListener struct {
     errors int
+    quiet bool
+    output io.Writer
 }
 
-func NewCustomErrorListener() *CustomErrorListener {
-    return new(CustomErrorListener)
+func NewCustomErrorListener(q bool, o io.Writer) *CustomErrorListener {
+    p := new(CustomErrorListener)
+    p.quiet = q
+    p.errors = 0
+    p.output = o
+    return p
 }
 
-func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line int, column int, msg string, e antlr.RecognitionException) {
     l.errors += 1
-    fmt.Printf("line %d:%d %s", line, column, msg)
+    if ! l.quiet {
+        fmt.Fprintf(l.output, "line %d:%d %s", line, column, msg)
+	fmt.Fprintln(l.output)
+    }
 }
 
 func (l *CustomErrorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
@@ -37,47 +45,98 @@ func (l *CustomErrorListener) ReportContextSensitivity(recognizer antlr.Parser, 
     antlr.ConsoleErrorListenerINSTANCE.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
 }
 
+var inputs = make([]string, 0)
+var is_fns = make([]bool, 0)
+var error_code int = 0
+var show_tree = false
+var show_tokens = false
+var show_trace = false
+var string_instance = 0
+var prefix = ""
+var quiet = false
+var shunt_output = false
 
 func main() {
-    var show_tree = false
-    var show_tokens = false
-    var file_name = ""
-    var input = ""
-    var str antlr.CharStream = nil
-    for i := 0; i \< len(os.Args); i = i + 1 {
+    for i := 1; i \< len(os.Args); i = i + 1 {
         if os.Args[i] == "-tokens" {
             show_tokens = true
-            continue
         } else if os.Args[i] == "-tree" {
             show_tree = true
-            continue
+        } else if os.Args[i] == "-prefix" {
+            i = i + 1
+            prefix = os.Args[i] + " ";
         } else if os.Args[i] == "-input" {
             i = i + 1
-            input = os.Args[i]
-        } else if os.Args[i] == "-file" {
-            i = i + 1
-            file_name = os.Args[i]
-        }
-    }
-    if input == "" && file_name == "" {
-        var b []byte = make([]byte, 1)
-        var st = ""
-        for {
-            _, err := os.Stdin.Read(b)
-            if err == io.EOF {
-                break
+            inputs = append(inputs, os.Args[i])
+            is_fns = append(is_fns, false)
+        } else if os.Args[i] == "-shunt" {
+            shunt_output = true
+        } else if os.Args[i] == "-x" {
+            scanner := bufio.NewScanner(os.Stdin)
+            for scanner.Scan() {
+                line := scanner.Text()
+                inputs = append(inputs, line)
+                is_fns = append(is_fns, true)
             }
-            st = st + string(b)
+        } else if os.Args[i] == "-q" {
+            quiet = true
+        } else if os.Args[i] == "-trace" {
+            show_trace = true
+        } else {
+            inputs = append(inputs, os.Args[i])
+            is_fns = append(is_fns, true)
         }
-        str = antlr.NewInputStream(st)
-    } else if input != "" {
-        str = antlr.NewInputStream(input)
-    } else if file_name != "" {
-        str, _ = antlr.NewFileStream(file_name);        
     }
-<if (case_insensitive_type)>
-    str = antlr_resource.NewCaseChangingStream(str, "<case_insensitive_type>" == "Upper");
-<endif>
+    if len(inputs) == 0 {
+        ParseStdin()
+    } else {
+        start := time.Now()
+        for i := 0; i \< len(inputs); i = i + 1 {
+            if is_fns[i] {
+                ParseFilename(inputs[i], i)
+            } else {
+                ParseString(inputs[i], i)
+            }
+        }
+        elapsed := time.Since(start)
+        fmt.Fprintf(os.Stderr, "Total Time: %.3f s", elapsed.Seconds())
+        fmt.Fprintln(os.Stderr)
+    }
+    if error_code != 0 {
+        os.Exit(1)
+    } else {
+        os.Exit(0)
+    }
+}
+
+func ParseStdin() {
+    var b []byte = make([]byte, 1)
+    var st = ""
+    for {
+        _, err := os.Stdin.Read(b)
+        if err == io.EOF {
+            break
+        }
+        st = st + string(b)
+    }
+    var str antlr.CharStream = nil
+    str = antlr.NewInputStream(st)
+    DoParse(str, "stdin", 0)
+}
+
+func ParseString(input string, row_number int) {
+    str := antlr.NewInputStream(input)
+    DoParse(str, "string" + strconv.Itoa(string_instance), row_number)
+    string_instance = string_instance + 1
+}
+
+func ParseFilename(input string, row_number int) {
+    var str antlr.CharStream = nil
+    str, _ = antlr.NewFileStream(input)        
+    DoParse(str, input, row_number)
+}
+
+func DoParse(str antlr.CharStream, input_name string, row_number int) {
     var lexer = <go_lexer_name>(str);
     if show_tokens {
         j := 0
@@ -98,32 +157,59 @@ func main() {
     var tokens = antlr.NewCommonTokenStream(lexer, 0)
     var parser = <go_parser_name>(tokens)
 
-    lexerErrors := &CustomErrorListener{}
+    var (
+        output io.Writer
+    )
+    if shunt_output {
+        f, _ := os.Create(input_name + ".errors")
+        defer f.Close()
+        output = bufio.NewWriter(f)
+    } else {
+        output = os.Stdout
+    }
+
+    lexerErrors := NewCustomErrorListener(quiet, output)
     lexer.RemoveErrorListeners()
     lexer.AddErrorListener(lexerErrors)
 
-    parserErrors := &CustomErrorListener{}
+    parserErrors := NewCustomErrorListener(quiet, output)
     parser.RemoveErrorListeners()
     parser.AddErrorListener(parserErrors)
 
+    if show_trace {
+        //parser.SetTrace(true)
+        //antlr.ParserATNSimulatorTraceATNSim = true
+    }
     // mutated name--not lowercase.
     start := time.Now()
     var tree = parser.<cap_start_symbol>()
     elapsed := time.Since(start)
-    fmt.Fprintf(os.Stderr, "Time: %.3f s", elapsed.Seconds())
-    fmt.Fprintln(os.Stderr)
+    var result = ""
     if parserErrors.errors > 0 || lexerErrors.errors > 0 {
-        fmt.Fprintln(os.Stderr, "Parse failed.");
+        result = "fail"
+        error_code = 1
     } else {
-        fmt.Fprintln(os.Stderr, "Parse succeeded.")
-        if show_tree {
-            ss := tree.ToStringTree(parser.RuleNames, parser)
+        result = "success"
+    }
+    if show_tree {
+        ss := tree.ToStringTree(parser.RuleNames, parser)
+        if shunt_output {
+            f, _ := os.Create(input_name + ".tree")
+            defer f.Close()
+            w := bufio.NewWriter(f)
+            fmt.Fprintln(w, ss)
+            w.Flush()
+        } else {
             fmt.Println(ss)
         }
     }
-    if parserErrors.errors > 0 || lexerErrors.errors > 0 {
-        os.Exit(1)
-    } else {
-        os.Exit(0)
+    if ! quiet {
+        fmt.Fprintf(os.Stderr, "%s", prefix)
+        fmt.Fprintf(os.Stderr, "Go ")
+        fmt.Fprintf(os.Stderr, "%d ", row_number)
+        fmt.Fprintf(os.Stderr, "%s ", input_name)
+        fmt.Fprintf(os.Stderr, "%s ", result)
+        fmt.Fprintf(os.Stderr, "%.3f", elapsed.Seconds())
+        fmt.Fprintln(os.Stderr)
     }
 }
