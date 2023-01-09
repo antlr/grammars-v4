@@ -2647,7 +2647,7 @@ role_identified_clause
     ;
 
 alter_table
-    : ALTER TABLE tableview_name memoptimize_read_clause? memoptimize_write_clause?
+    : ALTER TABLE tableview_name memoptimize_read_write_clause*
       (
       | alter_table_properties
       | constraint_clauses
@@ -2660,12 +2660,8 @@ alter_table
       ';'
     ;
 
-memoptimize_read_clause
-    : NO? MEMOPTIMIZE FOR READ
-    ;
-
-memoptimize_write_clause
-    : NO? MEMOPTIMIZE FOR WRITE
+memoptimize_read_write_clause
+    : NO? MEMOPTIMIZE FOR (READ | WRITE)
     ;
 
 alter_table_properties
