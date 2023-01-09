@@ -1,40 +1,98 @@
 # Template generated code from trgen <version>
 function Test-Case {
+
+    # There's no "find" and "grep" per se in Powershell, but functions that offer
+    # similar behavior.
+
     $TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
     Write-Host "Test cases here: $TestDirectory"
     if (Test-Path -Path "tests.txt" -PathType Leaf) {
         Remove-Item "tests.txt"
     }
+    $files = New-Object System.Collections.Generic.List[string]
+    $before_parse_errors = New-Object System.Collections.Generic.List[string]
+    $after_parse_errors = New-Object System.Collections.Generic.List[string]
+
     foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-        $case = $item.fullname
+        $file = $item.fullname
         $ext = $item.Extension
-        if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
-            $shouldFail = $true
+        if (Test-Path $file -PathType Container) {
             continue
-        }
-        if (Test-Path $case -PathType Container) {
+        } elseif ($ext -eq ".errors") {
+			$text = Get-content $file
+			if ( [String]::IsNullOrWhiteSpace($text)) {
+			} else {
+				$before_parse_errors.Add($item)
+			}
             continue
+        } elseif ($ext -eq ".tree") {
+            continue
+        } else {
+            $files.Add($item)
+            Write-Host "Test case: $item"
         }
-        Write-Host "Test case: $item"
-        Add-Content "tests.txt" $case
+    }
+    foreach ($file in $files) {
+        Add-Content "tests.txt" $file
     }
     if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
         Write-Host "No test cases provided."
-    }
-    else {
+    } else {
+
+        # Parse
         get-content "tests.txt" | trwdog dotnet run -x -shunt -tree
         $status = $LASTEXITCODE
+
         Write-Host "exit code $status"
-        $parseOk = $status -eq 0
-        if ( ! $parseOK )
-        {
-            Write-Host "Driver program returned non-zero exit code $exitcode."
+
+        $os = (Get-WMIObject win32_operatingsystem).name
+        foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
+            $file = $item.fullname
+            $ext = $item.Extension
+            if ($ext -eq ".errors") {
+                $text = Get-content $file
+                if ( [String]::IsNullOrWhiteSpace($text)) {
+				} else {
+                    $after_parse_errors.Add($item)
+                    ((Get-Content $file) -join "`n") + "`n" | Set-Content -NoNewline $file
+                }
+                continue
+            }
+        }
+
+        $message = git diff --exit-code --name-only .
+        $diffs = $LASTEXITCODE
+		Write-Host "git exited $diffs"
+
+		Write-Host "Before $before_parse_errors"
+		Write-Host "After $after_parse_errors"
+		$b = -join $before_parse_errors.ToArray()
+		$a = -join $before_parse_errors.ToArray()
+
+        if ( $diffs -eq 129 ) {
+            Write-Host "Grammar outside a git repository."
+            Write-Host "Defaulting to exit code of group parse."
+            $err = $status
+        } elseif ( $diffs -eq 1 ) {
+            Write-Host $message
+            Write-Host "Difference in output. Failed."
+            $err = 1
+        } elseif ( $a -ne $b ) {
+            foreach ($item in $after_parse_errors) {
+                $text = Get-Content $file
+                Write-Host $text
+            }
+            Write-Host "Difference in output. Failed."
+            $err = 1
+        } else {
+            $err = 0
         }
     }
-    return $parseOk
+    return $err
 }
 
-if (Test-Case)
+$ret = Test-Case
+if ("$ret" -eq "0")
 {
     exit 0
 }
