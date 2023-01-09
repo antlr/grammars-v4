@@ -1,35 +1,33 @@
+// Template generated code from trgen <version>
+
+using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
 <if(has_name_space)>namespace <name_space>
 {<endif>
-    public class ErrorListener<Symbol> : IAntlrErrorListener<Symbol>
+    public class ErrorListener\<S> : IAntlrErrorListener\<S>
     {
-        /// <summary>
-        /// Provides a default instance of
-        /// <see cref="ErrorListener{Symbol}"/>
-        /// .
-        /// </summary>
-        public static readonly ErrorListener<Symbol> Instance = new ErrorListener<Symbol>();
+        public bool had_error;
+        bool _quiet;
+        TextWriter _out;
 
-        /// <summary>
-        /// <inheritDoc/>
-        /// <p>
-        /// This implementation prints messages to
-        /// <see cref="System.Console.Out"/>
-        /// containing the
-        /// values of
-        /// <paramref name="line"/>
-        /// ,
-        /// <paramref name="charPositionInLine"/>
-        /// , and
-        /// <paramref name="msg"/>
-        /// using
-        /// the following format.</p>
-        /// <pre>
-        /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
-        /// </pre>
-        /// </summary>
-        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        public ErrorListener(bool quiet, TextWriter @out)
         {
-            System.Console.Out.WriteLine("line " + line + ":" + charPositionInLine + " " + msg);
+            _quiet = quiet;
+            _out = @out;
+        }
+
+        public virtual void SyntaxError(IRecognizer recognizer, S offendingSymbol, int line, int col, string msg, RecognitionException e)
+        {
+            had_error = true;
+            if (!_quiet)
+            {
+                _out.WriteLine("line " + line + ":" + col + " " + msg);
+            }
         }
     }
 <if(has_name_space)>}<endif>

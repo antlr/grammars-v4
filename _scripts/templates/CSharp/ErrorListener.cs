@@ -7,25 +7,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class ErrorListener\<S> : IAntlrErrorListener\< S>
-{
-    public bool had_error;
-    bool _quiet;
-    TextWriter _out;
-
-    public ErrorListener(bool quiet, TextWriter @out)
+<if(has_name_space)>namespace <name_space>
+{<endif>
+    public class ErrorListener\<S> : IAntlrErrorListener\<S>
     {
-        _quiet = quiet;
-        _out = @out;
-    }
-
-    public void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
-        int col, string msg, RecognitionException e)
-    {
-        had_error = true;
-        if (!_quiet)
+        public bool had_error;
+        bool _quiet;
+        TextWriter _out;
+    
+        public ErrorListener(bool quiet, TextWriter @out)
         {
-            _out.WriteLine("line " + line + ":" + col + " " + msg);
+            _quiet = quiet;
+            _out = @out;
+        }
+    
+        public void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
+            int col, string msg, RecognitionException e)
+        {
+            had_error = true;
+            if (!_quiet)
+            {
+                _out.WriteLine("line " + line + ":" + col + " " + msg);
+            }
         }
     }
-}
+<if(has_name_space)>}<endif>

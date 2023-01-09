@@ -41,7 +41,7 @@ function Test-Case {
     } else {
 
         # Parse
-        get-content "tests.txt" | trwdog dotnet run -x -shunt -tree
+        get-content "tests.txt" | trwdog ./Test.exe -x -shunt -tree
         $status = $LASTEXITCODE
 
         Write-Host "exit code $status"

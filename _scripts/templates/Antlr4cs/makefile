@@ -1,4 +1,4 @@
-# Template generated code from trgen <version>
+# Generated code from trgen <version>
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 default:
 	dotnet restore

@@ -43,7 +43,7 @@ then
 elif [ "$diffs" = "1" ]
 then
   cat $old/temp-output.txt
-  echo "Difference in output. Failed."
+  echo "Difference in output."
   err=1
 elif [ "$before_parse_errors" != "$after_parse_errors" ]
 then
@@ -51,9 +51,11 @@ then
   do
 	cat $f
   done
-  echo "Difference in output. Failed."
+  echo "Difference in output."
+  echo "Test failed."
   err=1
 else
+  echo "Test succeeded."
   err=0
 fi
 rm -f $old/temp-output.txt
