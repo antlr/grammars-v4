@@ -9,6 +9,7 @@ CREATE PROCEDURE createMyGlobalTables  AS
    DROP TABLE ##globalTemporary1;
    DROP TABLE ##globalTemporary2;
 
+GO
 -- Local temporary tables
 CREATE PROCEDURE createMyLocalTables  AS
     CREATE table #Color(

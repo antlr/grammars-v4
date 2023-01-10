@@ -17,3 +17,5 @@ EXECUTE sp_executesql @SQLString, @ParmDefinition,
 SET @IntVariable = 109;
 EXECUTE sp_executesql @SQLString, @ParmDefinition,
                       @BusinessEntityID = @IntVariable;
+
+GO
