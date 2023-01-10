@@ -74,7 +74,6 @@ function main() {
 				var sb = new strops.StringBuilder();
 				var ch;
 				while ((ch = getChar()) != '') {
-					console.error("read " + ch);
 					sb.Append(ch);
 				}
 				var input = sb.ToString();

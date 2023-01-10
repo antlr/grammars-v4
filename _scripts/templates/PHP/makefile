@@ -13,9 +13,11 @@ classes: $(SOURCES)
 clean:
 	rm -f *.interp
 	rm -f *.tokens
+	rm -rf vendor
+	rm -f composer.lock
 	rm -f $(GENERATED)
 run:
-	trwdog php Test.php $(RUNARGS)
+	@trwdog php -d memory_limit=1G Test.php $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=PHP <antlr_tool_args:{y | <y> } > $\<
 } >
