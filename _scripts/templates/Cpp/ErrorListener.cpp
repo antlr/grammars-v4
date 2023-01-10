@@ -2,8 +2,18 @@
 
 #include "ErrorListener.h"
 
+ErrorListener::ErrorListener(bool quiet, std::ostream* output)
+{
+    had_error = false;
+    _quiet = quiet;
+    _output = output;
+}
+
 void ErrorListener::syntaxError(antlr4::Recognizer* recognizer, antlr4::Token* offendingSymbol, size_t line, size_t col, const std::string& msg, std::exception_ptr e)
 {
     had_error = true;
-    std::cout \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
+    if (!_quiet)
+    {
+        (*_output) \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
+    }
 }

@@ -7,6 +7,7 @@
 ./Antlr4cs/test.ps1
 ./Antlr4cs/test.sh
 ./Arithmetic.g4
+./Cpp/build.ps1
 ./Cpp/CaseChangingCharStream.cpp
 ./Cpp/CaseChangingCharStream.h
 ./Cpp/cmake/antlr4-generator.cmake.in
@@ -19,10 +20,10 @@
 ./Cpp/ErrorListener.cpp
 ./Cpp/ErrorListener.h
 ./Cpp/makefile
-./Cpp/Program.cpp
 ./Cpp/readme.md
+./Cpp/Test.cpp
+./Cpp/test.ps1
 ./Cpp/test.sh
-./Cpp/tester.psm1
 ./CSharp/build.ps1
 ./CSharp/Encodings.cs
 ./CSharp/ErrorListener.cs
@@ -48,7 +49,6 @@
 ./Go/test.sh
 ./Java/CaseChangingCharStream.java
 ./Java/ErrorListener.java
-./Java/java
 ./Java/makefile
 ./Java/Program.java
 ./Java/test.sh

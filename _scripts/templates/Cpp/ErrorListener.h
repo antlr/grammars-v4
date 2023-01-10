@@ -16,6 +16,9 @@ class ErrorListener : public antlr4::ConsoleErrorListener
 {
     public:
         bool had_error;
+        bool _quiet;
+        std::ostream* _output;
     public:
+        ErrorListener(bool quiet, std::ostream* output);
         void syntaxError(antlr4::Recognizer* recognizer, antlr4::Token* offendingSymbol, size_t line, size_t col, const std::string& msg, std::exception_ptr e) override;
 };
