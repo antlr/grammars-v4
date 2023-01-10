@@ -108,6 +108,8 @@ unit_statement
     | drop_view
     | drop_index
 
+    | flashback_table
+
     | rename_object
 
     | comment_on_column
@@ -1270,6 +1272,19 @@ sql_statement_shortcut
 
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+flashback_table
+    : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
+      (
+        (( (SCN | TIMESTAMP) expression | RESTORE POINT restore_point ) ((ENABLE | DISABLE) TRIGGERS)? )
+        |
+        (BEFORE DROP (RENAME TO tableview_name)?)
+      )
+    ;
+
+restore_point
+    : identifier ('.' id_expression)*
     ;
 
 rename_object
