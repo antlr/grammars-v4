@@ -1815,16 +1815,7 @@ create_materialized_view
     ;
 
 scoped_table_ref_constraint
-    : SCOPE FOR '(' ref_column_or_attribute ')' IS 
-        (schema_name '.')? scope_table_name_or_c_alias
-    ;
-
-ref_column_or_attribute
-    : identifier
-    ;
-
-scope_table_name_or_c_alias
-    : identifier
+    : SCOPE FOR '(' identifier ')' IS (schema_name '.')? identifier
     ;
 
 mv_column_alias
