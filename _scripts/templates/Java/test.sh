@@ -3,12 +3,14 @@ err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
+JAR="<antlr_tool_path>"
+CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
+
 files=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
 before_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
 
 # Parse
-CLASSPATH=$JAR<if(path_sep_semi)>\;<else>:<endif>.
-echo "$files" | trwdog java -classpath $CLASSPATH Test -x -shunt -tree
+echo "$files" | trwdog java -classpath "$CLASSPATH" Test -x -shunt -tree
 status=$?
 
 # rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`

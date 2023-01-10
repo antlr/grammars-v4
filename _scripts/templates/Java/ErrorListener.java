@@ -4,12 +4,21 @@ import org.antlr.v4.runtime.*;
 import java.nio.charset.StandardCharsets;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class ErrorListener extends ConsoleErrorListener
 {
     public boolean had_error = false;
     private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
-    
+    private boolean quiet = false;
+    private PrintStream output = null;
+
+    public ErrorListener(boolean q, PrintStream o)
+    {
+        quiet = q;
+        output = o;
+    }
+
     @Override
     public void syntaxError(Recognizer\<?, ?> recognizer,
         Object offendingSymbol,

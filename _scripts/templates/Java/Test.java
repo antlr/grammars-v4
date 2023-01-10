@@ -10,19 +10,22 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
+import java.io.PrintStream;
+import java.io.File;
 
 public class Test {
 
-	static boolean shunt_output = false;
-	static boolean show_profile = false;
+    static boolean shunt_output = false;
+    static boolean show_profile = false;
     static boolean show_tree = false;
     static boolean show_tokens = false;
     static boolean show_trace = false;
-	static int error_code = 0;
-	static java.nio.charset.Charset charset = null;
+    static int error_code = 0;
+    static java.nio.charset.Charset charset = null;
     static int string_instance = 0;
     static String prefix = "";
-	static boolean quiet = false;
+    static boolean quiet = false;
 
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
@@ -30,11 +33,11 @@ public class Test {
         List\<String> inputs = new ArrayList\<String>();
         for (int i = 0; i \< args.length; ++i)
         {
-			if (args[i].Equals("-profile"))
-			{
-				show_profile = true;
-			}
-			else if (args[i].equals("-tokens"))
+            if (args[i].equals("-profile"))
+            {
+                show_profile = true;
+            }
+            else if (args[i].equals("-tokens"))
             {
                 show_tokens = true;
             }
@@ -50,32 +53,32 @@ public class Test {
                 inputs.add(args[++i]);
                 is_fns.add(false);
             }
-			else if (args[i].equals("-shunt"))
-			{
-				shunt_output = true;
-			}
+            else if (args[i].equals("-shunt"))
+            {
+                shunt_output = true;
+            }
             else if (args[i].equals("-encoding"))
             {
                 charset = java.nio.charset.Charset.forName(args[++i]);
             }
-			else if (args[i].equals("-x"))
-			{
-				for (; ; )
-				{
-					var line = System.Console.In.ReadLine();
-					line = line?.Trim();
-					if (line == null || line == "")
-					{
-						break;
-					}
-					inputs.Add(line);
-					is_fns.Add(true);
-				}
-			}
-			else if (args[i].equals("-q"))
-			{
-				quiet = true;
-			}
+            else if (args[i].equals("-x"))
+            {
+                Scanner scanner = new Scanner(System.in);
+                for (; ; )
+                {
+                    if (!scanner.hasNext()) break;
+                    String line = scanner.nextLine();
+                    if (line == null) break;
+                    line = line.trim();
+                    if (line == "") break;
+                    inputs.add(line);
+                    is_fns.add(true);
+                }
+            }
+            else if (args[i].equals("-q"))
+            {
+                quiet = true;
+            }
             else if (args[i].equals("-trace"))
             {
                 show_trace = true;
@@ -148,7 +151,14 @@ public class Test {
         }
         var tokens = new CommonTokenStream(lexer);
         <parser_name> parser = new <parser_name>(tokens);
-		output = shunt_output ? new StreamWriter(input_name + ".errors") : System.Console.Out;
+        PrintStream output = null;
+        try {
+            output = shunt_output ? new PrintStream(new File(input_name + ".errors")) : System.out;
+        } catch (NullPointerException e) {
+            output = System.out;
+        } catch (FileNotFoundException e2) {
+            output = System.out;
+        }
         ErrorListener listener_lexer = new ErrorListener(quiet, output);
         ErrorListener listener_parser = new ErrorListener(quiet, output);
         parser.removeErrorListeners();
@@ -174,18 +184,26 @@ public class Test {
             result = "success";
         if (show_tree)
         {
-			if (shunt_output)
-			{
-				System.out.println(tree.toStringTree(parser));
-			} else
-			{
-				System.out.println(tree.toStringTree(parser));
-			}
+            if (shunt_output)
+            {
+                PrintStream treef = null;
+                try {
+                    treef = new PrintStream(new File(input_name + ".tree"));
+                } catch (NullPointerException e) {
+                    treef = System.out;
+                } catch (FileNotFoundException e2) {
+                    treef = System.out;
+                }
+                treef.print(tree.toStringTree(parser));
+            } else
+            {
+                System.out.println(tree.toStringTree(parser));
+            }
         }
-		if (!quiet)
-		{
-			System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + (timeElapsed * 1.0) / 1000.0);
-		}
-		if (shunt_output) output.close();
+        if (!quiet)
+        {
+            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + (timeElapsed * 1.0) / 1000.0);
+        }
+        if (shunt_output) output.close();
     }
 }
