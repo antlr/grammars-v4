@@ -2,6 +2,7 @@
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
+
 files=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
 before_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
 
@@ -49,7 +50,7 @@ elif [ "$before_parse_errors" != "$after_parse_errors" ]
 then
   for f in $after_parse_errors
   do
-	cat $f
+    cat $f
   done
   echo "Difference in output."
   echo "Test failed."
