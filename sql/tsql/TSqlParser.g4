@@ -4222,40 +4222,40 @@ xml_data_type_methods
 
 // https://learn.microsoft.com/en-us/sql/t-sql/functions/date-bucket-transact-sql?view=sql-server-ver16
 dateparts_9
-    : (YEAR | YEAR_ABBR)
-    | (QUARTER | QUARTER_ABBR)
-    | (MONTH | MONTH_ABBR)
-    | (DAY | DAY_ABBR)
-    | (WEEK | WEEK_ABBR)
-    | (HOUR | HOUR_ABBR)
-    | (MINUTE | MINUTE_ABBR)
-    | (SECOND | SECOND_ABBR)
-    | (MILLISECOND | MILLISECOND_ABBR)
+    : YEAR | YEAR_ABBR
+    | QUARTER | QUARTER_ABBR
+    | MONTH | MONTH_ABBR
+    | DAY | DAY_ABBR
+    | WEEK | WEEK_ABBR
+    | HOUR | HOUR_ABBR
+    | MINUTE | MINUTE_ABBR
+    | SECOND | SECOND_ABBR
+    | MILLISECOND | MILLISECOND_ABBR
     ;
 
 // https://learn.microsoft.com/en-us/sql/t-sql/functions/dateadd-transact-sql?view=sql-server-ver16
 dateparts_12
-    :
-    | dateparts_9
-    | (DAYOFYEAR | DAYOFYEAR_ABBR)
-    | (MICROSECOND | MICROSECOND_ABBR)
-    | (NANOSECOND | NANOSECOND_ABBR)
+    : dateparts_9
+    | DAYOFYEAR | DAYOFYEAR_ABBR
+    | MICROSECOND | MICROSECOND_ABBR
+    | NANOSECOND | NANOSECOND_ABBR
     ;
 
 // https://learn.microsoft.com/en-us/sql/t-sql/functions/datename-transact-sql?view=sql-server-ver16
 dateparts_15
     : dateparts_12
-    | (WEEKDAY | WEEKDAY_ABBR)
-    | (TZOFFSET | TZOFFSET_ABBR)
-    | (ISO_WEEK | ISO_WEEK_ABBR)
+    | WEEKDAY | WEEKDAY_ABBR
+    | TZOFFSET | TZOFFSET_ABBR
+    | ISO_WEEK | ISO_WEEK_ABBR
     ;
 
 // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetrunc-transact-sql?view=sql-server-ver16
 dateparts_datetrunc
     : dateparts_9
-    | (DAYOFYEAR | DAYOFYEAR_ABBR)
-    | (MICROSECOND | MICROSECOND_ABBR)
-    | (ISO_WEEK | ISO_WEEK_ABBR);
+    | DAYOFYEAR | DAYOFYEAR_ABBR
+    | MICROSECOND | MICROSECOND_ABBR
+    | ISO_WEEK | ISO_WEEK_ABBR
+    ;
 
 value_method
     : (loc_id=LOCAL_ID | value_id=full_column_name | eventdata=EVENTDATA '(' ')'  | query=query_method | '(' subquery ')') '.' call=value_call
@@ -4553,12 +4553,12 @@ table_name
     ;
 
 persist_table_name
-    : (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? (table=id_ | blocking_hierarchy=BLOCKING_HIERARCHY)
+    : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=id_ | blocking_hierarchy=BLOCKING_HIERARCHY)
     ;
 
 // https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
 temp_table_name
-    : (database=id_ '.' (schema=id_)? '.' | schema=id_ '.')? (table=TEMP_ID | blocking_hierarchy=BLOCKING_HIERARCHY)
+    : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=TEMP_ID | blocking_hierarchy=BLOCKING_HIERARCHY)
     ;
 
 simple_name
