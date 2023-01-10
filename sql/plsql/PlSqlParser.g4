@@ -2655,7 +2655,7 @@ alter_table
       | alter_table_partitioning
 //TODO      | alter_external_table
       | move_table_clause
-      )?
+      )
       ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS) )+)?
       ';'
     ;
@@ -2847,7 +2847,7 @@ move_table_clause
     ;
 
 index_org_table_clause
-    : (mapping_table_clause | PCTTHRESHOLD UNSIGNED_INTEGER | key_compression) index_org_overflow_clause?
+    : (mapping_table_clause | PCTTHRESHOLD UNSIGNED_INTEGER | key_compression)* index_org_overflow_clause?
     ;
 
 mapping_table_clause
