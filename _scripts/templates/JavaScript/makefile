@@ -4,7 +4,7 @@ CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 .SUFFIXES: .g4 .js
 ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
-SOURCES = $(GENERATED) index.js
+SOURCES = $(GENERATED) Test.js
 default: setup classes
 setup:
 	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
@@ -17,7 +17,7 @@ clean:
 	rm -f *.tokens
 	rm -f $(GENERATED)
 run:
-	trwdog node index.js $(RUNARGS)
+	@trwdog node Test.js $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=JavaScript <antlr_tool_args:{y | <y> } > $\<
 } >
