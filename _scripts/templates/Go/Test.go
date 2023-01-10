@@ -197,7 +197,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
             f, _ := os.Create(input_name + ".tree")
             defer f.Close()
             w := bufio.NewWriter(f)
-            fmt.Fprintln(w, ss)
+            fmt.Fprint(w, ss)
             w.Flush()
         } else {
             fmt.Println(ss)
