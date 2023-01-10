@@ -100,40 +100,40 @@ public class Program
         List\<string> inputs = new List\<string>();
         for (int i = 0; i \< args.Length; ++i)
         {
-            if (args[i].Equals("-profile"))
+            if (args[i] == "-profile")
             {
                 show_profile = true;
             }
-            else if (args[i].Equals("-tokens"))
+            else if (args[i] == "-tokens")
             {
                 show_tokens = true;
             }
-            else if (args[i].Equals("-two-byte"))
+            else if (args[i] == "-two-byte")
             {
                 two_byte = true;
             }
-            else if (args[i].Equals("-old"))
+            else if (args[i] == "-old")
             {
                 old = true;
             }
-            else if (args[i].Equals("-tree"))
+            else if (args[i] == "-tree")
             {
                 show_tree = true;
             }
-            else if (args[i].Equals("-prefix"))
+            else if (args[i] == "-prefix")
             {
                 prefix = args[++i] + " ";
             }
-            else if (args[i].Equals("-input"))
+            else if (args[i] == "-input")
             {
                 inputs.Add(args[++i]);
                 is_fns.Add(false);
             }
-            else if (args[i].Equals("-shunt"))
+            else if (args[i] == "-shunt")
             {
                 shunt_output = true;
             }
-            else if (args[i].Equals("-encoding"))
+            else if (args[i] == "-encoding")
             {
                 ++i;
                 encoding = Encoding.GetEncoding(

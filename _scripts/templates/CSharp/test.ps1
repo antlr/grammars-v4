@@ -41,7 +41,7 @@ function Test-Case {
     } else {
 
         # Parse
-        $(& get-content "tests.txt" | trwdog dotnet run -x -shunt -tree ; $parse_exit = $statis ) | Write-Host
+        $(& get-content "tests.txt" | trwdog dotnet run -x -shunt -tree ; $status = $LASTEXITCODE ) | Write-Host
 
         Write-Host "exit code $status"
 

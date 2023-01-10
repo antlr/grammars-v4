@@ -7,20 +7,15 @@ CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) \
-    Program.java \
-<if (case_insensitive_type)>
-    CaseChangingCharStream.java \
-<endif>
+    Test.java \
     ErrorListener.java
 default: classes
 classes: $(GENERATED) $(SOURCES:.java=.class)
 clean:
-	rm -f *.class
-	rm -f *.interp
-	rm -f *.tokens
+	rm -f *.class *.interp *.tokens
 	rm -f $(GENERATED)
 run:
-	trwdog java -classpath $(CLASSPATH) Program $(RUNARGS)
+	@trwdog java -classpath $(CLASSPATH) Test $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> <antlr_tool_args:{y | <y> } > $\<
 } >

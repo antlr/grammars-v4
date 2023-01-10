@@ -41,7 +41,7 @@ function Test-Case {
     } else {
 
         # Parse
-        $(& get-content "tests.txt" | trwdog ./build/<if(os_win)>Release/<endif><exec_name> -x -shunt -tree ; $parse_exit = $statis ) | Write-Host
+        $(& get-content "tests.txt" | trwdog ./build/<if(os_win)>Release/<endif><exec_name> -x -shunt -tree ; $status = $LASTEXITCODE ) | Write-Host
 
         Write-Host "exit code $status"
 
