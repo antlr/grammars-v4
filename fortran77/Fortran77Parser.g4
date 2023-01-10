@@ -382,7 +382,7 @@ firstIfBlock
    ;
 
 elseIfStatement
-   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN EOL? wholeStatement+
+   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN EOL? commentStatement* (wholeStatement commentStatement*)+
    ;
 
 elseStatement
