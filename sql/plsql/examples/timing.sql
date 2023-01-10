@@ -1,0 +1,9 @@
+TIMING
+
+TIMING START
+TIMING START one_word
+TIMING START more than one word
+
+TIMING SHOW
+
+TIMING STOP
