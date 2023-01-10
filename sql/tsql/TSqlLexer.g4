@@ -1084,6 +1084,35 @@ TIMEFROMPARTS:                         'TIMEFROMPARTS';
 TODATETIMEOFFSET:                      'TODATETIMEOFFSET';
 YEAR:                                  'YEAR';
 
+QUARTER:                               'QUARTER';
+DAYOFYEAR:                             'DAYOFYEAR';
+WEEK:                                  'WEEK';
+HOUR:                                  'HOUR';
+MINUTE:                                'MINUTE';
+SECOND:                                'SECOND';
+MILLISECOND:                           'MILLISECOND';
+MICROSECOND:                           'MICROSECOND';
+NANOSECOND:                            'NANOSECOND';
+TZOFFSET:                              'TZOFFSET';
+ISO_WEEK:                              'ISO_WEEK';
+WEEKDAY:                               'WEEKDAY';
+
+YEAR_ABBR:                             'yy' | 'yyyy';
+QUARTER_ABBR:                          'qq' | 'q';
+MONTH_ABBR:                            'mm' | 'm';
+DAYOFYEAR_ABBR:                        'dy' | 'y';
+DAY_ABBR:                              'dd' | 'd';
+WEEK_ABBR:                             'wk' | 'ww';
+HOUR_ABBR:                             'hh';
+MINUTE_ABBR:                           'mi' | 'n';
+SECOND_ABBR:                           'ss' | 's';
+MILLISECOND_ABBR:                      'ms';
+MICROSECOND_ABBR:                      'mcs';
+NANOSECOND_ABBR:                       'ns';
+TZOFFSET_ABBR:                         'tz';
+ISO_WEEK_ABBR:                         'isowk' | 'isoww';
+WEEKDAY_ABBR:                          'dw';
+
 SP_EXECUTESQL:                         'SP_EXECUTESQL';
 
 //Build-ins:

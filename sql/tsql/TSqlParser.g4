@@ -4095,19 +4095,19 @@ built_in_functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/current-timezone-id-transact-sql?view=sql-server-ver16
     | CURRENT_TIMEZONE_ID '(' ')'                       #CURRENT_TIMEZONE_ID
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/date-bucket-transact-sql?view=sql-server-ver16
-    | DATE_BUCKET '(' datepart=ID ',' number=expression ',' date=expression (',' origin=expression)? ')' #DATE_BUCKET
+    | DATE_BUCKET '(' datepart=dateparts_9 ',' number=expression ',' date=expression (',' origin=expression)? ')' #DATE_BUCKET
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' datepart=ID ',' number=expression ',' date=expression ')'  #DATEADD
+    | DATEADD '(' datepart=dateparts_12 ',' number=expression ',' date=expression ')'  #DATEADD
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' datepart=ID ',' date_first=expression ',' date_second=expression ')' #DATEDIFF
+    | DATEDIFF '(' datepart=dateparts_12 ',' date_first=expression ',' date_second=expression ')' #DATEDIFF
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datediff-big-transact-sql?view=sql-server-ver16
-    | DATEDIFF_BIG '(' datepart=ID ',' startdate=expression ',' enddate=expression ')' #DATEDIFF_BIG
+    | DATEDIFF_BIG '(' datepart=dateparts_12 ',' startdate=expression ',' enddate=expression ')' #DATEDIFF_BIG
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datefromparts-transact-sql?view=sql-server-ver16
     | DATEFROMPARTS '(' year=expression ',' month=expression ',' day=expression ')'#DATEFROMPARTS
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' datepart=ID ',' date=expression ')'                #DATENAME
+    | DATENAME '(' datepart=dateparts_15 ',' date=expression ')'                #DATENAME
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' datepart=ID ',' date=expression ')'                #DATEPART
+    | DATEPART '(' datepart=dateparts_15 ',' date=expression ')'                #DATEPART
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetime2fromparts-transact-sql?view=sql-server-ver16
     | DATETIME2FROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ',' seconds=expression ',' fractions=expression ',' precision=expression ')' #DATETIME2FROMPARTS
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetimefromparts-transact-sql?view=sql-server-ver16
@@ -4115,7 +4115,7 @@ built_in_functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetimeoffsetfromparts-transact-sql?view=sql-server-ver16
     | DATETIMEOFFSETFROMPARTS '(' year=expression ',' month=expression ',' day=expression ',' hour=expression ',' minute=expression ',' seconds=expression ',' fractions=expression ',' hour_offset=expression ',' minute_offset=expression ',' precision=DECIMAL ')' #DATETIMEOFFSETFROMPARTS
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datetrunc-transact-sql?view=sql-server-ver16
-    | DATETRUNC '(' datepart=ID ',' date=expression ')' #DATETRUNC
+    | DATETRUNC '(' datepart=dateparts_datetrunc ',' date=expression ')' #DATETRUNC
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/day-transact-sql?view=sql-server-ver16
     | DAY '(' date=expression ')' #DAY
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/eomonth-transact-sql?view=sql-server-ver16
@@ -4219,6 +4219,43 @@ xml_data_type_methods
     | exist_method
     | modify_method
     ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/functions/date-bucket-transact-sql?view=sql-server-ver16
+dateparts_9
+    : (YEAR | YEAR_ABBR)
+    | (QUARTER | QUARTER_ABBR)
+    | (MONTH | MONTH_ABBR)
+    | (DAY | DAY_ABBR)
+    | (WEEK | WEEK_ABBR)
+    | (HOUR | HOUR_ABBR)
+    | (MINUTE | MINUTE_ABBR)
+    | (SECOND | SECOND_ABBR)
+    | (MILLISECOND | MILLISECOND_ABBR)
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/functions/dateadd-transact-sql?view=sql-server-ver16
+dateparts_12
+    :
+    | dateparts_9
+    | (DAYOFYEAR | DAYOFYEAR_ABBR)
+    | (MICROSECOND | MICROSECOND_ABBR)
+    | (NANOSECOND | NANOSECOND_ABBR)
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/functions/datename-transact-sql?view=sql-server-ver16
+dateparts_15
+    : dateparts_12
+    | (WEEKDAY | WEEKDAY_ABBR)
+    | (TZOFFSET | TZOFFSET_ABBR)
+    | (ISO_WEEK | ISO_WEEK_ABBR)
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/functions/datetrunc-transact-sql?view=sql-server-ver16
+dateparts_datetrunc
+    : dateparts_9
+    | (DAYOFYEAR | DAYOFYEAR_ABBR)
+    | (MICROSECOND | MICROSECOND_ABBR)
+    | (ISO_WEEK | ISO_WEEK_ABBR);
 
 value_method
     : (loc_id=LOCAL_ID | value_id=full_column_name | eventdata=EVENTDATA '(' ')'  | query=query_method | '(' subquery ')') '.' call=value_call
@@ -5546,6 +5583,35 @@ keyword
     | TIMEFROMPARTS
     | TODATETIMEOFFSET
     | YEAR
+    //
+    | QUARTER
+    | DAYOFYEAR
+    | WEEK
+    | HOUR
+    | MINUTE
+    | SECOND
+    | MILLISECOND
+    | MICROSECOND
+    | NANOSECOND
+    | TZOFFSET
+    | ISO_WEEK
+    | WEEKDAY
+    //
+    | YEAR_ABBR
+    | QUARTER_ABBR
+    | MONTH_ABBR
+    | DAYOFYEAR_ABBR
+    | DAY_ABBR
+    | WEEK_ABBR
+    | HOUR_ABBR
+    | MINUTE_ABBR
+    | SECOND_ABBR
+    | MILLISECOND_ABBR
+    | MICROSECOND_ABBR
+    | NANOSECOND_ABBR
+    | TZOFFSET_ABBR
+    | ISO_WEEK_ABBR
+    | WEEKDAY_ABBR
     //
     | SP_EXECUTESQL
     //Build-ins:
