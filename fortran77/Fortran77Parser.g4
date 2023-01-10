@@ -418,7 +418,7 @@ enddoStatement
    ;
 
 continueStatement
-   : lblRef* CONTINUE
+   : lblRef? CONTINUE
    ;
 
 stopStatement
