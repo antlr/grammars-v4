@@ -326,6 +326,14 @@ literal_value:
     | CURRENT_TIMESTAMP_
 ;
 
+value_row:
+    OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+;
+
+values_clause:
+    VALUES_ value_row (COMMA value_row)*
+;
+
 insert_stmt:
     with_clause? (
         INSERT_
@@ -341,12 +349,7 @@ insert_stmt:
         OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
     )? (
         (
-            (
-                VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
-                    COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
-                )*
-                | select_stmt
-            ) upsert_clause?
+            ( values_clause | select_stmt ) upsert_clause?
         )
         | DEFAULT_ VALUES_
     ) returning_clause?
@@ -407,9 +410,7 @@ select_core:
             )*
         )?
     )
-    | VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
-        COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
-    )*
+    | values_clause
 ;
 
 factored_select_stmt:
