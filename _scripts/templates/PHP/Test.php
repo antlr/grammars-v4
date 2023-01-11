@@ -20,6 +20,7 @@ use Antlr\Antlr4\Runtime\Tree\ParseTreeWalker;
 use Antlr\Antlr4\Runtime\Tree\TerminalNode;
 use Antlr\Antlr4\Runtime\Token;
 use Antlr\Antlr4\Runtime\CommonToken;
+
 final class TreeShapeListener implements ParseTreeListener {
     public function visitTerminal(TerminalNode $node) : void {}
     public function visitErrorNode(ErrorNode $node) : void {}

@@ -65,9 +65,9 @@
 ./PHP/Test.php
 ./PHP/test.ps1
 ./PHP/test.sh
-./Python3/CaseChangingStream.py
+./Python3/build.ps1
 ./Python3/makefile
-./Python3/Program.py
 ./Python3/requirements.txt
+./Python3/test.ps1
+./Python3/Test.py
 ./Python3/test.sh
-./Python3/tester.psm1
