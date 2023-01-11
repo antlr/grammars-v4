@@ -1656,6 +1656,7 @@ SWITCH:                       'SWITCH';
 SYNCHRONOUS:                  'SYNCHRONOUS';
 SYNC:                         'SYNC';
 SYNONYM:                      'SYNONYM';
+SYS:                          'SYS';
 SYSASM:                       'SYSASM';
 SYS_AUDIT:                    'SYS_AUDIT';
 SYSAUX:                       'SYSAUX';

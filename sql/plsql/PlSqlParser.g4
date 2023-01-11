@@ -5249,6 +5249,7 @@ non_reserved_keywords_in_12c
     | SUBSCRIBE
     | SUBSET
     | SUCCESS
+    | SYS
     | SYSBACKUP
     | SYS_CHECK_PRIVILEGE
     | SYSDG
@@ -6588,6 +6589,7 @@ non_reserved_keywords_pre12c
     | SWITCHOVER
     | SYNCHRONOUS
     | SYNC
+    | SYS
     | SYSASM
     | SYS_AUDIT
     | SYSAUX
