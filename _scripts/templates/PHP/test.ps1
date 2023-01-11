@@ -45,7 +45,6 @@ function Test-Case {
 
         Write-Host "exit code $status"
 
-        $os = (Get-WMIObject win32_operatingsystem).name
         foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
             $file = $item.fullname
             $ext = $item.Extension
