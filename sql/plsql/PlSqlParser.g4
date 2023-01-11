@@ -30,7 +30,7 @@ options {
 }
 
 sql_script
-    : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
+    : ((sql_plus_command | unit_statement) SEMICOLON?)* EOF
     ;
 
 unit_statement
@@ -92,6 +92,7 @@ unit_statement
     | drop_library
     | drop_package
     | drop_procedure
+    | drop_materialized_view
     | drop_materialized_zonemap
     | drop_rollback_segment
     | drop_role
@@ -1799,7 +1800,7 @@ create_zonemap_as_subquery
 create_materialized_view
     : CREATE MATERIALIZED VIEW tableview_name
       (OF type_name )?
-//scoped_table_ref and column alias goes here  TODO
+        ( '(' (scoped_table_ref_constraint | mv_column_alias) (',' (scoped_table_ref_constraint | mv_column_alias))* ')' )?
         ( ON PREBUILT TABLE ( (WITH | WITHOUT) REDUCED PRECISION)?
         | physical_properties?  (CACHE | NOCACHE)? parallel_clause? build_clause?
         )
@@ -1811,6 +1812,14 @@ create_materialized_view
         ( (DISABLE | ENABLE) QUERY REWRITE )?
         AS select_only_statement
         ';'
+    ;
+
+scoped_table_ref_constraint
+    : SCOPE FOR '(' ref_column_or_attribute=identifier ')' IS (schema_name '.')? scope_table_name_or_c_alias=identifier
+    ;
+
+mv_column_alias
+    : (identifier | quoted_string) (ENCRYPT encryption_spec)?
     ;
 
 create_mv_refresh
@@ -1827,6 +1836,11 @@ create_mv_refresh
          | USING (ENFORCED | TRUSTED) CONSTRAINTS
          )+
       )
+    ;
+
+drop_materialized_view
+    : DROP MATERIALIZED VIEW tableview_name (PRESERVE TABLE)?
+        ';'
     ;
 
 create_context
@@ -4367,8 +4381,8 @@ sql_plus_command
 
 whenever_command
     : WHENEVER (SQLERROR | OSERROR)
-         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name) (COMMIT | ROLLBACK)
-         | CONTINUE (COMMIT | ROLLBACK | NONE))
+         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name | numeric) (COMMIT | ROLLBACK)?
+         | CONTINUE (COMMIT | ROLLBACK | NONE)?)
     ;
 
 set_command
