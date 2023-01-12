@@ -3603,7 +3603,7 @@ a_expr_collate
 
 
 a_expr_typecast
-   : VARIADIC? c_expr (TYPECAST typename)*
+   : c_expr (TYPECAST typename)*
    ;
 
 b_expr
@@ -3617,8 +3617,6 @@ b_expr
    | b_expr (STAR | SLASH | PERCENT) b_expr
    //+ -	left	addition, subtraction
    | b_expr (PLUS | MINUS) b_expr
-   // named notation expr => expr
-   | b_expr EQUALS_GREATER b_expr
    //(any other operator)	left	all other native and user-defined operators
    | b_expr qual_op b_expr
    //< > = <= >= <>	 	comparison operators
@@ -3631,7 +3629,7 @@ b_expr
 
 c_expr
    : EXISTS select_with_parens # c_expr_exists
-   | VARIADIC? ARRAY (select_with_parens | array_expr) # c_expr_expr
+   | ARRAY (select_with_parens | array_expr) # c_expr_expr
    | PARAM opt_indirection # c_expr_expr
    | GROUPING OPEN_PAREN expr_list CLOSE_PAREN # c_expr_expr
    | /*22*/
@@ -4556,7 +4554,6 @@ reserved_keyword
    | CONSTRAINT
    | CREATE
    | CURRENT_CATALOG
-   | CLOCK_TIMESTAMP
    | CURRENT_DATE
    | CURRENT_ROLE
    | CURRENT_TIME
@@ -4745,6 +4742,7 @@ builtin_function_name
    | MAKE_TIME
    | MAKE_TIMESTAMP
    | MAKE_TIMESTAMPTZ
+   | CLOCK_TIMESTAMP
    | NOW
    | STATEMENT_TIMESTAMP
    | TIMEOFDAY
