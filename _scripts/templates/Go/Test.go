@@ -218,7 +218,4 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         fmt.Fprintf(os.Stderr, "%.3f", elapsed.Seconds())
         fmt.Fprintln(os.Stderr)
     }
-    if tee {
-        output.Close();
-    }
 }
