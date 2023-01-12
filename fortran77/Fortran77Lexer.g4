@@ -535,7 +535,7 @@ CTRLREC
 
 
 TO
-   : 'TO'
+   : 'TO' | 'to'
    ;
 
 

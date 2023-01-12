@@ -333,7 +333,7 @@ dataImpliedDoListWhat
    ;
 
 gotoStatement
-   : ((GO | GOTO) to) (unconditionalGoto | computedGoto | assignedGoto)
+   : (GO TO| GOTO) (unconditionalGoto | computedGoto | assignedGoto)
    ;
 
 unconditionalGoto
@@ -876,8 +876,4 @@ logicalConstant
 identifier
    : NAME
    | REAL
-   ;
-
-to
-   : NAME
    ;
