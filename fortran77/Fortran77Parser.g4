@@ -31,13 +31,8 @@ parser grammar Fortran77Parser;
 options
    { tokenVocab = Fortran77Lexer; }
 
-// multi-line comments?
-commentStatement
-    : COMMENT+
-    ;
-    
 program
-   : commentStatement* (executableUnit commentStatement*)+ EOL* EOF
+   : executableUnit+ EOL* EOF
    ;
 
 executableUnit
@@ -113,7 +108,7 @@ statement
    ;
 
 subprogramBody
-   : commentStatement* (wholeStatement commentStatement*)+ endStatement
+   : wholeStatement+ endStatement
    ;
 
 wholeStatement
@@ -378,7 +373,7 @@ blockIfStatement
    ;
 
 firstIfBlock
-   : THEN EOL? commentStatement* (wholeStatement commentStatement*)+
+   : THEN EOL? wholeStatement+
    ;
 
 elseIfStatement
@@ -386,7 +381,7 @@ elseIfStatement
    ;
 
 elseStatement
-   : ELSE EOL? commentStatement* (wholeStatement commentStatement*)+
+   : ELSE EOL? wholeStatement+
    ;
 
 endIfStatement
