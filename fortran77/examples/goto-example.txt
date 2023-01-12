@@ -6,9 +6,11 @@ c
 
       go to 20
 
-10    write ( *, '(a)' ) '  Hello, world!'
+10    continue
+      write ( *, '(a)' ) '  Hello, world!'
       stop
 
-20    goto 10
+20    continue
+      goto 10
 
       end
