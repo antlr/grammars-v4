@@ -3,7 +3,7 @@
 c*********************************************************************72
 c 
       IMPLICIT NONE
-      
+
       DOUBLE PRECISION M, INFO
 
       M = 3
@@ -21,7 +21,7 @@ c     M is one
 c     M is none of the above
             INFO = 4
       END IF
-      
+
       WRITE (*, '(d10.3)'), INFO
 
       END
