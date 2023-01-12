@@ -4391,7 +4391,7 @@ set_command
     ;
 
 timing_command
-    : TIMING (START (timing_text=id_expression)* | SHOW | STOP)?
+    : TIMING (START timing_text=id_expression* | SHOW | STOP)?
     ;
 
 // Common
