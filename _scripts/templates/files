@@ -8,8 +8,6 @@
 ./Antlr4cs/test.sh
 ./Arithmetic.g4
 ./Cpp/build.ps1
-./Cpp/CaseChangingCharStream.cpp
-./Cpp/CaseChangingCharStream.h
 ./Cpp/cmake/antlr4-generator.cmake.in
 ./Cpp/cmake/antlr4-runtime.cmake.in
 ./Cpp/cmake/Antlr4Package.md

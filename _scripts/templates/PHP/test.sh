@@ -7,11 +7,16 @@ JAR="<antlr_tool_path>"
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 
 files=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
-before_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
 
 # Parse
-echo "$files" | trwdog php -d memory_limit=1G Test.php -x -shunt -tree
+echo "$files" | trwdog php -d memory_limit=1G Test.php -x -tee -tree
 status=$?
+# trwdog returns 255 if it cannot spawn the process.
+if [ "$status" = "255" ]
+then
+  echo "Test failed."
+  exit 1
+fi
 
 # rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`
 unameOut="$(uname -s)"
@@ -32,39 +37,61 @@ then
 fi
 old=`pwd`
 cd ../<example_files_unix>
-# Notes: If the .tree and .errors files are not checked in,
-# then git won't complain. The trick here is to make sure we
-# don't have any new .errors files. Check the count again and
-# make sure that hasn't changed.
-git diff --exit-code --name-only . > $old/temp-output.txt 2>&1
-diffs=$?
-after_parse_errors=`find ../examples -type f -name '*.errors' -size +0`
-if [ "$diffs" = "129" ]
+
+# Check if any .errors/.tree files have changed. That's not good.
+git diff --exit-code --name-only . > $old/updated.txt 2>&1
+updated=$?
+
+# Check if any untracked .errors files are not empty. That's also not good.
+git ls-files --exclude-standard -o > $old/new_errors2.txt 2>&1
+new_errors=$?
+for f in `cat $old/new_errors2.txt`
+do
+  ext=${f##*.}
+  ext=".$ext"
+  if [ "$ext" = ".errors" ]
+  then  
+    if [ -s $f ]
+    then
+      echo $f >> $old/new_errors.txt
+    fi
+  fi
+done
+
+if [ "$updated" = "129" ]
 then
-  echo "Grammar outside a git repository."
-  echo "Defaulting to exit code of group parse."
-  err=$status
-elif [ "$diffs" = "1" ]
-then
-  cat $old/temp-output.txt
-  echo "Difference in output."
-  err=1
-elif [ "$before_parse_errors" != "$after_parse_errors" ]
-then
-  for f in $after_parse_errors
-  do
-    cat $f
-  done
-  echo "Difference in output."
-  echo "Test failed."
-  err=1
-elif [ "$status" = "255" ]
-then
-  echo "Test failed."
-  err=0
-else
-  echo "Test succeeded."
-  err=0
+  echo "Grammar outside a git repository. Assuming parse exit code."
+  if [ "$status" = 0 ]
+  then
+    echo "Test succeeded."
+  else
+    echo "Test failed."
+  fi
+  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+  exit $status
 fi
-rm -f $old/temp-output.txt
-exit $err
+
+if [ "$updated" = "1" ]
+then
+  echo "Difference in output."
+  echo "Test failed."
+  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+  exit 1
+fi
+
+if [ -s $old/new_errors.txt ]
+then
+  echo "New errors in output."
+  echo "Test failed."
+  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+  exit 1
+fi
+
+if [ "$status" = 0 ]
+then
+  echo "Test succeeded."
+else
+  echo "Test failed."
+fi
+rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+exit $status

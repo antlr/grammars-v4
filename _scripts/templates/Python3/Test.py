@@ -15,20 +15,22 @@ def getChar():
     return xx
 
 class MyErrorListener(ErrorListener):
-    __slots__ = 'num_errors'
 
-    def __init__(self, q, o):
+    def __init__(self, q, t, o):
         super().__init__()
-        self.num_errors = 0
+        self.had_error = False
         self.quiet = q
+        self.tee = t;
         self.output = o
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        self.num_errors = self.num_errors + 1
+        self.had_error = True
         if (not self.quiet):
-            self.output.write(f"line {line}:{column} {msg}\n");
+            if ( self.tee ):
+                self.output.write(f"line {line}:{column} {msg}\n");
+            print(f"line {line}:{column} {msg}");
 
-shunt_output = False
+tee = False
 show_tokens = False
 show_tree = False
 show_trace = False
@@ -39,13 +41,14 @@ prefix = ""
 quiet = False
 
 def main(argv):
-    global shunt_output
+    global tee
     global show_tokens
     global show_tree
     global show_trace
     global encoding
     global prefix
     global quiet
+    global error_code
     
     inputs = []
     is_fns = []
@@ -67,8 +70,8 @@ def main(argv):
         elif arg in ("-encoding"):
             i = i + 1
             encoding = argv[i]
-        elif arg in ("-shunt"):
-            shunt_output = True
+        elif arg in ("-tee"):
+            tee = True
         elif arg in ("-x"):
             while f := sys.stdin.readline():
                 f = f.strip()
@@ -115,27 +118,28 @@ def ParseFilename(input, row_number):
     DoParse(str, input, row_number)
 
 def DoParse(str, input_name, row_number):
-    global shunt_output
+    global tee
     global show_tokens
     global show_tree
     global show_trace
     global encoding
     global prefix
     global quiet
+    global error_code
 
     lexer = <lexer_name>(str)
     lexer.removeErrorListeners()
-    if (shunt_output):
+    if (tee):
         output = open(input_name + ".errors", "w")
     else:
         output = sys.stdout
-    listener_lexer = MyErrorListener(quiet, output)
+    listener_lexer = MyErrorListener(quiet, tee, output)
     lexer.addErrorListener(listener_lexer)
     # lexer.strictMode = false
     tokens = CommonTokenStream(lexer)
     parser = <parser_name>(tokens)
     parser.removeErrorListeners()
-    listener_parser = MyErrorListener(quiet, output)
+    listener_parser = MyErrorListener(quiet, tee, output)
     parser.addErrorListener(listener_parser)
     if (show_tokens):
         i = 0
@@ -158,13 +162,13 @@ def DoParse(str, input_name, row_number):
     diff = end_time - start_time
     diff_time = diff.total_seconds()
     result = ''
-    if listener_parser.num_errors > 0 or listener_lexer.num_errors > 0:
+    if listener_parser.had_error or listener_lexer.had_error:
         result = 'fail'
         error_code = 1
     else:
         result = 'success'
     if (show_tree):
-        if (shunt_output):
+        if (tee):
             f = open(input_name + '.tree', 'w')
             f.write(tree.toStringTree(recog=parser))
         else:

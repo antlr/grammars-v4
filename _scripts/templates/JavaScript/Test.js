@@ -11,37 +11,50 @@ import * as readline from 'node:readline';
 const { Timer, Time, TimerOptions } = pkg;
 
 function getChar() {
-	let buffer = Buffer.alloc(1);
-	var xx = 0;
-	try {
-		xx = fs.readSync(0, buffer, 0, 1);
-	} catch (err) {
-	}
+    let buffer = Buffer.alloc(1);
+    var xx = 0;
+    try {
+        xx = fs.readSync(0, buffer, 0, 1);
+    } catch (err) {
+    }
     if (xx === 0) {
         return '';
     }
     return buffer.toString('utf8');
 }
 
-var num_errors = 0;
 
 class MyErrorListener extends antlr4.error.ErrorListener {
+
+    constructor(quiet, tee, output) {
+        super();
+        this._quiet = quiet;
+        this._tee = tee;
+        this._output = output;
+        this.had_error = false;
+    }
+
     syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
-        num_errors++;
-        console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
+        this.had_error = true;
+        if (! quiet) {
+            if (tee) {
+                fs.writeSync(this._output, `${offendingSymbol} line ${line}, col ${column}: ${msg}\n`);
+            }
+            console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
+        }
     }
 }
 
-var shunt_output = false;
+var tee = false;
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
+var quiet = false;
 var encoding = 'utf8';
 var string_instance = 0;
 var prefix = '';
-var quiet = false;
 var inputs = [];
 var is_fns = [];
 
@@ -64,25 +77,25 @@ function main() {
                 inputs.push(process.argv[++i]);
                 is_fns.push(false);
                 break;
-            case '-shunt':
-                shunt_output = true;
+            case '-tee':
+                tee = true;
                 break;
             case '-encoding':
                 encoding = process.argv[++i];
                 break;
-			case '-x':
-				var sb = new strops.StringBuilder();
-				var ch;
-				while ((ch = getChar()) != '') {
-					sb.Append(ch);
-				}
-				var input = sb.ToString();
-				var sp = splitLines(input);
-				for (var ii of sp) {
-					if ( ii == '' ) continue;
-					inputs.push(ii);
-					is_fns.push(true);
-				}
+            case '-x':
+                var sb = new strops.StringBuilder();
+                var ch;
+                while ((ch = getChar()) != '') {
+                    sb.Append(ch);
+                }
+                var input = sb.ToString();
+                var sp = splitLines(input);
+                for (var ii of sp) {
+                    if ( ii == '' ) continue;
+                    inputs.push(ii);
+                    is_fns.push(true);
+                }
                 break;
             case '-trace':
                 show_trace = true;
@@ -141,8 +154,11 @@ function DoParse(str, input_name, row_number) {
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    parser.addErrorListener(new MyErrorListener());
-    lexer.addErrorListener(new MyErrorListener());
+    var output = tee ? fs.openSync(input_name + ".errors", 'w') : 1;
+    var listener_parser = new MyErrorListener(quiet, tee, output);
+    var listener_lexer = new MyErrorListener(quiet, tee, output);
+    parser.addErrorListener(listener_parser);
+    lexer.addErrorListener(listener_lexer);
     if (show_tokens) {
         for (var i = 0; ; ++i) {
             var ro_token = lexer.nextToken();
@@ -163,7 +179,7 @@ function DoParse(str, input_name, row_number) {
     const tree = parser.<start_symbol>();
     timer.stop();
     var result = "";
-    if (num_errors > 0) {
+    if (listener_parser.had_error || listener_lexer.had_error) {
         result = 'fail';
         error_code = 1;
     }
@@ -172,13 +188,18 @@ function DoParse(str, input_name, row_number) {
     }
     var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
     if (show_tree) {
-        if (shunt_output) {
+        if (tee) {
             fs.writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames));
         } else {
             console.log(tree.toStringTree(parser.ruleNames));
         }
     }
-    console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t);
+    if (! quiet) {
+        console.error(prefix + 'JavaScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t);
+    }
+    if (tee) {
+        fs.closeSync(output);
+    }
 }
 
 

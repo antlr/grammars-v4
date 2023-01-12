@@ -7,7 +7,7 @@ import 'MyErrorListener.dart';
 import 'dart:io';
 import 'dart:convert';
 
-var shunt_output = false;
+var tee = false;
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
@@ -24,12 +24,10 @@ void main(List\<String> args) async {
         if (args[i] == "-tokens")
         {
             show_tokens = true;
-            continue;
         }
         else if (args[i] == "-tree")
         {
             show_tree = true;
-            continue;
         }
         else if (args[i] == "-prefix")
         {
@@ -40,10 +38,9 @@ void main(List\<String> args) async {
             inputs.add(args[++i]);
             is_fns.add(false);
         }
-        else if (args[i] == "-shunt")
+        else if (args[i] == "-tee")
         {
-            shunt_output = true;
-            continue;
+            tee = true;
         }
         else if (args[i] == "-x")
         {
@@ -62,7 +59,6 @@ void main(List\<String> args) async {
         else if (args[i] == "-trace")
         {
             show_trace = true;
-            continue;
         }
         else
         {
@@ -135,12 +131,22 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         lexer.reset();
     }
     var tokens = CommonTokenStream(lexer);
-    var parser = <parser_name>(tokens);
-    IOSink output = shunt_output ? File(input_name + ".errors").openWrite() : stdout;
-    var listener_lexer = new MyErrorListener(quiet, output);
-    var listener_parser = new MyErrorListener(quiet, output);
-//    lexer.AddErrorListener(listener_lexer);
-//    parser.AddErrorListener(listener_parser);
+    var parser = abbParser(tokens);
+    IOSink output;
+    if (tee)
+    {
+        output =  File(input_name + ".errors").openWrite();
+    }
+    else
+    {
+        output = stdout;
+    }
+    var listener_lexer = new MyErrorListener(quiet, tee, output);
+    var listener_parser = new MyErrorListener(quiet, tee, output);
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+    lexer.addErrorListener(listener_lexer);
+    parser.addErrorListener(listener_parser);
     if (show_trace)
     {
         parser.setTrace(true);
@@ -163,7 +169,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     }
     if (show_tree)
     {
-        if (shunt_output)
+        if (tee)
         {
             try {
                 final fn = input_name + ".tree";
@@ -181,5 +187,9 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     {
         stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString());
     }
-    if (shunt_output) output.close();
+    if (tee)
+    {
+        await output.flush();
+        await output.close();
+    }
 }

@@ -1,106 +1,102 @@
 # Template generated code from trgen <version>
-function Test-Case {
 
-    # There's no "find" and "grep" per se in Powershell, but functions that offer
-    # similar behavior.
+$TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
+Write-Host "Test cases here: $TestDirectory"
+if (Test-Path -Path "tests.txt" -PathType Leaf) {
+    Remove-Item "tests.txt"
+}
+$files = New-Object System.Collections.Generic.List[string]
+$new_errors_txt = New-Object System.Collections.Generic.List[string]
 
-    $TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-    Write-Host "Test cases here: $TestDirectory"
-    if (Test-Path -Path "tests.txt" -PathType Leaf) {
-        Remove-Item "tests.txt"
-    }
-    $files = New-Object System.Collections.Generic.List[string]
-    $before_parse_errors = New-Object System.Collections.Generic.List[string]
-    $after_parse_errors = New-Object System.Collections.Generic.List[string]
-
-    foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-        $file = $item.fullname
-        $ext = $item.Extension
-        if (Test-Path $file -PathType Container) {
-            continue
-        } elseif ($ext -eq ".errors") {
-            $size = (Get-Item -Path $file).Length
-            if ( $size -eq 0 ) {
-            } else {
-                $before_parse_errors.Add($item)
-            }
-            continue
-        } elseif ($ext -eq ".tree") {
-            continue
-        } else {
-            $files.Add($item)
-            Write-Host "Test case: $item"
-        }
-    }
-    foreach ($file in $files) {
-        Add-Content "tests.txt" $file
-    }
-    if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
-        Write-Host "No test cases provided."
-        $err = 0
+foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
+    $file = $item.fullname
+    $ext = $item.Extension
+    if (Test-Path $file -PathType Container) {
+        continue
+    } elseif ($ext -eq ".errors") {
+        continue
+    } elseif ($ext -eq ".tree") {
+        continue
     } else {
-
-        # Parse
-        $(& get-content "tests.txt" | trwdog python3 Test.py -x -shunt -tree ; $status = $LASTEXITCODE ) | Write-Host
-
-        Write-Host "exit code $status"
-
-        foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-            $file = $item.fullname
-            $ext = $item.Extension
-            if ($ext -eq ".errors") {
-                $size = (Get-Item -Path $file).Length
-                if ( $size -eq 0 ) {
-                } else {
-                    $after_parse_errors.Add($item)
-                    ((Get-Content $file) -join "`n") + "`n" | Set-Content -NoNewline $file
-                }
-                continue
-            }
-        }
-
-        $message = git diff --exit-code --name-only .
-        $diffs = $LASTEXITCODE
-        Write-Host "git exited $diffs"
-
-        Write-Host "Before $before_parse_errors"
-        Write-Host "After $after_parse_errors"
-        $b = -join $before_parse_errors.ToArray()
-        $a = -join $before_parse_errors.ToArray()
-
-        if ( $diffs -eq 129 ) {
-            Write-Host "Grammar outside a git repository."
-            Write-Host "Defaulting to exit code of group parse."
-            $err = $status
-        } elseif ( $diffs -eq 1 ) {
-            Write-Host $message
-            Write-Host "Difference in output."
-            $err = 1
-        } elseif ( $a -ne $b ) {
-            foreach ($item in $after_parse_errors) {
-                $text = Get-Content $file
-                Write-Host $text
-            }
-            Write-Host "Difference in output."
-            $err = 1
-        } else {
-            $err = 0
-            Write-Host "OK. $err"
-        }
+        $files.Add($item)
+        Write-Host "Test case: $item"
     }
-    Write-Host "err $err"
-    return $err
+}
+foreach ($file in $files) {
+    Add-Content "tests.txt" $file
+}
+if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
+    Write-Host "No test cases provided."
+    exit 1
 }
 
-$ret = Test-Case
-Write-Host "ret $ret"
-if ($ret -eq 0)
-{
+# Parse
+$(& get-content "tests.txt" | trwdog python3 Test.py -x -tee -tree ; $status = $LASTEXITCODE ) | Write-Host
+
+# trwdog returns 255 if it cannot spawn the process.
+if ( $status -eq 255 ) {
+    Write-Host "Test failed."
+    exit 1
+}
+
+# Check if any .errors/.tree files have changed. That's not good.
+$message = git diff --exit-code --name-only $TestDirectory
+$updated = $LASTEXITCODE
+Write-Host $message
+
+# Check if any untracked .errors files are not empty. That's also not good.
+$new_errors2_txt = git ls-files --exclude-standard -o $TestDirectory
+$new_errors = $LASTEXITCODE
+if ( ! [String]::IsNullOrWhiteSpace($new_errors2_txt) ) {
+    $new_errors3_txt = $new_errors2_txt.Split("\n\r\t ")
+} else {
+    $new_errors3_txt = [System.Collections.Arraylist]@()
+}
+
+foreach ($s in $new_errors3_txt) {
+    if ( [String]::IsNullOrWhiteSpace($s) ) {
+        continue
+    }
+    $ext = $item.Extension
+    if (! $s.EndsWith(".errors")) {
+        continue
+    }
+    $file = $s
+    $size = (Get-Item -Path $file).Length
+    if ( $size -eq 0 ) {
+    } else {
+        $new_errors_txt.Add($item)
+        ((Get-Content $file) -join "`n") + "`n" | Set-Content -NoNewline $file
+    }
+}
+
+if ( $updated -eq 129 ) {
+    Write-Host "Grammar outside a git repository. Assuming parse exit code."
+    if ( $status -eq 0 ) {
+        Write-Host "Test succeeded."
+    } else {
+        Write-Host "Test failed."
+    }
+    $err = $status
+    exit 1
+}
+
+if ( $updated -eq 1 ) {
+    Write-Host "Difference in output."
+    Write-Host "Test failed."
+    exit 1
+}
+
+if ( $new_errors_txt.Count() > 0 ) {
+    Write-Host "New errors in output."
+    Write-Host "Test failed."
+    exit 1
+}
+
+if ( $status -eq 0 ) {
     Write-Host "Test succeeded."
     exit 0
-}
-else
-{
+} else {
     Write-Host "Test failed."
     exit 1
 }

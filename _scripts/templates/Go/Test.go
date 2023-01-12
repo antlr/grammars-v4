@@ -14,13 +14,15 @@ import (
 type CustomErrorListener struct {
     errors int
     quiet bool
+    tee bool
     output io.Writer
 }
 
-func NewCustomErrorListener(q bool, o io.Writer) *CustomErrorListener {
+func NewCustomErrorListener(q bool, t bool, o io.Writer) *CustomErrorListener {
     p := new(CustomErrorListener)
-    p.quiet = q
     p.errors = 0
+    p.quiet = q
+    p.tee = t
     p.output = o
     return p
 }
@@ -28,8 +30,12 @@ func NewCustomErrorListener(q bool, o io.Writer) *CustomErrorListener {
 func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line int, column int, msg string, e antlr.RecognitionException) {
     l.errors += 1
     if ! l.quiet {
-        fmt.Fprintf(l.output, "line %d:%d %s", line, column, msg)
-	fmt.Fprintln(l.output)
+        if l.tee {
+            fmt.Fprintf(l.output, "line %d:%d %s", line, column, msg)
+            fmt.Fprintln(l.output)
+        }
+        fmt.Fprintf(os.Stdout, "line %d:%d %s", line, column, msg)
+        fmt.Fprintln(os.Stdout)
     }
 }
 
@@ -54,7 +60,7 @@ var show_trace = false
 var string_instance = 0
 var prefix = ""
 var quiet = false
-var shunt_output = false
+var tee = false
 
 func main() {
     for i := 1; i \< len(os.Args); i = i + 1 {
@@ -69,8 +75,8 @@ func main() {
             i = i + 1
             inputs = append(inputs, os.Args[i])
             is_fns = append(is_fns, false)
-        } else if os.Args[i] == "-shunt" {
-            shunt_output = true
+        } else if os.Args[i] == "-tee" {
+            tee = true
         } else if os.Args[i] == "-x" {
             scanner := bufio.NewScanner(os.Stdin)
             for scanner.Scan() {
@@ -160,7 +166,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
     var (
         output io.Writer
     )
-    if shunt_output {
+    if tee {
         f, _ := os.Create(input_name + ".errors")
         defer f.Close()
         output = bufio.NewWriter(f)
@@ -168,11 +174,11 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         output = os.Stdout
     }
 
-    lexerErrors := NewCustomErrorListener(quiet, output)
+    lexerErrors := NewCustomErrorListener(quiet, tee, output)
     lexer.RemoveErrorListeners()
     lexer.AddErrorListener(lexerErrors)
 
-    parserErrors := NewCustomErrorListener(quiet, output)
+    parserErrors := NewCustomErrorListener(quiet, tee, output)
     parser.RemoveErrorListeners()
     parser.AddErrorListener(parserErrors)
 
@@ -193,7 +199,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
     }
     if show_tree {
         ss := tree.ToStringTree(parser.RuleNames, parser)
-        if shunt_output {
+        if tee {
             f, _ := os.Create(input_name + ".tree")
             defer f.Close()
             w := bufio.NewWriter(f)
@@ -211,5 +217,8 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         fmt.Fprintf(os.Stderr, "%s ", result)
         fmt.Fprintf(os.Stderr, "%.3f", elapsed.Seconds())
         fmt.Fprintln(os.Stderr)
+    }
+    if tee {
+        output.Close();
     }
 }

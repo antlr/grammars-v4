@@ -2,10 +2,11 @@
 
 #include "ErrorListener.h"
 
-ErrorListener::ErrorListener(bool quiet, std::ostream* output)
+ErrorListener::ErrorListener(bool quiet, bool tee, std::ostream* output)
 {
     had_error = false;
     _quiet = quiet;
+    _tee = tee;
     _output = output;
 }
 
@@ -14,6 +15,10 @@ void ErrorListener::syntaxError(antlr4::Recognizer* recognizer, antlr4::Token* o
     had_error = true;
     if (!_quiet)
     {
-        (*_output) \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
+        if (_tee)
+        {
+            (*_output) \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
+        }
+        std::cout \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
     }
 }

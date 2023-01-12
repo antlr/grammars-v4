@@ -16,7 +16,7 @@ import java.io.File;
 
 public class Test {
 
-    static boolean shunt_output = false;
+    static boolean tee = false;
     static boolean show_profile = false;
     static boolean show_tree = false;
     static boolean show_tokens = false;
@@ -53,9 +53,9 @@ public class Test {
                 inputs.add(args[++i]);
                 is_fns.add(false);
             }
-            else if (args[i].equals("-shunt"))
+            else if (args[i].equals("-tee"))
             {
-                shunt_output = true;
+                tee = true;
             }
             else if (args[i].equals("-encoding"))
             {
@@ -153,14 +153,14 @@ public class Test {
         <parser_name> parser = new <parser_name>(tokens);
         PrintStream output = null;
         try {
-            output = shunt_output ? new PrintStream(new File(input_name + ".errors")) : System.out;
+            output = tee ? new PrintStream(new File(input_name + ".errors")) : System.out;
         } catch (NullPointerException e) {
             output = System.out;
         } catch (FileNotFoundException e2) {
             output = System.out;
         }
-        ErrorListener listener_lexer = new ErrorListener(quiet, output);
-        ErrorListener listener_parser = new ErrorListener(quiet, output);
+        ErrorListener listener_lexer = new ErrorListener(quiet, tee, output);
+        ErrorListener listener_parser = new ErrorListener(quiet, tee, output);
         parser.removeErrorListeners();
         lexer.removeErrorListeners();
         parser.addErrorListener(listener_parser);
@@ -184,7 +184,7 @@ public class Test {
             result = "success";
         if (show_tree)
         {
-            if (shunt_output)
+            if (tee)
             {
                 PrintStream treef = null;
                 try {
@@ -204,6 +204,6 @@ public class Test {
         {
             System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + (timeElapsed * 1.0) / 1000.0);
         }
-        if (shunt_output) output.close();
+        if (tee) output.close();
     }
 }

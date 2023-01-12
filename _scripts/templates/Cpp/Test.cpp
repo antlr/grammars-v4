@@ -41,7 +41,7 @@ std::string formatDurationSeconds(uint64_t duration) {
     return oss.str();
 }
 
-bool shunt_output = false;
+bool tee = false;
 bool show_tree = false;
 bool show_tokens = false;
 bool show_trace = false;
@@ -68,11 +68,11 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     }
     auto tokens = new antlr4::CommonTokenStream(lexer);
     auto* parser = new <parser_name>(tokens);
-    std::ostream* output = shunt_output
+    std::ostream* output = tee
         ? new std::ofstream(input_name + ".errors")
         : &std::cout;
-    auto listener_lexer = new ErrorListener(quiet, output);
-    auto listener_parser = new ErrorListener(quiet, output);
+    auto listener_lexer = new ErrorListener(quiet, tee, output);
+    auto listener_parser = new ErrorListener(quiet, tee, output);
     lexer->removeErrorListeners();
     parser->removeErrorListeners();
     lexer->addErrorListener(listener_lexer);
@@ -98,13 +98,13 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     }
     if (show_tree)
     {
-        if (shunt_output)
+        if (tee)
         {
             try {
                 auto fn = input_name + ".tree";
                 auto out = new std::ofstream(fn);
-		(*out) \<\< tree->toStringTree(parser);
-		delete out;
+                (*out) \<\< tree->toStringTree(parser);
+                delete out;
             }
             catch (...) {
             }
@@ -117,6 +117,10 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     if (!quiet)
     {
         std::cerr \<\< prefix \<\< "Cpp " \<\< row_number \<\< " " \<\< input_name \<\< " " \<\< result \<\< " " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+    }
+    if (tee)
+    {
+        delete output;
     }
 }
 
@@ -165,9 +169,9 @@ int TryParse(std::vector\<std::string>& args)
             inputs.push_back(args[i]);
             is_fns.push_back(false);
         }
-        else if (args[i] == "-shunt")
+        else if (args[i] == "-tee")
         {
-            shunt_output = true;
+            tee = true;
         }
         else if (args[i] == "-x")
         {

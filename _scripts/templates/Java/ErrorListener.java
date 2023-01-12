@@ -11,11 +11,13 @@ public class ErrorListener extends ConsoleErrorListener
     public boolean had_error = false;
     private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
     private boolean quiet = false;
+    private boolean tee = false;
     private PrintStream output = null;
 
-    public ErrorListener(boolean q, PrintStream o)
+    public ErrorListener(boolean q, boolean t, PrintStream o)
     {
         quiet = q;
+        tee = t;
         output = o;
     }
 
@@ -28,6 +30,13 @@ public class ErrorListener extends ConsoleErrorListener
         RecognitionException e)
     {
         had_error = true;
-        stdout_utf8.println("line " + line + ":" + charPositionInLine + " " + msg);
+        if (! quiet)
+        {
+            if (tee)
+            {
+                output.println("line " + line + ":" + charPositionInLine + " " + msg);
+            }
+            stdout_utf8.println("line " + line + ":" + charPositionInLine + " " + msg);
+        }
     }
 }

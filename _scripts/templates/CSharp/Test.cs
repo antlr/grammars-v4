@@ -34,8 +34,8 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>(false, System.Console.Out);
-        var listener_parser = new ErrorListener\<IToken>(false, System.Console.Out);
+        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Out);
+        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Out);
         LexerErrorListener = listener_lexer;
         ParserErrorListener = listener_parser;
         lexer.RemoveErrorListeners();
@@ -68,8 +68,8 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>(false, System.Console.Out);
-        var listener_parser = new ErrorListener\<IToken>(false, System.Console.Out);
+        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Out);
+        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Out);
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
@@ -81,7 +81,7 @@ public class Program
         return tree;
     }
 
-    static bool shunt_output = false;
+    static bool tee = false;
     static bool show_profile = false;
     static bool show_tree = false;
     static bool show_tokens = false;
@@ -129,9 +129,9 @@ public class Program
                 inputs.Add(args[++i]);
                 is_fns.Add(false);
             }
-            else if (args[i] == "-shunt")
+            else if (args[i] == "-tee")
             {
-                shunt_output = true;
+                tee = true;
             }
             else if (args[i] == "-encoding")
             {
@@ -242,9 +242,9 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new <parser_name>(tokens);
-        var output = shunt_output ? new StreamWriter(input_name + ".errors") : System.Console.Out;
-        var listener_lexer = new ErrorListener\<int>(quiet, output);
-        var listener_parser = new ErrorListener\<IToken>(quiet, output);
+        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Out;
+        var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
+        var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
@@ -273,7 +273,7 @@ public class Program
         }
         if (show_tree)
         {
-            if (shunt_output)
+            if (tee)
             {
                 System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
             } else
@@ -289,7 +289,7 @@ public class Program
         {
             System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
         }
-        if (shunt_output) output.Close();
+        if (tee) output.Close();
     }
 }
 
