@@ -1919,6 +1919,7 @@ arg_class
 
 param_name
    : type_function_name
+   | builtin_function_name
    ;
 
 func_return
@@ -1927,8 +1928,8 @@ func_return
 
 func_type
    : typename
-   | type_function_name attrs PERCENT TYPE_P
-   | SETOF type_function_name attrs PERCENT TYPE_P
+   | (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
+   | SETOF (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
    ;
 
 func_arg_with_default
@@ -3308,7 +3309,7 @@ consttypename
    ;
 
 generictype
-   : type_function_name attrs? opt_type_modifiers
+   : (builtin_function_name | type_function_name) attrs? opt_type_modifiers
    ;
 
 opt_type_modifiers
