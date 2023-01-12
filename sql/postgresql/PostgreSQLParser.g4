@@ -4509,6 +4509,7 @@ col_name_keyword
    | XMLROOT
    | XMLSERIALIZE
    | XMLTABLE
+   | builtin_function_name
    ;
 
 type_func_name_keyword
