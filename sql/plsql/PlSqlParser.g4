@@ -2165,6 +2165,47 @@ table_compression
     | NOCOMPRESS
     ;
 
+// avoid to match an empty string in
+//  : (INMEMORY inmemory_attributes? | NO INMEMORY)? inmemory_column_clause*
+inmemory_table_clause
+    : (INMEMORY inmemory_attributes? | NO INMEMORY)
+        | inmemory_column_clause
+        | (INMEMORY inmemory_attributes? | NO INMEMORY) inmemory_column_clause*
+   ;
+
+// avoid to match an empty string in
+//    : inmemory_memcompress? inmemory_priority? inmemory_distribute? inmemory_duplicate?
+inmemory_attributes
+    : inmemory_memcompress inmemory_priority? inmemory_distribute? inmemory_duplicate?
+        | inmemory_memcompress? inmemory_priority inmemory_distribute? inmemory_duplicate?
+        | inmemory_memcompress? inmemory_priority? inmemory_distribute inmemory_duplicate?
+        | inmemory_memcompress? inmemory_priority? inmemory_distribute? inmemory_duplicate
+    ;
+
+inmemory_memcompress
+    : MEMCOMPRESS FOR (DML | (QUERY | CAPACITY) (LOW | HIGH)?)
+        | NO MEMCOMPRESS
+    ;
+
+inmemory_priority
+    : PRIORITY (NONE | LOW | MEDIUM | HIGH | CRITICAL)
+    ;
+
+inmemory_distribute
+    : DISTRIBUTE
+        (AUTO | (BY ((ROWID RANGE) | PARTITION | SUBPARTITION)))?
+        (FOR SERVICE (DEFAULT | ALL | identifier | NONE))?
+    ;
+
+inmemory_duplicate
+    : DUPLICATE ALL?
+        | NO DUPLICATE
+    ;
+
+inmemory_column_clause
+    : (INMEMORY inmemory_memcompress? | NO INMEMORY) '(' column_list ')'
+    ;
+
 physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
       | PCTUSED pctused=UNSIGNED_INTEGER
@@ -2752,6 +2793,7 @@ alter_table_properties_1
     : ( physical_attributes_clause
       | logging_clause
       | table_compression
+      | inmemory_table_clause
       | supplemental_table_logging
       | allocate_extent_clause
       | deallocate_unused_clause

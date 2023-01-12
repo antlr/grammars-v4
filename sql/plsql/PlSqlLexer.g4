@@ -1532,6 +1532,7 @@ SERIALLY_REUSABLE:            'SERIALLY_REUSABLE';
 SERIAL:                       'SERIAL';
 SERVERERROR:                  'SERVERERROR';
 SERVICE_NAME_CONVERT:         'SERVICE_NAME_CONVERT';
+SERVICE:                      'SERVICE';
 SERVICES:                     'SERVICES';
 SESSION_CACHED_CURSORS:       'SESSION_CACHED_CURSORS';
 SESSION:                      'SESSION';
