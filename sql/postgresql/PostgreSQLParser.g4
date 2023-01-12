@@ -3603,7 +3603,7 @@ a_expr_collate
 
 
 a_expr_typecast
-   : c_expr (TYPECAST typename)*
+   : VARIADIC? c_expr (TYPECAST typename)*
    ;
 
 b_expr
@@ -3631,7 +3631,7 @@ b_expr
 
 c_expr
    : EXISTS select_with_parens # c_expr_exists
-   | ARRAY (select_with_parens | array_expr) # c_expr_expr
+   | VARIADIC? ARRAY (select_with_parens | array_expr) # c_expr_expr
    | PARAM opt_indirection # c_expr_expr
    | GROUPING OPEN_PAREN expr_list CLOSE_PAREN # c_expr_expr
    | /*22*/
@@ -3729,7 +3729,7 @@ func_expr_common_subexpr
    | TRIM_SCALE OPEN_PAREN a_expr CLOSE_PAREN
    | TRUNC OPEN_PAREN a_expr (COMMA a_expr)? CLOSE_PAREN
    | WIDTH_BUCKET OPEN_PAREN a_expr COMMA a_expr (COMMA a_expr COMMA a_expr)? CLOSE_PAREN
-   | RANDOM OPEN_PAREN a_expr CLOSE_PAREN
+   | RANDOM OPEN_PAREN CLOSE_PAREN
    | SETSEED OPEN_PAREN a_expr CLOSE_PAREN
    | (ACOS | ACOSD | ACOSH) OPEN_PAREN a_expr CLOSE_PAREN
    | (ASIN | ASIND | ASINH) OPEN_PAREN a_expr CLOSE_PAREN
