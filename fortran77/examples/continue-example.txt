@@ -1,10 +1,9 @@
-      program main
+      PROGRAM MAIN
 
-      implicit none
-      
+      IMPLICIT NONE
+
       CONTINUE
-      GOTO 10
+      PRINT *, 'Hello, world!'
 10    CONTINUE
-      print *, 'Hello, world!'
 
-      end
+      END
