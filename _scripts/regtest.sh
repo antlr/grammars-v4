@@ -143,7 +143,7 @@ test()
         exit 1
     fi
     date1=$(date +"%s")
-    make test
+    bash test.sh
     status="$?"
     date2=$(date +"%s")
     DIFF=$(($date2-$date1))

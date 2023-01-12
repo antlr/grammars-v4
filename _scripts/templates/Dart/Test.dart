@@ -131,7 +131,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         lexer.reset();
     }
     var tokens = CommonTokenStream(lexer);
-    var parser = abbParser(tokens);
+    var parser = <parser_name>(tokens);
     IOSink output;
     if (tee)
     {
