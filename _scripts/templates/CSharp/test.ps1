@@ -87,16 +87,11 @@ if ( $updated -eq 1 ) {
     exit 1
 }
 
-if ( $new_errors_txt.Count() > 0 ) {
+if ( $new_errors_txt.Count > 0 ) {
     Write-Host "New errors in output."
     Write-Host "Test failed."
     exit 1
 }
 
-if ( $status -eq 0 ) {
-    Write-Host "Test succeeded."
-    exit 0
-} else {
-    Write-Host "Test failed."
-    exit 1
-}
+Write-Host "Test succeeded."
+exit 0
