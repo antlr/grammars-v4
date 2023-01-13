@@ -1,5 +1,17 @@
 # Template generated code from trgen <version>
-err=0
+
+if [ ! -d ../<example_files_unix> ]
+then
+    echo "No test cases provided."
+    exit 0
+else
+    if [ ! "$(ls -A ../<example_files_unix>)" ]
+    then
+        echo "No test cases provided."
+        exit 0
+    fi
+fi
+
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
@@ -35,6 +47,7 @@ then
     dos2unix $gen
   fi
 fi
+
 old=`pwd`
 cd ../<example_files_unix>
 
