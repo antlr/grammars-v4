@@ -535,7 +535,7 @@ CTRLREC
 
 
 TO
-   : 'TO'
+   : 'TO' | 'to'
    ;
 
 
@@ -650,7 +650,7 @@ NAME
 
 
 COMMENT
-   : {getCharPositionInLine() == 0}? ('c' | STARCHAR) (~ [\r\n])* EOL
+   : {getCharPositionInLine() == 0}? ('c' | STARCHAR) (~ [\r\n])* EOL -> channel(HIDDEN)
    ;
 
 STAR
