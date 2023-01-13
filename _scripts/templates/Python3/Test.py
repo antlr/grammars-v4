@@ -169,7 +169,7 @@ def DoParse(str, input_name, row_number):
         result = 'success'
     if (show_tree):
         if (tee):
-            f = open(input_name + '.tree', 'w')
+            f = open(input_name + '.tree', 'w', encoding='utf-8')
             f.write(tree.toStringTree(recog=parser))
         else:
             print(tree.toStringTree(recog=parser))
