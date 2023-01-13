@@ -185,7 +185,7 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new Test.<parser_name>(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Out;
+        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
         lexer.RemoveErrorListeners();
@@ -217,7 +217,7 @@ public class Program
                 System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
             } else
             {
-                System.Console.Out.WriteLine(tree.ToStringTree(parser));
+                System.Console.Error.WriteLine(tree.ToStringTree(parser));
             }
         }
         if (!quiet)

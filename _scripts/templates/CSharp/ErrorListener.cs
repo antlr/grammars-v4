@@ -33,7 +33,7 @@ public class ErrorListener\<S> : IAntlrErrorListener\< S>
             {
                 _out.WriteLine("line " + line + ":" + col + " " + msg);
             }
-            System.Console.Out.WriteLine("line " + line + ":" + col + " " + msg);
+            System.Console.Error.WriteLine("line " + line + ":" + col + " " + msg);
         }
     }
 }

@@ -34,8 +34,8 @@ func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offending
             fmt.Fprintf(l.output, "line %d:%d %s", line, column, msg)
             fmt.Fprintln(l.output)
         }
-        fmt.Fprintf(os.Stdout, "line %d:%d %s", line, column, msg)
-        fmt.Fprintln(os.Stdout)
+        fmt.Fprintf(os.Stderr, "line %d:%d %s", line, column, msg)
+        fmt.Fprintln(os.Stderr)
     }
 }
 
@@ -148,10 +148,10 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         j := 0
         for {
             t := lexer.NextToken()
-            fmt.Print(j)
-            fmt.Print(" ")
+            fmt.Fprintf(os.Stderr, "%d ", j)
+            fmt.Fprintf(os.Stderr, " ")
             // missing fmt.Println(t.String())
-            fmt.Println(t.GetText())
+            fmt.Fprintf(os.Stderr, "%d ", t.GetText())
             if t.GetTokenType() == antlr.TokenEOF {
                 break
             }
@@ -171,7 +171,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         defer f.Close()
         output = bufio.NewWriter(f)
     } else {
-        output = os.Stdout
+        output = os.Stderr
     }
 
     lexerErrors := NewCustomErrorListener(quiet, tee, output)
@@ -206,7 +206,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
             fmt.Fprint(w, ss)
             w.Flush()
         } else {
-            fmt.Println(ss)
+            fmt.Fprintf(os.Stderr, "%s", ss)
         }
     }
     if ! quiet {

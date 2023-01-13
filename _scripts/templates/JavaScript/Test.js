@@ -164,7 +164,7 @@ function DoParse(str, input_name, row_number) {
             var ro_token = lexer.nextToken();
             var token = ro_token;
             token.TokenIndex = i;
-            console.log(token.toString());
+            console.error(token.toString());
             if (token.type === antlr4.Token.EOF)
                 break;
         }
@@ -191,7 +191,7 @@ function DoParse(str, input_name, row_number) {
         if (tee) {
             fs.writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames));
         } else {
-            console.log(tree.toStringTree(parser.ruleNames));
+            console.error(tree.toStringTree(parser.ruleNames));
         }
     }
     if (! quiet) {

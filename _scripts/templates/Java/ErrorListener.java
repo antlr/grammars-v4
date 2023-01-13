@@ -9,7 +9,7 @@ import java.io.PrintStream;
 public class ErrorListener extends ConsoleErrorListener
 {
     public boolean had_error = false;
-    private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
+    private static PrintWriter stderr_utf8 = new PrintWriter(new OutputStreamWriter(System.err, StandardCharsets.UTF_8), true);
     private boolean quiet = false;
     private boolean tee = false;
     private PrintStream output = null;
@@ -36,7 +36,7 @@ public class ErrorListener extends ConsoleErrorListener
             {
                 output.println("line " + line + ":" + charPositionInLine + " " + msg);
             }
-            stdout_utf8.println("line " + line + ":" + charPositionInLine + " " + msg);
+            stderr_utf8.println("line " + line + ":" + charPositionInLine + " " + msg);
         }
     }
 }

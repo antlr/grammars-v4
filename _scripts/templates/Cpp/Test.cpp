@@ -60,7 +60,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         for (int i = 0; ; ++i)
         {
             auto token = lexer->nextToken();
-            std::cout \<\< token->toString() \<\< std::endl;
+            std::cerr \<\< token->toString() \<\< std::endl;
             if (token->getType() == antlr4::IntStream::EOF)
                 break;
         }
@@ -70,7 +70,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     auto* parser = new <parser_name>(tokens);
     std::ostream* output = tee
         ? new std::ofstream(input_name + ".errors")
-        : &std::cout;
+        : &std::cerr;
     auto listener_lexer = new ErrorListener(quiet, tee, output);
     auto listener_parser = new ErrorListener(quiet, tee, output);
     lexer->removeErrorListeners();
@@ -111,7 +111,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         }
         else
         {
-            std::cout \<\< tree->toStringTree(parser) \<\< std::endl;
+            std::cerr \<\< tree->toStringTree(parser) \<\< std::endl;
         }
     }
     if (!quiet)

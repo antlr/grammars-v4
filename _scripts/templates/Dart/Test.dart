@@ -124,7 +124,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         for (int i = 0; ; ++i)
         {
             var token = lexer.nextToken();
-            print(token.toString());
+            stderr.writeln(token.toString());
             if (token.type == -1)
                 break;
         }
@@ -139,7 +139,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     }
     else
     {
-        output = stdout;
+        output = stderr;
     }
     var listener_lexer = new MyErrorListener(quiet, tee, output);
     var listener_parser = new MyErrorListener(quiet, tee, output);
@@ -180,7 +180,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         }
         else
         {
-            print(tree.toStringTree(parser: parser));
+            stderr.writeln(tree.toStringTree(parser: parser));
         }
     }
     if (!quiet)

@@ -56,7 +56,7 @@ class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/
             if ($this->tee) {
                 fwrite($this->output, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
             }
-            fwrite(STDOUT, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
+            fwrite(STDERR, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
         }
     }
 }
@@ -165,7 +165,7 @@ function DoParse($str, $input_name, $row_number) {
         for ($i=0;  ; $i++) {
             $token = $lexer->nextToken();
             $token->setTokenIndex($i);
-            print($token . PHP_EOL);
+            fwrite(STDERR, $token . PHP_EOL);
             if ($token->getType() == Token::EOF){
                 break;
             }
@@ -176,7 +176,7 @@ function DoParse($str, $input_name, $row_number) {
     if ( $tee ) {
         $output = fopen($input_name . ".errors", "w");
     } else {
-        $output = STDOUT;
+        $output = STDERR;
     }
     $lexerErrorListener = new MyErrorListener($quiet, $tee, $output);
     $lexer->removeErrorListeners();
@@ -208,7 +208,7 @@ function DoParse($str, $input_name, $row_number) {
             fprintf($handle, "%s", $tree->toStringTree($parser->getRuleNames()));
             fclose($handle);
         } else {
-            print($tree->toStringTree($parser->getRuleNames()));
+            fwrite(STDERR, $tree->toStringTree($parser->getRuleNames()));
         }
     }
     fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $duration->asSeconds() . "\n");

@@ -40,7 +40,7 @@ class MyErrorListener extends BaseErrorListener
             {
                 _output.writeln('line $line:$charPositionInLine $msg');
             }
-            stdout.writeln('line $line:$charPositionInLine $msg');
+            stderr.writeln('line $line:$charPositionInLine $msg');
         }
     }
 

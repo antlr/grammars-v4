@@ -150,7 +150,7 @@ public class Test {
                 if (token.getType() == IntStream.EOF)
                     break;
             }
-            System.out.println(new_s.toString());
+            System.err.println(new_s.toString());
             lexer.reset();
         }
         var tokens = new CommonTokenStream(lexer);
@@ -159,9 +159,9 @@ public class Test {
         try {
             output = tee ? new PrintStream(new File(input_name + ".errors")) : System.out;
         } catch (NullPointerException e) {
-            output = System.out;
+            output = System.err;
         } catch (FileNotFoundException e2) {
-            output = System.out;
+            output = System.err;
         }
         ErrorListener listener_lexer = new ErrorListener(quiet, tee, output);
         ErrorListener listener_parser = new ErrorListener(quiet, tee, output);
@@ -203,7 +203,7 @@ public class Test {
                 treef.close();
             } else
             {
-                System.out.println(tree.toStringTree(parser));
+                System.err.println(tree.toStringTree(parser));
             }
         }
         if (!quiet)

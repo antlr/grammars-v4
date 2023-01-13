@@ -28,7 +28,7 @@ class MyErrorListener(ErrorListener):
         if (not self.quiet):
             if ( self.tee ):
                 self.output.write(f"line {line}:{column} {msg}\n");
-            print(f"line {line}:{column} {msg}");
+            print(f"line {line}:{column} {msg}", file=sys.stderr);
 
 tee = False
 show_tokens = False
@@ -114,6 +114,7 @@ def ParseString(input, row_number):
     string_instance = string_instance + 1
 
 def ParseFilename(input, row_number):
+    global encoding
     str = FileStream(input, encoding)
     DoParse(str, input, row_number)
 
@@ -132,7 +133,7 @@ def DoParse(str, input_name, row_number):
     if (tee):
         output = open(input_name + ".errors", "w")
     else:
-        output = sys.stdout
+        output = sys.stderr
     listener_lexer = MyErrorListener(quiet, tee, output)
     lexer.addErrorListener(listener_lexer)
     # lexer.strictMode = false
@@ -148,7 +149,7 @@ def DoParse(str, input_name, row_number):
             token = ro_token
             # token.TokenIndex = i
             i = i + 1
-            print(token)
+            print(token, file=sys.stderr)
             if (token.type == -1):
                 break
         lexer.reset()
@@ -171,8 +172,9 @@ def DoParse(str, input_name, row_number):
         if (tee):
             f = open(input_name + '.tree', 'w', encoding='utf-8')
             f.write(tree.toStringTree(recog=parser))
+            f.close()
         else:
-            print(tree.toStringTree(recog=parser))
+            print(tree.toStringTree(recog=parser), file=sys.stderr)
     if (not quiet):
         sys.stderr.write(prefix)
         sys.stderr.write('Python3 ')

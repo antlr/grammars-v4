@@ -34,8 +34,8 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Out);
-        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Out);
+        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
+        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Error);
         LexerErrorListener = listener_lexer;
         ParserErrorListener = listener_parser;
         lexer.RemoveErrorListeners();
@@ -68,8 +68,8 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
-        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Out);
-        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Out);
+        var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
+        var listener_parser = new ErrorListener\<IToken>(false, false, System.Console.Error);
         lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
@@ -242,7 +242,7 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new <parser_name>(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Out;
+        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
         lexer.RemoveErrorListeners();
@@ -278,12 +278,12 @@ public class Program
                 System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
             } else
             {
-                System.Console.Out.WriteLine(tree.ToStringTree(parser));
+                System.Console.Error.WriteLine(tree.ToStringTree(parser));
             }
         }
         if (show_profile)
         {
-            System.Console.Out.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
+            System.Console.Error.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
         }
         if (!quiet)
         {

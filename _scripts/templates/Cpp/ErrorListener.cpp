@@ -19,6 +19,6 @@ void ErrorListener::syntaxError(antlr4::Recognizer* recognizer, antlr4::Token* o
         {
             (*_output) \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
         }
-        std::cout \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
+        std::cerr \<\< "line " \<\< line \<\< ":" \<\< col \<\< " " \<\< msg \<\< std::endl;
     }
 }
