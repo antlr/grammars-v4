@@ -173,16 +173,19 @@ def DoParse(str, input_name, row_number):
             f.write(tree.toStringTree(recog=parser))
         else:
             print(tree.toStringTree(recog=parser))
-    sys.stderr.write(prefix)
-    sys.stderr.write('Python3 ')
-    sys.stderr.write(f'{row_number}')
-    sys.stderr.write(' ')
-    sys.stderr.write(input_name)
-    sys.stderr.write(' ')
-    sys.stderr.write(result)
-    sys.stderr.write(' ')
-    sys.stderr.write(f'{diff_time}')
-    sys.stderr.write('\n')
+    if (not quiet):
+        sys.stderr.write(prefix)
+        sys.stderr.write('Python3 ')
+        sys.stderr.write(f'{row_number}')
+        sys.stderr.write(' ')
+        sys.stderr.write(input_name)
+        sys.stderr.write(' ')
+        sys.stderr.write(result)
+        sys.stderr.write(' ')
+        sys.stderr.write(f'{diff_time}')
+        sys.stderr.write('\n')
+    if (tee):
+        output.close()
 
 if __name__ == '__main__':
     main(sys.argv)
