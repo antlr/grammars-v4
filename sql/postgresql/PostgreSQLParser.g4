@@ -1928,8 +1928,7 @@ func_return
 
 func_type
    : typename
-   | (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
-   | SETOF (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
+   | SETOF? (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
    ;
 
 func_arg_with_default
