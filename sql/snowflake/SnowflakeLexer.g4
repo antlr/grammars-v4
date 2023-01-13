@@ -377,6 +377,7 @@ HISTORY:                                               'HISTORY';
 HOURS:                                                 'HOURS';
 IDENTITY:                                              'IDENTITY';
 IF:                                                    'IF';
+IFF:                                                   'IFF';
 IGNORE:                                                'IGNORE';
 IGNORE_CONSTRAINTS:                                    'IGNORE_CONSTRAINTS';
 IGNORE_DUP_KEY:                                        'IGNORE_DUP_KEY';
