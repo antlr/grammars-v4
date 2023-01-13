@@ -1,0 +1,123 @@
+package app5 { 
+
+
+  class Bond {
+
+  stereotype persistent;
+
+
+    attribute id identity : String;
+
+    attribute term : double;
+
+    attribute coupon : double;
+
+    attribute price : double;
+
+    attribute frequency : int;
+
+    attribute yield derived : double;
+
+    attribute duration derived : double;
+
+
+    operation discount(amount : double , r : double , time : double ) : double
+    pre: r > -1 & r <= 1 & time >= 0
+    post: true
+    activity: 
+      result := amount / ( ( 1 + r )->pow(time) );
+
+    operation value(r : double ) : double
+    pre: r > -1 & r <= 1
+    post: true 
+    activity: 
+      var upper : int ; 
+      upper := ( term * frequency )->floor()->oclAsType(int) ; 
+      var c : double ; 
+      c := coupon / frequency ; 
+      var period : double ; 
+      period := 1.0 / frequency ;
+      result := self.discount(100,r,term) ;
+
+      for i : 1..upper
+      do 
+         result := result + self.discount(c,r,i * period); 
+      return result;
+
+    operation timeDiscount(amount : double , r : double , time : double ) : double
+    pre: r > -1 & r <= 1 & time >= 0
+    post: true 
+    activity: 
+      result := ( amount * time ) / ( ( 1 + r )->pow(time) );
+
+    operation macaulayDuration(r : double ) : double
+    pre: r > -1 & r <= 1
+    post: true 
+    activity: 
+      var upper : int ; 
+      upper := ( term * frequency )->floor()->oclAsType(int) ;
+      var c : double ; 
+      c := coupon / frequency ;
+      var period : double ;
+      period := 1.0 / frequency ; 
+      result := self.timeDiscount(100,r,term) ; 
+      for i : 1..upper
+      do 
+        result := result + self.timeDiscount(c,r,i * period) ; 
+      return result / self.value(r);
+
+    operation bisection(r : double , rl : double , ru : double ) : double
+    pre: r > -1 & rl > -1 & ru > -1 & ru <= 1 & rl <= 1 & r <= 1
+    post: true 
+    activity: 
+      var v : double ; 
+      v := value(r) ;
+      if ru - rl < 0.001 
+      then 
+        return r 
+      else 
+        if v > price 
+        then 
+          return self.bisection(( ru + r ) / 2,r,ru) 
+        else 
+          return self.bisection(( r + rl ) / 2,rl,r);
+
+  }
+
+
+
+
+
+
+  usecase findDuration(bondId : String) : String {
+
+    stereotype application; 
+
+    activity:
+      var bond : Bond ; bond := Bond[bondId] ; 
+      bond.duration := bond.macaulayDuration(bond.yield) ; 
+      call persistBond(bond) ; 
+      result := ( "Duration is: " + bond.duration ); 
+
+  }
+
+
+
+
+  usecase findYield(bondId : String) : String {
+    extendedBy findDuration;
+
+    stereotype application; 
+
+    activity:
+      var bond : Bond ; bond := Bond[bondId] ; 
+      bond.yield := bond.bisection(0.25,-0.5,1); 
+      call persistBond(bond) ; 
+      result := "Yield is: " + bond.yield;
+  }
+
+
+}
+
+
+

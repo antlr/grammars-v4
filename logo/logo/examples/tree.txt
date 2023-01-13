@@ -1,0 +1,50 @@
+to left_side
+rt 20 fd 20 lt 20 fd 60 
+end
+
+to top_side
+rt 90 fd 25 rt 90
+end
+
+
+to right_side
+fd 60 lt 20 fd 20 rt 20
+end
+
+
+to return_start
+rt 90 fd 40
+rt 90
+end
+
+
+to trunk
+left_side
+top_side
+right_side
+return_start
+end
+
+
+to center_top
+pu
+fd 80
+rt 90
+fd 20
+lt 90
+pd
+end
+
+
+to circle
+repeat 360 [fd 1 rt 1]
+end
+
+
+to tree
+pu bk 100 pd
+trunk
+center_top
+left 90
+circle
+end

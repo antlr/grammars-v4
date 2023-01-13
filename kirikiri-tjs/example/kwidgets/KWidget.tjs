@@ -1,0 +1,1917 @@
+//
+// $Id: KWidget.tjs,v 1.22 2007/09/17 12:09:52 m2 Exp $
+//
+
+
+global._dragging_packet_ = void;
+
+
+/**----------------------------------------------------------------------
+ * ウィジェット関連グローバル変数
+ ----------------------------------------------------------------------*/
+
+/// デフォルトのフォントフェイス
+global.defaultFontFace = "MS UI Gothic";
+/// デフォルトのフォントヘイト
+global.defaultFontHeight = 14;
+/// デフォルトのフォントカラー
+global.defaultFontColor = 0x00000000;
+/// デフォルトのマージン
+global.defaultMarginLeft = 0;
+global.defaultMarginTop = 0;
+global.defaultMarginRight = 0;
+global.defaultMarginBottom = 0;
+/// デフォルトのスペース
+global.defaultSpaceVertical = 0;
+global.defaultSpaceHorizontal = 0;
+/// デフォルトのアライメント
+global.defaultAlignHorizontal = ALIGN_LEFT;
+global.defaultAlignVertical = ALIGN_TOP;
+/// デフォルトのフォーカス能
+global.defaultFocusable = false;
+
+property defaultMargin {
+  setter(v) {
+    defaultMarginLeft = defaultMarginTop = defaultMarginRight = defaultMarginBottom = v;
+  }
+}
+
+property defaultMarginHorizontal {
+  setter(v) {
+    defaultMarginLeft = defaultMarginRight = v;
+  }
+}
+
+property defaultMarginVertical {
+  setter(v) {
+    defaultMarginTop = defaultMarginBottom = v;
+  }
+}
+
+property defaultSpace {
+  setter(v) {
+    defaultSpaceVertical = defaultSpaceHorizontal = v;
+  }
+}
+
+
+/*------------------------------
+ * ドラッグ用パケット
+ ------------------------------*/
+class KPacket
+{
+  var name, arg;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * ドラッグ用パケットを作る
+   *
+   * @param name 名前
+   * @param arg 引数
+   ------------------------------*/
+  function KPacket(name, arg) {
+    this.name = name;
+    this.arg = arg;
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * ウィジェット基底クラス
+ ----------------------------------------------------------------------*/
+class KWidget extends Layer
+{
+  // ウィジェットの最小サイズ
+  var _minWidth, _minHeight;
+  // ウィジェットの最大サイズ
+  var _maxWidth, _maxHeight;
+  // ウィジェットの上下左右のマージン
+  var _marginLeft, _marginTop, _marginRight, _marginBottom;
+  // ウィジェットのアライメント
+  var _alignHorizontal, _alignVertical;
+  // スペース
+  var _spaceHorizontal, _spaceVertical;
+  // フォントカラー
+  var _fontColor;
+  // nameプロパティを上書き
+  var _name;
+  // 辞書登録を避けるかどうか
+  var _isAvoidDictionaryRegistration = false;
+  // Ｄ＆Ｄ
+  var isReadyToDrag, isDragging;
+  var myDraggingPacket;
+  var mouseDownX, mouseDownY;
+  var curDragTarget, curDragTargetAcceptPacket;
+  var dragEnabledShiftMask;
+  var cursorOrig;
+  // ステータス関連
+  var _status;
+  var _inStatus;
+  // ウィジェット
+  var _nameCache = %[];
+  // 不定値
+  var _indeterminate = false;
+  var indeterminateLayer = void;
+  // ドラッグ閾値
+  var mouseDragThreshold = 4;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィジェットの属するウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KWidget(win, name = "", primary = false) {
+    if (primary)
+      super.Layer(win, null);
+    else
+      super.Layer(win, win.primaryWidget.widgetDepot);
+
+    // 名前を設定
+    _name = name;
+    // 最小・最大サイズを暫定サイズに決定
+    _minWidth = _maxWidth = width;
+    _minHeight = _maxHeight = height;
+    // マージンを暫定値に決定
+    _marginLeft = win.defaultMarginLeft;
+    _marginTop = win.defaultMarginTop;
+    _marginRight = win.defaultMarginRight;
+    _marginBottom = win.defaultMarginBottom;
+    // アラインメントを暫定値に決定
+    _alignVertical = win.defaultAlignVertical;
+    _alignHorizontal = win.defaultAlignHorizontal;
+    // スペースを暫定値に決定
+    _spaceHorizontal = win.defaultSpaceHorizontal;
+    _spaceVertical = win.defaultSpaceVertical;
+    // デフォルトのフォントを決定
+    font.face = win.defaultFontFace;
+    font.height = win.defaultFontHeight;
+    _fontColor = win.defaultFontColor;
+    // 可視
+    visible = true;
+    // ドラッグ初期化
+    isDragging = isReadyToDrag = false;
+    curDragTargetAcceptPacket = false;
+    dragEnabledShiftMask = 0;
+    // ステータス初期化
+    _status = "";
+    _inStatus = false;
+    // missing を有効にする
+    Scripts.setCallMissing(this);
+  }
+
+  /**------------------------------
+   * デストラクタ
+   * 
+   * 自動的に、自分が保持している子レイヤーを全てinvalidateする。
+   ------------------------------*/
+  function finalize {
+    // 子レイヤーを全て破棄する
+    discardArray(children);
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * nameプロパティを文字列以外も受け取るように変更
+   ------------------------------*/
+  property name {
+    getter {
+      return _name;
+    }
+    setter (v) {
+      _name = v;
+    }
+  }
+
+  /**------------------------------
+   * 不定値
+   *
+   * valueの値が不定であるかどうかを設定する
+   ------------------------------*/
+  property indeterminate {
+    getter {
+      return _indeterminate;
+    }
+    setter (v) {
+      if (v == _indeterminate)
+	return;
+      _indeterminate = v;
+      if (v) {
+	indeterminateLayer = new global.Layer(window, this);
+	indeterminateLayer.absolute = 100000;
+	indeterminateLayer.setSize(width, height);
+	indeterminateLayer.fillRect(0, 0, width, height, 0x40000000);
+	indeterminateLayer.visible = true;
+	indeterminateLayer.hitThreshold = 256;
+      } else {
+	invalidate indeterminateLayer;
+	indeterminateLayer = void;
+      }
+    }
+  }
+
+  /**------------------------------
+   * 可視
+   *
+   * 可視状態の変更は親へ通知される。
+   ------------------------------*/
+  property visible {
+    getter {
+      return super.visible;
+    }
+    setter (v) {
+      if (super.visible == v)
+        return;
+      super.visible = v;
+      if (isInWidgetTree)
+        parentWidget.onChildVisibleModified(this, v);
+    }
+  }
+
+  /**------------------------------
+   * 子の可視状態が変更された時に呼ばれるフック
+   *
+   * 可視状態の変更は親へ通知される。
+   ------------------------------*/
+  function onChildVisibleModified(child, value) {
+  }
+
+  /**------------------------------
+   * ステータス
+   *
+   * ステータスバーに表示するステータス文字列を設定します。
+   * ウィンドウにKStatusBarが登録されていれば、ウィジェットに
+   * マウスが侵入した時に、自動的にステータス文字列が表示されます。
+   *
+   * @param v ステータス
+   * @return ステータス
+   ------------------------------*/
+  property status {
+    getter {
+      for (var w = this; w != null; w = w.parent) 
+        if (w._status.length)
+          return w._status;
+      return "";
+    }
+    setter (v) {
+      _status = v;
+      if (_inStatus
+          && window.statusBar !== void) {
+        window.statusBar.label = _status;
+      }
+    }
+  }
+
+  /**------------------------------
+   * クラスツリー
+   *
+   * @return 自分自身の属するクラスツリーを配列で返す
+   ------------------------------*/
+  property classTrees {
+    getter {
+      return Scripts.getClassNames(this);
+    }
+  }
+
+  /**------------------------------
+   * クラス名
+   *
+   * @return 自分自身のクラス名を返す
+   ------------------------------*/
+  property className {
+    getter {
+      return Scripts.getClassNames(this)[0];
+    }
+  }
+
+  /**------------------------------
+   * 親ウィジェット。
+   *
+   * @return プライマリレイヤならwindowを、それ以外のレイヤならparentを返す
+   ------------------------------*/
+  property parentWidget {
+    getter {
+      if (isPrimary)
+        return window;
+      else
+        return parent;
+    }
+  }
+
+  /**------------------------------
+   * ウィジェットデポット
+   *
+   * addする前のウィジェットを格納する親レイヤ。ウィジェットの一時保管所
+   ------------------------------*/
+  property widgetDepot {
+    getter {
+      return window.primaryWidget.widgetDepot;
+    }
+  }
+
+  /**------------------------------
+   * ウィジェットツリーの中に存在するかどうか
+   ------------------------------*/
+  property isInWidgetTree {
+    getter {
+      if (isPrimary)
+        return true;
+      else
+        return parent != widgetDepot;
+    }
+  }
+
+  /**------------------------------
+   * 祖先ウィジェットの一覧
+   ------------------------------*/
+  property ancestors {
+    getter {
+      if (isPrimary)
+        return [];
+      else {
+        var result = parent.ancestors;
+        result.add(parent);
+        return result;
+      }
+    }
+  }
+
+  /**------------------------------
+   * 子孫ウィジェットの一覧
+   ------------------------------*/
+  property descendants {
+    getter {
+      var result = [];
+      for (var i = 0; i < children.count; i++) {
+        var child = children[i];
+        if (child instanceof "KWidget") {
+          result.add(child);
+          var childDescendants = child.descendants;
+          for (var j = 0; j < childDescendants.count; j++)
+            result.add(childDescendants[j]);
+        }
+      }
+      return result;
+    }
+  }
+
+  /**------------------------------
+   * 子孫ウィジェットから特定の名前を持った子ウィジェットを捜す
+   ------------------------------*/
+  function find(name) {
+    if (this.name === name)
+      return this;
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KWidget") {
+        var widget = child.find(name);
+        if (widget)
+          return widget;
+      }
+    }
+    return void;
+  }
+
+  /**------------------------------
+   * ウィジェットツリーから特定の名前を持った子ウィジェットを捜します
+   *
+   * find関数を経由せずに、オブジェクトのプロパティ扱いで名前を指定して
+   * ウィジェットツリー中のウィジェットを参照することが出来ます。
+   *
+   * パフォーマンスの都合で、グローバルに同名のシンボルが存在する場合は
+   * 優先的にそちらを見に行くという挙動をするので注意。
+   ------------------------------*/
+  function missing(get_or_set, name, value) {
+    if (! get_or_set) {
+      if (typeof(global[name]) != "undefined")
+        return false;
+      if (typeof(_nameCache[name]) != "undefined") {
+        var widget = _nameCache[name];
+        if (widget isvalid
+            && widget.name == name) {
+          *value = widget;
+          return true;
+        } else {
+          delete _nameCache[name];
+        }
+      }
+      var widget = find(name);
+      if (widget) {
+        _nameCache[name] = widget;
+        *value = widget;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**------------------------------
+   * 指定位置のウィジェットを取得
+   *
+   * @param x 取得したいウィジェットの位置の x 座標を表示座標上でピクセル単位で指定します。
+   * @param y 取得したいウィジェットの位置の y 座標を表示座標上でピクセル単位で指定します。
+   * @param exclude_self 　ウィジェットの検索から自分自身を除外するかどうかを指定します。 
+   * @param get_disabled 　無効になっているウィジェットのオブジェクトを得るかどうかを指定します。 
+   ------------------------------*/
+  function getWidgetAt(x, y, exclude_self = false, get_disabled = false) {
+    for (var targetLayer = getLayerAt(x, y, exclude_self, get_disabled);
+         targetLayer;
+         targetLayer = targetLayer.parent) {
+      if ((targetLayer instanceof "KWidget")) {
+        if (exclude_self)
+          return void;
+        else
+          return targetLayer;
+      }
+    }
+    return void;
+  }
+
+  /*----------------------------------------------------------------------
+   * parentプロパティの拡張
+   *
+   * parentが更新された時に、onParentModifiedが呼ばれるようにする
+   ----------------------------------------------------------------------*/
+  property parent {
+    getter {
+      return super.parent;
+    }
+    setter(v) {
+      if (super.parent == v)
+        return;
+      super.parent = v;
+      onParentModified(v == widgetDepot ? void : v);
+    }
+  }
+
+  /**----------------------------------------------------------------------
+   * parentが更新された時に呼ばれる関数
+   *
+   * @param p 新しくparentになったウィジェット。removeされてdepot行きになった時はvoidが設定されて呼ばれる
+   */
+  function onParentModified(parent) {
+  }
+
+  /**------------------------------
+   * 永続化辞書のバインドを避けるかどうか
+   *
+   * @param v 永続化辞書のバインドを避けるかどうか
+   * @return 永続化辞書のバインドを避けるかどうか
+   ------------------------------*/
+  property isAvoidDictionaryRegistration {
+    getter {
+      return _isAvoidDictionaryRegistration;
+    }
+    setter(v) {
+      _isAvoidDictionaryRegistration = v;
+    }
+  }
+
+  /**------------------------------
+   * 永続化辞書をバインドする
+   *
+   * ウィジェットを KPersistentDictionary クラスのオブジェクトにバインドします。
+   * デフォルトでは、全ての子ウィジェットを探索し、それらの
+   * ウィジェットの bindPersistentDictionary を再帰的に呼び出すという動作をします。
+   *
+   * @param dict バインドする辞書
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (_isAvoidDictionaryRegistration)
+      return;
+
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KWidget") 
+        child.bindPersistentDictionary(dict);
+    }
+  }
+
+  /**------------------------------
+   * 最小幅
+   *
+   * @return 最小幅
+   * @param w 最小幅
+   ------------------------------*/
+  property minWidth {
+    getter {
+      return _minWidth;
+    }
+
+    setter(w) {
+      setMinMaxSize(w, _minHeight, _maxWidth, _maxHeight);
+    }
+  }
+
+  /**------------------------------
+   * 最小高さ
+   *
+   * @return 最小高さ
+   * @param w 最小高さ
+   ------------------------------*/
+  property minHeight {
+    getter {
+      return _minHeight;
+    }
+
+    setter(h) {
+      setMinMaxSize(_minWidth, h, _maxWidth, _maxHeight);
+    }
+  }
+
+  /**------------------------------
+   * 最小サイズ設定
+   *
+   * @param w 最小幅
+   * @param h 最小高さ
+   ------------------------------*/
+  function setMinSize(w, h) {
+    setMinMaxSize(w, h, _maxWidth, _maxHeight);
+  }
+
+  /**------------------------------
+   * 最大幅
+   *
+   * @return 最大幅
+   * @param h 最大幅
+   ------------------------------*/
+  property maxWidth {
+    getter {
+      return _maxWidth;
+    }
+
+    setter(w) {
+      setMinMaxSize(_minWidth, _minHeight, w, _maxHeight);
+    }
+  }
+
+  /**------------------------------
+   * 最大高さ
+   *
+   * @return 最大高さ
+   * @param h 最大高さ
+   ------------------------------*/
+  property maxHeight {
+    getter {
+      return _maxHeight;
+    }
+
+    setter(h) {
+      setMinMaxSize(_minWidth, _minHeight, _maxWidth, h);
+    }
+  }
+
+  /*------------------------------
+   * 最大サイズ設定
+   *
+   * @param w 最大幅
+   * @param h 最大高さ
+   */
+  function setMaxSize(w, h) {
+    setMinMaxSize(_minWidth, _minHeight, w, h);
+  }
+
+  /**------------------------------
+   * 最大サイズと最小サイズを、同時に同じ値に設定
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setFixedSize(w, h) {
+    setMinMaxSize(w, h, w, h);
+  }
+
+  /**------------------------------
+   * 最大サイズと最小サイズを、イメージサイズに設定
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setFixedSizeToImageSize() {
+    setMinMaxSize(imageWidth, imageHeight, imageWidth, imageHeight);
+  }
+
+  /*------------------------------
+   * 最大サイズと最小サイズを同時設定
+   *
+   * @param minW 最小幅
+   * @param minH 最小高さ
+   * @param maxW 最大幅
+   * @param maxH 最大高さ
+   ------------------------------*/
+  function setMinMaxSize(minW, minH, maxW, maxH) {
+    // 変更があった時のみ処理
+    if (_minWidth == minW
+        && _minHeight == minH
+        && _maxWidth == maxW
+        && _maxHeight == maxH)
+      return;
+
+    // minとmaxの逆転をチェック
+    if (minW > maxW || minH > maxH)
+      throw new Exception("%s: minmax size mismatch(minW:%d,minH:%d,maxW:%d,maxH:%d".sprintf(className, minW,minH,maxW,maxH));
+
+    // 旧サイズを記録
+    var oldMinWidth, oldMinHeight, oldMaxWidth, oldMaxHeight;
+    oldMinWidth = _minWidth;
+    oldMinHeight = _minHeight;
+    oldMaxWidth = _maxWidth;
+    oldMaxHeight = _maxHeight;
+      
+    // サイズを更新
+    _minWidth = minW;
+    _minHeight = minH;
+    _maxWidth = maxW;
+    _maxHeight = maxH;
+    // サイズ変更を親に通知
+    if (isInWidgetTree)
+      parentWidget.onChildMinMaxSizeModified(this,
+                                             _minWidth, _minHeight, _maxWidth, _maxHeight,
+                                             oldMinWidth, oldMinHeight, oldMaxWidth, oldMaxHeight);
+    // サイズ変更
+    invalidateSize();
+  }
+
+  /**----------------------------------------------------------------------
+   * 子ウィジェットの最小サイズ、最大サイズの更新に伴って呼ばれるフック関数
+   *
+   * @param child 最小・最大サイズの更新された子ウィジェット
+   * @param newMinWidth 新規最小幅
+   * @param newMinHeight 新規最小高さ
+   * @param newMaxWidth 新規最大幅
+   * @param oldMinWidth 変更前の最小幅
+   * @param oldMinHeight 変更前の最小高さ
+   * @param oldMaxWidth 変更前の最大幅
+   * @param oldMaxHeight 変更前の最大高さ
+   ----------------------------------------------------------------------*/
+  function onChildMinMaxSizeModified(child,
+                                     newMinWidth, newMinHeight, newMaxWidth, newMaxHeight,
+                                     oldMinWidth, oldMinHeight, oldMaxWidth, oldMaxHeight) {
+  }
+
+  /**------------------------------
+   * ウィジェットの最大/最小サイズが変更された時に呼ばれ、
+   * 実際のサイズが変更されたかどうかを判定する関数。
+   * 
+   * 実際のサイズが変更されていた場合、onSizeModified() が呼ばれる
+   ------------------------------*/
+  function invalidateSize {
+    // サイズを変更する
+    setSize(width, height);
+  }
+
+  function setSize(newWidth, newHeight) {
+    // 最小サイズと最大サイズを元に現在のサイズを丸め込み
+    newWidth = int(Math.min(_maxWidth, Math.max(_minWidth, newWidth)));
+    newHeight = int(Math.min(_maxHeight, Math.max(_minHeight, newHeight)));
+
+    // サイズが変更された時のみ処理を行う
+    if (newWidth == width
+        && newHeight == height)
+      return;
+
+    // 実際にサイズを変更する
+    var oldWidth, oldHeight;
+    oldWidth = width;
+    oldHeight = height;
+    super.setSize(newWidth, newHeight);
+   
+    // サイズの変更を、自分自身に通知する
+    onSizeModified(newWidth, newHeight, oldWidth, oldHeight);
+  }
+
+
+  /**------------------------------
+   * ウィジェットの最小サイズ、最大サイズの更新に伴って
+   * ウィジェット自身のサイズが変更された時に呼ばれるフック関数。
+   *
+   * @param newWidth 新規幅
+   * @param newHeight 新規高さ
+   * @param oldWidth 変更前の幅
+   * @paarm oldHeight 変更前の幅
+   ------------------------------*/
+  function onSizeModified(newWidth, newHeight, oldWidth, oldHeight) {
+  }
+
+  /**------------------------------
+   * 水平方向の区切スペースの大きさを指定します
+   *
+   * @param space スペース
+   * @return スペース
+   ------------------------------*/
+  property spaceHorizontal {
+    getter {
+      return _spaceHorizontal;
+    }
+    setter(space) {
+      if (space == _spaceHorizontal)
+        return;
+      var oldSpace = _spaceHorizontal;
+      _spaceHorizontal = space;
+      onSpaceModified(space, _spaceVertical, oldSpace, _spaceVertical);
+    }
+  }
+
+  /**------------------------------
+   * 垂直方向の区切スペースの大きさを指定します
+   *
+   * @param space スペース
+   * @return スペース
+   ------------------------------*/
+  property spaceVertical {
+    getter {
+      return _spaceVertical;
+    }
+    setter(space) {
+      if (space == _spaceVertical)
+        return;
+      var oldSpace = _spaceVertical;
+      _spaceVertical = space;
+      onSpaceModified(_spaceHorizontal, space, _spaceHorizontal, _spaceVertical);
+    }
+  }
+
+  /**------------------------------
+   * 水平と垂直方向の区切スペースの大きさをまとえて指定します
+   *
+   * @param space スペース
+   ------------------------------*/
+  property space {
+    setter(s) {
+      if (s == _spaceHorizontal
+          && s == _spaceVertical)
+        return;
+      var oldSpaceHorizontal, oldSpaceVertical;
+      oldSpaceHorizontal = _spaceHorizontal;
+      oldSpaceVertical = _spaceVertical;
+      _spaceHorizontal = _spaceVertical = s;
+      onSpaceModified(_spaceHorizontal, _spaceVertical, oldSpaceHorizontal, oldSpaceVertical);
+    }
+  }
+
+  /**------------------------------
+   * スペースが変更された時に呼ばれるフック関数
+   *
+   * @param newSpaceHorizontal 新規水平スペース
+   * @param newSpaceVertical 新規垂直スペース
+   * @param oldSpaceHorizontal 変更前の水平スペース
+   * @param newSpaceVertical 変更前の垂直スペース
+   ------------------------------*/
+  function onSpaceModified(newSpaceHorizontal, newSpaceVertical,
+                          oldSpaceHorizontal, oldSpaceVertical) {
+  }
+
+  /**----------------------------------------------------------------------
+   * マージンを含めた幅(読み出し専用)
+   *
+   * @return width + marginLeft + marginRight
+   ----------------------------------------------------------------------*/
+  property marginIncludeWidth {
+    getter {
+      return width + _marginLeft + _marginRight;
+    }
+  }
+
+  /**----------------------------------------------------------------------
+   * マージンを含めた高さ(読み出し専用)
+   *
+   * @return height + marginTop + marginBottom
+   ----------------------------------------------------------------------*/
+  property marginIncludeHeight {
+    getter {
+      return height + _marginTop + _marginBottom;
+    }
+  }
+
+  /**----------------------------------------------------------------------
+   * 横方向マージンの合計(読み出し専用)
+   *
+   * @return marginLeft + marginRight
+   ----------------------------------------------------------------------*/
+  property marginHorizontal {
+    getter {
+      return _marginLeft + _marginRight;
+    }
+  }
+
+  /**----------------------------------------------------------------------
+   * 縦方向マージンの合計(読み出し専用)
+   *
+   * @return marginTop + marginBottom
+   ----------------------------------------------------------------------*/
+  property marginVertical {
+    getter {
+      return _marginTop + _marginBottom;
+    }
+  }
+
+  /**------------------------------
+   * 左マージン
+   *
+   * レイアウト時に、ウィジェットの左側にどれだけのマージンを空けるか設定します。
+   *
+   * @return 左マージン
+   * @param l 左マージン
+   ------------------------------*/
+  property marginLeft {
+    getter {
+      return _marginLeft;
+    }
+
+    setter(l) {
+      // マージンの値が変更された時のみ処理する
+      if (_marginLeft == l)
+        return;
+      // マージンを更新する
+      invalidateMargin(l, _marginTop, _marginRight, _marginBottom);
+    }
+  }
+
+  /**------------------------------
+   * 上マージン
+   *
+   * レイアウト時に、ウィジェットの上側にどれだけのマージンを空けるか設定します。
+   *
+   * @return 上マージン
+   * @param t 上マージン
+   ------------------------------*/
+  property marginTop {
+    getter {
+      return _marginTop;
+    }
+
+    setter(t) {
+      // マージンの値が変更された時のみ処理する
+      if (_marginTop == t)
+        return;
+      // マージンを更新する
+      invalidateMargin(_marginLeft, t, _marginRight, _marginBottom);
+    }
+  }
+
+  /**------------------------------
+   * 右マージン
+   *
+   * レイアウト時に、ウィジェットの右側にどれだけのマージンを空けるか設定します。
+   *
+   * @return 右マージン
+   * @param r 右マージン
+   ------------------------------*/
+  property marginRight {
+    getter {
+      return _marginRight;
+    }
+
+    setter(r) {
+      // マージンの値が変更された時のみ処理する
+      if (_marginRight == r)
+        return;
+      // マージンを更新する
+      invalidateMargin(_marginLeft, _marginTop, r, _marginBottom);
+    }
+  }
+
+  /**------------------------------
+   * 下マージン
+   *
+   * レイアウト時に、ウィジェットの下側にどれだけのマージンを空けるか設定します。
+   *
+   * @return 下マージン
+   * @param b 下マージン
+   ------------------------------*/
+  property marginBottom {
+    getter {
+      return _marginBottom;
+    }
+
+    setter(b) {
+      // マージンの値が変更された時のみ処理する
+      if (_marginBottom == b)
+        return;
+      // マージンを更新する
+      invalidateMargin(_marginLeft, _marginTop, _marginRight, b);
+    }
+  }
+
+  /**------------------------------
+   * マージンの設定
+   *
+   * マージンをまとめて設定します。
+   *
+   * 引数を1つだけ指定した場合、上下左右全てのマージンを同じ値に設定します。
+   *
+   * 引数を2つだけ指定した場合、第一引数を左右マージン、第二引数を上下マージンに設定します。
+   *
+   * 引数を4つ全て指定した場合、それぞれのマージンを個別に設定します。
+   *
+   * @param l 左マージン
+   * @param t 上マージン
+   * @param r 右マージン
+   * @param b 下マージン
+   ------------------------------*/
+  function setMargin(l, t = void, r = void, b = void) {
+    // 引数展開
+    if (t === void) {
+      t = r = b = l;
+    } else if (r === void) {
+      r = l;
+      b = t;
+    }
+
+    // 変更があった時のみ処理
+    if (_marginLeft == l
+        && _marginTop == t
+        && _marginRight == r
+        && _marginBottom == b)
+      return;
+
+    // マージン変更
+    invalidateMargin(l, t, r, b);
+  }
+
+  /**------------------------------
+   * マージンの設定
+   *
+   * 上下左右全てのマージンをまとめて設定します。
+   *
+   * @param m マージン
+   ------------------------------*/
+  property margin {
+    setter(m) {
+      // 変更があった時のみ処理
+      if (_marginLeft == m
+          && _marginTop == m
+          && _marginRight == m
+          && _marginBottom == m)
+        return;
+
+      // マージン変更
+      invalidateMargin(m, m, m, m);
+    }
+  }
+  
+  /*------------------------------
+   * ウィジェットのマージンが変更された時に呼ばれる関数。
+   *
+   * 親の onChildMarginModified() が呼ばれる
+   ------------------------------*/
+  function invalidateMargin(newMarginLeft, newMarginTop, newMarginRight, newMarginBottom) {
+    // 以前のマージンを記録
+    var oldMarginLeft, oldMarginTop, oldMarginRight, oldMarginBottom;
+    oldMarginLeft = _marginLeft;
+    oldMarginTop = _marginTop;
+    oldMarginRight = _marginRight;
+    oldMarginBottom = _marginBottom;
+    // マージンを更新
+    _marginLeft = newMarginLeft;
+    _marginTop = newMarginTop;
+    _marginRight = newMarginRight;
+    _marginBottom = newMarginBottom;
+    // 親に通知する
+    if (isInWidgetTree)
+      parentWidget.onChildMarginModified(this,
+                                         newMarginLeft, newMarginTop, newMarginRight, newMarginBottom,
+                                         oldMarginLeft, oldMarginTop, oldMarginRight, oldMarginBottom);
+  }
+
+  /**------------------------------
+   * 子ウィジェットのマージンが変更された時に呼ばれるフック関数
+   *
+   * @param child マージンの変更された子ウィジェット
+   * @param newMarginLeft   新規左マージン
+   * @param newMarginTop    新規上マージン
+   * @param newMarginRight  新規右マージン
+   * @param newMarginBottom 新規下マージン
+   * @param oldMarginLeft   変更前の左マージン
+   * @param oldMarginTop    変更前の上マージン
+   * @param oldMarginRight  変更前の右マージン
+   * @param oldMarginBottom 変更前の下マージン
+   *------------------------------*/
+  function onChildMarginModified(child,
+                                 newMarginLeft, newMarginTop, newMarginRight, newMarginBottom,
+                                 oldMarginLeft, oldMarginTop, oldMarginRight, oldMarginBottom) {
+  }
+
+  /**------------------------------
+   * 水平アライメント
+   *
+   * レイアウトの関係でウィジェットが本来のサイズより大きい領域に配置されることに
+   * なった時に、ウィジェットを左右のどちらに寄せるかを設定します。
+   * 
+   * ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT のいずれかの値を設定できます。
+   *
+   * @return 水平アライメント
+   * @param align 水平アライメン
+   ------------------------------*/
+  property alignHorizontal {
+    getter {
+      return _alignHorizontal;
+    }
+    setter(align) {
+      // 変更があった時のみ更新
+      if (_alignHorizontal == align)
+        return;
+      // 更新
+      invalidateAlign(align, _alignVertical);
+    }
+  }
+
+
+  /**------------------------------
+   * 垂直アライメント
+   *
+   * レイアウトの関係でウィジェットが本来のサイズより大きい領域に配置されることに
+   * なった時に、ウィジェットを上下のどちらに寄せるかを設定します。
+   * 
+   * ALIGN_TOP, ALIGN_CENTER, ALIGN_BOTTOM のいずれかの値を設定できます。
+   *
+   * @return 垂直アライメント
+   * @param align 垂直アライメン
+   ------------------------------*/
+  property alignVertical {
+    getter {
+      return _alignVertical;
+    }
+    setter(align) {
+      // 変更があった時のみ更新
+      if (_alignVertical == align)
+        return;
+      // 更新
+      invalidateAlign(_alignHorizontal, align);
+    }
+  }
+
+  /**------------------------------
+   * アライメントの設定
+   *
+   * アライメントをまとめて設定します。
+   *
+   * @param h 水平アライメント
+   * @param v 垂直アライメント
+   ------------------------------*/
+  function setAlign(h, v) {
+    // 変更があった時のみ更新
+    if (h == _alignHorizontal
+        && v == _alignVertical)
+      return;
+    // 更新
+    invalidateAlign(h, v);
+  }
+
+  /*------------------------------
+   * ウィジェットのアライメントが変更された時に呼ばれる関数。
+   *
+   * 親の onChildMarginModified() が呼ばれる
+   ------------------------------*/
+  function invalidateAlign(newAlignHorizontal, newAlignVertical) {
+    // 古い値を保存
+    var oldAlignHorizontal, oldAlignVertical;
+    oldAlignHorizontal = _alignHorizontal;
+    oldAlignVertical = _alignVertical;
+    // 更新
+    _alignHorizontal = newAlignHorizontal;
+    _alignVertical = newAlignVertical;
+    // フック関数を呼ぶ
+    if (isInWidgetTree) 
+      parentWidget.onChildAlignModified(this,
+                                        newAlignHorizontal, newAlignVertical,
+                                        oldAlignHorizontal, oldAlignVertical);
+   }
+
+  /*------------------------------
+   * 子ウィジェットのアライメントが変更された時に呼ばれるフック関数
+   *
+   * @param child アライメントの変更された子ウィジェット
+   * @param newAlignHorizontal 新規水平アライメント
+   * @param newAlignVertical 新規垂直アライメント
+   * @param oldAlignHorizontal 変更前の水平アライメント
+   * @param oldAlignVertical 変更前の垂直アライメント
+   ------------------------------*/
+  function onChildAlignModified(child,
+                                newAlignHorizontal, newAlignVertical,
+                                oldAlignHorizontal, oldAlignVertical) {
+  }
+
+  /**------------------------------
+   * フォントフェイス
+   *
+   * フォントフェイスが更新されると onFontFaceModified 関数が呼ばれます。
+   *
+   * @param newFace 新規フェイス
+   * @return フェイス
+   ------------------------------*/
+  property fontFace {
+    getter {
+      return font.face;
+    }
+    setter(newFace) {
+      // 更新がある時だけ処理
+      if (font.face == newFace)
+        return;
+      // 更新
+      var oldFace = font.face;
+      font.face = newFace;
+      // フック関数呼び出し
+      onFontFaceModified(newFace, oldFace);
+    }
+  }
+
+  /*------------------------------
+   * フォントフェイスが変更された時に呼ばれるフック関数
+   * 
+   * @param newFontFace 新規フォントフェイス
+   * @param oldFontFace 変更前のフォントフェイス
+   *------------------------------*/
+  function onFontFaceModified(newFontFace, oldFontFace) {
+  }
+
+  /**------------------------------
+   * フォントヘイト
+   *
+   * フォントヘイトが更新されると onFontHeightModified 関数が呼ばれます。
+   *
+   * @param newHeight 新規ヘイト
+   * @return ヘイト
+   ------------------------------*/
+  property fontHeight {
+    getter {
+      return font.height;
+    }
+    setter(newHeight) {
+      // 更新がある時だけ処理
+      if (font.height == newHeight)
+        return;
+      // 更新
+      var oldHeight = font.height;
+      font.height = newHeight;
+      // フック関数呼び出し
+      onFontHeightModified(newHeight, oldHeight);
+    }
+  }
+
+  /*------------------------------
+   * フォントヘイトが変更された時に呼ばれるフック関数
+   * 
+   * @param newFontHeight 新規フォントヘイト
+   * @param oldFontHeight 変更前のフォントヘイト
+   *------------------------------*/
+  function onFontHeightModified(newFontHeight, oldFontHeight) {
+  }
+
+  /**------------------------------
+   * フォントカラー
+   *
+   * フォントカラーが更新されると onFontColorModified 関数が呼ばれます。
+   *
+   * @param color 新規カラー
+   * @return カラー
+   ------------------------------*/
+  property fontColor {
+    getter {
+      return _fontColor;
+    }
+    setter(color) {
+      // 更新がある時だけ処理
+      if (color == _fontColor)
+        return;
+      // 更新
+      var oldFontColor = _fontColor;
+      _fontColor = color;
+      // フック関数呼び出し
+      onFontColorModified(color, oldFontColor);
+    }
+  }    
+
+  /**------------------------------
+   * フォントカラーが変更された時に呼ばれるフック関数
+   *
+   * @param newFontColor 新規フォントカラー
+   * @param oldFontColor 変更前のフォントカラー
+   ------------------------------*/
+  function onFontColorModified(newFontColor, oldFontColor) {
+  }
+
+  /**------------------------------
+   * 「値」が変わった時に呼ばれるフック関数
+   *
+   * 「値」を持つウィジェットで、値が変更された時に呼ばれます。
+   * デフォルトでは、parent の onChildValueModifiedを呼ぶように設定されています。
+   *
+   * @param newValue 新規の値
+   * @param oldValue 変更前の値
+   ------------------------------*/
+  function onValueModified(newValue, oldValue) {
+    indeterminate = false;
+    if (isInWidgetTree)
+      parentWidget.onChildValueModified(this, newValue, oldValue);
+  }
+
+  /**------------------------------
+   * 子ウィジェットの「値」が変わった時に呼ばれるフック関数
+   *
+   * 子ウィジェットの「値」値が変更された時に呼ばれます。
+   * デフォルトでは、さらに parent の onChildValueModifiedを呼ぶように設定されています。
+   * どこかのウィジェットが関数をオーバーライドして処理を行わない限り、
+   * 値変更の通知は KWindow まで届きます。
+   *
+   * @param newValue 新規の値
+   * @param oldValue 変更前の値
+   ------------------------------*/
+  function onChildValueModified(child, newValue, oldValue) {
+    if (isInWidgetTree)
+      parentWidget.onChildValueModified(...);
+  }
+
+  /*------------------------------
+   * へっこんだフレームを描く
+   *
+   * @param x フレームの左端
+   * @param y フレームの上端
+   * @param w フレームの幅
+   * @param h フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawSunkenFrame(x, y, w, h, boxColor = WIN_BG) {
+    fillRect(x + 0, y + 0, w - 1, 1, WIN_DARKEN1);
+    fillRect(x + 0, y + 0, 1, h - 1, WIN_DARKEN1);
+    fillRect(x + 1, y + 1, w - 3, 1, WIN_DARKEN2);
+    fillRect(x + 1, y + 1, 1, h - 3, WIN_DARKEN2);
+    fillRect(x + 0, y + h - 1, w, 1, WIN_LIGHTEN2);
+    fillRect(x + w - 1, y + 0, 1, h, WIN_LIGHTEN2);
+    fillRect(x + 1, y + h - 2, w - 2, 1, WIN_LIGHTEN1);
+    fillRect(x + w - 2, y + 1, 1, h - 2, WIN_LIGHTEN1);
+    fillRect(x + 2, y + 2, w - 4, h - 4, boxColor);
+  }
+
+  /*------------------------------
+   * へっこんだフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillSunkenFrame(boxColor = WIN_BG) {
+    drawSunkenFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 出っぱったフレームを描く
+   *
+   * @param x フレームの左端
+   * @param y フレームの上端
+   * @param w フレームの幅
+   * @param h フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawRaisedFrame(x, y, w, h, boxColor = WIN_BG) {
+    fillRect(x + 0, y + 0, w - 1, 1, WIN_LIGHTEN2);
+    fillRect(x + 0, y + 0, 1, h - 1, WIN_LIGHTEN2);
+    fillRect(x + 1, y + 1, w - 3, 1, WIN_LIGHTEN1);
+    fillRect(x + 1, y + 1, 1, h - 3, WIN_LIGHTEN1);
+    fillRect(x + 0, y + h - 1, w, 1, WIN_DARKEN2);
+    fillRect(x + w - 1, y + 0, 1, h, WIN_DARKEN2);
+    fillRect(x + 1, y + h - 2, w - 2, 1, WIN_DARKEN1);
+    fillRect(x + w - 2, y + 1, 1, h - 2, WIN_DARKEN1);
+    fillRect(x + 2, y + 2, w - 4, h - 4, boxColor);
+  }
+
+  /*------------------------------
+   * 出っぱったフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillRaisedFrame(boxColor = WIN_BG) {
+    drawRaisedFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 平坦なフレームを描く
+   *
+   * @param x フレームの左端
+   * @param y フレームの上端
+   * @param w フレームの幅
+   * @param h フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawFlattenFrame(x, y, w, h, boxColor = WIN_BG) {
+    fillRect(x, y, 1, h, WIN_DARKEN1);
+    fillRect(x, y, w, 1, WIN_DARKEN1);
+    fillRect(x + w - 1, y, 1, h, WIN_DARKEN1);
+    fillRect(x, y + h - 1, w, 1, WIN_DARKEN1);
+    fillRect(x + 1, y + 1, w - 2, h - 2, boxColor);
+  }
+
+  /*------------------------------
+   * 平坦なフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillFlattenFrame(boxColor = WIN_BG) {
+    drawFlattenFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * フレームを描く
+   *
+   * @param type タイプ
+   * @param x フレームの左端
+   * @param y フレームの上端
+   * @param w フレームの幅
+   * @param h フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawFrame(type, x, y, w, h, boxColor = WIN_BG) {
+    switch (type) {
+    case FRAME_FLATTEN:
+      drawFlattenFrame(x, y, w, h, boxColor);
+      break;
+    case FRAME_SUNKEN:
+      drawSunkenFrame(x, y, w, h, boxColor);
+      break;
+    case FRAME_RAISED:
+      drawRaisedFrame(x, y, w, h, boxColor);
+      break;
+    }
+  }
+
+  /*------------------------------
+   * フレームでレイヤ全体を塗り潰す
+   *
+   * @param type タイプ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillFrame(type, boxColor = WIN_BG) {
+    switch (type) {
+    case FRAME_FLATTEN:
+      fillFlattenFrame(boxColor);
+      break;
+    case FRAME_SUNKEN:
+      fillSunkenFrame(boxColor);
+      break;
+    case FRAME_RAISED:
+      fillRaisedFrame(boxColor);
+      break;
+    }
+  }
+
+  /*------------------------------
+   * チェッカー模様を描く
+   *
+   * @param l チェッカーの左端
+   * @param t チェッカーの上端
+   * @param w チェッカーの幅
+   * @param h チェッカーの高さ
+   * @param csize チェッカーサイズ
+   * @param color1 カラー1
+   * @param color2 カラー2
+   * @param sx シフトX
+   * @param sy シフトY
+   ------------------------------*/
+  function drawChecker(l, t, w, h, csize, color1 = 0xFFFFFFFF, color2 = 0xFFC0C0C0, sx = 0, sy = 0) {
+    var srcLayer = new global.Layer(window, this);
+    srcLayer.setSize(csize * 2, csize * 2);
+    srcLayer.fillRect(0, 0, csize, csize, color1);
+    srcLayer.fillRect(csize, 0, csize, csize, color2);
+    srcLayer.fillRect(0, csize, csize, csize, color2);
+    srcLayer.fillRect(csize, csize, csize, csize, color1);
+    copyWrappedRect(l, t, w, h, 
+                    srcLayer, 0, 0, csize * 2, csize * 2,
+                    sx, sy);
+    invalidate srcLayer;
+  }
+
+  /*------------------------------
+   * チェッカー模様で全体を塗り潰す
+   *
+   * @param csize チェッカーサイズ
+   * @param color1 カラー1
+   * @param color2 カラー2
+
+   ------------------------------*/
+  function fillChecker(csize, color1 = 0xFFFFFFFF, color2 = 0xFFC0C0C0) {
+    drawChecker(0, 0, width, height, csize, color1, color2);
+  }
+   
+  /*------------------------------
+   * ウィジェットを配置する
+   ------------------------------*/
+  function locateChild(x, y, w, h, child) {
+    switch (child.alignHorizontal) {
+    case ALIGN_LEFT:
+      child.left = x + child.marginLeft;
+      break;
+      
+    case ALIGN_CENTER:
+      child.left = int(x + (w - child.marginIncludeWidth) / 2 + child.marginLeft); 
+      break;
+      
+    case ALIGN_RIGHT:
+      child.left = int(x + (w - child.width - child.marginRight));
+      break;
+    }
+
+    switch (child.alignVertical) {
+    case ALIGN_TOP:
+      child.top = int(y) + child.marginTop;
+      break;
+      
+    case ALIGN_CENTER:
+      child.top = int(y + (h - child.marginIncludeHeight) / 2 + child.marginTop); 
+      break;
+
+    case ALIGN_BOTTOM:
+      child.top = int(y + (h - child.height - child.marginBottom)); 
+      break;
+    }
+  }
+
+  /*------------------------------
+   * 外部からファイルがドロップされた
+   *
+   * デフォルト動作では、親のonFileDropを呼ぶ。
+   * 順ぐりに、子から親へメッセージがチェーンされ、
+   * どこかのウィジェットが関数をオーバーライドして
+   * 処理を行うまでチェーンが続く
+   *
+   * @param x ファイルがドロップされた時のマウスのX座標
+   * @param y ファイルがドロップされた時のマウスのY座標
+   * @param files ドロップされたファイル名が格納された配列(Array)オブジェクトです。
+   * @param shift キーが押された時に同時に押されていたシフト系のキーの状態です。
+   ------------------------------*/
+  function onFileDrop(x, y, files, shift) {
+    if (parent)
+      parent.onFileDrop(x + left, 
+                        y + top, 
+                        files,
+                        shift);
+  }
+
+  /*------------------------------
+   * マウスホイールイベント
+   * 
+   * 自分自身でホイールをトラップしない時は、
+   * ホイールイベントは親へ通知される
+   ------------------------------*/
+  function onMouseWheel(shift, delta, x, y) {
+    if (parent)
+      parent.onMouseWheel(shift, delta, x + left, y + top);
+  }
+
+  /*------------------------------
+   * マウス関連イベント。
+   *
+   * Ｄ＆Ｄ関連の制御を行う
+   ------------------------------*/
+  function onMouseDown(x, y, button, shift) {
+    // 左クリックでドラッグ準備開始
+    if (button == mbLeft
+        && (! dragEnabledShiftMask || (shift & dragEnabledShiftMask))) {
+      // ドラッグ中にウィジェットがスクロールする事を考慮して
+      // 基準座標はprimaryLayerから取得する
+      mouseDownX = window.primaryLayer.cursorX;
+      mouseDownY = window.primaryLayer.cursorY;
+      // ドラッグ準備開始
+      isReadyToDrag = true;
+    } else if (button == mbRight
+               && ! isDragging) {
+      // 右クリックなら onRightClick を呼ぶ
+      onRightClick(x, y, shift);
+    }
+  }
+
+  function onMouseMove(x, y, shift) {
+    // ドラッグ中なら onDragMove を呼び出す
+    if (isDragging) {
+      onDragMove(x, y, shift);
+    }
+    // ドラッグ準備が出来ており、4ドット以上マウスが動いたら
+    // ドラッグ開始
+    if (isReadyToDrag) {
+      if (Math.abs(window.primaryLayer.cursorX - mouseDownX) > mouseDragThreshold
+          || Math.abs(window.primaryLayer.cursorY - mouseDownY) > mouseDragThreshold) {
+        isReadyToDrag = false;
+        isDragging = true;
+        // ウィジェットローカルのドラッグ開始を通知
+        onDragEnter(x + mouseDownX - window.primaryLayer.cursorX,
+                    y + mouseDownY - window.primaryLayer.cursorY,
+                    shift);
+      }
+    }
+    // パケットのドラッグ中の処理
+    if (myDraggingPacket) {
+      // アクティブなウィンドウより、ターゲットウィジェットを特定
+      var dragTarget = void;
+      for (var i = 0;
+           i < _existentWindowList.count; 
+           i++) {
+        var targetWindow = _existentWindowList[i];
+        if (! targetWindow.visible)
+          continue;
+        dragTarget = targetWindow.primaryLayer.getWidgetAt(targetWindow.primaryLayer.cursorX,
+                                                           targetWindow.primaryLayer.cursorY);
+        if (dragTarget)
+          break;
+      }
+
+      // ターゲットウィジェットが継続していたら
+      // onPacketMoveを通知
+      if (dragTarget == curDragTarget) {
+        if (curDragTargetAcceptPacket)
+          curDragTarget.onPacketMove
+            (curDragTarget.cursorX,
+             curDragTarget.cursorY,
+             _dragging_packet_,
+             shift);
+      } else {
+        // ターゲットウィジェットが変更された時の処理
+        if (curDragTargetAcceptPacket) {
+          // 直前のターゲットに onPacketLeave を通知
+          curDragTarget.onPacketLeave
+            (curDragTarget.cursorX,
+             curDragTarget.cursorY,
+             _dragging_packet_,
+             shift);
+        }
+        curDragTarget = dragTarget;
+        // 新規ターゲットがパケットを受け入れるなら
+        // onPacketEnterを通知
+        if (curDragTarget !== void
+            && curDragTarget.isPacketAcceptable(_dragging_packet_)) {
+          curDragTargetAcceptPacket = true;
+          curDragTarget.onPacketEnter
+            (curDragTarget.cursorX,
+             curDragTarget.cursorY,
+             _dragging_packet_,
+             shift);
+        } else {
+          curDragTargetAcceptPacket = false;
+        }       
+      }
+    }
+  }    
+
+  function onMouseUp(x, y, button, shift) {
+    if (button == mbLeft) {
+      // ドラッグ中であれば、ドラッグの終了を通知
+      if (isDragging) {
+        onDragLeave(x, y, shift);
+      }
+      
+      isReadyToDrag = isDragging = false;
+    
+      // パケットのドラッグ中であれば
+      // ターゲットにパケットのドロップを通知
+      if (myDraggingPacket) {
+        if (curDragTargetAcceptPacket
+            && curDragTarget.isPacketConfirmed(curDragTarget.cursorX,
+                                               curDragTarget.cursorY,
+                                               _dragging_packet_,
+                                               shift)) {
+          curDragTarget.onPacketLeave(curDragTarget.cursorX,
+                                      curDragTarget.cursorY,
+                                      _dragging_packet_,
+                                      shift);
+          curDragTarget.onPacketDrop(curDragTarget.cursorX,
+                                     curDragTarget.cursorY,
+                                     _dragging_packet_,
+                                     shift);
+        } else {
+          onPacketCancel(_dragging_packet_);
+        }
+        curDragTarget = void;
+        curDragTargetAcceptPacket = false;
+        myDraggingPacket = false;
+        _dragging_packet_ = void;
+        cursor = cursorOrig;
+      }
+    }
+  }
+
+  function onMouseEnter {
+    // ステータスバーにステータスを設定
+    var s = status;
+    _inStatus = true;
+    if (window.statusBar !== void) {
+      window.statusBar.label = s;
+    }
+  }
+
+  function onMouseLeave {
+    // ステータスバーのステータスをクリア
+    if (_inStatus) {
+      _inStatus = false;
+      if (window.statusBar !== void)
+        window.statusBar.label = "";
+    }
+  }
+
+  /**------------------------------
+   * マウスが右クリックされた時に呼ばれる
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift シフトキー
+   ------------------------------*/
+  function onRightClick(x, y, shift) {
+  }
+
+  /**------------------------------
+   * ウィジェット内でのドラッグの開始の通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift シフトキー
+   ------------------------------*/
+  function onDragEnter(x, y, shift) {
+  }
+
+  /**------------------------------
+   * ウィジェット内でのドラッグ中のマウス移動の通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift シフトキー
+   ------------------------------*/
+  function onDragMove(x, y, shift) {
+  }
+
+  /**------------------------------
+   * ウィジェット内でのドラッグの終了の通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift シフトキー
+   ------------------------------*/
+  function onDragLeave(x, y, shift) {
+  }
+
+  /**------------------------------
+   * パケットのドラッグ開始
+   *
+   * 他のウィジェットへのパケットのドラッグを開始する
+   *
+   * @param packet パケット
+   ------------------------------*/
+  function beginDragPacket(packet) {
+    _dragging_packet_ = packet;
+    myDraggingPacket = true;
+    cursorOrig = cursor;
+    cursor = crDrag;
+    curDragTarget = void;
+  }
+
+  /**------------------------------
+   * 自分自身が特定のパケットを受け入れられるかどうか判定する
+   *
+   * @param packet ドラッグ中のパケット
+   * @return パケットを受け入れ可能かどうか
+   ------------------------------*/
+  function isPacketAcceptable(packet) {
+    return false;
+  }
+
+  /**------------------------------
+   * 最終的にパケットを受け入れるかどうか判定する
+   *
+   * @param packet ドラッグ中のパケット
+   * @return パケットを受け入れるかどうか
+   ------------------------------*/
+  function isPacketConfirmed(x, y, packet, shift) {
+    return true;
+  }
+
+  /**------------------------------
+   * パケットの侵入を通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param packet パケット
+   * @param shift シフト
+   ------------------------------*/
+  function onPacketEnter(x, y, packet, shift) {
+  }
+
+  /**------------------------------
+   * パケットの移動を通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param packet パケット
+   * @param shift シフト
+   ------------------------------*/
+  function onPacketMove(x, y, packet, shift) {
+  }
+
+  /**------------------------------
+   * パケットの離脱を通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param packet パケット
+   * @param shift シフト
+   ------------------------------*/
+  function onPacketLeave(x, y, packet, shift) {
+  }
+
+  /**------------------------------
+   * パケットのドロップを通知
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param packet パケット
+   * @param shift シフト
+   ------------------------------*/
+  function onPacketDrop(x, y, packet, shift) {
+  }
+
+  /*------------------------------
+   * パケットがドロップされなかった事を通知
+   *
+   * @packet パケット
+   ------------------------------*/
+  function onPacketCancel(packet) {
+  }
+
+  /**------------------------------
+   * 視野に注目する
+   *
+   * ウィジェットの全体像を表示しないレイアウトにおいて、
+   * 子ウィジェットの任意の範囲を表示させるために呼び出す。
+   * ただちに parent の onChildNoticeRect が呼び出される。
+   *
+   * @param l 矩形左上X座標
+   * @param t 矩形左上Y座標
+   * @param w 矩形幅
+   * @param h 矩形高さ
+n   ------------------------------*/
+  function noticeRect(l, t, w, h) {
+    if (isInWidgetTree)
+      parentWidget.onChildNoticeRect(this, l, t, w, h);
+  }
+
+  /**------------------------------
+   * 子ウィジェットの視野に注目するよう通知
+   *
+   * @child 子ウィジェット
+   * @param l 矩形左上X座標
+   * @param t 矩形左上Y座標
+   * @param w 矩形幅
+   * @param h 矩形高さ
+   ------------------------------*/
+  function onChildNoticeRect(child, l, t, w, h) {
+    if (isInWidgetTree
+        && ! isPrimary)
+      parentWidget.onChildNoticeRect(child, child.left + l, child.top + t, w, h);
+  }
+
+  /**------------------------------
+   * ウィジェットの視矩形
+   *
+   * @return 視矩形
+   ------------------------------*/
+  property viewingRect {
+    getter {
+    var rect = %[ left:0, top:0, right:width, bottom:height ];
+    var diffX, diffY;
+    var layer;
+    diffX = diffY = 0;
+    for (layer = this; layer.parent; layer = layer.parent) {
+      rect.left = Math.max(rect.left, 0);
+      rect.top = Math.max(rect.top, 0);
+      rect.right = Math.min(rect.right, layer.width);
+      rect.bottom = Math.min(rect.bottom, layer.height);
+      rect.left += layer.left;
+      rect.top += layer.top;
+      rect.right += layer.left;
+      rect.bottom += layer.top;
+      diffX += layer.left;
+      diffY += layer.top;
+    }
+    rect.left -= diffX;
+    rect.top -= diffY;
+    rect.right -= diffX;
+    rect.bottom -= diffY;
+    rect.width = rect.right - rect.left;
+    rect.height = rect.bottom - rect.top;
+    return rect;
+  }
+  }
+
+  /**------------------------------
+   * ウィジェットの視矩形(ウィンドウ座標系)
+   *
+   * @return 視矩形
+   ------------------------------*/
+  property globalViewingRect {
+    getter {
+      var rect = %[ left:0, top:0, right:width, bottom:height ];
+      var layer;
+      for (layer = this; layer.parent; layer = layer.parent) {
+        rect.left = Math.max(rect.left, 0);
+        rect.top = Math.max(rect.top, 0);
+        rect.right = Math.min(rect.right, layer.width);
+        rect.bottom = Math.min(rect.bottom, layer.height);
+        rect.left += layer.left;
+        rect.top += layer.top;
+        rect.right += layer.left;
+        rect.bottom += layer.top;
+      }
+      rect.width = rect.right - rect.left;
+      rect.height = rect.bottom - rect.top;
+      return rect;
+    }
+  }
+
+  /**------------------------------
+   * 視矩形が更新された時に呼ばれるコールバック
+   *
+   * @param vleft 矩形左端
+   * @param vtop 矩形右端
+   * @param vwidth 矩形幅
+   * @param vheight 矩形高さ
+   *
+   * 視矩形が更新されたタイミングで呼ばれるコールバック関数。
+   * 常に呼び出されるわけではなく、特定のWidgetの子として登録
+   * している時にのみ呼び出される。
+   *
+   * このコールバックを発生させるWidgetの一覧は以下の通り
+   * - KScrollLayout
+   * - KRelativeLayout
+   ------------------------------*/
+  function onViewModified(vleft, vtop, vwidth, vheight) {
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KWidget") {
+        var rect = %[ left: vleft, top: vtop, right :vleft + vwidth, bottom: vtop + vheight ];
+        rect.left = Math.max(rect.left, child.left);
+        rect.top = Math.max(rect.top, child.top);
+        rect.right = Math.min(rect.right, child.left + child.width);
+        rect.bottom = Math.min(rect.bottom, child.top + child.height);
+        child.onViewModified(rect.left - child.left, rect.top - child.top, rect.right - rect.left, rect.bottom - rect.top);
+      }
+    }
+  }
+
+  function onWindowActivate {
+  }
+  
+  function onWindowDeactivate {
+  }
+};
+
+
+
+/**----------------------------------------------------------------------
+ * 値持ちウィジェット
+ ----------------------------------------------------------------------*/
+class KValueWidget extends KWidget
+{
+  // 辞書
+  var dict;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * プロパティ「value」を持つウィジェットの総称です。
+   * bindPersistentDictionary() を呼んでプロパティと
+   * バインドすることで、valueの値を永続化することが出来ます。
+   *
+   * @param win ウィンドウ
+   * @param name 名前。ユニークな名前を指定しないと永続化は行なわれません。
+   ------------------------------*/
+  function KValueWidget(win, name) {
+    super.KWidget(win, name);
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict) {
+      dict.set(name, value);
+    }
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * 現在の値で onValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (nodeEnabled)
+      onValueModified(value);
+  }
+
+  /*------------------------------
+   * 永続化辞書を値にバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (_isAvoidDictionaryRegistration)
+      return;
+
+    if (name !== void) {
+      this.dict = dict;
+      value = dict.init(name, value);
+    }
+  }
+}

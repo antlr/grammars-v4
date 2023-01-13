@@ -1,0 +1,4 @@
+
+rule_to_import: NESTED_TERMINAL
+
+%import .test_relative_import_of_nested_grammar__nested_grammar.NESTED_TERMINAL

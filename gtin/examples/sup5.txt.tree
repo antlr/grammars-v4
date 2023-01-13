@@ -1,0 +1,1 @@
+(gtin (supplemental_code (supplemental_code_5 (any_digit 1) (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 5))) <EOF>)

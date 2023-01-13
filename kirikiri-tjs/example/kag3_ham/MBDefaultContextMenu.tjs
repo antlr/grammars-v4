@@ -1,0 +1,378 @@
+/******************************************************************************
+	mb/system/cmenu/MBDefaultContextMenu.tjs
+*******************************************************************************/
+
+
+class MBDefaultContextMenu extends MBSystemLayer
+{
+	var owner;
+	
+	var objCloseButton; // 「閉じる」ボタン
+	var objQuitButton;	// 「終了」ボタン
+	var objResetButton;	// 「リセット」ボタン
+	var objScreenChangeButton; // 「フルスクリーン」ボタン
+	
+	var objMenuItemArray = [];	// メニューレイヤ
+	
+	var objWorkingSpace;	// 作業領域レイヤ
+	
+	var strCaption = "GAME OPTIONS";
+	
+	var defWidth = 179;
+	var intCButtonMargin = 20;
+	var closeButtonImage = "bt_cancel";
+	var intCButtonHeight = 0;
+	
+	var fontSize = MBFontStyle.size.label;
+	var fontFace = MBFontStyle.face.normal;
+	var fontColorDisable = MBColors.font.label.disabled;
+	
+	var refFocusMember;
+	
+	
+	function MBDefaultContextMenu(win, par, own)
+	{
+		// コンストラクタ
+		
+		super.MBSystemLayer(win, par, strCaption);
+		
+		owner = own;
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		
+		invalidate objCloseButton if (objCloseButton !== void);
+		invalidate objQuitButton if (objQuitButton !== void);
+		invalidate objResetButton if (objResetButton !== void);
+		invalidate objScreenChangeButton if (objScreenChangeButton !== void);
+		
+		var i;
+		for (i=0; i<objMenuItemArray.count; i++) {
+			invalidate objMenuItemArray[i] if (objMenuItemArray[i] !== void);
+		}
+		
+		invalidate objWorkingSpace if (objWorkingSpace !== void);
+		
+		super.finalize(...);
+	}
+	
+	function init()
+	{
+		// 初期化
+		
+		name      = 'コンテクストメニュー';
+		focusable = true;
+		defHeight = getContentHeight() + titleHeight;
+		
+		// マウスカーソルの位置から出現位置を決定
+		setOpenPosition(
+			parent.cursorX - defWidth * 0.75,
+			parent.cursorY - 10
+		);
+	}
+	
+	
+	//==========================================================================
+	
+	function onEndOfShowing()
+	{
+		// 出現完了後の動作
+		
+		super.onEndOfShowing();
+		
+		makeMainMenu();
+		setMenuStack();
+		sndfunc.seMenuStart();
+	}
+	
+	function hide()
+	{
+		// 消去
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		super.hide();
+	}
+	
+	function onEndOfHiding()
+	{
+		// 消去完了後の処理
+		
+		SystemManager.fireContextMenuEndTrigger();
+		SystemManager.destroyContextMenu();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getContentHeight()
+	{
+		// メニューの高さを取得する
+		
+		var items = 3;	// システム項目3つ
+		var lines = 2;	// 標準区切り線2本
+		var list = HamContextMenuSettings.currentMenu;
+		for (var i=0; i<list.count; i++) {
+			if (list[i].label == "--") {
+				lines += 1;
+			}
+			else {
+				items += 1;
+			}
+		}
+		
+		// 項目と区切り線の高さ合計
+		var nh = (fontSize * 1.5) * items + (fontSize * 0.5 + 1) * lines;
+		
+		// 上下枠線とマージンを加算（下マージンは狭めにする）
+		nh += borderWidth * 2 + marginWidth * 1.2;
+		
+		// 「閉じる」ボタンの高さと上マージンを加算
+		var bmp = new Bitmap(sysfunc.getPathImage(closeButtonImage));
+		intCButtonHeight = bmp.height + intCButtonMargin;
+		nh += intCButtonHeight;
+		
+		return nh;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function makeMainMenu()
+	{
+		// メニューを作る
+		var list = HamContextMenuSettings.currentMenu;
+		
+		var tx = borderWidth + marginWidth;
+		var ty = 30;
+		
+		var i;
+		var count = 0;
+		for (i=0; i<list.count; i++) {
+			if (list[i].label == '--') {
+				// 罫線を引く
+				drawHorizontalBorder(tx, ty);
+				ty += fontSize * 0.5 + 1;
+			}
+			else {
+				// メニュー項目
+				var label = list[i].label;
+				
+				objMenuItemArray[count] = new MBContextMenuItem(window, this, label);
+				objMenuItemArray[count].setPos(tx, ty);
+				objMenuItemArray[count].drawItemFaceDisabled();
+				
+				if (list[i].cond(this)) {
+					objMenuItemArray[count].drawItemFace();
+				}
+				
+				count += 1;
+				ty    += fontSize * 1.5;
+			}
+		}
+		
+		//ty += fontSize * 0.5;
+		drawHorizontalBorder(tx, ty);
+		
+		// フルスクリーン切り替え
+		ty += 1 + fontSize * 0.5;
+		objScreenChangeButton = new MBContextMenuItem(window, this, (window.fullScreened) ? "ウィンドウ表示" : "フルスクリーン");
+		objScreenChangeButton.setPos(tx, ty);
+		
+		// リセット
+		ty += fontSize * 1.5;
+		objResetButton = new MBContextMenuItem(window, this, "リセット");
+		objResetButton.setPos(tx, ty);
+		
+		// 終了
+		ty += fontSize * 1.5;
+		objQuitButton = new MBContextMenuItem(window, this, "ゲーム終了");
+		objQuitButton.setPos(tx, ty);
+		
+		ty += fontSize * 1.5;
+		drawHorizontalBorder(tx, ty);
+		
+		ty += 1 + intCButtonMargin;
+		objCloseButton = new MBContextMenuButton(window, this);
+		objCloseButton.loadImages(sysfunc.getPathImage(closeButtonImage));
+		objCloseButton.setPos((defWidth - objCloseButton.width) * 0.5, ty);
+		objCloseButton.visible = true;
+	}
+	
+	function drawHorizontalBorder(x, y)
+	{
+		// ヨコ線を引く
+		
+		fillRect(x, y, width - (marginWidth + borderWidth) * 2, 1, fontColor + 0xff000000);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setMenuStack()
+	{
+		// メニュースタックを作る
+		
+		var i;
+		for (i=0; i<objMenuItemArray.count; i++) {
+			if (i == 0) {
+				objMenuItemArray[i].objCursorMapHash.up = objCloseButton;
+				refFocusMember = SystemManager.fcPushFocusStack(objMenuItemArray[i]);
+			}
+			else {
+				objMenuItemArray[i].objCursorMapHash.up = objMenuItemArray[i - 1];
+			}
+			
+			if (i == objMenuItemArray.count - 1) {
+				objMenuItemArray[i].objCursorMapHash.down = objResetButton;
+			}
+			else {
+				objMenuItemArray[i].objCursorMapHash.down = objMenuItemArray[i + 1];
+			}
+		}
+		
+		if (!objMenuItemArray.count) {
+			objResetButton.objCursorMapHash.up = objCloseButton;
+			refFocusMember = SystemManager.fcPushFocusStack(objResetButton);
+		}
+		else {
+			objResetButton.objCursorMapHash.up = objMenuItemArray[objMenuItemArray.count - 1];
+		}
+		
+		objResetButton.objCursorMapHash.down = objQuitButton;
+		
+		objQuitButton.objCursorMapHash.up = objResetButton;
+		objQuitButton.objCursorMapHash.down = objCloseButton;
+		
+		objCloseButton.objCursorMapHash.up = objQuitButton;
+		objCloseButton.objCursorMapHash.down = objMenuItemArray[0];
+		
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function makePreferenceMenu()
+	{
+		// 設定画面を作る
+		
+		invalidate objWorkingSpace if (objWorkingSpace !== void);
+		objWorkingSpace = new MBControllPanel(window, parent, this);
+		objWorkingSpace.setControllPanel();
+		objWorkingSpace.show();
+	}
+	
+	function onControllPanelHasGone()
+	{
+		invalidate objWorkingSpace if (objWorkingSpace !== void);
+		SystemManager.acDisactivateCanceller();
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// 右クリックされたらこのレイヤを隠すように
+		
+		if(button == mbRight)
+		{
+			close();
+		}
+	}
+	
+	function disableAll(disact = true)
+	{
+		// 一時的にメニューを無効化
+		
+		SystemManager.acActivateCanceller();
+		if (disact) {
+			disactivate();
+		}
+	}
+	
+	function enableAll()
+	{
+		// メニューを有効化
+		
+		SystemManager.acDisactivateCanceller();
+		activate();
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function close()
+	{
+		sndfunc.seCancel();
+		disableAll(false);
+		hide();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onSelectedItemClick(sender)
+	{
+		// メニュー選択時の動作
+		
+		cursor = window.cursorDefault;
+		
+		// オプション項目
+		if (objMenuItemArray.find(sender) > -1) {
+			// オプションの動作はMenuSettings.tjsで定義されている
+			HamContextMenuFunctions[sender.strItemLabel]();
+			return;
+		}
+		
+		// システム項目
+		switch (sender)
+		{
+			case objScreenChangeButton:	// フルスクリーン切り替え
+				sndfunc.seDecide();
+				if (sender.strItemLabel == "フルスクリーン") {
+					window.onFullScreenMenuItemClick(window);
+				}
+				else {
+					window.onWindowedMenuItemClick();
+				}
+				disableAll(false);
+				hide();
+				break;
+			
+			case objResetButton:	// リセット
+				disableAll();
+				sndfunc.seDecide();
+				tf.gotoreset = true;
+				break;
+			
+			case objQuitButton:	// ゲーム終了
+				disableAll();
+				sndfunc.seDecide();
+				tf.gotoexit = true;
+				break;
+			
+			case objCloseButton:	// 閉じる
+				break;
+		}
+		
+		close();
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		if (VK_APPS) {
+			onEscapeKeyDown();
+		}
+		else {
+			ptFocusController.onKeyDown(key, shift);
+		}
+	}
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーが押されたときの動作
+		
+		onSelectedItemClick(objCloseButton);
+	}
+}

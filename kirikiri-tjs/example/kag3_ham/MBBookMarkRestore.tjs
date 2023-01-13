@@ -1,0 +1,642 @@
+/******************************************************************************
+	system_mb/mb/system/MBBookMarkRestore.tjs
+*******************************************************************************/
+
+
+class MBBookMarkRestore extends MBComponentLayer
+{
+	// プロパティ
+	var intSaveSlots   =  10;	// セーブスロットの数
+	var intCurrentSlot =   0;
+	var intSlotBarPosX = 140;
+	var intSlotBarPosY = 107;
+	var intSlotBarMargin = 32;	// タイトルからの距離
+	var intSlotButtonInterval = 50;
+	var intSavePanels  =   6;		// セーブパネルの数（ページあたり）
+	var intPanelMatrix = %[cols : 2, rows : 3];	// パネル配置の行数と列数
+	
+	var strBGImage = 'bookmark/background';	// 背景画像
+	
+	var strTitleImage = "bookmark/ti_load";	// タイトル画像
+	var regularTitlePosition = %[x : 30, y : 20];	// タイトル画像の標準位置
+	
+	var strPBtnBGImage = "bookmark/bg_pagebutton";	// ページボタン背景画像
+	var regularPBtnPosition = %[x : 0, y : 102];	// ページボタンの標準開始位置
+	
+	var strPTitleImage = "bookmark/ti_pagebutton";	// ページボタンタイトル画像
+	var regularPTitlePosition = %[x : 60, y : 108];	// ページボタンタイトルの標準開始位置
+	
+	var regularPanelSize  = %[width : 333, height : 127];	// パネルの標準サイズ
+	var regularPanelPosition = %[x : 65, y : 145];	// パネルの標準表示位置
+	var panelSize = %[];
+	var panelPosition = %[];
+	var panelMargin = 5;
+	var panelScale = 1;	// パネルの拡縮比率は別途用意する
+	
+	var cancelButtonImage = "bt_return_dark";	// 閉じるボタンの画像
+	var cancelButtonPositionType = "rbMargin";	// 閉じるボタンの配置タイプ
+	var cancelButtonPositionValue = %[x : 20, y : 20];	// 閉じるボタンの配置用数値
+	
+	var blForceActivate = false;	// とにかくパネルを選べるようにするかどうか
+	
+	var screenScale;	// 縮小比率（横か縦の変動率の小さい方に合わせる）
+	
+	// 管理オブジェクト
+	var objSaveSlotButtons = [];	// セーブスロットボタンの配列
+	var objBookMarkButtons = [];	// セーブデータボタンの配列
+	var objSlotMarkerLayer;			// 現在のセーブスロットを表示するレイヤ
+	var objCancelButton;			// キャンセルボタン
+	var objDialog;					// 確認ダイアログなど
+	
+	
+	// その他メンバ変数
+	var refFocusMember;	// フォーカススタックの参照
+	var intTempTarget;	// 選択されたセーブデータの番号
+	
+	
+	function MBBookMarkRestore(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		name = 'データローダー';
+		
+		// 拡縮比率を計算
+		screenScale = sysfunc.getScreenScale();
+		
+		// パネルの表示位置と拡縮比率を計算しておく
+		(Dictionary.assign incontextof panelSize)(regularPanelSize);
+		(Dictionary.assign incontextof panelPosition)(regularPanelPosition);
+		var defSize = calcPanelPosition();
+		var sized = false;
+		var c = 0;
+		do {
+			if (c++ > 9999) {
+				throw new Exception("ループ試行回数の上限を超えました。");
+				break;
+			}
+			
+			var size = calcPanelPosition();
+			
+			if (panelPosition.x < panelMargin) {
+				var nw = window.fore.base.width - (panelMargin * 2 + panelMargin * (intPanelMatrix.cols - 1));
+				panelScale = nw / defSize[0];
+				
+				panelSize.width = Math.floor(regularPanelSize.width * panelScale);
+				panelSize.height = Math.floor(regularPanelSize.height * panelScale);
+				continue;
+			}
+			
+			if (panelPosition.y + size[1] > window.fore.base.height - panelMargin) {
+				var nh = window.fore.base.height - (panelPosition.y + panelMargin);
+				panelScale = nh / defSize[1];
+				
+				panelSize.width = Math.floor(regularPanelSize.width * panelScale);
+				panelSize.height = Math.floor(regularPanelSize.height * panelScale);
+				continue;
+			}
+			
+			sized = true;
+		} while (!sized);
+		
+		init();
+	}
+	
+	
+	function calcPanelPosition()
+	{
+		var pw = panelSize.width * intPanelMatrix.cols + panelMargin * (intPanelMatrix.cols - 1);
+		var ph = panelSize.height * intPanelMatrix.rows + panelMargin * (intPanelMatrix.rows - 1);
+		panelPosition.x = Math.ceil((window.fore.base.width - pw) * 0.5);
+		panelPosition.y = Math.ceil(regularPanelPosition.y * screenScale);
+		
+		return [pw, ph];
+	}
+	
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		disactivate();
+		super.finalize(...);
+	}
+	
+	function init()
+	{
+		// イニシャライザ
+		
+		parent   = window.fore.base;
+		absolute = MBLayerAbs.backpack;
+		
+		// 背景を読み込む
+		var bmp = new Bitmap(sysfunc.getPathImage(strBGImage));
+		setPos(0, 0);
+		setSize(window.fore.base.width, window.fore.base.height);
+		operateStretch(
+			0, 0, width, height,
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		// タイトルを読み込む
+		bmp.load(sysfunc.getPathImage(strTitleImage));
+		var tl = Math.round(regularTitlePosition.x * screenScale);
+		if (tl > panelPosition.x) {
+			tl = panelPosition.x;
+		}
+		operateStretch(
+			tl, Math.round(regularTitlePosition.y * screenScale),
+			Math.round(bmp.width * screenScale), Math.round(bmp.height * screenScale),
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		// ページボタン背景を読み込む
+		bmp.load(sysfunc.getPathImage(strPBtnBGImage));
+		operateStretch(
+			Math.round(regularPBtnPosition.x * screenScale), Math.round(regularPBtnPosition.y * screenScale),
+			width, bmp.height,	/* 縦幅は拡縮無し */
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		// ページボタンタイトル画像を読み込む
+		bmp.load(sysfunc.getPathImage(strPTitleImage));
+		operateStretch(
+			panelPosition.x, Math.round(regularPTitlePosition.y * screenScale),
+			bmp.width, bmp.height,	/* 拡縮無し */
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		intSlotBarPosX = panelPosition.x + bmp.width + intSlotBarMargin;
+		
+		intCurrentSlot = getSlotIDFromDataID(sf.backpack_lastused);
+		
+		setSaveSlotButtons();
+		setBookMarkButtons();
+		
+		// キャンセルボタンを作る
+		if (objCancelButton === void || !isvalid(objCancelButton)) {
+			objCancelButton = new MBButton(window, this);
+			objCancelButton.loadImages(sysfunc.getPathImage(cancelButtonImage));
+			
+			// 表示座標を計算する
+			var pos = getCancelButtonPosition();
+			objCancelButton.setPos(pos.x, pos.y);
+			
+			// キャンセルボタンがパネルと干渉していたら右上に待避させる
+			for (var i=0; i<objBookMarkButtons.count; i++) {
+				if (sysfunc.collideTestRect(objBookMarkButtons[i], objCancelButton)) {
+					cancelButtonPositionType = "rtMargin";
+					cancelButtonPositionValue = %[x : 20, y : 20];
+					pos = getCancelButtonPosition();
+					objCancelButton.setPos(pos.x, pos.y);
+					break;
+				}
+			}
+			
+			objCancelButton.visible = true;
+		}
+		
+		setFocusStack();
+		
+		visible = true;
+	}
+	
+	
+	function getCancelButtonPosition()
+	{
+		// キャンセルボタンの表示位置を計算して返す
+		
+		var pos = %[x : 0, y : 0];
+		var scsize = %[width : window.fore.base.width, height : window.fore.base.height];
+		var size = %[width : objCancelButton.width, height : objCancelButton.height];
+		switch (cancelButtonPositionType) {
+			case "lbMargin":
+				pos.x = cancelButtonPositionValue.x;
+				pos.y = scsize.height - (size.height + cancelButtonPositionValue.y);
+				break;
+			
+			case "rbMargin":
+				pos.x = scsize.width - (size.width + cancelButtonPositionValue.x);
+				pos.y = scsize.height - (size.height + cancelButtonPositionValue.y);
+				break;
+			
+			case "rtMargin":
+				pos.x = scsize.width - (size.width + cancelButtonPositionValue.x);
+				pos.y = cancelButtonPositionValue.y;
+				break;
+			
+			case "ltMargin":
+			case "absolute":
+			default:
+				pos = cancelButtonPositionValue;
+				break;
+		}
+		
+		return pos;
+	}
+	
+	
+	function disactivate()
+	{
+		// 不可視化
+		
+		visible = false;
+		
+		invalidate objDialog       if (objDialog       !== void);
+		invalidate objCancelButton if (objCancelButton !== void);
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		initSaveSlotButtons();
+		initBookMarkButtons();
+		
+		freeImage();
+		SystemManager.intPlayDataStoragerState = 0;
+		SystemManager.fireContextMenuEndTrigger();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setFocusStack()
+	{
+		// フォーカススタックを設定
+		
+		setSaveSlotFocusStack();
+		setBookMarkFocusStack();
+		
+		objCancelButton.objCursorMapHash.up   = objBookMarkButtons[intSavePanels - 1];
+		objCancelButton.objCursorMapHash.down = objSaveSlotButtons[intCurrentSlot];
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		refFocusMember = SystemManager.fcPushFocusStack(objSaveSlotButtons[intCurrentSlot]);
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	
+	//==========================================================================
+	// セーブスロット関連
+	
+	function initSaveSlotButtons()
+	{
+		// セーブスロットボタンを初期化、というか不可視化
+		
+		invalidate objSlotMarkerLayer if (objSlotMarkerLayer !== void);
+		
+		var i;
+		for (i=0; i<objSaveSlotButtons.count; i++) {
+			invalidate objSaveSlotButtons[i] if (objSaveSlotButtons[i] !== void);
+		}
+		objSaveSlotButtons = [];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setSaveSlotButtons()
+	{
+		// セーブスロットボタンを配置
+		
+		initSaveSlotButtons();
+		
+		var py = Math.round(intSlotBarPosY * screenScale);
+		var i;
+		for (i=0; i<intSaveSlots; i++) {
+			objSaveSlotButtons[i] = new MBSaveSlotButton(window, this);
+			var obj = objSaveSlotButtons[i];
+			
+			obj.setPos(intSlotBarPosX + intSlotButtonInterval * i, py);
+			
+			if (i == intCurrentSlot) {
+				obj.loadImages(sysfunc.getPathImage("bookmark/sect%02d_active".sprintf(i + 1)));
+			}
+			else {
+				obj.loadImages(sysfunc.getPathImage("bookmark/sect%02d".sprintf(i + 1)));
+			}
+			obj.visible = true;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setSaveSlotMarker()
+	{
+		// スロットマーカーを配置する
+		// ・・・というより、スロットボタンを描画しなおす
+		
+		var i;
+		
+		for (i=0; i<intSaveSlots; i++) {
+			var obj = objSaveSlotButtons[i];
+			
+			if (i == intCurrentSlot) {
+				obj.loadImages(sysfunc.getPathImage("bookmark/sect%02d_active".sprintf(i + 1)));
+			}
+			else {
+				obj.loadImages(sysfunc.getPathImage("bookmark/sect%02d".sprintf(i + 1)));
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setSaveSlotFocusStack()
+	{
+		// セーブスロットボタンのフォーカス設定
+		
+		var i;
+		
+		for (i=0; i<objSaveSlotButtons.count; i++) {
+			var obj = objSaveSlotButtons[i];
+			var left = i - 1;
+			if (left < 0) {
+				left = intSaveSlots - 1;
+			}
+			var right = i + 1;
+			if (right >= intSaveSlots) {
+				right = 0;
+			}
+			var top    = objCancelButton;
+			var bottom = objBookMarkButtons[0];
+			
+			obj.objCursorMapHash.left  = objSaveSlotButtons[left];
+			obj.objCursorMapHash.right = objSaveSlotButtons[right];
+			obj.objCursorMapHash.up    = top;
+			obj.objCursorMapHash.down  = bottom;
+		}
+	}
+	
+	
+	//==========================================================================
+	// セーブデータ関連
+	
+	function initBookMarkButtons()
+	{
+		// セーブデータの選択ボタンを初期化というか不可視化
+		
+		var i;
+		for (i=0; i<objBookMarkButtons.count; i++) {
+			invalidate objBookMarkButtons[i] if (objBookMarkButtons[i] !== void);
+		}
+		objBookMarkButtons = [];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setBookMarkButtons()
+	{
+		// セーブデータボタンを配置
+		
+		initBookMarkButtons();
+		
+		var i;
+		for (i=0; i<intSavePanels; i++) {
+			objBookMarkButtons[i] = new MBBookMarkSelectPanel(window, this);
+			var obj = objBookMarkButtons[i];
+			
+			if (i == 0) {
+				obj.isAhead = true;
+			}
+			obj.size = panelSize;
+			obj.scale = panelScale;
+			obj.init(intCurrentSlot * intSavePanels + i);
+			obj.setPos(
+				panelPosition.x + (panelSize.width + panelMargin) * (i % intPanelMatrix.cols), 
+				panelPosition.y + (panelSize.height + panelMargin) * (i \ intPanelMatrix.cols));	// 330, mg10
+			obj.drawItemFace();
+			obj.visible  = true;
+			
+			if (blForceActivate || obj.blHaveContent) {
+				obj.blActive = true;
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function updateBookMarkButtons()
+	{
+		// セーブデータパネルを再描画
+		
+		var i;
+		for (i=0; i<intSavePanels; i++) {
+			var obj = objBookMarkButtons[i];
+			obj.init(intCurrentSlot * intSavePanels + i);
+			obj.drawItemFace();
+			obj.visible = true;
+			
+			if (blForceActivate || obj.blHaveContent) {
+				obj.blActive = true;
+			}
+			else {
+				obj.blActive = false;
+			}
+		}
+		
+		// トップパネルとキャンセルボタンのフォーカススタックを再設定
+		var ref = objSaveSlotButtons[intCurrentSlot];
+		objBookMarkButtons[0].objCursorMapHash.up = ref;
+		objCancelButton.objCursorMapHash.down     = ref;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setBookMarkFocusStack()
+	{
+		// ブックマークボタンのフォーカス設定
+		
+		var i;
+		
+		for (i=0; i<intSavePanels; i++) {
+			var obj = objBookMarkButtons[i];
+			var up  = i - 2;
+			if (up < 0) {
+				up = objSaveSlotButtons[intCurrentSlot];
+			}
+			else {
+				up = objBookMarkButtons[up];
+			}
+			
+			var down = i + 2;
+			if (down >= intSavePanels) {
+				down = objCancelButton;
+			}
+			else {
+				down = objBookMarkButtons[down];
+			}
+			
+			var left;
+			var right;
+			if (i % 2) {
+				left  = objBookMarkButtons[i - 1];
+				right = objBookMarkButtons[i - 1];
+			}
+			else {
+				left  = objBookMarkButtons[i + 1];
+				right = objBookMarkButtons[i + 1];
+			}
+			
+			obj.objCursorMapHash.up    = up;
+			obj.objCursorMapHash.down  = down;
+			obj.objCursorMapHash.left  = left;
+			obj.objCursorMapHash.right = right;
+		}
+	}
+	
+	//==========================================================================
+	// イベント処理関連
+	
+	function onSelectedItemClick(sender)
+	{
+		// ボタンクリック時の動作
+		
+		// キャンセル
+		if (sender == objCancelButton) {
+			sndfunc.seDecide();
+			disactivate();
+			window.trigger('CLOSE_BOOKMARK_WINDOW');
+			return;
+		}
+		
+		var res;
+		
+		// スロット変更
+		res = objSaveSlotButtons.find(sender);
+		if (res > -1) {
+			sndfunc.seDecide();
+			intCurrentSlot = res;
+			setSaveSlotMarker();
+			updateBookMarkButtons();
+			return;
+		}
+		
+		
+		// ブックマークパネル
+		res = objBookMarkButtons.find(sender);
+		if (res > -1) {
+			makeConfirmation(sender);
+			return;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーが押されたときの動作
+		
+		onSelectedItemClick(objCancelButton);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight) {
+			onEscapeKeyDown();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+	
+	
+	//==========================================================================
+	// 動作関連
+	
+	function makeConfirmation(sender)
+	{
+		// 動作の確認
+		
+		intTempTarget = sender.intDataNumber;
+		
+		invalidate objDialog if (objDialog !== void);
+		
+		var str   = "No.%dをロードします。\nよろしいですか？".sprintf(intTempTarget + 1);
+		objDialog = new MBPseudyYesNoDialog(window, window.fore.base, this, str);
+		objDialog.show();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onYesNoSelected(res)
+	{
+		// 選択結果
+		
+		if (res) {
+			doMyWork();
+		}
+		else {
+			intTempTarget = void;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function doMyWork()
+	{
+		// 動作を行う
+		
+		sf.backpack_lastused  = intTempTarget;
+		tf.lastloaded_savenum = intTempTarget;
+		
+		SystemManager.strContextMenuType = 'normal';
+		disactivate();
+		
+		window.loadBookMark(intTempTarget, true, true);
+	}
+	
+	//==========================================================================
+	// その他ユーティリティ
+	
+	function getSlotIDFromDataID(num)
+	{
+		// データIDからスロット番号を取得
+		
+		if (!num) {
+			num = 0;
+		}
+		
+		var res = num \ intSavePanels;
+		
+		if (!res) {
+			res = 0;
+		}
+		else if (res >= intSaveSlots) {
+			res = intSaveSlots - 1;
+		}
+		
+		return res;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function removeSaveDate(num)
+	{
+		// 指定番号のセーブデータを消去する
+		if (!MBGraphicPref.BookmarkDeleterEnabled) {
+			return;
+		}
+		
+		if (num < 0 || num >= intSavePanels * intSaveSlots) {
+			return;
+		}
+		
+		var fname = "%s/data%d.bmp".sprintf(window.saveDataLocation, num);
+		
+		if (!Storages.isExistentStorage(fname)) {
+			return;
+		}
+		
+		window.bookMarkNames[num] = "";
+		window.bookMarkDates[num] = "";
+		
+		updateBookMarkButtons();
+		
+		invalidate objDialog if (objDialog !== void);
+		
+		var str = "No.%dを削除しました。".sprintf(num + 1);
+		objDialog = new MBPseudyNoticeDialog(window, window.fore.base, str);
+		objDialog.show();
+		
+		// KTLに多謝
+		LocalFiles.remove(fname);
+	}
+}

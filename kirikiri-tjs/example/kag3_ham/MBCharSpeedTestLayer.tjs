@@ -1,0 +1,295 @@
+/******************************************************************************
+	system_mb/mb/system/userpref/MBCharSpeedTestLayer.tjs
+*******************************************************************************/
+
+//==============================================================================
+// 文字表示速度テストレイヤー
+
+class MBContextMenuCharSpeedTestLayer extends Layer
+{
+	var textcolor = MBGraphicPref.ConfigTextColor;	// 文字色
+	var testtext;	// テスト文字列
+	var timer;	// タイマ
+	var counter;	// カウンタ
+	
+	var intSpeedTestRingBufCount = 0;
+	var objSpeedTestChars = [];
+	
+	var intLineWaitRingBufCount = 0;
+	var intPageWaitRingBufCount = 0;
+	
+	var tmpPhase;
+	var tmpWait;
+	var tmpSpeed;
+	var tmpContPoint;
+	
+	
+	function MBContextMenuCharSpeedTestLayer(win, par)
+	{
+		super.Layer(win, par);
+		
+		setImageSize(578, 68);
+		setSizeToImageSize();
+		initWindow();
+		name = '文字表示速度テスタ';
+	}
+	
+	function finalize()
+	{
+		invalidate timer if timer !== void;
+		super.finalize(...);
+	}
+	
+	function setSpeedTester(id)
+	{
+		// スピードテスト文字列を設定する
+		
+		objSpeedTestChars = MBGraphicPref.ConfigNormalTestText;
+		intSpeedTestRingBufCount = 0;
+	}
+	
+	function initWindow()
+	{
+		fillRect(0, 0, 575, 66, 0x00000000);
+		font.height = 14;
+		font.bold = true;
+		drawText(10, 10, "[Speed Test]", textcolor);
+		counter = 0;
+	}
+	
+	function speedTest(speed)
+	{
+		// スピードテスト開始
+		
+		SystemManager.acActivateCanceller();
+		window.mouseCursorState = mcsHidden;
+		
+		initWindow();
+		do {
+			testtext = getStringRandom();
+		} while (testtext == "");
+		
+		font.height = 16;
+		font.bold = false;
+		
+		if (speed > 0) {
+			timer = new Timer(onTimer, '');
+			timer.interval = speed;
+			timer.enabled = true;
+		}
+		else {
+			//drawText(10, 35, testtext, textcolor);
+			drawText(108, 9, testtext, textcolor);
+			SystemManager.acDisactivateCanceller();
+			window.mouseCursorState = mcsVisible;
+		}
+	}
+	
+	function onTimer()
+	{
+		/*drawText(10 + font.getTextWidth(testtext.substring(0, counter)),
+			35,*/
+		drawText(108 + font.getTextWidth(testtext.substring(0, counter)),
+			9,
+			testtext.charAt(counter),
+			textcolor
+		);
+		
+		if (++counter == testtext.length) {
+			timer.enabled = false;
+			invalidate timer if (timer !== void);
+			counter = 0;
+			SystemManager.acDisactivateCanceller();
+			window.mouseCursorState = mcsVisible;
+		}
+	}
+	
+	function getStringRandom()
+	{
+		// テスト文をリングバッファ的に取得
+		
+		var str = objSpeedTestChars[intSpeedTestRingBufCount];
+		
+		intSpeedTestRingBufCount += 1;
+		if (intSpeedTestRingBufCount >= objSpeedTestChars.count) {
+			intSpeedTestRingBufCount = 0;
+		}
+		
+		return str;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function lineWaitTest(speed, wait, phase)
+	{
+		// 行待ちテストを開始
+		
+		var lineWaitTestChars = MBGraphicPref.ConfigLineWaitTestText;
+		
+		tmpPhase = phase;
+		testtext = lineWaitTestChars[phase - 1];
+		
+		if (phase == 1) {
+			SystemManager.acActivateCanceller();
+			window.mouseCursorState = mcsHidden;
+			
+			initWindow();
+			
+			font.height = 16;
+			font.bold = false;
+			
+			tmpSpeed = speed;
+			tmpWait  = wait;
+			
+			if (speed == 0) {
+				// 文字速度がノーウェイトの場合は待たない
+				testtext = lineWaitTestChars[0] +
+							lineWaitTestChars[1];
+				drawText(108, 9, testtext, textcolor);
+				intLineWaitRingBufCount += 1;
+				SystemManager.acDisactivateCanceller();
+				window.mouseCursorState = mcsVisible;
+				return;
+			}
+		}
+		
+		timer = new Timer(onTimerLineTest, '');
+		timer.interval = tmpSpeed;
+		timer.enabled  = true;
+	}
+	
+	function onTimerLineTest()
+	{
+		// 行待ちテスト
+		
+		drawText(108 + font.getTextWidth(testtext.substring(0, counter)) + tmpContPoint,
+			9,
+			testtext.charAt(counter),
+			textcolor
+		);
+		
+		if (++counter == testtext.length) {
+			timer.enabled = false;
+			invalidate timer if (timer !== void);
+			tmpContPoint = font.getTextWidth(testtext.substring(0, counter));
+			counter = 0;
+			if (tmpPhase == 1) {
+				timer = new Timer(onTimerWait, '');
+				timer.interval = tmpWait;
+				timer.enabled  = true;
+			}
+			else {
+				tmpContPoint = 0;
+				intLineWaitRingBufCount = 0;
+				SystemManager.acDisactivateCanceller();
+				window.mouseCursorState = mcsVisible;
+			}
+		}
+	}
+	
+	function onTimerWait()
+	{
+		// 待つ
+		
+		timer.enabled = false;
+		invalidate timer if (timer !== void);
+		
+		if (tmpContPoint) {
+			lineWaitTest('', '', 2);
+		}
+		else {
+			pageWaitTest('', '', 2);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function pageWaitTest(speed, wait, phase)
+	{
+		// ページ待ちテストを開始
+		
+		tmpPhase = phase;
+		
+		initWindow();
+		font.height = 16;
+		font.bold = false;
+		
+		if (phase == 1) {
+			SystemManager.acActivateCanceller();
+			window.mouseCursorState = mcsHidden;
+			
+			tmpSpeed = speed;
+			tmpWait  = wait;
+		}
+		
+		testtext = MBGraphicPref.ConfigPageWaitTestText[intPageWaitRingBufCount];
+		
+		if (tmpSpeed == 0) {
+			// 文字速度がノーウェイトの場合は待たない
+			drawText(108, 9, testtext, textcolor);
+			intPageWaitRingBufCount += 1;
+			if (intPageWaitRingBufCount >= MBGraphicPref.ConfigPageWaitTestText.count) {
+				intPageWaitRingBufCount = 0;
+				SystemManager.acDisactivateCanceller();
+				window.mouseCursorState = mcsVisible;
+				return;
+			}
+			else {
+				timer = new Timer(onTimerWait, '');
+				timer.interval = tmpWait;
+				timer.enabled  = true;
+			}
+		}
+		else {
+			timer = new Timer(onTimerPageTest, '');
+			timer.interval = tmpSpeed;
+			timer.enabled  = true;
+		}
+	}
+	
+	function onTimerPageTest()
+	{
+		// ページ待ちテスト
+		
+		drawText(108 + font.getTextWidth(testtext.substring(0, counter)),
+			9,
+			testtext.charAt(counter),
+			textcolor
+		);
+		
+		if (++counter == testtext.length) {
+			timer.enabled = false;
+			invalidate timer if (timer !== void);
+			counter = 0;
+			if (tmpPhase == 1) {
+				timer = new Timer(onTimerWait, '');
+				timer.interval = tmpWait;
+				timer.enabled  = true;
+			}
+			else {
+				tmpContPoint = 0;
+				SystemManager.acDisactivateCanceller();
+				window.mouseCursorState = mcsVisible;
+			}
+			
+			intPageWaitRingBufCount += 1;
+			if (intPageWaitRingBufCount >= MBGraphicPref.ConfigPageWaitTestText.count) {
+				intPageWaitRingBufCount = 0;
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight)
+		{
+			parent.onChildrenRightClick();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}
+

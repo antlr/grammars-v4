@@ -1,0 +1,10 @@
+DGS004
+elements 0 0
+
+an A
+an "B"
+an C
+
+ae AB A B
+ae AC A > C
+ae BC C < B

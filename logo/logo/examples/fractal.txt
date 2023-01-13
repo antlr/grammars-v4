@@ -1,0 +1,8 @@
+to triangle :size
+	  to fractal :size
+  	    repeat 3 [fd :size rt 120]
+	    if :size < 3 [stop] ; the procedure stops if size is too small
+	  end
+	  repeat 3 [fd :size fractal :size/2 fd :size rt 120]
+	end
+	

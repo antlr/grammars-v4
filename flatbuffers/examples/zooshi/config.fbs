@@ -1,0 +1,279 @@
+// Copyright 2015 Google Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "audio_config.fbs";
+include "bullet_def.fbs";
+include "common.fbs";
+include "components.fbs";
+include "scene_lab_config.fbs";
+include "gpg.fbs";
+include "unlockables.fbs";
+
+namespace fpl.zooshi;
+
+// One point in the river cross-section.
+//
+// 0      1     2    3     4     5          6    7
+// *---___                             _____*----*
+//        *-----*____       _____*-----
+//                   *_____*
+//
+//                   ^
+//                   |
+//                river_index
+//
+// Here the river cross-section has 8 points. Each point has a horizontal (x)
+// and vertical (z) offset. There's some randomness allowed for these offsets.
+// Therefore, we specify min/max pairs.
+//
+// The `river_index` indicates the left side of the river.
+// `river_index` + 1 is the right bank. Therefore, the river width is at least
+//      banks[river_index + 1].x_min - banks[river_index].x_min
+// and at most,
+//      banks[river_index + 1].x_max - banks[river_index].x_max
+//
+// So in the example above, to make the river wider, you'd decrease
+// banks[3].x_min/max and increase banks[3].x_min/max. Be sure to keep the
+// x-values monotonically increasing. You will get strange geometry otherwise.
+//
+// Riverbanks are zero-based, (with zero representing the width of the river
+// at that point), so 3 and 4 are likely to be at or near zero.
+// This means that in most cases, you probably want to have everything <=
+// river_index to have negative x values, and everything > river_index to have
+// positive x values.
+//
+table RiverBankContour {
+  x_min:float;  // Min absolute distance from the center of the river.
+  x_max:float;  // Max absolute distance from the center of the river.
+  z_min:float;  // Min absolute height of the bank.
+  z_max:float;  // Max absolute height of the bank.
+}
+
+// How far along the river to start each zone. The entire river ranges from
+// 0 to 1.
+table RiverZone {
+  zone_start:float;
+  material:string;
+  width:float = 0;
+  banks:[RiverBankContour];  // Override the default riverbanks - must be the
+                             // same size as RiverConfig's default_banks().
+}
+
+table RiverConfig {
+  // How much faster the river flows than the raft.  At 0.0, river and raft
+  // move at exactly the same speed.  Should be nonzero though, or it looks
+  // weird at the start of the game when the raft is stopped.
+  speed_boost:float = 0.5;
+  texture_repeats:float = 16;
+  spline_stepsize: float = 700.0;
+  track_height:float = -1.89;
+  texture_tile_size:float = 25.0;
+  material:string;
+  shader:string;
+
+  // Detail the cross section of the procedurally-generated banks.
+  // See the diagram in RiverBankContour for more information.
+  default_banks:[RiverBankContour];
+  default_width: float = 5.0;
+
+  // Zones for the riverbank. Each zone specifies a material to use.
+  zones:[RiverZone];
+
+  // Index into `banks` of the left side of the river. The right side is
+  // river_index + 1.
+  river_index:int;
+
+  // The collision type of the river banks.
+  collision_type:corgi.BulletCollisionType;
+
+  // What the river banks can collide with.
+  collides_with:[corgi.BulletCollisionType];
+
+  // The mass of the river banks.
+  mass:float = 1000;
+
+  // The restitution of the river banks.
+  restitution:float = 0.5;
+
+  // An arbitrary tag that is passed to the functions that handle collisions
+  // with the river.
+  user_tag:string;
+}
+
+table RenderConfig {
+  // Should we render shadows?
+  render_shadows_by_default:bool;
+
+  // Resolution (in pixels) of the shadowmap.
+  // Needs to be a power of 2, or GLES breaks
+  // Larger = shadows are visible further away, but takes more memory.
+  shadow_map_resolution:int;
+
+  // Scalar affecting the resolution/scale of the shadowmap.
+  // Smaller values mean low resolution - you can see them from
+  // far away, but shadows are blocky.
+  shadow_map_zoom:float;
+
+  // Distance (in world units) that the shadow-map should focus in front of
+  // the camera.  0 means the shadow map is perfectly centered on the camera.
+  shadow_map_offset:float;
+
+  // Minimum distance at which the fog does anything.
+  fog_roll_in_dist:float;
+
+  // Distance after which the fog no longer affects the color of the object.
+  fog_max_dist:float;
+
+  // The color of the fog.
+  fog_color:fplbase.ColorRGBA;
+
+  // The saturation of the color - 1.0 means that at max distance, objects
+  // will be entirely fog_color-colored.  0.0 means that the fog has no effect.
+  fog_max_saturation:float;
+
+  // Max distance at which an object renders - past this it just gets culled.
+  cull_distance:float;
+
+  // When distance exceeds this amount, cullable objects should try to get
+  // themselves out-of-view in a visually pleasing way. Suddenly being culled
+  // is jarring.
+  pop_out_distance:float;
+
+  // When distance is less than this amount, cullable objects should try to
+  // bring themselves into-view in a visually pleasing way. Suddenly appearing
+  // is jarring.
+  pop_in_distance:float;
+
+  // Depth bias for the shadow map.
+  shadow_map_bias:float;
+
+  // Viewport angle for the shadow map, in degrees.
+  shadow_map_viewport_angle:float;
+
+  // Apply Phong shading?
+  apply_phong_by_default:bool;
+
+  // Apply specular effect?
+  apply_specular_by_default:bool;
+
+  // Use normal maps?
+  apply_normal_maps_by_default:bool;
+
+  // Render shadows for Cardboard?
+  render_shadows_by_default_cardboard:bool;
+
+  // Apply Phong shading for Cardboard?
+  apply_phong_by_default_cardboard:bool;
+
+  // Apply specular effect for Cardboard?
+  apply_specular_by_default_cardboard:bool;
+
+  // Use normal maps for Cardboard?
+  apply_normal_maps_by_default_cardboard:bool;
+}
+
+// Table that describes elements specific to a single level.
+table LevelDef {
+  // The name of the level that will appear for UI.
+  name:string;
+  // Entity files that are loaded for this level.
+  entity_files:[string];
+  // Various settings for rendering the river.
+  river_config:RiverConfig;
+}
+
+table WorldDef {
+  // Entity files that are loaded for every level.
+  entity_files:[string];
+  // Different playable level definitions.
+  levels:[LevelDef];
+}
+
+enum UniqueBonusId : byte {
+  NonUnique = 0,
+  AdMobRewardedVideo = 1,
+}
+
+table Config {
+  // The name of the game, as displayed on the window title.
+  window_title:string;
+
+  // The relative path to the font file used for fine print menu text.
+  license_font:string;
+
+  // The relative path to the font file used to display menu items.
+  menu_font:string;
+
+  // Audio engine configuration file.
+  audio_config:string;
+
+  // Input configuration file.
+  input_config:string;
+
+  // The manifest of assets to load.
+  assets_filename:string;
+
+  // The initial offset from the player the projectile starts at, heightwise.
+  projectile_height_offset: float;
+
+  // The initial offset for the projectile in the direction it fires.
+  // It's nice to spawn projectile slightly in front of the player so that
+  // it doesn't get culled by the near plane.
+  projectile_forward_offset: float;
+
+  // Minimum anglular velocity, in degrees per second, of the launched
+  // projectiles, per axis.
+  projectile_min_angular_velocity: fplbase.Vec3;
+
+  // Maximum anglular velocity, in degrees per second, of the launched
+  // projectiles, per axis.
+  projectile_max_angular_velocity: fplbase.Vec3;
+
+  // The height above the patron to display the heart.
+  point_display_height: float;
+
+  // The strength of gravity
+  gravity: float;
+
+  // The maximum number of steps to advance bullet each frame
+  bullet_max_steps: int;
+
+  // The viewport angle to use when in Cardboard.
+  cardboard_viewport_angle:float;
+
+  // Configuration for the in-game editor, Scene Lab.
+  scene_lab_config: scene_lab.SceneLabConfig;
+
+  // Entity files to load.
+  world_def:WorldDef;
+
+  // Various settings for rendering:
+  rendering_config:RenderConfig;
+
+  // GPG configuration.
+  gpg_config:GPGConfig;
+
+  // Overshoot parameters for rotating scenery.
+  scenery_face_angle_def:motive.OvershootParameters;
+
+  // The different sushi types that will be used.
+  sushi_config:[UnlockableConfig];
+
+  // The amount of XP needed to get a reward.
+  xp_for_reward:int;
+}
+
+root_type Config;
+file_identifier "ZCON";
+file_extension "zooconfig";

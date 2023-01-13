@@ -1,0 +1,251 @@
+import SSF_SS_PMT:EXCEPTION:*;
+import SSF_SS_PMT:SSF_Student:*;
+import SSF_SS_PMT:SSF_Construct:*;
+import SSF_SS_PMT:*;
+import SCC_SI_VALIDITY:PERSON:SrvcIndPeriod;
+
+class Student
+   property string StdntISet;
+   property string Emplid;
+   property boolean TCalcIsRequired get;
+   property boolean TCalcIsRequiredSS get;
+   method get_Todays_Payments() Returns integer;
+   method get_deposit_due() Returns number;
+   method get_charges_due() Returns number;
+   method get_deposit_due_by_date(&as_of_date As date) Returns number;
+   method get_charges_due_by_date(&as_of_date As date) Returns number;
+
+   /*method get_todays_payments() Returns integer;*/
+   method Student(&Id As string);
+   method ValidateStdnt(&Iset As string);
+   method ValidatePurchase(&Iset As string);
+   method CheckInternetHold(&Srvc_rs As Rowset);
+   method OverrideLimit() Returns boolean;
+   method CalcTuition();
+   method CheckDailyUsage() Returns integer;
+   method DisplayTCalcMsg() Returns boolean;
+private
+   method GetStudentIset();
+   method ValidateImpact(&rs As Rowset);
+   Constant &msgNoInstSet = 17;
+   Constant &msgTuitionError = 124;
+   Constant &msgCannotPay = 45;
+   Constant &msgCannotPurchase = 1018;
+   Constant &set = 14870;
+   Constant &msgInternetHolds = 18;
+   Constant &MostCurrentEnrol = "E";
+   Constant &LastEnrol = "L";
+   Constant &SFTermDefault = "T";
+   Constant &msgDailyLimit = 13;
+   instance number &award;
+   instance Record &hcr_rec;
+   instance SSF_SS_PMT:SSF_Construct:InstitutionSet &IS;
+   instance SSF_SS_PMT:SSF_Calculate_Tuition &obj_Tuition;
+   instance SCC_SI_VALIDITY:PERSON:SrvcIndPeriod &srvc;
+end-class;
+
+method Student
+
+   /+ &Id as String +/
+   %This.GetStudentIset();
+   %This.Emplid = &Id;
+end-method;
+
+method GetStudentIset
+
+   Local Record &r = CreateRecord(Record.OPR_DEF_TBL_CS);
+   &r.OPRID.Value = %OperatorId;
+   &r.SelectByKey();
+   Local string &iset = &r.ISET_OVRD.Value;
+   If None(&iset) Then
+      &iset = &r.INSTITUTION_SET.Value;
+   End-If;
+   If None(&iset) Then
+      throw create SSF_SS_PMT:EXCEPTION:StudentException(&msgNoInstSet, &set);
+   Else
+      %This.StdntISet = &iset;
+      &IS = create SSF_SS_PMT:SSF_Construct:InstitutionSet(%This.StdntISet);
+   End-If;
+end-method;
+
+get TCalcIsRequired
+
+/+ Returns Boolean +/
+Local Rowset &temp_rs = CreateRowset(Record.SF_ISET_TERM_VW);
+Local number &cnt = &temp_rs.Fill("where  emplid = :1 and INSTITUTION_SET =:2", &Emplid, &StdntISet);
+If &cnt > 0 Then
+   Return True;
+Else
+   Return False;
+End-If;
+end-get;
+
+get TCalcIsRequiredSS
+
+/+ Returns Boolean +/
+Local Rowset &temp_rs = CreateRowset(Record.SF_ISET_TERM_VW);
+Local number &cnt;
+If &IS.TuitionCalcReq Then
+   &cnt = &temp_rs.Fill("where  emplid = :1 and INSTITUTION_SET =:2 AND SSF_SS_AUTO_CALC = 'Y'", &Emplid, &StdntISet);
+End-If;
+If &cnt > 0 Then
+   Return True;
+Else
+   Return False;
+End-If;
+end-get;
+
+method ValidateStdnt
+
+   /+ &Iset as String +/
+
+   If Not &IS.EnableWebPay Then
+      throw create SSF_SS_PMT:EXCEPTION:StudentException(&msgCannotPay, &set);
+   End-If;
+end-method;
+
+method ValidatePurchase
+
+   /+ &Iset as String +/
+   If Not &IS.EnableWebPurchase Then
+      throw create SSF_SS_PMT:EXCEPTION:StudentException(&msgCannotPurchase, &set);
+   End-If;
+end-method;
+
+method CalcTuition
+
+   Local Rowset &temp_rs = CreateRowset(Record.SF_ISET_TERM_VW);
+   Local number &i;
+   Local Record &rec;
+   Local number &cnt = &temp_rs.Fill("where  emplid = :1 and INSTITUTION_SET =:2 AND SSF_SS_AUTO_CALC = 'Y'", &Emplid, &StdntISet);
+   If &cnt > 0 Then
+      For &i = 1 To &temp_rs.ActiveRowCount
+         &rec = &temp_rs(&i).SF_ISET_TERM_VW;
+         &obj_Tuition = create SSF_SS_PMT:SSF_Calculate_Tuition(&rec.EMPLID.Value, &rec.BUSINESS_UNIT.Value, &rec.STRM.Value);
+         If Not &obj_Tuition.Success Then;
+            throw create SSF_SS_PMT:EXCEPTION:TuitionException(124, &rec.BUSINESS_UNIT.Value, &StdntISet);
+         End-If;
+      End-For;
+   End-If;
+
+end-method;
+
+
+method CheckInternetHold
+
+   /+ &Srvc_rs as Rowset +/
+   Local Rowset &rs = CreateRowset(Record.SF_ISET_SRVC_VW);
+   %This.ValidateImpact(&rs);
+   If Not &rs(1).IsDeleted Then
+      &rs.CopyTo(&Srvc_rs);
+      throw create SSF_SS_PMT:EXCEPTION:StudentException(&msgInternetHolds, &set);
+   End-If;
+end-method;
+
+method ValidateImpact
+
+   /+ &rs as Rowset +/
+   Local integer &i;
+   Local Record &srvc_rec;
+   If &rs.Fill("where  emplid = :1 and INSTITUTION_SET = :2", &Emplid, &StdntISet) > 0 Then
+      For &i = &rs.ActiveRowCount To 1 Step - 1
+         &srvc_rec = &rs(&i).GetRecord(1);
+         &srvc = create SCC_SI_VALIDITY:PERSON:SrvcIndPeriod(&srvc_rec.INSTITUTION.Value, &srvc_rec.SERVICE_IMPACT.Value);
+         If Not &srvc.ImpactValidate("") Then
+            &rs.DeleteRow(&i);
+         End-If;
+      End-For;
+   End-If;
+end-method;
+
+
+method OverrideLimit
+
+   /+ Returns Boolean +/
+   Local Rowset &rs = CreateRowset(Record.SF_ISET_SRVC2VW);
+   %This.ValidateImpact(&rs);
+   If &rs(1).IsDeleted Then
+      Return False;
+   Else
+      Return True;
+   End-If;
+end-method;
+
+
+
+method get_deposit_due
+
+   /+ Returns Number +/;
+   Local number &amt;
+   SQLExec("select sum(item_amt) from ps_ssf_ss_dep_due where emplid = :1 and institution_set = :2", &Emplid, &StdntISet, &amt);
+   Return &amt;
+end-method;
+
+method get_deposit_due_by_date
+
+   /+ &as_of_date as Date +/
+   /+ Returns Number +/;
+   Local number &amt;
+   SQLExec("select sum(item_amt) from ps_ssf_ss_dep_due where emplid = :1 and institution_set = :2 and due_dt <= %datein(:3)", &Emplid, &StdntISet, &as_of_date, &amt);
+   Return &amt;
+end-method;
+
+method get_charges_due
+
+   /+ Returns Number +/;
+
+   Local number &amt;
+   SQLExec("select sum(due_amt) from ps_ssf_due_chrg_vw where common_id = :1 and institution_set = :2", &Emplid, &StdntISet, &amt);
+   Return &amt;
+end-method;
+
+method get_charges_due_by_date
+
+   /+ &as_of_date as Date +/
+   /+ Returns Number +/;
+
+   Local number &amt;
+   SQLExec("select sum(due_amt) from ps_ssf_due_chrg_vw where common_id = :1 and institution_set = :2 and due_dt <= %datein(:3)", &Emplid, &StdntISet, &as_of_date, &amt);
+   Return &amt;
+end-method;
+
+method get_Todays_Payments
+
+   /+ Returns Integer +/
+   Local Rowset &pend_rs = CreateRowset(Record.SF_PAYMENT_VW);
+   Local integer &i = &pend_rs.Fill("where EMPLID =:1 AND SA_ID_TYPE ='P' AND SF_PAYMENT_STATUS='S' AND SF_POST_STATUS = 'P' AND CR_CARD_TRANS_SRC IN ('P','M') AND NOT( CR_CARD_AUTH_REPLY= 'ETIMEOUT') and %dateout(%datepart(LAST_DTTM_UPDATE)) = :2", &Emplid, %Date);
+   Local Rowset &log_rs = CreateRowset(Record.SF_PAY_LOG_VW);
+   Local integer &l = &log_rs.Fill("where COMMON_ID =:1 AND SA_ID_TYPE ='P' AND PROCESS_INSTANCE = 0 AND CR_CARD_TRANS_SRC IN ('P','M') and %dateout(%datepart(LAST_DTTM_UPDATE)) = :2", &Emplid, %Date);
+   Return &l + &i;
+
+end-method;
+
+method CheckDailyUsage
+
+   /+ Returns Integer +/
+   Local integer &num_payments = 0;
+   If &IS.CheckUsage And
+         Not %This.OverrideLimit() Then
+      &num_payments = %This.get_Todays_Payments();
+      If &num_payments >= INSTITUTION_SET.CR_CARD_DAY_LIMIT Then
+         throw create SSF_SS_PMT:EXCEPTION:StudentException(&msgDailyLimit, &set);
+      End-If;
+
+   End-If;
+   Return &num_payments;
+end-method;
+
+method DisplayTCalcMsg
+
+   /+ Returns Boolean +/
+   Local boolean &DispMsg = False;
+   If &IS.Disp_Tcalc_Msg Then
+      If ( Not &IS.TuitionCalcReq And
+            %This.TCalcIsRequired) Or
+            (&IS.TuitionCalcReq And
+            %This.TCalcIsRequiredSS) Then
+         &DispMsg = True;
+      End-If;
+   End-If;
+   Return &DispMsg;
+end-method;

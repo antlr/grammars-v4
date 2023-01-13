@@ -1,0 +1,32 @@
+Local boolean &boo_Rslt;
+Local Record &KeyRec;
+Local string &str_User_AdviseeID;
+
+
+DERIVED_REGFRM1.TITLE1.Visible = False;
+DERIVED_SCC_SUM.SSR_ADVISEE_LIST.Visible = True;
+
+rem  TransferPage(Page.SSS_ADVISEE_SRCH);
+
+&str_User_AdviseeID = GetUserOption("LS", "SSS_ADVISEE");
+If &str_User_AdviseeID <> DERIVED_SCC_SUM.SSR_ADVISEE_LIST Then
+   &boo_Rslt = SetUserOption("LS", "SSS_ADVISEE", DERIVED_SCC_SUM.SSR_ADVISEE_LIST);
+End-If;
+
+&KeyRec = CreateRecord(Record.SCC_PERS_SA_VW);
+&KeyRec.EMPLID.Value = DERIVED_SCC_SUM.SSR_ADVISEE_LIST;
+
+Evaluate %Component
+When Component.SCC_SUM_ACAD
+   TransferExact( False, @("MenuName." | %Menu), BarName.MAIN, ItemName.SCC_SUM_ACAD, Page.SCC_SUM_ACADEMICS, %Action_UpdateDisplay, &KeyRec);
+
+When Component.SCC_SUM_PERS
+   TransferExact( False, @("MenuName." | %Menu), BarName.MAIN, ItemName.SCC_SUM_PERS, Page.SCC_SUM_PERSONAL, %Action_UpdateDisplay, &KeyRec);
+
+When Component.SCC_SUM_TRCR
+   TransferExact( False, @("MenuName." | %Menu), BarName.MAIN, ItemName.SCC_SUM_TRCR, Page.SCC_SUM_TRNSFRCRDT, %Action_UpdateDisplay, &KeyRec);
+
+When Component.SSS_STUDENT_CENTER
+   TransferExact( False, @("MenuName." | %Menu), BarName.MAIN, ItemName.SSS_STDNTCTR_ADMIN, Page.SSS_STUDENT_CENTER, %Action_UpdateDisplay, &KeyRec);
+
+End-Evaluate;

@@ -1,0 +1,9 @@
+DGS004
+bad 0 0
+
+  an A
+
+#
+# This is a bad example because lines should start with
+# a DGS directive, a '#' or be empty.
+#

@@ -1,0 +1,15 @@
+import SCC_MASS_SCRTY_REPLACE:*;
+
+Global SCC_MASS_SCRTY_REPLACE:SecurityObject &ObjectSI;
+
+Local Row &Level0_Row;
+Local string &replacevalue, &CurrOprid;
+
+&Level0_Row = GetLevel0().GetRow(1);
+
+&CurrOprid = &Level0_Row.OPRDEFN2.OPRID.Value;
+&replacevalue = &Level0_Row.DERIVED_CS.REPLACE_INST_CMP.Value;
+
+&ObjectSI = create SCC_MASS_SCRTY_REPLACE:SecurityObject();
+/* Academic Instituion / Campus Security */
+&ObjectSI.UpdateOpridObjSecurity(&CurrOprid, &replacevalue, "SCC_STY_TBL_CMP");

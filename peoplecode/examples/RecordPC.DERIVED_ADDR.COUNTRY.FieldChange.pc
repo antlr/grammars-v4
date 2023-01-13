@@ -1,0 +1,46 @@
+Component boolean &Eo_No_Addr_Proc;
+Component string &Eo_Addr_Recname;
+
+try
+
+   If &Eo_No_Addr_Proc <> True Then
+
+      &Der_Address = GetRecord(Record.DERIVED_ADDRESS);
+      If &Eo_Addr_Recname <> "" Then
+         &Addr_Rec = GetRecord(@("Record." | &Eo_Addr_Recname));
+      Else
+
+         &Der_Parent = &Der_Address.ParentRow;
+         &Der_Parent_Rowset = &Der_Parent.Parentrowset;
+         &Addr_Recname = &Der_Parent_Rowset.DBRecordName;
+         &Addr_Rec = GetRecord(@("Record." | &Addr_Recname));
+      End-If;
+      &Der_addr = GetRecord();
+
+      &Addr_Rec.getfield(Field.COUNTRY).value = &Der_addr.getfield(Field.COUNTRY).value;
+      &Addr_Rec.getfield(Field.ADDRESS1).setdefault();
+      &Addr_Rec.getfield(Field.ADDRESS2).setdefault();
+      &Addr_Rec.getfield(Field.ADDRESS3).setdefault();
+      &Addr_Rec.getfield(Field.ADDRESS4).setdefault();
+      &Addr_Rec.getfield(Field.CITY).setdefault();
+      &Addr_Rec.getfield(Field.NUM1).setdefault();
+      &Addr_Rec.getfield(Field.NUM2).setdefault();
+      &Addr_Rec.getfield(Field.HOUSE_TYPE).setdefault();
+      &Addr_Rec.getfield(Field.ADDR_FIELD1).setdefault();
+      &Addr_Rec.getfield(Field.ADDR_FIELD2).setdefault();
+      &Addr_Rec.getfield(Field.ADDR_FIELD3).setdefault();
+      &Addr_Rec.getfield(Field.COUNTY).setdefault();
+      &Addr_Rec.getfield(Field.STATE).setdefault();
+      &Addr_Rec.getfield(Field.POSTAL).setdefault();
+      SetDefault(DERIVED_ADDR.ADDRESSLONG);
+      &RS_Country = CreateRowset(Record.COUNTRY_TBL);
+      &RS_Country.Fill("WHERE COUNTRY = :1", &Der_addr.getfield(Field.COUNTRY).value);
+      &Der_addr.GetField(Field.DESCR).Value = &RS_Country.GetRow(1).GetRecord(Record.COUNTRY_TBL).GetField(Field.DESCR).Value;
+      &Der_addr.GetField(Field.DESCR_COUNTRY).Value = &RS_Country.GetRow(1).GetRecord(Record.COUNTRY_TBL).GetField(Field.DESCR).Value;
+
+   End-If;
+
+catch Exception &id
+
+/* Exception Caught. */
+end-try

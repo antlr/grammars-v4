@@ -1,0 +1,1 @@
+(startRule (module (moduleBody (moduleBodyElement (propertyLetStmt (visibility Public)   Property Let   (ambiguousIdentifier Bar) (argList ( (arg (ambiguousIdentifier a) (typeHint $)) )) \r\n End Property))) \r\n) <EOF>)

@@ -1,0 +1,431 @@
+/******************************************************************************
+	system_mb/ui/MBScrollButtons.tjs
+*******************************************************************************/
+
+
+class MBScrollButtonUp extends MBComponentLayer
+{
+	var value;	// 割り当てられた値
+	
+	var fontColor = MBColors.font.label.normal;
+	
+	var objCursorMapHash = %[
+		up : false,
+		down : false,
+		right : false,
+		left : false,
+		prevGroup : false,
+		nextGroup : false
+	];
+	var ptFocusController;	// フォーカスコントローラ参照
+	var ptActionCanceller;	// アクションキャンセラ参照
+	
+	var fltHorizontalFocusPoint = 0.5;	// フォーカスするポイント（横幅に対する割合）
+	var fltVerticalFocusPoint = 0.5;	// フォーカスするポイント（縦幅に対する割合）
+	
+	var blKeyLock;	// 二重押下防止
+	
+	
+	function MBScrollButtonUp(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		name = "スクロールボタン";
+		
+		visible = false;
+		enabled = false;
+		focusable = false;
+		
+		hitType = htMask;
+		hitThreshold = 0;	// 全域透過
+		
+		setSize(16, 16);
+		font.height = 16;
+		
+		ptFocusController = SystemManager.objFocusController;
+		ptActionCanceller = SystemManager.objActionCanceller;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setValue(val)
+	{
+		// 値をセットしてボタンを用意
+		
+		value = val;
+		
+		fillRect(0, 0, width, height, MBColors.window.background);
+		
+		if (val === void) {
+			drawText(0, 0, '△', fontColor);
+			enabled = false;
+		}
+		else {
+			drawText(0, 0, '▲', fontColor);
+			enabled = true;
+		}
+		
+		visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getCursorFromManager(lock = true)
+	{
+		// フォーカススタックマネージャから割り当てをもらう
+		
+		blKeyLock = lock;
+		cursorX = width * fltHorizontalFocusPoint;
+		cursorY = height * fltVerticalFocusPoint;
+		focusable = true;
+		focus();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドを呼ぶ
+		
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+		
+		cursor = crDefault;
+		parent.onSelectedItemClick(this);
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// クリック動作
+		
+		super.onMouseDown(...);
+		
+		if (button == mbLeft) {
+			if(enabled) {
+				sndfunc.seDeside();
+				parent.isNewLayer = true;
+				
+				SystemManager.fcSetKBOperationState(false);
+				ptFocusController.isActive = false;
+				ptFocusController.relFocusStack(this);
+				callParentFunction();
+			}
+		}
+	}
+	
+	function onMouseEnter()
+	{
+		// マウスカーソル突入動作
+		
+		if (parent.isNewLayer) {
+			parent.isNewLayer = false;
+		}
+		else {
+			sndfunc.seSelect();
+		}
+		
+		super.onMouseEnter(...);
+		ptFocusController.isActive = true;
+		cursor = crHandPoint;
+		focusable = true;
+		focus();
+		
+		SystemManager.getPadHandler();
+	}
+	
+	function onMouseLeave()
+	{
+		// マウスカーソル脱出動作
+		
+		super.onMouseLeave(...);
+		
+		SystemManager.releasePadHandler();
+		ptFocusController.isActive = false;
+		cursor = crDefault;
+		focusable = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onCallFromFocusStackManager(key, shift)
+	{
+		// キーボード押下動作フック
+		
+		key = SystemManager.convertPadToKey(key);
+		
+		switch(key) {
+			// 決定
+			case VK_RETURN:
+			case VK_SPACE:
+				callParentFunction(this);
+				break;
+			
+			// キャンセル
+			case VK_ESCAPE:
+				parent.onEscapeKeyDown();
+				break;
+			
+			// 矢印キー
+			case VK_UP:
+			case VK_DOWN:
+			case VK_RIGHT:
+			case VK_LEFT:
+				passFocusToNextObject(key);
+				break;
+			
+			// TAB
+			case VK_TAB:
+				
+				break;
+		}
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		// 標準のキー操作を無効にしておく
+		
+		if (blKeyLock) {
+			if (!shift) {
+				return;
+			}
+		}
+		
+		blKeyLock = true;
+		onCallFromFocusStackManager(...);
+	}
+	
+	function onKeyUp(key, shift)
+	{
+		// キーが離されたらロックを解除
+		
+		blKeyLock = false;
+	}
+	
+	function onBlur()
+	{
+		// フォーカスを失ってもロック解除
+		
+		blKeyLock = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function passFocusToNextObject(dir)
+	{
+		// フォーカスを渡す
+
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+				
+		var res;
+		
+		SystemManager.fcSetKBOperationState(true);
+		
+		switch (dir) {
+			case VK_UP:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.up);
+				break;
+			
+			case VK_DOWN:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.down);
+				break;
+			
+			case VK_LEFT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.left);
+				break;
+			
+			case VK_RIGHT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.right);
+				break;
+			
+			default:
+				break;
+		}
+		
+		if (res) {
+			ptFocusController.setCursorToTarget();
+		}
+	}
+}
+
+
+//==============================================================================
+
+class MBScrollButtonDown extends MBScrollButtonUp
+{
+	
+	function MBScrollButtonDown(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBScrollButtonUp(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setValue(val)
+	{
+		// 値をセットしてボタンを用意
+		
+		value = val;
+		
+		fillRect(0, 0, width, height, MBColors.window.background);
+		
+		if (val === void) {
+			drawText(0, 0, '▽', fontColor);
+			enabled = false;
+		}
+		else {
+			drawText(0, 0, '▼', fontColor);
+			enabled = true;
+		}
+		
+		visible = true;
+	}
+}
+
+
+//==============================================================================
+
+class MBScrollButtonLeft extends MBScrollButtonUp
+{
+	
+	function MBScrollButtonLeft(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBScrollButtonUp(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setValue(val)
+	{
+		// 値をセットしてボタンを用意
+		
+		value = val;
+		
+		loadImages(%[storage : "scroll_left"]);
+		
+		if (val === void) {
+			enabled = false;
+		}
+		else {
+			enabled = true;
+		}
+		
+		visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		if (key == VK_LEFT || key == VK_PADLEFT) {
+			try {
+				sndfunc.seDeside();
+				parent.isNewLayer = true;
+				parent.scrollByKB('left');
+			}
+			catch {}
+			
+			return;
+		}
+		
+		super.onKeyDown(...);
+	}
+}
+
+
+//==============================================================================
+
+class MBScrollButtonRight extends MBScrollButtonUp
+{
+	
+	function MBScrollButtonRight(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBScrollButtonUp(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setValue(val)
+	{
+		// 値をセットしてボタンを用意
+		
+		value = val;
+		
+		loadImages(%[storage : "scroll_right"]);
+		
+		if (val === void) {
+			enabled = false;
+		}
+		else {
+			enabled = true;
+		}
+		
+		visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		if (key == VK_RIGHT || key == VK_PADRIGHT) {
+			try {
+				sndfunc.seDeside();
+				parent.isNewLayer = true;
+				parent.scrollByKB('right');
+			}
+			catch {}
+			
+			return;
+		}
+		
+		super.onKeyDown(...);
+	}
+}

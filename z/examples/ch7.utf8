@@ -1,0 +1,147 @@
+\chapter{\Conc\ model: implementation}\label{ch7}
+
+─ section ch7 parents ch6 └ 
+
+\section{Concrete World State}
+
+The \Conc\ world state has the same components as the \Betw\ state;
+we decorate with a subscript zero to distinguish like-named \Betw\
+and \Conc\ components.
+
+Since $\Delta ConWorld_0$ has components dashed-then-subscripted,
+whereas we require subscripted-then-dashed, Mondex defines their own
+$\Delta$ and $\Xi$ schemas. as
+\newcommand{\DeltaConWorldO}{\Delta ConWorld0}
+\newcommand{\XiConWorldO}{\Xi ConWorld0}
+\begin{gzed}
+  \DeltaConWorldO ~~\defs~~ ConWorld_0 \land ConWorld_0~' \\
+  \XiConWorldO ~~\defs~~ [~ \DeltaConWorldO | \theta ConWorld_0 = \theta ConWorld_0~' ~]
+\end{gzed}
+Nevertheless, there are two curious subtleties regarding this
+definition:~(i) an oddity in the Z standard;~and~(ii)~tool
+limitation. The curiosity in the Z standard is that in \LaTeX\
+\verb+x_0'+ ($x_0'$) typesets exactly the same as \verb+x'_0+. For
+this there is an easy solution: \verb+x_0~'+ ($x_0~'$). On the other
+hand, for \zeves, when decorated names are used in the way we need
+($x_0~'$), the $\pre$ expression does not work as expected, as it
+does not recognised that all subscribed-primed components need to be
+existentially quantified. This introduces a complication in the
+precondition calculation in Chapter~\ref{ch8} for all \Conc\ model
+operations. Therefore, we decided to use variable renaming instead
+of subscripting here. It would be possible to keep the original, but
+this would incur in error prone preconditions done by hand for
+Chapter~\ref{ch8} and all refinement proofs. In the end, there is no
+semantic difference as this is just a ``syntactic cosmetic
+surgery''.
+
+\begin{LNewSDef}[Renamed $ConWorld$ for Chapter~7]
+─ ConWorldCh7 == ConWorld [ conAuthPurseCh7 / conAuthPurse , etherCh7 / ether , archiveCh7 / archive ] └ ~\end{LNewSDef}
+
+\section{Framing Schema}\label{ch7.PhiCOp}
+
+\begin{LSDef}[Concrete world promotion]
+┌ PhiCOp 
+ΔConWorldCh7 
+ΔConPurse 
+m? , m! : MESSAGE 
+name? : NAMES |
+ m? ∈ etherCh7 
+name? ∈ dom conAuthPurseCh7 
+θ ConPurse = conAuthPurseCh7 name? 
+conAuthPurseCh7′ = conAuthPurseCh7 ⊕ { name? ↦ θ ConPurse ′ } 
+archiveCh7′ = archiveCh7 
+etherCh7′ ⊆ etherCh7 ∪ { m! } └ ~\end{LSDef}
+
+\section{Ignore, Increase and Abort}
+
+In the original the next declarations were given in wrong \LaTeX\ format. It
+did not followed Spivey's grammar which enforces one declaration per unboxed
+paragraph. That means we need a \verb|begin{zed}| \verb|end{zed}| environment
+for each of definition, rather than one for all definitions.
+\begin{LSDef}[Concrete world promoted ignore operation]
+─ CIgnore == [ ΞConWorldCh7 ; name? : NAMES ; m? , m! : MESSAGE | m! = bot ] └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete world promoted increase operation]
+─ CIncrease == CIgnore ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ IncreasePurseOkay ) └ ~\end{LSDef}
+\begin{LSDef}[Concrete world promoted abort operation]
+─ CAbort == CIgnore ∨ ( ∃ ΔConPurse ⦁ AbortPurseOkay ∧ [ PhiCOp | m! = bot ] ) └ ~\end{LSDef}
+
+\section{Promoted operations}
+
+\subsection{Value transfer operations}
+
+\begin{LSDef}[$ConWorld$ promoted $startFrom$ operation]
+─ CStartFrom == CIgnore ∨ CAbort ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ StartFromPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[$ConWorld$ promoted $startTo$ operation]
+─ CStartTo == CIgnore ∨ CAbort ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ StartToPurseOkay ) └ ~\end{LSDef}
+
+Same \LaTeX\ unboxed environment problem sorted here.
+\begin{LSDef}[$ConWorld$ promoted request operation]
+─ CReq == CIgnore ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ ReqPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[$ConWorld$ promoted value transfer operation]
+─ CVal == CIgnore ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ ValPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[$ConWorld$ promoted acknowledgement operation]
+─ CAck == CIgnore ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ AckPurseOkay ) └ ~\end{LSDef}
+
+\subsection{Exception log operations}
+
+\begin{LSDef}[$ConWorld$ promoted read exception log operation]
+─ CReadExceptionLog == CIgnore ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ ReadExceptionLogPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[$ConWorld$ promoted clear exception log operation]
+─ CClearExceptionLog == CIgnore ∨ CAbort ∨ ( ∃ ΔConPurse ⦁ PhiCOp ∧ ClearExceptionLogPurseOkay ) └ ~\end{LSDef}
+
+\section{Operations at the world level only}
+
+\subsection{Exception Log clear authorisation}
+
+\begin{LNewSDef}[$ConWorld$ promoted exception log clear]
+─ CPhiCOpExpLogClearNEW == [ PhiCOp | ( ∃ pds : ℙ↘1↖ PayDetails | { name? } × pds ⊆ archiveCh7 ⦁ m! = exceptionLogClear ( name? , image pds ) ) ] └ ~\end{LNewSDef}
+
+\begin{LSDef}[$ConWorld$ promoted authorise exception log clear]
+─ CAuthoriseExLogClear == CIgnore ∨ ( ∃ ΞConPurse ⦁ CPhiCOpExpLogClearNEW ) └ ~\end{LSDef}
+
+The same \LaTeX\ problems for subscripted names occurs here.
+\begin{LSDef}[Exception log archiving operation]
+┌ CArchive 
+ΔConWorldCh7 
+m? , m! : MESSAGE 
+name? : NAMES |
+ conAuthPurseCh7′ = conAuthPurseCh7 
+etherCh7′ ⊆ etherCh7 
+archiveCh7 ⊆ archiveCh7′ ⊆ archiveCh7′ ∪ { log : NAMES × PayDetails | exceptionLogResult log ∈ etherCh7 } 
+m! = bot └ ~\end{LSDef}
+
+\section{Initial state}
+
+The same \LaTeX\ problems for subscripted names occurs here.
+\begin{LSDef}[$ConWorld$ initialisation state]
+┌ ConInitState 
+ConWorldCh7 ′ |
+ ∃ BetweenWorld ′ | BetweenInitState ⦁ conAuthPurseCh7′ = conAuthPurse′ ∧ archiveCh7′ = archive′ ∧ { bot } ⊆ etherCh7′ ⊆ ether′ └ ~\end{LSDef}
+
+\section{Finalisation}
+
+In here the same finiteness problem that occurs in $BetwFinState$
+(Section~\ref{ch6.final} on page \pageref{ch6.final}) (Section $6.2$ on page
+$53$ on original document).
+
+\begin{LNewSDef}[Renamed $AuxWorld$ for Chapter~7]
+─ AuxWorldCh7 == AuxWorld [ conAuthPurseCh7 / conAuthPurse , etherCh7 / ether , archiveCh7 / archive , allLogsCh7 / allLogs , authenticFromCh7 / authenticFrom , authenticToCh7 / authenticTo , fromLoggedCh7 / fromLogged , toLoggedCh7 / toLogged , toInEpvCh7 / toInEpv , toInEapayeeCh7 / toInEapayee , fromInEprCh7 / fromInEpr , fromInEpaCh7 / fromInEpa , definitelyLostCh7 / definitelyLost , maybeLostCh7 / maybeLost ] └ ~\end{LNewSDef}
+
+\begin{LSDef}[$ConWorld$ finalisation state]
+┌ ConFinState 
+AuxWorldCh7 
+GlobalWorld |
+ dom gAuthPurse = dom conAuthPurseCh7 
+∀ name : dom conAuthPurseCh7 ⦁ ( gAuthPurse name ) . balance = ( conAuthPurseCh7 name ) . balance ∧ ( gAuthPurse name ) . lost = sumValue ( ( definitelyLostCh7 ∪ maybeLostCh7 ) ∩ { ld : PayDetails | ld . from = name } ) └ ~\end{LSDef}
+
+
+\newpage
+
+\section{Summary}\label{ch7.summary}
+
+\ldefsummary \lthmsummary \lthmaddeddefsummary \lthmaddedthmsummary \lzevessummary 

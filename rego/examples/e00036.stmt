@@ -1,0 +1,1 @@
+default p = [data.foo]

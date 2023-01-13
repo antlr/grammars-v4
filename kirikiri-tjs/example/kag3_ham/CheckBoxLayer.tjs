@@ -1,0 +1,267 @@
+// CheckBoxLayer.tjs - チェックボックスレイヤ
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+
+class CheckBoxLayer extends KAGLayer
+{
+	var CheckBox_checked = false;
+	var CheckBox_glyph;
+	var CheckBox_mouseOn = false;
+	var CheckBox_color = clWindow;
+	var CheckBox_glyphColor = clWindowText; // 記号の色
+	var CheckBox_opacity = 192; // 不透明度
+
+	function CheckBoxLayer(win, par)
+	{
+		super.Layer(...);
+
+		hitType = htMask;
+		hitThreshold = 0;
+
+		if(typeof win.cursorPointed !== "undefined")
+			cursor = win.cursorPointed;
+
+		CheckBox_glyph = new global.Layer(win, this);
+		CheckBox_glyph.loadImages("check.png");
+
+		setImageSize(CheckBox_glyph.width, CheckBox_glyph.height);
+		setSizeToImageSize();
+
+		focusable = true; // フォーカスを得られる
+	}
+
+	function finalize()
+	{
+		invalidate CheckBox_glyph;
+		super.finalize(...);
+	}
+
+	function assign(src)
+	{
+		// src の情報をこのボタンレイヤにコピー
+		assignImages(src, true);
+		CheckBox_checked = src.CheckBox_checked;
+		CheckBox_color = src.CheckBox_color;
+		CheckBox_glyphColor = src.CheckBox_glyphColor;
+		CheckBox_opacity = src.CheckBox_opacity;
+	}
+
+
+	function draw()
+	{
+		// 現在の状態を描画
+
+		// 背景を消去
+		face = dfAlpha;
+		fillRect(0, 0, imageWidth, imageHeight, 0);
+
+		var w, h;
+		var l = (imageWidth - (w = CheckBox_glyph.imageWidth)) >> 1;
+		var t = (imageHeight - (h = CheckBox_glyph.imageHeight)) >> 1;
+
+		if(CheckBox_color != clNone)
+			colorRect(l, t, w, h, CheckBox_color, CheckBox_opacity);
+
+		// マウスが上に乗っているときは下地を色づけする
+		if(CheckBox_mouseOn)
+			colorRect(l+1, t+1, w-2, h-2, clHighlight, 64); // ハイライトする
+
+		// 記号を描画
+		if(CheckBox_checked)
+		{
+			CheckBox_glyph.face = dfOpaque;
+			CheckBox_glyph.holdAlpha = true;
+			CheckBox_glyph.fillRect(0, 0, w, h, CheckBox_glyphColor); // 記号色で塗る
+			operateRect(l, t, CheckBox_glyph, 0, 0, w, h, omAlpha);
+		}
+
+		// 枠を描画
+		colorRect(l, t, w, 1, 0x000000, 128);
+		colorRect(l, t+1, 1, h-2, 0x000000, 128);
+		colorRect(l+w-1, t+1, 1, h-1, 0xffffff, 128);
+		colorRect(l+1, t+h-1, w-2, 1, 0xffffff, 128);
+
+		if(focused)
+		{
+			// フォーカスがあるのでハイライトする
+			colorRect(l+2, t+2, w-4, 1, clHighlight, 128);
+			colorRect(l+2, t+3, 1, h-5, clHighlight, 128);
+			colorRect(l+3, t+h-3, w-5, 1, clHighlight, 128);
+			colorRect(l+w-3, t+3, 1, h-6, clHighlight, 128);
+		}
+
+	}
+
+	function onPaint()
+	{
+		// 描画の直前に呼ばれる
+		super.onPaint(...);
+		draw();
+	}
+
+	function onMouseEnter()
+	{
+		// マウスがレイヤ領域内に入った
+		CheckBox_mouseOn = true;
+		update();
+		super.onMouseEnter(...);
+	}
+
+	function onMouseLeave()
+	{
+		// マウスがレイヤ領域から出ていった
+		CheckBox_mouseOn = false;
+		update();
+		super.onMouseLeave(...);
+	}
+
+	function onNodeDisabled()
+	{
+		// レイヤのノードが不可になった
+		super.onNodeDisabled(...);
+		update();
+	}
+
+	function onNodeEnabled()
+	{
+		// レイヤのノードが有効になった
+		super.onNodeEnabled(...);
+		update();
+	}
+
+	function onFocus()
+	{
+		// フォーカスを得た
+		super.onFocus(...);
+		update();
+	}
+
+	function onBlur()
+	{
+		// フォーカスを失った
+		super.onBlur(...);
+		update();
+	}
+
+	function onMouseDown()
+	{
+		// onMouseDown イベントハンドラ
+		focus();
+		CheckBox_checked = !CheckBox_checked;
+		update();
+		super.onMouseDown(...);
+	}
+
+	function onMouseUp()
+	{
+		// onMouseUp イベントハンドラ
+		update();
+		super.onMouseUp(...);
+	}
+
+	function onKeyDown(key, shift, process)
+	{
+		// キーが押された
+		if(process)
+		{
+			if(key == VK_RETURN || key == VK_SPACE)
+			{
+				// スペースキーまたはエンターキー
+				CheckBox_checked = !CheckBox_checked;
+				update();
+				super.onKeyDown(key, shift, false); // 処理をしたのでprocessにfalseを渡す
+			}
+			else
+			{
+				super.onKeyDown(...);
+			}
+		}
+		else
+		{
+			// process が false の場合は処理は行わない
+			super.onKeyDown(...);
+		}
+	}
+
+	property width
+	{
+		setter(x)
+		{
+			super.width = x;
+			imageWidth = x;
+			update();
+		}
+		getter
+		{
+			return super.width;
+		}
+	}
+
+	property height
+	{
+		setter(x)
+		{
+			super.height = x;
+			imageHeight = x;
+			update();
+		}
+		getter
+		{
+			return super.height;
+		}
+	}
+
+	property color
+	{
+		setter(x)
+		{
+			CheckBox_color = int x;
+			update();
+		}
+		getter
+		{
+			return CheckBox_color;
+		}
+	}
+
+	property glyphColor
+	{
+		setter(x)
+		{
+			CheckBox_glyphColor = int x;
+			update();
+		}
+		getter
+		{
+			return CheckBox_glyphColor;
+		}
+	}
+
+	property bgOpacity
+	{
+		setter(x)
+		{
+			CheckBox_opacity = int x;
+			update();
+		}
+		getter
+		{
+			return CheckBox_opacity;
+		}
+	}
+
+	property checked
+	{
+		setter(x)
+		{
+			CheckBox_checked = int x;
+			update();
+		}
+		getter
+		{
+			return CheckBox_checked;
+		}
+	}
+}
+
+

@@ -1,0 +1,1 @@
+(gtin (gtin12 (upc (upc_e (any_digit 1) (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 5) (any_digit 6)))) <EOF>)

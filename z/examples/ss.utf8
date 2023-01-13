@@ -1,0 +1,43 @@
+─ section ss parents ds └ 
+
+In the file storage system, files can be stored and retrieved using
+file identifiers.
+
+─ FID == ℕ └ 
+
+The file storage system is described by a partial function from file
+identifiers to $FILE$.
+
+─ SS == [ fstore : FID ⇸ FILE ] └ 
+
+┌ InitSS 
+SS ′ |
+ fstore′ = ∅ └ 
+
+The operation that creates an empty file is defined by
+
+┌ createSS 
+ΔSS 
+fid? : FID |
+ fstore′ = fstore ⊕ { fid? ↦ ∅ } └ 
+
+Destroying a file is defined as
+
+┌ destroySS 
+ΔSS 
+fid? : FID |
+ fid? ∈ dom fstore 
+fstore′ = { fid? } ⩤ fstore └ 
+
+To be destroyed, the file must exist and the new file store is
+identical to the old except that there is no file referred to by fid.
+
+┌ ΦSS 
+ΔSS 
+ΔDS 
+fid? : FID |
+ fid? ∈ dom fstore 
+file = fstore ( fid? ) 
+fstore′ = fstore ⊕ { fid? ↦ file′ } └ 
+
+─ readSS == ( ΦSS ∧ readFILE ) ⧹ ( file , file′ ) └ ─ writeSS == ( ΦSS ∧ writeFILE ) ⧹ ( file , file′ ) └ 

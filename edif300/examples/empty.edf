@@ -1,0 +1,68 @@
+(edif EXAMPLE_EMPTY
+    (edifVersion 3 0 0)
+    (edifHeader
+        (edifLevel 1)
+        (keywordMap
+            (k0KeywordLevel)
+        )
+        (unitDefinitions
+            (unit micrometer 1 (e 1 -6) (meter 1))
+        )
+        (fontDefinitions
+            (fonts
+                (setDistance
+                    (unitRef micrometer)
+                )
+                (font stick
+                    (typeface "stick")
+                    (fontProportions
+                        (fontHeight 1000)
+                        (fontDescent 100)
+                        (fontCapitalHeight 900)
+                        (fontWidth 250)
+                    )
+                )
+            )
+        )
+        (physicalDefaults
+            (schematicRequiredDefaults
+                (schematicMetric
+                    (setDistance
+                        (unitRef micrometer)
+                    )
+                    (noHotspotGrid)
+                )
+                (fontRef stick)
+                (textHeight 1000)
+            )
+        )
+        (status
+            (comment
+                "This is an example of a valid empty EDIF"
+            )
+            (written
+                (timeStamp (date 2017 12 15) (time 15 35 00))
+            )
+        )
+    )
+    (library LIB
+        (libraryHeader 
+            (edifLevel 0)
+            (nameCaseSensitivity)
+            (technology 
+                (physicalScaling)
+            )
+        )
+        (cell CELL
+            (cellHeader)
+        )
+    )
+    (design DESIGN
+        (cellRef CELL
+            (libraryRef LIB)
+        )
+        (designHeader
+            (designUnits)
+        )
+    )
+)

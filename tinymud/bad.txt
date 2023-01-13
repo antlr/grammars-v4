@@ -1,0 +1,18 @@
+@desc me=Igor is a ferret with an evil glint in his eye.
+@lock me=me
+@fail me=Igor chomps you on the knee with his little sharp teeth.
+@ofail me=howls in pain as Igor bites them.
+rob igor
+@ofail me=howls in pain as Igor bites %o.
+@osucc me=runs around the room nipping at everyone's heels.
+rob me
+@create Ferret Chow
+@desc Ferret Chow=This is a big bag full of yummy ferret chow. 
+@succ Ferret Chow=You tear into the end of the bag, stuffing yourself.
+@osucc Ferret Chow=tears into the Ferret Chow bag, eating greedily.
+@lock Ferret Chow=me
+@fail Ferret Chow=It's icky Ferret Chow. It would probably taste gross.
+@ofail Ferret Chow=decides Ferret Chow is icky.
+get Ferret Chow 
+@dig Igor's House
+

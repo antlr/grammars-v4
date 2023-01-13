@@ -1,0 +1,1 @@
+(gtin (gtin13 (ean13 (ean13_bookland (gs1_prefix_bookland_2 9 7 8 (any_digit 1)) (bookland_isbn (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 1) (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 5) (any_digit 7))))) <EOF>)

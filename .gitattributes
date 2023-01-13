@@ -1,0 +1,120 @@
+# Recipe from: https://help.github.com/articles/dealing-with-line-endings/#platform-all
+
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.abnf text
+*.agc text
+*.alg text
+*.asm text
+*.asn text
+*.b text
+*.bas text
+*.bcpl text
+*.bnf text
+*.c text
+*.cc text
+*.cl text
+*.cpp text
+*.cs text
+*.csproj text
+*.css text
+*.csv text
+*.dart text
+*.dgs text
+*.dot text
+*.erl text
+*.errors text
+*.faa text
+*.ffn text
+*.fna text
+*.g text
+*.g2 text
+*.g3 text
+*.g4 text
+*.g42 text
+*.gff text
+*.gml text
+*.go text
+*.gradle text
+*.h text
+*.html text
+*.ics text
+*.idl text
+*.iri text
+*.java text
+*.js text
+*.json text
+*.kt text
+*.lark text
+*.lua text
+*.m text
+*.map text
+*.md text
+*.mo text
+*.mps text
+*.ora text
+*.pas text
+*.pc text
+*.pgn text
+*.php text
+*.pkb text
+*.pks text
+*.properties text
+*.proto text
+*.py text
+*.rb text
+*.s text
+*.scala text
+*.sh text
+*.smt2 text
+*.sno text
+*.sql text
+*.st text
+*.style text
+*.swift text
+*.tree text
+*.ttl text
+*.txt text
+*.upnp text
+*.vb text
+*.vhd text
+*.x text
+*.xml text
+*.yml text
+access_log text
+
+# Declare files that will always have LF line endings on checkout.
+# Unicode input files end with *.txt, but should not be converted on Windows
+unicode/graphemes/examples/*.txt eol=lf
+# T-SQL tests with trees can fail with multiline strings
+sql/tsql/examples/*.sql eol=lf
+# Rexx places EOL on default channel, so the .tree's contain EOL.
+# Make sure EOL's are consistent regardless of OS.
+rexx/examples/* eol=lf
+
+# Declare files that will always have CRLF line endings on checkout.
+# Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
+*.cls text eol=crlf
+*.frm text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.pdf binary
+*.png binary
+
+# All input for parsers are to be ignored. Issue #2667
+**/examples/** linguist-vendored
+**/example-scripts/** linguist-vendored
+**/example-scriptlets/** linguist-vendored
+**/examples-sql-script/** linguist-vendored
+**/examples_todo/** linguist-vendored
+**/example/test_scripts/** linguist-vendored
+agc/notworking/** linguist-vendored
+asm/asmMASM/helloworld2.asm linguist-vendored
+basic/print.bas linguist-vendored
+erlang/src/** linguist-vendored
+solidity/test.sol linguist-vendored
+sql/postgresql/examples.errors/** linguist-vendored
+v/failed_examples/** linguist-vendored

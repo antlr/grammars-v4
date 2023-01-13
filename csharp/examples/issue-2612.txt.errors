@@ -1,0 +1,1 @@
+line 4:17 mismatched input ':' expecting {'add', 'alias', '__arglist', 'ascending', 'async', 'await', 'by', 'descending', 'dynamic', 'equals', 'from', 'get', 'group', 'into', 'join', 'let', 'nameof', 'on', 'orderby', 'partial', 'remove', 'select', 'set', 'unmanaged', 'var', 'when', 'where', 'yield', IDENTIFIER, '[', '*', '?'}

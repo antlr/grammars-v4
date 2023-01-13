@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{oz}   \newenvironment{machine}[1]{
+    \begin{tabular}{@{\qquad}l}\textbf{\kern-1em machine}\ #1\\ }{
+    \\ \textbf{\kern-1em end} \end{tabular} }
+\newcommand{\machineInit}{\\ \textbf{\kern-1em init} \\}
+\newcommand{\machineOps}{\\ \textbf{\kern-1em ops} \\}
+
+\begin{document}
+This is the BirthdayBook specification, from 
+Spivey~\cite{spivey:z-notation2}.  We extend it slightly
+by adding an extra operation, $RemindOne$, that is non-deterministic.
+
+
+─ section birthdaybook_simple parents standard_toolkit └ 
+
+─ NAME == 1 .. 5 └ 
+─ DATE == 10 .. 15 └ 
+
+The $BirthdayBook$ schema defines the \emph{state space} of 
+the birthday book system. 
+
+┌ BirthdayBook 
+known : ℙ NAME 
+birthday : NAME ⇸ DATE |
+ known = dom birthday └ 
+
+This $InitBirthdayBook$ specifies the initial state
+of the birthday book system.  It does not say explicitly that
+$birthday'$ is empty, but that is implicit, because its domain
+is empty.
+
+┌ InitBirthdayBook 
+known : ℙ NAME 
+birthday : NAME ⇸ DATE |
+ known = dom birthday 
+known = { } └ 
+
+Next we have several operation schemas to define the normal (non-error)
+behaviour of the system.
+
+┌ AddBirthday 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+date? : DATE |
+ known = dom birthday 
+known′ = dom birthday′ 
+name? ∉ known 
+birthday′ = birthday ∪ { name? ↦ date? } └ 
+
+┌ FindBirthday 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+date! : DATE |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+name? ∈ known 
+date! = birthday ( name? ) └ 
+
+┌ Remind 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+today? : DATE 
+cards! : ℙ NAME |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+cards! = { n : known | birthday ( n ) = today? } └ 
+
+This $RemindOne$ schema does not appear in Spivey, but is
+included to show how non-deterministic schemas can be animated.
+It reminds us of just one person who has a birthday on the given 
+day.
+┌ RemindOne 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+today? : DATE 
+card! : NAME |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+card! ∈ known 
+birthday card! = today? └ 
+
+
+\bibliography{spec}
+\begin{thebibliography}{1}
+\bibitem{spivey:z-notation2}
+J.~Michael Spivey.
+\newblock {\em The Z Notation: A Reference Manual}.
+\newblock International Series in Computer Science. Prentice-Hall International
+  (UK) Ltd, second edition, 1992.
+\end{thebibliography}
+\end{document}
+

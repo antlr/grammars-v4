@@ -1,0 +1,14 @@
+─ section sstest parents dstest , ss └ 
+
+To promote the ds tests, we define a special case of the
+$\Phi SS$ framing schema.
+─ ΦSSTest == [ ΦSS | fid? = 101 ; fstore = { 100 ↦ ⟨ 3 , 5 ⟩ , 101 ↦ file } ] └ 
+
+Then we can promote the $dsPos$ tests and check if they satisfy $readSS$.
+─ ⊢? ( dsPos ∧ ΦSSTest ) ⧹ ( file , file′ ) ⊆ readSS └ 
+
+
+Unfortunately, due to an inefficiency in its sorting/optimization
+algorithms, ZLive currently says the left side of the $\subseteq$ is too
+large to evaluate.  However, it should be capable of evaluating it, and we
+expect that it will be able to in the next few months.

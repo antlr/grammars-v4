@@ -1,0 +1,29 @@
+**/.DS_Store
+/**/.project
+/**/.classpath
+/**/.settings/
+/**/target
+/**/bin
+
+# Visual Studio Generated
+.antlr
+.fetch_time_cache
+.vs/
+.vscode/
+.gradle/
+
+#IntelliJ Idea project files
+.idea/
+*.iml
+/**/gen
+*.tokens
+
+# Ignore C# regression temporaries.
+**/Generated*/
+
+# Ignore Emacs backup files.
+*~
+\#*\#
+
+# Ignore downloaded temporaries create by _scripts/get-antlr.ps1
+antlr4-*-complete.jar

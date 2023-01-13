@@ -1,0 +1,28 @@
+@supports (animation-name: test) {
+    /* specific CSS applied when animations are supported unprefixed */
+    @keyframes identifier { /* @supports being a CSS conditional group at-rule, it can includes other relevant at-rules */
+        0% { top: 0; left: 0; }
+        30% { top: 50px; }
+        68%, 72% { left: 50px; }
+        100% { top: 100px; left: 100%; }
+    }
+    
+    .example { color: red }
+}
+
+@supports ( (perspective: 10px) or (-moz-perspective: 10px) or (-webkit-perspective: 10px) or
+            (-ms-perspective: 10px) or (-o-perspective: 10px) ) {
+    /* specific CSS applied when 3D transforms, eventually prefixed, are supported */
+    .example { color: green }
+}
+
+@supports not ((text-align-last:justify) or (-moz-text-align-last:justify) ){
+    /* specific CSS applied to simulate text-align-last:justify */
+    .example { color: blue }
+}
+
+@supports (--foo: green) {
+  body {
+    color: green;
+  }
+}

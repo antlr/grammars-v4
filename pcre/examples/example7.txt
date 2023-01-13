@@ -1,0 +1,1 @@
+(?i:saturday|sunday)

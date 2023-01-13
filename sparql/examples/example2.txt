@@ -1,0 +1,7 @@
+PREFIX sch-ont:   <http://education.data.gov.uk/def/school/>
+SELECT ?name WHERE {
+  ?school a sch-ont:School.
+  ?school sch-ont:establishmentName ?name.
+  ?school sch-ont:districtAdministrative <http://statistics.data.gov.uk/id/local-authority-district/00AA>.
+}
+ORDER BY ?name

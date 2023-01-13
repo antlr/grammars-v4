@@ -1,0 +1,8 @@
+DGS004
+triangled 0 6
+an A
+an B
+an C
+ae AB A > B
+ae BC B < C
+ae CA C > A

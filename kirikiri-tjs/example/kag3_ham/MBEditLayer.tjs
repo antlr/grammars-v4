@@ -1,0 +1,70 @@
+/******************************************************************************
+	system_mb/ui/MBEditLayer.tjs
+*******************************************************************************/
+
+
+class MBEditLayer extends EditLayer
+{
+	// プロパティ
+	var refTabTarget;	// TABキーを押したときの移動先
+	var blEscapeEnabled = true;
+	
+	var hexBGColor   = MBColors.window.border - 0xcc000000;	// 背景色
+	var hexBGOpacity = 0x66;	// 背景の透明度
+	var hexFontColor = MBColors.font.label.noraml;	// 文字色
+	
+	
+	function MBEditLayer(win, par)
+	{
+		// コンストラクタ
+		
+		super.EditLayer(win, par);
+		
+		height = 18;
+		font.height = 14;
+		font.face = MBFontStyle.face.normal;
+		//color = 0x004b6d;
+		Edit_color = hexBGColor;
+		opacity    = 255;
+		//textColor = MBColors.font.label.normal;
+		textColor  = hexFontColor;
+		//bgOpacity = 0x66;
+		bgOpacity  = hexBGOpacity;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		switch (key) {
+			case VK_RETURN:
+				parent.onEditFinish();
+				break;
+			
+			case VK_TAB:
+				try {
+					refTabTarget.getCursorFromManager();
+				}
+				catch {}
+				break;
+			
+			case VK_ESCAPE:
+				if (blEscapeEnabled) {
+					parent.onEscapeKeyDown(...);
+					return;
+				}
+				break;
+			
+			default:
+				super.onKeyDown(...);
+				break;
+		}
+	}
+}

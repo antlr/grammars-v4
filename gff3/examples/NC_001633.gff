@@ -1,0 +1,16 @@
+##gff-version 3
+#!gff-spec-version 1.20
+#!processor NCBI annotwriter
+##sequence-region NC_001633.1 1 4009
+##species http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=32625
+NC_001633.1	RefSeq	region	1	4009	.	+	.	ID=id0;Dbxref=taxon:32625;country=Australia;gbkey=Src;genome=genomic;mol_type=genomic RNA
+NC_001633.1	RefSeq	gene	61	600	.	+	.	ID=gene0;Name=MBVgp1;Dbxref=GeneID:1497109;gbkey=Gene;locus_tag=MBVgp1
+NC_001633.1	RefSeq	CDS	61	600	.	+	0	ID=cds0;Name=NP_042508.1;Parent=gene0;Dbxref=Genbank:NP_042508.1,GeneID:1497109;gbkey=CDS;product=hypothetical protein;protein_id=NP_042508.1
+NC_001633.1	RefSeq	gene	68	3144	.	+	.	ID=gene1;Name=MBVgp3;Dbxref=GeneID:1497107;gbkey=Gene;locus_tag=MBVgp3
+NC_001633.1	RefSeq	CDS	68	1594	.	+	0	ID=cds1;Name=NP_042510.2;Parent=gene1;Note=The frameshifting site was predicted based on homology with luteoviruses.;Dbxref=Genbank:NP_042510.2,GeneID:1497107;gbkey=CDS;product=hypothetical protein;protein_id=NP_042510.2
+NC_001633.1	RefSeq	CDS	1594	3144	.	+	0	ID=cds1;Name=NP_042510.2;Parent=gene1;Note=The frameshifting site was predicted based on homology with luteoviruses.;Dbxref=Genbank:NP_042510.2,GeneID:1497107;gbkey=CDS;product=hypothetical protein;protein_id=NP_042510.2
+NC_001633.1	RefSeq	gene	68	2041	.	+	.	ID=gene2;Name=MBVgp2;Dbxref=GeneID:1497108;gbkey=Gene;locus_tag=MBVgp2
+NC_001633.1	RefSeq	CDS	68	2041	.	+	0	ID=cds2;Name=NP_042509.1;Parent=gene2;Dbxref=Genbank:NP_042509.1,GeneID:1497108;gbkey=CDS;product=hypothetical protein;protein_id=NP_042509.1
+NC_001633.1	RefSeq	gene	3163	3759	.	+	.	ID=gene3;Name=MBVgp4;Dbxref=GeneID:1497106;gbkey=Gene;locus_tag=MBVgp4
+NC_001633.1	RefSeq	CDS	3163	3759	.	+	0	ID=cds3;Name=NP_042511.1;Parent=gene3;Note=orf4;Dbxref=Genbank:NP_042511.1,GeneID:1497106;gbkey=CDS;product=coat protein;protein_id=NP_042511.1
+###

@@ -1,0 +1,442 @@
+\documentclass{article}
+\usepackage{ltcadiz}
+\begin{document}
+
+This is a specification of a simple scheduler and assembler. The
+system contains a set of registers and a block of memory. Processes
+can be created, with each containing a sequence on instructions that
+are executed on the system. The instruction format is a simplified
+format of the Intel x86 architecture. Processes are scheduled based on
+the credit system that is found in the Linux 2.0 kernel.
+
+This specification was written as a test spec for the CZT project. As
+a result, there are parts that may appear to be specified in a strange
+way - this is to test out the tools on a large set of Z.
+
+─ section Stack parents standard_toolkit └ 
+
+A generic stack.
+
+─ Stack [ X ] == [ stack : seq X ] └ ─ InitStack [ X ] == [ Stack [ X ] | stack = ∅ ] └ 
+
+┌═ PushStack [ X ] 
+ΔStack [ X ] 
+x? : X |
+ stack′ = stack ⁀ ⟨ x? ⟩ └ 
+
+┌═ PopStack [ X ] 
+ΔStack [ X ] 
+x! : X |
+ stack′ ⁀ ⟨ x! ⟩ = stack └ 
+
+
+─ section Definitions parents standard_toolkit └ 
+
+Firstly, we define some basic types and functions that are used
+throughout the specification.
+
+$singleton$ is the set of all sets whose size is less than or equal to~$1$.
+This is included only to have a generic axiom definition.
+
+─ relation ( singleton _ ) └ 
+
+╷═ [ X ] 
+singleton _ : ℙ ( ℙ X ) |
+ ∀ s : ℙ X ⦁ singleton s ⇔ # s ≤ 1 └ 
+
+The basic type of this system is a word, which specifically, is an
+unsigned octet. An unsigned word is used so references to memory etc a
+1-relative.
+
+─ WORD == 0 .. 255 └ 
+
+Then, we define the size of the memory block, and give it a value for
+animation purposes.
+
+╷ mem_size : WORD |
+ mem_size = 100 └ 
+
+A $LABEL$ is used to label instructions for $jump$ instructions etc,
+although 'jump' hasn't been specified yet.
+
+─ [ LABEL ] └ 
+
+Now we define the different instructions, as well as their operands. A
+$CONSTANT$ is used both as a constant value, as well as a memory
+reference for load and store instructions.
+
+─ INST_NAME ::= add | sub | divide | mult | push | pop | load | store | loadConst | print └ ─ OPERAND ::= AX | BX | CX | DX | constant ⟪ WORD ⟫ └ ─ REGISTER == { AX , BX , CX , DX } └ ─ CONSTANT == OPERAND ∖ REGISTER └ 
+
+An instruction is specified as a instruction name, a sequence of
+operands, and optionally, a label.
+
+┌ Instruction 
+label : ℙ LABEL 
+name : INST_NAME 
+params : seq OPERAND |
+ singleton label └ 
+
+─ section System parents Definitions , Stack └ 
+
+The system consists of a set of registers, and a block of
+memory. There is also a buffer for displaying output.
+
+─ REGISTERS == REGISTER → OPERAND └ ─ MEMORY == ( 1 .. mem_size ) ⇸ WORD └ 
+
+┌ System 
+registers : REGISTERS 
+memory : MEMORY 
+output : seq WORD └ 
+
+Initially, all registers and memory hold the minimum $WORD$ value. The
+output buffer is empty.
+
+┌ InitSystem 
+System |
+ registers = { r : REGISTER ⦁ r ↦ constant ( min ( WORD ) ) } 
+memory = { m : 1 .. mem_size ⦁ m ↦ min ( WORD ) } 
+output = ⟨ ⟩ └ 
+
+The system can have arithmetic and memory instructions.
+
+─ Arith_Inst == [ Instruction | # params = 2 ∧ params ( 1 ) ∈ REGISTER ] └ ─ Add_Inst == [ Arith_Inst | name = add ] └ ─ Sub_Inst == [ Arith_Inst | name = sub ] └ ─ Mult_Inst == [ Arith_Inst | name = mult ] └ ─ Div_Inst == [ Arith_Inst | name = divide ] └ 
+
+─ Memory_Inst == [ Instruction | # params = 2 ∧ params ( 1 ) ∈ REGISTER ∧ params ( 2 ) ∈ CONSTANT ] └ ─ Load_Inst == [ Memory_Inst | name = load ] └ ─ LoadConst_Inst == [ Memory_Inst | name = loadConst ] └ ─ Store_Inst == [ Memory_Inst | name = store ] └ 
+
+A print instruction prints the value of a register.
+
+─ Print_Inst == [ Instruction | # params = 1 ] └ 
+
+$val$ maps constants to their value, and $dereference$ dereferences
+the value of a register, transitively if required.
+
+╷ val : CONSTANT → WORD 
+dereference : OPERAND × REGISTERS → WORD |
+ ∀ c : CONSTANT ⦁ ( ∃ n : WORD ⦁ c = constant ( n ) ∧ val ( c ) = n ) 
+∀ a : OPERAND ; r : REGISTERS ⦁ dereference ( a , r ) = if ( a ∈ REGISTER ) then dereference ( r ( a ) , r ) else val ( a ) └ 
+
+The specification of the arithmetic instructions.
+
+┌ Add 
+ΔSystem 
+Add_Inst |
+ ∃ o↘1↖ == dereference ( params ( 1 ) , registers ) ; o↘2↖ == dereference ( params ( 2 ) , registers ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( o↘1↖ + o↘2↖ ) } 
+memory′ = memory 
+output′ = output └ 
+
+┌ Sub 
+ΔSystem 
+Sub_Inst |
+ ∃ o↘1↖ == dereference ( params ( 1 ) , registers ) ; o↘2↖ == dereference ( params ( 2 ) , registers ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( o↘1↖ − o↘2↖ ) } 
+memory′ = memory 
+output′ = output └ 
+
+┌ Mult 
+ΔSystem 
+Mult_Inst |
+ ∃ o↘1↖ == dereference ( params ( 1 ) , registers ) ; o↘2↖ == dereference ( params ( 2 ) , registers ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( o↘1↖ * o↘2↖ ) } 
+memory′ = memory 
+output′ = output └ 
+
+┌ Div 
+ΔSystem 
+Div_Inst |
+ ∃ o↘1↖ == dereference ( params ( 1 ) , registers ) ; o↘2↖ == dereference ( params ( 2 ) , registers ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( o↘1↖ div o↘2↖ ) } 
+memory′ = memory 
+output′ = output └ 
+
+The {\tt load} operation loads a constant from memory. The second
+parameter is an index to the memory location from which the constant
+is loaded.
+
+┌ Load 
+ΔSystem 
+Load_Inst |
+ ∃ o↘2↖ == val ( params ( 2 ) ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( memory ( o↘2↖ ) ) } 
+memory′ = memory 
+output′ = output └ 
+
+{\tt loadConst} loads a constant into a register. The second parameter
+the constant to be loaded.
+
+┌ Load_Const 
+ΔSystem 
+LoadConst_Inst |
+ ∃ o↘2↖ == val ( params ( 2 ) ) ⦁ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( o↘2↖ ) } 
+memory′ = memory 
+output′ = output └ 
+
+Store the value of a register in memory.
+
+┌ Store 
+ΔSystem 
+Store_Inst |
+ ∃ o↘1↖ == dereference ( params ( 1 ) , registers ) ; o↘2↖ == val ( params ( 2 ) ) ⦁ memory′ = memory ⊕ { o↘2↖ ↦ o↘1↖ } 
+registers′ = registers 
+output′ = output └ 
+
+┌ Print 
+ΞSystem 
+Print_Inst |
+ output′ = output ⁀ ⟨ dereference ( params ( 1 ) , registers ) ⟩ 
+registers′ = registers 
+memory′ = memory └ 
+
+─ Stack_Inst == [ Instruction | # params = 1 ] └ ─ Push_Inst == [ Stack_Inst | name = push ] └ ─ Pop_Inst == [ Stack_Inst | name = pop ] └ 
+
+The specification of the stack instructions on the system.
+
+┌ Push0 
+ΞSystem 
+PushStack [ WORD ] 
+Push_Inst |
+ x? = dereference ( params ( 1 ) , registers ) └ 
+
+┌ Pop0 
+ΔSystem 
+PopStack [ WORD ] 
+Pop_Inst |
+ registers′ = registers ⊕ { params ( 1 ) ↦ constant ( x! ) } 
+memory′ = memory 
+output′ = output └ 
+
+─ Push == Push0 ⨡ [ System ; Stack [ WORD ] ] └ ─ Pop == Pop0 ⨡ [ System ; Stack [ WORD ] ] └ 
+
+This executes an instruction on the on the system. $inst?$ is the
+instruction to execute, and $base?$ is the base memory value of the
+executing process. If the instruction is a {\tt load} or {\tt store}
+instruction, the memory reference must offset using the base value.
+
+┌ exec_inst 
+ΔSystem 
+inst? : Instruction 
+base? : 1 .. mem_size |
+ ∃ label : ℙ LABEL ; name : INST_NAME ; params : seq OPERAND | label = inst? . label ∧ name = inst? . name ∧ params = inst? . params ⦁ Add ∨ Sub ∨ Mult ∨ Div ∨ Print ∨ Load_Const ∨ name ∈ { load , store } ⇒ ( ∃ p : seq OPERAND | p = ⟨ params ( 1 ) , constant ( val ( params ( 2 ) ) + base? ) ⟩ ⦁ Load [ p / params ] ∨ Store [ p / params ] ) └ 
+
+─ section Scheduler parents System └ 
+
+This part of the specification is the scheduler.
+
+Here, we declare the set of process IDs, the priority values, and the
+default number of credits a process receives when it is created.
+
+─ Pid == ℕ └ ─ Priority == - 19 .. 19 └ ─ Default_Credits == 10 └ 
+
+The possible status that a process can hold.
+
+─ Status ::= pWaiting | pReady | pRunning └ 
+
+A process consists of a process ID, a status, a number of credits, and
+a priority. Each process has a sequence of instructions to be executed
+on the assembler, with a pointer to the current instruction. The
+memory that a process can occupy is between a base and limit
+value. Instructions must only access memory with a value less than the
+limit, but they know nothing about the base value - this is added onto
+the memory index provided by the instruction when an instruction is
+executed. Each procss also contains a stack and values for all
+registers, which are used to store values when the process is
+suspended.
+
+┌ Processes 
+pids : ℙ Pid 
+status : Pid ⇸ Status 
+credits : Pid ⇸ ℕ 
+priority : Pid ⇸ Priority 
+instructions : Pid ⇸ ( seq Instruction ) 
+inst_pointer : Pid ⇸ ℕ↘1↖ 
+base , limit : Pid ⇸ WORD 
+pregisters : Pid ⇸ REGISTERS 
+pstack : Pid ⇸ Stack [ WORD ] |
+ pids = dom ( status ) = dom ( credits ) = dom ( priority ) = dom ( instructions ) = dom ( inst_pointer ) = dom ( base ) = dom ( limit ) = dom ( pstack ) 
+∀ pid : pids ⦁ inst_pointer ( pid ) ≤ # ( instructions ( pid ) ) 
+∀ pid : pids ⦁ base ( pid ) + limit ( pid ) ≤ mem_size └ 
+
+The $sort$ function takes the credits and priorities of all processes,
+and returns a sequence of process IDS sorted firstly by their credits
+(the more credits a process has, the higher preference they get), and
+if the credits are equal, then their priority. If the priority is
+equal, then the order is non-deterministic.
+
+╷ sort : ( Pid ⇸ ℕ ) × ( Pid ⇸ Priority ) ⇸ iseq Pid |
+ sort = ( λ credits : ( Pid ⇸ ℕ ) ; priority : ( Pid ⇸ Priority ) | dom ( credits ) = dom ( priority ) ⦁ ( μ s : iseq Pid | ran ( s ) = dom ( credits ) ∧ ( ∀ i : 1 .. ( # s − 1 ) ⦁ credits ( s ( i ) ) > credits ( s ( i + 1 ) ) ∨ ( credits ( s ( i ) ) = credits ( s ( i + 1 ) ) ∧ priority ( s ( i ) ) > priority ( s ( i ) ) ) ) ⦁ s ) ) └ 
+
+To interrupt a process during execution, the kernel must be in $kernel$ mode.
+
+─ Mode ::= user | kernel └ 
+
+For the scheduler, we track which mode the operating system is in, as
+well as declaring three ``secondary'' variables, $waiting$, $running$,
+and $ready$, to keep the sets of waiting running, and ready variables
+respecitvely. In fact, $ready$ is a sequence, and is ordered based on
+the credits that each process has. A process with more credits will
+have a higher priority. This is fair scheduling, because at each timer
+interrupt (the $tick$ operation specified below), the current process
+losses one credit, therefore, process spending a lot of time executing
+will eventually have a low priority.
+
+┌ Scheduler 
+Processes 
+System 
+Stack [ WORD ] 
+mode : Mode 
+waiting , running : ℙ Pid 
+ready : iseq Pid |
+ # running ≤ 1 
+waiting ∩ running ∩ ran ready = ∅ 
+waiting ∪ running ∪ ran ready = pids 
+waiting = { p : pids | ( status ∼ ) ( pWaiting ) = p } 
+running = { p : pids | ( status ∼ ) ( pRunning ) = p } 
+ready = sort ( ( waiting ∪ running ) ⩤ credits , ( waiting ∪ running ) ⩤ priority ) 
+∀ r : ran ( ready ) ⦁ status ( r ) = pReady 
+∀ r : running ⦁ credits ( r ) > 0 └ 
+
+This uses semicolons as conjunctions for predicates, which conforms to
+the grammar in the ISO standard, but according to the list of
+differences between ZRM and ISO Z on Ian Toyn's website, semicolons
+can no longer be used to conjoin predicates.
+
+┌ InitScheduler 
+Scheduler 
+InitStack [ WORD ] 
+InitSystem |
+ pids = ∅ ; status = ∅ ; priority = ∅ 
+credits = ∅ ; instructions = ∅ ; inst_pointer = ∅ 
+waiting = ∅ ; running = ∅ ; ready = ⟨ ⟩ 
+base = { } ; limit = { } ; pregisters = { } 
+mode = user └ 
+
+$newProcess$ creates a new process with a unique process ID and a
+specified priority, and places this new process on the ready queue.
+
+┌ create_new_process 
+ΔScheduler 
+ΞSystem 
+priority? : Priority 
+instructions? : seq Instruction 
+base? , limit? : WORD 
+pid! : Pid |
+ pid! ∉ pids 
+status′ = status ∪ { pid! ↦ pReady } 
+credits′ = credits ∪ { pid! ↦ Default_Credits } 
+priority′ = priority ∪ { pid! ↦ priority? } 
+instructions′ = instructions ∪ { pid! ↦ instructions? } 
+inst_pointer′ = inst_pointer ∪ { pid! ↦ 1 } 
+base′ = base ∪ { pid! ↦ base? } 
+limit′ = limit ∪ { pid! ↦ limit? } 
+pregisters′ = pregisters ∪ { pid! ↦ { r : REGISTER ⦁ r ↦ constant ( min ( WORD ) ) } } 
+pstack′ = pstack ∪ { pid! ↦ ( ⦉ stack == ⟨ ⟩ ⦊ ) } 
+pids′ = pids ∪ { pid! } └ 
+
+We define a schema that contains only the variables that do not change
+when a reschedule occurs.
+
+─ RescheduleChange == Scheduler ⧹ ( status , running , ready , waiting , credits ) └ 
+
+A reschedule occurs when all ready processes have no credits. Every
+process, not just the ready processes, have their credits
+re-calculated using the formula $credits = credits/2 + priority$. This
+implies that the ready process with the highest priority will be the
+next process executed.
+
+┌ reschedule 
+ΔScheduler 
+ΞRescheduleChange |
+ ready ≠ ∅ 
+∀ r : ran ( ready ) ⦁ credits ( r ) = 0 ⇒ credits′ = { p : pids ⦁ p ↦ ( ( credits ( p ) div 2 ) + priority ( p ) ) } ∧ status′ = status 
+¬ ( ∀ r : ran ( ready ) ⦁ credits ( r ) = 0 ) ⇒ status′ = status ⊕ { head ( ready ) ↦ pRunning } ∧ credits′ = credits └ 
+
+We declare a new schema that contains only the state variables that do
+not change when a status change occurs.
+
+─ StatusChange == Scheduler ⧹ ( status , running , waiting , ready , registers , pregisters , pstack ) └ 
+
+Interrupts the currently executing process if the new process is of a
+higher priority then the current process and the kernel is in $kernel$
+mode.
+
+┌ interrupt 
+ΔScheduler 
+ΞStatusChange 
+create_new_process |
+ mode = kernel 
+running = ∅ ∨ ( ∃ p : running ⦁ priority? ≥ priority ( p ) ) 
+∃ r : running ⦁ status′ = status ⊕ { pid! ↦ pRunning , r ↦ pReady } ∧ pregisters′ = pregisters ⊕ { r ↦ registers } ∧ θ Stack ′ = pstack ( r ) 
+registers′ = pregisters ( pid! ) └ 
+
+Remove the currently running process and put it back in the ready queue.
+
+┌ remove_running_process 
+ΔScheduler 
+ΞStatusChange |
+ ∃ pid == ( μ r : running ) ⦁ status′ = status ⊕ { pid ↦ pReady } ∧ pregisters′ = pregisters ⊕ { pid ↦ registers } ∧ pstack′ = pstack ⊕ { pid ↦ θ Stack ′ } └ 
+
+A process becomes blocked if it is waiting on a resource such a an IO
+device, or waiting on another process 
+
+─ block_process == remove_running_process ⨟ reschedule └ 
+
+We declare a schema containing only the variables that change for an
+unblock.
+
+─ UnblockProcessChange == Scheduler ⧹ ( status , running , ready , waiting ) └ 
+
+Unblocks a process that is blocked by another process.
+
+┌ unblock_process 
+ΔScheduler 
+ΞUnblockProcessChange 
+pid? : Pid |
+ pid? ∈ pids 
+status ( pid? ) = pWaiting 
+running = ∅ ⇔ status′ = status ⊕ { pid? ↦ pRunning } 
+running ≠ ∅ ⇔ status′ = status ⊕ { pid? ↦ pReady } └ 
+
+Remove a process from the system
+
+┌ remove_process 
+ΔScheduler 
+ΞStack [ WORD ] 
+ΞSystem 
+pid? : Pid |
+ pid? ∈ pids 
+pids′ = pids ∖ { pid? } 
+status′ = { pid? } ⩤ status 
+credits′ = { pid? } ⩤ credits 
+priority′ = { pid? } ⩤ priority 
+instructions′ = { pid? } ⩤ instructions 
+inst_pointer′ = { pid? } ⩤ inst_pointer 
+base′ = { pid? } ⩤ base 
+limit′ = { pid? } ⩤ limit 
+pregisters′ = { pid? } ⩤ pregisters 
+pstack′ = { pid? } ⩤ pstack └ 
+
+Update the details in the process table when each instruction is
+executed, as well as communicate the current instruction and the base
+value for the current process.
+
+─ ChangeInstPointer == Scheduler ⧹ ( inst_pointer ) └ 
+
+┌ update_process_table 
+ΔScheduler 
+inst! : Instruction 
+base! : WORD |
+ running ≠ ∅ 
+( ∃ pid == ( μ r : running ) ⦁ inst! = head ( instructions ( pid ) ) ∧ base! = base ( pid ) ∧ ( inst_pointer ( pid ) = # ( instructions ( pid ) ) ⇒ remove_process [ pid / pid? ] ) ∧ inst_pointer ( pid ) < # ( instructions ( pid ) ) ⇒ inst_pointer′ = inst_pointer ⊕ { pid ↦ ( inst_pointer ( pid ) + 1 ) } ) 
+θ ChangeInstPointer = θ ChangeInstPointer ′ └ 
+
+─ next == exec_inst ⨠ update_process_table ⨟ ( [ ΔScheduler | running = ∅ ] ∧ reschedule ) ∨ [ ΞScheduler | running ≠ ∅ ] └ 
+
+─ idle0 == ¬ pre next └ 
+
+┌ idle 
+ΞScheduler 
+inst? : Instruction 
+base? : WORD |
+ idle0 └ 
+
+─ tick == next ∨ idle └ 
+
+─ ⊢? ( ∀ n : ℕ↘1↖ ⦁ n > 0 ) └ 
+─ [ X ] ⊢? ∀ x : ℙ X ⦁ # x ≤ 1 ⇔ singleton x └ 
+
+\end{document}

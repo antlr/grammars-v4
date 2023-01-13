@@ -1,0 +1,37 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@base <http://example.org/schemas/vehicles>.
+
+:MotorVehicle a rdfs:Class.
+
+:PassengerVehicle a rdfs:Class;
+   rdfs:subClassOf :MotorVehicle.
+
+:Truck a rdfs:Class;
+   rdfs:subClassOf :MotorVehicle.
+    
+:Van a rdfs:Class;
+   rdfs:subClassOf :MotorVehicle.
+
+:MiniVan a rdfs:Class;
+   rdfs:subClassOf :Van;
+   rdfs:subClassOf :PassengerVehicle.
+
+:Person a rdfs:Class.
+
+xsd:integer a rdfs:Datatype.
+
+:registeredTo a rdf:Property;
+   rdfs:domain :MotorVehicle;
+   rdfs:range  :Person.
+    
+:rearSeatLegRoom a rdf:Property;
+   rdfs:domain :MotorVehicle;
+   rdfs:range xsd:integer.
+
+:driver a rdf:Property;
+   rdfs:domain :MotorVehicle.
+
+:primaryDriver a rdf:Property;
+   rdfs:subPropertyOf :driver.

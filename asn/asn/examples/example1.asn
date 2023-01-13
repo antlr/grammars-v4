@@ -1,0 +1,15 @@
+MyModule DEFINITIONS ::=
+BEGIN
+
+MyTypes ::= SEQUENCE {
+    myObjectId   OBJECT IDENTIFIER,
+    mySeqOf      SEQUENCE OF MyInt,
+    myBitString  BIT STRING {
+                        muxToken(0), 
+                        modemToken(1)
+                 }
+}
+
+MyInt ::= INTEGER (0..65535)
+
+END

@@ -1,0 +1,692 @@
+//
+// $Id$
+//
+
+/*----------------------------------------------------------------------
+ * XYセレクタ
+ ----------------------------------------------------------------------*/
+class KColorPickerXYSelecter extends KValueWidget
+{
+  var colorLayer;
+  var cursorLayer;
+  var dragging;
+  var value;
+  var hasAlpha;
+  var cache;
+
+  function KColorPickerXYSelecter(window, name, hasAlpha) {
+    super.KValueWidget(window, name);
+    this.hasAlpha = hasAlpha;
+    setFixedSize(256, 256);
+    colorLayer = new global.Layer(window, this);
+    colorLayer.setSize(width, height);
+    colorLayer.visible = true;
+    colorLayer.hitThreshold = 256;
+    cursorLayer = new global.Layer(window, this);
+    cursorLayer.visible = true;
+    cursorLayer.hitThreshold = 256;
+    cursor = crCross;
+    fillChecker(8);
+    if (! hasAlpha)
+      colorLayer.face = dfOpaque;
+  }
+
+  function drawHSV(h, s, v, x, y, alpha) {
+    var prevCache = cache;
+    cache = %[h:h,s:s,v:v];
+    if (! equalStruct(cache, prevCache)) 
+      colorLayer.fillHSV(h, s, v);
+    if (hasAlpha)
+      colorLayer.opacity = alpha;
+    drawCursor(x, y);
+  }
+
+  function drawRGB(r, g, b, x, y, alpha) {
+    var prevCache = cache;
+    cache = %[r:r,g:g,b:b];
+    if (! equalStruct(cache, prevCache)) 
+      colorLayer.fillRGB(r, g, b);
+    if (hasAlpha)
+      colorLayer.opacity = alpha;
+    drawCursor(x, y);
+  }
+
+  function drawCursor(x, y) {
+    x = int(x * (width - 1));
+    y = int((1 - y) * (height - 1));
+    var color = colorLayer.getMainPixel(x, y);
+    if (global.Layer.RGB2HSV((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff).v < 75)
+      cursorLayer.loadImages("k_color_picker_xy_cursor_white");
+    else
+      cursorLayer.loadImages("k_color_picker_xy_cursor_black");
+    cursorLayer.setSizeToImageSize();
+    cursorLayer.setPos(x - int(cursorLayer.width / 2),
+                       y - int(cursorLayer.height / 2));
+  }
+
+  function onMouseDown(x, y, button) {
+    super.onMouseDown(...);
+    if (button == mbLeft) {
+      dragging = true;
+      applyValue(x, y);
+    }
+  }
+
+  function onMouseMove(x, y) {
+    super.onMouseMove(...);
+    if (dragging) {
+      applyValue(x, y);
+    }
+  }
+
+  function onMouseUp(x, y, button) {
+    super.onMouseUp(...);
+    if (dragging 
+        && button == mbLeft) {
+      dragging = false;
+    }
+  }
+
+  function applyValue(x, y) {
+    value = [ Math.min(1, Math.max(0, x / (width - 1))),
+              Math.min(1, Math.max(0, 1 - y / (height - 1))) ];
+    invalidateValue();
+  }
+}
+
+/*----------------------------------------------------------------------
+ * Zセレクタ
+ ----------------------------------------------------------------------*/
+class KColorPickerZSelecter extends KValueWidget
+{
+  var colorLayer;
+  var cursorLayer;
+  var dragging;
+  var value;
+  var hasAlpha;
+  var cache;
+
+  function KColorPickerZSelecter(window, name, hasAlpha) {
+    super.KWidget(window, name);
+    setFixedSize(16, 256);
+    this.hasAlpha = hasAlpha;
+    colorLayer = new global.Layer(window, this);
+    colorLayer.setSize(width, height);
+    colorLayer.visible = true;
+    colorLayer.hitThreshold = 256;
+    cursorLayer = new global.Layer(window, this);
+    cursorLayer.visible = true;
+    cursorLayer.hitThreshold = 256;
+    cursorLayer.loadImages("k_color_picker_z_cursor");
+    cursorLayer.setSizeToImageSize();
+    fillChecker(8);
+    if (! hasAlpha)
+      colorLayer.face = dfOpaque;
+  }
+
+  function drawHSV(h, s, v, y, alpha) {
+    var prevCache = cache;
+    cache = %[h:h,s:s,v:v];
+    if (! equalStruct(prevCache, cache)) 
+      colorLayer.fillHSV(h, s, v);
+    if (hasAlpha) 
+      colorLayer.opacity = alpha;
+    drawCursor(y);
+  }
+
+  function drawRGB(r, g, b, y, alpha) {
+    var prevCache = cache;
+    cache = %[r:r,g:g,b:b];
+    if (! equalStruct(cache, prevCache)) 
+      colorLayer.fillRGB(r, g, b);
+    if (hasAlpha)
+      colorLayer.opacity = alpha;
+    drawCursor(y);
+  }
+
+  function drawCursor(y) {
+    y = int((1 - y) * (height - 1));
+    cursorLayer.setPos(0, y -  int(cursorLayer.height / 2));
+  }
+
+  function onMouseDown(x, y, button) {
+    super.onMouseDown(...);
+    if (button == mbLeft) {
+      dragging = true;
+      applyValue(y);
+    }
+  }
+
+  function onMouseMove(x, y) {
+    super.onMouseMove(...);
+    if (dragging) {
+      applyValue(y);
+    }
+  }
+
+  function onMouseUp(x, y, button) {
+    super.onMouseUp(...);
+    if (dragging 
+        && button == mbLeft) {
+      dragging = false;
+    }
+  }
+
+  function applyValue(y) {
+    value = Math.min(1, Math.max(0, 1 - y / (height - 1)));
+    invalidateValue();
+  }
+}
+
+/*----------------------------------------------------------------------
+ * αセレクタ
+ ----------------------------------------------------------------------*/
+class KColorPickerAlphaSelecter extends KValueWidget
+{
+  var colorLayer;
+  var cursorLayer;
+  var dragging;
+  var value;
+  var cache;
+
+  function KColorPickerAlphaSelecter(window, name) {
+    super.KWidget(window, name);
+    setFixedSize(16, 256);
+    colorLayer = new global.Layer(window, this);
+    colorLayer.setSize(width, height);
+    colorLayer.visible = true;
+    colorLayer.hitThreshold = 256;
+    cursorLayer = new global.Layer(window, this);
+    cursorLayer.visible = true;
+    cursorLayer.hitThreshold = 256;
+    cursorLayer.loadImages("k_color_picker_z_cursor");
+    cursorLayer.setSizeToImageSize();
+    fillChecker(8);
+    for (var y = 0; y < height; y++) 
+      colorLayer.colorRect(0, y, width, 1, 0xFFFFFF, (height - y - 1) * 255 / (height - 1));
+    colorLayer.holdAlpha = true;
+  }
+
+  function drawRGB(r, g, b, alpha) {
+    var prevCache = cache;
+    cache = %[r:r,g:g,b:b];
+    if (! equalStruct(cache, prevCache)) {
+      var color = (r << 16) | (g << 8) | b;
+      colorLayer.face = dfOpaque;
+      colorLayer.fillRect(0, 0, width, height, color);
+      colorLayer.face = dfBoth;
+    }
+    colorLayer.opacity = alpha * 255;
+    drawCursor(alpha);
+  }
+
+  function drawCursor(y) {
+    y = int((1 - y) * (height - 1));
+    cursorLayer.setPos(0, y -  int(cursorLayer.height / 2));
+  }
+
+  function onMouseDown(x, y, button) {
+    super.onMouseDown(...);
+    if (button == mbLeft) {
+      dragging = true;
+      applyValue(y);
+    }
+  }
+
+  function onMouseMove(x, y) {
+    super.onMouseMove(...);
+    if (dragging) {
+      applyValue(y);
+    }
+  }
+
+  function onMouseUp(x, y, button) {
+    super.onMouseUp(...);
+    if (dragging 
+        && button == mbLeft) {
+      dragging = false;
+    }
+  }
+
+  function applyValue(y) {
+    value = Math.min(1, Math.max(0, 1 - y / (height - 1)));
+    invalidateValue();
+  }
+}
+
+/*----------------------------------------------------------------------
+ * カラーボックス
+ ----------------------------------------------------------------------*/
+class KColorPickerColorBox extends KColorBox
+{
+  function KColorPickerColorBox(window, w, h, name) {
+    super.KColorBox(...);
+  }
+
+  function onMouseDown(x, y, key) {
+    if (key == mbLeft)
+      invalidateValue();
+  }
+}
+
+/**----------------------------------------------------------------------
+ * カラーピッカー
+ ----------------------------------------------------------------------*/
+class KColorPickerDialog extends KWindow
+{
+  var canceled = true;
+  var color, prevColor;
+  var hasAlpha;
+  var dict;
+  var mode;
+  var alpha;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param color カラー
+   * @param hasAlpha アルファを持っているか？
+   * @param dict カラーピッカーの位置を保存する辞書
+   ------------------------------*/
+  function KColorPickerDialog(color, hasAlpha = false, dict = void, name = "colorPicker") {
+    super.KWindow(name);
+
+    caption = "カラーピッカー";
+    borderStyle = bsDialog;
+
+    defaultFocusable = true;
+    defaultAlignHorizontal = ALIGN_LEFT;
+
+    this.color = prevColor = color;
+    this.hasAlpha = hasAlpha;
+    this.dict = dict;
+    mode = "h";
+
+    primaryLayer.add(new KGridLayout(this, "rootGrid"));
+    rootGrid.add(0, 0, new KGridLayout(this, "selecterGrid"), 1, 2);
+    selecterGrid.add(0, 0, new KFrameLayout(this, FRAME_SUNKEN, "", "xyFrame"), 1, 2);
+    xyFrame.add(new KColorPickerXYSelecter(this, "xySelecter", hasAlpha));
+    selecterGrid.add(1, 0, new KFrameLayout(this, FRAME_SUNKEN, "", "zFrame"), 1, 2);
+    zFrame.add(new KColorPickerZSelecter(this, "zSelecter", hasAlpha));
+    if (hasAlpha) {
+      selecterGrid.add(2, 0, new KFrameLayout(this, FRAME_SUNKEN, "", "alphaFrame"), 1, 2);
+      alphaFrame.add(new KColorPickerAlphaSelecter(this, "alphaSelecter"));
+    }
+    rootGrid.add(1, 0, new KFrameLayout(this, FRAME_SUNKEN, "", "colorFrame"));
+    colorFrame.add(new KGridLayout(this, "colorGrid"));
+    colorGrid.add(0, 0, new KColorPickerColorBox(this, 64, 32, "newColor"));
+    colorGrid.add(0, 1, new KColorPickerColorBox(this, 64, 32, "oldColor"));
+    rootGrid.add(1, 1, new KGridLayout(this, "paramGrid"));
+    defaultAlignVertical = ALIGN_CENTER;
+    paramGrid.add(0, 0, new KRadioButton(this, "H:", "hSelect"));
+    paramGrid.add(1, 0, new KTextInput(this, 30, 20, TEXT_DIGIT, "hInput"));
+    paramGrid.add(2, 0, new KTextLabel(this, "°"));
+    paramGrid.add(0, 1, new KRadioButton(this, "S:", "sSelect"));
+    paramGrid.add(1, 1, new KTextInput(this, 30, 20, TEXT_DIGIT, "sInput"));
+    paramGrid.add(2, 1, new KTextLabel(this, "％"));
+    paramGrid.add(0, 2, new KRadioButton(this, "V:", "vSelect"));
+    paramGrid.add(1, 2, new KTextInput(this, 30, 20, TEXT_DIGIT, "vInput"));
+    paramGrid.add(2, 2, new KTextLabel(this, "％"));
+
+    paramGrid.add(0, 4, new KRadioButton(this, "R:", "rSelect"));
+    paramGrid.add(1, 4, new KTextInput(this, 30, 20, TEXT_DIGIT, "rInput"));
+    paramGrid.add(0, 5, new KRadioButton(this, "G:", "gSelect"));
+    paramGrid.add(1, 5, new KTextInput(this, 30, 20, TEXT_DIGIT, "gInput"));
+    paramGrid.add(0, 6, new KRadioButton(this, "B:", "bSelect"));
+    paramGrid.add(1, 6, new KTextInput(this, 30, 20, TEXT_DIGIT, "bInput"));
+
+    var textRow;
+    if (hasAlpha) {
+      paramGrid.add(0, 7, new KTextLabel(this, "A:", "aSelect"));
+      paramGrid.add(1, 7, new KTextInput(this, 30, 20, TEXT_DIGIT, "aInput"));
+      aSelect.alignHorizontal = ALIGN_RIGHT;
+      textRow = 9;
+    } else 
+      textRow = 8;
+
+    paramGrid.add(0, textRow, new KTextLabel(this, "#", "labelSharp"));
+    labelSharp.alignHorizontal = ALIGN_RIGHT;
+    paramGrid.add(1, textRow, new KTextInput(this, 50, 20, TEXT_ANY, "textInput"), 2, 1);
+
+    hSelect.focusable = false;
+    sSelect.focusable = false;
+    vSelect.focusable = false;
+    rSelect.focusable = false;
+    gSelect.focusable = false;
+    bSelect.focusable = false;
+
+    hInput.respondToValueModification = true;
+    sInput.respondToValueModification = true;
+    vInput.respondToValueModification = true;
+    rInput.respondToValueModification = true;
+    gInput.respondToValueModification = true;
+    bInput.respondToValueModification = true;
+    if (hasAlpha)
+      aInput.respondToValueModification = true;
+    textInput.respondToValueModification = true;
+
+    rootGrid.add(0, 2, new KGridLayout(this, "buttonGrid"), 2, 1);
+    buttonGrid.alignHorizontal = ALIGN_RIGHT;
+    buttonGrid.add(0, 0, new KTextButton(this, "OK", "okButton"));
+    buttonGrid.add(1, 0, new KTextButton(this, "キャンセル", "cancelButton"));
+
+    rootGrid.margin = 10;
+    rootGrid.space = 10;
+
+    selecterGrid.margin = 0;
+    selecterGrid.space = 10;
+
+    buttonGrid.marign = 20;
+    buttonGrid.space = 10;
+
+    paramGrid.space = 3;
+
+    newColor.hasAlpha = oldColor.hasAlpha = hasAlpha;
+    newColor.value = oldColor.value = color;
+
+    primaryLayer.isAvoidDictionaryRegistration = true;
+
+    if (dict)
+      bindPersistentDictionary(dict);
+
+    hSelect.value = true;
+    alpha = hasAlpha ? (color >> 24) & 0xff : 0xff;
+    applyRGB((color >> 16) & 0xff,
+             (color >> 8) & 0xff,
+             (color) & 0xff);
+    updateSelecter();
+
+    if (hasAlpha)
+      aInput.value = string(alpha);
+
+    invalidateLayout();
+  }
+
+  function onKeyDown(key) {
+    switch (key) {
+    case VK_RETURN:
+      pressOK();
+      break;
+    case VK_ESCAPE:
+      pressCancel();
+      break;
+    default:
+      super.onKeyDown(...);
+      break;
+    }
+  }
+
+  function pressCancel {
+    canceled = true;
+    close();
+  }
+
+  function pressOK {
+    if (prevColor == color)
+      canceled = true;
+    else
+      canceled = false;
+    close();
+  }
+
+  function applyRGB(r, g, b) {
+    rInput.value = string(r);
+    gInput.value = string(g);
+    bInput.value = string(b);
+    var hsv = Layer.RGB2HSV(r, g, b);
+    hInput.value = string(hsv.h);
+    sInput.value = string(hsv.s);
+    vInput.value = string(hsv.v);
+    color = (+rInput.value << 16) | (+gInput.value << 8) | +bInput.value | (hasAlpha ? (alpha << 24) : 0);
+    textInput.value = convertColorToText(color, hasAlpha);
+  }
+
+  function applyHSV(h, s, v) {
+    hInput.value = string(h);
+    sInput.value = string(s);
+    vInput.value = string(v);
+    var rgb = Layer.HSV2RGB(h, s, v);
+    rInput.value = string(rgb.r);
+    gInput.value = string(rgb.g);
+    bInput.value = string(rgb.b);
+    color = (+rInput.value << 16) | (+gInput.value << 8) | +bInput.value | (hasAlpha ? (alpha << 24) : 0);
+    textInput.value = convertColorToText(color, hasAlpha);
+  }
+
+  function updateSelecter {
+    switch (mode) {
+    case "h": {
+      xySelecter.drawHSV(+hInput.value, "x", "y", +sInput.value / 100, +vInput.value / 100, alpha);
+      zSelecter.drawHSV("y", 100, 100, +hInput.value / 360, alpha);
+      break;
+    }
+    case "s": {
+      xySelecter.drawHSV("x", +sInput.value, "y", +hInput.value / 360, +vInput.value / 100, alpha);
+      zSelecter.drawHSV(+hInput.value, "y", +vInput.value, +sInput.value / 100, alpha);
+      break;
+    }
+    case "v": {
+      xySelecter.drawHSV("x", "y", +vInput.value, +hInput.value / 360, +sInput.value / 100, alpha);
+      zSelecter.drawHSV(+hInput.value, +sInput.value, "y", +vInput.value / 100, alpha);
+      break;
+    }
+    case "r": {
+      xySelecter.drawRGB(+rInput.value, "y", "x", +bInput.value / 255, +gInput.value / 255, alpha);
+      zSelecter.drawRGB("y", +gInput.value, +bInput.value, +rInput.value / 255, alpha);
+      break;
+    }
+    case "g": {
+      xySelecter.drawRGB("y", +gInput.value, "x", +bInput.value / 255, +rInput.value / 255, alpha);
+      zSelecter.drawRGB(+rInput.value, "y", +bInput.value, +gInput.value / 255, alpha);
+      break;
+    }
+    case "b": {
+      xySelecter.drawRGB("x", "y", +bInput.value, +rInput.value / 255, +gInput.value / 255, alpha);
+      zSelecter.drawRGB(+rInput.value, +gInput.value, "y", +bInput.value / 255, alpha);
+      break;
+    }
+    }
+    if (hasAlpha) 
+      alphaSelecter.drawRGB(+rInput.value, +gInput.value, +bInput.value, alpha / 255);
+    newColor.value = color;
+  }
+
+  function applyXYSelecter(x, y) {
+    switch (mode) {
+    case "h": {
+      sInput.value = string(int(x * 100));
+      vInput.value = string(int(y * 100));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "s": {
+      hInput.value = string(int(x * 360));
+      vInput.value = string(int(y * 100));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "v": {
+      hInput.value = string(int(x * 360));
+      sInput.value = string(int(y * 100));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "r": {
+      bInput.value = string(int(x * 255));
+      gInput.value = string(int(y * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    case "g": {
+      bInput.value = string(int(x * 255));
+      rInput.value = string(int(y * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    case "b": {
+      rInput.value = string(int(x * 255));
+      gInput.value = string(int(y * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    }
+    updateSelecter();
+  }
+
+  function applyZSelecter(z) {
+    switch (mode) {
+    case "h": {
+      hInput.value = string(int(z * 360));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "s": {
+      sInput.value = string(int(z * 100));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "v": {
+      vInput.value = string(int(z * 100));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      break;
+    }
+    case "r": {
+      rInput.value = string(int(z * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    case "g": {
+      gInput.value = string(int(z * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    case "b": {
+      bInput.value = string(int(z * 255));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      break;
+    }
+    }
+    updateSelecter();
+  }
+
+  function applyAlphaSelecter(alpha) {
+    this.alpha = alpha;
+    color = (+rInput.value << 16) | (+gInput.value << 8) | +bInput.value | (hasAlpha ? (alpha << 24) : 0);
+    aInput.value = string(alpha);
+    textInput.value = convertColorToText(color, hasAlpha);
+    updateSelecter();
+  }
+
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    case "okButton": pressOK(); break;
+    case "cancelButton": pressCancel(); break;
+    case "hSelect": case "sSelect": case "vSelect":
+    case "rSelect": case "gSelect": case "bSelect": {
+      hSelect.value = false;
+      sSelect.value = false;
+      vSelect.value = false;
+      rSelect.value = false;
+      gSelect.value = false;
+      bSelect.value = false;
+      child.value = true;
+      mode = child.name.substr(0, 1);
+      updateSelecter();
+      break;
+    }
+    case "hInput": {
+      hInput.value = int(Math.max(0, Math.min(360, +hInput.value)));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      updateSelecter();
+      break;
+    }
+    case "sInput": {
+      sInput.value = int(Math.max(0, Math.min(100, +sInput.value)));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      updateSelecter();
+      break;
+    }
+    case "vInput": {
+      vInput.value = int(Math.max(0, Math.min(100, +vInput.value)));
+      applyHSV(+hInput.value, +sInput.value, +vInput.value);
+      updateSelecter();
+      break;
+    }
+    case "rInput": {
+      rInput.value = int(Math.max(0, Math.min(255, +rInput.value)));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      updateSelecter();
+      break;
+    }
+    case "gInput": {
+      gInput.value = int(Math.max(0, Math.min(255, +gInput.value)));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      updateSelecter();
+      break;
+    }
+    case "bInput": {
+      bInput.value = int(Math.max(0, Math.min(255, +bInput.value)));
+      applyRGB(+rInput.value, +gInput.value, +bInput.value);
+      updateSelecter();
+      break;
+    }
+    case "aInput": {
+      applyAlphaSelecter(int(Math.max(0, Math.min(255, +value))));
+      break;
+    }
+    case "textInput": {
+      value = convertTextToColor(value, hasAlpha);
+      // FOLLOW THROUGH
+    }
+    case "oldColor": {
+      if (hasAlpha) 
+        alpha = (value >> 24) & 0xFF;
+      applyRGB((value >> 16) & 0xff,
+               (value >> 8) & 0xff,
+               (value) & 0xff);
+      updateSelecter();
+      break;
+    }
+    case "xySelecter": {
+      applyXYSelecter(value[0], value[1]);
+      break;
+    }
+    case "zSelecter": {
+      applyZSelecter(value);
+      break;
+    }
+    case "alphaSelecter": {
+      applyAlphaSelecter(int(value * 255));
+      break;
+    }
+    }
+  }
+}
+
+/**------------------------------
+ * カラーピッカーを呼び出す関数
+ *
+ * カラーピッカーダイアログを表示して、カラーを編集します。
+ * hasAlpha=falseの時は0xRRGGBB形式のカラー値を、
+ * hasAlpha=trueの時は0xAARRGGBB形式のカラー値を取り扱います。
+ * ダイアログがキャンセルされた時は、返り値にカラーの替わりにvoidを返します。
+ *
+ * @param color カラー
+ * @param hasAlpha アルファを持っているか？
+ * @param dict カラーピッカーの位置を保存する辞書
+ * @param name カラーピッカーの名前
+ * @return 変更されたカラー
+ ------------------------------*/
+function queryColorPicker(color, hasAlpha = false, dict = void, name = "colorPicker")
+{
+  var win = new KColorPickerDialog(color, hasAlpha, dict, name);
+  win.showModal();
+  var result;
+  if (win.canceled)
+    result = void;
+  else
+    result = win.color;
+  invalidate win;
+  return result;
+}
+  

@@ -1,0 +1,48 @@
+/******************************************************************************
+	system_mb/mb/system/cmenu/MBContextMenuItem.tjs
+*******************************************************************************/
+
+
+class MBContextMenuItem extends MBSelectItem
+{
+	var owner;
+	
+	function MBContextMenuItem(win, par, str)
+	{
+		// コンストラクタ
+		
+		super.MBSelectItem(win, par, str);
+		
+		owner = parent;
+		name = 'メニューアイテム';
+		visible = true;
+		opacity = 255;
+		focusable = true;
+		enabled = true;
+		
+		//width = 147;
+		width = parent.defWidth - 24;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// マウスが押された
+		
+		if (button == mbRight)
+		{
+			owner.hide();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}

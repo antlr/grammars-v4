@@ -1,0 +1,8 @@
+to star	to walk_the_stars
+	repeat 5 [fd 10 rt 144]	fd 20 rt random 360
+	end	
+
+	star
+	walk_the_stars
+	end
+	

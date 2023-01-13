@@ -1,0 +1,88 @@
+/******************************************************************************
+	system_mb/mb/system/MBPlayTimeCounter
+*******************************************************************************/
+
+
+class MBPlayTimeCounter
+{
+	var window;	// ウィンドウ参照
+	var timer;	// タイマー
+	
+	var totalPlayTime;	// 総プレイ時間
+	
+	function MBPlayTimeCounter(win)
+	{
+		// コンストラクタ
+		
+		window = win;
+		
+		reset(0);
+		
+		timer = new Timer(onTimer, '');
+		timer.interval = 1000;
+		//timer.enabled = true;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		if (timer !== void) {
+			timer.enabled = false;
+			invalidate timer;
+		}
+	}
+	
+	function reset(num=0)
+	{
+		// numでカウンタをリセット
+		
+		totalPlayTime = num;
+	}
+	
+	function onTimer()
+	{
+		// タイマイベント
+		// 総プレイ時間を１秒ごとに計算。
+		
+		totalPlayTime += 1;
+		window.pcflags.totalPlayTime = totalPlayTime;
+	}
+	
+	function getTotalPlayTime()
+	{
+		// 総プレイ時間を時刻フォーマットの文字列で返す
+		
+		var pt = totalPlayTime;
+		
+		var h = pt \ (3600);
+		pt -= 3600 * h;
+		
+		var m = pt \ 60;
+		pt -= m * 60;
+		
+		return "%02d:%02d:%02d".sprintf(h, m, pt);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function save()
+	{
+		// セーブ
+		
+		return totalPlayTime;
+	}
+	
+	function load(sec)
+	{
+		// ロード
+		
+		try {
+			reset(sec);
+		}
+		catch {
+			dm("<PlayTimeCounter> カウンタは0にリセットされます。");
+			reset(0);
+		}
+	}
+}

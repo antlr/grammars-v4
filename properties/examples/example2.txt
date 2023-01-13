@@ -1,0 +1,6 @@
+# This is my test.properties file
+favoriteFood=kun pao chicken
+favoriteVegetable=artichoke
+favoriteSoda=Dr Pepper
+
+

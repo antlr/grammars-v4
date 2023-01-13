@@ -1,0 +1,7 @@
+;
+; =================== Strings ===================
+;
+[Strings]
+Provider                        = "My Device Provider"
+MediaDescription                = "My Device Installation Media"
+USB\MyDevice.DeviceDesc         = "My Device Description"

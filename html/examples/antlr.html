@@ -1,0 +1,285 @@
+
+<!doctype html>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if gte IE 9]><!--><html><!--<![endif]-->
+
+	<head>
+		<meta charset="utf-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+		<title>ANTLR</title>
+
+		<!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+		
+		
+		<link rel="stylesheet" href="css/fontface/Droid-Sans/stylesheet.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="css/fontface/DejaVu-Sans-Mono/stylesheet.css" type="text/css" media="screen" />
+			
+		<link rel="stylesheet" href="css/antlr.css" type="text/css" media="screen" />
+		
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script src="scripts/selectivizr-min.js"></script>	
+		<script src="scripts/cycle.js"></script>	
+		<script src="scripts/rounded.js"></script>	
+		<script src="scripts/watermark.js"></script>	
+		
+		<script type="text/javascript" src="scripts/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+		<script type="text/javascript" src="scripts/source/jquery.fancybox.js?v=2.0.6"></script>
+		<link rel="stylesheet" type="text/css" href="scripts/source/jquery.fancybox.css?v=2.0.6" media="screen" />		
+	
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1024344-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+	</head>
+
+<body>
+
+<header>
+
+<a id="index" href="index.html">ANTLR</a>
+
+<nav>
+  <script src="scripts/topnav.js"></script>
+</nav>
+
+
+</header>
+
+<div id="wrapper">
+<div id="home"><!--this div provides the light background section on the homepage-->
+
+<div id="container">
+
+<div id="main">
+
+
+<div class="col3" id="whatis">
+	
+<h2>What is ANTLR?</h2>
+
+<p><strong>ANTLR</strong> (ANother Tool for Language Recognition) is a
+powerful parser generator for reading, processing, executing, or
+translating structured text or binary files. It's widely used to build
+languages, tools, and frameworks.  From a grammar, ANTLR generates a
+parser that can build and walk parse trees.</p>
+
+<font size=3><p><i>Looking for <a href="http://www.antlr3.org">ANTLR v3</a>?</i></p></font>
+<div id="terence"><img src="images/terence.jpg" alt="terence" />
+<strong>Terence Parr</strong> is the maniac behind ANTLR and has been
+working on language tools since 1989. He is a professor of computer
+science at the <a href="http://www.cs.usfca.edu/~parrt">University of San Francisco</a>.
+</div>
+	
+</div><!--/col3-->
+
+<div id="module">
+	
+<ul id="tabs">
+	<li id="tab-qs"><a href="javascript:void">Quick Start</a></li>
+	<li id="tab-sa"><a href="javascript:void">Samples</a></li>
+</ul>
+
+<h2 id="hd-sa">Samples</h2>
+<h2 id="hd-qs">Quick Start
+
+<br>
+<font size=2>See <a href="https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4">Getting Started with ANTLR v4</a></font>
+</h2>
+
+<div class="screen" id="quickstart">
+
+	<div class="slide">
+OS X
+<pre>
+<span class="dollar">$</span> <span class="cmd">cd</span> /usr/local/lib
+<span class="dollar">$</span> <span class="cmd">sudo curl</span> -O http://www.antlr.org/download/antlr-4.2.2-complete.jar
+<span class="dollar">$</span> <span class="cmd">export</span> <span class="equals">CLASSPATH=</span><span class="path">".:/usr/local/lib/antlr-4.2.2-complete.jar:$CLASSPATH"</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">antlr4=</span><span class="path">'java -jar /usr/local/lib/antlr-4.2.2-complete.jar'</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.gui.TestRig'</span>
+</pre>
+	</div>
+	
+<div class="slide">
+LINUX
+<pre>
+<span class="dollar">$</span> <span class="cmd">cd</span> /usr/local/lib
+<span class="dollar">$</span> <span class="cmd">wget</span> http://antlr.org/download/antlr-4.2.2-complete.jar
+<span class="dollar">$</span> <span class="cmd">export</span> <span class="equals">CLASSPATH=</span><span class="path">".:/usr/local/lib/antlr-4.2.2-complete.jar:$CLASSPATH"</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">antlr4=</span><span class="path">'java -jar /usr/local/lib/antlr-4.2.2-complete.jar'</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.gui.TestRig'</span>
+</pre>
+</div>
+
+<div class="slide">
+Windows
+<ol>
+<li>Download <a href="http://antlr.org/download/antlr-4.2.2-complete.jar">http://antlr.org/download/antlr-4.2.2-complete.jar</a>.
+
+<li>Add antlr4-complete.jar to CLASSPATH, either:
+<ul>
+<li>Permanently: Using System Properties dialog > Environment variables > Create or append to CLASSPATH variable
+<li>Temporarily, at command line:<br>
+<pre>
+SET CLASSPATH=.;C:\Javalib\antlr4-complete.jar;%CLASSPATH%
+</pre>
+</ul>
+
+<li>Create batch commands for ANTLR Tool, TestRig in dir in PATH
+<pre>
+ antlr4.bat: java org.antlr.v4.Tool %*
+ grun.bat:   java org.antlr.v4.gui.TestRig %*
+</pre>
+</ol>
+</div>
+
+</div><!--/screen-->
+
+<div class="screen" id="samples">
+
+	<div class="slide">
+		
+		<pre class="pre3">
+grammar Expr;		
+prog:	(expr NEWLINE)* ;
+expr:	expr ('*'|'/') expr
+    |	expr ('+'|'-') expr
+    |	INT
+    |	'(' expr ')'
+    ;
+NEWLINE : [\r\n]+ ;
+INT     : [0-9]+ ;
+</pre>
+		
+		<pre class="pre3">
+$ antlr4 Expr.g4
+$ javac Expr*.java
+$ grun Expr prog -gui
+100+2*34
+^D
+		</pre>
+		
+		<pre class="pre3">
+<img src="images/sample3.png" alt="sample3" width="130"/>
+		</pre>
+		
+		
+	</div>
+	<div class="slide"><code>Linux</code></div>
+	<div class="slide"><code>Mac</code></div>
+	
+</div><!--/screen-->
+
+	<div id="pager-qs" class="pager"></div>
+	<div id="pager-sa" class="pager"></div>
+	
+</div><!--/module-->
+
+</div><!--/main-->
+
+<section><!--home only-->
+	
+<div class="col3" id="latest-news">
+	<h2>Latest News</h2>
+	
+<a class="twitter-timeline" href="https://twitter.com/the_antlr_guy" data-widget-id="373882077285871616">Tweets by @the_antlr_guy</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+	<div class="dot-pager" id="pager-tw"></div>
+	
+</div><!--/col3-->
+
+<div class="col3" id="testimonials">
+<h2><a href="testimonials.html">Testimonials</a></h2>	
+
+<div id="tests">
+	
+	<div class="testimonial">
+Kudos. I'm actually really liking ANTLR! I have a pretty darn good
+velocity with a rapid prototyping project I am doing in my Google 20%
+time. For example, I just discovered a feature in rewrite rules that
+does exactly what I need (referencing previous rule ASTs, p. 174 in
+your book). It took me about 5 minutes to get this to work and remove
+an ugly wart from my grammar. Hats off!
+<strong>Guido van Rossum, Inventor of Python</strong>
+	</div>
+
+	<div class="testimonial">
+ANTLR is an exceptionally powerful and flexible tool for parsing
+formal languages. At Twitter, we use it exclusively for query parsing
+in Twitter search. Our grammars are clean and concise, and the
+generated code is efficient and stable. The <a href="http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference">book</a> is our go-to
+reference for ANTLR v4 -- engaging writing, clear descriptions and
+practical examples all in one place.
+<strong>Samuel Luckenbill, Senior Manager of Search Infrastructure, Twitter, inc.</strong>
+	</div>
+
+	<div class="testimonial">
+Just wanted to take the opportunity to say thanks. ANTLR is a BIG
+improvement over yacc/lex, and your support for it most
+commendable. Managed to get my tired old brain around it in a
+day. Nice work!
+<strong>Brad Cox, Inventor of Objective-C</strong>
+	</div>
+
+<a href="testimonials.html">More...</a>
+
+	<div class="testimonial">
+	</div>
+
+</div><!--/tests-->
+
+<div class="dot-pager" id="pager-te"></div>	
+</div><!--/col3-->
+
+
+<div class="col3" id="resources">
+<h2>Resources</h2>	
+
+<a href="http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference"><img src="images/tpantlr2.jpg"
+width=110></a>
+<a href="http://pragprog.com/book/tpdsl/language-implementation-patterns"><img src="images/tpdsl.jpg"
+width=110></a>
+
+<br><br><a href="https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4">Getting started with ANTLR v4</a>
+
+<br><br><a href="https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+4+Documentation">ANTLR
+Documentation</a>
+
+<br><br><a href="/api">Runtime API Doc</a>
+<br><br><a href="https://github.com/antlr/antlr4">Browse source tree (github)</a>
+
+<br><br><a href="https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+v4+FAQ">Frequently Asked Questions</a>
+
+
+<br><br><a href="http://www.stringtemplate.org">StringTemplate template engine</a>
+
+</div><!--/col3-->
+	
+</section>
+
+
+
+</div><!--/container-->
+
+<div class="clear"><!--necessary nudge--></div>
+</div><!--/home-->
+</div><!--/wrapper-->	
+
+<footer>
+    <script src="scripts/bottomnav.js"></script>
+</footer>
+
+<script src="scripts/functions.js"></script>	
+
+</body>
+</html>

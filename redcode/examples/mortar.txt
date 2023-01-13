@@ -1,0 +1,8 @@
+MOV # 0 , @ 7
+MOV 5 , 4
+MOV 5 , 4
+ADD 2 , 4
+JMP -4
+DAT 1
+DAT 1
+DAT 0

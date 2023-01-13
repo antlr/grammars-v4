@@ -1,0 +1,39 @@
+\chapter{Auxiliary toolkit definitions}\label{apD}
+
+─ section apD parents ch3 └ 
+
+Originally Appendix D (p.$225$). In this document it appears after the original
+Chapter $4$ because we need the definitions of $NAME$ and $AbPurse$ from
+Chapter $3$ and $PayDetails$ from chapter $4$. These functions were used in
+conjectures in the original Chapter $2$.
+
+\section{Total abstract balance}
+
+\begin{LADef}[Total balance of abstract purses]
+╷ totalAbBalance : ( NAME ⇻ AbPurse ) → ℕ |
+ totalAbBalance { } = 0 
+∀ w : ( NAME ⇻ AbPurse ) ; n : NAME ; AbPurse | n ∉ dom w ⦁ totalAbBalance ( { n ↦ θ AbPurse } ∪ w ) = balance + totalAbBalance w └ ~\end{LADef}
+
+\subsection*{Proofs}
+
+\begin{LDCheck}\begin{zproof}[totalAbBalance\$domainCheck]
+   prove;
+\end{zproof}\end{LDCheck}
+
+\section{Total lost value}
+
+\begin{LADef}[Total lost of abstract purses]
+╷ totalLost : ( NAME ⇻ AbPurse ) → ℕ |
+ totalAbBalance { } = 0 
+∀ w : ( NAME ⇻ AbPurse ) ; n : NAME ; AbPurse | n ∉ dom w ⦁ totalLost ( { n ↦ θ AbPurse } ∪ w ) = balance + totalLost w └ ~\end{LADef}
+
+\subsection*{Proofs}
+
+\begin{LDCheck}\begin{zproof}[totalLost\$domainCheck]
+   prove;
+\end{zproof}\end{LDCheck}
+
+\newpage
+\section{Summary}\label{apD.summary}
+
+\ldefsummary \lthmsummary \lthmaddeddefsummary \lthmaddedthmsummary \lzevessummary 

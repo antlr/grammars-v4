@@ -1,0 +1,13 @@
+##gff-version 3
+#!gff-spec-version 1.20
+#!processor NCBI annotwriter
+##sequence-region NC_001792.2 1 1758
+##species http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=133704
+NC_001792.2	RefSeq	region	1	1758	.	+	.	ID=id0;Dbxref=taxon:133704;Is_circular=true;gbkey=Src;genome=genomic;mol_type=genomic DNA
+NC_001792.2	RefSeq	stem_loop	1747	1758	.	+	.	ID=id1;gbkey=stem_loop;part=1%2F2
+NC_001792.2	RefSeq	stem_loop	1	21	.	+	.	ID=id1;gbkey=stem_loop;part=2%2F2
+NC_001792.2	RefSeq	gene	55	993	.	+	.	ID=gene0;Name=V1;Dbxref=GeneID:7693233;gbkey=Gene;gene=V1;locus_tag=PCVgp1
+NC_001792.2	RefSeq	CDS	55	993	.	+	0	ID=cds0;Name=NP_065678.1;Parent=gene0;Dbxref=Genbank:NP_065678.1,GeneID:7693233;gbkey=CDS;gene=V1;product=replication-associated protein;protein_id=NP_065678.1
+NC_001792.2	RefSeq	gene	1038	1730	.	-	.	ID=gene1;Name=C1;Dbxref=GeneID:7693232;gbkey=Gene;gene=C1;locus_tag=PCVgp2
+NC_001792.2	RefSeq	CDS	1038	1730	.	-	0	ID=cds1;Name=NP_065679.1;Parent=gene1;Dbxref=Genbank:NP_065679.1,GeneID:7693232;gbkey=CDS;gene=C1;product=capsid protein;protein_id=NP_065679.1
+###

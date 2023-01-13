@@ -1,0 +1,208 @@
+\documentclass{article}
+\usepackage{oz}   \newenvironment{machine}[1]{
+    \begin{tabular}{@{\qquad}l}\textbf{\kern-1em machine}\ #1\\ }{
+    \\ \textbf{\kern-1em end} \end{tabular} }
+\newcommand{\machineInit}{\\ \textbf{\kern-1em init} \\}
+\newcommand{\machineOps}{\\ \textbf{\kern-1em ops} \\}
+
+\begin{document}
+This is the BirthdayBook specification, from 
+Spivey~\cite{spivey:z-notation2}.  We extend it slightly
+by adding an extra operation, $RemindOne$, that is non-deterministic.
+
+─ section birthdaybook_unfolded parents standard_toolkit └ 
+
+
+─ NAME == 1 .. 5 └ 
+─ DATE == 10 .. 15 └ 
+
+The $BirthdayBook$ schema defines the \emph{state space} of 
+the birthday book system. 
+
+┌ BirthdayBook 
+known : ℙ NAME 
+birthday : NAME ⇸ DATE |
+ known = dom birthday └ 
+
+This $InitBirthdayBook$ specifies the initial state
+of the birthday book system.  It does not say explicitly that
+$birthday'$ is empty, but that is implicit, because its domain
+is empty.
+
+┌ InitBirthdayBook 
+known′ : ℙ NAME 
+birthday′ : NAME ⇸ DATE |
+ known′ = dom birthday′ 
+known′ = { } └ 
+
+Next we have several operation schemas to define the normal (non-error)
+behaviour of the system.
+
+┌ AddBirthday 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+date? : DATE |
+ known = dom birthday 
+known′ = dom birthday′ 
+name? ∉ known 
+birthday′ = birthday ∪ { name? ↦ date? } └ 
+
+┌ FindBirthday 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+date! : DATE |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+name? ∈ known 
+date! = birthday ( name? ) └ 
+
+┌ Remind 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+today? : DATE 
+cards! : ℙ NAME |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+cards! = { n : known | birthday ( n ) = today? } └ 
+
+This $RemindOne$ schema does not appear in Spivey, but is
+included to show how non-deterministic schemas can be animated.
+It reminds us of just one person who has a birthday on the given 
+day.
+┌ RemindOne 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+today? : DATE 
+card! : NAME |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+card! ∈ known 
+birthday card! = today? └ 
+
+
+Now we strengthen the specification by adding error handling.
+
+─ REPORT ::= ok | already_known | not_known └ 
+
+First we define auxiliary schemas that capture various success
+and error cases.
+
+┌ Success 
+result! : REPORT |
+ result! = ok └ 
+
+┌ AlreadyKnown 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+result! : REPORT |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+name? ∈ known 
+result! = already_known └ 
+
+
+┌ NotKnown 
+known , known′ : ℙ NAME 
+birthday , birthday′ : NAME ⇸ DATE 
+name? : NAME 
+result! : REPORT |
+ known = dom birthday 
+known′ = dom birthday′ 
+known′ = known 
+birthday′ = birthday 
+name? ∉ known 
+result! = not_known └ 
+
+Finally, we define robust versions of all the operations
+by specifying how errors are handled.  
+For illustration purposes, we leave the $RemindOne$ operation non-robust.
+
+─ RAddBirthday == ( AddBirthday ∧ Success ) ∨ AlreadyKnown └ ─ RFindBirthday == ( FindBirthday ∧ Success ) ∨ NotKnown └ ─ RRemind == Remind ∧ Success └ 
+
+Finally, we can (optionally) define an explicit state machine,
+by identifying the state and initialisation schemas and the
+operations.  This is not necessary for the animator, but is
+useful to make the roles of the various schemas explicit, rather
+than relying on informal naming conventions.  
+This \emph{machine} construct is a Java-specific extension of Z
+and will be ignored by other Z tools (because they do not
+recognise the \verb!\begin{machine}..\end{machine}! \LaTeX environment.
+
+Jaza uses this construct for translating the machine into the B
+specification language or other similar languages and (in the future) for
+constructing GUI animation interface for the machine.
+
+
+\begin{machine}{BirthdayBook}
+  BirthdayBook
+\machineInit
+  InitBirthdayBook
+\machineOps
+    RAddBirthday; 
+    RFindBirthday;
+    RRemind;
+    RemindOne
+\end{machine}
+
+  
+Here is an alternative style of defining a machine -- as a
+schema with fields named $state$ and $init$, plus other
+fields for the operations of the machine.  
+Advantages of this approach include:
+\begin{enumerate}
+
+\item This \emph{machine} construct is a standard Z schema, 
+  so all the usual Z operators can be used to construct machines, 
+  add and hide operations etc.  
+
+\item The operation names are local to this schema rather than global, 
+  so short, non-qualified names can be used.  Furthermore, several
+  machines can have the same operation name.
+
+\item Other (non-schema) fields inside the machine can represent
+  global constants of the machine, and the invariant can be used
+  to constrain these constants.
+
+\item A generic schema can represent a parameterised machine.  
+\end{enumerate}
+
+Disadvantages: 
+\begin{enumerate}
+\item The machine name cannot be the same as its state schema.  
+\item Some restrictions are probably necessary on the invariant
+  of the machine, because it is difficult to see what should be
+  the meaning of a predicate that constrains two of the operations.
+  (This has no obvious translation into B.  It is not expressive
+  enough to act as a history invariant.)
+\end{enumerate}
+
+┌ BBook 
+state : BirthdayBook 
+init : InitBirthdayBook 
+add : RAddBirthday 
+find : RFindBirthday 
+remind : RRemind 
+remind1 : RemindOne └ 
+
+
+\bibliography{spec}
+\begin{thebibliography}{1}
+\bibitem{spivey:z-notation2}
+J.~Michael Spivey.
+\newblock {\em The Z Notation: A Reference Manual}.
+\newblock International Series in Computer Science. Prentice-Hall International
+  (UK) Ltd, second edition, 1992.
+\end{thebibliography}
+\end{document}
+
