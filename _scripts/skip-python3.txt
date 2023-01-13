@@ -84,6 +84,8 @@ sparql
 sql/hive/v2
 sql/hive/v3
 sql/mariadb
+sql/mysql
+sql/plsql
 sql/postgresql
 sql/sqlite
 sql/tsql
