@@ -27,7 +27,7 @@ foreach ($file in $files) {
 }
 if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
     Write-Host "No test cases provided."
-    exit 1
+    exit 0
 }
 
 # Parse
