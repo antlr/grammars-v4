@@ -18,6 +18,11 @@ foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
     } elseif ($ext -eq ".tree") {
         continue
     } else {
+        $(& triconv -f utf-8 $file ; $last = $LASTEXITCODE ) | out-null
+        if ($last -ne 0)
+        {
+            continue
+        }
         $files.Add($item)
         Write-Host "Test case: $item"
     }
