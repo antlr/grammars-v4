@@ -15,14 +15,21 @@ fi
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
-JAR="<antlr_tool_path>"
-CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
-
-files=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+files=()
+for f in $files2
+do
+	triconv -f utf-8 $f > /dev/null 2>&1
+    if [ "$?" = "0" ]
+    then
+        files+=( $f )
+    fi
+done
 
 # Parse
-echo "$files" | trwdog python3 Test.py -x -tee -tree
+echo "${files[*]}" | trwdog python3 Test.py -x -tee -tree
 status=$?
+
 # trwdog returns 255 if it cannot spawn the process.
 if [ "$status" = "255" ]
 then
