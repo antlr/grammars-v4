@@ -1,4 +1,4 @@
-# Template generated code from trgen <version>
+# Generated from trgen <version>
 
 $TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $TestDirectory"
@@ -92,7 +92,7 @@ if ( $updated -eq 1 ) {
     exit 1
 }
 
-if ( $new_errors_txt.Count > 0 ) {
+if ( $new_errors_txt.Count -gt 0 ) {
     Write-Host "New errors in output."
     Write-Host "Test failed."
     exit 1

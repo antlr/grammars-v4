@@ -1,4 +1,4 @@
-# Template generated code from trgen <version>
+# Generated from trgen <version>
 
 if [ ! -d ../<example_files_unix> ]
 then

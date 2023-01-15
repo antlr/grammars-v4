@@ -1,4 +1,4 @@
-# Template generated code from trgen <version>
+# Generated from trgen <version>
 
 $TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $TestDirectory"

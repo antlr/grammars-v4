@@ -1,4 +1,5 @@
 \<?php
+// Generated from trgen <version>
 
 require_once 'vendor/autoload.php';
 <tool_grammar_tuples:{x | require_once './<x.GeneratedFileName>';

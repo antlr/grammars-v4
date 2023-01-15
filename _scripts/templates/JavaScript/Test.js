@@ -1,4 +1,4 @@
-// Template generated code from trgen <version>
+// Generated from trgen <version>
 
 import antlr4 from 'antlr4';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';

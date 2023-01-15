@@ -1,4 +1,4 @@
-// Template generated code from trgen <version>
+// Generated from trgen <version>
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

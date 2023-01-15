@@ -1,4 +1,4 @@
-# Template generated code from trgen <version>
+# Generated from trgen <version>
 function rmrf([string]$Path) {
     try {
         Remove-Item -Recurse -ErrorAction:Stop $Path
@@ -6,6 +6,10 @@ function rmrf([string]$Path) {
         # Ignore
         $Error.Clear()
     }
+}
+
+if (Test-Path -Path transformGrammar.py -PathType Leaf) {
+    $(& python3 transformGrammar.py ) 2>&1 | Write-Host
 }
 
 rmrf('build')

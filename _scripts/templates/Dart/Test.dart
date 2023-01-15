@@ -1,4 +1,4 @@
-// Template generated code from trgen <version>
+// Generated from trgen <version>
 
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';

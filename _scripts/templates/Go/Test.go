@@ -1,4 +1,4 @@
-// Template generated code from trgen <version>
+// Generated from trgen <version>
 
 package main
 import (

@@ -1,4 +1,4 @@
-// Template generated code from trgen <version>
+// Generated from trgen <version>
 
 import org.antlr.v4.runtime.*;
 import java.nio.charset.StandardCharsets;

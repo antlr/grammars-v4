@@ -1,25 +1,10 @@
-# Template generated code from trgen <version>
-JAR = <antlr_tool_path>
-CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
-.SUFFIXES: .g4 .php
-ANTLRGRAMMARS ?= $(wildcard *.g4)
-GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
-SOURCES = $(GENERATED) Test.php
-default: setup classes
-setup:
-	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
-	composer install
-classes: $(SOURCES)
+# Generated from trgen <version>
+default:
+	bash build.sh
 clean:
-	rm -f *.interp
-	rm -f *.tokens
-	rm -rf vendor
-	rm -f composer.lock
-	rm -f $(GENERATED)
+	bash clean.sh
 run:
 	@trwdog php -d memory_limit=1G Test.php $(RUNARGS)
-<tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=PHP <antlr_tool_args:{y | <y> } > $\<
-} >
-test:
+FORCE: ;
+test: FORCE
 	bash test.sh
