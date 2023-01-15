@@ -166,10 +166,10 @@ setupdeps()
     if [ $? != "0" ]
     then
         echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.19.0-alpha7
-        dotnet tool install -g triconv --version 0.19.0-alpha7
-        dotnet tool install -g trxml2 --version 0.19.0-alpha7
-        dotnet tool install -g trwdog --version 0.19.0-alpha7
+        dotnet tool install -g trgen --version 0.19.0
+        dotnet tool install -g triconv --version 0.19.0
+        dotnet tool install -g trxml2 --version 0.19.0
+        dotnet tool install -g trwdog --version 0.19.0
 	case "${unameOut}" in
 		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
 		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
