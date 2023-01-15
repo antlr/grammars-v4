@@ -15,10 +15,10 @@ type CustomErrorListener struct {
     errors int
     quiet bool
     tee bool
-    output io.Writer
+    output *os.File
 }
 
-func NewCustomErrorListener(q bool, t bool, o io.Writer) *CustomErrorListener {
+func NewCustomErrorListener(q bool, t bool, o *os.File) *CustomErrorListener {
     p := new(CustomErrorListener)
     p.errors = 0
     p.quiet = q
@@ -31,8 +31,13 @@ func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offending
     l.errors += 1
     if ! l.quiet {
         if l.tee {
-            fmt.Fprintf(l.output, "line %d:%d %s", line, column, msg)
-            fmt.Fprintln(l.output)
+            l.output.WriteString("line ")
+            l.output.WriteString(strconv.Itoa(line))
+            l.output.WriteString(":")
+            l.output.WriteString(strconv.Itoa(column))
+            l.output.WriteString(" ")
+            l.output.WriteString(msg)
+            l.output.WriteString("\n")
         }
         fmt.Fprintf(os.Stderr, "line %d:%d %s", line, column, msg)
         fmt.Fprintln(os.Stderr)
@@ -164,14 +169,10 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
     var parser = <go_parser_name>(tokens)
 
     var (
-        output io.Writer
+        output *os.File
     )
     if tee {
-        f, _ := os.Create(input_name + ".errors")
-        defer f.Close()
-        output = bufio.NewWriter(f)
-    } else {
-        output = os.Stderr
+        output, _ = os.Create(input_name + ".errors")
     }
 
     lexerErrors := NewCustomErrorListener(quiet, tee, output)
@@ -201,13 +202,14 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         ss := tree.ToStringTree(parser.RuleNames, parser)
         if tee {
             f, _ := os.Create(input_name + ".tree")
-            defer f.Close()
-            w := bufio.NewWriter(f)
-            fmt.Fprint(w, ss)
-            w.Flush()
+            f.Write([]byte(ss))
+            f.Close()
         } else {
             fmt.Fprintf(os.Stderr, "%s", ss)
         }
+    }
+    if tee {
+        output.Close()
     }
     if ! quiet {
         fmt.Fprintf(os.Stderr, "%s", prefix)

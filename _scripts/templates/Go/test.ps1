@@ -36,7 +36,7 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse
-$(& get-content "tests.txt" | trwdog ./Test.exe -x -tee -tree ; $status = $LASTEXITCODE ) | Write-Host
+$(& get-content "tests.txt" | trwdog ./<if(os_win)>Test.exe<else>Test<endif> -x -tee -tree ; $status = $LASTEXITCODE ) | Write-Host
 
 # trwdog returns 255 if it cannot spawn the process.
 if ( $status -eq 255 ) {
