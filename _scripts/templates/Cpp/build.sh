@@ -5,5 +5,5 @@ rm -rf build
 mkdir build
 cd build
 cmake .. <cmake_target>
-<if(os_win)>cmake --build . --config Release<else>$(MAKE)<endif>
+<if(os_win)>cmake --build . --config Release<else>make<endif>
 exit 0
