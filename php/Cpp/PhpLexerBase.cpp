@@ -3,7 +3,7 @@
 #include "PhpLexer.h"
 #include "ystd.hpp"
 
-using namespace antlr4php;
+using namespace antlr4;
 
 using namespace std::string_view_literals;
 
@@ -65,9 +65,7 @@ std::unique_ptr<antlr4::Token> PhpLexerBase::nextToken()
             {
                 auto text = token->getText();
                 text.erase(0, 3);
-                ystd::trim(text);
-                ystd::replace(text, "\'", "");
-                _heredocIdentifier = std::move(text); // token.Text.Substring(3).Trim().Trim('\'');
+                _heredocIdentifier = std::move(ystd::replace(ystd::trim(text), "\'"sv, ""sv)); // token.Text.Substring(3).Trim().Trim('\'');
                 break;
             }
 
@@ -78,7 +76,7 @@ std::unique_ptr<antlr4::Token> PhpLexerBase::nextToken()
                 auto text = token->getText();
                 ystd::trim(text);
                 auto heredocIdentifier = GetHeredocIdentifier(text);
-                if (ystd::ends_with(text, ";"))
+                if (ystd::ends_with(text, ";"sv))
                 {
                     token->setText(heredocIdentifier += ";\n"sv);
                     token->setType(PhpLexer::SemiColon);
