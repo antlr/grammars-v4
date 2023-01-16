@@ -16,7 +16,7 @@ compilation_unit
 
 //B.2.1 Basic concepts
 
-namespace_or_type_name 
+namespace_or_type_name
 	: (identifier type_argument_list? | qualified_alias_member) ('.' identifier type_argument_list?)*
 	;
 
@@ -40,18 +40,18 @@ tuple_element
     : type_ identifier?
     ;
 
-simple_type 
+simple_type
 	: numeric_type
 	| BOOL
 	;
 
-numeric_type 
+numeric_type
 	: integral_type
 	| floating_point_type
 	| DECIMAL
 	;
 
-integral_type 
+integral_type
 	: SBYTE
 	| BYTE
 	| SHORT
@@ -63,30 +63,33 @@ integral_type
 	| CHAR
 	;
 
-floating_point_type 
+floating_point_type
 	: FLOAT
 	| DOUBLE
 	;
 
 /** namespace_or_type_name, OBJECT, STRING */
-class_type 
+class_type
 	: namespace_or_type_name
 	| OBJECT
 	| DYNAMIC
 	| STRING
 	;
 
-type_argument_list 
+type_argument_list
 	: '<' type_ ( ',' type_)* '>'
 	;
 
 //B.2.4 Expressions
-argument_list 
+argument_list
 	: argument ( ',' argument)*
 	;
 
 argument
-	: (identifier ':')? refout=(REF | OUT | IN)? (VAR | type_)? expression
+	: (identifier ':')? refout=(REF | OUT | IN)?
+	  ( expression
+	  | (VAR | type_) expression
+	  )
 	;
 
 expression
@@ -427,7 +430,7 @@ local_function_body
     ;
 
 labeled_Statement
-	: identifier ':' statement  
+	: identifier ':' statement
 	;
 
 embedded_statement
@@ -477,7 +480,7 @@ local_variable_declaration
 	| FIXED pointer_type fixed_pointer_declarators
 	;
 
-local_variable_type 
+local_variable_type
 	: VAR
 	| type_
 	;
