@@ -2687,7 +2687,7 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? (table_type_definition | table_name) ';'?
+    : DECLARE LOCAL_ID AS? (data_type | table_type_definition | table_name) ';'?
     | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
     | DECLARE LOCAL_ID AS? xml_type_definition ';'?
     | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
@@ -4012,7 +4012,7 @@ built_in_functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/string-escape-transact-sql?view=sql-server-ver16
     | STRING_ESCAPE '(' text_=expression ',' type_=expression ')'           #STRING_ESCAPE
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' str=expression ',' from=DECIMAL ',' to=DECIMAL ',' str_with=expression ')' #STUFF
+    | STUFF '(' str=expression ',' from=expression ',' to=expression ',' str_with=expression ')' #STUFF
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver16
     | SUBSTRING '(' string_expression=expression ',' start_=expression ',' length=expression ')' #SUBSTRING
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/translate-transact-sql?view=sql-server-ver16
