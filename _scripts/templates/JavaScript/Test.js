@@ -38,9 +38,9 @@ class MyErrorListener extends antlr4.error.ErrorListener {
         this.had_error = true;
         if (! quiet) {
             if (tee) {
-                fs.writeSync(this._output, `${offendingSymbol} line ${line}, col ${column}: ${msg}\n`);
+                fs.writeSync(this._output, `line ${line}:${column} ${msg}\n`);
             }
-            console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
+            console.error(`line ${line}:${column} ${msg}`);
         }
     }
 }
