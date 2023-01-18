@@ -180,19 +180,23 @@ range_expression
 
 // https://msdn.microsoft.com/library/6a71f45d(v=vs.110).aspx
 unary_expression
-	: primary_expression
+	: cast_expression
+	| primary_expression
 	| '+' unary_expression
 	| '-' unary_expression
 	| BANG unary_expression
 	| '~' unary_expression
 	| '++' unary_expression
 	| '--' unary_expression
-	| OPEN_PARENS type_ CLOSE_PARENS unary_expression
 	| AWAIT unary_expression // C# 5
 	| '&' unary_expression
 	| '*' unary_expression
 	| '^' unary_expression // C# 8 ranges
 	;
+
+cast_expression
+    : OPEN_PARENS type_ CLOSE_PARENS unary_expression
+    ;
 
 primary_expression  // Null-conditional operators C# 6: https://msdn.microsoft.com/en-us/library/dn986595.aspx
 	: pe=primary_expression_start '!'? bracket_expression* '!'?
