@@ -1,5 +1,5 @@
 #include "TypeScriptLexerBase.h"
-
+#include "TypeScriptLexer.h"
 using namespace antlr4;
 
 TypeScriptLexerBase::TypeScriptLexerBase(CharStream *input) : Lexer(input)
