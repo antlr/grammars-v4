@@ -126,7 +126,9 @@ function main($argv) : void {
                 ParseString($inputs[$f], $f);
         }
         $duration = $timer->stop();
-        fwrite(STDERR, "Total Time: " . $duration->asSeconds() . "\n");
+        if (! $quiet) {
+            fwrite(STDERR, "Total Time: " . $duration->asSeconds() . "\n");
+        }
     }
     exit($error_code);
 }   

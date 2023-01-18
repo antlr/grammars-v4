@@ -36,11 +36,22 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse
-$(& get-content "tests.txt" | trwdog php -d memory_limit=1G Test.php -x -tee -tree ; $status = $LASTEXITCODE ) | Write-Host
+get-content "tests.txt" | trwdog php -d memory_limit=1G Test.php -q -x -tee -tree *> parse.txt
+$status = $LASTEXITCODE
+
+$file = "parse.txt"
+$size = (Get-Item -Path $file).Length
+if ( $size -eq 0 ) {
+} else {
+    Write-Host "Test failed."
+    Get-Content $file | Write-Host
+    exit 1
+}
 
 # trwdog returns 255 if it cannot spawn the process.
 if ( $status -eq 255 ) {
     Write-Host "Test failed."
+    Get-Content $file | Write-Host
     exit 1
 }
 
