@@ -33,6 +33,7 @@ javascript/ecmascript
 javascript/jsx
 javascript/typescript
 joss
+kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 kuka

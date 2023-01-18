@@ -36,7 +36,7 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse
-get-content "tests.txt" | trwdog dotnet run -q -x -shunt -tree *> parse.txt
+get-content "tests.txt" | trwdog node Test.js -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 
 $file = "parse.txt"
