@@ -29,16 +29,16 @@ func NewCustomErrorListener(q bool, t bool, o *os.File) *CustomErrorListener {
 
 func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line int, column int, msg string, e antlr.RecognitionException) {
     l.errors += 1
+    if l.tee {
+        l.output.WriteString("line ")
+        l.output.WriteString(strconv.Itoa(line))
+        l.output.WriteString(":")
+        l.output.WriteString(strconv.Itoa(column))
+        l.output.WriteString(" ")
+        l.output.WriteString(msg)
+        l.output.WriteString("\n")
+    }
     if ! l.quiet {
-        if l.tee {
-            l.output.WriteString("line ")
-            l.output.WriteString(strconv.Itoa(line))
-            l.output.WriteString(":")
-            l.output.WriteString(strconv.Itoa(column))
-            l.output.WriteString(" ")
-            l.output.WriteString(msg)
-            l.output.WriteString("\n")
-        }
         fmt.Fprintf(os.Stderr, "line %d:%d %s", line, column, msg)
         fmt.Fprintln(os.Stderr)
     }
@@ -110,8 +110,10 @@ func main() {
             }
         }
         elapsed := time.Since(start)
-        fmt.Fprintf(os.Stderr, "Total Time: %.3f s", elapsed.Seconds())
-        fmt.Fprintln(os.Stderr)
+        if ! quiet {
+            fmt.Fprintf(os.Stderr, "Total Time: %.3f s", elapsed.Seconds())
+            fmt.Fprintln(os.Stderr)
+        }
     }
     if error_code != 0 {
         os.Exit(1)

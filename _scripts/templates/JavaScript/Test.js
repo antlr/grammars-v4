@@ -36,10 +36,10 @@ class MyErrorListener extends antlr4.error.ErrorListener {
 
     syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
         this.had_error = true;
+        if (tee) {
+            fs.writeSync(this._output, `line ${line}:${column} ${msg}\n`);
+        }
         if (! quiet) {
-            if (tee) {
-                fs.writeSync(this._output, `line ${line}:${column} ${msg}\n`);
-            }
             console.error(`line ${line}:${column} ${msg}`);
         }
     }
@@ -97,6 +97,9 @@ function main() {
                     is_fns.push(true);
                 }
                 break;
+            case '-q':
+                quiet = true;
+                break;
             case '-trace':
                 show_trace = true;
                 break;
@@ -121,7 +124,7 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        console.error('Total Time: ' + t);
+        if (!quiet) console.error('Total Time: ' + t);
     }
     process.exitCode = error_code;
 }

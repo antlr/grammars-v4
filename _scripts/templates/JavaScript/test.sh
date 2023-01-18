@@ -19,7 +19,7 @@ files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tr
 files=()
 for f in $files2
 do
-	triconv -f utf-8 $f > /dev/null 2>&1
+    triconv -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
@@ -27,14 +27,23 @@ do
 done
 
 # Parse
-echo "${files[*]}" | trwdog node Test.js -x -tee -tree
+echo "${files[*]}" | trwdog node Test.js -q -x -tee -tree > parse.txt 2>&1
 status=$?
 
 # trwdog returns 255 if it cannot spawn the process.
 if [ "$status" = "255" ]
 then
-  echo "Test failed."
-  exit 1
+    echo "Test failed."
+    cat parse.txt
+    exit 1
+fi
+
+# if there's any output from the program, it's bad news, too.
+if [ -s parse.txt ]
+then
+    echo "Test failed."
+    cat parse.txt
+    exit 1
 fi
 
 # rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`
@@ -48,11 +57,11 @@ case "${unameOut}" in
 esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-  gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
-  if [ "$gen" != "" ]
-  then
-    dos2unix $gen
-  fi
+    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
+    if [ "$gen" != "" ]
+    then
+        dos2unix $gen
+    fi
 fi
 
 old=`pwd`
@@ -67,44 +76,44 @@ git ls-files --exclude-standard -o > $old/new_errors2.txt 2>&1
 new_errors=$?
 for f in `cat $old/new_errors2.txt`
 do
-  ext=${f##*.}
-  ext=".$ext"
-  if [ "$ext" = ".errors" ]
-  then  
-    if [ -s $f ]
-    then
-      echo $f >> $old/new_errors.txt
+    ext=${f##*.}
+    ext=".$ext"
+    if [ "$ext" = ".errors" ]
+    then  
+        if [ -s $f ]
+        then
+            echo $f >> $old/new_errors.txt
+        fi
     fi
-  fi
 done
 
 if [ "$updated" = "129" ]
 then
-  echo "Grammar outside a git repository. Assuming parse exit code."
-  if [ "$status" = 0 ]
-  then
-    echo "Test succeeded."
-  else
-    echo "Test failed."
-  fi
-  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-  exit $status
+    echo "Grammar outside a git repository. Assuming parse exit code."
+    if [ "$status" = 0 ]
+    then
+        echo "Test succeeded."
+    else
+        echo "Test failed."
+    fi
+    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+    exit $status
 fi
 
 if [ "$updated" = "1" ]
 then
-  echo "Difference in output."
-  echo "Test failed."
-  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-  exit 1
+    echo "Difference in output."
+    echo "Test failed."
+    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+    exit 1
 fi
 
 if [ -s $old/new_errors.txt ]
 then
-  echo "New errors in output."
-  echo "Test failed."
-  rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
-  exit 1
+    echo "New errors in output."
+    echo "Test failed."
+    rm -f $old/updated.txt $old/new_errors2.txt $old/new_errors.txt
+    exit 1
 fi
 
 echo "Test succeeded."

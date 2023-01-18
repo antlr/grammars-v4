@@ -219,7 +219,7 @@ int TryParse(std::vector\<std::string>& args)
         }
         auto after = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
-        std::cerr \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+        if (! quiet) std::cerr \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
     }
     return error_code;
 }

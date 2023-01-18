@@ -30,12 +30,12 @@ public class ErrorListener extends ConsoleErrorListener
         RecognitionException e)
     {
         had_error = true;
+        if (tee)
+        {
+            output.println("line " + line + ":" + charPositionInLine + " " + msg);
+        }
         if (! quiet)
         {
-            if (tee)
-            {
-                output.println("line " + line + ":" + charPositionInLine + " " + msg);
-            }
             stderr_utf8.println("line " + line + ":" + charPositionInLine + " " + msg);
         }
     }

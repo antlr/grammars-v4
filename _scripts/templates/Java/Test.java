@@ -110,7 +110,7 @@ public class Test {
             }
             Instant finish = Instant.now();
             long timeElapsed = Duration.between(start, finish).toMillis();
-            System.err.println("Total Time: " + (timeElapsed * 1.0) / 1000.0);
+            if (!quiet) System.err.println("Total Time: " + (timeElapsed * 1.0) / 1000.0);
         }
         java.lang.System.exit(error_code);
     }

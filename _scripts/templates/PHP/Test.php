@@ -53,10 +53,10 @@ class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/
         ?RecognitionException $e
     ) : void {
         $this->had_error = true;
+        if ($this->tee) {
+            fwrite($this->output, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
+        }
         if (! $this->quiet) {
-            if ($this->tee) {
-                fwrite($this->output, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
-            }
             fwrite(STDERR, sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
         }
     }
@@ -103,6 +103,8 @@ function main($argv) : void {
                 array_push($inputs, $f);
                 array_push($is_fns, true);
             }
+        } else if ($argv[$i] == "-q") {
+            $quiet = true;
         } else if ($argv[$i] == "-trace") {
             $show_trace = true;
         } else {
@@ -212,7 +214,9 @@ function DoParse($str, $input_name, $row_number) {
             fwrite(STDERR, $tree->toStringTree($parser->getRuleNames()));
         }
     }
-    fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $duration->asSeconds() . "\n");
+    if ( ! $quiet ) {
+        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $duration->asSeconds() . "\n");
+    }
     if ( $tee ) {
         fclose($output);
     }

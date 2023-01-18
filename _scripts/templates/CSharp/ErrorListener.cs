@@ -27,12 +27,12 @@ public class ErrorListener\<S> : IAntlrErrorListener\< S>
         int col, string msg, RecognitionException e)
     {
         had_error = true;
+        if (_tee)
+        {
+            _out.WriteLine("line " + line + ":" + col + " " + msg);
+        }
         if (!_quiet)
         {
-            if (_tee)
-            {
-                _out.WriteLine("line " + line + ":" + col + " " + msg);
-            }
             System.Console.Error.WriteLine("line " + line + ":" + col + " " + msg);
         }
     }

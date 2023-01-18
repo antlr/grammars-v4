@@ -30,12 +30,12 @@ class MyErrorListener extends BaseErrorListener
         RecognitionException? e,
     ) {
         had_error = true;
+        if (_tee)
+        {
+            _output.writeln('line $line:$charPositionInLine $msg');
+        }
         if (!_quiet)
         {
-            if (_tee)
-            {
-                _output.writeln('line $line:$charPositionInLine $msg');
-            }
             stderr.writeln('line $line:$charPositionInLine $msg');
         }
     }

@@ -56,6 +56,10 @@ void main(List\<String> args) async {
                 is_fns.add(true);
             }
         }
+        else if (args[i] == "-q")
+        {
+            quiet = true;
+        }
         else if (args[i] == "-trace")
         {
             show_trace = true;
@@ -83,7 +87,7 @@ void main(List\<String> args) async {
         }
         s.stop();
         var et = s.elapsedMilliseconds / 1000.0;
-        stderr.writeln("Total Time: " + et.toString());
+        if (!quiet) stderr.writeln("Total Time: " + et.toString());
     }
     exit(error_code);
 }

@@ -27,7 +27,7 @@ do
 done
 
 # Parse
-echo "${files[*]}" | trwdog php -d memory_limit=1G Test.php -x -tee -tree
+echo "${files[*]}" | trwdog php -d memory_limit=1G Test.php -q -x -tee -tree
 status=$?
 
 # trwdog returns 255 if it cannot spawn the process.

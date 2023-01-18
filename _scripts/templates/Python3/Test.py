@@ -25,9 +25,9 @@ class MyErrorListener(ErrorListener):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.had_error = True
+        if ( self.tee ):
+            self.output.write(f"line {line}:{column} {msg}\n");
         if (not self.quiet):
-            if ( self.tee ):
-                self.output.write(f"line {line}:{column} {msg}\n");
             print(f"line {line}:{column} {msg}", file=sys.stderr);
 
 tee = False
@@ -77,6 +77,8 @@ def main(argv):
                 f = f.strip()
                 inputs.append(f)
                 is_fns.append(True)
+        elif arg in ("-q"):
+            quiet = True
         elif arg in ("-trace"):
             show_trace = True
         else:
@@ -95,7 +97,8 @@ def main(argv):
         end_time = datetime.now()
         diff = end_time - start_time
         diff_time = diff.total_seconds()
-        print(f'Total Time: {diff_time}', file=sys.stderr);
+        if (not quiet):
+            print(f'Total Time: {diff_time}', file=sys.stderr);
     sys.exit(error_code)
 
 def ParseStdin():
