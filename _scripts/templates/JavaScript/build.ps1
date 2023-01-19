@@ -4,7 +4,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 }
 
 <tool_grammar_tuples:{x |
-$(& java -jar <antlr_tool_path> <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& java -jar <antlr_tool_path> <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

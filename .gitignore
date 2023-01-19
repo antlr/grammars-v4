@@ -27,3 +27,8 @@
 
 # Ignore downloaded temporaries create by _scripts/get-antlr.ps1
 antlr4-*-complete.jar
+
+# Ignore untracked .errors and .tree files. If it was
+# checked in, it is tracked, and cannot be ignored.
+/**/*.errors
+/**/*.tree
