@@ -68,7 +68,7 @@ old=`pwd`
 cd ../<example_files_unix>
 
 # Check if any .errors/.tree files have changed. That's not good.
-git diff --exit-code --name-only . > $old/updated.txt 2>&1
+git diff --exit-code --name-only . --ignored > $old/updated.txt 2>&1
 updated=$?
 
 # Check if any untracked .errors files are not empty. That's also not good.

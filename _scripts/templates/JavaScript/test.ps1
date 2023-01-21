@@ -61,7 +61,7 @@ $updated = $LASTEXITCODE
 Write-Host $message
 
 # Check if any untracked .errors files are not empty. That's also not good.
-$new_errors2_txt = git ls-files --exclude-standard -o $TestDirectory
+$new_errors2_txt = git ls-files --exclude-standard -o --ignored $TestDirectory
 $new_errors = $LASTEXITCODE
 if ( ! [String]::IsNullOrWhiteSpace($new_errors2_txt) ) {
     $new_errors3_txt = $new_errors2_txt.Split("\n\r\t ")

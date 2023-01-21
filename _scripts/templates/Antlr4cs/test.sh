@@ -72,7 +72,7 @@ git diff --exit-code --name-only . > $old/updated.txt 2>&1
 updated=$?
 
 # Check if any untracked .errors files are not empty. That's also not good.
-git ls-files --exclude-standard -o > $old/new_errors2.txt 2>&1
+git ls-files --exclude-standard -o --ignored > $old/new_errors2.txt 2>&1
 new_errors=$?
 for f in `cat $old/new_errors2.txt`
 do
