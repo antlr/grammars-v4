@@ -164,6 +164,6 @@ public abstract class LexerAdaptor : Lexer
     public override void Reset()
     {
         CurrentRuleType = TokenConstants.InvalidType;
-        base.Reset();
+	base.Reset();
     }
 }
