@@ -90,6 +90,7 @@ new_errors=$?
 
 # Gather up all untracked .errors file output. These are new errors
 # and must be reported as a parse fail.
+rm -f $old/new_errors.txt
 touch $old/new_errors.txt
 for f in `cat $old/new_errors2.txt`
 do
