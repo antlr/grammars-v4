@@ -97,7 +97,7 @@ add() {
     fi
 }
 
-rm -rf `find . -name Generated -type d`
+rm -rf `find . -name 'Generated*' -type d`
 
 build()
 {
@@ -108,7 +108,7 @@ build()
     echo Building $testname
     echo ""
     # Assert(cwd is valid)
-    pushd "$x/Generated"
+    pushd "$x/Generated-$target"
     if [[ $? != "0" ]]
     then
         echo "$1 is not a valid directory"
@@ -136,14 +136,14 @@ test()
     echo Testing $testname
     echo ""
     # Assert(cwd is valid)
-    pushd "$x/Generated"
+    pushd "$x/Generated-$target"
     if [[ $? != "0" ]]
     then
         echo "$1 is not a valid directory"
         exit 1
     fi
     date1=$(date +"%s")
-    make test
+    bash test.sh
     status="$?"
     date2=$(date +"%s")
     DIFF=$(($date2-$date1))
@@ -166,9 +166,10 @@ setupdeps()
     if [ $? != "0" ]
     then
         echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.16.3
-        dotnet tool install -g trxml2 --version 0.16.3
-        dotnet tool install -g trwdog --version 0.16.3
+        dotnet tool install -g trgen --version 0.19.0
+        dotnet tool install -g triconv --version 0.19.0
+        dotnet tool install -g trxml2 --version 0.19.0
+        dotnet tool install -g trwdog --version 0.19.0
 	case "${unameOut}" in
 		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
 		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
@@ -185,7 +186,7 @@ part1()
 {
     date
     # 1) Generate driver source code from poms.
-    rm -rf `find . -name Generated -type d`
+    rm -rf `find . -name Generated-$target -type d`
     echo "Generating drivers."
     if [[ "$invert" == "" ]]
     then
@@ -208,7 +209,7 @@ part2()
     esac
     echo prefix $prefix
     echo bft $build_file_type
-    build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+    build_files=`find $prefix -type f -name $build_file_type | grep Generated-$target`
     echo bf $build_files
     for build_file in $build_files
     do
@@ -229,7 +230,7 @@ part3()
     # 3) Test generated parser on examples.
     echo "Parsing."
     date
-    build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+    build_files=`find $prefix -type f -name $build_file_type | grep Generated-$target`
     echo bf $build_files
     for build_file in $build_files
     do

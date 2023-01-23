@@ -33,6 +33,7 @@ javascript/ecmascript
 javascript/jsx
 javascript/typescript
 joss
+kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 kuka
@@ -84,6 +85,8 @@ sparql
 sql/hive/v2
 sql/hive/v3
 sql/mariadb
+sql/mysql
+sql/plsql
 sql/postgresql
 sql/sqlite
 sql/tsql
