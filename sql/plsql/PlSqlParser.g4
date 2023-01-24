@@ -6853,6 +6853,7 @@ non_reserved_keywords_pre12c
     | THREAD
     | THROUGH
     | TIME
+    | TIMING
     | TIMEOUT
     | TIMES
     | TIMESTAMP
