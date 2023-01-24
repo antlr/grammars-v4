@@ -97,6 +97,7 @@ GRANT 'db_old_ro'@'%' TO 'oghalawinji'@'%'
 GRANT FLUSH_OPTIMIZER_COSTS, FLUSH_STATUS, FLUSH_TABLES, FLUSH_USER_RESOURCES, PASSWORDLESS_USER_ADMIN ON *.* TO "@"
 REVOKE reader FROM 'mysqluser'@'localhost'
 REVOKE reader FROM topreader
+REVOKE `cloudsqlsuperuser`@`%` FROM `sarmonitoring`@`10.90.29.%`
 -- Set Role
 SET ROLE DEFAULT;
 SET ROLE 'role1', 'role2';
