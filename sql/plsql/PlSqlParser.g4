@@ -2166,25 +2166,22 @@ table_compression
     ;
 
 // avoid to match an empty string in
-//  : (INMEMORY inmemory_attributes? | NO INMEMORY)? inmemory_column_clause*
 inmemory_table_clause
-    : (INMEMORY inmemory_attributes? | NO INMEMORY)
-        | inmemory_column_clause
-        | (INMEMORY inmemory_attributes? | NO INMEMORY) inmemory_column_clause*
-   ;
+    : inmemory_column_clause+
+    | (INMEMORY inmemory_attributes? | NO INMEMORY) inmemory_column_clause*
+    ;
 
 // avoid to match an empty string in
-//    : inmemory_memcompress? inmemory_priority? inmemory_distribute? inmemory_duplicate?
 inmemory_attributes
     : inmemory_memcompress inmemory_priority? inmemory_distribute? inmemory_duplicate?
-        | inmemory_memcompress? inmemory_priority inmemory_distribute? inmemory_duplicate?
-        | inmemory_memcompress? inmemory_priority? inmemory_distribute inmemory_duplicate?
-        | inmemory_memcompress? inmemory_priority? inmemory_distribute? inmemory_duplicate
+    | inmemory_priority inmemory_distribute? inmemory_duplicate?
+    | inmemory_distribute inmemory_duplicate?
+    | inmemory_duplicate
     ;
 
 inmemory_memcompress
     : MEMCOMPRESS FOR (DML | (QUERY | CAPACITY) (LOW | HIGH)?)
-        | NO MEMCOMPRESS
+    | NO MEMCOMPRESS
     ;
 
 inmemory_priority
@@ -2193,13 +2190,13 @@ inmemory_priority
 
 inmemory_distribute
     : DISTRIBUTE
-        (AUTO | (BY ((ROWID RANGE) | PARTITION | SUBPARTITION)))?
+        (AUTO | BY (ROWID RANGE | PARTITION | SUBPARTITION))?
         (FOR SERVICE (DEFAULT | ALL | identifier | NONE))?
     ;
 
 inmemory_duplicate
     : DUPLICATE ALL?
-        | NO DUPLICATE
+    | NO DUPLICATE
     ;
 
 inmemory_column_clause
