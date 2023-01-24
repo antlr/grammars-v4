@@ -48,3 +48,6 @@ ALTER TABLE customer INMEMORY (customer_name, customer_id);
 ALTER TABLE customer INMEMORY (name) INMEMORY (customer_id);
 ALTER TABLE customer INMEMORY (name) NO INMEMORY (customer_id);
 ALTER TABLE customer INMEMORY MEMCOMPRESS FOR QUERY LOW (name) NO INMEMORY (customer_id);
+
+-- verify usage of ... as regular id
+CREATE TABLE vendor (SERVICE VARCHAR2(100));

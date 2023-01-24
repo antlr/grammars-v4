@@ -6506,6 +6506,7 @@ non_reserved_keywords_pre12c
     | SEQUENTIAL
     | SERIALIZABLE
     | SERVERERROR
+    | SERVICE
     | SESSION_CACHED_CURSORS
     | SESSION
     | SESSIONS_PER_USER
