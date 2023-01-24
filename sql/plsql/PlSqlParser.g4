@@ -4416,6 +4416,7 @@ sql_plus_command
     | START_CMD
     | whenever_command
     | set_command
+    | timing_command
     ;
 
 whenever_command
@@ -4426,6 +4427,10 @@ whenever_command
 
 set_command
     : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/numeric | regular_id)
+    ;
+
+timing_command
+    : TIMING (START timing_text=id_expression* | SHOW | STOP)?
     ;
 
 // Common
@@ -6888,6 +6893,7 @@ non_reserved_keywords_pre12c
     | THREAD
     | THROUGH
     | TIME
+    | TIMING
     | TIMEOUT
     | TIMES
     | TIMESTAMP

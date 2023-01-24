@@ -1974,6 +1974,7 @@ TIMEZONE_MINUTE:              'TIMEZONE_MINUTE';
 TIMEZONE_OFFSET:              'TIMEZONE_OFFSET';
 TIMEZONE_REGION:              'TIMEZONE_REGION';
 TIME_ZONE:                    'TIME_ZONE';
+TIMING:                       'TIMING';
 TIV_GB:                       'TIV_GB';
 TIV_SSF:                      'TIV_SSF';
 TO_ACLID:                     'TO_ACLID';
