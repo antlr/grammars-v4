@@ -149,6 +149,7 @@ other_command
     | truncate_materialized_view
     | truncate_table
     | unset
+    | call
     ;
 
 copy_into_table
@@ -1388,6 +1389,7 @@ create_command
     | create_storage_integration
     | create_stream
     | create_table
+    | create_table_as_select
     //    | create_|_alter_table_…_constraint
     | create_tag
     | create_task
@@ -2162,7 +2164,7 @@ temporary
     ;
 
 table_type
-    : ( ( LOCAL | GLOBAL ) temporary | VOLATILE ) | TRANSIENT
+    : ( ( LOCAL | GLOBAL )? temporary | VOLATILE ) | TRANSIENT
     ;
 
 with_tags
@@ -2247,6 +2249,17 @@ create_table
         comment_clause?
     ;
 
+create_table_as_select
+    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+        ('(' column_decl_item_list ')')?
+        cluster_by?
+        copy_grants?
+        with_row_access_policy?
+        with_tags?
+        comment_clause?
+        AS select_statement
+    ;
+
 create_tag
     : CREATE or_replace? TAG if_not_exists? id_ ( COMMENT EQ string )?
     | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
@@ -2274,7 +2287,7 @@ session_parameter
     | DATA_RETENTION_TIME_IN_DAYS
     | DATE_INPUT_FORMAT
     | DATE_OUTPUT_FORMAT
-    | DEFAULT_DDL_COLLATION
+    | DEFAULT_DDL_COLLATION_
     | ENABLE_INTERNAL_STAGES_PRIVATELINK
     | ENABLE_UNLOAD_PHYSICAL_TYPE_OPTIMIZATION
     | ENFORCE_SESSION_POLICY
@@ -3213,16 +3226,41 @@ string_list
 
 id_
     : ID
+    | ID2
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | data_type
+    | builtin_function
     ;
 
 keyword
     : INT
     | BIGINT
     | STAGE
+    | USER
+    | TYPE
+    | CLUSTER
+    | TEMP
+    | FUNCTION
+    | REGION
+    | ROLLUP
+    | AT_KEYWORD
+    | TIMESTAMP
     // etc
+    ;
+
+builtin_function
+    // If there is a lexer entry for a function we also need to add the token here
+    // as it otherwise will not be picked up by the id_ rule
+    : IFF
+    | SUM
+    | AVG
+    | MIN
+    | COUNT
+    | COALESCE
+    | CURRENT_TIMESTAMP
+    | CURRENT_DATE
     ;
 
 pattern
@@ -3261,6 +3299,7 @@ expr
     | function_call
     | expr COLLATE string
     | case_expression
+    | iff_expr
     | full_column_name
     | bracket_expression
     | op=('+' | '-') expr
@@ -3275,6 +3314,10 @@ expr
     | over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
+    ;
+
+iff_expr
+    : IFF '(' search_condition ',' expr ',' expr ')'
     ;
 
 json_literal
@@ -3318,7 +3361,7 @@ data_type
     | TIMESTAMP_TZ
     | STRING_
     | CHAR | CHARACTER
-    | VARCHAR
+    | VARCHAR ('(' num ')')?
     | TEXT
     | BINARY
     | VARBINARY
@@ -3596,14 +3639,14 @@ join_clause
     ;
 
 at_before
-    : AT
+    : AT_KEYWORD
       LR_BRACKET (
-        TIMESTAMP ARROW string
-        | OFFSET ARROW string
-        | STATEMENT ARROW id_
-        | STREAM ARROW string
+        TIMESTAMP ASSOC expr
+        | OFFSET ASSOC expr
+        | STATEMENT ASSOC string
+        | STREAM ASSOC string
       ) RR_BRACKET
-    | BEFORE LR_BRACKET STATEMENT ARROW id_ RR_BRACKET
+    | BEFORE LR_BRACKET STATEMENT ASSOC string RR_BRACKET
     ;
 
 end
@@ -3760,7 +3803,7 @@ group_by_clause
     ;
 
 having_clause
-    : HAVING expr
+    : HAVING search_condition
     ;
 
 qualify_clause
