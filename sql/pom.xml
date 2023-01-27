@@ -24,5 +24,6 @@
         <module>sqlite</module>
         <module>trino</module>
         <module>tsql</module>
+        <module>sybase</module>
     </modules>
 </project>
