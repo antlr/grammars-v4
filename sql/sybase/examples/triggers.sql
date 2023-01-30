@@ -11,7 +11,7 @@ AS
    EXEC msdb.dbo.sp_send_dbmail  
         @profile_name = "AdventureWorks2012 Administrator",  
         @recipients = "danw@Adventure-Works.com",  
-        @body = "Don""t forget to print a report for the sales force.",  
+        @body = "Don't forget to print a report for the sales force.",  
         @subject = "Reminder";  
 GO  
 

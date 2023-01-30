@@ -27,5 +27,5 @@ import TSqlParser;
 
 // https://help.sap.com/docs/SAP_ASE/e0d4539d39c34f52ae9ef822c2060077/ab2cd64abc2b101486cbba68f2c5a234.html
 execute_var_string
-: (LOCAL_ID | STRING | DOUBLE_QUOTED_STRING) ('+' execute_var_string)?
+: (LOCAL_ID | STRING ) ('+' execute_var_string)?
 ;
