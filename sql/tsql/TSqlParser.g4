@@ -3323,7 +3323,7 @@ table_constraint
             )
             |
             (
-                DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
+                DEFAULT constant_expr=expression FOR column=id_ (WITH VALUES)?
             )
             | check_constraint
         )
