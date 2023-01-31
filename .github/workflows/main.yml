@@ -6,27 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [11, 17 ]
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: '6.0.102'
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'zulu'
-        java-version: ${{ matrix.java }}
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
   build-csharp:
     runs-on: ubuntu-latest
     strategy:
