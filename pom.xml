@@ -262,6 +262,7 @@
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
+                <module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
