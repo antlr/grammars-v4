@@ -1,4 +1,4 @@
-\<!-- Template generated code from trgen <version> -->
+\<!-- Generated from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
     \<TargetFramework>net6.0\</TargetFramework>
@@ -13,7 +13,7 @@
 } >  \</ItemGroup>
   \<ItemGroup>
     \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.11.1" />
-    \<PackageReference Include="Antlr4BuildTasks" Version = "11.1" PrivateAssets="all" />
+    \<PackageReference Include="Antlr4BuildTasks" Version = "12.1" PrivateAssets="all" />
   \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>

@@ -1,42 +1,19 @@
-function Get-GrammarSkipList {
+function Get-GrammarSkip {
     param (
-        $Target
+        $Target,
+	$Grammar
     )
-    switch ($Target) {
-        "CSharp" {
-		$lines = Get-Content -Path _scripts\skip-csharp.txt
-		return $lines
-        }
-        "Java" {
-		$lines = Get-Content -Path _scripts\skip-java.txt
-		return $lines
-        }
-        "JavaScript" {
-		$lines = Get-Content -Path _scripts\skip-javascript.txt
-		return $lines
-        }
-        "Go" {
-		$lines = Get-Content -Path _scripts\skip-go.txt
-		return $lines
-        }
-        "Python3" {
-		$lines = Get-Content -Path _scripts\skip-python3.txt
-		return $lines
-        }
-        "Dart" {
-		$lines = Get-Content -Path _scripts\skip-dart.txt
-		return $lines
-        }
-        "PHP" {
-		$lines = Get-Content -Path _scripts\skip-php.txt
-		return $lines
-        }
-        Default {
-            #    Write-Error "Unknown target $Target"
-            #    exit 1
-        }
+    Write-Host "Target $Target Grammar $Grammar"
+    if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
+	Write-Host "skip"
+	return $True
     }
-    
+    $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
+    if ("$lines" -eq "") {
+	Write-Host "skip"
+	return $True
+    }
+    return $False
 }
 
 enum FailStage {
@@ -56,10 +33,6 @@ function Test-Grammar {
     Set-Location $Directory
 
     $failStage = [FailStage]::Success
-    $hasTest = Test-Path "./examples"
-    if ($hasTest) {
-        $testDir = Resolve-Path "./examples"
-    }
     
     $success = $true
     $start = Get-Date
@@ -71,8 +44,9 @@ function Test-Grammar {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
-    if (Test-Path 'Generated') {
-        Set-Location 'Generated'
+    $targetgenerated = "Generated-$Target"
+    if (Test-Path $targetgenerated) {
+        Set-Location $targetgenerated
     }
     else {
         $failStage = [FailStage]::CodeGeneration
@@ -94,19 +68,16 @@ function Test-Grammar {
     # build
 
     # see _scripts/templates/*/tester.psm1
-    Import-Module ./tester.psm1
+    ./build.ps1
+    $buildResult = $LASTEXITCODE
 
-    $buildResult = Build-Grammar
-
-    if (!$buildResult.Success) {
+    if ($buildResult -ne 0) {
         $failStage = [FailStage]::Compile
         Write-Host "Build failed" -ForegroundColor Red
-        Write-Host $buildResult.Message
     }
 
     Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     if ($failStage -ne [FailStage]::Success) {
-        Remove-Module tester
         Set-Location $cwd
         return @{
             Success     = $false
@@ -117,77 +88,22 @@ function Test-Grammar {
 
     # test
     $start2 = Get-Date
-    Write-Host "Testing"
-    $failedList = @()
-    if ($hasTest) {
-        $failedList = Test-GrammarTestCases -TestDirectory $testDir
-        if ($failedList.Length -gt 0) {
-            $success = $false
-            $failStage = [FailStage]::Test
-        }
+    Write-Host "--- Testing files ---"
+    ./test.ps1
+    $passed = $LASTEXITCODE -eq 0
+
+    if (! $passed) {
+        $success = $false
+        $failStage = [FailStage]::Test
     }
 
     Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
-    Remove-Module tester
     Set-Location $cwd
     return @{
         Success     = $success
         Stage       = $failStage
         FailedCases = $failedList
     }
-}
-
-function Test-GrammarTestCases {
-    param (
-        $TestDirectory
-    )
-    $failedList = @()
-    Write-Host "Test cases here: $TestDirectory"
-    foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-
-        Write-Host "Test case: $item"
-
-        $case = $item.fullname
-        $ext = $item.Extension
-        if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
-            continue
-        }
-        if (Test-Path $case -PathType Container) {
-            continue
-        }
-
-        $errorFile = "$case.errors"
-        $shouldFail = Test-Path $errorFile
-        if (!$shouldFail) {
-            $errorFile = ""
-        }
-        $treeFile = "$case.tree"
-        Write-Host "--- Testing file $item ---"
-        $parseOk, $treeMatch = Test-Case -InputFile $case -ErrorFile $errorFile -TreeFile $treeFile
-
-        if (!$parseOk) {
-            if ($shouldFail) {
-                Write-Host "Test case should return error"
-                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
-                $failedList += $case
-                continue
-            }
-            else { 
-                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
-                $failedList += $case
-                continue
-            }
-        }
-        if (Test-Path $treeFile) {
-			if ($treeMatch) {
-				Write-Host "Parse tree match succeeded"
-			} else {
-				Write-Host "$TestDirectory test $case parse tree match failed" -ForegroundColor Red
-				$failedList += $case
-			}
-        }
-    }
-    return $failedList
 }
 
 function Get-Grammars {
@@ -295,15 +211,9 @@ function Get-GrammarsNeedsTest {
     else {
         $allGrammars = Get-ChangedGrammars -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit
     }
-    $skip = Get-GrammarSkipList -Target $Target | Resolve-Path -Relative
     $grammars = @()
     foreach ($g in $allGrammars | Resolve-Path -Relative) {
-        $shouldSkip = $false
-        foreach ($s in $skip) {
-            if ($s -eq $g) {
-                $shouldSkip = $true
-            }
-        }
+        $shouldSkip = Get-GrammarSkip -Target $Target -Grammar $g
         if (!$shouldSkip) {
             $grammars += $g
         }
