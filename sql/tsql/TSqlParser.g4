@@ -4619,10 +4619,6 @@ null_notnull
     : NOT? NULL_
     ;
 
-null_or_default
-    :(null_notnull | DEFAULT constant_expression (COLLATE id_)? (WITH VALUES)?)
-    ;
-
 scalar_function_name
     : func_proc_name_server_database_schema
     | RIGHT
