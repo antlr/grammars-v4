@@ -1268,9 +1268,9 @@ relationalExpression
 
 shiftExpression
 	:	additiveExpression
-	|	shiftExpression '<' '<' additiveExpression
-	|	shiftExpression '>' '>' additiveExpression
-	|	shiftExpression '>' '>' '>' additiveExpression
+	|	shiftExpression '<<' additiveExpression
+	|	shiftExpression '>>' additiveExpression
+	|	shiftExpression '>>>' additiveExpression
 	;
 
 additiveExpression

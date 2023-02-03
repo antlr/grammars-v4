@@ -426,6 +426,9 @@ BITAND : '&';
 BITOR : '|';
 CARET : '^';
 MOD : '%';
+LSHIFT : '<<';
+RSHIFT : '>>';
+URSHIFT : '>>>';
 ARROW : '->';
 COLONCOLON : '::';
 
