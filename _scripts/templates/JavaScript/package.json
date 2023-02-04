@@ -2,7 +2,7 @@
   "name": "i",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "Test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "antlr4": "^4.11.0",
-    "fs-extra": "^11.0.0",
+    "fs-extra": "^10.1.0",
+    "timer-node": "^5.0.6",
     "typescript-string-operations": "^1.4.1"
   },
   "type": "module"

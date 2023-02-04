@@ -6,27 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [11, 17 ]
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: '6.0.102'
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'zulu'
-        java-version: ${{ matrix.java }}
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
   build-csharp:
     runs-on: ubuntu-latest
     strategy:
@@ -121,8 +100,9 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.16.3
-        dotnet tool install -g trwdog --version 0.16.3
+        dotnet tool install -g trgen --version 0.19.0
+        dotnet tool install -g triconv --version 0.19.0
+        dotnet tool install -g trwdog --version 0.19.0
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
