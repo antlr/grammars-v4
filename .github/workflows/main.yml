@@ -6,26 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build-csharp:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: '6.0.102'
-    - name: Do not trust Dotnet env
-      run: |
-        dotnet --version
-        dotnet --info
-        dotnet --list-runtimes
-        dotnet --list-sdks
-    - name: Test C# target
-      run: |
-        bash _scripts/regtest.sh CSharp
-
   build-pwsh:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -38,7 +18,6 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-
     - name: Install Dotnet
       uses: actions/setup-dotnet@v3.0.3
       with:
@@ -98,15 +77,16 @@ jobs:
       run: |
         $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-    - name: Install trgen
+    - name: Update paths
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.19.2
-        dotnet tool install -g triconv --version 0.19.2
-        dotnet tool install -g trwdog --version 0.19.2
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
+    - name: Install trgen
+      shell: bash
+      run: |
+        for i in trgen triconv trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
     - name: Test
       shell: pwsh
       run: |
@@ -195,9 +175,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        dotnet tool install -g trgen --version 0.19.2
-        dotnet tool install -g triconv --version 0.19.2
-        dotnet tool install -g trwdog --version 0.19.2
+        for i in trgen triconv trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
     - name: Test
       shell: bash
       run: |
@@ -209,79 +187,3 @@ jobs:
             After="${{github.event.after}}"
         fi
         bash _scripts/test.sh -t ${{matrix.language}} -f diff $Before $After
-
-  build-cpp:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Install Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'zulu'
-    - name: Do not trust Java env
-      run: |
-        dotnet --version
-        java --version
-        javac --version
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: '6.0.102'
-    - name: Do not trust Dotnet env
-      run: |
-        dotnet --version
-        dotnet --info
-        dotnet --list-runtimes
-        dotnet --list-sdks
-    - name: Setup Cpp
-      run: |
-         sudo apt update
-         sudo apt install gcc-10 g++-10
-      shell: bash
-    - name: Test Cpp target
-      run: |
-        bash _scripts/regtest.sh Cpp
-      env:
-        CC:   gcc-10
-        CXX:  g++-10
-
-  build-php:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Install Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'zulu'
-    - name: Do not trust Java env
-      run: |
-        dotnet --version
-        java --version
-        javac --version
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: '6.0.102'
-    - name: Do not trust Dotnet env
-      run: |
-        dotnet --version
-        dotnet --info
-        dotnet --list-runtimes
-        dotnet --list-sdks
-    - name: Setup PHP
-      uses: nanasess/setup-php@master
-      with:
-        php-version: '8.0'
-    - name: Test PHP target
-      run: |
-        bash _scripts/test.sh -t PHP
