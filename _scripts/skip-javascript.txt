@@ -35,6 +35,7 @@ r
 rego
 rexx
 rust
+scss
 sql/hive/v2
 sql/hive/v3
 sql/mariadb
