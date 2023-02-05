@@ -4037,7 +4037,7 @@ length
     ;
 
 rep_type
-    : (SMALLINT | INTEGER | INT | BIGINT)
+    : (SMALLINT | INTEGER_ | INT | BIGINT)
     | (DECIMAL | DEC | NUMERIC | NUM) ('(' integer (',' integer)? ')')?
     | DECFLOAT ('(' integer ')')?
     | char_character integer_paren? for_bit_data?

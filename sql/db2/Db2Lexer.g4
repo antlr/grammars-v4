@@ -396,7 +396,7 @@ INSERT                              : 'INSERT';
 INSERTIN                            : 'INSERTIN';
 INSTANTIABLE                        : 'INSTANTIABLE';
 INT                                 : 'INT';
-INTEGER                             : 'INTEGER';
+INTEGER_                            : 'INTEGER';
 INTEGRITY                           : 'INTEGRITY';
 INTERACTIVE                         : 'INTERACTIVE';
 INTERARRIVALTIME                    : 'INTERARRIVALTIME';
