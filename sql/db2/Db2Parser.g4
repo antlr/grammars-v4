@@ -825,7 +825,7 @@ alter_server_opts
     ;
 
 alter_service_class
-    : ALTER SERVICE CLASS service_class_name (UNDER service_superclass_name)?
+    : ALTER SERVICE CLASS_ service_class_name (UNDER service_superclass_name)?
         alter_service_class_opts+
     ;
 
@@ -1253,7 +1253,7 @@ work_action_alteration
     ;
 
 work_action_alteration_opts
-    : SET WORK CLASS work_class_name
+    : SET WORK CLASS_ work_class_name
     | alter_action_types_clause
     | ACTIVITY (LIFETIME | QUEUETIME | EXECUTETIME | ESTIMATEDCOST | INTERARRIVALTIME) HISTOGRAM TEMPLATE template_name
     | enable_disable
@@ -1280,17 +1280,17 @@ threshold_predicate_clause
     ;
 
 alter_work_class_set
-    : ALTER WORK CLASS SET work_class_set_name alter_work_class_set_opts+
+    : ALTER WORK CLASS_ SET work_class_set_name alter_work_class_set_opts+
     ;
 
 alter_work_class_set_opts
     : ADD work_class_definition
     | ALTER work_class_alteration
-    | DROP (WORK CLASS)? work_class_name
+    | DROP (WORK CLASS_)? work_class_name
     ;
 
 work_class_alteration
-    : (WORK CLASS)? work_class_name work_class_alteration_opts+
+    : (WORK CLASS_)? work_class_name work_class_alteration_opts+
     ;
 
 work_class_alteration_opts
@@ -1322,7 +1322,7 @@ alter_workload_opts_item
     | allow_disallow DB ACCESS
     | enable_disable
     | MAXIMUM DEGREE (DEFAULT | degree)
-    | SERVICE CLASS service_class_name (UNDER service_superclass_name)?
+    | SERVICE CLASS_ service_class_name (UNDER service_superclass_name)?
     | POSITION (CRITICAL | HIGH | MEDIUM | LOW)
     | COLLECT ACTIVITY DATA (alter_collect_activity_data_clause | NONE)
     | COLLECT ACTIVITY METRICS DATA extended_base_none?
@@ -1595,7 +1595,7 @@ drop_command
            | VIEW view_name
            | VIEW HIERARCHY root_view_name
            | WORK ACTION SET work_action_set_name
-           | WORK CLASS SET work_class_set_name
+           | WORK CLASS_ SET work_class_set_name
            | WORKLOAD workload_name
            | WRAPPER wrapper_name
            | XSROBJECT xsrobject_name
@@ -1607,7 +1607,7 @@ alias_designator
     ;
 
 service_class_designator
-    : SERVICE CLASS service_class_name (UNDER service_superclass_name)?
+    : SERVICE CLASS_ service_class_name (UNDER service_superclass_name)?
     ;
 
 tablespace_name_list
@@ -1740,7 +1740,7 @@ comment_objects
     | USAGE LIST usage_list_name
     | VARIABLE variable_name
     | WORK ACTION SET work_action_set_name
-    | WORK CLASS SET work_class_set_name
+    | WORK CLASS_ SET work_class_set_name
     | WORKLOAD workload_name
     | WRAPPER wrapper_name
     | XSROBJECT xsrobject_name
@@ -3243,7 +3243,7 @@ create_sequence_opts_item
     ;
 
 create_service_class
-    : CREATE SERVICE CLASS service_class_name (UNDER service_superclass_name)?
+    : CREATE SERVICE CLASS_ service_class_name (UNDER service_superclass_name)?
         (FOR WORKLOAD TYPE (CUSTOM | BATCH | INTERACTIVE | MIXED))?
         ( soft_hard? RESOURCE SHARES integer_constant )?
         ( soft_hard? CPU SHARES integer_constant )?
@@ -3720,7 +3720,7 @@ create_threshold
 
 threshold_domain
     : DATABASE
-    | SERVICE CLASS service_class_name (UNDER service_class_name)?
+    | SERVICE CLASS_ service_class_name (UNDER service_class_name)?
     | STATEMENT (TEXT statement_text | REFERENCE executable_id)
     | WORKLOAD workload_name
     ;
@@ -4560,8 +4560,8 @@ under_clause
     ;
 
 create_work_action_set
-    : CREATE WORK ACTION SET work_action_set_name FOR (DATABASE | SERVICE CLASS service_superclass_name | WORKLOAD workload_name)
-        USING WORK CLASS SET work_class_set_name (work_action_definition_list_paren)?
+    : CREATE WORK ACTION SET work_action_set_name FOR (DATABASE | SERVICE CLASS_ service_superclass_name | WORKLOAD workload_name)
+        USING WORK CLASS_ SET work_class_set_name (work_action_definition_list_paren)?
     ;
 
 work_action_definition_list_paren
@@ -4573,7 +4573,7 @@ work_action_definition_list
     ;
 
 work_action_definition
-    : WORK ACTION work_action_name ON WORK CLASS work_class_name action_types_clause histogram_templace_clause* enable_disable?
+    : WORK ACTION work_action_name ON WORK CLASS_ work_class_name action_types_clause histogram_templace_clause* enable_disable?
     ;
 
 action_types_clause
@@ -4632,7 +4632,7 @@ histogram_templace_clause
     ;
 
 create_work_class_set
-    : CREATE WORK CLASS SET work_class_set_name work_class_definition_list_paren?
+    : CREATE WORK CLASS_ SET work_class_set_name work_class_definition_list_paren?
     ;
 
 work_class_definition_list_paren
@@ -4644,7 +4644,7 @@ work_class_definition_list
     ;
 
 work_class_definition
-    : (WORK CLASS)? work_class_name work_attributes position_clause
+    : (WORK CLASS_)? work_class_name work_attributes position_clause
     ;
 
 work_attributes
@@ -4731,7 +4731,7 @@ string_list_paren
 
 workload_attributes
     : enable_disable? (allow_disallow DB ACCESS)? (MAXIMUM DEGREE (DEFAULT | degree) )?
-        ( SERVICE CLASS (SYSDEFAULTUSERCLASS | service_class_name (UNDER service_superclass_name)? ) )?
+        ( SERVICE CLASS_ (SYSDEFAULTUSERCLASS | service_class_name (UNDER service_superclass_name)? ) )?
     ;
 
 degree

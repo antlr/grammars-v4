@@ -135,7 +135,7 @@ CHAR                                : 'CHAR';
 CHARACTER                           : 'CHARACTER';
 CHECK                               : 'CHECK';
 CHECKING                            : 'CHECKING';
-CLASS                               : 'CLASS';
+CLASS_                              : 'CLASS';
 CLIENT_ACCTNG                       : 'CLIENT_ACCTNG';
 CLIENT_APPLNAME                     : 'CLIENT_APPLNAME';
 CLIENT_USERID                       : 'CLIENT_USERID';
