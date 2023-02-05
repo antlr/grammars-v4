@@ -543,7 +543,7 @@ OVER                                : 'OVER';
 OVERFLOW                            : 'OVERFLOW';
 OVERHEAD                            : 'OVERHEAD';
 OVERLAPS                            : 'OVERLAPS';
-OVERRIDE                            : 'OVERRIDE';
+OVERRIDE_                           : 'OVERRIDE';
 OVERRIDING                          : 'OVERRIDING';
 OWNERSHIP                           : 'OWNERSHIP';
 PACKAGE                             : 'PACKAGE';

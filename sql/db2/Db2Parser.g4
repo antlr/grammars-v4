@@ -794,7 +794,7 @@ alter_security_policy
 
 alter_security_policy_opts
     : ADD SECURITY LABEL COMPONENT component_name
-    | (OVERRIDE | RESTRICT) NOT AUTHORIZED WRITE SECURITY LABEL
+    | (OVERRIDE_ | RESTRICT) NOT AUTHORIZED WRITE SECURITY LABEL
     | (USE | IGNORE) (GROUP | ROLE) AUTHORIZATIONS
     ;
 
@@ -3220,7 +3220,7 @@ create_security_label_item
 
 create_security_policy
     : CREATE SECURITY POLICY security_policy_name COMPONENTS  component_name (',' component_name)*
-        WITH DB2LBACRULES ( (OVERRIDE | RESTRICT) NOT AUTHORIZED WRITE SECURITY LABEL)?
+        WITH DB2LBACRULES ( (OVERRIDE_ | RESTRICT) NOT AUTHORIZED WRITE SECURITY LABEL)?
     ;
 
 create_sequence
