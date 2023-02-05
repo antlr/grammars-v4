@@ -836,8 +836,8 @@ alter_service_class_opts
     | ACTIVITY SORTMEM LIMIT (integer_constant | NONE)
     | MINIMUM RESOURCE SHARE integer_constant PERCENT
     | ADMISSION QUEUE ORDER (FIFO | LATENCY)
-    | DEGREE SCALEBACK default_on_off?
-    | MAXIMUM DEGREE default_on_off?
+    | DEGREE_ SCALEBACK default_on_off?
+    | MAXIMUM DEGREE_ default_on_off?
     | PREFETCH PRIORITY default_high_medium_low
     | OUTBOUND CORRELATOR (NONE | string_constant)
     | BUFFERPOOL PRIORITY default_high_medium_low
@@ -1321,7 +1321,7 @@ alter_workload_opts_item
     | DROP connection_attributes
     | allow_disallow DB ACCESS
     | enable_disable
-    | MAXIMUM DEGREE (DEFAULT | degree)
+    | MAXIMUM DEGREE_ (DEFAULT | degree)
     | SERVICE CLASS_ service_class_name (UNDER service_superclass_name)?
     | POSITION (CRITICAL | HIGH | MEDIUM | LOW)
     | COLLECT ACTIVITY DATA (alter_collect_activity_data_clause | NONE)
@@ -1946,13 +1946,13 @@ set
           | CONNECTION (server_name | host_variable)
           | CURRENT DECFLOAT ROUNDING MODE EQ? (ROUND_CEILING | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_EVEN | ROUND_HALF_UP | string_constant | host_variable)
           | CURRENT? DEFAULT TRANSFORM GROUP EQ? group_name
-          | CURRENT DEGREE EQ? (string_constant | host_variable)
+          | CURRENT DEGREE_ EQ? (string_constant | host_variable)
           | CURRENT EXPLAIN MODE EQ? (yes_no | EXPLAIN NORCAC? | REOPT | (RECOMMEND|EVALUATE) (INDEXES|PARTITIONINGS) | host_variable )
           | CURRENT EXPLAIN SNAPSHOT EQ? (yes_no | EXPLAIN | REOPT | host_variable)
           | CURRENT FEDERATED ASYNCHRONY EQ? (ANY | integer_constant | host_variable)
           | CURRENT IMPLICIT XMLPARSE OPTION EQ? (string_constant | host_variable)
           | CURRENT? ISOLATION EQ? (UR | CS | RR | RS | RESET)
-          | CURRENT LOCALE (LC_MESSAGES | LC_TIME) EQ? (host_variable | string_constant)
+          | CURRENT LOCALE (LC_MESSAGES_ | LC_TIME_) EQ? (host_variable | string_constant)
           | CURRENT? LOCK TIMEOUT EQ? (NOT? WAIT | NULL_ | WAIT integer_constant | host_variable)
           | CURRENT MAINTAINED TABLE? TYPES (FOR OPTIMIZATION)? EQ? (ALL | NONE | host_variable | maintain_opt_list)
           | CURRENT MDC ROLLOUT MODE (NONE | IMMEDIATE | DEFERRED | host_variable)
@@ -3250,8 +3250,8 @@ create_service_class
         ( CPU LIMIT (integer_constant | NONE) )?
         ( MINIMUM RESOURCE SHARE integer_constant PERCENT )?
         ( ADMISSION QUEUE ORDER (FIFO | LATENCY) )?
-        ( DEGREE SCALEBACK (DEFAULT | on_off) )?
-        ( MAXIMUM DEGREE (DEFAULT | NONE | degree) )?
+        ( DEGREE_ SCALEBACK (DEFAULT | on_off) )?
+        ( MAXIMUM DEGREE_ (DEFAULT | NONE | degree) )?
         ( PREFETCH PRIORITY (DEFAULT | high_medium_low ) )?
         ( OUTBOUND CORRELATOR (NONE | string_constant) )?
         ( BUFFERPOOL PRIORITY (DEFAULT | high_medium_low) )?
@@ -4730,7 +4730,7 @@ string_list_paren
     ;
 
 workload_attributes
-    : enable_disable? (allow_disallow DB ACCESS)? (MAXIMUM DEGREE (DEFAULT | degree) )?
+    : enable_disable? (allow_disallow DB ACCESS)? (MAXIMUM DEGREE_ (DEFAULT | degree) )?
         ( SERVICE CLASS_ (SYSDEFAULTUSERCLASS | service_class_name (UNDER service_superclass_name)? ) )?
     ;
 
