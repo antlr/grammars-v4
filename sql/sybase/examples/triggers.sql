@@ -87,3 +87,23 @@ DISABLE TRIGGER safety ON DATABASE;
 GO
 DISABLE Trigger ALL ON ALL SERVER;
 GO
+
+CREATE TRIGGER tr_rollback_with
+  On dbo.TABLE_A
+  for Insert
+AS 
+BEGIN
+DECLARE @ErrorCode int
+
+INSERT INTO DB_COPY(col1, col2, col3, col4)
+SELECT colA, colB, colC, colD FROM inserted
+
+SELECT @ErrorCode = @@Error 
+IF @ErrorCode <> 0
+BEGIN
+    ROLLBACK Trigger  WITH RAISERROR 42 'Format String with Error %1 .', @ErrorCode
+    Return    
+END
+END
+GO
+
