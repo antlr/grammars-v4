@@ -1187,7 +1187,6 @@ fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DI
 fragment HEX_DIGIT:    [0-9A-F];
 fragment DEC_DIGIT:    [0-9];
 
-
 fragment FullWidthLetter options { caseInsensitive=false; }
     : '\u00c0'..'\u00d6'
     | '\u00d8'..'\u00f6'

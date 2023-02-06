@@ -29,3 +29,24 @@ import TSqlParser;
 execute_var_string
 : (LOCAL_ID | STRING ) ('+' execute_var_string)?
 ;
+
+transaction_statement
+    // https://msdn.microsoft.com/en-us/library/ms188386.aspx
+    : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    // https://msdn.microsoft.com/en-us/library/ms188929.aspx
+    | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)? ';'?
+    // https://msdn.microsoft.com/en-us/library/ms190295.aspx
+    | COMMIT (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
+    // https://msdn.microsoft.com/en-us/library/ms178628.aspx
+    | COMMIT WORK? ';'?
+    | COMMIT id_
+    | ROLLBACK id_
+    // https://msdn.microsoft.com/en-us/library/ms181299.aspx
+    | ROLLBACK (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    // https://msdn.microsoft.com/en-us/library/ms174973.aspx
+    | ROLLBACK WORK? ';'?
+    // https://msdn.microsoft.com/en-us/library/ms188378.aspx
+    | SAVE (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    // https://help.sap.com/docs/SAP_ASE/e0d4539d39c34f52ae9ef822c2060077/ab3e3fb7bc2b10149a51ba2433c1df42.html
+    | ROLLBACK TRIGGER (WITH  raiseerror_statement)?
+    ;

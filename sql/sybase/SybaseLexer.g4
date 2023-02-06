@@ -22,9 +22,11 @@ THE SOFTWARE.
 lexer grammar SybaseLexer;
 
 import TSqlLexer;
+
 options { caseInsensitive = true; }
 
 STRING options { caseInsensitive=false; } : 'N'? ('\'' (~'\'' | '\'\'')* '\'' )| ('"' (~'"' | '\\"' )* '"' );
+
 IPV4_ADDR:                            DECIMAL '.' DECIMAL '.' DECIMAL '.' DECIMAL;
 IPV6_ADDR:                            (HEX_DIGIT+ ':')+ HEX_DIGIT+;
 FILESTREAM_ON:                         'FILESTREAM_ON';

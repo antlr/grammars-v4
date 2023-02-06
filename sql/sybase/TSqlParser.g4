@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 parser grammar TSqlParser;
 
-options { tokenVocab=TSqlLexer; }
+// options { tokenVocab=TSqlLexer; }
 
 tsql_file
     : batch* EOF
