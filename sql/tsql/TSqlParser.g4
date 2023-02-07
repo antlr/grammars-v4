@@ -4519,37 +4519,14 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
-    : temp_full_table_name
-    | persist_full_table_name
-    ;
-
-persist_full_table_name
     : (linkedServer=id_ '.' '.' schema=id_   '.'
     |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
     |                                         database=id_ '.'  schema=id_? '.'
     |                                                           schema=id_    '.')? table=id_
     ;
 
-// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
-temp_full_table_name
-    : (linkedServer=id_ '.' '.' schema=id_   '.'
-    |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
-    |                                         database=id_ '.'  schema=id_? '.'
-    |                                                           schema=id_    '.')? table=TEMP_ID
-    ;
-
 table_name
-    : temp_table_name
-    | persist_table_name
-    ;
-
-persist_table_name
     : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=id_ | blocking_hierarchy=BLOCKING_HIERARCHY)
-    ;
-
-// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
-temp_table_name
-    : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=TEMP_ID | blocking_hierarchy=BLOCKING_HIERARCHY)
     ;
 
 simple_name
