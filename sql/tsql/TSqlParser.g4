@@ -4443,6 +4443,11 @@ built_in_functions
     | SQUARE '(' float_expression=expression ')' #SQUARE
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/tan-transact-sql?view=sql-server-ver16
     | TAN '(' float_expression=expression ')' #TAN
+    // Logical functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-greatest-transact-sql?view=azure-sqldw-latest
+    | GREATEST '(' expression_list ')' #GREATEST
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-least-transact-sql?view=azure-sqldw-latest
+    | LEAST '(' expression_list ')' #LEAST
     ;
 
 xml_data_type_methods
@@ -5153,6 +5158,7 @@ keyword
     | GETUTCDATE
     | GLOBAL
     | GO
+    | GREATEST
     | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
@@ -5202,6 +5208,7 @@ keyword
     | LAST
     | LAST_VALUE
     | LEAD
+    | LEAST
     | LEN
     | LEVEL
     | LIST
