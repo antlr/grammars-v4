@@ -49,7 +49,6 @@ sql_clauses
     | cfl_statement SEMI?
     | another_statement SEMI?
     | ddl_clause SEMI?
-    | dbcc_special SEMI?
     | dbcc_clause SEMI?
     | backup_statement SEMI?
     | SEMI
@@ -2904,7 +2903,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON (class_type_for_grant '::')? on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
-    | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
+    | REVERT (WITH COOKIE '=' LOCAL_ID)? ';'?
     | open_key
     | close_key
     | create_key
@@ -3160,21 +3159,259 @@ checkpoint_statement
     : CHECKPOINT (checkPointDuration=DECIMAL)?
     ;
 
-//These are dbcc commands with strange syntax that doesn't fit the regular dbcc syntax
-dbcc_special
-    : DBCC SHRINKLOG ('(' SIZE '='  (constant_expression| id_ | DEFAULT) ')')? ';'?
+dbcc_checkalloc_option
+    : ALL_ERRORMSGS
+    | NO_INFOMSGS
+    | TABLOCK
+    | ESTIMATEONLY
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkalloc-transact-sql?view=sql-server-ver16
+dbcc_checkalloc
+    : name=CHECKALLOC
+        (
+            '('
+                ( database=id_ | databaseid=STRING | DECIMAL )
+                ( ',' NOINDEX | ',' ( REPAIR_ALLOW_DATA_LOSS | REPAIR_FAST | REPAIR_REBUILD ) )?
+            ')'
+            (
+                WITH dbcc_option=dbcc_checkalloc_option ( ',' dbcc_option=dbcc_checkalloc_option )*
+            )?
+        )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkcatalog-transact-sql?view=sql-server-ver16
+dbcc_checkcatalog
+    : name=CHECKCATALOG
+        (
+            '('
+                ( database=id_ | databasename=STRING | DECIMAL )
+            ')'
+        )?
+        (
+            WITH dbcc_option=NO_INFOMSGS
+        )?
+    ;
+
+dbcc_checkconstraints_option
+    : ALL_CONSTRAINTS
+    | ALL_ERRORMSGS
+    | NO_INFOMSGS
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkconstraints-transact-sql?view=sql-server-ver16
+dbcc_checkconstraints
+    : name=CHECKCONSTRAINTS
+        (
+            '('
+                ( table_or_constraint=id_ | table_or_constraint_name=STRING )
+            ')'
+        )?
+        (
+            WITH dbcc_option=dbcc_checkconstraints_option (',' dbcc_option=dbcc_checkconstraints_option)*
+        )?
+    ;
+
+dbcc_checkdb_table_option
+    : ALL_ERRORMSGS
+    | EXTENDED_LOGICAL_CHECKS
+    | NO_INFOMSGS
+    | TABLOCK
+    | ESTIMATEONLY
+    | PHYSICAL_ONLY
+    | DATA_PURITY
+    | MAXDOP '=' max_dregree_of_parallelism=DECIMAL
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkdb-transact-sql?view=sql-server-ver16
+dbcc_checkdb
+    : name=CHECKDB
+        (
+            '('
+                ( database=id_ | databasename=STRING | DECIMAL )
+                (
+                    ',' (
+                            NOINDEX
+                            | REPAIR_ALLOW_DATA_LOSS
+                            | REPAIR_FAST
+                            | REPAIR_REBUILD
+                    )
+                )?
+            ')'
+        )?
+        (
+            WITH dbcc_option=dbcc_checkdb_table_option (',' dbcc_option=dbcc_checkdb_table_option)*
+        )?
+    ;
+
+dbcc_checkfilegroup_option
+    : ALL_ERRORMSGS
+    | NO_INFOMSGS
+    | TABLOCK
+    | ESTIMATEONLY
+    | PHYSICAL_ONLY
+    | MAXDOP '=' max_dregree_of_parallelism=DECIMAL
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkfilegroup-transact-sql?view=sql-server-ver16
+// Additional parameters: https://dbtut.com/index.php/2019/01/01/dbcc-checkfilegroup-command-on-sql-server/
+dbcc_checkfilegroup
+    : name=CHECKFILEGROUP
+        (
+            '('
+                ( filegroup_id=DECIMAL | filegroup_name=STRING )
+                (
+                    ',' (
+                            NOINDEX
+                            | REPAIR_ALLOW_DATA_LOSS
+                            | REPAIR_FAST
+                            | REPAIR_REBUILD
+                    )
+                )?
+            ')'
+        )?
+        (
+            WITH dbcc_option=dbcc_checkfilegroup_option (',' dbcc_option=dbcc_checkfilegroup_option)*
+        )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checktable-transact-sql?view=sql-server-ver16
+dbcc_checktable
+    : name=CHECKTABLE
+        '('
+            table_or_view_name=STRING
+            ( ',' (
+                    NOINDEX
+                    | index_id=expression
+                    | REPAIR_ALLOW_DATA_LOSS
+                    | REPAIR_FAST
+                    | REPAIR_REBUILD
+                )
+            )?
+        ')'
+        (
+            WITH dbcc_option=dbcc_checkdb_table_option (',' dbcc_option=dbcc_checkdb_table_option)*
+        )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-cleantable-transact-sql?view=sql-server-ver16
+dbcc_cleantable
+    : name=CLEANTABLE
+        '('
+            ( database=id_ | databasename=STRING | DECIMAL )
+            ',' ( table_or_view=id_ | table_or_view_name=STRING )
+            ( ',' batch_size=DECIMAL )?
+        ')'
+        ( WITH dbcc_option=NO_INFOMSGS )?
+    ;
+
+dbcc_clonedatabase_option
+    : NO_STATISTICS
+    | NO_QUERYSTORE
+    | SERVICEBROKER
+    | VERIFY_CLONEDB
+    | BACKUP_CLONEDB
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-clonedatabase-transact-sql?view=sql-server-ver16
+dbcc_clonedatabase
+    : name=CLONEDATABASE
+        '('
+            source_database=id_
+            ',' target_database=id_
+        ')'
+        ( WITH dbcc_option=dbcc_clonedatabase_option (',' dbcc_option=dbcc_clonedatabase_option)* )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-pdw-showspaceused-transact-sql?view=aps-pdw-2016-au7
+dbcc_pdw_showspaceused
+    : name=PDW_SHOWSPACEUSED ( '(' tablename=id_ ')' ) ? ( WITH dbcc_option=IGNORE_REPLICATED_TABLE_CACHE )? ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-proccache-transact-sql?view=sql-server-ver16
+dbcc_proccache
+    : name=PROCCACHE ( WITH dbcc_option=NO_INFOMSGS )? ;
+
+dbcc_showcontig_option
+    : ALL_INDEXES
+    | TABLERESULTS
+    | FAST
+    | ALL_LEVELS
+    | NO_INFOMSGS
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-showcontig-transact-sql?view=sql-server-ver16
+dbcc_showcontig
+    : name=SHOWCONTIG
+        (
+            '('
+                table_or_view=expression
+                (
+                    ',' index=expression
+                )?
+            ')'
+        )?
+        ( WITH dbcc_option=dbcc_showcontig_option (',' dbcc_showcontig_option)* )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-shrinklog-azure-sql-data-warehouse?view=aps-pdw-2016-au7
+dbcc_shrinklog
+    : name=SHRINKLOG
+        ('(' SIZE '=' ( (DECIMAL ( MB | GB | TB ) ) | DEFAULT ) ')')?
+        ( WITH dbcc_option=NO_INFOMSGS )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-dbreindex-transact-sql?view=sql-server-ver16
+dbcc_dbreindex
+    : name=DBREINDEX
+        '('
+            table=id_or_string
+            ( ',' index_name=id_or_string ( ',' fillfactor=expression)? )?
+        ')'
+        (
+            WITH dbcc_option=NO_INFOMSGS
+        )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-dllname-free-transact-sql?view=sql-server-ver16
+dbcc_dll_free
+    : dllname=id_
+        '(' name=FREE ')'
+        (
+            WITH dbcc_option=NO_INFOMSGS
+        )?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-dropcleanbuffers-transact-sql?view=sql-server-ver16
+dbcc_dropcleanbuffers
+    : name=DROPCLEANBUFFERS
+        (
+            '('
+                COMPUTE | ALL
+            ')'
+        )?
+        (
+            WITH dbcc_option=NO_INFOMSGS
+        )?
     ;
 
 dbcc_clause
-    : DBCC name=dbcc_command ('(' expression_list ')')? (WITH dbcc_options)? ';'?
-    ;
-
-dbcc_command
-    : simple_id | keyword
-    ;
-
-dbcc_options
-    :  simple_id (',' simple_id)?
+    : DBCC (
+        dbcc_checkalloc
+        | dbcc_checkcatalog
+        | dbcc_checkconstraints
+        | dbcc_checkdb
+        | dbcc_checkfilegroup
+        | dbcc_checktable
+        | dbcc_cleantable
+        | dbcc_clonedatabase
+        | dbcc_dbreindex
+        | dbcc_dll_free
+        | dbcc_dropcleanbuffers
+        | dbcc_pdw_showspaceused
+        | dbcc_proccache
+        | dbcc_showcontig
+        | dbcc_shrinklog
+    )
     ;
 
 execute_clause
@@ -3496,15 +3733,6 @@ unary_operator_expression
 
 bracket_expression
     : '(' expression ')' | '(' subquery ')'
-    ;
-
-constant_expression
-    : NULL_
-    | constant
-    // system functions: https://msdn.microsoft.com/en-us/library/ms187786.aspx
-    | function_call
-    | LOCAL_ID         // TODO: remove.
-    | '(' constant_expression ')'
     ;
 
 subquery
@@ -4076,6 +4304,19 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Data type functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datalength-transact-sql?view=sql-server-ver16
+    | DATALENGTH '(' expression ')'                     #DATALENGTH
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-current-transact-sql?view=sql-server-ver16
+    | IDENT_CURRENT '(' table_or_view=expression ')'    # IDENT_CURRENT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-incr-transact-sql?view=sql-server-ver16
+    | IDENT_INCR '(' table_or_view=expression ')'       # IDENT_INCR
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | IDENT_SEED '(' table_or_view=expression ')'       # IDENT_SEED
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | IDENTITY '(' datatype=data_type (',' seed=DECIMAL ',' increment=DECIMAL)? ')' #IDENTITY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | SQL_VARIANT_PROPERTY '(' expr=expression ',' property=STRING ')' #SQL_VARIANT_PROPERTY
     // Date functions
     //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
     | CURRENT_DATE '(' ')'                              #CURRENT_DATE
@@ -4202,6 +4443,11 @@ built_in_functions
     | SQUARE '(' float_expression=expression ')' #SQUARE
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/tan-transact-sql?view=sql-server-ver16
     | TAN '(' float_expression=expression ')' #TAN
+    // Logical functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-greatest-transact-sql?view=azure-sqldw-latest
+    | GREATEST '(' expression_list ')' #GREATEST
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-least-transact-sql?view=azure-sqldw-latest
+    | LEAST '(' expression_list ')' #LEAST
     ;
 
 xml_data_type_methods
@@ -4519,37 +4765,14 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
-    : temp_full_table_name
-    | persist_full_table_name
-    ;
-
-persist_full_table_name
     : (linkedServer=id_ '.' '.' schema=id_   '.'
     |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
     |                                         database=id_ '.'  schema=id_? '.'
     |                                                           schema=id_    '.')? table=id_
     ;
 
-// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
-temp_full_table_name
-    : (linkedServer=id_ '.' '.' schema=id_   '.'
-    |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
-    |                                         database=id_ '.'  schema=id_? '.'
-    |                                                           schema=id_    '.')? table=TEMP_ID
-    ;
-
 table_name
-    : temp_table_name
-    | persist_table_name
-    ;
-
-persist_table_name
     : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=id_ | blocking_hierarchy=BLOCKING_HIERARCHY)
-    ;
-
-// https://www.red-gate.com/simple-talk/databases/sql-server/t-sql-programming-sql-server/temporary-tables-in-sql-server/
-temp_table_name
-    : (database=id_ '.' schema=id_? '.' | schema=id_ '.')? (table=TEMP_ID | blocking_hierarchy=BLOCKING_HIERARCHY)
     ;
 
 simple_name
@@ -4726,6 +4949,10 @@ keyword
     | AFTER
     | AGGREGATE
     | ALGORITHM
+    | ALL_CONSTRAINTS
+    | ALL_ERRORMSGS
+    | ALL_INDEXES
+    | ALL_LEVELS
     | ALLOW_ENCRYPTED_VALUE_MODIFICATIONS
     | ALLOW_PAGE_LOCKS
     | ALLOW_ROW_LOCKS
@@ -4764,6 +4991,7 @@ keyword
     | AUTOGROW_SINGLE_FILE
     | AVAILABILITY
     | AVG
+    | BACKUP_CLONEDB
     | BACKUP_PRIORITY
     | BASE64
     | BEGIN_DIALOG
@@ -4786,9 +5014,17 @@ keyword
     | CHANGE_TRACKING
     | CHAR
     | CHARINDEX
+    | CHECKALLOC
+    | CHECKCATALOG
+    | CHECKCONSTRAINTS
+    | CHECKDB
+    | CHECKFILEGROUP
     | CHECKSUM
     | CHECKSUM_AGG
+    | CHECKTABLE
+    | CLEANTABLE
     | CLEANUP
+    | CLONEDATABASE
     | COL_LENGTH
     | COL_NAME
     | COLLECTION
@@ -4820,8 +5056,10 @@ keyword
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
     | DATA
+    | DATA_PURITY
     | DATABASE_PRINCIPAL_ID
     | DATABASEPROPERTYEX
+    | DATALENGTH
     | DATE_CORRELATION_OPTIMIZATION
     | DATEADD
     | DATEDIFF
@@ -4832,6 +5070,8 @@ keyword
     | DB_FAILOVER
     | DB_ID
     | DB_NAME
+    | DBCC
+    | DBREINDEX
     | DECRYPTION
     | DEFAULT_DOUBLE_QUOTE
     | DEFAULT_FULLTEXT_LANGUAGE
@@ -4855,6 +5095,7 @@ keyword
     | DISABLED
     | DOCUMENT
     | DROP_EXISTING
+    | DROPCLEANBUFFERS
     | DYNAMIC
     | ELEMENTS
     | EMERGENCY
@@ -4867,12 +5108,14 @@ keyword
     | ENCRYPTION_TYPE
     | ENDPOINT_URL
     | ERROR_BROKER_CONVERSATIONS
+    | ESTIMATEONLY
     | EXCLUSIVE
     | EXECUTABLE
     | EXIST
     | EXPAND
     | EXPIRY_DATE
     | EXPLICIT
+    | EXTENDED_LOGICAL_CHECKS
     | FAIL_OPERATION
     | FAILOVER_MODE
     | FAILURE
@@ -4904,6 +5147,7 @@ keyword
     | FORCESCAN
     | FORMAT
     | FORWARD_ONLY
+    | FREE
     | FULLSCAN
     | FULLTEXT
     | FULLTEXTCATALOGPROPERTY
@@ -4914,6 +5158,7 @@ keyword
     | GETUTCDATE
     | GLOBAL
     | GO
+    | GREATEST
     | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
@@ -4924,10 +5169,14 @@ keyword
     | HIGH
     | HONOR_BROKER_PRIORITY
     | HOURS
+    | IDENT_CURRENT
+    | IDENT_INCR
+    | IDENT_SEED
     | IDENTITY_VALUE
     | IGNORE_CONSTRAINTS
     | IGNORE_DUP_KEY
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | IGNORE_REPLICATED_TABLE_CACHE
     | IGNORE_TRIGGERS
     | IMMEDIATE
     | IMPERSONATE
@@ -4959,6 +5208,7 @@ keyword
     | LAST
     | LAST_VALUE
     | LEAD
+    | LEAST
     | LEN
     | LEVEL
     | LIST
@@ -5015,12 +5265,16 @@ keyword
     | NEWNAME
     | NEXT
     | NO
+    | NO_INFOMSGS
+    | NO_QUERYSTORE
+    | NO_STATISTICS
     | NO_TRUNCATE
     | NO_WAIT
     | NOCOUNT
     | NODES
     | NOEXEC
     | NOEXPAND
+    | NOINDEX
     | NOLOCK
     | NON_TRANSACTED_ACCESS
     | NORECOMPUTE
@@ -5068,10 +5322,12 @@ keyword
     | PATH
     | PATINDEX
     | PAUSE
+    | PDW_SHOWSPACEUSED
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
     | PERSIST_SAMPLE_PERCENT
+    | PHYSICAL_ONLY
     | POISON_MESSAGE_HANDLING
     | POOL
     | PORT
@@ -5083,6 +5339,7 @@ keyword
     | PRIVATE
     | PRIVATE_KEY
     | PRIVILEGES
+    | PROCCACHE
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
@@ -5119,6 +5376,9 @@ keyword
     | REMOTE_SERVICE_NAME
     | REMOVE
     | REORGANIZE
+    | REPAIR_ALLOW_DATA_LOSS
+    | REPAIR_FAST
+    | REPAIR_REBUILD
     | REPEATABLE
     | REPEATABLEREAD
     | REPLACE
@@ -5171,10 +5431,12 @@ keyword
     | SEQUENCE_NUMBER
     | SERIALIZABLE
     | SERVERPROPERTY
+    | SERVICEBROKER
     | SESSION_TIMEOUT
     | SETERROR
     | SHARE
     | SHARED
+    | SHOWCONTIG
     | SHOWPLAN
     | SHOWPLAN_ALL
     | SHOWPLAN_TEXT
@@ -5190,6 +5452,7 @@ keyword
     | SPACE_KEYWORD
     | SPARSE
     | SPATIAL_WINDOW_MAX_CELLS
+    | SQL_VARIANT_PROPERTY
     | STANDBY
     | START_DATE
     | STATIC
@@ -5216,6 +5479,7 @@ keyword
     | SYNCHRONOUS_COMMIT
     | SYNONYM
     | SYSTEM
+    | TABLERESULTS
     | TABLOCK
     | TABLOCKX
     | TAKE
@@ -5261,6 +5525,7 @@ keyword
     | VAR
     | VARBINARY_KEYWORD
     | VARP
+    | VERIFY_CLONEDB
     | VERSION
     | VIEW_METADATA
     | VIEWS
