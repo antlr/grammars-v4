@@ -4304,6 +4304,19 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Data type functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/datalength-transact-sql?view=sql-server-ver16
+    | DATALENGTH '(' expression ')'                     #DATALENGTH
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-current-transact-sql?view=sql-server-ver16
+    | IDENT_CURRENT '(' table_or_view=expression ')'    # IDENT_CURRENT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-incr-transact-sql?view=sql-server-ver16
+    | IDENT_INCR '(' table_or_view=expression ')'       # IDENT_INCR
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | IDENT_SEED '(' table_or_view=expression ')'       # IDENT_SEED
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | IDENTITY '(' datatype=data_type (',' seed=DECIMAL ',' increment=DECIMAL)? ')' #IDENTITY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-seed-transact-sql?view=sql-server-ver16
+    | SQL_VARIANT_PROPERTY '(' expr=expression ',' property=STRING ')' #SQL_VARIANT_PROPERTY
     // Date functions
     //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
     | CURRENT_DATE '(' ')'                              #CURRENT_DATE
@@ -5041,6 +5054,7 @@ keyword
     | DATA_PURITY
     | DATABASE_PRINCIPAL_ID
     | DATABASEPROPERTYEX
+    | DATALENGTH
     | DATE_CORRELATION_OPTIMIZATION
     | DATEADD
     | DATEDIFF
@@ -5149,6 +5163,9 @@ keyword
     | HIGH
     | HONOR_BROKER_PRIORITY
     | HOURS
+    | IDENT_CURRENT
+    | IDENT_INCR
+    | IDENT_SEED
     | IDENTITY_VALUE
     | IGNORE_CONSTRAINTS
     | IGNORE_DUP_KEY
@@ -5428,6 +5445,7 @@ keyword
     | SPACE_KEYWORD
     | SPARSE
     | SPATIAL_WINDOW_MAX_CELLS
+    | SQL_VARIANT_PROPERTY
     | STANDBY
     | START_DATE
     | STATIC
