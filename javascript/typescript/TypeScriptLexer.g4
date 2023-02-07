@@ -197,7 +197,7 @@ mode TEMPLATE;
 
 TemplateStringEscapeAtom:       '\\' .;
 BackTickInside:                 '`' {this.DecreaseTemplateDepth();} -> type(BackTick), popMode;
-TemplateStringStartExpression:  '${' -> pushMode(DEFAULT_MODE);
+TemplateStringStartExpression:  '${' {this.StartTemplateString();} -> pushMode(DEFAULT_MODE);
 TemplateStringAtom:             ~[`\\];
 
 // Fragment rules
