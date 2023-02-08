@@ -4099,6 +4099,15 @@ freetext_predicate
     : CONTAINS '(' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' | PROPERTY '(' full_column_name ',' expression ')') ',' expression ')'
     | FREETEXT '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? ')'
     ;
+
+json_key_value
+    : json_key_name=expression ':' value_expression=expression
+    ;
+
+json_null_clause
+    : (ABSENT | NULL_) ON NULL_
+    ;
+
 built_in_functions
     // Metadata functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/app-name-transact-sql?view=sql-server-ver16
@@ -4396,6 +4405,21 @@ built_in_functions
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
+    // JSON functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/isjson-transact-sql?view=azure-sqldw-latest
+    | ISJSON '(' json_expr=expression (',' json_type_constraint=expression)? ')' #ISJSON
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-object-transact-sql?view=azure-sqldw-latest
+    | JSON_OBJECT '(' (key_value=json_key_value (',' key_value=json_key_value)*)? json_null_clause? ')' #JSON_OBJECT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-array-transact-sql?view=azure-sqldw-latest
+    | JSON_ARRAY '(' expression_list? json_null_clause? ')' #JSON_ARRAY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-value-transact-sql?view=azure-sqldw-latest
+    | JSON_VALUE '(' expr=expression ',' path=expression ')' #JSON_VALUE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-query-transact-sql?view=azure-sqldw-latest
+    | JSON_QUERY '(' expr=expression (',' path=expression)? ')' #JSON_QUERY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-modify-transact-sql?view=azure-sqldw-latest
+    | JSON_MODIFY '(' expr=expression ',' path=expression ',' new_value=expression ')' #JSON_MODIFY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-path-exists-transact-sql?view=azure-sqldw-latest
+    | JSON_PATH_EXISTS '(' value_expression=expression ',' sql_json_path=expression ')' #JSON_PATH_EXISTS
     // Math functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/abs-transact-sql?view=sql-server-ver16
     | ABS '(' numeric_expression=expression ')' #ABS
@@ -5193,9 +5217,16 @@ keyword
     | INSERTED
     | INT
     | IP
+    | ISJSON
     | ISOLATION
     | JOB
     | JSON
+    | JSON_OBJECT
+    | JSON_ARRAY
+    | JSON_VALUE
+    | JSON_QUERY
+    | JSON_MODIFY
+    | JSON_PATH_EXISTS
     | KB
     | KEEP
     | KEEPDEFAULTS
