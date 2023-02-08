@@ -4523,7 +4523,7 @@ value_method
     ;
 
 value_call
-    :  VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    :  (VALUE | VALUE_SQUARE_BRACKET) '(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
@@ -4531,7 +4531,7 @@ query_method
     ;
 
 query_call
-    : QUERY '(' xquery=STRING ')'
+    : (QUERY | QUERY_SQUARE_BRACKET) '(' xquery=STRING ')'
     ;
 
 exist_method
@@ -4539,7 +4539,7 @@ exist_method
     ;
 
 exist_call
-    : EXIST '(' xquery=STRING ')'
+    : (EXIST | EXIST_SQUARE_BRACKET) '(' xquery=STRING ')'
     ;
 
 modify_method
@@ -4547,7 +4547,7 @@ modify_method
     ;
 
 modify_call
-    : MODIFY '(' xml_dml=STRING ')'
+    : (MODIFY | MODIFY_SQUARE_BRACKET) '(' xml_dml=STRING ')'
     ;
 
 hierarchyid_call
@@ -5136,6 +5136,7 @@ keyword
     | EXCLUSIVE
     | EXECUTABLE
     | EXIST
+    | EXIST_SQUARE_BRACKET
     | EXPAND
     | EXPIRY_DATE
     | EXPLICIT
@@ -5285,6 +5286,7 @@ keyword
     | MIXED_PAGE_ALLOCATION
     | MODE
     | MODIFY
+    | MODIFY_SQUARE_BRACKET
     | MOVE
     | MULTI_USER
     | NAME
@@ -5376,6 +5378,7 @@ keyword
     | PROVIDER
     | PROVIDER_KEY_NAME
     | QUERY
+    | QUERY_SQUARE_BRACKET
     | QUEUE
     | QUEUE_DELAY
     | QUOTED_IDENTIFIER
@@ -5553,6 +5556,7 @@ keyword
     | VALID_XML
     | VALIDATION
     | VALUE
+    | VALUE_SQUARE_BRACKET
     | VAR
     | VARBINARY_KEYWORD
     | VARP
