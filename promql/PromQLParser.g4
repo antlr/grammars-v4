@@ -46,6 +46,7 @@ vectorOperation
     | vectorOperation andUnlessOp vectorOperation
     | vectorOperation orOp vectorOperation
     | vectorOperation vectorMatchOp vectorOperation
+    | vectorOperation AT vectorOperation
     | vector
     ;
 
