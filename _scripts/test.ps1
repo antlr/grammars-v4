@@ -1,42 +1,19 @@
-function Get-GrammarSkipList {
+function Get-GrammarSkip {
     param (
-        $Target
+        $Target,
+	$Grammar
     )
-    switch ($Target) {
-        "CSharp" {
-		$lines = Get-Content -Path _scripts\skip-csharp.txt
-		return $lines
-        }
-        "Java" {
-		$lines = Get-Content -Path _scripts\skip-java.txt
-		return $lines
-        }
-        "JavaScript" {
-		$lines = Get-Content -Path _scripts\skip-javascript.txt
-		return $lines
-        }
-        "Go" {
-		$lines = Get-Content -Path _scripts\skip-go.txt
-		return $lines
-        }
-        "Python3" {
-		$lines = Get-Content -Path _scripts\skip-python3.txt
-		return $lines
-        }
-        "Dart" {
-		$lines = Get-Content -Path _scripts\skip-dart.txt
-		return $lines
-        }
-        "PHP" {
-		$lines = Get-Content -Path _scripts\skip-php.txt
-		return $lines
-        }
-        Default {
-            #    Write-Error "Unknown target $Target"
-            #    exit 1
-        }
+    Write-Host "Target $Target Grammar $Grammar"
+    if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
+	Write-Host "skip"
+	return $True
     }
-    
+    $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
+    if ("$lines" -eq "") {
+	Write-Host "skip"
+	return $True
+    }
+    return $False
 }
 
 enum FailStage {
@@ -234,15 +211,9 @@ function Get-GrammarsNeedsTest {
     else {
         $allGrammars = Get-ChangedGrammars -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit
     }
-    $skip = Get-GrammarSkipList -Target $Target | Resolve-Path -Relative
     $grammars = @()
     foreach ($g in $allGrammars | Resolve-Path -Relative) {
-        $shouldSkip = $false
-        foreach ($s in $skip) {
-            if ($s -eq $g) {
-                $shouldSkip = $true
-            }
-        }
+        $shouldSkip = Get-GrammarSkip -Target $Target -Grammar $g
         if (!$shouldSkip) {
             $grammars += $g
         }
