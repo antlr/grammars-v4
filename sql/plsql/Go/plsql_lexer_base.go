@@ -1,17 +1,16 @@
 package parser
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/antlr/antlr4/runtime/Go/antlr/v4"
 
-// PlSqlBaseLexer state
-type PlSqlBaseLexer struct {
+// PlSqlLexerBase state
+type PlSqlLexerBase struct {
     *antlr.BaseLexer
 
     lastToken antlr.Token
-    self PlSqlBaseLexer
 }
 
 // NextToken from the character stream.
-func (l *PlSqlBaseLexer) NextToken() antlr.Token {
+func (l *PlSqlLexerBase) NextToken() antlr.Token {
     next := l.BaseLexer.NextToken() // Get next token
     if next.GetChannel() == antlr.TokenDefaultChannel {
         // Keep track of the last token on default channel
@@ -22,10 +21,10 @@ func (l *PlSqlBaseLexer) NextToken() antlr.Token {
 
 // IsRegexPossible returns true if the lexer can match a
 // regex literal.
-func (l *PlSqlBaseLexer) IsNewlineAtPos(pos int) bool {
+func (l *PlSqlLexerBase) IsNewlineAtPos(pos int) bool {
     if l.lastToken == nil {
         return true
     }
-    la := b.input.LA(pos)
+    la := l.GetInputStream().LA(pos)
     return la == -1 || la == '\n'
 }
