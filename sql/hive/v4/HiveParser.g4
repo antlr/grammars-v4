@@ -1803,7 +1803,7 @@ partitionTableFunctionSource
     ;
 
 partitionedTableFunction
-    : name=identifier LPAREN KW_ON
+    : n=identifier LPAREN KW_ON
     ( (ptfsrc=partitionTableFunctionSource spec=partitioningSpec?))
     ( Identifier LPAREN expression RPAREN ( COMMA Identifier LPAREN expression RPAREN)*)?
     RPAREN (alias=identifier)?
@@ -2559,7 +2559,7 @@ functionIdentifier
 
 principalIdentifier
     : identifier
-    | QuotedIdentifier
+    //| QuotedIdentifier
     ;
 
 // Here is what you have to do if you would like to add a new keyword.
