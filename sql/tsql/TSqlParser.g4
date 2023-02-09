@@ -2876,7 +2876,11 @@ execute_body_batch
 //https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
     : (return_status=LOCAL_ID '=')? (func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
-    | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
+    | '(' execute_var_string (',' execute_var_string)* ')' (AS (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
+    | AS (
+            (LOGIN | USER) '=' STRING
+            | CALLER
+    )
     ;
 
 execute_statement_arg
@@ -4310,6 +4314,9 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Cryptographic functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cert-id-transact-sql?view=sql-server-ver16
+    | CERT_ID '(' cert_name=expression ')'              #CERT_ID
     // Data type functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datalength-transact-sql?view=sql-server-ver16
     | DATALENGTH '(' expression ')'                     #DATALENGTH
@@ -4388,13 +4395,6 @@ built_in_functions
     | MIN_ACTIVE_ROWVERSION '(' ')'                     #MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' left=expression ',' right=expression ')'          #NULLIF
-    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER                                      #CURRENT_USER
-    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER                                      #SESSION_USER
-    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER                                       #SYSTEM_USER
-    | USER                                              #USER
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/parse-transact-sql
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-parse-transact-sql
     | PARSE '(' str=expression AS data_type ( USING culture=expression )? ')'          #PARSE
@@ -4469,6 +4469,55 @@ built_in_functions
     | GREATEST '(' expression_list ')' #GREATEST
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-least-transact-sql?view=azure-sqldw-latest
     | LEAST '(' expression_list ')' #LEAST
+    // Security functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/certencoded-transact-sql?view=sql-server-ver16
+    | CERTENCODED '(' certid=expression ')'             #CERTENCODED
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/certprivatekey-transact-sql?view=sql-server-ver16
+    | CERTPRIVATEKEY '(' certid=expression ',' encryption_password=expression (',' decryption_pasword=expression)? ')' #CERTPRIVATEKEY
+    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
+    | CURRENT_USER                                      #CURRENT_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/database-principal-id-transact-sql?view=sql-server-ver16
+    | DATABASE_PRINCIPAL_ID '(' (principal_name=expression)? ')' #DATABASE_PRINCIPAL_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/has-dbaccess-transact-sql?view=sql-server-ver16
+    | HAS_DBACCESS '(' database_name=expression ')'     #HAS_DBACCESS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/has-perms-by-name-transact-sql?view=sql-server-ver16
+    | HAS_PERMS_BY_NAME '(' securable=expression ',' securable_class=expression ',' permission=expression ( ',' sub_securable=expression (',' sub_securable_class=expression )? )? ')' #HAS_PERMS_BY_NAME
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-member-transact-sql?view=sql-server-ver16
+    | IS_MEMBER '(' group_or_role=expression ')'        #IS_MEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-rolemember-transact-sql?view=sql-server-ver16
+    | IS_ROLEMEMBER '(' role=expression ( ',' database_principal=expression )? ')' #IS_ROLEMEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-srvrolemember-transact-sql?view=sql-server-ver16
+    | IS_SRVROLEMEMBER '(' role=expression ( ',' login=expression )? ')' #IS_SRVROLEMEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/loginproperty-transact-sql?view=sql-server-ver16
+    | LOGINPROPERTY '(' login_name=expression ',' property_name=expression ')' #LOGINPROPERTY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/original-login-transact-sql?view=sql-server-ver16
+    | ORIGINAL_LOGIN '(' ')'                            #ORIGINAL_LOGIN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/permissions-transact-sql?view=sql-server-ver16
+    | PERMISSIONS '(' ( object_id=expression (',' column=expression)? )? ')' #PERMISSIONS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/pwdencrypt-transact-sql?view=sql-server-ver16
+    | PWDENCRYPT '(' password=expression ')'            #PWDENCRYPT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/pwdcompare-transact-sql?view=sql-server-ver16
+    | PWDCOMPARE '(' clear_text_password=expression ',' password_hash=expression (',' version=expression )?')' #PWDCOMPARE
+    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
+    | SESSION_USER                                      #SESSION_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sessionproperty-transact-sql?view=sql-server-ver16
+    | SESSIONPROPERTY '(' option_name=expression ')'    #SESSIONPROPERTY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-id-transact-sql?view=sql-server-ver16
+    | SUSER_ID '(' (login=expression)? ')'              #SUSER_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-name-transact-sql?view=sql-server-ver16
+    | SUSER_NAME '(' (server_user_sid=expression)? ')'  #SUSER_SNAME
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-sid-transact-sql?view=sql-server-ver16
+    | SUSER_SID '(' (login=expression (',' param2=expression)?)? ')' #SUSER_SID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-sname-transact-sql?view=sql-server-ver16
+    | SUSER_SNAME '(' (server_user_sid=expression)? ')' #SUSER_SNAME
+    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
+    | SYSTEM_USER                                       #SYSTEM_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-transact-sql?view=sql-server-ver16
+    | USER                                              #USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-id-transact-sql?view=sql-server-ver16
+    | USER_ID '(' (user=expression)? ')'                #USER_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-name-transact-sql?view=sql-server-ver16
+    | USER_NAME '(' (id=expression)? ')' #USER_NAME
     ;
 
 xml_data_type_methods
@@ -5023,6 +5072,9 @@ keyword
     | TRY_CAST
     | CATALOG
     | CATCH
+    | CERT_ID
+    | CERTENCODED
+    | CERTPRIVATEKEY
     | CHANGE
     | CHANGE_RETENTION
     | CHANGE_TRACKING
@@ -5178,6 +5230,8 @@ keyword
     | GROUPING
     | GROUPING_ID
     | HADR
+    | HAS_DBACCESS
+    | HAS_PERMS_BY_NAME
     | HASH
     | HEALTH_CHECK_TIMEOUT
     | HIDDEN_KEYWORD
@@ -5208,6 +5262,9 @@ keyword
     | INSERTED
     | INT
     | IP
+    | IS_MEMBER
+    | IS_ROLEMEMBER
+    | IS_SRVROLEMEMBER
     | ISJSON
     | ISOLATION
     | JOB
@@ -5242,6 +5299,7 @@ keyword
     | LOCK
     | LOCK_ESCALATION
     | LOGIN
+    | LOGINPROPERTY
     | LOOP
     | LOW
     | LOWER
@@ -5327,6 +5385,7 @@ keyword
     | OPTIMIZE
     | OPTIMIZE_FOR_SEQUENTIAL_KEY
     | ORIGINAL_DB_NAME
+    | ORIGINAL_LOGIN
     | OUT
     | OUTPUT
     | OVERRIDE
@@ -5349,6 +5408,7 @@ keyword
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
+    | PERMISSIONS
     | PERSIST_SAMPLE_PERCENT
     | PHYSICAL_ONLY
     | POISON_MESSAGE_HANDLING
@@ -5367,6 +5427,8 @@ keyword
     | PROPERTY
     | PROVIDER
     | PROVIDER_KEY_NAME
+    | PWDCOMPARE
+    | PWDENCRYPT
     | QUERY
     | QUERY_SQUARE_BRACKET
     | QUEUE
@@ -5456,6 +5518,7 @@ keyword
     | SERIALIZABLE
     | SERVERPROPERTY
     | SERVICEBROKER
+    | SESSIONPROPERTY
     | SESSION_TIMEOUT
     | SETERROR
     | SHARE
@@ -5498,6 +5561,10 @@ keyword
     | SUBSCRIPTION
     | SUBSTRING
     | SUM
+    | SUSER_ID
+    | SUSER_NAME
+    | SUSER_SID
+    | SUSER_SNAME
     | SUSPEND
     | SYMMETRIC
     | SYNCHRONOUS_COMMIT
@@ -5542,6 +5609,8 @@ keyword
     | UOW
     | UPDLOCK
     | UPPER
+    | USER_ID
+    | USER_NAME
     | USING
     | VALID_XML
     | VALIDATION
