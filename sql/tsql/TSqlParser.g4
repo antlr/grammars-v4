@@ -2162,8 +2162,15 @@ func_body_returns_scalar
        END)
     ;
 
+procedure_param_default_value
+    : NULL_
+    | DEFAULT
+    | constant
+    | LOCAL_ID
+    ;
+
 procedure_param
-    : LOCAL_ID AS? (type_schema=id_ '.')? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
+    : LOCAL_ID AS? (type_schema=id_ '.')? data_type VARYING? ('=' default_val=procedure_param_default_value)? (OUT | OUTPUT | READONLY)?
     ;
 
 procedure_option
@@ -2658,7 +2665,7 @@ drop_view
 
 create_type
     : CREATE TYPE name = simple_name
-      (FROM data_type default_value)?
+      (FROM data_type null_notnull?)?
       (AS TABLE LR_BRACKET column_def_table_constraints RR_BRACKET)?
     ;
 
@@ -2686,10 +2693,10 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? (data_type | table_type_definition | table_name) ';'?
-    | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
-    | DECLARE LOCAL_ID AS? xml_type_definition ';'?
-    | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
+    : DECLARE LOCAL_ID AS? (data_type | table_type_definition | table_name)
+    | DECLARE loc+=declare_local (',' loc+=declare_local)*
+    | DECLARE LOCAL_ID AS? xml_type_definition
+    | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')'
     ;
 
 xml_declaration
@@ -3103,10 +3110,10 @@ grant_permission
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
 // https://msdn.microsoft.com/en-us/library/ms189484.aspx
 set_statement
-    : SET LOCAL_ID ('.' member_name=id_)? '=' expression ';'?
-    | SET LOCAL_ID assignment_operator expression ';'?
+    : SET LOCAL_ID ('.' member_name=id_)? '=' expression
+    | SET LOCAL_ID assignment_operator expression
     | SET LOCAL_ID '='
-      CURSOR declare_set_cursor_common (FOR (READ ONLY | UPDATE (OF column_name_list)?))? ';'?
+      CURSOR declare_set_cursor_common (FOR (READ ONLY | UPDATE (OF column_name_list)?))?
     // https://msdn.microsoft.com/en-us/library/ms189837.aspx
     | set_special
     ;
@@ -3114,21 +3121,21 @@ set_statement
 // https://msdn.microsoft.com/en-us/library/ms174377.aspx
 transaction_statement
     // https://msdn.microsoft.com/en-us/library/ms188386.aspx
-    : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     // https://msdn.microsoft.com/en-us/library/ms188929.aspx
-    | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)? ';'?
+    | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)?
     // https://msdn.microsoft.com/en-us/library/ms190295.aspx
-    | COMMIT (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
+    | COMMIT (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)?
     // https://msdn.microsoft.com/en-us/library/ms178628.aspx
-    | COMMIT WORK? ';'?
+    | COMMIT WORK?
     | COMMIT id_
     | ROLLBACK id_
     // https://msdn.microsoft.com/en-us/library/ms181299.aspx
-    | ROLLBACK (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    | ROLLBACK (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     // https://msdn.microsoft.com/en-us/library/ms174973.aspx
-    | ROLLBACK WORK? ';'?
+    | ROLLBACK WORK?
     // https://msdn.microsoft.com/en-us/library/ms188378.aspx
-    | SAVE (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    | SAVE (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188037.aspx
@@ -3138,7 +3145,7 @@ go_statement
 
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
-    : USE database=id_ ';'?
+    : USE database=id_
     ;
 
 setuser_statement
@@ -3717,7 +3724,7 @@ time_zone
     ;
 
 primitive_expression
-    : DEFAULT | NULL_ | LOCAL_ID | constant
+    : DEFAULT | NULL_ | LOCAL_ID | primitive_constant
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/case-transact-sql
@@ -3783,8 +3790,8 @@ predicate
 // Changed union rule to sql_union to avoid union construct with C++ target.  Issue reported by person who generates into C++.  This individual reports change causes generated code to work
 
 query_expression
-    : (query_specification | '(' query_expression ')' (UNION ALL? query_expression)? )
-    |  query_specification select_order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
+    : query_specification select_order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
+    | '(' query_expression ')' (UNION ALL? query_expression)?
     ;
 
 sql_union
@@ -3915,10 +3922,6 @@ asterisk
     | (INSERTED | DELETED) '.' '*'
     ;
 
-column_elem
-    : (full_column_name | '$' IDENTITY | '$' ROWGUID | NULL_) as_column_alias?
-    ;
-
 udt_elem
     : udt_column_name=id_ '.' non_static_attr=id_ udt_method_arguments as_column_alias?
     | udt_column_name=id_ DOUBLE_COLON static_attr=id_ udt_method_arguments? as_column_alias?
@@ -3931,7 +3934,6 @@ expression_elem
 
 select_list_elem
     : asterisk
-    | column_elem
     | udt_elem
     | LOCAL_ID (assignment_operator | '=') expression
     | expression_elem
@@ -3949,13 +3951,7 @@ non_ansi_join
 
 // https://docs.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql
 table_source
-    : table_source_item_joined
-    | '(' table_source ')'
-    ;
-
-table_source_item_joined
     : table_source_item joins+=join_part*
-    | '(' table_source_item_joined ')' joins+=join_part*
     ;
 
 table_source_item
@@ -3971,6 +3967,7 @@ table_source_item
     | open_xml
     | open_json
     | DOUBLE_COLON oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
+    | '(' table_source ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
@@ -4027,11 +4024,11 @@ join_on
     ;
 
 cross_join
-    : CROSS JOIN table_source
+    : CROSS JOIN table_source_item
     ;
 
 apply_
-    : apply_style=(CROSS | OUTER) APPLY source=table_source
+    : apply_style=(CROSS | OUTER) APPLY source=table_source_item
     ;
 
 pivot
@@ -4823,11 +4820,7 @@ ddl_object
     ;
 
 full_column_name
-    : (DELETED | INSERTED) '.' column_name=id_
-    | server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
-    | schema=id_? '.' tablename=id_? '.' column_name=id_
-    | tablename=id_? '.' column_name=id_
-    | column_name=id_
+    : ((DELETED | INSERTED | full_table_name) '.')? (column_name=id_ | ('$' (IDENTITY | ROWGUID)))
     ;
 
 column_name_list_with_order
@@ -4935,25 +4928,22 @@ data_type
     | unscaled_type=id_
     ;
 
-default_value
-    : NULL_
-    | DEFAULT
-    | constant
-    ;
-
 // https://msdn.microsoft.com/en-us/library/ms179899.aspx
 constant
     : STRING // string, datetime or uniqueidentifier
     | BINARY
-    | sign? DECIMAL
-    | sign? (REAL | FLOAT)  // float or decimal
-    | sign? dollar='$' (DECIMAL | FLOAT)       // money
+    | '-'? (DECIMAL | REAL | FLOAT)     // float or decimal
+    | '-'? dollar='$' ('-'|'+')? (DECIMAL | FLOAT) // money
     | parameter
     ;
 
-sign
-    : '+'
-    | '-'
+// To reduce ambiguity, -X is considered as an application of unary operator
+primitive_constant
+    : STRING // string, datetime or uniqueidentifier
+    | BINARY
+    | (DECIMAL | REAL | FLOAT)          // float or decimal
+    | dollar='$' ('-'|'+')? (DECIMAL | FLOAT) // money
+    | parameter
     ;
 
 keyword
