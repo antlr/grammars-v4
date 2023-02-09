@@ -171,7 +171,9 @@ jobs:
       shell: pwsh
       run: |
         $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        echo "$antlrPath"
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+        copy $antlrPath /tmp/
     - name: Install trgen
       shell: bash
       run: |
