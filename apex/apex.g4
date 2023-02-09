@@ -521,7 +521,7 @@ expression
     |   expression '.' Identifier
     |   expression '.' THIS
     |   expression '.' NEW
-    |   expression ('.' | '?.')
+    |   expression '.'
         (   DB_INSERT
         |   DB_UPSERT
         |   DB_UPDATE
