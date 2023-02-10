@@ -2162,8 +2162,15 @@ func_body_returns_scalar
        END)
     ;
 
+procedure_param_default_value
+    : NULL_
+    | DEFAULT
+    | constant
+    | LOCAL_ID
+    ;
+
 procedure_param
-    : LOCAL_ID AS? (type_schema=id_ '.')? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
+    : LOCAL_ID AS? (type_schema=id_ '.')? data_type VARYING? ('=' default_val=procedure_param_default_value)? (OUT | OUTPUT | READONLY)?
     ;
 
 procedure_option
@@ -2658,7 +2665,7 @@ drop_view
 
 create_type
     : CREATE TYPE name = simple_name
-      (FROM data_type default_value)?
+      (FROM data_type null_notnull?)?
       (AS TABLE LR_BRACKET column_def_table_constraints RR_BRACKET)?
     ;
 
@@ -2686,10 +2693,10 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? (data_type | table_type_definition | table_name) ';'?
-    | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
-    | DECLARE LOCAL_ID AS? xml_type_definition ';'?
-    | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
+    : DECLARE LOCAL_ID AS? (data_type | table_type_definition | table_name)
+    | DECLARE loc+=declare_local (',' loc+=declare_local)*
+    | DECLARE LOCAL_ID AS? xml_type_definition
+    | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')'
     ;
 
 xml_declaration
@@ -2869,7 +2876,11 @@ execute_body_batch
 //https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
     : (return_status=LOCAL_ID '=')? (func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
-    | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
+    | '(' execute_var_string (',' execute_var_string)* ')' (AS (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
+    | AS (
+            (LOGIN | USER) '=' STRING
+            | CALLER
+    )
     ;
 
 execute_statement_arg
@@ -3103,10 +3114,10 @@ grant_permission
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
 // https://msdn.microsoft.com/en-us/library/ms189484.aspx
 set_statement
-    : SET LOCAL_ID ('.' member_name=id_)? '=' expression ';'?
-    | SET LOCAL_ID assignment_operator expression ';'?
+    : SET LOCAL_ID ('.' member_name=id_)? '=' expression
+    | SET LOCAL_ID assignment_operator expression
     | SET LOCAL_ID '='
-      CURSOR declare_set_cursor_common (FOR (READ ONLY | UPDATE (OF column_name_list)?))? ';'?
+      CURSOR declare_set_cursor_common (FOR (READ ONLY | UPDATE (OF column_name_list)?))?
     // https://msdn.microsoft.com/en-us/library/ms189837.aspx
     | set_special
     ;
@@ -3114,21 +3125,21 @@ set_statement
 // https://msdn.microsoft.com/en-us/library/ms174377.aspx
 transaction_statement
     // https://msdn.microsoft.com/en-us/library/ms188386.aspx
-    : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     // https://msdn.microsoft.com/en-us/library/ms188929.aspx
-    | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)? ';'?
+    | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)?
     // https://msdn.microsoft.com/en-us/library/ms190295.aspx
-    | COMMIT (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
+    | COMMIT (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)?
     // https://msdn.microsoft.com/en-us/library/ms178628.aspx
-    | COMMIT WORK? ';'?
+    | COMMIT WORK?
     | COMMIT id_
     | ROLLBACK id_
     // https://msdn.microsoft.com/en-us/library/ms181299.aspx
-    | ROLLBACK (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    | ROLLBACK (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     // https://msdn.microsoft.com/en-us/library/ms174973.aspx
-    | ROLLBACK WORK? ';'?
+    | ROLLBACK WORK?
     // https://msdn.microsoft.com/en-us/library/ms188378.aspx
-    | SAVE (TRAN | TRANSACTION) (id_ | LOCAL_ID)? ';'?
+    | SAVE (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188037.aspx
@@ -3138,7 +3149,7 @@ go_statement
 
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
-    : USE database=id_ ';'?
+    : USE database=id_
     ;
 
 setuser_statement
@@ -3717,7 +3728,7 @@ time_zone
     ;
 
 primitive_expression
-    : DEFAULT | NULL_ | LOCAL_ID | constant
+    : DEFAULT | NULL_ | LOCAL_ID | primitive_constant
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/case-transact-sql
@@ -3783,8 +3794,8 @@ predicate
 // Changed union rule to sql_union to avoid union construct with C++ target.  Issue reported by person who generates into C++.  This individual reports change causes generated code to work
 
 query_expression
-    : (query_specification | '(' query_expression ')' (UNION ALL? query_expression)? )
-    |  query_specification select_order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
+    : query_specification select_order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
+    | '(' query_expression ')' (UNION ALL? query_expression)?
     ;
 
 sql_union
@@ -3915,10 +3926,6 @@ asterisk
     | (INSERTED | DELETED) '.' '*'
     ;
 
-column_elem
-    : (full_column_name | '$' IDENTITY | '$' ROWGUID | NULL_) as_column_alias?
-    ;
-
 udt_elem
     : udt_column_name=id_ '.' non_static_attr=id_ udt_method_arguments as_column_alias?
     | udt_column_name=id_ DOUBLE_COLON static_attr=id_ udt_method_arguments? as_column_alias?
@@ -3931,7 +3938,6 @@ expression_elem
 
 select_list_elem
     : asterisk
-    | column_elem
     | udt_elem
     | LOCAL_ID (assignment_operator | '=') expression
     | expression_elem
@@ -3949,13 +3955,7 @@ non_ansi_join
 
 // https://docs.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql
 table_source
-    : table_source_item_joined
-    | '(' table_source ')'
-    ;
-
-table_source_item_joined
     : table_source_item joins+=join_part*
-    | '(' table_source_item_joined ')' joins+=join_part*
     ;
 
 table_source_item
@@ -3971,6 +3971,7 @@ table_source_item
     | open_xml
     | open_json
     | DOUBLE_COLON oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
+    | '(' table_source ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
@@ -4027,11 +4028,11 @@ join_on
     ;
 
 cross_join
-    : CROSS JOIN table_source
+    : CROSS JOIN table_source_item
     ;
 
 apply_
-    : apply_style=(CROSS | OUTER) APPLY source=table_source
+    : apply_style=(CROSS | OUTER) APPLY source=table_source_item
     ;
 
 pivot
@@ -4099,6 +4100,15 @@ freetext_predicate
     : CONTAINS '(' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' | PROPERTY '(' full_column_name ',' expression ')') ',' expression ')'
     | FREETEXT '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? ')'
     ;
+
+json_key_value
+    : json_key_name=expression ':' value_expression=expression
+    ;
+
+json_null_clause
+    : (ABSENT | NULL_) ON NULL_
+    ;
+
 built_in_functions
     // Metadata functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/app-name-transact-sql?view=sql-server-ver16
@@ -4304,6 +4314,16 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Cursor functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-rows-transact-sql?view=sql-server-ver16
+    | CURSOR_ROWS                                       #CURSOR_ROWS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-rows-transact-sql?view=sql-server-ver16
+    | FETCH_STATUS                                      #FETCH_STATUS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-status-transact-sql?view=sql-server-ver16
+    | CURSOR_STATUS '(' scope=STRING ',' cursor=expression ')' #CURSOR_STATUS
+    // Cryptographic functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cert-id-transact-sql?view=sql-server-ver16
+    | CERT_ID '(' cert_name=expression ')'              #CERT_ID
     // Data type functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/datalength-transact-sql?view=sql-server-ver16
     | DATALENGTH '(' expression ')'                     #DATALENGTH
@@ -4382,13 +4402,6 @@ built_in_functions
     | MIN_ACTIVE_ROWVERSION '(' ')'                     #MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' left=expression ',' right=expression ')'          #NULLIF
-    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER                                      #CURRENT_USER
-    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER                                      #SESSION_USER
-    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER                                       #SYSTEM_USER
-    | USER                                              #USER
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/parse-transact-sql
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-parse-transact-sql
     | PARSE '(' str=expression AS data_type ( USING culture=expression )? ')'          #PARSE
@@ -4396,6 +4409,21 @@ built_in_functions
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
+    // JSON functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/isjson-transact-sql?view=azure-sqldw-latest
+    | ISJSON '(' json_expr=expression (',' json_type_constraint=expression)? ')' #ISJSON
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-object-transact-sql?view=azure-sqldw-latest
+    | JSON_OBJECT '(' (key_value=json_key_value (',' key_value=json_key_value)*)? json_null_clause? ')' #JSON_OBJECT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-array-transact-sql?view=azure-sqldw-latest
+    | JSON_ARRAY '(' expression_list? json_null_clause? ')' #JSON_ARRAY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-value-transact-sql?view=azure-sqldw-latest
+    | JSON_VALUE '(' expr=expression ',' path=expression ')' #JSON_VALUE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-query-transact-sql?view=azure-sqldw-latest
+    | JSON_QUERY '(' expr=expression (',' path=expression)? ')' #JSON_QUERY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-modify-transact-sql?view=azure-sqldw-latest
+    | JSON_MODIFY '(' expr=expression ',' path=expression ',' new_value=expression ')' #JSON_MODIFY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-path-exists-transact-sql?view=azure-sqldw-latest
+    | JSON_PATH_EXISTS '(' value_expression=expression ',' sql_json_path=expression ')' #JSON_PATH_EXISTS
     // Math functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/abs-transact-sql?view=sql-server-ver16
     | ABS '(' numeric_expression=expression ')' #ABS
@@ -4448,6 +4476,55 @@ built_in_functions
     | GREATEST '(' expression_list ')' #GREATEST
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-least-transact-sql?view=azure-sqldw-latest
     | LEAST '(' expression_list ')' #LEAST
+    // Security functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/certencoded-transact-sql?view=sql-server-ver16
+    | CERTENCODED '(' certid=expression ')'             #CERTENCODED
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/certprivatekey-transact-sql?view=sql-server-ver16
+    | CERTPRIVATEKEY '(' certid=expression ',' encryption_password=expression (',' decryption_pasword=expression)? ')' #CERTPRIVATEKEY
+    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
+    | CURRENT_USER                                      #CURRENT_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/database-principal-id-transact-sql?view=sql-server-ver16
+    | DATABASE_PRINCIPAL_ID '(' (principal_name=expression)? ')' #DATABASE_PRINCIPAL_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/has-dbaccess-transact-sql?view=sql-server-ver16
+    | HAS_DBACCESS '(' database_name=expression ')'     #HAS_DBACCESS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/has-perms-by-name-transact-sql?view=sql-server-ver16
+    | HAS_PERMS_BY_NAME '(' securable=expression ',' securable_class=expression ',' permission=expression ( ',' sub_securable=expression (',' sub_securable_class=expression )? )? ')' #HAS_PERMS_BY_NAME
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-member-transact-sql?view=sql-server-ver16
+    | IS_MEMBER '(' group_or_role=expression ')'        #IS_MEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-rolemember-transact-sql?view=sql-server-ver16
+    | IS_ROLEMEMBER '(' role=expression ( ',' database_principal=expression )? ')' #IS_ROLEMEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/is-srvrolemember-transact-sql?view=sql-server-ver16
+    | IS_SRVROLEMEMBER '(' role=expression ( ',' login=expression )? ')' #IS_SRVROLEMEMBER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/loginproperty-transact-sql?view=sql-server-ver16
+    | LOGINPROPERTY '(' login_name=expression ',' property_name=expression ')' #LOGINPROPERTY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/original-login-transact-sql?view=sql-server-ver16
+    | ORIGINAL_LOGIN '(' ')'                            #ORIGINAL_LOGIN
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/permissions-transact-sql?view=sql-server-ver16
+    | PERMISSIONS '(' ( object_id=expression (',' column=expression)? )? ')' #PERMISSIONS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/pwdencrypt-transact-sql?view=sql-server-ver16
+    | PWDENCRYPT '(' password=expression ')'            #PWDENCRYPT
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/pwdcompare-transact-sql?view=sql-server-ver16
+    | PWDCOMPARE '(' clear_text_password=expression ',' password_hash=expression (',' version=expression )?')' #PWDCOMPARE
+    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
+    | SESSION_USER                                      #SESSION_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/sessionproperty-transact-sql?view=sql-server-ver16
+    | SESSIONPROPERTY '(' option_name=expression ')'    #SESSIONPROPERTY
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-id-transact-sql?view=sql-server-ver16
+    | SUSER_ID '(' (login=expression)? ')'              #SUSER_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-name-transact-sql?view=sql-server-ver16
+    | SUSER_NAME '(' (server_user_sid=expression)? ')'  #SUSER_SNAME
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-sid-transact-sql?view=sql-server-ver16
+    | SUSER_SID '(' (login=expression (',' param2=expression)?)? ')' #SUSER_SID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/suser-sname-transact-sql?view=sql-server-ver16
+    | SUSER_SNAME '(' (server_user_sid=expression)? ')' #SUSER_SNAME
+    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
+    | SYSTEM_USER                                       #SYSTEM_USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-transact-sql?view=sql-server-ver16
+    | USER                                              #USER
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-id-transact-sql?view=sql-server-ver16
+    | USER_ID '(' (user=expression)? ')'                #USER_ID
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/user-name-transact-sql?view=sql-server-ver16
+    | USER_NAME '(' (id=expression)? ')' #USER_NAME
     ;
 
 xml_data_type_methods
@@ -4499,7 +4576,7 @@ value_method
     ;
 
 value_call
-    :  VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    :  (VALUE | VALUE_SQUARE_BRACKET) '(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
@@ -4507,7 +4584,7 @@ query_method
     ;
 
 query_call
-    : QUERY '(' xquery=STRING ')'
+    : (QUERY | QUERY_SQUARE_BRACKET) '(' xquery=STRING ')'
     ;
 
 exist_method
@@ -4515,7 +4592,7 @@ exist_method
     ;
 
 exist_call
-    : EXIST '(' xquery=STRING ')'
+    : (EXIST | EXIST_SQUARE_BRACKET) '(' xquery=STRING ')'
     ;
 
 modify_method
@@ -4523,7 +4600,7 @@ modify_method
     ;
 
 modify_call
-    : MODIFY '(' xml_dml=STRING ')'
+    : (MODIFY | MODIFY_SQUARE_BRACKET) '(' xml_dml=STRING ')'
     ;
 
 hierarchyid_call
@@ -4799,11 +4876,7 @@ ddl_object
     ;
 
 full_column_name
-    : (DELETED | INSERTED) '.' column_name=id_
-    | server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
-    | schema=id_? '.' tablename=id_? '.' column_name=id_
-    | tablename=id_? '.' column_name=id_
-    | column_name=id_
+    : ((DELETED | INSERTED | full_table_name) '.')? (column_name=id_ | ('$' (IDENTITY | ROWGUID)))
     ;
 
 column_name_list_with_order
@@ -4911,25 +4984,22 @@ data_type
     | unscaled_type=id_
     ;
 
-default_value
-    : NULL_
-    | DEFAULT
-    | constant
-    ;
-
 // https://msdn.microsoft.com/en-us/library/ms179899.aspx
 constant
     : STRING // string, datetime or uniqueidentifier
     | BINARY
-    | sign? DECIMAL
-    | sign? (REAL | FLOAT)  // float or decimal
-    | sign? dollar='$' (DECIMAL | FLOAT)       // money
+    | '-'? (DECIMAL | REAL | FLOAT)     // float or decimal
+    | '-'? dollar='$' ('-'|'+')? (DECIMAL | FLOAT) // money
     | parameter
     ;
 
-sign
-    : '+'
-    | '-'
+// To reduce ambiguity, -X is considered as an application of unary operator
+primitive_constant
+    : STRING // string, datetime or uniqueidentifier
+    | BINARY
+    | (DECIMAL | REAL | FLOAT)          // float or decimal
+    | dollar='$' ('-'|'+')? (DECIMAL | FLOAT) // money
+    | parameter
     ;
 
 keyword
@@ -5009,6 +5079,9 @@ keyword
     | TRY_CAST
     | CATALOG
     | CATCH
+    | CERT_ID
+    | CERTENCODED
+    | CERTPRIVATEKEY
     | CHANGE
     | CHANGE_RETENTION
     | CHANGE_TRACKING
@@ -5055,6 +5128,7 @@ keyword
     | CUME_DIST
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
+    | CURSOR_STATUS
     | DATA
     | DATA_PURITY
     | DATABASE_PRINCIPAL_ID
@@ -5112,6 +5186,7 @@ keyword
     | EXCLUSIVE
     | EXECUTABLE
     | EXIST
+    | EXIST_SQUARE_BRACKET
     | EXPAND
     | EXPIRY_DATE
     | EXPLICIT
@@ -5163,6 +5238,8 @@ keyword
     | GROUPING
     | GROUPING_ID
     | HADR
+    | HAS_DBACCESS
+    | HAS_PERMS_BY_NAME
     | HASH
     | HEALTH_CHECK_TIMEOUT
     | HIDDEN_KEYWORD
@@ -5193,9 +5270,19 @@ keyword
     | INSERTED
     | INT
     | IP
+    | IS_MEMBER
+    | IS_ROLEMEMBER
+    | IS_SRVROLEMEMBER
+    | ISJSON
     | ISOLATION
     | JOB
     | JSON
+    | JSON_OBJECT
+    | JSON_ARRAY
+    | JSON_VALUE
+    | JSON_QUERY
+    | JSON_MODIFY
+    | JSON_PATH_EXISTS
     | KB
     | KEEP
     | KEEPDEFAULTS
@@ -5220,6 +5307,7 @@ keyword
     | LOCK
     | LOCK_ESCALATION
     | LOGIN
+    | LOGINPROPERTY
     | LOOP
     | LOW
     | LOWER
@@ -5254,6 +5342,7 @@ keyword
     | MIXED_PAGE_ALLOCATION
     | MODE
     | MODIFY
+    | MODIFY_SQUARE_BRACKET
     | MOVE
     | MULTI_USER
     | NAME
@@ -5304,6 +5393,7 @@ keyword
     | OPTIMIZE
     | OPTIMIZE_FOR_SEQUENTIAL_KEY
     | ORIGINAL_DB_NAME
+    | ORIGINAL_LOGIN
     | OUT
     | OUTPUT
     | OVERRIDE
@@ -5326,6 +5416,7 @@ keyword
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
+    | PERMISSIONS
     | PERSIST_SAMPLE_PERCENT
     | PHYSICAL_ONLY
     | POISON_MESSAGE_HANDLING
@@ -5344,7 +5435,10 @@ keyword
     | PROPERTY
     | PROVIDER
     | PROVIDER_KEY_NAME
+    | PWDCOMPARE
+    | PWDENCRYPT
     | QUERY
+    | QUERY_SQUARE_BRACKET
     | QUEUE
     | QUEUE_DELAY
     | QUOTED_IDENTIFIER
@@ -5432,6 +5526,7 @@ keyword
     | SERIALIZABLE
     | SERVERPROPERTY
     | SERVICEBROKER
+    | SESSIONPROPERTY
     | SESSION_TIMEOUT
     | SETERROR
     | SHARE
@@ -5474,6 +5569,10 @@ keyword
     | SUBSCRIPTION
     | SUBSTRING
     | SUM
+    | SUSER_ID
+    | SUSER_NAME
+    | SUSER_SID
+    | SUSER_SNAME
     | SUSPEND
     | SYMMETRIC
     | SYNCHRONOUS_COMMIT
@@ -5518,10 +5617,13 @@ keyword
     | UOW
     | UPDLOCK
     | UPPER
+    | USER_ID
+    | USER_NAME
     | USING
     | VALID_XML
     | VALIDATION
     | VALUE
+    | VALUE_SQUARE_BRACKET
     | VAR
     | VARBINARY_KEYWORD
     | VARP
