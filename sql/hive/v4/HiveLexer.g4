@@ -91,13 +91,13 @@ KW_DATACONNECTOR                       : 'CONNECTOR';
 KW_DATACONNECTORS                      : 'CONNECTORS';
 KW_DATE                                : 'DATE';
 KW_DATETIME                            : 'DATETIME';
-KW_DAY                                 : 'DAY' | 'DAYS';
+KW_DAY                                 : 'DAY' 'S'?;
 KW_DAYOFWEEK                           : 'KW_DAYOFWEEK';
 KW_DBPROPERTIES                        : 'DBPROPERTIES';
 KW_DCPROPERTIES                        : 'DCPROPERTIES';
 KW_DDL                                 : 'DDL';
 KW_DEBUG                               : 'DEBUG';
-KW_DECIMAL                             : 'DECIMAL' | 'DEC' | 'NUMERIC';
+KW_DECIMAL                             : ('DEC' 'IMAL'?) | 'NUMERIC';
 KW_DEFAULT                             : 'DEFAULT';
 KW_DEFERRED                            : 'DEFERRED';
 KW_DEFINED                             : 'DEFINED';
@@ -109,7 +109,7 @@ KW_DESCRIBE                            : 'DESCRIBE';
 KW_DETAIL                              : 'DETAIL';
 KW_DIRECTORIES                         : 'DIRECTORIES';
 KW_DIRECTORY                           : 'DIRECTORY';
-KW_DISABLE                             : 'DISABLE' | 'DISABLED';
+KW_DISABLE                             : 'DISABLE' 'D'?;
 KW_DISTINCT                            : 'DISTINCT';
 KW_DISTRIBUTE                          : 'DISTRIBUTE';
 KW_DISTRIBUTED                         : 'DISTRIBUTED';
@@ -120,7 +120,7 @@ KW_DROP                                : 'DROP';
 KW_DUMP                                : 'DUMP';
 KW_ELEM_TYPE                           : '$ELEM$';
 KW_ELSE                                : 'ELSE';
-KW_ENABLE                              : 'ENABLE' | 'ENABLED';
+KW_ENABLE                              : 'ENABLE' 'D'?;
 KW_END                                 : 'END';
 KW_ENFORCED                            : 'ENFORCED';
 KW_ESCAPED                             : 'ESCAPED';
@@ -161,7 +161,7 @@ KW_GROUP                               : 'GROUP';
 KW_GROUPING                            : 'GROUPING';
 KW_HAVING                              : 'HAVING';
 KW_HOLD_DDLTIME                        : 'KW_HOLD_DDLTIME';
-KW_HOUR                                : 'HOUR' | 'HOURS';
+KW_HOUR                                : 'HOUR' 'S'?;
 KW_IDXPROPERTIES                       : 'IDXPROPERTIES';
 KW_IF                                  : 'IF';
 KW_IGNORE                              : 'IGNORE';
@@ -174,7 +174,7 @@ KW_INPATH                              : 'INPATH';
 KW_INPUTDRIVER                         : 'INPUTDRIVER';
 KW_INPUTFORMAT                         : 'INPUTFORMAT';
 KW_INSERT                              : 'INSERT';
-KW_INT                                 : 'INT' | 'INTEGER';
+KW_INT                                 : 'INT' 'EGER'?;
 KW_INTERSECT                           : 'INTERSECT';
 KW_INTERVAL                            : 'INTERVAL';
 KW_INTO                                : 'INTO';
@@ -216,8 +216,8 @@ KW_MATERIALIZED                        : 'MATERIALIZED';
 KW_MERGE                               : 'MERGE';
 KW_METADATA                            : 'METADATA';
 KW_MINUS                               : 'MINUS';
-KW_MINUTE                              : 'MINUTE' | 'MINUTES';
-KW_MONTH                               : 'MONTH' | 'MONTHS';
+KW_MINUTE                              : 'MINUTE' 'S'?;
+KW_MONTH                               : 'MONTH' 'S'?;
 KW_MORE                                : 'MORE';
 KW_MOVE                                : 'MOVE';
 KW_MSCK                                : 'MSCK';
@@ -305,7 +305,7 @@ KW_SCHEDULED                           : 'SCHEDULED';
 KW_SCHEDULING_POLICY                   : 'SCHEDULING_POLICY';
 KW_SCHEMA                              : 'SCHEMA';
 KW_SCHEMAS                             : 'SCHEMAS';
-KW_SECOND                              : 'SECOND' | 'SECONDS';
+KW_SECOND                              : 'SECOND' 'S'?;
 KW_SELECT                              : 'SELECT';
 KW_SEMI                                : 'SEMI';
 KW_SERDE                               : 'SERDE';
@@ -388,7 +388,7 @@ KW_VECTORIZATION                       : 'VECTORIZATION';
 KW_VIEW                                : 'VIEW';
 KW_VIEWS                               : 'VIEWS';
 KW_WAIT                                : 'WAIT';
-KW_WEEK                                : 'WEEK' | 'WEEKS';
+KW_WEEK                                : 'WEEK' 'S'?;
 KW_WHEN                                : 'WHEN';
 KW_WHERE                               : 'WHERE';
 KW_WHILE                               : 'WHILE';
@@ -398,7 +398,7 @@ KW_WITHIN                              : 'WITHIN';
 KW_WORK                                : 'WORK';
 KW_WORKLOAD                            : 'WORKLOAD';
 KW_WRITE                               : 'WRITE';
-KW_YEAR                                : 'YEAR' | 'YEARS';
+KW_YEAR                                : 'YEAR' 'S'?;
 KW_ZONE                                : 'ZONE';
 
 // Operators
@@ -501,12 +501,12 @@ QuotedIdentifier
 
 fragment
 Letter
-    : 'a'..'z' | 'A'..'Z'
+    : 'A'..'Z'
     ;
 
 fragment
 HexDigit
-    : 'a'..'f' | 'A'..'F'
+    : 'A'..'F'
     ;
 
 fragment
@@ -516,7 +516,7 @@ Digit
 
 fragment
 Exponent
-    : ('e' | 'E') ( PLUS|MINUS )? (Digit)+
+    : ('E') ( PLUS|MINUS )? (Digit)+
     ;
 
 fragment
@@ -531,7 +531,8 @@ CharSetName
     : '_' (Letter | Digit | '_' | '-' | '.' | ':' )+
     ;
 
-WS  : (' '|'\r'|'\t'|'\n') -> channel(HIDDEN)
+WHITE_SPACE
+    : (' '|'\r'|'\t'|'\n') -> channel(HIDDEN)
     ;
 
 LINE_COMMENT
