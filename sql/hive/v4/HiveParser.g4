@@ -23,8 +23,7 @@ options
 
 // starting rule
 statement
-    : explainStatement EOF
-    | execStatement EOF
+    : (explainStatement | execStatement) EOF
     ;
 
 explainStatement
@@ -45,7 +44,7 @@ explainOption
     | KW_REOPTIMIZATION
     | KW_LOCKS
     | KW_AST
-    | (KW_VECTORIZATION vectorizationOnly? vectorizatonDetail?)
+    | KW_VECTORIZATION vectorizationOnly? vectorizatonDetail?
     | KW_DEBUG
     | KW_DDL
     ;
@@ -343,7 +342,8 @@ showStatement
 
 showTablesFilterExpr
     : KW_WHERE id_ EQUAL StringLiteral
-    | KW_LIKE showStmtIdentifier|showStmtIdentifier
+    | KW_LIKE showStmtIdentifier
+    | showStmtIdentifier
     ;
 
 lockStatement
@@ -1172,7 +1172,7 @@ limitClause
 DELETE FROM <tableName> WHERE ...;
 */
 deleteStatement
-    : KW_DELETE KW_FROM tableName (whereClause)?
+    : KW_DELETE KW_FROM tableName whereClause?
     ;
 
 /*SET <columName> = (3 + col2)*/
@@ -1444,7 +1444,8 @@ alterStatementSuffixUpdateStats
     ;
 
 alterStatementChangeColPosition
-    : first=KW_FIRST|KW_AFTER afterCol=id_
+    : first=KW_FIRST
+    | KW_AFTER afterCol=id_
     ;
 
 alterStatementSuffixAddPartitions
@@ -1456,15 +1457,15 @@ alterStatementSuffixAddPartitionsElement
     ;
 
 alterStatementSuffixTouch
-    : KW_TOUCH (partitionSpec)*
+    : KW_TOUCH partitionSpec*
     ;
 
 alterStatementSuffixArchive
-    : KW_ARCHIVE (partitionSpec)*
+    : KW_ARCHIVE partitionSpec*
     ;
 
 alterStatementSuffixUnArchive
-    : KW_UNARCHIVE (partitionSpec)*
+    : KW_UNARCHIVE partitionSpec*
     ;
 
 partitionLocation
@@ -2998,7 +2999,7 @@ comparisionOperator
 
 triggerActionExpression
     : KW_KILL
-    | (KW_MOVE KW_TO poolPath)
+    | KW_MOVE KW_TO poolPath
     ;
 
 triggerActionExpressionStandalone

@@ -448,23 +448,23 @@ StringLiteral
 
 CharSetLiteral
     : StringLiteral
-    | '0' 'X' (HexDigit|Digit)+
+    | '0' 'X' (HexDigit | Digit)+
     ;
 
 IntegralLiteral
-    : (Digit)+ ('L' | 'S' | 'Y')
+    : Digit+ ('L' | 'S' | 'Y')
     ;
 
 NumberLiteral
-    : Number ('D' | 'B' 'D')
+    : Number ('B'? 'D')
     ;
 
 ByteLengthLiteral
-    : (Digit)+ ('b' | 'B' | 'k' | 'K' | 'm' | 'M' | 'g' | 'G')
+    : Digit+ [BKMG]
     ;
 
 Number
-    : (Digit)+ ( DOT (Digit)* (Exponent)? | Exponent)?
+    : Digit+ (DOT Digit* Exponent? | Exponent)?
     ;
 
 /*
@@ -496,7 +496,7 @@ Identifier
 
 fragment
 QuotedIdentifier
-    : '`'  ( '``' | ~('`') )* '`'
+    : '`'  ('``' | ~'`')* '`'
     ;
 
 fragment
@@ -521,14 +521,14 @@ Exponent
 
 fragment
 RegexComponent
-    : 'a'..'z' | 'A'..'Z' | '0'..'9' | '_'
+    : 'A'..'Z' | '0'..'9' | '_'
     | PLUS | STAR | QUESTION | MINUS | DOT
     | LPAREN | RPAREN | LSQUARE | RSQUARE | LCURLY | RCURLY
     | BITWISEXOR | BITWISEOR | DOLLAR | '!'
     ;
 
 CharSetName
-    : '_' (Letter | Digit | '_' | '-' | '.' | ':' )+
+    : '_' (Letter | Digit | '_' | '-' | '.' | ':')+
     ;
 
 WHITE_SPACE
@@ -536,7 +536,7 @@ WHITE_SPACE
     ;
 
 LINE_COMMENT
-    : '--' (~('\n'|'\r'))* -> channel(HIDDEN)
+    : '--' ~('\n' | '\r')* -> channel(HIDDEN)
     ;
 
 QUERY_HINT
