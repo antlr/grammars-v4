@@ -4314,6 +4314,13 @@ built_in_functions
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    // Cursor functions
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-rows-transact-sql?view=sql-server-ver16
+    | CURSOR_ROWS                                       #CURSOR_ROWS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-rows-transact-sql?view=sql-server-ver16
+    | FETCH_STATUS                                      #FETCH_STATUS
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-status-transact-sql?view=sql-server-ver16
+    | CURSOR_STATUS '(' scope=STRING ',' cursor=expression ')' #CURSOR_STATUS
     // Cryptographic functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/cert-id-transact-sql?view=sql-server-ver16
     | CERT_ID '(' cert_name=expression ')'              #CERT_ID
@@ -5121,6 +5128,7 @@ keyword
     | CUME_DIST
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
+    | CURSOR_STATUS
     | DATA
     | DATA_PURITY
     | DATABASE_PRINCIPAL_ID
