@@ -115,6 +115,7 @@ select CRYPTOGRAPHIC from (select 1 as CRYPTOGRAPHIC) t;
 select CUME_DIST from (select 1 as CUME_DIST) t;
 select CURSOR_CLOSE_ON_COMMIT from (select 1 as CURSOR_CLOSE_ON_COMMIT) t;
 select CURSOR_DEFAULT from (select 1 as CURSOR_DEFAULT) t;
+select CURSOR_STATUS from (select 1 as CURSOR_STATUS) t;
 select DATA from (select 1 as DATA) t;
 select DATA_PURITY from (select 1 as DATA_PURITY) t;
 select DATABASE_PRINCIPAL_ID from (select 1 as DATABASE_PRINCIPAL_ID) t;

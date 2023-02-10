@@ -348,6 +348,7 @@ CRYPTOGRAPHIC:                         'CRYPTOGRAPHIC';
 CUME_DIST:                             'CUME_DIST';
 CURSOR_CLOSE_ON_COMMIT:                'CURSOR_CLOSE_ON_COMMIT';
 CURSOR_DEFAULT:                        'CURSOR_DEFAULT';
+CURSOR_STATUS:                         'CURSOR_STATUS';
 DATA:                                  'DATA';
 DATA_PURITY:                           'DATA_PURITY';
 DATABASE_PRINCIPAL_ID:                 'DATABASE_PRINCIPAL_ID';
@@ -1195,6 +1196,10 @@ NVARCHAR:                              'NVARCHAR';
 DISK_DRIVE:                            [A-Z][:];
 DOLLAR_ACTION:                         '$ACTION';
 
+// Functions starting with double at signs
+// https://learn.microsoft.com/en-us/sql/t-sql/language-elements/variables-transact-sql?view=sql-server-ver16
+CURSOR_ROWS:                           '@@CURSOR_ROWS';
+FETCH_STATUS:                          '@@FETCH_STATUS';
 
 SPACE:              [ \t\r\n]+    -> skip;
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/slash-star-comment-transact-sql
