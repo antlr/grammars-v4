@@ -97,7 +97,7 @@ KW_DBPROPERTIES                        : 'DBPROPERTIES';
 KW_DCPROPERTIES                        : 'DCPROPERTIES';
 KW_DDL                                 : 'DDL';
 KW_DEBUG                               : 'DEBUG';
-KW_DECIMAL                             : ('DEC' 'IMAL'?) | 'NUMERIC';
+KW_DECIMAL                             : 'DEC' 'IMAL'? | 'NUMERIC';
 KW_DEFAULT                             : 'DEFAULT';
 KW_DEFERRED                            : 'DEFERRED';
 KW_DEFINED                             : 'DEFINED';
