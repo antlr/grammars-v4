@@ -1569,7 +1569,11 @@ alter_server_role_pdw
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-service-transact-sql
 alter_service
-    : ALTER SERVICE modified_service_name=id_ (ON QUEUE (schema_name=id_ DOT)? queue_name=id_)?  ('(' (COMMA? (ADD|DROP) CONTRACT modified_contract_name=id_)* ')')?
+    : ALTER SERVICE modified_service_name=id_ (ON QUEUE (schema_name=id_ DOT)? queue_name=id_)?  ('(' opt_arg_clause (COMMA opt_arg_clause)* ')')?
+    ;
+
+opt_arg_clause
+    : (ADD|DROP) CONTRACT modified_contract_name=id_
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-service-transact-sql
