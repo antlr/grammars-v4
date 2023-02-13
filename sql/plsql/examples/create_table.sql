@@ -21,7 +21,7 @@ CREATE TABLE purchaseorder_as_table OF XMLType
   XMLSCHEMA "http://xmlns.oracle.com/xdb/documentation/purchaseOrder.xsd"
   ELEMENT "PurchaseOrder";
 
-CREATE TABLE purchaseorder_as_column (id NUMBER, xml_document XMLType)
+CREATE TABLE purchaseorder_as_column OF XMLType
   XMLTYPE COLUMN xml_document
   ELEMENT
     "http://xmlns.oracle.com/xdb/documentation/purchaseOrder.xsd#PurchaseOrder";
@@ -337,3 +337,6 @@ CREATE TABLE "ASEDBUSR"."DOCBESTPARAMATTR"
   STORAGE(INITIAL 106496 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0
   BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)) ;
+
+CREATE TABLE "A"."B" ( "FIELD1" NUMBER(19,0) NOT NULL ENABLE, "FIELD2" NUMBER(19,0) NOT NULL ENABLE, PRIMARY KEY ("FIELD1") ENABLE ) 
+ORGANIZATION INDEX NOCOMPRESS ; 

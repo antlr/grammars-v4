@@ -6,3 +6,4 @@ As SQL grammar are normally not case sensitive but this grammar implementation i
 
 You could find more information [here](https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md#custom-character-streams-approach) with implementations for various target languages.
 
+https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Introduction-to-Oracle-SQL.html
