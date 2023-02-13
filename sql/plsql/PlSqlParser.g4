@@ -1276,10 +1276,8 @@ drop_index
 
 flashback_table
     : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
-      (
-        (( (SCN | TIMESTAMP) expression | RESTORE POINT restore_point ) ((ENABLE | DISABLE) TRIGGERS)? )
-        |
-        (BEFORE DROP (RENAME TO tableview_name)?)
+      ( ((SCN | TIMESTAMP) expression | RESTORE POINT restore_point) ((ENABLE | DISABLE) TRIGGERS)?
+        | BEFORE DROP (RENAME TO tableview_name)?
       )
     ;
 
