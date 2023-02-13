@@ -70,7 +70,7 @@ dmlStatement
     : selectStatement | insertStatement | updateStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
-    | handlerStatement
+    | handlerStatement | valuesStatement
     ;
 
 transactionStatement
@@ -942,6 +942,13 @@ selectStatement
 
 updateStatement
     : singleUpdateStatement | multipleUpdateStatement
+    ;
+
+// https://mariadb.com/kb/en/table-value-constructors/
+valuesStatement
+    : VALUES
+    '(' expressionsWithDefaults? ')'
+    (',' '(' expressionsWithDefaults? ')')*
     ;
 
 // details
