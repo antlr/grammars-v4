@@ -1056,14 +1056,14 @@ queryExpressionNointo
 
 querySpecification
     : SELECT selectSpec* selectElements selectIntoExpression?
-      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
+      fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
     | SELECT selectSpec* selectElements
-    fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
+    fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
     : SELECT selectSpec* selectElements
-      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
+      fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
     ;
 
 unionParenthesis
@@ -1453,13 +1453,11 @@ routineBody
 
 blockStatement
     : (uid ':')? BEGIN
-      (
         (declareVariable SEMI)*
         (declareCondition SEMI)*
         (declareCursor SEMI)*
         (declareHandler SEMI)*
         procedureSqlStatement*
-      )?
       END uid?
     ;
 
@@ -2503,7 +2501,7 @@ nonAggregateWindowedFunction
     ;
 
 overClause
-    : OVER ('(' windowSpec? ')' | windowName)
+    : OVER ('(' windowSpec ')' | windowName)
     ;
 
 windowSpec
