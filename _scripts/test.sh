@@ -301,7 +301,7 @@ do
     do
         if [ "$t" == "+all" ]; then yes=true; fi
         if [ "$t" == "-$target" ]; then yes=false; fi
-        if [ "$t" == "+$target" ]; then yes=true; fi
+        if [ "$t" == "$target" ]; then yes=true; fi
     done
 
     if [ "$yes" == "false" ]
