@@ -173,6 +173,9 @@ jobs:
         $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
         echo "$antlrPath"
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+        If(!(test-path -PathType container /tmp)) {
+           New-Item -Path '/tmp' -ItemType Directory
+        }
         copy $antlrPath /tmp/
     - name: Install trgen
       shell: bash
