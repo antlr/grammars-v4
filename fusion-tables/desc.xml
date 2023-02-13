@@ -1,3 +1,3 @@
 <desc>
-   <targets>+Antlr4cs;+CSharp;+Cpp;+Dart;+Go;+Java;+JavaScript;+PHP;+Python3</targets>
+   <targets>Antlr4cs;CSharp;Cpp;Dart;Go;Java;JavaScript;TypeScript;PHP;Python3</targets>
 </desc>

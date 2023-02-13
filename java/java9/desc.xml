@@ -1,3 +1,3 @@
 <desc>
-   <targets>+CSharp;+Cpp;+Dart</targets>
+   <targets>CSharp;Cpp;Dart</targets>
 </desc>

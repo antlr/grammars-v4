@@ -1,3 +1,3 @@
 <desc>
-   <targets>+CSharp;+Python3</targets>
+   <targets>CSharp;Python3</targets>
 </desc>

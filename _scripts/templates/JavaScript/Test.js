@@ -152,7 +152,6 @@ function ParseFilename(input, row_number) {
 
 function DoParse(str, input_name, row_number) {
     const lexer = new <lexer_name>(str);
-    lexer.strictMode = false;
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
@@ -174,8 +173,8 @@ function DoParse(str, input_name, row_number) {
         lexer.reset();
     }
     if (show_trace) {
-        parser._interp.trace_atn_sim = true;
-        antlr4.context.PredictionContext.trace_atn_sim = true;
+//        parser._interp.trace_atn_sim = true;
+//        antlr4.context.PredictionContext.trace_atn_sim = true;
     }
     const timer = new Timer({ label: 'test-timer2' });
     timer.start();
