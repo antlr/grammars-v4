@@ -92,10 +92,10 @@ select_statement
         (WHERE condition)?
         (GROUP BY all_distinct? grouping_element (','grouping_element)*)?
         (HAVING condition)?
-        ( (UNION|INTERSECT|EXCEPT) all_distinct? select_statement )?
-        (ORDER BY order_item (',' order_item)* )?
-        (OFFSET count (ROW|ROWS)? )?
-        (LIMIT (count | ALL) )?
+        ((UNION | INTERSECT | EXCEPT) all_distinct? select_statement)?
+        (ORDER BY order_item (',' order_item)*)?
+        (OFFSET count (ROW | ROWS)?)?
+        (LIMIT (count | ALL))?
     ;
 
 all_distinct
@@ -104,7 +104,7 @@ all_distinct
     ;
 
 order_item
-    : expression (ASC|DESC) (NULLS (FIRST|LAST))?
+    : expression (ASC|DESC)? (NULLS (FIRST|LAST))?
     ;
 
 from_item
@@ -128,7 +128,7 @@ condition
     ;
 
 insert_into
-    : INSERT INTO destination_table ( '(' column_list ')' )?
+    : INSERT INTO destination_table ('(' column_list ')')?
         ( select_statement
         | VALUES value_list (',' value_list)*
         )
@@ -144,7 +144,7 @@ select_list
 
 select_item
     : expression (AS? alias)?
-    | (table_name'.')?'*'
+    | (table_name '.')?'*'
     ;
 
 delete_stmt
@@ -152,7 +152,9 @@ delete_stmt
     ;
 
 update
-    : UPDATE (db_name'.')? table_name SET col_name '=' expression (',' col_name '=' expression)* (WHERE predicate)?
+    : UPDATE (db_name'.')? table_name
+        SET col_name '=' expression (',' col_name '=' expression)*
+        (WHERE predicate)?
     ;
 
 merge_into
@@ -167,7 +169,7 @@ search_condition
     ;
 
 when_clauses
-    : (when_matched_and_clause|when_matched_then_clause)* when_not_matched_clause?
+    : (when_matched_and_clause | when_matched_then_clause)* when_not_matched_clause?
     ;
 
 when_not_matched_clause
@@ -196,7 +198,7 @@ update_delete
     ;
 
 optimize_stmt
-    : OPTIMIZE (db_name'.')? table_name REWRITE DATA USING BIN_PACK (WHERE predicate)?
+    : OPTIMIZE (db_name '.')? table_name REWRITE DATA USING BIN_PACK (WHERE predicate)?
     ;
 
 vacuum
@@ -213,7 +215,7 @@ source_table
 
 explain
     : EXPLAIN statement ('(' explain_option (',' explain_option)* ')')?
-    | EXPLAIN ANALYZE ( '(' FORMAT (TEXT|JSON) ')' )? statement
+    | EXPLAIN ANALYZE ('(' FORMAT (TEXT | JSON) ')')? statement
     ;
 
 explain_option
@@ -233,7 +235,7 @@ statement
     ;
 
 execute
-    : EXECUTE statement_name (USING parameter (',' parameter)* )?
+    : EXECUTE statement_name (USING parameter (',' parameter)*)?
     ;
 
 parameter
@@ -257,7 +259,11 @@ unload
     ;
 
 property_list
-    : property_name '=' string (',' property_name '=' string)*
+    : property_name '=' property_value (',' property_name '=' property_value)*
+    ;
+
+property_value
+    : value
     ;
 
 predicate
@@ -269,16 +275,20 @@ predicate
 DDL
 */
 alter_database
-    : ALTER (DATABASE|SCHEMA) database_name SET DBPROPERTIES '(' kv_pair (',' kv_pair)* ')'
+    : ALTER db_schema database_name SET DBPROPERTIES '(' kv_pair (',' kv_pair)* ')'
+    ;
+
+db_schema
+    : DATABASE
+    | SCHEMA
     ;
 
 kv_pair
-    : string '=' string
-    | todo // 'v' or "v"
+    : string '=' (string | DQ_STRING_LITERAL)
     ;
 
 alter_table_add_cols
-    : ALTER TABLE table_name (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')' )?
+    : ALTER TABLE table_name (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')')?
         ADD COLUMNS (col_name data_type)
     ;
 
@@ -300,7 +310,7 @@ alter_table_add_part
     ;
 
 alter_table_drop_part
-    : ALTER TABLE table_name DROP if_exists? PARTITION '('partition_spec')' (',' PARTITION '('partition_spec')' )*
+    : ALTER TABLE table_name DROP if_exists? PARTITION '('partition_spec')' (',' PARTITION '('partition_spec')')*
     ;
 
 partition_spec
@@ -313,12 +323,12 @@ alter_table_rename_part
 
 alter_table_replace_part
     : ALTER TABLE table_name
-        (PARTITION '('part_col_name_value (',' part_col_name_value)* ')' )?
+        (PARTITION '('part_col_name_value (',' part_col_name_value)* ')')?
         REPLACE COLUMNS '('col_name data_type (',' col_name data_type)* ')'
     ;
 
 alter_table_set_location
-    : ALTER TABLE table_name ( PARTITION '('partition_spec')' )? SET LOCATION string
+    : ALTER TABLE table_name (PARTITION '('partition_spec')')? SET LOCATION string
     ;
 
 alter_table_set_props
@@ -326,35 +336,63 @@ alter_table_set_props
     ;
 
 create_database
-    : CREATE (DATABASE|SCHEMA) if_not_exists? database_name
+    : CREATE db_schema if_not_exists? database_name
       (COMMENT string)?
       (LOCATION string)?
-      (WITH DBPROPERTIES '(' kv_pair (',' kv_pair)* ')' )?
+      (WITH DBPROPERTIES '(' kv_pair (',' kv_pair)* ')')?
     ;
 
 create_table
     : CREATE EXTERNAL TABLE if_not_exists?
      (db_name'.')? table_name ('(' col_def_with_comment (',' col_def_with_comment)* ')')?
      (COMMENT table_comment)?
-     (PARTITIONED BY '('col_def_with_comment (',' col_def_with_comment)* ')' )?
+     (PARTITIONED BY '('col_def_with_comment (',' col_def_with_comment)* ')')?
      (CLUSTERED BY '(' col_name (',' col_name)* ')' INTO num_buckets BUCKETS)?
      (ROW FORMAT row_format)?
      (STORED AS file_format)?
-     (WITH SERDEPROPERTIES '(' todo ')' )?
-     (LOCATION string)?
-  //   (TBLPROPERTIES '(' ['has_encrypted_data'='true | false',] ['classification'='aws_glue_classification',] property_name=property_value [, ...] ')' )?
+     LOCATION string
+     (TBLPROPERTIES '(' property_list ')')?
     ;
 
 table_comment
-    : todo
+    : string
     ;
 
 row_format
-    : todo
+    : DELIMITED table_row_format_field_identifier? table_row_format_coll_items_identifier?
+              table_row_format_map_keys_identifier? table_row_format_lines_identifier? table_row_null_format?
+    | SERDE string (WITH SERDEPROPERTIES '(' property_list ')')?
+    ;
+
+table_row_format_field_identifier
+    : FIELDS TERMINATED BY string (ESCAPED BY string)?
+    ;
+
+table_row_format_coll_items_identifier
+    : COLLECTION ITEMS TERMINATED BY string
+    ;
+
+table_row_format_map_keys_identifier
+    : MAP KEYS TERMINATED BY string
+    ;
+
+table_row_format_lines_identifier
+    : LINES TERMINATED BY string
+    ;
+
+table_row_null_format
+    : NULL_ DEFINED AS string
     ;
 
 file_format
-    : todo
+    : SEQUENCEFILE
+    | TEXTFILE
+    | RCFILE
+    | ORC
+    | PARQUET
+    | AVRO
+    | ION
+    | INPUTFORMAT string OUTPUTFORMAT string
     ;
 
 num_buckets
@@ -371,13 +409,13 @@ col_comment
 
 create_table_as
     : CREATE TABLE table_name
-    ( WITH '(' prop_exp (',' prop_exp)* ')' )?
+    ( WITH '(' prop_exp (',' prop_exp)* ')')?
     AS query
-    ( WITH NO? DATA )?
+    (WITH NO? DATA)?
     ;
 
 property_name
-    : todo
+    : id_
     ;
 
 prop_exp
@@ -390,7 +428,11 @@ create_view
 
 describe
     : DESCRIBE (EXTENDED | FORMATTED)? (db_name '.')? table_name (PARTITION partition_spec)?
-    //    [col_name ( [.field_name] | [.'$elem$'] | [.'$key$'] | [.'$value$'] ) ]
+        //(col_name ( [.field_name] | [.'$elem$'] | [.'$key$'] | [.'$value$'] ) )? //TODO - poor documentation vs actual functionality
+    ;
+
+field_name
+    : id_
     ;
 
 describe_view
@@ -398,7 +440,7 @@ describe_view
     ;
 
 drop_database
-    : DROP (DATABASE | SCHEMA) if_exists? database_name (RESTRICT | CASCADE)?
+    : DROP db_schema if_exists? database_name (RESTRICT | CASCADE)?
     ;
 
 drop_table
@@ -435,15 +477,15 @@ show_partitions
     ;
 
 show_tables
-    : SHOW TABLES (IN database_name)? (reg_ex)?
+    : SHOW TABLES (IN database_name)? reg_ex?
     ;
 
 show_tblproperties
-    : SHOW TBLPROPERTIES table_name ( '(' string ')' )?
+    : SHOW TBLPROPERTIES table_name ('(' string ')')?
     ;
 
 show_views
-    : SHOW VIEWS (IN database_name)? LIKE (reg_ex)?
+    : SHOW VIEWS (IN database_name)? (LIKE reg_ex)?
     ;
 
 query
@@ -458,7 +500,7 @@ true_false
 boolean_expression
     : boolean_expression AND boolean_expression
     | boolean_expression OR boolean_expression
-    | NOT* ( '(' boolean_expression ')' | pred)
+    | NOT* ('(' boolean_expression ')' | pred)
     ;
 
 pred
@@ -469,7 +511,7 @@ pred
     | expression NOT? IN table_subquery
     | expression NOT? IN '(' expression_list ')'
     | NOT? EXISTS table_subquery
-    | expression comparison_operator ( ALL | ANY | SOME ) table_subquery
+    | expression comparison_operator (ALL | ANY | SOME) table_subquery
     ;
 
 table_subquery
@@ -485,13 +527,29 @@ expression
     | '(' expression ')'
     | table_subquery
     | id_ '(' expression_list ')'
-//    | case_expression
+    | case_expression
+    | when_expression
     | op=(PLUS | MINUS) expression
     | expression op=(STAR | DIVIDE | MODULE) expression
-    | expression op=(PLUS | MINUS ) expression
+    | expression op=(PLUS | MINUS) expression
     | expression DOT expression
     | CAST '(' expression AS data_type ')'
     ;
+
+case_expression
+    : CASE expression
+        (WHEN expression THEN expression)+
+        (ELSE expression)?
+        END
+    ;
+
+when_expression
+    : CASE
+        (WHEN expression THEN expression)+
+        (ELSE expression)?
+        END
+    ;
+
 
 primitive_expression
     : literal
@@ -516,6 +574,13 @@ number
     ;
 
 data_type
+    : primitive_type
+    | ARRAY '<' data_type '>'
+    | MAP '<' primitive_type ',' data_type '>'
+    | STRUCT '<' struct_col_def (',' struct_col_def)* '>'
+    ;
+
+primitive_type
     : BOOLEAN
     | TINYINT
     | SMALLINT
@@ -525,19 +590,11 @@ data_type
     | DOUBLE
     | FLOAT
     | DECIMAL '(' precision ',' scale ')'
-    | CHAR
-    | VARCHAR '(' int_number ')'
+    | (CHAR | VARCHAR) '(' int_number ')'
     | STRING
     | BINARY
     | DATE
     | TIMESTAMP
-    | ARRAY '<' data_type '>'
-    | MAP '<' primitive_type ',' data_type '>'
-    | STRUCT '<' struct_col_def (',' struct_col_def)* '>'
-    ;
-
-primitive_type
-    : todo
     ;
 
 precision
@@ -620,8 +677,4 @@ or_replace
 from_in
     : FROM
     | IN
-    ;
-
-todo
-    : ','
     ;
