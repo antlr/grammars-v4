@@ -5134,6 +5134,7 @@ non_reserved_keywords_in_12c
     | MAX_SHARED_TEMP_SIZE
     | MEMCOMPRESS
     | METADATA
+    | MEMOPTIMIZE
     | MODEL_NB
     | MODEL_SV
     | MODIFICATION
