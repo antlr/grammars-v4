@@ -341,7 +341,7 @@ create trigger trg_my1 before delete on test.t1 for each row begin insert into l
 create or replace view my_view1 as select 1 union select 2 limit 0,5;
 create algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
 create or replace definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
-create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
+create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 create view v_some_table as (with a as (select * from some_table) select * from a);
 
@@ -618,4 +618,13 @@ SELECT * FROM cte;
 #begin
 lock tables t1 read;
 lock table t1 read local wait 100;
+#end
+
+#begin
+CREATE OR REPLACE VIEW view_name AS
+WITH my_values(val1, val2) AS (
+    VALUES (1, 'One'),
+           (2, 'Two')
+)
+SELECT v.val1, v.val2 FROM my_values v;
 #end
