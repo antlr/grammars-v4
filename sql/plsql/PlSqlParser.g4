@@ -1993,15 +1993,7 @@ blockchain_row_retention_clause
     ;
 
 blockchain_hash_and_data_format_clause
-    : HASHING USING sha2_512_quoted VERSION v1_quoted
-    ;
-
-sha2_512_quoted
-    : SHA2_512_Q
-    ;
-
-v1_quoted
-    : V1_Q
+    : HASHING USING SHA2_512_Q VERSION V1_Q
     ;
 
 collation_name
