@@ -1959,8 +1959,8 @@ object_table_substitution
 
 relational_table
     : ('(' relational_property (',' relational_property)* ')')?
-      (immutable_table_clauses)?
-      (blockchain_table_clauses)?
+      immutable_table_clauses?
+      blockchain_table_clauses?
       (DEFAULT COLLATION collation_name)?
       (ON COMMIT (DROP | PRESERVE) DEFINITION)?
       (ON COMMIT (DELETE | PRESERVE) ROWS)?
@@ -1993,15 +1993,15 @@ blockchain_row_retention_clause
     ;
 
 blockchain_hash_and_data_format_clause
-    : HASHING USING sha2_512 VERSION v1
+    : HASHING USING sha2_512_quoted VERSION v1_quoted
     ;
 
-sha2_512
-    :
+sha2_512_quoted
+    : SHA2_512_Q
     ;
 
-v1
-    :
+v1_quoted
+    : V1_Q
     ;
 
 collation_name
@@ -2036,7 +2036,7 @@ indexing_clause
 
 attribute_clustering_clause
     : CLUSTERING
-        (clustering_join)?
+        clustering_join?
         cluster_clause
         (yes_no? ON LOAD)?
         (yes_no? ON DATA MOVEMENT)?

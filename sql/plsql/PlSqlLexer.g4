@@ -2226,6 +2226,9 @@ YMINTERVAL_UNCONSTRAINED:     'YMINTERVAL_UNCONSTRAINED';
 ZONE:                         'ZONE';
 ZONEMAP:                      'ZONEMAP';
 
+SHA2_512_Q:                   '"SHA2_512"';
+V1_Q:                         '"V1"';
+
 CUME_DIST:                    'CUME_DIST';
 DENSE_RANK:                   'DENSE_RANK';
 LISTAGG:                      'LISTAGG';
