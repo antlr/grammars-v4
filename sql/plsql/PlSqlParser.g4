@@ -3091,7 +3091,7 @@ end_time_column
 
 column_definition
     : column_name (datatype | type_name)
-         SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
+         SORT? (VISIBLE | INVISIBLE)? (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
     ;
 
 virtual_column_definition
