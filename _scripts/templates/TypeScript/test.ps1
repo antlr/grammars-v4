@@ -146,9 +146,9 @@ if ( $updated -eq 129 ) {
         Get-Content "$old/new_errors.txt" | Write-Host
         Write-Host "Test failed."
     }
-    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
     $err = $status
     exit 1
 }
@@ -160,9 +160,9 @@ if ( $updated -eq 1 ) {
     git diff . | Write-Host
     Get-Content "$old/new_errors.txt" | Write-Host
     Write-Host "Test failed."
-    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
     exit 1
 }
 
@@ -172,14 +172,14 @@ if ( $new_errors_txt.Count -gt 0 ) {
     Write-Host "New errors in output."
     Get-Content "$old/new_errors.txt" | Write-Host
     Write-Host "Test failed."
-    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
-    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
     exit 1
 }
 
 Write-Host "Test succeeded."
-Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
-Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
-Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
+Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
+Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
+Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
 exit 0
