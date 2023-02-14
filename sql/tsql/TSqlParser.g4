@@ -5972,6 +5972,9 @@ keyword
     | VARCHAR
     | NVARCHAR
     | PRECISION //For some reason this is possible to use as ID
+    | IPV4_ADDR
+    | IPV6_ADDR
+    | FILESTREAM_ON
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
