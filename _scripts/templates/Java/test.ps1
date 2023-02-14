@@ -72,10 +72,34 @@ if ( $size -eq 0 ) {
     exit 1
 }
 
+$old = Get-Location
+Set-Location ../<example_files_unix>
+
 # Check if any .errors/.tree files have changed. That's not good.
-$message = git diff --exit-code --name-only $TestDirectory
-$updated = $LASTEXITCODE
-Write-Host $message
+rm -fo $old/updated.txt 2>&1 | Out-Null
+$updated = 0
+foreach ($item in Get-ChildItem . -Recurse) {
+    $file = $item.fullname
+    $ext = $item.Extension
+    if ($ext -eq ".errors") {
+        git diff --exit-code $file *>> $old/updated.txt
+	$st = $LASTEXITCODE
+        if ($st -ne 0) {
+            $updated = $st
+        }
+    }
+}
+foreach ($item in Get-ChildItem . -Recurse) {
+    $file = $item.fullname
+    $ext = $item.Extension
+    if ($ext -eq ".tree") {
+        git diff --exit-code $file *>> $old/updated.txt
+	$st = $LASTEXITCODE
+        if ($st -ne 0) {
+            $updated = $st
+        }
+    }
+}
 
 # Check if any untracked .errors files are not empty.
 $new_errors_txt = New-Object System.Collections.Generic.List[string]
@@ -89,10 +113,10 @@ if ( ! [String]::IsNullOrWhiteSpace($new_errors2_txt) ) {
 } else {
     $new_errors3_txt = [System.Collections.Arraylist]@()
 }
-if (Test-Path -Path "new_errors.txt" -PathType Leaf) {
-    Remove-Item "new_errors.txt"
+if (Test-Path -Path "$old/new_errors.txt" -PathType Leaf) {
+    Remove-Item "$old/new_errors.txt"
 }
-New-Item -Path . -Name "new_errors.txt" -ItemType "file" -Value "" | Out-Null
+New-Item -Path "$old" -Name "new_errors.txt" -ItemType "file" -Value "" | Out-Null
 foreach ($s in $new_errors3_txt) {
     if ( [String]::IsNullOrWhiteSpace($s) ) {
         continue
@@ -106,8 +130,8 @@ foreach ($s in $new_errors3_txt) {
     if ( $size -eq 0 ) {
     } else {
         $new_errors_txt.Add($item)
-        Add-Content -Path "new_errors.txt" -Value "$item"
-        ((Get-Content $file) -join "`n") + "`n" | Add-Content -Path "new_errors.txt"
+        Add-Content -Path "$old/new_errors.txt" -Value "$item"
+        ((Get-Content $file) -join "`n") + "`n" | Add-Content -Path "$old/new_errors.txt"
     }
 }
 
@@ -119,9 +143,12 @@ if ( $updated -eq 129 ) {
     if ( $status -eq 0 ) {
         Write-Host "Test succeeded."
     } else {
-        Get-Content "new_errors.txt" | Write-Host
+        Get-Content "$old/new_errors.txt" | Write-Host
         Write-Host "Test failed."
     }
+    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
     $err = $status
     exit 1
 }
@@ -131,8 +158,11 @@ if ( $updated -eq 129 ) {
 if ( $updated -eq 1 ) {
     Write-Host "Difference in output."
     git diff . | Write-Host
-    Get-Content "new_errors.txt" | Write-Host
+    Get-Content "$old/new_errors.txt" | Write-Host
     Write-Host "Test failed."
+    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
     exit 1
 }
 
@@ -140,10 +170,16 @@ if ( $updated -eq 1 ) {
 # as errors in the parse.
 if ( $new_errors_txt.Count -gt 0 ) {
     Write-Host "New errors in output."
-    Get-Content "new_errors.txt" | Write-Host
+    Get-Content "$old/new_errors.txt" | Write-Host
     Write-Host "Test failed."
+    Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
     exit 1
 }
 
 Write-Host "Test succeeded."
+Remove-Item -Force -Path $old/updated.txt 2>&1 | Out-Null
+Remove-Item -Force -Path $old/new_errors2.txt 2>&1 | Out-Null
+Remove-Item -Force -Path $old/new_errors.txt 2>&1 | Out-Null
 exit 0
