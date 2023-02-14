@@ -243,10 +243,7 @@ do
         if [ "$i" == "desc.xml" ]; then i='.'; fi
         directory=${i%/*}
         pushd $directory > /dev/null
-echo here `pwd`
-echo prefix $prefix
         directory=${directory##*$prefix/}
-echo directory $directory
         testname=$directory
         new_grammars+=( "$testname" )
         popd > /dev/null
