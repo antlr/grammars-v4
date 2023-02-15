@@ -15,6 +15,7 @@ atl
 b
 basic
 bibcode
+bicep
 bnf
 brainflak
 brainfuck

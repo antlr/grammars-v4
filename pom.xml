@@ -91,6 +91,7 @@
 				<module>bcpl</module>
 				<module>bdf</module>
 				<module>bibcode</module>
+				<module>bicep</module>
 				<module>bnf</module>
 				<module>c</module>
 				<module>calculator</module>
@@ -261,6 +262,7 @@
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
+                <module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>

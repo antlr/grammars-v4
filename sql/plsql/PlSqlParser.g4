@@ -2165,6 +2165,44 @@ table_compression
     | NOCOMPRESS
     ;
 
+// avoid to match an empty string in
+inmemory_table_clause
+    : inmemory_column_clause+
+    | (INMEMORY inmemory_attributes? | NO INMEMORY) inmemory_column_clause*
+    ;
+
+// avoid to match an empty string in
+inmemory_attributes
+    : inmemory_memcompress inmemory_priority? inmemory_distribute? inmemory_duplicate?
+    | inmemory_priority inmemory_distribute? inmemory_duplicate?
+    | inmemory_distribute inmemory_duplicate?
+    | inmemory_duplicate
+    ;
+
+inmemory_memcompress
+    : MEMCOMPRESS FOR (DML | (QUERY | CAPACITY) (LOW | HIGH)?)
+    | NO MEMCOMPRESS
+    ;
+
+inmemory_priority
+    : PRIORITY (NONE | LOW | MEDIUM | HIGH | CRITICAL)
+    ;
+
+inmemory_distribute
+    : DISTRIBUTE
+        (AUTO | BY (ROWID RANGE | PARTITION | SUBPARTITION))?
+        (FOR SERVICE (DEFAULT | ALL | identifier | NONE))?
+    ;
+
+inmemory_duplicate
+    : DUPLICATE ALL?
+    | NO DUPLICATE
+    ;
+
+inmemory_column_clause
+    : (INMEMORY inmemory_memcompress? | NO INMEMORY) '(' column_list ')'
+    ;
+
 physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
       | PCTUSED pctused=UNSIGNED_INTEGER
@@ -2752,6 +2790,7 @@ alter_table_properties_1
     : ( physical_attributes_clause
       | logging_clause
       | table_compression
+      | inmemory_table_clause
       | supplemental_table_logging
       | allocate_extent_clause
       | deallocate_unused_clause
@@ -3052,7 +3091,7 @@ end_time_column
 
 column_definition
     : column_name (datatype | type_name)
-         SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
+         SORT? (VISIBLE | INVISIBLE)? (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
     ;
 
 virtual_column_definition
@@ -4218,21 +4257,21 @@ other_function
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
     | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
-    | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)?
+    | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)*
     | (XMLCOLATTVAL | XMLFOREST)
-      '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
+      '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)*
     | XMLELEMENT
       '(' (ENTITYESCAPING | NOENTITYESCAPING)? (NAME | EVALNAME)? expression
        (/*TODO{input.LT(2).getText().equalsIgnoreCase("xmlattributes")}?*/ ',' xml_attributes_clause)?
-       (',' expression column_alias?)* ')' ('.' general_element_part)?
+       (',' expression column_alias?)* ')' ('.' general_element_part)*
     | XMLEXISTS '(' expression xml_passing_clause? ')'
-    | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation WELLFORMED? ')' ('.' general_element_part)?
+    | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation WELLFORMED? ')' ('.' general_element_part)*
     | XMLPI
-      '(' (NAME identifier | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)?
+      '(' (NAME identifier | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)*
     | XMLQUERY
-      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL_ ON EMPTY)? ')' ('.' general_element_part)?
+      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL_ ON EMPTY)? ')' ('.' general_element_part)*
     | XMLROOT
-      '(' concatenation (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
+      '(' concatenation (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)*
     | XMLSERIALIZE
       '(' (DOCUMENT | CONTENT) concatenation (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
@@ -4377,6 +4416,7 @@ sql_plus_command
     | START_CMD
     | whenever_command
     | set_command
+    | timing_command
     ;
 
 whenever_command
@@ -4387,6 +4427,10 @@ whenever_command
 
 set_command
     : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/numeric | regular_id)
+    ;
+
+timing_command
+    : TIMING (START timing_text=id_expression* | SHOW | STOP)?
     ;
 
 // Common
@@ -6467,6 +6511,7 @@ non_reserved_keywords_pre12c
     | SEQUENTIAL
     | SERIALIZABLE
     | SERVERERROR
+    | SERVICE
     | SESSION_CACHED_CURSORS
     | SESSION
     | SESSIONS_PER_USER
@@ -6848,6 +6893,7 @@ non_reserved_keywords_pre12c
     | THREAD
     | THROUGH
     | TIME
+    | TIMING
     | TIMEOUT
     | TIMES
     | TIMESTAMP

@@ -3,6 +3,7 @@ antlr/antlr2
 antlr/antlr3
 antlr/antlr4
 apex
+asm/asm8086
 asn/asn_3gpp
 clif
 cobol85
@@ -11,6 +12,7 @@ csharp
 dart2
 databank
 edif300
+fasta
 fortran77
 gdscript
 glsl
@@ -73,6 +75,7 @@ sql/hive/v2
 sql/hive/v3
 sql/plsql
 sql/postgresql
+sql/tsql
 stringtemplate
 swift/swift2
 swift/swift3

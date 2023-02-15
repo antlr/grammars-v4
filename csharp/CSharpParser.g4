@@ -16,7 +16,7 @@ compilation_unit
 
 //B.2.1 Basic concepts
 
-namespace_or_type_name 
+namespace_or_type_name
 	: (identifier type_argument_list? | qualified_alias_member) ('.' identifier type_argument_list?)*
 	;
 
@@ -40,18 +40,18 @@ tuple_element
     : type_ identifier?
     ;
 
-simple_type 
+simple_type
 	: numeric_type
 	| BOOL
 	;
 
-numeric_type 
+numeric_type
 	: integral_type
 	| floating_point_type
 	| DECIMAL
 	;
 
-integral_type 
+integral_type
 	: SBYTE
 	| BYTE
 	| SHORT
@@ -63,30 +63,33 @@ integral_type
 	| CHAR
 	;
 
-floating_point_type 
+floating_point_type
 	: FLOAT
 	| DOUBLE
 	;
 
 /** namespace_or_type_name, OBJECT, STRING */
-class_type 
+class_type
 	: namespace_or_type_name
 	| OBJECT
 	| DYNAMIC
 	| STRING
 	;
 
-type_argument_list 
+type_argument_list
 	: '<' type_ ( ',' type_)* '>'
 	;
 
 //B.2.4 Expressions
-argument_list 
+argument_list
 	: argument ( ',' argument)*
 	;
 
 argument
-	: (identifier ':')? refout=(REF | OUT | IN)? (VAR | type_)? expression
+	: (identifier ':')? refout=(REF | OUT | IN)?
+	  ( expression
+	  | (VAR | type_) expression
+	  )
 	;
 
 expression
@@ -177,19 +180,23 @@ range_expression
 
 // https://msdn.microsoft.com/library/6a71f45d(v=vs.110).aspx
 unary_expression
-	: primary_expression
+	: cast_expression
+	| primary_expression
 	| '+' unary_expression
 	| '-' unary_expression
 	| BANG unary_expression
 	| '~' unary_expression
 	| '++' unary_expression
 	| '--' unary_expression
-	| OPEN_PARENS type_ CLOSE_PARENS unary_expression
 	| AWAIT unary_expression // C# 5
 	| '&' unary_expression
 	| '*' unary_expression
 	| '^' unary_expression // C# 8 ranges
 	;
+
+cast_expression
+    : OPEN_PARENS type_ CLOSE_PARENS unary_expression
+    ;
 
 primary_expression  // Null-conditional operators C# 6: https://msdn.microsoft.com/en-us/library/dn986595.aspx
 	: pe=primary_expression_start '!'? bracket_expression* '!'?
@@ -427,7 +434,7 @@ local_function_body
     ;
 
 labeled_Statement
-	: identifier ':' statement  
+	: identifier ':' statement
 	;
 
 embedded_statement
@@ -477,7 +484,7 @@ local_variable_declaration
 	| FIXED pointer_type fixed_pointer_declarators
 	;
 
-local_variable_type 
+local_variable_type
 	: VAR
 	| type_
 	;

@@ -68,7 +68,7 @@ dmlStatement
     : selectStatement | insertStatement | updateStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
-    | handlerStatement
+    | handlerStatement | valuesStatement
     ;
 
 transactionStatement
@@ -908,6 +908,13 @@ updateStatement
     : singleUpdateStatement | multipleUpdateStatement
     ;
 
+// https://dev.mysql.com/doc/refman/8.0/en/values.html
+valuesStatement
+    : VALUES
+    '(' expressionsWithDefaults? ')'
+    (',' '(' expressionsWithDefaults? ')')*
+    ;
+
 // details
 
 insertStatementValue
@@ -1056,14 +1063,14 @@ queryExpressionNointo
 
 querySpecification
     : SELECT selectSpec* selectElements selectIntoExpression?
-      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
+      fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
     | SELECT selectSpec* selectElements
-    fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
+    fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
     : SELECT selectSpec* selectElements
-      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
+      fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
     ;
 
 unionParenthesis
@@ -1453,13 +1460,11 @@ routineBody
 
 blockStatement
     : (uid ':')? BEGIN
-      (
         (declareVariable SEMI)*
         (declareCondition SEMI)*
         (declareCursor SEMI)*
         (declareHandler SEMI)*
         procedureSqlStatement*
-      )?
       END uid?
     ;
 
@@ -1576,12 +1581,15 @@ alterUser
         (WITH userResourceOption+)?
         (userPasswordOption | userLockOption)*
         (COMMENT STRING_LITERAL |  ATTRIBUTE STRING_LITERAL)?       #alterUserMysqlV80
+    | ALTER USER ifExists?
+      (userName | uid) DEFAULT ROLE roleOption                      #alterUserMysqlV80
     ;
 
 createUser
     : CREATE USER userAuthOption (',' userAuthOption)*              #createUserMysqlV56
     | CREATE USER ifNotExists?
         userAuthOption (',' userAuthOption)*
+        (DEFAULT ROLE roleOption)?
         (
           REQUIRE
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
@@ -1638,7 +1646,7 @@ revokeStatement
       FROM userName (',' userName)*                                 #detailRevoke
     | REVOKE ALL PRIVILEGES? ',' GRANT OPTION
       FROM userName (',' userName)*                                 #shortRevoke
-    | REVOKE uid (',' uid)*
+    | REVOKE (userName | uid) (',' (userName | uid))*
       FROM (userName | uid) (',' (userName | uid))*                 #roleRevoke
     ;
 
@@ -2500,7 +2508,7 @@ nonAggregateWindowedFunction
     ;
 
 overClause
-    : OVER ('(' windowSpec? ')' | windowName)
+    : OVER ('(' windowSpec ')' | windowName)
     ;
 
 windowSpec
