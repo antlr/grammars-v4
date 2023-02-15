@@ -130,17 +130,17 @@ alter_constraint
     : ALTER CONSTRAINT constraint_name AS
     (
         VALUES '(' name':'value (',' name':'value)* ')'
-        | FUNCTION ( ( ADD | REPLACE ) action syslib_dot function_name | DROP action )
+        | FUNCTION ( ( ADD | REPLACE ) action_ syslib_dot function_name | DROP action_ )
     )
     ;
 
-action
+action_
     : DELETE | INSERT | SELECT | UPDATE
     ;
 
 alter_function
-    : ALTER ( SPECIFIC FUNCTION ( database_name'.' | user_name'.' )? specific_function_name |
-        FUNCTION ( database_name'.' | user_name'.' )? function_name
+    : ALTER ( SPECIFIC FUNCTION ( database_name_dot | user_name_dot )? specific_function_name |
+        FUNCTION ( database_name_dot | user_name_dot )? function_name
           ( '(' ( data_type | sysudtlib_dot? user_defined_type_name )
 //          (','dots)?
           ')' )?
@@ -177,12 +177,12 @@ data_type
     LONG VARCHAR |
     LONG VARGRAPHIC |
     ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB ) '(' integer ( G | K | M )? ')' |
-    (SYSUDTLIB'.')? ( XML | XMLTYPE ) ( '(' integer ( G | K | M )? ')' )? ( INLINE LENGTH integer )? |
-    (SYSUDTLIB'.')? JSON ( '(' integer ( K | M )? ')' )? ( INLINE LENGTH integer )?
+    sysudtlib_dot? ( XML | XMLTYPE ) ( '(' integer ( G | K | M )? ')' )? ( INLINE LENGTH integer )? |
+    sysudtlib_dot? JSON ( '(' integer ( K | M )? ')' )? ( INLINE LENGTH integer )?
     ( CHARACTER SET ( UNICODE | LATIN ) | STORAGE FORMAT ( BSON | UBJSON ) )? |
-    (SYSUDTLIB'.')? ST_GEOMETRY ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? |
-    (SYSUDTLIB'.')? DATASET ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? storage_format |
-    (SYSUDTLIB'.')? ( user_defined_type_name | MBR | array_type_name | varray_name )
+    sysudtlib_dot? ST_GEOMETRY ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? |
+    sysudtlib_dot? DATASET ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? storage_format |
+    sysudtlib_dot? ( user_defined_type_name | MBR | array_type_name | varray_name )
     ))
     ;
 
@@ -258,22 +258,22 @@ alter_table
     ;
 
 alter_option
-    :  ( ADD add_option |
-    MODIFY ( CONSTRAINT? name )? CHECK '(' boolean_condition ')' |
-    RENAME ( column_name as_to column_name |
-           constraint_name as_to constraint_name
-         ) |
-    DROP drop_option
-)
+    : ADD add_option
+      | MODIFY ( CONSTRAINT? name )? CHECK '(' boolean_condition ')'
+      | RENAME ( column_name as_to column_name
+               | constraint_name as_to constraint_name
+               )
+      | DROP drop_option
     ;
 
 as_to
-    : AS | TO
+    : AS
+    | TO
     ;
 
 table_option
     : ( NO? FALLBACK PROTECTION? |
-        WITH JOURNAL TABLE '=' ( database_name'.' )? table_name |
+        WITH JOURNAL TABLE '=' ( database_name_dot )? table_name |
         ( NO | DUAL )? ( BEFORE )? JOURNAL |
         ON COMMIT ( DELETE | PRESERVE ) ROWS |
         NO? LOG |
@@ -404,12 +404,12 @@ range
 //  LONG VARCHAR |
 //  LONG VARGRAPHIC |
 //  ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB ) '('integer ( G | K | M )?')' |
-//  (SYSUDTLIB'.')? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
-//  (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? ( CHARACTER SET ( UNICODE | LATIN ) | STORAGE FORMAT ( BSON | UBJSON ) )? |
-//  (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//  (SYSUDTLIB'.')? DATASET ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//  sysudtlib_dot? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
+//  sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? ( CHARACTER SET ( UNICODE | LATIN ) | STORAGE FORMAT ( BSON | UBJSON ) )? |
+//  sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//  sysudtlib_dot? DATASET ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //    storage_format |
-//  (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//  sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //))
 //    ;
 
@@ -442,7 +442,7 @@ constant_null
 //    ;
 
 alter_table_2
-    : ALTER TABLE ( database_name'.' | user_name'.' )? table_name ','
+    : ALTER TABLE ( database_name_dot | user_name_dot )? table_name ','
     MAP '=' map_name ( COLOCATE USING colocation_name )?
     ;
 
@@ -452,7 +452,7 @@ alter_table_to_current
     ;
 
 alter_trigger
-    : ALTER TRIGGER ( database_name'.' | user_name'.' )?
+    : ALTER TRIGGER ( database_name_dot | user_name_dot )?
         ( trigger_name ( ENABLED | DISABLED | TIMESTAMP ) |
           table_name ( ENABLED | DISABLED )
         )
@@ -476,7 +476,7 @@ begin_isolated_loading
     ;
 
 table_specification
-    : ( database_name'.' )? table_name
+    : ( database_name_dot )? table_name
     ;
 
 begin_logging
@@ -497,7 +497,7 @@ item_list
   DATABASE database_name |
   USER user_name |
   ( TABLE | VIEW | MACRO | PROCEDURE | FUNCTION | FUNCTION MAPPING | TYPE )
-    ( database_name'.' | user_name'.' )? object_name
+    ( database_name_dot | user_name_dot )? object_name
 ) (','dots)?
     ;
 
@@ -590,14 +590,14 @@ index_specification
 //    ;
 
 collection_source
-    : ( ( TEMPORARY )? ( database_name'.' | user_name'.' )? table_name |
-        ( database_name'.' | user_name'.' )? ( join_index_name | hash_index_name )
+    : ( ( TEMPORARY )? ( database_name_dot | user_name_dot )? table_name |
+        ( database_name_dot | user_name_dot )? ( join_index_name | hash_index_name )
       )
     ;
 
 from_option
-    : ( ( TEMPORARY )? ( database_name'.' | user_name'.' )? table_name |
-        ( database_name'.' | user_name'.' )? ( join_index_name | hash_index_name )
+    : ( ( TEMPORARY )? ( database_name_dot | user_name_dot )? table_name |
+        ( database_name_dot | user_name_dot )? ( join_index_name | hash_index_name )
       ) ( COLUMN (
             ( column_name | PARTITION ) |
             statistics_name |
@@ -608,12 +608,12 @@ from_option
 
 comment
     : COMMENT (ON)? ( object_kind | object_kind )
-        ( database_name'.' | user_name'.' )? object_name
+        ( database_name_dot | user_name_dot )? object_name
         ( ( AS | IS )? string )?
     ;
 
 create_authorization
-    : ( CREATE | REPLACE ) AUTHORIZATION ( database_name'.' | user_name'.' )? authorization_name
+    : ( CREATE | REPLACE ) AUTHORIZATION ( database_name_dot | user_name_dot )? authorization_name
         ( AS ( DEFINER | INVOKER )? TRUSTED )?
         USER string
         PASSWORD string
@@ -627,11 +627,11 @@ create_cast
     ;
 
 source
-    : ( source_predefined_data_type | (SYSUDTLIB'.')? source_UDT_name )
+    : ( source_predefined_data_type | sysudtlib_dot? source_UDT_name )
     ;
 
 target
-    : ( target_predefined_data_type | (SYSUDTLIB'.')? target_UDT_name )
+    : ( target_predefined_data_type | sysudtlib_dot? target_UDT_name )
     ;
 
 specific_method
@@ -672,7 +672,7 @@ database_attribute
         (NO)? FALLBACK (PROTECTION)? |
         ( NO | DUAL )? (BEFORE)? JOURNAL |
         ( NO | DUAL | (NOT)? LOCAL )? AFTER JOURNAL |
-        DEFAULT JOURNAL TABLE '=' ( database_name'.' )? table_name
+        DEFAULT JOURNAL TABLE '=' ( database_name_dot )? table_name
       )
     ;
 
@@ -682,11 +682,11 @@ create_error_table
     ;
 
 error_table_name_specification
-    : ( database_name'.' | user_name'.')? error_table_name
+    : ( database_name_dot | user_name_dot)? error_table_name
     ;
 
 data_table_name_specification
-    : ( database_name'.' | user_name'.' )? data_table_name
+    : ( database_name_dot | user_name_dot )? data_table_name
     ;
 
 create_foreign_table
@@ -712,12 +712,12 @@ create_foreign_table
     ;
 
 //table_specification
-//    : (database_name'.' | user_name'.')? table_name
+//    : (database_name_dot | user_name_dot)? table_name
 //    ;
 
 external_security_clause
     : EXTERNAL SECURITY ( ( INVOKER | DEFINER ) TRUSTED )?
-        ( database_name'.'| user_name'.')?authorization_name
+        ( database_name_dot| user_name_dot)?authorization_name
     ;
 
 partition_column_spec
@@ -725,7 +725,7 @@ partition_column_spec
     ;
 
 create_function_external
-    : ( CREATE | REPLACE ) FUNCTION ( database_name'.' | user_name'.' )? function_name
+    : ( CREATE | REPLACE ) FUNCTION ( database_name_dot | user_name_dot )? function_name
         '(' parameter_specification (dots)? ')' RETURNS r=data_type ( CAST FROM data_type )?
         language_and_access_specification
         function_attribute (dots)?
@@ -745,7 +745,7 @@ parameter_specification
     ;
 
 create_function_table_form
-    :( CREATE | REPLACE ) FUNCTION ( database_name'.' | user_name'.' )? function_name
+    :( CREATE | REPLACE ) FUNCTION ( database_name_dot | user_name_dot )? function_name
        '(' parameter_specification (dots)? ')' RETURNS TABLE table_specification
        language_and_access_specification
        function_attribute (dots)?
@@ -793,7 +793,7 @@ external_data_access
     ;
 
 function_attribute
-    : ( SPECIFIC ( database_name'.' | user_name'.' )? specific_function_name |
+    : ( SPECIFIC ( database_name_dot | user_name_dot )? specific_function_name |
        PARAMETER STYLE ( SQL | JAVA ) |
        (NOT)? DETERMINISTIC |
        CALLED ON NULL_ INPUT
@@ -835,14 +835,14 @@ jar_id_specification
 //       LONG VARGRAPHIC |
 //       ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB )
 //         '('integer ( G | K | M )?')' |
-//       (SYSUDTLIB'.')? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')?
+//       sysudtlib_dot? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')?
 //         ( INLINE LENGTH integer )? |
-//       (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//       sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //         ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//       (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//       (SYSUDTLIB'.')? DATASET ('('integer ( K | M )?')')?
+//       sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//       sysudtlib_dot? DATASET ('('integer ( K | M )?')')?
 //         ( INLINE LENGTH integer )? storage_format |
-//       (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//       sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //     ))
 //    ;
 //
@@ -870,7 +870,7 @@ java_parameter_class
 //    ;
 
 create_function
-    : ( CREATE | REPLACE ) FUNCTION ( database_name'.' | user_name'.' )? function_name
+    : ( CREATE | REPLACE ) FUNCTION ( database_name_dot | user_name_dot )? function_name
         '(' parameter_specification (','dots)? ')' RETURNS r=data_type
         language_and_access_specification
         ( function_attribute (dots)? )?
@@ -905,13 +905,13 @@ create_function
 //        LONG VARCHAR |
 //        LONG VARGRAPHIC |
 //        ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB ) '('integer ( G | K | M )?')' |
-//        (SYSUDTLIB'.')? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //          ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//        (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? DATASET ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? DATASET ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //          storage_format |
-//        (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //      ))
 //    ;
 //
@@ -935,9 +935,9 @@ create_function
 //    ;
 
 create_function_mapping
-    : ( CREATE | REPLACE ) FUNCTION MAPPING ( database_name'.' | user_name'.' )? function_mapping_name
-        FOR ( ( database_name'.' | user_name'.' ) ( schema_name'.' )? )? function_name
-        ( SERVER ( database_name'.' | user_name'.' )? server_name )?
+    : ( CREATE | REPLACE ) FUNCTION MAPPING ( database_name_dot | user_name_dot )? function_mapping_name
+        FOR ( ( database_name_dot | user_name_dot ) ( schema_name'.' )? )? function_name
+        ( SERVER ( database_name_dot | user_name_dot )? server_name )?
         ( EXTERNAL SECURITY ( DEFINER | INVOKER )? TRUSTED )? authorization_name
         ( MAP JSON '('json_document')' )?
         //( STOREDAS '(' ( 'PARQUET' | 'TEXTFILE' ) ')' )?
@@ -949,7 +949,7 @@ table_list
     ;
 
 create_global_temporary_trace_table
-    : CREATE GLOBAL TEMPORARY TRACE TABLE ( database_name'.' | user_name'.' )? table_name
+    : CREATE GLOBAL TEMPORARY TRACE TABLE ( database_name_dot | user_name_dot )? table_name
         '(' proc_id BYTE'(' number ')' ',' sequence INTEGER ( column_specification (','dots)? )? ')'
         ( ON COMMIT ( DELETE | PRESERVE ) ROWS )?
     ;
@@ -993,11 +993,11 @@ data_type_attribute
     ;
 
 create_globl_set
-    : CREATE GLOP SET ( database_name'.' | user_name'.' )? glop_set_name
+    : CREATE GLOP SET ( database_name_dot | user_name_dot )? glop_set_name
     ;
 
 create_hash_index
-    : CREATE HASH INDEX ( database_name'.' | user_name'.' )? hash_index_name (',' index )?
+    : CREATE HASH INDEX ( database_name_dot | user_name_dot )? hash_index_name (',' index )?
         '(' column_name (','dots)?')' ON table_name
         ( BY '(' column_name (','dots)?')' )?
         ( ORDER BY (
@@ -1027,11 +1027,11 @@ create_index
 //    ;
 //
 //table_specification
-//    : (TEMPORARY)? ( database_name'.' | user_name'.' )? table_name
+//    : (TEMPORARY)? ( database_name_dot | user_name_dot )? table_name
 //    ;
 
 join_index_specification
-    : ( database_name'.' | user_name'.' )? join_index_name
+    : ( database_name_dot | user_name_dot )? join_index_name
     ;
 
 ordering_clause
@@ -1039,11 +1039,11 @@ ordering_clause
     ;
 
 loading_clause
-    : WITH (NO)? LOAD IDENTITY
+    : WITH NO? LOAD IDENTITY
     ;
 
 create_join_index
-    : CREATE JOIN INDEX ( database_name'.' | user_name'.' )? join_index_name
+    : CREATE JOIN INDEX ( database_name_dot | user_name_dot )?
         ( table_option (','dots)? )?
         select_clause
         FROM source (','dots)?
@@ -1070,7 +1070,7 @@ select_clause
     ;
 
 //source
-//    : ( ( database_name'.' | user_name'.' )? table_name ( (AS)? corrolation_name )? |
+//    : ( ( database_name_dot | user_name_dot )? table_name ( (AS)? corrolation_name )? |
 //        joined_table
 //      )
 //    ;
@@ -1090,7 +1090,7 @@ grouping_or_ordering_specification
 //    ;
 
 selection
-    : //( ( database_name'.' | user_name'.' )? table_name )? ( column_name | ROWID ) | aggregation_clause )
+    : //( ( database_name_dot | user_name_dot )? table_name )? ( column_name | ROWID ) | aggregation_clause )
     ;
 
 //TODO left-recursive
@@ -1118,7 +1118,7 @@ aggregation_clause
     ;
 
 create_macro
-    : ( CREATE MACRO | CM | REPLACE MACRO ) ( database_name'.' )? macro_name
+    : ( CREATE MACRO | CM | REPLACE MACRO ) ( database_name_dot )? macro_name
         ( '(' macro_parameter (','dots)? ')' )?
         AS '(' ( USING using_modifier )?
              ( LOCKING locking modifier )?(dots)?
@@ -1139,7 +1139,7 @@ create_map
     ;
 
 create_method
-    : CREATE ( INSTANCE | CONSTRUCTOR )? METHOD (SYSUDTLIB'.')? method_name
+    : CREATE ( INSTANCE | CONSTRUCTOR )? METHOD sysudtlib_dot? method_name
         '(' locator_specification (','dots)? ')'
         RETURNS r=data_type ( CAST FROM c=data_type )? FOR user_defined_type_name
         ( USING GLOP SET glop_set_name )?
@@ -1179,7 +1179,7 @@ locator_specification
 //          '(' integer ( G | K | M )? ')' |
 //        ( XML | XMLTYPE ) |
 //        JSON ( '(' integer ')' )? ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//        (SYSUDTLIB'.')? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
 //      ))
 //    ;
 //
@@ -1240,12 +1240,12 @@ function_specification
 //          '('integer ( G | K | M )?')' |
 //        ( XML | XMLTYPE ) |
 //        JSON ( '(' integer ')' )? ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//        (SYSUDTLIB'.')? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
 //      ))
 //    ;
 
 create_procedure_external
-    : ( CREATE | REPLACE ) PROCEDURE ( database_name'.' | user_name'.' )? procedure_name
+    : ( CREATE | REPLACE ) PROCEDURE ( database_name_dot | user_name_dot )? procedure_name
         '(' parameter_specification (','dots)? ')'
         ( DYNAMIC RESULT SETS number_of_sets )?
         language_and_access_specification
@@ -1312,13 +1312,13 @@ parameter_style_specification
 //        LONG VARCHAR |
 //        LONG VARGRAPHIC |
 //        ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB ) '('integer ( G | K | M )?')' |
-//        (SYSUDTLIB'.')? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //          ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//        (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? DATASET ('('integer ( K | M )?')')?
+//        sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? DATASET ('('integer ( K | M )?')')?
 //          ( INLINE LENGTH integer )? storage_format |
-//        (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //      ))
 //    ;
 //
@@ -1342,7 +1342,7 @@ parameter_style_specification
 //    ;
 
 create_procedure
-    : ( CREATE | REPLACE ) PROCEDURE ( database_name'.' | user_name'.' )? procedure_name
+    : ( CREATE | REPLACE ) PROCEDURE ( database_name_dot | user_name_dot )? procedure_name
         '(' ( parameter_specification (','dots)? )? ')'
         sql_data_access
         ( DYNAMIC RESULT SETS number_of_sets )?
@@ -1406,14 +1406,14 @@ sql_multistatement_request
 //        LONG VARGRAPHIC |
 //        ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB )
 //          '('integer ( G | K | M )?')' |
-//        (SYSUDTLIB'.')? ( XML | XMLTYPE )
+//        sysudtlib_dot? ( XML | XMLTYPE )
 //          ('('integer ( G | K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //          ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//        (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//        (SYSUDTLIB'.')? DATASET ('('integer ( K | M )?')')?
+//        sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? DATASET ('('integer ( K | M )?')')?
 //          ( INLINE LENGTH integer )? storage_format |
-//        (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //      ) )
 //    ;
 
@@ -1616,7 +1616,7 @@ level_specification
     ;
 
 create_recursive_view
-    :  ( CREATE | REPLACE ) RECURSIVE VIEW ( database_name'.' | user_name'.' )? view_name
+    :  ( CREATE | REPLACE ) RECURSIVE VIEW ( database_name_dot | user_name_dot )? view_name
         '(' column_name (',' column_name)* ')' AS
           ( view_specification | '(' view_specification ')' )
     ;
@@ -1661,8 +1661,8 @@ recursive_statement
 
 item_to_lock
     : ( ( DATABASE )? ( database_name | user_name ) |
-        ( TABLE )? ( database_name'.' | user_name'.' )? table_name |
-        ( VIEW )? ( database_name'.' | user_name'.' )? view_name |
+        ( TABLE )? ( database_name_dot | user_name_dot )? table_name |
+        ( VIEW )? ( database_name_dot | user_name_dot )? view_name |
         ROW
       )
     ;
@@ -1678,15 +1678,15 @@ lock_type
     ;
 
 seed_statement_selection
-    : ( expression | ( database_name'.' | user_name'.' )? table_name'.'* )
+    : ( expression | ( database_name_dot | user_name_dot )? table_name'.'* )
     ;
 
 seed_statement_source
-    : ( ( database_name'.' | user_name'.' )?
+    : ( ( database_name_dot | user_name_dot )?
           ( table_name ( (AS)? correlation_name )? |
 
             joined_table
-              ( join_on | CROSS JOIN ( database_name'.' | user_name'.' )? single_table )
+              ( join_on | CROSS JOIN ( database_name_dot | user_name_dot )? single_table )
           ) |
 
           '(' subquery ')' (AS)? d=table_name ( '(' column_name (','dots)? ')' )?
@@ -1724,7 +1724,7 @@ recursive_statement_source
 
 join_on
     : ( INNER | ( LEFT | RIGHT | FULL ) ( OUTER)? )? JOIN
-        ( database_name'.' | user_name'.' )? joined_table ON search_condition
+        ( database_name_dot | user_name_dot )? joined_table ON search_condition
     ;
 
 create_role
@@ -1732,7 +1732,7 @@ create_role
     ;
 
 create_schema
-    : CREATE storage_format SCHEMA (SYSUDTLIB'.')? schema_name AS schema
+    : CREATE storage_format SCHEMA sysudtlib_dot? schema_name AS schema
     ;
 
 create_table
@@ -1747,7 +1747,7 @@ table_kind
     ;
 
 //table_specification
-//    : ( database_name'.' | user_name'.' )? table_name
+//    : ( database_name_dot | user_name_dot )? table_name
 //    ;
 //
 //table_option
@@ -1911,7 +1911,7 @@ create_table_as
 //    ;
 //
 //table_specification
-//    : ( database_name'.' | user_name'.' )? table_name
+//    : ( database_name_dot | user_name_dot )? table_name
 //    ;
 //
 //table_option
@@ -2058,7 +2058,7 @@ create_table_queue_table_form
 //    ;
 //
 //table_specification
-//    : ( database_name'.' | user_name'.' )? table_name
+//    : ( database_name_dot | user_name_dot )? table_name
 //    ;
 //
 //table_option
@@ -2156,7 +2156,7 @@ identity_attribute
     ;
 
 create_transform
-    : ( CREATE | REPLACE ) TRANSFORM FOR (SYSUDTLIB'.')? user_defined_type_name
+    : ( CREATE | REPLACE ) TRANSFORM FOR sysudtlib_dot? user_defined_type_name
         transform_specification (dots)?
     ;
 
@@ -2170,28 +2170,28 @@ to_method_or_function
     ;
 
 //specific_method
-//    : SPECIFIC (SYSUDTLIB'.')? specific_method_name FOR (SYSUDTLIB'.')? UDT_name
+//    : SPECIFIC sysudtlib_dot? specific_method_name FOR sysudtlib_dot? UDT_name
 //    ;
 
 instance_method
-    : INSTANCE? METHOD (SYSUDTLIB'.')? method_name
-        '(' ( data_type | (SYSUDTLIB'.')? user_defined_type_name )? (','dots)? ')' FOR (SYSUDTLIB'.')? user_defined_type_name
+    : INSTANCE? METHOD sysudtlib_dot? method_name
+        '(' ( data_type | sysudtlib_dot? user_defined_type_name )? (','dots)? ')' FOR sysudtlib_dot? user_defined_type_name
     ;
 
 //specific_function
-//    : SPECIFIC FUNCTION (SYSUDTLIB'.')? specific_function_name
+//    : SPECIFIC FUNCTION sysudtlib_dot? specific_function_name
 //    ;
 
 function
-    : FUNCTION (SYSUDTLIB'.')? function_name
-        '(' ( data_type | (SYSUDTLIB'.')? user_defined_type_name )? (','dots)? ')'
+    : FUNCTION sysudtlib_dot? function_name
+        '(' ( data_type | sysudtlib_dot? user_defined_type_name )? (','dots)? ')'
     ;
 
 create_trigger
-    : ( CREATE | REPLACE ) TRIGGER ( database_name'.' )? trigger_name
+    : ( CREATE | REPLACE ) TRIGGER ( database_name_dot )? trigger_name
         ( ENABLED | DISABLED )?
         ( BEFORE | AFTER ) ( temporal_option )? triggering_event
-        ON ( database_name'.' )? table_name
+        ON ( database_name_dot )? table_name
         ( ORDER integer )?
         REFERENCING reference (dots)?
         ( FOR EACH ( ROW | STATEMENT ) )?
@@ -2227,27 +2227,27 @@ sql_procedure_statement
 
 //One-Dimensional ARRAY - Teradata Form
 create_type_1
-    : CREATE TYPE (SYSUDTLIB'.')? array_type_name
+    : CREATE TYPE sysudtlib_dot? array_type_name
   AS data_type ARRAY ( number_of_elements )?
   ( DEFAULT NULL_ )?
     ;
 //One-Dimensional VARRAY - Oracle-Compatible Form
 create_type_2
-    : CREATE TYPE (SYSUDTLIB'.')? array_type_name
+    : CREATE TYPE sysudtlib_dot? array_type_name
   AS ( VARYING ARRAY | VARRAY ) '(' number_of_elements ')' OF data_type
   ( DEFAULT NULL_ )?
     ;
 
 //Multidimensional Array - Teradata Form
 create_type_3
-    : CREATE TYPE (SYSUDTLIB'.')? array_type_name
+    : CREATE TYPE sysudtlib_dot? array_type_name
   AS data_type ARRAY ( ( l=bound ':' u=bound | maximum_size ) )?
   ( DEFAULT NULL_ )?
     ;
 //Multidimensional Array - Oracle-Compatible Form
 
 create_type_4
-    : CREATE TYPE (SYSUDTLIB'.')? array_type_name
+    : CREATE TYPE sysudtlib_dot? array_type_name
   AS ( VARYING ARRAY | VARRAY ) '(' ( l=bound ':' u=bound | maximum_size ) ')'
     OF data_type ( DEFAULT NULL_ )?
     ;
@@ -2411,12 +2411,12 @@ attribute_specification
 //  LONG VARGRAPHIC |
 //  ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB )
 //    '('integer ( G | K | M )?')' |
-//  (SYSUDTLIB'.')? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')?
+//  sysudtlib_dot? ( XML | XMLTYPE ) ('('integer ( G | K | M )?')')?
 //    ( INLINE LENGTH integer )? |
-//  (SYSUDTLIB'.')? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
+//  sysudtlib_dot? JSON ('('integer ( K | M )?')')? ( INLINE LENGTH integer )?
 //    ( CHARACTER SET ( UNICODE | LATIN ) )? |
-//  (SYSUDTLIB'.')? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
-//  (SYSUDTLIB'.')? ( UDT_name | MBR )
+//  sysudtlib_dot? ST_GEOMETRY ('('integer ( K | M )?')')? ( INLINE LENGTH integer )? |
+//  sysudtlib_dot? ( UDT_name | MBR )
 //)
 //    ;
 
@@ -2456,7 +2456,7 @@ user_attribute
   (NO)? FALLBACK (PROTECTION)? |
   ( NO | DUAL )? (BEFORE)? JOURNAL |
   ( NO | DUAL | (NOT)? LOCAL )? AFTER JOURNAL |
-  DEFAULT JOURNAL TABLE '=' ( database_name'.' )? table_name |
+  DEFAULT JOURNAL TABLE '=' ( database_name_dot )? table_name |
   TIME ZONE '=' ( LOCAL | ( sign )? string | string | NULL_ ) |
   DATEFORM '=' ( INTEGERDATE | ANSIDATE | NULL_ ) |
   DEFAULT CHARACTER SET server_character_set |
@@ -2481,7 +2481,7 @@ user_attribute
 //    ;
 
 create_view
-    : ( CREATE VIEW | CV | REPLACE VIEW ) ( database_name'.' | user_name'.' )? view_name
+    : ( CREATE VIEW | CV | REPLACE VIEW ) ( database_name_dot | user_name_dot )? view_name
         ( '(' column_name (','dots)? ')' )? AS
         ( view_specification | '(' view_specification ')' ) (';')?
     ;
@@ -2525,7 +2525,7 @@ recursive_with_modifier
 //    ;
 //
 //source
-//    : ( ( database_name'.' | user_name'.' )? ( table_name | view_name ) ( (AS)? correlation_name )? |
+//    : ( ( database_name_dot | user_name_dot )? ( table_name | view_name ) ( (AS)? correlation_name )? |
 //
 //        joined_table_source |
 //
@@ -2545,7 +2545,7 @@ group_specification
 order_by_specification
     : ( expression |
 
-        ( ( ( database_name'.' | user_name'.' )? table_name'.' )? column_name |
+        ( ( ( database_name_dot | user_name_dot )? table_name'.' )? column_name |
           cn=alias |
           column_position
         ) ( ASC | DESC )?
@@ -2554,8 +2554,8 @@ order_by_specification
 
 //item_to_lock
 //    : ( ( DATABASE )? ( database_name | user_name ) |
-//        ( TABLE )? ( database_name'.' | user_name'.' )? table_name |
-//        ( VIEW )? ( database_name'.' | user_name'.' )? view_name |
+//        ( TABLE )? ( database_name_dot | user_name_dot )? table_name |
+//        ( VIEW )? ( database_name_dot | user_name_dot )? view_name |
 //        ROW
 //      )
 //    ;
@@ -2585,7 +2585,7 @@ seed
 
 sub_selection
     : ( expression ( (AS)? e=alias )? |
-        ( database_name'.' | user_name'.' )? table_name'.' '*'
+        ( database_name_dot | user_name_dot )? table_name'.' '*'
       )
     ;
 
@@ -2657,11 +2657,11 @@ delete_user
     ;
 
 drop_autorization
-    : DROP AUTHORIZATION ( database_name'.' )? authorization_name
+    : DROP AUTHORIZATION ( database_name_dot )? authorization_name
     ;
 
 drop_cast
-    : DROP CAST ( database_name'.' )? '(' s=data_type AS t=data_type ')'
+    : DROP CAST ( database_name_dot )? '(' s=data_type AS t=data_type ')'
     ;
 
 drop_constraint
@@ -2674,27 +2674,27 @@ drop_database
 
 drop_error_table
     : DROP ERROR TABLE (
-        FOR ( database_name'.' | user_name'.' )? data_table_name |
-        ( database_name'.' | user_name'.' )? error_table_name
+        FOR ( database_name_dot | user_name_dot )? data_table_name |
+        ( database_name_dot | user_name_dot )? error_table_name
       )
     ;
 
 drop_function
-    : DROP ( SPECIFIC FUNCTION ( database_name'.' )? specific_function_name |
-             FUNCTION ( database_name'.' )? function_name ( '(' data_type (','dots)? ')' )?
+    : DROP ( SPECIFIC FUNCTION ( database_name_dot )? specific_function_name |
+             FUNCTION ( database_name_dot )? function_name ( '(' data_type (','dots)? ')' )?
            )
     ;
 
 drop_function_mapping
-    : DROP FUNCTION MAPPING ( database_name'.' | user_name'.' )? function_mapping_name
+    : DROP FUNCTION MAPPING ( database_name_dot | user_name_dot )? function_mapping_name
     ;
 
 drop_glop_set
-    : DROP GLOP SET ( database_name'.' | user_name'.' )? glop_set_name
+    : DROP GLOP SET ( database_name_dot | user_name_dot )? glop_set_name
     ;
 
 drop_hash_index
-    : DROP HASH INDEX ( database_name'.' )? hash_index_name
+    : DROP HASH INDEX ( database_name_dot )? hash_index_name
     ;
 
 drop_index
@@ -2702,22 +2702,22 @@ drop_index
     ;
 
 //index_specification
-//    : ( database_name'.' )? index_name
+//    : ( database_name_dot )? index_name
 //        ON ( table_specification | join_index_specification )
 //    ;
 
 index_definition
-    : ( '(' column_name (','dots)? ')' | ( database_name'.' )? index_name )
+    : ( '(' column_name (','dots)? ')' | ( database_name_dot )? index_name )
         ( order_clause )?
         ON ( table_specification | join_index_specification )
     ;
 
 //table_specification
-//    : ( TEMPORARY )? ( database_name'.' )? table_name
+//    : ( TEMPORARY )? ( database_name_dot )? table_name
 //    ;
 //
 //join_index_specification
-//    : ( database_name'.' )? join_index_name
+//    : ( database_name_dot )? join_index_name
 //    ;
 
 order_clause
@@ -2725,11 +2725,11 @@ order_clause
     ;
 
 drop_join_index
-    : DROP JOIN INDEX ( database_name'.' )? join_index_name
+    : DROP JOIN INDEX ( database_name_dot )? join_index_name
     ;
 
 drop_macro
-    : DROP MACRO ( database_name'.' | user_name'.' )? macro_name
+    : DROP MACRO ( database_name_dot | user_name_dot )? macro_name
     ;
 
 drop_map
@@ -2737,11 +2737,11 @@ drop_map
     ;
 
 drop_ordering
-    : DROP ORDERING ( database_name'.' )? user_defined_type_name
+    : DROP ORDERING ( database_name_dot )? user_defined_type_name
     ;
 
 drop_procedure
-    : DROP PROCEDURE ( database_name'.' | user_name'.' )? procedure_name
+    : DROP PROCEDURE ( database_name_dot | user_name_dot )? procedure_name
     ;
 
 drop_profile
@@ -2749,11 +2749,11 @@ drop_profile
     ;
 
 drop_role
-    : DROP (EXTERNAL)? ROLE ( database_name'.' )? role_name
+    : DROP (EXTERNAL)? ROLE ( database_name_dot )? role_name
     ;
 
 drop_schema
-    : DROP storage_format SCHEMA (SYSUDTLIB'.')? schema_name
+    : DROP storage_format SCHEMA sysudtlib_dot? schema_name
     ;
 
 drop_statistics
@@ -2769,8 +2769,8 @@ statistic
     ;
 
 indexed_item
-    : ( (TEMPORARY)? ( database_name'.' | user_name'.' )? table_name |
-        ( database_name'.' | user_name'.' )? ( join_index_name | hash_index_name )
+    : ( (TEMPORARY)? ( database_name_dot | user_name_dot )? table_name |
+        ( database_name_dot | user_name_dot )? ( join_index_name | hash_index_name )
       )
     ;
 
@@ -2779,20 +2779,20 @@ column_index
     ;
 
 drop_table
-    : DROP (TEMPORARY)? (FOREIGN)? TABLE ( database_name'.' | user_name'.' )? table_name (ALL)?
+    : DROP (TEMPORARY)? (FOREIGN)? TABLE ( database_name_dot | user_name_dot )? table_name (ALL)?
     ;
 
 drop_transform
-    : DROP TRANSFORM ( database_name'.' )? ( transform_group_name | ALL )
+    : DROP TRANSFORM ( database_name_dot )? ( transform_group_name | ALL )
         FOR user_defined_type_name
     ;
 
 drop_trigger
-    : DROP TRIGGER ( database_name'.' | user_name'.' )? trigger_name
+    : DROP TRIGGER ( database_name_dot | user_name_dot )? trigger_name
     ;
 
 drop_type
-    : DROP TYPE ( database_name'.' )? user_defined_type_name
+    : DROP TYPE ( database_name_dot )? user_defined_type_name
     ;
 
 drop_user
@@ -2800,7 +2800,7 @@ drop_user
     ;
 
 drop_view
-    : DROP VIEW ( database_name'.' | user_name )? view_name
+    : DROP VIEW ( database_name_dot | user_name )? view_name
     ;
 
 drop_zone
@@ -2838,7 +2838,7 @@ logged_item
           FUNCTION |
           FUNCTION WRAPPING |
           TYPE
-        ) ( database_name'.' | user_name'.' )? object_name
+        ) ( database_name_dot | user_name_dot )? object_name
       )
     ;
 
@@ -2867,7 +2867,7 @@ flush_query
     ;
 
 help_cast
-    : HELP CAST (SYSUDTLIB'.')? user_defined_type_name ( SOURCE | TARGET )?
+    : HELP CAST sysudtlib_dot? user_defined_type_name ( SOURCE | TARGET )?
     ;
 
 help_column_1
@@ -2902,16 +2902,16 @@ help_column_6
 
 help_column_7
 //Column from Error Table for Data Table
-    : HELP COLUMN column_name FROM ERROR TABLE FOR ( database_name'.' | user_name'.' )? data_table_name
+    : HELP COLUMN column_name FROM ERROR TABLE FOR ( database_name_dot | user_name_dot )? data_table_name
     ;
 
 help_column_8
 //Column from Error Table
-    : HELP COLUMN column_name FROM ( database_name'.' | user_name'.' )? error_table_name
+    : HELP COLUMN column_name FROM ( database_name_dot | user_name_dot )? error_table_name
     ;
 
 //source
-//    : ( database_name'.' | user_name'.' )?
+//    : ( database_name_dot | user_name_dot )?
 //        ( table_name | join_index_name | hash_index_name )
 //    ;
 
@@ -2920,7 +2920,7 @@ column_spec
     ;
 
 help_constraint
-    : HELP CONSTRAINT ( database_name'.' | user_name'.' )?
+    : HELP CONSTRAINT ( database_name_dot | user_name_dot )?
         ( table_name'.' | view_name'.' ) constraint_name
     ;
 
@@ -2928,32 +2928,32 @@ help_database
     : HELP DATABASE database_name
     ;
 help_error_table
-    : HELP ERROR TABLE FOR ( database_name'.' | user_name'.')? data_table_name
+    : HELP ERROR TABLE FOR ( database_name_dot | user_name_dot)? data_table_name
     ;
 
 help_function
-    : HELP ( SPECIFIC FUNCTION ( database_name'.' | user_name'.' )? specific_function_name |
-             FUNCTION ( database_name'.' | user_name'.' )? function_name ('('data_type (','dots)?')')?
+    : HELP ( SPECIFIC FUNCTION ( database_name_dot | user_name_dot )? specific_function_name |
+             FUNCTION ( database_name_dot | user_name_dot )? function_name ('('data_type (','dots)?')')?
            )
     ;
 
 help_hash_index
-    : HELP HASH INDEX ( database_name'.' | user_name'.' )? hash_index_name
+    : HELP HASH INDEX ( database_name_dot | user_name_dot )? hash_index_name
     ;
 
 help_index
     : HELP INDEX (
-        (TEMPORARY)? ( database_name'.' | user_name'.' )? table_name |
-        ( database_name'.' | user_name'.' )? ( join_index_name | hash_index_name | view_name )
+        (TEMPORARY)? ( database_name_dot | user_name_dot )? table_name |
+        ( database_name_dot | user_name_dot )? ( join_index_name | hash_index_name | view_name )
       ) ( '(' column_name (','dots)? ')' )?
     ;
 
 help_join_index
-    : HELP JOIN INDEX ( database_name'.' | user_name'.' )? join_index_name
+    : HELP JOIN INDEX ( database_name_dot | user_name_dot )? join_index_name
     ;
 
 help_macro
-    : HELP MACRO ( database_name'.' | user_name'.' )? macro_name
+    : HELP MACRO ( database_name_dot | user_name_dot )? macro_name
     ;
 
 help_method
@@ -2961,12 +2961,12 @@ help_method
     ;
 
 //method_clause
-//    : ( INSTANCE | CONSTRUCTOR )? METHOD (database_name'.')? method_name
+//    : ( INSTANCE | CONSTRUCTOR )? METHOD (database_name_dot)? method_name
 //        ( '(' user_defined_type_name (','dots)? ')' )? FOR user_defined_type_name
 //    ;
 //
 //specific_method_clause
-//    : SPECIFIC METHOD (database_name'.')?specific_method_name
+//    : SPECIFIC METHOD (database_name_dot)?specific_method_name
 //    ;
 
 help_online
@@ -2985,7 +2985,7 @@ help_online
     ;
 
 help_procedure
-    : HELP PROCEDURE ( database_name'.')? procedure_name ( ATTRIBUTES | ATTR | ATTRS )?
+    : HELP PROCEDURE ( database_name_dot)? procedure_name ( ATTRIBUTES | ATTR | ATTRS )?
     ;
 
 help_session
@@ -2994,14 +2994,14 @@ help_session
 
 help_statistics
     : HELP (CURRENT)? STATISTICS (ON)? (
-        (TEMPORARY)? ( database_name'.' | user_name'.' )? table_name |
-        ( database_name'.' | user_name'.' ) ( join_index_name | hash_index_name )
+        (TEMPORARY)? ( database_name_dot | user_name_dot )? table_name |
+        ( database_name_dot | user_name_dot ) ( join_index_name | hash_index_name )
       )
     ;
 
 help_statistics_qcd
     : HELP (CURRENT)? STATISTICS
-        (ON)? ( database_name'.' | user_name'.' )? object_name
+        (ON)? ( database_name_dot | user_name_dot )? object_name
 
         FROM qcd_name
         ( FOR QUERY query_id )?
@@ -3011,23 +3011,23 @@ help_statistics_qcd
     ;
 
 help_schema
-    : HELP storage_format SCHEMA (SYSUDTLIB'.')? schema_name
+    : HELP storage_format SCHEMA sysudtlib_dot? schema_name
     ;
 
 help_table
-    : HELP TABLE ( database_name'.' | user_name'.')? ( table_name | error_table_name ) ( LAYER '('layer_name')')?
+    : HELP TABLE ( database_name_dot | user_name_dot)? ( table_name | error_table_name ) ( LAYER '('layer_name')')?
     ;
 
 help_transform
-    : HELP TRANSFORM ( database_name'.' | user_name'.' )? user_defined_type_name
+    : HELP TRANSFORM ( database_name_dot | user_name_dot )? user_defined_type_name
     ;
 
 help_trigger
-    : HELP TRIGGER ( database_name'.' | user_name'.' )? ( trigger_name | table_name )
+    : HELP TRIGGER ( database_name_dot | user_name_dot )? ( trigger_name | table_name )
     ;
 
 help_type
-    : HELP TYPE (SYSUDTLIB'.')? user_defined_type_name ( ATTRIBUTE | METHOD )?
+    : HELP TYPE sysudtlib_dot? user_defined_type_name ( ATTRIBUTE | METHOD )?
     ;
 
 help_user
@@ -3035,7 +3035,7 @@ help_user
     ;
 
 help_view
-    : HELP VIEW ( database_name'.' | user_name )? view_name
+    : HELP VIEW ( database_name_dot | user_name )? view_name
     ;
 
 help_volatile_table
@@ -3078,8 +3078,8 @@ modify_database
 //        (NO)? FALLBACK (PROTECTION)? |
 //        ( NO | DUAL )? (BEFORE)? JOURNAL |
 //        ( NO | DUAL | (NOT)? LOCAL )? AFTER JOURNAL |
-//        DEFAULT JOURNAL TABLE '=' ( database_name'.' )? table_name |
-//        DROP DEFAULT JOURNAL TABLE '=' ( database_name'.' )? table_name
+//        DEFAULT JOURNAL TABLE '=' ( database_name_dot )? table_name |
+//        DROP DEFAULT JOURNAL TABLE '=' ( database_name_dot )? table_name
 //      )
 //    ;
 
@@ -3149,7 +3149,7 @@ modify_user
 //        (NO)? FALLBACK (PROTECTION)? |
 //        ( NO | DUAL )? (BEFORE)? JOURNAL |
 //        ( NO | DUAL | (NOT)? LOCAL )? AFTER JOURNAL |
-//        DEFAULT JOURNAL TABLE '=' ( database_name'.' )? table_name |
+//        DEFAULT JOURNAL TABLE '=' ( database_name_dot )? table_name |
 //        DROP DEFAULT JOURNAL TABLE ( '=' table_name )? |
 //        TIME ZONE '=' ( LOCAL | (sign)? 'quotestring' | 'time_zone_string' | NULL_ ) |
 //        DATEFORM '=' ( INTEGERDATE | ANSIDATE | NULL_ ) |
@@ -3176,10 +3176,10 @@ modify_user
 
 rename_function_external
     : RENAME (
-        SPECIFIC FUNCTION ( database_name'.' )? specific_function_name
+        SPECIFIC FUNCTION ( database_name_dot )? specific_function_name
           ( TO | AS ) specific_function_name |
 
-        FUNCTION ( database_name'.' )? function_name ( '(' data_type (','dots)? ')' )?
+        FUNCTION ( database_name_dot )? function_name ( '(' data_type (','dots)? ')' )?
           ( TO | AS ) function_name
       )
     ;
@@ -3225,16 +3225,16 @@ rename_function_external
 //
 //        JSON ( '(' integer ')' )? ( CHARACTER SET ( UNICODE | LATIN ) )? |
 //
-//        (SYSUDTLIB'.')? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
 //      )
 //    ;
 
 rename_function_sql
     : RENAME (
-        SPECIFIC FUNCTION ( database_name'.' )? specific_function_name
+        SPECIFIC FUNCTION ( database_name_dot )? specific_function_name
           ( TO | AS ) specific_function_name |
 
-        FUNCTION ( database_name'.' )? function_name ( '(' data_type (','dots)? ')' )?
+        FUNCTION ( database_name_dot )? function_name ( '(' data_type (','dots)? ')' )?
           ( TO | AS ) function_name
       )
     ;
@@ -3287,33 +3287,33 @@ rename_function_sql
 //
 //        JSON ( '(' integer ')' )? ( CHARACTER SET ( UNICODE | LATIN ) )? |
 //
-//        (SYSUDTLIB'.')? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | ST_Geometry | MBR | ARRAY_name | VARRAY_name )
 //      )
 //    ;
 
 rename_macro
-    : RENAME MACRO ( database_name'.' | user_name'.' )? o=macro_name
-        ( TO | AS ) ( database_name'.' | user_name'.' )? n=macro_name
+    : RENAME MACRO ( database_name_dot | user_name_dot )? o=macro_name
+        ( TO | AS ) ( database_name_dot | user_name_dot )? n=macro_name
     ;
 
 rename_procedure
-    : RENAME PROCEDURE ( database_name'.' | user_name'.' )? o=procedure_name
-        ( TO | AS ) ( database_name'.' | user_name'.' )? n=procedure_name
+    : RENAME PROCEDURE ( database_name_dot | user_name_dot )? o=procedure_name
+        ( TO | AS ) ( database_name_dot | user_name_dot )? n=procedure_name
     ;
 
 rename_table
-    : RENAME TABLE ( database_name'.' | user_name'.' )? o=table_name
-        ( TO | AS ) ( database_name'.' | user_name'.' )? n=table_name
+    : RENAME TABLE ( database_name_dot | user_name_dot )? o=table_name
+        ( TO | AS ) ( database_name_dot | user_name_dot )? n=table_name
     ;
 
 rename_trigger
-    : RENAME TRIGGER ( database_name'.' | user_name'.' )? o=name
-        ( TO | AS ) ( database_name'.' | user_name'.' )? n=name
+    : RENAME TRIGGER ( database_name_dot | user_name_dot )? o=name
+        ( TO | AS ) ( database_name_dot | user_name_dot )? n=name
     ;
 
 rename_view
-    : RENAME VIEW ( database_name'.' | user_name'.' )? o=view_name
-        ( TO | AS )? ( database_name'.' | user_name'.' )? n=view_name
+    : RENAME VIEW ( database_name_dot | user_name_dot )? o=view_name
+        ( TO | AS )? ( database_name_dot | user_name_dot )? n=view_name
     ;
 
 replace_method
@@ -3322,13 +3322,13 @@ replace_method
     ;
 
 //specific_method_clause
-//    : SPECIFIC METHOD (SYSUDTLIB'.')? specific_method_name
+//    : SPECIFIC METHOD sysudtlib_dot? specific_method_name
 //    ;
 //
 //method_clause
 //    : (INSTANCE | CONSTRUCTOR ) METHOD (SYSUDTLIB' .') method_name
-//          '(' parameter_name? ( data_type | (SYSUDTLIB'.')?UDT_name )? ( AS LOCATOR )? ')'
-//          FOR (SYSUDTLIB'.') UDT_name
+//          '(' parameter_name? ( data_type | sysudtlib_dot?UDT_name )? ( AS LOCATOR )? ')'
+//          FOR sysudtlib_dot UDT_name
 //    ;
 //
 //item_list
@@ -3439,9 +3439,9 @@ set_session_dateform
 
 set_session_debug_function
     : ( SET SESSION | SS ) DEBUG (
-        FUNCTION ( database_name'.' | user_name'.' )? function_name |
-        PROCEDURE ( database_name'.' | user_name'.' )? procedure_name |
-        METHOD ( database_name'.' | user_name'.' )? method_name
+        FUNCTION ( database_name_dot | user_name_dot )? function_name |
+        PROCEDURE ( database_name_dot | user_name_dot )? procedure_name |
+        METHOD ( database_name_dot | user_name_dot )? method_name
         )
         ( ON | OFF )
     ;
@@ -3465,7 +3465,7 @@ set_session_function_trace
     ;
 
 trace_enabling_specification
-    : USING mask_string FOR (TRACE)? TABLE ( database_name'.' )? table_name
+    : USING mask_string FOR (TRACE)? TABLE ( database_name_dot )? table_name
     ;
 
 set_session_json_ignore_errors
@@ -3499,7 +3499,7 @@ set_transform_group_for_type
     ;
 
 show_function_mapping
-    : SHOW (IN XML)? FUNCTION MAPPING ( database_name'.' | user_name'.' )? function_mapping_name
+    : SHOW (IN XML)? FUNCTION MAPPING ( database_name_dot | user_name_dot )? function_mapping_name
     ;
 
 show_map
@@ -3508,24 +3508,24 @@ show_map
 
 show_object
     : SHOW (
-        ( IN XML )? HASH INDEX ( database_name'.' | user_name'.' )? hash_index_name |
-        ( IN XML )? JOIN INDEX ( database_name'.' | user_name'.' )? join_index_name |
-        MACRO ( database_name'.' | user_name'.' )? macro_name |
-        ( TEMPORARY )? TABLE ( database_name'.' | user_name'.' )? table_name |
-        ERROR TABLE FOR ( database_name'.' | user_name'.' )? data_table_name |
-        ( IN XML )? TABLE ( database_name'.' | user_name'.' )? error_table_name |
-        TRIGGER ( database_name'.' | user_name'.' )? trigger_name |
-        ( IN XML )? VIEW ( database_name'.' | user_name'.' )? view_name |
-        PROCEDURE ( database_name'.' | user_name'.' )? procedure_name |
-        SPECIFIC FUNCTION ( database_name'.' | user_name'.' )? specific_function_name |
-        FUNCTION ( database_name'.' | user_name'.' )? function_name
+        ( IN XML )? HASH INDEX ( database_name_dot | user_name_dot )? hash_index_name |
+        ( IN XML )? JOIN INDEX ( database_name_dot | user_name_dot )? join_index_name |
+        MACRO ( database_name_dot | user_name_dot )? macro_name |
+        ( TEMPORARY )? TABLE ( database_name_dot | user_name_dot )? table_name |
+        ERROR TABLE FOR ( database_name_dot | user_name_dot )? data_table_name |
+        ( IN XML )? TABLE ( database_name_dot | user_name_dot )? error_table_name |
+        TRIGGER ( database_name_dot | user_name_dot )? trigger_name |
+        ( IN XML )? VIEW ( database_name_dot | user_name_dot )? view_name |
+        PROCEDURE ( database_name_dot | user_name_dot )? procedure_name |
+        SPECIFIC FUNCTION ( database_name_dot | user_name_dot )? specific_function_name |
+        FUNCTION ( database_name_dot | user_name_dot )? function_name
          ( '(' ( data_type | user_defined_type_name )(','dots)? ')' )? |
-        SPECIFIC METHOD (SYSUDTLIB'.')? specific_method_name |
+        SPECIFIC METHOD sysudtlib_dot? specific_method_name |
         method |
-        CAST (SYSUDTLIB'.')? user_defined_type_name |
-        TYPE (SYSUDTLIB'.')? ( user_defined_type_name | array_name | varray_name ) |
-        storage_format SCHEMA (SYSUDTLIB'.')? schema_name |
-        FILE ( uifd=database_name'.' | uifu=user_name'.' )? uifn=name |
+        CAST sysudtlib_dot? user_defined_type_name |
+        TYPE sysudtlib_dot? ( user_defined_type_name | array_name | varray_name ) |
+        storage_format SCHEMA sysudtlib_dot? schema_name |
+        FILE ( uifd=database_name_dot | uifu=user_name_dot )? uifn=name |
         CONSTRAINT constraint_name |
         AUTHORIZATION authorization_name |
         GLOP SET glop_set_name
@@ -3576,23 +3576,23 @@ show_object
 //        ( BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CLOB )
 //          '(' integer ( G | K | M )? ')' |
 //
-//        (SYSUDTLIB'.')? ( XML | XMLTYPE ) ( '(' integer ( G | K | M )? ')' )?
+//        sysudtlib_dot? ( XML | XMLTYPE ) ( '(' integer ( G | K | M )? ')' )?
 //          ( INLINE LENGTH integer )? |
 //
-//        (SYSUDTLIB'.')? JSON ( '(' integer ( K | M )? ')' )? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? JSON ( '(' integer ( K | M )? ')' )? ( INLINE LENGTH integer )?
 //          ( CHARACTER SET ( UNICODE | LATIN ) | STORAGE FORMAT ( BSON | UBJSON ) )? |
 //
-//        (SYSUDTLIB'.')? ST_GEOMETRY ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? |
+//        sysudtlib_dot? ST_GEOMETRY ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )? |
 //
-//        (SYSUDTLIB'.')? DATASET ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )?
+//        sysudtlib_dot? DATASET ( '('integer ( K | M )?')' )? ( INLINE LENGTH integer )?
 //          storage_format |
 //
-//        (SYSUDTLIB'.')? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
+//        sysudtlib_dot? ( UDT_name | MBR | ARRAY_name | VARRAY_name )
 //      )
 //    ;
 
 method
-    : ( INSTANCE | CONSTRUCTOR )? METHOD (SYSUDTLIB'.')? method_name
+    : ( INSTANCE | CONSTRUCTOR )? METHOD sysudtlib_dot? method_name
         ( '(' ( data_type | user_defined_type_name )(','dots)? ')' )?
         FOR user_defined_type_name
     ;
@@ -3651,9 +3651,9 @@ show_statistics
 //    ;
 //
 //table_specification
-//    : ( (TEMPORARY)? ( database_name'.' | user_name'.' )? table_name_1 |
+//    : ( (TEMPORARY)? ( database_name_dot | user_name_dot )? table_name_1 |
 //
-//        ( database_name'.' | database_name'.' )? ( join_index_name | hash_index_name )
+//        ( database_name_dot | database_name_dot )? ( join_index_name | hash_index_name )
 //      )
 //    ;
 
@@ -3683,12 +3683,12 @@ show_statistics_qcd
 //    ;
 //
 //table_specification
-//    : ( database_name'.' | user_name'.' )?
+//    : ( database_name_dot | user_name_dot )?
 //        ( table_name | join_index_name | hash_index_name ) FROM qcd_name
 //    ;
 
 show_table
-    : SHOW (IN XML)? (TEMPORARY)? TABLE ( database_name'.' | user_name'.' )? table_name
+    : SHOW (IN XML)? (TEMPORARY)? TABLE ( database_name_dot | user_name_dot )? table_name
     ;
 
 boolean_condition
