@@ -1750,7 +1750,7 @@ authorization
     ;
 
 passwords
-    : USING password (NEW password CONFIRM password)?
+    : USING password_ (NEW password_ CONFIRM password_)?
     | CHANGE PASSWORD
     ;
 
@@ -3269,11 +3269,11 @@ soft_hard
 
 create_server
     : CREATE SERVER server_name (TYPE server_type)? (VERSION server_version) WRAPPER wrapper_name
-        (AUTHORIZATION authorization_name PASSWORD password)?
+        (AUTHORIZATION authorization_name PASSWORD password_)?
         (OPTIONS '(' server_option_name string_constant (',' server_option_name string_constant)* ')')?
     ;
 
-password
+password_
     : todo // "pass"
     ;
 
