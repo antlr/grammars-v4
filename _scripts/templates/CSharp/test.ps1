@@ -76,7 +76,7 @@ $old = Get-Location
 Set-Location ../<example_files_unix>
 
 # Check if any .errors/.tree files have changed. That's not good.
-rm -fo $old/updated.txt 2>&1 | Out-Null
+Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
 $updated = 0
 foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname

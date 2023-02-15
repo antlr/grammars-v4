@@ -76,7 +76,12 @@ jobs:
       shell: pwsh
       run: |
         $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+        If(!(test-path -PathType container /tmp)) {
+           New-Item -Path '/tmp' -ItemType Directory
+        }
+        copy $antlrPath /tmp/antlr4-complete.jar
     - name: Update paths
       shell: pwsh
       run: |
@@ -99,7 +104,7 @@ jobs:
             $After = "${{ github.event.after }}"
         }
         $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
-        _scripts/test.ps1 ${{ matrix.language }} $Before $After
+        _scripts/test.ps1 /tmp/antlr4-complete.jar ${{ matrix.language }} $Before $After
 
   build-bash:
     runs-on: ${{ matrix.os }}
@@ -171,12 +176,12 @@ jobs:
       shell: pwsh
       run: |
         $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
-        echo "$antlrPath"
+        echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
         If(!(test-path -PathType container /tmp)) {
            New-Item -Path '/tmp' -ItemType Directory
         }
-        copy $antlrPath /tmp/
+        copy $antlrPath /tmp/antlr4-complete.jar
     - name: Install trgen
       shell: bash
       run: |
@@ -191,4 +196,4 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/test.sh -t ${{matrix.language}} -f diff $Before $After
+        bash _scripts/test.sh -a /tmp/antlr4-complete.jar -t ${{matrix.language}} -f diff $Before $After

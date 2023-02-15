@@ -1,17 +1,17 @@
 function Get-GrammarSkip {
     param (
         $Target,
-	$Grammar
+        $Grammar
     )
     Write-Host "Target $Target Grammar $Grammar"
     if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
-	Write-Host "skip"
-	return $True
+        Write-Host "skip"
+        return $True
     }
     $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
     if ("$lines" -eq "") {
-	Write-Host "skip"
-	return $True
+        Write-Host "skip"
+        return $True
     }
     return $False
 }
@@ -25,6 +25,7 @@ enum FailStage {
 
 function Test-Grammar {
     param (
+        $Antlrjar,
         $Directory,
         $Target = "CSharp"
     )
@@ -38,8 +39,8 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates"
-    trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates"
+    trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -226,7 +227,8 @@ function Test-AllGrammars {
     param (
         $PreviousCommit,
         $CurrentCommit = "HEAD",
-        $Target = "CSharp"
+        $Target = "CSharp",
+        $Antlrjar = "/tmp/antlr4-complete.jar"
     )
     
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
@@ -243,7 +245,7 @@ function Test-AllGrammars {
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Directory $g -Target $Target
+        $state = Test-Grammar -Antlrjar $Antlrjar -Directory $g -Target $Target
         if (!$state.Success) {
             $success = $false
             $failedGrammars += $g
@@ -283,9 +285,10 @@ if ($env:ANTLR_JAR_PATH) {
 $Dir = Get-Location
 $templates = Join-Path $Dir "/_scripts/templates/"
 
-$t = $args[0]
-$pc = $args[1]
-$cc = $args[2]
+$antlrjar = $args[0]
+$t = $args[1]
+$pc = $args[2]
+$cc = $args[3]
 
 $diff = $true
 if (!$t) {
@@ -298,8 +301,8 @@ if (!$cc) {
     $cc = "HEAD"
 }
 if ($diff) {
-    Test-AllGrammars -Target $t -PreviousCommit $pc -CurrentCommit $cc
+    Test-AllGrammars -Target $t -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
 }
 else {
-    Test-AllGrammars -Target $t 
+    Test-AllGrammars -Target $t -Antlrjar $antlrjar
 }
