@@ -782,7 +782,7 @@ array_element_clause
 
 tree_element_clause
     : ROOT
-    | UNDER string_constant (OVER string_constant (',' OVER string_constant)* )?
+    | UNDER string_constant (OVER string_constant (',' OVER string_constant)*)?
     ;
 
 alter_security_policy
@@ -811,7 +811,7 @@ alter_sequence_opts
 
 alter_server
     : ALTER SERVER ( server_name (VERSION server_version)?
-                   | TYPE server_type (VERSION server_version (WRAPPER wrapper_name)? )?
+                   | TYPE server_type (VERSION server_version (WRAPPER wrapper_name)?)?
                    )
         (OPTIONS '(' alter_server_opts (',' alter_server_opts)* ')')?
     ;
@@ -994,7 +994,7 @@ period_definition_alter
 
 add_partition
     : partition_name? boundary_spec_alter (IN tablespace_name)
-        (INDEX IN tablespace_name (LONG IN tablespace_name)? )?
+        (INDEX IN tablespace_name (LONG IN tablespace_name)?)?
     ;
 
 boundary_spec_alter
@@ -1266,7 +1266,7 @@ alter_action_types_clause
     ;
 
 threshold_predicate_clause
-    : CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED) )?
+    : CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED))?
     | SQLTEMPSPACE '>' kmg
     | SQLROWSRETURNED '>' integer_value
     | ESTIMATEDSQLCOST '>' bigint_value
@@ -1328,7 +1328,7 @@ alter_workload_opts_item
     | COLLECT LOCK TIMEOUT DATA (alter_collect_history_clause | NONE)
     | COLLECT DEADLOCK DATA alter_collect_history_clause
     | COLLECT LOCK WAIT DATA (alter_collect_lock_wait_data_clause | NONE)
-    | COLLECT UNIT OF WORK DATA ( BASE (INCLUDE package_executable LIST (',' package_executable LIST)* )?
+    | COLLECT UNIT OF WORK DATA ( BASE (INCLUDE package_executable LIST (',' package_executable LIST)*)?
                                 | NONE
                                 )
     | ACTIVITY LIFETIME HISTOGRAM TEMPLATE template_name
@@ -1351,7 +1351,7 @@ extended_base_none
 
 alter_collect_activity_data_clause
     : (ON COORDINATOR MEMBER? | ON ALL MEMBERS?)
-        (WITHOUT DETAILS | WITH with_opts (',' with_opts)* (AND VALUES)? )
+        (WITHOUT DETAILS | WITH with_opts (',' with_opts)* (AND VALUES)?)
     ;
 
 with_opts
@@ -1469,7 +1469,7 @@ built_in_type
     | BINARY integer_paren?
     | (VARBINARY | BINARY VARYING) integer_paren
     | (BLOB | BINARY LARGE OBJECT) integer_kmg_paren?
-    | (DATE | TIME | TIMESTAMP integer_paren? )
+    | (DATE | TIME | TIMESTAMP integer_paren?)
     | BOOLEAN
     | XML
     | CURSOR
@@ -1592,7 +1592,7 @@ drop_command
     ;
 
 alias_designator
-    : PUBLIC? ALIAS alias_name (FOR (TABLE | MODULE | SEQUENCE) )?
+    : PUBLIC? ALIAS alias_name (FOR (TABLE | MODULE | SEQUENCE))?
     ;
 
 service_class_designator
@@ -1809,7 +1809,7 @@ end_declare_section
 
 execute
     : EXECUTE statement_name
-        (INTO (assignment_target (',' assignment_target)* | DESCRIPTOR descriptor_name) )?
+        (INTO (assignment_target (',' assignment_target)* | DESCRIPTOR descriptor_name))?
         (USING (host_variable_expression (',' host_variable_expression)* | DESCRIPTOR input_descriptor_name))?
         (FOR (host_variable | integer_constant) ROWS)?
     ;
@@ -1836,7 +1836,7 @@ explain
     : EXPLAIN
         (PLAN SELECTION | ALL | PLAN)
         ((FOR | WITH) SNAPSHOT)?
-        (WITH REOPT ONCE )?
+        (WITH REOPT ONCE)?
         (SET QUERYNO '=' integer_value)?
         (SET QUERYTAG '=' string_constant)? FOR
         (explainable_sql_statement | XQUERY string)
@@ -1936,7 +1936,7 @@ set
           | CURRENT DECFLOAT ROUNDING MODE EQ? (ROUND_CEILING | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_EVEN | ROUND_HALF_UP | string_constant | host_variable)
           | CURRENT? DEFAULT TRANSFORM GROUP EQ? group_name
           | CURRENT DEGREE_ EQ? (string_constant | host_variable)
-          | CURRENT EXPLAIN MODE EQ? (yes_no | EXPLAIN NORCAC? | REOPT | (RECOMMEND|EVALUATE) (INDEXES|PARTITIONINGS) | host_variable )
+          | CURRENT EXPLAIN MODE EQ? (yes_no | EXPLAIN NORCAC? | REOPT | (RECOMMEND|EVALUATE) (INDEXES|PARTITIONINGS) | host_variable)
           | CURRENT EXPLAIN SNAPSHOT EQ? (yes_no | EXPLAIN | REOPT | host_variable)
           | CURRENT FEDERATED ASYNCHRONY EQ? (ANY | integer_constant | host_variable)
           | CURRENT IMPLICIT XMLPARSE OPTION EQ? (string_constant | host_variable)
@@ -2265,7 +2265,7 @@ repeat
     ;
 
 return
-    : RETURN (expression | NULL_ | (WITH common_table_expression (',' common_table_expression)* )? fullselect)?
+    : RETURN (expression | NULL_ | (WITH common_table_expression (',' common_table_expression)*)? fullselect)?
     ;
 
 while
@@ -2394,7 +2394,7 @@ audit_policy_categories_opts
 create_bufferpool
     : CREATE BUFFERPOOL bufferpool_name
         (IMMEDIATE | DEFERRED)?
-        (ALL DBPARTITIONNUMS | DATABASE PARTITION GROUP db_partition_group_name (',' db_partition_group_name)* )?
+        (ALL DBPARTITIONNUMS | DATABASE PARTITION GROUP db_partition_group_name (',' db_partition_group_name)*)?
         (SIZE number_of_pages? AUTOMATIC?)?
         bufferpool_opts
     ;
@@ -2477,13 +2477,13 @@ event_control
 
 create_event_monitor_locking
     : CREATE EVENT MONITOR event_monitor_name FOR LOCKING
-        WRITE TO (TABLE formatted_event_table_info | UNFORMATTED EVENT TABLE ('(' target_table_options ')')? )
+        WRITE TO (TABLE formatted_event_table_info | UNFORMATTED EVENT TABLE ('(' target_table_options ')')?)
         autostart_manualstart?
     ;
 
 create_event_monitor_package_cache
     : CREATE EVENT MONITOR event_monitor_name FOR PACKAGE CACHE filter_and_collection_options
-        WRITE TO (TABLE formatted_event_table_info | UNFORMATTED EVENT TABLE ('(' target_table_options ')')? )
+        WRITE TO (TABLE formatted_event_table_info | UNFORMATTED EVENT TABLE ('(' target_table_options ')')?)
         autostart_manualstart?
     ;
 
@@ -2568,7 +2568,7 @@ target_table_options
     ;
 
 create_external_table
-    : CREATE EXTERNAL TABLE table_name ('(' column_definition (',' column_definition)* ')' | LIKE (table_name | view_name | nick_name) )
+    : CREATE EXTERNAL TABLE table_name ('(' column_definition (',' column_definition)* ')' | LIKE (table_name | view_name | nick_name))
         USING '(' ext_table_option ext_table_option_value (',' ext_table_option ext_table_option_value)* ')'
     ;
 
@@ -2624,7 +2624,7 @@ ext_scalar_option_list
 ext_scalar_option_list_item
     : LANGUAGE (C_ | JAVA | CLR | OLE | CPP | PYTHON)
     | SPECIFIC specific_name
-    | EXTERNAL (NAME (string | id_) )?
+    | EXTERNAL (NAME (string | id_))?
     | PARAMETER STYLE (DB2GENERAL | JAVA | SQL | NPSGENERIC)
     | PARAMETER CCSID ascii_unicode
     | NOT? DETERMINISTIC
@@ -2650,7 +2650,7 @@ ext_scalar_option_list_item
     ;
 
 predicate_specification
-    : WHEN ('=' | '<>' | '<' | '>' | '<=' | '>=') (constant | EXPRESSION AS expression_name)
+    : WHEN ('=' | '<>' | '<' | '>' | '<=' | '>=') (constant_ | EXPRESSION AS expression_name)
         (data_filter index_exploitation? | index_exploitation data_filter?)
     ;
 
@@ -2691,7 +2691,7 @@ ext_table_option_list
 ext_table_option_list_item
     : LANGUAGE (C_ | JAVA | CLR | OLE | CPP)
     | SPECIFIC specific_name
-    | EXTERNAL (NAME (string | id_) )?
+    | EXTERNAL (NAME (string | id_))?
     | PARAMETER STYLE (DB2GENERAL | SQL | NPSGENERIC)
     | PARAMETER CCSID ascii_unicode
     | NOT? DETERMINISTIC
@@ -2883,7 +2883,7 @@ index_search
 
 search_method_definition
     : WHEN method_name '(' param_list ')' RANGE THROUGH range_producing_funciton_invocation
-        (FILTER USING (index_filtering_function_invocation | case_expression) )?
+        (FILTER USING (index_filtering_function_invocation | case_expression))?
     ;
 
 create_mask
@@ -2921,7 +2921,7 @@ method_opts_item
     ;
 
 method_signature
-    : method_name '(' method_param_list? ')' (RETURNS (data_type_2 as_locator? | data_type_3 CAST FROM data_type_4 as_locator?) )?
+    : method_name '(' method_param_list? ')' (RETURNS (data_type_2 as_locator? | data_type_3 CAST FROM data_type_4 as_locator?))?
     ;
 
 method_param_list
@@ -2950,7 +2950,7 @@ todo
 sql_statement_inlined
     : call
     | for
-    | (WITH cte (',' cte)* )? fullselect
+    | (WITH cte (',' cte)*)? fullselect
     | get_diagnostics
     | if
     | insert
@@ -2990,7 +2990,7 @@ create_module
 
 create_nickname
     : CREATE or_replace? NICKNAME nick_name (FOR remote_object_name | non_relational_data_definition)
-        (OPTIONS '(' nick_name_option_name string_constant (',' nick_name_option_name string_constant)* ')' )?
+        (OPTIONS '(' nick_name_option_name string_constant (',' nick_name_option_name string_constant)* ')')?
     ;
 
 nick_name_option_name
@@ -3071,7 +3071,7 @@ option_list_2_item
     | NOT? DETERMINISTIC
     | CALLED ON NULL_ INPUT
     | old_new SAVEPOINT LEVEL
-    | EXTERNAL (NAME (string | id_) )?
+    | EXTERNAL (NAME (string | id_))?
     | FENCED NOT? THREADSAFE
     | NOT FENCED THREADSAFE?
     | COMMIT ON RETURN yes_no
@@ -3167,7 +3167,7 @@ create_role
 
 create_schema
     : CREATE SCHEMA (schema_name | AUTHORIZATION authorization_name | schema_name AUTHORIZATION authorization_name)
-            (DATA CAPTURE (NONE | CHANGES) )?
+            (DATA CAPTURE (NONE | CHANGES))?
             schema_sql_statement*
     ;
 
@@ -3213,7 +3213,7 @@ create_security_policy
     ;
 
 create_sequence
-    : CREATE or_replace? SEQUENCE sequence_name (AS (INTEGER | data_type) )?
+    : CREATE or_replace? SEQUENCE sequence_name (AS (INTEGER | data_type))?
         create_sequence_opts?
     ;
 
@@ -3356,11 +3356,11 @@ unique_constraint
     ;
 
 referential_constraint
-    : (CONSTRAINT constraint_name )? FOREIGN KEY '(' column_list ')' references_clause
+    : (CONSTRAINT constraint_name)? FOREIGN KEY '(' column_list ')' references_clause
     ;
 
 check_constraint
-    : (CONSTRAINT constraint_name )? CHECK '(' check_condition ')' constraint_attributes?
+    : (CONSTRAINT constraint_name)? CHECK '(' check_condition ')' constraint_attributes?
     ;
 
 column_options
@@ -3392,7 +3392,7 @@ references_clause
 
 rule_clause
     : ON DELETE (NO ACTION | RESTRICT | CASCADE | SET NULL_)
-    | ON UPDATE (NO ACTION | RESTRICT ) //todo bullet
+    | ON UPDATE (NO ACTION | RESTRICT) //todo bullet
     ;
 
 constraint_attributes
@@ -3405,13 +3405,13 @@ default_clause
     ;
 
 default_values
-    : constant
+    : constant_
     | datetime_special_register
     | user_special_register
     | CURRENT (SCHEMA | MEMBER)
     | NULL_
-    | cast_function '(' (constant | datetime_special_register | user_special_register) ')'
-    | (EMPTY_CLOB | EMPTY_DBCLOB | EMPTY_NCLOB | EMPTY_BLOB ) '(' ')'
+    | cast_function '(' (constant_ | datetime_special_register | user_special_register) ')'
+    | (EMPTY_CLOB | EMPTY_DBCLOB | EMPTY_NCLOB | EMPTY_BLOB) '(' ')'
     ;
 
 generated_clause
@@ -3480,7 +3480,7 @@ partition_expression_list
     ;
 
 partition_expression
-    : column_name (NULLS (FIRST | LAST) )?
+    : column_name (NULLS first_last)?
     ;
 
 partition_element_list
@@ -3489,8 +3489,8 @@ partition_element_list
 
 partition_element
     : (PARTITION partition_name)? boundary_spec partition_tablespace_options?
-    | boundary_spec EVERY ( '(' constant duration_label? ')'
-                          | constant duration_label?
+    | boundary_spec EVERY ( '(' constant_ duration_label? ')'
+                          | constant_ duration_label?
                           )
     ;
 
@@ -3528,7 +3528,7 @@ const_min_max_list
     ;
 
 const_min_max
-    : constant
+    : constant_
     | MINVALUE
     | MAXVALUE
     ;
@@ -3586,7 +3586,7 @@ sequence_key_spec_list
     ;
 
 sequence_key_spec_list_item
-    : column_name (STARTING FROM? constant)? ENDING AT? constant
+    : column_name (STARTING FROM? constant_)? ENDING AT? constant_
     ;
 
 tablespace_clauses
@@ -3606,9 +3606,9 @@ if_not_exists
     ;
 
 create_tablespace
-    : CREATE (LARGE | REGULAR | ( SYSTEM | USER )? TEMPORARY)? TABLESPACE tablespace_name
-        ( IN ( DATABASE PARTITION GROUP )? db_partition_group_name)?
-        ( PAGESIZE integer_value K? )?
+    : CREATE (LARGE | REGULAR | (SYSTEM | USER)? TEMPORARY)? TABLESPACE tablespace_name
+        (IN (DATABASE PARTITION GROUP)? db_partition_group_name)?
+        (PAGESIZE integer_value K?)?
         ( MANAGED BY ( AUTOMATIC STORAGE storage_group? size_attributes?
                      | SYSTEM system_containers+
                      | DATABASE database_containers+ size_attributes?
@@ -3620,10 +3620,11 @@ create_tablespace
         )?
         ( PREFETCHSIZE ( AUTOMATIC
                        | number_of_pages
-                       | integer_value (K | M) )?
+                       | integer_value (K | M)
+                       )?
         )?
         (BUFFERPOOL bufferpool_name)?
-        (OVERHEAD (number_of_milliseconds | INHERIT) )?
+        (OVERHEAD (number_of_milliseconds | INHERIT))?
         (NO? FILE SYSTEM CACHING)?
         (TRANSFERRATE (number_of_milliseconds | INHERIT))?
         (DATA TAG (integer_constant | INHERIT | NONE))?
@@ -3725,11 +3726,11 @@ enforcement_scope
 
 threshold_predicate
     : TOTALMEMBERCONNECTIONS '>' integer_value
-    | TOTALSCMEMBERCONNECTIONS '>' integer_value (AND QUEUEDCONNECTIONS ('>' integer_value | UNBOUNDED) )?
+    | TOTALSCMEMBERCONNECTIONS '>' integer_value (AND QUEUEDCONNECTIONS ('>' integer_value | UNBOUNDED))?
     | CONNECTIONIDLETIME '>' integer_value day_to_minutes
     | CONCURRENTWORKLOADOCCURRENCES '>' integer_value
     | CONCURRENTWORKLOADACTIVITIES '>' integer_value
-    | CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED) )?
+    | CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED))?
     | ESTIMATEDSQLCOST '>' integer_value
     | SQLROWSRETURNED '>' integer_value
     | (ACTIVITYTOTALTIME | UOWTOTALTIME) '>' integer_value day_to_seconds
@@ -3737,7 +3738,7 @@ threshold_predicate
     | (SQLROWSREAD | SQLROWSREADINSC) '>' bigint_value checking_every?
     | (CPUTIME | CPUTIMEINSC) '>' hour_to_seconds integer_value checking_every?
     | (ACTIVITYTOTALRUNTIME | ACTIVITYTOTALRUNTIMEINALLSC) '>' integer_value day_to_seconds
-    | SORTSHRHEAPUTIL '>' integer_value PERCENT (AND BLOCKING ADMISSION FOR '>' integer_value day_to_seconds )?
+    | SORTSHRHEAPUTIL '>' integer_value PERCENT (AND BLOCKING ADMISSION FOR '>' integer_value day_to_seconds)?
     | DATATAGINSC (NOT? IN) '(' integer_constant_list ')'
     ;
 
@@ -3774,8 +3775,8 @@ day_to_seconds
     ;
 
 threshold_exceeded_actions_2
-    : (COLLECT ACTIVITY DATA () )?
-        (WITHOUT DETAILS | WITH details_section (AND VALUES)? )?
+    : (COLLECT ACTIVITY DATA (todo) )?
+        (WITHOUT DETAILS | WITH details_section (AND VALUES)?)?
         (STOP EXECUTION | CONTINUE | FOR APPLICATION | remap_activity_action)
     ;
 
@@ -3845,7 +3846,7 @@ trigger_event
     ;
 
 triggered_action
-    : (WHEN '(' search_condition ')' )? label? sql_procedure_statement
+    : (WHEN '(' search_condition ')')? label? sql_procedure_statement
     ;
 
 sql_procedure_statement
@@ -4060,7 +4061,7 @@ create_type_mapping
 
 for_bit_data_precision
     : for_bit_data
-    | '(' (precision | precision '..' precision ) (',' (scale | scale '..' scale) )? ')' precision_scale_comp?
+    | '(' (precision | precision '..' precision) (',' (scale | scale '..' scale))? ')' precision_scale_comp?
     ;
 
 precision
@@ -4090,7 +4091,7 @@ local_data_type
 
 remote_server
     : SERVER server_name
-    | SERVER TYPE server_type (VERSION server_version (WRAPPER wrapper_name)? )?
+    | SERVER TYPE server_type (VERSION server_version (WRAPPER wrapper_name)?)?
     ;
 
 server_version
@@ -4115,9 +4116,9 @@ mod
     ;
 
 create_usage_list
-    : CREATE USAGE LIST usage_list_name FOR (TABLE | INDEX ) object_name
+    : CREATE USAGE LIST usage_list_name FOR (TABLE | INDEX) object_name
         (LIST SIZE integer_value)?
-        (WHEN FULL (WRAP | DEACTIVATE) )?
+        (WHEN FULL (WRAP | DEACTIVATE))?
         ((INACTIVE | ACTIVE) ON START DATABASE)?
     ;
 
@@ -4136,7 +4137,7 @@ user_mapping_options
 create_variable
     : CREATE or_replace? VARIABLE variable_name data_type_1
             ( (DEFAULT | CONSTANT)? NULL_
-            | (DEFAULT | CONSTANT) ( constant
+            | (DEFAULT | CONSTANT) ( constant_
                                    | special_register
                                    | global_variable
                                    | '(' cursor_value_constructor ')'
@@ -4145,7 +4146,7 @@ create_variable
             )
     ;
 
-constant
+constant_
     : integer_constant
     | bigint_constant
     | todo
@@ -4288,7 +4289,7 @@ implementation_clause
     ;
 
 nested_table_reference
-    : (LATERAL (continue_handler WITHIN)? )? '(' (WITH cte_list)? fullselect ')' correlation_clause?
+    : (LATERAL (continue_handler WITHIN)?)? '(' (WITH cte_list)? fullselect ')' correlation_clause?
     ;
 
 continue_handler
@@ -4364,7 +4365,7 @@ xmltable_function
     ;
 
 joined_table
-    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_list ')' )
+    : table_reference (INNER | outer)? JOIN table_reference (ON join_condition | USING '(' column_list ')')
     | table_reference CROSS JOIN table_reference
     | '(' joined_table ')'
     ;
@@ -4438,7 +4439,7 @@ order_by_clause
     ;
 
 order_by_clause_opts
-    : sort_key (asc_desc (NULLS first_last)? )?
+    : sort_key (asc_desc (NULLS first_last)?)?
     | ORDER OF table_designator
     ;
 
@@ -4570,7 +4571,7 @@ action_types_clause
     ;
 
 threshold_types_clause
-    : CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED) )?
+    : CONCURRENTDBCOORDACTIVITIES '>' integer_value (AND QUEUEDACTIVITIES ('>' integer_value | UNBOUNDED))?
     | SQLTEMPSPACE '>' integer_value kmg
     | SQLROWSRETURNED '>' integer_value
     | ESTIMATEDSQLCOST '>' bigint_value
@@ -4594,11 +4595,11 @@ hours_minutes
     ;
 
 threshold_exceeded_actions
-    : (COLLECT ACTIVITY DATA (NONE | collect_activity_data_clause) )? (STOP EXECUTION | CONTINUE)
+    : (COLLECT ACTIVITY DATA (NONE | collect_activity_data_clause))? (STOP EXECUTION | CONTINUE)
     ;
 
 collect_activity_data_clause
-    : (ON COORDINATOR MEMBER? | ON ALL MEMBERS? )?
+    : (ON COORDINATOR MEMBER? | ON ALL MEMBERS?)?
         ( WITHOUT DETAILS
         | WITH ( DETAILS
                | SECTION (INCLUDE ACTUALS BASE)?
@@ -4652,7 +4653,7 @@ position
     ;
 
 for_from_to_clause
-    : FOR (TIMERONCOST | CARDINALITY) FROM from_value (TO (UNBOUNDED | to_value) )?
+    : FOR (TIMERONCOST | CARDINALITY) FROM from_value (TO (UNBOUNDED | to_value))?
     ;
 
 from_value
@@ -4674,15 +4675,15 @@ schema_clause
 create_workload
     : CREATE WORKLOAD workload_name connection_attributes+ workload_attributes
         position_clause_2?
-        (PRIORITY (CRITICAL | HIGH | MEDIUM | LOW) )?
-        (COLLECT ACTIVITY METRICS (NONE | BASE | EXTENDED)? )?
-        (COLLECT ACTIVITY DATA (NONE | collect_on_clause collect_details_clause) )?
-        (COLLECT AGGREGATE ACTIVITY DATA (BASE | EXTENDED)? )?
-        (COLLECT AGGREGATE UNIT OF WORK DATA BASE? )?
-        (COLLECT LOCK TIMEOUT DATA (NONE | WITH HISTORY (AND VALUES)? )? )?
-        (COLLECT DEADLOCK DATA (WITH HISTORY (AND VALUES)? )? )?
-        (COLLECT LOCK WAIT DATA collect_lock_wait_options )?
-        (COLLECT UNIT OF WORK DATA (BASE (INCLUDE pkg_exec_seq)? )? )?
+        (PRIORITY (CRITICAL | HIGH | MEDIUM | LOW))?
+        (COLLECT ACTIVITY METRICS (NONE | BASE | EXTENDED)?)?
+        (COLLECT ACTIVITY DATA (NONE | collect_on_clause collect_details_clause))?
+        (COLLECT AGGREGATE ACTIVITY DATA (BASE | EXTENDED)?)?
+        (COLLECT AGGREGATE UNIT OF WORK DATA BASE?)?
+        (COLLECT LOCK TIMEOUT DATA (NONE | WITH HISTORY (AND VALUES)?)?)?
+        (COLLECT DEADLOCK DATA (WITH HISTORY (AND VALUES)?)?)?
+        (COLLECT LOCK WAIT DATA collect_lock_wait_options)?
+        (COLLECT UNIT OF WORK DATA (BASE (INCLUDE pkg_exec_seq)?)?)?
         histogram_templace_clause
     ;
 
@@ -4715,7 +4716,7 @@ string_list_paren
     ;
 
 workload_attributes
-    : enable_disable? (allow_disallow DB ACCESS)? (MAXIMUM DEGREE_ (DEFAULT | degree) )?
+    : enable_disable? (allow_disallow DB ACCESS)? (MAXIMUM DEGREE_ (DEFAULT | degree))?
         (SERVICE CLASS_ (SYSDEFAULTUSERCLASS | service_class_name (UNDER service_superclass_name)?))?
     ;
 
@@ -4735,7 +4736,7 @@ collect_on_clause
 
 collect_details_clause
     : WITHOUT DETAILS
-    | WITH  (DETAILS | SECTION (INCLUDE ACTUALS BASE)? )? (AND VALUES)?
+    | WITH  (DETAILS | SECTION (INCLUDE ACTUALS BASE)?)? (AND VALUES)?
     ;
 
 collect_lock_wait_options
