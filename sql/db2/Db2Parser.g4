@@ -4645,10 +4645,10 @@ work_attributes
 position_clause
     : POSITION LAST
     | POSITION (BEFORE | AFTER) work_class_name
-    | POSITION AT position
+    | POSITION AT position_
     ;
 
-position
+position_
     : positive_integer
     ;
 
@@ -4695,7 +4695,7 @@ pkg_exec_seq
 position_clause_2
     : POSITION LAST
     | POSITION (BEFORE | AFTER) workload_name
-    | POSITION AT position
+    | POSITION AT position_
     ;
 
 connection_attributes
