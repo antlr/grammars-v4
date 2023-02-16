@@ -189,7 +189,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
 //        lexer.reset();
     }
     if (show_trace) {
-//      PredictionContext.trace_atn_sim = true;
+//       parser._interp.trace_atn_sim = true;
     }
     const timer = new Timer({ label: 'test-timer2' });
     timer.start();

@@ -103,12 +103,13 @@ rm -rf `find . -name 'Generated*' -type d`
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
-antlr4jar=/tmp/antlr4-4.11.1-complete.jar
+antlr4jar=/tmp/antlr4-complete.jar
 while getopts 'agthf' opt; do
     case "$opt" in
         a)
             getopts-extra "$@"
             antlr4jar="${OPTARG[0]}"
+	    echo Antlr4jar is $antlr4jar
             ;;
         g)
             getopts-extra "$@"
