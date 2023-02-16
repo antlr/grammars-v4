@@ -78,6 +78,7 @@ ddl_clause
     | alter_credential
     | alter_cryptographic_provider
     | alter_database
+    | alter_database_audit_specification
     | alter_db_role
     | alter_endpoint
     | create_or_alter_event_session
@@ -120,6 +121,7 @@ ddl_clause
     | create_credential
     | create_cryptographic_provider
     | create_database
+    | create_database_audit_specification
     | create_db_role
     | create_event_notification
     | create_external_library
@@ -1331,11 +1333,55 @@ alter_resource_governor
     : ALTER RESOURCE GOVERNOR ( (DISABLE | RECONFIGURE) | WITH LR_BRACKET CLASSIFIER_FUNCTION EQUAL ( schema_name=id_ DOT function_name=id_ | NULL_ ) RR_BRACKET | RESET STATISTICS | WITH LR_BRACKET MAX_OUTSTANDING_IO_PER_VOLUME EQUAL max_outstanding_io_per_volume=DECIMAL RR_BRACKET )
     ;
 
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-audit-specification-transact-sql?view=sql-server-ver16
+alter_database_audit_specification
+    : ALTER DATABASE AUDIT SPECIFICATION audit_specification_name=id_
+        (FOR SERVER AUDIT audit_name=id_)?
+        (audit_action_spec_group (',' audit_action_spec_group)*)?
+        (WITH '(' STATE '=' (ON|OFF) ')')?
+    ;
+
+audit_action_spec_group
+    : (ADD|DROP) '(' (audit_action_specification | audit_action_group_name=id_) ')'
+    ;
+
+audit_action_specification
+    : action_specification (',' action_specification)* ON (audit_class_name '::')? audit_securable BY principal_id (',' principal_id)*
+    ;
+
+action_specification
+    : SELECT
+    | INSERT
+    | UPDATE
+    | DELETE
+    | EXECUTE
+    | RECEIVE
+    | REFERENCES
+    ;
+
+audit_class_name
+    : OBJECT
+    | SCHEMA
+    | TABLE
+    ;
+
+audit_securable
+    : ((id_ '.')? id_ '.')? id_
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-role-transact-sql
 alter_db_role
     : ALTER ROLE role_name=id_
         ( (ADD|DROP) MEMBER database_principal=id_
         | WITH NAME EQUAL new_role_name=id_ )
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/create-database-audit-specification-transact-sql?view=sql-server-ver16
+create_database_audit_specification
+    : CREATE DATABASE AUDIT SPECIFICATION audit_specification_name=id_
+         (FOR SERVER AUDIT audit_name=id_)?
+         (audit_action_spec_group (',' audit_action_spec_group)*)?
+         (WITH '(' STATE '=' (ON|OFF) ')')?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-role-transact-sql
