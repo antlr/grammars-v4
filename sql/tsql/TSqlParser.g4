@@ -112,6 +112,7 @@ ddl_clause
     | alter_user
     | alter_user_azure_sql
     | alter_workload_group
+    | alter_xml_schema_collection
     | create_application_role
     | create_assembly
     | create_asymmetric_key
@@ -353,6 +354,11 @@ another_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-xml-schema-collection-transact-sql?view=sql-server-ver16
+alter_xml_schema_collection
+    : ALTER XML SCHEMA COLLECTION (id_ '.')? id_ ADD STRING
     ;
 
 create_application_role
