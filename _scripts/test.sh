@@ -4,7 +4,7 @@
 quiet=true
 
 # Get full path of this script.
-full_path_script=$(realpath $0)
+full_path_script=`dirname -- "$0"`
 full_path_templates=$(dirname $full_path_script)/templates
 
 # Sanity checks for required environment.
