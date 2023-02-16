@@ -1,11 +1,29 @@
 #!/usr/bin/bash
 
+myrealpath ()                                                                                                                                                                                   
+{                                                                                                                                                                                             
+    f=$@;                                                                                                                                                                                     
+    if [ -d "$f" ]; then                                                                                                                                                                      
+        base="";                                                                                                                                                                              
+        dir="$f";                                                                                                                                                                             
+    else                                                                                                                                                                                      
+        base="/$(basename "$f")";                                                                                                                                                             
+        dir=$(dirname "$f");                                                                                                                                                                  
+    fi;                                                                                                                                                                                       
+    dir=$(cd "$dir" && /bin/pwd);                                                                                                                                                             
+    echo "$dir$base"                                                                                                                                                                          
+}
+
 # true or false
 quiet=true
 
 # Get full path of this script.
-full_path_script=`dirname -- "$0"`
+echo "\$0 = $0"
+full_path_script=$(myrealpath $0)
+#full_path_script=`dirname -- "$0"`
+echo full_path_script = $full_path_script
 full_path_templates=$(dirname $full_path_script)/templates
+echo full_path_script = $full_path_script
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"
