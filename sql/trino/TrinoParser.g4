@@ -74,6 +74,7 @@ statement
     | DELETE_ FROM_ qualifiedName (WHERE_ booleanExpression)?             #delete
     | TRUNCATE_ TABLE_ qualifiedName                                     #truncateTable
     | COMMENT_ ON_ TABLE_ qualifiedName IS_ (string_ | NULL_)                #commentTable
+    | COMMENT_ ON_ VIEW_ qualifiedName IS_ (string_ | NULL_)                 #commentView
     | COMMENT_ ON_ COLUMN_ qualifiedName IS_ (string_ | NULL_)               #commentColumn
     | ALTER_ TABLE_ (IF_ EXISTS_)? from=qualifiedName
         RENAME_ TO_ to=qualifiedName                                     #renameTable
@@ -95,6 +96,7 @@ statement
     | ANALYZE_ qualifiedName (WITH_ properties)?                         #analyze
     | CREATE_ (OR_ REPLACE_)? MATERIALIZED_ VIEW_
         (IF_ NOT_ EXISTS_)? qualifiedName
+        (GRACE_ PERIOD_ interval)?
         (COMMENT_ string_)?
         (WITH_ properties)? AS_ query                                    #createMaterializedView
     | CREATE_ (OR_ REPLACE_)? VIEW_ qualifiedName
@@ -846,7 +848,7 @@ nonReserved
     | DATA_ | DATE_ | DAY_ | DEFAULT_ | DEFINE_ | DEFINER_ | DESC_ | DESCRIPTOR_ | DISTRIBUTED_ | DOUBLE_
     | EMPTY_ | ENCODING_ | ERROR_ | EXCLUDING_ | EXPLAIN_
     | FETCH_ | FILTER_ | FINAL_ | FIRST_ | FOLLOWING_ | FORMAT_ | FUNCTIONS_
-    | GRANT_ | DENY_ | GRANTED_ | GRANTS_ | GRAPHVIZ_ | GROUPS_
+    | GRACE_ | GRANT_ | DENY_ | GRANTED_ | GRANTS_ | GRAPHVIZ_ | GROUPS_
     | HOUR_
     | IF_ | IGNORE_ | INCLUDING_ | INITIAL_ | INPUT_ | INTERVAL_ | INVOKER_ | IO_ | ISOLATION_
     | JSON_
@@ -855,7 +857,7 @@ nonReserved
     | MAP_ | MATCH_ | MATCHED_ | MATCHES_ | MATCH_RECOGNIZE_ | MATERIALIZED_ | MEASURES_ | MERGE_ | MINUTE_ | MONTH_
     | NEXT_ | NFC_ | NFD_ | NFKC_ | NFKD_ | NO_ | NONE_ | NULLIF_ | NULLS_
     | OBJECT_ | OF_ | OFFSET_ | OMIT_ | ONE_ | ONLY_ | OPTION_ | ORDINALITY_ | OUTPUT_ | OVER_ | OVERFLOW_
-    | PARTITION_ | PARTITIONS_ | PASSING_ | PAST_ | PATH_ | PATTERN_ | PER_ | PERMUTE_ | POSITION_ | PRECEDING_ | PRECISION_ | PRIVILEGES_ | PROPERTIES_ | PRUNE_
+    | PARTITION_ | PARTITIONS_ | PASSING_ | PAST_ | PATH_ | PATTERN_ | PER_ | PERIOD_ | PERMUTE_ | POSITION_ | PRECEDING_ | PRECISION_ | PRIVILEGES_ | PROPERTIES_ | PRUNE_
     | QUOTES_
     | RANGE_ | READ_ | REFRESH_ | RENAME_ | REPEATABLE_ | REPLACE_ | RESET_ | RESPECT_ | RESTRICT_ | RETURNING_ | REVOKE_ | ROLE_ | ROLES_ | ROLLBACK_ | ROW_ | ROWS_ | RUNNING_
     | SCALAR_ | SCHEMA_ | SCHEMAS_ | SECOND_ | SECURITY_ | SEEK_ | SERIALIZABLE_ | SESSION_ | SET_ | SETS_
