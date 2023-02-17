@@ -124,6 +124,7 @@ ddl_clause
     | create_database
     | create_database_audit_specification
     | create_db_role
+    | create_endpoint
     | create_event_notification
     | create_external_library
     | create_external_resource_pool
@@ -1090,6 +1091,42 @@ alter_cryptographic_provider
 create_cryptographic_provider
     : CREATE CRYPTOGRAPHIC PROVIDER provider_name=id_
       FROM FILE EQUAL path_of_DLL=STRING
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql?view=sql-server-ver16
+create_endpoint
+    : CREATE ENDPOINT endpointname=id_ (AUTHORIZATION login=id_)?
+            (STATE EQUAL state=(STARTED | STOPPED | DISABLED))?
+                AS TCP LR_BRACKET endpoint_listener_clause RR_BRACKET
+                ( FOR TSQL LR_BRACKET RR_BRACKET
+                | FOR SERVICE_BROKER LR_BRACKET
+                    endpoint_authentication_clause
+                    (COMMA? endpoint_encryption_alogorithm_clause)?
+                    (COMMA? MESSAGE_FORWARDING EQUAL (ENABLED | DISABLED))?
+                    (COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+                    RR_BRACKET
+                | FOR DATABASE_MIRRORING LR_BRACKET
+                    endpoint_authentication_clause
+                    (COMMA? endpoint_encryption_alogorithm_clause)?
+                    COMMA? ROLE EQUAL (WITNESS | PARTNER | ALL)
+                    RR_BRACKET
+                )
+    ;
+
+endpoint_encryption_alogorithm_clause
+    : ENCRYPTION EQUAL (DISABLED | SUPPORTED | REQUIRED) (ALGORITHM (AES RC4? | RC4 AES?))?
+    ;
+
+endpoint_authentication_clause
+    : AUTHENTICATION EQUAL
+        ( WINDOWS (NTLM | KERBEROS | NEGOTIATE)? (CERTIFICATE cert_name=id_)?
+        | CERTIFICATE cert_name=id_ WINDOWS? (NTLM | KERBEROS | NEGOTIATE)?
+        )
+    ;
+
+endpoint_listener_clause
+    : LISTENER_PORT EQUAL port=DECIMAL
+        (COMMA LISTENER_IP EQUAL (ALL | '(' (ipv4=IPV4_ADDR | ipv6=STRING) ')'))?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-notification-transact-sql
@@ -2472,44 +2509,22 @@ cursor_option
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-endpoint-transact-sql
 alter_endpoint
     : ALTER ENDPOINT endpointname=id_ (AUTHORIZATION login=id_)?
-       ( STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED ) )?
-            AS TCP LR_BRACKET
-               LISTENER_PORT EQUAL port=DECIMAL
-                 ( COMMA LISTENER_IP EQUAL
-                   (ALL | IPV4_ADDR | IPV6_ADDR | STRING) )?
-                RR_BRACKET
-               (TSQL
-               |
-                FOR SERVICE_BROKER LR_BRACKET
-                   AUTHENTICATION EQUAL
-                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id_)?
-                           | CERTIFICATE cert_name=id_  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
-                           )
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
-                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
-                   )?
-
-                   ( COMMA? MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED ) )?
-                   ( COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+       (STATE EQUAL state=(STARTED | STOPPED | DISABLED))?
+               AS TCP LR_BRACKET endpoint_listener_clause RR_BRACKET
+               ( FOR TSQL LR_BRACKET RR_BRACKET
+               | FOR SERVICE_BROKER LR_BRACKET
+                   endpoint_authentication_clause
+                   (COMMA? endpoint_encryption_alogorithm_clause)?
+                   (COMMA? MESSAGE_FORWARDING EQUAL (ENABLED | DISABLED))?
+                   (COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
                    RR_BRACKET
-              |
-               FOR DATABASE_MIRRORING LR_BRACKET
-                   AUTHENTICATION EQUAL
-                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id_)?
-                           | CERTIFICATE cert_name=id_  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
-                           )
-
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
-                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
-                   )?
-
-                   COMMA? ROLE EQUAL ( WITNESS | PARTNER | ALL )
+               | FOR DATABASE_MIRRORING LR_BRACKET
+                   endpoint_authentication_clause
+                   (COMMA? endpoint_encryption_alogorithm_clause)?
+                   COMMA? ROLE EQUAL (WITNESS | PARTNER | ALL)
                    RR_BRACKET
-             )
+               )
     ;
-
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
-// todo: not implemented
 
 /* Will visit later
 */
@@ -6028,6 +6043,7 @@ keyword
     | VARCHAR
     | NVARCHAR
     | PRECISION //For some reason this is possible to use as ID
+    | FILESTREAM_ON
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
