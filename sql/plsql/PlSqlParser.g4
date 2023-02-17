@@ -37,6 +37,7 @@ unit_statement
     : transaction_control_statements
     | alter_cluster
     | alter_database
+    | alter_database_link
     | alter_function
     | alter_package
     | alter_procedure
@@ -81,6 +82,7 @@ unit_statement
     | create_materialized_zonemap
     | create_rollback_segment
     | create_user
+    | create_database_link
 
     | create_sequence
     | create_trigger
@@ -107,6 +109,7 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_database_link
 
     | flashback_table
 
@@ -2690,6 +2693,29 @@ filenumber
 
 filename
     : CHAR_STRING
+    ;
+
+alter_database_link
+    : ALTER SHARED? PUBLIC? DATABASE LINK link_name (CONNECT TO user_object_name IDENTIFIED BY password_value link_authentication? | link_authentication)
+    ;
+
+password_value
+    : id_expression
+    | numeric
+    ;
+
+link_authentication
+    : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
+    ;
+
+create_database_link
+    : CREATE SHARED? PUBLIC? DATABASE LINK link_name ( CONNECT TO ( CURRENT_USER
+                                                                  | user_object_name IDENTIFIED BY password_value (link_authentication)?)
+                                                     | link_authentication)* (USING identifier)?
+    ;
+
+drop_database_link
+    : DROP PUBLIC? DATABASE LINK link_name
     ;
 
 alter_role
