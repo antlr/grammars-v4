@@ -82,8 +82,10 @@ statement
     | ALTER_ TABLE_ (IF_ EXISTS_)? tableName=qualifiedName
         RENAME_ COLUMN_ (IF_ EXISTS_)? from=identifier TO_ to=identifier    #renameColumn
     | ALTER_ TABLE_ (IF_ EXISTS_)? tableName=qualifiedName
-        DROP_ COLUMN_ (IF_ EXISTS_)? column=qualifiedName                  #dropColumn
-    | ALTER_ TABLE_ tableName=qualifiedName SET_ AUTHORIZATION_ principal  #setTableAuthorization
+        DROP_ COLUMN_ (IF_ EXISTS_)? column=qualifiedName                   #dropColumn
+    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName=qualifiedName
+        ALTER_ COLUMN_ columnName=identifier SET_ DATA_ TYPE_ type          #setColumnType
+    | ALTER_ TABLE_ tableName=qualifiedName SET_ AUTHORIZATION_ principal   #setTableAuthorization
     | ALTER_ TABLE_ tableName=qualifiedName
         SET_ PROPERTIES_ propertyAssignments                             #setTableProperties
     | ALTER_ TABLE_ tableName=qualifiedName
@@ -387,7 +389,7 @@ emptyMatchHandling
     ;
 
 skipTo
-    : SKIP_ 
+    : SKIP_
            ( TO_ (NEXT_ ROW_ | (FIRST_ | LAST_)? identifier)
            | PAST_ LAST_ ROW_
            )
