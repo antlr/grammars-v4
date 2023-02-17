@@ -1111,6 +1111,9 @@ WITHOUT:                               'WITHOUT';
 WITNESS:                               'WITNESS';
 XACT_ABORT:                            'XACT_ABORT';
 XACT_STATE:                            'XACT_STATE';
+IPV4_ADDR:                             'IPV4_ADDR';
+IPV6_ADDR:                             'IPV6_ADDR';
+FILESTREAM_ON:                         'FILESTREAM_ON';
 
 ABS:                                   'ABS';
 ACOS:                                  'ACOS';
