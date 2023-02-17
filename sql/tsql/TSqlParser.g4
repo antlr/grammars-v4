@@ -3639,8 +3639,7 @@ primary_key_options
 foreign_key_options
     :
         REFERENCES table_name '(' pk = column_name_list')'
-        on_delete?
-        on_update?
+        (on_delete | on_update)*
         (NOT FOR REPLICATION)?
     ;
 
