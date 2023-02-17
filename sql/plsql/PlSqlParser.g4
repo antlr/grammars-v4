@@ -6875,6 +6875,7 @@ non_reserved_keywords_pre12c
     | SWITCHOVER
     | SYNCHRONOUS
     | SYNC
+    | SYS
     | SYSASM
     | SYS_AUDIT
     | SYSAUX
