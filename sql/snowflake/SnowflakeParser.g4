@@ -3247,6 +3247,7 @@ keyword
     | ROLLUP
     | AT_KEYWORD
     | TIMESTAMP
+    | PUBLIC
     // etc
     ;
 
