@@ -5306,6 +5306,7 @@ non_reserved_keywords_in_12c
     | BEGINNING
     | BEQUEATH
     | BITMAP_AND
+    | BLOCKCHAIN
     | BSON
     | CACHING
     | CALCULATED
@@ -5315,20 +5316,22 @@ non_reserved_keywords_in_12c
     | CLASSIFIER
     | CLEANUP
     | CLIENT
+    | CLUSTERING
     | CLUSTER_DETAILS
     | CLUSTER_DISTANCE
-    | CLUSTERING
+    | COLLATE
+    | COLLATION
     | COMMON_DATA
     | COMPONENT
     | COMPONENTS
-    | CON_DBID_TO_ID
     | CONDITION
     | CONDITIONAL
+    | CONTAINERS
+    | CONTAINER_DATA
+    | CON_DBID_TO_ID
     | CON_GUID_TO_ID
     | CON_ID
     | CON_NAME_TO_ID
-    | CONTAINER_DATA
-    | CONTAINERS
     | CON_UID_TO_ID
     | COOKIE
     | COPY
@@ -5345,6 +5348,7 @@ non_reserved_keywords_in_12c
     | DB_UNIQUE_NAME
     | DECORRELATE
     | DEFINE
+    | DEFINITION
     | DELEGATE
     | DELETE_ALL
     | DESTROY
@@ -5354,6 +5358,7 @@ non_reserved_keywords_in_12c
     | DISCARD
     | DISTRIBUTE
     | DUPLICATE
+    | DUPLICATED
     | DV
     | EDITIONABLE
     | ELIM_GROUPBY
@@ -5365,6 +5370,7 @@ non_reserved_keywords_in_12c
     | EVALUATE
     | EXISTING
     | EXPRESS
+    | EXTENDED
     | EXTRACTCLOBXML
     | FACTOR
     | FAILOVER
@@ -5379,7 +5385,10 @@ non_reserved_keywords_in_12c
     | FORMAT
     | GATHER_OPTIMIZER_STATISTICS
     | GET
+    | HASHING
+    | IDLE
     | ILM
+    | IMMUTABLE
     | INACTIVE
     | INDEXING
     | INHERIT
@@ -5388,15 +5397,15 @@ non_reserved_keywords_in_12c
     | INPLACE
     | INTERLEAVED
     | JSON
+    | JSONGET
+    | JSONPARSE
     | JSON_ARRAY
     | JSON_ARRAYAGG
     | JSON_EQUAL
     | JSON_EXISTS
     | JSON_EXISTS2
-    | JSONGET
     | JSON_OBJECT
     | JSON_OBJECTAGG
-    | JSONPARSE
     | JSON_QUERY
     | JSON_SERIALIZE
     | JSON_TABLE
@@ -5425,31 +5434,31 @@ non_reserved_keywords_in_12c
     | MONTHS
     | MULTIDIMENSIONAL
     | NEG
+    | NOCOPY
+    | NOKEEP
+    | NONEDITIONABLE
+    | NOPARTITION
+    | NORELOCATE
+    | NOREPLAY
     | NO_ADAPTIVE_PLAN
     | NO_ANSI_REARCH
     | NO_AUTO_REOPTIMIZE
     | NO_BATCH_TABLE_ACCESS_BY_ROWID
     | NO_CLUSTERING
     | NO_COMMON_DATA
-    | NOCOPY
     | NO_DATA_SECURITY_REWRITE
     | NO_DECORRELATE
     | NO_ELIM_GROUPBY
     | NO_GATHER_OPTIMIZER_STATISTICS
     | NO_INMEMORY
     | NO_INMEMORY_PRUNING
-    | NOKEEP
-    | NONEDITIONABLE
     | NO_OBJECT_LINK
     | NO_PARTIAL_JOIN
     | NO_PARTIAL_ROLLUP_PUSHDOWN
-    | NOPARTITION
     | NO_PQ_CONCURRENT_UNION
     | NO_PQ_REPLICATE
     | NO_PQ_SKEW
     | NO_PX_FAULT_TOLERANCE
-    | NORELOCATE
-    | NOREPLAY
     | NO_ROOT_SW_FOR_LOCAL
     | NO_SQL_TRANSLATION
     | NO_USE_CUBE
@@ -5463,6 +5472,10 @@ non_reserved_keywords_in_12c
     | OLS
     | OMIT
     | ONE
+    | ORACLE_DATAPUMP
+    | ORACLE_HDFS
+    | ORACLE_HIVE
+    | ORACLE_LOADER
     | ORA_CHECK_ACL
     | ORA_CHECK_PRIVILEGE
     | ORA_CLUSTERING
@@ -5516,8 +5529,9 @@ non_reserved_keywords_in_12c
     | SDO_GEOM_MBR
     | SECRET
     | SERIAL
-    | SERVICE_NAME_CONVERT
     | SERVICES
+    | SERVICE_NAME_CONVERT
+    | SHARDED
     | SHARING
     | SHELFLIFE
     | SOURCE_FILE_DIRECTORY
@@ -5532,13 +5546,13 @@ non_reserved_keywords_in_12c
     | SUBSET
     | SUCCESS
     | SYSBACKUP
-    | SYS_CHECK_PRIVILEGE
     | SYSDG
-    | SYS_GET_COL_ACLIDS
     | SYSGUID
     | SYSKM
-    | SYS_MKXTI
     | SYSOBJ
+    | SYS_CHECK_PRIVILEGE
+    | SYS_GET_COL_ACLIDS
+    | SYS_MKXTI
     | SYS_OP_CYCLED_SEQ
     | SYS_OP_HASH
     | SYS_OP_KEY_VECTOR_CREATE
@@ -5565,10 +5579,10 @@ non_reserved_keywords_in_12c
     | UNPLUG
     | UNSUBSCRIBE
     | USABLE
-    | USE_CUBE
-    | USE_HIDDEN_PARTITIONS
     | USER_DATA
     | USER_TABLESPACES
+    | USE_CUBE
+    | USE_HIDDEN_PARTITIONS
     | USE_VECTOR_AGGREGATION
     | USING_NO_EXPAND
     | UTF16BE
@@ -5591,20 +5605,6 @@ non_reserved_keywords_in_12c
     | XS
     | YEARS
     | ZONEMAP
-    | BLOCKCHAIN
-    | COLLATE
-    | COLLATION
-    | DEFINITION
-    | DUPLICATED
-    | EXTENDED
-    | HASHING
-    | IDLE
-    | IMMUTABLE
-    | ORACLE_DATAPUMP
-    | ORACLE_HDFS
-    | ORACLE_HIVE
-    | ORACLE_LOADER
-    | SHARDED
     ;
 
 non_reserved_keywords_pre12c
