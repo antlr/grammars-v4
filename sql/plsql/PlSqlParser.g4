@@ -5591,6 +5591,20 @@ non_reserved_keywords_in_12c
     | XS
     | YEARS
     | ZONEMAP
+    | BLOCKCHAIN
+    | COLLATE
+    | COLLATION
+    | DEFINITION
+    | DUPLICATED
+    | EXTENDED
+    | HASHING
+    | IDLE
+    | IMMUTABLE
+    | ORACLE_DATAPUMP
+    | ORACLE_HDFS
+    | ORACLE_HIVE
+    | ORACLE_LOADER
+    | SHARDED
     ;
 
 non_reserved_keywords_pre12c
