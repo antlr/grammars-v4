@@ -1409,7 +1409,7 @@ create_account
             EDITION EQ ( STANDARD | ENTERPRISE | BUSINESS_CRITICAL )
           ( REGION_GROUP EQ region_group_id )?
           ( REGION EQ snowflake_region_id )?
-          ( comment_clause )?
+          comment_clause?
     ;
 
 create_api_integration
@@ -1448,7 +1448,7 @@ create_object_clone
     ;
 
 create_connection
-    : CREATE CONNECTION if_not_exists? id_ ( ( comment_clause )? | (AS REPLICA OF id_ DOT id_ DOT id_ ( comment_clause )?) )
+    : CREATE CONNECTION if_not_exists? id_ ( comment_clause? | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?) )
     ;
 
 create_database
@@ -2261,7 +2261,7 @@ create_table_as_select
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ ( comment_clause )?
+    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
     | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
     ;
 
