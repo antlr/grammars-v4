@@ -2216,7 +2216,7 @@ out_of_line_constraint
 full_col_decl
     : col_decl
         collate?
-        comment_clause?
+        (COMMENT string)?
         default_value?
         not_null?
         with_masking_policy?
