@@ -104,7 +104,7 @@ jobs:
             $After = "${{ github.event.after }}"
         }
         $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
-        _scripts/test.ps1 /tmp/antlr4-complete.jar ${{ matrix.language }} $Before $After
+        _scripts/test.ps1 -antlrjar /tmp/antlr4-complete.jar -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
   build-bash:
     runs-on: ${{ matrix.os }}

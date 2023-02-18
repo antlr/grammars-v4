@@ -1,3 +1,10 @@
+param (
+    [string]$antlrjar='/tmp/antlr4-complete.jar',
+    [string]$target='CSharp',
+    [string]$pc,
+    [string]$cc
+)
+
 function Get-GrammarSkip {
     param (
         $Target,
@@ -264,45 +271,39 @@ function Test-AllGrammars {
     }
 }
 
-# Setup ANTLR
-if ($env:ANTLR_JAR_PATH) {
-    $sep = ':';
-    if ($IsWindows) {
-        $sep = ';'
-    }
-    $cps = ('.', $env:ANTLR_JAR_PATH)
-    if ($env:CLASSPATH) {
-        $cps += $env:CLASSPATH
-    }
-    $env:CLASSPATH = [String]::Join($sep, $cps)
-    function global:antlr {
-        java -jar $env:ANTLR_JAR_PATH $args
-    }
-}
+##########################################################
+##########################################################
+#
+# MAIN
+#
+##########################################################
+##########################################################
+
+$rootdir = $PSScriptRoot
 
 # This has to be inserted somewhere. This script requires
 # the trgen tool to instantiate drivers from templates.
-$Dir = Get-Location
-$templates = Join-Path $Dir "/_scripts/templates/"
-
-$antlrjar = $args[0]
-$t = $args[1]
-$pc = $args[2]
-$cc = $args[3]
+$templates = Join-Path $rootdir "/templates/"
 
 $diff = $true
-if (!$t) {
-    $t = "CSharp"
+if (!$target) {
+    $target = "CSharp"
 }
 if (!$pc) {
     $diff = $false
+} else {
+    if (!$cc) {
+        $cc = "HEAD"
+    }
 }
-if (!$cc) {
-    $cc = "HEAD"
-}
+Write-Host "antlrjar = $antlrjar"
+Write-Host "target = $target"
+Write-Host "pc = $pc"
+Write-Host "cc = $cc"
+
 if ($diff) {
-    Test-AllGrammars -Target $t -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
 }
 else {
-    Test-AllGrammars -Target $t -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target -Antlrjar $antlrjar
 }
