@@ -2212,6 +2212,23 @@ PREDICTION_DETAILS:           'PREDICTION_DETAILS';
 PREDICTION_PROBABILITY:       'PREDICTION_PROBABILITY';
 PREDICTION_SET:               'PREDICTION_SET';
 
+BLOCKCHAIN:                   'BLOCKCHAIN';
+COLLATE:                      'COLLATE';
+COLLATION:                    'COLLATION';
+DEFINITION:                   'DEFINITION';
+DUPLICATED:                   'DUPLICATED';
+EXTENDED:                     'EXTENDED';
+HASHING:                      'HASHING';
+IDLE:                         'IDLE';
+IMMUTABLE:                    'IMMUTABLE';
+ORACLE_DATAPUMP:              'ORACLE_DATAPUMP';
+ORACLE_HDFS:                  'ORACLE_HDFS';
+ORACLE_HIVE:                  'ORACLE_HIVE';
+ORACLE_LOADER:                'ORACLE_LOADER';
+SHA2_512_Q:                   '"SHA2_512"';
+SHARDED:                      'SHARDED';
+V1_Q:                         '"V1"';
+
 CUME_DIST:                    'CUME_DIST';
 DENSE_RANK:                   'DENSE_RANK';
 LISTAGG:                      'LISTAGG';
