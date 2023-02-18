@@ -22,4 +22,3 @@ truncate materialized view v;
 truncate table t;
 unset i;
 unset (i,j,k);
-call my_stored_proc(arg_1);
