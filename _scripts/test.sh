@@ -18,12 +18,8 @@ myrealpath ()
 quiet=true
 
 # Get full path of this script.
-echo "\$0 = $0"
 full_path_script=$(myrealpath $0)
-#full_path_script=`dirname -- "$0"`
-echo full_path_script = $full_path_script
 full_path_templates=$(dirname $full_path_script)/templates
-echo full_path_script = $full_path_script
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"
@@ -96,25 +92,25 @@ tests=()
 # Get "root" of the repo clone.
 cwd=`pwd`
 prefix=`pwd`
-pushd $prefix
+pushd $prefix > /dev/null 2>&1
 while true
 do
-	if [ -f `pwd`/_scripts/test.sh ]
-	then
-		break
-	elif [ `pwd` == "/" ]
-	then
-		break
-	fi
-	cd ..
+    if [ -f `pwd`/_scripts/test.sh ]
+    then
+        break
+    elif [ `pwd` == "/" ]
+    then
+        break
+    fi
+    cd ..
 done
 if [ ! -f `pwd`/_scripts/test.sh ]
 then
-	echo "Not in repo."
-	exit 1
+    echo "Not in repo."
+    exit 1
 fi
 prefix=`pwd`
-popd
+popd > /dev/null 2>&1
 
 rm -rf `find . -name 'Generated*' -type d`
 
@@ -127,7 +123,7 @@ while getopts 'agthf' opt; do
         a)
             getopts-extra "$@"
             antlr4jar="${OPTARG[0]}"
-	    echo Antlr4jar is $antlr4jar
+        echo Antlr4jar is $antlr4jar
             ;;
         g)
             getopts-extra "$@"
@@ -174,20 +170,18 @@ OPTIONS
 
        -f
            Specifies the type of testing to filter. Possible types are "diff",
-		   "all", or "agnostic". The default is "all".
+           "all", or "agnostic". The default is "all".
 
        -t
            Specifies the targets to test. Possible targets are "Antlr4cs",
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
-		   All targets are tested by default.
+           All targets are tested by default.
 
 EOF
             exit 0
             ;;
     esac
 done
-
-echo $filter $first $second
 
 if [ "$filter" == "diff" ]
 then
@@ -201,62 +195,74 @@ then
             directories=`git diff --name-only . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
             for g in $directories
             do
-				pushd $g
-				echo here
-				while true
-				do
-				    if [ -f `pwd`/desc.xml ]
-				    then
-				        break
-					elif [ `pwd` == "$prefix" ]
-					then
-						break
-					fi
-					cd ..
-			    done
-				g=`pwd`
-		        g=${g##*$prefix/}
-				popd
+                pushd $g
+                echo here
+                while true
+                do
+                    if [ -f `pwd`/desc.xml ]
+                    then
+                        break
+                    elif [ `pwd` == "$prefix" ]
+                    then
+                        break
+                    fi
+                    cd ..
+                done
+                g=`pwd`
+                g=${g##*$prefix/}
+                popd
                 echo Adding diff $g
                 grammars+=( $g )
             done
-			grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
-            echo Grammars to do are: ${grammars[@]}
+            grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
         fi
     elif [ "${#additional[@]}" -eq 2 ]
     then
-            grammars=()
-            # Test grammars for the enclosing directories.
-            directories=`git diff --name-only ${additional[0]} ${additional[1]} 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
-            for g in $directories
-            do
-                echo Adding diff $g
-                grammars+=( $g )
-            done
-            echo Grammars to do are: ${grammars[@]}
+        grammars=()
+        # Test grammars for the enclosing directories.
+        directories=`git diff --name-only ${additional[0]} ${additional[1]} 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
+        for g in $directories
+        do
+            echo Adding diff $g
+            grammars+=( $g )
+        done
     else
         echo ouch
         exit 1
     fi
+elif [ "$filter" == "all" ]
+then
+    grammars=()
+    # Test grammars for the enclosing directories.
+    directories=`find . -name desc.xml | sed 's#/desc.xml##' | sort -u`
+    for g in $directories
+    do
+        pushd $g > /dev/null 2>&1
+        g=`pwd`
+        g=${g##*$prefix/}
+        popd > /dev/null 2>&1
+        echo Adding $g
+        grammars+=( $g )
+    done
+    grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
 elif [ "$filter" != "all" ]
 then
     echo Unknown filter $filter
     exit 1
 fi
 
-if [ "$grammars" == "" ]
+if [ "${#grammars[@]}" -eq 0 ]
 then
-echo gramar is dot
     grammars=( "." )
 fi
 new_grammars=()
 for d in ${grammars[@]}
 do
-    if [ ! -d "$d" ]
+    if [ ! -d "$prefix/$d" ]
     then
         continue
     fi
-    desc=`find $d -name desc.xml`
+    desc=`find "$prefix/$d" -name desc.xml`
     for i in $desc
     do
         if [ "$i" == "desc.xml" ]; then i='.'; fi
@@ -269,6 +275,14 @@ do
     done
 done
 grammars=("${new_grammars[@]}")
+
+if [ "${#grammars[@]}" -eq 0 ]
+then
+    echo There are no grammars in current directory to test.
+    exit 0
+else
+    echo Grammars to do are: ${grammars[@]}
+fi
 
 if [ "$targets" == "" ]
 then
@@ -301,7 +315,7 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=${all[0]}
     target=${all[1]}
-    pushd $testname > /dev/null
+    pushd "$prefix/$testname" > /dev/null
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
@@ -357,15 +371,19 @@ do
     date2=$(date +"%s")
     DIFF=$(($date2-$date1))
     length=" Build "`thetime $DIFF`
-    echo -n " $length"
-    if [ "$status" != "0" ]; then echo ""; cat output.txt; fi
-    if [[ "$status" != "0" ]]
+    if [ "$status" != "0" ]
     then
-        echo " Failed."
+        echo ""
+        echo ========
+        echo "Build of $testname for $target failed."
+        cat output.txt
         failed+=( "$testname/$target" )
+        echo ========
         popd > /dev/null
         popd > /dev/null
         continue
+    else
+        echo -n " $length"
     fi
 
     # Test generated parser on examples.
@@ -377,11 +395,14 @@ do
     DIFF=$(($date2-$date1))
     length=" Test "`thetime $DIFF`
     echo -n " $length"
-    if [ "$status" != "0" ]; then echo ""; cat output.txt; fi
-    if [[ "$status" != "0" ]]
+    if [ "$status" != "0" ]
     then
-        echo " Failed."
-        failed+=( "$testname,$target" )
+        echo ""
+        echo ========
+        echo "Parsing tests of $testname for $target failed."
+        cat output.txt
+        failed+=( "$testname/$target" )
+        echo ========
     else
         echo " Succeeded."      
         succeeded+=( "$testname,$target" )
