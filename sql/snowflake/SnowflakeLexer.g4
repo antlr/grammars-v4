@@ -636,7 +636,6 @@ PROFILE:                                               'PROFILE';
 PROPERTY:                                              'PROPERTY';
 PROVIDER:                                              'PROVIDER';
 PROVIDER_KEY_NAME:                                     'PROVIDER_KEY_NAME';
-PUBLIC:                                                'PUBLIC';
 PURGE:                                                 'PURGE';
 PUT:                                                   'PUT';
 PYTHON:                                                'PYTHON';
