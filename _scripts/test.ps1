@@ -1,42 +1,26 @@
-function Get-GrammarSkipList {
+param (
+    [string]$antlrjar='/tmp/antlr4-complete.jar',
+    [string]$target='CSharp',
+    [string]$pc,
+    [string]$cc
+)
+
+function Get-GrammarSkip {
     param (
-        $Target
+        $Target,
+        $Grammar
     )
-    switch ($Target) {
-        "CSharp" {
-		$lines = Get-Content -Path _scripts\skip-csharp.txt
-		return $lines
-        }
-        "Java" {
-		$lines = Get-Content -Path _scripts\skip-java.txt
-		return $lines
-        }
-        "JavaScript" {
-		$lines = Get-Content -Path _scripts\skip-javascript.txt
-		return $lines
-        }
-        "Go" {
-		$lines = Get-Content -Path _scripts\skip-go.txt
-		return $lines
-        }
-        "Python3" {
-		$lines = Get-Content -Path _scripts\skip-python3.txt
-		return $lines
-        }
-        "Dart" {
-		$lines = Get-Content -Path _scripts\skip-dart.txt
-		return $lines
-        }
-        "PHP" {
-		$lines = Get-Content -Path _scripts\skip-php.txt
-		return $lines
-        }
-        Default {
-            #    Write-Error "Unknown target $Target"
-            #    exit 1
-        }
+    Write-Host "Target $Target Grammar $Grammar"
+    if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
+        Write-Host "skip"
+        return $True
     }
-    
+    $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
+    if ("$lines" -eq "") {
+        Write-Host "skip"
+        return $True
+    }
+    return $False
 }
 
 enum FailStage {
@@ -48,6 +32,7 @@ enum FailStage {
 
 function Test-Grammar {
     param (
+        $Antlrjar,
         $Directory,
         $Target = "CSharp"
     )
@@ -61,8 +46,8 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates"
-    trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates"
+    trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -234,15 +219,9 @@ function Get-GrammarsNeedsTest {
     else {
         $allGrammars = Get-ChangedGrammars -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit
     }
-    $skip = Get-GrammarSkipList -Target $Target | Resolve-Path -Relative
     $grammars = @()
     foreach ($g in $allGrammars | Resolve-Path -Relative) {
-        $shouldSkip = $false
-        foreach ($s in $skip) {
-            if ($s -eq $g) {
-                $shouldSkip = $true
-            }
-        }
+        $shouldSkip = Get-GrammarSkip -Target $Target -Grammar $g
         if (!$shouldSkip) {
             $grammars += $g
         }
@@ -255,7 +234,8 @@ function Test-AllGrammars {
     param (
         $PreviousCommit,
         $CurrentCommit = "HEAD",
-        $Target = "CSharp"
+        $Target = "CSharp",
+        $Antlrjar = "/tmp/antlr4-complete.jar"
     )
     
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
@@ -272,7 +252,7 @@ function Test-AllGrammars {
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Directory $g -Target $Target
+        $state = Test-Grammar -Antlrjar $Antlrjar -Directory $g -Target $Target
         if (!$state.Success) {
             $success = $false
             $failedGrammars += $g
@@ -291,44 +271,39 @@ function Test-AllGrammars {
     }
 }
 
-# Setup ANTLR
-if ($env:ANTLR_JAR_PATH) {
-    $sep = ':';
-    if ($IsWindows) {
-        $sep = ';'
-    }
-    $cps = ('.', $env:ANTLR_JAR_PATH)
-    if ($env:CLASSPATH) {
-        $cps += $env:CLASSPATH
-    }
-    $env:CLASSPATH = [String]::Join($sep, $cps)
-    function global:antlr {
-        java -jar $env:ANTLR_JAR_PATH $args
-    }
-}
+##########################################################
+##########################################################
+#
+# MAIN
+#
+##########################################################
+##########################################################
+
+$rootdir = $PSScriptRoot
 
 # This has to be inserted somewhere. This script requires
 # the trgen tool to instantiate drivers from templates.
-$Dir = Get-Location
-$templates = Join-Path $Dir "/_scripts/templates/"
-
-$t = $args[0]
-$pc = $args[1]
-$cc = $args[2]
+$templates = Join-Path $rootdir "/templates/"
 
 $diff = $true
-if (!$t) {
-    $t = "CSharp"
+if (!$target) {
+    $target = "CSharp"
 }
 if (!$pc) {
     $diff = $false
+} else {
+    if (!$cc) {
+        $cc = "HEAD"
+    }
 }
-if (!$cc) {
-    $cc = "HEAD"
-}
+Write-Host "antlrjar = $antlrjar"
+Write-Host "target = $target"
+Write-Host "pc = $pc"
+Write-Host "cc = $cc"
+
 if ($diff) {
-    Test-AllGrammars -Target $t -PreviousCommit $pc -CurrentCommit $cc
+    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
 }
 else {
-    Test-AllGrammars -Target $t 
+    Test-AllGrammars -Target $target -Antlrjar $antlrjar
 }

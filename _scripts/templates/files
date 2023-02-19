@@ -96,3 +96,14 @@
 ./Python3/test.ps1
 ./Python3/Test.py
 ./Python3/test.sh
+./TypeScript/build.ps1
+./TypeScript/build.sh
+./TypeScript/clean.ps1
+./TypeScript/clean.sh
+./TypeScript/makefile
+./TypeScript/package.json
+./TypeScript/run.sh
+./TypeScript/test.ps1
+./TypeScript/test.sh
+./TypeScript/Test.ts
+./TypeScript/tsconfig.json
