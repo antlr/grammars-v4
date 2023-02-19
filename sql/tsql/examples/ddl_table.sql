@@ -169,6 +169,23 @@ ALTER TABLE dbo.TestTable
   FOR Value
 GO
 
+-- Alter Table Add Constraint To Column
+ALTER TABLE dbo.TestTable
+  ADD CONSTRAINT DF_TestTable_Value DEFAULT(0)
+  FOR Value
+  WITH VALUES
+GO
+
+-- Alter Table Add Constraint To Column with extra parentheses
+ALTER TABLE dbo.TestTable
+  ADD CONSTRAINT DF_TestTable_Value DEFAULT((0))
+  FOR Value
+GO
+ALTER TABLE dbo.TestTable
+  ADD CONSTRAINT DF_TestTable_Value DEFAULT(((((0)))))
+  FOR Value
+GO
+
 -- Alter Table Add Constraint With String Concatenation
 ALTER TABLE dbo.TestTable
   ADD CONSTRAINT DF_Name

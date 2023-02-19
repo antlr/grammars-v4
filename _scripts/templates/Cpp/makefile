@@ -1,11 +1,10 @@
-# Template generated code from trgen <version>
-default: setup
-	rm -rf build; mkdir build; cd build; cmake .. <cmake_target>; $(MAKE)
-setup:
-	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
+# Generated from trgen <version>
+default:
+	bash build.sh
 run:
-	cd build; trwdog ./<exec_name> $(RUNARGS)
+	@trwdog ./build/<if(os_win)>Release/<endif><exec_name> $(RUNARGS)
 clean:
-	rm -rf build <temp_dir>/antlr4_runtime
-test:
+	bash clean.sh
+FORCE: ;
+test: FORCE
 	bash test.sh

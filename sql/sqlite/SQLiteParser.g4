@@ -141,7 +141,7 @@ type_name:
 
 column_constraint: (CONSTRAINT_ name)? (
         (PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?)
-        | (NOT_ NULL_ | UNIQUE_) conflict_clause?
+        | (NOT_? NULL_ | UNIQUE_) conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | DEFAULT_ (signed_number | literal_value | OPEN_PAR expr CLOSE_PAR)
         | COLLATE_ collation_name
@@ -326,6 +326,14 @@ literal_value:
     | CURRENT_TIMESTAMP_
 ;
 
+value_row:
+    OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+;
+
+values_clause:
+    VALUES_ value_row (COMMA value_row)*
+;
+
 insert_stmt:
     with_clause? (
         INSERT_
@@ -341,12 +349,7 @@ insert_stmt:
         OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
     )? (
         (
-            (
-                VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
-                    COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
-                )*
-                | select_stmt
-            ) upsert_clause?
+            ( values_clause | select_stmt ) upsert_clause?
         )
         | DEFAULT_ VALUES_
     ) returning_clause?
@@ -398,15 +401,16 @@ select_core:
     (
         SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
             FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-        )? (WHERE_ expr)? (GROUP_ BY_ expr (COMMA expr)* (HAVING_ expr)?)? (
+        )? (WHERE_ whereExpr=expr)? (
+          GROUP_ BY_ groupByExpr+=expr (COMMA groupByExpr+=expr)* (
+              HAVING_ havingExpr=expr
+          )?)? (
             WINDOW_ window_name AS_ window_defn (
                 COMMA window_name AS_ window_defn
             )*
         )?
     )
-    | VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
-        COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
-    )*
+    | values_clause
 ;
 
 factored_select_stmt:
@@ -511,10 +515,12 @@ over_clause:
 
 frame_spec:
     frame_clause (
-        EXCLUDE_ (NO_ OTHERS_)
-        | CURRENT_ ROW_
-        | GROUP_
-        | TIES_
+        EXCLUDE_ (
+            NO_ OTHERS_
+            | CURRENT_ ROW_
+            | GROUP_
+            | TIES_
+        )
     )?
 ;
 

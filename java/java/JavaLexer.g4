@@ -100,7 +100,7 @@ TRANSITIVE:         'transitive';
 VAR:                'var'; // reserved type name
 
 // Switch Expressions
-YIELD:              'yield';
+YIELD:              'yield';  // reserved type name from Java 14
 
 // Records
 RECORD:             'record';

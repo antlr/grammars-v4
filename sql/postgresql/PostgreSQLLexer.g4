@@ -1129,12 +1129,20 @@ MATCH
    : 'MATCH'
    ;
 
+MATCHED
+   : 'MATCHED'
+   ;
+
 MATERIALIZED
    : 'MATERIALIZED'
    ;
 
 MAXVALUE
    : 'MAXVALUE'
+   ;
+
+MERGE
+   : 'MERGE'
    ;
 
 MINUTE_P
@@ -1799,6 +1807,34 @@ XMLATTRIBUTES
    : 'XMLATTRIBUTES'
    ;
 
+XMLCOMMENT
+   : 'XMLCOMMENT'
+   ;
+
+XMLAGG
+   : 'XMLAGG'
+   ;
+
+XML_IS_WELL_FORMED
+   : 'XML_IS_WELL_FORMED'
+   ;
+
+XML_IS_WELL_FORMED_DOCUMENT
+   : 'XML_IS_WELL_FORMED_DOCUMENT'
+   ;
+
+XML_IS_WELL_FORMED_CONTENT
+   : 'XML_IS_WELL_FORMED_CONTENT'
+   ;
+
+XPATH
+   : 'XPATH'
+   ;
+
+XPATH_EXISTS
+   : 'XPATH_EXISTS'
+   ;
+
 XMLCONCAT
    : 'XMLCONCAT'
    ;
@@ -2189,6 +2225,466 @@ OPEN
 
    //
 
+ABS
+   : 'ABS'
+   ;
+
+CBRT
+   : 'CBRT'
+   ;
+
+CEIL
+   : 'CEIL'
+   ;
+
+CEILING
+   : 'CEILING'
+   ;
+
+DEGREES
+   : 'DEGREES'
+   ;
+
+DIV
+   : 'DIV'
+   ;
+
+EXP
+   : 'EXP'
+   ;
+
+FACTORIAL
+   : 'FACTORIAL'
+   ;
+
+FLOOR
+   : 'FLOOR'
+   ;
+
+GCD
+   : 'GCD'
+   ;
+
+LCM
+   : 'LCM'
+   ;
+
+LN
+   : 'LN'
+   ;
+
+LOG10
+   : 'LOG10'
+   ;
+
+MIN_SCALE
+   : 'MIN_SCALE'
+   ;
+
+MOD
+   : 'MOD'
+   ;
+
+PI
+   : 'PI'
+   ;
+
+POWER
+   : 'POWER'
+   ;
+
+RADIANS
+   : 'RADIANS'
+   ;
+
+ROUND
+   : 'ROUND'
+   ;
+
+SCALE
+   : 'SCALE'
+   ;
+
+SIGN
+   : 'SIGN'
+   ;
+
+SQRT
+   : 'SQRT'
+   ;
+
+TRIM_SCALE
+   : 'TRIM_SCALE'
+   ;
+
+TRUNC
+   : 'TRUNC'
+   ;
+
+WIDTH_BUCKET
+   : 'WIDTH_BUCKET'
+   ;
+
+RANDOM
+   : 'RANDOM'
+   ;
+
+SETSEED
+   : 'SETSEED'
+   ;
+
+ACOS
+   : 'ACOS'
+   ;
+
+ACOSD
+   : 'ACOSD'
+   ;
+
+ASIN
+   : 'ASIN'
+   ;
+
+ASIND
+   : 'ASIND'
+   ;
+
+ATAN
+   : 'ATAN'
+   ;
+
+ATAND
+   : 'ATAND'
+   ;
+
+ATAN2
+   : 'ATAN2'
+   ;
+
+ATAN2D
+   : 'ATAN2D'
+   ;
+
+COS
+   : 'COS'
+   ;
+
+COSD
+   : 'COSD'
+   ;
+
+COT
+   : 'COT'
+   ;
+
+COTD
+   : 'COTD'
+   ;
+
+SIN
+   : 'SIN'
+   ;
+
+SIND
+   : 'SIND'
+   ;
+
+TAN
+   : 'TAN'
+   ;
+
+TAND
+   : 'TAND'
+   ;
+
+SINH
+   : 'SINH'
+   ;
+
+COSH
+   : 'COSH'
+   ;
+
+TANH
+   : 'TANH'
+   ;
+
+ASINH
+   : 'ASINH'
+   ;
+
+ACOSH
+   : 'ACOSH'
+   ;
+
+ATANH
+   : 'ATANH'
+   ;
+
+BIT_LENGTH
+   : 'BIT_LENGTH'
+   ;
+
+CHAR_LENGTH
+   : 'CHAR_LENGTH'
+   ;
+
+CHARACTER_LENGTH
+   : 'CHARACTER_LENGTH'
+   ;
+
+LOWER
+   : 'LOWER'
+   ;
+
+OCTET_LENGTH
+   : 'OCTET_LENGTH'
+   ;
+
+UPPER
+   : 'UPPER'
+   ;
+
+ASCII
+   : 'ASCII'
+   ;
+
+BTRIM
+   : 'BTRIM'
+   ;
+
+CHR
+   : 'CHR'
+   ;
+
+CONCAT
+   : 'CONCAT'
+   ;
+
+CONCAT_WS
+   : 'CONCAT_WS'
+   ;
+
+FORMAT
+   : 'FORMAT'
+   ;
+
+INITCAP
+   : 'INITCAP'
+   ;
+
+LENGTH
+   : 'LENGTH'
+   ;
+
+LPAD
+   : 'LPAD'
+   ;
+
+LTRIM
+   : 'LTRIM'
+   ;
+
+MD5
+   : 'MD5'
+   ;
+
+PARSE_IDENT
+   : 'PARSE_IDENT'
+   ;
+
+PG_CLIENT_ENCODING
+   : 'PG_CLIENT_ENCODING'
+   ;
+
+QUOTE_IDENT
+   : 'QUOTE_IDENT'
+   ;
+
+QUOTE_LITERAL
+   : 'QUOTE_LITERAL'
+   ;
+
+QUOTE_NULLABLE
+   : 'QUOTE_NULLABLE'
+   ;
+
+REGEXP_COUNT
+   : 'REGEXP_COUNT'
+   ;
+
+REGEXP_INSTR
+   : 'REGEXP_INSTR'
+   ;
+
+REGEXP_LIKE
+   : 'REGEXP_LIKE'
+   ;
+
+REGEXP_MATCH
+   : 'REGEXP_MATCH'
+   ;
+
+REGEXP_MATCHES
+   : 'REGEXP_MATCHES'
+   ;
+
+REGEXP_REPLACE
+   : 'REGEXP_REPLACE'
+   ;
+
+REGEXP_SPLIT_TO_ARRAY
+   : 'REGEXP_SPLIT_TO_ARRAY'
+   ;
+
+REGEXP_SPLIT_TO_TABLE
+   : 'REGEXP_SPLIT_TO_TABLE'
+   ;
+
+REGEXP_SUBSTR
+   : 'REGEXP_SUBSTR'
+   ;
+
+REPEAT
+   : 'REPEAT'
+   ;
+
+RPAD
+   : 'RPAD'
+   ;
+
+RTRIM
+   : 'RTRIM'
+   ;
+
+SPLIT_PART
+   : 'SPLIT_PART'
+   ;
+
+STARTS_WITH
+   : 'STARTS_WITH'
+   ;
+
+STRING_TO_ARRAY
+   : 'STRING_TO_ARRAY'
+   ;
+
+STRING_TO_TABLE
+   : 'STRING_TO_TABLE'
+   ;
+
+STRPOS
+   : 'STRPOS'
+   ;
+
+SUBSTR
+   : 'SUBSTR'
+   ;
+
+TO_ASCII
+   : 'TO_ASCII'
+   ;
+
+TO_HEX
+   : 'TO_HEX'
+   ;
+
+TRANSLATE
+   : 'TRANSLATE'
+   ;
+
+UNISTR
+   : 'UNISTR'
+   ;
+
+AGE
+   : 'AGE'
+   ;
+
+CLOCK_TIMESTAMP
+   : 'CLOCK_TIMESTAMP'
+   ;
+
+DATE_BIN
+   : 'DATE_BIN'
+   ;
+
+DATE_PART
+   : 'DATE_PART'
+   ;
+
+DATE_TRUNC
+   : 'DATE_TRUNC'
+   ;
+
+ISFINITE
+   : 'ISFINITE'
+   ;
+
+JUSTIFY_DAYS
+   : 'JUSTIFY_DAYS'
+   ;
+
+JUSTIFY_HOURS
+   : 'JUSTIFY_HOURS'
+   ;
+
+JUSTIFY_INTERVAL
+   : 'JUSTIFY_INTERVAL'
+   ;
+
+MAKE_DATE
+   : 'MAKE_DATE'
+   ;
+
+MAKE_INTERVAL
+   : 'MAKE_INTERVAL'
+   ;
+
+MAKE_TIME
+   : 'MAKE_TIME'
+   ;
+
+MAKE_TIMESTAMP
+   : 'MAKE_TIMESTAMP'
+   ;
+
+MAKE_TIMESTAMPTZ
+   : 'MAKE_TIMESTAMPTZ'
+   ;
+
+NOW
+   : 'NOW'
+   ;
+
+STATEMENT_TIMESTAMP
+   : 'STATEMENT_TIMESTAMP'
+   ;
+
+TIMEOFDAY
+   : 'TIMEOFDAY'
+   ;
+
+TRANSACTION_TIMESTAMP
+   : 'TRANSACTION_TIMESTAMP'
+   ;
+
+TO_TIMESTAMP
+   : 'TO_TIMESTAMP'
+   ;
+
+TO_CHAR
+   : 'TO_CHAR'
+   ;
+
+TO_DATE
+   : 'TO_DATE'
+   ;
+
+TO_NUMBER
+   : 'TO_NUMBER'
+   ;
+
 Identifier
    : IdentifierStartChar IdentifierChar*
    ;
@@ -2541,4 +3037,3 @@ EndDollarStringConstant
    {isTag()}?
    {popTag();} -> popMode
    ;
-

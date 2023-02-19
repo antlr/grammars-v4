@@ -1,0 +1,27 @@
+      PROGRAM MAIN
+
+c*********************************************************************72
+c 
+      IMPLICIT NONE
+
+      DOUBLE PRECISION M, INFO
+
+      M = 3
+
+      IF (M.LT.0) THEN
+c     M is negative
+            INFO = 1
+      ELSE IF (M.EQ.0) THEN
+c     M is zero
+            INFO = 2
+      ELSE IF (M.EQ.1) THEN
+c     M is one
+            INFO = 3
+      ELSE
+c     M is none of the above
+            INFO = 4
+      END IF
+
+      WRITE (*, '(d10.3)'), INFO
+
+      END

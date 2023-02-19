@@ -1,4 +1,7 @@
 #begin
+-- Create User
+CREATE USER 'test_crm_debezium'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9' PASSWORD EXPIRE NEVER COMMENT '-';
+CREATE USER 'jim'@'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
@@ -195,8 +198,14 @@ PRIMARY KEY (`pk_realm`),
 KEY `auth_realms_auth_realm_clients` (`fk_realm`)
 ) START TRANSACTION ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Mariadb default value for function: unix_timestamp()
-CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
+create table `site_checker_b_sonet_group_favorites` (
+USER_ID int(11) not null,
+GROUP_ID int(11) not null,
+DATE_ADD datetime DEFAULT NULL,
+primary key (USER_ID, GROUP_ID)
+);
+
+CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL);
 
 #end
 #begin
@@ -205,7 +214,7 @@ CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` big
 RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_table;
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
-rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
+rename table debezium_all_types_old to debezium_all_types, test_json_object_old to test_json_object;
 #end
 #begin
 -- Truncate table
@@ -213,7 +222,7 @@ truncate table t1;
 truncate parent_table;
 truncate `#`;
 truncate `#!^%$`;
-truncate table tbl_without_pk nowait;
+truncate table tbl_without_pk;
 #end
 #begin
 -- Create database
@@ -254,9 +263,7 @@ create index index4 on antlr_tokens(token(30) asc) lock default;
 create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
--- Create mariadb index
-CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
-create index index8 on t1(col1) nowait comment 'test index' using btree;
+create index index8 on t1(col1) comment 'test index' using btree;
 #end
 #begin
 -- Create logfile group
@@ -327,15 +334,16 @@ END
 #begin
 -- Create trigger 6
 -- delimiter //
-create or replace trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
+create trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
 -- Create view
 create or replace view my_view1 as select 1 union select 2 limit 0,5;
 create algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
 create or replace definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
-create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
+create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
+create view v_some_table as (with a as (select * from some_table) select * from a);
 
 #end
 #begin
@@ -494,6 +502,67 @@ BEGIN
 END; -- //-- delimiter ;
 #end
 #begin
+CREATE DEFINER=`prod_migrations`@`%` PROCEDURE `upsert_virtual_item`(IN name VARCHAR(45), IN type TINYINT UNSIGNED)
+BEGIN
+    SET @merchantId := (SELECT merchant_id FROM merchant LIMIT 1);
+    IF @merchantId > 0 THEN
+        SET @rows := (SELECT COUNT(*) FROM item WHERE item_type = type);
+        IF @rows > 0 THEN
+UPDATE item SET
+                merchant_id = @merchantId,
+                cz_title = name,
+                price = 0,
+                orderer = 2,
+                takeaway = 0,
+                currency_id = (
+                    SELECT currency_currency_id
+                    FROM merchant
+                    WHERE merchant_id = @merchantId
+                ),
+                tax_vat_id = (
+                    SELECT tax_vat.tax_vat_id
+                    FROM tax_vat
+                             JOIN merchant
+                                  ON merchant.place_country_id = tax_vat.country_id
+                                      AND merchant.merchant_id = @merchantId
+                    WHERE tax_vat.default = 1
+                ),
+                item_measure_id = 1,
+                kitchen_print = 0,
+                deleted = 0,
+                virtual = 1
+WHERE item_type = type;
+ELSE
+            INSERT INTO item SET
+                merchant_id = @merchantId,
+                cz_title = name,
+                price = 0,
+                orderer = 2,
+                takeaway = 0,
+                currency_id = (
+                    SELECT currency_currency_id
+                    FROM merchant
+                    WHERE merchant_id = @merchantId
+                ),
+                tax_vat_id = (
+                    SELECT tax_vat.tax_vat_id
+                    FROM tax_vat
+                    JOIN merchant
+                        ON merchant.place_country_id = tax_vat.country_id
+                        AND merchant.merchant_id = @merchantId
+                    WHERE tax_vat.default = 1
+                ),
+                item_measure_id = 1,
+                kitchen_print = 0,
+                deleted = 0,
+                virtual = 1,
+                item_type = type
+            ;
+END IF;
+END IF;
+END
+#end
+#begin
 -- Create Role
 create role 'RL_COMPLIANCE_NSA';
 create role if not exists 'RL_COMPLIANCE_NSA';
@@ -547,13 +616,15 @@ SELECT * FROM cte;
 #end
 
 #begin
-lock tables t1 read nowait;
+lock tables t1 read;
 lock table t1 read local wait 100;
 #end
 
--- Create sequence
 #begin
-CREATE SEQUENCE if NOT EXISTS workdb.s2 START=1 CYCLE MINVALUE=10000 MAXVALUE=999999999999;
-CREATE OR REPLACE SEQUENCE if NOT EXISTS s2 START=100 CACHE 1000;
-CREATE SEQUENCE `seq_8b4d1cdf-377e-4021-aef3-f7c9846903fc` INCREMENT BY 1 START WITH 1;
+CREATE OR REPLACE VIEW view_name AS
+WITH my_values(val1, val2) AS (
+    VALUES (1, 'One'),
+           (2, 'Two')
+)
+SELECT v.val1, v.val2 FROM my_values v;
 #end

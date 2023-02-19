@@ -25,10 +25,12 @@ public:
     void ProcessCloseBrace();
     void ProcessStringLiteral();
     bool IsRegexPossible();
+    void StartTemplateString();
     bool IsInTemplateString();
     void IncreaseTemplateDepth();
     void DecreaseTemplateDepth();
 
 private:
     int templateDepth = 0;
+    int bracesDepth = 0;
 };

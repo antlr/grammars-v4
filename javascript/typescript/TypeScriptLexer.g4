@@ -195,9 +195,10 @@ UnexpectedCharacter:            . -> channel(ERROR);
 
 mode TEMPLATE;
 
+TemplateStringEscapeAtom:       '\\' .;
 BackTickInside:                 '`' {this.DecreaseTemplateDepth();} -> type(BackTick), popMode;
-TemplateStringStartExpression:  '${' -> pushMode(DEFAULT_MODE);
-TemplateStringAtom:             ~[`];
+TemplateStringStartExpression:  '${' {this.StartTemplateString();} -> pushMode(DEFAULT_MODE);
+TemplateStringAtom:             ~[`\\];
 
 // Fragment rules
 

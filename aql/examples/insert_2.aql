@@ -1,0 +1,20 @@
+with coll2
+let a = 1
+for i in [1]
+let b=1
+collect jj=1
+let bb=1
+filter a==1
+let c=1
+sort a
+let d=1
+limit 1
+let ee=1
+window {following:1} aggregate tt= avg(a)
+let e=1
+    for j in [2]
+    limit 1
+let hhh=1
+insert {} into coll2
+let f=1
+return NEW

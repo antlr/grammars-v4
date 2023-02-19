@@ -35,7 +35,7 @@ options { caseInsensitive=true; }
 fragment NUMERAL: [0-9]+ ('.' [0-9]+)?;
 
 fragment SCIENTIFIC_NUMBER
-   : NUMERAL ('e' ('-' | '+')? NUMERAL)?
+   : NUMERAL ('e' [-+]? NUMERAL)?
    ;
 
 NUMBER
@@ -165,13 +165,15 @@ RIGHT_BRACKET: ']';
 
 COMMA: ',';
 
+AT: '@';
+
 SUBQUERY_RANGE
      : LEFT_BRACKET DURATION ':' DURATION? RIGHT_BRACKET;
 
 TIME_RANGE
     : LEFT_BRACKET DURATION RIGHT_BRACKET;
 
-DURATION: [0-9]+ ('s' | 'm' | 'h' | 'd' | 'w' | 'y');
+DURATION: [0-9]+ [smhdwy];
 
 METRIC_NAME: [a-z_:] [a-z0-9_:]*;
 LABEL_NAME:  [a-z_] [a-z0-9_]*;

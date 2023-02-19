@@ -133,7 +133,8 @@ classBodyDeclaration
     ;
 
 memberDeclaration
-    : methodDeclaration
+    : recordDeclaration //Java17
+    | methodDeclaration
     | genericMethodDeclaration
     | fieldDeclaration
     | constructorDeclaration
@@ -142,7 +143,6 @@ memberDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
-    | recordDeclaration //Java17
     ;
 
 /* We use rule this even for void methods which cannot have [] after parameters.
@@ -176,6 +176,10 @@ genericConstructorDeclaration
 
 constructorDeclaration
     : identifier formalParameters (THROWS qualifiedNameList)? constructorBody=block
+    ;
+
+compactConstructorDeclaration
+    : modifier* identifier constructorBody=block
     ;
 
 fieldDeclaration
@@ -254,7 +258,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : identifier typeArguments? ('.' identifier typeArguments?)*
+    : (identifier typeArguments? '.')* typeIdentifier typeArguments?
     ;
 
 typeArgument
@@ -435,7 +439,7 @@ recordComponent
     ;
 
 recordBody
-    : '{' classBodyDeclaration* '}'
+    : '{' (classBodyDeclaration | compactConstructorDeclaration)*  '}'
     ;
 
 // STATEMENTS / BLOCKS
@@ -446,12 +450,12 @@ block
 
 blockStatement
     : localVariableDeclaration ';'
-    | statement
     | localTypeDeclaration
+    | statement
     ;
 
 localVariableDeclaration
-    : variableModifier* (typeType variableDeclarators | VAR identifier '=' expression)
+    : variableModifier* (VAR identifier '=' expression | typeType variableDeclarators)
     ;
 
 identifier
@@ -473,10 +477,26 @@ identifier
     | VAR
     ;
 
+typeIdentifier  // Identifiers that are not restricted for type declarations
+    : IDENTIFIER
+    | MODULE
+    | OPEN
+    | REQUIRES
+    | EXPORTS
+    | OPENS
+    | TO
+    | USES
+    | PROVIDES
+    | WITH
+    | TRANSITIVE
+    | SEALED
+    | PERMITS
+    | RECORD
+    ;
+
 localTypeDeclaration
     : classOrInterfaceModifier*
       (classDeclaration | interfaceDeclaration | recordDeclaration)
-    | ';'
     ;
 
 statement

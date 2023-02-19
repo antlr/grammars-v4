@@ -46,6 +46,7 @@ vectorOperation
     | vectorOperation andUnlessOp vectorOperation
     | vectorOperation orOp vectorOperation
     | vectorOperation vectorMatchOp vectorOperation
+    | vectorOperation AT vectorOperation
     | vector
     ;
 
@@ -83,7 +84,7 @@ instantSelector
 
 labelMatcher:         labelName labelMatcherOperator STRING;
 labelMatcherOperator: EQ | NE | RE | NRE;
-labelMatcherList:     labelMatcher (COMMA labelMatcher)*;
+labelMatcherList:     labelMatcher (COMMA labelMatcher)* COMMA?;
 
 matrixSelector: instantSelector TIME_RANGE;
 
