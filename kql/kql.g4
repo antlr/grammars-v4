@@ -88,7 +88,7 @@ onear
    ;
 
 proximity_param
-   : '(' (('N' '=')? integer_value)? ')'
+   : '(' (('N' '=')? INTEGER_VALUE)? ')'
    ;
 
 words
@@ -112,18 +112,18 @@ xrank_param_list
    ;
 
 xrank_param
-   : ('pb' '=' float_value)
-   | ('rb' '=' float_value)
-   | ('cb' '=' float_value)
-   | ('avgb' '=' float_value)
-   | ('stdb' '=' float_value)
-   | ('nb' '=' float_value)
-   | ('n' '=' integer_value)
+   : ('pb' '=' FLOAT_VALUE)
+   | ('rb' '=' FLOAT_VALUE)
+   | ('cb' '=' FLOAT_VALUE)
+   | ('avgb' '=' FLOAT_VALUE)
+   | ('stdb' '=' FLOAT_VALUE)
+   | ('nb' '=' FLOAT_VALUE)
+   | ('n' '=' INTEGER_VALUE)
    ;
    // Property restriction
    
 property_restriction
-   : QUALIFICATION? property_name PROPERTY_OPERATOR property_value
+   : QUALIFICATION? property_name PROPERTY_OPERATOR PROPERTY_VALUE
    ;
 
 property_name
@@ -135,7 +135,7 @@ PROPERTY_TOKEN
    : ('\u0030' .. '\u0039' | '\u0041' .. '\u005a' | '\u005f' | '\u0061' .. '\u007a' | '\u00aa' | '\u00b5' | '\u00ba' | '\u00c0' .. '\u00d6' | '\u00e0' .. '\uffff')+
    ;
 
-property_value
+PROPERTY_VALUE
    : PROPERTY_TYPED_VALUE
    | UNQUOTED_PROPERTY_TOKEN
    | QUOTED_STRING_VALUE
@@ -148,13 +148,13 @@ UNQUOTED_PROPERTY_TOKEN
 PROPERTY_TYPED_VALUE
    : BOOLEAN_VALUE
    | '\u0022' BOOLEAN_VALUE '\u0022'
-   | float_value['..' float_value]
-   | '\u0022' float_value['..' float_value] '\u0022'
-   | integer_value['..' integer_value]
-   | '\u0022' integer_value['..' integer_value] '\u0022'
+   | FLOAT_VALUE ('..' FLOAT_VALUE)?
+   | '\u0022' FLOAT_VALUE ('..' FLOAT_VALUE)? '\u0022'
+   | INTEGER_VALUE ('..' INTEGER_VALUE)?
+   | '\u0022' INTEGER_VALUE ('..' INTEGER_VALUE)? '\u0022'
    | DATE_NAMED
-   | date_value_no_ws['..' date-value-no-ws]
-   | '\u0022' date_value['..' date-value] '\u0022'
+   | DATE_VALUE_NO_WS ('..' DATE_VALUE_NO_WS)?
+   | '\u0022' DATE_VALUE ('..' DATE_VALUE)? '\u0022'
    ;
 
 DATE_NAMED
@@ -179,6 +179,14 @@ PROPERTY_OPERATOR
    | '<='
    ;
 
+INTEGER_VALUE
+   : [0-9]+
+   ;
+
+FLOAT_VALUE
+   : [0-9]+ '.' [0-9]*
+   ;
+
 BOOLEAN_VALUE
    : 'true'
    | 'false'
@@ -187,6 +195,14 @@ BOOLEAN_VALUE
    
    // float_value, integer_value, date-value, date-value-no-ws
    
+DATE_VALUE_NO_WS
+   : INTEGER_VALUE
+   ;
+
+DATE_VALUE
+   : DATE_VALUE_NO_WS
+   ;
+
 STRING_VALUE
    : QUOTED_STRING_VALUE
    | UNQUOTED_STRING_VALUE
