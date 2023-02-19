@@ -78,6 +78,7 @@ ddl_clause
     | alter_credential
     | alter_cryptographic_provider
     | alter_database
+    | alter_database_audit_specification
     | alter_db_role
     | alter_endpoint
     | create_or_alter_event_session
@@ -112,6 +113,7 @@ ddl_clause
     | alter_user
     | alter_user_azure_sql
     | alter_workload_group
+    | alter_xml_schema_collection
     | create_application_role
     | create_assembly
     | create_asymmetric_key
@@ -120,7 +122,9 @@ ddl_clause
     | create_credential
     | create_cryptographic_provider
     | create_database
+    | create_database_audit_specification
     | create_db_role
+    | create_endpoint
     | create_event_notification
     | create_external_library
     | create_external_resource_pool
@@ -353,6 +357,11 @@ another_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-xml-schema-collection-transact-sql?view=sql-server-ver16
+alter_xml_schema_collection
+    : ALTER XML SCHEMA COLLECTION (id_ '.')? id_ ADD STRING
     ;
 
 create_application_role
@@ -1084,6 +1093,42 @@ create_cryptographic_provider
       FROM FILE EQUAL path_of_DLL=STRING
     ;
 
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql?view=sql-server-ver16
+create_endpoint
+    : CREATE ENDPOINT endpointname=id_ (AUTHORIZATION login=id_)?
+            (STATE EQUAL state=(STARTED | STOPPED | DISABLED))?
+                AS TCP LR_BRACKET endpoint_listener_clause RR_BRACKET
+                ( FOR TSQL LR_BRACKET RR_BRACKET
+                | FOR SERVICE_BROKER LR_BRACKET
+                    endpoint_authentication_clause
+                    (COMMA? endpoint_encryption_alogorithm_clause)?
+                    (COMMA? MESSAGE_FORWARDING EQUAL (ENABLED | DISABLED))?
+                    (COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+                    RR_BRACKET
+                | FOR DATABASE_MIRRORING LR_BRACKET
+                    endpoint_authentication_clause
+                    (COMMA? endpoint_encryption_alogorithm_clause)?
+                    COMMA? ROLE EQUAL (WITNESS | PARTNER | ALL)
+                    RR_BRACKET
+                )
+    ;
+
+endpoint_encryption_alogorithm_clause
+    : ENCRYPTION EQUAL (DISABLED | SUPPORTED | REQUIRED) (ALGORITHM (AES RC4? | RC4 AES?))?
+    ;
+
+endpoint_authentication_clause
+    : AUTHENTICATION EQUAL
+        ( WINDOWS (NTLM | KERBEROS | NEGOTIATE)? (CERTIFICATE cert_name=id_)?
+        | CERTIFICATE cert_name=id_ WINDOWS? (NTLM | KERBEROS | NEGOTIATE)?
+        )
+    ;
+
+endpoint_listener_clause
+    : LISTENER_PORT EQUAL port=DECIMAL
+        (COMMA LISTENER_IP EQUAL (ALL | '(' (ipv4=IPV4_ADDR | ipv6=STRING) ')'))?
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-notification-transact-sql
 create_event_notification
     : CREATE EVENT NOTIFICATION event_notification_name=id_
@@ -1331,11 +1376,55 @@ alter_resource_governor
     : ALTER RESOURCE GOVERNOR ( (DISABLE | RECONFIGURE) | WITH LR_BRACKET CLASSIFIER_FUNCTION EQUAL ( schema_name=id_ DOT function_name=id_ | NULL_ ) RR_BRACKET | RESET STATISTICS | WITH LR_BRACKET MAX_OUTSTANDING_IO_PER_VOLUME EQUAL max_outstanding_io_per_volume=DECIMAL RR_BRACKET )
     ;
 
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-audit-specification-transact-sql?view=sql-server-ver16
+alter_database_audit_specification
+    : ALTER DATABASE AUDIT SPECIFICATION audit_specification_name=id_
+        (FOR SERVER AUDIT audit_name=id_)?
+        (audit_action_spec_group (',' audit_action_spec_group)*)?
+        (WITH '(' STATE '=' (ON|OFF) ')')?
+    ;
+
+audit_action_spec_group
+    : (ADD|DROP) '(' (audit_action_specification | audit_action_group_name=id_) ')'
+    ;
+
+audit_action_specification
+    : action_specification (',' action_specification)* ON (audit_class_name '::')? audit_securable BY principal_id (',' principal_id)*
+    ;
+
+action_specification
+    : SELECT
+    | INSERT
+    | UPDATE
+    | DELETE
+    | EXECUTE
+    | RECEIVE
+    | REFERENCES
+    ;
+
+audit_class_name
+    : OBJECT
+    | SCHEMA
+    | TABLE
+    ;
+
+audit_securable
+    : ((id_ '.')? id_ '.')? id_
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-role-transact-sql
 alter_db_role
     : ALTER ROLE role_name=id_
         ( (ADD|DROP) MEMBER database_principal=id_
         | WITH NAME EQUAL new_role_name=id_ )
+    ;
+
+// https://learn.microsoft.com/en-us/sql/t-sql/statements/create-database-audit-specification-transact-sql?view=sql-server-ver16
+create_database_audit_specification
+    : CREATE DATABASE AUDIT SPECIFICATION audit_specification_name=id_
+         (FOR SERVER AUDIT audit_name=id_)?
+         (audit_action_spec_group (',' audit_action_spec_group)*)?
+         (WITH '(' STATE '=' (ON|OFF) ')')?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-role-transact-sql
@@ -2420,44 +2509,22 @@ cursor_option
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-endpoint-transact-sql
 alter_endpoint
     : ALTER ENDPOINT endpointname=id_ (AUTHORIZATION login=id_)?
-       ( STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED ) )?
-            AS TCP LR_BRACKET
-               LISTENER_PORT EQUAL port=DECIMAL
-                 ( COMMA LISTENER_IP EQUAL
-                   (ALL | IPV4_ADDR | IPV6_ADDR | STRING) )?
-                RR_BRACKET
-               (TSQL
-               |
-                FOR SERVICE_BROKER LR_BRACKET
-                   AUTHENTICATION EQUAL
-                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id_)?
-                           | CERTIFICATE cert_name=id_  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
-                           )
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
-                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
-                   )?
-
-                   ( COMMA? MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED ) )?
-                   ( COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+       (STATE EQUAL state=(STARTED | STOPPED | DISABLED))?
+               AS TCP LR_BRACKET endpoint_listener_clause RR_BRACKET
+               ( FOR TSQL LR_BRACKET RR_BRACKET
+               | FOR SERVICE_BROKER LR_BRACKET
+                   endpoint_authentication_clause
+                   (COMMA? endpoint_encryption_alogorithm_clause)?
+                   (COMMA? MESSAGE_FORWARDING EQUAL (ENABLED | DISABLED))?
+                   (COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
                    RR_BRACKET
-              |
-               FOR DATABASE_MIRRORING LR_BRACKET
-                   AUTHENTICATION EQUAL
-                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id_)?
-                           | CERTIFICATE cert_name=id_  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
-                           )
-
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
-                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
-                   )?
-
-                   COMMA? ROLE EQUAL ( WITNESS | PARTNER | ALL )
+               | FOR DATABASE_MIRRORING LR_BRACKET
+                   endpoint_authentication_clause
+                   (COMMA? endpoint_encryption_alogorithm_clause)?
+                   COMMA? ROLE EQUAL (WITNESS | PARTNER | ALL)
                    RR_BRACKET
-             )
+               )
     ;
-
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
-// todo: not implemented
 
 /* Will visit later
 */
@@ -5976,6 +6043,7 @@ keyword
     | VARCHAR
     | NVARCHAR
     | PRECISION //For some reason this is possible to use as ID
+    | FILESTREAM_ON
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx

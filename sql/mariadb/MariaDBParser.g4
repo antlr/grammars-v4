@@ -679,7 +679,7 @@ alterSpecification
       indexColumnNames indexOption*                                 #alterByAddIndex
     | ADD (CONSTRAINT name=uid?)? PRIMARY KEY index=uid?
       indexType? indexColumnNames indexOption*                      #alterByAddPrimaryKey
-    | ADD (CONSTRAINT name=uid?)? UNIQUE
+    | ADD (CONSTRAINT name=uid?)? UNIQUE ifNotExists?
       indexFormat=(INDEX | KEY)? indexName=uid?
       indexType? indexColumnNames indexOption*                      #alterByAddUniqueKey
     | ADD keyType=(FULLTEXT | SPATIAL)

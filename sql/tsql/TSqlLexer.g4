@@ -1111,6 +1111,7 @@ WITHOUT:                               'WITHOUT';
 WITNESS:                               'WITNESS';
 XACT_ABORT:                            'XACT_ABORT';
 XACT_STATE:                            'XACT_STATE';
+FILESTREAM_ON:                         'FILESTREAM_ON';
 
 ABS:                                   'ABS';
 ACOS:                                  'ACOS';
@@ -1200,6 +1201,8 @@ DOLLAR_ACTION:                         '$ACTION';
 // https://learn.microsoft.com/en-us/sql/t-sql/language-elements/variables-transact-sql?view=sql-server-ver16
 CURSOR_ROWS:                           '@@CURSOR_ROWS';
 FETCH_STATUS:                          '@@FETCH_STATUS';
+
+IPV4_ADDR:                             DEC_DIGIT+ '.' DEC_DIGIT+ '.' DEC_DIGIT+ '.' DEC_DIGIT+;
 
 SPACE:              [ \t\r\n]+    -> skip;
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/slash-star-comment-transact-sql

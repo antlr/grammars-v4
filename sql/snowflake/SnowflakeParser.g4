@@ -559,7 +559,7 @@ object_properties
     | MINS_TO_BYPASS_MFA EQ num
     | RSA_PUBLIC_KEY EQ string
     | RSA_PUBLIC_KEY_2 EQ string
-    | COMMENT EQ string
+    | comment_clause
     ;
 
 session_params
@@ -795,7 +795,7 @@ alter_pipe
 
 alter_procedure
     : ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' RENAME TO id_
-    | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' SET COMMENT EQ string
+    | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' SET comment_clause
     | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' UNSET COMMENT
     | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' EXECUTE AS caller_owner
     ;
@@ -1409,7 +1409,7 @@ create_account
             EDITION EQ ( STANDARD | ENTERPRISE | BUSINESS_CRITICAL )
           ( REGION_GROUP EQ region_group_id )?
           ( REGION EQ snowflake_region_id )?
-          ( comment_clause )?
+          comment_clause?
     ;
 
 create_api_integration
@@ -1448,7 +1448,7 @@ create_object_clone
     ;
 
 create_connection
-    : CREATE CONNECTION if_not_exists? id_ ( ( COMMENT EQ string )? | (AS REPLICA OF id_ DOT id_ DOT id_ ( COMMENT EQ string )?) )
+    : CREATE CONNECTION if_not_exists? id_ ( comment_clause? | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?) )
     ;
 
 create_database
@@ -1604,7 +1604,7 @@ create_function
     ;
 
 create_managed_account
-    : CREATE MANAGED ACCOUNT id_ ADMIN_NAME EQ id_ COMMA ADMIN_PASSWORD EQ string COMMA TYPE EQ READER (COMMA COMMENT EQ string)?
+    : CREATE MANAGED ACCOUNT id_ ADMIN_NAME EQ id_ COMMA ADMIN_PASSWORD EQ string COMMA TYPE EQ READER (COMMA comment_clause)?
     ;
 
 create_masking_policy
@@ -2216,7 +2216,7 @@ out_of_line_constraint
 full_col_decl
     : col_decl
         collate?
-        comment_clause?
+        (COMMENT string)?
         default_value?
         not_null?
         with_masking_policy?
@@ -2261,7 +2261,7 @@ create_table_as_select
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ ( COMMENT EQ string )?
+    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
     | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
     ;
 

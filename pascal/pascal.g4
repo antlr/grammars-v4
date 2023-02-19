@@ -401,7 +401,7 @@ actualParameter
    ;
 
 parameterwidth
-   : ':' expression
+   : COLON expression
    ;
 
 gotoStatement
