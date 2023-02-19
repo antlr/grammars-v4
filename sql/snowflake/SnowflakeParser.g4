@@ -384,7 +384,7 @@ object_privilege
     ;
 
 grant_role
-    : GRANT ROLE role_name TO (ROLE role_name | USER id_)?
+    : GRANT ROLE role_name TO (ROLE role_name | USER id_)
     ;
 
 role_name
