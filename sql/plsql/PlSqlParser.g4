@@ -2710,7 +2710,7 @@ link_authentication
 
 create_database_link
     : CREATE SHARED? PUBLIC? DATABASE LINK link_name ( CONNECT TO ( CURRENT_USER
-                                                                  | user_object_name IDENTIFIED BY password_value (link_authentication)?)
+                                                                  | user_object_name IDENTIFIED BY password_value link_authentication?)
                                                      | link_authentication)* (USING identifier)?
     ;
 
