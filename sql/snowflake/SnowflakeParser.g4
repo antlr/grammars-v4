@@ -2214,17 +2214,14 @@ out_of_line_constraint
     ;
 
 
-// These can appear in any order of each other
-collate_constraint_default_value
-    : collate
-    | inline_constraint
-    | default_value
-    | not_null
-    ;
-
 full_col_decl
     : col_decl
-        collate_constraint_default_value*
+        (
+            collate
+            | inline_constraint
+            | default_value
+            | not_null
+        )*
         with_masking_policy?
         with_tags?
         (COMMENT string)?
