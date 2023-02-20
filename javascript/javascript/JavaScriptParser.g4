@@ -30,6 +30,8 @@
  */
 parser grammar JavaScriptParser;
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab=JavaScriptLexer;
     superClass=JavaScriptParserBase;
@@ -48,7 +50,7 @@ statement
     | variableStatement
     | importStatement
     | exportStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
     | expressionStatement
     | ifStatement
@@ -131,7 +133,7 @@ variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -237,7 +239,7 @@ classTail
 
 classElement
     : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
-    | emptyStatement
+    | emptyStatement_
     | '#'? propertyName '=' singleExpression
     ;
 
@@ -311,7 +313,8 @@ expressionSequence
 singleExpression
     : anonymousFunction                                                     # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
-    | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
+    | singleExpression '?.' singleExpression                                # OptionalChainExpression
+    | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression arguments                                        # NewExpression
@@ -366,7 +369,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 anonymousFunction
@@ -451,6 +454,7 @@ identifier
     : Identifier
     | NonStrictLet
     | Async
+    | As
     ;
 
 reservedWord

@@ -1,1 +1,1 @@
-(smiles (chain (branched_atom (atom (bracket_atom [ (symbol (element_symbols O)) (hcount H 3) (charge +) ])))))
+(smiles (chain (branched_atom (atom (bracket_atom [ (symbol (element_symbols O)) (hcount H 3) (charge +) ])))) <EOF>)

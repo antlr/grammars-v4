@@ -1,0 +1,1 @@
+important_metric{name="testing",service="cassandra", comma="trailing",} > 100000

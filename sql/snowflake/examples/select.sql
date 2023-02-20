@@ -1,0 +1,3 @@
+-- Table with types and functions as column names
+-- Causes timeout on PHP build test?
+-- select user, date, iff, current_timestamp, cluster, type, region, function from edge;

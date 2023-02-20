@@ -94,7 +94,7 @@ K_WHERE : W H E R E;
 K_WITH : W I T H;
 
 fusionTablesSql
- : sql_stmt * ; 
+ : sql_stmt * EOF ; 
 
 sql_stmt
  : ( alter_table_stmt

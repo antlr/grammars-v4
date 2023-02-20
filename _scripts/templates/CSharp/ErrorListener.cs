@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Generated from trgen <version>
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -7,14 +7,34 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class ErrorListener\<S> : ConsoleErrorListener\<S>
+<if(has_name_space)>namespace <name_space>
+{<endif>
+public class ErrorListener\<S> : IAntlrErrorListener\< S>
 {
     public bool had_error;
+    bool _quiet;
+    bool _tee;
+    TextWriter _out;
 
-    public override void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
+    public ErrorListener(bool quiet, bool tee, TextWriter @out)
+    {
+        _quiet = quiet;
+        _tee = tee;
+        _out = @out;
+    }
+
+    public void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
         int col, string msg, RecognitionException e)
     {
         had_error = true;
-        base.SyntaxError(output, recognizer, offendingSymbol, line, col, msg, e);
+        if (_tee)
+        {
+            _out.WriteLine("line " + line + ":" + col + " " + msg);
+        }
+        if (!_quiet)
+        {
+            System.Console.Error.WriteLine("line " + line + ":" + col + " " + msg);
+        }
     }
 }
+<if(has_name_space)>}<endif>

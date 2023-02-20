@@ -1,0 +1,2 @@
+(find('*Mon_MCS_Info.num_of_active*video*clients`gauge*','or(__check_name:\"host1\",
+__check_name:\"host2\",__check_name:\"host3\")')|stats:sum())

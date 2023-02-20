@@ -28,7 +28,7 @@ grammar PeopleCode;
 // Parser Rules                                         //
 //******************************************************//
 
-program : stmtList ;
+program : stmtList EOF ;
 
 // Multiple semicolons may be present; the last/only statement may not have a semicolon.
 stmtList: (stmt ';'+)* stmt? ;   
