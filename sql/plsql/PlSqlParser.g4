@@ -35,6 +35,7 @@ sql_script
 
 unit_statement
     : transaction_control_statements
+    | alter_analytic_view
     | alter_cluster
     | alter_database
     | alter_function
@@ -67,6 +68,7 @@ unit_statement
     | create_package
     | create_package_body
 
+    | create_analytic_view
     | create_index
     | create_library
     | create_table
@@ -611,6 +613,116 @@ sequence_spec
 
 sequence_start_clause
     : START WITH UNSIGNED_INTEGER
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-ANALYTIC-VIEW.html
+create_analytic_view
+    : CREATE (OR REPLACE)? (NOFORCE | FORCE)? ANALYTIC VIEW av=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        //classification_clause*
+        cav_using_clause?
+        dim_by_clause?
+        measures_clause?
+        default_measure_clause?
+        default_aggregate_clause?
+        cache_clause?
+        fact_columns_clause?
+        qry_transform_clause?
+    ;
+
+classification_clause
+    : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+    ;
+
+classification_item
+    : CLASSIFICATION cn=id_expression (VALUE cv=quoted_string)? (LANGUAGE language)?
+    ;
+
+language
+    : NULL_
+    | nls=id_expression
+    ;
+
+cav_using_clause
+    : USING (schema_name '.')? t=id_expression REMOTE? (AS? ta=id_expression)?
+    ;
+
+dim_by_clause
+    : DIMENSION BY '(' dim_key (',' dim_key)* ')'
+    ;
+
+dim_key
+    : dim_ref //classification_clause*
+        KEY ( '(' (a=id_expression '.')? f=column_name (',' (a=id_expression '.')? f=column_name)* ')'
+            |  (a=id_expression '.')? f=column_name
+            )
+        REFERENCES DISTINCT? ('(' attribute_name (',' attribute_name) ')' | attribute_name)
+        HIERARCHIES '(' hier_ref (',' hier_ref)* ')'
+    ;
+
+dim_ref
+    : (schema_name '.')? ad=id_expression (AS? da=id_expression)?
+    ;
+
+hier_ref
+    : (schema_name '.')? h=id_expression (AS? ha=id_expression)? DEFAULT?
+    ;
+
+measures_clause
+    : MEASURES '(' av_measure (',' av_measure)* ')'
+    ;
+
+av_measure
+    : mn=id_expression (base_meas_clause | calc_meas_clause)? //classification_clause*
+    ;
+
+base_meas_clause
+    : FACT /*FOR MEASURE*/ bm=id_expression meas_aggregate_clause? //FIXME inconsistent documentation
+    ;
+
+meas_aggregate_clause
+    : AGGREGATE BY aggregate_function_name
+    ;
+
+calc_meas_clause
+    : /*m=id_expression*/ AS '(' expression ')' //FIXME inconsistent documentation
+    ;
+
+default_measure_clause
+    : DEFAULT MEASURE m=id_expression
+    ;
+
+default_aggregate_clause
+    : DEFAULT AGGREGATE BY aggregate_function_name
+    ;
+
+cache_clause
+    : CACHE cache_specification (',' cache_specification)*
+    ;
+
+cache_specification
+    : MEASURE GROUP (ALL | '(' id_expression (',' id_expression)* ')' levels_clause (',' levels_clause)* )
+    ;
+
+levels_clause
+    : LEVELS '(' level_specification (',' level_specification)* ')' level_group_type
+    ;
+
+level_specification
+    : '(' ((d=id_expression '.')? h=id_expression '.')? l=id_expression ')'
+    ;
+
+level_group_type
+    : DYNAMIC
+    | MATERIALIZED (USING (schema_name '.')? t=id_expression)?
+    ;
+
+fact_columns_clause
+    : FACT COLUMN f=column_name (AS? fa=id_expression (',' AS? fa=id_expression)* )?
+    ;
+
+qry_transform_clause
+    : ENABLE QUERY TRANSFORM (RELY | NORELY)?
     ;
 
 create_index
@@ -2575,6 +2687,33 @@ comment_on_materialized
     : COMMENT ON MATERIALIZED VIEW tableview_name IS quoted_string
     ;
 
+alter_analytic_view
+    : ALTER ANALYTIC VIEW (schema_name '.')? av=id_expression
+        ( RENAME TO id_expression
+        | COMPILE
+        | alter_add_cache_clause
+        | alter_drop_cache_clause
+        )
+    ;
+
+alter_add_cache_clause
+    : ADD CACHE MEASURE GROUP '(' (ALL | measure_list)? ')'
+        LEVELS '(' levels_item (',' levels_item)* ')'
+    ;
+
+levels_item
+    : ((d=id_expression '.')? h=id_expression '.')? l=id_expression
+    ;
+
+measure_list
+    : id_expression (',' id_expression)*
+    ;
+
+alter_drop_cache_clause
+    : DROP CACHE MEASURE GROUP '(' (ALL | measure_list)? ')'
+        LEVELS '(' levels_item (',' levels_item)* ')'
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -4320,10 +4459,11 @@ unary_logical_expression
     ;
 
 logical_operation:
-        (NULL_
-        | NAN | PRESENT
-        | INFINITE | A_LETTER SET | EMPTY
-        | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')')
+    ( NULL_
+    | NAN | PRESENT
+    | INFINITE | A_LETTER SET | EMPTY
+    | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
+    )
     ;
 
 multiset_expression
@@ -4393,7 +4533,7 @@ single_column_for_loop
 
 multi_column_for_loop
     : FOR paren_column_list
-      IN  '(' (subquery | '(' expressions? ')') ')'
+      IN '(' (subquery | '(' expressions? ')') ')'
     ;
 
 unary_expression
@@ -4540,6 +4680,8 @@ over_clause_keyword
     : AVG
     | CORR
     | LAG
+    | LAG_DIFF
+    | LAG_DIFF_PERCENT
     | LEAD
     | MAX
     | MEDIAN
@@ -4574,7 +4716,10 @@ standard_prediction_function_keyword
     ;
 
 over_clause
-    : OVER '(' query_partition_clause? (order_by_clause windowing_clause?)? ')'
+    : OVER '(' ( query_partition_clause? (order_by_clause windowing_clause?)?
+               | HIERARCHY th=id_expression OFFSET numeric (ACROSS ANCESTOR AT LEVEL id_expression)?
+               )
+           ')'
     ;
 
 windowing_clause
@@ -5281,6 +5426,7 @@ regular_id
 
 non_reserved_keywords_in_12c
     : ACL
+    | ACROSS
     | ACTION
     | ACTIONS
     | ACTIVE
@@ -5289,6 +5435,8 @@ non_reserved_keywords_in_12c
     | ADAPTIVE_PLAN
     | ADVANCED
     | AFD_DISKSTRING
+    | ANALYTIC
+    | ANCESTOR
     | ANOMALY
     | ANSI_REARCH
     | APPLICATION
@@ -5312,7 +5460,9 @@ non_reserved_keywords_in_12c
     | CALCULATED
     | CALLBACK
     | CAPACITY
+    | CAPTION
     | CDBDEFAULT
+    | CLASSIFICATION
     | CLASSIFIER
     | CLEANUP
     | CLIENT
@@ -5351,6 +5501,7 @@ non_reserved_keywords_in_12c
     | DEFINITION
     | DELEGATE
     | DELETE_ALL
+    | DESCRIPTION
     | DESTROY
     | DIMENSIONS
     | DISABLE_ALL
@@ -5520,6 +5671,7 @@ non_reserved_keywords_in_12c
     | REALM
     | REDEFINE
     | RELOCATE
+    | REMOTE
     | RESTART
     | ROLESET
     | ROWID_MAPPING_TABLE
@@ -5571,6 +5723,7 @@ non_reserved_keywords_in_12c
     | TIER
     | TIES
     | TO_ACLID
+    | TRANSFORM
     | TRANSLATION
     | TRUST
     | UCS2
