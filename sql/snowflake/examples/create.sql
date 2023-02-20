@@ -42,3 +42,4 @@ create table t2(i int) as select(i) from t;
 create table t3 as select(i) from t;
 create table t1 (v varchar(16777216));
 create table t1 (v varchar(16777216) comment 'hello world');
+create or replace stream str_test2 on table test_str at (STREAM => 'STR_TEST2');

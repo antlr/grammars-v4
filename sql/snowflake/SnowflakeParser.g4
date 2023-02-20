@@ -1442,7 +1442,7 @@ create_api_integration
 create_object_clone
     : CREATE or_replace? ( DATABASE | SCHEMA | TABLE ) if_not_exists? id_
         CLONE object_name
-              ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+              ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     | CREATE or_replace? ( STAGE | FILE FORMAT | SEQUENCE | STREAM | TASK ) if_not_exists? object_name
         CLONE object_name
     ;
@@ -1462,11 +1462,11 @@ create_database
     ;
 
 clone_at_before
-    : CLONE id_ ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+    : CLONE id_ ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     ;
 
 at_before1
-    : AT | BEFORE
+    : AT_KEYWORD | BEFORE_KEYWORD
     ;
 
 header_decl
@@ -2121,7 +2121,7 @@ show_initial_rows
     ;
 
 stream_time
-    : at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) ')'
+    : at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) RR_BRACKET
     ;
 
 create_stream
@@ -3646,7 +3646,7 @@ at_before
         | STATEMENT ASSOC string
         | STREAM ASSOC string
       ) RR_BRACKET
-    | BEFORE LR_BRACKET STATEMENT ASSOC string RR_BRACKET
+    | BEFORE_KEYWORD LR_BRACKET STATEMENT ASSOC string RR_BRACKET
     ;
 
 end

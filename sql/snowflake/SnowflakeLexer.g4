@@ -112,7 +112,7 @@ AZURE_SAS_TOKEN:                                       'AZURE_SAS_TOKEN';
 AZURE_STORAGE_QUEUE_PRIMARY_URI:                       'AZURE_STORAGE_QUEUE_PRIMARY_URI';
 AZURE_TENANT_ID:                                       'AZURE_TENANT_ID';
 BASE64:                                                'BASE64';
-BEFORE:                                                'BEFORE';
+BEFORE_KEYWORD:                                        'BEFORE';
 BEGIN:                                                 'BEGIN';
 BERNOULLI:                                             'BERNOULLI';
 BETWEEN:                                               'BETWEEN';
