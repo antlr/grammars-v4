@@ -220,9 +220,25 @@ then
     then
         grammars=()
         # Test grammars for the enclosing directories.
-        directories=`git diff --name-only ${additional[0]} ${additional[1]} 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
+        directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
+            pushd $g
+            echo here
+            while true
+            do
+                if [ -f `pwd`/desc.xml ]
+                then
+                break
+                elif [ `pwd` == "$prefix" ]
+                then
+                break
+                fi
+                cd ..
+            done
+            g=`pwd`
+            g=${g##*$prefix/}
+            popd
             echo Adding diff $g
             grammars+=( $g )
         done
