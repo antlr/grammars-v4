@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar metamath;
 
 database
-   : outermostscopestmt*
+   : outermostscopestmt* EOF
    ;
 
 outermostscopestmt
@@ -113,7 +113,11 @@ typecode
    ;
 
 mathsymbol
-   : (PRINTABLECHARACTER | LPAREN | RPAREN)+
+   : (printablecharacter | LPAREN | RPAREN)+
+   ;
+
+printablecharacter
+   : PRINTABLECHARACTER | LABEL
    ;
 
 filename
@@ -136,12 +140,12 @@ RPAREN
    : ')'
    ;
 
-PRINTABLECHARACTER
-   : [\u0021-\u007e]+
-   ;
-
 LABEL
    : (LETTERORDIGIT | '.' | '-' | '_')+
+   ;
+
+PRINTABLECHARACTER
+   : [\u0021-\u007e]+
    ;
 
 fragment LETTERORDIGIT

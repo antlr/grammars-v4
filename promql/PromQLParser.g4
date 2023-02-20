@@ -45,20 +45,23 @@ vectorOperation
     | vectorOperation compareOp vectorOperation
     | vectorOperation andUnlessOp vectorOperation
     | vectorOperation orOp vectorOperation
+    | vectorOperation vectorMatchOp vectorOperation
+    | vectorOperation AT vectorOperation
     | vector
     ;
 
 // Operators
 
-unaryOp:     (ADD | SUB);
-powOp:       POW grouping?;
-multOp:      (MULT | DIV | MOD) grouping?;
-addOp:       (ADD | SUB) grouping?;
-compareOp:   (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?;
-andUnlessOp: (AND | UNLESS) grouping?;
-orOp:        OR grouping?;
-subqueryOp:  SUBQUERY_RANGE offsetOp?;
-offsetOp:    OFFSET DURATION;
+unaryOp:        (ADD | SUB);
+powOp:          POW grouping?;
+multOp:         (MULT | DIV | MOD) grouping?;
+addOp:          (ADD | SUB) grouping?;
+compareOp:      (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?;
+andUnlessOp:    (AND | UNLESS) grouping?;
+orOp:           OR grouping?;
+vectorMatchOp:  (ON | UNLESS) grouping?;
+subqueryOp:     SUBQUERY_RANGE offsetOp?;
+offsetOp:       OFFSET DURATION;
 
 vector
     : function_
@@ -81,7 +84,7 @@ instantSelector
 
 labelMatcher:         labelName labelMatcherOperator STRING;
 labelMatcherOperator: EQ | NE | RE | NRE;
-labelMatcherList:     labelMatcher (COMMA labelMatcher)*;
+labelMatcherList:     labelMatcher (COMMA labelMatcher)* COMMA?;
 
 matrixSelector: instantSelector TIME_RANGE;
 
@@ -92,7 +95,7 @@ offset
 
 // Functions
 
-function_: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
+function_: FUNCTION LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
@@ -112,8 +115,8 @@ without: WITHOUT labelNameList;
 grouping:   (on_ | ignoring) (groupLeft | groupRight)?;
 on_:         ON labelNameList;
 ignoring:   IGNORING labelNameList;
-groupLeft:  GROUP_LEFT labelNameList;
-groupRight: GROUP_RIGHT labelNameList;
+groupLeft:  GROUP_LEFT labelNameList?;
+groupRight: GROUP_RIGHT labelNameList?;
 
 // Label names
 

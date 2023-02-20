@@ -164,7 +164,7 @@ grammar V;
 
 //SourceFile       = ModuleClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
-    : (moduleClause eos)? ( importDecl eos )* ( topLevelDecl eos )*
+    : (moduleClause eos)? ( importDecl eos )* ( topLevelDecl eos )* EOF
     ;
 
 /*

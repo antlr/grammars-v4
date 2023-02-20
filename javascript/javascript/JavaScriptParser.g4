@@ -30,6 +30,8 @@
  */
 parser grammar JavaScriptParser;
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab=JavaScriptLexer;
     superClass=JavaScriptParserBase;
@@ -311,7 +313,8 @@ expressionSequence
 singleExpression
     : anonymousFunction                                                     # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
-    | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
+    | singleExpression '?.' singleExpression                                # OptionalChainExpression
+    | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression arguments                                        # NewExpression
@@ -451,6 +454,7 @@ identifier
     : Identifier
     | NonStrictLet
     | Async
+    | As
     ;
 
 reservedWord

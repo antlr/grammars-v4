@@ -1,0 +1,30 @@
+name: REINDEX
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  reindex:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v4.5.0
+      with:
+          python-version: '3.10'
+    - name: Do not trust Python env
+      run: |
+          python --version
+
+    - uses: actions/checkout@v3
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+        fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+    - name: Create local changes
+      run: |
+        cd _scripts; bash reindex.sh
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v3
+      with:
+        name: grammars-index
+        path: grammars.json

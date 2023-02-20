@@ -2,7 +2,7 @@
 grammar ISL;
 
 program
-    : defOrExpr+
+    : defOrExpr+ EOF
     ;
 
 defOrExpr

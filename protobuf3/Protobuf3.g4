@@ -22,7 +22,7 @@ proto
       | optionStatement
       | topLevelDef
       | emptyStatement_
-    )*
+    )* EOF
   ;
 
 // Syntax
@@ -55,9 +55,12 @@ optionName
   ;
 
 // Normal Field
+fieldLabel
+  : OPTIONAL | REPEATED
+  ;
 
 field
-  : ( REPEATED )? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
+  : fieldLabel? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 
 fieldOptions
@@ -148,6 +151,7 @@ reservedFieldNames
 topLevelDef
   : messageDef
   | enumDef
+  | extendDef
   | serviceDef
   ;
 
@@ -193,12 +197,26 @@ messageElement
   : field
   | enumDef
   | messageDef
+  | extendDef
   | optionStatement
   | oneof
   | mapField
   | reserved
   | emptyStatement_
   ;
+
+// Extend definition
+//
+// NB: not defined in the spec but supported by protoc and covered by protobuf3 tests
+//     see e.g. php/tests/proto/test_import_descriptor_proto.proto
+//     of https://github.com/protocolbuffers/protobuf
+// it also was discussed here: https://github.com/protocolbuffers/protobuf/issues/4610
+
+extendDef
+    :   EXTEND messageType LC ( field
+                                 | emptyStatement_
+                                 )* RC
+    ;
 
 // service
 
@@ -262,6 +280,7 @@ WEAK: 'weak';
 PUBLIC: 'public';
 PACKAGE: 'package';
 OPTION: 'option';
+OPTIONAL: 'optional';
 REPEATED: 'repeated';
 ONEOF: 'oneof';
 MAP: 'map';
@@ -286,6 +305,7 @@ MAX: 'max';
 ENUM: 'enum';
 MESSAGE: 'message';
 SERVICE: 'service';
+EXTEND: 'extend';
 RPC: 'rpc';
 STREAM: 'stream';
 RETURNS: 'returns';
@@ -337,8 +357,8 @@ fragment HEX_DIGIT: [0-9A-Fa-f];
 
 // comments
 WS  :   [ \t\r\n\u000C]+ -> skip;
-LINE_COMMENT: '//' ~[\r\n]* -> skip;
-COMMENT: '/*' .*? '*/' -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
+COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
 keywords
   : SYNTAX
@@ -347,6 +367,7 @@ keywords
   | PUBLIC
   | PACKAGE
   | OPTION
+  | OPTIONAL
   | REPEATED
   | ONEOF
   | MAP
@@ -371,6 +392,7 @@ keywords
   | ENUM
   | MESSAGE
   | SERVICE
+  | EXTEND
   | RPC
   | STREAM
   | RETURNS

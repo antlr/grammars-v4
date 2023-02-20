@@ -1,27 +1,10 @@
-# Template generated code from trgen <version>
-JAR = <antlr_tool_path>
-CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
-.SUFFIXES: .g4 .go
-ANTLRGRAMMARS ?= $(wildcard *.g4)
-GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
-SOURCES = $(GENERATED) Test.go
-default: classes
-classes: setup $(SOURCES) program
-setup:
-	-export | grep GO
-	-go env
-	-go version
-	export GO111MODULE=on; go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
-program:
-	export GO111MODULE=on; go build Test.go
+# Generated from trgen <version>
+default:
+	bash build.sh
 clean:
-	rm -f *.tokens *.interp
-	rm -f $(GENERATED)
+	bash clean.sh
 run:
-	export GO111MODULE=on; trwdog go run Test.go $(RUNARGS)
+	@trwdog ./<if(os_win)>Test.exe<else>Test<endif> $(RUNARGS)
+FORCE: ;
 test: FORCE
 	bash test.sh
-<tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > $\<
-} >
-FORCE: ;

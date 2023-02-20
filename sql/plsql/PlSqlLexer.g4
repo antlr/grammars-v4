@@ -22,6 +22,7 @@ lexer grammar PlSqlLexer;
 
 options {
     superClass=PlSqlLexerBase;
+    caseInsensitive = true;
 }
 
 @lexer::postinclude {
@@ -1531,6 +1532,7 @@ SERIALLY_REUSABLE:            'SERIALLY_REUSABLE';
 SERIAL:                       'SERIAL';
 SERVERERROR:                  'SERVERERROR';
 SERVICE_NAME_CONVERT:         'SERVICE_NAME_CONVERT';
+SERVICE:                      'SERVICE';
 SERVICES:                     'SERVICES';
 SESSION_CACHED_CURSORS:       'SESSION_CACHED_CURSORS';
 SESSION:                      'SESSION';
@@ -1655,6 +1657,7 @@ SWITCH:                       'SWITCH';
 SYNCHRONOUS:                  'SYNCHRONOUS';
 SYNC:                         'SYNC';
 SYNONYM:                      'SYNONYM';
+SYS:                          'SYS';
 SYSASM:                       'SYSASM';
 SYS_AUDIT:                    'SYS_AUDIT';
 SYSAUX:                       'SYSAUX';
@@ -1972,6 +1975,7 @@ TIMEZONE_MINUTE:              'TIMEZONE_MINUTE';
 TIMEZONE_OFFSET:              'TIMEZONE_OFFSET';
 TIMEZONE_REGION:              'TIMEZONE_REGION';
 TIME_ZONE:                    'TIME_ZONE';
+TIMING:                       'TIMING';
 TIV_GB:                       'TIV_GB';
 TIV_SSF:                      'TIV_SSF';
 TO_ACLID:                     'TO_ACLID';
@@ -2208,6 +2212,23 @@ PREDICTION_DETAILS:           'PREDICTION_DETAILS';
 PREDICTION_PROBABILITY:       'PREDICTION_PROBABILITY';
 PREDICTION_SET:               'PREDICTION_SET';
 
+BLOCKCHAIN:                   'BLOCKCHAIN';
+COLLATE:                      'COLLATE';
+COLLATION:                    'COLLATION';
+DEFINITION:                   'DEFINITION';
+DUPLICATED:                   'DUPLICATED';
+EXTENDED:                     'EXTENDED';
+HASHING:                      'HASHING';
+IDLE:                         'IDLE';
+IMMUTABLE:                    'IMMUTABLE';
+ORACLE_DATAPUMP:              'ORACLE_DATAPUMP';
+ORACLE_HDFS:                  'ORACLE_HDFS';
+ORACLE_HIVE:                  'ORACLE_HIVE';
+ORACLE_LOADER:                'ORACLE_LOADER';
+SHA2_512_Q:                   '"SHA2_512"';
+SHARDED:                      'SHARDED';
+V1_Q:                         '"V1"';
+
 CUME_DIST:                    'CUME_DIST';
 DENSE_RANK:                   'DENSE_RANK';
 LISTAGG:                      'LISTAGG';
@@ -2224,6 +2245,7 @@ LAG:                          'LAG';
 LEAD:                         'LEAD';
 MAX:                          'MAX';
 MEDIAN:                       'MEDIAN';
+MEMOPTIMIZE:                  'MEMOPTIMIZE';
 MIN:                          'MIN';
 NTILE:                        'NTILE';
 NVL:                          'NVL';

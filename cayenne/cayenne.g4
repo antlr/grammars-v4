@@ -27,6 +27,8 @@
 
 grammar cayenne;
 
+file_: expr EOF ;
+
 expr:
 	'(' varid '::' type_ ')' '->' expr
 	| '\\' '(' varid '::' type_ ')' '->' expr

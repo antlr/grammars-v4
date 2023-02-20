@@ -10,7 +10,7 @@
 grammar Pddl;
 
 /************* Start of grammar *******************/ pddlDoc
-   : domain | problem
+   : ( domain | problem ) EOF
    ;
 
 /************* DOMAINS ****************************/ domain
@@ -250,7 +250,7 @@ fExpDA
    ;
 
 /************* PROBLEMS ****************************/ problem
-   : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init_ goal probConstraints? metricSpec?
+   : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init_ goal probConstraints? metricSpec? ')'
    // lengthSpec? This is not defined anywhere in the BNF spec ')'
    ;
 

@@ -1,1 +1,1 @@
-(notation (dice 30 d 100))
+(file_ (notation (dice 30 d 100)) <EOF>)

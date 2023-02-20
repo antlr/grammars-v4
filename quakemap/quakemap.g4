@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar quakemap;
 
 map_
-   : entity*
+   : entity* EOF
    ;
 
 entity

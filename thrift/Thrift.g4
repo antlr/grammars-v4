@@ -14,7 +14,7 @@ include_
 
 namespace_
     : 'namespace' '*' (IDENTIFIER | LITERAL)
-    | 'namespace' IDENTIFIER (IDENTIFIER | LITERAL)
+    | 'namespace' IDENTIFIER (IDENTIFIER | LITERAL) type_annotations?
     | 'cpp_namespace' IDENTIFIER
     | 'php_namespace' IDENTIFIER
     ;
@@ -186,8 +186,12 @@ TYPE_STRING: 'string';
 TYPE_BINARY: 'binary';
 
 LITERAL
-    : (('"' ~'"'* '"') | ('\'' ~'\''* '\''))
+    : '"' ( ESC_SEQ | ~[\\"] )* '"'
+    | '\'' ( ESC_SEQ | ~[\\'] )* '\''
     ;
+
+fragment ESC_SEQ : '\\' [rnt"'\\] ;
+
 
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '.' | '_')*

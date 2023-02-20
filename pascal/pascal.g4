@@ -35,8 +35,10 @@ Adapted from pascal.g by  Hakki Dogusan, Piet Schoutteten and Marton Papp
 
 grammar pascal;
 
+options { caseInsensitive = true; }
+
 program
-   : programHeading (INTERFACE)? block DOT
+   : programHeading (INTERFACE)? block DOT EOF
    ;
 
 programHeading
@@ -399,7 +401,7 @@ actualParameter
    ;
 
 parameterwidth
-   : ':' expression
+   : COLON expression
    ;
 
 gotoStatement
@@ -485,334 +487,203 @@ recordVariableList
    : variable (COMMA variable)*
    ;
 
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
-
-
 AND
-   : A N D
+   : 'AND'
    ;
 
 
 ARRAY
-   : A R R A Y
+   : 'ARRAY'
    ;
 
 
 BEGIN
-   : B E G I N
+   : 'BEGIN'
    ;
 
 
 BOOLEAN
-   : B O O L E A N
+   : 'BOOLEAN'
    ;
 
 
 CASE
-   : C A S E
+   : 'CASE'
    ;
 
 
 CHAR
-   : C H A R
+   : 'CHAR'
    ;
 
 
 CHR
-   : C H R
+   : 'CHR'
    ;
 
 
 CONST
-   : C O N S T
+   : 'CONST'
    ;
 
 
 DIV
-   : D I V
+   : 'DIV'
    ;
 
 
 DO
-   : D O
+   : 'DO'
    ;
 
 
 DOWNTO
-   : D O W N T O
+   : 'DOWNTO'
    ;
 
 
 ELSE
-   : E L S E
+   : 'ELSE'
    ;
 
 
 END
-   : E N D
+   : 'END'
    ;
 
 
 FILE
-   : F I L E
+   : 'FILE'
    ;
 
 
 FOR
-   : F O R
+   : 'FOR'
    ;
 
 
 FUNCTION
-   : F U N C T I O N
+   : 'FUNCTION'
    ;
 
 
 GOTO
-   : G O T O
+   : 'GOTO'
    ;
 
 
 IF
-   : I F
+   : 'IF'
    ;
 
 
 IN
-   : I N
+   : 'IN'
    ;
 
 
 INTEGER
-   : I N T E G E R
+   : 'INTEGER'
    ;
 
 
 LABEL
-   : L A B E L
+   : 'LABEL'
    ;
 
 
 MOD
-   : M O D
+   : 'MOD'
    ;
 
 
 NIL
-   : N I L
+   : 'NIL'
    ;
 
 
 NOT
-   : N O T
+   : 'NOT'
    ;
 
 
 OF
-   : O F
+   : 'OF'
    ;
 
 
 OR
-   : O R
+   : 'OR'
    ;
 
 
 PACKED
-   : P A C K E D
+   : 'PACKED'
    ;
 
 
 PROCEDURE
-   : P R O C E D U R E
+   : 'PROCEDURE'
    ;
 
 
 PROGRAM
-   : P R O G R A M
+   : 'PROGRAM'
    ;
 
 
 REAL
-   : R E A L
+   : 'REAL'
    ;
 
 
 RECORD
-   : R E C O R D
+   : 'RECORD'
    ;
 
 
 REPEAT
-   : R E P E A T
+   : 'REPEAT'
    ;
 
 
 SET
-   : S E T
+   : 'SET'
    ;
 
 
 THEN
-   : T H E N
+   : 'THEN'
    ;
 
 
 TO
-   : T O
+   : 'TO'
    ;
 
 
 TYPE
-   : T Y P E
+   : 'TYPE'
    ;
 
 
 UNTIL
-   : U N T I L
+   : 'UNTIL'
    ;
 
 
 VAR
-   : V A R
+   : 'VAR'
    ;
 
 
 WHILE
-   : W H I L E
+   : 'WHILE'
    ;
 
 
 WITH
-   : W I T H
+   : 'WITH'
    ;
 
 
@@ -947,37 +818,37 @@ RCURLY
 
 
 UNIT
-   : U N I T
+   : 'UNIT'
    ;
 
 
 INTERFACE
-   : I N T E R F A C E
+   : 'INTERFACE'
    ;
 
 
 USES
-   : U S E S
+   : 'USES'
    ;
 
 
 STRING
-   : S T R I N G
+   : 'STRING'
    ;
 
 
 IMPLEMENTATION
-   : I M P L E M E N T A T I O N
+   : 'IMPLEMENTATION'
    ;
 
 
 TRUE
-   : T R U E
+   : 'TRUE'
    ;
 
 
 FALSE
-   : F A L S E
+   : 'FALSE'
    ;
 
 
@@ -997,7 +868,7 @@ COMMENT_2
 
 
 IDENT
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
+   : ('A' .. 'Z') ('A' .. 'Z' | '0' .. '9' | '_')*
    ;
 
 
@@ -1017,5 +888,5 @@ NUM_REAL
 
 
 fragment EXPONENT
-   : ('e') ('+' | '-')? ('0' .. '9') +
+   : ('E') ('+' | '-')? ('0' .. '9') +
    ;

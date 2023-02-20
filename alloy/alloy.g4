@@ -28,7 +28,7 @@
 grammar alloy;
 
 alloyModule
-   : moduleDecl? import_* paragraph+
+   : moduleDecl? import_* paragraph+ EOF
    ;
 
 moduleDecl

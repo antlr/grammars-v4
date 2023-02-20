@@ -1,11 +1,11 @@
 import sys, os, re, shutil
 
-if __name__ == "__main__":
-    print("Python utility to transform the JavaScript Parser and Lexer grammars to work with a python output")
-    if len(sys.argv) == 1:
-        print(f"""Please run this script as {sys.argv[0]} <grammar>.g4""")
-        sys.exit(0)
-    file_path = sys.argv[1]
+def main(argv):
+    fix("JavaScriptLexer.g4")
+    fix("JavaScriptParser.g4")
+
+def fix(file_path):
+    print("Altering " + file_path)
     if not os.path.exists(file_path):
         print(f"Could not find file: {file_path}")
         sys.exit(1)
@@ -27,10 +27,16 @@ if __name__ == "__main__":
             output_file.flush()
     elif file_name.lower() == "javascriptlexer.g4":
         for x in input_file:
-            if '!this.IsStrictMode' in x:
-                x = x.replace('!this.Is', 'not self.is')
+            if '!this.' in x:
+                x = x.replace('!this.', 'not self.')
+            if 'this.' in x:
+                x = x.replace('this.', 'self.')
             output_file.write(x)
             output_file.flush()
 
+    print("Writing ...")
     input_file.close()
     output_file.close()
+
+if __name__ == '__main__':
+    main(sys.argv)

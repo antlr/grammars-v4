@@ -23,21 +23,15 @@ SOFTWARE.
 */
 
 parser grammar VerilogPreParser;
+options { tokenVocab = VerilogLexer; }
 
-options {
-	tokenVocab = VerilogLexer;
-}
-
-source_text
-	: compiler_directive*
-	;
-
+source_text : compiler_directive* ;
 compiler_directive
 	: begin_keywords_directive
 	| celldefine_directive
 	| default_nettype_directive
-	| endcelldefine_directive
 	| end_keywords_directive
+	| endcelldefine_directive
 	| ifdef_directive
 	| ifndef_directive
 	| include_directive
@@ -51,30 +45,48 @@ compiler_directive
 	| unconnected_drive_directive
 	| undef_directive
 	;
-
-begin_keywords_directive : GA BEGIN_KEYWORDS_DIRECTIVE DIRECTIVE_TEXT ;
+begin_keywords_directive : GA BEGIN_KEYWORDS_DIRECTIVE DQ version_specifier DQ ;
 celldefine_directive : GA CELLDEFINE_DIRECTIVE ;
-default_nettype_directive : GA DEFAULT_NETTYPE_DIRECTIVE DIRECTIVE_TEXT ;
-endcelldefine_directive : GA ENDCELLDEFINE_DIRECTIVE ;
+default_nettype_directive : GA DEFAULT_NETTYPE_DIRECTIVE default_nettype_value ;
+default_nettype_value : DEFAULT_NETTYPE_VALUE ;
+else_directive : GA ELSE_DIRECTIVE group_of_lines ;
+elsif_directive : GA ELSIF_DIRECTIVE macro_identifier group_of_lines ;
 end_keywords_directive : GA END_KEYWORDS_DIRECTIVE ;
-ifdef_directive : GA IFDEF_DIRECTIVE text_macro_identifier ifdef_group_of_lines elsif_directive* else_directive? endif_directive ;
-ifndef_directive : GA IFNDEF_DIRECTIVE text_macro_identifier ifndef_group_of_lines elsif_directive* else_directive? endif_directive ;
-include_directive : GA INCLUDE_DIRECTIVE DIRECTIVE_TEXT ;
-line_directive : GA LINE_DIRECTIVE DIRECTIVE_TEXT ;
-nounconnected_drive_directive : GA NOUNCONNECTED_DRIVE_DIRECTIVE ;
-pragma_directive : GA PRAGMA_DIRECTIVE DIRECTIVE_TEXT ;
-resetall_directive : GA RESETALL_DIRECTIVE ;
-text_macro_definition : GA DEFINE_DIRECTIVE text_macro_identifier macro_text ;
-text_macro_usage : GA MACRO_USAGE ;
-timescale_directive : GA TIMESCALE_DIRECTIVE  DIRECTIVE_TEXT ;
-unconnected_drive_directive : GA UNCONNECTED_DRIVE_DIRECTIVE DIRECTIVE_TEXT ;
-undef_directive : GA UNDEF_DIRECTIVE text_macro_identifier ;
-elsif_directive : GA ELSIF_DIRECTIVE text_macro_identifier elsif_group_of_lines ;
-else_directive : GA ELSE_DIRECTIVE else_group_of_lines ;
+endcelldefine_directive : GA ENDCELLDEFINE_DIRECTIVE ;
 endif_directive : GA ENDIF_DIRECTIVE ;
-text_macro_identifier : DIRECTIVE_IDENTIFIER ;
-ifdef_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
-ifndef_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
-elsif_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
-else_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
-macro_text : ( MACRO_TEXT | MACRO_ESC_NEWLINE )* ;
+filename : FILENAME ;
+group_of_lines : ( source_text_ | compiler_directive )* ;
+identifier : SIMPLE_IDENTIFIER ;
+ifdef_directive : GA IFDEF_DIRECTIVE macro_identifier group_of_lines elsif_directive* else_directive? endif_directive ;
+ifndef_directive : GA IFNDEF_DIRECTIVE macro_identifier group_of_lines elsif_directive* else_directive? endif_directive ;
+include_directive : GA INCLUDE_DIRECTIVE DQ filename DQ ;
+level : UNSIGNED_NUMBER ;
+line_directive : GA LINE_DIRECTIVE number DQ filename DQ level ;
+macro_delimiter : MACRO_DELIMITER ;
+macro_esc_newline : MACRO_ESC_NEWLINE ;
+macro_esc_quote : MACRO_ESC_QUOTE ;
+macro_identifier : MACRO_IDENTIFIER ;
+macro_name : MACRO_NAME ;
+macro_quote : MACRO_QUOTE ;
+macro_text : ( macro_text_ | macro_delimiter | macro_esc_newline | macro_esc_quote | macro_quote | string_ )* ;
+macro_text_ : MACRO_TEXT ;
+macro_usage : MACRO_USAGE ;
+nounconnected_drive_directive : GA NOUNCONNECTED_DRIVE_DIRECTIVE ;
+number : UNSIGNED_NUMBER ;
+pragma_directive : GA PRAGMA_DIRECTIVE pragma_name ( pragma_expression ( CO pragma_expression )* )? ;
+pragma_expression : ( pragma_keyword EQ )? pragma_value ;
+pragma_keyword : SIMPLE_IDENTIFIER ;
+pragma_name : SIMPLE_IDENTIFIER ;
+pragma_value : LP pragma_expression ( CO pragma_expression )* RP | number | string_ | identifier ;
+resetall_directive : GA RESETALL_DIRECTIVE ;
+source_text_ : SOURCE_TEXT ;
+string_ : STRING ;
+text_macro_definition : GA DEFINE_DIRECTIVE macro_name macro_text ;
+text_macro_usage : GA macro_usage ;
+time_precision : TIME_VALUE TIME_UNIT ;
+time_unit : TIME_VALUE TIME_UNIT ;
+timescale_directive : GA TIMESCALE_DIRECTIVE time_unit SL time_precision ;
+unconnected_drive_directive : GA UNCONNECTED_DRIVE_DIRECTIVE unconnected_drive_value ;
+unconnected_drive_value : UNCONNECTED_DRIVE_VALUE ;
+undef_directive : GA UNDEF_DIRECTIVE macro_identifier ;
+version_specifier : VERSION_SPECIFIER ;

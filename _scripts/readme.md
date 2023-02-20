@@ -3,12 +3,11 @@
 This directory contains scripts for CI testing.
 
 * regtest.sh -- This is a Bash-based script to test any target. To
-run, cd to grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is CSharp, Java, Cpp, Dart, Go, or one
-of the other targets. To test the target, you will need the NET SDK installed,
-access to the internet, and to toolchain for the target you want to test.
-For CSharp, it will download the Antlr4 tool and runtime. For the other
-targets, you will need to download the Antlr4 tool antlr-4.9.3-complete.jar and
-place it in /tmp.
+run, cd to grammar-vs/ or a grammar directory, then type `bash regtest.sh <target>`
+where `<target>` is Antlr4cs, Cpp, CSharp, Dart, Go, Java, PHP, or Python3.
+To test the target, you will need the NET SDK installed (required for the trgen
+driver generator), access to the internet, and to toolchain for the target
+you want to test. You will also need to set the Antlr4 tool.
 
 * test.ps1 -- this is a Powershell script for testing, similar to regtest.sh.
 

@@ -41,7 +41,7 @@ parser grammar DGSParser;
 
 options { tokenVocab=DGSLexer; }
 
-dgs : header ( event | COMMENT | EOL )* ;
+dgs : header ( event | COMMENT | EOL )* EOF ;
 header : MAGIC EOL identifier INT INT EOL;
 event : ( an | cn | dn | ae | ce | de | cg | st | cl ) ( COMMENT | EOL ) ;
 

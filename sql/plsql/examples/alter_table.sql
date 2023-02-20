@@ -110,3 +110,70 @@ ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
 ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
 
 alter TABLE employee add ( constraint employee_pk UNique ( a , b ) ) ;
+
+alter table employee
+    add constraint emp_fk foreign key (col1, col2) references other;
+
+alter table employee
+    add constraint emp_fk foreign key (col1, col2) references other on delete set null;
+
+alter table employee
+    add constraint emp_fk foreign key (col1, col2) references other on delete cascade;
+
+ALTER TABLE TABLE_A
+    ADD TABLE_B_ID NUMBER(5)
+    ADD FOREIGN KEY (TABLE_B_ID) REFERENCES TABLE_B (ID);
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION
+    FOR 101;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    UPDATE GLOBAL INDEXES;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    INVALIDATE GLOBAL INDEXES;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    UPDATE INDEXES;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    UPDATE GLOBAL INDEXES NOPARALLEL;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    INVALIDATE GLOBAL INDEXES NOPARALLEL;
+
+ALTER TABLE S.PRODUCTS
+    DROP PARTITION p0
+    UPDATE INDEXES NOPARALLEL;
+
+ALTER TABLE B.EXCHANGE_LOG
+    DROP PARTITION
+    FOR (TIMESTAMP '2022-01-28 00:00:00')
+    UPDATE GLOBAL INDEXES ;
+
+ALTER TABLE mesg_perf_stat
+    TRUNCATE PARTITION SYS_P1221396
+    DROP STORAGE CASCADE UPDATE INDEXES;
+
+ALTER TABLE employees MEMOPTIMIZE FOR READ
+    ENABLE VALIDATE CONSTRAINT emp_manager_fk
+    EXCEPTIONS INTO exceptions;
+
+ALTER TABLE employees NO MEMOPTIMIZE FOR READ
+    ENABLE VALIDATE CONSTRAINT emp_manager_fk
+    EXCEPTIONS INTO exceptions;
+
+ALTER TABLE employees MEMOPTIMIZE FOR WRITE
+    ENABLE VALIDATE CONSTRAINT emp_manager_fk
+    EXCEPTIONS INTO exceptions;
+
+ALTER TABLE employees NO MEMOPTIMIZE FOR WRITE
+    ENABLE VALIDATE CONSTRAINT emp_manager_fk
+    EXCEPTIONS INTO exceptions;
+

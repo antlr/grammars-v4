@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2010 The Rust Project Developers
-Copyright (c) 2020-2021 Student Main
+Copyright (c) 2020-2022 Student Main
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -92,7 +92,35 @@ KW_UNDERLINELIFETIME: '\'_';
 KW_DOLLARCRATE: '$crate';
 
 // rule itself allow any identifier, but keyword has been matched before
-NON_KEYWORD_IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]* | '_' [a-zA-Z0-9_]+;
+NON_KEYWORD_IDENTIFIER: XID_Start XID_Continue* | '_' XID_Continue+;
+
+// [\p{L}\p{Nl}\p{Other_ID_Start}-\p{Pattern_Syntax}-\p{Pattern_White_Space}]
+fragment XID_Start
+   : [\p{L}\p{Nl}]
+   | UNICODE_OIDS
+   ;
+
+// [\p{ID_Start}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Other_ID_Continue}-\p{Pattern_Syntax}-\p{Pattern_White_Space}]
+fragment XID_Continue
+   : XID_Start
+   | [\p{Mn}\p{Mc}\p{Nd}\p{Pc}]
+   | UNICODE_OIDC
+   ;
+
+fragment UNICODE_OIDS
+   : '\u1885'..'\u1886'
+   | '\u2118'
+   | '\u212e'
+   | '\u309b'..'\u309c'
+   ;
+
+fragment UNICODE_OIDC
+   : '\u00b7'
+   | '\u0387'
+   | '\u1369'..'\u1371'
+   | '\u19da'
+   ;
+
 RAW_IDENTIFIER: 'r#' NON_KEYWORD_IDENTIFIER;
 // comments https://doc.rust-lang.org/reference/comments.html
 LINE_COMMENT: ('//' (~[/!] | '//') ~[\r\n]* | '//') -> channel (HIDDEN);
