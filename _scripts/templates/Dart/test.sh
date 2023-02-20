@@ -17,6 +17,9 @@ fi
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
+# Get a list of test files from the test directory. Do not include any
+# .errors or .tree files. Pay close attention to remove only file names
+# that end with the suffix .errors or .tree.
 files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
@@ -29,7 +32,7 @@ do
 done
 
 # Parse all input files.
-echo "${files[*]}" | trwdog ./<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | trwdog ./Test.exe -q -x -tee -tree > parse.txt 2>&1
 status=$?
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
@@ -76,8 +79,24 @@ old=`pwd`
 cd ../<example_files_unix>
 
 # Check if any files in the test files directory have changed.
-git diff --exit-code --name-only . > $old/updated.txt 2>&1
-updated=$?
+rm -f $old/updated.txt
+updated=0
+for f in `find . -name '*.errors'`
+do
+    git diff --exit-code $f >> $old/updated.txt 2>&1
+    if [ "$?" -ne 0 ]
+    then
+        updated=$?
+    fi
+done
+for f in `find . -name '*.tree'`
+do
+    git diff --exit-code $f >> $old/updated.txt 2>&1
+    if [ "$?" -ne 0 ]
+    then
+        updated=$?
+    fi
+done
 
 # Check if any untracked .errors files.
 git ls-files --exclude-standard -o --ignored > $old/new_errors2.txt 2>&1

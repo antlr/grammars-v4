@@ -66,7 +66,7 @@ def main(argv):
         elif arg in ("-input"):
             i = i + 1
             inputs.append(argv[i])
-            is_fns.append(false)
+            is_fns.append(False)
         elif arg in ("-encoding"):
             i = i + 1
             encoding = argv[i]
@@ -112,8 +112,9 @@ def ParseStdin():
     DoParse(str, 'stdin', 0)
 
 def ParseString(input, row_number):
+    global string_instance
     str = InputStream(input)
-    DoParse(str, 'string' + string_instance, row_number)
+    DoParse(str, 'string' + str(string_instance), row_number)
     string_instance = string_instance + 1
 
 def ParseFilename(input, row_number):

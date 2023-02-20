@@ -13,6 +13,7 @@
     </parent>
 
     <modules>
+        <module>athena</module>
         <module>derby</module>
         <module>hive</module>
         <module>mariadb</module>

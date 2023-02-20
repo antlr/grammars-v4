@@ -110,6 +110,8 @@ unit_statement
     | drop_view
     | drop_index
 
+    | flashback_table
+
     | rename_object
 
     | comment_on_column
@@ -1382,6 +1384,17 @@ sql_statement_shortcut
 
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+flashback_table
+    : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
+      ( ((SCN | TIMESTAMP) expression | RESTORE POINT restore_point) ((ENABLE | DISABLE) TRIGGERS)?
+        | BEFORE DROP (RENAME TO tableview_name)?
+      )
+    ;
+
+restore_point
+    : identifier ('.' id_expression)*
     ;
 
 rename_object
@@ -3049,7 +3062,7 @@ role_identified_clause
     ;
 
 alter_table
-    : ALTER TABLE tableview_name
+    : ALTER TABLE tableview_name memoptimize_read_write_clause*
       (
       | alter_table_properties
       | constraint_clauses
@@ -3060,6 +3073,10 @@ alter_table
       )
       ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS) )+)?
       ';'
+    ;
+
+memoptimize_read_write_clause
+    : NO? MEMOPTIMIZE FOR (READ | WRITE)
     ;
 
 alter_table_properties
@@ -3246,7 +3263,7 @@ move_table_clause
     ;
 
 index_org_table_clause
-    : (mapping_table_clause | PCTTHRESHOLD UNSIGNED_INTEGER | key_compression) index_org_overflow_clause?
+    : (mapping_table_clause | PCTTHRESHOLD UNSIGNED_INTEGER | key_compression)* index_org_overflow_clause?
     ;
 
 mapping_table_clause
@@ -5578,6 +5595,7 @@ non_reserved_keywords_in_12c
     | MAX_SHARED_TEMP_SIZE
     | MEMCOMPRESS
     | METADATA
+    | MEMOPTIMIZE
     | MODEL_NB
     | MODEL_SV
     | MODIFICATION
@@ -5697,6 +5715,7 @@ non_reserved_keywords_in_12c
     | SUBSCRIBE
     | SUBSET
     | SUCCESS
+    | SYS
     | SYSBACKUP
     | SYSDG
     | SYSGUID
