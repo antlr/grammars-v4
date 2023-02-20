@@ -89,6 +89,7 @@ unit_statement
     | create_type
     | create_synonym
 
+    | drop_analytic_view
     | drop_cluster
     | drop_function
     | drop_library
@@ -2737,6 +2738,10 @@ alter_cluster
         )+
         parallel_clause?
         ';'
+    ;
+
+drop_analytic_view
+    : DROP ANALYTIC VIEW (schema_name '.')? av=id_expression
     ;
 
 drop_cluster
