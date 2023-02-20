@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>uom</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>metric</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

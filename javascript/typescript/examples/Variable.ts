@@ -26,6 +26,7 @@ playerCodesArray = {     //Compiler Error: Cannot assign to playerCodes because 
     player4 : 20
 };
 
+
 export const ROUTES: any[] = [
     {path: '/dashboard', title: 'Dashboard', icon: 'dashboard', class: '', allowAnonymous: false},
     {path: '/deals', title: 'Deals', icon: 'assignment', class: '', allowAnonymous: false},
@@ -43,3 +44,13 @@ export const Components = _.chain([_.values(ROUTES) as any[]])
 var fileLanguages = _.uniqBy([...this.fileLanguages, ...Components], p => p.fileId);
 
 var languageMap = new Map(fileLanguages.map(lang => [lang.id, lang] as [string, ILanguage]));
+
+let schema = mapEnumToSchema(Joi.boolean())
+
+const codesByType = Joi.object()
+  .keys({
+    type: Joi.string().required(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+  })
+  .required();

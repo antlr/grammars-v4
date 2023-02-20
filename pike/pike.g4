@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2022, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /*
 * http://www.mit.edu/afs.new/sipb/project/pike/tutorial/tutorial_onepage.html#D
 */
-
 grammar pike;
 
 program
-   : definition*
+   : definition* EOF?
    ;
 
 definition
@@ -54,15 +54,15 @@ impo
    ;
 
 inheritance
-   : modifiers? 'inherit' program_specifier (':' IDENTIFIER)? ';'
+   : modifiers? 'inherit' program_specifier (':' identifier)? ';'
    ;
 
 function_declaration
-   : modifiers? type_ IDENTIFIER '(' arguments ')' ';'
+   : modifiers? type_ identifier '(' arguments? ')' ';'
    ;
 
 function_definition
-   : modifiers? type_ IDENTIFIER '(' arguments ')' block
+   : modifiers? type_ identifier '(' arguments? ')' block
    ;
 
 variables
@@ -74,7 +74,7 @@ variable_names
    ;
 
 variable_name
-   : '*'* IDENTIFIER ('=' expression2)?
+   : '*'* identifier ('=' expression2)?
    ;
 
 constant
@@ -86,7 +86,7 @@ constant_names
    ;
 
 constant_name
-   : IDENTIFIER '=' expression2
+   : identifier '=' expression2
    ;
 
 class_def
@@ -94,7 +94,7 @@ class_def
    ;
 
 class_implementation
-   : 'class' IDENTIFIER? '{' program '}'
+   : 'class' identifier? '{' program '}'
    ;
 
 modifiers
@@ -120,6 +120,7 @@ statement
    | case_stmt
    | default_stmt
    | block
+   | return_stmt
    | foreach_stmt
    | break_stmt
    | continue_stmt
@@ -131,7 +132,11 @@ cond
    ;
 
 while_stmt
-   : 'while''(' expression ')' statement
+   : 'while' '(' expression ')' statement
+   ;
+
+return_stmt
+   : 'return' expression
    ;
 
 do_while_stmt
@@ -191,29 +196,16 @@ expression5
    | expression6 '++'
    | '~' expression5
    | '-' expression5
+   | '!' expression5
    ;
 
 expression6
-   :
-   ( STRING
-   | NUMBER
-   | FLOAT
-   | catch_
-   | gauge
-   | sscanf
-   | lambda
-   | class_implementation
-   | constant_identifier
-   | mapping
-   | multiset
-   | array
-   | parenthesis
-   ) extension*
+   : (STRING | NUMBER | FLOAT | catch_ | gauge | sscanf | lambda | class_implementation | constant_identifier | mapping | multiset | array | parenthesis) extension*
    ;
 
 extension
    : '(' expression_list ')'
-   | '->' IDENTIFIER
+   | '->' identifier
    | '[' expression ('..' expression)? ']'
    ;
 
@@ -231,17 +223,16 @@ sscanf
 
 lvalue
    : 'lambda' expression6
-   | type_ IDENTIFIER
+   | type_ identifier
    ;
 
 lambda
-   : 'lambda' '(' arguments ')' block
+   : 'lambda' '(' arguments? ')' block
    ;
 
 constant_identifier
-   : IDENTIFIER ('.' IDENTIFIER)*
+   : identifier ('.' identifier)*
    ;
-
 
 array
    : '({' expression_list '})'
@@ -255,10 +246,8 @@ mapping
    : '([' (expression ':' expression (',' expression ':' expression)*)? ','? '])'
    ;
 
-
 program_specifier
-   :
-   /*string_constant |*/ constant_identifier
+   : constant_identifier
    ;
 
 parenthesis
@@ -274,52 +263,126 @@ splice_expression
    ;
 
 argument
-   : type_ ('...')? (IDENTIFIER)?
+   : type_ ('...')? identifier
    ;
 
 arguments
-   : (argument (',' argument)*)? (',')?
+   : (argument (',' argument)*) (',')?
    ;
 
 type_
-   : ('int' | 'string' | 'float' | 'program' | ('object' ('(' program_specifier ')')?) | ('mapping' ('(' type_ ':' type_ ')')?) | ('array' ('(' type_ ')')?) | ('multiset' ('(' type_ ')')?) | ('function' function_type?)) ('*')*
+   : type__ ('*')*
+   ;
+
+type__
+   : INTTYPE
+   | STRINGTYPE
+   | FLOATTYPE
+   | PROGRAMTYPE
+   | (OBJECTTYPE ('(' program_specifier ')')?)
+   | (MAPPINGTYPE ('(' type_ ':' type_ ')')?)
+   | (ARRAYTYPE ('(' type_ ')')?)
+   | (MULTISETTYPE ('(' type_ ')')?)
+   | (FUNCTIONTYPE function_type?)
    ;
 
 function_type
    : '(' type_ (',' type_)* ('...')? ')'
    ;
 
+identifier
+   : IDENTIFIER
+   ;
+
+INTTYPE
+   : 'int'
+   ;
+
+FLOATTYPE
+   : 'float'
+   ;
+
+STRINGTYPE
+   : 'string'
+   ;
+
+PROGRAMTYPE
+   : 'program'
+   ;
+
+OBJECTTYPE
+   : 'object'
+   ;
+
+MAPPINGTYPE
+   : 'mapping'
+   ;
+
+ARRAYTYPE
+   : 'array'
+   ;
+
+MULTISETTYPE
+   : 'multiset'
+   ;
+
+FUNCTIONTYPE
+   : 'function'
+   ;
 
 IDENTIFIER
-   : LETTER (LETTER | DIGIT)* | '+' | '/' | '%' | '*' | '&' | '|' | '^' | '~' | '<' | '<<' | '<=' | '>' | '>>' | '>=' | '==' | '!=' | '!' | '()' | '-' | '->' | '->=' | '[]' | '[]='
+   : LETTER (LETTER | DIGIT | IDSYMBOL)*
    ;
-
 
 LETTER
-   : 'a' .. 'z' | 'A' .. 'Z' | '_'
+   : 'a' .. 'z'
+   | 'A' .. 'Z'
+   | '_'
    ;
-
-
-DIGIT
-   : '0' .. '9'
-   ;
-
 
 FLOAT
-   : DIGIT DIGIT* '.' DIGIT*
+   : DIGIT+ '.' DIGIT+
    ;
-
 
 NUMBER
-   : DIGIT DIGIT* | '0x' DIGIT*
+   : '0x'? DIGIT+
    ;
-
 
 STRING
    : '"' ~ '"'* '"'
    ;
 
+fragment DIGIT
+   : '0' .. '9'
+   ;
+
+fragment IDSYMBOL
+   : '`+'
+   | '`/'
+   | '`%'
+   | '`*'
+   | '`&'
+   | '`|'
+   | '`^'
+   | '`~'
+   | '`<'
+   | '`<<'
+   | '`<='
+   | '`>'
+   | '`>>'
+   | '`>='
+   | '`=='
+   | '`!='
+   | '`!'
+   | '`()'
+   | '`-'
+   | '`->'
+   | '`->='
+   | '`[]'
+   | '`[]='
+   ;
 
 WS
    : [ \t\r\n] -> skip
    ;
+

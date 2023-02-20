@@ -13,4 +13,4 @@ versionDef: 'version' IDENTIFIER '{'
 procedureDef: procReturn IDENTIFIER '(' procFirstArg (',' typeSpecifier)* ')' '=' constant ';';
 procReturn: 'void' | typeSpecifier;
 procFirstArg: 'void' | typeSpecifier;
-oncrpcv2Specification : (xdrSpecification | programDef)*; //this is the top level rule for oncrpcv2 (rfc 5531)
+oncrpcv2Specification : (xdrSpecification | programDef)* EOF; //this is the top level rule for oncrpcv2 (rfc 5531)

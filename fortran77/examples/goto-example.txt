@@ -1,0 +1,16 @@
+      program main
+
+c*********************************************************************72
+c 
+      implicit none
+
+      go to 20
+
+10    continue
+      write ( *, '(a)' ) '  Hello, world!'
+      stop
+
+20    continue
+      goto 10
+
+      end

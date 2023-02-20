@@ -61,47 +61,50 @@ INTEGER
  | BIN_INTEGER
  ;
 
-DEF : 'def';
-RETURN : 'return';
-RAISE : 'raise';
-FROM : 'from';
-IMPORT : 'import';
-AS : 'as';
-GLOBAL : 'global';
-NONLOCAL : 'nonlocal';
-ASSERT : 'assert';
-IF : 'if';
-ELIF : 'elif';
-ELSE : 'else';
-WHILE : 'while';
-FOR : 'for';
-IN : 'in';
-TRY : 'try';
-FINALLY : 'finally';
-WITH : 'with';
-EXCEPT : 'except';
-LAMBDA : 'lambda';
-OR : 'or';
 AND : 'and';
-NOT : 'not';
-IS : 'is';
-NONE : 'None';
-TRUE : 'True';
-FALSE : 'False';
-CLASS : 'class';
-YIELD : 'yield';
-DEL : 'del';
-PASS : 'pass';
-CONTINUE : 'continue';
-BREAK : 'break';
+AS : 'as';
+ASSERT : 'assert';
 ASYNC : 'async';
 AWAIT : 'await';
+BREAK : 'break';
+CASE : 'case' ;
+CLASS : 'class';
+CONTINUE : 'continue';
+DEF : 'def';
+DEL : 'del';
+ELIF : 'elif';
+ELSE : 'else';
+EXCEPT : 'except';
+FALSE : 'False';
+FINALLY : 'finally';
+FOR : 'for';
+FROM : 'from';
+GLOBAL : 'global';
+IF : 'if';
+IMPORT : 'import';
+IN : 'in';
+IS : 'is';
+LAMBDA : 'lambda';
+MATCH : 'match' ;
+NONE : 'None';
+NONLOCAL : 'nonlocal';
+NOT : 'not';
+OR : 'or';
+PASS : 'pass';
+RAISE : 'raise';
+RETURN : 'return';
+TRUE : 'True';
+TRY : 'try';
+UNDERSCORE : '_' ;
+WHILE : 'while';
+WITH : 'with';
+YIELD : 'yield';
 
 NEWLINE
- : ( {atStartOfInput()}?   SPACES
+ : ( {this.atStartOfInput()}?   SPACES
    | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
    )
-   {onNewLine();}
+   {this.onNewLine();}
  ;
 
 /// identifier   ::=  id_start id_continue*
@@ -157,15 +160,15 @@ IMAG_NUMBER
 DOT : '.';
 ELLIPSIS : '...';
 STAR : '*';
-OPEN_PAREN : '(' {openBrace();};
-CLOSE_PAREN : ')' {closeBrace();};
+OPEN_PAREN : '(' {this.openBrace();};
+CLOSE_PAREN : ')' {this.closeBrace();};
 COMMA : ',';
 COLON : ':';
 SEMI_COLON : ';';
 POWER : '**';
 ASSIGN : '=';
-OPEN_BRACK : '[' {openBrace();};
-CLOSE_BRACK : ']' {closeBrace();};
+OPEN_BRACK : '[' {this.openBrace();};
+CLOSE_BRACK : ']' {this.closeBrace();};
 OR_OP : '|';
 XOR : '^';
 AND_OP : '&';
@@ -177,8 +180,8 @@ DIV : '/';
 MOD : '%';
 IDIV : '//';
 NOT_OP : '~';
-OPEN_BRACE : '{' {openBrace();};
-CLOSE_BRACE : '}' {closeBrace();};
+OPEN_BRACE : '{' {this.openBrace();};
+CLOSE_BRACE : '}' {this.closeBrace();};
 LESS_THAN : '<';
 GREATER_THAN : '>';
 EQUALS : '==';

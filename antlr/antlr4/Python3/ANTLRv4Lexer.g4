@@ -39,7 +39,7 @@
 // Lexer specification
 // ======================================================
 
-lexer grammar ANTLRv4LexerPythonTarget;
+lexer grammar ANTLRv4Lexer;
 
 options { superClass = LexerAdaptor; }
 import LexBasic;

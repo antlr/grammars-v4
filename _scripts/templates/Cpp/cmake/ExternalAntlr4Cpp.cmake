@@ -13,7 +13,7 @@ if(NOT DEFINED ANTLR4_TAG)
 endif()
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
-  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(Configuration))
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
 elseif(${CMAKE_GENERATOR} MATCHES "Xcode.*")
   set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(CONFIGURATION))
 else()

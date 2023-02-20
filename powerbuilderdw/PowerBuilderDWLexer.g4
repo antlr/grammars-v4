@@ -28,6 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 lexer grammar PowerBuilderDWLexer;
 
+options {
+    caseInsensitive = true;
+}
+
 // Keywords
 TABLE:              'TABLE';
 COLUMN:             'COLUMN';
@@ -209,7 +213,7 @@ fragment NUM
 fragment DIGIT
    : '0' .. '9'
    ;
-   
+
 fragment LETTER
    : 'A' .. 'Z'
    ;

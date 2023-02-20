@@ -1,9 +1,10 @@
-# Generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+# Generated from trgen <version>
 default:
-	rm -rf build; mkdir build; cd build; cmake .. <cmake_target>; $(MAKE)
+	bash build.sh
 run:
-	cd build; trwdog ./<exec_name> $(RUNARGS)
+	@trwdog ./build/<if(os_win)>Release/<endif><exec_name> $(RUNARGS)
 clean:
-	rm -rf build
-test:
+	bash clean.sh
+FORCE: ;
+test: FORCE
 	bash test.sh
