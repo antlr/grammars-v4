@@ -8,7 +8,10 @@ create table t1 (v varchar(16777216) not null comment 'hello world');
 create table t1 (v varchar(32) not null unique comment 'hello world');
 create table t1 (i integer default 1 comment 'hello world');
 create table t1 (i integer not null unique tag (test_tag='t') comment 'hello world');
-create table t1 (i integer tag (test_tag='t') comment 'hello world');
+
+create table t1 (i integer tag (t='t'));
+create table t1 (i integer tag (s.t='s.t'));
+create table t1 (i integer tag (d.s.t='d.s.t'));
 
 create table t1 (i integer not null);
 create table t1 (i integer not null unique);
