@@ -1615,7 +1615,7 @@ create_masking_policy
     ;
 
 tag_decl
-    : id_ EQ string
+    : object_name EQ string
     ;
 
 column_list_in_parentheses
@@ -2213,15 +2213,21 @@ out_of_line_constraint
         constraint_properties?
     ;
 
+
+// These can appear in any order of each other
+collate_constraint_default_value
+    : collate
+    | inline_constraint
+    | default_value
+    | not_null
+    ;
+
 full_col_decl
     : col_decl
-        collate?
-        (COMMENT string)?
-        default_value?
-        not_null?
+        collate_constraint_default_value*
         with_masking_policy?
         with_tags?
-        inline_constraint?
+        (COMMENT string)?
     ;
 
 column_decl_item
