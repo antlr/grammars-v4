@@ -19,3 +19,6 @@ comment on task t is 't';
 comment on user u is 'u';
 comment on view v is 'v';
 comment on warehouse w is 'w';
+comment on column t.c IS 't.c';
+comment on column s.t.c IS 's.t.c';
+comment on column d.s.t.c IS 'd.s.t.c';
