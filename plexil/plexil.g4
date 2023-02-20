@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2022, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -176,6 +176,10 @@ initialValue
 command
    : 'command' ':' (declaredVariable '=')? commandName '(' arguments? ')' ';'
    ;
+
+
+// this is missing in the PDF from NASA
+commandName: STRING;
 
 arguments
    : ((integerValue | realValue | booleanValue | declaredVariable) ';'?)*
