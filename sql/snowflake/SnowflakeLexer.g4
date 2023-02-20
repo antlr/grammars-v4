@@ -1065,7 +1065,7 @@ LISTAGG: 'LISTAGG';
 DUMMY: 'DUMMY';
 
 
-SPACE:                  [ \t\r\n]+                    -> skip;
+SPACE:                  [ \t\r\n]+                    -> channel(HIDDEN);
 
 SQL_COMMENT:            '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:           '--' ~[\r\n]*                 -> channel(HIDDEN);
