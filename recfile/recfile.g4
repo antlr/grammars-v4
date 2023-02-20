@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2022, Tom Everett
+Copyright (c) 2023, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,45 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar recfile;
 
-file_ : line* EOF;
+file_
+   : line* EOF
+   ;
 
-line: (descriptor|record)? EOL+;
+line
+   : (descriptor | record)? EOL+
+   ;
 
-descriptor: '%' value;
+descriptor
+   : '%' key ':' (EOL '+')? value
+   ;
 
-record: key ':' value;
+record
+   : key ':' (EOL '+')? value
+   ;
 
-key: STRING;
+key
+   : STRING
+   ;
 
-value: STRING;
+value
+   : STRING
+   ;
 
-STRING: [a-zA-Z%][a-zA-Z0-9_]*;
+STRING
+   : [a-zA-Z0-9'.] [a-zA-Z0-9_ '.]*
+   ;
 
-EOL: [\r\n];
+EOL
+   : [\r\n]
+   ;
 
 COMMENT
-   : '#' ~ [\r\n]+ ->skip
+   : '#' ~ [\r\n]+ -> skip
    ;
 
 WS
-   : [ \t] + -> skip
+   : [ \t]+ -> skip
    ;
+
