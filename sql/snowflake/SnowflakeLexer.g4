@@ -651,7 +651,6 @@ QUEUE:                                                 'QUEUE';
 QUOTED_IDENTIFIERS_IGNORE_CASE:                        'QUOTED_IDENTIFIERS_IGNORE_CASE';
 RANGE:                                                 'RANGE';
 RANK:                                                  'RANK';
-RAW:                                                   'RAW';
 RAW_DEFLATE:                                           'RAW_DEFLATE';
 READ:                                                  'READ';
 READER:                                                'READER';
