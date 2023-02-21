@@ -11,7 +11,7 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
-		<antlr.version>4.11.1</antlr.version>
+		<antlr.version>4.12.0</antlr.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
