@@ -268,7 +268,7 @@ ECONOMY:                                               'ECONOMY';
 EDITION:                                               'EDITION';
 ELSE:                                                  'ELSE';
 EMAIL:                                                 'EMAIL';
-EMPTY:                                                 'EMPTY';
+EMPTY_:                                                'EMPTY';
 EMPTY_FIELD_AS_NULL:                                   'EMPTY_FIELD_AS_NULL';
 ENABLE:                                                'ENABLE';
 ENABLE_FOR_PRIVILEGE:                                  'ENABLE_FOR_PRIVILEGE';

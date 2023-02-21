@@ -226,12 +226,8 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON comment_object_type object_name IS string
-    | COMMENT if_exists? ON COLUMN column_name IS string
-    ;
-
-comment_object_type
-    : TABLE
+    : COMMENT if_exists? ON object_type_name object_name IS string
+    | COMMENT if_exists? ON COLUMN full_column_name IS string
     ;
 
 commit
@@ -1442,7 +1438,7 @@ create_api_integration
 create_object_clone
     : CREATE or_replace? ( DATABASE | SCHEMA | TABLE ) if_not_exists? id_
         CLONE object_name
-              ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+              ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     | CREATE or_replace? ( STAGE | FILE FORMAT | SEQUENCE | STREAM | TASK ) if_not_exists? object_name
         CLONE object_name
     ;
@@ -1462,11 +1458,11 @@ create_database
     ;
 
 clone_at_before
-    : CLONE id_ ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+    : CLONE id_ ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     ;
 
 at_before1
-    : AT | BEFORE
+    : AT_KEYWORD | BEFORE
     ;
 
 header_decl
@@ -1615,7 +1611,7 @@ create_masking_policy
     ;
 
 tag_decl
-    : id_ EQ string
+    : object_name EQ string
     ;
 
 column_list_in_parentheses
@@ -2121,7 +2117,7 @@ show_initial_rows
     ;
 
 stream_time
-    : at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) ')'
+    : at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) RR_BRACKET
     ;
 
 create_stream
@@ -2213,15 +2209,18 @@ out_of_line_constraint
         constraint_properties?
     ;
 
+
 full_col_decl
     : col_decl
-        collate?
-        (COMMENT string)?
-        default_value?
-        not_null?
+        (
+            collate
+            | inline_constraint
+            | default_value
+            | not_null
+        )*
         with_masking_policy?
         with_tags?
-        inline_constraint?
+        (COMMENT string)?
     ;
 
 column_decl_item
@@ -3684,7 +3683,7 @@ measures
     ;
 
 match_opts
-    : SHOW EMPTY MATCHES | OMIT EMPTY MATCHES | WITH UNMATCHED ROWS
+    : SHOW EMPTY_ MATCHES | OMIT EMPTY_ MATCHES | WITH UNMATCHED ROWS
     ;
 
 row_match
