@@ -35,7 +35,7 @@ create table t(i int, constraint c unique (i));
 create tag t comment ='1';
 create task t as call sp1();
 create user u;
-create view v as select 1 as c;
 create warehouse w;
 create database public;
 create or replace stream str_test2 on table test_str at (STREAM => 'STR_TEST2');
+create schema raw;
