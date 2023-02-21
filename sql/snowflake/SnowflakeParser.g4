@@ -2401,7 +2401,7 @@ create_view
         with_tags?
         copy_grants?
         comment_clause?
-        AS select_statement
+        AS query_statement
     ;
 
 create_warehouse
