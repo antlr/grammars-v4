@@ -12,12 +12,13 @@ function Get-GrammarSkip {
     )
     Write-Host "Target $Target Grammar $Grammar"
     if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
+        Write-Host "$Grammar/desc.xml does not exist."
         Write-Host "skip"
         return $True
     }
     $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
     if ("$lines" -eq "") {
-        Write-Host "skip"
+        Write-Host "Skipping $Grammar because target $Target does not work for it."
         return $True
     }
     return $False
@@ -171,22 +172,14 @@ function Get-GitChangedDirectories {
     if ($diff -is "string") {
         $diff = @($diff)
     }
-    $treatAsRootDir = @(".github/", "_scripts/")
-    foreach ($item in $diff) {
-        foreach ($j in $treatAsRootDir) {
-            if ($item.StartsWith($j)) {
-                $diff += "README.md"
-                break;
-            }
-        }
-    }
 
     $dirs = @()
     foreach ($item in $diff) {
         $dirs += Join-Path "." $item
     }
-    
-    return $dirs | Split-Path | Get-Unique
+
+    $newdirs = $dirs | Split-Path | Get-Unique
+    return $newdirs
 }
 
 function Get-ChangedGrammars {
@@ -194,15 +187,37 @@ function Get-ChangedGrammars {
         $PreviousCommit,
         $CurrentCommit = "HEAD"
     )
+    $prefix = Get-Location
     $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
     $grammars = Get-Grammars | Resolve-Path -Relative
     $changed = @()
-    foreach ($g in $grammars) {
-        foreach ($d in $diff) {
-            if ($d.StartsWith($g) -or $g.StartsWith($d)) {
-                $changed += $g
-            } 
+    foreach ($d in $diff) {
+        $old = Get-Location
+        Set-Location $d
+        while ($True) {
+            if (Test-Path -Path "desc.xml" -PathType Leaf) {
+                break
+            }
+            $cwd = Get-Location
+            if ("$cwd" -eq "$prefix") {
+                break
+            }
+            $newloc = Get-Location | Split-Path
+            Set-Location "$newloc"
         }
+        # g=${g##*$prefix/} not needed.
+        if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
+            Set-Location "$old"
+            continue
+        }
+        $g = Get-Location
+        Set-Location "$old"
+        $pattern = "$prefix" -replace "\\","/"
+        $g = $g -replace "\\","/"
+        $g = $g -replace "$pattern/",""
+        $g = "./" + $g
+        Write-Host "Adding diff $g"
+        $changed += $g
     }
     return $changed | Get-Unique
 }
@@ -238,10 +253,15 @@ function Test-AllGrammars {
         $Antlrjar = "/tmp/antlr4-complete.jar"
     )
     
+Write-Host "target = $target"
+Write-Host "previouscommit = $PreviousCommit"
+Write-Host "CurrentCommit = $CurrentCommit"
+
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
-    
+
     Write-Host "Grammars to be tested with $Target target:"
     Write-Host "$grammars"
+
     # Try adding to path for Ubuntu.
     # Write-Host "PATH is $env:PATH"
     # $env:PATH += ":/home/runner/.dotnet/tools"
