@@ -338,7 +338,7 @@ annotation
 annotationName : qualifiedName ;
 
 elementValuePairs
-    :   elementValuePair (',' elementValuePair)*
+    :   elementValuePair (','? elementValuePair)*
     ;
 
 elementValuePair
@@ -518,7 +518,7 @@ expression
     :   primary
     |   expression '.' GET '(' expressionList? ')'
     |   expression '.' SET '(' expressionList? ')'
-    |   expression '.' Identifier
+    |   expression '?'? '.' Identifier
     |   expression '.' THIS
     |   expression '.' NEW
     |   expression '.'

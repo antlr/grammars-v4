@@ -18,3 +18,6 @@ let templateStringWithEscapes = `\\ \` \n \$`;
 // https://github.com/antlr/grammars-v4/issues/2978
 let templateStringWithEscapedLineBreak = `\
 `;
+
+// https://github.com/antlr/grammars-v4/issues/3051
+let nestedBracesTest = `${[1, 2, 3].map(x => { return x * 2;}).join("")}`;
