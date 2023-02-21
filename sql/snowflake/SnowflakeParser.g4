@@ -226,12 +226,8 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON comment_object_type object_name IS string
-    | COMMENT if_exists? ON COLUMN column_name IS string
-    ;
-
-comment_object_type
-    : TABLE
+    : COMMENT if_exists? ON object_type_name object_name IS string
+    | COMMENT if_exists? ON COLUMN full_column_name IS string
     ;
 
 commit
