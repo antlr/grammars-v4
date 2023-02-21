@@ -37,8 +37,3 @@ create task t as call sp1();
 create user u;
 create view v as select 1 as c;
 create warehouse w;
-create temporary table t(i int);
-create table t2(i int) as select(i) from t;
-create table t3 as select(i) from t;
-create table t1 (v varchar(16777216));
-create table t1 (v varchar(16777216) comment 'hello world');

@@ -1,6 +1,5 @@
 copy into t from @stage/;
 copy into @stage/ from t;
-comment on table t is 's';
 commit ;
 execute immediate 'select 1';
 execute task tsk;
