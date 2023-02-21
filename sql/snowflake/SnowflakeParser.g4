@@ -1466,7 +1466,7 @@ clone_at_before
     ;
 
 at_before1
-    : AT_KEYWORD | BEFORE_KEYWORD
+    : AT_KEYWORD | BEFORE
     ;
 
 header_decl
@@ -3646,7 +3646,7 @@ at_before
         | STATEMENT ASSOC string
         | STREAM ASSOC string
       ) RR_BRACKET
-    | BEFORE_KEYWORD LR_BRACKET STATEMENT ASSOC string RR_BRACKET
+    | BEFORE LR_BRACKET STATEMENT ASSOC string RR_BRACKET
     ;
 
 end
