@@ -229,10 +229,10 @@ then
             do
                 if [ -f `pwd`/desc.xml ]
                 then
-                break
+                    break
                 elif [ `pwd` == "$prefix" ]
                 then
-                break
+                    break
                 fi
                 cd ..
             done
@@ -267,30 +267,9 @@ then
     exit 1
 fi
 
-if [ "${#grammars[@]}" -eq 0 ]
-then
-    grammars=( "." )
-fi
-new_grammars=()
-for d in ${grammars[@]}
-do
-    if [ ! -d "$prefix/$d" ]
-    then
-        continue
-    fi
-    desc=`find "$prefix/$d" -name desc.xml`
-    for i in $desc
-    do
-        if [ "$i" == "desc.xml" ]; then i='.'; fi
-        directory=${i%/*}
-        pushd $directory > /dev/null
-        directory=${directory##*$prefix/}
-        testname=$directory
-        new_grammars+=( "$testname" )
-        popd > /dev/null
-    done
-done
-grammars=("${new_grammars[@]}")
+echo "Number of grammars before sorting and making unique: ${#grammars[@]}"
+grammars=($(echo "${grammars[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+echo "Number of grammars after sorting and making unique: ${#grammars[@]}"
 
 if [ "${#grammars[@]}" -eq 0 ]
 then

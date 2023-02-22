@@ -226,12 +226,8 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON comment_object_type object_name IS string
-    | COMMENT if_exists? ON COLUMN column_name IS string
-    ;
-
-comment_object_type
-    : TABLE
+    : COMMENT if_exists? ON object_type_name object_name IS string
+    | COMMENT if_exists? ON COLUMN full_column_name IS string
     ;
 
 commit
@@ -384,7 +380,21 @@ object_privilege
     ;
 
 grant_role
-    : GRANT ROLE id_ TO ( ROLE id_ | USER id_ )?
+    : GRANT ROLE role_name TO (ROLE role_name | USER id_)
+    ;
+
+role_name
+    : system_defined_role
+    | id_
+    ;
+
+system_defined_role
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 list
@@ -440,7 +450,7 @@ revoke_from_share
     ;
 
 revoke_role
-    : REVOKE ROLE id_ FROM ( ROLE id_ | USER id_ )
+    : REVOKE ROLE role_name FROM (ROLE role_name | USER id_)
     ;
 
 rollback
@@ -1615,7 +1625,7 @@ create_masking_policy
     ;
 
 tag_decl
-    : id_ EQ string
+    : object_name EQ string
     ;
 
 column_list_in_parentheses
@@ -2213,15 +2223,18 @@ out_of_line_constraint
         constraint_properties?
     ;
 
+
 full_col_decl
     : col_decl
-        collate?
-        (COMMENT string)?
-        default_value?
-        not_null?
+        (
+            collate
+            | inline_constraint
+            | default_value
+            | not_null
+        )*
         with_masking_policy?
         with_tags?
-        inline_constraint?
+        (COMMENT string)?
     ;
 
 column_decl_item
@@ -3230,6 +3243,7 @@ id_
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | non_reserved_words
     | data_type
     | builtin_function
     ;
@@ -3248,6 +3262,15 @@ keyword
     | AT_KEYWORD
     | TIMESTAMP
     // etc
+    ;
+
+non_reserved_words
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 builtin_function
@@ -3684,7 +3707,7 @@ measures
     ;
 
 match_opts
-    : SHOW EMPTY MATCHES | OMIT EMPTY MATCHES | WITH UNMATCHED ROWS
+    : SHOW EMPTY_ MATCHES | OMIT EMPTY_ MATCHES | WITH UNMATCHED ROWS
     ;
 
 row_match
