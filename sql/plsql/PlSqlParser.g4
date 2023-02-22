@@ -36,6 +36,7 @@ sql_script
 unit_statement
     : transaction_control_statements
     | alter_analytic_view
+    | alter_attribute_dimension
     | alter_cluster
     | alter_database
     | alter_function
@@ -69,6 +70,7 @@ unit_statement
     | create_package_body
 
     | create_analytic_view
+    | create_attribute_dimension
     | create_index
     | create_library
     | create_table
@@ -90,6 +92,7 @@ unit_statement
     | create_synonym
 
     | drop_analytic_view
+    | drop_attribute_dimension
     | drop_cluster
     | drop_function
     | drop_library
@@ -622,7 +625,7 @@ sequence_start_clause
 create_analytic_view
     : CREATE (OR REPLACE)? (NOFORCE | FORCE)? ANALYTIC VIEW av=id_expression
         (SHARING '=' (METADATA | NONE))?
-        //classification_clause*
+        classification_clause*
         cav_using_clause?
         dim_by_clause?
         measures_clause?
@@ -634,7 +637,19 @@ create_analytic_view
     ;
 
 classification_clause
-    : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    : caption_clause description_clause? classification_item*
+    | caption_clause? description_clause classification_item*
+    | caption_clause? description_clause? classification_item+
+    ;
+
+caption_clause
+    : CAPTION c=quoted_string
+    ;
+
+description_clause
+    : DESCRIPTION d=quoted_string
     ;
 
 classification_item
@@ -655,7 +670,7 @@ dim_by_clause
     ;
 
 dim_key
-    : dim_ref //classification_clause*
+    : dim_ref classification_clause*
         KEY ( '(' (a=id_expression '.')? f=column_name (',' (a=id_expression '.')? f=column_name)* ')'
             |  (a=id_expression '.')? f=column_name
             )
@@ -726,6 +741,79 @@ fact_columns_clause
 
 qry_transform_clause
     : ENABLE QUERY TRANSFORM (RELY | NORELY)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-ATTRIBUTE-DIMENSION.html
+create_attribute_dimension
+    : CREATE (OR REPLACE)? (NOFORCE | FORCE)? ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        classification_clause*
+        (DIMENSION TYPE (STANDARD | TIME))?
+        ad_using_clause
+        attributes_clause
+        ad_level_clause+
+        all_clause?
+    ;
+
+ad_using_clause
+    : USING source_clause (',' source_clause)* join_path_clause*
+    ;
+
+source_clause
+    : (schema_name '.')? ftov=id_expression REMOTE? (AS? a=id_expression)?
+    ;
+
+join_path_clause
+    : JOIN PATH jpn=id_expression ON join_condition
+    ;
+
+join_condition
+    : join_condition_item (AND join_condition_item)*
+    ;
+
+join_condition_item
+    : (a=id_expression '.')? column_name '=' (b=id_expression '.')? column_name
+    ;
+
+attributes_clause
+    : ATTRIBUTES '(' ad_attributes_clause (',' ad_attributes_clause)* ')'
+    ;
+
+ad_attributes_clause
+    : (a=id_expression '.')? column_name (AS? an=id_expression)?
+        classification_clause*
+    ;
+
+ad_level_clause
+    : LEVEL l=id_expression (NOT NULL_ | SKIP_ WHEN NULL_)?
+        (LEVEL TYPE (STANDARD | YEARS | HALF_YEARS | QUARTERS | MONTHS | WEEKS | DAYS | HOURS | MINUTES | SECONDS))?
+        classification_clause* //inconsistent documentation - LEVEL TYPE goes after the classification_clause rule
+        key_clause
+        alternate_key_clause?
+        (MEMBER NAME expression)?
+        (MEMBER CAPTION expression)?
+        (MEMBER DESCRIPTION expression)?
+        (ORDER BY (MIN | MAX)? dim_order_clause (',' (MIN | MAX)? dim_order_clause)*)?
+        (DETERMINES '(' id_expression (',' id_expression)* ')')?
+    ;
+
+key_clause
+    : KEY (a=id_expression | '(' id_expression (',' id_expression)* ')')
+    ;
+
+alternate_key_clause
+    : ALTERNATE key_clause
+    ;
+
+dim_order_clause
+    : a=id_expression (ASC | DESC)? (NULLS (FIRST | LAST))?
+    ;
+
+all_clause
+    : ALL MEMBER ( NAME expression (MEMBER CAPTION expression)?
+                 | CAPTION expression (MEMBER DESCRIPTION expression)?
+                 | DESCRIPTION expression
+                 )
     ;
 
 create_index
@@ -2728,6 +2816,12 @@ alter_drop_cache_clause
         LEVELS '(' levels_item (',' levels_item)* ')'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-ATTRIBUTE-DIMENSION.html
+alter_attribute_dimension
+    : ALTER ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+        (RENAME TO nad=id_expression | COMPILE)
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -2742,6 +2836,11 @@ alter_cluster
 
 drop_analytic_view
     : DROP ANALYTIC VIEW (schema_name '.')? av=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-ATTRIBUTE-DIMENSION.html
+drop_attribute_dimension
+    : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
     ;
 
 drop_cluster
@@ -5457,6 +5556,7 @@ non_reserved_keywords_in_12c
     | ADAPTIVE_PLAN
     | ADVANCED
     | AFD_DISKSTRING
+    | ALTERNATE
     | ANALYTIC
     | ANCESTOR
     | ANOMALY
@@ -5558,7 +5658,9 @@ non_reserved_keywords_in_12c
     | FORMAT
     | GATHER_OPTIMIZER_STATISTICS
     | GET
+    | HALF_YEARS
     | HASHING
+    | HOURS
     | IDLE
     | ILM
     | IMMUTABLE
@@ -5601,6 +5703,7 @@ non_reserved_keywords_in_12c
     | MEMCOMPRESS
     | METADATA
     | MEMOPTIMIZE
+    | MINUTES
     | MODEL_NB
     | MODEL_SV
     | MODIFICATION
@@ -5691,6 +5794,7 @@ non_reserved_keywords_in_12c
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
+    | QUARTERS
     | REALM
     | REDEFINE
     | RELOCATE
@@ -5702,6 +5806,7 @@ non_reserved_keywords_in_12c
     | SAVE
     | SCRUB
     | SDO_GEOM_MBR
+    | SECONDS
     | SECRET
     | SERIAL
     | SERVICES
@@ -5712,6 +5817,7 @@ non_reserved_keywords_in_12c
     | SOURCE_FILE_DIRECTORY
     | SOURCE_FILE_NAME_CONVERT
     | SQL_TRANSLATION_PROFILE
+    | STANDARD
     | STANDARD_HASH
     | STANDBYS
     | STATE
