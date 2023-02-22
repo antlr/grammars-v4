@@ -32,11 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar chip8octo;
 
 file_
-   : (instruction | label | num)* EOF
-   ;
-
-label
-   : ':' IDENTIFIER
+   : (instruction | num)* EOF
    ;
 
 instruction
@@ -45,14 +41,61 @@ instruction
    | loop_
    | sprite_
    | addeq_
+   | subeq_
+   | if_
+   | end_
+   | label_
+   | load_
+   | unpack_
+   | save_
+   | labelnane_
+   | alias_
+   | const_
+   | oreq_
+   | xoreq_
+   | andeq_
+   | shleq_
+   | shreq_
+   ;
+
+const_
+   : ':' IDENTIFIER num
+   ;
+
+alias_
+   : ':' aliasname_ (IDENTIFER | num | REGISTER)
+   ;
+
+aliasname_
+   : IDENTIFER
+   ;
+
+label_
+   : ':' labelnane_
+   ;
+
+labelnane_
+   : IDENTIFIER
+   ;
+
+unpack_
+   : ':' 'unpack' (REGISTER | I | DELAY | BUZZER | num | IDENTIFIER) (REGISTER | I | DELAY | BUZZER | num | IDENTIFIER)
+   ;
+
+save_
+   : 'save' atom
    ;
 
 clear_
    : 'clear'
    ;
 
+end_
+   : ';'
+   ;
+
 assign_
-   : REGISTER ':=' num
+   : (REGISTER | I | DELAY | BUZZER) ':=' (num | IDENTIFIER | REGISTER | DELAY | BUZZER)
    ;
 
 loop_
@@ -64,17 +107,70 @@ sprite_
    ;
 
 addeq_
-   : (REGISTER | I) '+=' atom
+   : atom '+=' atom
+   ;
+
+subeq_
+   : atom '-=' atom
+   ;
+
+oreq_
+   : atom '|=' atom
+   ;
+
+andeq_
+   : atom '&=' atom
+   ;
+
+xoreq_
+   : atom '^=' atom
+   ;
+
+shleq_
+   : atom '<<=' atom
+   ;
+
+shreq_
+   : atom '>>=' atom
+   ;
+
+if_
+   : 'if' condition_ 'then' instruction?
+   ;
+
+condition_
+   : atom COMPARATOR atom
+   ;
+
+load_
+   : 'load' REGISTER
    ;
 
 atom
    : num
    | REGISTER
+   | I
+   | DELAY
+   | BUZZER
+   | aliasname_
    ;
 
 num
    : DECIMAL
    | HEXBYTE
+   ;
+
+COMPARATOR
+   : '=='
+   | '!='
+   ;
+
+DELAY
+   : 'delay'
+   ;
+
+BUZZER
+   : 'buzzer'
    ;
 
 REGISTER
@@ -86,15 +182,15 @@ I
    ;
 
 DECIMAL
-   : [0-9]+
+   : ('-')? [0-9]+
    ;
 
 HEXBYTE
-   : '0x' [0-9A-F] [0-9A-F]
+   : '0x' [0-9A-F] [0-9A-F]?
    ;
 
 IDENTIFIER
-   : [a-zA-Z-]+
+   : [a-zA-Z-_]+
    ;
 
 COMMENT
