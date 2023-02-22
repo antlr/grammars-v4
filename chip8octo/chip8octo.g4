@@ -59,7 +59,11 @@ instruction
    ;
 
 const_
-   : ':' IDENTIFIER num
+   : ':' constname_ num
+   ;
+
+constname_
+   : IDENTIFIER
    ;
 
 alias_
@@ -79,7 +83,7 @@ labelnane_
    ;
 
 unpack_
-   : ':' 'unpack' (REGISTER | I | DELAY | BUZZER | num | IDENTIFIER) (REGISTER | I | DELAY | BUZZER | num | IDENTIFIER)
+   : ':' 'unpack' (register_ | num | IDENTIFIER) (register_ | num | IDENTIFIER)
    ;
 
 save_
@@ -95,7 +99,7 @@ end_
    ;
 
 assign_
-   : (REGISTER | I | DELAY | BUZZER) ':=' (num | IDENTIFIER | REGISTER | DELAY | BUZZER)
+   : register_ ':=' atom
    ;
 
 loop_
@@ -143,16 +147,22 @@ condition_
    ;
 
 load_
-   : 'load' REGISTER
+   : 'load' register_
    ;
 
 atom
    : num
-   | REGISTER
+   | register_
+   | aliasname_
+   | labelnane_
+   | constname_
+   ;
+
+register_
+   : REGISTER
    | I
    | DELAY
    | BUZZER
-   | aliasname_
    ;
 
 num
@@ -190,7 +200,7 @@ HEXBYTE
    ;
 
 IDENTIFIER
-   : [a-zA-Z-_]+
+   : [a-zA-Z] [a-zA-Z0-9-_?]*
    ;
 
 COMMENT
