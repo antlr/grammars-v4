@@ -380,7 +380,21 @@ object_privilege
     ;
 
 grant_role
-    : GRANT ROLE id_ TO ( ROLE id_ | USER id_ )?
+    : GRANT ROLE role_name TO (ROLE role_name | USER id_)
+    ;
+
+role_name
+    : system_defined_role
+    | id_
+    ;
+
+system_defined_role
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 list
@@ -436,7 +450,7 @@ revoke_from_share
     ;
 
 revoke_role
-    : REVOKE ROLE id_ FROM ( ROLE id_ | USER id_ )
+    : REVOKE ROLE role_name FROM (ROLE role_name | USER id_)
     ;
 
 rollback
@@ -3229,6 +3243,7 @@ id_
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | non_reserved_words
     | data_type
     | builtin_function
     ;
@@ -3247,6 +3262,15 @@ keyword
     | AT_KEYWORD
     | TIMESTAMP
     // etc
+    ;
+
+non_reserved_words
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 builtin_function
