@@ -2489,12 +2489,12 @@ auto_option
     ;
 
 change_tracking_option
-    : CHANGE_TRACKING  EQUAL ( OFF | ON (change_tracking_option_list (',' change_tracking_option_list)*)*  )
+    : CHANGE_TRACKING  EQUAL ( OFF | ON '(' (change_tracking_option_list (',' change_tracking_option_list)*)* ')' )
     ;
 
 change_tracking_option_list
     : AUTO_CLEANUP EQUAL on_off
-    | CHANGE_RETENTION EQUAL ( DAYS | HOURS | MINUTES )
+    | CHANGE_RETENTION EQUAL DECIMAL ( DAYS | HOURS | MINUTES )
     ;
 
 containment_option
