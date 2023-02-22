@@ -29,45 +29,79 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar chip8octo;
 
-file_ : (instruction | label | num)* EOF;
+file_
+   : (instruction | label | num)* EOF
+   ;
 
-label: ':' IDENTIFIER;
+label
+   : ':' IDENTIFIER
+   ;
 
-instruction: clear_|assign_ |loop_|sprite_|addeq_;
+instruction
+   : clear_
+   | assign_
+   | loop_
+   | sprite_
+   | addeq_
+   ;
 
-clear_ : 'clear';
+clear_
+   : 'clear'
+   ;
 
-assign_: REGISTER ':=' num;
+assign_
+   : REGISTER ':=' num
+   ;
 
-loop_: 'loop' instruction* 'again';
+loop_
+   : 'loop' instruction* 'again'
+   ;
 
-sprite_: 'sprite' atom atom atom;
+sprite_
+   : 'sprite' atom atom atom
+   ;
 
-addeq_: REGISTER|I '+=' atom;
+addeq_
+   : (REGISTER | I) '+=' atom
+   ;
 
-atom: num|REGISTER;
+atom
+   : num
+   | REGISTER
+   ;
 
-num: DECIMAL|HEXBYTE;
+num
+   : DECIMAL
+   | HEXBYTE
+   ;
 
-REGISTER: ('v'|'V') [0-9A-F];
+REGISTER
+   : ('v' | 'V') [0-9A-F]
+   ;
 
-I: 'i';
+I
+   : 'i'
+   ;
 
-DECIMAL: [0-9]+;
+DECIMAL
+   : [0-9]+
+   ;
 
-HEXBYTE: '0x'[0-9A-F][0-9A-F];
+HEXBYTE
+   : '0x' [0-9A-F] [0-9A-F]
+   ;
 
-
-
- IDENTIFIER: [a-zA-Z-]+;
+IDENTIFIER
+   : [a-zA-Z-]+
+   ;
 
 COMMENT
-    :   '#' ~[\r\n]* -> skip
-    ;
+   : '#' ~ [\r\n]* -> skip
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
