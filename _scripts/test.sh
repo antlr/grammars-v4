@@ -195,7 +195,7 @@ then
             directories=`git diff --name-only . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
             for g in $directories
             do
-                pushd $g
+                pushd $g > /dev/null
                 while true
                 do
                     if [ -f `pwd`/desc.xml ]
@@ -209,12 +209,12 @@ then
                 done
                 g=`pwd`
                 g=${g##*$prefix}
-        g=${g#^/##}
-        if [ "$g" == "" ]
-        then
-            g="."
-        fi
-                popd
+                g=${g##/}
+                if [ "$g" == "" ]
+                then
+                    g="."
+                fi
+                popd > /dev/null
                 echo Adding diff $g
                 grammars+=( $g )
             done
@@ -227,7 +227,7 @@ then
         directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
-            pushd $g
+            pushd $g > /dev/null
             while true
             do
                 if [ -f `pwd`/desc.xml ]
@@ -241,12 +241,12 @@ then
             done
             g=`pwd`
             g=${g##*$prefix}
-            g=${g#^/##}
+            g=${g##/}
             if [ "$g" == "" ]
             then
                 g="."
             fi
-            popd
+            popd > /dev/null
             echo Adding diff $g
             grammars+=( $g )
         done
@@ -349,7 +349,7 @@ do
 
     if [ "$yes" == "false" ]
     then
-        echo "Intentionally skipping grammar $test target $target."
+        echo "Intentionally skipping grammar $testname target $target."
         popd > /dev/null
         continue
     fi
