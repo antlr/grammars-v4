@@ -90,6 +90,7 @@
 				<module>bcl</module>
 				<module>bcpl</module>
 				<module>bdf</module>
+				<module>bencoding</module>
 				<module>bibcode</module>
 				<module>bicep</module>
 				<module>bnf</module>
