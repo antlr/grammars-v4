@@ -68,7 +68,7 @@ dmlStatement
     : selectStatement | insertStatement | updateStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
-    | handlerStatement | valuesStatement
+    | handlerStatement | valuesStatement | withStatement
     ;
 
 transactionStatement
@@ -2023,6 +2023,10 @@ signalConditionInformation
           | CURSOR_NAME
         ) '=' ( stringLiteral | DECIMAL_LITERAL | mysqlVariable | simpleId )
     ;
+
+withStatement
+  : 'WITH' commonTableExpressions (',' commonTableExpressions)*
+  ;
 
 diagnosticsStatement
     : GET ( CURRENT | STACKED )? DIAGNOSTICS (
