@@ -75,7 +75,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
         echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
         If(!(test-path -PathType container /tmp)) {
@@ -175,7 +175,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
         echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
         If(!(test-path -PathType container /tmp)) {
