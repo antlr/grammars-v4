@@ -196,7 +196,6 @@ then
             for g in $directories
             do
                 pushd $g
-                echo here
                 while true
                 do
                     if [ -f `pwd`/desc.xml ]
@@ -209,15 +208,12 @@ then
                     cd ..
                 done
                 g=`pwd`
-echo "g1 $g"
-echo "prefix $prefix"
                 g=${g##*$prefix}
-		g=${g#^/##}
-		if [ "$g" == "" ]
-		then
-		    g="."
-		fi
-echo "g2 $g"
+        g=${g#^/##}
+        if [ "$g" == "" ]
+        then
+            g="."
+        fi
                 popd
                 echo Adding diff $g
                 grammars+=( $g )
@@ -232,7 +228,6 @@ echo "g2 $g"
         for g in $directories
         do
             pushd $g
-            echo here
             while true
             do
                 if [ -f `pwd`/desc.xml ]
@@ -245,7 +240,12 @@ echo "g2 $g"
                 cd ..
             done
             g=`pwd`
-            g=${g##*$prefix/}
+            g=${g##*$prefix}
+            g=${g#^/##}
+            if [ "$g" == "" ]
+            then
+                g="."
+            fi
             popd
             echo Adding diff $g
             grammars+=( $g )
@@ -318,7 +318,6 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=${all[0]}
     target=${all[1]}
-echo "pushd $prefix/$testname"
     pushd "$prefix/$testname" > /dev/null
 
     echo ""
