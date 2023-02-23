@@ -14,7 +14,6 @@ create materialized view mv as select 1 as c;
 create network policy np allowed_ip_list = ();
 create notification integration ni enabled = true type = queue notification_provider = gcp_pubsub gcp_pubsub_subscription_name = 's';
 create pipe p1 as copy into t from @stg/;
-create procedure p() returns int language sql as ' ';
 create replication group rg object_types = databases allowed_accounts = o.a;
 create resource monitor rm  with  credit_quota = 1;
 create role r;
