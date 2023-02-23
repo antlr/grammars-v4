@@ -3167,14 +3167,21 @@ link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
-    : CREATE SHARED? PUBLIC? DATABASE LINK link_name ( CONNECT TO ( CURRENT_USER
-                                                                  | user_object_name IDENTIFIED BY password_value link_authentication?)
-                                                     | link_authentication)* (USING identifier)?
+    : CREATE SHARED? PUBLIC? DATABASE LINK dblink ( CONNECT TO ( CURRENT_USER
+                                                                  | user_object_name IDENTIFIED BY password_value link_authentication?
+                                                                  )
+                                                     | link_authentication
+                                                     )* (USING CHAR_STRING)?
+    ;
+
+dblink
+    : database_name ('.' d=id_expression)* ('@' cq=id_expression)?
     ;
 
 drop_database_link
-    : DROP PUBLIC? DATABASE LINK link_name
+    : DROP PUBLIC? DATABASE LINK dblink
     ;
 
 alter_role
