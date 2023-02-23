@@ -18,7 +18,7 @@ function Get-GrammarSkip {
     }
     $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
     if ("$lines" -eq "") {
-        Write-Host "Skipping $Grammar because target $Target does not work for it."
+        Write-Host "Intentionally skipping $Grammar because target $Target does not exist."
         return $True
     }
     return $False

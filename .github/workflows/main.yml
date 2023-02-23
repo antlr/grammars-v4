@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
+        language: [ Java, JavaScript, Go, Python3, Dart, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -91,7 +91,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.0; done
     - name: Test
       shell: pwsh
       run: |
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
+        language: [ Java, JavaScript, Go, Python3, Dart, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -185,7 +185,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.0; done
     - name: Test
       shell: bash
       run: |
