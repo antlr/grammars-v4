@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [ Java, JavaScript, Go, Python3, Dart, TypeScript ]
+        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-        language: [ Java, JavaScript, Go, Python3, Dart, TypeScript ]
+        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3

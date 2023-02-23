@@ -209,7 +209,15 @@ then
                     cd ..
                 done
                 g=`pwd`
-                g=${g##*$prefix/}
+echo "g1 $g"
+echo "prefix $prefix"
+                g=${g##*$prefix}
+		g=${g#^/##}
+		if [ "$g" == "" ]
+		then
+		    g="."
+		fi
+echo "g2 $g"
                 popd
                 echo Adding diff $g
                 grammars+=( $g )
@@ -310,6 +318,7 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=${all[0]}
     target=${all[1]}
+echo "pushd $prefix/$testname"
     pushd "$prefix/$testname" > /dev/null
 
     echo ""
