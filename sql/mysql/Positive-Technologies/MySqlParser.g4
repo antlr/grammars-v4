@@ -2025,7 +2025,7 @@ signalConditionInformation
     ;
 
 withStatement
-  : 'WITH' commonTableExpressions (',' commonTableExpressions)*
+  : WITH commonTableExpressions (',' commonTableExpressions)*
   ;
 
 diagnosticsStatement
