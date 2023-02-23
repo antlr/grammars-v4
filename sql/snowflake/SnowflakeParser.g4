@@ -1721,6 +1721,14 @@ create_procedure
         comment_clause?
         executa_as?
         AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET ( arg_decl (COMMA arg_decl)* )? RR_BRACKET
+        RETURNS data_type ( NOT NULL_ )?
+        LANGUAGE JAVASCRIPT
+        ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+        ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
+        comment_clause?
+        executa_as?
+        AS procedure_definition
     ;
 
 create_replication_group
