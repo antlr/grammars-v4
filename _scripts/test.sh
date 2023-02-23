@@ -289,7 +289,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 )
+    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
@@ -349,7 +349,7 @@ do
 
     if [ "$yes" == "false" ]
     then
-        echo "Intentionally skipping $test because target $target does not exist."
+        echo "Intentionally skipping grammar $test target $target."
         popd > /dev/null
         continue
     fi
