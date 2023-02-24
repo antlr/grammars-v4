@@ -63,7 +63,7 @@ preproc_
    ;
 
 const_
-   : COLON 'const' constname_ num_
+   : COLON CONST constname_ num_
    ;
 
 constname_
@@ -71,11 +71,15 @@ constname_
    ;
 
 alias_
-   : COLON 'alias' aliasname_ (IDENTIFER | num_ | register_)
+   : COLON ALIAS aliasname_ aliastarget_
    ;
 
 aliasname_
    : IDENTIFER
+   ;
+
+aliastarget_
+   : (IDENTIFER | num_ | register_)
    ;
 
 label_
@@ -87,7 +91,7 @@ labelnane_
    ;
 
 unpack_
-   : COLON 'unpack' (register_ | num_ | IDENTIFIER) (register_ | num_ | IDENTIFIER)
+   : COLON UNPACK (register_ | num_ | IDENTIFIER) (register_ | num_ | IDENTIFIER)
    ;
 
 save_
@@ -172,6 +176,18 @@ register_
 num_
    : DECIMAL
    | HEXBYTE
+   ;
+
+ALIAS
+   : 'alias'
+   ;
+
+CONST
+   : 'const'
+   ;
+
+UNPACK
+   : 'unpack'
    ;
 
 COLON
