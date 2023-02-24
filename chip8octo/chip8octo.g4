@@ -150,15 +150,15 @@ shreq_
    ;
 
 if_
-   : 'if' condition_ 'then' instruction_?
+   : 'if' (condition_ | keycondition_) 'then' instruction_?
    ;
 
 if2_
-   : 'if' condition_ 'begin' instruction_* ('else' instruction_*)? 'end'
+   : 'if' (condition_ | keycondition_) 'begin' instruction_* ('else' instruction_*)? 'end'
    ;
 
 while_
-   : 'while' condition_ instruction_?
+   : 'while' (condition_ | keycondition_) instruction_?
    ;
 
 bcd_
@@ -167,6 +167,10 @@ bcd_
 
 condition_
    : atom COMPARATOR atom
+   ;
+
+keycondition_
+   : register_ '-'? KEY
    ;
 
 load_
@@ -191,6 +195,7 @@ register_
    | I
    | DELAY
    | BUZZER
+   | KEY
    ;
 
 num_
@@ -234,6 +239,10 @@ DELAY
 
 BUZZER
    : 'buzzer'
+   ;
+
+KEY
+   : 'key'
    ;
 
 REGISTER
