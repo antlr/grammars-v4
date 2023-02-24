@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
+        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v3.0.3
       with:
-        dotnet-version: '6.0.102'
+        dotnet-version: '7.0.x'
     - name: Do not trust Dotnet env
       run: |
         dotnet --version
@@ -75,7 +75,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
         echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
         If(!(test-path -PathType container /tmp)) {
@@ -91,7 +91,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.0; done
     - name: Test
       shell: pwsh
       run: |
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
+        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -121,7 +121,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v3.0.3
       with:
-        dotnet-version: '6.0.102'
+        dotnet-version: '7.0.x'
     - name: Do not trust Dotnet env
       run: |
         dotnet --version
@@ -175,7 +175,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
         echo "$antlrPath" | Write-Host
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
         If(!(test-path -PathType container /tmp)) {
@@ -185,7 +185,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.19.2; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.0; done
     - name: Test
       shell: bash
       run: |

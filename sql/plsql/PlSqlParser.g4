@@ -40,6 +40,7 @@ unit_statement
     | alter_cluster
     | alter_database
     | alter_database_link
+    | alter_flashback_archive
     | alter_function
     | alter_package
     | alter_procedure
@@ -75,6 +76,7 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_flashback_archive
     | create_index
     | create_library
     | create_table
@@ -97,6 +99,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_flashback_archive
     | drop_function
     | drop_library
     | drop_package
@@ -139,6 +142,18 @@ unit_statement
 
 drop_function
     : DROP FUNCTION function_name ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-FLASHBACK-ARCHIVE.html
+alter_flashback_archive
+    : ALTER FLASHBACK ARCHIVE fa=id_expression
+        ( SET DEFAULT
+        | (ADD | MODIFY) TABLESPACE ts=id_expression flashback_archive_quota?
+        | REMOVE TABLESPACE rts=id_expression
+        | MODIFY /*RETENTION*/ flashback_archive_retention // inconsistent documentation
+        | PURGE (ALL | BEFORE (SCN expression | TIMESTAMP expression))
+        | NO? OPTIMIZE DATA
+        )
     ;
 
 alter_function
@@ -851,6 +866,21 @@ character_set_clause
 file_specification
     : datafile_tempfile_spec
     | redo_log_file_spec
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-FLASHBACK-ARCHIVE.html
+create_flashback_archive
+    : CREATE FLASHBACK ARCHIVE DEFAULT? fa=id_expression TABLESPACE ts=id_expression
+        flashback_archive_quota?
+        (NO? OPTIMIZE DATA)?
+        flashback_archive_retention
+    ;
+
+flashback_archive_quota
+    : QUOTA UNSIGNED_INTEGER (M_LETTER | G_LETTER | T_LETTER | P_LETTER | E_LETTER)
+    ;
+
+flashback_archive_retention
+    : RETENTION UNSIGNED_INTEGER (YEAR | MONTH | DAY)
     ;
 
 create_index
@@ -2527,10 +2557,11 @@ datatype_null_enable
          (NOT NULL_)? (ENABLE | DISABLE)?
    ;
 
-//Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/size_clause.html
+// Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
 // but having issues with examples/numbers01.sql line 11 "sysdate -1m"
 size_clause
-    : UNSIGNED_INTEGER REGULAR_ID?
+    : UNSIGNED_INTEGER (K_LETTER | M_LETTER | G_LETTER | T_LETTER | P_LETTER | E_LETTER)?
     ;
 
 
@@ -2720,7 +2751,7 @@ row_movement_clause
     ;
 
 flashback_archive_clause
-    : FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+    : FLASHBACK ARCHIVE fa=id_expression?
     | NO FLASHBACK ARCHIVE
     ;
 
@@ -2877,6 +2908,11 @@ drop_analytic_view
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-ATTRIBUTE-DIMENSION.html
 drop_attribute_dimension
     : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-FLASHBACK-ARCHIVE.html
+drop_flashback_archive
+    : DROP FLASHBACK ARCHIVE fa=id_expression
     ;
 
 drop_cluster
@@ -5603,6 +5639,7 @@ regular_id
     | DELETE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
+    | E_LETTER
     | ERR
     | EXCEPTION
     | EXCEPTION_INIT
@@ -5611,17 +5648,21 @@ regular_id
     | EXIT
     | FLOAT
     | FORALL
+    | G_LETTER
     | INDICES
     | INOUT
     | INTEGER
+    | K_LETTER
     | LANGUAGE
     | LONG
     | LOOP
+    | M_LETTER
     | NUMBER
     | ORADATA
     | OSERROR
     | OUT
     | OVERRIDING
+    | P_LETTER
     | PARALLEL_ENABLE
     | PIPELINED
     | PLS_INTEGER
@@ -5644,6 +5685,7 @@ regular_id
     | SQLDATA
     | SQLERROR
     | SUBTYPE
+    | T_LETTER
     | TIMESTAMP_LTZ_UNCONSTRAINED
     | TIMESTAMP_TZ_UNCONSTRAINED
     | TIMESTAMP_UNCONSTRAINED

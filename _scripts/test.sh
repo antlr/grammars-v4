@@ -42,15 +42,15 @@ setupdeps()
     if [ $? != "0" ]
     then
         echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.19.0
-        dotnet tool install -g triconv --version 0.19.0
-        dotnet tool install -g trxml2 --version 0.19.0
-        dotnet tool install -g trwdog --version 0.19.0
+        dotnet tool install -g trgen --version 0.20.0
+        dotnet tool install -g triconv --version 0.20.0
+        dotnet tool install -g trxml2 --version 0.20.0
+        dotnet tool install -g trwdog --version 0.20.0
     case "${unameOut}" in
-        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
-        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o $antlr4jar ;;
+        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
+        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
+        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
+        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
         *)          echo 'unknown machine'
     esac
         echo "Done setting up."
@@ -195,8 +195,7 @@ then
             directories=`git diff --name-only . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
             for g in $directories
             do
-                pushd $g
-                echo here
+                pushd $g > /dev/null
                 while true
                 do
                     if [ -f `pwd`/desc.xml ]
@@ -209,8 +208,13 @@ then
                     cd ..
                 done
                 g=`pwd`
-                g=${g##*$prefix/}
-                popd
+                g=${g##*$prefix}
+                g=${g##/}
+                if [ "$g" == "" ]
+                then
+                    g="."
+                fi
+                popd > /dev/null
                 echo Adding diff $g
                 grammars+=( $g )
             done
@@ -223,8 +227,7 @@ then
         directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
-            pushd $g
-            echo here
+            pushd $g > /dev/null
             while true
             do
                 if [ -f `pwd`/desc.xml ]
@@ -237,8 +240,13 @@ then
                 cd ..
             done
             g=`pwd`
-            g=${g##*$prefix/}
-            popd
+            g=${g##*$prefix}
+            g=${g##/}
+            if [ "$g" == "" ]
+            then
+                g="."
+            fi
+            popd > /dev/null
             echo Adding diff $g
             grammars+=( $g )
         done
@@ -281,7 +289,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 )
+    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
@@ -311,6 +319,10 @@ do
     testname=${all[0]}
     target=${all[1]}
     pushd "$prefix/$testname" > /dev/null
+
+    echo ""
+    echo "$testname,$target:"
+
     if [ ! -f desc.xml ]
     then
         echo No desc.xml for $testname
@@ -318,6 +330,12 @@ do
         continue
     fi
     desc_targets=`trxml2 desc.xml | grep '/desc/targets'`
+    if [ "${PIPESTATUS[0]}" -ne 0 ]
+    then
+        echo "The desc.xml for $testname is malformed. Skipping."
+        popd > /dev/null
+        continue
+    fi
     desc_targets="${desc_targets##*=}"
     desc_targets=`echo "$desc_targets" | tr ',' ' ' | tr ';' ' '`
 
@@ -331,7 +349,7 @@ do
 
     if [ "$yes" == "false" ]
     then
-        echo Skipping $test because target $target does not work for it.
+        echo "Intentionally skipping grammar $testname target $target."
         popd > /dev/null
         continue
     fi
@@ -349,7 +367,6 @@ do
     fi
 
     # Generate driver source code.
-    echo -n "$testname,$target:"
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
     bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
@@ -378,7 +395,7 @@ do
         popd > /dev/null
         continue
     else
-        echo -n " $length"
+        echo "$length"
     fi
 
     # Test generated parser on examples.
@@ -389,7 +406,7 @@ do
     date2=$(date +"%s")
     DIFF=$(($date2-$date1))
     length=" Test "`thetime $DIFF`
-    echo -n " $length"
+    echo "$length"
     if [ "$status" != "0" ]
     then
         echo ""
