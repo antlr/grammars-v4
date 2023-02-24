@@ -1840,7 +1840,7 @@ tempfile_specification
     ;
 
 datafile_tempfile_spec
-    : (CHAR_STRING)? (SIZE size_clause)? REUSE? autoextend_clause?
+    : CHAR_STRING? (SIZE size_clause)? REUSE? autoextend_clause?
     ;
 
 redo_log_file_spec
