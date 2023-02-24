@@ -72,6 +72,7 @@ unit_statement
 
     | create_analytic_view
     | create_attribute_dimension
+    | create_edition
     | create_index
     | create_library
     | create_table
@@ -96,6 +97,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_edition
     | drop_function
     | drop_library
     | drop_package
@@ -585,6 +587,7 @@ alter_sequence
     : ALTER SEQUENCE sequence_name sequence_spec+ ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-SESSION.html
 alter_session
     : ALTER SESSION (
         ADVISE ( COMMIT | ROLLBACK | NOTHING )
@@ -597,7 +600,11 @@ alter_session
     ;
 
 alter_session_set_clause
-    : parameter_name '=' parameter_value
+    : (parameter_name '=' parameter_value)+
+    | EDITION '=' en=id_expression
+    | CONTAINER '=' cn=id_expression (SERVICE '=' sn=id_expression)?
+    | ROW ARCHIVAL VISIBILITY '=' (ACTIVE | ALL)
+    | DEFAULT_COLLATION '=' (c=id_expression | NONE)
     ;
 
 create_sequence
@@ -816,6 +823,11 @@ all_clause
                  | CAPTION expression (MEMBER DESCRIPTION expression)?
                  | DESCRIPTION expression
                  )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
+create_edition
+    : CREATE EDITION e=id_expression (AS CHILD OF pe=id_expression)?
     ;
 
 create_index
@@ -1567,6 +1579,7 @@ compiler_parameters_clause
 
 parameter_value
     : regular_id
+    | CHAR_STRING
     ;
 
 library_name
@@ -2847,6 +2860,11 @@ drop_attribute_dimension
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
+drop_edition
+    : DROP EDITION e=id_expression CASCADE?
     ;
 
 truncate_cluster
