@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar chip8octo;
 
 file_
-   : (instruction | num)* EOF
+   : (instruction_ | num_)* EOF
    ;
 
-instruction
+instruction_
    : preproc_
    | clear_
    | assign_
@@ -63,7 +63,7 @@ preproc_
    ;
 
 const_
-   : ':' 'const' constname_ num
+   : ':' 'const' constname_ num_
    ;
 
 constname_
@@ -71,7 +71,7 @@ constname_
    ;
 
 alias_
-   : ':' 'alias' aliasname_ (IDENTIFER | num | register_)
+   : ':' 'alias' aliasname_ (IDENTIFER | num_ | register_)
    ;
 
 aliasname_
@@ -87,7 +87,7 @@ labelnane_
    ;
 
 unpack_
-   : ':' 'unpack' (register_ | num | IDENTIFIER) (register_ | num | IDENTIFIER)
+   : ':' 'unpack' (register_ | num_ | IDENTIFIER) (register_ | num_ | IDENTIFIER)
    ;
 
 save_
@@ -107,7 +107,7 @@ assign_
    ;
 
 loop_
-   : 'loop' instruction* 'again'
+   : 'loop' instruction_* 'again'
    ;
 
 sprite_
@@ -143,7 +143,7 @@ shreq_
    ;
 
 if_
-   : 'if' condition_ 'then' instruction?
+   : 'if' condition_ 'then' instruction_?
    ;
 
 condition_
@@ -155,7 +155,7 @@ load_
    ;
 
 atom
-   : num
+   : num_
    | register_
    | aliasname_
    | labelnane_
@@ -169,7 +169,7 @@ register_
    | BUZZER
    ;
 
-num
+num_
    : DECIMAL
    | HEXBYTE
    ;
