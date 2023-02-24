@@ -72,13 +72,14 @@ unit_statement
 
     | create_analytic_view
     | create_attribute_dimension
+    | create_cluster
+    | create_context
+    | create_controlfile
     | create_index
     | create_library
     | create_table
     | create_role
     | create_tablespace
-    | create_cluster
-    | create_context
     | create_view //TODO
     | create_directory
     | create_materialized_view
@@ -816,6 +817,40 @@ all_clause
                  | CAPTION expression (MEMBER DESCRIPTION expression)?
                  | DESCRIPTION expression
                  )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-CONTROLFILE.html
+create_controlfile
+    : CREATE CONTROLFILE REUSE? SET? DATABASE d=id_expression
+        logfile_clause? (RESETLOGS | NORESETLOGS)
+        (DATAFILE file_specification (',' file_specification)*)?
+        controlfile_options*
+        character_set_clause?
+    ;
+
+controlfile_options
+    : MAXLOGFILES numeric
+    | MAXLOGMEMBERS numeric
+    | MAXLOGHISTORY numeric
+    | MAXDATAFILES numeric
+    | MAXINSTANCES numeric
+    | ARCHIVELOG
+    | NOARCHIVELOG
+    | FORCE LOGGING
+    | SET STANDBY NOLOGGING FOR (DATA AVAILABILITY | LOAD PERFORMANCE)
+    ;
+
+logfile_clause
+    : LOGFILE (GROUP? numeric)? file_specification (',' (GROUP? numeric)? file_specification)*
+    ;
+
+character_set_clause
+    : CHARACTER SET cs=id_expression
+    ;
+
+file_specification
+    : datafile_tempfile_spec
+    | redo_log_file_spec
     ;
 
 create_index
@@ -1808,11 +1843,10 @@ datafile_tempfile_spec
     : (CHAR_STRING)? (SIZE size_clause)? REUSE? autoextend_clause?
     ;
 
-
 redo_log_file_spec
-    : (DATAFILE CHAR_STRING
-      | '(' ( ','? CHAR_STRING )+ ')'
-      )?
+    : ( filename
+      | '(' filename (',' filename)* ')'
+      )
         (SIZE size_clause)?
         (BLOCKSIZE size_clause)?
         REUSE?
@@ -2863,7 +2897,7 @@ database_name
     ;
 
 alter_database
-    : ALTER DATABASE database_name?
+    : ALTER database_clause
        ( startup_clauses
        | recovery_clauses
        | database_file_clauses
@@ -2873,8 +2907,18 @@ alter_database
        | default_settings_clause
        | instance_clauses
        | security_clause
+       | prepare_clause
+       | drop_mirror_clause
+       | lost_write_protection
+       | cdb_fleet_clauses
+       | property_clauses
+       | replay_upgrade_clauses
        )
       ';'
+    ;
+
+database_clause
+    : PLUGGABLE? DATABASE database_name?
     ;
 
 startup_clauses
@@ -2918,6 +2962,7 @@ full_database_recovery
     : STANDBY? DATABASE
           ((UNTIL (CANCEL |TIME CHAR_STRING | CHANGE UNSIGNED_INTEGER | CONSISTENT)
            | USING BACKUP CONTROLFILE
+           | SNAPSHOT TIME CHAR_STRING
            )+
           )?
     ;
@@ -2961,6 +3006,7 @@ database_file_clauses
     | create_datafile_clause
     | alter_datafile_clause
     | alter_tempfile_clause
+    | move_datafile_clause
     ;
 
 create_datafile_clause
@@ -2970,7 +3016,7 @@ create_datafile_clause
     ;
 
 alter_datafile_clause
-    : DATAFILE (filename|filenumber) (',' (filename|filenumber) )*
+    : DATAFILE (filename | filenumber) (',' (filename | filenumber) )*
         ( ONLINE
         | OFFLINE (FOR DROP)?
         | RESIZE size_clause
@@ -2989,9 +3035,15 @@ alter_tempfile_clause
         )
     ;
 
+move_datafile_clause
+    : MOVE DATAFILE (filename | filenumber) (',' (filename | filenumber) )*
+        (TO filename)? REUSE? KEEP?
+    ;
+
 logfile_clauses
     : (ARCHIVELOG MANUAL? | NOARCHIVELOG)
     | NO? FORCE LOGGING
+    | SET STANDBY NOLOGGING FOR (DATA AVAILABILITY | LOAD PERFORMANCE)
     | RENAME FILE filename (',' filename)* TO filename
     | CLEAR UNARCHIVED? LOGFILE logfile_descriptor (',' logfile_descriptor)* (UNRECOVERABLE DATAFILE)?
     | add_logfile_clauses
@@ -3002,15 +3054,13 @@ logfile_clauses
 
 add_logfile_clauses
     : ADD STANDBY? LOGFILE
-             (
-//TODO        (INSTANCE CHAR_STRING | THREAD UNSIGNED_INTEGER)?
-               (log_file_group   redo_log_file_spec)+
-             | MEMBER filename REUSE? (',' filename REUSE?)* TO logfile_descriptor (',' logfile_descriptor)*
-             )
+        ( (INSTANCE CHAR_STRING | THREAD UNSIGNED_INTEGER)? group_redo_logfile+
+        | MEMBER filename REUSE? (',' filename REUSE?)* TO logfile_descriptor (',' logfile_descriptor)*
+        )
     ;
 
-log_file_group
-    :(','? (THREAD UNSIGNED_INTEGER)? GROUP UNSIGNED_INTEGER)
+group_redo_logfile
+    : (GROUP UNSIGNED_INTEGER)? redo_log_file_spec
     ;
 
 drop_logfile_clauses
@@ -3154,6 +3204,40 @@ filename
     : CHAR_STRING
     ;
 
+prepare_clause
+    : PREPARE MIRROR COPY c=id_expression (WITH (UNPROTECTED | MIRROR | HIGH) REDUNDANCY)?
+        (FOR DATABASE id_expression)?
+    ;
+
+drop_mirror_clause
+    : DROP MIRROR COPY mn=id_expression
+    ;
+
+lost_write_protection
+    : (ENABLE | DISABLE | REMOVE | SUSPEND) LOST WRITE PROTECTION
+    ;
+
+cdb_fleet_clauses
+    : lead_cdb_clause
+    | lead_cdb_uri_clause
+    ;
+
+lead_cdb_clause
+    : SET LEAD_CDB '=' (TRUE | FALSE)
+    ;
+
+lead_cdb_uri_clause
+    : SET LEAD_CDB_URI '=' CHAR_STRING
+    ;
+
+property_clauses
+    : PROPERTY (SET | REMOVE) DEFAULT_CREDENTIAL '=' qcn=id_expression
+    ;
+
+replay_upgrade_clauses
+    : UPGRADE SYNC (ON | OFF)
+    ;
+
 alter_database_link
     : ALTER SHARED? PUBLIC? DATABASE LINK link_name (CONNECT TO user_object_name IDENTIFIED BY password_value link_authentication? | link_authentication)
     ;
@@ -3170,10 +3254,10 @@ link_authentication
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
     : CREATE SHARED? PUBLIC? DATABASE LINK dblink ( CONNECT TO ( CURRENT_USER
-                                                                  | user_object_name IDENTIFIED BY password_value link_authentication?
-                                                                  )
-                                                     | link_authentication
-                                                     )* (USING CHAR_STRING)?
+                                                               | user_object_name IDENTIFIED BY password_value link_authentication?
+                                                               )
+                                                  | link_authentication
+                                                  )* (USING CHAR_STRING)?
     ;
 
 dblink
@@ -5651,6 +5735,7 @@ non_reserved_keywords_in_12c
     | DAYS
     | DB_UNIQUE_NAME
     | DECORRELATE
+    | DEFAULT_CREDENTIAL
     | DEFINE
     | DEFINITION
     | DELEGATE
@@ -5722,10 +5807,13 @@ non_reserved_keywords_in_12c
     | KEYSTORE
     | LABEL
     | LAX
+    | LEAD_CDB
+    | LEAD_CDB_URI
     | LIFECYCLE
     | LINEAR
     | LOCKING
     | LOGMINING
+    | LOST
     | MAP
     | MATCH
     | MATCHES
@@ -5823,6 +5911,7 @@ non_reserved_keywords_in_12c
     | PRINTBLOBTOCLOB
     | PRIORITY
     | PRIVILEGED
+    | PROPERTY
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
