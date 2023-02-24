@@ -109,7 +109,7 @@ end_
    ;
 
 assign_
-   : (register_ | IDENTIFIER) ASSIGN atom
+   : (register_ | IDENTIFIER) ASSIGN 'hex'? atom
    ;
 
 loop_
