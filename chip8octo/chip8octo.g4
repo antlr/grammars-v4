@@ -44,6 +44,7 @@ instruction_
    | addeq_
    | subeq_
    | if_
+   | if2_
    | end_
    | load_
    | save_
@@ -57,8 +58,8 @@ instruction_
    ;
 
 preproc_
-   : const_
-   | alias_
+   : alias_
+   | const_
    | label_
    | unpack_
    ;
@@ -76,11 +77,11 @@ alias_
    ;
 
 aliasname_
-   : IDENTIFER
+   : IDENTIFIER
    ;
 
 aliastarget_
-   : (IDENTIFER | num_ | register_)
+   : (IDENTIFIER | num_ | register_)
    ;
 
 label_
@@ -151,6 +152,10 @@ if_
    : 'if' condition_ 'then' instruction_?
    ;
 
+if2_
+   : 'if' condition_ 'begin' instruction_* ('else' instruction_*)? 'end'
+   ;
+
 while_
    : 'while' condition_ instruction_
    ;
@@ -163,12 +168,17 @@ load_
    : 'load' register_
    ;
 
+random_
+   : 'random' num_
+   ;
+
 atom
    : num_
    | register_
    | aliasname_
    | labelnane_
    | constname_
+   | random_
    ;
 
 register_
@@ -181,6 +191,7 @@ register_
 num_
    : DECIMAL
    | HEXBYTE
+   | BINARY
    ;
 
 ALIAS
@@ -234,6 +245,10 @@ DECIMAL
 
 HEXBYTE
    : '0x' [0-9A-F] [0-9A-F]?
+   ;
+
+BINARY
+   : '0b' ('0' | '1')+
    ;
 
 IDENTIFIER
