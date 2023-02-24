@@ -36,7 +36,8 @@ file_
    ;
 
 instruction
-   : clear_
+   : preproc_
+   | clear_
    | assign_
    | loop_
    | sprite_
@@ -44,13 +45,9 @@ instruction
    | subeq_
    | if_
    | end_
-   | label_
    | load_
-   | unpack_
    | save_
    | labelnane_
-   | alias_
-   | const_
    | oreq_
    | xoreq_
    | andeq_
@@ -58,8 +55,15 @@ instruction
    | shreq_
    ;
 
+preproc_
+   : const_
+   | alias_
+   | label_
+   | unpack_
+   ;
+
 const_
-   : ':' constname_ num
+   : ':' 'const' constname_ num
    ;
 
 constname_
@@ -67,7 +71,7 @@ constname_
    ;
 
 alias_
-   : ':' aliasname_ (IDENTIFER | num | REGISTER)
+   : ':' 'alias' aliasname_ (IDENTIFER | num | register_)
    ;
 
 aliasname_
