@@ -55,6 +55,7 @@ instruction_
    | shleq_
    | shreq_
    | while_
+   | bcd_
    ;
 
 preproc_
@@ -157,7 +158,11 @@ if2_
    ;
 
 while_
-   : 'while' condition_ instruction_
+   : 'while' condition_ instruction_?
+   ;
+
+bcd_
+   : 'bcd' atom
    ;
 
 condition_
