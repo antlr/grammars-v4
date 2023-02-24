@@ -866,6 +866,7 @@ character_set_clause
 file_specification
     : datafile_tempfile_spec
     | redo_log_file_spec
+    ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-FLASHBACK-ARCHIVE.html
 create_flashback_archive
