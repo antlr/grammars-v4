@@ -53,6 +53,7 @@ instruction_
    | andeq_
    | shleq_
    | shreq_
+   | while_
    ;
 
 preproc_
@@ -63,7 +64,7 @@ preproc_
    ;
 
 const_
-   : COLON CONST constname_ num_
+   : CONST constname_ num_
    ;
 
 constname_
@@ -71,7 +72,7 @@ constname_
    ;
 
 alias_
-   : COLON ALIAS aliasname_ aliastarget_
+   : ALIAS aliasname_ aliastarget_
    ;
 
 aliasname_
@@ -91,7 +92,7 @@ labelnane_
    ;
 
 unpack_
-   : COLON UNPACK (register_ | num_ | IDENTIFIER) (register_ | num_ | IDENTIFIER)
+   : UNPACK (register_ | num_ | IDENTIFIER) (register_ | num_ | IDENTIFIER)
    ;
 
 save_
@@ -107,7 +108,7 @@ end_
    ;
 
 assign_
-   : register_ ':=' atom
+   : (register_ | IDENTIFIER) ASSIGN atom
    ;
 
 loop_
@@ -150,6 +151,10 @@ if_
    : 'if' condition_ 'then' instruction_?
    ;
 
+while_
+   : 'while' condition_ instruction_
+   ;
+
 condition_
    : atom COMPARATOR atom
    ;
@@ -179,15 +184,19 @@ num_
    ;
 
 ALIAS
-   : 'alias'
+   : ':alias'
    ;
 
 CONST
-   : 'const'
+   : ':const'
    ;
 
 UNPACK
-   : 'unpack'
+   : ':unpack'
+   ;
+
+ASSIGN
+   : ':='
    ;
 
 COLON
@@ -212,7 +221,7 @@ BUZZER
    ;
 
 REGISTER
-   : ('v' | 'V') [0-9A-F]
+   : ('v' | 'V') [0-9A-Fa-f]
    ;
 
 I
