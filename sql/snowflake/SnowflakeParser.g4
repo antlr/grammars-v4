@@ -3279,6 +3279,7 @@ non_reserved_words
     | USERADMIN
     | SYSADMIN
     | PUBLIC
+    | JAVASCRIPT
     ;
 
 builtin_function
