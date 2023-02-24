@@ -1,8 +1,6 @@
 # Generated from trgen <version>
-default:
+build:
 	bash build.sh
-run:
-	@trwdog dotnet run $(RUNARGS)
 clean:
 	bash clean.sh
 FORCE: ;
