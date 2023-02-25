@@ -38,3 +38,4 @@ create or replace table t1 (i integer masking policy m tag (t='t'));
 create table t (i integer default 1 not null unique masking policy m tag (t='t') comment 'hello world');
 create table t (v varchar unique not null collate 'upper' masking policy m tag (t='t') comment 'hello world');
 create table public.public.public (public int);
+CREATE TABLE T ( Source string NOT NULL, Query_Id string NULL,	State string NOT NULL,Procedure_Name string);

@@ -1497,7 +1497,7 @@ compression
 create_external_function
     : CREATE or_replace? SECURE? EXTERNAL FUNCTION object_name LR_BRACKET ( arg_name arg_data_type (COMMA arg_name arg_data_type)* )? RR_BRACKET
         RETURNS data_type
-        ( NOT? NULL_ )?
+        null_not_null?
         ( ( CALLED ON NULL_ INPUT) | ((RETURNS NULL_ ON NULL_ INPUT) | STRICT) )?
         ( VOLATILE | IMMUTABLE )?
         comment_clause?
@@ -1606,7 +1606,7 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
         RETURNS ( data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET )
-        ( NOT? NULL_ )?
+        null_not_null?
         ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
         ( VOLATILE | IMMUTABLE )?
         comment_clause?
@@ -2238,7 +2238,7 @@ full_col_decl
             collate
             | inline_constraint
             | default_value
-            | not_null
+            | null_not_null
         )*
         with_masking_policy?
         with_tags?
@@ -3280,6 +3280,11 @@ non_reserved_words
     | SYSADMIN
     | PUBLIC
     | JAVASCRIPT
+    | SOURCE
+    | PROCEDURE_NAME
+    | STATE
+    | ROLE
+    | DEFINITION
     ;
 
 builtin_function
