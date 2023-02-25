@@ -35,8 +35,12 @@ sql_script
 
 unit_statement
     : transaction_control_statements
+    | alter_analytic_view
+    | alter_attribute_dimension
     | alter_cluster
     | alter_database
+    | alter_database_link
+    | alter_flashback_archive
     | alter_function
     | alter_package
     | alter_procedure
@@ -67,6 +71,9 @@ unit_statement
     | create_package
     | create_package_body
 
+    | create_analytic_view
+    | create_attribute_dimension
+    | create_flashback_archive
     | create_index
     | create_library
     | create_table
@@ -81,13 +88,17 @@ unit_statement
     | create_materialized_zonemap
     | create_rollback_segment
     | create_user
+    | create_database_link
 
     | create_sequence
     | create_trigger
     | create_type
     | create_synonym
 
+    | drop_analytic_view
+    | drop_attribute_dimension
     | drop_cluster
+    | drop_flashback_archive
     | drop_function
     | drop_library
     | drop_package
@@ -107,6 +118,7 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_database_link
 
     | flashback_table
 
@@ -129,6 +141,18 @@ unit_statement
 
 drop_function
     : DROP FUNCTION function_name ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-FLASHBACK-ARCHIVE.html
+alter_flashback_archive
+    : ALTER FLASHBACK ARCHIVE fa=id_expression
+        ( SET DEFAULT
+        | (ADD | MODIFY) TABLESPACE ts=id_expression flashback_archive_quota?
+        | REMOVE TABLESPACE rts=id_expression
+        | MODIFY /*RETENTION*/ flashback_archive_retention // inconsistent documentation
+        | PURGE (ALL | BEFORE (SCN expression | TIMESTAMP expression))
+        | NO? OPTIMIZE DATA
+        )
     ;
 
 alter_function
@@ -613,6 +637,216 @@ sequence_spec
 
 sequence_start_clause
     : START WITH UNSIGNED_INTEGER
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-ANALYTIC-VIEW.html
+create_analytic_view
+    : CREATE (OR REPLACE)? (NOFORCE | FORCE)? ANALYTIC VIEW av=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        classification_clause*
+        cav_using_clause?
+        dim_by_clause?
+        measures_clause?
+        default_measure_clause?
+        default_aggregate_clause?
+        cache_clause?
+        fact_columns_clause?
+        qry_transform_clause?
+    ;
+
+classification_clause
+// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    : (caption_clause description_clause? | caption_clause? description_clause) classification_item*
+    | caption_clause? description_clause? classification_item+
+    ;
+
+caption_clause
+    : CAPTION c=quoted_string
+    ;
+
+description_clause
+    : DESCRIPTION d=quoted_string
+    ;
+
+classification_item
+    : CLASSIFICATION cn=id_expression (VALUE cv=quoted_string)? (LANGUAGE language)?
+    ;
+
+language
+    : NULL_
+    | nls=id_expression
+    ;
+
+cav_using_clause
+    : USING (schema_name '.')? t=id_expression REMOTE? (AS? ta=id_expression)?
+    ;
+
+dim_by_clause
+    : DIMENSION BY '(' dim_key (',' dim_key)* ')'
+    ;
+
+dim_key
+    : dim_ref classification_clause*
+        KEY ( '(' (a=id_expression '.')? f=column_name (',' (a=id_expression '.')? f=column_name)* ')'
+            |  (a=id_expression '.')? f=column_name
+            )
+        REFERENCES DISTINCT? ('(' attribute_name (',' attribute_name) ')' | attribute_name)
+        HIERARCHIES '(' hier_ref (',' hier_ref)* ')'
+    ;
+
+dim_ref
+    : (schema_name '.')? ad=id_expression (AS? da=id_expression)?
+    ;
+
+hier_ref
+    : (schema_name '.')? h=id_expression (AS? ha=id_expression)? DEFAULT?
+    ;
+
+measures_clause
+    : MEASURES '(' av_measure (',' av_measure)* ')'
+    ;
+
+av_measure
+    : mn=id_expression (base_meas_clause | calc_meas_clause)? //classification_clause*
+    ;
+
+base_meas_clause
+    : FACT /*FOR MEASURE*/ bm=id_expression meas_aggregate_clause? //FIXME inconsistent documentation
+    ;
+
+meas_aggregate_clause
+    : AGGREGATE BY aggregate_function_name
+    ;
+
+calc_meas_clause
+    : /*m=id_expression*/ AS '(' expression ')' //FIXME inconsistent documentation
+    ;
+
+default_measure_clause
+    : DEFAULT MEASURE m=id_expression
+    ;
+
+default_aggregate_clause
+    : DEFAULT AGGREGATE BY aggregate_function_name
+    ;
+
+cache_clause
+    : CACHE cache_specification (',' cache_specification)*
+    ;
+
+cache_specification
+    : MEASURE GROUP (ALL | '(' id_expression (',' id_expression)* ')' levels_clause (',' levels_clause)* )
+    ;
+
+levels_clause
+    : LEVELS '(' level_specification (',' level_specification)* ')' level_group_type
+    ;
+
+level_specification
+    : '(' ((d=id_expression '.')? h=id_expression '.')? l=id_expression ')'
+    ;
+
+level_group_type
+    : DYNAMIC
+    | MATERIALIZED (USING (schema_name '.')? t=id_expression)?
+    ;
+
+fact_columns_clause
+    : FACT COLUMN f=column_name (AS? fa=id_expression (',' AS? fa=id_expression)* )?
+    ;
+
+qry_transform_clause
+    : ENABLE QUERY TRANSFORM (RELY | NORELY)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-ATTRIBUTE-DIMENSION.html
+create_attribute_dimension
+    : CREATE (OR REPLACE)? (NOFORCE | FORCE)? ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        classification_clause*
+        (DIMENSION TYPE (STANDARD | TIME))?
+        ad_using_clause
+        attributes_clause
+        ad_level_clause+
+        all_clause?
+    ;
+
+ad_using_clause
+    : USING source_clause (',' source_clause)* join_path_clause*
+    ;
+
+source_clause
+    : (schema_name '.')? ftov=id_expression REMOTE? (AS? a=id_expression)?
+    ;
+
+join_path_clause
+    : JOIN PATH jpn=id_expression ON join_condition
+    ;
+
+join_condition
+    : join_condition_item (AND join_condition_item)*
+    ;
+
+join_condition_item
+    : (a=id_expression '.')? column_name '=' (b=id_expression '.')? column_name
+    ;
+
+attributes_clause
+    : ATTRIBUTES '(' ad_attributes_clause (',' ad_attributes_clause)* ')'
+    ;
+
+ad_attributes_clause
+    : (a=id_expression '.')? column_name (AS? an=id_expression)?
+        classification_clause*
+    ;
+
+ad_level_clause
+    : LEVEL l=id_expression (NOT NULL_ | SKIP_ WHEN NULL_)?
+        (LEVEL TYPE (STANDARD | YEARS | HALF_YEARS | QUARTERS | MONTHS | WEEKS | DAYS | HOURS | MINUTES | SECONDS))?
+        classification_clause* //inconsistent documentation - LEVEL TYPE goes after the classification_clause rule
+        key_clause
+        alternate_key_clause?
+        (MEMBER NAME expression)?
+        (MEMBER CAPTION expression)?
+        (MEMBER DESCRIPTION expression)?
+        (ORDER BY (MIN | MAX)? dim_order_clause (',' (MIN | MAX)? dim_order_clause)*)?
+        (DETERMINES '(' id_expression (',' id_expression)* ')')?
+    ;
+
+key_clause
+    : KEY (a=id_expression | '(' id_expression (',' id_expression)* ')')
+    ;
+
+alternate_key_clause
+    : ALTERNATE key_clause
+    ;
+
+dim_order_clause
+    : a=id_expression (ASC | DESC)? (NULLS (FIRST | LAST))?
+    ;
+
+all_clause
+    : ALL MEMBER ( NAME expression (MEMBER CAPTION expression)?
+                 | CAPTION expression (MEMBER DESCRIPTION expression)?
+                 | DESCRIPTION expression
+                 )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-FLASHBACK-ARCHIVE.html
+create_flashback_archive
+    : CREATE FLASHBACK ARCHIVE DEFAULT? fa=id_expression TABLESPACE ts=id_expression
+        flashback_archive_quota?
+        (NO? OPTIMIZE DATA)?
+        flashback_archive_retention
+    ;
+
+flashback_archive_quota
+    : QUOTA UNSIGNED_INTEGER (M_LETTER | G_LETTER | T_LETTER | P_LETTER | E_LETTER)
+    ;
+
+flashback_archive_retention
+    : RETENTION UNSIGNED_INTEGER (YEAR | MONTH | DAY)
     ;
 
 create_index
@@ -2290,10 +2524,11 @@ datatype_null_enable
          (NOT NULL_)? (ENABLE | DISABLE)?
    ;
 
-//Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/size_clause.html
+// Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
 // but having issues with examples/numbers01.sql line 11 "sysdate -1m"
 size_clause
-    : UNSIGNED_INTEGER REGULAR_ID?
+    : UNSIGNED_INTEGER (K_LETTER | M_LETTER | G_LETTER | T_LETTER | P_LETTER | E_LETTER)?
     ;
 
 
@@ -2483,7 +2718,7 @@ row_movement_clause
     ;
 
 flashback_archive_clause
-    : FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+    : FLASHBACK ARCHIVE fa=id_expression?
     | NO FLASHBACK ARCHIVE
     ;
 
@@ -2588,6 +2823,39 @@ comment_on_materialized
     : COMMENT ON MATERIALIZED VIEW tableview_name IS quoted_string
     ;
 
+alter_analytic_view
+    : ALTER ANALYTIC VIEW (schema_name '.')? av=id_expression
+        ( RENAME TO id_expression
+        | COMPILE
+        | alter_add_cache_clause
+        | alter_drop_cache_clause
+        )
+    ;
+
+alter_add_cache_clause
+    : ADD CACHE MEASURE GROUP '(' (ALL | measure_list)? ')'
+        LEVELS '(' levels_item (',' levels_item)* ')'
+    ;
+
+levels_item
+    : ((d=id_expression '.')? h=id_expression '.')? l=id_expression
+    ;
+
+measure_list
+    : id_expression (',' id_expression)*
+    ;
+
+alter_drop_cache_clause
+    : DROP CACHE MEASURE GROUP '(' (ALL | measure_list)? ')'
+        LEVELS '(' levels_item (',' levels_item)* ')'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-ATTRIBUTE-DIMENSION.html
+alter_attribute_dimension
+    : ALTER ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+        (RENAME TO nad=id_expression | COMPILE)
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -2598,6 +2866,20 @@ alter_cluster
         )+
         parallel_clause?
         ';'
+    ;
+
+drop_analytic_view
+    : DROP ANALYTIC VIEW (schema_name '.')? av=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-ATTRIBUTE-DIMENSION.html
+drop_attribute_dimension
+    : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-FLASHBACK-ARCHIVE.html
+drop_flashback_archive
+    : DROP FLASHBACK ARCHIVE fa=id_expression
     ;
 
 drop_cluster
@@ -2907,6 +3189,36 @@ filenumber
 
 filename
     : CHAR_STRING
+    ;
+
+alter_database_link
+    : ALTER SHARED? PUBLIC? DATABASE LINK link_name (CONNECT TO user_object_name IDENTIFIED BY password_value link_authentication? | link_authentication)
+    ;
+
+password_value
+    : id_expression
+    | numeric
+    ;
+
+link_authentication
+    : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
+create_database_link
+    : CREATE SHARED? PUBLIC? DATABASE LINK dblink ( CONNECT TO ( CURRENT_USER
+                                                                  | user_object_name IDENTIFIED BY password_value link_authentication?
+                                                                  )
+                                                     | link_authentication
+                                                     )* (USING CHAR_STRING)?
+    ;
+
+dblink
+    : database_name ('.' d=id_expression)* ('@' cq=id_expression)?
+    ;
+
+drop_database_link
+    : DROP PUBLIC? DATABASE LINK dblink
     ;
 
 alter_role
@@ -4337,10 +4649,11 @@ unary_logical_expression
     ;
 
 logical_operation:
-        (NULL_
-        | NAN | PRESENT
-        | INFINITE | A_LETTER SET | EMPTY
-        | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')')
+    ( NULL_
+    | NAN | PRESENT
+    | INFINITE | A_LETTER SET | EMPTY
+    | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
+    )
     ;
 
 multiset_expression
@@ -4410,7 +4723,7 @@ single_column_for_loop
 
 multi_column_for_loop
     : FOR paren_column_list
-      IN  '(' (subquery | '(' expressions? ')') ')'
+      IN '(' (subquery | '(' expressions? ')') ')'
     ;
 
 unary_expression
@@ -4557,6 +4870,8 @@ over_clause_keyword
     : AVG
     | CORR
     | LAG
+    | LAG_DIFF
+    | LAG_DIFF_PERCENT
     | LEAD
     | MAX
     | MEDIAN
@@ -4591,7 +4906,10 @@ standard_prediction_function_keyword
     ;
 
 over_clause
-    : OVER '(' query_partition_clause? (order_by_clause windowing_clause?)? ')'
+    : OVER '(' ( query_partition_clause? (order_by_clause windowing_clause?)?
+               | HIERARCHY th=id_expression OFFSET numeric (ACROSS ANCESTOR AT LEVEL id_expression)?
+               )
+           ')'
     ;
 
 windowing_clause
@@ -5238,6 +5556,7 @@ regular_id
     | DELETE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
+    | E_LETTER
     | ERR
     | EXCEPTION
     | EXCEPTION_INIT
@@ -5246,17 +5565,21 @@ regular_id
     | EXIT
     | FLOAT
     | FORALL
+    | G_LETTER
     | INDICES
     | INOUT
     | INTEGER
+    | K_LETTER
     | LANGUAGE
     | LONG
     | LOOP
+    | M_LETTER
     | NUMBER
     | ORADATA
     | OSERROR
     | OUT
     | OVERRIDING
+    | P_LETTER
     | PARALLEL_ENABLE
     | PIPELINED
     | PLS_INTEGER
@@ -5279,6 +5602,7 @@ regular_id
     | SQLDATA
     | SQLERROR
     | SUBTYPE
+    | T_LETTER
     | TIMESTAMP_LTZ_UNCONSTRAINED
     | TIMESTAMP_TZ_UNCONSTRAINED
     | TIMESTAMP_UNCONSTRAINED
@@ -5298,6 +5622,7 @@ regular_id
 
 non_reserved_keywords_in_12c
     : ACL
+    | ACROSS
     | ACTION
     | ACTIONS
     | ACTIVE
@@ -5306,6 +5631,9 @@ non_reserved_keywords_in_12c
     | ADAPTIVE_PLAN
     | ADVANCED
     | AFD_DISKSTRING
+    | ALTERNATE
+    | ANALYTIC
+    | ANCESTOR
     | ANOMALY
     | ANSI_REARCH
     | APPLICATION
@@ -5329,7 +5657,9 @@ non_reserved_keywords_in_12c
     | CALCULATED
     | CALLBACK
     | CAPACITY
+    | CAPTION
     | CDBDEFAULT
+    | CLASSIFICATION
     | CLASSIFIER
     | CLEANUP
     | CLIENT
@@ -5368,6 +5698,7 @@ non_reserved_keywords_in_12c
     | DEFINITION
     | DELEGATE
     | DELETE_ALL
+    | DESCRIPTION
     | DESTROY
     | DIMENSIONS
     | DISABLE_ALL
@@ -5402,7 +5733,9 @@ non_reserved_keywords_in_12c
     | FORMAT
     | GATHER_OPTIMIZER_STATISTICS
     | GET
+    | HALF_YEARS
     | HASHING
+    | HOURS
     | IDLE
     | ILM
     | IMMUTABLE
@@ -5445,6 +5778,7 @@ non_reserved_keywords_in_12c
     | MEMCOMPRESS
     | METADATA
     | MEMOPTIMIZE
+    | MINUTES
     | MODEL_NB
     | MODEL_SV
     | MODIFICATION
@@ -5535,9 +5869,11 @@ non_reserved_keywords_in_12c
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
+    | QUARTERS
     | REALM
     | REDEFINE
     | RELOCATE
+    | REMOTE
     | RESTART
     | ROLESET
     | ROWID_MAPPING_TABLE
@@ -5545,6 +5881,7 @@ non_reserved_keywords_in_12c
     | SAVE
     | SCRUB
     | SDO_GEOM_MBR
+    | SECONDS
     | SECRET
     | SERIAL
     | SERVICES
@@ -5555,6 +5892,7 @@ non_reserved_keywords_in_12c
     | SOURCE_FILE_DIRECTORY
     | SOURCE_FILE_NAME_CONVERT
     | SQL_TRANSLATION_PROFILE
+    | STANDARD
     | STANDARD_HASH
     | STANDBYS
     | STATE
@@ -5590,6 +5928,7 @@ non_reserved_keywords_in_12c
     | TIER
     | TIES
     | TO_ACLID
+    | TRANSFORM
     | TRANSLATION
     | TRUST
     | UCS2

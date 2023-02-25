@@ -380,7 +380,21 @@ object_privilege
     ;
 
 grant_role
-    : GRANT ROLE id_ TO ( ROLE id_ | USER id_ )?
+    : GRANT ROLE role_name TO (ROLE role_name | USER id_)
+    ;
+
+role_name
+    : system_defined_role
+    | id_
+    ;
+
+system_defined_role
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 list
@@ -436,7 +450,7 @@ revoke_from_share
     ;
 
 revoke_role
-    : REVOKE ROLE id_ FROM ( ROLE id_ | USER id_ )
+    : REVOKE ROLE role_name FROM (ROLE role_name | USER id_)
     ;
 
 rollback
@@ -1438,7 +1452,7 @@ create_api_integration
 create_object_clone
     : CREATE or_replace? ( DATABASE | SCHEMA | TABLE ) if_not_exists? id_
         CLONE object_name
-              ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+              ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     | CREATE or_replace? ( STAGE | FILE FORMAT | SEQUENCE | STREAM | TASK ) if_not_exists? object_name
         CLONE object_name
     ;
@@ -1458,11 +1472,11 @@ create_database
     ;
 
 clone_at_before
-    : CLONE id_ ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+    : CLONE id_ ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     ;
 
 at_before1
-    : AT | BEFORE
+    : AT_KEYWORD | BEFORE
     ;
 
 header_decl
@@ -1702,6 +1716,14 @@ create_procedure
         RETURNS ( data_type | TABLE LR_BRACKET ( col_decl (COMMA col_decl)* )? RR_BRACKET )
         ( NOT NULL_ )?
         LANGUAGE SQL
+        ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+        ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
+        comment_clause?
+        executa_as?
+        AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET ( arg_decl (COMMA arg_decl)* )? RR_BRACKET
+        RETURNS data_type ( NOT NULL_ )?
+        LANGUAGE JAVASCRIPT
         ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
         ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
         comment_clause?
@@ -2117,7 +2139,7 @@ show_initial_rows
     ;
 
 stream_time
-    : at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) ')'
+    : at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) RR_BRACKET
     ;
 
 create_stream
@@ -2400,7 +2422,7 @@ create_view
         with_tags?
         copy_grants?
         comment_clause?
-        AS select_statement
+        AS query_statement
     ;
 
 create_warehouse
@@ -3229,6 +3251,7 @@ id_
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | non_reserved_words
     | data_type
     | builtin_function
     ;
@@ -3247,6 +3270,16 @@ keyword
     | AT_KEYWORD
     | TIMESTAMP
     // etc
+    ;
+
+non_reserved_words
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
+    | JAVASCRIPT
     ;
 
 builtin_function
