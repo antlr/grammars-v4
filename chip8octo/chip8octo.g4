@@ -63,6 +63,42 @@ preproc_
    | const_
    | label_
    | unpack_
+   | calc_
+   | macro_
+   | org_
+   | byte_
+   ;
+
+org_
+   : ORG '{' IDENTIFIER '}'
+   ;
+
+macro_
+   : MACRO macroname_ IDENTIFIER* '{' preproc_ '}'
+   ;
+
+macroname_
+   : IDENTIFIER
+   ;
+
+expression_
+   : expression_ BINOP expression_
+   | '(' expression_ ')'
+   | atom
+   | UNOP expression_
+   | preproc_
+   ;
+
+calc_
+   : CALC calcname_ '{' expression_ '}'
+   ;
+
+calcname_
+   : IDENTIFIER
+   ;
+
+byte_
+   : BYTE '{' expression_ '}'
    ;
 
 const_
@@ -200,7 +236,7 @@ register_
 
 num_
    : DECIMAL
-   | HEXBYTE
+   | HEX
    | BINARY
    ;
 
@@ -214,6 +250,22 @@ CONST
 
 UNPACK
    : ':unpack'
+   ;
+
+CALC
+   : ':calc'
+   ;
+
+MACRO
+   : ':macro'
+   ;
+
+BYTE
+   : ':byte'
+   ;
+
+ORG
+   : ':org'
    ;
 
 ASSIGN
@@ -231,6 +283,46 @@ COMPARATOR
    | '<'
    | '>='
    | '<='
+   ;
+
+BINOP
+   : '-'
+   | '+'
+   | '*'
+   | '/'
+   | '%'
+   | '&'
+   | '|'
+   | '^'
+   | '<<'
+   | '>>'
+   | 'pow'
+   | 'min'
+   | 'max'
+   | '<'
+   | '<='
+   | '=='
+   | '!='
+   | '>='
+   | '>'
+   ;
+
+UNOP
+   : '-'
+   | '~'
+   | '!'
+   | 'sin'
+   | 'cos'
+   | 'tan'
+   | 'exp'
+   | 'log'
+   | 'abs'
+   | 'sqrt'
+   | 'sign'
+   | 'ceil'
+   | 'floor'
+   | '@'
+   | 'strlen'
    ;
 
 DELAY
@@ -257,8 +349,8 @@ DECIMAL
    : ('-')? [0-9]+
    ;
 
-HEXBYTE
-   : '0x' [0-9A-F] [0-9A-F]?
+HEX
+   : '0x' [0-9A-F] [0-9A-F]+
    ;
 
 BINARY
