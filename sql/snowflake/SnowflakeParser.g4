@@ -1169,20 +1169,12 @@ ext_table_column_action
     ;
 
 constraint_action
-    : ADD outofline_constraint
+    : ADD out_of_line_constraint
     | RENAME CONSTRAINT id_ TO id_
     | alter_modify ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
     | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          cascade_restrict?
-    ;
-
-outofline_constraint
-    : ( CONSTRAINT id_ )?
-            ( UNIQUE column_list_in_parentheses?
-            | PRIMARY KEY column_list_in_parentheses?
-            | ( FOREIGN KEY )? column_list_in_parentheses? REFERENCES object_name column_list_in_parentheses? )
-        constraint_properties?
     ;
 
 search_optimization_action
