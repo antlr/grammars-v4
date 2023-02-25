@@ -1,0 +1,73 @@
+###########################################
+#
+#  Keyboard Test
+#
+#  A simple live display of which CHIP-8
+#  keys appear to be held down at any given time.
+#  useful for testing alternative Keyboard
+#  layouts or input routines.
+#
+###########################################
+
+: held    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+: keymap  0x1 0x2 0x3 0xC 0x4 0x5 0x6 0xD 0x7 0x8 0x9 0xE 0xA 0x0 0xB 0xF
+: button  0x7E 0xFF 0xFF 0xFF 0xFF 0xFF 0x7E
+
+: main
+	:const cell 8
+	:calc start-x { 2 + 32 - ( cell * 4 ) / 2 }
+	:calc start-y { 1 + 0 }
+	:calc end-x   { start-x + cell * 4 }
+	:calc end-y   { start-y + cell * 4 }
+	
+	v1 := start-x
+	v2 := start-y
+	v3 := 0
+	loop
+		i := keymap
+		i += v3
+		load v0
+		i := hex v0
+		sprite v1 v2 5
+		v1 += cell
+		if v1 == end-x then v2 += cell
+		if v1 == end-x then v1 := start-x
+		v3 += 1
+		if v3 != 16 then
+	again
+	
+	loop
+		# unroll this loop fully to try to
+		# minimize input lag:
+		:macro scan {
+			:calc keycode  { @ keymap + CALLS }
+			:calc heldaddr { held + CALLS }
+			:calc kx       { -2 + start-x + cell * floor CALLS % 4 }
+			:calc ky       { -1 + start-y + cell * floor CALLS / 4 }
+			v1 := keycode
+			v2 := kx
+			v3 := ky
+			i  := heldaddr
+			load v0
+			if v0 == 0 begin
+				if v1 key begin
+					v0 := 1
+					i := button
+					sprite v2 v3 7
+				end
+			else
+				if v1 -key begin
+					v0 := 0
+					i := button
+					sprite v2 v3 7
+				end
+			end
+			i := heldaddr
+			save v0
+		}
+		scan scan scan scan
+		scan scan scan scan
+		scan scan scan scan
+		scan scan scan scan
+	again
+

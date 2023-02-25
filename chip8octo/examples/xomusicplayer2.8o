@@ -1,0 +1,52 @@
+###########################################
+#
+#  Music Player 2
+#
+#  A music player using the pitch register,
+#  instead of varying the pattern buffer.
+#
+###########################################
+
+: main
+	loop
+		cave-1
+		cave-2
+		cave-1
+		cave-3
+	again
+
+: cave-1  D$4 --- G$4 --- D$4 --- G$4 ---
+          D-4 --- G$4 --- D-4 --- G$4 ---
+          C$4 --- G$4 --- C$4 --- G$4 --- ;
+: cave-2  C-4 --- G$4 --- C-4 --- C$4 D-4 ;
+: cave-3  B-4 --- A$4 --- G$4 --- --- --- ;
+
+: ---
+	i := silence
+	jump play
+: note
+	pitch := vf
+	i := waveform
+: play
+	audio
+	vf     := 6   # actual note duration
+	delay  := vf
+	vf     := 60  # prevent background flicker
+	buzzer := vf
+	loop
+		vf := delay
+		if vf != 0 then
+	again
+;
+
+:macro def-note NAME PITCH { : NAME vf := PITCH jump note }
+def-note B-4 159
+def-note A$4 155
+def-note G$4 147
+def-note D$4 127
+def-note D-4 123
+def-note C$4 119
+def-note C-4 115
+
+: waveform  0x00 0x00 0xFF 0xFF 0x00 0x00 0xFF 0xFF 0x00 0x00 0xFF 0xFF 0x00 0x00 0xFF 0xFF
+: silence   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00

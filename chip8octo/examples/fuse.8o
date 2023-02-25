@@ -1,0 +1,231 @@
+###########################################
+#
+#  Fuse
+#
+#  A minimalist reinterpretation of
+#  the classic Pipe Dream. Assemble lines
+#  to guide a burning fuse. Don't let it
+#  burn out!
+#
+#  Press WASD to move the current line
+#  fragments and E to lay them down.
+#  You cannot lay down a line overlapping
+#  any existing lines.
+#
+#  Runs best at 7 cycles/frame.
+#
+#  John Earnest
+#
+###########################################
+
+:alias ex      vd # fuse position x
+:alias ey      vc # fuse position y
+:alias px      vb # cursor position x
+:alias py      va # cursor position y
+:alias tile    v9 # selected tile
+:alias timer-0 v8 # fuse movement cookoff
+:alias timer-1 v7 # score (low digits)
+:alias timer-2 v6 # score (high digits)
+
+:const tile-mask 0b111000
+:const fuse-speed 3 # higher is slower
+
+: main
+	init-game
+
+	# draw starting cursor:
+	i := tiles
+	i += tile
+	sprite px py 8
+
+	# wait for an initial key press:
+	show-title
+	v0 := key
+	show-title
+
+	loop
+		i := tiles
+		i += tile
+
+		v0 := 6 if v0 key begin # keyboard E
+			# wait for key release:
+			loop if v0 key then again
+
+			# we can't drop a tile overlapping
+			# any existing lines:
+			sprite px py 8 # erase
+			sprite px py 8 # redraw
+
+			if vf == 0 begin
+				# drop a tile:
+				tile := random tile-mask
+				i := tiles
+				i += tile
+				sprite px py 8
+			end
+		else
+			# erase the cursor:
+			sprite px py 8
+
+			# move cursor:
+			v0 := 5 if v0 key then py += -1 # keyboard W
+			v0 := 8 if v0 key then py +=  1 # keyboard S
+			v0 := 7 if v0 key then px += -1 # keyboard A
+			v0 := 9 if v0 key then px +=  1 # keyboard D
+
+			# handle fuse movement without
+			# the cursor drawn, to avoid
+			# extreme weirdness:
+			move-fuse
+
+			# redraw cursor:
+			i := tiles
+			i += tile
+			sprite px py 8
+		end
+
+		# sync framerate
+		loop
+			vf := delay
+			if vf != 0 then
+		again
+		vf := 6
+		delay := vf
+	again
+
+: init-game
+	clear
+
+	# set up a random starting position:
+	ex := random 15
+	ex += 8
+	ey := random 31
+	ey += 16
+	v0 := random 0b11000
+	i := starts
+	i += v0
+	sprite ex ey 8
+	
+	# initialize the cursor:
+	tile  := random tile-mask
+	px    := 1
+	py    := 1
+
+	# reset score:
+	timer-0 := 0
+	timer-1 := 0
+	timer-2 := 0
+;
+
+: move-fuse
+	# don't move every single frame:
+	timer-0 += 1
+	if timer-0 != fuse-speed then return
+	timer-0 := 0
+
+	# increment score:
+	timer-1 += 1
+	if timer-1 == 100 begin
+		timer-1 := 0
+		timer-2 += 1
+	end
+
+	:macro try-move SPRITE REG DELTA {
+		i := SPRITE
+		sprite ex ey 5
+		if vf != 0 begin
+			REG += DELTA
+			return
+		end
+		sprite ex ey 5
+	}
+	try-move dot-n ey -1 # north
+	try-move dot-e ex  1 # east
+	try-move dot-s ey  1 # south
+	try-move dot-w ex -1 # west
+
+: game-over
+	# no trail, so we've failed!
+	i := dot
+	v0 := 6 # keyboard E
+	loop
+		sprite ex ey 5
+		if v0 -key then # key down
+	again
+	loop
+		if v0 key then # key up
+	again
+	clear
+
+: show-score
+	v3 := 37 # x position
+	v4 := 10 # y position
+
+	# draw low two digits:
+	i := digit-buffer
+	bcd timer-1
+	show-score-byte
+
+	# draw high two digits:
+	i := digit-buffer
+	bcd timer-2
+	show-score-byte
+
+	# wait for any key:
+	v0 := key
+
+	init-game
+;
+
+: show-score-byte
+	load v2
+	i := hex v2
+	sprite v3 v4 5
+	v3 += -5
+	i := hex v1
+	sprite v3 v4 5
+	v3 += -5
+;
+
+: show-title
+	v0 := 52
+	v1 := 2
+	v2 := 1
+	i  := title
+	loop
+		sprite v0 v1 1
+		v1 += 1
+		i += v2
+		if v1 != 30 then
+	again
+;
+
+: digit-buffer 0 0 0
+
+: title
+	0x7F 0xFF 0xC0 0xFC 0xC0 0xC0 0x00 0xC3 
+	0xC3 0xC3 0xFF 0x7E 0x00 0x7F 0xFF 0xC0
+	0xFF 0x03 0xFF 0xFE 0x00 0x7F 0xFF 0xC0
+	0xFC 0xC0 0xFF 0x7F
+
+: dot   0x00 0x00 0x00 0x10 0x00
+: dot-n 0x00 0x00 0x10 0x00 0x00
+: dot-s 0x00 0x00 0x00 0x00 0x10
+: dot-e 0x00 0x00 0x00 0x08 0x00
+: dot-w 0x00 0x00 0x00 0x20 0x00
+
+: starts
+	0x40 0x5C 0x54 0x44 0x44 0x7C 0x00 0x00 # N
+	0x00 0x7F 0x40 0x4C 0x44 0x7C 0x00 0x00 # E
+	0x00 0x7C 0x44 0x44 0x54 0x74 0x04 0x00 # S
+	0x00 0x3C 0x24 0x24 0x04 0xFC 0x00 0x00 # W
+
+: tiles
+	0x20 0x20 0xE0 0x00 0x0F 0x08 0x08 0x08 # cross 1
+	0x04 0x04 0x0C 0x08 0xEF 0x20 0x20 0x20 # cross 2
+	0x02 0x7E 0x40 0x7E 0x02 0x7E 0x40 0x7E # zig n-s
+	0xC0 0x5C 0x54 0x55 0x55 0x55 0x57 0x70 # zig e-w
+	0x14 0x14 0x34 0xE7 0x00 0x7E 0xC3 0x00 # tee N
+	0x40 0x5F 0x50 0x57 0x54 0x54 0x54 0x54 # tee E
+	0x00 0xF0 0x1F 0xC0 0x6E 0x2A 0x2B 0x28 # tee S
+	0x22 0xE2 0x02 0x72 0x56 0x54 0xD4 0x14 # tee W
