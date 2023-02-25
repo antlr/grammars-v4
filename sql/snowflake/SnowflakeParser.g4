@@ -3285,6 +3285,8 @@ non_reserved_words
     | STATE
     | ROLE
     | DEFINITION
+    | TIMEZONE
+    | LOCAL
     ;
 
 builtin_function
