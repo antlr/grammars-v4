@@ -2255,7 +2255,7 @@ column_decl_item_list
     ;
 
 create_table
-    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+    : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
         '(' column_decl_item_list ')'
         cluster_by?
         stage_file_format?
@@ -2271,7 +2271,7 @@ create_table
     ;
 
 create_table_as_select
-    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+    : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
         ('(' column_decl_item_list ')')?
         cluster_by?
         copy_grants?

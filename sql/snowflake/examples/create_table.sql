@@ -39,3 +39,7 @@ create table t (i integer default 1 not null unique masking policy m tag (t='t')
 create table t (v varchar unique not null collate 'upper' masking policy m tag (t='t') comment 'hello world');
 create table public.public.public (public int);
 CREATE TABLE T ( Source string NOT NULL, Query_Id string NULL,	State string NOT NULL,Procedure_Name string);
+create table if not exists t1 (v varchar(16777216));
+create table t1 if not exists (v varchar(16777216));
+create table if not exists t2(i int) as select(v) from t1;
+create table t2 if not exists (i int) as select(v) from t1;
