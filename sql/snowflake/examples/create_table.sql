@@ -45,3 +45,6 @@ create table if not exists t2(i int) as select(v) from t1;
 create table t2 if not exists (i int) as select(v) from t1;
 CREATE OR REPLACE TABLE TESTSEED (IDENT int DEFAULT SEQID.NEXTVAL,mycol string);
 CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START 2);
+CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START WITH = 2);
+CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1);
+CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY INCREMENT 2);
