@@ -867,6 +867,7 @@ STRING_ESCAPE:                                         'STRING_ESCAPE';
 STRIP_NULL_VALUES:                                     'STRIP_NULL_VALUES';
 STRIP_OUTER_ARRAY:                                     'STRIP_OUTER_ARRAY';
 STRIP_OUTER_ELEMENT:                                   'STRIP_OUTER_ELEMENT';
+SUBSTR:                                                'SUBSTR';
 SUBSTRING:                                             'SUBSTRING';
 SUM:                                                   'SUM';
 SUPPORTED:                                             'SUPPORTED';

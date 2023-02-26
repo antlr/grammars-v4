@@ -3358,10 +3358,15 @@ expr
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
+    | substring_expr
     ;
 
 iff_expr
     : IFF '(' search_condition ',' expr ',' expr ')'
+    ;
+
+substring_expr
+    : ( SUBSTR | SUBSTRING ) LR_BRACKET expr COMMA expr ( COMMA expr )? RR_BRACKET
     ;
 
 json_literal
