@@ -3345,6 +3345,7 @@ expr
     | over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
+    | object_name DOT NEXTVAL
     ;
 
 iff_expr

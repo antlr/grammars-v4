@@ -43,3 +43,4 @@ create table if not exists t1 (v varchar(16777216));
 create table t1 if not exists (v varchar(16777216));
 create table if not exists t2(i int) as select(v) from t1;
 create table t2 if not exists (i int) as select(v) from t1;
+CREATE OR REPLACE TABLE TESTSEED (IDENT int DEFAULT SEQID.NEXTVAL,mycol string);
