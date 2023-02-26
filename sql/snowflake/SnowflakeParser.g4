@@ -2206,7 +2206,7 @@ not_null
     ;
 
 default_value
-    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | START num INCREMENT num  )?
+    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | START num ( INCREMENT num )?  )?
     ;
 
 foreign_key
