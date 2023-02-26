@@ -3326,6 +3326,10 @@ expr_list
     : expr (COMMA expr)*
     ;
 
+expr_list_sorted
+    : expr asc_desc? (COMMA expr asc_desc?)*
+    ;
+
 expr
     : primitive_expression
     | function_call
@@ -3343,7 +3347,7 @@ expr
     | expr COLON expr //json access
     | expr DOT expr
     | expr COLON_COLON data_type //cast
-    | over_clause
+    | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
     ;
@@ -3414,7 +3418,7 @@ primitive_expression
     ;
 
 order_by_expr
-    : ORDER BY expr
+    : ORDER BY expr_list_sorted
     ;
 
 //order_by_expr_list
@@ -3430,7 +3434,8 @@ asc_desc
     ;
 
 over_clause
-    : OVER '(' partition_by? order_by_expr asc_desc? ')'
+    : OVER '(' partition_by order_by_expr? ')'
+    | OVER '(' order_by_expr ')'
     ;
 
 function_call
