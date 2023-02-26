@@ -99,7 +99,7 @@ do
 done
 
 # Check if any untracked .errors files.
-git ls-files --exclude-standard -o --ignored > $old/new_errors2.txt 2>&1
+git ls-files --exclude-standard -o > $old/new_errors2.txt 2>&1
 new_errors=$?
 
 # Gather up all untracked .errors file output. These are new errors
