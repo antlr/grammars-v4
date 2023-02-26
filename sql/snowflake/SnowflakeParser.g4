@@ -3280,6 +3280,7 @@ non_reserved_words
     | SYSADMIN
     | PUBLIC
     | JAVASCRIPT
+    | RESULT
     ;
 
 builtin_function
@@ -3293,6 +3294,13 @@ builtin_function
     | COALESCE
     | CURRENT_TIMESTAMP
     | CURRENT_DATE
+    ;
+
+list_operator
+    // lexer entry which admit a list of comma separated expr
+    : CONCAT
+    | CONCAT_WS
+    // To complete as needed
     ;
 
 pattern
@@ -3443,6 +3451,7 @@ function_call
     | aggregate_function
 //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
+    | list_operator LR_BRACKET expr_list RR_BRACKET
     ;
 
 ranking_windowed_function
