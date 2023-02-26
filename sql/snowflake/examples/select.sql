@@ -11,3 +11,4 @@ SELECT concat('A',' ','bcd');
 SELECT 'teststring';  
 SELECT 'teststring' AS result;
 SELECT  cast(concat(to_date(ColDate, 'yyyyMMdd'), ' ', substring(ColHour, 1, 2), ':', substr(ColHour, 3, 2), ':', substring(ColHour, 5, 2)) as datetime) as FinalDate;
+with src as (SELECT 1 as COL1 UNION SELECT 2) SELECT COL1 FROM SRC;

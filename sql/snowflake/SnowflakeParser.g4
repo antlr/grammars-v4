@@ -3538,7 +3538,7 @@ with_expression
     ;
 
 common_table_expression
-    : id_ ('(' columns=column_list ')')? AS '(' select_statement ')'
+    : id_ ('(' columns=column_list ')')? AS '(' select_statement set_operators* ')'
     ;
 
 select_statement
