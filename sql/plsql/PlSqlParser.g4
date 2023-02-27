@@ -76,8 +76,8 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
-    | create_flashback_archive
     | create_edition
+    | create_flashback_archive
     | create_index
     | create_library
     | create_table
@@ -875,6 +875,11 @@ file_specification
     | redo_log_file_spec
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
+create_edition
+    : CREATE EDITION e=id_expression (AS CHILD OF pe=id_expression)?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-FLASHBACK-ARCHIVE.html
 create_flashback_archive
     : CREATE FLASHBACK ARCHIVE DEFAULT? fa=id_expression TABLESPACE ts=id_expression
@@ -889,11 +894,6 @@ flashback_archive_quota
 
 flashback_archive_retention
     : RETENTION UNSIGNED_INTEGER (YEAR | MONTH | DAY)
-	;
-
-// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
-create_edition
-    : CREATE EDITION e=id_expression (AS CHILD OF pe=id_expression)?
     ;
 
 create_index
@@ -5797,6 +5797,7 @@ non_reserved_keywords_in_12c
     | DB_UNIQUE_NAME
     | DECORRELATE
     | DEFAULT_CREDENTIAL
+    | DEFAULT_COLLATION
     | DEFINE
     | DEFINITION
     | DELEGATE
