@@ -133,7 +133,7 @@ other_command
     | execute_immediate
     | execute_task
     | explain
-    | get
+    | get_dml
     | grant_ownership
     | grant_to_role
     | grant_to_share
@@ -252,7 +252,7 @@ parallel
     : PARALLEL EQ num
     ;
 
-get
+get_dml
     : GET internal_stage FILE_PATH
             parallel?
             pattern?
@@ -3281,6 +3281,7 @@ non_reserved_words
     | PUBLIC
     | JAVASCRIPT
     | RESULT
+    | INDEX
     ;
 
 builtin_function
@@ -3301,6 +3302,14 @@ list_operator
     : CONCAT
     | CONCAT_WS
     // To complete as needed
+    ;
+binary_builtin_function
+    : ifnull=( IFNULL | NVL )
+    | GET
+    ;
+
+ternary_builtin_function
+    : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )    
     ;
 
 pattern
@@ -3353,12 +3362,15 @@ expr
     | arr_literal
 //    | expr time_zone
     | expr COLON expr //json access
+    | expr DOT VALUE
     | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
     | substring_expr
+    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     ;
 
 iff_expr
@@ -3495,6 +3507,7 @@ literal
     | sign? (REAL | FLOAT)
     | true_false
     | NULL_
+    | AT_Q
     ;
 
 sign
@@ -3660,9 +3673,22 @@ object_ref
         sample?
     | LATERAL? '(' subquery ')'
         as_alias?
+    | LATERAL flatten_table
+        as_alias?
     //| AT id_ PATH?
     //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
     //    as_alias?
+    ;
+
+flatten_table_option
+    : PATH_ ASSOC string
+    | OUTER ASSOC true_false
+    | RECURSIVE ASSOC true_false
+    | MODE ASSOC (ARRAY_Q | OBJECT_Q | BOTH_Q)
+    ;
+
+flatten_table
+    : FLATTEN LR_BRACKET ( INPUT ASSOC )? expr ( COMMA flatten_table_option )* RR_BRACKET
     ;
 
 prior_list
