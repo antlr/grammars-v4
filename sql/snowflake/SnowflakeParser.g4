@@ -3306,6 +3306,8 @@ list_operator
 binary_builtin_function
     : ifnull=( IFNULL | NVL )
     | GET
+    | LEFT
+    | RIGHT
     ;
 
 ternary_builtin_function
@@ -3853,7 +3855,7 @@ null_not_null
     ;
 
 subquery
-    : select_statement
+    : query_statement
     ;
 
 predicate
