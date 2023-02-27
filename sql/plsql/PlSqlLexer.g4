@@ -387,6 +387,7 @@ DECRYPT:                      'DECRYPT';
 DEDUPLICATE:                  'DEDUPLICATE';
 DEFAULT:                      'DEFAULT';
 DEFAULTS:                     'DEFAULTS';
+DEFAULT_COLLATION:            'DEFAULT_COLLATION';
 DEFAULT_CREDENTIAL:           'DEFAULT_CREDENTIAL';
 DEFERRABLE:                   'DEFERRABLE';
 DEFERRED:                     'DEFERRED';
