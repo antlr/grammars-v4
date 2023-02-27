@@ -33,6 +33,8 @@ options {
     caseInsensitive = true;
 }
 
+// Insert here @header for C++ lexer.
+
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
 XmlStart:       '<?xml' -> pushMode(XML);

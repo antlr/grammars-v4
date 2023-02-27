@@ -32,7 +32,7 @@ do
 done
 
 # Parse all input files.
-echo "${files[*]}" | trwdog ./bin/Debug/net6.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | trwdog ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
 status=$?
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
