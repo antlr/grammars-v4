@@ -2161,13 +2161,13 @@ create_stream
         insert_only?
         comment_clause?
     //-- Directory table
-    |  CREATE or_replace? STREAM if_not_exists
+    |  CREATE or_replace? STREAM if_not_exists?
         object_name
         copy_grants?
         ON STAGE object_name
         comment_clause?
     //-- View
-    |  CREATE or_replace STREAM if_not_exists
+    |  CREATE or_replace? STREAM if_not_exists?
         object_name
         copy_grants?
         ON VIEW object_name
