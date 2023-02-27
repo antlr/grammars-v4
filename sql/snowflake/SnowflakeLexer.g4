@@ -1077,7 +1077,7 @@ VARIANT:                                               'VARIANT';
 
 LISTAGG: 'LISTAGG';
 
-DUMMY: 'DUMMY';
+DUMMY: 'DUMMY'; //Dummy is not a keyword but rules reference it. As to be cleaned.
 
 
 SPACE:                  [ \t\r\n]+                    -> channel(HIDDEN);
@@ -1100,9 +1100,9 @@ GCS_PATH:           '\'gcs://\'';
 AZURE_PATH:         '\'azure://\'';
 FILE_PATH:          'file://';            //file://<path_to_file>/<filename>
 
-DBL_DOLLAR           : '$$' (~'$' | '\\$')*? '$$';
+DBL_DOLLAR:             '$$' (~'$' | '\\$')*? '$$';
 
-STRING       options { caseInsensitive=false; }     : '\'' (~'\'' | '\'\'')* '\'';
+STRING:                 '\'' (~'\'' | '\'\'')* '\'';
 
 DECIMAL:             DEC_DIGIT+;
 FLOAT:               DEC_DOT_DEC;

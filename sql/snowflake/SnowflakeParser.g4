@@ -3687,6 +3687,7 @@ object_ref
     | '(' values ')'
         sample?
     | LATERAL? '(' subquery ')'
+        pivot_unpivot?
         as_alias?
     | LATERAL flatten_table
         as_alias?
@@ -3815,12 +3816,8 @@ match_recognize
     RR_BRACKET
     ;
 
-val
-    : DUMMY
-    ;
-
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET val (COMMA val)* RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
