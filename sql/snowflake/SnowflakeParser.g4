@@ -3308,10 +3308,19 @@ binary_builtin_function
     | GET
     | LEFT
     | RIGHT
+    | DATE_PART
+    | to_date=( TO_DATE | DATE )
+    ;
+
+binary_or_ternary_builtin_function
+    : CHARINDEX
+    | REPLACE
+    | substring=( SUBSTRING | SUBSTR )
     ;
 
 ternary_builtin_function
-    : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )    
+    : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
+    | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     ;
 
 pattern
@@ -3370,17 +3379,19 @@ expr
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
-    | substring_expr
     | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
+    | subquery
+    | try_cast_expr
     ;
 
 iff_expr
     : IFF '(' search_condition ',' expr ',' expr ')'
     ;
 
-substring_expr
-    : ( SUBSTR | SUBSTRING ) LR_BRACKET expr COMMA expr ( COMMA expr )? RR_BRACKET
+try_cast_expr
+    : TRY_CAST LR_BRACKET expr AS data_type RR_BRACKET
     ;
 
 json_literal
@@ -3471,6 +3482,8 @@ function_call
 //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
     | list_operator LR_BRACKET expr_list RR_BRACKET
+    | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
+    | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
     ;
 
 ranking_windowed_function

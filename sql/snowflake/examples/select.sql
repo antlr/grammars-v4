@@ -14,3 +14,7 @@ SELECT  cast(concat(to_date(ColDate, 'yyyyMMdd'), ' ', substring(ColHour, 1, 2),
 with src as (SELECT 1 as COL1 UNION SELECT 2) SELECT COL1 FROM SRC;
 SELECT IFNULL(DATEADD(DAY, -1, CAST(ColDate as date)), CAST('2999-12-31' as datetime)) , NVL(TIMEADD(DAY, -1, CAST(ColDate as date)), CAST('2999-12-31' as datetime));
 SELECT RES FROM (SELECT LEFT('COL1',1) AS RES UNION SELECT RIGHT('COL1',1)) as TableRes;
+SELECT to_date(select dateadd(d,-((date_part(dw,getdate())+1)%7+1),getdate())) AS Res;
+SELECT TRY_CAST("150" as INT);
+SELECT LEN(COL1), LENGTH (COL2) from t;
+SELECT REPLACE('abcd', 'bc'), CHARINDEX('abcd','c') F;
