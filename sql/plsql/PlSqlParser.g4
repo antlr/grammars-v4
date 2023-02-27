@@ -44,6 +44,7 @@ unit_statement
     | alter_function
     | alter_package
     | alter_procedure
+    | alter_resource_cost
     | alter_rollback_segment
     | alter_sequence
     | alter_session
@@ -81,6 +82,7 @@ unit_statement
     | create_index
     | create_library
     | create_table
+    | create_profile
     | create_role
     | create_tablespace
     | create_view //TODO
@@ -267,6 +269,11 @@ create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')?
       invoker_rights_clause? (IS | AS)
       (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
+alter_resource_cost
+    : ALTER RESOURCE COST ((CPU_PER_SESSION | CONNECT_TIME | LOGICAL_READS_PER_SESSION | PRIVATE_SGA) UNSIGNED_INTEGER)+
     ;
 
 // Rollback Segment DDLs
@@ -2161,6 +2168,39 @@ create_cluster
           parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)?
           (CACHE | NOCACHE)?
           ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-PROFILE.html
+create_profile
+    : CREATE MANDATORY? PROFILE p=id_expression
+        LIMIT (resource_parameters | password_parameters)+
+        container_clause?
+    ;
+
+resource_parameters
+    : ( SESSIONS_PER_USER
+      | CPU_PER_SESSION
+      | CPU_PER_CALL
+      | CONNECT_TIME
+      | IDLE_TIME
+      | LOGICAL_READS_PER_SESSION
+      | LOGICAL_READS_PER_CALL
+      | COMPOSITE_LIMIT
+      ) (UNSIGNED_INTEGER | UNLIMITED | DEFAULT)
+      | PRIVATE_SGA (size_clause | UNLIMITED | DEFAULT)
+    ;
+
+password_parameters
+    : ( FAILED_LOGIN_ATTEMPTS
+      | PASSWORD_LIFE_TIME
+      | PASSWORD_REUSE_TIME
+      | PASSWORD_REUSE_MAX
+      | PASSWORD_LOCK_TIME
+      | PASSWORD_GRACE_TIME
+      | INACTIVE_ACCOUNT_TIME
+      ) (expression | UNLIMITED | DEFAULT)
+      | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
+      | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
     ;
 
 create_role
@@ -5844,6 +5884,7 @@ non_reserved_keywords_in_12c
     | ILM
     | IMMUTABLE
     | INACTIVE
+    | INACTIVE_ACCOUNT_TIME
     | INDEXING
     | INHERIT
     | INMEMORY
@@ -5876,6 +5917,7 @@ non_reserved_keywords_in_12c
     | LOCKING
     | LOGMINING
     | LOST
+    | MANDATORY
     | MAP
     | MATCH
     | MATCHES
@@ -5945,6 +5987,7 @@ non_reserved_keywords_in_12c
     | ORA_RAWCOMPARE
     | ORA_RAWCONCAT
     | ORA_WRITE_TIME
+    | PASSWORD_ROLLOVER_TIME
     | PARTIAL
     | PARTIAL_JOIN
     | PARTIAL_ROLLUP_PUSHDOWN
