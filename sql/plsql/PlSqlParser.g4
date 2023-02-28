@@ -59,6 +59,7 @@ unit_statement
     | alter_materialized_view
     | alter_materialized_view_log
     | alter_materialized_zonemap
+    | alter_operator
     | alter_user
     | alter_view
 
@@ -2090,12 +2091,54 @@ zonemap_name
     : identifier ('.' id_expression)?
     ;
 
+operator_name
+    : identifier ('.' id_expression)?
+    ;
+
+operator_function_name
+    : identifier ('.' id_expression)*
+    ;
+
 create_zonemap_on_table
     : ON tableview_name LEFT_PAREN column_list RIGHT_PAREN
     ;
 
 create_zonemap_as_subquery
     : AS subquery
+    ;
+
+alter_operator
+    : ALTER OPERATOR operator_name (add_binding_clause | drop_binding_clause | COMPILE)
+    ;
+
+add_binding_clause
+    : ADD BINDING LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN
+        RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
+    ;
+
+implementation_clause
+    : ANCILLARY TO primary_operator_list | operator_context_clause
+    ;
+
+primary_operator_list
+    : primary_operator_item (COMMA primary_operator_item)*
+    ;
+
+primary_operator_item
+    : schema_object_name LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN
+    ;
+
+operator_context_clause
+    : WITH INDEX CONTEXT COMMA SCAN CONTEXT implementation_type_name (COMPUTE ANCILLARY DATA)?
+        (WITH COLUMN CONTEXT)?
+    ;
+
+using_function_clause
+    : USING operator_function_name
+    ;
+
+drop_binding_clause
+    : DROP BINDING LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN FORCE?
     ;
 
 create_materialized_view
