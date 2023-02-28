@@ -226,12 +226,8 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON comment_object_type object_name IS string
-    | COMMENT if_exists? ON COLUMN column_name IS string
-    ;
-
-comment_object_type
-    : TABLE
+    : COMMENT if_exists? ON object_type_name object_name IS string
+    | COMMENT if_exists? ON COLUMN full_column_name IS string
     ;
 
 commit
@@ -384,7 +380,21 @@ object_privilege
     ;
 
 grant_role
-    : GRANT ROLE id_ TO ( ROLE id_ | USER id_ )?
+    : GRANT ROLE role_name TO (ROLE role_name | USER id_)
+    ;
+
+role_name
+    : system_defined_role
+    | id_
+    ;
+
+system_defined_role
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
     ;
 
 list
@@ -440,7 +450,7 @@ revoke_from_share
     ;
 
 revoke_role
-    : REVOKE ROLE id_ FROM ( ROLE id_ | USER id_ )
+    : REVOKE ROLE role_name FROM (ROLE role_name | USER id_)
     ;
 
 rollback
@@ -559,7 +569,7 @@ object_properties
     | MINS_TO_BYPASS_MFA EQ num
     | RSA_PUBLIC_KEY EQ string
     | RSA_PUBLIC_KEY_2 EQ string
-    | COMMENT EQ string
+    | comment_clause
     ;
 
 session_params
@@ -795,7 +805,7 @@ alter_pipe
 
 alter_procedure
     : ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' RENAME TO id_
-    | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' SET COMMENT EQ string
+    | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' SET comment_clause
     | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' UNSET COMMENT
     | ALTER PROCEDURE if_exists? id_ '(' data_type_list? ')' EXECUTE AS caller_owner
     ;
@@ -1409,7 +1419,7 @@ create_account
             EDITION EQ ( STANDARD | ENTERPRISE | BUSINESS_CRITICAL )
           ( REGION_GROUP EQ region_group_id )?
           ( REGION EQ snowflake_region_id )?
-          ( comment_clause )?
+          comment_clause?
     ;
 
 create_api_integration
@@ -1442,13 +1452,13 @@ create_api_integration
 create_object_clone
     : CREATE or_replace? ( DATABASE | SCHEMA | TABLE ) if_not_exists? id_
         CLONE object_name
-              ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+              ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     | CREATE or_replace? ( STAGE | FILE FORMAT | SEQUENCE | STREAM | TASK ) if_not_exists? object_name
         CLONE object_name
     ;
 
 create_connection
-    : CREATE CONNECTION if_not_exists? id_ ( ( COMMENT EQ string )? | (AS REPLICA OF id_ DOT id_ DOT id_ ( COMMENT EQ string )?) )
+    : CREATE CONNECTION if_not_exists? id_ ( comment_clause? | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?) )
     ;
 
 create_database
@@ -1462,11 +1472,11 @@ create_database
     ;
 
 clone_at_before
-    : CLONE id_ ( at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) ')' )?
+    : CLONE id_ ( at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ ) RR_BRACKET )?
     ;
 
 at_before1
-    : AT | BEFORE
+    : AT_KEYWORD | BEFORE
     ;
 
 header_decl
@@ -1604,7 +1614,7 @@ create_function
     ;
 
 create_managed_account
-    : CREATE MANAGED ACCOUNT id_ ADMIN_NAME EQ id_ COMMA ADMIN_PASSWORD EQ string COMMA TYPE EQ READER (COMMA COMMENT EQ string)?
+    : CREATE MANAGED ACCOUNT id_ ADMIN_NAME EQ id_ COMMA ADMIN_PASSWORD EQ string COMMA TYPE EQ READER (COMMA comment_clause)?
     ;
 
 create_masking_policy
@@ -1615,7 +1625,7 @@ create_masking_policy
     ;
 
 tag_decl
-    : id_ EQ string
+    : object_name EQ string
     ;
 
 column_list_in_parentheses
@@ -1706,6 +1716,14 @@ create_procedure
         RETURNS ( data_type | TABLE LR_BRACKET ( col_decl (COMMA col_decl)* )? RR_BRACKET )
         ( NOT NULL_ )?
         LANGUAGE SQL
+        ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+        ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
+        comment_clause?
+        executa_as?
+        AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET ( arg_decl (COMMA arg_decl)* )? RR_BRACKET
+        RETURNS data_type ( NOT NULL_ )?
+        LANGUAGE JAVASCRIPT
         ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
         ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
         comment_clause?
@@ -2121,7 +2139,7 @@ show_initial_rows
     ;
 
 stream_time
-    : at_before1 '(' ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) ')'
+    : at_before1 LR_BRACKET ( TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_ | STREAM ASSOC string ) RR_BRACKET
     ;
 
 create_stream
@@ -2213,15 +2231,18 @@ out_of_line_constraint
         constraint_properties?
     ;
 
+
 full_col_decl
     : col_decl
-        collate?
-        comment_clause?
-        default_value?
-        not_null?
+        (
+            collate
+            | inline_constraint
+            | default_value
+            | not_null
+        )*
         with_masking_policy?
         with_tags?
-        inline_constraint?
+        (COMMENT string)?
     ;
 
 column_decl_item
@@ -2261,7 +2282,7 @@ create_table_as_select
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ ( COMMENT EQ string )?
+    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
     | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
     ;
 
@@ -2401,7 +2422,7 @@ create_view
         with_tags?
         copy_grants?
         comment_clause?
-        AS select_statement
+        AS query_statement
     ;
 
 create_warehouse
@@ -3230,6 +3251,7 @@ id_
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | non_reserved_words
     | data_type
     | builtin_function
     ;
@@ -3248,6 +3270,16 @@ keyword
     | AT_KEYWORD
     | TIMESTAMP
     // etc
+    ;
+
+non_reserved_words
+    : ORGADMIN
+    | ACCOUNTADMIN
+    | SECURITYADMIN
+    | USERADMIN
+    | SYSADMIN
+    | PUBLIC
+    | JAVASCRIPT
     ;
 
 builtin_function
@@ -3684,7 +3716,7 @@ measures
     ;
 
 match_opts
-    : SHOW EMPTY MATCHES | OMIT EMPTY MATCHES | WITH UNMATCHED ROWS
+    : SHOW EMPTY_ MATCHES | OMIT EMPTY_ MATCHES | WITH UNMATCHED ROWS
     ;
 
 row_match

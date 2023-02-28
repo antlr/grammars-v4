@@ -11,7 +11,7 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
-		<antlr.version>4.11.1</antlr.version>
+		<antlr.version>4.12.0</antlr.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -52,7 +52,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.11.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -90,6 +90,7 @@
 				<module>bcl</module>
 				<module>bcpl</module>
 				<module>bdf</module>
+				<module>bencoding</module>
 				<module>bibcode</module>
 				<module>bicep</module>
 				<module>bnf</module>
@@ -262,6 +263,7 @@
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
+                <module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
@@ -358,7 +360,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.4.1</version>
+						<version>3.5.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>

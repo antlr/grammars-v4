@@ -1,12 +1,8 @@
-# Generated code from trgen <version>
-GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
-default:
-	dotnet restore
-	dotnet build
-run:
-	trwdog dotnet run $(RUNARGS)
+# Generated from trgen <version>
+build:
+	bash build.sh
 clean:
-	dotnet clean
-	rm -rf bin obj
-test:
+	bash clean.sh
+FORCE: ;
+test: FORCE
 	bash test.sh

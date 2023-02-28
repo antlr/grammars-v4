@@ -672,9 +672,9 @@ typedtableelementlist
    ;
 
 tableelement
-   : columnDef
+   : tableconstraint
    | tablelikeclause
-   | tableconstraint
+   | columnDef
    ;
 
 typedtableelement
