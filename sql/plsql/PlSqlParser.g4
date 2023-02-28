@@ -42,6 +42,7 @@ unit_statement
     | alter_database_link
     | alter_flashback_archive
     | alter_function
+    | alter_outline
     | alter_package
     | alter_procedure
     | alter_resource_cost
@@ -81,6 +82,7 @@ unit_statement
     | create_flashback_archive
     | create_index
     | create_library
+    | create_outline
     | create_table
     | create_profile
     | create_role
@@ -110,6 +112,7 @@ unit_statement
     | drop_procedure
     | drop_materialized_view
     | drop_materialized_zonemap
+    | drop_outline
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -190,6 +193,20 @@ relies_on_part
 
 streaming_clause
     : (ORDER | CLUSTER) expression BY paren_column_list
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-OUTLINE.html
+alter_outline
+    : ALTER OUTLINE (PUBLIC | PRIVATE)? o=id_expression
+        outline_options+
+    ;
+
+outline_options
+    : REBUILD
+    | RENAME TO non=id_expression
+    | CHANGE CATEGORY TO ncn=id_expression
+    | ENABLE
+    | DISABLE
     ;
 
 // Package DDLs
@@ -274,6 +291,11 @@ create_procedure_body
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
 alter_resource_cost
     : ALTER RESOURCE COST ((CPU_PER_SESSION | CONNECT_TIME | LOGICAL_READS_PER_SESSION | PRIVATE_SGA) UNSIGNED_INTEGER)+
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-OUTLINE.html
+drop_outline
+    : DROP OUTLINE o=id_expression
     ;
 
 // Rollback Segment DDLs
@@ -2201,6 +2223,14 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
+create_outline
+    : CREATE (OR REPLACE)? (PUBLIC | PRIVATE)? OUTLINE (o=id_expression)?
+        (FROM (PUBLIC | PRIVATE)? so=id_expression)?
+        (FOR CATEGORY c=id_expression)?
+        (ON statement)?
     ;
 
 create_role
