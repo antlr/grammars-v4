@@ -40,6 +40,7 @@ unit_statement
     | alter_cluster
     | alter_database
     | alter_database_link
+    | alter_dimension
     | alter_flashback_archive
     | alter_function
     | alter_package
@@ -128,6 +129,7 @@ unit_statement
     | drop_inmemory_join_group
     | drop_database_link
 
+    | disassociate_statistics
     | flashback_table
 
     | rename_object
@@ -1571,6 +1573,19 @@ drop_index
     : DROP INDEX index_name ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DISASSOCIATE-STATISTICS.html
+disassociate_statistics
+    : DISASSOCIATE STATISTICS FROM
+        ( COLUMNS (schema_name '.')? tb=id_expression '.' c=id_expression (',' (schema_name '.')? tb=id_expression '.' c=id_expression)*
+        | FUNCTIONS (schema_name '.')? fn=id_expression (',' (schema_name '.')? fn=id_expression)*
+        | PACKAGES (schema_name '.')? pkg=id_expression (',' (schema_name '.')? pkg=id_expression)*
+        | TYPES (schema_name '.')? t=id_expression (',' (schema_name '.')? t=id_expression)*
+        | INDEXES (schema_name '.')? ix=id_expression (',' (schema_name '.')? ix=id_expression)*
+        | INDEXTYPES (schema_name '.')? it=id_expression (',' (schema_name '.')? it=id_expression)*
+        )
+        FORCE?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
 drop_inmemory_join_group
     : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
@@ -1677,6 +1692,40 @@ parameter_value
 
 library_name
     : (regular_id '.')? regular_id
+    ;
+
+alter_dimension
+    : ALTER DIMENSION identifier
+    ( (ADD (level_clause | hierarchy_clause | attribute_clause |  extended_attribute_clause))+
+     | (DROP (LEVEL identifier (RESTRICT | CASCADE)? | HIERARCHY identifier | ATTRIBUTE identifier (LEVEL identifier (COLUMN column_name (',' COLUMN column_name)*)?)? ))+
+     | COMPILE
+    )
+    ;
+
+level_clause
+    : LEVEL identifier IS (table_name '.' column_name | '(' table_name '.' column_name (',' table_name '.' column_name)* ')')
+        (SKIP_ WHEN NULL_)?
+    ;
+
+hierarchy_clause
+    : HIERARCHY identifier '(' identifier (CHILD OF identifier)+ dimension_join_clause? ')'
+    ;
+
+dimension_join_clause
+    : (JOIN KEY column_one_or_more_sub_clause REFERENCES identifier)+
+    ;
+
+attribute_clause
+    : (ATTRIBUTE identifier DETERMINES column_one_or_more_sub_clause)+
+    ;
+
+extended_attribute_clause
+    : ATTRIBUTE identifier (LEVEL identifier DETERMINES column_one_or_more_sub_clause )+
+    ;
+
+column_one_or_more_sub_clause
+    : column_name
+    | '(' column_name (',' column_name)* ')'
     ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4004.htm#SQLRF01104
