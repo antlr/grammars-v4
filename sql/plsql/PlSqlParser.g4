@@ -107,6 +107,7 @@ unit_statement
     | drop_edition
     | drop_flashback_archive
     | drop_function
+    | drop_hierarchy
     | drop_library
     | drop_package
     | drop_procedure
@@ -1654,6 +1655,11 @@ directory_name
 
 directory_path
     : CHAR_STRING
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-HIERARCHY.html
+drop_hierarchy
+    : DROP HIERARCHY (schema_name '.')? hn=id_expression
     ;
 
 // https://docs.oracle.com/cd/E11882_01/appdev.112/e25519/alter_library.htm#LNPLS99946
