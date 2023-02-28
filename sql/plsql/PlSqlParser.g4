@@ -40,6 +40,7 @@ unit_statement
     | alter_cluster
     | alter_database
     | alter_database_link
+    | alter_dimension
     | alter_flashback_archive
     | alter_function
     | alter_package
@@ -1657,6 +1658,40 @@ parameter_value
 
 library_name
     : (regular_id '.')? regular_id
+    ;
+
+alter_dimension
+    : ALTER DIMENSION identifier
+    ( (ADD (level_clause | hierarchy_clause | attribute_clause |  extended_attribute_clause))+
+     | (DROP (LEVEL identifier (RESTRICT | CASCADE)? | HIERARCHY identifier | ATTRIBUTE identifier (LEVEL identifier (COLUMN column_name (',' COLUMN column_name)*)?)? ))+
+     | COMPILE
+    )
+    ;
+
+level_clause
+    : LEVEL identifier IS (table_name '.' column_name | '(' table_name '.' column_name (',' table_name '.' column_name)* ')')
+        (SKIP_ WHEN NULL_)?
+    ;
+
+hierarchy_clause
+    : HIERARCHY identifier '(' identifier (CHILD OF identifier)+ dimension_join_clause? ')'
+    ;
+
+dimension_join_clause
+    : (JOIN KEY column_one_or_more_sub_clause REFERENCES identifier)+
+    ;
+
+attribute_clause
+    : (ATTRIBUTE identifier DETERMINES column_one_or_more_sub_clause)+
+    ;
+
+extended_attribute_clause
+    : ATTRIBUTE identifier (LEVEL identifier DETERMINES column_one_or_more_sub_clause )+
+    ;
+
+column_one_or_more_sub_clause
+    : column_name
+    | '(' column_name (',' column_name)* ')'
     ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4004.htm#SQLRF01104
