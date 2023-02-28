@@ -55,6 +55,7 @@ unit_statement
     | alter_tablespace
     | alter_role
     | alter_index
+    | alter_inmemory_join_group
     | alter_library
     | alter_materialized_view
     | alter_materialized_view_log
@@ -80,6 +81,7 @@ unit_statement
     | create_edition
     | create_flashback_archive
     | create_index
+    | create_inmemory_join_group
     | create_library
     | create_table
     | create_profile
@@ -123,6 +125,7 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_inmemory_join_group
     | drop_database_link
 
     | flashback_table
@@ -1173,6 +1176,12 @@ new_index_name
     : index_name
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-INMEMORY-JOIN-GROUP.html
+alter_inmemory_join_group
+    : ALTER INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        (ADD | REMOVE) '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' ')'
+    ;
+
 create_user
     : CREATE USER
       user_object_name
@@ -1562,6 +1571,11 @@ drop_index
     : DROP INDEX index_name ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
+drop_inmemory_join_group
+    : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+    ;
+
 flashback_table
     : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
       ( ((SCN | TIMESTAMP) expression | RESTORE POINT restore_point) ((ENABLE | DISABLE) TRIGGERS)?
@@ -1608,6 +1622,12 @@ directory_name
 
 directory_path
     : CHAR_STRING
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-INMEMORY-JOIN-GROUP.html
+create_inmemory_join_group
+    : CREATE INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' (',' (schema_name '.')? t=id_expression '(' c=id_expression ')')+ ')'
     ;
 
 // https://docs.oracle.com/cd/E11882_01/appdev.112/e25519/alter_library.htm#LNPLS99946
