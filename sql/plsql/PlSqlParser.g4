@@ -99,6 +99,7 @@ unit_statement
     | create_trigger
     | create_type
     | create_synonym
+    | create_spfile
 
     | drop_analytic_view
     | drop_attribute_dimension
@@ -2949,6 +2950,20 @@ create_synonym
 
 drop_synonym
     : DROP PUBLIC? SYNONYM (schema_name '.')? synonym_name FORCE?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-SPFILE.html
+create_spfile
+    : CREATE SPFILE ('=' spfile_name)?
+        FROM (PFILE ('=' pfile_name)? (AS COPY)? | MEMORY)
+    ;
+
+spfile_name
+    : CHAR_STRING
+    ;
+
+pfile_name
+    : CHAR_STRING
     ;
 
 comment_on_table
