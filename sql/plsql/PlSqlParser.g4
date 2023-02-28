@@ -125,6 +125,7 @@ unit_statement
     | drop_index
     | drop_database_link
 
+    | disassociate_statistics
     | flashback_table
 
     | rename_object
@@ -1560,6 +1561,19 @@ sql_statement_shortcut
 
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DISASSOCIATE-STATISTICS.html
+disassociate_statistics
+    : DISASSOCIATE STATISTICS FROM
+        ( COLUMNS (schema_name '.')? tb=id_expression '.' c=id_expression (',' (schema_name '.')? tb=id_expression '.' c=id_expression)*
+        | FUNCTIONS (schema_name '.')? fn=id_expression (',' (schema_name '.')? fn=id_expression)*
+        | PACKAGES (schema_name '.')? pkg=id_expression (',' (schema_name '.')? pkg=id_expression)*
+        | TYPES (schema_name '.')? t=id_expression (',' (schema_name '.')? t=id_expression)*
+        | INDEXES (schema_name '.')? ix=id_expression (',' (schema_name '.')? ix=id_expression)*
+        | INDEXTYPES (schema_name '.')? it=id_expression (',' (schema_name '.')? it=id_expression)*
+        )
+        FORCE?
     ;
 
 flashback_table
