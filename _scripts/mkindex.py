@@ -113,9 +113,10 @@ def index_grammars(root : str) -> Sequence[dict]:
             if exampleFilesDir is None:
                 continue
             exampleFilesDir = os.path.join(path,exampleFilesDir)
+            prefix = str(exampleFilesDir).replace('\\','/').removeprefix("./")
             if not os.path.exists(exampleFilesDir):
                 continue
-            examplesFiles = [str(f).replace('\\','/') for f in Path(exampleFilesDir).glob("**/*") if f.is_file() and not (f.parts[-1].endswith(".errors") or f.parts[-1].endswith(".tree")) ]
+            examplesFiles = [str(f).replace('\\','/').removeprefix(prefix) for f in Path(exampleFilesDir).glob("**/*") if f.is_file() and not (f.parts[-1].endswith(".errors") or f.parts[-1].endswith(".tree")) ]
 
             entry = {
                 'name' : grammarName,
