@@ -833,6 +833,8 @@ keyword
     | Require
     | TypeAlias
     | String
+    | Boolean
+    | Number
     ;
 
 getter

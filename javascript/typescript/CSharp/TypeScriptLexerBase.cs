@@ -31,7 +31,7 @@ public abstract class TypeScriptLexerBase : Lexer
     private bool _useStrictCurrent;
 
     /// <summary>
-    /// Keeps track of the the current depth of nested template string backticks.
+    /// Keeps track of the current depth of nested template string backticks.
     /// E.g. after the X in:
     ///
     /// `${a ? `${X
@@ -40,6 +40,16 @@ public abstract class TypeScriptLexerBase : Lexer
     /// plain CloseBrace, or one that closes an expression inside a template string.
     /// </summary>
     private int _templateDepth = 0;
+
+    /// <summary>
+    /// Keeps track of the depth of open- and close-braces. Used for expressions like:
+    ///
+    /// `${[1, 2, 3].map(x => { return x * 2;}).join("")}`
+    ///
+    /// where the '}' from `return x * 2;}` should not become a `TemplateCloseBrace`
+    /// token but rather a `CloseBrace` token.
+    /// </summary>
+    private int _bracesDepth = 0;
 
     public TypeScriptLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
@@ -67,9 +77,14 @@ public abstract class TypeScriptLexerBase : Lexer
         return _useStrictCurrent;
     }
 
+    public void StartTemplateString()
+    {
+      _bracesDepth = 0;
+    }
+
     public bool IsInTemplateString()
     {
-        return _templateDepth > 0;
+        return _templateDepth > 0 && _bracesDepth == 0;
     }
 
     /// <summary>
@@ -98,12 +113,14 @@ public abstract class TypeScriptLexerBase : Lexer
 
     protected void ProcessOpenBrace()
     {
+        _bracesDepth++;
         _useStrictCurrent = (_scopeStrictModes.Count > 0 && _scopeStrictModes.Peek()) || UseStrictDefault;
         _scopeStrictModes.Push(_useStrictCurrent);
     }
 
     protected void ProcessCloseBrace()
     {
+        _bracesDepth--;
         _useStrictCurrent = _scopeStrictModes.Count > 0 ? _scopeStrictModes.Pop() : UseStrictDefault;
     }
 
