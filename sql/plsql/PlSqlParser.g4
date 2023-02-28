@@ -128,6 +128,7 @@ unit_statement
 
     | disassociate_statistics
     | flashback_table
+    | noaudit_statement
 
     | rename_object
 
@@ -1586,6 +1587,18 @@ flashback_table
 
 restore_point
     : identifier ('.' id_expression)*
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
+noaudit_statement
+    : NOAUDIT
+        ( audit_operation_clause auditing_by_clause?
+        | audit_schema_object_clause
+        | NETWORK
+        | DIRECT_PATH LOAD auditing_by_clause?
+        )
+        (WHENEVER NOT? SUCCESSFUL)?
+        container_clause?
     ;
 
 rename_object
