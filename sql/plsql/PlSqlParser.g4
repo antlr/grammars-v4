@@ -43,6 +43,7 @@ unit_statement
     | alter_flashback_archive
     | alter_function
     | alter_package
+    | alter_pmem_filestore
     | alter_procedure
     | alter_resource_cost
     | alter_rollback_segment
@@ -90,6 +91,7 @@ unit_statement
     | create_materialized_view
     | create_materialized_view_log
     | create_materialized_zonemap
+    | create_pmem_filestore
     | create_rollback_segment
     | create_user
     | create_database_link
@@ -107,6 +109,7 @@ unit_statement
     | drop_function
     | drop_library
     | drop_package
+    | drop_pmem_filestore
     | drop_procedure
     | drop_materialized_view
     | drop_materialized_zonemap
@@ -244,6 +247,22 @@ package_obj_body
     | function_spec
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
+alter_pmem_filestore
+    : ALTER PMEM FILESTORE fsn=id_expression
+        ( RESIZE size_clause
+        | autoextend_clause
+        | MOUNT (MOUNTPOINT file_path)? (BACKINGFILE filename)? FORCE? //inconsistent documentation
+        | DISMOUNT
+        )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/drop-pmem-filestore.html
+drop_pmem_filestore
+    : DROP PMEM FILESTORE fsn=id_expression
+        ((FORCE? INCLUDING | EXCLUDING) CONTENTS)?
+    ;
+
 // Procedure DDLs
 
 drop_procedure
@@ -289,6 +308,23 @@ drop_rollback_segment
 
 drop_role
     : DROP ROLE role_name ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/create-pmem-filestore.html
+create_pmem_filestore
+    : CREATE PMEM FILESTORE fsn=id_expression
+        pmem_filestore_options+
+    ;
+
+pmem_filestore_options
+    : MOUNTPOINT file_path
+    | BACKINGFILE filename REUSE?
+    | (SIZE | BLOCKSIZE) size_clause
+    | autoextend_clause
+    ;
+
+file_path
+    : CHAR_STRING
     ;
 
 create_rollback_segment
@@ -5686,6 +5722,7 @@ regular_id
     | AGGREGATE
     | ANALYZE
     | AUTONOMOUS_TRANSACTION
+    | BACKINGFILE
     | BATCH
     | BINARY_INTEGER
     | BOOLEAN
@@ -5705,6 +5742,7 @@ regular_id
     | EXCEPTIONS
     | EXISTS
     | EXIT
+    | FILESTORE
     | FLOAT
     | FORALL
     | G_LETTER
@@ -5715,6 +5753,7 @@ regular_id
     | LANGUAGE
     | LONG
     | LOOP
+    | MOUNTPOINT
     | M_LETTER
     | NUMBER
     | ORADATA
@@ -5725,6 +5764,7 @@ regular_id
     | PARALLEL_ENABLE
     | PIPELINED
     | PLS_INTEGER
+    | PMEM
     | POSITIVE
     | POSITIVEN
     | PRAGMA
