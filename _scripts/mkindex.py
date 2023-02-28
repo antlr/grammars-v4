@@ -115,7 +115,7 @@ def index_grammars(root : str) -> Sequence[dict]:
             exampleFilesDir = os.path.join(path,exampleFilesDir)
             if not os.path.exists(exampleFilesDir):
                 continue
-            examplesFiles = os.listdir(exampleFilesDir)
+            examplesFiles = [str(f).replace('\\','/') for f in Path(exampleFilesDir).glob("**/*") if f.is_file() and not (f.parts[-1].endswith(".errors") or f.parts[-1].endswith(".tree")) ]
 
             entry = {
                 'name' : grammarName,
@@ -133,4 +133,4 @@ if __name__ == '__main__':
         print("Usage: python mkindex.py grammars-v4-path")
         exit(1)
     grammars = index_grammars(sys.argv[1])
-    print(json.dumps(grammars))
+    print(json.dumps(grammars, indent=1))
