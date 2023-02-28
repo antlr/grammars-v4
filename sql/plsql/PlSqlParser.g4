@@ -42,6 +42,7 @@ unit_statement
     | alter_database_link
     | alter_flashback_archive
     | alter_function
+    | alter_hierarchy
     | alter_package
     | alter_procedure
     | alter_resource_cost
@@ -79,6 +80,7 @@ unit_statement
     | create_controlfile
     | create_edition
     | create_flashback_archive
+    | create_hierarchy
     | create_index
     | create_library
     | create_table
@@ -158,6 +160,11 @@ alter_flashback_archive
         | PURGE (ALL | BEFORE (SCN expression | TIMESTAMP expression))
         | NO? OPTIMIZE DATA
         )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-HIERARCHY.html
+alter_hierarchy
+    : ALTER HIERARCHY (schema_name '.')? hn=id_expression (RENAME TO nhn=id_expression | COMPILE)
     ;
 
 alter_function
@@ -901,6 +908,45 @@ flashback_archive_quota
 
 flashback_archive_retention
     : RETENTION UNSIGNED_INTEGER (YEAR | MONTH | DAY)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-HIERARCHY.html
+create_hierarchy
+    : CREATE (OR REPLACE)? (NO? FORCE)? HIERARCHY (schema_name '.')? h=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        classification_clause*
+        hier_using_clause
+        level_hier_clause
+        hier_attrs_clause?
+    ;
+
+hier_using_clause
+    : USING (schema_name '.')? ad=id_expression
+    ;
+
+level_hier_clause
+    : '(' (l=id_expression (CHILD OF)?)+ ')'
+    ;
+
+hier_attrs_clause
+    : HIERARCHICAL ATTRIBUTES '(' hier_attr_clause ')'
+    ;
+
+hier_attr_clause
+    : hier_attr_name classification_clause*
+    ;
+
+hier_attr_name
+    : MEMBER_NAME
+    | MEMBER_UNIQUE_NAME
+    | MEMBER_CAPTION
+    | MEMBER_DESCRIPTION
+    | LEVEL_NAME
+    | HIER_ORDER
+    | DEPTH
+    | IS_LEAF
+    | PARENT_LEVEL_NAME
+    | PARENT_UNIQUE_NAME
     ;
 
 create_index
@@ -5879,6 +5925,8 @@ non_reserved_keywords_in_12c
     | GET
     | HALF_YEARS
     | HASHING
+    | HIER_ORDER
+    | HIERARCHICAL
     | HOURS
     | IDLE
     | ILM
@@ -5891,6 +5939,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | IS_LEAF
     | JSON
     | JSONGET
     | JSONPARSE
@@ -5912,6 +5961,7 @@ non_reserved_keywords_in_12c
     | LAX
     | LEAD_CDB
     | LEAD_CDB_URI
+    | LEVEL_NAME
     | LIFECYCLE
     | LINEAR
     | LOCKING
@@ -5926,6 +5976,10 @@ non_reserved_keywords_in_12c
     | MAX_SHARED_TEMP_SIZE
     | MEMCOMPRESS
     | METADATA
+    | MEMBER_CAPTION
+    | MEMBER_DESCRIPTION
+    | MEMBER_NAME
+    | MEMBER_UNIQUE_NAME
     | MEMOPTIMIZE
     | MINUTES
     | MODEL_NB
@@ -5987,6 +6041,8 @@ non_reserved_keywords_in_12c
     | ORA_RAWCOMPARE
     | ORA_RAWCONCAT
     | ORA_WRITE_TIME
+    | PARENT_LEVEL_NAME
+    | PARENT_UNIQUE_NAME
     | PASSWORD_ROLLOVER_TIME
     | PARTIAL
     | PARTIAL_JOIN
