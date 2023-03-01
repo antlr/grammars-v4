@@ -211,8 +211,13 @@ fragment ExponentPart
     : [eE] [+-]? Digits
     ;
 
+fragment EscapeChar
+    : '\\'
+    | '\\u005c'
+    ;
+
 fragment EscapeSequence
-    : '\\' [btnfr"'\\]
+    : EscapeChar [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
     ;
