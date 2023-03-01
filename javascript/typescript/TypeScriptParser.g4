@@ -504,7 +504,7 @@ functionDeclaration
 
 //Ovveride ECMA
 classDeclaration
-    : decoratorList? (Export Default?)? Abstract? Class Identifier typeParameters? classHeritage classTail
+    : decoratorList? (Export | Export Default)? Abstract? Class Identifier typeParameters? classHeritage classTail
     ;
 
 classHeritage
@@ -539,7 +539,7 @@ propertyMemberDeclaration
     ;
 
 propertyMemberBase
-    : Async? accessibilityModifier? Static? ReadOnly?
+    : accessibilityModifier? Async? Static? ReadOnly?
     ;
 
 indexMemberDeclaration
@@ -835,6 +835,7 @@ keyword
     | String
     | Boolean
     | Number
+    | Module
     ;
 
 getter
