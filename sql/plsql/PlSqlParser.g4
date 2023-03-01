@@ -1591,10 +1591,8 @@ restore_point
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/PURGE.html
 purge_statement
-    : PURGE ( TABLE t=id_expression
-            | INDEX i=id_expression
-            | TABLESPACE ts=id_expression (USER u1=id_expression)?
-            | TABLESPACE SET tss=id_expression (USER u2=id_expression)?
+    : PURGE ( (TABLE | INDEX) id_expression
+            | TABLESPACE SET? ts=id_expression (USER u=id_expression)?
             | RECYCLEBIN
             | DBA_RECYCLEBIN
             )
