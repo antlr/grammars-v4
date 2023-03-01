@@ -296,8 +296,10 @@ CONSTRAINT:                   'CONSTRAINT';
 CONSTRAINTS:                  'CONSTRAINTS';
 CONSTRUCTOR:                  'CONSTRUCTOR';
 CONTAINER:                    'CONTAINER';
-CONTAINER_DATA:               'CONTAINER_DATA';
 CONTAINERS:                   'CONTAINERS';
+CONTAINERS_DEFAULT:           'CONTAINERS_DEFAULT';
+CONTAINER_DATA:               'CONTAINER_DATA';
+CONTAINER_MAP:                'CONTAINER_MAP';
 CONTENT:                      'CONTENT';
 CONTENTS:                     'CONTENTS';
 CONTEXT:                      'CONTEXT';
@@ -2367,6 +2369,7 @@ COMMA:                     ',';
 SOLIDUS:                   '/';
 AT_SIGN:                   '@';
 ASSIGN_OP:                 ':=';
+HASH_OP:                   '#';
 
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
