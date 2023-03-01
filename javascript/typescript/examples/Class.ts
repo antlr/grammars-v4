@@ -39,3 +39,21 @@ class Employee extends Person {
 }
 
 let emp = new Employee(100,"Steve");
+
+import {Controller, Get, Post} from '@nestjs/common';
+
+export class NotController {
+    @Post()
+    notControllerPost(body) {
+        return 'This is not an api method';
+    }
+}
+
+export default class CustomerModel {
+    constructor(data) {
+        this.cardAccountId = data.cardAccountId;
+        this.accountHolderId = data.accountHolderId;
+        this.firstName = data.firstName;
+        this.lastName = data.lastName;
+    }
+}

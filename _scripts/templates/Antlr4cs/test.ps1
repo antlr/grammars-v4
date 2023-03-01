@@ -103,7 +103,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
 
 # Check if any untracked .errors files are not empty.
 $new_errors_txt = New-Object System.Collections.Generic.List[string]
-$new_errors2_txt = git ls-files --exclude-standard -o --ignored $TestDirectory
+$new_errors2_txt = git ls-files --exclude-standard -o $TestDirectory
 $new_errors = $LASTEXITCODE
 
 # Gather up all untracked .errors file output. These are new errors
