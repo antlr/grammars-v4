@@ -504,7 +504,7 @@ functionDeclaration
 
 //Ovveride ECMA
 classDeclaration
-    : decoratorList? (Export | Export Default)? Abstract? Class Identifier typeParameters? classHeritage classTail
+    : decoratorList? (Export Default?)? Abstract? Class Identifier typeParameters? classHeritage classTail
     ;
 
 classHeritage
