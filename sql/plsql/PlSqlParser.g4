@@ -40,10 +40,13 @@ unit_statement
     | alter_cluster
     | alter_database
     | alter_database_link
+    | alter_dimension
     | alter_flashback_archive
     | alter_function
+    | alter_outline
     | alter_hierarchy
     | alter_package
+    | alter_pmem_filestore
     | alter_procedure
     | alter_resource_cost
     | alter_rollback_segment
@@ -56,10 +59,12 @@ unit_statement
     | alter_tablespace
     | alter_role
     | alter_index
+    | alter_inmemory_join_group
     | alter_library
     | alter_materialized_view
     | alter_materialized_view_log
     | alter_materialized_zonemap
+    | alter_operator
     | alter_user
     | alter_view
 
@@ -82,7 +87,9 @@ unit_statement
     | create_flashback_archive
     | create_hierarchy
     | create_index
+    | create_inmemory_join_group
     | create_library
+    | create_outline
     | create_table
     | create_profile
     | create_role
@@ -92,6 +99,7 @@ unit_statement
     | create_materialized_view
     | create_materialized_view_log
     | create_materialized_zonemap
+    | create_pmem_filestore
     | create_rollback_segment
     | create_user
     | create_database_link
@@ -110,9 +118,11 @@ unit_statement
     | drop_hierarchy
     | drop_library
     | drop_package
+    | drop_pmem_filestore
     | drop_procedure
     | drop_materialized_view
     | drop_materialized_zonemap
+    | drop_outline
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -126,8 +136,10 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_inmemory_join_group
     | drop_database_link
 
+    | disassociate_statistics
     | flashback_table
 
     | rename_object
@@ -200,6 +212,20 @@ streaming_clause
     : (ORDER | CLUSTER) expression BY paren_column_list
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-OUTLINE.html
+alter_outline
+    : ALTER OUTLINE (PUBLIC | PRIVATE)? o=id_expression
+        outline_options+
+    ;
+
+outline_options
+    : REBUILD
+    | RENAME TO non=id_expression
+    | CHANGE CATEGORY TO ncn=id_expression
+    | ENABLE
+    | DISABLE
+    ;
+
 // Package DDLs
 
 drop_package
@@ -252,6 +278,22 @@ package_obj_body
     | function_spec
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
+alter_pmem_filestore
+    : ALTER PMEM FILESTORE fsn=id_expression
+        ( RESIZE size_clause
+        | autoextend_clause
+        | MOUNT (MOUNTPOINT file_path)? (BACKINGFILE filename)? FORCE? //inconsistent documentation
+        | DISMOUNT
+        )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/drop-pmem-filestore.html
+drop_pmem_filestore
+    : DROP PMEM FILESTORE fsn=id_expression
+        ((FORCE? INCLUDING | EXCLUDING) CONTENTS)?
+    ;
+
 // Procedure DDLs
 
 drop_procedure
@@ -284,6 +326,11 @@ alter_resource_cost
     : ALTER RESOURCE COST ((CPU_PER_SESSION | CONNECT_TIME | LOGICAL_READS_PER_SESSION | PRIVATE_SGA) UNSIGNED_INTEGER)+
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-OUTLINE.html
+drop_outline
+    : DROP OUTLINE o=id_expression
+    ;
+
 // Rollback Segment DDLs
 
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
@@ -297,6 +344,23 @@ drop_rollback_segment
 
 drop_role
     : DROP ROLE role_name ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/create-pmem-filestore.html
+create_pmem_filestore
+    : CREATE PMEM FILESTORE fsn=id_expression
+        pmem_filestore_options+
+    ;
+
+pmem_filestore_options
+    : MOUNTPOINT file_path
+    | BACKINGFILE filename REUSE?
+    | (SIZE | BLOCKSIZE) size_clause
+    | autoextend_clause
+    ;
+
+file_path
+    : CHAR_STRING
     ;
 
 create_rollback_segment
@@ -1220,6 +1284,12 @@ new_index_name
     : index_name
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-INMEMORY-JOIN-GROUP.html
+alter_inmemory_join_group
+    : ALTER INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        (ADD | REMOVE) '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' ')'
+    ;
+
 create_user
     : CREATE USER
       user_object_name
@@ -1609,6 +1679,24 @@ drop_index
     : DROP INDEX index_name ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DISASSOCIATE-STATISTICS.html
+disassociate_statistics
+    : DISASSOCIATE STATISTICS FROM
+        ( COLUMNS (schema_name '.')? tb=id_expression '.' c=id_expression (',' (schema_name '.')? tb=id_expression '.' c=id_expression)*
+        | FUNCTIONS (schema_name '.')? fn=id_expression (',' (schema_name '.')? fn=id_expression)*
+        | PACKAGES (schema_name '.')? pkg=id_expression (',' (schema_name '.')? pkg=id_expression)*
+        | TYPES (schema_name '.')? t=id_expression (',' (schema_name '.')? t=id_expression)*
+        | INDEXES (schema_name '.')? ix=id_expression (',' (schema_name '.')? ix=id_expression)*
+        | INDEXTYPES (schema_name '.')? it=id_expression (',' (schema_name '.')? it=id_expression)*
+        )
+        FORCE?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
+drop_inmemory_join_group
+    : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+    ;
+
 flashback_table
     : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
       ( ((SCN | TIMESTAMP) expression | RESTORE POINT restore_point) ((ENABLE | DISABLE) TRIGGERS)?
@@ -1655,6 +1743,12 @@ directory_name
 
 directory_path
     : CHAR_STRING
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-INMEMORY-JOIN-GROUP.html
+create_inmemory_join_group
+    : CREATE INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' (',' (schema_name '.')? t=id_expression '(' c=id_expression ')')+ ')'
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-HIERARCHY.html
@@ -1709,6 +1803,40 @@ parameter_value
 
 library_name
     : (regular_id '.')? regular_id
+    ;
+
+alter_dimension
+    : ALTER DIMENSION identifier
+    ( (ADD (level_clause | hierarchy_clause | attribute_clause |  extended_attribute_clause))+
+     | (DROP (LEVEL identifier (RESTRICT | CASCADE)? | HIERARCHY identifier | ATTRIBUTE identifier (LEVEL identifier (COLUMN column_name (',' COLUMN column_name)*)?)? ))+
+     | COMPILE
+    )
+    ;
+
+level_clause
+    : LEVEL identifier IS (table_name '.' column_name | '(' table_name '.' column_name (',' table_name '.' column_name)* ')')
+        (SKIP_ WHEN NULL_)?
+    ;
+
+hierarchy_clause
+    : HIERARCHY identifier '(' identifier (CHILD OF identifier)+ dimension_join_clause? ')'
+    ;
+
+dimension_join_clause
+    : (JOIN KEY column_one_or_more_sub_clause REFERENCES identifier)+
+    ;
+
+attribute_clause
+    : (ATTRIBUTE identifier DETERMINES column_one_or_more_sub_clause)+
+    ;
+
+extended_attribute_clause
+    : ATTRIBUTE identifier (LEVEL identifier DETERMINES column_one_or_more_sub_clause )+
+    ;
+
+column_one_or_more_sub_clause
+    : column_name
+    | '(' column_name (',' column_name)* ')'
     ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4004.htm#SQLRF01104
@@ -2142,12 +2270,55 @@ zonemap_name
     : identifier ('.' id_expression)?
     ;
 
+operator_name
+    : identifier ('.' id_expression)?
+    ;
+
+operator_function_name
+    : identifier ('.' id_expression)*
+    ;
+
 create_zonemap_on_table
     : ON tableview_name LEFT_PAREN column_list RIGHT_PAREN
     ;
 
 create_zonemap_as_subquery
     : AS subquery
+    ;
+
+alter_operator
+    : ALTER OPERATOR operator_name (add_binding_clause | drop_binding_clause | COMPILE)
+    ;
+
+add_binding_clause
+    : ADD BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
+        RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
+    ;
+
+implementation_clause
+    : ANCILLARY TO primary_operator_list
+    | operator_context_clause
+    ;
+
+primary_operator_list
+    : primary_operator_item (COMMA primary_operator_item)*
+    ;
+
+primary_operator_item
+    : schema_object_name LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
+    ;
+
+operator_context_clause
+    : WITH INDEX CONTEXT COMMA SCAN CONTEXT implementation_type_name (COMPUTE ANCILLARY DATA)?
+        (WITH COLUMN CONTEXT)?
+    ;
+
+using_function_clause
+    : USING operator_function_name
+    ;
+
+drop_binding_clause
+    : DROP BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN FORCE?
     ;
 
 create_materialized_view
@@ -2253,6 +2424,14 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
+create_outline
+    : CREATE (OR REPLACE)? (PUBLIC | PRIVATE)? OUTLINE (o=id_expression)?
+        (FROM (PUBLIC | PRIVATE)? so=id_expression)?
+        (FOR CATEGORY c=id_expression)?
+        (ON statement)?
     ;
 
 create_role
@@ -5738,6 +5917,7 @@ regular_id
     | AGGREGATE
     | ANALYZE
     | AUTONOMOUS_TRANSACTION
+    | BACKINGFILE
     | BATCH
     | BINARY_INTEGER
     | BOOLEAN
@@ -5757,6 +5937,7 @@ regular_id
     | EXCEPTIONS
     | EXISTS
     | EXIT
+    | FILESTORE
     | FLOAT
     | FORALL
     | G_LETTER
@@ -5767,6 +5948,7 @@ regular_id
     | LANGUAGE
     | LONG
     | LOOP
+    | MOUNTPOINT
     | M_LETTER
     | NUMBER
     | ORADATA
@@ -5777,6 +5959,7 @@ regular_id
     | PARALLEL_ENABLE
     | PIPELINED
     | PLS_INTEGER
+    | PMEM
     | POSITIVE
     | POSITIVEN
     | PRAGMA
