@@ -1576,6 +1576,7 @@ SETS:                         'SETS';
 SETTINGS:                     'SETTINGS';
 SET_TO_JOIN:                  'SET_TO_JOIN';
 SEVERE:                       'SEVERE';
+SHARDSPACE:                   'SHARDSPACE';
 SHARED_POOL:                  'SHARED_POOL';
 SHARED:                       'SHARED';
 SHARE:                        'SHARE';

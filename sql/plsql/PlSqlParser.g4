@@ -56,6 +56,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_tablespace_set
     | alter_role
     | alter_index
     | alter_inmemory_join_group
@@ -92,6 +93,7 @@ unit_statement
     | create_profile
     | create_role
     | create_tablespace
+    | create_tablespace_set
     | create_view //TODO
     | create_directory
     | create_materialized_view
@@ -130,6 +132,8 @@ unit_statement
     | truncate_table
     | truncate_cluster
     | drop_table
+    | drop_tablespace
+    | drop_tablespace_set
     | drop_user
     | drop_view
     | drop_index
@@ -2006,6 +2010,55 @@ tablespace_retention_clause
     : RETENTION (GUARANTEE | NOGUARANTEE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLESPACE-SET.html
+create_tablespace_set
+    : CREATE TABLESPACE SET tss=id_expression (IN SHARDSPACE ss=id_expression)?
+        (USING TEMPLATE '(' (DATAFILE file_specification (',' file_specification)*)? permanent_tablespace_attrs+ ')')?
+    ;
+
+permanent_tablespace_attrs
+    : MINIMUM EXTENT size_clause
+    | BLOCKSIZE numeric K_LETTER?
+    | logging_clause
+    | FORCE LOGGING
+    | tablespace_encryption_clause
+    | default_tablespace_params
+    | ONLINE
+    | OFFLINE
+    | extent_management_clause
+    | segment_management_clause
+    | flashback_mode_clause
+    | lost_write_protection
+    ;
+
+tablespace_encryption_clause
+    : ENCRYPTION (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+    ;
+
+default_tablespace_params
+    : DEFAULT default_table_compression? default_index_compression? inmmemory_clause? ilm_clause? storage_clause?
+    ;
+
+default_table_compression
+    : TABLE ( COMPRESS FOR (OLTP | QUERY low_high | ARCHIVE low_high)
+            | NOCOMPRESS
+            )
+    ;
+
+low_high
+    : LOW
+    | HIGH
+    ;
+
+default_index_compression
+    : INDEX (COMPRESS ADVANCED low_high | NOCOMPRESS)
+    ;
+
+inmmemory_clause
+    : INMEMORY inmemory_attributes? (TEXT (column_name (',' column_name)* | column_name USING policy_name (',' column_name USING policy_name)*))?
+    | NO INMEMORY
+    ;
+
 // asm_filename is just a charater string.  Would need to parse the string
 // to find diskgroup...
 datafile_specification
@@ -3048,6 +3101,22 @@ drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
+drop_tablespace
+    : DROP TABLESPACE ts=id_expression ((DROP | KEEP) QUOTA?)?
+        including_contents_clause?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE-SET.html
+drop_tablespace_set
+    : DROP TABLESPACE SET tss=id_expression
+        including_contents_clause?
+    ;
+
+including_contents_clause
+    : INCLUDING CONTENTS ((AND | KEEP) DATAFILES)? (CASCADE CONSTRAINTS)?
+    ;
+
 drop_view
     : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
@@ -3540,6 +3609,41 @@ dblink
 
 drop_database_link
     : DROP PUBLIC? DATABASE LINK dblink
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
+alter_tablespace_set
+    : ALTER TABLESPACE SET tss=id_expression alter_tablespace_attrs
+    ;
+
+alter_tablespace_attrs
+    : default_tablespace_params
+    | MINIMUM EXTENT size_clause
+    | RESIZE size_clause
+    | COALESCE
+    | SHRINK SPACE_KEYWORD (KEEP size_clause)?
+    | RENAME TO nts=id_expression
+    | (BEGIN | END) BACKUP
+    | datafile_tempfile_clauses
+    | tablespace_logging_clauses
+    | tablespace_group_clause
+    | tablespace_state_clauses
+    | autoextend_clause
+    | flashback_mode_clause
+    | tablespace_retention_clause
+    | alter_tablespace_encryption
+    | lost_write_protection
+    ;
+
+alter_tablespace_encryption
+    : ENCRYPTION ( OFFLINE (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+                 | ONLINE (tablespace_encryption_spec? (ENCRYPT | REKEY) | DECRYPT) ts_file_name_convert?
+                 | FINISH (ENCRYPT | REKEY | DECRYPT) ts_file_name_convert?
+                 )
+    ;
+
+ts_file_name_convert
+    : FILE_NAME_CONVERT '=' '(' CHAR_STRING ',' CHAR_STRING (',' CHAR_STRING ',' CHAR_STRING)* ')' KEEP?
     ;
 
 alter_role
@@ -5921,6 +6025,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
