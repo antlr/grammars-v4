@@ -2112,12 +2112,13 @@ alter_operator
     ;
 
 add_binding_clause
-    : ADD BINDING LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN
+    : ADD BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
         RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
     ;
 
 implementation_clause
-    : ANCILLARY TO primary_operator_list | operator_context_clause
+    : ANCILLARY TO primary_operator_list
+    | operator_context_clause
     ;
 
 primary_operator_list
@@ -2125,7 +2126,7 @@ primary_operator_list
     ;
 
 primary_operator_item
-    : schema_object_name LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN
+    : schema_object_name LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
     ;
 
 operator_context_clause
@@ -2138,7 +2139,7 @@ using_function_clause
     ;
 
 drop_binding_clause
-    : DROP BINDING LEFT_PAREN (datatype (COMMA datatype)*) RIGHT_PAREN FORCE?
+    : DROP BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN FORCE?
     ;
 
 create_materialized_view
