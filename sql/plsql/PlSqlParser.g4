@@ -151,6 +151,7 @@ unit_statement
     | anonymous_block
 
     | grant_statement
+    | revoke_statement
 
     | procedure_call
     ;
@@ -1730,6 +1731,43 @@ grant_statement
 
 container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/REVOKE.html
+revoke_statement
+    : REVOKE ((revoke_system_privilege | revoke_object_privileges) container_clause? | revoke_roles_from_programs)
+    ;
+
+revoke_system_privilege
+    : (system_privilege | role_name | ALL PRIVILEGES) FROM revokee_clause
+    ;
+
+revokee_clause
+    : (id_expression | PUBLIC) (',' (id_expression | PUBLIC))*
+    ;
+
+revoke_object_privileges
+    : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
+        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+    ;
+
+on_object_clause
+    : ON ( (schema_name '.')? o=id_expression
+         | USER id_expression (',' id_expression)*
+         | DIRECTORY directory_name
+         | EDITION edition_name
+         | MINING MODEL (schema_name '.')? mmn=id_expression
+         | JAVA (SOURCE | RESOURCE) (schema_name '.')? o2=id_expression
+         | SQL TRANSLATION PROFILE (schema_name '.')? p=id_expression
+         )
+    ;
+
+revoke_roles_from_programs
+    : (role_name (',' role_name)* | ALL) FROM program_unit (',' program_unit)*
+    ;
+
+program_unit
+    : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
     ;
 
 create_directory
