@@ -50,7 +50,7 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
-get-content "tests.txt" | trwdog bash -c "ts-node Test.js -q -x -tee -tree" 2>&1 > parse.txt
+get-content "tests.txt" | trwdog pwsh -command "ts-node Test.js -q -x -tee -tree" 2>&1 > parse.txt
 $status=$LASTEXITCODE
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
