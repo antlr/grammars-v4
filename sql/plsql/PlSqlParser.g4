@@ -108,6 +108,7 @@ unit_statement
     | create_trigger
     | create_type
     | create_synonym
+    | create_spfile
 
     | drop_analytic_view
     | drop_attribute_dimension
@@ -142,6 +143,7 @@ unit_statement
     | disassociate_statistics
     | flashback_table
 
+    | purge_statement
     | rename_object
 
     | comment_on_column
@@ -1708,6 +1710,15 @@ restore_point
     : identifier ('.' id_expression)*
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/PURGE.html
+purge_statement
+    : PURGE ( (TABLE | INDEX) id_expression
+            | TABLESPACE SET? ts=id_expression (USER u=id_expression)?
+            | RECYCLEBIN
+            | DBA_RECYCLEBIN
+            )
+    ;
+
 rename_object
     : RENAME object_name TO object_name ';'
     ;
@@ -3131,6 +3142,20 @@ create_synonym
 
 drop_synonym
     : DROP PUBLIC? SYNONYM (schema_name '.')? synonym_name FORCE?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-SPFILE.html
+create_spfile
+    : CREATE SPFILE ('=' spfile_name)?
+        FROM (PFILE ('=' pfile_name)? (AS COPY)? | MEMORY)
+    ;
+
+spfile_name
+    : CHAR_STRING
+    ;
+
+pfile_name
+    : CHAR_STRING
     ;
 
 comment_on_table
