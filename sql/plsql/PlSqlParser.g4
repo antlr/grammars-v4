@@ -93,6 +93,7 @@ unit_statement
     | create_outline
     | create_table
     | create_profile
+    | create_restore_point
     | create_role
     | create_tablespace
     | create_tablespace_set
@@ -127,6 +128,7 @@ unit_statement
     | drop_materialized_view
     | drop_materialized_zonemap
     | drop_outline
+    | drop_restore_point
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -347,6 +349,11 @@ drop_outline
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
 alter_rollback_segment
     : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+drop_restore_point
+    : DROP RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
     ;
 
 drop_rollback_segment
@@ -1732,7 +1739,7 @@ purge_statement
             | DBA_RECYCLEBIN
             )
     ;
-            
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
 noaudit_statement
     : NOAUDIT
@@ -2555,6 +2562,13 @@ create_outline
         (FROM (PUBLIC | PRIVATE)? so=id_expression)?
         (FOR CATEGORY c=id_expression)?
         (ON statement)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+create_restore_point
+    : CREATE CLEAN? RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
+        (AS OF (TIMESTAMP | SCN) expression)?
+        (PRESERVE | GUARANTEE FLASHBACK DATABASE)?
     ;
 
 create_role
@@ -6237,6 +6251,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLEAN
     | CLEANUP
     | CLIENT
     | CLUSTERING
