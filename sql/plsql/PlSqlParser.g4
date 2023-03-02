@@ -45,6 +45,7 @@ unit_statement
     | alter_function
     | alter_outline
     | alter_hierarchy
+    | alter_lockdown_profile
     | alter_package
     | alter_pmem_filestore
     | alter_procedure
@@ -90,6 +91,7 @@ unit_statement
     | create_index
     | create_inmemory_join_group
     | create_library
+    | create_lockdown_profile
     | create_outline
     | create_table
     | create_profile
@@ -120,6 +122,7 @@ unit_statement
     | drop_function
     | drop_hierarchy
     | drop_library
+    | drop_lockdown_profile
     | drop_package
     | drop_pmem_filestore
     | drop_procedure
@@ -232,6 +235,64 @@ outline_options
     | CHANGE CATEGORY TO ncn=id_expression
     | ENABLE
     | DISABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-LOCKDOWN-PROFILE.html
+alter_lockdown_profile
+    : ALTER LOCKDOWN PROFILE id_expression (lockdown_feature | lockdown_options | lockdown_statements)
+        (USERS '=' (ALL | COMMON | LOCAL))?
+    ;
+
+lockdown_feature
+    : disable_enable FEATURE ( '=' '(' string_list ')'
+                             | ALL (EXCEPT '=' '(' string_list ')')?
+                             )
+    ;
+
+lockdown_options
+    : disable_enable OPTION ( '=' '(' string_list ')'
+                            | ALL (EXCEPT '=' '(' string_list ')')?
+                            )
+    ;
+
+lockdown_statements
+    : disable_enable STATEMENT ( '=' '(' string_list ')'
+                               | '=' '(' CHAR_STRING ')' statement_clauses
+                               | ALL (EXCEPT '=' '(' string_list ')')?
+                               )
+    ;
+
+statement_clauses
+    : CLAUSE ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' clause_options
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+clause_options
+    : OPTION ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' option_values+
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+option_values
+    : VALUE '=' '(' string_list ')'
+    | (MINVALUE | MAXVALUE) '=' CHAR_STRING
+    ;
+
+string_list
+    : CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+disable_enable
+    : DISABLE
+    | ENABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-LOCKDOWN-PROFILE.html
+drop_lockdown_profile
+    : DROP LOCKDOWN PROFILE p=id_expression
     ;
 
 // Package DDLs
@@ -1724,7 +1785,7 @@ purge_statement
             | DBA_RECYCLEBIN
             )
     ;
-            
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
 noaudit_statement
     : NOAUDIT
@@ -1776,7 +1837,7 @@ revokee_clause
 
 revoke_object_privileges
     : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
-        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+        FROM revokee_clause (CASCADE CONSTRAINTS | FORCE)?
     ;
 
 on_object_clause
@@ -2539,6 +2600,19 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-LOCKDOWN-PROFILE.html
+create_lockdown_profile
+    : CREATE LOCKDOWN PROFILE id_expression (static_base_profile | dynamic_base_profile)?
+    ;
+
+static_base_profile
+    : FROM bp=id_expression
+    ;
+
+dynamic_base_profile
+    : INCLUDING bp=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
@@ -6219,6 +6293,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLAUSE
     | CLEANUP
     | CLIENT
     | CLUSTERING
@@ -6226,6 +6301,7 @@ non_reserved_keywords_in_12c
     | CLUSTER_DISTANCE
     | COLLATE
     | COLLATION
+    | COMMON
     | COMMON_DATA
     | COMPONENT
     | COMPONENTS
@@ -6286,6 +6362,7 @@ non_reserved_keywords_in_12c
     | FAMILY
     | FAR
     | FASTSTART
+    | FEATURE
     | FEATURE_DETAILS
     | FETCH
     | FILE_NAME_CONVERT
@@ -6334,6 +6411,7 @@ non_reserved_keywords_in_12c
     | LEVEL_NAME
     | LIFECYCLE
     | LINEAR
+    | LOCKDOWN
     | LOCKING
     | LOGMINING
     | LOST
