@@ -3,8 +3,6 @@ CREATE DATABASE myoracle
             GROUP 2 ('diska:log2.log', 'diskb:log2.log') SIZE 50K
     DATAFILE 'diskc:dbone.dbf' SIZE 30M;
 
-CREATE DATABASE LINK local  CONNECT TO hr IDENTIFIED BY password USING 'local';
-
 CREATE DATABASE sample
    CONTROLFILE REUSE
    LOGFILE
