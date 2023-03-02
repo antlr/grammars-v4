@@ -113,6 +113,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_directory
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -1743,8 +1744,11 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
 create_directory
-    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
+    : CREATE (OR REPLACE)? DIRECTORY directory_name
+        (SHARING '=' (METADATA | NONE))?
+        AS directory_path
       ';'
     ;
 
@@ -3227,6 +3231,11 @@ drop_flashback_archive
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DIRECTORY.html
+drop_directory
+    : DROP DIRECTORY dn=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
