@@ -1410,6 +1410,7 @@ container_data_clause
     | add_rem_container_data (FOR container_tableview_name)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ADMINISTER-KEY-MANAGEMENT.html
 administer_key_management
     : ADMINISTER KEY MANAGEMENT ( keystore_management_clauses
                                 | key_management_clauses
@@ -1432,52 +1433,60 @@ keystore_management_clauses
     ;
 
 create_keystore
-    : CREATE ( KEYSTORE SQ keystore_location SQ
-             | LOCAL? AUTO_LOGIN KEYSTORE FROM KEYSTORE SQ keystore_location SQ
+    : CREATE ( KEYSTORE ksl=CHAR_STRING
+             | LOCAL? AUTO_LOGIN KEYSTORE FROM KEYSTORE ksl=CHAR_STRING
              ) IDENTIFIED BY keystore_password
     ;
 
 open_keystore
-    : SET KEYSTORE OPEN (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | keystore_password)
-        (CONTAINER '=' (ALL | CURRENT))?
+    : SET KEYSTORE OPEN force_keystore?
+        identified_by_store
+        container_clause?
+    ;
+
+force_keystore
+    : FORCE KEYSTORE
     ;
 
 close_keystore
-    : SET KEYSTORE CLOSE (IDENTIFIED BY (EXTERNAL STORE | keystore_password))? container_clause?
+    : SET KEYSTORE CLOSE identified_by_store?
+        container_clause?
     ;
 
 backup_keystore
-    : BACKUP KEYSTORE (USING SQ backup_identifier SQ)? (FORCE KEYSTORE)?
-        IDENTIFIED BY (EXTERNAL STORE | keystore_password)?
-        (TO SQ keystore_location SQ)?
+    : BACKUP KEYSTORE (USING bi=CHAR_STRING)? force_keystore?
+        identified_by_store
+        (TO ksl=CHAR_STRING)?
     ;
 
 alter_keystore_password
-    : ALTER KEYSTORE PASSWORD (FORCE KEYSTORE)? IDENTIFIED BY o=keystore_password
+    : ALTER KEYSTORE PASSWORD force_keystore? IDENTIFIED BY o=keystore_password
         SET n=keystore_password with_backup_clause?
     ;
 
 merge_into_new_keystore
-    : MERGE KEYSTORE SQ l1=keystore_location SQ identified_by_password_clause?
-        AND KEYSTORE SQ l2=keystore_location SQ identified_by_password_clause?
-        INTO NEW KEYSTORE SQ l3=keystore_location SQ identified_by_password_clause
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        AND KEYSTORE ksl2=CHAR_STRING identified_by_password_clause?
+        INTO NEW KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
     ;
 
 merge_into_existing_keystore
-    : MERGE KEYSTORE SQ l1=keystore_location SQ identified_by_password_clause?
-        INTO EXISTING KEYSTORE SQ l2=keystore_location SQ identified_by_password_clause
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        INTO EXISTING KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
         with_backup_clause?
     ;
 
 isolate_keystore
     : FORCE? ISOLATE KEYSTORE IDENTIFIED BY i=keystore_password FROM ROOT KEYSTORE
-        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | u=keystore_password)
+        force_keystore?
+        identified_by_store
         with_backup_clause?
     ;
 
 unite_keystore
     : UNITE KEYSTORE IDENTIFIED BY i=keystore_password WITH ROOT KEYSTORE
-        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | u=keystore_password)
+        force_keystore?
+        identified_by_store
         with_backup_clause?
     ;
 
@@ -1494,60 +1503,84 @@ key_management_clauses
     ;
 
 set_key
-    : SET ENCRYPTION? KEY (mkid ':' mk | mk)? using_tag_clause?
-        using_algorithm_clause? (FORCE KEYSTORE)?
-        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+    : SET ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
         with_backup_clause?
         container_clause?
     ;
 
 create_key
-    : CREATE ENCRYPTION? KEY ()? using_tag_clause?
-        using_algorithm_clause? (FORCE KEYSTORE)?
-        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+    : CREATE ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
         with_backup_clause?
         container_clause?
     ;
 
-use_key
-    : USE ENCRYPTION? KEY ()? using_tag_clause?
+mkid
+    : CHAR_STRING
+    ;
 
+mk
+    : CHAR_STRING
+    ;
+
+use_key
+    : USE ENCRYPTION? KEY k=CHAR_STRING using_tag_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
     ;
 
 set_key_tag
-    :
+    : SET TAG t=CHAR_STRING FOR k=CHAR_STRING force_keystore?
+        identified_by_store
+        with_backup_clause?
     ;
 
 export_keys
-    :
+    : EXPORT ENCRYPTION? KEYS WITH SECRET secret TO filename
+        force_keystore? identified_by_store
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | '(' subquery ')'))?
     ;
 
 import_keys
-    :
+    : IMPORT ENCRYPTION? KEYS WITH SECRET secret FROM filename
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
     ;
 
 migrate_keys
-    :
+    : SET ENCRYPTION? KEY IDENTIFIED BY hsm=secret
+        force_keystore?
+        MIGRATE USING keystore_password
+        with_backup_clause?
     ;
 
 reverse_migrate_keys
-    :
+    : SET ENCRYPTION? KEY IDENTIFIED BY s=secret
+        force_keystore?
+        REVERSE MIGRATE USING hsm=secret
     ;
 
 move_keys
-    :
+    : MOVE ENCRYPTION? KEYS TO NEW KEYSTORE ksl1=CHAR_STRING
+        IDENTIFIED BY ksp1=keystore_password FROM FORCE? KEYSTORE IDENTIFIED BY ksp=keystore_password
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | subquery))?
+        with_backup_clause?
+    ;
+
+identified_by_store
+    : IDENTIFIED BY (EXTERNAL STORE | keystore_password)
     ;
 
 using_algorithm_clause
-    : USING ALGORITHM encrypt_algorithm SQ SQ
-    ;
-
-encrypt_algorithm
-    :
+    : USING ALGORITHM ea=CHAR_STRING
     ;
 
 using_tag_clause
-    : USING TAG SQ tag SQ
+    : USING TAG t=CHAR_STRING
     ;
 
 secret_management_clauses
@@ -1558,67 +1591,53 @@ secret_management_clauses
     ;
 
 add_update_secret
-    : (ADD | UPDATE) SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
         using_tag_clause?
-        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | keystore_password)?
+        force_keystore?
+        identified_by_store?
         with_backup_clause?
     ;
 
 delete_secret
-    : DELETE SECRET FOR CLIENT SQ SQ (FORCE KEYSTORE)?
-        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+    : DELETE SECRET FOR CLIENT ci=CHAR_STRING
+        force_keystore?
+        identified_by_store
         with_backup_clause?
     ;
 
 add_update_secret_seps
-    : (ADD | UPDATE) SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
         using_tag_clause?
         TO LOCAL? AUTO_LOGIN KEYSTORE directory_path
     ;
 
 delete_secret_seps
-    : DELETE SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+    : DELETE SECRET s=CHAR_STRING SQ FOR CLIENT ci=CHAR_STRING
         FROM LOCAL? AUTO_LOGIN KEYSTORE directory_path
     ;
 
 zero_downtime_software_patching_clauses
-    : SWITCHOVER LIBRARY path FOR ALL CONTAINERS
+    : SWITCHOVER TO? LIBRARY path FOR ALL CONTAINERS //inconsistent documentation
     ;
 
 with_backup_clause
-    : WITH BACKUP (USING SQ backup_identifier SQ)?
+    : WITH BACKUP (USING bi=CHAR_STRING)?
     ;
 
 identified_by_password_clause
     : IDENTIFIED BY keystore_password
     ;
 
-keystore_location
-    :
-    ;
-
 keystore_password
-    :
-    ;
-
-backup_identifier
-    :
-    ;
-
-client_identifier
-    :
-    ;
-
-tag
-    :
+    : DELIMITED_ID
     ;
 
 path
-    :
+    : CHAR_STRING
     ;
 
 secret
-    :
+    : DELIMITED_ID
     ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
@@ -7724,6 +7743,7 @@ non_reserved_keywords_pre12c
     | ROLLBACK
     | ROLLING
     | ROLLUP
+    | ROOT
     | ROUND
     | ROWDEPENDENCIES
     | ROWID
