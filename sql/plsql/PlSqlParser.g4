@@ -68,6 +68,7 @@ unit_statement
     | alter_user
     | alter_view
 
+    | administer_key_management
     | analyze
     | associate_statistics
     | audit_traditional
@@ -1407,6 +1408,217 @@ add_rem_container_data
 container_data_clause
     : set_container_data
     | add_rem_container_data (FOR container_tableview_name)?
+    ;
+
+administer_key_management
+    : ADMINISTER KEY MANAGEMENT ( keystore_management_clauses
+                                | key_management_clauses
+                                | secret_management_clauses
+                                | zero_downtime_software_patching_clauses
+                                )
+        ';'
+    ;
+
+keystore_management_clauses
+    : create_keystore
+    | open_keystore
+    | close_keystore
+    | backup_keystore
+    | alter_keystore_password
+    | merge_into_new_keystore
+    | merge_into_existing_keystore
+    | isolate_keystore
+    | unite_keystore
+    ;
+
+create_keystore
+    : CREATE ( KEYSTORE SQ keystore_location SQ
+             | LOCAL? AUTO_LOGIN KEYSTORE FROM KEYSTORE SQ keystore_location SQ
+             ) IDENTIFIED BY keystore_password
+    ;
+
+open_keystore
+    : SET KEYSTORE OPEN (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+        (CONTAINER '=' (ALL | CURRENT))?
+    ;
+
+close_keystore
+    : SET KEYSTORE CLOSE (IDENTIFIED BY (EXTERNAL STORE | keystore_password))? container_clause?
+    ;
+
+backup_keystore
+    : BACKUP KEYSTORE (USING SQ backup_identifier SQ)? (FORCE KEYSTORE)?
+        IDENTIFIED BY (EXTERNAL STORE | keystore_password)?
+        (TO SQ keystore_location SQ)?
+    ;
+
+alter_keystore_password
+    : ALTER KEYSTORE PASSWORD (FORCE KEYSTORE)? IDENTIFIED BY o=keystore_password
+        SET n=keystore_password with_backup_clause?
+    ;
+
+merge_into_new_keystore
+    : MERGE KEYSTORE SQ l1=keystore_location SQ identified_by_password_clause?
+        AND KEYSTORE SQ l2=keystore_location SQ identified_by_password_clause?
+        INTO NEW KEYSTORE SQ l3=keystore_location SQ identified_by_password_clause
+    ;
+
+merge_into_existing_keystore
+    : MERGE KEYSTORE SQ l1=keystore_location SQ identified_by_password_clause?
+        INTO EXISTING KEYSTORE SQ l2=keystore_location SQ identified_by_password_clause
+        with_backup_clause?
+    ;
+
+isolate_keystore
+    : FORCE? ISOLATE KEYSTORE IDENTIFIED BY i=keystore_password FROM ROOT KEYSTORE
+        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | u=keystore_password)
+        with_backup_clause?
+    ;
+
+unite_keystore
+    : UNITE KEYSTORE IDENTIFIED BY i=keystore_password WITH ROOT KEYSTORE
+        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | u=keystore_password)
+        with_backup_clause?
+    ;
+
+key_management_clauses
+    : set_key
+    | create_key
+    | use_key
+    | set_key_tag
+    | export_keys
+    | import_keys
+    | migrate_keys
+    | reverse_migrate_keys
+    | move_keys
+    ;
+
+set_key
+    : SET ENCRYPTION? KEY (mkid ':' mk | mk)? using_tag_clause?
+        using_algorithm_clause? (FORCE KEYSTORE)?
+        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+        with_backup_clause?
+        container_clause?
+    ;
+
+create_key
+    : CREATE ENCRYPTION? KEY ()? using_tag_clause?
+        using_algorithm_clause? (FORCE KEYSTORE)?
+        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+        with_backup_clause?
+        container_clause?
+    ;
+
+use_key
+    : USE ENCRYPTION? KEY ()? using_tag_clause?
+
+    ;
+
+set_key_tag
+    :
+    ;
+
+export_keys
+    :
+    ;
+
+import_keys
+    :
+    ;
+
+migrate_keys
+    :
+    ;
+
+reverse_migrate_keys
+    :
+    ;
+
+move_keys
+    :
+    ;
+
+using_algorithm_clause
+    : USING ALGORITHM encrypt_algorithm SQ SQ
+    ;
+
+encrypt_algorithm
+    :
+    ;
+
+using_tag_clause
+    : USING TAG SQ tag SQ
+    ;
+
+secret_management_clauses
+    : add_update_secret
+    | delete_secret
+    | add_update_secret_seps
+    | delete_secret_seps
+    ;
+
+add_update_secret
+    : (ADD | UPDATE) SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+        using_tag_clause?
+        (FORCE KEYSTORE)? IDENTIFIED BY (EXTERNAL STORE | keystore_password)?
+        with_backup_clause?
+    ;
+
+delete_secret
+    : DELETE SECRET FOR CLIENT SQ SQ (FORCE KEYSTORE)?
+        IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+        with_backup_clause?
+    ;
+
+add_update_secret_seps
+    : (ADD | UPDATE) SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+        using_tag_clause?
+        TO LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+delete_secret_seps
+    : DELETE SECRET SQ secret SQ FOR CLIENT SQ client_identifier SQ
+        FROM LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+zero_downtime_software_patching_clauses
+    : SWITCHOVER LIBRARY path FOR ALL CONTAINERS
+    ;
+
+with_backup_clause
+    : WITH BACKUP (USING SQ backup_identifier SQ)?
+    ;
+
+identified_by_password_clause
+    : IDENTIFIED BY keystore_password
+    ;
+
+keystore_location
+    :
+    ;
+
+keystore_password
+    :
+    ;
+
+backup_identifier
+    :
+    ;
+
+client_identifier
+    :
+    ;
+
+tag
+    :
+    ;
+
+path
+    :
+    ;
+
+secret
+    :
     ;
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
