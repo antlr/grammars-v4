@@ -113,6 +113,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_context
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -3227,6 +3228,11 @@ drop_flashback_archive
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
+drop_context
+    : DROP CONTEXT ns=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
