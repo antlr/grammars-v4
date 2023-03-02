@@ -141,6 +141,7 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_indextype
     | drop_inmemory_join_group
     | drop_database_link
 
@@ -1698,6 +1699,11 @@ disassociate_statistics
         | INDEXTYPES (schema_name '.')? it=id_expression (',' (schema_name '.')? it=id_expression)*
         )
         FORCE?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INDEXTYPE.html
+drop_indextype
+    : DROP INDEXTYPE (schema_name '.')? it=id_expression FORCE?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
