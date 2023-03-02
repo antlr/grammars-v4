@@ -143,6 +143,7 @@ unit_statement
     | disassociate_statistics
     | flashback_table
 
+    | purge_statement
     | rename_object
 
     | comment_on_column
@@ -1707,6 +1708,15 @@ flashback_table
 
 restore_point
     : identifier ('.' id_expression)*
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/PURGE.html
+purge_statement
+    : PURGE ( (TABLE | INDEX) id_expression
+            | TABLESPACE SET? ts=id_expression (USER u=id_expression)?
+            | RECYCLEBIN
+            | DBA_RECYCLEBIN
+            )
     ;
 
 rename_object
