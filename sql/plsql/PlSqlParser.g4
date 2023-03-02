@@ -43,6 +43,8 @@ unit_statement
     | alter_dimension
     | alter_flashback_archive
     | alter_function
+    | alter_outline
+    | alter_hierarchy
     | alter_package
     | alter_pmem_filestore
     | alter_procedure
@@ -55,12 +57,15 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_tablespace_set
     | alter_role
     | alter_index
+    | alter_inmemory_join_group
     | alter_library
     | alter_materialized_view
     | alter_materialized_view_log
     | alter_materialized_zonemap
+    | alter_operator
     | alter_user
     | alter_view
 
@@ -81,12 +86,16 @@ unit_statement
     | create_controlfile
     | create_edition
     | create_flashback_archive
+    | create_hierarchy
     | create_index
+    | create_inmemory_join_group
     | create_library
+    | create_outline
     | create_table
     | create_profile
     | create_role
     | create_tablespace
+    | create_tablespace_set
     | create_view
     | create_directory
     | create_materialized_view
@@ -101,6 +110,7 @@ unit_statement
     | create_trigger
     | create_type
     | create_synonym
+    | create_spfile
 
     | drop_analytic_view
     | drop_attribute_dimension
@@ -108,12 +118,14 @@ unit_statement
     | drop_edition
     | drop_flashback_archive
     | drop_function
+    | drop_hierarchy
     | drop_library
     | drop_package
     | drop_pmem_filestore
     | drop_procedure
     | drop_materialized_view
     | drop_materialized_zonemap
+    | drop_outline
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -124,14 +136,19 @@ unit_statement
     | truncate_table
     | truncate_cluster
     | drop_table
+    | drop_tablespace
+    | drop_tablespace_set
     | drop_user
     | drop_view
     | drop_index
+    | drop_inmemory_join_group
     | drop_database_link
 
     | disassociate_statistics
     | flashback_table
+    | noaudit_statement
 
+    | purge_statement
     | rename_object
 
     | comment_on_column
@@ -141,6 +158,7 @@ unit_statement
     | anonymous_block
 
     | grant_statement
+    | revoke_statement
 
     | procedure_call
     ;
@@ -163,6 +181,11 @@ alter_flashback_archive
         | PURGE (ALL | BEFORE (SCN expression | TIMESTAMP expression))
         | NO? OPTIMIZE DATA
         )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-HIERARCHY.html
+alter_hierarchy
+    : ALTER HIERARCHY (schema_name '.')? hn=id_expression (RENAME TO nhn=id_expression | COMPILE)
     ;
 
 alter_function
@@ -195,6 +218,20 @@ relies_on_part
 
 streaming_clause
     : (ORDER | CLUSTER) expression BY paren_column_list
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-OUTLINE.html
+alter_outline
+    : ALTER OUTLINE (PUBLIC | PRIVATE)? o=id_expression
+        outline_options+
+    ;
+
+outline_options
+    : REBUILD
+    | RENAME TO non=id_expression
+    | CHANGE CATEGORY TO ncn=id_expression
+    | ENABLE
+    | DISABLE
     ;
 
 // Package DDLs
@@ -295,6 +332,11 @@ create_procedure_body
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
 alter_resource_cost
     : ALTER RESOURCE COST ((CPU_PER_SESSION | CONNECT_TIME | LOGICAL_READS_PER_SESSION | PRIVATE_SGA) UNSIGNED_INTEGER)+
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-OUTLINE.html
+drop_outline
+    : DROP OUTLINE o=id_expression
     ;
 
 // Rollback Segment DDLs
@@ -941,6 +983,45 @@ flashback_archive_retention
     : RETENTION UNSIGNED_INTEGER (YEAR | MONTH | DAY)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-HIERARCHY.html
+create_hierarchy
+    : CREATE (OR REPLACE)? (NO? FORCE)? HIERARCHY (schema_name '.')? h=id_expression
+        (SHARING '=' (METADATA | NONE))?
+        classification_clause*
+        hier_using_clause
+        level_hier_clause
+        hier_attrs_clause?
+    ;
+
+hier_using_clause
+    : USING (schema_name '.')? ad=id_expression
+    ;
+
+level_hier_clause
+    : '(' (l=id_expression (CHILD OF)?)+ ')'
+    ;
+
+hier_attrs_clause
+    : HIERARCHICAL ATTRIBUTES '(' hier_attr_clause ')'
+    ;
+
+hier_attr_clause
+    : hier_attr_name classification_clause*
+    ;
+
+hier_attr_name
+    : MEMBER_NAME
+    | MEMBER_UNIQUE_NAME
+    | MEMBER_CAPTION
+    | MEMBER_DESCRIPTION
+    | LEVEL_NAME
+    | HIER_ORDER
+    | DEPTH
+    | IS_LEAF
+    | PARENT_LEVEL_NAME
+    | PARENT_UNIQUE_NAME
+    ;
+
 create_index
     : CREATE (UNIQUE | BITMAP)? INDEX index_name
        ON (cluster_index_clause | table_index_clause | bitmap_join_index_clause)
@@ -1209,6 +1290,12 @@ new_partition_name
 
 new_index_name
     : index_name
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-INMEMORY-JOIN-GROUP.html
+alter_inmemory_join_group
+    : ALTER INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        (ADD | REMOVE) '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' ')'
     ;
 
 create_user
@@ -1613,6 +1700,11 @@ disassociate_statistics
         FORCE?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
+drop_inmemory_join_group
+    : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+    ;
+
 flashback_table
     : FLASHBACK TABLE tableview_name (',' tableview_name)* TO
       ( ((SCN | TIMESTAMP) expression | RESTORE POINT restore_point) ((ENABLE | DISABLE) TRIGGERS)?
@@ -1622,6 +1714,27 @@ flashback_table
 
 restore_point
     : identifier ('.' id_expression)*
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/PURGE.html
+purge_statement
+    : PURGE ( (TABLE | INDEX) id_expression
+            | TABLESPACE SET? ts=id_expression (USER u=id_expression)?
+            | RECYCLEBIN
+            | DBA_RECYCLEBIN
+            )
+    ;
+            
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
+noaudit_statement
+    : NOAUDIT
+        ( audit_operation_clause auditing_by_clause?
+        | audit_schema_object_clause
+        | NETWORK
+        | DIRECT_PATH LOAD auditing_by_clause?
+        )
+        (WHENEVER NOT? SUCCESSFUL)?
+        container_clause?
     ;
 
 rename_object
@@ -1648,6 +1761,43 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/REVOKE.html
+revoke_statement
+    : REVOKE ((revoke_system_privilege | revoke_object_privileges) container_clause? | revoke_roles_from_programs)
+    ;
+
+revoke_system_privilege
+    : (system_privilege | role_name | ALL PRIVILEGES) FROM revokee_clause
+    ;
+
+revokee_clause
+    : (id_expression | PUBLIC) (',' (id_expression | PUBLIC))*
+    ;
+
+revoke_object_privileges
+    : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
+        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+    ;
+
+on_object_clause
+    : ON ( (schema_name '.')? o=id_expression
+         | USER id_expression (',' id_expression)*
+         | DIRECTORY directory_name
+         | EDITION edition_name
+         | MINING MODEL (schema_name '.')? mmn=id_expression
+         | JAVA (SOURCE | RESOURCE) (schema_name '.')? o2=id_expression
+         | SQL TRANSLATION PROFILE (schema_name '.')? p=id_expression
+         )
+    ;
+
+revoke_roles_from_programs
+    : (role_name (',' role_name)* | ALL) FROM program_unit (',' program_unit)*
+    ;
+
+program_unit
+    : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
+    ;
+
 create_directory
     : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
       ';'
@@ -1659,6 +1809,17 @@ directory_name
 
 directory_path
     : CHAR_STRING
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-INMEMORY-JOIN-GROUP.html
+create_inmemory_join_group
+    : CREATE INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
+        '(' (schema_name '.')? t=id_expression '(' c=id_expression ')' (',' (schema_name '.')? t=id_expression '(' c=id_expression ')')+ ')'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-HIERARCHY.html
+drop_hierarchy
+    : DROP HIERARCHY (schema_name '.')? hn=id_expression
     ;
 
 // https://docs.oracle.com/cd/E11882_01/appdev.112/e25519/alter_library.htm#LNPLS99946
@@ -1981,6 +2142,55 @@ tablespace_retention_clause
     : RETENTION (GUARANTEE | NOGUARANTEE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLESPACE-SET.html
+create_tablespace_set
+    : CREATE TABLESPACE SET tss=id_expression (IN SHARDSPACE ss=id_expression)?
+        (USING TEMPLATE '(' (DATAFILE file_specification (',' file_specification)*)? permanent_tablespace_attrs+ ')')?
+    ;
+
+permanent_tablespace_attrs
+    : MINIMUM EXTENT size_clause
+    | BLOCKSIZE numeric K_LETTER?
+    | logging_clause
+    | FORCE LOGGING
+    | tablespace_encryption_clause
+    | default_tablespace_params
+    | ONLINE
+    | OFFLINE
+    | extent_management_clause
+    | segment_management_clause
+    | flashback_mode_clause
+    | lost_write_protection
+    ;
+
+tablespace_encryption_clause
+    : ENCRYPTION (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+    ;
+
+default_tablespace_params
+    : DEFAULT default_table_compression? default_index_compression? inmmemory_clause? ilm_clause? storage_clause?
+    ;
+
+default_table_compression
+    : TABLE ( COMPRESS FOR (OLTP | QUERY low_high | ARCHIVE low_high)
+            | NOCOMPRESS
+            )
+    ;
+
+low_high
+    : LOW
+    | HIGH
+    ;
+
+default_index_compression
+    : INDEX (COMPRESS ADVANCED low_high | NOCOMPRESS)
+    ;
+
+inmmemory_clause
+    : INMEMORY inmemory_attributes? (TEXT (column_name (',' column_name)* | column_name USING policy_name (',' column_name USING policy_name)*))?
+    | NO INMEMORY
+    ;
+
 // asm_filename is just a charater string.  Would need to parse the string
 // to find diskgroup...
 datafile_specification
@@ -2193,12 +2403,55 @@ zonemap_name
     : identifier ('.' id_expression)?
     ;
 
+operator_name
+    : identifier ('.' id_expression)?
+    ;
+
+operator_function_name
+    : identifier ('.' id_expression)*
+    ;
+
 create_zonemap_on_table
     : ON tableview_name LEFT_PAREN column_list RIGHT_PAREN
     ;
 
 create_zonemap_as_subquery
     : AS subquery
+    ;
+
+alter_operator
+    : ALTER OPERATOR operator_name (add_binding_clause | drop_binding_clause | COMPILE)
+    ;
+
+add_binding_clause
+    : ADD BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
+        RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
+    ;
+
+implementation_clause
+    : ANCILLARY TO primary_operator_list
+    | operator_context_clause
+    ;
+
+primary_operator_list
+    : primary_operator_item (COMMA primary_operator_item)*
+    ;
+
+primary_operator_item
+    : schema_object_name LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
+    ;
+
+operator_context_clause
+    : WITH INDEX CONTEXT COMMA SCAN CONTEXT implementation_type_name (COMPUTE ANCILLARY DATA)?
+        (WITH COLUMN CONTEXT)?
+    ;
+
+using_function_clause
+    : USING operator_function_name
+    ;
+
+drop_binding_clause
+    : DROP BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN FORCE?
     ;
 
 create_materialized_view
@@ -2304,6 +2557,14 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
+create_outline
+    : CREATE (OR REPLACE)? (PUBLIC | PRIVATE)? OUTLINE (o=id_expression)?
+        (FROM (PUBLIC | PRIVATE)? so=id_expression)?
+        (FOR CATEGORY c=id_expression)?
+        (ON statement)?
     ;
 
 create_role
@@ -2972,6 +3233,22 @@ drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
+drop_tablespace
+    : DROP TABLESPACE ts=id_expression ((DROP | KEEP) QUOTA?)?
+        including_contents_clause?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE-SET.html
+drop_tablespace_set
+    : DROP TABLESPACE SET tss=id_expression
+        including_contents_clause?
+    ;
+
+including_contents_clause
+    : INCLUDING CONTENTS ((AND | KEEP) DATAFILES)? (CASCADE CONSTRAINTS)?
+    ;
+
 drop_view
     : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
@@ -3003,6 +3280,20 @@ create_synonym
 
 drop_synonym
     : DROP PUBLIC? SYNONYM (schema_name '.')? synonym_name FORCE?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-SPFILE.html
+create_spfile
+    : CREATE SPFILE ('=' spfile_name)?
+        FROM (PFILE ('=' pfile_name)? (AS COPY)? | MEMORY)
+    ;
+
+spfile_name
+    : CHAR_STRING
+    ;
+
+pfile_name
+    : CHAR_STRING
     ;
 
 comment_on_table
@@ -3464,6 +3755,41 @@ dblink
 
 drop_database_link
     : DROP PUBLIC? DATABASE LINK dblink
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
+alter_tablespace_set
+    : ALTER TABLESPACE SET tss=id_expression alter_tablespace_attrs
+    ;
+
+alter_tablespace_attrs
+    : default_tablespace_params
+    | MINIMUM EXTENT size_clause
+    | RESIZE size_clause
+    | COALESCE
+    | SHRINK SPACE_KEYWORD (KEEP size_clause)?
+    | RENAME TO nts=id_expression
+    | (BEGIN | END) BACKUP
+    | datafile_tempfile_clauses
+    | tablespace_logging_clauses
+    | tablespace_group_clause
+    | tablespace_state_clauses
+    | autoextend_clause
+    | flashback_mode_clause
+    | tablespace_retention_clause
+    | alter_tablespace_encryption
+    | lost_write_protection
+    ;
+
+alter_tablespace_encryption
+    : ENCRYPTION ( OFFLINE (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+                 | ONLINE (tablespace_encryption_spec? (ENCRYPT | REKEY) | DECRYPT) ts_file_name_convert?
+                 | FINISH (ENCRYPT | REKEY | DECRYPT) ts_file_name_convert?
+                 )
+    ;
+
+ts_file_name_convert
+    : FILE_NAME_CONVERT '=' '(' CHAR_STRING ',' CHAR_STRING (',' CHAR_STRING ',' CHAR_STRING)* ')' KEEP?
     ;
 
 alter_role
@@ -5845,6 +6171,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
@@ -5988,6 +6315,8 @@ non_reserved_keywords_in_12c
     | GET
     | HALF_YEARS
     | HASHING
+    | HIER_ORDER
+    | HIERARCHICAL
     | HOURS
     | IDLE
     | ILM
@@ -6000,6 +6329,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | IS_LEAF
     | JSON
     | JSONGET
     | JSONPARSE
@@ -6021,6 +6351,7 @@ non_reserved_keywords_in_12c
     | LAX
     | LEAD_CDB
     | LEAD_CDB_URI
+    | LEVEL_NAME
     | LIFECYCLE
     | LINEAR
     | LOCKING
@@ -6035,6 +6366,10 @@ non_reserved_keywords_in_12c
     | MAX_SHARED_TEMP_SIZE
     | MEMCOMPRESS
     | METADATA
+    | MEMBER_CAPTION
+    | MEMBER_DESCRIPTION
+    | MEMBER_NAME
+    | MEMBER_UNIQUE_NAME
     | MEMOPTIMIZE
     | MINUTES
     | MODEL_NB
@@ -6096,6 +6431,8 @@ non_reserved_keywords_in_12c
     | ORA_RAWCOMPARE
     | ORA_RAWCONCAT
     | ORA_WRITE_TIME
+    | PARENT_LEVEL_NAME
+    | PARENT_UNIQUE_NAME
     | PASSWORD_ROLLOVER_TIME
     | PARTIAL
     | PARTIAL_JOIN
