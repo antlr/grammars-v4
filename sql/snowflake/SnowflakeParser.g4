@@ -3385,12 +3385,12 @@ data_type
     | REAL_
     | BOOLEAN
     | DATE
-    | DATETIME
-    | TIME
-    | TIMESTAMP
-    | TIMESTAMP_LTZ
-    | TIMESTAMP_NTZ
-    | TIMESTAMP_TZ
+    | DATETIME ('(' num ')')?
+    | TIME ('(' num ')')?
+    | TIMESTAMP ('(' num ')')?
+    | TIMESTAMP_LTZ ('(' num ')')?
+    | TIMESTAMP_NTZ ('(' num ')')?
+    | TIMESTAMP_TZ ('(' num ')')?
     | STRING_
     | CHAR | CHARACTER
     | VARCHAR ('(' num ')')?
