@@ -138,6 +138,7 @@ unit_statement
     | drop_view
     | drop_index
     | drop_inmemory_join_group
+    | drop_database
     | drop_database_link
 
     | disassociate_statistics
@@ -3600,6 +3601,11 @@ password_value
 
 link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
+drop_database
+    : DROP DATABASE
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
