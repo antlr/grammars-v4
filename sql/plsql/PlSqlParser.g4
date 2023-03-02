@@ -1697,7 +1697,7 @@ disassociate_statistics
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INDEXTYPE.html
 drop_indextype
-    : DROP INDEXTYPE (schema_name '.')? it=identifier FORCE?
+    : DROP INDEXTYPE (schema_name '.')? it=id_expression FORCE?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
