@@ -41,6 +41,7 @@ unit_statement
     | alter_database
     | alter_database_link
     | alter_dimension
+    | alter_diskgroup
     | alter_flashback_archive
     | alter_function
     | alter_outline
@@ -83,6 +84,7 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_diskgroup
     | create_edition
     | create_flashback_archive
     | create_hierarchy
@@ -113,6 +115,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_diskgroup
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -155,6 +158,268 @@ unit_statement
     | grant_statement
 
     | procedure_call
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-DISKGROUP.html
+alter_diskgroup
+    : ALTER DISKGROUP ( id_expression (((add_disk_clause | drop_disk_clause)+ | resize_disk_clause) rebalance_diskgroup_clause?
+                                      | ( replace_disk_clause
+                                        | rename_disk_clause
+                                        | disk_online_clause
+                                        | disk_offline_clause
+                                        | rebalance_diskgroup_clause
+                                        | check_diskgroup_clause
+                                        | diskgroup_template_clauses
+                                        | diskgroup_directory_clauses
+                                        | diskgroup_alias_clauses
+                                        | diskgroup_volume_clauses
+                                        | diskgroup_attributes
+                                        | drop_diskgroup_file_clause
+                                        | convert_redundancy_clause
+                                        | usergroup_clauses
+                                        | user_clauses
+                                        | file_permissions_clause
+                                        | file_owner_clause
+                                        | scrub_clause
+                                        | quotagroup_clauses
+                                        | filegroup_clauses
+                                        )
+                                      )
+                      | (id_expression (',' id_expression)* | ALL) (undrop_disk_clause | diskgroup_availability | enable_disable_volume)
+                      )
+    ;
+
+add_disk_clause
+    : ADD ( (SITE sn=id_expression)? quorum_regular? (FAILGROUP fgn=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+    ;
+
+drop_disk_clause
+    : DROP ( quorum_regular? DISK id_expression force_noforce? (',' id_expression force_noforce?)*
+           | DISKS IN quorum_regular? FAILGROUP id_expression force_noforce? (',' id_expression force_noforce?)*
+           )
+    ;
+
+resize_disk_clause
+    : RESIZE ALL (SIZE size_clause)?
+    ;
+
+replace_disk_clause
+    : REPLACE DISK id_expression WITH CHAR_STRING force_noforce? (',' id_expression WITH CHAR_STRING force_noforce?)*
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+wait_nowait
+    : WAIT
+    | NOWAIT
+    ;
+
+rename_disk_clause
+    : RENAME ( DISK id_expression TO id_expression (',' id_expression TO id_expression)*
+             | DISKS ALL
+             )
+    ;
+
+disk_online_clause
+    : ONLINE ( (quorum_regular? DISK id_expression (',' id_expression)* | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*)+
+             | ALL
+             )
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+disk_offline_clause
+    : OFFLINE ( quorum_regular? DISK id_expression (',' id_expression)*
+              | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*
+              ) timeout_clause?
+    ;
+
+timeout_clause
+    : DROP AFTER numeric (M_LETTER | H_LETTER)
+    ;
+
+rebalance_diskgroup_clause
+    : REBALANCE ( ((WITH | WITHOUT) phase+)? (POWER numeric) (WAIT | NOWAIT)?
+                | MODIFY POWER numeric?
+                )
+    ;
+
+phase
+    : id_expression //TODO
+    ;
+
+check_diskgroup_clause
+    : CHECK ALL? (REPAIR | NOREPAIR)? //inconsistent documentation
+    ;
+
+diskgroup_template_clauses
+    : (ADD | MODIFY) TEMPLATE id_expression qualified_template_clause (',' id_expression qualified_template_clause)*
+    | DROP TEMPLATE id_expression (',' id_expression)*
+    ;
+
+qualified_template_clause
+    : ATTRIBUTES '(' redundancy_clause? striping_clause? ')' //inconsistent documentation
+    ;
+
+redundancy_clause
+    : MIRROR
+    | HIGH
+    | UNPROTECTED
+    | PARITY
+    | DOUBLE
+    ;
+
+striping_clause
+    : FINE
+    | COARSE
+    ;
+
+force_noforce
+    : FORCE
+    | NOFORCE
+    ;
+
+diskgroup_directory_clauses
+    : ADD DIRECTORY filename (',' filename)*
+    | DROP DIRECTORY filename force_noforce? (','filename force_noforce?)*
+    | RENAME DIRECTORY dir_name TO dir_name (',' dir_name TO dir_name)*
+    ;
+
+dir_name
+    : CHAR_STRING
+    ;
+
+diskgroup_alias_clauses
+    : ADD ALIAS CHAR_STRING FOR CHAR_STRING (',' CHAR_STRING FOR CHAR_STRING)*
+    | DROP ALIAS CHAR_STRING (',' CHAR_STRING)*
+    | RENAME ALIAS CHAR_STRING TO CHAR_STRING (',' CHAR_STRING TO CHAR_STRING)*
+    ;
+
+diskgroup_volume_clauses
+    : add_volume_clause
+    | modify_volume_clause
+    | RESIZE VOLUME id_expression SIZE size_clause
+    | DROP VOLUME id_expression
+    ;
+
+add_volume_clause
+    : ADD VOLUME id_expression SIZE size_clause redundancy_clause?
+        (STRIPE_WIDTH numeric (K_LETTER | M_LETTER))?
+        (STRIPE_COLUMNS numeric)?
+    ;
+
+modify_volume_clause
+    : MODIFY VOLUME id_expression (MOUNTPATH CHAR_STRING)?
+        (USAGE CHAR_STRING)?
+    ;
+
+diskgroup_attributes
+    : SET ATTRIBUTE CHAR_STRING '=' CHAR_STRING
+    ;
+
+modify_diskgroup_file
+    : MODIFY FILE CHAR_STRING ATTRIBUTE '(' disk_region_clause ')' (',' CHAR_STRING ATTRIBUTE '(' disk_region_clause ')')*
+    ;
+
+disk_region_clause
+    :
+    ;
+
+drop_diskgroup_file_clause
+    : DROP FILE filename (',' filename)*
+    ;
+
+convert_redundancy_clause
+    : CONVERT REDUNDANCY TO FLEX
+    ;
+
+usergroup_clauses
+    : ADD USERGROUP CHAR_STRING WITH MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | MODIFY USERGROUP CHAR_STRING (ADD | DROP) MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USERGROUP CHAR_STRING
+    ;
+
+user_clauses
+    : ADD USER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USER CHAR_STRING (',' CHAR_STRING)* CASCADE?
+    | REPLACE USER CHAR_STRING WITH CHAR_STRING (',' CHAR_STRING WITH CHAR_STRING)*
+    ;
+
+file_permissions_clause
+    : SET PERMISSION (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)) (',' (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)))*
+        FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+file_owner_clause
+    : SET OWNERSHIP (OWNER | GROUP) '=' CHAR_STRING (',' (OWNER | GROUP) '=' CHAR_STRING)* FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+scrub_clause
+    : SCRUB (FILE CHAR_STRING | DISK id_expression)?
+        (REPAIR | NOREPAIR)?
+        (POWER (AUTO | LOW | HIGH | MAX))?
+        wait_nowait?
+        force_noforce?
+        STOP?
+    ;
+
+quotagroup_clauses
+    : ADD QUOTAGROUP id_expression (SET property_name '=' property_value)?
+    | MODIFY QUOTAGROUP id_expression SET property_name '=' property_value
+    | MOVE QUOTAGROUP id_expression TO id_expression
+    | DROP QUOTAGROUP id_expression
+    ;
+
+property_name
+    : id_expression
+    ;
+
+property_value
+    : id_expression
+    ;
+
+filegroup_clauses
+    : add_filegroup_clause
+    | modify_filegroup_clause
+    | move_to_filegroup_clause
+    | drop_filegroup_clause
+    ;
+
+add_filegroup_clause
+    : ADD FILEGROUP id_expression ((DATABASE | CLUSTER | VOLUME) id_expression | TEMPLATE) (FROM TEMPLATE id_expression)?
+        (SET CHAR_STRING '=' CHAR_STRING)?
+    ;
+
+modify_filegroup_clause
+    : MODIFY FILEGROUP id_expression
+        SET CHAR_STRING '=' CHAR_STRING
+    ;
+
+move_to_filegroup_clause
+    : MOVE FILE CHAR_STRING TO FILEGROUP id_expression
+    ;
+
+drop_filegroup_clause
+    : DROP FILEGROUP id_expression CASCADE?
+    ;
+
+
+quorum_regular
+    : QUORUM
+    | REGULAR
+    ;
+
+undrop_disk_clause
+    : UNDROP DISKS
+    ;
+
+diskgroup_availability
+    : MOUNT (RESTRICTED | NORMAL)? (FORCE | NOFORCE)?
+    | DISMOUNT (FORCE | NOFORCE)?
+    ;
+
+enable_disable_volume
+    : (ENABLE | DISABLE) VOLUME ( id_expression (',' id_expression)* | ALL)
     ;
 
 // DDL -> SQL Statements for Stored PL/SQL Units
@@ -954,6 +1219,17 @@ character_set_clause
 file_specification
     : datafile_tempfile_spec
     | redo_log_file_spec
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DISKGROUP.html
+create_diskgroup
+    : CREATE DISKGROUP id_expression ((HIGH | NORMAL | FLEX | EXTENDED (SITE sn=id_expression)? | EXTERNAL) REDUNDANCY)?
+        (quorum_regular? (FAILGROUP fg=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+        (ATTRIBUTE an=CHAR_STRING '=' av=CHAR_STRING (',' CHAR_STRING '=' CHAR_STRING)*)?
+    ;
+
+qualified_disk_clause
+    : ss=CHAR_STRING (NAME dn=id_expression)? (SIZE size_clause)? force_noforce?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
@@ -3227,6 +3503,11 @@ drop_flashback_archive
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DISKGROUP.html
+drop_diskgroup
+    : DROP DISKGROUP dgn=id_expression ((FORCE? INCLUDING | EXCLUDING) CONTENTS)?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
@@ -6133,7 +6414,9 @@ non_reserved_keywords_in_12c
     | FEATURE_DETAILS
     | FETCH
     | FILE_NAME_CONVERT
+    | FILEGROUP
     | FIXED_VIEW_DATA
+    | FLEX
     | FORMAT
     | GATHER_OPTIMIZER_STATISTICS
     | GET
@@ -6142,6 +6425,7 @@ non_reserved_keywords_in_12c
     | HIER_ORDER
     | HIERARCHICAL
     | HOURS
+    | H_LETTER
     | IDLE
     | ILM
     | IMMUTABLE
@@ -6291,6 +6575,7 @@ non_reserved_keywords_in_12c
     | PRUNING
     | PX_FAULT_TOLERANCE
     | QUARTERS
+    | QUOTAGROUP
     | REALM
     | REDEFINE
     | RELOCATE
@@ -6310,6 +6595,7 @@ non_reserved_keywords_in_12c
     | SHARDED
     | SHARING
     | SHELFLIFE
+    | SITE
     | SOURCE_FILE_DIRECTORY
     | SOURCE_FILE_NAME_CONVERT
     | SQL_TRANSLATION_PROFILE
