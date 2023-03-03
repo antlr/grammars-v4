@@ -3608,10 +3608,8 @@ create_database
     : CREATE DATABASE database_name
     ( USER (SYS | SYSTEM) IDENTIFIED BY password_value
      | CONTROLFILE REUSE
-     | MAXDATAFILES UNSIGNED_INTEGER
-     | MAXINSTANCES UNSIGNED_INTEGER
-     | CHARACTER SET char_set_name
-     | NATIONAL CHARACTER SET char_set_name
+     | (MAXDATAFILES | MAXINSTANCES) UNSIGNED_INTEGER
+     | NATIONAL? CHARACTER SET char_set_name
      | SET DEFAULT (BIGFILE | SMALLFILE) TABLESPACE
      | database_logging_clauses
      | tablespace_clauses
@@ -3623,10 +3621,9 @@ create_database
 
 database_logging_clauses
     : LOGFILE database_logging_sub_clause (',' database_logging_sub_clause)*
-    | MAXLOGFILES UNSIGNED_INTEGER
-    | MAXLOGMEMBERS UNSIGNED_INTEGER
-    | MAXLOGHISTORY UNSIGNED_INTEGER
-    | (ARCHIVELOG | NOARCHIVELOG)
+    | (MAXLOGFILES | MAXLOGMEMBERS | MAXLOGHISTORY) UNSIGNED_INTEGER
+    | ARCHIVELOG
+    | NOARCHIVELOG
     | FORCE LOGGING
     ;
 
@@ -3636,8 +3633,7 @@ database_logging_sub_clause
 
 tablespace_clauses
     : EXTENT MANAGEMENT LOCAL
-    | DATAFILE file_specification (',' file_specification)*
-    | SYSAUX DATAFILE file_specification (',' file_specification)*
+    | SYSAUX? DATAFILE file_specification (',' file_specification)*
     | default_tablespace
     | default_temp_tablespace
     | undo_tablespace
