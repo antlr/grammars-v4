@@ -6761,6 +6761,7 @@ non_reserved_keywords_in_12c
     | ADVANCED
     | AFD_DISKSTRING
     | ALTERNATE
+    | ALGORITHM
     | ANALYTIC
     | ANCESTOR
     | ANOMALY
@@ -6886,6 +6887,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | ISOLATE
     | IS_LEAF
     | JSON
     | JSONGET
@@ -7089,6 +7091,7 @@ non_reserved_keywords_in_12c
     | TRUST
     | UCS2
     | UNCONDITIONAL
+    | UNITE
     | UNMATCHED
     | UNPLUG
     | UNSUBSCRIBE
