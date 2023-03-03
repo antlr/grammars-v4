@@ -57,6 +57,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_tablespace_set
     | alter_role
     | alter_index
     | alter_inmemory_join_group
@@ -92,8 +93,10 @@ unit_statement
     | create_outline
     | create_table
     | create_profile
+    | create_restore_point
     | create_role
     | create_tablespace
+    | create_tablespace_set
     | create_view //TODO
     | create_directory
     | create_materialized_view
@@ -114,6 +117,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_context
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -125,6 +129,7 @@ unit_statement
     | drop_materialized_view
     | drop_materialized_zonemap
     | drop_outline
+    | drop_restore_point
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -135,14 +140,19 @@ unit_statement
     | truncate_table
     | truncate_cluster
     | drop_table
+    | drop_tablespace
+    | drop_tablespace_set
     | drop_user
     | drop_view
     | drop_index
+    | drop_indextype
     | drop_inmemory_join_group
+    | drop_database
     | drop_database_link
 
     | disassociate_statistics
     | flashback_table
+    | noaudit_statement
 
     | purge_statement
     | rename_object
@@ -154,6 +164,7 @@ unit_statement
     | anonymous_block
 
     | grant_statement
+    | revoke_statement
 
     | procedure_call
     ;
@@ -339,6 +350,11 @@ drop_outline
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
 alter_rollback_segment
     : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+drop_restore_point
+    : DROP RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
     ;
 
 drop_rollback_segment
@@ -1695,6 +1711,11 @@ disassociate_statistics
         FORCE?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INDEXTYPE.html
+drop_indextype
+    : DROP INDEXTYPE (schema_name '.')? it=id_expression FORCE?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
 drop_inmemory_join_group
     : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
@@ -1720,6 +1741,18 @@ purge_statement
             )
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
+noaudit_statement
+    : NOAUDIT
+        ( audit_operation_clause auditing_by_clause?
+        | audit_schema_object_clause
+        | NETWORK
+        | DIRECT_PATH LOAD auditing_by_clause?
+        )
+        (WHENEVER NOT? SUCCESSFUL)?
+        container_clause?
+    ;
+
 rename_object
     : RENAME object_name TO object_name ';'
     ;
@@ -1742,6 +1775,43 @@ grant_statement
 
 container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/REVOKE.html
+revoke_statement
+    : REVOKE ((revoke_system_privilege | revoke_object_privileges) container_clause? | revoke_roles_from_programs)
+    ;
+
+revoke_system_privilege
+    : (system_privilege | role_name | ALL PRIVILEGES) FROM revokee_clause
+    ;
+
+revokee_clause
+    : (id_expression | PUBLIC) (',' (id_expression | PUBLIC))*
+    ;
+
+revoke_object_privileges
+    : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
+        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+    ;
+
+on_object_clause
+    : ON ( (schema_name '.')? o=id_expression
+         | USER id_expression (',' id_expression)*
+         | DIRECTORY directory_name
+         | EDITION edition_name
+         | MINING MODEL (schema_name '.')? mmn=id_expression
+         | JAVA (SOURCE | RESOURCE) (schema_name '.')? o2=id_expression
+         | SQL TRANSLATION PROFILE (schema_name '.')? p=id_expression
+         )
+    ;
+
+revoke_roles_from_programs
+    : (role_name (',' role_name)* | ALL) FROM program_unit (',' program_unit)*
+    ;
+
+program_unit
+    : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
     ;
 
 create_directory
@@ -2068,6 +2138,55 @@ undo_tablespace_clause
 
 tablespace_retention_clause
     : RETENTION (GUARANTEE | NOGUARANTEE)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLESPACE-SET.html
+create_tablespace_set
+    : CREATE TABLESPACE SET tss=id_expression (IN SHARDSPACE ss=id_expression)?
+        (USING TEMPLATE '(' (DATAFILE file_specification (',' file_specification)*)? permanent_tablespace_attrs+ ')')?
+    ;
+
+permanent_tablespace_attrs
+    : MINIMUM EXTENT size_clause
+    | BLOCKSIZE numeric K_LETTER?
+    | logging_clause
+    | FORCE LOGGING
+    | tablespace_encryption_clause
+    | default_tablespace_params
+    | ONLINE
+    | OFFLINE
+    | extent_management_clause
+    | segment_management_clause
+    | flashback_mode_clause
+    | lost_write_protection
+    ;
+
+tablespace_encryption_clause
+    : ENCRYPTION (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+    ;
+
+default_tablespace_params
+    : DEFAULT default_table_compression? default_index_compression? inmmemory_clause? ilm_clause? storage_clause?
+    ;
+
+default_table_compression
+    : TABLE ( COMPRESS FOR (OLTP | QUERY low_high | ARCHIVE low_high)
+            | NOCOMPRESS
+            )
+    ;
+
+low_high
+    : LOW
+    | HIGH
+    ;
+
+default_index_compression
+    : INDEX (COMPRESS ADVANCED low_high | NOCOMPRESS)
+    ;
+
+inmmemory_clause
+    : INMEMORY inmemory_attributes? (TEXT (column_name (',' column_name)* | column_name USING policy_name (',' column_name USING policy_name)*))?
+    | NO INMEMORY
     ;
 
 // asm_filename is just a charater string.  Would need to parse the string
@@ -2444,6 +2563,13 @@ create_outline
         (FROM (PUBLIC | PRIVATE)? so=id_expression)?
         (FOR CATEGORY c=id_expression)?
         (ON statement)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+create_restore_point
+    : CREATE CLEAN? RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
+        (AS OF (TIMESTAMP | SCN) expression)?
+        (PRESERVE | GUARANTEE FLASHBACK DATABASE)?
     ;
 
 create_role
@@ -3112,6 +3238,22 @@ drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
+drop_tablespace
+    : DROP TABLESPACE ts=id_expression ((DROP | KEEP) QUOTA?)?
+        including_contents_clause?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE-SET.html
+drop_tablespace_set
+    : DROP TABLESPACE SET tss=id_expression
+        including_contents_clause?
+    ;
+
+including_contents_clause
+    : INCLUDING CONTENTS ((AND | KEEP) DATAFILES)? (CASCADE CONSTRAINTS)?
+    ;
+
 drop_view
     : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
@@ -3228,6 +3370,11 @@ drop_flashback_archive
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
+drop_context
+    : DROP CONTEXT ns=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
@@ -3670,7 +3817,6 @@ default_temp_tablespace
 
 undo_tablespace
     : (BIGFILE | SMALLFILE)? UNDO TABLESPACE tablespace (DATAFILE file_specification (',' file_specification)*)?
-    ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
@@ -3687,6 +3833,41 @@ dblink
 
 drop_database_link
     : DROP PUBLIC? DATABASE LINK dblink
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
+alter_tablespace_set
+    : ALTER TABLESPACE SET tss=id_expression alter_tablespace_attrs
+    ;
+
+alter_tablespace_attrs
+    : default_tablespace_params
+    | MINIMUM EXTENT size_clause
+    | RESIZE size_clause
+    | COALESCE
+    | SHRINK SPACE_KEYWORD (KEEP size_clause)?
+    | RENAME TO nts=id_expression
+    | (BEGIN | END) BACKUP
+    | datafile_tempfile_clauses
+    | tablespace_logging_clauses
+    | tablespace_group_clause
+    | tablespace_state_clauses
+    | autoextend_clause
+    | flashback_mode_clause
+    | tablespace_retention_clause
+    | alter_tablespace_encryption
+    | lost_write_protection
+    ;
+
+alter_tablespace_encryption
+    : ENCRYPTION ( OFFLINE (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+                 | ONLINE (tablespace_encryption_spec? (ENCRYPT | REKEY) | DECRYPT) ts_file_name_convert?
+                 | FINISH (ENCRYPT | REKEY | DECRYPT) ts_file_name_convert?
+                 )
+    ;
+
+ts_file_name_convert
+    : FILE_NAME_CONVERT '=' '(' CHAR_STRING ',' CHAR_STRING (',' CHAR_STRING ',' CHAR_STRING)* ')' KEEP?
     ;
 
 alter_role
@@ -6068,6 +6249,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
@@ -6133,6 +6315,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLEAN
     | CLEANUP
     | CLIENT
     | CLUSTERING
