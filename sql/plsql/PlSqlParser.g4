@@ -3624,10 +3624,9 @@ create_database
 
 database_logging_clauses
     : LOGFILE database_logging_sub_clause (',' database_logging_sub_clause)*
-    | MAXLOGFILES UNSIGNED_INTEGER
-    | MAXLOGMEMBERS UNSIGNED_INTEGER
-    | MAXLOGHISTORY UNSIGNED_INTEGER
-    | (ARCHIVELOG | NOARCHIVELOG)
+    | (MAXLOGFILES | MAXLOGMEMBERS | MAXLOGHISTORY) UNSIGNED_INTEGER
+    | ARCHIVELOG
+    | NOARCHIVELOG
     | FORCE LOGGING
     ;
 
