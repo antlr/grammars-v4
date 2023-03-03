@@ -51,13 +51,13 @@ LEFT_BRACKET_1 : LEFT_BRACKET -> type(LEFT_BRACKET), pushMode(LOCALE_MODE) ;
 SPACE_1 : SPACE -> channel(HIDDEN), type(SPACE) ;
 
 mode VALUE_MODE;
+TRUE : 'true' ;
 FALSE : 'false' ;
 NEWLINE_3 : NEWLINE -> channel(HIDDEN), type(NEWLINE), mode(ENTRY_MODE) ;
 NUMBER : [0-9]+ ( '.' [0-9]+ )? ;
 SEMICOLON : ';' ;
 SPACE_2 : SPACE -> channel(HIDDEN), type(SPACE) ;
 STRING : ( ~[\n\r\\;] | ESC_SEQ )+ ;
-TRUE : 'true' ;
 
 mode LOCALE_MODE;
 AT : '@' -> mode(MODIFIER_MODE) ;
@@ -81,7 +81,6 @@ mode MODIFIER_MODE;
 MODIFIER : IDENTIFIER ;
 RIGHT_BRACKET_3 : RIGHT_BRACKET -> type(RIGHT_BRACKET), popMode ;
 
-fragment ASCII_PRINTABLE : [\u0020-\u007e] ;
 fragment ASCII_PRINTABLE_NO_BRACKETS : [\u0020-\u005a\u005c\u005e-\u007e] ;
 fragment ESC_SEQ : '\\' [nrst\\;] ;
-fragment IDENTIFIER : [A-Za-z0-9\-]+ ;
+fragment IDENTIFIER : [A-Za-z] [A-Za-z0-9\-]* ;
