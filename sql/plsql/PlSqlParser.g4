@@ -3606,8 +3606,7 @@ link_authentication
 // added by zrh
 create_database
     : CREATE DATABASE database_name
-    ( USER SYS IDENTIFIED BY password_value
-     | USER SYSTEM IDENTIFIED BY password_value
+    ( USER (SYS | SYSTEM) IDENTIFIED BY password_value
      | CONTROLFILE REUSE
      | MAXDATAFILES UNSIGNED_INTEGER
      | MAXINSTANCES UNSIGNED_INTEGER
@@ -7014,6 +7013,7 @@ non_reserved_keywords_pre12c
     | LDAP_REG_SYNC_INTERVAL
     | LEADING
     | LEAD
+    | LEAF
     | LEAST
     | LEFT
     | LENGTH2
