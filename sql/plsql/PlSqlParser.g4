@@ -3817,6 +3817,7 @@ default_temp_tablespace
 
 undo_tablespace
     : (BIGFILE | SMALLFILE)? UNDO TABLESPACE tablespace (DATAFILE file_specification (',' file_specification)*)?
+    ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
@@ -3829,6 +3830,11 @@ create_database_link
 
 dblink
     : database_name ('.' d=id_expression)* ('@' cq=id_expression)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
+drop_database
+    : DROP DATABASE
     ;
 
 drop_database_link
