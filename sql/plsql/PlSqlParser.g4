@@ -3609,10 +3609,8 @@ create_database
     ( USER SYS IDENTIFIED BY password_value
      | USER SYSTEM IDENTIFIED BY password_value
      | CONTROLFILE REUSE
-     | MAXDATAFILES UNSIGNED_INTEGER
-     | MAXINSTANCES UNSIGNED_INTEGER
-     | CHARACTER SET char_set_name
-     | NATIONAL CHARACTER SET char_set_name
+     | (MAXDATAFILES | MAXINSTANCES) UNSIGNED_INTEGER
+     | NATIONAL? CHARACTER SET char_set_name
      | SET DEFAULT (BIGFILE | SMALLFILE) TABLESPACE
      | database_logging_clauses
      | tablespace_clauses
