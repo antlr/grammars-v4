@@ -37,6 +37,7 @@ unit_statement
     : transaction_control_statements
     | alter_analytic_view
     | alter_attribute_dimension
+    | alter_audit_policy
     | alter_cluster
     | alter_database
     | alter_database_link
@@ -81,6 +82,7 @@ unit_statement
 
     | create_analytic_view
     | create_attribute_dimension
+    | create_audit_policy
     | create_cluster
     | create_context
     | create_controlfile
@@ -115,6 +117,7 @@ unit_statement
 
     | drop_analytic_view
     | drop_attribute_dimension
+    | drop_audit_policy
     | drop_cluster
     | drop_context
     | drop_edition
@@ -936,6 +939,73 @@ all_clause
                  | CAPTION expression (MEMBER DESCRIPTION expression)?
                  | DESCRIPTION expression
                  )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-AUDIT-POLICY-Unified-Auditing.html
+create_audit_policy
+    : CREATE AUDIT POLICY p=id_expression
+        privilege_audit_clause?
+        action_audit_clause?
+        role_audit_clause?
+        (WHEN quoted_string EVALUATE PER (STATEMENT | SESSION | INSTANCE))?
+        (ONLY TOPLEVEL)?
+        container_clause?
+    ;
+
+privilege_audit_clause
+    : PRIVILEGES system_privilege (',' system_privilege)*
+    ;
+
+action_audit_clause
+    : (standard_actions | component_actions)+
+    ;
+
+standard_actions
+    : ACTIONS actions_clause (',' actions_clause)*
+    ;
+
+actions_clause
+    : (object_action | ALL) ON (DIRECTORY directory_name | (MINING MODEL)? (schema_name '.')? id_expression)
+    | (system_action | ALL)
+    ;
+
+object_action
+    : ALTER
+    | GRANT
+    | READ
+    | EXECUTE
+    | AUDIT
+    | COMMENT
+    | DELETE
+    | INDEX
+    | INSERT
+    | LOCK
+    | SELECT
+    | UPDATE
+    | FLASHBACK
+    | RENAME
+    ;
+
+system_action
+    : id_expression // SELECT name FROM AUDITABLE_SYSTEM_ACTIONS WHERE component = 'Standard';
+    | (CREATE | ALTER | DROP) JAVA
+    | LOCK TABLE
+    | (READ | WRITE | EXECUTE) DIRECTORY
+    ;
+
+component_actions
+    : ACTIONS COMPONENT '=' ( (DATAPUMP | DIRECT_LOAD | OLS | XS) component_action (',' component_action)*
+                            | DV component_action ON id_expression (',' component_action ON id_expression)*
+                            | PROTOCOL (FTP | HTTP | AUTHENTICATION)
+                            )
+    ;
+
+component_action
+    : id_expression // SELECT name FROM auditable_system_actions WHERE component = 'Datapump';
+    ;
+
+role_audit_clause
+    : ROLES role_name (',' role_name)*
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-CONTROLFILE.html
@@ -3341,6 +3411,16 @@ alter_attribute_dimension
         (RENAME TO nad=id_expression | COMPILE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-AUDIT-POLICY-Unified-Auditing.html
+alter_audit_policy
+    : ALTER AUDIT POLICY p=id_expression
+        ADD? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        DROP? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        (CONDITION ( DROP
+                   | CHAR_STRING EVALUATE PER (STATEMENT | SESSION | INSTANCE))
+                   )?
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -3360,6 +3440,11 @@ drop_analytic_view
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-ATTRIBUTE-DIMENSION.html
 drop_attribute_dimension
     : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-AUDIT-POLICY-Unified-Auditing.html
+drop_audit_policy
+    : DROP AUDIT POLICY p=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-FLASHBACK-ARCHIVE.html
@@ -6324,6 +6409,7 @@ non_reserved_keywords_in_12c
     | FILE_NAME_CONVERT
     | FIXED_VIEW_DATA
     | FORMAT
+    | FTP
     | GATHER_OPTIMIZER_STATISTICS
     | GET
     | HALF_YEARS
@@ -6331,6 +6417,7 @@ non_reserved_keywords_in_12c
     | HIER_ORDER
     | HIERARCHICAL
     | HOURS
+    | HTTP
     | IDLE
     | ILM
     | IMMUTABLE
@@ -6476,6 +6563,7 @@ non_reserved_keywords_in_12c
     | PRIORITY
     | PRIVILEGED
     | PROPERTY
+    | PROTOCOL
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
