@@ -117,6 +117,7 @@ unit_statement
     | drop_attribute_dimension
     | drop_cluster
     | drop_context
+    | drop_directory
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -1813,8 +1814,11 @@ program_unit
     : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
 create_directory
-    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
+    : CREATE (OR REPLACE)? DIRECTORY directory_name
+        (SHARING '=' (METADATA | NONE))?
+        AS directory_path
       ';'
     ;
 
@@ -3392,6 +3396,11 @@ drop_cluster
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
 drop_context
     : DROP CONTEXT ns=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DIRECTORY.html
+drop_directory
+    : DROP DIRECTORY dn=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
