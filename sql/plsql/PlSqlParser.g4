@@ -95,6 +95,7 @@ unit_statement
     | create_outline
     | create_table
     | create_profile
+    | create_restore_point
     | create_role
     | create_tablespace
     | create_tablespace_set
@@ -117,6 +118,7 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_context
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -129,6 +131,7 @@ unit_statement
     | drop_materialized_view
     | drop_materialized_zonemap
     | drop_outline
+    | drop_restore_point
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -144,7 +147,9 @@ unit_statement
     | drop_user
     | drop_view
     | drop_index
+    | drop_indextype
     | drop_inmemory_join_group
+    | drop_database
     | drop_database_link
 
     | disassociate_statistics
@@ -405,6 +410,11 @@ drop_outline
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
 alter_rollback_segment
     : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+drop_restore_point
+    : DROP RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
     ;
 
 drop_rollback_segment
@@ -1761,6 +1771,11 @@ disassociate_statistics
         FORCE?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INDEXTYPE.html
+drop_indextype
+    : DROP INDEXTYPE (schema_name '.')? it=id_expression FORCE?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
 drop_inmemory_join_group
     : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
@@ -2623,6 +2638,13 @@ create_outline
         (ON statement)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+create_restore_point
+    : CREATE CLEAN? RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
+        (AS OF (TIMESTAMP | SCN) expression)?
+        (PRESERVE | GUARANTEE FLASHBACK DATABASE)?
+    ;
+
 create_role
     : CREATE ROLE role_name role_identified_clause? container_clause?
     ;
@@ -3423,6 +3445,11 @@ drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
+drop_context
+    : DROP CONTEXT ns=id_expression
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
 drop_edition
     : DROP EDITION e=id_expression CASCADE?
@@ -3794,6 +3821,11 @@ password_value
 
 link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
+drop_database
+    : DROP DATABASE
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
@@ -6294,6 +6326,7 @@ non_reserved_keywords_in_12c
     | CLASSIFICATION
     | CLASSIFIER
     | CLAUSE
+    | CLEAN
     | CLEANUP
     | CLIENT
     | CLUSTERING

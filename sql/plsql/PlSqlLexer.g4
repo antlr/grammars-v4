@@ -224,6 +224,7 @@ CLASS:                        'CLASS';
 CLASSIFICATION:               'CLASSIFICATION';
 CLASSIFIER:                   'CLASSIFIER';
 CLAUSE:                       'CLAUSE';
+CLEAN:                        'CLEAN';
 CLEANUP:                      'CLEANUP';
 CLEAR:                        'CLEAR';
 C_LETTER:                     'C';
