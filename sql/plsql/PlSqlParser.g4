@@ -45,6 +45,7 @@ unit_statement
     | alter_function
     | alter_outline
     | alter_hierarchy
+    | alter_java
     | alter_package
     | alter_pmem_filestore
     | alter_procedure
@@ -89,6 +90,7 @@ unit_statement
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
+    | create_java
     | create_library
     | create_outline
     | create_table
@@ -121,6 +123,7 @@ unit_statement
     | drop_flashback_archive
     | drop_function
     | drop_hierarchy
+    | drop_java
     | drop_library
     | drop_package
     | drop_pmem_filestore
@@ -195,6 +198,18 @@ alter_hierarchy
 
 alter_function
     : ALTER FUNCTION function_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-JAVA.html
+alter_java
+    : ALTER JAVA (SOURCE | CLASS) (schema_name '.')? o=id_expression
+        (RESOLVER '(' ('(' match_string ','? (schema_name | '-') ')')+ ')')?
+        (COMPILE | RESOLVE | invoker_rights_clause)
+    ;
+
+match_string
+    : DELIMITED_ID
+    | '*'
     ;
 
 create_function_body
@@ -1847,8 +1862,27 @@ alter_library
      ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-JAVA.html
+drop_java
+    : DROP JAVA (SOURCE | CLASS | RESOURCE) (schema_name '.')? id_expression
+    ;
+
 drop_library
     : DROP LIBRARY library_name
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-JAVA.html
+create_java
+    : CREATE (OR REPLACE)? (AND (RESOLVE | COMPILE))? NOFORCE?
+        JAVA ( (SOURCE | RESOURCE) NAMED (schema_name '.')? pn=id_expression
+             | CLASS (SCHEMA id_expression)?
+             )
+        (SHARING '=' (METADATA | NONE))?
+        invoker_rights_clause?
+        (RESOLVER '(' ('(' CHAR_STRING ','? (sn=id_expression | '-') ')')+ ')')?
+        ( USING (BFILE '(' d=id_expression ',' filename ')' | (CLOB | BLOB | BFILE) subquery | CHAR_STRING)
+        | AS CHAR_STRING
+        )
     ;
 
 create_library
@@ -6175,6 +6209,7 @@ regular_id
     | POSITIVE
     | POSITIVEN
     | PRAGMA
+    | PUBLIC
     | RAISE
     | RAW
     | RECORD
