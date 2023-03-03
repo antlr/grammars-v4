@@ -3636,8 +3636,7 @@ database_logging_sub_clause
 
 tablespace_clauses
     : EXTENT MANAGEMENT LOCAL
-    | DATAFILE file_specification (',' file_specification)*
-    | SYSAUX DATAFILE file_specification (',' file_specification)*
+    | SYSAUX? DATAFILE file_specification (',' file_specification)*
     | default_tablespace
     | default_temp_tablespace
     | undo_tablespace
