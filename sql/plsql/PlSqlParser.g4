@@ -99,7 +99,7 @@ unit_statement
     | create_role
     | create_tablespace
     | create_tablespace_set
-    | create_view //TODO
+    | create_view
     | create_directory
     | create_materialized_view
     | create_materialized_view_log
@@ -119,6 +119,7 @@ unit_statement
     | drop_attribute_dimension
     | drop_cluster
     | drop_context
+    | drop_directory
     | drop_diskgroup
     | drop_edition
     | drop_flashback_archive
@@ -2089,8 +2090,11 @@ program_unit
     : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
 create_directory
-    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
+    : CREATE (OR REPLACE)? DIRECTORY directory_name
+        (SHARING '=' (METADATA | NONE))?
+        AS directory_path
       ';'
     ;
 
@@ -2217,16 +2221,15 @@ alter_view_editionable
     : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-VIEW.html
 create_view
-    : CREATE (OR REPLACE)? no_force_clause? editioning_clause? VIEW
-      tableview_name view_options?
+    : CREATE (OR REPLACE)? (NO? FORCE)? editioning_clause? VIEW (schema_name '.')? v=id_expression
+      (SHARING '=' (METADATA | EXTENDED? DATA | NONE))?
+      view_options?
+      (DEFAULT COLLATION cn=id_expression)?
+      (BEQUEATH (CURRENT_USER | DEFINER))?
       AS select_only_statement subquery_restriction_clause?
-    ;
-
-
-no_force_clause
-    : (NO | OR)? FORCE
-    | NOFORCE
+      (CONTAINER_MAP | CONTAINERS_DEFAULT)?
     ;
 
 editioning_clause
@@ -2236,9 +2239,9 @@ editioning_clause
     ;
 
 view_options
-    :  view_alias_constraint
+    : view_alias_constraint
     | object_view_clause
-//  | xmltype_view_clause //TODO
+    | xmltype_view_clause
     ;
 
 view_alias_constraint
@@ -2246,11 +2249,11 @@ view_alias_constraint
     ;
 
 object_view_clause
-    : OF type_name
-       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')' )
-       | UNDER tableview_name
+    : OF (schema_name '.')? tn=id_expression
+       ( WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')')
+       | UNDER (schema_name '.')? sv=id_expression
        )
-       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+       ('(' (','? (out_of_line_constraint | REGULAR_ID inline_constraint))+ ')')*
     ;
 
 inline_constraint
@@ -2289,12 +2292,31 @@ out_of_line_constraint
 
 constraint_state
     : ( NOT? DEFERRABLE
-      | INITIALLY (IMMEDIATE|DEFERRED)
-      | (RELY|NORELY)
-      | (ENABLE|DISABLE)
-      | (VALIDATE|NOVALIDATE)
+      | INITIALLY (IMMEDIATE | DEFERRED)
+      | (RELY | NORELY)
+      | (ENABLE | DISABLE)
+      | (VALIDATE | NOVALIDATE)
       | using_index_clause
       )+
+    ;
+
+xmltype_view_clause
+    : OF XMLTYPE xml_schema_spec? WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' expression (',' expression)* ')')
+    ;
+
+xml_schema_spec
+    : (XMLSCHEMA xml_schema_url)? ELEMENT (element | xml_schema_url '#' element)
+        (STORE ALL VARRAYS AS (LOBS | TABLES))?
+        (allow_or_disallow NONSCHEMA)?
+        (allow_or_disallow ANYSCHEMA)?
+    ;
+
+xml_schema_url
+    : DELIMITED_ID
+    ;
+
+element
+    : DELIMITED_ID
     ;
 
 alter_tablespace
@@ -3650,6 +3672,11 @@ drop_cluster
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
 drop_context
     : DROP CONTEXT ns=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DIRECTORY.html
+drop_directory
+    : DROP DIRECTORY dn=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DISKGROUP.html
@@ -6546,7 +6573,9 @@ non_reserved_keywords_in_12c
     | CONDITION
     | CONDITIONAL
     | CONTAINERS
+    | CONTAINERS_DEFAULT
     | CONTAINER_DATA
+    | CONTAINER_MAP
     | CON_DBID_TO_ID
     | CON_GUID_TO_ID
     | CON_ID
