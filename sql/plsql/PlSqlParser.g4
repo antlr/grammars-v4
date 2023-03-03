@@ -41,6 +41,7 @@ unit_statement
     | alter_database
     | alter_database_link
     | alter_dimension
+    | alter_diskgroup
     | alter_flashback_archive
     | alter_function
     | alter_outline
@@ -57,6 +58,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_tablespace_set
     | alter_role
     | alter_index
     | alter_inmemory_join_group
@@ -84,6 +86,7 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_diskgroup
     | create_edition
     | create_flashback_archive
     | create_hierarchy
@@ -93,9 +96,11 @@ unit_statement
     | create_outline
     | create_table
     | create_profile
+    | create_restore_point
     | create_role
     | create_tablespace
-    | create_view //TODO
+    | create_tablespace_set
+    | create_view
     | create_directory
     | create_materialized_view
     | create_materialized_view_log
@@ -114,6 +119,9 @@ unit_statement
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_cluster
+    | drop_context
+    | drop_directory
+    | drop_diskgroup
     | drop_edition
     | drop_flashback_archive
     | drop_function
@@ -125,6 +133,7 @@ unit_statement
     | drop_materialized_view
     | drop_materialized_zonemap
     | drop_outline
+    | drop_restore_point
     | drop_rollback_segment
     | drop_role
     | drop_synonym
@@ -135,14 +144,19 @@ unit_statement
     | truncate_table
     | truncate_cluster
     | drop_table
+    | drop_tablespace
+    | drop_tablespace_set
     | drop_user
     | drop_view
     | drop_index
+    | drop_indextype
     | drop_inmemory_join_group
+    | drop_database
     | drop_database_link
 
     | disassociate_statistics
     | flashback_table
+    | noaudit_statement
 
     | purge_statement
     | rename_object
@@ -154,8 +168,271 @@ unit_statement
     | anonymous_block
 
     | grant_statement
+    | revoke_statement
 
     | procedure_call
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-DISKGROUP.html
+alter_diskgroup
+    : ALTER DISKGROUP ( id_expression (((add_disk_clause | drop_disk_clause)+ | resize_disk_clause) rebalance_diskgroup_clause?
+                                      | ( replace_disk_clause
+                                        | rename_disk_clause
+                                        | disk_online_clause
+                                        | disk_offline_clause
+                                        | rebalance_diskgroup_clause
+                                        | check_diskgroup_clause
+                                        | diskgroup_template_clauses
+                                        | diskgroup_directory_clauses
+                                        | diskgroup_alias_clauses
+                                        | diskgroup_volume_clauses
+                                        | diskgroup_attributes
+                                        | drop_diskgroup_file_clause
+                                        | convert_redundancy_clause
+                                        | usergroup_clauses
+                                        | user_clauses
+                                        | file_permissions_clause
+                                        | file_owner_clause
+                                        | scrub_clause
+                                        | quotagroup_clauses
+                                        | filegroup_clauses
+                                        )
+                                      )
+                      | (id_expression (',' id_expression)* | ALL) (undrop_disk_clause | diskgroup_availability | enable_disable_volume)
+                      )
+    ;
+
+add_disk_clause
+    : ADD ( (SITE sn=id_expression)? quorum_regular? (FAILGROUP fgn=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+    ;
+
+drop_disk_clause
+    : DROP ( quorum_regular? DISK id_expression force_noforce? (',' id_expression force_noforce?)*
+           | DISKS IN quorum_regular? FAILGROUP id_expression force_noforce? (',' id_expression force_noforce?)*
+           )
+    ;
+
+resize_disk_clause
+    : RESIZE ALL (SIZE size_clause)?
+    ;
+
+replace_disk_clause
+    : REPLACE DISK id_expression WITH CHAR_STRING force_noforce? (',' id_expression WITH CHAR_STRING force_noforce?)*
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+wait_nowait
+    : WAIT
+    | NOWAIT
+    ;
+
+rename_disk_clause
+    : RENAME ( DISK id_expression TO id_expression (',' id_expression TO id_expression)*
+             | DISKS ALL
+             )
+    ;
+
+disk_online_clause
+    : ONLINE ( (quorum_regular? DISK id_expression (',' id_expression)* | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*)+
+             | ALL
+             )
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+disk_offline_clause
+    : OFFLINE ( quorum_regular? DISK id_expression (',' id_expression)*
+              | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*
+              ) timeout_clause?
+    ;
+
+timeout_clause
+    : DROP AFTER numeric (M_LETTER | H_LETTER)
+    ;
+
+rebalance_diskgroup_clause
+    : REBALANCE ( ((WITH | WITHOUT) phase+)? (POWER numeric) (WAIT | NOWAIT)?
+                | MODIFY POWER numeric?
+                )
+    ;
+
+phase
+    : id_expression //TODO
+    ;
+
+check_diskgroup_clause
+    : CHECK ALL? (REPAIR | NOREPAIR)? //inconsistent documentation
+    ;
+
+diskgroup_template_clauses
+    : (ADD | MODIFY) TEMPLATE id_expression qualified_template_clause (',' id_expression qualified_template_clause)*
+    | DROP TEMPLATE id_expression (',' id_expression)*
+    ;
+
+qualified_template_clause
+    : ATTRIBUTES '(' redundancy_clause? striping_clause? ')' //inconsistent documentation
+    ;
+
+redundancy_clause
+    : MIRROR
+    | HIGH
+    | UNPROTECTED
+    | PARITY
+    | DOUBLE
+    ;
+
+striping_clause
+    : FINE
+    | COARSE
+    ;
+
+force_noforce
+    : FORCE
+    | NOFORCE
+    ;
+
+diskgroup_directory_clauses
+    : ADD DIRECTORY filename (',' filename)*
+    | DROP DIRECTORY filename force_noforce? (','filename force_noforce?)*
+    | RENAME DIRECTORY dir_name TO dir_name (',' dir_name TO dir_name)*
+    ;
+
+dir_name
+    : CHAR_STRING
+    ;
+
+diskgroup_alias_clauses
+    : ADD ALIAS CHAR_STRING FOR CHAR_STRING (',' CHAR_STRING FOR CHAR_STRING)*
+    | DROP ALIAS CHAR_STRING (',' CHAR_STRING)*
+    | RENAME ALIAS CHAR_STRING TO CHAR_STRING (',' CHAR_STRING TO CHAR_STRING)*
+    ;
+
+diskgroup_volume_clauses
+    : add_volume_clause
+    | modify_volume_clause
+    | RESIZE VOLUME id_expression SIZE size_clause
+    | DROP VOLUME id_expression
+    ;
+
+add_volume_clause
+    : ADD VOLUME id_expression SIZE size_clause redundancy_clause?
+        (STRIPE_WIDTH numeric (K_LETTER | M_LETTER))?
+        (STRIPE_COLUMNS numeric)?
+    ;
+
+modify_volume_clause
+    : MODIFY VOLUME id_expression (MOUNTPATH CHAR_STRING)?
+        (USAGE CHAR_STRING)?
+    ;
+
+diskgroup_attributes
+    : SET ATTRIBUTE CHAR_STRING '=' CHAR_STRING
+    ;
+
+modify_diskgroup_file
+    : MODIFY FILE CHAR_STRING ATTRIBUTE '(' disk_region_clause ')' (',' CHAR_STRING ATTRIBUTE '(' disk_region_clause ')')*
+    ;
+
+disk_region_clause
+    :
+    ;
+
+drop_diskgroup_file_clause
+    : DROP FILE filename (',' filename)*
+    ;
+
+convert_redundancy_clause
+    : CONVERT REDUNDANCY TO FLEX
+    ;
+
+usergroup_clauses
+    : ADD USERGROUP CHAR_STRING WITH MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | MODIFY USERGROUP CHAR_STRING (ADD | DROP) MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USERGROUP CHAR_STRING
+    ;
+
+user_clauses
+    : ADD USER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USER CHAR_STRING (',' CHAR_STRING)* CASCADE?
+    | REPLACE USER CHAR_STRING WITH CHAR_STRING (',' CHAR_STRING WITH CHAR_STRING)*
+    ;
+
+file_permissions_clause
+    : SET PERMISSION (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)) (',' (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)))*
+        FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+file_owner_clause
+    : SET OWNERSHIP (OWNER | GROUP) '=' CHAR_STRING (',' (OWNER | GROUP) '=' CHAR_STRING)* FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+scrub_clause
+    : SCRUB (FILE CHAR_STRING | DISK id_expression)?
+        (REPAIR | NOREPAIR)?
+        (POWER (AUTO | LOW | HIGH | MAX))?
+        wait_nowait?
+        force_noforce?
+        STOP?
+    ;
+
+quotagroup_clauses
+    : ADD QUOTAGROUP id_expression (SET property_name '=' property_value)?
+    | MODIFY QUOTAGROUP id_expression SET property_name '=' property_value
+    | MOVE QUOTAGROUP id_expression TO id_expression
+    | DROP QUOTAGROUP id_expression
+    ;
+
+property_name
+    : id_expression
+    ;
+
+property_value
+    : id_expression
+    ;
+
+filegroup_clauses
+    : add_filegroup_clause
+    | modify_filegroup_clause
+    | move_to_filegroup_clause
+    | drop_filegroup_clause
+    ;
+
+add_filegroup_clause
+    : ADD FILEGROUP id_expression ((DATABASE | CLUSTER | VOLUME) id_expression | TEMPLATE) (FROM TEMPLATE id_expression)?
+        (SET CHAR_STRING '=' CHAR_STRING)?
+    ;
+
+modify_filegroup_clause
+    : MODIFY FILEGROUP id_expression
+        SET CHAR_STRING '=' CHAR_STRING
+    ;
+
+move_to_filegroup_clause
+    : MOVE FILE CHAR_STRING TO FILEGROUP id_expression
+    ;
+
+drop_filegroup_clause
+    : DROP FILEGROUP id_expression CASCADE?
+    ;
+
+
+quorum_regular
+    : QUORUM
+    | REGULAR
+    ;
+
+undrop_disk_clause
+    : UNDROP DISKS
+    ;
+
+diskgroup_availability
+    : MOUNT (RESTRICTED | NORMAL)? (FORCE | NOFORCE)?
+    | DISMOUNT (FORCE | NOFORCE)?
+    ;
+
+enable_disable_volume
+    : (ENABLE | DISABLE) VOLUME ( id_expression (',' id_expression)* | ALL)
     ;
 
 // DDL -> SQL Statements for Stored PL/SQL Units
@@ -339,6 +616,11 @@ drop_outline
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
 alter_rollback_segment
     : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+drop_restore_point
+    : DROP RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
     ;
 
 drop_rollback_segment
@@ -955,6 +1237,17 @@ character_set_clause
 file_specification
     : datafile_tempfile_spec
     | redo_log_file_spec
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DISKGROUP.html
+create_diskgroup
+    : CREATE DISKGROUP id_expression ((HIGH | NORMAL | FLEX | EXTENDED (SITE sn=id_expression)? | EXTERNAL) REDUNDANCY)?
+        (quorum_regular? (FAILGROUP fg=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+        (ATTRIBUTE an=CHAR_STRING '=' av=CHAR_STRING (',' CHAR_STRING '=' CHAR_STRING)*)?
+    ;
+
+qualified_disk_clause
+    : ss=CHAR_STRING (NAME dn=id_expression)? (SIZE size_clause)? force_noforce?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
@@ -1925,6 +2218,11 @@ disassociate_statistics
         FORCE?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INDEXTYPE.html
+drop_indextype
+    : DROP INDEXTYPE (schema_name '.')? it=id_expression FORCE?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-INMEMORY-JOIN-GROUP.html
 drop_inmemory_join_group
     : DROP INMEMORY JOIN GROUP (schema_name '.')? jg=id_expression
@@ -1948,6 +2246,18 @@ purge_statement
             | RECYCLEBIN
             | DBA_RECYCLEBIN
             )
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/NOAUDIT-Traditional-Auditing.html
+noaudit_statement
+    : NOAUDIT
+        ( audit_operation_clause auditing_by_clause?
+        | audit_schema_object_clause
+        | NETWORK
+        | DIRECT_PATH LOAD auditing_by_clause?
+        )
+        (WHENEVER NOT? SUCCESSFUL)?
+        container_clause?
     ;
 
 rename_object
@@ -1974,8 +2284,48 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/REVOKE.html
+revoke_statement
+    : REVOKE ((revoke_system_privilege | revoke_object_privileges) container_clause? | revoke_roles_from_programs)
+    ;
+
+revoke_system_privilege
+    : (system_privilege | role_name | ALL PRIVILEGES) FROM revokee_clause
+    ;
+
+revokee_clause
+    : (id_expression | PUBLIC) (',' (id_expression | PUBLIC))*
+    ;
+
+revoke_object_privileges
+    : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
+        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+    ;
+
+on_object_clause
+    : ON ( (schema_name '.')? o=id_expression
+         | USER id_expression (',' id_expression)*
+         | DIRECTORY directory_name
+         | EDITION edition_name
+         | MINING MODEL (schema_name '.')? mmn=id_expression
+         | JAVA (SOURCE | RESOURCE) (schema_name '.')? o2=id_expression
+         | SQL TRANSLATION PROFILE (schema_name '.')? p=id_expression
+         )
+    ;
+
+revoke_roles_from_programs
+    : (role_name (',' role_name)* | ALL) FROM program_unit (',' program_unit)*
+    ;
+
+program_unit
+    : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
 create_directory
-    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
+    : CREATE (OR REPLACE)? DIRECTORY directory_name
+        (SHARING '=' (METADATA | NONE))?
+        AS directory_path
       ';'
     ;
 
@@ -2102,16 +2452,15 @@ alter_view_editionable
     : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-VIEW.html
 create_view
-    : CREATE (OR REPLACE)? no_force_clause? editioning_clause? VIEW
-      tableview_name view_options?
+    : CREATE (OR REPLACE)? (NO? FORCE)? editioning_clause? VIEW (schema_name '.')? v=id_expression
+      (SHARING '=' (METADATA | EXTENDED? DATA | NONE))?
+      view_options?
+      (DEFAULT COLLATION cn=id_expression)?
+      (BEQUEATH (CURRENT_USER | DEFINER))?
       AS select_only_statement subquery_restriction_clause?
-    ;
-
-
-no_force_clause
-    : (NO | OR)? FORCE
-    | NOFORCE
+      (CONTAINER_MAP | CONTAINERS_DEFAULT)?
     ;
 
 editioning_clause
@@ -2121,9 +2470,9 @@ editioning_clause
     ;
 
 view_options
-    :  view_alias_constraint
+    : view_alias_constraint
     | object_view_clause
-//  | xmltype_view_clause //TODO
+    | xmltype_view_clause
     ;
 
 view_alias_constraint
@@ -2131,11 +2480,11 @@ view_alias_constraint
     ;
 
 object_view_clause
-    : OF type_name
-       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')' )
-       | UNDER tableview_name
+    : OF (schema_name '.')? tn=id_expression
+       ( WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')')
+       | UNDER (schema_name '.')? sv=id_expression
        )
-       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+       ('(' (','? (out_of_line_constraint | REGULAR_ID inline_constraint))+ ')')*
     ;
 
 inline_constraint
@@ -2174,12 +2523,31 @@ out_of_line_constraint
 
 constraint_state
     : ( NOT? DEFERRABLE
-      | INITIALLY (IMMEDIATE|DEFERRED)
-      | (RELY|NORELY)
-      | (ENABLE|DISABLE)
-      | (VALIDATE|NOVALIDATE)
+      | INITIALLY (IMMEDIATE | DEFERRED)
+      | (RELY | NORELY)
+      | (ENABLE | DISABLE)
+      | (VALIDATE | NOVALIDATE)
       | using_index_clause
       )+
+    ;
+
+xmltype_view_clause
+    : OF XMLTYPE xml_schema_spec? WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' expression (',' expression)* ')')
+    ;
+
+xml_schema_spec
+    : (XMLSCHEMA xml_schema_url)? ELEMENT (element | xml_schema_url '#' element)
+        (STORE ALL VARRAYS AS (LOBS | TABLES))?
+        (allow_or_disallow NONSCHEMA)?
+        (allow_or_disallow ANYSCHEMA)?
+    ;
+
+xml_schema_url
+    : DELIMITED_ID
+    ;
+
+element
+    : DELIMITED_ID
     ;
 
 alter_tablespace
@@ -2298,6 +2666,55 @@ undo_tablespace_clause
 
 tablespace_retention_clause
     : RETENTION (GUARANTEE | NOGUARANTEE)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLESPACE-SET.html
+create_tablespace_set
+    : CREATE TABLESPACE SET tss=id_expression (IN SHARDSPACE ss=id_expression)?
+        (USING TEMPLATE '(' (DATAFILE file_specification (',' file_specification)*)? permanent_tablespace_attrs+ ')')?
+    ;
+
+permanent_tablespace_attrs
+    : MINIMUM EXTENT size_clause
+    | BLOCKSIZE numeric K_LETTER?
+    | logging_clause
+    | FORCE LOGGING
+    | tablespace_encryption_clause
+    | default_tablespace_params
+    | ONLINE
+    | OFFLINE
+    | extent_management_clause
+    | segment_management_clause
+    | flashback_mode_clause
+    | lost_write_protection
+    ;
+
+tablespace_encryption_clause
+    : ENCRYPTION (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+    ;
+
+default_tablespace_params
+    : DEFAULT default_table_compression? default_index_compression? inmmemory_clause? ilm_clause? storage_clause?
+    ;
+
+default_table_compression
+    : TABLE ( COMPRESS FOR (OLTP | QUERY low_high | ARCHIVE low_high)
+            | NOCOMPRESS
+            )
+    ;
+
+low_high
+    : LOW
+    | HIGH
+    ;
+
+default_index_compression
+    : INDEX (COMPRESS ADVANCED low_high | NOCOMPRESS)
+    ;
+
+inmmemory_clause
+    : INMEMORY inmemory_attributes? (TEXT (column_name (',' column_name)* | column_name USING policy_name (',' column_name USING policy_name)*))?
+    | NO INMEMORY
     ;
 
 // asm_filename is just a charater string.  Would need to parse the string
@@ -2674,6 +3091,13 @@ create_outline
         (FROM (PUBLIC | PRIVATE)? so=id_expression)?
         (FOR CATEGORY c=id_expression)?
         (ON statement)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-RESTORE-POINT.html
+create_restore_point
+    : CREATE CLEAN? RESTORE POINT rp=id_expression (FOR PLUGGABLE DATABASE pdb=id_expression)?
+        (AS OF (TIMESTAMP | SCN) expression)?
+        (PRESERVE | GUARANTEE FLASHBACK DATABASE)?
     ;
 
 create_role
@@ -3342,6 +3766,22 @@ drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
+drop_tablespace
+    : DROP TABLESPACE ts=id_expression ((DROP | KEEP) QUOTA?)?
+        including_contents_clause?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE-SET.html
+drop_tablespace_set
+    : DROP TABLESPACE SET tss=id_expression
+        including_contents_clause?
+    ;
+
+including_contents_clause
+    : INCLUDING CONTENTS ((AND | KEEP) DATAFILES)? (CASCADE CONSTRAINTS)?
+    ;
+
 drop_view
     : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
@@ -3458,6 +3898,21 @@ drop_flashback_archive
 
 drop_cluster
     : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
+drop_context
+    : DROP CONTEXT ns=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DIRECTORY.html
+drop_directory
+    : DROP DIRECTORY dn=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DISKGROUP.html
+drop_diskgroup
+    : DROP DISKGROUP dgn=id_expression ((FORCE? INCLUDING | EXCLUDING) CONTENTS)?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
@@ -3833,6 +4288,11 @@ link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
+drop_database
+    : DROP DATABASE
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
     : CREATE SHARED? PUBLIC? DATABASE LINK dblink ( CONNECT TO ( CURRENT_USER
@@ -3848,6 +4308,41 @@ dblink
 
 drop_database_link
     : DROP PUBLIC? DATABASE LINK dblink
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
+alter_tablespace_set
+    : ALTER TABLESPACE SET tss=id_expression alter_tablespace_attrs
+    ;
+
+alter_tablespace_attrs
+    : default_tablespace_params
+    | MINIMUM EXTENT size_clause
+    | RESIZE size_clause
+    | COALESCE
+    | SHRINK SPACE_KEYWORD (KEEP size_clause)?
+    | RENAME TO nts=id_expression
+    | (BEGIN | END) BACKUP
+    | datafile_tempfile_clauses
+    | tablespace_logging_clauses
+    | tablespace_group_clause
+    | tablespace_state_clauses
+    | autoextend_clause
+    | flashback_mode_clause
+    | tablespace_retention_clause
+    | alter_tablespace_encryption
+    | lost_write_protection
+    ;
+
+alter_tablespace_encryption
+    : ENCRYPTION ( OFFLINE (tablespace_encryption_spec? ENCRYPT | DECRYPT)
+                 | ONLINE (tablespace_encryption_spec? (ENCRYPT | REKEY) | DECRYPT) ts_file_name_convert?
+                 | FINISH (ENCRYPT | REKEY | DECRYPT) ts_file_name_convert?
+                 )
+    ;
+
+ts_file_name_convert
+    : FILE_NAME_CONVERT '=' '(' CHAR_STRING ',' CHAR_STRING (',' CHAR_STRING ',' CHAR_STRING)* ')' KEEP?
     ;
 
 alter_role
@@ -6229,6 +6724,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
@@ -6294,6 +6790,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLEAN
     | CLEANUP
     | CLIENT
     | CLUSTERING
@@ -6307,7 +6804,9 @@ non_reserved_keywords_in_12c
     | CONDITION
     | CONDITIONAL
     | CONTAINERS
+    | CONTAINERS_DEFAULT
     | CONTAINER_DATA
+    | CONTAINER_MAP
     | CON_DBID_TO_ID
     | CON_GUID_TO_ID
     | CON_ID
@@ -6364,7 +6863,9 @@ non_reserved_keywords_in_12c
     | FEATURE_DETAILS
     | FETCH
     | FILE_NAME_CONVERT
+    | FILEGROUP
     | FIXED_VIEW_DATA
+    | FLEX
     | FORMAT
     | GATHER_OPTIMIZER_STATISTICS
     | GET
@@ -6373,6 +6874,7 @@ non_reserved_keywords_in_12c
     | HIER_ORDER
     | HIERARCHICAL
     | HOURS
+    | H_LETTER
     | IDLE
     | ILM
     | IMMUTABLE
@@ -6522,6 +7024,7 @@ non_reserved_keywords_in_12c
     | PRUNING
     | PX_FAULT_TOLERANCE
     | QUARTERS
+    | QUOTAGROUP
     | REALM
     | REDEFINE
     | RELOCATE
@@ -6541,6 +7044,7 @@ non_reserved_keywords_in_12c
     | SHARDED
     | SHARING
     | SHELFLIFE
+    | SITE
     | SOURCE_FILE_DIRECTORY
     | SOURCE_FILE_NAME_CONVERT
     | SQL_TRANSLATION_PROFILE
