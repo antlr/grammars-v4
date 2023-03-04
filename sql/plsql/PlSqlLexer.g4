@@ -2287,6 +2287,11 @@ SHA2_512_Q:                   '"SHA2_512"';
 SHARDED:                      'SHARDED';
 V1_Q:                         '"V1"';
 
+ISOLATE:                      'ISOLATE';
+ROOT:                         'ROOT';
+UNITE:                        'UNITE';
+ALGORITHM:                    'ALGORITHM';
+
 CUME_DIST:                    'CUME_DIST';
 DENSE_RANK:                   'DENSE_RANK';
 LISTAGG:                      'LISTAGG';
@@ -2391,6 +2396,8 @@ SOLIDUS:                   '/';
 AT_SIGN:                   '@';
 ASSIGN_OP:                 ':=';
 HASH_OP:                   '#';
+
+SQ:                        '\'';
 
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
