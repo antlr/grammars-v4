@@ -37,6 +37,7 @@ unit_statement
     : transaction_control_statements
     | alter_analytic_view
     | alter_attribute_dimension
+    | alter_audit_policy
     | alter_cluster
     | alter_database
     | alter_database_link
@@ -46,6 +47,7 @@ unit_statement
     | alter_function
     | alter_outline
     | alter_hierarchy
+    | alter_lockdown_profile
     | alter_package
     | alter_pmem_filestore
     | alter_procedure
@@ -70,6 +72,7 @@ unit_statement
     | alter_user
     | alter_view
 
+    | administer_key_management
     | analyze
     | associate_statistics
     | audit_traditional
@@ -82,6 +85,7 @@ unit_statement
 
     | create_analytic_view
     | create_attribute_dimension
+    | create_audit_policy
     | create_cluster
     | create_context
     | create_controlfile
@@ -92,6 +96,7 @@ unit_statement
     | create_index
     | create_inmemory_join_group
     | create_library
+    | create_lockdown_profile
     | create_outline
     | create_table
     | create_profile
@@ -117,6 +122,7 @@ unit_statement
 
     | drop_analytic_view
     | drop_attribute_dimension
+    | drop_audit_policy
     | drop_cluster
     | drop_context
     | drop_directory
@@ -126,6 +132,7 @@ unit_statement
     | drop_function
     | drop_hierarchy
     | drop_library
+    | drop_lockdown_profile
     | drop_package
     | drop_pmem_filestore
     | drop_procedure
@@ -503,6 +510,64 @@ outline_options
     | CHANGE CATEGORY TO ncn=id_expression
     | ENABLE
     | DISABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-LOCKDOWN-PROFILE.html
+alter_lockdown_profile
+    : ALTER LOCKDOWN PROFILE id_expression (lockdown_feature | lockdown_options | lockdown_statements)
+        (USERS '=' (ALL | COMMON | LOCAL))?
+    ;
+
+lockdown_feature
+    : disable_enable FEATURE ( '=' '(' string_list ')'
+                             | ALL (EXCEPT '=' '(' string_list ')')?
+                             )
+    ;
+
+lockdown_options
+    : disable_enable OPTION ( '=' '(' string_list ')'
+                            | ALL (EXCEPT '=' '(' string_list ')')?
+                            )
+    ;
+
+lockdown_statements
+    : disable_enable STATEMENT ( '=' '(' string_list ')'
+                               | '=' '(' CHAR_STRING ')' statement_clauses
+                               | ALL (EXCEPT '=' '(' string_list ')')?
+                               )
+    ;
+
+statement_clauses
+    : CLAUSE ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' clause_options
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+clause_options
+    : OPTION ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' option_values+
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+option_values
+    : VALUE '=' '(' string_list ')'
+    | (MINVALUE | MAXVALUE) '=' CHAR_STRING
+    ;
+
+string_list
+    : CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+disable_enable
+    : DISABLE
+    | ENABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-LOCKDOWN-PROFILE.html
+drop_lockdown_profile
+    : DROP LOCKDOWN PROFILE p=id_expression
     ;
 
 // Package DDLs
@@ -1204,6 +1269,73 @@ all_clause
                  )
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-AUDIT-POLICY-Unified-Auditing.html
+create_audit_policy
+    : CREATE AUDIT POLICY p=id_expression
+        privilege_audit_clause?
+        action_audit_clause?
+        role_audit_clause?
+        (WHEN quoted_string EVALUATE PER (STATEMENT | SESSION | INSTANCE))?
+        (ONLY TOPLEVEL)?
+        container_clause?
+    ;
+
+privilege_audit_clause
+    : PRIVILEGES system_privilege (',' system_privilege)*
+    ;
+
+action_audit_clause
+    : (standard_actions | component_actions)+
+    ;
+
+standard_actions
+    : ACTIONS actions_clause (',' actions_clause)*
+    ;
+
+actions_clause
+    : (object_action | ALL) ON (DIRECTORY directory_name | (MINING MODEL)? (schema_name '.')? id_expression)
+    | (system_action | ALL)
+    ;
+
+object_action
+    : ALTER
+    | GRANT
+    | READ
+    | EXECUTE
+    | AUDIT
+    | COMMENT
+    | DELETE
+    | INDEX
+    | INSERT
+    | LOCK
+    | SELECT
+    | UPDATE
+    | FLASHBACK
+    | RENAME
+    ;
+
+system_action
+    : id_expression // SELECT name FROM AUDITABLE_SYSTEM_ACTIONS WHERE component = 'Standard';
+    | (CREATE | ALTER | DROP) JAVA
+    | LOCK TABLE
+    | (READ | WRITE | EXECUTE) DIRECTORY
+    ;
+
+component_actions
+    : ACTIONS COMPONENT '=' ( (DATAPUMP | DIRECT_LOAD | OLS | XS) component_action (',' component_action)*
+                            | DV component_action ON id_expression (',' component_action ON id_expression)*
+                            | PROTOCOL (FTP | HTTP | AUTHENTICATION)
+                            )
+    ;
+
+component_action
+    : id_expression // SELECT name FROM auditable_system_actions WHERE component = 'Datapump';
+    ;
+
+role_audit_clause
+    : ROLES role_name (',' role_name)*
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-CONTROLFILE.html
 create_controlfile
     : CREATE CONTROLFILE REUSE? SET? DATABASE d=id_expression
@@ -1702,6 +1834,236 @@ container_data_clause
     | add_rem_container_data (FOR container_tableview_name)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ADMINISTER-KEY-MANAGEMENT.html
+administer_key_management
+    : ADMINISTER KEY MANAGEMENT ( keystore_management_clauses
+                                | key_management_clauses
+                                | secret_management_clauses
+                                | zero_downtime_software_patching_clauses
+                                )
+        ';'
+    ;
+
+keystore_management_clauses
+    : create_keystore
+    | open_keystore
+    | close_keystore
+    | backup_keystore
+    | alter_keystore_password
+    | merge_into_new_keystore
+    | merge_into_existing_keystore
+    | isolate_keystore
+    | unite_keystore
+    ;
+
+create_keystore
+    : CREATE ( KEYSTORE ksl=CHAR_STRING
+             | LOCAL? AUTO_LOGIN KEYSTORE FROM KEYSTORE ksl=CHAR_STRING
+             ) IDENTIFIED BY keystore_password
+    ;
+
+open_keystore
+    : SET KEYSTORE OPEN force_keystore?
+        identified_by_store
+        container_clause?
+    ;
+
+force_keystore
+    : FORCE KEYSTORE
+    ;
+
+close_keystore
+    : SET KEYSTORE CLOSE identified_by_store?
+        container_clause?
+    ;
+
+backup_keystore
+    : BACKUP KEYSTORE (USING bi=CHAR_STRING)? force_keystore?
+        identified_by_store
+        (TO ksl=CHAR_STRING)?
+    ;
+
+alter_keystore_password
+    : ALTER KEYSTORE PASSWORD force_keystore? IDENTIFIED BY o=keystore_password
+        SET n=keystore_password with_backup_clause?
+    ;
+
+merge_into_new_keystore
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        AND KEYSTORE ksl2=CHAR_STRING identified_by_password_clause?
+        INTO NEW KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
+    ;
+
+merge_into_existing_keystore
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        INTO EXISTING KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
+        with_backup_clause?
+    ;
+
+isolate_keystore
+    : FORCE? ISOLATE KEYSTORE IDENTIFIED BY i=keystore_password FROM ROOT KEYSTORE
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+unite_keystore
+    : UNITE KEYSTORE IDENTIFIED BY i=keystore_password WITH ROOT KEYSTORE
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+key_management_clauses
+    : set_key
+    | create_key
+    | use_key
+    | set_key_tag
+    | export_keys
+    | import_keys
+    | migrate_keys
+    | reverse_migrate_keys
+    | move_keys
+    ;
+
+set_key
+    : SET ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+        container_clause?
+    ;
+
+create_key
+    : CREATE ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+        container_clause?
+    ;
+
+mkid
+    : CHAR_STRING
+    ;
+
+mk
+    : CHAR_STRING
+    ;
+
+use_key
+    : USE ENCRYPTION? KEY k=CHAR_STRING using_tag_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+set_key_tag
+    : SET TAG t=CHAR_STRING FOR k=CHAR_STRING force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+export_keys
+    : EXPORT ENCRYPTION? KEYS WITH SECRET secret TO filename
+        force_keystore? identified_by_store
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | '(' subquery ')'))?
+    ;
+
+import_keys
+    : IMPORT ENCRYPTION? KEYS WITH SECRET secret FROM filename
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+migrate_keys
+    : SET ENCRYPTION? KEY IDENTIFIED BY hsm=secret
+        force_keystore?
+        MIGRATE USING keystore_password
+        with_backup_clause?
+    ;
+
+reverse_migrate_keys
+    : SET ENCRYPTION? KEY IDENTIFIED BY s=secret
+        force_keystore?
+        REVERSE MIGRATE USING hsm=secret
+    ;
+
+move_keys
+    : MOVE ENCRYPTION? KEYS TO NEW KEYSTORE ksl1=CHAR_STRING
+        IDENTIFIED BY ksp1=keystore_password FROM FORCE? KEYSTORE IDENTIFIED BY ksp=keystore_password
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | subquery))?
+        with_backup_clause?
+    ;
+
+identified_by_store
+    : IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+    ;
+
+using_algorithm_clause
+    : USING ALGORITHM ea=CHAR_STRING
+    ;
+
+using_tag_clause
+    : USING TAG t=CHAR_STRING
+    ;
+
+secret_management_clauses
+    : add_update_secret
+    | delete_secret
+    | add_update_secret_seps
+    | delete_secret_seps
+    ;
+
+add_update_secret
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
+        using_tag_clause?
+        force_keystore?
+        identified_by_store?
+        with_backup_clause?
+    ;
+
+delete_secret
+    : DELETE SECRET FOR CLIENT ci=CHAR_STRING
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+add_update_secret_seps
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
+        using_tag_clause?
+        TO LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+delete_secret_seps
+    : DELETE SECRET s=CHAR_STRING SQ FOR CLIENT ci=CHAR_STRING
+        FROM LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+zero_downtime_software_patching_clauses
+    : SWITCHOVER TO? LIBRARY path FOR ALL CONTAINERS //inconsistent documentation
+    ;
+
+with_backup_clause
+    : WITH BACKUP (USING bi=CHAR_STRING)?
+    ;
+
+identified_by_password_clause
+    : IDENTIFIED BY keystore_password
+    ;
+
+keystore_password
+    : DELIMITED_ID
+    ;
+
+path
+    : CHAR_STRING
+    ;
+
+secret
+    : DELIMITED_ID
+    ;
+
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
 analyze
     : ( ANALYZE (TABLE tableview_name | INDEX index_name) partition_extention_clause?
@@ -2068,7 +2430,7 @@ revokee_clause
 
 revoke_object_privileges
     : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
-        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+        FROM revokee_clause (CASCADE CONSTRAINTS | FORCE)?
     ;
 
 on_object_clause
@@ -2852,6 +3214,19 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-LOCKDOWN-PROFILE.html
+create_lockdown_profile
+    : CREATE LOCKDOWN PROFILE id_expression (static_base_profile | dynamic_base_profile)?
+    ;
+
+static_base_profile
+    : FROM bp=id_expression
+    ;
+
+dynamic_base_profile
+    : INCLUDING bp=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
@@ -3639,6 +4014,16 @@ alter_attribute_dimension
         (RENAME TO nad=id_expression | COMPILE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-AUDIT-POLICY-Unified-Auditing.html
+alter_audit_policy
+    : ALTER AUDIT POLICY p=id_expression
+        ADD? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        DROP? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        (CONDITION ( DROP
+                   | CHAR_STRING EVALUATE PER (STATEMENT | SESSION | INSTANCE))
+                   )?
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -3658,6 +4043,11 @@ drop_analytic_view
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-ATTRIBUTE-DIMENSION.html
 drop_attribute_dimension
     : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-AUDIT-POLICY-Unified-Auditing.html
+drop_audit_policy
+    : DROP AUDIT POLICY p=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-FLASHBACK-ARCHIVE.html
@@ -6530,6 +6920,7 @@ non_reserved_keywords_in_12c
     | ADVANCED
     | AFD_DISKSTRING
     | ALTERNATE
+    | ALGORITHM
     | ANALYTIC
     | ANCESTOR
     | ANOMALY
@@ -6559,6 +6950,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLAUSE
     | CLEAN
     | CLEANUP
     | CLIENT
@@ -6567,6 +6959,7 @@ non_reserved_keywords_in_12c
     | CLUSTER_DISTANCE
     | COLLATE
     | COLLATION
+    | COMMON
     | COMMON_DATA
     | COMPONENT
     | COMPONENTS
@@ -6629,6 +7022,7 @@ non_reserved_keywords_in_12c
     | FAMILY
     | FAR
     | FASTSTART
+    | FEATURE
     | FEATURE_DETAILS
     | FETCH
     | FILE_NAME_CONVERT
@@ -6636,6 +7030,7 @@ non_reserved_keywords_in_12c
     | FIXED_VIEW_DATA
     | FLEX
     | FORMAT
+    | FTP
     | GATHER_OPTIMIZER_STATISTICS
     | GET
     | HALF_YEARS
@@ -6643,6 +7038,7 @@ non_reserved_keywords_in_12c
     | HIER_ORDER
     | HIERARCHICAL
     | HOURS
+    | HTTP
     | H_LETTER
     | IDLE
     | ILM
@@ -6655,6 +7051,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | ISOLATE
     | IS_LEAF
     | JSON
     | JSONGET
@@ -6680,6 +7077,7 @@ non_reserved_keywords_in_12c
     | LEVEL_NAME
     | LIFECYCLE
     | LINEAR
+    | LOCKDOWN
     | LOCKING
     | LOGMINING
     | LOST
@@ -6789,6 +7187,7 @@ non_reserved_keywords_in_12c
     | PRIORITY
     | PRIVILEGED
     | PROPERTY
+    | PROTOCOL
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
@@ -6858,6 +7257,7 @@ non_reserved_keywords_in_12c
     | TRUST
     | UCS2
     | UNCONDITIONAL
+    | UNITE
     | UNMATCHED
     | UNPLUG
     | UNSUBSCRIBE
@@ -8016,6 +8416,7 @@ non_reserved_keywords_pre12c
     | ROLLBACK
     | ROLLING
     | ROLLUP
+    | ROOT
     | ROUND
     | ROWDEPENDENCIES
     | ROWID
