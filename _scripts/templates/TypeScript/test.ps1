@@ -50,28 +50,8 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
-# Note, a lot of this crap is taken verbatim out of the "ts-node.ps1" script that
-# npm installs. It's totally bogus, but typical un-powerful Powershell non-sense.
-$tsnode = (Get-Command ts-node).Path
-$basedir=Split-Path $tsnode -Parent
-
-$exe=""
-if ($PSVersionTable.PSVersion -lt "6.0" -or $IsWindows) {
-  # Fix case when both the Windows and Linux builds of Node
-  # are installed in the same directory
-  $exe=".exe"
-}
-$ret=0
-get-content "tests.txt" | trwdog node "$basedir/node_modules/ts-node/dist/bin.js" Test.js -q -x -tee -tree 2>&1 > parse.txt
+get-content "tests.txt" | trwdog pwsh -command "ts-node Test.js -q -x -tee -tree" 2>&1 > parse.txt
 $status=$LASTEXITCODE
-if (Test-Path "$basedir/node$exe") {
-  # Support pipeline input
-  get-content "tests.txt" | trwdog "$basedir/node$exe" "$basedir/node_modules/ts-node/dist/bin.js" Test.js -q -x -tee -tree 2>&1 > parse.txt
-  $status=$LASTEXITCODE
-} else {
-  get-content "tests.txt" | trwdog node$exe "$basedir/node_modules/ts-node/dist/bin.js" Test.js -q -x -tee -tree 2>&1 > parse.txt
-  $status=$LASTEXITCODE
-}
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the
@@ -123,7 +103,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
 
 # Check if any untracked .errors files are not empty.
 $new_errors_txt = New-Object System.Collections.Generic.List[string]
-$new_errors2_txt = git ls-files --exclude-standard -o --ignored $TestDirectory
+$new_errors2_txt = git ls-files --exclude-standard -o $TestDirectory
 $new_errors = $LASTEXITCODE
 
 # Gather up all untracked .errors file output. These are new errors
