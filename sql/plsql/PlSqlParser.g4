@@ -47,6 +47,7 @@ unit_statement
     | alter_function
     | alter_outline
     | alter_hierarchy
+    | alter_java
     | alter_lockdown_profile
     | alter_package
     | alter_pmem_filestore
@@ -95,6 +96,7 @@ unit_statement
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
+    | create_java
     | create_library
     | create_lockdown_profile
     | create_outline
@@ -131,6 +133,7 @@ unit_statement
     | drop_flashback_archive
     | drop_function
     | drop_hierarchy
+    | drop_java
     | drop_library
     | drop_lockdown_profile
     | drop_package
@@ -468,6 +471,18 @@ alter_hierarchy
 
 alter_function
     : ALTER FUNCTION function_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? ';'
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-JAVA.html
+alter_java
+    : ALTER JAVA (SOURCE | CLASS) (schema_name '.')? o=id_expression
+        (RESOLVER '(' ('(' match_string ','? (schema_name | '-') ')')+ ')')?
+        (COMPILE | RESOLVE | invoker_rights_clause)
+    ;
+
+match_string
+    : DELIMITED_ID
+    | '*'
     ;
 
 create_function_body
@@ -2489,8 +2504,27 @@ alter_library
      ';'
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-JAVA.html
+drop_java
+    : DROP JAVA (SOURCE | CLASS | RESOURCE) (schema_name '.')? id_expression
+    ;
+
 drop_library
     : DROP LIBRARY library_name
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-JAVA.html
+create_java
+    : CREATE (OR REPLACE)? (AND (RESOLVE | COMPILE))? NOFORCE?
+        JAVA ( (SOURCE | RESOURCE) NAMED (schema_name '.')? pn=id_expression
+             | CLASS (SCHEMA id_expression)?
+             )
+        (SHARING '=' (METADATA | NONE))?
+        invoker_rights_clause?
+        (RESOLVER '(' ('(' CHAR_STRING ','? (sn=id_expression | '-') ')')+ ')')?
+        ( USING (BFILE '(' d=id_expression ',' filename ')' | (CLOB | BLOB | BFILE) subquery | CHAR_STRING)
+        | AS CHAR_STRING
+        )
     ;
 
 create_library
@@ -5421,10 +5455,16 @@ set_constraint_command
     : SET (CONSTRAINT | CONSTRAINTS) (ALL | constraint_name (',' constraint_name)*) (IMMEDIATE | DEFERRED)
     ;
 
+// https://docs.oracle.com/cd/E18283_01/server.112/e17118/statements_4010.htm#SQLRF01110
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/COMMIT.html
 commit_statement
     : COMMIT WORK?
-      (COMMENT expression | FORCE (CORRUPT_XID expression | CORRUPT_XID_ALL | expression (',' expression)?))?
-      write_clause?
+      ( COMMENT CHAR_STRING write_clause?
+      | FORCE ( CHAR_STRING (',' numeric)?
+              | CORRUPT_XID CHAR_STRING
+              | CORRUPT_XID_ALL
+              )
+      )?
     ;
 
 write_clause
@@ -6873,6 +6913,7 @@ regular_id
     | POSITIVE
     | POSITIVEN
     | PRAGMA
+    | PUBLIC
     | RAISE
     | RAW
     | RECORD
