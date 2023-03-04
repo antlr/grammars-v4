@@ -37,15 +37,18 @@ unit_statement
     : transaction_control_statements
     | alter_analytic_view
     | alter_attribute_dimension
+    | alter_audit_policy
     | alter_cluster
     | alter_database
     | alter_database_link
     | alter_dimension
+    | alter_diskgroup
     | alter_flashback_archive
     | alter_function
     | alter_outline
     | alter_hierarchy
     | alter_java
+    | alter_lockdown_profile
     | alter_package
     | alter_pmem_filestore
     | alter_procedure
@@ -70,6 +73,7 @@ unit_statement
     | alter_user
     | alter_view
 
+    | administer_key_management
     | analyze
     | associate_statistics
     | audit_traditional
@@ -82,9 +86,11 @@ unit_statement
 
     | create_analytic_view
     | create_attribute_dimension
+    | create_audit_policy
     | create_cluster
     | create_context
     | create_controlfile
+    | create_diskgroup
     | create_edition
     | create_flashback_archive
     | create_hierarchy
@@ -92,6 +98,7 @@ unit_statement
     | create_inmemory_join_group
     | create_java
     | create_library
+    | create_lockdown_profile
     | create_outline
     | create_table
     | create_profile
@@ -99,7 +106,7 @@ unit_statement
     | create_role
     | create_tablespace
     | create_tablespace_set
-    | create_view //TODO
+    | create_view
     | create_directory
     | create_materialized_view
     | create_materialized_view_log
@@ -117,14 +124,18 @@ unit_statement
 
     | drop_analytic_view
     | drop_attribute_dimension
+    | drop_audit_policy
     | drop_cluster
     | drop_context
+    | drop_directory
+    | drop_diskgroup
     | drop_edition
     | drop_flashback_archive
     | drop_function
     | drop_hierarchy
     | drop_java
     | drop_library
+    | drop_lockdown_profile
     | drop_package
     | drop_pmem_filestore
     | drop_procedure
@@ -169,6 +180,268 @@ unit_statement
     | revoke_statement
 
     | procedure_call
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-DISKGROUP.html
+alter_diskgroup
+    : ALTER DISKGROUP ( id_expression (((add_disk_clause | drop_disk_clause)+ | resize_disk_clause) rebalance_diskgroup_clause?
+                                      | ( replace_disk_clause
+                                        | rename_disk_clause
+                                        | disk_online_clause
+                                        | disk_offline_clause
+                                        | rebalance_diskgroup_clause
+                                        | check_diskgroup_clause
+                                        | diskgroup_template_clauses
+                                        | diskgroup_directory_clauses
+                                        | diskgroup_alias_clauses
+                                        | diskgroup_volume_clauses
+                                        | diskgroup_attributes
+                                        | drop_diskgroup_file_clause
+                                        | convert_redundancy_clause
+                                        | usergroup_clauses
+                                        | user_clauses
+                                        | file_permissions_clause
+                                        | file_owner_clause
+                                        | scrub_clause
+                                        | quotagroup_clauses
+                                        | filegroup_clauses
+                                        )
+                                      )
+                      | (id_expression (',' id_expression)* | ALL) (undrop_disk_clause | diskgroup_availability | enable_disable_volume)
+                      )
+    ;
+
+add_disk_clause
+    : ADD ( (SITE sn=id_expression)? quorum_regular? (FAILGROUP fgn=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+    ;
+
+drop_disk_clause
+    : DROP ( quorum_regular? DISK id_expression force_noforce? (',' id_expression force_noforce?)*
+           | DISKS IN quorum_regular? FAILGROUP id_expression force_noforce? (',' id_expression force_noforce?)*
+           )
+    ;
+
+resize_disk_clause
+    : RESIZE ALL (SIZE size_clause)?
+    ;
+
+replace_disk_clause
+    : REPLACE DISK id_expression WITH CHAR_STRING force_noforce? (',' id_expression WITH CHAR_STRING force_noforce?)*
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+wait_nowait
+    : WAIT
+    | NOWAIT
+    ;
+
+rename_disk_clause
+    : RENAME ( DISK id_expression TO id_expression (',' id_expression TO id_expression)*
+             | DISKS ALL
+             )
+    ;
+
+disk_online_clause
+    : ONLINE ( (quorum_regular? DISK id_expression (',' id_expression)* | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*)+
+             | ALL
+             )
+        (POWER numeric)?
+        wait_nowait?
+    ;
+
+disk_offline_clause
+    : OFFLINE ( quorum_regular? DISK id_expression (',' id_expression)*
+              | DISKS IN quorum_regular? FAILGROUP id_expression (',' id_expression)*
+              ) timeout_clause?
+    ;
+
+timeout_clause
+    : DROP AFTER numeric (M_LETTER | H_LETTER)
+    ;
+
+rebalance_diskgroup_clause
+    : REBALANCE ( ((WITH | WITHOUT) phase+)? (POWER numeric) (WAIT | NOWAIT)?
+                | MODIFY POWER numeric?
+                )
+    ;
+
+phase
+    : id_expression //TODO
+    ;
+
+check_diskgroup_clause
+    : CHECK ALL? (REPAIR | NOREPAIR)? //inconsistent documentation
+    ;
+
+diskgroup_template_clauses
+    : (ADD | MODIFY) TEMPLATE id_expression qualified_template_clause (',' id_expression qualified_template_clause)*
+    | DROP TEMPLATE id_expression (',' id_expression)*
+    ;
+
+qualified_template_clause
+    : ATTRIBUTES '(' redundancy_clause? striping_clause? ')' //inconsistent documentation
+    ;
+
+redundancy_clause
+    : MIRROR
+    | HIGH
+    | UNPROTECTED
+    | PARITY
+    | DOUBLE
+    ;
+
+striping_clause
+    : FINE
+    | COARSE
+    ;
+
+force_noforce
+    : FORCE
+    | NOFORCE
+    ;
+
+diskgroup_directory_clauses
+    : ADD DIRECTORY filename (',' filename)*
+    | DROP DIRECTORY filename force_noforce? (','filename force_noforce?)*
+    | RENAME DIRECTORY dir_name TO dir_name (',' dir_name TO dir_name)*
+    ;
+
+dir_name
+    : CHAR_STRING
+    ;
+
+diskgroup_alias_clauses
+    : ADD ALIAS CHAR_STRING FOR CHAR_STRING (',' CHAR_STRING FOR CHAR_STRING)*
+    | DROP ALIAS CHAR_STRING (',' CHAR_STRING)*
+    | RENAME ALIAS CHAR_STRING TO CHAR_STRING (',' CHAR_STRING TO CHAR_STRING)*
+    ;
+
+diskgroup_volume_clauses
+    : add_volume_clause
+    | modify_volume_clause
+    | RESIZE VOLUME id_expression SIZE size_clause
+    | DROP VOLUME id_expression
+    ;
+
+add_volume_clause
+    : ADD VOLUME id_expression SIZE size_clause redundancy_clause?
+        (STRIPE_WIDTH numeric (K_LETTER | M_LETTER))?
+        (STRIPE_COLUMNS numeric)?
+    ;
+
+modify_volume_clause
+    : MODIFY VOLUME id_expression (MOUNTPATH CHAR_STRING)?
+        (USAGE CHAR_STRING)?
+    ;
+
+diskgroup_attributes
+    : SET ATTRIBUTE CHAR_STRING '=' CHAR_STRING
+    ;
+
+modify_diskgroup_file
+    : MODIFY FILE CHAR_STRING ATTRIBUTE '(' disk_region_clause ')' (',' CHAR_STRING ATTRIBUTE '(' disk_region_clause ')')*
+    ;
+
+disk_region_clause
+    :
+    ;
+
+drop_diskgroup_file_clause
+    : DROP FILE filename (',' filename)*
+    ;
+
+convert_redundancy_clause
+    : CONVERT REDUNDANCY TO FLEX
+    ;
+
+usergroup_clauses
+    : ADD USERGROUP CHAR_STRING WITH MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | MODIFY USERGROUP CHAR_STRING (ADD | DROP) MEMBER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USERGROUP CHAR_STRING
+    ;
+
+user_clauses
+    : ADD USER CHAR_STRING (',' CHAR_STRING)*
+    | DROP USER CHAR_STRING (',' CHAR_STRING)* CASCADE?
+    | REPLACE USER CHAR_STRING WITH CHAR_STRING (',' CHAR_STRING WITH CHAR_STRING)*
+    ;
+
+file_permissions_clause
+    : SET PERMISSION (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)) (',' (OWNER | GROUP | OTHER) '=' (NONE | READ (ONLY | WRITE)))*
+        FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+file_owner_clause
+    : SET OWNERSHIP (OWNER | GROUP) '=' CHAR_STRING (',' (OWNER | GROUP) '=' CHAR_STRING)* FOR FILE CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+scrub_clause
+    : SCRUB (FILE CHAR_STRING | DISK id_expression)?
+        (REPAIR | NOREPAIR)?
+        (POWER (AUTO | LOW | HIGH | MAX))?
+        wait_nowait?
+        force_noforce?
+        STOP?
+    ;
+
+quotagroup_clauses
+    : ADD QUOTAGROUP id_expression (SET property_name '=' property_value)?
+    | MODIFY QUOTAGROUP id_expression SET property_name '=' property_value
+    | MOVE QUOTAGROUP id_expression TO id_expression
+    | DROP QUOTAGROUP id_expression
+    ;
+
+property_name
+    : id_expression
+    ;
+
+property_value
+    : id_expression
+    ;
+
+filegroup_clauses
+    : add_filegroup_clause
+    | modify_filegroup_clause
+    | move_to_filegroup_clause
+    | drop_filegroup_clause
+    ;
+
+add_filegroup_clause
+    : ADD FILEGROUP id_expression ((DATABASE | CLUSTER | VOLUME) id_expression | TEMPLATE) (FROM TEMPLATE id_expression)?
+        (SET CHAR_STRING '=' CHAR_STRING)?
+    ;
+
+modify_filegroup_clause
+    : MODIFY FILEGROUP id_expression
+        SET CHAR_STRING '=' CHAR_STRING
+    ;
+
+move_to_filegroup_clause
+    : MOVE FILE CHAR_STRING TO FILEGROUP id_expression
+    ;
+
+drop_filegroup_clause
+    : DROP FILEGROUP id_expression CASCADE?
+    ;
+
+
+quorum_regular
+    : QUORUM
+    | REGULAR
+    ;
+
+undrop_disk_clause
+    : UNDROP DISKS
+    ;
+
+diskgroup_availability
+    : MOUNT (RESTRICTED | NORMAL)? (FORCE | NOFORCE)?
+    | DISMOUNT (FORCE | NOFORCE)?
+    ;
+
+enable_disable_volume
+    : (ENABLE | DISABLE) VOLUME ( id_expression (',' id_expression)* | ALL)
     ;
 
 // DDL -> SQL Statements for Stored PL/SQL Units
@@ -252,6 +525,64 @@ outline_options
     | CHANGE CATEGORY TO ncn=id_expression
     | ENABLE
     | DISABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-LOCKDOWN-PROFILE.html
+alter_lockdown_profile
+    : ALTER LOCKDOWN PROFILE id_expression (lockdown_feature | lockdown_options | lockdown_statements)
+        (USERS '=' (ALL | COMMON | LOCAL))?
+    ;
+
+lockdown_feature
+    : disable_enable FEATURE ( '=' '(' string_list ')'
+                             | ALL (EXCEPT '=' '(' string_list ')')?
+                             )
+    ;
+
+lockdown_options
+    : disable_enable OPTION ( '=' '(' string_list ')'
+                            | ALL (EXCEPT '=' '(' string_list ')')?
+                            )
+    ;
+
+lockdown_statements
+    : disable_enable STATEMENT ( '=' '(' string_list ')'
+                               | '=' '(' CHAR_STRING ')' statement_clauses
+                               | ALL (EXCEPT '=' '(' string_list ')')?
+                               )
+    ;
+
+statement_clauses
+    : CLAUSE ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' clause_options
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+clause_options
+    : OPTION ( '=' '(' string_list ')'
+             | '=' '(' CHAR_STRING ')' option_values+
+             | ALL (EXCEPT '=' '(' string_list ')')?
+             )
+    ;
+
+option_values
+    : VALUE '=' '(' string_list ')'
+    | (MINVALUE | MAXVALUE) '=' CHAR_STRING
+    ;
+
+string_list
+    : CHAR_STRING (',' CHAR_STRING)*
+    ;
+
+disable_enable
+    : DISABLE
+    | ENABLE
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-LOCKDOWN-PROFILE.html
+drop_lockdown_profile
+    : DROP LOCKDOWN PROFILE p=id_expression
     ;
 
 // Package DDLs
@@ -953,6 +1284,73 @@ all_clause
                  )
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-AUDIT-POLICY-Unified-Auditing.html
+create_audit_policy
+    : CREATE AUDIT POLICY p=id_expression
+        privilege_audit_clause?
+        action_audit_clause?
+        role_audit_clause?
+        (WHEN quoted_string EVALUATE PER (STATEMENT | SESSION | INSTANCE))?
+        (ONLY TOPLEVEL)?
+        container_clause?
+    ;
+
+privilege_audit_clause
+    : PRIVILEGES system_privilege (',' system_privilege)*
+    ;
+
+action_audit_clause
+    : (standard_actions | component_actions)+
+    ;
+
+standard_actions
+    : ACTIONS actions_clause (',' actions_clause)*
+    ;
+
+actions_clause
+    : (object_action | ALL) ON (DIRECTORY directory_name | (MINING MODEL)? (schema_name '.')? id_expression)
+    | (system_action | ALL)
+    ;
+
+object_action
+    : ALTER
+    | GRANT
+    | READ
+    | EXECUTE
+    | AUDIT
+    | COMMENT
+    | DELETE
+    | INDEX
+    | INSERT
+    | LOCK
+    | SELECT
+    | UPDATE
+    | FLASHBACK
+    | RENAME
+    ;
+
+system_action
+    : id_expression // SELECT name FROM AUDITABLE_SYSTEM_ACTIONS WHERE component = 'Standard';
+    | (CREATE | ALTER | DROP) JAVA
+    | LOCK TABLE
+    | (READ | WRITE | EXECUTE) DIRECTORY
+    ;
+
+component_actions
+    : ACTIONS COMPONENT '=' ( (DATAPUMP | DIRECT_LOAD | OLS | XS) component_action (',' component_action)*
+                            | DV component_action ON id_expression (',' component_action ON id_expression)*
+                            | PROTOCOL (FTP | HTTP | AUTHENTICATION)
+                            )
+    ;
+
+component_action
+    : id_expression // SELECT name FROM auditable_system_actions WHERE component = 'Datapump';
+    ;
+
+role_audit_clause
+    : ROLES role_name (',' role_name)*
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-CONTROLFILE.html
 create_controlfile
     : CREATE CONTROLFILE REUSE? SET? DATABASE d=id_expression
@@ -985,6 +1383,17 @@ character_set_clause
 file_specification
     : datafile_tempfile_spec
     | redo_log_file_spec
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DISKGROUP.html
+create_diskgroup
+    : CREATE DISKGROUP id_expression ((HIGH | NORMAL | FLEX | EXTENDED (SITE sn=id_expression)? | EXTERNAL) REDUNDANCY)?
+        (quorum_regular? (FAILGROUP fg=id_expression)? DISK qualified_disk_clause (',' qualified_disk_clause)*)+
+        (ATTRIBUTE an=CHAR_STRING '=' av=CHAR_STRING (',' CHAR_STRING '=' CHAR_STRING)*)?
+    ;
+
+qualified_disk_clause
+    : ss=CHAR_STRING (NAME dn=id_expression)? (SIZE size_clause)? force_noforce?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-EDITION.html
@@ -1440,6 +1849,236 @@ container_data_clause
     | add_rem_container_data (FOR container_tableview_name)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ADMINISTER-KEY-MANAGEMENT.html
+administer_key_management
+    : ADMINISTER KEY MANAGEMENT ( keystore_management_clauses
+                                | key_management_clauses
+                                | secret_management_clauses
+                                | zero_downtime_software_patching_clauses
+                                )
+        ';'
+    ;
+
+keystore_management_clauses
+    : create_keystore
+    | open_keystore
+    | close_keystore
+    | backup_keystore
+    | alter_keystore_password
+    | merge_into_new_keystore
+    | merge_into_existing_keystore
+    | isolate_keystore
+    | unite_keystore
+    ;
+
+create_keystore
+    : CREATE ( KEYSTORE ksl=CHAR_STRING
+             | LOCAL? AUTO_LOGIN KEYSTORE FROM KEYSTORE ksl=CHAR_STRING
+             ) IDENTIFIED BY keystore_password
+    ;
+
+open_keystore
+    : SET KEYSTORE OPEN force_keystore?
+        identified_by_store
+        container_clause?
+    ;
+
+force_keystore
+    : FORCE KEYSTORE
+    ;
+
+close_keystore
+    : SET KEYSTORE CLOSE identified_by_store?
+        container_clause?
+    ;
+
+backup_keystore
+    : BACKUP KEYSTORE (USING bi=CHAR_STRING)? force_keystore?
+        identified_by_store
+        (TO ksl=CHAR_STRING)?
+    ;
+
+alter_keystore_password
+    : ALTER KEYSTORE PASSWORD force_keystore? IDENTIFIED BY o=keystore_password
+        SET n=keystore_password with_backup_clause?
+    ;
+
+merge_into_new_keystore
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        AND KEYSTORE ksl2=CHAR_STRING identified_by_password_clause?
+        INTO NEW KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
+    ;
+
+merge_into_existing_keystore
+    : MERGE KEYSTORE ksl1=CHAR_STRING identified_by_password_clause?
+        INTO EXISTING KEYSTORE ksl2=CHAR_STRING identified_by_password_clause
+        with_backup_clause?
+    ;
+
+isolate_keystore
+    : FORCE? ISOLATE KEYSTORE IDENTIFIED BY i=keystore_password FROM ROOT KEYSTORE
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+unite_keystore
+    : UNITE KEYSTORE IDENTIFIED BY i=keystore_password WITH ROOT KEYSTORE
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+key_management_clauses
+    : set_key
+    | create_key
+    | use_key
+    | set_key_tag
+    | export_keys
+    | import_keys
+    | migrate_keys
+    | reverse_migrate_keys
+    | move_keys
+    ;
+
+set_key
+    : SET ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+        container_clause?
+    ;
+
+create_key
+    : CREATE ENCRYPTION? KEY ((mkid ':')? mk)? using_tag_clause?
+        using_algorithm_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+        container_clause?
+    ;
+
+mkid
+    : CHAR_STRING
+    ;
+
+mk
+    : CHAR_STRING
+    ;
+
+use_key
+    : USE ENCRYPTION? KEY k=CHAR_STRING using_tag_clause? force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+set_key_tag
+    : SET TAG t=CHAR_STRING FOR k=CHAR_STRING force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+export_keys
+    : EXPORT ENCRYPTION? KEYS WITH SECRET secret TO filename
+        force_keystore? identified_by_store
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | '(' subquery ')'))?
+    ;
+
+import_keys
+    : IMPORT ENCRYPTION? KEYS WITH SECRET secret FROM filename
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+migrate_keys
+    : SET ENCRYPTION? KEY IDENTIFIED BY hsm=secret
+        force_keystore?
+        MIGRATE USING keystore_password
+        with_backup_clause?
+    ;
+
+reverse_migrate_keys
+    : SET ENCRYPTION? KEY IDENTIFIED BY s=secret
+        force_keystore?
+        REVERSE MIGRATE USING hsm=secret
+    ;
+
+move_keys
+    : MOVE ENCRYPTION? KEYS TO NEW KEYSTORE ksl1=CHAR_STRING
+        IDENTIFIED BY ksp1=keystore_password FROM FORCE? KEYSTORE IDENTIFIED BY ksp=keystore_password
+        (WITH IDENTIFIER IN (CHAR_STRING (',' CHAR_STRING)* | subquery))?
+        with_backup_clause?
+    ;
+
+identified_by_store
+    : IDENTIFIED BY (EXTERNAL STORE | keystore_password)
+    ;
+
+using_algorithm_clause
+    : USING ALGORITHM ea=CHAR_STRING
+    ;
+
+using_tag_clause
+    : USING TAG t=CHAR_STRING
+    ;
+
+secret_management_clauses
+    : add_update_secret
+    | delete_secret
+    | add_update_secret_seps
+    | delete_secret_seps
+    ;
+
+add_update_secret
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
+        using_tag_clause?
+        force_keystore?
+        identified_by_store?
+        with_backup_clause?
+    ;
+
+delete_secret
+    : DELETE SECRET FOR CLIENT ci=CHAR_STRING
+        force_keystore?
+        identified_by_store
+        with_backup_clause?
+    ;
+
+add_update_secret_seps
+    : (ADD | UPDATE) SECRET s=CHAR_STRING FOR CLIENT ci=CHAR_STRING
+        using_tag_clause?
+        TO LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+delete_secret_seps
+    : DELETE SECRET s=CHAR_STRING SQ FOR CLIENT ci=CHAR_STRING
+        FROM LOCAL? AUTO_LOGIN KEYSTORE directory_path
+    ;
+
+zero_downtime_software_patching_clauses
+    : SWITCHOVER TO? LIBRARY path FOR ALL CONTAINERS //inconsistent documentation
+    ;
+
+with_backup_clause
+    : WITH BACKUP (USING bi=CHAR_STRING)?
+    ;
+
+identified_by_password_clause
+    : IDENTIFIED BY keystore_password
+    ;
+
+keystore_password
+    : DELIMITED_ID
+    ;
+
+path
+    : CHAR_STRING
+    ;
+
+secret
+    : DELIMITED_ID
+    ;
+
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
 analyze
     : ( ANALYZE (TABLE tableview_name | INDEX index_name) partition_extention_clause?
@@ -1806,7 +2445,7 @@ revokee_clause
 
 revoke_object_privileges
     : (object_privilege | ALL PRIVILEGES?) (',' (object_privilege | ALL PRIVILEGES?))* on_object_clause
-        FROM revokee_clause (CASCADE CONTRAINTS | FORCE)?
+        FROM revokee_clause (CASCADE CONSTRAINTS | FORCE)?
     ;
 
 on_object_clause
@@ -1828,8 +2467,11 @@ program_unit
     : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
 create_directory
-    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path
+    : CREATE (OR REPLACE)? DIRECTORY directory_name
+        (SHARING '=' (METADATA | NONE))?
+        AS directory_path
       ';'
     ;
 
@@ -1975,16 +2617,15 @@ alter_view_editionable
     : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-VIEW.html
 create_view
-    : CREATE (OR REPLACE)? no_force_clause? editioning_clause? VIEW
-      tableview_name view_options?
+    : CREATE (OR REPLACE)? (NO? FORCE)? editioning_clause? VIEW (schema_name '.')? v=id_expression
+      (SHARING '=' (METADATA | EXTENDED? DATA | NONE))?
+      view_options?
+      (DEFAULT COLLATION cn=id_expression)?
+      (BEQUEATH (CURRENT_USER | DEFINER))?
       AS select_only_statement subquery_restriction_clause?
-    ;
-
-
-no_force_clause
-    : (NO | OR)? FORCE
-    | NOFORCE
+      (CONTAINER_MAP | CONTAINERS_DEFAULT)?
     ;
 
 editioning_clause
@@ -1994,9 +2635,9 @@ editioning_clause
     ;
 
 view_options
-    :  view_alias_constraint
+    : view_alias_constraint
     | object_view_clause
-//  | xmltype_view_clause //TODO
+    | xmltype_view_clause
     ;
 
 view_alias_constraint
@@ -2004,11 +2645,11 @@ view_alias_constraint
     ;
 
 object_view_clause
-    : OF type_name
-       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')' )
-       | UNDER tableview_name
+    : OF (schema_name '.')? tn=id_expression
+       ( WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' REGULAR_ID (',' REGULAR_ID)* ')')
+       | UNDER (schema_name '.')? sv=id_expression
        )
-       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+       ('(' (','? (out_of_line_constraint | REGULAR_ID inline_constraint))+ ')')*
     ;
 
 inline_constraint
@@ -2047,12 +2688,31 @@ out_of_line_constraint
 
 constraint_state
     : ( NOT? DEFERRABLE
-      | INITIALLY (IMMEDIATE|DEFERRED)
-      | (RELY|NORELY)
-      | (ENABLE|DISABLE)
-      | (VALIDATE|NOVALIDATE)
+      | INITIALLY (IMMEDIATE | DEFERRED)
+      | (RELY | NORELY)
+      | (ENABLE | DISABLE)
+      | (VALIDATE | NOVALIDATE)
       | using_index_clause
       )+
+    ;
+
+xmltype_view_clause
+    : OF XMLTYPE xml_schema_spec? WITH OBJECT (IDENTIFIER | ID) (DEFAULT | '(' expression (',' expression)* ')')
+    ;
+
+xml_schema_spec
+    : (XMLSCHEMA xml_schema_url)? ELEMENT (element | xml_schema_url '#' element)
+        (STORE ALL VARRAYS AS (LOBS | TABLES))?
+        (allow_or_disallow NONSCHEMA)?
+        (allow_or_disallow ANYSCHEMA)?
+    ;
+
+xml_schema_url
+    : DELIMITED_ID
+    ;
+
+element
+    : DELIMITED_ID
     ;
 
 alter_tablespace
@@ -2588,6 +3248,19 @@ password_parameters
       ) (expression | UNLIMITED | DEFAULT)
       | PASSWORD_VERIFY_FUNCTION (function_name | NULL_ | DEFAULT)
       | PASSWORD_ROLLOVER_TIME (expression | DEFAULT)
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-LOCKDOWN-PROFILE.html
+create_lockdown_profile
+    : CREATE LOCKDOWN PROFILE id_expression (static_base_profile | dynamic_base_profile)?
+    ;
+
+static_base_profile
+    : FROM bp=id_expression
+    ;
+
+dynamic_base_profile
+    : INCLUDING bp=id_expression
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-OUTLINE.html
@@ -3375,6 +4048,16 @@ alter_attribute_dimension
         (RENAME TO nad=id_expression | COMPILE)
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-AUDIT-POLICY-Unified-Auditing.html
+alter_audit_policy
+    : ALTER AUDIT POLICY p=id_expression
+        ADD? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        DROP? (privilege_audit_clause? action_audit_clause? role_audit_clause? | (ONLY TOPLEVEL)?)
+        (CONDITION ( DROP
+                   | CHAR_STRING EVALUATE PER (STATEMENT | SESSION | INSTANCE))
+                   )?
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -3396,6 +4079,11 @@ drop_attribute_dimension
     : DROP ATTRIBUTE DIMENSION (schema_name '.')? ad=id_expression
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-AUDIT-POLICY-Unified-Auditing.html
+drop_audit_policy
+    : DROP AUDIT POLICY p=id_expression
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-FLASHBACK-ARCHIVE.html
 drop_flashback_archive
     : DROP FLASHBACK ARCHIVE fa=id_expression
@@ -3408,6 +4096,16 @@ drop_cluster
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-CONTEXT.html
 drop_context
     : DROP CONTEXT ns=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DIRECTORY.html
+drop_directory
+    : DROP DIRECTORY dn=id_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DISKGROUP.html
+drop_diskgroup
+    : DROP DISKGROUP dgn=id_expression ((FORCE? INCLUDING | EXCLUDING) CONTENTS)?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-EDITION.html
@@ -6257,6 +6955,7 @@ non_reserved_keywords_in_12c
     | ADVANCED
     | AFD_DISKSTRING
     | ALTERNATE
+    | ALGORITHM
     | ANALYTIC
     | ANCESTOR
     | ANOMALY
@@ -6286,6 +6985,7 @@ non_reserved_keywords_in_12c
     | CDBDEFAULT
     | CLASSIFICATION
     | CLASSIFIER
+    | CLAUSE
     | CLEAN
     | CLEANUP
     | CLIENT
@@ -6294,13 +6994,16 @@ non_reserved_keywords_in_12c
     | CLUSTER_DISTANCE
     | COLLATE
     | COLLATION
+    | COMMON
     | COMMON_DATA
     | COMPONENT
     | COMPONENTS
     | CONDITION
     | CONDITIONAL
     | CONTAINERS
+    | CONTAINERS_DEFAULT
     | CONTAINER_DATA
+    | CONTAINER_MAP
     | CON_DBID_TO_ID
     | CON_GUID_TO_ID
     | CON_ID
@@ -6354,11 +7057,15 @@ non_reserved_keywords_in_12c
     | FAMILY
     | FAR
     | FASTSTART
+    | FEATURE
     | FEATURE_DETAILS
     | FETCH
     | FILE_NAME_CONVERT
+    | FILEGROUP
     | FIXED_VIEW_DATA
+    | FLEX
     | FORMAT
+    | FTP
     | GATHER_OPTIMIZER_STATISTICS
     | GET
     | HALF_YEARS
@@ -6366,6 +7073,8 @@ non_reserved_keywords_in_12c
     | HIER_ORDER
     | HIERARCHICAL
     | HOURS
+    | HTTP
+    | H_LETTER
     | IDLE
     | ILM
     | IMMUTABLE
@@ -6377,6 +7086,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | ISOLATE
     | IS_LEAF
     | JSON
     | JSONGET
@@ -6402,6 +7112,7 @@ non_reserved_keywords_in_12c
     | LEVEL_NAME
     | LIFECYCLE
     | LINEAR
+    | LOCKDOWN
     | LOCKING
     | LOGMINING
     | LOST
@@ -6511,10 +7222,12 @@ non_reserved_keywords_in_12c
     | PRIORITY
     | PRIVILEGED
     | PROPERTY
+    | PROTOCOL
     | PROXY
     | PRUNING
     | PX_FAULT_TOLERANCE
     | QUARTERS
+    | QUOTAGROUP
     | REALM
     | REDEFINE
     | RELOCATE
@@ -6534,6 +7247,7 @@ non_reserved_keywords_in_12c
     | SHARDED
     | SHARING
     | SHELFLIFE
+    | SITE
     | SOURCE_FILE_DIRECTORY
     | SOURCE_FILE_NAME_CONVERT
     | SQL_TRANSLATION_PROFILE
@@ -6578,6 +7292,7 @@ non_reserved_keywords_in_12c
     | TRUST
     | UCS2
     | UNCONDITIONAL
+    | UNITE
     | UNMATCHED
     | UNPLUG
     | UNSUBSCRIBE
@@ -7736,6 +8451,7 @@ non_reserved_keywords_pre12c
     | ROLLBACK
     | ROLLING
     | ROLLUP
+    | ROOT
     | ROUND
     | ROWDEPENDENCIES
     | ROWID
