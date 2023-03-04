@@ -5421,10 +5421,16 @@ set_constraint_command
     : SET (CONSTRAINT | CONSTRAINTS) (ALL | constraint_name (',' constraint_name)*) (IMMEDIATE | DEFERRED)
     ;
 
+// https://docs.oracle.com/cd/E18283_01/server.112/e17118/statements_4010.htm#SQLRF01110
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/COMMIT.html
 commit_statement
     : COMMIT WORK?
-      (COMMENT expression | FORCE (CORRUPT_XID expression | CORRUPT_XID_ALL | expression (',' expression)?))?
-      write_clause?
+      ( COMMENT CHAR_STRING write_clause?
+      | FORCE ( CHAR_STRING (',' numeric)?
+              | CORRUPT_XID CHAR_STRING
+              | CORRUPT_XID_ALL
+              )
+      )?
     ;
 
 write_clause
