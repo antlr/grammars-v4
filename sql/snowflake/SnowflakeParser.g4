@@ -1584,9 +1584,24 @@ create_failover_group
           AS REPLICA OF id_ DOT id_ DOT id_
     ;
 
+type_fileformat
+    : CSV 
+    | JSON 
+    | AVRO 
+    | ORC 
+    | PARQUET 
+    | XML 
+    | CSV_Q
+    | JSON_Q
+    | AVRO_Q
+    | ORC_Q
+    | PARQUET_Q
+    | XML_Q
+    ;
+
 create_file_format
     : CREATE or_replace? FILE FORMAT if_not_exists? object_name
-            TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options?
+            (TYPE EQ type_fileformat)? format_type_options*
             comment_clause?
     ;
 
@@ -1907,9 +1922,9 @@ character
 
 format_type_options
     //-- If TYPE EQ CSV
-    : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE)
-    | RECORD_DELIMITER EQ (character | NONE)
-    | FIELD_DELIMITER EQ (character | NONE)
+    : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE | AUTO_Q )
+    | RECORD_DELIMITER EQ ( string | NONE)
+    | FIELD_DELIMITER EQ ( string | NONE)
     | FILE_EXTENSION EQ string
     | SKIP_HEADER EQ num
     | SKIP_BLANK_LINES EQ true_false
@@ -1917,16 +1932,16 @@ format_type_options
     | TIME_FORMAT EQ (string | AUTO)
     | TIMESTAMP_FORMAT EQ (string | AUTO)
     | BINARY_FORMAT EQ (HEX | BASE64 | UTF8)
-    | ESCAPE EQ (character | NONE)
-    | ESCAPE_UNENCLOSED_FIELD EQ (character | NONE)
+    | ESCAPE EQ (character | NONE | NONE_Q )
+    | ESCAPE_UNENCLOSED_FIELD EQ (character | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (character | NONE)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (character | NONE | NONE_Q)
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
     | EMPTY_FIELD_AS_NULL EQ true_false
     | SKIP_BYTE_ORDER_MARK EQ true_false
-    | ENCODING EQ string | UTF8
+    | ENCODING EQ (string | UTF8) //by the way other encoding keyword are valid ie WINDOWS1252
     //-- If TYPE EQ JSON
     //| COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE)
 //    | DATE_FORMAT EQ string | AUTO
