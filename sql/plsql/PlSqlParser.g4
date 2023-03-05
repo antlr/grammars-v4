@@ -34,8 +34,7 @@ sql_script
     ;
 
 unit_statement
-    : transaction_control_statements
-    | alter_analytic_view
+    : alter_analytic_view
     | alter_attribute_dimension
     | alter_audit_policy
     | alter_cluster
@@ -45,44 +44,33 @@ unit_statement
     | alter_diskgroup
     | alter_flashback_archive
     | alter_function
-    | alter_outline
     | alter_hierarchy
-    | alter_java
-    | alter_lockdown_profile
-    | alter_package
-    | alter_pmem_filestore
-    | alter_procedure
-    | alter_resource_cost
-    | alter_rollback_segment
-    | alter_sequence
-    | alter_session
-    | alter_synonym
-    | alter_trigger
-    | alter_type
-    | alter_table
-    | alter_tablespace
-    | alter_tablespace_set
-    | alter_role
     | alter_index
     | alter_inmemory_join_group
+    | alter_java
     | alter_library
+    | alter_lockdown_profile
     | alter_materialized_view
     | alter_materialized_view_log
     | alter_materialized_zonemap
     | alter_operator
+    | alter_outline
+    | alter_package
+    | alter_pmem_filestore
+    | alter_procedure
+    | alter_resource_cost
+    | alter_role
+    | alter_rollback_segment
+    | alter_sequence
+    | alter_session
+    | alter_synonym
+    | alter_table
+    | alter_tablespace
+    | alter_tablespace_set
+    | alter_trigger
+    | alter_type
     | alter_user
     | alter_view
-
-    | administer_key_management
-    | analyze
-    | associate_statistics
-    | audit_traditional
-    | unified_auditing
-
-    | create_function_body
-    | create_procedure_body
-    | create_package
-    | create_package_body
 
     | create_analytic_view
     | create_attribute_dimension
@@ -90,96 +78,100 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_database_link
+    | create_directory
     | create_diskgroup
     | create_edition
     | create_flashback_archive
+    | create_function_body
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
     | create_java
     | create_library
     | create_lockdown_profile
-    | create_outline
-    | create_table
-    | create_profile
-    | create_restore_point
-    | create_role
-    | create_tablespace
-    | create_tablespace_set
-    | create_view
-    | create_directory
     | create_materialized_view
     | create_materialized_view_log
     | create_materialized_zonemap
+    | create_outline
+    | create_package
+    | create_package_body
     | create_pmem_filestore
+    | create_procedure_body
+    | create_profile
+    | create_restore_point
+    | create_role
     | create_rollback_segment
-    | create_user
-    | create_database_link
-
     | create_sequence
+    | create_spfile
+    | create_synonym
+    | create_table
+    | create_tablespace
+    | create_tablespace_set
     | create_trigger
     | create_type
-    | create_synonym
-    | create_spfile
+    | create_user
+    | create_view
 
     | drop_analytic_view
     | drop_attribute_dimension
     | drop_audit_policy
     | drop_cluster
     | drop_context
+    | drop_database
+    | drop_database_link
     | drop_directory
     | drop_diskgroup
     | drop_edition
     | drop_flashback_archive
     | drop_function
     | drop_hierarchy
-    | drop_java
-    | drop_library
-    | drop_lockdown_profile
-    | drop_package
-    | drop_pmem_filestore
-    | drop_procedure
-    | drop_materialized_view
-    | drop_materialized_zonemap
-    | drop_outline
-    | drop_restore_point
-    | drop_rollback_segment
-    | drop_role
-    | drop_synonym
-    | drop_sequence
-    | drop_trigger
-    | drop_type
-    | data_manipulation_language_statements
-    | truncate_table
-    | truncate_cluster
-    | drop_table
-    | drop_tablespace
-    | drop_tablespace_set
-    | drop_user
-    | drop_view
     | drop_index
     | drop_indextype
     | drop_inmemory_join_group
-    | drop_database
-    | drop_database_link
+    | drop_java
+    | drop_library
+    | drop_lockdown_profile
+    | drop_materialized_view
+    | drop_materialized_zonemap
+    | drop_outline
+    | drop_package
+    | drop_pmem_filestore
+    | drop_procedure
+    | drop_restore_point
+    | drop_role
+    | drop_rollback_segment
+    | drop_sequence
+    | drop_synonym
+    | drop_table
+    | drop_tablespace
+    | drop_tablespace_set
+    | drop_trigger
+    | drop_type
+    | drop_user
+    | drop_view
 
+    | administer_key_management
+    | analyze
+    | anonymous_block
+    | associate_statistics
+    | audit_traditional
+    | comment_on_column
+    | comment_on_materialized
+    | comment_on_table
+    | data_manipulation_language_statements
     | disassociate_statistics
     | flashback_table
+    | grant_statement
     | noaudit_statement
-
+    | procedure_call
     | purge_statement
     | rename_object
-
-    | comment_on_column
-    | comment_on_table
-    | comment_on_materialized
-
-    | anonymous_block
-
-    | grant_statement
     | revoke_statement
-
-    | procedure_call
+    | transaction_control_statements
+    | truncate_cluster
+    | truncate_table
+    | unified_auditing
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-DISKGROUP.html
