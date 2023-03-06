@@ -4753,7 +4753,7 @@ move_table_clause
         segment_attributes_clause?
         table_compression?
         index_org_table_clause?
-        ((lob_storage_clause | varray_col_properties)+)?
+        (lob_storage_clause | varray_col_properties)*
         parallel_clause?
     ;
 
