@@ -93,6 +93,7 @@ unit_statement
     | create_materialized_view
     | create_materialized_view_log
     | create_materialized_zonemap
+    | create_operator
     | create_outline
     | create_package
     | create_package_body
@@ -134,6 +135,7 @@ unit_statement
     | drop_lockdown_profile
     | drop_materialized_view
     | drop_materialized_zonemap
+    | drop_operator
     | drop_outline
     | drop_package
     | drop_pmem_filestore
@@ -3106,9 +3108,22 @@ alter_operator
     : ALTER OPERATOR operator_name (add_binding_clause | drop_binding_clause | COMPILE)
     ;
 
+drop_operator
+    : DROP OPERATOR operator_name FORCE?
+    ;
+
+create_operator
+    : CREATE (OR REPLACE)? OPERATOR operator_name BINDING binding_clause (COMMA binding_clause)*
+        (SHARING '=' (METADATA | NONE))?
+    ;
+
+binding_clause
+    : LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
+          RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
+    ;
+
 add_binding_clause
-    : ADD BINDING LEFT_PAREN datatype (COMMA datatype)* RIGHT_PAREN
-        RETURN LEFT_PAREN? datatype RIGHT_PAREN? implementation_clause? using_function_clause
+    : ADD BINDING binding_clause
     ;
 
 implementation_clause
