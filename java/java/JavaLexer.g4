@@ -212,8 +212,8 @@ fragment ExponentPart
     ;
 
 fragment EscapeSequence
-    : '\\' [btnfr"'\\]
-    | '\\' ([0-3]? [0-7])? [0-7]
+    : '\\' 'u005c'? [btnfr"'\\]
+    | '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
     ;
 
