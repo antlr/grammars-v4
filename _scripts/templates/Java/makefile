@@ -1,28 +1,8 @@
-# Template generated code from trgen <version>
-JAR = <antlr_tool_path>
-CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
-.SUFFIXES: .g4 .java .class
-.java.class:
-	javac -cp $(CLASSPATH) $*.java
-ANTLRGRAMMARS ?= $(wildcard *.g4)
-GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
-SOURCES = $(GENERATED) \
-    Program.java \
-<if (case_insensitive_type)>
-    CaseChangingCharStream.java \
-<endif>
-    ErrorListener.java
-default: classes
-classes: $(GENERATED) $(SOURCES:.java=.class)
+# Generated from trgen <version>
+default:
+	bash build.sh
 clean:
-	rm -f *.class
-	rm -f *.interp
-	rm -f *.tokens
-	rm -f $(GENERATED)
-run:
-	trwdog java -classpath $(CLASSPATH) Program $(RUNARGS)
-<tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -encoding <antlr_encoding> <antlr_tool_args:{y | <y> } > $\<
-} >
-test:
+	bash clean.sh
+FORCE: ;
+test: FORCE
 	bash test.sh

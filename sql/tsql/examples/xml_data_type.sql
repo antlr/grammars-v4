@@ -187,3 +187,16 @@ declare namespace MI="https://schemas.microsoft.com/sqlserver/2004/07/adventure-
 ./MI:step ') AS T2(steps)
 WHERE ProductModelID=7
 GO
+
+-- Square bracket variants
+SET @ProdID =  @myDoc.[value]('(/Root/ProductDescription/@ProductID)[1]', 'int' )
+SET @f = @x.[exist](' declare namespace AWMI="http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/ProductModelManuInstructions";
+    /AWMI:root/AWMI:Location[@LocationID=50]
+');
+SELECT T.c.[query]('.') AS result
+SET @myDoc.[modify]('
+  replace value of (/Root/Location/step[1]/text())[1]
+  with     "new text describing the manu step"
+');
+GO
+

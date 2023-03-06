@@ -70,7 +70,7 @@ dmlStatement
     : selectStatement | insertStatement | updateStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
-    | handlerStatement
+    | handlerStatement | valuesStatement
     ;
 
 transactionStatement
@@ -679,7 +679,7 @@ alterSpecification
       indexColumnNames indexOption*                                 #alterByAddIndex
     | ADD (CONSTRAINT name=uid?)? PRIMARY KEY index=uid?
       indexType? indexColumnNames indexOption*                      #alterByAddPrimaryKey
-    | ADD (CONSTRAINT name=uid?)? UNIQUE
+    | ADD (CONSTRAINT name=uid?)? UNIQUE ifNotExists?
       indexFormat=(INDEX | KEY)? indexName=uid?
       indexType? indexColumnNames indexOption*                      #alterByAddUniqueKey
     | ADD keyType=(FULLTEXT | SPATIAL)
@@ -942,6 +942,13 @@ selectStatement
 
 updateStatement
     : singleUpdateStatement | multipleUpdateStatement
+    ;
+
+// https://mariadb.com/kb/en/table-value-constructors/
+valuesStatement
+    : VALUES
+    '(' expressionsWithDefaults? ')'
+    (',' '(' expressionsWithDefaults? ')')*
     ;
 
 // details
@@ -1756,9 +1763,9 @@ privilege
     | DELETE | DROP (ROLE)? | EVENT | EXECUTE | FILE | GRANT OPTION
     | INDEX | INSERT | LOCK TABLES | PROCESS | PROXY
     | REFERENCES | RELOAD
-    | REPLICATION (CLIENT | SLAVE | REPLICA)     // REPLICA is MariaDB-specific
+    | REPLICATION (CLIENT | SLAVE | REPLICA | MASTER) ADMIN?
     | SELECT
-    | SHOW (VIEW | DATABASES)
+    | SHOW (VIEW | DATABASES | SCHEMAS)
     | SHUTDOWN | SUPER | TRIGGER | UPDATE | USAGE
     | APPLICATION_PASSWORD_ADMIN | AUDIT_ADMIN | BACKUP_ADMIN | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | CLONE_ADMIN
     | CONNECTION_ADMIN | ENCRYPTION_KEY_ADMIN | FIREWALL_ADMIN | FIREWALL_USER | FLUSH_OPTIMIZER_COSTS
@@ -1770,6 +1777,13 @@ privilege
     | TABLE_ENCRYPTION_ADMIN | VERSION_TOKEN_ADMIN | XA_RECOVER_ADMIN
     // MariaDB
     | BINLOG_MONITOR | BINLOG_REPLAY | FEDERATED_ADMIN | READ_ONLY_ADMIN | REPLICATION_MASTER_ADMIN
+    | BINLOG (ADMIN | MONITOR | REPLAY) | FEDERATED ADMIN | (READ ONLY | READ_ONLY) ADMIN
+    | ADMIN OPTION
+    | CONNECTION ADMIN
+    | DELETE HISTORY | REPLICA MONITOR
+    | GRANT OPTION
+    | SET USER
+    | SLAVE MONITOR
     // MySQL on Amazon RDS
     | LOAD FROM S3 | SELECT INTO S3 | INVOKE LAMBDA
     ;
@@ -2785,6 +2799,7 @@ keywordsCanBeId
     | BINLOG_MONITOR | BINLOG_REPLAY | CURRENT_ROLE | CYCLE | ENCRYPTED | ENCRYPTION_KEY_ID | FEDERATED_ADMIN
     | INCREMENT | LASTVAL | LOCKED | MAXVALUE | MINVALUE | NEXTVAL | NOCACHE | NOCYCLE | NOMAXVALUE | NOMINVALUE
     | PERSISTENT | PREVIOUS | READ_ONLY_ADMIN | REPLICA | REPLICATION_MASTER_ADMIN | RESTART | SEQUENCE | SETVAL | SKIP_ | STATEMENT | VIA
+    | MONITOR | READ_ONLY| REPLAY
     ;
 
 functionNameBase

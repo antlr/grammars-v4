@@ -338,7 +338,6 @@ statement
     | exportStatement
     | emptyStatement_
     | abstractDeclaration //ADDED
-    | decoratorList
     | classDeclaration
     | interfaceDeclaration //ADDED
     | namespaceDeclaration //ADDED
@@ -505,7 +504,7 @@ functionDeclaration
 
 //Ovveride ECMA
 classDeclaration
-    : Abstract? Class Identifier typeParameters? classHeritage classTail
+    : decoratorList? (Export Default?)? Abstract? Class Identifier typeParameters? classHeritage classTail
     ;
 
 classHeritage
@@ -540,7 +539,7 @@ propertyMemberDeclaration
     ;
 
 propertyMemberBase
-    : Async? accessibilityModifier? Static? ReadOnly?
+    : accessibilityModifier? Async? Static? ReadOnly?
     ;
 
 indexMemberDeclaration
@@ -658,7 +657,6 @@ functionExpressionDeclaration
 singleExpression
     : functionExpressionDeclaration                                          # FunctionExpression
     | arrowFunctionDeclaration                                               # ArrowFunctionExpression   // ECMAScript 6
-    | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '!'? '.' identifierName nestedTypeGeneric?            # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
@@ -835,6 +833,9 @@ keyword
     | Require
     | TypeAlias
     | String
+    | Boolean
+    | Number
+    | Module
     ;
 
 getter

@@ -1,6 +1,7 @@
-import { Parser } from "antlr4";
+import antlr4 from 'antlr4';
+import JavaScriptLexer from './PlSqlParser.js';
 
-export default class PlSqlParserBase extends Parser {
+export default class PlSqlParserBase extends antlr4.Parser {
   _isVersion10;
   _isVersion12;
 
