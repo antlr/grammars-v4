@@ -15,6 +15,7 @@
     <modules>
         <module>derby</module>
         <module>hive</module>
+        <module>impala</module>
         <module>mariadb</module>
         <module>mysql</module>
         <module>phoenix</module>
