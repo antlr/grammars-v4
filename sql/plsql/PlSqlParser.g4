@@ -3819,6 +3819,11 @@ undo_tablespace
     : (BIGFILE | SMALLFILE)? UNDO TABLESPACE tablespace (DATAFILE file_specification (',' file_specification)*)?
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
+drop_database
+    : DROP DATABASE
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
     : CREATE SHARED? PUBLIC? DATABASE LINK dblink ( CONNECT TO ( CURRENT_USER
