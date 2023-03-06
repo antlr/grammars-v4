@@ -1,6 +1,6 @@
 {
   "require": {
-    "antlr/antlr4-php-runtime": "0.8.0",
+    "antlr/antlr4-php-runtime": "0.9.0",
     "phpunit/php-timer": "^5.0",
     "php": "^8.0",
     "ext-mbstring": "^8.0",
