@@ -44,6 +44,13 @@ batch_level_statement
     | create_or_alter_trigger
     | create_view
     ;
+
+dml_trigger_sql_clauses
+    : dml_trigger_cfl_statement SEMI?
+    | sql_clauses SEMI?
+    | SEMI
+    ;
+
 sql_clauses
     : dml_clause SEMI?
     | cfl_statement SEMI?
@@ -256,9 +263,20 @@ cfl_statement
     | while_statement
     ;
 
+dml_trigger_cfl_statement
+    : IF dml_trigger_if_update_statement
+    | dml_trigger_block_statement
+    | dml_trigger_if_statement
+    | cfl_statement
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/begin-end-transact-sql
 block_statement
     : BEGIN ';'? sql_clauses* END ';'?
+    ;
+
+dml_trigger_block_statement
+    : BEGIN ';'? dml_trigger_sql_clauses* END ';'?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/break-transact-sql
@@ -285,6 +303,19 @@ return_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/if-else-transact-sql
 if_statement
     : IF search_condition sql_clauses (ELSE sql_clauses)? ';'?
+    ;
+
+//assuming the sql_clause is only valid in the context of a trigger
+dml_trigger_if_statement
+    : IF search_condition dml_trigger_sql_clauses (ELSE dml_trigger_sql_clauses)? ';'?
+    ;
+
+// https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc32300.1600/doc/html/san1390612503040.html
+dml_trigger_if_update_statement
+    : NOT* ('(' dml_trigger_if_update_statement ')')
+    | dml_trigger_if_update_statement AND dml_trigger_if_update_statement // AND takes precedence over OR
+    | dml_trigger_if_update_statement OR dml_trigger_if_update_statement
+    | UPDATE '(' ID ')'?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/throw-transact-sql
@@ -2192,14 +2223,14 @@ create_or_alter_trigger
     ;
 
 create_or_alter_dml_trigger
-    : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_name
+    : ((CREATE (OR (ALTER | REPLACE))?) | ALTER) TRIGGER simple_name
       ON table_name
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
       (FOR | AFTER | INSTEAD OF)
       dml_trigger_operation (',' dml_trigger_operation)*
       (WITH APPEND)?
       (NOT FOR REPLICATION)?
-      AS sql_clauses+
+      AS dml_trigger_sql_clauses+
     ;
 
 dml_trigger_option
