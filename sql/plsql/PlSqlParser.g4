@@ -4982,7 +4982,11 @@ column_collation_name
     ;
 
 identity_clause
-    : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY ('(' identity_options* ')')?
+    : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY identity_options_parentheses?
+    ;
+
+identity_options_parentheses
+    : '('? identity_options+ ')'?
     ;
 
 identity_options
