@@ -15,7 +15,10 @@ jobs:
         language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Info
-      run: arch ; uname -a; cat /proc/cpuinfo
+      run: |
+        arch
+        uname -a
+        if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -116,6 +119,11 @@ jobs:
         os: [macos-latest, ubuntu-latest]
         language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
+    - name: Info
+      run: |
+        arch
+        uname -a
+        if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
       uses: actions/checkout@v3
       with:
