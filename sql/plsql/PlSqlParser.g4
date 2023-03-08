@@ -78,6 +78,7 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_database
     | create_database_link
     | create_directory
     | create_diskgroup
@@ -4488,6 +4489,75 @@ link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
     ;
 
+// added by zrh
+create_database
+    : CREATE DATABASE database_name
+    ( USER (SYS | SYSTEM) IDENTIFIED BY password_value
+     | CONTROLFILE REUSE
+     | (MAXDATAFILES | MAXINSTANCES) UNSIGNED_INTEGER
+     | NATIONAL? CHARACTER SET char_set_name
+     | SET DEFAULT (BIGFILE | SMALLFILE) TABLESPACE
+     | database_logging_clauses
+     | tablespace_clauses
+     | set_time_zone_clause
+     | (BIGFILE | SMALLFILE)? USER_DATA TABLESPACE tablespace_group_name DATAFILE datafile_tempfile_spec (',' datafile_tempfile_spec)*
+     | enable_pluggable_database
+    )+
+    ;
+
+database_logging_clauses
+    : LOGFILE database_logging_sub_clause (',' database_logging_sub_clause)*
+    | (MAXLOGFILES | MAXLOGMEMBERS | MAXLOGHISTORY) UNSIGNED_INTEGER
+    | ARCHIVELOG
+    | NOARCHIVELOG
+    | FORCE LOGGING
+    ;
+
+database_logging_sub_clause
+    : (GROUP UNSIGNED_INTEGER)? file_specification
+    ;
+
+tablespace_clauses
+    : EXTENT MANAGEMENT LOCAL
+    | SYSAUX? DATAFILE file_specification (',' file_specification)*
+    | default_tablespace
+    | default_temp_tablespace
+    | undo_tablespace
+    ;
+
+enable_pluggable_database
+    : ENABLE PLUGGABLE DATABASE (SEED file_name_convert? (SYSTEM tablespace_datafile_clauses)? (SYSAUX tablespace_datafile_clauses)? )? undo_mode_clause?
+    ;
+
+file_name_convert
+    : FILE_NAME_CONVERT EQUALS_OP ( '(' filename_convert_sub_clause (',' filename_convert_sub_clause)* ')' | NONE)
+    ;
+
+filename_convert_sub_clause
+    : CHAR_STRING (',' CHAR_STRING)?
+    ;
+
+tablespace_datafile_clauses
+    : DATAFILES (SIZE size_clause | autoextend_clause)+
+    ;
+
+undo_mode_clause
+    : LOCAL UNDO (ON | OFF)
+    ;
+
+default_tablespace
+    : DEFAULT TABLESPACE tablespace (DATAFILE datafile_tempfile_spec)? extent_management_clause?
+    ;
+
+default_temp_tablespace
+    : (BIGFILE | SMALLFILE)? DEFAULT (TEMPORARY TABLESPACE | LOCAL TEMPORARY TABLESPACE FOR (ALL | LEAF)) tablespace
+        (TEMPFILE file_specification (',' file_specification)*)? extent_management_clause?
+    ;
+
+undo_tablespace
+    : (BIGFILE | SMALLFILE)? UNDO TABLESPACE tablespace (DATAFILE file_specification (',' file_specification)*)?
+    ;
+
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
 drop_database
     : DROP DATABASE
@@ -4982,7 +5052,17 @@ column_collation_name
     ;
 
 identity_clause
-    : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY ('(' identity_options* ')')?
+    : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY identity_options_parentheses?
+    ;
+
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6
+// NOTE to identity options
+// according to the SQL Reference, identity_options be nested in parentheses.
+// But statements without parentheses can also be executed successfully on a oracle database.
+// See this issue for more details: https://github.com/antlr/grammars-v4/issues/3183
+identity_options_parentheses
+    : identity_options+
+    | '(' identity_options+ ')'
     ;
 
 identity_options
@@ -7897,6 +7977,7 @@ non_reserved_keywords_pre12c
     | LDAP_REG_SYNC_INTERVAL
     | LEADING
     | LEAD
+    | LEAF
     | LEAST
     | LEFT
     | LENGTH2
