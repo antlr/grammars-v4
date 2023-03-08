@@ -38,6 +38,13 @@ class Employee extends Person {
     }
 }
 
+
+export class myClass {
+    public async foo(    ): Promise<any> {
+    }
+}
+
+
 let emp = new Employee(100,"Steve");
 
 import {Controller, Get, Post} from '@nestjs/common';
