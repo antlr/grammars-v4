@@ -15,6 +15,7 @@
     <modules>
         <module>athena</module>
         <module>derby</module>
+        <module>drill</module>
         <module>hive</module>
         <module>mariadb</module>
         <module>mysql</module>
