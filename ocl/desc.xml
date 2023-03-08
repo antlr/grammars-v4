@@ -3,12 +3,12 @@
    <targets>Java</targets>
    <test>
       <name>spec</name>
-      <entryPoint>specification</entryPoint>
+      <entry-point>specification</entry-point>
       <inputs>examples</inputs>
    </test>
    <test>
       <name>expr</name>
-      <entryPoint>expressions</entryPoint>
+      <entry-point>expressions</entry-point>
       <inputs>examples-expr</inputs>
    </test>
 </desc>

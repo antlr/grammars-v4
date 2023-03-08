@@ -15,6 +15,7 @@ jobs:
         language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Info
+      shell: bash
       run: |
         arch
         uname -a
@@ -120,6 +121,7 @@ jobs:
         language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Info
+      shell: bash
       run: |
         arch
         uname -a
