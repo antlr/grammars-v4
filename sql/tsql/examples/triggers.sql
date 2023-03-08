@@ -90,8 +90,8 @@ GO
 
 
 CREATE OR REPLACE TRIGGER triggerOnDatabase
-    ON DATABASE
-    FOR create_procedure
+ON DATABASE
+FOR create_procedure
 AS
 BEGIN
     declare @variable int
