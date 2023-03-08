@@ -133,7 +133,7 @@ other_command
     | execute_immediate
     | execute_task
     | explain
-    | get
+    | get_dml
     | grant_ownership
     | grant_to_role
     | grant_to_share
@@ -252,7 +252,7 @@ parallel
     : PARALLEL EQ num
     ;
 
-get
+get_dml
     : GET internal_stage FILE_PATH
             parallel?
             pattern?
@@ -1584,9 +1584,24 @@ create_failover_group
           AS REPLICA OF id_ DOT id_ DOT id_
     ;
 
+type_fileformat
+    : CSV 
+    | JSON 
+    | AVRO 
+    | ORC 
+    | PARQUET 
+    | XML 
+    | CSV_Q
+    | JSON_Q
+    | AVRO_Q
+    | ORC_Q
+    | PARQUET_Q
+    | XML_Q
+    ;
+
 create_file_format
     : CREATE or_replace? FILE FORMAT if_not_exists? object_name
-            TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options?
+            (TYPE EQ type_fileformat)? format_type_options*
             comment_clause?
     ;
 
@@ -1907,9 +1922,9 @@ character
 
 format_type_options
     //-- If TYPE EQ CSV
-    : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE)
-    | RECORD_DELIMITER EQ (character | NONE)
-    | FIELD_DELIMITER EQ (character | NONE)
+    : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE | AUTO_Q )
+    | RECORD_DELIMITER EQ ( string | NONE)
+    | FIELD_DELIMITER EQ ( string | NONE)
     | FILE_EXTENSION EQ string
     | SKIP_HEADER EQ num
     | SKIP_BLANK_LINES EQ true_false
@@ -1917,16 +1932,16 @@ format_type_options
     | TIME_FORMAT EQ (string | AUTO)
     | TIMESTAMP_FORMAT EQ (string | AUTO)
     | BINARY_FORMAT EQ (HEX | BASE64 | UTF8)
-    | ESCAPE EQ (character | NONE)
-    | ESCAPE_UNENCLOSED_FIELD EQ (character | NONE)
+    | ESCAPE EQ (character | NONE | NONE_Q )
+    | ESCAPE_UNENCLOSED_FIELD EQ (character | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (character | NONE)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (character | NONE | NONE_Q)
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
     | EMPTY_FIELD_AS_NULL EQ true_false
     | SKIP_BYTE_ORDER_MARK EQ true_false
-    | ENCODING EQ string | UTF8
+    | ENCODING EQ (string | UTF8) //by the way other encoding keyword are valid ie WINDOWS1252
     //-- If TYPE EQ JSON
     //| COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE)
 //    | DATE_FORMAT EQ string | AUTO
@@ -2161,13 +2176,13 @@ create_stream
         insert_only?
         comment_clause?
     //-- Directory table
-    |  CREATE or_replace? STREAM if_not_exists
+    |  CREATE or_replace? STREAM if_not_exists?
         object_name
         copy_grants?
         ON STAGE object_name
         comment_clause?
     //-- View
-    |  CREATE or_replace STREAM if_not_exists
+    |  CREATE or_replace? STREAM if_not_exists?
         object_name
         copy_grants?
         ON VIEW object_name
@@ -3280,6 +3295,8 @@ non_reserved_words
     | SYSADMIN
     | PUBLIC
     | JAVASCRIPT
+    | RESULT
+    | INDEX
     ;
 
 builtin_function
@@ -3293,6 +3310,32 @@ builtin_function
     | COALESCE
     | CURRENT_TIMESTAMP
     | CURRENT_DATE
+    ;
+
+list_operator
+    // lexer entry which admit a list of comma separated expr
+    : CONCAT
+    | CONCAT_WS
+    // To complete as needed
+    ;
+binary_builtin_function
+    : ifnull=( IFNULL | NVL )
+    | GET
+    | LEFT
+    | RIGHT
+    | DATE_PART
+    | to_date=( TO_DATE | DATE )
+    ;
+
+binary_or_ternary_builtin_function
+    : CHARINDEX
+    | REPLACE
+    | substring=( SUBSTRING | SUBSTR )
+    ;
+
+ternary_builtin_function
+    : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
+    | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     ;
 
 pattern
@@ -3326,6 +3369,10 @@ expr_list
     : expr (COMMA expr)*
     ;
 
+expr_list_sorted
+    : expr asc_desc? (COMMA expr asc_desc?)*
+    ;
+
 expr
     : primitive_expression
     | function_call
@@ -3341,15 +3388,25 @@ expr
     | arr_literal
 //    | expr time_zone
     | expr COLON expr //json access
+    | expr DOT VALUE
     | expr DOT expr
     | expr COLON_COLON data_type //cast
-    | over_clause
+    | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
+    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
+    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
+    | subquery
+    | try_cast_expr
     ;
 
 iff_expr
     : IFF '(' search_condition ',' expr ',' expr ')'
+    ;
+
+try_cast_expr
+    : TRY_CAST LR_BRACKET expr AS data_type RR_BRACKET
     ;
 
 json_literal
@@ -3414,7 +3471,7 @@ primitive_expression
     ;
 
 order_by_expr
-    : ORDER BY expr
+    : ORDER BY expr_list_sorted
     ;
 
 //order_by_expr_list
@@ -3430,7 +3487,8 @@ asc_desc
     ;
 
 over_clause
-    : OVER '(' partition_by? order_by_expr asc_desc? ')'
+    : OVER '(' partition_by order_by_expr? ')'
+    | OVER '(' order_by_expr ')'
     ;
 
 function_call
@@ -3438,6 +3496,9 @@ function_call
     | aggregate_function
 //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
+    | list_operator LR_BRACKET expr_list RR_BRACKET
+    | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
+    | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
     ;
 
 ranking_windowed_function
@@ -3476,6 +3537,7 @@ literal
     | sign? (REAL | FLOAT)
     | true_false
     | NULL_
+    | AT_Q
     ;
 
 sign
@@ -3519,7 +3581,7 @@ with_expression
     ;
 
 common_table_expression
-    : id_ ('(' columns=column_list ')')? AS '(' select_statement ')'
+    : id_ ('(' columns=column_list ')')? AS '(' select_statement set_operators* ')'
     ;
 
 select_statement
@@ -3640,10 +3702,24 @@ object_ref
     | '(' values ')'
         sample?
     | LATERAL? '(' subquery ')'
+        pivot_unpivot?
+        as_alias?
+    | LATERAL flatten_table
         as_alias?
     //| AT id_ PATH?
     //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
     //    as_alias?
+    ;
+
+flatten_table_option
+    : PATH_ ASSOC string
+    | OUTER ASSOC true_false
+    | RECURSIVE ASSOC true_false
+    | MODE ASSOC (ARRAY_Q | OBJECT_Q | BOTH_Q)
+    ;
+
+flatten_table
+    : FLATTEN LR_BRACKET ( INPUT ASSOC )? expr ( COMMA flatten_table_option )* RR_BRACKET
     ;
 
 prior_list
@@ -3755,12 +3831,8 @@ match_recognize
     RR_BRACKET
     ;
 
-val
-    : DUMMY
-    ;
-
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET val (COMMA val)* RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
@@ -3808,7 +3880,7 @@ null_not_null
     ;
 
 subquery
-    : select_statement
+    : query_statement
     ;
 
 predicate

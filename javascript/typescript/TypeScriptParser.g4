@@ -539,7 +539,7 @@ propertyMemberDeclaration
     ;
 
 propertyMemberBase
-    : Async? accessibilityModifier? Static? ReadOnly?
+    : accessibilityModifier? Async? Static? ReadOnly?
     ;
 
 indexMemberDeclaration
@@ -835,6 +835,7 @@ keyword
     | String
     | Boolean
     | Number
+    | Module
     ;
 
 getter
