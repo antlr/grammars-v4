@@ -40,6 +40,8 @@ function Test-Grammar {
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
     Set-Location $Directory
+    $zzz = Get-Location
+    Write-Host "zzz is $zzz"
 
     $failStage = [FailStage]::Success
     
@@ -53,57 +55,71 @@ function Test-Grammar {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
-    $targetgenerated = "Generated-$Target"
-    if (Test-Path $targetgenerated) {
-        Set-Location $targetgenerated
-    }
-    else {
-        $failStage = [FailStage]::CodeGeneration
-        Write-Host "No code generated" -ForegroundColor Red
-    }
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
+    $dirs = Get-ChildItem -Path "Generated-$Target*"
+    foreach ($m in $dirs) {
+        $targetgenerated = $m.Name
+        Write-Host "targetgenerated is $targetgenerated"
+		Set-Location $zzz
+        if (Test-Path $targetgenerated) {
+            Set-Location $targetgenerated
         }
-    }
-    $hasTransform = Test-Path transformGrammar.py
-    if ($hasTransform) {
-        python3 transformGrammar.py
-    }
-
-    # build
-
-    # see _scripts/templates/*/tester.psm1
-    ./build.ps1
-    $buildResult = $LASTEXITCODE
-
-    if ($buildResult -ne 0) {
-        $failStage = [FailStage]::Compile
-        Write-Host "Build failed" -ForegroundColor Red
-    }
-
-    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
+        else {
+            $failStage = [FailStage]::CodeGeneration
+            Write-Host "No code generated" -ForegroundColor Red
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
         }
-    }
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
 
-    # test
-    $start2 = Get-Date
-    Write-Host "--- Testing files ---"
-    ./test.ps1
-    $passed = $LASTEXITCODE -eq 0
+        # build
 
-    if (! $passed) {
-        $success = $false
-        $failStage = [FailStage]::Test
+        # see _scripts/templates/*/tester.psm1
+        ./build.ps1
+        $buildResult = $LASTEXITCODE
+
+        if ($buildResult -ne 0) {
+            $failStage = [FailStage]::Compile
+            Write-Host "Build failed" -ForegroundColor Red
+        }
+
+        Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+
+        # test
+        $start2 = Get-Date
+        Write-Host "--- Testing files ---"
+        ./test.ps1
+        $passed = $LASTEXITCODE -eq 0
+
+        if (! $passed) {
+            $success = $false
+            $failStage = [FailStage]::Test
+            Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+            Set-Location $cwd
+            return @{
+                Success     = $success
+                Stage       = $failStage
+                FailedCases = $failedList
+            }
+        }
     }
 
     Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
