@@ -21,6 +21,28 @@ function Get-GrammarSkip {
         Write-Host "Intentionally skipping grammar $Grammar target $Target."
         return $True
     }
+    $desc_targets = trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    $yes = $false
+    foreach ($t in $desc_targets.Split(' ')) {
+        if ($t -eq '+all') { $yes = $true }
+        if ($t -eq "-$target") { $yes = $false }
+        if ($t -eq $target) { $yes = $true }
+    }
+    if (! $yes) { 
+        return $True
+    }
     return $False
 }
 
@@ -59,7 +81,7 @@ function Test-Grammar {
     foreach ($m in $dirs) {
         $targetgenerated = $m.Name
         Write-Host "targetgenerated is $targetgenerated"
-		Set-Location $zzz
+        Set-Location $zzz
         if (Test-Path $targetgenerated) {
             Set-Location $targetgenerated
         }
@@ -223,6 +245,25 @@ function Get-ChangedGrammars {
         }
         # g=${g##*$prefix/} not needed.
         if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
+            Write-Host "No desc.xml for $d"
+            Set-Location "$old"
+            continue
+        }
+        $desc_targets = trxml2 desc.xml | Select-String '/desc/targets'
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "The desc.xml for $testname is malformed. Skipping."
+            Set-Location "$old"
+            continue
+        }
+        $desc_targets = $desc_targets -replace '.*='
+        $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+        $yes = $false
+        foreach ($t in $desc_targets.Split(' ')) {
+            if ($t -eq '+all') { $yes = $true }
+            if ($t -eq "-$target") { $yes = $false }
+            if ($t -eq $target) { $yes = $true }
+        }
+        if (! $yes) { 
             Set-Location "$old"
             continue
         }
