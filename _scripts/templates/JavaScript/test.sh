@@ -84,17 +84,19 @@ updated=0
 for f in `find . -name '*.errors'`
 do
     git diff --exit-code $f >> $old/updated.txt 2>&1
-    if [ "$?" -ne 0 ]
+    xxx=$?
+    if [ "$xxx" -ne 0 ]
     then
-        updated=$?
+        updated=$xxx
     fi
 done
 for f in `find . -name '*.tree'`
 do
     git diff --exit-code $f >> $old/updated.txt 2>&1
-    if [ "$?" -ne 0 ]
+    xxx=$?
+    if [ "$xxx" -ne 0 ]
     then
-        updated=$?
+        updated=$xxx
     fi
 done
 
