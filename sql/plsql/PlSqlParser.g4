@@ -4985,8 +4985,14 @@ identity_clause
     : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY identity_options_parentheses?
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6
+// NOTE to identity options
+// according to the SQL Reference, identity_options be nested in parentheses.
+// But statements without parentheses can also be executed successfully on a oracle database.
+// See this issue for more details: https://github.com/antlr/grammars-v4/issues/3183
 identity_options_parentheses
-    : '('? identity_options+ ')'?
+    : identity_options+
+    | '(' identity_options+ ')'
     ;
 
 identity_options
