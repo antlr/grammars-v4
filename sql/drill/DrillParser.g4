@@ -346,11 +346,7 @@ limit_clause
     ;
 
 offset_clause
-    : OFFSET start (ROW | ROWS)
-    ;
-
-start
-    : number
+    : OFFSET number (ROW | ROWS)
     ;
 
 number
