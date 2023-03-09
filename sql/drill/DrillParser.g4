@@ -55,13 +55,25 @@ create_command
 create_schema
     : CREATE or_replace? SCHEMA
         (LOAD string)?
-        ( '(' column_name data_type nullability? format? default? props? ')')?
-        (FOR TABLE id_ | PATH string)?
-        (PROPERTIES '(' string ASSIGN string (',' string ASSIGN string)* ')')?
+        ('(' column_definition (',' column_definition)* ')')?
+        (FOR TABLE table_name | PATH string)?
+        (PROPERTIES '(' kv_list ')')?
+    ;
+
+column_definition
+    : column_name data_type nullability? format_clause? default_clause? properties_clause?
+    ;
+
+kv_list
+    : kv_pair (',' kv_pair)*
+    ;
+
+kv_pair
+    : string '=' string
     ;
 
 create_table
-    : CREATE TABLE name column_list_paren? AS query
+    : CREATE TABLE table_name column_list_paren? AS query
     ;
 
 column_list_paren
@@ -93,17 +105,13 @@ alter_command
     ;
 
 alter_system
-    : ALTER SYSTEM ( SET id_ ASSIGN value
-                   | RESET (id_ | ALL)
+    : ALTER SYSTEM ( SET option_name '=' value
+                   | RESET (option_name | ALL)
                    )
     ;
 
-id_
+option_name
     : BS_STRING_LITERAL
-    ;
-
-string
-    : SQ_STRING_LITERAL
     ;
 
 drop_command
@@ -135,7 +143,7 @@ other_command
     ;
 
 set_command
-    : (ALTER SESSION)? SET id_ ASSIGN value
+    : (ALTER SESSION)? SET option_name '=' value
     ;
 
 reset_command
@@ -143,7 +151,7 @@ reset_command
     ;
 
 refresh_table_metadata
-    : REFRESH TABLE METADATA (COLUMNS column_list_paren | NONE )? table_path
+    : REFRESH TABLE METADATA (COLUMNS column_list_paren | NONE)? table_path
     ;
 
 describe_command
@@ -154,7 +162,7 @@ describe_command
 
 show_command
     : SHOW (TABLES | DATABASES | SCHEMAS)
-    | SHOW FILES (FROM | IN )?
+    | SHOW FILES ((FROM | IN ) fs=id_ '.' dir=id_)?
     ;
 
 use_command
@@ -162,37 +170,78 @@ use_command
     ;
 
 select_stmt
-    : with_clause
-        select_list
-        from_clause
-        where_clause
-        group_by_clause
-        having_clause
+    : with_clause?
+        select_clause
+        from_clause?
+        where_clause?
+        group_by_clause?
+        having_clause?
         order_by_clause?
-        limit_clause
-        offset_clause
+        limit_clause?
+        offset_clause?
     ;
 
 with_clause
-    : WITH
+    : WITH with_item (',' with_item)*
     ;
 
-select_list
+with_item
+    : name column_list_paren? AS query
+    ;
+
+select_clause
     : SELECT DISTINCT? select_item (',' select_item)*
     ;
 
 select_item
     : ( COLUMNS '[' number ']'
-      | '*'
-      | expression ) (AS column_alias)?
+      | ((table_name | column_alias) '.')? '*'
+      | expression
+      ) (AS? column_alias)?
     ;
 
 from_clause
-    : FROM table_reference
+    : FROM table_expression (',' table_expression)*
+    ;
+
+table_expression
+    : with_clause correlation_clause?
+    | table_name correlation_clause?
+    | table_subquery correlation_clause?
+    | join_clause
+    | LATERAL? lateral_join_type? lateral_subquery (ON TRUE)?
+    ;
+
+lateral_join_type
+    : (INNER? | LEFT OUTER?) JOIN
+    ;
+
+lateral_subquery
+    : unnest_table_expr
+    | '(' select_clause FROM unnest_table_expr (',' select_clause FROM unnest_table_expr)* ')'
+    ;
+
+join_clause
+    : table_reference join_type table_reference (ON boolean_expression)?
+    ;
+
+join_type
+    : ( INNER?
+      | (LEFT | RIGHT | FULL) OUTER?
+      | CROSS
+      ) JOIN
     ;
 
 table_reference
-    : todo
+    : table_name correlation_clause?
+    ;
+
+unnest_table_expr
+    : UNNEST '(' expression ')' correlation_clause
+    ;
+
+correlation_clause
+    : AS? correlation_name column_list_paren?
     ;
 
 where_clause
@@ -200,15 +249,67 @@ where_clause
     ;
 
 boolean_expression
-    : todo
+    : expression AND expression
+    | expression OR expression
+    | NOT+ expression
+    | expression comparison_operator expression
+    | expression IS NOT? NULL_
+    | string NOT? LIKE string (ESCAPE string)?
+    | expression NOT? BETWEEN expression AND expression
+    | expression NOT? IN table_subquery
+    | expression NOT? IN '(' expression_list ')'
+    | NOT? EXISTS table_subquery
+    | expression comparison_operator (ALL | ANY | SOME) table_subquery
+    ;
+
+table_subquery
+    : '(' query
+          order_by_clause?
+          offset_clause?
+      ')'
     ;
 
 expression
+    : primitive_expression
+    | '(' expression ')'
+    | table_subquery
+    | function_call
+//    | case_expression
+    | op=('+' | '-') expression
+    | expression op=(STAR | DIVIDE | MODULE) expression
+    | expression op=(PLUS | MINUS ) expression
+    | expression DOT expression
+    | expression comparison_operator expression
+    | expression AND expression
+    | expression OR expression
+    | NOT expression
+    | expression NOT? IN '(' expression_list ')'
+    | CAST '(' expression AS data_type ')'
+    ;
+
+primitive_expression
     : literal
+    | id_
     ;
 
 literal
-    : id_
+    : TRUE
+    | FALSE
+    | NULL_
+    | SQ_STRING_LITERAL
+    | DECIMAL_LITERAL
+    | FLOAT_LITERAL
+    | REAL_LITERAL
+    ;
+
+function_call
+    : function_name '(' expression_list? ')'
+//    | standard_built_in_function '(' expr_list? ')'
+//    | aggreagate_built_in_function '(' expr_list? ')'
+    ;
+
+comparison_operator
+    : '<' | '=' | '>' | '<=' | '>=' | '<>'
     ;
 
 expression_list
@@ -245,7 +346,22 @@ number
     ;
 
 query
-    : SELECT
+    : '(' query
+            order_by_clause?
+            offset_clause?
+        ')'
+    | query UNION ALL? query
+    | select_stmt
+    ;
+
+select_expression
+    : select_clause
+        from_clause?
+        where_clause?
+        group_by_clause?
+        having_clause?
+        order_by_clause?
+        offset_clause?
     ;
 
 data_type
@@ -260,7 +376,7 @@ data_type
     | DOUBLE PRECISION?
     | INTEGER
     | INT
-    | INTERVAL
+    | INTERVAL (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND)
     | SMALLINT
     | TIME
     | TIMESTAMP
@@ -269,20 +385,20 @@ data_type
     | VARCHAR
     ;
 
-default
-    : todo
+default_clause
+    : DEFAULT string
     ;
 
 nullability
-    : todo
+    : NOT? NULL_
     ;
 
-format
-    : todo
+format_clause
+    : FORMAT string
     ;
 
-props
-    : todo
+properties_clause
+    : PROPERTIES '{' kv_list '}'
     ;
 
 or_replace
@@ -293,23 +409,35 @@ if_exists
     : IF EXISTS
     ;
 
+id_
+    : IDENTIFIER
+    ;
+
+string
+    : SQ_STRING_LITERAL
+    ;
+
 workspace
     : name
     ;
 
 name
-    : ID
+    : IDENTIFIER
     ;
 
 schema_name
-    : name
+    : (id_ '.')? name
     ;
 
 table_name
-    : name
+    : ((id_ '.')? id_ '.')? (name | BS_STRING_LITERAL)
     ;
 
 view_name
+    : name
+    ;
+
+correlation_name
     : name
     ;
 
@@ -317,18 +445,19 @@ column_name
     : name
     ;
 
-column_alias
+function_name
     : name
     ;
 
+column_alias
+    : name
+    | BS_STRING_LITERAL
+    ;
+
 table_path
-    : todo
+    : BS_STRING_LITERAL
     ;
 
 value
-    : todo
-    ;
-
-todo
-    : ';'
+    : literal
     ;
