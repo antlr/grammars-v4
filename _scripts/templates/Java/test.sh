@@ -34,8 +34,23 @@ done
 # Parse all input files.
 JAR="<antlr_tool_path>"
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
+<if(individual_parsing)>
+# Individual parsing.
+rm -f parse.txt
+for f in "${files[*]}"
+do
+    trwdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
+    xxx="$?"
+    if [ "$xxx" -ne 0 ]
+    then
+        status="$xxx"
+    fi
+done
+<else>
+# Group parsing.
 echo "${files[*]}" | trwdog java -classpath "$CLASSPATH" Test -q -x -tee -tree > parse.txt 2>&1
 status=$?
+<endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the

@@ -50,8 +50,14 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
+<if(individual_parsing)>
+# Individual parsing.
+Get-Content "tests.txt" | ForEach-Object { trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $_ *>> parse.txt }
+<else>
+# Group parsing.
 get-content "tests.txt" | trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
+<endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the

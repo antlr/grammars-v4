@@ -32,8 +32,23 @@ do
 done
 
 # Parse all input files.
+# Individual parsing.
+<if(individual_parsing)>
+rm -f parse.txt
+for f in "${files[*]}"
+do
+    trwdog ./<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+    xxx="$?"
+    if [ "$xxx" -ne 0 ]
+    then
+        status="$xxx"
+    fi
+done
+<else>
+# Group parsing.
 echo "${files[*]}" | trwdog ./<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
 status=$?
+<endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the
