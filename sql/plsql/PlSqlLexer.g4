@@ -799,6 +799,7 @@ LAYER:                        'LAYER';
 LDAP_REGISTRATION_ENABLED:    'LDAP_REGISTRATION_ENABLED';
 LDAP_REGISTRATION:            'LDAP_REGISTRATION';
 LDAP_REG_SYNC_INTERVAL:       'LDAP_REG_SYNC_INTERVAL';
+LEAF:                         'LEAF';
 LEAD_CDB:                     'LEAD_CDB';
 LEAD_CDB_URI:                 'LEAD_CDB_URI';
 LEADING:                      'LEADING';
