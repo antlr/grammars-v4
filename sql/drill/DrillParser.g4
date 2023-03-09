@@ -134,6 +134,7 @@ drop_function
 
 other_command
     : set_command
+    | analyze_command
     | reset_command
     | refresh_table_metadata
     | describe_command
@@ -151,7 +152,18 @@ reset_command
     ;
 
 refresh_table_metadata
-    : REFRESH TABLE METADATA (COLUMNS column_list_paren | NONE)? table_path
+    : REFRESH TABLE METADATA (COLUMNS column_list_paren | NONE)? table_name
+    ;
+
+analyze_command
+    : ANALYZE TABLE (table_name | TABLE'(' id_'(' param_list ')' ')')?
+      (COLUMNS (column_list_paren | NONE))?
+      (REFRESH METADATA (string LEVEL)?)?
+      ((COMPUTE | ESTIMATE) STATISTICS (SAMPLE number PERCENT)?)?
+    ;
+
+param_list
+    : expression_list
     ;
 
 describe_command
@@ -430,7 +442,7 @@ schema_name
     ;
 
 table_name
-    : ((id_ '.')? id_ '.')? (name | BS_STRING_LITERAL)
+    : ((id_ '.')? id_ '.')? (name | table_path)
     ;
 
 view_name
