@@ -582,7 +582,7 @@ formalParameterArg
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
-    : Ellipsis Identifier
+    : Ellipsis Identifier typeAnnotation?
     ;
 
 functionBody
