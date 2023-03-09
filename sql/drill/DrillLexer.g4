@@ -158,8 +158,8 @@ DQ_STRING_LITERAL : '"' ~'"'+ '"';
 
 DECIMAL_LITERAL   : DEC_DIGIT+;
 FLOAT_LITERAL     : DEC_DOT_DEC;
-REAL_LITERAL      : (DECIMAL_LITERAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
-CHAR_LITERAL      : '\'' (~['\\\r\n]) '\'';
+REAL_LITERAL      : (DECIMAL_LITERAL | DEC_DOT_DEC) 'E' [+-]? DEC_DIGIT+;
+CHAR_LITERAL      : '\'' ~['\\\r\n] '\'';
 
 NE                : '!=';
 LTGT              : '<>';
@@ -187,5 +187,5 @@ PLUS              : '+';
 MINUS             : '-';
 
 fragment LETTER      : [A-Z_];
-fragment DEC_DOT_DEC : (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
+fragment DEC_DOT_DEC : DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+;
 fragment DEC_DIGIT   : [0-9];

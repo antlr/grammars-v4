@@ -156,7 +156,7 @@ refresh_table_metadata
     ;
 
 analyze_command
-    : ANALYZE TABLE (table_name | TABLE'(' id_'(' param_list ')' ')')?
+    : ANALYZE TABLE (table_name | TABLE '(' id_ '(' param_list ')' ')')?
       (COLUMNS (column_list_paren | NONE))?
       (REFRESH METADATA (string LEVEL)?)?
       ((COMPUTE | ESTIMATE) STATISTICS (SAMPLE number PERCENT)?)?
