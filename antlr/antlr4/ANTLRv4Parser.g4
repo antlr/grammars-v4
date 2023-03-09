@@ -235,16 +235,11 @@ lexerElements
    ;
 
 lexerElement
-   : labeledLexerElement ebnfSuffix?
-   | lexerAtom ebnfSuffix?
+   : lexerAtom ebnfSuffix?
    | lexerBlock ebnfSuffix?
    | actionBlock QUESTION?
    ;
    // but preds can be anywhere
-
-labeledLexerElement
-   : identifier (ASSIGN | PLUS_ASSIGN) (lexerAtom | lexerBlock)
-   ;
 
 lexerBlock
    : LPAREN lexerAltList RPAREN
