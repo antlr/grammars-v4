@@ -163,7 +163,7 @@ analyze_command
     ;
 
 param_list
-    : expression_list
+    : expr_list
     ;
 
 describe_command
@@ -269,7 +269,7 @@ boolean_expression
     | string NOT? LIKE string (ESCAPE string)?
     | expression NOT? BETWEEN expression AND expression
     | expression NOT? IN table_subquery
-    | expression NOT? IN '(' expression_list ')'
+    | expression NOT? IN '(' expr_list ')'
     | NOT? EXISTS table_subquery
     | expression comparison_operator (ALL | ANY | SOME) table_subquery
     ;
@@ -295,7 +295,7 @@ expression
     | expression AND expression
     | expression OR expression
     | NOT expression
-    | expression NOT? IN '(' expression_list ')'
+    | expression NOT? IN '(' expr_list ')'
     | CAST '(' expression AS data_type ')'
     ;
 
@@ -315,7 +315,7 @@ literal
     ;
 
 function_call
-    : function_name '(' expression_list? ')'
+    : function_name '(' expr_list? ')'
 //    | standard_built_in_function '(' expr_list? ')'
 //    | aggreagate_built_in_function '(' expr_list? ')'
     ;
@@ -324,12 +324,12 @@ comparison_operator
     : '<' | '=' | '>' | '<=' | '>=' | '<>'
     ;
 
-expression_list
+expr_list
     : expression (',' expression)*
     ;
 
 group_by_clause
-    : GROUP BY expression_list
+    : GROUP BY expr_list
     ;
 
 having_clause
