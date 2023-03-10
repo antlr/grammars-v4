@@ -3,10 +3,10 @@
    <targets>CSharp;Cpp;Go;Java;TypeScript</targets>
    <test>
       <targets>TypeScript</targets>
-      <parsing-type>individual</parsing-type>
+      <inputs>examples-small</inputs>
    </test>
    <test>
       <targets>CSharp;Cpp;Go;Java</targets>
-      <parsing-type>group</parsing-type>
+      <inputs>examples</inputs>
    </test>
 </desc>

@@ -35,7 +35,7 @@ done
 # Individual parsing.
 <if(individual_parsing)>
 rm -f parse.txt
-for f in "${files[*]}"
+for f in ${files[*]}
 do
     trwdog ./<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"

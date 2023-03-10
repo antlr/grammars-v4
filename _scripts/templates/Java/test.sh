@@ -37,7 +37,7 @@ CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
-for f in "${files[*]}"
+for f in ${files[*]}
 do
     trwdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"

@@ -35,7 +35,7 @@ done
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
-for f in "${files[*]}"
+for f in ${files[*]}
 do
     trwdog php -d memory_limit=1G Test.php -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
