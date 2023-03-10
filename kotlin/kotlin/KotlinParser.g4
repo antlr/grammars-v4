@@ -563,6 +563,7 @@ jumpExpression
 
 callableReference
     : (userType (QUEST NL*)*)? NL* (COLONCOLON | Q_COLONCOLON) NL* (identifier | CLASS)
+    | THIS NL* COLONCOLON NL* CLASS
     ;
 
 assignmentOperator
