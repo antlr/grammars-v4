@@ -31,7 +31,9 @@ do
     fi
 done
 
+# Parse all input files.
 <if(individual_parsing)>
+# Individual parsing.
 rm -f parse.txt
 for f in "${files[*]}"
 do
@@ -43,7 +45,7 @@ do
     fi
 done
 <else>
-# Parse all input files.
+# Group parsing.
 echo "${files[*]}" | trwdog sh -c "ts-node Test.js -q -x -tee -tree" > parse.txt 2>&1
 status="$?"
 <endif>
@@ -92,6 +94,7 @@ old=`pwd`
 cd ../<example_files_unix>
 
 # Check if any files in the test files directory have changed.
+git config --global pager.diff false
 rm -f $old/updated.txt
 updated=0
 for f in `find . -name '*.errors'`

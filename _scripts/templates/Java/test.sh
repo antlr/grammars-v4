@@ -96,6 +96,7 @@ old=`pwd`
 cd ../<example_files_unix>
 
 # Check if any files in the test files directory have changed.
+git config --global pager.diff false
 rm -f $old/updated.txt
 updated=0
 for f in `find . -name '*.errors'`
