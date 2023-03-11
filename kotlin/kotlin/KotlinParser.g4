@@ -71,7 +71,7 @@ primaryConstructor
     ;
 
 classParameters
-    : LPAREN (classParameter (COMMA classParameter)*)? RPAREN
+    : LPAREN (classParameter (COMMA classParameter)* COMMA?)? RPAREN
     ;
 
 classParameter
@@ -186,7 +186,7 @@ propertyDeclaration
     (NL* (multiVariableDeclaration | variableDeclaration))
     (NL* typeConstraints)?
     (NL* (BY | ASSIGNMENT) NL* expression)?
-    (getter (semi setter)? | setter (semi getter)?)?
+    (NL* getter (semi setter)? | NL* setter (semi getter)?)?
     ;
 
 multiVariableDeclaration
