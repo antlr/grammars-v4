@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>asmMASM</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com MASM grammar</name>
+	<name>MASM grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>asmparent</artifactId>
@@ -40,7 +40,6 @@
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>asmMASM</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
