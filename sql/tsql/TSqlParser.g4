@@ -1800,7 +1800,7 @@ create_xml_schema_collection
 create_partition_function
     : CREATE PARTITION FUNCTION partition_function_name=id_ '(' input_parameter_type=data_type ')'
       AS RANGE ( LEFT | RIGHT )?
-      FOR VALUES '(' boundary_values=expression_list ')'
+      FOR VALUES '(' boundary_values=expression_list_ ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-partition-scheme-transact-sql?view=sql-server-ver15
@@ -3833,13 +3833,13 @@ common_table_expression
 update_elem
     : LOCAL_ID '=' full_column_name ('=' | assignment_operator) expression //Combined variable and column update
     | (full_column_name | LOCAL_ID) ('=' | assignment_operator) expression
-    | udt_column_name=id_ '.' method_name=id_ '(' expression_list ')'
+    | udt_column_name=id_ '.' method_name=id_ '(' expression_list_ ')'
     //| full_column_name '.' WRITE (expression, )
     ;
 
 update_elem_merge
     : (full_column_name | LOCAL_ID) ('=' | assignment_operator) expression
-    | udt_column_name=id_ '.' method_name=id_ '(' expression_list ')'
+    | udt_column_name=id_ '.' method_name=id_ '(' expression_list_ ')'
     //| full_column_name '.' WRITE (expression, )
     ;
 
@@ -3857,7 +3857,7 @@ predicate
     | expression MULT_ASSIGN expression ////SQL-82 syntax for left outer joins; '*='. See https://stackoverflow.com/questions/40665/in-sybase-sql
     | expression comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expression NOT* BETWEEN expression AND expression
-    | expression NOT* IN '(' (subquery | expression_list) ')'
+    | expression NOT* IN '(' (subquery | expression_list_) ')'
     | expression NOT* LIKE expression (ESCAPE expression)?
     | expression IS null_notnull
     ;
@@ -4151,7 +4151,7 @@ function_call
     | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNC
     | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
     | built_in_functions                                #BUILT_IN_FUNC
-    | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
+    | scalar_function_name '(' expression_list_? ')'     #SCALAR_FUNCTION
     | freetext_function                                 #FREE_TEXT
     | partition_function                                #PARTITION_FUNC
     | hierarchyid_static_method                         #HIERARCHYID_METHOD
@@ -4384,7 +4384,7 @@ built_in_functions
     | TRY_CAST '(' expression AS data_type ')'          #TRY_CAST
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list ')'                  #COALESCE
+    | COALESCE '(' expression_list_ ')'                  #COALESCE
     // Cursor functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-rows-transact-sql?view=sql-server-ver16
     | CURSOR_ROWS                                       #CURSOR_ROWS
@@ -4486,7 +4486,7 @@ built_in_functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-object-transact-sql?view=azure-sqldw-latest
     | JSON_OBJECT '(' (key_value=json_key_value (',' key_value=json_key_value)*)? json_null_clause? ')' #JSON_OBJECT
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-array-transact-sql?view=azure-sqldw-latest
-    | JSON_ARRAY '(' expression_list? json_null_clause? ')' #JSON_ARRAY
+    | JSON_ARRAY '(' expression_list_? json_null_clause? ')' #JSON_ARRAY
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-value-transact-sql?view=azure-sqldw-latest
     | JSON_VALUE '(' expr=expression ',' path=expression ')' #JSON_VALUE
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/json-query-transact-sql?view=azure-sqldw-latest
@@ -4544,9 +4544,9 @@ built_in_functions
     | TAN '(' float_expression=expression ')' #TAN
     // Logical functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-greatest-transact-sql?view=azure-sqldw-latest
-    | GREATEST '(' expression_list ')' #GREATEST
+    | GREATEST '(' expression_list_ ')' #GREATEST
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-least-transact-sql?view=azure-sqldw-latest
-    | LEAST '(' expression_list ')' #LEAST
+    | LEAST '(' expression_list_ ')' #LEAST
     // Security functions
     // https://learn.microsoft.com/en-us/sql/t-sql/functions/certencoded-transact-sql?view=sql-server-ver16
     | CERTENCODED '(' certid=expression ')'             #CERTENCODED
@@ -4785,10 +4785,10 @@ column_alias
     ;
 
 table_value_constructor
-    : VALUES '(' exps+=expression_list ')' (',' '(' exps+=expression_list ')')*
+    : VALUES '(' exps+=expression_list_ ')' (',' '(' exps+=expression_list_ ')')*
     ;
 
-expression_list
+expression_list_
     : exp+=expression (',' exp+=expression)*
     ;
 
@@ -4806,15 +4806,15 @@ aggregate_windowed_function
       '(' ('*' | all_distinct_expression) ')' over_clause?
     | CHECKSUM_AGG '(' all_distinct_expression ')'
     | GROUPING '(' expression ')'
-    | GROUPING_ID '(' expression_list ')'
+    | GROUPING_ID '(' expression_list_ ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/analytic-functions-transact-sql
 analytic_windowed_function
     : (FIRST_VALUE | LAST_VALUE) '(' expression ')' over_clause
     | (LAG | LEAD) '(' expression  (',' expression (',' expression)? )? ')' over_clause
-    | (CUME_DIST | PERCENT_RANK) '(' ')' OVER '(' (PARTITION BY expression_list)? order_by_clause ')'
-    | (PERCENTILE_CONT | PERCENTILE_DISC) '(' expression ')' WITHIN GROUP '(' order_by_clause ')' OVER '(' (PARTITION BY expression_list)? ')'
+    | (CUME_DIST | PERCENT_RANK) '(' ')' OVER '(' (PARTITION BY expression_list_)? order_by_clause ')'
+    | (PERCENTILE_CONT | PERCENTILE_DISC) '(' expression ')' WITHIN GROUP '(' order_by_clause ')' OVER '(' (PARTITION BY expression_list_)? ')'
     ;
 
 all_distinct_expression
@@ -4823,7 +4823,7 @@ all_distinct_expression
 
 // https://msdn.microsoft.com/en-us/library/ms189461.aspx
 over_clause
-    : OVER '(' (PARTITION BY expression_list)? order_by_clause? row_or_range_clause? ')'
+    : OVER '(' (PARTITION BY expression_list_)? order_by_clause? row_or_range_clause? ')'
     ;
 
 row_or_range_clause

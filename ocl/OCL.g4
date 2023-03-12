@@ -19,6 +19,10 @@ specification
   : 'package' ID '{' classifier* '}' EOF
   ;
 
+expressions
+  : expression (';' expression)* ';'? EOF
+  ;
+
 classifier
     : classDefinition
     | interfaceDefinition

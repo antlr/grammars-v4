@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
    <targets>Java</targets>
+   <test>
+      <name>spec</name>
+      <entry-point>specification</entry-point>
+      <inputs>examples</inputs>
+   </test>
+   <test>
+      <name>expr</name>
+      <entry-point>expressions</entry-point>
+      <inputs>examples-expr</inputs>
+   </test>
 </desc>

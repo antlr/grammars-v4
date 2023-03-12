@@ -1,0 +1,4 @@
+line 89:0 no viable alternative at input 'RLM_ARRAY_TYPE(Dog)\n\n// Source: https://github.com/realm/realm-cocoa/blob/master/examples/ios/objc/Encryption/LabelViewController.m#L100\n@implementation'
+line 148:100 missing ';' at '__deprecated_msg'
+line 224:92 mismatched input '*' expecting RP
+line 244:38 no viable alternative at input 'REGULAREXPRESSION(URLRegularExpression,'

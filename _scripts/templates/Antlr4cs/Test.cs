@@ -170,7 +170,7 @@ public class Program
 <if (case_insensitive_type)>
         str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
 <endif>
-        var lexer = new Test.<lexer_name>(str);
+        var lexer = new <lexer_name>(str);
         if (show_tokens)
         {
             StringBuilder new_s = new StringBuilder();
@@ -187,7 +187,7 @@ public class Program
             lexer.Reset();
         }
         var tokens = new CommonTokenStream(lexer);
-        var parser = new Test.<parser_name>(tokens);
+        var parser = new <parser_name>(tokens);
         var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
