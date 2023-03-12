@@ -371,6 +371,7 @@ atomicExpression
     | loopExpression
     | collectionLiteral
     | simpleIdentifier
+    | VAL identifier
     ;
 
 parenthesizedExpression
