@@ -50,8 +50,14 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
+<if(individual_parsing)>
+# Individual parsing.
+Get-Content "tests.txt" | ForEach-Object { trwdog ./Test.exe -q -tee -tree $_ *>> parse.txt }
+<else>
+# Group parsing.
 get-content "tests.txt" | trwdog ./Test.exe -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
+<endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the
@@ -76,6 +82,7 @@ $old = Get-Location
 Set-Location ../<example_files_unix>
 
 # Check if any .errors/.tree files have changed. That's not good.
+git config --global pager.diff false
 Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
 $updated = 0
 foreach ($item in Get-ChildItem . -Recurse) {
