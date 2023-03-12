@@ -7109,6 +7109,7 @@ non_reserved_keywords_in_12c
     | CONTAINERS_DEFAULT
     | CONTAINER_DATA
     | CONTAINER_MAP
+    | CONVERSION
     | CON_DBID_TO_ID
     | CON_GUID_TO_ID
     | CON_ID
@@ -7414,6 +7415,7 @@ non_reserved_keywords_in_12c
     | UTF8
     | V1
     | V2
+    | VALIDATE_CONVERSION
     | VALID_TIME_END
     | VECTOR_TRANSFORM
     | VECTOR_TRANSFORM_DIMS
