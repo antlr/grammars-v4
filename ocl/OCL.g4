@@ -5,7 +5,7 @@
 * Arrow operators ->op are used consistently for any OCL 
 * operator, not just collection operators. 
 * 
-* Copyright (c) 2003--2022 Kevin Lano
+* Copyright (c) 2003--2023 Kevin Lano
 * This program and the accompanying materials are made available under the
 * terms of the Eclipse Public License 2.0 which is available at
 * http://www.eclipse.org/legal/epl-2.0
@@ -181,14 +181,15 @@ equalityExpression
     ; 
 
 additiveExpression
-    : factorExpression ('+' | '-' | '..' | '|->') 
-                              additiveExpression 
+    : additiveExpression '+' additiveExpression 
+    | additiveExpression '-' factorExpression
+    | factorExpression ('..' | '|->') factorExpression                         
     | factorExpression
     ; 
 
 factorExpression 
     : factorExpression ('*' | '/' | 'mod' | 'div') 
-                                   factorExpression 
+                                   factorExpression
     | '-' factorExpression 
     | '+' factorExpression  
     | factor2Expression
@@ -318,6 +319,34 @@ statement
    | '(' statement ')'
    ;  
 
+nlpscript 
+   : (nlpstatement ';')+ nlpstatement
+   ; 
+
+nlpstatement
+   : loadStatement 
+   | assignStatement 
+   | storeStatement 
+   | analyseStatement 
+   | displayStatement
+   ;
+
+loadStatement:
+  'load' expression 'into' basicExpression;
+
+assignStatement:
+  basicExpression ':=' expression; 
+
+storeStatement:
+  'store' expression 'in' identifier;
+
+analyseStatement:
+  'analyse' expression 'using' expression;
+
+displayStatement:
+  'display' expression 'on' identifier;
+
+
 identifier: ID ;
 
 FLOAT_LITERAL:  Digits '.' Digits ;
@@ -348,8 +377,11 @@ fragment Digits
     : [0-9]+
     ;
 
+INTEGRAL : '\u222B'; 
+SIGMA : '\u2211';
+
 NEWLINE : [\r\n]+ -> skip ;
 INT     : [0-9]+ ;
-ID  :   [a-zA-Z]+[a-zA-Z0-9_$]* ;      // match identifiers
+ID  :   [a-zA-Z_$]+[a-zA-Z0-9_$]* ;      // match identifiers
 WS  :   [ \t\n\r]+ -> skip ;
 
