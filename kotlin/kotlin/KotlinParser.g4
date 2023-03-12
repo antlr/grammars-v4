@@ -396,7 +396,7 @@ valueArguments
     ;
 
 typeArguments
-    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* NL* RANGLE
+    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* NL* RANGLE QUEST?
     ;
 
 typeProjection
