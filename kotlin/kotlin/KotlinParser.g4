@@ -149,7 +149,7 @@ functionDeclaration
     ;
 
 functionValueParameters
-    : LPAREN (functionValueParameter (COMMA functionValueParameter)*)? RPAREN
+    : LPAREN (functionValueParameter (COMMA functionValueParameter)* COMMA?)? RPAREN
     ;
 
 functionValueParameter
