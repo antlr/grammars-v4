@@ -217,7 +217,7 @@ typeParameters
     ;
 
 typeParameter
-    : modifierList? NL* simpleIdentifier (NL* COLON NL* type)?
+    : modifierList? NL* (simpleIdentifier | MULT) (NL* COLON NL* type)?
     ;
 
 type
