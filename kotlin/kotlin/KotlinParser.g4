@@ -397,7 +397,7 @@ arrayAccess
     ;
 
 valueArguments
-    : LPAREN (valueArgument (COMMA valueArgument)*)? RPAREN
+    : LPAREN (valueArgument (COMMA valueArgument)* (NL* COMMA)?)? RPAREN
     ;
 
 typeArguments
