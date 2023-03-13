@@ -79,7 +79,7 @@ classParameter
     ;
 
 delegationSpecifiers
-    : annotations* delegationSpecifier (NL* COMMA NL* delegationSpecifier)*
+    : annotations* delegationSpecifier (NL* COMMA NL* annotations* delegationSpecifier)*
     ;
 
 delegationSpecifier
@@ -715,7 +715,7 @@ annotations
 
 annotation
     : annotationUseSiteTarget NL* COLON NL* unescapedAnnotation
-    | LabelReference (NL* typeArguments)? (NL* valueArguments)?
+    | LabelReference (NL* DOT NL* simpleIdentifier)* (NL* typeArguments)? (NL* valueArguments)?
     ;
 
 annotationList
