@@ -79,7 +79,7 @@ classParameter
     ;
 
 delegationSpecifiers
-    : annotations* delegationSpecifier (NL* COMMA NL* delegationSpecifier)*
+    : annotations* delegationSpecifier (NL* COMMA NL* annotations* delegationSpecifier)*
     ;
 
 delegationSpecifier
@@ -140,7 +140,7 @@ functionDeclaration
     : modifierList? FUN
     (NL* type NL* DOT)?
     (NL* typeParameters)?
-    (NL* (identifier NL* DOT)* NL* identifier NL* typeParameters NL* DOT)?
+    (NL* receiverType NL* DOT)?
     (NL* identifier)?
     NL* functionValueParameters
     (NL* COLON NL* type)?
@@ -149,7 +149,7 @@ functionDeclaration
     ;
 
 functionValueParameters
-    : LPAREN (functionValueParameter (COMMA functionValueParameter)*)? RPAREN
+    : LPAREN (functionValueParameter (COMMA functionValueParameter)* COMMA?)? RPAREN
     ;
 
 functionValueParameter
@@ -158,6 +158,10 @@ functionValueParameter
 
 parameter
     : simpleIdentifier COLON type
+    ;
+
+receiverType
+    : typeModifierList? (parenthesizedType | nullableType | typeReference)
     ;
 
 functionBody
@@ -213,11 +217,11 @@ typeAlias
     ;
 
 typeParameters
-    : LANGLE NL* typeParameter (NL* COMMA NL* typeParameter)* NL* RANGLE
+    : LANGLE NL* typeParameter (NL* COMMA NL* typeParameter)* (NL* COMMA)? NL* RANGLE
     ;
 
 typeParameter
-    : modifierList? NL* simpleIdentifier (NL* COLON NL* type)?
+    : modifierList? NL* (simpleIdentifier | MULT) (NL* COLON NL* type)?
     ;
 
 type
@@ -266,7 +270,7 @@ simpleUserType
 
 //parameters for functionType
 functionTypeParameters
-    : LPAREN (parameter | type)? (COMMA (parameter | type))* RPAREN
+    : LPAREN NL* (parameter | type)? (NL* COMMA NL* (parameter | type))* (NL* COMMA)? NL* RPAREN
     ;
 
 typeConstraints
@@ -371,6 +375,7 @@ atomicExpression
     | loopExpression
     | collectionLiteral
     | simpleIdentifier
+    | VAL identifier
     ;
 
 parenthesizedExpression
@@ -396,7 +401,7 @@ valueArguments
     ;
 
 typeArguments
-    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* NL* RANGLE
+    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* (NL* COMMA)? NL* RANGLE QUEST?
     ;
 
 typeProjection
@@ -471,8 +476,9 @@ lambdaParameter
     | multiVariableDeclaration (NL* COLON NL* type)?
     ;
 
+// https://kotlinlang.org/docs/reference/grammar.html#objectLiteral
 objectLiteral
-    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody
+    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody?
     ;
 
 collectionLiteral
@@ -714,7 +720,7 @@ annotations
 
 annotation
     : annotationUseSiteTarget NL* COLON NL* unescapedAnnotation
-    | LabelReference (NL* typeArguments)? (NL* valueArguments)?
+    | LabelReference (NL* DOT NL* simpleIdentifier)* (NL* typeArguments)? (NL* valueArguments)?
     ;
 
 annotationList
