@@ -472,8 +472,9 @@ lambdaParameter
     | multiVariableDeclaration (NL* COLON NL* type)?
     ;
 
+// https://kotlinlang.org/docs/reference/grammar.html#objectLiteral
 objectLiteral
-    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody
+    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody?
     ;
 
 collectionLiteral
