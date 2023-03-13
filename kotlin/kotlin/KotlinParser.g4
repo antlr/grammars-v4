@@ -140,7 +140,7 @@ functionDeclaration
     : modifierList? FUN
     (NL* type NL* DOT)?
     (NL* typeParameters)?
-    (NL* (identifier NL* DOT)* NL* identifier NL* typeParameters NL* DOT)?
+    (NL* receiverType NL* DOT)?
     (NL* identifier)?
     NL* functionValueParameters
     (NL* COLON NL* type)?
@@ -158,6 +158,10 @@ functionValueParameter
 
 parameter
     : simpleIdentifier COLON type
+    ;
+
+receiverType
+    : typeModifierList? (parenthesizedType | nullableType | typeReference)
     ;
 
 functionBody
