@@ -36,27 +36,6 @@ then
     exit 0
 fi
 
-setupdeps()
-{
-    trgen --version
-    if [ $? != "0" ]
-    then
-        echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.20.8
-        dotnet tool install -g triconv --version 0.20.8
-        dotnet tool install -g trxml2 --version 0.20.8
-        dotnet tool install -g trwdog --version 0.20.8
-    case "${unameOut}" in
-        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        *)          echo 'unknown machine'
-    esac
-        echo "Done setting up."
-    fi
-}
-
 thetime()
 {
     local hh

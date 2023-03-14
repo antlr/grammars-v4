@@ -975,7 +975,7 @@ abort_statement
    
    
 compilation
-   : compilation_unit*
+   : compilation_unit* EOF
    ;
 
 compilation_unit
