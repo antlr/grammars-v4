@@ -16,7 +16,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<sourceDirectory>${basedir}/Positive-Technologies</sourceDirectory>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 						<include>MySqlLexer.g4</include>
 						<include>MySqlParser.g4</include>
@@ -42,7 +42,7 @@
 					<entryPoint>root</entryPoint>
 					<grammarName>MySql</grammarName>
 					<packageName></packageName>
-					<exampleFiles>Positive-Technologies/examples/</exampleFiles>
+					<exampleFiles>examples</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
