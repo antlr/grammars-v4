@@ -36,27 +36,6 @@ then
     exit 0
 fi
 
-setupdeps()
-{
-    trgen --version
-    if [ $? != "0" ]
-    then
-        echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.20.6
-        dotnet tool install -g triconv --version 0.20.6
-        dotnet tool install -g trxml2 --version 0.20.6
-        dotnet tool install -g trwdog --version 0.20.6
-    case "${unameOut}" in
-        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        *)          echo 'unknown machine'
-    esac
-        echo "Done setting up."
-    fi
-}
-
 thetime()
 {
     local hh
@@ -372,8 +351,9 @@ do
     bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
-    for d in Generated-$target*
+    for d in `echo Generated-$target-* Generated-$target`
     do
+	if [ ! -d $d ]; then continue; fi
         if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
 
         # Build driver code.

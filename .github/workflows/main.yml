@@ -53,7 +53,7 @@ jobs:
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
         go-version: '^1.18.0'
     - name: Do not trust Go env
@@ -97,7 +97,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.6; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.11; done
     - name: Test
       shell: pwsh
       run: |
@@ -159,7 +159,7 @@ jobs:
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
         go-version: '^1.18.0'
     - name: Do not trust Go env
@@ -197,7 +197,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.6; done
+        for i in trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.11; done
     - name: Test
       shell: bash
       run: |

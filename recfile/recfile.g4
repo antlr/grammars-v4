@@ -36,7 +36,7 @@ file_
    ;
 
 line
-   : (descriptor | record)? EOL+
+   : (descriptor | record)? EOL
    ;
 
 descriptor
@@ -60,7 +60,7 @@ STRING
    ;
 
 EOL
-   : [\r\n]
+   : [\r\n]+
    ;
 
 COMMENT

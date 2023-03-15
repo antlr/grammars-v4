@@ -144,7 +144,7 @@ function Test-Grammar {
         }
     }
 
-    Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+    Write-Host "Test completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     Set-Location $cwd
     return @{
         Success     = $success
