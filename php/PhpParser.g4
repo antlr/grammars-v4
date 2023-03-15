@@ -118,7 +118,8 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+        (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -367,7 +368,9 @@ classStatement
     : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
                   | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
                                      | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
-                                       baseCtorCall? methodBody))
+                                       (baseCtorCall | returnTypeDecl)? methodBody
+                                     )
+                  )
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
@@ -395,6 +398,10 @@ traitMethodReference
 
 baseCtorCall
     : ':' identifier arguments?
+    ;
+
+returnTypeDecl
+    : ':' QuestionMark? typeHint
     ;
 
 methodBody
