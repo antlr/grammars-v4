@@ -4560,7 +4560,7 @@ undo_tablespace
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-DATABASE.html
 drop_database
-    : DROP DATABASE
+    : DROP DATABASE (INCLUDING BACKUPS)? NOPROMPT?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
@@ -7075,6 +7075,7 @@ non_reserved_keywords_in_12c
     | AUTO_REOPTIMIZE
     | AVRO
     | BACKGROUND
+    | BACKUPS
     | BATCHSIZE
     | BATCH_TABLE_ACCESS_BY_ROWID
     | BEGINNING
@@ -7268,6 +7269,7 @@ non_reserved_keywords_in_12c
     | NO_PQ_CONCURRENT_UNION
     | NO_PQ_REPLICATE
     | NO_PQ_SKEW
+    | NOPROMPT
     | NO_PX_FAULT_TOLERANCE
     | NO_ROOT_SW_FOR_LOCAL
     | NO_SQL_TRANSLATION
