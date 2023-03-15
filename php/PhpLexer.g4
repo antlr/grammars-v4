@@ -190,6 +190,7 @@ Print:              'print';
 Private:            'private';
 Protected:          'protected';
 Public:             'public';
+Readonly:           'readonly';
 Require:            'require';
 RequireOnce:        'require_once';
 Resource:           'resource';

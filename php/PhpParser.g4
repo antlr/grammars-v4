@@ -335,7 +335,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes? memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier* QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -812,6 +812,7 @@ identifier
     | Private
     | Protected
     | Public
+    | Readonly
     | Require
     | RequireOnce
     | Resource
@@ -865,6 +866,7 @@ memberModifier
     | Static
     | Abstract
     | Final
+    | Readonly
     ;
 
 magicConstant
