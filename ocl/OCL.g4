@@ -19,9 +19,9 @@ specification
   : 'package' ID '{' classifier* '}' EOF
   ;
 
-// expressions
-//   : expression (';' expression)* ';'? EOF
-//   ;
+expressions
+  : expression (';' expression)* ';'? EOF
+  ;
 
 classifier
     : classDefinition
@@ -198,8 +198,7 @@ factorExpression
 // ->subrange is used for ->substring and ->subSequence
 
 factor2Expression
-  : '-' factor2Expression 
-  | '+' factor2Expression  
+  : ('-' | '+') factor2Expression 
   | factor2Expression '->size()' 
   | factor2Expression '->copy()'  
   | factor2Expression ('->isEmpty()' | 
