@@ -292,7 +292,8 @@ unsetStatement
 
 foreachStatement
     : Foreach
-        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+        ( '(' expression As arrayDestructuring ')'
+        | '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
         | '(' expression As assignable ('=>' '&'? chain)? ')'
         | '(' chain As List '(' assignmentList ')' ')' )
       (statement | ':' innerStatementList EndForeach SemiColon)
@@ -492,6 +493,7 @@ expression
 
     | Throw expression                                          #SpecialWordExpression
 
+    | arrayDestructuring Eq expression                          #ArrayDestructExpression
     | assignable assignmentOperator attributes? expression      #AssignmentExpression
     | assignable Eq attributes? '&' (chain | newExpr)           #AssignmentExpression
 
@@ -507,6 +509,19 @@ assignable
 
 arrayCreation
     : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
+    ;
+
+arrayDestructuring
+    : '[' ','* indexedDestructItem (','+ indexedDestructItem)* ','* ']'
+    | '[' keyedDestructItem (','+ keyedDestructItem)* ','? ']'
+    ;
+
+indexedDestructItem
+    : '&'? chain
+    ;
+
+keyedDestructItem
+    : (expression '=>')? '&'? chain
     ;
 
 lambdaFunctionExpr
