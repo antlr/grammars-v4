@@ -701,7 +701,7 @@ functionCallName
     ;
 
 actualArguments
-    : genericDynamicArgs? arguments squareCurlyExpression*
+    : genericDynamicArgs? arguments+ squareCurlyExpression*
     ;
 
 chainBase
