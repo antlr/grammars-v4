@@ -624,6 +624,7 @@ constantInitializer
     | Array '(' (arrayItemList ','?)? ')'
     | '[' (arrayItemList ','?)? ']'
     | ('+' | '-') constantInitializer
+    | (string | constant) ('.' (string | constant))*
     ;
 
 constant
