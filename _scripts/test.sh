@@ -351,8 +351,9 @@ do
     bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
-    for d in Generated-$target*
+    for d in `echo Generated-$target-* Generated-$target`
     do
+	if [ ! -d $d ]; then continue; fi
         if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
 
         # Build driver code.
