@@ -91,6 +91,7 @@ topStatement
     | functionDeclaration
     | classDeclaration
     | globalConstantDeclaration
+    | enumDeclaration
     ;
 
 useDeclaration
@@ -429,6 +430,18 @@ identifierInitializer
 
 globalConstantDeclaration
     : attributes? Const identifierInitializer (',' identifierInitializer)* SemiColon
+    ;
+
+enumDeclaration
+    : Enum_ identifier (Colon (IntType | StringType))?
+        OpenCurlyBracket
+            enumItem*
+        CloseCurlyBracket
+    ;
+
+enumItem
+    : Case identifier (Eq expression)? SemiColon
+    | memberModifiers? functionDeclaration
     ;
 
 expressionList
@@ -855,6 +868,7 @@ identifier
     | While
     | Yield
     | From
+    | Enum_
 
     | Get
     | Set
