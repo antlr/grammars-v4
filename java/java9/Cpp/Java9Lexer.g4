@@ -391,16 +391,16 @@ StringCharacter
 
 fragment
 EscapeSequence
-	:	'\\' [btnfr"'\\]
+	:	'\\' 'u005c'? [btnfr"'\\]
 	|	OctalEscape
     |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
 	;
 
 fragment
 OctalEscape
-	:	'\\' OctalDigit
-	|	'\\' OctalDigit OctalDigit
-	|	'\\' ZeroToThree OctalDigit OctalDigit
+	:	'\\' 'u005c'? OctalDigit
+	|	'\\' 'u005c'? OctalDigit OctalDigit
+	|	'\\' 'u005c'? ZeroToThree OctalDigit OctalDigit
 	;
 
 fragment

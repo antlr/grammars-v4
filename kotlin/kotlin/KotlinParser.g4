@@ -71,7 +71,7 @@ primaryConstructor
     ;
 
 classParameters
-    : LPAREN (classParameter (COMMA classParameter)*)? RPAREN
+    : LPAREN (classParameter (COMMA classParameter)* COMMA?)? RPAREN
     ;
 
 classParameter
@@ -79,7 +79,7 @@ classParameter
     ;
 
 delegationSpecifiers
-    : annotations* delegationSpecifier (NL* COMMA NL* delegationSpecifier)*
+    : annotations* delegationSpecifier (NL* COMMA NL* annotations* delegationSpecifier)*
     ;
 
 delegationSpecifier
@@ -133,13 +133,14 @@ enumEntries
     ;
 
 enumEntry
-    : simpleIdentifier (NL* valueArguments)? (NL* classBody)? (NL* COMMA)?
+    : annotations* simpleIdentifier (NL* valueArguments)? (NL* classBody)? (NL* COMMA)?
     ;
 
 functionDeclaration
     : modifierList? FUN
     (NL* type NL* DOT)?
     (NL* typeParameters)?
+    (NL* receiverType NL* DOT)?
     (NL* identifier)?
     NL* functionValueParameters
     (NL* COLON NL* type)?
@@ -148,7 +149,7 @@ functionDeclaration
     ;
 
 functionValueParameters
-    : LPAREN (functionValueParameter (COMMA functionValueParameter)*)? RPAREN
+    : LPAREN (functionValueParameter (COMMA functionValueParameter)* COMMA?)? RPAREN
     ;
 
 functionValueParameter
@@ -157,6 +158,10 @@ functionValueParameter
 
 parameter
     : simpleIdentifier COLON type
+    ;
+
+receiverType
+    : typeModifierList? (parenthesizedType | nullableType | typeReference)
     ;
 
 functionBody
@@ -186,7 +191,7 @@ propertyDeclaration
     (NL* (multiVariableDeclaration | variableDeclaration))
     (NL* typeConstraints)?
     (NL* (BY | ASSIGNMENT) NL* expression)?
-    (getter (semi setter)? | setter (semi getter)?)?
+    (NL* getter (semi setter)? | NL* setter (semi getter)?)?
     ;
 
 multiVariableDeclaration
@@ -212,11 +217,11 @@ typeAlias
     ;
 
 typeParameters
-    : LANGLE NL* typeParameter (NL* COMMA NL* typeParameter)* NL* RANGLE
+    : LANGLE NL* typeParameter (NL* COMMA NL* typeParameter)* (NL* COMMA)? NL* RANGLE
     ;
 
 typeParameter
-    : modifierList? NL* simpleIdentifier (NL* COLON NL* type)?
+    : modifierList? NL* (simpleIdentifier | MULT) (NL* COLON NL* type)?
     ;
 
 type
@@ -265,7 +270,7 @@ simpleUserType
 
 //parameters for functionType
 functionTypeParameters
-    : LPAREN (parameter | type)? (COMMA (parameter | type))* RPAREN
+    : LPAREN NL* (parameter | type)? (NL* COMMA NL* (parameter | type))* (NL* COMMA)? NL* RPAREN
     ;
 
 typeConstraints
@@ -370,6 +375,7 @@ atomicExpression
     | loopExpression
     | collectionLiteral
     | simpleIdentifier
+    | VAL identifier
     ;
 
 parenthesizedExpression
@@ -391,11 +397,11 @@ arrayAccess
     ;
 
 valueArguments
-    : LPAREN (valueArgument (COMMA valueArgument)*)? RPAREN
+    : LPAREN (valueArgument (COMMA valueArgument)* (NL* COMMA)?)? RPAREN
     ;
 
 typeArguments
-    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* NL* RANGLE
+    : LANGLE NL* typeProjection (NL* COMMA typeProjection)* (NL* COMMA)? NL* RANGLE QUEST?
     ;
 
 typeProjection
@@ -470,8 +476,9 @@ lambdaParameter
     | multiVariableDeclaration (NL* COLON NL* type)?
     ;
 
+// https://kotlinlang.org/docs/reference/grammar.html#objectLiteral
 objectLiteral
-    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody
+    : OBJECT (NL* COLON NL* delegationSpecifiers)? NL* classBody?
     ;
 
 collectionLiteral
@@ -563,6 +570,7 @@ jumpExpression
 
 callableReference
     : (userType (QUEST NL*)*)? NL* (COLONCOLON | Q_COLONCOLON) NL* (identifier | CLASS)
+    | THIS NL* COLONCOLON NL* CLASS
     ;
 
 assignmentOperator
@@ -712,7 +720,7 @@ annotations
 
 annotation
     : annotationUseSiteTarget NL* COLON NL* unescapedAnnotation
-    | LabelReference (NL* typeArguments)? (NL* valueArguments)?
+    | LabelReference (NL* DOT NL* simpleIdentifier)* (NL* typeArguments)? (NL* valueArguments)?
     ;
 
 annotationList

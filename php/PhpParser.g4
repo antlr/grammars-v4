@@ -118,7 +118,8 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+        (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -292,7 +293,8 @@ unsetStatement
 
 foreachStatement
     : Foreach
-        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+        ( '(' expression As arrayDestructuring ')'
+        | '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
         | '(' expression As assignable ('=>' '&'? chain)? ')'
         | '(' chain As List '(' assignmentList ')' ')' )
       (statement | ':' innerStatementList EndForeach SemiColon)
@@ -335,7 +337,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes? memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier* QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -367,7 +369,9 @@ classStatement
     : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
                   | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
                                      | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
-                                       baseCtorCall? methodBody))
+                                       (baseCtorCall | returnTypeDecl)? methodBody
+                                     )
+                  )
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
@@ -395,6 +399,10 @@ traitMethodReference
 
 baseCtorCall
     : ':' identifier arguments?
+    ;
+
+returnTypeDecl
+    : ':' QuestionMark? typeHint
     ;
 
 methodBody
@@ -492,6 +500,7 @@ expression
 
     | Throw expression                                          #SpecialWordExpression
 
+    | arrayDestructuring Eq expression                          #ArrayDestructExpression
     | assignable assignmentOperator attributes? expression      #AssignmentExpression
     | assignable Eq attributes? '&' (chain | newExpr)           #AssignmentExpression
 
@@ -507,6 +516,19 @@ assignable
 
 arrayCreation
     : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
+    ;
+
+arrayDestructuring
+    : '[' ','* indexedDestructItem (','+ indexedDestructItem)* ','* ']'
+    | '[' keyedDestructItem (','+ keyedDestructItem)* ','? ']'
+    ;
+
+indexedDestructItem
+    : '&'? chain
+    ;
+
+keyedDestructItem
+    : (expression '=>')? '&'? chain
     ;
 
 lambdaFunctionExpr
@@ -624,6 +646,7 @@ constantInitializer
     | Array '(' (arrayItemList ','?)? ')'
     | '[' (arrayItemList ','?)? ']'
     | ('+' | '-') constantInitializer
+    | (string | constant) ('.' (string | constant))*
     ;
 
 constant
@@ -701,7 +724,7 @@ functionCallName
     ;
 
 actualArguments
-    : genericDynamicArgs? arguments squareCurlyExpression*
+    : genericDynamicArgs? arguments+ squareCurlyExpression*
     ;
 
 chainBase
@@ -812,6 +835,7 @@ identifier
     | Private
     | Protected
     | Public
+    | Readonly
     | Require
     | RequireOnce
     | Resource
@@ -865,6 +889,7 @@ memberModifier
     | Static
     | Abstract
     | Final
+    | Readonly
     ;
 
 magicConstant

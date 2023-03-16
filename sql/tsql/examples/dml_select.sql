@@ -800,3 +800,9 @@ where t.a_field_2 *= t2.field_we_do_a_left_outer_join_on
 
 select distinct t.a_field_1 f1 from a_table t
 where t.a_field_2 <= current_date()
+
+with
+	t as (select 1 as x),
+	u as (select 1 as y),
+	v as (select 1 as z)
+select x from t join u join v on u.y = v.z on t.x = v.z

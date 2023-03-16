@@ -1,7 +1,7 @@
-\<!-- Template generated code from trgen <version> -->
+\<!-- Generated from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
-    \<TargetFramework>net6.0\</TargetFramework>
+    \<TargetFramework>net7.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
     \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
   \</PropertyGroup>
@@ -12,8 +12,8 @@
 \</Antlr4>
 } >  \</ItemGroup>
   \<ItemGroup>
-    \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.11.1" />
-    \<PackageReference Include="Antlr4BuildTasks" Version = "11.1" PrivateAssets="all" />
+    \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.12.0" />
+    \<PackageReference Include="Antlr4BuildTasks" Version="12.2" PrivateAssets="all" />
   \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
@@ -36,7 +36,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo $file
-    cat $file | bin/Debug/net6.0/Test
+    cat $file | bin/Debug/net7.0/Test
     status="$?"
     if [ -f "$file".errors ]
     then
@@ -72,7 +72,7 @@ for %%G in (..\\<example_files_win>\*) do (
   set X3=%%~pG
   if !X1! neq .errors (
     echo !FILE!
-    cat !FILE! | bin\Debug\net6.0\Test.exe
+    cat !FILE! | bin\Debug\net7.0\Test.exe
     if not exist !FILE!.errors (
       if ERRORLEVEL 1 set ERR=1
     ) else (

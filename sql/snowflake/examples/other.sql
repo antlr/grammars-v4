@@ -1,6 +1,5 @@
 copy into t from @stage/;
 copy into @stage/ from t;
-comment on table t is 's';
 commit ;
 execute immediate 'select 1';
 execute task tsk;
@@ -22,4 +21,3 @@ truncate materialized view v;
 truncate table t;
 unset i;
 unset (i,j,k);
-call my_stored_proc(arg_1);
