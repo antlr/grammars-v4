@@ -232,6 +232,9 @@ function Get-ChangedGrammars {
     $changed = @()
     foreach ($d in $diff) {
         $old = Get-Location
+        if (!(Test-Path -Path "$d")) {
+            continue
+        }
         Set-Location $d
         while ($True) {
             if (Test-Path -Path "desc.xml" -PathType Leaf) {
