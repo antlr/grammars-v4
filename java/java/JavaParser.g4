@@ -543,7 +543,7 @@ resources
 
 resource
     : variableModifier* ( classOrInterfaceType variableDeclaratorId | VAR identifier ) '=' expression
-    | identifier
+    | qualifiedName
     ;
 
 /** Matches cases then statements, both of which are mandatory.
