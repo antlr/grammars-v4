@@ -433,7 +433,7 @@ globalConstantDeclaration
     ;
 
 enumDeclaration
-    : Enum_ identifier (Colon (IntType | StringType))?
+    : Enum_ identifier (Colon (IntType | StringType))? (Implements interfaceList)?
         OpenCurlyBracket
             enumItem*
         CloseCurlyBracket
@@ -442,6 +442,7 @@ enumDeclaration
 enumItem
     : Case identifier (Eq expression)? SemiColon
     | memberModifiers? functionDeclaration
+    | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
 expressionList
