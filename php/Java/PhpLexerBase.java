@@ -72,7 +72,7 @@ public abstract class PhpLexerBase extends Lexer
                 }
                 else
                 {
-                    token = new CommonToken(PhpLexer.SemiColon);
+                    token.setType(PhpLexer.SemiColon);
                 }
             }
         }
