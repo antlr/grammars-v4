@@ -506,7 +506,7 @@ partitionDefinitions
 partitionFunctionDefinition
     : LINEAR? HASH '(' expression ')'                               #partitionFunctionHash
     | LINEAR? KEY (ALGORITHM '=' algType=('1' | '2'))?
-      '(' uidList ')'                                               #partitionFunctionKey
+      '(' uidList? ')'                                              #partitionFunctionKey // Optional uidList for MySQL only
     | RANGE ( '(' expression ')' | COLUMNS '(' uidList ')' )        #partitionFunctionRange
     | LIST ( '(' expression ')' | COLUMNS '(' uidList ')' )         #partitionFunctionList
     ;

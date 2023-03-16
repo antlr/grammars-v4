@@ -87,6 +87,12 @@ CREATE TABLE table_items (id INT, purchased DATE)
         PARTITION p2 VALUES LESS THAN MAXVALUE
     );
 
+CREATE TABLE T1 (
+ID INT NOT NULL,
+NAME VARCHAR(255),
+UNIQUE KEY(ID)
+) PARTITION BY KEY() PARTITIONS 2;
+
 CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
