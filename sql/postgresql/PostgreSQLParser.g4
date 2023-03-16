@@ -3507,7 +3507,7 @@ a_expr_and
 /*21*/
 
 a_expr_between
-   : a_expr_in (BETWEEN SYMMETRIC? a_expr_in AND a_expr_in)?
+   : a_expr_in (NOT? BETWEEN SYMMETRIC? a_expr_in AND a_expr_in)?
    ;
 /*20*/
 
