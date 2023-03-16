@@ -192,14 +192,14 @@ interfaceBodyDeclaration
     ;
 
 interfaceMemberDeclaration
-    : constDeclaration
+    : recordDeclaration // Java17
+    | constDeclaration
     | interfaceMethodDeclaration
     | genericInterfaceMethodDeclaration
     | interfaceDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
-    | recordDeclaration // Java17
     ;
 
 constDeclaration
