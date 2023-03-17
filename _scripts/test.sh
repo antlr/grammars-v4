@@ -152,7 +152,7 @@ OPTIONS
            "all", or "agnostic". The default is "all".
 
        -t
-           Specifies the targets to test. Possible targets are "Antlr4cs",
+           Specifies the targets to test. Possible targets are
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
            All targets are tested by default.
 
@@ -268,7 +268,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
+    targets=( CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
 fi
 
 echo grammars = ${grammars[@]}

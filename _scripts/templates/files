@@ -1,16 +1,3 @@
-./Antlr4cs/build.ps1
-./Antlr4cs/build.sh
-./Antlr4cs/CaseChangingCharStream.cs
-./Antlr4cs/clean.ps1
-./Antlr4cs/clean.sh
-./Antlr4cs/ErrorListener.cs
-./Antlr4cs/makefile
-./Antlr4cs/run.ps1
-./Antlr4cs/run.sh
-./Antlr4cs/Test.cs
-./Antlr4cs/Test.csproj
-./Antlr4cs/test.ps1
-./Antlr4cs/test.sh
 ./Arithmetic.g4
 ./Cpp/build.ps1
 ./Cpp/build.sh

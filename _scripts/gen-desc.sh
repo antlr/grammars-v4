@@ -128,7 +128,7 @@ fi
 echo "grammars = $grammars"
 echo "Evaluating targets for each grammar..."
 
-targets="Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript"
+targets="CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript"
 for g in $grammars
 do
     echo Starting analysis of $g
