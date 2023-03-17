@@ -212,6 +212,9 @@ While:              'while';
 Yield:              'yield';
 From:               'from';
 LambdaFn:           'fn';
+Ticks:              'ticks';
+Encoding:           'encoding';
+StrictTypes:        'strict_types';
 
 Get:                '__get';
 Set:                '__set';
