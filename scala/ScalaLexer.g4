@@ -32,6 +32,8 @@
 
 lexer grammar ScalaLexer;
 
+options { superClass = ScalaLexerBase; }
+
 tokens {
 	LBraceXML,
 	RBraceXML,
@@ -139,11 +141,11 @@ BackTickId:
 	BackTick (CharNoBackQuoteOrNewline | EscapeSeq)* BackTick { popModeForIdentifier();};
 
 AlphaId
-	: Upper IdRest {!getText().endsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier(); }
+	: Upper IdRest {!Text.EndsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier(); }
 	;
 
 VarId
-	: Lower IdRest { !getText().endsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier(); }
+	: Lower IdRest { !Text.EndsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier(); }
 	;
 
 fragment EscapeSeq
@@ -323,7 +325,7 @@ DoubleDollarSingle: '$$';
 EscapedQuoteSingle: '$"';
 
 DollarInsideSingle:
-	'$' { curlyLevels.push(0); } -> pushMode(DEFAULT_MODE);
+	'$' { curlyLevels.Push(0); } -> pushMode(DEFAULT_MODE);
 
 DoubleQuoteSingle: '"' { interpolatedStringLevel--; } -> popMode;
 
@@ -337,7 +339,7 @@ DoubleDollarMulti: '$$';
 EscapedQuoteMulti: '$"';
 
 DollarInsideMulti:
-	'$' { curlyLevels.push(0); } -> pushMode(DEFAULT_MODE);
+	'$' { curlyLevels.Push(0); } -> pushMode(DEFAULT_MODE);
 
 DoubleQuoteMulti: '"';
 
@@ -352,23 +354,23 @@ EntityRef: '&' Name ';';
 CharRef: '&#' DIGIT+ ';' | '&#x' HEXDIGIT+ ';';
 
 XMLCommentOutside:
-	'<!--' .*? '-->' {setType(XMLComment);} -> channel(HIDDEN);
+	'<!--' .*? '-->' {Type = XMLComment;} -> channel(HIDDEN);
 
 PI:
 	'<?' .*? '?>';
 
 CDataChunk: '<![CDATA[' .*? ']]>';
 
-LBraceEscaped: '{{' {setType(CharData);};
+LBraceEscaped: '{{' {Type = ScalaLexer.CharData;};
 
 LBraceXMLOutsideNode:
-	'{' {curlyLevels.push(1); xmlLevels.push(0); setType(LBraceXML);  pushMode(DEFAULT_MODE);};
+	'{' {curlyLevels.Push(1); xmlLevels.Push(0); Type = LBraceXML; PushMode(DEFAULT_MODE);};
 
 XMLClosingNodeTag:
-	'<' '/' {  openingTags.push('/'); pushMode(XMLInsideNode);};
+	'<' '/' {  openingTags.Push('/'); PushMode(XMLInsideNode);};
 
 XMLOpenTagMode:
-	'<' {xmlLevels.push(xmlLevels.pop()+1); String text = getText(); openingTags.push(text.charAt(text.length()-1)); setType(XMLOpenTag); pushMode(XMLInsideNode);
+	'<' {xmlLevels.Push(xmlLevels.Pop()+1); openingTags.Push(Text[Text.Length-1]); Type = ScalaLexer.XMLOpenTag; PushMode(XMLInsideNode);
 		};
 
 CharData: ~[<&{]+;
@@ -376,32 +378,32 @@ CharData: ~[<&{]+;
 mode XMLInsideNode;
 
 XMLCommentModeInside:
-	'<!--' .*? '-->' {setType(XMLComment);} -> channel(HIDDEN);
+	'<!--' .*? '-->' {Type = XMLComment;} -> channel(HIDDEN);
 
 LBraceXMLInsideNode:
-	'{' {curlyLevels.push(1); xmlLevels.push(0); setType(LBraceXML);} -> pushMode(DEFAULT_MODE);
+	'{' {curlyLevels.Push(1); xmlLevels.Push(0); Type = LBraceXML;} -> pushMode(DEFAULT_MODE);
 
 XMLAutoClose:
-	'/>' {  if (openingTags.pop() != '/') {
-				xmlLevels.push(xmlLevels.pop()-1);
-                if (xmlLevels.peek() == 0) {
-                    popMode();
-                    xmlLevels.pop();
+	'/>' {  if (openingTags.Pop() != '/') {
+				xmlLevels.Push(xmlLevels.Pop()-1);
+                if (xmlLevels.Peek() == 0) {
+                    PopMode();
+                    xmlLevels.Pop();
                 }
-            } else throw new RuntimeException("Bad XML");
-            popMode();
+            } else throw new Exception("Bad XML");
+            PopMode();
 };
 
 XMLCloseTag:
-	'>' {             if (openingTags.pop() == '/') {
-			  	xmlLevels.push(xmlLevels.pop()-1);
-                if (xmlLevels.peek() == 0)
+	'>' {             if (openingTags.Pop() == '/') {
+			  	xmlLevels.Push(xmlLevels.Pop()-1);
+                if (xmlLevels.Peek() == 0)
                 {
-                    popMode();
-                    xmlLevels.pop();
+                    PopMode();
+                    xmlLevels.Pop();
                 }
             }
-            popMode();};
+            PopMode();};
 
 SLASH: '/';
 EQUALS: '=';
