@@ -42,6 +42,14 @@ alter table `some_table` add (primary key `id` (`id`),`k_id` int unsigned not nu
 alter table `some_table` add column (unique key `another_field` (`another_field`));
 alter table default.task add column xxxx varchar(200) comment 'cdc test';
 ALTER TABLE `hcore`.comments COLLATE='utf8mb4_general_ci', CONVERT TO CHARSET UTF8MB4;
+ALTER TABLE T1 ADD FOREIGN KEY ( I )  REFERENCES TT ( I ) ON DELETE SET DEFAULT;
+ALTER TABLE T1 ADD FOREIGN KEY ( I ) REFERENCES TT ( I ) ON UPDATE SET DEFAULT;
+ALTER TABLE T1 ADD CHECK (id + 6 > 10) ENFORCED;
+ALTER TABLE T1 ADD CHECK (ID + 6 > 10) NOT ENFORCED;
+ALTER TABLE T1 ALTER CHECK C_CONS ENFORCED;
+ALTER TABLE T1 ALTER CHECK C_CONS NOT ENFORCED;
+ALTER TABLE T1 ALTER I SET VISIBLE;
+ALTER TABLE T1 ALTER I SET INVISIBLE;
 #end
 #begin
 -- Alter database

@@ -143,6 +143,7 @@ Echo:               'echo';
 Else:               'else';
 ElseIf:             'elseif';
 Empty:              'empty';
+Enum_:              'enum';
 
 EndDeclare:         'enddeclare';
 EndFor:             'endfor';
