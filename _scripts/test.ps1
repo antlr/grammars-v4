@@ -63,7 +63,6 @@ function Test-Grammar {
     $cwd = Get-Location
     Set-Location $Directory
     $zzz = Get-Location
-    Write-Host "zzz is $zzz"
 
     $failStage = [FailStage]::Success
     
