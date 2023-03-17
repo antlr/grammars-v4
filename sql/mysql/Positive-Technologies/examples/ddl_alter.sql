@@ -41,6 +41,14 @@ alter table add_test add column col1 int not null;
 alter table `some_table` add (primary key `id` (`id`),`k_id` int unsigned not null,`another_field` smallint not null,index `k_id` (`k_id`));
 alter table `some_table` add column (unique key `another_field` (`another_field`));
 alter table default.task add column xxxx varchar(200) comment 'cdc test';
+ALTER TABLE T1 ADD FOREIGN KEY ( I )  REFERENCES TT ( I ) ON DELETE SET DEFAULT;
+ALTER TABLE T1 ADD FOREIGN KEY ( I ) REFERENCES TT ( I ) ON UPDATE SET DEFAULT;
+ALTER TABLE T1 ADD CHECK (id + 6 > 10) ENFORCED;
+ALTER TABLE T1 ADD CHECK (ID + 6 > 10) NOT ENFORCED;
+ALTER TABLE T1 ALTER CHECK C_CONS ENFORCED;
+ALTER TABLE T1 ALTER CHECK C_CONS NOT ENFORCED;
+ALTER TABLE T1 ALTER I SET VISIBLE;
+ALTER TABLE T1 ALTER I SET INVISIBLE;
 #end
 #begin
 -- Alter database
