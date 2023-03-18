@@ -3501,9 +3501,13 @@ a_expr_or
    ;
 /*16*/
 
-
 a_expr_and
-   : a_expr_in (AND a_expr_in)*
+   : a_expr_between (AND a_expr_between)*
+   ;
+/*21*/
+
+a_expr_between
+   : a_expr_in (NOT? BETWEEN SYMMETRIC? a_expr_in AND a_expr_in)?
    ;
 /*20*/
 
@@ -3547,7 +3551,7 @@ a_expr_compare
 
 
 a_expr_like
-   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO | BETWEEN SYMMETRIC?) a_expr_qual_op opt_escape)?
+   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO) a_expr_qual_op opt_escape)?
    ;
 /* 8*/
 
