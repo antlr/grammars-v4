@@ -330,7 +330,13 @@ inlineHtmlStatement
     ;
 
 declareList
-    : identifierInitializer (',' identifierInitializer)*
+    : directive (',' directive)*
+    ;
+
+directive
+    : Ticks Eq (numericConstant | Real)
+    | Encoding Eq SingleQuoteString
+    | StrictTypes Eq numericConstant
     ;
 
 formalParameterList
@@ -835,6 +841,7 @@ identifier
     | Interface
     | IntType
     | IsSet
+    | LambdaFn
     | List
     | LogicalAnd
     | LogicalOr
@@ -870,6 +877,9 @@ identifier
     | Yield
     | From
     | Enum_
+    | Ticks
+    | Encoding
+    | StrictTypes
 
     | Get
     | Set
