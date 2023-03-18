@@ -63,7 +63,6 @@ function Test-Grammar {
     $cwd = Get-Location
     Set-Location $Directory
     $zzz = Get-Location
-    Write-Host "zzz is $zzz"
 
     $failStage = [FailStage]::Success
     
@@ -206,7 +205,8 @@ function Get-GitChangedDirectories {
         Write-Error "which commit to diff?"
         exit 1
     }
-    $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    $diff = git diff $PreviousCommit $CurrentCommit --name-only | Where-Object { $_ -notmatch "_scripts" -and $_ -notmatch "\.github" }
+
     if ($diff -is "string") {
         $diff = @($diff)
     }
@@ -231,6 +231,9 @@ function Get-ChangedGrammars {
     $changed = @()
     foreach ($d in $diff) {
         $old = Get-Location
+        if (!(Test-Path -Path "$d")) {
+            continue
+        }
         Set-Location $d
         while ($True) {
             if (Test-Path -Path "desc.xml" -PathType Leaf) {
