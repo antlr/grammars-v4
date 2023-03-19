@@ -1,57 +1,57 @@
 lexer grammar BibTeXLexer;
-import CaseInsensitiveFragments;
+options { caseInsensitive = true; }
 
 // Keywords
 ARTICLE:
-    AT A R T I C L E
+    AT 'article'
     ;
 
 BOOK:
-    AT B O O K
+    AT 'book'
     ;
 
 BOOKLET:
-    AT B O O K L E T
+    AT 'booklet'
     ;
 
 INBOOK:
-    AT I N B O O K
+    AT 'inbook'
     ;
 
 INCOLLECTION:
-    AT I N C O L L E C T I O N
+    AT 'incollection'
     ;
 
 INPROCEEDINGS:
-    AT I N P R O C E E D I N G S
+    AT 'inproceedings'
     ;
 
 PROCEEDINGS:
-    AT P R O C E E D I N G S
+    AT 'proceedings'
     ;
 
 MANUAL:
-    AT M A N U A L
+    AT 'manual'
     ;
 
 MASTERTHESIS:
-    AT M A S T E R T H E S I S
+    AT 'masterthesis'
     ;
 
 PHDTHESIS:
-    AT P H D T H E S I S
+    AT 'phdthesis'
     ;
 
 MISC:
-    AT M I S C
+    AT 'misc'
     ;
 
 TECHREPORT:
-    AT T E C H R E P O R T
+    AT 'techreport'
     ;
 
 UNPUBLISHED:
-    AT U N P U B L I S H E D
+    AT 'unpublished'
     ;
 
 
