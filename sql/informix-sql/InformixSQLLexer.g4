@@ -226,7 +226,7 @@ NUMERIC_LITERAL: (DIGIT+ ('.' DIGIT*)? | '.' DIGIT+) ('E' [-+]? DIGIT+)? | '0x' 
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
-STRING_LITERAL: '\'' ( ~'\'' | '\'\'')* '\'';
+STRING_LITERAL: '\'' (~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: 'X' STRING_LITERAL;
 
