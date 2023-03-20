@@ -1,0 +1,34 @@
+.version 8.1
+.target sm_10
+.address_size 64
+
+        .reg    .b32 r1, r2;
+        .reg    .s32 i;
+        .reg    .v4 .f32 accel;
+        .reg    .pred p, q, r;
+        .reg    .b32 %r<100>;
+        .const  .f32 bias[] = {-1.0, 1.0};
+        .struct  float4 { .f32 v0,v1,v2,v3; }; // typedef
+        .struct  some_struct { .s32 i; .s32 j; .f32 x; .f32 y; };
+        .global .f32  array[N];
+        .global .u32 loc;
+        .global .u8  bg[4] = {0, 0, 0, 0};
+        .global .struct float4 coord;
+        .global .v4 .f32 V;     // a length-4 vector of floats
+        .global .s32 offset[][] = { {-1, 0}, {0, -1}, {1, 0}, {0, 1} };
+        .union   intOrFloat { .s32 i; .f32 f; };
+        .global  some_struct p;
+        .shared .v2 .u16 uv;    // a length-2 vector of unsigned ints
+        .shared .u8  mailbox[128];
+        .local  .u16 kernel[19][19];
+
+        .func (.reg .b32 rval) foo (.reg .b32 arg0, .reg .f64 arg1) {
+            .reg .b32 localVar;
+            //mov.b32 rval,result;
+            //ret;
+        }
+
+start:  mov.b32   r1, %tid.x;
+        shl.b32   r1, r1, 2;          // shift thread id by 2 bits
+        ld.global.b32 r2, array[r1];  // thread[tid] gets array[tid]
+        add.f32   r2, r2, 0.5;        // add 1/2
