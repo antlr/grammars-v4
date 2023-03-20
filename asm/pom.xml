@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>asmparent</artifactId>
-	<packaging>pom</packaging>
-	<name>Assembler Grammars</name>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>asmparent</artifactId>
+  <packaging>pom</packaging>
+  <name>Assembler Grammars</name>
 
-	 <parent>
-		<groupId>org.antlr.grammars</groupId>
-		<artifactId>grammarsv4</artifactId>
-		<version>1.0-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <groupId>org.antlr.grammars</groupId>
+    <artifactId>grammarsv4</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
 
-	<modules>
-		<module>asm6502</module>
-		<module>asm8080</module>
-		<module>asm8086</module>
-		<module>asmMASM</module>
-		<module>asmZ80</module>
-		<module>masm</module>
-		<module>pdp7</module>
-	</modules>
+  <modules>
+    <module>asm6502</module>
+    <module>asm8080</module>
+    <module>asm8086</module>
+    <module>asmMASM</module>
+    <module>asmZ80</module>
+    <module>masm</module>
+    <module>pdp7</module>
+    <module>ptx</module>
+  </modules>
 </project>
