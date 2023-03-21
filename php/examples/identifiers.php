@@ -20,3 +20,11 @@ class C{
 
 $c = new C();
 $c->fn = 1;
+
+class CM{
+    const match = 1;
+}
+
+enum EM{
+    case match;
+}

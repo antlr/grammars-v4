@@ -306,7 +306,7 @@ tryCatchFinally
     ;
 
 catchClause
-    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName ')' blockStatement
+    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName? ')' blockStatement
     ;
 
 finallyStatement
@@ -877,6 +877,7 @@ identifier
     | Yield
     | From
     | Enum_
+    | Match_
     | Ticks
     | Encoding
     | StrictTypes
