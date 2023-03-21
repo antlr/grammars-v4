@@ -1,0 +1,466 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling convolutionTexture.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a05340)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"convolutionTexture.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/convolutionTexture/convolutionTexture.cu"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\texture_fetch_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+	.const .align 4 .b8 c_Kernel[68];
+	.tex .u32 texSrc;
+
+	.entry _Z21convolutionRowsKernelPfii (
+		.param .u32 __cudaparm__Z21convolutionRowsKernelPfii_d_Dst,
+		.param .s32 __cudaparm__Z21convolutionRowsKernelPfii_imageW,
+		.param .s32 __cudaparm__Z21convolutionRowsKernelPfii_imageH)
+	{
+	.reg .u32 %r<25>;
+	.reg .f32 %f<211>;
+	.reg .pred %p<3>;
+	.loc	16	99	0
+$LDWbegin__Z21convolutionRowsKernelPfii:
+	cvt.s32.u16 	%r1, %ntid.x;
+	cvt.s32.u16 	%r2, %ctaid.x;
+	mul24.lo.s32 	%r3, %r1, %r2;
+	cvt.s32.u16 	%r4, %ntid.y;
+	cvt.s32.u16 	%r5, %ctaid.y;
+	mul24.lo.s32 	%r6, %r4, %r5;
+	cvt.u32.u16 	%r7, %tid.x;
+	add.u32 	%r8, %r3, %r7;
+	cvt.u32.u16 	%r9, %tid.y;
+	add.u32 	%r10, %r6, %r9;
+	ld.param.s32 	%r11, [__cudaparm__Z21convolutionRowsKernelPfii_imageW];
+	ld.param.s32 	%r12, [__cudaparm__Z21convolutionRowsKernelPfii_imageH];
+	set.le.u32.s32 	%r13, %r12, %r10;
+	neg.s32 	%r14, %r13;
+	set.le.u32.s32 	%r15, %r11, %r8;
+	neg.s32 	%r16, %r15;
+	or.b32 	%r17, %r14, %r16;
+	mov.u32 	%r18, 0;
+	setp.eq.s32 	%p1, %r17, %r18;
+	@%p1 bra 	$Lt_0_1282;
+	bra.uni 	$LBB21__Z21convolutionRowsKernelPfii;
+$Lt_0_1282:
+	.loc	16	112	0
+	cvt.rn.f32.s32 	%f1, %r8;
+	mov.f32 	%f2, 0f3f000000;     	// 0.5
+	add.f32 	%f3, %f1, %f2;
+	cvt.rn.f32.s32 	%f4, %r10;
+	mov.f32 	%f5, 0f3f000000;     	// 0.5
+	add.f32 	%f6, %f4, %f5;
+	mov.f32 	%f7, 0fc1000000;     	// -8
+	add.f32 	%f8, %f3, %f7;
+	mov.f32 	%f9, %f6;
+	mov.f32 	%f10, 0f00000000;    	// 0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f12,%f13,%f14,%f15},[texSrc,{%f8,%f9,%f10,%f11}];
+	.loc	16	72	0
+	mov.f32 	%f16, %f12;
+	mov.f32 	%f17, 0fc0e00000;    	// -7
+	add.f32 	%f18, %f3, %f17;
+	mov.f32 	%f19, %f6;
+	mov.f32 	%f20, 0f00000000;    	// 0
+	mov.f32 	%f21, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f22,%f23,%f24,%f25},[texSrc,{%f18,%f19,%f20,%f21}];
+	mov.f32 	%f26, %f22;
+	mov.f32 	%f27, 0fc0c00000;    	// -6
+	add.f32 	%f28, %f3, %f27;
+	mov.f32 	%f29, %f6;
+	mov.f32 	%f30, 0f00000000;    	// 0
+	mov.f32 	%f31, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f32,%f33,%f34,%f35},[texSrc,{%f28,%f29,%f30,%f31}];
+	mov.f32 	%f36, %f32;
+	mov.f32 	%f37, 0fc0a00000;    	// -5
+	add.f32 	%f38, %f3, %f37;
+	mov.f32 	%f39, %f6;
+	mov.f32 	%f40, 0f00000000;    	// 0
+	mov.f32 	%f41, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f42,%f43,%f44,%f45},[texSrc,{%f38,%f39,%f40,%f41}];
+	mov.f32 	%f46, %f42;
+	mov.f32 	%f47, 0fc0800000;    	// -4
+	add.f32 	%f48, %f3, %f47;
+	mov.f32 	%f49, %f6;
+	mov.f32 	%f50, 0f00000000;    	// 0
+	mov.f32 	%f51, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f52,%f53,%f54,%f55},[texSrc,{%f48,%f49,%f50,%f51}];
+	mov.f32 	%f56, %f52;
+	mov.f32 	%f57, 0fc0400000;    	// -3
+	add.f32 	%f58, %f3, %f57;
+	mov.f32 	%f59, %f6;
+	mov.f32 	%f60, 0f00000000;    	// 0
+	mov.f32 	%f61, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f62,%f63,%f64,%f65},[texSrc,{%f58,%f59,%f60,%f61}];
+	mov.f32 	%f66, %f62;
+	mov.f32 	%f67, 0fc0000000;    	// -2
+	add.f32 	%f68, %f3, %f67;
+	mov.f32 	%f69, %f6;
+	mov.f32 	%f70, 0f00000000;    	// 0
+	mov.f32 	%f71, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f72,%f73,%f74,%f75},[texSrc,{%f68,%f69,%f70,%f71}];
+	mov.f32 	%f76, %f72;
+	mov.f32 	%f77, 0fbf800000;    	// -1
+	add.f32 	%f78, %f3, %f77;
+	mov.f32 	%f79, %f6;
+	mov.f32 	%f80, 0f00000000;    	// 0
+	mov.f32 	%f81, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f82,%f83,%f84,%f85},[texSrc,{%f78,%f79,%f80,%f81}];
+	mov.f32 	%f86, %f82;
+	mov.f32 	%f87, %f3;
+	mov.f32 	%f88, %f6;
+	mov.f32 	%f89, 0f00000000;    	// 0
+	mov.f32 	%f90, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f91,%f92,%f93,%f94},[texSrc,{%f87,%f88,%f89,%f90}];
+	mov.f32 	%f95, %f91;
+	mov.f32 	%f96, 0f3f800000;    	// 1
+	add.f32 	%f97, %f3, %f96;
+	mov.f32 	%f98, %f6;
+	mov.f32 	%f99, 0f00000000;    	// 0
+	mov.f32 	%f100, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f101,%f102,%f103,%f104},[texSrc,{%f97,%f98,%f99,%f100}];
+	mov.f32 	%f105, %f101;
+	mov.f32 	%f106, 0f40000000;   	// 2
+	add.f32 	%f107, %f3, %f106;
+	mov.f32 	%f108, %f6;
+	mov.f32 	%f109, 0f00000000;   	// 0
+	mov.f32 	%f110, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f111,%f112,%f113,%f114},[texSrc,{%f107,%f108,%f109,%f110}];
+	mov.f32 	%f115, %f111;
+	mov.f32 	%f116, 0f40400000;   	// 3
+	add.f32 	%f117, %f3, %f116;
+	mov.f32 	%f118, %f6;
+	mov.f32 	%f119, 0f00000000;   	// 0
+	mov.f32 	%f120, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f121,%f122,%f123,%f124},[texSrc,{%f117,%f118,%f119,%f120}];
+	mov.f32 	%f125, %f121;
+	mov.f32 	%f126, 0f40800000;   	// 4
+	add.f32 	%f127, %f3, %f126;
+	mov.f32 	%f128, %f6;
+	mov.f32 	%f129, 0f00000000;   	// 0
+	mov.f32 	%f130, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f131,%f132,%f133,%f134},[texSrc,{%f127,%f128,%f129,%f130}];
+	mov.f32 	%f135, %f131;
+	mov.f32 	%f136, 0f40a00000;   	// 5
+	add.f32 	%f137, %f3, %f136;
+	mov.f32 	%f138, %f6;
+	mov.f32 	%f139, 0f00000000;   	// 0
+	mov.f32 	%f140, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f141,%f142,%f143,%f144},[texSrc,{%f137,%f138,%f139,%f140}];
+	mov.f32 	%f145, %f141;
+	mov.f32 	%f146, 0f40c00000;   	// 6
+	add.f32 	%f147, %f3, %f146;
+	mov.f32 	%f148, %f6;
+	mov.f32 	%f149, 0f00000000;   	// 0
+	mov.f32 	%f150, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f151,%f152,%f153,%f154},[texSrc,{%f147,%f148,%f149,%f150}];
+	mov.f32 	%f155, %f151;
+	mov.f32 	%f156, 0f40e00000;   	// 7
+	add.f32 	%f157, %f3, %f156;
+	mov.f32 	%f158, %f6;
+	mov.f32 	%f159, 0f00000000;   	// 0
+	mov.f32 	%f160, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f161,%f162,%f163,%f164},[texSrc,{%f157,%f158,%f159,%f160}];
+	mov.f32 	%f165, %f161;
+	mov.f32 	%f166, 0f41000000;   	// 8
+	add.f32 	%f167, %f3, %f166;
+	mov.f32 	%f168, %f6;
+	mov.f32 	%f169, 0f00000000;   	// 0
+	mov.f32 	%f170, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f171,%f172,%f173,%f174},[texSrc,{%f167,%f168,%f169,%f170}];
+	mov.f32 	%f175, %f171;
+	ld.const.f32 	%f176, [c_Kernel+0];
+	mul.f32 	%f177, %f176, %f175;
+	ld.const.f32 	%f178, [c_Kernel+4];
+	mad.f32 	%f179, %f178, %f165, %f177;
+	ld.const.f32 	%f180, [c_Kernel+8];
+	mad.f32 	%f181, %f180, %f155, %f179;
+	ld.const.f32 	%f182, [c_Kernel+12];
+	mad.f32 	%f183, %f182, %f145, %f181;
+	ld.const.f32 	%f184, [c_Kernel+16];
+	mad.f32 	%f185, %f184, %f135, %f183;
+	ld.const.f32 	%f186, [c_Kernel+20];
+	mad.f32 	%f187, %f186, %f125, %f185;
+	ld.const.f32 	%f188, [c_Kernel+24];
+	mad.f32 	%f189, %f188, %f115, %f187;
+	ld.const.f32 	%f190, [c_Kernel+28];
+	mad.f32 	%f191, %f190, %f105, %f189;
+	ld.const.f32 	%f192, [c_Kernel+32];
+	mad.f32 	%f193, %f192, %f95, %f191;
+	ld.const.f32 	%f194, [c_Kernel+36];
+	mad.f32 	%f195, %f194, %f86, %f193;
+	ld.const.f32 	%f196, [c_Kernel+40];
+	mad.f32 	%f197, %f196, %f76, %f195;
+	ld.const.f32 	%f198, [c_Kernel+44];
+	mad.f32 	%f199, %f198, %f66, %f197;
+	.loc	16	118	0
+	ld.const.f32 	%f200, [c_Kernel+48];
+	mad.f32 	%f201, %f200, %f56, %f199;
+	ld.const.f32 	%f202, [c_Kernel+52];
+	mad.f32 	%f203, %f202, %f46, %f201;
+	ld.const.f32 	%f204, [c_Kernel+56];
+	mad.f32 	%f205, %f204, %f36, %f203;
+	ld.const.f32 	%f206, [c_Kernel+60];
+	mad.f32 	%f207, %f206, %f26, %f205;
+	ld.const.f32 	%f208, [c_Kernel+64];
+	mad.f32 	%f209, %f208, %f16, %f207;
+	ld.param.u32 	%r19, [__cudaparm__Z21convolutionRowsKernelPfii_d_Dst];
+	.loc	16	99	0
+	ld.param.s32 	%r11, [__cudaparm__Z21convolutionRowsKernelPfii_imageW];
+	.loc	16	118	0
+	mul24.lo.s32 	%r20, %r10, %r11;
+	add.s32 	%r21, %r8, %r20;
+	mul.lo.u32 	%r22, %r21, 4;
+	add.u32 	%r23, %r19, %r22;
+	st.global.f32 	[%r23+0], %f209;
+$LBB21__Z21convolutionRowsKernelPfii:
+	.loc	16	119	0
+	exit;
+$LDWend__Z21convolutionRowsKernelPfii:
+	} // _Z21convolutionRowsKernelPfii
+
+	.entry _Z24convolutionColumnsKernelPfii (
+		.param .u32 __cudaparm__Z24convolutionColumnsKernelPfii_d_Dst,
+		.param .s32 __cudaparm__Z24convolutionColumnsKernelPfii_imageW,
+		.param .s32 __cudaparm__Z24convolutionColumnsKernelPfii_imageH)
+	{
+	.reg .u32 %r<25>;
+	.reg .f32 %f<211>;
+	.reg .pred %p<3>;
+	.loc	16	150	0
+$LDWbegin__Z24convolutionColumnsKernelPfii:
+	cvt.s32.u16 	%r1, %ntid.x;
+	cvt.s32.u16 	%r2, %ctaid.x;
+	mul24.lo.s32 	%r3, %r1, %r2;
+	cvt.s32.u16 	%r4, %ntid.y;
+	cvt.s32.u16 	%r5, %ctaid.y;
+	mul24.lo.s32 	%r6, %r4, %r5;
+	cvt.u32.u16 	%r7, %tid.x;
+	add.u32 	%r8, %r3, %r7;
+	cvt.u32.u16 	%r9, %tid.y;
+	add.u32 	%r10, %r6, %r9;
+	ld.param.s32 	%r11, [__cudaparm__Z24convolutionColumnsKernelPfii_imageW];
+	ld.param.s32 	%r12, [__cudaparm__Z24convolutionColumnsKernelPfii_imageH];
+	set.le.u32.s32 	%r13, %r12, %r10;
+	neg.s32 	%r14, %r13;
+	set.le.u32.s32 	%r15, %r11, %r8;
+	neg.s32 	%r16, %r15;
+	or.b32 	%r17, %r14, %r16;
+	mov.u32 	%r18, 0;
+	setp.eq.s32 	%p1, %r17, %r18;
+	@%p1 bra 	$Lt_1_1282;
+	bra.uni 	$LBB21__Z24convolutionColumnsKernelPfii;
+$Lt_1_1282:
+	.loc	16	163	0
+	cvt.rn.f32.s32 	%f1, %r10;
+	cvt.rn.f32.s32 	%f2, %r8;
+	mov.f32 	%f3, 0f3f000000;     	// 0.5
+	add.f32 	%f4, %f2, %f3;
+	mov.f32 	%f5, 0f3f000000;     	// 0.5
+	add.f32 	%f6, %f1, %f5;
+	mov.f32 	%f7, %f4;
+	mov.f32 	%f8, 0fc1000000;     	// -8
+	add.f32 	%f9, %f6, %f8;
+	mov.f32 	%f10, 0f00000000;    	// 0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f12,%f13,%f14,%f15},[texSrc,{%f7,%f9,%f10,%f11}];
+	.loc	16	82	0
+	mov.f32 	%f16, %f12;
+	mov.f32 	%f17, %f4;
+	mov.f32 	%f18, 0fc0e00000;    	// -7
+	add.f32 	%f19, %f6, %f18;
+	mov.f32 	%f20, 0f00000000;    	// 0
+	mov.f32 	%f21, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f22,%f23,%f24,%f25},[texSrc,{%f17,%f19,%f20,%f21}];
+	mov.f32 	%f26, %f22;
+	mov.f32 	%f27, %f4;
+	mov.f32 	%f28, 0fc0c00000;    	// -6
+	add.f32 	%f29, %f6, %f28;
+	mov.f32 	%f30, 0f00000000;    	// 0
+	mov.f32 	%f31, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f32,%f33,%f34,%f35},[texSrc,{%f27,%f29,%f30,%f31}];
+	mov.f32 	%f36, %f32;
+	mov.f32 	%f37, %f4;
+	mov.f32 	%f38, 0fc0a00000;    	// -5
+	add.f32 	%f39, %f6, %f38;
+	mov.f32 	%f40, 0f00000000;    	// 0
+	mov.f32 	%f41, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f42,%f43,%f44,%f45},[texSrc,{%f37,%f39,%f40,%f41}];
+	mov.f32 	%f46, %f42;
+	mov.f32 	%f47, %f4;
+	mov.f32 	%f48, 0fc0800000;    	// -4
+	add.f32 	%f49, %f6, %f48;
+	mov.f32 	%f50, 0f00000000;    	// 0
+	mov.f32 	%f51, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f52,%f53,%f54,%f55},[texSrc,{%f47,%f49,%f50,%f51}];
+	mov.f32 	%f56, %f52;
+	mov.f32 	%f57, %f4;
+	mov.f32 	%f58, 0fc0400000;    	// -3
+	add.f32 	%f59, %f6, %f58;
+	mov.f32 	%f60, 0f00000000;    	// 0
+	mov.f32 	%f61, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f62,%f63,%f64,%f65},[texSrc,{%f57,%f59,%f60,%f61}];
+	mov.f32 	%f66, %f62;
+	mov.f32 	%f67, %f4;
+	mov.f32 	%f68, 0fc0000000;    	// -2
+	add.f32 	%f69, %f6, %f68;
+	mov.f32 	%f70, 0f00000000;    	// 0
+	mov.f32 	%f71, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f72,%f73,%f74,%f75},[texSrc,{%f67,%f69,%f70,%f71}];
+	mov.f32 	%f76, %f72;
+	mov.f32 	%f77, %f4;
+	mov.f32 	%f78, 0fbf800000;    	// -1
+	add.f32 	%f79, %f6, %f78;
+	mov.f32 	%f80, 0f00000000;    	// 0
+	mov.f32 	%f81, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f82,%f83,%f84,%f85},[texSrc,{%f77,%f79,%f80,%f81}];
+	mov.f32 	%f86, %f82;
+	mov.f32 	%f87, %f4;
+	mov.f32 	%f88, %f6;
+	mov.f32 	%f89, 0f00000000;    	// 0
+	mov.f32 	%f90, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f91,%f92,%f93,%f94},[texSrc,{%f87,%f88,%f89,%f90}];
+	mov.f32 	%f95, %f91;
+	mov.f32 	%f96, %f4;
+	mov.f32 	%f97, 0f3f800000;    	// 1
+	add.f32 	%f98, %f6, %f97;
+	mov.f32 	%f99, 0f00000000;    	// 0
+	mov.f32 	%f100, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f101,%f102,%f103,%f104},[texSrc,{%f96,%f98,%f99,%f100}];
+	mov.f32 	%f105, %f101;
+	mov.f32 	%f106, %f4;
+	mov.f32 	%f107, 0f40000000;   	// 2
+	add.f32 	%f108, %f6, %f107;
+	mov.f32 	%f109, 0f00000000;   	// 0
+	mov.f32 	%f110, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f111,%f112,%f113,%f114},[texSrc,{%f106,%f108,%f109,%f110}];
+	mov.f32 	%f115, %f111;
+	mov.f32 	%f116, %f4;
+	mov.f32 	%f117, 0f40400000;   	// 3
+	add.f32 	%f118, %f6, %f117;
+	mov.f32 	%f119, 0f00000000;   	// 0
+	mov.f32 	%f120, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f121,%f122,%f123,%f124},[texSrc,{%f116,%f118,%f119,%f120}];
+	mov.f32 	%f125, %f121;
+	mov.f32 	%f126, %f4;
+	mov.f32 	%f127, 0f40800000;   	// 4
+	add.f32 	%f128, %f6, %f127;
+	mov.f32 	%f129, 0f00000000;   	// 0
+	mov.f32 	%f130, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f131,%f132,%f133,%f134},[texSrc,{%f126,%f128,%f129,%f130}];
+	mov.f32 	%f135, %f131;
+	mov.f32 	%f136, %f4;
+	mov.f32 	%f137, 0f40a00000;   	// 5
+	add.f32 	%f138, %f6, %f137;
+	mov.f32 	%f139, 0f00000000;   	// 0
+	mov.f32 	%f140, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f141,%f142,%f143,%f144},[texSrc,{%f136,%f138,%f139,%f140}];
+	mov.f32 	%f145, %f141;
+	mov.f32 	%f146, %f4;
+	mov.f32 	%f147, 0f40c00000;   	// 6
+	add.f32 	%f148, %f6, %f147;
+	mov.f32 	%f149, 0f00000000;   	// 0
+	mov.f32 	%f150, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f151,%f152,%f153,%f154},[texSrc,{%f146,%f148,%f149,%f150}];
+	mov.f32 	%f155, %f151;
+	mov.f32 	%f156, %f4;
+	mov.f32 	%f157, 0f40e00000;   	// 7
+	add.f32 	%f158, %f6, %f157;
+	mov.f32 	%f159, 0f00000000;   	// 0
+	mov.f32 	%f160, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f161,%f162,%f163,%f164},[texSrc,{%f156,%f158,%f159,%f160}];
+	mov.f32 	%f165, %f161;
+	mov.f32 	%f166, %f4;
+	mov.f32 	%f167, 0f41000000;   	// 8
+	add.f32 	%f168, %f6, %f167;
+	mov.f32 	%f169, 0f00000000;   	// 0
+	mov.f32 	%f170, 0f00000000;   	// 0
+	tex.2d.v4.f32.f32 {%f171,%f172,%f173,%f174},[texSrc,{%f166,%f168,%f169,%f170}];
+	mov.f32 	%f175, %f171;
+	ld.const.f32 	%f176, [c_Kernel+0];
+	mul.f32 	%f177, %f176, %f175;
+	ld.const.f32 	%f178, [c_Kernel+4];
+	mad.f32 	%f179, %f178, %f165, %f177;
+	ld.const.f32 	%f180, [c_Kernel+8];
+	mad.f32 	%f181, %f180, %f155, %f179;
+	ld.const.f32 	%f182, [c_Kernel+12];
+	mad.f32 	%f183, %f182, %f145, %f181;
+	ld.const.f32 	%f184, [c_Kernel+16];
+	mad.f32 	%f185, %f184, %f135, %f183;
+	ld.const.f32 	%f186, [c_Kernel+20];
+	mad.f32 	%f187, %f186, %f125, %f185;
+	ld.const.f32 	%f188, [c_Kernel+24];
+	mad.f32 	%f189, %f188, %f115, %f187;
+	ld.const.f32 	%f190, [c_Kernel+28];
+	mad.f32 	%f191, %f190, %f105, %f189;
+	ld.const.f32 	%f192, [c_Kernel+32];
+	mad.f32 	%f193, %f192, %f95, %f191;
+	ld.const.f32 	%f194, [c_Kernel+36];
+	mad.f32 	%f195, %f194, %f86, %f193;
+	ld.const.f32 	%f196, [c_Kernel+40];
+	mad.f32 	%f197, %f196, %f76, %f195;
+	ld.const.f32 	%f198, [c_Kernel+44];
+	mad.f32 	%f199, %f198, %f66, %f197;
+	.loc	16	169	0
+	ld.const.f32 	%f200, [c_Kernel+48];
+	mad.f32 	%f201, %f200, %f56, %f199;
+	ld.const.f32 	%f202, [c_Kernel+52];
+	mad.f32 	%f203, %f202, %f46, %f201;
+	ld.const.f32 	%f204, [c_Kernel+56];
+	mad.f32 	%f205, %f204, %f36, %f203;
+	ld.const.f32 	%f206, [c_Kernel+60];
+	mad.f32 	%f207, %f206, %f26, %f205;
+	ld.const.f32 	%f208, [c_Kernel+64];
+	mad.f32 	%f209, %f208, %f16, %f207;
+	ld.param.u32 	%r19, [__cudaparm__Z24convolutionColumnsKernelPfii_d_Dst];
+	.loc	16	150	0
+	ld.param.s32 	%r11, [__cudaparm__Z24convolutionColumnsKernelPfii_imageW];
+	.loc	16	169	0
+	mul24.lo.s32 	%r20, %r10, %r11;
+	add.s32 	%r21, %r8, %r20;
+	mul.lo.u32 	%r22, %r21, 4;
+	add.u32 	%r23, %r19, %r22;
+	st.global.f32 	[%r23+0], %f209;
+$LBB21__Z24convolutionColumnsKernelPfii:
+	.loc	16	170	0
+	exit;
+$LDWend__Z24convolutionColumnsKernelPfii:
+	} // _Z24convolutionColumnsKernelPfii
+

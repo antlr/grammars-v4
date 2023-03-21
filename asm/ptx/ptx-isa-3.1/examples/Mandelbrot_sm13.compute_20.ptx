@@ -1,0 +1,4910 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	.visible .func (.param .s32 __cudaretf__Z16CalcMandelbrotDSffffffib) _Z16CalcMandelbrotDSffffffib (.param .f32 __cudaparmf1__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf2__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf3__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf4__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf5__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf6__Z16CalcMandelbrotDSffffffib, .param .s32 __cudaparmf7__Z16CalcMandelbrotDSffffffib, .param .s32 __cudaparmf8__Z16CalcMandelbrotDSffffffib)
+
+	.visible .func (.param .s32 __cudaretf__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib) _Z14CalcMandelbrotIfEiT_S0_S0_S0_ib (.param .f32 __cudaparmf1__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf2__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf3__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf4__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .s32 __cudaparmf5__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .s32 __cudaparmf6__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib)
+
+	.visible .func (.param .s32 __cudaretf__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib) _Z14CalcMandelbrotIdEiT_S0_S0_S0_ib (.param .f64 __cudaparmf1__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf2__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf3__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf4__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .s32 __cudaparmf5__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .s32 __cudaparmf6__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib)
+
+	//-----------------------------------------------------------
+	// Compiling Mandelbrot_sm13.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a06620)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"Mandelbrot_sm13.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\mandelbrot\Mandelbrot_kernel.cu"
+	.file	17	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/Mandelbrot/Mandelbrot_sm13.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.global .u32 blockCounter;
+
+	.visible .func (.param .s32 __cudaretf__Z16CalcMandelbrotDSffffffib) _Z16CalcMandelbrotDSffffffib (.param .f32 __cudaparmf1__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf2__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf3__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf4__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf5__Z16CalcMandelbrotDSffffffib, .param .f32 __cudaparmf6__Z16CalcMandelbrotDSffffffib, .param .s32 __cudaparmf7__Z16CalcMandelbrotDSffffffib, .param .s32 __cudaparmf8__Z16CalcMandelbrotDSffffffib)
+	{
+	.reg .u32 %r<11>;
+	.reg .f32 %f<211>;
+	.reg .pred %p<7>;
+	.loc	16	372	0
+$LDWbegin__Z16CalcMandelbrotDSffffffib:
+	ld.param.f32 	%f1, [__cudaparmf1__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf2__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf3__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f6, %f5;
+	ld.param.f32 	%f7, [__cudaparmf4__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f8, %f7;
+	ld.param.f32 	%f9, [__cudaparmf5__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f10, %f9;
+	ld.param.f32 	%f11, [__cudaparmf6__Z16CalcMandelbrotDSffffffib];
+	mov.f32 	%f12, %f11;
+	ld.param.u32 	%r1, [__cudaparmf7__Z16CalcMandelbrotDSffffffib];
+	mov.s32 	%r2, %r1;
+	ld.param.u32 	%r3, [__cudaparmf8__Z16CalcMandelbrotDSffffffib];
+	cvt.s8.s32 	%r4, %r3;
+	mov.u32 	%r5, 0;
+	setp.eq.s32 	%p1, %r4, %r5;
+	@%p1 bra 	$Lt_0_3842;
+	.loc	16	382	0
+	mov.f32 	%f13, %f10;
+	.loc	16	384	0
+	mov.f32 	%f14, %f12;
+	.loc	16	386	0
+	mov.f32 	%f15, %f6;
+	.loc	16	387	0
+	mov.f32 	%f16, %f8;
+	.loc	16	388	0
+	mov.f32 	%f17, %f2;
+	.loc	16	389	0
+	mov.f32 	%f18, %f4;
+	.loc	16	390	0
+	mul.f32 	%f19, %f6, %f8;
+	mul.f32 	%f20, %f6, %f6;
+	mov.f32 	%f21, 0f46000400;    	// 8193
+	mul.f32 	%f22, %f6, %f21;
+	fma.rn.f32 	%f23, %f6, %f8, %f19;
+	sub.f32 	%f24, %f22, %f6;
+	add.f32 	%f25, %f20, %f23;
+	sub.f32 	%f26, %f22, %f24;
+	sub.f32 	%f27, %f25, %f20;
+	mul.f32 	%f28, %f26, %f26;
+	sub.f32 	%f29, %f28, %f20;
+	sub.f32 	%f30, %f6, %f26;
+	sub.f32 	%f31, %f23, %f27;
+	sub.f32 	%f32, %f25, %f27;
+	fma.rn.f32 	%f33, %f26, %f30, %f29;
+	sub.f32 	%f34, %f20, %f32;
+	fma.rn.f32 	%f35, %f26, %f30, %f33;
+	add.f32 	%f36, %f31, %f34;
+	fma.rn.f32 	%f37, %f30, %f30, %f35;
+	add.f32 	%f38, %f36, %f37;
+	fma.rn.f32 	%f39, %f8, %f8, %f38;
+	add.f32 	%f40, %f25, %f39;
+	mov.f32 	%f41, %f40;
+	sub.f32 	%f42, %f40, %f25;
+	sub.f32 	%f43, %f39, %f42;
+	.loc	16	391	0
+	mul.f32 	%f44, %f2, %f4;
+	mul.f32 	%f45, %f2, %f2;
+	mov.f32 	%f46, 0f46000400;    	// 8193
+	mul.f32 	%f47, %f2, %f46;
+	fma.rn.f32 	%f48, %f2, %f4, %f44;
+	sub.f32 	%f49, %f47, %f2;
+	add.f32 	%f50, %f45, %f48;
+	sub.f32 	%f51, %f47, %f49;
+	sub.f32 	%f52, %f50, %f45;
+	mul.f32 	%f53, %f51, %f51;
+	sub.f32 	%f54, %f53, %f45;
+	sub.f32 	%f55, %f2, %f51;
+	sub.f32 	%f56, %f48, %f52;
+	sub.f32 	%f57, %f50, %f52;
+	fma.rn.f32 	%f58, %f51, %f55, %f54;
+	sub.f32 	%f59, %f45, %f57;
+	fma.rn.f32 	%f60, %f51, %f55, %f58;
+	add.f32 	%f61, %f56, %f59;
+	fma.rn.f32 	%f62, %f55, %f55, %f60;
+	add.f32 	%f63, %f61, %f62;
+	fma.rn.f32 	%f64, %f4, %f4, %f63;
+	add.f32 	%f65, %f50, %f64;
+	mov.f32 	%f66, %f65;
+	sub.f32 	%f67, %f65, %f50;
+	sub.f32 	%f68, %f64, %f67;
+	mov.f32 	%f69, 0f00000000;    	// 0
+	mov.f32 	%f70, 0f00000000;    	// 0
+	bra.uni 	$Lt_0_3586;
+$Lt_0_3842:
+	.loc	16	394	0
+	mov.f32 	%f13, %f2;
+	.loc	16	395	0
+	mov.f32 	%f70, %f4;
+	.loc	16	396	0
+	mov.f32 	%f14, %f6;
+	.loc	16	397	0
+	mov.f32 	%f69, %f8;
+	.loc	16	405	0
+	mov.f32 	%f68, 0f00000000;    	// 0
+	mov.f32 	%f66, 0f00000000;    	// 0
+	mov.f32 	%f43, 0f00000000;    	// 0
+	mov.f32 	%f41, 0f00000000;    	// 0
+	mov.f32 	%f18, 0f00000000;    	// 0
+	mov.f32 	%f17, 0f00000000;    	// 0
+	mov.f32 	%f16, 0f00000000;    	// 0
+	mov.f32 	%f15, 0f00000000;    	// 0
+$Lt_0_3586:
+	.loc	16	409	0
+	sub.s32 	%r6, %r2, 1;
+	mov.u32 	%r7, 1;
+	setp.eq.s32 	%p2, %r2, %r7;
+	@%p2 bra 	$Lt_0_4098;
+	add.f32 	%f71, %f66, %f41;
+	sub.f32 	%f72, %f71, %f66;
+	sub.f32 	%f73, %f71, %f72;
+	sub.f32 	%f74, %f41, %f72;
+	sub.f32 	%f75, %f66, %f73;
+	add.f32 	%f76, %f74, %f75;
+	add.f32 	%f77, %f76, %f68;
+	add.f32 	%f78, %f77, %f43;
+	add.f32 	%f79, %f71, %f78;
+	sub.f32 	%f80, %f79, %f71;
+	sub.f32 	%f81, %f78, %f80;
+	add.f32 	%f82, %f79, %f81;
+	mov.f32 	%f83, 0f40800000;    	// 4
+	setp.lt.f32 	%p3, %f82, %f83;
+	@!%p3 bra 	$Lt_0_4098;
+	mov.f32 	%f84, 0f46000400;    	// 8193
+	mul.f32 	%f85, %f17, %f84;
+	mov.f32 	%f86, 0f46000400;    	// 8193
+	mul.f32 	%f87, %f15, %f86;
+	sub.f32 	%f88, %f85, %f17;
+	sub.f32 	%f89, %f87, %f15;
+	sub.f32 	%f90, %f85, %f88;
+	sub.f32 	%f91, %f87, %f89;
+	sub.f32 	%f92, %f17, %f90;
+	sub.f32 	%f93, %f15, %f91;
+$L_0_2562:
+ //<loop> Loop body line 410
+	.loc	16	410	0
+	mul.f32 	%f94, %f18, %f15;
+	mul.f32 	%f95, %f17, %f15;
+	fma.rn.f32 	%f96, %f17, %f16, %f94;
+	add.f32 	%f97, %f95, %f96;
+	sub.f32 	%f98, %f97, %f95;
+	mul.f32 	%f99, %f90, %f91;
+	sub.f32 	%f100, %f99, %f95;
+	sub.f32 	%f101, %f96, %f98;
+	sub.f32 	%f102, %f97, %f98;
+	fma.rn.f32 	%f103, %f90, %f93, %f100;
+	sub.f32 	%f104, %f95, %f102;
+	fma.rn.f32 	%f105, %f91, %f92, %f103;
+	add.f32 	%f106, %f101, %f104;
+	fma.rn.f32 	%f107, %f92, %f93, %f105;
+	add.f32 	%f108, %f106, %f107;
+	fma.rn.f32 	%f109, %f18, %f16, %f108;
+	add.f32 	%f110, %f97, %f109;
+	sub.f32 	%f111, %f110, %f97;
+	sub.f32 	%f112, %f109, %f111;
+	.loc	16	411	0
+	add.f32 	%f113, %f110, %f110;
+	sub.f32 	%f114, %f113, %f110;
+	sub.f32 	%f115, %f110, %f114;
+	sub.f32 	%f116, %f113, %f114;
+	sub.f32 	%f117, %f110, %f116;
+	add.f32 	%f118, %f115, %f117;
+	add.f32 	%f119, %f118, %f112;
+	add.f32 	%f120, %f119, %f112;
+	add.f32 	%f121, %f113, %f120;
+	sub.f32 	%f122, %f121, %f113;
+	sub.f32 	%f123, %f120, %f122;
+	.loc	16	412	0
+	add.f32 	%f124, %f121, %f14;
+	sub.f32 	%f125, %f124, %f121;
+	sub.f32 	%f126, %f124, %f125;
+	sub.f32 	%f127, %f14, %f125;
+	sub.f32 	%f128, %f121, %f126;
+	add.f32 	%f129, %f127, %f128;
+	add.f32 	%f130, %f129, %f123;
+	add.f32 	%f131, %f130, %f69;
+	add.f32 	%f132, %f124, %f131;
+	mov.f32 	%f15, %f132;
+	sub.f32 	%f133, %f132, %f124;
+	sub.f32 	%f16, %f131, %f133;
+	.loc	16	415	0
+	sub.f32 	%f134, %f66, %f41;
+	sub.f32 	%f135, %f134, %f66;
+	sub.f32 	%f136, %f134, %f135;
+	add.f32 	%f137, %f135, %f41;
+	sub.f32 	%f138, %f66, %f136;
+	sub.f32 	%f139, %f138, %f137;
+	add.f32 	%f140, %f139, %f68;
+	sub.f32 	%f141, %f140, %f43;
+	add.f32 	%f142, %f134, %f141;
+	add.f32 	%f143, %f142, %f13;
+	sub.f32 	%f144, %f143, %f142;
+	sub.f32 	%f145, %f143, %f144;
+	sub.f32 	%f146, %f142, %f145;
+	sub.f32 	%f147, %f13, %f144;
+	add.f32 	%f148, %f146, %f147;
+	sub.f32 	%f149, %f142, %f134;
+	sub.f32 	%f150, %f141, %f149;
+	add.f32 	%f151, %f148, %f150;
+	add.f32 	%f152, %f70, %f151;
+	add.f32 	%f153, %f143, %f152;
+	mov.f32 	%f17, %f153;
+	sub.f32 	%f154, %f153, %f143;
+	sub.f32 	%f18, %f152, %f154;
+	.loc	16	417	0
+	mov.f32 	%f155, 0f46000400;   	// 8193
+	mul.f32 	%f156, %f132, %f155;
+	mul.f32 	%f157, %f132, %f16;
+	mul.f32 	%f158, %f132, %f132;
+	sub.f32 	%f159, %f156, %f132;
+	fma.rn.f32 	%f160, %f132, %f16, %f157;
+	sub.f32 	%f91, %f156, %f159;
+	add.f32 	%f161, %f158, %f160;
+	sub.f32 	%f93, %f132, %f91;
+	mul.f32 	%f162, %f91, %f91;
+	sub.f32 	%f163, %f162, %f158;
+	sub.f32 	%f164, %f161, %f158;
+	fma.rn.f32 	%f165, %f91, %f93, %f163;
+	sub.f32 	%f166, %f160, %f164;
+	sub.f32 	%f167, %f161, %f164;
+	fma.rn.f32 	%f168, %f91, %f93, %f165;
+	sub.f32 	%f169, %f158, %f167;
+	fma.rn.f32 	%f170, %f93, %f93, %f168;
+	add.f32 	%f171, %f166, %f169;
+	add.f32 	%f172, %f170, %f171;
+	fma.rn.f32 	%f173, %f16, %f16, %f172;
+	add.f32 	%f174, %f161, %f173;
+	mov.f32 	%f41, %f174;
+	sub.f32 	%f175, %f174, %f161;
+	sub.f32 	%f43, %f173, %f175;
+	.loc	16	418	0
+	mov.f32 	%f176, 0f46000400;   	// 8193
+	mul.f32 	%f177, %f153, %f176;
+	mul.f32 	%f178, %f153, %f18;
+	mul.f32 	%f179, %f153, %f153;
+	sub.f32 	%f180, %f177, %f153;
+	fma.rn.f32 	%f181, %f153, %f18, %f178;
+	sub.f32 	%f90, %f177, %f180;
+	add.f32 	%f182, %f179, %f181;
+	sub.f32 	%f92, %f153, %f90;
+	mul.f32 	%f183, %f90, %f90;
+	sub.f32 	%f184, %f183, %f179;
+	sub.f32 	%f185, %f182, %f179;
+	fma.rn.f32 	%f186, %f90, %f92, %f184;
+	sub.f32 	%f187, %f181, %f185;
+	sub.f32 	%f188, %f182, %f185;
+	fma.rn.f32 	%f189, %f90, %f92, %f186;
+	sub.f32 	%f190, %f179, %f188;
+	fma.rn.f32 	%f191, %f92, %f92, %f189;
+	add.f32 	%f192, %f187, %f190;
+	add.f32 	%f193, %f191, %f192;
+	fma.rn.f32 	%f194, %f18, %f18, %f193;
+	add.f32 	%f195, %f182, %f194;
+	mov.f32 	%f66, %f195;
+	sub.f32 	%f196, %f195, %f182;
+	sub.f32 	%f68, %f194, %f196;
+	.loc	16	419	0
+	add.f32 	%f197, %f174, %f195;
+	sub.f32 	%f198, %f197, %f195;
+	sub.f32 	%f199, %f174, %f198;
+	sub.f32 	%f200, %f197, %f198;
+	sub.f32 	%f201, %f195, %f200;
+	add.f32 	%f202, %f199, %f201;
+	add.f32 	%f203, %f68, %f202;
+	add.f32 	%f204, %f43, %f203;
+	add.f32 	%f205, %f197, %f204;
+	sub.f32 	%f206, %f205, %f197;
+	sub.f32 	%f207, %f204, %f206;
+	.loc	16	409	0
+	sub.s32 	%r6, %r6, 1;
+	mov.u32 	%r8, 0;
+	setp.eq.s32 	%p4, %r6, %r8;
+	@%p4 bra 	$Lt_0_4098;
+ //<loop> Part of loop body line 410, head labeled $L_0_2562
+	add.f32 	%f208, %f207, %f205;
+	mov.f32 	%f209, 0f40800000;   	// 4
+	setp.lt.f32 	%p5, %f208, %f209;
+	@%p5 bra 	$L_0_2562;
+$Lt_0_4098:
+$L_0_2818:
+	.loc	16	421	0
+	mov.s32 	%r9, %r6;
+	st.param.s32 	[__cudaretf__Z16CalcMandelbrotDSffffffib], %r9;
+	ret;
+$LDWend__Z16CalcMandelbrotDSffffffib:
+	} // _Z16CalcMandelbrotDSffffffib
+
+	.visible .func (.param .s32 __cudaretf__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib) _Z14CalcMandelbrotIfEiT_S0_S0_S0_ib (.param .f32 __cudaparmf1__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf2__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf3__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .f32 __cudaparmf4__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .s32 __cudaparmf5__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib, .param .s32 __cudaparmf6__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib)
+	{
+	.reg .u32 %r<11>;
+	.reg .f32 %f<117>;
+	.reg .pred %p<24>;
+	.loc	16	144	0
+$LDWbegin__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib:
+	ld.param.f32 	%f1, [__cudaparmf1__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf2__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf3__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	mov.f32 	%f6, %f5;
+	ld.param.f32 	%f7, [__cudaparmf4__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	mov.f32 	%f8, %f7;
+	ld.param.u32 	%r1, [__cudaparmf5__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	mov.s32 	%r2, %r1;
+	ld.param.u32 	%r3, [__cudaparmf6__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib];
+	cvt.s8.s32 	%r4, %r3;
+	.loc	16	146	0
+	mov.s32 	%r5, %r2;
+	mov.u32 	%r6, 0;
+	setp.eq.s32 	%p1, %r4, %r6;
+	@%p1 bra 	$Lt_1_18178;
+	.loc	16	151	0
+	mov.f32 	%f9, %f6;
+	.loc	16	152	0
+	mov.f32 	%f10, %f8;
+	.loc	16	153	0
+	mov.f32 	%f11, %f4;
+	.loc	16	154	0
+	mov.f32 	%f12, %f2;
+	.loc	16	155	0
+	mul.f32 	%f13, %f4, %f4;
+	.loc	16	156	0
+	mul.f32 	%f14, %f2, %f2;
+	bra.uni 	$Lt_1_17922;
+$Lt_1_18178:
+	.loc	16	160	0
+	mov.f32 	%f9, %f2;
+	.loc	16	161	0
+	mov.f32 	%f10, %f4;
+	.loc	16	165	0
+	mov.f32 	%f14, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f11, 0f00000000;    	// 0
+$Lt_1_17922:
+$Lt_1_12034:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f32 	%f15, %f14, %f13;
+	mov.f32 	%f16, 0f40800000;    	// 4
+	setp.gt.f32 	%p2, %f15, %f16;
+	@!%p2 bra 	$Lt_1_18434;
+	.loc	16	171	0
+	sub.s32 	%r7, %r5, 1;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_18434:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	172	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f18, %f17, %f17;
+	add.f32 	%f11, %f10, %f18;
+	.loc	16	173	0
+	sub.f32 	%f19, %f14, %f13;
+	add.f32 	%f12, %f9, %f19;
+	.loc	16	174	0
+	mul.f32 	%f20, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f22, %f21, %f20;
+	mov.f32 	%f23, 0f40800000;    	// 4
+	setp.gt.f32 	%p3, %f22, %f23;
+	@!%p3 bra 	$Lt_1_18946;
+	.loc	16	179	0
+	sub.s32 	%r7, %r5, 2;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_18946:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	180	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f24, %f17, %f17;
+	add.f32 	%f11, %f10, %f24;
+	.loc	16	181	0
+	sub.f32 	%f25, %f21, %f20;
+	add.f32 	%f12, %f9, %f25;
+	.loc	16	182	0
+	mul.f32 	%f26, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f27, %f21, %f26;
+	mov.f32 	%f28, 0f40800000;    	// 4
+	setp.gt.f32 	%p4, %f27, %f28;
+	@!%p4 bra 	$Lt_1_19458;
+	.loc	16	187	0
+	sub.s32 	%r7, %r5, 3;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_19458:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	188	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f29, %f17, %f17;
+	add.f32 	%f11, %f10, %f29;
+	.loc	16	189	0
+	sub.f32 	%f30, %f21, %f26;
+	add.f32 	%f12, %f9, %f30;
+	.loc	16	190	0
+	mul.f32 	%f31, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f32, %f21, %f31;
+	mov.f32 	%f33, 0f40800000;    	// 4
+	setp.gt.f32 	%p5, %f32, %f33;
+	@!%p5 bra 	$Lt_1_19970;
+	.loc	16	195	0
+	sub.s32 	%r7, %r5, 4;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_19970:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	196	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f34, %f17, %f17;
+	add.f32 	%f11, %f10, %f34;
+	.loc	16	197	0
+	sub.f32 	%f35, %f21, %f31;
+	add.f32 	%f12, %f9, %f35;
+	.loc	16	198	0
+	mul.f32 	%f36, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f37, %f21, %f36;
+	mov.f32 	%f38, 0f40800000;    	// 4
+	setp.gt.f32 	%p6, %f37, %f38;
+	@!%p6 bra 	$Lt_1_20482;
+	.loc	16	203	0
+	sub.s32 	%r7, %r5, 5;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_20482:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	204	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f39, %f17, %f17;
+	add.f32 	%f11, %f10, %f39;
+	.loc	16	205	0
+	sub.f32 	%f40, %f21, %f36;
+	add.f32 	%f12, %f9, %f40;
+	.loc	16	206	0
+	mul.f32 	%f41, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f42, %f21, %f41;
+	mov.f32 	%f43, 0f40800000;    	// 4
+	setp.gt.f32 	%p7, %f42, %f43;
+	@!%p7 bra 	$Lt_1_20994;
+	.loc	16	211	0
+	sub.s32 	%r7, %r5, 6;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_20994:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	212	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f44, %f17, %f17;
+	add.f32 	%f11, %f10, %f44;
+	.loc	16	213	0
+	sub.f32 	%f45, %f21, %f41;
+	add.f32 	%f12, %f9, %f45;
+	.loc	16	214	0
+	mul.f32 	%f46, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f47, %f21, %f46;
+	mov.f32 	%f48, 0f40800000;    	// 4
+	setp.gt.f32 	%p8, %f47, %f48;
+	@!%p8 bra 	$Lt_1_21506;
+	.loc	16	219	0
+	sub.s32 	%r7, %r5, 7;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_21506:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	220	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f49, %f17, %f17;
+	add.f32 	%f11, %f10, %f49;
+	.loc	16	221	0
+	sub.f32 	%f50, %f21, %f46;
+	add.f32 	%f12, %f9, %f50;
+	.loc	16	222	0
+	mul.f32 	%f51, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f52, %f21, %f51;
+	mov.f32 	%f53, 0f40800000;    	// 4
+	setp.gt.f32 	%p9, %f52, %f53;
+	@!%p9 bra 	$Lt_1_22018;
+	.loc	16	227	0
+	sub.s32 	%r7, %r5, 8;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_22018:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	228	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f54, %f17, %f17;
+	add.f32 	%f11, %f10, %f54;
+	.loc	16	229	0
+	sub.f32 	%f55, %f21, %f51;
+	add.f32 	%f12, %f9, %f55;
+	.loc	16	230	0
+	mul.f32 	%f56, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f57, %f21, %f56;
+	mov.f32 	%f58, 0f40800000;    	// 4
+	setp.gt.f32 	%p10, %f57, %f58;
+	@!%p10 bra 	$Lt_1_22530;
+	.loc	16	235	0
+	sub.s32 	%r7, %r5, 9;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_22530:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	236	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f59, %f17, %f17;
+	add.f32 	%f11, %f10, %f59;
+	.loc	16	237	0
+	sub.f32 	%f60, %f21, %f56;
+	add.f32 	%f12, %f9, %f60;
+	.loc	16	238	0
+	mul.f32 	%f61, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f62, %f21, %f61;
+	mov.f32 	%f63, 0f40800000;    	// 4
+	setp.gt.f32 	%p11, %f62, %f63;
+	@!%p11 bra 	$Lt_1_23042;
+	.loc	16	243	0
+	sub.s32 	%r7, %r5, 10;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_23042:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	244	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f64, %f17, %f17;
+	add.f32 	%f11, %f10, %f64;
+	.loc	16	245	0
+	sub.f32 	%f65, %f21, %f61;
+	add.f32 	%f12, %f9, %f65;
+	.loc	16	246	0
+	mul.f32 	%f66, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f67, %f21, %f66;
+	mov.f32 	%f68, 0f40800000;    	// 4
+	setp.gt.f32 	%p12, %f67, %f68;
+	@!%p12 bra 	$Lt_1_23554;
+	.loc	16	251	0
+	sub.s32 	%r7, %r5, 11;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_23554:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	252	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f69, %f17, %f17;
+	add.f32 	%f11, %f10, %f69;
+	.loc	16	253	0
+	sub.f32 	%f70, %f21, %f66;
+	add.f32 	%f12, %f9, %f70;
+	.loc	16	254	0
+	mul.f32 	%f71, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f72, %f21, %f71;
+	mov.f32 	%f73, 0f40800000;    	// 4
+	setp.gt.f32 	%p13, %f72, %f73;
+	@!%p13 bra 	$Lt_1_24066;
+	.loc	16	259	0
+	sub.s32 	%r7, %r5, 12;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_24066:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	260	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f74, %f17, %f17;
+	add.f32 	%f11, %f10, %f74;
+	.loc	16	261	0
+	sub.f32 	%f75, %f21, %f71;
+	add.f32 	%f12, %f9, %f75;
+	.loc	16	262	0
+	mul.f32 	%f76, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f77, %f21, %f76;
+	mov.f32 	%f78, 0f40800000;    	// 4
+	setp.gt.f32 	%p14, %f77, %f78;
+	@!%p14 bra 	$Lt_1_24578;
+	.loc	16	267	0
+	sub.s32 	%r7, %r5, 13;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_24578:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	268	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f79, %f17, %f17;
+	add.f32 	%f11, %f10, %f79;
+	.loc	16	269	0
+	sub.f32 	%f80, %f21, %f76;
+	add.f32 	%f12, %f9, %f80;
+	.loc	16	270	0
+	mul.f32 	%f81, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f82, %f21, %f81;
+	mov.f32 	%f83, 0f40800000;    	// 4
+	setp.gt.f32 	%p15, %f82, %f83;
+	@!%p15 bra 	$Lt_1_25090;
+	.loc	16	275	0
+	sub.s32 	%r7, %r5, 14;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_25090:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	276	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f84, %f17, %f17;
+	add.f32 	%f11, %f10, %f84;
+	.loc	16	277	0
+	sub.f32 	%f85, %f21, %f81;
+	add.f32 	%f12, %f9, %f85;
+	.loc	16	278	0
+	mul.f32 	%f86, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f87, %f21, %f86;
+	mov.f32 	%f88, 0f40800000;    	// 4
+	setp.gt.f32 	%p16, %f87, %f88;
+	@!%p16 bra 	$Lt_1_25602;
+	.loc	16	283	0
+	sub.s32 	%r7, %r5, 15;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_25602:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	284	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f89, %f17, %f17;
+	add.f32 	%f11, %f10, %f89;
+	.loc	16	285	0
+	sub.f32 	%f90, %f21, %f86;
+	add.f32 	%f12, %f9, %f90;
+	.loc	16	286	0
+	mul.f32 	%f91, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f92, %f21, %f91;
+	mov.f32 	%f93, 0f40800000;    	// 4
+	setp.gt.f32 	%p17, %f92, %f93;
+	@!%p17 bra 	$Lt_1_26114;
+	.loc	16	291	0
+	sub.s32 	%r7, %r5, 16;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_26114:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	292	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f94, %f17, %f17;
+	add.f32 	%f11, %f10, %f94;
+	.loc	16	293	0
+	sub.f32 	%f95, %f21, %f91;
+	add.f32 	%f12, %f9, %f95;
+	.loc	16	294	0
+	mul.f32 	%f96, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f97, %f21, %f96;
+	mov.f32 	%f98, 0f40800000;    	// 4
+	setp.gt.f32 	%p18, %f97, %f98;
+	@!%p18 bra 	$Lt_1_26626;
+	.loc	16	299	0
+	sub.s32 	%r7, %r5, 17;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_26626:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	300	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f99, %f17, %f17;
+	add.f32 	%f11, %f10, %f99;
+	.loc	16	301	0
+	sub.f32 	%f100, %f21, %f96;
+	add.f32 	%f12, %f9, %f100;
+	.loc	16	302	0
+	mul.f32 	%f101, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f102, %f21, %f101;
+	mov.f32 	%f103, 0f40800000;   	// 4
+	setp.gt.f32 	%p19, %f102, %f103;
+	@!%p19 bra 	$Lt_1_27138;
+	.loc	16	307	0
+	sub.s32 	%r7, %r5, 18;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_27138:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	308	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f104, %f17, %f17;
+	add.f32 	%f11, %f10, %f104;
+	.loc	16	309	0
+	sub.f32 	%f105, %f21, %f101;
+	add.f32 	%f12, %f9, %f105;
+	.loc	16	310	0
+	mul.f32 	%f106, %f11, %f11;
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f107, %f21, %f106;
+	mov.f32 	%f108, 0f40800000;   	// 4
+	setp.gt.f32 	%p20, %f107, %f108;
+	@!%p20 bra 	$Lt_1_27650;
+	.loc	16	315	0
+	sub.s32 	%r7, %r5, 19;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib;
+$Lt_1_27650:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	316	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f109, %f17, %f17;
+	add.f32 	%f11, %f10, %f109;
+	.loc	16	317	0
+	sub.f32 	%f110, %f21, %f106;
+	add.f32 	%f12, %f9, %f110;
+	.loc	16	318	0
+	mul.f32 	%f111, %f11, %f11;
+	.loc	16	322	0
+	sub.s32 	%r5, %r5, 20;
+	.loc	16	316	0
+	mov.u32 	%r8, 0;
+	setp.le.s32 	%p21, %r5, %r8;
+	@%p21 bra 	$L_1_17666;
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	mul.f32 	%f21, %f12, %f12;
+	add.f32 	%f112, %f21, %f111;
+	mov.f32 	%f113, 0f40800000;   	// 4
+	setp.gt.f32 	%p22, %f112, %f113;
+	@!%p22 bra 	$L_1_17410;
+$L_1_17666:
+	.loc	16	324	0
+	mov.s32 	%r7, %r5;
+$LBB46__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib:
+	mov.s32 	%r9, %r7;
+	st.param.s32 	[__cudaretf__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib], %r9;
+	ret;
+$L_1_17410:
+ //<loop> Part of loop body line 329, head labeled $Lt_1_17922
+	.loc	16	325	0
+	mul.f32 	%f17, %f12, %f11;
+	add.f32 	%f114, %f17, %f17;
+	add.f32 	%f11, %f10, %f114;
+	.loc	16	326	0
+	sub.f32 	%f115, %f21, %f111;
+	add.f32 	%f12, %f9, %f115;
+	.loc	16	327	0
+	mul.f32 	%f13, %f11, %f11;
+	.loc	16	328	0
+	mul.f32 	%f14, %f12, %f12;
+	.loc	16	325	0
+	bra.uni 	$Lt_1_12034;
+$LDWend__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib:
+	} // _Z14CalcMandelbrotIfEiT_S0_S0_S0_ib
+
+	.visible .func (.param .s32 __cudaretf__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib) _Z14CalcMandelbrotIdEiT_S0_S0_S0_ib (.param .f64 __cudaparmf1__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf2__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf3__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .f64 __cudaparmf4__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .s32 __cudaparmf5__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib, .param .s32 __cudaparmf6__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib)
+	{
+	.reg .u32 %r<11>;
+	.reg .f64 %fd<117>;
+	.reg .pred %p<24>;
+	.loc	16	144	0
+$LDWbegin__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib:
+	ld.param.f64 	%fd1, [__cudaparmf1__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	mov.f64 	%fd2, %fd1;
+	ld.param.f64 	%fd3, [__cudaparmf2__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	mov.f64 	%fd4, %fd3;
+	ld.param.f64 	%fd5, [__cudaparmf3__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	mov.f64 	%fd6, %fd5;
+	ld.param.f64 	%fd7, [__cudaparmf4__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	mov.f64 	%fd8, %fd7;
+	ld.param.u32 	%r1, [__cudaparmf5__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	mov.s32 	%r2, %r1;
+	ld.param.u32 	%r3, [__cudaparmf6__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib];
+	cvt.s8.s32 	%r4, %r3;
+	.loc	16	146	0
+	mov.s32 	%r5, %r2;
+	mov.u32 	%r6, 0;
+	setp.eq.s32 	%p1, %r4, %r6;
+	@%p1 bra 	$Lt_2_18178;
+	.loc	16	151	0
+	mov.f64 	%fd9, %fd6;
+	.loc	16	152	0
+	mov.f64 	%fd10, %fd8;
+	.loc	16	153	0
+	mov.f64 	%fd11, %fd4;
+	.loc	16	154	0
+	mov.f64 	%fd12, %fd2;
+	.loc	16	155	0
+	mul.f64 	%fd13, %fd4, %fd4;
+	.loc	16	156	0
+	mul.f64 	%fd14, %fd2, %fd2;
+	bra.uni 	$Lt_2_17922;
+$Lt_2_18178:
+	.loc	16	160	0
+	mov.f64 	%fd9, %fd2;
+	.loc	16	161	0
+	mov.f64 	%fd10, %fd4;
+	.loc	16	165	0
+	mov.f64 	%fd14, 0d0000000000000000;	// 0
+	mov.f64 	%fd13, 0d0000000000000000;	// 0
+	mov.f64 	%fd12, 0d0000000000000000;	// 0
+	mov.f64 	%fd11, 0d0000000000000000;	// 0
+$Lt_2_17922:
+$Lt_2_12034:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f64 	%fd15, %fd14, %fd13;
+	mov.f64 	%fd16, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p2, %fd15, %fd16;
+	@!%p2 bra 	$Lt_2_18434;
+	.loc	16	171	0
+	sub.s32 	%r7, %r5, 1;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_18434:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	172	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd18, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd18;
+	.loc	16	173	0
+	sub.f64 	%fd19, %fd14, %fd13;
+	add.f64 	%fd12, %fd9, %fd19;
+	.loc	16	174	0
+	mul.f64 	%fd20, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd22, %fd21, %fd20;
+	mov.f64 	%fd23, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p3, %fd22, %fd23;
+	@!%p3 bra 	$Lt_2_18946;
+	.loc	16	179	0
+	sub.s32 	%r7, %r5, 2;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_18946:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	180	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd24, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd24;
+	.loc	16	181	0
+	sub.f64 	%fd25, %fd21, %fd20;
+	add.f64 	%fd12, %fd9, %fd25;
+	.loc	16	182	0
+	mul.f64 	%fd26, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd27, %fd21, %fd26;
+	mov.f64 	%fd28, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p4, %fd27, %fd28;
+	@!%p4 bra 	$Lt_2_19458;
+	.loc	16	187	0
+	sub.s32 	%r7, %r5, 3;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_19458:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	188	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd29, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd29;
+	.loc	16	189	0
+	sub.f64 	%fd30, %fd21, %fd26;
+	add.f64 	%fd12, %fd9, %fd30;
+	.loc	16	190	0
+	mul.f64 	%fd31, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd32, %fd21, %fd31;
+	mov.f64 	%fd33, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p5, %fd32, %fd33;
+	@!%p5 bra 	$Lt_2_19970;
+	.loc	16	195	0
+	sub.s32 	%r7, %r5, 4;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_19970:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	196	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd34, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd34;
+	.loc	16	197	0
+	sub.f64 	%fd35, %fd21, %fd31;
+	add.f64 	%fd12, %fd9, %fd35;
+	.loc	16	198	0
+	mul.f64 	%fd36, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd37, %fd21, %fd36;
+	mov.f64 	%fd38, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p6, %fd37, %fd38;
+	@!%p6 bra 	$Lt_2_20482;
+	.loc	16	203	0
+	sub.s32 	%r7, %r5, 5;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_20482:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	204	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd39, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd39;
+	.loc	16	205	0
+	sub.f64 	%fd40, %fd21, %fd36;
+	add.f64 	%fd12, %fd9, %fd40;
+	.loc	16	206	0
+	mul.f64 	%fd41, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd42, %fd21, %fd41;
+	mov.f64 	%fd43, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p7, %fd42, %fd43;
+	@!%p7 bra 	$Lt_2_20994;
+	.loc	16	211	0
+	sub.s32 	%r7, %r5, 6;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_20994:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	212	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd44, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd44;
+	.loc	16	213	0
+	sub.f64 	%fd45, %fd21, %fd41;
+	add.f64 	%fd12, %fd9, %fd45;
+	.loc	16	214	0
+	mul.f64 	%fd46, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd47, %fd21, %fd46;
+	mov.f64 	%fd48, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p8, %fd47, %fd48;
+	@!%p8 bra 	$Lt_2_21506;
+	.loc	16	219	0
+	sub.s32 	%r7, %r5, 7;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_21506:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	220	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd49, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd49;
+	.loc	16	221	0
+	sub.f64 	%fd50, %fd21, %fd46;
+	add.f64 	%fd12, %fd9, %fd50;
+	.loc	16	222	0
+	mul.f64 	%fd51, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd52, %fd21, %fd51;
+	mov.f64 	%fd53, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p9, %fd52, %fd53;
+	@!%p9 bra 	$Lt_2_22018;
+	.loc	16	227	0
+	sub.s32 	%r7, %r5, 8;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_22018:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	228	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd54, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd54;
+	.loc	16	229	0
+	sub.f64 	%fd55, %fd21, %fd51;
+	add.f64 	%fd12, %fd9, %fd55;
+	.loc	16	230	0
+	mul.f64 	%fd56, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd57, %fd21, %fd56;
+	mov.f64 	%fd58, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p10, %fd57, %fd58;
+	@!%p10 bra 	$Lt_2_22530;
+	.loc	16	235	0
+	sub.s32 	%r7, %r5, 9;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_22530:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	236	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd59, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd59;
+	.loc	16	237	0
+	sub.f64 	%fd60, %fd21, %fd56;
+	add.f64 	%fd12, %fd9, %fd60;
+	.loc	16	238	0
+	mul.f64 	%fd61, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd62, %fd21, %fd61;
+	mov.f64 	%fd63, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p11, %fd62, %fd63;
+	@!%p11 bra 	$Lt_2_23042;
+	.loc	16	243	0
+	sub.s32 	%r7, %r5, 10;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_23042:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	244	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd64, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd64;
+	.loc	16	245	0
+	sub.f64 	%fd65, %fd21, %fd61;
+	add.f64 	%fd12, %fd9, %fd65;
+	.loc	16	246	0
+	mul.f64 	%fd66, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd67, %fd21, %fd66;
+	mov.f64 	%fd68, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p12, %fd67, %fd68;
+	@!%p12 bra 	$Lt_2_23554;
+	.loc	16	251	0
+	sub.s32 	%r7, %r5, 11;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_23554:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	252	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd69, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd69;
+	.loc	16	253	0
+	sub.f64 	%fd70, %fd21, %fd66;
+	add.f64 	%fd12, %fd9, %fd70;
+	.loc	16	254	0
+	mul.f64 	%fd71, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd72, %fd21, %fd71;
+	mov.f64 	%fd73, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p13, %fd72, %fd73;
+	@!%p13 bra 	$Lt_2_24066;
+	.loc	16	259	0
+	sub.s32 	%r7, %r5, 12;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_24066:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	260	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd74, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd74;
+	.loc	16	261	0
+	sub.f64 	%fd75, %fd21, %fd71;
+	add.f64 	%fd12, %fd9, %fd75;
+	.loc	16	262	0
+	mul.f64 	%fd76, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd77, %fd21, %fd76;
+	mov.f64 	%fd78, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p14, %fd77, %fd78;
+	@!%p14 bra 	$Lt_2_24578;
+	.loc	16	267	0
+	sub.s32 	%r7, %r5, 13;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_24578:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	268	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd79, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd79;
+	.loc	16	269	0
+	sub.f64 	%fd80, %fd21, %fd76;
+	add.f64 	%fd12, %fd9, %fd80;
+	.loc	16	270	0
+	mul.f64 	%fd81, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd82, %fd21, %fd81;
+	mov.f64 	%fd83, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p15, %fd82, %fd83;
+	@!%p15 bra 	$Lt_2_25090;
+	.loc	16	275	0
+	sub.s32 	%r7, %r5, 14;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_25090:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	276	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd84, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd84;
+	.loc	16	277	0
+	sub.f64 	%fd85, %fd21, %fd81;
+	add.f64 	%fd12, %fd9, %fd85;
+	.loc	16	278	0
+	mul.f64 	%fd86, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd87, %fd21, %fd86;
+	mov.f64 	%fd88, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p16, %fd87, %fd88;
+	@!%p16 bra 	$Lt_2_25602;
+	.loc	16	283	0
+	sub.s32 	%r7, %r5, 15;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_25602:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	284	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd89, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd89;
+	.loc	16	285	0
+	sub.f64 	%fd90, %fd21, %fd86;
+	add.f64 	%fd12, %fd9, %fd90;
+	.loc	16	286	0
+	mul.f64 	%fd91, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd92, %fd21, %fd91;
+	mov.f64 	%fd93, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p17, %fd92, %fd93;
+	@!%p17 bra 	$Lt_2_26114;
+	.loc	16	291	0
+	sub.s32 	%r7, %r5, 16;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_26114:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	292	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd94, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd94;
+	.loc	16	293	0
+	sub.f64 	%fd95, %fd21, %fd91;
+	add.f64 	%fd12, %fd9, %fd95;
+	.loc	16	294	0
+	mul.f64 	%fd96, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd97, %fd21, %fd96;
+	mov.f64 	%fd98, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p18, %fd97, %fd98;
+	@!%p18 bra 	$Lt_2_26626;
+	.loc	16	299	0
+	sub.s32 	%r7, %r5, 17;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_26626:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	300	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd99, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd99;
+	.loc	16	301	0
+	sub.f64 	%fd100, %fd21, %fd96;
+	add.f64 	%fd12, %fd9, %fd100;
+	.loc	16	302	0
+	mul.f64 	%fd101, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd102, %fd21, %fd101;
+	mov.f64 	%fd103, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p19, %fd102, %fd103;
+	@!%p19 bra 	$Lt_2_27138;
+	.loc	16	307	0
+	sub.s32 	%r7, %r5, 18;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_27138:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	308	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd104, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd104;
+	.loc	16	309	0
+	sub.f64 	%fd105, %fd21, %fd101;
+	add.f64 	%fd12, %fd9, %fd105;
+	.loc	16	310	0
+	mul.f64 	%fd106, %fd11, %fd11;
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd107, %fd21, %fd106;
+	mov.f64 	%fd108, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p20, %fd107, %fd108;
+	@!%p20 bra 	$Lt_2_27650;
+	.loc	16	315	0
+	sub.s32 	%r7, %r5, 19;
+	bra.uni 	$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib;
+$Lt_2_27650:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	316	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd109, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd109;
+	.loc	16	317	0
+	sub.f64 	%fd110, %fd21, %fd106;
+	add.f64 	%fd12, %fd9, %fd110;
+	.loc	16	318	0
+	mul.f64 	%fd111, %fd11, %fd11;
+	.loc	16	322	0
+	sub.s32 	%r5, %r5, 20;
+	.loc	16	316	0
+	mov.u32 	%r8, 0;
+	setp.le.s32 	%p21, %r5, %r8;
+	@%p21 bra 	$L_2_17666;
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	mul.f64 	%fd21, %fd12, %fd12;
+	add.f64 	%fd112, %fd21, %fd111;
+	mov.f64 	%fd113, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p22, %fd112, %fd113;
+	@!%p22 bra 	$L_2_17410;
+$L_2_17666:
+	.loc	16	324	0
+	mov.s32 	%r7, %r5;
+$LBB46__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib:
+	mov.s32 	%r9, %r7;
+	st.param.s32 	[__cudaretf__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib], %r9;
+	ret;
+$L_2_17410:
+ //<loop> Part of loop body line 329, head labeled $Lt_2_17922
+	.loc	16	325	0
+	mul.f64 	%fd17, %fd12, %fd11;
+	add.f64 	%fd114, %fd17, %fd17;
+	add.f64 	%fd11, %fd10, %fd114;
+	.loc	16	326	0
+	sub.f64 	%fd115, %fd21, %fd111;
+	add.f64 	%fd12, %fd9, %fd115;
+	.loc	16	327	0
+	mul.f64 	%fd13, %fd11, %fd11;
+	.loc	16	328	0
+	mul.f64 	%fd14, %fd12, %fd12;
+	.loc	16	325	0
+	bra.uni 	$Lt_2_12034;
+$LDWend__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib:
+	} // _Z14CalcMandelbrotIdEiT_S0_S0_S0_ib
+
+	.entry _Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib (
+		.param .u32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_dst,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_imageW,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_imageH,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_crunch,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xOff0,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xOff1,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yOff0,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yOff1,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xJP,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yJP,
+		.param .f32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_colors[4],
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_frame,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_isJ)
+	{
+	.reg .u32 %r<86>;
+	.reg .f32 %f<228>;
+	.reg .pred %p<15>;
+	.shared .u32 __cuda_local_var_286804_41_blockIndex;
+	.shared .u32 __cuda_local_var_286805_41_blockX;
+	.shared .u32 __cuda_local_var_286805_49_blockY;
+	.loc	17	110	0
+$LDWbegin__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_numBlocks];
+$Lt_3_5890:
+ //<loop> Loop body line 116
+	.loc	17	116	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_3_9474;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	119	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286804_41_blockIndex], %r13;
+	.loc	17	120	0
+	ld.param.u32 	%r14, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286805_41_blockX], %r15;
+	.loc	17	121	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286805_49_blockY], %r16;
+$Lt_3_9474:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	124	0
+	bar.sync 	0;
+	.loc	17	127	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286804_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_3_258;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	ld.shared.u32 	%r18, [__cuda_local_var_286805_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286805_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_imageW];
+	ld.param.s32 	%r27, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_imageH];
+	set.gt.u32.s32 	%r28, %r27, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r26, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_3_5890;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	139	0
+	cvt.rn.f32.s32 	%f1, %r24;
+	ld.param.f32 	%f2, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_scale];
+	mul.f32 	%f3, %f1, %f2;
+	ld.param.f32 	%f4, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xOff0];
+	add.f32 	%f5, %f3, %f4;
+	sub.f32 	%f6, %f5, %f3;
+	sub.f32 	%f7, %f4, %f6;
+	sub.f32 	%f8, %f5, %f6;
+	sub.f32 	%f9, %f3, %f8;
+	add.f32 	%f10, %f7, %f9;
+	ld.param.f32 	%f11, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xOff1];
+	add.f32 	%f12, %f11, %f10;
+	add.f32 	%f13, %f5, %f12;
+	sub.f32 	%f14, %f13, %f5;
+	sub.f32 	%f15, %f12, %f14;
+	.loc	17	140	0
+	cvt.rn.f32.s32 	%f16, %r25;
+	mul.f32 	%f17, %f16, %f2;
+	ld.param.f32 	%f18, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yOff0];
+	add.f32 	%f19, %f17, %f18;
+	sub.f32 	%f20, %f19, %f17;
+	sub.f32 	%f21, %f18, %f20;
+	sub.f32 	%f22, %f19, %f20;
+	sub.f32 	%f23, %f17, %f22;
+	add.f32 	%f24, %f21, %f23;
+	ld.param.f32 	%f25, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yOff1];
+	add.f32 	%f26, %f25, %f24;
+	add.f32 	%f27, %f19, %f26;
+	sub.f32 	%f28, %f27, %f19;
+	sub.f32 	%f29, %f26, %f28;
+	.loc	17	143	0
+	ld.param.s8 	%r34, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_isJ];
+	mov.u32 	%r35, 0;
+	setp.eq.s32 	%p6, %r34, %r35;
+	@%p6 bra 	$Lt_3_10754;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	16	382	0
+	ld.param.f32 	%f30, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_xJP];
+	.loc	16	384	0
+	ld.param.f32 	%f31, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_yJP];
+	.loc	16	386	0
+	mov.f32 	%f32, %f27;
+	.loc	16	387	0
+	mov.f32 	%f33, %f29;
+	.loc	16	388	0
+	mov.f32 	%f34, %f13;
+	.loc	16	389	0
+	mov.f32 	%f35, %f15;
+	.loc	16	390	0
+	mov.f32 	%f36, 0f46000400;    	// 8193
+	mul.f32 	%f37, %f27, %f36;
+	sub.f32 	%f38, %f37, %f27;
+	sub.f32 	%f39, %f37, %f38;
+	sub.f32 	%f40, %f27, %f39;
+	mul.f32 	%f41, %f27, %f27;
+	mul.f32 	%f42, %f27, %f29;
+	fma.rn.f32 	%f43, %f27, %f29, %f42;
+	add.f32 	%f44, %f41, %f43;
+	mul.f32 	%f45, %f39, %f39;
+	sub.f32 	%f46, %f45, %f41;
+	sub.f32 	%f47, %f44, %f41;
+	fma.rn.f32 	%f48, %f39, %f40, %f46;
+	sub.f32 	%f49, %f44, %f47;
+	sub.f32 	%f50, %f43, %f47;
+	fma.rn.f32 	%f51, %f39, %f40, %f48;
+	sub.f32 	%f52, %f41, %f49;
+	fma.rn.f32 	%f53, %f40, %f40, %f51;
+	add.f32 	%f54, %f50, %f52;
+	add.f32 	%f55, %f53, %f54;
+	fma.rn.f32 	%f56, %f29, %f29, %f55;
+	add.f32 	%f57, %f44, %f56;
+	mov.f32 	%f58, %f57;
+	sub.f32 	%f59, %f57, %f44;
+	sub.f32 	%f60, %f56, %f59;
+	.loc	16	391	0
+	mov.f32 	%f61, 0f46000400;    	// 8193
+	mul.f32 	%f62, %f13, %f61;
+	sub.f32 	%f63, %f62, %f13;
+	sub.f32 	%f64, %f62, %f63;
+	sub.f32 	%f65, %f13, %f64;
+	mul.f32 	%f66, %f13, %f13;
+	mul.f32 	%f67, %f13, %f15;
+	fma.rn.f32 	%f68, %f13, %f15, %f67;
+	add.f32 	%f69, %f66, %f68;
+	mul.f32 	%f70, %f64, %f64;
+	sub.f32 	%f71, %f70, %f66;
+	sub.f32 	%f72, %f69, %f66;
+	fma.rn.f32 	%f73, %f64, %f65, %f71;
+	sub.f32 	%f74, %f69, %f72;
+	sub.f32 	%f75, %f68, %f72;
+	fma.rn.f32 	%f76, %f64, %f65, %f73;
+	sub.f32 	%f77, %f66, %f74;
+	fma.rn.f32 	%f78, %f65, %f65, %f76;
+	add.f32 	%f79, %f75, %f77;
+	add.f32 	%f80, %f78, %f79;
+	fma.rn.f32 	%f81, %f15, %f15, %f80;
+	add.f32 	%f82, %f69, %f81;
+	mov.f32 	%f83, %f82;
+	sub.f32 	%f84, %f82, %f69;
+	sub.f32 	%f85, %f81, %f84;
+	mov.f32 	%f86, 0f00000000;    	// 0
+	mov.f32 	%f87, 0f00000000;    	// 0
+	bra.uni 	$Lt_3_10498;
+$Lt_3_10754:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	16	394	0
+	mov.f32 	%f30, %f13;
+	.loc	16	395	0
+	mov.f32 	%f87, %f15;
+	.loc	16	396	0
+	mov.f32 	%f31, %f27;
+	.loc	16	397	0
+	mov.f32 	%f86, %f29;
+	.loc	16	405	0
+	mov.f32 	%f85, 0f00000000;    	// 0
+	mov.f32 	%f83, 0f00000000;    	// 0
+	mov.f32 	%f60, 0f00000000;    	// 0
+	mov.f32 	%f58, 0f00000000;    	// 0
+	mov.f32 	%f35, 0f00000000;    	// 0
+	mov.f32 	%f34, 0f00000000;    	// 0
+	mov.f32 	%f33, 0f00000000;    	// 0
+	mov.f32 	%f32, 0f00000000;    	// 0
+$Lt_3_10498:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	16	409	0
+	ld.param.s32 	%r36, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_crunch];
+	sub.s32 	%r37, %r36, 1;
+	mov.u32 	%r38, 1;
+	setp.eq.s32 	%p7, %r36, %r38;
+	@%p7 bra 	$Lt_3_12034;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	add.f32 	%f88, %f83, %f58;
+	sub.f32 	%f89, %f88, %f83;
+	sub.f32 	%f90, %f88, %f89;
+	sub.f32 	%f91, %f58, %f89;
+	sub.f32 	%f92, %f83, %f90;
+	add.f32 	%f93, %f91, %f92;
+	add.f32 	%f94, %f93, %f85;
+	add.f32 	%f95, %f94, %f60;
+	add.f32 	%f96, %f88, %f95;
+	sub.f32 	%f97, %f96, %f88;
+	sub.f32 	%f98, %f95, %f97;
+	add.f32 	%f99, %f96, %f98;
+	mov.f32 	%f100, 0f40800000;   	// 4
+	setp.lt.f32 	%p8, %f99, %f100;
+	@!%p8 bra 	$Lt_3_12034;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	mov.f32 	%f101, 0f46000400;   	// 8193
+	mul.f32 	%f102, %f34, %f101;
+	mov.f32 	%f103, 0f46000400;   	// 8193
+	mul.f32 	%f104, %f32, %f103;
+	sub.f32 	%f105, %f102, %f34;
+	sub.f32 	%f106, %f104, %f32;
+	sub.f32 	%f107, %f102, %f105;
+	sub.f32 	%f108, %f104, %f106;
+	sub.f32 	%f109, %f34, %f107;
+	sub.f32 	%f110, %f32, %f108;
+$L_3_8450:
+ //<loop> Loop body line 410
+	.loc	16	410	0
+	mul.f32 	%f111, %f35, %f32;
+	mul.f32 	%f112, %f34, %f32;
+	fma.rn.f32 	%f113, %f34, %f33, %f111;
+	add.f32 	%f114, %f112, %f113;
+	sub.f32 	%f115, %f114, %f112;
+	mul.f32 	%f116, %f107, %f108;
+	sub.f32 	%f117, %f116, %f112;
+	sub.f32 	%f118, %f113, %f115;
+	sub.f32 	%f119, %f114, %f115;
+	fma.rn.f32 	%f120, %f107, %f110, %f117;
+	sub.f32 	%f121, %f112, %f119;
+	fma.rn.f32 	%f122, %f108, %f109, %f120;
+	add.f32 	%f123, %f118, %f121;
+	fma.rn.f32 	%f124, %f109, %f110, %f122;
+	add.f32 	%f125, %f123, %f124;
+	fma.rn.f32 	%f126, %f35, %f33, %f125;
+	add.f32 	%f127, %f114, %f126;
+	sub.f32 	%f128, %f127, %f114;
+	sub.f32 	%f129, %f126, %f128;
+	.loc	16	411	0
+	add.f32 	%f130, %f127, %f127;
+	sub.f32 	%f131, %f130, %f127;
+	sub.f32 	%f132, %f127, %f131;
+	sub.f32 	%f133, %f130, %f131;
+	sub.f32 	%f134, %f127, %f133;
+	add.f32 	%f135, %f132, %f134;
+	add.f32 	%f136, %f135, %f129;
+	add.f32 	%f137, %f136, %f129;
+	add.f32 	%f138, %f130, %f137;
+	sub.f32 	%f139, %f138, %f130;
+	sub.f32 	%f140, %f137, %f139;
+	.loc	16	412	0
+	add.f32 	%f141, %f138, %f31;
+	sub.f32 	%f142, %f141, %f138;
+	sub.f32 	%f143, %f141, %f142;
+	sub.f32 	%f144, %f31, %f142;
+	sub.f32 	%f145, %f138, %f143;
+	add.f32 	%f146, %f144, %f145;
+	add.f32 	%f147, %f146, %f140;
+	add.f32 	%f148, %f147, %f86;
+	add.f32 	%f149, %f141, %f148;
+	mov.f32 	%f32, %f149;
+	sub.f32 	%f150, %f149, %f141;
+	sub.f32 	%f33, %f148, %f150;
+	.loc	16	415	0
+	sub.f32 	%f151, %f83, %f58;
+	sub.f32 	%f152, %f151, %f83;
+	sub.f32 	%f153, %f151, %f152;
+	add.f32 	%f154, %f152, %f58;
+	sub.f32 	%f155, %f83, %f153;
+	sub.f32 	%f156, %f155, %f154;
+	add.f32 	%f157, %f156, %f85;
+	sub.f32 	%f158, %f157, %f60;
+	add.f32 	%f159, %f151, %f158;
+	add.f32 	%f160, %f159, %f30;
+	sub.f32 	%f161, %f160, %f159;
+	sub.f32 	%f162, %f160, %f161;
+	sub.f32 	%f163, %f159, %f162;
+	sub.f32 	%f164, %f30, %f161;
+	add.f32 	%f165, %f163, %f164;
+	sub.f32 	%f166, %f159, %f151;
+	sub.f32 	%f167, %f158, %f166;
+	add.f32 	%f168, %f165, %f167;
+	add.f32 	%f169, %f87, %f168;
+	add.f32 	%f170, %f160, %f169;
+	mov.f32 	%f34, %f170;
+	sub.f32 	%f171, %f170, %f160;
+	sub.f32 	%f35, %f169, %f171;
+	.loc	16	417	0
+	mov.f32 	%f172, 0f46000400;   	// 8193
+	mul.f32 	%f173, %f149, %f172;
+	mul.f32 	%f174, %f149, %f33;
+	mul.f32 	%f175, %f149, %f149;
+	sub.f32 	%f176, %f173, %f149;
+	fma.rn.f32 	%f177, %f149, %f33, %f174;
+	sub.f32 	%f108, %f173, %f176;
+	add.f32 	%f178, %f175, %f177;
+	sub.f32 	%f110, %f149, %f108;
+	mul.f32 	%f179, %f108, %f108;
+	sub.f32 	%f180, %f179, %f175;
+	sub.f32 	%f181, %f178, %f175;
+	fma.rn.f32 	%f182, %f108, %f110, %f180;
+	sub.f32 	%f183, %f177, %f181;
+	sub.f32 	%f184, %f178, %f181;
+	fma.rn.f32 	%f185, %f108, %f110, %f182;
+	sub.f32 	%f186, %f175, %f184;
+	fma.rn.f32 	%f187, %f110, %f110, %f185;
+	add.f32 	%f188, %f183, %f186;
+	add.f32 	%f189, %f187, %f188;
+	fma.rn.f32 	%f190, %f33, %f33, %f189;
+	add.f32 	%f191, %f178, %f190;
+	mov.f32 	%f58, %f191;
+	sub.f32 	%f192, %f191, %f178;
+	sub.f32 	%f60, %f190, %f192;
+	.loc	16	418	0
+	mov.f32 	%f193, 0f46000400;   	// 8193
+	mul.f32 	%f194, %f170, %f193;
+	mul.f32 	%f195, %f170, %f35;
+	mul.f32 	%f196, %f170, %f170;
+	sub.f32 	%f197, %f194, %f170;
+	fma.rn.f32 	%f198, %f170, %f35, %f195;
+	sub.f32 	%f107, %f194, %f197;
+	add.f32 	%f199, %f196, %f198;
+	sub.f32 	%f109, %f170, %f107;
+	mul.f32 	%f200, %f107, %f107;
+	sub.f32 	%f201, %f200, %f196;
+	sub.f32 	%f202, %f199, %f196;
+	fma.rn.f32 	%f203, %f107, %f109, %f201;
+	sub.f32 	%f204, %f198, %f202;
+	sub.f32 	%f205, %f199, %f202;
+	fma.rn.f32 	%f206, %f107, %f109, %f203;
+	sub.f32 	%f207, %f196, %f205;
+	fma.rn.f32 	%f208, %f109, %f109, %f206;
+	add.f32 	%f209, %f204, %f207;
+	add.f32 	%f210, %f208, %f209;
+	fma.rn.f32 	%f211, %f35, %f35, %f210;
+	add.f32 	%f212, %f199, %f211;
+	mov.f32 	%f83, %f212;
+	sub.f32 	%f213, %f212, %f199;
+	sub.f32 	%f85, %f211, %f213;
+	.loc	16	419	0
+	add.f32 	%f214, %f191, %f212;
+	sub.f32 	%f215, %f214, %f212;
+	sub.f32 	%f216, %f191, %f215;
+	sub.f32 	%f217, %f214, %f215;
+	sub.f32 	%f218, %f212, %f217;
+	add.f32 	%f219, %f216, %f218;
+	add.f32 	%f220, %f85, %f219;
+	add.f32 	%f221, %f60, %f220;
+	add.f32 	%f222, %f214, %f221;
+	sub.f32 	%f223, %f222, %f214;
+	sub.f32 	%f224, %f221, %f223;
+	.loc	16	409	0
+	sub.s32 	%r37, %r37, 1;
+	mov.u32 	%r39, 0;
+	setp.eq.s32 	%p9, %r37, %r39;
+	@%p9 bra 	$Lt_3_12034;
+ //<loop> Part of loop body line 410, head labeled $L_3_8450
+	add.f32 	%f225, %f224, %f222;
+	mov.f32 	%f226, 0f40800000;   	// 4
+	setp.lt.f32 	%p10, %f225, %f226;
+	@%p10 bra 	$L_3_8450;
+$Lt_3_12034:
+$L_3_8706:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	143	0
+	mov.s32 	%r40, 0;
+	setp.gt.s32 	%p11, %r37, %r40;
+	sub.s32 	%r41, %r36, %r37;
+	mov.s32 	%r42, 0;
+	selp.s32 	%r43, %r41, %r42, %p11;
+	mov.u32 	%r44, 0;
+	setp.eq.s32 	%p12, %r43, %r44;
+	@%p12 bra 	$Lt_3_11266;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	150	0
+	ld.param.s32 	%r45, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_animationFrame];
+	add.s32 	%r46, %r45, %r43;
+	ld.param.u8 	%r47, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_colors+0];
+	mul.lo.s32 	%r48, %r46, %r47;
+	cvt.u8.u32 	%r49, %r48;
+	.loc	17	151	0
+	ld.param.u8 	%r50, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_colors+1];
+	mul.lo.s32 	%r51, %r46, %r50;
+	cvt.u8.u32 	%r52, %r51;
+	.loc	17	152	0
+	ld.param.u8 	%r53, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_colors+2];
+	mul.lo.s32 	%r54, %r46, %r53;
+	cvt.u8.u32 	%r55, %r54;
+	bra.uni 	$Lt_3_11010;
+$Lt_3_11266:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	156	0
+	mov.u32 	%r55, 0;
+	mov.u32 	%r52, 0;
+	mov.u32 	%r49, 0;
+$Lt_3_11010:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	mul.lo.s32 	%r56, %r26, %r25;
+	add.s32 	%r57, %r56, %r24;
+	mul.lo.u32 	%r58, %r57, 4;
+	ld.param.u32 	%r59, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_dst];
+	add.u32 	%r60, %r59, %r58;
+	ld.param.s32 	%r61, [__cudaparm__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib_frame];
+	mov.u32 	%r62, 0;
+	setp.ne.s32 	%p13, %r61, %r62;
+	@%p13 bra 	$Lt_3_11778;
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	163	0
+	mov.u32 	%r63, 0;
+	st.global.v4.u8 	[%r60+0], {%r49,%r52,%r55,%r63};
+	bra.uni 	$Lt_3_5890;
+$Lt_3_11778:
+ //<loop> Part of loop body line 116, head labeled $Lt_3_5890
+	.loc	17	167	0
+	add.s32 	%r64, %r61, 1;
+	shr.s32 	%r65, %r64, 31;
+	mov.s32 	%r66, 1;
+	and.b32 	%r67, %r65, %r66;
+	add.s32 	%r68, %r67, %r64;
+	shr.s32 	%r69, %r68, 1;
+	ld.global.v4.u8 	{%r70,%r71,%r72,_}, [%r60+0];
+	mul.lo.s32 	%r73, %r61, %r70;
+	add.s32 	%r74, %r49, %r73;
+	add.s32 	%r75, %r69, %r74;
+	div.s32 	%r76, %r75, %r64;
+	.loc	17	168	0
+	mul.lo.s32 	%r77, %r61, %r71;
+	add.s32 	%r78, %r52, %r77;
+	add.s32 	%r79, %r69, %r78;
+	div.s32 	%r80, %r79, %r64;
+	st.global.v2.u8 	[%r60+0], {%r76,%r80};
+	.loc	17	169	0
+	mul.lo.s32 	%r81, %r61, %r72;
+	add.s32 	%r82, %r55, %r81;
+	add.s32 	%r83, %r69, %r82;
+	div.s32 	%r84, %r83, %r64;
+	st.global.u8 	[%r60+2], %r84;
+	bra.uni 	$Lt_3_5890;
+$Lt_3_258:
+	.loc	17	174	0
+	exit;
+$LDWend__Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib:
+	} // _Z18MandelbrotDS0_sm13P6uchar4iiifffffffS_iiiib
+
+	.entry _Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib (
+		.param .u32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_dst,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_imageW,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_imageH,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_crunch,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xOff0,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xOff1,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yOff0,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yOff1,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xJP,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yJP,
+		.param .f32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_colors[4],
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_frame,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_isJ)
+	{
+	.reg .u32 %r<175>;
+	.reg .f32 %f<228>;
+	.reg .pred %p<19>;
+	.shared .u32 __cuda_local_var_286950_41_blockIndex;
+	.shared .u32 __cuda_local_var_286951_41_blockX;
+	.shared .u32 __cuda_local_var_286951_49_blockY;
+	.loc	17	256	0
+$LDWbegin__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_numBlocks];
+$Lt_4_12034:
+ //<loop> Loop body line 262
+	.loc	17	262	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_4_16642;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	265	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286950_41_blockIndex], %r13;
+	.loc	17	266	0
+	ld.param.u32 	%r14, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286951_41_blockX], %r15;
+	.loc	17	267	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286951_49_blockY], %r16;
+$Lt_4_16642:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	270	0
+	bar.sync 	0;
+	.loc	17	273	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286950_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_4_258;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	ld.shared.u32 	%r18, [__cuda_local_var_286951_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286951_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_imageH];
+	ld.param.s32 	%r27, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_imageW];
+	set.gt.u32.s32 	%r28, %r26, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r27, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_4_12034;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	282	0
+	mul.lo.s32 	%r34, %r27, %r25;
+	add.s32 	%r35, %r34, %r24;
+	mul.lo.u32 	%r36, %r35, 4;
+	ld.param.u32 	%r37, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_dst];
+	add.u32 	%r38, %r36, %r37;
+	ld.global.v4.u8 	{%r39,%r40,%r41,_}, [%r38+0];
+	mov.u32 	%r42, 0;
+	setp.le.s32 	%p6, %r24, %r42;
+	@%p6 bra 	$Lt_4_17922;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	ld.global.v4.u8 	{%r43,%r44,%r45,_}, [%r38+-4];
+	.loc	17	287	0
+	sub.s32 	%r46, %r45, %r41;
+	abs.s32 	%r47, %r46;
+	mov.s32 	%r48, 10;
+	set.gt.u32.s32 	%r49, %r47, %r48;
+	neg.s32 	%r50, %r49;
+	sub.s32 	%r51, %r43, %r39;
+	abs.s32 	%r52, %r51;
+	mov.s32 	%r53, 10;
+	set.gt.u32.s32 	%r54, %r52, %r53;
+	neg.s32 	%r55, %r54;
+	sub.s32 	%r56, %r44, %r40;
+	abs.s32 	%r57, %r56;
+	mov.s32 	%r58, 10;
+	set.gt.u32.s32 	%r59, %r57, %r58;
+	neg.s32 	%r60, %r59;
+	or.b32 	%r61, %r55, %r60;
+	or.b32 	%r62, %r50, %r61;
+	bra.uni 	$Lt_4_17666;
+$Lt_4_17922:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	mov.s32 	%r62, 0;
+$Lt_4_17666:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	add.s32 	%r63, %r24, 1;
+	setp.le.s32 	%p7, %r27, %r63;
+	@%p7 bra 	$Lt_4_18178;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	ld.global.v4.u8 	{%r64,%r65,%r66,_}, [%r38+4];
+	.loc	17	289	0
+	sub.s32 	%r67, %r66, %r41;
+	abs.s32 	%r68, %r67;
+	mov.s32 	%r69, 10;
+	set.gt.u32.s32 	%r70, %r68, %r69;
+	neg.s32 	%r71, %r70;
+	sub.s32 	%r72, %r64, %r39;
+	abs.s32 	%r73, %r72;
+	mov.s32 	%r74, 10;
+	set.gt.u32.s32 	%r75, %r73, %r74;
+	neg.s32 	%r76, %r75;
+	sub.s32 	%r77, %r65, %r40;
+	abs.s32 	%r78, %r77;
+	mov.s32 	%r79, 10;
+	set.gt.u32.s32 	%r80, %r78, %r79;
+	neg.s32 	%r81, %r80;
+	or.b32 	%r82, %r76, %r81;
+	or.b32 	%r83, %r71, %r82;
+	add.s32 	%r62, %r62, %r83;
+$Lt_4_18178:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	mov.u32 	%r84, 0;
+	setp.le.s32 	%p8, %r25, %r84;
+	@%p8 bra 	$Lt_4_18690;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	291	0
+	sub.s32 	%r85, %r35, %r27;
+	mul.lo.u32 	%r86, %r85, 4;
+	add.u32 	%r87, %r86, %r37;
+	ld.global.v4.u8 	{%r88,%r89,%r90,_}, [%r87+0];
+	sub.s32 	%r91, %r90, %r41;
+	abs.s32 	%r92, %r91;
+	mov.s32 	%r93, 10;
+	set.gt.u32.s32 	%r94, %r92, %r93;
+	neg.s32 	%r95, %r94;
+	sub.s32 	%r96, %r88, %r39;
+	abs.s32 	%r97, %r96;
+	mov.s32 	%r98, 10;
+	set.gt.u32.s32 	%r99, %r97, %r98;
+	neg.s32 	%r100, %r99;
+	sub.s32 	%r101, %r89, %r40;
+	abs.s32 	%r102, %r101;
+	mov.s32 	%r103, 10;
+	set.gt.u32.s32 	%r104, %r102, %r103;
+	neg.s32 	%r105, %r104;
+	or.b32 	%r106, %r100, %r105;
+	or.b32 	%r107, %r95, %r106;
+	add.s32 	%r62, %r62, %r107;
+$Lt_4_18690:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	add.s32 	%r108, %r25, 1;
+	setp.le.s32 	%p9, %r26, %r108;
+	@%p9 bra 	$Lt_4_19202;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	293	0
+	add.s32 	%r109, %r35, %r27;
+	mul.lo.u32 	%r110, %r109, 4;
+	add.u32 	%r111, %r110, %r37;
+	ld.global.v4.u8 	{%r112,%r113,%r114,_}, [%r111+0];
+	sub.s32 	%r115, %r114, %r41;
+	abs.s32 	%r116, %r115;
+	mov.s32 	%r117, 10;
+	set.gt.u32.s32 	%r118, %r116, %r117;
+	neg.s32 	%r119, %r118;
+	sub.s32 	%r120, %r112, %r39;
+	abs.s32 	%r121, %r120;
+	mov.s32 	%r122, 10;
+	set.gt.u32.s32 	%r123, %r121, %r122;
+	neg.s32 	%r124, %r123;
+	sub.s32 	%r125, %r113, %r40;
+	abs.s32 	%r126, %r125;
+	mov.s32 	%r127, 10;
+	set.gt.u32.s32 	%r128, %r126, %r127;
+	neg.s32 	%r129, %r128;
+	or.b32 	%r130, %r124, %r129;
+	or.b32 	%r131, %r119, %r130;
+	add.s32 	%r62, %r62, %r131;
+$Lt_4_19202:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	mov.u32 	%r132, 0;
+	setp.eq.s32 	%p10, %r62, %r132;
+	@%p10 bra 	$Lt_4_12034;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	300	0
+	cvt.rn.f32.s32 	%f1, %r24;
+	ld.param.f32 	%f2, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_scale];
+	mul.f32 	%f3, %f1, %f2;
+	ld.param.f32 	%f4, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xOff0];
+	add.f32 	%f5, %f3, %f4;
+	sub.f32 	%f6, %f5, %f3;
+	sub.f32 	%f7, %f4, %f6;
+	sub.f32 	%f8, %f5, %f6;
+	sub.f32 	%f9, %f3, %f8;
+	add.f32 	%f10, %f7, %f9;
+	ld.param.f32 	%f11, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xOff1];
+	add.f32 	%f12, %f11, %f10;
+	add.f32 	%f13, %f5, %f12;
+	sub.f32 	%f14, %f13, %f5;
+	sub.f32 	%f15, %f12, %f14;
+	.loc	17	301	0
+	cvt.rn.f32.s32 	%f16, %r25;
+	mul.f32 	%f17, %f16, %f2;
+	ld.param.f32 	%f18, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yOff0];
+	add.f32 	%f19, %f17, %f18;
+	sub.f32 	%f20, %f19, %f17;
+	sub.f32 	%f21, %f18, %f20;
+	sub.f32 	%f22, %f19, %f20;
+	sub.f32 	%f23, %f17, %f22;
+	add.f32 	%f24, %f21, %f23;
+	ld.param.f32 	%f25, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yOff1];
+	add.f32 	%f26, %f25, %f24;
+	add.f32 	%f27, %f19, %f26;
+	sub.f32 	%f28, %f27, %f19;
+	sub.f32 	%f29, %f26, %f28;
+	.loc	17	304	0
+	ld.param.s8 	%r133, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_isJ];
+	mov.u32 	%r134, 0;
+	setp.eq.s32 	%p11, %r133, %r134;
+	@%p11 bra 	$Lt_4_20482;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	16	382	0
+	ld.param.f32 	%f30, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_xJP];
+	.loc	16	384	0
+	ld.param.f32 	%f31, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_yJP];
+	.loc	16	386	0
+	mov.f32 	%f32, %f27;
+	.loc	16	387	0
+	mov.f32 	%f33, %f29;
+	.loc	16	388	0
+	mov.f32 	%f34, %f13;
+	.loc	16	389	0
+	mov.f32 	%f35, %f15;
+	.loc	16	390	0
+	mov.f32 	%f36, 0f46000400;    	// 8193
+	mul.f32 	%f37, %f27, %f36;
+	sub.f32 	%f38, %f37, %f27;
+	sub.f32 	%f39, %f37, %f38;
+	sub.f32 	%f40, %f27, %f39;
+	mul.f32 	%f41, %f27, %f27;
+	mul.f32 	%f42, %f27, %f29;
+	fma.rn.f32 	%f43, %f27, %f29, %f42;
+	add.f32 	%f44, %f41, %f43;
+	mul.f32 	%f45, %f39, %f39;
+	sub.f32 	%f46, %f45, %f41;
+	sub.f32 	%f47, %f44, %f41;
+	fma.rn.f32 	%f48, %f39, %f40, %f46;
+	sub.f32 	%f49, %f44, %f47;
+	sub.f32 	%f50, %f43, %f47;
+	fma.rn.f32 	%f51, %f39, %f40, %f48;
+	sub.f32 	%f52, %f41, %f49;
+	fma.rn.f32 	%f53, %f40, %f40, %f51;
+	add.f32 	%f54, %f50, %f52;
+	add.f32 	%f55, %f53, %f54;
+	fma.rn.f32 	%f56, %f29, %f29, %f55;
+	add.f32 	%f57, %f44, %f56;
+	mov.f32 	%f58, %f57;
+	sub.f32 	%f59, %f57, %f44;
+	sub.f32 	%f60, %f56, %f59;
+	.loc	16	391	0
+	mov.f32 	%f61, 0f46000400;    	// 8193
+	mul.f32 	%f62, %f13, %f61;
+	sub.f32 	%f63, %f62, %f13;
+	sub.f32 	%f64, %f62, %f63;
+	sub.f32 	%f65, %f13, %f64;
+	mul.f32 	%f66, %f13, %f13;
+	mul.f32 	%f67, %f13, %f15;
+	fma.rn.f32 	%f68, %f13, %f15, %f67;
+	add.f32 	%f69, %f66, %f68;
+	mul.f32 	%f70, %f64, %f64;
+	sub.f32 	%f71, %f70, %f66;
+	sub.f32 	%f72, %f69, %f66;
+	fma.rn.f32 	%f73, %f64, %f65, %f71;
+	sub.f32 	%f74, %f69, %f72;
+	sub.f32 	%f75, %f68, %f72;
+	fma.rn.f32 	%f76, %f64, %f65, %f73;
+	sub.f32 	%f77, %f66, %f74;
+	fma.rn.f32 	%f78, %f65, %f65, %f76;
+	add.f32 	%f79, %f75, %f77;
+	add.f32 	%f80, %f78, %f79;
+	fma.rn.f32 	%f81, %f15, %f15, %f80;
+	add.f32 	%f82, %f69, %f81;
+	mov.f32 	%f83, %f82;
+	sub.f32 	%f84, %f82, %f69;
+	sub.f32 	%f85, %f81, %f84;
+	mov.f32 	%f86, 0f00000000;    	// 0
+	mov.f32 	%f87, 0f00000000;    	// 0
+	bra.uni 	$Lt_4_20226;
+$Lt_4_20482:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	16	394	0
+	mov.f32 	%f30, %f13;
+	.loc	16	395	0
+	mov.f32 	%f87, %f15;
+	.loc	16	396	0
+	mov.f32 	%f31, %f27;
+	.loc	16	397	0
+	mov.f32 	%f86, %f29;
+	.loc	16	405	0
+	mov.f32 	%f85, 0f00000000;    	// 0
+	mov.f32 	%f83, 0f00000000;    	// 0
+	mov.f32 	%f60, 0f00000000;    	// 0
+	mov.f32 	%f58, 0f00000000;    	// 0
+	mov.f32 	%f35, 0f00000000;    	// 0
+	mov.f32 	%f34, 0f00000000;    	// 0
+	mov.f32 	%f33, 0f00000000;    	// 0
+	mov.f32 	%f32, 0f00000000;    	// 0
+$Lt_4_20226:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	16	409	0
+	ld.param.s32 	%r135, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_crunch];
+	sub.s32 	%r136, %r135, 1;
+	mov.u32 	%r137, 1;
+	setp.eq.s32 	%p12, %r135, %r137;
+	@%p12 bra 	$Lt_4_21250;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	add.f32 	%f88, %f83, %f58;
+	sub.f32 	%f89, %f88, %f83;
+	sub.f32 	%f90, %f88, %f89;
+	sub.f32 	%f91, %f58, %f89;
+	sub.f32 	%f92, %f83, %f90;
+	add.f32 	%f93, %f91, %f92;
+	add.f32 	%f94, %f93, %f85;
+	add.f32 	%f95, %f94, %f60;
+	add.f32 	%f96, %f88, %f95;
+	sub.f32 	%f97, %f96, %f88;
+	sub.f32 	%f98, %f95, %f97;
+	add.f32 	%f99, %f96, %f98;
+	mov.f32 	%f100, 0f40800000;   	// 4
+	setp.lt.f32 	%p13, %f99, %f100;
+	@!%p13 bra 	$Lt_4_21250;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	mov.f32 	%f101, 0f46000400;   	// 8193
+	mul.f32 	%f102, %f34, %f101;
+	mov.f32 	%f103, 0f46000400;   	// 8193
+	mul.f32 	%f104, %f32, %f103;
+	sub.f32 	%f105, %f102, %f34;
+	sub.f32 	%f106, %f104, %f32;
+	sub.f32 	%f107, %f102, %f105;
+	sub.f32 	%f108, %f104, %f106;
+	sub.f32 	%f109, %f34, %f107;
+	sub.f32 	%f110, %f32, %f108;
+$L_4_15618:
+ //<loop> Loop body line 410
+	.loc	16	410	0
+	mul.f32 	%f111, %f35, %f32;
+	mul.f32 	%f112, %f34, %f32;
+	fma.rn.f32 	%f113, %f34, %f33, %f111;
+	add.f32 	%f114, %f112, %f113;
+	sub.f32 	%f115, %f114, %f112;
+	mul.f32 	%f116, %f107, %f108;
+	sub.f32 	%f117, %f116, %f112;
+	sub.f32 	%f118, %f113, %f115;
+	sub.f32 	%f119, %f114, %f115;
+	fma.rn.f32 	%f120, %f107, %f110, %f117;
+	sub.f32 	%f121, %f112, %f119;
+	fma.rn.f32 	%f122, %f108, %f109, %f120;
+	add.f32 	%f123, %f118, %f121;
+	fma.rn.f32 	%f124, %f109, %f110, %f122;
+	add.f32 	%f125, %f123, %f124;
+	fma.rn.f32 	%f126, %f35, %f33, %f125;
+	add.f32 	%f127, %f114, %f126;
+	sub.f32 	%f128, %f127, %f114;
+	sub.f32 	%f129, %f126, %f128;
+	.loc	16	411	0
+	add.f32 	%f130, %f127, %f127;
+	sub.f32 	%f131, %f130, %f127;
+	sub.f32 	%f132, %f127, %f131;
+	sub.f32 	%f133, %f130, %f131;
+	sub.f32 	%f134, %f127, %f133;
+	add.f32 	%f135, %f132, %f134;
+	add.f32 	%f136, %f135, %f129;
+	add.f32 	%f137, %f136, %f129;
+	add.f32 	%f138, %f130, %f137;
+	sub.f32 	%f139, %f138, %f130;
+	sub.f32 	%f140, %f137, %f139;
+	.loc	16	412	0
+	add.f32 	%f141, %f138, %f31;
+	sub.f32 	%f142, %f141, %f138;
+	sub.f32 	%f143, %f141, %f142;
+	sub.f32 	%f144, %f31, %f142;
+	sub.f32 	%f145, %f138, %f143;
+	add.f32 	%f146, %f144, %f145;
+	add.f32 	%f147, %f146, %f140;
+	add.f32 	%f148, %f147, %f86;
+	add.f32 	%f149, %f141, %f148;
+	mov.f32 	%f32, %f149;
+	sub.f32 	%f150, %f149, %f141;
+	sub.f32 	%f33, %f148, %f150;
+	.loc	16	415	0
+	sub.f32 	%f151, %f83, %f58;
+	sub.f32 	%f152, %f151, %f83;
+	sub.f32 	%f153, %f151, %f152;
+	add.f32 	%f154, %f152, %f58;
+	sub.f32 	%f155, %f83, %f153;
+	sub.f32 	%f156, %f155, %f154;
+	add.f32 	%f157, %f156, %f85;
+	sub.f32 	%f158, %f157, %f60;
+	add.f32 	%f159, %f151, %f158;
+	add.f32 	%f160, %f159, %f30;
+	sub.f32 	%f161, %f160, %f159;
+	sub.f32 	%f162, %f160, %f161;
+	sub.f32 	%f163, %f159, %f162;
+	sub.f32 	%f164, %f30, %f161;
+	add.f32 	%f165, %f163, %f164;
+	sub.f32 	%f166, %f159, %f151;
+	sub.f32 	%f167, %f158, %f166;
+	add.f32 	%f168, %f165, %f167;
+	add.f32 	%f169, %f87, %f168;
+	add.f32 	%f170, %f160, %f169;
+	mov.f32 	%f34, %f170;
+	sub.f32 	%f171, %f170, %f160;
+	sub.f32 	%f35, %f169, %f171;
+	.loc	16	417	0
+	mov.f32 	%f172, 0f46000400;   	// 8193
+	mul.f32 	%f173, %f149, %f172;
+	mul.f32 	%f174, %f149, %f33;
+	mul.f32 	%f175, %f149, %f149;
+	sub.f32 	%f176, %f173, %f149;
+	fma.rn.f32 	%f177, %f149, %f33, %f174;
+	sub.f32 	%f108, %f173, %f176;
+	add.f32 	%f178, %f175, %f177;
+	sub.f32 	%f110, %f149, %f108;
+	mul.f32 	%f179, %f108, %f108;
+	sub.f32 	%f180, %f179, %f175;
+	sub.f32 	%f181, %f178, %f175;
+	fma.rn.f32 	%f182, %f108, %f110, %f180;
+	sub.f32 	%f183, %f177, %f181;
+	sub.f32 	%f184, %f178, %f181;
+	fma.rn.f32 	%f185, %f108, %f110, %f182;
+	sub.f32 	%f186, %f175, %f184;
+	fma.rn.f32 	%f187, %f110, %f110, %f185;
+	add.f32 	%f188, %f183, %f186;
+	add.f32 	%f189, %f187, %f188;
+	fma.rn.f32 	%f190, %f33, %f33, %f189;
+	add.f32 	%f191, %f178, %f190;
+	mov.f32 	%f58, %f191;
+	sub.f32 	%f192, %f191, %f178;
+	sub.f32 	%f60, %f190, %f192;
+	.loc	16	418	0
+	mov.f32 	%f193, 0f46000400;   	// 8193
+	mul.f32 	%f194, %f170, %f193;
+	mul.f32 	%f195, %f170, %f35;
+	mul.f32 	%f196, %f170, %f170;
+	sub.f32 	%f197, %f194, %f170;
+	fma.rn.f32 	%f198, %f170, %f35, %f195;
+	sub.f32 	%f107, %f194, %f197;
+	add.f32 	%f199, %f196, %f198;
+	sub.f32 	%f109, %f170, %f107;
+	mul.f32 	%f200, %f107, %f107;
+	sub.f32 	%f201, %f200, %f196;
+	sub.f32 	%f202, %f199, %f196;
+	fma.rn.f32 	%f203, %f107, %f109, %f201;
+	sub.f32 	%f204, %f198, %f202;
+	sub.f32 	%f205, %f199, %f202;
+	fma.rn.f32 	%f206, %f107, %f109, %f203;
+	sub.f32 	%f207, %f196, %f205;
+	fma.rn.f32 	%f208, %f109, %f109, %f206;
+	add.f32 	%f209, %f204, %f207;
+	add.f32 	%f210, %f208, %f209;
+	fma.rn.f32 	%f211, %f35, %f35, %f210;
+	add.f32 	%f212, %f199, %f211;
+	mov.f32 	%f83, %f212;
+	sub.f32 	%f213, %f212, %f199;
+	sub.f32 	%f85, %f211, %f213;
+	.loc	16	419	0
+	add.f32 	%f214, %f191, %f212;
+	sub.f32 	%f215, %f214, %f212;
+	sub.f32 	%f216, %f191, %f215;
+	sub.f32 	%f217, %f214, %f215;
+	sub.f32 	%f218, %f212, %f217;
+	add.f32 	%f219, %f216, %f218;
+	add.f32 	%f220, %f85, %f219;
+	add.f32 	%f221, %f60, %f220;
+	add.f32 	%f222, %f214, %f221;
+	sub.f32 	%f223, %f222, %f214;
+	sub.f32 	%f224, %f221, %f223;
+	.loc	16	409	0
+	sub.s32 	%r136, %r136, 1;
+	mov.u32 	%r138, 0;
+	setp.eq.s32 	%p14, %r136, %r138;
+	@%p14 bra 	$Lt_4_21250;
+ //<loop> Part of loop body line 410, head labeled $L_4_15618
+	add.f32 	%f225, %f224, %f222;
+	mov.f32 	%f226, 0f40800000;   	// 4
+	setp.lt.f32 	%p15, %f225, %f226;
+	@%p15 bra 	$L_4_15618;
+$Lt_4_21250:
+$L_4_15874:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	304	0
+	mov.s32 	%r139, 0;
+	setp.gt.s32 	%p16, %r136, %r139;
+	sub.s32 	%r140, %r135, %r136;
+	mov.s32 	%r141, 0;
+	selp.s32 	%r142, %r140, %r141, %p16;
+	mov.u32 	%r143, 0;
+	setp.eq.s32 	%p17, %r142, %r143;
+	@%p17 bra 	$Lt_4_20994;
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	311	0
+	ld.param.s32 	%r144, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_animationFrame];
+	add.s32 	%r145, %r144, %r142;
+	ld.param.u8 	%r146, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_colors+0];
+	mul.lo.s32 	%r147, %r145, %r146;
+	cvt.u8.u32 	%r148, %r147;
+	.loc	17	312	0
+	ld.param.u8 	%r149, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_colors+1];
+	mul.lo.s32 	%r150, %r145, %r149;
+	cvt.u8.u32 	%r151, %r150;
+	.loc	17	313	0
+	ld.param.u8 	%r152, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_colors+2];
+	mul.lo.s32 	%r153, %r145, %r152;
+	cvt.u8.u32 	%r154, %r153;
+	bra.uni 	$Lt_4_20738;
+$Lt_4_20994:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	317	0
+	mov.u32 	%r154, 0;
+	mov.u32 	%r151, 0;
+	mov.u32 	%r148, 0;
+$Lt_4_20738:
+ //<loop> Part of loop body line 262, head labeled $Lt_4_12034
+	.loc	17	323	0
+	ld.param.s32 	%r155, [__cudaparm__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib_frame];
+	add.s32 	%r156, %r155, 1;
+	shr.s32 	%r157, %r156, 31;
+	mov.s32 	%r158, 1;
+	and.b32 	%r159, %r157, %r158;
+	add.s32 	%r160, %r159, %r156;
+	shr.s32 	%r161, %r160, 1;
+	mul.lo.s32 	%r162, %r155, %r39;
+	add.s32 	%r163, %r148, %r162;
+	add.s32 	%r164, %r161, %r163;
+	div.s32 	%r165, %r164, %r156;
+	.loc	17	324	0
+	mul.lo.s32 	%r166, %r155, %r40;
+	add.s32 	%r167, %r151, %r166;
+	add.s32 	%r168, %r161, %r167;
+	div.s32 	%r169, %r168, %r156;
+	st.global.v2.u8 	[%r38+0], {%r165,%r169};
+	.loc	17	325	0
+	mul.lo.s32 	%r170, %r155, %r41;
+	add.s32 	%r171, %r154, %r170;
+	add.s32 	%r172, %r161, %r171;
+	div.s32 	%r173, %r172, %r156;
+	st.global.u8 	[%r38+2], %r173;
+	bra.uni 	$Lt_4_12034;
+$Lt_4_258:
+	.loc	17	330	0
+	exit;
+$LDWend__Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib:
+	} // _Z18MandelbrotDS1_sm13P6uchar4iiifffffffS_iiiib
+
+	.entry _Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib (
+		.param .u32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch,
+		.param .f32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff,
+		.param .f32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff,
+		.param .f32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP,
+		.param .f32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP,
+		.param .f32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors[4],
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ)
+	{
+	.reg .u32 %r<86>;
+	.reg .f32 %f<116>;
+	.reg .pred %p<32>;
+	.shared .u32 __cuda_local_var_286735_41_blockIndex;
+	.shared .u32 __cuda_local_var_286736_41_blockX;
+	.shared .u32 __cuda_local_var_286736_49_blockY;
+	.loc	17	41	0
+$LDWbegin__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks];
+$Lt_5_16386:
+ //<loop> Loop body line 47
+	.loc	17	47	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_5_24322;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	50	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286735_41_blockIndex], %r13;
+	.loc	17	51	0
+	ld.param.u32 	%r14, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286736_41_blockX], %r15;
+	.loc	17	52	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286736_49_blockY], %r16;
+$Lt_5_24322:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	55	0
+	bar.sync 	0;
+	.loc	17	58	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286735_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_5_258;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	ld.shared.u32 	%r18, [__cuda_local_var_286736_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286736_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW];
+	ld.param.s32 	%r27, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH];
+	set.gt.u32.s32 	%r28, %r27, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r26, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_5_16386;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	16	146	0
+	ld.param.s32 	%r34, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch];
+	mov.s32 	%r35, %r34;
+	cvt.rn.f32.s32 	%f1, %r24;
+	cvt.rn.f32.s32 	%f2, %r25;
+	ld.param.f32 	%f3, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale];
+	ld.param.f32 	%f4, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff];
+	fma.rn.f32 	%f5, %f1, %f3, %f4;
+	ld.param.f32 	%f6, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff];
+	fma.rn.f32 	%f7, %f2, %f3, %f6;
+	ld.param.s8 	%r36, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ];
+	mov.u32 	%r37, 0;
+	setp.eq.s32 	%p6, %r36, %r37;
+	@%p6 bra 	$Lt_5_25602;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	16	151	0
+	ld.param.f32 	%f8, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP];
+	.loc	16	152	0
+	ld.param.f32 	%f9, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP];
+	.loc	16	153	0
+	mov.f32 	%f10, %f7;
+	.loc	16	154	0
+	mov.f32 	%f11, %f5;
+	.loc	16	155	0
+	mul.f32 	%f12, %f7, %f7;
+	.loc	16	156	0
+	mul.f32 	%f13, %f5, %f5;
+	bra.uni 	$Lt_5_25346;
+$Lt_5_25602:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	16	160	0
+	mov.f32 	%f8, %f5;
+	.loc	16	161	0
+	mov.f32 	%f9, %f7;
+	.loc	16	165	0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f10, 0f00000000;    	// 0
+$Lt_5_25346:
+$Lt_5_17666:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f32 	%f14, %f13, %f12;
+	mov.f32 	%f15, 0f40800000;    	// 4
+	setp.gt.f32 	%p7, %f14, %f15;
+	@!%p7 bra 	$Lt_5_25858;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 1;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_25858:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	172	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f17, %f16, %f16;
+	add.f32 	%f10, %f9, %f17;
+	.loc	16	173	0
+	sub.f32 	%f18, %f13, %f12;
+	add.f32 	%f11, %f8, %f18;
+	.loc	16	174	0
+	mul.f32 	%f19, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f21, %f20, %f19;
+	mov.f32 	%f22, 0f40800000;    	// 4
+	setp.gt.f32 	%p8, %f21, %f22;
+	@!%p8 bra 	$Lt_5_26370;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 2;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_26370:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	180	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f23, %f16, %f16;
+	add.f32 	%f10, %f9, %f23;
+	.loc	16	181	0
+	sub.f32 	%f24, %f20, %f19;
+	add.f32 	%f11, %f8, %f24;
+	.loc	16	182	0
+	mul.f32 	%f25, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f26, %f20, %f25;
+	mov.f32 	%f27, 0f40800000;    	// 4
+	setp.gt.f32 	%p9, %f26, %f27;
+	@!%p9 bra 	$Lt_5_26882;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 3;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_26882:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	188	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f28, %f16, %f16;
+	add.f32 	%f10, %f9, %f28;
+	.loc	16	189	0
+	sub.f32 	%f29, %f20, %f25;
+	add.f32 	%f11, %f8, %f29;
+	.loc	16	190	0
+	mul.f32 	%f30, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f31, %f20, %f30;
+	mov.f32 	%f32, 0f40800000;    	// 4
+	setp.gt.f32 	%p10, %f31, %f32;
+	@!%p10 bra 	$Lt_5_27394;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 4;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_27394:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	196	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f33, %f16, %f16;
+	add.f32 	%f10, %f9, %f33;
+	.loc	16	197	0
+	sub.f32 	%f34, %f20, %f30;
+	add.f32 	%f11, %f8, %f34;
+	.loc	16	198	0
+	mul.f32 	%f35, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f36, %f20, %f35;
+	mov.f32 	%f37, 0f40800000;    	// 4
+	setp.gt.f32 	%p11, %f36, %f37;
+	@!%p11 bra 	$Lt_5_27906;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 5;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_27906:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	204	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f38, %f16, %f16;
+	add.f32 	%f10, %f9, %f38;
+	.loc	16	205	0
+	sub.f32 	%f39, %f20, %f35;
+	add.f32 	%f11, %f8, %f39;
+	.loc	16	206	0
+	mul.f32 	%f40, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f41, %f20, %f40;
+	mov.f32 	%f42, 0f40800000;    	// 4
+	setp.gt.f32 	%p12, %f41, %f42;
+	@!%p12 bra 	$Lt_5_28418;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 6;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_28418:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	212	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f43, %f16, %f16;
+	add.f32 	%f10, %f9, %f43;
+	.loc	16	213	0
+	sub.f32 	%f44, %f20, %f40;
+	add.f32 	%f11, %f8, %f44;
+	.loc	16	214	0
+	mul.f32 	%f45, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f46, %f20, %f45;
+	mov.f32 	%f47, 0f40800000;    	// 4
+	setp.gt.f32 	%p13, %f46, %f47;
+	@!%p13 bra 	$Lt_5_28930;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 7;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_28930:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	220	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f48, %f16, %f16;
+	add.f32 	%f10, %f9, %f48;
+	.loc	16	221	0
+	sub.f32 	%f49, %f20, %f45;
+	add.f32 	%f11, %f8, %f49;
+	.loc	16	222	0
+	mul.f32 	%f50, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f51, %f20, %f50;
+	mov.f32 	%f52, 0f40800000;    	// 4
+	setp.gt.f32 	%p14, %f51, %f52;
+	@!%p14 bra 	$Lt_5_29442;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 8;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_29442:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	228	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f53, %f16, %f16;
+	add.f32 	%f10, %f9, %f53;
+	.loc	16	229	0
+	sub.f32 	%f54, %f20, %f50;
+	add.f32 	%f11, %f8, %f54;
+	.loc	16	230	0
+	mul.f32 	%f55, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f56, %f20, %f55;
+	mov.f32 	%f57, 0f40800000;    	// 4
+	setp.gt.f32 	%p15, %f56, %f57;
+	@!%p15 bra 	$Lt_5_29954;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 9;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_29954:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	236	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f58, %f16, %f16;
+	add.f32 	%f10, %f9, %f58;
+	.loc	16	237	0
+	sub.f32 	%f59, %f20, %f55;
+	add.f32 	%f11, %f8, %f59;
+	.loc	16	238	0
+	mul.f32 	%f60, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f61, %f20, %f60;
+	mov.f32 	%f62, 0f40800000;    	// 4
+	setp.gt.f32 	%p16, %f61, %f62;
+	@!%p16 bra 	$Lt_5_30466;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 10;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_30466:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	244	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f63, %f16, %f16;
+	add.f32 	%f10, %f9, %f63;
+	.loc	16	245	0
+	sub.f32 	%f64, %f20, %f60;
+	add.f32 	%f11, %f8, %f64;
+	.loc	16	246	0
+	mul.f32 	%f65, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f66, %f20, %f65;
+	mov.f32 	%f67, 0f40800000;    	// 4
+	setp.gt.f32 	%p17, %f66, %f67;
+	@!%p17 bra 	$Lt_5_30978;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 11;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_30978:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	252	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f68, %f16, %f16;
+	add.f32 	%f10, %f9, %f68;
+	.loc	16	253	0
+	sub.f32 	%f69, %f20, %f65;
+	add.f32 	%f11, %f8, %f69;
+	.loc	16	254	0
+	mul.f32 	%f70, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f71, %f20, %f70;
+	mov.f32 	%f72, 0f40800000;    	// 4
+	setp.gt.f32 	%p18, %f71, %f72;
+	@!%p18 bra 	$Lt_5_31490;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 12;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_31490:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	260	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f73, %f16, %f16;
+	add.f32 	%f10, %f9, %f73;
+	.loc	16	261	0
+	sub.f32 	%f74, %f20, %f70;
+	add.f32 	%f11, %f8, %f74;
+	.loc	16	262	0
+	mul.f32 	%f75, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f76, %f20, %f75;
+	mov.f32 	%f77, 0f40800000;    	// 4
+	setp.gt.f32 	%p19, %f76, %f77;
+	@!%p19 bra 	$Lt_5_32002;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 13;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_32002:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	268	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f78, %f16, %f16;
+	add.f32 	%f10, %f9, %f78;
+	.loc	16	269	0
+	sub.f32 	%f79, %f20, %f75;
+	add.f32 	%f11, %f8, %f79;
+	.loc	16	270	0
+	mul.f32 	%f80, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f81, %f20, %f80;
+	mov.f32 	%f82, 0f40800000;    	// 4
+	setp.gt.f32 	%p20, %f81, %f82;
+	@!%p20 bra 	$Lt_5_32514;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 14;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_32514:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	276	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f83, %f16, %f16;
+	add.f32 	%f10, %f9, %f83;
+	.loc	16	277	0
+	sub.f32 	%f84, %f20, %f80;
+	add.f32 	%f11, %f8, %f84;
+	.loc	16	278	0
+	mul.f32 	%f85, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f86, %f20, %f85;
+	mov.f32 	%f87, 0f40800000;    	// 4
+	setp.gt.f32 	%p21, %f86, %f87;
+	@!%p21 bra 	$Lt_5_33026;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 15;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_33026:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	284	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f88, %f16, %f16;
+	add.f32 	%f10, %f9, %f88;
+	.loc	16	285	0
+	sub.f32 	%f89, %f20, %f85;
+	add.f32 	%f11, %f8, %f89;
+	.loc	16	286	0
+	mul.f32 	%f90, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f91, %f20, %f90;
+	mov.f32 	%f92, 0f40800000;    	// 4
+	setp.gt.f32 	%p22, %f91, %f92;
+	@!%p22 bra 	$Lt_5_33538;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 16;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_33538:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	292	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f93, %f16, %f16;
+	add.f32 	%f10, %f9, %f93;
+	.loc	16	293	0
+	sub.f32 	%f94, %f20, %f90;
+	add.f32 	%f11, %f8, %f94;
+	.loc	16	294	0
+	mul.f32 	%f95, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f96, %f20, %f95;
+	mov.f32 	%f97, 0f40800000;    	// 4
+	setp.gt.f32 	%p23, %f96, %f97;
+	@!%p23 bra 	$Lt_5_34050;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 17;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_34050:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	300	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f98, %f16, %f16;
+	add.f32 	%f10, %f9, %f98;
+	.loc	16	301	0
+	sub.f32 	%f99, %f20, %f95;
+	add.f32 	%f11, %f8, %f99;
+	.loc	16	302	0
+	mul.f32 	%f100, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f101, %f20, %f100;
+	mov.f32 	%f102, 0f40800000;   	// 4
+	setp.gt.f32 	%p24, %f101, %f102;
+	@!%p24 bra 	$Lt_5_34562;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 18;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_34562:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	308	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f103, %f16, %f16;
+	add.f32 	%f10, %f9, %f103;
+	.loc	16	309	0
+	sub.f32 	%f104, %f20, %f100;
+	add.f32 	%f11, %f8, %f104;
+	.loc	16	310	0
+	mul.f32 	%f105, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f106, %f20, %f105;
+	mov.f32 	%f107, 0f40800000;   	// 4
+	setp.gt.f32 	%p25, %f106, %f107;
+	@!%p25 bra 	$Lt_5_35074;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	sub.s32 	%r38, %r35, 19;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$Lt_5_35074:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	316	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f108, %f16, %f16;
+	add.f32 	%f10, %f9, %f108;
+	.loc	16	317	0
+	sub.f32 	%f109, %f20, %f105;
+	add.f32 	%f11, %f8, %f109;
+	.loc	16	318	0
+	mul.f32 	%f110, %f10, %f10;
+	.loc	16	322	0
+	sub.s32 	%r35, %r35, 20;
+	.loc	16	316	0
+	mov.u32 	%r39, 0;
+	setp.le.s32 	%p26, %r35, %r39;
+	@%p26 bra 	$L_5_24066;
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f111, %f20, %f110;
+	mov.f32 	%f112, 0f40800000;   	// 4
+	setp.gt.f32 	%p27, %f111, %f112;
+	@!%p27 bra 	$L_5_23810;
+$L_5_24066:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	mov.s32 	%r38, %r35;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2;
+$L_5_23810:
+ //<loop> Part of loop body line 329, head labeled $Lt_5_25346
+	.loc	16	325	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f113, %f16, %f16;
+	add.f32 	%f10, %f9, %f113;
+	.loc	16	326	0
+	sub.f32 	%f114, %f20, %f110;
+	add.f32 	%f11, %f8, %f114;
+	.loc	16	327	0
+	mul.f32 	%f12, %f10, %f10;
+	.loc	16	328	0
+	mul.f32 	%f13, %f11, %f11;
+	.loc	16	325	0
+	bra.uni 	$Lt_5_25346;
+$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_182_2:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	70	0
+	mov.s32 	%r40, 0;
+	setp.gt.s32 	%p28, %r38, %r40;
+	sub.s32 	%r41, %r34, %r38;
+	mov.s32 	%r42, 0;
+	selp.s32 	%r43, %r41, %r42, %p28;
+	mov.u32 	%r44, 0;
+	setp.eq.s32 	%p29, %r43, %r44;
+	@%p29 bra 	$Lt_5_35842;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	78	0
+	ld.param.s32 	%r45, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame];
+	add.s32 	%r46, %r45, %r43;
+	ld.param.u8 	%r47, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+0];
+	mul.lo.s32 	%r48, %r46, %r47;
+	cvt.u8.u32 	%r49, %r48;
+	.loc	17	79	0
+	ld.param.u8 	%r50, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+1];
+	mul.lo.s32 	%r51, %r46, %r50;
+	cvt.u8.u32 	%r52, %r51;
+	.loc	17	80	0
+	ld.param.u8 	%r53, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+2];
+	mul.lo.s32 	%r54, %r46, %r53;
+	cvt.u8.u32 	%r55, %r54;
+	bra.uni 	$Lt_5_35586;
+$Lt_5_35842:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	84	0
+	mov.u32 	%r55, 0;
+	mov.u32 	%r52, 0;
+	mov.u32 	%r49, 0;
+$Lt_5_35586:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	mul.lo.s32 	%r56, %r26, %r25;
+	add.s32 	%r57, %r56, %r24;
+	mul.lo.u32 	%r58, %r57, 4;
+	ld.param.u32 	%r59, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst];
+	add.u32 	%r60, %r59, %r58;
+	ld.param.s32 	%r61, [__cudaparm__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame];
+	mov.u32 	%r62, 0;
+	setp.ne.s32 	%p30, %r61, %r62;
+	@%p30 bra 	$Lt_5_36354;
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	91	0
+	mov.u32 	%r63, 0;
+	st.global.v4.u8 	[%r60+0], {%r49,%r52,%r55,%r63};
+	bra.uni 	$Lt_5_16386;
+$Lt_5_36354:
+ //<loop> Part of loop body line 47, head labeled $Lt_5_16386
+	.loc	17	95	0
+	add.s32 	%r64, %r61, 1;
+	shr.s32 	%r65, %r64, 31;
+	mov.s32 	%r66, 1;
+	and.b32 	%r67, %r65, %r66;
+	add.s32 	%r68, %r67, %r64;
+	shr.s32 	%r69, %r68, 1;
+	ld.global.v4.u8 	{%r70,%r71,%r72,_}, [%r60+0];
+	mul.lo.s32 	%r73, %r61, %r70;
+	add.s32 	%r74, %r49, %r73;
+	add.s32 	%r75, %r69, %r74;
+	div.s32 	%r76, %r75, %r64;
+	.loc	17	96	0
+	mul.lo.s32 	%r77, %r61, %r71;
+	add.s32 	%r78, %r52, %r77;
+	add.s32 	%r79, %r69, %r78;
+	div.s32 	%r80, %r79, %r64;
+	st.global.v2.u8 	[%r60+0], {%r76,%r80};
+	.loc	17	97	0
+	mul.lo.s32 	%r81, %r61, %r72;
+	add.s32 	%r82, %r55, %r81;
+	add.s32 	%r83, %r69, %r82;
+	div.s32 	%r84, %r83, %r64;
+	st.global.u8 	[%r60+2], %r84;
+	bra.uni 	$Lt_5_16386;
+$Lt_5_258:
+	.loc	17	103	0
+	exit;
+$LDWend__Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	} // _Z16Mandelbrot0_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib
+
+	.entry _Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib (
+		.param .u32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch,
+		.param .f64 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff,
+		.param .f64 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff,
+		.param .f64 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP,
+		.param .f64 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP,
+		.param .f64 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors[4],
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ)
+	{
+	.reg .u32 %r<86>;
+	.reg .f64 %fd<116>;
+	.reg .pred %p<32>;
+	.shared .u32 __cuda_local_var_286735_41_blockIndex;
+	.shared .u32 __cuda_local_var_286736_41_blockX;
+	.shared .u32 __cuda_local_var_286736_49_blockY;
+	.loc	17	41	0
+$LDWbegin__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks];
+$Lt_6_16386:
+ //<loop> Loop body line 47
+	.loc	17	47	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_6_24322;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	50	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286735_41_blockIndex], %r13;
+	.loc	17	51	0
+	ld.param.u32 	%r14, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286736_41_blockX], %r15;
+	.loc	17	52	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286736_49_blockY], %r16;
+$Lt_6_24322:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	55	0
+	bar.sync 	0;
+	.loc	17	58	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286735_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_6_258;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	ld.shared.u32 	%r18, [__cuda_local_var_286736_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286736_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW];
+	ld.param.s32 	%r27, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH];
+	set.gt.u32.s32 	%r28, %r27, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r26, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_6_16386;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	16	146	0
+	ld.param.s32 	%r34, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch];
+	mov.s32 	%r35, %r34;
+	ld.param.f64 	%fd1, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale];
+	ld.param.f64 	%fd2, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff];
+	cvt.rn.f64.s32 	%fd3, %r24;
+	mad.rn.f64 	%fd4, %fd3, %fd1, %fd2;
+	ld.param.f64 	%fd5, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff];
+	cvt.rn.f64.s32 	%fd6, %r25;
+	mad.rn.f64 	%fd7, %fd6, %fd1, %fd5;
+	ld.param.s8 	%r36, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ];
+	mov.u32 	%r37, 0;
+	setp.eq.s32 	%p6, %r36, %r37;
+	@%p6 bra 	$Lt_6_25602;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	16	151	0
+	ld.param.f64 	%fd8, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP];
+	.loc	16	152	0
+	ld.param.f64 	%fd9, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP];
+	.loc	16	153	0
+	mov.f64 	%fd10, %fd7;
+	.loc	16	154	0
+	mov.f64 	%fd11, %fd4;
+	.loc	16	155	0
+	mul.f64 	%fd12, %fd7, %fd7;
+	.loc	16	156	0
+	mul.f64 	%fd13, %fd4, %fd4;
+	bra.uni 	$Lt_6_25346;
+$Lt_6_25602:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	16	160	0
+	mov.f64 	%fd8, %fd4;
+	.loc	16	161	0
+	mov.f64 	%fd9, %fd7;
+	.loc	16	165	0
+	mov.f64 	%fd13, 0d0000000000000000;	// 0
+	mov.f64 	%fd12, 0d0000000000000000;	// 0
+	mov.f64 	%fd11, 0d0000000000000000;	// 0
+	mov.f64 	%fd10, 0d0000000000000000;	// 0
+$Lt_6_25346:
+$Lt_6_17666:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f64 	%fd14, %fd13, %fd12;
+	mov.f64 	%fd15, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p7, %fd14, %fd15;
+	@!%p7 bra 	$Lt_6_25858;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 1;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_25858:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	172	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd17, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd17;
+	.loc	16	173	0
+	sub.f64 	%fd18, %fd13, %fd12;
+	add.f64 	%fd11, %fd8, %fd18;
+	.loc	16	174	0
+	mul.f64 	%fd19, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd21, %fd20, %fd19;
+	mov.f64 	%fd22, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p8, %fd21, %fd22;
+	@!%p8 bra 	$Lt_6_26370;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 2;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_26370:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	180	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd23, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd23;
+	.loc	16	181	0
+	sub.f64 	%fd24, %fd20, %fd19;
+	add.f64 	%fd11, %fd8, %fd24;
+	.loc	16	182	0
+	mul.f64 	%fd25, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd26, %fd20, %fd25;
+	mov.f64 	%fd27, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p9, %fd26, %fd27;
+	@!%p9 bra 	$Lt_6_26882;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 3;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_26882:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	188	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd28, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd28;
+	.loc	16	189	0
+	sub.f64 	%fd29, %fd20, %fd25;
+	add.f64 	%fd11, %fd8, %fd29;
+	.loc	16	190	0
+	mul.f64 	%fd30, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd31, %fd20, %fd30;
+	mov.f64 	%fd32, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p10, %fd31, %fd32;
+	@!%p10 bra 	$Lt_6_27394;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 4;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_27394:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	196	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd33, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd33;
+	.loc	16	197	0
+	sub.f64 	%fd34, %fd20, %fd30;
+	add.f64 	%fd11, %fd8, %fd34;
+	.loc	16	198	0
+	mul.f64 	%fd35, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd36, %fd20, %fd35;
+	mov.f64 	%fd37, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p11, %fd36, %fd37;
+	@!%p11 bra 	$Lt_6_27906;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 5;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_27906:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	204	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd38, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd38;
+	.loc	16	205	0
+	sub.f64 	%fd39, %fd20, %fd35;
+	add.f64 	%fd11, %fd8, %fd39;
+	.loc	16	206	0
+	mul.f64 	%fd40, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd41, %fd20, %fd40;
+	mov.f64 	%fd42, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p12, %fd41, %fd42;
+	@!%p12 bra 	$Lt_6_28418;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 6;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_28418:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	212	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd43, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd43;
+	.loc	16	213	0
+	sub.f64 	%fd44, %fd20, %fd40;
+	add.f64 	%fd11, %fd8, %fd44;
+	.loc	16	214	0
+	mul.f64 	%fd45, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd46, %fd20, %fd45;
+	mov.f64 	%fd47, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p13, %fd46, %fd47;
+	@!%p13 bra 	$Lt_6_28930;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 7;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_28930:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	220	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd48, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd48;
+	.loc	16	221	0
+	sub.f64 	%fd49, %fd20, %fd45;
+	add.f64 	%fd11, %fd8, %fd49;
+	.loc	16	222	0
+	mul.f64 	%fd50, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd51, %fd20, %fd50;
+	mov.f64 	%fd52, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p14, %fd51, %fd52;
+	@!%p14 bra 	$Lt_6_29442;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 8;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_29442:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	228	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd53, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd53;
+	.loc	16	229	0
+	sub.f64 	%fd54, %fd20, %fd50;
+	add.f64 	%fd11, %fd8, %fd54;
+	.loc	16	230	0
+	mul.f64 	%fd55, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd56, %fd20, %fd55;
+	mov.f64 	%fd57, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p15, %fd56, %fd57;
+	@!%p15 bra 	$Lt_6_29954;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 9;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_29954:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	236	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd58, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd58;
+	.loc	16	237	0
+	sub.f64 	%fd59, %fd20, %fd55;
+	add.f64 	%fd11, %fd8, %fd59;
+	.loc	16	238	0
+	mul.f64 	%fd60, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd61, %fd20, %fd60;
+	mov.f64 	%fd62, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p16, %fd61, %fd62;
+	@!%p16 bra 	$Lt_6_30466;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 10;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_30466:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	244	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd63, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd63;
+	.loc	16	245	0
+	sub.f64 	%fd64, %fd20, %fd60;
+	add.f64 	%fd11, %fd8, %fd64;
+	.loc	16	246	0
+	mul.f64 	%fd65, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd66, %fd20, %fd65;
+	mov.f64 	%fd67, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p17, %fd66, %fd67;
+	@!%p17 bra 	$Lt_6_30978;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 11;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_30978:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	252	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd68, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd68;
+	.loc	16	253	0
+	sub.f64 	%fd69, %fd20, %fd65;
+	add.f64 	%fd11, %fd8, %fd69;
+	.loc	16	254	0
+	mul.f64 	%fd70, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd71, %fd20, %fd70;
+	mov.f64 	%fd72, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p18, %fd71, %fd72;
+	@!%p18 bra 	$Lt_6_31490;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 12;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_31490:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	260	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd73, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd73;
+	.loc	16	261	0
+	sub.f64 	%fd74, %fd20, %fd70;
+	add.f64 	%fd11, %fd8, %fd74;
+	.loc	16	262	0
+	mul.f64 	%fd75, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd76, %fd20, %fd75;
+	mov.f64 	%fd77, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p19, %fd76, %fd77;
+	@!%p19 bra 	$Lt_6_32002;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 13;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_32002:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	268	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd78, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd78;
+	.loc	16	269	0
+	sub.f64 	%fd79, %fd20, %fd75;
+	add.f64 	%fd11, %fd8, %fd79;
+	.loc	16	270	0
+	mul.f64 	%fd80, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd81, %fd20, %fd80;
+	mov.f64 	%fd82, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p20, %fd81, %fd82;
+	@!%p20 bra 	$Lt_6_32514;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 14;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_32514:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	276	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd83, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd83;
+	.loc	16	277	0
+	sub.f64 	%fd84, %fd20, %fd80;
+	add.f64 	%fd11, %fd8, %fd84;
+	.loc	16	278	0
+	mul.f64 	%fd85, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd86, %fd20, %fd85;
+	mov.f64 	%fd87, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p21, %fd86, %fd87;
+	@!%p21 bra 	$Lt_6_33026;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 15;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_33026:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	284	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd88, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd88;
+	.loc	16	285	0
+	sub.f64 	%fd89, %fd20, %fd85;
+	add.f64 	%fd11, %fd8, %fd89;
+	.loc	16	286	0
+	mul.f64 	%fd90, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd91, %fd20, %fd90;
+	mov.f64 	%fd92, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p22, %fd91, %fd92;
+	@!%p22 bra 	$Lt_6_33538;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 16;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_33538:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	292	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd93, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd93;
+	.loc	16	293	0
+	sub.f64 	%fd94, %fd20, %fd90;
+	add.f64 	%fd11, %fd8, %fd94;
+	.loc	16	294	0
+	mul.f64 	%fd95, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd96, %fd20, %fd95;
+	mov.f64 	%fd97, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p23, %fd96, %fd97;
+	@!%p23 bra 	$Lt_6_34050;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 17;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_34050:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	300	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd98, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd98;
+	.loc	16	301	0
+	sub.f64 	%fd99, %fd20, %fd95;
+	add.f64 	%fd11, %fd8, %fd99;
+	.loc	16	302	0
+	mul.f64 	%fd100, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd101, %fd20, %fd100;
+	mov.f64 	%fd102, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p24, %fd101, %fd102;
+	@!%p24 bra 	$Lt_6_34562;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 18;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_34562:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	308	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd103, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd103;
+	.loc	16	309	0
+	sub.f64 	%fd104, %fd20, %fd100;
+	add.f64 	%fd11, %fd8, %fd104;
+	.loc	16	310	0
+	mul.f64 	%fd105, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd106, %fd20, %fd105;
+	mov.f64 	%fd107, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p25, %fd106, %fd107;
+	@!%p25 bra 	$Lt_6_35074;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	sub.s32 	%r38, %r35, 19;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$Lt_6_35074:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	316	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd108, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd108;
+	.loc	16	317	0
+	sub.f64 	%fd109, %fd20, %fd105;
+	add.f64 	%fd11, %fd8, %fd109;
+	.loc	16	318	0
+	mul.f64 	%fd110, %fd10, %fd10;
+	.loc	16	322	0
+	sub.s32 	%r35, %r35, 20;
+	.loc	16	316	0
+	mov.u32 	%r39, 0;
+	setp.le.s32 	%p26, %r35, %r39;
+	@%p26 bra 	$L_6_24066;
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd111, %fd20, %fd110;
+	mov.f64 	%fd112, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p27, %fd111, %fd112;
+	@!%p27 bra 	$L_6_23810;
+$L_6_24066:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	mov.s32 	%r38, %r35;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2;
+$L_6_23810:
+ //<loop> Part of loop body line 329, head labeled $Lt_6_25346
+	.loc	16	325	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd113, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd113;
+	.loc	16	326	0
+	sub.f64 	%fd114, %fd20, %fd110;
+	add.f64 	%fd11, %fd8, %fd114;
+	.loc	16	327	0
+	mul.f64 	%fd12, %fd10, %fd10;
+	.loc	16	328	0
+	mul.f64 	%fd13, %fd11, %fd11;
+	.loc	16	325	0
+	bra.uni 	$Lt_6_25346;
+$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_183_2:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	70	0
+	mov.s32 	%r40, 0;
+	setp.gt.s32 	%p28, %r38, %r40;
+	sub.s32 	%r41, %r34, %r38;
+	mov.s32 	%r42, 0;
+	selp.s32 	%r43, %r41, %r42, %p28;
+	mov.u32 	%r44, 0;
+	setp.eq.s32 	%p29, %r43, %r44;
+	@%p29 bra 	$Lt_6_35842;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	78	0
+	ld.param.s32 	%r45, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame];
+	add.s32 	%r46, %r45, %r43;
+	ld.param.u8 	%r47, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+0];
+	mul.lo.s32 	%r48, %r46, %r47;
+	cvt.u8.u32 	%r49, %r48;
+	.loc	17	79	0
+	ld.param.u8 	%r50, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+1];
+	mul.lo.s32 	%r51, %r46, %r50;
+	cvt.u8.u32 	%r52, %r51;
+	.loc	17	80	0
+	ld.param.u8 	%r53, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+2];
+	mul.lo.s32 	%r54, %r46, %r53;
+	cvt.u8.u32 	%r55, %r54;
+	bra.uni 	$Lt_6_35586;
+$Lt_6_35842:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	84	0
+	mov.u32 	%r55, 0;
+	mov.u32 	%r52, 0;
+	mov.u32 	%r49, 0;
+$Lt_6_35586:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	mul.lo.s32 	%r56, %r26, %r25;
+	add.s32 	%r57, %r56, %r24;
+	mul.lo.u32 	%r58, %r57, 4;
+	ld.param.u32 	%r59, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst];
+	add.u32 	%r60, %r59, %r58;
+	ld.param.s32 	%r61, [__cudaparm__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame];
+	mov.u32 	%r62, 0;
+	setp.ne.s32 	%p30, %r61, %r62;
+	@%p30 bra 	$Lt_6_36354;
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	91	0
+	mov.u32 	%r63, 0;
+	st.global.v4.u8 	[%r60+0], {%r49,%r52,%r55,%r63};
+	bra.uni 	$Lt_6_16386;
+$Lt_6_36354:
+ //<loop> Part of loop body line 47, head labeled $Lt_6_16386
+	.loc	17	95	0
+	add.s32 	%r64, %r61, 1;
+	shr.s32 	%r65, %r64, 31;
+	mov.s32 	%r66, 1;
+	and.b32 	%r67, %r65, %r66;
+	add.s32 	%r68, %r67, %r64;
+	shr.s32 	%r69, %r68, 1;
+	ld.global.v4.u8 	{%r70,%r71,%r72,_}, [%r60+0];
+	mul.lo.s32 	%r73, %r61, %r70;
+	add.s32 	%r74, %r49, %r73;
+	add.s32 	%r75, %r69, %r74;
+	div.s32 	%r76, %r75, %r64;
+	.loc	17	96	0
+	mul.lo.s32 	%r77, %r61, %r71;
+	add.s32 	%r78, %r52, %r77;
+	add.s32 	%r79, %r69, %r78;
+	div.s32 	%r80, %r79, %r64;
+	st.global.v2.u8 	[%r60+0], {%r76,%r80};
+	.loc	17	97	0
+	mul.lo.s32 	%r81, %r61, %r72;
+	add.s32 	%r82, %r55, %r81;
+	add.s32 	%r83, %r69, %r82;
+	div.s32 	%r84, %r83, %r64;
+	st.global.u8 	[%r60+2], %r84;
+	bra.uni 	$Lt_6_16386;
+$Lt_6_258:
+	.loc	17	103	0
+	exit;
+$LDWend__Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	} // _Z16Mandelbrot0_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib
+
+	.entry _Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib (
+		.param .u32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch,
+		.param .f32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff,
+		.param .f32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff,
+		.param .f32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP,
+		.param .f32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP,
+		.param .f32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors[4],
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ)
+	{
+	.reg .u32 %r<175>;
+	.reg .f32 %f<116>;
+	.reg .pred %p<36>;
+	.shared .u32 __cuda_local_var_286874_41_blockIndex;
+	.shared .u32 __cuda_local_var_286875_41_blockX;
+	.shared .u32 __cuda_local_var_286875_49_blockY;
+	.loc	17	180	0
+$LDWbegin__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks];
+$Lt_7_22530:
+ //<loop> Loop body line 186
+	.loc	17	186	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_7_31490;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	189	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286874_41_blockIndex], %r13;
+	.loc	17	190	0
+	ld.param.u32 	%r14, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286875_41_blockX], %r15;
+	.loc	17	191	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286875_49_blockY], %r16;
+$Lt_7_31490:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	194	0
+	bar.sync 	0;
+	.loc	17	197	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286874_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_7_258;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	ld.shared.u32 	%r18, [__cuda_local_var_286875_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286875_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH];
+	ld.param.s32 	%r27, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW];
+	set.gt.u32.s32 	%r28, %r26, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r27, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_7_22530;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	206	0
+	mul.lo.s32 	%r34, %r27, %r25;
+	add.s32 	%r35, %r34, %r24;
+	mul.lo.u32 	%r36, %r35, 4;
+	ld.param.u32 	%r37, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst];
+	add.u32 	%r38, %r36, %r37;
+	ld.global.v4.u8 	{%r39,%r40,%r41,_}, [%r38+0];
+	mov.u32 	%r42, 0;
+	setp.le.s32 	%p6, %r24, %r42;
+	@%p6 bra 	$Lt_7_32770;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	ld.global.v4.u8 	{%r43,%r44,%r45,_}, [%r38+-4];
+	.loc	17	211	0
+	sub.s32 	%r46, %r45, %r41;
+	abs.s32 	%r47, %r46;
+	mov.s32 	%r48, 10;
+	set.gt.u32.s32 	%r49, %r47, %r48;
+	neg.s32 	%r50, %r49;
+	sub.s32 	%r51, %r43, %r39;
+	abs.s32 	%r52, %r51;
+	mov.s32 	%r53, 10;
+	set.gt.u32.s32 	%r54, %r52, %r53;
+	neg.s32 	%r55, %r54;
+	sub.s32 	%r56, %r44, %r40;
+	abs.s32 	%r57, %r56;
+	mov.s32 	%r58, 10;
+	set.gt.u32.s32 	%r59, %r57, %r58;
+	neg.s32 	%r60, %r59;
+	or.b32 	%r61, %r55, %r60;
+	or.b32 	%r62, %r50, %r61;
+	bra.uni 	$Lt_7_32514;
+$Lt_7_32770:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	mov.s32 	%r62, 0;
+$Lt_7_32514:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	add.s32 	%r63, %r24, 1;
+	setp.le.s32 	%p7, %r27, %r63;
+	@%p7 bra 	$Lt_7_33026;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	ld.global.v4.u8 	{%r64,%r65,%r66,_}, [%r38+4];
+	.loc	17	213	0
+	sub.s32 	%r67, %r66, %r41;
+	abs.s32 	%r68, %r67;
+	mov.s32 	%r69, 10;
+	set.gt.u32.s32 	%r70, %r68, %r69;
+	neg.s32 	%r71, %r70;
+	sub.s32 	%r72, %r64, %r39;
+	abs.s32 	%r73, %r72;
+	mov.s32 	%r74, 10;
+	set.gt.u32.s32 	%r75, %r73, %r74;
+	neg.s32 	%r76, %r75;
+	sub.s32 	%r77, %r65, %r40;
+	abs.s32 	%r78, %r77;
+	mov.s32 	%r79, 10;
+	set.gt.u32.s32 	%r80, %r78, %r79;
+	neg.s32 	%r81, %r80;
+	or.b32 	%r82, %r76, %r81;
+	or.b32 	%r83, %r71, %r82;
+	add.s32 	%r62, %r62, %r83;
+$Lt_7_33026:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	mov.u32 	%r84, 0;
+	setp.le.s32 	%p8, %r25, %r84;
+	@%p8 bra 	$Lt_7_33538;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	215	0
+	sub.s32 	%r85, %r35, %r27;
+	mul.lo.u32 	%r86, %r85, 4;
+	add.u32 	%r87, %r86, %r37;
+	ld.global.v4.u8 	{%r88,%r89,%r90,_}, [%r87+0];
+	sub.s32 	%r91, %r90, %r41;
+	abs.s32 	%r92, %r91;
+	mov.s32 	%r93, 10;
+	set.gt.u32.s32 	%r94, %r92, %r93;
+	neg.s32 	%r95, %r94;
+	sub.s32 	%r96, %r88, %r39;
+	abs.s32 	%r97, %r96;
+	mov.s32 	%r98, 10;
+	set.gt.u32.s32 	%r99, %r97, %r98;
+	neg.s32 	%r100, %r99;
+	sub.s32 	%r101, %r89, %r40;
+	abs.s32 	%r102, %r101;
+	mov.s32 	%r103, 10;
+	set.gt.u32.s32 	%r104, %r102, %r103;
+	neg.s32 	%r105, %r104;
+	or.b32 	%r106, %r100, %r105;
+	or.b32 	%r107, %r95, %r106;
+	add.s32 	%r62, %r62, %r107;
+$Lt_7_33538:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	add.s32 	%r108, %r25, 1;
+	setp.le.s32 	%p9, %r26, %r108;
+	@%p9 bra 	$Lt_7_34050;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	217	0
+	add.s32 	%r109, %r35, %r27;
+	mul.lo.u32 	%r110, %r109, 4;
+	add.u32 	%r111, %r110, %r37;
+	ld.global.v4.u8 	{%r112,%r113,%r114,_}, [%r111+0];
+	sub.s32 	%r115, %r114, %r41;
+	abs.s32 	%r116, %r115;
+	mov.s32 	%r117, 10;
+	set.gt.u32.s32 	%r118, %r116, %r117;
+	neg.s32 	%r119, %r118;
+	sub.s32 	%r120, %r112, %r39;
+	abs.s32 	%r121, %r120;
+	mov.s32 	%r122, 10;
+	set.gt.u32.s32 	%r123, %r121, %r122;
+	neg.s32 	%r124, %r123;
+	sub.s32 	%r125, %r113, %r40;
+	abs.s32 	%r126, %r125;
+	mov.s32 	%r127, 10;
+	set.gt.u32.s32 	%r128, %r126, %r127;
+	neg.s32 	%r129, %r128;
+	or.b32 	%r130, %r124, %r129;
+	or.b32 	%r131, %r119, %r130;
+	add.s32 	%r62, %r62, %r131;
+$Lt_7_34050:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	mov.u32 	%r132, 0;
+	setp.eq.s32 	%p10, %r62, %r132;
+	@%p10 bra 	$Lt_7_22530;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	16	146	0
+	ld.param.s32 	%r133, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch];
+	mov.s32 	%r134, %r133;
+	cvt.rn.f32.s32 	%f1, %r24;
+	cvt.rn.f32.s32 	%f2, %r25;
+	ld.param.f32 	%f3, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale];
+	ld.param.f32 	%f4, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff];
+	fma.rn.f32 	%f5, %f1, %f3, %f4;
+	ld.param.f32 	%f6, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff];
+	fma.rn.f32 	%f7, %f2, %f3, %f6;
+	ld.param.s8 	%r135, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ];
+	mov.u32 	%r136, 0;
+	setp.eq.s32 	%p11, %r135, %r136;
+	@%p11 bra 	$Lt_7_35330;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	16	151	0
+	ld.param.f32 	%f8, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP];
+	.loc	16	152	0
+	ld.param.f32 	%f9, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP];
+	.loc	16	153	0
+	mov.f32 	%f10, %f7;
+	.loc	16	154	0
+	mov.f32 	%f11, %f5;
+	.loc	16	155	0
+	mul.f32 	%f12, %f7, %f7;
+	.loc	16	156	0
+	mul.f32 	%f13, %f5, %f5;
+	bra.uni 	$Lt_7_35074;
+$Lt_7_35330:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	16	160	0
+	mov.f32 	%f8, %f5;
+	.loc	16	161	0
+	mov.f32 	%f9, %f7;
+	.loc	16	165	0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f10, 0f00000000;    	// 0
+$Lt_7_35074:
+$Lt_7_25090:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f32 	%f14, %f13, %f12;
+	mov.f32 	%f15, 0f40800000;    	// 4
+	setp.gt.f32 	%p12, %f14, %f15;
+	@!%p12 bra 	$Lt_7_35586;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 1;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_35586:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	172	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f17, %f16, %f16;
+	add.f32 	%f10, %f9, %f17;
+	.loc	16	173	0
+	sub.f32 	%f18, %f13, %f12;
+	add.f32 	%f11, %f8, %f18;
+	.loc	16	174	0
+	mul.f32 	%f19, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f21, %f20, %f19;
+	mov.f32 	%f22, 0f40800000;    	// 4
+	setp.gt.f32 	%p13, %f21, %f22;
+	@!%p13 bra 	$Lt_7_36098;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 2;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_36098:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	180	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f23, %f16, %f16;
+	add.f32 	%f10, %f9, %f23;
+	.loc	16	181	0
+	sub.f32 	%f24, %f20, %f19;
+	add.f32 	%f11, %f8, %f24;
+	.loc	16	182	0
+	mul.f32 	%f25, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f26, %f20, %f25;
+	mov.f32 	%f27, 0f40800000;    	// 4
+	setp.gt.f32 	%p14, %f26, %f27;
+	@!%p14 bra 	$Lt_7_36610;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 3;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_36610:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	188	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f28, %f16, %f16;
+	add.f32 	%f10, %f9, %f28;
+	.loc	16	189	0
+	sub.f32 	%f29, %f20, %f25;
+	add.f32 	%f11, %f8, %f29;
+	.loc	16	190	0
+	mul.f32 	%f30, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f31, %f20, %f30;
+	mov.f32 	%f32, 0f40800000;    	// 4
+	setp.gt.f32 	%p15, %f31, %f32;
+	@!%p15 bra 	$Lt_7_37122;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 4;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_37122:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	196	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f33, %f16, %f16;
+	add.f32 	%f10, %f9, %f33;
+	.loc	16	197	0
+	sub.f32 	%f34, %f20, %f30;
+	add.f32 	%f11, %f8, %f34;
+	.loc	16	198	0
+	mul.f32 	%f35, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f36, %f20, %f35;
+	mov.f32 	%f37, 0f40800000;    	// 4
+	setp.gt.f32 	%p16, %f36, %f37;
+	@!%p16 bra 	$Lt_7_37634;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 5;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_37634:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	204	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f38, %f16, %f16;
+	add.f32 	%f10, %f9, %f38;
+	.loc	16	205	0
+	sub.f32 	%f39, %f20, %f35;
+	add.f32 	%f11, %f8, %f39;
+	.loc	16	206	0
+	mul.f32 	%f40, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f41, %f20, %f40;
+	mov.f32 	%f42, 0f40800000;    	// 4
+	setp.gt.f32 	%p17, %f41, %f42;
+	@!%p17 bra 	$Lt_7_38146;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 6;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_38146:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	212	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f43, %f16, %f16;
+	add.f32 	%f10, %f9, %f43;
+	.loc	16	213	0
+	sub.f32 	%f44, %f20, %f40;
+	add.f32 	%f11, %f8, %f44;
+	.loc	16	214	0
+	mul.f32 	%f45, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f46, %f20, %f45;
+	mov.f32 	%f47, 0f40800000;    	// 4
+	setp.gt.f32 	%p18, %f46, %f47;
+	@!%p18 bra 	$Lt_7_38658;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 7;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_38658:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	220	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f48, %f16, %f16;
+	add.f32 	%f10, %f9, %f48;
+	.loc	16	221	0
+	sub.f32 	%f49, %f20, %f45;
+	add.f32 	%f11, %f8, %f49;
+	.loc	16	222	0
+	mul.f32 	%f50, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f51, %f20, %f50;
+	mov.f32 	%f52, 0f40800000;    	// 4
+	setp.gt.f32 	%p19, %f51, %f52;
+	@!%p19 bra 	$Lt_7_39170;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 8;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_39170:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	228	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f53, %f16, %f16;
+	add.f32 	%f10, %f9, %f53;
+	.loc	16	229	0
+	sub.f32 	%f54, %f20, %f50;
+	add.f32 	%f11, %f8, %f54;
+	.loc	16	230	0
+	mul.f32 	%f55, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f56, %f20, %f55;
+	mov.f32 	%f57, 0f40800000;    	// 4
+	setp.gt.f32 	%p20, %f56, %f57;
+	@!%p20 bra 	$Lt_7_39682;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 9;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_39682:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	236	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f58, %f16, %f16;
+	add.f32 	%f10, %f9, %f58;
+	.loc	16	237	0
+	sub.f32 	%f59, %f20, %f55;
+	add.f32 	%f11, %f8, %f59;
+	.loc	16	238	0
+	mul.f32 	%f60, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f61, %f20, %f60;
+	mov.f32 	%f62, 0f40800000;    	// 4
+	setp.gt.f32 	%p21, %f61, %f62;
+	@!%p21 bra 	$Lt_7_40194;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 10;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_40194:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	244	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f63, %f16, %f16;
+	add.f32 	%f10, %f9, %f63;
+	.loc	16	245	0
+	sub.f32 	%f64, %f20, %f60;
+	add.f32 	%f11, %f8, %f64;
+	.loc	16	246	0
+	mul.f32 	%f65, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f66, %f20, %f65;
+	mov.f32 	%f67, 0f40800000;    	// 4
+	setp.gt.f32 	%p22, %f66, %f67;
+	@!%p22 bra 	$Lt_7_40706;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 11;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_40706:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	252	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f68, %f16, %f16;
+	add.f32 	%f10, %f9, %f68;
+	.loc	16	253	0
+	sub.f32 	%f69, %f20, %f65;
+	add.f32 	%f11, %f8, %f69;
+	.loc	16	254	0
+	mul.f32 	%f70, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f71, %f20, %f70;
+	mov.f32 	%f72, 0f40800000;    	// 4
+	setp.gt.f32 	%p23, %f71, %f72;
+	@!%p23 bra 	$Lt_7_41218;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 12;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_41218:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	260	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f73, %f16, %f16;
+	add.f32 	%f10, %f9, %f73;
+	.loc	16	261	0
+	sub.f32 	%f74, %f20, %f70;
+	add.f32 	%f11, %f8, %f74;
+	.loc	16	262	0
+	mul.f32 	%f75, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f76, %f20, %f75;
+	mov.f32 	%f77, 0f40800000;    	// 4
+	setp.gt.f32 	%p24, %f76, %f77;
+	@!%p24 bra 	$Lt_7_41730;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 13;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_41730:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	268	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f78, %f16, %f16;
+	add.f32 	%f10, %f9, %f78;
+	.loc	16	269	0
+	sub.f32 	%f79, %f20, %f75;
+	add.f32 	%f11, %f8, %f79;
+	.loc	16	270	0
+	mul.f32 	%f80, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f81, %f20, %f80;
+	mov.f32 	%f82, 0f40800000;    	// 4
+	setp.gt.f32 	%p25, %f81, %f82;
+	@!%p25 bra 	$Lt_7_42242;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 14;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_42242:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	276	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f83, %f16, %f16;
+	add.f32 	%f10, %f9, %f83;
+	.loc	16	277	0
+	sub.f32 	%f84, %f20, %f80;
+	add.f32 	%f11, %f8, %f84;
+	.loc	16	278	0
+	mul.f32 	%f85, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f86, %f20, %f85;
+	mov.f32 	%f87, 0f40800000;    	// 4
+	setp.gt.f32 	%p26, %f86, %f87;
+	@!%p26 bra 	$Lt_7_42754;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 15;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_42754:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	284	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f88, %f16, %f16;
+	add.f32 	%f10, %f9, %f88;
+	.loc	16	285	0
+	sub.f32 	%f89, %f20, %f85;
+	add.f32 	%f11, %f8, %f89;
+	.loc	16	286	0
+	mul.f32 	%f90, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f91, %f20, %f90;
+	mov.f32 	%f92, 0f40800000;    	// 4
+	setp.gt.f32 	%p27, %f91, %f92;
+	@!%p27 bra 	$Lt_7_43266;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 16;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_43266:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	292	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f93, %f16, %f16;
+	add.f32 	%f10, %f9, %f93;
+	.loc	16	293	0
+	sub.f32 	%f94, %f20, %f90;
+	add.f32 	%f11, %f8, %f94;
+	.loc	16	294	0
+	mul.f32 	%f95, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f96, %f20, %f95;
+	mov.f32 	%f97, 0f40800000;    	// 4
+	setp.gt.f32 	%p28, %f96, %f97;
+	@!%p28 bra 	$Lt_7_43778;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 17;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_43778:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	300	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f98, %f16, %f16;
+	add.f32 	%f10, %f9, %f98;
+	.loc	16	301	0
+	sub.f32 	%f99, %f20, %f95;
+	add.f32 	%f11, %f8, %f99;
+	.loc	16	302	0
+	mul.f32 	%f100, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f101, %f20, %f100;
+	mov.f32 	%f102, 0f40800000;   	// 4
+	setp.gt.f32 	%p29, %f101, %f102;
+	@!%p29 bra 	$Lt_7_44290;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 18;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_44290:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	308	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f103, %f16, %f16;
+	add.f32 	%f10, %f9, %f103;
+	.loc	16	309	0
+	sub.f32 	%f104, %f20, %f100;
+	add.f32 	%f11, %f8, %f104;
+	.loc	16	310	0
+	mul.f32 	%f105, %f10, %f10;
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f106, %f20, %f105;
+	mov.f32 	%f107, 0f40800000;   	// 4
+	setp.gt.f32 	%p30, %f106, %f107;
+	@!%p30 bra 	$Lt_7_44802;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	sub.s32 	%r137, %r134, 19;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$Lt_7_44802:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	316	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f108, %f16, %f16;
+	add.f32 	%f10, %f9, %f108;
+	.loc	16	317	0
+	sub.f32 	%f109, %f20, %f105;
+	add.f32 	%f11, %f8, %f109;
+	.loc	16	318	0
+	mul.f32 	%f110, %f10, %f10;
+	.loc	16	322	0
+	sub.s32 	%r134, %r134, 20;
+	.loc	16	316	0
+	mov.u32 	%r138, 0;
+	setp.le.s32 	%p31, %r134, %r138;
+	@%p31 bra 	$L_7_31234;
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	mul.f32 	%f20, %f11, %f11;
+	add.f32 	%f111, %f20, %f110;
+	mov.f32 	%f112, 0f40800000;   	// 4
+	setp.gt.f32 	%p32, %f111, %f112;
+	@!%p32 bra 	$L_7_30978;
+$L_7_31234:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	mov.s32 	%r137, %r134;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2;
+$L_7_30978:
+ //<loop> Part of loop body line 329, head labeled $Lt_7_35074
+	.loc	16	325	0
+	mul.f32 	%f16, %f11, %f10;
+	add.f32 	%f113, %f16, %f16;
+	add.f32 	%f10, %f9, %f113;
+	.loc	16	326	0
+	sub.f32 	%f114, %f20, %f110;
+	add.f32 	%f11, %f8, %f114;
+	.loc	16	327	0
+	mul.f32 	%f12, %f10, %f10;
+	.loc	16	328	0
+	mul.f32 	%f13, %f11, %f11;
+	.loc	16	325	0
+	bra.uni 	$Lt_7_35074;
+$LDWendi__Z14CalcMandelbrotIfEiT_S0_S0_S0_ib_184_2:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	224	0
+	mov.s32 	%r139, 0;
+	setp.gt.s32 	%p33, %r137, %r139;
+	sub.s32 	%r140, %r133, %r137;
+	mov.s32 	%r141, 0;
+	selp.s32 	%r142, %r140, %r141, %p33;
+	mov.u32 	%r143, 0;
+	setp.eq.s32 	%p34, %r142, %r143;
+	@%p34 bra 	$Lt_7_45570;
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	231	0
+	ld.param.s32 	%r144, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame];
+	add.s32 	%r145, %r144, %r142;
+	ld.param.u8 	%r146, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+0];
+	mul.lo.s32 	%r147, %r145, %r146;
+	cvt.u8.u32 	%r148, %r147;
+	.loc	17	232	0
+	ld.param.u8 	%r149, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+1];
+	mul.lo.s32 	%r150, %r145, %r149;
+	cvt.u8.u32 	%r151, %r150;
+	.loc	17	233	0
+	ld.param.u8 	%r152, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+2];
+	mul.lo.s32 	%r153, %r145, %r152;
+	cvt.u8.u32 	%r154, %r153;
+	bra.uni 	$Lt_7_45314;
+$Lt_7_45570:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	237	0
+	mov.u32 	%r154, 0;
+	mov.u32 	%r151, 0;
+	mov.u32 	%r148, 0;
+$Lt_7_45314:
+ //<loop> Part of loop body line 186, head labeled $Lt_7_22530
+	.loc	17	243	0
+	ld.param.s32 	%r155, [__cudaparm__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame];
+	add.s32 	%r156, %r155, 1;
+	shr.s32 	%r157, %r156, 31;
+	mov.s32 	%r158, 1;
+	and.b32 	%r159, %r157, %r158;
+	add.s32 	%r160, %r159, %r156;
+	shr.s32 	%r161, %r160, 1;
+	mul.lo.s32 	%r162, %r155, %r39;
+	add.s32 	%r163, %r148, %r162;
+	add.s32 	%r164, %r161, %r163;
+	div.s32 	%r165, %r164, %r156;
+	.loc	17	244	0
+	mul.lo.s32 	%r166, %r155, %r40;
+	add.s32 	%r167, %r151, %r166;
+	add.s32 	%r168, %r161, %r167;
+	div.s32 	%r169, %r168, %r156;
+	st.global.v2.u8 	[%r38+0], {%r165,%r169};
+	.loc	17	245	0
+	mul.lo.s32 	%r170, %r155, %r41;
+	add.s32 	%r171, %r154, %r170;
+	add.s32 	%r172, %r161, %r171;
+	div.s32 	%r173, %r172, %r156;
+	st.global.u8 	[%r38+2], %r173;
+	bra.uni 	$Lt_7_22530;
+$Lt_7_258:
+	.loc	17	250	0
+	exit;
+$LDWend__Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	} // _Z16Mandelbrot1_sm13IfEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib
+
+	.entry _Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib (
+		.param .u32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch,
+		.param .f64 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff,
+		.param .f64 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff,
+		.param .f64 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP,
+		.param .f64 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP,
+		.param .f64 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale,
+		.param .align 4 .b8 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors[4],
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth,
+		.param .s32 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks,
+		.param .s8 __cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ)
+	{
+	.reg .u32 %r<175>;
+	.reg .f64 %fd<116>;
+	.reg .pred %p<36>;
+	.shared .u32 __cuda_local_var_286874_41_blockIndex;
+	.shared .u32 __cuda_local_var_286875_41_blockX;
+	.shared .u32 __cuda_local_var_286875_49_blockY;
+	.loc	17	180	0
+$LDWbegin__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 0;
+	setp.eq.u32 	%p1, %r1, %r2;
+	mov.u32 	%r3, %tid.y;
+	mov.u32 	%r4, 0;
+	setp.eq.u32 	%p2, %r3, %r4;
+	selp.s32 	%r5, 1, 0, %p1;
+	selp.s32 	%r6, 1, 0, %p2;
+	and.b32 	%r7, %r5, %r6;
+	ld.param.u32 	%r8, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_numBlocks];
+$Lt_8_22530:
+ //<loop> Loop body line 186
+	.loc	17	186	0
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p3, %r7, %r9;
+	@%p3 bra 	$Lt_8_31490;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	189	0
+	mov.u32 	%r10, blockCounter;
+	mov.u32 	%r11, 1;
+	atom.global.add.u32 	%r12, [%r10], %r11;
+	mov.s32 	%r13, %r12;
+	st.shared.u32 	[__cuda_local_var_286874_41_blockIndex], %r13;
+	.loc	17	190	0
+	ld.param.u32 	%r14, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_gridWidth];
+	rem.u32 	%r15, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286875_41_blockX], %r15;
+	.loc	17	191	0
+	div.u32 	%r16, %r13, %r14;
+	st.shared.u32 	[__cuda_local_var_286875_49_blockY], %r16;
+$Lt_8_31490:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	194	0
+	bar.sync 	0;
+	.loc	17	197	0
+	ld.shared.u32 	%r17, [__cuda_local_var_286874_41_blockIndex];
+	setp.ge.u32 	%p4, %r17, %r8;
+	@%p4 bra 	$Lt_8_258;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	ld.shared.u32 	%r18, [__cuda_local_var_286875_41_blockX];
+	mov.u32 	%r19, %ntid.x;
+	mul.lo.u32 	%r20, %r18, %r19;
+	ld.shared.u32 	%r21, [__cuda_local_var_286875_49_blockY];
+	mov.u32 	%r22, %ntid.y;
+	mul.lo.u32 	%r23, %r21, %r22;
+	add.u32 	%r24, %r20, %r1;
+	add.u32 	%r25, %r23, %r3;
+	ld.param.s32 	%r26, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageH];
+	ld.param.s32 	%r27, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_imageW];
+	set.gt.u32.s32 	%r28, %r26, %r25;
+	neg.s32 	%r29, %r28;
+	set.gt.u32.s32 	%r30, %r27, %r24;
+	neg.s32 	%r31, %r30;
+	and.b32 	%r32, %r29, %r31;
+	mov.u32 	%r33, 0;
+	setp.eq.s32 	%p5, %r32, %r33;
+	@%p5 bra 	$Lt_8_22530;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	206	0
+	mul.lo.s32 	%r34, %r27, %r25;
+	add.s32 	%r35, %r34, %r24;
+	mul.lo.u32 	%r36, %r35, 4;
+	ld.param.u32 	%r37, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_dst];
+	add.u32 	%r38, %r36, %r37;
+	ld.global.v4.u8 	{%r39,%r40,%r41,_}, [%r38+0];
+	mov.u32 	%r42, 0;
+	setp.le.s32 	%p6, %r24, %r42;
+	@%p6 bra 	$Lt_8_32770;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	ld.global.v4.u8 	{%r43,%r44,%r45,_}, [%r38+-4];
+	.loc	17	211	0
+	sub.s32 	%r46, %r45, %r41;
+	abs.s32 	%r47, %r46;
+	mov.s32 	%r48, 10;
+	set.gt.u32.s32 	%r49, %r47, %r48;
+	neg.s32 	%r50, %r49;
+	sub.s32 	%r51, %r43, %r39;
+	abs.s32 	%r52, %r51;
+	mov.s32 	%r53, 10;
+	set.gt.u32.s32 	%r54, %r52, %r53;
+	neg.s32 	%r55, %r54;
+	sub.s32 	%r56, %r44, %r40;
+	abs.s32 	%r57, %r56;
+	mov.s32 	%r58, 10;
+	set.gt.u32.s32 	%r59, %r57, %r58;
+	neg.s32 	%r60, %r59;
+	or.b32 	%r61, %r55, %r60;
+	or.b32 	%r62, %r50, %r61;
+	bra.uni 	$Lt_8_32514;
+$Lt_8_32770:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	mov.s32 	%r62, 0;
+$Lt_8_32514:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	add.s32 	%r63, %r24, 1;
+	setp.le.s32 	%p7, %r27, %r63;
+	@%p7 bra 	$Lt_8_33026;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	ld.global.v4.u8 	{%r64,%r65,%r66,_}, [%r38+4];
+	.loc	17	213	0
+	sub.s32 	%r67, %r66, %r41;
+	abs.s32 	%r68, %r67;
+	mov.s32 	%r69, 10;
+	set.gt.u32.s32 	%r70, %r68, %r69;
+	neg.s32 	%r71, %r70;
+	sub.s32 	%r72, %r64, %r39;
+	abs.s32 	%r73, %r72;
+	mov.s32 	%r74, 10;
+	set.gt.u32.s32 	%r75, %r73, %r74;
+	neg.s32 	%r76, %r75;
+	sub.s32 	%r77, %r65, %r40;
+	abs.s32 	%r78, %r77;
+	mov.s32 	%r79, 10;
+	set.gt.u32.s32 	%r80, %r78, %r79;
+	neg.s32 	%r81, %r80;
+	or.b32 	%r82, %r76, %r81;
+	or.b32 	%r83, %r71, %r82;
+	add.s32 	%r62, %r62, %r83;
+$Lt_8_33026:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	mov.u32 	%r84, 0;
+	setp.le.s32 	%p8, %r25, %r84;
+	@%p8 bra 	$Lt_8_33538;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	215	0
+	sub.s32 	%r85, %r35, %r27;
+	mul.lo.u32 	%r86, %r85, 4;
+	add.u32 	%r87, %r86, %r37;
+	ld.global.v4.u8 	{%r88,%r89,%r90,_}, [%r87+0];
+	sub.s32 	%r91, %r90, %r41;
+	abs.s32 	%r92, %r91;
+	mov.s32 	%r93, 10;
+	set.gt.u32.s32 	%r94, %r92, %r93;
+	neg.s32 	%r95, %r94;
+	sub.s32 	%r96, %r88, %r39;
+	abs.s32 	%r97, %r96;
+	mov.s32 	%r98, 10;
+	set.gt.u32.s32 	%r99, %r97, %r98;
+	neg.s32 	%r100, %r99;
+	sub.s32 	%r101, %r89, %r40;
+	abs.s32 	%r102, %r101;
+	mov.s32 	%r103, 10;
+	set.gt.u32.s32 	%r104, %r102, %r103;
+	neg.s32 	%r105, %r104;
+	or.b32 	%r106, %r100, %r105;
+	or.b32 	%r107, %r95, %r106;
+	add.s32 	%r62, %r62, %r107;
+$Lt_8_33538:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	add.s32 	%r108, %r25, 1;
+	setp.le.s32 	%p9, %r26, %r108;
+	@%p9 bra 	$Lt_8_34050;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	217	0
+	add.s32 	%r109, %r35, %r27;
+	mul.lo.u32 	%r110, %r109, 4;
+	add.u32 	%r111, %r110, %r37;
+	ld.global.v4.u8 	{%r112,%r113,%r114,_}, [%r111+0];
+	sub.s32 	%r115, %r114, %r41;
+	abs.s32 	%r116, %r115;
+	mov.s32 	%r117, 10;
+	set.gt.u32.s32 	%r118, %r116, %r117;
+	neg.s32 	%r119, %r118;
+	sub.s32 	%r120, %r112, %r39;
+	abs.s32 	%r121, %r120;
+	mov.s32 	%r122, 10;
+	set.gt.u32.s32 	%r123, %r121, %r122;
+	neg.s32 	%r124, %r123;
+	sub.s32 	%r125, %r113, %r40;
+	abs.s32 	%r126, %r125;
+	mov.s32 	%r127, 10;
+	set.gt.u32.s32 	%r128, %r126, %r127;
+	neg.s32 	%r129, %r128;
+	or.b32 	%r130, %r124, %r129;
+	or.b32 	%r131, %r119, %r130;
+	add.s32 	%r62, %r62, %r131;
+$Lt_8_34050:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	mov.u32 	%r132, 0;
+	setp.eq.s32 	%p10, %r62, %r132;
+	@%p10 bra 	$Lt_8_22530;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	16	146	0
+	ld.param.s32 	%r133, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_crunch];
+	mov.s32 	%r134, %r133;
+	ld.param.f64 	%fd1, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_scale];
+	ld.param.f64 	%fd2, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xOff];
+	cvt.rn.f64.s32 	%fd3, %r24;
+	mad.rn.f64 	%fd4, %fd3, %fd1, %fd2;
+	ld.param.f64 	%fd5, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yOff];
+	cvt.rn.f64.s32 	%fd6, %r25;
+	mad.rn.f64 	%fd7, %fd6, %fd1, %fd5;
+	ld.param.s8 	%r135, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_isJ];
+	mov.u32 	%r136, 0;
+	setp.eq.s32 	%p11, %r135, %r136;
+	@%p11 bra 	$Lt_8_35330;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	16	151	0
+	ld.param.f64 	%fd8, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_xJP];
+	.loc	16	152	0
+	ld.param.f64 	%fd9, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_yJP];
+	.loc	16	153	0
+	mov.f64 	%fd10, %fd7;
+	.loc	16	154	0
+	mov.f64 	%fd11, %fd4;
+	.loc	16	155	0
+	mul.f64 	%fd12, %fd7, %fd7;
+	.loc	16	156	0
+	mul.f64 	%fd13, %fd4, %fd4;
+	bra.uni 	$Lt_8_35074;
+$Lt_8_35330:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	16	160	0
+	mov.f64 	%fd8, %fd4;
+	.loc	16	161	0
+	mov.f64 	%fd9, %fd7;
+	.loc	16	165	0
+	mov.f64 	%fd13, 0d0000000000000000;	// 0
+	mov.f64 	%fd12, 0d0000000000000000;	// 0
+	mov.f64 	%fd11, 0d0000000000000000;	// 0
+	mov.f64 	%fd10, 0d0000000000000000;	// 0
+$Lt_8_35074:
+$Lt_8_25090:
+ //<loop> Loop body line 329
+	.loc	16	329	0
+	add.f64 	%fd14, %fd13, %fd12;
+	mov.f64 	%fd15, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p12, %fd14, %fd15;
+	@!%p12 bra 	$Lt_8_35586;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 1;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_35586:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	172	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd17, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd17;
+	.loc	16	173	0
+	sub.f64 	%fd18, %fd13, %fd12;
+	add.f64 	%fd11, %fd8, %fd18;
+	.loc	16	174	0
+	mul.f64 	%fd19, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd21, %fd20, %fd19;
+	mov.f64 	%fd22, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p13, %fd21, %fd22;
+	@!%p13 bra 	$Lt_8_36098;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 2;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_36098:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	180	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd23, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd23;
+	.loc	16	181	0
+	sub.f64 	%fd24, %fd20, %fd19;
+	add.f64 	%fd11, %fd8, %fd24;
+	.loc	16	182	0
+	mul.f64 	%fd25, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd26, %fd20, %fd25;
+	mov.f64 	%fd27, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p14, %fd26, %fd27;
+	@!%p14 bra 	$Lt_8_36610;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 3;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_36610:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	188	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd28, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd28;
+	.loc	16	189	0
+	sub.f64 	%fd29, %fd20, %fd25;
+	add.f64 	%fd11, %fd8, %fd29;
+	.loc	16	190	0
+	mul.f64 	%fd30, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd31, %fd20, %fd30;
+	mov.f64 	%fd32, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p15, %fd31, %fd32;
+	@!%p15 bra 	$Lt_8_37122;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 4;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_37122:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	196	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd33, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd33;
+	.loc	16	197	0
+	sub.f64 	%fd34, %fd20, %fd30;
+	add.f64 	%fd11, %fd8, %fd34;
+	.loc	16	198	0
+	mul.f64 	%fd35, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd36, %fd20, %fd35;
+	mov.f64 	%fd37, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p16, %fd36, %fd37;
+	@!%p16 bra 	$Lt_8_37634;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 5;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_37634:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	204	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd38, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd38;
+	.loc	16	205	0
+	sub.f64 	%fd39, %fd20, %fd35;
+	add.f64 	%fd11, %fd8, %fd39;
+	.loc	16	206	0
+	mul.f64 	%fd40, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd41, %fd20, %fd40;
+	mov.f64 	%fd42, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p17, %fd41, %fd42;
+	@!%p17 bra 	$Lt_8_38146;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 6;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_38146:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	212	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd43, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd43;
+	.loc	16	213	0
+	sub.f64 	%fd44, %fd20, %fd40;
+	add.f64 	%fd11, %fd8, %fd44;
+	.loc	16	214	0
+	mul.f64 	%fd45, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd46, %fd20, %fd45;
+	mov.f64 	%fd47, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p18, %fd46, %fd47;
+	@!%p18 bra 	$Lt_8_38658;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 7;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_38658:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	220	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd48, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd48;
+	.loc	16	221	0
+	sub.f64 	%fd49, %fd20, %fd45;
+	add.f64 	%fd11, %fd8, %fd49;
+	.loc	16	222	0
+	mul.f64 	%fd50, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd51, %fd20, %fd50;
+	mov.f64 	%fd52, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p19, %fd51, %fd52;
+	@!%p19 bra 	$Lt_8_39170;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 8;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_39170:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	228	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd53, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd53;
+	.loc	16	229	0
+	sub.f64 	%fd54, %fd20, %fd50;
+	add.f64 	%fd11, %fd8, %fd54;
+	.loc	16	230	0
+	mul.f64 	%fd55, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd56, %fd20, %fd55;
+	mov.f64 	%fd57, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p20, %fd56, %fd57;
+	@!%p20 bra 	$Lt_8_39682;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 9;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_39682:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	236	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd58, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd58;
+	.loc	16	237	0
+	sub.f64 	%fd59, %fd20, %fd55;
+	add.f64 	%fd11, %fd8, %fd59;
+	.loc	16	238	0
+	mul.f64 	%fd60, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd61, %fd20, %fd60;
+	mov.f64 	%fd62, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p21, %fd61, %fd62;
+	@!%p21 bra 	$Lt_8_40194;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 10;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_40194:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	244	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd63, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd63;
+	.loc	16	245	0
+	sub.f64 	%fd64, %fd20, %fd60;
+	add.f64 	%fd11, %fd8, %fd64;
+	.loc	16	246	0
+	mul.f64 	%fd65, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd66, %fd20, %fd65;
+	mov.f64 	%fd67, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p22, %fd66, %fd67;
+	@!%p22 bra 	$Lt_8_40706;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 11;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_40706:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	252	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd68, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd68;
+	.loc	16	253	0
+	sub.f64 	%fd69, %fd20, %fd65;
+	add.f64 	%fd11, %fd8, %fd69;
+	.loc	16	254	0
+	mul.f64 	%fd70, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd71, %fd20, %fd70;
+	mov.f64 	%fd72, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p23, %fd71, %fd72;
+	@!%p23 bra 	$Lt_8_41218;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 12;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_41218:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	260	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd73, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd73;
+	.loc	16	261	0
+	sub.f64 	%fd74, %fd20, %fd70;
+	add.f64 	%fd11, %fd8, %fd74;
+	.loc	16	262	0
+	mul.f64 	%fd75, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd76, %fd20, %fd75;
+	mov.f64 	%fd77, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p24, %fd76, %fd77;
+	@!%p24 bra 	$Lt_8_41730;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 13;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_41730:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	268	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd78, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd78;
+	.loc	16	269	0
+	sub.f64 	%fd79, %fd20, %fd75;
+	add.f64 	%fd11, %fd8, %fd79;
+	.loc	16	270	0
+	mul.f64 	%fd80, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd81, %fd20, %fd80;
+	mov.f64 	%fd82, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p25, %fd81, %fd82;
+	@!%p25 bra 	$Lt_8_42242;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 14;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_42242:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	276	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd83, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd83;
+	.loc	16	277	0
+	sub.f64 	%fd84, %fd20, %fd80;
+	add.f64 	%fd11, %fd8, %fd84;
+	.loc	16	278	0
+	mul.f64 	%fd85, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd86, %fd20, %fd85;
+	mov.f64 	%fd87, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p26, %fd86, %fd87;
+	@!%p26 bra 	$Lt_8_42754;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 15;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_42754:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	284	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd88, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd88;
+	.loc	16	285	0
+	sub.f64 	%fd89, %fd20, %fd85;
+	add.f64 	%fd11, %fd8, %fd89;
+	.loc	16	286	0
+	mul.f64 	%fd90, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd91, %fd20, %fd90;
+	mov.f64 	%fd92, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p27, %fd91, %fd92;
+	@!%p27 bra 	$Lt_8_43266;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 16;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_43266:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	292	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd93, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd93;
+	.loc	16	293	0
+	sub.f64 	%fd94, %fd20, %fd90;
+	add.f64 	%fd11, %fd8, %fd94;
+	.loc	16	294	0
+	mul.f64 	%fd95, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd96, %fd20, %fd95;
+	mov.f64 	%fd97, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p28, %fd96, %fd97;
+	@!%p28 bra 	$Lt_8_43778;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 17;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_43778:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	300	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd98, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd98;
+	.loc	16	301	0
+	sub.f64 	%fd99, %fd20, %fd95;
+	add.f64 	%fd11, %fd8, %fd99;
+	.loc	16	302	0
+	mul.f64 	%fd100, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd101, %fd20, %fd100;
+	mov.f64 	%fd102, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p29, %fd101, %fd102;
+	@!%p29 bra 	$Lt_8_44290;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 18;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_44290:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	308	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd103, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd103;
+	.loc	16	309	0
+	sub.f64 	%fd104, %fd20, %fd100;
+	add.f64 	%fd11, %fd8, %fd104;
+	.loc	16	310	0
+	mul.f64 	%fd105, %fd10, %fd10;
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd106, %fd20, %fd105;
+	mov.f64 	%fd107, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p30, %fd106, %fd107;
+	@!%p30 bra 	$Lt_8_44802;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	sub.s32 	%r137, %r134, 19;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$Lt_8_44802:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	316	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd108, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd108;
+	.loc	16	317	0
+	sub.f64 	%fd109, %fd20, %fd105;
+	add.f64 	%fd11, %fd8, %fd109;
+	.loc	16	318	0
+	mul.f64 	%fd110, %fd10, %fd10;
+	.loc	16	322	0
+	sub.s32 	%r134, %r134, 20;
+	.loc	16	316	0
+	mov.u32 	%r138, 0;
+	setp.le.s32 	%p31, %r134, %r138;
+	@%p31 bra 	$L_8_31234;
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	mul.f64 	%fd20, %fd11, %fd11;
+	add.f64 	%fd111, %fd20, %fd110;
+	mov.f64 	%fd112, 0d4010000000000000;	// 4
+	setp.gt.f64 	%p32, %fd111, %fd112;
+	@!%p32 bra 	$L_8_30978;
+$L_8_31234:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	mov.s32 	%r137, %r134;
+	bra.uni 	$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2;
+$L_8_30978:
+ //<loop> Part of loop body line 329, head labeled $Lt_8_35074
+	.loc	16	325	0
+	mul.f64 	%fd16, %fd11, %fd10;
+	add.f64 	%fd113, %fd16, %fd16;
+	add.f64 	%fd10, %fd9, %fd113;
+	.loc	16	326	0
+	sub.f64 	%fd114, %fd20, %fd110;
+	add.f64 	%fd11, %fd8, %fd114;
+	.loc	16	327	0
+	mul.f64 	%fd12, %fd10, %fd10;
+	.loc	16	328	0
+	mul.f64 	%fd13, %fd11, %fd11;
+	.loc	16	325	0
+	bra.uni 	$Lt_8_35074;
+$LDWendi__Z14CalcMandelbrotIdEiT_S0_S0_S0_ib_185_2:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	224	0
+	mov.s32 	%r139, 0;
+	setp.gt.s32 	%p33, %r137, %r139;
+	sub.s32 	%r140, %r133, %r137;
+	mov.s32 	%r141, 0;
+	selp.s32 	%r142, %r140, %r141, %p33;
+	mov.u32 	%r143, 0;
+	setp.eq.s32 	%p34, %r142, %r143;
+	@%p34 bra 	$Lt_8_45570;
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	231	0
+	ld.param.s32 	%r144, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_animationFrame];
+	add.s32 	%r145, %r144, %r142;
+	ld.param.u8 	%r146, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+0];
+	mul.lo.s32 	%r147, %r145, %r146;
+	cvt.u8.u32 	%r148, %r147;
+	.loc	17	232	0
+	ld.param.u8 	%r149, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+1];
+	mul.lo.s32 	%r150, %r145, %r149;
+	cvt.u8.u32 	%r151, %r150;
+	.loc	17	233	0
+	ld.param.u8 	%r152, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_colors+2];
+	mul.lo.s32 	%r153, %r145, %r152;
+	cvt.u8.u32 	%r154, %r153;
+	bra.uni 	$Lt_8_45314;
+$Lt_8_45570:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	237	0
+	mov.u32 	%r154, 0;
+	mov.u32 	%r151, 0;
+	mov.u32 	%r148, 0;
+$Lt_8_45314:
+ //<loop> Part of loop body line 186, head labeled $Lt_8_22530
+	.loc	17	243	0
+	ld.param.s32 	%r155, [__cudaparm__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib_frame];
+	add.s32 	%r156, %r155, 1;
+	shr.s32 	%r157, %r156, 31;
+	mov.s32 	%r158, 1;
+	and.b32 	%r159, %r157, %r158;
+	add.s32 	%r160, %r159, %r156;
+	shr.s32 	%r161, %r160, 1;
+	mul.lo.s32 	%r162, %r155, %r39;
+	add.s32 	%r163, %r148, %r162;
+	add.s32 	%r164, %r161, %r163;
+	div.s32 	%r165, %r164, %r156;
+	.loc	17	244	0
+	mul.lo.s32 	%r166, %r155, %r40;
+	add.s32 	%r167, %r151, %r166;
+	add.s32 	%r168, %r161, %r167;
+	div.s32 	%r169, %r168, %r156;
+	st.global.v2.u8 	[%r38+0], {%r165,%r169};
+	.loc	17	245	0
+	mul.lo.s32 	%r170, %r155, %r41;
+	add.s32 	%r171, %r154, %r170;
+	add.s32 	%r172, %r161, %r171;
+	div.s32 	%r173, %r172, %r156;
+	st.global.u8 	[%r38+2], %r173;
+	bra.uni 	$Lt_8_22530;
+$Lt_8_258:
+	.loc	17	250	0
+	exit;
+$LDWend__Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib:
+	} // _Z16Mandelbrot1_sm13IdEvP6uchar4iiiT_S2_S2_S2_S2_S0_iiiib
+
