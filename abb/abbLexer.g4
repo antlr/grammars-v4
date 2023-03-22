@@ -1,21 +1,23 @@
 lexer grammar abbLexer;
 
+options { caseInsensitive = true; }
+
 MODULE : 'module' ;
 ENDMODULE : 'endmodule' ;
-PROC : P R O C ;
-ENDPROC : E N D P R O C;
-LOCAL : L O C A L ;
-CONST : C O N S T ;
-PERS : P E R S ;
-VAR : V A R ;
-TOOLDATA : T O O L D A T A ;
-WOBJDATA : W O B J D A T A ;
-SPEEDDATA : S P E E D D A T A ;
-ZONEDATA : Z O N E D A T A ;
-CLOCK : C L O C K ;
-BOOL : B O O L ;
-ON_CALL : '\\' O N ;
-OFF_CALL : '\\' O F F ;
+PROC: 'PROC';
+ENDPROC: 'ENDPROC';
+LOCAL: 'LOCAL';
+CONST: 'CONST';
+PERS: 'PERS';
+VAR: 'VAR';
+TOOLDATA: 'TOOLDATA';
+WOBJDATA: 'WOBJDATA';
+SPEEDDATA: 'SPEEDDATA';
+ZONEDATA: 'ZONEDATA';
+CLOCK: 'CLOCK';
+BOOL: 'BOOL';
+ON_CALL: '\\ON';
+OFF_CALL: '\\OFF';
 
 SLASH               : '/' ;
 EQUALS              : ':=' ;
@@ -42,136 +44,6 @@ MULTIPLY            : '*';
 PERCENT             : '%';
 HASH                : '#';
 
-fragment A
-   : ('a' | 'A')
-   ;
-
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
-
-
 WS
    : (' ' | '\t' | '\u000C') -> skip
    ;
@@ -186,7 +58,8 @@ LINE_COMMENT
    ;
 
 BOOLLITERAL
-   : (F A L S E | T R U E)
+   : 'FALSE'
+   | 'TRUE'
    ;
 
 CHARLITERAL
@@ -208,7 +81,7 @@ FLOATLITERAL
 
 
 fragment Exponent
-   : E ('+' | '-')? ('0' .. '9') +
+   : 'E' ('+' | '-')? ('0' .. '9') +
    ;
 
 
@@ -218,12 +91,12 @@ INTLITERAL
 
 
 fragment HexPrefix
-   : '\'' H
+   : '\'' 'H'
    ;
 
 
 fragment HexDigit
-   : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+   : ('0' .. '9' | 'A' .. 'F')
    ;
 
 
@@ -233,7 +106,7 @@ fragment HexSuffix
 
 
 fragment BinPrefix
-   : '\'' B
+   : '\'' 'B'
    ;
 
 
@@ -252,7 +125,7 @@ IDENTIFIER
 
 
 fragment IdentifierStart
-   : 'a' .. 'z' | 'A' .. 'Z' | '_'
+   : 'A' .. 'Z' | '_'
    ;
 
 

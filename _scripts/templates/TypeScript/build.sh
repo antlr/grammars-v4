@@ -9,5 +9,5 @@ java -jar "<antlr_tool_path>" -encoding <antlr_encoding> -Dlanguage=TypeScript <
 
 npm install -g typescript ts-node
 npm install
-npm run build
+tsc -p tsconfig.json --pretty
 exit 0

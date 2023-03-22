@@ -15,10 +15,6 @@ updates:
     labels:
       - "infrastructure"
       - "dependencies"
-  # script based multiple runtime test
-  # antlr4cs test is not supported by this repo
-  # cpp cmake is not supported by bot
-  # csharp
   - package-ecosystem: "nuget"
     directory: "/_scripts/templates/CSharp"
     schedule:

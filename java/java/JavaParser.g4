@@ -192,14 +192,14 @@ interfaceBodyDeclaration
     ;
 
 interfaceMemberDeclaration
-    : constDeclaration
+    : recordDeclaration // Java17
+    | constDeclaration
     | interfaceMethodDeclaration
     | genericInterfaceMethodDeclaration
     | interfaceDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
-    | recordDeclaration // Java17
     ;
 
 constDeclaration
@@ -543,7 +543,7 @@ resources
 
 resource
     : variableModifier* ( classOrInterfaceType variableDeclaratorId | VAR identifier ) '=' expression
-    | identifier
+    | qualifiedName
     ;
 
 /** Matches cases then statements, both of which are mandatory.

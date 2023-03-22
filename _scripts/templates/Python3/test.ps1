@@ -50,8 +50,14 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
+<if(individual_parsing)>
+# Individual parsing.
+Get-Content "tests.txt" | ForEach-Object { trwdog python3 Test.py -q -tee -tree $_ *>> parse.txt }
+<else>
+# Group parsing.
 get-content "tests.txt" | trwdog python3 Test.py -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
+<endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
 # if the environment for running the program does not exist, or the
@@ -76,6 +82,7 @@ $old = Get-Location
 Set-Location ../<example_files_unix>
 
 # Check if any .errors/.tree files have changed. That's not good.
+git config --global pager.diff false
 Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
 $updated = 0
 foreach ($item in Get-ChildItem . -Recurse) {
@@ -103,7 +110,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
 
 # Check if any untracked .errors files are not empty.
 $new_errors_txt = New-Object System.Collections.Generic.List[string]
-$new_errors2_txt = git ls-files --exclude-standard -o --ignored $TestDirectory
+$new_errors2_txt = git ls-files --exclude-standard -o $TestDirectory
 $new_errors = $LASTEXITCODE
 
 # Gather up all untracked .errors file output. These are new errors

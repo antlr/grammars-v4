@@ -21,6 +21,28 @@ function Get-GrammarSkip {
         Write-Host "Intentionally skipping grammar $Grammar target $Target."
         return $True
     }
+    $desc_targets = trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    $yes = $false
+    foreach ($t in $desc_targets.Split(' ')) {
+        if ($t -eq '+all') { $yes = $true }
+        if ($t -eq "-$target") { $yes = $false }
+        if ($t -eq $target) { $yes = $true }
+    }
+    if (! $yes) { 
+        return $True
+    }
     return $False
 }
 
@@ -40,6 +62,7 @@ function Test-Grammar {
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
     Set-Location $Directory
+    $zzz = Get-Location
 
     $failStage = [FailStage]::Success
     
@@ -53,60 +76,74 @@ function Test-Grammar {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
-    $targetgenerated = "Generated-$Target"
-    if (Test-Path $targetgenerated) {
-        Set-Location $targetgenerated
-    }
-    else {
-        $failStage = [FailStage]::CodeGeneration
-        Write-Host "No code generated" -ForegroundColor Red
-    }
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
+    $dirs = Get-ChildItem -Path "Generated-$Target*"
+    foreach ($m in $dirs) {
+        $targetgenerated = $m.Name
+        Write-Host "targetgenerated is $targetgenerated"
+        Set-Location $zzz
+        if (Test-Path $targetgenerated) {
+            Set-Location $targetgenerated
+        }
+        else {
+            $failStage = [FailStage]::CodeGeneration
+            Write-Host "No code generated" -ForegroundColor Red
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+
+        # build
+
+        # see _scripts/templates/*/tester.psm1
+        ./build.ps1
+        $buildResult = $LASTEXITCODE
+
+        if ($buildResult -ne 0) {
+            $failStage = [FailStage]::Compile
+            Write-Host "Build failed" -ForegroundColor Red
+        }
+
+        Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+
+        # test
+        $start2 = Get-Date
+        Write-Host "--- Testing files ---"
+        ./test.ps1
+        $passed = $LASTEXITCODE -eq 0
+
+        if (! $passed) {
+            $success = $false
+            $failStage = [FailStage]::Test
+            Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+            Set-Location $cwd
+            return @{
+                Success     = $success
+                Stage       = $failStage
+                FailedCases = $failedList
+            }
         }
     }
-    $hasTransform = Test-Path transformGrammar.py
-    if ($hasTransform) {
-        python3 transformGrammar.py
-    }
 
-    # build
-
-    # see _scripts/templates/*/tester.psm1
-    ./build.ps1
-    $buildResult = $LASTEXITCODE
-
-    if ($buildResult -ne 0) {
-        $failStage = [FailStage]::Compile
-        Write-Host "Build failed" -ForegroundColor Red
-    }
-
-    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
-        }
-    }
-
-    # test
-    $start2 = Get-Date
-    Write-Host "--- Testing files ---"
-    ./test.ps1
-    $passed = $LASTEXITCODE -eq 0
-
-    if (! $passed) {
-        $success = $false
-        $failStage = [FailStage]::Test
-    }
-
-    Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+    Write-Host "Test completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     Set-Location $cwd
     return @{
         Success     = $success
@@ -168,7 +205,8 @@ function Get-GitChangedDirectories {
         Write-Error "which commit to diff?"
         exit 1
     }
-    $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    $diff = git diff $PreviousCommit $CurrentCommit --name-only | Where-Object { $_ -notmatch "_scripts" -and $_ -notmatch "\.github" }
+
     if ($diff -is "string") {
         $diff = @($diff)
     }
@@ -193,6 +231,9 @@ function Get-ChangedGrammars {
     $changed = @()
     foreach ($d in $diff) {
         $old = Get-Location
+        if (!(Test-Path -Path "$d")) {
+            continue
+        }
         Set-Location $d
         while ($True) {
             if (Test-Path -Path "desc.xml" -PathType Leaf) {
@@ -207,6 +248,25 @@ function Get-ChangedGrammars {
         }
         # g=${g##*$prefix/} not needed.
         if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
+            Write-Host "No desc.xml for $d"
+            Set-Location "$old"
+            continue
+        }
+        $desc_targets = trxml2 desc.xml | Select-String '/desc/targets'
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "The desc.xml for $testname is malformed. Skipping."
+            Set-Location "$old"
+            continue
+        }
+        $desc_targets = $desc_targets -replace '.*='
+        $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+        $yes = $false
+        foreach ($t in $desc_targets.Split(' ')) {
+            if ($t -eq '+all') { $yes = $true }
+            if ($t -eq "-$target") { $yes = $false }
+            if ($t -eq $target) { $yes = $true }
+        }
+        if (! $yes) { 
             Set-Location "$old"
             continue
         }

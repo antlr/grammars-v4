@@ -27,7 +27,7 @@ options
    { tokenVocab = CqlLexer; }
 
 root
-   : cqls? MINUSMINUS? eof
+   : cqls? MINUSMINUS? EOF
    ;
 
 cqls
@@ -1253,10 +1253,6 @@ kwWith
 
 kwRevoke
    : K_REVOKE
-   ;
-
-eof
-   : EOF
    ;
 
 // BRACKETS

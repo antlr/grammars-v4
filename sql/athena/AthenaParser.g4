@@ -173,10 +173,10 @@ when_clauses
     ;
 
 when_not_matched_clause
-    : WHEN NOT MATCHED (AND expression)? THEN INSERT column_list? VALUES '(' expression_list ')'
+    : WHEN NOT MATCHED (AND expression)? THEN INSERT column_list? VALUES '(' expression_list_ ')'
     ;
 
-expression_list
+expression_list_
     : expression (',' expression)*
     ;
 
@@ -509,7 +509,7 @@ pred
     | id_ NOT? LIKE string
     | expression NOT? BETWEEN expression AND expression
     | expression NOT? IN table_subquery
-    | expression NOT? IN '(' expression_list ')'
+    | expression NOT? IN '(' expression_list_ ')'
     | NOT? EXISTS table_subquery
     | expression comparison_operator (ALL | ANY | SOME) table_subquery
     ;
@@ -526,7 +526,7 @@ expression
     : primitive_expression
     | '(' expression ')'
     | table_subquery
-    | id_ '(' expression_list ')'
+    | id_ '(' expression_list_ ')'
     | case_expression
     | when_expression
     | op=(PLUS | MINUS) expression

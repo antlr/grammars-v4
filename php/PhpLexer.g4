@@ -143,6 +143,7 @@ Echo:               'echo';
 Else:               'else';
 ElseIf:             'elseif';
 Empty:              'empty';
+Enum_:              'enum';
 
 EndDeclare:         'enddeclare';
 EndFor:             'endfor';
@@ -190,6 +191,7 @@ Print:              'print';
 Private:            'private';
 Protected:          'protected';
 Public:             'public';
+Readonly:           'readonly';
 Require:            'require';
 RequireOnce:        'require_once';
 Resource:           'resource';
@@ -210,6 +212,9 @@ While:              'while';
 Yield:              'yield';
 From:               'from';
 LambdaFn:           'fn';
+Ticks:              'ticks';
+Encoding:           'encoding';
+StrictTypes:        'strict_types';
 
 Get:                '__get';
 Set:                '__set';
@@ -306,12 +311,12 @@ BackQuote:          '`';
 
 VarName:            '$' NameString;
 Label:              [a-z_][a-z_0-9]*;
-Octal:              '0' [0-7]+;
-Decimal:            '0' | NonZeroDigit Digit*;
-Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
-    |               Digit+ ExponentPart;
-Hex:                '0x' HexDigit+;
-Binary:             '0b' [01_]+;
+Octal:              '0' 'o'? OctalDigit+ ('_' OctalDigit+)*;
+Decimal:            '0' | NonZeroDigit Digit* ('_' Digit+)*;
+Real:               (LNum '.' LNum? | LNum? '.' LNum ) ExponentPart?
+    |               LNum+ ExponentPart;
+Hex:                '0x' HexDigit+ ('_' HexDigit+)*;
+Binary:             '0b' [01]+ ('_' [01]+)*;
 
 BackQuoteString:   '`' ~'`'* '`';
 SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
@@ -371,7 +376,9 @@ fragment HtmlNameStartChar options { caseInsensitive = false; }
     | '\uF900'..'\uFDCF'
     | '\uFDF0'..'\uFFFD'
     ;
-fragment ExponentPart:         'e' [+-]? Digit+;
-fragment NonZeroDigit:         [1-9_];
-fragment Digit:                [0-9_];
-fragment HexDigit:             [a-f0-9_];
+fragment LNum:                 Digit+ ('_' Digit+)*;
+fragment ExponentPart:         'e' [+-]? LNum;
+fragment NonZeroDigit:         [1-9];
+fragment Digit:                [0-9];
+fragment OctalDigit:           [0-7];
+fragment HexDigit:             [a-f0-9];

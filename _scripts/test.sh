@@ -36,27 +36,6 @@ then
     exit 0
 fi
 
-setupdeps()
-{
-    trgen --version
-    if [ $? != "0" ]
-    then
-        echo "Setting up trgen and antlr jar."
-        dotnet tool install -g trgen --version 0.20.0
-        dotnet tool install -g triconv --version 0.20.0
-        dotnet tool install -g trxml2 --version 0.20.0
-        dotnet tool install -g trwdog --version 0.20.0
-    case "${unameOut}" in
-        Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.12.0-complete.jar' -o $antlr4jar ;;
-        *)          echo 'unknown machine'
-    esac
-        echo "Done setting up."
-    fi
-}
-
 thetime()
 {
     local hh
@@ -173,7 +152,7 @@ OPTIONS
            "all", or "agnostic". The default is "all".
 
        -t
-           Specifies the targets to test. Possible targets are "Antlr4cs",
+           Specifies the targets to test. Possible targets are
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
            All targets are tested by default.
 
@@ -289,7 +268,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4cs CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
+    targets=( CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
@@ -372,54 +351,57 @@ do
     bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
-    if [ ! -f Generated-$target/build.sh ]; then echo " no build.sh"; popd > /dev/null 2>&1; continue; fi
+    for d in `echo Generated-$target-* Generated-$target`
+    do
+	if [ ! -d $d ]; then continue; fi
+        if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
 
-    # Build driver code.
-    if [ $quiet != "true" ]; then echo "Building."; fi
-    pushd Generated-$target > /dev/null
-    date1=$(date +"%s")
-    bash build.sh > output.txt 2>&1
-    status="$?"
-    date2=$(date +"%s")
-    DIFF=$(($date2-$date1))
-    length=" Build "`thetime $DIFF`
-    if [ "$status" != "0" ]
-    then
-        echo ""
-        echo ========
-        echo "Build of $testname for $target failed."
-        cat output.txt
-        failed+=( "$testname/$target" )
-        echo ========
-        popd > /dev/null
-        popd > /dev/null
-        continue
-    else
+        # Build driver code.
+        if [ $quiet != "true" ]; then echo "Building."; fi
+        pushd $d > /dev/null
+        date1=$(date +"%s")
+        bash build.sh > output.txt 2>&1
+        status="$?"
+        date2=$(date +"%s")
+        DIFF=$(($date2-$date1))
+        length=" Build "`thetime $DIFF`
+        if [ "$status" != "0" ]
+        then
+            echo ""
+            echo ========
+            echo "Build of $testname for $target failed."
+            cat output.txt
+            failed+=( "$testname/$target" )
+            echo ========
+            popd > /dev/null
+            continue
+        else
+            echo "$length"
+        fi
+
+        # Test generated parser on examples.
+        if [ $quiet != "true" ]; then echo "Parsing."; fi
+        date1=$(date +"%s")
+        bash test.sh > output.txt 2>&1
+        status="$?"
+        date2=$(date +"%s")
+        DIFF=$(($date2-$date1))
+        length=" Test "`thetime $DIFF`
         echo "$length"
-    fi
-
-    # Test generated parser on examples.
-    if [ $quiet != "true" ]; then echo "Parsing."; fi
-    date1=$(date +"%s")
-    bash test.sh > output.txt 2>&1
-    status="$?"
-    date2=$(date +"%s")
-    DIFF=$(($date2-$date1))
-    length=" Test "`thetime $DIFF`
-    echo "$length"
-    if [ "$status" != "0" ]
-    then
-        echo ""
-        echo ========
-        echo "Parsing tests of $testname for $target failed."
-        cat output.txt
-        failed+=( "$testname/$target" )
-        echo ========
-    else
-        echo " Succeeded."      
-        succeeded+=( "$testname,$target" )
-    fi
-    popd > /dev/null
+        if [ "$status" != "0" ]
+        then
+            echo ""
+            echo ========
+            echo "Parsing tests of $testname for $target failed."
+            cat output.txt
+            failed+=( "$testname/$target" )
+            echo ========
+            else
+            echo " Succeeded."      
+            succeeded+=( "$testname,$target" )
+        fi
+        popd > /dev/null
+    done
     popd > /dev/null
 done
 

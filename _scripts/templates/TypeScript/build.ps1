@@ -20,6 +20,6 @@ if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
 
-$(& npm run build ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+$(& tsc -p tsconfig.json --pretty ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 
 exit $compile_exit_code
