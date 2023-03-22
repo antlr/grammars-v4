@@ -3335,7 +3335,7 @@ binary_or_ternary_builtin_function
     : CHARINDEX
     | REPLACE
     | substring=( SUBSTRING | SUBSTR )
-    | ( LIKE | ILIKE )
+    | LIKE | ILIKE 
     ;
 
 ternary_builtin_function
@@ -3650,8 +3650,7 @@ as_alias
     ;
 
 expression_elem
-    : expr as_alias?
-    | predicate as_alias?
+    : ( expr | predicate ) as_alias?
     ;
 
 column_position
@@ -3898,8 +3897,8 @@ predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
     | expr comparison_operator expr
     | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
-    | expr NOT* BETWEEN expr AND expr
-    | expr NOT* IN '(' (subquery | expr_list) ')'
+    | expr NOT? BETWEEN expr AND expr
+    | expr NOT? IN '(' (subquery | expr_list) ')'
     | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
