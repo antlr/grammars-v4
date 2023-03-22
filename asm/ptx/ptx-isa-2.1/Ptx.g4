@@ -1,5 +1,5 @@
 /*
-   Copyright 2010 Ken Domino
+   Copyright 2023 Ken Domino
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,17 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   This is an Antlr v3 grammar for Nvidia's CUDA
+   This is an Antlr v4 grammar for Nvidia's CUDA
    (Compute Unified Device Architecture) PTX (Parallel Thread Execution)
    assembly language, version 2.1 (April 21, 2010).  A description
    (informal) can be found in the CUDA SDK (see
    http://www.nvidia.com/object/cuda_home_new.html and
    http://developer.nvidia.com/object/cuda_3_1_downloads.html).
-
-   Aug 26, 2010 -- This version of the grammar specifies little more
-   than the context-free grammar, and a simple tree construction.
-
-   Additional work must be done to accept valid PTX assembly language.
 
 */
 
