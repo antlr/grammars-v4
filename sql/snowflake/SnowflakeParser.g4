@@ -3297,6 +3297,7 @@ non_reserved_words
     | JAVASCRIPT
     | RESULT
     | INDEX
+    | ROW_NUMBER
     ;
 
 builtin_function
@@ -3310,6 +3311,8 @@ builtin_function
     | COALESCE
     | CURRENT_TIMESTAMP
     | CURRENT_DATE
+    | UPPER
+    | LOWER
     ;
 
 list_operator
@@ -3318,6 +3321,7 @@ list_operator
     | CONCAT_WS
     // To complete as needed
     ;
+
 binary_builtin_function
     : ifnull=( IFNULL | NVL )
     | GET
@@ -3331,6 +3335,7 @@ binary_or_ternary_builtin_function
     : CHARINDEX
     | REPLACE
     | substring=( SUBSTRING | SUBSTR )
+    | LIKE | ILIKE 
     ;
 
 ternary_builtin_function
@@ -3399,10 +3404,15 @@ expr
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | subquery
     | try_cast_expr
+    | trim_expression
     ;
 
 iff_expr
     : IFF '(' search_condition ',' expr ',' expr ')'
+    ;
+
+trim_expression
+    : ( TRIM | LTRIM | RTRIM ) LR_BRACKET expr (COMMA string)* RR_BRACKET
     ;
 
 try_cast_expr
@@ -3640,7 +3650,7 @@ as_alias
     ;
 
 expression_elem
-    : expr as_alias?
+    : ( expr | predicate ) as_alias?
     ;
 
 column_position
@@ -3887,9 +3897,11 @@ predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
     | expr comparison_operator expr
     | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
-    | expr NOT* BETWEEN expr AND expr
-    | expr NOT* IN '(' (subquery | expr_list) ')'
-    | expr NOT* LIKE expr (ESCAPE expr)?
+    | expr NOT? BETWEEN expr AND expr
+    | expr NOT? IN '(' (subquery | expr_list) ')'
+    | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
+    | expr NOT? RLIKE expr
+    | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | expr IS null_not_null
     ;
 
