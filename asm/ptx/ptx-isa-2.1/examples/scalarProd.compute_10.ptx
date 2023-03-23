@@ -1,0 +1,191 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling scalarProd.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07396)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"scalarProd.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx1.h"
+	.file	28	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\scalarprod\scalarProd_kernel.cu"
+
+
+	.entry _Z13scalarProdGPUPfS_S_ii (
+		.param .u32 __cudaparm__Z13scalarProdGPUPfS_S_ii_d_C,
+		.param .u32 __cudaparm__Z13scalarProdGPUPfS_S_ii_d_A,
+		.param .u32 __cudaparm__Z13scalarProdGPUPfS_S_ii_d_B,
+		.param .s32 __cudaparm__Z13scalarProdGPUPfS_S_ii_vectorN,
+		.param .s32 __cudaparm__Z13scalarProdGPUPfS_S_ii_elementN)
+	{
+	.reg .u16 %rh<3>;
+	.reg .u32 %r<46>;
+	.reg .f32 %f<9>;
+	.reg .pred %p<12>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_276999_34_accumResult20[4096];
+	.loc	28	43	0
+$LDWbegin__Z13scalarProdGPUPfS_S_ii:
+	.loc	28	53	0
+	cvt.s32.u16 	%r1, %ctaid.x;
+	mov.s32 	%r2, %r1;
+	ld.param.s32 	%r3, [__cudaparm__Z13scalarProdGPUPfS_S_ii_vectorN];
+	setp.le.s32 	%p1, %r3, %r1;
+	@%p1 bra 	$Lt_0_6146;
+	cvt.s32.u16 	%r4, %tid.x;
+	mov.s32 	%r5, 1023;
+	setp.le.s32 	%p2, %r4, %r5;
+	mov.u32 	%r6, 0;
+	setp.eq.u32 	%p3, %r4, %r6;
+	cvt.u32.u16 	%r7, %nctaid.x;
+	mov.u32 	%r8, __cuda___cuda_local_var_276999_34_accumResult20;
+$Lt_0_6658:
+ //<loop> Loop body line 53, nesting depth: 1, estimated iterations: unknown
+	@!%p2 bra 	$Lt_0_6914;
+ //<loop> Part of loop body line 53, head labeled $Lt_0_6658
+	ld.param.s32 	%r9, [__cudaparm__Z13scalarProdGPUPfS_S_ii_elementN];
+	mul24.lo.s32 	%r10, %r9, %r2;
+	add.s32 	%r11, %r10, %r9;
+	mul24.lo.u32 	%r12, %r4, 4;
+	cvt.u32.u16 	%r13, %ntid.x;
+	mul24.lo.u32 	%r14, %r13, 4;
+	add.s32 	%r15, %r10, %r4;
+	add.u32 	%r16, %r12, %r8;
+	add.u32 	%r17, %r8, 4092;
+$Lt_0_7426:
+ //<loop> Loop body line 53, nesting depth: 2, estimated iterations: unknown
+	.loc	28	66	0
+	mov.s32 	%r18, %r15;
+	setp.le.s32 	%p4, %r11, %r18;
+	@%p4 bra 	$Lt_0_12290;
+ //<loop> Part of loop body line 53, head labeled $Lt_0_7426
+	sub.s32 	%r19, %r11, %r18;
+	add.s32 	%r20, %r19, 1023;
+	shr.s32 	%r21, %r20, 31;
+	mov.s32 	%r22, 1023;
+	and.b32 	%r23, %r21, %r22;
+	add.s32 	%r24, %r23, %r20;
+	shr.s32 	%r25, %r24, 10;
+	mul.lo.u32 	%r26, %r18, 4;
+	ld.param.u32 	%r27, [__cudaparm__Z13scalarProdGPUPfS_S_ii_d_A];
+	add.u32 	%r28, %r26, %r27;
+	ld.param.u32 	%r29, [__cudaparm__Z13scalarProdGPUPfS_S_ii_d_B];
+	add.u32 	%r30, %r29, %r26;
+	mul.lo.u32 	%r31, %r11, 4;
+	add.u32 	%r32, %r31, %r27;
+	mov.f32 	%f1, 0f00000000;     	// 0
+ //<loop> Part of loop body line 53, head labeled $Lt_0_7426
+	mov.s32 	%r33, %r25;
+$Lt_0_8194:
+ //<loop> Loop body line 66, nesting depth: 3, estimated iterations: unknown
+	.loc	28	67	0
+	ld.global.f32 	%f2, [%r28+0];
+	ld.global.f32 	%f3, [%r30+0];
+	mad.f32 	%f1, %f2, %f3, %f1;
+	add.u32 	%r30, %r30, 4096;
+	add.u32 	%r28, %r28, 4096;
+	setp.lt.u32 	%p5, %r28, %r32;
+	@%p5 bra 	$Lt_0_8194;
+ //<loop> Part of loop body line 53, head labeled $Lt_0_7426
+	bra.uni 	$Lt_0_7682;
+$Lt_0_12290:
+ //<loop> Part of loop body line 53, head labeled $Lt_0_7426
+	mov.f32 	%f1, 0f00000000;     	// 0
+$Lt_0_7682:
+ //<loop> Part of loop body line 53, head labeled $Lt_0_7426
+	.loc	28	69	0
+	st.shared.f32 	[%r16+0], %f1;
+	add.s32 	%r15, %r18, %r13;
+	add.u32 	%r16, %r16, %r14;
+	setp.le.u32 	%p6, %r16, %r17;
+	@%p6 bra 	$Lt_0_7426;
+$Lt_0_6914:
+ //<loop> Part of loop body line 53, head labeled $Lt_0_6658
+	mov.s32 	%r34, 512;
+$Lt_0_9474:
+ //<loop> Loop body line 69, nesting depth: 2, estimated iterations: unknown
+	.loc	28	77	0
+	bar.sync 	0;
+	setp.ge.s32 	%p7, %r4, %r34;
+	@%p7 bra 	$Lt_0_9730;
+ //<loop> Part of loop body line 69, head labeled $Lt_0_9474
+	mul24.lo.u32 	%r35, %r4, 4;
+	mov.u16 	%rh1, %ntid.x;
+	mul.wide.u16 	%r14, %rh1, 4;
+	mul.lo.u32 	%r36, %r34, 4;
+	add.u32 	%r37, %r35, %r8;
+	add.u32 	%r38, %r36, %r8;
+	add.s32 	%r39, %r36, %r35;
+	add.u32 	%r40, %r39, %r8;
+$Lt_0_10242:
+ //<loop> Loop body line 77, nesting depth: 2, estimated iterations: unknown
+	.loc	28	79	0
+	ld.shared.f32 	%f4, [%r37+0];
+	ld.shared.f32 	%f5, [%r40+0];
+	add.f32 	%f6, %f4, %f5;
+	st.shared.f32 	[%r37+0], %f6;
+	add.u32 	%r40, %r40, %r14;
+	add.u32 	%r37, %r37, %r14;
+	setp.lt.u32 	%p8, %r37, %r38;
+	@%p8 bra 	$Lt_0_10242;
+$Lt_0_9730:
+ //<loop> Part of loop body line 69, head labeled $Lt_0_9474
+	.loc	28	76	0
+	shr.s32 	%r34, %r34, 1;
+	mov.u32 	%r41, 0;
+	setp.gt.s32 	%p9, %r34, %r41;
+	@%p9 bra 	$Lt_0_9474;
+ //<loop> Part of loop body line 53, head labeled $Lt_0_6658
+	@!%p3 bra 	$Lt_0_11010;
+ //<loop> Part of loop body line 53, head labeled $Lt_0_6658
+	.loc	28	82	0
+	ld.shared.f32 	%f7, [__cuda___cuda_local_var_276999_34_accumResult20+0];
+	ld.param.u32 	%r42, [__cudaparm__Z13scalarProdGPUPfS_S_ii_d_C];
+	mul.lo.u32 	%r43, %r2, 4;
+	add.u32 	%r44, %r42, %r43;
+	st.global.f32 	[%r44+0], %f7;
+$Lt_0_11010:
+ //<loop> Part of loop body line 53, head labeled $Lt_0_6658
+	add.u32 	%r2, %r2, %r7;
+	setp.lt.s32 	%p10, %r2, %r3;
+	@%p10 bra 	$Lt_0_6658;
+$Lt_0_6146:
+	.loc	28	84	0
+	exit;
+$LDWend__Z13scalarProdGPUPfS_S_ii:
+	} // _Z13scalarProdGPUPfS_S_ii
+

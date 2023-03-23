@@ -1,0 +1,72 @@
+.version 3.1
+.target sm_20
+.address_size 64
+
+.file   1 "C:/Users/Ken/AppData/Local/Temp/tmpxft_00000d58_00000000-8_cudatex.cpp3.i"
+.file   2 "C:/Users/Ken/Documents/Visual Studio 2012/Projects/cudatex1/cudatex.cu"
+.file   3 "c:\\program files\\nvidia gpu computing toolkit\\cuda\\v5.0\\include\\device_functions
+.h"
+.file   4 "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v5.0/nvvm/ci_include.h"
+.global .align 8 .b8 _ZTVSt11_Facet_base[48];
+.global .align 8 .b8 _ZTVNSt6locale5facetE[48];
+.global .texref texRef;
+.global .align 8 .b8 _ZTVSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE[112];
+.global .align 8 .b8 _ZTVN10__cxxabiv117__class_type_infoE[8];
+.global .align 8 .b8 _ZTVN10__cxxabiv120__si_class_type_infoE[8];
+.global .align 8 .b8 _ZTVSt13runtime_error[40];
+.global .align 8 .b8 _ZTVSt14error_category[72];
+.global .align 8 .b8 _ZTVSt12system_error[40];
+.global .align 8 .b8 _ZTVSt23_Generic_error_category[72];
+.global .align 8 .b8 _ZTVSt24_Iostream_error_category[72];
+.global .align 8 .b8 _ZTVSt22_System_error_category[72];
+.global .align 8 .b8 _ZTVNSt8ios_base7failureE[40];
+
+.visible .entry _Z15transformKernelPfiiiif(
+.param .u64 _Z15transformKernelPfiiiif_param_0,
+.param .u32 _Z15transformKernelPfiiiif_param_1,
+.param .u32 _Z15transformKernelPfiiiif_param_2,
+.param .u32 _Z15transformKernelPfiiiif_param_3,
+.param .u32 _Z15transformKernelPfiiiif_param_4,
+.param .f32 _Z15transformKernelPfiiiif_param_5
+)
+{
+.reg .s32 %r<14>;
+.reg .f32 %f<10>;
+.reg .s64 %rd<6>;
+
+
+ld.param.u64 %rd2, [_Z15transformKernelPfiiiif_param_0];
+ld.param.u32 %r2, [_Z15transformKernelPfiiiif_param_1];
+ld.param.u32 %r3, [_Z15transformKernelPfiiiif_param_3];
+cvta.to.global.u64 %rd3, %rd2;
+.loc 2 22 1
+mov.u32 %r4, %ntid.x;
+mov.u32 %r5, %ctaid.x;
+mov.u32 %r6, %tid.x;
+mad.lo.s32 %r7, %r4, %r5, %r6;
+.loc 2 23 1
+mov.u32 %r8, %ntid.y;
+mov.u32 %r9, %ctaid.y;
+mov.u32 %r10, %tid.y;
+mad.lo.s32 %r11, %r8, %r9, %r10;
+.loc 2 28 1
+cvt.rn.f32.u32 %f5, %r7;
+cvt.rn.f32.s32 %f6, %r2;
+mul.f32 %f7, %f6, %f5;
+cvt.rn.f32.s32 %f8, %r3;
+.loc 3 2399 3
+div.rn.f32 %f9, %f7, %f8;
+.loc 4 1343 5
+cvt.rzi.s32.f32 %r1, %f9;
+
+tex.1d.v4.f32.s32 {%f1, %f2, %f3, %f4}, [texRef, {%r1} ];
+
+.loc 2 30 1
+mad.lo.s32 %r12, %r11, %r3, %r7;
+mul.wide.u32 %rd4, %r12, 4;
+add.s64 %rd5, %rd3, %rd4;
+st.global.f32 [%rd5], %f1;
+.loc 2 31 2
+ret;
+}
+

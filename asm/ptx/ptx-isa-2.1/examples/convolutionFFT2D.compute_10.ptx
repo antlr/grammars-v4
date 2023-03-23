@@ -1,0 +1,1111 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling convolutionFFT2D.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07312)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"convolutionFFT2D.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\convolutionfft2d\convolutionFFT2D_common.h"
+	.file	17	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\convolutionfft2d\convolutionFFT2D.cuh"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+	.tex .u32 texFloat;
+	.tex .u32 texComplexA;
+	.tex .u32 texComplexB;
+
+	.entry _Z16padKernel_kernelPfS_iiiiii (
+		.param .u32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_d_Dst,
+		.param .u32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_d_Src,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_fftH,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_fftW,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelH,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelW,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelY,
+		.param .s32 __cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelX)
+	{
+	.reg .u16 %rh<6>;
+	.reg .u32 %r<38>;
+	.reg .f32 %f<7>;
+	.reg .pred %p<5>;
+	.loc	17	43	0
+$LDWbegin__Z16padKernel_kernelPfS_iiiiii:
+	mov.u16 	%rh1, %ctaid.y;
+	mov.u16 	%rh2, %ntid.y;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	mov.u16 	%rh3, %ctaid.x;
+	mov.u16 	%rh4, %ntid.x;
+	mul.wide.u16 	%r2, %rh3, %rh4;
+	cvt.u32.u16 	%r3, %tid.y;
+	add.u32 	%r4, %r3, %r1;
+	cvt.u32.u16 	%r5, %tid.x;
+	add.u32 	%r6, %r5, %r2;
+	ld.param.s32 	%r7, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelW];
+	ld.param.s32 	%r8, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelH];
+	set.gt.u32.s32 	%r9, %r8, %r4;
+	neg.s32 	%r10, %r9;
+	set.gt.u32.s32 	%r11, %r7, %r6;
+	neg.s32 	%r12, %r11;
+	and.b32 	%r13, %r10, %r12;
+	mov.u32 	%r14, 0;
+	setp.eq.s32 	%p1, %r13, %r14;
+	@%p1 bra 	$Lt_0_2818;
+	ld.param.s32 	%r7, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelW];
+	mul.lo.s32 	%r15, %r7, %r4;
+	add.s32 	%r16, %r6, %r15;
+	mov.s32 	%r17, 0;
+	mov.s32 	%r18, 0;
+	mov.s32 	%r19, 0;
+	tex.1d.v4.f32.s32 {%f1,%f2,%f3,%f4},[texFloat,{%r16,%r17,%r18,%r19}];
+	.loc	17	51	0
+	mov.f32 	%f5, %f1;
+	ld.param.s32 	%r20, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelY];
+	sub.s32 	%r21, %r4, %r20;
+	ld.param.s32 	%r22, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_kernelX];
+	sub.s32 	%r23, %r6, %r22;
+	ld.param.s32 	%r24, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_fftW];
+	ld.param.u32 	%r25, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_d_Dst];
+	add.s32 	%r26, %r23, %r24;
+	mov.s32 	%r27, 0;
+	setp.lt.s32 	%p2, %r23, %r27;
+	selp.s32 	%r28, %r26, %r23, %p2;
+	ld.param.s32 	%r29, [__cudaparm__Z16padKernel_kernelPfS_iiiiii_fftH];
+	add.s32 	%r30, %r29, %r21;
+	mov.s32 	%r31, 0;
+	setp.lt.s32 	%p3, %r21, %r31;
+	selp.s32 	%r32, %r30, %r21, %p3;
+	mul.lo.s32 	%r33, %r32, %r24;
+	add.s32 	%r34, %r28, %r33;
+	mul.lo.u32 	%r35, %r34, 4;
+	add.u32 	%r36, %r25, %r35;
+	st.global.f32 	[%r36+0], %f5;
+$Lt_0_2818:
+	.loc	17	53	0
+	exit;
+$LDWend__Z16padKernel_kernelPfS_iiiiii:
+	} // _Z16padKernel_kernelPfS_iiiiii
+
+	.entry _Z27padDataClampToBorder_kernelPfS_iiiiiiii (
+		.param .u32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_d_Dst,
+		.param .u32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_d_Src,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_fftH,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_fftW,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_dataH,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_dataW,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelH,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelW,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelY,
+		.param .s32 __cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelX)
+	{
+	.reg .u16 %rh<6>;
+	.reg .u32 %r<58>;
+	.reg .f32 %f<7>;
+	.reg .pred %p<7>;
+	.loc	17	70	0
+$LDWbegin__Z27padDataClampToBorder_kernelPfS_iiiiiiii:
+	mov.u16 	%rh1, %ctaid.y;
+	mov.u16 	%rh2, %ntid.y;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	mov.u16 	%rh3, %ctaid.x;
+	mov.u16 	%rh4, %ntid.x;
+	mul.wide.u16 	%r2, %rh3, %rh4;
+	cvt.u32.u16 	%r3, %tid.y;
+	add.u32 	%r4, %r3, %r1;
+	cvt.u32.u16 	%r5, %tid.x;
+	add.u32 	%r6, %r5, %r2;
+	ld.param.s32 	%r7, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_fftW];
+	ld.param.s32 	%r8, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_fftH];
+	set.gt.u32.s32 	%r9, %r8, %r4;
+	neg.s32 	%r10, %r9;
+	set.gt.u32.s32 	%r11, %r7, %r6;
+	neg.s32 	%r12, %r11;
+	and.b32 	%r13, %r10, %r12;
+	mov.u32 	%r14, 0;
+	setp.eq.s32 	%p1, %r13, %r14;
+	@%p1 bra 	$Lt_1_6402;
+	.loc	17	80	0
+	ld.param.s32 	%r15, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_dataH];
+	mov.s32 	%r16, %r17;
+	setp.gt.s32 	%p2, %r15, %r4;
+	selp.s32 	%r18, %r4, %r16, %p2;
+	.loc	17	81	0
+	ld.param.s32 	%r19, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_dataW];
+	mov.s32 	%r20, %r21;
+	setp.gt.s32 	%p3, %r19, %r6;
+	selp.s32 	%r22, %r6, %r20, %p3;
+	.loc	17	82	0
+	ld.param.s32 	%r23, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelY];
+	add.s32 	%r24, %r23, %r15;
+	sub.s32 	%r25, %r15, 1;
+	set.gt.u32.s32 	%r26, %r24, %r4;
+	neg.s32 	%r27, %r26;
+	set.le.u32.s32 	%r28, %r15, %r4;
+	neg.s32 	%r29, %r28;
+	and.b32 	%r30, %r27, %r29;
+	neg.s32 	%r31, %r30;
+	slct.s32.s32 	%r32, %r18, %r25, %r31;
+	.loc	17	83	0
+	ld.param.s32 	%r33, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_kernelX];
+	add.s32 	%r34, %r33, %r19;
+	sub.s32 	%r35, %r19, 1;
+	set.gt.u32.s32 	%r36, %r34, %r6;
+	neg.s32 	%r37, %r36;
+	set.le.u32.s32 	%r38, %r19, %r6;
+	neg.s32 	%r39, %r38;
+	and.b32 	%r40, %r37, %r39;
+	neg.s32 	%r41, %r40;
+	slct.s32.s32 	%r42, %r22, %r35, %r41;
+	mov.s32 	%r43, 0;
+	setp.le.s32 	%p4, %r34, %r6;
+	selp.s32 	%r44, %r43, %r42, %p4;
+	mov.s32 	%r45, 0;
+	setp.le.s32 	%p5, %r24, %r4;
+	selp.s32 	%r46, %r45, %r32, %p5;
+	mul.lo.s32 	%r47, %r46, %r19;
+	add.s32 	%r48, %r44, %r47;
+	mov.s32 	%r49, 0;
+	mov.s32 	%r50, 0;
+	mov.s32 	%r51, 0;
+	tex.1d.v4.f32.s32 {%f1,%f2,%f3,%f4},[texFloat,{%r48,%r49,%r50,%r51}];
+	.loc	17	87	0
+	mov.f32 	%f5, %f1;
+	ld.param.u32 	%r52, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_d_Dst];
+	.loc	17	70	0
+	ld.param.s32 	%r7, [__cudaparm__Z27padDataClampToBorder_kernelPfS_iiiiiiii_fftW];
+	.loc	17	87	0
+	mul.lo.s32 	%r53, %r7, %r4;
+	add.s32 	%r54, %r6, %r53;
+	mul.lo.u32 	%r55, %r54, 4;
+	add.u32 	%r56, %r52, %r55;
+	st.global.f32 	[%r56+0], %f5;
+$Lt_1_6402:
+	.loc	17	89	0
+	exit;
+$LDWend__Z27padDataClampToBorder_kernelPfS_iiiiiiii:
+	} // _Z27padDataClampToBorder_kernelPfS_iiiiiiii
+
+	.entry _Z27modulateAndNormalize_kernelP6float2S0_if (
+		.param .u32 __cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_d_Dst,
+		.param .u32 __cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_d_Src,
+		.param .s32 __cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_dataSize,
+		.param .f32 __cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if___val_paramc)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<11>;
+	.reg .f32 %f<14>;
+	.reg .pred %p<3>;
+	.loc	17	106	0
+$LDWbegin__Z27modulateAndNormalize_kernelP6float2S0_if:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_dataSize];
+	setp.gt.s32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_2_1026;
+	bra.uni 	$LBB4__Z27modulateAndNormalize_kernelP6float2S0_if;
+$Lt_2_1026:
+	.loc	17	112	0
+	mul.lo.u32 	%r5, %r3, 8;
+	ld.param.u32 	%r6, [__cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_d_Src];
+	add.u32 	%r7, %r6, %r5;
+	ld.global.v2.f32 	{%f1,%f2}, [%r7+0];
+	.loc	17	113	0
+	ld.param.u32 	%r8, [__cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if_d_Dst];
+	add.u32 	%r9, %r8, %r5;
+	ld.global.v2.f32 	{%f3,%f4}, [%r9+0];
+	.loc	17	117	0
+	ld.param.f32 	%f5, [__cudaparm__Z27modulateAndNormalize_kernelP6float2S0_if___val_paramc];
+	mul.f32 	%f6, %f2, %f4;
+	mul.f32 	%f7, %f1, %f3;
+	sub.f32 	%f8, %f7, %f6;
+	mul.f32 	%f9, %f5, %f8;
+	mul.f32 	%f10, %f3, %f2;
+	mad.f32 	%f11, %f1, %f4, %f10;
+	mul.f32 	%f12, %f5, %f11;
+	st.global.v2.f32 	[%r9+0], {%f9,%f12};
+$LBB4__Z27modulateAndNormalize_kernelP6float2S0_if:
+	.loc	17	118	0
+	exit;
+$LDWend__Z27modulateAndNormalize_kernelP6float2S0_if:
+	} // _Z27modulateAndNormalize_kernelP6float2S0_if
+
+	.entry _Z22spPostprocess2D_kernelP6float2S0_jjjjf (
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_d_Dst,
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_d_Src,
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DY,
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX,
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_threadCount,
+		.param .u32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_padding,
+		.param .f32 __cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_phaseBase)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<86>;
+	.reg .f32 %f<76>;
+	.reg .pred %p<9>;
+	.loc	17	206	0
+$LDWbegin__Z22spPostprocess2D_kernelP6float2S0_jjjjf:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.u32 	%r4, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_threadCount];
+	setp.gt.u32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_3_7938;
+	bra.uni 	$LBB22__Z22spPostprocess2D_kernelP6float2S0_jjjjf;
+$Lt_3_7938:
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	shr.u32 	%r6, %r5, 1;
+	neg.s32 	%r7, %r6;
+	and.b32 	%r8, %r7, %r6;
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p2, %r8, %r9;
+	@%p2 bra 	$Lt_3_8706;
+	cvt.rz.f32.u32 	%f1, %r8;
+	mov.b32 	%r10, %f1;
+	shr.s32 	%r11, %r10, 23;
+	mov.s32 	%r12, 158;
+	sub.s32 	%r13, %r12, %r11;
+	bra.uni 	$Lt_3_8450;
+$Lt_3_8706:
+	mov.s32 	%r13, 32;
+$Lt_3_8450:
+	ld.param.u32 	%r14, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DY];
+	neg.s32 	%r15, %r14;
+	and.b32 	%r16, %r15, %r14;
+	mov.u32 	%r17, 0;
+	setp.eq.s32 	%p3, %r16, %r17;
+	@%p3 bra 	$Lt_3_9218;
+	cvt.rz.f32.u32 	%f2, %r16;
+	mov.b32 	%r18, %f2;
+	shr.s32 	%r19, %r18, 23;
+	mov.s32 	%r20, 158;
+	sub.s32 	%r21, %r20, %r19;
+	bra.uni 	$Lt_3_8962;
+$Lt_3_9218:
+	mov.s32 	%r21, 32;
+$Lt_3_8962:
+	ld.param.u32 	%r14, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DY];
+	.loc	17	214	0
+	sub.u32 	%r22, %r14, 1;
+	mov.s32 	%r23, 31;
+	sub.s32 	%r24, %r23, %r13;
+	mov.s32 	%r25, 31;
+	sub.s32 	%r26, %r25, %r21;
+	shr.u32 	%r27, %r3, %r24;
+	and.b32 	%r28, %r22, %r27;
+	shr.u32 	%r29, %r27, %r26;
+	mov.u32 	%r30, 0;
+	setp.ne.u32 	%p4, %r28, %r30;
+	sub.u32 	%r31, %r14, %r28;
+	mul.lo.u32 	%r32, %r29, %r14;
+	add.u32 	%r33, %r28, %r32;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	214	0
+	mul.lo.u32 	%r34, %r33, %r5;
+	@!%p4 bra 	$Lt_3_9730;
+	.loc	17	222	0
+	add.u32 	%r35, %r31, %r32;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	222	0
+	mul.lo.u32 	%r36, %r5, %r35;
+	bra.uni 	$Lt_3_9474;
+$Lt_3_9730:
+	mov.s32 	%r36, %r34;
+$Lt_3_9474:
+	sub.u32 	%r37, %r6, 1;
+	and.b32 	%r38, %r3, %r37;
+	add.u32 	%r39, %r38, %r34;
+	mov.s32 	%r40, 0;
+	mov.s32 	%r41, 0;
+	mov.s32 	%r42, 0;
+	tex.1d.v4.f32.s32 {%f3,%f4,%f5,%f6},[texComplexA,{%r39,%r40,%r41,%r42}];
+	.loc	17	226	0
+	mov.f32 	%f7, %f3;
+	mov.f32 	%f8, %f4;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	226	0
+	sub.u32 	%r43, %r5, %r38;
+	add.u32 	%r44, %r36, %r43;
+	add.u32 	%r45, %r36, %r38;
+	mov.u32 	%r46, 0;
+	setp.ne.u32 	%p5, %r38, %r46;
+	selp.u32 	%r47, %r44, %r45, %p5;
+	mov.s32 	%r48, 0;
+	mov.s32 	%r49, 0;
+	mov.s32 	%r50, 0;
+	tex.1d.v4.f32.s32 {%f9,%f10,%f11,%f12},[texComplexA,{%r47,%r48,%r49,%r50}];
+	.loc	17	227	0
+	mov.f32 	%f13, %f9;
+	mov.f32 	%f14, %f10;
+	.loc	17	233	0
+	sub.f32 	%f15, %f7, %f13;
+	add.f32 	%f16, %f8, %f14;
+	add.f32 	%f17, %f7, %f13;
+	ld.param.u32 	%r51, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_padding];
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	233	0
+	add.u32 	%r52, %r51, %r5;
+	mov.f32 	%f18, 0f3f000000;    	// 0.5
+	mul.f32 	%f19, %f15, %f18;
+	mov.f32 	%f20, 0f3f000000;    	// 0.5
+	mul.f32 	%f21, %f16, %f20;
+	mov.f32 	%f22, 0f3f000000;    	// 0.5
+	mul.f32 	%f23, %f17, %f22;
+	cvt.rn.f32.u32 	%f24, %r38;
+	ld.param.f32 	%f25, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_phaseBase];
+	mul.f32 	%f26, %f24, %f25;
+	sin.approx.f32 	%f27, %f26;
+	cos.approx.f32 	%f28, %f26;
+	mul.lo.u32 	%r53, %r52, %r33;
+	mul.f32 	%f29, %f19, %f27;
+	add.u32 	%r54, %r38, %r53;
+	mad.f32 	%f30, %f21, %f28, %f29;
+	mul.lo.u32 	%r55, %r54, 8;
+	ld.param.u32 	%r56, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_d_Dst];
+	add.u32 	%r57, %r55, %r56;
+	add.f32 	%f31, %f23, %f30;
+	sub.f32 	%f32, %f8, %f14;
+	mov.f32 	%f33, 0f3f000000;    	// 0.5
+	mul.f32 	%f34, %f32, %f33;
+	mul.f32 	%f35, %f19, %f28;
+	mul.f32 	%f36, %f21, %f27;
+	sub.f32 	%f37, %f36, %f35;
+	add.f32 	%f38, %f34, %f37;
+	st.global.v2.f32 	[%r57+0], {%f31,%f38};
+	.loc	17	234	0
+	mul.lo.u32 	%r58, %r52, %r28;
+	mul.lo.u32 	%r59, %r52, %r31;
+	mul.lo.u32 	%r60, %r52, %r32;
+	selp.u32 	%r61, %r59, %r58, %p4;
+	add.u32 	%r62, %r60, %r61;
+	add.u32 	%r63, %r43, %r62;
+	mul.lo.u32 	%r64, %r63, 8;
+	add.u32 	%r65, %r64, %r56;
+	sub.f32 	%f39, %f23, %f30;
+	sub.f32 	%f40, %f37, %f34;
+	st.global.v2.f32 	[%r65+0], {%f39,%f40};
+	mov.u32 	%r66, 0;
+	setp.ne.u32 	%p6, %r38, %r66;
+	@%p6 bra 	$LBB22__Z22spPostprocess2D_kernelP6float2S0_jjjjf;
+	add.u32 	%r67, %r6, %r34;
+	@!%p4 bra 	$Lt_3_10754;
+	.loc	17	240	0
+	add.u32 	%r68, %r31, %r32;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	240	0
+	mul.lo.u32 	%r69, %r5, %r68;
+	add.u32 	%r70, %r6, %r69;
+	bra.uni 	$Lt_3_10498;
+$Lt_3_10754:
+	mov.s32 	%r70, %r67;
+$Lt_3_10498:
+	mov.s32 	%r71, %r67;
+	mov.s32 	%r72, 0;
+	mov.s32 	%r73, 0;
+	mov.s32 	%r74, 0;
+	tex.1d.v4.f32.s32 {%f41,%f42,%f43,%f44},[texComplexA,{%r71,%r72,%r73,%r74}];
+	.loc	17	244	0
+	mov.f32 	%f45, %f41;
+	mov.f32 	%f46, %f42;
+	mov.s32 	%r75, %r70;
+	mov.s32 	%r76, 0;
+	mov.s32 	%r77, 0;
+	mov.s32 	%r78, 0;
+	tex.1d.v4.f32.s32 {%f47,%f48,%f49,%f50},[texComplexA,{%r75,%r76,%r77,%r78}];
+	.loc	17	245	0
+	mov.f32 	%f51, %f47;
+	mov.f32 	%f52, %f48;
+	.loc	17	251	0
+	add.f32 	%f53, %f45, %f51;
+	sub.f32 	%f54, %f45, %f51;
+	mov.f32 	%f55, 0f00000000;    	// 0
+	.loc	17	233	0
+	ld.param.f32 	%f25, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_phaseBase];
+	.loc	17	251	0
+	setp.gt.f32 	%p7, %f25, %f55;
+	mov.f32 	%f56, 0f3f000000;    	// 0.5
+	mul.f32 	%f57, %f53, %f56;
+	mov.f32 	%f58, 0f3f000000;    	// 0.5
+	mul.f32 	%f59, %f54, %f58;
+	mov.f32 	%f60, 0f3f800000;    	// 1
+	mov.f32 	%f61, 0fbf800000;    	// -1
+	selp.f32 	%f62, %f60, %f61, %p7;
+	add.u32 	%r79, %r6, %r53;
+	mul.lo.u32 	%r80, %r79, 8;
+	.loc	17	233	0
+	ld.param.u32 	%r56, [__cudaparm__Z22spPostprocess2D_kernelP6float2S0_jjjjf_d_Dst];
+	.loc	17	251	0
+	add.u32 	%r81, %r80, %r56;
+	mad.f32 	%f63, %f59, %f62, %f57;
+	sub.f32 	%f64, %f46, %f52;
+	add.f32 	%f65, %f46, %f52;
+	mov.f32 	%f66, 0f3f000000;    	// 0.5
+	mul.f32 	%f67, %f64, %f66;
+	mov.f32 	%f68, 0f3f000000;    	// 0.5
+	mul.f32 	%f69, %f65, %f68;
+	mad.f32 	%f70, %f69, %f62, %f67;
+	st.global.v2.f32 	[%r81+0], {%f63,%f70};
+	.loc	17	252	0
+	add.u32 	%r82, %r6, %r62;
+	mul.lo.u32 	%r83, %r82, 8;
+	add.u32 	%r84, %r83, %r56;
+	mul.f32 	%f71, %f59, %f62;
+	sub.f32 	%f72, %f57, %f71;
+	mul.f32 	%f73, %f69, %f62;
+	sub.f32 	%f74, %f73, %f67;
+	st.global.v2.f32 	[%r84+0], {%f72,%f74};
+$LBB22__Z22spPostprocess2D_kernelP6float2S0_jjjjf:
+	.loc	17	254	0
+	exit;
+$LDWend__Z22spPostprocess2D_kernelP6float2S0_jjjjf:
+	} // _Z22spPostprocess2D_kernelP6float2S0_jjjjf
+
+	.entry _Z21spPreprocess2D_kernelP6float2S0_jjjjf (
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_d_Dst,
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_d_Src,
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DY,
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX,
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_threadCount,
+		.param .u32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_padding,
+		.param .f32 __cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_phaseBase)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<90>;
+	.reg .f32 %f<60>;
+	.reg .pred %p<10>;
+	.loc	17	263	0
+$LDWbegin__Z21spPreprocess2D_kernelP6float2S0_jjjjf:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.u32 	%r4, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_threadCount];
+	setp.gt.u32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_4_8962;
+	bra.uni 	$LBB24__Z21spPreprocess2D_kernelP6float2S0_jjjjf;
+$Lt_4_8962:
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	shr.u32 	%r6, %r5, 1;
+	neg.s32 	%r7, %r6;
+	and.b32 	%r8, %r7, %r6;
+	mov.u32 	%r9, 0;
+	setp.eq.s32 	%p2, %r8, %r9;
+	@%p2 bra 	$Lt_4_9730;
+	cvt.rz.f32.u32 	%f1, %r8;
+	mov.b32 	%r10, %f1;
+	shr.s32 	%r11, %r10, 23;
+	mov.s32 	%r12, 158;
+	sub.s32 	%r13, %r12, %r11;
+	bra.uni 	$Lt_4_9474;
+$Lt_4_9730:
+	mov.s32 	%r13, 32;
+$Lt_4_9474:
+	ld.param.u32 	%r14, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DY];
+	neg.s32 	%r15, %r14;
+	and.b32 	%r16, %r15, %r14;
+	mov.u32 	%r17, 0;
+	setp.eq.s32 	%p3, %r16, %r17;
+	@%p3 bra 	$Lt_4_10242;
+	cvt.rz.f32.u32 	%f2, %r16;
+	mov.b32 	%r18, %f2;
+	shr.s32 	%r19, %r18, 23;
+	mov.s32 	%r20, 158;
+	sub.s32 	%r21, %r20, %r19;
+	bra.uni 	$Lt_4_9986;
+$Lt_4_10242:
+	mov.s32 	%r21, 32;
+$Lt_4_9986:
+	ld.param.u32 	%r14, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DY];
+	.loc	17	271	0
+	sub.u32 	%r22, %r14, 1;
+	mov.s32 	%r23, 31;
+	sub.s32 	%r24, %r23, %r13;
+	sub.u32 	%r25, %r6, 1;
+	shr.u32 	%r26, %r3, %r24;
+	and.b32 	%r27, %r3, %r25;
+	and.b32 	%r28, %r22, %r26;
+	mov.u32 	%r29, 0;
+	setp.eq.u32 	%p4, %r27, %r29;
+	selp.s32 	%r30, 1, 0, %p4;
+	shr.u32 	%r31, %r14, 1;
+	set.gt.u32.u32 	%r32, %r28, %r31;
+	neg.s32 	%r33, %r32;
+	and.b32 	%r34, %r30, %r33;
+	mov.u32 	%r35, 0;
+	setp.eq.s32 	%p5, %r34, %r35;
+	@%p5 bra 	$Lt_4_10498;
+	bra.uni 	$LBB24__Z21spPreprocess2D_kernelP6float2S0_jjjjf;
+$Lt_4_10498:
+	.loc	17	275	0
+	mov.s32 	%r36, 31;
+	sub.s32 	%r37, %r36, %r21;
+	shr.u32 	%r38, %r26, %r37;
+	mov.u32 	%r39, 0;
+	setp.ne.u32 	%p6, %r28, %r39;
+	.loc	21	2580	0
+	ld.param.u32 	%r14, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DY];
+	.loc	17	275	0
+	sub.u32 	%r40, %r14, %r28;
+	mul.lo.u32 	%r41, %r38, %r14;
+	add.u32 	%r42, %r28, %r41;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	275	0
+	mul.lo.u32 	%r43, %r42, %r5;
+	@!%p6 bra 	$Lt_4_11266;
+	.loc	17	285	0
+	add.u32 	%r44, %r40, %r41;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	285	0
+	mul.lo.u32 	%r45, %r5, %r44;
+	bra.uni 	$Lt_4_11010;
+$Lt_4_11266:
+	mov.s32 	%r45, %r43;
+$Lt_4_11010:
+	ld.param.u32 	%r46, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_padding];
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	285	0
+	add.u32 	%r47, %r46, %r5;
+	mul.lo.u32 	%r48, %r47, %r42;
+	add.u32 	%r49, %r27, %r48;
+	mov.s32 	%r50, 0;
+	mov.s32 	%r51, 0;
+	mov.s32 	%r52, 0;
+	tex.1d.v4.f32.s32 {%f3,%f4,%f5,%f6},[texComplexA,{%r49,%r50,%r51,%r52}];
+	.loc	17	287	0
+	mov.f32 	%f7, %f3;
+	mov.f32 	%f8, %f4;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	287	0
+	sub.u32 	%r53, %r5, %r27;
+	mul.lo.u32 	%r54, %r47, %r28;
+	mul.lo.u32 	%r55, %r47, %r40;
+	mul.lo.u32 	%r56, %r47, %r41;
+	selp.u32 	%r57, %r55, %r54, %p6;
+	add.u32 	%r58, %r56, %r57;
+	add.u32 	%r59, %r53, %r58;
+	mov.s32 	%r60, 0;
+	mov.s32 	%r61, 0;
+	mov.s32 	%r62, 0;
+	tex.1d.v4.f32.s32 {%f9,%f10,%f11,%f12},[texComplexA,{%r59,%r60,%r61,%r62}];
+	.loc	17	288	0
+	mov.f32 	%f13, %f9;
+	mov.f32 	%f14, %f10;
+	.loc	17	294	0
+	add.f32 	%f15, %f7, %f13;
+	sub.f32 	%f16, %f7, %f13;
+	add.f32 	%f17, %f8, %f14;
+	cvt.rn.f32.u32 	%f18, %r27;
+	ld.param.f32 	%f19, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_phaseBase];
+	mul.f32 	%f20, %f18, %f19;
+	sin.approx.f32 	%f21, %f20;
+	cos.approx.f32 	%f22, %f20;
+	mul.f32 	%f23, %f16, %f21;
+	add.u32 	%r63, %r27, %r43;
+	mul.f32 	%f24, %f17, %f22;
+	sub.f32 	%f25, %f24, %f23;
+	mul.lo.u32 	%r64, %r63, 8;
+	ld.param.u32 	%r65, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_d_Dst];
+	add.u32 	%r66, %r64, %r65;
+	sub.f32 	%f26, %f15, %f25;
+	sub.f32 	%f27, %f8, %f14;
+	mul.f32 	%f28, %f16, %f22;
+	mad.f32 	%f29, %f17, %f21, %f28;
+	add.f32 	%f30, %f27, %f29;
+	st.global.v2.f32 	[%r66+0], {%f26,%f30};
+	.loc	17	295	0
+	mov.u32 	%r67, 0;
+	setp.ne.u32 	%p7, %r27, %r67;
+	add.u32 	%r68, %r45, %r27;
+	add.u32 	%r69, %r45, %r53;
+	selp.u32 	%r70, %r69, %r68, %p7;
+	mul.lo.u32 	%r71, %r70, 8;
+	add.u32 	%r72, %r71, %r65;
+	add.f32 	%f31, %f15, %f25;
+	sub.f32 	%f32, %f29, %f27;
+	st.global.v2.f32 	[%r72+0], {%f31,%f32};
+	@!%p4 bra 	$LBB24__Z21spPreprocess2D_kernelP6float2S0_jjjjf;
+	add.u32 	%r73, %r6, %r43;
+	@!%p6 bra 	$Lt_4_12290;
+	.loc	17	303	0
+	add.u32 	%r74, %r40, %r41;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_DX];
+	.loc	17	303	0
+	mul.lo.u32 	%r75, %r5, %r74;
+	add.u32 	%r76, %r6, %r75;
+	bra.uni 	$Lt_4_12034;
+$Lt_4_12290:
+	mov.s32 	%r76, %r73;
+$Lt_4_12034:
+	add.u32 	%r77, %r6, %r48;
+	mov.s32 	%r78, 0;
+	mov.s32 	%r79, 0;
+	mov.s32 	%r80, 0;
+	tex.1d.v4.f32.s32 {%f33,%f34,%f35,%f36},[texComplexA,{%r77,%r78,%r79,%r80}];
+	.loc	17	305	0
+	mov.f32 	%f37, %f33;
+	mov.f32 	%f38, %f34;
+	add.u32 	%r81, %r6, %r58;
+	mov.s32 	%r82, 0;
+	mov.s32 	%r83, 0;
+	mov.s32 	%r84, 0;
+	tex.1d.v4.f32.s32 {%f39,%f40,%f41,%f42},[texComplexA,{%r81,%r82,%r83,%r84}];
+	.loc	17	306	0
+	mov.f32 	%f43, %f39;
+	mov.f32 	%f44, %f40;
+	.loc	17	312	0
+	add.f32 	%f45, %f37, %f43;
+	sub.f32 	%f46, %f37, %f43;
+	mov.f32 	%f47, 0f00000000;    	// 0
+	.loc	17	294	0
+	ld.param.f32 	%f19, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_phaseBase];
+	.loc	17	312	0
+	setp.gt.f32 	%p8, %f19, %f47;
+	mov.f32 	%f48, 0f3f800000;    	// 1
+	mov.f32 	%f49, 0fbf800000;    	// -1
+	selp.f32 	%f50, %f48, %f49, %p8;
+	mul.lo.u32 	%r85, %r73, 8;
+	.loc	17	294	0
+	ld.param.u32 	%r65, [__cudaparm__Z21spPreprocess2D_kernelP6float2S0_jjjjf_d_Dst];
+	.loc	17	312	0
+	add.u32 	%r86, %r85, %r65;
+	mad.f32 	%f51, %f46, %f50, %f45;
+	sub.f32 	%f52, %f38, %f44;
+	add.f32 	%f53, %f38, %f44;
+	mad.f32 	%f54, %f53, %f50, %f52;
+	st.global.v2.f32 	[%r86+0], {%f51,%f54};
+	.loc	17	313	0
+	mul.lo.u32 	%r87, %r76, 8;
+	add.u32 	%r88, %r87, %r65;
+	mul.f32 	%f55, %f46, %f50;
+	sub.f32 	%f56, %f45, %f55;
+	mul.f32 	%f57, %f53, %f50;
+	sub.f32 	%f58, %f57, %f52;
+	st.global.v2.f32 	[%r88+0], {%f56,%f58};
+$LBB24__Z21spPreprocess2D_kernelP6float2S0_jjjjf:
+	.loc	17	315	0
+	exit;
+$LDWend__Z21spPreprocess2D_kernelP6float2S0_jjjjf:
+	} // _Z21spPreprocess2D_kernelP6float2S0_jjjjf
+
+	.entry _Z18spProcess2D_kernelP6float2S0_S0_jjjff (
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_d_Dst,
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_d_SrcA,
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_d_SrcB,
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DY,
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX,
+		.param .u32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_threadCount,
+		.param .f32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_phaseBase,
+		.param .f32 __cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff___val_paramc)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<99>;
+	.reg .f32 %f<196>;
+	.reg .pred %p<9>;
+	.loc	17	330	0
+$LDWbegin__Z18spProcess2D_kernelP6float2S0_S0_jjjff:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.u32 	%r4, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_threadCount];
+	setp.gt.u32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_5_6658;
+	bra.uni 	$LBB25__Z18spProcess2D_kernelP6float2S0_S0_jjjff;
+$Lt_5_6658:
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	neg.s32 	%r6, %r5;
+	and.b32 	%r7, %r6, %r5;
+	mov.u32 	%r8, 0;
+	setp.eq.s32 	%p2, %r7, %r8;
+	@%p2 bra 	$Lt_5_7426;
+	cvt.rz.f32.u32 	%f1, %r7;
+	mov.b32 	%r9, %f1;
+	shr.s32 	%r10, %r9, 23;
+	mov.s32 	%r11, 158;
+	sub.s32 	%r12, %r11, %r10;
+	bra.uni 	$Lt_5_7170;
+$Lt_5_7426:
+	mov.s32 	%r12, 32;
+$Lt_5_7170:
+	ld.param.u32 	%r13, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DY];
+	shr.u32 	%r14, %r13, 1;
+	neg.s32 	%r15, %r14;
+	and.b32 	%r16, %r15, %r14;
+	mov.u32 	%r17, 0;
+	setp.eq.s32 	%p3, %r16, %r17;
+	@%p3 bra 	$Lt_5_7938;
+	cvt.rz.f32.u32 	%f2, %r16;
+	mov.b32 	%r18, %f2;
+	shr.s32 	%r19, %r18, 23;
+	mov.s32 	%r20, 158;
+	sub.s32 	%r21, %r20, %r19;
+	bra.uni 	$Lt_5_7682;
+$Lt_5_7938:
+	mov.s32 	%r21, 32;
+$Lt_5_7682:
+	.loc	17	338	0
+	mov.s32 	%r22, 31;
+	sub.s32 	%r23, %r22, %r12;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	.loc	17	338	0
+	sub.u32 	%r24, %r5, 1;
+	sub.u32 	%r25, %r14, 1;
+	shr.u32 	%r26, %r3, %r23;
+	and.b32 	%r27, %r24, %r3;
+	and.b32 	%r28, %r25, %r26;
+	mov.u32 	%r29, 0;
+	setp.eq.u32 	%p4, %r28, %r29;
+	selp.s32 	%r30, 1, 0, %p4;
+	shr.u32 	%r31, %r5, 1;
+	set.gt.u32.u32 	%r32, %r27, %r31;
+	neg.s32 	%r33, %r32;
+	and.b32 	%r34, %r30, %r33;
+	mov.u32 	%r35, 0;
+	setp.eq.s32 	%p5, %r34, %r35;
+	@%p5 bra 	$Lt_5_8194;
+	bra.uni 	$LBB25__Z18spProcess2D_kernelP6float2S0_S0_jjjff;
+$Lt_5_8194:
+	.loc	17	345	0
+	mov.s32 	%r36, 31;
+	sub.s32 	%r37, %r36, %r21;
+	shr.u32 	%r38, %r26, %r37;
+	.loc	21	2580	0
+	ld.param.u32 	%r13, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DY];
+	.loc	17	345	0
+	mul.lo.u32 	%r39, %r38, %r13;
+	add.u32 	%r40, %r28, %r39;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	.loc	17	345	0
+	mul.lo.u32 	%r41, %r40, %r5;
+	mov.u32 	%r42, 0;
+	setp.eq.u32 	%p6, %r28, %r42;
+	@%p6 bra 	$Lt_5_8962;
+	.loc	21	2580	0
+	ld.param.u32 	%r13, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DY];
+	.loc	17	352	0
+	sub.u32 	%r43, %r13, %r28;
+	add.u32 	%r44, %r39, %r43;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	.loc	17	352	0
+	mul.lo.u32 	%r45, %r5, %r44;
+	bra.uni 	$Lt_5_8706;
+$Lt_5_8962:
+	mov.s32 	%r45, %r41;
+$Lt_5_8706:
+	add.u32 	%r46, %r27, %r41;
+	mov.s32 	%r47, %r46;
+	mov.s32 	%r48, 0;
+	mov.s32 	%r49, 0;
+	mov.s32 	%r50, 0;
+	tex.1d.v4.f32.s32 {%f3,%f4,%f5,%f6},[texComplexA,{%r47,%r48,%r49,%r50}];
+	.loc	17	354	0
+	mov.f32 	%f7, %f3;
+	mov.f32 	%f8, %f4;
+	mov.u32 	%r51, 0;
+	setp.ne.u32 	%p7, %r27, %r51;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	.loc	17	354	0
+	sub.u32 	%r52, %r5, %r27;
+	add.u32 	%r53, %r45, %r52;
+	add.u32 	%r54, %r45, %r27;
+	selp.u32 	%r55, %r53, %r54, %p7;
+	mov.s32 	%r56, %r55;
+	mov.s32 	%r57, 0;
+	mov.s32 	%r58, 0;
+	mov.s32 	%r59, 0;
+	tex.1d.v4.f32.s32 {%f9,%f10,%f11,%f12},[texComplexA,{%r56,%r57,%r58,%r59}];
+	.loc	17	355	0
+	mov.f32 	%f13, %f9;
+	mov.f32 	%f14, %f10;
+	mov.s32 	%r60, %r46;
+	mov.s32 	%r61, 0;
+	mov.s32 	%r62, 0;
+	mov.s32 	%r63, 0;
+	tex.1d.v4.f32.s32 {%f15,%f16,%f17,%f18},[texComplexB,{%r60,%r61,%r62,%r63}];
+	.loc	17	356	0
+	mov.f32 	%f19, %f15;
+	mov.f32 	%f20, %f16;
+	mov.s32 	%r64, %r55;
+	mov.s32 	%r65, 0;
+	mov.s32 	%r66, 0;
+	mov.s32 	%r67, 0;
+	tex.1d.v4.f32.s32 {%f21,%f22,%f23,%f24},[texComplexB,{%r64,%r65,%r66,%r67}];
+	.loc	17	357	0
+	mov.f32 	%f25, %f21;
+	mov.f32 	%f26, %f22;
+	.loc	17	362	0
+	sub.f32 	%f27, %f8, %f14;
+	sub.f32 	%f28, %f7, %f13;
+	add.f32 	%f29, %f8, %f14;
+	sub.f32 	%f30, %f20, %f26;
+	sub.f32 	%f31, %f19, %f25;
+	add.f32 	%f32, %f20, %f26;
+	add.f32 	%f33, %f7, %f13;
+	add.f32 	%f34, %f19, %f25;
+	mov.f32 	%f35, 0f3f000000;    	// 0.5
+	mul.f32 	%f36, %f27, %f35;
+	mov.f32 	%f37, 0f3f000000;    	// 0.5
+	mul.f32 	%f38, %f28, %f37;
+	mov.f32 	%f39, 0f3f000000;    	// 0.5
+	mul.f32 	%f40, %f29, %f39;
+	mov.f32 	%f41, 0f3f000000;    	// 0.5
+	mul.f32 	%f42, %f30, %f41;
+	mov.f32 	%f43, 0f3f000000;    	// 0.5
+	mul.f32 	%f44, %f31, %f43;
+	mov.f32 	%f45, 0f3f000000;    	// 0.5
+	mul.f32 	%f46, %f32, %f45;
+	mov.f32 	%f47, 0f3f000000;    	// 0.5
+	mul.f32 	%f48, %f33, %f47;
+	mov.f32 	%f49, 0f3f000000;    	// 0.5
+	mul.f32 	%f50, %f34, %f49;
+	cvt.rn.f32.u32 	%f51, %r27;
+	ld.param.f32 	%f52, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_phaseBase];
+	mul.f32 	%f53, %f52, %f51;
+	cos.approx.f32 	%f54, %f53;
+	sin.approx.f32 	%f55, %f53;
+	mul.f32 	%f56, %f38, %f54;
+	mul.f32 	%f57, %f44, %f54;
+	mul.f32 	%f58, %f38, %f55;
+	mul.f32 	%f59, %f44, %f55;
+	mul.f32 	%f60, %f40, %f55;
+	sub.f32 	%f61, %f60, %f56;
+	mul.f32 	%f62, %f46, %f55;
+	sub.f32 	%f63, %f62, %f57;
+	mad.f32 	%f64, %f54, %f40, %f58;
+	mad.f32 	%f65, %f54, %f46, %f59;
+	add.f32 	%f66, %f36, %f61;
+	add.f32 	%f67, %f42, %f63;
+	add.f32 	%f68, %f48, %f64;
+	add.f32 	%f69, %f50, %f65;
+	ld.param.f32 	%f70, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff___val_paramc];
+	mul.f32 	%f71, %f66, %f67;
+	mul.f32 	%f72, %f68, %f69;
+	sub.f32 	%f73, %f72, %f71;
+	mul.f32 	%f74, %f70, %f73;
+	mul.f32 	%f75, %f66, %f69;
+	mad.f32 	%f76, %f68, %f67, %f75;
+	mul.f32 	%f77, %f70, %f76;
+	.loc	17	363	0
+	sub.f32 	%f78, %f61, %f36;
+	sub.f32 	%f79, %f63, %f42;
+	sub.f32 	%f80, %f48, %f64;
+	sub.f32 	%f81, %f50, %f65;
+	mul.f32 	%f82, %f78, %f79;
+	mul.f32 	%f83, %f80, %f81;
+	sub.f32 	%f84, %f83, %f82;
+	mul.f32 	%f85, %f70, %f84;
+	mul.f32 	%f86, %f78, %f81;
+	mad.f32 	%f87, %f80, %f79, %f86;
+	mul.f32 	%f88, %f70, %f87;
+	.loc	17	366	0
+	add.f32 	%f89, %f74, %f85;
+	sub.f32 	%f90, %f74, %f85;
+	add.f32 	%f91, %f77, %f88;
+	mul.f32 	%f92, %f90, %f55;
+	mul.f32 	%f93, %f54, %f91;
+	sub.f32 	%f94, %f93, %f92;
+	mul.lo.u32 	%r68, %r46, 8;
+	ld.param.u32 	%r69, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_d_Dst];
+	add.u32 	%r70, %r68, %r69;
+	sub.f32 	%f95, %f89, %f94;
+	sub.f32 	%f96, %f77, %f88;
+	mul.f32 	%f97, %f91, %f55;
+	mad.f32 	%f98, %f54, %f90, %f97;
+	add.f32 	%f99, %f96, %f98;
+	st.global.v2.f32 	[%r70+0], {%f95,%f99};
+	.loc	17	367	0
+	mul.lo.u32 	%r71, %r55, 8;
+	add.u32 	%r72, %r71, %r69;
+	add.f32 	%f100, %f89, %f94;
+	sub.f32 	%f101, %f98, %f96;
+	st.global.v2.f32 	[%r72+0], {%f100,%f101};
+	@!%p4 bra 	$LBB25__Z18spProcess2D_kernelP6float2S0_S0_jjjff;
+	add.u32 	%r73, %r14, %r39;
+	.loc	21	2580	0
+	ld.param.u32 	%r5, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_DX];
+	.loc	17	367	0
+	mul.lo.u32 	%r74, %r73, %r5;
+	add.u32 	%r75, %r27, %r74;
+	mov.s32 	%r76, %r75;
+	mov.s32 	%r77, 0;
+	mov.s32 	%r78, 0;
+	mov.s32 	%r79, 0;
+	tex.1d.v4.f32.s32 {%f102,%f103,%f104,%f105},[texComplexA,{%r76,%r77,%r78,%r79}];
+	.loc	17	374	0
+	mov.f32 	%f106, %f102;
+	mov.f32 	%f107, %f103;
+	add.u32 	%r80, %r52, %r74;
+	selp.u32 	%r81, %r80, %r75, %p7;
+	mov.s32 	%r82, %r81;
+	mov.s32 	%r83, 0;
+	mov.s32 	%r84, 0;
+	mov.s32 	%r85, 0;
+	tex.1d.v4.f32.s32 {%f108,%f109,%f110,%f111},[texComplexA,{%r82,%r83,%r84,%r85}];
+	.loc	17	375	0
+	mov.f32 	%f112, %f108;
+	mov.f32 	%f113, %f109;
+	mov.s32 	%r86, %r75;
+	mov.s32 	%r87, 0;
+	mov.s32 	%r88, 0;
+	mov.s32 	%r89, 0;
+	tex.1d.v4.f32.s32 {%f114,%f115,%f116,%f117},[texComplexB,{%r86,%r87,%r88,%r89}];
+	.loc	17	376	0
+	mov.f32 	%f118, %f114;
+	mov.f32 	%f119, %f115;
+	mov.s32 	%r90, %r81;
+	mov.s32 	%r91, 0;
+	mov.s32 	%r92, 0;
+	mov.s32 	%r93, 0;
+	tex.1d.v4.f32.s32 {%f120,%f121,%f122,%f123},[texComplexB,{%r90,%r91,%r92,%r93}];
+	.loc	17	377	0
+	mov.f32 	%f124, %f120;
+	mov.f32 	%f125, %f121;
+	.loc	17	381	0
+	sub.f32 	%f126, %f107, %f113;
+	sub.f32 	%f127, %f106, %f112;
+	add.f32 	%f128, %f107, %f113;
+	sub.f32 	%f129, %f119, %f125;
+	sub.f32 	%f130, %f118, %f124;
+	add.f32 	%f131, %f119, %f125;
+	add.f32 	%f132, %f106, %f112;
+	add.f32 	%f133, %f118, %f124;
+	mov.f32 	%f134, 0f3f000000;   	// 0.5
+	mul.f32 	%f135, %f126, %f134;
+	mov.f32 	%f136, 0f3f000000;   	// 0.5
+	mul.f32 	%f137, %f127, %f136;
+	mov.f32 	%f138, 0f3f000000;   	// 0.5
+	mul.f32 	%f139, %f128, %f138;
+	mov.f32 	%f140, 0f3f000000;   	// 0.5
+	mul.f32 	%f141, %f129, %f140;
+	mov.f32 	%f142, 0f3f000000;   	// 0.5
+	mul.f32 	%f143, %f130, %f142;
+	mov.f32 	%f144, 0f3f000000;   	// 0.5
+	mul.f32 	%f145, %f131, %f144;
+	mov.f32 	%f146, 0f3f000000;   	// 0.5
+	mul.f32 	%f147, %f132, %f146;
+	mov.f32 	%f148, 0f3f000000;   	// 0.5
+	mul.f32 	%f149, %f133, %f148;
+	mul.f32 	%f150, %f137, %f54;
+	mul.f32 	%f151, %f143, %f54;
+	mul.f32 	%f152, %f137, %f55;
+	mul.f32 	%f153, %f143, %f55;
+	mul.f32 	%f154, %f139, %f55;
+	sub.f32 	%f155, %f154, %f150;
+	mul.f32 	%f156, %f145, %f55;
+	sub.f32 	%f157, %f156, %f151;
+	mad.f32 	%f158, %f54, %f139, %f152;
+	mad.f32 	%f159, %f54, %f145, %f153;
+	add.f32 	%f160, %f135, %f155;
+	add.f32 	%f161, %f141, %f157;
+	add.f32 	%f162, %f147, %f158;
+	add.f32 	%f163, %f149, %f159;
+	mul.f32 	%f164, %f160, %f161;
+	mul.f32 	%f165, %f162, %f163;
+	sub.f32 	%f166, %f165, %f164;
+	.loc	17	362	0
+	ld.param.f32 	%f70, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff___val_paramc];
+	.loc	17	381	0
+	mul.f32 	%f167, %f70, %f166;
+	mul.f32 	%f168, %f160, %f163;
+	mad.f32 	%f169, %f162, %f161, %f168;
+	mul.f32 	%f170, %f70, %f169;
+	.loc	17	382	0
+	sub.f32 	%f171, %f155, %f135;
+	sub.f32 	%f172, %f157, %f141;
+	sub.f32 	%f173, %f147, %f158;
+	sub.f32 	%f174, %f149, %f159;
+	mul.f32 	%f175, %f171, %f172;
+	mul.f32 	%f176, %f173, %f174;
+	sub.f32 	%f177, %f176, %f175;
+	mul.f32 	%f178, %f70, %f177;
+	mul.f32 	%f179, %f171, %f174;
+	mad.f32 	%f180, %f173, %f172, %f179;
+	mul.f32 	%f181, %f70, %f180;
+	.loc	17	385	0
+	add.f32 	%f182, %f167, %f178;
+	sub.f32 	%f183, %f167, %f178;
+	add.f32 	%f184, %f170, %f181;
+	mul.f32 	%f185, %f183, %f55;
+	mul.f32 	%f186, %f54, %f184;
+	sub.f32 	%f187, %f186, %f185;
+	mul.lo.u32 	%r94, %r75, 8;
+	.loc	17	366	0
+	ld.param.u32 	%r69, [__cudaparm__Z18spProcess2D_kernelP6float2S0_S0_jjjff_d_Dst];
+	.loc	17	385	0
+	add.u32 	%r95, %r94, %r69;
+	sub.f32 	%f188, %f182, %f187;
+	sub.f32 	%f189, %f170, %f181;
+	mul.f32 	%f190, %f184, %f55;
+	mad.f32 	%f191, %f54, %f183, %f190;
+	add.f32 	%f192, %f189, %f191;
+	st.global.v2.f32 	[%r95+0], {%f188,%f192};
+	.loc	17	386	0
+	mul.lo.u32 	%r96, %r81, 8;
+	add.u32 	%r97, %r96, %r69;
+	add.f32 	%f193, %f182, %f187;
+	sub.f32 	%f194, %f191, %f189;
+	st.global.v2.f32 	[%r97+0], {%f193,%f194};
+$LBB25__Z18spProcess2D_kernelP6float2S0_S0_jjjff:
+	.loc	17	388	0
+	exit;
+$LDWend__Z18spProcess2D_kernelP6float2S0_S0_jjjff:
+	} // _Z18spProcess2D_kernelP6float2S0_S0_jjjff
+

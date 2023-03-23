@@ -1,0 +1,190 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling sobol_gpu.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04576)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"sobol_gpu.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx3.h"
+	.file	28	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/SobolQRNG/sobol_gpu.cu"
+
+
+	.entry _Z15sobolGPU_kerneljjPjPf (
+		.param .u32 __cudaparm__Z15sobolGPU_kerneljjPjPf_n_vectors,
+		.param .u32 __cudaparm__Z15sobolGPU_kerneljjPjPf_n_dimensions,
+		.param .u32 __cudaparm__Z15sobolGPU_kerneljjPjPf___val_paramd_directions,
+		.param .u32 __cudaparm__Z15sobolGPU_kerneljjPjPf___val_paramd_output)
+	{
+	.reg .u32 %r<75>;
+	.reg .f32 %f<8>;
+	.reg .pred %p<8>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_285793_41_v16[128];
+	.loc	28	50	0
+$LDWbegin__Z15sobolGPU_kerneljjPjPf:
+	mov.u32 	%r1, %tid.x;
+	mov.u32 	%r2, 31;
+	setp.gt.u32 	%p1, %r1, %r2;
+	@%p1 bra 	$Lt_0_3842;
+	.loc	28	64	0
+	mov.u32 	%r3, __cuda___cuda_local_var_285793_41_v16;
+	mul.lo.u32 	%r4, %r1, 4;
+	ld.param.u32 	%r5, [__cudaparm__Z15sobolGPU_kerneljjPjPf___val_paramd_directions];
+	mov.u32 	%r6, %ctaid.y;
+	mul.lo.u32 	%r7, %r6, 128;
+	add.u32 	%r8, %r5, %r7;
+	add.u32 	%r9, %r4, %r8;
+	ld.global.u32 	%r10, [%r9+0];
+	add.u32 	%r11, %r4, %r3;
+	st.shared.u32 	[%r11+0], %r10;
+$Lt_0_3842:
+	mov.u32 	%r3, __cuda___cuda_local_var_285793_41_v16;
+	.loc	28	66	0
+	bar.sync 	0;
+	.loc	28	77	0
+	mov.u32 	%r12, %ntid.x;
+	mov.u32 	%r13, %ctaid.x;
+	mul.lo.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r14, %r1;
+	shr.s32 	%r16, %r15, 1;
+	xor.b32 	%r17, %r15, %r16;
+	.loc	28	85	0
+	mov.u32 	%r18, %nctaid.x;
+	mul.lo.u32 	%r19, %r18, %r12;
+	neg.s32 	%r20, %r19;
+	and.b32 	%r21, %r20, %r19;
+	clz.b32 	%r22, %r21;
+	mov.s32 	%r23, 31;
+	sub.s32 	%r24, %r23, %r22;
+	mov.u32 	%r25, 0;
+	setp.eq.u32 	%p2, %r24, %r25;
+	@%p2 bra 	$Lt_0_6914;
+	mov.s32 	%r26, 1;
+	max.s32 	%r27, %r24, %r26;
+	mov.s32 	%r28, %r3;
+	mul.lo.u32 	%r29, %r24, 4;
+	add.u32 	%r30, %r29, %r3;
+	mov.u32 	%r31, 0;
+	mov.s32 	%r32, %r27;
+$Lt_0_4866:
+ //<loop> Loop body line 85, nesting depth: 1, estimated iterations: unknown
+	.loc	28	92	0
+	ld.shared.u32 	%r33, [%r28+0];
+	and.b32 	%r34, %r17, 1;
+	neg.s32 	%r35, %r34;
+	and.b32 	%r36, %r33, %r35;
+	xor.b32 	%r31, %r31, %r36;
+	.loc	28	93	0
+	shr.u32 	%r17, %r17, 1;
+	.loc	28	85	0
+	add.u32 	%r28, %r28, 4;
+	setp.lt.u32 	%p3, %r28, %r30;
+	@%p3 bra 	$Lt_0_4866;
+	bra.uni 	$Lt_0_4354;
+$Lt_0_6914:
+	mov.u32 	%r31, 0;
+$Lt_0_4354:
+	ld.param.u32 	%r37, [__cudaparm__Z15sobolGPU_kerneljjPjPf_n_vectors];
+	setp.ge.u32 	%p4, %r15, %r37;
+	@%p4 bra 	$Lt_0_5378;
+	.loc	28	97	0
+	cvt.rn.f32.u32 	%f1, %r31;
+	mov.f32 	%f2, 0f2f800000;     	// 2.32831e-010
+	mul.f32 	%f3, %f1, %f2;
+	ld.param.u32 	%r38, [__cudaparm__Z15sobolGPU_kerneljjPjPf___val_paramd_output];
+	mov.u32 	%r39, %ctaid.y;
+	mul.lo.u32 	%r40, %r39, %r37;
+	mul.lo.u32 	%r41, %r40, 4;
+	add.u32 	%r42, %r38, %r41;
+	mul.lo.u32 	%r43, %r15, 4;
+	add.u32 	%r44, %r42, %r43;
+	st.global.f32 	[%r44+0], %f3;
+$Lt_0_5378:
+	.loc	28	124	0
+	mov.s32 	%r45, 32;
+	sub.s32 	%r46, %r45, %r22;
+	mul.lo.u32 	%r47, %r46, 4;
+	add.u32 	%r48, %r3, %r47;
+	ld.shared.u32 	%r49, [%r48+-8];
+	.loc	28	126	0
+	add.s32 	%r50, %r19, %r15;
+	setp.ge.u32 	%p5, %r50, %r37;
+	@%p5 bra 	$Lt_0_5890;
+	mov.u32 	%r51, %ctaid.y;
+	mul.lo.u32 	%r52, %r51, %r37;
+	mul.lo.u32 	%r53, %r50, 4;
+	mul.lo.u32 	%r54, %r37, 4;
+	mul.lo.u32 	%r55, %r19, 4;
+	sub.u32 	%r56, %r19, 1;
+	mov.s32 	%r57, %r15;
+	mul.lo.u32 	%r58, %r52, 4;
+	ld.param.u32 	%r59, [__cudaparm__Z15sobolGPU_kerneljjPjPf___val_paramd_output];
+	add.s32 	%r60, %r59, %r58;
+	add.s32 	%r61, %r60, %r53;
+	add.s32 	%r62, %r60, %r54;
+$Lt_0_6402:
+ //<loop> Loop body line 126, nesting depth: 1, estimated iterations: unknown
+	.loc	28	134	0
+	or.b32 	%r63, %r56, %r57;
+	not.b32 	%r64, %r63;
+	neg.s32 	%r65, %r64;
+	and.b32 	%r66, %r64, %r65;
+	clz.b32 	%r67, %r66;
+	mov.s32 	%r68, 32;
+	sub.s32 	%r69, %r68, %r67;
+	mul.lo.u32 	%r70, %r69, 4;
+	add.u32 	%r71, %r3, %r70;
+	ld.shared.u32 	%r72, [%r71+-4];
+	xor.b32 	%r73, %r72, %r49;
+	xor.b32 	%r31, %r31, %r73;
+	.loc	28	135	0
+	cvt.rn.f32.u32 	%f4, %r31;
+	mov.f32 	%f5, 0f2f800000;     	// 2.32831e-010
+	mul.f32 	%f6, %f4, %f5;
+	st.global.f32 	[%r61+0], %f6;
+	add.u32 	%r57, %r19, %r57;
+	add.s32 	%r61, %r61, %r55;
+	setp.lt.u32 	%p6, %r61, %r62;
+	@%p6 bra 	$Lt_0_6402;
+$Lt_0_5890:
+	.loc	28	137	0
+	exit;
+$LDWend__Z15sobolGPU_kerneljjPjPf:
+	} // _Z15sobolGPU_kerneljjPjPf
+

@@ -1,0 +1,333 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling fastWalshTransform.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07376)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"fastWalshTransform.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\fastwalshtransform\fastWalshTransform_kernel.cu"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\texture_fetch_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.extern	.shared .align 4 .b8 s_data[];
+
+	.entry _Z15fwtBatch1KernelPfS_i (
+		.param .u32 __cudaparm__Z15fwtBatch1KernelPfS_i_d_Output,
+		.param .u32 __cudaparm__Z15fwtBatch1KernelPfS_i_d_Input,
+		.param .s32 __cudaparm__Z15fwtBatch1KernelPfS_i_log2N)
+	{
+	.reg .u32 %r<60>;
+	.reg .f32 %f<20>;
+	.reg .pred %p<10>;
+	.loc	16	31	0
+$LDWbegin__Z15fwtBatch1KernelPfS_i:
+	.loc	16	40	0
+	cvt.s32.u32 	%r1, %tid.x;
+	ld.param.s32 	%r2, [__cudaparm__Z15fwtBatch1KernelPfS_i_log2N];
+	shl.b32 	%r3, 1, %r2;
+	setp.gt.s32 	%p1, %r3, %r1;
+	@!%p1 bra 	$Lt_0_5122;
+	mov.u32 	%r4, s_data;
+	mov.u32 	%r5, %ctaid.x;
+	shl.b32 	%r6, %r5, %r2;
+	mul.lo.u32 	%r7, %r1, 4;
+	mul.lo.u32 	%r8, %r3, 4;
+	mov.u32 	%r9, %ntid.x;
+	mul.lo.u32 	%r10, %r9, 4;
+	mul.lo.u32 	%r11, %r6, 4;
+	add.u32 	%r12, %r7, %r4;
+	add.u32 	%r13, %r8, %r4;
+	ld.param.u32 	%r14, [__cudaparm__Z15fwtBatch1KernelPfS_i_d_Input];
+	add.s32 	%r15, %r14, %r11;
+	add.s32 	%r16, %r15, %r7;
+$Lt_0_5634:
+ //<loop> Loop body line 40, nesting depth: 1, estimated iterations: unknown
+	.loc	16	41	0
+	ld.global.f32 	%f1, [%r16+0];
+	st.shared.f32 	[%r12+0], %f1;
+	add.s32 	%r16, %r16, %r10;
+	add.u32 	%r12, %r12, %r10;
+	setp.lt.u32 	%p2, %r12, %r13;
+	@%p2 bra 	$Lt_0_5634;
+$Lt_0_5122:
+	mov.u32 	%r4, s_data;
+	.loc	16	45	0
+	shr.s32 	%r17, %r3, 2;
+	mov.s32 	%r18, %r17;
+	mov.u32 	%r19, 0;
+	setp.le.s32 	%p3, %r17, %r19;
+	@%p3 bra 	$Lt_0_6146;
+$Lt_0_6658:
+ //<loop> Loop body line 52
+	.loc	16	52	0
+	bar.sync 	0;
+	.loc	16	53	0
+	sub.s32 	%r20, %r18, 1;
+	and.b32 	%r21, %r20, %r1;
+	sub.s32 	%r22, %r1, %r21;
+	shl.b32 	%r23, %r22, 2;
+	add.s32 	%r24, %r21, %r23;
+	mul.lo.u32 	%r25, %r24, 4;
+	add.u32 	%r26, %r25, %r4;
+	ld.shared.f32 	%f2, [%r26+0];
+	.loc	16	54	0
+	add.s32 	%r27, %r24, %r18;
+	mul.lo.u32 	%r28, %r27, 4;
+	add.u32 	%r29, %r28, %r4;
+	ld.shared.f32 	%f3, [%r29+0];
+	.loc	16	55	0
+	add.s32 	%r30, %r27, %r18;
+	mul.lo.u32 	%r31, %r30, 4;
+	add.u32 	%r32, %r31, %r4;
+	ld.shared.f32 	%f4, [%r32+0];
+	.loc	16	56	0
+	add.s32 	%r33, %r30, %r18;
+	mul.lo.u32 	%r34, %r33, 4;
+	add.u32 	%r35, %r34, %r4;
+	ld.shared.f32 	%f5, [%r35+0];
+	.loc	16	59	0
+	add.f32 	%f6, %f2, %f4;
+	sub.f32 	%f7, %f2, %f4;
+	.loc	16	60	0
+	add.f32 	%f8, %f3, %f5;
+	sub.f32 	%f9, %f3, %f5;
+	.loc	16	61	0
+	add.f32 	%f10, %f6, %f8;
+	st.shared.f32 	[%r26+0], %f10;
+	sub.f32 	%f11, %f6, %f8;
+	st.shared.f32 	[%r29+0], %f11;
+	.loc	16	62	0
+	add.f32 	%f12, %f7, %f9;
+	st.shared.f32 	[%r32+0], %f12;
+	sub.f32 	%f13, %f7, %f9;
+	st.shared.f32 	[%r35+0], %f13;
+	.loc	16	45	0
+	shr.s32 	%r18, %r18, 2;
+	mov.u32 	%r36, 0;
+	setp.gt.s32 	%p4, %r18, %r36;
+	@%p4 bra 	$Lt_0_6658;
+$Lt_0_6146:
+	and.b32 	%r37, %r2, 1;
+	mov.u32 	%r38, 0;
+	setp.eq.s32 	%p5, %r37, %r38;
+	@%p5 bra 	$Lt_0_7170;
+	.loc	16	67	0
+	bar.sync 	0;
+	.loc	16	68	0
+	mov.s32 	%r39, %r1;
+	shr.s32 	%r40, %r3, 31;
+	mov.s32 	%r41, 1;
+	and.b32 	%r42, %r40, %r41;
+	add.s32 	%r43, %r42, %r3;
+	shr.s32 	%r44, %r43, 1;
+	setp.le.s32 	%p6, %r44, %r1;
+	@%p6 bra 	$Lt_0_7682;
+	mov.u32 	%r45, %ntid.x;
+$Lt_0_8194:
+ //<loop> Loop body line 68, nesting depth: 1, estimated iterations: unknown
+	.loc	16	72	0
+	shl.b32 	%r46, %r39, 1;
+	mul.lo.u32 	%r47, %r46, 4;
+	add.u32 	%r48, %r47, %r4;
+	ld.shared.f32 	%f14, [%r48+0];
+	.loc	16	73	0
+	ld.shared.f32 	%f15, [%r48+4];
+	.loc	16	74	0
+	add.f32 	%f16, %f14, %f15;
+	st.shared.f32 	[%r48+0], %f16;
+	.loc	16	75	0
+	sub.f32 	%f17, %f14, %f15;
+	st.shared.f32 	[%r48+4], %f17;
+	add.u32 	%r39, %r39, %r45;
+	setp.gt.s32 	%p7, %r44, %r39;
+	@%p7 bra 	$Lt_0_8194;
+$Lt_0_7682:
+$Lt_0_7170:
+	.loc	16	79	0
+	bar.sync 	0;
+	@!%p1 bra 	$Lt_0_8706;
+	mul.lo.u32 	%r49, %r1, 4;
+	mul.lo.u32 	%r50, %r3, 4;
+	mov.u32 	%r51, %ntid.x;
+	mul.lo.u32 	%r10, %r51, 4;
+	mov.u32 	%r52, %ctaid.x;
+	shl.b32 	%r53, %r52, %r2;
+	add.u32 	%r54, %r49, %r4;
+	add.u32 	%r13, %r50, %r4;
+	mul.lo.u32 	%r55, %r53, 4;
+	ld.param.u32 	%r56, [__cudaparm__Z15fwtBatch1KernelPfS_i_d_Output];
+	add.s32 	%r57, %r56, %r55;
+	add.s32 	%r58, %r57, %r49;
+$Lt_0_9218:
+ //<loop> Loop body line 79, nesting depth: 1, estimated iterations: unknown
+	.loc	16	81	0
+	ld.shared.f32 	%f18, [%r54+0];
+	st.global.f32 	[%r58+0], %f18;
+	add.s32 	%r58, %r58, %r10;
+	add.u32 	%r54, %r54, %r10;
+	setp.lt.u32 	%p8, %r54, %r13;
+	@%p8 bra 	$Lt_0_9218;
+$Lt_0_8706:
+	.loc	16	82	0
+	exit;
+$LDWend__Z15fwtBatch1KernelPfS_i:
+	} // _Z15fwtBatch1KernelPfS_i
+
+	.entry _Z15fwtBatch2KernelPfS_i (
+		.param .u32 __cudaparm__Z15fwtBatch2KernelPfS_i_d_Output,
+		.param .u32 __cudaparm__Z15fwtBatch2KernelPfS_i_d_Input,
+		.param .s32 __cudaparm__Z15fwtBatch2KernelPfS_i_stride)
+	{
+	.reg .u32 %r<37>;
+	.reg .f32 %f<14>;
+	.loc	16	91	0
+$LDWbegin__Z15fwtBatch2KernelPfS_i:
+	.loc	16	105	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %nctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z15fwtBatch2KernelPfS_i_stride];
+	sub.s32 	%r5, %r4, 1;
+	mov.u32 	%r6, %ctaid.x;
+	mul.lo.u32 	%r7, %r6, %r1;
+	mov.u32 	%r8, %ctaid.y;
+	mul.lo.u32 	%r9, %r8, %r3;
+	mov.u32 	%r10, %tid.x;
+	add.u32 	%r11, %r10, %r7;
+	mul.lo.u32 	%r12, %r9, 16;
+	and.b32 	%r13, %r5, %r11;
+	ld.param.u32 	%r14, [__cudaparm__Z15fwtBatch2KernelPfS_i_d_Input];
+	add.u32 	%r15, %r14, %r12;
+	sub.s32 	%r16, %r11, %r13;
+	shl.b32 	%r17, %r16, 2;
+	add.s32 	%r18, %r13, %r17;
+	mul.lo.u32 	%r19, %r18, 4;
+	add.u32 	%r20, %r15, %r19;
+	ld.global.f32 	%f1, [%r20+0];
+	.loc	16	106	0
+	add.s32 	%r21, %r18, %r4;
+	mul.lo.u32 	%r22, %r21, 4;
+	add.u32 	%r23, %r15, %r22;
+	ld.global.f32 	%f2, [%r23+0];
+	.loc	16	107	0
+	add.s32 	%r24, %r21, %r4;
+	mul.lo.u32 	%r25, %r24, 4;
+	add.u32 	%r26, %r15, %r25;
+	ld.global.f32 	%f3, [%r26+0];
+	.loc	16	108	0
+	add.s32 	%r27, %r24, %r4;
+	mul.lo.u32 	%r28, %r27, 4;
+	add.u32 	%r29, %r15, %r28;
+	ld.global.f32 	%f4, [%r29+0];
+	.loc	16	111	0
+	add.f32 	%f5, %f1, %f3;
+	sub.f32 	%f6, %f1, %f3;
+	.loc	16	112	0
+	add.f32 	%f7, %f2, %f4;
+	sub.f32 	%f8, %f2, %f4;
+	.loc	16	113	0
+	ld.param.u32 	%r30, [__cudaparm__Z15fwtBatch2KernelPfS_i_d_Output];
+	add.u32 	%r31, %r30, %r12;
+	add.f32 	%f9, %f5, %f7;
+	add.u32 	%r32, %r31, %r19;
+	st.global.f32 	[%r32+0], %f9;
+	sub.f32 	%f10, %f5, %f7;
+	add.u32 	%r33, %r31, %r22;
+	st.global.f32 	[%r33+0], %f10;
+	.loc	16	114	0
+	add.f32 	%f11, %f6, %f8;
+	add.u32 	%r34, %r31, %r25;
+	st.global.f32 	[%r34+0], %f11;
+	sub.f32 	%f12, %f6, %f8;
+	add.u32 	%r35, %r31, %r28;
+	st.global.f32 	[%r35+0], %f12;
+	.loc	16	115	0
+	exit;
+$LDWend__Z15fwtBatch2KernelPfS_i:
+	} // _Z15fwtBatch2KernelPfS_i
+
+	.entry _Z14modulateKernelPfS_i (
+		.param .u32 __cudaparm__Z14modulateKernelPfS_i_d_A,
+		.param .u32 __cudaparm__Z14modulateKernelPfS_i_d_B,
+		.param .s32 __cudaparm__Z14modulateKernelPfS_i_N)
+	{
+	.reg .u32 %r<18>;
+	.reg .f32 %f<8>;
+	.reg .pred %p<4>;
+	.loc	16	143	0
+$LDWbegin__Z14modulateKernelPfS_i:
+	.loc	16	148	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z14modulateKernelPfS_i_N];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_2_1282;
+	mul.lo.u32 	%r7, %r5, 4;
+	mul.lo.u32 	%r8, %r6, 4;
+	cvt.rn.f32.s32 	%f1, %r6;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z14modulateKernelPfS_i_d_A];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z14modulateKernelPfS_i_d_B];
+	add.u32 	%r16, %r15, %r7;
+	rcp.rn.f32 	%f2, %f1;
+$Lt_2_1794:
+ //<loop> Loop body line 148, nesting depth: 1, estimated iterations: unknown
+	.loc	16	149	0
+	ld.global.f32 	%f3, [%r12+0];
+	ld.global.f32 	%f4, [%r16+0];
+	mul.f32 	%f5, %f4, %f2;
+	mul.f32 	%f6, %f3, %f5;
+	st.global.f32 	[%r12+0], %f6;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_2_1794;
+$Lt_2_1282:
+	.loc	16	150	0
+	exit;
+$LDWend__Z14modulateKernelPfS_i:
+	} // _Z14modulateKernelPfS_i
+

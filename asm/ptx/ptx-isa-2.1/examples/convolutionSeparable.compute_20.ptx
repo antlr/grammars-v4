@@ -1,0 +1,1131 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling convolutionSeparable.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07528)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"convolutionSeparable.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/convolutionSeparable/convolutionSeparable.cu"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\texture_fetch_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.const .align 4 .b8 c_Kernel[68];
+
+	.entry _Z21convolutionRowsKernelPfS_iii (
+		.param .u32 __cudaparm__Z21convolutionRowsKernelPfS_iii___val_paramd_Dst,
+		.param .u32 __cudaparm__Z21convolutionRowsKernelPfS_iii___val_paramd_Src,
+		.param .s32 __cudaparm__Z21convolutionRowsKernelPfS_iii_imageW,
+		.param .s32 __cudaparm__Z21convolutionRowsKernelPfS_iii_imageH,
+		.param .s32 __cudaparm__Z21convolutionRowsKernelPfS_iii_pitch)
+	{
+	.reg .u32 %r<29>;
+	.reg .f32 %f<428>;
+	.reg .pred %p<4>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_287926_34_s_Data88[2560];
+	.loc	16	47	0
+$LDWbegin__Z21convolutionRowsKernelPfS_iii:
+	.loc	16	61	0
+	mov.u32 	%r1, %ctaid.y;
+	mul.lo.u32 	%r2, %r1, 4;
+	mov.u32 	%r3, %ctaid.x;
+	mul.lo.u32 	%r4, %r3, 128;
+	mov.u32 	%r5, %tid.y;
+	mul.lo.u32 	%r6, %r5, 160;
+	add.u32 	%r7, %r2, %r5;
+	mov.u32 	%r8, %tid.x;
+	add.u32 	%r9, %r4, %r8;
+	add.u32 	%r10, %r6, %r8;
+	ld.param.s32 	%r11, [__cudaparm__Z21convolutionRowsKernelPfS_iii_pitch];
+	mul.lo.s32 	%r12, %r11, %r7;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.s32 	%r14, %r12, %r9;
+	mov.u32 	%r15, __cuda___cuda_local_var_287926_34_s_Data88;
+	add.u32 	%r16, %r13, %r15;
+	mul.lo.u32 	%r17, %r14, 4;
+	ld.param.u32 	%r18, [__cudaparm__Z21convolutionRowsKernelPfS_iii___val_paramd_Src];
+	add.u32 	%r19, %r18, %r17;
+	ld.global.f32 	%f1, [%r19+0];
+	st.shared.f32 	[%r16+64], %f1;
+	ld.global.f32 	%f2, [%r19+64];
+	st.shared.f32 	[%r16+128], %f2;
+	ld.global.f32 	%f3, [%r19+128];
+	st.shared.f32 	[%r16+192], %f3;
+	ld.global.f32 	%f4, [%r19+192];
+	st.shared.f32 	[%r16+256], %f4;
+	ld.global.f32 	%f5, [%r19+256];
+	st.shared.f32 	[%r16+320], %f5;
+	ld.global.f32 	%f6, [%r19+320];
+	st.shared.f32 	[%r16+384], %f6;
+	ld.global.f32 	%f7, [%r19+384];
+	st.shared.f32 	[%r16+448], %f7;
+	ld.global.f32 	%f8, [%r19+448];
+	st.shared.f32 	[%r16+512], %f8;
+	.loc	16	24	0
+	sub.s32 	%r20, %r9, 16;
+	mov.u32 	%r21, 0;
+	setp.lt.s32 	%p1, %r20, %r21;
+	@%p1 bra 	$Lt_0_7170;
+	.loc	16	66	0
+	ld.global.f32 	%f9, [%r19+-64];
+	bra.uni 	$Lt_0_6914;
+$Lt_0_7170:
+	mov.f32 	%f9, 0f00000000;     	// 0
+$Lt_0_6914:
+	st.shared.f32 	[%r16+0], %f9;
+	.loc	16	24	0
+	ld.param.s32 	%r22, [__cudaparm__Z21convolutionRowsKernelPfS_iii_imageW];
+	sub.s32 	%r23, %r22, %r9;
+	add.s32 	%r24, %r23, 16;
+	mov.u32 	%r25, 144;
+	setp.le.s32 	%p2, %r24, %r25;
+	@%p2 bra 	$Lt_0_7682;
+	.loc	16	71	0
+	ld.global.f32 	%f10, [%r19+512];
+	bra.uni 	$Lt_0_7426;
+$Lt_0_7682:
+	mov.f32 	%f10, 0f00000000;    	// 0
+$Lt_0_7426:
+	st.shared.f32 	[%r16+576], %f10;
+	.loc	16	74	0
+	bar.sync 	0;
+	.loc	16	81	0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	ld.const.f32 	%f12, [c_Kernel+64];
+	ld.shared.f32 	%f13, [%r16+32];
+	fma.rn.f32 	%f14, %f12, %f13, %f11;
+	ld.const.f32 	%f15, [c_Kernel+60];
+	ld.shared.f32 	%f16, [%r16+36];
+	fma.rn.f32 	%f17, %f15, %f16, %f14;
+	ld.const.f32 	%f18, [c_Kernel+56];
+	ld.shared.f32 	%f19, [%r16+40];
+	fma.rn.f32 	%f20, %f18, %f19, %f17;
+	ld.const.f32 	%f21, [c_Kernel+52];
+	ld.shared.f32 	%f22, [%r16+44];
+	fma.rn.f32 	%f23, %f21, %f22, %f20;
+	ld.const.f32 	%f24, [c_Kernel+48];
+	ld.shared.f32 	%f25, [%r16+48];
+	fma.rn.f32 	%f26, %f24, %f25, %f23;
+	ld.const.f32 	%f27, [c_Kernel+44];
+	ld.shared.f32 	%f28, [%r16+52];
+	fma.rn.f32 	%f29, %f27, %f28, %f26;
+	ld.const.f32 	%f30, [c_Kernel+40];
+	ld.shared.f32 	%f31, [%r16+56];
+	fma.rn.f32 	%f32, %f30, %f31, %f29;
+	ld.const.f32 	%f33, [c_Kernel+36];
+	ld.shared.f32 	%f34, [%r16+60];
+	fma.rn.f32 	%f35, %f33, %f34, %f32;
+	ld.const.f32 	%f36, [c_Kernel+32];
+	ld.shared.f32 	%f37, [%r16+64];
+	fma.rn.f32 	%f38, %f36, %f37, %f35;
+	ld.const.f32 	%f39, [c_Kernel+28];
+	ld.shared.f32 	%f40, [%r16+68];
+	fma.rn.f32 	%f41, %f39, %f40, %f38;
+	ld.const.f32 	%f42, [c_Kernel+24];
+	ld.shared.f32 	%f43, [%r16+72];
+	fma.rn.f32 	%f44, %f42, %f43, %f41;
+	ld.const.f32 	%f45, [c_Kernel+20];
+	ld.shared.f32 	%f46, [%r16+76];
+	fma.rn.f32 	%f47, %f45, %f46, %f44;
+	ld.const.f32 	%f48, [c_Kernel+16];
+	ld.shared.f32 	%f49, [%r16+80];
+	fma.rn.f32 	%f50, %f48, %f49, %f47;
+	ld.const.f32 	%f51, [c_Kernel+12];
+	ld.shared.f32 	%f52, [%r16+84];
+	fma.rn.f32 	%f53, %f51, %f52, %f50;
+	ld.const.f32 	%f54, [c_Kernel+8];
+	ld.shared.f32 	%f55, [%r16+88];
+	fma.rn.f32 	%f56, %f54, %f55, %f53;
+	ld.const.f32 	%f57, [c_Kernel+4];
+	ld.shared.f32 	%f58, [%r16+92];
+	fma.rn.f32 	%f59, %f57, %f58, %f56;
+	ld.const.f32 	%f60, [c_Kernel+0];
+	ld.shared.f32 	%f61, [%r16+96];
+	fma.rn.f32 	%f62, %f60, %f61, %f59;
+	.loc	16	83	0
+	ld.param.u32 	%r26, [__cudaparm__Z21convolutionRowsKernelPfS_iii___val_paramd_Dst];
+	add.u32 	%r27, %r26, %r17;
+	st.global.f32 	[%r27+0], %f62;
+	.loc	16	81	0
+	mov.f32 	%f63, 0f00000000;    	// 0
+	ld.const.f32 	%f64, [c_Kernel+64];
+	ld.shared.f32 	%f65, [%r16+96];
+	fma.rn.f32 	%f66, %f64, %f65, %f63;
+	ld.const.f32 	%f67, [c_Kernel+60];
+	ld.shared.f32 	%f68, [%r16+100];
+	fma.rn.f32 	%f69, %f67, %f68, %f66;
+	ld.const.f32 	%f70, [c_Kernel+56];
+	ld.shared.f32 	%f71, [%r16+104];
+	fma.rn.f32 	%f72, %f70, %f71, %f69;
+	ld.const.f32 	%f73, [c_Kernel+52];
+	ld.shared.f32 	%f74, [%r16+108];
+	fma.rn.f32 	%f75, %f73, %f74, %f72;
+	ld.const.f32 	%f76, [c_Kernel+48];
+	ld.shared.f32 	%f77, [%r16+112];
+	fma.rn.f32 	%f78, %f76, %f77, %f75;
+	ld.const.f32 	%f79, [c_Kernel+44];
+	ld.shared.f32 	%f80, [%r16+116];
+	fma.rn.f32 	%f81, %f79, %f80, %f78;
+	ld.const.f32 	%f82, [c_Kernel+40];
+	ld.shared.f32 	%f83, [%r16+120];
+	fma.rn.f32 	%f84, %f82, %f83, %f81;
+	ld.const.f32 	%f85, [c_Kernel+36];
+	ld.shared.f32 	%f86, [%r16+124];
+	fma.rn.f32 	%f87, %f85, %f86, %f84;
+	ld.const.f32 	%f88, [c_Kernel+32];
+	ld.shared.f32 	%f89, [%r16+128];
+	fma.rn.f32 	%f90, %f88, %f89, %f87;
+	ld.const.f32 	%f91, [c_Kernel+28];
+	ld.shared.f32 	%f92, [%r16+132];
+	fma.rn.f32 	%f93, %f91, %f92, %f90;
+	ld.const.f32 	%f94, [c_Kernel+24];
+	ld.shared.f32 	%f95, [%r16+136];
+	fma.rn.f32 	%f96, %f94, %f95, %f93;
+	ld.const.f32 	%f97, [c_Kernel+20];
+	ld.shared.f32 	%f98, [%r16+140];
+	fma.rn.f32 	%f99, %f97, %f98, %f96;
+	ld.const.f32 	%f100, [c_Kernel+16];
+	ld.shared.f32 	%f101, [%r16+144];
+	fma.rn.f32 	%f102, %f100, %f101, %f99;
+	ld.const.f32 	%f103, [c_Kernel+12];
+	ld.shared.f32 	%f104, [%r16+148];
+	fma.rn.f32 	%f105, %f103, %f104, %f102;
+	ld.const.f32 	%f106, [c_Kernel+8];
+	ld.shared.f32 	%f107, [%r16+152];
+	fma.rn.f32 	%f108, %f106, %f107, %f105;
+	ld.const.f32 	%f109, [c_Kernel+4];
+	ld.shared.f32 	%f110, [%r16+156];
+	fma.rn.f32 	%f111, %f109, %f110, %f108;
+	ld.const.f32 	%f112, [c_Kernel+0];
+	ld.shared.f32 	%f113, [%r16+160];
+	fma.rn.f32 	%f114, %f112, %f113, %f111;
+	.loc	16	83	0
+	st.global.f32 	[%r27+64], %f114;
+	.loc	16	81	0
+	mov.f32 	%f115, 0f00000000;   	// 0
+	ld.const.f32 	%f116, [c_Kernel+64];
+	ld.shared.f32 	%f117, [%r16+160];
+	fma.rn.f32 	%f118, %f116, %f117, %f115;
+	ld.const.f32 	%f119, [c_Kernel+60];
+	ld.shared.f32 	%f120, [%r16+164];
+	fma.rn.f32 	%f121, %f119, %f120, %f118;
+	ld.const.f32 	%f122, [c_Kernel+56];
+	ld.shared.f32 	%f123, [%r16+168];
+	fma.rn.f32 	%f124, %f122, %f123, %f121;
+	ld.const.f32 	%f125, [c_Kernel+52];
+	ld.shared.f32 	%f126, [%r16+172];
+	fma.rn.f32 	%f127, %f125, %f126, %f124;
+	ld.const.f32 	%f128, [c_Kernel+48];
+	ld.shared.f32 	%f129, [%r16+176];
+	fma.rn.f32 	%f130, %f128, %f129, %f127;
+	ld.const.f32 	%f131, [c_Kernel+44];
+	ld.shared.f32 	%f132, [%r16+180];
+	fma.rn.f32 	%f133, %f131, %f132, %f130;
+	ld.const.f32 	%f134, [c_Kernel+40];
+	ld.shared.f32 	%f135, [%r16+184];
+	fma.rn.f32 	%f136, %f134, %f135, %f133;
+	ld.const.f32 	%f137, [c_Kernel+36];
+	ld.shared.f32 	%f138, [%r16+188];
+	fma.rn.f32 	%f139, %f137, %f138, %f136;
+	ld.const.f32 	%f140, [c_Kernel+32];
+	ld.shared.f32 	%f141, [%r16+192];
+	fma.rn.f32 	%f142, %f140, %f141, %f139;
+	ld.const.f32 	%f143, [c_Kernel+28];
+	ld.shared.f32 	%f144, [%r16+196];
+	fma.rn.f32 	%f145, %f143, %f144, %f142;
+	ld.const.f32 	%f146, [c_Kernel+24];
+	ld.shared.f32 	%f147, [%r16+200];
+	fma.rn.f32 	%f148, %f146, %f147, %f145;
+	ld.const.f32 	%f149, [c_Kernel+20];
+	ld.shared.f32 	%f150, [%r16+204];
+	fma.rn.f32 	%f151, %f149, %f150, %f148;
+	ld.const.f32 	%f152, [c_Kernel+16];
+	ld.shared.f32 	%f153, [%r16+208];
+	fma.rn.f32 	%f154, %f152, %f153, %f151;
+	ld.const.f32 	%f155, [c_Kernel+12];
+	ld.shared.f32 	%f156, [%r16+212];
+	fma.rn.f32 	%f157, %f155, %f156, %f154;
+	ld.const.f32 	%f158, [c_Kernel+8];
+	ld.shared.f32 	%f159, [%r16+216];
+	fma.rn.f32 	%f160, %f158, %f159, %f157;
+	ld.const.f32 	%f161, [c_Kernel+4];
+	ld.shared.f32 	%f162, [%r16+220];
+	fma.rn.f32 	%f163, %f161, %f162, %f160;
+	ld.const.f32 	%f164, [c_Kernel+0];
+	ld.shared.f32 	%f165, [%r16+224];
+	fma.rn.f32 	%f166, %f164, %f165, %f163;
+	.loc	16	83	0
+	st.global.f32 	[%r27+128], %f166;
+	.loc	16	81	0
+	mov.f32 	%f167, 0f00000000;   	// 0
+	ld.const.f32 	%f168, [c_Kernel+64];
+	ld.shared.f32 	%f169, [%r16+224];
+	fma.rn.f32 	%f170, %f168, %f169, %f167;
+	ld.const.f32 	%f171, [c_Kernel+60];
+	ld.shared.f32 	%f172, [%r16+228];
+	fma.rn.f32 	%f173, %f171, %f172, %f170;
+	ld.const.f32 	%f174, [c_Kernel+56];
+	ld.shared.f32 	%f175, [%r16+232];
+	fma.rn.f32 	%f176, %f174, %f175, %f173;
+	ld.const.f32 	%f177, [c_Kernel+52];
+	ld.shared.f32 	%f178, [%r16+236];
+	fma.rn.f32 	%f179, %f177, %f178, %f176;
+	ld.const.f32 	%f180, [c_Kernel+48];
+	ld.shared.f32 	%f181, [%r16+240];
+	fma.rn.f32 	%f182, %f180, %f181, %f179;
+	ld.const.f32 	%f183, [c_Kernel+44];
+	ld.shared.f32 	%f184, [%r16+244];
+	fma.rn.f32 	%f185, %f183, %f184, %f182;
+	ld.const.f32 	%f186, [c_Kernel+40];
+	ld.shared.f32 	%f187, [%r16+248];
+	fma.rn.f32 	%f188, %f186, %f187, %f185;
+	ld.const.f32 	%f189, [c_Kernel+36];
+	ld.shared.f32 	%f190, [%r16+252];
+	fma.rn.f32 	%f191, %f189, %f190, %f188;
+	ld.const.f32 	%f192, [c_Kernel+32];
+	ld.shared.f32 	%f193, [%r16+256];
+	fma.rn.f32 	%f194, %f192, %f193, %f191;
+	ld.const.f32 	%f195, [c_Kernel+28];
+	ld.shared.f32 	%f196, [%r16+260];
+	fma.rn.f32 	%f197, %f195, %f196, %f194;
+	ld.const.f32 	%f198, [c_Kernel+24];
+	ld.shared.f32 	%f199, [%r16+264];
+	fma.rn.f32 	%f200, %f198, %f199, %f197;
+	ld.const.f32 	%f201, [c_Kernel+20];
+	ld.shared.f32 	%f202, [%r16+268];
+	fma.rn.f32 	%f203, %f201, %f202, %f200;
+	ld.const.f32 	%f204, [c_Kernel+16];
+	ld.shared.f32 	%f205, [%r16+272];
+	fma.rn.f32 	%f206, %f204, %f205, %f203;
+	ld.const.f32 	%f207, [c_Kernel+12];
+	ld.shared.f32 	%f208, [%r16+276];
+	fma.rn.f32 	%f209, %f207, %f208, %f206;
+	ld.const.f32 	%f210, [c_Kernel+8];
+	ld.shared.f32 	%f211, [%r16+280];
+	fma.rn.f32 	%f212, %f210, %f211, %f209;
+	ld.const.f32 	%f213, [c_Kernel+4];
+	ld.shared.f32 	%f214, [%r16+284];
+	fma.rn.f32 	%f215, %f213, %f214, %f212;
+	ld.const.f32 	%f216, [c_Kernel+0];
+	ld.shared.f32 	%f217, [%r16+288];
+	fma.rn.f32 	%f218, %f216, %f217, %f215;
+	.loc	16	83	0
+	st.global.f32 	[%r27+192], %f218;
+	.loc	16	81	0
+	mov.f32 	%f219, 0f00000000;   	// 0
+	ld.const.f32 	%f220, [c_Kernel+64];
+	ld.shared.f32 	%f221, [%r16+288];
+	fma.rn.f32 	%f222, %f220, %f221, %f219;
+	ld.const.f32 	%f223, [c_Kernel+60];
+	ld.shared.f32 	%f224, [%r16+292];
+	fma.rn.f32 	%f225, %f223, %f224, %f222;
+	ld.const.f32 	%f226, [c_Kernel+56];
+	ld.shared.f32 	%f227, [%r16+296];
+	fma.rn.f32 	%f228, %f226, %f227, %f225;
+	ld.const.f32 	%f229, [c_Kernel+52];
+	ld.shared.f32 	%f230, [%r16+300];
+	fma.rn.f32 	%f231, %f229, %f230, %f228;
+	ld.const.f32 	%f232, [c_Kernel+48];
+	ld.shared.f32 	%f233, [%r16+304];
+	fma.rn.f32 	%f234, %f232, %f233, %f231;
+	ld.const.f32 	%f235, [c_Kernel+44];
+	ld.shared.f32 	%f236, [%r16+308];
+	fma.rn.f32 	%f237, %f235, %f236, %f234;
+	ld.const.f32 	%f238, [c_Kernel+40];
+	ld.shared.f32 	%f239, [%r16+312];
+	fma.rn.f32 	%f240, %f238, %f239, %f237;
+	ld.const.f32 	%f241, [c_Kernel+36];
+	ld.shared.f32 	%f242, [%r16+316];
+	fma.rn.f32 	%f243, %f241, %f242, %f240;
+	ld.const.f32 	%f244, [c_Kernel+32];
+	ld.shared.f32 	%f245, [%r16+320];
+	fma.rn.f32 	%f246, %f244, %f245, %f243;
+	ld.const.f32 	%f247, [c_Kernel+28];
+	ld.shared.f32 	%f248, [%r16+324];
+	fma.rn.f32 	%f249, %f247, %f248, %f246;
+	ld.const.f32 	%f250, [c_Kernel+24];
+	ld.shared.f32 	%f251, [%r16+328];
+	fma.rn.f32 	%f252, %f250, %f251, %f249;
+	ld.const.f32 	%f253, [c_Kernel+20];
+	ld.shared.f32 	%f254, [%r16+332];
+	fma.rn.f32 	%f255, %f253, %f254, %f252;
+	ld.const.f32 	%f256, [c_Kernel+16];
+	ld.shared.f32 	%f257, [%r16+336];
+	fma.rn.f32 	%f258, %f256, %f257, %f255;
+	ld.const.f32 	%f259, [c_Kernel+12];
+	ld.shared.f32 	%f260, [%r16+340];
+	fma.rn.f32 	%f261, %f259, %f260, %f258;
+	ld.const.f32 	%f262, [c_Kernel+8];
+	ld.shared.f32 	%f263, [%r16+344];
+	fma.rn.f32 	%f264, %f262, %f263, %f261;
+	ld.const.f32 	%f265, [c_Kernel+4];
+	ld.shared.f32 	%f266, [%r16+348];
+	fma.rn.f32 	%f267, %f265, %f266, %f264;
+	ld.const.f32 	%f268, [c_Kernel+0];
+	ld.shared.f32 	%f269, [%r16+352];
+	fma.rn.f32 	%f270, %f268, %f269, %f267;
+	.loc	16	83	0
+	st.global.f32 	[%r27+256], %f270;
+	.loc	16	81	0
+	mov.f32 	%f271, 0f00000000;   	// 0
+	ld.const.f32 	%f272, [c_Kernel+64];
+	ld.shared.f32 	%f273, [%r16+352];
+	fma.rn.f32 	%f274, %f272, %f273, %f271;
+	ld.const.f32 	%f275, [c_Kernel+60];
+	ld.shared.f32 	%f276, [%r16+356];
+	fma.rn.f32 	%f277, %f275, %f276, %f274;
+	ld.const.f32 	%f278, [c_Kernel+56];
+	ld.shared.f32 	%f279, [%r16+360];
+	fma.rn.f32 	%f280, %f278, %f279, %f277;
+	ld.const.f32 	%f281, [c_Kernel+52];
+	ld.shared.f32 	%f282, [%r16+364];
+	fma.rn.f32 	%f283, %f281, %f282, %f280;
+	ld.const.f32 	%f284, [c_Kernel+48];
+	ld.shared.f32 	%f285, [%r16+368];
+	fma.rn.f32 	%f286, %f284, %f285, %f283;
+	ld.const.f32 	%f287, [c_Kernel+44];
+	ld.shared.f32 	%f288, [%r16+372];
+	fma.rn.f32 	%f289, %f287, %f288, %f286;
+	ld.const.f32 	%f290, [c_Kernel+40];
+	ld.shared.f32 	%f291, [%r16+376];
+	fma.rn.f32 	%f292, %f290, %f291, %f289;
+	ld.const.f32 	%f293, [c_Kernel+36];
+	ld.shared.f32 	%f294, [%r16+380];
+	fma.rn.f32 	%f295, %f293, %f294, %f292;
+	ld.const.f32 	%f296, [c_Kernel+32];
+	ld.shared.f32 	%f297, [%r16+384];
+	fma.rn.f32 	%f298, %f296, %f297, %f295;
+	ld.const.f32 	%f299, [c_Kernel+28];
+	ld.shared.f32 	%f300, [%r16+388];
+	fma.rn.f32 	%f301, %f299, %f300, %f298;
+	ld.const.f32 	%f302, [c_Kernel+24];
+	ld.shared.f32 	%f303, [%r16+392];
+	fma.rn.f32 	%f304, %f302, %f303, %f301;
+	ld.const.f32 	%f305, [c_Kernel+20];
+	ld.shared.f32 	%f306, [%r16+396];
+	fma.rn.f32 	%f307, %f305, %f306, %f304;
+	ld.const.f32 	%f308, [c_Kernel+16];
+	ld.shared.f32 	%f309, [%r16+400];
+	fma.rn.f32 	%f310, %f308, %f309, %f307;
+	ld.const.f32 	%f311, [c_Kernel+12];
+	ld.shared.f32 	%f312, [%r16+404];
+	fma.rn.f32 	%f313, %f311, %f312, %f310;
+	ld.const.f32 	%f314, [c_Kernel+8];
+	ld.shared.f32 	%f315, [%r16+408];
+	fma.rn.f32 	%f316, %f314, %f315, %f313;
+	ld.const.f32 	%f317, [c_Kernel+4];
+	ld.shared.f32 	%f318, [%r16+412];
+	fma.rn.f32 	%f319, %f317, %f318, %f316;
+	ld.const.f32 	%f320, [c_Kernel+0];
+	ld.shared.f32 	%f321, [%r16+416];
+	fma.rn.f32 	%f322, %f320, %f321, %f319;
+	.loc	16	83	0
+	st.global.f32 	[%r27+320], %f322;
+	.loc	16	81	0
+	mov.f32 	%f323, 0f00000000;   	// 0
+	ld.const.f32 	%f324, [c_Kernel+64];
+	ld.shared.f32 	%f325, [%r16+416];
+	fma.rn.f32 	%f326, %f324, %f325, %f323;
+	ld.const.f32 	%f327, [c_Kernel+60];
+	ld.shared.f32 	%f328, [%r16+420];
+	fma.rn.f32 	%f329, %f327, %f328, %f326;
+	ld.const.f32 	%f330, [c_Kernel+56];
+	ld.shared.f32 	%f331, [%r16+424];
+	fma.rn.f32 	%f332, %f330, %f331, %f329;
+	ld.const.f32 	%f333, [c_Kernel+52];
+	ld.shared.f32 	%f334, [%r16+428];
+	fma.rn.f32 	%f335, %f333, %f334, %f332;
+	ld.const.f32 	%f336, [c_Kernel+48];
+	ld.shared.f32 	%f337, [%r16+432];
+	fma.rn.f32 	%f338, %f336, %f337, %f335;
+	ld.const.f32 	%f339, [c_Kernel+44];
+	ld.shared.f32 	%f340, [%r16+436];
+	fma.rn.f32 	%f341, %f339, %f340, %f338;
+	ld.const.f32 	%f342, [c_Kernel+40];
+	ld.shared.f32 	%f343, [%r16+440];
+	fma.rn.f32 	%f344, %f342, %f343, %f341;
+	ld.const.f32 	%f345, [c_Kernel+36];
+	ld.shared.f32 	%f346, [%r16+444];
+	fma.rn.f32 	%f347, %f345, %f346, %f344;
+	ld.const.f32 	%f348, [c_Kernel+32];
+	ld.shared.f32 	%f349, [%r16+448];
+	fma.rn.f32 	%f350, %f348, %f349, %f347;
+	ld.const.f32 	%f351, [c_Kernel+28];
+	ld.shared.f32 	%f352, [%r16+452];
+	fma.rn.f32 	%f353, %f351, %f352, %f350;
+	ld.const.f32 	%f354, [c_Kernel+24];
+	ld.shared.f32 	%f355, [%r16+456];
+	fma.rn.f32 	%f356, %f354, %f355, %f353;
+	ld.const.f32 	%f357, [c_Kernel+20];
+	ld.shared.f32 	%f358, [%r16+460];
+	fma.rn.f32 	%f359, %f357, %f358, %f356;
+	ld.const.f32 	%f360, [c_Kernel+16];
+	ld.shared.f32 	%f361, [%r16+464];
+	fma.rn.f32 	%f362, %f360, %f361, %f359;
+	ld.const.f32 	%f363, [c_Kernel+12];
+	ld.shared.f32 	%f364, [%r16+468];
+	fma.rn.f32 	%f365, %f363, %f364, %f362;
+	ld.const.f32 	%f366, [c_Kernel+8];
+	ld.shared.f32 	%f367, [%r16+472];
+	fma.rn.f32 	%f368, %f366, %f367, %f365;
+	ld.const.f32 	%f369, [c_Kernel+4];
+	ld.shared.f32 	%f370, [%r16+476];
+	fma.rn.f32 	%f371, %f369, %f370, %f368;
+	ld.const.f32 	%f372, [c_Kernel+0];
+	ld.shared.f32 	%f373, [%r16+480];
+	fma.rn.f32 	%f374, %f372, %f373, %f371;
+	.loc	16	83	0
+	st.global.f32 	[%r27+384], %f374;
+	.loc	16	81	0
+	mov.f32 	%f375, 0f00000000;   	// 0
+	ld.const.f32 	%f376, [c_Kernel+64];
+	ld.shared.f32 	%f377, [%r16+480];
+	fma.rn.f32 	%f378, %f376, %f377, %f375;
+	ld.const.f32 	%f379, [c_Kernel+60];
+	ld.shared.f32 	%f380, [%r16+484];
+	fma.rn.f32 	%f381, %f379, %f380, %f378;
+	ld.const.f32 	%f382, [c_Kernel+56];
+	ld.shared.f32 	%f383, [%r16+488];
+	fma.rn.f32 	%f384, %f382, %f383, %f381;
+	ld.const.f32 	%f385, [c_Kernel+52];
+	ld.shared.f32 	%f386, [%r16+492];
+	fma.rn.f32 	%f387, %f385, %f386, %f384;
+	ld.const.f32 	%f388, [c_Kernel+48];
+	ld.shared.f32 	%f389, [%r16+496];
+	fma.rn.f32 	%f390, %f388, %f389, %f387;
+	ld.const.f32 	%f391, [c_Kernel+44];
+	ld.shared.f32 	%f392, [%r16+500];
+	fma.rn.f32 	%f393, %f391, %f392, %f390;
+	ld.const.f32 	%f394, [c_Kernel+40];
+	ld.shared.f32 	%f395, [%r16+504];
+	fma.rn.f32 	%f396, %f394, %f395, %f393;
+	ld.const.f32 	%f397, [c_Kernel+36];
+	ld.shared.f32 	%f398, [%r16+508];
+	fma.rn.f32 	%f399, %f397, %f398, %f396;
+	ld.const.f32 	%f400, [c_Kernel+32];
+	ld.shared.f32 	%f401, [%r16+512];
+	fma.rn.f32 	%f402, %f400, %f401, %f399;
+	ld.const.f32 	%f403, [c_Kernel+28];
+	ld.shared.f32 	%f404, [%r16+516];
+	fma.rn.f32 	%f405, %f403, %f404, %f402;
+	ld.const.f32 	%f406, [c_Kernel+24];
+	ld.shared.f32 	%f407, [%r16+520];
+	fma.rn.f32 	%f408, %f406, %f407, %f405;
+	ld.const.f32 	%f409, [c_Kernel+20];
+	ld.shared.f32 	%f410, [%r16+524];
+	fma.rn.f32 	%f411, %f409, %f410, %f408;
+	ld.const.f32 	%f412, [c_Kernel+16];
+	ld.shared.f32 	%f413, [%r16+528];
+	fma.rn.f32 	%f414, %f412, %f413, %f411;
+	ld.const.f32 	%f415, [c_Kernel+12];
+	ld.shared.f32 	%f416, [%r16+532];
+	fma.rn.f32 	%f417, %f415, %f416, %f414;
+	ld.const.f32 	%f418, [c_Kernel+8];
+	ld.shared.f32 	%f419, [%r16+536];
+	fma.rn.f32 	%f420, %f418, %f419, %f417;
+	ld.const.f32 	%f421, [c_Kernel+4];
+	ld.shared.f32 	%f422, [%r16+540];
+	fma.rn.f32 	%f423, %f421, %f422, %f420;
+	ld.const.f32 	%f424, [c_Kernel+0];
+	ld.shared.f32 	%f425, [%r16+544];
+	fma.rn.f32 	%f426, %f424, %f425, %f423;
+	.loc	16	83	0
+	st.global.f32 	[%r27+448], %f426;
+	.loc	16	85	0
+	exit;
+$LDWend__Z21convolutionRowsKernelPfS_iii:
+	} // _Z21convolutionRowsKernelPfS_iii
+
+	.entry _Z24convolutionColumnsKernelPfS_iii (
+		.param .u32 __cudaparm__Z24convolutionColumnsKernelPfS_iii___val_paramd_Dst,
+		.param .u32 __cudaparm__Z24convolutionColumnsKernelPfS_iii___val_paramd_Src,
+		.param .s32 __cudaparm__Z24convolutionColumnsKernelPfS_iii_imageW,
+		.param .s32 __cudaparm__Z24convolutionColumnsKernelPfS_iii_imageH,
+		.param .s32 __cudaparm__Z24convolutionColumnsKernelPfS_iii_pitch)
+	{
+	.reg .u32 %r<63>;
+	.reg .f32 %f<428>;
+	.reg .pred %p<4>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_288004_34_s_Data2668[5184];
+	.loc	16	125	0
+$LDWbegin__Z24convolutionColumnsKernelPfS_iii:
+	.loc	16	138	0
+	mov.u32 	%r1, %ctaid.y;
+	mul.lo.u32 	%r2, %r1, 64;
+	mov.u32 	%r3, %ctaid.x;
+	mul.lo.u32 	%r4, %r3, 16;
+	ld.param.s32 	%r5, [__cudaparm__Z24convolutionColumnsKernelPfS_iii_pitch];
+	mul.lo.u32 	%r6, %r5, 32;
+	mov.u32 	%r7, %tid.x;
+	mul.lo.u32 	%r8, %r7, 81;
+	mov.u32 	%r9, %tid.y;
+	add.u32 	%r10, %r2, %r9;
+	add.u32 	%r11, %r4, %r7;
+	add.u32 	%r12, %r8, %r9;
+	sub.s32 	%r13, %r10, 8;
+	mul.lo.u32 	%r14, %r12, 4;
+	mul.lo.s32 	%r15, %r13, %r5;
+	mov.u32 	%r16, __cuda___cuda_local_var_288004_34_s_Data2668;
+	add.u32 	%r17, %r14, %r16;
+	add.s32 	%r18, %r15, %r11;
+	mul.lo.u32 	%r19, %r18, 4;
+	ld.param.u32 	%r20, [__cudaparm__Z24convolutionColumnsKernelPfS_iii___val_paramd_Src];
+	add.u32 	%r21, %r20, %r19;
+	add.u32 	%r22, %r6, %r21;
+	ld.global.f32 	%f1, [%r22+0];
+	st.shared.f32 	[%r17+32], %f1;
+	mul.lo.s32 	%r23, %r5, 2;
+	mul.lo.u32 	%r24, %r23, 32;
+	add.u32 	%r25, %r24, %r21;
+	ld.global.f32 	%f2, [%r25+0];
+	st.shared.f32 	[%r17+64], %f2;
+	mul.lo.s32 	%r26, %r5, 3;
+	mul.lo.u32 	%r27, %r26, 32;
+	add.u32 	%r28, %r27, %r21;
+	ld.global.f32 	%f3, [%r28+0];
+	st.shared.f32 	[%r17+96], %f3;
+	mul.lo.s32 	%r29, %r5, 4;
+	mul.lo.u32 	%r30, %r29, 32;
+	add.u32 	%r31, %r30, %r21;
+	ld.global.f32 	%f4, [%r31+0];
+	st.shared.f32 	[%r17+128], %f4;
+	mul.lo.s32 	%r32, %r5, 5;
+	mul.lo.u32 	%r33, %r32, 32;
+	add.u32 	%r34, %r33, %r21;
+	ld.global.f32 	%f5, [%r34+0];
+	st.shared.f32 	[%r17+160], %f5;
+	mul.lo.s32 	%r35, %r5, 6;
+	mul.lo.u32 	%r36, %r35, 32;
+	add.u32 	%r37, %r36, %r21;
+	ld.global.f32 	%f6, [%r37+0];
+	st.shared.f32 	[%r17+192], %f6;
+	mul.lo.s32 	%r38, %r5, 7;
+	mul.lo.u32 	%r39, %r38, 32;
+	add.u32 	%r40, %r39, %r21;
+	ld.global.f32 	%f7, [%r40+0];
+	st.shared.f32 	[%r17+224], %f7;
+	mul.lo.s32 	%r41, %r5, 8;
+	mul.lo.u32 	%r42, %r41, 32;
+	add.u32 	%r43, %r42, %r21;
+	ld.global.f32 	%f8, [%r43+0];
+	st.shared.f32 	[%r17+256], %f8;
+	.loc	16	24	0
+	mov.u32 	%r44, 0;
+	setp.lt.s32 	%p1, %r13, %r44;
+	@%p1 bra 	$Lt_1_7170;
+	.loc	16	143	0
+	ld.global.f32 	%f9, [%r21+0];
+	bra.uni 	$Lt_1_6914;
+$Lt_1_7170:
+	mov.f32 	%f9, 0f00000000;     	// 0
+$Lt_1_6914:
+	st.shared.f32 	[%r17+0], %f9;
+	.loc	16	24	0
+	ld.param.s32 	%r45, [__cudaparm__Z24convolutionColumnsKernelPfS_iii_imageH];
+	sub.s32 	%r46, %r45, %r10;
+	add.s32 	%r47, %r46, 8;
+	mov.u32 	%r48, 72;
+	setp.le.s32 	%p2, %r47, %r48;
+	@%p2 bra 	$Lt_1_7682;
+	.loc	16	148	0
+	mul.lo.s32 	%r49, %r5, 9;
+	mul.lo.u32 	%r50, %r49, 32;
+	add.u32 	%r51, %r21, %r50;
+	ld.global.f32 	%f10, [%r51+0];
+	bra.uni 	$Lt_1_7426;
+$Lt_1_7682:
+	mov.f32 	%f10, 0f00000000;    	// 0
+$Lt_1_7426:
+	st.shared.f32 	[%r17+288], %f10;
+	.loc	16	151	0
+	bar.sync 	0;
+	.loc	16	157	0
+	mov.f32 	%f11, 0f00000000;    	// 0
+	ld.const.f32 	%f12, [c_Kernel+64];
+	ld.shared.f32 	%f13, [%r17+0];
+	fma.rn.f32 	%f14, %f12, %f13, %f11;
+	ld.const.f32 	%f15, [c_Kernel+60];
+	ld.shared.f32 	%f16, [%r17+4];
+	fma.rn.f32 	%f17, %f15, %f16, %f14;
+	ld.const.f32 	%f18, [c_Kernel+56];
+	ld.shared.f32 	%f19, [%r17+8];
+	fma.rn.f32 	%f20, %f18, %f19, %f17;
+	ld.const.f32 	%f21, [c_Kernel+52];
+	ld.shared.f32 	%f22, [%r17+12];
+	fma.rn.f32 	%f23, %f21, %f22, %f20;
+	ld.const.f32 	%f24, [c_Kernel+48];
+	ld.shared.f32 	%f25, [%r17+16];
+	fma.rn.f32 	%f26, %f24, %f25, %f23;
+	ld.const.f32 	%f27, [c_Kernel+44];
+	ld.shared.f32 	%f28, [%r17+20];
+	fma.rn.f32 	%f29, %f27, %f28, %f26;
+	ld.const.f32 	%f30, [c_Kernel+40];
+	ld.shared.f32 	%f31, [%r17+24];
+	fma.rn.f32 	%f32, %f30, %f31, %f29;
+	ld.const.f32 	%f33, [c_Kernel+36];
+	ld.shared.f32 	%f34, [%r17+28];
+	fma.rn.f32 	%f35, %f33, %f34, %f32;
+	ld.const.f32 	%f36, [c_Kernel+32];
+	ld.shared.f32 	%f37, [%r17+32];
+	fma.rn.f32 	%f38, %f36, %f37, %f35;
+	ld.const.f32 	%f39, [c_Kernel+28];
+	ld.shared.f32 	%f40, [%r17+36];
+	fma.rn.f32 	%f41, %f39, %f40, %f38;
+	ld.const.f32 	%f42, [c_Kernel+24];
+	ld.shared.f32 	%f43, [%r17+40];
+	fma.rn.f32 	%f44, %f42, %f43, %f41;
+	ld.const.f32 	%f45, [c_Kernel+20];
+	ld.shared.f32 	%f46, [%r17+44];
+	fma.rn.f32 	%f47, %f45, %f46, %f44;
+	ld.const.f32 	%f48, [c_Kernel+16];
+	ld.shared.f32 	%f49, [%r17+48];
+	fma.rn.f32 	%f50, %f48, %f49, %f47;
+	ld.const.f32 	%f51, [c_Kernel+12];
+	ld.shared.f32 	%f52, [%r17+52];
+	fma.rn.f32 	%f53, %f51, %f52, %f50;
+	ld.const.f32 	%f54, [c_Kernel+8];
+	ld.shared.f32 	%f55, [%r17+56];
+	fma.rn.f32 	%f56, %f54, %f55, %f53;
+	ld.const.f32 	%f57, [c_Kernel+4];
+	ld.shared.f32 	%f58, [%r17+60];
+	fma.rn.f32 	%f59, %f57, %f58, %f56;
+	ld.const.f32 	%f60, [c_Kernel+0];
+	ld.shared.f32 	%f61, [%r17+64];
+	fma.rn.f32 	%f62, %f60, %f61, %f59;
+	.loc	16	159	0
+	ld.param.u32 	%r52, [__cudaparm__Z24convolutionColumnsKernelPfS_iii___val_paramd_Dst];
+	add.u32 	%r53, %r52, %r19;
+	add.u32 	%r54, %r6, %r53;
+	st.global.f32 	[%r54+0], %f62;
+	.loc	16	157	0
+	mov.f32 	%f63, 0f00000000;    	// 0
+	ld.const.f32 	%f64, [c_Kernel+64];
+	ld.shared.f32 	%f65, [%r17+32];
+	fma.rn.f32 	%f66, %f64, %f65, %f63;
+	ld.const.f32 	%f67, [c_Kernel+60];
+	ld.shared.f32 	%f68, [%r17+36];
+	fma.rn.f32 	%f69, %f67, %f68, %f66;
+	ld.const.f32 	%f70, [c_Kernel+56];
+	ld.shared.f32 	%f71, [%r17+40];
+	fma.rn.f32 	%f72, %f70, %f71, %f69;
+	ld.const.f32 	%f73, [c_Kernel+52];
+	ld.shared.f32 	%f74, [%r17+44];
+	fma.rn.f32 	%f75, %f73, %f74, %f72;
+	ld.const.f32 	%f76, [c_Kernel+48];
+	ld.shared.f32 	%f77, [%r17+48];
+	fma.rn.f32 	%f78, %f76, %f77, %f75;
+	ld.const.f32 	%f79, [c_Kernel+44];
+	ld.shared.f32 	%f80, [%r17+52];
+	fma.rn.f32 	%f81, %f79, %f80, %f78;
+	ld.const.f32 	%f82, [c_Kernel+40];
+	ld.shared.f32 	%f83, [%r17+56];
+	fma.rn.f32 	%f84, %f82, %f83, %f81;
+	ld.const.f32 	%f85, [c_Kernel+36];
+	ld.shared.f32 	%f86, [%r17+60];
+	fma.rn.f32 	%f87, %f85, %f86, %f84;
+	ld.const.f32 	%f88, [c_Kernel+32];
+	ld.shared.f32 	%f89, [%r17+64];
+	fma.rn.f32 	%f90, %f88, %f89, %f87;
+	ld.const.f32 	%f91, [c_Kernel+28];
+	ld.shared.f32 	%f92, [%r17+68];
+	fma.rn.f32 	%f93, %f91, %f92, %f90;
+	ld.const.f32 	%f94, [c_Kernel+24];
+	ld.shared.f32 	%f95, [%r17+72];
+	fma.rn.f32 	%f96, %f94, %f95, %f93;
+	ld.const.f32 	%f97, [c_Kernel+20];
+	ld.shared.f32 	%f98, [%r17+76];
+	fma.rn.f32 	%f99, %f97, %f98, %f96;
+	ld.const.f32 	%f100, [c_Kernel+16];
+	ld.shared.f32 	%f101, [%r17+80];
+	fma.rn.f32 	%f102, %f100, %f101, %f99;
+	ld.const.f32 	%f103, [c_Kernel+12];
+	ld.shared.f32 	%f104, [%r17+84];
+	fma.rn.f32 	%f105, %f103, %f104, %f102;
+	ld.const.f32 	%f106, [c_Kernel+8];
+	ld.shared.f32 	%f107, [%r17+88];
+	fma.rn.f32 	%f108, %f106, %f107, %f105;
+	ld.const.f32 	%f109, [c_Kernel+4];
+	ld.shared.f32 	%f110, [%r17+92];
+	fma.rn.f32 	%f111, %f109, %f110, %f108;
+	ld.const.f32 	%f112, [c_Kernel+0];
+	ld.shared.f32 	%f113, [%r17+96];
+	fma.rn.f32 	%f114, %f112, %f113, %f111;
+	.loc	16	159	0
+	add.u32 	%r55, %r24, %r53;
+	st.global.f32 	[%r55+0], %f114;
+	.loc	16	157	0
+	mov.f32 	%f115, 0f00000000;   	// 0
+	ld.const.f32 	%f116, [c_Kernel+64];
+	ld.shared.f32 	%f117, [%r17+64];
+	fma.rn.f32 	%f118, %f116, %f117, %f115;
+	ld.const.f32 	%f119, [c_Kernel+60];
+	ld.shared.f32 	%f120, [%r17+68];
+	fma.rn.f32 	%f121, %f119, %f120, %f118;
+	ld.const.f32 	%f122, [c_Kernel+56];
+	ld.shared.f32 	%f123, [%r17+72];
+	fma.rn.f32 	%f124, %f122, %f123, %f121;
+	ld.const.f32 	%f125, [c_Kernel+52];
+	ld.shared.f32 	%f126, [%r17+76];
+	fma.rn.f32 	%f127, %f125, %f126, %f124;
+	ld.const.f32 	%f128, [c_Kernel+48];
+	ld.shared.f32 	%f129, [%r17+80];
+	fma.rn.f32 	%f130, %f128, %f129, %f127;
+	ld.const.f32 	%f131, [c_Kernel+44];
+	ld.shared.f32 	%f132, [%r17+84];
+	fma.rn.f32 	%f133, %f131, %f132, %f130;
+	ld.const.f32 	%f134, [c_Kernel+40];
+	ld.shared.f32 	%f135, [%r17+88];
+	fma.rn.f32 	%f136, %f134, %f135, %f133;
+	ld.const.f32 	%f137, [c_Kernel+36];
+	ld.shared.f32 	%f138, [%r17+92];
+	fma.rn.f32 	%f139, %f137, %f138, %f136;
+	ld.const.f32 	%f140, [c_Kernel+32];
+	ld.shared.f32 	%f141, [%r17+96];
+	fma.rn.f32 	%f142, %f140, %f141, %f139;
+	ld.const.f32 	%f143, [c_Kernel+28];
+	ld.shared.f32 	%f144, [%r17+100];
+	fma.rn.f32 	%f145, %f143, %f144, %f142;
+	ld.const.f32 	%f146, [c_Kernel+24];
+	ld.shared.f32 	%f147, [%r17+104];
+	fma.rn.f32 	%f148, %f146, %f147, %f145;
+	ld.const.f32 	%f149, [c_Kernel+20];
+	ld.shared.f32 	%f150, [%r17+108];
+	fma.rn.f32 	%f151, %f149, %f150, %f148;
+	ld.const.f32 	%f152, [c_Kernel+16];
+	ld.shared.f32 	%f153, [%r17+112];
+	fma.rn.f32 	%f154, %f152, %f153, %f151;
+	ld.const.f32 	%f155, [c_Kernel+12];
+	ld.shared.f32 	%f156, [%r17+116];
+	fma.rn.f32 	%f157, %f155, %f156, %f154;
+	ld.const.f32 	%f158, [c_Kernel+8];
+	ld.shared.f32 	%f159, [%r17+120];
+	fma.rn.f32 	%f160, %f158, %f159, %f157;
+	ld.const.f32 	%f161, [c_Kernel+4];
+	ld.shared.f32 	%f162, [%r17+124];
+	fma.rn.f32 	%f163, %f161, %f162, %f160;
+	ld.const.f32 	%f164, [c_Kernel+0];
+	ld.shared.f32 	%f165, [%r17+128];
+	fma.rn.f32 	%f166, %f164, %f165, %f163;
+	.loc	16	159	0
+	add.u32 	%r56, %r27, %r53;
+	st.global.f32 	[%r56+0], %f166;
+	.loc	16	157	0
+	mov.f32 	%f167, 0f00000000;   	// 0
+	ld.const.f32 	%f168, [c_Kernel+64];
+	ld.shared.f32 	%f169, [%r17+96];
+	fma.rn.f32 	%f170, %f168, %f169, %f167;
+	ld.const.f32 	%f171, [c_Kernel+60];
+	ld.shared.f32 	%f172, [%r17+100];
+	fma.rn.f32 	%f173, %f171, %f172, %f170;
+	ld.const.f32 	%f174, [c_Kernel+56];
+	ld.shared.f32 	%f175, [%r17+104];
+	fma.rn.f32 	%f176, %f174, %f175, %f173;
+	ld.const.f32 	%f177, [c_Kernel+52];
+	ld.shared.f32 	%f178, [%r17+108];
+	fma.rn.f32 	%f179, %f177, %f178, %f176;
+	ld.const.f32 	%f180, [c_Kernel+48];
+	ld.shared.f32 	%f181, [%r17+112];
+	fma.rn.f32 	%f182, %f180, %f181, %f179;
+	ld.const.f32 	%f183, [c_Kernel+44];
+	ld.shared.f32 	%f184, [%r17+116];
+	fma.rn.f32 	%f185, %f183, %f184, %f182;
+	ld.const.f32 	%f186, [c_Kernel+40];
+	ld.shared.f32 	%f187, [%r17+120];
+	fma.rn.f32 	%f188, %f186, %f187, %f185;
+	ld.const.f32 	%f189, [c_Kernel+36];
+	ld.shared.f32 	%f190, [%r17+124];
+	fma.rn.f32 	%f191, %f189, %f190, %f188;
+	ld.const.f32 	%f192, [c_Kernel+32];
+	ld.shared.f32 	%f193, [%r17+128];
+	fma.rn.f32 	%f194, %f192, %f193, %f191;
+	ld.const.f32 	%f195, [c_Kernel+28];
+	ld.shared.f32 	%f196, [%r17+132];
+	fma.rn.f32 	%f197, %f195, %f196, %f194;
+	ld.const.f32 	%f198, [c_Kernel+24];
+	ld.shared.f32 	%f199, [%r17+136];
+	fma.rn.f32 	%f200, %f198, %f199, %f197;
+	ld.const.f32 	%f201, [c_Kernel+20];
+	ld.shared.f32 	%f202, [%r17+140];
+	fma.rn.f32 	%f203, %f201, %f202, %f200;
+	ld.const.f32 	%f204, [c_Kernel+16];
+	ld.shared.f32 	%f205, [%r17+144];
+	fma.rn.f32 	%f206, %f204, %f205, %f203;
+	ld.const.f32 	%f207, [c_Kernel+12];
+	ld.shared.f32 	%f208, [%r17+148];
+	fma.rn.f32 	%f209, %f207, %f208, %f206;
+	ld.const.f32 	%f210, [c_Kernel+8];
+	ld.shared.f32 	%f211, [%r17+152];
+	fma.rn.f32 	%f212, %f210, %f211, %f209;
+	ld.const.f32 	%f213, [c_Kernel+4];
+	ld.shared.f32 	%f214, [%r17+156];
+	fma.rn.f32 	%f215, %f213, %f214, %f212;
+	ld.const.f32 	%f216, [c_Kernel+0];
+	ld.shared.f32 	%f217, [%r17+160];
+	fma.rn.f32 	%f218, %f216, %f217, %f215;
+	.loc	16	159	0
+	add.u32 	%r57, %r30, %r53;
+	st.global.f32 	[%r57+0], %f218;
+	.loc	16	157	0
+	mov.f32 	%f219, 0f00000000;   	// 0
+	ld.const.f32 	%f220, [c_Kernel+64];
+	ld.shared.f32 	%f221, [%r17+128];
+	fma.rn.f32 	%f222, %f220, %f221, %f219;
+	ld.const.f32 	%f223, [c_Kernel+60];
+	ld.shared.f32 	%f224, [%r17+132];
+	fma.rn.f32 	%f225, %f223, %f224, %f222;
+	ld.const.f32 	%f226, [c_Kernel+56];
+	ld.shared.f32 	%f227, [%r17+136];
+	fma.rn.f32 	%f228, %f226, %f227, %f225;
+	ld.const.f32 	%f229, [c_Kernel+52];
+	ld.shared.f32 	%f230, [%r17+140];
+	fma.rn.f32 	%f231, %f229, %f230, %f228;
+	ld.const.f32 	%f232, [c_Kernel+48];
+	ld.shared.f32 	%f233, [%r17+144];
+	fma.rn.f32 	%f234, %f232, %f233, %f231;
+	ld.const.f32 	%f235, [c_Kernel+44];
+	ld.shared.f32 	%f236, [%r17+148];
+	fma.rn.f32 	%f237, %f235, %f236, %f234;
+	ld.const.f32 	%f238, [c_Kernel+40];
+	ld.shared.f32 	%f239, [%r17+152];
+	fma.rn.f32 	%f240, %f238, %f239, %f237;
+	ld.const.f32 	%f241, [c_Kernel+36];
+	ld.shared.f32 	%f242, [%r17+156];
+	fma.rn.f32 	%f243, %f241, %f242, %f240;
+	ld.const.f32 	%f244, [c_Kernel+32];
+	ld.shared.f32 	%f245, [%r17+160];
+	fma.rn.f32 	%f246, %f244, %f245, %f243;
+	ld.const.f32 	%f247, [c_Kernel+28];
+	ld.shared.f32 	%f248, [%r17+164];
+	fma.rn.f32 	%f249, %f247, %f248, %f246;
+	ld.const.f32 	%f250, [c_Kernel+24];
+	ld.shared.f32 	%f251, [%r17+168];
+	fma.rn.f32 	%f252, %f250, %f251, %f249;
+	ld.const.f32 	%f253, [c_Kernel+20];
+	ld.shared.f32 	%f254, [%r17+172];
+	fma.rn.f32 	%f255, %f253, %f254, %f252;
+	ld.const.f32 	%f256, [c_Kernel+16];
+	ld.shared.f32 	%f257, [%r17+176];
+	fma.rn.f32 	%f258, %f256, %f257, %f255;
+	ld.const.f32 	%f259, [c_Kernel+12];
+	ld.shared.f32 	%f260, [%r17+180];
+	fma.rn.f32 	%f261, %f259, %f260, %f258;
+	ld.const.f32 	%f262, [c_Kernel+8];
+	ld.shared.f32 	%f263, [%r17+184];
+	fma.rn.f32 	%f264, %f262, %f263, %f261;
+	ld.const.f32 	%f265, [c_Kernel+4];
+	ld.shared.f32 	%f266, [%r17+188];
+	fma.rn.f32 	%f267, %f265, %f266, %f264;
+	ld.const.f32 	%f268, [c_Kernel+0];
+	ld.shared.f32 	%f269, [%r17+192];
+	fma.rn.f32 	%f270, %f268, %f269, %f267;
+	.loc	16	159	0
+	add.u32 	%r58, %r33, %r53;
+	st.global.f32 	[%r58+0], %f270;
+	.loc	16	157	0
+	mov.f32 	%f271, 0f00000000;   	// 0
+	ld.const.f32 	%f272, [c_Kernel+64];
+	ld.shared.f32 	%f273, [%r17+160];
+	fma.rn.f32 	%f274, %f272, %f273, %f271;
+	ld.const.f32 	%f275, [c_Kernel+60];
+	ld.shared.f32 	%f276, [%r17+164];
+	fma.rn.f32 	%f277, %f275, %f276, %f274;
+	ld.const.f32 	%f278, [c_Kernel+56];
+	ld.shared.f32 	%f279, [%r17+168];
+	fma.rn.f32 	%f280, %f278, %f279, %f277;
+	ld.const.f32 	%f281, [c_Kernel+52];
+	ld.shared.f32 	%f282, [%r17+172];
+	fma.rn.f32 	%f283, %f281, %f282, %f280;
+	ld.const.f32 	%f284, [c_Kernel+48];
+	ld.shared.f32 	%f285, [%r17+176];
+	fma.rn.f32 	%f286, %f284, %f285, %f283;
+	ld.const.f32 	%f287, [c_Kernel+44];
+	ld.shared.f32 	%f288, [%r17+180];
+	fma.rn.f32 	%f289, %f287, %f288, %f286;
+	ld.const.f32 	%f290, [c_Kernel+40];
+	ld.shared.f32 	%f291, [%r17+184];
+	fma.rn.f32 	%f292, %f290, %f291, %f289;
+	ld.const.f32 	%f293, [c_Kernel+36];
+	ld.shared.f32 	%f294, [%r17+188];
+	fma.rn.f32 	%f295, %f293, %f294, %f292;
+	ld.const.f32 	%f296, [c_Kernel+32];
+	ld.shared.f32 	%f297, [%r17+192];
+	fma.rn.f32 	%f298, %f296, %f297, %f295;
+	ld.const.f32 	%f299, [c_Kernel+28];
+	ld.shared.f32 	%f300, [%r17+196];
+	fma.rn.f32 	%f301, %f299, %f300, %f298;
+	ld.const.f32 	%f302, [c_Kernel+24];
+	ld.shared.f32 	%f303, [%r17+200];
+	fma.rn.f32 	%f304, %f302, %f303, %f301;
+	ld.const.f32 	%f305, [c_Kernel+20];
+	ld.shared.f32 	%f306, [%r17+204];
+	fma.rn.f32 	%f307, %f305, %f306, %f304;
+	ld.const.f32 	%f308, [c_Kernel+16];
+	ld.shared.f32 	%f309, [%r17+208];
+	fma.rn.f32 	%f310, %f308, %f309, %f307;
+	ld.const.f32 	%f311, [c_Kernel+12];
+	ld.shared.f32 	%f312, [%r17+212];
+	fma.rn.f32 	%f313, %f311, %f312, %f310;
+	ld.const.f32 	%f314, [c_Kernel+8];
+	ld.shared.f32 	%f315, [%r17+216];
+	fma.rn.f32 	%f316, %f314, %f315, %f313;
+	ld.const.f32 	%f317, [c_Kernel+4];
+	ld.shared.f32 	%f318, [%r17+220];
+	fma.rn.f32 	%f319, %f317, %f318, %f316;
+	ld.const.f32 	%f320, [c_Kernel+0];
+	ld.shared.f32 	%f321, [%r17+224];
+	fma.rn.f32 	%f322, %f320, %f321, %f319;
+	.loc	16	159	0
+	add.u32 	%r59, %r36, %r53;
+	st.global.f32 	[%r59+0], %f322;
+	.loc	16	157	0
+	mov.f32 	%f323, 0f00000000;   	// 0
+	ld.const.f32 	%f324, [c_Kernel+64];
+	ld.shared.f32 	%f325, [%r17+192];
+	fma.rn.f32 	%f326, %f324, %f325, %f323;
+	ld.const.f32 	%f327, [c_Kernel+60];
+	ld.shared.f32 	%f328, [%r17+196];
+	fma.rn.f32 	%f329, %f327, %f328, %f326;
+	ld.const.f32 	%f330, [c_Kernel+56];
+	ld.shared.f32 	%f331, [%r17+200];
+	fma.rn.f32 	%f332, %f330, %f331, %f329;
+	ld.const.f32 	%f333, [c_Kernel+52];
+	ld.shared.f32 	%f334, [%r17+204];
+	fma.rn.f32 	%f335, %f333, %f334, %f332;
+	ld.const.f32 	%f336, [c_Kernel+48];
+	ld.shared.f32 	%f337, [%r17+208];
+	fma.rn.f32 	%f338, %f336, %f337, %f335;
+	ld.const.f32 	%f339, [c_Kernel+44];
+	ld.shared.f32 	%f340, [%r17+212];
+	fma.rn.f32 	%f341, %f339, %f340, %f338;
+	ld.const.f32 	%f342, [c_Kernel+40];
+	ld.shared.f32 	%f343, [%r17+216];
+	fma.rn.f32 	%f344, %f342, %f343, %f341;
+	ld.const.f32 	%f345, [c_Kernel+36];
+	ld.shared.f32 	%f346, [%r17+220];
+	fma.rn.f32 	%f347, %f345, %f346, %f344;
+	ld.const.f32 	%f348, [c_Kernel+32];
+	ld.shared.f32 	%f349, [%r17+224];
+	fma.rn.f32 	%f350, %f348, %f349, %f347;
+	ld.const.f32 	%f351, [c_Kernel+28];
+	ld.shared.f32 	%f352, [%r17+228];
+	fma.rn.f32 	%f353, %f351, %f352, %f350;
+	ld.const.f32 	%f354, [c_Kernel+24];
+	ld.shared.f32 	%f355, [%r17+232];
+	fma.rn.f32 	%f356, %f354, %f355, %f353;
+	ld.const.f32 	%f357, [c_Kernel+20];
+	ld.shared.f32 	%f358, [%r17+236];
+	fma.rn.f32 	%f359, %f357, %f358, %f356;
+	ld.const.f32 	%f360, [c_Kernel+16];
+	ld.shared.f32 	%f361, [%r17+240];
+	fma.rn.f32 	%f362, %f360, %f361, %f359;
+	ld.const.f32 	%f363, [c_Kernel+12];
+	ld.shared.f32 	%f364, [%r17+244];
+	fma.rn.f32 	%f365, %f363, %f364, %f362;
+	ld.const.f32 	%f366, [c_Kernel+8];
+	ld.shared.f32 	%f367, [%r17+248];
+	fma.rn.f32 	%f368, %f366, %f367, %f365;
+	ld.const.f32 	%f369, [c_Kernel+4];
+	ld.shared.f32 	%f370, [%r17+252];
+	fma.rn.f32 	%f371, %f369, %f370, %f368;
+	ld.const.f32 	%f372, [c_Kernel+0];
+	ld.shared.f32 	%f373, [%r17+256];
+	fma.rn.f32 	%f374, %f372, %f373, %f371;
+	.loc	16	159	0
+	add.u32 	%r60, %r39, %r53;
+	st.global.f32 	[%r60+0], %f374;
+	.loc	16	157	0
+	mov.f32 	%f375, 0f00000000;   	// 0
+	ld.const.f32 	%f376, [c_Kernel+64];
+	ld.shared.f32 	%f377, [%r17+224];
+	fma.rn.f32 	%f378, %f376, %f377, %f375;
+	ld.const.f32 	%f379, [c_Kernel+60];
+	ld.shared.f32 	%f380, [%r17+228];
+	fma.rn.f32 	%f381, %f379, %f380, %f378;
+	ld.const.f32 	%f382, [c_Kernel+56];
+	ld.shared.f32 	%f383, [%r17+232];
+	fma.rn.f32 	%f384, %f382, %f383, %f381;
+	ld.const.f32 	%f385, [c_Kernel+52];
+	ld.shared.f32 	%f386, [%r17+236];
+	fma.rn.f32 	%f387, %f385, %f386, %f384;
+	ld.const.f32 	%f388, [c_Kernel+48];
+	ld.shared.f32 	%f389, [%r17+240];
+	fma.rn.f32 	%f390, %f388, %f389, %f387;
+	ld.const.f32 	%f391, [c_Kernel+44];
+	ld.shared.f32 	%f392, [%r17+244];
+	fma.rn.f32 	%f393, %f391, %f392, %f390;
+	ld.const.f32 	%f394, [c_Kernel+40];
+	ld.shared.f32 	%f395, [%r17+248];
+	fma.rn.f32 	%f396, %f394, %f395, %f393;
+	ld.const.f32 	%f397, [c_Kernel+36];
+	ld.shared.f32 	%f398, [%r17+252];
+	fma.rn.f32 	%f399, %f397, %f398, %f396;
+	ld.const.f32 	%f400, [c_Kernel+32];
+	ld.shared.f32 	%f401, [%r17+256];
+	fma.rn.f32 	%f402, %f400, %f401, %f399;
+	ld.const.f32 	%f403, [c_Kernel+28];
+	ld.shared.f32 	%f404, [%r17+260];
+	fma.rn.f32 	%f405, %f403, %f404, %f402;
+	ld.const.f32 	%f406, [c_Kernel+24];
+	ld.shared.f32 	%f407, [%r17+264];
+	fma.rn.f32 	%f408, %f406, %f407, %f405;
+	ld.const.f32 	%f409, [c_Kernel+20];
+	ld.shared.f32 	%f410, [%r17+268];
+	fma.rn.f32 	%f411, %f409, %f410, %f408;
+	ld.const.f32 	%f412, [c_Kernel+16];
+	ld.shared.f32 	%f413, [%r17+272];
+	fma.rn.f32 	%f414, %f412, %f413, %f411;
+	ld.const.f32 	%f415, [c_Kernel+12];
+	ld.shared.f32 	%f416, [%r17+276];
+	fma.rn.f32 	%f417, %f415, %f416, %f414;
+	ld.const.f32 	%f418, [c_Kernel+8];
+	ld.shared.f32 	%f419, [%r17+280];
+	fma.rn.f32 	%f420, %f418, %f419, %f417;
+	ld.const.f32 	%f421, [c_Kernel+4];
+	ld.shared.f32 	%f422, [%r17+284];
+	fma.rn.f32 	%f423, %f421, %f422, %f420;
+	ld.const.f32 	%f424, [c_Kernel+0];
+	ld.shared.f32 	%f425, [%r17+288];
+	fma.rn.f32 	%f426, %f424, %f425, %f423;
+	.loc	16	159	0
+	add.u32 	%r61, %r42, %r53;
+	st.global.f32 	[%r61+0], %f426;
+	.loc	16	161	0
+	exit;
+$LDWend__Z24convolutionColumnsKernelPfS_iii:
+	} // _Z24convolutionColumnsKernelPfS_iii
+
