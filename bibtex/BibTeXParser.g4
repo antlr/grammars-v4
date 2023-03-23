@@ -1,9 +1,9 @@
-parser grammar BibTeX;
+parser grammar BibTeXParser;
 
 options { tokenVocab=BibTeXLexer; }
 
 bibTex
-    : entry*
+    : entry* EOF
     ;
 
 // Entries
