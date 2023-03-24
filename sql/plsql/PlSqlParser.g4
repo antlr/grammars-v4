@@ -6219,6 +6219,7 @@ standard_function
     | other_function
     ;
 
+//see as https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/JSON_ARRAY.html#GUID-46CDB3AF-5795-455B-85A8-764528CEC43B
 json_function
     : JSON_ARRAY '('  json_array_element ( ',' json_array_element)* json_on_null_clause? json_return_clause? STRICT? ')'
     | JSON_ARRAYAGG '(' expression (FORMAT JSON)? order_by_clause? json_on_null_clause? json_return_clause? STRICT? ')'
