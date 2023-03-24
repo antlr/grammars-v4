@@ -6247,7 +6247,7 @@ json_array_element
     ;
 
 json_on_null_clause
-    : ( NULL_ | ABSENT ) ON NULL_
+    : (NULL_ | ABSENT) ON NULL_
     ;
 
 json_return_clause
