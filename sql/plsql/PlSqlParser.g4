@@ -6231,7 +6231,7 @@ json_function
     ;
 
 json_object_content
-    : ((json_object_entry (',' json_object_entry)* ) | '*') json_on_null_clause? json_return_clause? STRICT? (WITH UNIQUE KEYS)?
+    : (json_object_entry (',' json_object_entry)* | '*') json_on_null_clause? json_return_clause? STRICT? (WITH UNIQUE KEYS)?
     ;
 
 json_object_entry
