@@ -6243,7 +6243,7 @@ json_table_clause
     ;
 
 json_array_element
-    : ( expression | CHAR_STRING | NULL_ |  UNSIGNED_INTEGER | json_function) (FORMAT JSON)?
+    : (expression | CHAR_STRING | NULL_ |  UNSIGNED_INTEGER | json_function) (FORMAT JSON)?
     ;
 
 json_on_null_clause
