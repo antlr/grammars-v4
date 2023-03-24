@@ -6235,7 +6235,7 @@ json_object_content
     ;
 
 json_object_entry
-    : ((KEY? expression (VALUE | IS)? expression) | (expression ':' expression) (FORMAT JSON)?) | identifier
+    : (KEY? expression (VALUE | IS)? expression | expression ':' expression (FORMAT JSON)?) | identifier
     ;
 
 json_table_clause
