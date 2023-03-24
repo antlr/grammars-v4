@@ -6284,7 +6284,7 @@ json_query_return_type
     ;
 
 json_query_wrapper_clause
-    : (WITHOUT ARRAY? WRAPPER) | ( WITH (UNCONDITIONAL | CONDITIONAL)? ARRAY? WRAPPER)
+    : (WITHOUT ARRAY? WRAPPER) | (WITH (UNCONDITIONAL | CONDITIONAL)? ARRAY? WRAPPER)
     ;
 
 json_query_on_error_clause
