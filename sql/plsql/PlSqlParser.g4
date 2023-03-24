@@ -7057,6 +7057,7 @@ regular_id
     : non_reserved_keywords_pre12c
     | non_reserved_keywords_in_12c
     | REGULAR_ID
+    | ABSENT
     | A_LETTER
     | AGENT
     | AGGREGATE
@@ -7071,6 +7072,7 @@ regular_id
     | CLUSTER
     | CONSTRUCTOR
     | CUSTOMDATUM
+    | CASESENSITIVE
     | DECIMAL
     | DELETE
     | DETERMINISTIC
@@ -7089,12 +7091,15 @@ regular_id
     | INDICES
     | INOUT
     | INTEGER
+    | JSON_TRANSFORM
     | K_LETTER
     | LANGUAGE
     | LONG
     | LOOP
     | MOUNTPOINT
     | M_LETTER
+    | MISSING
+    | MISMATCH
     | NUMBER
     | ORADATA
     | OSERROR
@@ -7116,6 +7121,7 @@ regular_id
     | RENAME
     | RESTRICT_REFERENCES
     | RESULT
+    | SDO_GEOMETRY
     | SELF
     | SERIALLY_REUSABLE
     | SET
