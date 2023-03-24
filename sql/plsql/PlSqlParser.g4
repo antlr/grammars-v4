@@ -6220,7 +6220,7 @@ standard_function
     ;
 
 json_function
-    : JSON_ARRAY '('  (json_array_element ( ',' json_array_element)*) json_on_null_clause? json_return_clause? STRICT? ')'
+    : JSON_ARRAY '('  json_array_element ( ',' json_array_element)* json_on_null_clause? json_return_clause? STRICT? ')'
     | JSON_ARRAYAGG '(' expression (FORMAT JSON)? order_by_clause? json_on_null_clause? json_return_clause? STRICT? ')'
     | JSON_OBJECT '(' json_object_content ')'
     | JSON_OBJECTAGG '(' KEY? expression VALUE expression ((NULL_ | ABSENT) ON NULL_)? (RETURNING ( VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB ))?  STRICT? (WITH UNIQUE KEYS)?')'
