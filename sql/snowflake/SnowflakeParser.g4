@@ -1462,7 +1462,7 @@ alert_condition
     ;
 
 alert_action
-    :
+    : sql_command
     ;
 
 create_api_integration
