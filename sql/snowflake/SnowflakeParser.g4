@@ -478,6 +478,7 @@ unset
 // alter commands
 alter_command
     : alter_account
+    | alter_alert
     | alter_api_integration
     | alter_connection
     | alter_database
@@ -612,6 +613,32 @@ alter_account
 
 enabled_true_false
     : ENABLED EQ true_false
+    ;
+
+alter_alert
+    : ALTER ALERT if_exists? id_ ( resume_suspend
+                                 | SET alert_set_clause+
+                                 | UNSET alert_unset_clause+
+                                 | MODIFY CONDITION EXISTS '(' alert_condition ')'
+                                 | MODIFY ACTION alert_action
+                                 )
+    ;
+
+resume_suspend
+    : RESUME
+    | SUSPEND
+    ;
+
+alert_set_clause
+    : WAREHOUSE EQ id_
+    | SCHEDULE EQ string
+    | comment_clause
+    ;
+
+alert_unset_clause
+    : WAREHOUSE
+    | SCHEDULE
+    | COMMENT
     ;
 
 alter_api_integration
@@ -762,10 +789,7 @@ alter_materialized_view
         RENAME TO id_
         | CLUSTER BY '(' expr_list ')'
         | DROP CLUSTERING KEY
-        | SUSPEND RECLUSTER
-        | RESUME RECLUSTER
-        | SUSPEND
-        | RESUME
+        | resume_suspend RECLUSTER?
         | SET (
             SECURE?
             comment_clause? )
@@ -1112,7 +1136,7 @@ alter_table
 clustering_action
     : CLUSTER BY '(' expr_list ')'
     | RECLUSTER ( MAX_SIZE EQ num )? ( WHERE expr )?
-    | ( SUSPEND | RESUME ) RECLUSTER
+    | resume_suspend RECLUSTER
     | DROP CLUSTERING KEY
     ;
 
@@ -1236,7 +1260,7 @@ alter_tag
     ;
 
 alter_task
-    : ALTER TASK if_exists? id_ (RESUME | SUSPEND)
+    : ALTER TASK if_exists? id_ resume_suspend
     | ALTER TASK if_exists? id_ REMOVE AFTER string_list | ADD AFTER string_list
     | ALTER TASK if_exists? id_ SET
         ( WAREHOUSE EQ string )?
@@ -1366,6 +1390,7 @@ unset_tags
 // create commands
 create_command
     : create_account
+    | create_alert
     | create_api_integration
     | create_object_clone
     | create_connection
@@ -1420,6 +1445,24 @@ create_account
           ( REGION_GROUP EQ region_group_id )?
           ( REGION EQ snowflake_region_id )?
           comment_clause?
+    ;
+
+create_alert
+    : CREATE or_replace? ALERT if_not_exists? id_
+        WAREHOUSE EQ id_
+        SCHEDULE EQ string
+        IF '(' EXISTS '(' alert_condition ')' ')'
+        THEN alert_action
+    ;
+
+alert_condition
+    : select_statement
+    | show_command
+    | call
+    ;
+
+alert_action
+    :
     ;
 
 create_api_integration
@@ -1585,12 +1628,12 @@ create_failover_group
     ;
 
 type_fileformat
-    : CSV 
-    | JSON 
-    | AVRO 
-    | ORC 
-    | PARQUET 
-    | XML 
+    : CSV
+    | JSON
+    | AVRO
+    | ORC
+    | PARQUET
+    | XML
     | CSV_Q
     | JSON_Q
     | AVRO_Q
@@ -2512,6 +2555,7 @@ object_type_plural
 // drop commands
 drop_command
     : drop_object
+    | drop_alert
     | drop_connection
     | drop_database
     | drop_external_table
@@ -2545,6 +2589,10 @@ drop_command
 
 drop_object
     : DROP object_type if_exists id_ cascade_restrict?
+    ;
+
+drop_alert
+    : DROP ALERT id_
     ;
 
 drop_connection
@@ -2752,7 +2800,8 @@ describe
 
 // describe command
 describe_command
-    : describe_database
+    : describe_alert
+    | describe_database
     | describe_external_table
     | describe_file_format
     | describe_function
@@ -2777,6 +2826,10 @@ describe_command
     | describe_user
     | describe_view
     | describe_warehouse
+    ;
+
+describe_alert
+    : describe ALERT id_
     ;
 
 describe_database
@@ -2881,7 +2934,8 @@ describe_warehouse
 
 // show commands
 show_command
-    : show_columns
+    : show_alerts
+    | show_columns
     | show_connections
     | show_databases
     | show_databases_in_failover_group
@@ -2930,6 +2984,13 @@ show_command
     | show_variables
     | show_views
     | show_warehouses
+    ;
+
+show_alerts
+    : SHOW TERSE? ALERTS like_pattern?
+        ( IN ( ACCOUNT | DATABASE id_? | SCHEMA schema_name? ) )?
+        starts_with?
+        limit_rows?
     ;
 
 show_columns
@@ -3269,6 +3330,9 @@ id_
     | non_reserved_words
     | data_type
     | builtin_function
+    | ALERT
+    | ALERTS
+    | CONDITION
     ;
 
 keyword
