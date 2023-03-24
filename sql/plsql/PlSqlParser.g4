@@ -6271,7 +6271,7 @@ json_column_definition
     : expression json_value_return_type? EXISTS? PATH CHAR_STRING json_query_on_error_clause? json_query_on_empty_clause?
     | expression json_query_return_type? TRUNCATE? FORMAT JSON  json_query_wrapper_clause? PATH CHAR_STRING json_query_on_error_clause? json_query_on_empty_clause?
     | expression json_value_return_type? TRUNCATE? (PATH CHAR_STRING)? json_query_on_error_clause? json_query_on_empty_clause?
-    | NESTED (PATH)? expression('[' ASTERISK ']')? json_column_clause
+    | NESTED PATH? expression ('[' ASTERISK ']')? json_column_clause
     | expression FOR ORDINALITY
     ;
 
