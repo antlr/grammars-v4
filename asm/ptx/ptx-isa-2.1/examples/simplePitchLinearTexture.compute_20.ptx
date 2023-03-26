@@ -1,0 +1,152 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling simplePitchLinearTexture.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a01304)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"simplePitchLinearTexture.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/simplePitchLinearTexture/simplePitchLinearTexture.cu"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\texture_fetch_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.global .texref texRefPL;
+	.global .texref texRefArray;
+
+	.entry _Z16shiftPitchLinearPfiiiii (
+		.param .u32 __cudaparm__Z16shiftPitchLinearPfiiiii_odata,
+		.param .s32 __cudaparm__Z16shiftPitchLinearPfiiiii_pitch,
+		.param .s32 __cudaparm__Z16shiftPitchLinearPfiiiii_width,
+		.param .s32 __cudaparm__Z16shiftPitchLinearPfiiiii_height,
+		.param .s32 __cudaparm__Z16shiftPitchLinearPfiiiii_shiftX,
+		.param .s32 __cudaparm__Z16shiftPitchLinearPfiiiii_shiftY)
+	{
+	.reg .u32 %r<24>;
+	.reg .f32 %f<15>;
+	.loc	16	49	0
+$LDWbegin__Z16shiftPitchLinearPfiiiii:
+	.loc	16	54	0
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ntid.y;
+	mul.lo.u32 	%r6, %r4, %r5;
+	mov.u32 	%r7, %tid.x;
+	add.u32 	%r8, %r7, %r3;
+	mov.u32 	%r9, %tid.y;
+	add.u32 	%r10, %r9, %r6;
+	ld.param.s32 	%r11, [__cudaparm__Z16shiftPitchLinearPfiiiii_shiftX];
+	add.s32 	%r12, %r11, %r8;
+	cvt.rn.f32.s32 	%f1, %r12;
+	ld.param.s32 	%r13, [__cudaparm__Z16shiftPitchLinearPfiiiii_width];
+	cvt.rn.f32.s32 	%f2, %r13;
+	div.rn.f32 	%f3, %f1, %f2;
+	ld.param.s32 	%r14, [__cudaparm__Z16shiftPitchLinearPfiiiii_shiftY];
+	add.s32 	%r15, %r14, %r10;
+	cvt.rn.f32.s32 	%f4, %r15;
+	ld.param.s32 	%r16, [__cudaparm__Z16shiftPitchLinearPfiiiii_height];
+	cvt.rn.f32.s32 	%f5, %r16;
+	div.rn.f32 	%f6, %f4, %f5;
+	mov.f32 	%f7, 0f00000000;     	// 0
+	mov.f32 	%f8, 0f00000000;     	// 0
+	tex.2d.v4.f32.f32 {%f9,%f10,%f11,%f12},[texRefPL,{%f3,%f6,%f7,%f8}];
+	mov.f32 	%f13, %f9;
+	ld.param.u32 	%r17, [__cudaparm__Z16shiftPitchLinearPfiiiii_odata];
+	ld.param.s32 	%r18, [__cudaparm__Z16shiftPitchLinearPfiiiii_pitch];
+	mul.lo.s32 	%r19, %r18, %r10;
+	add.s32 	%r20, %r8, %r19;
+	mul.lo.u32 	%r21, %r20, 4;
+	add.u32 	%r22, %r17, %r21;
+	st.global.f32 	[%r22+0], %f13;
+	.loc	16	57	0
+	exit;
+$LDWend__Z16shiftPitchLinearPfiiiii:
+	} // _Z16shiftPitchLinearPfiiiii
+
+	.entry _Z10shiftArrayPfiiiii (
+		.param .u32 __cudaparm__Z10shiftArrayPfiiiii_odata,
+		.param .s32 __cudaparm__Z10shiftArrayPfiiiii_pitch,
+		.param .s32 __cudaparm__Z10shiftArrayPfiiiii_width,
+		.param .s32 __cudaparm__Z10shiftArrayPfiiiii_height,
+		.param .s32 __cudaparm__Z10shiftArrayPfiiiii_shiftX,
+		.param .s32 __cudaparm__Z10shiftArrayPfiiiii_shiftY)
+	{
+	.reg .u32 %r<24>;
+	.reg .f32 %f<15>;
+	.loc	16	60	0
+$LDWbegin__Z10shiftArrayPfiiiii:
+	.loc	16	65	0
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ntid.y;
+	mul.lo.u32 	%r6, %r4, %r5;
+	mov.u32 	%r7, %tid.x;
+	add.u32 	%r8, %r7, %r3;
+	mov.u32 	%r9, %tid.y;
+	add.u32 	%r10, %r9, %r6;
+	ld.param.s32 	%r11, [__cudaparm__Z10shiftArrayPfiiiii_shiftX];
+	add.s32 	%r12, %r11, %r8;
+	cvt.rn.f32.s32 	%f1, %r12;
+	ld.param.s32 	%r13, [__cudaparm__Z10shiftArrayPfiiiii_width];
+	cvt.rn.f32.s32 	%f2, %r13;
+	div.rn.f32 	%f3, %f1, %f2;
+	ld.param.s32 	%r14, [__cudaparm__Z10shiftArrayPfiiiii_shiftY];
+	add.s32 	%r15, %r14, %r10;
+	cvt.rn.f32.s32 	%f4, %r15;
+	ld.param.s32 	%r16, [__cudaparm__Z10shiftArrayPfiiiii_height];
+	cvt.rn.f32.s32 	%f5, %r16;
+	div.rn.f32 	%f6, %f4, %f5;
+	mov.f32 	%f7, 0f00000000;     	// 0
+	mov.f32 	%f8, 0f00000000;     	// 0
+	tex.2d.v4.f32.f32 {%f9,%f10,%f11,%f12},[texRefArray,{%f3,%f6,%f7,%f8}];
+	mov.f32 	%f13, %f9;
+	ld.param.u32 	%r17, [__cudaparm__Z10shiftArrayPfiiiii_odata];
+	ld.param.s32 	%r18, [__cudaparm__Z10shiftArrayPfiiiii_pitch];
+	mul.lo.s32 	%r19, %r18, %r10;
+	add.s32 	%r20, %r8, %r19;
+	mul.lo.u32 	%r21, %r20, 4;
+	add.u32 	%r22, %r17, %r21;
+	st.global.f32 	[%r22+0], %f13;
+	.loc	16	68	0
+	exit;
+$LDWend__Z10shiftArrayPfiiiii:
+	} // _Z10shiftArrayPfiiiii
+

@@ -1,0 +1,152 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling clock.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07252)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"clock.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\clock\clock_kernel.cu"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\texture_fetch_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.extern	.shared .align 4 .b8 shared[];
+
+	.entry _Z14timedReductionPKfPfPl (
+		.param .u32 __cudaparm__Z14timedReductionPKfPfPl_input,
+		.param .u32 __cudaparm__Z14timedReductionPKfPfPl_output,
+		.param .u32 __cudaparm__Z14timedReductionPKfPfPl_timer)
+	{
+	.reg .u32 %r<42>;
+	.reg .f32 %f<7>;
+	.reg .pred %p<7>;
+	.loc	16	22	0
+$LDWbegin__Z14timedReductionPKfPfPl:
+	cvt.s32.u32 	%r1, %tid.x;
+	mov.s32 	%r2, 0;
+	setp.eq.s32 	%p1, %r1, %r2;
+	@!%p1 bra 	$Lt_0_5122;
+	.loc	16	30	0
+	mov.u32 	%r3, %clock;
+	mov.s32 	%r4, %r3;
+	ld.param.u32 	%r5, [__cudaparm__Z14timedReductionPKfPfPl_timer];
+	cvt.s32.u32 	%r6, %ctaid.x;
+	mul.lo.u32 	%r7, %r6, 4;
+	add.u32 	%r8, %r5, %r7;
+	st.global.s32 	[%r8+0], %r4;
+$Lt_0_5122:
+	mov.u32 	%r9, shared;
+	.loc	16	33	0
+	mul.lo.u32 	%r10, %r1, 4;
+	add.u32 	%r11, %r10, %r9;
+	ld.param.u32 	%r12, [__cudaparm__Z14timedReductionPKfPfPl_input];
+	add.u32 	%r13, %r10, %r12;
+	ld.global.f32 	%f1, [%r13+0];
+	st.shared.f32 	[%r11+0], %f1;
+	.loc	16	34	0
+	mov.u32 	%r14, %ntid.x;
+	add.u32 	%r15, %r1, %r14;
+	mul.lo.u32 	%r16, %r15, 4;
+	add.u32 	%r17, %r16, %r12;
+	ld.global.f32 	%f2, [%r17+0];
+	add.u32 	%r18, %r16, %r9;
+	st.shared.f32 	[%r18+0], %f2;
+	.loc	16	37	0
+	mov.s32 	%r19, %r14;
+	mov.u32 	%r20, 0;
+	setp.le.s32 	%p2, %r14, %r20;
+	@%p2 bra 	$Lt_0_5634;
+$Lt_0_6146:
+ //<loop> Loop body line 39
+	.loc	16	39	0
+	bar.sync 	0;
+	setp.le.s32 	%p3, %r19, %r1;
+	@%p3 bra 	$Lt_0_6402;
+ //<loop> Part of loop body line 39, head labeled $Lt_0_6146
+	.loc	16	44	0
+	add.s32 	%r21, %r19, %r1;
+	mul.lo.u32 	%r22, %r21, 4;
+	add.u32 	%r23, %r9, %r22;
+	ld.shared.f32 	%f3, [%r23+0];
+	ld.shared.f32 	%f4, [%r11+0];
+	setp.gt.f32 	%p4, %f4, %f3;
+	@!%p4 bra 	$Lt_0_6914;
+ //<loop> Part of loop body line 39, head labeled $Lt_0_6146
+	.loc	16	47	0
+	st.shared.f32 	[%r11+0], %f3;
+$Lt_0_6914:
+$Lt_0_6402:
+ //<loop> Part of loop body line 39, head labeled $Lt_0_6146
+	.loc	16	37	0
+	shr.s32 	%r24, %r19, 31;
+	mov.s32 	%r25, 1;
+	and.b32 	%r26, %r24, %r25;
+	add.s32 	%r27, %r26, %r19;
+	shr.s32 	%r19, %r27, 1;
+	mov.u32 	%r28, 0;
+	setp.gt.s32 	%p5, %r19, %r28;
+	@%p5 bra 	$Lt_0_6146;
+$Lt_0_5634:
+	@!%p1 bra 	$Lt_0_7682;
+	.loc	16	53	0
+	ld.shared.f32 	%f5, [shared+0];
+	ld.param.u32 	%r29, [__cudaparm__Z14timedReductionPKfPfPl_output];
+	cvt.s32.u32 	%r30, %ctaid.x;
+	mul.lo.u32 	%r31, %r30, 4;
+	add.u32 	%r32, %r29, %r31;
+	st.global.f32 	[%r32+0], %f5;
+$Lt_0_7682:
+	.loc	16	55	0
+	bar.sync 	0;
+	@!%p1 bra 	$Lt_0_8194;
+	.loc	16	57	0
+	mov.u32 	%r33, %clock;
+	mov.s32 	%r34, %r33;
+	ld.param.u32 	%r35, [__cudaparm__Z14timedReductionPKfPfPl_timer];
+	cvt.s32.u32 	%r36, %ctaid.x;
+	mov.u32 	%r37, %nctaid.x;
+	add.u32 	%r38, %r36, %r37;
+	mul.lo.u32 	%r39, %r38, 4;
+	add.u32 	%r40, %r35, %r39;
+	st.global.s32 	[%r40+0], %r34;
+$Lt_0_8194:
+	.loc	16	58	0
+	exit;
+$LDWend__Z14timedReductionPKfPfPl:
+	} // _Z14timedReductionPKfPfPl
+

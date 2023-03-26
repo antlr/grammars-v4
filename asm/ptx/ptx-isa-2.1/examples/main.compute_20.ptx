@@ -1,0 +1,47 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling main.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a07312)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"main.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"C:\CUDA\include\common_functions.h"
+	.file	17	"c:\cuda\include\math_functions.h"
+	.file	18	"c:\cuda\include\math_constants.h"
+	.file	19	"c:\cuda\include\device_functions.h"
+	.file	20	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	21	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_13_double_functions.h"
+	.file	23	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	25	"c:\cuda\include\surface_functions.h"
+	.file	26	"c:\cuda\include\texture_fetch_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+

@@ -19,3 +19,9 @@ SELECT TRY_CAST("150" as INT);
 SELECT LEN(COL1), LENGTH (COL2) from t;
 SELECT REPLACE('abcd', 'bc'), CHARINDEX('abcd','c') F;
 SELECT * FROM (SELECT 1 as col1 ,'FuturCol2' as col2 union SELECT 2,'FuturCol3') PIVOT (sum(col1) FOR col2 in ('FuturCol2','FuturCol3'));
+SELECT 'Detox' ILIKE ANY ('DET%', 'SEC%','DEP%','CMP%', 'TRT%','ODO%', 'INT%') as BoolResult;
+SELECT ILIKE('Detox','DET%') as BoolResult, LIKE('Detox','DET%') 
+SELECT UPPER('Detox') as UPRESULT;
+SELECT LOWER('DeTox') as LOWRESULT;
+SELECT TRIM(' test '),LTRIM(' test '),RTRIM(' test ') as Row_number;
+

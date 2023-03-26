@@ -1,0 +1,581 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling alignedTypes.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a02280)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"alignedTypes.compute_20.cudafe2.gpu"
+	.file	2	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/alignedTypes/alignedTypes.cu"
+	.file	3	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	4	"C:\CUDA\include\crt/device_runtime.h"
+	.file	5	"C:\CUDA\include\host_defines.h"
+	.file	6	"C:\CUDA\include\builtin_types.h"
+	.file	7	"c:\cuda\include\device_types.h"
+	.file	8	"c:\cuda\include\driver_types.h"
+	.file	9	"c:\cuda\include\surface_types.h"
+	.file	10	"c:\cuda\include\texture_types.h"
+	.file	11	"c:\cuda\include\vector_types.h"
+	.file	12	"c:\cuda\include\builtin_types.h"
+	.file	13	"c:\cuda\include\host_defines.h"
+	.file	14	"C:\CUDA\include\device_launch_parameters.h"
+	.file	15	"c:\cuda\include\crt\storage_class.h"
+	.file	16	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	17	"c:\cuda\include\texture_fetch_functions.h"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+
+	.entry _Z10testKernelIhEvPT_S1_i (
+		.param .u32 __cudaparm__Z10testKernelIhEvPT_S1_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelIhEvPT_S1_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelIhEvPT_S1_i_numElements)
+	{
+	.reg .u32 %r<16>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelIhEvPT_S1_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelIhEvPT_S1_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_0_1282;
+	ld.param.u32 	%r7, [__cudaparm__Z10testKernelIhEvPT_S1_i_d_idata];
+	add.u32 	%r8, %r5, %r7;
+	add.u32 	%r9, %r6, %r7;
+	ld.param.u32 	%r10, [__cudaparm__Z10testKernelIhEvPT_S1_i_d_odata];
+	add.u32 	%r11, %r10, %r5;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.u32 	%r13, %r12, %r1;
+$Lt_0_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u8 	%r14, [%r8+0];
+	st.global.u8 	[%r11+0], %r14;
+	add.u32 	%r11, %r11, %r13;
+	add.u32 	%r8, %r8, %r13;
+	setp.lt.s32 	%p2, %r8, %r9;
+	@%p2 bra 	$Lt_0_1794;
+$Lt_0_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelIhEvPT_S1_i:
+	} // _Z10testKernelIhEvPT_S1_i
+
+	.entry _Z10testKernelItEvPT_S1_i (
+		.param .u32 __cudaparm__Z10testKernelItEvPT_S1_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelItEvPT_S1_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelItEvPT_S1_i_numElements)
+	{
+	.reg .u32 %r<19>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelItEvPT_S1_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelItEvPT_S1_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_1_1282;
+	mul.lo.u32 	%r7, %r5, 2;
+	mul.lo.u32 	%r8, %r6, 2;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelItEvPT_S1_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 2;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelItEvPT_S1_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_1_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u16 	%r17, [%r12+0];
+	st.global.u16 	[%r16+0], %r17;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_1_1794;
+$Lt_1_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelItEvPT_S1_i:
+	} // _Z10testKernelItEvPT_S1_i
+
+	.entry _Z10testKernelI16RGBA8_misalignedEvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<22>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI16RGBA8_misalignedEvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_2_1282;
+	mul.lo.u32 	%r7, %r5, 4;
+	mul.lo.u32 	%r8, %r6, 4;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI16RGBA8_misalignedEvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_2_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u8 	%r17, [%r12+0];
+	st.global.u8 	[%r16+0], %r17;
+	ld.global.u8 	%r18, [%r12+1];
+	st.global.u8 	[%r16+1], %r18;
+	ld.global.u8 	%r19, [%r12+2];
+	st.global.u8 	[%r16+2], %r19;
+	ld.global.u8 	%r20, [%r12+3];
+	st.global.u8 	[%r16+3], %r20;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_2_1794;
+$Lt_2_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI16RGBA8_misalignedEvPT_S2_i:
+	} // _Z10testKernelI16RGBA8_misalignedEvPT_S2_i
+
+	.entry _Z10testKernelI15LA32_misalignedEvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<20>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI15LA32_misalignedEvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_3_1282;
+	mul.lo.u32 	%r7, %r5, 8;
+	mul.lo.u32 	%r8, %r6, 8;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 8;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI15LA32_misalignedEvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_3_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u32 	%r17, [%r12+0];
+	st.global.u32 	[%r16+0], %r17;
+	ld.global.u32 	%r18, [%r12+4];
+	st.global.u32 	[%r16+4], %r18;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_3_1794;
+$Lt_3_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI15LA32_misalignedEvPT_S2_i:
+	} // _Z10testKernelI15LA32_misalignedEvPT_S2_i
+
+	.entry _Z10testKernelI16RGB32_misalignedEvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<21>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI16RGB32_misalignedEvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_4_1282;
+	mul.lo.u32 	%r7, %r5, 12;
+	mul.lo.u32 	%r8, %r6, 12;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 12;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI16RGB32_misalignedEvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_4_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u32 	%r17, [%r12+0];
+	st.global.u32 	[%r16+0], %r17;
+	ld.global.u32 	%r18, [%r12+4];
+	st.global.u32 	[%r16+4], %r18;
+	ld.global.u32 	%r19, [%r12+8];
+	st.global.u32 	[%r16+8], %r19;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_4_1794;
+$Lt_4_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI16RGB32_misalignedEvPT_S2_i:
+	} // _Z10testKernelI16RGB32_misalignedEvPT_S2_i
+
+	.entry _Z10testKernelI17RGBA32_misalignedEvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<22>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI17RGBA32_misalignedEvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_5_1282;
+	mul.lo.u32 	%r7, %r5, 16;
+	mul.lo.u32 	%r8, %r6, 16;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 16;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI17RGBA32_misalignedEvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_5_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u32 	%r17, [%r12+0];
+	st.global.u32 	[%r16+0], %r17;
+	ld.global.u32 	%r18, [%r12+4];
+	st.global.u32 	[%r16+4], %r18;
+	ld.global.u32 	%r19, [%r12+8];
+	st.global.u32 	[%r16+8], %r19;
+	ld.global.u32 	%r20, [%r12+12];
+	st.global.u32 	[%r16+12], %r20;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_5_1794;
+$Lt_5_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI17RGBA32_misalignedEvPT_S2_i:
+	} // _Z10testKernelI17RGBA32_misalignedEvPT_S2_i
+
+	.entry _Z10testKernelI5RGBA8EvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<22>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI5RGBA8EvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_6_1282;
+	mul.lo.u32 	%r7, %r5, 4;
+	mul.lo.u32 	%r8, %r6, 4;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI5RGBA8EvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_6_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	ld.global.v4.u8 	{%r17,%r18,%r19,%r20}, [%r12+0];
+	st.global.v4.u8 	[%r16+0], {%r17,%r18,%r19,%r20};
+	.loc	2	134	0
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_6_1794;
+$Lt_6_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI5RGBA8EvPT_S2_i:
+	} // _Z10testKernelI5RGBA8EvPT_S2_i
+
+	.entry _Z10testKernelIjEvPT_S1_i (
+		.param .u32 __cudaparm__Z10testKernelIjEvPT_S1_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelIjEvPT_S1_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelIjEvPT_S1_i_numElements)
+	{
+	.reg .u32 %r<19>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelIjEvPT_S1_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelIjEvPT_S1_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_7_1282;
+	mul.lo.u32 	%r7, %r5, 4;
+	mul.lo.u32 	%r8, %r6, 4;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelIjEvPT_S1_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelIjEvPT_S1_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_7_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	.loc	2	134	0
+	ld.global.u32 	%r17, [%r12+0];
+	st.global.u32 	[%r16+0], %r17;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_7_1794;
+$Lt_7_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelIjEvPT_S1_i:
+	} // _Z10testKernelIjEvPT_S1_i
+
+	.entry _Z10testKernelI4LA32EvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI4LA32EvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI4LA32EvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI4LA32EvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<20>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI4LA32EvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI4LA32EvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_8_1282;
+	mul.lo.u32 	%r7, %r5, 8;
+	mul.lo.u32 	%r8, %r6, 8;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI4LA32EvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 8;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI4LA32EvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_8_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	ld.global.v2.u32 	{%r17,%r18}, [%r12+0];
+	st.global.v2.u32 	[%r16+0], {%r17,%r18};
+	.loc	2	134	0
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_8_1794;
+$Lt_8_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI4LA32EvPT_S2_i:
+	} // _Z10testKernelI4LA32EvPT_S2_i
+
+	.entry _Z10testKernelI5RGB32EvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI5RGB32EvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI5RGB32EvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI5RGB32EvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<21>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI5RGB32EvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI5RGB32EvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_9_1282;
+	mul.lo.u32 	%r7, %r5, 16;
+	mul.lo.u32 	%r8, %r6, 16;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI5RGB32EvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 16;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI5RGB32EvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_9_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	ld.global.v4.u32 	{%r17,%r18,%r19,_}, [%r12+0];
+	st.global.v4.u32 	[%r16+0], {%r17,%r18,%r19,%r17};
+	.loc	2	134	0
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_9_1794;
+$Lt_9_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI5RGB32EvPT_S2_i:
+	} // _Z10testKernelI5RGB32EvPT_S2_i
+
+	.entry _Z10testKernelI6RGBA32EvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<22>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI6RGBA32EvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_10_1282;
+	mul.lo.u32 	%r7, %r5, 16;
+	mul.lo.u32 	%r8, %r6, 16;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 16;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI6RGBA32EvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_10_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	ld.global.v4.u32 	{%r17,%r18,%r19,%r20}, [%r12+0];
+	st.global.v4.u32 	[%r16+0], {%r17,%r18,%r19,%r20};
+	.loc	2	134	0
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_10_1794;
+$Lt_10_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI6RGBA32EvPT_S2_i:
+	} // _Z10testKernelI6RGBA32EvPT_S2_i
+
+	.entry _Z10testKernelI8RGBA32_2EvPT_S2_i (
+		.param .u32 __cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_d_odata,
+		.param .u32 __cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_d_idata,
+		.param .s32 __cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_numElements)
+	{
+	.reg .u32 %r<26>;
+	.reg .pred %p<4>;
+	.loc	2	128	0
+$LDWbegin__Z10testKernelI8RGBA32_2EvPT_S2_i:
+	.loc	2	133	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_numElements];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_11_1282;
+	mul.lo.u32 	%r7, %r5, 32;
+	mul.lo.u32 	%r8, %r6, 32;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_d_idata];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 32;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z10testKernelI8RGBA32_2EvPT_S2_i_d_odata];
+	add.u32 	%r16, %r15, %r7;
+$Lt_11_1794:
+ //<loop> Loop body line 133, nesting depth: 1, estimated iterations: unknown
+	ld.global.v4.u32 	{%r17,%r18,%r19,%r20}, [%r12+0];
+	st.global.v4.u32 	[%r16+0], {%r17,%r18,%r19,%r20};
+	ld.global.v4.u32 	{%r21,%r22,%r23,%r24}, [%r12+16];
+	st.global.v4.u32 	[%r16+16], {%r21,%r22,%r23,%r24};
+	.loc	2	134	0
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p2, %r12, %r14;
+	@%p2 bra 	$Lt_11_1794;
+$Lt_11_1282:
+	.loc	2	135	0
+	exit;
+$LDWend__Z10testKernelI8RGBA32_2EvPT_S2_i:
+	} // _Z10testKernelI8RGBA32_2EvPT_S2_i
+
