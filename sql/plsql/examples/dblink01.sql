@@ -3,6 +3,3 @@ select last_name, department_name
    where employees.department_id = departments.department_id;
 
 SELECT * FROM scott.emp@hq.acme.com;
-
-
-
