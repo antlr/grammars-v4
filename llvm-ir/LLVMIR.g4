@@ -1196,7 +1196,7 @@ diSubprogramField:
 	| annotationsField
 	| targetFuncNameField;
 diSubrange:
-	'!DICompileUnit' '(' (diSubrangeField (',' diSubrangeField)*)? ')';
+	'!DISubrange' '(' (diSubrangeField (',' diSubrangeField)*)? ')';
 diSubrangeField:
 	countField
 	| lowerBoundField
