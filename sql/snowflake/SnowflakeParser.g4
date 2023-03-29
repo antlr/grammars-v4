@@ -3297,6 +3297,8 @@ non_reserved_words
     | TIMEZONE
     | LOCAL
     | ROW_NUMBER
+    | VALUE
+    | NAME
     ;
 
 builtin_function
