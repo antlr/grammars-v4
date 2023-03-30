@@ -3164,8 +3164,12 @@ alias_clause
    ;
 
 opt_alias_clause
-   : AS? table_alias
+   : table_alias_clause
    |
+   ;
+
+table_alias_clause
+   : AS? table_alias (OPEN_PAREN name_list CLOSE_PAREN)?
    ;
 
 func_alias_clause
