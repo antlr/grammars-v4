@@ -1,18 +1,8 @@
 using Antlr4.Runtime;
 using System.Collections.Generic;
-using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Diagnostics;
-using System.Security.Claims;
-using System.Xml.Linq;
-using Antlr4.Build.Tasks;
-using System.Transactions;
-using static Antlr4.Runtime.Atn.SemanticContext;
-using static System.Net.WebRequestMethods;
-using System.Security.Policy;
 
 public abstract class ScalaLexerBase : Lexer
 {
@@ -28,6 +18,30 @@ public abstract class ScalaLexerBase : Lexer
         _input = input;
     }
 
+    private ICharStream _input;
+    bool first = true;
+    BufferedList tokens = null;
+    int lastIndex = -1;
+    bool inCase = false;
+    Stack<bool> newLineEnables = new Stack<bool>();
+    HashSet<int> arrowsForCase = new HashSet<int>();
+    private static HashSet<int> nonStarters = new HashSet<int>() { ScalaLexer.Catch, ScalaLexer.Else, ScalaLexer.Extends, ScalaLexer.Finally, ScalaLexer.ForSome, ScalaLexer.MatchKW, ScalaLexer.With,
+        ScalaLexer.Yield, ScalaLexer.Comma, ScalaLexer.Dot, ScalaLexer.Colon, ScalaLexer.SemiColon, ScalaLexer.Eq, ScalaLexer.Arrow, ScalaLexer.Assign, ScalaLexer.LowerType, ScalaLexer.ViewBound, ScalaLexer.UpperType, ScalaLexer.Hash, ScalaLexer.LBracket,
+        ScalaLexer.RParen, ScalaLexer.RBracket, ScalaLexer.RBrace, /* per spec */
+        ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti /* custom cases */
+    };
+    private static HashSet<int> terminators = new HashSet<int>() {
+        ScalaLexer.This, ScalaLexer.Null, ScalaLexer.BooleanLiteral, ScalaLexer.Return, ScalaLexer.TypeKW, ScalaLexer.RParen,
+            ScalaLexer.RBracket, ScalaLexer.RBrace, ScalaLexer.UnderScore, ScalaLexer.IntegerLiteral, ScalaLexer.FloatingPointLiteral, ScalaLexer.StringLiteral, ScalaLexer.CharacterLiteral,
+    /* Id equivalents */
+    ScalaLexer.AlphaId, ScalaLexer.VarId, ScalaLexer.BackTickId,
+    /* Tokens that are part of the operator token */ ScalaLexer.OpChar, ScalaLexer.Hash, ScalaLexer.Colon, ScalaLexer.Or,
+            /* Tokens that are part of the operator token */ ScalaLexer.Exclamation, ScalaLexer.Plus, ScalaLexer.Minus, ScalaLexer.Tilde, ScalaLexer.Star, ScalaLexer.ViewBound,
+            /* XML Terminators */ ScalaLexer.XMLCloseTag, ScalaLexer.XMLAutoClose,
+            /* Custom tokens for interpolated strings */ ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti
+        /*SymbolLiteral was removed*/
+    };
+
     protected int interpolatedStringLevel = 0;
     protected Stack<int> xmlLevels = new Stack<int>();
     protected Stack<int> curlyLevels = new Stack<int>();
@@ -40,13 +54,12 @@ public abstract class ScalaLexerBase : Lexer
         this.xmlLevels.Clear();
         this.curlyLevels.Clear();
         this.openingTags.Clear();
-        this.ready = false;
-        ready = false;
         first = true;
         tokens = null;
         lastIndex = -1;
         inCase = false;
         newLineEnables = new Stack<bool>();
+        arrowsForCase = new HashSet<int>();
     }
 
     protected void popModeForIdentifier()
@@ -111,38 +124,8 @@ public abstract class ScalaLexerBase : Lexer
                 }
                 PopMode();
             }
-
         }
     }
-
-    private ICharStream _input;
-    //protected int interpolatedStringLevel;
-    //protected Stack<bool> interpolatedVerbatiums = new Stack<bool>();
-    //protected Stack<int> curlyLevels = new Stack<int>();
-    //protected bool verbatium;
-
-    bool ready = false;
-    bool first = true;
-    BufferedList tokens = null;
-    int lastIndex = -1;
-    bool inCase = false;
-    Stack<bool> newLineEnables = new Stack<bool>();
-    private static HashSet<int> nonStarters = new HashSet<int>() { ScalaLexer.Catch, ScalaLexer.Else, ScalaLexer.Extends, ScalaLexer.Finally, ScalaLexer.ForSome, ScalaLexer.MatchKW, ScalaLexer.With,
-        ScalaLexer.Yield, ScalaLexer.Comma, ScalaLexer.Dot, ScalaLexer.Colon, ScalaLexer.SemiColon, ScalaLexer.Eq, ScalaLexer.Arrow, ScalaLexer.Assign, ScalaLexer.LowerType, ScalaLexer.ViewBound, ScalaLexer.UpperType, ScalaLexer.Hash, ScalaLexer.LBracket,
-        ScalaLexer.RParen, ScalaLexer.RBracket, ScalaLexer.RBrace, /* per spec */
-        ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti /* custom cases */
-    };
-    private static HashSet<int> terminators = new HashSet<int>() {
-        ScalaLexer.This, ScalaLexer.Null, ScalaLexer.BooleanLiteral, ScalaLexer.Return, ScalaLexer.TypeKW, ScalaLexer.RParen,
-            ScalaLexer.RBracket, ScalaLexer.RBrace, ScalaLexer.UnderScore, ScalaLexer.IntegerLiteral, ScalaLexer.FloatingPointLiteral, ScalaLexer.StringLiteral, ScalaLexer.CharacterLiteral,
-    /* Id equivalents */
-    ScalaLexer.AlphaId, ScalaLexer.VarId, ScalaLexer.BackTickId,
-    /* Tokens that are part of the operator token */ ScalaLexer.OpChar, ScalaLexer.Hash, ScalaLexer.Colon, ScalaLexer.Or,
-            /* Tokens that are part of the operator token */ ScalaLexer.Exclamation, ScalaLexer.Plus, ScalaLexer.Minus, ScalaLexer.Tilde, ScalaLexer.Star, ScalaLexer.ViewBound,
-            /* XML Terminators */ ScalaLexer.XMLCloseTag, ScalaLexer.XMLAutoClose,
-            /* Custom tokens for interpolated strings */ ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti
-        /*SymbolLiteral was removed*/
-    };
 
     public override IToken NextToken()
     {
@@ -219,7 +202,8 @@ public abstract class ScalaLexerBase : Lexer
 
         //return token;
     }
-    bool canEmitNLToken()
+
+    private bool canEmitNLToken()
     {
         IToken previousToken = tokens.LB(1);
         IToken nextToken = tokens.LT(2);
@@ -275,42 +259,6 @@ public abstract class ScalaLexerBase : Lexer
                 break;
         }
     }
-
-    HashSet<int> arrowsForCase = new HashSet<int>();
-
-    private void StepBack(CommonToken t)
-    {
-        switch (t.Type)
-        {
-            case ScalaLexer.Case:
-                if (inCase)
-                {
-                    newLineEnables.Pop();
-                    inCase = false;
-                }
-                break;
-            case ScalaLexer.Arrow:
-                if (arrowsForCase.Contains(t.TokenIndex))
-                {
-                    newLineEnables.Push(false);
-                    inCase = true;
-                }
-                break;
-            case ScalaLexer.RBrace:
-                newLineEnables.Push(true);
-                break;
-            case ScalaLexer.RParen:
-            case ScalaLexer.RBracket:
-                newLineEnables.Push(false);
-                break;
-            case ScalaLexer.LBrace:
-            case ScalaLexer.LParen:
-            case ScalaLexer.LBracket:
-                newLineEnables.Pop();
-                break;
-        }
-        tokens.Backup();
-    }
 }
 
 public class BufferedList
@@ -340,7 +288,11 @@ public class BufferedList
         {
             return tokens[tokens.Count - 1];
         }
-        return tokens[current - i];
+        else if (current - i < 0)
+        {
+            return null;
+        }
+        else return tokens[current - i];
     }
 
     public void Advance()
