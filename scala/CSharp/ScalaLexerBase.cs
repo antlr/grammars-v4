@@ -35,12 +35,18 @@ public abstract class ScalaLexerBase : Lexer
 
     public override void Reset()
     {
+        base.Reset();
         this.interpolatedStringLevel = 0;
         this.xmlLevels.Clear();
         this.curlyLevels.Clear();
         this.openingTags.Clear();
         this.ready = false;
-        base.Reset();
+        ready = false;
+        first = true;
+        tokens = null;
+        lastIndex = -1;
+        inCase = false;
+        newLineEnables = new Stack<bool>();
     }
 
     protected void popModeForIdentifier()
@@ -148,42 +154,32 @@ public abstract class ScalaLexerBase : Lexer
             for (; ; )
             {
                 var x = base.NextToken() as CommonToken;
-                x.TokenIndex = index;
+                x.TokenIndex = index++;
                 list.Add(x);
                 if (x.Type == ScalaLexer.Eof) break;
             }
             tokens = new BufferedList(list);
+            // Now go through token list and mark up NL as hidden if required.
+            for (; ; )
+            {
+                var x = tokens.LT(1);
+                Advance(x);
+                if (x.Type == ScalaLexer.NL)
+                {
+                    bool canEmitNLToken_ = canEmitNLToken();
+                    if (!canEmitNLToken_)
+                    {
+                        x.Channel = TokenConstants.HiddenChannel;
+                    }
+                }
+                tokens.Advance();
+                if (x.Type == ScalaLexer.Eof) break;
+            }
+            tokens.Reset();
             first = false;
         }
         CommonToken t = tokens.LT(1);
-        if (lastIndex != t.TokenIndex)
-        {
-            if (lastIndex < t.TokenIndex)
-            {
-                for (int i = lastIndex + 1; i <= t.TokenIndex; i++)
-                {
-                    Advance(tokens.LT(i+1));
-                }
-            }
-            else
-            {
-                for (int i = lastIndex; i > t.TokenIndex; i--)
-                {
-                    StepBack(tokens.LT(i+1));
-                }
-            }
-            lastIndex = t.TokenIndex;
-        }
-        if (t.Type == ScalaLexer.NL)
-        {
-            bool canEmitNLToken_ = canEmitNLToken();
-            if (!canEmitNLToken_)
-            {
-                t.Channel = TokenConstants.HiddenChannel;
-                //tokens.Advance();
-                //return tokens.LT(1);
-            }
-        }
+        tokens.Advance();
         return t;
         //if (!ready)
         //{
@@ -278,7 +274,6 @@ public abstract class ScalaLexerBase : Lexer
                 newLineEnables.Pop();
                 break;
         }
-        tokens.Advance();
     }
 
     HashSet<int> arrowsForCase = new HashSet<int>();
@@ -356,5 +351,10 @@ public class BufferedList
     public void Backup()
     {
         current--;
+    }
+
+    internal void Reset()
+    {
+        current = 0;
     }
 }
