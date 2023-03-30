@@ -4,6 +4,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
+using System.Security.Claims;
+using System.Xml.Linq;
+using Antlr4.Build.Tasks;
+using System.Transactions;
+using static Antlr4.Runtime.Atn.SemanticContext;
+using static System.Net.WebRequestMethods;
+using System.Security.Policy;
 
 public abstract class ScalaLexerBase : Lexer
 {
@@ -30,6 +39,7 @@ public abstract class ScalaLexerBase : Lexer
         this.xmlLevels.Clear();
         this.curlyLevels.Clear();
         this.openingTags.Clear();
+        this.ready = false;
         base.Reset();
     }
 
@@ -105,4 +115,246 @@ public abstract class ScalaLexerBase : Lexer
     //protected Stack<int> curlyLevels = new Stack<int>();
     //protected bool verbatium;
 
+    bool ready = false;
+    bool first = true;
+    BufferedList tokens = null;
+    int lastIndex = -1;
+    bool inCase = false;
+    Stack<bool> newLineEnables = new Stack<bool>();
+    private static HashSet<int> nonStarters = new HashSet<int>() { ScalaLexer.Catch, ScalaLexer.Else, ScalaLexer.Extends, ScalaLexer.Finally, ScalaLexer.ForSome, ScalaLexer.MatchKW, ScalaLexer.With,
+        ScalaLexer.Yield, ScalaLexer.Comma, ScalaLexer.Dot, ScalaLexer.Colon, ScalaLexer.SemiColon, ScalaLexer.Eq, ScalaLexer.Arrow, ScalaLexer.Assign, ScalaLexer.LowerType, ScalaLexer.ViewBound, ScalaLexer.UpperType, ScalaLexer.Hash, ScalaLexer.LBracket,
+        ScalaLexer.RParen, ScalaLexer.RBracket, ScalaLexer.RBrace, /* per spec */
+        ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti /* custom cases */
+    };
+    private static HashSet<int> terminators = new HashSet<int>() {
+        ScalaLexer.This, ScalaLexer.Null, ScalaLexer.BooleanLiteral, ScalaLexer.Return, ScalaLexer.TypeKW, ScalaLexer.RParen,
+            ScalaLexer.RBracket, ScalaLexer.RBrace, ScalaLexer.UnderScore, ScalaLexer.IntegerLiteral, ScalaLexer.FloatingPointLiteral, ScalaLexer.StringLiteral, ScalaLexer.CharacterLiteral,
+    /* Id equivalents */
+    ScalaLexer.AlphaId, ScalaLexer.VarId, ScalaLexer.BackTickId,
+    /* Tokens that are part of the operator token */ ScalaLexer.OpChar, ScalaLexer.Hash, ScalaLexer.Colon, ScalaLexer.Or,
+            /* Tokens that are part of the operator token */ ScalaLexer.Exclamation, ScalaLexer.Plus, ScalaLexer.Minus, ScalaLexer.Tilde, ScalaLexer.Star, ScalaLexer.ViewBound,
+            /* XML Terminators */ ScalaLexer.XMLCloseTag, ScalaLexer.XMLAutoClose,
+            /* Custom tokens for interpolated strings */ ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti
+        /*SymbolLiteral was removed*/
+    };
+
+    public override IToken NextToken()
+    {
+        if (first)
+        {
+            List<CommonToken> list;
+            list = new List<CommonToken>();
+            int index = 0;
+            for (; ; )
+            {
+                var x = base.NextToken() as CommonToken;
+                x.TokenIndex = index;
+                list.Add(x);
+                if (x.Type == ScalaLexer.Eof) break;
+            }
+            tokens = new BufferedList(list);
+            first = false;
+        }
+        CommonToken t = tokens.LT(1);
+        if (lastIndex != t.TokenIndex)
+        {
+            if (lastIndex < t.TokenIndex)
+            {
+                for (int i = lastIndex + 1; i <= t.TokenIndex; i++)
+                {
+                    Advance(tokens.LT(i+1));
+                }
+            }
+            else
+            {
+                for (int i = lastIndex; i > t.TokenIndex; i--)
+                {
+                    StepBack(tokens.LT(i+1));
+                }
+            }
+            lastIndex = t.TokenIndex;
+        }
+        if (t.Type == ScalaLexer.NL)
+        {
+            bool canEmitNLToken_ = canEmitNLToken();
+            if (!canEmitNLToken_)
+            {
+                t.Channel = TokenConstants.HiddenChannel;
+                //tokens.Advance();
+                //return tokens.LT(1);
+            }
+        }
+        return t;
+        //if (!ready)
+        //{
+        //    // Scan ahead for "package", returning everything
+        //    // off-channel until then.
+        //    if (token.Type == ScalaLexer.NL)
+        //    {
+        //        var fixed_token = token as CommonToken;
+        //        fixed_token.Channel = TokenConstants.HiddenChannel;
+        //        return fixed_token;
+        //    }
+        //    if (token.Type == ScalaLexer.COMMENT)
+        //    {
+        //        var fixed_token = token as CommonToken;
+        //        fixed_token.Channel = TokenConstants.HiddenChannel;
+        //        return fixed_token;
+        //    }
+        //    if (token.Type == ScalaLexer.WS)
+        //    {
+        //        var fixed_token = token as CommonToken;
+        //        fixed_token.Channel = TokenConstants.HiddenChannel;
+        //        return fixed_token;
+        //    }
+        //    ready = true;
+        //}
+        //// We are past the initial text of the file. Scan ahead to
+        //// figure out what to do with NL.
+        //if (token.Type == ScalaLexer.NL)
+        //{
+        //    bool canEmitNLToken_ = canEmitNLToken();
+        //    if (!canEmitNLToken_)
+        //    {
+        //        return token;
+        //    }
+        //    else return NextToken();
+        //}
+
+        //return token;
+    }
+    bool canEmitNLToken()
+    {
+        IToken previousToken = tokens.LB(1);
+        IToken nextToken = tokens.LT(2);
+        bool afterStatementTerminator = previousToken != null && terminators.Contains(previousToken.Type);
+
+        bool beforeStatementStarter = nextToken != null && !nonStarters.Contains(nextToken.Type)
+        || (nextToken?.Type == ScalaLexer.Case
+                && (tokens.LT(3) != null && tokens.LT(3).Type == ScalaLexer.Class || tokens.LT(3).Type == ScalaLexer.Object));
+
+        if (inCase)
+        {
+            return false;
+        }
+
+        return (isEnabledRegion() && afterStatementTerminator && beforeStatementStarter);
+    }
+
+    private bool isEnabledRegion()
+    {
+        return !newLineEnables.Any() || newLineEnables.Peek();
+    }
+
+    private void Advance(CommonToken t)
+    {
+        switch (t.Type)
+        {
+            case ScalaLexer.Case:
+                if (tokens.LT(2).Type != ScalaLexer.Class && tokens.LT(2).Type != ScalaLexer.Object)
+                {
+                    newLineEnables.Push(true);
+                    inCase = true;
+                }
+                break;
+            case ScalaLexer.Arrow:
+                if (inCase)
+                {
+                    arrowsForCase.Add(t.TokenIndex);
+                    newLineEnables.Pop();
+                    inCase = false;
+                }
+                break;
+            case ScalaLexer.LBrace:
+                newLineEnables.Push(true);
+                break;
+            case ScalaLexer.LParen:
+            case ScalaLexer.LBracket:
+                newLineEnables.Push(false);
+                break;
+            case ScalaLexer.RBrace:
+            case ScalaLexer.RParen:
+            case ScalaLexer.RBracket:
+                newLineEnables.Pop();
+                break;
+        }
+        tokens.Advance();
+    }
+
+    HashSet<int> arrowsForCase = new HashSet<int>();
+
+    private void StepBack(CommonToken t)
+    {
+        switch (t.Type)
+        {
+            case ScalaLexer.Case:
+                if (inCase)
+                {
+                    newLineEnables.Pop();
+                    inCase = false;
+                }
+                break;
+            case ScalaLexer.Arrow:
+                if (arrowsForCase.Contains(t.TokenIndex))
+                {
+                    newLineEnables.Push(false);
+                    inCase = true;
+                }
+                break;
+            case ScalaLexer.RBrace:
+                newLineEnables.Push(true);
+                break;
+            case ScalaLexer.RParen:
+            case ScalaLexer.RBracket:
+                newLineEnables.Push(false);
+                break;
+            case ScalaLexer.LBrace:
+            case ScalaLexer.LParen:
+            case ScalaLexer.LBracket:
+                newLineEnables.Pop();
+                break;
+        }
+        tokens.Backup();
+    }
+}
+
+public class BufferedList
+{
+    List<CommonToken> tokens;
+    int current = 0;
+    public BufferedList(List<CommonToken> list)
+    {
+        tokens = list;
+        current = 0;
+    }
+
+    public CommonToken LT(int i)
+    {
+        Debug.Assert(i > 0);
+        if (current + i - 1 >= tokens.Count)
+        {
+            return tokens[tokens.Count - 1];
+        }
+        return tokens[current + i - 1];
+    }
+
+    public CommonToken LB(int i)
+    {
+        Debug.Assert(i > 0);
+        if (current - i >= tokens.Count)
+        {
+            return tokens[tokens.Count - 1];
+        }
+        return tokens[current - i];
+    }
+
+    public void Advance()
+    {
+        current++;
+    }
+
+    public void Backup()
+    {
+        current--;
+    }
 }
