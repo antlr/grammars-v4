@@ -368,7 +368,7 @@ CREATE TABLE T_ORDER
     COLUMN1  VARCHAR2(10)
 );
 
-
+-- see as https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6
 CREATE TABLE print_media_demo
 ( product_id NUMBER(6)
     , ad_id NUMBER(6)
