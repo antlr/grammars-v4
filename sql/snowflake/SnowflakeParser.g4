@@ -1193,20 +1193,12 @@ ext_table_column_action
     ;
 
 constraint_action
-    : ADD outofline_constraint
+    : ADD out_of_line_constraint
     | RENAME CONSTRAINT id_ TO id_
     | alter_modify ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
     | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          cascade_restrict?
-    ;
-
-outofline_constraint
-    : ( CONSTRAINT id_ )?
-            ( UNIQUE column_list_in_parentheses?
-            | PRIMARY KEY column_list_in_parentheses?
-            | ( FOREIGN KEY )? column_list_in_parentheses? REFERENCES object_name column_list_in_parentheses? )
-        constraint_properties?
     ;
 
 search_optimization_action
@@ -1540,7 +1532,7 @@ compression
 create_external_function
     : CREATE or_replace? SECURE? EXTERNAL FUNCTION object_name LR_BRACKET ( arg_name arg_data_type (COMMA arg_name arg_data_type)* )? RR_BRACKET
         RETURNS data_type
-        ( NOT? NULL_ )?
+        null_not_null?
         ( ( CALLED ON NULL_ INPUT) | ((RETURNS NULL_ ON NULL_ INPUT) | STRICT) )?
         ( VOLATILE | IMMUTABLE )?
         comment_clause?
@@ -1664,7 +1656,7 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
         RETURNS ( data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET )
-        ( NOT? NULL_ )?
+        null_not_null?
         ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
         ( VOLATILE | IMMUTABLE )?
         comment_clause?
@@ -2272,7 +2264,7 @@ not_null
     ;
 
 default_value
-    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | START num INCREMENT num  )?
+    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
     ;
 
 foreign_key
@@ -2296,7 +2288,7 @@ full_col_decl
             collate
             | inline_constraint
             | default_value
-            | not_null
+            | null_not_null
         )*
         with_masking_policy?
         with_tags?
@@ -2313,7 +2305,7 @@ column_decl_item_list
     ;
 
 create_table
-    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+    : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
         '(' column_decl_item_list ')'
         cluster_by?
         stage_file_format?
@@ -2329,7 +2321,7 @@ create_table
     ;
 
 create_table_as_select
-    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+    : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
         ('(' column_decl_item_list ')')?
         cluster_by?
         copy_grants?
@@ -3361,7 +3353,16 @@ non_reserved_words
     | JAVASCRIPT
     | RESULT
     | INDEX
+    | SOURCE
+    | PROCEDURE_NAME
+    | STATE
+    | ROLE
+    | DEFINITION
+    | TIMEZONE
+    | LOCAL
     | ROW_NUMBER
+    | VALUE
+    | NAME
     ;
 
 builtin_function
@@ -3468,6 +3469,7 @@ expr
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | subquery
     | try_cast_expr
+    | object_name DOT NEXTVAL
     | trim_expression
     ;
 
@@ -3516,12 +3518,12 @@ data_type
     | REAL_
     | BOOLEAN
     | DATE
-    | DATETIME
-    | TIME
-    | TIMESTAMP
-    | TIMESTAMP_LTZ
-    | TIMESTAMP_NTZ
-    | TIMESTAMP_TZ
+    | DATETIME ('(' num ')')?
+    | TIME ('(' num ')')?
+    | TIMESTAMP ('(' num ')')?
+    | TIMESTAMP_LTZ ('(' num ')')?
+    | TIMESTAMP_NTZ ('(' num ')')?
+    | TIMESTAMP_TZ ('(' num ')')?
     | STRING_
     | CHAR | CHARACTER
     | VARCHAR ('(' num ')')?
