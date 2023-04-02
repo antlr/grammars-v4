@@ -1,8 +1,21 @@
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
+using SharpCompress.Common;
+using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Numerics;
+using System.Reflection.PortableExecutable;
+using System.Security.Policy;
+using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public abstract class ScalaLexerBase : Lexer
 {
@@ -25,21 +38,130 @@ public abstract class ScalaLexerBase : Lexer
     bool inCase = false;
     Stack<bool> newLineEnables = new Stack<bool>();
     HashSet<int> arrowsForCase = new HashSet<int>();
-    private static HashSet<int> nonStarters = new HashSet<int>() { ScalaLexer.Catch, ScalaLexer.Else, ScalaLexer.Extends, ScalaLexer.Finally, ScalaLexer.ForSome, ScalaLexer.MatchKW, ScalaLexer.With,
-        ScalaLexer.Yield, ScalaLexer.Comma, ScalaLexer.Dot, ScalaLexer.Colon, ScalaLexer.SemiColon, ScalaLexer.Eq, ScalaLexer.Arrow, ScalaLexer.Assign, ScalaLexer.LowerType, ScalaLexer.ViewBound, ScalaLexer.UpperType, ScalaLexer.Hash, ScalaLexer.LBracket,
-        ScalaLexer.RParen, ScalaLexer.RBracket, ScalaLexer.RBrace, /* per spec */
-        ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti /* custom cases */
-    };
+
+    // See https://www.scala-lang.org/files/archive/spec/2.13/01-lexical-syntax.html#newline-characters
+    // for information on newline characters.
+    //
+    // This code changes newline tokens to either channel(hidden) or channel(default) depending
+    // on the rules for newlines in the Spec.
+    //
+    //   Scala is a line-oriented language where statements may be terminated by semi-colons or
+    //   newlines. A newline in a Scala source text is treated as the special token “nl” if the
+    //   three following criteria are satisfied:
+    //    1) The token immediately preceding the newline can terminate a statement.
+    //    2) The token immediately following the newline can begin a statement.
+    //    3) The token appears in a region where newlines are enabled.
+    //
+    //   The tokens that can terminate a statement are: literals, identifiers and the following
+    //   delimiters and reserved words:
+    //    this    null    true    false    return    type    <xml-start>
+    //    _     )       ]       }
+    //
+    //   The tokens that can begin a statement are all Scala tokens except the following
+    //   delimiters and reserved words:
+    //    catch    else    extends    finally    forSome    match
+    //    with yield   ,    .    ;    :    =    =>    <-    <:    <%
+    //    >:    #    [    )    ]    }
+    //
+    //   A case token can begin a statement only if followed by a class or object token.
+    //   Newlines are enabled in:
+    //    1) all of a Scala source file, except for nested regions where newlines are disabled, and
+    //    2) the interval between matching { and } brace tokens, except for nested regions
+    //    where newlines are disabled.
+    //
+    //   Newlines are disabled in:
+    //    1) the interval between matching (and ) parenthesis tokens, except for nested regions
+    //    where newlines are enabled, and
+    //    2) the interval between matching[and] bracket tokens, except for nested regions where newlines are enabled.
+    //    3) The interval between a case token and its matching => token, except for nested regions where newlines are enabled.
+    //    4) Any regions analyzed in XML mode.
+    //   Note that the brace characters of { ...} escapes in XML and string literals are not
+    //   tokens, and therefore do not enclose a region where newlines are enabled.
+    //   Normally, only a single nl token is inserted between two consecutive non-newline
+    //   tokens which are on different lines, even if there are multiple lines between the
+    //   two tokens. However, if two tokens are separated by at least one completely blank
+    //   line (i.e a line which contains no printable characters), then two nl tokens are
+    //   inserted.
+    //
+    //   The Scala grammar (given in full here) contains productions where optional nl tokens,
+    //   but not semicolons, are accepted.This has the effect that a new line in one of these
+    //   positions does not terminate an expression or statement.These positions can be
+    //   summarized as follows:
+    //   Multiple newline tokens are accepted in the following places(note that a semicolon in place of the newline would be illegal in every one of these cases) :
+    //    * between the condition of a conditional expression or while loop and the next following expression,
+    //    * between the enumerators of a for-comprehension and the next following expression, and
+    //    * after the initial type keyword in a type definition or declaration.
+    //   A single new line token is accepted
+    //    * in front of an opening brace ‘{’, if that brace is a legal continuation of the current statement or expression,
+    //    * after an infix operator, if the first token on the next line can start an expression,
+    //    * in front of a parameter clause, and
+    //    * after an annotation.
+
     private static HashSet<int> terminators = new HashSet<int>() {
-        ScalaLexer.This, ScalaLexer.Null, ScalaLexer.BooleanLiteral, ScalaLexer.Return, ScalaLexer.TypeKW, ScalaLexer.RParen,
-            ScalaLexer.RBracket, ScalaLexer.RBrace, ScalaLexer.UnderScore, ScalaLexer.IntegerLiteral, ScalaLexer.FloatingPointLiteral, ScalaLexer.StringLiteral, ScalaLexer.CharacterLiteral,
-    /* Id equivalents */
-    ScalaLexer.AlphaId, ScalaLexer.VarId, ScalaLexer.BackTickId,
-    /* Tokens that are part of the operator token */ ScalaLexer.OpChar, ScalaLexer.Hash, ScalaLexer.Colon, ScalaLexer.Or,
-            /* Tokens that are part of the operator token */ ScalaLexer.Exclamation, ScalaLexer.Plus, ScalaLexer.Minus, ScalaLexer.Tilde, ScalaLexer.Star, ScalaLexer.ViewBound,
-            /* XML Terminators */ ScalaLexer.XMLCloseTag, ScalaLexer.XMLAutoClose,
-            /* Custom tokens for interpolated strings */ ScalaLexer.DoubleQuoteSingle, ScalaLexer.TripleDoubleQuoteMulti
+        ScalaLexer.This, // Here and below, per spec.
+        ScalaLexer.Null,
+        ScalaLexer.BooleanLiteral,
+        ScalaLexer.Return,
+        ScalaLexer.TypeKW,
+        ScalaLexer.UnderScore,
+        ScalaLexer.RParen,
+        ScalaLexer.RBracket,
+        ScalaLexer.RBrace,
+        ScalaLexer.IntegerLiteral, // Here and below, not spec.
+        ScalaLexer.FloatingPointLiteral,
+        ScalaLexer.StringLiteral,
+        ScalaLexer.CharacterLiteral,
+        /* Id equivalents */
+        ScalaLexer.AlphaId,
+        ScalaLexer.VarId,
+        ScalaLexer.BackTickId,
+        /* Tokens that are part of the operator token */
+        ScalaLexer.OpChar,
+        ScalaLexer.Hash,
+        ScalaLexer.Colon,
+        ScalaLexer.Or,
+        /* Tokens that are part of the operator token */
+        ScalaLexer.Exclamation,
+        ScalaLexer.Plus,
+        ScalaLexer.Minus,
+        ScalaLexer.Tilde,
+        ScalaLexer.Star,
+        ScalaLexer.ViewBound,
+        /* XML Terminators */
+        ScalaLexer.XMLCloseTag,
+        ScalaLexer.XMLAutoClose,
+        /* Custom tokens for interpolated strings */
+        ScalaLexer.DoubleQuoteSingle,
+        ScalaLexer.TripleDoubleQuoteMulti
         /*SymbolLiteral was removed*/
+    };
+    
+    private static HashSet<int> nonStarters = new HashSet<int>() {
+        ScalaLexer.Catch, // Here and below, per spec.
+        ScalaLexer.Else,
+        ScalaLexer.Extends,
+        ScalaLexer.Finally,
+        ScalaLexer.ForSome,
+        ScalaLexer.MatchKW,
+        ScalaLexer.With,
+        ScalaLexer.Yield,
+        ScalaLexer.Comma,
+        ScalaLexer.Dot,
+        ScalaLexer.SemiColon,
+        ScalaLexer.Colon,
+        ScalaLexer.Eq,
+        ScalaLexer.Arrow,
+        ScalaLexer.Assign,
+        ScalaLexer.LowerType,
+        ScalaLexer.ViewBound,
+        ScalaLexer.UpperType,
+        ScalaLexer.Hash,
+        ScalaLexer.LBracket,
+        ScalaLexer.RParen,
+        ScalaLexer.RBracket,
+        ScalaLexer.RBrace,
+        ScalaLexer.DoubleQuoteSingle, // Not spec.
+        ScalaLexer.TripleDoubleQuoteMulti // Not spec.
     };
 
     protected int interpolatedStringLevel = 0;
@@ -164,54 +286,53 @@ public abstract class ScalaLexerBase : Lexer
         CommonToken t = tokens.LT(1);
         tokens.Advance();
         return t;
-        //if (!ready)
-        //{
-        //    // Scan ahead for "package", returning everything
-        //    // off-channel until then.
-        //    if (token.Type == ScalaLexer.NL)
-        //    {
-        //        var fixed_token = token as CommonToken;
-        //        fixed_token.Channel = TokenConstants.HiddenChannel;
-        //        return fixed_token;
-        //    }
-        //    if (token.Type == ScalaLexer.COMMENT)
-        //    {
-        //        var fixed_token = token as CommonToken;
-        //        fixed_token.Channel = TokenConstants.HiddenChannel;
-        //        return fixed_token;
-        //    }
-        //    if (token.Type == ScalaLexer.WS)
-        //    {
-        //        var fixed_token = token as CommonToken;
-        //        fixed_token.Channel = TokenConstants.HiddenChannel;
-        //        return fixed_token;
-        //    }
-        //    ready = true;
-        //}
-        //// We are past the initial text of the file. Scan ahead to
-        //// figure out what to do with NL.
-        //if (token.Type == ScalaLexer.NL)
-        //{
-        //    bool canEmitNLToken_ = canEmitNLToken();
-        //    if (!canEmitNLToken_)
-        //    {
-        //        return token;
-        //    }
-        //    else return NextToken();
-        //}
-
-        //return token;
     }
 
     private bool canEmitNLToken()
     {
-        IToken previousToken = tokens.LB(1);
-        IToken nextToken = tokens.LT(2);
-        bool afterStatementTerminator = previousToken != null && terminators.Contains(previousToken.Type);
-
-        bool beforeStatementStarter = nextToken != null && !nonStarters.Contains(nextToken.Type)
-        || (nextToken?.Type == ScalaLexer.Case
-                && (tokens.LT(3) != null && tokens.LT(3).Type == ScalaLexer.Class || tokens.LT(3).Type == ScalaLexer.Object));
+        IToken lb1 = null;
+        for (int j = 1; ; )
+        {
+            lb1 = tokens.LB(j);
+            if (lb1 == null) break;
+            if (lb1.Channel == TokenConstants.HiddenChannel)
+            {
+                j++;
+                continue;
+            }
+            break;
+        }
+        IToken lt2 = null;
+        int k;
+        for (k = 2; ;)
+        {
+            lt2 = tokens.LT(k);
+            if (lt2 == null) break;
+            if (lt2.Type == ScalaLexer.Eof) break;
+            if (lt2.Channel == TokenConstants.HiddenChannel)
+            {
+                k++;
+                continue;
+            }
+            break;
+        }
+        IToken lt3 = null;
+        for (; ; )
+        {
+            lt3 = tokens.LT(k);
+            if (lt3 == null) break;
+            if (lt3.Type == ScalaLexer.Eof) break;
+            if (lt3.Channel == TokenConstants.HiddenChannel)
+            {
+                k++;
+                continue;
+            }
+            break;
+        }
+        bool afterStatementTerminator = lb1 != null && terminators.Contains(lb1.Type);
+        bool beforeStatementStarter = lt2 != null && !nonStarters.Contains(lt2.Type)
+            || (lt2?.Type == ScalaLexer.Case
+                && (lt3 != null && lt3.Type == ScalaLexer.Class || lt3.Type == ScalaLexer.Object));
 
         if (inCase)
         {
@@ -228,15 +349,54 @@ public abstract class ScalaLexerBase : Lexer
 
     private void Advance(CommonToken t)
     {
+        IToken lb1 = null;
+        for (int j = 1; ;)
+        {
+            lb1 = tokens.LB(j);
+            if (lb1 == null) break;
+            if (lb1.Channel == TokenConstants.HiddenChannel)
+            {
+                j++;
+                continue;
+            }
+            break;
+        }
+        IToken lt2 = null;
+        int k;
+        for (k = 2; ;)
+        {
+            lt2 = tokens.LT(k);
+            if (lt2 == null) break;
+            if (lt2.Type == ScalaLexer.Eof) break;
+            if (lt2.Channel == TokenConstants.HiddenChannel)
+            {
+                k++;
+                continue;
+            }
+            break;
+        }
+        IToken lt3 = null;
+        for (; ; )
+        {
+            lt3 = tokens.LT(k);
+            if (lt3 == null) break;
+            if (lt3.Type == ScalaLexer.Eof) break;
+            if (lt3.Channel == TokenConstants.HiddenChannel)
+            {
+                k++;
+                continue;
+            }
+            break;
+        }
         switch (t.Type)
         {
-            case ScalaLexer.Case:
-                if (tokens.LT(2).Type != ScalaLexer.Class && tokens.LT(2).Type != ScalaLexer.Object)
-                {
-                    newLineEnables.Push(true);
-                    inCase = true;
-                }
-                break;
+            //case ScalaLexer.Case:
+            //    if (/*lt2.Type != ScalaLexer.Class && */ lt2.Type != ScalaLexer.Object)
+            //    {
+            //        newLineEnables.Push(true);
+            //        inCase = true;
+            //    }
+            //    break;
             case ScalaLexer.Arrow:
                 if (inCase)
                 {
