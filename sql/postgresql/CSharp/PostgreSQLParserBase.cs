@@ -35,8 +35,6 @@ public abstract class PostgreSQLParserBase : Parser
         if (func_as != null)
         {
             var txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            var line = func_as.func_as()
-                .sconst(0).Start.Line;
             var ph = getPostgreSQLParser(txt);
             switch (lang)
             {

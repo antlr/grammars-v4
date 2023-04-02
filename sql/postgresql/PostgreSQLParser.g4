@@ -1920,6 +1920,8 @@ arg_class
 param_name
    : type_function_name
    | builtin_function_name
+   | LEFT
+   | RIGHT
    ;
 
 func_return
@@ -1928,7 +1930,7 @@ func_return
 
 func_type
    : typename
-   | SETOF? (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
+   | SETOF? (builtin_function_name | type_function_name | LEFT | RIGHT) attrs PERCENT TYPE_P
    ;
 
 func_arg_with_default
@@ -3162,8 +3164,12 @@ alias_clause
    ;
 
 opt_alias_clause
-   : alias_clause
+   : table_alias_clause
    |
+   ;
+
+table_alias_clause
+   : AS? table_alias (OPEN_PAREN name_list CLOSE_PAREN)?
    ;
 
 func_alias_clause
@@ -3308,7 +3314,7 @@ consttypename
    ;
 
 generictype
-   : (builtin_function_name | type_function_name) attrs? opt_type_modifiers
+   : (builtin_function_name | type_function_name | LEFT | RIGHT) attrs? opt_type_modifiers
    ;
 
 opt_type_modifiers
@@ -4049,6 +4055,8 @@ func_name
    : builtin_function_name
    | type_function_name
    | colid indirection
+   | LEFT
+   | RIGHT
    ;
 
 aexprconst
@@ -4122,7 +4130,17 @@ colid
    | unreserved_keyword
    | col_name_keyword
    | plsql_unreserved_keyword
+   | LEFT
+   | RIGHT
    ;
+
+table_alias
+   : identifier
+   | unreserved_keyword
+   | col_name_keyword
+   | plsql_unreserved_keyword
+   ;
+
 
 type_function_name
    : identifier
@@ -4699,7 +4717,6 @@ builtin_function_name
    | CONCAT_WS
    | FORMAT
    | INITCAP
-   | LEFT
    | LENGTH
    | LPAD
    | LTRIM
@@ -4721,7 +4738,6 @@ builtin_function_name
    | REPEAT
    | REPLACE
    | REVERSE
-   | RIGHT
    | RPAD
    | RTRIM
    | SPLIT_PART

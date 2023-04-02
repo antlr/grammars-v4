@@ -72,6 +72,7 @@ unit_statement
     | alter_user
     | alter_view
 
+    | call_statement
     | create_analytic_view
     | create_attribute_dimension
     | create_audit_policy
@@ -167,7 +168,6 @@ unit_statement
     | flashback_table
     | grant_statement
     | noaudit_statement
-    | procedure_call
     | purge_statement
     | rename_object
     | revoke_statement
@@ -3431,6 +3431,7 @@ table_properties
         row_movement_clause?
         logical_replication_clause?
         flashback_archive_clause?
+        physical_properties?
         (ROW ARCHIVAL)?
         (AS select_only_statement | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name)?
     ;
@@ -3667,7 +3668,7 @@ table_partition_description
     : deferred_segment_creation? segment_attributes_clause?
         (table_compression | key_compression)?
         (OVERFLOW segment_attributes_clause? )?
-        (lob_storage_clause | varray_col_properties | nested_table_col_properties)?
+        (lob_storage_clause | varray_col_properties | nested_table_col_properties)*
     ;
 
 partitioning_storage_clause
@@ -3785,7 +3786,7 @@ deferred_segment_creation
 
 segment_attributes_clause
     : ( physical_attributes_clause
-      | TABLESPACE tablespace_name=id_expression
+      | TABLESPACE (tablespace_name=id_expression | SET? identifier)
       | table_compression
       | logging_clause
       )+
@@ -5018,10 +5019,16 @@ varray_item
     ;
 
 column_properties
-    : object_type_col_properties
+    : (object_type_col_properties
     | nested_table_col_properties
-    | (varray_col_properties | lob_storage_clause) //TODO '(' ( ','? lob_partition_storage)+ ')'
-    | xmltype_column_properties
+    | (varray_col_properties | lob_storage_clause) ('(' lob_partition_storage (',' lob_partition_storage)* ')')? //TODO '(' ( ','? lob_partition_storage)+ ')'
+    | xmltype_column_properties)+
+    ;
+
+lob_partition_storage
+    : LOB ('(' lob_item (',' lob_item) ')' STORE AS ((SECUREFILE | BASICFILE) | '(' lob_storage_parameters ')')+
+          | '(' lob_item ')' STORE AS ((SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')')+
+          )
     ;
 
 period_definition
@@ -5361,9 +5368,8 @@ statement
     | return_statement
     | case_statement
     | sql_statement
-    | function_call
+    | call_statement
     | pipe_row_statement
-    | procedure_call
     ;
 
 swallow_to_semi
@@ -5443,12 +5449,8 @@ return_statement
     : RETURN expression?
     ;
 
-function_call
-    : CALL? routine_name function_argument?
-    ;
-
-procedure_call
-    : routine_name function_argument?
+call_statement
+    : CALL? routine_name function_argument? (INTO bind_variable)?
     ;
 
 pipe_row_statement
@@ -6011,6 +6013,7 @@ dml_table_expression_clause
     : table_collection_expression
     | '(' select_statement subquery_restriction_clause? ')'
     | tableview_name sample_clause?
+    | json_table_clause (AS identifier)?
     ;
 
 table_collection_expression
@@ -6214,7 +6217,104 @@ string_function
 standard_function
     : string_function
     | numeric_function_wrapper
+    | json_function
     | other_function
+    ;
+
+//see as https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/JSON_ARRAY.html#GUID-46CDB3AF-5795-455B-85A8-764528CEC43B
+json_function
+    : JSON_ARRAY '('  json_array_element ( ',' json_array_element)* json_on_null_clause? json_return_clause? STRICT? ')'
+    | JSON_ARRAYAGG '(' expression (FORMAT JSON)? order_by_clause? json_on_null_clause? json_return_clause? STRICT? ')'
+    | JSON_OBJECT '(' json_object_content ')'
+    | JSON_OBJECTAGG '(' KEY? expression VALUE expression ((NULL_ | ABSENT) ON NULL_)? (RETURNING ( VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB ))?  STRICT? (WITH UNIQUE KEYS)?')'
+    | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause? json_query_wrapper_clause? json_query_on_error_clause? json_query_on_empty_clause? ')'
+    | JSON_SERIALIZE '(' CHAR_STRING (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? ((NULL_ | ERROR | EMPTY (ARRAY | OBJECT)) ON ERROR)? ')'
+    | JSON_TRANSFORM '(' expression ',' json_transform_op (',' json_transform_op)* ')'
+    | JSON_VALUE '('  expression (FORMAT JSON)? (',' CHAR_STRING? json_value_return_clause? ((ERROR | NULL_ | DEFAULT literal)? ON ERROR)? ((ERROR | NULL_ | DEFAULT literal)? ON EMPTY)? json_value_on_mismatch_clause?')')?
+    ;
+
+json_object_content
+    : (json_object_entry (',' json_object_entry)* | '*') json_on_null_clause? json_return_clause? STRICT? (WITH UNIQUE KEYS)?
+    ;
+
+json_object_entry
+    : KEY? expression (VALUE | IS)? expression
+    | expression ':' expression (FORMAT JSON)?
+    | identifier
+    ;
+
+json_table_clause
+    : JSON_TABLE '(' expression (FORMAT JSON)? (',' CHAR_STRING)? ((ERROR | NULL_) ON ERROR)? ((EMPTY | NULL_) ON EMPTY)? json_column_clause? ')'
+    ;
+
+json_array_element
+    : (expression | CHAR_STRING | NULL_ |  UNSIGNED_INTEGER | json_function) (FORMAT JSON)?
+    ;
+
+json_on_null_clause
+    : (NULL_ | ABSENT) ON NULL_
+    ;
+
+json_return_clause
+    : RETURNING ( VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB )
+    ;
+
+json_transform_op
+    : REMOVE CHAR_STRING ((IGNORE | ERROR)? ON MISSING)?
+    | INSERT CHAR_STRING '=' CHAR_STRING ((REPLACE | IGNORE | ERROR) ON EXISTING)? ((NULL_ | IGNORE | ERROR | REMOVE)? ON NULL_)?
+    | REPLACE CHAR_STRING '=' CHAR_STRING ((CREATE | IGNORE | ERROR) ON MISSING)? ((NULL_ | IGNORE | ERROR)? ON NULL_)?
+    | expression (FORMAT JSON)?
+    | APPEND CHAR_STRING '=' CHAR_STRING ((CREATE | IGNORE | ERROR) ON MISSING)? ((NULL_ | IGNORE | ERROR)? ON NULL_)?
+    | SET CHAR_STRING '=' expression (FORMAT JSON)? ((REPLACE | IGNORE | ERROR) ON EXISTING)? ((CREATE | IGNORE | ERROR) ON MISSING)? ((NULL_ | IGNORE | ERROR)? ON NULL_)?
+    ;
+
+json_column_clause
+    : COLUMNS '(' json_column_definition (',' json_column_definition)* ')'
+    ;
+
+json_column_definition
+    : expression json_value_return_type? (EXISTS? PATH CHAR_STRING | TRUNCATE (PATH CHAR_STRING)?)? json_query_on_error_clause? json_query_on_empty_clause?
+    | expression json_query_return_type? TRUNCATE? FORMAT JSON  json_query_wrapper_clause? PATH CHAR_STRING
+    | NESTED PATH? expression ('[' ASTERISK ']')? json_column_clause
+    | expression FOR ORDINALITY
+    ;
+
+json_query_returning_clause
+    : (RETURNING json_query_return_type)? PRETTY? ASCII?
+    ;
+
+json_query_return_type
+    : VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB
+    ;
+
+json_query_wrapper_clause
+    : (WITHOUT ARRAY? WRAPPER) | (WITH (UNCONDITIONAL | CONDITIONAL)? ARRAY? WRAPPER)
+    ;
+
+json_query_on_error_clause
+    : (ERROR | NULL_ | EMPTY | EMPTY ARRAY | EMPTY OBJECT)? ON ERROR
+    ;
+
+json_query_on_empty_clause
+    : (ERROR | NULL_ | EMPTY | EMPTY ARRAY | EMPTY OBJECT)? ON EMPTY
+    ;
+
+json_value_return_clause
+    : RETURNING json_value_return_type? ASCII?
+    ;
+
+json_value_return_type
+    : VARCHAR2 ('(' UNSIGNED_INTEGER  ( BYTE | CHAR )? ')')? TRUNCATE?
+    | CLOB
+    | DATE
+    | NUMBER '(' INTEGER (',' INTEGER)? ')'
+    | TIMESTAMP (WITH TIMEZONE)?
+    | SDO_GEOMETRY
+    | expression (USING CASESENSITIVE MAPPING)?
+    ;
+
+json_value_on_mismatch_clause
+    : (IGNORE | ERROR | NULL_) ON MISMATCH ('(' MISSING DATA | EXTRA DATA | TYPE ERROR ')')?
     ;
 
 literal
@@ -6616,7 +6716,7 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)?
-          (AT_SIGN link_name (PERIOD link_name)? | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+          (AT_SIGN link_name (PERIOD link_name)* | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
     | xmltable outer_join_sign?
     ;
 
@@ -6961,6 +7061,7 @@ regular_id
     : non_reserved_keywords_pre12c
     | non_reserved_keywords_in_12c
     | REGULAR_ID
+    | ABSENT
     | A_LETTER
     | AGENT
     | AGGREGATE
@@ -6975,6 +7076,7 @@ regular_id
     | CLUSTER
     | CONSTRUCTOR
     | CUSTOMDATUM
+    | CASESENSITIVE
     | DECIMAL
     | DELETE
     | DETERMINISTIC
@@ -6993,12 +7095,15 @@ regular_id
     | INDICES
     | INOUT
     | INTEGER
+    | JSON_TRANSFORM
     | K_LETTER
     | LANGUAGE
     | LONG
     | LOOP
     | MOUNTPOINT
     | M_LETTER
+    | MISSING
+    | MISMATCH
     | NUMBER
     | ORADATA
     | OSERROR
@@ -7020,6 +7125,7 @@ regular_id
     | RENAME
     | RESTRICT_REFERENCES
     | RESULT
+    | SDO_GEOMETRY
     | SELF
     | SERIALLY_REUSABLE
     | SET

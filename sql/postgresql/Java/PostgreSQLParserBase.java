@@ -42,7 +42,6 @@ public abstract class PostgreSQLParserBase extends Parser {
         }
         if (func_as != null) {
             String txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            int line = func_as.func_as().sconst(0).start.getLine();
             PostgreSQLParser ph = getPostgreSQLParser(txt);
             switch (lang) {
                 case "plpgsql":

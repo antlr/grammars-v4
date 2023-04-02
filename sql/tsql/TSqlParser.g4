@@ -6054,6 +6054,7 @@ id_
     | DOUBLE_QUOTE_BLANK
     | SQUARE_BRACKET_ID
     | keyword
+    | RAW
     ;
 
 simple_id
