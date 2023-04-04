@@ -81,6 +81,7 @@ unit_statement
     | create_controlfile
     | create_database
     | create_database_link
+    | create_dimension
     | create_directory
     | create_diskgroup
     | create_edition
@@ -2460,6 +2461,10 @@ revoke_roles_from_programs
 
 program_unit
     : (FUNCTION | PROCEDURE | PACKAGE) (schema_name '.')? id_expression
+    ;
+
+create_dimension
+    : CREATE DIMENSION identifier  level_clause+ (hierarchy_clause | attribute_clause | extended_attribute_clause)+
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DIRECTORY.html
