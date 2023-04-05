@@ -3340,6 +3340,7 @@ keyword
     | ROLLUP
     | AT_KEYWORD
     | TIMESTAMP
+    | IF
     // etc
     ;
 
@@ -3453,6 +3454,7 @@ expr
     | full_column_name
     | bracket_expression
     | op=( PLUS | MINUS ) expr
+    | op=NOT expr
     | expr op=(STAR | DIVIDE | MODULE) expr
     | expr op=(PLUS | MINUS | PIPE_PIPE) expr
     | expr op=( AND | OR | NOT ) expr //bool operation
@@ -3473,6 +3475,8 @@ expr
     | try_cast_expr
     | object_name DOT NEXTVAL
     | trim_expression
+    | expr comparison_operator expr
+    | expr IS null_not_null
     ;
 
 iff_expr
