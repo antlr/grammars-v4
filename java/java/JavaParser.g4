@@ -605,7 +605,6 @@ expression
     | '(' annotation* typeType ('&' typeType)* ')' expression
     | lambdaExpression // Java8
     | switchExpression // Java17
-
     // Java 8 methodReference
     | expression '::' typeArguments? identifier
     | typeType '::' (typeArguments? identifier | NEW)
