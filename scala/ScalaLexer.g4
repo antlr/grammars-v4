@@ -115,7 +115,7 @@ BooleanLiteral: 'true' | 'false' { popModeForIdentifier();};
 
 PIDefault: '<?' .*? '?>';
 CDataChunkDefault: '<![CDATA[' .*? ']]>';
-XMLOpenTag: (NL | WhiteSpace)? '<' (XNameStart | '!' | '?') {startXMLMode();};
+XMLOpenTag: (NLf | WhiteSpace)? '<' (XNameStart | '!' | '?') {startXMLMode();};
 fragment XNameStart:
 	[a-zA-Z]
 	| '\u2070' ..'\u218F'
@@ -222,7 +222,7 @@ fragment StringElement
 fragment MultiLineChars
 	: (
 		DoubleQuote? DoubleQuote? StringElement
-		| NL
+		| NLf
 	)* DoubleQuote*
    ;
 
@@ -301,9 +301,10 @@ fragment UnicodeLetter
 //
 fragment LineEnding: '\n' | '\r' '\n'?;
 
-NL
+fragment NLf
    : LineEnding (WhiteSpace* LineEnding)?
    ;
+NL : NLf -> channel(HIDDEN);
 
 WS
    :  WhiteSpace+ -> channel(HIDDEN)

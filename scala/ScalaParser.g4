@@ -37,6 +37,10 @@ options {
    tokenVocab = ScalaLexer;
 }
 
+compilationUnit
+   : (Package qualId semi1)* topStatSeq? semi0n EOF
+   ;
+
 literal
    : Minus? (IntegerLiteral | FloatingPointLiteral)
    | BooleanLiteral
@@ -61,8 +65,8 @@ path
    ;
 
 stableId
-   : identifier (NL? Dot identifier)*
-   | (identifier Dot)? (This | Super classQualifier?) (NL? Dot identifier)+
+   : identifier (nl01 Dot identifier)*
+   | (identifier Dot)? (This | Super classQualifier?) (nl01 Dot identifier)+
    ;
 
 classQualifier
@@ -80,7 +84,7 @@ functionArgTypes
    ;
 
 existentialClause
-   : ForSome LBrace existentialDcl (semi existentialDcl)* RBrace
+   : ForSome LBrace existentialDcl (semi1 existentialDcl)* RBrace
    ;
 
 existentialDcl
@@ -89,7 +93,7 @@ existentialDcl
    ;
 
 infixType
-   : compoundType (identifier NL? compoundType)*
+   : compoundType (identifier nl01 compoundType)*
    ;
 
 compoundType
@@ -124,7 +128,7 @@ types
    ;
 
 refinement
-   : NL? LBrace refineStat+ (semi refineStat)* RBrace
+   : nl01 LBrace refineStat+ (semi1 refineStat)* RBrace
    ;
 
 refineStat
@@ -145,11 +149,11 @@ expr
    ;
 
 expr1
-   : If LParen expr RParen NL* expr (semi? Else expr)?
-   | While LParen expr RParen NL* expr
+   : If LParen expr RParen nl0n expr (semi01 Else expr)?
+   | While LParen expr RParen nl0n expr
    | Try expr (Catch expr)? (Finally expr)?
-   | Do expr semi? While LParen expr RParen
-   | For (LParen enumerators RParen | LBrace enumerators RBrace) NL* Yield? expr
+   | Do expr semi01 While LParen expr RParen
+   | For (LParen enumerators RParen | LBrace enumerators RBrace) nl0n Yield? expr
    | Throw expr
    | Return expr?
    | ((simpleExpr | simpleExpr1 UnderScore?) Dot)? identifier Eq expr
@@ -162,13 +166,13 @@ prefixDef
    ;
 
 postfixExpr
-   : infixExpr (identifier NL?)?
+   : infixExpr (identifier nl01)?
    ;
 
 infixExpr
    : prefixExpr
-   | infixExpr NL? operator NL? typeParamClause? infixExpr // special case
-   | infixExpr identifier NL? typeParamClause? infixExpr
+   | infixExpr nl01 operator nl01 typeParamClause? infixExpr // special case
+   | infixExpr identifier nl01 typeParamClause? infixExpr
    ;
 
 prefixExpr
@@ -188,10 +192,10 @@ simpleExpr1
          | path
          | UnderScore
          | parenthesisExprs
-         | (New (classTemplate | templateBody) | blockExpr) (NL? Dot identifier | typeArgs)
+         | (New (classTemplate | templateBody) | blockExpr) (nl01 Dot identifier | typeArgs)
          | xmlExpr
       )
-      (simpleExpr1Suffix (NL? simpleExpr1Suffix)*)?
+      (simpleExpr1Suffix (nl01 simpleExpr1Suffix)*)?
    ;
 
 parenthesisExprs
@@ -308,7 +312,7 @@ exprs
 argumentExprs
    : parenthesisExprs
    | LParen (exprs Comma)? postfixExpr Colon UnderScore Star RParen
-   | NL? blockExpr
+   | nl01 blockExpr
    ;
 
 blockExpr
@@ -316,12 +320,13 @@ blockExpr
    ;
 
 block
-   : blockStat? ( semi blockStat?)* resultExpr?
+   : blockStat?
+        ((SemiColon blockStat? | nl1n blockStat)* | nl1n) resultExpr?
    ;
 
 blockStat
    : import_
-   | (annotation NL?)* (Implicit? Lazy? def_ | localModifier* tmplDef)
+   | (annotation nl01)* (Implicit? Lazy? def_ | localModifier* tmplDef)
    | expr1
    ;
 
@@ -331,11 +336,11 @@ resultExpr
    ;
 
 enumerators
-   : generator (semi generator)*
+   : generator (semi1 generator)*
    ;
 
 generator
-   : pattern1 Assign expr (semi? guard_ | semi pattern1 Eq expr)*
+   : pattern1 Assign expr (semi01 guard_ | semi1 pattern1 Eq expr)*
    ;
 
 caseClauses
@@ -347,11 +352,11 @@ caseClause
    ;
 
 guard_
-   : If NL? postfixExpr
+   : If nl01 postfixExpr
    ;
 
 pattern
-   : pattern1 (NL? Or NL? pattern1)*
+   : pattern1 (nl01 Or nl01 pattern1)*
    ;
 
 pattern1
@@ -365,7 +370,7 @@ pattern2
    ;
 
 pattern3
-   : simplePattern (identifier NL? simplePattern)*
+   : simplePattern (identifier nl01 simplePattern)*
    ;
 
 simplePattern
@@ -399,11 +404,11 @@ typeParam
    ;
 
 paramClauses
-   : paramClause* (NL? LParen Implicit params RParen)?
+   : paramClause* (nl01 LParen Implicit params RParen)?
    ;
 
 paramClause
-   : NL? LParen params? RParen
+   : nl01 LParen params? RParen
    ;
 
 params
@@ -420,15 +425,17 @@ paramType
    ;
 
 classParamClauses
-   : classParamClause* (NL? LParen Implicit classParams RParen)?
+   : classParamClause* (nl01 LParen Implicit classParams RParen)?
    ;
 
 classParamClause
-   : NL? LParen classParams? RParen
+   : nl01 LParen classParams? RParen
    ;
 
-classParams
-   : annotation* (modifier NL?)* (Val | Var)? identifier Colon paramType (Eq expr)?
+classParams :  classParam ( Comma classParam )* ;
+
+classParam
+   : annotation* (modifier nl01)* (Val | Var)? identifier Colon paramType (Eq expr)?
    ;
 
 bindings
@@ -470,12 +477,13 @@ constrAnnotation
    ;
 
 templateBody
-   : NL? LBrace selfType? templateStat? (semi templateStat?)* semi* RBrace
+   : nl01 LBrace selfType? templateStat?
+        ((SemiColon templateStat? | nl1n templateStat)* | nl0n) semi0n RBrace
    ;
 
 templateStat
    : import_
-   | (annotation NL?)* (modifier NL?)* (def_ | dcl)
+   | (annotation nl01)* (modifier nl01)* (def_ | dcl)
    | expr
    ;
 
@@ -492,7 +500,7 @@ importExpr
    ;
 
 importSelectors
-   : LBrace NL* (importSelector Comma NL*)* (importSelector | UnderScore)? NL* RBrace
+   : LBrace nl0n (importSelector Comma nl0n)* (importSelector | UnderScore)? nl01 RBrace
    ;
 
 importSelector
@@ -503,19 +511,19 @@ dcl
    : Val valDcl
    | Var varDcl
    | Def funDcl
-   | TypeKW NL* typeDcl
+   | TypeKW nl0n typeDcl
    ;
 
 valDcl
-   : ids Colon NL? type_
+   : ids Colon nl01 type_
    ;
 
 varDcl
-   : ids Colon NL? type_
+   : ids Colon nl01 type_
    ;
 
 funDcl
-   : funSig (Colon NL? type_)?
+   : funSig (Colon nl01 type_)?
    ;
 
 funSig
@@ -533,12 +541,12 @@ patVarDef
 def_
    : patVarDef
    | Def funDef
-   | TypeKW NL* typeDef
+   | TypeKW nl0n typeDef
    | tmplDef
    ;
 
 patDef
-   : pattern2 (Comma pattern2)* (Colon NL? type_)? NL? Eq expr
+   : pattern2 (Comma pattern2)* (Colon nl01 type_)? nl01 Eq expr
    ;
 
 varDef
@@ -547,8 +555,8 @@ varDef
    ;
 
 funDef
-   : funSig ((Colon NL? type_)? Eq (Macro? expr | Macro qualId funTypeParamClause?) | NL? LBrace block RBrace)
-   | This paramClause paramClauses (Eq constrExpr | NL? constrBlock)
+   : funSig ((Colon nl01 type_)? Eq (Macro? expr | Macro qualId funTypeParamClause?) | nl01 LBrace block RBrace)
+   | This paramClause paramClauses (Eq constrExpr | nl01 constrBlock)
    ;
 
 typeDef
@@ -561,7 +569,7 @@ tmplDef
    ;
 
 classDef
-   : identifier typeParamClause? constrAnnotation* accessModifier? classParamClauses NL? classTemplateOpt?
+   : identifier typeParamClause? constrAnnotation* accessModifier? classParamClauses nl01 classTemplateOpt?
    ;
 
 traitDef
@@ -601,11 +609,11 @@ constr
    ;
 
 earlyDefs
-   : LBrace (earlyDef (semi earlyDef)*)? RBrace With
+   : LBrace (earlyDef (semi1 earlyDef)*)? RBrace With
    ;
 
 earlyDef
-   : (annotation NL?)* (modifier NL?)* patVarDef
+   : (annotation nl01)* (modifier nl01)* patVarDef
    ;
 
 constrExpr
@@ -614,7 +622,8 @@ constrExpr
    ;
 
 constrBlock
-   : LBrace selfInvocation (semi blockStat?)* RBrace
+//   : LBrace selfInvocation (semi1 blockStat?)* RBrace
+   : LBrace selfInvocation ((SemiColon blockStat? | nl1n blockStat)* | nl1n) RBrace
    ;
 
 selfInvocation
@@ -622,29 +631,24 @@ selfInvocation
    ;
 
 topStatSeq
-   : topStat ( semi+ topStat)* semi?
+   : topStat ( semi1n topStat)* semi01
    ;
 
 topStat
-   : (annotation NL?)* (modifier NL?)* tmplDef
+   : (annotation nl01)* (modifier nl01)* tmplDef
    | import_
    | packageObject
    | packaging
    ;
 
 packaging
-   : Package qualId NL? LBrace NL* topStatSeq? RBrace
+   : Package qualId nl01 LBrace nl0n topStatSeq? RBrace
    ;
 
 packageObject
    : Package Object objectDef
    ;
 
-compilationUnit
-   : (Package qualId semi)* topStatSeq? semi* EOF
-   ;
-
-// Inspired from the logic of CSharp's grammar
 interpolatedString
    : interpolatedStringSingleLine
    | interpolatedStringMultiLine
@@ -759,7 +763,13 @@ operator
       )+
    ;
 
-semi
+semi1
    : SemiColon
-   | NL+
+   | nl1n
    ;
+semi0n : SemiColon*;
+semi01 : SemiColon?;
+semi1n : SemiColon*;
+nl01 : ;
+nl0n : ;
+nl1n : ;
