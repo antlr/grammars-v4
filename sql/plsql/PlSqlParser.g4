@@ -4627,7 +4627,7 @@ alter_role
 
 role_identified_clause
     : NOT IDENTIFIED
-    | IDENTIFIED ( BY VALUES? identifier
+    | IDENTIFIED ( BY identifier
                  | USING identifier ('.' id_expression)?
                  | EXTERNALLY
                  | GLOBALLY (AS CHAR_STRING)?
