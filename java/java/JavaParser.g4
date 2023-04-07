@@ -603,6 +603,13 @@ expression
     | methodCall
     | NEW creator
     | '(' annotation* typeType ('&' typeType)* ')' expression
+    | lambdaExpression // Java8
+    | switchExpression // Java17
+    // Java 8 methodReference
+    | expression '::' typeArguments? identifier
+    | typeType '::' (typeArguments? identifier | NEW)
+    | classType '::' typeArguments? NEW
+    // Operators
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -621,13 +628,6 @@ expression
     | <assoc=right> expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
-    | lambdaExpression // Java8
-    | switchExpression // Java17
-
-    // Java 8 methodReference
-    | expression '::' typeArguments? identifier
-    | typeType '::' (typeArguments? identifier | NEW)
-    | classType '::' typeArguments? NEW
     ;
 
 // Java17
