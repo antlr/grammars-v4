@@ -609,6 +609,7 @@ expression
     | expression '::' typeArguments? identifier
     | typeType '::' (typeArguments? identifier | NEW)
     | classType '::' typeArguments? NEW
+    // Operators
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
