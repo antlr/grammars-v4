@@ -1165,7 +1165,7 @@ table_column_action
     ;
 
 inline_constraint :
-    ( NOT NULL_ )?
+    null_not_null?
     ( CONSTRAINT id_ )?
     ( UNIQUE | PRIMARY KEY | ( ( FOREIGN KEY )? REFERENCES object_name ( '(' column_name ')' )? ) )
     constraint_properties?
@@ -1968,9 +1968,9 @@ format_type_options
     | TIMESTAMP_FORMAT EQ (string | AUTO)
     | BINARY_FORMAT EQ (HEX | BASE64 | UTF8)
     | ESCAPE EQ (character | NONE | NONE_Q )
-    | ESCAPE_UNENCLOSED_FIELD EQ (character | NONE | NONE_Q )
+    | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (character | NONE | NONE_Q)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q)
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
@@ -3340,6 +3340,7 @@ keyword
     | ROLLUP
     | AT_KEYWORD
     | TIMESTAMP
+    | IF
     // etc
     ;
 
@@ -3363,6 +3364,7 @@ non_reserved_words
     | ROW_NUMBER
     | VALUE
     | NAME
+    | TAG
     ;
 
 builtin_function
@@ -3451,9 +3453,11 @@ expr
     | iff_expr
     | full_column_name
     | bracket_expression
-    | op=('+' | '-') expr
+    | op=( PLUS | MINUS ) expr
+    | op=NOT expr
     | expr op=(STAR | DIVIDE | MODULE) expr
     | expr op=(PLUS | MINUS | PIPE_PIPE) expr
+    | expr op=( AND | OR | NOT ) expr //bool operation
     | expr LSB expr RSB //array access
     | arr_literal
 //    | expr time_zone
@@ -3471,6 +3475,8 @@ expr
     | try_cast_expr
     | object_name DOT NEXTVAL
     | trim_expression
+    | expr comparison_operator expr
+    | expr IS null_not_null
     ;
 
 iff_expr
@@ -3629,8 +3635,8 @@ full_column_name
     ;
 
 bracket_expression
-    : '(' expr ')'
-    | '(' subquery ')'
+    : LR_BRACKET expr RR_BRACKET
+    | LR_BRACKET subquery RR_BRACKET
     ;
 
 case_expression

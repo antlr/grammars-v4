@@ -175,7 +175,8 @@ SUBQUERY_RANGE
 TIME_RANGE
     : LEFT_BRACKET DURATION RIGHT_BRACKET;
 
-DURATION: [0-9]+ [smhdwy];
+// The proper order (longest to the shortest) must be validated after parsing
+DURATION: ([0-9]+ ('ms' | [smhdwy]))+;
 
 METRIC_NAME: [a-z_:] [a-z0-9_:]*;
 LABEL_NAME:  [a-z_] [a-z0-9_]*;
