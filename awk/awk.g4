@@ -28,10 +28,10 @@ item_list
 	: (item terminator)*
 	;
 item
-	: action
-	| pattern action
+	: action_
+	| pattern action_
 	| normal_pattern
-	| FUNCTION func_name '(' param_list_opt ')' newline_opt action
+	| FUNCTION func_name '(' param_list_opt ')' newline_opt action_
 	;
 param_list_opt
 	: param_list?
@@ -50,7 +50,7 @@ special_pattern
 	: BEGIN
 	| END
 	;
-action
+action_
 	: '{' newline_opt (terminated_statement_list | unterminated_statement_list)? '}'
 	;
 terminator
@@ -65,7 +65,7 @@ unterminated_statement_list
 	: terminated_statement* unterminated_statement
 	;
 terminated_statement
-	: action newline_opt
+	: action_ newline_opt
 	| IF '(' expr ')' newline_opt terminated_statement (ELSE newline_opt terminated_statement)?
 	| WHILE '(' expr ')' newline_opt terminated_statement
 	| FOR '(' simple_statement_opt ';' expr_opt ';' simple_statement_opt ')' newline_opt terminated_statement
@@ -303,9 +303,17 @@ COMMENT : '#' .*? NEWLINE -> channel(HIDDEN) ;
 ERE : '/' (~[/\\\r\n] | ESCAPE_SEQUENCE)* '/' ;
 ESC_NEWLINE : '\\' NEWLINE -> skip ;
 NEWLINE : '\r'? '\n' ;
-NUMBER : '-'? [0-9]+ ('.' [0-9]+)? ;
+NUMBER : DECIMAL_CONSTANT | FLOAT_CONSTANT | HEX_CONSTANT | OCTAL_CONSTANT ;
 SPACE : [ \t]+ -> skip ;
 STRING : '"' (~["\\\r\n] | ESCAPE_SEQUENCE)* '"' ;
 WORD : [A-Za-z_] [A-Za-z_0-9]* ;
 
-fragment ESCAPE_SEQUENCE : '\\' . ;
+fragment DECIMAL_CONSTANT : [1-9] [0-9]* ;
+fragment DIGIT_SEQUENCE : [0-9]+ ;
+fragment ESCAPE_SEQUENCE : '\\' (HEX_NUMBER | OCTAL_NUMBER | .) ;
+fragment EXPONENT_PART : [eE] [+\-]? DIGIT_SEQUENCE ;
+fragment FLOAT_CONSTANT : DIGIT_SEQUENCE '.' DIGIT_SEQUENCE EXPONENT_PART? | DIGIT_SEQUENCE EXPONENT_PART ;
+fragment HEX_CONSTANT : '0' [xX] [0-9A-Fa-f]+ ;
+fragment HEX_NUMBER : [xX] [0-9A-Fa-f] [0-9A-Fa-f]? ;
+fragment OCTAL_CONSTANT : '0' [0-7]* ;
+fragment OCTAL_NUMBER : [0-7] [0-7]? [0-7]? ;
