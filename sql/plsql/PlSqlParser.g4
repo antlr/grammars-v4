@@ -8773,6 +8773,7 @@ non_reserved_keywords_pre12c
     | SQLLDR
     | SQL
     | SQL_TRACE
+    | SQL_MACRO
     | SQRT
     | STALE
     | STANDALONE
