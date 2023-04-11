@@ -1655,6 +1655,7 @@ SQLDATA:                      'SQLDATA';
 SQLERROR:                     'SQLERROR';
 SQLLDR:                       'SQLLDR';
 SQL:                          'SQL';
+SQL_MACRO:                    'SQL_MACRO';
 SQL_TRACE:                    'SQL_TRACE';
 SQL_TRANSLATION_PROFILE:      'SQL_TRANSLATION_PROFILE';
 SQRT:                         'SQRT';
