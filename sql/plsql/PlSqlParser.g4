@@ -491,7 +491,7 @@ create_function_body
     ;
 
 sql_macro_body
-    : SQL_MACRO IS BEGIN RETURN CHAR_STRING_PERL SEMICOLON END
+    : SQL_MACRO IS BEGIN RETURN Q_STR_BLOCK SEMICOLON END
     ;
 
 // Creation Function - Specific Clauses
