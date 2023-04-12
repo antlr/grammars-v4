@@ -491,7 +491,7 @@ create_function_body
     ;
 
 sql_macro_body
-    : SQL_MACRO IS BEGIN RETURN Q_STR_BLOCK SEMICOLON END
+    : SQL_MACRO IS BEGIN RETURN quoted_string SEMICOLON END
     ;
 
 // Creation Function - Specific Clauses
@@ -6208,6 +6208,7 @@ atom
     | general_element
     | '(' subquery ')' subquery_operation_part*
     | '(' expressions ')'
+    | quoted_string
     ;
 
 quantified_expression

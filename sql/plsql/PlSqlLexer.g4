@@ -2383,7 +2383,6 @@ APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? 
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
-Q_STR_BLOCK: 'Q' CHAR_STRING ;
 CHAR_STRING: CHAR_STRING_FRAGMENT;
 fragment CHAR_STRING_FRAGMENT: '\''  (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
 
