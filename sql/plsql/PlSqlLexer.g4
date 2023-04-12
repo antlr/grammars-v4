@@ -1655,6 +1655,7 @@ SQLDATA:                      'SQLDATA';
 SQLERROR:                     'SQLERROR';
 SQLLDR:                       'SQLLDR';
 SQL:                          'SQL';
+SQL_MACRO:                    'SQL_MACRO';
 SQL_TRACE:                    'SQL_TRACE';
 SQL_TRANSLATION_PROFILE:      'SQL_TRANSLATION_PROFILE';
 SQRT:                         'SQRT';
@@ -2378,6 +2379,7 @@ PERIOD:         '.';
 
 UNSIGNED_INTEGER:    [0-9]+;
 APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? ('D' | 'F')?;
+
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
