@@ -1,7 +1,7 @@
 
 /** Taken from "The Definitive ANTLR 4 Reference" by Terence Parr */
 
-// Derived from http://json.org
+// Derived from https://json.org
 grammar JSON;
 
 json
@@ -64,13 +64,15 @@ NUMBER
 
 
 fragment INT
+   // integer part forbis leading 0s (e.g. `01`)
    : '0' | [1-9] [0-9]*
    ;
 
 // no leading zeros
 
 fragment EXP
-   : [Ee] [+\-]? INT
+   // exponent number permits leading 0s (e.g. `1e01`)
+   : [Ee] [+\-]? [0-9]+
    ;
 
 // \- since - means "range" inside [...]
