@@ -37,7 +37,7 @@ attribute
 
 // LEXER RULES
 
-INTEGER : '-'? ( DIGIT )+;
+INTEGER : '-'? DIGIT+;
 DECIMAL : INTEGER ( '.' DIGIT* )?;
 
 // Unknown behaviour: What if I want to escape a quote?
