@@ -52,8 +52,8 @@ COMMA : ',';
 OPEN_BRACE : '{';
 CLOSE_BRACE : '}';
 
-COMMENT : ';' NON_NL* NL -> skip;
+COMMENT : ';' NON_NL* NL -> channel(HIDDEN);
 
-WS : ( ' ' | '\t' | NL )+ -> skip;
+WS : ( ' ' | '\t' | NL )+ -> channel(HIDDEN);
 NL : '\r' '\n'? | '\n';
 NON_NL : ~[\r\n];
