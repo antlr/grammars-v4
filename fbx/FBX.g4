@@ -41,7 +41,7 @@ INTEGER : '-'? ( DIGIT )+;
 DECIMAL : INTEGER ( '.' DIGIT* )?;
 
 // Unknown behaviour: What if I want to escape a quote?
-STRING : '"' ~["] '"';
+STRING : '"' ~'"'* '"';
 
 IDENTIFIER : ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' )+;
 
