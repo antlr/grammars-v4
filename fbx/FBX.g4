@@ -55,5 +55,5 @@ CLOSE_BRACE : '}';
 COMMENT : ';' NON_NL* NL -> skip;
 
 WS : ( ' ' | '\t' | NL )+ -> skip;
-NL : ( '\r' '\n'? | '\n' );
+NL : '\r' '\n'? | '\n';
 NON_NL : ~[\r\n];
