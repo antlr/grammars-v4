@@ -39,11 +39,12 @@ compilationUnit
     ;
 
 packageDeclaration
-    : annotation* PACKAGE qualifiedName ';'+
+    : annotation* PACKAGE qualifiedName ';'
     ;
 
 importDeclaration
-    : IMPORT STATIC? qualifiedName ('.' '*')? ';'+
+    : IMPORT STATIC? qualifiedName ('.' '*')? ';'
+    | ';'
     ;
 
 typeDeclaration
