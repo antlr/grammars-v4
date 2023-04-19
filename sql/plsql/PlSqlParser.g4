@@ -6133,6 +6133,7 @@ concatenation
 interval_expression
     : DAY ('(' concatenation ')')? TO SECOND ('(' concatenation ')')?
     | YEAR ('(' concatenation ')')? TO MONTH
+    | concatenation (SECOND | DAY | MONTH | YEAR)
     ;
 
 model_expression
@@ -6398,6 +6399,7 @@ other_function
       '(' (DOCUMENT | CONTENT) concatenation (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
       ('.' general_element_part)?
+    | TIME CHAR_STRING
     | xmltable
     ;
 
