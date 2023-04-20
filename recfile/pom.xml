@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>recfile</artifactId>
+	<packaging>jar</packaging>
+	<name>khubla.com recfile grammar</name>
+	<parent>
+		<groupId>org.antlr.grammars</groupId>
+		<artifactId>grammarsv4</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr.version}</version>
+				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
+					<includes>
+					   <include>recfile.g4</include>
+					</includes>
+					<visitor>true</visitor>
+					<listener>true</listener>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.khubla.antlr</groupId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
+				<configuration>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
+					<entryPoint>file_</entryPoint>
+					<grammarName>recfile</grammarName>
+					<packageName></packageName>
+					<exampleFiles>examples/</exampleFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

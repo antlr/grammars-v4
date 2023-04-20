@@ -1,0 +1,555 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling fluidsGL.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a08160)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"fluidsGL.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\fluidsgl\fluidsGL_kernels.h"
+	.file	17	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\fluidsgl\fluidsGL_kernels.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+	.tex .u32 texref;
+
+	.entry _Z11addForces_kP6float2iiiiffij (
+		.param .u32 __cudaparm__Z11addForces_kP6float2iiiiffij_v,
+		.param .s32 __cudaparm__Z11addForces_kP6float2iiiiffij_dx,
+		.param .s32 __cudaparm__Z11addForces_kP6float2iiiiffij_dy,
+		.param .s32 __cudaparm__Z11addForces_kP6float2iiiiffij_spx,
+		.param .s32 __cudaparm__Z11addForces_kP6float2iiiiffij_spy,
+		.param .f32 __cudaparm__Z11addForces_kP6float2iiiiffij_fx,
+		.param .f32 __cudaparm__Z11addForces_kP6float2iiiiffij_fy,
+		.param .s32 __cudaparm__Z11addForces_kP6float2iiiiffij_r,
+		.param .u32 __cudaparm__Z11addForces_kP6float2iiiiffij_pitch)
+	{
+	.reg .u32 %r<24>;
+	.reg .f32 %f<14>;
+	.loc	17	64	0
+$LDWbegin__Z11addForces_kP6float2iiiiffij:
+	.loc	17	74	0
+	cvt.s32.u16 	%r1, %tid.x;
+	mul24.lo.u32 	%r2, %r1, 8;
+	cvt.s32.u16 	%r3, %tid.y;
+	ld.param.s32 	%r4, [__cudaparm__Z11addForces_kP6float2iiiiffij_spy];
+	add.s32 	%r5, %r4, %r3;
+	ld.param.u32 	%r6, [__cudaparm__Z11addForces_kP6float2iiiiffij_spx];
+	mul.lo.u32 	%r7, %r6, 8;
+	ld.param.s32 	%r8, [__cudaparm__Z11addForces_kP6float2iiiiffij_r];
+	sub.s32 	%r9, %r3, %r8;
+	sub.s32 	%r10, %r1, %r8;
+	ld.param.u32 	%r11, [__cudaparm__Z11addForces_kP6float2iiiiffij_pitch];
+	mul.lo.u32 	%r12, %r5, %r11;
+	mul.lo.s32 	%r13, %r9, %r9;
+	mul.lo.s32 	%r14, %r10, %r10;
+	add.u32 	%r15, %r2, %r12;
+	mul.lo.s32 	%r16, %r9, %r13;
+	mul.lo.s32 	%r17, %r10, %r14;
+	ld.param.u32 	%r18, [__cudaparm__Z11addForces_kP6float2iiiiffij_v];
+	add.u32 	%r19, %r18, %r15;
+	mul.lo.s32 	%r20, %r9, %r16;
+	mul.lo.s32 	%r21, %r10, %r17;
+	add.u32 	%r22, %r7, %r19;
+	cvt.rn.f32.s32 	%f1, %r20;
+	cvt.rn.f32.s32 	%f2, %r21;
+	mov.f32 	%f3, 0f3f800000;     	// 1
+	add.f32 	%f4, %f2, %f3;
+	add.f32 	%f5, %f1, %f4;
+	rcp.approx.f32 	%f6, %f5;
+	ld.global.v2.f32 	{%f7,%f8}, [%r22+0];
+	ld.param.f32 	%f9, [__cudaparm__Z11addForces_kP6float2iiiiffij_fy];
+	mad.f32 	%f10, %f9, %f6, %f8;
+	.loc	17	75	0
+	ld.param.f32 	%f11, [__cudaparm__Z11addForces_kP6float2iiiiffij_fx];
+	mad.f32 	%f12, %f11, %f6, %f7;
+	st.global.v2.f32 	[%r22+0], {%f12,%f10};
+	.loc	17	76	0
+	exit;
+$LDWend__Z11addForces_kP6float2iiiiffij:
+	} // _Z11addForces_kP6float2iiiiffij
+
+	.entry _Z16advectVelocity_kP6float2PfS1_iiifi (
+		.param .u32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_v,
+		.param .u32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_vx,
+		.param .u32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_vy,
+		.param .s32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dx,
+		.param .s32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_pdx,
+		.param .s32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dy,
+		.param .f32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dt,
+		.param .s32 __cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_lb)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<28>;
+	.reg .f32 %f<35>;
+	.reg .pred %p<6>;
+	.loc	17	84	0
+$LDWbegin__Z16advectVelocity_kP6float2PfS1_iiifi:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dx];
+	setp.le.s32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_1_2818;
+	ld.param.u32 	%r5, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_lb];
+	mov.u32 	%r6, 0;
+	setp.le.s32 	%p2, %r5, %r6;
+	@%p2 bra 	$Lt_1_3330;
+	ld.param.u32 	%r5, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_lb];
+	mov.s32 	%r7, %r5;
+	cvt.u32.u16 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	cvt.u32.u16 	%r10, %ntid.y;
+	mul.lo.u32 	%r11, %r10, %r5;
+	cvt.u32.u16 	%r12, %ctaid.y;
+	mul.lo.u32 	%r13, %r12, %r11;
+	add.s32 	%r14, %r9, %r13;
+	ld.param.s32 	%r15, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dy];
+	mov.s32 	%r16, 0;
+	mov.s32 	%r17, %r7;
+$Lt_1_3842:
+ //<loop> Loop body line 84, nesting depth: 1, estimated iterations: unknown
+	add.s32 	%r18, %r14, %r16;
+	ld.param.s32 	%r15, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dy];
+	setp.ge.s32 	%p3, %r18, %r15;
+	@%p3 bra 	$Lt_1_4098;
+ //<loop> Part of loop body line 84, head labeled $Lt_1_3842
+	cvt.rn.f32.s32 	%f1, %r3;
+	cvt.rn.f32.s32 	%f2, %r18;
+	mov.f32 	%f3, %f1;
+	mov.f32 	%f4, %f2;
+	mov.f32 	%f5, 0f00000000;     	// 0
+	mov.f32 	%f6, 0f00000000;     	// 0
+	tex.2d.v4.f32.f32 {%f7,%f8,%f9,%f10},[texref,{%f3,%f4,%f5,%f6}];
+ //<loop> Part of loop body line 84, head labeled $Lt_1_3842
+	.loc	17	99	0
+	mov.f32 	%f11, %f7;
+	mov.f32 	%f12, %f8;
+	ld.param.f32 	%f13, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dt];
+	mov.f32 	%f14, 0f3f000000;    	// 0.5
+	add.f32 	%f15, %f1, %f14;
+	.loc	17	84	0
+	ld.param.s32 	%r4, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dx];
+	.loc	17	99	0
+	cvt.rn.f32.s32 	%f16, %r4;
+	mul.f32 	%f17, %f11, %f13;
+	mul.f32 	%f18, %f16, %f17;
+	sub.f32 	%f19, %f15, %f18;
+	mov.f32 	%f20, 0f3f000000;    	// 0.5
+	add.f32 	%f21, %f2, %f20;
+	.loc	17	84	0
+	ld.param.s32 	%r15, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_dy];
+	.loc	17	99	0
+	cvt.rn.f32.s32 	%f22, %r15;
+	mul.f32 	%f23, %f12, %f13;
+	mul.f32 	%f24, %f22, %f23;
+	sub.f32 	%f25, %f21, %f24;
+	mov.f32 	%f26, 0f00000000;    	// 0
+	mov.f32 	%f27, 0f00000000;    	// 0
+	tex.2d.v4.f32.f32 {%f28,%f29,%f30,%f31},[texref,{%f19,%f25,%f26,%f27}];
+ //<loop> Part of loop body line 84, head labeled $Lt_1_3842
+	.loc	17	102	0
+	mov.f32 	%f32, %f28;
+	mov.f32 	%f33, %f29;
+	.loc	17	104	0
+	ld.param.s32 	%r19, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_pdx];
+	mul.lo.s32 	%r20, %r19, %r18;
+	add.s32 	%r21, %r20, %r3;
+	mul.lo.u32 	%r22, %r21, 4;
+	ld.param.u32 	%r23, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_vx];
+	add.u32 	%r24, %r23, %r22;
+	st.global.f32 	[%r24+0], %f32;
+	.loc	17	105	0
+	ld.param.u32 	%r25, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_vy];
+	add.u32 	%r26, %r25, %r22;
+	st.global.f32 	[%r26+0], %f33;
+$Lt_1_4098:
+ //<loop> Part of loop body line 84, head labeled $Lt_1_3842
+	add.s32 	%r16, %r16, 1;
+	.loc	17	84	0
+	ld.param.u32 	%r5, [__cudaparm__Z16advectVelocity_kP6float2PfS1_iiifi_lb];
+	.loc	17	105	0
+	setp.ne.s32 	%p4, %r16, %r5;
+	@%p4 bra 	$Lt_1_3842;
+$Lt_1_3330:
+$Lt_1_2818:
+	.loc	17	109	0
+	exit;
+$LDWend__Z16advectVelocity_kP6float2PfS1_iiifi:
+	} // _Z16advectVelocity_kP6float2PfS1_iiifi
+
+	.entry _Z16diffuseProject_kP6float2S0_iiffi (
+		.param .u32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_vx,
+		.param .u32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_vy,
+		.param .s32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dx,
+		.param .s32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dy,
+		.param .f32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dt,
+		.param .f32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_visc,
+		.param .s32 __cudaparm__Z16diffuseProject_kP6float2S0_iiffi_lb)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<37>;
+	.reg .f32 %f<31>;
+	.reg .pred %p<8>;
+	.loc	17	121	0
+$LDWbegin__Z16diffuseProject_kP6float2S0_iiffi:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dx];
+	setp.le.s32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_2_4354;
+	ld.param.u32 	%r5, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_lb];
+	mov.u32 	%r6, 0;
+	setp.le.s32 	%p2, %r5, %r6;
+	@%p2 bra 	$Lt_2_4866;
+	ld.param.u32 	%r5, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_lb];
+	mov.s32 	%r7, %r5;
+	cvt.u32.u16 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	cvt.u32.u16 	%r10, %ntid.y;
+	mul.lo.u32 	%r11, %r10, %r5;
+	cvt.u32.u16 	%r12, %ctaid.y;
+	mul.lo.u32 	%r13, %r12, %r11;
+	add.s32 	%r14, %r9, %r13;
+	ld.param.s32 	%r15, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dy];
+	mov.s32 	%r16, 0;
+	mov.s32 	%r17, %r7;
+$Lt_2_5378:
+ //<loop> Loop body line 121, nesting depth: 1, estimated iterations: unknown
+	add.s32 	%r18, %r14, %r16;
+	ld.param.s32 	%r15, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dy];
+	setp.ge.s32 	%p3, %r18, %r15;
+	@%p3 bra 	$Lt_2_5634;
+ //<loop> Part of loop body line 121, head labeled $Lt_2_5378
+	ld.param.s32 	%r15, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dy];
+	.loc	17	146	0
+	shr.s32 	%r19, %r15, 31;
+	mov.s32 	%r20, 1;
+	and.b32 	%r21, %r19, %r20;
+	add.s32 	%r22, %r21, %r15;
+	shr.s32 	%r23, %r22, 1;
+	ld.param.f32 	%f1, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dt];
+	ld.param.f32 	%f2, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_visc];
+	mul.f32 	%f3, %f1, %f2;
+	mul.lo.s32 	%r24, %r3, %r3;
+	.loc	17	121	0
+	ld.param.s32 	%r4, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_dx];
+	.loc	17	146	0
+	mul.lo.s32 	%r25, %r18, %r4;
+	setp.lt.s32 	%p4, %r23, %r18;
+	sub.s32 	%r26, %r18, %r15;
+	add.s32 	%r27, %r25, %r3;
+	selp.s32 	%r28, %r26, %r18, %p4;
+	mul.lo.u32 	%r29, %r27, 8;
+	mul.lo.s32 	%r30, %r28, %r28;
+	ld.param.u32 	%r31, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_vx];
+	add.u32 	%r32, %r31, %r29;
+	add.s32 	%r33, %r24, %r30;
+	cvt.rn.f32.s32 	%f4, %r33;
+	mov.f32 	%f5, 0f3f800000;     	// 1
+	mad.f32 	%f6, %f4, %f3, %f5;
+	rcp.approx.f32 	%f7, %f6;
+	ld.global.v2.f32 	{%f8,%f9}, [%r32+0];
+	mul.f32 	%f10, %f8, %f7;
+	mul.f32 	%f11, %f9, %f7;
+	.loc	17	147	0
+	ld.param.u32 	%r34, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_vy];
+	add.u32 	%r35, %r34, %r29;
+	ld.global.v2.f32 	{%f12,%f13}, [%r35+0];
+	mul.f32 	%f14, %f12, %f7;
+	mul.f32 	%f15, %f13, %f7;
+	mov.f32 	%f16, 0f00000000;    	// 0
+	setp.gt.f32 	%p5, %f4, %f16;
+	@!%p5 bra 	$Lt_2_6146;
+ //<loop> Part of loop body line 121, head labeled $Lt_2_5378
+	.loc	17	153	0
+	cvt.rn.f32.s32 	%f17, %r3;
+	cvt.rn.f32.s32 	%f18, %r28;
+	mul.f32 	%f19, %f18, %f14;
+	mad.f32 	%f20, %f17, %f10, %f19;
+	.loc	17	155	0
+	mul.f32 	%f21, %f18, %f15;
+	mad.f32 	%f22, %f17, %f11, %f21;
+	.loc	17	156	0
+	rcp.approx.f32 	%f23, %f4;
+	mul.f32 	%f24, %f20, %f23;
+	mul.f32 	%f25, %f17, %f24;
+	sub.f32 	%f10, %f10, %f25;
+	.loc	17	157	0
+	mul.f32 	%f26, %f22, %f23;
+	mul.f32 	%f27, %f17, %f26;
+	sub.f32 	%f11, %f11, %f27;
+	.loc	17	158	0
+	mul.f32 	%f28, %f18, %f24;
+	sub.f32 	%f14, %f14, %f28;
+	.loc	17	159	0
+	mul.f32 	%f29, %f18, %f26;
+	sub.f32 	%f15, %f15, %f29;
+$Lt_2_6146:
+ //<loop> Part of loop body line 121, head labeled $Lt_2_5378
+	st.global.v2.f32 	[%r32+0], {%f10,%f11};
+	st.global.v2.f32 	[%r35+0], {%f14,%f15};
+$Lt_2_5634:
+ //<loop> Part of loop body line 121, head labeled $Lt_2_5378
+	.loc	17	163	0
+	add.s32 	%r16, %r16, 1;
+	.loc	17	121	0
+	ld.param.u32 	%r5, [__cudaparm__Z16diffuseProject_kP6float2S0_iiffi_lb];
+	.loc	17	163	0
+	setp.ne.s32 	%p6, %r16, %r5;
+	@%p6 bra 	$Lt_2_5378;
+$Lt_2_4866:
+$Lt_2_4354:
+	.loc	17	167	0
+	exit;
+$LDWend__Z16diffuseProject_kP6float2S0_iiffi:
+	} // _Z16diffuseProject_kP6float2S0_iiffi
+
+	.entry _Z16updateVelocity_kP6float2PfS1_iiiij (
+		.param .u32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_v,
+		.param .u32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_vx,
+		.param .u32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_vy,
+		.param .s32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dx,
+		.param .s32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_pdx,
+		.param .s32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dy,
+		.param .s32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_lb,
+		.param .u32 __cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_pitch)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<35>;
+	.reg .f32 %f<8>;
+	.reg .pred %p<6>;
+	.loc	17	174	0
+$LDWbegin__Z16updateVelocity_kP6float2PfS1_iiiij:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dx];
+	setp.le.s32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_3_2818;
+	ld.param.u32 	%r5, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_lb];
+	mov.u32 	%r6, 0;
+	setp.le.s32 	%p2, %r5, %r6;
+	@%p2 bra 	$Lt_3_3330;
+	ld.param.u32 	%r5, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_lb];
+	mov.s32 	%r7, %r5;
+	cvt.u32.u16 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	cvt.u32.u16 	%r10, %ntid.y;
+	mul.lo.u32 	%r11, %r10, %r5;
+	cvt.u32.u16 	%r12, %ctaid.y;
+	mul.lo.u32 	%r13, %r12, %r11;
+	add.s32 	%r14, %r9, %r13;
+	ld.param.s32 	%r15, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dy];
+	mov.s32 	%r16, 0;
+	mov.s32 	%r17, %r7;
+$Lt_3_3842:
+ //<loop> Loop body line 174, nesting depth: 1, estimated iterations: unknown
+	add.s32 	%r18, %r14, %r16;
+	ld.param.s32 	%r15, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dy];
+	setp.ge.s32 	%p3, %r18, %r15;
+	@%p3 bra 	$Lt_3_4098;
+ //<loop> Part of loop body line 174, head labeled $Lt_3_3842
+	.loc	17	190	0
+	ld.param.s32 	%r19, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_pdx];
+	mul.lo.s32 	%r20, %r19, %r18;
+	add.s32 	%r21, %r20, %r3;
+	mul.lo.u32 	%r22, %r21, 4;
+	ld.param.u32 	%r23, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_vy];
+	add.u32 	%r24, %r23, %r22;
+	ld.global.f32 	%f1, [%r24+0];
+	.loc	17	174	0
+	ld.param.s32 	%r15, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dy];
+	ld.param.s32 	%r4, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_dx];
+	.loc	17	198	0
+	mul.lo.s32 	%r25, %r15, %r4;
+	cvt.rn.f32.s32 	%f2, %r25;
+	mul.lo.u32 	%r26, %r3, 8;
+	rcp.approx.f32 	%f3, %f2;
+	ld.param.u32 	%r27, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_pitch];
+	mul.lo.u32 	%r28, %r18, %r27;
+	add.u32 	%r29, %r26, %r28;
+	ld.param.u32 	%r30, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_v];
+	add.u32 	%r31, %r30, %r29;
+	ld.param.u32 	%r32, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_vx];
+	add.u32 	%r33, %r32, %r22;
+	ld.global.f32 	%f4, [%r33+0];
+	mul.f32 	%f5, %f4, %f3;
+	mul.f32 	%f6, %f3, %f1;
+	st.global.v2.f32 	[%r31+0], {%f5,%f6};
+$Lt_3_4098:
+ //<loop> Part of loop body line 174, head labeled $Lt_3_3842
+	add.s32 	%r16, %r16, 1;
+	.loc	17	174	0
+	ld.param.u32 	%r5, [__cudaparm__Z16updateVelocity_kP6float2PfS1_iiiij_lb];
+	.loc	17	198	0
+	setp.ne.s32 	%p4, %r16, %r5;
+	@%p4 bra 	$Lt_3_3842;
+$Lt_3_3330:
+$Lt_3_2818:
+	.loc	17	202	0
+	exit;
+$LDWend__Z16updateVelocity_kP6float2PfS1_iiiij:
+	} // _Z16updateVelocity_kP6float2PfS1_iiiij
+
+	.entry _Z17advectParticles_kP6float2S0_iifij (
+		.param .u32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_part,
+		.param .u32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_v,
+		.param .s32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_dx,
+		.param .s32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_dy,
+		.param .f32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_dt,
+		.param .s32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_lb,
+		.param .u32 __cudaparm__Z17advectParticles_kP6float2S0_iifij_pitch)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<40>;
+	.reg .f32 %f<25>;
+	.reg .pred %p<6>;
+	.local .align 8 .b8 __cuda___cuda_local_var_522011_18_vterm_168[8];
+	.loc	17	209	0
+$LDWbegin__Z17advectParticles_kP6float2S0_iifij:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %tid.x;
+	add.u32 	%r3, %r2, %r1;
+	ld.param.s32 	%r4, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dx];
+	setp.le.s32 	%p1, %r4, %r3;
+	@%p1 bra 	$Lt_4_2818;
+	ld.param.u32 	%r5, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_lb];
+	mov.u32 	%r6, 0;
+	setp.le.s32 	%p2, %r5, %r6;
+	@%p2 bra 	$Lt_4_3330;
+	ld.param.u32 	%r5, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_lb];
+	mov.s32 	%r7, %r5;
+	cvt.u32.u16 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	cvt.u32.u16 	%r10, %ntid.y;
+	mul.lo.u32 	%r11, %r10, %r5;
+	cvt.u32.u16 	%r12, %ctaid.y;
+	mul.lo.u32 	%r13, %r12, %r11;
+	add.s32 	%r14, %r9, %r13;
+	ld.param.s32 	%r15, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dy];
+	mov.s32 	%r16, 0;
+	mov.s32 	%r17, %r7;
+$Lt_4_3842:
+ //<loop> Loop body line 209, nesting depth: 1, estimated iterations: unknown
+	add.s32 	%r18, %r14, %r16;
+	ld.param.s32 	%r15, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dy];
+	setp.ge.s32 	%p3, %r18, %r15;
+	@%p3 bra 	$Lt_4_4098;
+ //<loop> Part of loop body line 209, head labeled $Lt_4_3842
+	ld.param.s32 	%r4, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dx];
+	.loc	17	223	0
+	mul.lo.s32 	%r19, %r18, %r4;
+	add.s32 	%r20, %r19, %r3;
+	mul.lo.u32 	%r21, %r20, 8;
+	ld.param.u32 	%r22, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_part];
+	add.u32 	%r23, %r22, %r21;
+	ld.global.v2.f32 	{%f1,%f2}, [%r23+0];
+	.loc	17	227	0
+	ld.param.u32 	%r24, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_v];
+	ld.param.u32 	%r25, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_pitch];
+	.loc	17	209	0
+	ld.param.s32 	%r15, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dy];
+	.loc	17	227	0
+	cvt.rn.f32.s32 	%f3, %r15;
+	mul.f32 	%f4, %f3, %f2;
+	cvt.rzi.s32.f32 	%r26, %f4;
+	mul.lo.u32 	%r27, %r25, %r26;
+	cvt.rn.f32.s32 	%f5, %r4;
+	mul.f32 	%f6, %f5, %f1;
+	cvt.rzi.s32.f32 	%r28, %f6;
+	mul.lo.u32 	%r29, %r28, 8;
+	add.u32 	%r30, %r27, %r29;
+	add.u32 	%r31, %r24, %r30;
+	mov.u32 	%r32, __cuda___cuda_local_var_522011_18_vterm_168;
+	ld.global.v2.u32 	{%r33,%r34}, [%r31+0];
+	st.local.u32 	[%r32+0], %r33;
+	st.local.u32 	[%r32+4], %r34;
+	.loc	17	229	0
+	ld.param.f32 	%f7, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_dt];
+	ld.local.f32 	%f8, [__cuda___cuda_local_var_522011_18_vterm_168+0];
+	mad.f32 	%f9, %f7, %f8, %f1;
+	.loc	17	230	0
+	cvt.rzi.s32.f32 	%r35, %f9;
+	cvt.rn.f32.s32 	%f10, %r35;
+	sub.f32 	%f11, %f9, %f10;
+	.loc	17	232	0
+	mov.f32 	%f12, 0f3f800000;    	// 1
+	add.f32 	%f13, %f11, %f12;
+	cvt.rzi.s32.f32 	%r36, %f13;
+	cvt.rn.f32.s32 	%f14, %r36;
+	sub.f32 	%f15, %f13, %f14;
+	.loc	17	233	0
+	ld.local.f32 	%f16, [__cuda___cuda_local_var_522011_18_vterm_168+4];
+	mad.f32 	%f17, %f7, %f16, %f2;
+	.loc	17	234	0
+	cvt.rzi.s32.f32 	%r37, %f17;
+	cvt.rn.f32.s32 	%f18, %r37;
+	sub.f32 	%f19, %f17, %f18;
+	.loc	17	236	0
+	mov.f32 	%f20, 0f3f800000;    	// 1
+	add.f32 	%f21, %f19, %f20;
+	cvt.rzi.s32.f32 	%r38, %f21;
+	cvt.rn.f32.s32 	%f22, %r38;
+	sub.f32 	%f23, %f21, %f22;
+	st.global.v2.f32 	[%r23+0], {%f15,%f23};
+$Lt_4_4098:
+ //<loop> Part of loop body line 209, head labeled $Lt_4_3842
+	.loc	17	238	0
+	add.s32 	%r16, %r16, 1;
+	.loc	17	209	0
+	ld.param.u32 	%r5, [__cudaparm__Z17advectParticles_kP6float2S0_iifij_lb];
+	.loc	17	238	0
+	setp.ne.s32 	%p4, %r16, %r5;
+	@%p4 bra 	$Lt_4_3842;
+$Lt_4_3330:
+$Lt_4_2818:
+	.loc	17	242	0
+	exit;
+$LDWend__Z17advectParticles_kP6float2S0_iifij:
+	} // _Z17advectParticles_kP6float2S0_iifij
+

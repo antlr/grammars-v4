@@ -27,18 +27,18 @@ options
    { tokenVocab = CqlLexer; }
 
 root
-   : cqls? MINUSMINUS? eof
+   : cqls? MINUSMINUS? EOF
    ;
 
 cqls
-   : (cql MINUSMINUS? statementSeparator | empty)* (cql (MINUSMINUS? statementSeparator)? | empty)
+   : (cql MINUSMINUS? statementSeparator | empty_)* (cql (MINUSMINUS? statementSeparator)? | empty_)
    ;
 
 statementSeparator
    : SEMI
    ;
 
-empty
+empty_
    : statementSeparator
    ;
 
@@ -60,7 +60,7 @@ cql
    | createTrigger
    | createType
    | createUser
-   | delete
+   | delete_
    | dropAggregate
    | dropFunction
    | dropIndex
@@ -76,18 +76,14 @@ cql
    | listPermissions
    | listRoles
    | revoke
-   | select
+   | select_
    | truncate
    | update
-   | use
+   | use_
    ;
 
 revoke
    : kwRevoke priviledge kwOn resource kwFrom role
-   ;
-
-listUsers
-   : kwList kwUsers
    ;
 
 listRoles
@@ -117,7 +113,7 @@ priviledge
 resource
    : kwAll kwFunctions
    | kwAll kwFunctions kwIn kwKeyspace keyspace
-   | kwFunction (keyspace DOT)? function
+   | kwFunction (keyspace DOT)? function_
    | kwAll kwKeyspaces
    | kwKeyspace keyspace
    | (kwTable)? (keyspace DOT)? table
@@ -134,7 +130,7 @@ createRole
    ;
 
 createType
-   : kwCreate kwType ifNotExist? (keyspace DOT)? type syntaxBracketLr typeMemberColumnList syntaxBracketRr
+   : kwCreate kwType ifNotExist? (keyspace DOT)? type_ syntaxBracketLr typeMemberColumnList syntaxBracketRr
    ;
 
 typeMemberColumnList
@@ -180,11 +176,12 @@ createKeyspace
    ;
 
 createFunction
-   : kwCreate orReplace? kwFunction ifNotExist? (keyspace DOT)? function syntaxBracketLr paramList? syntaxBracketRr returnMode kwReturns dataType kwLanguage language kwAs codeBlock
+   : kwCreate orReplace? kwFunction ifNotExist? (keyspace DOT)? function_ syntaxBracketLr paramList? syntaxBracketRr returnMode kwReturns dataType kwLanguage language kwAs codeBlock
    ;
 
 codeBlock
    : CODE_BLOCK
+   | STRING_LITERAL
    ;
 
 paramList
@@ -196,7 +193,7 @@ returnMode
    ;
 
 createAggregate
-   : kwCreate orReplace? kwAggregate ifNotExist? (keyspace DOT)? aggregate syntaxBracketLr dataType syntaxBracketRr kwSfunc function kwStype dataType kwFinalfunc function kwInitcond initCondDefinition
+   : kwCreate orReplace? kwAggregate ifNotExist? (keyspace DOT)? aggregate syntaxBracketLr dataType syntaxBracketRr kwSfunc function_ kwStype dataType kwFinalfunc function_ kwInitcond initCondDefinition
    ;
 
 // paramList
@@ -242,7 +239,7 @@ userSuperUser
    ;
 
 alterType
-   : kwAlter kwType (keyspace DOT)? type alterTypeOperation
+   : kwAlter kwType (keyspace DOT)? type_ alterTypeOperation
    ;
 
 alterTypeOperation
@@ -277,7 +274,6 @@ alterTable
 
 alterTableOperation
    : alterTableAdd
-   | alterTableDropColumns
    | alterTableDropColumns
    | alterTableDropCompactStorage
    | alterTableRename
@@ -336,7 +332,7 @@ dropUser
    ;
 
 dropType
-   : kwDrop kwType ifExist? (keyspace DOT)? type
+   : kwDrop kwType ifExist? (keyspace DOT)? type_
    ;
 
 dropMaterializedView
@@ -348,7 +344,7 @@ dropAggregate
    ;
 
 dropFunction
-   : kwDrop kwFunction ifExist? (keyspace DOT)? function
+   : kwDrop kwFunction ifExist? (keyspace DOT)? function_
    ;
 
 dropTrigger
@@ -500,7 +496,7 @@ durableWrites
    : kwDurableWrites OPERATOR_EQ booleanLiteral
    ;
 
-use
+use_
    : kwUse keyspace
    ;
 
@@ -536,7 +532,7 @@ indexFullSpec
    : kwFull syntaxBracketLr OBJECT_NAME syntaxBracketRr
    ;
 
-delete
+delete_
    : beginBatch? kwDelete deleteColumnList? fromSpec usingTimestampSpec? whereSpec (ifExist | ifSpec)?
    ;
 
@@ -586,7 +582,7 @@ assignmentSet
    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (constant syntaxColon constant)* syntaxBracketRc
+   : syntaxBracketLc (constant syntaxColon constant) (syntaxComma constant syntaxColon constant)* syntaxBracketRc
    ;
 
 assignmentList
@@ -594,10 +590,7 @@ assignmentList
    ;
 
 assignmentTuple
-   : syntaxBracketLr (
-         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
-         assignmentTuple (syntaxComma assignmentTuple)*
-     ) syntaxBracketRr
+   : syntaxBracketLr ( expression (syntaxComma expression)* ) syntaxBracketRr
    ;
 
 insert
@@ -650,13 +643,14 @@ expressionList
 
 expression
    : constant
+   | functionCall
    | assignmentMap
    | assignmentSet
    | assignmentList
    | assignmentTuple
    ;
 
-select
+select_
    : kwSelect distinctSpec? kwJson? selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
    ;
 
@@ -730,6 +724,7 @@ relalationContainsKey
 functionCall
    : OBJECT_NAME '(' STAR ')'
    | OBJECT_NAME '(' functionArgs? ')'
+   | K_UUID '(' ')'
    ;
 
 functionArgs
@@ -843,7 +838,7 @@ materializedView
    : OBJECT_NAME
    ;
 
-type
+type_
    : OBJECT_NAME
    ;
 
@@ -851,7 +846,7 @@ aggregate
    : OBJECT_NAME
    ;
 
-function
+function_
    : OBJECT_NAME
    ;
 
@@ -877,6 +872,7 @@ param
 
 paramName
    : OBJECT_NAME
+   | K_INPUT
    ;
 
 kwAdd
@@ -1235,10 +1231,6 @@ kwUser
    : K_USER
    ;
 
-kwUsers
-   : K_USERS
-   ;
-
 kwUsing
    : K_USING
    ;
@@ -1261,10 +1253,6 @@ kwWith
 
 kwRevoke
    : K_REVOKE
-   ;
-
-eof
-   : EOF
    ;
 
 // BRACKETS

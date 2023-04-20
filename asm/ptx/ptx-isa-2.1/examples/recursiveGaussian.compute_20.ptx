@@ -1,0 +1,853 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	.visible .func (.param .u32 __cudaretf__Z14rgbaFloatToInt6float4) _Z14rgbaFloatToInt6float4 (.param .align 16 .b8 __cudaparmf1__Z14rgbaFloatToInt6float4[16])
+
+	.visible .func (.param .align 16 .b8 __cudaretf__Z14rgbaIntToFloatj[16]) _Z14rgbaIntToFloatj (.param .u32 __cudaparmf1__Z14rgbaIntToFloatj)
+
+	//-----------------------------------------------------------
+	// Compiling recursiveGaussian.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a09520)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"recursiveGaussian.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\inc\cutil_math.h"
+	.file	17	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\src\recursiveGaussian\recursiveGaussian_kernel.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+
+	.visible .func (.param .u32 __cudaretf__Z14rgbaFloatToInt6float4) _Z14rgbaFloatToInt6float4 (.param .align 16 .b8 __cudaparmf1__Z14rgbaFloatToInt6float4[16])
+	{
+	.reg .u32 %r<12>;
+	.reg .f32 %f<22>;
+	.loc	17	63	0
+$LDWbegin__Z14rgbaFloatToInt6float4:
+	ld.param.f32 	%f1, [__cudaparmf1__Z14rgbaFloatToInt6float4+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z14rgbaFloatToInt6float4+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z14rgbaFloatToInt6float4+8];
+	mov.f32 	%f6, %f5;
+	ld.param.f32 	%f7, [__cudaparmf1__Z14rgbaFloatToInt6float4+12];
+	mov.f32 	%f8, %f7;
+	.loc	17	64	0
+	cvt.sat.f32.f32 	%f9, %f2;
+	.loc	17	65	0
+	cvt.sat.f32.f32 	%f10, %f4;
+	.loc	17	66	0
+	cvt.sat.f32.f32 	%f11, %f6;
+	.loc	17	67	0
+	cvt.sat.f32.f32 	%f12, %f8;
+	.loc	17	68	0
+	mov.f32 	%f13, 0f437f0000;    	// 255
+	mul.f32 	%f14, %f9, %f13;
+	cvt.rzi.u32.f32 	%r1, %f14;
+	mov.f32 	%f15, 0f437f0000;    	// 255
+	mul.f32 	%f16, %f10, %f15;
+	cvt.rzi.u32.f32 	%r2, %f16;
+	shl.b32 	%r3, %r2, 8;
+	or.b32 	%r4, %r1, %r3;
+	mov.f32 	%f17, 0f437f0000;    	// 255
+	mul.f32 	%f18, %f11, %f17;
+	cvt.rzi.u32.f32 	%r5, %f18;
+	shl.b32 	%r6, %r5, 16;
+	mov.f32 	%f19, 0f437f0000;    	// 255
+	mul.f32 	%f20, %f12, %f19;
+	cvt.rzi.u32.f32 	%r7, %f20;
+	shl.b32 	%r8, %r7, 24;
+	or.b32 	%r9, %r6, %r8;
+	or.b32 	%r10, %r4, %r9;
+	st.param.u32 	[__cudaretf__Z14rgbaFloatToInt6float4], %r10;
+	ret;
+$LDWend__Z14rgbaFloatToInt6float4:
+	} // _Z14rgbaFloatToInt6float4
+
+	.visible .func (.param .align 16 .b8 __cudaretf__Z14rgbaIntToFloatj[16]) _Z14rgbaIntToFloatj (.param .u32 __cudaparmf1__Z14rgbaIntToFloatj)
+	{
+	.reg .u32 %r<10>;
+	.reg .f32 %f<14>;
+	.loc	17	73	0
+$LDWbegin__Z14rgbaIntToFloatj:
+	ld.param.u32 	%r1, [__cudaparmf1__Z14rgbaIntToFloatj];
+	mov.s32 	%r2, %r1;
+	.loc	17	79	0
+	and.b32 	%r3, %r2, 255;
+	cvt.rn.f32.u32 	%f1, %r3;
+	mov.f32 	%f2, 0f437f0000;     	// 255
+	div.rn.f32 	%f3, %f1, %f2;
+	st.param.f32 	[__cudaretf__Z14rgbaIntToFloatj+0], %f3;
+	shl.b32 	%r4, %r2, 16;
+	shr.u32 	%r5, %r4, 24;
+	cvt.rn.f32.u32 	%f4, %r5;
+	mov.f32 	%f5, 0f437f0000;     	// 255
+	div.rn.f32 	%f6, %f4, %f5;
+	st.param.f32 	[__cudaretf__Z14rgbaIntToFloatj+4], %f6;
+	shl.b32 	%r6, %r2, 8;
+	shr.u32 	%r7, %r6, 24;
+	cvt.rn.f32.u32 	%f7, %r7;
+	mov.f32 	%f8, 0f437f0000;     	// 255
+	div.rn.f32 	%f9, %f7, %f8;
+	st.param.f32 	[__cudaretf__Z14rgbaIntToFloatj+8], %f9;
+	shr.u32 	%r8, %r2, 24;
+	cvt.rn.f32.u32 	%f10, %r8;
+	mov.f32 	%f11, 0f437f0000;    	// 255
+	div.rn.f32 	%f12, %f10, %f11;
+	st.param.f32 	[__cudaretf__Z14rgbaIntToFloatj+12], %f12;
+	ret;
+$LDWend__Z14rgbaIntToFloatj:
+	} // _Z14rgbaIntToFloatj
+
+	.entry _Z11d_transposePjS_ii (
+		.param .u32 __cudaparm__Z11d_transposePjS_ii_odata,
+		.param .u32 __cudaparm__Z11d_transposePjS_ii_idata,
+		.param .s32 __cudaparm__Z11d_transposePjS_ii_width,
+		.param .s32 __cudaparm__Z11d_transposePjS_ii_height)
+	{
+	.reg .u32 %r<47>;
+	.reg .pred %p<4>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_288227_33_block16[1088];
+	.loc	17	33	0
+$LDWbegin__Z11d_transposePjS_ii:
+	mov.u32 	%r1, %ctaid.x;
+	mul.lo.u32 	%r2, %r1, 16;
+	mov.u32 	%r3, %ctaid.y;
+	mul.lo.u32 	%r4, %r3, 16;
+	mov.u32 	%r5, %tid.x;
+	add.u32 	%r6, %r2, %r5;
+	mov.u32 	%r7, %tid.y;
+	add.u32 	%r8, %r4, %r7;
+	ld.param.u32 	%r9, [__cudaparm__Z11d_transposePjS_ii_height];
+	ld.param.u32 	%r10, [__cudaparm__Z11d_transposePjS_ii_width];
+	set.lt.u32.u32 	%r11, %r6, %r10;
+	neg.s32 	%r12, %r11;
+	set.lt.u32.u32 	%r13, %r8, %r9;
+	neg.s32 	%r14, %r13;
+	and.b32 	%r15, %r12, %r14;
+	mov.u32 	%r16, 0;
+	setp.eq.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_2_2306;
+	.loc	17	43	0
+	mov.u32 	%r17, __cuda___cuda_local_var_288227_33_block16;
+	ld.param.u32 	%r18, [__cudaparm__Z11d_transposePjS_ii_idata];
+	mul.lo.u32 	%r19, %r8, %r10;
+	add.u32 	%r20, %r6, %r19;
+	mul.lo.u32 	%r21, %r20, 4;
+	add.u32 	%r22, %r18, %r21;
+	ld.global.u32 	%r23, [%r22+0];
+	mul.lo.u32 	%r24, %r7, 17;
+	add.u32 	%r25, %r5, %r24;
+	mul.lo.u32 	%r26, %r25, 4;
+	add.u32 	%r27, %r17, %r26;
+	st.shared.u32 	[%r27+0], %r23;
+$Lt_2_2306:
+	mov.u32 	%r17, __cuda___cuda_local_var_288227_33_block16;
+	.loc	17	46	0
+	bar.sync 	0;
+	add.u32 	%r28, %r2, %r7;
+	add.u32 	%r29, %r4, %r5;
+	set.lt.u32.u32 	%r30, %r28, %r10;
+	neg.s32 	%r31, %r30;
+	set.lt.u32.u32 	%r32, %r29, %r9;
+	neg.s32 	%r33, %r32;
+	and.b32 	%r34, %r31, %r33;
+	mov.u32 	%r35, 0;
+	setp.eq.s32 	%p2, %r34, %r35;
+	@%p2 bra 	$Lt_2_2818;
+	.loc	17	54	0
+	mul.lo.u32 	%r36, %r5, 17;
+	add.u32 	%r37, %r7, %r36;
+	mul.lo.u32 	%r38, %r37, 4;
+	add.u32 	%r39, %r17, %r38;
+	ld.shared.u32 	%r40, [%r39+0];
+	ld.param.u32 	%r41, [__cudaparm__Z11d_transposePjS_ii_odata];
+	mul.lo.u32 	%r42, %r28, %r9;
+	add.u32 	%r43, %r29, %r42;
+	mul.lo.u32 	%r44, %r43, 4;
+	add.u32 	%r45, %r41, %r44;
+	st.global.u32 	[%r45+0], %r40;
+$Lt_2_2818:
+	.loc	17	56	0
+	exit;
+$LDWend__Z11d_transposePjS_ii:
+	} // _Z11d_transposePjS_ii
+
+	.entry _Z22d_simpleRecursive_rgbaPjS_iif (
+		.param .u32 __cudaparm__Z22d_simpleRecursive_rgbaPjS_iif___val_paramid,
+		.param .u32 __cudaparm__Z22d_simpleRecursive_rgbaPjS_iif___val_paramod,
+		.param .s32 __cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_w,
+		.param .s32 __cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_h,
+		.param .f32 __cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_a)
+	{
+	.reg .u32 %r<86>;
+	.reg .f32 %f<119>;
+	.reg .pred %p<7>;
+	.loc	17	95	0
+$LDWbegin__Z22d_simpleRecursive_rgbaPjS_iif:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.u32 	%r6, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_w];
+	setp.lt.u32 	%p1, %r5, %r6;
+	@%p1 bra 	$Lt_3_3074;
+	bra.uni 	$LBB14__Z22d_simpleRecursive_rgbaPjS_iif;
+$Lt_3_3074:
+	.loc	17	100	0
+	mul.lo.u32 	%r7, %r5, 4;
+	ld.param.u32 	%r8, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif___val_paramid];
+	add.u32 	%r9, %r8, %r7;
+	mov.s32 	%r10, %r9;
+	.loc	17	101	0
+	ld.param.u32 	%r11, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif___val_paramod];
+	add.u32 	%r12, %r11, %r7;
+	mov.s32 	%r13, %r12;
+	.loc	17	104	0
+	ld.global.u32 	%r14, [%r9+0];
+	and.b32 	%r15, %r14, 255;
+	cvt.rn.f32.u32 	%f1, %r15;
+	mov.f32 	%f2, 0f437f0000;     	// 255
+	div.rn.f32 	%f3, %f1, %f2;
+	shl.b32 	%r16, %r14, 16;
+	shr.u32 	%r17, %r16, 24;
+	cvt.rn.f32.u32 	%f4, %r17;
+	mov.f32 	%f5, 0f437f0000;     	// 255
+	div.rn.f32 	%f6, %f4, %f5;
+	shl.b32 	%r18, %r14, 8;
+	shr.u32 	%r19, %r18, 24;
+	cvt.rn.f32.u32 	%f7, %r19;
+	mov.f32 	%f8, 0f437f0000;     	// 255
+	div.rn.f32 	%f9, %f7, %f8;
+	shr.u32 	%r20, %r14, 24;
+	cvt.rn.f32.u32 	%f10, %r20;
+	mov.f32 	%f11, 0f437f0000;    	// 255
+	div.rn.f32 	%f12, %f10, %f11;
+	ld.param.s32 	%r21, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_h];
+	mov.u32 	%r22, 0;
+	setp.le.s32 	%p2, %r21, %r22;
+	@%p2 bra 	$Lt_3_5634;
+	mov.s32 	%r23, %r21;
+	mul.lo.u32 	%r24, %r6, 4;
+	mov.s32 	%r25, %r9;
+	mov.s32 	%r26, %r12;
+	ld.param.f32 	%f13, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_a];
+	mov.s32 	%r27, 0;
+	mov.s32 	%r28, %r23;
+$Lt_3_4098:
+ //<loop> Loop body line 104, nesting depth: 1, estimated iterations: unknown
+	.loc	17	106	0
+	ld.global.u32 	%r29, [%r25+0];
+	.loc	17	108	0
+	shl.b32 	%r30, %r29, 8;
+	shr.u32 	%r31, %r30, 24;
+	shr.u32 	%r32, %r29, 24;
+	shl.b32 	%r33, %r29, 16;
+	shr.u32 	%r34, %r33, 24;
+	and.b32 	%r35, %r29, 255;
+	cvt.rn.f32.u32 	%f14, %r31;
+	cvt.rn.f32.u32 	%f15, %r32;
+	cvt.rn.f32.u32 	%f16, %r34;
+	cvt.rn.f32.u32 	%f17, %r35;
+	mov.f32 	%f18, 0f437f0000;    	// 255
+	div.rn.f32 	%f19, %f14, %f18;
+	mov.f32 	%f20, 0f437f0000;    	// 255
+	div.rn.f32 	%f21, %f15, %f20;
+	mov.f32 	%f22, 0f437f0000;    	// 255
+	div.rn.f32 	%f23, %f16, %f22;
+	mov.f32 	%f24, 0f437f0000;    	// 255
+	div.rn.f32 	%f25, %f17, %f24;
+	sub.f32 	%f26, %f9, %f19;
+	sub.f32 	%f27, %f12, %f21;
+	sub.f32 	%f28, %f6, %f23;
+	sub.f32 	%f29, %f3, %f25;
+	mul.f32 	%f30, %f26, %f13;
+	mul.f32 	%f31, %f27, %f13;
+	mul.f32 	%f32, %f28, %f13;
+	mul.f32 	%f33, %f29, %f13;
+	add.f32 	%f34, %f19, %f30;
+	add.f32 	%f35, %f21, %f31;
+	add.f32 	%f36, %f23, %f32;
+	add.f32 	%f37, %f25, %f33;
+	cvt.sat.f32.f32 	%f38, %f37;
+	mov.f32 	%f39, 0f437f0000;    	// 255
+	mul.f32 	%f40, %f38, %f39;
+	cvt.rzi.u32.f32 	%r36, %f40;
+	cvt.sat.f32.f32 	%f41, %f36;
+	mov.f32 	%f42, 0f437f0000;    	// 255
+	mul.f32 	%f43, %f41, %f42;
+	cvt.rzi.u32.f32 	%r37, %f43;
+	shl.b32 	%r38, %r37, 8;
+	or.b32 	%r39, %r36, %r38;
+	cvt.sat.f32.f32 	%f44, %f34;
+	mov.f32 	%f45, 0f437f0000;    	// 255
+	mul.f32 	%f46, %f44, %f45;
+	cvt.rzi.u32.f32 	%r40, %f46;
+	shl.b32 	%r41, %r40, 16;
+	cvt.sat.f32.f32 	%f47, %f35;
+	mov.f32 	%f48, 0f437f0000;    	// 255
+	mul.f32 	%f49, %f47, %f48;
+	cvt.rzi.u32.f32 	%r42, %f49;
+	shl.b32 	%r43, %r42, 24;
+	or.b32 	%r44, %r41, %r43;
+	or.b32 	%r45, %r39, %r44;
+	st.global.u32 	[%r26+0], %r45;
+	.loc	17	110	0
+	mov.f32 	%f3, %f37;
+	mov.f32 	%f6, %f36;
+	mov.f32 	%f9, %f34;
+	mov.f32 	%f12, %f35;
+	add.s32 	%r27, %r27, 1;
+	add.s32 	%r26, %r26, %r24;
+	add.s32 	%r25, %r25, %r24;
+	setp.ne.s32 	%p3, %r21, %r27;
+	@%p3 bra 	$Lt_3_4098;
+	mul.lo.u32 	%r46, %r21, %r6;
+	mul.lo.u32 	%r47, %r46, 4;
+	add.u32 	%r13, %r47, %r12;
+	add.u32 	%r10, %r47, %r9;
+	bra.uni 	$Lt_3_3586;
+$Lt_3_5634:
+	mul.lo.u32 	%r24, %r6, 4;
+$Lt_3_3586:
+	.loc	17	114	0
+	sub.u32 	%r10, %r10, %r24;
+	.loc	17	115	0
+	sub.u32 	%r13, %r13, %r24;
+	.loc	17	119	0
+	ld.global.u32 	%r48, [%r10+0];
+	and.b32 	%r49, %r48, 255;
+	cvt.rn.f32.u32 	%f50, %r49;
+	mov.f32 	%f51, 0f437f0000;    	// 255
+	div.rn.f32 	%f3, %f50, %f51;
+	shl.b32 	%r50, %r48, 16;
+	shr.u32 	%r51, %r50, 24;
+	cvt.rn.f32.u32 	%f52, %r51;
+	mov.f32 	%f53, 0f437f0000;    	// 255
+	div.rn.f32 	%f6, %f52, %f53;
+	shl.b32 	%r52, %r48, 8;
+	shr.u32 	%r53, %r52, 24;
+	cvt.rn.f32.u32 	%f54, %r53;
+	mov.f32 	%f55, 0f437f0000;    	// 255
+	div.rn.f32 	%f9, %f54, %f55;
+	shr.u32 	%r54, %r48, 24;
+	cvt.rn.f32.u32 	%f56, %r54;
+	mov.f32 	%f57, 0f437f0000;    	// 255
+	div.rn.f32 	%f12, %f56, %f57;
+	.loc	17	120	0
+	sub.s32 	%r55, %r21, 1;
+	mov.s32 	%r56, %r55;
+	mov.u32 	%r57, 0;
+	setp.lt.s32 	%p4, %r55, %r57;
+	@%p4 bra 	$LBB14__Z22d_simpleRecursive_rgbaPjS_iif;
+	mov.s32 	%r58, %r21;
+	ld.param.f32 	%f13, [__cudaparm__Z22d_simpleRecursive_rgbaPjS_iif_a];
+	mov.s32 	%r59, %r58;
+$Lt_3_5122:
+ //<loop> Loop body line 120, nesting depth: 1, estimated iterations: unknown
+	.loc	17	121	0
+	ld.global.u32 	%r60, [%r10+0];
+	.loc	17	123	0
+	ld.global.u32 	%r61, [%r13+0];
+	shl.b32 	%r62, %r60, 8;
+	shr.u32 	%r63, %r62, 24;
+	shr.u32 	%r64, %r60, 24;
+	shl.b32 	%r65, %r60, 16;
+	shr.u32 	%r66, %r65, 24;
+	and.b32 	%r67, %r60, 255;
+	cvt.rn.f32.u32 	%f58, %r63;
+	cvt.rn.f32.u32 	%f59, %r64;
+	cvt.rn.f32.u32 	%f60, %r66;
+	cvt.rn.f32.u32 	%f61, %r67;
+	mov.f32 	%f62, 0f437f0000;    	// 255
+	div.rn.f32 	%f63, %f58, %f62;
+	mov.f32 	%f64, 0f437f0000;    	// 255
+	div.rn.f32 	%f65, %f59, %f64;
+	mov.f32 	%f66, 0f437f0000;    	// 255
+	div.rn.f32 	%f67, %f60, %f66;
+	mov.f32 	%f68, 0f437f0000;    	// 255
+	div.rn.f32 	%f69, %f61, %f68;
+	sub.f32 	%f70, %f9, %f63;
+	sub.f32 	%f71, %f12, %f65;
+	sub.f32 	%f72, %f6, %f67;
+	sub.f32 	%f73, %f3, %f69;
+	mul.f32 	%f74, %f70, %f13;
+	mul.f32 	%f75, %f71, %f13;
+	mul.f32 	%f76, %f72, %f13;
+	mul.f32 	%f77, %f73, %f13;
+	add.f32 	%f78, %f63, %f74;
+	add.f32 	%f79, %f65, %f75;
+	add.f32 	%f80, %f67, %f76;
+	add.f32 	%f81, %f69, %f77;
+	and.b32 	%r68, %r61, 255;
+	cvt.rn.f32.u32 	%f82, %r68;
+	mov.f32 	%f83, 0f437f0000;    	// 255
+	div.rn.f32 	%f84, %f82, %f83;
+	add.f32 	%f85, %f81, %f84;
+	mov.f32 	%f86, 0f3f000000;    	// 0.5
+	mul.f32 	%f87, %f85, %f86;
+	cvt.sat.f32.f32 	%f88, %f87;
+	mov.f32 	%f89, 0f437f0000;    	// 255
+	mul.f32 	%f90, %f88, %f89;
+	cvt.rzi.u32.f32 	%r69, %f90;
+	shl.b32 	%r70, %r61, 16;
+	shr.u32 	%r71, %r70, 24;
+	cvt.rn.f32.u32 	%f91, %r71;
+	mov.f32 	%f92, 0f437f0000;    	// 255
+	div.rn.f32 	%f93, %f91, %f92;
+	add.f32 	%f94, %f80, %f93;
+	mov.f32 	%f95, 0f3f000000;    	// 0.5
+	mul.f32 	%f96, %f94, %f95;
+	cvt.sat.f32.f32 	%f97, %f96;
+	mov.f32 	%f98, 0f437f0000;    	// 255
+	mul.f32 	%f99, %f97, %f98;
+	cvt.rzi.u32.f32 	%r72, %f99;
+	shl.b32 	%r73, %r72, 8;
+	or.b32 	%r74, %r69, %r73;
+	shl.b32 	%r75, %r61, 8;
+	shr.u32 	%r76, %r75, 24;
+	cvt.rn.f32.u32 	%f100, %r76;
+	mov.f32 	%f101, 0f437f0000;   	// 255
+	div.rn.f32 	%f102, %f100, %f101;
+	add.f32 	%f103, %f78, %f102;
+	mov.f32 	%f104, 0f3f000000;   	// 0.5
+	mul.f32 	%f105, %f103, %f104;
+	cvt.sat.f32.f32 	%f106, %f105;
+	mov.f32 	%f107, 0f437f0000;   	// 255
+	mul.f32 	%f108, %f106, %f107;
+	cvt.rzi.u32.f32 	%r77, %f108;
+	shl.b32 	%r78, %r77, 16;
+	shr.u32 	%r79, %r61, 24;
+	cvt.rn.f32.u32 	%f109, %r79;
+	mov.f32 	%f110, 0f437f0000;   	// 255
+	div.rn.f32 	%f111, %f109, %f110;
+	add.f32 	%f112, %f79, %f111;
+	mov.f32 	%f113, 0f3f000000;   	// 0.5
+	mul.f32 	%f114, %f112, %f113;
+	cvt.sat.f32.f32 	%f115, %f114;
+	mov.f32 	%f116, 0f437f0000;   	// 255
+	mul.f32 	%f117, %f115, %f116;
+	cvt.rzi.u32.f32 	%r80, %f117;
+	shl.b32 	%r81, %r80, 24;
+	or.b32 	%r82, %r78, %r81;
+	or.b32 	%r83, %r74, %r82;
+	st.global.u32 	[%r13+0], %r83;
+	.loc	17	124	0
+	sub.u32 	%r10, %r10, %r24;
+	sub.u32 	%r13, %r13, %r24;
+	.loc	17	125	0
+	mov.f32 	%f3, %f81;
+	mov.f32 	%f6, %f80;
+	mov.f32 	%f9, %f78;
+	mov.f32 	%f12, %f79;
+	sub.s32 	%r56, %r56, 1;
+	mov.u32 	%r84, -1;
+	setp.ne.s32 	%p5, %r56, %r84;
+	@%p5 bra 	$Lt_3_5122;
+$LBB14__Z22d_simpleRecursive_rgbaPjS_iif:
+	.loc	17	127	0
+	exit;
+$LDWend__Z22d_simpleRecursive_rgbaPjS_iif:
+	} // _Z22d_simpleRecursive_rgbaPjS_iif
+
+	.entry _Z24d_recursiveGaussian_rgbaPjS_iiffffffff (
+		.param .u32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff___val_paramid,
+		.param .u32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff___val_paramod,
+		.param .s32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_w,
+		.param .s32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_h,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a0,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a1,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a2,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a3,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b1,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b2,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_coefp,
+		.param .f32 __cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_coefn)
+	{
+	.reg .u32 %r<86>;
+	.reg .f32 %f<182>;
+	.reg .pred %p<7>;
+	.loc	17	141	0
+$LDWbegin__Z24d_recursiveGaussian_rgbaPjS_iiffffffff:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.u32 	%r6, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_w];
+	setp.lt.u32 	%p1, %r5, %r6;
+	@%p1 bra 	$Lt_4_3074;
+	bra.uni 	$LBB14__Z24d_recursiveGaussian_rgbaPjS_iiffffffff;
+$Lt_4_3074:
+	.loc	17	146	0
+	mul.lo.u32 	%r7, %r5, 4;
+	ld.param.u32 	%r8, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff___val_paramid];
+	add.u32 	%r9, %r8, %r7;
+	mov.s32 	%r10, %r9;
+	.loc	17	147	0
+	ld.param.u32 	%r11, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff___val_paramod];
+	add.u32 	%r12, %r11, %r7;
+	mov.s32 	%r13, %r12;
+	.loc	17	154	0
+	ld.global.u32 	%r14, [%r9+0];
+	and.b32 	%r15, %r14, 255;
+	cvt.rn.f32.u32 	%f1, %r15;
+	mov.f32 	%f2, 0f437f0000;     	// 255
+	div.rn.f32 	%f3, %f1, %f2;
+	mov.f32 	%f4, %f3;
+	shl.b32 	%r16, %r14, 16;
+	shr.u32 	%r17, %r16, 24;
+	cvt.rn.f32.u32 	%f5, %r17;
+	mov.f32 	%f6, 0f437f0000;     	// 255
+	div.rn.f32 	%f7, %f5, %f6;
+	mov.f32 	%f8, %f7;
+	shl.b32 	%r18, %r14, 8;
+	shr.u32 	%r19, %r18, 24;
+	cvt.rn.f32.u32 	%f9, %r19;
+	mov.f32 	%f10, 0f437f0000;    	// 255
+	div.rn.f32 	%f11, %f9, %f10;
+	mov.f32 	%f12, %f11;
+	shr.u32 	%r20, %r14, 24;
+	cvt.rn.f32.u32 	%f13, %r20;
+	mov.f32 	%f14, 0f437f0000;    	// 255
+	div.rn.f32 	%f15, %f13, %f14;
+	mov.f32 	%f16, %f15;
+	ld.param.f32 	%f17, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_coefp];
+	mul.f32 	%f18, %f3, %f17;
+	mov.f32 	%f19, %f18;
+	mul.f32 	%f20, %f7, %f17;
+	mov.f32 	%f21, %f20;
+	mul.f32 	%f22, %f11, %f17;
+	mov.f32 	%f23, %f22;
+	mul.f32 	%f24, %f15, %f17;
+	mov.f32 	%f25, %f24;
+	mov.f32 	%f26, %f18;
+	mov.f32 	%f27, %f20;
+	mov.f32 	%f28, %f22;
+	mov.f32 	%f29, %f24;
+	ld.param.s32 	%r21, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_h];
+	mov.u32 	%r22, 0;
+	setp.le.s32 	%p2, %r21, %r22;
+	@%p2 bra 	$Lt_4_5634;
+	mov.s32 	%r23, %r21;
+	mul.lo.u32 	%r24, %r6, 4;
+	mov.s32 	%r25, %r9;
+	mov.s32 	%r26, %r12;
+	ld.param.f32 	%f30, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a0];
+	ld.param.f32 	%f31, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a1];
+	ld.param.f32 	%f32, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b2];
+	ld.param.f32 	%f33, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b1];
+	mov.s32 	%r27, 0;
+	mov.s32 	%r28, %r23;
+$Lt_4_4098:
+ //<loop> Loop body line 154, nesting depth: 1, estimated iterations: unknown
+	.loc	17	157	0
+	ld.global.u32 	%r29, [%r25+0];
+	.loc	17	158	0
+	and.b32 	%r30, %r29, 255;
+	mul.f32 	%f34, %f4, %f31;
+	mul.f32 	%f35, %f26, %f33;
+	mul.f32 	%f36, %f19, %f32;
+	cvt.rn.f32.u32 	%f37, %r30;
+	mov.f32 	%f38, 0f437f0000;    	// 255
+	div.rn.f32 	%f39, %f37, %f38;
+	mul.f32 	%f40, %f39, %f30;
+	add.f32 	%f41, %f34, %f40;
+	sub.f32 	%f42, %f41, %f35;
+	sub.f32 	%f43, %f42, %f36;
+	shl.b32 	%r31, %r29, 16;
+	shr.u32 	%r32, %r31, 24;
+	mul.f32 	%f44, %f8, %f31;
+	mul.f32 	%f45, %f27, %f33;
+	mul.f32 	%f46, %f21, %f32;
+	cvt.rn.f32.u32 	%f47, %r32;
+	mov.f32 	%f48, 0f437f0000;    	// 255
+	div.rn.f32 	%f49, %f47, %f48;
+	mul.f32 	%f50, %f49, %f30;
+	add.f32 	%f51, %f44, %f50;
+	sub.f32 	%f52, %f51, %f45;
+	sub.f32 	%f53, %f52, %f46;
+	shl.b32 	%r33, %r29, 8;
+	shr.u32 	%r34, %r33, 24;
+	mul.f32 	%f54, %f12, %f31;
+	mul.f32 	%f55, %f28, %f33;
+	mul.f32 	%f56, %f23, %f32;
+	cvt.rn.f32.u32 	%f57, %r34;
+	mov.f32 	%f58, 0f437f0000;    	// 255
+	div.rn.f32 	%f59, %f57, %f58;
+	mul.f32 	%f60, %f59, %f30;
+	add.f32 	%f61, %f54, %f60;
+	sub.f32 	%f62, %f61, %f55;
+	sub.f32 	%f63, %f62, %f56;
+	shr.u32 	%r35, %r29, 24;
+	mul.f32 	%f64, %f16, %f31;
+	mul.f32 	%f65, %f29, %f33;
+	mul.f32 	%f66, %f25, %f32;
+	cvt.rn.f32.u32 	%f67, %r35;
+	mov.f32 	%f68, 0f437f0000;    	// 255
+	div.rn.f32 	%f69, %f67, %f68;
+	mul.f32 	%f70, %f69, %f30;
+	add.f32 	%f71, %f64, %f70;
+	sub.f32 	%f72, %f71, %f65;
+	sub.f32 	%f73, %f72, %f66;
+	.loc	17	159	0
+	cvt.sat.f32.f32 	%f74, %f43;
+	mov.f32 	%f75, 0f437f0000;    	// 255
+	mul.f32 	%f76, %f74, %f75;
+	cvt.rzi.u32.f32 	%r36, %f76;
+	cvt.sat.f32.f32 	%f77, %f53;
+	mov.f32 	%f78, 0f437f0000;    	// 255
+	mul.f32 	%f79, %f77, %f78;
+	cvt.rzi.u32.f32 	%r37, %f79;
+	shl.b32 	%r38, %r37, 8;
+	or.b32 	%r39, %r36, %r38;
+	cvt.sat.f32.f32 	%f80, %f73;
+	mov.f32 	%f81, 0f437f0000;    	// 255
+	mul.f32 	%f82, %f80, %f81;
+	cvt.rzi.u32.f32 	%r40, %f82;
+	shl.b32 	%r41, %r40, 24;
+	cvt.sat.f32.f32 	%f83, %f63;
+	mov.f32 	%f84, 0f437f0000;    	// 255
+	mul.f32 	%f85, %f83, %f84;
+	cvt.rzi.u32.f32 	%r42, %f85;
+	shl.b32 	%r43, %r42, 16;
+	or.b32 	%r44, %r41, %r43;
+	or.b32 	%r45, %r39, %r44;
+	st.global.u32 	[%r26+0], %r45;
+	.loc	17	161	0
+	mov.f32 	%f4, %f39;
+	mov.f32 	%f8, %f49;
+	mov.f32 	%f12, %f59;
+	mov.f32 	%f16, %f69;
+	mov.f32 	%f19, %f26;
+	mov.f32 	%f21, %f27;
+	mov.f32 	%f23, %f28;
+	mov.f32 	%f25, %f29;
+	mov.f32 	%f26, %f43;
+	mov.f32 	%f27, %f53;
+	mov.f32 	%f28, %f63;
+	mov.f32 	%f29, %f73;
+	add.s32 	%r27, %r27, 1;
+	add.s32 	%r26, %r26, %r24;
+	add.s32 	%r25, %r25, %r24;
+	setp.ne.s32 	%p3, %r21, %r27;
+	@%p3 bra 	$Lt_4_4098;
+	mul.lo.u32 	%r46, %r21, %r6;
+	mul.lo.u32 	%r47, %r46, 4;
+	add.u32 	%r13, %r47, %r12;
+	add.u32 	%r10, %r47, %r9;
+	bra.uni 	$Lt_4_3586;
+$Lt_4_5634:
+	mul.lo.u32 	%r24, %r6, 4;
+$Lt_4_3586:
+	.loc	17	165	0
+	sub.u32 	%r10, %r10, %r24;
+	.loc	17	166	0
+	sub.u32 	%r13, %r13, %r24;
+	.loc	17	175	0
+	ld.global.u32 	%r48, [%r10+0];
+	and.b32 	%r49, %r48, 255;
+	cvt.rn.f32.u32 	%f86, %r49;
+	mov.f32 	%f87, 0f437f0000;    	// 255
+	div.rn.f32 	%f88, %f86, %f87;
+	mov.f32 	%f89, %f88;
+	shl.b32 	%r50, %r48, 16;
+	shr.u32 	%r51, %r50, 24;
+	cvt.rn.f32.u32 	%f90, %r51;
+	mov.f32 	%f91, 0f437f0000;    	// 255
+	div.rn.f32 	%f92, %f90, %f91;
+	mov.f32 	%f93, %f92;
+	shl.b32 	%r52, %r48, 8;
+	shr.u32 	%r53, %r52, 24;
+	cvt.rn.f32.u32 	%f94, %r53;
+	mov.f32 	%f95, 0f437f0000;    	// 255
+	div.rn.f32 	%f96, %f94, %f95;
+	mov.f32 	%f97, %f96;
+	shr.u32 	%r54, %r48, 24;
+	cvt.rn.f32.u32 	%f98, %r54;
+	mov.f32 	%f99, 0f437f0000;    	// 255
+	div.rn.f32 	%f100, %f98, %f99;
+	mov.f32 	%f101, %f100;
+	mov.f32 	%f102, %f88;
+	mov.f32 	%f103, %f92;
+	mov.f32 	%f104, %f96;
+	mov.f32 	%f105, %f100;
+	ld.param.f32 	%f106, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_coefn];
+	mul.f32 	%f107, %f88, %f106;
+	mov.f32 	%f108, %f107;
+	mul.f32 	%f109, %f92, %f106;
+	mov.f32 	%f110, %f109;
+	mul.f32 	%f111, %f96, %f106;
+	mov.f32 	%f112, %f111;
+	mul.f32 	%f113, %f100, %f106;
+	mov.f32 	%f114, %f113;
+	mov.f32 	%f115, %f107;
+	mov.f32 	%f116, %f109;
+	mov.f32 	%f117, %f111;
+	mov.f32 	%f118, %f113;
+	.loc	17	177	0
+	sub.s32 	%r55, %r21, 1;
+	mov.s32 	%r56, %r55;
+	mov.u32 	%r57, 0;
+	setp.lt.s32 	%p4, %r55, %r57;
+	@%p4 bra 	$LBB14__Z24d_recursiveGaussian_rgbaPjS_iiffffffff;
+	mov.s32 	%r58, %r21;
+	ld.param.f32 	%f32, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b2];
+	ld.param.f32 	%f33, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_b1];
+	ld.param.f32 	%f119, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a3];
+	ld.param.f32 	%f120, [__cudaparm__Z24d_recursiveGaussian_rgbaPjS_iiffffffff_a2];
+	mov.s32 	%r59, %r58;
+$Lt_4_5122:
+ //<loop> Loop body line 177, nesting depth: 1, estimated iterations: unknown
+	.loc	17	178	0
+	ld.global.u32 	%r60, [%r10+0];
+	.loc	17	179	0
+	mul.f32 	%f121, %f89, %f119;
+	fma.rn.f32 	%f122, %f102, %f120, %f121;
+	mul.f32 	%f123, %f108, %f33;
+	sub.f32 	%f124, %f122, %f123;
+	mul.f32 	%f125, %f115, %f32;
+	sub.f32 	%f126, %f124, %f125;
+	mul.f32 	%f127, %f93, %f119;
+	fma.rn.f32 	%f128, %f103, %f120, %f127;
+	mul.f32 	%f129, %f110, %f33;
+	sub.f32 	%f130, %f128, %f129;
+	mul.f32 	%f131, %f116, %f32;
+	sub.f32 	%f132, %f130, %f131;
+	mul.f32 	%f133, %f97, %f119;
+	fma.rn.f32 	%f134, %f104, %f120, %f133;
+	mul.f32 	%f135, %f112, %f33;
+	sub.f32 	%f136, %f134, %f135;
+	mul.f32 	%f137, %f117, %f32;
+	sub.f32 	%f138, %f136, %f137;
+	mul.f32 	%f139, %f101, %f119;
+	fma.rn.f32 	%f140, %f105, %f120, %f139;
+	mul.f32 	%f141, %f114, %f33;
+	sub.f32 	%f142, %f140, %f141;
+	mul.f32 	%f143, %f118, %f32;
+	sub.f32 	%f144, %f142, %f143;
+	.loc	17	180	0
+	mov.f32 	%f89, %f102;
+	mov.f32 	%f93, %f103;
+	mov.f32 	%f97, %f104;
+	mov.f32 	%f101, %f105;
+	and.b32 	%r61, %r60, 255;
+	cvt.rn.f32.u32 	%f145, %r61;
+	mov.f32 	%f146, 0f437f0000;   	// 255
+	div.rn.f32 	%f102, %f145, %f146;
+	shl.b32 	%r62, %r60, 16;
+	shr.u32 	%r63, %r62, 24;
+	cvt.rn.f32.u32 	%f147, %r63;
+	mov.f32 	%f148, 0f437f0000;   	// 255
+	div.rn.f32 	%f103, %f147, %f148;
+	shl.b32 	%r64, %r60, 8;
+	shr.u32 	%r65, %r64, 24;
+	cvt.rn.f32.u32 	%f149, %r65;
+	mov.f32 	%f150, 0f437f0000;   	// 255
+	div.rn.f32 	%f104, %f149, %f150;
+	shr.u32 	%r66, %r60, 24;
+	cvt.rn.f32.u32 	%f151, %r66;
+	mov.f32 	%f152, 0f437f0000;   	// 255
+	div.rn.f32 	%f105, %f151, %f152;
+	mov.f32 	%f115, %f108;
+	mov.f32 	%f116, %f110;
+	mov.f32 	%f117, %f112;
+	mov.f32 	%f118, %f114;
+	mov.f32 	%f108, %f126;
+	mov.f32 	%f110, %f132;
+	mov.f32 	%f112, %f138;
+	mov.f32 	%f114, %f144;
+	.loc	17	181	0
+	ld.global.u32 	%r67, [%r13+0];
+	and.b32 	%r68, %r67, 255;
+	cvt.rn.f32.u32 	%f153, %r68;
+	mov.f32 	%f154, 0f437f0000;   	// 255
+	div.rn.f32 	%f155, %f153, %f154;
+	add.f32 	%f156, %f126, %f155;
+	cvt.sat.f32.f32 	%f157, %f156;
+	mov.f32 	%f158, 0f437f0000;   	// 255
+	mul.f32 	%f159, %f157, %f158;
+	cvt.rzi.u32.f32 	%r69, %f159;
+	shl.b32 	%r70, %r67, 16;
+	shr.u32 	%r71, %r70, 24;
+	cvt.rn.f32.u32 	%f160, %r71;
+	mov.f32 	%f161, 0f437f0000;   	// 255
+	div.rn.f32 	%f162, %f160, %f161;
+	add.f32 	%f163, %f132, %f162;
+	cvt.sat.f32.f32 	%f164, %f163;
+	mov.f32 	%f165, 0f437f0000;   	// 255
+	mul.f32 	%f166, %f164, %f165;
+	cvt.rzi.u32.f32 	%r72, %f166;
+	shl.b32 	%r73, %r72, 8;
+	or.b32 	%r74, %r69, %r73;
+	shl.b32 	%r75, %r67, 8;
+	shr.u32 	%r76, %r75, 24;
+	cvt.rn.f32.u32 	%f167, %r76;
+	mov.f32 	%f168, 0f437f0000;   	// 255
+	div.rn.f32 	%f169, %f167, %f168;
+	add.f32 	%f170, %f138, %f169;
+	cvt.sat.f32.f32 	%f171, %f170;
+	mov.f32 	%f172, 0f437f0000;   	// 255
+	mul.f32 	%f173, %f171, %f172;
+	cvt.rzi.u32.f32 	%r77, %f173;
+	shl.b32 	%r78, %r77, 16;
+	shr.u32 	%r79, %r67, 24;
+	cvt.rn.f32.u32 	%f174, %r79;
+	mov.f32 	%f175, 0f437f0000;   	// 255
+	div.rn.f32 	%f176, %f174, %f175;
+	add.f32 	%f177, %f144, %f176;
+	cvt.sat.f32.f32 	%f178, %f177;
+	mov.f32 	%f179, 0f437f0000;   	// 255
+	mul.f32 	%f180, %f178, %f179;
+	cvt.rzi.u32.f32 	%r80, %f180;
+	shl.b32 	%r81, %r80, 24;
+	or.b32 	%r82, %r78, %r81;
+	or.b32 	%r83, %r74, %r82;
+	st.global.u32 	[%r13+0], %r83;
+	.loc	17	182	0
+	sub.u32 	%r10, %r10, %r24;
+	sub.u32 	%r13, %r13, %r24;
+	sub.s32 	%r56, %r56, 1;
+	mov.u32 	%r84, -1;
+	setp.ne.s32 	%p5, %r56, %r84;
+	@%p5 bra 	$Lt_4_5122;
+$LBB14__Z24d_recursiveGaussian_rgbaPjS_iiffffffff:
+	.loc	17	184	0
+	exit;
+$LDWend__Z24d_recursiveGaussian_rgbaPjS_iiffffffff:
+	} // _Z24d_recursiveGaussian_rgbaPjS_iiffffffff
+

@@ -20,6 +20,14 @@ test_string = "You'll hate me after this - #"          # " Annoying, isn't it?
             # ] Oh yes I did
             ]
 
+# A key can look like a number
+1 = "first"
+# Just a "normal" dotted key for a nested table
+-6.674e-11 = '100% a good reason, trust me'
+10.0.0.0 = 'private' # This works.
+# Even things that look like dates work as keys
+2000-01-01 = "Some Day"
+
 # Each of the following keygroups/key value pairs should produce an error. Uncomment to them to test
 
 #[error]   if you didn't catch this, your parser is broken

@@ -1,0 +1,43 @@
+[Desktop Entry]
+Name=Videos
+Comment=Play movies
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon! Do NOT translate or remove the application name from the list! It is used for search.
+Keywords=Video;Movie;Film;Clip;Series;Player;DVD;TV;Disc;Totem;
+Exec=totem %U
+# Translators: Do NOT translate or transliterate this text (this is an icon file name)!
+Icon=org.gnome.Totem
+DBusActivatable=true
+Terminal=false
+Type=Application
+Categories=GTK;GNOME;AudioVideo;Player;Video;
+X-GNOME-DocPath=totem/totem.xml
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=totem
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=42.0
+X-GNOME-Bugzilla-OtherBinaries=totem-video-thumbnailer;
+StartupNotify=true
+MimeType=application/mxf;application/ram;application/sdp;application/vnd.apple.mpegurl;application/vnd.ms-asf;application/vnd.ms-wpl;application/vnd.rn-realmedia;application/vnd.rn-realmedia-vbr;application/x-extension-m4a;application/x-extension-mp4;application/x-flash-video;application/x-matroska;application/x-netshow-channel;application/x-quicktimeplayer;application/x-shorten;image/vnd.rn-realpix;image/x-pict;misc/ultravox;text/x-google-video-pointer;video/3gp;video/3gpp;video/3gpp2;video/dv;video/divx;video/fli;video/flv;video/mp2t;video/mp4;video/mp4v-es;video/mpeg;video/mpeg-system;video/msvideo;video/ogg;video/quicktime;video/vivo;video/vnd.divx;video/vnd.mpegurl;video/vnd.rn-realvideo;video/vnd.vivo;video/webm;video/x-anim;video/x-avi;video/x-flc;video/x-fli;video/x-flic;video/x-flv;video/x-m4v;video/x-matroska;video/x-mjpeg;video/x-mpeg;video/x-mpeg2;video/x-ms-asf;video/x-ms-asf-plugin;video/x-ms-asx;video/x-msvideo;video/x-ms-wm;video/x-ms-wmv;video/x-ms-wmx;video/x-ms-wvx;video/x-nsv;video/x-ogm+ogg;video/x-theora;video/x-theora+ogg;video/x-totem-stream;audio/x-pn-realaudio;application/smil;application/smil+xml;application/x-quicktime-media-link;application/x-smil;text/google-video-pointer;x-content/video-dvd;x-scheme-handler/pnm;x-scheme-handler/mms;x-scheme-handler/net;x-scheme-handler/rtp;x-scheme-handler/rtmp;x-scheme-handler/rtsp;x-scheme-handler/mmsh;x-scheme-handler/uvox;x-scheme-handler/icy;x-scheme-handler/icyx;
+X-Ubuntu-Gettext-Domain=totem
+
+Actions=play;next-chapter;previous-chapter;mute;fullscreen;
+
+[Desktop Action play]
+Name=Play/Pause
+Exec=totem --play-pause
+
+[Desktop Action next-chapter]
+Name=Next
+Exec=totem --next
+
+[Desktop Action previous-chapter]
+Name=Previous
+Exec=totem --previous
+
+[Desktop Action mute]
+Name=Mute
+Exec=totem --mute
+
+[Desktop Action fullscreen]
+Name=Fullscreen
+Exec=totem --fullscreen

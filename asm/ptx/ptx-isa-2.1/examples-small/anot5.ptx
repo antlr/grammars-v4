@@ -1,0 +1,41 @@
+.version 3.1
+.target sm_20
+.address_size 64
+
+.file   1 "C:/Users/Ken/AppData/Local/Temp/tmpxft_00001798_00000000-21_cudasymbol.compute_20.cpp3
+.i"
+.file   2 "C:/Personal/ocelot/cuda-waste/test/cudasymbol/cudasymbol.cu"
+.global .align 8 .b8 _ZTVSt11_Facet_base[48];
+.global .align 8 .b8 _ZTVNSt6locale5facetE[48];
+.const .align 4 .b8 cData[12];
+.global .align 4 .b8 wData[12];
+.global .align 8 .b8 _ZTVSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE[112];
+.global .align 8 .b8 _ZTVN10__cxxabiv117__class_type_infoE[8];
+.global .align 8 .b8 _ZTVN10__cxxabiv120__si_class_type_infoE[8];
+.global .align 8 .b8 _ZTVSt13runtime_error[40];
+.global .align 8 .b8 _ZTVSt14error_category[72];
+.global .align 8 .b8 _ZTVSt12system_error[40];
+.global .align 8 .b8 _ZTVSt23_Generic_error_category[72];
+.global .align 8 .b8 _ZTVSt24_Iostream_error_category[72];
+.global .align 8 .b8 _ZTVSt22_System_error_category[72];
+.global .align 8 .b8 _ZTVNSt8ios_base7failureE[40];
+
+.visible .entry _Z6kernelv(
+
+)
+{
+.reg .s32 %r<4>;
+
+
+.loc 2 23 1
+ld.const.u32 %r1, [cData+8];
+st.global.u32 [wData], %r1;
+.loc 2 24 1
+ld.const.u32 %r2, [cData+4];
+st.global.u32 [wData+4], %r2;
+.loc 2 25 1
+ld.const.u32 %r3, [cData];
+st.global.u32 [wData+8], %r3;
+.loc 2 26 2
+ret;
+}

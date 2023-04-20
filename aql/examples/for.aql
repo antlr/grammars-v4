@@ -1,0 +1,2 @@
+for i in [[1..2], 1..2, {a:[], "a2":1}, 1+1, 1==1,'c','gg',"ggg", not true, [true], null]
+return i

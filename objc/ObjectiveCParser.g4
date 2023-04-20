@@ -73,7 +73,7 @@ classImplementation
 
 categoryImplementation
     : '@implementation'
-       categoryName=genericTypeSpecifier LP className=identifier RP implementationDefinitionList?
+       className=genericTypeSpecifier LP categoryName=identifier RP implementationDefinitionList?
       '@end'
     ;
 
@@ -231,6 +231,7 @@ genericsSpecifier
 
 typeSpecifierWithPrefixes
     : typePrefix* typeSpecifier
+    | typeName
     ;
 
 dictionaryExpression
@@ -787,7 +788,7 @@ constant
     | ('+' | '-')? FLOATING_POINT_LITERAL
     | CHARACTER_LITERAL
     | NIL
-    | NULL
+    | NULL_
     | YES
     | NO
     | TRUE

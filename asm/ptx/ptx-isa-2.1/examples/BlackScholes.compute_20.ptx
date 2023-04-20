@@ -1,0 +1,198 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling BlackScholes.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a08572)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"BlackScholes.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx3.h"
+	.file	28	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\blackscholes\BlackScholes_kernel.cuh"
+
+
+	.entry _Z15BlackScholesGPUPfS_S_S_S_ffi (
+		.param .u32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_CallResult,
+		.param .u32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_PutResult,
+		.param .u32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_StockPrice,
+		.param .u32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_OptionStrike,
+		.param .u32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_OptionYears,
+		.param .f32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_Riskfree,
+		.param .f32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_Volatility,
+		.param .s32 __cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_optN)
+	{
+	.reg .u32 %r<24>;
+	.reg .f32 %f<92>;
+	.reg .pred %p<6>;
+	.loc	28	83	0
+$LDWbegin__Z15BlackScholesGPUPfS_S_S_S_ffi:
+	.loc	28	92	0
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r4, %r3;
+	ld.param.s32 	%r6, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_optN];
+	setp.le.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_0_2818;
+	mul.lo.u32 	%r7, %r5, 4;
+	mul.lo.u32 	%r8, %r6, 4;
+	ld.param.f32 	%f1, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_Volatility];
+	mov.f32 	%f2, 0f3f000000;     	// 0.5
+	mul.f32 	%f3, %f1, %f2;
+	mov.u32 	%r9, %nctaid.x;
+	mul.lo.u32 	%r10, %r9, %r1;
+	ld.param.u32 	%r11, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_StockPrice];
+	add.u32 	%r12, %r7, %r11;
+	mul.lo.u32 	%r13, %r10, 4;
+	add.u32 	%r14, %r8, %r11;
+	ld.param.u32 	%r15, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_OptionStrike];
+	add.u32 	%r16, %r15, %r7;
+	ld.param.u32 	%r17, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_OptionYears];
+	add.u32 	%r18, %r17, %r7;
+	ld.param.u32 	%r19, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_CallResult];
+	add.u32 	%r20, %r19, %r7;
+	ld.param.u32 	%r21, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_d_PutResult];
+	add.u32 	%r22, %r21, %r7;
+	ld.param.f32 	%f4, [__cudaparm__Z15BlackScholesGPUPfS_S_S_S_ffi_Riskfree];
+	fma.rn.f32 	%f5, %f1, %f3, %f4;
+$Lt_0_3330:
+ //<loop> Loop body line 92, nesting depth: 1, estimated iterations: unknown
+	.loc	28	93	0
+	ld.global.f32 	%f6, [%r12+0];
+	ld.global.f32 	%f7, [%r16+0];
+	ld.global.f32 	%f8, [%r18+0];
+	mul.f32 	%f9, %f8, %f4;
+	div.rn.f32 	%f10, %f6, %f7;
+	sqrt.rn.f32 	%f11, %f8;
+	neg.f32 	%f12, %f9;
+	lg2.approx.f32 	%f13, %f10;
+	mul.f32 	%f14, %f11, %f1;
+	mov.f32 	%f15, 0f3fb8aa3b;    	// 1.4427
+	mul.f32 	%f16, %f12, %f15;
+	mov.f32 	%f17, 0f3f317218;    	// 0.693147
+	mul.f32 	%f18, %f13, %f17;
+	ex2.approx.f32 	%f19, %f16;
+	fma.rn.f32 	%f20, %f8, %f5, %f18;
+	mul.f32 	%f21, %f19, %f7;
+	div.rn.f32 	%f22, %f20, %f14;
+	mul.f32 	%f23, %f1, %f11;
+	sub.f32 	%f24, %f22, %f23;
+	mov.f32 	%f25, 0f00000000;    	// 0
+	setp.gt.f32 	%p2, %f22, %f25;
+	mov.f32 	%f26, 0fbf000000;    	// -0.5
+	mul.f32 	%f27, %f22, %f26;
+	abs.f32 	%f28, %f22;
+	mov.f32 	%f29, 0f00000000;    	// 0
+	setp.gt.f32 	%p3, %f24, %f29;
+	mov.f32 	%f30, 0fbf000000;    	// -0.5
+	mul.f32 	%f31, %f24, %f30;
+	abs.f32 	%f32, %f24;
+	mul.f32 	%f33, %f22, %f27;
+	mov.f32 	%f34, 0f3f800000;    	// 1
+	mov.f32 	%f35, 0f3e6d3389;    	// 0.231642
+	fma.rn.f32 	%f36, %f28, %f35, %f34;
+	mul.f32 	%f37, %f24, %f31;
+	mov.f32 	%f38, 0f3f800000;    	// 1
+	mov.f32 	%f39, 0f3e6d3389;    	// 0.231642
+	fma.rn.f32 	%f40, %f32, %f39, %f38;
+	mov.f32 	%f41, 0f3fb8aa3b;    	// 1.4427
+	mul.f32 	%f42, %f33, %f41;
+	rcp.rn.f32 	%f43, %f36;
+	mov.f32 	%f44, 0f3fb8aa3b;    	// 1.4427
+	mul.f32 	%f45, %f37, %f44;
+	rcp.rn.f32 	%f46, %f40;
+	ex2.approx.f32 	%f47, %f42;
+	mov.f32 	%f48, 0fbfe91eea;    	// -1.82126
+	mov.f32 	%f49, 0f3faa466f;    	// 1.33027
+	fma.rn.f32 	%f50, %f49, %f43, %f48;
+	ex2.approx.f32 	%f51, %f45;
+	mov.f32 	%f52, 0fbfe91eea;    	// -1.82126
+	mov.f32 	%f53, 0f3faa466f;    	// 1.33027
+	fma.rn.f32 	%f54, %f53, %f46, %f52;
+	mov.f32 	%f55, 0f3ecc422a;    	// 0.398942
+	mul.f32 	%f56, %f47, %f55;
+	mov.f32 	%f57, 0f3fe40778;    	// 1.78148
+	fma.rn.f32 	%f58, %f43, %f50, %f57;
+	mov.f32 	%f59, 0f3ecc422a;    	// 0.398942
+	mul.f32 	%f60, %f51, %f59;
+	mov.f32 	%f61, 0f3fe40778;    	// 1.78148
+	fma.rn.f32 	%f62, %f46, %f54, %f61;
+	mov.f32 	%f63, 0fbeb68f87;    	// -0.356564
+	fma.rn.f32 	%f64, %f43, %f58, %f63;
+	mov.f32 	%f65, 0fbeb68f87;    	// -0.356564
+	fma.rn.f32 	%f66, %f46, %f62, %f65;
+	mov.f32 	%f67, 0f3ea385fa;    	// 0.319382
+	fma.rn.f32 	%f68, %f43, %f64, %f67;
+	mov.f32 	%f69, 0f3ea385fa;    	// 0.319382
+	fma.rn.f32 	%f70, %f46, %f66, %f69;
+	mul.f32 	%f71, %f43, %f68;
+	mul.f32 	%f72, %f46, %f70;
+	mul.f32 	%f73, %f56, %f71;
+	mul.f32 	%f74, %f60, %f72;
+	mov.f32 	%f75, 0f3f800000;    	// 1
+	sub.f32 	%f76, %f75, %f73;
+	mov.f32 	%f77, 0f3f800000;    	// 1
+	sub.f32 	%f78, %f77, %f74;
+	selp.f32 	%f79, %f76, %f73, %p2;
+	selp.f32 	%f80, %f78, %f74, %p3;
+	mul.f32 	%f81, %f21, %f80;
+	mul.f32 	%f82, %f6, %f79;
+	sub.f32 	%f83, %f82, %f81;
+	st.global.f32 	[%r20+0], %f83;
+	mov.f32 	%f84, 0f3f800000;    	// 1
+	sub.f32 	%f85, %f84, %f79;
+	mul.f32 	%f86, %f6, %f85;
+	mov.f32 	%f87, 0f3f800000;    	// 1
+	sub.f32 	%f88, %f87, %f80;
+	mul.f32 	%f89, %f21, %f88;
+	sub.f32 	%f90, %f89, %f86;
+	st.global.f32 	[%r22+0], %f90;
+	add.u32 	%r22, %r22, %r13;
+	add.u32 	%r20, %r20, %r13;
+	add.u32 	%r18, %r18, %r13;
+	add.u32 	%r16, %r16, %r13;
+	add.u32 	%r12, %r12, %r13;
+	setp.lt.u32 	%p4, %r12, %r14;
+	@%p4 bra 	$Lt_0_3330;
+$Lt_0_2818:
+	.loc	28	102	0
+	exit;
+$LDWend__Z15BlackScholesGPUPfS_S_S_S_ffi:
+	} // _Z15BlackScholesGPUPfS_S_S_S_ffi
+

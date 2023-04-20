@@ -1,0 +1,135 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling texture_volume.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04580)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"texture_volume.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx3.h"
+	.file	28	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/simpleD3D9Texture/texture_volume.cu"
+
+
+	.entry _Z26cuda_kernel_texture_volumePhiiijj (
+		.param .u32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_surface,
+		.param .s32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_width,
+		.param .s32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_height,
+		.param .s32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_depth,
+		.param .u32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_pitch,
+		.param .u32 __cudaparm__Z26cuda_kernel_texture_volumePhiiijj_pitchSlice)
+	{
+	.reg .u32 %r<49>;
+	.reg .pred %p<5>;
+	.loc	28	24	0
+$LDWbegin__Z26cuda_kernel_texture_volumePhiiijj:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ntid.y;
+	mul.lo.u32 	%r6, %r4, %r5;
+	mov.u32 	%r7, %tid.x;
+	add.u32 	%r8, %r7, %r3;
+	mov.u32 	%r9, %tid.y;
+	add.u32 	%r10, %r9, %r6;
+	ld.param.s32 	%r11, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_width];
+	ld.param.s32 	%r12, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_height];
+	set.le.u32.s32 	%r13, %r12, %r10;
+	neg.s32 	%r14, %r13;
+	set.le.u32.s32 	%r15, %r11, %r8;
+	neg.s32 	%r16, %r15;
+	or.b32 	%r17, %r14, %r16;
+	mov.u32 	%r18, 0;
+	setp.eq.s32 	%p1, %r17, %r18;
+	@%p1 bra 	$Lt_0_3842;
+	bra.uni 	$LBB8__Z26cuda_kernel_texture_volumePhiiijj;
+$Lt_0_3842:
+	.loc	28	36	0
+	ld.param.s32 	%r19, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_depth];
+	mov.u32 	%r20, 0;
+	setp.le.s32 	%p2, %r19, %r20;
+	@%p2 bra 	$LBB8__Z26cuda_kernel_texture_volumePhiiijj;
+	mov.s32 	%r21, %r19;
+	sub.s32 	%r22, %r11, 1;
+	mov.s32 	%r23, 0;
+	sub.s32 	%r24, %r19, 1;
+	mul.lo.s32 	%r25, %r8, 255;
+	mul.lo.s32 	%r26, %r8, 4;
+	ld.param.u32 	%r27, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_pitch];
+	mul.lo.u32 	%r28, %r27, %r10;
+	div.s32 	%r29, %r25, %r22;
+	ld.param.u32 	%r30, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_surface];
+	add.s32 	%r31, %r26, %r30;
+	mov.s32 	%r32, %r29;
+	add.s32 	%r33, %r31, %r28;
+	mov.s32 	%r34, %r33;
+	ld.param.u32 	%r35, [__cudaparm__Z26cuda_kernel_texture_volumePhiiijj_pitchSlice];
+	mov.s32 	%r36, 0;
+	mov.s32 	%r37, %r21;
+$Lt_0_3330:
+ //<loop> Loop body line 36, nesting depth: 1, estimated iterations: unknown
+	.loc	28	40	0
+	st.global.u8 	[%r34+0], %r32;
+	.loc	28	41	0
+	div.s32 	%r38, %r23, %r24;
+	st.global.u8 	[%r34+1], %r38;
+	.loc	28	42	0
+	shr.s32 	%r39, %r36, 31;
+	mov.s32 	%r40, 1;
+	and.b32 	%r41, %r39, %r40;
+	add.s32 	%r42, %r41, %r36;
+	shr.s32 	%r43, %r42, 1;
+	mul.lo.s32 	%r44, %r43, 2;
+	sub.s32 	%r45, %r36, %r44;
+	mul.lo.s32 	%r46, %r45, 255;
+	st.global.u8 	[%r34+2], %r46;
+	.loc	28	43	0
+	mov.u32 	%r47, 255;
+	st.global.u8 	[%r34+3], %r47;
+	add.s32 	%r36, %r36, 1;
+	add.s32 	%r23, %r23, 255;
+	add.s32 	%r34, %r34, %r35;
+	setp.ne.s32 	%p3, %r19, %r36;
+	@%p3 bra 	$Lt_0_3330;
+$LBB8__Z26cuda_kernel_texture_volumePhiiijj:
+	.loc	28	45	0
+	exit;
+$LDWend__Z26cuda_kernel_texture_volumePhiiijj:
+	} // _Z26cuda_kernel_texture_volumePhiiijj
+

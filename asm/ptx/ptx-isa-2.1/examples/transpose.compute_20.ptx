@@ -1,0 +1,173 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling transpose.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a09920)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"transpose.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\src\transpose\transpose_kernel.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+
+	.entry _Z9transposePfS_ii (
+		.param .u32 __cudaparm__Z9transposePfS_ii_odata,
+		.param .u32 __cudaparm__Z9transposePfS_ii_idata,
+		.param .s32 __cudaparm__Z9transposePfS_ii_width,
+		.param .s32 __cudaparm__Z9transposePfS_ii_height)
+	{
+	.reg .u32 %r<45>;
+	.reg .f32 %f<4>;
+	.reg .pred %p<4>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_496130_31_block16[1088];
+	.loc	17	30	0
+$LDWbegin__Z9transposePfS_ii:
+	mov.u32 	%r1, %ctaid.x;
+	mul.lo.u32 	%r2, %r1, 16;
+	mov.u32 	%r3, %ctaid.y;
+	mul.lo.u32 	%r4, %r3, 16;
+	mov.u32 	%r5, %tid.x;
+	add.u32 	%r6, %r2, %r5;
+	mov.u32 	%r7, %tid.y;
+	add.u32 	%r8, %r4, %r7;
+	ld.param.u32 	%r9, [__cudaparm__Z9transposePfS_ii_height];
+	ld.param.u32 	%r10, [__cudaparm__Z9transposePfS_ii_width];
+	set.lt.u32.u32 	%r11, %r6, %r10;
+	neg.s32 	%r12, %r11;
+	set.lt.u32.u32 	%r13, %r8, %r9;
+	neg.s32 	%r14, %r13;
+	and.b32 	%r15, %r12, %r14;
+	mov.u32 	%r16, 0;
+	setp.eq.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_0_2306;
+	.loc	17	40	0
+	mov.u32 	%r17, __cuda___cuda_local_var_496130_31_block16;
+	ld.param.u32 	%r18, [__cudaparm__Z9transposePfS_ii_idata];
+	mul.lo.u32 	%r19, %r8, %r10;
+	add.u32 	%r20, %r6, %r19;
+	mul.lo.u32 	%r21, %r20, 4;
+	add.u32 	%r22, %r18, %r21;
+	ld.global.f32 	%f1, [%r22+0];
+	mul.lo.u32 	%r23, %r7, 17;
+	add.u32 	%r24, %r5, %r23;
+	mul.lo.u32 	%r25, %r24, 4;
+	add.u32 	%r26, %r17, %r25;
+	st.shared.f32 	[%r26+0], %f1;
+$Lt_0_2306:
+	mov.u32 	%r17, __cuda___cuda_local_var_496130_31_block16;
+	.loc	17	43	0
+	bar.sync 	0;
+	add.u32 	%r27, %r2, %r7;
+	add.u32 	%r28, %r4, %r5;
+	set.lt.u32.u32 	%r29, %r27, %r10;
+	neg.s32 	%r30, %r29;
+	set.lt.u32.u32 	%r31, %r28, %r9;
+	neg.s32 	%r32, %r31;
+	and.b32 	%r33, %r30, %r32;
+	mov.u32 	%r34, 0;
+	setp.eq.s32 	%p2, %r33, %r34;
+	@%p2 bra 	$Lt_0_2818;
+	.loc	17	51	0
+	mul.lo.u32 	%r35, %r5, 17;
+	add.u32 	%r36, %r7, %r35;
+	mul.lo.u32 	%r37, %r36, 4;
+	add.u32 	%r38, %r17, %r37;
+	ld.shared.f32 	%f2, [%r38+0];
+	ld.param.u32 	%r39, [__cudaparm__Z9transposePfS_ii_odata];
+	mul.lo.u32 	%r40, %r27, %r9;
+	add.u32 	%r41, %r28, %r40;
+	mul.lo.u32 	%r42, %r41, 4;
+	add.u32 	%r43, %r39, %r42;
+	st.global.f32 	[%r43+0], %f2;
+$Lt_0_2818:
+	.loc	17	53	0
+	exit;
+$LDWend__Z9transposePfS_ii:
+	} // _Z9transposePfS_ii
+
+	.entry _Z15transpose_naivePfS_ii (
+		.param .u32 __cudaparm__Z15transpose_naivePfS_ii_odata,
+		.param .u32 __cudaparm__Z15transpose_naivePfS_ii_idata,
+		.param .s32 __cudaparm__Z15transpose_naivePfS_ii_width,
+		.param .s32 __cudaparm__Z15transpose_naivePfS_ii_height)
+	{
+	.reg .u32 %r<30>;
+	.reg .f32 %f<3>;
+	.reg .pred %p<3>;
+	.loc	17	58	0
+$LDWbegin__Z15transpose_naivePfS_ii:
+	mov.u32 	%r1, %ctaid.x;
+	mov.u32 	%r2, %ntid.x;
+	mul.lo.u32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ntid.y;
+	mul.lo.u32 	%r6, %r4, %r5;
+	mov.u32 	%r7, %tid.x;
+	add.u32 	%r8, %r7, %r3;
+	mov.u32 	%r9, %tid.y;
+	add.u32 	%r10, %r9, %r6;
+	ld.param.u32 	%r11, [__cudaparm__Z15transpose_naivePfS_ii_height];
+	ld.param.u32 	%r12, [__cudaparm__Z15transpose_naivePfS_ii_width];
+	set.lt.u32.u32 	%r13, %r8, %r12;
+	neg.s32 	%r14, %r13;
+	set.lt.u32.u32 	%r15, %r10, %r11;
+	neg.s32 	%r16, %r15;
+	and.b32 	%r17, %r14, %r16;
+	mov.u32 	%r18, 0;
+	setp.eq.s32 	%p1, %r17, %r18;
+	@%p1 bra 	$Lt_1_1282;
+	.loc	17	67	0
+	ld.param.u32 	%r19, [__cudaparm__Z15transpose_naivePfS_ii_idata];
+	mul.lo.u32 	%r20, %r10, %r12;
+	add.u32 	%r21, %r8, %r20;
+	mul.lo.u32 	%r22, %r21, 4;
+	add.u32 	%r23, %r19, %r22;
+	ld.global.f32 	%f1, [%r23+0];
+	ld.param.u32 	%r24, [__cudaparm__Z15transpose_naivePfS_ii_odata];
+	mul.lo.u32 	%r25, %r8, %r11;
+	add.u32 	%r26, %r10, %r25;
+	mul.lo.u32 	%r27, %r26, 4;
+	add.u32 	%r28, %r24, %r27;
+	st.global.f32 	[%r28+0], %f1;
+$Lt_1_1282:
+	.loc	17	69	0
+	exit;
+$LDWend__Z15transpose_naivePfS_ii:
+	} // _Z15transpose_naivePfS_ii
+

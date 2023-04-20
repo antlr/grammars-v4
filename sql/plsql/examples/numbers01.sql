@@ -7,8 +7,7 @@ select 25
 , +6.34F
 , 0.5d
 , -1D
-, (sysdate -1d)   -- here we substract "one" in decimal format
-, sysdate -1m   -- here we substract "one" and "m" is column's alias
+, (sysdate -1d)   -- here we subtract "one" in decimal format
+, sysdate -1m     -- here we subtract "one" and "m" is column's alias
 , sysdate -1dm
 from dual
-

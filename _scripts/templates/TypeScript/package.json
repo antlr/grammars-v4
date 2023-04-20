@@ -1,0 +1,25 @@
+{
+  "name": "i",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "antlr4": "4.12",
+    "buffer": "^6.0.3",
+    "fs-extra": "^10.1.0",
+    "timer-node": "^5.0.6",
+    "typescript-string-operations": "^1.5.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^18.13.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  }
+}

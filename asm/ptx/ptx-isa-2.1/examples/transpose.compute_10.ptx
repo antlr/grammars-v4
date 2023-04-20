@@ -1,0 +1,184 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling transpose.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a01852)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"transpose.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\src\transpose\transpose_kernel.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+
+	.entry _Z9transposePfS_ii (
+		.param .u32 __cudaparm__Z9transposePfS_ii_odata,
+		.param .u32 __cudaparm__Z9transposePfS_ii_idata,
+		.param .s32 __cudaparm__Z9transposePfS_ii_width,
+		.param .s32 __cudaparm__Z9transposePfS_ii_height)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<43>;
+	.reg .f32 %f<4>;
+	.reg .pred %p<4>;
+	.shared .align 4 .b8 __cuda___cuda_local_var_487394_31_block16[1088];
+	.loc	17	30	0
+$LDWbegin__Z9transposePfS_ii:
+	mov.u16 	%rh1, %ctaid.x;
+	mul.wide.u16 	%r1, %rh1, 16;
+	mov.u16 	%rh2, %ctaid.y;
+	mul.wide.u16 	%r2, %rh2, 16;
+	cvt.u32.u16 	%r3, %tid.x;
+	add.u32 	%r4, %r1, %r3;
+	cvt.u32.u16 	%r5, %tid.y;
+	add.u32 	%r6, %r2, %r5;
+	ld.param.u32 	%r7, [__cudaparm__Z9transposePfS_ii_height];
+	ld.param.u32 	%r8, [__cudaparm__Z9transposePfS_ii_width];
+	set.lt.u32.u32 	%r9, %r4, %r8;
+	neg.s32 	%r10, %r9;
+	set.lt.u32.u32 	%r11, %r6, %r7;
+	neg.s32 	%r12, %r11;
+	and.b32 	%r13, %r10, %r12;
+	mov.u32 	%r14, 0;
+	setp.eq.s32 	%p1, %r13, %r14;
+	@%p1 bra 	$Lt_0_2306;
+	.loc	17	40	0
+	mov.u32 	%r15, __cuda___cuda_local_var_487394_31_block16;
+	ld.param.u32 	%r16, [__cudaparm__Z9transposePfS_ii_idata];
+	.loc	17	30	0
+	ld.param.u32 	%r8, [__cudaparm__Z9transposePfS_ii_width];
+	.loc	17	40	0
+	mul.lo.u32 	%r17, %r6, %r8;
+	add.u32 	%r18, %r4, %r17;
+	mul.lo.u32 	%r19, %r18, 4;
+	add.u32 	%r20, %r16, %r19;
+	ld.global.f32 	%f1, [%r20+0];
+	mul24.lo.u32 	%r21, %r5, 17;
+	add.u32 	%r22, %r3, %r21;
+	mul.lo.u32 	%r23, %r22, 4;
+	add.u32 	%r24, %r15, %r23;
+	st.shared.f32 	[%r24+0], %f1;
+$Lt_0_2306:
+	mov.u32 	%r15, __cuda___cuda_local_var_487394_31_block16;
+	.loc	17	43	0
+	bar.sync 	0;
+	add.u32 	%r25, %r1, %r5;
+	add.u32 	%r26, %r2, %r3;
+	set.lt.u32.u32 	%r27, %r25, %r8;
+	neg.s32 	%r28, %r27;
+	set.lt.u32.u32 	%r29, %r26, %r7;
+	neg.s32 	%r30, %r29;
+	and.b32 	%r31, %r28, %r30;
+	mov.u32 	%r32, 0;
+	setp.eq.s32 	%p2, %r31, %r32;
+	@%p2 bra 	$Lt_0_2818;
+	.loc	17	51	0
+	mul24.lo.u32 	%r33, %r3, 17;
+	add.u32 	%r34, %r5, %r33;
+	mul.lo.u32 	%r35, %r34, 4;
+	add.u32 	%r36, %r15, %r35;
+	ld.shared.f32 	%f2, [%r36+0];
+	ld.param.u32 	%r37, [__cudaparm__Z9transposePfS_ii_odata];
+	mul.lo.u32 	%r38, %r25, %r7;
+	add.u32 	%r39, %r26, %r38;
+	mul.lo.u32 	%r40, %r39, 4;
+	add.u32 	%r41, %r37, %r40;
+	st.global.f32 	[%r41+0], %f2;
+$Lt_0_2818:
+	.loc	17	53	0
+	exit;
+$LDWend__Z9transposePfS_ii:
+	} // _Z9transposePfS_ii
+
+	.entry _Z15transpose_naivePfS_ii (
+		.param .u32 __cudaparm__Z15transpose_naivePfS_ii_odata,
+		.param .u32 __cudaparm__Z15transpose_naivePfS_ii_idata,
+		.param .s32 __cudaparm__Z15transpose_naivePfS_ii_width,
+		.param .s32 __cudaparm__Z15transpose_naivePfS_ii_height)
+	{
+	.reg .u16 %rh<6>;
+	.reg .u32 %r<26>;
+	.reg .f32 %f<3>;
+	.reg .pred %p<3>;
+	.loc	17	58	0
+$LDWbegin__Z15transpose_naivePfS_ii:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	mov.u16 	%rh3, %ctaid.y;
+	mov.u16 	%rh4, %ntid.y;
+	mul.wide.u16 	%r2, %rh3, %rh4;
+	cvt.u32.u16 	%r3, %tid.x;
+	add.u32 	%r4, %r3, %r1;
+	cvt.u32.u16 	%r5, %tid.y;
+	add.u32 	%r6, %r5, %r2;
+	ld.param.u32 	%r7, [__cudaparm__Z15transpose_naivePfS_ii_height];
+	ld.param.u32 	%r8, [__cudaparm__Z15transpose_naivePfS_ii_width];
+	set.lt.u32.u32 	%r9, %r4, %r8;
+	neg.s32 	%r10, %r9;
+	set.lt.u32.u32 	%r11, %r6, %r7;
+	neg.s32 	%r12, %r11;
+	and.b32 	%r13, %r10, %r12;
+	mov.u32 	%r14, 0;
+	setp.eq.s32 	%p1, %r13, %r14;
+	@%p1 bra 	$Lt_1_1282;
+	.loc	17	67	0
+	ld.param.u32 	%r15, [__cudaparm__Z15transpose_naivePfS_ii_idata];
+	.loc	17	58	0
+	ld.param.u32 	%r8, [__cudaparm__Z15transpose_naivePfS_ii_width];
+	.loc	17	67	0
+	mul.lo.u32 	%r16, %r6, %r8;
+	add.u32 	%r17, %r4, %r16;
+	mul.lo.u32 	%r18, %r17, 4;
+	add.u32 	%r19, %r15, %r18;
+	ld.global.f32 	%f1, [%r19+0];
+	ld.param.u32 	%r20, [__cudaparm__Z15transpose_naivePfS_ii_odata];
+	.loc	17	58	0
+	ld.param.u32 	%r7, [__cudaparm__Z15transpose_naivePfS_ii_height];
+	.loc	17	67	0
+	mul.lo.u32 	%r21, %r4, %r7;
+	add.u32 	%r22, %r6, %r21;
+	mul.lo.u32 	%r23, %r22, 4;
+	add.u32 	%r24, %r20, %r23;
+	st.global.f32 	[%r24+0], %f1;
+$Lt_1_1282:
+	.loc	17	69	0
+	exit;
+$LDWend__Z15transpose_naivePfS_ii:
+	} // _Z15transpose_naivePfS_ii
+

@@ -36,7 +36,7 @@ RPAR : ')' ;
 NAT : Nat ;
 INT : Int ;
 FLOAT : Float ;
-STRING : String ;
+STRING_ : String_ ;
 VALUE_TYPE : NXX ;
 CONST : NXX '.const' ;
 
@@ -158,7 +158,7 @@ MEMORY_GROW : 'memory.grow' ;
 
 TYPE: 'type' ;
 FUNC: 'func' ;
-START: 'start' ;
+START_: 'start' ;
 PARAM: 'param' ;
 RESULT: 'result' ;
 LOCAL: 'local' ;
@@ -244,7 +244,7 @@ fragment Float
   | Sign? 'nan:' '0x' HexNum
   ;
 
-fragment String
+fragment String_
   : '"' ( Char | '\n' | '\t' | '\\' | '\'' | '\\' HexDigit HexDigit | '\\u{' HexDigit+ '}' )* '"'
   ;
 

@@ -1,0 +1,31 @@
+# -*- mode: rec -*-
+
+%rec: Book
+%mandatory: Title
+%type: Location enum loaned home unknown
+%doc:
++ A book in my personal collection.
+
+Title: GNU Emacs Manual
+Author: Richard M. Stallman
+Publisher: FSF
+Location: home
+
+Title: The Colour of Magic
+Author: Terry Pratchett
+Location: loaned
+
+Title: Mio Cid
+Author: Anonymous
+Location: home
+
+Title: chapters.gnu.org administration guide
+Author: Nacho Gonzalez
+Author: Jose E. Marchesi
+Location: unknown
+
+Title: Yeelong User Manual
+Location: home
+
+# End of books.rec
+

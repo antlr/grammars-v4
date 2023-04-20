@@ -8,3 +8,9 @@ LANGUAGE java AS
      r/= state.getInt(0); 
      return Double.valueOf(r); $$ 
 ;
+
+CREATE OR REPLACE FUNCTION setMin(input set<int>) RETURNS NULL ON NULL INPUT RETURNS int LANGUAGE java AS '
+                int min = Integer.MAX_VALUE;
+                for (Object i : input) { min = Math.min(min, (Integer) i); }
+                return min;
+            ';

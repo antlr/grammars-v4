@@ -1,0 +1,2 @@
+line 4:8 no viable alternative at input 'var'
+line 4:11 mismatched input '=' expecting {BEGIN_ARGUMENT, OPTIONS, 'returns', 'locals', 'throws', COLON, AT}

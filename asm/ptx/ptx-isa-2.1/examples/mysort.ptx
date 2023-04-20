@@ -1,0 +1,476 @@
+	.version 2.2
+	.target sm_20
+	// compiled with C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\\bin/../open64/lib//be.exe
+	// nvopencc 3.2 built on 2010-09-09
+
+	.extern .func (.param .s32 __cudaretf_printf) printf (.param .u32 __cudaparmf1_printf)
+
+	.extern .func (.param .s32 __cudaretf_vprintf) vprintf (.param .u32 __cudaparmf1_vprintf, .param .u32 __cudaparmf2_vprintf)
+
+	//-----------------------------------------------------------
+	// Compiling sort.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04260)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"sort.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\include\crt/device_runtime.h"
+	.file	4	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\include\host_defines.h"
+	.file	5	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\include\builtin_types.h"
+	.file	6	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\device_types.h"
+	.file	7	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\driver_types.h"
+	.file	8	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\surface_types.h"
+	.file	9	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\texture_types.h"
+	.file	10	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\vector_types.h"
+	.file	11	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\builtin_types.h"
+	.file	12	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\host_defines.h"
+	.file	13	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\include\device_launch_parameters.h"
+	.file	14	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\sm_11_atomic_functions.h"
+	.file	17	"C:/Users/Ken/Documents/Visual Studio 2010/Projects/radix-sort/sort.cu"
+	.file	18	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v3.2\include\common_functions.h"
+	.file	19	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\math_functions.h"
+	.file	20	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\math_constants.h"
+	.file	21	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\device_functions.h"
+	.file	22	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\sm_12_atomic_functions.h"
+	.file	23	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\sm_13_double_functions.h"
+	.file	24	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\sm_20_atomic_functions.h"
+	.file	25	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\sm_20_intrinsics.h"
+	.file	26	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\surface_functions.h"
+	.file	27	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\texture_fetch_functions.h"
+	.file	28	"c:\program files\nvidia gpu computing toolkit\cuda\v3.2\include\math_functions_dbl_ptx3.h"
+
+
+	.entry _Z5step1Piii (
+		.param .u32 __cudaparm__Z5step1Piii_c,
+		.param .s32 __cudaparm__Z5step1Piii_Kp,
+		.param .s32 __cudaparm__Z5step1Piii_n)
+	{
+	.reg .u32 %r<23>;
+	.reg .pred %p<4>;
+	.loc	17	6	0
+$LDWbegin__Z5step1Piii:
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %nctaid.x;
+	mul.lo.u32 	%r5, %r4, %r1;
+	mov.u32 	%r6, %ntid.y;
+	mul.lo.u32 	%r7, %r6, %r5;
+	mov.u32 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	mov.u32 	%r10, %ctaid.y;
+	mul.lo.u32 	%r11, %r10, %r7;
+	add.u32 	%r12, %r3, %r11;
+	mov.u32 	%r13, %tid.x;
+	add.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r9, %r14;
+	mov.u32 	%r16, 0;
+	setp.ge.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_0_1794;
+	bra.uni 	$LBB6__Z5step1Piii;
+$Lt_0_1794:
+	.loc	17	13	0
+	ld.param.s32 	%r17, [__cudaparm__Z5step1Piii_Kp];
+	setp.gt.s32 	%p2, %r17, %r15;
+	@%p2 bra 	$Lt_0_2306;
+	bra.uni 	$LBB6__Z5step1Piii;
+$Lt_0_2306:
+	.loc	17	17	0
+	mov.s32 	%r18, 0;
+	ld.param.u32 	%r19, [__cudaparm__Z5step1Piii_c];
+	mul.lo.u32 	%r20, %r15, 4;
+	add.u32 	%r21, %r19, %r20;
+	st.global.s32 	[%r21+0], %r18;
+$LBB6__Z5step1Piii:
+	.loc	17	18	0
+	exit;
+$LDWend__Z5step1Piii:
+	} // _Z5step1Piii
+	.global .align 1 .b8 __constant846[10] = {0x69,0x64,0x78,0x20,0x3d,0x20,0x25,0x64,0xa,0x0};
+	.global .align 1 .b8 __constant848[8] = {0x70,0x20,0x3d,0x20,0x25,0x64,0xa,0x0};
+
+	.entry _Z5step2PiS_ii (
+		.param .u32 __cudaparm__Z5step2PiS_ii_c,
+		.param .u32 __cudaparm__Z5step2PiS_ii_a,
+		.param .s32 __cudaparm__Z5step2PiS_ii_K,
+		.param .s32 __cudaparm__Z5step2PiS_ii_n)
+	{
+	.reg .u32 %r<36>;
+	.reg .pred %p<7>;
+	.local .align 8 .b8 __cuda___cuda__temp__valist_array_41_160[4];
+	.param .u32 __cudaparma1_vprintf;
+	.param .u32 __cudaparma2_vprintf;
+	.loc	17	20	0
+$LDWbegin__Z5step2PiS_ii:
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %nctaid.x;
+	mul.lo.u32 	%r5, %r4, %r1;
+	mov.u32 	%r6, %ntid.y;
+	mul.lo.u32 	%r7, %r6, %r5;
+	mov.u32 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	mov.u32 	%r10, %ctaid.y;
+	mul.lo.u32 	%r11, %r10, %r7;
+	add.u32 	%r12, %r3, %r11;
+	mov.u32 	%r13, %tid.x;
+	add.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r9, %r14;
+	mov.u32 	%r16, 0;
+	setp.ge.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_1_4098;
+	bra.uni 	$LBB13__Z5step2PiS_ii;
+$Lt_1_4098:
+	.loc	17	29	0
+	ld.param.s32 	%r17, [__cudaparm__Z5step2PiS_ii_n];
+	setp.gt.s32 	%p2, %r17, %r15;
+	@%p2 bra 	$Lt_1_4610;
+	bra.uni 	$LBB13__Z5step2PiS_ii;
+$Lt_1_4610:
+	.loc	17	32	0
+	st.local.s32 	[__cuda___cuda__temp__valist_array_41_160+0], %r15;
+	cvta.global.u32 	%r18, __constant846;
+	st.param.u32 	[__cudaparma1_vprintf], %r18;
+	cvta.local.u32 	%r19, __cuda___cuda__temp__valist_array_41_160;
+	st.param.u32 	[__cudaparma2_vprintf], %r19;
+	call.uni (_), vprintf, (__cudaparma1_vprintf, __cudaparma2_vprintf);
+	.loc	17	33	0
+	mul.lo.u32 	%r20, %r15, 4;
+	ld.param.u32 	%r21, [__cudaparm__Z5step2PiS_ii_a];
+	add.u32 	%r22, %r21, %r20;
+	ld.s32 	%r23, [%r22+0];
+	mov.u32 	%r24, 0;
+	setp.ge.s32 	%p3, %r23, %r24;
+	@%p3 bra 	$Lt_1_5122;
+	bra.uni 	$LBB13__Z5step2PiS_ii;
+$Lt_1_5122:
+	.loc	17	35	0
+	ld.param.s32 	%r25, [__cudaparm__Z5step2PiS_ii_K];
+	setp.ge.s32 	%p4, %r25, %r23;
+	@%p4 bra 	$Lt_1_5634;
+	bra.uni 	$LBB13__Z5step2PiS_ii;
+$Lt_1_5634:
+	.loc	17	37	0
+	mul.lo.u32 	%r26, %r23, 4;
+	ld.param.u32 	%r27, [__cudaparm__Z5step2PiS_ii_c];
+	add.u32 	%r28, %r27, %r26;
+	mov.u32 	%r29, 1;
+	setp.ne.s32 	%p5, %r23, %r29;
+	@%p5 bra 	$Lt_1_6146;
+	.loc	17	40	0
+	ld.s32 	%r30, [%r28+0];
+	st.local.s32 	[__cuda___cuda__temp__valist_array_41_160+0], %r30;
+	cvta.global.u32 	%r31, __constant848;
+	st.param.u32 	[__cudaparma1_vprintf], %r31;
+	cvta.local.u32 	%r32, __cuda___cuda__temp__valist_array_41_160;
+	st.param.u32 	[__cudaparma2_vprintf], %r32;
+	call.uni (_), vprintf, (__cudaparma1_vprintf, __cudaparma2_vprintf);
+$Lt_1_6146:
+	.loc	16	104	0
+	mov.s32 	%r33, 1;
+	atom.add.s32 	%r34, [%r28], %r33;
+$LBB13__Z5step2PiS_ii:
+	.loc	17	42	0
+	exit;
+$LDWend__Z5step2PiS_ii:
+	} // _Z5step2PiS_ii
+	.extern	.shared .align 4 .b8 temp[];
+
+	.entry _Z7prescanPiS_i (
+		.param .u32 __cudaparm__Z7prescanPiS_i_g_odata,
+		.param .u32 __cudaparm__Z7prescanPiS_i_g_idata,
+		.param .s32 __cudaparm__Z7prescanPiS_i_K)
+	{
+	.reg .u32 %r<53>;
+	.reg .pred %p<8>;
+	.loc	17	45	0
+$LDWbegin__Z7prescanPiS_i:
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %nctaid.x;
+	mul.lo.u32 	%r5, %r4, %r1;
+	mov.u32 	%r6, %ntid.y;
+	mul.lo.u32 	%r7, %r6, %r5;
+	mov.u32 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	mov.u32 	%r10, %ctaid.y;
+	mul.lo.u32 	%r11, %r10, %r7;
+	add.u32 	%r12, %r3, %r11;
+	mov.u32 	%r13, %tid.x;
+	add.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r9, %r14;
+	mov.u32 	%r16, 0;
+	setp.ge.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_2_4354;
+	bra.uni 	$LBB17__Z7prescanPiS_i;
+$Lt_2_4354:
+	.loc	17	53	0
+	ld.param.s32 	%r17, [__cudaparm__Z7prescanPiS_i_K];
+	setp.gt.s32 	%p2, %r17, %r15;
+	@%p2 bra 	$Lt_2_4866;
+	bra.uni 	$LBB17__Z7prescanPiS_i;
+$Lt_2_4866:
+	.loc	17	55	0
+	mul.lo.u32 	%r18, %r15, 4;
+	mov.u32 	%r19, 0;
+	setp.le.s32 	%p3, %r15, %r19;
+	@%p3 bra 	$Lt_2_5634;
+	.loc	17	58	0
+	ld.param.u32 	%r20, [__cudaparm__Z7prescanPiS_i_g_idata];
+	add.u32 	%r21, %r20, %r18;
+	ld.global.s32 	%r22, [%r21+-4];
+	bra.uni 	$Lt_2_5378;
+$Lt_2_5634:
+	mov.s32 	%r22, 0;
+$Lt_2_5378:
+	mov.u32 	%r23, temp;
+	add.u32 	%r24, %r18, %r23;
+	st.shared.s32 	[%r24+0], %r22;
+	.loc	17	59	0
+	mov.s32 	%r25, 0;
+	add.s32 	%r26, %r17, %r15;
+	mul.lo.u32 	%r27, %r26, 4;
+	add.u32 	%r28, %r23, %r27;
+	st.shared.s32 	[%r28+0], %r25;
+	.loc	17	60	0
+	bar.sync 	0;
+	mov.u32 	%r29, 1;
+	setp.le.s32 	%p4, %r17, %r29;
+	@%p4 bra 	$Lt_2_7426;
+	mov.s32 	%r30, 1;
+	mov.s32 	%r31, 1;
+	mov.s32 	%r32, 0;
+$Lt_2_6402:
+ //<loop> Loop body line 60, nesting depth: 1, estimated iterations: unknown
+	.loc	17	63	0
+	mov.s32 	%r33, 1;
+	sub.s32 	%r32, %r33, %r32;
+	.loc	17	64	0
+	mov.s32 	%r34, 1;
+	sub.s32 	%r31, %r34, %r31;
+	mul.lo.s32 	%r35, %r32, %r17;
+	mul.lo.s32 	%r36, %r31, %r17;
+	add.s32 	%r37, %r35, %r15;
+	add.s32 	%r38, %r36, %r15;
+	mul.lo.u32 	%r39, %r37, 4;
+	mul.lo.u32 	%r40, %r38, 4;
+	add.u32 	%r41, %r39, %r23;
+	add.u32 	%r42, %r40, %r23;
+	ld.shared.s32 	%r43, [%r42+0];
+	setp.gt.s32 	%p5, %r30, %r15;
+	@%p5 bra 	$Lt_2_6914;
+ //<loop> Part of loop body line 60, head labeled $Lt_2_6402
+	.loc	17	66	0
+	sub.s32 	%r44, %r38, %r30;
+	mul.lo.u32 	%r45, %r44, 4;
+	add.u32 	%r46, %r23, %r45;
+	ld.shared.s32 	%r47, [%r46+0];
+	add.s32 	%r48, %r47, %r43;
+	st.shared.s32 	[%r41+0], %r48;
+	bra.uni 	$Lt_2_6658;
+$Lt_2_6914:
+ //<loop> Part of loop body line 60, head labeled $Lt_2_6402
+	.loc	17	68	0
+	st.shared.s32 	[%r41+0], %r43;
+$Lt_2_6658:
+ //<loop> Part of loop body line 60, head labeled $Lt_2_6402
+	.loc	17	69	0
+	bar.sync 	0;
+	.loc	17	61	0
+	mul.lo.s32 	%r30, %r30, 2;
+	setp.lt.s32 	%p6, %r30, %r17;
+	@%p6 bra 	$Lt_2_6402;
+	bra.uni 	$Lt_2_5890;
+$Lt_2_7426:
+	mov.s32 	%r41, %r24;
+$Lt_2_5890:
+	.loc	17	71	0
+	ld.shared.s32 	%r49, [%r41+0];
+	ld.param.u32 	%r50, [__cudaparm__Z7prescanPiS_i_g_odata];
+	add.u32 	%r51, %r50, %r18;
+	st.global.s32 	[%r51+0], %r49;
+$LBB17__Z7prescanPiS_i:
+	.loc	17	72	0
+	exit;
+$LDWend__Z7prescanPiS_i:
+	} // _Z7prescanPiS_i
+
+	.entry _Z5step3PiS_i (
+		.param .u32 __cudaparm__Z5step3PiS_i_g_odata,
+		.param .u32 __cudaparm__Z5step3PiS_i_g_idata,
+		.param .s32 __cudaparm__Z5step3PiS_i_K)
+	{
+	.reg .u32 %r<48>;
+	.reg .pred %p<7>;
+	.loc	17	74	0
+$LDWbegin__Z5step3PiS_i:
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %nctaid.x;
+	mul.lo.u32 	%r5, %r4, %r1;
+	mov.u32 	%r6, %ntid.y;
+	mul.lo.u32 	%r7, %r6, %r5;
+	mov.u32 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	mov.u32 	%r10, %ctaid.y;
+	mul.lo.u32 	%r11, %r10, %r7;
+	add.u32 	%r12, %r3, %r11;
+	mov.u32 	%r13, %tid.x;
+	add.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r9, %r14;
+	mov.u32 	%r16, 0;
+	setp.ge.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_3_3586;
+	bra.uni 	$LBB14__Z5step3PiS_i;
+$Lt_3_3586:
+	.loc	17	82	0
+	ld.param.s32 	%r17, [__cudaparm__Z5step3PiS_i_K];
+	setp.gt.s32 	%p2, %r17, %r15;
+	@%p2 bra 	$Lt_3_4098;
+	bra.uni 	$LBB14__Z5step3PiS_i;
+$Lt_3_4098:
+	.loc	17	84	0
+	mov.u32 	%r18, temp;
+	.loc	17	87	0
+	mul.lo.u32 	%r19, %r15, 4;
+	add.u32 	%r20, %r19, %r18;
+	ld.param.u32 	%r21, [__cudaparm__Z5step3PiS_i_g_idata];
+	add.u32 	%r22, %r21, %r19;
+	ld.global.s32 	%r23, [%r22+0];
+	st.shared.s32 	[%r20+0], %r23;
+	.loc	17	88	0
+	bar.sync 	0;
+	mov.u32 	%r24, 1;
+	setp.le.s32 	%p3, %r17, %r24;
+	@%p3 bra 	$Lt_3_6146;
+	mov.s32 	%r25, 1;
+	mov.s32 	%r26, 1;
+	mov.s32 	%r27, 0;
+$Lt_3_5122:
+ //<loop> Loop body line 88, nesting depth: 1, estimated iterations: unknown
+	.loc	17	91	0
+	mov.s32 	%r28, 1;
+	sub.s32 	%r27, %r28, %r27;
+	.loc	17	92	0
+	mov.s32 	%r29, 1;
+	sub.s32 	%r26, %r29, %r26;
+	mul.lo.s32 	%r30, %r27, %r17;
+	mul.lo.s32 	%r31, %r26, %r17;
+	add.s32 	%r32, %r30, %r15;
+	add.s32 	%r33, %r31, %r15;
+	mul.lo.u32 	%r34, %r32, 4;
+	mul.lo.u32 	%r35, %r33, 4;
+	add.u32 	%r36, %r34, %r18;
+	add.u32 	%r37, %r35, %r18;
+	ld.shared.s32 	%r38, [%r37+0];
+	setp.gt.s32 	%p4, %r25, %r15;
+	@%p4 bra 	$Lt_3_5634;
+ //<loop> Part of loop body line 88, head labeled $Lt_3_5122
+	.loc	17	94	0
+	sub.s32 	%r39, %r33, %r25;
+	mul.lo.u32 	%r40, %r39, 4;
+	add.u32 	%r41, %r18, %r40;
+	ld.shared.s32 	%r42, [%r41+0];
+	add.s32 	%r43, %r42, %r38;
+	st.shared.s32 	[%r36+0], %r43;
+	bra.uni 	$Lt_3_5378;
+$Lt_3_5634:
+ //<loop> Part of loop body line 88, head labeled $Lt_3_5122
+	.loc	17	96	0
+	st.shared.s32 	[%r36+0], %r38;
+$Lt_3_5378:
+ //<loop> Part of loop body line 88, head labeled $Lt_3_5122
+	.loc	17	97	0
+	bar.sync 	0;
+	.loc	17	89	0
+	mul.lo.s32 	%r25, %r25, 2;
+	setp.lt.s32 	%p5, %r25, %r17;
+	@%p5 bra 	$Lt_3_5122;
+	bra.uni 	$Lt_3_4610;
+$Lt_3_6146:
+	mov.s32 	%r36, %r20;
+$Lt_3_4610:
+	.loc	17	99	0
+	ld.shared.s32 	%r44, [%r36+0];
+	ld.param.u32 	%r45, [__cudaparm__Z5step3PiS_i_g_odata];
+	add.u32 	%r46, %r45, %r19;
+	st.global.s32 	[%r46+0], %r44;
+$LBB14__Z5step3PiS_i:
+	.loc	17	100	0
+	exit;
+$LDWend__Z5step3PiS_i:
+	} // _Z5step3PiS_i
+
+	.entry _Z5step4PiS_S_ii (
+		.param .u32 __cudaparm__Z5step4PiS_S_ii_c,
+		.param .u32 __cudaparm__Z5step4PiS_S_ii_a,
+		.param .u32 __cudaparm__Z5step4PiS_S_ii_b,
+		.param .s32 __cudaparm__Z5step4PiS_S_ii_Kp,
+		.param .s32 __cudaparm__Z5step4PiS_S_ii_n)
+	{
+	.reg .u32 %r<32>;
+	.reg .pred %p<4>;
+	.loc	17	102	0
+$LDWbegin__Z5step4PiS_S_ii:
+	mov.u32 	%r1, %ntid.x;
+	mov.u32 	%r2, %ctaid.x;
+	mul.lo.u32 	%r3, %r2, %r1;
+	mov.u32 	%r4, %nctaid.x;
+	mul.lo.u32 	%r5, %r4, %r1;
+	mov.u32 	%r6, %ntid.y;
+	mul.lo.u32 	%r7, %r6, %r5;
+	mov.u32 	%r8, %tid.y;
+	mul.lo.u32 	%r9, %r8, %r5;
+	mov.u32 	%r10, %ctaid.y;
+	mul.lo.u32 	%r11, %r10, %r7;
+	add.u32 	%r12, %r3, %r11;
+	mov.u32 	%r13, %tid.x;
+	add.u32 	%r14, %r13, %r12;
+	add.u32 	%r15, %r9, %r14;
+	mov.u32 	%r16, 0;
+	setp.ge.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_4_1794;
+	bra.uni 	$LBB6__Z5step4PiS_S_ii;
+$Lt_4_1794:
+	.loc	17	109	0
+	ld.param.s32 	%r17, [__cudaparm__Z5step4PiS_S_ii_n];
+	setp.gt.s32 	%p2, %r17, %r15;
+	@%p2 bra 	$Lt_4_2306;
+	bra.uni 	$LBB6__Z5step4PiS_S_ii;
+$Lt_4_2306:
+	.loc	17	112	0
+	ld.param.u32 	%r18, [__cudaparm__Z5step4PiS_S_ii_a];
+	mul.lo.u32 	%r19, %r15, 4;
+	add.u32 	%r20, %r18, %r19;
+	ld.global.s32 	%r21, [%r20+0];
+	.loc	17	113	0
+	ld.param.u32 	%r22, [__cudaparm__Z5step4PiS_S_ii_c];
+	mul.lo.u32 	%r23, %r21, 4;
+	add.u32 	%r24, %r22, %r23;
+	mov.s32 	%r25, -1;
+	atom.global.add.s32 	%r26, [%r24], %r25;
+	mov.s32 	%r27, %r26;
+	.loc	17	114	0
+	ld.param.u32 	%r28, [__cudaparm__Z5step4PiS_S_ii_b];
+	mul.lo.u32 	%r29, %r27, 4;
+	add.u32 	%r30, %r28, %r29;
+	st.global.s32 	[%r30+-4], %r21;
+$LBB6__Z5step4PiS_S_ii:
+	.loc	17	115	0
+	exit;
+$LDWend__Z5step4PiS_S_ii:
+	} // _Z5step4PiS_S_ii
+

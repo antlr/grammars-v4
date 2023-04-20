@@ -3,7 +3,7 @@
 * Processor: Intel(R) Core(TM) i5-4690K CPU @ 3.50GHz
 * Memory: 16 Gb 
 * OS: Windows 7 x64
-* Runtime: [Optimized C#](https://github.com/tunnelvisionlabs/antlr4cs), .NET 4.6.2
+* Runtime: Optimized Antlr C#, .NET 4.6.2
 * Configuration: Release, x64
 
 ## Projects

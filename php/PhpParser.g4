@@ -1,8 +1,8 @@
 /*
 PHP grammar.
 The MIT License (MIT).
-Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
-Copyright (c) 2019, Student Main for php7 support.
+Copyright (c) 2015-2020, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2019-2020, Student Main for php7, php8 support.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,22 +31,17 @@ options { tokenVocab=PhpLexer; }
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
 
 htmlDocument
-    : Shebang? htmlElementOrPhpBlock* EOF
+    : Shebang? (inlineHtml | phpBlock)* EOF
     ;
 
-htmlElementOrPhpBlock
-    : htmlElements
-    | phpBlock
-    | scriptTextPart
-    ;
-
-htmlElements
+inlineHtml
     : htmlElement+
+    | scriptText
     ;
 
+// TODO: split into html, css and xml elements
 htmlElement
     : HtmlDtd
-    | HtmlScriptOpen
     | HtmlClose
     | HtmlStyleOpen
     | HtmlOpen
@@ -65,27 +60,28 @@ htmlElement
     | HtmlDoubleQuoteString
 
     | StyleBody
-    
-    | ScriptClose
+
+    | HtmlScriptOpen
+    | HtmlScriptClose
 
     | XmlStart XmlText* XmlClose
     ;
 
 // Script
-// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
-    
-scriptTextPart
+// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/javascript if necessary.
+
+scriptText
     : ScriptText+
     ;
 
 // PHP
-    
+
 phpBlock
     : importStatement* topStatement+
     ;
 
 importStatement
-    : Import Namespace namespaceNameList ';'
+    : Import Namespace namespaceNameList SemiColon
     ;
 
 topStatement
@@ -95,10 +91,11 @@ topStatement
     | functionDeclaration
     | classDeclaration
     | globalConstantDeclaration
+    | enumDeclaration
     ;
-    
+
 useDeclaration
-    : Use (Function | Const)? useDeclarationContentList ';'
+    : Use (Function_ | Const)? useDeclarationContentList SemiColon
     ;
 
 useDeclarationContentList
@@ -110,7 +107,7 @@ useDeclarationContent
     ;
 
 namespaceDeclaration
-    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* '}' | namespaceNameList ';')
+    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* CloseCurlyBracket | namespaceNameList SemiColon)
     ;
 
 namespaceStatement
@@ -122,16 +119,17 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+        (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
-    : attributes Private? modifier? Partial? (
-      classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)? 
+    : attributes? Private? modifier? Partial? (
+      classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* '}'
+      OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
-    
+
 classEntryType
     : Class
     | Trait
@@ -156,11 +154,11 @@ typeParameterWithDefaultsList
     ;
 
 typeParameterDecl
-    : attributes identifier
+    : attributes? identifier
     ;
 
 typeParameterWithDefaultDecl
-    : attributes identifier Eq (qualifiedStaticTypeRef | primitiveType)
+    : attributes? identifier Eq (qualifiedStaticTypeRef | primitiveType)
     ;
 
 genericDynamicArgs
@@ -168,30 +166,15 @@ genericDynamicArgs
     ;
 
 attributes
-    : attributesGroup*
+    : attributeGroup+
     ;
 
-attributesGroup
-    : '[' (identifier ':')? attribute (',' attribute)* ']'
+attributeGroup
+    : AttributeStart (identifier ':')? attribute (',' attribute)* ']'
     ;
 
 attribute
-    : qualifiedNamespaceName
-    | qualifiedNamespaceName '(' attributeArgList ')'
-    | qualifiedNamespaceName '(' attributeNamedArgList ')'
-    | qualifiedNamespaceName '(' attributeArgList ',' attributeNamedArgList ')'
-    ;
-
-attributeArgList
-    : expression (',' expression)*
-    ;
-
-attributeNamedArgList
-    : attributeNamedArg (',' attributeNamedArg)*
-    ;
-
-attributeNamedArg
-    : VarName '=>' expression
+    : qualifiedNamespaceName arguments?
     ;
 
 innerStatementList
@@ -217,7 +200,7 @@ statement
     | breakStatement
     | continueStatement
     | returnStatement
-    | yieldExpression ';'
+    | yieldExpression SemiColon
     | globalStatement
     | staticVariableStatement
     | echoStatement
@@ -228,21 +211,21 @@ statement
     | throwStatement
     | gotoStatement
     | declareStatement
-    | emptyStatement
+    | emptyStatement_
     | inlineHtmlStatement
     ;
 
-emptyStatement
-    : ';'
+emptyStatement_
+    : SemiColon
     ;
 
 blockStatement
-    : OpenCurlyBracket innerStatementList '}'
+    : OpenCurlyBracket innerStatementList CloseCurlyBracket
     ;
-    
+
 ifStatement
     : If parentheses statement elseIfStatement* elseStatement?
-    | If parentheses ':' innerStatementList elseIfColonStatement* elseColonStatement? EndIf ';'
+    | If parentheses ':' innerStatementList elseIfColonStatement* elseColonStatement? EndIf SemiColon
     ;
 
 elseIfStatement
@@ -262,141 +245,146 @@ elseColonStatement
     ;
 
 whileStatement
-    : While parentheses (statement | ':' innerStatementList EndWhile ';')
+    : While parentheses (statement | ':' innerStatementList EndWhile SemiColon)
     ;
 
 doWhileStatement
-    : Do statement While parentheses ';'
+    : Do statement While parentheses SemiColon
     ;
-    
+
 forStatement
-    : For '(' forInit? ';' expressionList? ';' forUpdate? ')' (statement | ':' innerStatementList EndFor ';' )
+    : For '(' forInit? SemiColon expressionList? SemiColon forUpdate? ')' (statement | ':' innerStatementList EndFor SemiColon )
     ;
 
 forInit
     : expressionList
     ;
-    
+
 forUpdate
     : expressionList
     ;
-    
+
 switchStatement
-    : Switch parentheses (OpenCurlyBracket ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
+    : Switch parentheses (OpenCurlyBracket SemiColon? switchBlock* CloseCurlyBracket | ':' SemiColon? switchBlock* EndSwitch SemiColon)
     ;
 
 switchBlock
-    : ((Case expression | Default) (':' | ';'))+ innerStatementList
+    : ((Case expression | Default) (':' | SemiColon))+ innerStatementList
     ;
-    
+
 breakStatement
-    : Break expression? ';'
+    : Break expression? SemiColon
     ;
-    
+
 continueStatement
-    : Continue expression? ';'
+    : Continue expression? SemiColon
     ;
-    
+
 returnStatement
-    : Return expression? ';'
+    : Return expression? SemiColon
     ;
 
 expressionStatement
-    : expression ';'
+    : expression SemiColon
     ;
 
 unsetStatement
-    : Unset '(' chainList ')' ';'
+    : Unset '(' chainList ')' SemiColon
     ;
-    
+
 foreachStatement
-    : Foreach 
-        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+    : Foreach
+        ( '(' expression As arrayDestructuring ')'
+        | '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
         | '(' expression As assignable ('=>' '&'? chain)? ')'
         | '(' chain As List '(' assignmentList ')' ')' )
-      (statement | ':' innerStatementList EndForeach ';')
+      (statement | ':' innerStatementList EndForeach SemiColon)
     ;
-    
+
 tryCatchFinally
     : Try blockStatement (catchClause+ finallyStatement? | catchClause* finallyStatement)
     ;
 
 catchClause
-    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName ')' blockStatement
+    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName? ')' blockStatement
     ;
 
 finallyStatement
     : Finally blockStatement
     ;
-    
+
 throwStatement
-    : Throw expression ';'
+    : Throw expression SemiColon
     ;
-    
+
 gotoStatement
-    : Goto identifier ';'
+    : Goto identifier SemiColon
     ;
 
 declareStatement
-    : Declare '(' declareList ')' (statement | ':' innerStatementList EndDeclare ';')
+    : Declare '(' declareList ')' (statement | ':' innerStatementList EndDeclare SemiColon)
     ;
 
 inlineHtmlStatement
     : inlineHtml+
     ;
 
-inlineHtml
-    : htmlElements
-    | scriptTextPart
+declareList
+    : directive (',' directive)*
     ;
 
-declareList
-    : identifierInititalizer (',' identifierInititalizer)*
+directive
+    : Ticks Eq (numericConstant | Real)
+    | Encoding Eq SingleQuoteString
+    | StrictTypes Eq numericConstant
     ;
 
 formalParameterList
-    : formalParameter? (',' formalParameter)*
+    : formalParameter? (',' formalParameter)* ','?
     ;
 
 formalParameter
-    : attributes QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier* QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
     : qualifiedStaticTypeRef
     | Callable
     | primitiveType
+    | typeHint '|' typeHint
     ;
 
 globalStatement
-    : Global globalVar (',' globalVar)* ';'
+    : Global globalVar (',' globalVar)* SemiColon
     ;
 
 globalVar
     : VarName
     | Dollar chain
-    | Dollar OpenCurlyBracket expression '}'
+    | Dollar OpenCurlyBracket expression CloseCurlyBracket
     ;
 
 echoStatement
-    : Echo expressionList ';'
+    : Echo expressionList SemiColon
     ;
 
 staticVariableStatement
-    : Static variableInitializer (',' variableInitializer)* ';'
+    : Static variableInitializer (',' variableInitializer)* SemiColon
     ;
 
 classStatement
-    : attributes propertyModifiers typeHint? variableInitializer (',' variableInitializer)* ';'
-    | attributes memberModifiers? Const typeHint? identifierInititalizer (',' identifierInititalizer)* ';'
-    | attributes memberModifiers? Function '&'? identifier
-          typeParameterListInBrackets? '(' formalParameterList ')' baseCtorCall? methodBody
+    : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
+                  | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
+                                     | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+                                       (baseCtorCall | returnTypeDecl)? methodBody
+                                     )
+                  )
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
 traitAdaptations
-    : ';'
-    | OpenCurlyBracket traitAdaptationStatement* '}'
+    : SemiColon
+    | OpenCurlyBracket traitAdaptationStatement* CloseCurlyBracket
     ;
 
 traitAdaptationStatement
@@ -405,13 +393,13 @@ traitAdaptationStatement
     ;
 
 traitPrecedence
-    : qualifiedNamespaceName '::' identifier InsteadOf qualifiedNamespaceNameList ';'
+    : qualifiedNamespaceName '::' identifier InsteadOf qualifiedNamespaceNameList SemiColon
     ;
-    
+
 traitAlias
-    : traitMethodReference As (memberModifier | memberModifier? identifier) ';'
+    : traitMethodReference As (memberModifier | memberModifier? identifier) SemiColon
     ;
-    
+
 traitMethodReference
     : (qualifiedNamespaceName '::')? identifier
     ;
@@ -420,8 +408,12 @@ baseCtorCall
     : ':' identifier arguments?
     ;
 
+returnTypeDecl
+    : ':' QuestionMark? typeHint
+    ;
+
 methodBody
-    : ';'
+    : SemiColon
     | blockStatement
     ;
 
@@ -435,15 +427,28 @@ memberModifiers
     ;
 
 variableInitializer
-    : VarName (Eq constantInititalizer)?
+    : VarName (Eq constantInitializer)?
     ;
 
-identifierInititalizer
-    : identifier Eq constantInititalizer
+identifierInitializer
+    : identifier Eq constantInitializer
     ;
 
 globalConstantDeclaration
-    : attributes Const identifierInititalizer (',' identifierInititalizer)* ';'
+    : attributes? Const identifierInitializer (',' identifierInitializer)* SemiColon
+    ;
+
+enumDeclaration
+    : Enum_ identifier (Colon (IntType | StringType))? (Implements interfaceList)?
+        OpenCurlyBracket
+            enumItem*
+        CloseCurlyBracket
+    ;
+
+enumItem
+    : Case identifier (Eq expression)? SemiColon
+    | memberModifiers? functionDeclaration
+    | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
 expressionList
@@ -459,7 +464,7 @@ parentheses
 expression
     : Clone expression                                          #CloneExpression
     | newExpr                                                   #NewExpression
-    
+
     | stringConstant '[' expression ']'                         #IndexerExpression
 
     | '(' castOperation ')' expression                          #CastExpression
@@ -472,6 +477,7 @@ expression
 
     | Print expression                                          #PrintExpression
 
+    | arrayCreation                                             #ArrayCreationExpression
     | chain                                                     #ChainExpression
     | constant                                                  #ScalarExpression
     | string                                                    #ScalarExpression
@@ -479,7 +485,6 @@ expression
 
     | BackQuoteString                                           #BackQuoteStringExpression
     | parentheses                                               #ParenthesisExpression
-    | arrayCreation                                             #ArrayCreationExpression
 
     | Yield                                                     #SpecialWordExpression
     | List '(' assignmentList ')' Eq expression                 #SpecialWordExpression
@@ -491,6 +496,7 @@ expression
     | (Require | RequireOnce) expression                        #SpecialWordExpression
 
     | lambdaFunctionExpr                                        #LambdaFunctionExpression
+    | matchExpr                                                 #MatchExpression
 
     | <assoc=right> expression op='**' expression               #ArithmeticExpression
     | expression InstanceOf typeRef                             #InstanceOfExpression
@@ -512,8 +518,11 @@ expression
     | expression op='??' expression                             #NullCoalescingExpression
     | expression op='<=>' expression                            #SpaceshipExpression
 
-    | assignable assignmentOperator expression     #AssignmentExpression
-    | assignable Eq '&' (chain | newExpr)          #AssignmentExpression
+    | Throw expression                                          #SpecialWordExpression
+
+    | arrayDestructuring Eq expression                          #ArrayDestructExpression
+    | assignable assignmentOperator attributes? expression      #AssignmentExpression
+    | assignable Eq attributes? '&' (chain | newExpr)           #AssignmentExpression
 
     | expression op=LogicalAnd expression                       #LogicalExpression
     | expression op=LogicalXor expression                       #LogicalExpression
@@ -529,9 +538,30 @@ arrayCreation
     : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
     ;
 
+arrayDestructuring
+    : '[' ','* indexedDestructItem (','+ indexedDestructItem)* ','* ']'
+    | '[' keyedDestructItem (','+ keyedDestructItem)* ','? ']'
+    ;
+
+indexedDestructItem
+    : '&'? chain
+    ;
+
+keyedDestructItem
+    : (expression '=>')? '&'? chain
+    ;
+
 lambdaFunctionExpr
-    : Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
+    : Static? Function_ '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
     | LambdaFn '(' formalParameterList')' '=>' expression
+    ;
+
+matchExpr
+    : Match_ '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
+    ;
+
+matchItem
+    : expression (',' expression)* '=>' expression
     ;
 
 newExpr
@@ -585,14 +615,14 @@ typeRef
     : (qualifiedNamespaceName | indirectTypeRef) genericDynamicArgs?
     | primitiveType
     | Static
-    | anoymousClass
+    | anonymousClass
     ;
 
-anoymousClass
-    : attributes Private? modifier? Partial? (
+anonymousClass
+    : attributes? Private? modifier? Partial? (
       classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* '}'
+      OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
 
 indirectTypeRef
@@ -610,7 +640,7 @@ namespaceNameList
 
 namespaceNameTail
     : identifier (As identifier)?
-    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? '}'
+    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? CloseCurlyBracket
     ;
 
 qualifiedNamespaceNameList
@@ -620,28 +650,25 @@ qualifiedNamespaceNameList
 arguments
     : '(' ( actualArgument (',' actualArgument)* | yieldExpression)? ','? ')'
     ;
-    
+
 actualArgument
-    : '...'? expression
+    : argumentName? '...'? expression
     | '&' chain
     ;
 
-constantInititalizer
-    : constant
-    | string
-    | Array '(' (constantArrayItemList ','?)? ')'
-    | '[' (constantArrayItemList ','?)? ']'
-    | ('+'|'-') constantInititalizer
-    ;
-    
-constantArrayItemList
-    : constantArrayItem (',' constantArrayItem)*
+argumentName
+    : identifier ':'
     ;
 
-constantArrayItem
-    : constantInititalizer ('=>' constantInititalizer)?
+constantInitializer
+    : constant
+    | string
+    | Array '(' (arrayItemList ','?)? ')'
+    | '[' (arrayItemList ','?)? ']'
+    | ('+' | '-') constantInitializer
+    | (string | constant) ('.' (string | constant))*
     ;
-    
+
 constant
     : Null
     | literalConstant
@@ -649,7 +676,7 @@ constant
     | classConstant
     | qualifiedNamespaceName
     ;
-    
+
 literalConstant
     : Real
     | BooleanConstant
@@ -672,7 +699,7 @@ classConstant
 stringConstant
     : Label
     ;
-    
+
 string
     : StartHereDoc HereDocText+
     | StartNowDoc HereDocText+
@@ -717,7 +744,7 @@ functionCallName
     ;
 
 actualArguments
-    : genericDynamicArgs? arguments squareCurlyExpression*
+    : genericDynamicArgs? arguments+ squareCurlyExpression*
     ;
 
 chainBase
@@ -731,16 +758,16 @@ keyedFieldName
     ;
 
 keyedSimpleFieldName
-    : (identifier | OpenCurlyBracket expression '}') squareCurlyExpression*
+    : (identifier | OpenCurlyBracket expression CloseCurlyBracket) squareCurlyExpression*
     ;
 
 keyedVariable
-    : Dollar* (VarName | Dollar OpenCurlyBracket expression '}') squareCurlyExpression*
+    : Dollar* (VarName | Dollar OpenCurlyBracket expression CloseCurlyBracket) squareCurlyExpression*
     ;
 
 squareCurlyExpression
     : '[' expression? ']'
-    | OpenCurlyBracket expression '}'
+    | OpenCurlyBracket expression CloseCurlyBracket
     ;
 
 assignmentList
@@ -757,7 +784,7 @@ modifier
     : Abstract
     | Final
     ;
-    
+
 identifier
     : Label
 
@@ -798,7 +825,7 @@ identifier
     | FloatCast
     | For
     | Foreach
-    | Function
+    | Function_
     | Global
     | Goto
     | If
@@ -814,6 +841,7 @@ identifier
     | Interface
     | IntType
     | IsSet
+    | LambdaFn
     | List
     | LogicalAnd
     | LogicalOr
@@ -828,6 +856,7 @@ identifier
     | Private
     | Protected
     | Public
+    | Readonly
     | Require
     | RequireOnce
     | Resource
@@ -847,6 +876,11 @@ identifier
     | While
     | Yield
     | From
+    | Enum_
+    | Match_
+    | Ticks
+    | Encoding
+    | StrictTypes
 
     | Get
     | Set
@@ -881,8 +915,9 @@ memberModifier
     | Static
     | Abstract
     | Final
+    | Readonly
     ;
-    
+
 magicConstant
     : Namespace__
     | Class__
@@ -923,7 +958,7 @@ primitiveType
     | ObjectType
     | Array
     ;
-    
+
 castOperation
     : BoolType
     | Int8Cast

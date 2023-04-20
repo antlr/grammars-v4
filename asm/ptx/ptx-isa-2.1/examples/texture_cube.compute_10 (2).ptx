@@ -1,0 +1,389 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling texture_cube.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a04500)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"texture_cube.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\cuda\include\texture_fetch_functions.h"
+	.file	17	"C:\CUDA\include\common_functions.h"
+	.file	18	"c:\cuda\include\math_functions.h"
+	.file	19	"c:\cuda\include\math_constants.h"
+	.file	20	"c:\cuda\include\device_functions.h"
+	.file	21	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	22	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_13_double_functions.h"
+	.file	24	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	26	"c:\cuda\include\surface_functions.h"
+	.file	27	"c:\cuda\include\math_functions_dbl_ptx1.h"
+	.file	28	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/simpleD3D10Texture/texture_cube.cu"
+
+	.const .align 4 .b8 __cudart_i2opi_f[24] = {65,144,67,60,153,149,98,219,192,221,52,245,209,87,39,252,41,21,68,78,110,131,249,162};
+
+	.entry _Z24cuda_kernel_texture_cubePciijif (
+		.param .u32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_surface,
+		.param .s32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_width,
+		.param .s32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_height,
+		.param .u32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_pitch,
+		.param .s32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_face,
+		.param .f32 __cudaparm__Z24cuda_kernel_texture_cubePciijif_t)
+	{
+	.reg .u16 %rh<11>;
+	.reg .u32 %r<117>;
+	.reg .f32 %f<60>;
+	.reg .pred %p<16>;
+	.local .align 4 .b8 __cuda___cuda_result_1624[28];
+	.loc	28	27	0
+$LDWbegin__Z24cuda_kernel_texture_cubePciijif:
+	mov.u16 	%rh1, %ctaid.x;
+	mov.u16 	%rh2, %ntid.x;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	mov.u16 	%rh3, %ctaid.y;
+	mov.u16 	%rh4, %ntid.y;
+	mul.wide.u16 	%r2, %rh3, %rh4;
+	cvt.u32.u16 	%r3, %tid.x;
+	add.u32 	%r4, %r3, %r1;
+	cvt.u32.u16 	%r5, %tid.y;
+	add.u32 	%r6, %r5, %r2;
+	ld.param.s32 	%r7, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_height];
+	ld.param.s32 	%r8, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_width];
+	set.le.u32.s32 	%r9, %r7, %r6;
+	neg.s32 	%r10, %r9;
+	set.le.u32.s32 	%r11, %r8, %r4;
+	neg.s32 	%r12, %r11;
+	or.b32 	%r13, %r10, %r12;
+	mov.u32 	%r14, 0;
+	setp.eq.s32 	%p1, %r13, %r14;
+	@%p1 bra 	$Lt_0_13570;
+	bra.uni 	$LBB32__Z24cuda_kernel_texture_cubePciijif;
+$Lt_0_13570:
+	ld.param.s32 	%r7, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_height];
+	.loc	18	1702	0
+	cvt.rn.f32.s32 	%f1, %r7;
+	.loc	28	27	0
+	ld.param.s32 	%r8, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_width];
+	.loc	18	1702	0
+	cvt.rn.f32.s32 	%f2, %r8;
+	cvt.rn.f32.s32 	%f3, %r4;
+	cvt.rn.f32.s32 	%f4, %r6;
+	add.f32 	%f5, %f3, %f3;
+	add.f32 	%f6, %f4, %f4;
+	div.full.f32 	%f7, %f5, %f2;
+	div.full.f32 	%f8, %f6, %f1;
+	mov.f32 	%f9, 0fbf800000;     	// -1
+	add.f32 	%f10, %f7, %f9;
+	mov.f32 	%f11, 0fbf800000;    	// -1
+	add.f32 	%f12, %f8, %f11;
+	mul.f32 	%f13, %f12, %f12;
+	mad.f32 	%f14, %f10, %f10, %f13;
+	sqrt.approx.f32 	%f15, %f14;
+	mov.f32 	%f16, 0f40c90fdb;    	// 6.28319
+	mul.f32 	%f17, %f15, %f16;
+	ld.param.f32 	%f18, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_t];
+	add.f32 	%f19, %f18, %f17;
+	abs.f32 	%f20, %f19;
+	mov.f32 	%f21, 0f7f800000;    	// 1.#INF
+	set.eq.u32.f32 	%r15, %f20, %f21;
+	neg.s32 	%r16, %r15;
+	mov.u32 	%r17, 0;
+	setp.eq.s32 	%p2, %r16, %r17;
+	@%p2 bra 	$Lt_0_14082;
+	neg.f32 	%f22, %f19;
+	add.rn.f32 	%f23, %f19, %f22;
+	bra.uni 	$LDWendi___isinff_203_1;
+$Lt_0_14082:
+	mov.f32 	%f24, 0f473ba700;    	// 48039
+	setp.gt.f32 	%p3, %f20, %f24;
+	@!%p3 bra 	$Lt_0_14594;
+	.loc	18	1395	0
+	mov.u32 	%r18, __cudart_i2opi_f;
+	mov.b32 	%r19, %f19;
+	.loc	18	1396	0
+	and.b32 	%r20, %r19, -2147483648;
+	.loc	18	24	0
+	mov.s32 	%r21, %r18;
+	add.u32 	%r22, %r18, 24;
+	mov.u32 	%r23, __cuda___cuda_result_1624;
+	shl.b32 	%r24, %r19, 8;
+	or.b32 	%r25, %r24, -2147483648;
+	mov.u32 	%r26, 0;
+$Lt_0_15618:
+ //<loop> Loop body line 24, nesting depth: 1, iterations: 6
+	.loc	18	1411	0
+	ld.const.u32 	%r27, [%r21+0];
+	mul.lo.u32 	%r28, %r27, %r25;
+	add.u32 	%r29, %r28, %r26;
+	.loc	18	1412	0
+	set.gt.u32.u32 	%r30, %r28, %r29;
+	neg.s32 	%r31, %r30;
+	mul.hi.u32 	%r32, %r27, %r25;
+	add.u32 	%r26, %r31, %r32;
+	.loc	18	1413	0
+	st.local.u32 	[%r23+0], %r29;
+	add.u32 	%r23, %r23, 4;
+	add.u32 	%r21, %r21, 4;
+	setp.ne.u32 	%p4, %r21, %r22;
+	@%p4 bra 	$Lt_0_15618;
+	.loc	18	1415	0
+	st.local.u32 	[__cuda___cuda_result_1624+24], %r26;
+	.loc	18	1420	0
+	shl.b32 	%r33, %r19, 1;
+	shr.u32 	%r34, %r33, 24;
+	sub.u32 	%r35, %r34, 128;
+	shr.u32 	%r36, %r35, 5;
+	mul.lo.u32 	%r37, %r36, 4;
+	mov.u32 	%r38, __cuda___cuda_result_1624;
+	sub.u32 	%r39, %r38, %r37;
+	ld.local.u32 	%r26, [%r39+24];
+	.loc	18	1421	0
+	ld.local.u32 	%r40, [%r39+20];
+	and.b32 	%r41, %r35, 31;
+	mov.u32 	%r42, 0;
+	setp.eq.u32 	%p5, %r41, %r42;
+	@%p5 bra 	$Lt_0_16130;
+	.loc	18	1424	0
+	mov.s32 	%r43, 32;
+	sub.s32 	%r44, %r43, %r41;
+	shr.u32 	%r45, %r40, %r44;
+	shl.b32 	%r46, %r26, %r41;
+	add.u32 	%r26, %r45, %r46;
+	.loc	18	1425	0
+	ld.local.u32 	%r47, [%r39+16];
+	shr.u32 	%r48, %r47, %r44;
+	shl.b32 	%r49, %r40, %r41;
+	add.u32 	%r40, %r48, %r49;
+$Lt_0_16130:
+	.loc	18	1427	0
+	shr.u32 	%r50, %r26, 30;
+	.loc	18	1429	0
+	shr.u32 	%r51, %r40, 30;
+	shl.b32 	%r52, %r26, 2;
+	add.u32 	%r26, %r51, %r52;
+	.loc	18	1430	0
+	shl.b32 	%r40, %r40, 2;
+	mov.u32 	%r53, 0;
+	setp.eq.u32 	%p6, %r40, %r53;
+	@%p6 bra 	$Lt_0_16898;
+	.loc	18	1431	0
+	add.u32 	%r54, %r26, 1;
+	mov.u32 	%r55, -2147483648;
+	set.gt.u32.u32 	%r56, %r54, %r55;
+	neg.s32 	%r57, %r56;
+	bra.uni 	$Lt_0_16642;
+$Lt_0_16898:
+	mov.u32 	%r58, -2147483648;
+	set.gt.u32.u32 	%r59, %r26, %r58;
+	neg.s32 	%r57, %r59;
+$Lt_0_16642:
+	.loc	18	1432	0
+	add.u32 	%r60, %r50, %r57;
+	.loc	18	1431	0
+	neg.s32 	%r61, %r60;
+	mov.u32 	%r62, 0;
+	setp.ne.u32 	%p7, %r20, %r62;
+	selp.s32 	%r63, %r61, %r60, %p7;
+	mov.u32 	%r64, 0;
+	setp.eq.u32 	%p8, %r57, %r64;
+	@%p8 bra 	$Lt_0_17154;
+	.loc	18	1437	0
+	neg.s32 	%r40, %r40;
+	.loc	18	1439	0
+	mov.u32 	%r65, 0;
+	set.eq.u32.u32 	%r66, %r40, %r65;
+	neg.s32 	%r67, %r66;
+	not.b32 	%r68, %r26;
+	add.u32 	%r26, %r67, %r68;
+	.loc	18	1440	0
+	xor.b32 	%r20, %r20, -2147483648;
+$Lt_0_17154:
+	.loc	18	1442	0
+	mov.s32 	%r69, %r63;
+	mov.u32 	%r70, 0;
+	setp.le.s32 	%p9, %r26, %r70;
+	@%p9 bra 	$Lt_0_20226;
+	mov.u32 	%r71, 0;
+$Lt_0_18178:
+ //<loop> Loop body line 1442, nesting depth: 1, estimated iterations: unknown
+	.loc	18	1446	0
+	shr.u32 	%r72, %r40, 31;
+	shl.b32 	%r73, %r26, 1;
+	add.u32 	%r26, %r72, %r73;
+	.loc	18	1447	0
+	shl.b32 	%r40, %r40, 1;
+	.loc	18	1448	0
+	sub.u32 	%r71, %r71, 1;
+	mov.u32 	%r74, 0;
+	setp.gt.s32 	%p10, %r26, %r74;
+	@%p10 bra 	$Lt_0_18178;
+	bra.uni 	$Lt_0_17666;
+$Lt_0_20226:
+	mov.u32 	%r71, 0;
+$Lt_0_17666:
+	.loc	18	1450	0
+	mul.lo.u32 	%r40, %r26, -921707870;
+	.loc	18	1451	0
+	mov.s32 	%r75, -921707870;
+	mul.hi.u32 	%r26, %r26, %r75;
+	mov.u32 	%r76, 0;
+	setp.le.s32 	%p11, %r26, %r76;
+	@%p11 bra 	$Lt_0_18690;
+	.loc	18	1453	0
+	shr.u32 	%r77, %r40, 31;
+	shl.b32 	%r78, %r26, 1;
+	add.u32 	%r26, %r77, %r78;
+	.loc	18	1454	0
+	shl.b32 	%r40, %r40, 1;
+	.loc	18	1455	0
+	sub.u32 	%r71, %r71, 1;
+$Lt_0_18690:
+	.loc	18	1457	0
+	mov.u32 	%r79, 0;
+	set.ne.u32.u32 	%r80, %r40, %r79;
+	neg.s32 	%r81, %r80;
+	add.u32 	%r26, %r81, %r26;
+	shl.b32 	%r82, %r26, 24;
+	mov.s32 	%r83, 0;
+	set.lt.u32.s32 	%r84, %r82, %r83;
+	neg.s32 	%r85, %r84;
+	shr.u32 	%r86, %r26, 8;
+	add.u32 	%r87, %r71, 126;
+	shl.b32 	%r88, %r87, 23;
+	add.u32 	%r89, %r86, %r88;
+	add.u32 	%r90, %r85, %r89;
+	or.b32 	%r91, %r20, %r90;
+	mov.b32 	%f25, %r91;
+	bra.uni 	$LDWendi___internal_fmad_203_2;
+$Lt_0_14594:
+	.loc	18	1461	0
+	mov.f32 	%f26, 0f3f22f983;    	// 0.63662
+	mul.f32 	%f27, %f19, %f26;
+	cvt.rni.s32.f32 	%r92, %f27;
+	.loc	18	1463	0
+	cvt.rn.f32.s32 	%f28, %r92;
+	neg.f32 	%f29, %f28;
+	mov.f32 	%f30, 0f3fc90000;    	// 1.57031
+	mad.f32 	%f31, %f30, %f29, %f19;
+	.loc	18	1472	0
+	mov.s32 	%r69, %r92;
+	mov.f32 	%f32, 0f39fd8000;    	// 0.000483513
+	mad.f32 	%f33, %f32, %f29, %f31;
+	mov.f32 	%f34, 0f34a88000;    	// 3.13856e-007
+	mad.f32 	%f35, %f34, %f29, %f33;
+	mov.f32 	%f36, 0f2e85a309;    	// 6.0771e-011
+	mad.f32 	%f25, %f36, %f29, %f35;
+$LDWendi___internal_fmad_203_2:
+	.loc	18	1705	0
+	add.s32 	%r93, %r69, 1;
+	mul.f32 	%f37, %f25, %f25;
+	and.b32 	%r94, %r93, 1;
+	mov.u32 	%r95, 0;
+	setp.eq.s32 	%p12, %r94, %r95;
+	@%p12 bra 	$Lt_0_19458;
+	.loc	18	1709	0
+	mov.f32 	%f38, 0f3f800000;    	// 1
+	mov.f32 	%f39, 0fbf000000;    	// -0.5
+	mov.f32 	%f40, 0f3d2aaaa5;    	// 0.0416666
+	mov.f32 	%f41, 0fbab6061a;    	// -0.00138873
+	mov.f32 	%f42, 0f37ccf5ce;    	// 2.44332e-005
+	mad.f32 	%f43, %f42, %f37, %f41;
+	mad.f32 	%f44, %f37, %f43, %f40;
+	mad.f32 	%f45, %f37, %f44, %f39;
+	mad.f32 	%f46, %f37, %f45, %f38;
+	bra.uni 	$Lt_0_19202;
+$Lt_0_19458:
+	.loc	18	1711	0
+	mov.f32 	%f47, 0fbe2aaaa3;    	// -0.166667
+	mov.f32 	%f48, 0f3c08839e;    	// 0.00833216
+	mov.f32 	%f49, 0fb94ca1f9;    	// -0.000195153
+	mad.f32 	%f50, %f49, %f37, %f48;
+	mad.f32 	%f51, %f37, %f50, %f47;
+	mul.f32 	%f52, %f37, %f51;
+	mad.f32 	%f46, %f52, %f25, %f25;
+$Lt_0_19202:
+	.loc	18	1713	0
+	neg.f32 	%f53, %f46;
+	and.b32 	%r96, %r93, 2;
+	mov.s32 	%r97, 0;
+	setp.ne.s32 	%p13, %r96, %r97;
+	selp.f32 	%f46, %f53, %f46, %p13;
+	mov.f32 	%f23, %f46;
+$LDWendi___isinff_203_1:
+	.loc	28	47	0
+	mul.lo.s32 	%r98, %r4, 4;
+	ld.param.u32 	%r99, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_pitch];
+	mul.lo.u32 	%r100, %r99, %r6;
+	add.u32 	%r101, %r98, %r100;
+	ld.param.u32 	%r102, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_surface];
+	add.u32 	%r103, %r102, %r101;
+	mov.u16 	%rh5, 255;
+	st.global.u8 	[%r103+3], %rh5;
+	mov.f32 	%f54, 0f3f19999a;    	// 0.6
+	mov.f32 	%f55, 0f3ecccccd;    	// 0.4
+	mad.f32 	%f56, %f23, %f55, %f54;
+	ld.param.u32 	%r104, [__cudaparm__Z24cuda_kernel_texture_cubePciijif_face];
+	shr.s32 	%r105, %r104, 31;
+	mov.s32 	%r106, 1;
+	and.b32 	%r107, %r105, %r106;
+	add.s32 	%r108, %r107, %r104;
+	shr.s32 	%r109, %r108, 1;
+	mov.f32 	%f57, 0f437f0000;    	// 255
+	mul.f32 	%f58, %f56, %f57;
+	add.u32 	%r110, %r109, %r103;
+	and.b32 	%r111, %r104, 1;
+	mov.u32 	%r112, 0;
+	setp.eq.u32 	%p14, %r111, %r112;
+	@%p14 bra 	$Lt_0_19970;
+	.loc	28	50	0
+	mov.u16 	%rh6, 0;
+	st.global.u8 	[%r103+2], %rh6;
+	mov.u16 	%rh7, 0;
+	st.global.u8 	[%r103+1], %rh7;
+	mov.u16 	%rh8, 0;
+	st.global.u8 	[%r103+0], %rh8;
+	.loc	28	53	0
+	cvt.rzi.u32.f32 	%r113, %f58;
+	st.global.u8 	[%r110+0], %r113;
+	bra.uni 	$LBB32__Z24cuda_kernel_texture_cubePciijif;
+$Lt_0_19970:
+	.loc	28	57	0
+	cvt.rzi.u32.f32 	%r114, %f58;
+	mov.s32 	%r115, %r114;
+	st.global.u8 	[%r103+2], %r115;
+	st.global.u8 	[%r103+1], %r115;
+	st.global.u8 	[%r103+0], %r115;
+	.loc	28	60	0
+	mov.u16 	%rh9, 0;
+	st.global.u8 	[%r110+0], %rh9;
+$LBB32__Z24cuda_kernel_texture_cubePciijif:
+	.loc	28	62	0
+	exit;
+$LDWend__Z24cuda_kernel_texture_cubePciijif:
+	} // _Z24cuda_kernel_texture_cubePciijif
+

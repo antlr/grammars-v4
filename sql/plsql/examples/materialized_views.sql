@@ -79,3 +79,41 @@ CREATE MATERIALIZED VIEW TEST
       SELECT 'A', 'B', 'C'
       FROM DUAL
       JOIN TESTCTE;
+
+-- tests for column aliases
+CREATE MATERIALIZED VIEW sales_mv (year, "prod")
+   BUILD IMMEDIATE
+   REFRESH FAST ON COMMIT
+   AS SELECT t.calendar_year, p.prod_id,
+      SUM(s.amount_sold) AS sum_sales
+      FROM times t, products p, sales s
+      WHERE t.time_id = s.time_id AND p.prod_id = s.prod_id
+      GROUP BY t.calendar_year, p.prod_id;
+
+CREATE MATERIALIZED VIEW sales_mv (year ENCRYPT, prod)
+   BUILD IMMEDIATE
+   REFRESH FAST ON COMMIT
+   AS SELECT t.calendar_year, p.prod_id,
+      SUM(s.amount_sold) AS sum_sales
+      FROM times t, products p, sales s
+      WHERE t.time_id = s.time_id AND p.prod_id = s.prod_id
+      GROUP BY t.calendar_year, p.prod_id;
+
+CREATE MATERIALIZED VIEW sales_mv (year ENCRYPT, prod ENCRYPT USING 'some_algorithm' IDENTIFIED BY pass 'int_algorithm' NO SALT)
+   BUILD IMMEDIATE
+   REFRESH FAST ON COMMIT
+   AS SELECT t.calendar_year, p.prod_id,
+      SUM(s.amount_sold) AS sum_sales
+      FROM times t, products p, sales s
+      WHERE t.time_id = s.time_id AND p.prod_id = s.prod_id
+      GROUP BY t.calendar_year, p.prod_id;
+
+-- tests for scoped table ref constraints
+CREATE MATERIALIZED VIEW sales_mv (year ENCRYPT, prod ENCRYPT, SCOPE FOR (ref_col) IS schema.table_or_alias)
+   BUILD IMMEDIATE
+   REFRESH FAST ON COMMIT
+   AS SELECT t.calendar_year, p.prod_id,
+      SUM(s.amount_sold) AS sum_sales
+      FROM times t, products p, sales s
+      WHERE t.time_id = s.time_id AND p.prod_id = s.prod_id
+      GROUP BY t.calendar_year, p.prod_id;

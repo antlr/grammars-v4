@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gff3;
 
 document
-   : HEADER line+
+   : HEADER line+ EOF
    ; 
 
 line
@@ -42,7 +42,7 @@ line
    ;
 
 dataline
-   : seqid '\t' source '\t' type '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
+   : seqid '\t' source '\t' type_ '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
    ;
 
 attributes
@@ -61,7 +61,7 @@ source
    : TEXT
    ;
 
-type
+type_
    : TEXT
    ;
 

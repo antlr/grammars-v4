@@ -1,0 +1,795 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	.visible .func (.param .u32 __cudaretf__Z12ComputeSobelhhhhhhhhhf) _Z12ComputeSobelhhhhhhhhhf (.param .u32 __cudaparmf1__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf2__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf3__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf4__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf5__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf6__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf7__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf8__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf9__Z12ComputeSobelhhhhhhhhhf, .param .f32 __cudaparmf10__Z12ComputeSobelhhhhhhhhhf)
+
+	//-----------------------------------------------------------
+	// Compiling SobelFilter_kernels.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a09228)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"SobelFilter_kernels.compute_20.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\sobelfilter\SobelFilter_kernels.h"
+	.file	17	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/SobelFilter/SobelFilter_kernels.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.extern	.shared .align 1 .b8 LocalBlock[];
+	.global .texref tex;
+
+	.visible .func (.param .u32 __cudaretf__Z12ComputeSobelhhhhhhhhhf) _Z12ComputeSobelhhhhhhhhhf (.param .u32 __cudaparmf1__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf2__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf3__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf4__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf5__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf6__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf7__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf8__Z12ComputeSobelhhhhhhhhhf, .param .u32 __cudaparmf9__Z12ComputeSobelhhhhhhhhhf, .param .f32 __cudaparmf10__Z12ComputeSobelhhhhhhhhhf)
+	{
+	.reg .u32 %r<43>;
+	.reg .f32 %f<6>;
+	.reg .pred %p<4>;
+	.loc	17	50	0
+$LDWbegin__Z12ComputeSobelhhhhhhhhhf:
+	ld.param.u32 	%r1, [__cudaparmf1__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r2, %r1;
+	ld.param.u32 	%r3, [__cudaparmf2__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r4, %r3;
+	ld.param.u32 	%r5, [__cudaparmf3__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r6, %r5;
+	ld.param.u32 	%r7, [__cudaparmf4__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r8, %r7;
+	ld.param.u32 	%r9, [__cudaparmf6__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r10, %r9;
+	ld.param.u32 	%r11, [__cudaparmf7__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r12, %r11;
+	ld.param.u32 	%r13, [__cudaparmf8__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r14, %r13;
+	ld.param.u32 	%r15, [__cudaparmf9__Z12ComputeSobelhhhhhhhhhf];
+	cvt.u8.u32 	%r16, %r15;
+	ld.param.f32 	%f1, [__cudaparmf10__Z12ComputeSobelhhhhhhhhhf];
+	mov.f32 	%f2, %f1;
+	.loc	17	53	0
+	mul.lo.s32 	%r17, %r4, 2;
+	add.u32 	%r18, %r2, %r17;
+	add.u32 	%r19, %r6, %r18;
+	sub.u32 	%r20, %r19, %r12;
+	mul.lo.s32 	%r21, %r14, 2;
+	sub.s32 	%r22, %r20, %r21;
+	sub.u32 	%r23, %r22, %r16;
+	cvt.s16.s32 	%r24, %r23;
+	abs.s32 	%r25, %r24;
+	mul.lo.s32 	%r26, %r10, 2;
+	add.u32 	%r27, %r6, %r26;
+	add.u32 	%r28, %r16, %r27;
+	sub.u32 	%r29, %r28, %r2;
+	mul.lo.s32 	%r30, %r8, 2;
+	sub.s32 	%r31, %r29, %r30;
+	sub.u32 	%r32, %r31, %r12;
+	cvt.s16.s32 	%r33, %r32;
+	abs.s32 	%r34, %r33;
+	add.s32 	%r35, %r25, %r34;
+	cvt.rn.f32.s32 	%f3, %r35;
+	mul.f32 	%f4, %f3, %f2;
+	cvt.rzi.s32.f32 	%r36, %f4;
+	cvt.s16.s32 	%r37, %r36;
+	mov.u32 	%r38, 0;
+	setp.ge.s32 	%p1, %r37, %r38;
+	@%p1 bra 	$Lt_0_2050;
+	.loc	17	54	0
+	mov.s32 	%r39, 0;
+	bra.uni 	$LBB6__Z12ComputeSobelhhhhhhhhhf;
+$Lt_0_2050:
+	mov.u32 	%r40, 255;
+	setp.le.s32 	%p2, %r37, %r40;
+	@%p2 bra 	$Lt_0_1794;
+	mov.s32 	%r39, 255;
+	bra.uni 	$LBB6__Z12ComputeSobelhhhhhhhhhf;
+$Lt_0_1794:
+	.loc	17	55	0
+	cvt.u8.u32 	%r39, %r37;
+$LBB6__Z12ComputeSobelhhhhhhhhhf:
+	mov.s32 	%r41, %r39;
+	st.param.u32 	[__cudaretf__Z12ComputeSobelhhhhhhhhhf], %r41;
+	ret;
+$LDWend__Z12ComputeSobelhhhhhhhhhf:
+	} // _Z12ComputeSobelhhhhhhhhhf
+
+	.entry _Z11SobelSharedP6uchar4tssssf (
+		.param .u32 __cudaparm__Z11SobelSharedP6uchar4tssssf_pSobelOriginal,
+		.param .u16 __cudaparm__Z11SobelSharedP6uchar4tssssf_SobelPitch,
+		.param .s16 __cudaparm__Z11SobelSharedP6uchar4tssssf_BlockWidth,
+		.param .s16 __cudaparm__Z11SobelSharedP6uchar4tssssf_SharedPitch,
+		.param .s16 __cudaparm__Z11SobelSharedP6uchar4tssssf_w,
+		.param .s16 __cudaparm__Z11SobelSharedP6uchar4tssssf_h,
+		.param .f32 __cudaparm__Z11SobelSharedP6uchar4tssssf_fScale)
+	{
+	.reg .u32 %r<225>;
+	.reg .f32 %f<45>;
+	.reg .pred %p<18>;
+	.loc	17	63	0
+$LDWbegin__Z11SobelSharedP6uchar4tssssf:
+	.loc	17	71	0
+	mov.u32 	%r1, %tid.x;
+	cvt.s16.s32 	%r2, %r1;
+	mov.s32 	%r3, %r2;
+	ld.param.s16 	%r4, [__cudaparm__Z11SobelSharedP6uchar4tssssf_BlockWidth];
+	add.s32 	%r5, %r4, 2;
+	setp.gt.s32 	%p1, %r5, %r2;
+	mov.u32 	%r6, %tid.y;
+	@!%p1 bra 	$Lt_1_13314;
+	mov.u32 	%r7, %ctaid.y;
+	mov.u32 	%r8, %ntid.y;
+	mul.lo.u32 	%r9, %r7, %r8;
+	mov.u32 	%r10, %ctaid.x;
+	mul.lo.u32 	%r11, %r4, %r10;
+	ld.param.s16 	%r12, [__cudaparm__Z11SobelSharedP6uchar4tssssf_SharedPitch];
+	mul.lo.u32 	%r13, %r12, %r6;
+	add.u32 	%r14, %r9, %r6;
+	mul.lo.u32 	%r15, %r11, 4;
+	mov.s32 	%r16, %r14;
+	cvt.s16.s32 	%r17, %r15;
+	cvt.s16.s32 	%r18, %r16;
+	sub.s32 	%r19, %r18, 1;
+	cvt.rn.f32.s32 	%f1, %r19;
+	mov.u32 	%r20, %ntid.x;
+	mov.u32 	%r21, LocalBlock;
+$Lt_1_13826:
+ //<loop> Loop body line 71
+	mul.lo.s32 	%r22, %r3, 4;
+	add.s32 	%r23, %r22, %r17;
+	sub.s32 	%r24, %r23, 1;
+	cvt.rn.f32.s32 	%f2, %r24;
+	mov.f32 	%f3, %f1;
+	mov.f32 	%f4, 0f00000000;     	// 0
+	mov.f32 	%f5, 0f00000000;     	// 0
+	tex.2d.v4.u32.f32 {%r25,%r26,%r27,%r28},[tex,{%f2,%f3,%f4,%f5}];
+ //<loop> Part of loop body line 71, head labeled $Lt_1_13826
+	.loc	17	72	0
+	mov.s32 	%r29, %r25;
+	add.s32 	%r30, %r22, %r13;
+	add.u32 	%r31, %r30, %r21;
+	st.shared.u8 	[%r31+0], %r29;
+	cvt.rn.f32.s32 	%f6, %r23;
+	mov.f32 	%f7, %f1;
+	mov.f32 	%f8, 0f00000000;     	// 0
+	mov.f32 	%f9, 0f00000000;     	// 0
+	tex.2d.v4.u32.f32 {%r32,%r33,%r34,%r35},[tex,{%f6,%f7,%f8,%f9}];
+ //<loop> Part of loop body line 71, head labeled $Lt_1_13826
+	.loc	17	74	0
+	mov.s32 	%r36, %r32;
+	st.shared.u8 	[%r31+1], %r36;
+	add.s32 	%r37, %r23, 1;
+	cvt.rn.f32.s32 	%f10, %r37;
+	mov.f32 	%f11, %f1;
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r38,%r39,%r40,%r41},[tex,{%f10,%f11,%f12,%f13}];
+ //<loop> Part of loop body line 71, head labeled $Lt_1_13826
+	.loc	17	76	0
+	mov.s32 	%r42, %r38;
+	st.shared.u8 	[%r31+2], %r42;
+	add.s32 	%r43, %r23, 2;
+	cvt.rn.f32.s32 	%f14, %r43;
+	mov.f32 	%f15, %f1;
+	mov.f32 	%f16, 0f00000000;    	// 0
+	mov.f32 	%f17, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r44,%r45,%r46,%r47},[tex,{%f14,%f15,%f16,%f17}];
+ //<loop> Part of loop body line 71, head labeled $Lt_1_13826
+	.loc	17	78	0
+	mov.s32 	%r48, %r44;
+	st.shared.u8 	[%r31+3], %r48;
+	.loc	17	71	0
+	add.u32 	%r49, %r3, %r20;
+	cvt.s16.s32 	%r3, %r49;
+	setp.lt.s32 	%p2, %r3, %r5;
+	@%p2 bra 	$Lt_1_13826;
+$Lt_1_13314:
+	mov.u32 	%r21, LocalBlock;
+	mov.u32 	%r50, 1;
+	setp.gt.u32 	%p3, %r6, %r50;
+	@%p3 bra 	$Lt_1_14338;
+	.loc	17	86	0
+	mov.s32 	%r3, %r2;
+	@!%p1 bra 	$Lt_1_14850;
+	mov.u32 	%r51, %ntid.y;
+	mov.u32 	%r52, %ctaid.y;
+	mul.lo.u32 	%r9, %r52, %r51;
+	mov.u32 	%r53, %ctaid.x;
+	mul.lo.u32 	%r11, %r4, %r53;
+	add.u32 	%r54, %r51, %r6;
+	add.u32 	%r14, %r9, %r6;
+	mul.lo.u32 	%r15, %r11, 4;
+	ld.param.s16 	%r55, [__cudaparm__Z11SobelSharedP6uchar4tssssf_SharedPitch];
+	mul.lo.u32 	%r56, %r55, %r54;
+	mov.s32 	%r16, %r14;
+	cvt.s16.s32 	%r17, %r15;
+	cvt.s16.s32 	%r18, %r16;
+	add.u32 	%r57, %r18, %r51;
+	sub.u32 	%r58, %r57, 1;
+	cvt.rn.f32.u32 	%f18, %r58;
+	mov.u32 	%r20, %ntid.x;
+$Lt_1_15362:
+ //<loop> Loop body line 86
+	mul.lo.s32 	%r22, %r3, 4;
+	add.s32 	%r23, %r22, %r17;
+	sub.s32 	%r59, %r23, 1;
+	cvt.rn.f32.s32 	%f19, %r59;
+	mov.f32 	%f20, %f18;
+	mov.f32 	%f21, 0f00000000;    	// 0
+	mov.f32 	%f22, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r60,%r61,%r62,%r63},[tex,{%f19,%f20,%f21,%f22}];
+ //<loop> Part of loop body line 86, head labeled $Lt_1_15362
+	.loc	17	87	0
+	mov.s32 	%r64, %r60;
+	add.s32 	%r65, %r22, %r56;
+	add.u32 	%r66, %r65, %r21;
+	st.shared.u8 	[%r66+0], %r64;
+	cvt.rn.f32.s32 	%f23, %r23;
+	mov.f32 	%f24, %f18;
+	mov.f32 	%f25, 0f00000000;    	// 0
+	mov.f32 	%f26, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r67,%r68,%r69,%r70},[tex,{%f23,%f24,%f25,%f26}];
+ //<loop> Part of loop body line 86, head labeled $Lt_1_15362
+	.loc	17	89	0
+	mov.s32 	%r71, %r67;
+	st.shared.u8 	[%r66+1], %r71;
+	add.s32 	%r72, %r23, 1;
+	cvt.rn.f32.s32 	%f27, %r72;
+	mov.f32 	%f28, %f18;
+	mov.f32 	%f29, 0f00000000;    	// 0
+	mov.f32 	%f30, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r73,%r74,%r75,%r76},[tex,{%f27,%f28,%f29,%f30}];
+ //<loop> Part of loop body line 86, head labeled $Lt_1_15362
+	.loc	17	91	0
+	mov.s32 	%r77, %r73;
+	st.shared.u8 	[%r66+2], %r77;
+	add.s32 	%r78, %r23, 2;
+	cvt.rn.f32.s32 	%f31, %r78;
+	mov.f32 	%f32, %f18;
+	mov.f32 	%f33, 0f00000000;    	// 0
+	mov.f32 	%f34, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r79,%r80,%r81,%r82},[tex,{%f31,%f32,%f33,%f34}];
+ //<loop> Part of loop body line 86, head labeled $Lt_1_15362
+	.loc	17	93	0
+	mov.s32 	%r83, %r79;
+	st.shared.u8 	[%r66+3], %r83;
+	.loc	17	86	0
+	add.u32 	%r84, %r3, %r20;
+	cvt.s16.s32 	%r3, %r84;
+	setp.lt.s32 	%p4, %r3, %r5;
+	@%p4 bra 	$Lt_1_15362;
+$Lt_1_14850:
+$Lt_1_14338:
+	.loc	17	98	0
+	bar.sync 	0;
+	.loc	17	104	0
+	mov.s32 	%r3, %r2;
+	setp.ge.s32 	%p5, %r2, %r4;
+	@%p5 bra 	$Lt_1_15874;
+	mov.u32 	%r85, %ctaid.y;
+	mov.u32 	%r86, %ntid.y;
+	mul.lo.u32 	%r9, %r85, %r86;
+	add.u32 	%r14, %r9, %r6;
+	mov.s32 	%r16, %r14;
+	cvt.s16.s32 	%r18, %r16;
+	ld.param.u16 	%r87, [__cudaparm__Z11SobelSharedP6uchar4tssssf_SobelPitch];
+	mul.lo.s32 	%r88, %r18, %r87;
+	ld.param.u32 	%r89, [__cudaparm__Z11SobelSharedP6uchar4tssssf_pSobelOriginal];
+	add.u32 	%r90, %r88, %r89;
+	mov.u32 	%r91, %ctaid.x;
+	mul.lo.u32 	%r11, %r4, %r91;
+	mul.lo.u32 	%r15, %r11, 4;
+	cvt.s16.s32 	%r17, %r15;
+	shr.s32 	%r92, %r17, 2;
+	cvt.s16.s32 	%r93, %r92;
+	ld.param.s16 	%r94, [__cudaparm__Z11SobelSharedP6uchar4tssssf_SharedPitch];
+	mul.lo.u32 	%r13, %r94, %r6;
+	ld.param.s16 	%r95, [__cudaparm__Z11SobelSharedP6uchar4tssssf_w];
+	shr.s32 	%r96, %r95, 31;
+	mov.s32 	%r97, 3;
+	and.b32 	%r98, %r96, %r97;
+	add.s32 	%r99, %r98, %r95;
+	shr.s32 	%r100, %r99, 2;
+	cvt.s16.s32 	%r101, %r100;
+	ld.param.s16 	%r102, [__cudaparm__Z11SobelSharedP6uchar4tssssf_h];
+	setp.gt.s32 	%p6, %r102, %r18;
+	selp.s32 	%r103, 1, 0, %p6;
+	mov.u32 	%r20, %ntid.x;
+	ld.param.f32 	%f35, [__cudaparm__Z11SobelSharedP6uchar4tssssf_fScale];
+$Lt_1_16386:
+ //<loop> Loop body line 106
+	.loc	17	106	0
+	mul.lo.s32 	%r22, %r3, 4;
+	add.s32 	%r104, %r22, %r13;
+	add.u32 	%r31, %r104, %r21;
+	ld.shared.u8 	%r105, [%r31+0];
+	.loc	17	107	0
+	ld.shared.u8 	%r106, [%r31+1];
+	.loc	17	108	0
+	ld.shared.u8 	%r107, [%r31+2];
+	.loc	17	109	0
+	add.s32 	%r108, %r104, %r94;
+	add.u32 	%r109, %r108, %r21;
+	ld.shared.u8 	%r110, [%r109+0];
+	.loc	17	110	0
+	ld.shared.u8 	%r111, [%r109+1];
+	.loc	17	111	0
+	ld.shared.u8 	%r112, [%r109+2];
+	.loc	17	112	0
+	mul.lo.s32 	%r113, %r3, 2;
+	add.s32 	%r114, %r113, %r94;
+	mul.lo.s32 	%r115, %r114, 2;
+	add.s32 	%r116, %r115, %r13;
+	add.u32 	%r117, %r116, %r21;
+	ld.shared.u8 	%r118, [%r117+0];
+	.loc	17	113	0
+	ld.shared.u8 	%r119, [%r117+1];
+	.loc	17	114	0
+	ld.shared.u8 	%r120, [%r117+2];
+	.loc	17	53	0
+	mul.lo.s32 	%r121, %r112, 2;
+	mul.lo.s32 	%r122, %r106, 2;
+	add.u32 	%r123, %r105, %r122;
+	add.u32 	%r124, %r107, %r123;
+	sub.u32 	%r125, %r124, %r118;
+	mul.lo.s32 	%r126, %r119, 2;
+	sub.s32 	%r127, %r125, %r126;
+	sub.u32 	%r128, %r127, %r120;
+	cvt.s16.s32 	%r129, %r128;
+	abs.s32 	%r130, %r129;
+	add.u32 	%r131, %r121, %r107;
+	add.u32 	%r132, %r120, %r131;
+	sub.u32 	%r133, %r132, %r105;
+	mul.lo.s32 	%r134, %r110, 2;
+	sub.s32 	%r135, %r133, %r134;
+	sub.u32 	%r136, %r135, %r118;
+	cvt.s16.s32 	%r137, %r136;
+	abs.s32 	%r138, %r137;
+	add.s32 	%r139, %r130, %r138;
+	cvt.rn.f32.s32 	%f36, %r139;
+	mul.f32 	%f37, %f36, %f35;
+	cvt.rzi.s32.f32 	%r140, %f37;
+	cvt.s16.s32 	%r141, %r140;
+	mov.u32 	%r142, 0;
+	setp.ge.s32 	%p7, %r141, %r142;
+	@%p7 bra 	$Lt_1_16898;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r143, 0;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_7;
+$Lt_1_16898:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.u32 	%r144, 255;
+	setp.le.s32 	%p8, %r141, %r144;
+	@%p8 bra 	$Lt_1_16642;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r143, 255;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_7;
+$Lt_1_16642:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r143, %r141;
+$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_7:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	122	0
+	ld.shared.u8 	%r145, [%r31+3];
+	.loc	17	123	0
+	ld.shared.u8 	%r146, [%r109+3];
+	.loc	17	124	0
+	ld.shared.u8 	%r147, [%r117+3];
+	.loc	17	53	0
+	mul.lo.s32 	%r148, %r146, 2;
+	mul.lo.s32 	%r149, %r107, 2;
+	add.u32 	%r150, %r106, %r149;
+	add.u32 	%r151, %r145, %r150;
+	sub.u32 	%r152, %r151, %r119;
+	mul.lo.s32 	%r153, %r120, 2;
+	sub.s32 	%r154, %r152, %r153;
+	sub.u32 	%r155, %r154, %r147;
+	cvt.s16.s32 	%r156, %r155;
+	abs.s32 	%r157, %r156;
+	add.u32 	%r158, %r148, %r145;
+	add.u32 	%r159, %r147, %r158;
+	sub.u32 	%r160, %r159, %r106;
+	mul.lo.s32 	%r161, %r111, 2;
+	sub.s32 	%r162, %r160, %r161;
+	sub.u32 	%r163, %r162, %r119;
+	cvt.s16.s32 	%r164, %r163;
+	abs.s32 	%r165, %r164;
+	add.s32 	%r166, %r157, %r165;
+	cvt.rn.f32.s32 	%f38, %r166;
+	mul.f32 	%f39, %f38, %f35;
+	cvt.rzi.s32.f32 	%r167, %f39;
+	cvt.s16.s32 	%r141, %r167;
+	mov.u32 	%r168, 0;
+	setp.ge.s32 	%p9, %r141, %r168;
+	@%p9 bra 	$Lt_1_17922;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r169, 0;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_5;
+$Lt_1_17922:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.u32 	%r170, 255;
+	setp.le.s32 	%p10, %r141, %r170;
+	@%p10 bra 	$Lt_1_17666;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r169, 255;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_5;
+$Lt_1_17666:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r169, %r141;
+$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_5:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	129	0
+	ld.shared.u8 	%r106, [%r31+4];
+	.loc	17	130	0
+	ld.shared.u8 	%r111, [%r109+4];
+	.loc	17	131	0
+	ld.shared.u8 	%r119, [%r117+4];
+	.loc	17	53	0
+	mul.lo.s32 	%r171, %r145, 2;
+	add.u32 	%r172, %r107, %r171;
+	add.u32 	%r173, %r106, %r172;
+	sub.u32 	%r174, %r173, %r120;
+	mul.lo.s32 	%r175, %r147, 2;
+	sub.s32 	%r176, %r174, %r175;
+	sub.u32 	%r177, %r176, %r119;
+	cvt.s16.s32 	%r178, %r177;
+	abs.s32 	%r179, %r178;
+	mul.lo.s32 	%r180, %r111, 2;
+	add.u32 	%r181, %r106, %r180;
+	add.u32 	%r182, %r119, %r181;
+	sub.u32 	%r183, %r182, %r107;
+	sub.s32 	%r184, %r183, %r121;
+	sub.u32 	%r185, %r184, %r120;
+	cvt.s16.s32 	%r186, %r185;
+	abs.s32 	%r187, %r186;
+	add.s32 	%r188, %r179, %r187;
+	cvt.rn.f32.s32 	%f40, %r188;
+	mul.f32 	%f41, %f40, %f35;
+	cvt.rzi.s32.f32 	%r189, %f41;
+	cvt.s16.s32 	%r141, %r189;
+	mov.u32 	%r190, 0;
+	setp.ge.s32 	%p11, %r141, %r190;
+	@%p11 bra 	$Lt_1_18946;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r191, 0;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_3;
+$Lt_1_18946:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.u32 	%r192, 255;
+	setp.le.s32 	%p12, %r141, %r192;
+	@%p12 bra 	$Lt_1_18690;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r191, 255;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_3;
+$Lt_1_18690:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r191, %r141;
+$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_3:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	136	0
+	ld.shared.u8 	%r107, [%r31+5];
+	.loc	17	137	0
+	ld.shared.u8 	%r193, [%r109+5];
+	.loc	17	138	0
+	ld.shared.u8 	%r120, [%r117+5];
+	.loc	17	53	0
+	mul.lo.s32 	%r194, %r106, 2;
+	add.u32 	%r195, %r145, %r194;
+	add.u32 	%r196, %r107, %r195;
+	sub.u32 	%r197, %r196, %r147;
+	mul.lo.s32 	%r198, %r119, 2;
+	sub.s32 	%r199, %r197, %r198;
+	sub.u32 	%r200, %r199, %r120;
+	cvt.s16.s32 	%r201, %r200;
+	abs.s32 	%r202, %r201;
+	mul.lo.s32 	%r203, %r193, 2;
+	add.u32 	%r204, %r107, %r203;
+	add.u32 	%r205, %r120, %r204;
+	sub.u32 	%r206, %r205, %r145;
+	sub.s32 	%r207, %r206, %r148;
+	sub.u32 	%r208, %r207, %r147;
+	cvt.s16.s32 	%r209, %r208;
+	abs.s32 	%r210, %r209;
+	add.s32 	%r211, %r202, %r210;
+	cvt.rn.f32.s32 	%f42, %r211;
+	mul.f32 	%f43, %f42, %f35;
+	cvt.rzi.s32.f32 	%r212, %f43;
+	cvt.s16.s32 	%r141, %r212;
+	mov.u32 	%r213, 0;
+	setp.ge.s32 	%p13, %r141, %r213;
+	@%p13 bra 	$Lt_1_19970;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r214, 0;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_1;
+$Lt_1_19970:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.u32 	%r215, 255;
+	setp.le.s32 	%p14, %r141, %r215;
+	@%p14 bra 	$Lt_1_19714;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r214, 255;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_1;
+$Lt_1_19714:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	mov.s32 	%r214, %r141;
+$LDWendi__Z12ComputeSobelhhhhhhhhhf_178_1:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	139	0
+	add.s32 	%r216, %r3, %r93;
+	set.gt.u32.s32 	%r217, %r101, %r216;
+	neg.s32 	%r218, %r217;
+	and.b32 	%r219, %r218, %r103;
+	mov.u32 	%r220, 0;
+	setp.eq.s32 	%p15, %r219, %r220;
+	@%p15 bra 	$Lt_1_20738;
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	143	0
+	mul.lo.u32 	%r221, %r216, 4;
+	add.u32 	%r222, %r90, %r221;
+	st.global.v4.u8 	[%r222+0], {%r143,%r169,%r191,%r214};
+$Lt_1_20738:
+ //<loop> Part of loop body line 106, head labeled $Lt_1_16386
+	.loc	17	104	0
+	add.u32 	%r223, %r3, %r20;
+	cvt.s16.s32 	%r3, %r223;
+	setp.lt.s32 	%p16, %r3, %r4;
+	@%p16 bra 	$Lt_1_16386;
+$Lt_1_15874:
+	.loc	17	148	0
+	exit;
+$LDWend__Z11SobelSharedP6uchar4tssssf:
+	} // _Z11SobelSharedP6uchar4tssssf
+
+	.entry _Z14SobelCopyImagePhjiif (
+		.param .u32 __cudaparm__Z14SobelCopyImagePhjiif_pSobelOriginal,
+		.param .u32 __cudaparm__Z14SobelCopyImagePhjiif_Pitch,
+		.param .s32 __cudaparm__Z14SobelCopyImagePhjiif_w,
+		.param .s32 __cudaparm__Z14SobelCopyImagePhjiif_h,
+		.param .f32 __cudaparm__Z14SobelCopyImagePhjiif_fscale)
+	{
+	.reg .u32 %r<19>;
+	.reg .f32 %f<14>;
+	.reg .pred %p<4>;
+	.loc	17	152	0
+$LDWbegin__Z14SobelCopyImagePhjiif:
+	.loc	17	156	0
+	cvt.s32.u32 	%r1, %tid.x;
+	mov.s32 	%r2, %r1;
+	ld.param.s32 	%r3, [__cudaparm__Z14SobelCopyImagePhjiif_w];
+	setp.le.s32 	%p1, %r3, %r1;
+	@%p1 bra 	$Lt_2_1282;
+	mov.u32 	%r4, %ctaid.x;
+	cvt.rn.f32.u32 	%f1, %r4;
+	ld.param.u32 	%r5, [__cudaparm__Z14SobelCopyImagePhjiif_Pitch];
+	mul.lo.u32 	%r6, %r5, %r4;
+	ld.param.u32 	%r7, [__cudaparm__Z14SobelCopyImagePhjiif_pSobelOriginal];
+	add.s32 	%r8, %r7, %r6;
+	mov.u32 	%r9, %ntid.x;
+	ld.param.f32 	%f2, [__cudaparm__Z14SobelCopyImagePhjiif_fscale];
+$Lt_2_1794:
+ //<loop> Loop body line 156, nesting depth: 1, estimated iterations: unknown
+	cvt.rn.f32.s32 	%f3, %r2;
+	mov.f32 	%f4, %f1;
+	mov.f32 	%f5, 0f00000000;     	// 0
+	mov.f32 	%f6, 0f00000000;     	// 0
+	tex.2d.v4.u32.f32 {%r10,%r11,%r12,%r13},[tex,{%f3,%f4,%f5,%f6}];
+ //<loop> Part of loop body line 156, head labeled $Lt_2_1794
+	.loc	17	157	0
+	mov.s32 	%r14, %r10;
+	cvt.u8.u32 	%r15, %r14;
+	cvt.rn.f32.u32 	%f7, %r15;
+	mul.f32 	%f8, %f7, %f2;
+	mov.f32 	%f9, 0f00000000;     	// 0
+	max.f32 	%f10, %f8, %f9;
+	mov.f32 	%f11, 0f437f0000;    	// 255
+	min.f32 	%f12, %f10, %f11;
+	cvt.rzi.u32.f32 	%r16, %f12;
+	add.s32 	%r17, %r8, %r2;
+	st.global.u8 	[%r17+0], %r16;
+	add.u32 	%r2, %r2, %r9;
+	setp.lt.s32 	%p2, %r2, %r3;
+	@%p2 bra 	$Lt_2_1794;
+$Lt_2_1282:
+	.loc	17	159	0
+	exit;
+$LDWend__Z14SobelCopyImagePhjiif:
+	} // _Z14SobelCopyImagePhjiif
+
+	.entry _Z8SobelTexPhjiif (
+		.param .u32 __cudaparm__Z8SobelTexPhjiif_pSobelOriginal,
+		.param .u32 __cudaparm__Z8SobelTexPhjiif_Pitch,
+		.param .s32 __cudaparm__Z8SobelTexPhjiif_w,
+		.param .s32 __cudaparm__Z8SobelTexPhjiif_h,
+		.param .f32 __cudaparm__Z8SobelTexPhjiif_fScale)
+	{
+	.reg .u32 %r<88>;
+	.reg .f32 %f<51>;
+	.reg .pred %p<6>;
+	.loc	17	163	0
+$LDWbegin__Z8SobelTexPhjiif:
+	.loc	17	167	0
+	cvt.s32.u32 	%r1, %tid.x;
+	mov.s32 	%r2, %r1;
+	ld.param.s32 	%r3, [__cudaparm__Z8SobelTexPhjiif_w];
+	setp.le.s32 	%p1, %r3, %r1;
+	@%p1 bra 	$Lt_3_3330;
+	mov.u32 	%r4, %ctaid.x;
+	cvt.rn.f32.u32 	%f1, %r4;
+	ld.param.u32 	%r5, [__cudaparm__Z8SobelTexPhjiif_Pitch];
+	mul.lo.u32 	%r6, %r5, %r4;
+	mov.f32 	%f2, 0fbf800000;     	// -1
+	add.f32 	%f3, %f1, %f2;
+	mov.f32 	%f4, 0f3f800000;     	// 1
+	add.f32 	%f5, %f1, %f4;
+	ld.param.u32 	%r7, [__cudaparm__Z8SobelTexPhjiif_pSobelOriginal];
+	add.s32 	%r8, %r7, %r6;
+	mov.u32 	%r9, %ntid.x;
+	ld.param.f32 	%f6, [__cudaparm__Z8SobelTexPhjiif_fScale];
+$Lt_3_3842:
+ //<loop> Loop body line 167, nesting depth: 1, estimated iterations: unknown
+	cvt.rn.f32.s32 	%f7, %r2;
+	mov.f32 	%f8, 0fbf800000;     	// -1
+	add.f32 	%f9, %f7, %f8;
+	mov.f32 	%f10, %f9;
+	mov.f32 	%f11, %f3;
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r10,%r11,%r12,%r13},[tex,{%f10,%f11,%f12,%f13}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	168	0
+	mov.s32 	%r14, %r10;
+	mov.f32 	%f14, %f7;
+	mov.f32 	%f15, %f3;
+	mov.f32 	%f16, 0f00000000;    	// 0
+	mov.f32 	%f17, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r15,%r16,%r17,%r18},[tex,{%f14,%f15,%f16,%f17}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	169	0
+	mov.s32 	%r19, %r15;
+	mov.f32 	%f18, 0f3f800000;    	// 1
+	add.f32 	%f19, %f7, %f18;
+	mov.f32 	%f20, %f19;
+	mov.f32 	%f21, %f3;
+	mov.f32 	%f22, 0f00000000;    	// 0
+	mov.f32 	%f23, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r20,%r21,%r22,%r23},[tex,{%f20,%f21,%f22,%f23}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	170	0
+	mov.s32 	%r24, %r20;
+	mov.f32 	%f24, %f9;
+	mov.f32 	%f25, %f1;
+	mov.f32 	%f26, 0f00000000;    	// 0
+	mov.f32 	%f27, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r25,%r26,%r27,%r28},[tex,{%f24,%f25,%f26,%f27}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	171	0
+	mov.s32 	%r29, %r25;
+	mov.f32 	%f28, %f7;
+	mov.f32 	%f29, %f1;
+	mov.f32 	%f30, 0f00000000;    	// 0
+	mov.f32 	%f31, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r30,%r31,%r32,%r33},[tex,{%f28,%f29,%f30,%f31}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	mov.f32 	%f32, %f19;
+	mov.f32 	%f33, %f1;
+	mov.f32 	%f34, 0f00000000;    	// 0
+	mov.f32 	%f35, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r34,%r35,%r36,%r37},[tex,{%f32,%f33,%f34,%f35}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	173	0
+	mov.s32 	%r38, %r34;
+	mov.f32 	%f36, %f9;
+	mov.f32 	%f37, %f5;
+	mov.f32 	%f38, 0f00000000;    	// 0
+	mov.f32 	%f39, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r39,%r40,%r41,%r42},[tex,{%f36,%f37,%f38,%f39}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	174	0
+	mov.s32 	%r43, %r39;
+	mov.f32 	%f40, %f7;
+	mov.f32 	%f41, %f5;
+	mov.f32 	%f42, 0f00000000;    	// 0
+	mov.f32 	%f43, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r44,%r45,%r46,%r47},[tex,{%f40,%f41,%f42,%f43}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	175	0
+	mov.s32 	%r48, %r44;
+	mov.f32 	%f44, %f19;
+	mov.f32 	%f45, %f5;
+	mov.f32 	%f46, 0f00000000;    	// 0
+	mov.f32 	%f47, 0f00000000;    	// 0
+	tex.2d.v4.u32.f32 {%r49,%r50,%r51,%r52},[tex,{%f44,%f45,%f46,%f47}];
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	176	0
+	mov.s32 	%r53, %r49;
+	.loc	17	53	0
+	cvt.u8.u32 	%r54, %r14;
+	cvt.u8.u32 	%r55, %r24;
+	cvt.u8.u32 	%r56, %r43;
+	cvt.u8.u32 	%r57, %r53;
+	cvt.u8.u32 	%r58, %r19;
+	mul.lo.s32 	%r59, %r58, 2;
+	add.u32 	%r60, %r54, %r59;
+	add.u32 	%r61, %r55, %r60;
+	sub.u32 	%r62, %r61, %r56;
+	cvt.u8.u32 	%r63, %r48;
+	mul.lo.s32 	%r64, %r63, 2;
+	sub.s32 	%r65, %r62, %r64;
+	sub.u32 	%r66, %r65, %r57;
+	cvt.s16.s32 	%r67, %r66;
+	abs.s32 	%r68, %r67;
+	cvt.u8.u32 	%r69, %r38;
+	mul.lo.s32 	%r70, %r69, 2;
+	add.u32 	%r71, %r55, %r70;
+	add.u32 	%r72, %r57, %r71;
+	sub.u32 	%r73, %r72, %r54;
+	cvt.u8.u32 	%r74, %r29;
+	mul.lo.s32 	%r75, %r74, 2;
+	sub.s32 	%r76, %r73, %r75;
+	sub.u32 	%r77, %r76, %r56;
+	cvt.s16.s32 	%r78, %r77;
+	abs.s32 	%r79, %r78;
+	add.s32 	%r80, %r68, %r79;
+	cvt.rn.f32.s32 	%f48, %r80;
+	mul.f32 	%f49, %f48, %f6;
+	cvt.rzi.s32.f32 	%r81, %f49;
+	cvt.s16.s32 	%r82, %r81;
+	mov.u32 	%r83, 0;
+	setp.ge.s32 	%p2, %r82, %r83;
+	@%p2 bra 	$Lt_3_4354;
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	mov.s32 	%r84, 0;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_180_1;
+$Lt_3_4354:
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	mov.u32 	%r85, 255;
+	setp.le.s32 	%p3, %r82, %r85;
+	@%p3 bra 	$Lt_3_4098;
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	mov.s32 	%r84, 255;
+	bra.uni 	$LDWendi__Z12ComputeSobelhhhhhhhhhf_180_1;
+$Lt_3_4098:
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	mov.s32 	%r84, %r82;
+$LDWendi__Z12ComputeSobelhhhhhhhhhf_180_1:
+ //<loop> Part of loop body line 167, head labeled $Lt_3_3842
+	.loc	17	177	0
+	add.s32 	%r86, %r8, %r2;
+	st.global.u8 	[%r86+0], %r84;
+	add.u32 	%r2, %r2, %r9;
+	setp.lt.s32 	%p4, %r2, %r3;
+	@%p4 bra 	$Lt_3_3842;
+$Lt_3_3330:
+	.loc	17	181	0
+	exit;
+$LDWend__Z8SobelTexPhjiif:
+	} // _Z8SobelTexPhjiif
+

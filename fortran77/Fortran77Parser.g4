@@ -32,7 +32,7 @@ options
    { tokenVocab = Fortran77Lexer; }
 
 program
-   : executableUnit + EOL*
+   : executableUnit+ EOL* EOF
    ;
 
 executableUnit
@@ -78,7 +78,7 @@ entryStatement
    ;
 
 functionStatement
-   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN
+   : type_? FUNCTION NAME LPAREN namelist? RPAREN EOL?
    ;
 
 blockdataStatement
@@ -86,7 +86,7 @@ blockdataStatement
    ;
 
 subroutineStatement
-   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)?
+   : SUBROUTINE NAME (LPAREN namelist? RPAREN)? EOL?
    ;
 
 namelist
@@ -105,17 +105,16 @@ statement
    | dataStatement
    | (statementFunctionStatement) statementFunctionStatement
    | executableStatement
-   | commentStatement
    ;
 
 subprogramBody
-   : wholeStatement + endStatement
+   : wholeStatement+ endStatement
    ;
 
 wholeStatement
    : LABEL? statement EOL
    ;
-
+   
 endStatement
    : LABEL? END
    ;
@@ -174,12 +173,8 @@ commonBlock
    : commonName commonItems
    ;
 
-commentStatement
-    : COMMENT
-    ;
-
 typeStatement
-   : typename typeStatementNameList
+   : typename_ typeStatementNameList
    | characterWithLen typeStatementNameCharList
    ;
 
@@ -204,12 +199,12 @@ typeStatementLenSpec
    : STAR lenSpecification
    ;
 
-typename
-   : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL)
+typename_
+   : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL | CHARACTER)
    ;
 
-type
-   : typename
+type_
+   : typename_
    | characterWithLen
    ;
 
@@ -230,7 +225,7 @@ implicitStatement
    ;
 
 implicitSpec
-   : type LPAREN implicitLetters RPAREN
+   : type_ LPAREN implicitLetters RPAREN
    ;
 
 implicitSpecs
@@ -338,7 +333,7 @@ dataImpliedDoListWhat
    ;
 
 gotoStatement
-   : ((GO | GOTO) to) (unconditionalGoto | computedGoto | assignedGoto)
+   : (GO TO| GOTO) (unconditionalGoto | computedGoto | assignedGoto)
    ;
 
 unconditionalGoto
@@ -374,19 +369,19 @@ logicalIfStatement
    ;
 
 blockIfStatement
-   : firstIfBlock (: elseIfStatement)* (elseStatement)? endIfStatement
+   : firstIfBlock elseIfStatement* elseStatement? endIfStatement
    ;
 
 firstIfBlock
-   : THEN wholeStatement +
+   : THEN EOL? wholeStatement+
    ;
 
 elseIfStatement
-   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN wholeStatement +
+   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN EOL? wholeStatement+
    ;
 
 elseStatement
-   : ELSE wholeStatement +
+   : ELSE EOL? wholeStatement+
    ;
 
 endIfStatement
@@ -402,7 +397,7 @@ doVarArgs
    ;
 
 doWithLabel
-   : lblRef (COMMA)? doVarArgs
+   : lblRef COMMA? doVarArgs EOL? doBody EOL? continueStatement
    ;
 
 doBody
@@ -410,7 +405,7 @@ doBody
    ;
 
 doWithEndDo
-   : doVarArgs doBody enddoStatement
+   : doVarArgs EOL? doBody EOL? enddoStatement
    ;
 
 enddoStatement
@@ -418,7 +413,7 @@ enddoStatement
    ;
 
 continueStatement
-   : CONTINUE
+   : lblRef? CONTINUE
    ;
 
 stopStatement
@@ -747,7 +742,7 @@ aexpr3
    ;
 
 aexpr4
-   : (unsignedArithmeticConstant) unsignedArithmeticConstant
+   : unsignedArithmeticConstant
    | (HOLLERITH | SCON)
    | logicalConstant
    | varRef
@@ -882,8 +877,3 @@ identifier
    : NAME
    | REAL
    ;
-
-to
-   : NAME
-   ;
-

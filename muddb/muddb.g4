@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar muddb;
 
 db
-   : room* END
+   : room* END EOL* EOF
    ;
 
 room
-   : roomno name description location contents exits next key fail_message succ_message ofail osuccess owner pennies flags password
+   : roomno name description location contents exits next_ key fail_message succ_message ofail osuccess owner pennies flags password
    ;
 
 roomno
@@ -64,12 +64,12 @@ exits
    : ref
    ;
 
-next
+next_
    : ref
    ;
 
 key
-   : bool
+   : bool_
    ;
 
 fail_message
@@ -112,7 +112,7 @@ ref
    : NUM? EOL
    ;
 
-bool
+bool_
    : NUM? EOL
    ;
 
@@ -133,5 +133,5 @@ STRING
 
 
 EOL
-   : '\r'? '\n'
+   : ('\r' '\n' | '\n' | '\r')
    ;

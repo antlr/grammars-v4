@@ -1,0 +1,17 @@
+# testing
+# comments
+max by (
+  some_entry,
+  # comment here too
+  another_one
+)
+(
+  max_over_time (
+    a_metric
+    {
+      # another comment here
+      important="thing"
+    }
+  )
+)
+

@@ -1,0 +1,10 @@
+This is text that is outside the multi-line comment.
+Online visitors can see it.
+
+#*
+  Thus begins a multi-line comment. Online visitors won't
+  see this text because the Velocity Templating Engine will
+  ignore it.
+*#
+
+Here is text outside the multi-line comment; it is visible.

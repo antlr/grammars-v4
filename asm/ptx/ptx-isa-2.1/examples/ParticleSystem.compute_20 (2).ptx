@@ -1,0 +1,407 @@
+	.version 2.1
+	.target sm_20
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z7noise3D6float3[12]) _Z7noise3D6float3 (.param .align 4 .b8 __cudaparmf1__Z7noise3D6float3[12])
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z12fractalSum3D6float3iff[12]) _Z12fractalSum3D6float3iff (.param .align 4 .b8 __cudaparmf1__Z12fractalSum3D6float3iff[12], .param .s32 __cudaparmf2__Z12fractalSum3D6float3iff, .param .f32 __cudaparmf3__Z12fractalSum3D6float3iff, .param .f32 __cudaparmf4__Z12fractalSum3D6float3iff)
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z12turbulence3D6float3iff[12]) _Z12turbulence3D6float3iff (.param .align 4 .b8 __cudaparmf1__Z12turbulence3D6float3iff[12], .param .s32 __cudaparmf2__Z12turbulence3D6float3iff, .param .f32 __cudaparmf3__Z12turbulence3D6float3iff, .param .f32 __cudaparmf4__Z12turbulence3D6float3iff)
+
+	//-----------------------------------------------------------
+	// Compiling ParticleSystem.compute_20.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a09560)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_20, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"ParticleSystem.compute_20.cudafe2.gpu"
+	.file	2	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\smokeparticles\particles_kernel.cuh"
+	.file	3	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	4	"C:\CUDA\include\crt/device_runtime.h"
+	.file	5	"C:\CUDA\include\host_defines.h"
+	.file	6	"C:\CUDA\include\builtin_types.h"
+	.file	7	"c:\cuda\include\device_types.h"
+	.file	8	"c:\cuda\include\driver_types.h"
+	.file	9	"c:\cuda\include\surface_types.h"
+	.file	10	"c:\cuda\include\texture_types.h"
+	.file	11	"c:\cuda\include\vector_types.h"
+	.file	12	"c:\cuda\include\builtin_types.h"
+	.file	13	"c:\cuda\include\host_defines.h"
+	.file	14	"C:\CUDA\include\device_launch_parameters.h"
+	.file	15	"c:\cuda\include\crt\storage_class.h"
+	.file	16	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	17	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\inc\cutil_math.h"
+	.file	18	"c:\programdata\nvidia corporation\nvidia gpu computing sdk\c\src\smokeparticles\particles_kernel.cu"
+	.file	19	"C:\CUDA\include\common_functions.h"
+	.file	20	"c:\cuda\include\math_functions.h"
+	.file	21	"c:\cuda\include\math_constants.h"
+	.file	22	"c:\cuda\include\device_functions.h"
+	.file	23	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	25	"c:\cuda\include\sm_13_double_functions.h"
+	.file	26	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	27	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	28	"c:\cuda\include\surface_functions.h"
+	.file	29	"c:\cuda\include\texture_fetch_functions.h"
+	.file	30	"c:\cuda\include\math_functions_dbl_ptx3.h"
+
+	.global .texref noiseTex;
+	.const .align 4 .b8 params[52];
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z7noise3D6float3[12]) _Z7noise3D6float3 (.param .align 4 .b8 __cudaparmf1__Z7noise3D6float3[12])
+	{
+	.reg .f32 %f<22>;
+	.loc	18	35	0
+$LDWbegin__Z7noise3D6float3:
+	ld.param.f32 	%f1, [__cudaparmf1__Z7noise3D6float3+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z7noise3D6float3+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z7noise3D6float3+8];
+	mov.f32 	%f6, %f5;
+	mov.f32 	%f7, %f2;
+	mov.f32 	%f8, %f4;
+	mov.f32 	%f9, %f6;
+	mov.f32 	%f10, 0f00000000;    	// 0
+	tex.3d.v4.f32.f32 {%f11,%f12,%f13,%f14},[noiseTex,{%f7,%f8,%f9,%f10}];
+	.loc	18	36	0
+	mov.f32 	%f15, %f11;
+	mov.f32 	%f16, %f12;
+	mov.f32 	%f17, %f13;
+	.loc	18	37	0
+	mov.f32 	%f18, %f15;
+	st.param.f32 	[__cudaretf__Z7noise3D6float3+0], %f18;
+	mov.f32 	%f19, %f16;
+	st.param.f32 	[__cudaretf__Z7noise3D6float3+4], %f19;
+	mov.f32 	%f20, %f17;
+	st.param.f32 	[__cudaretf__Z7noise3D6float3+8], %f20;
+	ret;
+$LDWend__Z7noise3D6float3:
+	} // _Z7noise3D6float3
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z12fractalSum3D6float3iff[12]) _Z12fractalSum3D6float3iff (.param .align 4 .b8 __cudaparmf1__Z12fractalSum3D6float3iff[12], .param .s32 __cudaparmf2__Z12fractalSum3D6float3iff, .param .f32 __cudaparmf3__Z12fractalSum3D6float3iff, .param .f32 __cudaparmf4__Z12fractalSum3D6float3iff)
+	{
+	.reg .u32 %r<8>;
+	.reg .f32 %f<31>;
+	.reg .pred %p<4>;
+	.loc	18	42	0
+$LDWbegin__Z12fractalSum3D6float3iff:
+	ld.param.f32 	%f1, [__cudaparmf1__Z12fractalSum3D6float3iff+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z12fractalSum3D6float3iff+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z12fractalSum3D6float3iff+8];
+	mov.f32 	%f6, %f5;
+	ld.param.u32 	%r1, [__cudaparmf2__Z12fractalSum3D6float3iff];
+	mov.s32 	%r2, %r1;
+	ld.param.f32 	%f7, [__cudaparmf3__Z12fractalSum3D6float3iff];
+	mov.f32 	%f8, %f7;
+	ld.param.f32 	%f9, [__cudaparmf4__Z12fractalSum3D6float3iff];
+	mov.f32 	%f10, %f9;
+	mov.u32 	%r3, 0;
+	setp.le.s32 	%p1, %r2, %r3;
+	@%p1 bra 	$Lt_1_2306;
+	mov.s32 	%r4, %r2;
+	mov.s32 	%r5, 0;
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	mov.f32 	%f14, 0f3f000000;    	// 0.5
+	mov.f32 	%f15, 0f3f800000;    	// 1
+	mov.s32 	%r6, %r4;
+$Lt_1_1794:
+ //<loop> Loop body line 42, nesting depth: 1, estimated iterations: unknown
+	.loc	18	46	0
+	mul.f32 	%f16, %f2, %f15;
+	mul.f32 	%f17, %f4, %f15;
+	mul.f32 	%f18, %f6, %f15;
+	mov.f32 	%f19, 0f00000000;    	// 0
+	tex.3d.v4.f32.f32 {%f20,%f21,%f22,%f23},[noiseTex,{%f16,%f17,%f18,%f19}];
+ //<loop> Part of loop body line 42, head labeled $Lt_1_1794
+	.loc	18	36	0
+	mov.f32 	%f24, %f20;
+	mov.f32 	%f25, %f21;
+	mov.f32 	%f26, %f22;
+	.loc	18	46	0
+	fma.rn.f32 	%f13, %f24, %f14, %f13;
+	fma.rn.f32 	%f12, %f25, %f14, %f12;
+	fma.rn.f32 	%f11, %f26, %f14, %f11;
+	.loc	18	47	0
+	mul.f32 	%f15, %f8, %f15;
+	.loc	18	48	0
+	mul.f32 	%f14, %f10, %f14;
+	add.s32 	%r5, %r5, 1;
+	setp.ne.s32 	%p2, %r2, %r5;
+	@%p2 bra 	$Lt_1_1794;
+	bra.uni 	$Lt_1_1282;
+$Lt_1_2306:
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+$Lt_1_1282:
+	.loc	18	50	0
+	mov.f32 	%f27, %f13;
+	st.param.f32 	[__cudaretf__Z12fractalSum3D6float3iff+0], %f27;
+	mov.f32 	%f28, %f12;
+	st.param.f32 	[__cudaretf__Z12fractalSum3D6float3iff+4], %f28;
+	mov.f32 	%f29, %f11;
+	st.param.f32 	[__cudaretf__Z12fractalSum3D6float3iff+8], %f29;
+	ret;
+$LDWend__Z12fractalSum3D6float3iff:
+	} // _Z12fractalSum3D6float3iff
+
+	.visible .func (.param .align 4 .b8 __cudaretf__Z12turbulence3D6float3iff[12]) _Z12turbulence3D6float3iff (.param .align 4 .b8 __cudaparmf1__Z12turbulence3D6float3iff[12], .param .s32 __cudaparmf2__Z12turbulence3D6float3iff, .param .f32 __cudaparmf3__Z12turbulence3D6float3iff, .param .f32 __cudaparmf4__Z12turbulence3D6float3iff)
+	{
+	.reg .u32 %r<8>;
+	.reg .f32 %f<34>;
+	.reg .pred %p<4>;
+	.loc	18	55	0
+$LDWbegin__Z12turbulence3D6float3iff:
+	ld.param.f32 	%f1, [__cudaparmf1__Z12turbulence3D6float3iff+0];
+	mov.f32 	%f2, %f1;
+	ld.param.f32 	%f3, [__cudaparmf1__Z12turbulence3D6float3iff+4];
+	mov.f32 	%f4, %f3;
+	ld.param.f32 	%f5, [__cudaparmf1__Z12turbulence3D6float3iff+8];
+	mov.f32 	%f6, %f5;
+	ld.param.u32 	%r1, [__cudaparmf2__Z12turbulence3D6float3iff];
+	mov.s32 	%r2, %r1;
+	ld.param.f32 	%f7, [__cudaparmf3__Z12turbulence3D6float3iff];
+	mov.f32 	%f8, %f7;
+	ld.param.f32 	%f9, [__cudaparmf4__Z12turbulence3D6float3iff];
+	mov.f32 	%f10, %f9;
+	mov.u32 	%r3, 0;
+	setp.le.s32 	%p1, %r2, %r3;
+	@%p1 bra 	$Lt_2_2306;
+	mov.s32 	%r4, %r2;
+	mov.s32 	%r5, 0;
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+	mov.f32 	%f14, 0f3f000000;    	// 0.5
+	mov.f32 	%f15, 0f3f800000;    	// 1
+	mov.s32 	%r6, %r4;
+$Lt_2_1794:
+ //<loop> Loop body line 55, nesting depth: 1, estimated iterations: unknown
+	.loc	18	59	0
+	mul.f32 	%f16, %f2, %f15;
+	mul.f32 	%f17, %f4, %f15;
+	mul.f32 	%f18, %f6, %f15;
+	mov.f32 	%f19, 0f00000000;    	// 0
+	tex.3d.v4.f32.f32 {%f20,%f21,%f22,%f23},[noiseTex,{%f16,%f17,%f18,%f19}];
+ //<loop> Part of loop body line 55, head labeled $Lt_2_1794
+	.loc	18	36	0
+	mov.f32 	%f24, %f20;
+	mov.f32 	%f25, %f21;
+	mov.f32 	%f26, %f22;
+	.loc	18	59	0
+	abs.f32 	%f27, %f24;
+	fma.rn.f32 	%f13, %f14, %f27, %f13;
+	abs.f32 	%f28, %f25;
+	fma.rn.f32 	%f12, %f14, %f28, %f12;
+	abs.f32 	%f29, %f26;
+	fma.rn.f32 	%f11, %f14, %f29, %f11;
+	.loc	18	60	0
+	mul.f32 	%f15, %f8, %f15;
+	.loc	18	61	0
+	mul.f32 	%f14, %f10, %f14;
+	add.s32 	%r5, %r5, 1;
+	setp.ne.s32 	%p2, %r2, %r5;
+	@%p2 bra 	$Lt_2_1794;
+	bra.uni 	$Lt_2_1282;
+$Lt_2_2306:
+	mov.f32 	%f11, 0f00000000;    	// 0
+	mov.f32 	%f12, 0f00000000;    	// 0
+	mov.f32 	%f13, 0f00000000;    	// 0
+$Lt_2_1282:
+	.loc	18	63	0
+	mov.f32 	%f30, %f13;
+	st.param.f32 	[__cudaretf__Z12turbulence3D6float3iff+0], %f30;
+	mov.f32 	%f31, %f12;
+	st.param.f32 	[__cudaretf__Z12turbulence3D6float3iff+4], %f31;
+	mov.f32 	%f32, %f11;
+	st.param.f32 	[__cudaretf__Z12turbulence3D6float3iff+8], %f32;
+	ret;
+$LDWend__Z12turbulence3D6float3iff:
+	} // _Z12turbulence3D6float3iff
+
+	.entry _Z10integrateDP6float4S0_S0_S0_fi (
+		.param .u32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_newPos,
+		.param .u32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_newVel,
+		.param .u32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_oldPos,
+		.param .u32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_oldVel,
+		.param .f32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_deltaTime,
+		.param .s32 __cudaparm__Z10integrateDP6float4S0_S0_S0_fi_numParticles)
+	{
+	.reg .u32 %r<17>;
+	.reg .f32 %f<72>;
+	.reg .pred %p<4>;
+	// __cuda_local_var_307692_18_posData = 16
+	// __cuda_local_var_307693_21_velData = 32
+	.loc	18	71	0
+$LDWbegin__Z10integrateDP6float4S0_S0_S0_fi:
+	cvt.s32.u32 	%r1, %ctaid.x;
+	cvt.s32.u32 	%r2, %ntid.x;
+	mul24.lo.s32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r3, %r4;
+	ld.param.s32 	%r6, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_numParticles];
+	setp.gt.s32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_3_1794;
+	bra.uni 	$LBB5__Z10integrateDP6float4S0_S0_S0_fi;
+$Lt_3_1794:
+	.loc	18	76	0
+	mul.lo.u32 	%r7, %r5, 16;
+	ld.param.u32 	%r8, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_oldPos];
+	add.u32 	%r9, %r8, %r7;
+	ld.global.v4.f32 	{%f1,%f2,%f3,%f4}, [%r9+0];
+	mov.f32 	%f5, %f1;
+	mov.f32 	%f6, %f2;
+	mov.f32 	%f7, %f3;
+	mov.f32 	%f8, %f4;
+	.loc	18	77	0
+	ld.param.u32 	%r10, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_oldVel];
+	add.u32 	%r11, %r10, %r7;
+	ld.global.v4.f32 	{%f9,%f10,%f11,%f12}, [%r11+0];
+	mov.f32 	%f13, %f9;
+	mov.f32 	%f14, %f10;
+	mov.f32 	%f15, %f11;
+	mov.f32 	%f16, %f12;
+	.loc	18	79	0
+	mov.f32 	%f17, %f5;
+	mov.f32 	%f18, %f6;
+	mov.f32 	%f19, %f7;
+	.loc	18	80	0
+	mov.f32 	%f20, %f13;
+	mov.f32 	%f21, %f14;
+	mov.f32 	%f22, %f15;
+	.loc	18	83	0
+	mov.f32 	%f23, %f8;
+	.loc	18	84	0
+	mov.f32 	%f24, %f16;
+	.loc	18	76	0
+	ld.param.f32 	%f25, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_deltaTime];
+	add.f32 	%f26, %f23, %f25;
+	setp.lt.f32 	%p2, %f23, %f24;
+	selp.f32 	%f27, %f26, %f24, %p2;
+	.loc	18	95	0
+	ld.const.f32 	%f28, [params+36];
+	ld.const.f32 	%f29, [params+16];
+	ld.const.f32 	%f30, [params+40];
+	mul.f32 	%f31, %f30, %f28;
+	fma.rn.f32 	%f32, %f17, %f29, %f31;
+	ld.const.f32 	%f33, [params+44];
+	mul.f32 	%f34, %f33, %f28;
+	fma.rn.f32 	%f35, %f18, %f29, %f34;
+	ld.const.f32 	%f36, [params+48];
+	mul.f32 	%f37, %f36, %f28;
+	fma.rn.f32 	%f38, %f19, %f29, %f37;
+	mov.f32 	%f39, 0f00000000;    	// 0
+	tex.3d.v4.f32.f32 {%f40,%f41,%f42,%f43},[noiseTex,{%f32,%f35,%f38,%f39}];
+	.loc	18	36	0
+	mov.f32 	%f44, %f40;
+	mov.f32 	%f45, %f41;
+	mov.f32 	%f46, %f42;
+	.loc	18	104	0
+	ld.const.f32 	%f47, [params+0];
+	mul.f32 	%f48, %f47, %f25;
+	ld.const.f32 	%f49, [params+20];
+	mul.f32 	%f50, %f44, %f49;
+	add.f32 	%f51, %f48, %f20;
+	add.f32 	%f52, %f50, %f51;
+	ld.param.u32 	%r12, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_newPos];
+	add.u32 	%r13, %r12, %r7;
+	fma.rn.f32 	%f53, %f52, %f25, %f17;
+	ld.const.f32 	%f54, [params+4];
+	mul.f32 	%f55, %f54, %f25;
+	mul.f32 	%f56, %f45, %f49;
+	add.f32 	%f57, %f55, %f21;
+	add.f32 	%f58, %f56, %f57;
+	fma.rn.f32 	%f59, %f58, %f25, %f18;
+	ld.const.f32 	%f60, [params+8];
+	mul.f32 	%f61, %f60, %f25;
+	mul.f32 	%f62, %f46, %f49;
+	add.f32 	%f63, %f61, %f22;
+	add.f32 	%f64, %f62, %f63;
+	fma.rn.f32 	%f65, %f64, %f25, %f19;
+	st.global.v4.f32 	[%r13+0], {%f53,%f59,%f65,%f27};
+	.loc	18	105	0
+	mov.f32 	%f66, %f16;
+	ld.param.u32 	%r14, [__cudaparm__Z10integrateDP6float4S0_S0_S0_fi_newVel];
+	add.u32 	%r15, %r14, %r7;
+	ld.const.f32 	%f67, [params+12];
+	mul.f32 	%f68, %f52, %f67;
+	mul.f32 	%f69, %f58, %f67;
+	mul.f32 	%f70, %f64, %f67;
+	st.global.v4.f32 	[%r15+0], {%f68,%f69,%f70,%f66};
+$LBB5__Z10integrateDP6float4S0_S0_S0_fi:
+	.loc	18	106	0
+	exit;
+$LDWend__Z10integrateDP6float4S0_S0_S0_fi:
+	} // _Z10integrateDP6float4S0_S0_S0_fi
+
+	.entry _Z10calcDepthDP6float4PfPj6float3i (
+		.param .u32 __cudaparm__Z10calcDepthDP6float4PfPj6float3i_pos,
+		.param .u32 __cudaparm__Z10calcDepthDP6float4PfPj6float3i_keys,
+		.param .u32 __cudaparm__Z10calcDepthDP6float4PfPj6float3i_indices,
+		.param .align 4 .b8 __cudaparm__Z10calcDepthDP6float4PfPj6float3i_vector[12],
+		.param .s32 __cudaparm__Z10calcDepthDP6float4PfPj6float3i_numParticles)
+	{
+	.reg .u32 %r<16>;
+	.reg .f32 %f<20>;
+	.reg .pred %p<3>;
+	// __cuda_local_var_307730_18_p = 16
+	.loc	18	109	0
+$LDWbegin__Z10calcDepthDP6float4PfPj6float3i:
+	cvt.s32.u32 	%r1, %ctaid.x;
+	cvt.s32.u32 	%r2, %ntid.x;
+	mul24.lo.s32 	%r3, %r1, %r2;
+	mov.u32 	%r4, %tid.x;
+	add.u32 	%r5, %r3, %r4;
+	ld.param.u32 	%r6, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_numParticles];
+	setp.gt.u32 	%p1, %r6, %r5;
+	@%p1 bra 	$Lt_4_1026;
+	bra.uni 	$LBB4__Z10calcDepthDP6float4PfPj6float3i;
+$Lt_4_1026:
+	.loc	18	114	0
+	mul.lo.u32 	%r7, %r5, 16;
+	ld.param.u32 	%r8, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_pos];
+	add.u32 	%r9, %r8, %r7;
+	ld.global.v4.f32 	{%f1,%f2,%f3,%f4}, [%r9+0];
+	mov.f32 	%f5, %f1;
+	mov.f32 	%f6, %f2;
+	mov.f32 	%f7, %f3;
+	mov.f32 	%f8, %f4;
+	.loc	18	115	0
+	mov.f32 	%f9, %f5;
+	mov.f32 	%f10, %f6;
+	mov.f32 	%f11, %f7;
+	.loc	18	117	0
+	mul.lo.u32 	%r10, %r5, 4;
+	ld.param.f32 	%f12, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_vector+4];
+	mul.f32 	%f13, %f12, %f10;
+	ld.param.f32 	%f14, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_vector+0];
+	fma.rn.f32 	%f15, %f9, %f14, %f13;
+	ld.param.f32 	%f16, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_vector+8];
+	fma.rn.f32 	%f17, %f11, %f16, %f15;
+	neg.f32 	%f18, %f17;
+	ld.param.u32 	%r11, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_keys];
+	add.u32 	%r12, %r11, %r10;
+	st.global.f32 	[%r12+0], %f18;
+	.loc	18	118	0
+	ld.param.u32 	%r13, [__cudaparm__Z10calcDepthDP6float4PfPj6float3i_indices];
+	add.u32 	%r14, %r13, %r10;
+	st.global.u32 	[%r14+0], %r5;
+$LBB4__Z10calcDepthDP6float4PfPj6float3i:
+	.loc	18	119	0
+	exit;
+$LDWend__Z10calcDepthDP6float4PfPj6float3i:
+	} // _Z10calcDepthDP6float4PfPj6float3i
+

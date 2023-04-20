@@ -1,0 +1,6 @@
+[] = METSSP4:Set_Plan[]
+[] = METSSP4:Set_Plan[plan, reason]
+[result] = METSI3:Create_Detector_Update[detector, parameter]
+[detector_type] = MENU_D3:Get_Detector_Type[geog_addr]
+[detector_status] = E_METS_D2:Find_Detector_Status[geog_address]
+[mttr] = E_LOGS_D3:Get_Detector_MTTR[geog_address]
