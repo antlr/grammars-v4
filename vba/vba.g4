@@ -521,13 +521,13 @@ valueStmt :
 	literal 												# vsLiteral
 	| implicitCallStmt_InStmt 								# vsICS
 	| LPAREN WS? valueStmt (WS? ',' WS? valueStmt)* RPAREN 	# vsStruct
-	| NEW WS? valueStmt 										# vsNew
+	| NEW WS? valueStmt 									# vsNew
 	| typeOfStmt 											# vsTypeOf
 	| midStmt 												# vsMid
 	| ADDRESSOF WS? valueStmt 								# vsAddressOf
 	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt 		# vsAssign
 
-	| valueStmt WS? IS WS? valueStmt 							# vsIs
+	| valueStmt WS? IS WS? valueStmt 						# vsIs
 	| valueStmt WS? LIKE WS? valueStmt 						# vsLike
 	| valueStmt WS? GEQ WS? valueStmt 						# vsGeq
 	| valueStmt WS? LEQ WS? valueStmt 						# vsLeq
@@ -539,19 +539,17 @@ valueStmt :
 	| valueStmt WS? POW WS? valueStmt 						# vsPow
 	| MINUS WS? valueStmt 									# vsNegation
 	| PLUS WS? valueStmt 									# vsPlus
-	| valueStmt WS? DIV WS? valueStmt 						# vsDiv
-	| valueStmt WS? MULT WS? valueStmt 						# vsMult
+	| valueStmt (WS? DIV WS? | WS? MULT WS? ) valueStmt 	# vsDivMult
 	| valueStmt WS? MOD WS? valueStmt 						# vsMod
-	| valueStmt WS? PLUS WS? valueStmt 						# vsAdd
-	| valueStmt WS? MINUS WS? valueStmt 					# vsMinus
-	| valueStmt WS? AMPERSAND WS? valueStmt 					# vsAmp
+	| valueStmt (WS? PLUS WS? | WS? MINUS WS?) valueStmt 	# vsAddMinus
+	| valueStmt WS? AMPERSAND WS? valueStmt 				# vsAmp
 
 	| valueStmt WS? IMP WS? valueStmt 						# vsImp
 	| valueStmt WS? EQV WS? valueStmt 						# vsEqv
 	| valueStmt WS? XOR WS? valueStmt 						# vsXor
 	| valueStmt WS? OR WS? valueStmt 						# vsOr
 	| valueStmt WS? AND WS? valueStmt 						# vsAnd
-	| NOT WS? valueStmt 										# vsNot
+	| NOT WS? valueStmt 									# vsNot
 ;
 
 variableStmt : (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt;
