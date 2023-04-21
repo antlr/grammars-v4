@@ -541,7 +541,7 @@ valueStmt :
 	| PLUS WS? valueStmt 									# vsPlus
 	| valueStmt (WS? DIV WS? | WS? MULT WS? ) valueStmt 	# vsDivMult
 	| valueStmt WS? MOD WS? valueStmt 						# vsMod
-	| valueStmt (WS? PLUS WS? | WS? MINUS WS?) valueStmt 	# vsAddMinus
+	| valueStmt WS? (PLUS | MINUS) WS? valueStmt 	# vsAddMinus
 	| valueStmt WS? AMPERSAND WS? valueStmt 				# vsAmp
 
 	| valueStmt WS? IMP WS? valueStmt 						# vsImp
