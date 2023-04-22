@@ -527,8 +527,6 @@ valueStmt :
 	| ADDRESSOF WS? valueStmt 								# vsAddressOf
 	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt 		# vsAssign
 
-	| valueStmt WS? (IS | LIKE | GEQ | LEQ | GT | LT | NEQ | EQ) WS? valueStmt  #vsRelational
-
 	| valueStmt WS? POW WS? valueStmt 						# vsPow
 	| MINUS WS? valueStmt 									# vsNegation
 	| PLUS WS? valueStmt 									# vsPlus
@@ -536,6 +534,8 @@ valueStmt :
 	| valueStmt WS? MOD WS? valueStmt 						# vsMod
 	| valueStmt WS? (PLUS | MINUS) WS? valueStmt 			# vsAddMinus
 	| valueStmt WS? AMPERSAND WS? valueStmt 				# vsAmp
+    
+    | valueStmt WS? (IS | LIKE | GEQ | LEQ | GT | LT | NEQ | EQ) WS? valueStmt  #vsRelational
 
     | NOT WS? valueStmt 									# vsNot
 	| valueStmt WS? AND WS? valueStmt 						# vsAnd
