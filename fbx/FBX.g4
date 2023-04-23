@@ -16,6 +16,7 @@ start
 // Recursive node structure
 node
     : name=IDENTIFIER
+      COLON
       attributes
       ( OPEN_BRACE
         node*
@@ -48,6 +49,7 @@ IDENTIFIER : ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' )+;
 fragment DIGIT : '0' .. '9';
 
 QUOTE : '"';
+COLON : ':';
 COMMA : ',';
 OPEN_BRACE : '{';
 CLOSE_BRACE : '}';
