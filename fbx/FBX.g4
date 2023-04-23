@@ -33,16 +33,18 @@ attributes
     ;
 
 attribute
-    : value=(INTEGER | DECIMAL | STRING)
+    : value=ASTERISK? (INTEGER | DECIMAL | STRING | BOOLEAN)
     ;
 
 // LEXER RULES
 
 INTEGER : '-'? DIGIT+;
-DECIMAL : INTEGER ( '.' DIGIT* )?;
+DECIMAL : INTEGER ( '.' DIGIT* )? ( ('e' | 'E') ( '+' | '-' ) DIGIT+ )?;
 
 // Unknown behaviour: What if I want to escape a quote?
 STRING : '"' ~'"'* '"';
+
+BOOLEAN : 'Y' | 'N';
 
 IDENTIFIER : ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' )+;
 
@@ -53,6 +55,7 @@ COLON : ':';
 COMMA : ',';
 OPEN_BRACE : '{';
 CLOSE_BRACE : '}';
+ASTERISK : '*';
 
 COMMENT : ';' NON_NL* NL -> channel(HIDDEN);
 
