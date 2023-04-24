@@ -35,6 +35,8 @@ sqlScript
 unitStatement
     : (createRole
     | dropRole
+    | dropTable
+    | dropUser
     ) SCOL
     ;
 
@@ -48,8 +50,41 @@ dropRole
     : DROP ROLE (IF EXISTS)? roleName
     ;
 
-keyword:
-    ABORT
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
+dropTable
+    : DROP TABLE (IF EXISTS)? tableName (CASCADE | RESTRICT)?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
+dropUser
+    : DROP USER userName
+    ;
+
+roleName
+    : anyName
+    ;
+
+tableName
+    : identifier
+    ;
+
+userName
+    : anyName
+    ;
+
+anyName
+    : IDENTIFIER
+    | keyword
+    | STRING_LITERAL
+    | OPEN_PAR anyName CLOSE_PAR
+;
+
+identifier
+    : anyName ('.' anyName)*
+    ;
+
+keyword
+    : ABORT
     | ACTION
     | ADD
     | AFTER
@@ -165,6 +200,7 @@ keyword:
     | UNION
     | UNIQUE
     | UPDATE
+    | USER
     | USING
     | VACUUM
     | VALUES
@@ -204,15 +240,4 @@ keyword:
     | FILTER
     | GROUPS
     | EXCLUDE
-;
-
-roleName
-    : anyName
-    ;
-
-anyName
-    : IDENTIFIER
-    | keyword
-    | STRING_LITERAL
-    | OPEN_PAR anyName CLOSE_PAR
 ;
