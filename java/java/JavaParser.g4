@@ -589,7 +589,10 @@ methodCall
     ;
 
 expression
+    // Expression order in accordance with https://introcs.cs.princeton.edu/java/11precedence/
+    // Level 16, Primary, array and member access
     : primary
+    | expression '[' expression ']'
     | expression bop='.'
       (
          identifier
@@ -599,35 +602,44 @@ expression
        | SUPER superSuffix
        | explicitGenericInvocation
       )
-    | expression '[' expression ']'
+    // Method calls and method references are part of primary, and hence level 16 precedence
     | methodCall
-    | NEW creator
-    | '(' annotation* typeType ('&' typeType)* ')' expression
-    | lambdaExpression // Java8
-    | switchExpression // Java17
-    // Java 8 methodReference
     | expression '::' typeArguments? identifier
     | typeType '::' (typeArguments? identifier | NEW)
     | classType '::' typeArguments? NEW
-    // Operators
+
+    | switchExpression // Java17
+
+    // Level 15 Post-increment/decrement operators
     | expression postfix=('++' | '--')
-    | prefix=('+'|'-'|'++'|'--') expression
-    | prefix=('~'|'!') expression
-    | expression bop=('*'|'/'|'%') expression
-    | expression bop=('+'|'-') expression
-    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    | expression bop=('<=' | '>=' | '>' | '<') expression
+
+    // Level 14, Unary operators
+    | prefix=('+'|'-'|'++'|'--'|'~'|'!') expression
+
+    // Level 13 Cast and object creation
+    | '(' annotation* typeType ('&' typeType)* ')' expression
+    | NEW creator
+
+    // Level 12 to 1, Remaining operators
+    | expression bop=('*'|'/'|'%') expression  // Level 12, Multiplicative operators
+    | expression bop=('+'|'-') expression  // Level 11, Additive operators
+    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression  // Level 10, Shift operators
+    | expression bop=('<=' | '>=' | '>' | '<') expression  // Level 9, Relational operators
     | expression bop=INSTANCEOF (typeType | pattern)
-    | expression bop=('==' | '!=') expression
-    | expression bop='&' expression
-    | expression bop='^' expression
-    | expression bop='|' expression
-    | expression bop='&&' expression
-    | expression bop='||' expression
-    | <assoc=right> expression bop='?' expression ':' expression
+    | expression bop=('==' | '!=') expression  // Level 8, Equality Operators
+    | expression bop='&' expression  // Level 7, Bitwise AND
+    | expression bop='^' expression  // Level 6, Bitwise XOR
+    | expression bop='|' expression  // Level 5, Bitwise OR
+    | expression bop='&&' expression  // Level 4, Logic AND
+    | expression bop='||' expression  // Level 3, Logic OR
+    | <assoc=right> expression bop='?' expression ':' expression  // Level 2, Ternary
+    // Level 1, Assignment
     | <assoc=right> expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
+
+    // Level 0, Lambda Expression
+    | lambdaExpression // Java8
     ;
 
 // Java17
