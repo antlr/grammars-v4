@@ -171,6 +171,7 @@ TRIGGER:           'TRIGGER';
 UNION:             'UNION';
 UNIQUE:            'UNIQUE';
 UPDATE:            'UPDATE';
+USER:              'USER';
 USING:             'USING';
 VACUUM:            'VACUUM';
 VALUES:            'VALUES';
