@@ -3995,6 +3995,7 @@ predicate
     | expr NOT? RLIKE expr
     | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | expr IS null_not_null
+    | expr
     ;
 
 where_clause
