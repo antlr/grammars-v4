@@ -2993,8 +2993,8 @@ security_statement
     | create_certificate
     ;
 
-principal_id:
-    | id_
+principal_id
+    : id_
     | PUBLIC
     ;
 
