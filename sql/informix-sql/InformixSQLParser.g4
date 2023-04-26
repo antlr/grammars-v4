@@ -38,6 +38,7 @@ unitStatement
     | dropTable
     | dropType
     | dropUser
+    | dropView
     ) SCOL
     ;
 
@@ -66,6 +67,11 @@ dropUser
     : DROP USER userName
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
+dropView
+    : DROP VIEW (IF EXISTS)? viewName (CASCADE | RESTRICT)?
+    ;
+
 dataTypeName
     : identifier
     ;
@@ -75,6 +81,10 @@ roleName
     ;
 
 tableName
+    : identifier
+    ;
+
+viewName
     : identifier
     ;
 
