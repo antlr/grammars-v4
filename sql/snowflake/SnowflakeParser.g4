@@ -1657,8 +1657,17 @@ create_function
     : CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
         RETURNS ( data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET )
         null_not_null?
+        LANGUAGE JAVASCRIPT
         ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
         ( VOLATILE | IMMUTABLE )?
+        comment_clause?
+        AS function_definition
+    | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
+        RETURNS ( data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET )
+        null_not_null?
+        ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+        ( VOLATILE | IMMUTABLE )?
+        MEMOIZABLE?
         comment_clause?
         AS function_definition
     ;
@@ -3341,6 +3350,7 @@ keyword
     | AT_KEYWORD
     | TIMESTAMP
     | IF
+    | COPY_OPTIONS_
     // etc
     ;
 
@@ -3365,6 +3375,9 @@ non_reserved_words
     | VALUE
     | NAME
     | TAG
+    | WAREHOUSE
+    | VERSION
+    | OPTION
     ;
 
 builtin_function
@@ -3375,17 +3388,18 @@ builtin_function
     | AVG
     | MIN
     | COUNT
-    | COALESCE
     | CURRENT_TIMESTAMP
     | CURRENT_DATE
     | UPPER
     | LOWER
+    | TO_BOOLEAN
     ;
 
 list_operator
     // lexer entry which admit a list of comma separated expr
     : CONCAT
     | CONCAT_WS
+    | COALESCE
     // To complete as needed
     ;
 
@@ -3396,6 +3410,7 @@ binary_builtin_function
     | RIGHT
     | DATE_PART
     | to_date=( TO_DATE | DATE )
+    | SPLIT
     ;
 
 binary_or_ternary_builtin_function
@@ -3408,6 +3423,7 @@ binary_or_ternary_builtin_function
 ternary_builtin_function
     : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
+    | SPLIT_PART
     ;
 
 pattern
@@ -3463,7 +3479,6 @@ expr
 //    | expr time_zone
     | expr COLON expr //json access
     | expr DOT VALUE
-    | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
@@ -3477,6 +3492,10 @@ expr
     | trim_expression
     | expr comparison_operator expr
     | expr IS null_not_null
+    | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
+    | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
+    | expr NOT? RLIKE expr
+    | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     ;
 
 iff_expr
@@ -3581,6 +3600,7 @@ function_call
     | list_operator LR_BRACKET expr_list RR_BRACKET
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
+    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
     ;
 
 ranking_windowed_function
