@@ -290,7 +290,7 @@ mode DIRECTIVE_MODE;
 DEFINE_DIRECTIVE : 'define' -> channel (DIRECTIVES) , mode (DEFINE_DIRECTIVE_MODE) ;
 ELIF_DIRECTIVE : 'elif' -> channel (DIRECTIVES) , popMode , mode (ELIF_DIRECTIVE_MODE) ;
 ELSE_DIRECTIVE : 'else' -> channel (DIRECTIVES) , popMode , mode (PROGRAM_TEXT_MODE) ;
-ENDIF_DIRECTIVE : 'endif' -> channel (DIRECTIVES) , popMode , popMode , popMode ;
+ENDIF_DIRECTIVE : 'endif' -> channel (DIRECTIVES) , mode (ENDIF_DIRECTIVE_MODE) ;
 ERROR_DIRECTIVE : 'error' -> channel (DIRECTIVES) , mode (ERROR_DIRECTIVE_MODE) ;
 EXTENSION_DIRECTIVE : 'extension' -> channel (DIRECTIVES) , mode (EXTENSION_DIRECTIVE_MODE) ;
 IF_DIRECTIVE : 'if' -> channel (DIRECTIVES) , mode (IF_DIRECTIVE_MODE) ;
@@ -300,59 +300,63 @@ LINE_DIRECTIVE : 'line' -> channel (DIRECTIVES) , mode (LINE_DIRECTIVE_MODE) ;
 PRAGMA_DIRECTIVE : 'pragma' -> channel (DIRECTIVES) , mode (PRAGMA_DIRECTIVE_MODE) ;
 UNDEF_DIRECTIVE : 'undef' -> channel (DIRECTIVES) , mode (UNDEF_DIRECTIVE_MODE) ;
 VERSION_DIRECTIVE : 'version' -> channel (DIRECTIVES) , mode (VERSION_DIRECTIVE_MODE) ;
-SPACE_TAB_0 : SPACE_TAB -> skip ;
-NEWLINE_0 : NEWLINE -> skip , popMode ;
+SPACE_TAB_0 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
+NEWLINE_0 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
 
 mode DEFINE_DIRECTIVE_MODE;
 MACRO_NAME : IDENTIFIER MACRO_ARGS? -> channel (DIRECTIVES) , mode (MACRO_TEXT_MODE) ;
-NEWLINE_1 : NEWLINE -> skip , popMode ;
-SPACE_TAB_1 : SPACE_TAB -> skip ;
+NEWLINE_1 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
+SPACE_TAB_1 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode ELIF_DIRECTIVE_MODE;
 CONSTANT_EXPRESSION : ~ [\r\n]+ -> channel (DIRECTIVES) ;
-NEWLINE_2 : NEWLINE -> skip , mode (PROGRAM_TEXT_MODE) ;
+NEWLINE_2 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , mode (PROGRAM_TEXT_MODE) ;
+
+mode ENDIF_DIRECTIVE_MODE;
+NEWLINE_12 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode , popMode , popMode ;
+SPACE_TAB_8 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode ERROR_DIRECTIVE_MODE;
 ERROR_MESSAGE : ~ [\r\n]+ -> channel (DIRECTIVES) ;
-NEWLINE_3 : NEWLINE -> skip , popMode ;
+NEWLINE_3 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
 
 mode EXTENSION_DIRECTIVE_MODE;
 BEHAVIOR : ('require' | 'enable' | 'warn' | 'disable') -> channel (DIRECTIVES) ;
 COLON_0 : COLON -> channel (DIRECTIVES) , type (COLON) ;
 EXTENSION_NAME : IDENTIFIER -> channel (DIRECTIVES) ;
-NEWLINE_4 : NEWLINE -> skip , popMode ;
-SPACE_TAB_2 : SPACE_TAB -> skip ;
+NEWLINE_4 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
+SPACE_TAB_2 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode IF_DIRECTIVE_MODE;
 CONSTANT_EXPRESSION_0 : CONSTANT_EXPRESSION -> channel (DIRECTIVES) , type (CONSTANT_EXPRESSION) ;
-NEWLINE_5 : NEWLINE -> skip , pushMode (PROGRAM_TEXT_MODE) ;
+NEWLINE_5 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , pushMode (PROGRAM_TEXT_MODE) ;
 
 mode IFDEF_DIRECTIVE_MODE;
 MACRO_IDENTIFIER : IDENTIFIER -> channel (DIRECTIVES) ;
-NEWLINE_6 : NEWLINE -> skip , pushMode (PROGRAM_TEXT_MODE) ;
-SPACE_TAB_3 : SPACE_TAB -> skip ;
+NEWLINE_6 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , pushMode (PROGRAM_TEXT_MODE) ;
+SPACE_TAB_3 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode LINE_DIRECTIVE_MODE;
 LINE_EXPRESSION : ~ [\r\n]+ -> channel (DIRECTIVES) ;
-NEWLINE_7 : NEWLINE -> skip , mode (PROGRAM_TEXT_MODE) ;
+NEWLINE_7 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , mode (PROGRAM_TEXT_MODE) ;
 
 mode MACRO_TEXT_MODE;
 BLOCK_COMMENT_0 : BLOCK_COMMENT -> channel (COMMENTS) , type(BLOCK_COMMENT) ;
 MACRO_ESC_NEWLINE : '\\' NEWLINE -> channel(DIRECTIVES) ;
 MACRO_ESC_SEQUENCE : '\\' . -> channel(DIRECTIVES) , type (MACRO_TEXT) ;
 MACRO_TEXT : ~ [/\r\n\\]+ -> channel (DIRECTIVES) ;
-NEWLINE_8 : NEWLINE -> skip , popMode ;
+NEWLINE_8 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
 SLASH_0 : SLASH -> more ;
 
 mode PRAGMA_DIRECTIVE_MODE;
 DEBUG : 'debug' -> channel (DIRECTIVES) ;
 LEFT_PAREN_0 : LEFT_PAREN -> channel (DIRECTIVES) , type (LEFT_PAREN) ;
-NEWLINE_9 : NEWLINE -> skip , popMode ;
+NEWLINE_9 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
 OFF : 'off' -> channel (DIRECTIVES) ;
 ON : 'on' -> channel (DIRECTIVES) ;
 OPTIMIZE : 'optimize' -> channel (DIRECTIVES) ;
 RIGHT_PAREN_0 : RIGHT_PAREN -> channel (DIRECTIVES) , type (RIGHT_PAREN) ;
-SPACE_TAB_5 : SPACE_TAB -> skip ;
+SPACE_TAB_5 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 STDGL : 'STDGL' -> channel (DIRECTIVES) ;
 
 mode PROGRAM_TEXT_MODE;
@@ -364,14 +368,14 @@ SLASH_1 : SLASH -> more ;
 
 mode UNDEF_DIRECTIVE_MODE;
 MACRO_IDENTIFIER_0 : MACRO_IDENTIFIER -> channel (DIRECTIVES) , type (MACRO_IDENTIFIER) ;
-NEWLINE_10 : NEWLINE -> skip , popMode ;
-SPACE_TAB_6 : SPACE_TAB -> skip ;
+NEWLINE_10 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
+SPACE_TAB_6 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode VERSION_DIRECTIVE_MODE;
-NEWLINE_11 : NEWLINE -> skip , popMode ;
+NEWLINE_11 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE) , popMode ;
 NUMBER : [0-9]+ -> channel (DIRECTIVES) ;
 PROFILE : ('core' | 'compatibility' | 'es') -> channel (DIRECTIVES) ;
-SPACE_TAB_7 : SPACE_TAB -> skip ;
+SPACE_TAB_7 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 fragment DECIMAL_CONSTANT : [1-9] [0-9]* ;
 fragment DIGIT_SEQUENCE : [0-9]+ ;

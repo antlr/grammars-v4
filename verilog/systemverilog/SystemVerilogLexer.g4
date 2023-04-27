@@ -454,7 +454,7 @@ ELSE_DIRECTIVE : 'else' -> channel(DIRECTIVES), popMode, mode(ELSE_DIRECTIVE_MOD
 ELSIF_DIRECTIVE : 'elsif' -> channel(DIRECTIVES), popMode, mode(ELSIF_DIRECTIVE_MODE) ;
 END_KEYWORDS_DIRECTIVE : 'end_keywords' -> channel(DIRECTIVES), popMode ;
 ENDCELLDEFINE_DIRECTIVE : 'endcelldefine' -> channel(DIRECTIVES), popMode ;
-ENDIF_DIRECTIVE : 'endif' -> channel(DIRECTIVES), popMode, popMode, popMode ;
+ENDIF_DIRECTIVE : 'endif' -> channel(DIRECTIVES), mode(ENDIF_DIRECTIVE_MODE) ;
 FILE_DIRECTIVE : '__FILE__' -> channel(DIRECTIVES), popMode ;
 IFDEF_DIRECTIVE : 'ifdef' -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE) ;
 IFNDEF_DIRECTIVE : 'ifndef' -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE) ;
@@ -496,6 +496,10 @@ mode ELSIF_DIRECTIVE_MODE;
 IDENTIFIER_0 : IDENTIFIER -> channel(DIRECTIVES), type(MACRO_IDENTIFIER) ;
 NEWLINE_9 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE), mode(SOURCE_TEXT_MODE) ;
 SPACE_TAB_8 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
+
+mode ENDIF_DIRECTIVE_MODE;
+NEWLINE_13 : NEWLINE -> channel(HIDDEN), type(WHITE_SPACE), popMode, popMode, popMode ;
+SPACE_TAB_12 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE) ;
 
 mode FILENAME_MODE;
 DQ_1 : DQ -> channel(DIRECTIVES), type(DQ), popMode ;
