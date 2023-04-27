@@ -455,8 +455,8 @@ selectionStatement
     ;
 
 iterationStatement
-    :   While '(' expression ')' statement
-    |   Do statement While '(' expression ')' ';'
+    :   while '(' expression ')' statement
+    |   Do statement while '(' expression ')' ';'
     |   For '(' forCondition ')' statement
     ;
 
