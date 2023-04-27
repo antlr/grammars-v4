@@ -217,6 +217,7 @@ keyword
     | TO
     | TRANSACTION
     | TRIGGER
+    | TYPE
     | UNION
     | UNIQUE
     | UPDATE
