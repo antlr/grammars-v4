@@ -1164,26 +1164,61 @@ table_column_action
     | DROP COLUMN? column_list
     ;
 
-inline_constraint :
-    null_not_null?
-    ( CONSTRAINT id_ )?
-    ( UNIQUE | PRIMARY KEY | ( ( FOREIGN KEY )? REFERENCES object_name ( '(' column_name ')' )? ) )
-    constraint_properties?
+inline_constraint 
+    : null_not_null? (CONSTRAINT id_)? 
+    (
+        ( UNIQUE | primary_key ) common_constraint_properties*
+        | foreign_key REFERENCES object_name ( LR_BRACKET column_name RR_BRACKET )? constraint_properties
+    )
+    ;
+
+enforced_not_enforced
+    : NOT? ENFORCED
+    ;
+
+deferrable_not_deferrable
+    : NOT? DEFERRABLE
+    ;
+
+initially_deferred_or_immediate
+    : INITIALLY ( DEFERRED | IMMEDIATE )
+    ;
+
+//TODO : Some properties are mutualy exclusive ie INITIALLY DEFERRED is not compatible with NOT DEFERRABLE
+// also VALIDATE | NOVALIDATE need to be after ENABLE or ENFORCED. Lot of case to handle :)
+common_constraint_properties
+    : enforced_not_enforced ( VALIDATE | NOVALIDATE )?
+    | deferrable_not_deferrable
+    | initially_deferred_or_immediate
+    | ( ENABLE | DISABLE ) ( VALIDATE | NOVALIDATE )?
+    | RELY | NORELY
+    ;
+
+on_update
+    : ON UPDATE on_action
+    ;
+
+on_delete
+    : ON DELETE on_action
+    ;
+
+foreign_key_match
+    : MATCH match_type=( FULL | PARTIAL | SIMPLE )
+    ;
+
+on_action
+    : CASCADE 
+    | SET NULL_ 
+    | SET DEFAULT 
+    | RESTRICT 
+    | NO ACTION
     ;
 
 constraint_properties
-    : NOT? ENFORCED
-    | NOT? DEFERRABLE
-    | INITIALLY ( DEFERRED | IMMEDIATE )
-    | MATCH ( FULL | PARTIAL | SIMPLE )
-    | UPDATE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | DELETE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | ENABLE
-    | DISABLE
-    | VALIDATE
-    | NOVALIDATE
-    | RELY
-    | NORELY
+    : common_constraint_properties*
+    | foreign_key_match
+    | foreign_key_match? ( on_update | on_delete )
+    | foreign_key_match? ( on_update on_delete | on_delete on_update )
     ;
 
 ext_table_column_action
@@ -1195,9 +1230,9 @@ ext_table_column_action
 constraint_action
     : ADD out_of_line_constraint
     | RENAME CONSTRAINT id_ TO id_
-    | alter_modify ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
-                         ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
-    | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
+    | alter_modify ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
+                         enforced_not_enforced? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
+    | DROP ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
                          cascade_restrict?
     ;
 
@@ -2280,14 +2315,16 @@ foreign_key
     : FOREIGN KEY
     ;
 
+primary_key
+    : PRIMARY KEY
+    ;
+
 out_of_line_constraint
     : (CONSTRAINT id_ )?
         (
-             UNIQUE column_list_in_parentheses?
-           | PRIMARY KEY column_list_in_parentheses?
-           | foreign_key? column_list_in_parentheses? REFERENCES object_name column_list_in_parentheses?
+           (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
+           | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
         )
-        constraint_properties?
     ;
 
 
