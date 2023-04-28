@@ -3637,13 +3637,18 @@ function_call
     | list_operator LR_BRACKET expr_list RR_BRACKET
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
-    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
-    | ( LEAD | LAG ) LR_BRACKET expr ( COMMA expr COMMA expr)? RR_BRACKET ( ( IGNORE | RESPECT ) NULLS )? over_clause
+    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET    
+    ;
+
+ignore_or_repect_nulls
+    : ( IGNORE | RESPECT ) NULLS
     ;
 
 ranking_windowed_function
     : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
     | NTILE '(' expr ')' over_clause
+    | ( LEAD | LAG ) LR_BRACKET expr ( COMMA expr COMMA expr)? RR_BRACKET ignore_or_repect_nulls? over_clause
+    | ( FIRST_VALUE | LAST_VALUE ) LR_BRACKET expr RR_BRACKET ignore_or_repect_nulls? over_clause
     ;
 
 aggregate_function

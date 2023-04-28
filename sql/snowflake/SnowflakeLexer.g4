@@ -343,6 +343,7 @@ FILE_FORMAT:                                           'FILE_FORMAT';
 FILTER:                                                'FILTER';
 FIRST:                                                 'FIRST';
 FIRST_NAME:                                            'FIRST_NAME';
+FIRST_VALUE:                                           'FIRST_VALUE';
 FLATTEN:                                               'FLATTEN';
 FOR:                                                   'FOR';
 FORCE:                                                 'FORCE';
