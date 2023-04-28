@@ -3638,6 +3638,7 @@ function_call
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    | ( LEAD | LAG ) LR_BRACKET expr ( COMMA expr COMMA expr)? RR_BRACKET ( ( IGNORE | RESPECT ) NULLS )? over_clause
     ;
 
 ranking_windowed_function
