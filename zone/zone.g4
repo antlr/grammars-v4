@@ -83,15 +83,14 @@ integer
 record_data
    : (LETTER | DIGIT | '.')+
    ;
-   // ***** domain name *****
 
 domainname
    : subdomain
    ;
 
-subdomain
-   : (subdomain '.')? label
-   ;
+//subdomain
+ //  : (subdomain '.')? label
+ //  ;
 
 label
    : letter (ldhstr? LETDIG)?
@@ -129,6 +128,10 @@ DIGIT
 
 LETTER
    : [a-zA-Z]
+   ;
+
+COMMENT
+   : ';' ~ [\r\n]*
    ;
 
 WS
