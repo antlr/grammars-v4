@@ -168,6 +168,7 @@ THEN:              'THEN';
 TO:                'TO';
 TRANSACTION:       'TRANSACTION';
 TRIGGER:           'TRIGGER';
+TYPE:              'TYPE';
 UNION:             'UNION';
 UNIQUE:            'UNIQUE';
 UPDATE:            'UPDATE';
