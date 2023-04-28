@@ -36,7 +36,9 @@ unitStatement
     : (createRole
     | dropRole
     | dropTable
+    | dropType
     | dropUser
+    | dropView
     ) SCOL
     ;
 
@@ -55,9 +57,23 @@ dropTable
     : DROP TABLE (IF EXISTS)? tableName (CASCADE | RESTRICT)?
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
+dropType
+    : DROP TYPE (IF EXISTS)? dataTypeName RESTRICT
+    ;
+
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
 dropUser
     : DROP USER userName
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
+dropView
+    : DROP VIEW (IF EXISTS)? viewName (CASCADE | RESTRICT)?
+    ;
+
+dataTypeName
+    : identifier
     ;
 
 roleName
@@ -65,6 +81,10 @@ roleName
     ;
 
 tableName
+    : identifier
+    ;
+
+viewName
     : identifier
     ;
 
@@ -197,6 +217,7 @@ keyword
     | TO
     | TRANSACTION
     | TRIGGER
+    | TYPE
     | UNION
     | UNIQUE
     | UPDATE
