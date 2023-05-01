@@ -3461,6 +3461,7 @@ ternary_builtin_function
     : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     | SPLIT_PART
+    | NVL2
     ;
 
 pattern

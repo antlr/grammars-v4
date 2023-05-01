@@ -551,6 +551,7 @@ NUMANODE:                                              'NUMANODE';
 NUMBER:                                                'NUMBER';
 NUMERIC_ROUNDABORT:                                    'NUMERIC_ROUNDABORT';
 NVL:                                                   'NVL';
+NVL2:                                                  'NVL2';
 OAUTH:                                                 'OAUTH';
 OAUTH_ALLOW_NON_TLS_REDIRECT_URI:                      'OAUTH_ALLOW_NON_TLS_REDIRECT_URI';
 OAUTH_CLIENT:                                          'OAUTH_CLIENT';
