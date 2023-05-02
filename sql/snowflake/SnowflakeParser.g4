@@ -3418,6 +3418,7 @@ non_reserved_words
     | FIRST_VALUE
     | RESPECT
     | NVL
+    | RESTRICT
     ;
 
 builtin_function
