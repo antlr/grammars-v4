@@ -1727,16 +1727,14 @@ column_list_in_parentheses
 
 create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name
-        copy_grants?
-        column_list_in_parentheses?
-//         [ <col1> [ WITH ] MASKING POLICY <policy_name> [ USING ( <col1> , <cond_col1> , ... ) ]
-//                   [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
-//          [ , <col2> [ ... ] ]
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
+        view_col*
         with_row_access_policy?
         with_tags?
+        copy_grants?
         comment_clause?
         cluster_by?
-        AS select_statement
+        AS select_statement //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -2511,7 +2509,7 @@ view_col
 
 create_view
     : CREATE or_replace? SECURE? RECURSIVE? VIEW if_not_exists? object_name
-        ( LR_BRACKET column_list RR_BRACKET )?
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
         view_col*
         with_row_access_policy?
         with_tags?
@@ -3482,6 +3480,10 @@ column_name
 
 column_list
     : column_name (COMMA column_name)*
+    ;
+
+column_list_with_comment
+    : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
     ;
 
 object_name
