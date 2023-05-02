@@ -1191,7 +1191,8 @@ common_constraint_properties
     | deferrable_not_deferrable
     | initially_deferred_or_immediate
     | ( ENABLE | DISABLE ) ( VALIDATE | NOVALIDATE )?
-    | RELY | NORELY
+    | RELY
+    | NORELY
     ;
 
 on_update
@@ -1208,8 +1209,7 @@ foreign_key_match
 
 on_action
     : CASCADE 
-    | SET NULL_ 
-    | SET DEFAULT 
+    | SET ( NULL_ | DEFAULT )
     | RESTRICT 
     | NO ACTION
     ;
@@ -1217,8 +1217,7 @@ on_action
 constraint_properties
     : common_constraint_properties*
     | foreign_key_match
-    | foreign_key_match? ( on_update | on_delete )
-    | foreign_key_match? ( on_update on_delete | on_delete on_update )
+    | foreign_key_match? ( on_update on_delete? | on_delete on_update? )
     ;
 
 ext_table_column_action
@@ -3415,6 +3414,10 @@ non_reserved_words
     | WAREHOUSE
     | VERSION
     | OPTION
+    | NVL2
+    | FIRST_VALUE
+    | RESPECT
+    | NVL
     ;
 
 builtin_function
