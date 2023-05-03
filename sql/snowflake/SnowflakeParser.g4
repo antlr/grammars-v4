@@ -2300,10 +2300,6 @@ collate
     : COLLATE string
     ;
 
-not_null
-    : NOT NULL_
-    ;
-
 default_value
     : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
     ;
