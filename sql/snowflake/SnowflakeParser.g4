@@ -3980,7 +3980,7 @@ match_recognize
     ;
 
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
