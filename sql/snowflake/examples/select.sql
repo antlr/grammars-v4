@@ -37,3 +37,5 @@ SELECT C1, LEAD(C1,1,2) OVER (PARTITION BY C2);
 SELECT NVL2(C1, 1, 2);
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p (EMP_ID_renamed, JAN, FEB, MAR, APR) ORDER BY EMP_ID_renamed;
 SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p ORDER BY EMP_ID_renamed;
+SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues(c1,c2);
+SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues;

@@ -3847,7 +3847,7 @@ object_ref
         pivot_unpivot?
         as_alias?
         sample?
-    | '(' values ')'
+    | values_table
         sample?
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
@@ -3985,15 +3985,15 @@ pivot_unpivot
     ;
 
 column_alias_list_in_brackets
-    : '(' id_ (COMMA id_)* ')'
+    : LR_BRACKET id_ (COMMA id_)* RR_BRACKET
     ;
 
 expr_list_in_parentheses
     : LR_BRACKET expr_list RR_BRACKET
     ;
 
-values
-    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* as_alias? column_alias_list_in_brackets?
+values_table
+    : LR_BRACKET VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
     ;
 
 sample_method
