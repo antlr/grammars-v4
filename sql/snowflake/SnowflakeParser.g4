@@ -3364,6 +3364,7 @@ id_
     | ALERT
     | ALERTS
     | CONDITION
+    | binary_builtin_function
     ;
 
 keyword
@@ -3446,6 +3447,8 @@ binary_builtin_function
     | DATE_PART
     | to_date=( TO_DATE | DATE )
     | SPLIT
+    | NULLIF
+    | EQUAL_NULL
     ;
 
 binary_or_ternary_builtin_function

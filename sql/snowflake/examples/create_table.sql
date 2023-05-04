@@ -1,3 +1,6 @@
+--Keyword tester
+CREATE TABLE TESTKEYWORD(IFNULL int, NVL int, GET int, LEFT int,RIGHT int, DATE_PART int,TO_DATE int,DATE int,SPLIT int,NULLIF int,EQUAL_NULL int );
+
 create temporary table t(i int);
 create table t1 (v varchar(16777216));
 create table t2(i int) as select(i) from t;

@@ -295,6 +295,7 @@ ENFORCED:                                              'ENFORCED';
 ENFORCE_LENGTH:                                        'ENFORCE_LENGTH';
 ENFORCE_SESSION_POLICY:                                'ENFORCE_SESSION_POLICY';
 ENTERPRISE:                                            'ENTERPRISE';
+EQUAL_NULL:                                            'EQUAL_NULL';
 EQUALITY:                                              'EQUALITY';
 ERROR_INTEGRATION:                                     'ERROR_INTEGRATION';
 ERROR_ON_COLUMN_COUNT_MISMATCH:                        'ERROR_ON_COLUMN_COUNT_MISMATCH';
