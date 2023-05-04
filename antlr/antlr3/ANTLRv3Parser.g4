@@ -73,7 +73,7 @@ optionValue
    ;
 
 rule_
-   : DOC_COMMENT? ((PROTECTED | PUBLIC | PRIVATE | FRAGMENT))? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* COLON altList SEMI exceptionGroup?
+   : DOC_COMMENT? (PROTECTED | PUBLIC | PRIVATE | FRAGMENT)? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* COLON altList SEMI exceptionGroup?
    ;
    
 ruleAction
