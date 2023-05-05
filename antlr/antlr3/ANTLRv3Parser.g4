@@ -91,7 +91,7 @@ ruleScopeSpec
    ;
 
 block
-   : LPAREN ((optionsSpec)? COLON)?
+   : LPAREN (optionsSpec? COLON)?
                 alternative rewrite (OR alternative rewrite )*
         RPAREN
    ;
@@ -106,7 +106,7 @@ alternative
    ;
 
 exceptionGroup
-   : (exceptionHandler)+ (finallyClause)?
+   : exceptionHandler+ finallyClause?
    | finallyClause
    ;
 
@@ -152,7 +152,7 @@ notSet
    ;
 
 treeSpec
-   : TREE_BEGIN element (element)+ RPAREN
+   : TREE_BEGIN element element+ RPAREN
    ;
 
 ebnf
