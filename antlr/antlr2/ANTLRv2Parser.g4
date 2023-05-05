@@ -133,7 +133,7 @@ rules
    ;
 
 rule_
-   : DOC_COMMENT? ((PROTECTED | PUBLIC | PRIVATE))? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? ruleOptionsSpec? ruleAction* COLON altList SEMI exceptionGroup?
+   : DOC_COMMENT? (PROTECTED | PUBLIC | PRIVATE)? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? ruleOptionsSpec? ruleAction* COLON altList SEMI exceptionGroup?
    ;
 
 ruleOptionsSpec
@@ -183,8 +183,8 @@ elementOptionSpec
      ;
 
 elementNoOptionSpec
-   : (id_ EQUAL (id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | TOKEN_REF argActionBlock?))
-   | ((id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | range_ | terminal_ | NOT ( notTerminal | ebnf) | ebnf))
+   : id_ EQUAL (id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | TOKEN_REF argActionBlock?)
+   | (id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | range_ | terminal_ | NOT ( notTerminal | ebnf) | ebnf)
    | actionBlock QM?
    | tree_
    ;
