@@ -72,12 +72,12 @@ VARIABLE
 
 
 fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   : 'a' .. 'z' | 'A' .. 'Z' | '_'
    ;
 
 
 fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
+   : VALID_ID_START | '0' .. '9'
    ;
 
 //The NUMBER part gets its potential sign from "(PLUS | MINUS)* atom" in the expression rule
@@ -100,7 +100,7 @@ fragment E
 
 
 fragment SIGN
-   : ('+' | '-')
+   : '+' | '-'
    ;
 
 
