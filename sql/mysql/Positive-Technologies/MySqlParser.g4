@@ -2043,7 +2043,7 @@ withStatement
   ;
 
 tableStatement
-  :TABLE tableName orderByClause? limitClause? UNION TABLE tableName orderByClause? limitClause?
+  :TABLE tableName orderByClause? limitClause?
   ;
 
 diagnosticsStatement

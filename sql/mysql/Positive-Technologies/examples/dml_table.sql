@@ -11,7 +11,5 @@ TABLE t LIMIT 3;
 TABLE t ORDER BY b LIMIT 3;
 #end
 
-#begin
-TABLE t1 UNION TABLE t2;
-#end
+
 
