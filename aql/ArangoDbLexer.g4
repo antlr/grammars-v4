@@ -124,7 +124,7 @@ WHITE_SPACE                   : [ \t\r\n]+                   -> channel(HIDDEN);
 SQL_COMMENT                   : '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
 LINE_COMMENT                  : '//' ~[\r\n]*                 -> channel(HIDDEN);
 
-ID                            : [A-Z_] ( [A-Z0-9_] )*;
+ID                            : [A-Z_] [A-Z0-9_]*;
 BIND_PARAMETER                : '@' [A-Z0-9][A-Z0-9_]*;
 BIND_PARAMETER_COLL           : '@@' [A-Z0-9][A-Z0-9_]*;
 
@@ -134,10 +134,10 @@ BACKSTICK_STRING_LITERAL      : '`' ~'`'+ '`';
 
 DECIMAL_LITERAL               : DEC_DIGIT+;
 FLOAT_LITERAL                 : DEC_DOT_DEC;
-REAL_LITERAL                  : (DECIMAL_LITERAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
+REAL_LITERAL                  : (DECIMAL_LITERAL | DEC_DOT_DEC) 'E' [+-]? DEC_DIGIT+;
 
 
 fragment HexDigit             : [0-9a-f];
 fragment LETTER               : [A-Z_];
-fragment DEC_DOT_DEC          : (DEC_DIGIT+ '.' DEC_DIGIT+ |  '.' DEC_DIGIT+);
+fragment DEC_DOT_DEC          : DEC_DIGIT+ '.' DEC_DIGIT+ |  '.' DEC_DIGIT+;
 fragment DEC_DIGIT            : [0-9];
