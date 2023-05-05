@@ -69,7 +69,9 @@ dmlStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
     | handlerStatement | valuesStatement | withStatement
+    | tableStatement
     ;
+
 
 transactionStatement
     : startTransaction
@@ -834,10 +836,14 @@ insertStatement
       IGNORE? INTO? tableName
       (PARTITION '(' partitions=uidList? ')' )?
       (
-        ('(' columns=fullColumnNameList ')')? insertStatementValue (AS? uid)?
-        | SET
-            setFirst=updatedElement
-            (',' setElements+=updatedElement)*
+        ('(' columns=fullColumnNameList ')')?
+        (
+          insertStatementValue (AS? uid)?
+          | valuesStatement
+        )
+      | SET
+          setFirst=updatedElement
+          (',' setElements+=updatedElement)*
       )
       (
         ON DUPLICATE KEY UPDATE
@@ -1207,8 +1213,8 @@ limitClause
     ;
 
 limitClauseAtom
-	: decimalLiteral | mysqlVariable | simpleId
-	;
+    : decimalLiteral | mysqlVariable | simpleId
+    ;
 
 
 // Transaction's Statements
@@ -2034,6 +2040,10 @@ signalConditionInformation
 
 withStatement
   : WITH RECURSIVE? commonTableExpressions (',' commonTableExpressions)*
+  ;
+
+tableStatement
+  :TABLE tableName orderByClause? limitClause? UNION TABLE tableName orderByClause? limitClause?
   ;
 
 diagnosticsStatement
