@@ -72,7 +72,7 @@ repetition
    ;
 
 repeat_
-   : INT | ( INT? '*' INT? )
+   : INT | INT? '*' INT?
    ;
 
 element
