@@ -34,9 +34,11 @@
  *
  *  You can test with
  *
- *  $ antlr4 Apexcode.g4
+ *  $ antlr4 apex.g4
  *  $ javac *.java
- *  $ grun Apexcode compilationUnit *.cls
+ *  $ grun apex compilationUnit *.cls
+ *
+ *  How to run example: https://mohan-chinnappan-n5.github.io/sfbooks/sfdevnotes/language-design/apex-grammar.html 
  */
 grammar apex;
 
