@@ -34,7 +34,7 @@ parser grammar JavaParser;
 options { tokenVocab=JavaLexer; }
 
 compilationUnit
-    : packageDeclaration? importDeclaration* typeDeclaration*
+    : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')*
     | moduleDeclaration EOF
     ;
 
@@ -44,13 +44,11 @@ packageDeclaration
 
 importDeclaration
     : IMPORT STATIC? qualifiedName ('.' '*')? ';'
-    | ';'
     ;
 
 typeDeclaration
     : classOrInterfaceModifier*
       (classDeclaration | enumDeclaration | interfaceDeclaration | annotationTypeDeclaration | recordDeclaration)
-    | ';'
     ;
 
 modifier
