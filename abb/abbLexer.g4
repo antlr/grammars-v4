@@ -72,7 +72,7 @@ STRINGLITERAL
    ;
 
 fragment EscapeSequence
-   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | ('0' .. '3') ('0' .. '7') ('0' .. '7') | ('0' .. '7') ('0' .. '7') | ('0' .. '7'))
+   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | '0' .. '3' '0' .. '7' '0' .. '7' | '0' .. '7' '0' .. '7' | '0' .. '7')
    ;
 
 FLOATLITERAL
@@ -96,7 +96,7 @@ fragment HexPrefix
 
 
 fragment HexDigit
-   : ('0' .. '9' | 'A' .. 'F')
+   : '0' .. '9' | 'A' .. 'F'
    ;
 
 
@@ -111,7 +111,7 @@ fragment BinPrefix
 
 
 fragment BinDigit
-   : ('0' | '1')
+   : '0' | '1'
    ;
 
 
@@ -130,5 +130,5 @@ fragment IdentifierStart
 
 
 fragment IdentifierPart
-   : (IdentifierStart | '0' .. '9')
+   : IdentifierStart | '0' .. '9'
    ;
