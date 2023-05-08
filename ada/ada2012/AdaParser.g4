@@ -526,7 +526,7 @@ membership_choice
    ;
 
 simple_expression
-   : (unary_adding_operator)? term (binary_adding_operator term)*
+   : unary_adding_operator? term (binary_adding_operator term)*
    ;
 
 term
@@ -636,8 +636,8 @@ qualified_expression
    ;
 
 allocator
-   : NEW (subpool_specification)? subtype_indication
-   | NEW (subpool_specification)? qualified_expression
+   : NEW subpool_specification? subtype_indication
+   | NEW subpool_specification? qualified_expression
    ;
 
 subpool_specification
@@ -723,11 +723,11 @@ loop_parameter_specification
 
 iterator_specification
    : defining_identifier IN REVERSE? name
-   | defining_identifier (COLON subtype_indication) OF REVERSE? name
+   | defining_identifier COLON subtype_indication OF REVERSE? name
    ;
 
 block_statement
-   : (direct_name COLON)? (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END (identifier)? SEMI
+   : (direct_name COLON)? (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI
    ;
 
 exit_statement
@@ -1310,7 +1310,7 @@ formal_type_definition
    ;
 
 formal_private_type_definition
-   : ((ABSTRACT)? TAGGED)? LIMITED? PRIVATE
+   : (ABSTRACT? TAGGED)? LIMITED? PRIVATE
    ;
 
 formal_derived_type_definition

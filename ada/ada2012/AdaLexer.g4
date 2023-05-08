@@ -135,7 +135,7 @@ BASED_NUMERAL     : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
 EXTENDED_DIGIT    : DIGIT | [A-F];
 BASE              : NUMERAL;
 
-CHARACTER_LITERAL_: '\'' (~['\\\r\n]) '\'';
+CHARACTER_LITERAL_: '\'' ~['\\\r\n] '\'';
 STRING_LITERAL_   : '"' ('""' | ~('"') )* '"';
 
 fragment LETTER   : [A-Z];
