@@ -52,6 +52,7 @@ statement
     | exportStatement
     | emptyStatement_
     | classDeclaration
+    | functionDeclaration
     | expressionStatement
     | ifStatement
     | iterationStatement
@@ -65,7 +66,6 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration
     ;
 
 block
@@ -373,8 +373,7 @@ objectLiteral
     ;
 
 anonymousFunction
-    : functionDeclaration                                                       # FunctionDecl
-    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
+    : Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
