@@ -69,7 +69,9 @@ dmlStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
     | handlerStatement | valuesStatement | withStatement
+    | tableStatement
     ;
+
 
 transactionStatement
     : startTransaction
@@ -1207,8 +1209,8 @@ limitClause
     ;
 
 limitClauseAtom
-	: decimalLiteral | mysqlVariable | simpleId
-	;
+    : decimalLiteral | mysqlVariable | simpleId
+    ;
 
 
 // Transaction's Statements
@@ -2034,6 +2036,10 @@ signalConditionInformation
 
 withStatement
   : WITH RECURSIVE? commonTableExpressions (',' commonTableExpressions)*
+  ;
+
+tableStatement
+  :TABLE tableName orderByClause? limitClause?
   ;
 
 diagnosticsStatement
