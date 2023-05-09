@@ -69,6 +69,7 @@ dmlStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
     | handlerStatement | valuesStatement | withStatement
+    | tableStatement
     ;
 
 transactionStatement
