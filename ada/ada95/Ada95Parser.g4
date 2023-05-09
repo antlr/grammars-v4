@@ -607,7 +607,7 @@ condition
    ;
 
 case_statement
-   : CASE expression IS case_statement_alternative (case_statement_alternative)* END CASE ';'
+   : CASE expression IS case_statement_alternative case_statement_alternative* END CASE ';'
    ;
 
 case_statement_alternative
