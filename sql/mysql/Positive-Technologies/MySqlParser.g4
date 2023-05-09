@@ -2036,6 +2036,10 @@ withStatement
   : WITH RECURSIVE? commonTableExpressions (',' commonTableExpressions)*
   ;
 
+tableStatement
+  :TABLE tableName orderByClause? limitClause?
+  ;
+
 diagnosticsStatement
     : GET ( CURRENT | STACKED )? DIAGNOSTICS (
           ( variableClause '=' ( NUMBER | ROW_COUNT ) ( ',' variableClause '=' ( NUMBER | ROW_COUNT ) )* )
