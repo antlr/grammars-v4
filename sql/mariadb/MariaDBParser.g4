@@ -1965,7 +1965,7 @@ cacheIndexStatement
 flushStatement
     : FLUSH flushFormat=(NO_WRITE_TO_BINLOG | LOCAL)?
       flushOption (',' flushOption)*
-    | FLUSH (USER_STATISTICS|CLIENT_STATISTICS|INDEX_STATISTICS|TABLE_STATISTICS)
+    | FLUSH (USER_STATISTICS | CLIENT_STATISTICS | INDEX_STATISTICS | TABLE_STATISTICS)
     ;
 
 killStatement
