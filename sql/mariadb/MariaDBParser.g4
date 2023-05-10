@@ -1914,7 +1914,7 @@ showStatement
           rowCount=decimalLiteral
         )                                                           #showProfile
     | SHOW SLAVE STATUS (FOR CHANNEL STRING_LITERAL)?               #showSlaveStatus
-    | SHOW (USER_STATISTICS|CLIENT_STATISTICS|INDEX_STATISTICS|TABLE_STATISTICS) # showUserstatPlugin
+    | SHOW (USER_STATISTICS | CLIENT_STATISTICS | INDEX_STATISTICS | TABLE_STATISTICS) # showUserstatPlugin
     ;
 
 // details
