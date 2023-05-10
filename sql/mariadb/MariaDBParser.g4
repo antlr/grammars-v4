@@ -1914,6 +1914,7 @@ showStatement
           rowCount=decimalLiteral
         )                                                           #showProfile
     | SHOW SLAVE STATUS (FOR CHANNEL STRING_LITERAL)?               #showSlaveStatus
+    | SHOW (USER_STATISTICS|CLIENT_STATISTICS|INDEX_STATISTICS|TABLE_STATISTICS) # showUserstatPlugin
     ;
 
 // details
@@ -1964,6 +1965,7 @@ cacheIndexStatement
 flushStatement
     : FLUSH flushFormat=(NO_WRITE_TO_BINLOG | LOCAL)?
       flushOption (',' flushOption)*
+    | FLUSH (USER_STATISTICS|CLIENT_STATISTICS|INDEX_STATISTICS|TABLE_STATISTICS)
     ;
 
 killStatement
