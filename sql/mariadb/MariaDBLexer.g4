@@ -766,6 +766,7 @@ CLIENT_STATISTICS:                   'CLIENT_STATISTICS';
 INDEX_STATISTICS:                    'INDEX_STATISTICS';
 TABLE_STATISTICS:                    'TABLE_STATISTICS';
 
+
 // PRIVILEGES
 
 ADMIN:                               'ADMIN';
