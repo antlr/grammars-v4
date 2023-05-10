@@ -79,7 +79,7 @@ dottedIdentifierList : identifier ( D identifier )* ;
 element : expressionElement | mapElement | spreadElement | ifElement | forElement ;
 elements : element ( C element )* C? ;
 enumEntry : metadata identifier ;
-enumType : ENUM_ identifier OBC enumEntry ( C enumEntry )* ( C )? CBC ;
+enumType : ENUM_ identifier OBC enumEntry ( C enumEntry )* C? CBC ;
 equalityExpression : relationalExpression ( equalityOperator relationalExpression )? | SUPER_ equalityOperator relationalExpression ;
 equalityOperator : EE | NE ;
 expression : assignableExpression assignmentOperator expression | conditionalExpression | cascade | throwExpression ;
