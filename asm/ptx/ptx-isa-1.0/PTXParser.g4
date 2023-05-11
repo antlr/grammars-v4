@@ -187,7 +187,7 @@ instruction
     : ABS data_type d=operand ',' a=operand
     | ADD rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand
     | AND data_type d=operand ',' a=operand ',' b=operand
-    | ATOM space ('.' op=operation) data_type d=operand ',' a=operand ',' b=operand (',' c=operand)?
+    | ATOM space '.' op=operation data_type d=operand ',' a=operand ',' b=operand (',' c=operand)?
     | BAR SYNC? d=operand
     | BRA UNI? tgt=id_
     | BRKPT
