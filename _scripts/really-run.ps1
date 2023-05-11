@@ -14,9 +14,9 @@ $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
 # Set up env as it is used in test script.
 echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
 
-dotnet tool install -g trgen --version 0.20.17
-dotnet tool install -g triconv --version 0.20.17
-dotnet tool install -g trwdog --version 0.20.17
+dotnet tool install -g trgen --version 0.20.19
+dotnet tool install -g triconv --version 0.20.19
+dotnet tool install -g trwdog --version 0.20.19
 
 # Call test script.
 $env:ANTLR_JAR_PATH="$antlrPath"
