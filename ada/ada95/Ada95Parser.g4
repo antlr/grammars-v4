@@ -22,12 +22,11 @@ THE SOFTWARE.
 */
 parser grammar Ada95Parser;
 
-
 options { tokenVocab = Ada95Lexer; }
+
 /*
 2 - Lexical Elements
 */
-
 
 identifier
    : IDENTIFIER_
@@ -1292,4 +1291,3 @@ mod_clause
 boolean_expression
    : expression
    ;
-
