@@ -41,3 +41,4 @@ SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues(c1,c2);
 SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues;
 SELECT NULLIF(1,1);
 SELECT EQUAL_NULL(null,null);
+SELECT * FROM strings WHERE CONTAINS(s, 'te');

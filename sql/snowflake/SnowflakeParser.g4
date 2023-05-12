@@ -2011,7 +2011,7 @@ format_type_options
     | ESCAPE EQ (character | NONE | NONE_Q )
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE )
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
@@ -3448,6 +3448,7 @@ binary_builtin_function
     | SPLIT
     | NULLIF
     | EQUAL_NULL
+    | CONTAINS
     ;
 
 binary_or_ternary_builtin_function
@@ -3570,33 +3571,25 @@ arr_literal
     | LSB RSB
     ;
 
+data_type_size
+    : LR_BRACKET num RR_BRACKET 
+    ;
+
 data_type
-    : INT
-    | INTEGER
-    | SMALLINT
-    | TINYINT
-    | BYTEINT
-    | BIGINT
-    | (NUMBER | NUMERIC | DECIMAL_) ('(' num (COMMA num)? ')')?
-    | FLOAT_
-    | FLOAT4
-    | FLOAT8
-    | DOUBLE PRECISION?
-    | REAL_
+    : int_alias = ( INT | INTEGER | SMALLINT | TINYINT | BYTEINT | BIGINT )
+    | number_alias = ( NUMBER | NUMERIC | DECIMAL_ ) ( LR_BRACKET num (COMMA num)? RR_BRACKET )?
+    | float_alias = ( FLOAT_ | FLOAT4 | FLOAT8 | DOUBLE | DOUBLE_PRECISION | REAL_ )
     | BOOLEAN
     | DATE
-    | DATETIME ('(' num ')')?
-    | TIME ('(' num ')')?
-    | TIMESTAMP ('(' num ')')?
-    | TIMESTAMP_LTZ ('(' num ')')?
-    | TIMESTAMP_NTZ ('(' num ')')?
-    | TIMESTAMP_TZ ('(' num ')')?
-    | STRING_
-    | CHAR | CHARACTER
-    | VARCHAR ('(' num ')')?
-    | TEXT
-    | BINARY
-    | VARBINARY
+    | DATETIME data_type_size?
+    | TIME data_type_size?
+    | TIMESTAMP data_type_size?
+    | TIMESTAMP_LTZ data_type_size?
+    | TIMESTAMP_NTZ data_type_size?
+    | TIMESTAMP_TZ data_type_size?
+    | char_alias = ( CHAR | NCHAR | CHARACTER )
+    | varchar_alias = ( CHAR_VARYING | NCHAR_VARYING | NVARCHAR2 | NVARCHAR | STRING_ | TEXT | VARCHAR ) data_type_size?
+    | binary_alias = ( BINARY | VARBINARY ) data_type_size?
     | VARIANT
     | OBJECT
     | ARRAY
