@@ -34,6 +34,9 @@ sqlScript
 
 unitStatement
     : (createRole
+    | dropAccessMethod
+    | dropAggregate
+    | dropDatabase
     | dropRole
     | dropTable
     | dropType
@@ -72,6 +75,33 @@ dropView
     : DROP VIEW (IF EXISTS)? viewName (CASCADE | RESTRICT)?
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
+dropAccessMethod
+    : DROP ACCESS_METHOD (IF EXISTS)? accessMethodName RESTRICT
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-aggregate-statement
+dropAggregate
+    : DROP AGGREGATE (IF EXISTS)? aggregateName
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
+dropDatabase
+    : DROP DATABASE (IF EXISTS)? databaseName
+    ;
+
+databaseName
+    : identifier
+    ;
+
+aggregateName
+    : identifier
+    ;
+
+accessMethodName
+    : identifier
+    ;
+
 dataTypeName
     : identifier
     ;
@@ -106,8 +136,10 @@ identifier
 keyword
     : ABORT
     | ACTION
+    | ACCESS_METHOD
     | ADD
     | AFTER
+    | AGGREGATE
     | ALL
     | ALTER
     | ANALYZE
