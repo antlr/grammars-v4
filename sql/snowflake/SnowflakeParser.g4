@@ -2371,8 +2371,7 @@ create_table_as_select
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
-    | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
+    : CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )? comment_clause?
     ;
 
 session_parameter
