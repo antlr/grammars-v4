@@ -861,7 +861,7 @@ STATEMENT_TIMEOUT_IN_SECONDS:                          'STATEMENT_TIMEOUT_IN_SEC
 // STDEVP:                                                'STDEVP';
 // STOP:                                                  'STOP';
 // STOPLIST:                                              'STOPLIST';
-STOPPED:                                               'STOPPED';
+// STOPPED:                                               'STOPPED';
 STORAGE:                                               'STORAGE';
 STORAGE_ALLOWED_LOCATIONS:                             'STORAGE_ALLOWED_LOCATIONS';
 STORAGE_AWS_OBJECT_ACL:                                'STORAGE_AWS_OBJECT_ACL';
@@ -973,10 +973,10 @@ TYPE:                                                  'TYPE';
 // UNCHECKED:                                             'UNCHECKED';
 // UNCOMMITTED:                                           'UNCOMMITTED';
 UNDROP:                                                'UNDROP';
-UNICODE:                                               'UNICODE';
+// UNICODE:                                               'UNICODE';
 UNION:                                                 'UNION';
 UNIQUE:                                                'UNIQUE';
-UNKNOWN:                                               'UNKNOWN';
+// UNKNOWN:                                               'UNKNOWN';
 // UNLIMITED:                                             'UNLIMITED';
 // UNLOCK:                                                'UNLOCK';
 // UNMASK:                                                'UNMASK';
@@ -1166,6 +1166,7 @@ fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DI
 fragment DEC_DIGIT:    [0-9];
 
 
+/*
 fragment FullWidthLetter options { caseInsensitive=false; }
     : '\u00c0'..'\u00d6'
     | '\u00d8'..'\u00f6'
@@ -1182,3 +1183,4 @@ fragment FullWidthLetter options { caseInsensitive=false; }
     // | '\u10000'..'\u1F9FF'  //not support four bytes chars
     // | '\u20000'..'\u2FA1F'
     ;
+*/
