@@ -37,21 +37,21 @@ generalcomp : EQ | NE | LT | LE | GT | GE ;
 valuecomp : KW_EQ | KW_NE | KW_LT | KW_LE | KW_GT | KW_GE ;
 nodecomp : KW_IS | LL | GG ;
 // [25]
-pathexpr : ( SLASH relativepathexpr?) | ( SS relativepathexpr) | relativepathexpr ;
+pathexpr : SLASH relativepathexpr? | SS relativepathexpr | relativepathexpr ;
 relativepathexpr : stepexpr (( SLASH | SS) stepexpr)* ;
 stepexpr : filterexpr | axisstep ;
 axisstep : (reversestep | forwardstep) predicatelist ;
-forwardstep : (forwardaxis nodetest) | abbrevforwardstep ;
+forwardstep : forwardaxis nodetest | abbrevforwardstep ;
 // [30]
-forwardaxis : ( KW_CHILD COLONCOLON) | ( KW_DESCENDANT COLONCOLON) | ( KW_ATTRIBUTE COLONCOLON) | ( KW_SELF COLONCOLON) | ( KW_DESCENDANT_OR_SELF COLONCOLON) | ( KW_FOLLOWING_SIBLING COLONCOLON) | ( KW_FOLLOWING COLONCOLON) | ( KW_NAMESPACE COLONCOLON) ;
+forwardaxis : KW_CHILD COLONCOLON | KW_DESCENDANT COLONCOLON | KW_ATTRIBUTE COLONCOLON | KW_SELF COLONCOLON | KW_DESCENDANT_OR_SELF COLONCOLON | KW_FOLLOWING_SIBLING COLONCOLON | KW_FOLLOWING COLONCOLON | KW_NAMESPACE COLONCOLON ;
 abbrevforwardstep : AT? nodetest ;
-reversestep : (reverseaxis nodetest) | abbrevreversestep ;
-reverseaxis : ( KW_PARENT COLONCOLON) | ( KW_ANCESTOR COLONCOLON) | ( KW_PRECEDING_SIBLING COLONCOLON) | ( KW_PRECEDING COLONCOLON) | ( KW_ANCESTOR_OR_SELF COLONCOLON) ;
+reversestep : reverseaxis nodetest | abbrevreversestep ;
+reverseaxis : KW_PARENT COLONCOLON | KW_ANCESTOR COLONCOLON | KW_PRECEDING_SIBLING COLONCOLON | KW_PRECEDING COLONCOLON | KW_ANCESTOR_OR_SELF COLONCOLON ;
 abbrevreversestep : DD ;
 // [35]
 nodetest : kindtest | nametest ;
 nametest : qname | wildcard ;
-wildcard : STAR | (NCName CS) | ( SC NCName) ;
+wildcard : STAR | NCName CS | SC NCName ;
 filterexpr : primaryexpr predicatelist ;
 predicatelist : predicate* ;
 // [40]
@@ -86,9 +86,9 @@ functioncall :
                         qname OP (exprsingle ( COMMA exprsingle)*)? CP ;
 singletype : atomictype QM? ;
 // [50]
-sequencetype : ( KW_EMPTY_SEQUENCE OP CP) | (itemtype occurrenceindicator?) ;
+sequencetype : KW_EMPTY_SEQUENCE OP CP | itemtype occurrenceindicator? ;
 occurrenceindicator : QM | STAR | PLUS ;
-itemtype : kindtest | ( KW_ITEM OP CP) | atomictype ;
+itemtype : kindtest | KW_ITEM OP CP | atomictype ;
 atomictype : qname ;
 kindtest : documenttest | elementtest | attributetest | schemaelementtest | schemaattributetest | pitest | commenttest | texttest | anykindtest ;
 // [55]
@@ -282,9 +282,9 @@ KW_UNION : 'union' ;
 // Keywords and symbols are terminals.
 
 IntegerLiteral : FragDigits ;
-DecimalLiteral : ('.' FragDigits) | (FragDigits '.' [0-9]*) ;
-DoubleLiteral : (('.' FragDigits) | (FragDigits ('.' [0-9]*)?)) [eE] [+-]? FragDigits ;
-StringLiteral : ('"' (FragEscapeQuot | ~[^"])*? '"') | ('\'' (FragEscapeApos | ~['])*? '\'') ;
+DecimalLiteral : '.' FragDigits | FragDigits '.' [0-9]* ;
+DoubleLiteral : ('.' FragDigits | FragDigits ('.' [0-9]*)?) [eE] [+-]? FragDigits ;
+StringLiteral : '"' (FragEscapeQuot | ~[^"])*? '"' | '\'' (FragEscapeApos | ~['])*? '\'' ;
 URIQualifiedName : BracedURILiteral NCName ;
 BracedURILiteral : 'Q' '{' [^{}]* '}' ;
 // Error in spec: EscapeQuot and EscapeApos are not terminals!
