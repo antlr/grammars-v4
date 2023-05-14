@@ -1097,8 +1097,8 @@ DOUBLE_QUOTE_ID:        '"' ~'"'+ '"';
 DOUBLE_QUOTE_BLANK:     '""';
 SINGLE_QUOTE:           '\'';
 
-ID:                     [A-Z_] ( [A-Z0-9_@$] )*;
-ID2:                    '$' [A-Z_] ( [A-Z0-9_] )*;
+ID:                     [A-Z_] [A-Z0-9_@$]*;
+ID2:                    DOLLAR [A-Z_] [A-Z0-9_]*;
 
 
 S3_PATH:            '\'s3://\'';
@@ -1112,7 +1112,7 @@ STRING:                 '\'' (~'\'' | '\'\'')* '\'';
 
 DECIMAL:             DEC_DIGIT+;
 FLOAT:               DEC_DOT_DEC;
-REAL:                (DECIMAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
+REAL:                (DECIMAL | DEC_DOT_DEC) 'E' [+-]? DEC_DIGIT+;
 
 CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
 
@@ -1162,7 +1162,7 @@ MODULE:              '%';
 PLUS:                '+';
 MINUS:               '-';
 
-fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
+fragment DEC_DOT_DEC:  DEC_DIGIT+ DOT DEC_DIGIT+ |  DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
 fragment DEC_DIGIT:    [0-9];
 
 
