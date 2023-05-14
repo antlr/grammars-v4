@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar acme;
 
 acmeCompUnit
-   : (acmeImportDeclaration)* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+ EOF
+   : acmeImportDeclaration* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+ EOF
    ;
 
 acmeImportDeclaration
@@ -164,7 +164,7 @@ acmeGroupBody
    ;
 
 acmeMembersBlock
-   : MEMBERS LBRACE (acmeInstanceRef (COMMA acmeInstanceRef)*)? RBRACE (SEMICOLON)?
+   : MEMBERS LBRACE (acmeInstanceRef (COMMA acmeInstanceRef)*)? RBRACE SEMICOLON?
    ;
 
 acmePortTypeDeclaration
@@ -216,11 +216,11 @@ acmeConnectorBody
    ;
 
 acmeRepresentationDeclaration
-   : REPRESENTATION (IDENTIFIER ASSIGN)? LBRACE acmeSystemDeclaration (acmeBindingsMapDeclaration)? RBRACE (SEMICOLON)?
+   : REPRESENTATION (IDENTIFIER ASSIGN)? LBRACE acmeSystemDeclaration acmeBindingsMapDeclaration? RBRACE SEMICOLON?
    ;
 
 acmeBindingsMapDeclaration
-   : BINDINGS LBRACE (acmeBindingDeclaration)* RBRACE (SEMICOLON)?
+   : BINDINGS LBRACE acmeBindingDeclaration* RBRACE SEMICOLON?
    ;
 
 acmeBindingDeclaration
@@ -271,7 +271,7 @@ acmePropertyRecordEntry
    ;
 
 acmePropertyRecord
-   : LBRACKET (acmePropertyRecordEntry (SEMICOLON acmePropertyRecordEntry)* (SEMICOLON)?)? RBRACKET
+   : LBRACKET (acmePropertyRecordEntry (SEMICOLON acmePropertyRecordEntry)* SEMICOLON?)? RBRACKET
    ;
 
 acmePropertySequence
@@ -279,15 +279,15 @@ acmePropertySequence
    ;
 
 acmePropertyTypeRecord
-   : RECORD LBRACKET (acmePropertyRecordFieldDescription)* RBRACKET
+   : RECORD LBRACKET acmePropertyRecordFieldDescription* RBRACKET
    ;
 
 acmePropertyTypeSet
-   : SET LBRACE (acmeTypeRef)? RBRACE
+   : SET LBRACE acmeTypeRef? RBRACE
    ;
 
 acmePropertyTypeSequence
-   : SEQUENCE LANGLE (acmePropertyTypeRef)? RANGLE
+   : SEQUENCE LANGLE acmePropertyTypeRef? RANGLE
    ;
 
 acmePropertyTypeEnum
@@ -325,7 +325,7 @@ acmePropertyBlockEntry
    ;
 
 acmePropertyBlock
-   : PROPBEGIN (acmePropertyBlockEntry)+ PROPEND
+   : PROPBEGIN acmePropertyBlockEntry+ PROPEND
    ;
 
 acmePropertyTypeInt
@@ -493,7 +493,7 @@ literalRecordEntry
    ;
 
 literalRecord
-   : LBRACKET (literalRecordEntry (SEMICOLON literalRecordEntry)* (SEMICOLON)?)? RBRACKET
+   : LBRACKET (literalRecordEntry (SEMICOLON literalRecordEntry)* SEMICOLON?)? RBRACKET
    ;
 
 setConstructor
@@ -673,8 +673,8 @@ IN
    ;
 
 INT
-   : (I N T)
-   | (I N T E G E R)
+   : I N T
+   | I N T E G E R
    ;
 
 INVARIANT
@@ -742,7 +742,7 @@ OR
    ;
 
 PATHSEPARATOR
-   : ('.' | ':' | '-' | '+' | '\\' | '\\\\' | '/' | '$' | '%')
+   : '.' | ':' | '-' | '+' | '\\' | '\\\\' | '/' | '$' | '%'
    ;
 
 PUBLIC
@@ -814,8 +814,8 @@ ROLES
    ;
 
 SEQUENCE
-   : (S E Q U E N C E)
-   | (S E Q)
+   : S E Q U E N C E
+   | S E Q
    ;
 
 SELECT

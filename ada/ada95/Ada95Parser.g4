@@ -22,12 +22,11 @@ THE SOFTWARE.
 */
 parser grammar Ada95Parser;
 
-
 options { tokenVocab = Ada95Lexer; }
+
 /*
 2 - Lexical Elements
 */
-
 
 identifier
    : IDENTIFIER_
@@ -607,7 +606,7 @@ condition
    ;
 
 case_statement
-   : CASE expression IS case_statement_alternative (case_statement_alternative)* END CASE ';'
+   : CASE expression IS case_statement_alternative case_statement_alternative* END CASE ';'
    ;
 
 case_statement_alternative
@@ -1292,4 +1291,3 @@ mod_clause
 boolean_expression
    : expression
    ;
-

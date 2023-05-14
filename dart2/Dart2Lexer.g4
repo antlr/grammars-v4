@@ -1,6 +1,6 @@
 /* Generated Mon, Jun 13, 2022 8:11:58 AM EST
  *
- * Copyright (c) 2022 Ken Domino
+ * Copyright (c) 2022, 2023 Ken Domino
  * Copyright (c) 2017, the Dart project authors.  Please see the AUTHORS file
  * for details. All rights reserved. Use of this source code is governed by a
  * BSD-style license that can be found in the LICENSE file.
@@ -149,7 +149,7 @@ WITH_:'with';
 YIELD_:'yield';
 NUMBER : DIGIT+ ( '.' DIGIT+ )? EXPONENT? | '.' DIGIT+ EXPONENT? ;
 HEX_NUMBER : '0x' HEX_DIGIT+ | '0X' HEX_DIGIT+ ;
-SingleLineString : StringDQ | StringSQ | 'r\'' (~('\'' | '\n' | '\r'))* '\'' | 'r"' (~('"' | '\n' | '\r'))* '"' ;
+SingleLineString : StringDQ | StringSQ | 'r\'' ~('\'' | '\n' | '\r')* '\'' | 'r"' ~('"' | '\n' | '\r')* '"' ;
 MultiLineString : '"""' StringContentTDQ*? '"""' | '\'\'\'' StringContentTSQ*? '\'\'\'' | 'r"""' (~'"' | '"' ~'"' | '""' ~'"')* '"""' | 'r\'\'\'' (~'\'' | '\'' ~'\'' | '\'\'' ~'\'')* '\'\'\'' ;
 IDENTIFIER : IDENTIFIER_START IDENTIFIER_PART* ;
 WHITESPACE : ( '\t' | ' ' | NEWLINE )+  -> skip;
