@@ -47,12 +47,12 @@ unitStatement
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-create-role-statement
 createRole
-    : CREATE ROLE (IF NOT EXISTS)? roleName
+    : CREATE ROLE (IF NOT EXISTS)? roleName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-role-statement
 dropRole
-    : DROP ROLE (IF EXISTS)? roleName
+    : DROP ROLE (IF EXISTS)? roleName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
@@ -67,7 +67,7 @@ dropType
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
 dropUser
-    : DROP USER userName
+    : DROP USER userName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
@@ -88,14 +88,6 @@ dropAggregate
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
 dropDatabase
     : DROP DATABASE (IF EXISTS)? databaseName=identifier
-    ;
-
-roleName
-    : anyName
-    ;
-
-userName
-    : anyName
     ;
 
 anyName
