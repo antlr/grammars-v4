@@ -1747,7 +1747,7 @@ Hexnum
 
 
 Integer
-   : (Digit +)
+   : Digit+
    ;
 
 
@@ -1757,7 +1757,7 @@ Octalnum
 
 
 fragment HexDigit
-   : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+   : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
    ;
 
 
@@ -1777,7 +1777,7 @@ String_
 
 
 fragment Letter
-   : ('a' .. 'z' | 'A' .. 'Z')
+   : 'a' .. 'z' | 'A' .. 'Z'
    ;
 
 
@@ -1787,7 +1787,7 @@ fragment Digit
 
 
 Etiqueta
-   : Identifier (':')
+   : Identifier ':'
    ;
 
 
