@@ -57,12 +57,12 @@ dropRole
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
 dropTable
-    : DROP TABLE (IF EXISTS)? tableName (CASCADE | RESTRICT)?
+    : DROP TABLE (IF EXISTS)? tableName=identifier (CASCADE | RESTRICT)?
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
 dropType
-    : DROP TYPE (IF EXISTS)? dataTypeName RESTRICT
+    : DROP TYPE (IF EXISTS)? dataTypeName=identifier RESTRICT
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
@@ -72,50 +72,26 @@ dropUser
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
 dropView
-    : DROP VIEW (IF EXISTS)? viewName (CASCADE | RESTRICT)?
+    : DROP VIEW (IF EXISTS)? viewName=identifier (CASCADE | RESTRICT)?
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
 dropAccessMethod
-    : DROP ACCESS_METHOD (IF EXISTS)? accessMethodName RESTRICT
+    : DROP ACCESS_METHOD (IF EXISTS)? accessMethodName=identifier RESTRICT
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-aggregate-statement
 dropAggregate
-    : DROP AGGREGATE (IF EXISTS)? aggregateName
+    : DROP AGGREGATE (IF EXISTS)? aggregateName=identifier
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
 dropDatabase
-    : DROP DATABASE (IF EXISTS)? databaseName
-    ;
-
-databaseName
-    : identifier
-    ;
-
-aggregateName
-    : identifier
-    ;
-
-accessMethodName
-    : identifier
-    ;
-
-dataTypeName
-    : identifier
+    : DROP DATABASE (IF EXISTS)? databaseName=identifier
     ;
 
 roleName
     : anyName
-    ;
-
-tableName
-    : identifier
-    ;
-
-viewName
-    : identifier
     ;
 
 userName
