@@ -61,7 +61,8 @@ postfixExpression
     ('[' expression ']'
     | '(' argumentExpressionList? ')'
     | ('.' | '->') Identifier
-    | ('++' | '--')
+    | '++'
+    | '--'
     )*
     ;
 
@@ -190,7 +191,7 @@ storageClassSpecifier
     ;
 
 typeSpecifier
-    :   ('void'
+    :   'void'
     |   'char'
     |   'short'
     |   'int'
@@ -203,7 +204,7 @@ typeSpecifier
     |   '_Complex'
     |   '__m128'
     |   '__m128d'
-    |   '__m128i')
+    |   '__m128i'
     |   '__extension__' '(' ('__m128' | '__m128d' | '__m128i') ')'
     |   atomicTypeSpecifier
     |   structOrUnionSpecifier
@@ -274,10 +275,10 @@ typeQualifier
     ;
 
 functionSpecifier
-    :   ('inline'
+    :   'inline'
     |   '_Noreturn'
     |   '__inline__' // GCC extension
-    |   '__stdcall')
+    |   '__stdcall'
     |   gccAttributeSpecifier
     |   '__declspec' '(' Identifier ')'
     ;
@@ -305,12 +306,12 @@ directDeclarator
     ;
 
 vcSpecificModifer
-    :   ('__cdecl' 
+    :   '__cdecl' 
     |   '__clrcall' 
     |   '__stdcall' 
     |   '__fastcall' 
     |   '__thiscall' 
-    |   '__vectorcall') 
+    |   '__vectorcall'
     ;
 
 
@@ -477,7 +478,8 @@ forExpression
 
 jumpStatement
     :   ('goto' Identifier
-    |   ('continue'| 'break')
+    |   'continue'
+    |   'break'
     |   'return' expression?
     |   'goto' unaryExpression // GCC extension
     )
@@ -851,7 +853,7 @@ ComplexDefine
     ;
 
 IncludeDirective
-    :   '#' Whitespace? 'include' Whitespace? (('"' ~[\r\n]* '"') | ('<' ~[\r\n]* '>' )) Whitespace? Newline
+    :   '#' Whitespace? 'include' Whitespace? ('"' ~[\r\n]* '"' | '<' ~[\r\n]* '>' ) Whitespace? Newline
         -> skip
     ;
 
