@@ -35,7 +35,7 @@ prog
 
 // a line starts with an INT
 line
-   : (linenumber ((amprstmt (COLON amprstmt?)*) | (COMMENT | REM)))
+   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
    ;
 
 amperoper
@@ -47,12 +47,13 @@ linenumber
    ;
 
 amprstmt
-   : (amperoper? statement)
-   | (COMMENT | REM)
+   : amperoper? statement
+   | COMMENT
+   | REM
    ;
 
 statement
-   : (CLS | LOAD | SAVE | TRACE | NOTRACE | FLASH | INVERSE | GR | NORMAL | SHLOAD | CLEAR | RUN | STOP | TEXT | HOME | HGR | HGR2)
+   : CLS | LOAD | SAVE | TRACE | NOTRACE | FLASH | INVERSE | GR | NORMAL | SHLOAD | CLEAR | RUN | STOP | TEXT | HOME | HGR | HGR2
    | endstmt
    | returnstmt
    | restorestmt
@@ -128,12 +129,12 @@ variableassignment
    ;
 
 relop
-   : (GTE)
-   | (GT EQ)
-   | (EQ GT)
+   : GTE
+   | GT EQ
+   | EQ GT
    | LTE
-   | (LT EQ)
-   | (EQ LT)
+   | LT EQ
+   | EQ LT
    | neq
    | EQ
    | GT
@@ -368,7 +369,7 @@ func_
    | expfunc
    | logfunc
    | absfunc
-   | (LPAREN expression RPAREN)
+   | LPAREN expression RPAREN
    ;
 
 signExpression
@@ -388,12 +389,12 @@ addingExpression
    ;
 
 relationalExpression
-   : addingExpression ((relop) addingExpression)?
+   : addingExpression (relop addingExpression)?
    ;
 
 expression
    : func_
-   | (relationalExpression ((AND | OR) relationalExpression)*)
+   | relationalExpression ((AND | OR) relationalExpression)*
    ;
 
 // lists
@@ -406,7 +407,7 @@ varname
    ;
 
 varsuffix
-   : (DOLLAR | PERCENT)
+   : DOLLAR | PERCENT
    ;
 
 varlist
