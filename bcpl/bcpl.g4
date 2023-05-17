@@ -50,15 +50,11 @@ Identifier : Letter (Letter | Digit | '.' | '_')* ;
 name : identifier ;
 
 // 8.8.2 Operators
-address_op : '@' | '!' | '%' ;
 mult_op : '*' | '/' | 'REM' ;
 add_op : '+' | '-' ;
-rel_op : '=' | '~=' | '<=' | '>=' | '<' | '>' ;
 shift_op : '<<' | '>>' ;
 and_op : '&' ;
 or_op : '|' ;
-eqv_op : 'EQV' | 'NEQV' ;
-not_op : '~' ;
 
 // 8.8.3 Expressions
 
@@ -98,7 +94,7 @@ lhse : e0 ;
 left_hand_side_list : lhse (',' lhse)* ;
 
 // 8.8.8 Unlabeled commands
-assignment : left_hand_side_list ':=' expression_list ;
+assignment : left_hand_side_list assop expression_list ;
 simple_command : 'BREAK' | 'LOOP' | 'ENDCASE' | 'RETURN' | 'FINISH' ;
 goto_command : 'GOTO' expression ;
 routine_command : bexp '(' expression_list ')' | bexp '(' ')' ;
