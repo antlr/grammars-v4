@@ -253,7 +253,7 @@ variableInitializer
     ;
 
 arrayInitializer
-    : '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
+    : '{' (variableInitializer (',' variableInitializer)* ','? )? '}'
     ;
 
 classOrInterfaceType
@@ -352,7 +352,7 @@ elementValue
     ;
 
 elementValueArrayInitializer
-    : '{' (elementValue (',' elementValue)*)? (',')? '}'
+    : '{' (elementValue (',' elementValue)*)? ','? '}'
     ;
 
 annotationTypeDeclaration
@@ -360,7 +360,7 @@ annotationTypeDeclaration
     ;
 
 annotationTypeBody
-    : '{' (annotationTypeElementDeclaration)* '}'
+    : '{' annotationTypeElementDeclaration* '}'
     ;
 
 annotationTypeElementDeclaration
