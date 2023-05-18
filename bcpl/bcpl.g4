@@ -171,7 +171,7 @@ bexp
  | const
  | string
  | 'SLCT' e9 (':' e9 (':' e9)? )?
- | ('NEXT' | 'EXIT' | 'BREAK' | 'LOOP' | 'ENDCASE')
+ | 'NEXT' | 'EXIT' | 'BREAK' | 'LOOP' | 'ENDCASE'
  | '(' e0 ')'
  | ('FLOAT' | 'FIX' | '!' | '@') e7
  | ('+' | '-' | 'ABS' | '#+' | '#-' | '#ABS') e5
