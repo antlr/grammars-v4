@@ -14,7 +14,7 @@ bool IsNl()
 // program : declaration_part ;
 nl : { IsNl() }? ;
 
-program : (declaration_part | directive)* EOF ;
+program : directive* declaration_part EOF ;
 
 Rem : 'REM' | '%' ;
 Eqv : 'EQV' ;
@@ -116,7 +116,7 @@ label_prefix : identifier ':' ;
 case_prefix : 'CASE' constant_expression ':' ;
 default_prefix : 'DEFAULT' ':' ;
 prefix_ : label_prefix | case_prefix | default_prefix ;
-command : unlabelled_command | prefix_ command | prefix_ ;
+command : prefix_* unlabelled_command | prefix_ prefix_* ;
 
 // 8.8.10 Blocks and compound commands
 command_list : command (semi command)* ;
@@ -139,9 +139,9 @@ fname : 'FLT' identifier ;
 const : number | Character_constant | 'TRUE' | 'FALSE' | '?' ;
 bpat : '+' number | '-' number | 'TRUE' | 'FALSE' | '?' | Character_constant ;
 string : String_constant ;
-mulop : '*' | '/' | 'MOD' | '#*' | '#MOD' | 'REM' | '#REM' ;
-posop : '+' | '-' | 'ABS' | '#+' | '#-' | '#ABS' ;
-addop : '+' | '-' | '#+' | '#-' ;
+//mulop : '*' | '/' | 'MOD' | '#*' | '#MOD' | 'REM' | '#REM' ;
+//posop : '+' | '-' | 'ABS' | '#+' | '#-' | '#ABS' ;
+//addop : '+' | '-' | '#+' | '#-' ;
 relop : '=' | 'EQ' | '~=' | 'NE' | '<' | '<=' | '>' | '>='
 	| '#=' | '#~=' | '#<' | '#<=' | '#>' | '#>=' ;
 fcond : '->' | '#->' ;
@@ -171,10 +171,10 @@ bexp
  | const
  | string
  | 'SLCT' e9 (':' e9 (':' e9)? )?
- | jcom
+ | ('NEXT' | 'EXIT' | 'BREAK' | 'LOOP' | 'ENDCASE')
  | '(' e0 ')'
  | ('FLOAT' | 'FIX' | '!' | '@') e7
- | posop e5
+ | ('+' | '-' | 'ABS' | '#+' | '#-' | '#ABS') e5
  | ('NOT'|'~') e3
  | 'TABLE' e0 (',' e0)*
  | ('MATCH' | 'EVERY') '(' e0 (',' e0)* ')' mlist
@@ -182,8 +182,10 @@ bexp
  ;
 se9 :'(' (e0 (',' e0)*)? ')' | '#(' e0 (',' e0)* ')' | '[' e0 ']' ;
 se8 : ('OF' | '::' | '!' | '%') e8 ;
-se6 : mulop e6 ;
-se5 : relop e4 (relop e4)* | addop e5 ;
+se6 : ('*' | '/' | 'MOD' | '#*' | '#MOD' | 'REM' | '#REM') e6 ;
+se5 : ('=' | 'EQ' | '~=' | 'NE' | '<' | '<=' | '>' | '>='
+	| '#=' | '#~=' | '#<' | '#<=' | '#>' | '#>=') e4 (relop e4)*
+  | ('+' | '-' | '#+' | '#-') e5 ;
 se4 : ('<<' | '>>') e4 ;
 se3 : '&' e3 ;
 se2 : '|' e2 ;
