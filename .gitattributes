@@ -47,7 +47,6 @@
 *.java text
 *.js text
 *.json text
-json/examples/*.json text
 *.kt text
 *.lark text
 *.lua text
