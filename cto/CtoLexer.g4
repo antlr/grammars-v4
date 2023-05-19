@@ -110,7 +110,7 @@ fragment FullTime
 fragment TimeOffset
     : 'Z' | TimeNumOffset;
 fragment TimeNumOffset 
-    : '-' [01][0-2] (':' (HalfHour))?
+    : '-' [01][0-2] (':' HalfHour)?
     | '+' [01][0-5] (':' (HalfHour | [4][5]))?
     ;
 fragment HalfHour: [0][0] | [3][0];
