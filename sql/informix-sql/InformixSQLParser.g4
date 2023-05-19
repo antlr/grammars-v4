@@ -34,6 +34,9 @@ sqlScript
 
 unitStatement
     : (createRole
+    | dropAccessMethod
+    | dropAggregate
+    | dropDatabase
     | dropRole
     | dropTable
     | dropType
@@ -44,52 +47,47 @@ unitStatement
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-create-role-statement
 createRole
-    : CREATE ROLE (IF NOT EXISTS)? roleName
+    : CREATE ROLE (IF NOT EXISTS)? roleName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-role-statement
 dropRole
-    : DROP ROLE (IF EXISTS)? roleName
+    : DROP ROLE (IF EXISTS)? roleName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
 dropTable
-    : DROP TABLE (IF EXISTS)? tableName (CASCADE | RESTRICT)?
+    : DROP TABLE (IF EXISTS)? tableName=identifier (CASCADE | RESTRICT)?
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
 dropType
-    : DROP TYPE (IF EXISTS)? dataTypeName RESTRICT
+    : DROP TYPE (IF EXISTS)? dataTypeName=identifier RESTRICT
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
 dropUser
-    : DROP USER userName
+    : DROP USER userName=anyName
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
 dropView
-    : DROP VIEW (IF EXISTS)? viewName (CASCADE | RESTRICT)?
+    : DROP VIEW (IF EXISTS)? viewName=identifier (CASCADE | RESTRICT)?
     ;
 
-dataTypeName
-    : identifier
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
+dropAccessMethod
+    : DROP ACCESS_METHOD (IF EXISTS)? accessMethodName=identifier RESTRICT
     ;
 
-roleName
-    : anyName
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-aggregate-statement
+dropAggregate
+    : DROP AGGREGATE (IF EXISTS)? aggregateName=identifier
     ;
 
-tableName
-    : identifier
-    ;
-
-viewName
-    : identifier
-    ;
-
-userName
-    : anyName
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
+dropDatabase
+    : DROP DATABASE (IF EXISTS)? databaseName=identifier
     ;
 
 anyName
@@ -106,8 +104,10 @@ identifier
 keyword
     : ABORT
     | ACTION
+    | ACCESS_METHOD
     | ADD
     | AFTER
+    | AGGREGATE
     | ALL
     | ALTER
     | ANALYZE
