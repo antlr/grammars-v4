@@ -1,4 +1,6 @@
-grammar bcpl;
+parser grammar bcplParser;
+
+options { tokenVocab=bcplLexer; }
 
 @members
 {
@@ -16,37 +18,8 @@ nl : { IsNl() }? ;
 
 program : directive* declaration_part EOF ;
 
-Rem : 'REM' | '%' ;
-Eqv : 'EQV' ;
-Neqv : 'NEQV' ;
-True_ : 'TRUE' ;
-False_ : 'FALSE' ;
-Table : 'TABLE' ;
-OB : '$(' | '{';
-CB : '$)' | '}';
-
-Left_dollar_open : OB ;
-
-// 8.8.1 Identifier, Strings, Numbers.
-fragment Letter : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
-// extended
- | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
- ;
-fragment Octal_digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' ;
-fragment Hex_digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
-fragment Digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
-// extended
-String_constant : '"' ~'"'* /* 255 or fewer characters */ '"' ;
-Character_constant : '\'' '*'? . '\'' ;
-Octal_number : '#' Octal_digit Octal_digit* ;
-Hex_number : ('#X'|'#x') Hex_digit Hex_digit* ;
-Binary_number : ('#B'|'#b') [01]+ ;
-Digits : Digit+;
 number : Octal_number | Hex_number | Digits | Binary_number ;
 identifier : Identifier;
-Identifier : Letter (Letter | Digit | '.' | '_')* ;
-
-// missing
 name : identifier ;
 
 // 8.8.2 Operators
@@ -128,12 +101,6 @@ compound_command : OB command_list? CB ;
 
 // Extended
 directive : 'GET' String_constant | 'SECTION' String_constant ;
-
-// Extended
-
-Comment : ('/*' .*? '*/' | '//' ~('\n' | '\r')*) -> channel(HIDDEN) ;
-WS : [ \t]+ -> channel(HIDDEN) ;
-NL : [\n\r]+ -> channel(2) ;
 
 fname : 'FLT' identifier ;
 const : number | Character_constant | 'TRUE' | 'FALSE' | '?' ;
