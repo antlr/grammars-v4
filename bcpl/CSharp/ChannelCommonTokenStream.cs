@@ -7,9 +7,33 @@ using System.Threading.Tasks;
 
 internal class ChannelCommonTokenStream : CommonTokenStream
 {
-    public ChannelCommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
+    ITokenSource original = null;
+
+    public ChannelCommonTokenStream(ITokenSource tokenSource)
+        : base(tokenSource)
     {
     }
+
+    public ChannelCommonTokenStream(ITokenStream input)
+        : this(PrepareBaseParameters(input))
+    {
+        CommonTokenStream i = input as CommonTokenStream;
+        original = i.TokenSource;
+    }
+
+    private ChannelCommonTokenStream(FatData fd)
+        : base(fd.input.TokenSource)
+    {
+    }
+
+    private static FatData PrepareBaseParameters(ITokenStream input)
+    {
+        var fd = new FatData(input);
+        return fd;
+    }
+
+    private readonly record struct FatData(ITokenStream input);
+
     protected internal IToken Lb(int k, int ch)
     {
         if (k == 0 || (p - k) < 0)

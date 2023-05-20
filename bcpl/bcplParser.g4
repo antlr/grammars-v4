@@ -1,20 +1,6 @@
 parser grammar bcplParser;
 
-options { tokenVocab=bcplLexer; }
-
-@members
-{
-bool IsNl()
-{
-	   var c = (this.InputStream as ChannelCommonTokenStream).LT(-1, 2);
-	   var d = (this.InputStream as ChannelCommonTokenStream).LT(1, 2);
-	   return c.Type == bcplParser.NL;
-}
-}
-
-// Extended
-// program : declaration_part ;
-nl : { IsNl() }? ;
+options { tokenVocab=bcplLexer; superClass=bcplParserBase; }
 
 program : directive* declaration_part EOF ;
 
@@ -32,7 +18,6 @@ or_op : '|' ;
 // 8.8.3 Expressions
 
 expression : e0 ;
-
 
 // 8.8.4 Constant-expressions
 c_element : Character_constant | number | identifier | 'TRUE' | 'FALSE' | '(' constant_expression ')' | '?' ;
@@ -168,3 +153,6 @@ e3 : bexp (nonl ( se9 | se8 | se6 | se5 | se4 ))* ;
 e2 : bexp (nonl ( se9 | se8 | se6 | se5 | se4 | se3 ))* ;
 e1 : bexp (nonl ( se9 | se8 | se6 | se5 | se4 | se3 | se2 ))* ;
 e0 : bexp (nonl ( se9 | se8 | se6 | se5 | se4 | se3 | se2 | se1 ))* ;
+
+nl : { IsNl() }? ;
+

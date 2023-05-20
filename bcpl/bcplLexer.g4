@@ -1,15 +1,5 @@
 lexer grammar bcplLexer;
 
-@members
-{
-bool IsNl()
-{
-	   var c = (this.InputStream as ChannelCommonTokenStream).LT(-1, 2);
-	   var d = (this.InputStream as ChannelCommonTokenStream).LT(1, 2);
-	   return c.Type == bcplParser.NL;
-}
-}
-
 ACEQ : '&:=' ;
 AND : '&' ;
 ARROW : '->' ;
@@ -134,27 +124,20 @@ VBAR : '|' ;
 VCEQ : '|:=' ;
 XORCEQ : 'XOR:=' ;
 
+Identifier : Letter (Letter | Digit | '.' | '_')* ;
 
-Left_dollar_open : OB ;
+Binary_number : ('#B'|'#b') [01]+ ;
+Character_constant : '\'' '*'? . '\'' ;
+Comment : ('/*' .*? '*/' | '//' ~('\n' | '\r')*) -> channel(HIDDEN) ;
+Digits : Digit+;
+Hex_number : ('#X'|'#x') Hex_digit Hex_digit* ;
+Octal_number : '#' Octal_digit Octal_digit* ;
+String_constant : '"' ~'"'* /* 255 or fewer characters */ '"' ;
+WS : [ \t]+ -> channel(HIDDEN) ;
+NL : [\n\r]+ -> channel(2) ;
 
-// 8.8.1 Identifier, Strings, Numbers.
-fragment Letter : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
-// extended
- | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
- ;
+fragment Letter : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' ;
 fragment Octal_digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' ;
 fragment Hex_digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
 fragment Digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
-// extended
-String_constant : '"' ~'"'* /* 255 or fewer characters */ '"' ;
-Character_constant : '\'' '*'? . '\'' ;
-Octal_number : '#' Octal_digit Octal_digit* ;
-Hex_number : ('#X'|'#x') Hex_digit Hex_digit* ;
-Binary_number : ('#B'|'#b') [01]+ ;
-Digits : Digit+;
-Identifier : Letter (Letter | Digit | '.' | '_')* ;
-
-Comment : ('/*' .*? '*/' | '//' ~('\n' | '\r')*) -> channel(HIDDEN) ;
-WS : [ \t]+ -> channel(HIDDEN) ;
-NL : [\n\r]+ -> channel(2) ;
 
