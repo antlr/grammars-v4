@@ -1,4 +1,4 @@
-﻿using Antlr4.Runtime;
+using Antlr4.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +34,47 @@ internal class ChannelCommonTokenStream : CommonTokenStream
 
     private readonly record struct FatData(ITokenStream input);
 
+    protected int MyPreviousTokenOnChannel(int i, int channel)
+    {
+        Sync(i);
+        if (i >= Size)
+        {
+            // the EOF token is on every channel
+            return Size - 1;
+        }
+        while (i >= 0)
+        {
+            IToken token = tokens[i];
+            if (token.Type == TokenConstants.EOF || token.Channel == channel || token.Channel == Lexer.DefaultTokenChannel)
+            {
+                return i;
+            }
+            i--;
+        }
+        return i;
+    }
+
+    protected int MyNextTokenOnChannel(int i, int channel)
+    {
+        Sync(i);
+        if (i >= Size)
+        {
+            return Size - 1;
+        }
+        IToken token = tokens[i];
+        while (token.Channel != channel && token.Channel != Lexer.DefaultTokenChannel)
+        {
+            if (token.Type == TokenConstants.EOF)
+            {
+                return i;
+            }
+            i++;
+            Sync(i);
+            token = tokens[i];
+        }
+        return i;
+    }
+    
     protected internal IToken Lb(int k, int ch)
     {
         if (k == 0 || (p - k) < 0)
@@ -46,7 +87,7 @@ internal class ChannelCommonTokenStream : CommonTokenStream
         while (n <= k)
         {
             // skip off-channel tokens
-            i = PreviousTokenOnChannel(i - 1, ch);
+            i = MyPreviousTokenOnChannel(i - 1, ch);
             n++;
         }
         if (i < 0)
@@ -77,12 +118,11 @@ internal class ChannelCommonTokenStream : CommonTokenStream
             // skip off-channel tokens, but make sure to not look past EOF
             if (Sync(i + 1))
             {
-                i = NextTokenOnChannel(i + 1, ch);
+                i = MyNextTokenOnChannel(i + 1, ch);
             }
             n++;
         }
-        //		if ( i>range ) range = i;
+        //      if ( i>range ) range = i;
         return tokens[i];
     }
-
 }

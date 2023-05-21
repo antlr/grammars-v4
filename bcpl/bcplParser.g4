@@ -96,7 +96,7 @@ fcond : '->' | '#->' ;
 range : '..' | '#..' ;
 jcom : 'NEXT' | 'EXIT' | 'BREAK' | 'LOOP' | 'ENDCASE' ;
 assop : ':=' | '*:=' | '/:=' | 'MOD:=' | '+:=' | '~:=' | '#:=' | '#*:=' | '#/:=' | '#MOD:=' | '#+:=' | '#~:=' | '<<:=' | '>>:=' | '&:=' | '|:=' | 'EQV:=' | 'NEQV:=' | 'XOR:=' ;
-nonl : /* { checknonl() }? */ ;
+nonl : { IsNotNl() }? ;
 mlist : (':' p0? ('->' e0 | 'BE' command))+ '.'? ;
 p0 : sp (sp0 | sp1 | p3)* ;
 p1 : sp (sp1 | p3)* ;
