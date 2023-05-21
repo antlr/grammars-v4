@@ -643,7 +643,7 @@ virtualSpecifier: Override | Final;
  */
 
 pureSpecifier:
-	Assign val = OctalLiteral {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
+	Assign val = OctalLiteral {if($val.text.compare("0")!=0) throw new InputMismatchException(this);
 		};
 /*Derived classes*/
 
