@@ -148,6 +148,7 @@ keyword
     | CASE
     | CAST
     | CHECK
+    | CLOSE
     | COLLATE
     | COLUMN
     | COMMIT

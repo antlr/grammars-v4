@@ -75,6 +75,7 @@ CASCADE:           'CASCADE';
 CASE:              'CASE';
 CAST:              'CAST';
 CHECK:             'CHECK';
+CLOSE:             'CLOSE';
 COLLATE:           'COLLATE';
 COLUMN:            'COLUMN';
 COMMIT:            'COMMIT';
