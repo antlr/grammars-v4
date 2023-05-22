@@ -119,7 +119,7 @@ anyName
     | keyword
     | STRING_LITERAL
     | OPEN_PAR anyName CLOSE_PAR
-;
+    ;
 
 identifier
     : anyName ('.' anyName)*
