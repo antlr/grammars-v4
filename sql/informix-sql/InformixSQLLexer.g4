@@ -184,6 +184,7 @@ WHEN:              'WHEN';
 WHERE:             'WHERE';
 WITH:              'WITH';
 WITHOUT:           'WITHOUT';
+WORK:              'WORK';
 FIRST_VALUE:       'FIRST_VALUE';
 OVER:              'OVER';
 PARTITION:         'PARTITION';

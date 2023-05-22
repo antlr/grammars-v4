@@ -42,6 +42,10 @@ unitStatement
     | dropType
     | dropUser
     | dropView
+    | databaseStmt
+    | closeStmt
+    | closeDatabaseStmt
+    | commitWorkStmt
     ) SCOL
     ;
 
@@ -88,6 +92,26 @@ dropAggregate
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
 dropDatabase
     : DROP DATABASE (IF EXISTS)? databaseName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-statement
+closeStmt
+    : CLOSE cursorId=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-database-statement
+closeDatabaseStmt
+    : CLOSE DATABASE
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-database-statement
+databaseStmt
+    : DATABASE databaseName=anyName EXCLUSIVE?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-commit-work-statement
+commitWorkStmt
+    : COMMIT WORK?
     ;
 
 anyName
@@ -231,6 +255,7 @@ keyword
     | WHERE
     | WITH
     | WITHOUT
+    | WORK
     | FIRST_VALUE
     | OVER
     | PARTITION
