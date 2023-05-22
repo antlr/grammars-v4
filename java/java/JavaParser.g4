@@ -582,9 +582,9 @@ expressionList
     ;
 
 methodCall
-    : identifier '(' expressionList? ')'
-    | THIS '(' expressionList? ')'
-    | SUPER '(' expressionList? ')'
+    : identifier arguments
+    | THIS arguments
+    | SUPER arguments
     ;
 
 expression
