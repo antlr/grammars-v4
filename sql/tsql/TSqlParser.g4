@@ -3976,6 +3976,7 @@ option
     | RECOMPILE
     | ROBUST PLAN
     | USE PLAN STRING
+    | LABEL '=' STRING
     ;
 
 optimize_for_arg
