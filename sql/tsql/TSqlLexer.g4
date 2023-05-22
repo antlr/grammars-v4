@@ -527,6 +527,7 @@ KEY_PATH:                              'KEY_PATH';
 KEY_SOURCE:                            'KEY_SOURCE';
 KEY_STORE_PROVIDER_NAME:               'KEY_STORE_PROVIDER_NAME';
 KILL:                                  'KILL';
+LABEL:                                 'LABEL';
 LAG:                                   'LAG';
 LANGUAGE:                              'LANGUAGE';
 LAST:                                  'LAST';
