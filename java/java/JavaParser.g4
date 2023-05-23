@@ -704,8 +704,8 @@ classType
     ;
 
 creator
-    : nonWildcardTypeArguments createdName classCreatorRest
-    | createdName (arrayCreatorRest | classCreatorRest)
+    : nonWildcardTypeArguments? createdName classCreatorRest
+    | createdName arrayCreatorRest
     ;
 
 createdName
@@ -718,7 +718,8 @@ innerCreator
     ;
 
 arrayCreatorRest
-    : '[' (']' ('[' ']')* arrayInitializer | expression ']' ('[' expression ']')* ('[' ']')*)
+    : ('[' ']')+ arrayInitializer
+    | ('[' expression ']')+ ('[' ']')*
     ;
 
 classCreatorRest
