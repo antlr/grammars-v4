@@ -7,7 +7,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 # to manually look at the version in package.json and extract the
 # version number. We can then use this with antlr4 to generate the
 # parser and lexer.
-$version = Select-String -Path "package.json" -Pattern "antlr4" | ForEach-Object {$_.Line.Split(" ")[5]} | ForEach-Object {$_.Trim('"')} | ForEach-Object {$_.Trim(',')}
+$version = (Select-String -Path "package.json" -Pattern "antlr4" | ForEach-Object {$_.Line.Split(" ")[5]}) -replace '"|,|\r|\n'
 
 <tool_grammar_tuples:{x |
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
