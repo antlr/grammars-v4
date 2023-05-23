@@ -12,7 +12,7 @@ version=4.13.0
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 }>
 
-JAR=<antlr_tool_path>
+JAR=`python -c "import os; from pathlib import Path; print(os.path.join(Path.home() , '.m2',  'repository', 'org', 'antlr', 'antlr4', '$version', 'antlr4-$version-complete.jar'))"`
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 javac -cp "$CLASSPATH" *.java
 
