@@ -806,3 +806,7 @@ with
 	u as (select 1 as y),
 	v as (select 1 as z)
 select x from t join u join v on u.y = v.z on t.x = v.z
+
+--https://learn.microsoft.com/en-us/sql/t-sql/queries/option-clause-transact-sql?view=sql-server-ver16
+SELECT * FROM FactResellerSales
+  OPTION ( LABEL = 'q17' );
