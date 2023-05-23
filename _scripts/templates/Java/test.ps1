@@ -58,7 +58,7 @@ $JAR = Join-Path -Path $homePath -ChildPath ".m2/repository/org/antlr/antlr4/$ve
 Get-Content "tests.txt" | ForEach-Object { trwdog java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | trwdog java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
+get-content "tests.txt" | trwdog java -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
