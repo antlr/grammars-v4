@@ -69,6 +69,9 @@ jobs:
       if: ${{ matrix.language == 'Python3' }}
       run: |
         python --version
+    - name: Install Antlr tool
+      run: |
+         pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v3.6.0
@@ -78,16 +81,6 @@ jobs:
       if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
-    - name: Download ANTLR
-      shell: pwsh
-      run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
-        echo "$antlrPath" | Write-Host
-        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-        If(!(test-path -PathType container /tmp)) {
-           New-Item -Path '/tmp' -ItemType Directory
-        }
-        copy $antlrPath /tmp/antlr4-complete.jar
     - name: Update paths
       shell: pwsh
       run: |
@@ -175,6 +168,9 @@ jobs:
       if: ${{ matrix.language == 'Python3' }}
       run: |
         python --version
+    - name: Install Antlr tool
+      run: |
+         pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v3.6.0
@@ -184,16 +180,6 @@ jobs:
       if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
-    - name: Download ANTLR
-      shell: pwsh
-      run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.12.0"
-        echo "$antlrPath" | Write-Host
-        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-        If(!(test-path -PathType container /tmp)) {
-           New-Item -Path '/tmp' -ItemType Directory
-        }
-        copy $antlrPath /tmp/antlr4-complete.jar
     - name: Install trgen
       shell: bash
       run: |
