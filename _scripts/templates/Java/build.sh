@@ -2,8 +2,14 @@
 set -e
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 
+# Because there is no integrated build script for Dart targets, we need
+# to manually look at the version in pubspec.yaml and extract the
+# version number. We can then use this with antlr4 to generate the
+# parser and lexer.
+$version=4.13.0
+
 <tool_grammar_tuples:{x |
-java -jar "<antlr_tool_path>" -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 }>
 
 JAR=<antlr_tool_path>
