@@ -2317,7 +2317,7 @@ update_statistics_option
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraints  (','? table_indices)*  ','? ')' (LOCK simple_id)? table_options* (ON id_ | DEFAULT)? (TEXTIMAGE_ON id_ | DEFAULT)?';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints  (','? table_indices)*  ','? ')' (LOCK simple_id)? table_options* (ON id_ | DEFAULT | on_partition_or_filegroup)? (TEXTIMAGE_ON id_ | DEFAULT)?';'?
     ;
 
 table_indices
@@ -2364,7 +2364,7 @@ create_table_index_option
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
 create_view
-    : CREATE VIEW simple_name ('(' column_name_list ')')?
+    : CREATE (OR ALTER)? VIEW simple_name ('(' column_name_list ')')?
       (WITH view_attribute (',' view_attribute)*)?
       AS select_statement_standalone (WITH CHECK OPTION)? ';'?
     ;
