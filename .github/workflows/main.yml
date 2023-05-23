@@ -61,14 +61,18 @@ jobs:
       run: |
         go version
     - name: Install Python
-      if: ${{ matrix.language == 'Python3' }}
       uses: actions/setup-python@v4.6.0
       with:
         python-version: '3.10'
     - name: Do not trust Python env
-      if: ${{ matrix.language == 'Python3' }}
       run: |
         python --version
+    - name: Upgrade Pip.
+      run: |
+        python -m ensurepip --upgrade
+    - name: Do not trust Pip.
+      run: |
+        pip --version
     - name: Install Antlr tool
       run: |
          pip install antlr4-tools
@@ -160,14 +164,18 @@ jobs:
       run: |
         go version
     - name: Install Python
-      if: ${{ matrix.language == 'Python3' }}
       uses: actions/setup-python@v4.6.0
       with:
         python-version: '3.10'
     - name: Do not trust Python env
-      if: ${{ matrix.language == 'Python3' }}
       run: |
         python --version
+    - name: Upgrade Pip.
+      run: |
+        python -m ensurepip --upgrade
+    - name: Do not trust Pip.
+      run: |
+        pip --version
     - name: Install Antlr tool
       run: |
          pip install antlr4-tools
