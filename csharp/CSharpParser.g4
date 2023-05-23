@@ -200,7 +200,7 @@ cast_expression
 
 primary_expression  // Null-conditional operators C# 6: https://msdn.microsoft.com/en-us/library/dn986595.aspx
 	: pe=primary_expression_start '!'? bracket_expression* '!'?
-	  (((member_access | method_invocation | '++' | '--' | '->' identifier) '!'?) bracket_expression* '!'?)*
+	  ((member_access | method_invocation | '++' | '--' | '->' identifier) '!'? bracket_expression* '!'?)*
 	;
 
 primary_expression_start
@@ -535,7 +535,7 @@ for_iterator
 	;
 
 catch_clauses
-	: specific_catch_clause (specific_catch_clause)* general_catch_clause?
+	: specific_catch_clause specific_catch_clause* general_catch_clause?
 	| general_catch_clause
 	;
 

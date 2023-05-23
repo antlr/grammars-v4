@@ -55,8 +55,10 @@ NOT_EQ2:   '<>';
 // Interval type Keywords
 ABORT:             'ABORT';
 ACTION:            'ACTION';
+ACCESS_METHOD:     'ACCESS_METHOD';
 ADD:               'ADD';
 AFTER:             'AFTER';
+AGGREGATE:         'AGGREGATE';
 ALL:               'ALL';
 ALTER:             'ALTER';
 ANALYZE:           'ANALYZE';
