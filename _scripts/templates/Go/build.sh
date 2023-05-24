@@ -1,6 +1,6 @@
 # Generated from trgen <version>
 export GO111MODULE=on
-for i in {1..5}; do go get github.com/antlr/antlr4/runtime/Go/antlr/v4; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
+for i in {1..5}; do go get github.com/antlr4-go/antlr; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 
 set -e
 
