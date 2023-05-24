@@ -9,9 +9,6 @@ import (
     "strconv"
     "bufio"
     "github.com/antlr4-go/antlr/v4"
-    "./parser"  // Note that with modules you may not be able to use a relative immport path
-    "os"
-    "fmt"
 )
 type CustomErrorListener struct {
     errors int
