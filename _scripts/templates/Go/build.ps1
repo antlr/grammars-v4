@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 $env:GO111MODULE = "on"
 For ($i=0; $i -le 5; $i++) {
-	$(& go get github.com/antlr/antlr4/runtime/Go/antlr/v4 ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+	$(& go get github.com/antlr4-go/antlr ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 	if($compile_exit_code -eq 0){
 		Break
 	}
