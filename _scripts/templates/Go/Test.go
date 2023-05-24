@@ -9,6 +9,7 @@ import (
     "strconv"
     "bufio"
     "github.com/antlr4-go/antlr/v4"
+    "example.com/myparser/<package_name>"
 )
 type CustomErrorListener struct {
     errors int
