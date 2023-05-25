@@ -25,7 +25,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
+      uses: actions/setup-dotnet@v3.1.0
       with:
         dotnet-version: '7.0.x'
     - name: Do not trust Dotnet env
@@ -131,7 +131,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.3
+      uses: actions/setup-dotnet@v3.1.0
       with:
         dotnet-version: '7.0.x'
     - name: Do not trust Dotnet env
