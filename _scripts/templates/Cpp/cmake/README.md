@@ -31,7 +31,6 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
-set(ANTLR_EXECUTABLE /home/user/antlr-4.8-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
@@ -60,7 +59,6 @@ The module defines the following variables:
 
 ```
 ANTLR_FOUND - true is ANTLR jar executable is found
-ANTLR_EXECUTABLE - the path to the ANTLR jar executable
 ANTLR_VERSION - the version of ANTLR
 ```
 
