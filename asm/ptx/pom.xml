@@ -13,6 +13,6 @@
 
 	<modules>
 		<module>ptx-isa-1.0</module>
-		<module>ptx-isa-3.1</module>
+		<module>ptx-isa-2.1</module>
 	</modules>
 </project>
