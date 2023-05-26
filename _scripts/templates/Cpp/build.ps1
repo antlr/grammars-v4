@@ -27,4 +27,5 @@ if($compile_exit_code -ne 0){
     Write-Host "Failed second cmake call $compile_exit_code."
     exit $compile_exit_code
 }
+Set-Location '..'
 exit $compile_exit_code
