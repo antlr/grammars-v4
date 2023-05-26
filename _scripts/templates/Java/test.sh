@@ -32,7 +32,8 @@ do
 done
 
 # Parse all input files.
-JAR="<antlr_tool_path>"
+version=4.13.0
+JAR=`python -c "import os; from pathlib import Path; print(os.path.join(Path.home() , '.m2',  'repository', 'org', 'antlr', 'antlr4', '$version', 'antlr4-$version-complete.jar'))"`
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 <if(individual_parsing)>
 # Individual parsing.

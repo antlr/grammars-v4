@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4": "4.13",
+    "antlr4": "4.13.0",
     "buffer": "^6.0.3",
     "fs-extra": "^10.1.0",
     "timer-node": "^5.0.6",

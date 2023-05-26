@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 $env:GO111MODULE = "on"
 For ($i=0; $i -le 5; $i++) {
-	$(& go get github.com/antlr4-go/antlr ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+	$(& go get github.com/antlr4-go/antlr/v4 ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 	if($compile_exit_code -eq 0){
 		Break
 	}
@@ -16,7 +16,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 }
 
 <tool_grammar_tuples:{x |
-$(& java -jar <antlr_tool_path> <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& antlr4 <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
