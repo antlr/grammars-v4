@@ -24,7 +24,7 @@ files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tr
 files=()
 for f in $files2
 do
-    triconv -f utf-8 $f > /dev/null 2>&1
+    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
@@ -37,7 +37,7 @@ done
 rm -f parse.txt
 for f in ${files[*]}
 do
-    trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $f >> parse.txt
+    dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $f >> parse.txt
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -46,7 +46,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 

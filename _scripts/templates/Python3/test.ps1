@@ -32,7 +32,7 @@ foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
     } elseif ($ext -eq ".tree") {
         continue
     } else {
-        $(& triconv -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
+        $(& dotnet triconv -- -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
         if ($last -ne 0)
         {
             continue
@@ -52,10 +52,10 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { trwdog python3 Test.py -q -tee -tree $_ *>> parse.txt }
+Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- python3 Test.py -q -tee -tree $_ *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | trwdog python3 Test.py -q -x -tee -tree *> parse.txt
+get-content "tests.txt" | dotnet trwdog -- python3 Test.py -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
