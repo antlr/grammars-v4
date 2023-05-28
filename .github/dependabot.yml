@@ -8,7 +8,7 @@ updates:
     labels:
       - "infrastructure"
       - "dependencies"
-  # java
+  # Java
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
@@ -32,7 +32,7 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:csharp-standard"
-  # javascript
+  # JavaScript
   - package-ecosystem: "npm"
     directory: "/_scripts/templates/JavaScript"
     schedule:
@@ -41,7 +41,7 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:javascript"
-  # php
+  # PHP
   - package-ecosystem: "composer"
     directory: "/_scripts/templates/PHP"
     schedule:
@@ -50,7 +50,7 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:php"
-  # python3
+  # Python3
   - package-ecosystem: "pip"
     directory: "/_scripts/templates/Python3"
     schedule:
@@ -59,3 +59,12 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:python3"
+  # TypeScript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/TypeScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:typescript"
