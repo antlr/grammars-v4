@@ -1,5 +1,14 @@
 version: 2
 updates:
+  # dotnet tools
+  - package-ecosystem: "nuget"
+    directory: "/.config"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # java
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
@@ -23,18 +32,6 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:csharp-standard"
-  # dart is not supported by bot
-  # go
-  # TODO: go runtime need tagged version, may need another repository
-  # - package-ecosystem: "gomod"
-  #   directory: "/_scripts/templates/Go"
-  #   schedule:
-  #     interval: "daily"
-  #   labels:
-  #     - "infrastructure"
-  #     - "dependencies"
-  #     - "target:go"
-  # java support is unnecessary, it's runtime is in antlr4.jar itself
   # javascript
   - package-ecosystem: "npm"
     directory: "/_scripts/templates/JavaScript"
