@@ -37,6 +37,7 @@ unitStatement
     | dropAccessMethod
     | dropAggregate
     | dropDatabase
+    | dropIndex
     | dropRole
     | dropTable
     | dropType
@@ -92,6 +93,11 @@ dropAggregate
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
 dropDatabase
     : DROP DATABASE (IF EXISTS)? databaseName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-index-statement
+dropIndex
+    : DROP INDEX (IF EXISTS)? indexName=identifier ONLINE?
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-statement
@@ -212,6 +218,7 @@ keyword
     | OF
     | OFFSET
     | ON
+    | ONLINE
     | OR
     | ORDER
     | OUTER
