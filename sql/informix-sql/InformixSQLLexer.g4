@@ -139,6 +139,7 @@ NULL:              'NULL';
 OF:                'OF';
 OFFSET:            'OFFSET';
 ON:                'ON';
+ONLINE:            'ONLINE';
 OR:                'OR';
 ORDER:             'ORDER';
 OUTER:             'OUTER';
