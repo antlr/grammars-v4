@@ -42,6 +42,7 @@ unitStatement
     | dropSynonym
     | dropTable
     | dropTrigger
+    | dropTrustedContext
     | dropType
     | dropUser
     | dropView
@@ -77,6 +78,10 @@ dropTrigger
     : DROP TRIGGER (IF EXISTS)? triggerName=identifier
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trusted-context-statement
+dropTrustedContext
+    : DROP TRUSTED CONTEXT contextName=anyName
+    ;
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
 dropType
     : DROP TYPE (IF EXISTS)? dataTypeName=identifier RESTRICT
@@ -172,6 +177,7 @@ keyword
     | COMMIT
     | CONFLICT
     | CONSTRAINT
+    | CONTEXT
     | CREATE
     | CROSS
     | CURRENT_DATE
@@ -262,6 +268,7 @@ keyword
     | TO
     | TRANSACTION
     | TRIGGER
+    | TRUSTED
     | TYPE
     | UNION
     | UNIQUE
