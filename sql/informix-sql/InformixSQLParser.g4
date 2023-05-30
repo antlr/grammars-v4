@@ -39,7 +39,9 @@ unitStatement
     | dropDatabase
     | dropIndex
     | dropRole
+    | dropSynonym
     | dropTable
+    | dropTrigger
     | dropType
     | dropUser
     | dropView
@@ -60,9 +62,19 @@ dropRole
     : DROP ROLE (IF EXISTS)? roleName=anyName
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-synonym-statement
+dropSynonym
+    : DROP SYNONYM (IF EXISTS)? synonymName=identifier
+    ;
+
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
 dropTable
     : DROP TABLE (IF EXISTS)? tableName=identifier (CASCADE | RESTRICT)?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trigger-statement
+dropTrigger
+    : DROP TRIGGER (IF EXISTS)? triggerName=identifier
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
@@ -242,6 +254,7 @@ keyword
     | SAVEPOINT
     | SELECT
     | SET
+    | SYNONYM
     | TABLE
     | TEMP
     | TEMPORARY

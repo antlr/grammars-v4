@@ -165,6 +165,7 @@ ROWS:              'ROWS';
 SAVEPOINT:         'SAVEPOINT';
 SELECT:            'SELECT';
 SET:               'SET';
+SYNONYM:           'SYNONYM';
 TABLE:             'TABLE';
 TEMP:              'TEMP';
 TEMPORARY:         'TEMPORARY';
