@@ -190,6 +190,7 @@ WHERE:             'WHERE';
 WITH:              'WITH';
 WITHOUT:           'WITHOUT';
 WORK:              'WORK';
+XADATASOURCE:      'XADATASOURCE';
 FIRST_VALUE:       'FIRST_VALUE';
 OVER:              'OVER';
 PARTITION:         'PARTITION';
