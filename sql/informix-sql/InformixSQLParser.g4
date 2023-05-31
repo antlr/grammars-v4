@@ -46,6 +46,8 @@ unitStatement
     | dropType
     | dropUser
     | dropView
+    | dropXadatasource
+    | dropXadataTypeSource
     | databaseStmt
     | closeStmt
     | closeDatabaseStmt
@@ -95,6 +97,16 @@ dropUser
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
 dropView
     : DROP VIEW (IF EXISTS)? viewName=identifier (CASCADE | RESTRICT)?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-statement
+dropXadatasource
+    : DROP XADATASOURCE (IF EXISTS)? xaSourceName=identifier RESTRICT
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-type-statement
+dropXadataTypeSource
+    : DROP XADATASOURCE TYPE (IF EXISTS)? xaSourceName=identifier RESTRICT
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
@@ -284,6 +296,7 @@ keyword
     | WITH
     | WITHOUT
     | WORK
+    | XADATASOURCE
     | FIRST_VALUE
     | OVER
     | PARTITION
