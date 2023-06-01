@@ -34,6 +34,9 @@ sqlScript
 
 unitStatement
     : (createRole
+    | closeStmt
+    | closeDatabaseStmt
+    | commitWorkStmt
     | dropAccessMethod
     | dropAggregate
     | dropDatabase
@@ -49,9 +52,8 @@ unitStatement
     | dropXadatasource
     | dropXadataTypeSource
     | databaseStmt
-    | closeStmt
-    | closeDatabaseStmt
-    | commitWorkStmt
+    | releaseSavepoint
+    | renameColumn
     ) SCOL
     ;
 
@@ -147,6 +149,16 @@ databaseStmt
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-commit-work-statement
 commitWorkStmt
     : COMMIT WORK?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-release-savepoint-statement
+releaseSavepoint
+    : RELEASE SAVEPOINT savepointName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-column-statement
+renameColumn
+    : RENAME COLUMN oldColumn=identifier TO newColumn=identifier
     ;
 
 anyName
