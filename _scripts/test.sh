@@ -353,7 +353,7 @@ do
 
     for d in `echo Generated-$target-* Generated-$target`
     do
-	if [ ! -d $d ]; then continue; fi
+        if [ ! -d $d ]; then continue; fi
         if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
 
         # Build driver code.
@@ -400,6 +400,13 @@ do
             echo " Succeeded."      
             succeeded+=( "$testname,$target" )
         fi
+
+        if [ "$target" == "CSharp" ]
+        then
+            cd ..
+            curl https://raw.githubusercontent.com/kaby76/g4-checks/main/find-useless.sh 2> /dev/null | bash 1>&2
+        fi
+        
         popd > /dev/null
     done
     popd > /dev/null
