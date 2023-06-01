@@ -54,6 +54,8 @@ unitStatement
     | databaseStmt
     | releaseSavepoint
     | renameColumn
+    | renameDatabase
+    | renameConstraint
     ) SCOL
     ;
 
@@ -159,6 +161,16 @@ releaseSavepoint
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-column-statement
 renameColumn
     : RENAME COLUMN oldColumn=identifier TO newColumn=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-constraint-statement
+renameConstraint
+    : RENAME CONSTRAINT oldConstraint=identifier TO newConstraint=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-database-statement
+renameDatabase
+    : RENAME DATABASE oldDatabase=identifier TO newDatabase=identifier
     ;
 
 anyName
