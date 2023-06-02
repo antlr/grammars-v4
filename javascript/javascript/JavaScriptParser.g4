@@ -122,8 +122,8 @@ aliasName
     ;
 
 exportStatement
-    : Export (exportFromBlock | declaration) eos    # ExportDeclaration
-    | Export Default singleExpression eos           # ExportDefaultDeclaration
+    : Export Default? (exportFromBlock | declaration) eos    # ExportDeclaration
+    | Export Default singleExpression eos                    # ExportDefaultDeclaration
     ;
 
 exportFromBlock
