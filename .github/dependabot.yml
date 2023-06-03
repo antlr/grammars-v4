@@ -2,12 +2,15 @@ version: 2
 updates:
   # dotnet tools
   - package-ecosystem: "nuget"
-    directory: "/.config"
+    directory: "/"
     schedule:
       interval: "daily"
     labels:
       - "infrastructure"
       - "dependencies"
+    ignore:
+      - dependency-name: "tr*"
+        update-types: ["version-update:semver-patch"]
   # Java
   - package-ecosystem: "maven"
     directory: "/"
