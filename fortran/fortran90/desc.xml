@@ -3,5 +3,5 @@
    <!--
    <targets>Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
    -->
-   <targets>Cpp;CSharp;Dart;Java</targets>
+   <targets>Cpp;CSharp;Dart;Go;Java</targets>
 </desc>
