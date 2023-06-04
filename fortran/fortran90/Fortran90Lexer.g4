@@ -2,6 +2,8 @@ lexer grammar Fortran90Lexer;
 
 options { superClass = Fortran90LexerBase; } 
 
+// Insert here @header for C++ lexer.
+
 RECURSIVE  
    : 'RECURSIVE' | 'recursive' |'Recursive' ; 
  
