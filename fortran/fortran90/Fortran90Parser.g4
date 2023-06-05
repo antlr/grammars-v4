@@ -1,6 +1,6 @@
 /*	
  * Fortran 90 grammar for ANTLR 4.8
- * Adadpted from Fortran 90 PCCTS grammar by Olivier Dragon
+ * Adadpted from Fortran 90 PCCTS grammar by Cyrille MIDINGOYI
  * Original PCCTS grammar by Terence Parr
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ * INRA - CIRAD, Montpellier - FRANCE
  *
  */
 
