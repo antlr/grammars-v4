@@ -8,10 +8,11 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<target.jvm>1.7</target.jvm>
-		<antlr.version>4.8-1</antlr.version>
-		<antlr4test-maven-plugin.version>1.14</antlr4test-maven-plugin.version>
-		<junit.version>4.12</junit.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
+		<antlr.version>4.13.0</antlr.version>
+		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -46,17 +47,15 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>${target.jvm}</source>
-					<target>${target.jvm}</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.11.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -65,14 +64,22 @@
 			</activation>
 			<id>grammarv4</id>
 			<modules>
+				<module>abb</module>
 				<module>abnf</module>
-				<module>agc</module>
+				<module>acme</module>
+				<module>ada</module>
+				<module>alef</module>
 				<module>algol60</module>
+				<module>alloy</module>
 				<module>alpaca</module>
+				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
-				<module>apt</module>				
+				<module>apt</module>
+				<module>aql</module>
+				<module>argus</module>
 				<module>arithmetic</module>
+				<module>asl</module>
 				<module>asm</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
@@ -80,46 +87,69 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcl</module>
+				<module>bcpl</module>
+				<module>bdf</module>
+				<module>bencoding</module>
+				<module>bibcode</module>
+				<module>bicep</module>
 				<module>bnf</module>
-				<module>brainfuck</module>
 				<module>c</module>
 				<module>calculator</module>
+				<module>callable</module>
 				<module>capnproto</module>
+				<module>caql</module>
+				<module>cayenne</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
 				<module>cobol85</module>
 				<module>cookie</module>
-				<module>cool</module>
 				<module>cpp</module>
+				<module>cql</module>
 				<module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>ctl</module>
 				<module>cto</module>
+				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
+				<module>datalog</module>
 				<module>dcm</module>
 				<module>dice</module>
+				<module>dif</module>
+				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
+				<module>edn</module>
 				<module>erlang</module>
+				<module>esolang</module>
+				<module>evm-bytecode</module>
 				<module>fasta</module>
+				<module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+				<module>flowmatic</module>
+				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
+				<module>gedcom</module>
 				<module>gff3</module>
+				<module>glsl</module>
 				<module>gml</module>
+				<module>golang</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
-                <module>guitartab</module>
+				<module>guitartab</module>
+				<module>haskell</module>
 				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
@@ -128,112 +158,160 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
+				<module>infosapient</module>
 				<module>iri</module>
+				<module>iso8601</module>
 				<module>istc</module>
+				<module>itn</module>
+				<module>jam</module>
+				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
+				<module>joss</module>
 				<module>jpa</module>
 				<module>json</module>
+				<module>json5</module>
+				<module>karel</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
+				<module>kquery</module>
 				<module>lambda</module>
+				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
+				<module>limbo</module>
+				<module>lisa</module>
+                <module>lisp</module>
 				<module>logo</module>
-				<module>lolcode</module>
 				<module>lpc</module>
+				<module>lrc</module>
+				<module>ltl</module>
 				<module>lua</module>
+				<module>lucene</module>
 				<module>matlab</module>
+				<module>mckeeman-form</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
+				<module>metamath</module>
 				<module>metric</module>
+				<module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
+				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>muparser</module>				
-				<module>oberon</module>				
+				<module>muparser</module>
+				<module>newick</module>
+				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
+				<module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
-				<module>pdp7</module>
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
+				<module>plucid</module>
 				<module>ply</module>
+				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
+				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
+				<module>protobuf2</module>
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
+				<module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
+				<module>racket-bsl</module>
+				<module>racket-isl</module>
 				<module>rcs</module>
 				<module>redcode</module>
+				<module>refal</module>
 				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
+				<module>rfc1035</module>
+				<module>rfc1960</module>
+				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
+                <module>ron</module>
 				<module>rpn</module>
 				<module>ruby</module>
+				<module>rust</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
+                <module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
-				<module>sickbay</module>
+				<module>sici</module>
+				<module>sieve</module>
 				<module>smalltalk</module>
-			    <module>smiles</module>
+				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
 				<module>solidity</module>
 				<module>sparql</module>
+				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
+				<module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>szf</module>
+				<module>tcpheader</module>
 				<module>telephone</module>
+				<module>terraform</module>
 				<module>thrift</module>
 				<module>tiny</module>
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
+				<module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
+				<module>trac</module>
 				<module>tsv</module>
+				<module>ttm</module>
+				<module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+				<module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
 				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
+				<module>velocity</module>
 				<module>verilog</module>
 				<module>vhdl</module>
 				<module>vmf</module>
@@ -241,12 +319,14 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wln</module>
+				<module>wren</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
+				<module>xyz</module>
+				<module>yara</module>
 				<module>z</module>
-				<!-- testing repository -->
-				<!--<module>grammar-test</module> -->
 			</modules>
 		</profile>
 		<profile>
@@ -254,27 +334,9 @@
 			<build>
 				<plugins>
 					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
-						<configuration>
-							<descriptors>
-								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>1.6.13</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -285,7 +347,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.3.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -298,7 +360,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.0.1	</version>
+						<version>3.5.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -314,7 +376,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -327,15 +389,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>test</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>_grammar-test</module>
-			</modules>
 		</profile>
 	</profiles>
 	<distributionManagement>

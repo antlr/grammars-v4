@@ -9,6 +9,11 @@ using M = System.Math;
 
 using ConsoleApplication2.Test;
 
+/**/
+/* the previous comment is an empty delimited comment and not a document comment */
+/** this is a document comment */
+// this one is a single line comment
+
 using X = int1;
 using Y = ABC.X<int>;
 
@@ -64,7 +69,7 @@ namespace My
 
             var привет = local;
             var мир = local;
-            var local3 = 0, local4 = 1;
+            int local3 = 0, local4 = 1;
             local3 = local4 = 1;
             var local5 = null as Action ?? null;
             var local6 = local5 is Action;

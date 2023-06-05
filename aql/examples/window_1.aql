@@ -1,0 +1,14 @@
+FOR t IN observations
+    SORT t.time
+    WINDOW { preceding: 1, following: 1 }
+    AGGREGATE rollingAverage = AVG(t.val), rollingSum = SUM(t.val)
+    WINDOW { preceding: "unbounded", following: 0}
+    AGGREGATE cumulativeSum = SUM(t.val)
+    RETURN {
+      time: t.time,
+      subject: t.subject,
+      val: t.val,
+      rollingAverage, // average of the window's values
+      rollingSum,     // sum of the window's values
+      cumulativeSum   // running total
+    }

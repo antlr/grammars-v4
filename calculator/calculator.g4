@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar calculator;
 
 equation
-   : expression relop expression
+   : expression relop expression EOF
    ;
 
 expression
@@ -51,7 +51,7 @@ powExpression
 signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
-   | func
+   | func_
    | atom
    ;
 
@@ -76,7 +76,7 @@ variable
    : VARIABLE
    ;
 
-func
+func_
    : funcname LPAREN expression (COMMA expression)* RPAREN
    ;
 
@@ -225,12 +225,13 @@ VARIABLE
 
 
 fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   : 'a' .. 'z' | 'A' .. 'Z' | '_'
    ;
 
 
 fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
+   : VALID_ID_START
+   | '0' .. '9'
    ;
 
 
@@ -240,7 +241,7 @@ SCIENTIFIC_NUMBER
 
 
 fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   : '0'..'9'+ ('.' '0'..'9'+ )?
    ;
 
 
@@ -255,7 +256,7 @@ fragment E2
 
 
 fragment SIGN
-   : ('+' | '-')
+   : '+' | '-'
    ;
 
 

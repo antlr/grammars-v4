@@ -5,12 +5,12 @@
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -18,16 +18,16 @@
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is an approximate grammar for Visual Basic 6.0, derived 
-* from the Visual Basic 6.0 language reference 
-* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statement examples as well as several Visual 
+* This is an approximate grammar for Visual Basic 6.0, derived
+* from the Visual Basic 6.0 language reference
+* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx
+* and tested against MSDN VB6 statement examples as well as several Visual
 * Basic 6.0 code repositories.
 *
 * Characteristics:
 *
 * 1. This grammar is line-based and takes into account whitespace, so that
-*    member calls (e.g. "A.B") are distinguished from contextual object calls 
+*    member calls (e.g. "A.B") are distinguished from contextual object calls
 *    in WITH statements (e.g. "A .B").
 *
 * 2. Keywords can be used as identifiers depending on the context, enabling
@@ -52,7 +52,7 @@
 *   - blockStmt rules being sorted alphabetically was wrong. moved implicit call statement last.
 *   - '!' in dictionary call statement rule gets picked up as a type hint; changed member call
 *     to accept '!' as well as '.', but this complicates resolving the '!' shorthand syntax.
-*   - added a subscripts rule in procedure calls, to avoid breaking the parser with 
+*   - added a subscripts rule in procedure calls, to avoid breaking the parser with
 *     a function call that returns an array that is immediately accessed.
 *   - added missing macroConstStmt (#CONST) rule.
 *   - amended selectCaseStmt rules to support all valid syntaxes.
@@ -64,7 +64,7 @@
 *     the grammar support "Option _\n Explicit" and other keywords being specified on multiple lines.
 *	- modified moduleOption rules to account for WS token in corresponding lexer rules.
 *   - modified NEWLINE lexer rule to properly support instructions separator (':').
-*   - tightened DATELITERAL lexer rule to the format enforced by the VBE, because "#fn: Close #" 
+*   - tightened DATELITERAL lexer rule to the format enforced by the VBE, because "#fn: Close #"
 *     in "Dim fn: fn = FreeFile: Open "filename" For Output As #fn: Close #fn" was picked up as a date literal.
 *   - redefined IDENTIFIER lexer rule to support non-Latin characters (e.g. Japanese)
 *   - made seekStmt, lockStmt, unlockStmt, getStmt and widthStmt accept a fileNumber (needed to support '#')
@@ -84,7 +84,7 @@
 * v1.2
 *	- refined call statements
 *
-* v1.1 
+* v1.1
 *	- precedence of operators and of ELSE in select statements
 *	- optimized member calls
 *
@@ -93,11 +93,13 @@
 
 grammar vba;
 
+options { caseInsensitive = true; }
+
 // module ----------------------------------
 
 startRule : module EOF;
 
-module : 
+module :
 	WS?
 	endOfLine*
 	(moduleHeader endOfLine*)?
@@ -124,7 +126,7 @@ moduleAttributes : (attributeStmt endOfLine+)+;
 
 moduleDeclarations : moduleDeclarationsElement (endOfLine+ moduleDeclarationsElement)* endOfLine*;
 
-moduleOption : 
+moduleOption :
 	OPTION_BASE WS SHORTLITERAL 					# optionBaseStmt
 	| OPTION_COMPARE WS (BINARY | TEXT | DATABASE) 	# optionCompareStmt
 	| OPTION_EXPLICIT 								# optionExplicitStmt
@@ -134,7 +136,7 @@ moduleOption :
 moduleDeclarationsElement :
 	comment
 	| declareStmt
-	| enumerationStmt 
+	| enumerationStmt
 	| eventStmt
 	| constStmt
 	| implementsStmt
@@ -148,15 +150,15 @@ macroStmt :
 	macroConstStmt
 	| macroIfThenElseStmt;
 
-moduleBody : 
+moduleBody :
 	moduleBodyElement (endOfLine+ moduleBodyElement)* endOfLine*;
 
-moduleBodyElement : 
-	functionStmt 
-	| propertyGetStmt 
-	| propertySetStmt 
-	| propertyLetStmt 
-	| subStmt 
+moduleBodyElement :
+	functionStmt
+	| propertyGetStmt
+	| propertySetStmt
+	| propertyLetStmt
+	| subStmt
 	| macroStmt
 ;
 
@@ -235,6 +237,7 @@ blockStmt :
 	| withStmt
 	| writeStmt
 	| implicitCallStmt_InBlock
+    | implicitCallStmt_InStmt
 ;
 
 
@@ -258,10 +261,10 @@ dateStmt : DATE WS? EQ WS? valueStmt;
 
 declareStmt : (visibility WS)? DECLARE WS (PTRSAFE WS)? ((FUNCTION typeHint?) | SUB) WS ambiguousIdentifier typeHint? WS LIB WS STRINGLITERAL (WS ALIAS WS STRINGLITERAL)? (WS? argList)? (WS asTypeClause)?;
 
-deftypeStmt : 
+deftypeStmt :
 	(
-		DEFBOOL | DEFBYTE | DEFINT | DEFLNG | DEFCUR | 
-		DEFSNG | DEFDBL | DEFDEC | DEFDATE | 
+		DEFBOOL | DEFBYTE | DEFINT | DEFLNG | DEFCUR |
+		DEFSNG | DEFDBL | DEFDEC | DEFDATE |
 		DEFSTR | DEFOBJ | DEFVAR
 	) WS
 	letterrange (WS? ',' WS? letterrange)*
@@ -270,14 +273,14 @@ deftypeStmt :
 deleteSettingStmt : DELETESETTING WS valueStmt WS? ',' WS? valueStmt (WS? ',' WS? valueStmt)?;
 
 doLoopStmt :
-	DO endOfStatement 
+	DO endOfStatement
 	block?
 	LOOP
 	|
 	DO WS (WHILE | UNTIL) WS valueStmt endOfStatement
 	block?
 	LOOP
-	| 
+	|
 	DO endOfStatement
 	block
 	LOOP WS (WHILE | UNTIL) WS valueStmt
@@ -285,9 +288,9 @@ doLoopStmt :
 
 endStmt : END;
 
-enumerationStmt: 
-	(visibility WS)? ENUM WS ambiguousIdentifier endOfStatement 
-	enumerationStmt_Constant* 
+enumerationStmt:
+	(visibility WS)? ENUM WS ambiguousIdentifier endOfStatement
+	enumerationStmt_Constant*
 	END_ENUM
 ;
 
@@ -303,17 +306,17 @@ exitStmt : EXIT_DO | EXIT_FOR | EXIT_FUNCTION | EXIT_PROPERTY | EXIT_SUB;
 
 filecopyStmt : FILECOPY WS valueStmt WS? ',' WS? valueStmt;
 
-forEachStmt : 
+forEachStmt :
 	FOR WS EACH WS ambiguousIdentifier typeHint? WS IN WS valueStmt endOfStatement
 	block?
 	NEXT (WS ambiguousIdentifier)?
 ;
 
-forNextStmt : 
-	FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? endOfStatement 
+forNextStmt :
+	FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? endOfStatement
 	block?
 	NEXT (WS ambiguousIdentifier)?
-; 
+;
 
 functionStmt :
 	(visibility WS)? (STATIC WS)? FUNCTION WS? ambiguousIdentifier typeHint? (WS? argList)? (WS? asTypeClause)? endOfStatement
@@ -327,25 +330,25 @@ goSubStmt : GOSUB WS valueStmt;
 
 goToStmt : GOTO WS valueStmt;
 
-ifThenElseStmt : 
+ifThenElseStmt :
 	IF WS ifConditionStmt WS THEN WS blockStmt (WS ELSE WS blockStmt)?	# inlineIfThenElse
 	| ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF			# blockIfThenElse
 ;
 
-ifBlockStmt : 
-	IF WS ifConditionStmt WS THEN endOfStatement 
+ifBlockStmt :
+	IF WS ifConditionStmt WS THEN endOfStatement
 	block?
 ;
 
 ifConditionStmt : valueStmt;
 
-ifElseIfBlockStmt : 
+ifElseIfBlockStmt :
 	ELSEIF WS ifConditionStmt WS THEN endOfStatement
 	block?
 ;
 
-ifElseBlockStmt : 
-	ELSE endOfStatement 
+ifElseBlockStmt :
+	ELSE endOfStatement
 	block?
 ;
 
@@ -369,17 +372,17 @@ macroConstStmt : MACRO_CONST WS? ambiguousIdentifier WS? EQ WS? valueStmt;
 
 macroIfThenElseStmt : macroIfBlockStmt macroElseIfBlockStmt* macroElseBlockStmt? MACRO_END_IF;
 
-macroIfBlockStmt : 
+macroIfBlockStmt :
 	MACRO_IF WS? ifConditionStmt WS THEN endOfStatement
 	(moduleDeclarations | moduleBody | block)*
 ;
 
-macroElseIfBlockStmt : 
+macroElseIfBlockStmt :
 	MACRO_ELSEIF WS? ifConditionStmt WS THEN endOfStatement
 	(moduleDeclarations | moduleBody | block)*
 ;
 
-macroElseBlockStmt : 
+macroElseBlockStmt :
 	MACRO_ELSE endOfStatement
 	(moduleDeclarations | moduleBody | block)*
 ;
@@ -396,8 +399,8 @@ onGoToStmt : ON WS valueStmt WS GOTO WS valueStmt (WS? ',' WS? valueStmt)*;
 
 onGoSubStmt : ON WS valueStmt WS GOSUB WS valueStmt (WS? ',' WS? valueStmt)*;
 
-openStmt : 
-	OPEN WS valueStmt WS FOR WS (APPEND | BINARY | INPUT | OUTPUT | RANDOM) 
+openStmt :
+	OPEN WS valueStmt WS FOR WS (APPEND | BINARY | INPUT | OUTPUT | RANDOM)
 	(WS ACCESS WS (READ | WRITE | READ_WRITE))?
 	(WS (SHARED | LOCK_READ | LOCK_WRITE | LOCK_READ_WRITE))?
 	WS AS WS fileNumber
@@ -409,28 +412,28 @@ outputList :
 	| outputList_Expression? (WS? (';' | ',') WS? outputList_Expression?)+
 ;
 
-outputList_Expression : 
+outputList_Expression :
 	valueStmt
 	| (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
 ;
 
 printStmt : PRINT WS fileNumber WS? ',' (WS? outputList)?;
 
-propertyGetStmt : 
-	(visibility WS)? (STATIC WS)? PROPERTY_GET WS ambiguousIdentifier typeHint? (WS? argList)? (WS asTypeClause)? endOfStatement 
-	block? 
+propertyGetStmt :
+	(visibility WS)? (STATIC WS)? PROPERTY_GET WS ambiguousIdentifier typeHint? (WS? argList)? (WS asTypeClause)? endOfStatement
+	block?
 	END_PROPERTY
 ;
 
-propertySetStmt : 
-	(visibility WS)? (STATIC WS)? PROPERTY_SET WS ambiguousIdentifier (WS? argList)? endOfStatement 
-	block? 
+propertySetStmt :
+	(visibility WS)? (STATIC WS)? PROPERTY_SET WS ambiguousIdentifier (WS? argList)? endOfStatement
+	block?
 	END_PROPERTY
 ;
 
-propertyLetStmt : 
-	(visibility WS)? (STATIC WS)? PROPERTY_LET WS ambiguousIdentifier (WS? argList)? endOfStatement 
-	block? 
+propertyLetStmt :
+	(visibility WS)? (STATIC WS)? PROPERTY_LET WS ambiguousIdentifier (WS? argList)? endOfStatement
+	block?
 	END_PROPERTY
 ;
 
@@ -460,8 +463,8 @@ saveSettingStmt : SAVESETTING WS valueStmt WS? ',' WS? valueStmt WS? ',' WS? val
 
 seekStmt : SEEK WS fileNumber WS? ',' WS? valueStmt;
 
-selectCaseStmt : 
-	SELECT WS CASE WS valueStmt endOfStatement 
+selectCaseStmt :
+	SELECT WS CASE WS valueStmt endOfStatement
 	sC_Case*
 	END_SELECT
 ;
@@ -472,7 +475,7 @@ sC_Selection :
     | valueStmt                                                   # caseCondValue
 ;
 
-sC_Case : 
+sC_Case :
 	CASE WS sC_Cond endOfStatement
 	block?
 ;
@@ -491,15 +494,15 @@ setStmt : SET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt;
 
 stopStmt : STOP;
 
-subStmt : 
+subStmt :
 	(visibility WS)? (STATIC WS)? SUB WS? ambiguousIdentifier (WS? argList)? endOfStatement
-	block? 
+	block?
 	END_SUB
 ;
 
 timeStmt : TIME WS? EQ WS? valueStmt;
 
-typeStmt : 
+typeStmt :
 	(visibility WS)? TYPE WS ambiguousIdentifier endOfStatement
 	typeStmt_Element*
 	END_TYPE
@@ -507,48 +510,40 @@ typeStmt :
 
 typeStmt_Element : ambiguousIdentifier (WS? LPAREN (WS? subscripts)? WS? RPAREN)? (WS asTypeClause)? endOfStatement;
 
-typeOfStmt : TYPEOF WS valueStmt (WS IS WS type)?;
+typeOfStmt : TYPEOF WS valueStmt (WS IS WS type_)?;
 
 unloadStmt : UNLOAD WS valueStmt;
 
 unlockStmt : UNLOCK WS fileNumber (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
 
 // operator precedence is represented by rule order
-valueStmt : 
+valueStmt :
 	literal 												# vsLiteral
 	| implicitCallStmt_InStmt 								# vsICS
 	| LPAREN WS? valueStmt (WS? ',' WS? valueStmt)* RPAREN 	# vsStruct
-	| NEW WS? valueStmt 										# vsNew
+	| NEW WS? valueStmt 									# vsNew
 	| typeOfStmt 											# vsTypeOf
 	| midStmt 												# vsMid
 	| ADDRESSOF WS? valueStmt 								# vsAddressOf
 	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt 		# vsAssign
-	
-	| valueStmt WS? IS WS? valueStmt 							# vsIs
-	| valueStmt WS? LIKE WS? valueStmt 						# vsLike
-	| valueStmt WS? GEQ WS? valueStmt 						# vsGeq
-	| valueStmt WS? LEQ WS? valueStmt 						# vsLeq
-	| valueStmt WS? GT WS? valueStmt 						# vsGt
-	| valueStmt WS? LT WS? valueStmt 						# vsLt
-	| valueStmt WS? NEQ WS? valueStmt 						# vsNeq
-	| valueStmt WS? EQ WS? valueStmt 						# vsEq
 
 	| valueStmt WS? POW WS? valueStmt 						# vsPow
 	| MINUS WS? valueStmt 									# vsNegation
 	| PLUS WS? valueStmt 									# vsPlus
-	| valueStmt WS? DIV WS? valueStmt 						# vsDiv
-	| valueStmt WS? MULT WS? valueStmt 						# vsMult
+	| valueStmt WS? (DIV | MULT) WS? valueStmt 			    # vsDivMult
 	| valueStmt WS? MOD WS? valueStmt 						# vsMod
-	| valueStmt WS? PLUS WS? valueStmt 						# vsAdd
-	| valueStmt WS? MINUS WS? valueStmt 					# vsMinus
-	| valueStmt WS? AMPERSAND WS? valueStmt 					# vsAmp
+	| valueStmt WS? (PLUS | MINUS) WS? valueStmt 			# vsAddMinus
+	| valueStmt WS? AMPERSAND WS? valueStmt 				# vsAmp
+    
+    | valueStmt WS? (IS | LIKE | GEQ | LEQ | GT | LT | NEQ | EQ) WS? valueStmt  #vsRelational
 
-	| valueStmt WS? IMP WS? valueStmt 						# vsImp
-	| valueStmt WS? EQV WS? valueStmt 						# vsEqv
-	| valueStmt WS? XOR WS? valueStmt 						# vsXor
-	| valueStmt WS? OR WS? valueStmt 						# vsOr
+    | NOT WS? valueStmt 									# vsNot
 	| valueStmt WS? AND WS? valueStmt 						# vsAnd
-	| NOT WS? valueStmt 										# vsNot
+	| valueStmt WS? OR WS? valueStmt 						# vsOr
+	| valueStmt WS? XOR WS? valueStmt 						# vsXor
+	| valueStmt WS? EQV WS? valueStmt 						# vsEqv
+	| valueStmt WS? IMP WS? valueStmt 						# vsImp
+	
 ;
 
 variableStmt : (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt;
@@ -557,17 +552,17 @@ variableListStmt : variableSubStmt (WS? ',' WS? variableSubStmt)*;
 
 variableSubStmt : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?;
 
-whileWendStmt : 
-	WHILE WS valueStmt endOfStatement 
+whileWendStmt :
+	WHILE WS valueStmt endOfStatement
 	block?
 	WEND
 ;
 
 widthStmt : WIDTH WS fileNumber WS? ',' WS? valueStmt;
 
-withStmt : 
-	WITH WS (implicitCallStmt_InStmt | (NEW WS type)) endOfStatement 
-	block? 
+withStmt :
+	WITH WS (implicitCallStmt_InStmt | (NEW WS type_)) endOfStatement
+	block?
 	END_WITH
 ;
 
@@ -579,9 +574,9 @@ fileNumber : '#'? valueStmt;
 
 // complex call statements ----------------------------------
 
-explicitCallStmt : 
-	eCS_ProcedureCall 
-	| eCS_MemberProcedureCall 
+explicitCallStmt :
+	eCS_ProcedureCall
+	| eCS_MemberProcedureCall
 ;
 
 // parantheses are required in case of args -> empty parantheses are removed
@@ -594,7 +589,7 @@ eCS_MemberProcedureCall : CALL WS implicitCallStmt_InStmt? '.' ambiguousIdentifi
 
 
 implicitCallStmt_InBlock :
-	iCS_B_MemberProcedureCall 
+	iCS_B_MemberProcedureCall
 	| iCS_B_ProcedureCall
 ;
 
@@ -602,7 +597,7 @@ iCS_B_MemberProcedureCall : implicitCallStmt_InStmt? '.' ambiguousIdentifier typ
 
 // parantheses are forbidden in case of args
 // variables cannot be called in blocks
-// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
+// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords
 iCS_B_ProcedureCall : certainIdentifier (WS argsCall)? (WS? LPAREN subscripts RPAREN)*;
 
 
@@ -620,7 +615,7 @@ iCS_S_ProcedureOrArrayCall : (ambiguousIdentifier | baseType) typeHint? WS? LPAR
 
 iCS_S_MembersCall : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall+ dictionaryCallStmt? (WS? LPAREN subscripts RPAREN)*;
 
-iCS_S_MemberCall : ('.' | '!') (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
+iCS_S_MemberCall : LINE_CONTINUATION? ('.' | '!') LINE_CONTINUATION? (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
 
 iCS_S_DictionaryCall : dictionaryCallStmt;
 
@@ -642,22 +637,22 @@ arg : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier 
 
 argDefaultValue : EQ WS? valueStmt;
 
-subscripts : subscript (WS? ',' WS? subscript)*;
+subscripts : subscript_ (WS? ',' WS? subscript_)*;
 
-subscript : (valueStmt WS TO WS)? valueStmt;
+subscript_ : (valueStmt WS TO WS)? valueStmt;
 
 
 // atomic rules ----------------------------------
 
-ambiguousIdentifier : 
+ambiguousIdentifier :
 	(IDENTIFIER | ambiguousKeyword)+
 ;
 
-asTypeClause : AS WS? (NEW WS)? type (WS? fieldLength)?;
+asTypeClause : AS WS? (NEW WS)? type_ (WS? fieldLength)?;
 
 baseType : BOOLEAN | BYTE | COLLECTION | DATE | DOUBLE | INTEGER | LONG | SINGLE | STRING (WS? MULT WS? valueStmt)? | VARIANT;
 
-certainIdentifier : 
+certainIdentifier :
 	IDENTIFIER (ambiguousKeyword | IDENTIFIER)*
 	| ambiguousKeyword (ambiguousKeyword | IDENTIFIER)+
 ;
@@ -672,35 +667,35 @@ letterrange : certainIdentifier (WS? MINUS WS? certainIdentifier)?;
 
 lineLabel : ambiguousIdentifier ':';
 
-literal : HEXLITERAL | OCTLITERAL | DATELITERAL | DOUBLELITERAL | INTEGERLITERAL | SHORTLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL;
+literal : HEXLITERAL | OCTLITERAL | DATELITERAL | DOUBLELITERAL | INTEGERLITERAL | SHORTLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL_;
 
-type : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
+type_ : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
 typeHint : '&' | '%' | '#' | '!' | '@' | '$';
 
 visibility : PRIVATE | PUBLIC | FRIEND | GLOBAL;
 
 // ambiguous keywords
-ambiguousKeyword : 
+ambiguousKeyword :
 	ACCESS | ADDRESSOF | ALIAS | AND | ATTRIBUTE | APPACTIVATE | APPEND | AS |
-	BEEP | BEGIN | BINARY | BOOLEAN | BYVAL | BYREF | BYTE | 
-	CALL | CASE | CLASS | CLOSE | CHDIR | CHDRIVE | COLLECTION | CONST | 
-	DATABASE | DATE | DECLARE | DEFBOOL | DEFBYTE | DEFCUR | DEFDBL | DEFDATE | DEFDEC | DEFINT | DEFLNG | DEFOBJ | DEFSNG | DEFSTR | DEFVAR | DELETESETTING | DIM | DO | DOUBLE | 
-	EACH | ELSE | ELSEIF | END | ENUM | EQV | ERASE | ERROR | EVENT | 
-	FALSE | FILECOPY | FRIEND | FOR | FUNCTION | 
-	GET | GLOBAL | GOSUB | GOTO | 
+	BEEP | BEGIN | BINARY | BOOLEAN | BYVAL | BYREF | BYTE |
+	CALL | CASE | CLASS | CLOSE | CHDIR | CHDRIVE | COLLECTION | CONST |
+	DATABASE | DATE | DECLARE | DEFBOOL | DEFBYTE | DEFCUR | DEFDBL | DEFDATE | DEFDEC | DEFINT | DEFLNG | DEFOBJ | DEFSNG | DEFSTR | DEFVAR | DELETESETTING | DIM | DO | DOUBLE |
+	EACH | ELSE | ELSEIF | END | ENUM | EQV | ERASE | ERROR | EVENT |
+	FALSE | FILECOPY | FRIEND | FOR | FUNCTION |
+	GET | GLOBAL | GOSUB | GOTO |
 	IF | IMP | IMPLEMENTS | IN | INPUT | IS | INTEGER |
-	KILL | 
+	KILL |
 	LOAD | LOCK | LONG | LOOP | LEN | LET | LIB | LIKE | LSET |
-	ME | MID | MKDIR | MOD | 
-	NAME | NEXT | NEW | NOT | NOTHING | NULL | 
-	ON | OPEN | OPTIONAL | OR | OUTPUT | 
+	ME | MID | MKDIR | MOD |
+	NAME | NEXT | NEW | NOT | NOTHING | NULL_ |
+	ON | OPEN | OPTIONAL | OR | OUTPUT |
 	PARAMARRAY | PRESERVE | PRINT | PRIVATE | PUBLIC | PUT |
 	RANDOM | RANDOMIZE | RAISEEVENT | READ | REDIM | REM | RESET | RESUME | RETURN | RMDIR | RSET |
-	SAVEPICTURE | SAVESETTING | SEEK | SELECT | SENDKEYS | SET | SETATTR | SHARED | SINGLE | SPC | STATIC | STEP | STOP | STRING | SUB | 
-	TAB | TEXT | THEN | TIME | TO | TRUE | TYPE | TYPEOF | 
-	UNLOAD | UNLOCK | UNTIL | 
-	VARIANT | VERSION | 
+	SAVEPICTURE | SAVESETTING | SEEK | SELECT | SENDKEYS | SET | SETATTR | SHARED | SINGLE | SPC | STATIC | STEP | STOP | STRING | SUB |
+	TAB | TEXT | THEN | TIME | TO | TRUE | TYPE | TYPEOF |
+	UNLOAD | UNLOCK | UNTIL |
+	VARIANT | VERSION |
 	WEND | WHILE | WIDTH | WITH | WITHEVENTS | WRITE |
 	XOR
 ;
@@ -718,183 +713,183 @@ endOfStatement : (endOfLine | WS? COLON WS?)*;
 
 
 // keywords
-ACCESS : A C C E S S;
-ADDRESSOF : A D D R E S S O F;
-ALIAS : A L I A S;
-AND : A N D;
-ATTRIBUTE : A T T R I B U T E;
-APPACTIVATE : A P P A C T I V A T E;
-APPEND : A P P E N D;
-AS : A S;
-BEGIN : B E G I N;
-BEEP : B E E P;
-BINARY : B I N A R Y;
-BOOLEAN : B O O L E A N;
-BYVAL : B Y V A L;
-BYREF : B Y R E F;
-BYTE : B Y T E;
-CALL : C A L L;
-CASE : C A S E;
-CHDIR : C H D I R;
-CHDRIVE : C H D R I V E;
-CLASS : C L A S S;
-CLOSE : C L O S E;
-COLLECTION : C O L L E C T I O N;
-CONST : C O N S T;
-DATABASE : D A T A B A S E;
-DATE : D A T E;
-DECLARE : D E C L A R E;
-DEFBOOL : D E F B O O L; 
-DEFBYTE : D E F B Y T E;
-DEFDATE : D E F D A T E;
-DEFDBL : D E F D B L;
-DEFDEC : D E F D E C;
-DEFCUR : D E F C U R;
-DEFINT : D E F I N T;
-DEFLNG : D E F L N G;
-DEFOBJ : D E F O B J;
-DEFSNG : D E F S N G;
-DEFSTR : D E F S T R;
-DEFVAR : D E F V A R;
-DELETESETTING : D E L E T E S E T T I N G;
-DIM : D I M;
-DO : D O;
-DOUBLE : D O U B L E;
-EACH : E A C H;
-ELSE : E L S E;
-ELSEIF : E L S E I F;
-END_ENUM : E N D WS E N U M;
-END_FUNCTION : E N D WS F U N C T I O N;
-END_IF : E N D WS I F;
-END_PROPERTY : E N D WS P R O P E R T Y;
-END_SELECT : E N D WS S E L E C T;
-END_SUB : E N D WS S U B;
-END_TYPE : E N D WS T Y P E;
-END_WITH : E N D WS W I T H;
-END : E N D;
-ENUM : E N U M;
-EQV : E Q V;
-ERASE : E R A S E;
-ERROR : E R R O R;
-EVENT : E V E N T;
-EXIT_DO : E X I T WS D O;
-EXIT_FOR : E X I T WS F O R;
-EXIT_FUNCTION : E X I T WS F U N C T I O N;
-EXIT_PROPERTY : E X I T WS P R O P E R T Y;
-EXIT_SUB : E X I T WS S U B;
-FALSE : F A L S E;
-FILECOPY : F I L E C O P Y;
-FRIEND : F R I E N D;
-FOR : F O R;
-FUNCTION : F U N C T I O N;
-GET : G E T;
-GLOBAL : G L O B A L;
-GOSUB : G O S U B;
-GOTO : G O T O;
-IF : I F;
-IMP : I M P;
-IMPLEMENTS : I M P L E M E N T S;
-IN : I N;
-INPUT : I N P U T;
-IS : I S;
-INTEGER : I N T E G E R;
-KILL: K I L L;
-LOAD : L O A D;
-LOCK : L O C K;
-LONG : L O N G;
-LOOP : L O O P;
-LEN : L E N;
-LET : L E T;
-LIB : L I B;
-LIKE : L I K E;
-LINE_INPUT : L I N E WS I N P U T;
-LOCK_READ : L O C K WS R E A D;
-LOCK_WRITE : L O C K WS W R I T E;
-LOCK_READ_WRITE : L O C K WS R E A D WS W R I T E;
-LSET : L S E T;
-MACRO_CONST : '#' C O N S T;
-MACRO_IF : '#' I F;
-MACRO_ELSEIF : '#' E L S E I F;
-MACRO_ELSE : '#' E L S E;
-MACRO_END_IF : '#' E N D WS? I F;
-ME : M E;
-MID : M I D;
-MKDIR : M K D I R;
-MOD : M O D;
-NAME : N A M E;
-NEXT : N E X T;
-NEW : N E W;
-NOT : N O T;
-NOTHING : N O T H I N G;
-NULL : N U L L;
-ON : O N;
-ON_ERROR : O N WS E R R O R;
-ON_LOCAL_ERROR : O N WS L O C A L WS E R R O R;
-OPEN : O P E N;
-OPTIONAL : O P T I O N A L;
-OPTION_BASE : O P T I O N WS B A S E;
-OPTION_EXPLICIT : O P T I O N WS E X P L I C I T;
-OPTION_COMPARE : O P T I O N WS C O M P A R E;
-OPTION_PRIVATE_MODULE : O P T I O N WS P R I V A T E WS M O D U L E;
-OR : O R;
-OUTPUT : O U T P U T;
-PARAMARRAY : P A R A M A R R A Y;
-PRESERVE : P R E S E R V E;
-PRINT : P R I N T;
-PRIVATE : P R I V A T E;
-PROPERTY_GET : P R O P E R T Y WS G E T;
-PROPERTY_LET : P R O P E R T Y WS L E T;
-PROPERTY_SET : P R O P E R T Y WS S E T;
-PTRSAFE : P T R S A F E;
-PUBLIC : P U B L I C;
-PUT : P U T;
-RANDOM : R A N D O M;
-RANDOMIZE : R A N D O M I Z E;
-RAISEEVENT : R A I S E E V E N T;
-READ : R E A D;
-READ_WRITE : R E A D WS W R I T E;
-REDIM : R E D I M;
-REM : R E M;
-RESET : R E S E T;
-RESUME : R E S U M E;
-RETURN : R E T U R N;
-RMDIR : R M D I R;
-RSET : R S E T;
-SAVEPICTURE : S A V E P I C T U R E;
-SAVESETTING : S A V E S E T T I N G;
-SEEK : S E E K;
-SELECT : S E L E C T;
-SENDKEYS : S E N D K E Y S;
-SET : S E T;
-SETATTR : S E T A T T R;
-SHARED : S H A R E D;
-SINGLE : S I N G L E;
-SPC : S P C;
-STATIC : S T A T I C;
-STEP : S T E P;
-STOP : S T O P;
-STRING : S T R I N G;
-SUB : S U B;
-TAB : T A B;
-TEXT : T E X T;
-THEN : T H E N;
-TIME : T I M E;
-TO : T O;
-TRUE : T R U E;
-TYPE : T Y P E;
-TYPEOF : T Y P E O F;
-UNLOAD : U N L O A D;
-UNLOCK : U N L O C K;
-UNTIL : U N T I L;
-VARIANT : V A R I A N T;
-VERSION : V E R S I O N;
-WEND : W E N D;
-WHILE : W H I L E;
-WIDTH : W I D T H;
-WITH : W I T H;
-WITHEVENTS : W I T H E V E N T S;
-WRITE : W R I T E;
-XOR : X O R;
+ACCESS: 'ACCESS';
+ADDRESSOF: 'ADDRESSOF';
+ALIAS: 'ALIAS';
+AND: 'AND';
+ATTRIBUTE: 'ATTRIBUTE';
+APPACTIVATE: 'APPACTIVATE';
+APPEND: 'APPEND';
+AS: 'AS';
+BEGIN: 'BEGIN';
+BEEP: 'BEEP';
+BINARY: 'BINARY';
+BOOLEAN: 'BOOLEAN';
+BYVAL: 'BYVAL';
+BYREF: 'BYREF';
+BYTE: 'BYTE';
+CALL: 'CALL';
+CASE: 'CASE';
+CHDIR: 'CHDIR';
+CHDRIVE: 'CHDRIVE';
+CLASS: 'CLASS';
+CLOSE: 'CLOSE';
+COLLECTION: 'COLLECTION';
+CONST: 'CONST';
+DATABASE: 'DATABASE';
+DATE: 'DATE';
+DECLARE: 'DECLARE';
+DEFBOOL: 'DEFBOOL';
+DEFBYTE: 'DEFBYTE';
+DEFDATE: 'DEFDATE';
+DEFDBL: 'DEFDBL';
+DEFDEC: 'DEFDEC';
+DEFCUR: 'DEFCUR';
+DEFINT: 'DEFINT';
+DEFLNG: 'DEFLNG';
+DEFOBJ: 'DEFOBJ';
+DEFSNG: 'DEFSNG';
+DEFSTR: 'DEFSTR';
+DEFVAR: 'DEFVAR';
+DELETESETTING: 'DELETESETTING';
+DIM: 'DIM';
+DO: 'DO';
+DOUBLE: 'DOUBLE';
+EACH: 'EACH';
+ELSE: 'ELSE';
+ELSEIF: 'ELSEIF';
+END_ENUM: 'END' WS 'ENUM';
+END_FUNCTION: 'END' WS 'FUNCTION';
+END_IF: 'END' WS 'IF';
+END_PROPERTY: 'END' WS 'PROPERTY';
+END_SELECT: 'END' WS 'SELECT';
+END_SUB: 'END' WS 'SUB';
+END_TYPE: 'END' WS 'TYPE';
+END_WITH: 'END' WS 'WITH';
+END: 'END';
+ENUM: 'ENUM';
+EQV: 'EQV';
+ERASE: 'ERASE';
+ERROR: 'ERROR';
+EVENT: 'EVENT';
+EXIT_DO: 'EXIT' WS 'DO';
+EXIT_FOR: 'EXIT' WS 'FOR';
+EXIT_FUNCTION: 'EXIT' WS 'FUNCTION';
+EXIT_PROPERTY: 'EXIT' WS 'PROPERTY';
+EXIT_SUB: 'EXIT' WS 'SUB';
+FALSE: 'FALSE';
+FILECOPY: 'FILECOPY';
+FRIEND: 'FRIEND';
+FOR: 'FOR';
+FUNCTION: 'FUNCTION';
+GET: 'GET';
+GLOBAL: 'GLOBAL';
+GOSUB: 'GOSUB';
+GOTO: 'GOTO';
+IF: 'IF';
+IMP: 'IMP';
+IMPLEMENTS: 'IMPLEMENTS';
+IN: 'IN';
+INPUT: 'INPUT';
+IS: 'IS';
+INTEGER: 'INTEGER';
+KILL: 'KILL';
+LOAD: 'LOAD';
+LOCK: 'LOCK';
+LONG: 'LONG';
+LOOP: 'LOOP';
+LEN: 'LEN';
+LET: 'LET';
+LIB: 'LIB';
+LIKE: 'LIKE';
+LINE_INPUT: 'LINE' WS 'INPUT';
+LOCK_READ: 'LOCK' WS 'READ';
+LOCK_WRITE: 'LOCK' WS 'WRITE';
+LOCK_READ_WRITE: 'LOCK' WS 'READ' WS 'WRITE';
+LSET: 'LSET';
+MACRO_CONST: '#CONST';
+MACRO_IF: '#IF';
+MACRO_ELSEIF: '#ELSEIF';
+MACRO_ELSE: '#ELSE';
+MACRO_END_IF: '#END' WS? 'IF';
+ME: 'ME';
+MID: 'MID';
+MKDIR: 'MKDIR';
+MOD: 'MOD';
+NAME: 'NAME';
+NEXT: 'NEXT';
+NEW: 'NEW';
+NOT: 'NOT';
+NOTHING: 'NOTHING';
+NULL_: 'NULL';
+ON: 'ON';
+ON_ERROR: 'ON' WS 'ERROR';
+ON_LOCAL_ERROR: 'ON' WS 'LOCAL' WS 'ERROR';
+OPEN: 'OPEN';
+OPTIONAL: 'OPTIONAL';
+OPTION_BASE: 'OPTION' WS 'BASE';
+OPTION_EXPLICIT: 'OPTION' WS 'EXPLICIT';
+OPTION_COMPARE: 'OPTION' WS 'COMPARE';
+OPTION_PRIVATE_MODULE: 'OPTION' WS 'PRIVATE' WS 'MODULE';
+OR: 'OR';
+OUTPUT: 'OUTPUT';
+PARAMARRAY: 'PARAMARRAY';
+PRESERVE: 'PRESERVE';
+PRINT: 'PRINT';
+PRIVATE: 'PRIVATE';
+PROPERTY_GET: 'PROPERTY' WS 'GET';
+PROPERTY_LET: 'PROPERTY' WS 'LET';
+PROPERTY_SET: 'PROPERTY' WS 'SET';
+PTRSAFE: 'PTRSAFE';
+PUBLIC: 'PUBLIC';
+PUT: 'PUT';
+RANDOM: 'RANDOM';
+RANDOMIZE: 'RANDOMIZE';
+RAISEEVENT: 'RAISEEVENT';
+READ: 'READ';
+READ_WRITE: 'READ' WS 'WRITE';
+REDIM: 'REDIM';
+REM: 'REM';
+RESET: 'RESET';
+RESUME: 'RESUME';
+RETURN: 'RETURN';
+RMDIR: 'RMDIR';
+RSET: 'RSET';
+SAVEPICTURE: 'SAVEPICTURE';
+SAVESETTING: 'SAVESETTING';
+SEEK: 'SEEK';
+SELECT: 'SELECT';
+SENDKEYS: 'SENDKEYS';
+SET: 'SET';
+SETATTR: 'SETATTR';
+SHARED: 'SHARED';
+SINGLE: 'SINGLE';
+SPC: 'SPC';
+STATIC: 'STATIC';
+STEP: 'STEP';
+STOP: 'STOP';
+STRING: 'STRING';
+SUB: 'SUB';
+TAB: 'TAB';
+TEXT: 'TEXT';
+THEN: 'THEN';
+TIME: 'TIME';
+TO: 'TO';
+TRUE: 'TRUE';
+TYPE: 'TYPE';
+TYPEOF: 'TYPEOF';
+UNLOAD: 'UNLOAD';
+UNLOCK: 'UNLOCK';
+UNTIL: 'UNTIL';
+VARIANT: 'VARIANT';
+VERSION: 'VERSION';
+WEND: 'WEND';
+WHILE: 'WHILE';
+WIDTH: 'WIDTH';
+WITH: 'WITH';
+WITHEVENTS: 'WITHEVENTS';
+WRITE: 'WRITE';
+XOR: 'XOR';
 
 
 // symbols
@@ -924,22 +919,22 @@ STRINGLITERAL : '"' (~["\r\n] | '""')* '"';
 OCTLITERAL : '&O' [0-7]+ '&'?;
 HEXLITERAL : '&H' [0-9A-F]+ '&'?;
 SHORTLITERAL : (PLUS|MINUS)? DIGIT+ ('#' | '&' | '@')?;
-INTEGERLITERAL : SHORTLITERAL (E SHORTLITERAL)?;
-DOUBLELITERAL : (PLUS|MINUS)? DIGIT* '.' DIGIT+ (E SHORTLITERAL)?;
+INTEGERLITERAL : SHORTLITERAL ('E' SHORTLITERAL)?;
+DOUBLELITERAL : (PLUS|MINUS)? DIGIT* '.' DIGIT+ ('E' SHORTLITERAL)?;
 DATELITERAL : '#' DATEORTIME '#';
 fragment DATEORTIME : DATEVALUE WS? TIMEVALUE | DATEVALUE | TIMEVALUE;
 fragment DATEVALUE : DATEVALUEPART DATESEPARATOR DATEVALUEPART (DATESEPARATOR DATEVALUEPART)?;
 fragment DATEVALUEPART : DIGIT+ | MONTHNAME;
 fragment DATESEPARATOR : WS? [/,-]? WS?;
 fragment MONTHNAME : ENGLISHMONTHNAME | ENGLISHMONTHABBREVIATION;
-fragment ENGLISHMONTHNAME : J A N U A R Y | F E B R U A R Y | M A R C H | A P R I L | M A Y | J U N E  | A U G U S T | S E P T E M B E R | O C T O B E R | N O V E M B E R | D E C E M B E R;
-fragment ENGLISHMONTHABBREVIATION : J A N | F E B | M A R | A P R | J U N | J U L | A U G | S E P |  O C T | N O V | D E C;
+fragment ENGLISHMONTHNAME: 'JANUARY' | 'FEBRUARY' | 'MARCH' | 'APRIL' | 'MAY' | 'JUNE | AUGUST' | 'SEPTEMBER' | 'OCTOBER' | 'NOVEMBER' | 'DECEMBER';
+fragment ENGLISHMONTHABBREVIATION: 'JAN' | 'FEB' | 'MAR' | 'APR' | 'JUN' | 'JUL' | 'AUG' | 'SEP' | 'OCT' | 'NOV' | 'DEC';
 fragment TIMEVALUE : DIGIT+ AMPM | DIGIT+ TIMESEPARATOR DIGIT+ (TIMESEPARATOR DIGIT+)? AMPM?;
 fragment TIMESEPARATOR : WS? (':' | '.') WS?;
-fragment AMPM : WS? (A M | P M | A | P);
+fragment AMPM : WS? ('AM' | 'PM' | 'A' | 'P');
 
 // whitespace, line breaks, comments, ...
-LINE_CONTINUATION : [ \t]+ UNDERSCORE '\r'? '\n' -> skip;
+LINE_CONTINUATION : [ \t]+ UNDERSCORE '\r'? '\n' WS* -> skip;
 NEWLINE : [\r\n\u2028\u2029]+;
 REMCOMMENT : COLON? REM WS (LINE_CONTINUATION | ~[\r\n\u2028\u2029])*;
 COMMENT : SINGLEQUOTE (LINE_CONTINUATION | ~[\r\n\u2028\u2029])*;
@@ -952,34 +947,6 @@ WS : ([ \t] | LINE_CONTINUATION)+;
 IDENTIFIER :  ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; ]+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
 
 // letters
-fragment LETTER : [a-zA-Z_äöüÄÖÜ];
+fragment LETTER : [A-Z_\p{L}];
 fragment DIGIT : [0-9];
-fragment LETTERORDIGIT : [a-zA-Z0-9_äöüÄÖÜ];
-
-// case insensitive chars
-fragment A:('a'|'A');
-fragment B:('b'|'B');
-fragment C:('c'|'C');
-fragment D:('d'|'D');
-fragment E:('e'|'E');
-fragment F:('f'|'F');
-fragment G:('g'|'G');
-fragment H:('h'|'H');
-fragment I:('i'|'I');
-fragment J:('j'|'J');
-fragment K:('k'|'K');
-fragment L:('l'|'L');
-fragment M:('m'|'M');
-fragment N:('n'|'N');
-fragment O:('o'|'O');
-fragment P:('p'|'P');
-fragment Q:('q'|'Q');
-fragment R:('r'|'R');
-fragment S:('s'|'S');
-fragment T:('t'|'T');
-fragment U:('u'|'U');
-fragment V:('v'|'V');
-fragment W:('w'|'W');
-fragment X:('x'|'X');
-fragment Y:('y'|'Y');
-fragment Z:('z'|'Z');
+fragment LETTERORDIGIT : [A-Z0-9_\p{L}];

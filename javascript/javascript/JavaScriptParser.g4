@@ -30,6 +30,8 @@
  */
 parser grammar JavaScriptParser;
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab=JavaScriptLexer;
     superClass=JavaScriptParserBase;
@@ -48,8 +50,9 @@ statement
     | variableStatement
     | importStatement
     | exportStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
+    | functionDeclaration
     | expressionStatement
     | ifStatement
     | iterationStatement
@@ -63,7 +66,6 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration
     ;
 
 block
@@ -131,7 +133,7 @@ variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -155,7 +157,7 @@ iterationStatement
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | let
+    | let_
     | Const
     ;
 
@@ -224,7 +226,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' functionBody
     ;
 
 classDeclaration
@@ -237,14 +239,14 @@ classTail
 
 classElement
     : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
-    | emptyStatement
+    | emptyStatement_
     | '#'? propertyName '=' singleExpression
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | '*'? '#'? getter '(' ')' '{' functionBody '}'
-    | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'? '#'? propertyName '(' formalParameterList? ')' functionBody
+    | '*'? '#'? getter '(' ')' functionBody
+    | '*'? '#'? setter '(' formalParameterList? ')' functionBody
     ;
 
 formalParameterList
@@ -261,7 +263,7 @@ lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
     ;
 
 functionBody
-    : sourceElements?
+    : '{' sourceElements? '}'
     ;
 
 sourceElements
@@ -283,9 +285,9 @@ arrayElement
 propertyAssignment
     : propertyName ':' singleExpression                                             # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression                                 # ComputedPropertyExpressionAssignment
-    | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
-    | getter '(' ')' '{' functionBody '}'                                           # PropertyGetter
-    | setter '(' formalParameterArg ')' '{' functionBody '}'                        # PropertySetter
+    | Async? '*'? propertyName '(' formalParameterList?  ')'  functionBody  # FunctionProperty
+    | getter '(' ')' functionBody                                           # PropertyGetter
+    | setter '(' formalParameterArg ')' functionBody                        # PropertySetter
     | Ellipsis? singleExpression                                                    # PropertyShorthand
     ;
 
@@ -309,12 +311,15 @@ expressionSequence
     ;
 
 singleExpression
-    : anoymousFunction                                                      # FunctionExpression
+    : anonymousFunction                                                     # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
-    | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
+    | singleExpression '?.' singleExpression                                # OptionalChainExpression
+    | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
+    // Split to try `new Date()` first, then `new Date`.
+    | New singleExpression arguments                                        # NewExpression
+    | New singleExpression                                                  # NewExpression
     | singleExpression arguments                                            # ArgumentsExpression
-    | New singleExpression arguments?                                       # NewExpression
     | New '.' identifier                                                    # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
@@ -346,7 +351,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                       # ImportExpression
-    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+    | singleExpression templateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
     | identifier                                                            # IdentifierExpression
@@ -364,12 +369,11 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
-anoymousFunction
-    : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+anonymousFunction
+    : Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -380,7 +384,7 @@ arrowFunctionParameters
 
 arrowFunctionBody
     : singleExpression
-    | '{' functionBody '}'
+    | functionBody
     ;
 
 assignmentOperator
@@ -402,10 +406,19 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
+    ;
+
+templateStringLiteral
+    : BackTick templateStringAtom* BackTick
+    ;
+
+templateStringAtom
+    : TemplateStringAtom
+    | TemplateStringStartExpression singleExpression TemplateCloseBrace
     ;
 
 numericLiteral
@@ -440,6 +453,7 @@ identifier
     : Identifier
     | NonStrictLet
     | Async
+    | As
     ;
 
 reservedWord
@@ -466,7 +480,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default
@@ -484,7 +498,7 @@ keyword
     | Export
     | Import
     | Implements
-    | let
+    | let_
     | Private
     | Public
     | Interface
@@ -498,7 +512,7 @@ keyword
     | As
     ;
 
-let
+let_
     : NonStrictLet
     | StrictLet
     ;

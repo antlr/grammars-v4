@@ -1,4 +1,3 @@
-package PythonParseTree;
 
 public enum PythonVersion {
     Autodetect(0),

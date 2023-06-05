@@ -2,10 +2,6 @@
 
 using namespace antlr4;
 
-JavaScriptLexerBase::JavaScriptLexerBase(CharStream *input) : Lexer(input)
-{
-}
-
 bool JavaScriptLexerBase::getStrictDefault()
 {
     return useStrictDefault;
@@ -14,7 +10,7 @@ bool JavaScriptLexerBase::getStrictDefault()
 bool JavaScriptLexerBase::IsStartOfFile(){
     // No token has been produced yet: at the start of the input,
     // no division is possible, so a regex literal _is_ possible.
-    return lastToken;
+    return !lastToken;
 }
 
 void JavaScriptLexerBase::setUseStrictDefault(bool value)
@@ -26,6 +22,11 @@ void JavaScriptLexerBase::setUseStrictDefault(bool value)
 bool JavaScriptLexerBase::IsStrictMode()
 {
     return useStrictCurrent;
+}
+
+bool JavaScriptLexerBase::IsInTemplateString()
+{
+	return _templateDepth > 0;
 }
 
 std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
@@ -58,7 +59,7 @@ void JavaScriptLexerBase::ProcessCloseBrace()
 
 void JavaScriptLexerBase::ProcessStringLiteral()
 {
-    if (lastToken || lastTokenType == JavaScriptLexer::OpenBrace)
+    if (!lastToken || lastTokenType == JavaScriptLexer::OpenBrace)
     {
         std::string text = getText();
         if (text == "\"use strict\"" || text == "'use strict'")
@@ -71,9 +72,19 @@ void JavaScriptLexerBase::ProcessStringLiteral()
     }
 }
 
+void JavaScriptLexerBase::IncreaseTemplateDepth()
+{
+	_templateDepth++;
+}
+
+void JavaScriptLexerBase::DecreaseTemplateDepth()
+{
+	_templateDepth--;
+}
+
 bool JavaScriptLexerBase::IsRegexPossible()
 {
-    if (lastToken) {
+    if (!lastToken) {
         // No token has been produced yet: at the start of the input,
         // no division is possible, so a regex literal _is_ possible.
         return true;

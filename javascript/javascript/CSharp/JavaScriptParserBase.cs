@@ -1,5 +1,7 @@
 using Antlr4.Runtime;
-using static JavaScriptParseTree.JavaScriptParser;
+using System.Collections.Generic;
+using System.IO;
+using static JavaScriptParser;
 
 /// <summary>
 /// All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
@@ -10,6 +12,10 @@ public abstract class JavaScriptParserBase : Parser
     private readonly Stack<string> _tagNames = new Stack<string>();
     public JavaScriptParserBase(ITokenStream input)
         : base(input)
+    {
+    }
+
+    public JavaScriptParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : this(input)
     {
     }
 
@@ -26,7 +32,7 @@ public abstract class JavaScriptParserBase : Parser
     /// </summary>
     protected bool prev(string str)
     {
-        return _input.Lt(-1).Text.Equals(str);
+        return ((ITokenStream)this.InputStream).LT(-1).Text.Equals(str);
     }
 
     // Short form for next(String str)
@@ -38,7 +44,7 @@ public abstract class JavaScriptParserBase : Parser
     // Whether the next token value equals to @param str
     protected bool next(string str)
     {
-        return _input.Lt(1).Text.Equals(str);
+        return ((ITokenStream)this.InputStream).LT(1).Text.Equals(str);
     }
 
     protected bool notLineTerminator()
@@ -48,13 +54,13 @@ public abstract class JavaScriptParserBase : Parser
 
     protected bool notOpenBraceAndNotFunction()
     {
-        int nextTokenType = _input.Lt(1).Type;
-        return nextTokenType != OpenBrace && nextTokenType != Function;
+        int nextTokenType = ((ITokenStream)this.InputStream).LT(1).Type;
+        return nextTokenType != OpenBrace && nextTokenType != Function_;
     }
 
     protected bool closeBrace()
     {
-        return _input.Lt(1).Type == CloseBrace;
+        return ((ITokenStream)this.InputStream).LT(1).Type == CloseBrace;
     }
 
     /// <summary>Returns true if on the current index of the parser's
@@ -68,7 +74,7 @@ public abstract class JavaScriptParserBase : Parser
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
-        IToken ahead = _input.Get(possibleIndexEosToken);
+        IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
 
         // Check if the token resides on the Hidden channel and if it's of the
         // provided type.
@@ -85,7 +91,7 @@ public abstract class JavaScriptParserBase : Parser
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
-        IToken ahead = _input.Get(possibleIndexEosToken);
+        IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
 
         if (ahead.Channel != Lexer.Hidden)
         {
@@ -103,7 +109,7 @@ public abstract class JavaScriptParserBase : Parser
         {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = CurrentToken.TokenIndex - 2;
-            ahead = _input.Get(possibleIndexEosToken);
+            ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
         }
 
         // Get the token's text and type.
@@ -122,6 +128,6 @@ public abstract class JavaScriptParserBase : Parser
 
     protected bool popHtmlTagName(string tagName)
     {
-        return string.Equals(_tagNames.Pop(),tagName, StringComparison.InvariantCulture);
+        return string.Equals(_tagNames.Pop(),tagName, System.StringComparison.InvariantCulture);
     }
 }

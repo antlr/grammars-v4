@@ -7,11 +7,11 @@
 
 grammar sgf;
 
-collection      :   gameTree+;
+collection      :   gameTree+ EOF;
 gameTree        :   '(' sequence gameTree* ')';
 sequence        :   node+;
-node            :   ';' property*;
-property        :
+node            :   ';' property_*;
+property_        :
                     move
                 |   setup
                 |   nodeAnnotation
@@ -22,7 +22,7 @@ property        :
                 |   timing
                 |   misc
                 |   loa
-                |   go
+                |   go_
                 |   privateProp
                 ;
 
@@ -122,7 +122,7 @@ loa             :
                 |   'SU' TEXT
                 ;
 
-go              :
+go_              :
                     'HA' TEXT
                 |   'KM' TEXT
                 |   'TB' (NONE | TEXT+)

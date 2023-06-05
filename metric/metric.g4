@@ -31,19 +31,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar metric;
 
+file_ : uom EOF ;
+
 uom
    : measure (('*' | '/') measure)*
    ;
 
 measure
-   : prefix? unit exponent?
+   : prefix_? unit exponent?
    ;
 
 exponent
    : ('^' INTE)
    ;
 
-prefix
+prefix_
    : 'E'
    | 'P'
    | 'T'

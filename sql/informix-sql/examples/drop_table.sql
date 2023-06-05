@@ -1,0 +1,5 @@
+DROP TABLE customer;
+DROP TABLE joed.state;
+DROP TABLE IF EXISTS customer;
+DROP TABLE customer CASCADE;
+DROP TABLE customer RESTRICT;

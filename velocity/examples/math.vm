@@ -1,0 +1,16 @@
+#set( $foo = $bar + 3 )
+#set( $foo = $bar - 4 )
+#set( $foo = $bar * 6 )
+#set( $foo = $bar / 2 )
+#set( $foo = $bar % 2 )
+
+#set( $foo = $bar != 3 )
+#set( $foo = $bar == 4 )
+#set( $foo = $bar ne 6 )
+#set( $foo = $bar eq 2 )
+#set( $foo = $bar >= 3 )
+#set( $foo = $bar lt 4 )
+#set( $foo = $bar > 6 )
+
+#set( $foo = ! true )
+#set( $foo = not false )

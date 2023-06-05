@@ -22,9 +22,7 @@ grammar ATL;
  * Parser Rules
  */
 unit
-   : module
-   | library
-   | query
+   : ( module | library_ | query ) EOF
    ;
 
 module
@@ -45,7 +43,7 @@ transformationMode
    | 'from'
    ;
 
-library
+library_
    : 'library' (STRING | IDENTIFIER) ';' libraryRef* helper*
    ;
 

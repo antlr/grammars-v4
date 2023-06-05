@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar emailaddress;
 
 emailaddress
-    : mailbox                     
-    |  group ;                      
+    : (mailbox
+    |  group ) EOF ;
 
 group       
     :  phrase ':' mailbox* ';';

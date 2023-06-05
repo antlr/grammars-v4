@@ -1,0 +1,7 @@
+%import common.INT
+
+a: A
+b: A
+c: A
+
+A: "A"

@@ -1,0 +1,15 @@
+
+begin
+  integer procedure SIGMA(x, i, n);
+    value n;
+    integer x, i, n;
+  begin
+    integer sum;
+    sum:=0;
+    for i:=1 step 1 until n do
+        sum:=sum+x;
+    SIGMA:=sum;
+  end;
+  integer q;
+  printnln(SIGMA(q*2-1, q, 7));
+end

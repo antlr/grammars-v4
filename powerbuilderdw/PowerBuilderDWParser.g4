@@ -40,7 +40,7 @@ retrieve_attribute
     ;
 
 datawindow_property_attribute_sub
-   : ( NULL
+   : ( NULL_
      | numeric_atom
      | DQUOTED_STRING
      | DATE
@@ -71,7 +71,7 @@ attribute_value
    | TO
    | FROM
    | REF
-   | NULL
+   | NULL_
    | OPEN
    | LPAREN LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN (COMMA LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN)* RPAREN
    | dataTypeSub (LPAREN NUMBER RPAREN)?

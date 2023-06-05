@@ -1,0 +1,3 @@
+WITH *
+CREATE ()
+RETURN a

@@ -1,0 +1,119 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\CUDA\bin/../open64/lib//be.exe
+	// nvopencc 3.1 built on 2010-06-08
+
+	//-----------------------------------------------------------
+	// Compiling simpleTexture3D_kernel.compute_10.cpp3.i (C:/Users/Ken/AppData/Local/Temp/ccBI#.a03216)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"simpleTexture3D_kernel.compute_10.cudafe2.gpu"
+	.file	2	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\crtdefs.h"
+	.file	3	"C:\CUDA\include\crt/device_runtime.h"
+	.file	4	"C:\CUDA\include\host_defines.h"
+	.file	5	"C:\CUDA\include\builtin_types.h"
+	.file	6	"c:\cuda\include\device_types.h"
+	.file	7	"c:\cuda\include\driver_types.h"
+	.file	8	"c:\cuda\include\surface_types.h"
+	.file	9	"c:\cuda\include\texture_types.h"
+	.file	10	"c:\cuda\include\vector_types.h"
+	.file	11	"c:\cuda\include\builtin_types.h"
+	.file	12	"c:\cuda\include\host_defines.h"
+	.file	13	"C:\CUDA\include\device_launch_parameters.h"
+	.file	14	"c:\cuda\include\crt\storage_class.h"
+	.file	15	"C:\Program Files\Microsoft Visual Studio 9.0\VC\INCLUDE\time.h"
+	.file	16	"c:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\inc\cutil_math.h"
+	.file	17	"c:/ProgramData/NVIDIA Corporation/NVIDIA GPU Computing SDK/C/src/simpleTexture3D/simpleTexture3D_kernel.cu"
+	.file	18	"C:\CUDA\include\common_functions.h"
+	.file	19	"c:\cuda\include\math_functions.h"
+	.file	20	"c:\cuda\include\math_constants.h"
+	.file	21	"c:\cuda\include\device_functions.h"
+	.file	22	"c:\cuda\include\sm_11_atomic_functions.h"
+	.file	23	"c:\cuda\include\sm_12_atomic_functions.h"
+	.file	24	"c:\cuda\include\sm_13_double_functions.h"
+	.file	25	"c:\cuda\include\sm_20_atomic_functions.h"
+	.file	26	"c:\cuda\include\sm_20_intrinsics.h"
+	.file	27	"c:\cuda\include\surface_functions.h"
+	.file	28	"c:\cuda\include\texture_fetch_functions.h"
+	.file	29	"c:\cuda\include\math_functions_dbl_ptx1.h"
+
+	.tex .u32 tex;
+
+	.entry _Z8d_renderPjjjf (
+		.param .u32 __cudaparm__Z8d_renderPjjjf_d_output,
+		.param .u32 __cudaparm__Z8d_renderPjjjf_imageW,
+		.param .u32 __cudaparm__Z8d_renderPjjjf_imageH,
+		.param .f32 __cudaparm__Z8d_renderPjjjf_w)
+	{
+	.reg .u32 %r<31>;
+	.reg .f32 %f<13>;
+	.reg .pred %p<3>;
+	.loc	17	36	0
+$LDWbegin__Z8d_renderPjjjf:
+	.loc	17	42	0
+	cvt.u32.u16 	%r1, %ctaid.x;
+	cvt.u32.u16 	%r2, %ntid.x;
+	mul24.lo.u32 	%r3, %r1, %r2;
+	cvt.u32.u16 	%r4, %ctaid.y;
+	cvt.u32.u16 	%r5, %ntid.y;
+	mul24.lo.u32 	%r6, %r4, %r5;
+	cvt.u32.u16 	%r7, %tid.x;
+	add.u32 	%r8, %r7, %r3;
+	cvt.u32.u16 	%r9, %tid.y;
+	add.u32 	%r10, %r9, %r6;
+	ld.param.u32 	%r11, [__cudaparm__Z8d_renderPjjjf_imageH];
+	ld.param.u32 	%r12, [__cudaparm__Z8d_renderPjjjf_imageW];
+	cvt.rn.f32.u32 	%f1, %r8;
+	cvt.rn.f32.u32 	%f2, %r12;
+	div.full.f32 	%f3, %f1, %f2;
+	cvt.rn.f32.u32 	%f4, %r10;
+	cvt.rn.f32.u32 	%f5, %r11;
+	div.full.f32 	%f6, %f4, %f5;
+	ld.param.f32 	%f7, [__cudaparm__Z8d_renderPjjjf_w];
+	mov.f32 	%f8, 0f00000000;     	// 0
+	tex.3d.v4.u32.f32 {%r13,%r14,%r15,%r16},[tex,{%f3,%f6,%f7,%f8}];
+	.loc	17	44	0
+	mov.s32 	%r17, %r13;
+	.loc	17	42	0
+	ld.param.u32 	%r12, [__cudaparm__Z8d_renderPjjjf_imageW];
+	.loc	17	44	0
+	set.lt.u32.u32 	%r18, %r8, %r12;
+	neg.s32 	%r19, %r18;
+	.loc	17	42	0
+	ld.param.u32 	%r11, [__cudaparm__Z8d_renderPjjjf_imageH];
+	.loc	17	44	0
+	set.lt.u32.u32 	%r20, %r10, %r11;
+	neg.s32 	%r21, %r20;
+	and.b32 	%r22, %r19, %r21;
+	mov.u32 	%r23, 0;
+	setp.eq.s32 	%p1, %r22, %r23;
+	@%p1 bra 	$Lt_0_1282;
+	.loc	17	49	0
+	mov.b32 	%f9, %r17;
+	mov.f32 	%f10, 0f437f0000;    	// 255
+	mul.f32 	%f11, %f9, %f10;
+	cvt.rzi.u32.f32 	%r24, %f11;
+	ld.param.u32 	%r25, [__cudaparm__Z8d_renderPjjjf_d_output];
+	.loc	17	42	0
+	ld.param.u32 	%r12, [__cudaparm__Z8d_renderPjjjf_imageW];
+	.loc	17	49	0
+	mul24.lo.u32 	%r26, %r10, %r12;
+	add.u32 	%r27, %r8, %r26;
+	mul.lo.u32 	%r28, %r27, 4;
+	add.u32 	%r29, %r25, %r28;
+	st.global.u32 	[%r29+0], %r24;
+$Lt_0_1282:
+	.loc	17	51	0
+	exit;
+$LDWend__Z8d_renderPjjjf:
+	} // _Z8d_renderPjjjf
+

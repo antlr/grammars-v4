@@ -98,6 +98,7 @@ searchparameter
 
 string
    : STRING
+   | DIGITS
    ;
 
 

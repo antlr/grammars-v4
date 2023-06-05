@@ -45,6 +45,24 @@ DROP TRIGGER safety
 ON DATABASE;  
 GO  
 
+CREATE TRIGGER triggerOnDatabase
+ON DATABASE
+FOR create_procedure, alter_procedure, drop_procedure,
+    create_table, alter_table, drop_table,
+    create_trigger, alter_trigger, drop_trigger,
+    create_view, alter_view, drop_view,
+    create_function, alter_function, drop_function,
+    create_index, alter_index, drop_index
+AS
+BEGIN
+    declare @variable int        
+END
+GO
+
+DROP TRIGGER triggerOnDatabase  
+ON DATABASE;  
+GO  
+
 CREATE TRIGGER ddl_trig_database   
 ON ALL SERVER   
 FOR CREATE_DATABASE   
@@ -68,4 +86,20 @@ GO
 DISABLE TRIGGER safety ON DATABASE;
 GO
 DISABLE Trigger ALL ON ALL SERVER;
+GO
+
+
+CREATE OR REPLACE TRIGGER triggerOnDatabase
+ON DATABASE
+FOR create_procedure
+AS
+BEGIN
+    declare @variable int
+END
+GO
+
+CREATE OR REPLACE TRIGGER myTrigger ON myTable
+FOR UPDATE
+AS
+   PRINT 'This is the trigger from create-or-replace'
 GO

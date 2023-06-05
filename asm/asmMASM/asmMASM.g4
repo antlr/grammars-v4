@@ -32,31 +32,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar asmMASM;
 
+options { caseInsensitive=true; }
+
 prog
-   : (line EOL)*
+   : line* EOF
    ;
 
 line
-   : lbl? (assemblerdirective | masmdirectives | instruction)? comment?
+   : (lbl | endlbl)? (assemblerdirective | masmdirectives | instruction)? EOL
    ;
 
 instruction
-   : rep? opcode? expressionlist?
+   : rep? opcode expressionlist?
    ;
 
 lbl
    : label ':'?
    ;
 
+endlbl
+   : END name?
+   ;
+
 assemblerdirective
    : org
    | if_
-   | endif
+   | endif_
    | equ
    | db
    | dw
    | dm
    | ds
+   | include
+   | includelib
+   | invoke
+   | option
    | put
    | assign
    | segment
@@ -64,8 +74,9 @@ assemblerdirective
    | group
    | label_
    | assume
-   | extern
-   | (type expressionlist +)
+   | extern_
+   | public_
+   | type_ expressionlist+
    ;
 
 masmdirectives
@@ -81,10 +92,10 @@ assume
    ;
 
 label_
-   : name LABEL type
+   : name LABEL type_
    ;
 
-type
+type_
    : BYTE
    | SBYTE
    | WORD
@@ -104,8 +115,8 @@ endsegment
    ;
 
 align
-   : (BYTE | WORD | DWORD | PARA | PAGE)
-   | (ALIGN '(' number ')')
+   : BYTE | WORD | DWORD | PARA | PAGE
+   | ALIGN '(' number ')'
    ;
 
 assign
@@ -114,6 +125,22 @@ assign
 
 put
    : PUT expressionlist
+   ;
+
+include
+   : INCLUDE expressionlist
+   ;
+
+includelib
+   : INCLUDELIB expressionlist
+   ;
+
+invoke
+   : INVOKE expressionlist
+   ;
+
+option
+   : OPTION expressionlist
    ;
 
 ds
@@ -140,15 +167,19 @@ equ
    : EQU expression
    ;
 
-extern
+extern_
    : EXTERN expression
+   ;
+
+public_
+   : PUBLIC expression
    ;
 
 if_
    : IF expression
    ;
 
-endif
+endif_
    : ENDIF
    ;
 
@@ -180,8 +211,8 @@ argument
    | register_
    | (name ':')? name
    | string
-   | ('(' expression ')')
-   | ('[' expression ']')
+   | '(' expression ')'
+   | '[' expression ']'
    | NOT expression
    | OFFSET expression
    | gross
@@ -237,157 +268,191 @@ rep
    : REP
    ;
 
-comment
-   : COMMENT
-   ;
-
-
-ORG
-   : O R G
-   ;
-
-
-ENDIF
-   : E N D I F
-   ;
-
-
-IF
-   : I F
-   ;
-
-
-EQU
-   : E Q U
-   ;
-
-
-DW
-   : D W
-   ;
-
-
-DB
-   : D B
-   ;
-
-
-DM
-   : D M
-   ;
-
-
-DS
-   : D S
-   ;
-
-
-PUT
-   : P U T
-   ;
-
-
-NOT
-   : N O T
-   ;
-
-
+ORG: 'ORG';
+END: 'END';
+ENDIF: 'ENDIF';
+IF: 'IF';
+EQU: 'EQU';
+DW: 'DW';
+DB: 'DB';
+DM: 'DM';
+DS: 'DS';
+INCLUDE: 'INCLUDE';
+INCLUDELIB: 'INCLUDELIB';
+INVOKE: 'INVOKE';
+OPTION: 'OPTION';
+PUT: 'PUT';
+NOT: 'NOT';
 REGISTER
-   : A H | A L | B H | B L | C H | C L | D H | D L | A X | B X | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
-   ;
-
+    : 'AH'
+    | 'AL'
+    | 'BH'
+    | 'BL'
+    | 'CH'
+    | 'CL'
+    | 'DH'
+    | 'DL'
+    | 'AX'
+    | 'BX'
+    | 'CX'
+    | 'DX'
+    | 'CI'
+    | 'DI'
+    | 'BP'
+    | 'SP'
+    | 'IP'
+    | 'CS'
+    | 'ES'
+    | 'SS'
+    ;
 
 OPCODE
-   : A A A | A A D | A A M | A A S | A D C | A D D | A N D | C A L L | C B W | C L C | C L D | C L I | C M C | C M P | C M P S B | C M P S W | C W D | D A A | D A S | D E C | D I V | E S C | H L T | I D I V | I M U L | I N | I N C | I N T | I N T O | I R E T | J A | J A E | J B | J B E | J C | J E | J G | J G E | J L | J L E | J N A | J N A E | J N B | J N B E | J N C | J N E | J N G | J N G E | J N L | J N L E | J N O | J N P | J N S | J N Z | J O | J P | J P E | J P O | J S | J Z | J C X Z | J M P | J M P S | J M P F | L A H F | L D S | L E A | L E S | L O C K | L O D S | L O D S B | L O D S W | L O O P | L O O P E | L O O P N E | L O O P N Z | L O O P Z | M O V | M O V S | M O V S B | M O V S W | M U L | N E G | N O P | N O T | O R | O U T | P O P | P O P F | P U S H | P U S H F | R C L | R C R | R E T | R E T N | R E T F | R O L | R O R | S A H F | S A L | S A R | S A L C | S B B | S C A S B | S C A S W | S H L | S H R | S T C | S T D | S T I | S T O S B | S T O S W | S U B | T E S T | W A I T | X C H G | X L A T | X O R
-   ;
+    : 'AAA'
+    | 'AAD'
+    | 'AAM'
+    | 'AAS'
+    | 'ADC'
+    | 'ADD'
+    | 'AND'
+    | 'CALL'
+    | 'CBW'
+    | 'CLC'
+    | 'CLD'
+    | 'CLI'
+    | 'CMC'
+    | 'CMP'
+    | 'CMPSB'
+    | 'CMPSW'
+    | 'CWD'
+    | 'DAA'
+    | 'DAS'
+    | 'DEC'
+    | 'DIV'
+    | 'ESC'
+    | 'HLT'
+    | 'IDIV'
+    | 'IMUL'
+    | 'IN'
+    | 'INC'
+    | 'INT'
+    | 'INTO'
+    | 'IRET'
+    | 'JA'
+    | 'JAE'
+    | 'JB'
+    | 'JBE'
+    | 'JC'
+    | 'JE'
+    | 'JG'
+    | 'JGE'
+    | 'JL'
+    | 'JLE'
+    | 'JNA'
+    | 'JNAE'
+    | 'JNB'
+    | 'JNBE'
+    | 'JNC'
+    | 'JNE'
+    | 'JNG'
+    | 'JNGE'
+    | 'JNL'
+    | 'JNLE'
+    | 'JNO'
+    | 'JNP'
+    | 'JNS'
+    | 'JNZ'
+    | 'JO'
+    | 'JP'
+    | 'JPE'
+    | 'JPO'
+    | 'JS'
+    | 'JZ'
+    | 'JCXZ'
+    | 'JMP'
+    | 'JMPS'
+    | 'JMPF'
+    | 'LAHF'
+    | 'LDS'
+    | 'LEA'
+    | 'LES'
+    | 'LOCK'
+    | 'LODS'
+    | 'LODSB'
+    | 'LODSW'
+    | 'LOOP'
+    | 'LOOPE'
+    | 'LOOPNE'
+    | 'LOOPNZ'
+    | 'LOOPZ'
+    | 'MOV'
+    | 'MOVS'
+    | 'MOVSB'
+    | 'MOVSW'
+    | 'MUL'
+    | 'NEG'
+    | 'NOP'
+    | 'OR'
+    | 'OUT'
+    | 'POP'
+    | 'POPF'
+    | 'PUSH'
+    | 'PUSHF'
+    | 'RCL'
+    | 'RCR'
+    | 'RET'
+    | 'RETN'
+    | 'RETF'
+    | 'ROL'
+    | 'ROR'
+    | 'SAHF'
+    | 'SAL'
+    | 'SAR'
+    | 'SALC'
+    | 'SBB'
+    | 'SCASB'
+    | 'SCASW'
+    | 'SHL'
+    | 'SHR'
+    | 'STC'
+    | 'STD'
+    | 'STI'
+    | 'STOSB'
+    | 'STOSW'
+    | 'SUB'
+    | 'TEST'
+    | 'WAIT'
+    | 'XCHG'
+    | 'XLAT'
+    | 'XOR'
+    ;
 
+REP : 'REP'
+    | 'REPE'
+    | 'REPNE'
+    | 'REPNZ'
+    | 'REPZ'
+    ;
 
-REP
-   : R E P | R E P E | R E P N E | R E P N Z | R E P Z
-   ;
+OFFSET: 'OFFSET';
+SEGMENT: 'SEGMENT';
+SEGMENTEND: 'ENDS';
+GROUP: 'GROUP';
+BYTE: 'BYTE';
+SBYTE: 'SBYTE';
+WORD: 'WORD';
+DWORD: 'DWORD';
+PARA: 'PARA';
+PAGE: 'PAGE';
+ALIGN: 'ALIGN';
+LABEL: 'LABEL';
+DUP: 'DUP';
+ASSUME: 'ASSUME';
+EXTERN: 'EXTERN';
+PUBLIC: 'PUBLIC';
 
-
-ASSIGN
-   : '='
-   ;
-
-
-OFFSET
-   : O F F S E T
-   ;
-
-
-DOLLAR
-   : '$'
-   ;
-
-
-QUES
-   : '?'
-   ;
-
-
-SEGMENT
-   : S E G M E N T
-   ;
-
-
-SEGMENTEND
-   : E N D S
-   ;
-
-
-GROUP
-   : G R O U P
-   ;
-
-
-BYTE
-   : B Y T E
-   ;
-
-SBYTE
-   : S B Y T E
-   ;
-
-WORD
-   : W O R D
-   ;
-
-
-DWORD
-   : D W O R D
-   ;
-
-
-PARA
-   : P A R A
-   ;
-
-
-PAGE
-   : P A G E
-   ;
-
-
-ALIGN
-   : A L I G N
-   ;
-
-
-LABEL
-   : L A B E L
-   ;
-
-
-DUP
-   : D U P
-   ;
-
-
-ASSUME
-   : A S S U M E
-   ;
+ASSIGN: '=';
+DOLLAR: '$';
+QUES: '?';
 
 
 SIGN
@@ -395,23 +460,18 @@ SIGN
    ;
 
 
-EXTERN
-   : E X T E R N
-   ;
-
-
 MASMDIRECTIVE
-   : '.' [a-zA-Z0-9] +
+   : '.' [A-Z0-9] +
    ;
 
 
 NAME
-   : [_a-zA-Z] [a-zA-Z0-9._@]*
+   : [_A-Z] [A-Z0-9._@]*
    ;
 
 
 NUMBER
-   : [0-9a-fA-F] + ('H' | 'h')?
+   : [0-9A-F] + 'H'?
    ;
 
 
@@ -429,7 +489,6 @@ COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
 
-
 EOL
    : [\r\n] +
    ;
@@ -437,134 +496,4 @@ EOL
 
 WS
    : [ \t] -> skip
-   ;
-
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
    ;

@@ -28,8 +28,8 @@
 
 grammar redcode;
 
-file
-   : line +
+file_
+   : line + EOF
    ;
 
 line

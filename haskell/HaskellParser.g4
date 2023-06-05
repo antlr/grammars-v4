@@ -44,7 +44,7 @@ where_module
 
 module_body
     :
-    open body close semi*
+    open_ body close semi*
     ;
 
 pragmas
@@ -61,7 +61,7 @@ pragma
 
 language_pragma
     :
-    '{-#' 'LANGUAGE'  extension (',' extension)* '#-}' semi?
+    '{-#' 'LANGUAGE'  extension_ (',' extension_)* '#-}' semi?
     ;
 
 options_ghc
@@ -74,7 +74,7 @@ simple_options
     '{-#' 'OPTIONS' ('-' (varid | conid))* '#-}' semi?
     ;
 
-extension
+extension_
     :
     CONID
     ;
@@ -117,14 +117,14 @@ impspec
 
 himport
     :
-    var
+    var_
     | ( tycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')') )? )
     | ( tycls ( ('(' '..' ')') | ('(' sig_vars? ')') )? )
     ;
 
 cname
     :
-    var | con
+    var_ | con
     ;
 
 // -------------------------------------------
@@ -173,9 +173,9 @@ cl_decl
 ty_decl
     :
     // ordinary type synonyms
-    'type' type '=' ktypedoc
+    'type' type_ '=' ktypedoc
     // type family declarations
-    | 'type' 'family' type opt_tyfam_kind_sig? opt_injective_info? where_type_family?
+    | 'type' 'family' type_ opt_tyfam_kind_sig? opt_injective_info? where_type_family?
     // ordinary data type or newtype declaration
     | 'data' capi_ctype? tycl_hdr constrs derivings?
     | 'newtype' capi_ctype? tycl_hdr constrs derivings?
@@ -183,7 +183,7 @@ ty_decl
     | 'data' capi_ctype? tycl_hdr opt_kind_sig? gadt_constrlist? derivings?
     | 'newtype' capi_ctype? tycl_hdr opt_kind_sig? gadt_constrlist? derivings?
     // data/newtype family
-    | 'data' 'family' type opt_datafam_kind_sig?
+    | 'data' 'family' type_ opt_datafam_kind_sig?
     ;
 
 // standalone kind signature
@@ -268,9 +268,9 @@ where_type_family
 
 ty_fam_inst_eqn_list
     :
-    (open ty_fam_inst_eqns? close)
+    (open_ ty_fam_inst_eqns? close)
     | ('{' '..' '}')
-    | (open '..' close)
+    | (open_ '..' close)
     ;
 
 ty_fam_inst_eqns
@@ -280,8 +280,8 @@ ty_fam_inst_eqns
 
 ty_fam_inst_eqn
     :
-    'forall' tv_bndrs? '.' type '=' ktype
-    | type '=' ktype
+    'forall' tv_bndrs? '.' type_ '=' ktype
+    | type_ '=' ktype
     ;
 
 //  Associated type family declarations
@@ -295,8 +295,8 @@ ty_fam_inst_eqn
 
 at_decl_cls
     :
-    ('data' 'family'? type opt_datafam_kind_sig?)
-    | ('type' 'family'? type opt_at_kind_inj_sig?)
+    ('data' 'family'? type_ opt_datafam_kind_sig?)
+    | ('type' 'family'? type_ opt_at_kind_inj_sig?)
     | ('type' 'instance'? ty_fam_inst_eqn)
     ;
 
@@ -340,16 +340,16 @@ opt_at_kind_inj_sig
 
 tycl_hdr
     :
-    (tycl_context '=>' type)
-    | type
+    (tycl_context '=>' type_)
+    | type_
     ;
 
 tycl_hdr_inst
     :
-    ('forall' tv_bndrs? '.' tycl_context '=>' type)
-    | ('forall' tv_bndrs? '.' type)
-    | (tycl_context '=>' type)
-    | type
+    ('forall' tv_bndrs? '.' tycl_context '=>' type_)
+    | ('forall' tv_bndrs? '.' type_)
+    | (tycl_context '=>' type_)
+    | type_
     ;
 
 capi_ctype
@@ -395,24 +395,24 @@ pattern_synonym_decl
 
 pattern_synonym_lhs
     :
-    (con vars?)
+    (con vars_?)
     | (varid conop varid)
     | (con '{' cvars '}')
     ;
 
-vars
+vars_
     :
     varid+
     ;
 
 cvars
     :
-    var (',' var)*
+    var_ (',' var_)*
     ;
 
 where_decls
     :
-    'where' open decls? close
+    'where' open_ decls? close
     ;
 
 pattern_synonym_sig
@@ -439,7 +439,7 @@ decls_cls
 
 decllist_cls
     :
-    open decls_cls? close
+    open_ decls_cls? close
     ;
 
 // Class body
@@ -464,7 +464,7 @@ decls_inst
 
 decllist_inst
     :
-    open decls_inst? close
+    open_ decls_inst? close
     ;
 
 // Instance body
@@ -483,7 +483,7 @@ decls
 
 decllist
     :
-    open decls? close
+    open_ decls? close
     ;
 
 // Binding groups other than those of class and instance declarations
@@ -491,7 +491,7 @@ decllist
 binds
     :
     decllist
-    | (open dbinds? close)
+    | (open_ dbinds? close)
     ;
 
 wherebinds
@@ -603,7 +603,7 @@ safety : 'unsafe' | 'safe' | 'interruptible';
 
 fspec
     :
-    pstring? var '::' sigtypedoc
+    pstring? var_ '::' sigtypedoc
     ;
 
 // -------------------------------------------
@@ -625,7 +625,7 @@ sigtypedoc
 
 sig_vars
     :
-    var (',' var)*
+    var_ (',' var_)*
     ;
 
 sigtypes1
@@ -666,8 +666,8 @@ ctype
     :
     'forall' tv_bndrs? forall_vis_flag ctype
     | btype '=>' ctype
-    | var '::' type // not sure about this rule
-    | type
+    | var_ '::' type_ // not sure about this rule
+    | type_
     ;
 
 // -- Note [ctype and ctypedoc]
@@ -686,7 +686,7 @@ ctypedoc
     :
     'forall' tv_bndrs? forall_vis_flag ctypedoc
     | tycl_context '=>' ctypedoc
-    | var '::' type
+    | var_ '::' type_
     | typedoc
     ;
 
@@ -737,7 +737,7 @@ constr_context
 // is connected to the first type too.
 // -}
 
-type
+type_
     :
     btype
     | btype '->' ctype
@@ -805,7 +805,7 @@ atype
     | ('\'' qcon_nowiredlist)
     | ('\'' '(' ktype ',' comma_types ')')
     | ('\'' '[' comma_types? ']')
-    | ('\'' var)
+    | ('\'' var_)
     // Two or more [ty, ty, ty] must be a promoted list type, just as
     // if you had written '[ty, ty, ty]
     // (One means a list type, zero means the list type constructor,
@@ -909,7 +909,7 @@ kind
 
 gadt_constrlist
     :
-    'where' open gadt_constrs? semi* close
+    'where' open_ gadt_constrs? semi* close
     ;
 
 gadt_constrs
@@ -1131,7 +1131,7 @@ gdrh
 sigdecl
     :
     (infixexp '::' sigtypedoc)
-    | (var ',' sig_vars '::' sigtypedoc)
+    | (var_ ',' sig_vars '::' sigtypedoc)
     | (fixity integer? ops)
     | (pattern_synonym_sig)
     | ('{-#' 'COMPLETE' con_list opt_tyconsig? '#-}')
@@ -1237,7 +1237,7 @@ aexp2
     | ('(' tup_exprs ')')
     | ('(#' texp '#)')
     | ('(#' tup_exprs '#)')
-    | ('[' list ']')
+    | ('[' list_ ']')
     | '_'
     // Template Haskell
     | splice_untyped
@@ -1284,7 +1284,7 @@ acmd
 
 cvtopbody
     :
-    open cvtopdecls0? close
+    open_ cvtopdecls0? close
     ;
 
 cvtopdecls0
@@ -1325,7 +1325,7 @@ tup_tail
 // -------------------------------------------
 // List expressions
 
-list
+list_
     :
     texp
     | lexps
@@ -1383,10 +1383,10 @@ transformqual
 
 guards
     :
-    guard (',' guard)*
+    guard_ (',' guard_)*
     ;
 
-guard
+guard_
     :
     pat '<-' infixexp
     | 'let' decllist
@@ -1398,8 +1398,8 @@ guard
 
 alts
     :
-    (open (alt semi*)+ close)
-    | (open close)
+    (open_ (alt semi*)+ close)
+    | (open_ close)
     ;
 
 alt : pat alt_rhs ;
@@ -1464,7 +1464,7 @@ fpat
 
 stmtlist
     :
-    open stmts? close
+    open_ stmts? close
     ;
 
 stmts
@@ -1554,7 +1554,7 @@ namelist
 
 name_var
     :
-    var | con
+    var_ | con
     ;
 
 // -------------------------------------------
@@ -1685,7 +1685,7 @@ qtycls  : (modid '.')? tycls;
 // -------------------------------------------
 // Variables
 
-var	   : varid   | ( '(' varsym ')' );
+var_	   : varid   | ( '(' varsym ')' );
 
 qvar   : qvarid  | ( '(' qvarsym ')');
 
@@ -1747,7 +1747,7 @@ literal : integer | pfloat | pchar | pstring;
 // -------------------------------------------
 // Layout
 
-open : VOCURLY | OCURLY;
+open_ : VOCURLY | OCURLY;
 close : VCCURLY | CCURLY;
 semi : ';' | SEMI;
 

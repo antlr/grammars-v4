@@ -1,11 +1,5 @@
 ## Summary
 
-PHP 7.4 grammar with C# ([Sharwell runtime](https://github.com/tunnelvisionlabs/antlr4cs)) 
-and Java runtime by Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
-PHP keywords are case-insensitive, but tokens in grammar written in lower case.
-Thus [CaseInsensitiveInputStream](https://gist.github.com/sharwell/9424666) should be used.
-C# or Java code actions used for context-sensitivity features like Heredoc.
-
 Parser grammar based on [Phalanger](https://github.com/DEVSENSE/Phalanger) grammar
 by Jakub Míšek (jakubmisek).
 Html mode based on [ANTLR html grammar](https://github.com/antlr/grammars-v4/tree/master/html)

@@ -10,11 +10,9 @@ to provide the necessary tokens for the parser.
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
 grammar MASM;
-@ header{ 
- 	 package com.Ostermiller.Syntax;
- 	 }
+
 compilationUnit
-   : (segments | directive_exp1)* 'end' Identifier
+   : (segments | directive_exp1)* 'end' Identifier EOF
    ;
 
 segments
@@ -22,7 +20,7 @@ segments
    ;
 
 proc
-   : Identifier 'proc' (code)* 'ret' Identifier 'endp'
+   : Identifier 'proc' code* 'ret' Identifier 'endp'
    ;
 
 code
@@ -49,21 +47,21 @@ code
    ;
 
 binary_exp1
-   : o register Separator (register | Integer | memory)
-   | o memory Separator (register | Integer)
+   : o register_ Separator (register_ | Integer | memory)
+   | o memory Separator (register_ | Integer)
    ;
 
 unuary_exp1
-   : op (Integer | register | memory)
+   : op (Integer | register_ | memory)
    ;
 
 unuary_exp2
-   : ope (register | memory)
+   : ope (register_ | memory)
    ;
 
 binary_exp2
-   : oper register Separator (register | memory)
-   | oper memory Separator register
+   : oper register_ Separator (register_ | memory)
+   | oper memory Separator register_
    ;
 
 notarguments
@@ -71,7 +69,7 @@ notarguments
    ;
 
 binary_exp3
-   : operat (register | memory) Separator (register | Integer | memory)
+   : operat (register_ | memory) Separator (register_ | Integer | memory)
    ;
 
 unuary_exp3
@@ -79,31 +77,31 @@ unuary_exp3
    ;
 
 binary_exp4
-   : operator register Separator (register | memory)
+   : operator_ register_ Separator (register_ | memory)
    ;
 
 binary_exp5
-   : l register Separator memory
+   : l register_ Separator memory
    ;
 
 binary_exp6
-   : x (register | memory) Separator register
+   : x (register_ | memory) Separator register_
    ;
 
 binary_exp7
-   : s (register | memory) Separator (Integer | register)
+   : s (register_ | memory) Separator (Integer | register_)
    ;
 
 binary_exp8
-   : sh (register | memory) Separator register Separator (register | Integer)
+   : sh (register_ | memory) Separator register_ Separator (register_ | Integer)
    ;
 
 binary_exp9
-   : b (register | memory) Separator (register | memory)
+   : b (register_ | memory) Separator (register_ | memory)
    ;
 
 unuary_exp4
-   : call (register | memory | Integer)
+   : call (register_ | memory | Integer)
    ;
 
 unuary_exp5
@@ -111,11 +109,11 @@ unuary_exp5
    ;
 
 binary_exp10
-   : in register Separator (register | Integer)
+   : in_ register_ Separator (register_ | Integer)
    ;
 
 binary_exp11
-   : out (register | Integer) Separator register
+   : out (register_ | Integer) Separator register_
    ;
 
 binary_exp12
@@ -123,15 +121,16 @@ binary_exp12
    ;
 
 directive_exp1
-   : (directives Identifier | directives)
+   : directives Identifier
+   | directives
    ;
 
 variabledeclaration
-   : Identifier ty (question | String | Integer)
+   : Identifier ty (question | String_ | Integer)
    ;
 
 memory
-   : '[' (register | Identifier) ('+' ((register ('+' (Integer | Hexnum | Octalnum))?) | Integer | Hexnum | Octalnum))? ']'
+   : '[' (register_ | Identifier) ('+' (register_ ('+' (Integer | Hexnum | Octalnum))? | Integer | Hexnum | Octalnum))? ']'
    ;
 
 segmentos
@@ -143,7 +142,7 @@ segmentos
    | FS
    ;
 
-register
+register_
    : AH
    | AL
    | AX
@@ -332,7 +331,7 @@ operato
    | JNG
    ;
 
-operator
+operator_
    : MOVZX
    | BSF
    | BSR
@@ -384,7 +383,7 @@ interruption
    | RETF
    ;
 
-in
+in_
    : IN
    ;
 
@@ -1748,7 +1747,7 @@ Hexnum
 
 
 Integer
-   : (Digit +)
+   : Digit+
    ;
 
 
@@ -1758,7 +1757,7 @@ Octalnum
 
 
 fragment HexDigit
-   : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+   : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
    ;
 
 
@@ -1772,13 +1771,13 @@ fragment Exponent
    ;
 
 
-String
+String_
    : ' \'' ('\\' . | ~ ('\\' | '\''))* '\''
    ;
 
 
 fragment Letter
-   : ('a' .. 'z' | 'A' .. 'Z')
+   : 'a' .. 'z' | 'A' .. 'Z'
    ;
 
 
@@ -1788,7 +1787,7 @@ fragment Digit
 
 
 Etiqueta
-   : Identifier (':')
+   : Identifier ':'
    ;
 
 

@@ -25,7 +25,7 @@
 grammar PROV_N;
 
 document
-   : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT
+   : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT EOF
    ;
 
 /* parser */
@@ -43,10 +43,10 @@ defaultNamespaceDeclaration
 
 */
 namespaceDeclaration
-   : 'prefix' PREFX namespace
+   : 'prefix' PREFX namespace_
    ;
 
-namespace
+namespace_
    : IRI_REF
    ;
 

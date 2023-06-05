@@ -51,7 +51,7 @@ formals
 	;
 
 operatorTemplate
-	: RELATION template #RelationOperatorTemplate
+	: RELATION template_ #RelationOperatorTemplate
 	| FUNCTION categoryTemplate #FunctionOperatorTemplate
 	| GENERIC categoryTemplate #GenericOperatorTemplate
 	;
@@ -72,7 +72,7 @@ assoc
 	| RIGHTASSOC
 	;
 
-template
+template_
 	: prefixTemplate
 	| postfixTemplate
 	| infixTemplate
