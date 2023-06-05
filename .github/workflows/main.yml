@@ -303,7 +303,7 @@ jobs:
       run: |
         mkdir downloads
         find . -type f -name cover.html | xargs tar -uf archive.tar
-	cd downloads
+        cd downloads
         tar -xvf ../downloads/archive.tar
     - name: Upload Archive
       uses: actions/upload-artifact@v2
