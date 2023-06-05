@@ -1,6 +1,7 @@
-<!-- This file is provided exclusively for Dependabot updates to dotnet tools.
-  No executable is actually built with this project.
--->
+<!-- This file is provided so Dependabot updates the
+  -- dotnet tools. It should not be used in a build.
+  -- See https://github.com/dependabot/dependabot-core/issues/7390
+  -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
