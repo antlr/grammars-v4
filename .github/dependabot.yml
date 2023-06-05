@@ -62,3 +62,12 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:python3"
+  # TypeScript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/TypeScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:typescript"
