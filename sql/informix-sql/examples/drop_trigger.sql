@@ -1,0 +1,3 @@
+DROP TRIGGER tgr;
+DROP TRIGGER own.tgr;
+DROP TRIGGER IF EXISTS own.tgr;

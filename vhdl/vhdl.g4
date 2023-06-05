@@ -17,145 +17,120 @@
 
 grammar vhdl;
 
-ABS: A B S;
-ACCESS : A C C E S S;
-ACROSS : A C R O S S;
-AFTER : A F T E R;
-ALIAS : A L I A S;
-ALL : A L L;
-AND : A N D;
-ARCHITECTURE : A R C H I T E C T U R E;
-ARRAY : A R R A Y;
-ASSERT : A S S E R T;
-ATTRIBUTE : A T T R I B U T E;
-BEGIN : B E G I N;
-BLOCK : B L O C K;
-BODY : B O D Y;
-BREAK : B R E A K;
-BUFFER : B U F F E R;
-BUS : B U S;
-CASE : C A S E;
-COMPONENT : C O M P O N E N T;
-CONFIGURATION : C O N F I G U R A T I O N;
-CONSTANT : C O N S T A N T;
-DISCONNECT : D I S C O N N E C T;
-DOWNTO : D O W N T O;
-END : E N D;
-ENTITY : E N T I T Y;
-ELSE : E L S E;
-ELSIF : E L S I F;
-EXIT : E X I T;
-FILE : F I L E;
-FOR : F O R;
-FUNCTION : F U N C T I O N;
-GENERATE : G E N E R A T E;
-GENERIC : G E N E R I C;
-GROUP : G R O U P;
-GUARDED : G U A R D E D;
-IF : I F;
-IMPURE : I M P U R E;
-IN : I N;
-INERTIAL : I N E R T I A L;
-INOUT : I N O U T;
-IS : I S;
-LABEL : L A B E L;
-LIBRARY : L I B R A R Y;
-LIMIT : L I M I T;
-LINKAGE : L I N K A G E;
-LITERAL : L I T E R A L;
-LOOP : L O O P;
-MAP : M A P;
-MOD : M O D;
-NAND : N A N D;
-NATURE : N A T U R E;
-NEW : N E W;
-NEXT : N E X T;
-NOISE : N O I S E;
-NOR : N O R;
-NOT : N O T;
-NULL_ : N U L L;
-OF : O F;
-ON : O N;
-OPEN : O P E N;
-OR : O R;
-OTHERS : O T H E R S;
-OUT : O U T;
-PACKAGE : P A C K A G E;
-PORT : P O R T;
-POSTPONED : P O S T P O N E D;
-PROCESS : P R O C E S S;
-PROCEDURE : P R O C E D  U R E;
-PROCEDURAL : P R O C E D U R A L;
-PURE : P U R E;
-QUANTITY : Q U A N T I T Y;
-RANGE : R A N G E;
-REVERSE_RANGE : R E V E R S E '_' R A N G E;
-REJECT : R E J E C T;
-REM : R E M;
-RECORD : R E C O R D;
-REFERENCE : R E F E R E N C E;
-REGISTER : R E G I S T E R;
-REPORT : R E P O R T;
-RETURN : R E T U R N;
-ROL : R O L;
-ROR : R O R;
-SELECT : S E L E C T;
-SEVERITY : S E V E R I T Y;
-SHARED : S H A R E D;
-SIGNAL : S I G N A L;
-SLA : S L A;
-SLL : S L L;
-SPECTRUM : S P E C T R U M;
-SRA : S R A;
-SRL : S R L;
-SUBNATURE : S U B N A T U R E;
-SUBTYPE : S U B T Y P E;
-TERMINAL : T E R M I N A L;
-THEN : T H E N;
-THROUGH : T H R O U G H;
-TO : T O;
-TOLERANCE : T O L E R A N C E;
-TRANSPORT : T R A N S P O R T;
-TYPE : T Y P E;
-UNAFFECTED : U N A F F E C T E D;
-UNITS : U N I T S;
-UNTIL : U N T I L;
-USE : U S E;
-VARIABLE : V A R I A B L E;
-WAIT : W A I T;
-WITH : W I T H;
-WHEN : W H E N;
-WHILE : W H I L E;
-XNOR : X N O R;
-XOR : X O R;
+options { caseInsensitive = true; }
 
-// case insensitive chars
-fragment A:('a'|'A');
-fragment B:('b'|'B');
-fragment C:('c'|'C');
-fragment D:('d'|'D');
-fragment E:('e'|'E');
-fragment F:('f'|'F');
-fragment G:('g'|'G');
-fragment H:('h'|'H');
-fragment I:('i'|'I');
-fragment J:('j'|'J');
-fragment K:('k'|'K');
-fragment L:('l'|'L');
-fragment M:('m'|'M');
-fragment N:('n'|'N');
-fragment O:('o'|'O');
-fragment P:('p'|'P');
-fragment Q:('q'|'Q');
-fragment R:('r'|'R');
-fragment S:('s'|'S');
-fragment T:('t'|'T');
-fragment U:('u'|'U');
-fragment V:('v'|'V');
-fragment W:('w'|'W');
-fragment X:('x'|'X');
-fragment Y:('y'|'Y');
-fragment Z:('z'|'Z');
+ABS           : 'ABS';
+ACCESS        : 'ACCESS';
+ACROSS        : 'ACROSS';
+AFTER         : 'AFTER';
+ALIAS         : 'ALIAS';
+ALL           : 'ALL';
+AND           : 'AND';
+ARCHITECTURE  : 'ARCHITECTURE';
+ARRAY         : 'ARRAY';
+ASSERT        : 'ASSERT';
+ATTRIBUTE     : 'ATTRIBUTE';
+BEGIN         : 'BEGIN';
+BLOCK         : 'BLOCK';
+BODY          : 'BODY';
+BREAK         : 'BREAK';
+BUFFER        : 'BUFFER';
+BUS           : 'BUS';
+CASE          : 'CASE';
+COMPONENT     : 'COMPONENT';
+CONFIGURATION : 'CONFIGURATION';
+CONSTANT      : 'CONSTANT';
+DISCONNECT    : 'DISCONNECT';
+DOWNTO        : 'DOWNTO';
+END           : 'END';
+ENTITY        : 'ENTITY';
+ELSE          : 'ELSE';
+ELSIF         : 'ELSIF';
+EXIT          : 'EXIT';
+FILE          : 'FILE';
+FOR           : 'FOR';
+FUNCTION      : 'FUNCTION';
+GENERATE      : 'GENERATE';
+GENERIC       : 'GENERIC';
+GROUP         : 'GROUP';
+GUARDED       : 'GUARDED';
+IF            : 'IF';
+IMPURE        : 'IMPURE';
+IN            : 'IN';
+INERTIAL      : 'INERTIAL';
+INOUT         : 'INOUT';
+IS            : 'IS';
+LABEL         : 'LABEL';
+LIBRARY       : 'LIBRARY';
+LIMIT         : 'LIMIT';
+LINKAGE       : 'LINKAGE';
+LITERAL       : 'LITERAL';
+LOOP          : 'LOOP';
+MAP           : 'MAP';
+MOD           : 'MOD';
+NAND          : 'NAND';
+NATURE        : 'NATURE';
+NEW           : 'NEW';
+NEXT          : 'NEXT';
+NOISE         : 'NOISE';
+NOR           : 'NOR';
+NOT           : 'NOT';
+NULL_         : 'NULL';
+OF            : 'OF';
+ON            : 'ON';
+OPEN          : 'OPEN';
+OR            : 'OR';
+OTHERS        : 'OTHERS';
+OUT           : 'OUT';
+PACKAGE       : 'PACKAGE';
+PORT          : 'PORT';
+POSTPONED     : 'POSTPONED';
+PROCESS       : 'PROCESS';
+PROCEDURE     : 'PROCEDURE';
+PROCEDURAL    : 'PROCEDURAL';
+PURE          : 'PURE';
+QUANTITY      : 'QUANTITY';
+RANGE         : 'RANGE';
+REVERSE_RANGE : 'REVERSE_RANGE';
+REJECT        : 'REJECT';
+REM           : 'REM';
+RECORD        : 'RECORD';
+REFERENCE     : 'REFERENCE';
+REGISTER      : 'REGISTER';
+REPORT        : 'REPORT';
+RETURN        : 'RETURN';
+ROL           : 'ROL';
+ROR           : 'ROR';
+SELECT        : 'SELECT';
+SEVERITY      : 'SEVERITY';
+SHARED        : 'SHARED';
+SIGNAL        : 'SIGNAL';
+SLA           : 'SLA';
+SLL           : 'SLL';
+SPECTRUM      : 'SPECTRUM';
+SRA           : 'SRA';
+SRL           : 'SRL';
+SUBNATURE     : 'SUBNATURE';
+SUBTYPE       : 'SUBTYPE';
+TERMINAL      : 'TERMINAL';
+THEN          : 'THEN';
+THROUGH       : 'THROUGH';
+TO            : 'TO';
+TOLERANCE     : 'TOLERANCE';
+TRANSPORT     : 'TRANSPORT';
+TYPE          : 'TYPE';
+UNAFFECTED    : 'UNAFFECTED';
+UNITS         : 'UNITS';
+UNTIL         : 'UNTIL';
+USE           : 'USE';
+VARIABLE      : 'VARIABLE';
+WAIT          : 'WAIT';
+WITH          : 'WITH';
+WHEN          : 'WHEN';
+WHILE         : 'WHILE';
+XNOR          : 'XNOR';
+XOR           : 'XOR';
+
 
 
 //------------------------------------------Parser----------------------------------------
@@ -1583,33 +1558,33 @@ BIT_STRING_LITERAL
   ;
 
 BIT_STRING_LITERAL_BINARY
-    :   ('b'|'B') '"' ('1' | '0' | '_')+ '"'
+    :   'B"' ('1' | '0' | '_')+ '"'
     ;
 
 BIT_STRING_LITERAL_OCTAL
-    :   ('o'|'O') '"' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
+    :   'O"' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
     ;
 
 BIT_STRING_LITERAL_HEX
-    :   ('x'|'X') '"' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
+    :   'X"' ( 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
     ;
 
 REAL_LITERAL
    :    INTEGER '.' INTEGER  ( EXPONENT )?;
 
 BASIC_IDENTIFIER
-   :   LETTER ( '_' ( LETTER | DIGIT ) | LETTER | DIGIT )*
+   :    LETTER ( '_' ( LETTER | DIGIT ) | LETTER | DIGIT )*
    ;
    
 EXTENDED_IDENTIFIER
-  : '\\' ( 'a'..'z' | '0'..'9' | '&' | '\'' | '(' | ')'
+  : '\\' ( LETTER | '0'..'9' | '&' | '\'' | '(' | ')'
     | '+' | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '|'
     | ' ' | OTHER_SPECIAL_CHARACTER | '\\'
     | '#' | '[' | ']' | '_' )+ '\\'
   ;
 
 LETTER	
-  :  'a'..'z' | 'A'..'Z'
+  :  'A'..'Z'
   ;
 
 COMMENT
@@ -1643,18 +1618,11 @@ STRING_LITERAL
 
 OTHER_SPECIAL_CHARACTER
   : '!' | '$' | '%' | '@' | '?' | '^' | '`' | '{' | '}' | '~'
-  | ' ' | 'Ў' | 'ў' | 'Ј' | '¤' | 'Ґ' | '¦' | '§'
-  | 'Ё' | '©' | 'Є' | '«' | '¬' | '­' | '®' | 'Ї'
-  | '°' | '±' | 'І' | 'і' | 'ґ' | 'µ' | '¶' | '·'
-  | 'ё' | '№' | 'є' | '»' | 'ј' | 'Ѕ' | 'ѕ' | 'ї'
-  | 'А' | 'Б' | 'В' | 'Г' | 'Д' | 'Е' | 'Ж' | 'З'
-  | 'И' | 'Й' | 'К' | 'Л' | 'М' | 'Н' | 'О' | 'П'
-  | 'Р' | 'С' | 'Т' | 'У' | 'Ф' | 'Х' | 'Ц' | 'Ч'
-  | 'Ш' | 'Щ' | 'Ъ' | 'Ы' | 'Ь' | 'Э' | 'Ю' | 'Я'
-  | 'а' | 'б' | 'в' | 'г' | 'д' | 'е' | 'ж' | 'з'
-  | 'и' | 'й' | 'к' | 'л' | 'м' | 'н' | 'о' | 'п'
-  | 'р' | 'с' | 'т' | 'у' | 'ф' | 'х' | 'ц' | 'ч'
-  | 'ш' | 'щ' | 'ъ' | 'ы' | 'ь' | 'э' | 'ю' | 'я'
+  | ' ' | '\u00A4' | '\u00A6' | '\u00A7'
+  | '\u00A9' | '\u00AB' | '\u00AC' | '\u00AD' | '\u00AE'
+  | '\u00B0' | '\u00B1' | '\u00B5' | '\u00B6' | '\u00B7'
+  | '\u2116' | '\u00BB'
+  | '\u0400'..'\u045E'
   ;
 
 
@@ -1688,12 +1656,12 @@ BACKSLASH     : '\\'  ;
   
 
 EXPONENT
-  :  ('E'|'e') ( '+' | '-' )? INTEGER
+  :  'E' ( '+' | '-' )? INTEGER
   ;
 
 
 HEXDIGIT
-    :	('A'..'F'|'a'..'f')
+    :	'A'..'F'
     ;
 
 
