@@ -1,6 +1,6 @@
 import {Lexer, Token, CharStream} from "antlr4";
 
-export abstract class Fortran90LexerBase extends Lexer {
+export default class Fortran90LexerBase extends Lexer {
 
     constructor(input: CharStream) {
         super(input);
