@@ -94,7 +94,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.25; done
+        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.26; done
     - name: Test
       shell: pwsh
       run: |
@@ -191,7 +191,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.25; done
+        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.26; done
     - name: Test
       shell: bash
       run: |
@@ -286,7 +286,7 @@ jobs:
     - name: Install trgen
       shell: bash
       run: |
-        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.25; done
+        for i in trcover trgen triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.26; done
     - name: Test
       shell: bash
       run: |
