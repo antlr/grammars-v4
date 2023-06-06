@@ -26,6 +26,8 @@
 ./CSharp/Encodings.cs
 ./CSharp/ErrorListener.cs
 ./CSharp/makefile
+./CSharp/Other.csproj
+./CSharp/Other.meta
 ./CSharp/run.ps1
 ./CSharp/run.sh
 ./CSharp/Test.cs
@@ -40,6 +42,7 @@
 ./Dart/makefile
 ./Dart/MyErrorListener.dart
 ./Dart/pubspec.yaml
+./Dart/pubspec.yaml.meta
 ./Dart/run.ps1
 ./Dart/run.sh
 ./Dart/Test.dart

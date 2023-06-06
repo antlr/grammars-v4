@@ -34,14 +34,28 @@ sqlScript
 
 unitStatement
     : (createRole
+    | closeStmt
+    | closeDatabaseStmt
+    | commitWorkStmt
     | dropAccessMethod
     | dropAggregate
     | dropDatabase
+    | dropIndex
     | dropRole
+    | dropSynonym
     | dropTable
+    | dropTrigger
+    | dropTrustedContext
     | dropType
     | dropUser
     | dropView
+    | dropXadatasource
+    | dropXadataTypeSource
+    | databaseStmt
+    | releaseSavepoint
+    | renameColumn
+    | renameDatabase
+    | renameConstraint
     ) SCOL
     ;
 
@@ -55,11 +69,25 @@ dropRole
     : DROP ROLE (IF EXISTS)? roleName=anyName
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-synonym-statement
+dropSynonym
+    : DROP SYNONYM (IF EXISTS)? synonymName=identifier
+    ;
+
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
 dropTable
     : DROP TABLE (IF EXISTS)? tableName=identifier (CASCADE | RESTRICT)?
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trigger-statement
+dropTrigger
+    : DROP TRIGGER (IF EXISTS)? triggerName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trusted-context-statement
+dropTrustedContext
+    : DROP TRUSTED CONTEXT contextName=anyName
+    ;
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
 dropType
     : DROP TYPE (IF EXISTS)? dataTypeName=identifier RESTRICT
@@ -73,6 +101,16 @@ dropUser
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
 dropView
     : DROP VIEW (IF EXISTS)? viewName=identifier (CASCADE | RESTRICT)?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-statement
+dropXadatasource
+    : DROP XADATASOURCE (IF EXISTS)? xaSourceName=identifier RESTRICT
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-type-statement
+dropXadataTypeSource
+    : DROP XADATASOURCE TYPE (IF EXISTS)? xaSourceName=identifier RESTRICT
     ;
 
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
@@ -90,12 +128,57 @@ dropDatabase
     : DROP DATABASE (IF EXISTS)? databaseName=identifier
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-index-statement
+dropIndex
+    : DROP INDEX (IF EXISTS)? indexName=identifier ONLINE?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-statement
+closeStmt
+    : CLOSE cursorId=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-database-statement
+closeDatabaseStmt
+    : CLOSE DATABASE
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-database-statement
+databaseStmt
+    : DATABASE databaseName=anyName EXCLUSIVE?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-commit-work-statement
+commitWorkStmt
+    : COMMIT WORK?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-release-savepoint-statement
+releaseSavepoint
+    : RELEASE SAVEPOINT savepointName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-column-statement
+renameColumn
+    : RENAME COLUMN oldColumn=identifier TO newColumn=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-constraint-statement
+renameConstraint
+    : RENAME CONSTRAINT oldConstraint=identifier TO newConstraint=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-database-statement
+renameDatabase
+    : RENAME DATABASE oldDatabase=identifier TO newDatabase=identifier
+    ;
+
 anyName
     : IDENTIFIER
     | keyword
     | STRING_LITERAL
     | OPEN_PAR anyName CLOSE_PAR
-;
+    ;
 
 identifier
     : anyName ('.' anyName)*
@@ -124,11 +207,13 @@ keyword
     | CASE
     | CAST
     | CHECK
+    | CLOSE
     | COLLATE
     | COLUMN
     | COMMIT
     | CONFLICT
     | CONSTRAINT
+    | CONTEXT
     | CREATE
     | CROSS
     | CURRENT_DATE
@@ -187,6 +272,7 @@ keyword
     | OF
     | OFFSET
     | ON
+    | ONLINE
     | OR
     | ORDER
     | OUTER
@@ -210,6 +296,7 @@ keyword
     | SAVEPOINT
     | SELECT
     | SET
+    | SYNONYM
     | TABLE
     | TEMP
     | TEMPORARY
@@ -217,6 +304,7 @@ keyword
     | TO
     | TRANSACTION
     | TRIGGER
+    | TRUSTED
     | TYPE
     | UNION
     | UNIQUE
@@ -231,6 +319,8 @@ keyword
     | WHERE
     | WITH
     | WITHOUT
+    | WORK
+    | XADATASOURCE
     | FIRST_VALUE
     | OVER
     | PARTITION
