@@ -23,7 +23,15 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:csharp-standard"
-  # dart is not supported by bot
+  # dart
+  - package-ecosystem: "pub"
+    directory: "/_scripts/templates/Dart"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:dart"
   # go
   # TODO: go runtime need tagged version, may need another repository
   # - package-ecosystem: "gomod"
