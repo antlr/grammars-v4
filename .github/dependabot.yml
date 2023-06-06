@@ -35,7 +35,16 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:csharp-standard"
-  # JavaScript
+  # Dart
+  - package-ecosystem: "pub"
+    directory: "/_scripts/templates/Dart"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:dart"
+ # JavaScript
   - package-ecosystem: "npm"
     directory: "/_scripts/templates/JavaScript"
     schedule:
