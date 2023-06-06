@@ -54,9 +54,9 @@ unitStatement
     | databaseStmt
     | releaseSavepoint
     | renameColumn
+    | renameConstraint
     | renameDatabase
     | renameIndex
-    | renameConstraint
     ) SCOL
     ;
 
