@@ -69,6 +69,7 @@ dmlStatement
     | deleteStatement | replaceStatement | callStatement
     | loadDataStatement | loadXmlStatement | doStatement
     | handlerStatement | valuesStatement | withStatement
+    | tableStatement
     ;
 
 transactionStatement
@@ -2033,6 +2034,10 @@ signalConditionInformation
 
 withStatement
   : WITH RECURSIVE? commonTableExpressions (',' commonTableExpressions)*
+  ;
+
+tableStatement
+  : TABLE tableName orderByClause? limitClause?
   ;
 
 diagnosticsStatement
