@@ -1,5 +1,4 @@
 import org.antlr.v4.runtime.*;
-import java.util.Stack;
 
 public abstract class XPath31ParserBase extends Parser
 {
