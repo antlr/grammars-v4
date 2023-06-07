@@ -3,61 +3,61 @@
   "isRoot": true,
   "tools": {
     "trcaret": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trcaret"
       ]
     },
     "trcover": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trcover"
       ]
     },
     "trgen": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trgen"
       ]
     },
     "triconv": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "triconv"
       ]
     },
     "trparse": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trparse"
       ]
     },
     "trtext": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trtext"
       ]
     },
     "trwdog": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trwdog"
       ]
     },
     "trxgrep": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trxgrep"
       ]
     },
     "trxml": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trxml"
       ]
     },
     "trxml2": {
-      "version": "0.20.25",
+      "version": "0.20.26",
       "commands": [
         "trxml2"
       ]
