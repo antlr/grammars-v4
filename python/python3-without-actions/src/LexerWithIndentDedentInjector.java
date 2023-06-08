@@ -48,7 +48,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     // **** THE FOLLOWING SECTION ALSO CAN BE USED IN THE @lexer::members{} SECTION OF THE GRAMMAR ****
     // ************************************************************************************************
     // The stack that keeps track of the indentation lengths
-    private Stack<Integer> indentLengths = new Stack<>();
+    private Deque<Integer> indentLengths = new ArrayDeque<>();
     // A linked list where extra tokens are pushed on
     private LinkedList<Token> pendingTokens = new LinkedList<>();
     // An int that stores the last pending token type (including the inserted INDENT/DEDENT/NEWLINE token types also)
