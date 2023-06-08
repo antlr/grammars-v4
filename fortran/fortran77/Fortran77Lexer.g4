@@ -28,6 +28,9 @@
  */
 lexer grammar Fortran77Lexer;
 
+options { superClass = Fortran77LexerBase; } 
+
+// Insert here @header for C++ lexer.
 
 PROGRAM
    : 'program' | 'PROGRAM'
@@ -650,7 +653,7 @@ NAME
 
 
 COMMENT
-   : {getCharPositionInLine() == 0}? ('c' | STARCHAR) (~ [\r\n])* EOL -> channel(HIDDEN)
+   : {this.IsColumnZero()}? ('c' | STARCHAR) (~ [\r\n])* EOL -> channel(HIDDEN)
    ;
 
 STAR
