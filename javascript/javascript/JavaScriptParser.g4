@@ -81,12 +81,28 @@ importStatement
     ;
 
 importFromBlock
-    : importDefault? (importNamespace | moduleItems) importFrom eos
+    : importDefault? (importNamespace | importModuleItems) importFrom eos
     | StringLiteral eos
     ;
 
-moduleItems
-    : '{' (aliasName ',')* (aliasName ','?)? '}'
+importModuleItems
+    : '{' (importAliasName ',')* (importAliasName ','?)? '}'
+    ;
+
+importAliasName
+    : moduleExportName (As importedBinding)?
+    ;
+
+moduleExportName
+    : identifierName
+    | StringLiteral
+    ;
+
+// yield and await are permitted as BindingIdentifier in the grammar
+importedBinding
+    : Identifier
+    | Yield
+    | Await
     ;
 
 importDefault
@@ -106,13 +122,21 @@ aliasName
     ;
 
 exportStatement
-    : Export (exportFromBlock | declaration) eos    # ExportDeclaration
-    | Export Default singleExpression eos           # ExportDefaultDeclaration
+    : Export Default? (exportFromBlock | declaration) eos    # ExportDeclaration
+    | Export Default singleExpression eos                    # ExportDefaultDeclaration
     ;
 
 exportFromBlock
     : importNamespace importFrom eos
-    | moduleItems importFrom? eos
+    | exportModuleItems importFrom? eos
+    ;
+
+exportModuleItems
+    : '{' (exportAliasName ',')* (exportAliasName ','?)? '}'
+    ;
+
+exportAliasName
+    : moduleExportName (As moduleExportName)?
     ;
 
 declaration
