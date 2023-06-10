@@ -105,4 +105,13 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     IsStartOfFile() {
         return this.lastToken === null;
     }
+
+    reset() {
+        this.scopeStrictModes = new Array();
+        this.lastToken = null;
+        this.useStrictDefault = false;
+        this.useStrictCurrent = false;
+        this.templateDepth = 0;
+        super.reset();
+    }
 }

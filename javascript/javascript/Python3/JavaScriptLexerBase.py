@@ -111,3 +111,11 @@ class JavaScriptLexerBase(Lexer):
             return False
 
         return True
+
+    def reset(self):
+        self.scopeStrictModes = []
+        self.lastToken: Token = None
+        self.templateDepth = 0
+        self.useStrictDefault = False
+        self.useStrictCurrent = False
+        super(JavaScriptLexerBase, self).reset()
