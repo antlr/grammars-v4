@@ -28,7 +28,7 @@ jobs:
       uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: '7.0.x'
-    - name: Do not trust Dotnet env
+    - name: Test Dotnet
       run: |
         dotnet --version
         dotnet --info
@@ -39,7 +39,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'zulu'
-    - name: Do not trust Java env
+    - name: Test Java
       run: |
         dotnet --version
         java --version
@@ -47,7 +47,7 @@ jobs:
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
       uses: dart-lang/setup-dart@v1
-    - name: Do not trust Dart env
+    - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
@@ -56,7 +56,7 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '^1.18.0'
-    - name: Do not trust Go env
+    - name: Test Go
       if: ${{ matrix.language == 'Go' }}
       run: |
         go version
@@ -64,13 +64,13 @@ jobs:
       uses: actions/setup-python@v4.6.1
       with:
         python-version: '3.10'
-    - name: Do not trust Python env
+    - name: Test Python
       run: |
         python --version
     - name: Upgrade Pip.
       run: |
         python -m ensurepip --upgrade
-    - name: Do not trust Pip.
+    - name: Test Pip.
       run: |
         pip --version
     - name: Install Antlr tool
@@ -81,7 +81,7 @@ jobs:
       uses: actions/setup-node@v3.6.0
       with:
         node-version: '16.13.0'
-    - name: Do not trust JavaScript env
+    - name: Test JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
@@ -91,10 +91,14 @@ jobs:
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
-    - name: Install trgen
+    - name: Install Trash
       shell: bash
       run: |
-        for i in trgen trcaret triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.25; done
+        dotnet tool restore
+    - name: Test Trash install
+      shell: bash
+      run: |
+        dotnet trgen -- --help
     - name: Test
       shell: pwsh
       run: |
@@ -106,8 +110,7 @@ jobs:
             $Before = "${{ github.event.before }}"
             $After = "${{ github.event.after }}"
         }
-        $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
-        _scripts/test.ps1 -antlrjar /tmp/antlr4-complete.jar -target ${{ matrix.language }} -pc "$Before" -cc "$After"
+        _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
   build-bash:
     runs-on: ${{ matrix.os }}
@@ -131,7 +134,7 @@ jobs:
       uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: '7.0.x'
-    - name: Do not trust Dotnet env
+    - name: Test Dotnet
       run: |
         dotnet --version
         dotnet --info
@@ -142,7 +145,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'zulu'
-    - name: Do not trust Java env
+    - name: Test Java
       run: |
         dotnet --version
         java --version
@@ -150,7 +153,7 @@ jobs:
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
       uses: dart-lang/setup-dart@v1
-    - name: Do not trust Dart env
+    - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
@@ -159,7 +162,7 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '^1.18.0'
-    - name: Do not trust Go env
+    - name: Test Go
       if: ${{ matrix.language == 'Go' }}
       run: |
         go version
@@ -167,13 +170,13 @@ jobs:
       uses: actions/setup-python@v4.6.1
       with:
         python-version: '3.10'
-    - name: Do not trust Python env
+    - name: Test Python
       run: |
         python --version
     - name: Upgrade Pip.
       run: |
         python -m ensurepip --upgrade
-    - name: Do not trust Pip.
+    - name: Test Pip.
       run: |
         pip --version
     - name: Install Antlr tool
@@ -184,14 +187,18 @@ jobs:
       uses: actions/setup-node@v3.6.0
       with:
         node-version: '16.13.0'
-    - name: Do not trust JavaScript env
+    - name: Test JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
-    - name: Install trgen
+    - name: Install Trash
       shell: bash
       run: |
-        for i in trgen trcaret triconv trwdog trxml trxml2; do dotnet tool install -g $i --version 0.20.25; done
+        dotnet tool restore
+    - name: Test Trash install
+      shell: bash
+      run: |
+        dotnet trgen -- --help
     - name: Test
       shell: bash
       run: |

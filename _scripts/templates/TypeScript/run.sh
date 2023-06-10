@@ -12,8 +12,8 @@ case `uname` in
 esac
 
 if [ -x "$basedir/node" ]; then
-  exec trwdog "$basedir/node" "$basedir/node_modules/ts-node/dist/bin.js" Test.js "$@"
+  exec dotnet trwdog -- "$basedir/node" "$basedir/node_modules/ts-node/dist/bin.js" Test.js "$@"
 else 
-  exec trwdog node "$basedir/node_modules/ts-node/dist/bin.js" Test.js "$@"
+  exec dotnet trwdog -- node "$basedir/node_modules/ts-node/dist/bin.js" Test.js "$@"
 fi
 exit $?
