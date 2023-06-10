@@ -148,4 +148,14 @@ public abstract class JavaScriptLexerBase extends Lexer
                 return true;
         }
     }
+
+    @Override
+    public void reset() {
+        this.scopeStrictModes.clear();
+        this.lastToken = null;
+        this.useStrictDefault = false;
+        this.useStrictCurrent = false;
+        this.templateDepth = 0;
+        super.reset();
+    }
 }

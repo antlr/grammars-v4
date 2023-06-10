@@ -114,3 +114,14 @@ func (l *JavaScriptLexerBase) DecreaseTemplateDepth() {
 func (l *JavaScriptLexerBase) IsInTemplateString() bool {
 	return l.templateDepth > 0
 }
+
+func (l *JavaScriptLexerBase) Reset() {
+    l.scopeStrictModes = nil
+    l.stackLength = 0
+    l.stackIx = 0
+    l.lastToken = nil
+    l.useStrictDefault = false
+    l.useStrictCurrent = false
+    l.templateDepth = 0
+	l.BaseLexer.Reset()
+}
