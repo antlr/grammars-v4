@@ -100,9 +100,9 @@ def index_grammars(root : str) -> Sequence[dict]:
             for name in files:
                 if name.endswith(".g4"):
                     foo = os.path.join(path, name)
-                    p1 = subprocess.Popen(["trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
-                    p2 = subprocess.Popen(["trxgrep", "//actionBlock[1]"], stdin=p1.stdout, stdout=subprocess.PIPE)
-                    p3 = subprocess.Popen(["trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
+                    p1 = subprocess.Popen(["dotnet", "trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
+                    p2 = subprocess.Popen(["dotnet", "trxgrep", "//actionBlock[1]"], stdin=p1.stdout, stdout=subprocess.PIPE)
+                    p3 = subprocess.Popen(["dotnet", "trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
                     bar = p3.stdout.readline()
                     if bar:
                         skip = True
