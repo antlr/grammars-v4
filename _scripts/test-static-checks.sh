@@ -345,64 +345,8 @@ do
         fi
     fi
 
-    # Generate driver source code.
+    curl https://raw.githubusercontent.com/kaby76/g4-checks/d0e97c52787c9f47d6c3dd94f26159531fee7ee0/find-useless.sh 2> /dev/null | bash 1>&2
 
-    if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -- -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
-    for i in $bad; do failed+=( "$testname/$target" ); done
-
-    for d in `echo Generated-$target-* Generated-$target`
-    do
-        if [ ! -d $d ]; then continue; fi
-        if [ ! -f $d/build.sh ]; then echo " no build.sh"; continue; fi
-
-        # Build driver code.
-        if [ $quiet != "true" ]; then echo "Building."; fi
-        pushd $d > /dev/null
-        date1=$(date +"%s")
-        bash build.sh > output.txt 2>&1
-        status="$?"
-        date2=$(date +"%s")
-        DIFF=$(($date2-$date1))
-        length=" Build "`thetime $DIFF`
-        if [ "$status" != "0" ]
-        then
-            echo ""
-            echo ========
-            echo "Build of $testname for $target failed."
-            cat output.txt
-            failed+=( "$testname/$target" )
-            echo ========
-            popd > /dev/null
-            continue
-        else
-            echo "$length"
-        fi
-
-        # Test generated parser on examples.
-        if [ $quiet != "true" ]; then echo "Parsing."; fi
-        date1=$(date +"%s")
-        bash test.sh > output.txt 2>&1
-        status="$?"
-        date2=$(date +"%s")
-        DIFF=$(($date2-$date1))
-        length=" Test "`thetime $DIFF`
-        echo "$length"
-        if [ "$status" != "0" ]
-        then
-            echo ""
-            echo ========
-            echo "Parsing tests of $testname for $target failed."
-            cat output.txt
-            failed+=( "$testname/$target" )
-            echo ========
-            else
-            echo " Succeeded."      
-            succeeded+=( "$testname,$target" )
-        fi
-
-        popd > /dev/null
-    done
     popd > /dev/null
 done
 

@@ -104,4 +104,3 @@ primitive
     | (PLUS | MINUS)? FLOATLITERAL
     | (PLUS | MINUS)? INTLITERAL
     ;
-
