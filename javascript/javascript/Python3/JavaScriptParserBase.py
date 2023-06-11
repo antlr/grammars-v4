@@ -99,5 +99,6 @@ class JavaScriptParserBase(Parser):
         tokenType = ahead.type
 
         # Check if the token is, or contains a line terminator.
-        return ((tokenType == JavaScriptParser.MultiLineComment and (text.contains("\r") or text.contains("\n"))) or
-                (tokenType == JavaScriptParser.LineTerminator))
+
+        return (tokenType == JavaScriptParser.MultiLineComment and (("\r" in text) or ("\n" in text))) or \
+            (tokenType == JavaScriptParser.LineTerminator)

@@ -2,7 +2,7 @@
 name: cli
 description: A sample command-line application.
 environment:
-  sdk: '>=2.12.0 \<3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dependencies:
   antlr4: 4.13.0
 dev_dependencies:
