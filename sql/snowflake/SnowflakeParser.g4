@@ -1417,6 +1417,7 @@ create_command
     | create_stream
     | create_table
     | create_table_as_select
+    | create_table_like
     //    | create_|_alter_table_…_constraint
     | create_tag
     | create_task
@@ -2338,6 +2339,12 @@ create_table_as_select
         with_tags?
         comment_clause?
         AS select_statement
+    ;
+
+create_table_like
+    : CREATE or_replace? TRANSIENT? TABLE object_name LIKE object_name
+        cluster_by?
+        copy_grants?
     ;
 
 create_tag
@@ -3417,7 +3424,7 @@ binary_or_ternary_builtin_function
     : CHARINDEX
     | REPLACE
     | substring=( SUBSTRING | SUBSTR )
-    | LIKE | ILIKE 
+    | LIKE | ILIKE
     ;
 
 ternary_builtin_function
