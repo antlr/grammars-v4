@@ -161,7 +161,7 @@ citations:
 agranulocytosis and aplastic anemia. A report from the
 International Agranulocytosis and Aplastic Anemia Study.
 Archives of Internal Medicine, May 1989, 149(5):1036-40.";;
-links: MeSH 'Some link term' "Some link string";;
+links: MeSH_link 'Some link term' "Some link string";;
 knowledge:
 type: data-driven;;
 data: /* capitalized text within curly brackets would be replaced with */

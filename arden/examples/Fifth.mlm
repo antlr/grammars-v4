@@ -13,7 +13,7 @@ purpose: calculates the suggested daily doses based on the patients age;;
 explanation: ;;
 keywords: ;;
 citations:
-http://library.buffalo.edu/libraries/projects/cases/drug_dosing/drug_dosing_notes.htm
+1. refute "Some link";
 ;;
 knowledge:
 type: data_driven;;
