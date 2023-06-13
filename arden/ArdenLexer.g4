@@ -237,7 +237,7 @@ DOR:            '||';
 
 // Digit constructs
 NUMBER
-    :           Digit+ DOT? (Digit+)? Exponent
+    :           Digit+ DOT? Digit* Exponent
     |           DOT Digit+ Exponent
     ;
 
