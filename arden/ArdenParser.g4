@@ -209,8 +209,7 @@ logicAssignment
    | timeBecomes expr
    | applicabilityBecomes expr
    | identifierBecomes callPhrase
-   | LPAREN dataVarList RPAREN ASSIGN callPhrase
-   | LET LPAREN dataVarList RPAREN BE callPhrase
+   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) callPhrase
    | identifierBecomes (newObjectPhrase | fuzzySetPhrase)
    ;
 
@@ -394,7 +393,7 @@ exprAttributeFrom
 
 exprSubListFrom
    : SUBLIST exprFactor FROM exprFactor
-   | SUBLIST exprFactor (FROM | STARTING AT exprFactor FROM) exprFactor
+   | SUBLIST exprFactor (STARTING AT exprFactor)? exprFactor
    ;
 
 exprFactor
@@ -703,7 +702,7 @@ objectAttributeList
    ;
 
 newObjectPhrase
-   : NEW IDENTIFIER (WITH (expr | expr WITH)? LBRACK objectInitList RBRACK)?
+   : NEW IDENTIFIER (WITH (expr | (expr WITH)? LBRACK objectInitList RBRACK))?
    ;
 
 objectInitList
@@ -787,7 +786,7 @@ relativeEvokeTimeExpr
    ;
 
 qualifiedEvokeCycle
-   : simpleEvokeCycle (UNTIL expr)
+   : simpleEvokeCycle (UNTIL expr)?
    ;
 
 simpleEvokeCycle
