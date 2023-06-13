@@ -30,7 +30,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-parser grammar Arden;
+parser grammar ArdenParser;
 
 options { tokenVocab = ArdenLexer; }
 
@@ -65,8 +65,7 @@ titleSlot
    ;
 
 mlmNameSlot
-   : MLMNAME MLMID DSC
-   | FILENAME MLMID DSC
+   : (MLMNAME | FILENAME) MLMID DSC
    ;
 
 ardenVersionSlot
@@ -96,7 +95,7 @@ dateSlot
 validationSlot
    : VALIDATION VALIDATION_CODE DSC
    ;
-   
+
 purposeSlot
    : PURPOSE TEXT
    ;
@@ -132,9 +131,9 @@ linkList
    ;
 
 singleLink
-   : LINK_TYPE? TERM? STRING
+   : (LINK_TYPE TERM)? STRING
    ;
-   
+
 typeSlot
    : TYPE TYPE_CODE DSC
    ;
@@ -168,8 +167,7 @@ defaultSlot
    ;
 
 languageSlot
-   : languageSlot singleLanguageCode
-   | singleLanguageCode
+   : languageSlot? singleLanguageCode
    ;
 
 singleLanguageCode
@@ -213,8 +211,7 @@ logicAssignment
    | identifierBecomes callPhrase
    | LPAREN dataVarList RPAREN ASSIGN callPhrase
    | LET LPAREN dataVarList RPAREN BE callPhrase
-   | identifierBecomes newObjectPhrase
-   | identifierBecomes fuzzySetPhrase
+   | identifierBecomes (newObjectPhrase | fuzzySetPhrase)
    ;
 
 exprFuzzySet
@@ -239,8 +236,7 @@ logicSwitchCases
 
 identifierOrObjectRef
    : IDENTIFIER
-   | identifierOrObjectRef LBRACK expr RBRACK
-   | identifierOrObjectRef DOT identifierOrObjectRef
+   | identifierOrObjectRef (LBRACK expr RBRACK | DOT identifierOrObjectRef)
    ;
 
 timeBecomes
@@ -256,7 +252,7 @@ applicabilityBecomes
 callPhrase
    : CALL IDENTIFIER (WITH expr)?
    ;
-   
+
 expr
    : exprSort
    | expr COMMA exprSort
@@ -265,9 +261,8 @@ expr
 
 exprSort
    : exprAddList (MERGE exprSort)?
-   | SORT sortOption exprSort
+   | SORT sortOption exprSort (USING exprFunction)?
    | exprAddList MERGE exprSort USING exprFunction
-   | SORT sortOption exprSort USING exprFunction
    ;
 
 sortOption
@@ -287,13 +282,11 @@ exprRemoveList
    ;
 
 exprWhere
-   : exprRange
-   | exprRange WHERE exprRange
+   : exprRange (WHERE exprRange)?
    ;
 
 exprRange
-   : exprOr
-   | exprOr SEQTO exprOr
+   : exprOr (SEQTO exprOr)?
    ;
 
 exprOr
@@ -307,18 +300,15 @@ exprAnd
    ;
 
 exprNot
-   : NOT exprComparison
-   | exprComparison
+   : NOT? exprComparison
    ;
 
 exprComparison
    : exprString
    | exprFindString
    | exprString singleCompOp exprString
-   | exprString IS NOT? mainCompOp
-   | exprString NOT? inCompOp
-   | exprString OCCUR NOT? temporalCompOp
-   | exprString OCCUR NOT? rangeCompOp
+   | exprString IS? NOT? (mainCompOp | inCompOp)
+   | exprString OCCUR NOT? (temporalCompOp | rangeCompOp)
    | exprString MATCHES PATTERN exprString
    ;
 
@@ -328,10 +318,8 @@ exprFindString
 
 exprString
    : exprPlus
-   | exprString '||' exprPlus
-   | exprString FORMATTED WITH exprPlus
-   | TRIM trimOption exprString
-   | caseOption exprString
+   | exprString ('||' exprPlus | FORMATTED WITH) exprPlus
+   | (TRIM trimOption | caseOption) exprString
    | SUBSTRING exprPlus CHARACTERS stringSearchStart FROM exprString
    ;
 
@@ -351,16 +339,13 @@ stringSearchStart
 
 exprPlus
    : exprTimes
-   | exprPlus PLUS exprTimes
-   | exprPlus MINUS exprTimes
-   | PLUS exprTimes
-   | MINUS exprTimes
+   | exprPlus (PLUS | MINUS) exprTimes
+   | (PLUS | MINUS) exprTimes
    ;
 
 exprTimes
    : exprPower
-   | exprTimes MUL exprPower
-   | exprTimes DIV exprPower
+   | exprTimes (MUL | DIV) exprPower
    ;
 
 exprPower
@@ -369,8 +354,7 @@ exprPower
    ;
 
 exprAtTime
-   : exprBefore
-   | exprBefore ATTIME exprAtTime
+   : exprBefore (ATTIME exprAtTime)?
    ;
 
 exprBefore
