@@ -359,19 +359,15 @@ exprAtTime
 
 exprBefore
    : exprAgo
-   | exprDuration BEFORE exprAgo
-   | exprDuration AFTER exprAgo
-   | exprDuration FROM exprAgo
+   | exprDuration (BEFORE | AFTER | FROM) exprAgo
    ;
 
 exprAgo
-   : exprDuration AGO?
-   | exprFunction AGO?
+   : (exprDuration | exprFunction) AGO?
    ;
 
 exprDuration
-   : exprFunction
-   | exprFunction durationOp
+   : exprFunction durationOp?
    ;
 
 exprFunction
@@ -385,11 +381,8 @@ exprFunction
    | fromFuncOp exprFactor FROM exprFunction
    | indexFromOfFuncOp OF? exprFunction
    | indexFromOfFuncOp exprFactor FROM exprFunction
-   | atLeastMostOp exprFactor FROM exprFunction
-   | atLeastMostOp exprFactor ISTRUE FROM exprFunction
-   | atLeastMostOp exprFactor ARETRUE FROM exprFunction
-   | INDEX OF exprFactor FROM exprFunction
-   | indexFromFuncOp exprFactor FROM exprFunction
+   | atLeastMostOp exprFactor (ISTRUE | ARETRUE)? FROM exprFunction
+   | (INDEX OF | indexFromFuncOp) exprFactor FROM exprFunction
    | exprFactor AS asFuncOp
    | exprAttributeFrom
    | exprSubListFrom
@@ -401,12 +394,11 @@ exprAttributeFrom
 
 exprSubListFrom
    : SUBLIST exprFactor FROM exprFactor
-   | SUBLIST exprFactor STARTING AT exprFactor FROM exprFactor
+   | SUBLIST exprFactor (FROM | STARTING AT exprFactor FROM) exprFactor
    ;
 
 exprFactor
-   : exprFactorAtom
-   | exprFactorAtom LBRACK expr RBRACK
+   : exprFactorAtom (LBRACK expr RBRACK)?
    | exprFactor DOT IDENTIFIER
    ;
 
@@ -422,9 +414,7 @@ exprFactorAtom
    | NULL
    | CONCLUDE
    | IT
-   | LPAREN RPAREN
-   | LPAREN expr RPAREN
-   | LPAREN exprFuzzySet RPAREN
+   | LPAREN (expr | exprFuzzySet)? RPAREN
    ;
 
 singleCompOp
@@ -448,14 +438,9 @@ rangeCompOp
    ;
 
 temporalCompOp
-   : WITHIN exprString PRECEDING exprString
-   | WITHIN exprString FOLLOWING exprString
-   | WITHIN exprString SURROUNDING exprString
-   | WITHIN PAST exprString
-   | WITHIN SAME DAY AS exprString
-   | BEFORE exprString
-   | AFTER exprString
-   | EQUAL exprString
+   : WITHIN exprString (PRECEDING | FOLLOWING | SURROUNDING) exprString
+   | WITHIN (PAST | SAME DAY AS) exprString
+   | (BEFORE | AFTER | EQUAL) exprString
    | AT exprString
    ;
 
@@ -478,10 +463,7 @@ unaryCompOp
    ;
 
 binaryCompOp
-   : LESS THAN
-   | GREATER THAN
-   | GREATER THAN OR EQUAL
-   | LESS THAN OR EQUAL
+   : (LESS | GREATER) THAN (OR EQUAL)?
    | IN
    ;
 
@@ -503,22 +485,15 @@ ofReadFuncOp
    ;
 
 ofNoreadFuncOp
-   : ANY
-   | ANY ISTRUE
-   | ALL
-   | ALL ARETRUE
-   | NO
-   | NO ISTRUE
+   : ANY ISTRUE?
+   | ALL ARETRUE?
+   | NO ISTRUE?
    | SLOPE
    | STDDEV
    | VARIANCE
-   | INCREASE
-   | PERCENT INCREASE
-   | DECREASE
-   | PERCENT DECREASE
+   | PERCENT? (INCREASE | DECREASE)
    | INTERVAL
-   | TIME
-   | TIME OF DAY
+   | TIME (OF DAY)?
    | DAY OF WEEK
    | ARCCOS
    | ARCSIN
@@ -536,13 +511,7 @@ ofNoreadFuncOp
    | LOG10
    | ABS
    | SQRT
-   | EXTRACT YEAR
-   | EXTRACT MONTH
-   | EXTRACT DAY
-   | EXTRACT HOUR
-   | EXTRACT MINUTE
-   | EXTRACT SECOND
-   | EXTRACT TIME OF DAY
+   | EXTRACT (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND | TIME OF DAY)
    | STRINGOP
    | EXTRACT CHARACTERS
    | REVERSE
@@ -571,10 +540,7 @@ fromOfFuncOp
    ;
 
 indexFromOfFuncOp
-   : INDEX MINIMUM
-   | INDEX MAXIMUM
-   | INDEX EARLIEST
-   | INDEX LATEST
+   : INDEX (MINIMUM | MAXIMUM | EARLIEST | LATEST)
    ;
 
 asFuncOp
@@ -585,8 +551,7 @@ asFuncOp
    ;
 
 atLeastMostOp
-   : AT LEAST
-   | AT MOST
+   : AT (LEAST | MOST)
    ;
 
 durationOp
@@ -619,11 +584,8 @@ localizeOption
    ;
 
 booleanValue
-   : TRUE
-   | FALSE
+   : TRUTHVALUE? (TRUE | FALSE)
    | TRUTHVALUE NUMBER
-   | TRUTHVALUE TRUE
-   | TRUTHVALUE FALSE
    ;
 
 timeValue
@@ -674,31 +636,19 @@ dataAssignment
    : identifierBecomes dataAssignPhrase
    | timeBecomes expr
    | applicabilityBecomes expr
-   | LPAREN dataVarList RPAREN ASSIGN READ readPhrase
-   | LET LPAREN dataVarList RPAREN BE READ readPhrase
-   | LPAREN dataVarList RPAREN ASSIGN READ AS IDENTIFIER readPhrase
-   | LET LPAREN dataVarList RPAREN BE READ AS IDENTIFIER readPhrase
-   | LPAREN dataVarList RPAREN ASSIGN ARGUMENT
-   | LET LPAREN dataVarList RPAREN BE ARGUMENT
+   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) (READ (AS IDENTIFIER)? readPhrase | ARGUMENT)
    ;
 
 dataVarList
-   : IDENTIFIER
-   | IDENTIFIER COMMA dataVarList
+   : IDENTIFIER (COMMA dataVarList)?
    ;
 
 dataAssignPhrase
-   : READ readPhrase
-   | READ AS IDENTIFIER readPhrase
-   | MLM TERM
-   | MLM TERM FROM INSTITUTIONWC string
-   | MLM MLM_SELF
-   | INTERFACE mappingFactor
-   | EVENT mappingFactor
-   | MESSAGE mappingFactor
+   : READ (AS IDENTIFIER)? readPhrase
+   | MLM (TERM (FROM INSTITUTIONWC string)? | MLM_SELF)
+   | (INTERFACE | EVENT | MESSAGE) mappingFactor
    | MESSAGE AS IDENTIFIER mappingFactor?
-   | DESTINATION mappingFactor
-   | DESTINATION AS IDENTIFIER mappingFactor?
+   | DESTINATION (mappingFactor AS IDENTIFIER mappingFactor?)
    | ARGUMENT
    | OBJECT objectDefinition
    | LINGUISTIC VARIABLE objectDefinition
@@ -736,11 +686,7 @@ readPhrase
    ;
 
 readWhere
-   : mappingFactor
-   | mappingFactor WHERE IT OCCUR temporalCompOp
-   | mappingFactor WHERE IT OCCUR NOT temporalCompOp
-   | mappingFactor WHERE IT OCCUR rangeCompOp
-   | mappingFactor WHERE IT OCCUR NOT rangeCompOp
+   : mappingFactor (WHERE IT OCCUR NOT? (temporalCompOp | rangeCompOp))?
    | LPAREN readWhere RPAREN
    ;
 
@@ -753,14 +699,11 @@ objectDefinition
    ;
 
 objectAttributeList
-   : IDENTIFIER
-   | IDENTIFIER COMMA objectAttributeList
+   : IDENTIFIER (COMMA objectAttributeList)?
    ;
 
 newObjectPhrase
-   : NEW IDENTIFIER (WITH expr)?
-   | NEW IDENTIFIER WITH LBRACK objectInitList RBRACK
-   | NEW IDENTIFIER WITH expr WITH LBRACK objectInitList RBRACK
+   : NEW IDENTIFIER (WITH (expr | expr WITH)? LBRACK objectInitList RBRACK)?
    ;
 
 objectInitList
@@ -778,7 +721,7 @@ evokeBlock
    ;
 
 evokeStatement
-   : (eventOr)?
+   : eventOr?
    | evokeTime
    | delayedEvoke
    | qualifiedEvokeCycle
@@ -796,8 +739,7 @@ eventOr
    ;
 
 eventAny
-   : ANY OF? LPAREN eventList RPAREN
-   | ANY OF? IDENTIFIER
+   : ANY OF? (LPAREN eventList RPAREN | IDENTIFIER)
    | eventFactor
    ;
 
@@ -841,14 +783,11 @@ evokeDuration
    ;
 
 relativeEvokeTimeExpr
-   : TODAY ATTIME TIMEOFDAY
-   | TOMORROW ATTIME TIMEOFDAY
-   | WEEKDAYLITERAL ATTIME TIMEOFDAY
+   : (TODAY | TOMORROW | WEEKDAYLITERAL) ATTIME TIMEOFDAY
    ;
 
 qualifiedEvokeCycle
-   : simpleEvokeCycle
-   | simpleEvokeCycle UNTIL expr
+   : simpleEvokeCycle (UNTIL expr)
    ;
 
 simpleEvokeCycle
@@ -871,10 +810,8 @@ actionStatement
    | WHILE expr DO actionBlock SC ENDDO
    | actionSwitch
    | BREAKLOOP
-   | callPhrase
-   | callPhrase DELAY expr
-   | WRITE expr
-   | WRITE expr AT IDENTIFIER
+   | callPhrase (DELAY expr)?
+   | WRITE expr (AT IDENTIFIER)?
    | RETURN expr
    | identifierBecomes expr
    | timeBecomes expr

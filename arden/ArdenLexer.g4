@@ -1,4 +1,5 @@
 lexer grammar ArdenLexer;
+options { caseInsensitive = true; }
 
 // Keywords
 ABS:            [Aa][Bb][Ss];
