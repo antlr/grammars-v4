@@ -16,7 +16,7 @@ ARCCOS:         'arccos';
 ARCSIN:         'arcsin';
 ARCTAN:         'arctan';
 ARDEN:          'arden:';
-ARDEN_VERSION:  'version'[ ](('2' (DOT ( '1' | '2' | '5' | '6' | '7' | '8' | '9' | '10'))?) | [3]);
+ARDEN_VERSION:  'version'[ ]('2' (DOT ( '1' | '2' | '5' | '6' | '7' | '8' | '9' | '10'))? | [3]);
 ARETRUE:        'aretrue';
 ARGUMENT:       'argument';
 AS:             'as';
@@ -227,12 +227,12 @@ MINUS:          '-';
 MUL:            '*';
 DIV:            '/';
 POWER:          '**';
-EQ:             ('=' | 'eq');
-LT:             ('<' | 'lt');
-GT:             ('>' | 'gt');
-LE:             ('<=' | 'le');
-GE:             ('>=' | 'ge');
-NE:             ('<>' | 'ne');
+EQ:             '=' | 'eq';
+LT:             '<' | 'lt';
+GT:             '>' | 'gt';
+LE:             '<=' | 'le';
+GE:             '>=' | 'ge';
+NE:             '<>' | 'ne';
 DOR:            '||';
 
 // Digit constructs
@@ -246,12 +246,12 @@ TIMEOFDAY:      Digit Digit COLON Digit Digit Seconds TimeZone;
 
 ISO_DATE:       Digit Digit Digit Digit MINUS Digit Digit MINUS Digit Digit;
 
-ISO_DATE_TIME:  Digit Digit Digit Digit MINUS Digit Digit MINUS Digit Digit ('t') Digit Digit COLON Digit Digit COLON Digit Digit FractionalDigit TimeZone;
+ISO_DATE_TIME:  Digit Digit Digit Digit MINUS Digit Digit MINUS Digit Digit 't' Digit Digit COLON Digit Digit COLON Digit Digit FractionalDigit TimeZone;
 
 // String constructs
 CITATION:       Digit+ DOT ' ' ('support' | 'refute')?;
 
-TERM:           '\'' ( .)*? '\'';
+TERM:           '\''  .*? '\'';
 
 STRING:         '"' ( '""' | ~["] )* '"';
 
@@ -288,7 +288,7 @@ fragment Seconds
     ;
 
 fragment TimeZone
-    :           ('z')?
+    :           'z'?
     |           (PLUS | MINUS) Digit Digit COLON Digit Digit
     ;
 
@@ -308,11 +308,11 @@ fragment RestIdentifier
     ;
 
 fragment ID
-    :           (Letter | [0-9] | '_' )
+    :           Letter | [0-9] | '_'
     ;
 
 fragment MlmID
-    :           (ID | DOT | MINUS)
+    :           ID | DOT | MINUS
     ;
 
 // Lexer modes
@@ -320,12 +320,12 @@ mode TextMode;
 TEXT:           .+? ';;' -> mode(DEFAULT_MODE);
 
 mode DataMapping;
-DATA_MAPPING:   (~[}] | '\\' (.))+ -> mode(DEFAULT_MODE);
+DATA_MAPPING:   (~[}] | '\\' .)+ -> mode(DEFAULT_MODE);
 
 mode MlmName;
 MLMID:          MlmIDStart MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest -> mode(DEFAULT_MODE);
 
-WS_ID:          ([ \t\r\n]+) -> channel(HIDDEN);
+WS_ID:          [ \t\r\n]+ -> channel(HIDDEN);
 
 fragment MlmIDStart
     :           Letter MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID?
