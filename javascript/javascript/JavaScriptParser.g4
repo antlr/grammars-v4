@@ -262,15 +262,29 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
+    : (Static | {this.n("static")}? identifier)? methodDefinition
+    | (Static | {this.n("static")}? identifier)? fieldDefinition
+    | (Static | {this.n("static")}? identifier) block
     | emptyStatement_
-    | '#'? propertyName '=' singleExpression
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' functionBody
-    | '*'? '#'? getter '(' ')' functionBody
-    | '*'? '#'? setter '(' formalParameterList? ')' functionBody
+    : (Async {this.notLineTerminator()}?)? '*'? classElementName '(' formalParameterList? ')' functionBody
+    | '*'? getter '(' ')' functionBody
+    | '*'? setter '(' formalParameterList? ')' functionBody
+    ;
+
+fieldDefinition
+    : classElementName initializer?
+    ;
+
+classElementName
+    : propertyName
+    | privateIdentifier
+    ;
+
+privateIdentifier
+    : '#' identifierName
     ;
 
 formalParameterList
@@ -386,6 +400,12 @@ singleExpression
     | '(' expressionSequence ')'                                            # ParenthesizedExpression
     ;
 
+initializer
+// TODO: must be `= AssignmentExpression` and we have such label alredy but it doesn't respect the specification.
+//  See https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#prod-Initializer
+    : '=' singleExpression
+    ;
+
 assignable
     : identifier
     | arrayLiteral
@@ -461,11 +481,11 @@ bigintLiteral
     ;
 
 getter
-    : {this.n("get")}? identifier propertyName
+    : {this.n("get")}? identifier classElementName
     ;
 
 setter
-    : {this.n("set")}? identifier propertyName
+    : {this.n("set")}? identifier classElementName
     ;
 
 identifierName
