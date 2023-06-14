@@ -338,7 +338,3 @@ mode TwoCharMode;
 TWOCHARCODE    options {caseInsensitive = false; }: Letter Letter ('_' [A-Z] [A-Z])? -> mode(DEFAULT_MODE);
 
 WS_TCM:         WS -> channel(HIDDEN);
-
-
-
-
