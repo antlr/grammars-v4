@@ -172,6 +172,11 @@ GROUP_ID int(11) not null,
 DATE_ADD datetime DEFAULT NULL,
 primary key (USER_ID, GROUP_ID)
 );
+
+CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+
 #end
 #begin
 -- Rename table
