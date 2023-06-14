@@ -167,7 +167,8 @@ defaultSlot
    ;
 
 languageSlot
-   : languageSlot? singleLanguageCode
+   : languageSlot singleLanguageCode
+   | singleLanguageCode
    ;
 
 singleLanguageCode
