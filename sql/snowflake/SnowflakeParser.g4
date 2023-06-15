@@ -26,11 +26,11 @@ parser grammar SnowflakeParser;
 options { tokenVocab=SnowflakeLexer; }
 
 snowflake_file
-    : batch* EOF
+    : batch? EOF
     ;
 
 batch
-    : sql_command SEMI?
+    : sql_command (SEMI sql_command)* SEMI?
     ;
 
 sql_command
@@ -86,16 +86,18 @@ value_item
     ;
 
 merge_statement
-    : MERGE INTO object_name USING table_source ON search_condition merge_matches
+    : MERGE INTO object_name as_alias?
+        USING table_source ON search_condition
+        merge_matches
     ;
 
 merge_matches
-    : WHEN MATCHED (AND search_condition )? THEN merge_update_delete
-    | WHEN NOT MATCHED (AND search_condition )? THEN merge_insert
+    : (WHEN MATCHED (AND search_condition )? THEN merge_update_delete)+
+    (WHEN NOT MATCHED (AND search_condition )? THEN merge_insert)?
     ;
 
 merge_update_delete
-    : UPDATE SET column_name EQ expr ( column_name EQ expr )*
+    : UPDATE SET column_name EQ expr (',' column_name EQ expr )*
     | DELETE
     ;
 
@@ -104,19 +106,19 @@ merge_insert
     ;
 
 update_statement
-    : UPDATE object_name
+    : UPDATE object_name as_alias?
         SET column_name EQ expr (COMMA column_name EQ expr)*
         (FROM table_sources)?
         (WHERE search_condition)?
     ;
 
 table_or_query
-    : object_name
-    | '(' subquery ')'
+    : object_name as_alias?
+    | '(' subquery ')' as_alias?
     ;
 
 delete_statement
-    : DELETE FROM object_name
+    : DELETE FROM object_name as_alias?
         (USING table_or_query (COMMA table_or_query)? )?
         (WHERE search_condition)?
     ;
@@ -150,6 +152,12 @@ other_command
     | truncate_table
     | unset
     | call
+    | begin_txn
+    ;
+
+begin_txn
+    : BEGIN ( WORK | TRANSACTION )? ( NAME id_ )?
+    | START TRANSACTION ( NAME id_ )?
     ;
 
 copy_into_table
@@ -226,8 +234,12 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON object_type_name object_name IS string
+    : COMMENT if_exists? ON object_type_name object_name function_signature? IS string
     | COMMENT if_exists? ON COLUMN full_column_name IS string
+    ;
+
+function_signature
+    : '(' data_type_list? ')'
     ;
 
 commit
@@ -235,9 +247,8 @@ commit
     ;
 
 execute_immediate
-    : EXECUTE IMMEDIATE string ( USING '(' id_ (COMMA id_)* ')' )?
-    | EXECUTE IMMEDIATE id_ ( USING '(' id_ (COMMA id_)* ')' )?
-    | EXECUTE IMMEDIATE ID2 ( USING '(' id_ (COMMA id_)* ')' )?
+    : EXECUTE IMMEDIATE (string | id_ | ID2) (USING '(' id_ (COMMA id_)* ')')?
+    | EXECUTE IMMEDIATE DBL_DOLLAR
     ;
 
 execute_task
@@ -1199,6 +1210,8 @@ constraint_action
                          ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
     | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          cascade_restrict?
+    | DROP PRIMARY KEY
+
     ;
 
 search_optimization_action
@@ -1252,9 +1265,9 @@ alter_tag
     ;
 
 alter_task
-    : ALTER TASK if_exists? id_ resume_suspend
-    | ALTER TASK if_exists? id_ REMOVE AFTER string_list | ADD AFTER string_list
-    | ALTER TASK if_exists? id_ SET
+    : ALTER TASK if_exists? object_name resume_suspend
+    | ALTER TASK if_exists? object_name REMOVE AFTER string_list | ADD AFTER string_list
+    | ALTER TASK if_exists? object_name SET
         ( WAREHOUSE EQ string )?
         ( SCHEDULE EQ string )?
         ( ALLOW_OVERLAPPING_EXECUTION EQ true_false )?
@@ -1262,7 +1275,7 @@ alter_task
         ( SUSPEND_TASK_AFTER_NUM_FAILURES EQ num )?
         comment_clause?
         session_parameter_init_list?
-    | ALTER TASK if_exists? id_ UNSET
+    | ALTER TASK if_exists? object_name UNSET
         WAREHOUSE?
         SCHEDULE?
         ALLOW_OVERLAPPING_EXECUTION?
@@ -1271,10 +1284,10 @@ alter_task
         COMMENT?
         session_parameter_list?
             //[ , ... ]
-    | ALTER TASK if_exists? id_ set_tags
-    | ALTER TASK if_exists? id_ unset_tags
-    | ALTER TASK if_exists? id_ MODIFY AS sql
-    | ALTER TASK if_exists? id_ MODIFY WHEN expr
+    | ALTER TASK if_exists? object_name set_tags
+    | ALTER TASK if_exists? object_name unset_tags
+    | ALTER TASK if_exists? object_name MODIFY AS sql
+    | ALTER TASK if_exists? object_name MODIFY WHEN expr
     ;
 
 alter_user
@@ -1348,13 +1361,13 @@ alter_network_policy_opts
     ;
 
 alter_warehouse_opts
-    : id_? ( SUSPEND | RESUME if_suspended? )
-    | id_? ABORT ALL QUERIES
-    | id_ RENAME TO id_
+    : id_fn? ( SUSPEND | RESUME if_suspended? )
+    | id_fn? ABORT ALL QUERIES
+    | id_fn RENAME TO id_
 //    | id_ SET [ objectProperties ]
-    | id_ set_tags
-    | id_ unset_tags
-    | id_ UNSET id_ (COMMA id_)*
+    | id_fn set_tags
+    | id_fn unset_tags
+    | id_fn UNSET id_ (COMMA id_)*
     ;
 
 alter_account_opts
@@ -2316,7 +2329,11 @@ column_decl_item_list
 
 create_table
     : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
-        '(' column_decl_item_list ')'
+        ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
+    ;
+
+create_table_clause
+    : '(' column_decl_item_list ')'
         cluster_by?
         stage_file_format?
         ( STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET )?
@@ -2327,7 +2344,6 @@ create_table
         copy_grants?
         with_row_access_policy?
         with_tags?
-        comment_clause?
     ;
 
 create_table_as_select
@@ -2338,7 +2354,7 @@ create_table_as_select
         with_row_access_policy?
         with_tags?
         comment_clause?
-        AS select_statement
+        AS query_statement
     ;
 
 create_table_like
@@ -2456,16 +2472,16 @@ create_task
         ( ERROR_INTEGRATION EQ id_ )?
         copy_grants?
         comment_clause?
-        ( AFTER string (COMMA string)* )?
+        ( AFTER object_name (COMMA object_name)* )?
         ( WHEN search_condition )?
       AS
         sql
     ;
 
 sql
-    : sql_command
+    : EXECUTE IMMEDIATE DBL_DOLLAR
+    | sql_command
     | call
-    | DBL_DOLLAR
     ;
 
 call
@@ -2492,16 +2508,16 @@ create_view
     ;
 
 create_warehouse
-    : CREATE or_replace? WAREHOUSE if_not_exists? id_
+    : CREATE or_replace? WAREHOUSE if_not_exists? id_fn
               ( WITH? wh_properties+ )?
               wh_params*
     ;
 
 wh_properties
-    : WAREHOUSE_SIZE EQ (XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE | X5LARGE | X6LARGE)
+    : WAREHOUSE_SIZE EQ (XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE | X5LARGE | X6LARGE | ID2)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
-    | SCALING_POLICY EQ STANDARD | ECONOMY
+    | SCALING_POLICY EQ (STANDARD | ECONOMY)
     | AUTO_SUSPEND (EQ num | NULL_)
     | AUTO_RESUME EQ true_false
     | INITIALLY_SUSPENDED EQ true_false
@@ -2716,7 +2732,7 @@ drop_view
     ;
 
 drop_warehouse
-    : DROP WAREHOUSE if_exists? id_
+    : DROP WAREHOUSE if_exists? id_fn
     ;
 
 cascade_restrict
@@ -2778,7 +2794,7 @@ use_secondary_roles
     ;
 
 use_warehouse
-    : USE WAREHOUSE id_
+    : USE WAREHOUSE id_fn
     ;
 
 /* */
@@ -3329,6 +3345,11 @@ string_list
     : string (COMMA string)*
     ;
 
+id_fn
+    : id_
+    | IDENTIFIER '(' id_ ')'
+    ;
+
 id_
     : ID
     | ID2
@@ -3400,6 +3421,8 @@ builtin_function
     | UPPER
     | LOWER
     | TO_BOOLEAN
+    | IDENTIFIER
+    | FLATTEN
     ;
 
 list_operator
@@ -3442,7 +3465,7 @@ pattern
 //    ;
 
 column_name
-    : id_
+    : (id_ '.')? id_
     ;
 
 column_list
@@ -3486,6 +3509,7 @@ expr
 //    | expr time_zone
     | expr COLON expr //json access
     | expr DOT VALUE
+    | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
@@ -3618,7 +3642,7 @@ ranking_windowed_function
 aggregate_function
     : id_ '(' DISTINCT? expr_list ')'
     | id_ '(' STAR ')'
-    | LISTAGG '(' DISTINCT? expr (COMMA string)? ')' (WITHIN GROUP '(' order_by_clause ')' )?
+    | (LISTAGG | ARRAY_AGG) '(' DISTINCT? expr (COMMA string)? ')' (WITHIN GROUP '(' order_by_clause ')' )?
     ;
 
 //rows_range
@@ -3804,11 +3828,11 @@ object_ref
     | object_name
         START WITH predicate
         CONNECT BY prior_list?
-    | TABLE '(' object_name '('  expr_list  ')' ')'
+    | TABLE '(' function_call ')'
         pivot_unpivot?
         as_alias?
         sample?
-    | '(' values ')'
+    | '(' values ')' as_alias?
         sample?
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
