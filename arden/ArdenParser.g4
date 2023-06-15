@@ -29,37 +29,48 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 parser grammar ArdenParser;
 
+
 options { tokenVocab = ArdenLexer; }
+// A mlm always consists of three parts and ends with the statement END:
+
+// These parts are maintenace_category, library_category, knowledge_category Ref: 5.1
+
+file_
+   : mlms EOF
+   ;
 
 mlms
-   : mlms mlm
-   | mlm
-   | EOF
+   : mlm*
    ;
 
 mlm
    : maintenanceCategory libraryCategory knowledgeCategory resourcesCategory END
    ;
 
+// Maintenace category Ref: 6.1
 maintenanceCategory
    : MAINTENANCE titleSlot mlmNameSlot ardenVersionSlot versionSlot institutionSlot authorSlot specialistSlot dateSlot validationSlot
    ;
 
+// Library category Ref: 6.2
 libraryCategory
    : LIBRARY purposeSlot explanationSlot keywordsSlot citationsSlot linksSlot
    ;
 
+// Knowledge category Ref 6.3
 knowledgeCategory
    : KNOWLEDGE typeSlot dataSlot prioritySlot evokeSlot logicSlot actionSlot urgencySlot
    ;
 
+// Resource category Ref: 6.4
 resourcesCategory
    : (RESOURCES defaultSlot languageSlot)?
    ;
 
+// Slots
+// Maintenance slots
 titleSlot
    : TITLE TEXT
    ;
@@ -96,6 +107,7 @@ validationSlot
    : VALIDATION VALIDATION_CODE DSC
    ;
 
+// Library slots
 purposeSlot
    : PURPOSE TEXT
    ;
@@ -134,6 +146,7 @@ singleLink
    : (LINK_TYPE TERM)? STRING
    ;
 
+// Knowledge slots
 typeSlot
    : TYPE TYPE_CODE DSC
    ;
@@ -162,6 +175,7 @@ urgencySlot
    : (URGENCY (NUMBER | IDENTIFIER) DSC)?
    ;
 
+// Resource slots
 defaultSlot
    : DEFAULTCO TWOCHARCODE DSC
    ;
@@ -180,6 +194,7 @@ resourceTerms
    | (TERM COLON STRING)?
    ;
 
+// Logic block
 logicBlock
    : logicBlock SC logicStatement
    | logicStatement
@@ -240,19 +255,20 @@ identifierOrObjectRef
    ;
 
 timeBecomes
-   : TIME OF? IDENTIFIER ASSIGN
-   | LET TIME OF? IDENTIFIER BE
+   : TIME OF? identifierOrObjectRef ASSIGN
+   | LET TIME OF? identifierOrObjectRef BE
    ;
 
 applicabilityBecomes
-   : APPLICABILITY OF? IDENTIFIER ASSIGN
-   | LET APPLICABILITY OF? IDENTIFIER BE
+   : APPLICABILITY OF? identifierOrObjectRef ASSIGN
+   | LET APPLICABILITY OF? identifierOrObjectRef BE
    ;
 
 callPhrase
    : CALL IDENTIFIER (WITH expr)?
    ;
 
+// Expressions
 expr
    : exprSort
    | expr COMMA exprSort
@@ -318,8 +334,9 @@ exprFindString
 
 exprString
    : exprPlus
-   | exprString ('||' exprPlus | FORMATTED WITH) exprPlus
-   | (TRIM trimOption | caseOption) exprString
+   | exprString ('||' | FORMATTED WITH) exprPlus
+   | TRIM trimOption exprString
+   | caseOption exprString
    | SUBSTRING exprPlus CHARACTERS stringSearchStart FROM exprString
    ;
 
@@ -393,8 +410,7 @@ exprAttributeFrom
    ;
 
 exprSubListFrom
-   : SUBLIST exprFactor FROM exprFactor
-   | SUBLIST exprFactor (STARTING AT exprFactor)? exprFactor
+   : SUBLIST exprFactor ELEMENTS (STARTING AT exprFactor)? FROM exprFactor
    ;
 
 exprFactor
@@ -491,6 +507,7 @@ ofNoreadFuncOp
    | SLOPE
    | STDDEV
    | VARIANCE
+   | INCREASE
    | PERCENT? (INCREASE | DECREASE)
    | INTERVAL
    | TIME (OF DAY)?
@@ -573,6 +590,7 @@ timePart
    | SECOND
    ;
 
+// Factors
 string
    : STRING
    | LOCALIZED TERM localizeOption
@@ -598,6 +616,7 @@ timeValue
    | TIMEOFDAY
    ;
 
+// Data block
 dataBlock
    : dataBlock SC dataStatement
    | dataStatement
@@ -640,7 +659,7 @@ dataAssignment
    ;
 
 dataVarList
-   : IDENTIFIER (COMMA dataVarList)?
+   : identifierOrObjectRef (COMMA dataVarList)?
    ;
 
 dataAssignPhrase
@@ -715,6 +734,7 @@ objectInitElement
    : IDENTIFIER ASSIGN expr
    ;
 
+// Evoke block
 evokeBlock
    : evokeStatement
    | evokeBlock SC evokeStatement
@@ -799,6 +819,7 @@ startingDelay
    | delayedEvoke
    ;
 
+// Action block
 actionBlock
    : actionStatement
    | actionBlock SC actionStatement
