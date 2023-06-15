@@ -1,7 +1,7 @@
 find_package(Java QUIET COMPONENTS Runtime)
 
   execute_process(
-      COMMAND antlr4<if(os_win)>.exe<else><endif>
+      COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
       OUTPUT_VARIABLE ANTLR_COMMAND_OUTPUT
       ERROR_VARIABLE ANTLR_COMMAND_ERROR
       RESULT_VARIABLE ANTLR_COMMAND_RESULT
