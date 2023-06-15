@@ -380,7 +380,7 @@ exprBefore
    ;
 
 exprAgo
-   : (exprDuration | exprFunction) AGO?
+   : exprDuration AGO?
    ;
 
 exprDuration
