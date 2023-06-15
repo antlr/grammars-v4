@@ -16,7 +16,7 @@ ARCCOS:         'arccos';
 ARCSIN:         'arcsin';
 ARCTAN:         'arctan';
 ARDEN:          'arden:';
-ARDEN_VERSION:  'version'[ ]('2' (DOT ( '1' | '2' | '5' | '6' | '7' | '8' | '9' | '10'))? | [3]);
+ARDEN_VERSION:  'version ' ('2' ('.' ( '1' | '2' | '5' | '6' | '7' | '8' | '9' | '10'))? | '3');
 ARETRUE:        'aretrue';
 ARGUMENT:       'argument';
 AS:             'as';
@@ -37,14 +37,14 @@ CHARACTERS:     'characters';
 CITATIONS:      'citations:';
 CLONE:          'clone';
 CONCLUDE:       'conclude';
-COSINE:         'cosine' | 'cos';
+COSINE:         'cos' 'ine'?;
 COUNT:          'count';
 CRISP:          'crisp';
 CURRENTTIME:    'currenttime';
 DATA:           'data:';
 DATAWC:         'data';
 DATE:           'date:';
-DAY:            'day' | 'days';
+DAY:            'day' 's'?;
 DECREASE:       'decrease';
 DEFAULT:        'default';
 DEFAULTCO:      'default:' -> mode(TwoCharMode);
@@ -66,7 +66,7 @@ EVENT:          'event';
 EVENTTIME:      'eventtime';
 EVERY:          'every';
 EVOKE:          'evoke:';
-EXIST:          'exist' | 'exists';
+EXIST:          'exist' 's'?;
 EXP:            'exp';
 EXPLANATION:    'explanation:' -> mode(TextMode);
 EXTRACT:        'extract';
@@ -82,7 +82,7 @@ FROM:           'from';
 FUZZIFIED:      'fuzzified';
 FUZZY:          'fuzzy';
 GREATER:        'greater';
-HOUR:           'hour' | 'hours';
+HOUR:           'hour' 's'?;
 IF:             'if';
 IN:             'in';
 INCLUDE:        'include';
@@ -118,16 +118,16 @@ LOGIC:          'logic:';
 LOWERCASE:      'lowercase';
 MAINTENANCE:    'maintenance:';
 MATCHES:        'matches';
-MAXIMUM:        'maximum' | 'max';
+MAXIMUM:        'max' 'imum'?;
 MEDIAN:         'median';
 MERGE:          'merge';
 MESSAGE:        'message';
-MINIMUM:        'minimum' | 'min';
-MINUTE:         'minute' | 'minutes';
+MINIMUM:        'min' 'imum'?;
+MINUTE:         'minute' 's'?;
 MLM:            'mlm';
 MLMNAME:        'mlmname:' -> mode(MlmName);
 MLM_SELF:       'mlm'[_-]'self';
-MONTH:          'month' | 'months';
+MONTH:          'month' 's'?;
 MOST:           'most';
 NAMES:          'names';
 NEAREST:        'nearest';
@@ -138,7 +138,7 @@ NOW:            'now';
 NULL:           'null';
 NUMBEROP:       'number';
 OBJECT:         'object';
-OCCUR:          'occur' | 'occurs' | 'occurred';
+OCCUR:          'occur' ('s' | 'red')?;
 OF:             'of';
 OR:             'or';
 PAST:           'past';
@@ -157,10 +157,10 @@ REVERSE:        'reverse';
 RIGHT:          'right';
 ROUND:          'round';
 SAME:           'same';
-SECOND:         'second' | 'seconds';
+SECOND:         'second' 's'?;
 SEQTO:          'seqto';
 SET:            'set';
-SINE:           'sine' | 'sin';
+SINE:           'sin' 'e'?;
 SLOPE:          'slope';
 SORT:           'sort';
 SPECIALIST:     'specialist:' -> mode(TextMode);
@@ -173,7 +173,7 @@ SUBSTRING:      'substring';
 SUM:            'sum';
 SURROUNDING:    'surrounding';
 SWITCH:         'switch';
-TANGENT:        'tangent' | 'tan';
+TANGENT:        'tan' 'gent'?;
 THAN:           'than';
 THE:            'the' -> channel(HIDDEN);
 THEN:           'then';
@@ -198,14 +198,14 @@ VALIDATION_CODE:'production' | 'research' | 'testing' | 'expired';
 VARIABLE:       'variable';
 VARIANCE:       'variance';
 VERSION:        'version:' -> mode(TextMode);
-WEEK:           'week' | 'weeks';
+WEEK:           'week' 's'?;
 WEEKDAYLITERAL: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 WHERE:          'where';
 WHILE:          'while';
 WITH:           'with';
 WITHIN:         'within';
 WRITE:          'write';
-YEAR:           'year' | 'years';
+YEAR:           'year' 's'?;
 
 // Seperators
 LPAREN:         '(';
@@ -253,7 +253,7 @@ CITATION:       Digit+ DOT ' ' ('support' | 'refute')?;
 
 TERM:           '\''  .*? '\'';
 
-STRING:         '"' ( '""' | ~["] )* '"';
+STRING:         '"' ( '""' | ~'"' )* '"';
 
 // Creates an identifier with max of 80 chars
 IDENTIFIER
@@ -299,12 +299,12 @@ fragment Letter
 
 // Start of the identifier 10 chars, starting with a letter
 fragment StartIdentifier
-    :           Letter ID? ID? ID? ID? ID? ID? ID? ID? ID?
+    :           Letter (ID (ID (ID (ID (ID (ID (ID (ID (ID?)?)?)?)?)?)?)?)?)?
     ;
 
 // Rest of the identifier 10 chars
 fragment RestIdentifier
-    :           ID? ID? ID? ID? ID? ID? ID? ID? ID? ID?
+    :           (ID (ID (ID (ID (ID (ID (ID (ID(ID (ID?)?)?)?)?)?)?)?)?)?)?
     ;
 
 fragment ID
@@ -320,7 +320,7 @@ mode TextMode;
 TEXT:           .+? ';;' -> mode(DEFAULT_MODE);
 
 mode DataMapping;
-DATA_MAPPING:   (~[}] | '\\' .)+ -> mode(DEFAULT_MODE);
+DATA_MAPPING:   (~'}' | '\\' .)+ -> mode(DEFAULT_MODE);
 
 mode MlmName;
 MLMID:          MlmIDStart MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest -> mode(DEFAULT_MODE);
@@ -328,10 +328,10 @@ MLMID:          MlmIDStart MlmIDRest MlmIDRest MlmIDRest MlmIDRest MlmIDRest Mlm
 WS_ID:          [ \t\r\n]+ -> channel(HIDDEN);
 
 fragment MlmIDStart
-    :           Letter MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID?
+    :           Letter (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID?)?)?)?)?)?)?)?)?)?
     ;
 fragment MlmIDRest
-    :           MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID? MlmID?
+    :           (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID (MlmID?)?)?)?)?)?)?)?)?)?)?
     ;
 
 mode TwoCharMode;
