@@ -482,6 +482,7 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
     | alter_failover_group
     | alter_file_format
@@ -1387,6 +1388,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_event_table
     | create_external_function
     | create_external_table
     | create_failover_group
@@ -1528,6 +1530,19 @@ compression_type
 
 compression
     : COMPRESSION EQ compression_type
+    ;
+
+create_event_table
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_
+        cluster_by?
+        (DATA_RETENTION_TIME_IN_DAYS EQ num)?
+        (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)?
+        change_tracking?
+        (DEFAULT_DDL_COLLATION_ EQ string)?
+        copy_grants?
+        with_row_access_policy?
+        with_tags?
+        (WITH? comment_clause)?
     ;
 
 create_external_function
@@ -2566,6 +2581,7 @@ drop_command
     | drop_alert
     | drop_connection
     | drop_database
+    //| drop_event_table //uses DROP TABLE stmt
     | drop_external_table
     | drop_failover_group
     | drop_file_format
@@ -2803,13 +2819,15 @@ or_replace
     ;
 
 describe
-    : DESC | DESCRIBE
+    : DESC
+    | DESCRIBE
     ;
 
 // describe command
 describe_command
     : describe_alert
     | describe_database
+    | describe_event_table
     | describe_external_table
     | describe_file_format
     | describe_function
@@ -2842,6 +2860,10 @@ describe_alert
 
 describe_database
     : describe DATABASE id_
+    ;
+
+describe_event_table
+    : describe EVENT TABLE id_
     ;
 
 describe_external_table
@@ -2949,6 +2971,7 @@ show_command
     | show_databases_in_failover_group
     | show_databases_in_replication_group
     | show_delegated_authorizations
+    | show_event_tables
     | show_external_functions
     | show_external_tables
     | show_failover_groups
@@ -3035,6 +3058,13 @@ show_delegated_authorizations
     : SHOW DELEGATED AUTHORIZATIONS
     | SHOW DELEGATED AUTHORIZATIONS BY USER id_
     | SHOW DELEGATED AUTHORIZATIONS TO SECURITY INTEGRATION id_
+    ;
+
+show_event_tables
+    : SHOW TERSE? EVENT TABLES like_pattern?
+        ( IN ( ACCOUNT | DATABASE id_? | SCHEMA? schema_name? ) )?
+        starts_with?
+        limit_rows?
     ;
 
 show_external_functions
