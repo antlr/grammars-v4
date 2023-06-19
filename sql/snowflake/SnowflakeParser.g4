@@ -3471,6 +3471,7 @@ non_reserved_words
     | RESPECT
     | NVL
     | RESTRICT
+    | VALUES
     ;
 
 builtin_function
