@@ -36,7 +36,7 @@ done
 # Individual parsing: NOT SUPPORTED!
 <else>
 # Group parsing.
-echo "${files[*]}" | trwdog trcover -- -x
+echo "${files[*]}" | dotnet trwdog -- dotnet trcover -- -x
 status=$?
 <endif>
 
