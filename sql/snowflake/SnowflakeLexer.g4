@@ -302,6 +302,7 @@ ERROR_ON_NONDETERMINISTIC_MERGE:                       'ERROR_ON_NONDETERMINISTI
 ERROR_ON_NONDETERMINISTIC_UPDATE:                      'ERROR_ON_NONDETERMINISTIC_UPDATE';
 ESCAPE:                                                'ESCAPE';
 ESCAPE_UNENCLOSED_FIELD:                               'ESCAPE_UNENCLOSED_FIELD';
+EVENT:                                                 'EVENT';
 EXCEPT:                                                'EXCEPT';
 EXCHANGE:                                              'EXCHANGE';
 EXECUTE:                                               'EXEC' 'UTE'?;
