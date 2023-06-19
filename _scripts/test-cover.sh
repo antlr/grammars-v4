@@ -308,7 +308,7 @@ do
         popd > /dev/null
         continue
     fi
-    desc_targets=`trxml2 desc.xml | grep '/desc/targets'`
+    desc_targets=`dotnet trxml2 -- desc.xml | grep '/desc/targets'`
     if [ "${PIPESTATUS[0]}" -ne 0 ]
     then
         echo "The desc.xml for $testname is malformed. Skipping."
@@ -336,7 +336,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`trparse -t antlr4 *.g4 2> /dev/null | trxgrep ' //(actionBlock | argActionBlock)' | trtext -c`
+        count=`dotnet trparse -- -t antlr4 *.g4 2> /dev/null | dotnet trxgrep -- ' //(actionBlock | argActionBlock)' | dotnet trtext -- -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
