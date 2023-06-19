@@ -1,13 +1,12 @@
-import { CommonToken } from "antlr4ts/CommonToken";
-import { Lexer } from "antlr4ts/Lexer";
-import { Python3Parser } from './Python3Parser';
+import { CommonToken, Lexer, CharStream, Token } from "antlr4";
+import Python3Parser from './Python3Parser';
 
 export default abstract class Python3LexerBase extends Lexer {
     tokens: any[];
     indents: any[];
     opened: number;
 
-    constructor(input) {
+    constructor(input: CharStream) {
         super(input);
         this.tokens = [];
         this.indents = [];
@@ -27,8 +26,8 @@ export default abstract class Python3LexerBase extends Lexer {
         super.reset();
     }
 
-    emitToken(token) {
-        this._token = token;
+    emitToken(token: Token) {
+        super.emitToken(token);
         this.tokens.push(token);
     }
 
@@ -61,13 +60,13 @@ export default abstract class Python3LexerBase extends Lexer {
 		return this._input.index;
 	}
 
-    commonToken(type, text) {
+    commonToken(type: number, text: string) {
         let stop = this.getCharIndex() - 1;
         let start = text.length ? stop - text.length + 1 : stop;
-        return new CommonToken(type, text, this._tokenFactorySourcePair, Lexer.DEFAULT_TOKEN_CHANNEL, start, stop);
+        return new CommonToken(0, type, 0, start, stop);
     }
 
-    getIndentationCount(whitespace) {
+    getIndentationCount(whitespace: string) {
         let count = 0;
         for (let i = 0; i < whitespace.length; i++) {
             if (whitespace[i] === '\t') {
