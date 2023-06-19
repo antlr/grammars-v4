@@ -120,7 +120,7 @@ AZURE_STORAGE_QUEUE_PRIMARY_URI:                       'AZURE_STORAGE_QUEUE_PRIM
 AZURE_TENANT_ID:                                       'AZURE_TENANT_ID';
 BASE64:                                                'BASE64';
 BEFORE:                                                'BEFORE';
-//BEGIN:                                                 'BEGIN';
+BEGIN:                                                 'BEGIN';
 BERNOULLI:                                             'BERNOULLI';
 BETWEEN:                                               'BETWEEN';
 BINARY_AS_TEXT:                                        'BINARY_AS_TEXT';
