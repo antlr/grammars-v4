@@ -348,7 +348,7 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    bad=`dotnet trgen -- -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`
