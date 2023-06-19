@@ -54,8 +54,10 @@ unitStatement
     | databaseStmt
     | releaseSavepoint
     | renameColumn
-    | renameDatabase
     | renameConstraint
+    | renameDatabase
+    | renameIndex
+    | renameSecurity
     ) SCOL
     ;
 
@@ -173,6 +175,16 @@ renameDatabase
     : RENAME DATABASE oldDatabase=identifier TO newDatabase=identifier
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-index-statement
+renameIndex
+    : RENAME INDEX oldIndex=identifier TO newIndex=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-security-statement
+renameSecurity
+    : RENAME SECURITY (POLICY | LABEL (policy=identifier? | COMPONENT)) oldSecurity=identifier TO newSecurity=identifier
+    ;
+
 anyName
     : IDENTIFIER
     | keyword
@@ -210,6 +222,7 @@ keyword
     | CLOSE
     | COLLATE
     | COLUMN
+    | COMPONENT
     | COMMIT
     | CONFLICT
     | CONSTRAINT
@@ -260,6 +273,7 @@ keyword
     | ISNULL
     | JOIN
     | KEY
+    | LABEL
     | LEFT
     | LIKE
     | LIMIT
@@ -276,6 +290,7 @@ keyword
     | OR
     | ORDER
     | OUTER
+    | POLICY
     | PLAN
     | PRAGMA
     | PRIMARY
@@ -294,6 +309,7 @@ keyword
     | ROW
     | ROWS
     | SAVEPOINT
+    | SECURITY
     | SELECT
     | SET
     | SYNONYM

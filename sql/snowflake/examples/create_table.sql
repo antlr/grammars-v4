@@ -50,3 +50,16 @@ CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1);
 CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY INCREMENT 2);
 create table t1 (v datetime(9));
 CREATE TABLE T1 (TIMESTAMP DATETIME,VALUE STRING,NAME STRING);
+
+create table t
+as
+with q as (
+    select 1 as c
+)
+select c from q;
+
+create table tpk (i int primary key);
+alter table tpk drop primary key;
+
+create table tc1 comment = '' (i int);
+create table tc2 (i int) comment = '';

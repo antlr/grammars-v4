@@ -44,7 +44,17 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:dart"
- # JavaScript
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/_scripts/templates/Go"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "all"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # JavaScript
   - package-ecosystem: "npm"
     directory: "/_scripts/templates/JavaScript"
     schedule:

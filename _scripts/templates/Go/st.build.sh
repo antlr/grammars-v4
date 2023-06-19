@@ -1,6 +1,9 @@
 # Generated from trgen <version>
+
+version=`grep 'github.com/antlr4-go/antlr/v4' go.mod | awk '{print $2}' | sed 's/v//'`
+
 export GO111MODULE=on
-for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@v4.13.0; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
+for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@v$version; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 
 set -e
 
@@ -13,7 +16,7 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # Go has no version, just the latest version.
 
 <tool_grammar_tuples:{x |
-antlr4 -v 4.13.0 -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 } >
 
 go build Test.go
