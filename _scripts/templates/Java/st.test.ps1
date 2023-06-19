@@ -50,9 +50,8 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 }
 
 # Parse all input files.
-$version = "4.13.0"
-$homePath = [System.Environment]::GetFolderPath("UserProfile")
-$JAR = Join-Path -Path $homePath -ChildPath ".m2/repository/org/antlr/antlr4/$version/antlr4-$version-complete.jar"
+$version = Select-String -Path "build.sh" -Pattern "version=" | ForEach-Object { $_.Line -split "=" | Select-Object -Last 1 }
+$JAR = python -c "import os; from pathlib import Path; print(os.path.join(Path.home(), '.m2', 'repository', 'org', 'antlr', 'antlr4', '$version', ('antlr4-' + '$version' + '-complete.jar')))"
 <if(individual_parsing)>
 # Individual parsing.
 Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
