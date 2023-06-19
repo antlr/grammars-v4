@@ -26,11 +26,11 @@ parser grammar SnowflakeParser;
 options { tokenVocab=SnowflakeLexer; }
 
 snowflake_file
-    : batch* EOF
+    : batch? EOF
     ;
 
 batch
-    : sql_command SEMI?
+    : sql_command (SEMI sql_command)* SEMI?
     ;
 
 sql_command
@@ -86,16 +86,18 @@ value_item
     ;
 
 merge_statement
-    : MERGE INTO object_name USING table_source ON search_condition merge_matches
+    : MERGE INTO object_name as_alias?
+        USING table_source ON search_condition
+        merge_matches
     ;
 
 merge_matches
-    : WHEN MATCHED (AND search_condition )? THEN merge_update_delete
-    | WHEN NOT MATCHED (AND search_condition )? THEN merge_insert
+    : (WHEN MATCHED (AND search_condition )? THEN merge_update_delete)+
+    (WHEN NOT MATCHED (AND search_condition )? THEN merge_insert)?
     ;
 
 merge_update_delete
-    : UPDATE SET column_name EQ expr ( column_name EQ expr )*
+    : UPDATE SET column_name EQ expr (',' column_name EQ expr )*
     | DELETE
     ;
 
@@ -104,19 +106,19 @@ merge_insert
     ;
 
 update_statement
-    : UPDATE object_name
+    : UPDATE object_name as_alias?
         SET column_name EQ expr (COMMA column_name EQ expr)*
         (FROM table_sources)?
         (WHERE search_condition)?
     ;
 
 table_or_query
-    : object_name
-    | '(' subquery ')'
+    : object_name as_alias?
+    | '(' subquery ')' as_alias?
     ;
 
 delete_statement
-    : DELETE FROM object_name
+    : DELETE FROM object_name as_alias?
         (USING table_or_query (COMMA table_or_query)? )?
         (WHERE search_condition)?
     ;
@@ -150,6 +152,12 @@ other_command
     | truncate_table
     | unset
     | call
+    | begin_txn
+    ;
+
+begin_txn
+    : BEGIN ( WORK | TRANSACTION )? ( NAME id_ )?
+    | START TRANSACTION ( NAME id_ )?
     ;
 
 copy_into_table
@@ -226,8 +234,12 @@ copy_into_location
     ;
 
 comment
-    : COMMENT if_exists? ON object_type_name object_name IS string
+    : COMMENT if_exists? ON object_type_name object_name function_signature? IS string
     | COMMENT if_exists? ON COLUMN full_column_name IS string
+    ;
+
+function_signature
+    : '(' data_type_list? ')'
     ;
 
 commit
@@ -235,9 +247,8 @@ commit
     ;
 
 execute_immediate
-    : EXECUTE IMMEDIATE string ( USING '(' id_ (COMMA id_)* ')' )?
-    | EXECUTE IMMEDIATE id_ ( USING '(' id_ (COMMA id_)* ')' )?
-    | EXECUTE IMMEDIATE ID2 ( USING '(' id_ (COMMA id_)* ')' )?
+    : EXECUTE IMMEDIATE (string | id_ | ID2) (USING '(' id_ (COMMA id_)* ')')?
+    | EXECUTE IMMEDIATE DBL_DOLLAR
     ;
 
 execute_task
@@ -482,6 +493,7 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
     | alter_failover_group
     | alter_file_format
@@ -1199,6 +1211,8 @@ constraint_action
                          ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
     | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
                          cascade_restrict?
+    | DROP PRIMARY KEY
+
     ;
 
 search_optimization_action
@@ -1252,9 +1266,9 @@ alter_tag
     ;
 
 alter_task
-    : ALTER TASK if_exists? id_ resume_suspend
-    | ALTER TASK if_exists? id_ REMOVE AFTER string_list | ADD AFTER string_list
-    | ALTER TASK if_exists? id_ SET
+    : ALTER TASK if_exists? object_name resume_suspend
+    | ALTER TASK if_exists? object_name REMOVE AFTER string_list | ADD AFTER string_list
+    | ALTER TASK if_exists? object_name SET
         ( WAREHOUSE EQ string )?
         ( SCHEDULE EQ string )?
         ( ALLOW_OVERLAPPING_EXECUTION EQ true_false )?
@@ -1262,7 +1276,7 @@ alter_task
         ( SUSPEND_TASK_AFTER_NUM_FAILURES EQ num )?
         comment_clause?
         session_parameter_init_list?
-    | ALTER TASK if_exists? id_ UNSET
+    | ALTER TASK if_exists? object_name UNSET
         WAREHOUSE?
         SCHEDULE?
         ALLOW_OVERLAPPING_EXECUTION?
@@ -1271,10 +1285,10 @@ alter_task
         COMMENT?
         session_parameter_list?
             //[ , ... ]
-    | ALTER TASK if_exists? id_ set_tags
-    | ALTER TASK if_exists? id_ unset_tags
-    | ALTER TASK if_exists? id_ MODIFY AS sql
-    | ALTER TASK if_exists? id_ MODIFY WHEN expr
+    | ALTER TASK if_exists? object_name set_tags
+    | ALTER TASK if_exists? object_name unset_tags
+    | ALTER TASK if_exists? object_name MODIFY AS sql
+    | ALTER TASK if_exists? object_name MODIFY WHEN expr
     ;
 
 alter_user
@@ -1348,13 +1362,13 @@ alter_network_policy_opts
     ;
 
 alter_warehouse_opts
-    : id_? ( SUSPEND | RESUME if_suspended? )
-    | id_? ABORT ALL QUERIES
-    | id_ RENAME TO id_
+    : id_fn? ( SUSPEND | RESUME if_suspended? )
+    | id_fn? ABORT ALL QUERIES
+    | id_fn RENAME TO id_
 //    | id_ SET [ objectProperties ]
-    | id_ set_tags
-    | id_ unset_tags
-    | id_ UNSET id_ (COMMA id_)*
+    | id_fn set_tags
+    | id_fn unset_tags
+    | id_fn UNSET id_ (COMMA id_)*
     ;
 
 alter_account_opts
@@ -1387,6 +1401,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_event_table
     | create_external_function
     | create_external_table
     | create_failover_group
@@ -1417,6 +1432,7 @@ create_command
     | create_stream
     | create_table
     | create_table_as_select
+    | create_table_like
     //    | create_|_alter_table_…_constraint
     | create_tag
     | create_task
@@ -1527,6 +1543,19 @@ compression_type
 
 compression
     : COMPRESSION EQ compression_type
+    ;
+
+create_event_table
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_
+        cluster_by?
+        (DATA_RETENTION_TIME_IN_DAYS EQ num)?
+        (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)?
+        change_tracking?
+        (DEFAULT_DDL_COLLATION_ EQ string)?
+        copy_grants?
+        with_row_access_policy?
+        with_tags?
+        (WITH? comment_clause)?
     ;
 
 create_external_function
@@ -2315,7 +2344,11 @@ column_decl_item_list
 
 create_table
     : CREATE or_replace? table_type? TABLE (if_not_exists? object_name | object_name if_not_exists? )
-        '(' column_decl_item_list ')'
+        ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
+    ;
+
+create_table_clause
+    : '(' column_decl_item_list ')'
         cluster_by?
         stage_file_format?
         ( STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET )?
@@ -2326,7 +2359,6 @@ create_table
         copy_grants?
         with_row_access_policy?
         with_tags?
-        comment_clause?
     ;
 
 create_table_as_select
@@ -2337,7 +2369,13 @@ create_table_as_select
         with_row_access_policy?
         with_tags?
         comment_clause?
-        AS select_statement
+        AS query_statement
+    ;
+
+create_table_like
+    : CREATE or_replace? TRANSIENT? TABLE object_name LIKE object_name
+        cluster_by?
+        copy_grants?
     ;
 
 create_tag
@@ -2449,16 +2487,16 @@ create_task
         ( ERROR_INTEGRATION EQ id_ )?
         copy_grants?
         comment_clause?
-        ( AFTER string (COMMA string)* )?
+        ( AFTER object_name (COMMA object_name)* )?
         ( WHEN search_condition )?
       AS
         sql
     ;
 
 sql
-    : sql_command
+    : EXECUTE IMMEDIATE DBL_DOLLAR
+    | sql_command
     | call
-    | DBL_DOLLAR
     ;
 
 call
@@ -2485,16 +2523,16 @@ create_view
     ;
 
 create_warehouse
-    : CREATE or_replace? WAREHOUSE if_not_exists? id_
+    : CREATE or_replace? WAREHOUSE if_not_exists? id_fn
               ( WITH? wh_properties+ )?
               wh_params*
     ;
 
 wh_properties
-    : WAREHOUSE_SIZE EQ (XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE | X5LARGE | X6LARGE)
+    : WAREHOUSE_SIZE EQ (XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE | X5LARGE | X6LARGE | ID2)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
-    | SCALING_POLICY EQ STANDARD | ECONOMY
+    | SCALING_POLICY EQ (STANDARD | ECONOMY)
     | AUTO_SUSPEND (EQ num | NULL_)
     | AUTO_RESUME EQ true_false
     | INITIALLY_SUSPENDED EQ true_false
@@ -2559,6 +2597,7 @@ drop_command
     | drop_alert
     | drop_connection
     | drop_database
+    //| drop_event_table //uses DROP TABLE stmt
     | drop_external_table
     | drop_failover_group
     | drop_file_format
@@ -2709,7 +2748,7 @@ drop_view
     ;
 
 drop_warehouse
-    : DROP WAREHOUSE if_exists? id_
+    : DROP WAREHOUSE if_exists? id_fn
     ;
 
 cascade_restrict
@@ -2771,7 +2810,7 @@ use_secondary_roles
     ;
 
 use_warehouse
-    : USE WAREHOUSE id_
+    : USE WAREHOUSE id_fn
     ;
 
 /* */
@@ -2796,13 +2835,15 @@ or_replace
     ;
 
 describe
-    : DESC | DESCRIBE
+    : DESC
+    | DESCRIBE
     ;
 
 // describe command
 describe_command
     : describe_alert
     | describe_database
+    | describe_event_table
     | describe_external_table
     | describe_file_format
     | describe_function
@@ -2835,6 +2876,10 @@ describe_alert
 
 describe_database
     : describe DATABASE id_
+    ;
+
+describe_event_table
+    : describe EVENT TABLE id_
     ;
 
 describe_external_table
@@ -2942,6 +2987,7 @@ show_command
     | show_databases_in_failover_group
     | show_databases_in_replication_group
     | show_delegated_authorizations
+    | show_event_tables
     | show_external_functions
     | show_external_tables
     | show_failover_groups
@@ -3028,6 +3074,13 @@ show_delegated_authorizations
     : SHOW DELEGATED AUTHORIZATIONS
     | SHOW DELEGATED AUTHORIZATIONS BY USER id_
     | SHOW DELEGATED AUTHORIZATIONS TO SECURITY INTEGRATION id_
+    ;
+
+show_event_tables
+    : SHOW TERSE? EVENT TABLES like_pattern?
+        ( IN ( ACCOUNT | DATABASE id_? | SCHEMA? schema_name? ) )?
+        starts_with?
+        limit_rows?
     ;
 
 show_external_functions
@@ -3322,6 +3375,11 @@ string_list
     : string (COMMA string)*
     ;
 
+id_fn
+    : id_
+    | IDENTIFIER '(' id_ ')'
+    ;
+
 id_
     : ID
     | ID2
@@ -3393,6 +3451,8 @@ builtin_function
     | UPPER
     | LOWER
     | TO_BOOLEAN
+    | IDENTIFIER
+    | FLATTEN
     ;
 
 list_operator
@@ -3417,7 +3477,7 @@ binary_or_ternary_builtin_function
     : CHARINDEX
     | REPLACE
     | substring=( SUBSTRING | SUBSTR )
-    | LIKE | ILIKE 
+    | LIKE | ILIKE
     ;
 
 ternary_builtin_function
@@ -3435,7 +3495,7 @@ pattern
 //    ;
 
 column_name
-    : id_
+    : (id_ '.')? id_
     ;
 
 column_list
@@ -3479,6 +3539,7 @@ expr
 //    | expr time_zone
     | expr COLON expr //json access
     | expr DOT VALUE
+    | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
@@ -3611,7 +3672,7 @@ ranking_windowed_function
 aggregate_function
     : id_ '(' DISTINCT? expr_list ')'
     | id_ '(' STAR ')'
-    | LISTAGG '(' DISTINCT? expr (COMMA string)? ')' (WITHIN GROUP '(' order_by_clause ')' )?
+    | (LISTAGG | ARRAY_AGG) '(' DISTINCT? expr (COMMA string)? ')' (WITHIN GROUP '(' order_by_clause ')' )?
     ;
 
 //rows_range
@@ -3797,11 +3858,11 @@ object_ref
     | object_name
         START WITH predicate
         CONNECT BY prior_list?
-    | TABLE '(' object_name '('  expr_list  ')' ')'
+    | TABLE '(' function_call ')'
         pivot_unpivot?
         as_alias?
         sample?
-    | '(' values ')'
+    | '(' values ')' as_alias?
         sample?
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
