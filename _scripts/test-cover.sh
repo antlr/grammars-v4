@@ -393,7 +393,7 @@ do
             echo ""
             failed+=( "$testname/$target" )
             else
-            echo " Succeeded."      
+            echo " Succeeded."
             succeeded+=( "$testname,$target" )
         fi
         popd > /dev/null
