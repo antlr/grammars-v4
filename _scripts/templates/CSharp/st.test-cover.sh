@@ -24,7 +24,7 @@ files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tr
 files=()
 for f in $files2
 do
-    triconv -f utf-8 $f > /dev/null 2>&1
+    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
