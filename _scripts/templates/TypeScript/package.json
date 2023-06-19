@@ -9,15 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4": "4.12",
+    "antlr4": "4.13.0",
     "buffer": "^6.0.3",
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.1.1",
     "timer-node": "^5.0.6",
     "typescript-string-operations": "^1.5.0"
   },
   "type": "module",
   "devDependencies": {
-    "@types/node": "^18.13.0"
+    "@types/node": "^20.2.5"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"

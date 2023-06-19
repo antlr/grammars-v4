@@ -75,3 +75,15 @@ CREATE OR REPLACE TABLE T3 (C3 STRING FOREIGN KEY REFERENCES T2 MATCH PARTIAL ON
 create table TestK (NVL2 string, FIRST_VALUE string, RESTRICT int, NVL int, RESPECT int);
 
 Create table T1(C1 string) WITH TAG ( TAG_NAME='T1');
+create table t
+as
+with q as (
+    select 1 as c
+)
+select c from q;
+
+create table tpk (i int primary key);
+alter table tpk drop primary key;
+
+create table tc1 comment = '' (i int);
+create table tc2 (i int) comment = '';

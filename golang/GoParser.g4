@@ -63,9 +63,9 @@ typeSpec: IDENTIFIER ASSIGN? type_;
 
 // Function declarations
 
-functionDecl: FUNC IDENTIFIER (signature block?);
+functionDecl: FUNC IDENTIFIER signature block?;
 
-methodDecl: FUNC receiver IDENTIFIER ( signature block?);
+methodDecl: FUNC receiver IDENTIFIER signature block?;
 
 receiver: parameters;
 
@@ -284,7 +284,7 @@ primaryExpr:
 	| conversion
 	| methodExpr
 	| primaryExpr (
-		(DOT IDENTIFIER)
+		DOT IDENTIFIER
 		| index
 		| slice_
 		| typeAssertion

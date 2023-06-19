@@ -36,7 +36,7 @@ script
    ;
 
 class_
-   : ('shared' | 'abstract' | 'final' | 'external')* 'class' IDENTIFIER (';' | ((':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | func_ | var_ | funcdef)* '}'))
+   : ('shared' | 'abstract' | 'final' | 'external')* 'class' IDENTIFIER (';' | (':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | func_ | var_ | funcdef)* '}' )
    ;
 
 typdef
@@ -48,15 +48,15 @@ namespace
    ;
 
 func_
-   : ('shared' | 'external')* ('private' | 'protected')? (((type_ '&'?) | '~'))? IDENTIFIER paramlist 'const'? FUNCATTR? (';' | statblock)
+   : ('shared' | 'external')* ('private' | 'protected')? (type_ '&'? | '~')? IDENTIFIER paramlist 'const'? FUNCATTR? (';' | statblock)
    ;
 
 interface_
-   : ('external' | 'shared')* 'interface' IDENTIFIER (';' | ((':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | intfmthd)* '}'))
+   : ('external' | 'shared')* 'interface' IDENTIFIER (';' | (':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | intfmthd)* '}' )
    ;
 
 var_
-   : ('private' | 'protected')? type_ IDENTIFIER (('=' (initlist | expr)) | arglist)? (',' IDENTIFIER (('=' (initlist | expr)) | arglist)?)* ';'
+   : ('private' | 'protected')? type_ IDENTIFIER ('=' (initlist | expr) | arglist)? (',' IDENTIFIER ('=' (initlist | expr) | arglist)?)* ';'
    ;
 
 import_
@@ -64,7 +64,7 @@ import_
    ;
 
 enum_
-   : ('shared' | 'external')* 'enum' IDENTIFIER (';' | ('{' IDENTIFIER ('=' expr)? (',' IDENTIFIER ('=' expr)?)* '}'))
+   : ('shared' | 'external')* 'enum' IDENTIFIER (';' | '{' IDENTIFIER ('=' expr)? (',' IDENTIFIER ('=' expr)?)* '}')
    ;
 
 funcdef
@@ -88,7 +88,7 @@ statblock
    ;
 
 paramlist
-   : '(' (VOID | (type_ typemod IDENTIFIER? ('=' expr)? (',' type_ typemod IDENTIFIER? ('=' expr)?)*))? ')'
+   : '(' (VOID | type_ typemod IDENTIFIER? ('=' expr)? (',' type_ typemod IDENTIFIER? ('=' expr)?)* )? ')'
    ;
 
 typemod
@@ -96,7 +96,7 @@ typemod
    ;
 
 type_
-   : 'const'? scope datatype ('<' type_ (',' type_)* '>')* (('[' ']') | ('@' 'const'?))*
+   : 'const'? scope datatype ('<' type_ (',' type_)* '>')* ('[' ']' | '@' 'const'?)*
    ;
 
 initlist
@@ -108,11 +108,11 @@ scope
    ;
 
 datatype
-   : (IDENTIFIER | PRIMTYPE | '?' | 'auto')
+   : IDENTIFIER | PRIMTYPE | '?' | 'auto'
    ;
 
 statement
-   : (if_ | for_ | while_ | return_ | statblock | break_ | continue_ | dowhile | switch_ | exprstat | try_)
+   : if_ | for_ | while_ | return_ | statblock | break_ | continue_ | dowhile | switch_ | exprstat | try_
    ;
 
 switch_
@@ -156,7 +156,7 @@ return_
    ;
 
 case_
-   : (('case' expr) | 'default') ':' statement*
+   : ('case' expr | 'default') ':' statement*
    ;
 
 expr
@@ -164,8 +164,8 @@ expr
    ;
 
 exprterm
-   : ((type_ '=')? initlist)
-   | (EXPRPREOP* exprvalue exprpostop*)
+   : (type_ '=')? initlist
+   | EXPRPREOP* exprvalue exprpostop*
    ;
 
 exprvalue
@@ -184,8 +184,8 @@ constructcall
    ;
 
 exprpostop
-   : ('.' (funccall | IDENTIFIER))
-   | ('[' (IDENTIFIER ':')? assign (',' IDENTIFIER? ':' assign)* ']')
+   : '.' (funccall | IDENTIFIER)
+   | '[' (IDENTIFIER ':')? assign (',' IDENTIFIER? ':' assign)* ']'
    | arglist
    | '++'
    | '--'
@@ -298,7 +298,7 @@ PRIMTYPE
    ;
 
 FUNCATTR
-   : ('override' | 'final' | 'explicit' | 'property')
+   : 'override' | 'final' | 'explicit' | 'property'
    ;
 
 EXPRPREOP
@@ -337,16 +337,16 @@ IDENTIFIER
    ;
 
 NUMBER
-   : [0-9] ('.' [0-9]+)
+   : [0-9] '.' [0-9]+
    ;
 
 STRING
-   : ('"' ~ '"'* '"')
-   | ('\'' ~ '\''* '\'')
+   : '"' ~ '"'* '"'
+   | '\'' ~ '\''* '\''
    ;
 
 BITS
-   : (('0b' | '0o' | '0d' | '0x' | '0B' | '0O' | '0D' | '0X') [0-9a-z])
+   : ('0b' | '0o' | '0d' | '0x' | '0B' | '0O' | '0D' | '0X') [0-9a-z]
    ;
 
 COMMENT

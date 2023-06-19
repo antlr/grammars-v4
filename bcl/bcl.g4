@@ -38,7 +38,7 @@ bcl
 term
    : '00'
    | '01'
-   | ('1' term term)
+   | '1' term term
    ;
 
 WS

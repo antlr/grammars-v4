@@ -97,7 +97,7 @@ atomsent
 	
 atom
 	:	OPEN predicate termseq CLOSE
-	|	OPEN term OPEN 'cl-roleset' (OPEN name term CLOSE) CLOSE CLOSE
+	|	OPEN term OPEN 'cl-roleset' OPEN name term CLOSE CLOSE CLOSE
 	; 
 	
 predicate
@@ -225,7 +225,7 @@ CL_PREFIX				:	'cl-prefix';
 
 //A.2.2.7 Name character sequence
 NAMECHARSEQUENCE
-	:	( CHAR  (CHAR | STRINGQUOTE | NAMEQUOTE | BACKSLASH)* )
+	:	CHAR  (CHAR | STRINGQUOTE | NAMEQUOTE | BACKSLASH)*
 	;
 
 

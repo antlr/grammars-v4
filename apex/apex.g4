@@ -34,9 +34,11 @@
  *
  *  You can test with
  *
- *  $ antlr4 Apexcode.g4
+ *  $ antlr4 apex.g4
  *  $ javac *.java
- *  $ grun Apexcode compilationUnit *.cls
+ *  $ grun apex compilationUnit *.cls
+ *
+ *  How to run example: https://mohan-chinnappan-n5.github.io/sfbooks/sfdevnotes/language-design/apex-grammar.html 
  */
 grammar apex;
 
@@ -63,28 +65,26 @@ typeDeclaration
 
 modifier
     :   classOrInterfaceModifier
-    |   (   NATIVE
-        |   SYNCHRONIZED
-        |   TRANSIENT
-        )
+    |   NATIVE
+    |   SYNCHRONIZED
+    |   TRANSIENT
     ;
 
 classOrInterfaceModifier
     :   annotation       // class or interface
-    |   (   PUBLIC     // class or interface
-        |   PROTECTED  // class or interface
-        |   PRIVATE    // class or interface
-        |   STATIC     // class or interface
-        |   ABSTRACT   // class or interface
-        |   FINAL      // class only -- does not apply to interfaces
-        |   GLOBAL     // class or interface
-        |   WEBSERVICE // class only -- does not apply to interfaces
-        |   OVERRIDE   // method only
-        |   VIRTUAL    // method only
-        |   TESTMETHOD    // method only
-		|	APEX_WITH_SHARING // class only
-		|	APEX_WITHOUT_SHARING //class only
-        )
+    |   PUBLIC     // class or interface
+    |   PROTECTED  // class or interface
+    |   PRIVATE    // class or interface
+    |   STATIC     // class or interface
+    |   ABSTRACT   // class or interface
+    |   FINAL      // class only -- does not apply to interfaces
+    |   GLOBAL     // class or interface
+    |   WEBSERVICE // class only -- does not apply to interfaces
+    |   OVERRIDE   // method only
+    |   VIRTUAL    // method only
+    |   TESTMETHOD    // method only
+    |   APEX_WITH_SHARING // class only
+    |   APEX_WITHOUT_SHARING //class only
     ;
 
 variableModifier
@@ -253,7 +253,7 @@ variableInitializer
     ;
 
 arrayInitializer
-    :   '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
+    :   '{' (variableInitializer (',' variableInitializer)* ','? )? '}'
     ;
 
 enumConstantName
@@ -352,7 +352,7 @@ elementValue
     ;
 
 elementValueArrayInitializer
-    :   '{' (elementValue (',' elementValue)*)? (',')? '}'
+    :   '{' (elementValue (',' elementValue)*)? ','? '}'
     ;
 
 annotationTypeDeclaration
@@ -360,7 +360,7 @@ annotationTypeDeclaration
     ;
 
 annotationTypeBody
-    :   '{' (annotationTypeElementDeclaration)* '}'
+    :   '{' annotationTypeElementDeclaration* '}'
     ;
 
 annotationTypeElementDeclaration
@@ -506,7 +506,7 @@ constantExpression
     ;
 
 apexDbUpsertExpression
-    :   DB_UPSERT expression (expression)*
+    :   DB_UPSERT expression expression*
     ;
 
 apexDbExpression
