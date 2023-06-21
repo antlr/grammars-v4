@@ -2279,7 +2279,7 @@ convertedDataType
       | typeName=CHAR lengthOneDimension? (charSet charsetName)?
       | typeName=(DATE | DATETIME | TIME | JSON | INT | INTEGER)
       | typeName=(DECIMAL | DEC) lengthTwoOptionalDimension?
-      | (SIGNED | UNSIGNED) INTEGER?
+      | (SIGNED | UNSIGNED) (INTEGER | INT)?
     ) ARRAY?
     ;
 
