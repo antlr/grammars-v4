@@ -22,19 +22,24 @@ abstract class Python3LexerBase extends Lexer
     {
         int stop = this.charIndex - 1;
         int start = text.length == 0 ? stop : stop - text.length + 1;
-		var ctf = this.tokenFactor;
+	var ctf = this.tokenFactory;
         final t = ctf.create(
             type,
             text,
-            CommonTokenFactory.DEFAULT,
+            Pair<TokenSource?, CharStream?>(this, this.inputStream),
             channel,
             start,
             charIndex - 1,
             tokenStartLine,
             tokenStartCharPositionInLine);
-        emitToken(t);
-        Tokens.add(t);
         return t;
+    }
+
+    @override
+    void emitToken(Token token)
+    {
+	super.emitToken(token);
+        Tokens.add(token);
     }
 
     Token CreateDedent()
@@ -61,17 +66,17 @@ abstract class Python3LexerBase extends Lexer
             }
             
             // First emit an extra line break that serves as the end of the statement.
-            MakeCommonToken(Python3Parser.TOKEN_NEWLINE, "\n");
+            this.emitToken(MakeCommonToken(Python3Parser.TOKEN_NEWLINE, "\n"));
 
             // Now emit as much DEDENT tokens as needed.
             while (! Indents.isEmpty)
             {
-                CreateDedent();
+                this.emitToken(CreateDedent());
                 Indents.removeLast();
             }
 
             // Put the EOF back on the token stream.
-            MakeCommonToken(IntStream.EOF, "<EOF>");
+            this.emitToken(MakeCommonToken(IntStream.EOF, "<EOF>"));
         }
 
         Token next = super.nextToken();
@@ -97,7 +102,7 @@ abstract class Python3LexerBase extends Lexer
     {
         int count = 0;
         for (int i = 0; i < spaces.length; i++) {
-            count += spaces[i] == '\t' ? 8 - (count % 8) : 1;
+            count += spaces[i] == '\t'.codeUnitAt(0) ? 8 - (count % 8) : 1;
         }
         return count;
     }
@@ -123,7 +128,7 @@ abstract class Python3LexerBase extends Lexer
         // satisfy the final newline needed by the single_put rule used by the REPL.
         int? next = this.inputStream.LA(1);
         int? nextnext = this.inputStream.LA(2);
-        if (Opened > 0 || (nextnext != -1 && (next == '\r' || next == '\n' || next == '\f' || next == '#')))
+        if (Opened > 0 || (nextnext != -1 && (next == '\r'.codeUnitAt(0) || next == '\n'.codeUnitAt(0) || next == '\f'.codeUnitAt(0) || next == '#'.codeUnitAt(0))))
         {
             // If we're inside a list or on a blank line, ignore all indents, 
             // dedents and line breaks.
@@ -131,7 +136,7 @@ abstract class Python3LexerBase extends Lexer
         }
         else
         {
-            MakeCommonToken(Python3Lexer.TOKEN_NEWLINE, newLine);
+            this.emitToken(MakeCommonToken(Python3Lexer.TOKEN_NEWLINE, newLine));
             int indent = getIndentationCount(spaces);
             int previous = Indents.isEmpty ? 0 : Indents.last;
             if (indent == previous)
@@ -141,13 +146,13 @@ abstract class Python3LexerBase extends Lexer
             }
             else if (indent > previous) {
                 Indents.add(indent);
-                MakeCommonToken(Python3Parser.TOKEN_INDENT, spaces);
+                this.emitToken(MakeCommonToken(Python3Parser.TOKEN_INDENT, spaces));
             }
             else {
                 // Possibly emit more than 1 DEDENT token.
                 while(!Indents.isEmpty && Indents.last > indent)
                 {
-                    CreateDedent();
+                    this.emitToken(CreateDedent());
                     Indents.removeLast();
                 }
             }
