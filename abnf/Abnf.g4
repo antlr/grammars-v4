@@ -112,21 +112,17 @@ ProseValue
    : '<' ~'>'* '>'
    ;
 
-
 ID
    : LETTER ( LETTER | DIGIT | '-' )*
    ;
-
 
 INT
    : '0' .. '9'+
    ;
 
-
 COMMENT
    : ';' ~ ( '\n' | '\r' )* '\r'? '\n' -> channel ( HIDDEN )
    ;
-
 
 WS
    : ( ' ' | '\t' | '\r' | '\n' ) -> channel ( HIDDEN )
