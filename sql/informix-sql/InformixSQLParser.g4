@@ -59,6 +59,7 @@ unitStatement
     | renameIndex
     | renameSecurity
     | renameSequence
+    | renameTable
     ) SCOL
     ;
 
@@ -189,6 +190,11 @@ renameSecurity
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-sequence-statement
 renameSequence
     : RENAME SEQUENCE oldSequence=identifier TO newSequence=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-table-statement
+renameTable
+    : RENAME TABLE oldTableName=identifier TO newTableName=identifier
     ;
 
 
