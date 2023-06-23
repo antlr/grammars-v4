@@ -87,3 +87,4 @@ alter table tpk drop primary key;
 
 create table tc1 comment = '' (i int);
 create table tc2 (i int) comment = '';
+create table tc3 (c char(4), c2 character(2));

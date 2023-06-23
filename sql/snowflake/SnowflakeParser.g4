@@ -3649,7 +3649,7 @@ data_type
     | TIMESTAMP_LTZ data_type_size?
     | TIMESTAMP_NTZ data_type_size?
     | TIMESTAMP_TZ data_type_size?
-    | char_alias = ( CHAR | NCHAR | CHARACTER )
+    | char_alias = ( CHAR | NCHAR | CHARACTER ) data_type_size?
     | varchar_alias = ( CHAR_VARYING | NCHAR_VARYING | NVARCHAR2 | NVARCHAR | STRING_ | TEXT | VARCHAR ) data_type_size?
     | binary_alias = ( BINARY | VARBINARY ) data_type_size?
     | VARIANT
@@ -4050,7 +4050,12 @@ expr_list_in_parentheses
     ;
 
 values_table
-    : LR_BRACKET VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
+    : LR_BRACKET values_table_body RR_BRACKET (as_alias column_alias_list_in_brackets?)?
+    | values_table_body (as_alias column_alias_list_in_brackets?)?
+    ;
+
+values_table_body
+    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)*
     ;
 
 sample_method
