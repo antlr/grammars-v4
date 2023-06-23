@@ -3649,7 +3649,7 @@ data_type
     | TIMESTAMP_LTZ data_type_size?
     | TIMESTAMP_NTZ data_type_size?
     | TIMESTAMP_TZ data_type_size?
-    | char_alias = ( CHAR | NCHAR | CHARACTER )
+    | char_alias = ( CHAR | NCHAR | CHARACTER ) data_type_size?
     | varchar_alias = ( CHAR_VARYING | NCHAR_VARYING | NVARCHAR2 | NVARCHAR | STRING_ | TEXT | VARCHAR ) data_type_size?
     | binary_alias = ( BINARY | VARBINARY ) data_type_size?
     | VARIANT
