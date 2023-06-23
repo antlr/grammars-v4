@@ -1176,26 +1176,60 @@ table_column_action
     | DROP COLUMN? column_list
     ;
 
-inline_constraint :
-    null_not_null?
-    ( CONSTRAINT id_ )?
-    ( UNIQUE | PRIMARY KEY | ( ( FOREIGN KEY )? REFERENCES object_name ( '(' column_name ')' )? ) )
-    constraint_properties?
+inline_constraint 
+    : null_not_null? (CONSTRAINT id_)? 
+    (
+        ( UNIQUE | primary_key ) common_constraint_properties*
+        | foreign_key REFERENCES object_name ( LR_BRACKET column_name RR_BRACKET )? constraint_properties
+    )
+    ;
+
+enforced_not_enforced
+    : NOT? ENFORCED
+    ;
+
+deferrable_not_deferrable
+    : NOT? DEFERRABLE
+    ;
+
+initially_deferred_or_immediate
+    : INITIALLY ( DEFERRED | IMMEDIATE )
+    ;
+
+//TODO : Some properties are mutualy exclusive ie INITIALLY DEFERRED is not compatible with NOT DEFERRABLE
+// also VALIDATE | NOVALIDATE need to be after ENABLE or ENFORCED. Lot of case to handle :)
+common_constraint_properties
+    : enforced_not_enforced ( VALIDATE | NOVALIDATE )?
+    | deferrable_not_deferrable
+    | initially_deferred_or_immediate
+    | ( ENABLE | DISABLE ) ( VALIDATE | NOVALIDATE )?
+    | RELY
+    | NORELY
+    ;
+
+on_update
+    : ON UPDATE on_action
+    ;
+
+on_delete
+    : ON DELETE on_action
+    ;
+
+foreign_key_match
+    : MATCH match_type=( FULL | PARTIAL | SIMPLE )
+    ;
+
+on_action
+    : CASCADE 
+    | SET ( NULL_ | DEFAULT )
+    | RESTRICT 
+    | NO ACTION
     ;
 
 constraint_properties
-    : NOT? ENFORCED
-    | NOT? DEFERRABLE
-    | INITIALLY ( DEFERRED | IMMEDIATE )
-    | MATCH ( FULL | PARTIAL | SIMPLE )
-    | UPDATE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | DELETE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | ENABLE
-    | DISABLE
-    | VALIDATE
-    | NOVALIDATE
-    | RELY
-    | NORELY
+    : common_constraint_properties*
+    | foreign_key_match
+    | foreign_key_match? ( on_update on_delete? | on_delete on_update? )
     ;
 
 ext_table_column_action
@@ -1207,9 +1241,9 @@ ext_table_column_action
 constraint_action
     : ADD out_of_line_constraint
     | RENAME CONSTRAINT id_ TO id_
-    | alter_modify ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
-                         ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
-    | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
+    | alter_modify ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
+                         enforced_not_enforced? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
+    | DROP ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
                          cascade_restrict?
     | DROP PRIMARY KEY
 
@@ -1722,16 +1756,14 @@ column_list_in_parentheses
 
 create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name
-        copy_grants?
-        column_list_in_parentheses?
-//         [ <col1> [ WITH ] MASKING POLICY <policy_name> [ USING ( <col1> , <cond_col1> , ... ) ]
-//                   [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
-//          [ , <col2> [ ... ] ]
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
+        view_col*
         with_row_access_policy?
         with_tags?
+        copy_grants?
         comment_clause?
         cluster_by?
-        AS select_statement
+        AS select_statement //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -2008,7 +2040,7 @@ format_type_options
     | ESCAPE EQ (character | NONE | NONE_Q )
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE )
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
@@ -2297,10 +2329,6 @@ collate
     : COLLATE string
     ;
 
-not_null
-    : NOT NULL_
-    ;
-
 default_value
     : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
     ;
@@ -2309,14 +2337,16 @@ foreign_key
     : FOREIGN KEY
     ;
 
+primary_key
+    : PRIMARY KEY
+    ;
+
 out_of_line_constraint
     : (CONSTRAINT id_ )?
         (
-             UNIQUE column_list_in_parentheses?
-           | PRIMARY KEY column_list_in_parentheses?
-           | foreign_key? column_list_in_parentheses? REFERENCES object_name column_list_in_parentheses?
+           (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
+           | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
         )
-        constraint_properties?
     ;
 
 
@@ -2379,8 +2409,7 @@ create_table_like
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
-    | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
+    : CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )? comment_clause?
     ;
 
 session_parameter
@@ -2513,7 +2542,7 @@ view_col
 
 create_view
     : CREATE or_replace? SECURE? RECURSIVE? VIEW if_not_exists? object_name
-        ( LR_BRACKET column_list RR_BRACKET )?
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
         view_col*
         with_row_access_policy?
         with_tags?
@@ -3392,6 +3421,7 @@ id_
     | ALERT
     | ALERTS
     | CONDITION
+    | binary_builtin_function
     ;
 
 keyword
@@ -3436,6 +3466,12 @@ non_reserved_words
     | WAREHOUSE
     | VERSION
     | OPTION
+    | NVL2
+    | FIRST_VALUE
+    | RESPECT
+    | NVL
+    | RESTRICT
+    | VALUES
     ;
 
 builtin_function
@@ -3471,6 +3507,9 @@ binary_builtin_function
     | DATE_PART
     | to_date=( TO_DATE | DATE )
     | SPLIT
+    | NULLIF
+    | EQUAL_NULL
+    | CONTAINS
     ;
 
 binary_or_ternary_builtin_function
@@ -3484,6 +3523,7 @@ ternary_builtin_function
     : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     | SPLIT_PART
+    | NVL2
     ;
 
 pattern
@@ -3500,6 +3540,10 @@ column_name
 
 column_list
     : column_name (COMMA column_name)*
+    ;
+
+column_list_with_comment
+    : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
     ;
 
 object_name
@@ -3589,33 +3633,25 @@ arr_literal
     | LSB RSB
     ;
 
+data_type_size
+    : LR_BRACKET num RR_BRACKET 
+    ;
+
 data_type
-    : INT
-    | INTEGER
-    | SMALLINT
-    | TINYINT
-    | BYTEINT
-    | BIGINT
-    | (NUMBER | NUMERIC | DECIMAL_) ('(' num (COMMA num)? ')')?
-    | FLOAT_
-    | FLOAT4
-    | FLOAT8
-    | DOUBLE PRECISION?
-    | REAL_
+    : int_alias = ( INT | INTEGER | SMALLINT | TINYINT | BYTEINT | BIGINT )
+    | number_alias = ( NUMBER | NUMERIC | DECIMAL_ ) ( LR_BRACKET num (COMMA num)? RR_BRACKET )?
+    | float_alias = ( FLOAT_ | FLOAT4 | FLOAT8 | DOUBLE | DOUBLE_PRECISION | REAL_ )
     | BOOLEAN
     | DATE
-    | DATETIME ('(' num ')')?
-    | TIME ('(' num ')')?
-    | TIMESTAMP ('(' num ')')?
-    | TIMESTAMP_LTZ ('(' num ')')?
-    | TIMESTAMP_NTZ ('(' num ')')?
-    | TIMESTAMP_TZ ('(' num ')')?
-    | STRING_
-    | CHAR | CHARACTER
-    | VARCHAR ('(' num ')')?
-    | TEXT
-    | BINARY
-    | VARBINARY
+    | DATETIME data_type_size?
+    | TIME data_type_size?
+    | TIMESTAMP data_type_size?
+    | TIMESTAMP_LTZ data_type_size?
+    | TIMESTAMP_NTZ data_type_size?
+    | TIMESTAMP_TZ data_type_size?
+    | char_alias = ( CHAR | NCHAR | CHARACTER )
+    | varchar_alias = ( CHAR_VARYING | NCHAR_VARYING | NVARCHAR2 | NVARCHAR | STRING_ | TEXT | VARCHAR ) data_type_size?
+    | binary_alias = ( BINARY | VARBINARY ) data_type_size?
     | VARIANT
     | OBJECT
     | ARRAY
@@ -3661,12 +3697,18 @@ function_call
     | list_operator LR_BRACKET expr_list RR_BRACKET
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
-    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET    
+    ;
+
+ignore_or_repect_nulls
+    : ( IGNORE | RESPECT ) NULLS
     ;
 
 ranking_windowed_function
     : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
     | NTILE '(' expr ')' over_clause
+    | ( LEAD | LAG ) LR_BRACKET expr ( COMMA expr COMMA expr)? RR_BRACKET ignore_or_repect_nulls? over_clause
+    | ( FIRST_VALUE | LAST_VALUE ) LR_BRACKET expr RR_BRACKET ignore_or_repect_nulls? over_clause
     ;
 
 aggregate_function
@@ -3862,7 +3904,7 @@ object_ref
         pivot_unpivot?
         as_alias?
         sample?
-    | '(' values ')' as_alias?
+    | values_table
         sample?
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
@@ -3995,20 +4037,20 @@ match_recognize
     ;
 
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
 column_alias_list_in_brackets
-    : '(' id_ (COMMA id_)* ')'
+    : LR_BRACKET id_ (COMMA id_)* RR_BRACKET
     ;
 
 expr_list_in_parentheses
     : LR_BRACKET expr_list RR_BRACKET
     ;
 
-values
-    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* as_alias? column_alias_list_in_brackets?
+values_table
+    : LR_BRACKET VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
     ;
 
 sample_method
