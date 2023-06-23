@@ -4050,7 +4050,12 @@ expr_list_in_parentheses
     ;
 
 values_table
-    : LR_BRACKET VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
+    : LR_BRACKET values_table_body RR_BRACKET (as_alias column_alias_list_in_brackets?)?
+    | values_table_body (as_alias column_alias_list_in_brackets?)?
+    ;
+
+values_table_body
+    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)*
     ;
 
 sample_method
