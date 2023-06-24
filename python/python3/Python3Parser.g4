@@ -38,6 +38,8 @@ options {
     tokenVocab=Python3Lexer;
 }
 
+// Insert here @header for C++ parser.
+
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
