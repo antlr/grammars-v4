@@ -3472,6 +3472,7 @@ non_reserved_words
     | NVL
     | RESTRICT
     | VALUES
+    | EVENT
     ;
 
 builtin_function
