@@ -58,6 +58,8 @@ unitStatement
     | renameDatabase
     | renameIndex
     | renameSecurity
+    | renameSequence
+    | renameTable
     ) SCOL
     ;
 
@@ -184,6 +186,17 @@ renameIndex
 renameSecurity
     : RENAME SECURITY (POLICY | LABEL (policy=identifier? | COMPONENT)) oldSecurity=identifier TO newSecurity=identifier
     ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-sequence-statement
+renameSequence
+    : RENAME SEQUENCE oldSequence=identifier TO newSequence=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-table-statement
+renameTable
+    : RENAME TABLE oldTableName=identifier TO newTableName=identifier
+    ;
+
 
 anyName
     : IDENTIFIER
@@ -312,6 +325,7 @@ keyword
     | SECURITY
     | SELECT
     | SET
+    | SEQUENCE
     | SYNONYM
     | TABLE
     | TEMP

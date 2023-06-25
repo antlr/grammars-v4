@@ -170,6 +170,7 @@ SAVEPOINT:         'SAVEPOINT';
 SECURITY:          'SECURITY';
 SELECT:            'SELECT';
 SET:               'SET';
+SEQUENCE:          'SEQUENCE';
 SYNONYM:           'SYNONYM';
 TABLE:             'TABLE';
 TEMP:              'TEMP';
