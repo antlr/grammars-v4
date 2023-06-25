@@ -6,7 +6,7 @@
 
 class Python3LexerBase : public antlr4::Lexer {
 public:
-    Python3LexerBase(antlr4::CharStream *input): Lexer(input) { }
+    Python3LexerBase(antlr4::CharStream *input);
 
     std::vector<std::unique_ptr<antlr4::Token>> tokens;
     std::stack<int> indents;
@@ -22,6 +22,6 @@ public:
     void openBrace();
     void closeBrace();
     void onNewLine();
-    virtual void reset() override {}
+    virtual void reset() override;
     std::unique_ptr<antlr4::CommonToken> cloneToken(const std::unique_ptr<antlr4::Token>& source);
 };

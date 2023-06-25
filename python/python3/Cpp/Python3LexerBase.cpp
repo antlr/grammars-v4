@@ -4,6 +4,12 @@
 
 using namespace antlr4;
 
+Python3LexerBase::Python3LexerBase(antlr4::CharStream *input): Lexer(input)
+{
+	opened = 0;
+	lastToken = nullptr;
+}
+
 void Python3LexerBase::emit(std::unique_ptr<antlr4::Token> t)
 {
     tokens.push_back(cloneToken(t));
@@ -109,4 +115,14 @@ void Python3LexerBase::onNewLine()
             }
         }
     }
+}
+
+
+void Python3LexerBase::reset()
+{
+	tokens = std::vector<std::unique_ptr<antlr4::Token>>{};
+	indents = std::stack<int>{};
+	opened = 0;
+	lastToken = nullptr;
+	Lexer::reset();
 }
