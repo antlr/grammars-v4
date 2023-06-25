@@ -47,3 +47,5 @@ select d.s.t.c from d.s.t where d.s.t.c = 1;
 
 SELECT * FROM (VALUES (1), (2)) AS v1;
 SELECT * FROM (VALUES (1), (2));
+SELECT * FROM T1 SAMPLE BLOCK (1);
+SELECT * FROM T1 SAMPLE ROW (10 ROWS);

@@ -4092,8 +4092,8 @@ values_table_body
     ;
 
 sample_method
-    : (BERNOULLI | ROW)
-    | (SYSTEM | BLOCK)
+    : row_sampling =  ( BERNOULLI | ROW )
+    | block_sampling = ( SYSTEM | BLOCK )
     ;
 
 repeatable_seed
@@ -4101,7 +4101,7 @@ repeatable_seed
     ;
 
 sample_opts
-    : LR_BRACKET (num | (num ROWS)) RR_BRACKET repeatable_seed?
+    : LR_BRACKET num ROWS? RR_BRACKET repeatable_seed?
     ;
 
 sample
