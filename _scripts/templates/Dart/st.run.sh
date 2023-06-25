@@ -1,1 +1,1 @@
-Test.exe $@
+./Test.exe "$@"

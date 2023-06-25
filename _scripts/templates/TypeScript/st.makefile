@@ -1,7 +1,7 @@
 # Generated from trgen <version>
-build:
+build: FORCE
 	bash build.sh
-clean:
+clean: FORCE
 	bash clean.sh
 FORCE: ;
 test: FORCE
