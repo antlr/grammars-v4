@@ -417,12 +417,12 @@ list
 //  | @[<namespace>.]%<table_name>[/<path>]
 //  | @~[/<path>]
 internal_stage
-    : AT id_ '/'
+    : AT id_ '/'?
     ;
 
 //  @[<namespace>.]<ext_stage_name>[/<path>]
 external_stage
-    : AT id_ '/'
+    : AT id_ '/'?
     ;
 
 put
@@ -2095,9 +2095,9 @@ stage_kms_key
 
 stage_encryption_opts_aws
     : ENCRYPTION EQ LR_BRACKET
-        (stage_type? stage_master_key |
-        stage_type? |
-        ( stage_type stage_kms_key? )? | stage_type? )
+        ( stage_type? stage_master_key 
+        | stage_type stage_kms_key?
+        )
         RR_BRACKET
     ;
 
@@ -3582,7 +3582,7 @@ object_name
 
 object_name_or_identifier
     : object_name
-    | IDENTIFIER LR_BRACKET SINGLE_QUOTE object_name SINGLE_QUOTE RR_BRACKET
+    | IDENTIFIER LR_BRACKET string RR_BRACKET
     ;
 
 num

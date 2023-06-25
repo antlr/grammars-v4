@@ -1,4 +1,4 @@
-CREATE OR REPLACE STAGE STG1 url = 'azure://myaccount.blob.core.windows.net/mycontainer'
+CREATE OR REPLACE STAGE STG1 url = 'azure://myaccount.blob.core.windows.net/mycontainer';
 CREATE OR REPLACE STAGE STG1 url = 'azure://myaccount.blob.core.windows.net/mycontainer' ENCRYPTION = (TYPE = 'NONE');
 CREATE OR REPLACE STAGE STG1 url = 'azure://myaccount.blob.core.windows.net/mycontainer' ENCRYPTION = ( MASTER_KEY = 'toto' );
 CREATE OR REPLACE STAGE STG1 url = 'azure://myaccount.blob.core.windows.net/mycontainer' ENCRYPTION = ( MASTER_KEY = 'toto' TYPE ='AZURE_CSE');

@@ -1112,7 +1112,7 @@ S3_PATH:            SINGLE_QUOTE 's3://' Uri SINGLE_QUOTE;
 S3GOV_PATH:         SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
 GCS_PATH:           SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
 AZURE_PATH:         SINGLE_QUOTE 'azure://' Uri SINGLE_QUOTE;
-FILE_PATH:          'file://' Uri;            //file://<path_to_file>/<filename>
+FILE_PATH:          'file://' ( DIVIDE Uri | WindowsPath );            //file://<path_to_file>/<filename>
 
 DBL_DOLLAR:          '$$' (~'$'  | '\\$' | '$' ~'$')*? '$$';
 
@@ -1140,6 +1140,10 @@ fragment HexString
 
 fragment Uri
     : HexString (DIVIDE HexString)* DIVIDE?
+    ;
+
+fragment WindowsPath
+    : [A-Z] COLON '\\' HexString ('\\' HexString)* '\\'?
     ;
 
 ARROW:               '->';
