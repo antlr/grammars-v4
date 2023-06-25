@@ -1069,26 +1069,6 @@ alter_share
     | ALTER SHARE if_exists? id_ UNSET COMMENT
     ;
 
-alter_stage
-    : ALTER STAGE if_exists? id_ RENAME TO id_
-    | ALTER STAGE if_exists? id_ set_tags
-    | ALTER STAGE id_ unset_tags
-    // Internal stage
-    | ALTER STAGE if_exists? id_ SET (
-          internal_stage_params?
-          file_format?
-          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
-          comment_clause
-          )
-    // External stage
-    | ALTER STAGE if_exists? id_ SET (
-          external_stage_params?
-          file_format?
-          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
-          comment_clause?
-          )
-    ;
-
 alter_storage_integration
     : ALTER STORAGE? INTEGRATION if_exists? id_ SET
         cloud_provider_params2?
@@ -2097,8 +2077,8 @@ copy_options
     | FORCE EQ true_false
     ;
 
-internal_stage_params
-    : ENCRYPTION EQ LR_BRACKET TYPE EQ /*'SNOWFLAKE_FULL' */| TYPE EQ /*'SNOWFLAKE_SSE'*/ RR_BRACKET
+stage_encryption_opts_internal
+    : ENCRYPTION EQ LR_BRACKET TYPE EQ ( SNOWFLAKE_FULL | SNOWFLAKE_SSE ) RR_BRACKET
     ;
 
 stage_type
@@ -2137,25 +2117,53 @@ aws_role
     : AWS_ROLE EQ string
     ;
 
+azure_encryption_value
+    : ( TYPE EQ AZURE_CSE_Q )? MASTER_KEY EQ string
+    | MASTER_KEY EQ string TYPE EQ AZURE_CSE_Q
+    | TYPE EQ NONE_Q
+    ;
+stage_encryption_opts_az
+    : ENCRYPTION EQ LR_BRACKET azure_encryption_value RR_BRACKET
+    ;
+storage_integration_eq_id
+    : STORAGE_INTEGRATION EQ id_
+    ;
+
+az_credential_or_storage_integration:
+    storage_integration_eq_id
+    |  CREDENTIALS EQ LR_BRACKET AZURE_SAS_TOKEN EQ string RR_BRACKET
+    ;
+
+gcp_encryption_value
+    : ( TYPE EQ GCS_SSE_KMS_Q )? KMS_KEY_ID EQ string
+    | KMS_KEY_ID EQ string TYPE EQ GCS_SSE_KMS_Q
+    | TYPE EQ NONE_Q
+    ;
+
+stage_encryption_opts_gcp
+    : ENCRYPTION EQ LR_BRACKET gcp_encryption_value RR_BRACKET
+    ;
+
+aws_credential_or_storage_integration:
+    storage_integration_eq_id
+    |  CREDENTIALS EQ LR_BRACKET ( aws_key_id aws_secret_key aws_token? | aws_role ) RR_BRACKET
+    ;
+
 external_stage_params
     //(for Amazon S3)
-    : URL EQ string_list
-      ( ( STORAGE_INTEGRATION EQ id_ )
-        | ( CREDENTIALS EQ LR_BRACKET ( ( aws_key_id aws_secret_key aws_token? ) | aws_role ) RR_BRACKET )
-        )?
-        stage_encryption_opts_aws?
+    : URL EQ s3_url=( S3_PATH | S3GOV_PATH )
+      ( aws_credential_or_storage_integration? stage_encryption_opts_aws | stage_encryption_opts_aws? aws_credential_or_storage_integration )?
     //(for Google Cloud Storage)
-    | URL EQ string
-      ( STORAGE_INTEGRATION EQ id_ )?
-      ( ENCRYPTION EQ ( ( TYPE EQ /*'GCS_SSE_KMS'*/ )? ( KMS_KEY_ID EQ string )? | ( TYPE EQ 'NONE' )? ) )?
+    | URL EQ gc_url=GCS_PATH
+      ( storage_integration_eq_id? stage_encryption_opts_gcp | stage_encryption_opts_gcp? storage_integration_eq_id )?
     //(for Microsoft Azure)
-    | URL EQ string
-      ( ( STORAGE_INTEGRATION EQ id_ ) | ( CREDENTIALS EQ LR_BRACKET ( AZURE_SAS_TOKEN EQ string )? RR_BRACKET ) )?
-      ( ENCRYPTION EQ LR_BRACKET ( TYPE EQ /*'AZURE_CSE'*/ )? ( MASTER_KEY EQ string )? | ( TYPE EQ 'NONE' )? RR_BRACKET )?
+    | URL EQ azure_url=AZURE_PATH
+      ( az_credential_or_storage_integration? stage_encryption_opts_az  | stage_encryption_opts_az? az_credential_or_storage_integration )?      
     ;
 
 true_false
-    : TRUE | FALSE
+    : TRUE 
+    | FALSE
     ;
 
 enable
@@ -2174,11 +2182,19 @@ notification_integration
     : NOTIFICATION_INTEGRATION EQ string
     ;
 
-directory_table_params
- //(for internal stages)
-    :  DIRECTORY EQ LR_BRACKET enable refresh_on_create? RR_BRACKET
+directory_table_internal_params
+    : DIRECTORY EQ LR_BRACKET 
+        (   
+            enable refresh_on_create? 
+            | REFRESH_ON_CREATE EQ FALSE
+            | refresh_on_create enable
+        )
+        RR_BRACKET
+    ;
+
+directory_table_external_params
 // (for Amazon S3)
-    |  DIRECTORY EQ LR_BRACKET enable
+    :  DIRECTORY EQ LR_BRACKET enable
           refresh_on_create?
           auto_refresh? RR_BRACKET
 // (for Google Cloud Storage)
@@ -2193,24 +2209,48 @@ directory_table_params
           notification_integration? RR_BRACKET
     ;
 
+/* ===========  Stage DDL section =========== */
 create_stage
-    //Internal stage
-    : CREATE or_replace? TEMPORARY? STAGE if_not_exists? object_name
-          internal_stage_params?
-          directory_table_params?
+    : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier
+        stage_encryption_opts_internal? 
+        directory_table_internal_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
         ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
-    //External stage
-    | CREATE or_replace? TEMPORARY? STAGE if_not_exists? object_name
-          external_stage_params
-          directory_table_params?
+    | CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier
+        external_stage_params
+        directory_table_external_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
         ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
     ;
+
+alter_stage
+    : ALTER STAGE if_exists? object_name_or_identifier RENAME TO object_name_or_identifier
+    | ALTER STAGE if_exists? object_name_or_identifier set_tags
+    | ALTER STAGE if_exists? object_name_or_identifier unset_tags
+    | ALTER STAGE if_exists? object_name_or_identifier SET 
+          external_stage_params?
+          file_format?
+          ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
+          comment_clause?          
+    ;
+
+drop_stage
+    : DROP STAGE if_exists? object_name_or_identifier
+    ;
+
+describe_stage
+    : describe STAGE object_name_or_identifier
+    ;
+
+show_stages
+    : SHOW STAGES like_pattern? in_obj?
+    ;
+
+/* ===========  End of stage DDL section =========== */
 
 cloud_provider_params
     //(for Amazon S3)
@@ -2748,10 +2788,6 @@ drop_share
     : DROP SHARE id_
     ;
 
-drop_stage
-    : DROP STAGE if_exists? object_name
-    ;
-
 drop_stream
     : DROP STREAM if_exists? object_name
     ;
@@ -2973,10 +3009,6 @@ describe_session_policy
 
 describe_share
     : describe SHARE id_
-    ;
-
-describe_stage
-    : describe STAGE object_name
     ;
 
 describe_stream
@@ -3290,10 +3322,6 @@ show_shares_in_replication_group
     : SHOW SHARES IN REPLICATION GROUP id_
     ;
 
-show_stages
-    : SHOW STAGES like_pattern? in_obj?
-    ;
-
 show_streams
     : SHOW STREAMS like_pattern? in_obj?
     ;
@@ -3550,6 +3578,11 @@ object_name
     : d=id_ DOT s=id_ DOT o=id_
     | s=id_ DOT o=id_
     | o=id_
+    ;
+
+object_name_or_identifier
+    : object_name
+    | IDENTIFIER LR_BRACKET SINGLE_QUOTE object_name SINGLE_QUOTE RR_BRACKET
     ;
 
 num
