@@ -57,8 +57,8 @@ export default abstract class Python3LexerBase extends Lexer {
     }
 
     getCharIndex() {
-		return this._input.index;
-	}
+        return this._input.index;
+    }
 
     commonToken(type: number, text: string) {
         let stop = this.getCharIndex() - 1;

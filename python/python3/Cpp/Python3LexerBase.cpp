@@ -6,8 +6,8 @@ using namespace antlr4;
 
 Python3LexerBase::Python3LexerBase(antlr4::CharStream *input): Lexer(input)
 {
-	opened = 0;
-	lastToken = nullptr;
+    opened = 0;
+    lastToken = nullptr;
 }
 
 void Python3LexerBase::emit(std::unique_ptr<antlr4::Token> t)
@@ -90,8 +90,8 @@ void Python3LexerBase::closeBrace() {
 
 void Python3LexerBase::onNewLine()
 {
-	std::string newLine = std::regex_replace(getText(), std::regex("[^\r\n\f]+"), "");
-	std::string spaces = std::regex_replace(getText(), std::regex("[\r\n\f]+"), "");
+    std::string newLine = std::regex_replace(getText(), std::regex("[^\r\n\f]+"), "");
+    std::string spaces = std::regex_replace(getText(), std::regex("[\r\n\f]+"), "");
     int next = _input->LA(1);
     int nextnext = _input->LA(2);
     if (opened > 0 || (nextnext != -1 && (next == '\r' || next == '\n' || next == '\f' || next == '#'))) {
@@ -120,9 +120,9 @@ void Python3LexerBase::onNewLine()
 
 void Python3LexerBase::reset()
 {
-	tokens = std::vector<std::unique_ptr<antlr4::Token>>{};
-	indents = std::stack<int>{};
-	opened = 0;
-	lastToken = nullptr;
-	Lexer::reset();
+    tokens = std::vector<std::unique_ptr<antlr4::Token>>{};
+    indents = std::stack<int>{};
+    opened = 0;
+    lastToken = nullptr;
+    Lexer::reset();
 }

@@ -22,7 +22,7 @@ abstract class Python3LexerBase extends Lexer
     {
         int stop = this.charIndex - 1;
         int start = text.length == 0 ? stop : stop - text.length + 1;
-	var ctf = this.tokenFactory;
+        var ctf = this.tokenFactory;
         final t = ctf.create(
             type,
             text,
@@ -38,7 +38,7 @@ abstract class Python3LexerBase extends Lexer
     @override
     void emitToken(Token token)
     {
-	super.emitToken(token);
+        super.emitToken(token);
         Tokens.add(token);
     }
 
