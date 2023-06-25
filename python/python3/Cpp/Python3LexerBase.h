@@ -17,13 +17,11 @@ public:
     virtual std::unique_ptr<antlr4::Token> nextToken() override;
     std::unique_ptr<antlr4::Token> createDedent();
     std::unique_ptr<antlr4::CommonToken> commonToken(size_t type, const std::string& text);
-    static int getIndentationCount(std::string spaces);
+    static int getIndentationCount(const std::string& spaces);
     bool atStartOfInput();
     void openBrace();
     void closeBrace();
     void onNewLine();
-    virtual void reset() override;
-
+    virtual void reset() override {}
     std::unique_ptr<antlr4::CommonToken> cloneToken(const std::unique_ptr<antlr4::Token>& source);
-
 };
