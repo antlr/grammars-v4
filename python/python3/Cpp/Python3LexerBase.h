@@ -9,14 +9,14 @@ public:
     Python3LexerBase(antlr4::CharStream *input): Lexer(input) { }
 
     std::vector<std::unique_ptr<antlr4::Token>> tokens;
-    std::deque<int> indents;
+    std::stack<int> indents;
     int opened;
-    antlr4::Token* lastToken;
+    std::unique_ptr<antlr4::Token> lastToken;
 
     virtual void emit(std::unique_ptr<antlr4::Token> newToken) override;
     virtual std::unique_ptr<antlr4::Token> nextToken() override;
-    antlr4::Token createDedent();
-    antlr4::CommonToken commonToken(int type, std::string text);
+    std::unique_ptr<antlr4::Token> createDedent();
+    std::unique_ptr<antlr4::CommonToken> commonToken(size_t type, const std::string& text);
     static int getIndentationCount(std::string spaces);
     bool atStartOfInput();
     void openBrace();
