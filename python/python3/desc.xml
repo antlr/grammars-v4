@@ -6,12 +6,12 @@
    <test>
       <targets>Cpp;CSharp;Go;Java</targets>
       <entry-point>file_input</entry-point>
-      <inputs>slow</inputs>
+      <inputs>large</inputs>
    </test>
    <!-- slow parsers work only on a small test suite. -->
    <test>
       <targets>JavaScript;PHP;Python3;TypeScript</targets>
       <entry-point>file_input</entry-point>
-      <inputs>fast</inputs>
+      <inputs>small</inputs>
    </test>
 </desc>
