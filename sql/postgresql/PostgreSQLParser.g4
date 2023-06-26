@@ -3473,7 +3473,57 @@ original version of a_expr, for info
 
 
 a_expr
-   : a_expr_qual
+   : a_expr_bool
+   ;
+
+a_expr_bool
+   : NOT a_expr_bool
+   | a_expr_var
+   | a_expr_bool AND a_expr_bool
+   | a_expr_bool OR a_expr_bool
+   | a_expr_bool (LESS_LESS|GREATER_GREATER) a_expr_bool
+   | a_expr_bool qual_op
+   ;
+
+a_expr_var
+   : c_expr
+   | a_expr_var TYPECAST typename
+   | a_expr_var COLLATE any_name
+   | a_expr_var AT TIME ZONE a_expr_var
+   //right	unary plus, unary minus
+   | (PLUS| MINUS) a_expr_var
+   //left	exponentiation
+   | a_expr_var CARET a_expr_var
+   //left	multiplication, division, modulo
+   | a_expr_var (STAR | SLASH | PERCENT) a_expr_var
+   //left	addition, subtraction
+   | a_expr_var (PLUS | MINUS) a_expr_var
+   //left	all other native and user-defined operators
+   | a_expr_var qual_op a_expr_var
+   | qual_op a_expr_var
+   //range containment, set membership, string matching BETWEEN IN LIKE ILIKE SIMILAR
+   | a_expr_var NOT? (LIKE|ILIKE|SIMILAR TO) a_expr_var opt_escape
+   | a_expr_var NOT? BETWEEN SYMMETRIC? a_expr_var AND a_expr_var opt_escape
+   //< > = <= >= <>	 	comparison operators
+   | a_expr_var (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr_var
+   //IS ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
+   | a_expr_var IS NOT?
+            (
+                NULL_P
+                |TRUE_P
+                |FALSE_P
+                |UNKNOWN
+                |DISTINCT FROM a_expr_var
+                |OF OPEN_PAREN type_list CLOSE_PAREN
+                |DOCUMENT_P
+                |unicode_normal_form? NORMALIZED
+            )
+   | a_expr_var (ISNULL|NOTNULL)
+   | row OVERLAPS row
+   | a_expr_var NOT? IN_P in_expr
+   | a_expr_var subquery_Op sub_type (select_with_parens|OPEN_PAREN a_expr_var CLOSE_PAREN)
+   | UNIQUE select_with_parens
+   | DEFAULT
    ;
 /*23*/
 
