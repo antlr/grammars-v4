@@ -1655,6 +1655,7 @@ SQLDATA:                      'SQLDATA';
 SQLERROR:                     'SQLERROR';
 SQLLDR:                       'SQLLDR';
 SQL:                          'SQL';
+FILE_EXT:                     ('PKB' | 'PKS');
 SQL_MACRO:                    'SQL_MACRO';
 SQL_TRACE:                    'SQL_TRACE';
 SQL_TRANSLATION_PROFILE:      'SQL_TRANSLATION_PROFILE';
@@ -2458,7 +2459,7 @@ START_CMD
     //: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
     // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
     // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
-    : '@' {self.IsNewlineAtPos(-2)}? '@'? ~('\r' | '\n')* NEWLINE_EOF
+    : '@''@'?
     ;
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;

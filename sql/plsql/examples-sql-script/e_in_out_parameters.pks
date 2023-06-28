@@ -6,7 +6,7 @@ is
 end e_in_out_parameters;
 /
 
-show errors
+show errors;
 
 create or replace package e_in_out_parameters
 is
@@ -16,7 +16,7 @@ is
 end e_in_out_parameters;
 /
 
-show errors
+show errors;
 
 create or replace package e_in_out_parameters
 is
