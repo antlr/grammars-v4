@@ -2902,11 +2902,6 @@ select_no_parens
    ;
 
 select_clause
-   : simple_select
-   | select_with_parens
-   ;
-
-simple_select
    : simple_select_intersect ((UNION | EXCEPT) all_or_distinct simple_select_intersect)*
    ;
 
@@ -2922,10 +2917,10 @@ simple_select_pramary
            group_clause
            having_clause
            window_clause
-       | values_clause
-       | TABLE relation_expr
-       | select_with_parens
-     )
+    )
+   | values_clause
+   | TABLE relation_expr
+   | select_with_parens
    ;
 
 with_clause
