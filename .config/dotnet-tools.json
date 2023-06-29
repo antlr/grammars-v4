@@ -39,7 +39,7 @@
       ]
     },
     "trwdog": {
-      "version": "0.20.27",
+      "version": "0.21.0",
       "commands": [
         "trwdog"
       ]
