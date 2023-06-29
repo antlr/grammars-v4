@@ -2907,6 +2907,14 @@ select_clause
    ;
 
 simple_select
+   : simple_select_intersect ((UNION | EXCEPT) all_or_distinct simple_select_intersect)*
+   ;
+
+simple_select_intersect
+    : simple_select_pramary ((INTERSECT) all_or_distinct simple_select_pramary)*
+    ;
+
+simple_select_pramary
    : ( SELECT (opt_all_clause into_clause opt_target_list | distinct_clause target_list)
            into_clause
            from_clause
@@ -2916,19 +2924,8 @@ simple_select
            window_clause
        | values_clause
        | TABLE relation_expr
-       | select_with_parens set_operator_with_all_or_distinct (simple_select | select_with_parens)
+       | select_with_parens
      )
-        (set_operator_with_all_or_distinct (simple_select | select_with_parens))*
-   ;
-
-set_operator
-   : UNION # union
-   | INTERSECT # intersect
-   | EXCEPT # except
-   ;
-
-set_operator_with_all_or_distinct
-   : set_operator all_or_distinct
    ;
 
 with_clause
