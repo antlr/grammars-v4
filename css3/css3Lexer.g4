@@ -1,5 +1,7 @@
 lexer grammar css3Lexer;
 
+channels { ERROR }
+
 OpenBracket:                    '[';
 CloseBracket:                   ']';
 OpenParen:                      '(';
@@ -550,3 +552,5 @@ Ident
 Function_
     : Ident '('
     ;
+
+UnexpectedCharacter:            . -> channel(ERROR);
