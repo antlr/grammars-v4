@@ -1,126 +1,141 @@
 package parser
 
-import "github.com/antlr4-go/antlr/v4"
+import (
+	"github.com/antlr4-go/antlr/v4"
+	"regexp"
+)
 
 type Python3LexerBase struct {
-	*antlr.BaseLexer
-
-	scopeStrictModes []bool
-	stackLength      int
-	stackIx          int
-
-	lastToken        antlr.Token
-	useStrictDefault bool
-	useStrictCurrent bool
-	templateDepth    int
+    *antlr.BaseLexer
+    tokens []antlr.Token
+    indents []int
+    Opened int
+    lastToken antlr.Token
 }
 
-func (l *Python3LexerBase) IsStartOfFile() bool {
-	return l.lastToken == nil
+
+
+func (l *Python3LexerBase) MakeCommonToken(ttype int, text string) antlr.Token {
+    stop := l.TokenStartCharIndex - 1
+    start := stop
+    if len(text) != 0 {
+        start = stop - len(text) + 1
+    }
+    ctf := l.GetTokenFactory()
+        t := ctf.Create(
+            l.GetTokenSourceCharStreamPair(),
+            ttype,
+            text,
+            antlr.TokenDefaultChannel,
+            start,
+            l.TokenStartCharIndex - 1,
+            l.TokenStartLine,
+            l.TokenStartColumn)
+        return t
 }
 
-func (l *Python3LexerBase) pushStrictModeScope(v bool) {
-	if l.stackIx == l.stackLength {
-		l.scopeStrictModes = append(l.scopeStrictModes, v)
-		l.stackLength++
-	} else {
-		l.scopeStrictModes[l.stackIx] = v
-	}
-	l.stackIx++
+func (l *Python3LexerBase) EmitToken(token antlr.Token) {
+    l.BaseLexer.EmitToken(token)
+    l.tokens = append(l.tokens, token)
 }
 
-func (l *Python3LexerBase) popStrictModeScope() bool {
-	l.stackIx--
-	v := l.scopeStrictModes[l.stackIx]
-	l.scopeStrictModes[l.stackIx] = false
-	return v
+func (l *Python3LexerBase) CreateDedent() antlr.Token {
+    dedent := l.MakeCommonToken(Python3ParserDEDENT, "")
+    //dedent.Line = LastToken.GetLine()
+    return dedent
 }
 
-// IsStrictMode is self explanatory.
-func (l *Python3LexerBase) IsStrictMode() bool {
-	return l.useStrictCurrent
-}
-
-// NextToken from the character stream.
 func (l *Python3LexerBase) NextToken() antlr.Token {
-	next := l.BaseLexer.NextToken() // Get next token
-	if next.GetChannel() == antlr.TokenDefaultChannel {
-		// Keep track of the last token on default channel
+	if (l.GetInputStream().LA(1) == antlr.TokenEOF && len(l.indents) != 0) {
+		var filtered []antlr.Token
+		for _, value := range l.tokens {
+			if value.GetTokenType() != antlr.TokenEOF {
+				filtered = append(filtered, value)
+			}
+		}
+		l.tokens = filtered
+		l.EmitToken(l.MakeCommonToken(Python3ParserNEWLINE, "\n"))
+		for len(l.indents) != 0 {
+			l.EmitToken(l.CreateDedent())
+			l.indents = l.indents[:len(l.indents)-1]
+		}
+		l.EmitToken(l.MakeCommonToken(antlr.TokenEOF, "<EOF>"))
+	}
+
+	next := l.BaseLexer.NextToken()
+	if (next.GetChannel() == antlr.TokenDefaultChannel) {
 		l.lastToken = next
 	}
-	return next
-}
-
-// ProcessOpenBrace is called when a { is encountered during
-// lexing, we push a new scope everytime.
-func (l *Python3LexerBase) ProcessOpenBrace() {
-	l.useStrictCurrent = l.useStrictDefault
-	if l.stackIx > 0 && l.scopeStrictModes[l.stackIx-1] {
-		l.useStrictCurrent = true
-	}
-	l.pushStrictModeScope(l.useStrictCurrent)
-}
-
-// ProcessCloseBrace is called when a } is encountered during
-// lexing, we pop a scope unless we're inside global scope.
-func (l *Python3LexerBase) ProcessCloseBrace() {
-	l.useStrictCurrent = l.useStrictDefault
-	if l.stackIx > 0 {
-		l.useStrictCurrent = l.popStrictModeScope()
+	if (len(l.tokens) == 0) {
+		return next
+	} else {
+		x := l.tokens[0]
+		l.tokens = l.tokens[1:]
+		return x
 	}
 }
 
-// ProcessStringLiteral is called when lexing a string literal.
-func (l *Python3LexerBase) ProcessStringLiteral() {
-	if l.lastToken == nil || l.lastToken.GetTokenType() == JavaScriptLexerOpenBrace {
-		if l.GetText() == `"use strict"` || l.GetText() == "'use strict'" {
-			if l.stackIx > 0 {
-				l.popStrictModeScope()
-			}
-			l.useStrictCurrent = true
-			l.pushStrictModeScope(l.useStrictCurrent)
+func (l *Python3LexerBase) GetIndentationCount(spaces string) int {
+	count := 0
+	for _, ch := range spaces {
+		if (ch == '\t') {
+			count += 8 - (count % 8)
+		} else {
+			count += 1
 		}
 	}
+	return count
 }
 
-// IsRegexPossible returns true if the lexer can match a
-// regex literal.
-func (l *Python3LexerBase) IsRegexPossible() bool {
-	if l.lastToken == nil {
-		return true
-	}
-	switch l.lastToken.GetTokenType() {
-	case JavaScriptLexerIdentifier, JavaScriptLexerNullLiteral,
-		JavaScriptLexerBooleanLiteral, JavaScriptLexerThis,
-		JavaScriptLexerCloseBracket, JavaScriptLexerCloseParen,
-		JavaScriptLexerOctalIntegerLiteral, JavaScriptLexerDecimalLiteral,
-		JavaScriptLexerHexIntegerLiteral, JavaScriptLexerStringLiteral,
-		JavaScriptLexerPlusPlus, JavaScriptLexerMinusMinus:
-		return false
-	default:
-		return true
-	}
+func (l *Python3LexerBase) atStartOfInput() bool {
+    return l.TokenStartColumn == 0 && l.TokenStartLine == 1
 }
 
-func (l *Python3LexerBase) IncreaseTemplateDepth() {
-	l.templateDepth++
+func (l *Python3LexerBase) openBrace() {
+    l.Opened++
 }
 
-func (l *Python3LexerBase) DecreaseTemplateDepth() {
-	l.templateDepth--
+func (l *Python3LexerBase) closeBrace() {
+    l.Opened--
 }
 
-func (l *Python3LexerBase) IsInTemplateString() bool {
-	return l.templateDepth > 0
+func (l *Python3LexerBase) onNewLine() {
+	newLineRegex := regexp.MustCompile(`[^\r\n\f]+`)
+	newLine := newLineRegex.ReplaceAllString(l.GetText(), "")
+	spacesRegex := regexp.MustCompile(`[\r\n\f]+`)
+	spaces := spacesRegex.ReplaceAllString(l.GetText(), "")
+    next := l.GetInputStream().LA(1)
+    nextnext := l.GetInputStream().LA(2)
+    if (l.Opened > 0 || (nextnext != -1 && (next == '\r' || next == '\n' || next == '\f' || next == '#'))) {
+        l.Skip()
+    } else {
+        l.EmitToken(l.MakeCommonToken(Python3LexerNEWLINE, newLine))
+        indent := l.GetIndentationCount(spaces)
+        previous := 0
+		if len(l.indents) == 0 {
+			previous = 0
+        } else {
+			previous = l.indents[len(l.indents)-1]
+		}
+        if (indent == previous) {
+            l.Skip()
+        } else if (indent > previous) {
+            l.indents = append(l.indents, indent)
+            l.EmitToken(l.MakeCommonToken(Python3ParserINDENT, spaces))
+        } else {
+            for len(l.indents) != 0 && l.indents[len(l.indents)-1] > indent {
+                l.EmitToken(l.CreateDedent())
+				l.indents = l.indents[:len(l.indents)-1]
+            }
+        }
+    }
 }
+
 
 func (l *Python3LexerBase) Reset() {
-    l.scopeStrictModes = nil
-    l.stackLength = 0
-    l.stackIx = 0
-    l.lastToken = nil
-    l.useStrictDefault = false
-    l.useStrictCurrent = false
-    l.templateDepth = 0
-	l.BaseLexer.Reset()
+    l.tokens = make([]antlr.Token, 0)
+    l.indents = make([]int, 0)
+    l.Opened = 0
+    //l.lastToken = null
+    l.BaseLexer.Reset()
 }
