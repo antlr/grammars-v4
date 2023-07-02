@@ -367,11 +367,11 @@ fontFaceDeclaration
 // Animations
 // https://www.w3.org/TR/css3-animations/
 keyframesRule
-    : Keyframes ws Space ws ident ws '{' ws keyframesBlocks '}' ws
+    : Keyframes ws Space ws ident ws '{' ws keyframeBlock* '}' ws
     ;
 
-keyframesBlocks
-    : ( keyframeSelector '{' ws declarationList? '}' ws )*
+keyframeBlock
+    : ( keyframeSelector '{' ws declarationList? '}' ws )
     ;
 
 keyframeSelector
