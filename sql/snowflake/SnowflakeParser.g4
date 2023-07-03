@@ -3042,6 +3042,7 @@ describe_warehouse
 // show commands
 show_command
     : show_alerts
+    | show_channels
     | show_columns
     | show_connections
     | show_databases
@@ -3099,6 +3100,10 @@ show_alerts
         ( IN ( ACCOUNT | DATABASE id_? | SCHEMA schema_name? ) )?
         starts_with?
         limit_rows?
+    ;
+
+show_channels
+    : SHOW CHANNELS like_pattern? ( IN ( ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE | TABLE? object_name) )?
     ;
 
 show_columns
