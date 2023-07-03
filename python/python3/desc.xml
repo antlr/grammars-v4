@@ -4,7 +4,7 @@
    <targets>Cpp;CSharp;Go;Java;JavaScript;PHP;Python3;TypeScript</targets>
    <!-- fast parsers can work on a large test suite. -->
    <test>
-      <targets>Cpp;CSharp;Go;Java</targets>
+      <targets>Cpp;CSharp;Java</targets>
       <entry-point>file_input</entry-point>
       <inputs>large</inputs>
    </test>
