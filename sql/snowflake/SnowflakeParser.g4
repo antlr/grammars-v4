@@ -1156,8 +1156,8 @@ table_column_action
     | DROP COLUMN? column_list
     ;
 
-inline_constraint 
-    : null_not_null? (CONSTRAINT id_)? 
+inline_constraint
+    : null_not_null? (CONSTRAINT id_)?
     (
         ( UNIQUE | primary_key ) common_constraint_properties*
         | foreign_key REFERENCES object_name ( LR_BRACKET column_name RR_BRACKET )? constraint_properties
@@ -1200,9 +1200,9 @@ foreign_key_match
     ;
 
 on_action
-    : CASCADE 
+    : CASCADE
     | SET ( NULL_ | DEFAULT )
-    | RESTRICT 
+    | RESTRICT
     | NO ACTION
     ;
 
@@ -2095,7 +2095,7 @@ stage_kms_key
 
 stage_encryption_opts_aws
     : ENCRYPTION EQ LR_BRACKET
-        ( stage_type? stage_master_key 
+        ( stage_type? stage_master_key
         | stage_type stage_kms_key?
         )
         RR_BRACKET
@@ -2158,11 +2158,11 @@ external_stage_params
       ( storage_integration_eq_id? stage_encryption_opts_gcp | stage_encryption_opts_gcp? storage_integration_eq_id )?
     //(for Microsoft Azure)
     | URL EQ azure_url=AZURE_PATH
-      ( az_credential_or_storage_integration? stage_encryption_opts_az  | stage_encryption_opts_az? az_credential_or_storage_integration )?      
+      ( az_credential_or_storage_integration? stage_encryption_opts_az  | stage_encryption_opts_az? az_credential_or_storage_integration )?
     ;
 
 true_false
-    : TRUE 
+    : TRUE
     | FALSE
     ;
 
@@ -2183,9 +2183,9 @@ notification_integration
     ;
 
 directory_table_internal_params
-    : DIRECTORY EQ LR_BRACKET 
-        (   
-            enable refresh_on_create? 
+    : DIRECTORY EQ LR_BRACKET
+        (
+            enable refresh_on_create?
             | REFRESH_ON_CREATE EQ FALSE
             | refresh_on_create enable
         )
@@ -2212,7 +2212,7 @@ directory_table_external_params
 /* ===========  Stage DDL section =========== */
 create_stage
     : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier
-        stage_encryption_opts_internal? 
+        stage_encryption_opts_internal?
         directory_table_internal_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
         ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
@@ -2231,11 +2231,11 @@ alter_stage
     : ALTER STAGE if_exists? object_name_or_identifier RENAME TO object_name_or_identifier
     | ALTER STAGE if_exists? object_name_or_identifier set_tags
     | ALTER STAGE if_exists? object_name_or_identifier unset_tags
-    | ALTER STAGE if_exists? object_name_or_identifier SET 
+    | ALTER STAGE if_exists? object_name_or_identifier SET
           external_stage_params?
           file_format?
           ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
-          comment_clause?          
+          comment_clause?
     ;
 
 drop_stage
@@ -3673,7 +3673,7 @@ arr_literal
     ;
 
 data_type_size
-    : LR_BRACKET num RR_BRACKET 
+    : LR_BRACKET num RR_BRACKET
     ;
 
 data_type
@@ -3736,7 +3736,7 @@ function_call
     | list_operator LR_BRACKET expr_list RR_BRACKET
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
-    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET    
+    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
     ;
 
 ignore_or_repect_nulls
