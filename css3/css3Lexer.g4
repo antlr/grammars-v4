@@ -63,8 +63,8 @@ fragment Name
     : Nmchar+
     ;
 
-fragment Url
-    : ( [!#$%&*-~] | Nonascii | Escape )*
+Url
+    : U R L '(' Whitespace ( [!#$%&*-~] | Nonascii | Escape )* Whitespace ')'
     ;
 
 Space
@@ -374,9 +374,8 @@ Percentage
     : Number '%'
     ;
 
-Uri
-    : U R L '(' Whitespace String_ Whitespace ')'
-    | U R L '(' Whitespace Url Whitespace ')'
+Url_
+    : 'url('
     ;
 
 UnicodeRange
