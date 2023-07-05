@@ -155,6 +155,7 @@ CHANGES:                                               'CHANGES';
 //CHANGETABLE:                                           'CHANGETABLE';
 //CHANGE_RETENTION:                                      'CHANGE_RETENTION';
 CHANGE_TRACKING:                                       'CHANGE_TRACKING';
+CHANNELS:                                              'CHANNELS';
 CHAR:                                                  'CHAR';
 CHARACTER:                                             'CHARACTER';
 CHARINDEX:                                             'CHARINDEX';
