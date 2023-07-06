@@ -178,7 +178,7 @@ prio
     ;
 
 value
-    : ( any_ | block | atKeyword ws )+
+    : ( any_ | block | AtKeyword ws )+
     ;
 
 expr
@@ -250,23 +250,19 @@ any_
     ;
 
 atRule
-    : atKeyword ws any_* ( block | ';' ws )    # unknownAtRule
-    ;
-
-atKeyword
-    : '@' ident
+    : AtKeyword ws any_* ( block | ';' ws )    # unknownAtRule
     ;
 
 unused
     : block
-    | atKeyword ws
+    | AtKeyword ws
     | ';' ws
     | Cdo ws
     | Cdc ws
     ;
 
 block
-    : '{' ws (  declarationList | nestedStatement | any_ | block | atKeyword ws | ';' ws )* '}' ws
+    : '{' ws (  declarationList | nestedStatement | any_ | block | AtKeyword ws | ';' ws )* '}' ws
     ;
 
 // Conditional
@@ -367,11 +363,11 @@ fontFaceDeclaration
 // Animations
 // https://www.w3.org/TR/css3-animations/
 keyframesRule
-    : Keyframes ws Space ws ident ws '{' ws keyframesBlocks '}' ws
+    : Keyframes ws Space ws ident ws '{' ws keyframeBlock* '}' ws
     ;
 
-keyframesBlocks
-    : ( keyframeSelector '{' ws declarationList? '}' ws )*
+keyframeBlock
+    : ( keyframeSelector '{' ws declarationList? '}' ws )
     ;
 
 keyframeSelector
@@ -410,7 +406,7 @@ featureValueBlock
     ;
 
 featureType
-    : atKeyword
+    : AtKeyword
     ;
 
 featureValueDefinition

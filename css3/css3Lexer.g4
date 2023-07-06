@@ -16,7 +16,10 @@ Multiply:                       '*';
 Divide:                         '/';
 Pipe:                           '|';
 Underscore:                     '_';
-At:                             '@';
+
+fragment At
+    : '@'
+    ;
 
 fragment Hex
     : [0-9a-fA-F]
@@ -301,23 +304,19 @@ Hash
     ;
 
 Import
-    : '@' I M P O R T
+    : At I M P O R T
     ;
 
 Page
-    : '@' P A G E
+    : At P A G E
     ;
 
 Media
-    : '@' M E D I A
+    : At M E D I A
     ;
 
 Namespace
-    : '@' N A M E S P A C E
-    ;
-
-fragment AtKeyword
-    : '@' Ident
+    : At N A M E S P A C E
     ;
 
 Charset
@@ -478,12 +477,12 @@ SubstringMatch
 
 // https://www.w3.org/TR/css-fonts-3/#font-face-rule
 FontFace
-    : '@' F O N T DashChar F A C E
+    : At F O N T DashChar F A C E
     ;
 
 // https://www.w3.org/TR/css3-conditional/
 Supports
-    : '@' S U P P O R T S
+    : At S U P P O R T S
     ;
 
 Or
@@ -498,7 +497,7 @@ fragment VendorPrefix
     ;
 
 Keyframes
-    : '@' VendorPrefix? K E Y F R A M E S
+    : At VendorPrefix? K E Y F R A M E S
     ;
 
 From
@@ -516,22 +515,26 @@ Calc
 
 // https://www.w3.org/TR/css-device-adapt-1/
 Viewport
-    : '@' V I E W P O R T
+    : At V I E W P O R T
     ;
 
 // https://www.w3.org/TR/css-counter-styles-3/
 CounterStyle
-    : '@' C O U N T E R DashChar S T Y L E
+    : At C O U N T E R DashChar S T Y L E
     ;
 
 // https://www.w3.org/TR/css-fonts-3/
 FontFeatureValues
-    : '@' F O N T DashChar F E A T U R E DashChar V A L U E S
+    : At F O N T DashChar F E A T U R E DashChar V A L U E S
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms532847.aspx
 DxImageTransform
     : 'progid:DXImageTransform.Microsoft.' Function_
+    ;
+
+AtKeyword
+    : At Ident
     ;
 
 // Variables
