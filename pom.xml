@@ -136,7 +136,7 @@
 				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
-				<module>fortran77</module>
+				<module>fortran</module>
 				<module>fusion-tables</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
