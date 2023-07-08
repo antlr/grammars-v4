@@ -61,6 +61,7 @@ unitStatement
     | renameSequence
     | renameTable
     | renameTrustedContext
+    | renameUser
     ) SCOL
     ;
 
@@ -201,6 +202,11 @@ renameTable
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-trusted-context-statement
 renameTrustedContext
     : RENAME TRUSTED CONTEXT oldTrustedContextName=identifier TO newTrustedContextName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-user-statement-unix-linux
+renameUser
+    : RENAME USER oldUserName=identifier TO newUserName=identifier
     ;
 
 
