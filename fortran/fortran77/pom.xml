@@ -10,6 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
+		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
