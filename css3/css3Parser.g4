@@ -14,17 +14,17 @@ charset
     ;
 
 imports
-    : Import ws ( String_ | Uri ) ws mediaQueryList ';' ws     # goodImport
-    | Import ws ( String_ | Uri ) ws ';' ws                    # goodImport
-    | Import ws ( String_ | Uri ) ws mediaQueryList            # badImport
-    | Import ws ( String_ | Uri ) ws                           # badImport
+    : Import ws ( String_ | url ) ws mediaQueryList ';' ws     # goodImport
+    | Import ws ( String_ | url ) ws ';' ws                    # goodImport
+    | Import ws ( String_ | url ) ws mediaQueryList            # badImport
+    | Import ws ( String_ | url ) ws                           # badImport
     ;
 
 // Namespaces
 // https://www.w3.org/TR/css-namespaces-3/
 namespace_
-    : Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws ';' ws    # goodNamespace
-    | Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws           # badNamespace
+    : Namespace ws (namespacePrefix ws)? ( String_ | url ) ws ';' ws    # goodNamespace
+    | Namespace ws (namespacePrefix ws)? ( String_ | url ) ws           # badNamespace
     ;
 
 namespacePrefix
@@ -193,7 +193,7 @@ term
     | UnicodeRange ws        # knownTerm
     | ident ws               # knownTerm
     | var_                   # knownTerm
-    | Uri ws                 # knownTerm
+    | url ws                 # knownTerm
     | hexcolor               # knownTerm
     | calc                   # knownTerm
     | function_              # knownTerm
@@ -238,7 +238,7 @@ any_
     | unknownDimension ws
     | String_ ws
     //| Delim ws    // Not implemented yet
-    | Uri ws
+    | url ws
     | Hash ws
     | UnicodeRange ws
     | Includes ws
@@ -319,6 +319,13 @@ supportsDeclarationCondition
 
 generalEnclosed
     : ( Function_ | '(' ) ( any_ | unused )* ')'
+    ;
+
+// Url
+// https://www.w3.org/TR/css3-values/#urls
+url
+    : Url_ ws String_ ws ')'
+    | Url
     ;
 
 // Variable
