@@ -1,8 +1,0 @@
-line 28:6 no viable alternative at input 'printerr2'
-line 29:6 no viable alternative at input 'print"python 3 should NOT like this."'
-line 32:6 no viable alternative at input 'xrange'
-line 39:6 no viable alternative at input 'raiseIOError'
-line 49:7 no viable alternative at input 'exceptNameError'
-line 50:10 no viable alternative at input 'printerr'
-line 65:13 no viable alternative at input 'my_generator.next'
-line 70:11 no viable alternative at input 'raw_input'
