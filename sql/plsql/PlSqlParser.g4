@@ -599,11 +599,11 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE (schema_object_name '.')? package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE (schema_object_name '.')? package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
     ;
 
 create_package_body
-    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements)? END package_name? ';'
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements)? END package_name? ';'
     ;
 
 // Create Package Specific Clauses
