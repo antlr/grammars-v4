@@ -20,7 +20,7 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$' | grep -v '.tokens$'`
 files=()
 for f in $files2
 do
@@ -37,7 +37,7 @@ done
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+    dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f -tokens >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -46,7 +46,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree -tokens > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -83,7 +83,7 @@ case "${unameOut}" in
 esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
+    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -o '*.tokens'`
     if [ "$gen" != "" ]
     then
         dos2unix $gen
@@ -107,6 +107,15 @@ do
     fi
 done
 for f in `find . -name '*.tree'`
+do
+    git diff --exit-code $f >> $old/updated.txt 2>&1
+    xxx=$?
+    if [ "$xxx" -ne 0 ]
+    then
+        updated=$xxx
+    fi
+done
+for f in `find . -name '*.tokens'`
 do
     git diff --exit-code $f >> $old/updated.txt 2>&1
     xxx=$?

@@ -227,17 +227,17 @@ public class Program
         var lexer = new <lexer_name>(str);
         if (show_tokens)
         {
-            StringBuilder new_s = new StringBuilder();
+            var output_tokens = tee ? new StreamWriter(input_name + ".tokens") : System.Console.Error;
             for (int i = 0; ; ++i)
             {
                 var ro_token = lexer.NextToken();
                 var token = (CommonToken)ro_token;
                 token.TokenIndex = i;
-                new_s.AppendLine(token.ToString());
+                output_tokens.WriteLine(token);
                 if (token.Type == Antlr4.Runtime.TokenConstants.EOF)
                     break;
             }
-            System.Console.Error.WriteLine(new_s.ToString());
+            if (tee) output_tokens.Close();
             lexer.Reset();
         }
         var tokens = new CommonTokenStream(lexer);
