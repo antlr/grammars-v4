@@ -11,8 +11,10 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 
-		<!-- antlr.version is the version of the tool. But the
-		runtime is tied to the version of antlr4test-maven-plugin.version -->
+		<!-- The Antlr tool version is specified with
+		antlr.version. The Antlr runtime is tied to the
+		version of antlr4test-maven-plugin.version. When Antlr
+		is release, the plugin has to be updated. -->
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
 		<antlr.version>4.11.1</antlr.version>
 
