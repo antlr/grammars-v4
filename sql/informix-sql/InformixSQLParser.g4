@@ -62,6 +62,7 @@ unitStatement
     | renameTable
     | renameTrustedContext
     | renameUser
+    | rollbackWork
     ) SCOL
     ;
 
@@ -207,6 +208,11 @@ renameTrustedContext
 //https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-user-statement-unix-linux
 renameUser
     : RENAME USER oldUserName=identifier TO newUserName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rollback-work-statement
+rollbackWork
+    : ROLLBACK WORK? (TO SAVEPOINT savepoint=identifier?)?
     ;
 
 
