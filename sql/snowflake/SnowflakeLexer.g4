@@ -112,6 +112,7 @@ AWS_SNS_TOPIC_ARN:                                     'AWS_SNS_TOPIC_ARN';
 AWS_TOKEN:                                             'AWS_TOKEN';
 AZURE:                                                 'AZURE';
 AZURE_AD_APPLICATION_ID:                               'AZURE_AD_APPLICATION_ID';
+AZURE_CSE_Q:                                           '\'AZURE_CSE\'';
 AZURE_EVENT_GRID:                                      'AZURE_EVENT_GRID';
 AZURE_EVENT_GRID_TOPIC_ENDPOINT:                       'AZURE_EVENT_GRID_TOPIC_ENDPOINT';
 AZURE_Q:                                               '\'AZURE\'';
@@ -154,6 +155,7 @@ CHANGES:                                               'CHANGES';
 //CHANGETABLE:                                           'CHANGETABLE';
 //CHANGE_RETENTION:                                      'CHANGE_RETENTION';
 CHANGE_TRACKING:                                       'CHANGE_TRACKING';
+CHANNELS:                                              'CHANNELS';
 CHAR:                                                  'CHAR';
 CHARACTER:                                             'CHARACTER';
 CHARINDEX:                                             'CHARINDEX';
@@ -360,6 +362,7 @@ GCP_PUBSUB:                                            'GCP_PUBSUB';
 GCP_PUBSUB_SUBSCRIPTION_NAME:                          'GCP_PUBSUB_SUBSCRIPTION_NAME';
 GCP_PUBSUB_TOPIC_NAME:                                 'GCP_PUBSUB_TOPIC_NAME';
 GCS:                                                   'GCS';
+GCS_SSE_KMS_Q:                                         '\'GCS_SSE_KMS\'';
 GENERIC_Q:                                             '\'GENERIC\'';
 GENERIC_SCIM_PROVISIONER_Q:                            '\'GENERIC_SCIM_PROVISIONER\'';
 GEO:                                                   'GEO';
@@ -827,6 +830,8 @@ SKIP_HEADER:                                           'SKIP_HEADER';
 SMALL:                                                 'SMALL';
 SNAPPY:                                                'SNAPPY';
 SNAPPY_COMPRESSION:                                    'SNAPPY_COMPRESSION';
+SNOWFLAKE_FULL:                                        'SNOWFLAKE_FULL';
+SNOWFLAKE_SSE:                                         'SNOWFLAKE_SSE';
 SOME:                                                  'SOME';
 // SOUNDEX:                                               'SOUNDEX';
 SOURCE:                                                'SOURCE';
@@ -923,13 +928,13 @@ TIMESTAMP:                                             'TIMESTAMP';
 TIMESTAMP_DAY_IS_ALWAYS_24H:                           'TIMESTAMP_DAY_IS_ALWAYS_24H';
 TIMESTAMP_FORMAT:                                      'TIMESTAMP_FORMAT';
 TIMESTAMP_INPUT_FORMAT:                                'TIMESTAMP_INPUT_FORMAT';
-TIMESTAMP_LTZ:                                         'TIMESTAMP_LTZ';
+TIMESTAMP_LTZ:                                         'TIMESTAMP' '_'? 'LTZ';
 TIMESTAMP_LTZ_OUTPUT_FORMAT:                           'TIMESTAMP_LTZ_OUTPUT_FORMAT';
-TIMESTAMP_NTZ:                                         'TIMESTAMP_NTZ';
+TIMESTAMP_NTZ:                                         'TIMESTAMP' '_'? 'NTZ';
 TIMESTAMP_NTZ_OUTPUT_FORMAT:                           'TIMESTAMP_NTZ_OUTPUT_FORMAT';
 TIMESTAMP_OUTPUT_FORMAT:                               'TIMESTAMP_OUTPUT_FORMAT';
 TIMESTAMP_TYPE_MAPPING:                                'TIMESTAMP_TYPE_MAPPING';
-TIMESTAMP_TZ:                                          'TIMESTAMP_TZ';
+TIMESTAMP_TZ:                                          'TIMESTAMP' '_'? 'TZ';
 TIMESTAMP_TZ_OUTPUT_FORMAT:                            'TIMESTAMP_TZ_OUTPUT_FORMAT';
 TIMESTAMPADD:                                          'TIMESTAMPADD';
 TIMESTAMPDIFF:                                         'TIMESTAMPDIFF';
@@ -1104,10 +1109,11 @@ ID:                     [A-Z_] [A-Z0-9_@$]*;
 ID2:                    DOLLAR [A-Z_] [A-Z0-9_]*;
 
 
-S3_PATH:            '\'s3://\'';
-GCS_PATH:           '\'gcs://\'';
-AZURE_PATH:         '\'azure://\'';
-FILE_PATH:          'file://';            //file://<path_to_file>/<filename>
+S3_PATH:            SINGLE_QUOTE 's3://' Uri SINGLE_QUOTE;
+S3GOV_PATH:         SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
+GCS_PATH:           SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
+AZURE_PATH:         SINGLE_QUOTE 'azure://' Uri SINGLE_QUOTE;
+FILE_PATH:          'file://' ( DIVIDE Uri | WindowsPath );            //file://<path_to_file>/<filename>
 
 DBL_DOLLAR:          '$$' (~'$'  | '\\$' | '$' ~'$')*? '$$';
 
@@ -1127,6 +1133,18 @@ fragment EscapeSequence
 
 fragment HexDigit
     : [0-9a-f]
+    ;
+
+fragment HexString
+    : [A-Z0-9|.] [A-Z0-9+\-|.]*
+    ;
+
+fragment Uri
+    : HexString (DIVIDE HexString)* DIVIDE?
+    ;
+
+fragment WindowsPath
+    : [A-Z] COLON '\\' HexString ('\\' HexString)* '\\'?
     ;
 
 ARROW:               '->';

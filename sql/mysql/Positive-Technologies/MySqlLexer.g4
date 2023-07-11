@@ -1079,6 +1079,7 @@ POWER:                               'POWER';
 QUOTE:                               'QUOTE';
 RADIANS:                             'RADIANS';
 RAND:                                'RAND';
+RANDOM:                              'RANDOM';
 RANDOM_BYTES:                        'RANDOM_BYTES';
 RELEASE_LOCK:                        'RELEASE_LOCK';
 REVERSE:                             'REVERSE';

@@ -38,6 +38,8 @@ options {
     tokenVocab=Python3Lexer;
 }
 
+// Insert here @header for C++ parser.
+
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
@@ -182,14 +184,27 @@ comparison: expr (comp_op expr)*;
 // sake of a __future__ import described in PEP 401 (which really works :-)
 comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not';
 star_expr: '*' expr;
-expr: xor_expr ('|' xor_expr)*;
-xor_expr: and_expr ('^' and_expr)*;
-and_expr: shift_expr ('&' shift_expr)*;
-shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
-arith_expr: term (('+'|'-') term)*;
-term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
-factor: ('+'|'-'|'~') factor | power;
-power: atom_expr ('**' factor)?;
+
+expr: 
+    atom_expr
+    | expr '**' expr
+    | ('+'|'-'|'~')+ expr
+    | expr ('*'|'@'|'/'|'%'|'//') expr
+    | expr ('+'|'-') expr
+    | expr ('<<' | '>>') expr
+    | expr '&' expr
+    | expr '^' expr
+    | expr '|' expr
+    ;
+
+//expr: xor_expr ('|' xor_expr)*;
+//xor_expr: and_expr ('^' and_expr)*;
+//and_expr: shift_expr ('&' shift_expr)*;
+//shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
+//arith_expr: term (('+'|'-') term)*;
+//term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
+//factor: ('+'|'-'|'~') factor | power;
+//power: atom_expr ('**' factor)?;
 atom_expr: AWAIT? atom trailer*;
 atom: '(' (yield_expr|testlist_comp)? ')'
    | '[' testlist_comp? ']'
