@@ -630,7 +630,7 @@ memberDeclaratorList:
 	memberDeclarator (Comma memberDeclarator)*;
 
 memberDeclarator:
-    declarator (virtualSpecifierSeq | { IsPureSpecifierAllowed() }? pureSpecifier | { IsPureSpecifierAllowed() }? virtualSpecifierSeq pureSpecifier | braceOrEqualInitializer)
+    declarator (virtualSpecifierSeq | { this.IsPureSpecifierAllowed() }? pureSpecifier | { this.IsPureSpecifierAllowed() }? virtualSpecifierSeq pureSpecifier | braceOrEqualInitializer)
     | declarator
     | Identifier? attributeSpecifierSeq? Colon constantExpression
     ;

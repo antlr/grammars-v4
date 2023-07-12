@@ -18,7 +18,7 @@ public abstract class CPP14ParserBase extends Parser
 	    if (p == null) return false;
 	    return (p instanceof CPP14Parser.ParametersAndQualifiersContext);
 	}
-	catch
+	catch (Exception e)
 	{
 	}
 	return false;
