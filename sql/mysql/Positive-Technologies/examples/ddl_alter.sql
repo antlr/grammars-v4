@@ -102,6 +102,8 @@ alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 -- Alter user
 ALTER USER 'mattias.hultman' DEFAULT ROLE `prod-spain-mysql-read-only`@`%`;
 rename user user1@100.200.1.1 to user2@100.200.1.2;
+rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
+rename user user1@100.200.1.1 to user2@::1;
 alter user 'user'@'%' IDENTIFIED BY 'newpassword' RETAIN CURRENT PASSWORD;
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY RANDOM PASSWORD RETAIN CURRENT PASSWORD;
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19' RETAIN CURRENT PASSWORD;
