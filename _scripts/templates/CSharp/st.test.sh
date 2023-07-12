@@ -83,7 +83,7 @@ case "${unameOut}" in
 esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -o '*.tokens'`
+    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -o -name '*.tokens'`
     if [ "$gen" != "" ]
     then
         dos2unix $gen

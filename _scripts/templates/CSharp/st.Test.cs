@@ -224,7 +224,11 @@ public class Program
 
     static void DoParse(ICharStream str, string input_name, int row_number)
     {
+		var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var lexer = new <lexer_name>(str);
+		var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
+		lexer.RemoveErrorListeners();
+		lexer.AddErrorListener(listener_lexer);
         if (show_tokens)
         {
             var output_tokens = tee ? new StreamWriter(input_name + ".tokens") : System.Console.Error;
@@ -242,12 +246,8 @@ public class Program
         }
         var tokens = new CommonTokenStream(lexer);
         var parser = new <parser_name>(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
-        var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
-        lexer.RemoveErrorListeners();
         parser.RemoveErrorListeners();
-        lexer.AddErrorListener(listener_lexer);
         parser.AddErrorListener(listener_parser);
         if (show_profile)
         {
