@@ -154,6 +154,21 @@ FUNCTION options { caseInsensitive=false; }
     | 'stddev_over_time'
     | 'stdvar_over_time'
     | 'last_over_time'
+    | 'acos'
+    | 'acosh'
+    | 'asin'
+    | 'asinh'
+    | 'atan'
+    | 'atanh'
+    | 'cos'
+    | 'cosh'
+    | 'sin'
+    | 'sinh'
+    | 'tan'
+    | 'tanh'
+    | 'deg'
+    | 'pi'
+    | 'rad'
     ;
 
 LEFT_BRACE:  '{';
