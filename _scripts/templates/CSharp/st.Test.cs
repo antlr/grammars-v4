@@ -231,7 +231,7 @@ public class Program
 		lexer.AddErrorListener(listener_lexer);
         if (show_tokens)
         {
-            var output_tokens = tee ? new StreamWriter(input_name + ".tokens") : System.Console.Error;
+            var output_tokens = tee ? new StreamWriter(input_name + ".token") : System.Console.Error;
             for (int i = 0; ; ++i)
             {
                 var ro_token = lexer.NextToken();
