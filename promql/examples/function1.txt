@@ -1,2 +1,1 @@
 day_of_month(timestamp(up{job="prometheus"}))
-sin(rate(http_requests_total[5m]))
