@@ -12,7 +12,7 @@ abstract class GDScriptLexerBase extends Lexer {
     // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
     private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
     // The stack that keeps track of the indentation level.
-    private final Deque<Integer> indents = new ArrayDeque<>();
+    private Deque<Integer> indents = new ArrayDeque<>();
     // The amount of opened braces, brackets and parenthesis.
     private int opened = 0;
     // The most recently produced token.
@@ -142,5 +142,15 @@ abstract class GDScriptLexerBase extends Lexer {
                 }
             }
         }
+    }
+    
+    @Override
+    public void reset()
+    {
+        tokens = new java.util.LinkedList<>();
+        indents = new ArrayDeque<>();
+        opened = 0;
+        lastToken = null;
+        super.reset();
     }
 }
