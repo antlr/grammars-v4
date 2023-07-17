@@ -16,14 +16,14 @@ class CPP14ParserBase(Parser):
 
     def IsPureSpecifierAllowed(self) -> bool:
         try:
-            x = self.Context  # memberDeclarator
-            c = x.get_child(0).get_child(0)
-            c2 = c.get_child(0)
-            p = c2.get_child(1)
+            x = self._ctx  # memberDeclarator
+            c = x.getChild(0).getChild(0)
+            c2 = c.getChild(0)
+            p = c2.getChild(1)
             if p is None:
                 return False
-            return isinstance(p, CPP14Parser.ParametersAndQualifiersContext)
+            yo = isinstance(p, self.parser().ParametersAndQualifiersContext)
+            return yo
         except:
             pass
         return False
-
