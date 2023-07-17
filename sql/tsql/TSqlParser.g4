@@ -2364,7 +2364,7 @@ create_table_index_option
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
 create_view
-    : (CREATE (OR ALTER)? | ALTER) VIEW simple_name ('(' column_name_list ')')?
+    : (CREATE (OR (ALTER | REPLACE))? | ALTER) VIEW simple_name ('(' column_name_list ')')?
       (WITH view_attribute (',' view_attribute)*)?
       AS select_statement_standalone (WITH CHECK OPTION)? ';'?
     ;

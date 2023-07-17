@@ -9,3 +9,14 @@ SELECT
 FROM xyz
 ;
 GO
+
+CREATE OR REPLACE VIEW xyz_view
+AS
+SELECT
+    ccc,
+    xxx,
+    yyy
+        zzz
+FROM xyz
+;
+GO

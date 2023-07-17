@@ -1,7 +1,7 @@
 // XPath v3.1
 // Author--Ken Domino
 // Date--4 June 2020
-// 
+//
 // This is a faithful implementation of the XPath version 3.1 grammar
 // from the spec at https://www.w3.org/TR/2017/REC-xpath-31-20170321/
 
@@ -105,7 +105,7 @@ KW_TO : 'to' ;
 KW_TREAT : 'treat' ;
 KW_UNION : 'union' ;
 
-// A.2.1. TEMINAL SYMBOLS
+// A.2.1. TERMINAL SYMBOLS
 // This isn't a complete list of tokens in the language.
 // Keywords and symbols are terminals.
 
@@ -116,7 +116,7 @@ StringLiteral : '"' (~["] | FragEscapeQuot)* '"' | '\'' (~['] | FragEscapeApos)*
 URIQualifiedName : BracedURILiteral NCName ;
 BracedURILiteral : 'Q' '{' [^{}]* '}' ;
 // Error in spec: EscapeQuot and EscapeApos are not terminals!
-fragment FragEscapeQuot : '""' ; 
+fragment FragEscapeQuot : '""' ;
 fragment FragEscapeApos : '\'\'';
 // Error in spec: Comment isn't really a terminal, but an off-channel object.
 Comment : '(:' (Comment | CommentContents)*? ':)' -> skip ;
