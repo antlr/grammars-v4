@@ -123,30 +123,30 @@ unaryExpression:
 	)
 	| Alignof LeftParen theTypeId RightParen
 	| noExceptExpression
-	| newExpression
+	| newExpression_
 	| deleteExpression;
 
 unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 
-newExpression:
+newExpression_:
 	Doublecolon? New newPlacement? (
 		newTypeId
 		| (LeftParen theTypeId RightParen)
-	) newInitializer?;
+	) newInitializer_?;
 
 newPlacement: LeftParen expressionList RightParen;
 
-newTypeId: typeSpecifierSeq newDeclarator?;
+newTypeId: typeSpecifierSeq newDeclarator_?;
 
-newDeclarator:
-	pointerOperator newDeclarator?
+newDeclarator_:
+	pointerOperator newDeclarator_?
 	| noPointerNewDeclarator;
 
 noPointerNewDeclarator:
 	LeftBracket expression RightBracket attributeSpecifierSeq?
 	| noPointerNewDeclarator LeftBracket constantExpression RightBracket attributeSpecifierSeq?;
 
-newInitializer:
+newInitializer_:
 	LeftParen expressionList? RightParen
 	| bracedInitList;
 
@@ -300,7 +300,7 @@ declaration:
 	| explicitSpecialization
 	| linkageSpecification
 	| namespaceDefinition
-	| emptyDeclaration
+	| emptyDeclaration_
 	| attributeDeclaration;
 
 blockDeclaration:
@@ -323,7 +323,7 @@ simpleDeclaration:
 staticAssertDeclaration:
 	Static_assert LeftParen constantExpression Comma StringLiteral RightParen Semi;
 
-emptyDeclaration: Semi;
+emptyDeclaration_: Semi;
 
 attributeDeclaration: attributeSpecifierSeq Semi;
 
@@ -628,7 +628,7 @@ memberdeclaration:
 	| staticAssertDeclaration
 	| templateDeclaration
 	| aliasDeclaration
-	| emptyDeclaration;
+	| emptyDeclaration_;
 
 memberDeclaratorList:
 	memberDeclarator (Comma memberDeclarator)*;
