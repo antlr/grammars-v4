@@ -20,10 +20,14 @@
  * ****************************************************************************
  */
 parser grammar CPP14Parser;
+
 options {
 	superClass = CPP14ParserBase;
 	tokenVocab = CPP14Lexer;
 }
+
+// Insert here @header for C++ parser.
+
 /*Basic concepts*/
 
 translationUnit: declarationseq? EOF;
