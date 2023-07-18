@@ -3955,7 +3955,6 @@ substr_list
    | a_expr FOR a_expr
    | a_expr SIMILAR a_expr ESCAPE a_expr
    | expr_list
-   |
    ;
 
 trim_list
