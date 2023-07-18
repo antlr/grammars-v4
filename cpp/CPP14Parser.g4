@@ -131,7 +131,7 @@ unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 newExpression_:
 	Doublecolon? New newPlacement? (
 		newTypeId
-		| (LeftParen theTypeId RightParen)
+		| LeftParen theTypeId RightParen
 	) newInitializer_?;
 
 newPlacement: LeftParen expressionList RightParen;
@@ -446,7 +446,7 @@ namespaceAliasDefinition:
 qualifiednamespacespecifier: nestedNameSpecifier? namespaceName;
 
 usingDeclaration:
-	Using ((Typename_? nestedNameSpecifier) | Doublecolon) unqualifiedId Semi;
+	Using (Typename_? nestedNameSpecifier | Doublecolon) unqualifiedId Semi;
 
 usingDirective:
 	attributeSpecifierSeq? Using Namespace nestedNameSpecifier? namespaceName Semi;
@@ -567,11 +567,8 @@ parameterDeclarationList:
 	parameterDeclaration (Comma parameterDeclaration)*;
 
 parameterDeclaration:
-	attributeSpecifierSeq? declSpecifierSeq (
-		(declarator | abstractDeclarator?) (
-			Assign initializerClause
-		)?
-	);
+	attributeSpecifierSeq? declSpecifierSeq (declarator | abstractDeclarator?) (Assign initializerClause)?
+	;
 
 functionDefinition:
 	attributeSpecifierSeq? declSpecifierSeq? declarator virtualSpecifierSeq? functionBody;
@@ -715,7 +712,7 @@ typeParameter:
 	(
 		(Template Less templateparameterList Greater)? Class
 		| Typename_
-	) ((Ellipsis? Identifier?) | (Identifier? Assign theTypeId));
+	) (Ellipsis? Identifier? | Identifier? Assign theTypeId);
 
 simpleTemplateId:
 	templateName Less templateArgumentList? Greater;
