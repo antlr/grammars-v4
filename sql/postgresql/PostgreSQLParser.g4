@@ -2906,7 +2906,7 @@ select_clause
    ;
 
 simple_select_intersect
-    : simple_select_pramary ((INTERSECT) all_or_distinct simple_select_pramary)*
+    : simple_select_pramary (INTERSECT all_or_distinct simple_select_pramary)*
     ;
 
 simple_select_pramary
