@@ -181,3 +181,8 @@ ALTER TABLE employees NO MEMOPTIMIZE FOR WRITE
     ENABLE VALIDATE CONSTRAINT emp_manager_fk
     EXCEPTIONS INTO exceptions;
 
+ALTER TABLE employees
+    MODIFY LAST_UPDATE_DATE invisible;
+
+ALTER TABLE employees
+    MODIFY LAST_UPDATE_DATE visible;
