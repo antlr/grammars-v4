@@ -371,19 +371,23 @@ simpleTypeSignednessModifier:
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
-	| simpleTypeSignednessModifier
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
-	| simpleTypeSignednessModifier? Char
-	| simpleTypeSignednessModifier? Char16
-	| simpleTypeSignednessModifier? Char32
-	| simpleTypeSignednessModifier? Wchar
+	| Char
+	| Char16
+	| Char32
+	| Wchar
 	| Bool
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
+	| Short
+	| Int
+	| Long
 	| Float
-	| simpleTypeLengthModifier? Double
+	| Signed
+	| Unsigned
+	| Float
+	| Double
 	| Void
 	| Auto
-	| decltypeSpecifier;
+	| decltypeSpecifier
+	;
 
 theTypeName:
 	className
