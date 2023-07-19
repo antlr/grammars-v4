@@ -30,7 +30,7 @@ options {
 }
 
 sql_script
-    : sql_plus_command_no_semicolon? (((sql_plus_command | unit_statement) (SEMICOLON'/'? (sql_plus_command | unit_statement))* SEMICOLON?'/'?)) EOF
+    : sql_plus_command_no_semicolon? ((sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?) EOF
     ;
 
 unit_statement

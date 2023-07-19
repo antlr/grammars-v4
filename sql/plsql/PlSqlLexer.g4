@@ -1655,7 +1655,7 @@ SQLDATA:                      'SQLDATA';
 SQLERROR:                     'SQLERROR';
 SQLLDR:                       'SQLLDR';
 SQL:                          'SQL';
-FILE_EXT:                     ('PKB' | 'PKS');
+FILE_EXT:                     'PKB' | 'PKS';
 SQL_MACRO:                    'SQL_MACRO';
 SQL_TRACE:                    'SQL_TRACE';
 SQL_TRANSLATION_PROFILE:      'SQL_TRANSLATION_PROFILE';
