@@ -63,6 +63,7 @@ unitStatement
     | renameTrustedContext
     | renameUser
     | rollbackWork
+    | savepointStmt
     ) SCOL
     ;
 
@@ -215,6 +216,10 @@ rollbackWork
     : ROLLBACK WORK? (TO SAVEPOINT savepoint=identifier?)?
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-savepoint-statement
+savepointStmt
+    : SAVEPOINT savepoint=identifier UNIQUE?
+    ;
 
 anyName
     : IDENTIFIER
