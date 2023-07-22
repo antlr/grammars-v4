@@ -2,8 +2,7 @@ ALTER DISKGROUP hmdg ADD FILEGROUP fgtem TEMPLATE SET 'datafile.redundancy'='unp
 
 ALTER DISKGROUP hmdg ADD FILEGROUP fgdb DATABASE NONE FROM TEMPLATE fgtem;
 
-ALTER DISKGROUP hmdg ADD FILEGROUP fgtem2 TEMPLATE
-    CREATE TABLESPACE tbs1 datafile '+hmdg(fg$fgtem2)/dbs/tbs1.f' size 1M;
+ALTER DISKGROUP hmdg ADD FILEGROUP fgtem2 TEMPLATE FROM TEMPLATE fgtem;
 
 ALTER DISKGROUP dgroup_01
   ADD DISK '/devices/disks/d100';

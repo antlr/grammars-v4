@@ -63,6 +63,8 @@ unitStatement
     | renameTrustedContext
     | renameUser
     | rollbackWork
+    | savepointStmt
+    | setAutofree
     ) SCOL
     ;
 
@@ -215,6 +217,15 @@ rollbackWork
     : ROLLBACK WORK? (TO SAVEPOINT savepoint=identifier?)?
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-savepoint-statement
+savepointStmt
+    : SAVEPOINT savepoint=identifier UNIQUE?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-autofree-statement
+setAutofree
+    : SET AUTOFREE (ENABLED | DISABLED)? (FOR (cursorId=identifier | cursorIdVar=anyName))?
+    ;
 
 anyName
     : IDENTIFIER
@@ -241,6 +252,7 @@ keyword
     | AS
     | ASC
     | ATTACH
+    | AUTOFREE
     | AUTOINCREMENT
     | BEFORE
     | BEGIN
@@ -270,10 +282,12 @@ keyword
     | DELETE
     | DESC
     | DETACH
+    | DISABLED
     | DISTINCT
     | DROP
     | EACH
     | ELSE
+    | ENABLED
     | END
     | ESCAPE
     | EXCEPT
