@@ -16,11 +16,8 @@ export default abstract class CPP14ParserBase extends Parser {
             var p = c2.children[1] as ParserRuleContext;
 	    if (p == undefined)
 		return false;
-//	    console.log("P " + p);
-//	    var q = p.constructor === ParametersAndQualifiersContext;
-	    var q = p instanceof ParametersAndQualifiersContext;
-//	    console.log("Q " + q);
-	    return true;
+	    var r = p.constructor.name === "ParametersAndQualifiersContext";
+	    return r;
         } catch (e) {
         }
         return false;
