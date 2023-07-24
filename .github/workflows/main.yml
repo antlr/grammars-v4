@@ -61,7 +61,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.6.1
+      uses: actions/setup-python@v4.7.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -78,7 +78,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.6.0
+      uses: actions/setup-node@v3.7.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -118,7 +118,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
+        language: [ Cpp, CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
     steps:
     - name: Info
       shell: bash
@@ -167,7 +167,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.6.1
+      uses: actions/setup-python@v4.7.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -184,7 +184,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.6.0
+      uses: actions/setup-node@v3.7.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -266,7 +266,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.6.1
+      uses: actions/setup-python@v4.7.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -283,7 +283,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.6.0
+      uses: actions/setup-node@v3.7.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -309,3 +309,5 @@ jobs:
             After="${{github.event.after}}"
         fi
         bash _scripts/test-static-checks.sh -t ${{matrix.language}} -f diff $Before $After
+
+

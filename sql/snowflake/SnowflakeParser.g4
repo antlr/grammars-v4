@@ -417,12 +417,12 @@ list
 //  | @[<namespace>.]%<table_name>[/<path>]
 //  | @~[/<path>]
 internal_stage
-    : AT id_ '/'
+    : AT id_ '/'?
     ;
 
 //  @[<namespace>.]<ext_stage_name>[/<path>]
 external_stage
-    : AT id_ '/'
+    : AT id_ '/'?
     ;
 
 put
@@ -1069,26 +1069,6 @@ alter_share
     | ALTER SHARE if_exists? id_ UNSET COMMENT
     ;
 
-alter_stage
-    : ALTER STAGE if_exists? id_ RENAME TO id_
-    | ALTER STAGE if_exists? id_ set_tags
-    | ALTER STAGE id_ unset_tags
-    // Internal stage
-    | ALTER STAGE if_exists? id_ SET (
-          internal_stage_params?
-          file_format?
-          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
-          comment_clause
-          )
-    // External stage
-    | ALTER STAGE if_exists? id_ SET (
-          external_stage_params?
-          file_format?
-          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
-          comment_clause?
-          )
-    ;
-
 alter_storage_integration
     : ALTER STORAGE? INTEGRATION if_exists? id_ SET
         cloud_provider_params2?
@@ -1176,26 +1156,60 @@ table_column_action
     | DROP COLUMN? column_list
     ;
 
-inline_constraint :
-    null_not_null?
-    ( CONSTRAINT id_ )?
-    ( UNIQUE | PRIMARY KEY | ( ( FOREIGN KEY )? REFERENCES object_name ( '(' column_name ')' )? ) )
-    constraint_properties?
+inline_constraint
+    : null_not_null? (CONSTRAINT id_)?
+    (
+        ( UNIQUE | primary_key ) common_constraint_properties*
+        | foreign_key REFERENCES object_name ( LR_BRACKET column_name RR_BRACKET )? constraint_properties
+    )
+    ;
+
+enforced_not_enforced
+    : NOT? ENFORCED
+    ;
+
+deferrable_not_deferrable
+    : NOT? DEFERRABLE
+    ;
+
+initially_deferred_or_immediate
+    : INITIALLY ( DEFERRED | IMMEDIATE )
+    ;
+
+//TODO : Some properties are mutualy exclusive ie INITIALLY DEFERRED is not compatible with NOT DEFERRABLE
+// also VALIDATE | NOVALIDATE need to be after ENABLE or ENFORCED. Lot of case to handle :)
+common_constraint_properties
+    : enforced_not_enforced ( VALIDATE | NOVALIDATE )?
+    | deferrable_not_deferrable
+    | initially_deferred_or_immediate
+    | ( ENABLE | DISABLE ) ( VALIDATE | NOVALIDATE )?
+    | RELY
+    | NORELY
+    ;
+
+on_update
+    : ON UPDATE on_action
+    ;
+
+on_delete
+    : ON DELETE on_action
+    ;
+
+foreign_key_match
+    : MATCH match_type=( FULL | PARTIAL | SIMPLE )
+    ;
+
+on_action
+    : CASCADE
+    | SET ( NULL_ | DEFAULT )
+    | RESTRICT
+    | NO ACTION
     ;
 
 constraint_properties
-    : NOT? ENFORCED
-    | NOT? DEFERRABLE
-    | INITIALLY ( DEFERRED | IMMEDIATE )
-    | MATCH ( FULL | PARTIAL | SIMPLE )
-    | UPDATE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | DELETE ( CASCADE | SET NULL_ | SET DEFAULT | RESTRICT | NO ACTION )
-    | ENABLE
-    | DISABLE
-    | VALIDATE
-    | NOVALIDATE
-    | RELY
-    | NORELY
+    : common_constraint_properties*
+    | foreign_key_match
+    | foreign_key_match? ( on_update on_delete? | on_delete on_update? )
     ;
 
 ext_table_column_action
@@ -1207,9 +1221,9 @@ ext_table_column_action
 constraint_action
     : ADD out_of_line_constraint
     | RENAME CONSTRAINT id_ TO id_
-    | alter_modify ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
-                         ( NOT? ENFORCED )? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
-    | DROP ( CONSTRAINT id_ | PRIMARY KEY | UNIQUE | FOREIGN KEY ) column_list_in_parentheses
+    | alter_modify ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
+                         enforced_not_enforced? ( VALIDATE | NOVALIDATE ) ( RELY | NORELY )
+    | DROP ( CONSTRAINT id_ | primary_key | UNIQUE | foreign_key ) column_list_in_parentheses
                          cascade_restrict?
     | DROP PRIMARY KEY
 
@@ -1722,16 +1736,14 @@ column_list_in_parentheses
 
 create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name
-        copy_grants?
-        column_list_in_parentheses?
-//         [ <col1> [ WITH ] MASKING POLICY <policy_name> [ USING ( <col1> , <cond_col1> , ... ) ]
-//                   [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
-//          [ , <col2> [ ... ] ]
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
+        view_col*
         with_row_access_policy?
         with_tags?
+        copy_grants?
         comment_clause?
         cluster_by?
-        AS select_statement
+        AS select_statement //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -2008,7 +2020,7 @@ format_type_options
     | ESCAPE EQ (character | NONE | NONE_Q )
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q )
     | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q)
+    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE )
     | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
@@ -2065,8 +2077,8 @@ copy_options
     | FORCE EQ true_false
     ;
 
-internal_stage_params
-    : ENCRYPTION EQ LR_BRACKET TYPE EQ /*'SNOWFLAKE_FULL' */| TYPE EQ /*'SNOWFLAKE_SSE'*/ RR_BRACKET
+stage_encryption_opts_internal
+    : ENCRYPTION EQ LR_BRACKET TYPE EQ ( SNOWFLAKE_FULL | SNOWFLAKE_SSE ) RR_BRACKET
     ;
 
 stage_type
@@ -2083,9 +2095,9 @@ stage_kms_key
 
 stage_encryption_opts_aws
     : ENCRYPTION EQ LR_BRACKET
-        (stage_type? stage_master_key |
-        stage_type? |
-        ( stage_type stage_kms_key? )? | stage_type? )
+        ( stage_type? stage_master_key
+        | stage_type stage_kms_key?
+        )
         RR_BRACKET
     ;
 
@@ -2105,25 +2117,53 @@ aws_role
     : AWS_ROLE EQ string
     ;
 
+azure_encryption_value
+    : ( TYPE EQ AZURE_CSE_Q )? MASTER_KEY EQ string
+    | MASTER_KEY EQ string TYPE EQ AZURE_CSE_Q
+    | TYPE EQ NONE_Q
+    ;
+stage_encryption_opts_az
+    : ENCRYPTION EQ LR_BRACKET azure_encryption_value RR_BRACKET
+    ;
+storage_integration_eq_id
+    : STORAGE_INTEGRATION EQ id_
+    ;
+
+az_credential_or_storage_integration:
+    storage_integration_eq_id
+    |  CREDENTIALS EQ LR_BRACKET AZURE_SAS_TOKEN EQ string RR_BRACKET
+    ;
+
+gcp_encryption_value
+    : ( TYPE EQ GCS_SSE_KMS_Q )? KMS_KEY_ID EQ string
+    | KMS_KEY_ID EQ string TYPE EQ GCS_SSE_KMS_Q
+    | TYPE EQ NONE_Q
+    ;
+
+stage_encryption_opts_gcp
+    : ENCRYPTION EQ LR_BRACKET gcp_encryption_value RR_BRACKET
+    ;
+
+aws_credential_or_storage_integration:
+    storage_integration_eq_id
+    |  CREDENTIALS EQ LR_BRACKET ( aws_key_id aws_secret_key aws_token? | aws_role ) RR_BRACKET
+    ;
+
 external_stage_params
     //(for Amazon S3)
-    : URL EQ string_list
-      ( ( STORAGE_INTEGRATION EQ id_ )
-        | ( CREDENTIALS EQ LR_BRACKET ( ( aws_key_id aws_secret_key aws_token? ) | aws_role ) RR_BRACKET )
-        )?
-        stage_encryption_opts_aws?
+    : URL EQ s3_url=( S3_PATH | S3GOV_PATH )
+      ( aws_credential_or_storage_integration? stage_encryption_opts_aws | stage_encryption_opts_aws? aws_credential_or_storage_integration )?
     //(for Google Cloud Storage)
-    | URL EQ string
-      ( STORAGE_INTEGRATION EQ id_ )?
-      ( ENCRYPTION EQ ( ( TYPE EQ /*'GCS_SSE_KMS'*/ )? ( KMS_KEY_ID EQ string )? | ( TYPE EQ 'NONE' )? ) )?
+    | URL EQ gc_url=GCS_PATH
+      ( storage_integration_eq_id? stage_encryption_opts_gcp | stage_encryption_opts_gcp? storage_integration_eq_id )?
     //(for Microsoft Azure)
-    | URL EQ string
-      ( ( STORAGE_INTEGRATION EQ id_ ) | ( CREDENTIALS EQ LR_BRACKET ( AZURE_SAS_TOKEN EQ string )? RR_BRACKET ) )?
-      ( ENCRYPTION EQ LR_BRACKET ( TYPE EQ /*'AZURE_CSE'*/ )? ( MASTER_KEY EQ string )? | ( TYPE EQ 'NONE' )? RR_BRACKET )?
+    | URL EQ azure_url=AZURE_PATH
+      ( az_credential_or_storage_integration? stage_encryption_opts_az  | stage_encryption_opts_az? az_credential_or_storage_integration )?
     ;
 
 true_false
-    : TRUE | FALSE
+    : TRUE
+    | FALSE
     ;
 
 enable
@@ -2142,11 +2182,19 @@ notification_integration
     : NOTIFICATION_INTEGRATION EQ string
     ;
 
-directory_table_params
- //(for internal stages)
-    :  DIRECTORY EQ LR_BRACKET enable refresh_on_create? RR_BRACKET
+directory_table_internal_params
+    : DIRECTORY EQ LR_BRACKET
+        (
+            enable refresh_on_create?
+            | REFRESH_ON_CREATE EQ FALSE
+            | refresh_on_create enable
+        )
+        RR_BRACKET
+    ;
+
+directory_table_external_params
 // (for Amazon S3)
-    |  DIRECTORY EQ LR_BRACKET enable
+    :  DIRECTORY EQ LR_BRACKET enable
           refresh_on_create?
           auto_refresh? RR_BRACKET
 // (for Google Cloud Storage)
@@ -2161,24 +2209,48 @@ directory_table_params
           notification_integration? RR_BRACKET
     ;
 
+/* ===========  Stage DDL section =========== */
 create_stage
-    //Internal stage
-    : CREATE or_replace? TEMPORARY? STAGE if_not_exists? object_name
-          internal_stage_params?
-          directory_table_params?
+    : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier
+        stage_encryption_opts_internal?
+        directory_table_internal_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
         ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
-    //External stage
-    | CREATE or_replace? TEMPORARY? STAGE if_not_exists? object_name
-          external_stage_params
-          directory_table_params?
+    | CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier
+        external_stage_params
+        directory_table_external_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
         ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
     ;
+
+alter_stage
+    : ALTER STAGE if_exists? object_name_or_identifier RENAME TO object_name_or_identifier
+    | ALTER STAGE if_exists? object_name_or_identifier set_tags
+    | ALTER STAGE if_exists? object_name_or_identifier unset_tags
+    | ALTER STAGE if_exists? object_name_or_identifier SET
+          external_stage_params?
+          file_format?
+          ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
+          comment_clause?
+    ;
+
+drop_stage
+    : DROP STAGE if_exists? object_name_or_identifier
+    ;
+
+describe_stage
+    : describe STAGE object_name_or_identifier
+    ;
+
+show_stages
+    : SHOW STAGES like_pattern? in_obj?
+    ;
+
+/* ===========  End of stage DDL section =========== */
 
 cloud_provider_params
     //(for Amazon S3)
@@ -2297,10 +2369,6 @@ collate
     : COLLATE string
     ;
 
-not_null
-    : NOT NULL_
-    ;
-
 default_value
     : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
     ;
@@ -2309,14 +2377,16 @@ foreign_key
     : FOREIGN KEY
     ;
 
+primary_key
+    : PRIMARY KEY
+    ;
+
 out_of_line_constraint
     : (CONSTRAINT id_ )?
         (
-             UNIQUE column_list_in_parentheses?
-           | PRIMARY KEY column_list_in_parentheses?
-           | foreign_key? column_list_in_parentheses? REFERENCES object_name column_list_in_parentheses?
+           (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
+           | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
         )
-        constraint_properties?
     ;
 
 
@@ -2379,8 +2449,7 @@ create_table_like
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ comment_clause?
-    | CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )?
+    : CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )? comment_clause?
     ;
 
 session_parameter
@@ -2513,7 +2582,7 @@ view_col
 
 create_view
     : CREATE or_replace? SECURE? RECURSIVE? VIEW if_not_exists? object_name
-        ( LR_BRACKET column_list RR_BRACKET )?
+        ( LR_BRACKET column_list_with_comment RR_BRACKET )?
         view_col*
         with_row_access_policy?
         with_tags?
@@ -2717,10 +2786,6 @@ drop_session_policy
 
 drop_share
     : DROP SHARE id_
-    ;
-
-drop_stage
-    : DROP STAGE if_exists? object_name
     ;
 
 drop_stream
@@ -2946,10 +3011,6 @@ describe_share
     : describe SHARE id_
     ;
 
-describe_stage
-    : describe STAGE object_name
-    ;
-
 describe_stream
     : describe STREAM object_name
     ;
@@ -2981,6 +3042,7 @@ describe_warehouse
 // show commands
 show_command
     : show_alerts
+    | show_channels
     | show_columns
     | show_connections
     | show_databases
@@ -3038,6 +3100,10 @@ show_alerts
         ( IN ( ACCOUNT | DATABASE id_? | SCHEMA schema_name? ) )?
         starts_with?
         limit_rows?
+    ;
+
+show_channels
+    : SHOW CHANNELS like_pattern? ( IN ( ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE | TABLE? object_name) )?
     ;
 
 show_columns
@@ -3261,10 +3327,6 @@ show_shares_in_replication_group
     : SHOW SHARES IN REPLICATION GROUP id_
     ;
 
-show_stages
-    : SHOW STAGES like_pattern? in_obj?
-    ;
-
 show_streams
     : SHOW STREAMS like_pattern? in_obj?
     ;
@@ -3392,6 +3454,7 @@ id_
     | ALERT
     | ALERTS
     | CONDITION
+    | binary_builtin_function
     ;
 
 keyword
@@ -3436,6 +3499,13 @@ non_reserved_words
     | WAREHOUSE
     | VERSION
     | OPTION
+    | NVL2
+    | FIRST_VALUE
+    | RESPECT
+    | NVL
+    | RESTRICT
+    | VALUES
+    | EVENT
     ;
 
 builtin_function
@@ -3471,6 +3541,9 @@ binary_builtin_function
     | DATE_PART
     | to_date=( TO_DATE | DATE )
     | SPLIT
+    | NULLIF
+    | EQUAL_NULL
+    | CONTAINS
     ;
 
 binary_or_ternary_builtin_function
@@ -3484,6 +3557,7 @@ ternary_builtin_function
     : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     | SPLIT_PART
+    | NVL2
     ;
 
 pattern
@@ -3502,10 +3576,19 @@ column_list
     : column_name (COMMA column_name)*
     ;
 
+column_list_with_comment
+    : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
+    ;
+
 object_name
     : d=id_ DOT s=id_ DOT o=id_
     | s=id_ DOT o=id_
     | o=id_
+    ;
+
+object_name_or_identifier
+    : object_name
+    | IDENTIFIER LR_BRACKET string RR_BRACKET
     ;
 
 num
@@ -3589,33 +3672,25 @@ arr_literal
     | LSB RSB
     ;
 
+data_type_size
+    : LR_BRACKET num RR_BRACKET
+    ;
+
 data_type
-    : INT
-    | INTEGER
-    | SMALLINT
-    | TINYINT
-    | BYTEINT
-    | BIGINT
-    | (NUMBER | NUMERIC | DECIMAL_) ('(' num (COMMA num)? ')')?
-    | FLOAT_
-    | FLOAT4
-    | FLOAT8
-    | DOUBLE PRECISION?
-    | REAL_
+    : int_alias = ( INT | INTEGER | SMALLINT | TINYINT | BYTEINT | BIGINT )
+    | number_alias = ( NUMBER | NUMERIC | DECIMAL_ ) ( LR_BRACKET num (COMMA num)? RR_BRACKET )?
+    | float_alias = ( FLOAT_ | FLOAT4 | FLOAT8 | DOUBLE | DOUBLE_PRECISION | REAL_ )
     | BOOLEAN
     | DATE
-    | DATETIME ('(' num ')')?
-    | TIME ('(' num ')')?
-    | TIMESTAMP ('(' num ')')?
-    | TIMESTAMP_LTZ ('(' num ')')?
-    | TIMESTAMP_NTZ ('(' num ')')?
-    | TIMESTAMP_TZ ('(' num ')')?
-    | STRING_
-    | CHAR | CHARACTER
-    | VARCHAR ('(' num ')')?
-    | TEXT
-    | BINARY
-    | VARBINARY
+    | DATETIME data_type_size?
+    | TIME data_type_size?
+    | TIMESTAMP data_type_size?
+    | TIMESTAMP_LTZ data_type_size?
+    | TIMESTAMP_NTZ data_type_size?
+    | TIMESTAMP_TZ data_type_size?
+    | char_alias = ( CHAR | NCHAR | CHARACTER ) data_type_size?
+    | varchar_alias = ( CHAR_VARYING | NCHAR_VARYING | NVARCHAR2 | NVARCHAR | STRING_ | TEXT | VARCHAR ) data_type_size?
+    | binary_alias = ( BINARY | VARBINARY ) data_type_size?
     | VARIANT
     | OBJECT
     | ARRAY
@@ -3664,9 +3739,15 @@ function_call
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
     ;
 
+ignore_or_repect_nulls
+    : ( IGNORE | RESPECT ) NULLS
+    ;
+
 ranking_windowed_function
     : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
     | NTILE '(' expr ')' over_clause
+    | ( LEAD | LAG ) LR_BRACKET expr ( COMMA expr COMMA expr)? RR_BRACKET ignore_or_repect_nulls? over_clause
+    | ( FIRST_VALUE | LAST_VALUE ) LR_BRACKET expr RR_BRACKET ignore_or_repect_nulls? over_clause
     ;
 
 aggregate_function
@@ -3862,7 +3943,7 @@ object_ref
         pivot_unpivot?
         as_alias?
         sample?
-    | '(' values ')' as_alias?
+    | values_table
         sample?
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
@@ -3995,25 +4076,30 @@ match_recognize
     ;
 
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET ( as_alias column_alias_list_in_brackets? )?
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
 column_alias_list_in_brackets
-    : '(' id_ (COMMA id_)* ')'
+    : LR_BRACKET id_ (COMMA id_)* RR_BRACKET
     ;
 
 expr_list_in_parentheses
     : LR_BRACKET expr_list RR_BRACKET
     ;
 
-values
-    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)* as_alias? column_alias_list_in_brackets?
+values_table
+    : LR_BRACKET values_table_body RR_BRACKET (as_alias column_alias_list_in_brackets?)?
+    | values_table_body (as_alias column_alias_list_in_brackets?)?
+    ;
+
+values_table_body
+    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)*
     ;
 
 sample_method
-    : (BERNOULLI | ROW)
-    | (SYSTEM | BLOCK)
+    : row_sampling =  ( BERNOULLI | ROW )
+    | block_sampling = ( SYSTEM | BLOCK )
     ;
 
 repeatable_seed
@@ -4021,7 +4107,7 @@ repeatable_seed
     ;
 
 sample_opts
-    : LR_BRACKET (num | (num ROWS)) RR_BRACKET repeatable_seed?
+    : LR_BRACKET num ROWS? RR_BRACKET repeatable_seed?
     ;
 
 sample

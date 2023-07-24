@@ -32,8 +32,20 @@ SELECT C1 IS NULL, C2 IS NOT NULL, C1 = C2 FROM T1;
 SELECT SPLIT(C1,';') FROM T1;
 SELECT SPLIT_PART(C1,';',1) FROM T1;
 SELECT C1 FROM T1 WHERE NOT C2;
+SELECT C1, LAG(C1) OVER (PARTITION BY C2);
+SELECT C1, LEAD(C1,1,2) OVER (PARTITION BY C2);
+SELECT NVL2(C1, 1, 2);
+SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p (EMP_ID_renamed, JAN, FEB, MAR, APR) ORDER BY EMP_ID_renamed;
+SELECT * FROM monthly_sales PIVOT(SUM(amount) FOR MONTH IN ('JAN', 'FEB', 'MAR', 'APR')) AS p ORDER BY EMP_ID_renamed;
+SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues(c1,c2);
+SELECT * from  (VALUES ('00',1 ),('30',2)) AS tablevalues;
+SELECT NULLIF(1,1);
+SELECT EQUAL_NULL(null,null);
+SELECT * FROM strings WHERE CONTAINS(s, 'te');
 
 select d.s.t.c from d.s.t where d.s.t.c = 1;
 
 SELECT * FROM (VALUES (1), (2)) AS v1;
 SELECT * FROM (VALUES (1), (2));
+SELECT * FROM T1 SAMPLE BLOCK (1);
+SELECT * FROM T1 SAMPLE ROW (10 ROWS);

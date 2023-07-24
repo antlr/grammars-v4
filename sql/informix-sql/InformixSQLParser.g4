@@ -58,6 +58,13 @@ unitStatement
     | renameDatabase
     | renameIndex
     | renameSecurity
+    | renameSequence
+    | renameTable
+    | renameTrustedContext
+    | renameUser
+    | rollbackWork
+    | savepointStmt
+    | setAutofree
     ) SCOL
     ;
 
@@ -185,6 +192,41 @@ renameSecurity
     : RENAME SECURITY (POLICY | LABEL (policy=identifier? | COMPONENT)) oldSecurity=identifier TO newSecurity=identifier
     ;
 
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-sequence-statement
+renameSequence
+    : RENAME SEQUENCE oldSequence=identifier TO newSequence=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-table-statement
+renameTable
+    : RENAME TABLE oldTableName=identifier TO newTableName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-trusted-context-statement
+renameTrustedContext
+    : RENAME TRUSTED CONTEXT oldTrustedContextName=identifier TO newTrustedContextName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-user-statement-unix-linux
+renameUser
+    : RENAME USER oldUserName=identifier TO newUserName=identifier
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rollback-work-statement
+rollbackWork
+    : ROLLBACK WORK? (TO SAVEPOINT savepoint=identifier?)?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-savepoint-statement
+savepointStmt
+    : SAVEPOINT savepoint=identifier UNIQUE?
+    ;
+
+//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-autofree-statement
+setAutofree
+    : SET AUTOFREE (ENABLED | DISABLED)? (FOR (cursorId=identifier | cursorIdVar=anyName))?
+    ;
+
 anyName
     : IDENTIFIER
     | keyword
@@ -210,6 +252,7 @@ keyword
     | AS
     | ASC
     | ATTACH
+    | AUTOFREE
     | AUTOINCREMENT
     | BEFORE
     | BEGIN
@@ -239,10 +282,12 @@ keyword
     | DELETE
     | DESC
     | DETACH
+    | DISABLED
     | DISTINCT
     | DROP
     | EACH
     | ELSE
+    | ENABLED
     | END
     | ESCAPE
     | EXCEPT
@@ -312,6 +357,7 @@ keyword
     | SECURITY
     | SELECT
     | SET
+    | SEQUENCE
     | SYNONYM
     | TABLE
     | TEMP

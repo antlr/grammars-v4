@@ -2902,11 +2902,14 @@ select_no_parens
    ;
 
 select_clause
-   : simple_select
-   | select_with_parens
+   : simple_select_intersect ((UNION | EXCEPT) all_or_distinct simple_select_intersect)*
    ;
 
-simple_select
+simple_select_intersect
+    : simple_select_pramary (INTERSECT all_or_distinct simple_select_pramary)*
+    ;
+
+simple_select_pramary
    : ( SELECT (opt_all_clause into_clause opt_target_list | distinct_clause target_list)
            into_clause
            from_clause
@@ -2914,21 +2917,10 @@ simple_select
            group_clause
            having_clause
            window_clause
-       | values_clause
-       | TABLE relation_expr
-       | select_with_parens set_operator_with_all_or_distinct (simple_select | select_with_parens)
-     )
-        (set_operator_with_all_or_distinct (simple_select | select_with_parens))*
-   ;
-
-set_operator
-   : UNION # union
-   | INTERSECT # intersect
-   | EXCEPT # except
-   ;
-
-set_operator_with_all_or_distinct
-   : set_operator all_or_distinct
+    )
+   | values_clause
+   | TABLE relation_expr
+   | select_with_parens
    ;
 
 with_clause
@@ -3955,7 +3947,6 @@ substr_list
    | a_expr FOR a_expr
    | a_expr SIMILAR a_expr ESCAPE a_expr
    | expr_list
-   |
    ;
 
 trim_list

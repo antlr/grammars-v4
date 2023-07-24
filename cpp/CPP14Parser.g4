@@ -21,6 +21,7 @@
  */
 parser grammar CPP14Parser;
 options {
+	superClass = CPP14ParserBase;
 	tokenVocab = CPP14Lexer;
 }
 /*Basic concepts*/
@@ -370,19 +371,23 @@ simpleTypeSignednessModifier:
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
-	| simpleTypeSignednessModifier
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
-	| simpleTypeSignednessModifier? Char
-	| simpleTypeSignednessModifier? Char16
-	| simpleTypeSignednessModifier? Char32
-	| simpleTypeSignednessModifier? Wchar
+	| Char
+	| Char16
+	| Char32
+	| Wchar
 	| Bool
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
+	| Short
+	| Int
+	| Long
 	| Float
-	| simpleTypeLengthModifier? Double
+	| Signed
+	| Unsigned
+	| Float
+	| Double
 	| Void
 	| Auto
-	| decltypeSpecifier;
+	| decltypeSpecifier
+	;
 
 theTypeName:
 	className
@@ -629,22 +634,23 @@ memberDeclaratorList:
 	memberDeclarator (Comma memberDeclarator)*;
 
 memberDeclarator:
-	declarator (
-		virtualSpecifierSeq? pureSpecifier?
-		| braceOrEqualInitializer?
-	)
-	| Identifier? attributeSpecifierSeq? Colon constantExpression;
+    declarator (virtualSpecifierSeq | { this.IsPureSpecifierAllowed() }? pureSpecifier | { this.IsPureSpecifierAllowed() }? virtualSpecifierSeq pureSpecifier | braceOrEqualInitializer)
+    | declarator
+    | Identifier? attributeSpecifierSeq? Colon constantExpression
+    ;
 
 virtualSpecifierSeq: virtualSpecifier+;
 
 virtualSpecifier: Override | Final;
+
 /*
  purespecifier: Assign '0'//Conflicts with the lexer ;
  */
 
 pureSpecifier:
-	Assign val = OctalLiteral {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
-		};
+	Assign IntegerLiteral
+    ;
+
 /*Derived classes*/
 
 baseClause: Colon baseSpecifierList;

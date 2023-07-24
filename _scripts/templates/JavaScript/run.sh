@@ -1,1 +1,1 @@
-node Test.js $@
+node Test.js "$@"

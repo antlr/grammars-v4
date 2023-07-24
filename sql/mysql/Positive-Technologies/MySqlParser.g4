@@ -1588,7 +1588,7 @@ alterUser
         )?
         (WITH userResourceOption+)?
         (userPasswordOption | userLockOption)*
-        (COMMENT STRING_LITERAL |  ATTRIBUTE STRING_LITERAL)?       #alterUserMysqlV80
+        (COMMENT STRING_LITERAL | ATTRIBUTE STRING_LITERAL)?        #alterUserMysqlV80
     | ALTER USER ifExists?
       (userName | uid) DEFAULT ROLE roleOption                      #alterUserMysqlV80
     ;
@@ -1676,17 +1676,20 @@ userSpecification
 
 userAuthOption
     : userName IDENTIFIED BY PASSWORD hashed=STRING_LITERAL         #hashAuthOption
-    | userName
-      IDENTIFIED BY STRING_LITERAL (RETAIN CURRENT PASSWORD)?       #stringAuthOption
-    | userName
-      IDENTIFIED WITH
-      authenticationRule                                            #moduleAuthOption
+    | userName IDENTIFIED BY RANDOM PASSWORD authOptionClause       #randomAuthOption
+    | userName IDENTIFIED BY STRING_LITERAL authOptionClause        #stringAuthOption
+    | userName IDENTIFIED WITH authenticationRule                   #moduleAuthOption
     | userName                                                      #simpleAuthOption
+    ;
+
+authOptionClause
+    : (REPLACE STRING_LITERAL)? (RETAIN CURRENT PASSWORD)?
     ;
 
 authenticationRule
     : authPlugin
-      ((BY | USING | AS) STRING_LITERAL)?                           #module
+      ((BY | USING | AS) (STRING_LITERAL | RANDOM PASSWORD)
+      authOptionClause)?                                            #module
     | authPlugin
       USING passwordFunctionClause                                  #passwordModuleOption
     ;
@@ -2278,8 +2281,8 @@ convertedDataType
       typeName=(BINARY| NCHAR) lengthOneDimension?
       | typeName=CHAR lengthOneDimension? (charSet charsetName)?
       | typeName=(DATE | DATETIME | TIME | JSON | INT | INTEGER)
-      | typeName=DECIMAL lengthTwoOptionalDimension?
-      | (SIGNED | UNSIGNED) INTEGER?
+      | typeName=(DECIMAL | DEC) lengthTwoOptionalDimension?
+      | (SIGNED | UNSIGNED) (INTEGER | INT)?
     ) ARRAY?
     ;
 
@@ -2692,7 +2695,7 @@ dataTypeBase
     ;
 
 keywordsCanBeId
-    : ACCOUNT | ACTION | ADMIN | AFTER | AGGREGATE | ALGORITHM | ANY
+    : ACCOUNT | ACTION | ADMIN | AFTER | AGGREGATE | ALGORITHM | ANY | ARRAY
     | AT | AUDIT_ADMIN | AUDIT_ABORT_EXEMPT | AUTHORS | AUTOCOMMIT | AUTOEXTEND_SIZE
     | AUTO_INCREMENT | AUTHENTICATION_POLICY_ADMIN | AVG | AVG_ROW_LENGTH | ATTRIBUTE
     | BACKUP_ADMIN | BEGIN | BINLOG | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | BIT | BIT_AND | BIT_OR | BIT_XOR
@@ -2805,7 +2808,7 @@ functionNameBase
     | OVERLAPS | PERCENT_RANK | PERIOD_ADD | PERIOD_DIFF | PI | POINT
     | POINTFROMTEXT | POINTFROMWKB | POINTN | POLYFROMTEXT
     | POLYFROMWKB | POLYGON | POLYGONFROMTEXT | POLYGONFROMWKB
-    | POSITION | POW | POWER | QUARTER | QUOTE | RADIANS | RAND | RANK
+    | POSITION | POW | POWER | QUARTER | QUOTE | RADIANS | RAND | RANDOM | RANK
     | RANDOM_BYTES | RELEASE_LOCK | REVERSE | RIGHT | ROUND
     | ROW_COUNT | ROW_NUMBER | RPAD | RTRIM | SCHEMA | SECOND | SEC_TO_TIME
     | SESSION_USER | SESSION_VARIABLES_ADMIN
