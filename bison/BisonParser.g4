@@ -125,8 +125,7 @@ tag_opt
     ;
 
 generic_symlist
-    : generic_symlist_item
-    | generic_symlist generic_symlist_item
+    : generic_symlist_item+
     ;
 
 generic_symlist_item
@@ -160,12 +159,8 @@ nterm_decls
 
 // A non empty list of possibly tagged symbols for %token or %nterm.
 
-token_decls : ( | TAG ) token_decl_1 ( TAG token_decl_1 )* ;
+token_decls : ( | TAG ) token_decl+ ( TAG token_decl+ )* ;
 
-// One or more symbol declarations for %token or %nterm.
-
-token_decl_1 : token_decl token_decl* ;
-  
 // One symbol declaration for %token or %nterm.
 
 token_decl
@@ -195,16 +190,9 @@ alias
 // FOO and 'foo' as two different symbols instead of aliasing them.
 
 token_decls_for_prec
-    : token_decl_for_prec_1
-    | TAG token_decl_for_prec_1
-    | token_decls_for_prec TAG token_decl_for_prec_1
-    ;
-
-// One or more token declarations for precedence declaration.
-
-token_decl_for_prec_1
-    : token_decl_for_prec
-    | token_decl_for_prec_1 token_decl_for_prec
+    : token_decl_for_prec+
+    | TAG token_decl_for_prec+
+    | token_decls_for_prec TAG token_decl_for_prec+
     ;
 
 // One token declaration for precedence declaration.
@@ -222,16 +210,9 @@ token_decl_for_prec
 // A non empty list of typed symbols (for %type).
 
 symbol_decls
-    : symbol_decl_1
-    | TAG symbol_decl_1
-    | symbol_decls TAG symbol_decl_1
-    ;
-
-// One or more token declarations (for %type).
-
-symbol_decl_1
-    : symbol
-    | symbol_decl_1 symbol
+    : symbol+
+    | TAG symbol+
+    | symbol_decls TAG symbol+
     ;
 
 /*------------------------------------------.
