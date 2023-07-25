@@ -19,14 +19,12 @@ class BisonLexerBase(Lexer):
             from .BisonLexer import BisonLexer
         else:
             from BisonLexer import BisonLexer
-        ++self.percent_percent_count;
+        self.percent_percent_count = self.percent_percent_count + 1;
         if self.percent_percent_count == 1:
             return
         elif self.percent_percent_count == 2:
             self.pushMode(BisonLexer.EpilogueMode)
             return
         else:
-            self.Type = BisonLexer.PercentPercent;
+            self.type = BisonLexer.PercentPercent;
             return;
-        self.opened += 1
-
