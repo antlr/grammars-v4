@@ -27,7 +27,7 @@ parser grammar BisonParser;
 
 options { tokenVocab=BisonLexer; }
 
-input
+input_
     : prologue_declarations '%%' bison_grammar epilogue_opt EOF
     ;
 
