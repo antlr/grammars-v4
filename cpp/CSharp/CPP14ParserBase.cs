@@ -3,12 +3,12 @@ using System.IO;
 
 public abstract class CPP14ParserBase : Parser {
 
-	protected CPP14ParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
-			: base(input, output, errorOutput)
-	{
-	}
+    protected CPP14ParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
+        : base(input, output, errorOutput)
+    {
+    }
 
-	public bool IsPureSpecifierAllowed()
+    public bool IsPureSpecifierAllowed()
     {
         try
         {
