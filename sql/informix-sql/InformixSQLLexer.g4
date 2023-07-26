@@ -78,6 +78,7 @@ CAST:              'CAST';
 CHECK:             'CHECK';
 CLOSE:             'CLOSE';
 COLLATE:           'COLLATE';
+COLLATION:         'COLLATION';
 COLUMN:            'COLUMN';
 COMMIT:            'COMMIT';
 COMPONENT:         'COMPONENT';
@@ -249,6 +250,20 @@ STRING_LITERAL: '\'' (~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: 'X' STRING_LITERAL;
 
+NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
+
+CHAR_STRING: '\''  (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
+
+CHAR_STRING_PERL    : 'Q' '\'' (QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN | QS_EXCLAM | QS_SHARP | QS_QUOTE | QS_DQUOTE) '\'' -> type(CHAR_STRING);
+fragment QS_ANGLE   : '<' .*? '>';
+fragment QS_BRACE   : '{' .*? '}';
+fragment QS_BRACK   : '[' .*? ']';
+fragment QS_PAREN   : '(' .*? ')';
+fragment QS_EXCLAM  : '!' .*? '!';
+fragment QS_SHARP   : '#' .*? '#';
+fragment QS_QUOTE   : '\'' .*? '\'';
+fragment QS_DQUOTE  : '"' .*? '"';
+
 SINGLE_LINE_COMMENT: '--' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
 
 MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
@@ -257,5 +272,8 @@ SPACES: [ \u000B\t\r\n] -> channel(HIDDEN);
 
 UNEXPECTED_CHAR: .;
 
+fragment NEWLINE_EOF    : NEWLINE | EOF;
 fragment HEX_DIGIT: [0-9A-F];
 fragment DIGIT:     [0-9];
+fragment NEWLINE        : '\r'? '\n';
+fragment SPACE          : [ \t];
