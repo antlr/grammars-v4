@@ -215,10 +215,11 @@ fragment LETTER
     | '_'
     ;
 
+//[\p{Nd}] matches a digit zero through nine in any script except ideographic scripts
 fragment UNICODE_DIGIT
     : [\p{Nd}]
     ;
-
+//[\p{L}] matches any kind of letter from any language
 fragment UNICODE_LETTER
     : [\p{L}]
     ;
