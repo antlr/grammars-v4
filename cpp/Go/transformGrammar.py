@@ -7,7 +7,7 @@ from pathlib import Path
 
 def main():
     """Executes the script."""
-    for file in glob("./*.g4"):
+    for file in glob("./parser/*.g4"):
         transform_grammar(file)
 
 def transform_grammar(file_path):
