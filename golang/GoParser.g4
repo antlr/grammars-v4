@@ -72,7 +72,7 @@ typeParameterDecl : identifierList typeElement;
 
 typeElement : typeTerm (OR typeTerm)*;
 
-typeTerm : UNDERLYING ?type_;
+typeTerm : UNDERLYING? type_;
 
 // Function declarations
 
