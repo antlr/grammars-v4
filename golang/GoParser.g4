@@ -236,7 +236,7 @@ elementType: type_;
 pointerType: STAR type_;
 
 interfaceType:
-	INTERFACE L_CURLY ((methodSpec | typeName) eos)* R_CURLY;
+	INTERFACE L_CURLY ((methodSpec | typeElement ) eos)* R_CURLY;
 
 sliceType: L_BRACKET R_BRACKET elementType;
 
