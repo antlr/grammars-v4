@@ -235,7 +235,6 @@ setCollation
 
 quotedString
     : CHAR_STRING
-    | NATIONAL_CHAR_STRING_LIT
     ;
 
 anyName

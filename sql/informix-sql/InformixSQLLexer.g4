@@ -250,8 +250,6 @@ STRING_LITERAL: '\'' (~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: 'X' STRING_LITERAL;
 
-NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'\'' | NEWLINE)* '\'';
-
 CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'\'' | NEWLINE)* '\'';
 
 //use quoted string as char_string
