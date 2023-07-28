@@ -142,8 +142,6 @@ assign_op: (
 
 shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
 
-emptyStmt: EOS | SEMI;
-
 labeledStmt: IDENTIFIER COLON statement?;
 
 returnStmt: RETURN expressionList?;
@@ -379,10 +377,6 @@ arguments:
 	)? R_PAREN;
 
 methodExpr: type_ DOT IDENTIFIER;
-
-//receiverType: typeName | '(' ('*' typeName | receiverType) ')';
-
-receiverType: type_;
 
 eos:
 	SEMI
