@@ -31,26 +31,6 @@ SCOL:      ';';
 DOT:       '.';
 OPEN_PAR:  '(';
 CLOSE_PAR: ')';
-COMMA:     ',';
-ASSIGN:    '=';
-STAR:      '*';
-PLUS:      '+';
-MINUS:     '-';
-TILDE:     '~';
-PIPE2:     '||';
-DIV:       '/';
-MOD:       '%';
-LT2:       '<<';
-GT2:       '>>';
-AMP:       '&';
-PIPE:      '|';
-LT:        '<';
-LT_EQ:     '<=';
-GT:        '>';
-GT_EQ:     '>=';
-EQ:        '==';
-NOT_EQ1:   '!=';
-NOT_EQ2:   '<>';
 
 // Interval type Keywords
 ABORT:             'ABORT';
@@ -164,7 +144,6 @@ RELEASE:           'RELEASE';
 RENAME:            'RENAME';
 REPLACE:           'REPLACE';
 RESTRICT:          'RESTRICT';
-RETURNING:         'RETURNING';
 RIGHT:             'RIGHT';
 ROLLBACK:          'ROLLBACK';
 ROW:               'ROW';
@@ -230,10 +209,6 @@ LAST:              'LAST';
 FILTER:            'FILTER';
 GROUPS:            'GROUPS';
 EXCLUDE:           'EXCLUDE';
-TIES:              'TIES';
-OTHERS:            'OTHERS';
-DO:                'DO';
-NOTHING:           'NOTHING';
 
 IDENTIFIER:
     '"' (~'"' | '""')* '"'
@@ -247,8 +222,6 @@ NUMERIC_LITERAL: (DIGIT+ ('.' DIGIT*)? | '.' DIGIT+) ('E' [-+]? DIGIT+)? | '0x' 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
 STRING_LITERAL: '\'' (~'\'' | '\'\'')* '\'';
-
-BLOB_LITERAL: 'X' STRING_LITERAL;
 
 CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'\'' | NEWLINE)* '\'';
 
@@ -269,10 +242,8 @@ MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
 SPACES: [ \u000B\t\r\n] -> channel(HIDDEN);
 
-UNEXPECTED_CHAR: .;
 
 fragment NEWLINE_EOF    : NEWLINE | EOF;
 fragment HEX_DIGIT: [0-9A-F];
 fragment DIGIT:     [0-9];
 fragment NEWLINE        : '\r'? '\n';
-fragment SPACE          : [ \t];
