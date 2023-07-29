@@ -65,6 +65,7 @@ unitStatement
     | rollbackWork
     | savepointStmt
     | setAutofree
+    | setCollation
     ) SCOL
     ;
 
@@ -227,6 +228,15 @@ setAutofree
     : SET AUTOFREE (ENABLED | DISABLED)? (FOR (cursorId=identifier | cursorIdVar=anyName))?
     ;
 
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-collation-statement
+setCollation
+    : SET (COLLATION locale=quotedString | NO COLLATION)
+    ;
+
+quotedString
+    : CHAR_STRING
+    ;
+
 anyName
     : IDENTIFIER
     | keyword
@@ -264,6 +274,7 @@ keyword
     | CHECK
     | CLOSE
     | COLLATE
+    | COLLATION
     | COLUMN
     | COMPONENT
     | COMMIT
