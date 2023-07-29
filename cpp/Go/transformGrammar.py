@@ -1,31 +1,30 @@
-import sys, os, re, shutil
+"""The script transforms the grammar to fit for the go target """
+import sys
+import re
+import shutil
 from glob import glob
 from pathlib import Path
 
-def main(argv):
+def main():
+    """Executes the script."""
     for file in glob("./parser/*.g4"):
-        fix(file)
+        transform_grammar(file)
 
-def fix(file_path):
+def transform_grammar(file_path):
+    """Transforms the grammar to fit for the go target"""
     print("Altering " + file_path)
-    if not os.path.exists(file_path):
+    if not Path(file_path).is_file:
         print(f"Could not find file: {file_path}")
         sys.exit(1)
-    parts = os.path.split(file_path)
-    file_name = parts[-1]
 
     shutil.move(file_path, file_path + ".bak")
-    input_file = open(file_path + ".bak",'r')
-    output_file = open(file_path, 'w')
-    for x in input_file:
-        if 'this.' in x:
-            x = x.replace('this.', 'p.')
-        output_file.write(x)
-        output_file.flush()
+    with open(file_path + ".bak",'r', encoding="utf-8") as input_file:
+        with open(file_path, 'w', encoding="utf-8") as output_file:
+            for line in input_file:
+                line = re.sub(r"(this\.)", 'p.', line)
+                output_file.write(line)
 
     print("Writing ...")
-    input_file.close()
-    output_file.close()
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
