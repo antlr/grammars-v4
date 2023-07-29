@@ -31,26 +31,6 @@ SCOL:      ';';
 DOT:       '.';
 OPEN_PAR:  '(';
 CLOSE_PAR: ')';
-COMMA:     ',';
-ASSIGN:    '=';
-STAR:      '*';
-PLUS:      '+';
-MINUS:     '-';
-TILDE:     '~';
-PIPE2:     '||';
-DIV:       '/';
-MOD:       '%';
-LT2:       '<<';
-GT2:       '>>';
-AMP:       '&';
-PIPE:      '|';
-LT:        '<';
-LT_EQ:     '<=';
-GT:        '>';
-GT_EQ:     '>=';
-EQ:        '==';
-NOT_EQ1:   '!=';
-NOT_EQ2:   '<>';
 
 // Interval type Keywords
 ABORT:             'ABORT';
@@ -78,6 +58,7 @@ CAST:              'CAST';
 CHECK:             'CHECK';
 CLOSE:             'CLOSE';
 COLLATE:           'COLLATE';
+COLLATION:         'COLLATION';
 COLUMN:            'COLUMN';
 COMMIT:            'COMMIT';
 COMPONENT:         'COMPONENT';
@@ -163,7 +144,6 @@ RELEASE:           'RELEASE';
 RENAME:            'RENAME';
 REPLACE:           'REPLACE';
 RESTRICT:          'RESTRICT';
-RETURNING:         'RETURNING';
 RIGHT:             'RIGHT';
 ROLLBACK:          'ROLLBACK';
 ROW:               'ROW';
@@ -229,10 +209,6 @@ LAST:              'LAST';
 FILTER:            'FILTER';
 GROUPS:            'GROUPS';
 EXCLUDE:           'EXCLUDE';
-TIES:              'TIES';
-OTHERS:            'OTHERS';
-DO:                'DO';
-NOTHING:           'NOTHING';
 
 IDENTIFIER:
     '"' (~'"' | '""')* '"'
@@ -247,7 +223,18 @@ BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
 STRING_LITERAL: '\'' (~'\'' | '\'\'')* '\'';
 
-BLOB_LITERAL: 'X' STRING_LITERAL;
+CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'\'' | NEWLINE)* '\'';
+
+//use quoted string as char_string
+CHAR_STRING_PERL    : 'Q' '\'' (QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN | QS_EXCLAM | QS_SHARP | QS_QUOTE | QS_DQUOTE) '\'' -> type(CHAR_STRING);
+fragment QS_ANGLE   : '<' ~'>'* '>';
+fragment QS_BRACE   : '{' ~'}'* '}';
+fragment QS_BRACK   : '[' ~']'* ']';
+fragment QS_PAREN   : '(' ~')'* ')';
+fragment QS_EXCLAM  : '!' ~'!'* '!';
+fragment QS_SHARP   : '#' ~'#'* '#';
+fragment QS_QUOTE   : '\'' ~'\''* '\'';
+fragment QS_DQUOTE  : '"' ~'"'* '"';
 
 SINGLE_LINE_COMMENT: '--' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
 
@@ -255,7 +242,8 @@ MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
 SPACES: [ \u000B\t\r\n] -> channel(HIDDEN);
 
-UNEXPECTED_CHAR: .;
 
+fragment NEWLINE_EOF    : NEWLINE | EOF;
 fragment HEX_DIGIT: [0-9A-F];
 fragment DIGIT:     [0-9];
+fragment NEWLINE        : '\r'? '\n';
