@@ -69,161 +69,161 @@ unitStatement
     ) SCOL
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-create-role-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-create-role-statement
 createRole
     : CREATE ROLE (IF NOT EXISTS)? roleName=anyName
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-role-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-role-statement
 dropRole
     : DROP ROLE (IF EXISTS)? roleName=anyName
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-synonym-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-synonym-statement
 dropSynonym
     : DROP SYNONYM (IF EXISTS)? synonymName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-table-statement
 dropTable
     : DROP TABLE (IF EXISTS)? tableName=identifier (CASCADE | RESTRICT)?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trigger-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trigger-statement
 dropTrigger
     : DROP TRIGGER (IF EXISTS)? triggerName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trusted-context-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-trusted-context-statement
 dropTrustedContext
     : DROP TRUSTED CONTEXT contextName=anyName
     ;
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-type-statement
 dropType
     : DROP TYPE (IF EXISTS)? dataTypeName=identifier RESTRICT
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-user-statement-unix-linux
 dropUser
     : DROP USER userName=anyName
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-view-statement
 dropView
     : DROP VIEW (IF EXISTS)? viewName=identifier (CASCADE | RESTRICT)?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-statement
 dropXadatasource
     : DROP XADATASOURCE (IF EXISTS)? xaSourceName=identifier RESTRICT
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-type-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-xadatasource-type-statement
 dropXadataTypeSource
     : DROP XADATASOURCE TYPE (IF EXISTS)? xaSourceName=identifier RESTRICT
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-access-method-statement
 dropAccessMethod
     : DROP ACCESS_METHOD (IF EXISTS)? accessMethodName=identifier RESTRICT
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-aggregate-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-aggregate-statement
 dropAggregate
     : DROP AGGREGATE (IF EXISTS)? aggregateName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-database-statement
 dropDatabase
     : DROP DATABASE (IF EXISTS)? databaseName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-index-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-drop-index-statement
 dropIndex
     : DROP INDEX (IF EXISTS)? indexName=identifier ONLINE?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-statement
 closeStmt
     : CLOSE cursorId=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-database-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-close-database-statement
 closeDatabaseStmt
     : CLOSE DATABASE
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-database-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-database-statement
 databaseStmt
     : DATABASE databaseName=anyName EXCLUSIVE?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-commit-work-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-commit-work-statement
 commitWorkStmt
     : COMMIT WORK?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-release-savepoint-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-release-savepoint-statement
 releaseSavepoint
     : RELEASE SAVEPOINT savepointName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-column-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-column-statement
 renameColumn
     : RENAME COLUMN oldColumn=identifier TO newColumn=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-constraint-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-constraint-statement
 renameConstraint
     : RENAME CONSTRAINT oldConstraint=identifier TO newConstraint=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-database-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-database-statement
 renameDatabase
     : RENAME DATABASE oldDatabase=identifier TO newDatabase=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-index-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-index-statement
 renameIndex
     : RENAME INDEX oldIndex=identifier TO newIndex=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-security-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-security-statement
 renameSecurity
     : RENAME SECURITY (POLICY | LABEL (policy=identifier? | COMPONENT)) oldSecurity=identifier TO newSecurity=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-sequence-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-sequence-statement
 renameSequence
     : RENAME SEQUENCE oldSequence=identifier TO newSequence=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-table-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-table-statement
 renameTable
     : RENAME TABLE oldTableName=identifier TO newTableName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-trusted-context-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-trusted-context-statement
 renameTrustedContext
     : RENAME TRUSTED CONTEXT oldTrustedContextName=identifier TO newTrustedContextName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-user-statement-unix-linux
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rename-user-statement-unix-linux
 renameUser
     : RENAME USER oldUserName=identifier TO newUserName=identifier
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rollback-work-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-rollback-work-statement
 rollbackWork
     : ROLLBACK WORK? (TO SAVEPOINT savepoint=identifier?)?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-savepoint-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-savepoint-statement
 savepointStmt
     : SAVEPOINT savepoint=identifier UNIQUE?
     ;
 
-//https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-autofree-statement
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-autofree-statement
 setAutofree
     : SET AUTOFREE (ENABLED | DISABLED)? (FOR (cursorId=identifier | cursorIdVar=anyName))?
     ;
