@@ -3523,6 +3523,7 @@ builtin_function
     | TO_BOOLEAN
     | IDENTIFIER
     | FLATTEN
+    | SPLIT_TO_TABLE
     ;
 
 list_operator
@@ -3948,7 +3949,7 @@ object_ref
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
         as_alias?
-    | LATERAL flatten_table
+    | LATERAL ( flatten_table | splited_table )
         as_alias?
     //| AT id_ PATH?
     //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
@@ -3964,6 +3965,10 @@ flatten_table_option
 
 flatten_table
     : FLATTEN LR_BRACKET ( INPUT ASSOC )? expr ( COMMA flatten_table_option )* RR_BRACKET
+    ;
+
+splited_table
+    : SPLIT_TO_TABLE LR_BRACKET expr COMMA expr RR_BRACKET
     ;
 
 prior_list
