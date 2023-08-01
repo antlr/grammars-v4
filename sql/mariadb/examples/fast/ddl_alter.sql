@@ -45,6 +45,7 @@ alter table add_test drop constraint if exists cons;
 alter table add_test wait 100 add column col1 int not null;
 alter table default.task add column xxxx varchar(200) comment 'cdc test';
 alter table `some_table` add unique if not exists `id_unique` (`id`)
+alter table if exists `add_test` add column if not exists `new_col` text default 'my_default';
 #end
 #begin
 -- Alter database
@@ -118,6 +119,8 @@ alter user 'user'@'%' identified with 'mysql_native_password' as '*2470C0C06DEE4
 alter user 'user'@'%' identified with 'mysql_native_password' as '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19'
     require none password expire default account unlock password_lock_time unbounded;
 alter user 'user'@'%' identified by 'newpassword' retain current password;
+alter user if exists 'user'@'%' identified with 'mysql_native_password' as '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19'
+    require none password expire default account unlock password history default;
 rename user user1@100.200.1.1 to user2@100.200.1.2;
 rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
 #end
