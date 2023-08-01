@@ -841,6 +841,7 @@ SOURCE_COMPRESSION:                                    'SOURCE_COMPRESSION';
 // SPECIFICATION:                                         'SPECIFICATION';
 SPLIT:                                                 'SPLIT';
 SPLIT_PART:                                            'SPLIT_PART';
+SPLIT_TO_TABLE:                                        'SPLIT_TO_TABLE';
 SQL:                                                   'SQL';
 SSO_LOGIN_PAGE:                                        'SSO_LOGIN_PAGE';
 STAGE:                                                 'STAGE';
