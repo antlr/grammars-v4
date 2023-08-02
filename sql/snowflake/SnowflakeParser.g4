@@ -1284,7 +1284,7 @@ column_unset_tags
     ;
 
 alter_tag
-    : ALTER TAG alter_tag_opts
+    : ALTER TAG if_exists? object_name alter_tag_opts
     ;
 
 alter_task
@@ -1365,13 +1365,13 @@ alter_user_opts
     ;
 
 alter_tag_opts
-    : if_exists? id_ RENAME TO id_
-    | if_exists? id_ ( ADD | DROP ) ALLOWED_VALUES string (COMMA string)*
-    | id_ UNSET ALLOWED_VALUES
-    | id_ SET MASKING POLICY id_ (COMMA MASKING POLICY id_)*
-    | id_ UNSET MASKING POLICY id_ (COMMA MASKING POLICY id_)*
-    | if_exists? id_ SET comment_clause
-    | if_exists? id_ UNSET COMMENT
+    : RENAME TO object_name
+    | ( ADD | DROP ) tag_allowed_values
+    | UNSET ALLOWED_VALUES
+    | SET MASKING POLICY id_ (COMMA MASKING POLICY id_)*
+    | UNSET MASKING POLICY id_ (COMMA MASKING POLICY id_)*
+    | SET comment_clause
+    | UNSET COMMENT
     ;
 
 alter_network_policy_opts
@@ -1408,11 +1408,11 @@ set_tags
     ;
 
 tag_decl_list
-    : TAG id_ EQ tag_value (COMMA id_ EQ tag_value )*
+    : TAG object_name EQ tag_value (COMMA object_name EQ tag_value )*
     ;
 
 unset_tags
-    : UNSET TAG id_ (COMMA id_)*
+    : UNSET TAG object_name (COMMA object_name)*
     ;
 
 // create commands
@@ -1871,9 +1871,7 @@ create_resource_monitor
     ;
 
 create_role
-    : CREATE or_replace? ROLE if_not_exists? id_
-        ( WITH? TAG LR_BRACKET id_ EQ STRING ( COMMA id_ EQ STRING  )* RR_BRACKET )?
-        ( COMMENT EQ STRING )?
+    : CREATE or_replace? ROLE if_not_exists? id_ with_tags? comment_clause?
     ;
 
 create_row_access_policy
@@ -2465,7 +2463,11 @@ create_table_like
     ;
 
 create_tag
-    : CREATE or_replace? TAG if_not_exists? id_ ( ALLOWED_VALUES string (COMMA string)* )? comment_clause?
+    : CREATE or_replace? TAG if_not_exists? object_name tag_allowed_values? comment_clause?
+    ;
+
+tag_allowed_values
+    : ALLOWED_VALUES tag_value (COMMA tag_value)*
     ;
 
 session_parameter
@@ -2818,7 +2820,7 @@ drop_table
     ;
 
 drop_tag
-    : DROP TAG if_exists? id_
+    : DROP TAG if_exists? object_name
     ;
 
 drop_task
@@ -2867,7 +2869,7 @@ undrop_table
     ;
 
 undrop_tag
-    : UNDROP TAG id_
+    : UNDROP TAG object_name
     ;
 
 // use commands
