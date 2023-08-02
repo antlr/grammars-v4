@@ -2467,7 +2467,7 @@ create_tag
     ;
 
 tag_allowed_values
-    : ALLOWED_VALUES string (COMMA string)*
+    : ALLOWED_VALUES tag_value (COMMA tag_value)*
     ;
 
 session_parameter
