@@ -493,6 +493,7 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    | alter_dynamic_table
     //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
     | alter_failover_group
@@ -707,6 +708,13 @@ database_property
 
 account_id_list
     : account_identifier (COMMA account_identifier)*
+    ;
+
+alter_dynamic_table
+    : ALTER DYNAMIC TABLE id_ ( resume_suspend
+                              | REFRESH
+                              | SET WAREHOUSE EQ id_
+                              )
     ;
 
 alter_external_table
@@ -1415,6 +1423,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_dynamic_table
     | create_event_table
     | create_external_function
     | create_external_table
@@ -1557,6 +1566,13 @@ compression_type
 
 compression
     : COMPRESSION EQ compression_type
+    ;
+
+create_dynamic_table
+    : CREATE or_replace? DYNAMIC TABLE id_
+        TARGET_LAG EQ (string | DOWNSTREAM)
+        WAREHOUSE EQ wh=id_
+        AS query_statement
     ;
 
 create_event_table
@@ -2666,6 +2682,7 @@ drop_command
     | drop_alert
     | drop_connection
     | drop_database
+    | drop_dynamic_table
     //| drop_event_table //uses DROP TABLE stmt
     | drop_external_table
     | drop_failover_group
@@ -2710,6 +2727,10 @@ drop_connection
 
 drop_database
     : DROP DATABASE if_exists? id_ cascade_restrict?
+    ;
+
+drop_dynamic_table
+    : DROP DYNAMIC TABLE id_
     ;
 
 drop_external_table
@@ -2908,6 +2929,7 @@ describe
 describe_command
     : describe_alert
     | describe_database
+    | describe_dynamic_table
     | describe_event_table
     | describe_external_table
     | describe_file_format
@@ -2941,6 +2963,10 @@ describe_alert
 
 describe_database
     : describe DATABASE id_
+    ;
+
+describe_dynamic_table
+    : describe DYNAMIC TABLE id_
     ;
 
 describe_event_table
@@ -3049,6 +3075,7 @@ show_command
     | show_databases_in_failover_group
     | show_databases_in_replication_group
     | show_delegated_authorizations
+    | show_dynamic_tables
     | show_event_tables
     | show_external_functions
     | show_external_tables
@@ -3140,6 +3167,13 @@ show_delegated_authorizations
     : SHOW DELEGATED AUTHORIZATIONS
     | SHOW DELEGATED AUTHORIZATIONS BY USER id_
     | SHOW DELEGATED AUTHORIZATIONS TO SECURITY INTEGRATION id_
+    ;
+
+show_dynamic_tables
+    : SHOW DYNAMIC TABLES like_pattern?
+        (IN ( ACCOUNT | DATABASE id_? | SCHEMA? schema_name?))?
+        starts_with?
+        limit_rows?
     ;
 
 show_event_tables
@@ -3506,6 +3540,9 @@ non_reserved_words
     | RESTRICT
     | VALUES
     | EVENT
+    | DOWNSTREAM
+    | DYNAMIC
+    | TARGET_LAG
     ;
 
 builtin_function
@@ -3523,6 +3560,7 @@ builtin_function
     | TO_BOOLEAN
     | IDENTIFIER
     | FLATTEN
+    | SPLIT_TO_TABLE
     ;
 
 list_operator
@@ -3948,7 +3986,7 @@ object_ref
     | LATERAL? '(' subquery ')'
         pivot_unpivot?
         as_alias?
-    | LATERAL flatten_table
+    | LATERAL ( flatten_table | splited_table )
         as_alias?
     //| AT id_ PATH?
     //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
@@ -3964,6 +4002,10 @@ flatten_table_option
 
 flatten_table
     : FLATTEN LR_BRACKET ( INPUT ASSOC )? expr ( COMMA flatten_table_option )* RR_BRACKET
+    ;
+
+splited_table
+    : SPLIT_TO_TABLE LR_BRACKET expr COMMA expr RR_BRACKET
     ;
 
 prior_list
