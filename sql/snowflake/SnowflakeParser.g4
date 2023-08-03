@@ -4198,6 +4198,7 @@ group_item
 group_by_clause
     : GROUP BY group_item (COMMA group_item)* having_clause?
     | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_item (COMMA group_item)* RR_BRACKET
+    | GROUP BY ALL
     ;
 
 having_clause
