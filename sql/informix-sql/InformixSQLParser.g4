@@ -66,6 +66,7 @@ unitStatement
     | savepointStmt
     | setAutofree
     | setCollation
+    | setDataskip
     ) SCOL
     ;
 
@@ -233,6 +234,11 @@ setCollation
     : SET (COLLATION locale=quotedString | NO COLLATION)
     ;
 
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-dataskip-statement
+setDataskip
+    : SET DATASKIP (ON (identifier (COMMA identifier)*)?  | OFF | DEFAULT)
+    ;
+
 quotedString
     : CHAR_STRING
     ;
@@ -287,6 +293,7 @@ keyword
     | CURRENT_TIME
     | CURRENT_TIMESTAMP
     | DATABASE
+    | DATASKIP
     | DEFAULT
     | DEFERRABLE
     | DEFERRED
@@ -340,6 +347,7 @@ keyword
     | NOTNULL
     | NULL
     | OF
+    | OFF
     | OFFSET
     | ON
     | ONLINE

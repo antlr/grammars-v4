@@ -29,6 +29,7 @@ options { caseInsensitive = true; }
 
 SCOL:      ';';
 DOT:       '.';
+COMMA:     ',';
 OPEN_PAR:  '(';
 CLOSE_PAR: ')';
 
@@ -71,6 +72,7 @@ CURRENT_DATE:      'CURRENT_DATE';
 CURRENT_TIME:      'CURRENT_TIME';
 CURRENT_TIMESTAMP: 'CURRENT_TIMESTAMP';
 DATABASE:          'DATABASE';
+DATASKIP:          'DATASKIP';
 DEFAULT:           'DEFAULT';
 DEFERRABLE:        'DEFERRABLE';
 DEFERRED:          'DEFERRED';
@@ -124,6 +126,7 @@ NOT:               'NOT';
 NOTNULL:           'NOTNULL';
 NULL:              'NULL';
 OF:                'OF';
+OFF:               'OFF';
 OFFSET:            'OFFSET';
 ON:                'ON';
 ONLINE:            'ONLINE';
