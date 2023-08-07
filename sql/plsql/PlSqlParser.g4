@@ -6243,7 +6243,7 @@ json_function
     | JSON_ARRAYAGG '(' expression (FORMAT JSON)? order_by_clause? json_on_null_clause? json_return_clause? STRICT? ')'
     | JSON_OBJECT '(' json_object_content ')'
     | JSON_OBJECTAGG '(' KEY? expression VALUE expression ((NULL_ | ABSENT) ON NULL_)? (RETURNING ( VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB ))?  STRICT? (WITH UNIQUE KEYS)?')'
-    | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause? json_query_wrapper_clause? json_query_on_error_clause? json_query_on_empty_clause? ')'
+    | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause json_query_wrapper_clause? json_query_on_error_clause? json_query_on_empty_clause? ')'
     | JSON_SERIALIZE '(' CHAR_STRING (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? ((NULL_ | ERROR | EMPTY (ARRAY | OBJECT)) ON ERROR)? ')'
     | JSON_TRANSFORM '(' expression ',' json_transform_op (',' json_transform_op)* ')'
     | JSON_VALUE '('  expression (FORMAT JSON)? (',' CHAR_STRING? json_value_return_clause? ((ERROR | NULL_ | DEFAULT literal)? ON ERROR)? ((ERROR | NULL_ | DEFAULT literal)? ON EMPTY)? json_value_on_mismatch_clause?')')?
