@@ -28,6 +28,7 @@ options {
     tokenVocab = InformixSQLLexer;
 }
 
+// root
 sqlScript
     : unitStatement* EOF
     ;
