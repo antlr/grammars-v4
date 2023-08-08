@@ -485,7 +485,7 @@ ELSIF:                        'ELSIF';
 EM:                           'EM';
 EMPTY_BLOB:                   'EMPTY_BLOB';
 EMPTY_CLOB:                   'EMPTY_CLOB';
-EMPTY:                        'EMPTY';
+EMPTY_:                        'EMPTY';
 ENABLE_ALL:                   'ENABLE_ALL';
 ENABLE:                       'ENABLE';
 ENABLE_PARALLEL_DML:          'ENABLE_PARALLEL_DML';
