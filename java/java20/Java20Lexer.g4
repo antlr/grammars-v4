@@ -5,6 +5,8 @@ options
    superClass = JavaLexerBase;
 }
 
+// Insert here @header for C++ lexer.
+
 // Copied from Java9.g4 and adjusted.
 
 // LEXER
