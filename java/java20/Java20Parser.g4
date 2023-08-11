@@ -4,7 +4,7 @@ options { tokenVocab = Java20Lexer; }
 
 //=============
 
-start: compilationUnit ; //EOF
+start: compilationUnit EOF ;
 
 // Paragraph 3.10
 // --------------
