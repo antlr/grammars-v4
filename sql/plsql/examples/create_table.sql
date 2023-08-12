@@ -394,6 +394,12 @@ CREATE TABLE print_media_demo
          NESTED TABLE ad_textdocs_ntab STORE AS nt_p2
        )
    TABLESPACE tbs_03;
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+);
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE

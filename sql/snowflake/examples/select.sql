@@ -50,3 +50,6 @@ SELECT * FROM (VALUES (1), (2));
 SELECT * FROM T1 SAMPLE BLOCK (1);
 SELECT * FROM T1 SAMPLE ROW (10 ROWS);
 SELECT * FROM splittable, LATERAL SPLIT_TO_TABLE(splittable.v, '.');
+
+with t as (select 1 as c, 2 as d)
+select * from t group by all;

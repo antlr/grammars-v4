@@ -114,7 +114,10 @@ gc: 'gc' StringLit;
 prefix: 'prefix' typeConst;
 prologue: 'prologue' typeConst;
 personality: 'personality' typeConst;
-returnAttribute: returnAttr | dereferenceable;
+returnAttribute: 
+    returnAttr 
+    | dereferenceable
+    | align;
 funcBody: '{' basicBlock+ useListOrder* '}';
 basicBlock: LabelIdent? instruction* terminator;
 instruction: // Instructions producing values.

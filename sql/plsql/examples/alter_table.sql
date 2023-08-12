@@ -186,3 +186,6 @@ ALTER TABLE employees
 
 ALTER TABLE employees
     MODIFY LAST_UPDATE_DATE visible;
+
+ALTER TABLE employees
+    ADD XMLTYPE;
