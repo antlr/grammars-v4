@@ -2215,7 +2215,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {self.isVersion12()}?
+    : {this.isVersion12()}?
       AUDIT (POLICY policy_name ((BY | EXCEPT) audit_user (',' audit_user)* )?
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace
@@ -2243,11 +2243,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {self.isVersion12()}? DIRECT_PATH auditing_by_clause
+    : {this.isVersion12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {self.isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {this.isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -2289,7 +2289,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {self.isVersion12()}? SQL TRANSLATION PROFILE profile_name
+         | {this.isVersion12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -2317,7 +2317,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {self.isVersion12()}? PLUGGABLE DATABASE
+    | {this.isVersion12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -2550,11 +2550,11 @@ credential_name
     ;
 
 library_editionable
-    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {this.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 library_debug
-    : {self.isVersion12()}? DEBUG
+    : {this.isVersion12()}? DEBUG
     ;
 
 
@@ -2623,7 +2623,7 @@ alter_view
     ;
 
 alter_view_editionable
-    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {this.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-VIEW.html
@@ -4222,7 +4222,7 @@ partial_database_recovery
     ;
 
 partial_database_recovery_10g
-    : {self.isVersion10()}? STANDBY
+    : {this.isVersion10()}? STANDBY
       ( TABLESPACE tablespace (',' tablespace)*
       | DATAFILE CHAR_STRING | filenumber (',' CHAR_STRING | filenumber)*
       )
@@ -5046,7 +5046,7 @@ lob_partition_storage
     ;
 
 period_definition
-    : {self.isVersion12()}? PERIOD FOR column_name
+    : {this.isVersion12()}? PERIOD FOR column_name
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
@@ -6084,7 +6084,7 @@ unary_logical_expression
 logical_operation:
     ( NULL_
     | NAN | PRESENT
-    | INFINITE | A_LETTER SET | EMPTY
+    | INFINITE | A_LETTER SET | EMPTY_
     | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
     )
     ;
@@ -6241,10 +6241,10 @@ json_function
     | JSON_ARRAYAGG '(' expression (FORMAT JSON)? order_by_clause? json_on_null_clause? json_return_clause? STRICT? ')'
     | JSON_OBJECT '(' json_object_content ')'
     | JSON_OBJECTAGG '(' KEY? expression VALUE expression ((NULL_ | ABSENT) ON NULL_)? (RETURNING ( VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR )? ')')? | CLOB | BLOB ))?  STRICT? (WITH UNIQUE KEYS)?')'
-    | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause? json_query_wrapper_clause? json_query_on_error_clause? json_query_on_empty_clause? ')'
-    | JSON_SERIALIZE '(' CHAR_STRING (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? ((NULL_ | ERROR | EMPTY (ARRAY | OBJECT)) ON ERROR)? ')'
+    | JSON_QUERY '(' expression (FORMAT JSON)? ',' CHAR_STRING json_query_returning_clause json_query_wrapper_clause? json_query_on_error_clause? json_query_on_empty_clause? ')'
+    | JSON_SERIALIZE '(' CHAR_STRING (RETURNING json_query_return_type)? PRETTY? ASCII? TRUNCATE? ((NULL_ | ERROR | EMPTY_ (ARRAY | OBJECT)) ON ERROR)? ')'
     | JSON_TRANSFORM '(' expression ',' json_transform_op (',' json_transform_op)* ')'
-    | JSON_VALUE '('  expression (FORMAT JSON)? (',' CHAR_STRING? json_value_return_clause? ((ERROR | NULL_ | DEFAULT literal)? ON ERROR)? ((ERROR | NULL_ | DEFAULT literal)? ON EMPTY)? json_value_on_mismatch_clause?')')?
+    | JSON_VALUE '('  expression (FORMAT JSON)? (',' CHAR_STRING? json_value_return_clause? ((ERROR | NULL_ | DEFAULT literal)? ON ERROR)? ((ERROR | NULL_ | DEFAULT literal)? ON EMPTY_)? json_value_on_mismatch_clause?')')?
     ;
 
 json_object_content
@@ -6258,7 +6258,7 @@ json_object_entry
     ;
 
 json_table_clause
-    : JSON_TABLE '(' expression (FORMAT JSON)? (',' CHAR_STRING)? ((ERROR | NULL_) ON ERROR)? ((EMPTY | NULL_) ON EMPTY)? json_column_clause? ')'
+    : JSON_TABLE '(' expression (FORMAT JSON)? (',' CHAR_STRING)? ((ERROR | NULL_) ON ERROR)? ((EMPTY_ | NULL_) ON EMPTY_)? json_column_clause? ')'
     ;
 
 json_array_element
@@ -6306,11 +6306,11 @@ json_query_wrapper_clause
     ;
 
 json_query_on_error_clause
-    : (ERROR | NULL_ | EMPTY | EMPTY ARRAY | EMPTY OBJECT)? ON ERROR
+    : (ERROR | NULL_ | EMPTY_ | EMPTY_ ARRAY | EMPTY_ OBJECT)? ON ERROR
     ;
 
 json_query_on_empty_clause
-    : (ERROR | NULL_ | EMPTY | EMPTY ARRAY | EMPTY OBJECT)? ON EMPTY
+    : (ERROR | NULL_ | EMPTY_ | EMPTY_ ARRAY | EMPTY_ OBJECT)? ON EMPTY_
     ;
 
 json_value_return_clause
@@ -6392,7 +6392,7 @@ other_function
     | XMLPI
       '(' (NAME identifier | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)*
     | XMLQUERY
-      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL_ ON EMPTY)? ')' ('.' general_element_part)*
+      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL_ ON EMPTY_)? ')' ('.' general_element_part)*
     | XMLROOT
       '(' concatenation (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)*
     | XMLSERIALIZE
@@ -6883,6 +6883,7 @@ native_datatype_element
     | CLOB
     | NCLOB
     | MLSLABEL
+    | XMLTYPE
     ;
 
 bind_variable
@@ -7881,7 +7882,7 @@ non_reserved_keywords_pre12c
     | ELIMINATE_OUTER_JOIN
     | EMPTY_BLOB
     | EMPTY_CLOB
-    | EMPTY
+    | EMPTY_
     | ENABLE
     | ENABLE_PRESET
     | ENCODING
