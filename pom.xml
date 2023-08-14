@@ -325,6 +325,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wkt-crs-v1</module>
 				<module>wln</module>
 				<module>wren</module>
 				<module>xml</module>
