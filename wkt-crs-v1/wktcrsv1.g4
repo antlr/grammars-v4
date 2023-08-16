@@ -12,11 +12,9 @@
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- * For parsing propeties file (like GeoTools epsg.properties), use starting rule "propsFile".
- * For parsing single WKT CRS definition, use starting rule "wkt".
+ * For parsing propeties file (like GeoTools epsg.properties), use starting rule "propsFile". For parsing single WKT CRS definition, use starting rule "wkt".
  */
 grammar wktcrsv1;
-options { caseInsensitive = true; }
 
 propsFile: propRow* EOF;
 
@@ -35,10 +33,10 @@ datum:         'DATUM' LPAR name COMMA spheroid (COMMA towgs84)? (COMMA authorit
 vertdatum:     'VERT_DATUM' LPAR name COMMA type COMMA authority RPAR;
 localdatum:    'LOCAL_DATUM' LPAR name COMMA type (COMMA authority)? RPAR;
 spheroid:      'SPHEROID' LPAR name COMMA semiMajorAxis COMMA inverseFlattening (COMMA authority)? RPAR;
-towgs84:       'TOWGS84' LPAR dXBF COMMA dYBF COMMA dZBF (COMMA rXBF COMMA rYBF COMMA rZBF (COMMA mBF)?)? RPAR;
+towgs84:       'TOWGS84' LPAR dx COMMA dy COMMA dz (COMMA ex COMMA ey COMMA ez (COMMA ppm)?)? RPAR;
 authority:     'AUTHORITY' LPAR authorityName COMMA code RPAR;
 primem:        'PRIMEM' LPAR name COMMA longitude (COMMA authority)? RPAR;
-unit:          'UNIT' LPAR name COMMA angularUnit (COMMA authority)? RPAR;
+unit:          'UNIT' LPAR name COMMA conversionFactor (COMMA authority)? RPAR;
 axis:          'AXIS' LPAR name COMMA axisOrient RPAR;
 projection:    'PROJECTION' LPAR name (COMMA authority)? RPAR;
 parameter:     'PARAMETER' LPAR name COMMA value RPAR;
@@ -63,16 +61,16 @@ number:            NUMBER;
 type:              NUMBER;
 semiMajorAxis:     NUMBER;
 inverseFlattening: NUMBER;
-dXBF:              NUMBER;
-dYBF:              NUMBER;
-dZBF:              NUMBER;
-rXBF:              NUMBER;
-rYBF:              NUMBER;
-rZBF:              NUMBER;
-mBF:               NUMBER;
+dx:              NUMBER;
+dy:              NUMBER;
+dz:              NUMBER;
+ex:              NUMBER;
+ey:              NUMBER;
+ez:              NUMBER;
+ppm:               NUMBER;
 code:              TEXT;
 longitude:         NUMBER;
-angularUnit:       NUMBER;
+conversionFactor:  NUMBER;
 value:             NUMBER;
 
 NUMBER:       PM? INT ('.' INT)? EXP?;
@@ -87,5 +85,5 @@ RPAR:  ']' | ')';
 EQ:    '=';
 
 fragment INT: [0-9]+;
-fragment EXP: 'E' PM? INT;
+fragment EXP: [Ee] PM? INT;
 fragment PM:  '+' | '-';

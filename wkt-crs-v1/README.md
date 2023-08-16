@@ -2,17 +2,17 @@
 
 Grammar for parsing Well Known Text Coordinate Reference System, version 1.
 
-Reference: [Specification](https://docs.ogc.org/is/12-063r5/12-063r5.html)
+References:
+
+- [WKT](https://en.wikipedia.org/wiki/Well-known_text_representation_of_coordinate_reference_systems)
+- [WKT v1](https://github.com/geotools/geotools/blob/main/modules/library/opengis/src/main/java/org/opengis/referencing/doc-files/WKT.html)
 
 The grammar tries to adhere to the spec but have not made extensive tests.
 
-This grammar is extended with ability to parse properties file, containing EPSG=WKTCRS type of definitions.
-For example one can parse [GeoTools epsg.properties](https://raw.githubusercontent.com/geotools/geotools/main/modules/plugin/epsg-wkt/src/main/resources/org/geotools/referencing/epsg/wkt/epsg.properties) directly.
+This grammar is extended with ability to parse multiple WTK definitions from a properties file of the format EPSG_CODE=WKTCRS.
+Specifically it ca parse [GeoTools epsg.properties](https://raw.githubusercontent.com/geotools/geotools/main/modules/plugin/epsg-wkt/src/main/resources/org/geotools/referencing/epsg/wkt/epsg.properties).
 
-If the input is properties file, use `propsFile` starting rule.
+Grammar rules:
 
-If the input is pure WKT, use `wkt` starting rule.
-
-## License
-
-BSD
+- if the input is properties file, use `propsFile` starting rule.
+- if the input is pure WKT, use `wkt` starting rule.
