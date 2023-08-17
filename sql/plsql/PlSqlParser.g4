@@ -3311,7 +3311,7 @@ create_table
             )?
         TABLE (schema_name '.')? table_name
         (SHARING '=' (METADATA | EXTENDED? DATA | NONE))?
-        (relational_table | object_table | xmltype_table)
+        (relational_table | xmltype_table | object_table)
         (MEMOPTIMIZE FOR READ)?
         (MEMOPTIMIZE FOR WRITE)?
         (PARENT tableview_name)?
