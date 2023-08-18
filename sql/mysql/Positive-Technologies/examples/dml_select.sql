@@ -116,6 +116,8 @@ order by ship_power.ship_name;
 select * from t1 inner join (t1 as tt1, t2 as tt2) on t1.col1 = tt1.col1;
 select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 select * from  t1 as tt1, t2 as tt2 inner join t1 on true;
+SELECT * FROM test_table_1 t1 LEFT JOIN test_table_2 t2 JOIN test_table_3 t3 ON t3.id=t2.id ON t1.id=t2.id;
+SELECT * FROM TABLE1 T1 STRAIGHT_JOIN TABLE2 T2 STRAIGHT_JOIN TABLE3 T3 ON T3.ID=T2.ID ON T1.ID=T2.ID;
 #end
 #begin
 -- where_condition test
@@ -182,6 +184,7 @@ SELECT * FROM test LIMIT LIMIT1,LIMIT2;
 -- SCHEMA as a function name
 SELECT SCHEMA();
 -- Functions
+SELECT REPEAT('X',2);
 SELECT mod(3,2);SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
 -- Group By with computed column
 SELECT 1 AS col1, t1.Id FROM t1 GROUP BY col1;
@@ -232,4 +235,16 @@ SELECT *
            NESTED PATH '$.b[*]' COLUMNS (b INT PATH '$')
          )
         ) AS tt;
-
+SELECT !(1 + @sum:=1) AS ss;
+SELECT (@sum:=1 + 1) AS ss;
+SELECT 1 + @sum:=1 AS ss;
+SELECT 100 >> @sum:=1 AS ss;
+SELECT @sum:=1 < 100 AS ss;
+SELECT 100 and @sum:=1 AS ss;
+SELECT
+    @sum := @sum + column_name AS running_sum
+FROM
+    your_table,
+    (SELECT @sum := 0) AS init
+ORDER BY
+    some_order_column;

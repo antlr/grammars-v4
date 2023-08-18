@@ -241,4 +241,16 @@ SELECT *
            NESTED PATH '$.b[*]' COLUMNS (b INT PATH '$')
          )
         ) AS tt;
-
+SELECT !(1 + @sum:=1) AS ss;
+SELECT (@sum:=1 + 1) AS ss;
+SELECT 1 + @sum:=1 AS ss;
+SELECT 100 >> @sum:=1 AS ss;
+SELECT @sum:=1 < 100 AS ss;
+SELECT 100 and @sum:=1 AS ss;
+SELECT
+    @sum := @sum + column_name AS running_sum
+FROM
+    your_table,
+    (SELECT @sum := 0) AS init
+ORDER BY
+    some_order_column;

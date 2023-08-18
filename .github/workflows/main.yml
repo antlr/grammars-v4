@@ -78,7 +78,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.7.0
+      uses: actions/setup-node@v3.8.1
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -184,7 +184,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.7.0
+      uses: actions/setup-node@v3.8.1
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -283,7 +283,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.7.0
+      uses: actions/setup-node@v3.8.1
       with:
         node-version: '16.13.0'
     - name: Test JavaScript

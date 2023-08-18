@@ -33,6 +33,7 @@ CREATE TABLE po_binaryxml OF XMLType
  PASSING OBJECT_VALUE RETURNING CONTENT)
  AS DATE))) ;
 
+CREATE TABLE po_binary OF XMLType;
 
 create table junk (
        me date,

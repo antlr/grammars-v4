@@ -1043,18 +1043,15 @@ indexHintType
     ;
 
 joinPart
-    : (INNER | CROSS)? JOIN LATERAL? tableSourceItem
-      (
-        ON expression
-        | USING '(' uidList ')'
-      )?                                                            #innerJoin
-    | STRAIGHT_JOIN tableSourceItem (ON expression)?                #straightJoin
-    | (LEFT | RIGHT) OUTER? JOIN LATERAL? tableSourceItem
-        (
-          ON expression
-          | USING '(' uidList ')'
-        )                                                           #outerJoin
+    : (INNER | CROSS)? JOIN LATERAL? tableSourceItem joinSpec*      #innerJoin
+    | STRAIGHT_JOIN tableSourceItem (ON expression)*                #straightJoin
+    | (LEFT | RIGHT) OUTER? JOIN LATERAL? tableSourceItem joinSpec* #outerJoin
     | NATURAL ((LEFT | RIGHT) OUTER?)? JOIN tableSourceItem         #naturalJoin
+    ;
+
+joinSpec
+    : (ON expression)
+    | USING '(' uidList ')'
     ;
 
 //    Select Statement's Details
@@ -2574,7 +2571,7 @@ scalarFunctionName
     | ASCII | CURDATE | CURRENT_DATE | CURRENT_TIME
     | CURRENT_TIMESTAMP | CURTIME | DATE_ADD | DATE_SUB
     | IF | INSERT | LOCALTIME | LOCALTIMESTAMP | MID | NOW
-    | REPLACE | SUBSTR | SUBSTRING | SYSDATE | TRIM
+    | REPEAT | REPLACE | SUBSTR | SUBSTRING | SYSDATE | TRIM
     | UTC_DATE | UTC_TIME | UTC_TIMESTAMP
     ;
 
@@ -2615,8 +2612,8 @@ predicate
     | predicate SOUNDS LIKE predicate                               #soundsLikePredicate
     | predicate NOT? LIKE predicate (ESCAPE STRING_LITERAL)?        #likePredicate
     | predicate NOT? regex=(REGEXP | RLIKE) predicate               #regexpPredicate
-    | (LOCAL_ID VAR_ASSIGN)? expressionAtom                         #expressionAtomPredicate
     | predicate MEMBER OF '(' predicate ')'                         #jsonMemberOfPredicate
+    | expressionAtom                                                #expressionAtomPredicate
     ;
 
 
@@ -2629,6 +2626,7 @@ expressionAtom
     | mysqlVariable                                                 #mysqlVariableExpressionAtom
     | unaryOperator expressionAtom                                  #unaryExpressionAtom
     | BINARY expressionAtom                                         #binaryExpressionAtom
+    | LOCAL_ID VAR_ASSIGN expressionAtom                            #variableAssignExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
     | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
     | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
