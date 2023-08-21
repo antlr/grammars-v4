@@ -628,3 +628,13 @@ WITH my_values(val1, val2) AS (
 )
 SELECT v.val1, v.val2 FROM my_values v;
 #end
+
+#begin
+CREATE DEFINER=`peuser`@`%` PROCEDURE `test_utf`()
+BEGIN
+    SET @Ν_greece := 1, @N_latin := 'test';
+SELECT
+    @Ν_greece
+     ,@N_latin;
+END
+#end
