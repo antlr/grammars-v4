@@ -1324,14 +1324,14 @@ IP_ADDRESS:                          (
                                      );
 LOCAL_ID:                               '@'
                                      (
-                                        [A-Z0-9._$]+
+                                        [A-Z0-9._$\u0080-\uFFFF]+
                                         | SQUOTA_STRING
                                         | DQUOTA_STRING
                                         | BQUOTA_STRING
                                     );
 GLOBAL_ID:                              '@' '@'
                                     (
-                                        [A-Z0-9._$]+
+                                        [A-Z0-9._$\u0080-\uFFFF]+
                                         | BQUOTA_STRING
                                     );
 
