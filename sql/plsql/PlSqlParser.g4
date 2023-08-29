@@ -6898,7 +6898,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression /* ('.' id_expression)* */ ('@' link_name)? function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('@' link_name)? function_argument?
     ;
 
 table_element
