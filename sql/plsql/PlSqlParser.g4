@@ -6205,13 +6205,11 @@ case_else_part
     ;
 
 atom
-    : table_element outer_join_sign
-    | bind_variable
+    : bind_variable
     | constant
-    | general_element
+    | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
     | '(' expressions ')'
-    | quoted_string
     ;
 
 quantified_expression
@@ -6900,7 +6898,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* ('@' link_name)? function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('@' link_name)? function_argument?
     ;
 
 table_element
@@ -7061,10 +7059,10 @@ numeric_negative
     ;
 
 quoted_string
-    : variable_name
-    | CHAR_STRING
+    : CHAR_STRING
     //| CHAR_STRING_PERL
     | NATIONAL_CHAR_STRING_LIT
+    | DELIMITED_ID
     ;
 
 identifier
