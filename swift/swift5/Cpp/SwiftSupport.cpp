@@ -6,14 +6,30 @@
 using namespace antlr4;
 
 static int utf8_first_char_len(const char *s, int len) {
-    int i = 0;
-    for(; i < len; i++) {
+    int i;
+    if(len <= 1) return len;
+    for(i = 1; i < len; i++) {
         if((s[i] & 0xc0) != 0x80) {
-            i += 1;
             break;
         }
     }
     return i;
+}
+
+static int utf8_char_to_ucs4(const char *s, int len) {
+    switch(len) {
+        case 0: return 0;
+        case 1: return *s;
+        default: {
+            int mask = (1 << (8 - len)) - 1;                // first utf8 code point data mask e.g len = 2 => 00111111 for 110XXXXX
+            int value = *s & mask;
+            for (++s, --len; len != 0; s++, len--) {
+                value <<= 6;
+                value += (*s & 0x3F);
+            }
+            return value;
+        }
+    }
 }
 
 template<typename BITSET>
@@ -22,11 +38,12 @@ static bool isCharacterFromSet(std::unique_ptr<antlr4::Token>& token, const BITS
         return false;
     } else {
         String text = token->getText();
-        if (utf8_first_char_len(text.data(), text.size()) != text.size()) {
+        int first_char_len = utf8_first_char_len(text.data(), text.size());
+        if (first_char_len != text.size()) {
             // not a single character
             return false;
         } else {
-            return bitSet.get(text.data()[0]);
+            return bitSet.get(utf8_char_to_ucs4(text.data(), first_char_len));
         }
     }
 }
