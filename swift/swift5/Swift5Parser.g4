@@ -1,6 +1,9 @@
 parser grammar Swift5Parser;
 
+// Insert here @header for C++ parser.
+
 options {
+	superClass = SwiftSupport;
 	tokenVocab = Swift5Lexer;
 }
 
@@ -22,7 +25,7 @@ statement:
 
 statements
 	locals[int indexBefore = -1]: (
-		{SwiftSupport.isSeparatedStatement(_input, $indexBefore)}? statement {$indexBefore = _input.index();
+		{this.isSeparatedStatement(_input, $indexBefore)}? statement {$indexBefore = _input.index();
 			}
 	)+;
 
@@ -679,8 +682,8 @@ balanced_token_punctuation:
 		| QUESTION
 	)
 	| arrow_operator
-	| {SwiftSupport.isPrefixOp(_input)}? AND
-	| {SwiftSupport.isPostfixOp(_input)}? BANG;
+	| {this.isPrefixOp(_input)}? AND
+	| {this.isPostfixOp(_input)}? BANG;
 
 // Expressions
 expression: try_operator? prefix_expression binary_expressions?;
@@ -900,9 +903,9 @@ postfix_self_suffix: DOT SELF;
 
 subscript_suffix: LBRACK function_call_argument_list RBRACK;
 
-forced_value_suffix: {!SwiftSupport.isBinaryOp(_input)}? BANG;
+forced_value_suffix: {!this.isBinaryOp(_input)}? BANG;
 optional_chaining_suffix:
-	{!SwiftSupport.isBinaryOp(_input)}? QUESTION;
+	{!this.isBinaryOp(_input)}? QUESTION;
 
 // Function Call Expression
 
@@ -941,8 +944,8 @@ type:
 	| tuple_type
 	| opaque_type
 	| type (
-		{!SwiftSupport.isBinaryOp(_input)}? QUESTION //optional_type
-		| {!SwiftSupport.isBinaryOp(_input)}? BANG //implicitly_unwrapped_optional_type
+		{!this.isBinaryOp(_input)}? QUESTION //optional_type
+		| {!this.isBinaryOp(_input)}? BANG //implicitly_unwrapped_optional_type
 		| DOT TYPE
 		| DOT PROTOCOL
 	) //metatype_type
@@ -996,7 +999,7 @@ protocol_composition_type:
 	type_identifier (AND type_identifier)* trailing_composition_and?;
 
 trailing_composition_and:
-	{!SwiftSupport.isBinaryOp(_input)}? AND;
+	{!this.isBinaryOp(_input)}? AND;
 
 // Opaque Type
 opaque_type: SOME type;
@@ -1190,27 +1193,27 @@ keyword:
 // Operators
 
 // Assignment Operator
-assignment_operator: {SwiftSupport.isBinaryOp(_input)}? EQUAL;
+assignment_operator: {this.isBinaryOp(_input)}? EQUAL;
 
-negate_prefix_operator: {SwiftSupport.isPrefixOp(_input)}? SUB;
+negate_prefix_operator: {this.isPrefixOp(_input)}? SUB;
 
 compilation_condition_AND:
-	{SwiftSupport.isOperator(_input,"&&")}? AND AND;
+	{this.isOperator(_input,"&&")}? AND AND;
 compilation_condition_OR:
-	{SwiftSupport.isOperator(_input,"||")}? OR OR;
+	{this.isOperator(_input,"||")}? OR OR;
 compilation_condition_GE:
-	{SwiftSupport.isOperator(_input,">=")}? GT EQUAL;
-compilation_condition_L: {SwiftSupport.isOperator(_input,"<")}? LT;
-arrow_operator: {SwiftSupport.isOperator(_input,"->")}? SUB GT;
-range_operator: {SwiftSupport.isOperator(_input,"...")}? DOT DOT DOT;
+	{this.isOperator(_input,">=")}? GT EQUAL;
+compilation_condition_L: {this.isOperator(_input,"<")}? LT;
+arrow_operator: {this.isOperator(_input,"->")}? SUB GT;
+range_operator: {this.isOperator(_input,"...")}? DOT DOT DOT;
 same_type_equals:
-	{SwiftSupport.isOperator(_input,"==")}? EQUAL EQUAL;
+	{this.isOperator(_input,"==")}? EQUAL EQUAL;
 
-binary_operator: {SwiftSupport.isBinaryOp(_input)}? operator;
+binary_operator: {this.isBinaryOp(_input)}? operator;
 
-prefix_operator: {SwiftSupport.isPrefixOp(_input)}? operator;
+prefix_operator: {this.isPrefixOp(_input)}? operator;
 
-postfix_operator: {SwiftSupport.isPostfixOp(_input)}? operator;
+postfix_operator: {this.isPostfixOp(_input)}? operator;
 
 operator:
 	operator_head operator_characters?
