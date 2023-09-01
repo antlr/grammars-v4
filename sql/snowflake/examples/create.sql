@@ -33,7 +33,6 @@ create table t(i int);
 create table t(i int, constraint c unique (i));
 create tag t comment ='1';
 create tag t ALLOWED_VALUES 'V1','v2' comment ='1';
-create task t as call sp1();
 create user u;
 create warehouse w;
 create database public;
