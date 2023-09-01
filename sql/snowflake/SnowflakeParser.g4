@@ -1320,22 +1320,22 @@ alter_user
     ;
 
 alter_view
-    : ALTER VIEW if_exists? id_ RENAME TO id_
-    | ALTER VIEW if_exists? id_ SET comment_clause
-    | ALTER VIEW if_exists? id_ UNSET COMMENT
-    | ALTER VIEW id_ SET SECURE
-    | ALTER VIEW id_ UNSET SECURE
-    | ALTER VIEW if_exists? id_ set_tags
-    | ALTER VIEW if_exists? id_ unset_tags
-    | ALTER VIEW if_exists? id_ ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER VIEW if_exists? id_ DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? id_ ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses COMMA DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? id_ DROP ALL ROW ACCESS POLICIES
-    | ALTER VIEW id_ alter_modify COLUMN? id_ SET MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )?
+    : ALTER VIEW if_exists? object_name RENAME TO object_name
+    | ALTER VIEW if_exists? object_name SET comment_clause
+    | ALTER VIEW if_exists? object_name UNSET COMMENT
+    | ALTER VIEW object_name SET SECURE
+    | ALTER VIEW object_name UNSET SECURE
+    | ALTER VIEW if_exists? object_name set_tags
+    | ALTER VIEW if_exists? object_name unset_tags
+    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
+    | ALTER VIEW if_exists? object_name DROP ROW ACCESS POLICY id_
+    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses COMMA DROP ROW ACCESS POLICY id_
+    | ALTER VIEW if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER VIEW object_name alter_modify COLUMN? id_ SET MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )?
                                                                                                   FORCE?
-    | ALTER VIEW id_ alter_modify COLUMN? id_ UNSET MASKING POLICY
-    | ALTER VIEW id_ alter_modify COLUMN? id_ set_tags
-    | ALTER VIEW id_ alter_modify COLUMN id_ unset_tags
+    | ALTER VIEW object_name alter_modify COLUMN? id_ UNSET MASKING POLICY
+    | ALTER VIEW object_name alter_modify COLUMN? id_ set_tags
+    | ALTER VIEW object_name alter_modify COLUMN id_ unset_tags
     ;
 
 alter_modify
