@@ -25,7 +25,6 @@ from collections import deque
 from typing import TextIO
 from antlr4 import InputStream, Lexer, Token
 from antlr4.Token import CommonToken
-from IndentationErrorListener import IndentationErrorListener
 import sys
 import re
 
