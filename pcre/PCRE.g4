@@ -372,7 +372,8 @@ callout
  ;
 
 atom
- : subroutine_reference
+ : backreference
+ | subroutine_reference
  | shared_atom
  | literal
  | character_class
@@ -381,7 +382,6 @@ atom
  | comment
  | option
  | look_around
- | backreference
  | conditional
  | backtrack_control
  | newline_convention
