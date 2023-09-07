@@ -6223,7 +6223,7 @@ string_function
     | DECODE '(' expressions  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
-    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    | TRIM '(' ((LEADING | TRAILING | BOTH)? expression? FROM)? concatenation ')'
     | TO_DATE '(' (table_element | standard_function | expression)
        (DEFAULT concatenation ON CONVERSION ERROR)? (',' quoted_string  (',' quoted_string)? )? ')'
     ;
