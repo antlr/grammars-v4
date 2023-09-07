@@ -4957,6 +4957,7 @@ lob_segname
 lob_item
     : regular_id
     | quoted_string
+    | DELIMITED_ID
     ;
 
 lob_storage_parameters
@@ -7062,7 +7063,6 @@ quoted_string
     : CHAR_STRING
     //| CHAR_STRING_PERL
     | NATIONAL_CHAR_STRING_LIT
-    | DELIMITED_ID
     ;
 
 identifier
