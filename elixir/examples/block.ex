@@ -4,13 +4,13 @@ is_binary(string)
 
 ?a
 
-?ł
+?l
 
 "\u0061" == "a"
 
 0x0061 = 97 = ?a
 
-IO.inspect("hełło", binaries: :as_binaries)
+IO.inspect("hello", binaries: :as_binaries)
 
 String.split("1  2  3", " ", [trim: true])
 
@@ -138,7 +138,7 @@ stream = Stream.cycle([1, 2, 3])
 
 Enum.take(stream, 10)
 
-Stream.unfold("hełło", &String.next_codepoint/1)
+Stream.unfold("hello", &String.next_codepoint/1)
 
 stream = File.stream!("path/to/file")
 %File.Stream{
@@ -471,7 +471,7 @@ catch
 end
 
 try do
-  IO.write(file, "olá")
+  IO.write(file, "ola")
   raise "oops, something went wrong"
 after
   File.close(file)

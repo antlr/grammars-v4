@@ -10,4 +10,4 @@ put_in users[:john].age, 31
 
 update_in users[:mary].languages, fn languages -> List.delete(languages, "Clojure") end
 
-inspect("hełło", binaries: :as_binaries)
+inspect("hello", binaries: :as_binaries)
