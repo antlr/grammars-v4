@@ -1112,7 +1112,6 @@ SINGLE_QUOTE:           '\'';
 ID:                     [A-Z_] [A-Z0-9_@$]*;
 ID2:                    DOLLAR [A-Z_] [A-Z0-9_]*;
 
-
 S3_PATH:            SINGLE_QUOTE 's3://' Uri SINGLE_QUOTE;
 S3GOV_PATH:         SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
 GCS_PATH:           SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
