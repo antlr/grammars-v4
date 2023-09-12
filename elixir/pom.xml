@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>pcre</artifactId>
+	<artifactId>elixir-parser</artifactId>
 	<packaging>jar</packaging>
-	<name>PCRE grammar</name>
+	<name>Elixir grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>PCRE.g4</include>
+					   <include>ElixirLexer.g4</include>
+					   <include>ElixirParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -38,8 +39,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>pcre</entryPoint>
-					<grammarName>PCRE</grammarName>
+					<entryPoint>parse</entryPoint>
+					<grammarName>Elixir</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
