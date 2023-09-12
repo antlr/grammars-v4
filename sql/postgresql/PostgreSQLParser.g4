@@ -2134,6 +2134,9 @@ reindexstmt
 reindex_target_type
    : INDEX
    | TABLE
+   | SCHEMA
+   | DATABASE
+   | SYSTEM_P
    ;
 
 reindex_target_multitable
@@ -2148,6 +2151,8 @@ reindex_option_list
 
 reindex_option_elem
    : VERBOSE
+   | TABLESPACE
+   | CONCURRENTLY
    ;
 
 altertblspcstmt
