@@ -18,7 +18,7 @@ eoe
 
 expression
  : expression expression_tail                                        #dotExpr
- | expression '.'? '(' ( expressions ( ',' NL* options_ )? )? ')'    #functionCallExpr
+ | expression '.'? '(' ( expressions_ ( ',' NL* options_ )? )? ')'   #functionCallExpr
  | expression '.'? '(' NL* options_ NL*')'                           #functionCallExpr
  | module_def                                                        #moduleDefExpr
  | function_def                                                      #functionDefExpr
@@ -26,8 +26,8 @@ expression
  | for                                                               #forExpr
  | with                                                              #withExpr
  | try                                                               #tryExpr
- | expression expressions ( ',' NL* options_ )?                      #functionCallExpr
- | expression options_? expressions                                  #functionCallExpr
+ | expression expressions_ ( ',' NL* options_ )?                     #functionCallExpr
+ | expression options_? expressions_                                 #functionCallExpr
  | expression options_                                               #functionCallExpr
  | anonymous_function                                                #anonymousFunctionExpr
  | '(' expression ')'                                                #nestedExpr
@@ -55,7 +55,7 @@ expression
  | list                                                              #listExpr
  | tuple                                                             #tupleExpr
  | map                                                               #mapExpr
- | bool                                                              #boolExpr
+ | bool_                                                             #boolExpr
  | bitstring                                                         #bitstringExpr
  | case                                                              #caseExpr
  | cond                                                              #condExpr
@@ -104,14 +104,14 @@ do_block
  : DO NL* block? NL* ( AFTER NL* block NL* )? END
  ;
 
-bool
+bool_
  : TRUE
  | FALSE
  ;
 
 list
- : '[' NL* expressions ','? NL* ']'
- | '[' NL* ( expressions ','? NL* )? ']'
+ : '[' NL* expressions_ ','? NL* ']'
+ | '[' NL* ( expressions_ ','? NL* )? ']'
  | '[' NL* tuples ( ',' short_map_entries )? NL* ']'
  | '[' NL* short_map_entries NL* ']'
  ;
@@ -121,7 +121,7 @@ tuples
  ;
 
 tuple
- : '{' ( expressions ','? )? '}'
+ : '{' ( expressions_ ','? )? '}'
  ;
 
 map
@@ -148,8 +148,8 @@ short_map_entry
  ;
 
 anonymous_function
- : FN NL* expressions? '->' NL* block? NL* END
- | FN '(' expressions? ')' '->' NL* block? NL* END
+ : FN NL* expressions_? '->' NL* block? NL* END
+ | FN '(' expressions_? ')' '->' NL* block? NL* END
  ;
 
 case
@@ -174,7 +174,7 @@ unless
  ;
 
 bitstring
- : '<<' ( expressions ','? )? '>>'
+ : '<<' ( expressions_ ','? )? '>>'
  ;
 
 module_def
@@ -182,19 +182,19 @@ module_def
  ;
 
 function_def
- : ( DEF | DEFP ) variable ( '(' expressions? ')' )+ ( WHEN expression )? do_block
- | ( DEF | DEFP ) variable ( '(' expressions? ')' )+ ( WHEN expression )? ',' DO ':' expression
+ : ( DEF | DEFP ) variable ( '(' expressions_? ')' )+ ( WHEN expression )? do_block
+ | ( DEF | DEFP ) variable ( '(' expressions_? ')' )+ ( WHEN expression )? ',' DO ':' expression
  | ( DEF | DEFP ) variable ',' DO ':' expression
  ;
 
 macro_def
- : DEFMACRO variable '(' expressions? ')' ( WHEN expression )? do_block
- | DEFMACRO variable '(' expressions? ')' ( WHEN expression )? ',' DO ':' expression
+ : DEFMACRO variable '(' expressions_? ')' ( WHEN expression )? do_block
+ | DEFMACRO variable '(' expressions_? ')' ( WHEN expression )? ',' DO ':' expression
  ;
 
 for
- : FOR expressions ( ',' NL* options_ )? do_block
- | FOR expressions ( ',' NL* options_ )? ',' DO ':' NL* expression
+ : FOR expressions_ ( ',' NL* options_ )? do_block
+ | FOR expressions_ ( ',' NL* options_ )? ',' DO ':' NL* expression
  ;
 
 options_
@@ -206,14 +206,14 @@ option
  ;
 
 with
- : WITH expressions do_block
+ : WITH expressions_ do_block
  ;
 
 try
- : TRY DO NL* block ( RECUE | CATCH | AFTER ) NL* expressions ( NL* block )? ( NL* ELSE NL* block )? NL* END
+ : TRY DO NL* block ( RECUE | CATCH | AFTER ) NL* expressions_ ( NL* block )? ( NL* ELSE NL* block )? NL* END
  ;
 
-expressions
+expressions_
  : expression ( ',' NL* expression )*
  ;
 
