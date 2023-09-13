@@ -3625,6 +3625,7 @@ binary_builtin_function
     | NULLIF
     | EQUAL_NULL
     | CONTAINS
+    | COLLATE
     ;
 
 binary_or_ternary_builtin_function
