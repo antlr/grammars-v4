@@ -4957,6 +4957,7 @@ lob_segname
 lob_item
     : regular_id
     | quoted_string
+    | DELIMITED_ID
     ;
 
 lob_storage_parameters
@@ -5178,12 +5179,10 @@ new_constraint_name
     ;
 
 drop_constraint_clause
-    : DROP  drop_primary_key_or_unique_or_generic_clause
-    ;
-
-drop_primary_key_or_unique_or_generic_clause
-    : (PRIMARY KEY | UNIQUE '(' column_name (',' column_name)* ')') CASCADE? (KEEP | DROP)?
-    | CONSTRAINT constraint_name CASCADE?
+    : DROP ( PRIMARY KEY
+           | UNIQUE '(' column_name (',' column_name)* ')'
+           | CONSTRAINT constraint_name
+           ) CASCADE? ((KEY | DROP) INDEX)? ONLINE?
     ;
 
 add_constraint
@@ -6223,7 +6222,7 @@ string_function
     | DECODE '(' expressions  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
-    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    | TRIM '(' ((LEADING | TRAILING | BOTH)? expression? FROM)? concatenation ')'
     | TO_DATE '(' (table_element | standard_function | expression)
        (DEFAULT concatenation ON CONVERSION ERROR)? (',' quoted_string  (',' quoted_string)? )? ')'
     ;
@@ -7062,7 +7061,6 @@ quoted_string
     : CHAR_STRING
     //| CHAR_STRING_PERL
     | NATIONAL_CHAR_STRING_LIT
-    | DELIMITED_ID
     ;
 
 identifier

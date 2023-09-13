@@ -21,7 +21,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install Dotnet
@@ -127,7 +127,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install Dotnet
@@ -226,7 +226,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install Dotnet

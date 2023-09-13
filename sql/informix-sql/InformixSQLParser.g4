@@ -68,6 +68,7 @@ unitStatement
     | setAutofree
     | setCollation
     | setDataskip
+    | setDebugFile
     ) SCOL
     ;
 
@@ -240,6 +241,11 @@ setDataskip
     : SET DATASKIP (ON (identifier (COMMA identifier)*)?  | OFF | DEFAULT)
     ;
 
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-debug-file-statement
+setDebugFile
+    : SET DEBUG FILE TO (CHAR_STRING | identifier) (WITH APPEND)?
+    ;
+
 quotedString
     : CHAR_STRING
     ;
@@ -266,6 +272,7 @@ keyword
     | ALTER
     | ANALYZE
     | AND
+    | APPEND
     | AS
     | ASC
     | ATTACH
@@ -295,6 +302,7 @@ keyword
     | CURRENT_TIMESTAMP
     | DATABASE
     | DATASKIP
+    | DEBUG
     | DEFAULT
     | DEFERRABLE
     | DEFERRED
@@ -317,6 +325,7 @@ keyword
     | FOR
     | FOREIGN
     | FROM
+    | FILE
     | FULL
     | GLOB
     | GROUP

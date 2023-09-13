@@ -1289,16 +1289,18 @@ alter_tag
 
 alter_task
     : ALTER TASK if_exists? object_name resume_suspend
-    | ALTER TASK if_exists? object_name REMOVE AFTER string_list | ADD AFTER string_list
+    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list 
     | ALTER TASK if_exists? object_name SET
-        ( WAREHOUSE EQ string )?
-        ( SCHEDULE EQ string )?
-        ( ALLOW_OVERLAPPING_EXECUTION EQ true_false )?
-        ( USER_TASK_TIMEOUT_MS EQ num )?
-        ( SUSPEND_TASK_AFTER_NUM_FAILURES EQ num )?
+        // TODO : Check and review if element's order binded or not
+        ( WAREHOUSE EQ id_ )?
+        task_schedule?
+        task_overlap?
+        task_timeout?
+        task_suspend_after_failure_number?
         comment_clause?
-        session_parameter_init_list?
+        session_params_list?
     | ALTER TASK if_exists? object_name UNSET
+        // TODO : Check and review if element's order binded or not
         WAREHOUSE?
         SCHEDULE?
         ALLOW_OVERLAPPING_EXECUTION?
@@ -1318,22 +1320,22 @@ alter_user
     ;
 
 alter_view
-    : ALTER VIEW if_exists? id_ RENAME TO id_
-    | ALTER VIEW if_exists? id_ SET comment_clause
-    | ALTER VIEW if_exists? id_ UNSET COMMENT
-    | ALTER VIEW id_ SET SECURE
-    | ALTER VIEW id_ UNSET SECURE
-    | ALTER VIEW if_exists? id_ set_tags
-    | ALTER VIEW if_exists? id_ unset_tags
-    | ALTER VIEW if_exists? id_ ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER VIEW if_exists? id_ DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? id_ ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses COMMA DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? id_ DROP ALL ROW ACCESS POLICIES
-    | ALTER VIEW id_ alter_modify COLUMN? id_ SET MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )?
+    : ALTER VIEW if_exists? object_name RENAME TO object_name
+    | ALTER VIEW if_exists? object_name SET comment_clause
+    | ALTER VIEW if_exists? object_name UNSET COMMENT
+    | ALTER VIEW object_name SET SECURE
+    | ALTER VIEW object_name UNSET SECURE
+    | ALTER VIEW if_exists? object_name set_tags
+    | ALTER VIEW if_exists? object_name unset_tags
+    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
+    | ALTER VIEW if_exists? object_name DROP ROW ACCESS POLICY id_
+    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses COMMA DROP ROW ACCESS POLICY id_
+    | ALTER VIEW if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER VIEW object_name alter_modify COLUMN? id_ SET MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )?
                                                                                                   FORCE?
-    | ALTER VIEW id_ alter_modify COLUMN? id_ UNSET MASKING POLICY
-    | ALTER VIEW id_ alter_modify COLUMN? id_ set_tags
-    | ALTER VIEW id_ alter_modify COLUMN id_ unset_tags
+    | ALTER VIEW object_name alter_modify COLUMN? id_ UNSET MASKING POLICY
+    | ALTER VIEW object_name alter_modify COLUMN? id_ set_tags
+    | ALTER VIEW object_name alter_modify COLUMN id_ unset_tags
     ;
 
 alter_modify
@@ -2555,35 +2557,59 @@ session_parameter_list
     : session_parameter (COMMA session_parameter)*
     ;
 
-session_parameter_init_list
-    : session_parameter_init (COMMA session_parameter_init)*
-    ;
-
-session_parameter_init
-    : session_parameter EQ true_false
+session_params_list
+    : session_params (COMMA session_params)*
     ;
 
 create_task
     : CREATE or_replace? TASK if_not_exists? object_name
-        ( (WAREHOUSE EQ string) | (USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ string ) )?
-        ( SCHEDULE EQ string )?
-        ( ALLOW_OVERLAPPING_EXECUTION EQ true_false )?
-        session_parameter_init_list?
-        ( USER_TASK_TIMEOUT_MS EQ num )?
-        ( SUSPEND_TASK_AFTER_NUM_FAILURES EQ num )?
-        ( ERROR_INTEGRATION EQ id_ )?
-        copy_grants?
+        task_parameters*
         comment_clause?
+        copy_grants?
         ( AFTER object_name (COMMA object_name)* )?
         ( WHEN search_condition )?
       AS
         sql
     ;
 
+task_parameters
+    : task_compute
+    | task_schedule
+    | task_overlap
+    | session_params_list
+    | task_timeout
+    | task_suspend_after_failure_number
+    | task_error_integration
+    ;
+
+task_compute
+    : WAREHOUSE EQ id_
+    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote. 
+    ;
+
+task_schedule
+    : SCHEDULE EQ string
+    ;
+
+task_timeout
+    : USER_TASK_TIMEOUT_MS EQ num
+    ;
+
+task_suspend_after_failure_number
+    : SUSPEND_TASK_AFTER_NUM_FAILURES EQ num
+    ;
+
+task_error_integration
+    : ERROR_INTEGRATION EQ id_ 
+    ;
+
+task_overlap
+    : ALLOW_OVERLAPPING_EXECUTION EQ true_false
+    ;
+
 sql
     : EXECUTE IMMEDIATE DBL_DOLLAR
     | sql_command
-    | call
     ;
 
 call
@@ -2615,8 +2641,23 @@ create_warehouse
               wh_params*
     ;
 
+wh_common_size
+    : XSMALL
+    | SMALL
+    | MEDIUM
+    | LARGE
+    | XLARGE
+    | XXLARGE
+    ;
+wh_extra_size
+    : XXXLARGE
+    | X4LARGE
+    | X5LARGE
+    | X6LARGE
+    ;
+
 wh_properties
-    : WAREHOUSE_SIZE EQ (XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE | X5LARGE | X6LARGE | ID2)
+    : WAREHOUSE_SIZE EQ ( wh_common_size | wh_extra_size | ID2)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
     | SCALING_POLICY EQ (STANDARD | ECONOMY)

@@ -143,6 +143,7 @@ moduleDeclarationsElement :
 	| variableStmt
 	| moduleOption
 	| typeStmt
+    | deftypeStmt
 	| macroStmt
 ;
 
@@ -180,7 +181,6 @@ blockStmt :
 	| constStmt
 	| dateStmt
 	| deleteSettingStmt
-	| deftypeStmt
 	| doLoopStmt
 	| endStmt
 	| eraseStmt
