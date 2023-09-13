@@ -12,4 +12,9 @@
       <targets>CSharp;Java</targets>
       <inputs>examples</inputs>
    </test>
+    <test>
+        <name>examples-sql-script</name>
+        <targets>CSharp;Java</targets>
+        <inputs>examples-sql-script</inputs>
+    </test>
 </desc>
