@@ -63,7 +63,7 @@ export default abstract class Python3LexerBase extends Lexer {
     commonToken(type: number, text: string) {
         let stop = this.getCharIndex() - 1;
         let start = text.length ? stop - text.length + 1 : stop;
-        return new CommonToken([ this, this._input ] as any as number, type, 0, start, stop);
+        return new CommonToken([ this, this._input ], type, 0, start, stop);
     }
 
     getIndentationCount(whitespace: string) {
