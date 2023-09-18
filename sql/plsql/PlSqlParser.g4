@@ -778,7 +778,7 @@ non_dml_trigger
     ;
 
 trigger_body
-    : COMPOUND TRIGGER
+    : compound_trigger_block
     | CALL identifier
     | trigger_block
     ;
@@ -788,14 +788,14 @@ routine_clause
     ;
 
 compound_trigger_block
-    : COMPOUND TRIGGER seq_of_declare_specs? timing_point_section+ END trigger_name
+    : COMPOUND TRIGGER seq_of_declare_specs? timing_point_section+ END trigger_name?
     ;
 
 timing_point_section
-    : bk=BEFORE STATEMENT IS trigger_block BEFORE STATEMENT
-    | bk=BEFORE EACH ROW IS trigger_block BEFORE EACH ROW
-    | ak=AFTER STATEMENT IS trigger_block AFTER STATEMENT
-    | ak=AFTER EACH ROW IS trigger_block AFTER EACH ROW
+    : bk=BEFORE STATEMENT IS BEGIN tps_body END BEFORE STATEMENT ';'
+    | bk=BEFORE EACH ROW IS BEGIN tps_body END BEFORE EACH ROW ';'
+    | ak=AFTER STATEMENT IS BEGIN tps_body END AFTER STATEMENT ';'
+    | ak=AFTER EACH ROW IS BEGIN tps_body END AFTER EACH ROW ';'
     ;
 
 non_dml_event
@@ -5481,6 +5481,10 @@ exception_handler
 
 trigger_block
     : (DECLARE declare_spec*)? body
+    ;
+
+tps_body
+    : seq_of_statements (EXCEPTION exception_handler+)?
     ;
 
 block
