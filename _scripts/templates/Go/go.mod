@@ -1,6 +1,6 @@
 module example.com/myparser
 
-go 1.18
+go 1.20
 
 require (
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
