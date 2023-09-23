@@ -875,6 +875,8 @@ variableName : NAME;
 
 commaExpr: COMMA expression;
 
+semicolonStmt : SEMICOLON actionStmt;
+
 actionStmt :
 	arithmeticIfStmt
 	| assignmentStmt
@@ -905,6 +907,7 @@ actionStmt :
     | nullifyStmt 
     | pointerAssignmentStmt  
     | whereStmt
+    | semicolonStmt
     ;
 
 whereStmt : WHERE LPAREN maskExpr RPAREN assignmentStmt;
