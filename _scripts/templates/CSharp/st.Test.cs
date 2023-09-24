@@ -91,6 +91,7 @@ public class Program
     static int exit_code = 0;
     static Encoding encoding = null;
     static int string_instance = 0;
+    static bool lex_only = false;
     static string prefix = "";
     static bool quiet = false;
 
@@ -100,7 +101,11 @@ public class Program
         List\<string> inputs = new List\<string>();
         for (int i = 0; i \< args.Length; ++i)
         {
-            if (args[i] == "-profile")
+            if (args[i] == "-lex-only")
+            {
+                lex_only = true;
+            }
+            else if (args[i] == "-profile")
             {
                 show_profile = true;
             }
@@ -224,66 +229,84 @@ public class Program
 
     static void DoParse(ICharStream str, string input_name, int row_number)
     {
+        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var lexer = new <lexer_name>(str);
+        var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
+        lexer.RemoveErrorListeners();
+        lexer.AddErrorListener(listener_lexer);
+		DateTime before = DateTime.Now;
+		DateTime after = DateTime.Now;
         if (show_tokens)
         {
-            StringBuilder new_s = new StringBuilder();
+            before = DateTime.Now;
+            var output_tokens = tee ? new StreamWriter(input_name + ".token") : System.Console.Error;
             for (int i = 0; ; ++i)
             {
                 var ro_token = lexer.NextToken();
                 var token = (CommonToken)ro_token;
                 token.TokenIndex = i;
-                new_s.AppendLine(token.ToString());
+                output_tokens.WriteLine(token);
                 if (token.Type == Antlr4.Runtime.TokenConstants.EOF)
                     break;
             }
-            System.Console.Error.WriteLine(new_s.ToString());
+            if (tee) output_tokens.Close();
             lexer.Reset();
+            after = DateTime.Now;
         }
-        var tokens = new CommonTokenStream(lexer);
-        var parser = new <parser_name>(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
-        var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
-        var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
-        lexer.RemoveErrorListeners();
-        parser.RemoveErrorListeners();
-        lexer.AddErrorListener(listener_lexer);
-        parser.AddErrorListener(listener_parser);
-        if (show_profile)
-        {
-            parser.Profile = true;
-        }
-        if (show_trace)
-        {
-            parser.Trace = true;
-//            ParserATNSimulator.trace_atn_sim = true;
-        }
-        DateTime before = DateTime.Now;
-        var tree = parser.<start_symbol>();
-        DateTime after = DateTime.Now;
         var result = "";
-        if (listener_lexer.had_error || listener_parser.had_error)
+        if (lex_only)
         {
-            result = "fail";
-            exit_code = 1;
-        }
-        else
-        {
-            result = "success";
-        }
-        if (show_tree)
-        {
-            if (tee)
+            if (listener_lexer.had_error)
             {
-                System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
-            } else
+                result = "fail";
+                exit_code = 1;
+            }
+            else
             {
-                System.Console.Error.WriteLine(tree.ToStringTree(parser));
+                result = "success";
             }
         }
-        if (show_profile)
-        {
-            System.Console.Error.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
+        else {
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new <parser_name>(tokens);
+            var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(listener_parser);
+            if (show_profile)
+            {
+                parser.Profile = true;
+            }
+            if (show_trace)
+            {
+                parser.Trace = true;
+    //            ParserATNSimulator.trace_atn_sim = true;
+            }
+            before = DateTime.Now;
+            var tree = parser.<start_symbol>();
+            after = DateTime.Now;
+            if (listener_lexer.had_error || listener_parser.had_error)
+            {
+                result = "fail";
+                exit_code = 1;
+            }
+            else
+            {
+                result = "success";
+            }
+            if (show_tree)
+            {
+                if (tee)
+                {
+                    System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
+                } else
+                {
+                    System.Console.Error.WriteLine(tree.ToStringTree(parser));
+                }
+            }
+            if (show_profile)
+            {
+                System.Console.Error.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
+            }
         }
         if (!quiet)
         {

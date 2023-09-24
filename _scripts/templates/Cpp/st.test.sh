@@ -20,7 +20,7 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$' | grep -v '.token$'`
 files=()
 for f in $files2
 do
@@ -83,7 +83,7 @@ case "${unameOut}" in
 esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
-    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
+    gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -o -name '*.token'`
     if [ "$gen" != "" ]
     then
         dos2unix $gen
@@ -107,6 +107,15 @@ do
     fi
 done
 for f in `find . -name '*.tree'`
+do
+    git diff --exit-code $f >> $old/updated.txt 2>&1
+    xxx=$?
+    if [ "$xxx" -ne 0 ]
+    then
+        updated=$xxx
+    fi
+done
+for f in `find . -name '*.token'`
 do
     git diff --exit-code $f >> $old/updated.txt 2>&1
     xxx=$?
