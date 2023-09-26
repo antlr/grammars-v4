@@ -91,6 +91,10 @@ public abstract class JavaScriptParserBase : Parser
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
+        if (possibleIndexEosToken < 0)
+        {
+            return false;
+        }
         IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
 
         if (ahead.Channel != Lexer.Hidden)

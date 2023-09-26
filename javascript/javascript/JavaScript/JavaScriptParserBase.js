@@ -51,6 +51,9 @@ export default class JavaScriptParserBase extends antlr4.Parser {
 
     lineTerminatorAhead() {
         let possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
+        if (possibleIndexEosToken < 0) {
+            return false;
+        }
         let ahead = this._input.get(possibleIndexEosToken);
         if (ahead.channel !== antlr4.Lexer.HIDDEN) {
             return false;

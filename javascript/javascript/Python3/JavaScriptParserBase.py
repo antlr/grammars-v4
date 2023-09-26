@@ -79,6 +79,8 @@ class JavaScriptParserBase(Parser):
 
         # Get the token ahead of the current index.
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if possibleIndexEosToken < 0:
+            return False
         ahead: Token = self._input.get(possibleIndexEosToken)
 
         if ahead.channel != Lexer.HIDDEN:

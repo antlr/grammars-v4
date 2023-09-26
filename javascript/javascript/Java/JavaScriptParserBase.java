@@ -90,6 +90,9 @@ public abstract class JavaScriptParserBase extends Parser
 
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+        if (possibleIndexEosToken < 0) {
+            return false;
+        }
         Token ahead = _input.get(possibleIndexEosToken);
 
         if (ahead.getChannel() != Lexer.HIDDEN) {
