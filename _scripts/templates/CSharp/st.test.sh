@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 
 # comment for local dotnet tools.
-global=1
+global=""
 
 # glob patterns
 shopt -s globstar
