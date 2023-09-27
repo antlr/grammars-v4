@@ -45,15 +45,14 @@ export default class JavaScriptParserBase extends antlr4.Parser {
 
     here(type) {
         const possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         const ahead = this._input.get(possibleIndexEosToken);
         return ahead.channel === antlr4.Lexer.HIDDEN && ahead.type === type;
     }
 
     lineTerminatorAhead() {
         let possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
-        if (possibleIndexEosToken < 0) {
-            return false;
-        }
+        if (possibleIndexEosToken < 0) return false;
         let ahead = this._input.get(possibleIndexEosToken);
         if (ahead.channel !== antlr4.Lexer.HIDDEN) {
             return false;
@@ -63,6 +62,7 @@ export default class JavaScriptParserBase extends antlr4.Parser {
         }
         if (ahead.type === JavaScriptParser.WhiteSpaces) {
             possibleIndexEosToken = this.getCurrentToken().tokenIndex - 2;
+            if (possibleIndexEosToken < 0) return false;
             ahead = this._input.get(possibleIndexEosToken);
         }
         const text = ahead.text;

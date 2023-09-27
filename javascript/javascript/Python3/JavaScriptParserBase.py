@@ -57,6 +57,8 @@ class JavaScriptParserBase(Parser):
         # Get the token ahead of the current index.
         assert isinstance(self.getCurrentToken(), Token)
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if (possibleIndexEosToken < 0):
+            return False
         ahead = self._input.get(possibleIndexEosToken)
 
         # Check if the token resides on the HIDDEN channel and if it's of the
@@ -79,7 +81,7 @@ class JavaScriptParserBase(Parser):
 
         # Get the token ahead of the current index.
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
-        if possibleIndexEosToken < 0:
+        if (possibleIndexEosToken < 0):
             return False
         ahead: Token = self._input.get(possibleIndexEosToken)
 
@@ -94,6 +96,8 @@ class JavaScriptParserBase(Parser):
         if ahead.type == JavaScriptParser.WhiteSpaces:
             # Get the token ahead of the current whitespaces.
             possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+            if (possibleIndexEosToken < 0):
+                return False
             ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type.
