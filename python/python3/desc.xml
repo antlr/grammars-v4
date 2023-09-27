@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-   <antlr-version>^4.13.0</antlr-version>
-   <targets>Cpp;CSharp;Java;JavaScript;PHP;Python3;TypeScript</targets>
+   <antlr-version>^4.13.1</antlr-version>
+   <targets>Cpp;CSharp;Java;JavaScript;Python3;TypeScript</targets>
    <!-- fast parsers can work on a large test suite. -->
    <test>
       <targets>Cpp;CSharp;Java</targets>
@@ -10,7 +10,7 @@
    </test>
    <!-- slow parsers work only on a small test suite. -->
    <test>
-      <targets>JavaScript;PHP;Python3;TypeScript</targets>
+      <targets>JavaScript;Python3;TypeScript</targets>
       <entry-point>file_input</entry-point>
       <inputs>small</inputs>
    </test>

@@ -530,6 +530,11 @@ COLON
    ;
 
 
+SEMICOLON
+   : ';'
+   ;
+
+
 ASSIGN
    : '='
    ;
