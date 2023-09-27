@@ -97,7 +97,7 @@ filteropt
    ;
 
 scrubopts
-   : scrubopt ((',')? scrubopts)?
+   : scrubopt ((',')? scrubopt)?
    ;
 
 scrubopt
@@ -117,7 +117,7 @@ table_rule
    ;
 
 tableopts
-   : tableopt (tableopts)?
+   : tableopt+
    ;
 
 tableopt
@@ -181,7 +181,7 @@ bandwidth_spec
 action
    : 'pass'
    | 'match'
-   | 'block' (return)?
+   | 'block' return?
    ;
 
 return
@@ -250,11 +250,11 @@ address
    ;
 
 host_list
-   : host ((',')? host_list)?
+   : host (',' host)?
    ;
 
 redirhost_list
-   : redirhost ((',')? redirhost_list)?
+   : redirhost (',' redirhost)?
    ;
 
 port
@@ -294,7 +294,7 @@ os_name
    ;
 
 os_list
-   : os_name ((',')? os_list)?
+   : os_name (',' os_name)?
    ;
 
 flags
@@ -302,7 +302,7 @@ flags
    ;
 
 flag_set
-   : ('F'| 'S'| 'R'| 'P'| 'A'| 'U'| 'E'| 'W')+
+   : ('F' | 'S' | 'R' | 'P' | 'A' | 'U' | 'E' | 'W')+
    ;
 
 icmp_type
@@ -318,7 +318,7 @@ icmp_type_code
    ;
 
 icmp_list
-   : icmp_type_code ((',')? icmp_list)?
+   : icmp_type_code (',' icmp_type_code)?
    ;
 
 tos
@@ -326,7 +326,7 @@ tos
    ;
 
 state_opts
-   : state_opt ((',')? state_opts)?
+   : state_opt (',' state_opt)?
    ;
 
 state_opt
@@ -334,7 +334,7 @@ state_opt
    ;
 
 timeout_list
-   : timeout ((',')? timeout_list)?
+   : timeout (',' timeout)?
    ;
 
 timeout
@@ -342,7 +342,7 @@ timeout
    ;
 
 limit_list
-   : limit_item ((',')? limit_list)?
+   : limit_item (',' limit_item)?
    ;
 
 limit_item
@@ -446,7 +446,7 @@ HEX
    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0=9]*
+   : [a-zA-Z] [a-zA-Z0-9_]*
    ;
 
 QUOTED_STRING
