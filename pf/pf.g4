@@ -29,7 +29,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar pf;
 
 file_
@@ -49,8 +48,8 @@ pf_rule
    ;
 
 logopts
-   : logopt ((',')? logopts)?
-   NUMBER;
+   : logopt ((',')? logopts)? NUMBER
+   ;
 
 logopt
    : 'all'
@@ -60,7 +59,7 @@ logopt
    ;
 
 filteropts
-   : filteropt ((',')? filteropts)?
+   : filteropt (','? filteropt)*
    ;
 
 filteropt
@@ -92,9 +91,9 @@ filteropt
    | 'binat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
    | 'rdr-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
    | 'nat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)? ('static-port')?
-   | (route)?
-   | ('set tos' tos)?
-   | (('!')? 'received-on' (interface_name | interface_group))?
+   | (route)
+   | ('set tos' tos)
+   | (('!')? 'received-on' (interface_name | interface_group))
    ;
 
 scrubopts
@@ -162,14 +161,13 @@ load_anchor
    ;
 
 queueopts_list
-   : queueopts_list queueopts
-   | queueopts
+   : queueopts+
    ;
 
 queueopts
-   : (('bandwidth' bandwidth)? | ('min' bandwidth)? | ('max' bandwidth)? | ('parent' STRING)? | ('default')?)
-   | (('flows' NUMBER)? | ('quantum' NUMBER)?)
-   | ('qlimit' NUMBER)?
+   : (('bandwidth' bandwidth) | ('min' bandwidth) | ('max' bandwidth) | ('parent' STRING) | ('default'))
+   | (('flows' NUMBER) | ('quantum' NUMBER))
+   | ('qlimit' NUMBER)
    ;
 
 bandwidth
@@ -177,7 +175,7 @@ bandwidth
    ;
 
 bandwidth_spec
-   : NUMBER ('""' | '"K"' | '"M"' | '"G"')
+   : NUMBER ('K' | 'M' | 'G')?
    ;
 
 action
@@ -304,7 +302,7 @@ flags
    ;
 
 flag_set
-   : ('F')? ('S')? ('R')? ('P')? ('A')? ('U')? ('E')? ('W')?
+   : ('F'| 'S'| 'R'| 'P'| 'A'| 'U'| 'E'| 'W')+
    ;
 
 icmp_type
