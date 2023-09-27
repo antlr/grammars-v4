@@ -32,196 +32,430 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar pf;
 
-file_ : line* EOF;
-line           : ( option | pf_rule |
-                 antispoof_rule | queue_rule | anchor_rule |
-                 anchor_close | load_anchor | table_rule | include );
+file_
+   : line* EOF
+   ;
 
-option         : 'set' ( ( 'timeout' ( timeout | '{' timeout_list '}' ) )? |
-                 ( 'ruleset-optimization' ( 'none' | 'basic' |
-                 'profile' )? )? |
-                 ( 'optimization' ( 'default' | 'normal' | 'high-latency' |
-                 'satellite' | 'aggressive' | 'conservative' )? )?
-                 ( 'limit' ( limit_item | '{' limit_list '}' ) )? |
-                 ( 'loginterface' ( interface_name | 'none' ) )? |
-                 ( 'block-policy' ( 'drop' | 'return' ) )? |
-                 ( 'state-policy' ( 'if-bound' | 'floating' ) )?
-                 ( 'state-defaults' state_opts )?
-                 ( 'fingerprints' filename )? |
-                 ( 'skip on' ifspec )? |
-                 ( 'debug' ( 'emerg' | 'alert' | 'crit' | 'err' |
-                 'warning' | 'notice' | 'info' | 'debug' ) )? |
-                 ( 'reassemble' ( 'yes' | 'no' ) ( 'no-df' )? )? );
+line
+   : (option | pf_rule | antispoof_rule | queue_rule | anchor_rule | anchor_close | load_anchor | table_rule | include)
+   ;
 
-pf_rule        : action ( ( 'in' | 'out' ) )?
-                 ( 'log' ( '(' logopts ')')? )? ( 'quick' )?
-                 ( 'on' ( ifspec | 'rdomain' NUMBER ) )? ( af )?
-                 ( protospec )? ( hosts )? ( filteropts )?;
+option
+   : 'set' (('timeout' (timeout | '{' timeout_list '}'))? | ('ruleset-optimization' ('none' | 'basic' | 'profile')?)? | ('optimization' ('default' | 'normal' | 'high-latency' | 'satellite' | 'aggressive' | 'conservative')?)? ('limit' (limit_item | '{' limit_list '}'))? | ('loginterface' (interface_name | 'none'))? | ('block-policy' ('drop' | 'return'))? | ('state-policy' ('if-bound' | 'floating'))? ('state-defaults' state_opts)? ('fingerprints' filename)? | ('skip on' ifspec)? | ('debug' ('emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug'))? | ('reassemble' ('yes' | 'no') ('no-df')?)?)
+   ;
 
-logopts        : logopt ( ( ',' )? logopts )?;
-logopt         : 'all' | 'matches' | 'user' | 'to' interface_name;
+pf_rule
+   : action (('in' | 'out'))? ('log' ('(' logopts ')')?)? ('quick')? ('on' (ifspec | 'rdomain' NUMBER))? (af)? (protospec)? (hosts)? (filteropts)?
+   ;
 
-filteropts     : filteropt ( ( ',' )? filteropts )?;
-filteropt      : user | group | flags | icmp_type | icmp6_type |
-                 'tos' tos |
-                 ( 'no' | 'keep' | 'modulate' | 'synproxy' ) 'state'
-                 ( '(' state_opts ')' )? | 'scrub' '(' scrubopts ')' |
-                 'fragment' | 'allow-opts' | 'once' |
-                 'divert-packet' 'port' port | 'divert-reply' |
-                 'divert-to' host 'port' port |
-                 'label' STRING | 'tag' STRING | ( '!' )? 'tagged' STRING |
-                 'max-pkt-rate' NUMBER '/' seconds |
-                 'set delay' NUMBER |
-                 'set prio' ( NUMBER | '(' NUMBER ( ( ',' )? NUMBER )? ')' ) |
-                 'set queue' ( STRING | '(' STRING ( ( ',' )? STRING )? ')' ) |
-                 'rtable' NUMBER | 'probability' NUMBER'%' | 'prio' NUMBER |
-                 'af-to' af 'from' ( redirhost | '{' redirhost_list '}' )
-                 ( 'to' ( redirhost | '{' redirhost_list '}' ) )? |
-                 'binat-to' ( redirhost | '{' redirhost_list '}' )
-                 ( portspec )? ( pooltype )? |
-                 'rdr-to' ( redirhost | '{' redirhost_list '}' )
-                 ( portspec )? ( pooltype )? |
-                 'nat-to' ( redirhost | '{' redirhost_list '}' )
-                 ( portspec )? ( pooltype )? ( 'static-port' )? |
-                 ( route )? | ( 'set tos' tos )? |
-                 ( ( '!' )? 'received-on' ( interface_name | interface_group ) )?;
+logopts
+   : logopt ((',')? logopts)?
+   NUMBER;
 
-scrubopts      : scrubopt ( ( ',' )? scrubopts )?;
-scrubopt       : 'no-df' | 'min-ttl' NUMBER | 'max-mss' NUMBER |
-                 'reassemble tcp' | 'random-id';
+logopt
+   : 'all'
+   | 'matches'
+   | 'user'
+   | 'to' interface_name
+   ;
 
-antispoof_rule : 'antispoof' ( 'log' )? ( 'quick' )?
-                 'for' ifspec ( af )? ( 'label' STRING )?;
+filteropts
+   : filteropt ((',')? filteropts)?
+   ;
 
-table_rule     : 'table' '<' STRING '>' ( tableopts )?;
-tableopts      : tableopt ( tableopts )?;
-tableopt       : 'persist' | 'const' | 'counters' |
-                 'file' STRING | '{' ( tableaddrs )? '}';
-tableaddrs     : tableaddr_spec ( ( ',' )? tableaddrs )?;
-tableaddr_spec : ( '!' )? tableaddr ( '/' mask_bits )?;
-tableaddr      : hostname | ifspec | 'self' |
-                 ipv4_dotted_quad | ipv6_coloned_hex;
+filteropt
+   : user
+   | group
+   | flags
+   | icmp_type
+   | icmp6_type
+   | 'tos' tos
+   | ('no' | 'keep' | 'modulate' | 'synproxy') 'state' ('(' state_opts ')')?
+   | 'scrub' '(' scrubopts ')'
+   | 'fragment'
+   | 'allow-opts'
+   | 'once'
+   | 'divert-packet' 'port' port
+   | 'divert-reply'
+   | 'divert-to' host 'port' port
+   | 'label' STRING
+   | 'tag' STRING
+   | ('!')? 'tagged' STRING
+   | 'max-pkt-rate' NUMBER '/' seconds
+   | 'set delay' NUMBER
+   | 'set prio' (NUMBER | '(' NUMBER ((',')? NUMBER)? ')')
+   | 'set queue' (STRING | '(' STRING ((',')? STRING)? ')')
+   | 'rtable' NUMBER
+   | 'probability' NUMBER '%'
+   | 'prio' NUMBER
+   | 'af-to' af 'from' (redirhost | '{' redirhost_list '}') ('to' (redirhost | '{' redirhost_list '}'))?
+   | 'binat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
+   | 'rdr-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
+   | 'nat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)? ('static-port')?
+   | (route)?
+   | ('set tos' tos)?
+   | (('!')? 'received-on' (interface_name | interface_group))?
+   ;
 
-queue_rule     : 'queue' STRING ( 'on' interface_name )? queueopts_list;
+scrubopts
+   : scrubopt ((',')? scrubopts)?
+   ;
 
-anchor_rule    : 'anchor' ( STRING )? ( ( 'in' | 'out' ) )? ( 'on' ifspec )?
-                 ( af )? ( protospec )? ( hosts )? ( filteropt_list )? ( '{' )?;
+scrubopt
+   : 'no-df'
+   | 'min-ttl' NUMBER
+   | 'max-mss' NUMBER
+   | 'reassemble tcp'
+   | 'random-id'
+   ;
 
-anchor_close   : '}';
+antispoof_rule
+   : 'antispoof' ('log')? ('quick')? 'for' ifspec (af)? ('label' STRING)?
+   ;
 
-load_anchor    : 'load anchor' STRING 'from' filename;
+table_rule
+   : 'table' '<' STRING '>' (tableopts)?
+   ;
 
-queueopts_list : queueopts_list queueopts | queueopts;
-queueopts      : (( 'bandwidth' bandwidth )? | ( 'min' bandwidth )? |
-                 ( 'max' bandwidth )? | ( 'parent' STRING )? |
-                 ( 'default' )?) |
-                 (( 'flows' NUMBER )? | ( 'quantum' NUMBER )?) |
-                 ( 'qlimit' NUMBER )?;
+tableopts
+   : tableopt (tableopts)?
+   ;
 
-bandwidth      : bandwidth_spec ( 'burst' bandwidth_spec 'for' NUMBER 'ms' )?;
-bandwidth_spec : NUMBER ( '' | 'K' | 'M' | 'G' );
+tableopt
+   : 'persist'
+   | 'const'
+   | 'counters'
+   | 'file' STRING
+   | '{' (tableaddrs)? '}'
+   ;
 
-action         : 'pass' | 'match' | 'block' ( return )?;
-return         : 'drop' | 'return' |
-                 'return-rst' ( '(' 'ttl' NUMBER ')' )? |
-                 'return-icmp' ( '(' icmpcode ( ( ',' )? icmp6code )? ')' )? |
-                 'return-icmp6' ( '(' icmp6code ')' )?;
-icmpcode       : ( icmp_code_name | icmp_code_NUMBER );
-icmp6code      : ( icmp6_code_name | icmp6_code_NUMBER );
+tableaddrs
+   : tableaddr_spec ((',')? tableaddrs)?
+   ;
 
-ifspec         : ( ( '!' )? ( interface_name | interface_group ) ) |
-                 '{' interface_list '}';
-interface_list : ( '!' )? ( interface_name | interface_group )
-                 ( ( ',' )? interface_list )?;
-route          : ( 'route-to' | 'reply-to' | 'dup-to' )
-                 ( redirhost | '{' redirhost_list '}' );
-af             : 'inet' | 'inet6';
+tableaddr_spec
+   : ('!')? tableaddr ('/' mask_bits)?
+   ;
 
-protospec      : 'proto' ( proto_name | proto_NUMBER |
-                 '{' proto_list '}' );
-proto_list     : ( proto_name | proto_NUMBER ) ( ( ',' )? proto_list )?;
+tableaddr
+   : hostname
+   | ifspec
+   | 'self'
+   | IPV4_DOTTED_QUAD
+   | IPV6_COLONED_HEX
+   ;
 
-hosts          : 'all' |
-                 'from' ( 'any' | 'no-route' | 'urpf-failed' | 'self' |
-                 host | '{' host_list '}' | 'route' STRING ) ( port )?
-                 ( os )?
-                 'to'   ( 'any' | 'no-route' | 'self' | host |
-                 '{' host_list '}' | 'route' STRING ) ( port )?;
+queue_rule
+   : 'queue' STRING ('on' interface_name)? queueopts_list
+   ;
 
-ipspec         : 'any' | host | '{' host_list '}';
-host           : ( '!' )? ( address ( 'weight' NUMBER )? |
-                 address ( '/' mask_bits )? ( 'weight' NUMBER )? |
-                 '<' STRING '>' );
-redirhost      : address ( '/' mask_bits )?;
-address        : ( interface_name | interface_group |
-                 '(' ( interface_name | interface_group ) ')' |
-                 hostname | ipv4_dotted_quad | ipv6_coloned_hex );
-host_list      : host ( ( ',' )? host_list )?;
-redirhost_list : redirhost ( ( ',' )? redirhost_list )?;
+anchor_rule
+   : 'anchor' (STRING)? (('in' | 'out'))? ('on' ifspec)? (af)? (protospec)? (hosts)? (filteropts)? ('{')?
+   ;
 
-port           : 'port' ( unary_op | binary_op | '{' op_list '}' );
-portspec       : 'port' ( NUMBER | name ) ( ':' ( '*' | NUMBER | name ) )?;
-os             : 'os'  ( os_name | '{' os_list '}' );
-user           : 'user' ( unary_op | binary_op | '{' op_list '}' );
-group          : 'group' ( unary_op | binary_op | '{' op_list '}' );
+anchor_close
+   : '}'
+   ;
 
-unary_op       : ( '=' | '!=' | '<' | '<=' | '>' | '>=' )?
-                 ( name | NUMBER );
-binary_op      : NUMBER ( '<>' | '><' | ':' ) NUMBER;
-op_list        : ( unary_op | binary_op ) ( ( ',' )? op_list )?;
+load_anchor
+   : 'load anchor' STRING 'from' filename
+   ;
 
-os_name        : operating_system_name;
-os_list        : os_name ( ( ',' )? os_list )?;
+queueopts_list
+   : queueopts_list queueopts
+   | queueopts
+   ;
 
-flags          : 'flags' ( ( flag_set )? '/'  flag_set | 'any' );
-flag_set       : ( 'F' )? ( 'S' )? ( 'R' )? ( 'P' )? ( 'A' )? ( 'U' )? ( 'E' )?
-                 ( 'W' )?;
+queueopts
+   : (('bandwidth' bandwidth)? | ('min' bandwidth)? | ('max' bandwidth)? | ('parent' STRING)? | ('default')?)
+   | (('flows' NUMBER)? | ('quantum' NUMBER)?)
+   | ('qlimit' NUMBER)?
+   ;
 
-icmp_type      : 'icmp-type' ( icmp_type_code | '{' icmp_list '}' );
-icmp6_type     : 'icmp6-type' ( icmp_type_code | '{' icmp_list '}' );
-icmp_type_code : ( icmp_type_name | icmp_type_NUMBER )
-                 ( 'code' ( icmp_code_name | icmp_code_NUMBER ) )?;
-icmp_list      : icmp_type_code ( ( ',' )? icmp_list )?;
+bandwidth
+   : bandwidth_spec ('burst' bandwidth_spec 'for' NUMBER 'ms')?
+   ;
 
-tos            : ( 'lowdelay' | 'throughput' | 'reliability' |
-                 ( '0x' )? NUMBER );
+bandwidth_spec
+   : NUMBER ('""' | '"K"' | '"M"' | '"G"')
+   ;
 
-state_opts     : state_opt ( ( ',' )? state_opts )?;
-state_opt      : ( 'max' NUMBER | 'no-sync' | timeout | 'sloppy' |
-                 'pflow' | 'source-track' ( ( 'rule' | 'global' ) )? |
-                 'max-src-nodes' NUMBER | 'max-src-states' NUMBER |
-                 'max-src-conn' NUMBER |
-                 'max-src-conn-rate' NUMBER '/' NUMBER |
-                 'overload' '<' STRING '>' ( 'flush' ( 'global' )? )? |
-                 'if-bound' | 'floating' );
+action
+   : 'pass'
+   | 'match'
+   | 'block' (return)?
+   ;
 
-timeout_list   : timeout ( ( ',' )? timeout_list )?;
-timeout        : ( 'tcp.first' | 'tcp.opening' | 'tcp.established' |
-                 'tcp.closing' | 'tcp.finwait' | 'tcp.closed' |
-                 'udp.first' | 'udp.single' | 'udp.multiple' |
-                 'icmp.first' | 'icmp.error' |
-                 'other.first' | 'other.single' | 'other.multiple' |
-                 'frag' | 'interval' | 'src.track' |
-                 'adaptive.start' | 'adaptive.end' ) NUMBER;
+return
+   : 'drop'
+   | 'return'
+   | 'return-rst' ('(' 'ttl' NUMBER ')')?
+   | 'return-icmp' ('(' icmpcode ((',')? icmp6code)? ')')?
+   | 'return-icmp6' ('(' icmp6code ')')?
+   ;
 
-limit_list     : limit_item ( ( ',' )? limit_list )?;
-limit_item     : ( 'states' | 'frags' | 'src-nodes' | 'tables' |
-                 'table-entries' ) NUMBER;
+icmpcode
+   : (icmp_code_name | icmp_code_NUMBER)
+   ;
 
-pooltype       : ( 'bitmask' | 'least-states' |
-                 'random' | 'round-robin' |
-                 'source-hash' ( ( hex_key | string_key ) )? )
-                 ( 'sticky-address' )?;
+icmp6code
+   : (icmp6_code_name | icmp6_code_NUMBER)
+   ;
 
-include        : 'include' filename;
+ifspec
+   : (('!')? (interface_name | interface_group))
+   | '{' interface_list '}'
+   ;
 
+interface_list
+   : ('!')? (interface_name | interface_group) ((',')? interface_list)?
+   ;
 
+route
+   : ('route-to' | 'reply-to' | 'dup-to') (redirhost | '{' redirhost_list '}')
+   ;
 
+af
+   : 'inet'
+   | 'inet6'
+   ;
 
-NUMBER: [0-9]+;
+protospec
+   : 'proto' (proto_name | proto_NUMBER | '{' proto_list '}')
+   ;
 
-STRING: [a-zA-Z][a-zA-Z0=9]*;
+proto_list
+   : (proto_name | proto_NUMBER) ((',')? proto_list)?
+   ;
+
+hosts
+   : 'all'
+   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)? (os)? 'to' ('any' | 'no-route' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)?
+   ;
+
+ipspec
+   : 'any'
+   | host
+   | '{' host_list '}'
+   ;
+
+host
+   : ('!')? (address ('weight' NUMBER)? | address ('/' mask_bits)? ('weight' NUMBER)? | '<' STRING '>')
+   ;
+
+redirhost
+   : address ('/' mask_bits)?
+   ;
+
+address
+   : (interface_name | interface_group | '(' (interface_name | interface_group) ')' | hostname | IPV4_DOTTED_QUAD | IPV6_COLONED_HEX)
+   ;
+
+host_list
+   : host ((',')? host_list)?
+   ;
+
+redirhost_list
+   : redirhost ((',')? redirhost_list)?
+   ;
+
+port
+   : 'port' (unary_op | binary_op | '{' op_list '}')
+   ;
+
+portspec
+   : 'port' (NUMBER | name) (':' ('*' | NUMBER | name))?
+   ;
+
+os
+   : 'os' (os_name | '{' os_list '}')
+   ;
+
+user
+   : 'user' (unary_op | binary_op | '{' op_list '}')
+   ;
+
+group
+   : 'group' (unary_op | binary_op | '{' op_list '}')
+   ;
+
+unary_op
+   : ('=' | '!=' | '<' | '<=' | '>' | '>=')? (name | NUMBER)
+   ;
+
+binary_op
+   : NUMBER ('<>' | '><' | ':') NUMBER
+   ;
+
+op_list
+   : (unary_op | binary_op) ((',')? op_list)?
+   ;
+
+os_name
+   : operating_system_name
+   ;
+
+os_list
+   : os_name ((',')? os_list)?
+   ;
+
+flags
+   : 'flags' ((flag_set)? '/' flag_set | 'any')
+   ;
+
+flag_set
+   : ('F')? ('S')? ('R')? ('P')? ('A')? ('U')? ('E')? ('W')?
+   ;
+
+icmp_type
+   : 'icmp-type' (icmp_type_code | '{' icmp_list '}')
+   ;
+
+icmp6_type
+   : 'icmp6-type' (icmp_type_code | '{' icmp_list '}')
+   ;
+
+icmp_type_code
+   : (icmp_type_name | icmp_type_NUMBER) ('code' (icmp_code_name | icmp_code_NUMBER))?
+   ;
+
+icmp_list
+   : icmp_type_code ((',')? icmp_list)?
+   ;
+
+tos
+   : ('lowdelay' | 'throughput' | 'reliability' | ('0x')? NUMBER)
+   ;
+
+state_opts
+   : state_opt ((',')? state_opts)?
+   ;
+
+state_opt
+   : ('max' NUMBER | 'no-sync' | timeout | 'sloppy' | 'pflow' | 'source-track' (('rule' | 'global'))? | 'max-src-nodes' NUMBER | 'max-src-states' NUMBER | 'max-src-conn' NUMBER | 'max-src-conn-rate' NUMBER '/' NUMBER | 'overload' '<' STRING '>' ('flush' ('global')?)? | 'if-bound' | 'floating')
+   ;
+
+timeout_list
+   : timeout ((',')? timeout_list)?
+   ;
+
+timeout
+   : ('tcp.first' | 'tcp.opening' | 'tcp.established' | 'tcp.closing' | 'tcp.finwait' | 'tcp.closed' | 'udp.first' | 'udp.single' | 'udp.multiple' | 'icmp.first' | 'icmp.error' | 'other.first' | 'other.single' | 'other.multiple' | 'frag' | 'interval' | 'src.track' | 'adaptive.start' | 'adaptive.end') NUMBER
+   ;
+
+limit_list
+   : limit_item ((',')? limit_list)?
+   ;
+
+limit_item
+   : ('states' | 'frags' | 'src-nodes' | 'tables' | 'table-entries') NUMBER
+   ;
+
+pooltype
+   : ('bitmask' | 'least-states' | 'random' | 'round-robin' | 'source-hash' ((hex_key | string_key))?) ('sticky-address')?
+   ;
+
+include
+   : 'include' filename
+   ;
+
+operating_system_name
+   : STRING
+   ;
+
+icmp_type_name
+   : STRING
+   ;
+
+icmp_type_NUMBER
+   : NUMBER
+   ;
+
+icmp_code_name
+   : STRING
+   ;
+
+icmp6_code_name
+   : STRING
+   ;
+
+icmp6_code_NUMBER
+   : NUMBER
+   ;
+
+icmp_code_NUMBER
+   : NUMBER
+   ;
+
+interface_name
+   : STRING
+   ;
+
+seconds
+   : NUMBER
+   ;
+
+interface_group
+   : STRING
+   ;
+
+hostname
+   : STRING
+   ;
+
+proto_name
+   : STRING
+   ;
+
+proto_NUMBER
+   : NUMBER
+   ;
+
+name
+   : STRING
+   ;
+
+mask_bits
+   : NUMBER
+   ;
+
+filename
+   : QUOTED_STRING
+   ;
+
+hex_key
+   : HEX
+   ;
+
+string_key
+   : QUOTED_STRING
+   ;
+
+IPV4_DOTTED_QUAD
+   : NUMBER '.' NUMBER '.' NUMBER '.' NUMBER
+   ;
+
+IPV6_COLONED_HEX
+   : [0-9a-f] ':' [0-9a-f] ':' [0-9a-f] ':' [0-9a-f] ':' [0-9a-f] ':' [0-9a-f] ':' [0-9a-f] ':' [0-9a-f]
+   ;
+
+NUMBER
+   : [0-9]+
+   ;
+
+HEX
+   : '0' ('X' | 'x') [0-9a-f]+
+   ;
+
+STRING
+   : [a-zA-Z] [a-zA-Z0=9]*
+   ;
+
+QUOTED_STRING
+   : '"' ~ '"'* '"'
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
