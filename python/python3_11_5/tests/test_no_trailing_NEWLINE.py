@@ -1,0 +1,1 @@
+# REQUIREMENT: no trailing NEWLINE token, no error message
