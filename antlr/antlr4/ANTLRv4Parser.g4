@@ -51,7 +51,7 @@ grammarDecl
    ;
 
 grammarType
-   : (LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR)
+   : LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR
    ;
    // This is the list of all constructs that can be declared before
    // the set of rules that compose the grammar, and is invoked 0..n
@@ -235,16 +235,11 @@ lexerElements
    ;
 
 lexerElement
-   : labeledLexerElement ebnfSuffix?
-   | lexerAtom ebnfSuffix?
+   : lexerAtom ebnfSuffix?
    | lexerBlock ebnfSuffix?
    | actionBlock QUESTION?
    ;
    // but preds can be anywhere
-
-labeledLexerElement
-   : identifier (ASSIGN | PLUS_ASSIGN) (lexerAtom | lexerBlock)
-   ;
 
 lexerBlock
    : LPAREN lexerAltList RPAREN

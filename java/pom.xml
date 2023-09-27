@@ -15,5 +15,6 @@
 		<module>java</module>
 		<module>java8</module>
 		<module>java9</module>
+		<module>java20</module>
 	</modules>
 </project>

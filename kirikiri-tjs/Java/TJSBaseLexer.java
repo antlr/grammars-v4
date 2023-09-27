@@ -1,7 +1,5 @@
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
-
 /**
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.

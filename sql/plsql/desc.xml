@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+   <antlr-version>^4.12.0</antlr-version>
+   <targets>CSharp;Java;JavaScript;TypeScript</targets>
+   <test>
+      <name>hw</name>
+      <targets>JavaScript;TypeScript</targets>
+      <inputs>hw-examples</inputs>
+   </test>
+   <test>
+      <name>full</name>
+      <targets>CSharp;Java</targets>
+      <inputs>examples</inputs>
+   </test>
+    <test>
+        <name>examples-sql-script</name>
+        <targets>CSharp;Java</targets>
+        <inputs>examples-sql-script</inputs>
+    </test>
+</desc>

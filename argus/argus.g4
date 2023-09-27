@@ -237,11 +237,11 @@ tagwait_stmt
    ;
 
 tag_arm
-   : 'tag' name (',' name)* ((idn ':' type_spec))? ':' body
+   : 'tag' name (',' name)* (idn ':' type_spec)? ':' body
    ;
 
 atag_arm
-   : tag_kind name (',' name)* ((idn ':' type_spec))* ':' body
+   : tag_kind name (',' name)* (idn ':' type_spec)* ':' body
    ;
 
 tag_kind
@@ -250,12 +250,12 @@ tag_kind
    ;
 
 when_handler
-   : 'when' name (',' name)* ((decl (',' decl)*))* ':' body
+   : 'when' name (',' name)* (decl (',' decl)*)* ':' body
    | 'when' name (',' name)* '(' '*' ')' ':' body
    ;
 
 others_handler
-   : 'others' ((idn ':' type_spec))* ':' body
+   : 'others' (idn ':' type_spec)* ':' body
    ;
 
 body
@@ -283,10 +283,10 @@ type_spec
    | 'oneof' '[' field_spec (',' field_spec)* ']'
    | 'variant' '[' field_spec (',' field_spec)* ']'
    | 'atomic_variant' '[' field_spec (',' field_spec)* ']'
-   | 'proctype' ((type_spec (',' type_spec)*)?) returnz? signals?
-   | 'itertype' ((type_spec (',' type_spec)*)?) yields? signals?
-   | 'creatortype' ((type_spec (',' type_spec)*)?) returnz? signals?
-   | 'handlertype' ((type_spec (',' type_spec)*)?) returnz? signals?
+   | 'proctype' (type_spec (',' type_spec)*)? returnz? signals?
+   | 'itertype' (type_spec (',' type_spec)*)? yields? signals?
+   | 'creatortype' (type_spec (',' type_spec)*)? returnz? signals?
+   | 'handlertype' (type_spec (',' type_spec)*)? returnz? signals?
    | 'mutex' '[' type_actual ']'
    | reference
    ;
@@ -344,7 +344,7 @@ expression
    ;
 
 primaries
-   : primary (('.' name) | expression (',' expression)*)*
+   : primary ('.' name | expression (',' expression)*)*
    ;
 
 primary
@@ -352,11 +352,11 @@ primary
    ;
 
 call
-   : primaries '(' ((expression (',' expression)*))? ')'
+   : primaries '(' (expression (',' expression)*)? ')'
    ;
 
 entities
-   : entity (('.' name) | expression)*
+   : entity ('.' name | expression)*
    ;
 
 entity
@@ -369,10 +369,10 @@ entity
    | STRING_LITERAL
    | 'self'
    | reference
-   | 'bind' entities ((bind_arg (',' bind_arg)*)?)
+   | 'bind' entities (bind_arg (',' bind_arg)*)?
    | type_spec '$' (field (',' field)*)*
-   | type_spec '$' ((expression ':')? (expression (',' expression)*)?)
-   | type_spec '$' name ((actual_parm (',' actual_parm)*)?)
+   | type_spec '$' (expression ':')? (expression (',' expression)*)?
+   | type_spec '$' name (actual_parm (',' actual_parm)*)?
    | 'up' '(' expression ')'
    | 'down' '(' expression ')'
    ;

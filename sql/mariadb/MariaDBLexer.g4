@@ -53,6 +53,7 @@ ASC:                                 'ASC';
 ATTRIBUTE:                           'ATTRIBUTE';
 BEFORE:                              'BEFORE';
 BETWEEN:                             'BETWEEN';
+BODY:                                'BODY';
 BOTH:                                'BOTH';
 BUCKETS:                             'BUCKETS';
 BY:                                  'BY';
@@ -166,6 +167,7 @@ OUTFILE:                             'OUTFILE';
 OVER:                                'OVER';
 PARTITION:                           'PARTITION';
 PRIMARY:                             'PRIMARY';
+PACKAGE:                             'PACKAGE';
 PROCEDURE:                           'PROCEDURE';
 PURGE:                               'PURGE';
 RANGE:                               'RANGE';
@@ -528,6 +530,7 @@ LESS:                                'LESS';
 LEVEL:                               'LEVEL';
 LIST:                                'LIST';
 LOCAL:                               'LOCAL';
+LOCALES:                             'LOCALES';
 LOGFILE:                             'LOGFILE';
 LOGS:                                'LOGS';
 MASTER:                              'MASTER';
@@ -621,6 +624,7 @@ PROFILE:                             'PROFILE';
 PROFILES:                            'PROFILES';
 PROXY:                               'PROXY';
 QUERY:                               'QUERY';
+QUERY_RESPONSE_TIME:                 'QUERY_RESPONSE_TIME';
 QUICK:                               'QUICK';
 REBUILD:                             'REBUILD';
 RECOVER:                             'RECOVER';
@@ -668,6 +672,7 @@ SHARED:                              'SHARED';
 SIGNED:                              'SIGNED';
 SIMPLE:                              'SIMPLE';
 SLAVE:                               'SLAVE';
+SLAVES:                              'SLAVES';
 SLOW:                                'SLOW';
 SNAPSHOT:                            'SNAPSHOT';
 SOCKET:                              'SOCKET';
@@ -710,6 +715,7 @@ TRANSACTION:                         'TRANSACTION';
 TRANSACTIONAL:                       'TRANSACTIONAL';
 TRIGGERS:                            'TRIGGERS';
 TRUNCATE:                            'TRUNCATE';
+TYPES:                               'TYPES';
 UNBOUNDED:                           'UNBOUNDED';
 UNDEFINED:                           'UNDEFINED';
 UNDOFILE:                            'UNDOFILE';
@@ -733,6 +739,8 @@ WINDOW:                              'WINDOW';
 WITHOUT:                             'WITHOUT';
 WORK:                                'WORK';
 WRAPPER:                             'WRAPPER';
+WSREP_MEMBERSHIP:                    'WSREP_MEMBERSHIP';
+WSREP_STATUS:                        'WSREP_STATUS';
 X509:                                'X509';
 XA:                                  'XA';
 XML:                                 'XML';
@@ -757,6 +765,14 @@ MINUTE:                              'MINUTE';
 WEEK:                                'WEEK';
 SECOND:                              'SECOND';
 MICROSECOND:                         'MICROSECOND';
+
+
+// userstat plugin Keywords
+
+USER_STATISTICS:                     'USER_STATISTICS';
+CLIENT_STATISTICS:                   'CLIENT_STATISTICS';
+INDEX_STATISTICS:                    'INDEX_STATISTICS';
+TABLE_STATISTICS:                    'TABLE_STATISTICS';
 
 
 // PRIVILEGES
@@ -1201,7 +1217,11 @@ BINLOG_REPLAY:                       'BINLOG_REPLAY';
 FEDERATED_ADMIN:                     'FEDERATED_ADMIN';
 READ_ONLY_ADMIN:                     'READ_ONLY_ADMIN';
 REPLICA:                             'REPLICA';
+REPLICAS:                            'REPLICAS';
 REPLICATION_MASTER_ADMIN:            'REPLICATION_MASTER_ADMIN';
+MONITOR:                             'MONITOR';
+READ_ONLY:                           'READ_ONLY';
+REPLAY:                              'REPLAY';
 
 // Operators
 // Operators. Assigns
@@ -1311,7 +1331,7 @@ DOT_ID:                              '.' ID_LITERAL;
 
 ID:                                  ID_LITERAL;
 // DOUBLE_QUOTE_ID:                  '"' ~'"'+ '"';
-REVERSE_QUOTE_ID:                    '`' ~'`'+ '`';
+REVERSE_QUOTE_ID:                    BQUOTA_STRING;
 STRING_USER_NAME:                    (
                                        SQUOTA_STRING | DQUOTA_STRING
                                        | BQUOTA_STRING | ID_LITERAL
@@ -1331,14 +1351,14 @@ STRING_USER_NAME_MARIADB:            (
                                      )  '@';
 LOCAL_ID:                               '@'
                                      (
-                                        [A-Z0-9._$]+
+                                        [A-Z0-9._$\u0080-\uFFFF]+
                                         | SQUOTA_STRING
                                         | DQUOTA_STRING
                                         | BQUOTA_STRING
                                     );
 GLOBAL_ID:                              '@' '@'
                                     (
-                                        [A-Z0-9._$]+
+                                        [A-Z0-9._$\u0080-\uFFFF]+
                                         | BQUOTA_STRING
                                     );
 
@@ -1359,7 +1379,7 @@ fragment EXPONENT_NUM_PART:          'E' [-+]? DEC_DIGIT+;
 fragment ID_LITERAL:                 [A-Z_$0-9\u0080-\uFFFF]*?[A-Z_$\u0080-\uFFFF]+?[A-Z_$0-9\u0080-\uFFFF]*;
 fragment DQUOTA_STRING:              '"' ( '\\'. | '""' | ~('"'| '\\') )* '"';
 fragment SQUOTA_STRING:              '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
-fragment BQUOTA_STRING:              '`' ( '\\'. | '``' | ~('`'|'\\'))* '`';
+fragment BQUOTA_STRING:              '`' ( ~'`' | '``' )* '`';
 fragment HEX_DIGIT:                  [0-9A-F];
 fragment DEC_DIGIT:                  [0-9];
 fragment BIT_STRING_L:               'B' '\'' [01]+ '\'';

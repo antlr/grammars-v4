@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>compilationUnit</entryPoint>
+					<entryPoint>specification</entryPoint>
 					<grammarName>OCL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

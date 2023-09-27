@@ -1,6 +1,0 @@
-The skip list for Cpp is for the moment all grammars except for a few.
-It was determined by:
-
-find . -name pom.xml | sed 's#./##' | sed 's#/pom.xml##' | grep -v Generated
-
-then with a few removed.

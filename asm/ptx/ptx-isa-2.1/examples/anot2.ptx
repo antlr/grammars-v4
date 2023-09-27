@@ -1,0 +1,56 @@
+.version 3.1
+.target sm_20
+.address_size 64
+
+.file   1 "C:/Users/Ken/AppData/Local/Temp/tmpxft_00001c34_00000000-8_cudatex.cpp3.i"
+.file   2 "C:/Users/Ken/Documents/Visual Studio 2012/Projects/cudatex1/cudatex.cu"
+.global .align 8 .b8 _ZTVSt11_Facet_base[48];
+.global .align 8 .b8 _ZTVNSt6locale5facetE[48];
+.global .texref texRef;
+.global .align 8 .b8 _ZTVSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE[112];
+.global .align 8 .b8 _ZTVN10__cxxabiv117__class_type_infoE[8];
+.global .align 8 .b8 _ZTVN10__cxxabiv120__si_class_type_infoE[8];
+.global .align 8 .b8 _ZTVSt13runtime_error[40];
+.global .align 8 .b8 _ZTVSt14error_category[72];
+.global .align 8 .b8 _ZTVSt12system_error[40];
+.global .align 8 .b8 _ZTVSt23_Generic_error_category[72];
+.global .align 8 .b8 _ZTVSt24_Iostream_error_category[72];
+.global .align 8 .b8 _ZTVSt22_System_error_category[72];
+.global .align 8 .b8 _ZTVNSt8ios_base7failureE[40];
+
+.visible .entry _Z15transformKernelPfiiiif(
+.param .u64 _Z15transformKernelPfiiiif_param_0,
+.param .u32 _Z15transformKernelPfiiiif_param_1,
+.param .u32 _Z15transformKernelPfiiiif_param_2,
+.param .u32 _Z15transformKernelPfiiiif_param_3,
+.param .u32 _Z15transformKernelPfiiiif_param_4,
+.param .f32 _Z15transformKernelPfiiiif_param_5
+)
+{
+.reg .s32 %r<12>;
+.reg .f32 %f<2>;
+.reg .s64 %rd<5>;
+
+
+ld.param.u64 %rd1, [_Z15transformKernelPfiiiif_param_0];
+ld.param.u32 %r1, [_Z15transformKernelPfiiiif_param_3];
+cvta.to.global.u64 %rd2, %rd1;
+.loc 2 22 1
+mov.u32 %r2, %ntid.x;
+mov.u32 %r3, %ctaid.x;
+mov.u32 %r4, %tid.x;
+mad.lo.s32 %r5, %r2, %r3, %r4;
+.loc 2 23 1
+mov.u32 %r6, %ntid.y;
+mov.u32 %r7, %ctaid.y;
+mov.u32 %r8, %tid.y;
+mad.lo.s32 %r9, %r6, %r7, %r8;
+.loc 2 30 1
+cvt.rn.f32.u32 %f1, %r5;
+mad.lo.s32 %r10, %r9, %r1, %r5;
+mul.wide.u32 %rd3, %r10, 4;
+add.s64 %rd4, %rd2, %rd3;
+st.global.f32 [%rd4], %f1;
+.loc 2 31 2
+ret;
+}

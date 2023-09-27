@@ -13,3 +13,18 @@
 
 $a = 42;
 $b = "𠮷";
+
+class C{
+    public $fn = 0;
+}
+
+$c = new C();
+$c->fn = 1;
+
+class CM{
+    const match = 1;
+}
+
+enum EM{
+    case match;
+}

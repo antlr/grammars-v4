@@ -27,6 +27,7 @@ import sys
 from pathlib import Path
 import re
 import json
+import subprocess
 from typing import Sequence
 
 """
@@ -94,6 +95,20 @@ def index_grammars(root : str) -> Sequence[dict]:
             grammars = get_values("include", pom)
             if grammars is None:
                 continue
+
+            skip = False
+            for name in files:
+                if name.endswith(".g4"):
+                    foo = os.path.join(path, name)
+                    p1 = subprocess.Popen(["dotnet", "trparse", "-t", "ANTLRv4", foo], stdout=subprocess.PIPE)
+                    p2 = subprocess.Popen(["dotnet", "trxgrep", "//actionBlock[1]"], stdin=p1.stdout, stdout=subprocess.PIPE)
+                    p3 = subprocess.Popen(["dotnet", "trtext"], stdin=p2.stdout, stdout=subprocess.PIPE)
+                    bar = p3.stdout.readline()
+                    if bar:
+                        skip = True
+            if skip:
+                continue
+
             if len(grammars) > 1:
                 lexer = grammars[0] if 'Lexer' in grammars[0] else grammars[1]
                 parser = grammars[0] if 'Parser' in grammars[0] else grammars[1]
@@ -113,9 +128,10 @@ def index_grammars(root : str) -> Sequence[dict]:
             if exampleFilesDir is None:
                 continue
             exampleFilesDir = os.path.join(path,exampleFilesDir)
+            prefix = str(exampleFilesDir).replace('\\','/').removeprefix("./")
             if not os.path.exists(exampleFilesDir):
                 continue
-            examplesFiles = os.listdir(exampleFilesDir)
+            examplesFiles = [str(f).replace('\\','/').removeprefix(prefix) for f in Path(exampleFilesDir).glob("**/*") if f.is_file() and not (f.parts[-1].endswith(".errors") or f.parts[-1].endswith(".tree")) ]
 
             entry = {
                 'name' : grammarName,
@@ -133,4 +149,4 @@ if __name__ == '__main__':
         print("Usage: python mkindex.py grammars-v4-path")
         exit(1)
     grammars = index_grammars(sys.argv[1])
-    print(json.dumps(grammars))
+    print(json.dumps(grammars, indent=1))

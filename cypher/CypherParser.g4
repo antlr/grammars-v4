@@ -327,7 +327,7 @@ invocationName
     ;
 
 functionInvocation
-    : invocationName LPAREN DISTINCT? (expressionChain)? RPAREN
+    : invocationName LPAREN DISTINCT? expressionChain? RPAREN
     ;
 
 parenthesizedExpression
@@ -401,7 +401,7 @@ charLit
     : CHAR_LITERAL
     ;
 listLit
-    : LBRACK (expressionChain)? RBRACK
+    : LBRACK expressionChain? RBRACK
     ;
 
 mapLit

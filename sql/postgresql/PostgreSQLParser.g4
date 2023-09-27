@@ -1920,6 +1920,8 @@ arg_class
 param_name
    : type_function_name
    | builtin_function_name
+   | LEFT
+   | RIGHT
    ;
 
 func_return
@@ -1928,7 +1930,7 @@ func_return
 
 func_type
    : typename
-   | SETOF? (builtin_function_name | type_function_name) attrs PERCENT TYPE_P
+   | SETOF? (builtin_function_name | type_function_name | LEFT | RIGHT) attrs PERCENT TYPE_P
    ;
 
 func_arg_with_default
@@ -2132,6 +2134,9 @@ reindexstmt
 reindex_target_type
    : INDEX
    | TABLE
+   | SCHEMA
+   | DATABASE
+   | SYSTEM_P
    ;
 
 reindex_target_multitable
@@ -2146,6 +2151,8 @@ reindex_option_list
 
 reindex_option_elem
    : VERBOSE
+   | TABLESPACE
+   | CONCURRENTLY
    ;
 
 altertblspcstmt
@@ -2900,11 +2907,14 @@ select_no_parens
    ;
 
 select_clause
-   : simple_select
-   | select_with_parens
+   : simple_select_intersect ((UNION | EXCEPT) all_or_distinct simple_select_intersect)*
    ;
 
-simple_select
+simple_select_intersect
+    : simple_select_pramary (INTERSECT all_or_distinct simple_select_pramary)*
+    ;
+
+simple_select_pramary
    : ( SELECT (opt_all_clause into_clause opt_target_list | distinct_clause target_list)
            into_clause
            from_clause
@@ -2912,21 +2922,10 @@ simple_select
            group_clause
            having_clause
            window_clause
-       | values_clause
-       | TABLE relation_expr
-       | select_with_parens set_operator_with_all_or_distinct (simple_select | select_with_parens)
-     )
-        (set_operator_with_all_or_distinct (simple_select | select_with_parens))*
-   ;
-
-set_operator
-   : UNION # union
-   | INTERSECT # intersect
-   | EXCEPT # except
-   ;
-
-set_operator_with_all_or_distinct
-   : set_operator all_or_distinct
+    )
+   | values_clause
+   | TABLE relation_expr
+   | select_with_parens
    ;
 
 with_clause
@@ -3162,8 +3161,12 @@ alias_clause
    ;
 
 opt_alias_clause
-   : alias_clause
+   : table_alias_clause
    |
+   ;
+
+table_alias_clause
+   : AS? table_alias (OPEN_PAREN name_list CLOSE_PAREN)?
    ;
 
 func_alias_clause
@@ -3308,7 +3311,7 @@ consttypename
    ;
 
 generictype
-   : (builtin_function_name | type_function_name) attrs? opt_type_modifiers
+   : (builtin_function_name | type_function_name | LEFT | RIGHT) attrs? opt_type_modifiers
    ;
 
 opt_type_modifiers
@@ -3501,9 +3504,13 @@ a_expr_or
    ;
 /*16*/
 
-
 a_expr_and
-   : a_expr_in (AND a_expr_in)*
+   : a_expr_between (AND a_expr_between)*
+   ;
+/*21*/
+
+a_expr_between
+   : a_expr_in (NOT? BETWEEN SYMMETRIC? a_expr_in AND a_expr_in)?
    ;
 /*20*/
 
@@ -3547,7 +3554,7 @@ a_expr_compare
 
 
 a_expr_like
-   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO | BETWEEN SYMMETRIC?) a_expr_qual_op opt_escape)?
+   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO) a_expr_qual_op opt_escape)?
    ;
 /* 8*/
 
@@ -3945,7 +3952,6 @@ substr_list
    | a_expr FOR a_expr
    | a_expr SIMILAR a_expr ESCAPE a_expr
    | expr_list
-   |
    ;
 
 trim_list
@@ -4045,6 +4051,8 @@ func_name
    : builtin_function_name
    | type_function_name
    | colid indirection
+   | LEFT
+   | RIGHT
    ;
 
 aexprconst
@@ -4118,7 +4126,17 @@ colid
    | unreserved_keyword
    | col_name_keyword
    | plsql_unreserved_keyword
+   | LEFT
+   | RIGHT
    ;
+
+table_alias
+   : identifier
+   | unreserved_keyword
+   | col_name_keyword
+   | plsql_unreserved_keyword
+   ;
+
 
 type_function_name
    : identifier
@@ -4695,7 +4713,6 @@ builtin_function_name
    | CONCAT_WS
    | FORMAT
    | INITCAP
-   | LEFT
    | LENGTH
    | LPAD
    | LTRIM
@@ -4717,7 +4734,6 @@ builtin_function_name
    | REPEAT
    | REPLACE
    | REVERSE
-   | RIGHT
    | RPAD
    | RTRIM
    | SPLIT_PART

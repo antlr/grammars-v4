@@ -52,6 +52,7 @@ statement
     | exportStatement
     | emptyStatement_
     | classDeclaration
+    | functionDeclaration
     | expressionStatement
     | ifStatement
     | iterationStatement
@@ -65,7 +66,6 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration
     ;
 
 block
@@ -81,12 +81,28 @@ importStatement
     ;
 
 importFromBlock
-    : importDefault? (importNamespace | moduleItems) importFrom eos
+    : importDefault? (importNamespace | importModuleItems) importFrom eos
     | StringLiteral eos
     ;
 
-moduleItems
-    : '{' (aliasName ',')* (aliasName ','?)? '}'
+importModuleItems
+    : '{' (importAliasName ',')* (importAliasName ','?)? '}'
+    ;
+
+importAliasName
+    : moduleExportName (As importedBinding)?
+    ;
+
+moduleExportName
+    : identifierName
+    | StringLiteral
+    ;
+
+// yield and await are permitted as BindingIdentifier in the grammar
+importedBinding
+    : Identifier
+    | Yield
+    | Await
     ;
 
 importDefault
@@ -106,13 +122,21 @@ aliasName
     ;
 
 exportStatement
-    : Export (exportFromBlock | declaration) eos    # ExportDeclaration
-    | Export Default singleExpression eos           # ExportDefaultDeclaration
+    : Export Default? (exportFromBlock | declaration) eos    # ExportDeclaration
+    | Export Default singleExpression eos                    # ExportDefaultDeclaration
     ;
 
 exportFromBlock
     : importNamespace importFrom eos
-    | moduleItems importFrom? eos
+    | exportModuleItems importFrom? eos
+    ;
+
+exportModuleItems
+    : '{' (exportAliasName ',')* (exportAliasName ','?)? '}'
+    ;
+
+exportAliasName
+    : moduleExportName (As moduleExportName)?
     ;
 
 declaration
@@ -238,15 +262,29 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
+    : (Static | {this.n("static")}? identifier)? methodDefinition
+    | (Static | {this.n("static")}? identifier)? fieldDefinition
+    | (Static | {this.n("static")}? identifier) block
     | emptyStatement_
-    | '#'? propertyName '=' singleExpression
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' functionBody
-    | '*'? '#'? getter '(' ')' functionBody
-    | '*'? '#'? setter '(' formalParameterList? ')' functionBody
+    : (Async {this.notLineTerminator()}?)? '*'? classElementName '(' formalParameterList? ')' functionBody
+    | '*'? getter '(' ')' functionBody
+    | '*'? setter '(' formalParameterList? ')' functionBody
+    ;
+
+fieldDefinition
+    : classElementName initializer?
+    ;
+
+classElementName
+    : propertyName
+    | privateIdentifier
+    ;
+
+privateIdentifier
+    : '#' identifierName
     ;
 
 formalParameterList
@@ -362,6 +400,12 @@ singleExpression
     | '(' expressionSequence ')'                                            # ParenthesizedExpression
     ;
 
+initializer
+// TODO: must be `= AssignmentExpression` and we have such label alredy but it doesn't respect the specification.
+//  See https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#prod-Initializer
+    : '=' singleExpression
+    ;
+
 assignable
     : identifier
     | arrayLiteral
@@ -373,8 +417,7 @@ objectLiteral
     ;
 
 anonymousFunction
-    : functionDeclaration                                                       # FunctionDecl
-    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
+    : Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -438,11 +481,11 @@ bigintLiteral
     ;
 
 getter
-    : {this.n("get")}? identifier propertyName
+    : {this.n("get")}? identifier classElementName
     ;
 
 setter
-    : {this.n("set")}? identifier propertyName
+    : {this.n("set")}? identifier classElementName
     ;
 
 identifierName
@@ -455,6 +498,7 @@ identifier
     | NonStrictLet
     | Async
     | As
+    | From
     ;
 
 reservedWord

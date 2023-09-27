@@ -91,6 +91,7 @@ topStatement
     | functionDeclaration
     | classDeclaration
     | globalConstantDeclaration
+    | enumDeclaration
     ;
 
 useDeclaration
@@ -118,7 +119,8 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+        (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -292,7 +294,8 @@ unsetStatement
 
 foreachStatement
     : Foreach
-        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+        ( '(' expression As arrayDestructuring ')'
+        | '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
         | '(' expression As assignable ('=>' '&'? chain)? ')'
         | '(' chain As List '(' assignmentList ')' ')' )
       (statement | ':' innerStatementList EndForeach SemiColon)
@@ -303,7 +306,7 @@ tryCatchFinally
     ;
 
 catchClause
-    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName ')' blockStatement
+    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName? ')' blockStatement
     ;
 
 finallyStatement
@@ -327,7 +330,13 @@ inlineHtmlStatement
     ;
 
 declareList
-    : identifierInitializer (',' identifierInitializer)*
+    : directive (',' directive)*
+    ;
+
+directive
+    : Ticks Eq (numericConstant | Real)
+    | Encoding Eq SingleQuoteString
+    | StrictTypes Eq numericConstant
     ;
 
 formalParameterList
@@ -335,7 +344,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes? memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier* QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -367,7 +376,9 @@ classStatement
     : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
                   | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
                                      | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
-                                       baseCtorCall? methodBody))
+                                       (baseCtorCall | returnTypeDecl)? methodBody
+                                     )
+                  )
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
@@ -397,6 +408,10 @@ baseCtorCall
     : ':' identifier arguments?
     ;
 
+returnTypeDecl
+    : ':' QuestionMark? typeHint
+    ;
+
 methodBody
     : SemiColon
     | blockStatement
@@ -421,6 +436,19 @@ identifierInitializer
 
 globalConstantDeclaration
     : attributes? Const identifierInitializer (',' identifierInitializer)* SemiColon
+    ;
+
+enumDeclaration
+    : Enum_ identifier (Colon (IntType | StringType))? (Implements interfaceList)?
+        OpenCurlyBracket
+            enumItem*
+        CloseCurlyBracket
+    ;
+
+enumItem
+    : Case identifier (Eq expression)? SemiColon
+    | memberModifiers? functionDeclaration
+    | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
 expressionList
@@ -492,6 +520,7 @@ expression
 
     | Throw expression                                          #SpecialWordExpression
 
+    | arrayDestructuring Eq expression                          #ArrayDestructExpression
     | assignable assignmentOperator attributes? expression      #AssignmentExpression
     | assignable Eq attributes? '&' (chain | newExpr)           #AssignmentExpression
 
@@ -507,6 +536,19 @@ assignable
 
 arrayCreation
     : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
+    ;
+
+arrayDestructuring
+    : '[' ','* indexedDestructItem (','+ indexedDestructItem)* ','* ']'
+    | '[' keyedDestructItem (','+ keyedDestructItem)* ','? ']'
+    ;
+
+indexedDestructItem
+    : '&'? chain
+    ;
+
+keyedDestructItem
+    : (expression '=>')? '&'? chain
     ;
 
 lambdaFunctionExpr
@@ -624,6 +666,7 @@ constantInitializer
     | Array '(' (arrayItemList ','?)? ')'
     | '[' (arrayItemList ','?)? ']'
     | ('+' | '-') constantInitializer
+    | (string | constant) ('.' (string | constant))*
     ;
 
 constant
@@ -701,7 +744,7 @@ functionCallName
     ;
 
 actualArguments
-    : genericDynamicArgs? arguments squareCurlyExpression*
+    : genericDynamicArgs? arguments+ squareCurlyExpression*
     ;
 
 chainBase
@@ -798,6 +841,7 @@ identifier
     | Interface
     | IntType
     | IsSet
+    | LambdaFn
     | List
     | LogicalAnd
     | LogicalOr
@@ -812,6 +856,7 @@ identifier
     | Private
     | Protected
     | Public
+    | Readonly
     | Require
     | RequireOnce
     | Resource
@@ -831,6 +876,11 @@ identifier
     | While
     | Yield
     | From
+    | Enum_
+    | Match_
+    | Ticks
+    | Encoding
+    | StrictTypes
 
     | Get
     | Set
@@ -865,6 +915,7 @@ memberModifier
     | Static
     | Abstract
     | Final
+    | Readonly
     ;
 
 magicConstant

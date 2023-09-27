@@ -26,7 +26,7 @@ Star stands for: zero or more
 
 */
 
-module
+module_
     : moduleData EOF
     ;
 
@@ -82,7 +82,7 @@ declaration
     ;
 
 type_
-    : ( TOOLDATA | WOBJDATA | SPEEDDATA | ZONEDATA | CLOCK | BOOL )
+    : TOOLDATA | WOBJDATA | SPEEDDATA | ZONEDATA | CLOCK | BOOL
     ;
 
 init_

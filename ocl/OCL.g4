@@ -5,7 +5,7 @@
 * Arrow operators ->op are used consistently for any OCL 
 * operator, not just collection operators. 
 * 
-* Copyright (c) 2003--2022 Kevin Lano
+* Copyright (c) 2003--2023 Kevin Lano
 * This program and the accompanying materials are made available under the
 * terms of the Eclipse Public License 2.0 which is available at
 * http://www.eclipse.org/legal/epl-2.0
@@ -17,6 +17,10 @@ grammar OCL;
 	
 specification
   : 'package' ID '{' classifier* '}' EOF
+  ;
+
+expressions
+  : expression (';' expression)* ';'? EOF
   ;
 
 classifier
@@ -137,11 +141,11 @@ basicExpression
     | basicExpression '(' expressionList? ')'  
     | basicExpression '[' expression ']' 
     | ID '@pre'  
-    |	INT  
+    | INT  
     | FLOAT_LITERAL
     | STRING_LITERAL
     | ID   
-    |	'(' expression ')'
+    | '(' expression ')'
     ; 
 
 conditionalExpression
@@ -159,13 +163,13 @@ letExpression
     ; 
 
 logicalExpression
-    : logicalExpression '=>' logicalExpression  
-    | logicalExpression 'implies' logicalExpression  
+    : 'not' logicalExpression  
+    | logicalExpression 'and' logicalExpression  
+    | logicalExpression '&' logicalExpression 
     | logicalExpression 'or' logicalExpression  
     | logicalExpression 'xor' logicalExpression  
-    | logicalExpression '&' logicalExpression 
-    | logicalExpression 'and' logicalExpression  
-    | 'not' logicalExpression  
+    | logicalExpression '=>' logicalExpression  
+    | logicalExpression 'implies' logicalExpression  
     | equalityExpression
     ; 
 
@@ -177,16 +181,15 @@ equalityExpression
     ; 
 
 additiveExpression
-    : factorExpression ('+' | '-' | '..' | '|->') 
-                              additiveExpression 
+    : additiveExpression '+' additiveExpression 
+    | additiveExpression '-' factorExpression
+    | factorExpression ('..' | '|->') factorExpression 
     | factorExpression
     ; 
 
 factorExpression 
-    : factorExpression ('*' | '/' | 'mod' | 'div') 
+    : factor2Expression ('*' | '/' | 'mod' | 'div') 
                                    factorExpression 
-    | '-' factorExpression 
-    | '+' factorExpression  
     | factor2Expression
     ; 
 
@@ -195,7 +198,8 @@ factorExpression
 // ->subrange is used for ->substring and ->subSequence
 
 factor2Expression
-  : factor2Expression '->size()' 
+  : ('-' | '+') factor2Expression 
+  | factor2Expression '->size()' 
   | factor2Expression '->copy()'  
   | factor2Expression ('->isEmpty()' | 
                        '->notEmpty()' | 
@@ -346,6 +350,6 @@ fragment Digits
 
 NEWLINE : [\r\n]+ -> skip ;
 INT     : [0-9]+ ;
-ID  :   [a-zA-Z]+[a-zA-Z0-9_$]* ;      // match identifiers
+ID  :   [a-zA-Z$]+[a-zA-Z0-9_$]* ;      // match identifiers
 WS  :   [ \t\n\r]+ -> skip ;
 

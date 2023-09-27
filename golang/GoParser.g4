@@ -1,8 +1,9 @@
 /*
- [The "BSD licence"] Copyright (c) 2017 Sasa Coh, Michał Błotniak Copyright (c) 2019 Ivan Kochurkin,
- kvanttt@gmail.com, Positive Technologies Copyright (c) 2019 Dmitry Rassadin,
- flipparassa@gmail.com,Positive Technologies All rights reserved. Copyright (c) 2021 Martin Mirchev,
- mirchevmartin2203@gmail.com
+ [The "BSD licence"] Copyright (c) 2017 Sasa Coh, Michał Błotniak
+ Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies 
+ Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com,Positive Technologies All rights reserved. 
+ Copyright (c) 2021 Martin Mirchev, mirchevmartin2203@gmail.com
+ Copyright (c) 2023 Dmitry Litovchenko, i@dlitovchenko.ru
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met: 1. Redistributions of source code must retain the
@@ -59,13 +60,25 @@ expressionList: expression (COMMA expression)*;
 
 typeDecl: TYPE (typeSpec | L_PAREN (typeSpec eos)* R_PAREN);
 
-typeSpec: IDENTIFIER ASSIGN? type_;
+typeSpec: aliasDecl | typeDef;
+
+aliasDecl : IDENTIFIER ASSIGN type_;
+
+typeDef : IDENTIFIER typeParameters? type_;
+
+typeParameters : L_BRACKET typeParameterDecl (COMMA typeParameterDecl)* R_BRACKET;
+
+typeParameterDecl : identifierList typeElement;
+
+typeElement : typeTerm (OR typeTerm)*;
+
+typeTerm : UNDERLYING? type_;
 
 // Function declarations
 
-functionDecl: FUNC IDENTIFIER (signature block?);
+functionDecl: FUNC IDENTIFIER typeParameters? signature block?;
 
-methodDecl: FUNC receiver IDENTIFIER ( signature block?);
+methodDecl: FUNC receiver IDENTIFIER signature block?;
 
 receiver: parameters;
 
@@ -128,8 +141,6 @@ assign_op: (
 	)? ASSIGN;
 
 shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
-
-emptyStmt: EOS | SEMI;
 
 labeledStmt: IDENTIFIER COLON statement?;
 
@@ -198,7 +209,9 @@ rangeClause: (
 
 goStmt: GO expression;
 
-type_: typeName | typeLit | L_PAREN type_ R_PAREN;
+type_: typeName typeArgs? | typeLit | L_PAREN type_ R_PAREN;
+
+typeArgs: L_BRACKET typeList COMMA? R_BRACKET;
 
 typeName: qualifiedIdent | IDENTIFIER;
 
@@ -221,7 +234,7 @@ elementType: type_;
 pointerType: STAR type_;
 
 interfaceType:
-	INTERFACE L_CURLY ((methodSpec | typeName) eos)* R_CURLY;
+	INTERFACE L_CURLY ((methodSpec | typeElement ) eos)* R_CURLY;
 
 sliceType: L_BRACKET R_BRACKET elementType;
 
@@ -237,8 +250,7 @@ methodSpec:
 functionType: FUNC signature;
 
 signature:
-	parameters result
-	| parameters;
+	parameters result?;
 
 result: parameters | type_;
 
@@ -284,7 +296,7 @@ primaryExpr:
 	| conversion
 	| methodExpr
 	| primaryExpr (
-		(DOT IDENTIFIER)
+		DOT IDENTIFIER
 		| index
 		| slice_
 		| typeAssertion
@@ -292,11 +304,9 @@ primaryExpr:
 	);
 
 
-conversion: nonNamedType L_PAREN expression COMMA? R_PAREN;
+conversion: type_ L_PAREN expression COMMA? R_PAREN;
 
-nonNamedType: typeLit | L_PAREN nonNamedType R_PAREN;
-
-operand: literal | operandName | L_PAREN expression R_PAREN;
+operand: literal | operandName typeArgs? | L_PAREN expression R_PAREN;
 
 literal: basicLit | compositeLit | functionLit;
 
@@ -326,7 +336,7 @@ literalType:
 	| L_BRACKET ELLIPSIS R_BRACKET elementType
 	| sliceType
 	| mapType
-	| typeName;
+	| typeName typeArgs?;
 
 literalValue: L_CURLY (elementList COMMA?)? R_CURLY;
 
@@ -347,7 +357,7 @@ fieldDecl: (
 
 string_: RAW_STRING_LIT | INTERPRETED_STRING_LIT;
 
-embeddedField: STAR? typeName;
+embeddedField: STAR? typeName typeArgs?;
 
 functionLit: FUNC signature block; // function
 
@@ -363,14 +373,10 @@ typeAssertion: DOT L_PAREN type_ R_PAREN;
 
 arguments:
 	L_PAREN (
-		(expressionList | nonNamedType (COMMA expressionList)?) ELLIPSIS? COMMA?
+		(expressionList | type_ (COMMA expressionList)?) ELLIPSIS? COMMA?
 	)? R_PAREN;
 
-methodExpr: nonNamedType DOT IDENTIFIER;
-
-//receiverType: typeName | '(' ('*' typeName | receiverType) ')';
-
-receiverType: type_;
+methodExpr: type_ DOT IDENTIFIER;
 
 eos:
 	SEMI

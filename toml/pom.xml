@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>toml.g4</include>
+					   <include>TomlLexer.g4</include>
+					   <include>TomlParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>document</entryPoint>
-					<grammarName>toml</grammarName>
+					<grammarName>Toml</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

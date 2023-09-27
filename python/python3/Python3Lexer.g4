@@ -39,6 +39,8 @@ options {
     superClass=Python3LexerBase;
 }
 
+// Insert here @header for C++ lexer.
+
 /*
  * lexer rules
  */

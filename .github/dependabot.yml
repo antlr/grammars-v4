@@ -1,5 +1,17 @@
 version: 2
 updates:
+  # dotnet tools
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+    ignore:
+      - dependency-name: "tr*"
+        update-types: ["version-update:semver-patch"]
+  # Java
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
@@ -15,10 +27,6 @@ updates:
     labels:
       - "infrastructure"
       - "dependencies"
-  # script based multiple runtime test
-  # antlr4cs test is not supported by this repo
-  # cpp cmake is not supported by bot
-  # csharp
   - package-ecosystem: "nuget"
     directory: "/_scripts/templates/CSharp"
     schedule:
@@ -27,19 +35,26 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:csharp-standard"
-  # dart is not supported by bot
-  # go
-  # TODO: go runtime need tagged version, may need another repository
-  # - package-ecosystem: "gomod"
-  #   directory: "/_scripts/templates/Go"
-  #   schedule:
-  #     interval: "daily"
-  #   labels:
-  #     - "infrastructure"
-  #     - "dependencies"
-  #     - "target:go"
-  # java support is unnecessary, it's runtime is in antlr4.jar itself
-  # javascript
+  # Dart
+  - package-ecosystem: "pub"
+    directory: "/_scripts/templates/Dart"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:dart"
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/_scripts/templates/Go"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "all"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # JavaScript
   - package-ecosystem: "npm"
     directory: "/_scripts/templates/JavaScript"
     schedule:
@@ -48,7 +63,7 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:javascript"
-  # php
+  # PHP
   - package-ecosystem: "composer"
     directory: "/_scripts/templates/PHP"
     schedule:
@@ -57,7 +72,7 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:php"
-  # python3
+  # Python3
   - package-ecosystem: "pip"
     directory: "/_scripts/templates/Python3"
     schedule:
@@ -66,3 +81,12 @@ updates:
       - "infrastructure"
       - "dependencies"
       - "target:python3"
+  # TypeScript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/TypeScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:typescript"

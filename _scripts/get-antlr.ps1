@@ -45,7 +45,7 @@ function Test-Response {
 
 # configs
 $mvnRepo = "https://repo1.maven.org/maven2"
-$retry = 5
+$retry = 6
 $retryInterval = 10
 
 # download metadata

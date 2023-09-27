@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar asm8086;
 
+options { caseInsensitive = true; }
+
 prog
    : line* EOF
    ;
@@ -349,181 +351,181 @@ rep
 
 sign : PLUS | MINUS ;
 
-BYTE : B Y T E ;
-WORD : W O R D ;
-DWORD : D W O R D ;
-DSEG : D S E G ;
-CSEG : C S E G ;
-INCLUDE : I N C L U D E ;
-TITLE : T I T L E ;
-END : E N D ;
-ORG : O R G ;
-ENDIF : E N D I F ;
-IF : I F ;
-EQU : E Q U ;
-DW : D W ;
-DB : D B ;
-DD : D D ;
-PTR : P T R ;
-OFFSET : O F F S E T ;
-RW : R W ;
-RB : R B ;
-RS : R S ;
-LENGTH : L E N G T H ;
-EQ : E Q ;
-NE : N E ;
-MOD : M O D ;
+BYTE: 'BYTE';
+WORD: 'WORD';
+DWORD: 'DWORD';
+DSEG: 'DSEG';
+CSEG: 'CSEG';
+INCLUDE: 'INCLUDE';
+TITLE: 'TITLE';
+END: 'END';
+ORG: 'ORG';
+ENDIF: 'ENDIF';
+IF: 'IF';
+EQU: 'EQU';
+DW: 'DW';
+DB: 'DB';
+DD: 'DD';
+PTR: 'PTR';
+OFFSET: 'OFFSET';
+RW: 'RW';
+RB: 'RB';
+RS: 'RS';
+LENGTH: 'LENGTH';
+EQ: 'EQ';
+NE: 'NE';
+MOD: 'MOD';
 
 COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
 
-AH : A H ;
-AL : A L ;
-BH : B H ;
-BL : B L ;
-CH : C H ;
-CL : C L ;
-DH : D H ;
-DL : D L ;
-AX : A X ;
-BX : B X ;
-CX : C X ;
-DX : D X ;
-CI : C I ;
-DI : D I ;
-BP : B P ;
-SP : S P ;
-IP : I P ;
-CS : C S ;
-DS : D S ;
-ES : E S ;
-SS : S S ;
+AH: 'AH';
+AL: 'AL';
+BH: 'BH';
+BL: 'BL';
+CH: 'CH';
+CL: 'CL';
+DH: 'DH';
+DL: 'DL';
+AX: 'AX';
+BX: 'BX';
+CX: 'CX';
+DX: 'DX';
+CI: 'CI';
+DI: 'DI';
+BP: 'BP';
+SP: 'SP';
+IP: 'IP';
+CS: 'CS';
+DS: 'DS';
+ES: 'ES';
+SS: 'SS';
 
-AAA : A A A ;
-AAD : A A D ;
-AAM : A A M ;
-AAS : A A S ;
-ADC : A D C ;
-ADD : A D D ;
-AND : A N D ;
-CALL : C A L L ;
-CBW : C B W ;
-CLC : C L C ;
-CLD : C L D ;
-CLI : C L I ;
-CMC : C M C ;
-CMP : C M P ;
-CMPSB : C M P S B ;
-CMPSW : C M P S W ;
-CWD : C W D ;
-DAA : D A A ;
-DAS : D A S ;
-DEC : D E C ;
-DIV : D I V ;
-ESC : E S C ;
-HLT : H L T ;
-IDIV : I D I V ;
-IMUL : I M U L ;
-IN : I N ;
-INC : I N C ;
-INT : I N T ;
-INTO : I N T O ;
-IRET : I R E T ;
-JA : J A ;
-JAE : J A E ;
-JB : J B ;
-JBE : J B E ;
-JC : J C ;
-JE : J E ;
-JG : J G ;
-JGE : J G E ;
-JL : J L ;
-JLE : J L E ;
-JNA : J N A ;
-JNAE : J N A E ;
-JNB : J N B ;
-JNBE : J N B E ;
-JNC : J N C ;
-JNE : J N E ;
-JNG : J N G ;
-JNGE : J N G E ;
-JNL : J N L ;
-JNLE : J N L E ;
-JNO : J N O ;
-JNP : J N P ;
-JNS : J N S ;
-JNZ : J N Z ;
-JO : J O ;
-JP : J P ;
-JPE : J P E ;
-JPO : J P O ;
-JS : J S ;
-JZ : J Z ;
-JCXZ : J C X Z ;
-JMP : J M P ;
-JMPS : J M P S ;
-JMPF : J M P F ;
-LAHF : L A H F ;
-LDS : L D S ;
-LEA : L E A ;
-LES : L E S ;
-LOCK : L O C K ;
-LODS : L O D S ;
-LODSB : L O D S B ;
-LODSW : L O D S W ;
-LOOP : L O O P ;
-LOOPE : L O O P E ;
-LOOPNE : L O O P N E ;
-LOOPNZ : L O O P N Z ;
-LOOPZ : L O O P Z ;
-MOV : M O V ;
-MOVS : M O V S ;
-MOVSB : M O V S B ;
-MOVSW : M O V S W ;
-MUL : M U L ;
-NEG : N E G ;
-NOP : N O P ;
-NOT : N O T ;
-OR : O R ;
-OUT : O U T ;
-POP : P O P ;
-POPF : P O P F ;
-PUSH : P U S H ;
-PUSHF : P U S H F ;
-RCL : R C L ;
-RCR : R C R ;
-RET : R E T ;
-RETN : R E T N ;
-RETF : R E T F ;
-ROL : R O L ;
-ROR : R O R ;
-SAHF : S A H F ;
-SAL : S A L ;
-SAR : S A R ;
-SALC : S A L C ;
-SBB : S B B ;
-SCASB : S C A S B ;
-SCASW : S C A S W ;
-SHL : S H L ;
-SHR : S H R ;
-STC : S T C ;
-STD : S T D ;
-STI : S T I ;
-STOSB : S T O S B ;
-STOSW : S T O S W ;
-SUB : S U B ;
-TEST : T E S T ;
-WAIT : W A I T ;
-XCHG : X C H G ;
-XLAT : X L A T ;
-XOR : X O R ;
+AAA: 'AAA';
+AAD: 'AAD';
+AAM: 'AAM';
+AAS: 'AAS';
+ADC: 'ADC';
+ADD: 'ADD';
+AND: 'AND';
+CALL: 'CALL';
+CBW: 'CBW';
+CLC: 'CLC';
+CLD: 'CLD';
+CLI: 'CLI';
+CMC: 'CMC';
+CMP: 'CMP';
+CMPSB: 'CMPSB';
+CMPSW: 'CMPSW';
+CWD: 'CWD';
+DAA: 'DAA';
+DAS: 'DAS';
+DEC: 'DEC';
+DIV: 'DIV';
+ESC: 'ESC';
+HLT: 'HLT';
+IDIV: 'IDIV';
+IMUL: 'IMUL';
+IN: 'IN';
+INC: 'INC';
+INT: 'INT';
+INTO: 'INTO';
+IRET: 'IRET';
+JA: 'JA';
+JAE: 'JAE';
+JB: 'JB';
+JBE: 'JBE';
+JC: 'JC';
+JE: 'JE';
+JG: 'JG';
+JGE: 'JGE';
+JL: 'JL';
+JLE: 'JLE';
+JNA: 'JNA';
+JNAE: 'JNAE';
+JNB: 'JNB';
+JNBE: 'JNBE';
+JNC: 'JNC';
+JNE: 'JNE';
+JNG: 'JNG';
+JNGE: 'JNGE';
+JNL: 'JNL';
+JNLE: 'JNLE';
+JNO: 'JNO';
+JNP: 'JNP';
+JNS: 'JNS';
+JNZ: 'JNZ';
+JO: 'JO';
+JP: 'JP';
+JPE: 'JPE';
+JPO: 'JPO';
+JS: 'JS';
+JZ: 'JZ';
+JCXZ: 'JCXZ';
+JMP: 'JMP';
+JMPS: 'JMPS';
+JMPF: 'JMPF';
+LAHF: 'LAHF';
+LDS: 'LDS';
+LEA: 'LEA';
+LES: 'LES';
+LOCK: 'LOCK';
+LODS: 'LODS';
+LODSB: 'LODSB';
+LODSW: 'LODSW';
+LOOP: 'LOOP';
+LOOPE: 'LOOPE';
+LOOPNE: 'LOOPNE';
+LOOPNZ: 'LOOPNZ';
+LOOPZ: 'LOOPZ';
+MOV: 'MOV';
+MOVS: 'MOVS';
+MOVSB: 'MOVSB';
+MOVSW: 'MOVSW';
+MUL: 'MUL';
+NEG: 'NEG';
+NOP: 'NOP';
+NOT: 'NOT';
+OR: 'OR';
+OUT: 'OUT';
+POP: 'POP';
+POPF: 'POPF';
+PUSH: 'PUSH';
+PUSHF: 'PUSHF';
+RCL: 'RCL';
+RCR: 'RCR';
+RET: 'RET';
+RETN: 'RETN';
+RETF: 'RETF';
+ROL: 'ROL';
+ROR: 'ROR';
+SAHF: 'SAHF';
+SAL: 'SAL';
+SAR: 'SAR';
+SALC: 'SALC';
+SBB: 'SBB';
+SCASB: 'SCASB';
+SCASW: 'SCASW';
+SHL: 'SHL';
+SHR: 'SHR';
+STC: 'STC';
+STD: 'STD';
+STI: 'STI';
+STOSB: 'STOSB';
+STOSW: 'STOSW';
+SUB: 'SUB';
+TEST: 'TEST';
+WAIT: 'WAIT';
+XCHG: 'XCHG';
+XLAT: 'XLAT';
+XOR: 'XOR';
 
-REP : R E P ;
-REPE : R E P E ;
-REPNE : R E P N E ;
-REPNZ : R E P N Z ;
-REPZ : R E P Z ;
+REP: 'REP';
+REPE: 'REPE';
+REPNE: 'REPNE';
+REPNZ: 'REPNZ';
+REPZ: 'REPZ';
 
 
 STAR : '*' ;
@@ -543,11 +545,11 @@ RB_ : ']' ;
 
 
 NAME
-   : [.a-zA-Z] [a-zA-Z0-9."_]*
+   : [.A-Z] [A-Z0-9."_]*
    ;
 
 NUMBER
-   : [0-9a-fA-F] + ('H' | 'h')?
+   : [0-9A-F] + 'H'?
    ;
 
 STRING
@@ -560,109 +562,4 @@ EOL
 
 WS
    : [ \t] -> skip
-   ;
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-fragment Z
-   : ('z' | 'Z')
    ;

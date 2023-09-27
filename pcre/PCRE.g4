@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 by Bart Kiers
+ * Copyright (c) 2014-2023 by Bart Kiers
  *
  * The MIT license.
  *
@@ -27,711 +27,412 @@
  * Project      : PCRE Parser, an ANTLR 4 grammar for PCRE
  * Developed by : Bart Kiers, bart@big-o.nl
  * Also see     : https://github.com/bkiers/pcre-parser
+ *
+ * Based on http://www.pcre.org/pcre.txt
+ * (REVISION Last updated: 14 June 2021)
  */
 grammar PCRE;
 
-// Most single line comments above the lexer- and  parser rules
-// are copied from the official PCRE man pages (last updated:
-// 10 January 2012): http://www.pcre.org/pcre.txt
-parse
- : alternation EOF
+pcre
+ :  alternation? EOF
  ;
 
-// ALTERNATION
-//
-//         expr|expr|expr...
 alternation
- : expr ('|' expr)*
+ : expr ( '|' expr? )*
  ;
 
 expr
- : element*
+ : element+
  ;
 
 element
  : atom quantifier?
  ;
 
-// QUANTIFIERS
-//
-//         ?           0 or 1, greedy
-//         ?+          0 or 1, possessive
-//         ??          0 or 1, lazy
-//         *           0 or more, greedy
-//         *+          0 or more, possessive
-//         *?          0 or more, lazy
-//         +           1 or more, greedy
-//         ++          1 or more, possessive
-//         +?          1 or more, lazy
-//         {n}         exactly n
-//         {n,m}       at least n, no more than m, greedy
-//         {n,m}+      at least n, no more than m, possessive
-//         {n,m}?      at least n, no more than m, lazy
-//         {n,}        n or more, greedy
-//         {n,}+       n or more, possessive
-//         {n,}?       n or more, lazy
-quantifier
- : '?' quantifier_type
- | '+' quantifier_type
- | '*' quantifier_type
- | '{' number '}' quantifier_type
- | '{' number ',' '}' quantifier_type
- | '{' number ',' number '}' quantifier_type
+atom
+ : option_setting
+ | backtracking_control
+ | callout
+ | capture
+ | atomic_group
+ | lookaround
+ | backreference
+ | subroutine_reference
+ | conditional_pattern
+ | comment
+ | character
+ | character_type
+ | character_class
+ | posix_character_class
+ | letter
+ | digit
+ | anchor
+ | match_point_reset
+ | quoting
+ | other
  ;
 
-quantifier_type
- : '+'
- | '?'
- | /* nothing */
+capture
+ : '(' ( alternation
+       | '?' ( '<' name '>' alternation
+             | '\'' name '\'' alternation
+             | 'P' '<' name '>' alternation
+             | ( option_setting_flag+ ( '-' option_setting_flag+ )? )? ':' alternation
+             | '|' alternation
+             )
+       )
+   ')'
  ;
 
-// CHARACTER CLASSES
-//
-//         [...]       positive character class
-//         [^...]      negative character class
-//         [x-y]       range (can be used for hex characters)
-//         [[:xxx:]]   positive POSIX named set
-//         [[:^xxx:]]  negative POSIX named set
-//
-//         alnum       alphanumeric
-//         alpha       alphabetic
-//         ascii       0-127
-//         blank       space or tab
-//         cntrl       control character
-//         digit       decimal digit
-//         graph       printing, excluding space
-//         lower       lower case letter
-//         print       printing, including space
-//         punct       printing, excluding alphanumeric
-//         space       white space
-//         upper       upper case letter
-//         word        same as \w
-//         xdigit      hexadecimal digit
-//
-//       In PCRE, POSIX character set names recognize only ASCII  characters  by
-//       default,  but  some  of them use Unicode properties if PCRE_UCP is set.
-//       You can use \Q...\E inside a character class.
-character_class
- : '[' '^' CharacterClassEnd Hyphen cc_atom+ ']'
- | '[' '^' CharacterClassEnd cc_atom* ']'
- | '[' '^' cc_atom+ ']'
- | '[' CharacterClassEnd Hyphen cc_atom+ ']'
- | '[' CharacterClassEnd cc_atom* ']'
- | '[' cc_atom+ ']'
+atomic_group
+ : '(' '?' '>' alternation ')'
  ;
 
-// BACKREFERENCES
-//
-//         \n              reference by number (can be ambiguous)
-//         \gn             reference by number
-//         \g{n}           reference by number
-//         \g{-n}          relative reference by number
-//         \k<name>        reference by name (Perl)
-//         \k'name'        reference by name (Perl)
-//         \g{name}        reference by name (Perl)
-//         \k{name}        reference by name (.NET)
-//         (?P=name)       reference by name (Python)
+lookaround
+ : '(' '?' ( '=' | '!' | '<' '=' | '<' '!' ) alternation ')'
+ ;
+
 backreference
- : backreference_or_octal
- | '\\g' number
- | '\\g' '{' number '}'
- | '\\g' '{' '-' number '}'
- | '\\k' '<' name '>'
- | '\\k' '\'' name '\''
- | '\\g' '{' name '}'
- | '\\k' '{' name '}'
+ : '\\' ( 'g' digits
+        | 'g' '{' '-'? digits '}'
+        | 'g' '{' name '}'
+        | 'k' '<' name '>'
+        | 'k' '\'' name '\''
+        | 'k' '{' name '}'
+        )
  | '(' '?' 'P' '=' name ')'
  ;
 
-backreference_or_octal
- : octal_char
- | Backslash digit
- ;
-
-// CAPTURING
-//
-//         (...)           capturing group
-//         (?<name>...)    named capturing group (Perl)
-//         (?'name'...)    named capturing group (Perl)
-//         (?P<name>...)   named capturing group (Python)
-//         (?:...)         non-capturing group
-//         (?|...)         non-capturing group; reset group numbers for
-//                          capturing groups in each alternative
-//
-// ATOMIC GROUPS
-//
-//         (?>...)         atomic, non-capturing group
-capture
- : '(' '?' '<' name '>' alternation ')'
- | '(' '?''\'' name '\'' alternation ')'
- | '(' '?' 'P' '<' name '>' alternation ')'
- | '(' alternation ')'
- ;
-
-non_capture
- : '(' '?' ':' alternation ')'
- | '(' '?' '|' alternation ')'
- | '(' '?' '>' alternation ')'
- | '(' '?' option_flags ':' alternation ')'
- ;
-
-// COMMENT
-//
-//         (?#....)        comment (not nestable)
-comment
- : '(' '?' '#' non_close_parens ')'
- ;
-
-// OPTION SETTING
-//
-//         (?i)            caseless
-//         (?J)            allow duplicate names
-//         (?m)            multiline
-//         (?s)            single line (dotall)
-//         (?U)            default ungreedy (lazy)
-//         (?x)            extended (ignore white space)
-//         (?-...)         unset option(s)
-//
-//       The following are recognized only at the start of a  pattern  or  after
-//       one of the newline-setting options with similar syntax:
-//
-//         (*NO_START_OPT) no start-match optimization (PCRE_NO_START_OPTIMIZE)
-//         (*UTF8)         set UTF-8 mode: 8-bit library (PCRE_UTF8)
-//         (*UTF16)        set UTF-16 mode: 16-bit library (PCRE_UTF16)
-//         (*UCP)          set PCRE_UCP (use Unicode properties for \d etc)
-option
- : '(' '?' option_flags '-' option_flags ')'
- | '(' '?' option_flags ')'
- | '(' '?' '-' option_flags ')'
- | '(' '*' 'N' 'O' '_' 'S' 'T' 'A' 'R' 'T' '_' 'O' 'P' 'T' ')'
- | '(' '*' 'U' 'T' 'F' '8' ')'
- | '(' '*' 'U' 'T' 'F' '1' '6' ')'
- | '(' '*' 'U' 'C' 'P' ')'
- ;
-
-option_flags
- : option_flag+
- ;
-
-option_flag
- : 'i'
- | 'J'
- | 'm'
- | 's'
- | 'U'
- | 'x'
- ;
-
-// LOOKAHEAD AND LOOKBEHIND ASSERTIONS
-//
-//         (?=...)         positive look ahead
-//         (?!...)         negative look ahead
-//         (?<=...)        positive look behind
-//         (?<!...)        negative look behind
-//
-//       Each top-level branch of a look behind must be of a fixed length.
-look_around
- : '(' '?' '=' alternation ')'
- | '(' '?' '!' alternation ')'
- | '(' '?' '<' '=' alternation ')'
- | '(' '?' '<' '!' alternation ')'
- ;
-
-// SUBROUTINE REFERENCES (POSSIBLY RECURSIVE)
-//
-//         (?R)            recurse whole pattern
-//         (?n)            call subpattern by absolute number
-//         (?+n)           call subpattern by relative number
-//         (?-n)           call subpattern by relative number
-//         (?&name)        call subpattern by name (Perl)
-//         (?P>name)       call subpattern by name (Python)
-//         \g<name>        call subpattern by name (Oniguruma)
-//         \g'name'        call subpattern by name (Oniguruma)
-//         \g<n>           call subpattern by absolute number (Oniguruma)
-//         \g'n'           call subpattern by absolute number (Oniguruma)
-//         \g<+n>          call subpattern by relative number (PCRE extension)
-//         \g'+n'          call subpattern by relative number (PCRE extension)
-//         \g<-n>          call subpattern by relative number (PCRE extension)
-//         \g'-n'          call subpattern by relative number (PCRE extension)
 subroutine_reference
- : '(' '?' 'R' ')'
- | '(' '?' number ')'
- | '(' '?' '+' number ')'
- | '(' '?' '-' number ')'
- | '(' '?' '&' name ')'
- | '(' '?' 'P' '>' name ')'
- | '\\g' '<' name '>'
- | '\\g' '\'' name '\''
- | '\\g' '<' number '>'
- | '\\g' '\'' number '\''
- | '\\g' '<' '+' number '>'
- | '\\g' '\'' '+' number '\''
- | '\\g' '<' '-' number '>'
- | '\\g' '\'' '-' number '\''
+ : '(' '?' ( 'R'
+           | ( '+' | '-' )? digits
+           | '&' name
+           | 'P' '>' name
+           )
+   ')'
+ | '\\' 'g' ( '<' name '>'
+            | '\'' name '\''
+            | '<' ( '+' | '-' )? digits '>'
+            | '\'' ( '+' | '-' )? digits '\''
+            )
  ;
 
-// CONDITIONAL PATTERNS
-//
-//         (?(condition)yes-pattern)
-//         (?(condition)yes-pattern|no-pattern)
-//
-//         (?(n)...        absolute reference condition
-//         (?(+n)...       relative reference condition
-//         (?(-n)...       relative reference condition
-//         (?(<name>)...   named reference condition (Perl)
-//         (?('name')...   named reference condition (Perl)
-//         (?(name)...     named reference condition (PCRE)
-//         (?(R)...        overall recursion condition
-//         (?(Rn)...       specific group recursion condition
-//         (?(R&name)...   specific recursion condition
-//         (?(DEFINE)...   define subpattern for reference
-//         (?(assert)...   assertion condition
-conditional
- : '(' '?' '(' number ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' '+' number ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' '-' number ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' '<' name '>' ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' '\'' name '\'' ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' 'R' number ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' 'R' ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' 'R' '&' name ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' 'D' 'E' 'F' 'I' 'N' 'E' ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' 'a' 's' 's' 'e' 'r' 't' ')' alternation ('|' alternation)? ')'
- | '(' '?' '(' name ')' alternation ('|' alternation)? ')'
+conditional_pattern
+ : '(' '?' ( '(' ( ( '+' | '-' )? digits
+                 | '<' name '>'
+                 | '\'' name '\''
+                 | 'R' digits?
+                 | 'R' '&' name
+                 | name
+                 )
+             ')'
+           | callout
+           | lookaround
+           )
+           expr
+   ( '|' no_pattern=expr )? ')'
  ;
 
-// BACKTRACKING CONTROL
-//
-//       The following act immediately they are reached:
-//
-//         (*ACCEPT)       force successful match
-//         (*FAIL)         force backtrack; synonym (*F)
-//         (*MARK:NAME)    set name to be passed back; synonym (*:NAME)
-//
-//       The  following  act only when a subsequent match failure causes a back-
-//       track to reach them. They all force a match failure, but they differ in
-//       what happens afterwards. Those that advance the start-of-match point do
-//       so only if the pattern is not anchored.
-//
-//         (*COMMIT)       overall failure, no advance of starting point
-//         (*PRUNE)        advance to next starting character
-//         (*PRUNE:NAME)   equivalent to (*MARK:NAME)(*PRUNE)
-//         (*SKIP)         advance to current matching position
-//         (*SKIP:NAME)    advance to position corresponding to an earlier
-//                         (*MARK:NAME); if not found, the (*SKIP) is ignored
-//         (*THEN)         local failure, backtrack to next alternation
-//         (*THEN:NAME)    equivalent to (*MARK:NAME)(*THEN)
-backtrack_control
- : '(' '*' 'A' 'C' 'C' 'E' 'P' 'T' ')'
- | '(' '*' 'F' ('A' 'I' 'L')? ')'
- | '(' '*' ('M' 'A' 'R' 'K')? ':' 'N' 'A' 'M' 'E' ')'
- | '(' '*' 'C' 'O' 'M' 'M' 'I' 'T' ')'
- | '(' '*' 'P' 'R' 'U' 'N' 'E' ')'
- | '(' '*' 'P' 'R' 'U' 'N' 'E' ':' 'N' 'A' 'M' 'E' ')'
- | '(' '*' 'S' 'K' 'I' 'P' ')'
- | '(' '*' 'S' 'K' 'I' 'P' ':' 'N' 'A' 'M' 'E' ')'
- | '(' '*' 'T' 'H' 'E' 'N' ')'
- | '(' '*' 'T' 'H' 'E' 'N' ':' 'N' 'A' 'M' 'E' ')'
+comment
+ : '(' '?' '#' ~')'+ ')'
  ;
 
-// NEWLINE CONVENTIONS
-//capture
-//       These are recognized only at the very start of the pattern or  after  a
-//       (*BSR_...), (*UTF8), (*UTF16) or (*UCP) option.
-//
-//         (*CR)           carriage return only
-//         (*LF)           linefeed only
-//         (*CRLF)         carriage return followed by linefeed
-//         (*ANYCRLF)      all three of the above
-//         (*ANY)          any Unicode newline sequence
-//
-// WHAT \R MATCHES
-//
-//       These  are  recognized only at the very start of the pattern or after a
-//       (*...) option that sets the newline convention or a UTF or UCP mode.
-//
-//         (*BSR_ANYCRLF)  CR, LF, or CRLF
-//         (*BSR_UNICODE)  any Unicode newline sequence
-newline_convention
- : '(' '*' 'C' 'R' ')'
- | '(' '*' 'L' 'F' ')'
- | '(' '*' 'C' 'R' 'L' 'F' ')'
- | '(' '*' 'A' 'N' 'Y' 'C' 'R' 'L' 'F' ')'
- | '(' '*' 'A' 'N' 'Y' ')'
- | '(' '*' 'B' 'S' 'R' '_' 'A' 'N' 'Y' 'C' 'R' 'L' 'F' ')'
- | '(' '*' 'B' 'S' 'R' '_' 'U' 'N' 'I' 'C' 'O' 'D' 'E' ')'
+quantifier
+ : ( '?' | '*' | '+' ) ( possessive='+' | lazy='?' )?
+ | '{' from=digits ( ',' to=digits? )? '}' ( possessive='+' | lazy='?' )?
  ;
 
-// CALLOUTS
-//
-//         (?C)      callout
-//         (?Cn)     callout with data n
+option_setting
+ : '(' ( '*' ( utf ( '8' | '1' '6' | '3' '2' )?
+             | ucp
+             | no_auto_possess
+             | no_start_opt
+             | newline_conventions
+             | limit_match '=' digits
+             | limit_recursion '=' digits
+             | bsr_anycrlf
+             | bsr_unicode
+             )
+       | '?' ( option_setting_flag+ ( '-' option_setting_flag+ )?
+             | '-' option_setting_flag+
+             )
+       )
+   ')'
+ ;
+
+option_setting_flag
+ : 'i' | 'J' | 'm' | 's' | 'U' | 'x'
+ ;
+
+backtracking_control
+ : '(' '*' ( accept_
+           | fail
+           | mark? ':' name
+           | commit
+           | prune ( ':' name )?
+           | skip ( ':' name )?
+           | then ( ':' name )?
+           )
+   ')'
+ ;
+
 callout
- : '(' '?' 'C' ')'
- | '(' '?' 'C' number ')'
+ : '(' '?' 'C' digits? ')'
  ;
 
-atom
- : subroutine_reference
- | shared_atom
- | literal
- | character_class
- | capture
- | non_capture
- | comment
- | option
- | look_around
- | backreference
- | conditional
- | backtrack_control
- | newline_convention
- | callout
- | Dot
- | Caret
- | StartOfSubject
- | WordBoundary
- | NonWordBoundary
- | EndOfSubjectOrLine
- | EndOfSubjectOrLineEndOfSubject
- | EndOfSubject
- | PreviousMatchInSubject
- | ResetStartMatch
- | OneDataUnit
- | ExtendedUnicodeChar
+newline_conventions
+ : cr
+ | lf
+ | crlf
+ | anycrlf
+ | any
  ;
 
-cc_atom
- : cc_literal Hyphen cc_literal
- | shared_atom
- | cc_literal
- | backreference_or_octal // only octal is valid in a cc
+character
+ : '\\' ( 'a'
+        | 'c' .
+        | 'e'
+        | 'f'
+        | 'n'
+        | 'r'
+        | 't'
+        | digit ( digit digit? )? // can also be a backreference
+        | 'o' '{' digit digit digit+ '}'
+        | 'x' hex hex
+        | 'x' '{' hex hex hex+ '}'
+        | 'u' hex hex hex hex ( hex hex hex hex )?
+        )
  ;
 
-shared_atom
- : POSIXNamedSet
- | POSIXNegatedNamedSet
- | ControlChar
- | DecimalDigit
- | NotDecimalDigit
- | HorizontalWhiteSpace
- | NotHorizontalWhiteSpace
- | NotNewLine
- | CharWithProperty
- | CharWithoutProperty
- | NewLineSequence
- | WhiteSpace
- | NotWhiteSpace
- | VerticalWhiteSpace
- | NotVerticalWhiteSpace
- | WordChar
- | NotWordChar
- | Backslash . // will match "unfinished" escape sequences, like `\x`
+character_type
+ : '.'
+ | '\\' ( 'C'
+        | 'd'
+        | 'D'
+        | 'h'
+        | 'H'
+        | 'N'
+        | 'p' '{' '^'? name '&'? '}'
+        | 'P' '{' name '&'? '}'
+        | 'p' letter letter?
+        | 'R'
+        | 's'
+        | 'S'
+        | 'v'
+        | 'V'
+        | 'w'
+        | 'W'
+        | 'X'
+        )
  ;
 
-literal
- : shared_literal
- | CharacterClassEnd
+character_class
+ : '[' negate='^'? ']' character_class_atom* ']'
+ | '[' negate='^'? character_class_atom+ ']'
  ;
 
-cc_literal
- : shared_literal
- | Dot
- | CharacterClassStart
- | Caret
- | QuestionMark
- | Plus
- | Star
- | WordBoundary
- | EndOfSubjectOrLine
- | Pipe
- | OpenParen
- | CloseParen
+character_class_atom
+ : character_class_range
+ | posix_character_class
+ | character
+ | character_type
+ | '\\' .
+ | ~( '\\' | ']' )
  ;
 
-shared_literal
- : octal_char
- | letter
- | digit
- | BellChar
- | EscapeChar
- | FormFeed
- | NewLine
- | CarriageReturn
- | Tab
- | HexChar
- | Quoted
- | BlockQuoted
- | OpenBrace
- | CloseBrace
- | Comma
- | Hyphen
- | LessThan
- | GreaterThan
- | SingleQuote
- | Underscore
- | Colon
- | Hash
- | Equals
- | Exclamation
- | Ampersand
- | OtherChar
+character_class_range
+ : character_class_range_atom '-' character_class_range_atom
  ;
 
-number
- : digits
+character_class_range_atom
+ : character
+ | ~']'
  ;
 
-octal_char
- : ( Backslash (D0 | D1 | D2 | D3) octal_digit octal_digit
-   | Backslash octal_digit octal_digit
-   )
-
+posix_character_class
+ : '[:' negate='^'? letters ':]'
  ;
 
-octal_digit
- : D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7
+anchor
+ : '\\' ( 'b' | 'B' | 'A' | 'z' | 'Z' | 'G' )
+ | '^'
+ | '$'
  ;
 
-digits
- : digit+
+match_point_reset
+ : '\\' 'K'
  ;
 
-digit
- : D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9
+quoting
+ : '\\' .
+ | '\\' 'Q' .*? '\\' 'E'
+ ;
+
+// Helper rules
+digits : digit+;
+digit : D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9;
+hex : digit | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+letters : letter+;
+
+letter
+ : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+ | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+ | '_'
  ;
 
 name
- : alpha_nums
+ : letter ( letter | digit )*
  ;
 
-alpha_nums
- : (letter | Underscore) (letter | Underscore | digit)*
+other
+ : '}'
+ | ']'
+ | ','
+ | '-'
+ | '_'
+ | '='
+ | '&'
+ | '<'
+ | '>'
+ | '\''
+ | ':'
+ | '#'
+ | '!'
+ | OTHER
  ;
 
-non_close_parens
- : non_close_paren+
- ;
+utf : 'U' 'T' 'F';
+ucp : 'U' 'C' 'P';
+no_auto_possess : 'N' 'O' '_' 'A' 'U' 'T' 'O' '_' 'P' 'O' 'S' 'S' 'E' 'S' 'S';
+no_start_opt : 'N' 'O' '_' 'S' 'T' 'A' 'R' 'T' '_' 'O' 'P' 'T';
+cr : 'C' 'R';
+lf : 'L' 'F';
+crlf : 'C' 'R' 'L' 'F';
+anycrlf : 'A' 'N' 'Y' 'C' 'R' 'L' 'F';
+any : 'A' 'N' 'Y';
+limit_match : 'L' 'I' 'M' 'I' 'T' '_' 'M' 'A' 'T' 'C' 'H';
+limit_recursion : 'L' 'I' 'M' 'I' 'T' '_' 'R' 'E' 'C' 'U' 'R' 'S' 'I' 'O' 'N';
+bsr_anycrlf : 'B' 'S' 'R' '_' 'A' 'N' 'Y' 'C' 'R' 'L' 'F';
+bsr_unicode : 'B' 'S' 'R' '_' 'U' 'N' 'I' 'C' 'O' 'D' 'E';
+accept_ : 'A' 'C' 'C' 'E' 'P' 'T';
+fail : 'F' ( 'A' 'I' 'L' )?;
+mark : 'M' 'A' 'R' 'K';
+commit : 'C' 'O' 'M' 'M' 'I' 'T';
+prune : 'P' 'R' 'U' 'N' 'E';
+skip : 'S' 'K' 'I' 'P';
+then : 'T' 'H' 'E' 'N';
 
-non_close_paren
- : ~CloseParen
- ;
+/// \      general escape character with several uses
+BSlash : '\\';
 
-letter
- : ALC | BLC | CLC | DLC | ELC | FLC | GLC | HLC | ILC | JLC | KLC | LLC | MLC | NLC | OLC | PLC | QLC | RLC | SLC | TLC | ULC | VLC | WLC | XLC | YLC | ZLC |
-   AUC | BUC | CUC | DUC | EUC | FUC | GUC | HUC | IUC | JUC | KUC | LUC | MUC | NUC | OUC | PUC | QUC | RUC | SUC | TUC | UUC | VUC | WUC | XUC | YUC | ZUC
- ;
+/// $      assert end of string (or line, in multiline mode)
+Dollar : '$';
 
-// QUOTING
-//
-//         \x         where x is non-alphanumeric is a literal x
-//         \Q...\E    treat enclosed characters as literal
-Quoted      : '\\' NonAlphaNumeric;
-BlockQuoted : '\\Q' .*? '\\E';
+/// .      match any character except newline (by default)
+Dot : '.';
 
-// CHARACTERS
-//
-//         \a         alarm, that is, the BEL character (hex 07)
-//         \cx        "control-x", where x is any ASCII character
-//         \e         escape (hex 1B)
-//         \f         form feed (hex 0C)
-//         \n         newline (hex 0A)
-//         \r         carriage return (hex 0D)
-//         \t         tab (hex 09)
-//         \ddd       character with octal code ddd, or backreference
-//         \xhh       character with hex code hh
-//         \x{hhh..}  character with hex code hhh..
-BellChar       : '\\a';
-ControlChar    : '\\c' ASCII;
-EscapeChar     : '\\e';
-FormFeed       : '\\f';
-NewLine        : '\\n';
-CarriageReturn : '\\r';
-Tab            : '\\t';
-Backslash      : '\\';
-HexChar        : '\\x' ( HexDigit HexDigit
-                       | '{' HexDigit HexDigit HexDigit+ '}'
-                       )
-               ;
+/// [      start character class definition
+OBrack : '[';
 
-// CHARACTER TYPES
-//
-//         .          any character except newline;
-//                      in dotall mode, any character whatsoever
-//         \C         one data unit, even in UTF mode (best avoided)
-//         \d         a decimal digit
-//         \D         a character that is not a decimal digit
-//         \h         a horizontal white space character
-//         \H         a character that is not a horizontal white space character
-//         \N         a character that is not a newline
-//         \p{xx}     a character with the xx property
-//         \P{xx}     a character without the xx property
-//         \R         a newline sequence
-//         \s         a white space character
-//         \S         a character that is not a white space character
-//         \v         a vertical white space character
-//         \V         a character that is not a vertical white space character
-//         \w         a "word" character
-//         \W         a "non-word" character
-//         \X         an extended Unicode sequence
-//
-//       In  PCRE,  by  default, \d, \D, \s, \S, \w, and \W recognize only ASCII
-//       characters, even in a UTF mode. However, this can be changed by setting
-//       the PCRE_UCP option.
-Dot                     : '.';
-OneDataUnit             : '\\C';
-DecimalDigit            : '\\d';
-NotDecimalDigit         : '\\D';
-HorizontalWhiteSpace    : '\\h';
-NotHorizontalWhiteSpace : '\\H';
-NotNewLine              : '\\N';
-CharWithProperty        : '\\p{' UnderscoreAlphaNumerics '}';
-CharWithoutProperty     : '\\P{' UnderscoreAlphaNumerics '}';
-NewLineSequence         : '\\R';
-WhiteSpace              : '\\s';
-NotWhiteSpace           : '\\S';
-VerticalWhiteSpace      : '\\v';
-NotVerticalWhiteSpace   : '\\V';
-WordChar                : '\\w';
-NotWordChar             : '\\W';
-ExtendedUnicodeChar     : '\\X';
+/// ^      assert start of string (or line, in multiline mode)
+Caret : '^';
 
-// CHARACTER CLASSES
-//
-//         [...]       positive character class
-//         [^...]      negative character class
-//         [x-y]       range (can be used for hex characters)
-//         [[:xxx:]]   positive POSIX named set
-//         [[:^xxx:]]  negative POSIX named set
-//
-//         alnum       alphanumeric
-//         alpha       alphabetic
-//         ascii       0-127
-//         blank       space or tab
-//         cntrl       control character
-//         digit       decimal digit
-//         graph       printing, excluding space
-//         lower       lower case letter
-//         print       printing, including space
-//         punct       printing, excluding alphanumeric
-//         space       white space
-//         upper       upper case letter
-//         word        same as \w
-//         xdigit      hexadecimal digit
-//
-//       In PCRE, POSIX character set names recognize only ASCII  characters  by
-//       default,  but  some  of them use Unicode properties if PCRE_UCP is set.
-//       You can use \Q...\E inside a character class.
-CharacterClassStart  : '[';
-CharacterClassEnd    : ']';
-Caret                : '^';
-Hyphen               : '-';
-POSIXNamedSet        : '[[:' AlphaNumerics ':]]';
-POSIXNegatedNamedSet : '[[:^' AlphaNumerics ':]]';
+/// |      start of alternative branch
+Pipe : '|';
 
-QuestionMark : '?';
-Plus         : '+';
-Star         : '*';
-OpenBrace    : '{';
-CloseBrace   : '}';
-Comma        : ',';
+/// ?      extends the meaning of (, also 0 or 1 quantifier.txt, also quantifier.txt minimizer
+QMark : '?';
 
-// ANCHORS AND SIMPLE ASSERTIONS
-//
-//         \b          word boundary
-//         \B          not a word boundary
-//         ^           start of subject
-//                      also after internal newline in multiline mode
-//         \A          start of subject
-//         $           end of subject
-//                      also before newline at end of subject
-//                      also before internal newline in multiline mode
-//         \Z          end of subject
-//                      also before newline at end of subject
-//         \z          end of subject
-//         \G          first matching position in subject
-WordBoundary                   : '\\b';
-NonWordBoundary                : '\\B';
-StartOfSubject                 : '\\A';
-EndOfSubjectOrLine             : '$';
-EndOfSubjectOrLineEndOfSubject : '\\Z';
-EndOfSubject                   : '\\z';
-PreviousMatchInSubject         : '\\G';
+/// *      0 or more quantifier.txt
+Star : '*';
 
-// MATCH POINT RESET
-//
-//         \K          reset start of match
-ResetStartMatch : '\\K';
+/// +      1 or more quantifier.txt, also "possessive quantifier.txt"
+Plus : '+';
 
-SubroutineOrNamedReferenceStartG : '\\g';
-NamedReferenceStartK             : '\\k';
+/// {      start min/max quantifier.txt
+OBrace : '{';
 
-Pipe        : '|';
-OpenParen   : '(';
-CloseParen  : ')';
-LessThan    : '<';
-GreaterThan : '>';
-SingleQuote : '\'';
-Underscore  : '_';
-Colon       : ':';
-Hash        : '#';
-Equals      : '=';
-Exclamation : '!';
-Ampersand   : '&';
+CBrace : '}';
 
-ALC : 'a';
-BLC : 'b';
-CLC : 'c';
-DLC : 'd';
-ELC : 'e';
-FLC : 'f';
-GLC : 'g';
-HLC : 'h';
-ILC : 'i';
-JLC : 'j';
-KLC : 'k';
-LLC : 'l';
-MLC : 'm';
-NLC : 'n';
-OLC : 'o';
-PLC : 'p';
-QLC : 'q';
-RLC : 'r';
-SLC : 's';
-TLC : 't';
-ULC : 'u';
-VLC : 'v';
-WLC : 'w';
-XLC : 'x';
-YLC : 'y';
-ZLC : 'z';
+/// (      start subpattern
+OPar : '(';
 
-AUC : 'A';
-BUC : 'B';
-CUC : 'C';
-DUC : 'D';
-EUC : 'E';
-FUC : 'F';
-GUC : 'G';
-HUC : 'H';
-IUC : 'I';
-JUC : 'J';
-KUC : 'K';
-LUC : 'L';
-MUC : 'M';
-NUC : 'N';
-OUC : 'O';
-PUC : 'P';
-QUC : 'Q';
-RUC : 'R';
-SUC : 'S';
-TUC : 'T';
-UUC : 'U';
-VUC : 'V';
-WUC : 'W';
-XUC : 'X';
-YUC : 'Y';
-ZUC : 'Z';
+/// )      end subpattern
+CPar : ')';
 
+/// ]      terminates the character class
+CBrack : ']';
+
+OPosixBrack : '[:';
+CPosixBrack : ':]';
+
+Comma : ',';
+Dash : '-';
+UScore : '_';
+Eq : '=';
+Amp : '&';
+Lt : '<';
+Gt : '>';
+Quote : '\'';
+Col : ':';
+Hash : '#';
+Excl : '!';
+
+Au : 'A';
+Bu : 'B';
+Cu : 'C';
+Du : 'D';
+Eu : 'E';
+Fu : 'F';
+Gu : 'G';
+Hu : 'H';
+Iu : 'I';
+Ju : 'J';
+Ku : 'K';
+Lu : 'L';
+Mu : 'M';
+Nu : 'N';
+Ou : 'O';
+Pu : 'P';
+Qu : 'Q';
+Ru : 'R';
+Su : 'S';
+Tu : 'T';
+Uu : 'U';
+Vu : 'V';
+Wu : 'W';
+Xu : 'X';
+Yu : 'Y';
+Zu : 'Z';
+
+Al : 'a';
+Bl : 'b';
+Cl : 'c';
+Dl : 'd';
+El : 'e';
+Fl : 'f';
+Gl : 'g';
+Hl : 'h';
+Il : 'i';
+Jl : 'j';
+Kl : 'k';
+Ll : 'l';
+Ml : 'm';
+Nl : 'n';
+Ol : 'o';
+Pl : 'p';
+Ql : 'q';
+Rl : 'r';
+Sl : 's';
+Tl : 't';
+Ul : 'u';
+Vl : 'v';
+Wl : 'w';
+Xl : 'x';
+Yl : 'y';
+Zl : 'z';
+
+D0 : '0';
 D1 : '1';
 D2 : '2';
 D3 : '3';
@@ -741,14 +442,7 @@ D6 : '6';
 D7 : '7';
 D8 : '8';
 D9 : '9';
-D0 : '0';
 
-OtherChar : . ;
-
-// fragments
-fragment UnderscoreAlphaNumerics : ('_' | AlphaNumeric)+;
-fragment AlphaNumerics           : AlphaNumeric+;
-fragment AlphaNumeric            : [a-zA-Z0-9];
-fragment NonAlphaNumeric         : ~[a-zA-Z0-9];
-fragment HexDigit                : [0-9a-fA-F];
-fragment ASCII                   : [\u0000-\u007F];
+OTHER
+ : .
+ ;

@@ -10,8 +10,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
+
+		<!-- The Antlr tool version is specified with
+		antlr.version. The Antlr runtime is tied to the
+		version of antlr4test-maven-plugin.version. When Antlr
+		is release, the plugin has to be updated. -->
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
 		<antlr.version>4.11.1</antlr.version>
+
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -52,7 +58,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.11.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -90,6 +96,7 @@
 				<module>bcl</module>
 				<module>bcpl</module>
 				<module>bdf</module>
+				<module>bencoding</module>
 				<module>bibcode</module>
 				<module>bicep</module>
 				<module>bnf</module>
@@ -125,6 +132,7 @@
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>
+				<module>elixir</module>
 				<module>erlang</module>
 				<module>esolang</module>
 				<module>evm-bytecode</module>
@@ -135,7 +143,7 @@
 				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
-				<module>fortran77</module>
+				<module>fortran</module>
 				<module>fusion-tables</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
@@ -220,6 +228,7 @@
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
+				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
@@ -318,6 +327,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wkt-crs-v1</module>
 				<module>wln</module>
 				<module>wren</module>
 				<module>xml</module>
@@ -346,7 +356,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.2.1</version>
+						<version>3.3.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -359,7 +369,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.4.1</version>
+						<version>3.5.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -375,7 +385,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

@@ -87,6 +87,12 @@ CREATE TABLE table_items (id INT, purchased DATE)
         PARTITION p2 VALUES LESS THAN MAXVALUE
     );
 
+CREATE TABLE T1 (
+ID INT NOT NULL,
+NAME VARCHAR(255),
+UNIQUE KEY(ID)
+) PARTITION BY KEY() PARTITIONS 2;
+
 CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
@@ -170,6 +176,19 @@ CREATE TABLE keywords (
     instant BIT
 );
 
+CREATE TABLE T1 (C NATIONAL CHAR);
+CREATE TABLE T1 (C GEOMETRY SRID 0);
+CREATE TABLE T1 (C POINT SRID 0);
+CREATE TABLE T1 (C LINESTRING SRID 0);
+CREATE TABLE T1 (C POLYGON SRID 0);
+CREATE TABLE T1 (C MULTIPOINT SRID 0);
+CREATE TABLE T1 (C MULTILINESTRING SRID 0);
+CREATE TABLE T1 (C MULTIPOLYGON SRID 0);
+CREATE TABLE T1 (C GEOMETRYCOLLECTION SRID 0);
+CREATE TABLE T1 (ID BIGINT, S VARCHAR(100), I INT, CONSTRAINT ABC CHECK (ID < 5) ENFORCED);
+CREATE TABLE T1 (ID BIGINT REFERENCES TT (TT_ID) ON DELETE SET DEFAULT);
+CREATE TABLE T1 (ID BIGINT REFERENCES TT (TT_ID) ON UPDATE SET DEFAULT);
+
 create table if not exists tbl_signed_unsigned(
   `id` bigint(20) ZEROFILL signed UNSIGNED signed ZEROFILL unsigned ZEROFILL NOT NULL AUTO_INCREMENT COMMENT 'ID',
   c1 int signed unsigned,
@@ -206,6 +225,9 @@ primary key (USER_ID, GROUP_ID)
 );
 
 CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL);
+CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
 #end
 #begin
@@ -341,7 +363,7 @@ create trigger trg_my1 before delete on test.t1 for each row begin insert into l
 create or replace view my_view1 as select 1 union select 2 limit 0,5;
 create algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
 create or replace definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
-create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
+create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 create view v_some_table as (with a as (select * from some_table) select * from a);
 
@@ -425,6 +447,18 @@ BEGIN
   DECLARE var1 INT unsigned default 1;
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
+END -- //-- delimiter ;
+#end
+#begin
+-- delimiter //
+CREATE PROCEDURE doiterate(p1 INT)
+-- label which can be parsed as a beginning of IPv6 address
+aaa:BEGIN
+  label1:LOOP
+    SET p1 = p1 + 1;
+    IF p1 < 10 THEN ITERATE label1; END IF;
+    LEAVE label1;
+  END LOOP label1;
 END -- //-- delimiter ;
 #end
 #begin
@@ -618,4 +652,33 @@ SELECT * FROM cte;
 #begin
 lock tables t1 read;
 lock table t1 read local wait 100;
+#end
+
+#begin
+CREATE OR REPLACE VIEW view_name AS
+WITH my_values(val1, val2) AS (
+    VALUES (1, 'One'),
+           (2, 'Two')
+)
+SELECT v.val1, v.val2 FROM my_values v;
+#end
+
+#begin
+CREATE DEFINER=`gpuser`@`%` PROCEDURE `test_parse_array` (IN val INT)
+BEGIN
+DECLARE array VARCHAR(50);
+
+SELECT 1;
+
+END
+#end
+
+#begin
+CREATE DEFINER=`peuser`@`%` PROCEDURE `test_utf`()
+BEGIN
+    SET @Ν_greece := 1, @N_latin := 'test';
+SELECT
+    @Ν_greece
+     ,@N_latin;
+END
 #end

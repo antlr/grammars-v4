@@ -1032,7 +1032,7 @@ abort_statement
    
    
 compilation
-   : compilation_unit*
+   : compilation_unit* EOF
    ;
 
 compilation_unit
@@ -1274,7 +1274,7 @@ formal_concrete_subprogram_declaration
    ;
 
 formal_abstract_subprogram_declaration
-   : WITH subprogram_specification IS ABSTRACT (subprogram_default)? ';'
+   : WITH subprogram_specification IS ABSTRACT subprogram_default? ';'
    ;
 
 subprogram_default

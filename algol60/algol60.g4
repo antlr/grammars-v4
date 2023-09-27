@@ -99,7 +99,7 @@ fragment Bracket : LP_ | Rp_ | Lb_ | Rb_ | '⌈' | '⌝' | Begin_ | End_ ;
 fragment Declarator : Own_ | Boolean_ | Integer_ | Real_ | Array_ | Switch_ | Procedure_ ;
 fragment Specificator : String_ | Label_ | Value_ ;
 // Antlr restriction cannot use ~Semi_.
-Comment : Comment_ (~';')+ Semi_ -> channel(HIDDEN) ;
+Comment : Comment_ ~';'+ Semi_ -> channel(HIDDEN) ;
 
 // 2.4.1
 // rewritten to avoid MLR.
@@ -117,7 +117,7 @@ Unsigned_number : Decimal_number | Exponential_part | Decimal_number Exponential
 number : Unsigned_number | Plus_ Unsigned_number | Minus_ Unsigned_number ;
 
 // 2.6.1
-fragment Proper_string options { caseInsensitive=false; } : (~('\u231C' | '\u231D'))* ;
+fragment Proper_string options { caseInsensitive=false; } : ~('\u231C' | '\u231D')* ;
 fragment Open_string : Proper_string | Proper_string Closed_string Open_string ;
 fragment Closed_string : ULCorner Open_string URCorner ;
 fragment StdString : Closed_string | Closed_string StdString ;

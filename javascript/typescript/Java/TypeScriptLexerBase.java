@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
@@ -12,7 +13,7 @@ public abstract class TypeScriptLexerBase extends Lexer
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)
      */
-    private Stack<Boolean> scopeStrictModes = new Stack<Boolean>();
+    private final Deque<Boolean> scopeStrictModes = new ArrayDeque<>();
 
     private Token lastToken = null;
     /**
@@ -26,7 +27,7 @@ public abstract class TypeScriptLexerBase extends Lexer
      */
     private boolean useStrictCurrent = false;
     /**
-     * Keeps track of the the current depth of nested template string backticks.
+     * Keeps track of the current depth of nested template string backticks.
      * E.g. after the X in:
      *
      * `${a ? `${X
@@ -35,6 +36,16 @@ public abstract class TypeScriptLexerBase extends Lexer
      * plain CloseBrace, or one that closes an expression inside a template string.
      */
     private int templateDepth = 0;
+
+    /**
+     * Keeps track of the depth of open- and close-braces. Used for expressions like:
+     *
+     * `${[1, 2, 3].map(x => { return x * 2;}).join("")}`
+     *
+     * where the '}' from `return x * 2;}` should not become a `TemplateCloseBrace`
+     * token but rather a `CloseBrace` token.
+     */
+    private int bracesDepth = 0;
 
     public TypeScriptLexerBase(CharStream input) {
         super(input);
@@ -53,8 +64,12 @@ public abstract class TypeScriptLexerBase extends Lexer
         return useStrictCurrent;
     }
 
+    public void StartTemplateString() {
+        this.bracesDepth = 0;
+    }
+
     public boolean IsInTemplateString() {
-        return this.templateDepth > 0;
+        return this.templateDepth > 0 && this.bracesDepth == 0;
     }
 
     /**
@@ -80,12 +95,14 @@ public abstract class TypeScriptLexerBase extends Lexer
 
     protected void ProcessOpenBrace()
     {
+        bracesDepth++;
         useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.peek() ? true : useStrictDefault;
         scopeStrictModes.push(useStrictCurrent);
     }
 
     protected void ProcessCloseBrace()
     {
+        bracesDepth--;
         useStrictCurrent = scopeStrictModes.size() > 0 ? scopeStrictModes.pop() : useStrictDefault;
     }
 
