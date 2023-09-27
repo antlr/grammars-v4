@@ -228,7 +228,7 @@ proto_list
 
 hosts
    : 'all'
-   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)? (os)? 'to' ('any' | 'no-route' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)?
+   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' QUOTED_STRING) (port)? (os)? 'to' ('any' | 'no-route' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)?
    ;
 
 ipspec
@@ -358,7 +358,7 @@ include
    ;
 
 operating_system_name
-   : STRING
+   : QUOTED_STRING
    ;
 
 icmp_type_name
@@ -446,11 +446,15 @@ HEX
    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+   : '$'? [a-zA-Z] [a-zA-Z0-9_]*
    ;
 
 QUOTED_STRING
    : '"' ~ '"'* '"'
+   ;
+
+CONTINUATION
+   : '\\' -> skip
    ;
 
 WS

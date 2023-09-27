@@ -1,0 +1,4 @@
+
+ips = "{ 1.2.3.4, 1.2.3.5 }"
+pass in proto tcp from any to $ips \
+      port > 1023 label "$dstaddr:$dstport"
