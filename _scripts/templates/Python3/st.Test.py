@@ -114,7 +114,7 @@ def ParseStdin():
 def ParseString(input, row_number):
     global string_instance
     str = InputStream(input)
-    DoParse(str, 'string' + str(string_instance), row_number)
+    DoParse(str, 'string', row_number)
     string_instance = string_instance + 1
 
 def ParseFilename(input, row_number):
