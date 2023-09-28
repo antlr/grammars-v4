@@ -3549,6 +3549,7 @@ keyword
     | TIMESTAMP
     | IF
     | COPY_OPTIONS_
+    | COMMENT
     // etc
     ;
 
@@ -3586,6 +3587,7 @@ non_reserved_words
     | DOWNSTREAM
     | DYNAMIC
     | TARGET_LAG
+    | EMAIL
     ;
 
 builtin_function
