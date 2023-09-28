@@ -40,6 +40,7 @@ grammar ECMAScript;
 	here(type: number):boolean {
 		const possibleIndexEosToken = this.currentToken
 		const ahead = this._input.get(possibleIndexEosToken.tokenIndex)
+		if (possibleIndexEosToken < 0) return false;
 		return ahead.channel == Token.HIDDEN_CHANNEL && ahead.type == type
 	}
 	// ECMAScriptParser.prototype.here = function(type) {

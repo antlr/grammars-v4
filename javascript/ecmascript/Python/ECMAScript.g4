@@ -44,6 +44,8 @@ def here(self, type):
     """
     # Get the token ahead of the current index.
     possibleIndexEosToken = self.getCurrentToken().tokenIndex - 1
+    if (possibleIndexEosToken < 0):
+        return False
     ahead = self._input.get(possibleIndexEosToken)
 
     # Check if the token resides on the HIDDEN channel and if it is of the
@@ -64,6 +66,8 @@ def lineTerminatorAhead(self):
     """
     # Get the token ahead of the current index.
     possibleIndexEosToken = self.getCurrentToken().tokenIndex - 1
+    if (possibleIndexEosToken < 0):
+        return False
     ahead = self._input.get(possibleIndexEosToken)
 
     if ahead.channel != Lexer.HIDDEN:
@@ -77,6 +81,8 @@ def lineTerminatorAhead(self):
     if ahead.type == ECMAScriptParser.WhiteSpaces:
         # Get the token ahead of the current whitespaces.
         possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+        if (possibleIndexEosToken < 0):
+            return False
         ahead = self._input.get(possibleIndexEosToken)
 
     # Get the token's text and type.
