@@ -5,6 +5,6 @@
    <test>
       <targets>CSharp;Java;Python3</targets>
       <entry-point>file_input</entry-point>
-      <inputs>example</inputs>
+      <inputs>examples</inputs>
    </test>
 </desc>
