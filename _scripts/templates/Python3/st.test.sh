@@ -1,18 +1,10 @@
 # Generated from trgen <version>
 
-# People often specify a test file directory, but sometimes no
-# tests are provided. Git won't check in an empty directory.
-# Test if the test file directory does not exist, or it is just
-# an empty directory.
-if [ ! -d ../<example_files_unix> ]
-then
-    echo "No test cases provided."
-    exit 0
-elif [ ! "$(ls -A ../<example_files_unix>)" ]
-then
-    echo "No test cases provided."
-    exit 0
-fi
+# comment for local dotnet tools.
+global=""
+
+# glob patterns
+shopt -s globstar
 
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
@@ -21,15 +13,30 @@ IFS=$(echo -en "\n\b")
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
 files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+
 files=()
 for f in $files2
 do
-    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
+    if [ "$global" == "" ]
+    then
+        dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
+    else
+        triconv -f utf-8 $f > /dev/null 2>&1
+    fi
     if [ "$?" = "0" ]
     then
         files+=( $f )
     fi
 done
+
+# People often specify a test file directory, but sometimes no
+# tests are provided. Git won't check in an empty directory.
+# Test if there are no test files.
+if [ ${#files[@]} -eq 0 ]
+then
+    echo "No test cases provided."
+    exit 0
+fi
 
 # Parse all input files.
 <if(individual_parsing)>
@@ -37,7 +44,12 @@ done
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog -- python3 Test.py -q -tee -tree $f >> parse.txt 2>&1
+    if [ "$global" == "" ]
+    then
+        dotnet trwdog -- python3 Test.py -q -tee -tree $f >> parse.txt 2>&1
+    else
+        trwdog python3 Test.py -q -tee -tree $f >> parse.txt 2>&1
+    fi
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -46,7 +58,12 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog -- python3 Test.py -q -x -tee -tree > parse.txt 2>&1
+if [ "$global" == "" ]
+then
+    echo "${files[*]}" | dotnet trwdog -- python3 Test.py -q -x -tee -tree > parse.txt 2>&1
+else
+    echo "${files[*]}" | trwdog python3 Test.py -q -x -tee -tree > parse.txt 2>&1
+fi
 status=$?
 <endif>
 
@@ -91,7 +108,7 @@ then
 fi
 
 old=`pwd`
-cd ../<example_files_unix>
+cd ..
 
 # Check if any files in the test files directory have changed.
 git config --global pager.diff false

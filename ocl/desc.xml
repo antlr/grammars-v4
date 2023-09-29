@@ -4,7 +4,7 @@
    <test>
       <name>spec</name>
       <entry-point>specification</entry-point>
-      <inputs>examples</inputs>
+      <inputs>examples/**/*.km3</inputs>
    </test>
    <test>
       <name>expr</name>
