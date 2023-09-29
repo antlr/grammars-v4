@@ -510,7 +510,6 @@ alter_command
     | alter_role
     | alter_row_access_policy
     | alter_schema
-    | alter_security_integration
     | alter_security_integration_external_oauth
     | alter_security_integration_snowflake_oauth
     | alter_security_integration_saml2
@@ -946,10 +945,10 @@ schema_property
     | COMMENT
     ;
 
-alter_security_integration
+alter_sequence
     : ALTER SEQUENCE if_exists? object_name RENAME TO object_name
     | ALTER SEQUENCE if_exists? object_name SET? ( INCREMENT BY? EQ? num )?
-    | ALTER SEQUENCE if_exists? object_name SET comment_clause
+    | ALTER SEQUENCE if_exists? object_name SET ( order_noorder? comment_clause | order_noorder )
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
     ;
 
@@ -1049,12 +1048,6 @@ security_integration_scim_property
     | COMMENT
     ;
 
-alter_sequence
-    : ALTER SEQUENCE if_exists? id_ RENAME TO id_
-    | ALTER SEQUENCE if_exists? id_ SET? ( INCREMENT BY? EQ? num )?
-    | ALTER SEQUENCE if_exists? id_ SET comment_clause
-    | ALTER SEQUENCE if_exists? id_ UNSET COMMENT
-    ;
 
 alter_session
     : ALTER SESSION SET session_params
