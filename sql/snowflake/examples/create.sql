@@ -39,3 +39,4 @@ create database public;
 create or replace stream str_test2 on table test_str at (STREAM => 'STR_TEST2');
 create schema raw;
 create tag public.t ALLOWED_VALUES 'V1' comment ='1';
+create sequence s1 NOORDER;

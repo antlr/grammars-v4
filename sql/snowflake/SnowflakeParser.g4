@@ -510,7 +510,6 @@ alter_command
     | alter_role
     | alter_row_access_policy
     | alter_schema
-    | alter_security_integration
     | alter_security_integration_external_oauth
     | alter_security_integration_snowflake_oauth
     | alter_security_integration_saml2
@@ -946,10 +945,10 @@ schema_property
     | COMMENT
     ;
 
-alter_security_integration
+alter_sequence
     : ALTER SEQUENCE if_exists? object_name RENAME TO object_name
     | ALTER SEQUENCE if_exists? object_name SET? ( INCREMENT BY? EQ? num )?
-    | ALTER SEQUENCE if_exists? object_name SET comment_clause
+    | ALTER SEQUENCE if_exists? object_name SET ( order_noorder? comment_clause | order_noorder )
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
     ;
 
@@ -1049,12 +1048,6 @@ security_integration_scim_property
     | COMMENT
     ;
 
-alter_sequence
-    : ALTER SEQUENCE if_exists? id_ RENAME TO id_
-    | ALTER SEQUENCE if_exists? id_ SET? ( INCREMENT BY? EQ? num )?
-    | ALTER SEQUENCE if_exists? id_ SET comment_clause
-    | ALTER SEQUENCE if_exists? id_ UNSET COMMENT
-    ;
 
 alter_session
     : ALTER SESSION SET session_params
@@ -1142,7 +1135,7 @@ clustering_action
 
 table_column_action
     : ADD COLUMN? column_name data_type
-        ( DEFAULT expr | ( AUTOINCREMENT | IDENTITY ) (  '(' num COMMA num ')' | START num INCREMENT num  )? )?
+        default_value?
         inline_constraint?
         ( WITH? MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )? )?
     | RENAME COLUMN column_name TO column_name
@@ -2002,6 +1995,7 @@ create_sequence
         WITH?
         start_with?
         increment_by?
+        order_noorder?
         comment_clause?
     ;
 
@@ -2385,8 +2379,13 @@ collate
     : COLLATE string
     ;
 
+order_noorder
+    : ORDER
+    | NOORDER
+    ;
+
 default_value
-    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
+    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )? order_noorder?
     ;
 
 foreign_key
@@ -3549,6 +3548,8 @@ keyword
     | TIMESTAMP
     | IF
     | COPY_OPTIONS_
+    | ORDER
+    | NOORDER
     // etc
     ;
 
