@@ -334,11 +334,11 @@ COMMENT
     ;
 
 LINE_COMMENT
-    : '--' SingleLineInputCharacter* -> channel(HIDDEN)
+    : '--' ( ~[\r\n\u005b\u0085\u2028\u2029] SingleLineInputCharacter* )? -> channel(HIDDEN)
     ;
 
 WS
-    : [ \t\u000C\r\n]+ -> skip
+    : [ \t\u000C\r\n]+ -> channel(HIDDEN)
     ;
 
 SHEBANG
