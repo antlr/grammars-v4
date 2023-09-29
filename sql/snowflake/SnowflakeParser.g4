@@ -1995,6 +1995,7 @@ create_sequence
         WITH?
         start_with?
         increment_by?
+        order_noorder?
         comment_clause?
     ;
 
