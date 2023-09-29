@@ -1142,7 +1142,7 @@ clustering_action
 
 table_column_action
     : ADD COLUMN? column_name data_type
-        ( DEFAULT expr | ( AUTOINCREMENT | IDENTITY ) (  '(' num COMMA num ')' | START num INCREMENT num  )? )?
+        default_value?
         inline_constraint?
         ( WITH? MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )? )?
     | RENAME COLUMN column_name TO column_name
@@ -2385,8 +2385,13 @@ collate
     : COLLATE string
     ;
 
+order_noorder
+    : ORDER
+    | NOORDER
+    ;
+
 default_value
-    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )?
+    : DEFAULT expr | (AUTOINCREMENT | IDENTITY) (  LR_BRACKET num COMMA num RR_BRACKET | start_with | increment_by | start_with increment_by  )? order_noorder?
     ;
 
 foreign_key
@@ -3549,6 +3554,8 @@ keyword
     | TIMESTAMP
     | IF
     | COPY_OPTIONS_
+    | ORDER
+    | NOORDER
     // etc
     ;
 
