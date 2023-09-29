@@ -536,6 +536,7 @@ NEXTVAL:                                               'NEXTVAL';
 NO:                                                    'NO';
 NONE:                                                  'NONE';
 NONE_Q:                                                '\'NONE\'';
+NOORDER:                                               'NOORDER';
 NORELY:                                                'NORELY';
 NOT:                                                   'NOT';
 NOTIFICATION:                                          'NOTIFICATION';

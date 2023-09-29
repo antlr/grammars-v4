@@ -93,3 +93,5 @@ create table tc3 (c char(4), c2 character(2));
 create or replace table tz1(i TIMESTAMPLTZ);
 create or replace table tz2(i TIMESTAMPNTZ);
 create or replace table tz3(i TIMESTAMPTZ);
+CREATE TABLE TESTSEED2 (ident int IDENTITY INCREMENT 2 ORDER);
+CREATE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1 NOORDER);
