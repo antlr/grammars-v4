@@ -3548,6 +3548,7 @@ keyword
     | TIMESTAMP
     | IF
     | COPY_OPTIONS_
+    | COMMENT
     | ORDER
     | NOORDER
     // etc
@@ -3587,6 +3588,7 @@ non_reserved_words
     | DOWNSTREAM
     | DYNAMIC
     | TARGET_LAG
+    | EMAIL
     ;
 
 builtin_function
@@ -3688,7 +3690,8 @@ expr_list_sorted
     ;
 
 expr
-    : primitive_expression
+    : object_name DOT NEXTVAL
+    | primitive_expression
     | function_call
     | expr COLLATE string
     | case_expression
@@ -3715,7 +3718,6 @@ expr
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | subquery
     | try_cast_expr
-    | object_name DOT NEXTVAL
     | trim_expression
     | expr comparison_operator expr
     | expr IS null_not_null
