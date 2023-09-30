@@ -692,7 +692,8 @@ alterSpecification
     | ADD (CONSTRAINT name=uid?)? FOREIGN KEY ifNotExists?          // here ifNotExists is MariaDB-specific only
       indexName=uid? indexColumnNames referenceDefinition           #alterByAddForeignKey
     | ADD (CONSTRAINT name=uid?)? CHECK '(' expression ')'          #alterByAddCheckTableConstraint
-    | ALGORITHM '='? algType=(DEFAULT | INSTANT | INPLACE | COPY)   #alterBySetAlgorithm
+    | ALGORITHM '='?
+      algType=(DEFAULT | INSTANT | INPLACE | COPY | NOCOPY)         #alterBySetAlgorithm
     | ALTER COLUMN? uid
       (SET DEFAULT defaultValue | DROP DEFAULT)                     #alterByChangeDefault
     | CHANGE COLUMN? ifExists? oldColumn=uid                        // here ifExists is MariaDB-specific only
