@@ -47,6 +47,9 @@ import "strings"
 func (p *ECMAScriptParser) here(tokenType int) bool {
     // Get the token ahead of the current index.
     possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
+    if possibleIndexEosToken < 0 {
+        return false
+    }
     ahead := p.GetTokenStream().Get(possibleIndexEosToken)
 
     // Check if the token resides on the HIDDEN channel and if it is of the
@@ -61,6 +64,9 @@ func (p *ECMAScriptParser) here(tokenType int) bool {
 func (p *ECMAScriptParser) lineTerminatorAhead() bool {
     // Get the token ahead of the current index.
     possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
+    if possibleIndexEosToken < 0 {
+        return false
+    }
     ahead := p.GetTokenStream().Get(possibleIndexEosToken)
 
     if ahead.GetChannel() != antlr.LexerHidden {
@@ -76,6 +82,9 @@ func (p *ECMAScriptParser) lineTerminatorAhead() bool {
     if ahead.GetTokenType() == ECMAScriptParserWhiteSpaces {
         // Get the token ahead of the current whitespaces.
         possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - 2
+        if possibleIndexEosToken < 0 {
+            return false
+        }
         ahead = p.GetTokenStream().Get(possibleIndexEosToken)
     }
 

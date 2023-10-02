@@ -1,3 +1,5 @@
+GRANT ALL ON *.* TO `foo2` @`%`;
+GRANT ALL ON *.* TO `foo2` @test;
 GRANT ALL ON tbl TO admin@localhost;
 GRANT ALL ON tbl TO admin;
 GRANT ALL PRIVILEGES ON tbl TO admin;

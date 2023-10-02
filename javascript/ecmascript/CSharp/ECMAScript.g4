@@ -42,6 +42,7 @@ grammar ECMAScript;
 
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         IToken ahead = _input.Get(possibleIndexEosToken);
 
         // Check if the token resides on the Hidden channel and if it's of the
@@ -61,6 +62,7 @@ grammar ECMAScript;
 
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         IToken ahead = _input.Get(possibleIndexEosToken);
 
         if (ahead.Channel != Lexer.Hidden) {
@@ -76,6 +78,7 @@ grammar ECMAScript;
         if (ahead.Type == WhiteSpaces) {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = this.CurrentToken.TokenIndex - 2;
+            if (possibleIndexEosToken < 0) return false;
             ahead = _input.Get(possibleIndexEosToken);
         }
 
