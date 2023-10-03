@@ -29,12 +29,11 @@ http://sist.shanghaitech.edu.cn/faculty/songfu/course/spring2017/cs131/COOL/COOL
 grammar COOL;
 
 program
-   : programBlocks EOF
+   : (programBlocks | ) EOF
    ;
 
 programBlocks
-   : classDefine ';' programBlocks # classes
-   | EOF # eof
+   : classDefine ';' programBlocks
    ;
 
 classDefine
