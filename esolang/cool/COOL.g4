@@ -29,12 +29,9 @@ http://sist.shanghaitech.edu.cn/faculty/songfu/course/spring2017/cs131/COOL/COOL
 grammar COOL;
 
 program
-   : (programBlocks | ) EOF
+   : (classDefine ';')+ EOF
    ;
 
-programBlocks
-   : classDefine ';' programBlocks
-   ;
 
 classDefine
    : CLASS TYPEID (INHERITS TYPEID)? '{' (feature ';')* '}'
