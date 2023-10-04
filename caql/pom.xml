@@ -18,8 +18,7 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>CaQLLexer.g4</include>
-					   <include>CaQLParser.g4</include>
+					   <include>CaQL.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>CaQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
