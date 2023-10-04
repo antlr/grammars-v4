@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>CaQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

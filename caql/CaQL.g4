@@ -1,6 +1,6 @@
 grammar CaQL;
 
-start: expression EOF;
+start_: expression EOF;
 
 expression: vectorOperation;
 
