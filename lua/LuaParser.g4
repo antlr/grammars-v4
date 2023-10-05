@@ -64,7 +64,10 @@ Tested by Matt Hargett with:
     - Benchmarks and conformance test suite for Luau 0.537: https://github.com/Roblox/luau/tree/0.537
 */
 
-grammar Lua;
+parser grammar  LuaParser;
+
+options { tokenVocab = LuaLexer; }
+
 
 chunk
     : block EOF
@@ -232,115 +235,4 @@ number
 
 string
     : NORMALSTRING | CHARSTRING | LONGSTRING
-    ;
-
-// LEXER
-
-NAME
-    : [a-zA-Z_][a-zA-Z_0-9]*
-    ;
-
-NORMALSTRING
-    : '"' ( EscapeSequence | ~('\\'|'"') )* '"'
-    ;
-
-CHARSTRING
-    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
-    ;
-
-LONGSTRING
-    : '[' NESTED_STR ']'
-    ;
-
-fragment
-NESTED_STR
-    : '=' NESTED_STR '='
-    | '[' .*? ']'
-    ;
-
-INT
-    : Digit+
-    ;
-
-HEX
-    : '0' [xX] HexDigit+
-    ;
-
-FLOAT
-    : Digit+ '.' Digit* ExponentPart?
-    | '.' Digit+ ExponentPart?
-    | Digit+ ExponentPart
-    ;
-
-HEX_FLOAT
-    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
-    | '0' [xX] '.' HexDigit+ HexExponentPart?
-    | '0' [xX] HexDigit+ HexExponentPart
-    ;
-
-fragment
-ExponentPart
-    : [eE] [+-]? Digit+
-    ;
-
-fragment
-HexExponentPart
-    : [pP] [+-]? Digit+
-    ;
-
-fragment
-EscapeSequence
-    : '\\' [abfnrtvz"'|$#\\]   // World of Warcraft Lua additionally escapes |$# 
-    | '\\' '\r'? '\n'
-    | DecimalEscape
-    | HexEscape
-    | UtfEscape
-    ;
-
-fragment
-DecimalEscape
-    : '\\' Digit
-    | '\\' Digit Digit
-    | '\\' [0-2] Digit Digit
-    ;
-
-fragment
-HexEscape
-    : '\\' 'x' HexDigit HexDigit
-    ;
-
-fragment
-UtfEscape
-    : '\\' 'u{' HexDigit+ '}'
-    ;
-
-fragment
-Digit
-    : [0-9]
-    ;
-
-fragment
-HexDigit
-    : [0-9a-fA-F]
-    ;
-
-fragment
-SingleLineInputCharacter
-    : ~[\r\n\u0085\u2028\u2029]
-    ;
-
-COMMENT
-    : '--[' NESTED_STR ']' -> channel(HIDDEN)
-    ;
-
-LINE_COMMENT
-    : '--' ( ~[\r\n\u005b\u0085\u2028\u2029] SingleLineInputCharacter* )? -> channel(HIDDEN)
-    ;
-
-WS
-    : [ \t\u000C\r\n]+ -> channel(HIDDEN)
-    ;
-
-SHEBANG
-    : '#' '!' SingleLineInputCharacter* -> channel(HIDDEN)
     ;
