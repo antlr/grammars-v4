@@ -104,7 +104,7 @@ attrib
     ;
 
 laststat
-    : 'return' explist? | 'break' | 'continue' ';'?
+    : ('return' explist? | 'break' | 'continue') ';'?
     ;
 
 label
@@ -124,7 +124,7 @@ namelist
     ;
 
 explist
-    : (exp ',')* exp
+    : exp (',' exp)*
     ;
 
 exp

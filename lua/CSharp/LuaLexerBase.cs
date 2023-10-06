@@ -30,7 +30,7 @@ public abstract class LuaLexerBase : Lexer
                 return;
             }
         }
-        while (cs.LA(1) != '\n')
+        while (cs.LA(1) != '\n' && cs.LA(1) != -1)
         {
             cs.Consume();
         }
@@ -53,6 +53,8 @@ public abstract class LuaLexerBase : Lexer
                     if (skip_sep(cs) == sep) done = true;
                     break;
             }
+
+            if (cs.LA(1) == -1) break;
             cs.Consume();
             if (done) break;
         }
@@ -73,5 +75,12 @@ public abstract class LuaLexerBase : Lexer
         else if (count == 0) count = 1;
         else count = 0;
         return count;
+	}
+
+	public bool IsLine1Col0()
+	{
+		var cs = (ICharStream)InputStream;
+        if (cs.Index == 1) return true;
+        return false;
     }
 }

@@ -163,6 +163,6 @@ WS
     ;
 
 SHEBANG
-    : '#' '!' SingleLineInputCharacter* -> channel(HIDDEN)
+    : '#' { this.IsLine1Col0() }? '!'? SingleLineInputCharacter* -> channel(HIDDEN)
     ;
 
