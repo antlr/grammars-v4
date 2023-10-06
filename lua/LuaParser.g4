@@ -133,6 +133,7 @@ exp
     | string
     | '...'
     | functiondef
+    | functioncall
     | prefixexp
     | tableconstructor
     | <assoc=right> exp operatorPower exp
