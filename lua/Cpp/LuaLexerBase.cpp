@@ -35,7 +35,7 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
         auto cc = (char)c;
         switch (c)
         {
-            case -1:
+            case (size_t)-1:
                 done = true;
                 break;
             case ']':
@@ -43,7 +43,7 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
                 break;
         }
 
-        if (cs->LA(1) == -1) break;
+        if (cs->LA(1) == (size_t)-1) break;
         cs->consume();
         if (done) break;
     }
@@ -52,7 +52,7 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
 int LuaLexerBase::skip_sep(antlr4::CharStream * cs)
 {
     int count = 0;
-    int s = cs->LA(1);
+    size_t s = cs->LA(1);
     char ss = (char)s;
     cs->consume();
     while (cs->LA(1) == '=')
