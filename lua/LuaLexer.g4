@@ -1,6 +1,8 @@
-lexer grammar  LuaLexer;
+lexer grammar LuaLexer;
 
 options { superClass = LuaLexerBase; }
+
+// Insert here @header for C++ lexer.
 
 SEMI: ';';
 EQ: '=';
