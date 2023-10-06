@@ -1,5 +1,7 @@
 lexer grammar  LuaLexer;
 
+options { superClass = LuaLexerBase; }
+
 SEMI: ';';
 EQ: '=';
 
@@ -153,11 +155,7 @@ SingleLineInputCharacter
     ;
 
 COMMENT
-    : '--[' NESTED_STR ']' -> channel(HIDDEN)
-    ;
-
-LINE_COMMENT
-    : '--' ( ~[\r\n\u005b\u0085\u2028\u2029] SingleLineInputCharacter* )? -> channel(HIDDEN)
+    : '--' { this.HandleComment(); } -> channel(HIDDEN)
     ;
 
 WS
@@ -167,3 +165,4 @@ WS
 SHEBANG
     : '#' '!' SingleLineInputCharacter* -> channel(HIDDEN)
     ;
+
