@@ -692,7 +692,8 @@ alterSpecification
     | ADD (CONSTRAINT name=uid?)? FOREIGN KEY ifNotExists?          // here ifNotExists is MariaDB-specific only
       indexName=uid? indexColumnNames referenceDefinition           #alterByAddForeignKey
     | ADD (CONSTRAINT name=uid?)? CHECK '(' expression ')'          #alterByAddCheckTableConstraint
-    | ALGORITHM '='? algType=(DEFAULT | INSTANT | INPLACE | COPY)   #alterBySetAlgorithm
+    | ALGORITHM '='?
+      algType=(DEFAULT | INSTANT | INPLACE | COPY | NOCOPY)         #alterBySetAlgorithm
     | ALTER COLUMN? uid
       (SET DEFAULT defaultValue | DROP DEFAULT)                     #alterByChangeDefault
     | CHANGE COLUMN? ifExists? oldColumn=uid                        // here ifExists is MariaDB-specific only
@@ -2147,8 +2148,16 @@ indexColumnName
     : ((uid | STRING_LITERAL) ('(' decimalLiteral ')')? | expression) sortType=(ASC | DESC)?
     ;
 
+simpleUserName
+    : STRING_LITERAL
+    | ID
+    | ADMIN
+    | keywordsCanBeId;
+hostName: (LOCAL_ID | HOST_IP_ADDRESS | '@' );
 userName
-    : STRING_USER_NAME | STRING_USER_NAME_MARIADB | ID | STRING_LITERAL | ADMIN | keywordsCanBeId | currentUserExpression;
+    : simpleUserName
+    | simpleUserName hostName
+    | currentUserExpression;
 
 mysqlVariable
     : LOCAL_ID

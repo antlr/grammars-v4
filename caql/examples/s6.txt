@@ -1,0 +1,1 @@
+find("count", "and(service:www,code:200)") | stats:sum()
