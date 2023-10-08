@@ -150,7 +150,7 @@ Trgen will construct and pass to the template evaluator the following attributes
 To generate the driver code from templates for a grammar, you will need
 to have the NET SDK installed. Afterwards, install `trgen`:
 
-    dotnet tool install -g trgen --version 0.5.3
+    dotnet tool install -g trgen --version 0.20.19
 
 To create a driver program:
 

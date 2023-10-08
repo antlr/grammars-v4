@@ -39,6 +39,7 @@ grammar ECMAScript;
  */
 ECMAScriptParser.prototype.here = function(type) {
     var possibleIndexEosToken = antlr4.Parser.prototype.getCurrentToken.call(this).tokenIndex - 1;
+    if (possibleIndexEosToken < 0) return false;
     var ahead = this._input.get(possibleIndexEosToken);
     return (ahead.channel == antlr4.Lexer.HIDDEN) && (ahead.type == type);
 };
@@ -52,7 +53,9 @@ ECMAScriptParser.prototype.here = function(type) {
  */
 ECMAScriptParser.prototype.lineTerminatorAhead = function() {
     var possibleIndexEosToken = antlr4.Parser.prototype.getCurrentToken.call(this).tokenIndex - 1;
+    if (possibleIndexEosToken < 0) return false;
     var ahead = this._input.get(possibleIndexEosToken);
+    if (possibleIndexEosToken < 0) return false;
 
     if (ahead.channel != antlr4.Lexer.HIDDEN)
         return false;

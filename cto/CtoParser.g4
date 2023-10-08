@@ -48,12 +48,12 @@ importDeclaration
     ;
 
 typeDeclaration
-    : (assetDeclaration
+    : assetDeclaration
     | conceptDeclaration  
     | enumDeclaration
     | participantDeclaration
     | transactionDeclaration
-    | eventDeclaration)
+    | eventDeclaration
     ;
 
 classModifier
@@ -99,9 +99,9 @@ transactionDeclaration
       classBody
     ;
 
-extendsOrIdentified: ((EXTENDS IDENTIFIER) | identified);
+extendsOrIdentified: EXTENDS IDENTIFIER | identified;
 
-identified: (IDENTIFIED IDENTIFIER);
+identified: IDENTIFIED IDENTIFIER;
 
 classBody
     : '{' classBodyDeclaration* '}';
@@ -120,10 +120,10 @@ fieldDeclaration
     | reference identifier;
 
 identifierField
-    : VAR IDENTIFIER (square)*;
+    : VAR IDENTIFIER square*;
 
 numericField
-    : VAR numericPrimitive (square)*;
+    : VAR numericPrimitive square*;
 
 numericPrimitive
     : DOUBLE
@@ -132,10 +132,10 @@ numericPrimitive
     ;
 
 booleanField
-    : VAR BOOLEAN (square)*;
+    : VAR BOOLEAN square*;
 
 dateField
-    : VAR DATE_TIME (square)*;
+    : VAR DATE_TIME square*;
 
 defaultDate
     : DEFAULT ASSIGN DATE_TIME_LITERAL;
@@ -144,10 +144,10 @@ regexDeclaration
     : REGEX ASSIGN REGEX_EXPR;
 
 stringField
-    : VAR STRING (square)*;
+    : VAR STRING square*;
 
 reference
-    : REF IDENTIFIER (square)*;
+    : REF IDENTIFIER square*;
 
 qualifiedName
     : IDENTIFIER ('.' IDENTIFIER)*;
@@ -156,18 +156,18 @@ rangeValidation
     : RANGE ASSIGN rangeDeclaration;
 
 rangeDeclaration
-    : ('[' numberLiteral ',' ']')
-    | ('[' ',' numberLiteral ']')
-    | ('[' numberLiteral ',' numberLiteral ']');
+    : '[' numberLiteral ',' ']'
+    | '[' ',' numberLiteral ']'
+    | '[' numberLiteral ',' numberLiteral ']';
 
 defaultBoolean
-    : (DEFAULT ASSIGN BOOL_LITERAL);
+    : DEFAULT ASSIGN BOOL_LITERAL;
 
 defaultString
-    : (DEFAULT ASSIGN stringLiteral);
+    : DEFAULT ASSIGN stringLiteral;
 
 defaultNumber
-    : (DEFAULT ASSIGN numberLiteral);
+    : DEFAULT ASSIGN numberLiteral;
 
 identifier: IDENTIFIER | ASSET | PARTICIPANT;
 

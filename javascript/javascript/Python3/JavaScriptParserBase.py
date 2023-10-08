@@ -57,6 +57,8 @@ class JavaScriptParserBase(Parser):
         # Get the token ahead of the current index.
         assert isinstance(self.getCurrentToken(), Token)
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if (possibleIndexEosToken < 0):
+            return False
         ahead = self._input.get(possibleIndexEosToken)
 
         # Check if the token resides on the HIDDEN channel and if it's of the
@@ -79,6 +81,8 @@ class JavaScriptParserBase(Parser):
 
         # Get the token ahead of the current index.
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if (possibleIndexEosToken < 0):
+            return False
         ahead: Token = self._input.get(possibleIndexEosToken)
 
         if ahead.channel != Lexer.HIDDEN:
@@ -92,6 +96,8 @@ class JavaScriptParserBase(Parser):
         if ahead.type == JavaScriptParser.WhiteSpaces:
             # Get the token ahead of the current whitespaces.
             possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+            if (possibleIndexEosToken < 0):
+                return False
             ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type.
@@ -99,5 +105,6 @@ class JavaScriptParserBase(Parser):
         tokenType = ahead.type
 
         # Check if the token is, or contains a line terminator.
-        return ((tokenType == JavaScriptParser.MultiLineComment and (text.contains("\r") or text.contains("\n"))) or
-                (tokenType == JavaScriptParser.LineTerminator))
+
+        return (tokenType == JavaScriptParser.MultiLineComment and (("\r" in text) or ("\n" in text))) or \
+            (tokenType == JavaScriptParser.LineTerminator)

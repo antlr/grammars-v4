@@ -350,7 +350,7 @@ fragment Simpleescapesequence:
 	| '\\f'
 	| '\\n'
 	| '\\r'
-	| ('\\' ('\r' '\n'? | '\n'))
+	| '\\' ('\r' '\n'? | '\n')
 	| '\\t'
 	| '\\v';
 
@@ -382,7 +382,7 @@ fragment Schar:
 	| Escapesequence
 	| Universalcharactername;
 
-fragment Rawstring: 'R"' (( '\\' ["()] )|~[\r\n (])*? '(' ~[)]*? ')'  (( '\\' ["()]) | ~[\r\n "])*? '"';
+fragment Rawstring: 'R"' ( '\\' ["()] |~[\r\n (])*? '(' ~[)]*? ')'  ( '\\' ["()] | ~[\r\n "])*? '"';
 
 UserDefinedIntegerLiteral:
 	DecimalLiteral Udsuffix

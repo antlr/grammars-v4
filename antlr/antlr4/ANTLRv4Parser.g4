@@ -51,7 +51,7 @@ grammarDecl
    ;
 
 grammarType
-   : (LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR)
+   : LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR
    ;
    // This is the list of all constructs that can be declared before
    // the set of rules that compose the grammar, and is invoked 0..n

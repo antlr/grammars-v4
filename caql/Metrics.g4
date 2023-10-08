@@ -1,7 +1,9 @@
 grammar Metrics;
 
+start: expr EOF;
+
 expr:
-    op=(AND|OR) LEFT_PAREN metricsName=STRING COLON metricsValue=STRING (metricsMult)* RIGHT_PAREN
+    op=(AND|OR) LEFT_PAREN metricsName=STRING COLON metricsValue=STRING metricsMult* RIGHT_PAREN
     ;
 metricsMult: COMMA metricsName=STRING COLON metricsValue=STRING;
 LEFT_PAREN:  '(';

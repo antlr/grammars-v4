@@ -74,6 +74,7 @@ public abstract class JavaScriptParserBase : Parser
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
 
         // Check if the token resides on the Hidden channel and if it's of the
@@ -91,6 +92,7 @@ public abstract class JavaScriptParserBase : Parser
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
+        if (possibleIndexEosToken < 0) return false;
         IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
 
         if (ahead.Channel != Lexer.Hidden)
@@ -109,6 +111,7 @@ public abstract class JavaScriptParserBase : Parser
         {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = CurrentToken.TokenIndex - 2;
+            if (possibleIndexEosToken < 0) return false;
             ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
         }
 

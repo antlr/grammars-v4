@@ -37,8 +37,8 @@ program
    ;
 
 definition
-   : (name constant? (ival (',' ival)*)* ';')
-   | (name '(' (name (',' name)*)? ')' statement)
+   : name constant? (ival (',' ival)*)* ';'
+   | name '(' (name (',' name)*)? ')' statement
    ;
 
 ival
@@ -49,7 +49,7 @@ ival
 statement
    : externsmt
    | autosmt
-   | (name ':' statement)
+   | name ':' statement
    | casestmt
    | blockstmt
    | ifstmt
@@ -125,13 +125,13 @@ assignment
    ;
 
 expression
-   : ('(' rvalue ')')
+   : '(' rvalue ')'
    | name
    | constant
-   | (incdec name)
-   | (name incdec)
-   | (unary rvalue)
-   | ('&' name)
+   | incdec name
+   | name incdec
+   | unary rvalue
+   | '&' name
    | functioninvocation
    ;
 
@@ -177,8 +177,8 @@ binary
 
 lvalue
    : name
-   | ('*' rvalue)
-   | (rvalue '[' rvalue ']')
+   | '*' rvalue
+   | rvalue '[' rvalue ']'
    ;
 
 constant

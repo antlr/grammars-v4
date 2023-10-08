@@ -1,0 +1,3 @@
+find("duration") | histogram()
+| histogram:percentile(90, 99, 100)
+| label("duration-p90", "duration-p99", "duration-max")

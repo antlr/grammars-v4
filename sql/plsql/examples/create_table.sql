@@ -33,6 +33,7 @@ CREATE TABLE po_binaryxml OF XMLType
  PASSING OBJECT_VALUE RETURNING CONTENT)
  AS DATE))) ;
 
+CREATE TABLE po_binary OF XMLType;
 
 create table junk (
        me date,
@@ -394,3 +395,13 @@ CREATE TABLE print_media_demo
          NESTED TABLE ad_textdocs_ntab STORE AS nt_p2
        )
    TABLESPACE tbs_03;
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+);
+
+create TABLE PROCESSED AS (
+select * FROM T_ORDER_PROCESSED f)
+       --     WHERE
+       -- TO_CHAR(to_date('20'||f.nr_ano,'YYYY'),'YYYY')||'/'||TRIM(TO_CHAR(f.nr_mes,'00')) = :refCompAcad);

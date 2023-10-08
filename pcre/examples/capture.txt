@@ -1,0 +1,6 @@
+(X)
+(?<name>X)
+(?'name'X)
+(?P<name>X)
+(?:X)
+(?|X)

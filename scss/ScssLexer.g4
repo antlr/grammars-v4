@@ -147,7 +147,7 @@ PrefixMatch    : '^=';
 SuffixMatch    : '$=';
 SubstringMatch : '*=';
 
-VendorPrefix: '-mox-' | '-webkit-' | '-o-';
+VendorPrefix: '-moz-' | '-webkit-' | '-o-';
 
 Variable : '--' (Interpolation|Nmstart) (Interpolation|Nmchar)*;
 fragment Interpolation: Hash BlockStart Dollar? Ident BlockEnd;

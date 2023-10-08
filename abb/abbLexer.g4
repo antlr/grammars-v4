@@ -52,7 +52,6 @@ NEWLINE
    : '\r'? '\n'
    ;
 
-
 LINE_COMMENT
    : '!' ~ ('\n' | '\r')* -> skip
    ;
@@ -66,54 +65,45 @@ CHARLITERAL
    : '\'' (EscapeSequence | ~ ('\'' | '\\' | '\r' | '\n')) '\''
    ;
 
-
 STRINGLITERAL
    : '"' (EscapeSequence | ~ ('\\' | '"' | '\r' | '\n'))* '"'
    ;
 
 fragment EscapeSequence
-   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | ('0' .. '3') ('0' .. '7') ('0' .. '7') | ('0' .. '7') ('0' .. '7') | ('0' .. '7'))
+   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | '0' .. '3' '0' .. '7' '0' .. '7' | '0' .. '7' '0' .. '7' | '0' .. '7')
    ;
 
 FLOATLITERAL
    : ('0' .. '9') + '.' ('0' .. '9')* Exponent? | '.' ('0' .. '9') + Exponent? | ('0' .. '9') + Exponent
    ;
 
-
 fragment Exponent
    : 'E' ('+' | '-')? ('0' .. '9') +
    ;
-
 
 INTLITERAL
    : ('0' .. '9') + | HexPrefix HexDigit + HexSuffix | BinPrefix BinDigit + BinSuffix
    ;
 
-
 fragment HexPrefix
    : '\'' 'H'
    ;
 
-
 fragment HexDigit
-   : ('0' .. '9' | 'A' .. 'F')
+   : '0' .. '9' | 'A' .. 'F'
    ;
-
 
 fragment HexSuffix
    : '\''
    ;
 
-
 fragment BinPrefix
    : '\'' 'B'
    ;
 
-
 fragment BinDigit
-   : ('0' | '1')
+   : '0' | '1'
    ;
-
 
 fragment BinSuffix
    : '\''
@@ -123,12 +113,10 @@ IDENTIFIER
    : IdentifierStart IdentifierPart*
    ;
 
-
 fragment IdentifierStart
    : 'A' .. 'Z' | '_'
    ;
 
-
 fragment IdentifierPart
-   : (IdentifierStart | '0' .. '9')
+   : IdentifierStart | '0' .. '9'
    ;

@@ -3,7 +3,7 @@ package parser
 import (
 	"strings"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/antlr4-go/antlr/v4"
 )
 
 // JavaScriptParserBase implementation.
@@ -64,6 +64,9 @@ func (p *JavaScriptParserBase) here(_type int) bool {
 func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 	// Get the token ahead of the current index.
 	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
+        if possibleIndexEosToken < 0 {
+            return false
+        }
 	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
 
 	if ahead.GetChannel() != antlr.LexerHidden {

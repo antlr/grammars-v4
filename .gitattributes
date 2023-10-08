@@ -47,6 +47,7 @@
 *.java text
 *.js text
 *.json text
+json/examples/*.json text
 *.kt text
 *.lark text
 *.lua text
@@ -98,6 +99,7 @@ rexx/examples/* eol=lf
 # standard Unix endings.
 abb/examples/*.sys eol=lf
 asl/examples/* eol=lf
+css3/examples/*.css eol=lf
 gdscript/examples/*.gd eol=lf
 haskell/examples/*.hs eol=lf
 hypertalk/example-scripts/*.txt eol=lf

@@ -1,17 +1,9 @@
 lexer grammar Swift5Lexer;
-@lexer::header {
-	import java.util.Stack;
-}
-@lexer::members {
-	Stack<Integer> parenthesis = new Stack<Integer>();
+// Insert here @header for C++ lexer.
 
-	@Override
-	public void reset(){
-		super.reset();
-		parenthesis.clear();
-	}
+options {
+	superClass = SwiftSupportLexer;
 }
-
 AS: 'as';
 ALPHA: 'alpha';
 BREAK: 'break';
@@ -235,11 +227,11 @@ LPAREN:
 LBRACK: '[';
 RCURLY: '}';
 RPAREN:
-	')' { if(!parenthesis.isEmpty()) 
+	')' { if(!parenthesis.isEmpty())
 		{
-			parenthesis.push(parenthesis.pop()-1); 
-			if(parenthesis.peek() == 0) 
-			{ 
+			parenthesis.push(parenthesis.pop()-1);
+			if(parenthesis.peek() == 0)
+			{
 				parenthesis.pop();
 				popMode();
 			}

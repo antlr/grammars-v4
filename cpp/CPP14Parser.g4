@@ -20,9 +20,14 @@
  * ****************************************************************************
  */
 parser grammar CPP14Parser;
+
 options {
+	superClass = CPP14ParserBase;
 	tokenVocab = CPP14Lexer;
 }
+
+// Insert here @header for C++ parser.
+
 /*Basic concepts*/
 
 translationUnit: declarationseq? EOF;
@@ -118,30 +123,30 @@ unaryExpression:
 	)
 	| Alignof LeftParen theTypeId RightParen
 	| noExceptExpression
-	| newExpression
+	| newExpression_
 	| deleteExpression;
 
 unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 
-newExpression:
+newExpression_:
 	Doublecolon? New newPlacement? (
 		newTypeId
-		| (LeftParen theTypeId RightParen)
-	) newInitializer?;
+		| LeftParen theTypeId RightParen
+	) newInitializer_?;
 
 newPlacement: LeftParen expressionList RightParen;
 
-newTypeId: typeSpecifierSeq newDeclarator?;
+newTypeId: typeSpecifierSeq newDeclarator_?;
 
-newDeclarator:
-	pointerOperator newDeclarator?
+newDeclarator_:
+	pointerOperator newDeclarator_?
 	| noPointerNewDeclarator;
 
 noPointerNewDeclarator:
 	LeftBracket expression RightBracket attributeSpecifierSeq?
 	| noPointerNewDeclarator LeftBracket constantExpression RightBracket attributeSpecifierSeq?;
 
-newInitializer:
+newInitializer_:
 	LeftParen expressionList? RightParen
 	| bracedInitList;
 
@@ -295,7 +300,7 @@ declaration:
 	| explicitSpecialization
 	| linkageSpecification
 	| namespaceDefinition
-	| emptyDeclaration
+	| emptyDeclaration_
 	| attributeDeclaration;
 
 blockDeclaration:
@@ -318,7 +323,7 @@ simpleDeclaration:
 staticAssertDeclaration:
 	Static_assert LeftParen constantExpression Comma StringLiteral RightParen Semi;
 
-emptyDeclaration: Semi;
+emptyDeclaration_: Semi;
 
 attributeDeclaration: attributeSpecifierSeq Semi;
 
@@ -370,19 +375,23 @@ simpleTypeSignednessModifier:
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
-	| simpleTypeSignednessModifier
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
-	| simpleTypeSignednessModifier? Char
-	| simpleTypeSignednessModifier? Char16
-	| simpleTypeSignednessModifier? Char32
-	| simpleTypeSignednessModifier? Wchar
+	| Char
+	| Char16
+	| Char32
+	| Wchar
 	| Bool
-	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
+	| Short
+	| Int
+	| Long
 	| Float
-	| simpleTypeLengthModifier? Double
+	| Signed
+	| Unsigned
+	| Float
+	| Double
 	| Void
 	| Auto
-	| decltypeSpecifier;
+	| decltypeSpecifier
+	;
 
 theTypeName:
 	className
@@ -441,7 +450,7 @@ namespaceAliasDefinition:
 qualifiednamespacespecifier: nestedNameSpecifier? namespaceName;
 
 usingDeclaration:
-	Using ((Typename_? nestedNameSpecifier) | Doublecolon) unqualifiedId Semi;
+	Using (Typename_? nestedNameSpecifier | Doublecolon) unqualifiedId Semi;
 
 usingDirective:
 	attributeSpecifierSeq? Using Namespace nestedNameSpecifier? namespaceName Semi;
@@ -562,11 +571,8 @@ parameterDeclarationList:
 	parameterDeclaration (Comma parameterDeclaration)*;
 
 parameterDeclaration:
-	attributeSpecifierSeq? declSpecifierSeq (
-		(declarator | abstractDeclarator?) (
-			Assign initializerClause
-		)?
-	);
+	attributeSpecifierSeq? declSpecifierSeq (declarator | abstractDeclarator?) (Assign initializerClause)?
+	;
 
 functionDefinition:
 	attributeSpecifierSeq? declSpecifierSeq? declarator virtualSpecifierSeq? functionBody;
@@ -623,28 +629,29 @@ memberdeclaration:
 	| staticAssertDeclaration
 	| templateDeclaration
 	| aliasDeclaration
-	| emptyDeclaration;
+	| emptyDeclaration_;
 
 memberDeclaratorList:
 	memberDeclarator (Comma memberDeclarator)*;
 
 memberDeclarator:
-	declarator (
-		virtualSpecifierSeq? pureSpecifier?
-		| braceOrEqualInitializer?
-	)
-	| Identifier? attributeSpecifierSeq? Colon constantExpression;
+    declarator (virtualSpecifierSeq | { this.IsPureSpecifierAllowed() }? pureSpecifier | { this.IsPureSpecifierAllowed() }? virtualSpecifierSeq pureSpecifier | braceOrEqualInitializer)
+    | declarator
+    | Identifier? attributeSpecifierSeq? Colon constantExpression
+    ;
 
 virtualSpecifierSeq: virtualSpecifier+;
 
 virtualSpecifier: Override | Final;
+
 /*
  purespecifier: Assign '0'//Conflicts with the lexer ;
  */
 
 pureSpecifier:
-	Assign val = OctalLiteral {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
-		};
+	Assign IntegerLiteral
+    ;
+
 /*Derived classes*/
 
 baseClause: Colon baseSpecifierList;
@@ -709,7 +716,7 @@ typeParameter:
 	(
 		(Template Less templateparameterList Greater)? Class
 		| Typename_
-	) ((Ellipsis? Identifier?) | (Identifier? Assign theTypeId));
+	) (Ellipsis? Identifier? | Identifier? Assign theTypeId);
 
 simpleTemplateId:
 	templateName Less templateArgumentList? Greater;

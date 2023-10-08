@@ -2,6 +2,7 @@
 -- Create User
 CREATE USER 'test_crm_debezium'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9' PASSWORD EXPIRE NEVER COMMENT '-';
 CREATE USER 'jim'@'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
+CREATE USER 'jim' @'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
@@ -225,6 +226,9 @@ primary key (USER_ID, GROUP_ID)
 );
 
 CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL);
+CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
 #end
 #begin
@@ -447,6 +451,18 @@ BEGIN
 END -- //-- delimiter ;
 #end
 #begin
+-- delimiter //
+CREATE PROCEDURE doiterate(p1 INT)
+-- label which can be parsed as a beginning of IPv6 address
+aaa:BEGIN
+  label1:LOOP
+    SET p1 = p1 + 1;
+    IF p1 < 10 THEN ITERATE label1; END IF;
+    LEAVE label1;
+  END LOOP label1;
+END -- //-- delimiter ;
+#end
+#begin
 CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
 BEGIN  insert into order_config(order_id, attribute, value, performer)
        SELECT orderID, 'first_attr', 'true', 'AppConfig'
@@ -646,4 +662,24 @@ WITH my_values(val1, val2) AS (
            (2, 'Two')
 )
 SELECT v.val1, v.val2 FROM my_values v;
+#end
+
+#begin
+CREATE DEFINER=`gpuser`@`%` PROCEDURE `test_parse_array` (IN val INT)
+BEGIN
+DECLARE array VARCHAR(50);
+
+SELECT 1;
+
+END
+#end
+
+#begin
+CREATE DEFINER=`peuser`@`%` PROCEDURE `test_utf`()
+BEGIN
+    SET @Ν_greece := 1, @N_latin := 'test';
+SELECT
+    @Ν_greece
+     ,@N_latin;
+END
 #end
