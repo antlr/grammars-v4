@@ -68,18 +68,14 @@ parser grammar  LuaParser;
 
 options { tokenVocab = LuaLexer; }
 
-start_: chunk EOF;
 
 chunk
-    : block
+    : block EOF
     ;
 
-block: statlist;
-
-/* According to lparser.c, statlist is the "parse main body",
- * not 'chunk' or 'block'.
- */
-statlist: stat*;
+block
+    : stat* laststat?
+    ;
 
 stat
     : ';'
@@ -122,11 +118,6 @@ funcname
 varlist
     : var (',' var)*
     ;
-var
-    : NAME
-    | prefixexp '[' exp ']'
-    | prefixexp '.' NAME
-    ;
 
 namelist
     : NAME (',' NAME)*
@@ -137,38 +128,47 @@ explist
     ;
 
 exp
-    : 'nil'
-    | 'false'
-    | 'true'
+    : 'nil' | 'false' | 'true'
     | number
     | string
     | '...'
     | functiondef
+    | functioncall
     | prefixexp
     | tableconstructor
-    | <assoc=right> exp ('^') exp
-    | ('not' | '#' | '-' | '~') exp
-    | exp ('*' | '/' | '%' | '//') exp
-    | exp ('+' | '-') exp
-    | <assoc=right> exp ('..') exp
-    | exp ('<' | '>' | '<=' | '>=' | '~=' | '==') exp
-    | exp ('and') exp
-    | exp ('or') exp
-    | exp ('&' | '|' | '~' | '<<' | '>>') exp
+    | <assoc=right> exp operatorPower exp
+    | operatorUnary exp
+    | exp operatorMulDivMod exp
+    | exp operatorAddSub exp
+    | <assoc=right> exp operatorStrcat exp
+    | exp operatorComparison exp
+    | exp operatorAnd exp
+    | exp operatorOr exp
+    | exp operatorBitwise exp
     ;
 
 prefixexp
-    : NAME
-    | prefixexp '[' exp ']'
-    | prefixexp '.' NAME
-    | prefixexp args
-    | prefixexp ':' NAME args
-    | '(' exp ')'
+    : varOrExp nameAndArgs*
     ;
 
 functioncall
-    : prefixexp args
-    | prefixexp ':' NAME args
+    : varOrExp nameAndArgs+
+    ;
+
+varOrExp
+    : var | '(' exp ')'
+    ;
+
+var
+    : (NAME | '(' exp ')' varSuffix) varSuffix*
+    ;
+
+varSuffix
+    : nameAndArgs* ('[' exp ']' | '.' NAME)
+    ;
+
+nameAndArgs
+    : (':' NAME)? args
     ;
 
 args
@@ -180,17 +180,11 @@ functiondef
     ;
 
 funcbody
-    : '(' parlist ')' block 'end'
+    : '(' parlist? ')' block 'end'
     ;
 
-/* lparser.c says "is 'parlist' not empty?"
- * That code does so by checking la(1) == ')'.
- * This means that parlist can derive empty.
- */
 parlist
-    : namelist (',' '...')?
-    | '...'
-    |
+    : namelist (',' '...')? | '...'
     ;
 
 tableconstructor
@@ -208,6 +202,33 @@ field
 fieldsep
     : ',' | ';'
     ;
+
+operatorOr
+	: 'or';
+
+operatorAnd
+	: 'and';
+
+operatorComparison
+	: '<' | '>' | '<=' | '>=' | '~=' | '==';
+
+operatorStrcat
+	: '..';
+
+operatorAddSub
+	: '+' | '-';
+
+operatorMulDivMod
+	: '*' | '/' | '%' | '//';
+
+operatorBitwise
+	: '&' | '|' | '~' | '<<' | '>>';
+
+operatorUnary
+    : 'not' | '#' | '-' | '~';
+
+operatorPower
+    : '^';
 
 number
     : INT | HEX | FLOAT | HEX_FLOAT
