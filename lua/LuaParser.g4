@@ -66,8 +66,10 @@ Tested by Matt Hargett with:
 
 parser grammar  LuaParser;
 
-options { tokenVocab = LuaLexer; }
-
+options {
+    tokenVocab = LuaLexer; 
+    superClass = LuaParserBase;
+}
 
 chunk
     : block EOF
@@ -237,3 +239,5 @@ number
 string
     : NORMALSTRING | CHARSTRING | LONGSTRING
     ;
+
+nonl : { this.IsNotNl() }? ;
