@@ -150,11 +150,11 @@ exp
     ;
 
 prefixexp
-    : varOrExp nameAndArgs*
+    : varOrExp (notnl nameAndArgs)*
     ;
 
 functioncall
-    : varOrExp nameAndArgs+
+    : varOrExp (notnl nameAndArgs)+
     ;
 
 varOrExp
@@ -166,7 +166,7 @@ var
     ;
 
 varSuffix
-    : nameAndArgs* ('[' exp ']' | '.' NAME)
+    : notnl nameAndArgs* ('[' exp ']' | '.' NAME)
     ;
 
 nameAndArgs
@@ -240,4 +240,4 @@ string
     : NORMALSTRING | CHARSTRING | LONGSTRING
     ;
 
-nonl : { this.IsNotNl() }? ;
+notnl : { this.IsNotNl() }? ;
