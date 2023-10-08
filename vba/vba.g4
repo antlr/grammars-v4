@@ -363,7 +363,7 @@ letStmt : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? va
 
 lineInputStmt : LINE_INPUT WS fileNumber WS? ',' WS? valueStmt;
 
-lineNumber : (INTEGERLITERAL | SHORTLITERAL) ':'? WS;
+lineNumber : (INTEGERLITERAL | SHORTLITERAL) NEWLINE? ':'? NEWLINE? WS?;
 
 loadStmt : LOAD WS valueStmt;
 
