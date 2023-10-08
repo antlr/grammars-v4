@@ -1,3 +1,6 @@
+# COMMAND LINE:
+# grun Python file_input -tokens test_trailing_inconsistent_dedent.py
+#
 # REQUIREMENT:
 #   - no error message
 

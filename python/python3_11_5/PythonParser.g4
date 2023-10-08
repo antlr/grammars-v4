@@ -27,7 +27,10 @@ THE SOFTWARE.
   */
 
 parser grammar PythonParser; // Python 3.11.5    https://docs.python.org/3.11/reference/grammar.html
-options { tokenVocab=PythonLexer; superClass=PythonParserBase; }
+options {
+    tokenVocab=PythonLexer;
+    superClass=PythonParserBase;
+}
 
 // STARTING RULES
 // ==============
@@ -390,7 +393,7 @@ pattern_capture_target
     :  {self.isnotEqualCurrentTokenText("_")}? NAME;
 
 wildcard_pattern
-    : soft_kw_underscore;
+    : soft_kw_wildcard;
 
 value_pattern
     : attr;
@@ -826,8 +829,8 @@ func_type_comment
     | TYPE_COMMENT;
 
 // *** Soft Keywords:  https://docs.python.org/3/reference/lexical_analysis.html#soft-keywords
-soft_kw_match:      {self.isEqualCurrentTokenText("match")}? NAME;
-soft_kw_case:       {self.isEqualCurrentTokenText("case")}?  NAME;
-soft_kw_underscore: {self.isEqualCurrentTokenText("_")}?     NAME;
+soft_kw_match    : {self.isEqualCurrentTokenText("match")}? NAME;
+soft_kw_case     : {self.isEqualCurrentTokenText("case")}?  NAME;
+soft_kw_wildcard : {self.isEqualCurrentTokenText("_")}?     NAME;
 
 // ========================= END OF THE GRAMMAR ===========================

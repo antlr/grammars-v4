@@ -1,3 +1,6 @@
+# COMMAND LINE:
+# grun Python file_input -tokens test_explicit_line_joining.py
+#
 # REQUIREMENTS:
 #   - hiden (channel=1) LINE_JOINING token
 #   - no error message

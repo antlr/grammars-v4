@@ -1,6 +1,9 @@
+# COMMAND LINE:
+# grun Python file_input -tokens test_string_literal_with_newline_escape_sequence.py
+#
 # REQUIREMENTS:
 #   - removed \<newline> escape sequence from the STRING token
-#   - hidden token (channel=1) with the original string literal
+#   - inserted hidden token (channel=1) with the original string literal
 #   - no error message
 
 s = 'This string will not include \

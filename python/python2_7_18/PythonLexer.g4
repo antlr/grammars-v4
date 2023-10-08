@@ -30,8 +30,8 @@ THE SOFTWARE.
 lexer grammar PythonLexer;
 options { superClass=PythonLexerBase; }
 tokens {
-    INDENT, DEDENT,  // https://docs.python.org/2.7/reference/lexical_analysis.html#indentation
-    TYPE_COMMENT     // the TYPE_COMMENT token is only for compatibility with the PythonLexerBase class
+    INDENT, DEDENT // https://docs.python.org/2.7/reference/lexical_analysis.html#indentation
+  , TYPE_COMMENT   // the TYPE_COMMENT token is only for compatibility with the PythonLexerBase class
 }
 
 /*
@@ -117,8 +117,9 @@ DOUBLESTAREQUAL  : '**=';
 DOUBLESLASH      : '//';
 DOUBLESLASHEQUAL : '//=';
 AT               : '@';
-EXL : '!';
-PRB : AT EXL;
+
+
+// https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 NAME : IDENTIFIER;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#numeric-literals
@@ -129,18 +130,23 @@ NUMBER
    | IMAG_NUMBER
    ;
 
+// https://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
 STRING : STRING_LITERAL;
 
+// https://docs.python.org/2.7/reference/lexical_analysis.html#physical-lines
 NEWLINE : OS_INDEPENDENT_NL;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#comments
-COMMENT : '#' ~[\r\n\f]*             -> channel(HIDDEN);
+COMMENT : '#' ~[\r\n]*               -> channel(HIDDEN);
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#whitespace-between-tokens
-WS : [ \t]+                          -> channel(HIDDEN);
+WS : [ \t\f]+                        -> channel(HIDDEN);
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#explicit-line-joining
 EXPLICIT_LINE_JOINING : '\\' NEWLINE -> channel(HIDDEN);
+
+
+ERROR_TOKEN : . ; // catch unrecognized characters and redirect these errors to the parser
 
 
 /*
@@ -171,11 +177,10 @@ fragment LONG_STRING_ITEM : LONG_STRING_CHAR | ESCAPE_SEQ;
 fragment SHORT_STRING_CHAR_NO_SINGLE_QUOTE : ~[\\\r\n'];      // <any source character except "\" or newline or single quote>
 fragment SHORT_STRING_CHAR_NO_DOUBLE_QUOTE : ~[\\\r\n"];      // <any source character except "\" or newline or double quote>
 fragment LONG_STRING_CHAR  : ~'\\';                           // <any source character except "\">
-fragment ESCAPE_SEQ : '\\' (OS_INDEPENDENT_NL | ASCII_CHAR);  // "\" <any ASCII character>
-// the OS_INDEPENDENT_NL refers the \<newline> (not \n) escape sequence
-// it will be removed from the string literals by the PythonLexerBase class
-
-fragment ASCII_CHAR : [\u0000-\u007F];
+fragment ESCAPE_SEQ
+   : '\\' OS_INDEPENDENT_NL // \<newline> escape sequence
+   | '\\' [\u0000-\u007F]                                    // "\" <any ASCII character>
+   ; // the \<newline> (not \n) escape sequences will be removed from the string literals by the PythonLexerBase class
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#integer-and-long-integer-literals
 fragment LONG_INTEGER    : INTEGER ('l' | 'L');

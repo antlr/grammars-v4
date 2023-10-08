@@ -18,7 +18,7 @@ from cookielib import (_warn_unhandled_exception, FileCookieJar, LoadError,
                        iso2time, time2isoz)
 
 def lwp_cookie_str(cookie):
-    """Return string representation of Cookie in an the LWP cookie file format.
+    """Return string representation of Cookie in the LWP cookie file format.
 
     Actually, the format is extended a bit -- see module docstring.
 
@@ -48,8 +48,8 @@ def lwp_cookie_str(cookie):
 
 class LWPCookieJar(FileCookieJar):
     """
-    The LWPCookieJar saves a sequence of"Set-Cookie3" lines.
-    "Set-Cookie3" is the format used by the libwww-perl libary, not known
+    The LWPCookieJar saves a sequence of "Set-Cookie3" lines.
+    "Set-Cookie3" is the format used by the libwww-perl library, not known
     to be compatible with any browser, but which is easy to read and
     doesn't lose information about RFC 2965 cookies.
 
@@ -60,7 +60,7 @@ class LWPCookieJar(FileCookieJar):
     """
 
     def as_lwp_str(self, ignore_discard=True, ignore_expires=True):
-        """Return cookies as a string of "\n"-separated "Set-Cookie3" headers.
+        """Return cookies as a string of "\\n"-separated "Set-Cookie3" headers.
 
         ignore_discard and ignore_expires: see docstring for FileCookieJar.save
 

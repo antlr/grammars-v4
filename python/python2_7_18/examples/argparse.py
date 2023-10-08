@@ -168,6 +168,8 @@ class HelpFormatter(object):
         self._prog = prog
         self._indent_increment = indent_increment
         self._max_help_position = max_help_position
+        self._max_help_position = min(max_help_position,
+                                      max(width - 20, indent_increment * 2))
         self._width = width
 
         self._current_indent = 0
@@ -322,7 +324,11 @@ class HelpFormatter(object):
             if len(prefix) + len(usage) > text_width:
 
                 # break usage into wrappable parts
-                part_regexp = r'\(.*?\)+|\[.*?\]+|\S+'
+                part_regexp = (
+                    r'\(.*?\)+(?=\s|$)|'
+                    r'\[.*?\]+(?=\s|$)|'
+                    r'\S+'
+                )
                 opt_usage = format(optionals, groups)
                 pos_usage = format(positionals, groups)
                 opt_parts = _re.findall(part_regexp, opt_usage)
@@ -339,7 +345,7 @@ class HelpFormatter(object):
                     else:
                         line_len = len(indent) - 1
                     for part in parts:
-                        if line_len + 1 + len(part) > text_width:
+                        if line_len + 1 + len(part) > text_width and line:
                             lines.append(indent + ' '.join(line))
                             line = []
                             line_len = len(indent) - 1
@@ -478,7 +484,7 @@ class HelpFormatter(object):
     def _format_text(self, text):
         if '%(prog)' in text:
             text = text % dict(prog=self._prog)
-        text_width = self._width - self._current_indent
+        text_width = max(self._width - self._current_indent, 11)
         indent = ' ' * self._current_indent
         return self._fill_text(text, text_width, indent) + '\n\n'
 
@@ -486,7 +492,7 @@ class HelpFormatter(object):
         # determine the required width and the entry label
         help_position = min(self._action_max_length + 2,
                             self._max_help_position)
-        help_width = self._width - help_position
+        help_width = max(self._width - help_position, 11)
         action_width = help_position - self._current_indent - 2
         action_header = self._format_action_invocation(action)
 
@@ -740,10 +746,10 @@ class Action(_AttributeHolder):
 
         - default -- The value to be produced if the option is not specified.
 
-        - type -- The type which the command-line arguments should be converted
-            to, should be one of 'string', 'int', 'float', 'complex' or a
-            callable object that accepts a single string argument. If None,
-            'string' is assumed.
+        - type -- A callable that accepts a single string argument, and
+            returns the converted value.  The standard Python types str, int,
+            float, and complex are useful examples of such callables.  If None,
+            str is used.
 
         - choices -- A container of values that should be allowed. If not None,
             after a command-line argument has been converted to the appropriate
@@ -1087,7 +1093,14 @@ class _SubParsersAction(Action):
         # parse all the remaining options into the namespace
         # store any unrecognized options on the object, so that the top
         # level parser can decide what to do with them
-        namespace, arg_strings = parser.parse_known_args(arg_strings, namespace)
+
+        # In case this subparser defines new defaults, we parse them
+        # in a new namespace object and then update the original
+        # namespace for the relevant parts.
+        subnamespace, arg_strings = parser.parse_known_args(arg_strings, None)
+        for key, value in vars(subnamespace).items():
+            setattr(namespace, key, value)
+
         if arg_strings:
             vars(namespace).setdefault(_UNRECOGNIZED_ARGS_ATTR, [])
             getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(arg_strings)
@@ -1155,9 +1168,13 @@ class Namespace(_AttributeHolder):
     __hash__ = None
 
     def __eq__(self, other):
+        if not isinstance(other, Namespace):
+            return NotImplemented
         return vars(self) == vars(other)
 
     def __ne__(self, other):
+        if not isinstance(other, Namespace):
+            return NotImplemented
         return not (self == other)
 
     def __contains__(self, key):
@@ -1692,9 +1709,12 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         return args
 
     def parse_known_args(self, args=None, namespace=None):
-        # args default to the system args
         if args is None:
+            # args default to the system args
             args = _sys.argv[1:]
+        else:
+            # make sure that args are mutable
+            args = list(args)
 
         # default Namespace built from parser defaults
         if namespace is None:
@@ -1705,10 +1725,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             if action.dest is not SUPPRESS:
                 if not hasattr(namespace, action.dest):
                     if action.default is not SUPPRESS:
-                        default = action.default
-                        if isinstance(action.default, basestring):
-                            default = self._get_value(action, default)
-                        setattr(namespace, action.dest, default)
+                        setattr(namespace, action.dest, action.default)
 
         # add any parser defaults that aren't present
         for dest in self._defaults:
@@ -1936,12 +1953,23 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         if positionals:
             self.error(_('too few arguments'))
 
-        # make sure all required actions were present
+        # make sure all required actions were present, and convert defaults.
         for action in self._actions:
-            if action.required:
-                if action not in seen_actions:
+            if action not in seen_actions:
+                if action.required:
                     name = _get_action_name(action)
                     self.error(_('argument %s is required') % name)
+                else:
+                    # Convert action default now instead of doing it before
+                    # parsing arguments to avoid calling convert functions
+                    # twice (which may fail) if the argument was given, but
+                    # only if it was defined already in the namespace
+                    if (action.default is not None and
+                            isinstance(action.default, basestring) and
+                            hasattr(namespace, action.dest) and
+                            action.default is getattr(namespace, action.dest)):
+                        setattr(namespace, action.dest,
+                                self._get_value(action, action.default))
 
         # make sure all required groups had one option present
         for group in self._mutually_exclusive_groups:
@@ -1967,7 +1995,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         for arg_string in arg_strings:
 
             # for regular arguments, just add them back into the list
-            if arg_string[0] not in self.fromfile_prefix_chars:
+            if not arg_string or arg_string[0] not in self.fromfile_prefix_chars:
                 new_arg_strings.append(arg_string)
 
             # replace arguments referencing files with the file content
@@ -2174,9 +2202,12 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     # Value conversion methods
     # ========================
     def _get_values(self, action, arg_strings):
-        # for everything but PARSER args, strip out '--'
+        # for everything but PARSER, REMAINDER args, strip out first '--'
         if action.nargs not in [PARSER, REMAINDER]:
-            arg_strings = [s for s in arg_strings if s != '--']
+            try:
+                arg_strings.remove('--')
+            except ValueError:
+                pass
 
         # optional argument produces a default when not present
         if not arg_strings and action.nargs == OPTIONAL:
