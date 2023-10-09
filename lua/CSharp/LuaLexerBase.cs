@@ -8,6 +8,9 @@ using Microsoft.Build.Utilities;
 
 public abstract class LuaLexerBase : Lexer
 {
+    private int start_line;
+    private int start_col;
+
     public LuaLexerBase(ICharStream input)
             : base(input)
     {
@@ -20,6 +23,8 @@ public abstract class LuaLexerBase : Lexer
 
     public void HandleComment()
     {
+        start_line = this.Line;
+        start_col = this.Column - 2;
         var cs = (ICharStream)InputStream;
         if (cs.LA(1) == '[')
         {
@@ -48,6 +53,8 @@ public abstract class LuaLexerBase : Lexer
             {
                 case -1:
                     done = true;
+                    IAntlrErrorListener<int> listener = ErrorListenerDispatch;
+                    listener.SyntaxError(ErrorOutput, this, 0, this.start_line, this.start_col, "unfinished long comment", null);
                     break;
                 case ']':
                     if (skip_sep(cs) == sep) done = true;
@@ -75,11 +82,11 @@ public abstract class LuaLexerBase : Lexer
         else if (count == 0) count = 1;
         else count = 0;
         return count;
-	}
+    }
 
-	public bool IsLine1Col0()
-	{
-		var cs = (ICharStream)InputStream;
+    public bool IsLine1Col0()
+    {
+        var cs = (ICharStream)InputStream;
         if (cs.Index == 1) return true;
         return false;
     }
