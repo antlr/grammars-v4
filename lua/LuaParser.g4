@@ -89,13 +89,13 @@ exp
     | exp ('&' | '|' | '~' | '<<' | '>>') exp
     ;
 
-// var ::=  Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name 
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name 
 var
     : NAME
     | prefixexp ('[' exp ']' | '.' NAME)
     ;
 
-// prefixexp ::= var | functioncall | ‘(’ exp ‘)’
+// prefixexp ::= var | functioncall | '(' exp ')'
 prefixexp
     :
     NAME ('[' exp ']' | '.' NAME)*
@@ -103,7 +103,7 @@ prefixexp
     | '(' exp ')' ('[' exp ']' | '.' NAME)*
     ;
 
-// functioncall ::=  prefixexp args | prefixexp ‘:’ Name args;
+// functioncall ::=  prefixexp args | prefixexp ':' Name args;
 functioncall:
     NAME ('[' exp ']' | '.' NAME)* args
     | functioncall ('[' exp ']' | '.' NAME)* args
