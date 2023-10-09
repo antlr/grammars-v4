@@ -1,83 +1,22 @@
 /*
-BSD License
 
-Copyright (c) 2013, Kazunori Sakamoto
-Copyright (c) 2016, Alexander Alexeev
-All rights reserved.
+MIT license
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
+Author: Ken Domino, October 2023
 
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-3. Neither the NAME of Rainer Schuster nor the NAMEs of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+Based on previous work of: Kazunori Sakamoto, Alexander Alexeev
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-This grammar file derived from:
-
-    Luau 0.537 Grammar Documentation
-    https://github.com/Roblox/luau/blob/0.537/docs/_pages/grammar.md
-
-    Lua 5.4 Reference Manual
-    http://www.lua.org/manual/5.4/manual.html
-
-    Lua 5.3 Reference Manual
-    http://www.lua.org/manual/5.3/manual.html
-
-    Lua 5.2 Reference Manual
-    http://www.lua.org/manual/5.2/manual.html
-
-    Lua 5.1 grammar written by Nicolai Mainiero
-    http://www.antlr3.org/grammar/1178608849736/Lua.g
-
-Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
-
-Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz
-
-Tested by Matt Hargett with:
-    - Test suite for Lua 5.4.4: http://www.lua.org/tests/lua-5.4.4-tests.tar.gz
-    - Test suite for Selene Lua lint tool v0.20.0: https://github.com/Kampfkarren/selene/tree/0.20.0/selene-lib/tests
-    - Test suite for full-moon Lua parsing library v0.15.1: https://github.com/Kampfkarren/full-moon/tree/main/full-moon/tests
-    - Test suite for IntelliJ-Luanalysis IDE plug-in v1.3.0: https://github.com/Benjamin-Dobell/IntelliJ-Luanalysis/tree/v1.3.0/src/test
-    - Test suite for StyLua formatting tool v.14.1: https://github.com/JohnnyMorganz/StyLua/tree/v0.14.1/tests
-    - Entire codebase for luvit: https://github.com/luvit/luvit/
-    - Entire codebase for lit: https://github.com/luvit/lit/
-    - Entire codebase and test suite for neovim v0.7.2: https://github.com/neovim/neovim/tree/v0.7.2
-    - Entire codebase for World of Warcraft Interface: https://github.com/tomrus88/BlizzardInterfaceCode
-    - Benchmarks and conformance test suite for Luau 0.537: https://github.com/Roblox/luau/tree/0.537
 */
 
 parser grammar  LuaParser;
 
-options {
-    tokenVocab = LuaLexer; 
-    superClass = LuaParserBase;
-}
+options { tokenVocab = LuaLexer; }
 
-chunk
-    : block EOF
-    ;
+start_: chunk EOF;
 
-block
-    : stat* laststat?
-    ;
+chunk: block ;
+
+block: stat* retstat? ;
 
 stat
     : ';'
@@ -105,7 +44,7 @@ attrib
     : ('<' NAME '>')?
     ;
 
-laststat
+retstat
     : ('return' explist? | 'break' | 'continue') ';'?
     ;
 
@@ -130,47 +69,48 @@ explist
     ;
 
 exp
-    : 'nil' | 'false' | 'true'
+    : 'nil'
+    | 'false'
+    | 'true'
     | number
     | string
     | '...'
     | functiondef
-    | functioncall
     | prefixexp
     | tableconstructor
-    | <assoc=right> exp operatorPower exp
-    | operatorUnary exp
-    | exp operatorMulDivMod exp
-    | exp operatorAddSub exp
-    | <assoc=right> exp operatorStrcat exp
-    | exp operatorComparison exp
-    | exp operatorAnd exp
-    | exp operatorOr exp
-    | exp operatorBitwise exp
+    | <assoc=right> exp ('^') exp
+    | ('not' | '#' | '-' | '~') exp
+    | exp ('*' | '/' | '%' | '//') exp
+    | exp ('+' | '-') exp
+    | <assoc=right> exp ('..') exp
+    | exp ('<' | '>' | '<=' | '>=' | '~=' | '==') exp
+    | exp ('and') exp
+    | exp ('or') exp
+    | exp ('&' | '|' | '~' | '<<' | '>>') exp
     ;
 
-prefixexp
-    : varOrExp (notnl nameAndArgs)*
-    ;
-
-functioncall
-    : varOrExp (notnl nameAndArgs)+
-    ;
-
-varOrExp
-    : var | '(' exp ')'
-    ;
-
+// var ::=  Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name 
 var
-    : (NAME | '(' exp ')' varSuffix) varSuffix*
+    : NAME
+    | prefixexp ('[' exp ']' | '.' NAME)
     ;
 
-varSuffix
-    : notnl nameAndArgs* ('[' exp ']' | '.' NAME)
+// prefixexp ::= var | functioncall | ‘(’ exp ‘)’
+prefixexp
+    :
+    NAME ('[' exp ']' | '.' NAME)*
+    | functioncall ('[' exp ']' | '.' NAME)*
+    | '(' exp ')' ('[' exp ']' | '.' NAME)*
     ;
 
-nameAndArgs
-    : (':' NAME)? args
+// functioncall ::=  prefixexp args | prefixexp ‘:’ Name args;
+functioncall:
+    NAME ('[' exp ']' | '.' NAME)* args
+    | functioncall ('[' exp ']' | '.' NAME)* args
+    | '(' exp ')' ('[' exp ']' | '.' NAME)* args
+    | NAME ('[' exp ']' | '.' NAME)*  ':' NAME args
+    | functioncall ('[' exp ']' | '.' NAME)*  ':' NAME args
+    | '(' exp ')' ('[' exp ']' | '.' NAME)*  ':' NAME args
     ;
 
 args
@@ -182,11 +122,17 @@ functiondef
     ;
 
 funcbody
-    : '(' parlist? ')' block 'end'
+    : '(' parlist ')' block 'end'
     ;
 
+/* lparser.c says "is 'parlist' not empty?"
+ * That code does so by checking la(1) == ')'.
+ * This means that parlist can derive empty.
+ */
 parlist
-    : namelist (',' '...')? | '...'
+    : namelist (',' '...')?
+    | '...'
+    |
     ;
 
 tableconstructor
@@ -205,33 +151,6 @@ fieldsep
     : ',' | ';'
     ;
 
-operatorOr
-	: 'or';
-
-operatorAnd
-	: 'and';
-
-operatorComparison
-	: '<' | '>' | '<=' | '>=' | '~=' | '==';
-
-operatorStrcat
-	: '..';
-
-operatorAddSub
-	: '+' | '-';
-
-operatorMulDivMod
-	: '*' | '/' | '%' | '//';
-
-operatorBitwise
-	: '&' | '|' | '~' | '<<' | '>>';
-
-operatorUnary
-    : 'not' | '#' | '-' | '~';
-
-operatorPower
-    : '^';
-
 number
     : INT | HEX | FLOAT | HEX_FLOAT
     ;
@@ -239,5 +158,3 @@ number
 string
     : NORMALSTRING | CHARSTRING | LONGSTRING
     ;
-
-notnl : { this.IsNotNl() }? ;
