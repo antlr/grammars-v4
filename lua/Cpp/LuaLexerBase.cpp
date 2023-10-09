@@ -10,6 +10,8 @@ LuaLexerBase::LuaLexerBase(antlr4::CharStream * input) : antlr4::Lexer(input)
 void LuaLexerBase::HandleComment()
 {
     auto cs = (antlr4::CharStream*)this->_input;
+    this->start_line = this->getLine();
+    this->start_col = this->getCharPositionInLine() - 2;
     if (cs->LA(1) == '[')
     {
         int sep = skip_sep(cs);
@@ -35,9 +37,12 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
         auto cc = (char)c;
         switch (c)
         {
-            case (size_t)-1:
+            case (size_t)-1: {
                 done = true;
+                antlr4::ANTLRErrorListener & listener = this->getErrorListenerDispatch();
+                listener.syntaxError(this, nullptr, this->start_line, this->start_col, "unfinished long comment", nullptr);
                 break;
+                }
             case ']':
                 if (skip_sep(cs) == sep) done = true;
                 break;

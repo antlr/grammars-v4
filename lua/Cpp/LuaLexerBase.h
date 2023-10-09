@@ -5,6 +5,8 @@ class LuaLexerBase : public antlr4::Lexer
 {
     private:
         antlr4::CharStream * _input;
+    size_t start_line;
+    size_t start_col;
 
     public:
         LuaLexerBase(antlr4::CharStream * input);
