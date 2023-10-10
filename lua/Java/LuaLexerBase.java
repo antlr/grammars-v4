@@ -47,11 +47,21 @@ public abstract class LuaLexerBase extends Lexer {
                     listener.syntaxError(this, null, this.start_line, this.start_col, "unfinished long comment", null);
                     break;
                 case ']':
-                    if (skip_sep(cs) == sep) done = true;
+                    if (skip_sep(cs) == sep)
+                    {
+                        cs.consume();
+                        done = true;
+                    }
+                    break;
+                default:
+                    if (cs.LA(1) == -1)
+                    {
+                        done = true;
+                        break;
+                    }
+                    cs.consume();
                     break;
             }
-            if (cs.LA(1) == -1) break;
-            cs.consume();
             if (done) break;
         }
     }

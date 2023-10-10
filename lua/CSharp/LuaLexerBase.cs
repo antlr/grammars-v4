@@ -55,7 +55,6 @@ public abstract class LuaLexerBase : Lexer
                     done = true;
                     IAntlrErrorListener<int> listener = ErrorListenerDispatch;
                     listener.SyntaxError(ErrorOutput, this, 0, this.start_line, this.start_col, "unfinished long comment", null);
-                    done = true;
                     break;
                 case ']':
                     if (skip_sep(cs) == sep)

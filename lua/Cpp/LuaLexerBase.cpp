@@ -44,12 +44,21 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
                 break;
                 }
             case ']':
-                if (skip_sep(cs) == sep) done = true;
+                if (skip_sep(cs) == sep)
+                {
+                    cs->consume();
+                    done = true;
+                }
+                break;
+            default:
+                if (cs->LA(1) == (size_t) -1)
+                {
+                    done = true;
+                    break;
+                }
+                cs->consume();
                 break;
         }
-
-        if (cs->LA(1) == (size_t)-1) break;
-        cs->consume();
         if (done) break;
     }
 }

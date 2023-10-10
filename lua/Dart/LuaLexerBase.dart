@@ -21,6 +21,8 @@ abstract class LuaLexerBase extends Lexer
         start_line = this.line;
         start_col = this.charPositionInLine - 2;
         var cs = this.inputStream;
+        var c = cs.LA(1);
+        var yo = '['.codeUnitAt(0);
         if (cs.LA(1) == '['.codeUnitAt(0))
         {
             int sep = skip_sep(cs);
@@ -30,8 +32,11 @@ abstract class LuaLexerBase extends Lexer
                 return;
             }
         }
-        while (cs.LA(1) != '\n' && cs.LA(1) != -1)
-        {
+        for (;;) {
+            var c2 = cs.LA(1);
+            var yo2 = '\n'.codeUnitAt(0);
+            if (c2 == yo2) break;
+            if (c2 == -1) break;
             cs.consume();
         }
     }
@@ -50,12 +55,20 @@ abstract class LuaLexerBase extends Lexer
                 done = true;
                 final listener = this.errorListenerDispatch;
                 listener.syntaxError(this, null, this.start_line, this.start_col, "unfinished long comment", null);
-            } else if (c == yo)
-            {
-                if (skip_sep(cs) == sep) done = true;
+            } else if (c == yo) {
+                if (skip_sep(cs) == sep)
+                {
+                    cs.consume();
+                    done = true;
+                }
+            } else {
+                if (cs.LA(1) == -1)
+                {
+                    done = true;
+                } else {
+                    cs.consume();
+                }
             }
-            if (cs.LA(1) == -1) break;
-            cs.consume();
             if (done) break;
         }
     }
@@ -65,7 +78,8 @@ abstract class LuaLexerBase extends Lexer
         int count = 0;
         var s = cs.LA(1);
         cs.consume();
-        while (cs.LA(1) == '=')
+        var yoeq = '='.codeUnitAt(0);
+        while (cs.LA(1) == yoeq)
         {
             cs.consume();
             count++;
