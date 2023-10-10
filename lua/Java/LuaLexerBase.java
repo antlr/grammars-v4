@@ -1,7 +1,11 @@
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Lexer;
 
 public abstract class LuaLexerBase extends Lexer {
+
+    private int start_line;
+    private int start_col;
 
     protected LuaLexerBase(CharStream input) {
         super(input);
@@ -9,6 +13,8 @@ public abstract class LuaLexerBase extends Lexer {
 
     protected void HandleComment()
     {
+        start_line = this.getLine();
+        start_col = this.getCharPositionInLine() - 2;
         var cs = (CharStream)_input;
         if (cs.LA(1) == '[')
         {
@@ -37,6 +43,8 @@ public abstract class LuaLexerBase extends Lexer {
             {
                 case -1:
                     done = true;
+                    ANTLRErrorListener listener = this.getErrorListenerDispatch();
+                    listener.syntaxError(this, null, this.start_line, this.start_col, "unfinished long comment", null);
                     break;
                 case ']':
                     if (skip_sep(cs) == sep) done = true;
