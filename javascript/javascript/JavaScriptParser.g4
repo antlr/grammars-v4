@@ -499,6 +499,7 @@ identifier
     | Async
     | As
     | From
+    | Yield
     ;
 
 reservedWord
