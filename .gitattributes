@@ -137,3 +137,5 @@ erlang/src/** linguist-vendored
 solidity/test.sol linguist-vendored
 sql/postgresql/examples.errors/** linguist-vendored
 v/failed_examples/** linguist-vendored
+
+lua/examples/* eol=lf
