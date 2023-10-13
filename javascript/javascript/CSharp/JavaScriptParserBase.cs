@@ -133,4 +133,10 @@ public abstract class JavaScriptParserBase : Parser
     {
         return string.Equals(_tagNames.Pop(),tagName, System.StringComparison.InvariantCulture);
     }
+    
+        
+    protected bool notLineTerminatorAhead()
+    {
+        return !lineTerminatorAhead();
+    }
 }
