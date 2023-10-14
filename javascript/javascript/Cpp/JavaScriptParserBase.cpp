@@ -45,7 +45,7 @@ bool JavaScriptParserBase::here(int type)
     auto currentToken = _input->LT(-1);
 
     // Get the next token index.
-    int nextTokenIndex = currentToken == null ? 0 : currentToken->getTokenIndex() + 1;
+    int nextTokenIndex = currentToken == nullptr ? 0 : currentToken->getTokenIndex() + 1;
 
     // Get the token after the `currentToken`. By using `_input.get(index)`,
     // we also grab a token that is (possibly) on the HIDDEN channel.
