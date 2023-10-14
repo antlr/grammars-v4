@@ -55,7 +55,7 @@ func (p *JavaScriptParserBase) here(_type int) bool {
 	nextTokenIndex := 0
 
 	if currentToken != nil {
-		nextTokenIndex := currentToken.GetTokenIndex() + 1
+		nextTokenIndex = currentToken.GetTokenIndex() + 1
 	}
 
 	// Get the token after the `currentToken`. By using `_input.get(index)`,
