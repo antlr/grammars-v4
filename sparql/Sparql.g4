@@ -375,7 +375,7 @@ VAR2
     ;
 
 LANGTAG
-    : '@' PN_CHARS_BASE+ ('-' (PN_CHARS_BASE DIGIT)+)*
+    : '@' PN_CHARS_BASE+ ('-' (PN_CHARS_BASE | DIGIT)+)*
     ;
 
 INTEGER
