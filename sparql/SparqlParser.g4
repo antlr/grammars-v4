@@ -188,7 +188,7 @@ object_
 
 verb
     : varOrIRIref
-    | 'a'
+    | A
     ;
 
 triplesNode
