@@ -66,14 +66,19 @@ public abstract class JavaScriptParserBase extends Parser
      */
     private boolean here(final int type) {
 
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        if (possibleIndexEosToken < 0) return false;
-        Token ahead = _input.get(possibleIndexEosToken);
+        // Get the most recently emitted token.
+        Token currentToken = _input.LT(-1);
+
+        // Get the next token index.
+        int nextTokenIndex = currentToken == null ? 0 : currentToken.getTokenIndex() + 1;
+
+        // Get the token after the `currentToken`. By using `_input.get(index)`,
+        // we also grab a token that is (possibly) on the HIDDEN channel.
+        Token nextToken = _input.get(nextTokenIndex);
 
         // Check if the token resides on the HIDDEN channel and if it's of the
         // provided type.
-        return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
+        return (nextToken.getChannel() == Lexer.HIDDEN) && (nextToken.getType() == type);
     }
 
     /**
