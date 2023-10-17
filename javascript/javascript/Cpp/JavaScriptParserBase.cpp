@@ -88,3 +88,8 @@ bool JavaScriptParserBase::lineTerminatorAhead()
     return (type == JavaScriptParser::MultiLineComment && (text.find("\r") != std::string::npos || text.find("\n") != std::string::npos)) ||
             (type == JavaScriptParser::LineTerminator);
 }
+
+bool JavaScriptParserBase::notLineTerminatorAhead()
+{
+    return !notLineTerminatorAhead();
+}
