@@ -42,7 +42,7 @@ options {
 }
 
 query
-    : prologue ( selectQuery | constructQuery | describeQuery | askQuery ) EOF
+    : prologue (selectQuery | constructQuery | describeQuery | askQuery) EOF
     ;
 
 prologue
@@ -58,7 +58,7 @@ prefixDecl
     ;
 
 selectQuery
-    : SELECT ( DISTINCT | REDUCED )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
+    : SELECT (DISTINCT | REDUCED)? (var_+ | '*') datasetClause* whereClause solutionModifier
     ;
 
 constructQuery
@@ -66,7 +66,7 @@ constructQuery
     ;
 
 describeQuery
-    : DESCRIBE ( varOrIRIref+ | '*' ) datasetClause* whereClause? solutionModifier
+    : DESCRIBE (varOrIRIref+ | '*') datasetClause* whereClause? solutionModifier
     ;
 
 askQuery
@@ -74,7 +74,7 @@ askQuery
     ;
 
 datasetClause
-    : FROM ( defaultGraphClause | namedGraphClause )
+    : FROM (defaultGraphClause | namedGraphClause)
     ;
 
 defaultGraphClause
@@ -98,7 +98,8 @@ solutionModifier
     ;
 
 limitOffsetClauses
-    : ( limitClause offsetClause? | offsetClause limitClause? )
+    : limitClause offsetClause?
+    | offsetClause limitClause?
     ;
 
 orderClause
@@ -106,8 +107,9 @@ orderClause
     ;
 
 orderCondition
-    : ( ( ASC | DESC ) brackettedExpression )
-    | ( constraint | var_ )
+    : (ASC | DESC) brackettedExpression
+    | constraint
+    | var_
     ;
 
 limitClause
@@ -119,15 +121,17 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' triplesBlock? ( ( graphPatternNotTriples | filter_ ) '.'? triplesBlock? )* '}'
+    : '{' triplesBlock? ((graphPatternNotTriples | filter_) '.'? triplesBlock?)* '}'
     ;
 
 triplesBlock
-    : triplesSameSubject ( '.' triplesBlock? )?
+    : triplesSameSubject ('.' triplesBlock?)?
     ;
 
 graphPatternNotTriples
-    : optionalGraphPattern | groupOrUnionGraphPattern | graphGraphPattern
+    : optionalGraphPattern
+    | groupOrUnionGraphPattern
+    | graphGraphPattern
     ;
 
 optionalGraphPattern
@@ -139,7 +143,7 @@ graphGraphPattern
     ;
 
 groupOrUnionGraphPattern
-    : groupGraphPattern ( UNION groupGraphPattern )*
+    : groupGraphPattern (UNION groupGraphPattern)*
     ;
 
 filter_
@@ -147,7 +151,9 @@ filter_
     ;
 
 constraint
-    : brackettedExpression | builtInCall | functionCall
+    : brackettedExpression
+    | builtInCall
+    | functionCall
     ;
 
 functionCall
@@ -155,7 +161,8 @@ functionCall
     ;
 
 argList
-    : ( NIL | '(' expression ( ',' expression )* ')' )
+    : NIL
+    | '(' expression (',' expression)* ')'
     ;
 
 constructTemplate
@@ -163,15 +170,16 @@ constructTemplate
     ;
 
 constructTriples
-    : triplesSameSubject ( '.' constructTriples? )?
+    : triplesSameSubject ('.' constructTriples?)?
     ;
 
 triplesSameSubject
-    : varOrTerm propertyListNotEmpty | triplesNode propertyList
+    : varOrTerm propertyListNotEmpty
+    | triplesNode propertyList
     ;
 
 propertyListNotEmpty
-    : verb objectList ( ';' ( verb objectList )? )*
+    : verb objectList (';' (verb objectList)?)*
     ;
 
 propertyList
@@ -179,7 +187,7 @@ propertyList
     ;
 
 objectList
-    : object_ ( ',' object_ )*
+    : object_ (',' object_)*
     ;
 
 object_
@@ -205,7 +213,8 @@ collection
     ;
 
 graphNode
-    : varOrTerm | triplesNode
+    : varOrTerm
+    | triplesNode
     ;
 
 varOrTerm
@@ -214,7 +223,8 @@ varOrTerm
     ;
 
 varOrIRIref
-    : var_ | iriRef
+    : var_
+    | iriRef
     ;
 
 var_
@@ -236,11 +246,11 @@ expression
     ;
 
 conditionalOrExpression
-    : conditionalAndExpression ( '||' conditionalAndExpression )*
+    : conditionalAndExpression ('||' conditionalAndExpression)*
     ;
 
 conditionalAndExpression
-    : valueLogical ( '&&' valueLogical )*
+    : valueLogical ('&&' valueLogical)*
     ;
 
 valueLogical
@@ -248,7 +258,7 @@ valueLogical
     ;
 
 relationalExpression
-    : numericExpression ( '=' numericExpression | '!=' numericExpression | '<' numericExpression | '>' numericExpression | '<=' numericExpression | '>=' numericExpression )?
+    : numericExpression (('=' | '!=' | '<' | '>' | '<=' | '>=') numericExpression)?
     ;
 
 numericExpression
@@ -256,22 +266,25 @@ numericExpression
     ;
 
 additiveExpression
-    : multiplicativeExpression ( '+' multiplicativeExpression | '-' multiplicativeExpression | numericLiteralPositive | numericLiteralNegative )*
+    : multiplicativeExpression (('+' | '-') multiplicativeExpression | numericLiteralPositive | numericLiteralNegative)*
     ;
 
 multiplicativeExpression
-    : unaryExpression ( '*' unaryExpression | '/' unaryExpression )*
+    : unaryExpression (('*' | '/') unaryExpression)*
     ;
 
 unaryExpression
-    :  '!' primaryExpression
-    | '+' primaryExpression
-    | '-' primaryExpression
-    | primaryExpression
+    : ('!' | '+' | '-')? primaryExpression
     ;
 
 primaryExpression
-    : brackettedExpression | builtInCall | iriRefOrFunction | rdfLiteral | numericLiteral | booleanLiteral | var_
+    : brackettedExpression
+    | builtInCall
+    | iriRefOrFunction
+    | rdfLiteral
+    | numericLiteral
+    | booleanLiteral
+    | var_
     ;
 
 brackettedExpression
@@ -293,7 +306,7 @@ builtInCall
     ;
 
 regexExpression
-    : REGEX '(' expression ',' expression ( ',' expression )? ')'
+    : REGEX '(' expression ',' expression (',' expression)? ')'
     ;
 
 iriRefOrFunction
@@ -301,11 +314,13 @@ iriRefOrFunction
     ;
 
 rdfLiteral
-    : string_ ( LANGTAG | ( '^^' iriRef ) )?
+    : string_ (LANGTAG | '^^' iriRef)?
     ;
 
 numericLiteral
-    : numericLiteralUnsigned | numericLiteralPositive | numericLiteralNegative
+    : numericLiteralUnsigned
+    | numericLiteralPositive
+    | numericLiteralNegative
     ;
 
 numericLiteralUnsigned

@@ -71,7 +71,7 @@ STAR:             '*';
 // MISC
 
 IRI_REF
-    : '<' ( ~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`') | (PN_CHARS))* '>'
+    : '<' (~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`') | PN_CHARS)* '>'
     ;
 
 PNAME_NS
@@ -109,8 +109,7 @@ DECIMAL
 
 DOUBLE
     : DIGIT+ '.' DIGIT* EXPONENT
-    | '.' DIGIT+ EXPONENT
-    | DIGIT+ EXPONENT
+    | '.'? DIGIT+ EXPONENT
     ;
 
 INTEGER_POSITIVE
@@ -138,23 +137,23 @@ DOUBLE_NEGATIVE
     ;
 
 EXPONENT
-    : ('E') ('+'|'-')? DIGIT+
+    : 'E' ('+' | '-')? DIGIT+
     ;
 
 STRING_LITERAL1
-    : '\'' ( ~('\u0027' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '\''
+    : '\'' (~('\u0027' | '\u005C' | '\u000A' | '\u000D') | ECHAR)* '\''
     ;
 
 STRING_LITERAL2
-    : '"'  ( ~('\u0022' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '"'
+    : '"' (~('\u0022' | '\u005C' | '\u000A' | '\u000D') | ECHAR)* '"'
     ;
 
 STRING_LITERAL_LONG1
-    : '\'\'\'' ( ( '\'' | '\'\'' )? (~('\'' | '\\') | ECHAR ) )* '\'\'\''
+    : '\'\'\'' (('\'' | '\'\'' )? (~('\'' | '\\') | ECHAR))* '\'\'\''
     ;
 
 STRING_LITERAL_LONG2
-    : '"""' ( ( '"' | '""' )? ( ~('\'' | '\\') | ECHAR ) )* '"""'
+    : '"""' (( '"' | '""')? (~('\'' | '\\') | ECHAR))* '"""'
     ;
 
 ECHAR options { caseInsensitive=false; }
@@ -170,11 +169,12 @@ ANON
     ;
 
 PN_CHARS_U
-    : PN_CHARS_BASE | '_'
+    : PN_CHARS_BASE
+    | '_'
     ;
 
 VARNAME
-    : ( PN_CHARS_U | DIGIT ) ( PN_CHARS_U | DIGIT | '\u00B7' | ('\u0300'..'\u036F') | ('\u203F'..'\u2040') )*
+    : (PN_CHARS_U | DIGIT) (PN_CHARS_U | DIGIT | '\u00B7' | '\u0300'..'\u036F' | '\u203F'..'\u2040')*
     ;
 
 fragment
@@ -188,11 +188,11 @@ PN_CHARS
     ;
 
 PN_PREFIX
-    : PN_CHARS_BASE ((PN_CHARS|'.')* PN_CHARS)?
+    : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
 PN_LOCAL
-    : ( PN_CHARS_U | DIGIT ) ((PN_CHARS|'.')* PN_CHARS)?
+    : (PN_CHARS_U | DIGIT) ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
 fragment
@@ -218,8 +218,5 @@ DIGIT
     ;
 
 WS
-    : (' '
-    | '\t'
-    | '\n'
-    | '\r')+ ->skip
+    : [ \t\n\r]+ -> channel(HIDDEN)
     ;
