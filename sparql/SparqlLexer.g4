@@ -1,8 +1,11 @@
 lexer grammar SparqlLexer;
 
+options { caseInsensitive=true; }
+
 // Keywords
 
-A:                'a';
+A options { caseInsensitive=false; } : 'a';
+
 ASC:              'ASC';
 ASK:              'ASK';
 BASE:             'BASE';
@@ -135,7 +138,7 @@ DOUBLE_NEGATIVE
     ;
 
 EXPONENT
-    : ('e'|'E') ('+'|'-')? DIGIT+
+    : ('E') ('+'|'-')? DIGIT+
     ;
 
 STRING_LITERAL1
@@ -154,7 +157,7 @@ STRING_LITERAL_LONG2
     : '"""' ( ( '"' | '""' )? ( ~('\'' | '\\') | ECHAR ) )* '"""'
     ;
 
-ECHAR
+ECHAR options { caseInsensitive=false; }
     : '\\' ('t' | 'b' | 'n' | 'r' | 'f' | '"' | '\'')
     ;
 
@@ -193,7 +196,7 @@ PN_LOCAL
     ;
 
 fragment
-PN_CHARS_BASE
+PN_CHARS_BASE options { caseInsensitive=false; }
     : 'A'..'Z'
     | 'a'..'z'
     | '\u00C0'..'\u00D6'
