@@ -249,7 +249,7 @@ UNEXPECTED_CHAR : . ;
 fragment EXPONENT : 'E' [+-]? [0-9]+;
 
 /// [160]    ECHAR : '\' [tbnrf\"']
-fragment ECHAR : '\\' [tbnrf"'];
+fragment ECHAR options { caseInsensitive=false; } : '\\' [tbnrf"'];
 
 /// [162]    WS : #x20 | #x9 | #xD | #xA
 fragment WS : [\u0020\u0009\u000D\u000A];
