@@ -1,0 +1,11 @@
+SELECT ?proglang ?resource ?val {
+
+  ?proglang wdt:P31 wd:Q9143.
+
+  SERVICE <http://dbpedia.org/sparql> {
+    ?resource rdf:type wd:Q9143;
+    owl:sameAs ?proglang;
+    foaf:homepage ?homepage.
+  }
+}
+LIMIT 10

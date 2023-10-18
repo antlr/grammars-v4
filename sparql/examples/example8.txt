@@ -1,0 +1,11 @@
+PREFIX log: <http://example.org/ont/transaction-log/>
+CONSTRUCT {
+    ?server a log:Server .
+    ?server log:processed ?txn .
+	?txn log:processedAt ?procTime
+}
+WHERE {
+    ?txn a log:Transaction .
+    ?txn log:processedBy ?server .
+	?txn log:processedAt ?procTime .
+} ORDER BY ?procTime LIMIT 10

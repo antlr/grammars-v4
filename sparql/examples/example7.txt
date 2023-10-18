@@ -1,0 +1,8 @@
+PREFIX log: <http://example.org/ont/transaction-log/>
+CONSTRUCT {
+    ?server log:processed ?txn .
+}
+WHERE {
+    ?txn a log:Transaction .
+    ?txn log:processedBy ?server
+}

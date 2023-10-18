@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Sparql.g4</include>
+					   <include>SPARQLLexer.g4</include>
+                       <include>SPARQLParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -38,8 +39,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>query</entryPoint>
-					<grammarName>Sparql</grammarName>
+					<entryPoint>queryUnit</entryPoint>
+					<grammarName>SPARQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

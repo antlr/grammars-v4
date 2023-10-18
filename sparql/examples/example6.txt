@@ -1,0 +1,28 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>CONSTRUCT {
+  ?car rdfs:label ?taggedname ;
+       rdf:type dbo:Company ;
+       dbo:location ?location .
+
+  ?location rdf:type dbo:Country ;
+            rdfs:label ?lname ;
+            dbp:populationCensus ?pop .
+} WHERE {
+  ?c <urn:col:carNames> ?cname .
+
+  BIND(STRLANG(?cname, "en") AS ?taggedname)
+
+  SERVICE <https://dbpedia.org/sparql> {
+
+    ?car rdfs:label ?taggedname ;
+         dbo:location | dbo:locationCountry ?location .
+
+    ?location rdf:type dbo:Country ;
+              rdfs:label ?lname ;
+              dbp:populationCensus | dbo:populationTotal ?pop .
+
+    FILTER (LANG(?lname) = "en")
+  }
+}
