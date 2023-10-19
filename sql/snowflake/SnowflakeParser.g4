@@ -1282,7 +1282,7 @@ alter_tag
 
 alter_task
     : ALTER TASK if_exists? object_name resume_suspend
-    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list 
+    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list
     | ALTER TASK if_exists? object_name SET
         // TODO : Check and review if element's order binded or not
         ( WAREHOUSE EQ id_ )?
@@ -1386,6 +1386,7 @@ alter_warehouse_opts
     | id_fn set_tags
     | id_fn unset_tags
     | id_fn UNSET id_ (COMMA id_)*
+    | id_ SET wh_properties (',' wh_properties)*
     ;
 
 alter_account_opts
@@ -2583,7 +2584,7 @@ task_parameters
 
 task_compute
     : WAREHOUSE EQ id_
-    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote. 
+    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote.
     ;
 
 task_schedule
@@ -2599,7 +2600,7 @@ task_suspend_after_failure_number
     ;
 
 task_error_integration
-    : ERROR_INTEGRATION EQ id_ 
+    : ERROR_INTEGRATION EQ id_
     ;
 
 task_overlap
@@ -2657,6 +2658,7 @@ wh_extra_size
 
 wh_properties
     : WAREHOUSE_SIZE EQ ( wh_common_size | wh_extra_size | ID2)
+    | WAREHOUSE_TYPE EQ (STANDARD | SNOWPARK_OPTIMIZED)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
     | SCALING_POLICY EQ (STANDARD | ECONOMY)
@@ -2667,6 +2669,7 @@ wh_properties
     | comment_clause
     | ENABLE_QUERY_ACCELERATION EQ true_false
     | QUERY_ACCELERATION_MAX_SCALE_FACTOR EQ num
+    | MAX_CONCURRENCY_LEVEL EQ num
     ;
 
 wh_params
