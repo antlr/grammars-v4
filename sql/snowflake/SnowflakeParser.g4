@@ -3592,6 +3592,8 @@ non_reserved_words
     | DYNAMIC
     | TARGET_LAG
     | EMAIL
+    | MAX_CONCURRENCY_LEVEL
+    | WAREHOUSE_TYPE
     ;
 
 builtin_function
