@@ -10,7 +10,7 @@ program
     ;
 
 line
-    : label? (directive | times_prefix? pseudoinstruction | times_prefix? instruction)? EOL
+    : label? (directive | times_prefix? (pseudoinstruction | instruction))? EOL
     ;
 
 label
