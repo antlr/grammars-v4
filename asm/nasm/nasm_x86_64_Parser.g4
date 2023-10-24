@@ -30,9 +30,8 @@ directive
     | static name
     | cpu (decimal_integer | name)
     | float_name float_params
-    | LEFT_BRACKET warning warning_state? warning_class RIGHT_BRACKET
+    | LEFT_BRACKET (warning warning_state? warning_class | map map_type name) RIGHT_BRACKET
     | org integer
-    | LEFT_BRACKET map map_type name RIGHT_BRACKET
     | group name name name+
     | uppercase
     | import_rule name+
