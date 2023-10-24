@@ -352,10 +352,11 @@ times
 
 
 pseudoinstruction
-    : name? dx value (COMMA value)*
-    | name? resx integer
-    | name? incbin atom (COMMA atom)*
-    | name? equ (integer | expression)
+    : name? ( dx value (COMMA value)*
+            | resx integer
+            | incbin atom (COMMA atom)*
+            | equ (integer | expression)
+            )
     ;
 
 dx
