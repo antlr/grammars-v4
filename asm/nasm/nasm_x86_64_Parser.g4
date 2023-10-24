@@ -150,8 +150,7 @@ absolute_seg
     ;
 
 alingment
-    : ALIGN EQUAL_1 integer
-    | START EQUAL_1 integer
+    : (ALIGN | START) EQUAL_1 integer
     | POINTER
     ;
 
