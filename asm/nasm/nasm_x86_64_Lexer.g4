@@ -2677,7 +2677,7 @@ NAME
     ;
 
 PREPROCESSOR_DIRECTIVES
-    : ('%define' | '%xdefine' | '%ixdefine' | '%undef' | '%assign' | '%iassign' | '%defstr' | '%deftok' | '%defalias' | '%undefalias' | '%strcat' | '%strlen' | '%substr' | '%include' | '%pathsearch' | '%depend' | '%use' | '%line' | '%clear') ~[\r\n]*
+    : '%' ('define' | 'xdefine' | 'ixdefine' | 'undef' | 'assign' | 'iassign' | 'defstr' | 'deftok' | 'defalias' | 'undefalias' | 'strcat' | 'strlen' | 'substr' | 'include' | 'pathsearch' | 'depend' | 'use' | 'line' | 'clear') ~[\r\n]*
       -> channel(HIDDEN)
     ;
 
