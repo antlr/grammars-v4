@@ -2647,7 +2647,7 @@ OCT_INTEGER
 HEX_INTEGER
     : [0-9A-F][0-9A-F_]+ 'h'
     | '$' [0-9A-F][0-9A-F_]*
-    | ('0x' | '0h') [0-9A-F][0-9A-F_]*
+    | '0' [xh][0-9A-F][0-9A-F_]*
     ;
 
 BIN_INTEGER
