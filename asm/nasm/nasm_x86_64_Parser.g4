@@ -32,9 +32,8 @@ directive
     | float_name float_params
     | LEFT_BRACKET (warning warning_state? warning_class | map map_type name) RIGHT_BRACKET
     | org integer
-    | group name name name+
+    | (group name name | import_rule) name+
     | uppercase
-    | import_rule name+
     | export export_params
     | safeseh name
     | osabi decimal_integer
