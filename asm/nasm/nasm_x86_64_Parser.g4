@@ -24,8 +24,7 @@ directive
     | default default_perfix
     | section section_params
     | absolute (integer | name)
-    | extern extern_params
-    | required extern_params
+    | (extern | required) extern_params
     | global global_params
     | common common_params
     | static name
