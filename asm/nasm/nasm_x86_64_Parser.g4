@@ -138,8 +138,7 @@ starting_possition
     ;
 
 follow
-    : FOLLOWS EQUAL_1 name
-    | VFOLLOWS EQUAL_1 name
+    : (FOLLOWS | VFOLLOWS) EQUAL_1 name
     ;
 
 flat
