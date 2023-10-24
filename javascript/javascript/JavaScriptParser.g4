@@ -501,6 +501,13 @@ identifier
     | From
     | Yield
     | Of
+    | Static
+    | Implements
+    | Interface
+    | Package
+    | Private
+    | Public
+    | Protected
     ;
 
 reservedWord
