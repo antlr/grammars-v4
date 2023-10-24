@@ -156,6 +156,7 @@ In:                             'in';
 Try:                            'try';
 As:                             'as';
 From:                           'from';
+Of:                             'of';
 
 /// Future Reserved Words
 
