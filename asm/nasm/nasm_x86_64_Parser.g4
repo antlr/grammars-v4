@@ -535,8 +535,9 @@ strict
     ;
 
 macro_call
-    : name macro_param? (COMMA macro_param)*
-    | name LEFT_PARENTHESIS macro_param? (COMMA macro_param)* RIGHT_PARENTHESIS
+    : name ( macro_param? (COMMA macro_param)*
+           | LEFT_PARENTHESIS macro_param? (COMMA macro_param)* RIGHT_PARENTHESIS
+           )
     ;
 
 macro_param
