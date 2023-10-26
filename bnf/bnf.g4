@@ -42,11 +42,11 @@ grammar bnf;
 start_ : (delimited_nonterminal | delimited_terminal)? ws? EOF ;
 
 delimited_nonterminal : prod_dnt+ ;
-prod_dnt : lhs assign rhs ;
-lhs : ws? '<' .+? '>' ;
-rhs : alt? (or alt)* ;
-alt : elem+? ;
-elem : ws? ('<' .+? '>' | .) ;
+prod_dnt : ylhs assign yrhs ;
+ylhs : ws? '<' .+? '>' ;
+yrhs : yalt? (or yalt)* ;
+yalt : yelem+? ;
+yelem : ws? ('<' .+? '>' | .) ;
 
 delimited_terminal : prod_dt+ ;
 prod_dt : xlhs assign xrhs ;
