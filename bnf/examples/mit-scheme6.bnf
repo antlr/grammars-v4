@@ -1,4 +1,4 @@
-﻿<lexeme> → <identifier> ∣ <boolean> ∣ <number>
+<lexeme> → <identifier> ∣ <boolean> ∣ <number>
 ‌ ∣ <character> ∣ <string>
 
     ∣ ( ∣ ) ∣ [ ∣ ] ∣ #( ∣ #vu8( | ' ∣ ` ∣ , ∣ ,@ ∣ .
