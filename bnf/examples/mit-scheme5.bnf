@@ -1,0 +1,218 @@
+<token> --> <identifier> | <boolean> | <number>
+     | <character> | <string>
+     | ( | ) | #( | ' | ` | , | ,@ | .
+<delimiter> --> <whitespace> | ( | ) | " | ;
+<whitespace> --> <space or newline>
+<comment> --> ;  <all subsequent characters up to a
+                 line break>
+<atmosphere> --> <whitespace> | <comment>
+<intertoken space> --> <atmosphere>*
+
+<identifier> --> <initial> <subsequent>*
+     | <peculiar identifier>
+<initial> --> <letter> | <special initial>
+<letter> --> a | b | c | ... | z
+
+<special initial> --> ! | $ | % | & | * | / | : | < | =
+     | > | ? | ^ | _ | ~
+<subsequent> --> <initial> | <digit>
+     | <special subsequent>
+<digit> --> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<special subsequent> --> + | - | . | @
+<peculiar identifier> --> + | - | ...
+<syntactic keyword> --> <expression keyword>
+     | else | => | define 
+     | unquote | unquote-splicing
+<expression keyword> --> quote | lambda | if
+     | set! | begin | cond | and | or | case
+     | let | let* | letrec | do | delay
+     | quasiquote
+
+<boolean> --> #t | #f
+<character> --> #\ <any character>
+     | #\ <character name>
+<character name> --> space | newline
+
+<string> --> " <string element>* "
+<string element> --> <any character other than " or \>
+     | \" | \\ 
+
+<number> --> <num 2>| <num 8>
+     | <num 10>| <num 16>
+
+<num R> --> <prefix R> <complex R>
+<complex R> --> <real R> | <real R> @ <real R>
+    | <real R> + <ureal R> i | <real R> - <ureal R> i
+    | <real R> + i | <real R> - i
+    | + <ureal R> i | - <ureal R> i | + i | - i
+<real R> --> <sign> <ureal R>
+<ureal R> --> <uinteger R>
+    | <uinteger R> / <uinteger R>
+    | <decimal R>
+<decimal 10> --> <uinteger 10> <suffix>
+    | . <digit 10>+ #* <suffix>
+    | <digit 10>+ . <digit 10>* #* <suffix>
+    | <digit 10>+ #+ . #* <suffix>
+<uinteger R> --> <digit R>+ #*
+<prefix R> --> <radix R> <exactness>
+    | <exactness> <radix R>
+
+
+<suffix> --> <empty> 
+    | <exponent marker> <sign> <digit 10>+
+<exponent marker> --> e | s | f | d | l
+<sign> --> <empty>  | + |  -
+<exactness> --> <empty> | #i | #e
+<radix 2> --> #b
+<radix 8> --> #o
+<radix 10> --> <empty> | #d
+<radix 16> --> #x
+<digit 2> --> 0 | 1
+<digit 8> --> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+<digit 10> --> <digit>
+<digit 16> --> <digit 10> | a | b | c | d | e | f 
+
+
+<datum> --> <simple datum> | <compound datum>
+<simple datum> --> <boolean> | <number>
+     | <character> | <string> |  <symbol>
+<symbol> --> <identifier>
+<compound datum> --> <list> | <vector>
+<list> --> (<datum>*) | (<datum>+ . <datum>)
+       | <abbreviation>
+<abbreviation> --> <abbrev prefix> <datum>
+<abbrev prefix> --> ' | ` | , | ,@
+<vector> --> #(<datum>*) 
+
+<expression> --> <variable>
+     | <literal>
+     | <procedure call>
+     | <lambda expression>
+     | <conditional>
+     | <assignment>
+     | <derived expression>
+     | <macro use>
+     | <macro block>
+
+<literal> --> <quotation> | <self-evaluating>
+<self-evaluating> --> <boolean> | <number>
+     | <character> | <string>
+<quotation> --> '<datum> | (quote <datum>)
+<procedure call> --> (<operator> <operand>*)
+<operator> --> <expression>
+<operand> --> <expression>
+
+<lambda expression> --> (lambda <formals> <body>)
+<formals> --> (<variable>*) | <variable>
+     | (<variable>+ . <variable>)
+<body> --> <definition>* <sequence>
+<sequence> --> <command>* <expression>
+<command> --> <expression>
+
+<conditional> --> (if <test> <consequent> <alternate>)
+<test> --> <expression>
+<consequent> --> <expression>
+<alternate> --> <expression> | <empty>
+
+<assignment> --> (set! <variable> <expression>)
+
+<derived expression> -->
+       (cond <cond clause>+)
+     | (cond <cond clause>* (else <sequence>))
+     | (case <expression>
+         <case clause>+)
+     | (case <expression>
+         <case clause>*
+         (else <sequence>))
+     | (and <test>*)
+     | (or <test>*)
+     | (let (<binding spec>*) <body>)
+     | (let <variable> (<binding spec>*) <body>)
+     | (let* (<binding spec>*) <body>)
+     | (letrec (<binding spec>*) <body>)
+     | (begin <sequence>)
+     | (do (<iteration spec>*)
+           (<test> <do result>)
+         <command>*)
+     | (delay <expression>)
+     | <quasiquotation>
+
+<cond clause> --> (<test> <sequence>)
+      | (<test>)
+      | (<test> => <recipient>)
+<recipient> --> <expression>
+<case clause> --> ((<datum>*) <sequence>)
+<binding spec> --> (<variable> <expression>)
+<iteration spec> --> (<variable> <init> <step>)
+    | (<variable> <init>)
+<init> --> <expression>
+<step> --> <expression>
+<do result> --> <sequence> | <empty>
+
+<macro use> --> (<keyword> <datum>*)
+<keyword> --> <identifier>
+
+<macro block> -->
+     (let-syntax (<syntax spec>*) <body>)
+     | (letrec-syntax (<syntax spec>*) <body>)
+<syntax spec> --> (<keyword> <transformer spec>)
+
+
+<quasiquotation> --> <quasiquotation 1>
+<qq template 0> --> <expression>
+<quasiquotation D> --> `<qq template D>
+       | (quasiquote <qq template D>)
+<qq template D> --> <simple datum>
+       | <list qq template D>
+       | <vector qq template D>
+       | <unquotation D>
+<list qq template D> --> (<qq template or splice D>*)
+       | (<qq template or splice D>+ . <qq template D>)
+       | '<qq template D>
+       | <quasiquotation D+1>
+<vector qq template D> --> #(<qq template or splice D>*)
+<unquotation D> --> ,<qq template D-1>
+       | (unquote <qq template D-1>)
+<qq template or splice D> --> <qq template D>
+       | <splicing unquotation D>
+<splicing unquotation D> --> ,@<qq template D-1>
+       | (unquote-splicing <qq template D-1>) 
+
+<transformer spec> -->
+    (syntax-rules (<identifier>*) <syntax rule>*)
+<syntax rule> --> (<pattern> <template>)
+<pattern> --> <pattern identifier>
+     | (<pattern>*)
+     | (<pattern>+ . <pattern>)
+     | (<pattern>* <pattern> <ellipsis>)
+     | #(<pattern>*)
+     | #(<pattern>* <pattern> <ellipsis>)
+     | <pattern datum>
+<pattern datum> --> <string>
+     | <character>
+     | <boolean>
+     | <number>
+<template> --> <pattern identifier>
+     | (<template element>*)
+     | (<template element>+ . <template>)
+     | #(<template element>*)
+     | <template datum>
+<template element> --> <template>
+     | <template> <ellipsis>
+<template datum> --> <pattern datum>
+<pattern identifier> --> <any identifier except `...'>
+<ellipsis> --> <the identifier `...'>
+
+
+<program> --> <command or definition>*
+<command or definition> --> <command>
+    | <definition>
+    | <syntax definition>
+    | (begin <command or definition>+)
+<definition> --> (define <variable> <expression>)
+      | (define (<variable> <def formals>) <body>)
+      | (begin <definition>*)
+<def formals> --> <variable>*
+      | <variable>* . <variable>
+<syntax definition> -->
+     (define-syntax <keyword> <transformer spec>)

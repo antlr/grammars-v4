@@ -1,0 +1,25 @@
+<rulelist> :≡ <rules> <EOF>
+
+<rules> :≡ <rule> o̅r̅ <rule> <rules>
+
+<rule> :≡ <lhs> <ASSIGN> <rhs>
+
+<lhs> :≡ <id>
+
+<rhs> :≡ <alternatives>
+
+<alternatives> :≡ <alternative> o̅r̅ <alternative> <bar> <alternatives>
+
+<alternative> :≡ <optional> o̅r̅ <zeroormore> o̅r̅ <oneormore> o̅r̅ <text> o̅r̅ <id>
+
+<optional> :≡ [ <alternatives> ]
+
+<zeroormore> :≡ { <alternatives> }
+
+<oneormore> :≡ ( <alternatives> )
+
+<text> :≡ <TEXT>
+
+<id> :≡ <ID>
+
+<bar> :≡ <BAR>
