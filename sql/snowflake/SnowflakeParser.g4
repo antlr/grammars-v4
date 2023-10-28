@@ -3551,6 +3551,9 @@ keyword
     | COMMENT
     | ORDER
     | NOORDER
+    | DIRECTION
+    | LENGTH
+    | LANGUAGE
     // etc
     ;
 
