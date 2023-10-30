@@ -45,7 +45,7 @@ rhs
     ;
 
 alternatives
-    : alternative (BAR alternative)*
+    : alternative ('|' alternative)*
     ;
 
 alternative
@@ -61,15 +61,15 @@ element
     ;
 
 optional_
-    : REND alternatives LEND
+    : '[' alternatives ']'
     ;
 
 zeroormore
-    : RBRACE alternatives LBRACE
+    : '{' alternatives '}'
     ;
 
 oneormore
-    : RPAREN alternatives LPAREN
+    : '(' alternatives ')'
     ;
 
 text_
@@ -77,7 +77,7 @@ text_
     ;
 
 id_
-    : LT ruleid GT
+    : '<' ruleid '>'
     ;
 
 ruleid
@@ -88,39 +88,39 @@ ASSIGN
     : '::='
     ;
 
-LPAREN
+Right_Parenthesis
     : ')'
     ;
 
-RPAREN
+Left_Parenthesis
     : '('
     ;
 
-LBRACE
+Right_Curly_Bracket
     : '}'
     ;
 
-RBRACE
+Left_Curly_Bracket
     : '{'
     ;
 
-LEND
+Right_Square_Bracket
     : ']'
     ;
 
-REND
+Left_Square_Bracket
     : '['
     ;
 
-BAR
+Vertical_Line
     : '|'
     ;
 
-GT
+Greater_Than_Sign
     : '>'
     ;
 
-LT
+Less_Than_Sign
     : '<'
     ;
 

@@ -61,7 +61,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.7.0
+      uses: actions/setup-python@v4.7.1
       with:
         python-version: '3.10'
     - name: Test Python
@@ -78,7 +78,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.8.1
+      uses: actions/setup-node@v4.0.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -130,6 +130,16 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: Setup PHP
+      id: setup-php
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        ini-values: xdebug.max_nesting_level=1000
+    - name: Print PHP version
+      run: |
+        echo ${{ steps.setup-php.outputs.php-version }}
+        php --version
     - name: Install Dotnet
       uses: actions/setup-dotnet@v3.2.0
       with:
@@ -167,7 +177,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.7.0
+      uses: actions/setup-python@v4.7.1
       with:
         python-version: '3.10'
     - name: Test Python
@@ -184,7 +194,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.8.1
+      uses: actions/setup-node@v4.0.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -266,7 +276,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.7.0
+      uses: actions/setup-python@v4.7.1
       with:
         python-version: '3.10'
     - name: Test Python
@@ -283,7 +293,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.8.1
+      uses: actions/setup-node@v4.0.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript

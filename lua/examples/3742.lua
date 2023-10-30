@@ -1,0 +1,1 @@
+--[[some comment ]] local A = 10

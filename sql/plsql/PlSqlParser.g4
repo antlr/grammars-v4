@@ -629,7 +629,8 @@ function_spec
     ;
 
 package_obj_body
-    : exception_declaration
+    : pragma_declaration
+    | exception_declaration
     | subtype_declaration
     | cursor_declaration
     | variable_declaration
@@ -4142,7 +4143,7 @@ cache_or_nocache
     ;
 
 database_name
-    : regular_id
+    : id_expression
     ;
 
 alter_database
@@ -4493,6 +4494,7 @@ alter_database_link
 password_value
     : id_expression
     | numeric
+    | VALUES CHAR_STRING
     ;
 
 link_authentication
@@ -7152,6 +7154,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SEQ
     | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER

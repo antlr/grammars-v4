@@ -52,7 +52,7 @@ host
    ;
 
 hostname
-   : string ('.' string)*   #DomainNameOrIPv4Host
+   : string                 #DomainNameOrIPv4Host
    | '[' v6host ']'         #IPv6Host
    ;
 

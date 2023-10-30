@@ -430,7 +430,7 @@ COMMIT:                              'COMMIT';
 COMPACT:                             'COMPACT';
 COMPLETION:                          'COMPLETION';
 COMPRESSED:                          'COMPRESSED';
-COMPRESSION:                         'COMPRESSION' | QUOTE_SYMB? 'COMPRESSION' QUOTE_SYMB?;
+COMPRESSION:                         'COMPRESSION';
 CONCURRENT:                          'CONCURRENT';
 CONNECT:                             'CONNECT';
 CONNECTION:                          'CONNECTION';
@@ -1285,9 +1285,9 @@ DECIMAL_LITERAL:                     DEC_DIGIT+;
 HEXADECIMAL_LITERAL:                 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\''
                                      | '0X' HEX_DIGIT+;
 
-REAL_LITERAL:                        (DEC_DIGIT+)? '.' DEC_DIGIT+
+REAL_LITERAL:                        DEC_DIGIT* '.' DEC_DIGIT+
                                      | DEC_DIGIT+ '.' EXPONENT_NUM_PART
-                                     | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
+                                     | DEC_DIGIT* '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
                                      | DEC_DIGIT+ EXPONENT_NUM_PART;
 NULL_SPEC_LITERAL:                   '\\' 'N';
 BIT_STRING:                          BIT_STRING_L;

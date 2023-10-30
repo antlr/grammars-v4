@@ -175,8 +175,7 @@ iterationStatement
     | While '(' expressionSequence ')' statement                                                                              # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
     | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                                # ForInStatement
-    // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' (singleExpression | variableDeclarationList) identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
+    | For Await? '(' (singleExpression | variableDeclarationList) Of expressionSequence ')' statement                         # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -186,15 +185,15 @@ varModifier  // let, const - ECMAScript 6
     ;
 
 continueStatement
-    : Continue ({this.notLineTerminator()}? identifier)? eos
+    : Continue ({this.notLineTerminatorAhead()}? identifier)? eos
     ;
 
 breakStatement
-    : Break ({this.notLineTerminator()}? identifier)? eos
+    : Break ({this.notLineTerminatorAhead()}? identifier)? eos
     ;
 
 returnStatement
-    : Return ({this.notLineTerminator()}? expressionSequence)? eos
+    : Return ({this.notLineTerminatorAhead()}? expressionSequence)? eos
     ;
 
 yieldStatement
@@ -355,6 +354,7 @@ singleExpression
     | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
+    | New identifier arguments                                              # NewExpression
     | New singleExpression arguments                                        # NewExpression
     | New singleExpression                                                  # NewExpression
     | singleExpression arguments                                            # ArgumentsExpression
@@ -499,6 +499,8 @@ identifier
     | Async
     | As
     | From
+    | Yield
+    | Of
     ;
 
 reservedWord
@@ -555,6 +557,7 @@ keyword
     | Await
     | From
     | As
+    | Of
     ;
 
 let_
