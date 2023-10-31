@@ -114,8 +114,3 @@ class JavaScriptParserBase(Parser):
 
         return (tokenType == JavaScriptParser.MultiLineComment and (("\r" in text) or ("\n" in text))) or \
             (tokenType == JavaScriptParser.LineTerminator)
-
-    def notLineTerminatorAhead(self) -> bool:
-        JavaScriptParser = self.parser()
-
-        return not self.lineTerminatorAhead()
