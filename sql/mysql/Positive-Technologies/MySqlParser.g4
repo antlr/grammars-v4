@@ -2646,7 +2646,8 @@ expressionAtom
     | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | INTERVAL expression intervalType                              #intervalExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
-    | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
+    | left=expressionAtom mathPriorOperator right=expressionAtom    #mathPriorExpressionAtom
+    | left=expressionAtom mathAfterOperator right=expressionAtom    #mathAfterExpressionAtom
     | left=expressionAtom jsonOperator right=expressionAtom         #jsonExpressionAtom
     ;
 
@@ -2667,9 +2668,14 @@ bitOperator
     : '<' '<' | '>' '>' | '&' | '^' | '|'
     ;
 
-mathOperator
-    : '*' | '/' | '%' | DIV | MOD | '+' | '-'
+mathPriorOperator
+    : '*' | '/' | '%' | DIV | MOD
     ;
+
+mathAfterOperator
+    : '+' | '-'
+    ;
+
 
 jsonOperator
     : '-' '>' | '-' '>' '>'
