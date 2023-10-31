@@ -267,7 +267,7 @@ fragment EscapeCharacter
     ;
 
 fragment LineContinuation
-    : '\\' [\r\n\u2028\u2029]
+    : '\\' [\r\n\u2028\u2029]+
     ;
 
 fragment HexDigit
