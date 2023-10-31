@@ -2676,7 +2676,6 @@ mathOperator2
     : '+' | '-'
     ;
 
-
 jsonOperator
     : '-' '>' | '-' '>' '>'
     ;
