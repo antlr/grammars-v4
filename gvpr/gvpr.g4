@@ -1,6 +1,7 @@
 grammar gvpr;
 
 preds: pred* EOF;
+
 pred
     : 'BEGIN' ('{' program '}')?
     | 'BEG_G' ('{' program '}')?
@@ -11,10 +12,10 @@ pred
     ;
 
 IntegerConstant
-    :   DecimalConstant IntegerSuffix?
-    |   OctalConstant IntegerSuffix?
-    |   HexadecimalConstant IntegerSuffix?
-    |	BinaryConstant
+    : DecimalConstant IntegerSuffix?
+    | OctalConstant IntegerSuffix?
+    | HexadecimalConstant IntegerSuffix?
+    | BinaryConstant
     ;
 
 FloatingConstant
@@ -33,210 +34,241 @@ DigitSequence
     :   Digit+
     ;
 
-program		:	statement_list action_list
-		;
+program
+    : statement_list action_list
+    ;
 
-action_list	:	/* empty */
-		|	action_list action
-		;
+action_list
+    : /* empty */
+    | action_list action
+    ;
 
-action		:	label ':' statement_list
-		;
+action
+    : label ':' statement_list
+    ;
 
-statement_list	: statement*
-		;
+statement_list
+    : statement*
+    ;
 
-statement	:	'{' statement_list '}'
-		|	expr ';'?
-		|	static declare dcl_list ';'?
-		|	IF '(' expr ')' statement else_opt
-		|	FOR '(' variable ')' statement
-		|	FOR '(' expr_opt ';' expr_opt ';' expr_opt ')' statement
-		|	ITERATER '(' variable ')' statement
-		|	UNSET '(' dynamic ')'
-		|	UNSET '(' dynamic ',' expr  ')'
-		|	WHILE '(' expr ')' statement
-		|	SWITCH '(' expr ')' '{' switch_list '}'
-		|	BREAK expr_opt ';'?
-		|	CONTINUE expr_opt ';'?
-		|	RETURN expr_opt ';'?
-		;
+statement
+    : '{' statement_list '}'
+    | expr ';'?
+    | static declare dcl_list ';'?
+    | IF '(' expr ')' statement else_opt
+    | FOR '(' variable ')' statement
+    | FOR '(' expr_opt ';' expr_opt ';' expr_opt ')' statement
+    | ITERATER '(' variable ')' statement
+    | UNSET '(' dynamic ')'
+    | UNSET '(' dynamic ',' expr  ')'
+    | WHILE '(' expr ')' statement
+    | SWITCH '(' expr ')' '{' switch_list '}'
+    | BREAK expr_opt ';'?
+    | CONTINUE expr_opt ';'?
+    | RETURN expr_opt ';'?
+    ;
 
-switch_list	:
-		|	switch_list switch_item
-		;
+switch_list
+    : /* empty */
+    | switch_list switch_item
+    ;
 
-switch_item	:	case_list statement_list
-		;
+switch_item
+    : case_list statement_list
+    ;
 
-case_list	:	case_item
-		|	case_list case_item
-		;
+case_list
+    : case_item
+    | case_list case_item
+    ;
 
-case_item	:	CASE constant ':'
-		|	DEFAULT ':'
-		;
+case_item
+    : CASE constant ':'
+    | DEFAULT ':'
+    ;
 
-static	:
-		|	STATIC
-		;
+static
+    : /* empty */
+    | STATIC
+    ;
 
-dcl_list	:	dcl_item
-		|	dcl_list ',' dcl_item
-		;
+dcl_list
+    : dcl_item
+    | dcl_list ',' dcl_item
+    ;
 
-dcl_item	:	dcl_name array initialize
-		;
+dcl_item
+    : dcl_name array initialize
+    ;
 
-dcl_name	:	name
-		|	dynamic
-		|	ID
-		|	function
-		;
+dcl_name
+    : name
+    | dynamic
+    | ID
+    | function
+    ;
 
-name		:	ID
-		|	dynamic
-		;
+name
+    : ID
+    | dynamic
+    ;
 
-else_opt	:
-		|	ELSE statement
-		;
+else_opt
+    : /* empty */
+    | ELSE statement
+    ;
 
-expr_opt	:
-		|	expr
-		;
+expr_opt
+    : /* empty */
+    | expr
+    ;
 
-expr		:	'(' expr ')'
-		|	'(' declare ')' expr // %prec CAST
-		|	expr '<' expr
-		|	expr '-' expr
-		|	expr '*' expr
-		|	expr '/' expr
-		|	expr '%' expr
-		|	expr LSH expr
-		|	expr RSH expr
-		|	expr '>' expr
-		|	expr LE expr
-		|	expr GE expr
-		|	expr EQ expr
-		|	expr NE expr
-		|	expr '&' expr
-		|	expr '|' expr
-		|	expr '^' expr
-		|	expr '+' expr
-		|	expr AND expr
-		|	expr OR expr
-		|	expr ',' expr
-		|	expr '?' expr ':' expr
-		|	'!' expr
-		|	'#' dynamic
-		|	'~' expr
-		|	'-' expr	// %prec UNARY
-		|	'+' expr	// %prec UNARY
-		|	'&' variable	// %prec UNARY
-		|	array_ '[' args ']'
-		|	function '(' args ')'
-		|	GSUB '(' args ')'
-		|	SUB '(' args ')'
-		|	SUBSTR '(' args ')'
-		|	splitop '(' expr ',' dynamic ')'
-		|	splitop '(' expr ',' dynamic ',' expr ')'
-		|	EXIT '(' expr ')'
-		|	RAND '(' ')'
-		|	SRAND '(' ')'
-		|	SRAND '(' expr ')'
-		|	PROCEDURE '(' args ')'
-		|	PRINT '(' args ')'
-		|	print '(' args ')'
-		|	scan '(' args ')'
-		|	variable assign
-		|	INC variable
-		|	variable INC
-		|	expr IN_OP dynamic
-		|	DEC variable
-		|	variable DEC
-		|	constant
-		;
+expr
+    : '(' expr ')'
+    | '(' declare ')' expr // %prec CAST
+    | expr ('*'|'/'|'%') expr
+    | expr '<' expr
+    | expr LSH expr
+    | expr RSH expr
+    | expr '>' expr
+    | expr LE expr
+    | expr GE expr
+    | expr EQ expr
+    | expr NE expr
+    | expr '&' expr
+    | expr '|' expr
+    | expr '^' expr
+    | expr '+' expr
+    | expr AND expr
+    | expr OR expr
+    | expr ',' expr
+    | expr '?' expr ':' expr
+    | '!' expr
+    | '#' dynamic
+    | '~' expr
+    | '-' expr  // %prec UNARY
+    | '+' expr  // %prec UNARY
+    | '&' variable  // %prec UNARY
+    | array_ '[' args ']'
+    | function '(' args ')'
+    | GSUB '(' args ')'
+    | SUB '(' args ')'
+    | SUBSTR '(' args ')'
+    | splitop '(' expr ',' dynamic ')'
+    | splitop '(' expr ',' dynamic ',' expr ')'
+    | EXIT '(' expr ')'
+    | RAND '(' ')'
+    | SRAND '(' ')'
+    | SRAND '(' expr ')'
+    | PROCEDURE '(' args ')'
+    | PRINT '(' args ')'
+    | print '(' args ')'
+    | scan '(' args ')'
+    | variable assign
+    | INC variable
+    | variable INC
+    | expr IN_OP dynamic
+    | DEC variable
+    | variable DEC
+    | constant
+    ;
 
-splitop		:	SPLIT
-		|	TOKENS
-		;
+splitop
+    : SPLIT
+    | TOKENS
+    ;
 constant
-    :   IntegerConstant
-    |   FloatingConstant
-    |   CharacterConstant
+    : IntegerConstant
+    | FloatingConstant
+    | CharacterConstant
+    | STRING
+    ;
 
-//CONSTANT
-//		|	FLOATING
-//		|	INTEGER
-		|	STRING
-//		|	UNSIGNED
-		;
+print
+    : PRINTF
+    | QUERY
+    | SPRINTF
+    ;
 
-print		:	PRINTF
-		|	QUERY
-		|	SPRINTF
-		;
+scan
+    : SCANF
+    | SSCANF
+    ;
 
-scan		:	SCANF
-		|	SSCANF
-		;
+variable
+    : ID members
+    | dynamic index members
+    | name
+    ;
 
-variable	:	ID members
-		|	dynamic index members
-		|	name
-		;
+array_
+    : ID
+    ;
 
-array_ : ID ;
-array		:
-		|	'[' ']'
-		|	'[' declare ']'
-		;
+array
+    : /* empty */
+    | '[' ']'
+    | '[' declare ']'
+    ;
 
-index		:
-		|	'[' expr ']'
-		;
+index
+    : /* empty */
+    | '[' expr ']'
+    ;
 
-args		:
-		|	arg_list
-		;
+args
+    : /* empty */
+    | arg_list
+    ;
 
-arg_list	:	expr		// %prec ','
-		|	arg_list ',' expr
-		;
+arg_list
+    : expr      // %prec ','
+    | arg_list ',' expr
+    ;
 
-formals		:
-		|	declare
-		|	formal_list
-		;
+formals
+    : /* empty */
+    | declare
+    | formal_list
+    ;
 
-formal_list	:	formal_item
-		|	formal_list ',' formal_item
-		;
+formal_list
+    : formal_item
+    | formal_list ',' formal_item
+    ;
 
-formal_item	:	declare name
-		;
+formal_item
+    : declare name
+    ;
 
-members	:
-		|	member
-		|	'.' ID member
-		;
+members
+    : /* empty */
+    | member
+    | '.' ID member
+    ;
 
-member	:	'.' ID
-		|	'.' name
-		;
-assign		:
-		| AEQ expr
-		| APEQ expr
-		| AMEQ expr
-		| ASEQ expr
-		| ASLEQ expr
-			// '=' expr
-		;
+member
+    : '.' ID
+    | '.' name
+    ;
 
-initialize	:	assign
-		|	'(' formals ')' '{' statement_list '}'
-		;
+assign
+    : /* empty */
+    | AEQ expr
+    | APEQ expr
+    | AMEQ expr
+    | ASEQ expr
+    | ASLEQ expr
+    // '=' expr
+    ;
+
+initialize
+    : assign
+    | '(' formals ')' '{' statement_list '}'
+    ;
+
+label : ID;
+
 
 AND : '&&' ;
 BREAK : 'break' ;
@@ -286,11 +318,21 @@ AMEQ : '-=' ;
 ASEQ : '*=' ;
 ASLEQ : '/=' ;
 
-label : ID;
-
 STRING
     :   EncodingPrefix? '"' SCharSequence? '"'
     ;
+
+ID
+    :   IdentifierNondigit
+        (   IdentifierNondigit
+        |   Digit
+        )*
+    ;
+
+MLCOMMENT : '/*' .*? '*/' -> channel(HIDDEN);
+SLCOMMENT : '//' ~[\n\r]* -> channel(HIDDEN);
+
+WS : [ \t\n\r]+ -> channel(HIDDEN);
 
 fragment
 EncodingPrefix
@@ -313,18 +355,6 @@ SChar
     |   '\\\r\n' // Added line
     ;
 
-ID
-    :   IdentifierNondigit
-        (   IdentifierNondigit
-        |   Digit
-        )*
-    ;
-
-MLCOMMENT : '/*' .*? '*/' -> channel(HIDDEN);
-SLCOMMENT : '//' ~[\n\r]* -> channel(HIDDEN);
-
-WS : [ \t\n\r]+ -> channel(HIDDEN);
-
 fragment
 IdentifierNondigit
     :   Nondigit
@@ -346,8 +376,8 @@ Digit
 
 fragment
 BinaryConstant
-	:	'0' [bB] [0-1]+
-	;
+    : '0' [bB] [0-1]+
+    ;
 
 fragment
 DecimalConstant
