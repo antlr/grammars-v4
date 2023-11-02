@@ -1,0 +1,9 @@
+BEGIN { int n, e; int tot_n = 0; int tot_e = 0; }
+BEG_G {
+	n=nNodes($G);
+	e=nEdges($G);
+	printf ("%d nodes %d edges %s\n", n, e, $G.name);
+	tot_n += n;
+	tot_e += e;
+}
+END { printf ("%d nodes %d edges total\n", tot_n, tot_e) }
