@@ -102,15 +102,11 @@ dcl_item
     ;
 
 dcl_name
-    : name
-    | dynamic
-    | ID
-    | function
+    : ID
     ;
 
 name
     : ID
-    | dynamic
     ;
 
 else_opt
@@ -196,9 +192,7 @@ scan
     ;
 
 variable
-    : ID members
-    | dynamic index members
-    | name
+    : dynamic index? members?
     ;
 
 array_
@@ -212,8 +206,7 @@ array
     ;
 
 index
-    : /* empty */
-    | '[' expr ']'
+    : '[' expr ']'
     ;
 
 args
@@ -242,14 +235,12 @@ formal_item
     ;
 
 members
-    : /* empty */
-    | member
+    : member
     | '.' ID member
     ;
 
 member
     : '.' ID
-    | '.' name
     ;
 
 assign
