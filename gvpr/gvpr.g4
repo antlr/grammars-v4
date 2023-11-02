@@ -161,8 +161,7 @@ expr
     | SRAND '(' ')'
     | SRAND '(' expr ')'
     | PROCEDURE '(' args ')'
-    | PRINT '(' args ')'
-    | print '(' args ')'
+    | print_ '(' args ')'
     | scan '(' args ')'
     | variable assign
     | INC variable
@@ -184,8 +183,9 @@ constant
     | STRING
     ;
 
-print
-    : PRINTF
+print_
+    : XPRINT
+    | PRINTF
     | QUERY
     | SPRINTF
     ;
@@ -293,7 +293,7 @@ LE : '<=' ;
 LSH : 'lsh' ;
 NE : '!=' ;
 OR : '||' ;
-PRINT : 'print' ;
+XPRINT : 'print' ;
 PRINTF : 'printf' ;
 PROCEDURE : 'procedure' ;
 QUERY : 'query' ;
