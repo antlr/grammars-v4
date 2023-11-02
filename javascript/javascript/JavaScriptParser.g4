@@ -185,15 +185,15 @@ varModifier  // let, const - ECMAScript 6
     ;
 
 continueStatement
-    : Continue ({this.notLineTerminatorAhead()}? identifier)? eos
+    : Continue ({this.notLineTerminator()}? identifier)? eos
     ;
 
 breakStatement
-    : Break ({this.notLineTerminatorAhead()}? identifier)? eos
+    : Break ({this.notLineTerminator()}? identifier)? eos
     ;
 
 returnStatement
-    : Return ({this.notLineTerminatorAhead()}? expressionSequence)? eos
+    : Return ({this.notLineTerminator()}? expressionSequence)? eos
     ;
 
 yieldStatement

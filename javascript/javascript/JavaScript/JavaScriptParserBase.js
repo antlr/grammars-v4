@@ -82,8 +82,4 @@ export default class JavaScriptParserBase extends antlr4.Parser {
                 type === JavaScriptParser.LineTerminator
                );
     }
-    
-    notLineTerminatorAhead() {
-        return !this.lineTerminatorAhead();
-    }
 }
