@@ -40,10 +40,10 @@ program
 
 action_list
     : /* empty */
-    | action_list action
+    | action_list action_
     ;
 
-action
+action_
     : label ':' statement_list
     ;
 
@@ -98,7 +98,7 @@ dcl_list
     ;
 
 dcl_item
-    : dcl_name array initialize
+    : dcl_name array initialize_
     ;
 
 dcl_name
@@ -262,7 +262,7 @@ assign
     // '=' expr
     ;
 
-initialize
+initialize_
     : assign
     | '(' formals ')' '{' statement_list '}'
     ;
