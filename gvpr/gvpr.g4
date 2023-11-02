@@ -35,24 +35,23 @@ DigitSequence
     ;
 
 program
-    : statement_list action_list
+    : statement_list? action_list?
     ;
 
 action_list
-    : /* empty */
-    | action_list action_
+    : action_+
     ;
 
 action_
-    : label ':' statement_list
+    : label ':' statement_list?
     ;
 
 statement_list
-    : statement*
+    : statement+
     ;
 
 statement
-    : '{' statement_list '}'
+    : '{' statement_list? '}'
     | expr ';'?
     | static declare dcl_list ';'?
     | IF '(' expr ')' statement else_opt
@@ -74,7 +73,7 @@ switch_list
     ;
 
 switch_item
-    : case_list statement_list
+    : case_list statement_list?
     ;
 
 case_list
@@ -255,7 +254,7 @@ assign
 
 initialize_
     : assign
-    | '(' formals ')' '{' statement_list '}'
+    | '(' formals ')' '{' statement_list? '}'
     ;
 
 label : ID;
