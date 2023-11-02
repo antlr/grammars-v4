@@ -1,14 +1,18 @@
+/* MIT License
+ * Author: Ken Domino
+ * Date: Nov 2, 2023
+ */
 grammar gvpr;
 
 preds: pred* EOF;
 
 pred
-    : 'BEGIN' ('{' program '}')?
-    | 'BEG_G' ('{' program '}')?
-    | 'N' ('[' expr ']')? ('{' program '}')?
-    | 'E' ('[' expr ']')? ('{' program '}')?
-    | 'END_G' ('{' program '}')?
-    | 'END' ('{' program '}')?
+    : 'BEGIN' ('{' (program | expr) '}')?
+    | 'BEG_G' ('{' (program | expr) '}')?
+    | 'N' ('[' expr ']')? ('{' (program | expr) '}')?
+    | 'E' ('[' expr ']')? ('{' (program | expr) '}')?
+    | 'END_G' ('{' (program | expr) '}')?
+    | 'END' ('{' (program | expr) '}')?
     ;
 
 IntegerConstant
@@ -52,19 +56,20 @@ statement_list
 
 statement
     : '{' statement_list? '}'
-    | expr ';'?
-    | static declare dcl_list ';'?
-    | IF '(' expr ')' statement else_opt
+    | expr ';'
+    | static? declare dcl_list ';'
+    | static? declare fdcl_item
+    | IF '(' expr ')' statement else_?
     | FOR '(' variable ')' statement
-    | FOR '(' expr_opt ';' expr_opt ';' expr_opt ')' statement
+    | FOR '(' expr? ';' expr? ';' expr? ')' statement
     | ITERATER '(' variable ')' statement
-    | UNSET '(' dynamic ')'
-    | UNSET '(' dynamic ',' expr  ')'
+    | UNSET '(' ID ')'
+    | UNSET '(' ID ',' expr  ')'
     | WHILE '(' expr ')' statement
     | SWITCH '(' expr ')' '{' switch_list '}'
-    | BREAK expr_opt ';'?
-    | CONTINUE expr_opt ';'?
-    | RETURN expr_opt ';'?
+    | BREAK expr? ';'
+    | CONTINUE expr? ';'
+    | RETURN expr? ';'
     ;
 
 switch_list
@@ -87,17 +92,19 @@ case_item
     ;
 
 static
-    : /* empty */
-    | STATIC
+    : STATIC
     ;
 
 dcl_list
-    : dcl_item
-    | dcl_list ',' dcl_item
+    : dcl_item (',' dcl_item)*
     ;
 
 dcl_item
-    : dcl_name array initialize_
+    : dcl_name array initialize_?
+    ;
+
+fdcl_item
+    : dcl_name finitialize_
     ;
 
 dcl_name
@@ -108,49 +115,35 @@ name
     : ID
     ;
 
-else_opt
-    : /* empty */
-    | ELSE statement
-    ;
-
-expr_opt
-    : /* empty */
-    | expr
+else_
+    : ELSE statement
     ;
 
 expr
     : '(' expr ')'
-    | '(' declare ')' expr // %prec CAST
+    | '(' declare ')' expr
+    | (INC|DEC) variable
+    | variable (INC|DEC)
+    | ('!' expr | '#' ID | '~' expr | '-' expr | '+' expr | '&' variable)
     | expr ('*'|'/'|'%') expr
-    | expr '<' expr
-    | expr LSH expr
-    | expr RSH expr
-    | expr '>' expr
-    | expr LE expr
-    | expr GE expr
-    | expr EQ expr
-    | expr NE expr
+    | expr (('+'|'-') expr | IN_OP ID)
+    | expr (LSH|RSH) expr
+    | expr ('<'|'>'|LE|GE) expr
+    | expr (EQ|NE) expr
     | expr '&' expr
-    | expr '|' expr
     | expr '^' expr
-    | expr '+' expr
+    | expr '|' expr
     | expr AND expr
     | expr OR expr
+    | <assoc=right> expr '?' expr ':' expr
     | expr ',' expr
-    | expr '?' expr ':' expr
-    | '!' expr
-    | '#' dynamic
-    | '~' expr
-    | '-' expr  // %prec UNARY
-    | '+' expr  // %prec UNARY
-    | '&' variable  // %prec UNARY
     | array_ '[' args ']'
     | function '(' args ')'
     | GSUB '(' args ')'
     | SUB '(' args ')'
     | SUBSTR '(' args ')'
-    | splitop '(' expr ',' dynamic ')'
-    | splitop '(' expr ',' dynamic ',' expr ')'
+    | splitop '(' expr ',' ID ')'
+    | splitop '(' expr ',' ID ',' expr ')'
     | EXIT '(' expr ')'
     | RAND '(' ')'
     | SRAND '(' ')'
@@ -158,12 +151,7 @@ expr
     | PROCEDURE '(' args ')'
     | print_ '(' args ')'
     | scan '(' args ')'
-    | variable assign
-    | INC variable
-    | variable INC
-    | expr IN_OP dynamic
-    | DEC variable
-    | variable DEC
+    | variable assign?
     | constant
     ;
 
@@ -171,11 +159,12 @@ splitop
     : SPLIT
     | TOKENS
     ;
+
 constant
     : IntegerConstant
     | FloatingConstant
     | CharacterConstant
-    | STRING
+    | StringLit
     ;
 
 print_
@@ -191,7 +180,7 @@ scan
     ;
 
 variable
-    : dynamic index? members?
+    : ID index? members?
     ;
 
 array_
@@ -243,34 +232,42 @@ member
     ;
 
 assign
-    : /* empty */
-    | AEQ expr
+    : AEQ expr
     | APEQ expr
     | AMEQ expr
     | ASEQ expr
     | ASLEQ expr
-    // '=' expr
     ;
 
 initialize_
     : assign
-    | '(' formals ')' '{' statement_list? '}'
+    ;
+
+finitialize_
+    : '(' formals ')' '{' statement_list? '}'
     ;
 
 label : ID;
+declare : (CHAR | DOUBLE | FLOAT | INT | LONG | UNSIGNED | VOID | STRING | ID) '*'? ;
 
 
+AEQ : '=' ;
+AMEQ : '-=' ;
 AND : '&&' ;
+APEQ : '+=' ;
+ASEQ : '*=' ;
+ASLEQ : '/=' ;
 BREAK : 'break' ;
 CASE : 'case' ;
+CHAR : 'char' ;
 CONTINUE : 'continue' ;
 DEC : '--' ;
-declare : ID;
 DEFAULT : 'default' ;
-dynamic : ID;
+DOUBLE : 'double' ;
 ELSE : 'else' ;
 EQ : '==' ;
 EXIT : 'exit' ;
+FLOAT : 'float' ;
 FOR : 'for' ;
 function : ID ;
 GE : '>=' ;
@@ -278,12 +275,13 @@ GSUB : 'gsub' ;
 IF : 'if' ;
 IN_OP : 'in' ;
 INC : '++' ;
+INT : 'int' ;
 ITERATER : 'iterater' ;
 LE : '<=' ;
+LONG : 'long' ;
 LSH : 'lsh' ;
 NE : '!=' ;
 OR : '||' ;
-XPRINT : 'print' ;
 PRINTF : 'printf' ;
 PROCEDURE : 'procedure' ;
 QUERY : 'query' ;
@@ -296,19 +294,18 @@ SPRINTF : 'sprintf' ;
 SRAND : 'srand' ;
 SSCANF : 'sscanf' ;
 STATIC : 'static' ;
+STRING : 'string' ;
 SUB : 'sub' ;
 SUBSTR : 'substr' ;
 SWITCH : 'switch' ;
 TOKENS : 'tokens' ;
 UNSET : 'unset' ;
+UNSIGNED : 'unsigned' ;
+VOID : 'void' ;
 WHILE : 'while' ;
-AEQ : '=' ;
-APEQ : '+=' ;
-AMEQ : '-=' ;
-ASEQ : '*=' ;
-ASLEQ : '/=' ;
+XPRINT : 'print' ;
 
-STRING
+StringLit
     :   EncodingPrefix? '"' SCharSequence? '"'
     ;
 
