@@ -5053,6 +5053,7 @@ data_type
     | ext_type=id_ IDENTITY ('(' seed=DECIMAL ',' inc=DECIMAL ')')?
     | double_prec=DOUBLE PRECISION?
     | unscaled_type=id_
+    | xml_type_definition
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms179899.aspx
