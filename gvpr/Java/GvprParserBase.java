@@ -9,15 +9,15 @@ public abstract class GvprParserBase extends Parser
 
     protected boolean IsSemiRequired()
     {
-        var c = this._input.LT(-1);
+	var c = this._input.LT(-1);
         var d = this._input.LT(1);
-        return c.getType() == gvprParser.CCBC;
+        return c.getType() != gvprParser.CCBC;
     }
 
     protected boolean IsSemiNotRequired()
     {
 	var c = this._input.LT(-1);
 	var d = this._input.LT(1);
-        return c.getType() != gvprParser.CCBC;
+        return c.getType() == gvprParser.CCBC;
     }
 }
