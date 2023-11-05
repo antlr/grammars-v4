@@ -6083,7 +6083,7 @@ logical_expression
     ;
 
 unary_logical_expression
-    : NOT? multiset_expression unary_logical_operation*
+    : NOT? multiset_expression unary_logical_operation?
     ;
 
 unary_logical_operation
