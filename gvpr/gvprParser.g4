@@ -2,6 +2,8 @@ parser grammar  gvprParser;
 
 options { tokenVocab = gvprLexer; superClass = GvprParserBase; }
 
+// Insert here @header for C++ parser.
+
 preds: pred* EOF;
 
 pred

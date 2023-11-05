@@ -2,6 +2,8 @@ lexer grammar  gvprLexer;
 
 options { superClass = GvprLexerBase; }
 
+// Insert here @header for C++ lexer.
+
 MLCOMMENT : '/*' .*? '*/' -> channel(HIDDEN);
 SLCOMMENT : '//' ~[\n\r]* -> channel(HIDDEN);
 SHELLCOMMENT : '#' { this.IsColumnZero() }? ~[\n\r]* -> channel(HIDDEN);
