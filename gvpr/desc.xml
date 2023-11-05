@@ -3,6 +3,6 @@
 <!--
    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
    -->
-   <targets>CSharp;Dart;Java;JavaScript;TypeScript</targets>
+   <targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
    <inputs>examples/*.gvpr</inputs>
 </desc>
