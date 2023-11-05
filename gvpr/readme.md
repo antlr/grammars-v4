@@ -1,17 +1,21 @@
 # gvpr grammar
 
+Graphviz "gvpr" is a graph scanning and processing language.
+
 ## Author
 
-Ken Domino
+Ken Domino, Nov 5, 2023
 
 ## Notes
 
-For parsing "c-like expressions", see lib/expr/exparse.y in the
-Graphviz Git repo.
+This grammar was a scrape of three files in Graphviz source.
+* lib/expr/exparse.y
+* lib/cgraph/scal.l
+* lib/gvpr/parse.c
 
 ## Links
 
-https://gitlab.com/graphviz/graphviz
+Source code: https://gitlab.com/graphviz/graphviz
 
 https://www.graphviz.org/
 
