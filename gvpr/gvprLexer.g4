@@ -70,7 +70,7 @@ IF : 'if' ;
 IN_OP : 'in' ;
 INC : '++' ;
 INT : 'int' ;
-ITERATER : 'iterater' ;
+ITERATER : 'forr' ;
 LE : '<=' ;
 LT : '<' ;
 LONG : 'long' ;

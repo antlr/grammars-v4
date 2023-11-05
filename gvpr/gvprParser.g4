@@ -36,10 +36,10 @@ statement
     | static? declare dcl_list
     | static? declare fdcl_item
     | expr
-    | IF '(' expr ')' statement else_?
-    | FOR '(' variable ')' statement
-    | FOR '(' expr? ';' expr? ';' expr? ')' statement
-    | ITERATER '(' variable ')' statement
+    | 'if' '(' expr ')' statement ';'? else_?
+    | 'for' '(' variable ')' statement
+    | 'for' '(' expr? ';' expr? ';' expr? ')' statement
+    | 'forr' '(' variable ')' statement
     | UNSET '(' ID ')'
     | UNSET '(' ID ',' expr  ')'
     | WHILE '(' expr ')' statement
