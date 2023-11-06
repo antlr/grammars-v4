@@ -36,7 +36,7 @@ statement
     | static? declare dcl_list
     | static? declare fdcl_item
     | expr
-    | 'if' '(' expr ')' statement ';'? else_?
+    | 'if' '(' expr ')' statement (';'? else_)?
     | 'for' '(' variable ')' statement
     | 'for' '(' expr? ';' expr? ';' expr? ')' statement
     | 'forr' '(' variable ')' statement
