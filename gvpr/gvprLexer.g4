@@ -313,7 +313,7 @@ EscapeSequence
 
 fragment
 SimpleEscapeSequence
-    :   '\\' ['"?abfnrtv\\]
+    :   '\\' ['"?abfnrtv\\.]
     ;
 
 fragment
