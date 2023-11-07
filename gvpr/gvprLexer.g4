@@ -27,10 +27,6 @@ CharacterConstant
     |   'U\'' CCharSequence '\''
     ;
 
-DigitSequence
-    :   Digit+
-    ;
-
 AEQ : '=' ;
 AMEQ : '-=' ;
 AMP : '&' ;
@@ -235,6 +231,11 @@ fragment
 DecimalFloatingConstant
     :   FractionalConstant ExponentPart? FloatingSuffix?
     |   DigitSequence ExponentPart FloatingSuffix?
+    ;
+
+fragment
+DigitSequence
+    :   Digit+
     ;
 
 fragment
