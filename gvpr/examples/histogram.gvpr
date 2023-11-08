@@ -1,0 +1,20 @@
+/* print histogram of integer attribute */
+BEGIN {
+  int count[];
+  int maxd = 0;
+  int i, d, v;
+  char* attrname = ARGV[0];
+}
+N{ 
+  v = (int)(aget($,attrname));
+  count[v]++;
+  if (v > maxd) {
+    maxd = v;
+  }
+}
+END {
+  for (i = 1; i <= maxd; i++) {
+    d = count[i];
+    if (d > 0) printf ("[%d] %d\n", i, d);
+  }
+}

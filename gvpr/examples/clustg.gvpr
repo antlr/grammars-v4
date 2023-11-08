@@ -1,0 +1,54 @@
+/* Create derived graph whose nodes are top-level clusters (any nodes not in top-level clusters are trivial top-level clusters),
+ * and there is an edge between two nodes in the derived graph if there is an edge between the clusters in the original graph.
+ * The new graph is directed if the original one is; it is strict. Edges within clusters are ignored.
+ * Nodes and edges have a _cnt attribute indicating the number of node in a cluster and the number of equivalent edges, respectively.
+ */
+BEGIN {
+  graph_t dg;
+  graph_t c[node_t];
+  node_t nmap[node_t];
+  node_t n, n0, dn, dn0;
+  edge_t e;
+
+  void proc (graph_t h, graph_t g)
+  {
+    if (h.name == "cluster*") {
+      dn = node(dg, h.name);
+      dn._cnt = (string)(h.n_nodes);
+      for (n = fstnode(h); n; n = nxtnode_sg(h,n)) {
+		n0 = nmap[n];
+		if (n0) {
+          printf(2,"node %s in %s and %s\n", n.name, h.name, n0.name);
+		  exit(1);
+        }
+        nmap[n] = dn;
+      }
+      return;
+    }
+    for (g = fstsubg(h); g; g = nxtsubg(g)) {
+      proc(g,NULL);
+    }
+  }
+}
+BEG_G{
+  dg = graph("clust"+name, isDirect($)?"DS":"US");
+  setDflt(dg,"E","_cnt","0");
+  setDflt(dg,"N","_cnt","0");
+  proc($,NULL);
+  $tvtype = TV_ne;
+}
+N[!nmap[$]]{
+  dn = node(dg, name);
+  nmap[$] = dn;
+}
+E{
+  dn0 = nmap[$.tail];
+  dn = nmap[$.head];
+  if (dn != dn0) {
+    e = edge(dn0,dn,"");
+    e._cnt = (string)(1+(int)e._cnt);
+  }
+}
+END_G {
+  write(dg);
+}
