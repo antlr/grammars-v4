@@ -2014,6 +2014,27 @@ create_share
 
 character
     : CHAR_LITERAL
+    | AAD_PROVISIONER_Q
+    | ARRAY_Q
+    | AUTO_Q
+    | AVRO_Q
+    | AZURE_CSE_Q
+    | AZURE_Q
+    | BOTH_Q
+    | CSV_Q
+    | GCS_SSE_KMS_Q
+    | GENERIC_Q
+    | GENERIC_SCIM_PROVISIONER_Q
+    | JSON_Q
+    | NONE_Q
+    | OBJECT_Q
+    | OKTA_PROVISIONER_Q
+    | OKTA_Q
+    | ORC_Q
+    | PARQUET_Q
+    | S3
+    | SNOWPARK_OPTIMIZED
+    | XML_Q
     ;
 
 format_type_options
