@@ -1282,7 +1282,7 @@ alter_tag
 
 alter_task
     : ALTER TASK if_exists? object_name resume_suspend
-    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list 
+    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list
     | ALTER TASK if_exists? object_name SET
         // TODO : Check and review if element's order binded or not
         ( WAREHOUSE EQ id_ )?
@@ -1386,6 +1386,7 @@ alter_warehouse_opts
     | id_fn set_tags
     | id_fn unset_tags
     | id_fn UNSET id_ (COMMA id_)*
+    | id_ SET wh_properties (',' wh_properties)*
     ;
 
 alter_account_opts
@@ -2013,6 +2014,27 @@ create_share
 
 character
     : CHAR_LITERAL
+    | AAD_PROVISIONER_Q
+    | ARRAY_Q
+    | AUTO_Q
+    | AVRO_Q
+    | AZURE_CSE_Q
+    | AZURE_Q
+    | BOTH_Q
+    | CSV_Q
+    | GCS_SSE_KMS_Q
+    | GENERIC_Q
+    | GENERIC_SCIM_PROVISIONER_Q
+    | JSON_Q
+    | NONE_Q
+    | OBJECT_Q
+    | OKTA_PROVISIONER_Q
+    | OKTA_Q
+    | ORC_Q
+    | PARQUET_Q
+    | S3
+    | SNOWPARK_OPTIMIZED
+    | XML_Q
     ;
 
 format_type_options
@@ -2583,7 +2605,7 @@ task_parameters
 
 task_compute
     : WAREHOUSE EQ id_
-    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote. 
+    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote.
     ;
 
 task_schedule
@@ -2599,7 +2621,7 @@ task_suspend_after_failure_number
     ;
 
 task_error_integration
-    : ERROR_INTEGRATION EQ id_ 
+    : ERROR_INTEGRATION EQ id_
     ;
 
 task_overlap
@@ -2657,6 +2679,7 @@ wh_extra_size
 
 wh_properties
     : WAREHOUSE_SIZE EQ ( wh_common_size | wh_extra_size | ID2)
+    | WAREHOUSE_TYPE EQ (STANDARD | SNOWPARK_OPTIMIZED)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
     | SCALING_POLICY EQ (STANDARD | ECONOMY)
@@ -2667,6 +2690,7 @@ wh_properties
     | comment_clause
     | ENABLE_QUERY_ACCELERATION EQ true_false
     | QUERY_ACCELERATION_MAX_SCALE_FACTOR EQ num
+    | MAX_CONCURRENCY_LEVEL EQ num
     ;
 
 wh_params
@@ -3592,6 +3616,8 @@ non_reserved_words
     | DYNAMIC
     | TARGET_LAG
     | EMAIL
+    | MAX_CONCURRENCY_LEVEL
+    | WAREHOUSE_TYPE
     ;
 
 builtin_function
