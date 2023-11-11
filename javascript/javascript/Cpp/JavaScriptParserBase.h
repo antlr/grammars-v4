@@ -14,5 +14,4 @@ public:
     bool closeBrace();
     bool here(int type);
     bool lineTerminatorAhead();
-    bool notLineTerminatorAhead();
 };

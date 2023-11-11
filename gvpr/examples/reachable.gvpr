@@ -1,0 +1,39 @@
+#!/usr/bin/env gvpr -f
+#
+# Given a directed graph and two specified nodes a, b succeed if
+# node a is reachable from node b.
+# The program exits with success (0) if a path is found and failure (1)
+# if a path isn't found.
+#
+# Example invocation:
+# gvpr -f reachable.gvpr -a sourcename -a targetname file.dot && echo yes
+#
+#  Copyright 2019 Diomidis Spinellis
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+#
+
+BEG_G {
+	$tvtype = TV_fwd;
+	$tvroot = node($, ARGV[0]);
+}
+
+# Stop after this DFS; succeed if node matches specified one
+N [$tvroot = NULL; $.name == ARGV[1]] {
+	exit(0);
+}
+
+END_G {
+	exit(1);
+}

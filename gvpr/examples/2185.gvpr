@@ -1,0 +1,17 @@
+BEGIN{
+  int   i=99;
+  float f=76.3;
+  string A, B, Z;
+
+  void doPrnt(string errString) {
+    print(errString);
+  }
+  
+  A=" five ";
+ 
+  doPrnt("one " + "two " + "three");  // yea, something works
+  doPrnt("one " + A + "three");
+  doPrnt((string)(i));
+  // try the fallback - sprintf  (it fails, too)
+  doPrnt(sprintf("%s\n", "Constant"));  
+}

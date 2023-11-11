@@ -838,7 +838,7 @@ insertStatement
       IGNORE? INTO? tableName
       (PARTITION '(' partitions=uidList? ')' )?
       (
-        ('(' columns=fullColumnNameList ')')? insertStatementValue (AS? uid)?
+        ('(' columns=fullColumnNameList? ')')? insertStatementValue (AS? uid)?
         | SET
             setFirst=updatedElement
             (',' setElements+=updatedElement)*
@@ -2646,7 +2646,8 @@ expressionAtom
     | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | INTERVAL expression intervalType                              #intervalExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
-    | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
+    | left=expressionAtom multOperator right=expressionAtom         #mathExpressionAtom
+    | left=expressionAtom addOperator  right=expressionAtom         #mathExpressionAtom
     | left=expressionAtom jsonOperator right=expressionAtom         #jsonExpressionAtom
     ;
 
@@ -2667,8 +2668,12 @@ bitOperator
     : '<' '<' | '>' '>' | '&' | '^' | '|'
     ;
 
-mathOperator
-    : '*' | '/' | '%' | DIV | MOD | '+' | '-'
+multOperator
+    : '*' | '/' | '%' | DIV | MOD
+    ;
+
+addOperator
+    : '+' | '-'
     ;
 
 jsonOperator

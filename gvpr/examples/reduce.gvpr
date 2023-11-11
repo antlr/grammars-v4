@@ -1,0 +1,45 @@
+BEGIN{
+	if (ARGC != 2) {
+		print("This script takes exactly two parameter. 1: name of node, 2: number of hops");
+		exit(1);
+	}
+	
+	void reduce_in(graph_t _g, node_t _n, edge_t _e, int _d){
+		_e = fstin(_n);
+		while (_e != NULL) {
+			clone(_g, _e);
+			if (_d < atoi(ARGV[1])) {
+			  reduce_in(_g, _e.tail, NULL, _d + 1);
+			}
+			_e = nxtin(_e);
+		}
+	}
+
+	void reduce_out(graph_t _g, node_t _n, edge_t _e, int _d){
+		_e = fstout(_n);
+		while (_e != NULL) {
+			clone(_g, _e);
+			if (_d < atoi(ARGV[1])) {
+			  reduce_out(_g, _e.head, NULL, _d + 1);
+			}
+			_e = nxtout(_e);
+		}
+	}
+}
+
+BEG_G {
+	graph_t g = graph("G", "S");
+	g.rankdir = "RL";
+}
+
+
+N [name==ARGV[0]] {
+	node_t n = clone(g, $);
+	n.color="red";
+	reduce_in(g, $, NULL, 1);
+	reduce_out(g, $, NULL, 1);
+}
+
+END_G {
+	$O = g;
+}

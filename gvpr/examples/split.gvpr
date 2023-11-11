@@ -1,0 +1,101 @@
+BEGIN {
+	// Find the immediate parent subgraph of this object
+	graph_t find_owner(obj_t o, graph_t g)
+	{
+		graph_t g1;
+		for (g1 = fstsubg(g); g1; g1 = nxtsubg(g1))
+			if(isIn(g1,o)) return g1;
+		return NULL;
+	}
+}
+
+BEG_G {
+	node_t calls[]; // Crude hash table for tracking who calls what
+	graph_t g,g2;
+	edge_t e,e2;
+	string idx;
+	node_t n, n2;
+	int i;
+
+	$tvtype = TV_en;
+}
+
+// Each call edge which hasn't already been seen
+E [op == "call" && tail.split != 1] {
+	int offset=0;
+
+	// Clear the label of this call
+	label = "";
+	g = find_owner(tail, $G);
+
+	// Consider each outgoing call. Split the node accordingly
+	n = tail;
+	for (e = fstout(tail); e; e = nxtout(e)) {
+		if (e.op == "call") {
+
+			// Split node
+			n2 = node(g, sprintf("%s%s%d", tail.name, "x", offset++));
+			copyA(tail, n2);
+			n2.line = e.line;
+			n2.label = e.line;
+			n2.col = e.col;
+			n2.split = 1;
+			n2.op = "target";
+
+			// Record this call
+			g2 = find_owner(e.head, $G);
+			i = 0;
+			while(calls[sprintf("%s%d", g2.name, ++i)]) {
+			}
+			calls[sprintf("%s%d", g2.name, i)] = n2;
+
+			// Connect original to split
+			e2 = edge(n, n2, "call");
+			e2.style = "dotted";
+			e2.weight = 50;
+
+			// Replace this outedge
+			if (n != tail) {
+				e2 = edge(n, e.head, "transformed-call");
+				copyA(e,e2);
+				e2.label = "";
+				delete($G,e);
+			}
+
+			// Record where we were
+			n = n2;
+		}
+	}
+
+	// Consider the outgoing control flow: move down to the bottom of
+	// the call sequence nodes
+	for (e = fstout(tail); e; e = nxtout(e)) {
+		if (e.op == "br") {
+			// Replace this outedge
+			e2 = edge(n,e.head,"transformed");
+			copyA(e,e2);
+			delete($G,e);
+		}
+	}
+}
+
+// Each return node: add edges back to the caller
+N [op == "ret"] {
+	for (g = fstsubg($G); g; g = nxtsubg(g)) {
+		if(isIn(g,$)) {
+			i = 0;
+			while(calls[sprintf("%s%d", g.name, ++i)]) {
+				e = edge($, calls[sprintf("%s%d", g.name, i)], "return");
+				e.style = "dotted";
+				e.op = "ret";
+				e.line = e.tail.line;
+				e.weight = 5;
+			}
+		}
+	}
+}
+
+
+END_G {
+	write($);
+}

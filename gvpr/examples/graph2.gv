@@ -1,0 +1,5 @@
+digraph {
+   a [color = "blue"];
+   b [color = "red"];
+   a -> b;
+}

@@ -103,7 +103,3 @@ func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 	return (_type == JavaScriptParserMultiLineComment && (strings.Contains(text, "\r") || strings.Contains(text, "\n"))) ||
 		(_type == JavaScriptParserLineTerminator)
 }
-
-func (p *JavaScriptParserBase) notLineTerminatorAhead() bool {
-	return !p.lineTerminatorAhead()
-}
