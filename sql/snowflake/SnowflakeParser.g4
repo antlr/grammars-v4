@@ -3722,22 +3722,22 @@ expr
     : object_name DOT NEXTVAL
     | primitive_expression
     | function_call
+    | expr LSB expr RSB //array access
+    | expr COLON expr //json access
+    | expr DOT (VALUE | expr)
     | expr COLLATE string
     | case_expression
     | iff_expr
-    | full_column_name
     | bracket_expression
     | op=( PLUS | MINUS ) expr
-    | op=NOT expr
     | expr op=(STAR | DIVIDE | MODULE) expr
     | expr op=(PLUS | MINUS | PIPE_PIPE) expr
-    | expr op=( AND | OR | NOT ) expr //bool operation
-    | expr LSB expr RSB //array access
+    | expr comparison_operator expr
+    | op=NOT+ expr
+    | expr AND expr //bool operation
+    | expr OR expr //bool operation
     | arr_literal
 //    | expr time_zone
-    | expr COLON expr //json access
-    | expr DOT VALUE
-    | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
@@ -3748,7 +3748,6 @@ expr
     | subquery
     | try_cast_expr
     | trim_expression
-    | expr comparison_operator expr
     | expr IS null_not_null
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
@@ -3815,7 +3814,8 @@ data_type
 primitive_expression
     : DEFAULT //?
     | NULL_
-    | id_
+    | id_ ('.' id_)* // json field access
+    | full_column_name
     | literal
     //| json_literal
     //| arr_literal
@@ -4252,7 +4252,6 @@ subquery
 
 predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
-    | expr comparison_operator expr
     | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expr NOT? BETWEEN expr AND expr
     | expr NOT? IN '(' (subquery | expr_list) ')'
