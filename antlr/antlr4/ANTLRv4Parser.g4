@@ -302,7 +302,16 @@ element
     : labeledElement (ebnfSuffix |)
     | atom (ebnfSuffix |)
     | ebnf
-    | actionBlock (QUESTION elementOptions?)?
+    | actionBlock (QUESTION predicateOptions?)?
+    ;
+
+predicateOptions
+    : LT predicateOption (COMMA predicateOption)* GT
+    ;
+
+predicateOption
+    : elementOption
+    | identifier ASSIGN actionBlock
     ;
 
 labeledElement
