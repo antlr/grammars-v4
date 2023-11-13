@@ -1282,7 +1282,7 @@ alter_tag
 
 alter_task
     : ALTER TASK if_exists? object_name resume_suspend
-    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list
+    | ALTER TASK if_exists? object_name ( REMOVE | ADD ) AFTER string_list 
     | ALTER TASK if_exists? object_name SET
         // TODO : Check and review if element's order binded or not
         ( WAREHOUSE EQ id_ )?
@@ -1386,7 +1386,6 @@ alter_warehouse_opts
     | id_fn set_tags
     | id_fn unset_tags
     | id_fn UNSET id_ (COMMA id_)*
-    | id_ SET wh_properties (',' wh_properties)*
     ;
 
 alter_account_opts
@@ -2014,27 +2013,6 @@ create_share
 
 character
     : CHAR_LITERAL
-    | AAD_PROVISIONER_Q
-    | ARRAY_Q
-    | AUTO_Q
-    | AVRO_Q
-    | AZURE_CSE_Q
-    | AZURE_Q
-    | BOTH_Q
-    | CSV_Q
-    | GCS_SSE_KMS_Q
-    | GENERIC_Q
-    | GENERIC_SCIM_PROVISIONER_Q
-    | JSON_Q
-    | NONE_Q
-    | OBJECT_Q
-    | OKTA_PROVISIONER_Q
-    | OKTA_Q
-    | ORC_Q
-    | PARQUET_Q
-    | S3
-    | SNOWPARK_OPTIMIZED
-    | XML_Q
     ;
 
 format_type_options
@@ -2605,7 +2583,7 @@ task_parameters
 
 task_compute
     : WAREHOUSE EQ id_
-    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote.
+    | USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE EQ ( wh_common_size | string ) //Snowflake allow quoted warehouse size but must be without quote. 
     ;
 
 task_schedule
@@ -2621,7 +2599,7 @@ task_suspend_after_failure_number
     ;
 
 task_error_integration
-    : ERROR_INTEGRATION EQ id_
+    : ERROR_INTEGRATION EQ id_ 
     ;
 
 task_overlap
@@ -2679,7 +2657,6 @@ wh_extra_size
 
 wh_properties
     : WAREHOUSE_SIZE EQ ( wh_common_size | wh_extra_size | ID2)
-    | WAREHOUSE_TYPE EQ (STANDARD | SNOWPARK_OPTIMIZED)
     | MAX_CLUSTER_COUNT EQ num
     | MIN_CLUSTER_COUNT EQ num
     | SCALING_POLICY EQ (STANDARD | ECONOMY)
@@ -2690,7 +2667,6 @@ wh_properties
     | comment_clause
     | ENABLE_QUERY_ACCELERATION EQ true_false
     | QUERY_ACCELERATION_MAX_SCALE_FACTOR EQ num
-    | MAX_CONCURRENCY_LEVEL EQ num
     ;
 
 wh_params
@@ -3575,9 +3551,6 @@ keyword
     | COMMENT
     | ORDER
     | NOORDER
-    | DIRECTION
-    | LENGTH
-    | LANGUAGE
     // etc
     ;
 
@@ -3616,8 +3589,6 @@ non_reserved_words
     | DYNAMIC
     | TARGET_LAG
     | EMAIL
-    | MAX_CONCURRENCY_LEVEL
-    | WAREHOUSE_TYPE
     ;
 
 builtin_function
@@ -3722,22 +3693,22 @@ expr
     : object_name DOT NEXTVAL
     | primitive_expression
     | function_call
-    | expr LSB expr RSB //array access
-    | expr COLON expr //json access
-    | expr DOT (VALUE | expr)
     | expr COLLATE string
     | case_expression
     | iff_expr
+    | full_column_name
     | bracket_expression
     | op=( PLUS | MINUS ) expr
+    | op=NOT expr
     | expr op=(STAR | DIVIDE | MODULE) expr
     | expr op=(PLUS | MINUS | PIPE_PIPE) expr
-    | expr comparison_operator expr
-    | op=NOT+ expr
-    | expr AND expr //bool operation
-    | expr OR expr //bool operation
+    | expr op=( AND | OR | NOT ) boolean_operator //bool operation
+    | expr LSB expr RSB //array access
     | arr_literal
 //    | expr time_zone
+    | expr COLON expr //json access
+    | expr DOT VALUE
+    | expr DOT expr
     | expr COLON_COLON data_type //cast
     | expr over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
@@ -3748,6 +3719,7 @@ expr
     | subquery
     | try_cast_expr
     | trim_expression
+    | expr comparison_operator expr
     | expr IS null_not_null
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
@@ -3814,8 +3786,7 @@ data_type
 primitive_expression
     : DEFAULT //?
     | NULL_
-    | id_ ('.' id_)* // json field access
-    | full_column_name
+    | id_
     | literal
     //| json_literal
     //| arr_literal
@@ -4252,6 +4223,7 @@ subquery
 
 predicate
     : EXISTS LR_BRACKET subquery RR_BRACKET
+    | expr comparison_operator expr
     | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expr NOT? BETWEEN expr AND expr
     | expr NOT? IN '(' (subquery | expr_list) ')'
@@ -4303,4 +4275,10 @@ first_next
 limit_clause
     : LIMIT num (OFFSET num)?
     | (OFFSET num )? row_rows? FETCH first_next? num row_rows? ONLY?
+    ;
+
+boolean_operator
+    : NOT boolean_operator
+    | left=boolean_operator operator=AND right=boolean_operator
+    | left=boolean_operator operator=OR right=boolean_operator
     ;
