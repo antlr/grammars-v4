@@ -1,0 +1,131 @@
+#
+# Sample /etc/sudoers file.
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# See the sudoers man page for the details on how to write a sudoers file.
+#
+
+##
+# User alias specification
+##
+User_Alias	FULLTIMERS = millert, mikef, dowdy
+User_Alias	PARTTIMERS = bostley, jwfox, crawl
+User_Alias	WEBMASTERS = will, wendy, wim
+
+##
+# Runas alias specification
+##
+Runas_Alias	OP = root, operator
+Runas_Alias	DB = oracle, sybase
+
+##
+# Host alias specification
+##
+Host_Alias	SPARC = bigtime, eclipse, moet, anchor:\
+		SGI = grolsch, dandelion, black:\
+		ALPHA = widget, thalamus, foobar:\
+		HPPA = boa, nag, python
+Host_Alias	CUNETS = 128.138.0.0/255.255.0.0
+Host_Alias	CSNETS = 128.138.243.0, 128.138.204.0/24, 128.138.242.0
+Host_Alias	SERVERS = master, mail, www, ns
+Host_Alias	CDROM = orion, perseus, hercules
+
+##
+# Cmnd alias specification
+##
+Cmnd_Alias	DUMPS = /usr/sbin/dump, /usr/sbin/rdump, /usr/sbin/restore, \
+			/usr/sbin/rrestore, /usr/bin/mt
+Cmnd_Alias	KILL = /usr/bin/kill
+Cmnd_Alias	PRINTING = /usr/sbin/lpc, /usr/bin/lprm
+Cmnd_Alias	SHUTDOWN = /usr/sbin/shutdown
+Cmnd_Alias	HALT = /usr/sbin/halt
+Cmnd_Alias	REBOOT = /usr/sbin/reboot
+Cmnd_Alias	SHELLS = /sbin/sh, /usr/bin/sh, /usr/bin/csh, /usr/bin/ksh, \
+			 /usr/local/bin/tcsh, /usr/bin/rsh, \
+			 /usr/local/bin/zsh
+Cmnd_Alias	SU = /usr/bin/su
+Cmnd_Alias	VIPW = /usr/sbin/vipw, /usr/bin/passwd, /usr/bin/chsh, \
+		       /usr/bin/chfn
+
+##
+# Override built-in defaults
+##
+Defaults               syslog=auth
+Defaults>root          !set_logname
+Defaults:FULLTIMERS    !lecture
+Defaults:millert       !authenticate
+Defaults@SERVERS       log_year, logfile=/var/log/sudo.log
+
+##
+# User specification
+##
+
+# root and users in group wheel can run anything on any machine as any user
+root		ALL = (ALL) ALL
+%wheel		ALL = (ALL) ALL
+
+# full time sysadmins can run anything on any machine without a password
+FULLTIMERS	ALL = NOPASSWD: ALL
+
+# part time sysadmins may run anything but need a password
+PARTTIMERS	ALL = ALL
+
+# jack may run anything on machines in CSNETS
+jack		CSNETS = ALL
+
+# lisa may run any command on any host in CUNETS (a class B network)
+lisa		CUNETS = ALL
+
+# operator may run maintenance commands and anything in /usr/oper/bin/
+operator	ALL = DUMPS, KILL, SHUTDOWN, HALT, REBOOT, PRINTING,\
+		sudoedit /etc/printcap, /usr/oper/bin/
+
+# joe may su only to operator
+joe		ALL = /usr/bin/su operator
+
+# pete may change passwords for anyone but root on the hp snakes
+pete		HPPA = /usr/bin/passwd [A-z]*, !/usr/bin/passwd root
+
+# bob may run anything on the sparc and sgi machines as any user
+# listed in the Runas_Alias "OP" (ie: root and operator)
+bob		SPARC = (OP) ALL : SGI = (OP) ALL
+
+# jim may run anything on machines in the biglab netgroup
+jim		+biglab = ALL
+
+# users in the secretaries netgroup need to help manage the printers
+# as well as add and remove users
++secretaries	ALL = PRINTING, /usr/bin/adduser, /usr/bin/rmuser
+
+# fred can run commands as oracle or sybase without a password
+fred		ALL = (DB) NOPASSWD: ALL
+
+# on the alphas, john may su to anyone but root and flags are not allowed
+john		ALPHA = /usr/bin/su [!-]*, !/usr/bin/su *root*
+
+# jen can run anything on all machines except the ones
+# in the "SERVERS" Host_Alias
+jen		ALL, !SERVERS = ALL
+
+# jill can run any commands in the directory /usr/bin/, except for
+# those in the SU and SHELLS aliases.
+jill		SERVERS = /usr/bin/, !SU, !SHELLS
+
+# steve can run any command in the directory /usr/local/op_commands/
+# as user operator.
+steve		CSNETS = (operator) /usr/local/op_commands/
+
+# matt needs to be able to kill things on his workstation when
+# they get hung.
+matt		valkyrie = KILL
+
+# users in the WEBMASTERS User_Alias (will, wendy, and wim)
+# may run any command as user www (which owns the web pages)
+# or simply su to www.
+WEBMASTERS	www = (www) ALL, (root) /usr/bin/su www
+
+# anyone can mount/unmount a cd-rom on the machines in the CDROM alias
+ALL		CDROM = NOPASSWD: /sbin/umount /CDROM,\
+		/sbin/mount -o nosuid\,nodev /dev/cd0a /CDROM
+
