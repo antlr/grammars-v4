@@ -611,12 +611,12 @@ create_package_body
 package_obj_spec
     : pragma_declaration
     | exception_declaration
+    | procedure_spec
+    | function_spec
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | type_declaration
-    | procedure_spec
-    | function_spec
     ;
 
 procedure_spec
@@ -631,14 +631,14 @@ function_spec
 package_obj_body
     : pragma_declaration
     | exception_declaration
+    | procedure_spec
+    | function_spec
     | subtype_declaration
     | cursor_declaration
     | variable_declaration
     | type_declaration
     | procedure_body
     | function_body
-    | procedure_spec
-    | function_spec
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
@@ -5285,12 +5285,12 @@ seq_of_declare_specs
 declare_spec
     : pragma_declaration
     | exception_declaration
+    | procedure_spec
+    | function_spec
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | type_declaration
-    | procedure_spec
-    | function_spec
     | procedure_body
     | function_body
     ;
