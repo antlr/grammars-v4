@@ -683,3 +683,34 @@ SELECT
      ,@N_latin;
 END
 #end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
