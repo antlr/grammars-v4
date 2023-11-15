@@ -465,11 +465,18 @@ compound_operator:
 update_stmt:
     with_clause? UPDATE_ (
         OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_)
-    )? qualified_table_name SET_ (column_name | column_name_list) ASSIGN expr (
-        COMMA (column_name | column_name_list) ASSIGN expr
-    )* (
+    )? qualified_table_name SET_ assignment_list (
         FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-    )? (WHERE_ expr)? returning_clause?
+    )? (WHERE_ where = expr)? returning_clause?
+;
+
+assignment_list:
+    assignment
+    (COMMA assignment)*
+;
+
+assignment:
+    (column_name | column_name_list) ASSIGN expr
 ;
 
 column_name_list:
