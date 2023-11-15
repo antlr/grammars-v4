@@ -264,8 +264,8 @@ match_point_reset
  ;
 
 quoting
- : '\\' .
- | '\\' 'Q' .*? '\\' 'E'
+ : '\\' 'Q' .*? '\\' 'E'
+ | '\\' .
  ;
 
 // Helper rules
