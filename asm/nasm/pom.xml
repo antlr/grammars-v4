@@ -39,8 +39,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>compilationUnit</entryPoint>
-					<grammarName>NASM</grammarName>
+					<entryPoint>program</entryPoint>
+					<grammarName>nasm_x86_64_</grammarName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
