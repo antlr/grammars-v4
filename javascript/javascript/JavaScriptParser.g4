@@ -444,6 +444,7 @@ assignmentOperator
     | '^='
     | '|='
     | '**='
+    | '??='
     ;
 
 literal
