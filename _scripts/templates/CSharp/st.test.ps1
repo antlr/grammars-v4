@@ -10,7 +10,7 @@ if (Test-Path -Path "tests.txt" -PathType Leaf) {
     Remove-Item "tests.txt"
 }
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob -- $Tests ; $last = $LASTEXITCODE ) | Out-Null
+$allFiles = $(& dotnet trglob -- $Tests ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
