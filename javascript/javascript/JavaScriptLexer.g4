@@ -96,6 +96,7 @@ BitAndAssign:                   '&=';
 BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
 PowerAssign:                    '**=';
+NullishCoalescingAssign:        '??=';
 ARROW:                          '=>';
 
 /// Null Literals
