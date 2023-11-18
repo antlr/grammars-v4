@@ -70,7 +70,7 @@ varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
 vfpdef: name;
 
 stmt: simple_stmts | compound_stmt;
-simple_stmts: simple_stmt (';' simple_stmt)* ';'? NEWLINE;
+simple_stmts: simple_stmt (';' simple_stmt)* ';'? NEWLINE?;
 simple_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
 expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
