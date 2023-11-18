@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-   <targets>CSharp;Dart;Java</targets>
+   <targets>Cpp;CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
    <test>
       <name>quick</name>
-      <targets>Cpp;CSharp;Dart;JavaScript;Python3</targets>
+      <targets>Cpp;CSharp;Dart;JavaScript;Python3;TypeScript</targets>
       <inputs>examples/*.dart</inputs>
    </test>
    <!-- For Java, do a deeper test. -->
