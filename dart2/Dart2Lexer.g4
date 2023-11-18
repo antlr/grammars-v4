@@ -27,6 +27,8 @@ lexer grammar Dart2Lexer;
 
 options { superClass=Dart2LexerBase; }
 
+// Insert here @header for C++ lexer.
+
 A: '&';
 AA: '&&';
 AE: '&=';
