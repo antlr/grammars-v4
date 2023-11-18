@@ -285,8 +285,12 @@ charSet
     | CHAR SET
     ;
 
+currentUserExpression
+    : CURRENT_USER ( '(' ')')?
+    ;
+
 ownerStatement
-    : DEFINER '=' (userName | CURRENT_USER ( '(' ')')?)
+    : DEFINER '=' (userName | currentUserExpression)
     ;
 
 scheduleExpression
@@ -834,7 +838,7 @@ insertStatement
       IGNORE? INTO? tableName
       (PARTITION '(' partitions=uidList? ')' )?
       (
-        ('(' columns=fullColumnNameList ')')? insertStatementValue (AS? uid)?
+        ('(' columns=fullColumnNameList? ')')? insertStatementValue (AS? uid)?
         | SET
             setFirst=updatedElement
             (',' setElements+=updatedElement)*
@@ -897,7 +901,8 @@ replaceStatement
 selectStatement
     : querySpecification lockClause?                                #simpleSelect
     | queryExpression lockClause?                                   #parenthesisSelect
-    | querySpecificationNointo unionStatement+
+    | (querySpecificationNointo | queryExpressionNointo)
+        unionStatement+
         (
           UNION unionType=(ALL | DISTINCT)?
           (querySpecification | queryExpression)
@@ -2099,8 +2104,16 @@ indexColumnName
     : ((uid | STRING_LITERAL) ('(' decimalLiteral ')')? | expression) sortType=(ASC | DESC)?
     ;
 
-userName
-    : STRING_USER_NAME | ID | STRING_LITERAL | ADMIN | keywordsCanBeId;
+simpleUserName
+    : STRING_LITERAL
+    | ID
+    | ADMIN
+    | keywordsCanBeId;
+hostName: (LOCAL_ID | HOST_IP_ADDRESS | '@' );
+ userName
+    : simpleUserName
+    | simpleUserName hostName
+    | currentUserExpression;
 
 mysqlVariable
     : LOCAL_ID
@@ -2391,8 +2404,9 @@ functionCall
 specificFunction
     : (
       CURRENT_DATE | CURRENT_TIME | CURRENT_TIMESTAMP
-      | CURRENT_USER | LOCALTIME | UTC_TIMESTAMP | SCHEMA
+      | LOCALTIME | UTC_TIMESTAMP | SCHEMA
       ) ('(' ')')?                                                  #simpleFunctionCall
+    | currentUserExpression                                         #currentUser
     | CONVERT '(' expression separator=',' convertedDataType ')'    #dataTypeFunctionCall
     | CONVERT '(' expression USING charsetName ')'                  #dataTypeFunctionCall
     | CAST '(' expression AS convertedDataType ')'                  #dataTypeFunctionCall
@@ -2633,7 +2647,8 @@ expressionAtom
     | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | INTERVAL expression intervalType                              #intervalExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
-    | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
+    | left=expressionAtom multOperator right=expressionAtom         #mathExpressionAtom
+    | left=expressionAtom addOperator  right=expressionAtom         #mathExpressionAtom
     | left=expressionAtom jsonOperator right=expressionAtom         #jsonExpressionAtom
     ;
 
@@ -2654,8 +2669,12 @@ bitOperator
     : '<' '<' | '>' '>' | '&' | '^' | '|'
     ;
 
-mathOperator
-    : '*' | '/' | '%' | DIV | MOD | '+' | '-'
+multOperator
+    : '*' | '/' | '%' | DIV | MOD
+    ;
+
+addOperator
+    : '+' | '-'
     ;
 
 jsonOperator

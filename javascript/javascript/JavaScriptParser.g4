@@ -175,8 +175,7 @@ iterationStatement
     | While '(' expressionSequence ')' statement                                                                              # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
     | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                                # ForInStatement
-    // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' (singleExpression | variableDeclarationList) identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
+    | For Await? '(' (singleExpression | variableDeclarationList) Of expressionSequence ')' statement                         # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -355,6 +354,7 @@ singleExpression
     | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
+    | New identifier arguments                                              # NewExpression
     | New singleExpression arguments                                        # NewExpression
     | New singleExpression                                                  # NewExpression
     | singleExpression arguments                                            # ArgumentsExpression
@@ -444,6 +444,7 @@ assignmentOperator
     | '^='
     | '|='
     | '**='
+    | '??='
     ;
 
 literal
@@ -499,6 +500,8 @@ identifier
     | Async
     | As
     | From
+    | Yield
+    | Of
     ;
 
 reservedWord
@@ -555,6 +558,7 @@ keyword
     | Await
     | From
     | As
+    | Of
     ;
 
 let_

@@ -46,6 +46,7 @@ alter table add_test wait 100 add column col1 int not null;
 alter table default.task add column xxxx varchar(200) comment 'cdc test';
 alter table `some_table` add unique if not exists `id_unique` (`id`)
 alter table if exists `add_test` add column if not exists `new_col` text default 'my_default';
+alter table user_details add index if not exists `country_id_index` (country_id), algorithm=NOCOPY;
 #end
 #begin
 -- Alter database

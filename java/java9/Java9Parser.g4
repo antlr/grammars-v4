@@ -254,7 +254,7 @@ compilationUnit
 	;
 
 ordinaryCompilation
-	:	packageDeclaration? importDeclaration* typeDeclaration* EOF
+	:	packageDeclaration? importDeclaration* typeDeclaration*
 	;
 
 modularCompilation

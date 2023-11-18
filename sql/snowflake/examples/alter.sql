@@ -35,3 +35,5 @@ alter task ts suspend ;
 alter user u reset password ;
 alter view vw set secure ;
 alter warehouse wh suspend ;
+alter sequence seq set ORDER COMMENT ='A comment';
+alter sequence seq set NOORDER;

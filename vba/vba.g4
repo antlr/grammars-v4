@@ -199,6 +199,7 @@ blockStmt :
 	| killStmt
 	| letStmt
 	| lineInputStmt
+    | lineNumber
 	| loadStmt
 	| lockStmt
 	| lsetStmt
@@ -361,6 +362,8 @@ killStmt : KILL WS valueStmt;
 letStmt : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? valueStmt;
 
 lineInputStmt : LINE_INPUT WS fileNumber WS? ',' WS? valueStmt;
+
+lineNumber : (INTEGERLITERAL | SHORTLITERAL) NEWLINE? ':'? NEWLINE? WS?;
 
 loadStmt : LOAD WS valueStmt;
 

@@ -96,6 +96,7 @@ BitAndAssign:                   '&=';
 BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
 PowerAssign:                    '**=';
+NullishCoalescingAssign:        '??=';
 ARROW:                          '=>';
 
 /// Null Literals
@@ -156,6 +157,7 @@ In:                             'in';
 Try:                            'try';
 As:                             'as';
 From:                           'from';
+Of:                             'of';
 
 /// Future Reserved Words
 
@@ -266,7 +268,7 @@ fragment EscapeCharacter
     ;
 
 fragment LineContinuation
-    : '\\' [\r\n\u2028\u2029]
+    : '\\' [\r\n\u2028\u2029]+
     ;
 
 fragment HexDigit

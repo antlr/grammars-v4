@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-   <targets>CSharp;Dart;Java;TypeScript</targets>
-   <!-- Let's do a quick sanity check for all but Java. -->
+   <targets>CSharp;Dart;Java</targets>
    <test>
       <name>quick</name>
-      <targets>CSharp;Dart;TypeScript</targets>
+      <targets>CSharp;Dart</targets>
       <inputs>examples/*.dart</inputs>
    </test>
-   <!-- For Java, let's do a full test. -->
+   <!-- For Java, do a deeper test. -->
    <test>
       <name>full</name>
       <targets>Java</targets>
-      <inputs>examples/</inputs>
+      <inputs>examples/**/*.dart</inputs>
    </test>
 </desc>

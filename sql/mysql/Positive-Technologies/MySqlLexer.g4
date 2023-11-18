@@ -430,7 +430,7 @@ COMMIT:                              'COMMIT';
 COMPACT:                             'COMPACT';
 COMPLETION:                          'COMPLETION';
 COMPRESSED:                          'COMPRESSED';
-COMPRESSION:                         'COMPRESSION' | QUOTE_SYMB? 'COMPRESSION' QUOTE_SYMB?;
+COMPRESSION:                         'COMPRESSION';
 CONCURRENT:                          'CONCURRENT';
 CONNECT:                             'CONNECT';
 CONNECTION:                          'CONNECTION';
@@ -1285,9 +1285,9 @@ DECIMAL_LITERAL:                     DEC_DIGIT+;
 HEXADECIMAL_LITERAL:                 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\''
                                      | '0X' HEX_DIGIT+;
 
-REAL_LITERAL:                        (DEC_DIGIT+)? '.' DEC_DIGIT+
+REAL_LITERAL:                        DEC_DIGIT* '.' DEC_DIGIT+
                                      | DEC_DIGIT+ '.' EXPONENT_NUM_PART
-                                     | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
+                                     | DEC_DIGIT* '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
                                      | DEC_DIGIT+ EXPONENT_NUM_PART;
 NULL_SPEC_LITERAL:                   '\\' 'N';
 BIT_STRING:                          BIT_STRING_L;
@@ -1309,31 +1309,15 @@ DOT_ID:                              '.' ID_LITERAL;
 ID:                                  ID_LITERAL;
 // DOUBLE_QUOTE_ID:                  '"' ~'"'+ '"';
 REVERSE_QUOTE_ID:                    BQUOTA_STRING;
-STRING_USER_NAME:                    (
-                                       SQUOTA_STRING | DQUOTA_STRING
-                                       | BQUOTA_STRING | ID_LITERAL
-                                     ) '@'
+HOST_IP_ADDRESS:                     (AT_SIGN IP_ADDRESS);
+LOCAL_ID:                            AT_SIGN
                                      (
-                                       SQUOTA_STRING | DQUOTA_STRING
-                                       | BQUOTA_STRING | ID_LITERAL
-                                       | IP_ADDRESS
+                                       STRING_LITERAL | [A-Z0-9._$\u0080-\uFFFF]+
                                      );
-IP_ADDRESS:                          (
-                                       [0-9]+ '.' [0-9.]+
-                                       | [0-9A-F]* ':' [0-9A-F]* ':' [0-9A-F:]+
-                                     );
-LOCAL_ID:                               '@'
+GLOBAL_ID:                           AT_SIGN AT_SIGN
                                      (
-                                        [A-Z0-9._$\u0080-\uFFFF]+
-                                        | SQUOTA_STRING
-                                        | DQUOTA_STRING
-                                        | BQUOTA_STRING
-                                    );
-GLOBAL_ID:                              '@' '@'
-                                    (
-                                        [A-Z0-9._$\u0080-\uFFFF]+
-                                        | BQUOTA_STRING
-                                    );
+                                       [A-Z0-9._$\u0080-\uFFFF]+ | BQUOTA_STRING
+                                     );
 
 
 // Fragments for Literal primitives
@@ -1356,7 +1340,7 @@ fragment BQUOTA_STRING:              '`' ( ~'`' | '``' )* '`';
 fragment HEX_DIGIT:                  [0-9A-F];
 fragment DEC_DIGIT:                  [0-9];
 fragment BIT_STRING_L:               'B' '\'' [01]+ '\'';
-
+fragment IP_ADDRESS:                 [0-9]+ '.' [0-9.]+ | [0-9A-F]* ':' [0-9A-F]* ':' [0-9A-F:]+;
 
 
 // Last tokens must generate Errors

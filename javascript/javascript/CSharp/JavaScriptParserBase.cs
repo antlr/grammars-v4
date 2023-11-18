@@ -72,14 +72,19 @@ public abstract class JavaScriptParserBase : Parser
     /// </param>
     protected bool here(int type)
     {
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
-        if (possibleIndexEosToken < 0) return false;
-        IToken ahead = ((ITokenStream)this.InputStream).Get(possibleIndexEosToken);
+        // Get the most recently emitted token.
+        IToken currentToken = ((ITokenStream)this.InputStream).LT(-1);
 
-        // Check if the token resides on the Hidden channel and if it's of the
+        // Get the next token index.
+        int nextTokenIndex = currentToken == null ? 0 : currentToken.TokenIndex + 1;
+
+        // Get the token after the `currentToken`. By using `_input.get(index)`,
+        // we also grab a token that is (possibly) on the HIDDEN channel.
+        IToken nextToken = ((ITokenStream)this.InputStream).Get(nextTokenIndex);
+
+        // Check if the token resides on the HIDDEN channel and if it's of the
         // provided type.
-        return ahead.Channel == Lexer.Hidden && ahead.Type == type;
+        return (nextToken.Channel == Lexer.Hidden) && (nextToken.Type == type);
     }
 
     /// <summary>

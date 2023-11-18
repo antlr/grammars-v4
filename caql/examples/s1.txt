@@ -1,0 +1,1 @@
+(find("dur2") | stats:sum()) * (find("dur2") | stats:sum()) + 2

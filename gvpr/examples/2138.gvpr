@@ -1,0 +1,43 @@
+BEGIN{
+  int i, j, l, cnt;
+  string POS, st, tst, tok[int];
+
+  void tstStuff(string inStr){
+ 
+    print ("//  tok array count: ",cnt);
+    for (i=0;i<cnt;i++){
+      print("// tok[",i,"]    >>",tok[i],"<<   should NOT include trailing spaces or junk chars");
+      st=tok[i];
+      //st=sub(tok[i],"[	 ]"); // remove tabs and spaces !!
+      l=length(st);
+      print("// length (st) : ",l);
+      j=index(st," ");
+      print("// index of space (st) : ", j, "   << must NOT be less than -1");
+      st=sub(st,"[	 ]");
+      print ("// st   >>",st,"<<");
+      l=length(st);
+      print("// length (st) : ",l);
+      print("//");
+    }
+   }
+   
+  tst=" abc def   ghijk 3456789 012  ";
+  print("\n*****", tst, "******");
+  print("*********  space delimiter  *****************");  
+  print("*********  split results  *****************");
+  cnt=split(tst, tok );
+  tstStuff();
+  print("\n*********  tokens results  ***************");
+  cnt=tokens(tst, tok );
+  tstStuff();
+
+  tst="^abc^def^^^ghijk^3456789^012^^^";
+  print("\n*****", tst, "******");
+  print("*********  ^ delimiter  *****************");
+  print("*********  split results  *****************");
+  cnt=split(tst, tok,"^" );
+  tstStuff();
+  print("\n*********  tokens results  ***************");
+  cnt=tokens(tst, tok, "^" );
+  tstStuff();
+}

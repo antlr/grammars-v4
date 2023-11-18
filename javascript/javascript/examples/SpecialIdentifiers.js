@@ -4,3 +4,4 @@ let from;
 let get;
 let of;
 let set;
+let yield;

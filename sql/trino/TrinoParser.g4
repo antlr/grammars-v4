@@ -170,6 +170,7 @@ statement
     | SHOW_ SESSION_
         (LIKE_ pattern=string_ (ESCAPE_ escape=string_)?)?                 #showSession
     | SET_ SESSION_ qualifiedName EQ_ expression                          #setSession
+    | RESET_ SESSION_ AUTHORIZATION_                                     #resetSessionAuthorization
     | RESET_ SESSION_ qualifiedName                                      #resetSession
     | START_ TRANSACTION_ (transactionMode (COMMA_ transactionMode)*)?      #startTransaction
     | COMMIT_ WORK_?                                                     #commit

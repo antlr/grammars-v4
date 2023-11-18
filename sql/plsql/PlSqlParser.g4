@@ -611,12 +611,12 @@ create_package_body
 package_obj_spec
     : pragma_declaration
     | exception_declaration
+    | procedure_spec
+    | function_spec
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | type_declaration
-    | procedure_spec
-    | function_spec
     ;
 
 procedure_spec
@@ -629,15 +629,16 @@ function_spec
     ;
 
 package_obj_body
-    : exception_declaration
+    : pragma_declaration
+    | exception_declaration
+    | procedure_spec
+    | function_spec
     | subtype_declaration
     | cursor_declaration
     | variable_declaration
     | type_declaration
     | procedure_body
     | function_body
-    | procedure_spec
-    | function_spec
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
@@ -4142,7 +4143,7 @@ cache_or_nocache
     ;
 
 database_name
-    : regular_id
+    : id_expression
     ;
 
 alter_database
@@ -4493,6 +4494,7 @@ alter_database_link
 password_value
     : id_expression
     | numeric
+    | VALUES CHAR_STRING
     ;
 
 link_authentication
@@ -5283,12 +5285,12 @@ seq_of_declare_specs
 declare_spec
     : pragma_declaration
     | exception_declaration
+    | procedure_spec
+    | function_spec
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | type_declaration
-    | procedure_spec
-    | function_spec
     | procedure_body
     | function_body
     ;
@@ -6081,7 +6083,11 @@ logical_expression
     ;
 
 unary_logical_expression
-    : NOT? multiset_expression (IS NOT? logical_operation)*
+    : NOT? multiset_expression unary_logical_operation?
+    ;
+
+unary_logical_operation
+    : IS NOT? logical_operation
     ;
 
 logical_operation:
@@ -7152,6 +7158,7 @@ regular_id
     | SELF
     | SERIALLY_REUSABLE
     | SET
+    | SEQ
     | SHARDSPACE
     | SIGNTYPE
     | SIMPLE_INTEGER

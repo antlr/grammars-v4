@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Sparql.g4</include>
+						<include>SparqlLexer.g4</include>
+						<include>SparqlParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
