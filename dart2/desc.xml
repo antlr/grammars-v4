@@ -3,7 +3,7 @@
    <targets>CSharp;Dart;Java</targets>
    <test>
       <name>quick</name>
-      <targets>Cpp;CSharp;Dart;JavaScript</targets>
+      <targets>Cpp;CSharp;Dart;JavaScript;Python3</targets>
       <inputs>examples/*.dart</inputs>
    </test>
    <!-- For Java, do a deeper test. -->
