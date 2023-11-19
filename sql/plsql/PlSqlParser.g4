@@ -4695,7 +4695,9 @@ merge_table_partition
     ;
 
 modify_table_partition
-    : MODIFY PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (REBUILD? UNUSABLE LOCAL INDEXES)?
+    : MODIFY (PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (REBUILD? UNUSABLE LOCAL INDEXES)?
+             | range_partitions
+             )
     ;
 
 split_table_partition
