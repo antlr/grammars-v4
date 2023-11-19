@@ -3636,6 +3636,7 @@ builtin_function
     | IDENTIFIER
     | FLATTEN
     | SPLIT_TO_TABLE
+    | CAST
     ;
 
 list_operator
@@ -3740,7 +3741,7 @@ expr
 //    | expr time_zone
     | expr COLON_COLON data_type //cast
     | expr over_clause
-    | CAST LR_BRACKET expr AS data_type RR_BRACKET
+    | cast_expr
     | json_literal
     | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
@@ -3765,6 +3766,10 @@ trim_expression
 
 try_cast_expr
     : TRY_CAST LR_BRACKET expr AS data_type RR_BRACKET
+    ;
+
+cast_expr
+    : CAST LR_BRACKET expr AS data_type RR_BRACKET
     ;
 
 json_literal
