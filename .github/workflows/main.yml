@@ -26,7 +26,7 @@ jobs:
           Before="${{github.event.before}}"
           After="${{github.event.after}}"
         fi
-        bash _scripts/what-to-test.sh >> $GITHUB_OUTPUT
+        bash _scripts/what-to-test.sh $Before $After >> $GITHUB_OUTPUT
 
   build-pwsh:
     needs: setup
