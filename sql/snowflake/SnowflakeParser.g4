@@ -3626,9 +3626,8 @@ non_reserved_words
 
 builtin_function
     // If there is a lexer entry for a function we also need to add the token here
-    // as it otherwise will not be picked up by the id_ rule
-    : IFF
-    | SUM
+    // as it otherwise will not be picked up by the id_ rule (See also derived rule below)
+    : SUM
     | AVG
     | MIN
     | COUNT
@@ -3642,15 +3641,7 @@ builtin_function
     | SPLIT_TO_TABLE
     | CAST
     ;
-
-list_function
-    // lexer entry of function name which admit a list of comma separated expr
-    // expr rule use this
-    : CONCAT
-    | CONCAT_WS
-    | COALESCE
-    // To complete as needed
-    ;
+//TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 
 binary_builtin_function
     // lexer entry of function name which admit 2 parameters
@@ -3684,7 +3675,18 @@ ternary_builtin_function
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     | SPLIT_PART
     | NVL2
+    | IFF
     ;
+
+list_function
+    // lexer entry of function name which admit a list of comma separated expr
+    // expr rule use this
+    : CONCAT
+    | CONCAT_WS
+    | COALESCE
+    // To complete as needed
+    ;
+
 
 pattern
     : PATTERN EQ string
@@ -3732,8 +3734,6 @@ expr_list_sorted
 
 expr
     : object_name DOT NEXTVAL
-    | primitive_expression
-    | function_call
     | expr LSB expr RSB //array access
     | expr COLON expr //json access
     | expr DOT (VALUE | expr)
@@ -3750,21 +3750,23 @@ expr
     | expr OR expr //bool operation
     | arr_literal
 //    | expr time_zone
-    | expr COLON_COLON data_type //cast
     | expr over_clause
     | cast_expr
+    | expr COLON_COLON data_type // Cast also
+    | try_cast_expr
     | json_literal
+    | trim_expression
     | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
+    | function_call
     | subquery
-    | try_cast_expr
-    | trim_expression
     | expr IS null_not_null
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE ) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
+    | primitive_expression //Should be latest rule as it's nearly a catch all
     ;
 
 iff_expr
