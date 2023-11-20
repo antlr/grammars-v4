@@ -9,7 +9,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      languages: {{ steps.step1.outputs.myoutput }}
+      mymatrix: ${{ steps.step1.outputs.myoutput }}
     steps:
       - name: Gather targets.
         id: step1
