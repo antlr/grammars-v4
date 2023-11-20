@@ -13,7 +13,16 @@ jobs:
     steps:
       - name: Gather targets.
         id: step1
-        run: echo 'myoutput={"os":["macos-latest", "windows-latest", "ubuntu-latest"], "language":["CSharp", "Java"]}' >> $GITHUB_OUTPUT
+        shell: bash
+        run: |
+          if [ "${{github.event_name}}" == "pull_request" ]; then
+            Before="${{github.event.pull_request.base.sha}}"
+            After="${{github.event.pull_request.head.sha}}"
+          else
+            Before="${{github.event.before}}"
+            After="${{github.event.after}}"
+          fi
+          bash _scripts/what-to-test.sh >> $GITHUB_OUTPUT
 
   build-pwsh:
     needs: setup
@@ -121,12 +130,11 @@ jobs:
         _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
   build-bash:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-        language: [ Cpp, CSharp, Dart, Java, JavaScript, Go, PHP, Python3, TypeScript ]
+      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash
