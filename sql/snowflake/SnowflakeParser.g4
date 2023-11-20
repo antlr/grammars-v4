@@ -3640,6 +3640,7 @@ builtin_function
     | FLATTEN
     | SPLIT_TO_TABLE
     | CAST
+    | TRY_CAST
     ;
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 
