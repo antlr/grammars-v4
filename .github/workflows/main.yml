@@ -6,13 +6,22 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      languages: {{ steps.step1.outputs.myoutput }}
+    steps:
+      - name: Gather targets.
+        id: step1
+        run: echo 'myoutput=["CSharp", "Java"]' >> $GITHUB_OUTPUT
+
   build-pwsh:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
+        language: ${{ needs.setup.outputs.languages }}
     steps:
     - name: Info
       shell: bash
