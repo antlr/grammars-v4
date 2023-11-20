@@ -13,15 +13,14 @@ jobs:
     steps:
       - name: Gather targets.
         id: step1
-        run: echo 'myoutput=["CSharp", "Java"]' >> $GITHUB_OUTPUT
+        run: echo 'myoutput={"os":["macos-latest", "windows-latest", "ubuntu-latest"], "language":["CSharp", "Java"]}' >> $GITHUB_OUTPUT
 
   build-pwsh:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        language: ${{ needs.setup.outputs.languages }}
+      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix }}
     steps:
     - name: Info
       shell: bash
