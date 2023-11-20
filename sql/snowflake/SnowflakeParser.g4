@@ -3543,6 +3543,8 @@ id_fn
     ;
 
 id_
+    //id_ is used for object name. Snowflake is very permissive 
+    //so we could use nearly all keyword as object name (table, column etc..)
     : ID
     | ID2
     | DOUBLE_QUOTE_ID
@@ -3551,16 +3553,15 @@ id_
     | non_reserved_words
     | data_type
     | builtin_function
-    | ALERT
-    | ALERTS
-    | CONDITION
     | binary_builtin_function
+    | binary_or_ternary_builtin_function
+    | ternary_builtin_function
     ;
 
 keyword
-    : INT
-    | BIGINT
-    | STAGE
+    //List here keyword (SnowSQL meaning) allowed as object name
+    // Name of builtin function should be included in specifique section (ie builtin_function)
+    : STAGE
     | USER
     | TYPE
     | CLUSTER
@@ -3578,10 +3579,26 @@ keyword
     | DIRECTION
     | LENGTH
     | LANGUAGE
+    | KEY
+    | ALERT
+    | ALERTS
+    | CONDITION
+    | ROLE
+    | ROW_NUMBER
+    | VALUE
+    | FIRST_VALUE
+    | VALUES
+    | TARGET_LAG
+    | EMAIL
+    | MAX_CONCURRENCY_LEVEL
+    | WAREHOUSE_TYPE
+    | TAG
+    | WAREHOUSE
     // etc
     ;
 
 non_reserved_words
+    //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     : ORGADMIN
     | ACCOUNTADMIN
     | SECURITYADMIN
@@ -3594,30 +3611,17 @@ non_reserved_words
     | SOURCE
     | PROCEDURE_NAME
     | STATE
-    | ROLE
     | DEFINITION
     | TIMEZONE
     | LOCAL
-    | ROW_NUMBER
-    | VALUE
     | NAME
-    | TAG
-    | WAREHOUSE
     | VERSION
     | OPTION
-    | NVL2
-    | FIRST_VALUE
     | RESPECT
-    | NVL
     | RESTRICT
-    | VALUES
     | EVENT
     | DOWNSTREAM
     | DYNAMIC
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
-    | WAREHOUSE_TYPE
     ;
 
 builtin_function
@@ -3639,8 +3643,9 @@ builtin_function
     | CAST
     ;
 
-list_operator
-    // lexer entry which admit a list of comma separated expr
+list_function
+    // lexer entry of function name which admit a list of comma separated expr
+    // expr rule use this
     : CONCAT
     | CONCAT_WS
     | COALESCE
@@ -3648,6 +3653,8 @@ list_operator
     ;
 
 binary_builtin_function
+    // lexer entry of function name which admit 2 parameters
+    // expr rule use this
     : ifnull=( IFNULL | NVL )
     | GET
     | LEFT
@@ -3662,6 +3669,8 @@ binary_builtin_function
     ;
 
 binary_or_ternary_builtin_function
+    // lexer entry of function name which admit 2 or 3 parameters
+    // expr rule use this
     : CHARINDEX
     | REPLACE
     | substring=( SUBSTRING | SUBSTR )
@@ -3669,6 +3678,8 @@ binary_or_ternary_builtin_function
     ;
 
 ternary_builtin_function
+    // lexer entry of function name which admit 3 parameters
+    // expr rule use this
     : dateadd=( DATEADD | TIMEADD | TIMESTAMPADD )
     | datefiff=( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF )
     | SPLIT_PART
@@ -3852,7 +3863,7 @@ function_call
     | aggregate_function
 //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
-    | list_operator LR_BRACKET expr_list RR_BRACKET
+    | list_function LR_BRACKET expr_list RR_BRACKET
     | to_date=( TO_DATE | DATE ) LR_BRACKET expr RR_BRACKET
     | length= ( LENGTH | LEN ) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
