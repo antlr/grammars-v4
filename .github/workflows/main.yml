@@ -11,72 +11,22 @@ jobs:
     outputs:
       mymatrix: ${{ steps.step1.outputs.myoutput }}
     steps:
-      - name: Gather targets.
-        id: step1
-        shell: bash
-        run: |
-          if [ "${{github.event_name}}" == "pull_request" ]; then
-            Before="${{github.event.pull_request.base.sha}}"
-            After="${{github.event.pull_request.head.sha}}"
-          else
-            Before="${{github.event.before}}"
-            After="${{github.event.after}}"
-          fi
-          declare -A targets
-          for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "PHP" "Python3" "TypeScript"
-          do
-            targets[$t]=0
-          done
-          directories=( `git diff --name-only $Before $After . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | fgrep -v .github | tr -d '\r'` )
-          prefix=`pwd`
-          for g in ${directories[@]}
-          do
-            if [ ! -d "$g" ]
-            then
-              continue
-            fi
-            pushd $g > /dev/null 2> /dev/null
-            while true
-            do
-              if [ -f `pwd`/desc.xml ]
-              then
-                break
-              elif [ `pwd` == "$prefix" ]
-              then
-                break
-              fi
-              cd ..
-            done
-            g=`pwd`
-            g=${g##*$prefix}
-            g=${g##/}
-            if [ "$g" == "" ]
-            then
-              g="."
-            fi
-            if [ -f desc.xml ]
-            then
-              gtargets=`trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
-              for t in $gtargets
-              do
-                targets[$t]=`expr ${targets[$t]} + 1`
-              done
-            fi
-            popd > /dev/null
-          done
-          for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "PHP" "Python3" "TypeScript"
-          do
-            if [ ${targets[$t]} -ne 0 ]
-            then
-              if [ "$ttargets" == "" ]
-              then
-                ttargets="\"$t\""
-              else
-                ttargets="$ttargets, \"$t\""
-              fi
-            fi
-          done
-          echo 'myoutput={"os":["macos-latest", "windows-latest", "ubuntu-latest"], "language":[' $ttargets ']}' >> $GITHUB_OUTPUT
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Gather targets.
+      id: step1
+      shell: bash
+      run: |
+        if [ "${{github.event_name}}" == "pull_request" ]; then
+          Before="${{github.event.pull_request.base.sha}}"
+          After="${{github.event.pull_request.head.sha}}"
+        else
+          Before="${{github.event.before}}"
+          After="${{github.event.after}}"
+        fi
+        bash _scripts/what-to-test.sh >> $GITHUB_OUTPUT
 
   build-pwsh:
     needs: setup
