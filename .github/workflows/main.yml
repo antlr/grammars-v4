@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix }}
+      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash
