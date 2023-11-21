@@ -58,16 +58,34 @@ SEA_WS
     ;
 
 SCRIPT_OPEN
-    : '<script' .*? '>' ->pushMode(SCRIPT)
+    : '<script' .*? '>' -> pushMode(SCRIPT)
     ;
 
 STYLE_OPEN
-    : '<style' .*? '>'  ->pushMode(STYLE)
+    : '<style' .*? '>'  -> pushMode(STYLE)
+    ;
+
+TAG_NORMAL_SCRIPT
+    : '<script>' -> popMode
+    ;
+
+TAG_NORMAL_STYLE
+    : '<style>' -> popMode
+    ;
+
+
+TAG_CLOSE_SCRIPT
+    : '</script>' -> popMode
+    ;
+
+TAG_CLOSE_STYLE
+    : '</style>' -> popMode
     ;
 
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
+
 
 HTML_TEXT
     : ~'<'+
@@ -214,5 +232,92 @@ fragment DOUBLE_QUOTE_STRING
 
 fragment SINGLE_QUOTE_STRING
     : '\'' ~[<']* '\''
+    ;
+
+mode CSS;
+
+CSS_BODY
+    : .*? '</style>' -> popMode
+    ;
+
+CSS_SHORT_BODY
+    : .*? '</>' -> popMode
+    ;
+
+CSS_SELECTOR
+    : .*? '{' -> pushMode(CSS_DECLARATION)
+    ;
+
+
+mode CSS_DECLARATION;
+
+CSS_PROPERTY
+    : .*? ':' -> pushMode(CSS_VALUES)
+    ;
+
+CSS_DECLARATION_END
+    : ';' -> popMode
+    ;
+
+mode CSS_VALUES;
+
+CSS_VALUE
+    : .*? ';' -> popMode
+    ;
+
+CSS_COMMENT
+    : '/*' .*? '*/'
+    ;
+
+CSS_TEXT
+    : ~[;\n]+
+    ;
+    
+
+mode JAVASCRIPT;
+
+JAVASCRIPT_OPEN
+    : '<script' (~'>')* '>' -> pushMode(JAVASCRIPT)
+    ;
+
+TAG_CLOSE_JAVASCRIPT
+    : '</script>' -> popMode
+    ;
+
+JAVASCRIPT_KEYWORD
+    : 'var' | 'if' | 'else' | 'function' | 'for' | 'while' | 'do' | 'switch'
+    | 'case' | 'break' | 'continue' | 'return' | 'true' | 'false' | 'null'
+    ; // Add more keywords as needed
+
+JAVASCRIPT_IDENTIFIER
+    : [a-zA-Z_$] [a-zA-Z0-9_$]*
+    ;
+
+JAVASCRIPT_NUMERIC_LITERAL
+    : [0-9]+ ('.' [0-9]+)? (('e' | 'E') ('+' | '-')? [0-9]+)?
+    ;
+
+JAVASCRIPT_STRING_LITERAL
+    : '"' (~[\\"'] | '\\' .)* '"'
+    | '\'' (~[\\"'] | '\\' .)* '\''
+    ;
+
+JAVASCRIPT_COMMENT
+    : '/*' .*? '*/'
+    ;
+    
+
+ 
+
+JAVASCRIPT_OPERATOR
+    : '+' | '-' | '*' | '/' | '%' | '++' | '--'
+    | '==' | '!=' | '===' | '!==' | '>' | '>=' | '<' | '<='
+    | '&&' | '||' | '!' | '&' | '|' | '^' | '~'
+    | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '>>>='
+    | '&=' | '|=' | '^=' | '<<' | '>>' | '>>>'
+    ;
+
+JAVASCRIPT_WS
+    : [ \t\r\n]+ -> channel(HIDDEN)
     ;
 
