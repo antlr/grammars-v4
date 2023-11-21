@@ -38,10 +38,12 @@ jobs:
 
   build-pwsh:
     needs: setup
-    runs-on: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix) }}
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash
@@ -143,10 +145,12 @@ jobs:
 
   build-bash:
     needs: setup
-    runs-on: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:  ${{ fromJson(needs.setup.outputs.mymatrix) }}
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash

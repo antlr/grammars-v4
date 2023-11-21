@@ -55,4 +55,4 @@ do
 		fi
 	fi
 done
-echo 'myoutput={"os":["macos-latest", "windows-latest", "ubuntu-latest"], "language":[' $ttargets ']}'
+echo 'myoutput=[' $ttargets ']'
