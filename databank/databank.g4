@@ -33,69 +33,68 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * http://archive.li/m3fki#selection-1331.0-1331.26
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar databank;
 
-options { superClass = DatabankParserBase; }
+options {
+    superClass = DatabankParserBase;
+}
 
 databank
-   : EOL* (datedseries | undatedseries) sample + EOL* EOF
-   ;
+    : EOL* (datedseries | undatedseries) sample+ EOL* EOF
+    ;
 
 datedseries
-   : datatype dateline dateline
-   ;
+    : datatype dateline dateline
+    ;
 
 undatedseries
-   : dateline dateline
-   ;
+    : dateline dateline
+    ;
 
 datatype
-   : FLOATINGPOINT { isdatatype() }? EOL
-   ;
+    : FLOATINGPOINT { isdatatype() }? EOL
+    ;
 
 dateline
-   : number EOL
-   ;
+    : number EOL
+    ;
 
 sample
-   : (number | 'NA') EOL?
-   ;
+    : (number | 'NA') EOL?
+    ;
 
 number
-   : FLOATINGPOINT
-   ;
-
+    : FLOATINGPOINT
+    ;
 
 FLOATINGPOINT
-   : ('-'|'+')? NUMBER (E SIGN? NUMBER)?
-   ;
-
+    : ('-' | '+')? NUMBER (E SIGN? NUMBER)?
+    ;
 
 fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9')*)?
-   ;
-
+    : ('0' .. '9')+ ('.' ('0' .. '9')*)?
+    ;
 
 fragment E
-   : 'E' | 'e'
-   ;
-
+    : 'E'
+    | 'e'
+    ;
 
 fragment SIGN
-   : ('+' | '-')
-   ;
-
+    : ('+' | '-')
+    ;
 
 COMMENT
-   : '"c' ~ ["]* '"' ' '* EOL -> skip
-   ;
-
+    : '"c' ~ ["]* '"' ' '* EOL -> skip
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

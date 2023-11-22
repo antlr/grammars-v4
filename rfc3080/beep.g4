@@ -25,118 +25,121 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar beep;
 
 frame
-   : data EOF
-   ;
+    : data EOF
+    ;
 
 data
-   : header payload_trailer
-   ;
+    : header payload_trailer
+    ;
 
 header
-   : msg
-   | rpy
-   | err
-   | ans
-   | nul
-   ;
+    : msg
+    | rpy
+    | err
+    | ans
+    | nul
+    ;
 
 msg
-   : MSG SP common
-   ;
+    : MSG SP common
+    ;
 
 rpy
-   : RPY SP common
-   ;
+    : RPY SP common
+    ;
 
 ans
-   : ANS SP common SP ansno
-   ;
+    : ANS SP common SP ansno
+    ;
 
 err
-   : ERR SP common
-   ;
+    : ERR SP common
+    ;
 
 nul
-   : NUL SP common
-   ;
+    : NUL SP common
+    ;
 
 common
-   : channel SP msgno SP more SP seqno SP size
-   ;
+    : channel SP msgno SP more SP seqno SP size
+    ;
 
 channel
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 msgno
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 more
-   : DOT
-   | STAR
-   ;
+    : DOT
+    | STAR
+    ;
 
 seqno
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 size
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 ansno
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 payload_trailer
-   : PAYLOAD_TRAILER CRLF?
-   ;
+    : PAYLOAD_TRAILER CRLF?
+    ;
 
 DOT
-   : '.'
-   ;
+    : '.'
+    ;
 
 STAR
-   : '*'
-   ;
+    : '*'
+    ;
 
 NUL
-   : 'NUL'
-   ;
+    : 'NUL'
+    ;
 
 ERR
-   : 'ERR'
-   ;
+    : 'ERR'
+    ;
 
 ANS
-   : 'ANS'
-   ;
+    : 'ANS'
+    ;
 
 RPY
-   : 'RPY'
-   ;
+    : 'RPY'
+    ;
 
 MSG
-   : 'MSG'
-   ;
+    : 'MSG'
+    ;
 
 NUMBER
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 SP
-   : ' '
-   ;
+    : ' '
+    ;
 
 CRLF
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 PAYLOAD_TRAILER
-   : CRLF .*? 'END'
-   ;
-
+    : CRLF .*? 'END'
+    ;

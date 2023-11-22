@@ -30,104 +30,102 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ply;
 
 ply
-   : header vertices? faces? EOF
-   ;
+    : header vertices? faces? EOF
+    ;
 
 header
-   : plydeclaration format_ (element | property_)* end_header
-   ;
+    : plydeclaration format_ (element | property_)* end_header
+    ;
 
 end_header
-   : 'end_header' EOL
-   ;
+    : 'end_header' EOL
+    ;
 
 format_
-   : 'format' 'ascii 1.0' EOL
-   ;
+    : 'format' 'ascii 1.0' EOL
+    ;
 
 element
-   : 'element' string number EOL
-   ;
+    : 'element' string number EOL
+    ;
 
 property_
-   : scalarproperty
-   | listproperty
-   ;
+    : scalarproperty
+    | listproperty
+    ;
 
 scalarproperty
-   : 'property' type_ string EOL
-   ;
+    : 'property' type_ string EOL
+    ;
 
 listproperty
-   : 'property' 'list' type_ type_ string EOL
-   ;
+    : 'property' 'list' type_ type_ string EOL
+    ;
 
 type_
-   : 'char'
-   | 'uchar'
-   | 'short'
-   | 'ushort'
-   | 'int'
-   | 'uint'
-   | 'float'
-   | 'double'
-   | 'float32'
-   | 'uint8'
-   | 'int32'
-   ;
+    : 'char'
+    | 'uchar'
+    | 'short'
+    | 'ushort'
+    | 'int'
+    | 'uint'
+    | 'float'
+    | 'double'
+    | 'float32'
+    | 'uint8'
+    | 'int32'
+    ;
 
 plydeclaration
-   : 'ply' EOL
-   ;
+    : 'ply' EOL
+    ;
 
 vertices
-   : vertex +
-   ;
+    : vertex+
+    ;
 
 faces
-   : face +
-   ;
+    : face+
+    ;
 
 vertex
-   : number number number EOL
-   ;
+    : number number number EOL
+    ;
 
 face
-   : number number number number + EOL
-   ;
+    : number number number number+ EOL
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 string
-   : STRING
-   ;
-
+    : STRING
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_.]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_.]*
+    ;
 
 NUMBER
-   : ('-' | '+')? ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
+    : ('-' | '+')? ('0' .. '9')+ ('.' ('0' .. '9')+)?
+    ;
 
 COMMENT
-   : 'comment' ~ [\r\n]* EOL -> skip
-   ;
-
+    : 'comment' ~ [\r\n]* EOL -> skip
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

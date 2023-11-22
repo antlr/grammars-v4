@@ -1,6 +1,12 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar VisualBasic6Lexer;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 // keywords
 
@@ -240,8 +246,7 @@ OPTION_EXPLICIT: 'OPTION EXPLICIT';
 
 OPTION_COMPARE: 'OPTION COMPARE';
 
-OPTION_PRIVATE_MODULE:
-	'OPTION PRIVATE MODULE';
+OPTION_PRIVATE_MODULE: 'OPTION PRIVATE MODULE';
 
 OR: 'OR';
 
@@ -371,8 +376,8 @@ COLON: ':';
 
 COMMA: ',';
 
-IDIV: '\\' ;
-DIV: '/';
+IDIV : '\\';
+DIV  : '/';
 
 DOLLAR: '$';
 
@@ -430,16 +435,11 @@ DATELITERAL: HASH (~ [#\r\n])* HASH;
 
 COLORLITERAL: '&H' [0-9A-F]+ AMPERSAND?;
 
-INTEGERLITERAL: [0-9]+ ('E' INTEGERLITERAL)* (
-		HASH
-		| AMPERSAND
-		| EXCLAMATIONMARK
-		| AT
-	)?;
+INTEGERLITERAL: [0-9]+ ('E' INTEGERLITERAL)* ( HASH | AMPERSAND | EXCLAMATIONMARK | AT)?;
 
-DOUBLELITERAL: [0-9]* DOT [0-9]+ (
-		'E' (PLUS | MINUS)? [0-9]+
-	)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?;
+DOUBLELITERAL:
+    [0-9]* DOT [0-9]+ ('E' (PLUS | MINUS)? [0-9]+)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?
+;
 
 FILENUMBER: HASH LETTERORDIGIT+;
 
@@ -448,8 +448,7 @@ OCTALLITERAL: '&O' [0-7]+ AMPERSAND?;
 // misc
 FRX_OFFSET: COLON [0-9A-F]+;
 
-GUID:
-	LBRACE [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ RBRACE;
+GUID: LBRACE [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ RBRACE;
 
 // identifier
 
@@ -461,18 +460,12 @@ LINE_CONTINUATION: ' ' '_' '\r'? '\n' -> skip;
 
 NEWLINE: WS? ('\r'? '\n' | COLON ' ') WS?;
 
-COMMENT:
-	WS? ('\'' | COLON? REM ' ') (
-		LINE_CONTINUATION
-		| ~ ('\n' | '\r')
-	)* -> skip;
+COMMENT: WS? ('\'' | COLON? REM ' ') ( LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip;
 
 WS: [ \t]+;
 
 // letters
 
-fragment LETTER:
-	[A-Z_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];
+fragment LETTER: [A-Z_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];
 
-fragment LETTERORDIGIT:
-	[A-Z0-9_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];
+fragment LETTERORDIGIT: [A-Z0-9_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];

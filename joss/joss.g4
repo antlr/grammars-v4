@@ -29,458 +29,461 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar joss;
 
 prog
-   : statement+ EOF
-   ;
+    : statement+ EOF
+    ;
 
 statement
-   : direct '.'
-   | indirect_ '.'
-   | formCMD
-   | assignment
-   ;
+    : direct '.'
+    | indirect_ '.'
+    | formCMD
+    | assignment
+    ;
 
 direct
-   : cancelCMD
-   | deleteCmdCMD
-   | goCMD
-   | arbitraryCMD
-   ;
+    : cancelCMD
+    | deleteCmdCMD
+    | goCMD
+    | arbitraryCMD
+    ;
 
 indirect_
-   : STEPNUMBER indirectCMD
-   ;
+    : STEPNUMBER indirectCMD
+    ;
 
 indirectCMD
-   : toCMD
-   | doneCMD
-   | stopCMD
-   | demandCMD
-   | arbitraryCMD
-   ;
+    : toCMD
+    | doneCMD
+    | stopCMD
+    | demandCMD
+    | arbitraryCMD
+    ;
 
 arbitraryCMD
-   : setCMD
-   | doCMD
-   | typeCMD
-   | deleteValCMD
-   | LINECMD
-   | PAGECMD
-   ;
+    : setCMD
+    | doCMD
+    | typeCMD
+    | deleteValCMD
+    | LINECMD
+    | PAGECMD
+    ;
 
 goCMD
-   : 'Go'
-   ;
+    : 'Go'
+    ;
 
 cancelCMD
-   : 'Cancel'
-   ;
+    : 'Cancel'
+    ;
 
 deleteCmdCMD
-   : 'Delete' delCmdSel
-   ;
+    : 'Delete' delCmdSel
+    ;
 
 delCmdSel
-   : stepSel
-   | partSel
-   | formSel
-   | delCmdAllSel
-   ;
+    : stepSel
+    | partSel
+    | formSel
+    | delCmdAllSel
+    ;
 
 delCmdAllSel
-   : 'all'
-   | 'all' delCmdAllType
-   ;
+    : 'all'
+    | 'all' delCmdAllType
+    ;
 
 delCmdAllType
-   : 'steps'
-   | 'parts'
-   | 'forms'
-   ;
+    : 'steps'
+    | 'parts'
+    | 'forms'
+    ;
 
 doneCMD
-   : 'Done'
-   ;
+    : 'Done'
+    ;
 
 stopCMD
-   : 'Stop'
-   ;
+    : 'Stop'
+    ;
 
 demandCMD
-   : 'Demand' variable
-   ;
+    : 'Demand' variable
+    ;
 
 toCMD
-   : 'To' toSel
-   ;
+    : 'To' toSel
+    ;
 
 toSel
-   : stepSel
-   | partSel
-   ;
+    : stepSel
+    | partSel
+    ;
 
 setCMD
-   : 'Set' assignment
-   ;
+    : 'Set' assignment
+    ;
 
 doCMD
-   : 'Do' doSel
-   | 'Do' doSel conditional
-   ;
+    : 'Do' doSel
+    | 'Do' doSel conditional
+    ;
 
 doSel
-   : stepSel
-   | partSel
-   ;
+    : stepSel
+    | partSel
+    ;
 
 typeCMD
-   : 'Type' typeContent
-   ;
+    : 'Type' typeContent
+    ;
 
 typeContent
-   : typeForm
-   | typeData
-   | typeSel
-   | typeSys
-   ;
+    : typeForm
+    | typeData
+    | typeSel
+    | typeSys
+    ;
 
 typeSys
-   : 'size'
-   | 'time'
-   | 'users'
-   ;
+    : 'size'
+    | 'time'
+    | 'users'
+    ;
 
 typeForm
-   : varList 'in' formSel
-   ;
+    : varList 'in' formSel
+    ;
 
 typeData
-   : typeElem
-   | typeElem ',' typeData
-   ;
+    : typeElem
+    | typeElem ',' typeData
+    ;
 
 typeElem
-   : '\'' STRING '\''
-   | variable
-   ;
+    : '\'' STRING '\''
+    | variable
+    ;
 
 typeSel
-   : stepSel
-   | partSel
-   | formSel
-   | typeAllSel
-   ;
+    : stepSel
+    | partSel
+    | formSel
+    | typeAllSel
+    ;
 
 typeAllSel
-   : 'all'
-   | 'all' typeAllType
-   ;
+    : 'all'
+    | 'all' typeAllType
+    ;
 
 typeAllType
-   : 'steps'
-   | 'parts'
-   | 'forms'
-   | 'values'
-   ;
+    : 'steps'
+    | 'parts'
+    | 'forms'
+    | 'values'
+    ;
 
 deleteValCMD
-   : varList
-   | 'all' 'values'
-   ;
+    : varList
+    | 'all' 'values'
+    ;
 
 formCMD
-   : 'Form' PARTNUMBER ':'
-   ;
+    : 'Form' PARTNUMBER ':'
+    ;
 
 formContent
-   : formObject
-   | formObject formContent
-   ;
+    : formObject
+    | formObject formContent
+    ;
 
 formObject
-   : formPH
-   | STRING
-   ;
+    : formPH
+    | STRING
+    ;
 
 formPH
-   : sciNotation
-   | fixedNotation
-   ;
+    : sciNotation
+    | fixedNotation
+    ;
 
 sciNotation
-   : '..' dot
-   ;
+    : '..' dot
+    ;
 
 dot
-   : '.'
-   | '.' dot
-   ;
+    : '.'
+    | '.' dot
+    ;
 
 fixedNotation
-   : '__' uScore '.__' uScore
-   ;
+    : '__' uScore '.__' uScore
+    ;
 
 uScore
-   : '_'+
-   ;
+    : '_'+
+    ;
 
 stepSel
-   : 'step' STEPNUMBER
-   ;
+    : 'step' STEPNUMBER
+    ;
 
 partSel
-   : 'part' PARTNUMBER
-   ;
+    : 'part' PARTNUMBER
+    ;
 
 formSel
-   : 'form' PARTNUMBER
-   ;
+    : 'form' PARTNUMBER
+    ;
 
 conditional
-   : if_
-   | for_
-   ;
+    : if_
+    | for_
+    ;
 
 if_
-   : 'if' boolExp
-   ;
+    : 'if' boolExp
+    ;
 
 boolExp
-   : '(' boolExp ')'
-   | '[' boolExp ']'
-   | comparison
-   | comparison boolOp boolExp
-   ;
+    : '(' boolExp ')'
+    | '[' boolExp ']'
+    | comparison
+    | comparison boolOp boolExp
+    ;
 
 boolOp
-   : 'and'
-   | 'or'
-   ;
+    : 'and'
+    | 'or'
+    ;
 
 comparison
-   : mathExp boolComp mathExp
-   ;
+    : mathExp boolComp mathExp
+    ;
 
 boolComp
-   : '='
-   | '!='
-   | '<='
-   | '=>'
-   | '<'
-   | '>'
-   ;
+    : '='
+    | '!='
+    | '<='
+    | '=>'
+    | '<'
+    | '>'
+    ;
 
 for_
-   : 'for' range_
-   ;
+    : 'for' range_
+    ;
 
 range_
-   : variable '=' rangeExp
-   ;
+    : variable '=' rangeExp
+    ;
 
 rangeExp
-   : rangeVal
-   | rangeVal ',' rangeExp
-   ;
+    : rangeVal
+    | rangeVal ',' rangeExp
+    ;
 
 rangeVal
-   : mathExp '(' mathExp ')' rangeVal
-   | mathExp
-   ;
+    : mathExp '(' mathExp ')' rangeVal
+    | mathExp
+    ;
 
 mathExp
-   : term
-   | term ADDOP mathExp
-   ;
+    : term
+    | term ADDOP mathExp
+    ;
 
 term
-   : factor
-   | factor MULOP term
-   ;
+    : factor
+    | factor MULOP term
+    ;
 
 factor
-   : '(' mathExp ')'
-   | '[' mathExp ']'
-   | value
-   ;
+    : '(' mathExp ')'
+    | '[' mathExp ']'
+    | value
+    ;
 
 assignment
-   : variable '=' mathExp
-   ;
+    : variable '=' mathExp
+    ;
 
 value
-   : NUMBER
-   | variable
-   | function_
-   ;
+    : NUMBER
+    | variable
+    | function_
+    ;
 
 function_
-   : funcSqrt
-   | funcLog
-   | funcExp
-   | funcSin
-   | funcCos
-   | funcIp
-   | funcFp
-   | funcDp
-   | funcXp
-   | funcSgn
-   | funcMax
-   | funcMin
-   ;
+    : funcSqrt
+    | funcLog
+    | funcExp
+    | funcSin
+    | funcCos
+    | funcIp
+    | funcFp
+    | funcDp
+    | funcXp
+    | funcSgn
+    | funcMax
+    | funcMin
+    ;
 
 funcSqrt
-   : 'sqrt(' mathExp ')'
-   ;
+    : 'sqrt(' mathExp ')'
+    ;
 
 funcLog
-   : 'log(' mathExp ')'
-   ;
+    : 'log(' mathExp ')'
+    ;
 
 funcExp
-   : 'exp(' mathExp ')'
-   ;
+    : 'exp(' mathExp ')'
+    ;
 
 funcSin
-   : 'sin(' mathExp ')'
-   ;
+    : 'sin(' mathExp ')'
+    ;
 
 funcCos
-   : 'cos(' mathExp ')'
-   ;
+    : 'cos(' mathExp ')'
+    ;
 
 funcIp
-   : 'ip(' mathExp ')'
-   ;
+    : 'ip(' mathExp ')'
+    ;
 
 funcFp
-   : 'fp(' mathExp ')'
-   ;
+    : 'fp(' mathExp ')'
+    ;
 
 funcDp
-   : 'dp(' mathExp ')'
-   ;
+    : 'dp(' mathExp ')'
+    ;
 
 funcXp
-   : 'xp(' mathExp ')'
-   ;
+    : 'xp(' mathExp ')'
+    ;
 
 funcSgn
-   : 'sgn(' mathExp ')'
-   ;
+    : 'sgn(' mathExp ')'
+    ;
 
 funcMax
-   : 'max(' mathExp ',' argList ')'
-   ;
+    : 'max(' mathExp ',' argList ')'
+    ;
 
 funcMin
-   : 'min(' mathExp ',' argList ')'
-   ;
+    : 'min(' mathExp ',' argList ')'
+    ;
 
 argList
-   : mathExp
-   | mathExp ',' argList
-   ;
+    : mathExp
+    | mathExp ',' argList
+    ;
 
 variable
-   : ALPHA
-   | ALPHA '(' mathExp ')'
-   ;
+    : ALPHA
+    | ALPHA '(' mathExp ')'
+    ;
 
 varList
-   : variable
-   | variable ',' varList
-   ;
+    : variable
+    | variable ',' varList
+    ;
 
 LINECMD
-   : 'Line'
-   ;
+    : 'Line'
+    ;
 
 PAGECMD
-   : 'Page'
-   ;
+    : 'Page'
+    ;
 
 MULOP
-   : '*'
-   | '/'
-   ;
+    : '*'
+    | '/'
+    ;
 
 ADDOP
-   : '+'
-   | '-'
-   ;
+    : '+'
+    | '-'
+    ;
 
 STRING
-   : CHAR+
-   ;
+    : CHAR+
+    ;
 
 CHAR
-   : ALPHA
-   | DIGIT
-   | SPECIALCHAR
-   ;
+    : ALPHA
+    | DIGIT
+    | SPECIALCHAR
+    ;
 
 ALPHA
-   : [A-Za-z]
-   ;
+    : [A-Za-z]
+    ;
 
 SPECIALCHAR
-   : '.'
-   | ','
-   | ';'
-   | ':'
-   | '\''
-   | ' '
-   | '#'
-   | '$'
-   | '?'
-   ;
+    : '.'
+    | ','
+    | ';'
+    | ':'
+    | '\''
+    | ' '
+    | '#'
+    | '$'
+    | '?'
+    ;
 
 NUMBER
-   : SIGN? NUMBERPART
-   ;
+    : SIGN? NUMBERPART
+    ;
 
 NUMBERPART
-   : INTPART
-   | INTPART '.' DECIMALPART
-   ;
+    : INTPART
+    | INTPART '.' DECIMALPART
+    ;
 
 INTPART
-   : '0'
-   | NZDIGIT
-   | NZDIGIT DECIMALPART
-   ;
+    : '0'
+    | NZDIGIT
+    | NZDIGIT DECIMALPART
+    ;
 
 DECIMALPART
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 DIGIT
-   : '0'
-   | NZDIGIT
-   ;
+    : '0'
+    | NZDIGIT
+    ;
 
 NZDIGIT
-   : [1-9]
-   ;
+    : [1-9]
+    ;
 
 SIGN
-   : '+'
-   | '-'
-   ;
+    : '+'
+    | '-'
+    ;
 
 PARTNUMBER
-   : NZDIGIT
-   | NZDIGIT INTPART
-   ;
+    : NZDIGIT
+    | NZDIGIT INTPART
+    ;
 
 STEPNUMBER
-   : PARTNUMBER '.' PARTNUMBER
-   ;
+    : PARTNUMBER '.' PARTNUMBER
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

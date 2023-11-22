@@ -23,101 +23,199 @@
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar edn;
-program: value* EOF;
-value:
-	NilLiteral
-	| BooleanLiteral
-	| StringLiteral
-	| IntegerLiteral
-	| FloatingPointLiteral
-	| CharacterLiteral
-	| keyword
-	| Symbol
-	| tag
-	| list_
-	| vector
-	| map_
-	| set_;
+
+program
+    : value* EOF
+    ;
+
+value
+    : NilLiteral
+    | BooleanLiteral
+    | StringLiteral
+    | IntegerLiteral
+    | FloatingPointLiteral
+    | CharacterLiteral
+    | keyword
+    | Symbol
+    | tag
+    | list_
+    | vector
+    | map_
+    | set_
+    ;
 
 //maybe add more tags here? did not get a lot of info from the spec
-tag: Hash Symbol;
-keyword:
-	Colon (
-		Symbol
-		| IntegerLiteral
-		| FloatingPointLiteral
-		| NilLiteral
-		| BooleanLiteral
-		// maybe a character literal here?
-	);
-list_: LeftParenthesis value* RightParenthesis;
-vector: LeftBracket value* RightBracket;
-map_: LeftBrace (value value)* RightBrace;
-set_: HashedLeftBrace value* RightBrace;
+tag
+    : Hash Symbol
+    ;
 
-NilLiteral: 'nil';
+keyword
+    : Colon (
+        Symbol
+        | IntegerLiteral
+        | FloatingPointLiteral
+        | NilLiteral
+        | BooleanLiteral
+        // maybe a character literal here?
+    )
+    ;
 
-BooleanLiteral: 'true' | 'false';
+list_
+    : LeftParenthesis value* RightParenthesis
+    ;
 
-StringLiteral:
-	'"' (
-		~["\\]
-		| (
-			'\\' (
-				[ctrn\\"]
-				| [bf] //
-				| UnicodeCharacter
-			)
-		)
-	)* '"';
+vector
+    : LeftBracket value* RightBracket
+    ;
 
-IntegerLiteral: Int 'N'?;
+map_
+    : LeftBrace (value value)* RightBrace
+    ;
 
-FloatingPointLiteral: Int ('M' | FractionalPart? Exponent?);
+set_
+    : HashedLeftBrace value* RightBrace
+    ;
 
-CharacterLiteral:
-	'\\' (
-		'newline'
-		| 'return'
-		| 'space'
-		| 'tab'
-		| 'backspace'
-		| 'formfeed'
-		| UnicodeCharacter
-		| ~[ \r\n\t]
-	);
+NilLiteral
+    : 'nil'
+    ;
 
-LeftParenthesis: '(';
-RightParenthesis: ')';
-LeftBracket: '[';
-RightBracket: ']';
-LeftBrace: '{';
-RightBrace: '}';
-HashedLeftBrace: '#{';
-Hash: '#';
-Colon: ':';
+BooleanLiteral
+    : 'true'
+    | 'false'
+    ;
 
-FractionalPart: '.' Digit+;
-fragment Exponent: E Digit+;
-fragment E: [eE] [+-]?;
-Int: [+-]? ('0' | [1-9] Digit*);
-fragment Digit: [0-9];
-fragment HexDigit: [a-fA-F0-9];
-fragment UnicodeCharacter:
-	'u' HexDigit HexDigit HexDigit HexDigit;
+StringLiteral
+    : '"' (
+        ~["\\]
+        | (
+            '\\' (
+                [ctrn\\"]
+                | [bf] //
+                | UnicodeCharacter
+            )
+        )
+    )* '"'
+    ;
 
-Symbol: '/' | Name ('/' Name)?;
+IntegerLiteral
+    : Int 'N'?
+    ;
 
-Name: (( [-+.] (Alpha | Extra | Special)) | (Alpha | Extra)) (
-		Alpha
-		| Numeric
-		| Extra
-		| Special
-	)*;
-fragment Alpha: [a-zA-Z\p{L}];
-fragment Numeric: [0-9];
-fragment Extra: [.*+!\-_?$%&=<>];
-fragment Special: [#:];
-Comment: ';' .*? '\r'? '\n' -> skip;
-Whitespace: [ ,\r\n\t\u000C] -> skip;
+FloatingPointLiteral
+    : Int ('M' | FractionalPart? Exponent?)
+    ;
+
+CharacterLiteral
+    : '\\' (
+        'newline'
+        | 'return'
+        | 'space'
+        | 'tab'
+        | 'backspace'
+        | 'formfeed'
+        | UnicodeCharacter
+        | ~[ \r\n\t]
+    )
+    ;
+
+LeftParenthesis
+    : '('
+    ;
+
+RightParenthesis
+    : ')'
+    ;
+
+LeftBracket
+    : '['
+    ;
+
+RightBracket
+    : ']'
+    ;
+
+LeftBrace
+    : '{'
+    ;
+
+RightBrace
+    : '}'
+    ;
+
+HashedLeftBrace
+    : '#{'
+    ;
+
+Hash
+    : '#'
+    ;
+
+Colon
+    : ':'
+    ;
+
+FractionalPart
+    : '.' Digit+
+    ;
+
+fragment Exponent
+    : E Digit+
+    ;
+
+fragment E
+    : [eE] [+-]?
+    ;
+
+Int
+    : [+-]? ('0' | [1-9] Digit*)
+    ;
+
+fragment Digit
+    : [0-9]
+    ;
+
+fragment HexDigit
+    : [a-fA-F0-9]
+    ;
+
+fragment UnicodeCharacter
+    : 'u' HexDigit HexDigit HexDigit HexDigit
+    ;
+
+Symbol
+    : '/'
+    | Name ('/' Name)?
+    ;
+
+Name
+    : (( [-+.] (Alpha | Extra | Special)) | (Alpha | Extra)) (Alpha | Numeric | Extra | Special)*
+    ;
+
+fragment Alpha
+    : [a-zA-Z\p{L}]
+    ;
+
+fragment Numeric
+    : [0-9]
+    ;
+
+fragment Extra
+    : [.*+!\-_?$%&=<>]
+    ;
+
+fragment Special
+    : [#:]
+    ;
+
+Comment
+    : ';' .*? '\r'? '\n' -> skip
+    ;
+
+Whitespace
+    : [ ,\r\n\t\u000C] -> skip
+    ;

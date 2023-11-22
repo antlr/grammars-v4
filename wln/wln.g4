@@ -25,143 +25,146 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar wln;
 
 wln
-   : group (SPACE group)* EOF
-   ;
+    : group (SPACE group)* EOF
+    ;
 
 group
-   : symbol+
-   ;
+    : symbol+
+    ;
 
 symbol
-   : BROMINE
-   | CHLORINE
-   | IODINE
-   | BENZENE
-   | DOUBLEBOND
-   | CARBONYL
-   | CARBONNON
-   | NITROGEN3PLUS
-   | CARBOSYCLIC
-   | IMINO
-   | NITROGEN4LESS
-   | OXYGEN
-   | HETEROCYCLIC
-   | DIOXO
-   | CARBON4
-   | CARBON3
-   | AMINO
-   | FLOURINE
-   | HYDROGEN
-   | HYDROXYL
-   | SULFER
-   | TRIPLE
-   | DIGIT
-   ;
+    : BROMINE
+    | CHLORINE
+    | IODINE
+    | BENZENE
+    | DOUBLEBOND
+    | CARBONYL
+    | CARBONNON
+    | NITROGEN3PLUS
+    | CARBOSYCLIC
+    | IMINO
+    | NITROGEN4LESS
+    | OXYGEN
+    | HETEROCYCLIC
+    | DIOXO
+    | CARBON4
+    | CARBON3
+    | AMINO
+    | FLOURINE
+    | HYDROGEN
+    | HYDROXYL
+    | SULFER
+    | TRIPLE
+    | DIGIT
+    ;
 
 BROMINE
-   : 'E'
-   ;
+    : 'E'
+    ;
 
 CHLORINE
-   : 'G'
-   ;
+    : 'G'
+    ;
 
 IODINE
-   : 'I'
-   ;
+    : 'I'
+    ;
 
 BENZENE
-   : 'R'
-   ;
+    : 'R'
+    ;
 
 DOUBLEBOND
-   : 'U'
-   ;
+    : 'U'
+    ;
 
 CARBONYL
-   : 'V'
-   ;
+    : 'V'
+    ;
 
 CARBONNON
-   : 'C'
-   ;
+    : 'C'
+    ;
 
 NITROGEN3PLUS
-   : 'K'
-   ;
+    : 'K'
+    ;
 
 CARBOSYCLIC
-   : 'L'
-   ;
+    : 'L'
+    ;
 
 IMINO
-   : 'M'
-   ;
+    : 'M'
+    ;
 
 NITROGEN4LESS
-   : 'N'
-   ;
+    : 'N'
+    ;
 
 OXYGEN
-   : 'O'
-   ;
+    : 'O'
+    ;
 
 HETEROCYCLIC
-   : 'T'
-   ;
+    : 'T'
+    ;
 
 DIOXO
-   : 'W'
-   ;
+    : 'W'
+    ;
 
 CARBON4
-   : 'X'
-   ;
+    : 'X'
+    ;
 
 CARBON3
-   : 'Y'
-   ;
+    : 'Y'
+    ;
 
 AMINO
-   : 'Z'
-   ;
+    : 'Z'
+    ;
 
 FLOURINE
-   : 'F'
-   ;
+    : 'F'
+    ;
 
 HYDROGEN
-   : 'H'
-   ;
+    : 'H'
+    ;
 
 HYDROXYL
-   : 'Q'
-   ;
+    : 'Q'
+    ;
 
 SULFER
-   : 'S'
-   ;
+    : 'S'
+    ;
 
 TRIPLE
-   : 'UU'
-   ;
+    : 'UU'
+    ;
 
 AMP
-   : '&'
-   ;
+    : '&'
+    ;
 
 DIGIT
-   : '1' .. '9'
-   ;
+    : '1' .. '9'
+    ;
 
 SPACE
-   : ' '
-   ;
+    : ' '
+    ;
 
 WS
-   : [\r\n]+ -> skip
-   ;
-
+    : [\r\n]+ -> skip
+    ;

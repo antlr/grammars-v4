@@ -25,9 +25,15 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar CypherParser;
 
-options { tokenVocab=CypherLexer; }
+options {
+    tokenVocab = CypherLexer;
+}
 
 script
     : query SEMI? EOF
@@ -49,7 +55,7 @@ singleQuery
     ;
 
 standaloneCall
-    : CALL invocationName parenExpressionChain? (YIELD (MULT | yieldItems ))?
+    : CALL invocationName parenExpressionChain? (YIELD (MULT | yieldItems))?
     ;
 
 returnSt
@@ -96,7 +102,6 @@ multiPartQ
     : readingStatement* (updatingStatement* withSt)+ singlePartQ
     ;
 
-
 matchSt
     : OPTIONAL? MATCH patternWhere
     ;
@@ -123,7 +128,6 @@ deleteSt
     : DETACH? DELETE expressionChain
     ;
 
-
 removeSt
     : REMOVE removeItem (COMMA removeItem)*
     ;
@@ -144,6 +148,7 @@ parenExpressionChain
 yieldItems
     : yieldItem (COMMA yieldItem)* where?
     ;
+
 yieldItem
     : (symbol AS)? symbol
     ;
@@ -185,6 +190,7 @@ where
 pattern
     : patternPart (COMMA patternPart)*
     ;
+
 expression
     : xorExpression (OR xorExpression)*
     ;
@@ -202,7 +208,7 @@ notExpression
     ;
 
 comparisonExpression
-    : addSubExpression ( comparisonSigns addSubExpression)*
+    : addSubExpression (comparisonSigns addSubExpression)*
     ;
 
 comparisonSigns
@@ -264,6 +270,7 @@ propertyExpression
 patternPart
     : (symbol ASSIGN)? patternElem
     ;
+
 patternElem
     : nodePattern patternElemChain*
     | LPAREN patternElem RPAREN
@@ -331,7 +338,7 @@ functionInvocation
     ;
 
 parenthesizedExpression
-    : LPAREN  expression RPAREN
+    : LPAREN expression RPAREN
     ;
 
 filterWith
@@ -358,7 +365,6 @@ countAll
     : COUNT LPAREN MULT RPAREN
     ;
 
-
 expressionChain
     : expression (COMMA expression)*
     ;
@@ -383,7 +389,7 @@ literal
     ;
 
 rangeLit
-    : MULT numLit? (RANGE  numLit?)?
+    : MULT numLit? (RANGE numLit?)?
     ;
 
 boolLit
@@ -394,12 +400,15 @@ boolLit
 numLit
     : DIGIT
     ;
+
 stringLit
     : STRING_LITERAL
     ;
+
 charLit
     : CHAR_LITERAL
     ;
+
 listLit
     : LBRACK expressionChain? RBRACK
     ;
@@ -428,7 +437,6 @@ symbol
     | NONE
     | SINGLE
     ;
-
 
 reservedWord
     : ALL

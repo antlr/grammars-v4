@@ -1,48 +1,88 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar LarkParser;
 
 options {
     tokenVocab = LarkLexer;
 }
 
-start_: item* EOF;
+start
+    : item* EOF
+    ;
 
-item: rule_ | token | statement ;
+item
+    : rule_
+    | token
+    | statement
+    ;
 
-rule_: RULE rule_params priority? ':' expansions ;
+rule_
+    : RULE rule_params priority? ':' expansions
+    ;
 
-token: TOKEN token_params priority? ':' expansions ;
+token
+    : TOKEN token_params priority? ':' expansions
+    ;
 
-rule_params: ('{' RULE (',' RULE)* '}')? ;
+rule_params
+    : ('{' RULE (',' RULE)* '}')?
+    ;
 
-token_params: ('{' TOKEN (',' TOKEN)* '}')? ;
+token_params
+    : ('{' TOKEN (',' TOKEN)* '}')?
+    ;
 
-priority: '.' NUMBER ;
+priority
+    : '.' NUMBER
+    ;
 
-statement: '%ignore' expansions
-         | '%import' import_path ('->' name)?
-         | '%import' import_path name_list
-         | '%override' rule_
-         | '%declare' name+
-	 ;
+statement
+    : '%ignore' expansions
+    | '%import' import_path ('->' name)?
+    | '%import' import_path name_list
+    | '%override' rule_
+    | '%declare' name+
+    ;
 
-import_path: '.'? name ('.' name)* ;
+import_path
+    : '.'? name ('.' name)*
+    ;
 
-name_list: '(' name (',' name)* ')' ;
+name_list
+    : '(' name (',' name)* ')'
+    ;
 
-expansions: alias (VBAR alias)* ;
+expansions
+    : alias (VBAR alias)*
+    ;
 
-alias: expansion ('->' RULE)? ;
+alias
+    : expansion ('->' RULE)?
+    ;
 
-expansion: expr* ;
+expansion
+    : expr*
+    ;
 
-expr: atom (OP | '~' NUMBER ('..' NUMBER)? )? ;
+expr
+    : atom (OP | '~' NUMBER ('..' NUMBER)?)?
+    ;
 
-atom: '(' expansions ')' | '[' expansions ']' | value ;
+atom
+    : '(' expansions ')'
+    | '[' expansions ']'
+    | value
+    ;
 
-value: STRING '..' STRING
-      | name
-      | (REGEXP | STRING)
-      | name '{' value (',' value)* '}'
-      ;
+value
+    : STRING '..' STRING
+    | name
+    | (REGEXP | STRING)
+    | name '{' value (',' value)* '}'
+    ;
 
-name: RULE | TOKEN ;
+name
+    : RULE
+    | TOKEN
+    ;

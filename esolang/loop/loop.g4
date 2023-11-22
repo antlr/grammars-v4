@@ -29,55 +29,58 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar loop;
 
 prog
-   : statementlist+ EOF
-   ;
+    : statementlist+ EOF
+    ;
 
 statementlist
-   : statement (';' statement)?
-   ;
+    : statement (';' statement)?
+    ;
 
 statement
-   : assignstmt
-   | incrementstmt
-   | loopstmt
-   ;
+    : assignstmt
+    | incrementstmt
+    | loopstmt
+    ;
 
 assignstmt
-   : var_ ':=' number ';'
-   ;
+    : var_ ':=' number ';'
+    ;
 
 incrementstmt
-   : var_ ':=' var_ ('+' | '-') number
-   ;
+    : var_ ':=' var_ ('+' | '-') number
+    ;
 
 loopstmt
-   : 'LOOP' var_ 'DO' statementlist 'END'
-   ;
+    : 'LOOP' var_ 'DO' statementlist 'END'
+    ;
 
 var_
-   : ID
-   ;
+    : ID
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 ID
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 NUMBER
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
+    : '/*' .*? '*/' -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

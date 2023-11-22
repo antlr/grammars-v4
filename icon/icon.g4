@@ -30,336 +30,334 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar icon;
 
-start_
-   : prog EOF
-   ;
+start
+    : prog EOF
+    ;
 
 prog
-   : declaration
-   | (declaration prog)
-   ;
+    : declaration
+    | (declaration prog)
+    ;
 
 endOfExpr
-   : ';'
-   ;
+    : ';'
+    ;
 
 declaration
-   : link_declaration
-   | global_declaration
-   | record_declaration
-   | procedure_declaration
-   ;
+    : link_declaration
+    | global_declaration
+    | record_declaration
+    | procedure_declaration
+    ;
 
 link_declaration
-   : 'link' link_list
-   ;
+    : 'link' link_list
+    ;
 
 link_list
-   : file_name
-   | file_name ',' link_list
-   ;
+    : file_name
+    | file_name ',' link_list
+    ;
 
 file_name
-   : identifier
-   | string_literal
-   ;
+    : identifier
+    | string_literal
+    ;
 
 global_declaration
-   : 'global' identifier_list
-   ;
+    : 'global' identifier_list
+    ;
 
 identifier_list
-   : identifier
-   | identifier_list ',' identifier
-   ;
+    : identifier
+    | identifier_list ',' identifier
+    ;
 
 record_declaration
-   : 'record' identifier '(' field_list_opt ')'
-   ;
+    : 'record' identifier '(' field_list_opt ')'
+    ;
 
 field_list_opt
-   : field_list
-   ;
+    : field_list
+    ;
 
 field_list
-   : field_name
-   | field_list ',' field_name
-   ;
+    : field_name
+    | field_list ',' field_name
+    ;
 
 field_name
-   : identifier
-   ;
+    : identifier
+    ;
 
 procedure_declaration
-   : proc_header locals_opt? initial_opt? expression_sequence 'end'
-   ;
+    : proc_header locals_opt? initial_opt? expression_sequence 'end'
+    ;
 
 proc_header
-   : 'procedure' identifier '(' parameter_list_opt? ')'
-   ;
+    : 'procedure' identifier '(' parameter_list_opt? ')'
+    ;
 
 parameter_list_opt
-   : parameter_list
-   ;
+    : parameter_list
+    ;
 
 parameter_list
-   : (identifier)
-   | (identifier '[' ']')
-   | (identifier ',' parameter_list)
-   ;
+    : (identifier)
+    | (identifier '[' ']')
+    | (identifier ',' parameter_list)
+    ;
 
 locals_opt
-   : localz
-   ;
+    : localz
+    ;
 
 localz
-   : local_specification identifier_list
-   | local_specification identifier_list endOfExpr localz
-   ;
+    : local_specification identifier_list
+    | local_specification identifier_list endOfExpr localz
+    ;
 
 local_specification
-   : 'local'
-   | 'static'
-   ;
+    : 'local'
+    | 'static'
+    ;
 
 initial_opt
-   : 'initial' expression endOfExpr
-   |
-   ;
+    : 'initial' expression endOfExpr
+    |
+    ;
 
 expression_sequence
-   : expression_opt
-   | expression_sequence endOfExpr expression_opt
-   ;
+    : expression_opt
+    | expression_sequence endOfExpr expression_opt
+    ;
 
 expression_opt
-   : expression
-   ;
+    : expression
+    ;
 
 expression
-   : 'break' expression_opt
-   | 'create' expression
-   | 'return' expression_opt
-   | 'suspend' expression_opt suspend_do_clause_opt
-   | 'fail'
-   | 'next'
-   | 'case' expression 'of' '{' case_list '}'
-   | 'if' expression 'then' expression else_clause_opt
-   | 'repeat' expression
-   | 'while' expression while_do_clause_opt
-   | 'until' expression until_do_clause_opt
-   | 'every' expression every_do_clause_opt
-   | expr1
-   ;
+    : 'break' expression_opt
+    | 'create' expression
+    | 'return' expression_opt
+    | 'suspend' expression_opt suspend_do_clause_opt
+    | 'fail'
+    | 'next'
+    | 'case' expression 'of' '{' case_list '}'
+    | 'if' expression 'then' expression else_clause_opt
+    | 'repeat' expression
+    | 'while' expression while_do_clause_opt
+    | 'until' expression until_do_clause_opt
+    | 'every' expression every_do_clause_opt
+    | expr1
+    ;
 
 suspend_do_clause_opt
-   : 'do' expression
-   ;
+    : 'do' expression
+    ;
 
 while_do_clause_opt
-   : 'do' expression
-   ;
+    : 'do' expression
+    ;
 
 until_do_clause_opt
-   : 'do' expression
-   ;
+    : 'do' expression
+    ;
 
 every_do_clause_opt
-   : 'do' expression
-   ;
+    : 'do' expression
+    ;
 
 else_clause_opt
-   : 'else' expression
-   ;
+    : 'else' expression
+    ;
 
 case_list
-   : case_clause
-   | case_list endOfExpr case_clause
-   ;
+    : case_clause
+    | case_list endOfExpr case_clause
+    ;
 
 case_clause
-   : expression ':' expression
-   | 'default' ':' expression
-   ;
+    : expression ':' expression
+    | 'default' ':' expression
+    ;
 
 expr1
-   : expr1 '&' expr2
-   | expr2
-   ;
+    : expr1 '&' expr2
+    | expr2
+    ;
 
 expr2
-   : expr2 '?' expr3
-   | expr3
-   ;
+    : expr2 '?' expr3
+    | expr3
+    ;
 
 expr3
-   : expr4 ':=' expr3
-   | expr4 ':=:' expr3
-   | expr4 '<-' expr3
-   | expr4 '<->' expr3
-   | expr4
-   ;
+    : expr4 ':=' expr3
+    | expr4 ':=:' expr3
+    | expr4 '<-' expr3
+    | expr4 '<->' expr3
+    | expr4
+    ;
 
 expr4
-   : expr4 'to' expr5
-   | expr4 'to' expr5 'by' expr5
-   | expr5
-   ;
+    : expr4 'to' expr5
+    | expr4 'to' expr5 'by' expr5
+    | expr5
+    ;
 
 expr5
-   : expr5 '|' expr6
-   | expr6
-   ;
+    : expr5 '|' expr6
+    | expr6
+    ;
 
 expr6
-   : expr6 '<' expr7
-   | expr6 '<=' expr7
-   | expr6 '=' expr7
-   | expr6 '>=' expr7
-   | expr6 '>' expr7
-   | expr6 '~=' expr7
-   | expr6 '<<' expr7
-   | expr6 '<<=' expr7
-   | expr6 '==' expr7
-   | expr6 '>>=' expr7
-   | expr6 '>>' expr7
-   | expr6 '~==' expr7
-   | expr6 '===' expr7
-   | expr6 '~===' expr7
-   | expr7
-   ;
+    : expr6 '<' expr7
+    | expr6 '<=' expr7
+    | expr6 '=' expr7
+    | expr6 '>=' expr7
+    | expr6 '>' expr7
+    | expr6 '~=' expr7
+    | expr6 '<<' expr7
+    | expr6 '<<=' expr7
+    | expr6 '==' expr7
+    | expr6 '>>=' expr7
+    | expr6 '>>' expr7
+    | expr6 '~==' expr7
+    | expr6 '===' expr7
+    | expr6 '~===' expr7
+    | expr7
+    ;
 
 expr7
-   : expr7 '||' expr8
-   | expr7 '|||' expr8
-   | expr8
-   ;
+    : expr7 '||' expr8
+    | expr7 '|||' expr8
+    | expr8
+    ;
 
 expr8
-   : expr8 '+' expr9
-   | expr8 '-' expr9
-   | expr8 '++' expr9
-   | expr8 '--' expr9
-   | expr9
-   ;
+    : expr8 '+' expr9
+    | expr8 '-' expr9
+    | expr8 '++' expr9
+    | expr8 '--' expr9
+    | expr9
+    ;
 
 expr9
-   : expr9 '*' expr10
-   | expr9 '/' expr10
-   | expr9 '%' expr10
-   | expr9 '**' expr10
-   | expr10
-   ;
+    : expr9 '*' expr10
+    | expr9 '/' expr10
+    | expr9 '%' expr10
+    | expr9 '**' expr10
+    | expr10
+    ;
 
 expr10
-   : expr11 '^' expr10
-   | expr11
-   ;
+    : expr11 '^' expr10
+    | expr11
+    ;
 
 expr11
-   : expr11 '\\' expr12
-   | expr11 '@' expr12
-   | expr11 '!' expr12
-   | expr12
-   ;
+    : expr11 '\\' expr12
+    | expr11 '@' expr12
+    | expr11 '!' expr12
+    | expr12
+    ;
 
 expr12
-   : 'not' expr12
-   | '|' expr12
-   | '!' expr12
-   | '*' expr12
-   | '+' expr12
-   | '-' expr12
-   | '.' expr12
-   | '/' expr12
-   | '\\' expr12
-   | '=' expr12
-   | '?' expr12
-   | '~' expr12
-   | '@' expr12
-   | '^' expr12
-   | expr13
-   ;
+    : 'not' expr12
+    | '|' expr12
+    | '!' expr12
+    | '*' expr12
+    | '+' expr12
+    | '-' expr12
+    | '.' expr12
+    | '/' expr12
+    | '\\' expr12
+    | '=' expr12
+    | '?' expr12
+    | '~' expr12
+    | '@' expr12
+    | '^' expr12
+    | expr13
+    ;
 
 expr13
-   : '(' expression_list ')'
-   | '{' expression_sequence '}'
-   | '[' expression_list ']'
-   | expr13 '.' field_name
-   | expr13 '(' expression_list ')'
-   | expr13 '{' expression_list '}'
-   | expr13 '[' subscript_list ']'
-   | identifier
-   | keyword
-   | literal
-   ;
+    : '(' expression_list ')'
+    | '{' expression_sequence '}'
+    | '[' expression_list ']'
+    | expr13 '.' field_name
+    | expr13 '(' expression_list ')'
+    | expr13 '{' expression_list '}'
+    | expr13 '[' subscript_list ']'
+    | identifier
+    | keyword
+    | literal
+    ;
 
 expression_list
-   : expression_opt
-   | expression_list ',' expression_opt
-   ;
+    : expression_opt
+    | expression_list ',' expression_opt
+    ;
 
 subscript_list
-   : subscript_
-   | subscript_list ',' subscript_
-   ;
+    : subscript_
+    | subscript_list ',' subscript_
+    ;
 
 subscript_
-   : expression
-   | expression ':' expression
-   | expression '+:' expression
-   | expression '-:' expression
-   ;
+    : expression
+    | expression ':' expression
+    | expression '+:' expression
+    | expression '-:' expression
+    ;
 
 keyword
-   : '&' identifier
-   ;
+    : '&' identifier
+    ;
 
 identifier
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 literal
-   : string_literal
-   | integer_literal
-   | real_literal
-   ;
+    : string_literal
+    | integer_literal
+    | real_literal
+    ;
 
 string_literal
-   : STRING_LITERAL
-   ;
+    : STRING_LITERAL
+    ;
 
 real_literal
-   : REAL_LITERAL
-   ;
+    : REAL_LITERAL
+    ;
 
 integer_literal
-   : INTEGER_LITERAL
-   ;
-
+    : INTEGER_LITERAL
+    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 INTEGER_LITERAL
-   : ('0' .. '9') +
-   ;
-
+    : ('0' .. '9')+
+    ;
 
 REAL_LITERAL
-   : ('0' .. '9')* '.' ('0' .. '9') + (('e' | 'E') ('0' .. '9') +)*
-   ;
-
+    : ('0' .. '9')* '.' ('0' .. '9')+ (('e' | 'E') ('0' .. '9')+)*
+    ;
 
 STRING_LITERAL
-   : '"' ~ ["]* '"'
-   ;
-
+    : '"' ~ ["]* '"'
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

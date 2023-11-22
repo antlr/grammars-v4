@@ -30,14 +30,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar PTXParser;
 
-options { tokenVocab=PTXLexer; }
+options {
+    tokenVocab = PTXLexer;
+}
 
 prog
-    : version_directive
-        target_directive+
-        line* EOF
+    : version_directive target_directive+ line* EOF
     ;
 
 version_directive
@@ -71,10 +74,7 @@ line
     ;
 
 directive
-    : ( CONST
-      | GLOBAL
-      | LOCAL
-      | SHARED) var_decl
+    : (CONST | GLOBAL | LOCAL | SHARED) var_decl
     | REG vector_type? built_in_type id_list initializer?
     | SREG vector_type? built_in_type? special_register
     | state_space? STRUCT alignment? id_ ('{' struct_field_list '}' | id_)
@@ -104,8 +104,8 @@ special_register
 
 debugging_directive
     : SECTION /*section_type, section_name*/
-    | FILE filename=IDENTIFIER
-    | LOC line_number=DECIMAL_LITERAL
+    | FILE filename = IDENTIFIER
+    | LOC line_number = DECIMAL_LITERAL
     | BYTE data_list
     ;
 
@@ -184,64 +184,66 @@ data_type
     ;
 
 instruction
-    : ABS data_type d=operand ',' a=operand
-    | ADD rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand
-    | AND data_type d=operand ',' a=operand ',' b=operand
-    | ATOM space '.' op=operation data_type d=operand ',' a=operand ',' b=operand (',' c=operand)?
-    | BAR SYNC? d=operand
-    | BRA UNI? tgt=id_
+    : ABS data_type d = operand ',' a = operand
+    | ADD rounding_mode? SAT? data_type d = operand ',' a = operand ',' b = operand
+    | AND data_type d = operand ',' a = operand ',' b = operand
+    | ATOM space '.' op = operation data_type d = operand ',' a = operand ',' b = operand (
+        ',' c = operand
+    )?
+    | BAR SYNC? d = operand
+    | BRA UNI? tgt = id_
     | BRKPT
-    | CALL UNI? ('(' r=operand ')' ',')? fn=id_ (',' '(' operand (',' operand)* ')')?
-    | CNOT data_type d=operand ',' a=operand
-    | COS data_type d=operand ',' a=operand
+    | CALL UNI? ('(' r = operand ')' ',')? fn = id_ (',' '(' operand (',' operand)* ')')?
+    | CNOT data_type d = operand ',' a = operand
+    | COS data_type d = operand ',' a = operand
     | CROSS
-    | CVT rounding_mode? SAT? dt=data_type at=data_type d=operand ',' a=operand
-    | DIV WIDE? rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand
+    | CVT rounding_mode? SAT? dt = data_type at = data_type d = operand ',' a = operand
+    | DIV WIDE? rounding_mode? SAT? data_type d = operand ',' a = operand ',' b = operand
     | DOT
-    | EX2 data_type d=operand ',' a=operand
+    | EX2 data_type d = operand ',' a = operand
     | EXIT
     | EXTRACT
-    | FRC data_type d=operand ',' a=operand
+    | FRC data_type d = operand ',' a = operand
     | INSERT
-    | LD space t=data_type d=operand ',' a=operand
-    | LD space vec t=data_type d=operand ',' a=operand
-    | LG2 data_type d=operand ',' a=operand
-    | MAD (HI | LO | WIDE)? rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand ',' c=operand
-    | MAD24 (HI | LO)? SAT? data_type d=operand ',' a=operand ',' b=operand ',' c=operand
-    | MAX data_type d=operand ',' a=operand ',' b=operand
+    | LD space t = data_type d = operand ',' a = operand
+    | LD space vec t = data_type d = operand ',' a = operand
+    | LG2 data_type d = operand ',' a = operand
+    | MAD (HI | LO | WIDE)? rounding_mode? SAT? data_type d = operand ',' a = operand ',' b = operand ',' c = operand
+    | MAD24 (HI | LO)? SAT? data_type d = operand ',' a = operand ',' b = operand ',' c = operand
+    | MAX data_type d = operand ',' a = operand ',' b = operand
     | MEMBAR
-    | MIN data_type d=operand ',' a=operand ',' b=operand
-    | MOV data_type d=operand ',' a=operand
-    | MUL (HI | LO | WIDE)? rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand
-    | MUL24 (HI | LO)? data_type d=operand ',' a=operand ',' b=operand
-    | NEG data_type d=operand ',' a=operand
+    | MIN data_type d = operand ',' a = operand ',' b = operand
+    | MOV data_type d = operand ',' a = operand
+    | MUL (HI | LO | WIDE)? rounding_mode? SAT? data_type d = operand ',' a = operand ',' b = operand
+    | MUL24 (HI | LO)? data_type d = operand ',' a = operand ',' b = operand
+    | NEG data_type d = operand ',' a = operand
     | NOP
-    | NOT data_type d=operand ',' a=operand
-    | OR data_type d=operand ',' a=operand ',' b=operand
-    | RCP data_type d=operand ',' a=operand
-    | REM WIDE? data_type d=operand ',' a=operand ',' b=operand
+    | NOT data_type d = operand ',' a = operand
+    | OR data_type d = operand ',' a = operand ',' b = operand
+    | RCP data_type d = operand ',' a = operand
+    | REM WIDE? data_type d = operand ',' a = operand ',' b = operand
     | RET UNI?
-    | RSQRT data_type d=operand ',' a=operand
-    | SAD rounding_mode? data_type d=operand ',' a=operand ',' b=operand ',' c=operand
-    | SELP data_type d=operand ',' a=operand ',' b=operand ',' c=operand
-    | SET cmp_op dt=data_type st=data_type d=operand ',' a=operand ',' b=operand
-    | SET cmp_op bool_op dt=data_type st=data_type d=operand ',' a=operand ',' b=operand ',' '!'? c=operand
-    | SETP cmp_op data_type p=operand ('|' q=operand)? ',' a=operand ',' b=operand
-    | SETP cmp_op bool_op data_type p=operand ('|' q=operand)? ',' a=operand ',' b=operand ',' '!'? c=operand
-    | SHL data_type d=operand ',' a=operand ',' b=operand
-    | SHR data_type d=operand ',' a=operand ',' b=operand
-    | SIN data_type d=operand ',' a=operand
-    | SLCT dt=data_type ct=data_type d=operand ',' a=operand ',' b=operand ',' c=operand
-    | SQRT data_type d=operand ',' a=operand
-    | ST space t=data_type d=operand ',' a=operand
-    | ST space vec t=data_type d=operand ',' a=operand
-    | SUB rounding_mode? SAT? data_type d=operand ',' a=operand ',' b=operand
-    | TEX geom dt=data_type bt=data_type d=operand ',' a=operand ',' b=operand
+    | RSQRT data_type d = operand ',' a = operand
+    | SAD rounding_mode? data_type d = operand ',' a = operand ',' b = operand ',' c = operand
+    | SELP data_type d = operand ',' a = operand ',' b = operand ',' c = operand
+    | SET cmp_op dt = data_type st = data_type d = operand ',' a = operand ',' b = operand
+    | SET cmp_op bool_op dt = data_type st = data_type d = operand ',' a = operand ',' b = operand ',' '!'? c = operand
+    | SETP cmp_op data_type p = operand ('|' q = operand)? ',' a = operand ',' b = operand
+    | SETP cmp_op bool_op data_type p = operand ('|' q = operand)? ',' a = operand ',' b = operand ',' '!'? c = operand
+    | SHL data_type d = operand ',' a = operand ',' b = operand
+    | SHR data_type d = operand ',' a = operand ',' b = operand
+    | SIN data_type d = operand ',' a = operand
+    | SLCT dt = data_type ct = data_type d = operand ',' a = operand ',' b = operand ',' c = operand
+    | SQRT data_type d = operand ',' a = operand
+    | ST space t = data_type d = operand ',' a = operand
+    | ST space vec t = data_type d = operand ',' a = operand
+    | SUB rounding_mode? SAT? data_type d = operand ',' a = operand ',' b = operand
+    | TEX geom dt = data_type bt = data_type d = operand ',' a = operand ',' b = operand
     | TRAP
     | VOTE
     | VRED
-    | XOR data_type d=operand ',' a=operand ',' b=operand
-    | '{' instruction_list?  '}'
+    | XOR data_type d = operand ',' a = operand ',' b = operand
+    | '{' instruction_list? '}'
     ;
 
 instruction_list
@@ -257,7 +259,7 @@ operation
     | ADD
     | MIN
     | MAX
-    | CAS //compare and swap
+    | CAS  //compare and swap
     | EXCH //exchange
     ;
 

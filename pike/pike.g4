@@ -33,356 +33,393 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://www.mit.edu/afs.new/sipb/project/pike/tutorial/tutorial_onepage.html#D
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pike;
 
 program
-   : definition* EOF?
-   ;
+    : definition* EOF?
+    ;
 
 definition
-   : impo
-   | inheritance
-   | function_declaration
-   | function_definition
-   | variables
-   | constant
-   | class_def
-   ;
+    : impo
+    | inheritance
+    | function_declaration
+    | function_definition
+    | variables
+    | constant
+    | class_def
+    ;
 
 impo
-   : modifiers? 'import' constant_identifier ';'
-   ;
+    : modifiers? 'import' constant_identifier ';'
+    ;
 
 inheritance
-   : modifiers? 'inherit' program_specifier (':' identifier)? ';'
-   ;
+    : modifiers? 'inherit' program_specifier (':' identifier)? ';'
+    ;
 
 function_declaration
-   : modifiers? type_ identifier '(' arguments? ')' ';'
-   ;
+    : modifiers? type_ identifier '(' arguments? ')' ';'
+    ;
 
 function_definition
-   : modifiers? type_ identifier '(' arguments? ')' block
-   ;
+    : modifiers? type_ identifier '(' arguments? ')' block
+    ;
 
 variables
-   : modifiers? type_ variable_names ';'
-   ;
+    : modifiers? type_ variable_names ';'
+    ;
 
 variable_names
-   : variable_name (',' variable_name)*
-   ;
+    : variable_name (',' variable_name)*
+    ;
 
 variable_name
-   : '*'* identifier ('=' expression2)?
-   ;
+    : '*'* identifier ('=' expression2)?
+    ;
 
 constant
-   : modifiers? 'constant' constant_names ';'
-   ;
+    : modifiers? 'constant' constant_names ';'
+    ;
 
 constant_names
-   : constant_name (',' constant_name)*
-   ;
+    : constant_name (',' constant_name)*
+    ;
 
 constant_name
-   : identifier '=' expression2
-   ;
+    : identifier '=' expression2
+    ;
 
 class_def
-   : modifiers? 'class' ';'?
-   ;
+    : modifiers? 'class' ';'?
+    ;
 
 class_implementation
-   : 'class' identifier? '{' program '}'
-   ;
+    : 'class' identifier? '{' program '}'
+    ;
 
 modifiers
-   : 'static'
-   | 'private'
-   | 'nomask'
-   | 'public'
-   | 'protected'
-   | 'inline'
-   ;
+    : 'static'
+    | 'private'
+    | 'nomask'
+    | 'public'
+    | 'protected'
+    | 'inline'
+    ;
 
 block
-   : '{' statement* '}'
-   ;
+    : '{' statement* '}'
+    ;
 
 statement
-   : expression2 ';'
-   | cond
-   | while_stmt
-   | do_while_stmt
-   | for_stmt
-   | switch_stmt
-   | case_stmt
-   | default_stmt
-   | block
-   | return_stmt
-   | foreach_stmt
-   | break_stmt
-   | continue_stmt
-   | ';'
-   ;
+    : expression2 ';'
+    | cond
+    | while_stmt
+    | do_while_stmt
+    | for_stmt
+    | switch_stmt
+    | case_stmt
+    | default_stmt
+    | block
+    | return_stmt
+    | foreach_stmt
+    | break_stmt
+    | continue_stmt
+    | ';'
+    ;
 
 cond
-   : 'if' statement ('else' statement)?
-   ;
+    : 'if' statement ('else' statement)?
+    ;
 
 while_stmt
-   : 'while' '(' expression ')' statement
-   ;
+    : 'while' '(' expression ')' statement
+    ;
 
 return_stmt
-   : 'return' expression
-   ;
+    : 'return' expression
+    ;
 
 do_while_stmt
-   : 'do' statement while_stmt '(' expression ')' ';'
-   ;
+    : 'do' statement while_stmt '(' expression ')' ';'
+    ;
 
 for_stmt
-   : 'for' '(' expression? ';' expression? ';' expression? ')' statement
-   ;
+    : 'for' '(' expression? ';' expression? ';' expression? ')' statement
+    ;
 
 switch_stmt
-   : 'switch' '(' expression ')' block
-   ;
+    : 'switch' '(' expression ')' block
+    ;
 
 case_stmt
-   : 'case' expression ('..' expression)? ':'
-   ;
+    : 'case' expression ('..' expression)? ':'
+    ;
 
 default_stmt
-   : 'default' ':'
-   ;
+    : 'default' ':'
+    ;
 
 foreach_stmt
-   : 'foreach' '(' expression ':' expression6 ')' statement
-   ;
+    : 'foreach' '(' expression ':' expression6 ')' statement
+    ;
 
 break_stmt
-   : 'break' ';'
-   ;
+    : 'break' ';'
+    ;
 
 continue_stmt
-   : 'continue' ';'
-   ;
+    : 'continue' ';'
+    ;
 
 expression
-   : expression2 (',' expression2)*
-   ;
+    : expression2 (',' expression2)*
+    ;
 
 expression2
-   : (lvalue ('=' | '+=' | '*=' | '/=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '%='))* expression3
-   ;
+    : (lvalue ('=' | '+=' | '*=' | '/=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '%='))* expression3
+    ;
 
 expression3
-   : expression4 ('?' expression3 ':' expression3)?
-   ;
+    : expression4 ('?' expression3 ':' expression3)?
+    ;
 
 expression4
-   : (expression5 ('||' | '&&' | '|' | '^' | '&' | '==' | '!=' | '>' | '<' | '>=' | '<=' | '<<' | '>>' | '+' | '*' | '/' | '%'))* expression5
-   ;
+    : (
+        expression5 (
+            '||'
+            | '&&'
+            | '|'
+            | '^'
+            | '&'
+            | '=='
+            | '!='
+            | '>'
+            | '<'
+            | '>='
+            | '<='
+            | '<<'
+            | '>>'
+            | '+'
+            | '*'
+            | '/'
+            | '%'
+        )
+    )* expression5
+    ;
 
 expression5
-   : expression6
-   | '(' type_ ')' expression5
-   | '--' expression6
-   | '++' expression6
-   | expression6 '--'
-   | expression6 '++'
-   | '~' expression5
-   | '-' expression5
-   | '!' expression5
-   ;
+    : expression6
+    | '(' type_ ')' expression5
+    | '--' expression6
+    | '++' expression6
+    | expression6 '--'
+    | expression6 '++'
+    | '~' expression5
+    | '-' expression5
+    | '!' expression5
+    ;
 
 expression6
-   : (STRING | NUMBER | FLOAT | catch_ | gauge | sscanf | lambda | class_implementation | constant_identifier | mapping | multiset | array | parenthesis) extension*
-   ;
+    : (
+        STRING
+        | NUMBER
+        | FLOAT
+        | catch_
+        | gauge
+        | sscanf
+        | lambda
+        | class_implementation
+        | constant_identifier
+        | mapping
+        | multiset
+        | array
+        | parenthesis
+    ) extension*
+    ;
 
 extension
-   : '(' expression_list ')'
-   | '->' identifier
-   | '[' expression ('..' expression)? ']'
-   ;
+    : '(' expression_list ')'
+    | '->' identifier
+    | '[' expression ('..' expression)? ']'
+    ;
 
 catch_
-   : 'catch' ('(' expression ')' | block)
-   ;
+    : 'catch' ('(' expression ')' | block)
+    ;
 
 gauge
-   : 'gauge' ('(' expression ')' | block)
-   ;
+    : 'gauge' ('(' expression ')' | block)
+    ;
 
 sscanf
-   : 'sscanf' '(' expression2 ',' expression2 (',' lvalue)* ')'
-   ;
+    : 'sscanf' '(' expression2 ',' expression2 (',' lvalue)* ')'
+    ;
 
 lvalue
-   : 'lambda' expression6
-   | type_ identifier
-   ;
+    : 'lambda' expression6
+    | type_ identifier
+    ;
 
 lambda
-   : 'lambda' '(' arguments? ')' block
-   ;
+    : 'lambda' '(' arguments? ')' block
+    ;
 
 constant_identifier
-   : identifier ('.' identifier)*
-   ;
+    : identifier ('.' identifier)*
+    ;
 
 array
-   : '({' expression_list '})'
-   ;
+    : '({' expression_list '})'
+    ;
 
 multiset
-   : '(<' expression_list '>)'
-   ;
+    : '(<' expression_list '>)'
+    ;
 
 mapping
-   : '([' (expression ':' expression (',' expression ':' expression)*)? ','? '])'
-   ;
+    : '([' (expression ':' expression (',' expression ':' expression)*)? ','? '])'
+    ;
 
 program_specifier
-   : constant_identifier
-   ;
+    : constant_identifier
+    ;
 
 parenthesis
-   : '(' expression ')'
-   ;
+    : '(' expression ')'
+    ;
 
 expression_list
-   : (splice_expression (',' splice_expression)*)? ','?
-   ;
+    : (splice_expression (',' splice_expression)*)? ','?
+    ;
 
 splice_expression
-   : '@'? expression2
-   ;
+    : '@'? expression2
+    ;
 
 argument
-   : type_ ('...')? identifier
-   ;
+    : type_ ('...')? identifier
+    ;
 
 arguments
-   : (argument (',' argument)*) (',')?
-   ;
+    : (argument (',' argument)*) (',')?
+    ;
 
 type_
-   : type__ ('*')*
-   ;
+    : type__ ('*')*
+    ;
 
 type__
-   : INTTYPE
-   | STRINGTYPE
-   | FLOATTYPE
-   | PROGRAMTYPE
-   | (OBJECTTYPE ('(' program_specifier ')')?)
-   | (MAPPINGTYPE ('(' type_ ':' type_ ')')?)
-   | (ARRAYTYPE ('(' type_ ')')?)
-   | (MULTISETTYPE ('(' type_ ')')?)
-   | (FUNCTIONTYPE function_type?)
-   ;
+    : INTTYPE
+    | STRINGTYPE
+    | FLOATTYPE
+    | PROGRAMTYPE
+    | (OBJECTTYPE ('(' program_specifier ')')?)
+    | (MAPPINGTYPE ('(' type_ ':' type_ ')')?)
+    | (ARRAYTYPE ('(' type_ ')')?)
+    | (MULTISETTYPE ('(' type_ ')')?)
+    | (FUNCTIONTYPE function_type?)
+    ;
 
 function_type
-   : '(' type_ (',' type_)* ('...')? ')'
-   ;
+    : '(' type_ (',' type_)* ('...')? ')'
+    ;
 
 identifier
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 INTTYPE
-   : 'int'
-   ;
+    : 'int'
+    ;
 
 FLOATTYPE
-   : 'float'
-   ;
+    : 'float'
+    ;
 
 STRINGTYPE
-   : 'string'
-   ;
+    : 'string'
+    ;
 
 PROGRAMTYPE
-   : 'program'
-   ;
+    : 'program'
+    ;
 
 OBJECTTYPE
-   : 'object'
-   ;
+    : 'object'
+    ;
 
 MAPPINGTYPE
-   : 'mapping'
-   ;
+    : 'mapping'
+    ;
 
 ARRAYTYPE
-   : 'array'
-   ;
+    : 'array'
+    ;
 
 MULTISETTYPE
-   : 'multiset'
-   ;
+    : 'multiset'
+    ;
 
 FUNCTIONTYPE
-   : 'function'
-   ;
+    : 'function'
+    ;
 
 IDENTIFIER
-   : LETTER (LETTER | DIGIT | IDSYMBOL)*
-   ;
+    : LETTER (LETTER | DIGIT | IDSYMBOL)*
+    ;
 
 LETTER
-   : 'a' .. 'z'
-   | 'A' .. 'Z'
-   | '_'
-   ;
+    : 'a' .. 'z'
+    | 'A' .. 'Z'
+    | '_'
+    ;
 
 FLOAT
-   : DIGIT+ '.' DIGIT+
-   ;
+    : DIGIT+ '.' DIGIT+
+    ;
 
 NUMBER
-   : '0x'? DIGIT+
-   ;
+    : '0x'? DIGIT+
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 fragment DIGIT
-   : '0' .. '9'
-   ;
+    : '0' .. '9'
+    ;
 
 fragment IDSYMBOL
-   : '`+'
-   | '`/'
-   | '`%'
-   | '`*'
-   | '`&'
-   | '`|'
-   | '`^'
-   | '`~'
-   | '`<'
-   | '`<<'
-   | '`<='
-   | '`>'
-   | '`>>'
-   | '`>='
-   | '`=='
-   | '`!='
-   | '`!'
-   | '`()'
-   | '`-'
-   | '`->'
-   | '`->='
-   | '`[]'
-   | '`[]='
-   ;
+    : '`+'
+    | '`/'
+    | '`%'
+    | '`*'
+    | '`&'
+    | '`|'
+    | '`^'
+    | '`~'
+    | '`<'
+    | '`<<'
+    | '`<='
+    | '`>'
+    | '`>>'
+    | '`>='
+    | '`=='
+    | '`!='
+    | '`!'
+    | '`()'
+    | '`-'
+    | '`->'
+    | '`->='
+    | '`[]'
+    | '`[]='
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;
