@@ -4,4 +4,3 @@
    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;PHP;Python3;TypeScript</targets>
    <inputs>examples/**/*.sys</inputs>
 </desc>
-
