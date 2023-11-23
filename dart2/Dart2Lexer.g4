@@ -27,6 +27,8 @@ lexer grammar Dart2Lexer;
 
 options { superClass=Dart2LexerBase; }
 
+// Insert here @header for C++ lexer.
+
 A: '&';
 AA: '&&';
 AE: '&=';
@@ -158,9 +160,9 @@ MULTI_LINE_COMMENT : '/*' ( MULTI_LINE_COMMENT | . )*? '*/'  -> skip ;
 fragment EXPONENT : ( 'e' | 'E' ) ( '+' | '-' )? DIGIT+ ;
 fragment HEX_DIGIT : 'a' .. 'f' | 'A' .. 'F' | DIGIT ;
 fragment StringDQ : '"' StringContentDQ*? '"' ;
-fragment StringContentDQ : ~('\\' | '"' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringDQ | '${' StringContentDQ*? '}' | '$' { CheckNotOpenBrace() }? ;
+fragment StringContentDQ : ~('\\' | '"' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringDQ | '${' StringContentDQ*? '}' | '$' { this.CheckNotOpenBrace() }? ;
 fragment StringSQ : '\'' StringContentSQ*? '\'' ;
-fragment StringContentSQ : ~('\\' | '\'' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringSQ | '${' StringContentSQ*? '}' | '$' { CheckNotOpenBrace() }? ;
+fragment StringContentSQ : ~('\\' | '\'' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringSQ | '${' StringContentSQ*? '}' | '$' { this.CheckNotOpenBrace() }? ;
 fragment StringContentTDQ : ~('\\' | '"') | '"' ~'"' | '""' ~'"' ;
 fragment StringContentTSQ : '\'' ~'\'' | '\'\'' ~'\'' | . ;
 fragment ESCAPE_SEQUENCE : '\n' | '\r' | '\\f' | '\\b' | '\t' | '\\v' | '\\x' HEX_DIGIT HEX_DIGIT | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT | '\\u{' HEX_DIGIT_SEQUENCE '}' ;
