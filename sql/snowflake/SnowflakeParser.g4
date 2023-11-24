@@ -1134,7 +1134,7 @@ clustering_action
     ;
 
 table_column_action
-    : ADD COLUMN? column_name data_type
+    : ADD COLUMN? if_not_exists? column_name data_type
         default_value?
         inline_constraint?
         ( WITH? MASKING POLICY id_ ( USING '(' column_name COMMA column_list ')' )? )?
@@ -1154,7 +1154,7 @@ table_column_action
     | alter_modify COLUMN column_name UNSET MASKING POLICY
     | alter_modify column_set_tags (COMMA column_set_tags)*
     | alter_modify column_unset_tags (COMMA column_unset_tags)*
-    | DROP COLUMN? column_list
+    | DROP COLUMN? if_exists? column_list
     ;
 
 inline_constraint
@@ -2490,7 +2490,7 @@ create_tag
     ;
 
 tag_allowed_values
-    : ALLOWED_VALUES tag_value (COMMA tag_value)*
+    : ALLOWED_VALUES string_list
     ;
 
 session_parameter
