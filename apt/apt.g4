@@ -8,7 +8,7 @@ grammar apt;
 
 //  productions
 record
-    : commented = commenterR? rType = TypeR WSS options = optionsR? uri = uriR WSS distribution = wordWithDash components = componentsR WSS? EOF
+    : commented = commenterR? rType = TypeR WSS options_ = optionsR? uri = uriR WSS distribution = wordWithDash components = componentsR WSS? EOF
     ;
 
 wordWithDashSegment

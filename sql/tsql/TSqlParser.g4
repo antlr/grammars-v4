@@ -4088,7 +4088,7 @@ group_by_item
 
 option_clause
 // https://msdn.microsoft.com/en-us/library/ms181714.aspx
-    : OPTION '(' options += option (',' options += option)* ')'
+    : OPTION '(' options_ += option (',' options_ += option)* ')'
     ;
 
 option
