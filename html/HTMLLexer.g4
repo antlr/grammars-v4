@@ -28,6 +28,12 @@
 
 lexer grammar  HTMLLexer;
 
+
+IDENTIFIER
+    : [a-zA-Z_$] [a-zA-Z0-9_$]*
+    ;   
+
+
 HTML_COMMENT
     : '<!--' .*? '-->'
     ;
@@ -57,41 +63,13 @@ SEA_WS
     :  (' '|'\t'|'\r'? '\n')+
     ;
 
-SCRIPT_OPEN
-    : '<script' .*? '>' -> pushMode(SCRIPT)
-    ;
-
-STYLE_OPEN
-    : '<style' .*? '>'  -> pushMode(STYLE)
-    ;
-
-TAG_NORMAL_SCRIPT
-    : '<script>' -> popMode
-    ;
-
-TAG_NORMAL_STYLE
-    : '<style>' -> popMode
-    ;
-
-
-TAG_CLOSE_SCRIPT
-    : '</script>' -> popMode
-    ;
-
-TAG_CLOSE_STYLE
-    : '</style>' -> popMode
-    ;
-
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
 
-
 HTML_TEXT
     : ~'<'+
     ;
-
-
 // tag declarations
 
 mode TAG;
@@ -122,6 +100,7 @@ TAG_NAME
 TAG_WHITESPACE
     : [ \t\r\n] -> channel(HIDDEN)
     ;
+
 
 fragment
 HEXDIGIT
