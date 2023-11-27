@@ -7,7 +7,7 @@ options {
     tokenVocab = LarkLexer;
 }
 
-start
+start_
     : item* EOF
     ;
 
