@@ -311,6 +311,7 @@ attachparam
    | SCOL k_value ASSIGN k_binary
    | SCOL fmttypeparam
    | SCOL other_param
+   ;
 
 // 3.8.1.2 - Categories
 categories
