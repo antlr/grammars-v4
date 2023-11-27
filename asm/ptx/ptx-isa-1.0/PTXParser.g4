@@ -298,7 +298,7 @@ cmp_op
     | GTU
     | GEU
     | NUM
-    | NAN
+    | NAN_
     ;
 
 bool_op

@@ -4,7 +4,7 @@ options {
     tokenVocab = LarkLexer;
 }
 
-start: item* EOF;
+start_: item* EOF;
 
 item: rule_ | token | statement ;
 
