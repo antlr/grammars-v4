@@ -8,7 +8,7 @@ grammar WavefrontOBJ;
 
 // PARSER RULES
 
-start
+start_
     : NL* (statement (NL+ | EOF))+
     ;
 

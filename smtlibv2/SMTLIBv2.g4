@@ -485,7 +485,7 @@ UndefinedSymbol:
 
 // Starting rule(s)
 
-start
+start_
     : logic EOF
     | theory_decl EOF
     | script EOF
