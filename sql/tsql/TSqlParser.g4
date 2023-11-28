@@ -61,6 +61,7 @@ dml_clause
     | insert_statement
     | select_statement_standalone
     | update_statement
+    | bulk_insert_statement
     ;
 
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
@@ -1992,6 +1993,40 @@ output_clause
 
 output_dml_list_elem
     : (expression | asterisk) as_column_alias?
+    ;
+
+bulk_insert_statement
+    : BULK INSERT
+    ddl_object
+    FROM STRING
+    (WITH LR_BRACKET (bulk_insert_option (COMMA bulk_insert_option)*) RR_BRACKET)?
+    ;
+
+bulk_insert_option
+    : BATCHSIZE EQUAL DECIMAL
+    | CHECK_CONSTRAINTS
+    | CODEPAGE EQUAL STRING
+    | DATAFILETYPE EQUAL STRING
+    | DATA_SOURCE EQUAL STRING
+    | ERRORFILE EQUAL STRING
+    | ERRORFILE_DATA_SOURCE EQUAL STRING
+    | FIRSTROW EQUAL DECIMAL
+    | FIRE_TRIGGERS
+    | FORMATFILE_DATA_SOURCE EQUAL STRING
+    | KEEPIDENTITY
+    | KEEPNULLS
+    | KILOBYTES_PER_BATCH EQUAL DECIMAL
+    | LASTROW EQUAL DECIMAL
+    | MAXERRORS EQUAL DECIMAL
+    | ORDER LR_BRACKET column_name_list_with_order RR_BRACKET
+    | ROWS_PER_BATCH EQUAL DECIMAL
+    | ROWTERMINATOR EQUAL STRING
+    | TABLOCK
+    | FORMAT EQUAL STRING
+    | FIELDQUOTE EQUAL STRING
+    | FORMATFILE EQUAL STRING
+    | FIELDTERMINATOR EQUAL STRING
+    | ROWTERMINATOR EQUAL STRING
     ;
 
 // DDL
