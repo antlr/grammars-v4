@@ -1,0 +1,202 @@
+<lexeme> → <identifier> ∣ <boolean> ∣ <number>
+‌ ∣ <character> ∣ <string>
+
+    ∣ ( ∣ ) ∣ [ ∣ ] ∣ #( ∣ #vu8( | ' ∣ ` ∣ , ∣ ,@ ∣ .
+
+    ∣ #' ∣ #` ∣ #, ∣ #,@
+
+<delimiter> → ( ∣ ) ∣ [ ∣ ] ∣ " ∣ ; ∣ #
+
+    ∣ <whitespace>
+
+<whitespace> → <character tabulation>
+
+    ∣ <linefeed> ∣ <line tabulation> ∣ <form feed>
+
+    ∣ <carriage return> ∣ <next line>
+
+    ∣ <any character whose category is Zs, Zl, or Zp>
+
+<line ending> → <linefeed> ∣ <carriage return>
+
+    ∣ <carriage return> <linefeed> ∣ <next line>
+
+    ∣ <carriage return> <next line> ∣ <line separator>
+
+<comment> → ; ⟨all subsequent characters up to a
+
+    <line ending> or <paragraph separator>⟩
+
+‌ ∣ <nested comment>
+
+    ∣ #; <interlexeme space> <datum>
+
+    ∣ #!r6rs
+
+<nested comment> → #| <comment text>
+
+    <comment cont>* |#
+
+<comment text> → ⟨character sequence not containing
+
+    #| or |#⟩
+
+<comment cont> → <nested comment> <comment text>
+
+<atmosphere> → <whitespace> ∣ <comment>
+
+<interlexeme space> → <atmosphere>*
+
+<identifier> → <initial> <subsequent>*
+‌ ∣ <peculiar identifier>
+
+<initial> → <constituent> ∣ <special initial>
+
+    ∣ <inline hex escape>
+
+<letter> → a ∣ b ∣ c ∣ ... ∣ z
+
+    ∣ A ∣ B ∣ C ∣ ... ∣ Z
+
+<constituent> → <letter>
+
+    ∣ ⟨any character whose Unicode scalar value is greater than
+
+    ‌127, and whose category is Lu, Ll, Lt, Lm, Lo, Mn,
+
+    ‌Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, or Co⟩
+
+<special initial> → ! ∣ $ ∣ % ∣ & ∣ * ∣ / ∣ : ∣ < ∣ =
+
+    ∣ > ∣ ? ∣ ^ ∣ _ ∣ ~
+
+<subsequent> → <initial> ∣ <digit>
+
+    ∣ <any character whose category is Nd, Mc, or Me>
+
+    ∣ <special subsequent>
+
+<digit> → 0 ∣ 1 ∣ 2 ∣ 3 ∣ 4 ∣ 5 ∣ 6 ∣ 7 ∣ 8 ∣ 9
+
+<hex digit> → <digit>
+
+    ∣ a ∣ A ∣ b ∣ B ∣ c ∣ C ∣ d ∣ D ∣ e ∣ E ∣ f ∣ F
+
+<special subsequent> → + ∣ - ∣ . ∣ @
+
+<inline hex escape> → \x<hex scalar value>;
+
+<hex scalar value> → <hex digit>+
+
+<peculiar identifier> → + ∣ - ∣ ... ∣ -> <subsequent>*
+
+<boolean> → #t ∣ #T ∣ #f ∣ #F
+
+<character> → #\<any character>
+
+    ∣ #\<character name>
+
+    ∣ #\x<hex scalar value>
+
+<character name> → nul ∣ alarm ∣ backspace ∣ tab
+
+    ∣ linefeed ∣ newline ∣ vtab ∣ page ∣ return
+
+    ∣ esc ∣ space ∣ delete
+
+<string> → " <string element>* "
+
+<string element> → <any character other than " or \>
+
+    ∣ \a ∣ \b ∣ \t ∣ \n ∣ \v ∣ \f ∣ \r
+
+    ∣ \" ∣ \\
+
+    ∣ \<intraline whitespace><line ending>
+
+       <intraline whitespace>
+
+    ∣ <inline hex escape>
+
+<intraline whitespace> → <character tabulation>
+
+    ∣ <any character whose category is Zs>
+
+<number> → <num 2> ∣ <num 8>
+‌ ∣ <num 10> ∣ <num 16>
+
+<num R> → <prefix R> <complex R>
+
+<complex R> → <real R> ∣ <real R> @ <real R>
+
+    ∣ <real R> + <ureal R> i ∣ <real R> - <ureal R> i
+
+    ∣ <real R> + <naninf> i ∣ <real R> - <naninf> i
+
+    ∣ <real R> + i ∣ <real R> - i
+
+    ∣ + <ureal R> i ∣ - <ureal R> i
+
+    ∣ + <naninf> i ∣ - <naninf> i
+
+    ∣ + i ∣ - i
+
+<real R> → <sign> <ureal R>
+
+    ∣ + <naninf> ∣ - <naninf>
+
+<naninf> → nan.0 ∣ inf.0
+
+<ureal R> → <uinteger R>
+
+    ∣ <uinteger R> / <uinteger R>
+
+    ∣ <decimal R> <mantissa width>
+
+<decimal 10> → <uinteger 10> <suffix>
+
+    ∣ . <digit 10>+ <suffix>
+
+    ∣ <digit 10>+ . <digit 10>* <suffix>
+
+    ∣ <digit 10>+ . <suffix>
+
+<uinteger R> → <digit R>+
+
+<prefix R> → <radix R> <exactness>
+
+    ∣ <exactness> <radix R>
+
+<suffix> → <empty>
+‌ ∣ <exponent marker> <sign> <digit 10>+
+
+<exponent marker> → e ∣ E ∣ s ∣ S ∣ f ∣ F
+
+    ∣ d ∣ D ∣ l ∣ L
+
+<mantissa width> → <empty>
+
+    ∣ | <digit 10>+
+
+<sign> → <empty> ∣ + ∣ -
+
+<exactness> → <empty>
+
+    ∣ #i∣ #I ∣ #e∣ #E
+
+<radix 2> → #b∣ #B
+
+<radix 8> → #o∣ #O
+
+<radix 10> → <empty> ∣ #d ∣ #D
+
+<radix 16> → #x∣ #X
+
+<digit 2> → 0 ∣ 1
+
+<digit 8> → 0 ∣ 1 ∣ 2 ∣ 3 ∣ 4 ∣ 5 ∣ 6 ∣ 7
+
+<digit 10> → <digit>
+
+<digit 16> → <hex digit>
+
