@@ -2288,9 +2288,9 @@ collectionOptions
 convertedDataType
     :
     (
-      typeName=(BINARY| NCHAR) lengthOneDimension?
+      typeName=(BINARY | NCHAR | FLOAT) lengthOneDimension?
       | typeName=CHAR lengthOneDimension? (charSet charsetName)?
-      | typeName=(DATE | DATETIME | TIME | JSON | INT | INTEGER)
+      | typeName=(DATE | DATETIME | TIME | YEAR | JSON | INT | INTEGER | DOUBLE)
       | typeName=(DECIMAL | DEC) lengthTwoOptionalDimension?
       | (SIGNED | UNSIGNED) (INTEGER | INT)?
     ) ARRAY?
