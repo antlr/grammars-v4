@@ -25,21 +25,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar postalcode;
 
 postalcode
-   : LETTER DIGIT LETTER DIGIT LETTER DIGIT EOF
-   ;
+    : LETTER DIGIT LETTER DIGIT LETTER DIGIT EOF
+    ;
 
 DIGIT
-   : '0' .. '9'
-   ;
+    : '0' .. '9'
+    ;
 
 LETTER
-   : 'A' .. 'Z'
-   ;
+    : 'A' .. 'Z'
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;

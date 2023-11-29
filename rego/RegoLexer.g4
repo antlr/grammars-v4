@@ -5,245 +5,138 @@ Copyright Arroyo Networks 2019
 Authors: Josh Marshall
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar RegoLexer;
 
-channels { COMMENTS_AND_FORMATTING }
-
+channels {
+    COMMENTS_AND_FORMATTING
+}
 
 /*<1>*/
-Comment
-  : [^\\] '#' [^\r\n]* -> Channel(COMMENTS_AND_FORMATTING)
-  ;
+Comment: [^\\] '#' [^\r\n]* -> Channel(COMMENTS_AND_FORMATTING);
 
-fragment
-DoubleQuote
-  : '"'
-  ;
+fragment DoubleQuote: '"';
 
-fragment
-BackTick
-  : '`'
-  ;
+fragment BackTick: '`';
 
-fragment
-QuotedString 
-  : DoubleQuote Char* DoubleQuote
-  ;
+fragment QuotedString: DoubleQuote Char* DoubleQuote;
 
-fragment
-RawString 
-  : BackTick ~[`]* BackTick 
-  ;
+fragment RawString: BackTick ~[`]* BackTick;
 
 /*<2>*/
-String 
-  : QuotedString 
-  | RawString
-  ;
+String: QuotedString | RawString;
 
 /*Antlr doesn't support the '{4}' syntax.*/
-fragment
-UnicodeEscape 
-  : 'u' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
-  ;
+fragment UnicodeEscape: 'u' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F];
 
 /*<3>*/
-Bool 
-  : 'true' | 'false'
-  ;
+Bool: 'true' | 'false';
 
 /*<4>*/
-Null 
-  : 'null'
-  ;
+Null: 'null';
 
 /*<5>*/
-As 
-  : 'as' 
-  ;
+As: 'as';
 
 /*<6>*/
-Default 
-  : 'default' 
-  ;
+Default: 'default';
 
 /*<7>*/
-Else 
-  : 'else' 
-  ;
+Else: 'else';
 
 /*<8>*/
-Import 
-  : 'import' 
-  ;
+Import: 'import';
 
 /*<9>*/
-Package 
-  : 'package' 
-  ;
+Package: 'package';
 
 /*<10>*/
-Not 
-  : 'not' 
-  ;
+Not: 'not';
 
 /*<11>*/
-With 
-  : 'with' 
-  ;
+With: 'with';
 
 /*<12>*/
-Set
-  : 'set('
-  ;
+Set: 'set(';
 
 /*<13>*/
-LSBrace
-  : '['
-  ;
+LSBrace: '[';
 
 /*<14>*/
-LCBrace
-  : '{'
-  ;
+LCBrace: '{';
 
 /*<15>*/
-LParan
-  : '('
-  ;
+LParan: '(';
 
 /*<16>*/
-RSBrace
-  : ']'
-  ;
+RSBrace: ']';
 
 /*<17>*/
-RCBrace
-  : '}'
-  ;
+RCBrace: '}';
 
 /*<18>*/
-RParan
-  : ')'
-  ;
+RParan: ')';
 
 /*<19>*/
-Mid
-  : '|'
-  ;
+Mid: '|';
 
 /*<20>*/
-FactorOperator
-  : '*'
-  | '/' 
-  | '%'
-  ;
+FactorOperator: '*' | '/' | '%';
 
-fragment
-Plus
-  : '+'
-  ;
+fragment Plus: '+';
 
-fragment
-Minus
-  : '-'
-  ;
+fragment Minus: '-';
 
 /*<21>*/
-ArithOperator
-  : Plus 
-  | Minus
-  ;
+ArithOperator: Plus | Minus;
 
 /*<22>*/
-RelationOperator
-  : '==' 
-  | '!=' 
-  | '<=' 
-  | '>=' 
-  | '>' 
-  | '<'
-  ;
+RelationOperator: '==' | '!=' | '<=' | '>=' | '>' | '<';
 
 /*<23>*/
-EqOper 
-  : ':='
-  | '='
-  ;
+EqOper: ':=' | '=';
 
 /*<24>*/
-Comma
-  : ','
-  ;
+Comma: ',';
 
 /*<25>*/
-Semicolon
-  : ';'
-  ;
+Semicolon: ';';
 
 /*<26>*/
-Colon
-  : ':'
-  ;
+Colon: ':';
 
 /*<27>*/
-Ampersand
-  : '&'
-  ;
+Ampersand: '&';
 
 /*<28>*/
-Dot
-  : '.'
-  ;
+Dot: '.';
 
 /*<29>*/
-WhiteSpace
-  : [ \t] -> Channel(COMMENTS_AND_FORMATTING)
-  ;
+WhiteSpace: [ \t] -> Channel(COMMENTS_AND_FORMATTING);
 
 /*<30>*/
-LineEnd
-  : [\n] -> Channel(COMMENTS_AND_FORMATTING)
-  ;
+LineEnd: [\n] -> Channel(COMMENTS_AND_FORMATTING);
 
 /*<31>*/
-WindowsLineEnd
-  : [\r] -> skip
-  ;
+WindowsLineEnd: [\r] -> skip;
 
 /*****************************************************************************/
 
-fragment
-E
-  : 'e' | 'E'
-  ;
+fragment E: 'e' | 'E';
 
-fragment
-Real
-  : (DecimalDigit* '.' DecimalDigit+ | DecimalDigit+ '.'?)
-  ;
+fragment Real: (DecimalDigit* '.' DecimalDigit+ | DecimalDigit+ '.'?);
 
 /*<32>*/
-UnsignedNumber
-  : Real (E (Plus | Minus)? Real)?
-  ;
+UnsignedNumber: Real (E (Plus | Minus)? Real)?;
 
-fragment
-AsciiLetter 
-  : [A-Za-z_]
-  ;
+fragment AsciiLetter: [A-Za-z_];
 
-fragment 
-DecimalDigit 
-  : [0-9]
-  ;
+fragment DecimalDigit: [0-9];
 
-fragment
-Char 
-  : ~[\u0000-\u001f"\\]
-  | '\\' EscapeSequence 
-  ;
+fragment Char: ~[\u0000-\u001f"\\] | '\\' EscapeSequence;
 
 /*
 fragment
@@ -252,23 +145,11 @@ MyEscapedChar
   ;
 */
 
-fragment
-EscapeSequence 
-  : SingleCharEscape 
-  | UnicodeEscape
-  ;
+fragment EscapeSequence: SingleCharEscape | UnicodeEscape;
 
-fragment
-SingleCharEscape 
-  : [\\/bfnrt]
-  | DoubleQuote
-  | BackTick
-  ;
+fragment SingleCharEscape: [\\/bfnrt] | DoubleQuote | BackTick;
 
 /*****************************************************************************/
 
-
 /*<33>*/
-Name
-  : AsciiLetter (AsciiLetter | DecimalDigit)*
-  ;
+Name: AsciiLetter (AsciiLetter | DecimalDigit)*;

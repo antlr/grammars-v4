@@ -26,6 +26,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tinybasic;
 
 program
@@ -33,45 +36,44 @@ program
     ;
 
 line
-   : number statement CR
-   | statement CR
-   ;
+    : number statement CR
+    | statement CR
+    ;
 
 statement
-   : 'PRINT' exprlist
-   | 'IF' expression relop expression 'THEN'? statement
-   | 'GOTO' number
-   | 'INPUT' varlist
-   | 'LET'? vara '=' expression
-   | 'GOSUB' expression
-   | 'RETURN'
-   | 'CLEAR'
-   | 'LIST'
-   | 'RUN'
-   | 'END'
-   ;
+    : 'PRINT' exprlist
+    | 'IF' expression relop expression 'THEN'? statement
+    | 'GOTO' number
+    | 'INPUT' varlist
+    | 'LET'? vara '=' expression
+    | 'GOSUB' expression
+    | 'RETURN'
+    | 'CLEAR'
+    | 'LIST'
+    | 'RUN'
+    | 'END'
+    ;
 
 exprlist
-   : (STRING | expression) (',' (STRING | expression))*
-   ;
+    : (STRING | expression) (',' (STRING | expression))*
+    ;
 
 varlist
-   : vara (',' vara)*
-   ;
+    : vara (',' vara)*
+    ;
 
 expression
-   : ('+' | '-' )? term (('+' | '-') term)*
-   ;
+    : ('+' | '-')? term (('+' | '-') term)*
+    ;
 
 term
-   : factor (('*' | '/') factor)*
-   ;
+    : factor (('*' | '/') factor)*
+    ;
 
 factor
-   :
-   vara
-   | number
-   ;
+    : vara
+    | number
+    ;
 
 vara
     : VAR
@@ -79,36 +81,31 @@ vara
     ;
 
 number
-   : DIGIT +
-   ;
+    : DIGIT+
+    ;
 
 relop
-   : ('<' ('>' | '=' )?)
-   | ('>' ('<' | '=' )?)
-   | '='
-   ;
-
+    : ('<' ('>' | '=')?)
+    | ('>' ('<' | '=')?)
+    | '='
+    ;
 
 STRING
-   : '"' ~ ["\r\n]* '"'
-   ;
-
+    : '"' ~ ["\r\n]* '"'
+    ;
 
 DIGIT
-   : '0' .. '9'
-   ;
-
+    : '0' .. '9'
+    ;
 
 VAR
-   : 'A' .. 'Z'
-   ;
-
+    : 'A' .. 'Z'
+    ;
 
 CR
-   : [\r\n]+
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

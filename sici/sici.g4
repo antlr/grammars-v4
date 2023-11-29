@@ -32,73 +32,75 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://en.wikipedia.org/wiki/Serial_Item_and_Contribution_Identifier
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar sici;
 
 sici
-   : item contribution control* EOF
-   ;
+    : item contribution control* EOF
+    ;
 
 item
-   : issn chronology enumeration
-   ;
+    : issn chronology enumeration
+    ;
 
 issn
-   : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT
+    ;
 
 chronology
-   : '(' (DIGIT | '/')+ ')'
-   ;
+    : '(' (DIGIT | '/')+ ')'
+    ;
 
 enumeration
-   : DIGIT+ ':' DIGIT+
-   ;
+    : DIGIT+ ':' DIGIT+
+    ;
 
 contribution
-   : '<' location ':' title '>'
-   ;
+    : '<' location ':' title '>'
+    ;
 
 location
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 title
-   : LETTER+
-   ;
+    : LETTER+
+    ;
 
 control
-   : csi '.' dpi '.' mfi ';' version check
-   ;
+    : csi '.' dpi '.' mfi ';' version check
+    ;
 
 csi
-   : DIGIT
-   ;
+    : DIGIT
+    ;
 
 dpi
-   : DIGIT
-   ;
+    : DIGIT
+    ;
 
 mfi
-   : LETTER LETTER
-   ;
+    : LETTER LETTER
+    ;
 
 version
-   : DIGIT (DIGIT | '-')
-   ;
+    : DIGIT (DIGIT | '-')
+    ;
 
 check
-   : LETTER
-   ;
+    : LETTER
+    ;
 
 LETTER
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

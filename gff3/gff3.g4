@@ -30,89 +30,106 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar gff3;
 
 document
-   : HEADER line+ EOF
-   ; 
+    : HEADER line+ EOF
+    ;
 
 line
-   : commentline 
-   | dataline
-   ;
+    : commentline
+    | dataline
+    ;
 
 dataline
-   : seqid '\t' source '\t' type_ '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
-   ;
+    : seqid '\t' source '\t' type_ '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
+    ;
 
 attributes
-   : attribute (';' attribute)*
-   ;
+    : attribute (';' attribute)*
+    ;
 
 attribute
-   : TEXT '=' TEXT
-   ;
+    : TEXT '=' TEXT
+    ;
 
 seqid
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 source
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 type_
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 start
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 end
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 strand
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 score
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 phase
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 commentline
-   : COMMENTLINE
-   ;
+    : COMMENTLINE
+    ;
 
 HEADER
-   : '##gff-version 3' EOL
-   ;
+    : '##gff-version 3' EOL
+    ;
 
 COMMENTLINE
-   : '#' .*? EOL
-   ;
+    : '#' .*? EOL
+    ;
 
 EOL
-   : '\r'? '\n'
-   ;
+    : '\r'? '\n'
+    ;
 
 TEXT
-   : (CHAR | SYMBOL | DIGIT)+
-   ;
+    : (CHAR | SYMBOL | DIGIT)+
+    ;
 
 fragment CHAR
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 fragment SYMBOL
-   : '.' | ':' | '^' | '*' | '$' | '@' | '%' | '!' | '+' | '_' | '?' | '-' | '|' | ',' | ' '
-   ;
+    : '.'
+    | ':'
+    | '^'
+    | '*'
+    | '$'
+    | '@'
+    | '%'
+    | '!'
+    | '+'
+    | '_'
+    | '?'
+    | '-'
+    | '|'
+    | ','
+    | ' '
+    ;

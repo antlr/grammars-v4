@@ -29,135 +29,138 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar alpaca;
 
 prog
-   : defns ('.' | 'begin') EOF
-   ;
+    : defns ('.' | 'begin') EOF
+    ;
 
 defns
-   : defn (';' defn)*
-   ;
+    : defn (';' defn)*
+    ;
 
 defn
-   : stateDefn
-   | classDefn
-   | nbhdDefn
-   ;
+    : stateDefn
+    | classDefn
+    | nbhdDefn
+    ;
 
 stateDefn
-   : 'state' stateID QUOTEDCHAR? membershipDecl* rules?
-   ;
+    : 'state' stateID QUOTEDCHAR? membershipDecl* rules?
+    ;
 
 classDefn
-   : 'class' classID membershipDecl* rules?
-   ;
+    : 'class' classID membershipDecl* rules?
+    ;
 
 nbhdDefn
-   : 'neighbourhood' nbhdID neigbourhood
-   ;
+    : 'neighbourhood' nbhdID neigbourhood
+    ;
 
 classID
-   : identifier
-   ;
+    : identifier
+    ;
 
 stateID
-   : identifier
-   ;
+    : identifier
+    ;
 
 nbhdID
-   : identifier
-   ;
+    : identifier
+    ;
 
 membershipDecl
-   : classRef
-   ;
+    : classRef
+    ;
 
 classRef
-   : 'is' classID
-   ;
+    : 'is' classID
+    ;
 
 rules
-   : rule_ (',' rule_)*
-   ;
+    : rule_ (',' rule_)*
+    ;
 
 rule_
-   : 'to' stateRef ('when' expression)?
-   ;
+    : 'to' stateRef ('when' expression)?
+    ;
 
 stateRef
-   : stateID
-   | arrowchain
-   | 'me'
-   ;
+    : stateID
+    | arrowchain
+    | 'me'
+    ;
 
 expression
-   : term (('and' | 'or' | 'xor') term)*
-   ;
+    : term (('and' | 'or' | 'xor') term)*
+    ;
 
 term
-   : adjacencyPred
-   | '(' expression ')'
-   | 'not' term
-   | boolPrimitive
-   | relationalPred
-   ;
+    : adjacencyPred
+    | '(' expression ')'
+    | 'not' term
+    | boolPrimitive
+    | relationalPred
+    ;
 
 relationalPred
-   : stateRef ('='? stateRef | classRef)
-   ;
+    : stateRef ('='? stateRef | classRef)
+    ;
 
 adjacencyPred
-   : naturalnumber ('in' (neigbourhood | nbhdID))? (stateRef | classRef)
-   ;
+    : naturalnumber ('in' (neigbourhood | nbhdID))? (stateRef | classRef)
+    ;
 
 boolPrimitive
-   : 'true'
-   | 'false'
-   | 'guess'
-   ;
+    : 'true'
+    | 'false'
+    | 'guess'
+    ;
 
 neigbourhood
-   : '(' arrowchain* ')'
-   ;
+    : '(' arrowchain* ')'
+    ;
 
 identifier
-   : ALPHA (ALPHA | DIGIT)*
-   ;
+    : ALPHA (ALPHA | DIGIT)*
+    ;
 
 naturalnumber
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 arrowchain
-   : ARROW+
-   ;
+    : ARROW+
+    ;
 
 QUOTEDCHAR
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 QUOTE
-   : '"'
-   ;
+    : '"'
+    ;
 
 ALPHA
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 ARROW
-   : [^v<>]
-   ;
+    : [^v<>]
+    ;
 
 COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
+    : '/*' .*? '*/' -> skip
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;

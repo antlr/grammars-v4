@@ -33,152 +33,160 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
     https://www.ietf.org/rfc/rfc5228.txt
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar sieve;
 
 start_
-   : commands EOF
-   ;
+    : commands EOF
+    ;
 
 commands
-   : command+
-   ;
+    : command+
+    ;
 
 command
-   : IDENTIFIER arguments (';' | block)
-   ;
+    : IDENTIFIER arguments (';' | block)
+    ;
 
 arguments
-   : argument* (test | testlist)?
-   ;
+    : argument* (test | testlist)?
+    ;
 
 argument
-   : stringlist
-   | string
-   | NUMBER
-   | TAG
-   ;
+    : stringlist
+    | string
+    | NUMBER
+    | TAG
+    ;
 
 testlist
-   : '(' test (',' test)* ')'
-   ;
+    : '(' test (',' test)* ')'
+    ;
 
 test
-   : IDENTIFIER arguments
-   ;
+    : IDENTIFIER arguments
+    ;
 
 stringlist
-   : '[' string (',' string)* ']'
-   ;
+    : '[' string (',' string)* ']'
+    ;
 
 string
-   : QUOTEDSTRING
-   | multiline
-   ;
+    : QUOTEDSTRING
+    | multiline
+    ;
 
 block
-   : '{' commands '}'
-   ;
+    : '{' commands '}'
+    ;
 
 multiline
-   : 'text:' (multilineliteral | multilinedotstart)* '.'
-   ;
+    : 'text:' (multilineliteral | multilinedotstart)* '.'
+    ;
 
 comparator
-   : ':comparator' string
-   ;
+    : ':comparator' string
+    ;
 
 multilineliteral
-   : OCTETNOTPERIOD OCTETNOTCRLF*
-   ;
+    : OCTETNOTPERIOD OCTETNOTCRLF*
+    ;
 
 multilinedotstart
-   : '.' OCTETNOTCRLF+
-   ;
+    : '.' OCTETNOTCRLF+
+    ;
 
 LINECOMMENT
-   : '#' ~ [\r\n]* -> skip
-   ;
+    : '#' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \t\r\n]+ -> skip
-   ;
+    : [ \t\r\n]+ -> skip
+    ;
 
 QUOTEDSTRING
-   : '"' OCTETNOTQSPECIAL+ '"'
-   ;
+    : '"' OCTETNOTQSPECIAL+ '"'
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 ALPHA
-   : [A-Za-z]
-   ;
+    : [A-Za-z]
+    ;
 
 IDENTIFIER
-   : (ALPHA | '_') (ALPHA | DIGIT | '_')*
-   ;
+    : (ALPHA | '_') (ALPHA | DIGIT | '_')*
+    ;
 
 TAG
-   : ':' IDENTIFIER
-   ;
-   // a single octet other than NUL, CR, or LF
+    : ':' IDENTIFIER
+    ;
+
+// a single octet other than NUL, CR, or LF
 
 OCTETNOTCRLF
-   : [\u0001-\u0009]
-   | [\u000B-\u000C]
-   | [\u000E-\u00FF]
-   ;
-   // a single octet other than NUL,CR, LF, or period
+    : [\u0001-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u00FF]
+    ;
+
+// a single octet other than NUL,CR, LF, or period
 
 OCTETNOTPERIOD
-   : [\u0001-\u0009]
-   | [\u000B-\u000C]
-   | [\u000E-\u002D]
-   | [\u002F-\u00FF]
-   ;
-   // a single octet other than NUL, CR, LF, double-quote, or backslash
+    : [\u0001-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u002D]
+    | [\u002F-\u00FF]
+    ;
+
+// a single octet other than NUL, CR, LF, double-quote, or backslash
 
 OCTETNOTQSPECIAL
-   : [\u0001-\u0009]
-   | [\u000B-\u000C]
-   | [\u000E-\u0021]
-   | [\u0023-\u005B]
-   | [\u005D-\u00FF]
-   ;
-   // either a CRLF pair, OR a single octet other than NUL, CR, LF, or star
+    : [\u0001-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u0021]
+    | [\u0023-\u005B]
+    | [\u005D-\u00FF]
+    ;
+
+// either a CRLF pair, OR a single octet other than NUL, CR, LF, or star
 
 NOTSTAR
-   : [\u0001-\u0009]
-   | [\u000B-\u000C]
-   | [\u000E-\u0029]
-   | [\u002B-\u00FF]
-   ;
-   // either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
+    : [\u0001-\u0009]
+    | [\u000B-\u000C]
+    | [\u000E-\u0029]
+    | [\u002B-\u00FF]
+    ;
+
+// either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
 
 ADDRESSPART
-   : ':localpart'
-   | ':domain'
-   | ':all'
-   ;
+    : ':localpart'
+    | ':domain'
+    | ':all'
+    ;
 
 MATCHTYPE
-   : ':is'
-   | ':contains'
-   | ':matches'
-   ;
+    : ':is'
+    | ':contains'
+    | ':matches'
+    ;
 
 NUMBER
-   : DIGIT+ QUANTIFIER?
-   ;
+    : DIGIT+ QUANTIFIER?
+    ;
 
 STAR
-   : '*'
-   ;
+    : '*'
+    ;
 
 QUANTIFIER
-   : 'K'
-   | 'M'
-   | 'G'
-   ;
-
+    : 'K'
+    | 'M'
+    | 'G'
+    ;
