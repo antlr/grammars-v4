@@ -56,5 +56,5 @@ with t as (select 1 as c, 2 as d)
 select * from t group by all;
 SELECT COLLATE(c1, 'en_US-ci-as');
 
-select network from T1
-select outbound from T1
+select network from T1;
+select outbound from T1;
