@@ -196,7 +196,6 @@ COLUMN_MASTER_KEY:                     'COLUMN_MASTER_KEY';
 COL_LENGTH:                            'COL_LENGTH';
 COL_NAME:                              'COL_NAME';
 CODEPAGE:                              'CODEPAGE';
-CODE_PAGE:                             'code_page';
 COMMIT:                                'COMMIT';
 COMMITTED:                             'COMMITTED';
 COMPATIBILITY_LEVEL:                   'COMPATIBILITY_LEVEL';
