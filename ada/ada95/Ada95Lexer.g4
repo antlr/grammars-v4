@@ -21,144 +21,150 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar Ada95Lexer;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
-ABORT             : 'abort';
-ABS               : 'abs';
-ABSTRACT          : 'abstract';
-ACCEPT_           : 'accept';
-ACCESS            : 'access';
-ALIASED           : 'aliased';
-ALL               : 'all';
-AND               : 'and';
-ARRAY             : 'array';
-AT                : 'at';
+ABORT    : 'abort';
+ABS      : 'abs';
+ABSTRACT : 'abstract';
+ACCEPT_  : 'accept';
+ACCESS   : 'access';
+ALIASED  : 'aliased';
+ALL      : 'all';
+AND      : 'and';
+ARRAY    : 'array';
+AT       : 'at';
 
-BEGIN             : 'begin';
-BODY_             : 'body';
+BEGIN : 'begin';
+BODY_ : 'body';
 
-CASE              : 'case';
-CONSTANT          : 'constant';
+CASE     : 'case';
+CONSTANT : 'constant';
 
-DECLARE           : 'declare';
-DELAY             : 'delay';
-DELTA             : 'delta';
-DIGITS            : 'digits';
-DO                : 'do';
+DECLARE : 'declare';
+DELAY   : 'delay';
+DELTA   : 'delta';
+DIGITS  : 'digits';
+DO      : 'do';
 
-ELSE              : 'else';
-ELSIF             : 'elsif';
-END               : 'end';
-ENTRY             : 'entry';
-EXCEPTION         : 'exception';
-EXIT              : 'exit';
+ELSE      : 'else';
+ELSIF     : 'elsif';
+END       : 'end';
+ENTRY     : 'entry';
+EXCEPTION : 'exception';
+EXIT      : 'exit';
 
-FOR               : 'for';
-FUNCTION          : 'function';
+FOR      : 'for';
+FUNCTION : 'function';
 
-GENERIC           : 'generic';
-GOTO              : 'goto';
+GENERIC : 'generic';
+GOTO    : 'goto';
 
-IF                : 'if';
-IN                : 'in';
-IS                : 'is';
+IF : 'if';
+IN : 'in';
+IS : 'is';
 
-LIMITED           : 'limited';
-LOOP              : 'loop';
+LIMITED : 'limited';
+LOOP    : 'loop';
 
-MOD               : 'mod';
+MOD: 'mod';
 
-NEW               : 'new';
-NOT               : 'not';
-NULL_             : 'null';
+NEW   : 'new';
+NOT   : 'not';
+NULL_ : 'null';
 
-OF                : 'of';
-OR                : 'or';
-OTHERS            : 'others';
-OUT               : 'out';
+OF     : 'of';
+OR     : 'or';
+OTHERS : 'others';
+OUT    : 'out';
 
-PACKAGE           : 'package';
-PRAGMA            : 'pragma';
-PRIVATE           : 'private';
-PROCEDURE         : 'procedure';
-PROTECTED         : 'protected';
+PACKAGE   : 'package';
+PRAGMA    : 'pragma';
+PRIVATE   : 'private';
+PROCEDURE : 'procedure';
+PROTECTED : 'protected';
 
-RAISE             : 'raise';
-RANGE_            : 'range';
-RECORD            : 'record';
-REM               : 'rem';
-RENAMES           : 'renames';
-REQUEUE           : 'requeue';
-RETURN            : 'return';
-REVERSE           : 'reverse';
+RAISE   : 'raise';
+RANGE_  : 'range';
+RECORD  : 'record';
+REM     : 'rem';
+RENAMES : 'renames';
+REQUEUE : 'requeue';
+RETURN  : 'return';
+REVERSE : 'reverse';
 
-SELECT            : 'select';
-SEPARATE          : 'separate';
-SUBTYPE           : 'subtype';
+SELECT   : 'select';
+SEPARATE : 'separate';
+SUBTYPE  : 'subtype';
 
-TAGGED            : 'tagged';
-TASK              : 'task';
-TERMINATE         : 'terminate';
-THEN              : 'then';
-TYPE              : 'type';
+TAGGED    : 'tagged';
+TASK      : 'task';
+TERMINATE : 'terminate';
+THEN      : 'then';
+TYPE      : 'type';
 
-UNTIL             : 'until';
-USE               : 'use';
+UNTIL : 'until';
+USE   : 'use';
 
-WHEN              : 'when';
-WHILE             : 'while';
-WITH              : 'with';
+WHEN  : 'when';
+WHILE : 'while';
+WITH  : 'with';
 
-XOR               : 'xor';
+XOR: 'xor';
 
-WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
-LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
+WHITESPACE   : [ \t\r\n]+    -> channel(HIDDEN);
+LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 
-IDENTIFIER_       : LETTER+ [A-Z_0-9]*;
-NUMERIC_LITERAL_  : DECIMAL_LITERAL_ | BASED_LITERAL;
-DECIMAL_LITERAL_  : NUMERAL ('.' NUMERAL)? EXPONENT?;
-NUMERAL           : DIGIT+ ('_'? DIGIT)*;
-EXPONENT          : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
-BASED_LITERAL     : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
-BASED_NUMERAL     : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
-EXTENDED_DIGIT    : DIGIT | [A-F];
-BASE              : NUMERAL;
+IDENTIFIER_      : LETTER+ [A-Z_0-9]*;
+NUMERIC_LITERAL_ : DECIMAL_LITERAL_ | BASED_LITERAL;
+DECIMAL_LITERAL_ : NUMERAL ('.' NUMERAL)? EXPONENT?;
+NUMERAL          : DIGIT+ ('_'? DIGIT)*;
+EXPONENT         : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
+BASED_LITERAL    : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
+BASED_NUMERAL    : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
+EXTENDED_DIGIT   : DIGIT | [A-F];
+BASE             : NUMERAL;
 
 CHARACTER_LITERAL : '\'' ~['\\\r\n] '\'';
-STRING_LITERAL_   : '"' ('""' | ~'"' )* '"';
+STRING_LITERAL_   : '"' ('""' | ~'"')* '"';
 
-fragment LETTER   : [A-Z];
-fragment DIGIT    : [0-9];
+fragment LETTER : [A-Z];
+fragment DIGIT  : [0-9];
 
-HASH              : '#';
-AMPERSAND         : '&';
-LP                : '(';
-RP                : ')';
-MULT              : '*';
-PLUS              : '+';
-COMMA             : ',';
-MINUS             : '-';
-DOT               : '.';
-COLON             : ':';
-SEMI              : ';';
-LT                : '<';
-EQ                : '=';
-GT                : '>';
-US                : '_';
-VL                : '|';
-DIV               : '/';
-EP                : '!';
-PS                : '%';
-ARROW             : '=>';
-DOTDOT            : '..';
-EXPON             : '**';
-ASSIGN            : ':=';
-NE                : '/=';
-GE                : '>=';
-LE                : '<=';
-LLB               : '<<';
-RLB               : '>>';
-BOX               : '<>';
-SQ                : '\'';
+HASH      : '#';
+AMPERSAND : '&';
+LP        : '(';
+RP        : ')';
+MULT      : '*';
+PLUS      : '+';
+COMMA     : ',';
+MINUS     : '-';
+DOT       : '.';
+COLON     : ':';
+SEMI      : ';';
+LT        : '<';
+EQ        : '=';
+GT        : '>';
+US        : '_';
+VL        : '|';
+DIV       : '/';
+EP        : '!';
+PS        : '%';
+ARROW     : '=>';
+DOTDOT    : '..';
+EXPON     : '**';
+ASSIGN    : ':=';
+NE        : '/=';
+GE        : '>=';
+LE        : '<=';
+LLB       : '<<';
+RLB       : '>>';
+BOX       : '<>';
+SQ        : '\'';

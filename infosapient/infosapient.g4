@@ -29,79 +29,119 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar infosapient;
 
 conditionalRule
-   : IDENTIFIER premise consequent ';' EOF
-   ;
+    : IDENTIFIER premise consequent ';' EOF
+    ;
 
 premise
-   : IF clause
-   ;
+    : IF clause
+    ;
 
 consequent
-   : THEN attribClause (ELSE attribClause)?
-   ;
+    : THEN attribClause (ELSE attribClause)?
+    ;
 
 clause
-   : '(' clause ')'
-   | ((expr | attribClause) operator_ (expr | attribClause) (operator_ (expr | attribClause))*)
-   ;
+    : '(' clause ')'
+    | ((expr | attribClause) operator_ (expr | attribClause) (operator_ (expr | attribClause))*)
+    ;
 
 expr
-   : '(' expr ')'
-   | attribClause
-   ;
+    : '(' expr ')'
+    | attribClause
+    ;
 
 attribClause
-   : id_ ('s' | 'are') (hedgeCollection)? (nLiteral | id_ | restrictionHedge)
-   ;
+    : id_ ('s' | 'are') (hedgeCollection)? (nLiteral | id_ | restrictionHedge)
+    ;
 
 hedgeCollection
-   : (hedge)+
-   ;
+    : (hedge)+
+    ;
 
 restrictionHedge
-   : ('increased' | 'decreased')
-   ;
+    : ('increased' | 'decreased')
+    ;
 
 hedge
-   : ('about' | 'above' | 'after' | 'around' | 'before' | 'below' | 'closeTo' | 'definitely' | 'extremely' | 'generally' | 'mostly' | 'must' | 'near' | ('negative' | 'negatively') | 'not' | ('positive' | 'positively') | 'roughly' | 'should' | 'slightly' | 'somewhat' | 'very' | 'inVicinityOf')
-   ;
+    : (
+        'about'
+        | 'above'
+        | 'after'
+        | 'around'
+        | 'before'
+        | 'below'
+        | 'closeTo'
+        | 'definitely'
+        | 'extremely'
+        | 'generally'
+        | 'mostly'
+        | 'must'
+        | 'near'
+        | ('negative' | 'negatively')
+        | 'not'
+        | ('positive' | 'positively')
+        | 'roughly'
+        | 'should'
+        | 'slightly'
+        | 'somewhat'
+        | 'very'
+        | 'inVicinityOf'
+    )
+    ;
 
 operator_
-   : ('and' | 'boundedAnd' | 'cosineNot' | 'meanAnd' | 'meanOr' | 'or' | 'productAnd' | 'productOr' | 'sugenoNot' | 'thresholdNot' | 'yagerAnd' | 'yagerNot' | 'yagerOr')
-   ;
+    : (
+        'and'
+        | 'boundedAnd'
+        | 'cosineNot'
+        | 'meanAnd'
+        | 'meanOr'
+        | 'or'
+        | 'productAnd'
+        | 'productOr'
+        | 'sugenoNot'
+        | 'thresholdNot'
+        | 'yagerAnd'
+        | 'yagerNot'
+        | 'yagerOr'
+    )
+    ;
 
 nLiteral
-   : FP_LITERAL
-   ;
+    : FP_LITERAL
+    ;
 
 id_
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 FP_LITERAL
-   : [0-9]* '.' [0-9]*
-   ;
+    : [0-9]* '.' [0-9]*
+    ;
 
 IF
-   : 'if'
-   ;
+    : 'if'
+    ;
 
 THEN
-   : 'then'
-   ;
+    : 'then'
+    ;
 
 ELSE
-   : 'else'
-   ;
+    : 'else'
+    ;
 
 WS
-   : [\r\n\t]+ -> skip
-   ;
-
+    : [\r\n\t]+ -> skip
+    ;

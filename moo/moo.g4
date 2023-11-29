@@ -36,382 +36,357 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * https://www.hayseed.net/MOO/manuals/ProgrammersManual.html
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar moo;
 
 prog
-   : declaration + EOF
-   ;
+    : declaration+ EOF
+    ;
 
 declaration
-   : programdecl
-   | verbdecl
-   | propertydecl
-   | rmpropertydecl
-   | setpropertydecl
-   | displaypropertydecl
-   | kidsdecl
-   | parentdecl
-   | describedecl
-   | contentsdecl
-   | noteditdecl
-   | createdecl
-   | editdecl
-   | addaliasdecl
-   ;
+    : programdecl
+    | verbdecl
+    | propertydecl
+    | rmpropertydecl
+    | setpropertydecl
+    | displaypropertydecl
+    | kidsdecl
+    | parentdecl
+    | describedecl
+    | contentsdecl
+    | noteditdecl
+    | createdecl
+    | editdecl
+    | addaliasdecl
+    ;
 
 programdecl
-   : '@program' programname ':' name statement + '.'
-   ;
+    : '@program' programname ':' name statement+ '.'
+    ;
 
 programname
-   : name
-   | stringliteral
-   ;
+    : name
+    | stringliteral
+    ;
 
 verbdecl
-   : '@verb' (verbname ':' name) name + permissions?
-   ;
+    : '@verb' (verbname ':' name) name+ permissions?
+    ;
 
 verbname
-   : name
-   | stringliteral
-   ;
+    : name
+    | stringliteral
+    ;
 
 propertydecl
-   : ('@property' | '@prop') property_ '='? expression? permissions?
-   ;
+    : ('@property' | '@prop') property_ '='? expression? permissions?
+    ;
 
 rmpropertydecl
-   : ('@rmproperty' | '@rmprop') name
-   ;
+    : ('@rmproperty' | '@rmprop') name
+    ;
 
 setpropertydecl
-   : '@set' property_ 'to' expression
-   ;
+    : '@set' property_ 'to' expression
+    ;
 
 displaypropertydecl
-   : ('@display' | '@disp') property_
-   ;
+    : ('@display' | '@disp') property_
+    ;
 
 kidsdecl
-   : '@kids' name
-   ;
+    : '@kids' name
+    ;
 
 parentdecl
-   : '@parent' name
-   ;
+    : '@parent' name
+    ;
 
 describedecl
-   : '@describe' property_ 'as' expression
-   ;
+    : '@describe' property_ 'as' expression
+    ;
 
 contentsdecl
-   : '@contents' name
-   ;
+    : '@contents' name
+    ;
 
 noteditdecl
-   : '@notedit' property_
-   ;
+    : '@notedit' property_
+    ;
 
 createdecl
-   : '@create' sysname 'called' expressionlist
-   ;
+    : '@create' sysname 'called' expressionlist
+    ;
 
 editdecl
-   : '@edit' property_
-   ;
+    : '@edit' property_
+    ;
 
 addaliasdecl
-   : '@addalias' name (',' name)* 'to' expression
-   ;
+    : '@addalias' name (',' name)* 'to' expression
+    ;
 
 statement
-   : ifblock
-   | whileblock
-   | doblock
-   | forblock
-   | assignblock
-   | tryblock
-   | command SEMICOLON
-   ;
+    : ifblock
+    | whileblock
+    | doblock
+    | forblock
+    | assignblock
+    | tryblock
+    | command SEMICOLON
+    ;
 
 ifblock
-   : 'if' condition statement + ('elseif' condition statement +)? ('else' statement +)? 'endif' ';'?
-   ;
+    : 'if' condition statement+ ('elseif' condition statement+)? ('else' statement+)? 'endif' ';'?
+    ;
 
 whileblock
-   : 'while' condition statement +
-   ;
+    : 'while' condition statement+
+    ;
 
 doblock
-   : 'do' statement + 'while' condition
-   ;
+    : 'do' statement+ 'while' condition
+    ;
 
 forblock
-   : 'for' name 'in' expression statement + 'endfor'
-   ;
+    : 'for' name 'in' expression statement+ 'endfor'
+    ;
 
 tryblock
-   : 'try' statement + 'except' property_ statement + 'endtry'
-   ;
+    : 'try' statement+ 'except' property_ statement+ 'endtry'
+    ;
 
 assignblock
-   : property_ ASSIGN expression SEMICOLON
-   ;
+    : property_ ASSIGN expression SEMICOLON
+    ;
 
 condition
-   : LPAREN expression (relop expression)* RPAREN
-   ;
+    : LPAREN expression (relop expression)* RPAREN
+    ;
 
 relop
-   : EQ
-   | NEQ
-   | GT
-   | GTE
-   | LT
-   | LTE
-   | AND
-   | OR
-   ;
+    : EQ
+    | NEQ
+    | GT
+    | GTE
+    | LT
+    | LTE
+    | AND
+    | OR
+    ;
 
 expressionlist
-   : expression (COMMA expression)*
-   ;
+    : expression (COMMA expression)*
+    ;
 
 expression
-   : term ((PLUS | MINUS) term)*
-   ;
+    : term ((PLUS | MINUS) term)*
+    ;
 
 term
-   : factor ((TIMES | DIV | MOD) factor)*
-   ;
+    : factor ((TIMES | DIV | MOD) factor)*
+    ;
 
 factor
-   : signedAtom (POW signedAtom)*
-   ;
+    : signedAtom (POW signedAtom)*
+    ;
 
 signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | atom
-   ;
+    : PLUS signedAtom
+    | MINUS signedAtom
+    | atom
+    ;
 
 atom
-   : stringliteral
-   | functioninvocation
-   | verbinvocation
-   | property_
-   | integer
-   | real
-   | list_
-   | objref
-   | '(' expression ')'
-   | ('!' expression)
-   ;
+    : stringliteral
+    | functioninvocation
+    | verbinvocation
+    | property_
+    | integer
+    | real
+    | list_
+    | objref
+    | '(' expression ')'
+    | ('!' expression)
+    ;
 
 objref
-   : OBJREF
-   ;
+    : OBJREF
+    ;
 
 functioninvocation
-   : name '(' expressionlist ')'
-   ;
+    : name '(' expressionlist ')'
+    ;
 
 command
-   : verbinvocation
-   | returncommand
-   ;
+    : verbinvocation
+    | returncommand
+    ;
 
 returncommand
-   : 'return' expression?
-   ;
+    : 'return' expression?
+    ;
 
 verbinvocation
-   : property_ ':' verb
-   ;
+    : property_ ':' verb
+    ;
 
 verb
-   : name ('(' expressionlist? ')')?
-   ;
+    : name ('(' expressionlist? ')')?
+    ;
 
 property_
-   : propertyname (('.' name) | '[' expression ']')*
-   ;
+    : propertyname (('.' name) | '[' expression ']')*
+    ;
 
 propertyname
-   : name
-   | stringliteral
-   ;
+    : name
+    | stringliteral
+    ;
 
 list_
-   : '{' expressionlist? '}'
-   ;
+    : '{' expressionlist? '}'
+    ;
 
 stringliteral
-   : STRINGLITERAL
-   ;
+    : STRINGLITERAL
+    ;
 
 integer
-   : INTEGER
-   ;
+    : INTEGER
+    ;
 
 real
-   : REAL
-   ;
+    : REAL
+    ;
 
 name
-   : username
-   | sysname
-   ;
+    : username
+    | sysname
+    ;
 
 sysname
-   : DOLLAR STRING?
-   ;
+    : DOLLAR STRING?
+    ;
 
 username
-   : STRING
-   ;
+    : STRING
+    ;
 
 permissions
-   : PERMISSIONS
-   ;
-
+    : PERMISSIONS
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 MOD
-   : '%'
-   ;
-
+    : '%'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 GTE
-   : '>='
-   ;
-
+    : '>='
+    ;
 
 LTE
-   : '<='
-   ;
-
+    : '<='
+    ;
 
 EQ
-   : '=='
-   ;
-
+    : '=='
+    ;
 
 AND
-   : '&&'
-   ;
-
+    : '&&'
+    ;
 
 OR
-   : '||'
-   ;
-
+    : '||'
+    ;
 
 NEQ
-   : '!='
-   ;
-
+    : '!='
+    ;
 
 POW
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 ASSIGN
-   : '='
-   ;
-
+    : '='
+    ;
 
 SEMICOLON
-   : ';'
-   ;
-
+    : ';'
+    ;
 
 DOLLAR
-   : '$'
-   ;
-
+    : '$'
+    ;
 
 OBJREF
-   : '#' [0-9] +
-   ;
-
+    : '#' [0-9]+
+    ;
 
 PERMISSIONS
-   : [rcxd] +
-   ;
-
+    : [rcxd]+
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9!_*] +
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9!_*]+
+    ;
 
 STRINGLITERAL
-   : '"' ~ ["]* '"'
-   ;
-
+    : '"' ~ ["]* '"'
+    ;
 
 INTEGER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 REAL
-   : [0-9] + '.' [0-9] +
-   ;
-
+    : [0-9]+ '.' [0-9]+
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
-
+    : ';' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \r\n\t] -> skip
-   ;
+    : [ \r\n\t] -> skip
+    ;

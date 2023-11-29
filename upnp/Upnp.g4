@@ -26,60 +26,135 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar Upnp;
+
 /*
  * Parser Rules
  */
- 
-searchCrit : (searchExp | ASTERISK) EOF;
-searchExp : relExp | searchExp WCHAR+ LOGOP WCHAR+ searchExp | '(' WCHAR* searchExp WCHAR* ')'  ;
-relExp : PROPERTY WCHAR+ BINOP WCHAR+ quotedVal | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL ;
-quotedVal : DQUOTE escapedQuote DQUOTE ;
-escapedQuote :   STRING_LITERAL* WCHAR* STRING_LITERAL*;
- 
+
+searchCrit
+    : (searchExp | ASTERISK) EOF
+    ;
+
+searchExp
+    : relExp
+    | searchExp WCHAR+ LOGOP WCHAR+ searchExp
+    | '(' WCHAR* searchExp WCHAR* ')'
+    ;
+
+relExp
+    : PROPERTY WCHAR+ BINOP WCHAR+ quotedVal
+    | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL
+    ;
+
+quotedVal
+    : DQUOTE escapedQuote DQUOTE
+    ;
+
+escapedQuote
+    : STRING_LITERAL* WCHAR* STRING_LITERAL*
+    ;
+
 /*
  * Lexer Rules
  */
- 
-NUMBER     : [0-9]+ ;
- 
-WHITESPACE : [\r\t\n] -> skip ;
 
-LOGOP : 'and' | 'or' ;
-BINOP : RELOP | STRINGOP ;
-RELOP : '=' | '!=' | '<' | '<=' | '>' | '>=' ;
-STRINGOP : 'contains' | 'doesnotcontain' | 'derivedfrom' ;
-EXISTSOP : 'exists' ;
-BOOLVAL : 'true' | 'false' ;
-WCHAR : SPACE | HTAB ;
-PROPERTY	: 'res@resolution'
-				| 'res@duration'
-				| 'dc:title'
-				| 'dc:creator'
-				| 'upnp:actor'
-				| 'upnp:artist'
-				| 'upnp:genre'
-				| 'upnp:album'
-				| 'dc:date'
-				| 'upnp:class'
-				| '@id'
-				| '@refID'
-				| '@protocolInfo'
-				| 'upnp:author'
-				| 'dc:description'
-				| 'pv:avKeywords'
-				| 'pv:rating'
-				| 'upnp:seriesTitle'
-				| 'upnp:episodeNumber'
-				| 'upnp:director'
-				| 'upnp:rating'
-				| 'upnp:channelNr'
-				| 'upnp:channelName'
-				| 'upnp:longDescription'
-				| 'pv:capturedate'
-				| 'pv:custom' ;
-HTAB 		 :	 '\t' ;
-SPACE        :   ' '  ;      
-DQUOTE       :   '"' ;    
-ASTERISK     :   '*'  ;
-STRING_LITERAL : [a-zA-Z.] | '\\"';  
+NUMBER
+    : [0-9]+
+    ;
+
+WHITESPACE
+    : [\r\t\n] -> skip
+    ;
+
+LOGOP
+    : 'and'
+    | 'or'
+    ;
+
+BINOP
+    : RELOP
+    | STRINGOP
+    ;
+
+RELOP
+    : '='
+    | '!='
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    ;
+
+STRINGOP
+    : 'contains'
+    | 'doesnotcontain'
+    | 'derivedfrom'
+    ;
+
+EXISTSOP
+    : 'exists'
+    ;
+
+BOOLVAL
+    : 'true'
+    | 'false'
+    ;
+
+WCHAR
+    : SPACE
+    | HTAB
+    ;
+
+PROPERTY
+    : 'res@resolution'
+    | 'res@duration'
+    | 'dc:title'
+    | 'dc:creator'
+    | 'upnp:actor'
+    | 'upnp:artist'
+    | 'upnp:genre'
+    | 'upnp:album'
+    | 'dc:date'
+    | 'upnp:class'
+    | '@id'
+    | '@refID'
+    | '@protocolInfo'
+    | 'upnp:author'
+    | 'dc:description'
+    | 'pv:avKeywords'
+    | 'pv:rating'
+    | 'upnp:seriesTitle'
+    | 'upnp:episodeNumber'
+    | 'upnp:director'
+    | 'upnp:rating'
+    | 'upnp:channelNr'
+    | 'upnp:channelName'
+    | 'upnp:longDescription'
+    | 'pv:capturedate'
+    | 'pv:custom'
+    ;
+
+HTAB
+    : '\t'
+    ;
+
+SPACE
+    : ' '
+    ;
+
+DQUOTE
+    : '"'
+    ;
+
+ASTERISK
+    : '*'
+    ;
+
+STRING_LITERAL
+    : [a-zA-Z.]
+    | '\\"'
+    ;

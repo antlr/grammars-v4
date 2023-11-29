@@ -3,6 +3,8 @@
 alter table ship_class add column ship_spec varchar(150) first, add somecol int after start_build;
 alter table t3 add column (c2 decimal(10, 2) comment 'comment`' null, c3 enum('abc', 'cba', 'aaa')), add index t3_i1 using btree (c2) comment 'some index';
 alter table t3 add column (c2 decimal(10, 2), c3 int);
+ALTER TABLE `deals` ADD INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as DOUBLE)));
+ALTER TABLE `deals` ADD INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as FLOAT)));
 alter table t3 alter index t3_i1 invisible;
 alter table t3 alter index t3_i1 visible;
 alter table t3 rename index t3_i1 to t3_i2;

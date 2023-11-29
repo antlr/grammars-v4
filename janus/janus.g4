@@ -29,114 +29,117 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar janus;
 
 program
-   : (IDENT ('[' NUM ']')?)* ('PROCEDURE' IDENT statements)* EOF
-   ;
+    : (IDENT ('[' NUM ']')?)* ('PROCEDURE' IDENT statements)* EOF
+    ;
 
 statements
-   : statement+
-   ;
+    : statement+
+    ;
 
 statement
-   : ifstmt
-   | dostmt
-   | callstmt
-   | readstmt
-   | writestmt
-   | lvalstmt
-   ;
+    : ifstmt
+    | dostmt
+    | callstmt
+    | readstmt
+    | writestmt
+    | lvalstmt
+    ;
 
 ifstmt
-   : 'IF' expression ('THEN' statements)? ('ELSE' statements)? 'FI' expression
-   ;
+    : 'IF' expression ('THEN' statements)? ('ELSE' statements)? 'FI' expression
+    ;
 
 dostmt
-   : 'FROM' expression ('DO' statements)? ('LOOP' statements)? 'UNTIL' expression
-   ;
+    : 'FROM' expression ('DO' statements)? ('LOOP' statements)? 'UNTIL' expression
+    ;
 
 callstmt
-   : 'CALL' IDENT
-   | 'UNCALL' IDENT
-   ;
+    : 'CALL' IDENT
+    | 'UNCALL' IDENT
+    ;
 
 readstmt
-   : 'READ' IDENT
-   ;
+    : 'READ' IDENT
+    ;
 
 writestmt
-   : 'WRITE' IDENT
-   ;
+    : 'WRITE' IDENT
+    ;
 
 lvalstmt
-   : lvalue modstmt
-   | lvalue swapstmt
-   ;
+    : lvalue modstmt
+    | lvalue swapstmt
+    ;
 
 modstmt
-   : '+=' expression
-   | '-=' expression
-   | '!=' expression
-   | '<=>' expression
-   ;
+    : '+=' expression
+    | '-=' expression
+    | '!=' expression
+    | '<=>' expression
+    ;
 
 swapstmt
-   : ':' lvalue
-   ;
+    : ':' lvalue
+    ;
 
 expression
-   : minexp
-   | minexp BINOP expression
-   ;
+    : minexp
+    | minexp BINOP expression
+    ;
 
 minexp
-   : '(' expression ')'
-   | '-' expression
-   | '~' expression
-   | lvalue
-   | constant
-   ;
+    : '(' expression ')'
+    | '-' expression
+    | '~' expression
+    | lvalue
+    | constant
+    ;
 
 lvalue
-   : IDENT
-   | IDENT '[' expression ']'
-   ;
+    : IDENT
+    | IDENT '[' expression ']'
+    ;
 
 constant
-   : NUM
-   ;
+    : NUM
+    ;
 
 BINOP
-   : '+'
-   | '-'
-   | '!'
-   | '<'
-   | '>'
-   | '&'
-   | '|'
-   | '='
-   | '#'
-   | '<='
-   | '>='
-   | '*'
-   | '/'
-   | '\\'
-   ;
+    : '+'
+    | '-'
+    | '!'
+    | '<'
+    | '>'
+    | '&'
+    | '|'
+    | '='
+    | '#'
+    | '<='
+    | '>='
+    | '*'
+    | '/'
+    | '\\'
+    ;
 
 IDENT
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 NUM
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
+    : ';' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \t\r\n]+ -> skip
-   ;
-
+    : [ \t\r\n]+ -> skip
+    ;

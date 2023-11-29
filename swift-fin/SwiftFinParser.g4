@@ -21,56 +21,76 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar SwiftFinParser;
 
 options {
-	tokenVocab = SwiftFinLexer ;
+    tokenVocab = SwiftFinLexer;
 }
 
-messages : message+ EOF
-         ;
+messages
+    : message+ EOF
+    ;
 
-message : block1 block2? block3? block4? block5?
-        ;
+message
+    : block1 block2? block3? block4? block5?
+    ;
 
-block1 : BLOCK1 value V_END
-       ;
+block1
+    : BLOCK1 value V_END
+    ;
 
-block2 : BLOCK2 value V_END
-       ;
+block2
+    : BLOCK2 value V_END
+    ;
 
-block3 : BLOCK3 map_ RBRACE
-       ;
+block3
+    : BLOCK3 map_ RBRACE
+    ;
 
-block4 : BLOCK4_A block4Item+ B4_END
-       | BLOCK4_B map_ RBRACE
-       ;
+block4
+    : BLOCK4_A block4Item+ B4_END
+    | BLOCK4_B map_ RBRACE
+    ;
 
-block4Item : B4_COLON block4Field B4_COLON block4Line+
-           ;
+block4Item
+    : B4_COLON block4Field B4_COLON block4Line+
+    ;
 
-block4Field : B4_VALUE+
-            ;
+block4Field
+    : B4_VALUE+
+    ;
 
-block4Line : B4_VALUE+ B4_CRLF
-           | B4_VALUE+ B4_COLON (B4_VALUE | B4_COLON)* B4_CRLF
-           | B4_COLON B4_COLON+ (B4_VALUE | B4_COLON)* B4_CRLF
-           | B4_COLON+ B4_VALUE+ B4_COLON* B4_CRLF
-           ;
+block4Line
+    : B4_VALUE+ B4_CRLF
+    | B4_VALUE+ B4_COLON (B4_VALUE | B4_COLON)* B4_CRLF
+    | B4_COLON B4_COLON+ (B4_VALUE | B4_COLON)* B4_CRLF
+    | B4_COLON+ B4_VALUE+ B4_COLON* B4_CRLF
+    ;
 
-block5 : BLOCK5 map_ RBRACE
-       ;
+block5
+    : BLOCK5 map_ RBRACE
+    ;
 
-value : V_VALUE+
-      ;
+value
+    : V_VALUE+
+    ;
 
-map_ : keyValue+ ;
+map_
+    : keyValue+
+    ;
 
-keyValue : LBRACE mKey M_COLON mValue? RBRACE
-         ;
+keyValue
+    : LBRACE mKey M_COLON mValue? RBRACE
+    ;
 
-mKey : M_VALUE+
-     ;
+mKey
+    : M_VALUE+
+    ;
 
-mValue : (M_VALUE | M_COLON)+
-       ;
+mValue
+    : (M_VALUE | M_COLON)+
+    ;

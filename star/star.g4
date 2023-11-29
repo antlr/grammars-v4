@@ -29,100 +29,103 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar star;
 
 star
-   : datablock_* EOF
-   ;
+    : datablock_* EOF
+    ;
 
 datablock_
-   : DATA element_+
-   ;
+    : DATA element_+
+    ;
 
 element_
-   : (keyval_ | saveframe_ | global_ | loop_)+
-   ;
+    : (keyval_ | saveframe_ | global_ | loop_)+
+    ;
 
 saveframe_
-   : save_ (dataname_ | dataitem_ | loop_)+
-   ;
+    : save_ (dataname_ | dataitem_ | loop_)+
+    ;
 
 loop_
-   : LOOP dataname_+ (dataitem_+ STOP?)+
-   ;
+    : LOOP dataname_+ (dataitem_+ STOP?)+
+    ;
 
 keyval_
-   : dataname_ dataitem_
-   ;
+    : dataname_ dataitem_
+    ;
 
 dataitem_
-   : string_
-   | literal_
-   | loop_
-   ;
+    : string_
+    | literal_
+    | loop_
+    ;
 
 string_
-   : STRING1
-   | STRING2
-   ;
+    : STRING1
+    | STRING2
+    ;
 
 dataname_
-   : DATANAME
-   ;
+    : DATANAME
+    ;
 
 save_
-   : SAVE
-   ;
+    : SAVE
+    ;
 
 global_
-   : GLOBAL
-   ;
+    : GLOBAL
+    ;
 
 literal_
-   : LITERAL
-   ;
+    : LITERAL
+    ;
 
 STRING1
-   : '\'' .*? '\''
-   ;
+    : '\'' .*? '\''
+    ;
 
 STRING2
-   : '"' .*? '"'
-   ;
+    : '"' .*? '"'
+    ;
 
 LITERAL
-   : [a-zA-Z0-9()'.+-/*]+
-   ;
+    : [a-zA-Z0-9()'.+-/*]+
+    ;
 
 LOOP
-   : 'loop_'
-   ;
+    : 'loop_'
+    ;
 
 STOP
-   : 'stop_'
-   ;
+    : 'stop_'
+    ;
 
 GLOBAL
-   : 'global_'
-   ;
+    : 'global_'
+    ;
 
 SAVE
-   : 'save_' [a-zA-Z0-9_]+
-   ;
+    : 'save_' [a-zA-Z0-9_]+
+    ;
 
 DATA
-   : 'data_' [a-zA-Z0-9_]+
-   ;
+    : 'data_' [a-zA-Z0-9_]+
+    ;
 
 DATANAME
-   : '_' [a-zA-Z0-9_]+
-   ;
+    : '_' [a-zA-Z0-9_]+
+    ;
 
 COMMENT
-   : '#' ~ [\r\n]* -> skip
-   ;
+    : '#' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

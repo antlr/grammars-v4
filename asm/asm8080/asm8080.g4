@@ -33,206 +33,219 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * http://fms.komkon.org/comp/CPUs/8080.txt
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asm8080;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 prog
-   : EOL* ((line EOL)* line EOL*)? EOF
-   ;
+    : EOL* ((line EOL)* line EOL*)? EOF
+    ;
 
 line
-   : lbl? (instruction | directive) comment?
-   | lbl comment?
-   | comment
-   ;
+    : lbl? (instruction | directive) comment?
+    | lbl comment?
+    | comment
+    ;
 
 instruction
-   : opcode expressionlist?
-   ;
+    : opcode expressionlist?
+    ;
 
 opcode
-   : OPCODE
-   ;
+    : OPCODE
+    ;
 
 register_
-   : REGISTER
-   ;
+    : REGISTER
+    ;
 
 directive
-   : argument? assemblerdirective expressionlist
-   ;
+    : argument? assemblerdirective expressionlist
+    ;
 
 assemblerdirective
-   : ASSEMBLER_DIRECTIVE
-   ;
+    : ASSEMBLER_DIRECTIVE
+    ;
 
 lbl
-   : label ':'?
-   ;
+    : label ':'?
+    ;
 
 expressionlist
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 label
-   : name
-   ;
+    : name
+    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
-   ;
+    : multiplyingExpression (('+' | '-') multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : argument (('*' | '/') argument)*
-   ;
+    : argument (('*' | '/') argument)*
+    ;
 
 argument
-   : number
-   | register_
-   | dollar
-   | name
-   | string_
-   | '(' expression ')'
-   ;
+    : number
+    | register_
+    | dollar
+    | name
+    | string_
+    | '(' expression ')'
+    ;
 
 dollar
-   : '$'
-   ;
+    : '$'
+    ;
 
 string_
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 ASSEMBLER_DIRECTIVE
-   : 'ORG'
-   | 'END'
-   | 'EQU'
-   | 'DB'
-   | 'DW'
-   | 'DS'
-   | 'IF'
-   | 'ENDIF'
-   | 'SET'
-   ;
+    : 'ORG'
+    | 'END'
+    | 'EQU'
+    | 'DB'
+    | 'DW'
+    | 'DS'
+    | 'IF'
+    | 'ENDIF'
+    | 'SET'
+    ;
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
-   ;
+    : 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'H'
+    | 'L'
+    | 'PC'
+    | 'SP'
+    ;
 
 OPCODE
-   : 'MOV'
-   | 'MVI'
-   | 'LDA'
-   | 'STA'
-   | 'LDAX'
-   | 'STAX'
-   | 'LHLD'
-   | 'SHLD'
-   | 'LXI'
-   | 'PUSH'
-   | 'POP'
-   | 'XTHL'
-   | 'SPHL'
-   | 'PCHL'
-   | 'XCHG'
-   | 'ADD'
-   | 'SUB'
-   | 'INR'
-   | 'DCR'
-   | 'CMP'
-   | 'ANA'
-   | 'ORA'
-   | 'XRA'
-   | 'ADI'
-   | 'SUI'
-   | 'CPI'
-   | 'ANI'
-   | 'ORI'
-   | 'XRI'
-   | 'DAA'
-   | 'ADC'
-   | 'ACI'
-   | 'SBB'
-   | 'SBI'
-   | 'DAD'
-   | 'INX'
-   | 'DCX'
-   | 'JMP'
-   | 'CALL'
-   | 'RET'
-   | 'RAL'
-   | 'RAR'
-   | 'RLC'
-   | 'RRC'
-   | 'IN'
-   | 'OUT'
-   | 'CMC'
-   | 'STC'
-   | 'CMA'
-   | 'HLT'
-   | 'NOP'
-   | 'DI'
-   | 'EI'
-   | 'RST'
-   | 'JNZ'
-   | 'JZ'
-   | 'JNC'
-   | 'JC'
-   | 'JPO'
-   | 'JPE'
-   | 'JP'
-   | 'JM'
-   | 'CNZ'
-   | 'CZ'
-   | 'CNC'
-   | 'CC'
-   | 'CPO'
-   | 'CPE'
-   | 'CP'
-   | 'CM'
-   | 'RNZ'
-   | 'RZ'
-   | 'RNC'
-   | 'RC'
-   | 'RPO'
-   | 'RPE'
-   | 'RP'
-   | 'RM'
-   ;
+    : 'MOV'
+    | 'MVI'
+    | 'LDA'
+    | 'STA'
+    | 'LDAX'
+    | 'STAX'
+    | 'LHLD'
+    | 'SHLD'
+    | 'LXI'
+    | 'PUSH'
+    | 'POP'
+    | 'XTHL'
+    | 'SPHL'
+    | 'PCHL'
+    | 'XCHG'
+    | 'ADD'
+    | 'SUB'
+    | 'INR'
+    | 'DCR'
+    | 'CMP'
+    | 'ANA'
+    | 'ORA'
+    | 'XRA'
+    | 'ADI'
+    | 'SUI'
+    | 'CPI'
+    | 'ANI'
+    | 'ORI'
+    | 'XRI'
+    | 'DAA'
+    | 'ADC'
+    | 'ACI'
+    | 'SBB'
+    | 'SBI'
+    | 'DAD'
+    | 'INX'
+    | 'DCX'
+    | 'JMP'
+    | 'CALL'
+    | 'RET'
+    | 'RAL'
+    | 'RAR'
+    | 'RLC'
+    | 'RRC'
+    | 'IN'
+    | 'OUT'
+    | 'CMC'
+    | 'STC'
+    | 'CMA'
+    | 'HLT'
+    | 'NOP'
+    | 'DI'
+    | 'EI'
+    | 'RST'
+    | 'JNZ'
+    | 'JZ'
+    | 'JNC'
+    | 'JC'
+    | 'JPO'
+    | 'JPE'
+    | 'JP'
+    | 'JM'
+    | 'CNZ'
+    | 'CZ'
+    | 'CNC'
+    | 'CC'
+    | 'CPO'
+    | 'CPE'
+    | 'CP'
+    | 'CM'
+    | 'RNZ'
+    | 'RZ'
+    | 'RNC'
+    | 'RC'
+    | 'RPO'
+    | 'RPE'
+    | 'RP'
+    | 'RM'
+    ;
 
 NAME
-   : [A-Z] [A-Z0-9."]*
-   ;
+    : [A-Z] [A-Z0-9."]*
+    ;
 
 NUMBER
-   : '$'? [0-9A-F] + 'H'?
-   ;
+    : '$'? [0-9A-F]+ 'H'?
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
-   ;
+    : ';' ~ [\r\n]*
+    ;
 
 STRING
-   : '\u0027' ~'\u0027'* '\u0027'
-   ;
+    : '\u0027' ~'\u0027'* '\u0027'
+    ;
 
 EOL
-   : [\r\n] +
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

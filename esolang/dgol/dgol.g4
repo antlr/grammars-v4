@@ -29,87 +29,90 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar dgol;
 
 module
-   : (usedeclaration | NL)* (subroutinedefinition | NL)* (programdefinition | librarydefinition) NL* EOF
-   ;
+    : (usedeclaration | NL)* (subroutinedefinition | NL)* (programdefinition | librarydefinition) NL* EOF
+    ;
 
 usedeclaration
-   : 'USE' IDENTIFER NL
-   ;
+    : 'USE' IDENTIFER NL
+    ;
 
 subroutinedefinition
-   : 'SUBROUTINE' IDENTIFER '(' (IDENTIFER (',' IDENTIFER)*)? ')' NL statements 'END' IDENTIFER NL
-   ;
+    : 'SUBROUTINE' IDENTIFER '(' (IDENTIFER (',' IDENTIFER)*)? ')' NL statements 'END' IDENTIFER NL
+    ;
 
 programdefinition
-   : 'PROGRAM' IDENTIFER NL statements 'END' IDENTIFER NL
-   ;
+    : 'PROGRAM' IDENTIFER NL statements 'END' IDENTIFER NL
+    ;
 
 librarydefinition
-   : 'LIBRARY' IDENTIFER (subroutinedeclaration | NL)* 'END' IDENTIFER NL
-   ;
+    : 'LIBRARY' IDENTIFER (subroutinedeclaration | NL)* 'END' IDENTIFER NL
+    ;
 
 subroutinedeclaration
-   : 'SUBROUTINE' IDENTIFER NL
-   ;
+    : 'SUBROUTINE' IDENTIFER NL
+    ;
 
 statements
-   : (statement? NL)*
-   ;
+    : (statement? NL)*
+    ;
 
 statement
-   : letstatement
-   | ifstatement
-   | dostatement
-   | callstatement
-   | returnstatement
-   | exitstatement
-   ;
+    : letstatement
+    | ifstatement
+    | dostatement
+    | callstatement
+    | returnstatement
+    | exitstatement
+    ;
 
 identifierorzero
-   : IDENTIFER
-   | '0'
-   ;
+    : IDENTIFER
+    | '0'
+    ;
 
 letstatement
-   : 'LET' IDENTIFER ('=' identifierorzero | '<' IDENTIFER | '>' identifierorzero)
-   ;
+    : 'LET' IDENTIFER ('=' identifierorzero | '<' IDENTIFER | '>' identifierorzero)
+    ;
 
 ifstatement
-   : ifhead ('ELSE' ifhead)* ('ELSE' NL statements)? 'END' 'IF'
-   ;
+    : ifhead ('ELSE' ifhead)* ('ELSE' NL statements)? 'END' 'IF'
+    ;
 
 ifhead
-   : 'IF' IDENTIFER ('=' | '>') IDENTIFER NL statements
-   ;
+    : 'IF' IDENTIFER ('=' | '>') IDENTIFER NL statements
+    ;
 
 dostatement
-   : 'DO' IDENTIFER ('<' IDENTIFER)? NL statements 'END' 'DO'
-   ;
+    : 'DO' IDENTIFER ('<' IDENTIFER)? NL statements 'END' 'DO'
+    ;
 
 callstatement
-   : 'CALL' IDENTIFER ('.' IDENTIFER)? '(' (identifierorzero (',' identifierorzero)*)? ')'
-   ;
+    : 'CALL' IDENTIFER ('.' IDENTIFER)? '(' (identifierorzero (',' identifierorzero)*)? ')'
+    ;
 
 returnstatement
-   : 'RETURN'
-   ;
+    : 'RETURN'
+    ;
 
 exitstatement
-   : 'EXIT' IDENTIFER
-   ;
+    : 'EXIT' IDENTIFER
+    ;
 
 IDENTIFER
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 NL
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;

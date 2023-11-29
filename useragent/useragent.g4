@@ -30,38 +30,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar useragent;
 
 prog
-   : (product comment?) + EOF
-   ;
+    : (product comment?)+ EOF
+    ;
 
 product
-   : name '/' version
-   ;
+    : name '/' version
+    ;
 
 name
-   : STRING
-   ;
+    : STRING
+    ;
 
 version
-   : STRING ('.' STRING)*
-   ;
+    : STRING ('.' STRING)*
+    ;
 
 comment
-   : COMMENT
-   ;
-
+    : COMMENT
+    ;
 
 COMMENT
-   : '(' ~ ')'* ')'
-   ;
-
+    : '(' ~ ')'* ')'
+    ;
 
 STRING
-   : [a-zA-Z0-9]+
-   ;
+    : [a-zA-Z0-9]+
+    ;
 
 WS
-   : [ \r\n] + -> skip
-   ;
+    : [ \r\n]+ -> skip
+    ;

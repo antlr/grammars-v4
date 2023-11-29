@@ -30,11 +30,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tinyc;
 
 /*
     http://www.iro.umontreal.ca/~felipe/IFT2030-Automne2002/Complements/tinyc.c
-*//*
+*/ /*
  *  <program> ::= <statement>
  *  <statement> ::= "if" <paren_expr> <statement> |
  *                  "if" <paren_expr> <statement> "else" <statement> |
@@ -52,63 +55,61 @@ grammar tinyc;
  *  <int> ::= <an_unsigned_decimal_integer>
 */
 program
-   : statement + EOF
-   ;
+    : statement+ EOF
+    ;
 
 statement
-   : 'if' paren_expr statement
-   | 'if' paren_expr statement 'else' statement
-   | 'while' paren_expr statement
-   | 'do' statement 'while' paren_expr ';'
-   | '{' statement* '}'
-   | expr ';'
-   | ';'
-   ;
+    : 'if' paren_expr statement
+    | 'if' paren_expr statement 'else' statement
+    | 'while' paren_expr statement
+    | 'do' statement 'while' paren_expr ';'
+    | '{' statement* '}'
+    | expr ';'
+    | ';'
+    ;
 
 paren_expr
-   : '(' expr ')'
-   ;
+    : '(' expr ')'
+    ;
 
 expr
-   : test
-   | id_ '=' expr
-   ;
+    : test
+    | id_ '=' expr
+    ;
 
 test
-   : sum_
-   | sum_ '<' sum_
-   ;
+    : sum_
+    | sum_ '<' sum_
+    ;
 
 sum_
-   : term
-   | sum_ '+' term
-   | sum_ '-' term
-   ;
+    : term
+    | sum_ '+' term
+    | sum_ '-' term
+    ;
 
 term
-   : id_
-   | integer
-   | paren_expr
-   ;
+    : id_
+    | integer
+    | paren_expr
+    ;
 
 id_
-   : STRING
-   ;
+    : STRING
+    ;
 
 integer
-   : INT
-   ;
-
+    : INT
+    ;
 
 STRING
-   : [a-z]+
-   ;
-
+    : [a-z]+
+    ;
 
 INT
-   : [0-9] +
-   ;
+    : [0-9]+
+    ;
 
 WS
-   : [ \r\n\t] -> skip
-   ;
+    : [ \r\n\t] -> skip
+    ;

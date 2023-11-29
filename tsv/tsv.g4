@@ -33,41 +33,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * grammar based on CSV grammar by Terence Parr
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tsv;
 
 tsvFile
-   : hdr row* EOF
-   ;
+    : hdr row* EOF
+    ;
 
 hdr
-   : row
-   ;
+    : row
+    ;
 
 row
-   : field (TAB field)* EOL
-   ;
+    : field (TAB field)* EOL
+    ;
 
 field
-   : TEXT
-   | STRING
-   ;
-
+    : TEXT
+    | STRING
+    ;
 
 TAB
-   : '\t'
-   ;
-
+    : '\t'
+    ;
 
 EOL
-   : [\n\r] +
-   ;
-
+    : [\n\r]+
+    ;
 
 TEXT
-   : ~ [,\n\r"] +
-   ;
-
+    : ~ [,\n\r"]+
+    ;
 
 STRING
-   : '"' ('""' | ~ '"')* '"'
-   ;
+    : '"' ('""' | ~ '"')* '"'
+    ;

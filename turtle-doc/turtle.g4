@@ -4,449 +4,414 @@
  * and open the template in the editor.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar turtle;
 
 turtleDoc
-   : statement* EOF
-   ;
+    : statement* EOF
+    ;
 
 statement
-   : directive
-   | triples Dot
-   ;
+    : directive
+    | triples Dot
+    ;
 
 directive
-   : prefixID
-   | base
-   | sparqlPrefix
-   | sparqlBase
-   ;
+    : prefixID
+    | base
+    | sparqlPrefix
+    | sparqlBase
+    ;
 
 prefixID
-   : AtPrefixKeyword PNameNs IriRef Dot
-   ;
+    : AtPrefixKeyword PNameNs IriRef Dot
+    ;
 
 base
-   : AtBaseKeyword IriRef Dot
-   ;
+    : AtBaseKeyword IriRef Dot
+    ;
 
 sparqlBase
-   : BaseKeyword IriRef
-   ;
+    : BaseKeyword IriRef
+    ;
 
 sparqlPrefix
-   : PrefixKeyword PNameNs IriRef
-   ;
+    : PrefixKeyword PNameNs IriRef
+    ;
 
 triples
-   : subject predicateObjectList
-   | blankNodePropertyList predicateObjectList?
-   ;
+    : subject predicateObjectList
+    | blankNodePropertyList predicateObjectList?
+    ;
 
 predicateObjectList
-   : predicateObject (Semi predicateObject?)*
-   ;
+    : predicateObject (Semi predicateObject?)*
+    ;
 
 objectList
-   : object_ (Coma object_)*
-   ;
+    : object_ (Coma object_)*
+    ;
 
 predicateObject
-   : (predicate | LetterA) objectList
-   ;
+    : (predicate | LetterA) objectList
+    ;
 
 subject
-   : iri
-   | blankNode
-   | collection
-   ;
+    : iri
+    | blankNode
+    | collection
+    ;
 
 predicate
-   : iri
-   ;
+    : iri
+    ;
 
 object_
-   : iri
-   | blankNode
-   | collection
-   | blankNodePropertyList
-   | literal
-   ;
+    : iri
+    | blankNode
+    | collection
+    | blankNodePropertyList
+    | literal
+    ;
 
 literal
-   : rDFLiteral
-   | numericLiteral
-   | bool_
-   ;
+    : rDFLiteral
+    | numericLiteral
+    | bool_
+    ;
 
 blankNodePropertyList
-   : LEnd predicateObjectList REnd
-   ;
+    : LEnd predicateObjectList REnd
+    ;
 
 collection
-   : LParen object_* RParen
-   ;
+    : LParen object_* RParen
+    ;
 
 numericLiteral
-   : Integer
-   | Decimal
-   | Double
-   ;
+    : Integer
+    | Decimal
+    | Double
+    ;
 
 rDFLiteral
-   : string (LangTag | ('^^' iri))?
-   ;
+    : string (LangTag | ('^^' iri))?
+    ;
 
 bool_
-   : TrueKeyword
-   | FalseKeyword
-   ;
+    : TrueKeyword
+    | FalseKeyword
+    ;
 
 string
-   : StringLiteralQuote
-   | StringLiteralSingleQuote
-   | StringLiteralLongSingleQuote
-   | StringLiteralLongQuote
-   ;
+    : StringLiteralQuote
+    | StringLiteralSingleQuote
+    | StringLiteralLongSingleQuote
+    | StringLiteralLongQuote
+    ;
 
 iri
-   : IriRef
-   | PNameLn
-   | PNameNs
-   ;
+    : IriRef
+    | PNameLn
+    | PNameNs
+    ;
 
 blankNode
-   : BlankNodeLabel
-   | ANON
-   ;
-
+    : BlankNodeLabel
+    | ANON
+    ;
 
 PNameLn
-   : PNameNs PNLocal
-   ;
-
+    : PNameNs PNLocal
+    ;
 
 LetterA
-   : 'a'
-   ;
-
+    : 'a'
+    ;
 
 Dot
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 Coma
-   : ','
-   ;
-
+    : ','
+    ;
 
 LParen
-   : '('
-   ;
-
+    : '('
+    ;
 
 RParen
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 LEnd
-   : '['
-   ;
-
+    : '['
+    ;
 
 REnd
-   : ']'
-   ;
-
+    : ']'
+    ;
 
 IriRef
-   : '<' ((~ [\u0000-\u0020<>"{}|^`\\]) | Uchar)* '>'
-   ;
+    : '<' ((~ [\u0000-\u0020<>"{}|^`\\]) | Uchar)* '>'
+    ;
 
 /* [\u0000]=NULL #01-[\u001F]=control codes [\u0020]=space */
 
 PNameNs
-   : PN_Prefix? ':'
-   ;
-
+    : PN_Prefix? ':'
+    ;
 
 BlankNodeLabel
-   : '_:' (PNCharsU | [0-9]) ((PN_CHARS | Dot)* PN_CHARS)?
-   ;
-
+    : '_:' (PNCharsU | [0-9]) ((PN_CHARS | Dot)* PN_CHARS)?
+    ;
 
 Integer
-   : [+-]? [0-9] +
-   ;
-
+    : [+-]? [0-9]+
+    ;
 
 Decimal
-   : [+-]? [0-9]* Dot [0-9] +
-   ;
-
+    : [+-]? [0-9]* Dot [0-9]+
+    ;
 
 Double
-   : [+-]? ([0-9] + Dot [0-9]* Exponent | Dot [0-9] + Exponent | [0-9] + Exponent)
-   ;
-
+    : [+-]? ([0-9]+ Dot [0-9]* Exponent | Dot [0-9]+ Exponent | [0-9]+ Exponent)
+    ;
 
 Exponent
-   : [eE] [+-]? [0-9] +
-   ;
-
+    : [eE] [+-]? [0-9]+
+    ;
 
 StringLiteralQuote
-   : '"' ((~ [\u0022\u005C\u000A\u000D]) | ECHAR | Uchar)* '"'
-   ;
-
+    : '"' ((~ [\u0022\u005C\u000A\u000D]) | ECHAR | Uchar)* '"'
+    ;
 
 StringLiteralSingleQuote
-   : '\'' ((~ [\u0027\u005C\u000A\u000D]) | ECHAR | Uchar)* '\''
-   ;
-
+    : '\'' ((~ [\u0027\u005C\u000A\u000D]) | ECHAR | Uchar)* '\''
+    ;
 
 StringLiteralLongSingleQuote
-   : '\'\'\'' (('\'' | '\'\'')? ((~ ['\\]) | ECHAR | Uchar))* '\'\'\''
-   ;
-
+    : '\'\'\'' (('\'' | '\'\'')? ((~ ['\\]) | ECHAR | Uchar))* '\'\'\''
+    ;
 
 StringLiteralLongQuote
-   : '"""' (('\'' | '\'\'')? ((~ ['\\]) | ECHAR | Uchar))* '"""'
-   ;
-
+    : '"""' (('\'' | '\'\'')? ((~ ['\\]) | ECHAR | Uchar))* '"""'
+    ;
 
 Uchar
-   : '\\u' HEX HEX? HEX? HEX? | '\\U' HEX HEX? HEX? HEX? HEX? HEX? HEX? HEX?
-   ;
-
+    : '\\u' HEX HEX? HEX? HEX?
+    | '\\U' HEX HEX? HEX? HEX? HEX? HEX? HEX? HEX?
+    ;
 
 ECHAR
-   : '\\' [tbnrf"'\\]
-   ;
-
+    : '\\' [tbnrf"'\\]
+    ;
 
 WS
-   : [\u0020\u0009\u000D\u000A] -> skip
-   ;
-
+    : [\u0020\u0009\u000D\u000A] -> skip
+    ;
 
 ANON
-   : LEnd WS* REnd
-   ;
-
+    : LEnd WS* REnd
+    ;
 
 PN_CHARS_BASE
-   : [A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u1000-\uEFFFF]
-   ;
-
+    :
+        [A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u1000-\uEFFFF]
+    ;
 
 PNCharsU
-   : PN_CHARS_BASE | '_'
-   ;
-
+    : PN_CHARS_BASE
+    | '_'
+    ;
 
 PN_CHARS
-   : PNCharsU | '-' | [0-9\u00B7\u0300-\u036F\u203F-\u2040]
-   ;
-
+    : PNCharsU
+    | '-'
+    | [0-9\u00B7\u0300-\u036F\u203F-\u2040]
+    ;
 
 PN_Prefix
-   : PN_CHARS_BASE ((PN_CHARS | Dot)* PN_CHARS)?
-   ;
-
+    : PN_CHARS_BASE ((PN_CHARS | Dot)* PN_CHARS)?
+    ;
 
 PNLocal
-   : (PNCharsU | ':' | [0-9] | PLX) ((PN_CHARS | Dot | ':' | PLX)* (PN_CHARS | ':' | PLX))?
-   ;
-
+    : (PNCharsU | ':' | [0-9] | PLX) ((PN_CHARS | Dot | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+    ;
 
 PLX
-   : PERCENT | PN_LOCAL_ESC
-   ;
-
+    : PERCENT
+    | PN_LOCAL_ESC
+    ;
 
 PERCENT
-   : '%' HEX HEX
-   ;
-
+    : '%' HEX HEX
+    ;
 
 HEX
-   : [0-9A-Fa-f]
-   ;
-
+    : [0-9A-Fa-f]
+    ;
 
 PN_LOCAL_ESC
-   : '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
-   ;
-
+    : '\\' (
+        '_'
+        | '~'
+        | '.'
+        | '-'
+        | '!'
+        | '$'
+        | '&'
+        | '\''
+        | '('
+        | ')'
+        | '*'
+        | '+'
+        | ','
+        | ';'
+        | '='
+        | '/'
+        | '?'
+        | '#'
+        | '@'
+        | '%'
+    )
+    ;
 
 Semi
-   : ';'
-   ;
-
+    : ';'
+    ;
 
 TrueKeyword
-   : T R U E
-   ;
-
+    : T R U E
+    ;
 
 FalseKeyword
-   : F A L S E
-   ;
-
+    : F A L S E
+    ;
 
 PrefixKeyword
-   : P R E F I X
-   ;
-
+    : P R E F I X
+    ;
 
 BaseKeyword
-   : B A S E
-   ;
-
+    : B A S E
+    ;
 
 AtPrefixKeyword
-   : [@] PrefixKeyword
-   ;
-
+    : [@] PrefixKeyword
+    ;
 
 AtBaseKeyword
-   : [@] BaseKeyword
-   ;
-
+    : [@] BaseKeyword
+    ;
 
 LangTag
-   : '@' [a-zA-Z] + ('-' [a-zA-Z0-9] +)*
-   ;
-
+    : '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*
+    ;
 
 fragment A
-   : [aA]
-   ;
-
+    : [aA]
+    ;
 
 fragment B
-   : [bB]
-   ;
-
+    : [bB]
+    ;
 
 fragment C
-   : [cC]
-   ;
-
+    : [cC]
+    ;
 
 fragment D
-   : [dD]
-   ;
-
+    : [dD]
+    ;
 
 fragment E
-   : [eE]
-   ;
-
+    : [eE]
+    ;
 
 fragment F
-   : [fF]
-   ;
-
+    : [fF]
+    ;
 
 fragment G
-   : [gG]
-   ;
-
+    : [gG]
+    ;
 
 fragment H
-   : [hH]
-   ;
-
+    : [hH]
+    ;
 
 fragment I
-   : [iI]
-   ;
-
+    : [iI]
+    ;
 
 fragment J
-   : [jJ]
-   ;
-
+    : [jJ]
+    ;
 
 fragment K
-   : [kK]
-   ;
-
+    : [kK]
+    ;
 
 fragment L
-   : [lL]
-   ;
-
+    : [lL]
+    ;
 
 fragment M
-   : [mM]
-   ;
-
+    : [mM]
+    ;
 
 fragment N
-   : [nN]
-   ;
-
+    : [nN]
+    ;
 
 fragment O
-   : [oO]
-   ;
-
+    : [oO]
+    ;
 
 fragment P
-   : [pP]
-   ;
-
+    : [pP]
+    ;
 
 fragment Q
-   : [qQ]
-   ;
-
+    : [qQ]
+    ;
 
 fragment R
-   : [rR]
-   ;
-
+    : [rR]
+    ;
 
 fragment S
-   : [sS]
-   ;
-
+    : [sS]
+    ;
 
 fragment T
-   : [tT]
-   ;
-
+    : [tT]
+    ;
 
 fragment U
-   : [uU]
-   ;
-
+    : [uU]
+    ;
 
 fragment V
-   : [vV]
-   ;
-
+    : [vV]
+    ;
 
 fragment W
-   : [wW]
-   ;
-
+    : [wW]
+    ;
 
 fragment X
-   : [xX]
-   ;
-
+    : [xX]
+    ;
 
 fragment Y
-   : [yY]
-   ;
-
+    : [yY]
+    ;
 
 fragment Z
-   : [zZ]
-   ;
+    : [zZ]
+    ;
