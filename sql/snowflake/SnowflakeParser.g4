@@ -298,7 +298,7 @@ global_privilege
             | DATA EXCHANGE LISTING
             | DATABASE
             | INTEGRATION
-            | NETWORK_POLICY
+            | NETWORK POLICY
             | ROLE
             | SHARE
             | USER
@@ -819,7 +819,7 @@ alter_materialized_view
     ;
 
 alter_network_policy
-    : ALTER NETWORK_POLICY alter_network_policy_opts
+    : ALTER NETWORK POLICY alter_network_policy_opts
     ;
 
 alter_notification_integration
@@ -1759,7 +1759,7 @@ create_materialized_view
     ;
 
 create_network_policy
-    : CREATE or_replace? NETWORK_POLICY id_
+    : CREATE or_replace? NETWORK POLICY id_
          ALLOWED_IP_LIST EQ '(' string_list? ')'
          ( BLOCKED_IP_LIST EQ '(' string_list? ')' )?
          comment_clause?
@@ -2709,7 +2709,7 @@ object_type_name
     | USER
     | WAREHOUSE
     | INTEGRATION
-    | NETWORK_POLICY
+    | NETWORK POLICY
     | SESSION POLICY
     | DATABASE
     | SCHEMA
@@ -2832,7 +2832,7 @@ drop_materialized_view
     ;
 
 drop_network_policy
-    : DROP NETWORK_POLICY if_exists? id_
+    : DROP NETWORK POLICY if_exists? id_
     ;
 
 drop_pipe
@@ -3064,7 +3064,7 @@ describe_materialized_view
     ;
 
 describe_network_policy
-    : describe NETWORK_POLICY id_
+    : describe NETWORK POLICY id_
     ;
 
 describe_pipe
@@ -3340,7 +3340,7 @@ show_materialized_views
     ;
 
 show_network_policies
-    : SHOW NETWORK_POLICIES
+    : SHOW NETWORK POLICIES
     ;
 
 show_objects
@@ -3493,7 +3493,7 @@ object_type
     : ACCOUNT PARAMETERS
     | DATABASES
     | INTEGRATIONS
-    | NETWORK_POLICIES
+    | NETWORK POLICIES
     | RESOURCE MONITORS
     | ROLES
     | SHARES
@@ -3636,6 +3636,7 @@ builtin_function
     | IDENTIFIER
     | FLATTEN
     | SPLIT_TO_TABLE
+    | CAST
     ;
 
 list_operator
@@ -3734,15 +3735,13 @@ expr
     | expr op=(PLUS | MINUS | PIPE_PIPE) expr
     | expr comparison_operator expr
     | op=NOT+ expr
-    | expr AND expr
-    | expr OR expr
-//    | boolean_operator AND boolean_operator //bool operation
-//    | boolean_operator OR boolean_operator //bool operation
+    | expr AND expr //bool operation
+    | expr OR expr //bool operation
     | arr_literal
 //    | expr time_zone
     | expr COLON_COLON data_type //cast
     | expr over_clause
-    | CAST LR_BRACKET expr AS data_type RR_BRACKET
+    | cast_expr
     | json_literal
     | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
@@ -3757,12 +3756,6 @@ expr
     | expr NOT? ( LIKE | ILIKE ) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     ;
 
-boolean_operator
-    : NOT boolean_operator
-    | left=boolean_operator operator=AND right=boolean_operator
-    | left=boolean_operator operator=OR right=boolean_operator
-    ;
-
 iff_expr
     : IFF '(' search_condition ',' expr ',' expr ')'
     ;
@@ -3773,6 +3766,10 @@ trim_expression
 
 try_cast_expr
     : TRY_CAST LR_BRACKET expr AS data_type RR_BRACKET
+    ;
+
+cast_expr
+    : CAST LR_BRACKET expr AS data_type RR_BRACKET
     ;
 
 json_literal
