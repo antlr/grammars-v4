@@ -1189,5 +1189,5 @@ MODULE:              '%';
 PLUS:                '+';
 MINUS:               '-';
 
-fragment DEC_DOT_DEC:  DEC_DIGIT+ DOT DEC_DIGIT+ |  DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
-fragment DEC_DIGIT:    [0-9];
+fragment DEC_DOT_DEC : DEC_DIGIT+ DOT DEC_DIGIT+ | DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
+fragment DEC_DIGIT   : [0-9];
