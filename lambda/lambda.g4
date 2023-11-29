@@ -30,12 +30,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar lambda;
 
-file_ : expression EOF ;
+file_
+    : expression EOF
+    ;
 
 expression
-    : VARIABLE | function_ | application
+    : VARIABLE
+    | function_
+    | application
     ;
 
 function_
@@ -50,11 +57,10 @@ scope
     : expression
     ;
 
-
 VARIABLE
     : [a-z] [a-zA-Z0-9]*
     ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

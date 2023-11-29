@@ -25,55 +25,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar PythonLexer;
 
-options { superClass=PythonLexerBase; }
+options {
+    superClass = PythonLexerBase;
+}
 
 // Insert here @header for C++ lexer.
 
 // Artificial tokens only for parser purposes
 
-tokens { INDENT, DEDENT, LINE_BREAK }
+tokens {
+    INDENT,
+    DEDENT,
+    LINE_BREAK
+}
 
 // Keywords
 
-DEF                : 'def';
-RETURN             : 'return';
-RAISE              : 'raise';
-FROM               : 'from';
-IMPORT             : 'import';
-NONLOCAL           : 'nonlocal';
-AS                 : 'as';
-GLOBAL             : 'global';
-ASSERT             : 'assert';
-IF                 : 'if';
-ELIF               : 'elif';
-ELSE               : 'else';
-WHILE              : 'while';
-FOR                : 'for';
-IN                 : 'in';
-TRY                : 'try';
-NONE               : 'None';
-FINALLY            : 'finally';
-WITH               : 'with';
-EXCEPT             : 'except';
-LAMBDA             : 'lambda';
-OR                 : 'or';
-AND                : 'and';
-NOT                : 'not';
-IS                 : 'is';
-CLASS              : 'class';
-YIELD              : 'yield';
-DEL                : 'del';
-PASS               : 'pass';
-CONTINUE           : 'continue';
-BREAK              : 'break';
-ASYNC              : 'async';
-AWAIT              : 'await';
-PRINT              : 'print';
-EXEC               : 'exec';
-TRUE               : 'True';
-FALSE              : 'False';
+DEF      : 'def';
+RETURN   : 'return';
+RAISE    : 'raise';
+FROM     : 'from';
+IMPORT   : 'import';
+NONLOCAL : 'nonlocal';
+AS       : 'as';
+GLOBAL   : 'global';
+ASSERT   : 'assert';
+IF       : 'if';
+ELIF     : 'elif';
+ELSE     : 'else';
+WHILE    : 'while';
+FOR      : 'for';
+IN       : 'in';
+TRY      : 'try';
+NONE     : 'None';
+FINALLY  : 'finally';
+WITH     : 'with';
+EXCEPT   : 'except';
+LAMBDA   : 'lambda';
+OR       : 'or';
+AND      : 'and';
+NOT      : 'not';
+IS       : 'is';
+CLASS    : 'class';
+YIELD    : 'yield';
+DEL      : 'del';
+PASS     : 'pass';
+CONTINUE : 'continue';
+BREAK    : 'break';
+ASYNC    : 'async';
+AWAIT    : 'await';
+PRINT    : 'print';
+EXEC     : 'exec';
+TRUE     : 'True';
+FALSE    : 'False';
 
 // Operators
 
@@ -120,110 +130,84 @@ RIGHT_SHIFT_ASSIGN : '>>=';
 POWER_ASSIGN       : '**=';
 IDIV_ASSIGN        : '//=';
 
-STRING             : ([uU] | [fF] [rR]? | [rR] [fF]?)? (SHORT_STRING | LONG_STRING)
-                   | ([bB] [rR]? | [rR] [bB]) (SHORT_BYTES | LONG_BYTES)
-                   ;
+STRING:
+    ([uU] | [fF] [rR]? | [rR] [fF]?)? (SHORT_STRING | LONG_STRING)
+    | ([bB] [rR]? | [rR] [bB]) (SHORT_BYTES | LONG_BYTES)
+;
 
-DECIMAL_INTEGER    : [1-9] [0-9]*
-                   | '0'+
-                   ;
-OCT_INTEGER        : '0' [oO] [0-7]+;
-HEX_INTEGER        : '0' [xX] [0-9a-fA-F]+;
-BIN_INTEGER        : '0' [bB] [01]+;
+DECIMAL_INTEGER : [1-9] [0-9]* | '0'+;
+OCT_INTEGER     : '0' [oO] [0-7]+;
+HEX_INTEGER     : '0' [xX] [0-9a-fA-F]+;
+BIN_INTEGER     : '0' [bB] [01]+;
 
-IMAG_NUMBER        : (EXPONENT_OR_POINT_FLOAT | [0-9]+) [jJ];
-FLOAT_NUMBER       : EXPONENT_OR_POINT_FLOAT;
+IMAG_NUMBER  : (EXPONENT_OR_POINT_FLOAT | [0-9]+) [jJ];
+FLOAT_NUMBER : EXPONENT_OR_POINT_FLOAT;
 
-OPEN_PAREN         : '(' {this.IncIndentLevel();};
-CLOSE_PAREN        : ')' {this.DecIndentLevel();};
-OPEN_BRACE         : '{' {this.IncIndentLevel();};
-CLOSE_BRACE        : '}' {this.DecIndentLevel();};
-OPEN_BRACKET       : '[' {this.IncIndentLevel();};
-CLOSE_BRACKET      : ']' {this.DecIndentLevel();};
+OPEN_PAREN    : '(' {this.IncIndentLevel();};
+CLOSE_PAREN   : ')' {this.DecIndentLevel();};
+OPEN_BRACE    : '{' {this.IncIndentLevel();};
+CLOSE_BRACE   : '}' {this.DecIndentLevel();};
+OPEN_BRACKET  : '[' {this.IncIndentLevel();};
+CLOSE_BRACKET : ']' {this.DecIndentLevel();};
 
-NAME               : ID_START ID_CONTINUE*;
+NAME: ID_START ID_CONTINUE*;
 
-LINE_JOIN          : '\\' [ \t]* RN                        -> channel(HIDDEN);
-NEWLINE            : RN                {this.HandleNewLine();}  -> channel(HIDDEN);
-WS                 : [ \t]+            {this.HandleSpaces();}   -> channel(HIDDEN);
-COMMENT            : '#' ~[\r\n\f]*                        -> channel(HIDDEN);
+LINE_JOIN : '\\' [ \t]* RN -> channel(HIDDEN);
+NEWLINE   : RN             {this.HandleNewLine();} -> channel(HIDDEN);
+WS        : [ \t]+         {this.HandleSpaces();} -> channel(HIDDEN);
+COMMENT   : '#' ~[\r\n\f]* -> channel(HIDDEN);
 
 // Fragments
 
-fragment SHORT_STRING
-    : '\'' ('\\' (RN | .) | ~[\\\r\n'])* '\''
-    | '"'  ('\\' (RN | .) | ~[\\\r\n"])* '"'
-    ;
+fragment SHORT_STRING:
+    '\'' ('\\' (RN | .) | ~[\\\r\n'])* '\''
+    | '"' ('\\' (RN | .) | ~[\\\r\n"])* '"'
+;
 
-fragment LONG_STRING
-    : '\'\'\'' LONG_STRING_ITEM*? '\'\'\''
-    | '"""' LONG_STRING_ITEM*? '"""'
-    ;
+fragment LONG_STRING: '\'\'\'' LONG_STRING_ITEM*? '\'\'\'' | '"""' LONG_STRING_ITEM*? '"""';
 
-fragment LONG_STRING_ITEM
-    : ~'\\'
-    | '\\' (RN | .)
-    ;
+fragment LONG_STRING_ITEM: ~'\\' | '\\' (RN | .);
 
-fragment RN
-    : '\r'? '\n'
-    ;
+fragment RN: '\r'? '\n';
 
-fragment EXPONENT_OR_POINT_FLOAT
-    : ([0-9]+ | POINT_FLOAT) [eE] [+-]? [0-9]+
-    | POINT_FLOAT
-    ;
+fragment EXPONENT_OR_POINT_FLOAT: ([0-9]+ | POINT_FLOAT) [eE] [+-]? [0-9]+ | POINT_FLOAT;
 
-fragment POINT_FLOAT
-    : [0-9]* '.' [0-9]+
-    | [0-9]+ '.'
-    ;
+fragment POINT_FLOAT: [0-9]* '.' [0-9]+ | [0-9]+ '.';
 
-fragment SHORT_BYTES
-    : '\'' (SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ)* '\''
+fragment SHORT_BYTES:
+    '\'' (SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ)* '\''
     | '"' (SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE | BYTES_ESCAPE_SEQ)* '"'
-    ;
+;
 
-fragment LONG_BYTES
-    : '\'\'\'' LONG_BYTES_ITEM*? '\'\'\''
-    | '"""' LONG_BYTES_ITEM*? '"""'
-    ;
+fragment LONG_BYTES: '\'\'\'' LONG_BYTES_ITEM*? '\'\'\'' | '"""' LONG_BYTES_ITEM*? '"""';
 
-fragment LONG_BYTES_ITEM
-    : LONG_BYTES_CHAR
-    | BYTES_ESCAPE_SEQ
-    ;
+fragment LONG_BYTES_ITEM: LONG_BYTES_CHAR | BYTES_ESCAPE_SEQ;
 
-fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE
-    : [\u0000-\u0009]
+fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE:
+    [\u0000-\u0009]
     | [\u000B-\u000C]
     | [\u000E-\u0026]
     | [\u0028-\u005B]
     | [\u005D-\u007F]
-    ;
+;
 
-fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
-    : [\u0000-\u0009]
+fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE:
+    [\u0000-\u0009]
     | [\u000B-\u000C]
     | [\u000E-\u0021]
     | [\u0023-\u005B]
     | [\u005D-\u007F]
-    ;
+;
 
 /// Any ASCII character except "\"
-fragment LONG_BYTES_CHAR
-    : [\u0000-\u005B]
-    | [\u005D-\u007F]
-    ;
+fragment LONG_BYTES_CHAR: [\u0000-\u005B] | [\u005D-\u007F];
 
 /// "\" <any ASCII character>
-fragment BYTES_ESCAPE_SEQ
-    : '\\' [\u0000-\u007F]
-    ;
+fragment BYTES_ESCAPE_SEQ: '\\' [\u0000-\u007F];
 
 /// All characters in id_start, plus characters in the categories Mn, Mc, Nd, Pc and others with the Other_ID_Continue property
-fragment ID_CONTINUE
-    : ID_START
+fragment ID_CONTINUE:
+    ID_START
     | [0-9]
     | [\u0300-\u036F]
     | [\u0483-\u0486]
@@ -425,11 +409,11 @@ fragment ID_CONTINUE
     | [\uFE4D-\uFE4F]
     | [\uFF10-\uFF19]
     | '\uFF3F'
-    ;
+;
 
 /// All characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property
-fragment ID_START
-    : '_'
+fragment ID_START:
+    '_'
     | [A-Z]
     | [a-z]
     | '\u00AA'
@@ -756,4 +740,4 @@ fragment ID_START
     | [\uFFCA-\uFFCF]
     | [\uFFD2-\uFFD7]
     | [\uFFDA-\uFFDC]
-    ;
+;

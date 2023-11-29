@@ -26,107 +26,111 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 parser grammar ZOperatorParser;
-options { tokenVocab=ZLexer; }
+
+options {
+    tokenVocab = ZLexer;
+}
 
 specification
-	: (TEXT | section | paragraph)* EOF
-	;
+    : (TEXT | section | paragraph)* EOF
+    ;
 
 section
-	: ZED SECTION NAME PARENTS formals? END paragraph* #InheritingSection
-	| ZED SECTION NAME END paragraph* #BaseSection
-	;
-	
+    : ZED SECTION NAME PARENTS formals? END paragraph* # InheritingSection
+    | ZED SECTION NAME END paragraph*                  # BaseSection
+    ;
+
 paragraph
-	: ZED operatorTemplate END #OperatorTemplateParagraph
-	| AX .*? END #AxiomaticDescriptionParagraph
-	| SCH .*? END #SchemaDefinitionParagraph
-	| ZED .*? END #NONOperatorTemplateParagraph
-	;
+    : ZED operatorTemplate END # OperatorTemplateParagraph
+    | AX .*? END               # AxiomaticDescriptionParagraph
+    | SCH .*? END              # SchemaDefinitionParagraph
+    | ZED .*? END              # NONOperatorTemplateParagraph
+    ;
 
 formals
-	: NAME (COMMA NAME)*
-	;
+    : NAME (COMMA NAME)*
+    ;
 
 operatorTemplate
-	: RELATION template_ #RelationOperatorTemplate
-	| FUNCTION categoryTemplate #FunctionOperatorTemplate
-	| GENERIC categoryTemplate #GenericOperatorTemplate
-	;
+    : RELATION template_        # RelationOperatorTemplate
+    | FUNCTION categoryTemplate # FunctionOperatorTemplate
+    | GENERIC categoryTemplate  # GenericOperatorTemplate
+    ;
 
 categoryTemplate
-	: prefixTemplate
-	| postfixTemplate
-	| prec assoc infixTemplate
-	| nofixTemplate
-	;
+    : prefixTemplate
+    | postfixTemplate
+    | prec assoc infixTemplate
+    | nofixTemplate
+    ;
 
 prec
-	: NUMERAL
-	;
-	
+    : NUMERAL
+    ;
+
 assoc
-	: LEFTASSOC
-	| RIGHTASSOC
-	;
+    : LEFTASSOC
+    | RIGHTASSOC
+    ;
 
 template_
-	: prefixTemplate
-	| postfixTemplate
-	| infixTemplate
-	| nofixTemplate
-	;
+    : prefixTemplate
+    | postfixTemplate
+    | infixTemplate
+    | nofixTemplate
+    ;
 
 prefixTemplate
-	: LEFT_PARENTHESIS (prefixName | POWERSET ARGUMENT) RIGHT_PARENTHESIS
-	;
+    : LEFT_PARENTHESIS (prefixName | POWERSET ARGUMENT) RIGHT_PARENTHESIS
+    ;
 
 postfixTemplate
-	: LEFT_PARENTHESIS postfixName RIGHT_PARENTHESIS
-	;
+    : LEFT_PARENTHESIS postfixName RIGHT_PARENTHESIS
+    ;
 
 infixTemplate
-	: LEFT_PARENTHESIS infixName RIGHT_PARENTHESIS
-	;
+    : LEFT_PARENTHESIS infixName RIGHT_PARENTHESIS
+    ;
 
 nofixTemplate
-	: LEFT_PARENTHESIS nofixName RIGHT_PARENTHESIS
-	;
-	
+    : LEFT_PARENTHESIS nofixName RIGHT_PARENTHESIS
+    ;
+
 optArgName
-	: ARGUMENT NAME
-	;
-	
+    : ARGUMENT NAME
+    ;
+
 optListName
-	: LIST NAME
-	;
-	
+    : LIST NAME
+    ;
+
 argName
-	: ARGUMENT NAME
-	;
-	
+    : ARGUMENT NAME
+    ;
+
 listName
-	: LIST NAME
-	;
+    : LIST NAME
+    ;
 
-prefixName 
-	: NAME ARGUMENT
-	| NAME (optArgName | optListName)* (argName | listName) ARGUMENT
-	;
-	
-postfixName 
-	: ARGUMENT NAME
-	| ARGUMENT NAME (optArgName | optListName)* (argName | listName)
-	;
-	
-infixName 
-	: ARGUMENT NAME ARGUMENT
-	| ARGUMENT NAME (optArgName | optListName)* (argName | listName) ARGUMENT
-	;
-	
-nofixName 
-	: NAME (optArgName | optListName)* (argName | listName)
-	;
+prefixName
+    : NAME ARGUMENT
+    | NAME (optArgName | optListName)* (argName | listName) ARGUMENT
+    ;
 
+postfixName
+    : ARGUMENT NAME
+    | ARGUMENT NAME (optArgName | optListName)* (argName | listName)
+    ;
+
+infixName
+    : ARGUMENT NAME ARGUMENT
+    | ARGUMENT NAME (optArgName | optListName)* (argName | listName) ARGUMENT
+    ;
+
+nofixName
+    : NAME (optArgName | optListName)* (argName | listName)
+    ;

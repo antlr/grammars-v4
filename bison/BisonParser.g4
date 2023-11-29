@@ -17,15 +17,18 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-
 /*==========\
 | Grammar.  |
 \==========*/
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 parser grammar BisonParser;
 
-options { tokenVocab=BisonLexer; }
+options {
+    tokenVocab = BisonLexer;
+}
 
 input_
     : prologue_declarations '%%' bison_grammar epilogue_opt EOF
@@ -74,7 +77,6 @@ params
     : params actionBlock
     | actionBlock
     ;
-
 
 /*----------------------.
 | grammar_declaration.  |
@@ -159,13 +161,15 @@ nterm_decls
 
 // A non empty list of possibly tagged symbols for %token or %nterm.
 
-token_decls : ( | TAG ) token_decl+ ( TAG token_decl+ )* ;
+token_decls
+    : ( | TAG) token_decl+ (TAG token_decl+)*
+    ;
 
 // One symbol declaration for %token or %nterm.
 
 token_decl
     : id int_opt alias
-    | id id LPAREN id RPAREN alias    // Not in Bison, but used in https://github.com/ruby/ruby/parse.y
+    | id id LPAREN id RPAREN alias // Not in Bison, but used in https://github.com/ruby/ruby/parse.y
     ;
 
 int_opt
@@ -176,9 +180,8 @@ int_opt
 alias
     :
     | string_as_id
-//| TSTRING
+    //| TSTRING
     ;
-
 
 /*-------------------------------------.
 | token_decls_for_prec (%left, etc.).  |
@@ -201,7 +204,6 @@ token_decl_for_prec
     : id int_opt
     | string_as_id
     ;
-
 
 /*-----------------------------------.
 | symbol_decls (argument of %type).  |
@@ -241,7 +243,8 @@ rhses_1
     ;
 
 rhs
-    : ( symbol named_ref_opt
+    : (
+        symbol named_ref_opt
         | tag_opt actionBlock named_ref_opt
         | BRACED_PREDICATE
         | EMPTY_RULE
@@ -249,14 +252,14 @@ rhs
         | DPREC INT
         | MERGE TAG
         | EXPECT INT
-        | EXPECT_RR INT)*
+        | EXPECT_RR INT
+    )*
     ;
 
 named_ref_opt
     :
     | BRACKETED_ID
     ;
-
 
 /*---------------------.
 | variable and value.  |
@@ -272,7 +275,6 @@ value
     | STRING
     | actionBlock
     ;
-
 
 /*--------------.
 | Identifiers.  |

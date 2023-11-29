@@ -29,39 +29,42 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar lisp;
 
 lisp_
-   : s_expression+ EOF
-   ;
+    : s_expression+ EOF
+    ;
 
 s_expression
-   : ATOMIC_SYMBOL
-   | '(' s_expression '.' s_expression ')'
-   | list
-   ;
+    : ATOMIC_SYMBOL
+    | '(' s_expression '.' s_expression ')'
+    | list
+    ;
 
 list
-   : '(' s_expression+ ')'
-   ;
+    : '(' s_expression+ ')'
+    ;
 
 ATOMIC_SYMBOL
-   : LETTER ATOM_PART?
-   ;
+    : LETTER ATOM_PART?
+    ;
 
 fragment ATOM_PART
-   : (LETTER | NUMBER) ATOM_PART
-   ;
+    : (LETTER | NUMBER) ATOM_PART
+    ;
 
 fragment LETTER
-   : [a-z]
-   ;
+    : [a-z]
+    ;
 
 fragment NUMBER
-   : [1-9]
-   ;
+    : [1-9]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

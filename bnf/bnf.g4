@@ -26,11 +26,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar bnf;
 
 rulelist
     : rule_* EOF
-;
+    ;
 
 rule_
     : lhs ASSIGN rhs
@@ -125,7 +128,7 @@ Less_Than_Sign
     ;
 
 ID
-    : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-'|' ')+
+    : ('a' ..'z' | 'A' ..'Z') ('a' ..'z' | 'A' ..'Z' | '0' ..'9' | '-' | ' ')+
     ;
 
 WS

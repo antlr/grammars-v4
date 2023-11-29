@@ -26,128 +26,126 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar HaskellParser;
 
-options { tokenVocab=HaskellLexer; }
+options {
+    tokenVocab = HaskellLexer;
+}
 
-module :  OCURLY? semi* pragmas? semi* (module_content | body) CCURLY? semi? EOF;
+module
+    : OCURLY? semi* pragmas? semi* (module_content | body) CCURLY? semi? EOF
+    ;
 
 module_content
-    :
-    'module' modid exports? where_module
+    : 'module' modid exports? where_module
     ;
 
 where_module
-    :
-    'where' module_body
+    : 'where' module_body
     ;
 
 module_body
-    :
-    open_ body close semi*
+    : open_ body close semi*
     ;
 
 pragmas
-    :
-    pragma+
+    : pragma+
     ;
 
 pragma
-    :
-    language_pragma
+    : language_pragma
     | options_ghc
     | simple_options
     ;
 
 language_pragma
-    :
-    '{-#' 'LANGUAGE'  extension_ (',' extension_)* '#-}' semi?
+    : '{-#' 'LANGUAGE' extension_ (',' extension_)* '#-}' semi?
     ;
 
 options_ghc
-    :
-    '{-#' 'OPTIONS_GHC' ('-' (varid | conid))* '#-}' semi?
+    : '{-#' 'OPTIONS_GHC' ('-' (varid | conid))* '#-}' semi?
     ;
 
 simple_options
-    :
-    '{-#' 'OPTIONS' ('-' (varid | conid))* '#-}' semi?
+    : '{-#' 'OPTIONS' ('-' (varid | conid))* '#-}' semi?
     ;
 
 extension_
-    :
-    CONID
+    : CONID
     ;
 
 body
-    :
-    (impdecls topdecls)
+    : (impdecls topdecls)
     | impdecls
     | topdecls
     ;
 
 impdecls
-    :
-    (impdecl | NEWLINE | semi)+
+    : (impdecl | NEWLINE | semi)+
     ;
 
 exports
-    :
-    '(' (exprt (',' exprt)*)? ','? ')'
+    : '(' (exprt (',' exprt)*)? ','? ')'
     ;
 
 exprt
-    :
-    qvar
-    | ( qtycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')') )? )
-    | ( qtycls ( ('(' '..' ')') | ('(' (qvar (',' qvar)*)? ')') )? )
-    | ( 'module' modid )
+    : qvar
+    | ( qtycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')'))?)
+    | ( qtycls ( ('(' '..' ')') | ('(' (qvar (',' qvar)*)? ')'))?)
+    | ( 'module' modid)
     ;
 
 impdecl
-    :
-    'import' 'qualified'? modid ('as' modid)? impspec? semi+
+    : 'import' 'qualified'? modid ('as' modid)? impspec? semi+
     ;
 
 impspec
-    :
-    ('(' (himport (',' himport)* ','?)? ')')
-    | ( 'hiding' '(' (himport (',' himport)* ','?)? ')' )
+    : ('(' (himport (',' himport)* ','?)? ')')
+    | ( 'hiding' '(' (himport (',' himport)* ','?)? ')')
     ;
 
 himport
-    :
-    var_
-    | ( tycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')') )? )
-    | ( tycls ( ('(' '..' ')') | ('(' sig_vars? ')') )? )
+    : var_
+    | ( tycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')'))?)
+    | ( tycls ( ('(' '..' ')') | ('(' sig_vars? ')'))?)
     ;
 
 cname
-    :
-    var_ | con
+    : var_
+    | con
     ;
 
 // -------------------------------------------
 // Fixity Declarations
 
-fixity: 'infix' | 'infixl' | 'infixr';
+fixity
+    : 'infix'
+    | 'infixl'
+    | 'infixr'
+    ;
 
-ops : op (',' op)*;
+ops
+    : op (',' op)*
+    ;
 
 // -------------------------------------------
 // Top-Level Declarations
-topdecls : (topdecl semi+| NEWLINE | semi)+;
+topdecls
+    : (topdecl semi+ | NEWLINE | semi)+
+    ;
 
 topdecl
-    :
-    cl_decl
+    : cl_decl
     | ty_decl
     // Check KindSignatures
     | standalone_kind_sig
     | inst_decl
     | standalone_deriving
     | role_annot
-    | ('default' '(' comma_types? ')' )
+    | ('default' '(' comma_types? ')')
     | ('foreign' fdecl)
     | ('{-#' 'DEPRECATED' deprecations? '#-}')
     | ('{-#' 'WARNING' warnings? '#-}')
@@ -164,8 +162,7 @@ topdecl
 // Type classes
 //
 cl_decl
-    :
-    'class' tycl_hdr fds? where_cls?
+    : 'class' tycl_hdr fds? where_cls?
     ;
 
 // Type declarations (toplevel)
@@ -189,19 +186,16 @@ ty_decl
 // standalone kind signature
 
 standalone_kind_sig
-    :
-    'type' sks_vars '::' ktypedoc
+    : 'type' sks_vars '::' ktypedoc
     ;
 
 // See also: sig_vars
 sks_vars
-    :
-    oqtycon (',' oqtycon)*
+    : oqtycon (',' oqtycon)*
     ;
 
 inst_decl
-    :
-    ('instance' overlap_pragma? inst_type where_inst?)
+    : ('instance' overlap_pragma? inst_type where_inst?)
     | ('type' 'instance' ty_fam_inst_eqn)
     // 'constrs' in the end of this rules in GHC
     // This parser no use docs
@@ -213,29 +207,24 @@ inst_decl
     ;
 
 overlap_pragma
-    :
-      '{-#' 'OVERLAPPABLE' '#-}'
+    : '{-#' 'OVERLAPPABLE' '#-}'
     | '{-#' 'OVERLAPPING' '#-}'
     | '{-#' 'OVERLAPS' '#-}'
     | '{-#' 'INCOHERENT' '#-}'
     ;
 
-
 deriv_strategy_no_via
-    :
-      'stock'
+    : 'stock'
     | 'anyclass'
     | 'newtype'
     ;
 
 deriv_strategy_via
-    :
-    'via' ktype
+    : 'via' ktype
     ;
 
 deriv_standalone_strategy
-    :
-      'stock'
+    : 'stock'
     | 'anyclass'
     | 'newtype'
     | deriv_strategy_via
@@ -244,8 +233,7 @@ deriv_standalone_strategy
 // Injective type families
 
 opt_injective_info
-    :
-    '|' injectivity_cond
+    : '|' injectivity_cond
     ;
 
 injectivity_cond
@@ -255,32 +243,27 @@ injectivity_cond
     ;
 
 inj_varids
-    :
-    tyvarid+
+    : tyvarid+
     ;
 
 // Closed type families
 
 where_type_family
-    :
-    'where' ty_fam_inst_eqn_list
+    : 'where' ty_fam_inst_eqn_list
     ;
 
 ty_fam_inst_eqn_list
-    :
-    (open_ ty_fam_inst_eqns? close)
+    : (open_ ty_fam_inst_eqns? close)
     | ('{' '..' '}')
     | (open_ '..' close)
     ;
 
 ty_fam_inst_eqns
-    :
-    ty_fam_inst_eqn (semi+ ty_fam_inst_eqn)* semi*
+    : ty_fam_inst_eqn (semi+ ty_fam_inst_eqn)* semi*
     ;
 
 ty_fam_inst_eqn
-    :
-    'forall' tv_bndrs? '.' type_ '=' ktype
+    : 'forall' tv_bndrs? '.' type_ '=' ktype
     | type_ '=' ktype
     ;
 
@@ -294,8 +277,7 @@ ty_fam_inst_eqn
 //    data declarations.
 
 at_decl_cls
-    :
-    ('data' 'family'? type_ opt_datafam_kind_sig?)
+    : ('data' 'family'? type_ opt_datafam_kind_sig?)
     | ('type' 'family'? type_ opt_at_kind_inj_sig?)
     | ('type' 'instance'? ty_fam_inst_eqn)
     ;
@@ -317,44 +299,37 @@ at_decl_inst
 // Family result/return kind signatures
 
 opt_kind_sig
-    :
-    '::' kind
+    : '::' kind
     ;
 
 opt_datafam_kind_sig
-    :
-    '::' kind
+    : '::' kind
     ;
 
 opt_tyfam_kind_sig
-    :
-    ('::' kind)
+    : ('::' kind)
     | ('=' tv_bndr)
     ;
 
 opt_at_kind_inj_sig
-    :
-    ('::' kind)
+    : ('::' kind)
     | ('=' tv_bndr_no_braces '|' injectivity_cond)
     ;
 
 tycl_hdr
-    :
-    (tycl_context '=>' type_)
+    : (tycl_context '=>' type_)
     | type_
     ;
 
 tycl_hdr_inst
-    :
-    ('forall' tv_bndrs? '.' tycl_context '=>' type_)
+    : ('forall' tv_bndrs? '.' tycl_context '=>' type_)
     | ('forall' tv_bndrs? '.' type_)
     | (tycl_context '=>' type_)
     | type_
     ;
 
 capi_ctype
-    :
-    ('{-#' 'CTYPE' STRING STRING '#-}')
+    : ('{-#' 'CTYPE' STRING STRING '#-}')
     | ('{-#' 'CTYPE' STRING '#-}')
     ;
 
@@ -362,62 +337,52 @@ capi_ctype
 // Stand-alone deriving
 
 standalone_deriving
-    :
-    'deriving' deriv_standalone_strategy? 'instance' overlap_pragma? inst_type
+    : 'deriving' deriv_standalone_strategy? 'instance' overlap_pragma? inst_type
     ;
 
 // -------------------------------------------
 // Role annotations
 
 role_annot
-    :
-    'type' 'role' oqtycon roles?
+    : 'type' 'role' oqtycon roles?
     ;
 
 roles
-    :
-    role+
+    : role+
     ;
 
 role
-    :
-    varid | '_'
+    : varid
+    | '_'
     ;
-
 
 // -------------------------------------------
 // Pattern synonyms
 pattern_synonym_decl
-    :
-    ('pattern' pattern_synonym_lhs '=' pat)
+    : ('pattern' pattern_synonym_lhs '=' pat)
     | ('pattern' pattern_synonym_lhs '<-' pat where_decls?)
     ;
 
 pattern_synonym_lhs
-    :
-    (con vars_?)
+    : (con vars_?)
     | (varid conop varid)
     | (con '{' cvars '}')
     ;
 
 vars_
-    :
-    varid+
+    : varid+
     ;
 
 cvars
-    :
-    var_ (',' var_)*
+    : var_ (',' var_)*
     ;
 
 where_decls
-    :
-    'where' open_ decls? close
+    : 'where' open_ decls? close
     ;
 
 pattern_synonym_sig
-    :
-    'pattern' con_list '::' sigtypedoc
+    : 'pattern' con_list '::' sigtypedoc
     ;
 
 // -------------------------------------------
@@ -426,118 +391,99 @@ pattern_synonym_sig
 // Declaration in class bodies
 
 decl_cls
-    :
-    at_decl_cls
+    : at_decl_cls
     | decl
     | 'default' infixexp '::' sigtypedoc
     ;
 
 decls_cls
-    :
-    decl_cls (semi+ decl_cls)* semi*
+    : decl_cls (semi+ decl_cls)* semi*
     ;
 
 decllist_cls
-    :
-    open_ decls_cls? close
+    : open_ decls_cls? close
     ;
 
 // Class body
 //
 where_cls
-    :
-    'where' decllist_cls
+    : 'where' decllist_cls
     ;
 
 // Declarations in instance bodies
 //
 decl_inst
-    :
-    at_decl_inst
+    : at_decl_inst
     | decl
     ;
 
 decls_inst
-    :
-    decl_inst (semi+ decl_inst)* semi*
+    : decl_inst (semi+ decl_inst)* semi*
     ;
 
 decllist_inst
-    :
-    open_ decls_inst? close
+    : open_ decls_inst? close
     ;
 
 // Instance body
 //
 where_inst
-    :
-    'where' decllist_inst
+    : 'where' decllist_inst
     ;
 
 // Declarations in binding groups other than classes and instances
 //
 decls
-    :
-    decl (semi+ decl)* semi*
+    : decl (semi+ decl)* semi*
     ;
 
 decllist
-    :
-    open_ decls? close
+    : open_ decls? close
     ;
 
 // Binding groups other than those of class and instance declarations
 //
 binds
-    :
-    decllist
+    : decllist
     | (open_ dbinds? close)
     ;
 
 wherebinds
-    :
-    'where' binds
+    : 'where' binds
     ;
-
 
 // -------------------------------------------
 // Transformation Rules
 
 rules
-    :
-    pragma_rule (semi pragma_rule)* semi?
+    : pragma_rule (semi pragma_rule)* semi?
     ;
 
 pragma_rule
-    :
-    pstring rule_activation? rule_foralls? infixexp '=' exp
+    : pstring rule_activation? rule_foralls? infixexp '=' exp
     ;
 
 rule_activation_marker
-    :
-    '~' | varsym
+    : '~'
+    | varsym
     ;
 
 rule_activation
-    :
-    ('[' integer ']')
+    : ('[' integer ']')
     | ('[' rule_activation_marker integer ']')
     | ('[' rule_activation_marker ']')
     ;
 
 rule_foralls
-    :
-    ('forall' rule_vars? '.' ('forall' rule_vars? '.')?)
+    : ('forall' rule_vars? '.' ('forall' rule_vars? '.')?)
     ;
 
 rule_vars
-    :
-    rule_var+
+    : rule_var+
     ;
 
 rule_var
-    :
-    varid
+    : varid
     | ('(' varid '::' ctype ')')
     ;
 
@@ -545,42 +491,35 @@ rule_var
 // Warnings and deprecations (c.f. rules)
 
 warnings
-    :
-    pragma_warning (semi pragma_warning)* semi?
+    : pragma_warning (semi pragma_warning)* semi?
     ;
 
 pragma_warning
-    :
-    namelist strings
+    : namelist strings
     ;
 
 deprecations
-    :
-    pragma_deprecation (semi pragma_deprecation)* semi?
+    : pragma_deprecation (semi pragma_deprecation)* semi?
     ;
 
 pragma_deprecation
-    :
-    namelist strings
+    : namelist strings
     ;
 
 strings
-    :
-    pstring
+    : pstring
     | ('[' stringlist? ']')
     ;
 
 stringlist
-    :
-    pstring (',' pstring)*
+    : pstring (',' pstring)*
     ;
 
 // -------------------------------------------
 // Annotations
 
 annotation
-    :
-      ('{-#' 'ANN' name_var aexp '#-}')
+    : ('{-#' 'ANN' name_var aexp '#-}')
     | ('{-#' 'ANN' tycon aexp '#-}')
     | ('{-#' 'ANN' 'module' aexp '#-}')
     ;
@@ -589,82 +528,81 @@ annotation
 // Foreign import and export declarations
 
 fdecl
-    :
-    ('import' callconv safety? fspec)
+    : ('import' callconv safety? fspec)
     | ('export' callconv fspec)
     ;
 
 callconv
-    :
-    'ccall' | 'stdcall' | 'cplusplus' | 'javascript'
+    : 'ccall'
+    | 'stdcall'
+    | 'cplusplus'
+    | 'javascript'
     ;
 
-safety : 'unsafe' | 'safe' | 'interruptible';
+safety
+    : 'unsafe'
+    | 'safe'
+    | 'interruptible'
+    ;
 
 fspec
-    :
-    pstring? var_ '::' sigtypedoc
+    : pstring? var_ '::' sigtypedoc
     ;
 
 // -------------------------------------------
 // Type signatures
 
-opt_sig : '::' sigtype;
+opt_sig
+    : '::' sigtype
+    ;
 
-opt_tyconsig : '::' gtycon;
+opt_tyconsig
+    : '::' gtycon
+    ;
 
 sigtype
-    :
-    ctype
+    : ctype
     ;
 
 sigtypedoc
-    :
-    ctypedoc
+    : ctypedoc
     ;
 
 sig_vars
-    :
-    var_ (',' var_)*
+    : var_ (',' var_)*
     ;
 
 sigtypes1
-    :
-    sigtype (',' sigtype)*
+    : sigtype (',' sigtype)*
     ;
 
 // -------------------------------------------
 // Types
 
 unpackedness
-    :
-      ('{-#' 'UNPACK'   '#-}')
+    : ('{-#' 'UNPACK' '#-}')
     | ('{-#' 'NOUNPACK' '#-}')
     ;
 
 forall_vis_flag
-    :
-    '.'
+    : '.'
     | '->'
     ;
 
 // A ktype/ktypedoc is a ctype/ctypedoc, possibly with a kind annotation
 ktype
-    :
-    ctype
+    : ctype
     | (ctype '::' kind)
     ;
 
 ktypedoc
-    :
-    ctypedoc
+    : ctypedoc
     | ctypedoc '::' kind
     ;
 
 // A ctype is a for-all type
 ctype
-    :
-    'forall' tv_bndrs? forall_vis_flag ctype
+    : 'forall' tv_bndrs? forall_vis_flag ctype
     | btype '=>' ctype
     | var_ '::' type_ // not sure about this rule
     | type_
@@ -681,10 +619,8 @@ ctype
 // -- If we allow comments on types here, it's not clear if the comment applies
 // -- to 'field' or to 'Int'. So we must use `ctype` to describe the type.
 
-
 ctypedoc
-    :
-    'forall' tv_bndrs? forall_vis_flag ctypedoc
+    : 'forall' tv_bndrs? forall_vis_flag ctypedoc
     | tycl_context '=>' ctypedoc
     | var_ '::' type_
     | typedoc
@@ -692,8 +628,7 @@ ctypedoc
 
 // In GHC this rule is context
 tycl_context
-    :
-    btype
+    : btype
     ;
 
 // constr_context rule
@@ -716,8 +651,7 @@ tycl_context
 // -}
 
 constr_context
-    :
-    constr_btype
+    : constr_btype
     ;
 
 // {- Note [GADT decl discards annotations]
@@ -738,45 +672,37 @@ constr_context
 // -}
 
 type_
-    :
-    btype
+    : btype
     | btype '->' ctype
     ;
 
 typedoc
-    :
-    btype
+    : btype
     | btype '->' ctypedoc
     ;
 
 constr_btype
-    :
-    constr_tyapps
+    : constr_tyapps
     ;
 
 constr_tyapps
-    :
-    constr_tyapp+
+    : constr_tyapp+
     ;
 
 constr_tyapp
-    :
-    tyapp
+    : tyapp
     ;
 
 btype
-    :
-    tyapps
+    : tyapps
     ;
 
 tyapps
-    :
-    tyapp+
+    : tyapp+
     ;
 
 tyapp
-    :
-    atype
+    : atype
     | ('@' atype)
     | qtyconop
     | tyvarop
@@ -786,8 +712,7 @@ tyapp
     ;
 
 atype
-    :
-    ntgtycon
+    : ntgtycon
     | tyvar
     | '*'
     | ('~' atype)
@@ -817,70 +742,57 @@ atype
     ;
 
 inst_type
-    :
-    sigtype
+    : sigtype
     ;
 
 deriv_types
-    :
-    ktypedoc (',' ktypedoc)*
+    : ktypedoc (',' ktypedoc)*
     ;
 
 comma_types
-    :
-    ktype (',' ktype)*
+    : ktype (',' ktype)*
     ;
 
 bar_types2
-    :
-    ktype '|' ktype ('|' ktype)*
+    : ktype '|' ktype ('|' ktype)*
     ;
 
 tv_bndrs
-    :
-    tv_bndr+
+    : tv_bndr+
     ;
 
 tv_bndr
-    :
-    tv_bndr_no_braces
+    : tv_bndr_no_braces
     | ('{' tyvar '}')
     | ('{' tyvar '::' kind '}')
     ;
 
 tv_bndr_no_braces
-    :
-    tyvar
+    : tyvar
     | ('(' tyvar '::' kind ')')
     ;
 
 fds
-    :
-    '|' fds1
+    : '|' fds1
     ;
 
 fds1
-    :
-    fd (',' fd)*
+    : fd (',' fd)*
     ;
 
 fd
-    :
-    varids0? '->' varids0?
+    : varids0? '->' varids0?
     ;
 
 varids0
-    :
-    tyvar+
+    : tyvar+
     ;
-
 
 // -------------------------------------------
 // Kinds
 
 kind
-    :
-    ctype
+    : ctype
     ;
 
 // {- Note [Promotion]
@@ -908,13 +820,11 @@ kind
 // Datatype declarations
 
 gadt_constrlist
-    :
-    'where' open_ gadt_constrs? semi* close
+    : 'where' open_ gadt_constrs? semi* close
     ;
 
 gadt_constrs
-    :
-    gadt_constr_with_doc (semi gadt_constr_with_doc)*
+    : gadt_constr_with_doc (semi gadt_constr_with_doc)*
     ;
 
 // We allow the following forms:
@@ -924,15 +834,12 @@ gadt_constrs
 //      forall a. Eq a => D { x,y :: a } :: T a
 
 gadt_constr_with_doc
-    :
-    gadt_constr
+    : gadt_constr
     ;
 
 gadt_constr
-    :
-    con_list '::' sigtypedoc
+    : con_list '::' sigtypedoc
     ;
-
 
 // {- Note [Difference in parsing GADT and data constructors]
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -953,13 +860,11 @@ gadt_constr
 //     ;
 
 constrs
-    :
-    '=' constrs1
+    : '=' constrs1
     ;
 
 constrs1
-    :
-    constr ('|' constr)*
+    : constr ('|' constr)*
     ;
 
 // {- Note [Constr variations of non-terminals]
@@ -1022,48 +927,40 @@ constrs1
 //     ;
 
 constr
-    :
-    forall? (constr_context '=>')? constr_stuff
+    : forall? (constr_context '=>')? constr_stuff
     ;
 
 forall
-    :
-    'forall' tv_bndrs? '.'
+    : 'forall' tv_bndrs? '.'
     ;
 
 constr_stuff
-    :
-    constr_tyapps
+    : constr_tyapps
     ;
 
 fielddecls
-    :
-    fielddecl (',' fielddecl)*
+    : fielddecl (',' fielddecl)*
     ;
 
 fielddecl
-    :
-    sig_vars '::' ctype
+    : sig_vars '::' ctype
     ;
 
 // A list of one or more deriving clauses at the end of a datatype
 derivings
-    :
-    deriving+
+    : deriving+
     ;
 
 // The outer Located is just to allow the caller to
 // know the rightmost extremity of the 'deriving' clause
 deriving
-    :
-    ('deriving' deriv_clause_types)
+    : ('deriving' deriv_clause_types)
     | ('deriving' deriv_strategy_no_via deriv_clause_types)
     | ('deriving' deriv_clause_types deriv_strategy_via)
     ;
 
 deriv_clause_types
-    :
-    qtycon
+    : qtycon
     | '(' ')'
     | '(' deriv_types ')'
     ;
@@ -1094,8 +991,7 @@ deriv_clause_types
 // -}
 
 decl_no_th
-    :
-    sigdecl
+    : sigdecl
     | (infixexp opt_sig? rhs)
     | pattern_synonym_decl
     // | docdecl
@@ -1103,8 +999,7 @@ decl_no_th
     ;
 
 decl
-    :
-    decl_no_th
+    : decl_no_th
 
     // Why do we only allow naked declaration splices in top-level
     // declarations and not here? Short answer: because readFail009
@@ -1114,23 +1009,20 @@ decl
     ;
 
 rhs
-    :
-    ('=' exp wherebinds?)
-    | (gdrhs wherebinds?);
+    : ('=' exp wherebinds?)
+    | (gdrhs wherebinds?)
+    ;
 
 gdrhs
-    :
-    gdrh+
+    : gdrh+
     ;
 
 gdrh
-    :
-    '|' guards '=' exp
+    : '|' guards '=' exp
     ;
 
 sigdecl
-    :
-    (infixexp '::' sigtypedoc)
+    : (infixexp '::' sigtypedoc)
     | (var_ ',' sig_vars '::' sigtypedoc)
     | (fixity integer? ops)
     | (pattern_synonym_sig)
@@ -1141,12 +1033,11 @@ sigdecl
     | ('{-#' 'SPECIALISE_INLINE' activation? qvar '::' sigtypes1 '#-}')
     | ('{-#' 'SPECIALISE' 'instance' inst_type '#-}')
     | ('{-#' 'MINIMAL' '#-}' name_boolformula_opt? '#-}')
-    |(semi+)
+    | (semi+)
     ;
 
 activation
-    :
-    ('[' integer ']')
+    : ('[' integer ']')
     | ('[' rule_activation_marker integer ']')
     ;
 
@@ -1154,24 +1045,20 @@ activation
 // Expressions
 
 th_quasiquote
-    :
-    '[' varid '|'
+    : '[' varid '|'
     ;
 
 th_qquasiquote
-    :
-    '[' qvarid '|'
+    : '[' qvarid '|'
     ;
 
 quasiquote
-    :
-    th_quasiquote
+    : th_quasiquote
     | th_qquasiquote
     ;
 
 exp
-    :
-    (infixexp '::' sigtype)
+    : (infixexp '::' sigtype)
     | (infixexp '-<' exp)
     | (infixexp '>-' exp)
     | (infixexp '-<<' exp)
@@ -1180,28 +1067,23 @@ exp
     ;
 
 infixexp
-    :
-    exp10 (qop exp10p)*
+    : exp10 (qop exp10p)*
     ;
 
 exp10p
-    :
-    exp10
+    : exp10
     ;
 
 exp10
-    :
-    '-'? fexp
+    : '-'? fexp
     ;
 
 fexp
-    :
-    aexp+ ('@' atype)?
+    : aexp+ ('@' atype)?
     ;
 
 aexp
-    :
-    (qvar '@' aexp)
+    : (qvar '@' aexp)
     | ('~' aexp)
     | ('!' aexp)
     | ('\\' apats '->' exp)
@@ -1216,13 +1098,11 @@ aexp
     ;
 
 aexp1
-    :
-    aexp2 ('{' fbinds? '}')*
+    : aexp2 ('{' fbinds? '}')*
     ;
 
 aexp2
-    :
-    qvar
+    : qvar
     | qcon
     | varid
     | literal
@@ -1257,68 +1137,57 @@ aexp2
     ;
 
 splice_exp
-    :
-    splice_typed
+    : splice_typed
     | splice_untyped
     ;
 
 splice_untyped
-    :
-    '$' aexp
+    : '$' aexp
     ;
 
 splice_typed
-    :
-    '$$' aexp
+    : '$$' aexp
     ;
 
 cmdargs
-    :
-    acmd+
+    : acmd+
     ;
 
 acmd
-    :
-    aexp
+    : aexp
     ;
 
 cvtopbody
-    :
-    open_ cvtopdecls0? close
+    : open_ cvtopdecls0? close
     ;
 
 cvtopdecls0
-    :
-    topdecls semi*
+    : topdecls semi*
     ;
 
 // -------------------------------------------
 // Tuple expressions
 
 texp
-    :
-    exp
+    : exp
     | (infixexp qop)
     | (qopm infixexp)
     | (exp '->' texp)
     ;
 
 tup_exprs
-    :
-    (texp commas_tup_tail)
+    : (texp commas_tup_tail)
     | (texp bars)
     | (commas tup_tail?)
     | (bars texp bars?)
     ;
 
 commas_tup_tail
-    :
-    commas tup_tail?
+    : commas tup_tail?
     ;
 
 tup_tail
-    :
-    texp commas_tup_tail
+    : texp commas_tup_tail
     | texp
     ;
 
@@ -1326,8 +1195,7 @@ tup_tail
 // List expressions
 
 list_
-    :
-    texp
+    : texp
     | lexps
     | texp '..'
     | texp ',' exp '..'
@@ -1337,35 +1205,29 @@ list_
     ;
 
 lexps
-    :
-    texp ',' texp (',' texp)*
+    : texp ',' texp (',' texp)*
     ;
-
 
 // -------------------------------------------
 // List Comprehensions
 
 flattenedpquals
-    :
-    pquals
+    : pquals
     ;
 
 pquals
-    :
-    squals ('|' squals)*
+    : squals ('|' squals)*
     ;
 
 squals
-    :
-    transformqual (',' transformqual)*
+    : transformqual (',' transformqual)*
     | transformqual (',' qual)*
     | qual (',' transformqual)*
     | qual (',' qual)*
     ;
 
 transformqual
-    :
-    'then' exp
+    : 'then' exp
     | 'then' exp 'by' exp
     | 'then' 'group' 'using' exp
     | 'then' 'group' 'by' exp 'using' exp
@@ -1376,19 +1238,15 @@ transformqual
 // introduces a shift/reduce conflict. Happy chooses to resolve the conflict
 // in by choosing the "group by" variant, which is what we want.
 
-
-
 // -------------------------------------------
 // Guards (Different from GHC)
 
 guards
-    :
-    guard_ (',' guard_)*
+    : guard_ (',' guard_)*
     ;
 
 guard_
-    :
-    pat '<-' infixexp
+    : pat '<-' infixexp
     | 'let' decllist
     | infixexp
     ;
@@ -1397,79 +1255,67 @@ guard_
 // Case alternatives
 
 alts
-    :
-    (open_ (alt semi*)+ close)
+    : (open_ (alt semi*)+ close)
     | (open_ close)
     ;
 
-alt : pat alt_rhs ;
+alt
+    : pat alt_rhs
+    ;
 
 alt_rhs
-    :
-    ralt wherebinds?
+    : ralt wherebinds?
     ;
 
 ralt
-    :
-    ('->' exp)
+    : ('->' exp)
     | gdpats
     ;
 
-
 gdpats
-    :
-    gdpat+
+    : gdpat+
     ;
 
 // In ghc parser on GitLab second rule is 'gdpats close'
 // Unclearly, is there possible errors with this implemmentation
 ifgdpats
-    :
-    '{' gdpats '}'
+    : '{' gdpats '}'
     | gdpats
     ;
 
 gdpat
-    :
-    '|' guards '->' exp
+    : '|' guards '->' exp
     ;
 
 pat
-    :
-    exp
+    : exp
     ;
 
 bindpat
-    :
-    exp
+    : exp
     ;
 
 apat
-    :
-    aexp
+    : aexp
     ;
 
 apats
-    :
-    apat+
+    : apat+
     ;
 
 fpat
-    :
-    qvar '=' pat
+    : qvar '=' pat
     ;
 
 // -------------------------------------------
 // Statement sequences
 
 stmtlist
-    :
-    open_ stmts? close
+    : open_ stmts? close
     ;
 
 stmts
-    :
-    stmt (semi+ stmt)* semi*
+    : stmt (semi+ stmt)* semi*
     ;
 
 stmt
@@ -1478,10 +1324,8 @@ stmt
     | semi+
     ;
 
-
 qual
-    :
-    bindpat '<-' exp
+    : bindpat '<-' exp
     | exp
     | 'let' binds
     ;
@@ -1490,8 +1334,7 @@ qual
 // Record Field Update/Construction
 
 fbinds
-    :
-    (fbind (',' fbind)*)
+    : (fbind (',' fbind)*)
     | ('..')
     ;
 
@@ -1504,8 +1347,7 @@ fbinds
 // 2) In the punning case, use a place-holder
 // The renamer fills in the final value
 fbind
-    :
-    (qvar '=' exp)
+    : (qvar '=' exp)
     | qvar
     ;
 
@@ -1513,13 +1355,11 @@ fbind
 // Implicit Parameter Bindings
 
 dbinds
-    :
-    dbind (semi+ dbind) semi*
+    : dbind (semi+ dbind) semi*
     ;
 
 dbind
-    :
-    varid '=' exp
+    : varid '=' exp
     ;
 
 // -------------------------------------------
@@ -1527,34 +1367,29 @@ dbind
 // Warnings and deprecations
 
 name_boolformula_opt
-    :
-    name_boolformula_and ('|' name_boolformula_and)*
+    : name_boolformula_and ('|' name_boolformula_and)*
     ;
 
 name_boolformula_and
-    :
-    name_boolformula_and_list
+    : name_boolformula_and_list
     ;
 
 name_boolformula_and_list
-    :
-    name_boolformula_atom (',' name_boolformula_atom)*
+    : name_boolformula_atom (',' name_boolformula_atom)*
     ;
 
 name_boolformula_atom
-    :
-    ('(' name_boolformula_opt ')')
+    : ('(' name_boolformula_opt ')')
     | name_var
     ;
 
 namelist
-    :
-    name_var (',' name_var)*
+    : name_var (',' name_var)*
     ;
 
 name_var
-    :
-    var_ | con
+    : var_
+    | con
     ;
 
 // -------------------------------------------
@@ -1562,49 +1397,69 @@ name_var
 // There are two different productions here as lifted list constructors
 // are parsed differently.
 
-qcon_nowiredlist : gen_qcon | sysdcon_nolist;
+qcon_nowiredlist
+    : gen_qcon
+    | sysdcon_nolist
+    ;
 
-qcon  : gen_qcon | sysdcon;
+qcon
+    : gen_qcon
+    | sysdcon
+    ;
 
-gen_qcon : qconid | ( '(' qconsym ')' );
+gen_qcon
+    : qconid
+    | ( '(' qconsym ')')
+    ;
 
-con    : conid   | ( '(' consym ')' ) | sysdcon;
+con
+    : conid
+    | ( '(' consym ')')
+    | sysdcon
+    ;
 
-con_list : con (',' con)*;
+con_list
+    : con (',' con)*
+    ;
 
 sysdcon_nolist
-    :
-    ('(' ')')
+    : ('(' ')')
     | ('(' commas ')')
     | ('(#' '#)')
     | ('(#' commas '#)')
     ;
 
 sysdcon
-    :
-    sysdcon_nolist
+    : sysdcon_nolist
     | ('[' ']')
     ;
 
-conop  : consym  | ('`' conid '`')	 ;
+conop
+    : consym
+    | ('`' conid '`')
+    ;
 
-qconop : gconsym | ('`' qconid '`')	 ;
+qconop
+    : gconsym
+    | ('`' qconid '`')
+    ;
 
-gconsym: ':'  	 | qconsym			 ;
+gconsym
+    : ':'
+    | qconsym
+    ;
 
 // -------------------------------------------
 // Type constructors (Be careful!!!)
 
 gtycon
-    :
-    ntgtycon
-    | ('('  ')')
+    : ntgtycon
+    | ('(' ')')
     | ('(#' '#)')
     ;
 
 ntgtycon
-    :
-    oqtycon
+    : oqtycon
     | ('(' commas ')')
     | ('(#' commas '#)')
     | ('(' '->' ')')
@@ -1612,8 +1467,7 @@ ntgtycon
     ;
 
 oqtycon
-    :
-    qtycon
+    : qtycon
     | ('(' qtyconsym ')')
     ;
 
@@ -1637,78 +1491,147 @@ oqtycon
 // child.
 // -}
 
-qtyconop: qtyconsym | ('`' qtycon '`');
+qtyconop
+    : qtyconsym
+    | ('`' qtycon '`')
+    ;
 
-qtycon : (modid '.')? tycon;
+qtycon
+    : (modid '.')? tycon
+    ;
 
-tycon : conid;
+tycon
+    : conid
+    ;
 
-qtyconsym:qconsym | qvarsym | tyconsym;
+qtyconsym
+    : qconsym
+    | qvarsym
+    | tyconsym
+    ;
 
-tyconsym: consym | varsym | ':' | '-' | '.';
+tyconsym
+    : consym
+    | varsym
+    | ':'
+    | '-'
+    | '.'
+    ;
 
 // -------------------------------------------
 // Operators
 
-op     : varop   | conop           ;
+op
+    : varop
+    | conop
+    ;
 
-varop  : varsym  | ('`' varid '`') ;
+varop
+    : varsym
+    | ('`' varid '`')
+    ;
 
-qop    : qvarop  | qconop		   ;
+qop
+    : qvarop
+    | qconop
+    ;
 
-qopm   : qvaropm | qconop | hole_op;
+qopm
+    : qvaropm
+    | qconop
+    | hole_op
+    ;
 
-hole_op: '`' '_' '`';
+hole_op
+    : '`' '_' '`'
+    ;
 
-qvarop : qvarsym | ('`' qvarid '`');
+qvarop
+    : qvarsym
+    | ('`' qvarid '`')
+    ;
 
-qvaropm: qvarsym_no_minus | ('`' qvarid '`');
+qvaropm
+    : qvarsym_no_minus
+    | ('`' qvarid '`')
+    ;
 
 // -------------------------------------------
 // Type variables
 
-tyvar : varid;
+tyvar
+    : varid
+    ;
 
-tyvarop: '`' tyvarid '`';
+tyvarop
+    : '`' tyvarid '`'
+    ;
 
 // Expand this rule later
 // In GHC:
 // tyvarid : VARID | special_id | 'unsafe'
 //         | 'safe' | 'interruptible';
 
-tyvarid : varid | special_id | 'unsafe' | 'safe' | 'interruptible';
+tyvarid
+    : varid
+    | special_id
+    | 'unsafe'
+    | 'safe'
+    | 'interruptible'
+    ;
 
-tycls   : conid;
+tycls
+    : conid
+    ;
 
-qtycls  : (modid '.')? tycls;
+qtycls
+    : (modid '.')? tycls
+    ;
 
 // -------------------------------------------
 // Variables
 
-var_	   : varid   | ( '(' varsym ')' );
+var_
+    : varid
+    | ( '(' varsym ')')
+    ;
 
-qvar   : qvarid  | ( '(' qvarsym ')');
+qvar
+    : qvarid
+    | ( '(' qvarsym ')')
+    ;
 
 // We've inlined qvarsym here so that the decision about
 // whether it's a qvar or a var can be postponed until
 // *after* we see the close paren
-qvarid : (modid '.')? varid;
+qvarid
+    : (modid '.')? varid
+    ;
 
 // Note that 'role' and 'family' get lexed separately regardless of
 // the use of extensions. However, because they are listed here,
 // this is OK and they can be used as normal varids.
-varid : (VARID | special_id) '#'*;
+varid
+    : (VARID | special_id) '#'*
+    ;
 
-qvarsym: (modid '.')? varsym;
+qvarsym
+    : (modid '.')? varsym
+    ;
 
 qvarsym_no_minus
     : varsym_no_minus
     | qvarsym
     ;
 
-varsym : varsym_no_minus | '-';
+varsym
+    : varsym_no_minus
+    | '-'
+    ;
 
-varsym_no_minus : ascSymbol+;
+varsym_no_minus
+    : ascSymbol+
+    ;
 
 // These special_ids are treated as keywords in various places,
 // but as ordinary ids elsewhere.   'special_id' collects all these
@@ -1731,52 +1654,119 @@ special_id
 // -------------------------------------------
 // Data constructors
 
-qconid : (modid '.')? conid;
+qconid
+    : (modid '.')? conid
+    ;
 
-conid : CONID '#'*;
+conid
+    : CONID '#'*
+    ;
 
-qconsym: (modid '.')? consym;
+qconsym
+    : (modid '.')? consym
+    ;
 
-consym : ':' ascSymbol*;
+consym
+    : ':' ascSymbol*
+    ;
 
 // -------------------------------------------
 // Literals
 
-literal : integer | pfloat | pchar | pstring;
+literal
+    : integer
+    | pfloat
+    | pchar
+    | pstring
+    ;
 
 // -------------------------------------------
 // Layout
 
-open_ : VOCURLY | OCURLY;
-close : VCCURLY | CCURLY;
-semi : ';' | SEMI;
+open_
+    : VOCURLY
+    | OCURLY
+    ;
+
+close
+    : VCCURLY
+    | CCURLY
+    ;
+
+semi
+    : ';'
+    | SEMI
+    ;
 
 // -------------------------------------------
 // Miscellaneous (mostly renamings)
 
-modid : (conid '.')* conid;
+modid
+    : (conid '.')* conid
+    ;
 
-commas: ','+;
+commas
+    : ','+
+    ;
 
-bars : '|'+;
+bars
+    : '|'+
+    ;
 
 // -------------------------------------------
 
-special : '(' | ')' | ',' | ';' | '[' | ']' | '`' | '{' | '}';
+special
+    : '('
+    | ')'
+    | ','
+    | ';'
+    | '['
+    | ']'
+    | '`'
+    | '{'
+    | '}'
+    ;
 
-symbol: ascSymbol;
-ascSymbol: '!' | '#' | '$' | '%' | '&' | '*' | '+'
-        | '.' | '/' | '<' | '=' | '>' | '?' | '@'
-        | '\\' | '^' | '|' | '~' | ':' ;
+symbol
+    : ascSymbol
+    ;
+
+ascSymbol
+    : '!'
+    | '#'
+    | '$'
+    | '%'
+    | '&'
+    | '*'
+    | '+'
+    | '.'
+    | '/'
+    | '<'
+    | '='
+    | '>'
+    | '?'
+    | '@'
+    | '\\'
+    | '^'
+    | '|'
+    | '~'
+    | ':'
+    ;
 
 integer
-    :
-    DECIMAL
+    : DECIMAL
     | OCTAL
     | HEXADECIMAL
     ;
 
+pfloat
+    : FLOAT
+    ;
 
-pfloat : FLOAT;
-pchar  : CHAR;
-pstring: STRING;
+pchar
+    : CHAR
+    ;
+
+pstring
+    : STRING
+    ;

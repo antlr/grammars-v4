@@ -29,45 +29,48 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar recfile;
 
 file_
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : (descriptor | record)? EOL
-   ;
+    : (descriptor | record)? EOL
+    ;
 
 descriptor
-   : '%' key ':' (EOL '+')? value
-   ;
+    : '%' key ':' (EOL '+')? value
+    ;
 
 record
-   : key ':' (EOL '+')? value
-   ;
+    : key ':' (EOL '+')? value
+    ;
 
 key
-   : STRING
-   ;
+    : STRING
+    ;
 
 value
-   : STRING
-   ;
+    : STRING
+    ;
 
 STRING
-   : [a-zA-Z0-9'.] [a-zA-Z0-9_ '.]*
-   ;
+    : [a-zA-Z0-9'.] [a-zA-Z0-9_ '.]*
+    ;
 
 EOL
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 COMMENT
-   : '#' ~ [\r\n]+ -> skip
-   ;
+    : '#' ~ [\r\n]+ -> skip
+    ;
 
 WS
-   : [ \t]+ -> skip
-   ;
-
+    : [ \t]+ -> skip
+    ;

@@ -26,341 +26,300 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar robotwar;
 
 program
-   : line + EOF
-   ;
+    : line+ EOF
+    ;
 
 line
-   : (label | comment | statement)? EOL
-   ;
+    : (label | comment | statement)? EOL
+    ;
 
 label
-   : ID
-   ;
-   
+    : ID
+    ;
+
 statement
-   : ifstatement
-   | tostatement
-   | gosubstatement
-   | gotostatement
-   | endsubstatement
-   | accumstatement
-   ;
+    : ifstatement
+    | tostatement
+    | gosubstatement
+    | gotostatement
+    | endsubstatement
+    | accumstatement
+    ;
 
 accumstatement
-    : accumexpression;
+    : accumexpression
+    ;
 
 accumexpression
-    : ('='
-    | '#'
-    | ('<' expression)
-    | ('>' expression)) statement
+    : ('=' | '#' | ('<' expression) | ('>' expression)) statement
     ;
 
 gosubstatement
-   : 'GOSUB' label
-   ;
+    : 'GOSUB' label
+    ;
 
 gotostatement
-   : 'GOTO' label
-   ;
+    : 'GOTO' label
+    ;
 
 tostatement
-   : expression? ('TO' register_) +
-   ;
+    : expression? ('TO' register_)+
+    ;
 
 endsubstatement
-   : 'ENDSUB'
-   ;
+    : 'ENDSUB'
+    ;
 
 ifstatement
-   : 'IF'? condition (EOL | COMMA | DOT)? statement
-   ;
+    : 'IF'? condition (EOL | COMMA | DOT)? statement
+    ;
 
 condition
-   : expression comparison expression
-   ;
+    : expression comparison expression
+    ;
 
 expression
-   : (argument (operation argument)*)
-   | (operation argument)
-   | argument
-   ;
+    : (argument (operation argument)*)
+    | (operation argument)
+    | argument
+    ;
 
 operation
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   ;
+    : '+'
+    | '-'
+    | '*'
+    | '/'
+    ;
 
 comparison
-   : '<'
-   | '>'
-   | '='
-   | '#'
-   ;
+    : '<'
+    | '>'
+    | '='
+    | '#'
+    ;
 
 argument
-   : number
-   | register_
-   | DATA
-   ;
+    : number
+    | register_
+    | DATA
+    ;
 
 register_
-   : A
-   | B
-   | C
-   | D
-   | E
-   | F
-   | G
-   | H
-   | I
-   | J
-   | K
-   | L
-   | M
-   | N
-   | O
-   | P
-   | Q
-   | R
-   | S
-   | T
-   | U
-   | V
-   | W
-   | X
-   | Y
-   | Z
-   | AIM
-   | SHOT
-   | RADAR
-   | SPEEDX
-   | SPEEDY
-   | RANDOM
-   | INDEX
-   | DATA
-   | DAMAGE
-   ;
-
+    : A
+    | B
+    | C
+    | D
+    | E
+    | F
+    | G
+    | H
+    | I
+    | J
+    | K
+    | L
+    | M
+    | N
+    | O
+    | P
+    | Q
+    | R
+    | S
+    | T
+    | U
+    | V
+    | W
+    | X
+    | Y
+    | Z
+    | AIM
+    | SHOT
+    | RADAR
+    | SPEEDX
+    | SPEEDY
+    | RANDOM
+    | INDEX
+    | DATA
+    | DAMAGE
+    ;
 
 A
-   : 'A'
-   ;
-
+    : 'A'
+    ;
 
 B
-   : 'B'
-   ;
-
+    : 'B'
+    ;
 
 C
-   : 'C'
-   ;
-
+    : 'C'
+    ;
 
 D
-   : 'D'
-   ;
-
+    : 'D'
+    ;
 
 E
-   : 'E'
-   ;
-
+    : 'E'
+    ;
 
 F
-   : 'F'
-   ;
-
+    : 'F'
+    ;
 
 G
-   : 'G'
-   ;
-
+    : 'G'
+    ;
 
 H
-   : 'H'
-   ;
-
+    : 'H'
+    ;
 
 I
-   : 'I'
-   ;
-
+    : 'I'
+    ;
 
 J
-   : 'J'
-   ;
-
+    : 'J'
+    ;
 
 K
-   : 'K'
-   ;
-
+    : 'K'
+    ;
 
 L
-   : 'L'
-   ;
-
+    : 'L'
+    ;
 
 M
-   : 'M'
-   ;
-
+    : 'M'
+    ;
 
 N
-   : 'N'
-   ;
-
+    : 'N'
+    ;
 
 O
-   : 'O'
-   ;
-
+    : 'O'
+    ;
 
 P
-   : 'P'
-   ;
-
+    : 'P'
+    ;
 
 Q
-   : 'Q'
-   ;
-
+    : 'Q'
+    ;
 
 R
-   : 'R'
-   ;
-
+    : 'R'
+    ;
 
 S
-   : 'S'
-   ;
-
+    : 'S'
+    ;
 
 T
-   : 'T'
-   ;
-
+    : 'T'
+    ;
 
 U
-   : 'U'
-   ;
-
+    : 'U'
+    ;
 
 V
-   : 'V'
-   ;
-
+    : 'V'
+    ;
 
 W
-   : 'W'
-   ;
-
+    : 'W'
+    ;
 
 X
-   : 'X'
-   ;
-
+    : 'X'
+    ;
 
 Y
-   : 'Y'
-   ;
-
+    : 'Y'
+    ;
 
 Z
-   : 'Z'
-   ;
-
+    : 'Z'
+    ;
 
 AIM
-   : 'AIM'
-   ;
-
+    : 'AIM'
+    ;
 
 SHOT
-   : 'SHOT'
-   ;
-
+    : 'SHOT'
+    ;
 
 RADAR
-   : 'RADAR'
-   ;
-
+    : 'RADAR'
+    ;
 
 DAMAGE
-   : 'DAMAGE'
-   ;
-
+    : 'DAMAGE'
+    ;
 
 SPEEDX
-   : 'SPEEDX'
-   ;
-
+    : 'SPEEDX'
+    ;
 
 SPEEDY
-   : 'SPEEDY'
-   ;
-
+    : 'SPEEDY'
+    ;
 
 RANDOM
-   : 'RANDOM'
-   ;
-
+    : 'RANDOM'
+    ;
 
 INDEX
-   : 'INDEX'
-   ;
-
+    : 'INDEX'
+    ;
 
 DATA
-   : 'DATA'
-   ;
-
+    : 'DATA'
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 ID
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9') +
-   ;
+    : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9')+
+    ;
 
 number
-   : ('+' | '-')? NUMBER
-   ;
+    : ('+' | '-')? NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
-
+    : COMMENT
+    ;
 
 NUMBER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
-   ;
-
+    : ';' ~ [\r\n]*
+    ;
 
 EOL
-   : [\r\n] +
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

@@ -29,49 +29,52 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar xyz;
 
 file_
-   : header body EOF
-   ;
+    : header body EOF
+    ;
 
 header
-   : count desc EOL
-   ;
+    : count desc EOL
+    ;
 
 desc
-   : .*?
-   ;
+    : .*?
+    ;
 
 body
-   : atom+
-   ;
+    : atom+
+    ;
 
 count
-   : NUM EOL
-   ;
+    : NUM EOL
+    ;
 
 atom
-   : ATOMNAME NUM NUM NUM EOL
-   ;
+    : ATOMNAME NUM NUM NUM EOL
+    ;
 
 ATOMNAME
-   : [A-Za-z]+
-   ;
+    : [A-Za-z]+
+    ;
 
 NUM
-   : ('+' | '-')? DIGIT+ ('.' DIGIT+)?
-   ;
+    : ('+' | '-')? DIGIT+ ('.' DIGIT+)?
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 EOL
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t]+ -> skip
-   ;
-
+    : [ \t]+ -> skip
+    ;

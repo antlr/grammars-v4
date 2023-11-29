@@ -25,44 +25,77 @@
 
 // http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=F54E0B46B27FC0AEF07271B358CE34E3?doi=10.1.1.47.155&rep=rep1&type=pdf
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar cayenne;
 
-file_: expr EOF ;
+file_
+    : expr EOF
+    ;
 
-expr:
-	'(' varid '::' type_ ')' '->' expr
-	| '\\' '(' varid '::' type_ ')' '->' expr
-	| expr expr
-	| 'data' (conid type_* '|')*
-	| conid '@' type_
-	| 'case' varid 'of' arm* '::' type_
-	| 'sig' sign*
-	| 'struct' defn*
-	| expr '.' lblid
-	| id_
-	| '#';
+expr
+    : '(' varid '::' type_ ')' '->' expr
+    | '\\' '(' varid '::' type_ ')' '->' expr
+    | expr expr
+    | 'data' (conid type_* '|')*
+    | conid '@' type_
+    | 'case' varid 'of' arm* '::' type_
+    | 'sig' sign*
+    | 'struct' defn*
+    | expr '.' lblid
+    | id_
+    | '#'
+    ;
 
-arm: '(' conid varid* ')' '->' expr ';' | varid '->' expr ';';
+arm
+    : '(' conid varid* ')' '->' expr ';'
+    | varid '->' expr ';'
+    ;
 
-sign: lblid '::' type_ ';' | lblid '::' type_ '=' expr ';';
+sign
+    : lblid '::' type_ ';'
+    | lblid '::' type_ '=' expr ';'
+    ;
 
-defn: vis lblid '::' type_ '=' expr ';';
+defn
+    : vis lblid '::' type_ '=' expr ';'
+    ;
 
-vis: 'private' | 'public' abs_;
+vis
+    : 'private'
+    | 'public' abs_
+    ;
 
-abs_: 'abstract' | 'concrete';
+abs_
+    : 'abstract'
+    | 'concrete'
+    ;
 
-type_: expr;
+type_
+    : expr
+    ;
 
-varid: id_;
+varid
+    : id_
+    ;
 
-conid: id_;
+conid
+    : id_
+    ;
 
-lblid: id_;
+lblid
+    : id_
+    ;
 
-id_: ID;
+id_
+    : ID
+    ;
 
-ID: [a-zA-Z] [a-zA-Z0-9]*;
+ID
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
-WS: [ \r\n\t]+ -> skip;
-
+WS
+    : [ \r\n\t]+ -> skip
+    ;

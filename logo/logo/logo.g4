@@ -30,215 +30,212 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar logo;
 
 prog
-   : (line? EOL) + line? EOF
-   ;
+    : (line? EOL)+ line? EOF
+    ;
 
 line
-   : cmd + comment?
-   | comment
-   | print_ comment?
-   | procedureDeclaration
-   ;
+    : cmd+ comment?
+    | comment
+    | print_ comment?
+    | procedureDeclaration
+    ;
 
 cmd
-   : repeat_
-   | fd
-   | bk
-   | rt
-   | lt
-   | cs
-   | pu
-   | pd
-   | ht
-   | st
-   | home
-   | label
-   | setxy
-   | make
-   | procedureInvocation
-   | ife
-   | stop
-   | fore
-   ;
+    : repeat_
+    | fd
+    | bk
+    | rt
+    | lt
+    | cs
+    | pu
+    | pd
+    | ht
+    | st
+    | home
+    | label
+    | setxy
+    | make
+    | procedureInvocation
+    | ife
+    | stop
+    | fore
+    ;
 
 procedureInvocation
-   : name expression*
-   ;
+    : name expression*
+    ;
 
 procedureDeclaration
-   : 'to' name parameterDeclarations* EOL? (line? EOL) + 'end'
-   ;
+    : 'to' name parameterDeclarations* EOL? (line? EOL)+ 'end'
+    ;
 
 parameterDeclarations
-   : ':' name (',' parameterDeclarations)*
-   ;
+    : ':' name (',' parameterDeclarations)*
+    ;
 
 func_
-   : random
-   ;
+    : random
+    ;
 
 repeat_
-   : 'repeat' number block
-   ;
+    : 'repeat' number block
+    ;
 
 block
-   : '[' cmd + ']'
-   ;
+    : '[' cmd+ ']'
+    ;
 
 ife
-   : 'if' comparison block
-   ;
+    : 'if' comparison block
+    ;
 
 comparison
-   : expression comparisonOperator expression
-   ;
+    : expression comparisonOperator expression
+    ;
 
 comparisonOperator
-   : '<'
-   | '>'
-   | '='
-   ;
+    : '<'
+    | '>'
+    | '='
+    ;
 
 make
-   : 'make' STRINGLITERAL value
-   ;
+    : 'make' STRINGLITERAL value
+    ;
 
 print_
-   : 'print' (value | quotedstring)
-   ;
+    : 'print' (value | quotedstring)
+    ;
 
 quotedstring
-   : '[' (quotedstring | ~ ']')* ']'
-   ;
+    : '[' (quotedstring | ~ ']')* ']'
+    ;
 
 name
-   : STRING
-   ;
+    : STRING
+    ;
 
 value
-   : STRINGLITERAL
-   | expression
-   | deref
-   ;
+    : STRINGLITERAL
+    | expression
+    | deref
+    ;
 
 signExpression
-   : (('+' | '-'))* (number | deref | func_)
-   ;
+    : (('+' | '-'))* (number | deref | func_)
+    ;
 
 multiplyingExpression
-   : signExpression (('*' | '/') signExpression)*
-   ;
+    : signExpression (('*' | '/') signExpression)*
+    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
-   ;
+    : multiplyingExpression (('+' | '-') multiplyingExpression)*
+    ;
 
 deref
-   : ':' name
-   ;
+    : ':' name
+    ;
 
 fd
-   : ('fd' | 'forward') expression
-   ;
+    : ('fd' | 'forward') expression
+    ;
 
 bk
-   : ('bk' | 'backward') expression
-   ;
+    : ('bk' | 'backward') expression
+    ;
 
 rt
-   : ('rt' | 'right') expression
-   ;
+    : ('rt' | 'right') expression
+    ;
 
 lt
-   : ('lt' | 'left') expression
-   ;
+    : ('lt' | 'left') expression
+    ;
 
 cs
-   : 'cs'
-   | 'clearscreen'
-   ;
+    : 'cs'
+    | 'clearscreen'
+    ;
 
 pu
-   : 'pu'
-   | 'penup'
-   ;
+    : 'pu'
+    | 'penup'
+    ;
 
 pd
-   : 'pd'
-   | 'pendown'
-   ;
+    : 'pd'
+    | 'pendown'
+    ;
 
 ht
-   : 'ht'
-   | 'hideturtle'
-   ;
+    : 'ht'
+    | 'hideturtle'
+    ;
 
 st
-   : 'st'
-   | 'showturtle'
-   ;
+    : 'st'
+    | 'showturtle'
+    ;
 
 home
-   : 'home'
-   ;
+    : 'home'
+    ;
 
 stop
-   : 'stop'
-   ;
+    : 'stop'
+    ;
 
 label
-   : 'label'
-   ;
+    : 'label'
+    ;
 
 setxy
-   : 'setxy' expression expression
-   ;
+    : 'setxy' expression expression
+    ;
 
 random
-   : 'random' expression
-   ;
+    : 'random' expression
+    ;
 
 fore
-   : 'for' '[' name expression expression expression ']' block
-   ;
+    : 'for' '[' name expression expression expression ']' block
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
-
+    : COMMENT
+    ;
 
 STRINGLITERAL
-   : '"' STRING
-   ;
-
+    : '"' STRING
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_]*
+    ;
 
 NUMBER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
-   ;
-
+    : ';' ~ [\r\n]*
+    ;
 
 EOL
-   : '\r'? '\n'
-   ;
-
+    : '\r'? '\n'
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

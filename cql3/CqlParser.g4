@@ -21,147 +21,162 @@
  * Project : cql-parser; an ANTLR4 grammar for Apache Cassandra CQL  https://github.com/kdcro101cql-parser
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar CqlParser;
 
 options
-   { tokenVocab = CqlLexer; }
+   {
+    tokenVocab = CqlLexer;
+}
 
 root
-   : cqls? MINUSMINUS? EOF
-   ;
+    : cqls? MINUSMINUS? EOF
+    ;
 
 cqls
-   : (cql MINUSMINUS? statementSeparator | empty_)* (cql (MINUSMINUS? statementSeparator)? | empty_)
-   ;
+    : (cql MINUSMINUS? statementSeparator | empty_)* (
+        cql (MINUSMINUS? statementSeparator)?
+        | empty_
+    )
+    ;
 
 statementSeparator
-   : SEMI
-   ;
+    : SEMI
+    ;
 
 empty_
-   : statementSeparator
-   ;
+    : statementSeparator
+    ;
 
 cql
-   : alterKeyspace
-   | alterMaterializedView
-   | alterRole
-   | alterTable
-   | alterType
-   | alterUser
-   | applyBatch
-   | createAggregate
-   | createFunction
-   | createIndex
-   | createKeyspace
-   | createMaterializedView
-   | createRole
-   | createTable
-   | createTrigger
-   | createType
-   | createUser
-   | delete_
-   | dropAggregate
-   | dropFunction
-   | dropIndex
-   | dropKeyspace
-   | dropMaterializedView
-   | dropRole
-   | dropTable
-   | dropTrigger
-   | dropType
-   | dropUser
-   | grant
-   | insert
-   | listPermissions
-   | listRoles
-   | revoke
-   | select_
-   | truncate
-   | update
-   | use_
-   ;
+    : alterKeyspace
+    | alterMaterializedView
+    | alterRole
+    | alterTable
+    | alterType
+    | alterUser
+    | applyBatch
+    | createAggregate
+    | createFunction
+    | createIndex
+    | createKeyspace
+    | createMaterializedView
+    | createRole
+    | createTable
+    | createTrigger
+    | createType
+    | createUser
+    | delete_
+    | dropAggregate
+    | dropFunction
+    | dropIndex
+    | dropKeyspace
+    | dropMaterializedView
+    | dropRole
+    | dropTable
+    | dropTrigger
+    | dropType
+    | dropUser
+    | grant
+    | insert
+    | listPermissions
+    | listRoles
+    | revoke
+    | select_
+    | truncate
+    | update
+    | use_
+    ;
 
 revoke
-   : kwRevoke priviledge kwOn resource kwFrom role
-   ;
+    : kwRevoke priviledge kwOn resource kwFrom role
+    ;
 
 listRoles
-   : kwList kwRoles (kwOf role)? kwNorecursive?
-   ;
+    : kwList kwRoles (kwOf role)? kwNorecursive?
+    ;
 
 listPermissions
-   : kwList priviledge (kwOn resource)? (kwOf role)?
-   ;
+    : kwList priviledge (kwOn resource)? (kwOf role)?
+    ;
 
 grant
-   : kwGrant priviledge kwOn resource kwTo role
-   ;
+    : kwGrant priviledge kwOn resource kwTo role
+    ;
 
 priviledge
-   : (kwAll | kwAllPermissions)
-   | kwAlter
-   | kwAuthorize
-   | kwDescibe
-   | kwExecute
-   | kwCreate
-   | kwDrop
-   | kwModify
-   | kwSelect
-   ;
+    : (kwAll | kwAllPermissions)
+    | kwAlter
+    | kwAuthorize
+    | kwDescibe
+    | kwExecute
+    | kwCreate
+    | kwDrop
+    | kwModify
+    | kwSelect
+    ;
 
 resource
-   : kwAll kwFunctions
-   | kwAll kwFunctions kwIn kwKeyspace keyspace
-   | kwFunction (keyspace DOT)? function_
-   | kwAll kwKeyspaces
-   | kwKeyspace keyspace
-   | (kwTable)? (keyspace DOT)? table
-   | kwAll kwRoles
-   | kwRole role
-   ;
+    : kwAll kwFunctions
+    | kwAll kwFunctions kwIn kwKeyspace keyspace
+    | kwFunction (keyspace DOT)? function_
+    | kwAll kwKeyspaces
+    | kwKeyspace keyspace
+    | (kwTable)? (keyspace DOT)? table
+    | kwAll kwRoles
+    | kwRole role
+    ;
 
 createUser
-   : kwCreate kwUser ifNotExist? user kwWith kwPassword stringLiteral (kwSuperuser | kwNosuperuser)?
-   ;
+    : kwCreate kwUser ifNotExist? user kwWith kwPassword stringLiteral (
+        kwSuperuser
+        | kwNosuperuser
+    )?
+    ;
 
 createRole
-   : kwCreate kwRole ifNotExist? role roleWith?
-   ;
+    : kwCreate kwRole ifNotExist? role roleWith?
+    ;
 
 createType
-   : kwCreate kwType ifNotExist? (keyspace DOT)? type_ syntaxBracketLr typeMemberColumnList syntaxBracketRr
-   ;
+    : kwCreate kwType ifNotExist? (keyspace DOT)? type_ syntaxBracketLr typeMemberColumnList syntaxBracketRr
+    ;
 
 typeMemberColumnList
-   : column dataType (syntaxComma column dataType)*
-   ;
+    : column dataType (syntaxComma column dataType)*
+    ;
 
 createTrigger
-   : kwCreate kwTrigger ifNotExist? (keyspace DOT)? trigger kwUsing triggerClass
-   ;
+    : kwCreate kwTrigger ifNotExist? (keyspace DOT)? trigger kwUsing triggerClass
+    ;
 
 createMaterializedView
-   : kwCreate kwMaterialized kwView ifNotExist? (keyspace DOT)? materializedView kwAs kwSelect columnList kwFrom (keyspace DOT)? table materializedViewWhere kwPrimary kwKey syntaxBracketLr columnList syntaxBracketRr (kwWith materializedViewOptions)?
-   ;
+    : kwCreate kwMaterialized kwView ifNotExist? (keyspace DOT)? materializedView kwAs kwSelect columnList kwFrom (
+        keyspace DOT
+    )? table materializedViewWhere kwPrimary kwKey syntaxBracketLr columnList syntaxBracketRr (
+        kwWith materializedViewOptions
+    )?
+    ;
 
 materializedViewWhere
-   : kwWhere columnNotNullList (kwAnd relationElements)?
-   ;
+    : kwWhere columnNotNullList (kwAnd relationElements)?
+    ;
 
 columnNotNullList
-   : columnNotNull (kwAnd columnNotNull)*
-   ;
+    : columnNotNull (kwAnd columnNotNull)*
+    ;
 
 columnNotNull
-   : column kwIs kwNot kwNull
-   ;
+    : column kwIs kwNot kwNull
+    ;
 
 materializedViewOptions
-   : tableOptions
-   | tableOptions kwAnd clusteringOrder
-   | clusteringOrder
-   ;
+    : tableOptions
+    | tableOptions kwAnd clusteringOrder
+    | clusteringOrder
+    ;
 
 // CREATE MATERIALIZED VIEW [IF NOT EXISTS] [keyspace_name.] view_name
 // AS SELECT column_list
@@ -172,1088 +187,1114 @@ materializedViewOptions
 // [WITH [table_properties]
 //       [AND CLUSTERING ORDER BY (cluster_column_name order_option )]]
 createKeyspace
-   : kwCreate kwKeyspace ifNotExist? keyspace kwWith kwReplication OPERATOR_EQ syntaxBracketLc replicationList syntaxBracketRc (kwAnd durableWrites)?
-   ;
+    : kwCreate kwKeyspace ifNotExist? keyspace kwWith kwReplication OPERATOR_EQ syntaxBracketLc replicationList syntaxBracketRc (
+        kwAnd durableWrites
+    )?
+    ;
 
 createFunction
-   : kwCreate orReplace? kwFunction ifNotExist? (keyspace DOT)? function_ syntaxBracketLr paramList? syntaxBracketRr returnMode kwReturns dataType kwLanguage language kwAs codeBlock
-   ;
+    : kwCreate orReplace? kwFunction ifNotExist? (keyspace DOT)? function_ syntaxBracketLr paramList? syntaxBracketRr returnMode kwReturns dataType
+        kwLanguage language kwAs codeBlock
+    ;
 
 codeBlock
-   : CODE_BLOCK
-   | STRING_LITERAL
-   ;
+    : CODE_BLOCK
+    | STRING_LITERAL
+    ;
 
 paramList
-   : param (syntaxComma param)*
-   ;
+    : param (syntaxComma param)*
+    ;
 
 returnMode
-   : (kwCalled | kwReturns kwNull) kwOn kwNull kwInput
-   ;
+    : (kwCalled | kwReturns kwNull) kwOn kwNull kwInput
+    ;
 
 createAggregate
-   : kwCreate orReplace? kwAggregate ifNotExist? (keyspace DOT)? aggregate syntaxBracketLr dataType syntaxBracketRr kwSfunc function_ kwStype dataType kwFinalfunc function_ kwInitcond initCondDefinition
-   ;
+    : kwCreate orReplace? kwAggregate ifNotExist? (keyspace DOT)? aggregate syntaxBracketLr dataType syntaxBracketRr kwSfunc function_ kwStype
+        dataType kwFinalfunc function_ kwInitcond initCondDefinition
+    ;
 
 // paramList
 // :
 initCondDefinition
-   : constant
-   | initCondList
-   | initCondListNested
-   | initCondHash
-   ;
+    : constant
+    | initCondList
+    | initCondListNested
+    | initCondHash
+    ;
 
 initCondHash
-   : syntaxBracketLc initCondHashItem (syntaxComma initCondHashItem)* syntaxBracketRc
-   ;
+    : syntaxBracketLc initCondHashItem (syntaxComma initCondHashItem)* syntaxBracketRc
+    ;
 
 initCondHashItem
-   : hashKey COLON initCondDefinition
-   ;
+    : hashKey COLON initCondDefinition
+    ;
 
 initCondListNested
-   : syntaxBracketLr initCondList (syntaxComma constant | initCondList)* syntaxBracketRr
-   ;
+    : syntaxBracketLr initCondList (syntaxComma constant | initCondList)* syntaxBracketRr
+    ;
 
 initCondList
-   : syntaxBracketLr constant (syntaxComma constant)* syntaxBracketRr
-   ;
+    : syntaxBracketLr constant (syntaxComma constant)* syntaxBracketRr
+    ;
 
 orReplace
-   : kwOr kwReplace
-   ;
+    : kwOr kwReplace
+    ;
 
 alterUser
-   : kwAlter kwUser user kwWith userPassword userSuperUser?
-   ;
+    : kwAlter kwUser user kwWith userPassword userSuperUser?
+    ;
 
 userPassword
-   : kwPassword stringLiteral
-   ;
+    : kwPassword stringLiteral
+    ;
 
 userSuperUser
-   : kwSuperuser
-   | kwNosuperuser
-   ;
+    : kwSuperuser
+    | kwNosuperuser
+    ;
 
 alterType
-   : kwAlter kwType (keyspace DOT)? type_ alterTypeOperation
-   ;
+    : kwAlter kwType (keyspace DOT)? type_ alterTypeOperation
+    ;
 
 alterTypeOperation
-   : alterTypeAlterType
-   | alterTypeAdd
-   | alterTypeRename
-   ;
+    : alterTypeAlterType
+    | alterTypeAdd
+    | alterTypeRename
+    ;
 
 alterTypeRename
-   : kwRename alterTypeRenameList
-   ;
+    : kwRename alterTypeRenameList
+    ;
 
 alterTypeRenameList
-   : alterTypeRenameItem (kwAnd alterTypeRenameItem)*
-   ;
+    : alterTypeRenameItem (kwAnd alterTypeRenameItem)*
+    ;
 
 alterTypeRenameItem
-   : column kwTo column
-   ;
+    : column kwTo column
+    ;
 
 alterTypeAdd
-   : kwAdd column dataType (syntaxComma column dataType)*
-   ;
+    : kwAdd column dataType (syntaxComma column dataType)*
+    ;
 
 alterTypeAlterType
-   : kwAlter column kwType dataType
-   ;
+    : kwAlter column kwType dataType
+    ;
 
 alterTable
-   : kwAlter kwTable (keyspace DOT)? table alterTableOperation
-   ;
+    : kwAlter kwTable (keyspace DOT)? table alterTableOperation
+    ;
 
 alterTableOperation
-   : alterTableAdd
-   | alterTableDropColumns
-   | alterTableDropCompactStorage
-   | alterTableRename
-   | alterTableWith
-   ;
+    : alterTableAdd
+    | alterTableDropColumns
+    | alterTableDropCompactStorage
+    | alterTableRename
+    | alterTableWith
+    ;
 
 alterTableWith
-   : kwWith tableOptions
-   ;
+    : kwWith tableOptions
+    ;
 
 alterTableRename
-   : kwRename column kwTo column
-   ;
+    : kwRename column kwTo column
+    ;
 
 alterTableDropCompactStorage
-   : kwDrop kwCompact kwStorage
-   ;
+    : kwDrop kwCompact kwStorage
+    ;
 
 alterTableDropColumns
-   : kwDrop alterTableDropColumnList
-   ;
+    : kwDrop alterTableDropColumnList
+    ;
 
 alterTableDropColumnList
-   : column (syntaxComma column)*
-   ;
+    : column (syntaxComma column)*
+    ;
 
 alterTableAdd
-   : kwAdd alterTableColumnDefinition
-   ;
+    : kwAdd alterTableColumnDefinition
+    ;
 
 alterTableColumnDefinition
-   : column dataType (syntaxComma column dataType)*
-   ;
+    : column dataType (syntaxComma column dataType)*
+    ;
 
 alterRole
-   : kwAlter kwRole role roleWith?
-   ;
+    : kwAlter kwRole role roleWith?
+    ;
 
 roleWith
-   : kwWith (roleWithOptions (kwAnd roleWithOptions)*)
-   ;
+    : kwWith (roleWithOptions (kwAnd roleWithOptions)*)
+    ;
 
 roleWithOptions
-   : kwPassword OPERATOR_EQ stringLiteral
-   | kwLogin OPERATOR_EQ booleanLiteral
-   | kwSuperuser OPERATOR_EQ booleanLiteral
-   | kwOptions OPERATOR_EQ optionHash
-   ;
+    : kwPassword OPERATOR_EQ stringLiteral
+    | kwLogin OPERATOR_EQ booleanLiteral
+    | kwSuperuser OPERATOR_EQ booleanLiteral
+    | kwOptions OPERATOR_EQ optionHash
+    ;
 
 alterMaterializedView
-   : kwAlter kwMaterialized kwView (keyspace DOT)? materializedView (kwWith tableOptions)?
-   ;
+    : kwAlter kwMaterialized kwView (keyspace DOT)? materializedView (kwWith tableOptions)?
+    ;
 
 dropUser
-   : kwDrop kwUser ifExist? user
-   ;
+    : kwDrop kwUser ifExist? user
+    ;
 
 dropType
-   : kwDrop kwType ifExist? (keyspace DOT)? type_
-   ;
+    : kwDrop kwType ifExist? (keyspace DOT)? type_
+    ;
 
 dropMaterializedView
-   : kwDrop kwMaterialized kwView ifExist? (keyspace DOT)? materializedView
-   ;
+    : kwDrop kwMaterialized kwView ifExist? (keyspace DOT)? materializedView
+    ;
 
 dropAggregate
-   : kwDrop kwAggregate ifExist? (keyspace DOT)? aggregate
-   ;
+    : kwDrop kwAggregate ifExist? (keyspace DOT)? aggregate
+    ;
 
 dropFunction
-   : kwDrop kwFunction ifExist? (keyspace DOT)? function_
-   ;
+    : kwDrop kwFunction ifExist? (keyspace DOT)? function_
+    ;
 
 dropTrigger
-   : kwDrop kwTrigger ifExist? trigger kwOn (keyspace DOT)? table
-   ;
+    : kwDrop kwTrigger ifExist? trigger kwOn (keyspace DOT)? table
+    ;
 
 dropRole
-   : kwDrop kwRole ifExist? role
-   ;
+    : kwDrop kwRole ifExist? role
+    ;
 
 dropTable
-   : kwDrop kwTable ifExist? (keyspace DOT)? table
-   ;
+    : kwDrop kwTable ifExist? (keyspace DOT)? table
+    ;
 
 dropKeyspace
-   : kwDrop kwKeyspace ifExist? keyspace
-   ;
+    : kwDrop kwKeyspace ifExist? keyspace
+    ;
 
 dropIndex
-   : kwDrop kwIndex ifExist? (keyspace DOT)? indexName
-   ;
+    : kwDrop kwIndex ifExist? (keyspace DOT)? indexName
+    ;
 
 createTable
-   : kwCreate kwTable ifNotExist? (keyspace DOT)? table syntaxBracketLr columnDefinitionList syntaxBracketRr withElement?
-   ;
+    : kwCreate kwTable ifNotExist? (keyspace DOT)? table syntaxBracketLr columnDefinitionList syntaxBracketRr withElement?
+    ;
 
 withElement
-   : kwWith tableOptions? clusteringOrder?
-   ;
+    : kwWith tableOptions? clusteringOrder?
+    ;
 
 clusteringOrder
-   : kwClustering kwOrder kwBy syntaxBracketLr column orderDirection? syntaxBracketRr
-   ;
+    : kwClustering kwOrder kwBy syntaxBracketLr column orderDirection? syntaxBracketRr
+    ;
 
 tableOptions
-   : tableOptionItem (kwAnd tableOptionItem)*
-   ;
+    : tableOptionItem (kwAnd tableOptionItem)*
+    ;
 
 tableOptionItem
-   : tableOptionName OPERATOR_EQ tableOptionValue
-   | tableOptionName OPERATOR_EQ optionHash
-   ;
+    : tableOptionName OPERATOR_EQ tableOptionValue
+    | tableOptionName OPERATOR_EQ optionHash
+    ;
 
 tableOptionName
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 tableOptionValue
-   : stringLiteral
-   | floatLiteral
-   ;
+    : stringLiteral
+    | floatLiteral
+    ;
 
 optionHash
-   : syntaxBracketLc optionHashItem (syntaxComma optionHashItem)* syntaxBracketRc
-   ;
+    : syntaxBracketLc optionHashItem (syntaxComma optionHashItem)* syntaxBracketRc
+    ;
 
 optionHashItem
-   : optionHashKey COLON optionHashValue
-   ;
+    : optionHashKey COLON optionHashValue
+    ;
 
 optionHashKey
-   : stringLiteral
-   ;
+    : stringLiteral
+    ;
 
 optionHashValue
-   : stringLiteral
-   | floatLiteral
-   ;
+    : stringLiteral
+    | floatLiteral
+    ;
 
 columnDefinitionList
-   : (columnDefinition) (syntaxComma columnDefinition)* (syntaxComma primaryKeyElement)?
-   ;
+    : (columnDefinition) (syntaxComma columnDefinition)* (syntaxComma primaryKeyElement)?
+    ;
 
 //
 columnDefinition
-   : column dataType primaryKeyColumn?
-   ;
+    : column dataType primaryKeyColumn?
+    ;
 
 //
 primaryKeyColumn
-   : kwPrimary kwKey
-   ;
+    : kwPrimary kwKey
+    ;
 
 primaryKeyElement
-   : kwPrimary kwKey syntaxBracketLr primaryKeyDefinition syntaxBracketRr
-   ;
+    : kwPrimary kwKey syntaxBracketLr primaryKeyDefinition syntaxBracketRr
+    ;
 
 primaryKeyDefinition
-   : singlePrimaryKey
-   | compoundKey
-   | compositeKey
-   ;
+    : singlePrimaryKey
+    | compoundKey
+    | compositeKey
+    ;
 
 singlePrimaryKey
-   : column
-   ;
+    : column
+    ;
 
 compoundKey
-   : partitionKey (syntaxComma clusteringKeyList)
-   ;
+    : partitionKey (syntaxComma clusteringKeyList)
+    ;
 
 compositeKey
-   : syntaxBracketLr partitionKeyList syntaxBracketRr (syntaxComma clusteringKeyList)
-   ;
+    : syntaxBracketLr partitionKeyList syntaxBracketRr (syntaxComma clusteringKeyList)
+    ;
 
 partitionKeyList
-   : (partitionKey) (syntaxComma partitionKey)*
-   ;
+    : (partitionKey) (syntaxComma partitionKey)*
+    ;
 
 clusteringKeyList
-   : (clusteringKey) (syntaxComma clusteringKey)*
-   ;
+    : (clusteringKey) (syntaxComma clusteringKey)*
+    ;
 
 partitionKey
-   : column
-   ;
+    : column
+    ;
 
 clusteringKey
-   : column
-   ;
+    : column
+    ;
 
 applyBatch
-   : kwApply kwBatch
-   ;
+    : kwApply kwBatch
+    ;
 
 beginBatch
-   : kwBegin batchType? kwBatch usingTimestampSpec?
-   ;
+    : kwBegin batchType? kwBatch usingTimestampSpec?
+    ;
 
 batchType
-   : kwLogged
-   | kwUnlogged
-   ;
+    : kwLogged
+    | kwUnlogged
+    ;
 
 alterKeyspace
-   : kwAlter kwKeyspace keyspace kwWith kwReplication OPERATOR_EQ syntaxBracketLc replicationList syntaxBracketRc (kwAnd durableWrites)?
-   ;
+    : kwAlter kwKeyspace keyspace kwWith kwReplication OPERATOR_EQ syntaxBracketLc replicationList syntaxBracketRc (
+        kwAnd durableWrites
+    )?
+    ;
 
 replicationList
-   : (replicationListItem) (syntaxComma replicationListItem)*
-   ;
+    : (replicationListItem) (syntaxComma replicationListItem)*
+    ;
 
 replicationListItem
-   : STRING_LITERAL COLON STRING_LITERAL
-   | STRING_LITERAL COLON DECIMAL_LITERAL
-   ;
+    : STRING_LITERAL COLON STRING_LITERAL
+    | STRING_LITERAL COLON DECIMAL_LITERAL
+    ;
 
 durableWrites
-   : kwDurableWrites OPERATOR_EQ booleanLiteral
-   ;
+    : kwDurableWrites OPERATOR_EQ booleanLiteral
+    ;
 
 use_
-   : kwUse keyspace
-   ;
+    : kwUse keyspace
+    ;
 
 truncate
-   : kwTruncate (kwTable)? (keyspace DOT)? table
-   ;
+    : kwTruncate (kwTable)? (keyspace DOT)? table
+    ;
 
 createIndex
-   : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr
-   ;
+    : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr
+    ;
 
 indexName
-   : OBJECT_NAME
-   | stringLiteral
-   ;
+    : OBJECT_NAME
+    | stringLiteral
+    ;
 
 indexColumnSpec
-   : column
-   | indexKeysSpec
-   | indexEntriesSSpec
-   | indexFullSpec
-   ;
+    : column
+    | indexKeysSpec
+    | indexEntriesSSpec
+    | indexFullSpec
+    ;
 
 indexKeysSpec
-   : kwKeys syntaxBracketLr OBJECT_NAME syntaxBracketRr
-   ;
+    : kwKeys syntaxBracketLr OBJECT_NAME syntaxBracketRr
+    ;
 
 indexEntriesSSpec
-   : kwEntries syntaxBracketLr OBJECT_NAME syntaxBracketRr
-   ;
+    : kwEntries syntaxBracketLr OBJECT_NAME syntaxBracketRr
+    ;
 
 indexFullSpec
-   : kwFull syntaxBracketLr OBJECT_NAME syntaxBracketRr
-   ;
+    : kwFull syntaxBracketLr OBJECT_NAME syntaxBracketRr
+    ;
 
 delete_
-   : beginBatch? kwDelete deleteColumnList? fromSpec usingTimestampSpec? whereSpec (ifExist | ifSpec)?
-   ;
+    : beginBatch? kwDelete deleteColumnList? fromSpec usingTimestampSpec? whereSpec (
+        ifExist
+        | ifSpec
+    )?
+    ;
 
 deleteColumnList
-   : (deleteColumnItem) (syntaxComma deleteColumnItem)*
-   ;
+    : (deleteColumnItem) (syntaxComma deleteColumnItem)*
+    ;
 
 deleteColumnItem
-   : OBJECT_NAME
-   | OBJECT_NAME LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET
-   ;
+    : OBJECT_NAME
+    | OBJECT_NAME LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET
+    ;
 
 update
-   : beginBatch? kwUpdate (keyspace DOT)? table usingTtlTimestamp? kwSet assignments whereSpec (ifExist | ifSpec)?
-   ;
+    : beginBatch? kwUpdate (keyspace DOT)? table usingTtlTimestamp? kwSet assignments whereSpec (
+        ifExist
+        | ifSpec
+    )?
+    ;
 
 ifSpec
-   : kwIf ifConditionList
-   ;
+    : kwIf ifConditionList
+    ;
 
 ifConditionList
-   : (ifCondition) (kwAnd ifCondition)*
-   ;
+    : (ifCondition) (kwAnd ifCondition)*
+    ;
 
 ifCondition
-   : OBJECT_NAME OPERATOR_EQ constant
-   ;
+    : OBJECT_NAME OPERATOR_EQ constant
+    ;
 
 assignments
-   : (assignmentElement) (syntaxComma assignmentElement)*
-   ;
+    : (assignmentElement) (syntaxComma assignmentElement)*
+    ;
 
 assignmentElement
-   : OBJECT_NAME OPERATOR_EQ (constant | assignmentMap | assignmentSet | assignmentList)
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) decimalLiteral
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentSet
-   | OBJECT_NAME OPERATOR_EQ assignmentSet (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentMap
-   | OBJECT_NAME OPERATOR_EQ assignmentMap (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentList
-   | OBJECT_NAME OPERATOR_EQ assignmentList (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant
-   ;
+    : OBJECT_NAME OPERATOR_EQ (constant | assignmentMap | assignmentSet | assignmentList)
+    | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) decimalLiteral
+    | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentSet
+    | OBJECT_NAME OPERATOR_EQ assignmentSet (PLUS | MINUS) OBJECT_NAME
+    | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentMap
+    | OBJECT_NAME OPERATOR_EQ assignmentMap (PLUS | MINUS) OBJECT_NAME
+    | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentList
+    | OBJECT_NAME OPERATOR_EQ assignmentList (PLUS | MINUS) OBJECT_NAME
+    | OBJECT_NAME syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant
+    ;
 
 assignmentSet
-   : syntaxBracketLc (constant (syntaxComma constant)*)?  syntaxBracketRc
-   ;
+    : syntaxBracketLc (constant (syntaxComma constant)*)? syntaxBracketRc
+    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (syntaxComma constant syntaxColon constant)* syntaxBracketRc
-   ;
+    : syntaxBracketLc (constant syntaxColon constant) (syntaxComma constant syntaxColon constant)* syntaxBracketRc
+    ;
 
 assignmentList
-   : syntaxBracketLs constant (syntaxComma constant)* syntaxBracketRs
-   ;
+    : syntaxBracketLs constant (syntaxComma constant)* syntaxBracketRs
+    ;
 
 assignmentTuple
-   : syntaxBracketLr ( expression (syntaxComma expression)* ) syntaxBracketRr
-   ;
+    : syntaxBracketLr (expression (syntaxComma expression)*) syntaxBracketRr
+    ;
 
 insert
-   : beginBatch? kwInsert kwInto (keyspace DOT)? table insertColumnSpec? insertValuesSpec ifNotExist? usingTtlTimestamp?
-   ;
+    : beginBatch? kwInsert kwInto (keyspace DOT)? table insertColumnSpec? insertValuesSpec ifNotExist? usingTtlTimestamp?
+    ;
 
 usingTtlTimestamp
-   : kwUsing ttl
-   | kwUsing ttl kwAnd timestamp
-   | kwUsing timestamp
-   | kwUsing timestamp kwAnd ttl
-   ;
+    : kwUsing ttl
+    | kwUsing ttl kwAnd timestamp
+    | kwUsing timestamp
+    | kwUsing timestamp kwAnd ttl
+    ;
 
 timestamp
-   : kwTimestamp decimalLiteral
-   ;
+    : kwTimestamp decimalLiteral
+    ;
 
 ttl
-   : kwTtl decimalLiteral
-   ;
+    : kwTtl decimalLiteral
+    ;
 
 usingTimestampSpec
-   : kwUsing timestamp
-   ;
+    : kwUsing timestamp
+    ;
 
 ifNotExist
-   : kwIf kwNot kwExists
-   ;
+    : kwIf kwNot kwExists
+    ;
 
 ifExist
-   : kwIf kwExists
-   ;
+    : kwIf kwExists
+    ;
 
 insertValuesSpec
-   : kwValues '(' expressionList ')'
-   | kwJson constant
-   ;
+    : kwValues '(' expressionList ')'
+    | kwJson constant
+    ;
 
 insertColumnSpec
-   : '(' columnList ')'
-   ;
+    : '(' columnList ')'
+    ;
 
 columnList
-   : column (syntaxComma column)*
-   ;
+    : column (syntaxComma column)*
+    ;
 
 expressionList
-   : expression (syntaxComma expression)*
-   ;
+    : expression (syntaxComma expression)*
+    ;
 
 expression
-   : constant
-   | functionCall
-   | assignmentMap
-   | assignmentSet
-   | assignmentList
-   | assignmentTuple
-   ;
+    : constant
+    | functionCall
+    | assignmentMap
+    | assignmentSet
+    | assignmentList
+    | assignmentTuple
+    ;
 
 select_
-   : kwSelect distinctSpec? kwJson? selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
-   ;
+    : kwSelect distinctSpec? kwJson? selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
+    ;
 
 allowFilteringSpec
-   : kwAllow kwFiltering
-   ;
+    : kwAllow kwFiltering
+    ;
 
 limitSpec
-   : kwLimit decimalLiteral
-   ;
+    : kwLimit decimalLiteral
+    ;
 
 fromSpec
-   : kwFrom fromSpecElement
-   ;
+    : kwFrom fromSpecElement
+    ;
 
 fromSpecElement
-   : OBJECT_NAME
-   | OBJECT_NAME '.' OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    | OBJECT_NAME '.' OBJECT_NAME
+    ;
 
 orderSpec
-   : kwOrder kwBy orderSpecElement
-   ;
+    : kwOrder kwBy orderSpecElement
+    ;
 
 orderSpecElement
-   : OBJECT_NAME (kwAsc | kwDesc)?
-   ;
+    : OBJECT_NAME (kwAsc | kwDesc)?
+    ;
 
 whereSpec
-   : kwWhere relationElements
-   ;
+    : kwWhere relationElements
+    ;
 
 distinctSpec
-   : kwDistinct
-   ;
+    : kwDistinct
+    ;
 
 selectElements
-   : (star = '*' | selectElement) (syntaxComma selectElement)*
-   ;
+    : (star = '*' | selectElement) (syntaxComma selectElement)*
+    ;
 
 selectElement
-   : OBJECT_NAME '.' '*'
-   | OBJECT_NAME (kwAs OBJECT_NAME)?
-   | functionCall (kwAs OBJECT_NAME)?
-   ;
+    : OBJECT_NAME '.' '*'
+    | OBJECT_NAME (kwAs OBJECT_NAME)?
+    | functionCall (kwAs OBJECT_NAME)?
+    ;
 
 relationElements
-   : (relationElement) (kwAnd relationElement)*
-   ;
+    : (relationElement) (kwAnd relationElement)*
+    ;
 
 relationElement
-   : OBJECT_NAME (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
-   | OBJECT_NAME '.' OBJECT_NAME (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
-   | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
-   | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) functionCall
-   | OBJECT_NAME kwIn '(' functionArgs? ')'
-   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' kwIn '(' assignmentTuple (syntaxComma assignmentTuple)* ')'
-   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) ( assignmentTuple (syntaxComma assignmentTuple)* )
-   | relalationContainsKey
-   | relalationContains
-   ;
+    : OBJECT_NAME (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
+    | OBJECT_NAME '.' OBJECT_NAME (
+        OPERATOR_EQ
+        | OPERATOR_LT
+        | OPERATOR_GT
+        | OPERATOR_LTE
+        | OPERATOR_GTE
+    ) constant
+    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
+    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) functionCall
+    | OBJECT_NAME kwIn '(' functionArgs? ')'
+    | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' kwIn '(' assignmentTuple (
+        syntaxComma assignmentTuple
+    )* ')'
+    | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' (
+        OPERATOR_EQ
+        | OPERATOR_LT
+        | OPERATOR_GT
+        | OPERATOR_LTE
+        | OPERATOR_GTE
+    ) (assignmentTuple (syntaxComma assignmentTuple)*)
+    | relalationContainsKey
+    | relalationContains
+    ;
 
 relalationContains
-   : OBJECT_NAME kwContains constant
-   ;
+    : OBJECT_NAME kwContains constant
+    ;
 
 relalationContainsKey
-   : OBJECT_NAME (kwContains kwKey) constant
-   ;
+    : OBJECT_NAME (kwContains kwKey) constant
+    ;
 
 functionCall
-   : OBJECT_NAME '(' STAR ')'
-   | OBJECT_NAME '(' functionArgs? ')'
-   | K_UUID '(' ')'
-   ;
+    : OBJECT_NAME '(' STAR ')'
+    | OBJECT_NAME '(' functionArgs? ')'
+    | K_UUID '(' ')'
+    ;
 
 functionArgs
-   : (constant | OBJECT_NAME | functionCall) (syntaxComma (constant | OBJECT_NAME | functionCall))*
-   ;
+    : (constant | OBJECT_NAME | functionCall) (syntaxComma (constant | OBJECT_NAME | functionCall))*
+    ;
 
 constant
-   : UUID
-   | stringLiteral
-   | decimalLiteral
-   | floatLiteral
-   | hexadecimalLiteral
-   | booleanLiteral
-   | codeBlock
-   | kwNull
-   ;
+    : UUID
+    | stringLiteral
+    | decimalLiteral
+    | floatLiteral
+    | hexadecimalLiteral
+    | booleanLiteral
+    | codeBlock
+    | kwNull
+    ;
 
 decimalLiteral
-   : DECIMAL_LITERAL
-   ;
+    : DECIMAL_LITERAL
+    ;
 
 floatLiteral
-   : DECIMAL_LITERAL
-   | FLOAT_LITERAL
-   ;
+    : DECIMAL_LITERAL
+    | FLOAT_LITERAL
+    ;
 
 stringLiteral
-   : STRING_LITERAL
-   ;
+    : STRING_LITERAL
+    ;
 
 booleanLiteral
-   : K_TRUE
-   | K_FALSE
-   ;
+    : K_TRUE
+    | K_FALSE
+    ;
 
 hexadecimalLiteral
-   : HEXADECIMAL_LITERAL
-   ;
+    : HEXADECIMAL_LITERAL
+    ;
 
 keyspace
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
-   ;
+    : OBJECT_NAME
+    | DQUOTE OBJECT_NAME DQUOTE
+    ;
 
 table
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
-   ;
+    : OBJECT_NAME
+    | DQUOTE OBJECT_NAME DQUOTE
+    ;
 
 column
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
-   ;
+    : OBJECT_NAME
+    | DQUOTE OBJECT_NAME DQUOTE
+    ;
 
 dataType
-   : dataTypeName dataTypeDefinition?
-   ;
+    : dataTypeName dataTypeDefinition?
+    ;
 
 dataTypeName
-   : OBJECT_NAME
-   | K_TIMESTAMP
-   | K_SET
-   | K_ASCII
-   | K_BIGINT
-   | K_BLOB
-   | K_BOOLEAN
-   | K_COUNTER
-   | K_DATE
-   | K_DECIMAL
-   | K_DOUBLE
-   | K_FLOAT
-   | K_FROZEN
-   | K_INET
-   | K_INT
-   | K_LIST
-   | K_MAP
-   | K_SMALLINT
-   | K_TEXT
-   | K_TIME
-   | K_TIMEUUID
-   | K_TINYINT
-   | K_TUPLE
-   | K_VARCHAR
-   | K_VARINT
-   | K_TIMESTAMP
-   | K_UUID
-   ;
+    : OBJECT_NAME
+    | K_TIMESTAMP
+    | K_SET
+    | K_ASCII
+    | K_BIGINT
+    | K_BLOB
+    | K_BOOLEAN
+    | K_COUNTER
+    | K_DATE
+    | K_DECIMAL
+    | K_DOUBLE
+    | K_FLOAT
+    | K_FROZEN
+    | K_INET
+    | K_INT
+    | K_LIST
+    | K_MAP
+    | K_SMALLINT
+    | K_TEXT
+    | K_TIME
+    | K_TIMEUUID
+    | K_TINYINT
+    | K_TUPLE
+    | K_VARCHAR
+    | K_VARINT
+    | K_TIMESTAMP
+    | K_UUID
+    ;
 
 dataTypeDefinition
-   : syntaxBracketLa dataTypeName (syntaxComma dataTypeName)* syntaxBracketRa
-   ;
+    : syntaxBracketLa dataTypeName (syntaxComma dataTypeName)* syntaxBracketRa
+    ;
 
 orderDirection
-   : kwAsc
-   | kwDesc
-   ;
+    : kwAsc
+    | kwDesc
+    ;
 
 role
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 trigger
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 triggerClass
-   : stringLiteral
-   ;
+    : stringLiteral
+    ;
 
 materializedView
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 type_
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 aggregate
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 function_
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 language
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 user
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 password
-   : stringLiteral
-   ;
+    : stringLiteral
+    ;
 
 hashKey
-   : OBJECT_NAME
-   ;
+    : OBJECT_NAME
+    ;
 
 param
-   : paramName dataType
-   ;
+    : paramName dataType
+    ;
 
 paramName
-   : OBJECT_NAME
-   | K_INPUT
-   ;
+    : OBJECT_NAME
+    | K_INPUT
+    ;
 
 kwAdd
-   : K_ADD
-   ;
+    : K_ADD
+    ;
 
 kwAggregate
-   : K_AGGREGATE
-   ;
+    : K_AGGREGATE
+    ;
 
 kwAll
-   : K_ALL
-   ;
+    : K_ALL
+    ;
 
 kwAllPermissions
-   : K_ALL K_PERMISSIONS
-   ;
+    : K_ALL K_PERMISSIONS
+    ;
 
 kwAllow
-   : K_ALLOW
-   ;
+    : K_ALLOW
+    ;
 
 kwAlter
-   : K_ALTER
-   ;
+    : K_ALTER
+    ;
 
 kwAnd
-   : K_AND
-   ;
+    : K_AND
+    ;
 
 kwApply
-   : K_APPLY
-   ;
+    : K_APPLY
+    ;
 
 kwAs
-   : K_AS
-   ;
+    : K_AS
+    ;
 
 kwAsc
-   : K_ASC
-   ;
+    : K_ASC
+    ;
 
 kwAuthorize
-   : K_AUTHORIZE
-   ;
+    : K_AUTHORIZE
+    ;
 
 kwBatch
-   : K_BATCH
-   ;
+    : K_BATCH
+    ;
 
 kwBegin
-   : K_BEGIN
-   ;
+    : K_BEGIN
+    ;
 
 kwBy
-   : K_BY
-   ;
+    : K_BY
+    ;
 
 kwCalled
-   : K_CALLED
-   ;
+    : K_CALLED
+    ;
 
 kwClustering
-   : K_CLUSTERING
-   ;
+    : K_CLUSTERING
+    ;
 
 kwCompact
-   : K_COMPACT
-   ;
+    : K_COMPACT
+    ;
 
 kwContains
-   : K_CONTAINS
-   ;
+    : K_CONTAINS
+    ;
 
 kwCreate
-   : K_CREATE
-   ;
+    : K_CREATE
+    ;
 
 kwDelete
-   : K_DELETE
-   ;
+    : K_DELETE
+    ;
 
 kwDesc
-   : K_DESC
-   ;
+    : K_DESC
+    ;
 
 kwDescibe
-   : K_DESCRIBE
-   ;
+    : K_DESCRIBE
+    ;
 
 kwDistinct
-   : K_DISTINCT
-   ;
+    : K_DISTINCT
+    ;
 
 kwDrop
-   : K_DROP
-   ;
+    : K_DROP
+    ;
 
 kwDurableWrites
-   : K_DURABLE_WRITES
-   ;
+    : K_DURABLE_WRITES
+    ;
 
 kwEntries
-   : K_ENTRIES
-   ;
+    : K_ENTRIES
+    ;
 
 kwExecute
-   : K_EXECUTE
-   ;
+    : K_EXECUTE
+    ;
 
 kwExists
-   : K_EXISTS
-   ;
+    : K_EXISTS
+    ;
 
 kwFiltering
-   : K_FILTERING
-   ;
+    : K_FILTERING
+    ;
 
 kwFinalfunc
-   : K_FINALFUNC
-   ;
+    : K_FINALFUNC
+    ;
 
 kwFrom
-   : K_FROM
-   ;
+    : K_FROM
+    ;
 
 kwFull
-   : K_FULL
-   ;
+    : K_FULL
+    ;
 
 kwFunction
-   : K_FUNCTION
-   ;
+    : K_FUNCTION
+    ;
 
 kwFunctions
-   : K_FUNCTIONS
-   ;
+    : K_FUNCTIONS
+    ;
 
 kwGrant
-   : K_GRANT
-   ;
+    : K_GRANT
+    ;
 
 kwIf
-   : K_IF
-   ;
+    : K_IF
+    ;
 
 kwIn
-   : K_IN
-   ;
+    : K_IN
+    ;
 
 kwIndex
-   : K_INDEX
-   ;
+    : K_INDEX
+    ;
 
 kwInitcond
-   : K_INITCOND
-   ;
+    : K_INITCOND
+    ;
 
 kwInput
-   : K_INPUT
-   ;
+    : K_INPUT
+    ;
 
 kwInsert
-   : K_INSERT
-   ;
+    : K_INSERT
+    ;
 
 kwInto
-   : K_INTO
-   ;
+    : K_INTO
+    ;
 
 kwIs
-   : K_IS
-   ;
+    : K_IS
+    ;
 
 kwJson
-   : K_JSON
-   ;
+    : K_JSON
+    ;
 
 kwKey
-   : K_KEY
-   ;
+    : K_KEY
+    ;
 
 kwKeys
-   : K_KEYS
-   ;
+    : K_KEYS
+    ;
 
 kwKeyspace
-   : K_KEYSPACE
-   ;
+    : K_KEYSPACE
+    ;
 
 kwKeyspaces
-   : K_KEYSPACES
-   ;
+    : K_KEYSPACES
+    ;
 
 kwLanguage
-   : K_LANGUAGE
-   ;
+    : K_LANGUAGE
+    ;
 
 kwLimit
-   : K_LIMIT
-   ;
+    : K_LIMIT
+    ;
 
 kwList
-   : K_LIST
-   ;
+    : K_LIST
+    ;
 
 kwLogged
-   : K_LOGGED
-   ;
+    : K_LOGGED
+    ;
 
 kwLogin
-   : K_LOGIN
-   ;
+    : K_LOGIN
+    ;
 
 kwMaterialized
-   : K_MATERIALIZED
-   ;
+    : K_MATERIALIZED
+    ;
 
 kwModify
-   : K_MODIFY
-   ;
+    : K_MODIFY
+    ;
 
 kwNosuperuser
-   : K_NOSUPERUSER
-   ;
+    : K_NOSUPERUSER
+    ;
 
 kwNorecursive
-   : K_NORECURSIVE
-   ;
+    : K_NORECURSIVE
+    ;
 
 kwNot
-   : K_NOT
-   ;
+    : K_NOT
+    ;
 
 kwNull
-   : K_NULL
-   ;
+    : K_NULL
+    ;
 
 kwOf
-   : K_OF
-   ;
+    : K_OF
+    ;
 
 kwOn
-   : K_ON
-   ;
+    : K_ON
+    ;
 
 kwOptions
-   : K_OPTIONS
-   ;
+    : K_OPTIONS
+    ;
 
 kwOr
-   : K_OR
-   ;
+    : K_OR
+    ;
 
 kwOrder
-   : K_ORDER
-   ;
+    : K_ORDER
+    ;
 
 kwPassword
-   : K_PASSWORD
-   ;
+    : K_PASSWORD
+    ;
 
 kwPrimary
-   : K_PRIMARY
-   ;
+    : K_PRIMARY
+    ;
 
 kwRename
-   : K_RENAME
-   ;
+    : K_RENAME
+    ;
 
 kwReplace
-   : K_REPLACE
-   ;
+    : K_REPLACE
+    ;
 
 kwReplication
-   : K_REPLICATION
-   ;
+    : K_REPLICATION
+    ;
 
 kwReturns
-   : K_RETURNS
-   ;
+    : K_RETURNS
+    ;
 
 kwRole
-   : K_ROLE
-   ;
+    : K_ROLE
+    ;
 
 kwRoles
-   : K_ROLES
-   ;
+    : K_ROLES
+    ;
 
 kwSelect
-   : K_SELECT
-   ;
+    : K_SELECT
+    ;
 
 kwSet
-   : K_SET
-   ;
+    : K_SET
+    ;
 
 kwSfunc
-   : K_SFUNC
-   ;
+    : K_SFUNC
+    ;
 
 kwStorage
-   : K_STORAGE
-   ;
+    : K_STORAGE
+    ;
 
 kwStype
-   : K_STYPE
-   ;
+    : K_STYPE
+    ;
 
 kwSuperuser
-   : K_SUPERUSER
-   ;
+    : K_SUPERUSER
+    ;
 
 kwTable
-   : K_TABLE
-   ;
+    : K_TABLE
+    ;
 
 kwTimestamp
-   : K_TIMESTAMP
-   ;
+    : K_TIMESTAMP
+    ;
 
 kwTo
-   : K_TO
-   ;
+    : K_TO
+    ;
 
 kwTrigger
-   : K_TRIGGER
-   ;
+    : K_TRIGGER
+    ;
 
 kwTruncate
-   : K_TRUNCATE
-   ;
+    : K_TRUNCATE
+    ;
 
 kwTtl
-   : K_TTL
-   ;
+    : K_TTL
+    ;
 
 kwType
-   : K_TYPE
-   ;
+    : K_TYPE
+    ;
 
 kwUnlogged
-   : K_UNLOGGED
-   ;
+    : K_UNLOGGED
+    ;
 
 kwUpdate
-   : K_UPDATE
-   ;
+    : K_UPDATE
+    ;
 
 kwUse
-   : K_USE
-   ;
+    : K_USE
+    ;
 
 kwUser
-   : K_USER
-   ;
+    : K_USER
+    ;
 
 kwUsing
-   : K_USING
-   ;
+    : K_USING
+    ;
 
 kwValues
-   : K_VALUES
-   ;
+    : K_VALUES
+    ;
 
 kwView
-   : K_VIEW
-   ;
+    : K_VIEW
+    ;
 
 kwWhere
-   : K_WHERE
-   ;
+    : K_WHERE
+    ;
 
 kwWith
-   : K_WITH
-   ;
+    : K_WITH
+    ;
 
 kwRevoke
-   : K_REVOKE
-   ;
+    : K_REVOKE
+    ;
 
 // BRACKETS
 // L - left
@@ -1262,41 +1303,41 @@ kwRevoke
 // c - curly
 // r - rounded
 syntaxBracketLr
-   : LR_BRACKET
-   ;
+    : LR_BRACKET
+    ;
 
 syntaxBracketRr
-   : RR_BRACKET
-   ;
+    : RR_BRACKET
+    ;
 
 syntaxBracketLc
-   : LC_BRACKET
-   ;
+    : LC_BRACKET
+    ;
 
 syntaxBracketRc
-   : RC_BRACKET
-   ;
+    : RC_BRACKET
+    ;
 
 syntaxBracketLa
-   : OPERATOR_LT
-   ;
+    : OPERATOR_LT
+    ;
 
 syntaxBracketRa
-   : OPERATOR_GT
-   ;
+    : OPERATOR_GT
+    ;
 
 syntaxBracketLs
-   : LS_BRACKET
-   ;
+    : LS_BRACKET
+    ;
 
 syntaxBracketRs
-   : RS_BRACKET
-   ;
+    : RS_BRACKET
+    ;
 
 syntaxComma
-   : COMMA
-   ;
+    : COMMA
+    ;
 
 syntaxColon
-   : COLON
-   ;
+    : COLON
+    ;

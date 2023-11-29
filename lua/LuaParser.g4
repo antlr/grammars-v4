@@ -8,15 +8,26 @@ Based on previous work of: Kazunori Sakamoto, Alexander Alexeev
 
 */
 
-parser grammar  LuaParser;
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-options { tokenVocab = LuaLexer; }
+parser grammar LuaParser;
 
-start_: chunk EOF;
+options {
+    tokenVocab = LuaLexer;
+}
 
-chunk: block ;
+start_
+    : chunk EOF
+    ;
 
-block: stat* retstat? ;
+chunk
+    : block
+    ;
+
+block
+    : stat* retstat?
+    ;
 
 stat
     : ';'
@@ -78,11 +89,11 @@ exp
     | functiondef
     | prefixexp
     | tableconstructor
-    | <assoc=right> exp ('^') exp
+    | <assoc = right> exp ('^') exp
     | ('not' | '#' | '-' | '~') exp
     | exp ('*' | '/' | '%' | '//') exp
     | exp ('+' | '-') exp
-    | <assoc=right> exp ('..') exp
+    | <assoc = right> exp ('..') exp
     | exp ('<' | '>' | '<=' | '>=' | '~=' | '==') exp
     | exp ('and') exp
     | exp ('or') exp
@@ -97,24 +108,25 @@ var
 
 // prefixexp ::= var | functioncall | '(' exp ')'
 prefixexp
-    :
-    NAME ('[' exp ']' | '.' NAME)*
+    : NAME ('[' exp ']' | '.' NAME)*
     | functioncall ('[' exp ']' | '.' NAME)*
     | '(' exp ')' ('[' exp ']' | '.' NAME)*
     ;
 
 // functioncall ::=  prefixexp args | prefixexp ':' Name args;
-functioncall:
-    NAME ('[' exp ']' | '.' NAME)* args
+functioncall
+    : NAME ('[' exp ']' | '.' NAME)* args
     | functioncall ('[' exp ']' | '.' NAME)* args
     | '(' exp ')' ('[' exp ']' | '.' NAME)* args
-    | NAME ('[' exp ']' | '.' NAME)*  ':' NAME args
-    | functioncall ('[' exp ']' | '.' NAME)*  ':' NAME args
-    | '(' exp ')' ('[' exp ']' | '.' NAME)*  ':' NAME args
+    | NAME ('[' exp ']' | '.' NAME)* ':' NAME args
+    | functioncall ('[' exp ']' | '.' NAME)* ':' NAME args
+    | '(' exp ')' ('[' exp ']' | '.' NAME)* ':' NAME args
     ;
 
 args
-    : '(' explist? ')' | tableconstructor | string
+    : '(' explist? ')'
+    | tableconstructor
+    | string
     ;
 
 functiondef
@@ -144,17 +156,25 @@ fieldlist
     ;
 
 field
-    : '[' exp ']' '=' exp | NAME '=' exp | exp
+    : '[' exp ']' '=' exp
+    | NAME '=' exp
+    | exp
     ;
 
 fieldsep
-    : ',' | ';'
+    : ','
+    | ';'
     ;
 
 number
-    : INT | HEX | FLOAT | HEX_FLOAT
+    : INT
+    | HEX
+    | FLOAT
+    | HEX_FLOAT
     ;
 
 string
-    : NORMALSTRING | CHARSTRING | LONGSTRING
+    : NORMALSTRING
+    | CHARSTRING
+    | LONGSTRING
     ;
