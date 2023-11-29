@@ -30,49 +30,52 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar telephone;
 
 test
-   : number EOF
-   ;
+    : number EOF
+    ;
 
 number
-   : '+1'? '+'? variation
-   ;
+    : '+1'? '+'? variation
+    ;
 
 variation
-   : nanp
-   | japan
-   ;
+    : nanp
+    | japan
+    ;
 
 // North American Numbering Plan
 nanp
-   : '011' areacode exchange subscriber
-   ;
+    : '011' areacode exchange subscriber
+    ;
 
 areacode
-   : DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT
+    ;
 
 // Exhange
 exchange
-   : DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT
+    ;
 
 // Subscriber
 subscriber
-   : DIGIT DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT DIGIT
+    ;
 
 // Japan
 japan
-   : '010' areacode exchange subscriber
-   ;
+    : '010' areacode exchange subscriber
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \r\n] + -> skip
-   ;
+    : [ \r\n]+ -> skip
+    ;

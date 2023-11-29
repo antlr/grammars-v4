@@ -1,8 +1,12 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar Java20Lexer;
 
 options
 {
-   superClass = JavaLexerBase;
+    superClass = JavaLexerBase;
 }
 
 // Insert here @header for C++ lexer.
@@ -11,25 +15,23 @@ options
 
 // LEXER
 
-EXPORTS: 'exports';
-MODULE: 'module';
-NONSEALED: 'non-sealed';
-OACA:  '<>';
-OPEN: 'open';
-OPENS: 'opens';
-PERMITS: 'permits';
-PROVIDES: 'provides';
-RECORD: 'record';
-REQUIRES: 'requires';
-SEALED: 'sealed';
-TO: 'to';
-TRANSITIVE: 'transitive';
-USES: 'uses';
-VAR: 'var';
-WITH: 'with';
-YIELD: 'yield';
-
-
+EXPORTS    : 'exports';
+MODULE     : 'module';
+NONSEALED  : 'non-sealed';
+OACA       : '<>';
+OPEN       : 'open';
+OPENS      : 'opens';
+PERMITS    : 'permits';
+PROVIDES   : 'provides';
+RECORD     : 'record';
+REQUIRES   : 'requires';
+SEALED     : 'sealed';
+TO         : 'to';
+TRANSITIVE : 'transitive';
+USES       : 'uses';
+VAR        : 'var';
+WITH       : 'with';
+YIELD      : 'yield';
 
 // §3.9 Keywords
 
@@ -45,7 +47,7 @@ CLASS        : 'class';
 CONST        : 'const';
 CONTINUE     : 'continue';
 DEFAULT      : 'default';
-DO           : 'do'    ;
+DO           : 'do';
 DOUBLE       : 'double';
 ELSE         : 'else';
 ENUM         : 'enum';
@@ -83,338 +85,188 @@ TRY          : 'try';
 VOID         : 'void';
 VOLATILE     : 'volatile';
 WHILE        : 'while';
-UNDER_SCORE  : '_';  //Introduced in Java 9
+UNDER_SCORE  : '_'; //Introduced in Java 9
 
 // §3.10.1 Integer Literals
 
-IntegerLiteral
-	:	DecimalIntegerLiteral
-	|	HexIntegerLiteral
-	|	OctalIntegerLiteral
-	|	BinaryIntegerLiteral
-	;
+IntegerLiteral:
+    DecimalIntegerLiteral
+    | HexIntegerLiteral
+    | OctalIntegerLiteral
+    | BinaryIntegerLiteral
+;
 
-fragment
-DecimalIntegerLiteral
-	:	DecimalNumeral IntegerTypeSuffix?
-	;
+fragment DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix?;
 
-fragment
-HexIntegerLiteral
-	:	HexNumeral IntegerTypeSuffix?
-	;
+fragment HexIntegerLiteral: HexNumeral IntegerTypeSuffix?;
 
-fragment
-OctalIntegerLiteral
-	:	OctalNumeral IntegerTypeSuffix?
-	;
+fragment OctalIntegerLiteral: OctalNumeral IntegerTypeSuffix?;
 
-fragment
-BinaryIntegerLiteral
-	:	BinaryNumeral IntegerTypeSuffix?
-	;
+fragment BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix?;
 
-fragment
-IntegerTypeSuffix
-	:	[lL]
-	;
+fragment IntegerTypeSuffix: [lL];
 
-fragment
-DecimalNumeral
-	:	'0'
-	|	NonZeroDigit (Digits? | Underscores Digits)
-	;
+fragment DecimalNumeral: '0' | NonZeroDigit (Digits? | Underscores Digits);
 
-fragment
-Digits
-	:	Digit (DigitsAndUnderscores? Digit)?
-	;
+fragment Digits: Digit (DigitsAndUnderscores? Digit)?;
 
-fragment
-Digit
-	:	'0'
-	|	NonZeroDigit
-	;
+fragment Digit: '0' | NonZeroDigit;
 
-fragment
-NonZeroDigit
-	:	[1-9]
-	;
+fragment NonZeroDigit: [1-9];
 
-fragment
-DigitsAndUnderscores
-	:	DigitOrUnderscore+
-	;
+fragment DigitsAndUnderscores: DigitOrUnderscore+;
 
-fragment
-DigitOrUnderscore
-	:	Digit
-	|	'_'
-	;
+fragment DigitOrUnderscore: Digit | '_';
 
-fragment
-Underscores
-	:	'_'+
-	;
+fragment Underscores: '_'+;
 
-fragment
-HexNumeral
-	:	'0' [xX] HexDigits
-	;
+fragment HexNumeral: '0' [xX] HexDigits;
 
-fragment
-HexDigits
-	:	HexDigit (HexDigitsAndUnderscores? HexDigit)?
-	;
+fragment HexDigits: HexDigit (HexDigitsAndUnderscores? HexDigit)?;
 
-fragment
-HexDigit
-	:	[0-9a-fA-F]
-	;
+fragment HexDigit: [0-9a-fA-F];
 
-fragment
-HexDigitsAndUnderscores
-	:	HexDigitOrUnderscore+
-	;
+fragment HexDigitsAndUnderscores: HexDigitOrUnderscore+;
 
-fragment
-HexDigitOrUnderscore
-	:	HexDigit
-	|	'_'
-	;
+fragment HexDigitOrUnderscore: HexDigit | '_';
 
-fragment
-OctalNumeral
-	:	'0' Underscores? OctalDigits
-	;
+fragment OctalNumeral: '0' Underscores? OctalDigits;
 
-fragment
-OctalDigits
-	:	OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
-	;
+fragment OctalDigits: OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?;
 
-fragment
-OctalDigit
-	:	[0-7]
-	;
+fragment OctalDigit: [0-7];
 
-fragment
-OctalDigitsAndUnderscores
-	:	OctalDigitOrUnderscore+
-	;
+fragment OctalDigitsAndUnderscores: OctalDigitOrUnderscore+;
 
-fragment
-OctalDigitOrUnderscore
-	:	OctalDigit
-	|	'_'
-	;
+fragment OctalDigitOrUnderscore: OctalDigit | '_';
 
-fragment
-BinaryNumeral
-	:	'0' [bB] BinaryDigits
-	;
+fragment BinaryNumeral: '0' [bB] BinaryDigits;
 
-fragment
-BinaryDigits
-	:	BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
-	;
+fragment BinaryDigits: BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?;
 
-fragment
-BinaryDigit
-	:	[01]
-	;
+fragment BinaryDigit: [01];
 
-fragment
-BinaryDigitsAndUnderscores
-	:	BinaryDigitOrUnderscore+
-	;
+fragment BinaryDigitsAndUnderscores: BinaryDigitOrUnderscore+;
 
-fragment
-BinaryDigitOrUnderscore
-	:	BinaryDigit
-	|	'_'
-	;
+fragment BinaryDigitOrUnderscore: BinaryDigit | '_';
 
 // §3.10.2 Floating-Point Literals
 
-FloatingPointLiteral
-	:	DecimalFloatingPointLiteral
-	|	HexadecimalFloatingPointLiteral
-	;
+FloatingPointLiteral: DecimalFloatingPointLiteral | HexadecimalFloatingPointLiteral;
 
-fragment
-DecimalFloatingPointLiteral
-	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-	|	'.' Digits ExponentPart? FloatTypeSuffix?
-	|	Digits ExponentPart FloatTypeSuffix?
-	|	Digits FloatTypeSuffix
-	;
+fragment DecimalFloatingPointLiteral:
+    Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    | '.' Digits ExponentPart? FloatTypeSuffix?
+    | Digits ExponentPart FloatTypeSuffix?
+    | Digits FloatTypeSuffix
+;
 
-fragment
-ExponentPart
-	:	ExponentIndicator SignedInteger
-	;
+fragment ExponentPart: ExponentIndicator SignedInteger;
 
-fragment
-ExponentIndicator
-	:	[eE]
-	;
+fragment ExponentIndicator: [eE];
 
-fragment
-SignedInteger
-	:	Sign? Digits
-	;
+fragment SignedInteger: Sign? Digits;
 
-fragment
-Sign
-	:	[+-]
-	;
+fragment Sign: [+-];
 
-fragment
-FloatTypeSuffix
-	:	[fFdD]
-	;
+fragment FloatTypeSuffix: [fFdD];
 
-fragment
-HexadecimalFloatingPointLiteral
-	:	HexSignificand BinaryExponent FloatTypeSuffix?
-	;
+fragment HexadecimalFloatingPointLiteral: HexSignificand BinaryExponent FloatTypeSuffix?;
 
-fragment
-HexSignificand
-	:	HexNumeral '.'?
-	|	'0' [xX] HexDigits? '.' HexDigits
-	;
+fragment HexSignificand: HexNumeral '.'? | '0' [xX] HexDigits? '.' HexDigits;
 
-fragment
-BinaryExponent
-	:	BinaryExponentIndicator SignedInteger
-	;
+fragment BinaryExponent: BinaryExponentIndicator SignedInteger;
 
-fragment
-BinaryExponentIndicator
-	:	[pP]
-	;
+fragment BinaryExponentIndicator: [pP];
 
 // §3.10.3 Boolean Literals
 
-BooleanLiteral
-	:	'true'
-	|	'false'
-	;
+BooleanLiteral: 'true' | 'false';
 
 // §3.10.4 Character Literals
 
-CharacterLiteral
-	:	'\'' SingleCharacter '\''
-	|	'\'' EscapeSequence '\''
-	;
+CharacterLiteral: '\'' SingleCharacter '\'' | '\'' EscapeSequence '\'';
 
-fragment
-SingleCharacter
-	:	~['\\\r\n]
-	;
+fragment SingleCharacter: ~['\\\r\n];
 
 // §3.10.5 String Literals
 
-StringLiteral
-	:	'"' StringCharacters? '"'
-	;
+StringLiteral: '"' StringCharacters? '"';
 
-fragment
-StringCharacters
-	:	StringCharacter+
-	;
+fragment StringCharacters: StringCharacter+;
 
-fragment
-StringCharacter
-	:	~["\\\r\n]
-	|	EscapeSequence
-	;
+fragment StringCharacter: ~["\\\r\n] | EscapeSequence;
 
-TextBlock
-        : '"""' [ \t]* [\n\r] [.\r\b]*'"""'
-        ;	
+TextBlock: '"""' [ \t]* [\n\r] [.\r\b]* '"""';
 
 // §3.10.6 Escape Sequences for Character and String Literals
 
-fragment
-EscapeSequence
-	:	'\\' [btnfr"'\\]
-	|	OctalEscape
-        |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
-	;
+fragment EscapeSequence:
+    '\\' [btnfr"'\\]
+    | OctalEscape
+    | UnicodeEscape // This is not in the spec but prevents having to preprocess the input
+;
 
-fragment
-OctalEscape
-	:	'\\' OctalDigit
-	|	'\\' OctalDigit OctalDigit
-	|	'\\' ZeroToThree OctalDigit OctalDigit
-	;
+fragment OctalEscape:
+    '\\' OctalDigit
+    | '\\' OctalDigit OctalDigit
+    | '\\' ZeroToThree OctalDigit OctalDigit
+;
 
-fragment
-ZeroToThree
-	:	[0-3]
-	;
+fragment ZeroToThree: [0-3];
 
 // This is not in the spec but prevents having to preprocess the input
-fragment
-UnicodeEscape
-    :   '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
-    ;
+fragment UnicodeEscape: '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit;
 
 // §3.10.7 The Null Literal
 
-NullLiteral
-	:	'null'
-	;
+NullLiteral: 'null';
 
 // §3.11 Separators
 
-LPAREN         : '(';
-RPAREN         : ')';
-LBRACE         : '{';
-RBRACE         : '}';
-LBRACK         : '[';
-RBRACK         : ']';
-SEMI           : ';';
-COMMA          : ',';
-DOT            : '.';
-ELLIPSIS       : '...';
-AT             : '@';
-COLONCOLON     : '::';
-
+LPAREN     : '(';
+RPAREN     : ')';
+LBRACE     : '{';
+RBRACE     : '}';
+LBRACK     : '[';
+RBRACK     : ']';
+SEMI       : ';';
+COMMA      : ',';
+DOT        : '.';
+ELLIPSIS   : '...';
+AT         : '@';
+COLONCOLON : '::';
 
 // §3.12 Operators
 
-ASSIGN         : '=';
-GT             : '>';
-LT             : '<';
-BANG           : '!';
-TILDE          : '~';
-QUESTION       : '?';
-COLON          : ':';
-ARROW          : '->';
-EQUAL          : '==';
-LE             : '<=';
-GE             : '>=';
-NOTEQUAL       : '!=';
-AND            : '&&';
-OR             : '||';
-INC            : '++';
-DEC            : '--';
-ADD            : '+';
-SUB            : '-';
-MUL            : '*';
-DIV            : '/';
-BITAND         : '&';
-BITOR          : '|';
-CARET          : '^';
-MOD            : '%';
+ASSIGN   : '=';
+GT       : '>';
+LT       : '<';
+BANG     : '!';
+TILDE    : '~';
+QUESTION : '?';
+COLON    : ':';
+ARROW    : '->';
+EQUAL    : '==';
+LE       : '<=';
+GE       : '>=';
+NOTEQUAL : '!=';
+AND      : '&&';
+OR       : '||';
+INC      : '++';
+DEC      : '--';
+ADD      : '+';
+SUB      : '-';
+MUL      : '*';
+DIV      : '/';
+BITAND   : '&';
+BITOR    : '|';
+CARET    : '^';
+MOD      : '%';
 //LSHIFT       : '<<';
 //RSHIFT       : '>>';
 //URSHIFT      : '>>>';
-	       
+
 ADD_ASSIGN     : '+=';
 SUB_ASSIGN     : '-=';
 MUL_ASSIGN     : '*=';
@@ -429,43 +281,30 @@ URSHIFT_ASSIGN : '>>>=';
 
 // §3.8 Identifiers (must appear after all keywords in the grammar)
 
-Identifier
-	:	JavaLetter JavaLetterOrDigit*
-	;
+Identifier: JavaLetter JavaLetterOrDigit*;
 
-fragment
-JavaLetter
-	:	[a-zA-Z$_] // these are the "java letters" below 0x7F
-	|	// covers all characters above 0x7F which are not a surrogate
-		~[\u0000-\u007F\uD800-\uDBFF]
-		{ this.Check1() }?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{ this.Check2() }?
-	;
+fragment JavaLetter:
+    [a-zA-Z$_]                      // these are the "java letters" below 0x7F
+    |                               // covers all characters above 0x7F which are not a surrogate
+    ~[\u0000-\u007F\uD800-\uDBFF]   { this.Check1() }?
+    |                               // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+    [\uD800-\uDBFF] [\uDC00-\uDFFF] { this.Check2() }?
+;
 
-fragment
-JavaLetterOrDigit
-	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
-	|	// covers all characters above 0x7F which are not a surrogate
-		~[\u0000-\u007F\uD800-\uDBFF]
-		{ this.Check3() }?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{ this.Check4() }?
-	;
+fragment JavaLetterOrDigit:
+    [a-zA-Z0-9$_]                   // these are the "java letters or digits" below 0x7F
+    |                               // covers all characters above 0x7F which are not a surrogate
+    ~[\u0000-\u007F\uD800-\uDBFF]   { this.Check3() }?
+    |                               // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+    [\uD800-\uDBFF] [\uDC00-\uDFFF] { this.Check4() }?
+;
 
 //
 // Whitespace and comments
 //
 
-WS  :  [ \t\r\n\u000C]+ -> skip
-    ;
+WS: [ \t\r\n\u000C]+ -> skip;
 
-COMMENT
-    :   '/*' .*? '*/' -> channel(HIDDEN)
-    ;
+COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
-LINE_COMMENT
-    :   '//' ~[\r\n]* -> channel(HIDDEN)
-    ;
+LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);

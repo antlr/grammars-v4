@@ -1,3 +1,5 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar krl;
 
@@ -22,920 +24,840 @@ grammar krl;
 Antlr4 port by Tom Everett, 2016
 */
 module
-   : (moduleData | moduleRoutines) EOF
-   ;
+    : (moduleData | moduleRoutines) EOF
+    ;
 
 moduleRoutines
-   : mainRoutine (subRoutine | NEWLINE)*
-   ;
+    : mainRoutine (subRoutine | NEWLINE)*
+    ;
 
 mainRoutine
-   : procedureDefinition
-   | functionDefinition
-   ;
+    : procedureDefinition
+    | functionDefinition
+    ;
 
 subRoutine
-   : procedureDefinition
-   | functionDefinition
-   ;
+    : procedureDefinition
+    | functionDefinition
+    ;
 
 procedureDefinition
-   : GLOBAL? DEF procedureName formalParameters NEWLINE routineBody END
-   ;
+    : GLOBAL? DEF procedureName formalParameters NEWLINE routineBody END
+    ;
 
 procedureName
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 functionDefinition
-   : GLOBAL? DEFFCT type_ functionName formalParameters NEWLINE routineBody ENDFCT
-   ;
+    : GLOBAL? DEFFCT type_ functionName formalParameters NEWLINE routineBody ENDFCT
+    ;
 
 functionName
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 moduleData
-   : DEFDAT moduleName PUBLIC? NEWLINE dataList ENDDAT NEWLINE*
-   ;
+    : DEFDAT moduleName PUBLIC? NEWLINE dataList ENDDAT NEWLINE*
+    ;
 
 moduleName
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 dataList
-   : (NEWLINE | forwardDeclaration NEWLINE | typeDeclaration NEWLINE | variableDeclarationInDataList NEWLINE | arrayInitialisation NEWLINE | importStatement NEWLINE)*
-   ;
+    : (
+        NEWLINE
+        | forwardDeclaration NEWLINE
+        | typeDeclaration NEWLINE
+        | variableDeclarationInDataList NEWLINE
+        | arrayInitialisation NEWLINE
+        | importStatement NEWLINE
+    )*
+    ;
 
 arrayInitialisation
-   : IDENTIFIER arrayVariableSuffix '=' unaryPlusMinuxExpression
-   ;
+    : IDENTIFIER arrayVariableSuffix '=' unaryPlusMinuxExpression
+    ;
 
 typeDeclaration
-   : structureDefinition
-   | enumDefinition
-   ;
+    : structureDefinition
+    | enumDefinition
+    ;
 
 structureDefinition
-   : GLOBAL? STRUC typeName type_ variableName variableListRest (',' type_ variableName variableListRest)*
-   ;
+    : GLOBAL? STRUC typeName type_ variableName variableListRest (
+        ',' type_ variableName variableListRest
+    )*
+    ;
 
 enumDefinition
-   : GLOBAL? ENUM typeName enumValue (',' enumValue)*
-   ;
+    : GLOBAL? ENUM typeName enumValue (',' enumValue)*
+    ;
 
 enumValue
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 variableDeclaration
-   : DECL? (type_ variableName variableListRest | signalDeclaration)
-   ;
+    : DECL? (type_ variableName variableListRest | signalDeclaration)
+    ;
 
 signalDeclaration
-   : SIGNAL IDENTIFIER primary (TO primary)?
-   ;
+    : SIGNAL IDENTIFIER primary (TO primary)?
+    ;
 
 variableDeclarationInDataList
-   : DECL? GLOBAL? CONST? (type_ variableName (variableListRest | variableInitialisation) | signalDeclaration)
-   ;
+    : DECL? GLOBAL? CONST? (
+        type_ variableName (variableListRest | variableInitialisation)
+        | signalDeclaration
+    )
+    ;
 
 variableListRest
-   : (',' variableName)*
-   ;
+    : (',' variableName)*
+    ;
 
 variableInitialisation
-   : '=' unaryPlusMinuxExpression
-   ;
+    : '=' unaryPlusMinuxExpression
+    ;
 
 structLiteral
-   : '{' (typeName ':')? structElementList '}'
-   ;
+    : '{' (typeName ':')? structElementList '}'
+    ;
 
 structElementList
-   : structElement (',' structElement)*
-   ;
+    : structElement (',' structElement)*
+    ;
 
 structElement
-   : variableName unaryPlusMinuxExpression
-   ;
+    : variableName unaryPlusMinuxExpression
+    ;
 
 formalParameters
-   : '(' (parameter (',' parameter)*)? ')'
-   ;
+    : '(' (parameter (',' parameter)*)? ')'
+    ;
 
 parameter
-   : variableName (parameterCallType)?
-   ;
+    : variableName (parameterCallType)?
+    ;
 
 routineBody
-   : routineDataSection routineImplementationSection
-   ;
+    : routineDataSection routineImplementationSection
+    ;
 
 routineDataSection
-   : (forwardDeclaration NEWLINE | variableDeclaration NEWLINE | (NEWLINE) NEWLINE | importStatement NEWLINE)*
-   ;
+    : (
+        forwardDeclaration NEWLINE
+        | variableDeclaration NEWLINE
+        | (NEWLINE) NEWLINE
+        | importStatement NEWLINE
+    )*
+    ;
 
 forwardDeclaration
-   : EXT procedureName formalParametersWithType
-   | EXTFCT type_ functionName formalParametersWithType
-   ;
+    : EXT procedureName formalParametersWithType
+    | EXTFCT type_ functionName formalParametersWithType
+    ;
 
 formalParametersWithType
-   : '(' (parameterWithType (',' parameterWithType)*)? ')'
-   ;
+    : '(' (parameterWithType (',' parameterWithType)*)? ')'
+    ;
 
 parameterWithType
-   : type_ (parameterCallType)?
-   ;
+    : type_ (parameterCallType)?
+    ;
 
 parameterCallType
-   : ':' IDENTIFIER
-   ;
+    : ':' IDENTIFIER
+    ;
 
 importStatement
-   : IMPORT type_ variableName IS '/R1/' moduleName '..' variableName
-   ;
+    : IMPORT type_ variableName IS '/R1/' moduleName '..' variableName
+    ;
 
 variableName
-   : IDENTIFIER (arrayVariableSuffix)?
-   ;
+    : IDENTIFIER (arrayVariableSuffix)?
+    ;
 
 // expression in arrays are optional: a string literal can be assigned to a char array as a whole
 arrayVariableSuffix
-   : '[' (expression (',' (expression (',' expression?)?)?)?)? ']'
-   ;
+    : '[' (expression (',' (expression (',' expression?)?)?)?)? ']'
+    ;
 
 routineImplementationSection
-   : statementList
-   ;
+    : statementList
+    ;
 
 statementList
-   : statement*
-   ;
+    : statement*
+    ;
 
 statement
-   : CONTINUE NEWLINE
-   | EXIT NEWLINE
-   | FOR IDENTIFIER '=' expression TO expression (IDENTIFIER expression)? NEWLINE statementList ENDFOR
-   | GOTO IDENTIFIER NEWLINE
-   | HALT NEWLINE
-   | IF expression THEN NEWLINE statementList (ELSE NEWLINE statementList)? ENDIF NEWLINE
-   | LOOP NEWLINE statementList ENDLOOP NEWLINE
-   | REPEAT NEWLINE statementList UNTIL expression NEWLINE
-   | SWITCH expression NEWLINE switchBlockStatementGroups ENDSWITCH NEWLINE
-   | WAIT FOR expression NEWLINE
-   | WAIT SEC expression NEWLINE
-   | WHILE expression NEWLINE statementList ENDWHILE NEWLINE
-   | RETURN (assignmentExpression)? NEWLINE
-   | BRAKE (IDENTIFIER)? NEWLINE
-   | assignmentExpression NEWLINE
-   | IDENTIFIER ':' NEWLINE
-   | NEWLINE
-   | GLOBAL? INTERRUPT DECL primary WHEN expression DO assignmentExpression NEWLINE
-   | INTERRUPT IDENTIFIER primary? NEWLINE
-   | (PTP | PTP_REL) geometricExpression (C_PTP (C_DIS | C_ORI | C_VEL)?)? NEWLINE
-   | LIN geometricExpression (C_DIS | C_ORI | C_VEL)? NEWLINE
-   | LIN_REL geometricExpression (C_DIS | C_ORI | C_VEL)? enumElement? NEWLINE
-   | (CIRC | CIRC_REL) geometricExpression ',' geometricExpression (',' IDENTIFIER primary)? (C_DIS | C_ORI | C_VEL)? NEWLINE
-   | TRIGGER WHEN (IDENTIFIER) '=' expression DELAY '=' expression DO assignmentExpression (PRIO '=' expression)? NEWLINE
-   | analogInputStatement NEWLINE
-   | analogOutputStatement NEWLINE
-   ;
+    : CONTINUE NEWLINE
+    | EXIT NEWLINE
+    | FOR IDENTIFIER '=' expression TO expression (IDENTIFIER expression)? NEWLINE statementList ENDFOR
+    | GOTO IDENTIFIER NEWLINE
+    | HALT NEWLINE
+    | IF expression THEN NEWLINE statementList (ELSE NEWLINE statementList)? ENDIF NEWLINE
+    | LOOP NEWLINE statementList ENDLOOP NEWLINE
+    | REPEAT NEWLINE statementList UNTIL expression NEWLINE
+    | SWITCH expression NEWLINE switchBlockStatementGroups ENDSWITCH NEWLINE
+    | WAIT FOR expression NEWLINE
+    | WAIT SEC expression NEWLINE
+    | WHILE expression NEWLINE statementList ENDWHILE NEWLINE
+    | RETURN (assignmentExpression)? NEWLINE
+    | BRAKE (IDENTIFIER)? NEWLINE
+    | assignmentExpression NEWLINE
+    | IDENTIFIER ':' NEWLINE
+    | NEWLINE
+    | GLOBAL? INTERRUPT DECL primary WHEN expression DO assignmentExpression NEWLINE
+    | INTERRUPT IDENTIFIER primary? NEWLINE
+    | (PTP | PTP_REL) geometricExpression (C_PTP (C_DIS | C_ORI | C_VEL)?)? NEWLINE
+    | LIN geometricExpression (C_DIS | C_ORI | C_VEL)? NEWLINE
+    | LIN_REL geometricExpression (C_DIS | C_ORI | C_VEL)? enumElement? NEWLINE
+    | (CIRC | CIRC_REL) geometricExpression ',' geometricExpression (',' IDENTIFIER primary)? (
+        C_DIS
+        | C_ORI
+        | C_VEL
+    )? NEWLINE
+    | TRIGGER WHEN (IDENTIFIER) '=' expression DELAY '=' expression DO assignmentExpression (
+        PRIO '=' expression
+    )? NEWLINE
+    | analogInputStatement NEWLINE
+    | analogOutputStatement NEWLINE
+    ;
 
 analogOutputStatement
-   : ANOUT (IDENTIFIER assignmentExpression (IDENTIFIER '=' literal)* | IDENTIFIER IDENTIFIER)
-   ;
+    : ANOUT (IDENTIFIER assignmentExpression (IDENTIFIER '=' literal)* | IDENTIFIER IDENTIFIER)
+    ;
 
 analogInputStatement
-   : ANIN (IDENTIFIER assignmentExpression | IDENTIFIER IDENTIFIER)
-   ;
+    : ANIN (IDENTIFIER assignmentExpression | IDENTIFIER IDENTIFIER)
+    ;
 
 switchBlockStatementGroups
-   : NEWLINE* (caseLabel statementList) + (defaultLabel statementList)?
-   ;
+    : NEWLINE* (caseLabel statementList)+ (defaultLabel statementList)?
+    ;
 
 caseLabel
-   : CASE expression (',' expression)* NEWLINE
-   ;
+    : CASE expression (',' expression)* NEWLINE
+    ;
 
 defaultLabel
-   : DEFAULT NEWLINE
-   ;
+    : DEFAULT NEWLINE
+    ;
 
 expressionList
-   : assignmentExpression (',' assignmentExpression)*
-   ;
+    : assignmentExpression (',' assignmentExpression)*
+    ;
 
 assignmentExpression
-   : expression ('=' expression)*
-   ;
+    : expression ('=' expression)*
+    ;
 
 expression
-   : conditionalOrExpression (relationalOp conditionalOrExpression)*
-   ;
+    : conditionalOrExpression (relationalOp conditionalOrExpression)*
+    ;
 
 relationalOp
-   : '=='
-   | '<>'
-   | '<='
-   | '>='
-   | '<'
-   | '>'
-   ;
+    : '=='
+    | '<>'
+    | '<='
+    | '>='
+    | '<'
+    | '>'
+    ;
 
 conditionalOrExpression
-   : exclusiveOrExpression ((OR | B_OR) exclusiveOrExpression)*
-   ;
+    : exclusiveOrExpression ((OR | B_OR) exclusiveOrExpression)*
+    ;
 
 exclusiveOrExpression
-   : conditionalAndExpression ((EXOR | B_EXOR) conditionalAndExpression)*
-   ;
+    : conditionalAndExpression ((EXOR | B_EXOR) conditionalAndExpression)*
+    ;
 
 conditionalAndExpression
-   : additiveExpression ((AND | B_AND) additiveExpression)*
-   ;
+    : additiveExpression ((AND | B_AND) additiveExpression)*
+    ;
 
 additiveExpression
-   : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
-   ;
+    : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
+    ;
 
 multiplicativeExpression
-   : geometricExpression (('*' | '/') geometricExpression)*
-   ;
+    : geometricExpression (('*' | '/') geometricExpression)*
+    ;
 
 geometricExpression
-   : unaryNotExpression (':' unaryNotExpression)*
-   ;
+    : unaryNotExpression (':' unaryNotExpression)*
+    ;
 
 unaryNotExpression
-   : NOT unaryNotExpression
-   | B_NOT unaryNotExpression
-   | unaryPlusMinuxExpression
-   ;
+    : NOT unaryNotExpression
+    | B_NOT unaryNotExpression
+    | unaryPlusMinuxExpression
+    ;
 
 unaryPlusMinuxExpression
-   : '+' unaryPlusMinuxExpression
-   | '-' unaryPlusMinuxExpression
-   | primary
-   ;
+    : '+' unaryPlusMinuxExpression
+    | '-' unaryPlusMinuxExpression
+    | primary
+    ;
 
 primary
-   : parExpression
-   | variableName ('.' variableName)* (arguments)?
-   | literal
-   ;
+    : parExpression
+    | variableName ('.' variableName)* (arguments)?
+    | literal
+    ;
 
 parExpression
-   : '(' assignmentExpression ')'
-   ;
+    : '(' assignmentExpression ')'
+    ;
 
 type_
-   : primitiveType ('[' (INTLITERAL)? ']')?
-   | typeName ('[' (INTLITERAL)? ']')?
-   ;
+    : primitiveType ('[' (INTLITERAL)? ']')?
+    | typeName ('[' (INTLITERAL)? ']')?
+    ;
 
 typeName
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 primitiveType
-   : BOOL
-   | CHAR
-   | INT
-   | REAL
-   ;
+    : BOOL
+    | CHAR
+    | INT
+    | REAL
+    ;
 
 arguments
-   : '(' (expressionList)? ')'
-   ;
+    : '(' (expressionList)? ')'
+    ;
 
 literal
-   : INTLITERAL
-   | FLOATLITERAL
-   | CHARLITERAL
-   | STRINGLITERAL
-   | structLiteral
-   | TRUE
-   | FALSE
-   | enumElement
-   ;
+    : INTLITERAL
+    | FLOATLITERAL
+    | CHARLITERAL
+    | STRINGLITERAL
+    | structLiteral
+    | TRUE
+    | FALSE
+    | enumElement
+    ;
 
 enumElement
-   : '#' IDENTIFIER
-   ;
-
+    : '#' IDENTIFIER
+    ;
 
 AND
-   : A N D
-   ;
-
+    : A N D
+    ;
 
 ANIN
-   : A N I N
-   ;
-
+    : A N I N
+    ;
 
 ANOUT
-   : A N O U T
-   ;
-
+    : A N O U T
+    ;
 
 B_AND
-   : B '_' A N D
-   ;
-
+    : B '_' A N D
+    ;
 
 B_NOT
-   : B '_' N O T
-   ;
-
+    : B '_' N O T
+    ;
 
 B_OR
-   : B '_' O R
-   ;
-
+    : B '_' O R
+    ;
 
 B_EXOR
-   : B '_' E X O R
-   ;
-
+    : B '_' E X O R
+    ;
 
 BOOL
-   : B O O L
-   ;
-
+    : B O O L
+    ;
 
 BRAKE
-   : B R A K E
-   ;
-
+    : B R A K E
+    ;
 
 C_DIS
-   : C '_' D I S
-   ;
-
+    : C '_' D I S
+    ;
 
 C_ORI
-   : C '_' O R I
-   ;
-
+    : C '_' O R I
+    ;
 
 C_PTP
-   : C '_' P T P
-   ;
-
+    : C '_' P T P
+    ;
 
 C_VEL
-   : C '_' V E L
-   ;
-
+    : C '_' V E L
+    ;
 
 CASE
-   : C A S E
-   ;
-
+    : C A S E
+    ;
 
 CAST_FROM
-   : C A S T '_' F R O M
-   ;
-
+    : C A S T '_' F R O M
+    ;
 
 CAST_TO
-   : C A S T '_' T O
-   ;
-
+    : C A S T '_' T O
+    ;
 
 CHAR
-   : C H A R
-   ;
-
+    : C H A R
+    ;
 
 CIRC_REL
-   : C I R C '_' R E L
-   ;
-
+    : C I R C '_' R E L
+    ;
 
 CIRC
-   : C I R C
-   ;
-
+    : C I R C
+    ;
 
 CONST
-   : C O N S T
-   ;
-
+    : C O N S T
+    ;
 
 CONTINUE
-   : C O N T I N U E
-   ;
-
+    : C O N T I N U E
+    ;
 
 DELAY
-   : D E L A Y
-   ;
-
+    : D E L A Y
+    ;
 
 DECL
-   : D E C L
-   ;
-
+    : D E C L
+    ;
 
 DEF
-   : D E F
-   ;
-
+    : D E F
+    ;
 
 DEFAULT
-   : D E F A U L T
-   ;
-
+    : D E F A U L T
+    ;
 
 DEFDAT
-   : D E F D A T
-   ;
-
+    : D E F D A T
+    ;
 
 DEFFCT
-   : D E F F C T
-   ;
-
+    : D E F F C T
+    ;
 
 DO
-   : D O
-   ;
-
+    : D O
+    ;
 
 ELSE
-   : E L S E
-   ;
-
+    : E L S E
+    ;
 
 END
-   : E N D
-   ;
-
+    : E N D
+    ;
 
 ENDDAT
-   : E N D D A T
-   ;
-
+    : E N D D A T
+    ;
 
 ENDFCT
-   : E N D F C T
-   ;
-
+    : E N D F C T
+    ;
 
 ENDFOR
-   : E N D F O R
-   ;
-
+    : E N D F O R
+    ;
 
 ENDIF
-   : E N D I F
-   ;
-
+    : E N D I F
+    ;
 
 ENDLOOP
-   : E N D L O O P
-   ;
-
+    : E N D L O O P
+    ;
 
 ENDSWITCH
-   : E N D S W I T C H
-   ;
-
+    : E N D S W I T C H
+    ;
 
 ENDWHILE
-   : E N D W H I L E
-   ;
-
+    : E N D W H I L E
+    ;
 
 ENUM
-   : E N U M
-   ;
-
+    : E N U M
+    ;
 
 EXIT
-   : E X I T
-   ;
-
+    : E X I T
+    ;
 
 EXT
-   : E X T
-   ;
-
+    : E X T
+    ;
 
 EXTFCT
-   : E X T F C T
-   ;
-
+    : E X T F C T
+    ;
 
 FALSE
-   : F A L S E
-   ;
-
+    : F A L S E
+    ;
 
 FOR
-   : F O R
-   ;
-
+    : F O R
+    ;
 
 GLOBAL
-   : G L O B A L
-   ;
-
+    : G L O B A L
+    ;
 
 GOTO
-   : G O T O
-   ;
-
+    : G O T O
+    ;
 
 HALT
-   : H A L T
-   ;
-
+    : H A L T
+    ;
 
 IF
-   : I F
-   ;
-
+    : I F
+    ;
 
 IMPORT
-   : I M P O R T
-   ;
-
+    : I M P O R T
+    ;
 
 INTERRUPT
-   : I N T E R R U P T
-   ;
-
+    : I N T E R R U P T
+    ;
 
 INT
-   : I N T
-   ;
-
+    : I N T
+    ;
 
 IS
-   : I S
-   ;
-
+    : I S
+    ;
 
 LIN_REL
-   : L I N '_' R E L
-   ;
-
+    : L I N '_' R E L
+    ;
 
 LIN
-   : L I N
-   ;
-
+    : L I N
+    ;
 
 LOOP
-   : L O O P
-   ;
-
+    : L O O P
+    ;
 
 MAXIMUM
-   : M A X I M U M
-   ;
-
+    : M A X I M U M
+    ;
 
 MINIMUM
-   : M I N I M U M
-   ;
-
+    : M I N I M U M
+    ;
 
 NOT
-   : N O T
-   ;
-
+    : N O T
+    ;
 
 OR
-   : O R
-   ;
-
+    : O R
+    ;
 
 PRIO
-   : P R I O
-   ;
-
+    : P R I O
+    ;
 
 PTP_REL
-   : P T P '_' R E L
-   ;
-
+    : P T P '_' R E L
+    ;
 
 PTP
-   : P T P
-   ;
-
+    : P T P
+    ;
 
 PUBLIC
-   : P U B L I C
-   ;
-
+    : P U B L I C
+    ;
 
 REAL
-   : R E A L
-   ;
-
+    : R E A L
+    ;
 
 REPEAT
-   : R E P E A T
-   ;
-
+    : R E P E A T
+    ;
 
 RETURN
-   : R E T U R N
-   ;
-
+    : R E T U R N
+    ;
 
 SEC
-   : S E C
-   ;
-
+    : S E C
+    ;
 
 SIGNAL
-   : S I G N A L
-   ;
-
+    : S I G N A L
+    ;
 
 STRUC
-   : S T R U C
-   ;
-
+    : S T R U C
+    ;
 
 SWITCH
-   : S W I T C H
-   ;
-
+    : S W I T C H
+    ;
 
 THEN
-   : T H E N
-   ;
-
+    : T H E N
+    ;
 
 TO
-   : T O
-   ;
-
+    : T O
+    ;
 
 TRIGGER
-   : T R I G G E R
-   ;
-
+    : T R I G G E R
+    ;
 
 TRUE
-   : T R U E
-   ;
-
+    : T R U E
+    ;
 
 UNTIL
-   : U N T I L
-   ;
-
+    : U N T I L
+    ;
 
 WAIT
-   : W A I T
-   ;
-
+    : W A I T
+    ;
 
 WHEN
-   : W H E N
-   ;
-
+    : W H E N
+    ;
 
 WHILE
-   : W H I L E
-   ;
-
+    : W H I L E
+    ;
 
 EXOR
-   : E X O R
-   ;
-
+    : E X O R
+    ;
 
 fragment A
-   : ('a' | 'A')
-   ;
-
+    : ('a' | 'A')
+    ;
 
 fragment B
-   : ('b' | 'B')
-   ;
-
+    : ('b' | 'B')
+    ;
 
 fragment C
-   : ('c' | 'C')
-   ;
-
+    : ('c' | 'C')
+    ;
 
 fragment D
-   : ('d' | 'D')
-   ;
-
+    : ('d' | 'D')
+    ;
 
 fragment E
-   : ('e' | 'E')
-   ;
-
+    : ('e' | 'E')
+    ;
 
 fragment F
-   : ('f' | 'F')
-   ;
-
+    : ('f' | 'F')
+    ;
 
 fragment G
-   : ('g' | 'G')
-   ;
-
+    : ('g' | 'G')
+    ;
 
 fragment H
-   : ('h' | 'H')
-   ;
-
+    : ('h' | 'H')
+    ;
 
 fragment I
-   : ('i' | 'I')
-   ;
-
+    : ('i' | 'I')
+    ;
 
 fragment J
-   : ('j' | 'J')
-   ;
-
+    : ('j' | 'J')
+    ;
 
 fragment K
-   : ('k' | 'K')
-   ;
-
+    : ('k' | 'K')
+    ;
 
 fragment L
-   : ('l' | 'L')
-   ;
-
+    : ('l' | 'L')
+    ;
 
 fragment M
-   : ('m' | 'M')
-   ;
-
+    : ('m' | 'M')
+    ;
 
 fragment N
-   : ('n' | 'N')
-   ;
-
+    : ('n' | 'N')
+    ;
 
 fragment O
-   : ('o' | 'O')
-   ;
-
+    : ('o' | 'O')
+    ;
 
 fragment P
-   : ('p' | 'P')
-   ;
-
+    : ('p' | 'P')
+    ;
 
 fragment Q
-   : ('q' | 'Q')
-   ;
-
+    : ('q' | 'Q')
+    ;
 
 fragment R
-   : ('r' | 'R')
-   ;
-
+    : ('r' | 'R')
+    ;
 
 fragment S
-   : ('s' | 'S')
-   ;
-
+    : ('s' | 'S')
+    ;
 
 fragment T
-   : ('t' | 'T')
-   ;
-
+    : ('t' | 'T')
+    ;
 
 fragment U
-   : ('u' | 'U')
-   ;
-
+    : ('u' | 'U')
+    ;
 
 fragment V
-   : ('v' | 'V')
-   ;
-
+    : ('v' | 'V')
+    ;
 
 fragment W
-   : ('w' | 'W')
-   ;
-
+    : ('w' | 'W')
+    ;
 
 fragment X
-   : ('x' | 'X')
-   ;
-
+    : ('x' | 'X')
+    ;
 
 fragment Y
-   : ('y' | 'Y')
-   ;
-
+    : ('y' | 'Y')
+    ;
 
 fragment Z
-   : ('z' | 'Z')
-   ;
-
+    : ('z' | 'Z')
+    ;
 
 HEADERLINE
-   : '&' ~ ('\n' | '\r')* ('\r\n' | '\r' | '\n' | EOF) -> skip
-   ;
-
+    : '&' ~ ('\n' | '\r')* ('\r\n' | '\r' | '\n' | EOF) -> skip
+    ;
 
 WS
-   : (' ' | '\t' | '\u000C') -> skip
-   ;
-
+    : (' ' | '\t' | '\u000C') -> skip
+    ;
 
 NEWLINE
-   : '\r'? '\n'
-   ;
-
+    : '\r'? '\n'
+    ;
 
 LINE_COMMENT
-   : ';' ~ ('\n' | '\r')* -> skip
-   ;
-
+    : ';' ~ ('\n' | '\r')* -> skip
+    ;
 
 CHARLITERAL
-   : '\'' (EscapeSequence | ~ ('\'' | '\\' | '\r' | '\n')) '\''
-   ;
-
+    : '\'' (EscapeSequence | ~ ('\'' | '\\' | '\r' | '\n')) '\''
+    ;
 
 STRINGLITERAL
-   : '"' (EscapeSequence | ~ ('\\' | '"' | '\r' | '\n'))* '"'
-   ;
-
+    : '"' (EscapeSequence | ~ ('\\' | '"' | '\r' | '\n'))* '"'
+    ;
 
 fragment EscapeSequence
-   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | ('0' .. '3') ('0' .. '7') ('0' .. '7') | ('0' .. '7') ('0' .. '7') | ('0' .. '7'))
-   ;
-
+    : '\\' (
+        'b'
+        | 't'
+        | 'n'
+        | 'f'
+        | 'r'
+        | '"'
+        | '\''
+        | '\\'
+        | ('0' .. '3') ('0' .. '7') ('0' .. '7')
+        | ('0' .. '7') ('0' .. '7')
+        | ('0' .. '7')
+    )
+    ;
 
 FLOATLITERAL
-   : ('0' .. '9') + '.' ('0' .. '9')* Exponent? | '.' ('0' .. '9') + Exponent? | ('0' .. '9') + Exponent
-   ;
-
+    : ('0' .. '9')+ '.' ('0' .. '9')* Exponent?
+    | '.' ('0' .. '9')+ Exponent?
+    | ('0' .. '9')+ Exponent
+    ;
 
 fragment Exponent
-   : E ('+' | '-')? ('0' .. '9') +
-   ;
-
+    : E ('+' | '-')? ('0' .. '9')+
+    ;
 
 INTLITERAL
-   : ('0' .. '9') + | HexPrefix HexDigit + HexSuffix | BinPrefix BinDigit + BinSuffix
-   ;
-
+    : ('0' .. '9')+
+    | HexPrefix HexDigit+ HexSuffix
+    | BinPrefix BinDigit+ BinSuffix
+    ;
 
 fragment HexPrefix
-   : '\'' H
-   ;
-
+    : '\'' H
+    ;
 
 fragment HexDigit
-   : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
-   ;
-
+    : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
+    ;
 
 fragment HexSuffix
-   : '\''
-   ;
-
+    : '\''
+    ;
 
 fragment BinPrefix
-   : '\'' B
-   ;
-
+    : '\'' B
+    ;
 
 fragment BinDigit
-   : ('0' | '1')
-   ;
-
+    : ('0' | '1')
+    ;
 
 fragment BinSuffix
-   : '\''
-   ;
-
+    : '\''
+    ;
 
 IDENTIFIER
-   : IdentifierStart IdentifierPart*
-   ;
-
+    : IdentifierStart IdentifierPart*
+    ;
 
 fragment IdentifierStart
-   : 'a' .. 'z' | 'A' .. 'Z' | '_' | '$'
-   ;
-
+    : 'a' .. 'z'
+    | 'A' .. 'Z'
+    | '_'
+    | '$'
+    ;
 
 fragment IdentifierPart
-   : IdentifierStart | '0' .. '9'
-   ;
+    : IdentifierStart
+    | '0' .. '9'
+    ;

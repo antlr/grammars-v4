@@ -21,9 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar AthenaParser;
 
-options { tokenVocab=AthenaLexer; }
+options {
+    tokenVocab = AthenaLexer;
+}
 
 stmt
     : command SEMI? EOF
@@ -82,20 +87,15 @@ dml_command
 DML
 */
 select
-    : (WITH with_query (',' with_query)*)?
-        select_statement
+    : (WITH with_query (',' with_query)*)? select_statement
     ;
 
 select_statement
-    : SELECT all_distinct? select_list
-        (FROM from_item (',' from_item)*)?
-        (WHERE condition)?
-        (GROUP BY all_distinct? grouping_element (','grouping_element)*)?
-        (HAVING condition)?
-        ((UNION | INTERSECT | EXCEPT) all_distinct? select_statement)?
-        (ORDER BY order_item (',' order_item)*)?
-        (OFFSET count (ROW | ROWS)?)?
-        (LIMIT (count | ALL))?
+    : SELECT all_distinct? select_list (FROM from_item (',' from_item)*)? (WHERE condition)? (
+        GROUP BY all_distinct? grouping_element (',' grouping_element)*
+    )? (HAVING condition)? ((UNION | INTERSECT | EXCEPT) all_distinct? select_statement)? (
+        ORDER BY order_item (',' order_item)*
+    )? (OFFSET count (ROW | ROWS)?)? (LIMIT (count | ALL))?
     ;
 
 all_distinct
@@ -104,7 +104,7 @@ all_distinct
     ;
 
 order_item
-    : expression (ASC|DESC)? (NULLS (FIRST|LAST))?
+    : expression (ASC | DESC)? (NULLS (FIRST | LAST))?
     ;
 
 from_item
@@ -128,10 +128,10 @@ condition
     ;
 
 insert_into
-    : INSERT INTO destination_table ('(' column_list ')')?
-        ( select_statement
+    : INSERT INTO destination_table ('(' column_list ')')? (
+        select_statement
         | VALUES value_list (',' value_list)*
-        )
+    )
     ;
 
 value_list
@@ -144,24 +144,21 @@ select_list
 
 select_item
     : expression (AS? alias)?
-    | (table_name '.')?'*'
+    | (table_name '.')? '*'
     ;
 
 delete_stmt
-    : DELETE FROM (db_name'.')? table_name (WHERE predicate)?
+    : DELETE FROM (db_name '.')? table_name (WHERE predicate)?
     ;
 
 update
-    : UPDATE (db_name'.')? table_name
-        SET col_name '=' expression (',' col_name '=' expression)*
-        (WHERE predicate)?
+    : UPDATE (db_name '.')? table_name SET col_name '=' expression (',' col_name '=' expression)* (
+        WHERE predicate
+    )?
     ;
 
 merge_into
-    : MERGE INTO target_table (AS? target_alias)?
-        USING (source_table | query) (AS? source_alias)?
-        ON search_condition
-        when_clauses
+    : MERGE INTO target_table (AS? target_alias)? USING (source_table | query) (AS? source_alias)? ON search_condition when_clauses
     ;
 
 search_condition
@@ -253,9 +250,7 @@ deallocate
     ;
 
 unload
-    : UNLOAD '(' select ')'
-        TO string
-        WITH '(' property_list ')'
+    : UNLOAD '(' select ')' TO string WITH '(' property_list ')'
     ;
 
 property_list
@@ -288,8 +283,9 @@ kv_pair
     ;
 
 alter_table_add_cols
-    : ALTER TABLE table_name (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')')?
-        ADD COLUMNS (col_name data_type)
+    : ALTER TABLE table_name (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')')? ADD COLUMNS (
+        col_name data_type
+    )
     ;
 
 part_col_name_value
@@ -305,12 +301,15 @@ partition_col_value
     ;
 
 alter_table_add_part
-    : ALTER TABLE table_name ADD if_not_exists?
-        (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')' (LOCATION string)?)+
+    : ALTER TABLE table_name ADD if_not_exists? (
+        PARTITION '(' part_col_name_value (',' part_col_name_value)* ')' (LOCATION string)?
+    )+
     ;
 
 alter_table_drop_part
-    : ALTER TABLE table_name DROP if_exists? PARTITION '('partition_spec')' (',' PARTITION '('partition_spec')')*
+    : ALTER TABLE table_name DROP if_exists? PARTITION '(' partition_spec ')' (
+        ',' PARTITION '(' partition_spec ')'
+    )*
     ;
 
 partition_spec
@@ -318,17 +317,17 @@ partition_spec
     ;
 
 alter_table_rename_part
-    : ALTER TABLE table_name PARTITION (partition_spec) RENAME TO PARTITION (np=partition_spec)
+    : ALTER TABLE table_name PARTITION (partition_spec) RENAME TO PARTITION (np = partition_spec)
     ;
 
 alter_table_replace_part
-    : ALTER TABLE table_name
-        (PARTITION '('part_col_name_value (',' part_col_name_value)* ')')?
-        REPLACE COLUMNS '('col_name data_type (',' col_name data_type)* ')'
+    : ALTER TABLE table_name (PARTITION '(' part_col_name_value (',' part_col_name_value)* ')')? REPLACE COLUMNS '(' col_name data_type (
+        ',' col_name data_type
+    )* ')'
     ;
 
 alter_table_set_location
-    : ALTER TABLE table_name (PARTITION '('partition_spec')')? SET LOCATION string
+    : ALTER TABLE table_name (PARTITION '(' partition_spec ')')? SET LOCATION string
     ;
 
 alter_table_set_props
@@ -336,22 +335,19 @@ alter_table_set_props
     ;
 
 create_database
-    : CREATE db_schema if_not_exists? database_name
-      (COMMENT string)?
-      (LOCATION string)?
-      (WITH DBPROPERTIES '(' kv_pair (',' kv_pair)* ')')?
+    : CREATE db_schema if_not_exists? database_name (COMMENT string)? (LOCATION string)? (
+        WITH DBPROPERTIES '(' kv_pair (',' kv_pair)* ')'
+    )?
     ;
 
 create_table
-    : CREATE EXTERNAL TABLE if_not_exists?
-     (db_name'.')? table_name ('(' col_def_with_comment (',' col_def_with_comment)* ')')?
-     (COMMENT table_comment)?
-     (PARTITIONED BY '('col_def_with_comment (',' col_def_with_comment)* ')')?
-     (CLUSTERED BY '(' col_name (',' col_name)* ')' INTO num_buckets BUCKETS)?
-     (ROW FORMAT row_format)?
-     (STORED AS file_format)?
-     LOCATION string
-     (TBLPROPERTIES '(' property_list ')')?
+    : CREATE EXTERNAL TABLE if_not_exists? (db_name '.')? table_name (
+        '(' col_def_with_comment (',' col_def_with_comment)* ')'
+    )? (COMMENT table_comment)? (
+        PARTITIONED BY '(' col_def_with_comment (',' col_def_with_comment)* ')'
+    )? (CLUSTERED BY '(' col_name (',' col_name)* ')' INTO num_buckets BUCKETS)? (
+        ROW FORMAT row_format
+    )? (STORED AS file_format)? LOCATION string (TBLPROPERTIES '(' property_list ')')?
     ;
 
 table_comment
@@ -359,8 +355,8 @@ table_comment
     ;
 
 row_format
-    : DELIMITED table_row_format_field_identifier? table_row_format_coll_items_identifier?
-              table_row_format_map_keys_identifier? table_row_format_lines_identifier? table_row_null_format?
+    : DELIMITED table_row_format_field_identifier? table_row_format_coll_items_identifier? table_row_format_map_keys_identifier?
+        table_row_format_lines_identifier? table_row_null_format?
     | SERDE string (WITH SERDEPROPERTIES '(' property_list ')')?
     ;
 
@@ -408,10 +404,7 @@ col_comment
     ;
 
 create_table_as
-    : CREATE TABLE table_name
-    ( WITH '(' prop_exp (',' prop_exp)* ')')?
-    AS query
-    (WITH NO? DATA)?
+    : CREATE TABLE table_name (WITH '(' prop_exp (',' prop_exp)* ')')? AS query (WITH NO? DATA)?
     ;
 
 property_name
@@ -428,7 +421,7 @@ create_view
 
 describe
     : DESCRIBE (EXTENDED | FORMATTED)? (db_name '.')? table_name (PARTITION partition_spec)?
-        //(col_name ( [.field_name] | [.'$elem$'] | [.'$key$'] | [.'$value$'] ) )? //TODO - poor documentation vs actual functionality
+    //(col_name ( [.field_name] | [.'$elem$'] | [.'$key$'] | [.'$value$'] ) )? //TODO - poor documentation vs actual functionality
     ;
 
 field_name
@@ -519,7 +512,13 @@ table_subquery
     ;
 
 comparison_operator
-    : '<' | '=' | '>' | '<=' | '>=' | '<>' | '!='
+    : '<'
+    | '='
+    | '>'
+    | '<='
+    | '>='
+    | '<>'
+    | '!='
     ;
 
 expression
@@ -529,27 +528,20 @@ expression
     | id_ '(' expression_list_ ')'
     | case_expression
     | when_expression
-    | op=(PLUS | MINUS) expression
-    | expression op=(STAR | DIVIDE | MODULE) expression
-    | expression op=(PLUS | MINUS) expression
+    | op = (PLUS | MINUS) expression
+    | expression op = (STAR | DIVIDE | MODULE) expression
+    | expression op = (PLUS | MINUS) expression
     | expression DOT expression
     | CAST '(' expression AS data_type ')'
     ;
 
 case_expression
-    : CASE expression
-        (WHEN expression THEN expression)+
-        (ELSE expression)?
-        END
+    : CASE expression (WHEN expression THEN expression)+ (ELSE expression)? END
     ;
 
 when_expression
-    : CASE
-        (WHEN expression THEN expression)+
-        (ELSE expression)?
-        END
+    : CASE (WHEN expression THEN expression)+ (ELSE expression)? END
     ;
-
 
 primitive_expression
     : literal

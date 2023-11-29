@@ -21,60 +21,55 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar SwiftFinLexer;
 
-BLOCK1 : LBrace '1' Colon -> pushMode(InsideValue)
-       ;
+BLOCK1: LBrace '1' Colon -> pushMode(InsideValue);
 
-BLOCK2 : LBrace '2' Colon -> pushMode(InsideValue)
-       ;
+BLOCK2: LBrace '2' Colon -> pushMode(InsideValue);
 
-BLOCK3 : LBrace '3' Colon -> pushMode(InsideMaps)
-       ;
+BLOCK3: LBrace '3' Colon -> pushMode(InsideMaps);
 
-fragment
-Block4 : LBrace '4' Colon
-       ;
+fragment Block4: LBrace '4' Colon;
 
-BLOCK4_A : Block4 Crlf -> pushMode(InsideB4)
-         ;
+BLOCK4_A: Block4 Crlf -> pushMode(InsideB4);
 
-BLOCK4_B : Block4 -> pushMode(InsideMaps)
-         ;
+BLOCK4_B: Block4 -> pushMode(InsideMaps);
 
-BLOCK5 : LBrace '5' Colon -> pushMode(InsideMaps)
-       ;
+BLOCK5: LBrace '5' Colon -> pushMode(InsideMaps);
 
 LBRACE : LBrace;
 RBRACE : RBrace;
 COLON  : Colon;
 CRLF   : Crlf;
 
-fragment
-Crlf : '\r'? '\n'
-     ;
+fragment Crlf: '\r'? '\n';
 
-fragment LBrace : '{' ;
-fragment RBrace : '}' ;
-fragment Colon  : ':' ;
-fragment Minus  : '-' ;
-fragment Any    : . ;
+fragment LBrace : '{';
+fragment RBrace : '}';
+fragment Colon  : ':';
+fragment Minus  : '-';
+fragment Any    : .;
 
 mode InsideMaps;
 
 M_LBRACE : LBrace -> type(LBRACE), pushMode(InsideMaps);
 M_RBRACE : RBrace -> type(RBRACE), popMode;
-M_COLON  : Colon ;
-M_VALUE  : ~[:] ;
+M_COLON  : Colon;
+M_VALUE  : ~[:];
 
 mode InsideB4;
 
-B4_END      : Minus RBrace -> popMode;
-B4_COLON    : Colon ;
-B4_CRLF     : Crlf ;
-B4_VALUE    : ~[:] ;
+B4_END   : Minus RBrace -> popMode;
+B4_COLON : Colon;
+B4_CRLF  : Crlf;
+B4_VALUE : ~[:];
 //SPECIALS    : Any ; // every other token
 
 mode InsideValue;
 V_END   : RBrace -> popMode;
-V_VALUE : Any ;
+V_VALUE : Any;

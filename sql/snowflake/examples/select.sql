@@ -16,6 +16,7 @@ SELECT IFNULL(DATEADD(DAY, -1, CAST(ColDate as date)), CAST('2999-12-31' as date
 SELECT RES FROM (SELECT LEFT('COL1',1) AS RES UNION SELECT RIGHT('COL1',1)) as TableRes;
 SELECT to_date(select dateadd(d,-((date_part(dw,getdate())+1)%7+1),getdate())) AS Res;
 SELECT TRY_CAST("150" as INT);
+SELECT CAST("150" as INT);
 SELECT LEN(COL1), LENGTH (COL2) from t;
 SELECT REPLACE('abcd', 'bc'), CHARINDEX('abcd','c') F;
 SELECT * FROM (SELECT 1 as col1 ,'FuturCol2' as col2 union SELECT 2,'FuturCol3') PIVOT (sum(col1) FOR col2 in ('FuturCol2','FuturCol3'));

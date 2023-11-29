@@ -29,833 +29,841 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ArdenParser;
 
+options {
+    tokenVocab = ArdenLexer;
+}
 
-options { tokenVocab = ArdenLexer; }
 // A mlm always consists of three parts and ends with the statement END:
 
 // These parts are maintenace_category, library_category, knowledge_category Ref: 5.1
 
 file_
-   : mlms EOF
-   ;
+    : mlms EOF
+    ;
 
 mlms
-   : mlm*
-   ;
+    : mlm*
+    ;
 
 mlm
-   : maintenanceCategory libraryCategory knowledgeCategory resourcesCategory END
-   ;
+    : maintenanceCategory libraryCategory knowledgeCategory resourcesCategory END
+    ;
 
 // Maintenace category Ref: 6.1
 maintenanceCategory
-   : MAINTENANCE titleSlot mlmNameSlot ardenVersionSlot versionSlot institutionSlot authorSlot specialistSlot dateSlot validationSlot
-   ;
+    : MAINTENANCE titleSlot mlmNameSlot ardenVersionSlot versionSlot institutionSlot authorSlot specialistSlot dateSlot validationSlot
+    ;
 
 // Library category Ref: 6.2
 libraryCategory
-   : LIBRARY purposeSlot explanationSlot keywordsSlot citationsSlot linksSlot
-   ;
+    : LIBRARY purposeSlot explanationSlot keywordsSlot citationsSlot linksSlot
+    ;
 
 // Knowledge category Ref 6.3
 knowledgeCategory
-   : KNOWLEDGE typeSlot dataSlot prioritySlot evokeSlot logicSlot actionSlot urgencySlot
-   ;
+    : KNOWLEDGE typeSlot dataSlot prioritySlot evokeSlot logicSlot actionSlot urgencySlot
+    ;
 
 // Resource category Ref: 6.4
 resourcesCategory
-   : (RESOURCES defaultSlot languageSlot)?
-   ;
+    : (RESOURCES defaultSlot languageSlot)?
+    ;
 
 // Slots
 // Maintenance slots
 titleSlot
-   : TITLE TEXT
-   ;
+    : TITLE TEXT
+    ;
 
 mlmNameSlot
-   : (MLMNAME | FILENAME) MLMID DSC
-   ;
+    : (MLMNAME | FILENAME) MLMID DSC
+    ;
 
 ardenVersionSlot
-   : (ARDEN ARDEN_VERSION DSC)?
-   ;
+    : (ARDEN ARDEN_VERSION DSC)?
+    ;
 
 versionSlot
-   : VERSION TEXT
-   ;
+    : VERSION TEXT
+    ;
 
 institutionSlot
-   : INSTITUTION TEXT
-   ;
+    : INSTITUTION TEXT
+    ;
 
 authorSlot
-   : AUTHOR TEXT
-   ;
+    : AUTHOR TEXT
+    ;
 
 specialistSlot
-   : SPECIALIST TEXT
-   ;
+    : SPECIALIST TEXT
+    ;
 
 dateSlot
-   : DATE (ISO_DATE | ISO_DATE_TIME) DSC
-   ;
+    : DATE (ISO_DATE | ISO_DATE_TIME) DSC
+    ;
 
 validationSlot
-   : VALIDATION VALIDATION_CODE DSC
-   ;
+    : VALIDATION VALIDATION_CODE DSC
+    ;
 
 // Library slots
 purposeSlot
-   : PURPOSE TEXT
-   ;
+    : PURPOSE TEXT
+    ;
 
 explanationSlot
-   : EXPLANATION TEXT
-   ;
+    : EXPLANATION TEXT
+    ;
 
 keywordsSlot
-   : KEYWORDS TEXT
-   ;
+    : KEYWORDS TEXT
+    ;
 
 citationsSlot
-   : (CITATIONS citationList DSC)?
-   ;
+    : (CITATIONS citationList DSC)?
+    ;
 
 citationList
-   : singleCitation?
-   | singleCitation SC citationList
-   ;
+    : singleCitation?
+    | singleCitation SC citationList
+    ;
 
 singleCitation
-   : CITATION? STRING
-   ;
+    : CITATION? STRING
+    ;
 
 linksSlot
-   : (LINKS linkList DSC)?
-   ;
+    : (LINKS linkList DSC)?
+    ;
 
 linkList
-   : singleLink?
-   | linkList SC singleLink
-   ;
+    : singleLink?
+    | linkList SC singleLink
+    ;
 
 singleLink
-   : (LINK_TYPE TERM)? STRING
-   ;
+    : (LINK_TYPE TERM)? STRING
+    ;
 
 // Knowledge slots
 typeSlot
-   : TYPE TYPE_CODE DSC
-   ;
+    : TYPE TYPE_CODE DSC
+    ;
 
 dataSlot
-   : DATA dataBlock DSC
-   ;
+    : DATA dataBlock DSC
+    ;
 
 prioritySlot
-   : (PRIORITY NUMBER DSC)?
-   ;
+    : (PRIORITY NUMBER DSC)?
+    ;
 
 evokeSlot
-   : EVOKE evokeBlock DSC
-   ;
+    : EVOKE evokeBlock DSC
+    ;
 
 logicSlot
-   : LOGIC logicBlock DSC
-   ;
+    : LOGIC logicBlock DSC
+    ;
 
 actionSlot
-   : ACTION actionBlock DSC
-   ;
+    : ACTION actionBlock DSC
+    ;
 
 urgencySlot
-   : (URGENCY (NUMBER | IDENTIFIER) DSC)?
-   ;
+    : (URGENCY (NUMBER | IDENTIFIER) DSC)?
+    ;
 
 // Resource slots
 defaultSlot
-   : DEFAULTCO TWOCHARCODE DSC
-   ;
+    : DEFAULTCO TWOCHARCODE DSC
+    ;
 
 languageSlot
-   : languageSlot singleLanguageCode
-   | singleLanguageCode
-   ;
+    : languageSlot singleLanguageCode
+    | singleLanguageCode
+    ;
 
 singleLanguageCode
-   : LANGUAGE TWOCHARCODE resourceTerms DSC
-   ;
+    : LANGUAGE TWOCHARCODE resourceTerms DSC
+    ;
 
 resourceTerms
-   : resourceTerms SC TERM COLON STRING
-   | (TERM COLON STRING)?
-   ;
+    : resourceTerms SC TERM COLON STRING
+    | (TERM COLON STRING)?
+    ;
 
 // Logic block
 logicBlock
-   : logicBlock SC logicStatement
-   | logicStatement
-   ;
+    : logicBlock SC logicStatement
+    | logicStatement
+    ;
 
 logicStatement
-   : logicAssignment?
-   | IF logicIfThenElse
-   | FOR IDENTIFIER IN expr DO logicBlock SC ENDDO
-   | WHILE expr DO logicBlock SC ENDDO
-   | logicSwitch
-   | BREAKLOOP
-   | CONCLUDE expr
-   ;
+    : logicAssignment?
+    | IF logicIfThenElse
+    | FOR IDENTIFIER IN expr DO logicBlock SC ENDDO
+    | WHILE expr DO logicBlock SC ENDDO
+    | logicSwitch
+    | BREAKLOOP
+    | CONCLUDE expr
+    ;
 
 logicIfThenElse
-   : expr THEN logicBlock SC logicElseIf
-   ;
+    : expr THEN logicBlock SC logicElseIf
+    ;
 
 logicElseIf
-   : ENDIF AGGREGATE?
-   | ELSE logicBlock SC ENDIF AGGREGATE?
-   | ELSEIF logicIfThenElse
-   ;
+    : ENDIF AGGREGATE?
+    | ELSE logicBlock SC ENDIF AGGREGATE?
+    | ELSEIF logicIfThenElse
+    ;
 
 logicAssignment
-   : identifierBecomes expr
-   | timeBecomes expr
-   | applicabilityBecomes expr
-   | identifierBecomes callPhrase
-   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) callPhrase
-   | identifierBecomes (newObjectPhrase | fuzzySetPhrase)
-   ;
+    : identifierBecomes expr
+    | timeBecomes expr
+    | applicabilityBecomes expr
+    | identifierBecomes callPhrase
+    | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) callPhrase
+    | identifierBecomes (newObjectPhrase | fuzzySetPhrase)
+    ;
 
 exprFuzzySet
-   : fuzzySetPhrase
-   | expr
-   ;
+    : fuzzySetPhrase
+    | expr
+    ;
 
 identifierBecomes
-   : identifierOrObjectRef ASSIGN
-   | LET identifierOrObjectRef BE
-   | NOW ASSIGN
-   ;
+    : identifierOrObjectRef ASSIGN
+    | LET identifierOrObjectRef BE
+    | NOW ASSIGN
+    ;
 
 logicSwitch
-   : SWITCH IDENTIFIER COLON logicSwitchCases ENDSWITCH AGGREGATE?
-   ;
+    : SWITCH IDENTIFIER COLON logicSwitchCases ENDSWITCH AGGREGATE?
+    ;
 
 logicSwitchCases
-   : (CASE exprFactor logicBlock logicSwitchCases)?
-   | DEFAULT logicBlock
-   ;
+    : (CASE exprFactor logicBlock logicSwitchCases)?
+    | DEFAULT logicBlock
+    ;
 
 identifierOrObjectRef
-   : IDENTIFIER
-   | identifierOrObjectRef (LBRACK expr RBRACK | DOT identifierOrObjectRef)
-   ;
+    : IDENTIFIER
+    | identifierOrObjectRef (LBRACK expr RBRACK | DOT identifierOrObjectRef)
+    ;
 
 timeBecomes
-   : TIME OF? identifierOrObjectRef ASSIGN
-   | LET TIME OF? identifierOrObjectRef BE
-   ;
+    : TIME OF? identifierOrObjectRef ASSIGN
+    | LET TIME OF? identifierOrObjectRef BE
+    ;
 
 applicabilityBecomes
-   : APPLICABILITY OF? identifierOrObjectRef ASSIGN
-   | LET APPLICABILITY OF? identifierOrObjectRef BE
-   ;
+    : APPLICABILITY OF? identifierOrObjectRef ASSIGN
+    | LET APPLICABILITY OF? identifierOrObjectRef BE
+    ;
 
 callPhrase
-   : CALL IDENTIFIER (WITH expr)?
-   ;
+    : CALL IDENTIFIER (WITH expr)?
+    ;
 
 // Expressions
 expr
-   : exprSort
-   | expr COMMA exprSort
-   | COMMA exprSort
-   ;
+    : exprSort
+    | expr COMMA exprSort
+    | COMMA exprSort
+    ;
 
 exprSort
-   : exprAddList (MERGE exprSort)?
-   | SORT sortOption exprSort (USING exprFunction)?
-   | exprAddList MERGE exprSort USING exprFunction
-   ;
+    : exprAddList (MERGE exprSort)?
+    | SORT sortOption exprSort (USING exprFunction)?
+    | exprAddList MERGE exprSort USING exprFunction
+    ;
 
 sortOption
-   : DATAWC?
-   | TIME
-   | APPLICABILITY
-   ;
+    : DATAWC?
+    | TIME
+    | APPLICABILITY
+    ;
 
 exprAddList
-   : exprRemoveList
-   | ADD exprWhere TO exprWhere (AT exprWhere)?
-   ;
+    : exprRemoveList
+    | ADD exprWhere TO exprWhere (AT exprWhere)?
+    ;
 
 exprRemoveList
-   : exprWhere
-   | REMOVE exprWhere FROM exprWhere
-   ;
+    : exprWhere
+    | REMOVE exprWhere FROM exprWhere
+    ;
 
 exprWhere
-   : exprRange (WHERE exprRange)?
-   ;
+    : exprRange (WHERE exprRange)?
+    ;
 
 exprRange
-   : exprOr (SEQTO exprOr)?
-   ;
+    : exprOr (SEQTO exprOr)?
+    ;
 
 exprOr
-   : exprOr OR exprAnd
-   | exprAnd
-   ;
+    : exprOr OR exprAnd
+    | exprAnd
+    ;
 
 exprAnd
-   : exprAnd AND exprNot
-   | exprNot
-   ;
+    : exprAnd AND exprNot
+    | exprNot
+    ;
 
 exprNot
-   : NOT? exprComparison
-   ;
+    : NOT? exprComparison
+    ;
 
 exprComparison
-   : exprString
-   | exprFindString
-   | exprString singleCompOp exprString
-   | exprString IS? NOT? (mainCompOp | inCompOp)
-   | exprString OCCUR NOT? (temporalCompOp | rangeCompOp)
-   | exprString MATCHES PATTERN exprString
-   ;
+    : exprString
+    | exprFindString
+    | exprString singleCompOp exprString
+    | exprString IS? NOT? (mainCompOp | inCompOp)
+    | exprString OCCUR NOT? (temporalCompOp | rangeCompOp)
+    | exprString MATCHES PATTERN exprString
+    ;
 
 exprFindString
-   : FIND exprString IN? STRINGOP exprString stringSearchStart
-   ;
+    : FIND exprString IN? STRINGOP exprString stringSearchStart
+    ;
 
 exprString
-   : exprPlus
-   | exprString ('||' | FORMATTED WITH) exprPlus
-   | TRIM trimOption exprString
-   | caseOption exprString
-   | SUBSTRING exprPlus CHARACTERS stringSearchStart FROM exprString
-   ;
+    : exprPlus
+    | exprString ('||' | FORMATTED WITH) exprPlus
+    | TRIM trimOption exprString
+    | caseOption exprString
+    | SUBSTRING exprPlus CHARACTERS stringSearchStart FROM exprString
+    ;
 
 trimOption
-   : LEFT?
-   | RIGHT
-   ;
+    : LEFT?
+    | RIGHT
+    ;
 
 caseOption
-   : UPPERCASE
-   | LOWERCASE
-   ;
+    : UPPERCASE
+    | LOWERCASE
+    ;
 
 stringSearchStart
-   : (STARTING AT exprPlus)?
-   ;
+    : (STARTING AT exprPlus)?
+    ;
 
 exprPlus
-   : exprTimes
-   | exprPlus (PLUS | MINUS) exprTimes
-   | (PLUS | MINUS) exprTimes
-   ;
+    : exprTimes
+    | exprPlus (PLUS | MINUS) exprTimes
+    | (PLUS | MINUS) exprTimes
+    ;
 
 exprTimes
-   : exprPower
-   | exprTimes (MUL | DIV) exprPower
-   ;
+    : exprPower
+    | exprTimes (MUL | DIV) exprPower
+    ;
 
 exprPower
-   : exprAtTime
-   | exprFunction POWER exprFunction
-   ;
+    : exprAtTime
+    | exprFunction POWER exprFunction
+    ;
 
 exprAtTime
-   : exprBefore (ATTIME exprAtTime)?
-   ;
+    : exprBefore (ATTIME exprAtTime)?
+    ;
 
 exprBefore
-   : exprAgo
-   | exprDuration (BEFORE | AFTER | FROM) exprAgo
-   ;
+    : exprAgo
+    | exprDuration (BEFORE | AFTER | FROM) exprAgo
+    ;
 
 exprAgo
-   : exprDuration AGO?
-   ;
+    : exprDuration AGO?
+    ;
 
 exprDuration
-   : exprFunction durationOp?
-   ;
+    : exprFunction durationOp?
+    ;
 
 exprFunction
-   : exprFactor
-   | ofFuncOp OF? exprFunction
-   | fromOfFuncOp OF? exprFunction
-   | fromOfFuncOp exprFactor FROM exprFunction
-   | REPLACE timePart OF? exprFunction WITH exprFactor
-   | fromOfFuncOp OF? exprFunction USING exprFunction
-   | fromOfFuncOp exprFactor FROM exprFunction USING exprFunction
-   | fromFuncOp exprFactor FROM exprFunction
-   | indexFromOfFuncOp OF? exprFunction
-   | indexFromOfFuncOp exprFactor FROM exprFunction
-   | atLeastMostOp exprFactor (ISTRUE | ARETRUE)? FROM exprFunction
-   | (INDEX OF | indexFromFuncOp) exprFactor FROM exprFunction
-   | exprFactor AS asFuncOp
-   | exprAttributeFrom
-   | exprSubListFrom
-   ;
+    : exprFactor
+    | ofFuncOp OF? exprFunction
+    | fromOfFuncOp OF? exprFunction
+    | fromOfFuncOp exprFactor FROM exprFunction
+    | REPLACE timePart OF? exprFunction WITH exprFactor
+    | fromOfFuncOp OF? exprFunction USING exprFunction
+    | fromOfFuncOp exprFactor FROM exprFunction USING exprFunction
+    | fromFuncOp exprFactor FROM exprFunction
+    | indexFromOfFuncOp OF? exprFunction
+    | indexFromOfFuncOp exprFactor FROM exprFunction
+    | atLeastMostOp exprFactor (ISTRUE | ARETRUE)? FROM exprFunction
+    | (INDEX OF | indexFromFuncOp) exprFactor FROM exprFunction
+    | exprFactor AS asFuncOp
+    | exprAttributeFrom
+    | exprSubListFrom
+    ;
 
 exprAttributeFrom
-   : ATTRIBUTE exprFactor FROM exprFactor
-   ;
+    : ATTRIBUTE exprFactor FROM exprFactor
+    ;
 
 exprSubListFrom
-   : SUBLIST exprFactor ELEMENTS (STARTING AT exprFactor)? FROM exprFactor
-   ;
+    : SUBLIST exprFactor ELEMENTS (STARTING AT exprFactor)? FROM exprFactor
+    ;
 
 exprFactor
-   : exprFactorAtom (LBRACK expr RBRACK)?
-   | exprFactor DOT IDENTIFIER
-   ;
+    : exprFactorAtom (LBRACK expr RBRACK)?
+    | exprFactor DOT IDENTIFIER
+    ;
 
 exprFactorAtom
-   : IDENTIFIER
-   | NUMBER
-   | string
-   | timeValue
-   | booleanValue
-   | WEEKDAYLITERAL
-   | TODAY
-   | TOMORROW
-   | NULL
-   | CONCLUDE
-   | IT
-   | LPAREN (expr | exprFuzzySet)? RPAREN
-   ;
+    : IDENTIFIER
+    | NUMBER
+    | string
+    | timeValue
+    | booleanValue
+    | WEEKDAYLITERAL
+    | TODAY
+    | TOMORROW
+    | NULL
+    | CONCLUDE
+    | IT
+    | LPAREN (expr | exprFuzzySet)? RPAREN
+    ;
 
 singleCompOp
-   : EQ
-   | LT
-   | GT
-   | LE
-   | GE
-   | NE
-   ;
+    : EQ
+    | LT
+    | GT
+    | LE
+    | GE
+    | NE
+    ;
 
 mainCompOp
-   : temporalCompOp
-   | rangeCompOp
-   | unaryCompOp
-   | binaryCompOp exprString
-   ;
+    : temporalCompOp
+    | rangeCompOp
+    | unaryCompOp
+    | binaryCompOp exprString
+    ;
 
 rangeCompOp
-   : WITHIN exprString TO exprString
-   ;
+    : WITHIN exprString TO exprString
+    ;
 
 temporalCompOp
-   : WITHIN exprString (PRECEDING | FOLLOWING | SURROUNDING) exprString
-   | WITHIN (PAST | SAME DAY AS) exprString
-   | (BEFORE | AFTER | EQUAL) exprString
-   | AT exprString
-   ;
+    : WITHIN exprString (PRECEDING | FOLLOWING | SURROUNDING) exprString
+    | WITHIN (PAST | SAME DAY AS) exprString
+    | (BEFORE | AFTER | EQUAL) exprString
+    | AT exprString
+    ;
 
 unaryCompOp
-   : PRESENT
-   | NULL
-   | BOOLEAN
-   | TRUTHVALUE
-   | CRISP
-   | FUZZY
-   | NUMBEROP
-   | TIME
-   | DURATION
-   | STRINGOP
-   | LIST
-   | OBJECT
-   | LINGUISTIC VARIABLE
-   | IDENTIFIER
-   | TIME OF DAY
-   ;
+    : PRESENT
+    | NULL
+    | BOOLEAN
+    | TRUTHVALUE
+    | CRISP
+    | FUZZY
+    | NUMBEROP
+    | TIME
+    | DURATION
+    | STRINGOP
+    | LIST
+    | OBJECT
+    | LINGUISTIC VARIABLE
+    | IDENTIFIER
+    | TIME OF DAY
+    ;
 
 binaryCompOp
-   : (LESS | GREATER) THAN (OR EQUAL)?
-   | IN
-   ;
+    : (LESS | GREATER) THAN (OR EQUAL)?
+    | IN
+    ;
 
 ofFuncOp
-   : ofReadFuncOp
-   | ofNoreadFuncOp
-   ;
+    : ofReadFuncOp
+    | ofNoreadFuncOp
+    ;
 
 inCompOp
-   : IN exprString
-   ;
+    : IN exprString
+    ;
 
 ofReadFuncOp
-   : AVERAGE
-   | COUNT
-   | EXIST
-   | SUM
-   | MEDIAN
-   ;
+    : AVERAGE
+    | COUNT
+    | EXIST
+    | SUM
+    | MEDIAN
+    ;
 
 ofNoreadFuncOp
-   : ANY ISTRUE?
-   | ALL ARETRUE?
-   | NO ISTRUE?
-   | SLOPE
-   | STDDEV
-   | VARIANCE
-   | INCREASE
-   | PERCENT? (INCREASE | DECREASE)
-   | INTERVAL
-   | TIME (OF DAY)?
-   | DAY OF WEEK
-   | ARCCOS
-   | ARCSIN
-   | ARCTAN
-   | COSINE
-   | SINE
-   | TANGENT
-   | EXP
-   | FLOOR
-   | INT
-   | ROUND
-   | CEILING
-   | TRUNCATE
-   | LOG
-   | LOG10
-   | ABS
-   | SQRT
-   | EXTRACT (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND | TIME OF DAY)
-   | STRINGOP
-   | EXTRACT CHARACTERS
-   | REVERSE
-   | LENGTH
-   | CLONE
-   | EXTRACT ATTRIBUTE NAMES
-   | APPLICABILITY
-   | DEFUZZIFIED
-   ;
+    : ANY ISTRUE?
+    | ALL ARETRUE?
+    | NO ISTRUE?
+    | SLOPE
+    | STDDEV
+    | VARIANCE
+    | INCREASE
+    | PERCENT? (INCREASE | DECREASE)
+    | INTERVAL
+    | TIME (OF DAY)?
+    | DAY OF WEEK
+    | ARCCOS
+    | ARCSIN
+    | ARCTAN
+    | COSINE
+    | SINE
+    | TANGENT
+    | EXP
+    | FLOOR
+    | INT
+    | ROUND
+    | CEILING
+    | TRUNCATE
+    | LOG
+    | LOG10
+    | ABS
+    | SQRT
+    | EXTRACT (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND | TIME OF DAY)
+    | STRINGOP
+    | EXTRACT CHARACTERS
+    | REVERSE
+    | LENGTH
+    | CLONE
+    | EXTRACT ATTRIBUTE NAMES
+    | APPLICABILITY
+    | DEFUZZIFIED
+    ;
 
 fromFuncOp
-   : NEAREST
-   ;
+    : NEAREST
+    ;
 
 indexFromFuncOp
-   : INDEX NEAREST
-   ;
+    : INDEX NEAREST
+    ;
 
 fromOfFuncOp
-   : MINIMUM
-   | MAXIMUM
-   | LAST
-   | FIRST
-   | EARLIEST
-   | LATEST
-   ;
+    : MINIMUM
+    | MAXIMUM
+    | LAST
+    | FIRST
+    | EARLIEST
+    | LATEST
+    ;
 
 indexFromOfFuncOp
-   : INDEX (MINIMUM | MAXIMUM | EARLIEST | LATEST)
-   ;
+    : INDEX (MINIMUM | MAXIMUM | EARLIEST | LATEST)
+    ;
 
 asFuncOp
-   : NUMBEROP
-   | TIME
-   | STRINGOP
-   | TRUTHVALUE
-   ;
+    : NUMBEROP
+    | TIME
+    | STRINGOP
+    | TRUTHVALUE
+    ;
 
 atLeastMostOp
-   : AT (LEAST | MOST)
-   ;
+    : AT (LEAST | MOST)
+    ;
 
 durationOp
-   : YEAR
-   | MONTH
-   | WEEK
-   | DAY
-   | HOUR
-   | MINUTE
-   | SECOND
-   ;
+    : YEAR
+    | MONTH
+    | WEEK
+    | DAY
+    | HOUR
+    | MINUTE
+    | SECOND
+    ;
 
 timePart
-   : YEAR
-   | MONTH
-   | DAY
-   | HOUR
-   | MINUTE
-   | SECOND
-   ;
+    : YEAR
+    | MONTH
+    | DAY
+    | HOUR
+    | MINUTE
+    | SECOND
+    ;
 
 // Factors
 string
-   : STRING
-   | LOCALIZED TERM localizeOption
-   ;
+    : STRING
+    | LOCALIZED TERM localizeOption
+    ;
 
 localizeOption
-   : (BY STRING)?
-   | BY IDENTIFIER
-   ;
+    : (BY STRING)?
+    | BY IDENTIFIER
+    ;
 
 booleanValue
-   : TRUTHVALUE? (TRUE | FALSE)
-   | TRUTHVALUE NUMBER
-   ;
+    : TRUTHVALUE? (TRUE | FALSE)
+    | TRUTHVALUE NUMBER
+    ;
 
 timeValue
-   : NOW
-   | ISO_DATE_TIME
-   | ISO_DATE
-   | EVENTTIME
-   | TRIGGERTIME
-   | CURRENTTIME
-   | TIMEOFDAY
-   ;
+    : NOW
+    | ISO_DATE_TIME
+    | ISO_DATE
+    | EVENTTIME
+    | TRIGGERTIME
+    | CURRENTTIME
+    | TIMEOFDAY
+    ;
 
 // Data block
 dataBlock
-   : dataBlock SC dataStatement
-   | dataStatement
-   ;
+    : dataBlock SC dataStatement
+    | dataStatement
+    ;
 
 dataStatement
-   : dataAssignment?
-   | IF dataIfThenElse
-   | FOR IDENTIFIER IN expr DO dataBlock SC ENDDO
-   | WHILE expr DO dataBlock SC ENDDO
-   | dataSwitch
-   | BREAKLOOP
-   | INCLUDE IDENTIFIER
-   ;
+    : dataAssignment?
+    | IF dataIfThenElse
+    | FOR IDENTIFIER IN expr DO dataBlock SC ENDDO
+    | WHILE expr DO dataBlock SC ENDDO
+    | dataSwitch
+    | BREAKLOOP
+    | INCLUDE IDENTIFIER
+    ;
 
 dataIfThenElse
-   : expr THEN dataBlock SC dataElseIf
-   ;
+    : expr THEN dataBlock SC dataElseIf
+    ;
 
 dataElseIf
-   : ENDIF AGGREGATE?
-   | ELSE dataBlock SC ENDIF AGGREGATE?
-   | ELSEIF dataIfThenElse
-   ;
+    : ENDIF AGGREGATE?
+    | ELSE dataBlock SC ENDIF AGGREGATE?
+    | ELSEIF dataIfThenElse
+    ;
 
 dataSwitch
-   : SWITCH IDENTIFIER COLON dataSwitchCases ENDSWITCH AGGREGATE?
-   ;
+    : SWITCH IDENTIFIER COLON dataSwitchCases ENDSWITCH AGGREGATE?
+    ;
 
 dataSwitchCases
-   : (CASE exprFactor dataBlock dataSwitchCases)?
-   | DEFAULT dataBlock
-   ;
+    : (CASE exprFactor dataBlock dataSwitchCases)?
+    | DEFAULT dataBlock
+    ;
 
 dataAssignment
-   : identifierBecomes dataAssignPhrase
-   | timeBecomes expr
-   | applicabilityBecomes expr
-   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) (READ (AS IDENTIFIER)? readPhrase | ARGUMENT)
-   ;
+    : identifierBecomes dataAssignPhrase
+    | timeBecomes expr
+    | applicabilityBecomes expr
+    | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) (
+        READ (AS IDENTIFIER)? readPhrase
+        | ARGUMENT
+    )
+    ;
 
 dataVarList
-   : identifierOrObjectRef (COMMA dataVarList)?
-   ;
+    : identifierOrObjectRef (COMMA dataVarList)?
+    ;
 
 dataAssignPhrase
-   : READ (AS IDENTIFIER)? readPhrase
-   | MLM (TERM (FROM INSTITUTIONWC string)? | MLM_SELF)
-   | (INTERFACE | EVENT | MESSAGE) mappingFactor
-   | MESSAGE AS IDENTIFIER mappingFactor?
-   | DESTINATION (mappingFactor AS IDENTIFIER mappingFactor?)
-   | ARGUMENT
-   | OBJECT objectDefinition
-   | LINGUISTIC VARIABLE objectDefinition
-   | callPhrase
-   | newObjectPhrase
-   | fuzzySetPhrase
-   | expr
-   ;
+    : READ (AS IDENTIFIER)? readPhrase
+    | MLM (TERM (FROM INSTITUTIONWC string)? | MLM_SELF)
+    | (INTERFACE | EVENT | MESSAGE) mappingFactor
+    | MESSAGE AS IDENTIFIER mappingFactor?
+    | DESTINATION (mappingFactor AS IDENTIFIER mappingFactor?)
+    | ARGUMENT
+    | OBJECT objectDefinition
+    | LINGUISTIC VARIABLE objectDefinition
+    | callPhrase
+    | newObjectPhrase
+    | fuzzySetPhrase
+    | expr
+    ;
 
 fuzzySetPhrase
-   : FUZZY SET fuzzySetInitList
-   | exprDuration FUZZIFIED BY exprDuration
-   | exprFactor FUZZIFIED BY exprFactor
-   ;
+    : FUZZY SET fuzzySetInitList
+    | exprDuration FUZZIFIED BY exprDuration
+    | exprFactor FUZZIFIED BY exprFactor
+    ;
 
 fuzzySetInitList
-   : fuzzySetInitElement
-   | fuzzySetInitList COMMA fuzzySetInitElement
-   ;
+    : fuzzySetInitElement
+    | fuzzySetInitList COMMA fuzzySetInitElement
+    ;
 
 fuzzySetInitElement
-   : LPAREN fuzzySetInitFactor COMMA exprFactor RPAREN
-   ;
+    : LPAREN fuzzySetInitFactor COMMA exprFactor RPAREN
+    ;
 
 fuzzySetInitFactor
-   : exprFactor
-   | NUMBER durationOp
-   ;
+    : exprFactor
+    | NUMBER durationOp
+    ;
 
 readPhrase
-   : readWhere
-   | ofReadFuncOp OF? readWhere
-   | fromOfFuncOp OF? readWhere
-   | fromOfFuncOp exprFactor FROM readWhere
-   ;
+    : readWhere
+    | ofReadFuncOp OF? readWhere
+    | fromOfFuncOp OF? readWhere
+    | fromOfFuncOp exprFactor FROM readWhere
+    ;
 
 readWhere
-   : mappingFactor (WHERE IT OCCUR NOT? (temporalCompOp | rangeCompOp))?
-   | LPAREN readWhere RPAREN
-   ;
+    : mappingFactor (WHERE IT OCCUR NOT? (temporalCompOp | rangeCompOp))?
+    | LPAREN readWhere RPAREN
+    ;
 
 mappingFactor
-   : LBRACE DATA_MAPPING RBRACE
-   ;
+    : LBRACE DATA_MAPPING RBRACE
+    ;
 
 objectDefinition
-   : LBRACK objectAttributeList RBRACK
-   ;
+    : LBRACK objectAttributeList RBRACK
+    ;
 
 objectAttributeList
-   : IDENTIFIER (COMMA objectAttributeList)?
-   ;
+    : IDENTIFIER (COMMA objectAttributeList)?
+    ;
 
 newObjectPhrase
-   : NEW IDENTIFIER (WITH (expr | (expr WITH)? LBRACK objectInitList RBRACK))?
-   ;
+    : NEW IDENTIFIER (WITH (expr | (expr WITH)? LBRACK objectInitList RBRACK))?
+    ;
 
 objectInitList
-   : objectInitElement
-   | objectInitList COMMA objectInitElement
-   ;
+    : objectInitElement
+    | objectInitList COMMA objectInitElement
+    ;
 
 objectInitElement
-   : IDENTIFIER ASSIGN expr
-   ;
+    : IDENTIFIER ASSIGN expr
+    ;
 
 // Evoke block
 evokeBlock
-   : evokeStatement
-   | evokeBlock SC evokeStatement
-   ;
+    : evokeStatement
+    | evokeBlock SC evokeStatement
+    ;
 
 evokeStatement
-   : eventOr?
-   | evokeTime
-   | delayedEvoke
-   | qualifiedEvokeCycle
-   | CALL
-   ;
+    : eventOr?
+    | evokeTime
+    | delayedEvoke
+    | qualifiedEvokeCycle
+    | CALL
+    ;
 
 eventList
-   : eventOr
-   | eventList COMMA eventOr
-   ;
+    : eventOr
+    | eventList COMMA eventOr
+    ;
 
 eventOr
-   : eventOr OR eventAny
-   | eventAny
-   ;
+    : eventOr OR eventAny
+    | eventAny
+    ;
 
 eventAny
-   : ANY OF? (LPAREN eventList RPAREN | IDENTIFIER)
-   | eventFactor
-   ;
+    : ANY OF? (LPAREN eventList RPAREN | IDENTIFIER)
+    | eventFactor
+    ;
 
 eventFactor
-   : LPAREN eventOr RPAREN
-   | IDENTIFIER
-   ;
+    : LPAREN eventOr RPAREN
+    | IDENTIFIER
+    ;
 
 delayedEvoke
-   : evokeTimeExprOr (AFTER eventTime)?
-   | evokeDuration AFTER evokeTimeOr
-   ;
+    : evokeTimeExprOr (AFTER eventTime)?
+    | evokeDuration AFTER evokeTimeOr
+    ;
 
 eventTime
-   : TIME OF? eventAny
-   ;
+    : TIME OF? eventAny
+    ;
 
 evokeTimeOr
-   : evokeTime
-   | evokeTime OR evokeTimeOr
-   ;
+    : evokeTime
+    | evokeTime OR evokeTimeOr
+    ;
 
 evokeTimeExprOr
-   : evokeTimeExpr
-   | evokeTimeExpr OR evokeTimeExprOr
-   ;
+    : evokeTimeExpr
+    | evokeTimeExpr OR evokeTimeExprOr
+    ;
 
 evokeTimeExpr
-   : evokeDuration
-   | evokeTime
-   ;
+    : evokeDuration
+    | evokeTime
+    ;
 
 evokeTime
-   : ISO_DATE_TIME
-   | ISO_DATE
-   | relativeEvokeTimeExpr
-   ;
+    : ISO_DATE_TIME
+    | ISO_DATE
+    | relativeEvokeTimeExpr
+    ;
 
 evokeDuration
-   : NUMBER durationOp
-   ;
+    : NUMBER durationOp
+    ;
 
 relativeEvokeTimeExpr
-   : (TODAY | TOMORROW | WEEKDAYLITERAL) ATTIME TIMEOFDAY
-   ;
+    : (TODAY | TOMORROW | WEEKDAYLITERAL) ATTIME TIMEOFDAY
+    ;
 
 qualifiedEvokeCycle
-   : simpleEvokeCycle (UNTIL expr)?
-   ;
+    : simpleEvokeCycle (UNTIL expr)?
+    ;
 
 simpleEvokeCycle
-   : EVERY evokeDuration FOR evokeDuration STARTING startingDelay
-   ;
+    : EVERY evokeDuration FOR evokeDuration STARTING startingDelay
+    ;
 
 startingDelay
-   : eventTime
-   | delayedEvoke
-   ;
+    : eventTime
+    | delayedEvoke
+    ;
 
 // Action block
 actionBlock
-   : actionStatement
-   | actionBlock SC actionStatement
-   ;
+    : actionStatement
+    | actionBlock SC actionStatement
+    ;
 
 actionStatement
-   : (IF actionIfThenElse)?
-   | FOR IDENTIFIER IN expr DO actionBlock SC ENDDO
-   | WHILE expr DO actionBlock SC ENDDO
-   | actionSwitch
-   | BREAKLOOP
-   | callPhrase (DELAY expr)?
-   | WRITE expr (AT IDENTIFIER)?
-   | RETURN expr
-   | identifierBecomes expr
-   | timeBecomes expr
-   | applicabilityBecomes expr
-   | identifierBecomes newObjectPhrase
-   ;
+    : (IF actionIfThenElse)?
+    | FOR IDENTIFIER IN expr DO actionBlock SC ENDDO
+    | WHILE expr DO actionBlock SC ENDDO
+    | actionSwitch
+    | BREAKLOOP
+    | callPhrase (DELAY expr)?
+    | WRITE expr (AT IDENTIFIER)?
+    | RETURN expr
+    | identifierBecomes expr
+    | timeBecomes expr
+    | applicabilityBecomes expr
+    | identifierBecomes newObjectPhrase
+    ;
 
 actionIfThenElse
-   : expr THEN actionBlock SC actionElseIf
-   ;
+    : expr THEN actionBlock SC actionElseIf
+    ;
 
 actionElseIf
-   : ENDIF AGGREGATE?
-   | ELSE actionBlock SC ENDIF AGGREGATE?
-   | ELSEIF actionIfThenElse
-   ;
+    : ENDIF AGGREGATE?
+    | ELSE actionBlock SC ENDIF AGGREGATE?
+    | ELSEIF actionIfThenElse
+    ;
 
 actionSwitch
-   : SWITCH IDENTIFIER COLON actionSwitchCases ENDSWITCH AGGREGATE?
-   ;
+    : SWITCH IDENTIFIER COLON actionSwitchCases ENDSWITCH AGGREGATE?
+    ;
 
 actionSwitchCases
-   : (CASE exprFactor actionBlock actionSwitchCases)?
-   | DEFAULT actionBlock
-   ;
-
+    : (CASE exprFactor actionBlock actionSwitchCases)?
+    | DEFAULT actionBlock
+    ;

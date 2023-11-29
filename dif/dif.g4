@@ -29,67 +29,70 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar dif;
 
 dif
-   : header data EOF
-   ;
+    : header data EOF
+    ;
 
 header
-   : tableheader vectorsheader tuplesheader dataheader
-   ;
+    : tableheader vectorsheader tuplesheader dataheader
+    ;
 
 tableheader
-   : 'TABLE' pair STRING
-   ;
+    : 'TABLE' pair STRING
+    ;
 
 vectorsheader
-   : 'VECTORS' pair STRING
-   ;
+    : 'VECTORS' pair STRING
+    ;
 
 tuplesheader
-   : 'TUPLES' pair STRING
-   ;
+    : 'TUPLES' pair STRING
+    ;
 
 dataheader
-   : 'DATA' pair STRING
-   ;
+    : 'DATA' pair STRING
+    ;
 
 data
-   : datum+
-   ;
+    : datum+
+    ;
 
 datum
-   : directive
-   | string_
-   | numeric
-   ;
+    : directive
+    | string_
+    | numeric
+    ;
 
 directive
-   : pair ('BOT' | 'EOD')
-   ;
+    : pair ('BOT' | 'EOD')
+    ;
 
 string_
-   : pair STRING
-   ;
+    : pair STRING
+    ;
 
 numeric
-   : pair 'V'
-   ;
+    : pair 'V'
+    ;
 
 pair
-   : NUM ',' NUM
-   ;
+    : NUM ',' NUM
+    ;
 
 NUM
-   : ('-')? [0-9]+
-   ;
+    : ('-')? [0-9]+
+    ;
 
 STRING
-   : '"' .*? '"'
-   ;
+    : '"' .*? '"'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

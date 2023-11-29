@@ -16,96 +16,112 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER I
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-parser grammar RustParser
-   ;
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
+parser grammar RustParser;
 
 options
 {
-   tokenVocab = RustLexer;
-   superClass = RustParserBase;
+    tokenVocab = RustLexer;
+    superClass = RustParserBase;
 }
+
 // entry point
 // 4
 crate
-   : innerAttribute* item* EOF
-   ;
+    : innerAttribute* item* EOF
+    ;
 
 // 3
 macroInvocation
-   : simplePath '!' delimTokenTree
-   ;
+    : simplePath '!' delimTokenTree
+    ;
+
 delimTokenTree
-   : '(' tokenTree* ')'
-   | '[' tokenTree* ']'
-   | '{' tokenTree* '}'
-   ;
+    : '(' tokenTree* ')'
+    | '[' tokenTree* ']'
+    | '{' tokenTree* '}'
+    ;
+
 tokenTree
-   : tokenTreeToken+
-   | delimTokenTree
-   ;
+    : tokenTreeToken+
+    | delimTokenTree
+    ;
+
 tokenTreeToken
-   : macroIdentifierLikeToken
-   | macroLiteralToken
-   | macroPunctuationToken
-   | macroRepOp
-   | '$'
-   ;
+    : macroIdentifierLikeToken
+    | macroLiteralToken
+    | macroPunctuationToken
+    | macroRepOp
+    | '$'
+    ;
 
 macroInvocationSemi
-   : simplePath '!' '(' tokenTree* ')' ';'
-   | simplePath '!' '[' tokenTree* ']' ';'
-   | simplePath '!' '{' tokenTree* '}'
-   ;
+    : simplePath '!' '(' tokenTree* ')' ';'
+    | simplePath '!' '[' tokenTree* ']' ';'
+    | simplePath '!' '{' tokenTree* '}'
+    ;
 
 // 3.1
 macroRulesDefinition
-   : 'macro_rules' '!' identifier macroRulesDef
-   ;
+    : 'macro_rules' '!' identifier macroRulesDef
+    ;
+
 macroRulesDef
-   : '(' macroRules ')' ';'
-   | '[' macroRules ']' ';'
-   | '{' macroRules '}'
-   ;
+    : '(' macroRules ')' ';'
+    | '[' macroRules ']' ';'
+    | '{' macroRules '}'
+    ;
+
 macroRules
-   : macroRule (';' macroRule)* ';'?
-   ;
+    : macroRule (';' macroRule)* ';'?
+    ;
+
 macroRule
-   : macroMatcher '=>' macroTranscriber
-   ;
+    : macroMatcher '=>' macroTranscriber
+    ;
+
 macroMatcher
-   : '(' macroMatch* ')'
-   | '[' macroMatch* ']'
-   | '{' macroMatch* '}'
-   ;
+    : '(' macroMatch* ')'
+    | '[' macroMatch* ']'
+    | '{' macroMatch* '}'
+    ;
+
 macroMatch
-   : macroMatchToken+
-   | macroMatcher
-   | '$' (identifier | 'self') ':' macroFragSpec
-   | '$' '(' macroMatch+ ')' macroRepSep? macroRepOp
-   ;
+    : macroMatchToken+
+    | macroMatcher
+    | '$' (identifier | 'self') ':' macroFragSpec
+    | '$' '(' macroMatch+ ')' macroRepSep? macroRepOp
+    ;
+
 macroMatchToken
-   : macroIdentifierLikeToken
-   | macroLiteralToken
-   | macroPunctuationToken
-   | macroRepOp
-   ;
+    : macroIdentifierLikeToken
+    | macroLiteralToken
+    | macroPunctuationToken
+    | macroRepOp
+    ;
+
 macroFragSpec
-   : identifier // do validate here is wasting token
-   ;
+    : identifier // do validate here is wasting token
+    ;
+
 macroRepSep
-   : macroIdentifierLikeToken
-   | macroLiteralToken
-   | macroPunctuationToken
-   | '$'
-   ;
+    : macroIdentifierLikeToken
+    | macroLiteralToken
+    | macroPunctuationToken
+    | '$'
+    ;
+
 macroRepOp
-   : '*'
-   | '+'
-   | '?'
-   ;
+    : '*'
+    | '+'
+    | '?'
+    ;
+
 macroTranscriber
-   : delimTokenTree
-   ;
+    : delimTokenTree
+    ;
 
 //configurationPredicate
 // : configurationOption | configurationAll | configurationAny | configurationNot ; configurationOption: identifier (
@@ -118,251 +134,278 @@ macroTranscriber
 
 // 6
 item
-   : outerAttribute* (visItem | macroItem)
-   ;
+    : outerAttribute* (visItem | macroItem)
+    ;
+
 visItem
-   : visibility?
-   (
-      module
-      | externCrate
-      | useDeclaration
-      | function_
-      | typeAlias
-      | struct_
-      | enumeration
-      | union_
-      | constantItem
-      | staticItem
-      | trait_
-      | implementation
-      | externBlock
-   )
-   ;
+    : visibility? (
+        module
+        | externCrate
+        | useDeclaration
+        | function_
+        | typeAlias
+        | struct_
+        | enumeration
+        | union_
+        | constantItem
+        | staticItem
+        | trait_
+        | implementation
+        | externBlock
+    )
+    ;
+
 macroItem
-   : macroInvocationSemi
-   | macroRulesDefinition
-   ;
+    : macroInvocationSemi
+    | macroRulesDefinition
+    ;
 
 // 6.1
 module
-   : 'unsafe'? 'mod' identifier (';' | '{' innerAttribute* item* '}')
-   ;
+    : 'unsafe'? 'mod' identifier (';' | '{' innerAttribute* item* '}')
+    ;
 
 // 6.2
 externCrate
-   : 'extern' 'crate' crateRef asClause? ';'
-   ;
+    : 'extern' 'crate' crateRef asClause? ';'
+    ;
+
 crateRef
-   : identifier
-   | 'self'
-   ;
+    : identifier
+    | 'self'
+    ;
+
 asClause
-   : 'as' (identifier | '_')
-   ;
+    : 'as' (identifier | '_')
+    ;
 
 // 6.3
 useDeclaration
-   : 'use' useTree ';'
-   ;
+    : 'use' useTree ';'
+    ;
+
 useTree
-   : (simplePath? '::')? ('*' | '{' ( useTree (',' useTree)* ','?)? '}')
-   | simplePath ('as' (identifier | '_'))?
-   ;
+    : (simplePath? '::')? ('*' | '{' ( useTree (',' useTree)* ','?)? '}')
+    | simplePath ('as' (identifier | '_'))?
+    ;
 
 // 6.4
 function_
-   : functionQualifiers 'fn' identifier genericParams? '(' functionParameters? ')' functionReturnType? whereClause?
-      (blockExpression | ';')
-   ;
+    : functionQualifiers 'fn' identifier genericParams? '(' functionParameters? ')' functionReturnType? whereClause? (
+        blockExpression
+        | ';'
+    )
+    ;
+
 functionQualifiers
-   : 'const'? 'async'? 'unsafe'? ('extern' abi?)?
-   ;
+    : 'const'? 'async'? 'unsafe'? ('extern' abi?)?
+    ;
+
 abi
-   : STRING_LITERAL
-   | RAW_STRING_LITERAL
-   ;
+    : STRING_LITERAL
+    | RAW_STRING_LITERAL
+    ;
+
 functionParameters
-   : selfParam ','?
-   | (selfParam ',')? functionParam (',' functionParam)* ','?
-   ;
+    : selfParam ','?
+    | (selfParam ',')? functionParam (',' functionParam)* ','?
+    ;
+
 selfParam
-   : outerAttribute* (shorthandSelf | typedSelf)
-   ;
+    : outerAttribute* (shorthandSelf | typedSelf)
+    ;
+
 shorthandSelf
-   : ('&' lifetime?)? 'mut'? 'self'
-   ;
+    : ('&' lifetime?)? 'mut'? 'self'
+    ;
+
 typedSelf
-   : 'mut'? 'self' ':' type_
-   ;
+    : 'mut'? 'self' ':' type_
+    ;
+
 functionParam
-   : outerAttribute* (functionParamPattern | '...' | type_)
-   ;
+    : outerAttribute* (functionParamPattern | '...' | type_)
+    ;
+
 functionParamPattern
-   : pattern ':' (type_ | '...')
-   ;
+    : pattern ':' (type_ | '...')
+    ;
+
 functionReturnType
-   : '->' type_
-   ;
+    : '->' type_
+    ;
 
 // 6.5
 typeAlias
-   : 'type' identifier genericParams? whereClause? ('=' type_)? ';'
-   ;
+    : 'type' identifier genericParams? whereClause? ('=' type_)? ';'
+    ;
 
 // 6.6
 struct_
-   : structStruct
-   | tupleStruct
-   ;
+    : structStruct
+    | tupleStruct
+    ;
+
 structStruct
-   : 'struct' identifier genericParams? whereClause? ('{' structFields? '}' | ';')
-   ;
+    : 'struct' identifier genericParams? whereClause? ('{' structFields? '}' | ';')
+    ;
+
 tupleStruct
-   : 'struct' identifier genericParams? '(' tupleFields? ')' whereClause? ';'
-   ;
+    : 'struct' identifier genericParams? '(' tupleFields? ')' whereClause? ';'
+    ;
+
 structFields
-   : structField (',' structField)* ','?
-   ;
+    : structField (',' structField)* ','?
+    ;
+
 structField
-   : outerAttribute* visibility? identifier ':' type_
-   ;
+    : outerAttribute* visibility? identifier ':' type_
+    ;
+
 tupleFields
-   : tupleField (',' tupleField)* ','?
-   ;
+    : tupleField (',' tupleField)* ','?
+    ;
+
 tupleField
-   : outerAttribute* visibility? type_
-   ;
+    : outerAttribute* visibility? type_
+    ;
 
 // 6.7
 enumeration
-   : 'enum' identifier genericParams? whereClause? '{' enumItems? '}'
-   ;
+    : 'enum' identifier genericParams? whereClause? '{' enumItems? '}'
+    ;
+
 enumItems
-   : enumItem (',' enumItem)* ','?
-   ;
+    : enumItem (',' enumItem)* ','?
+    ;
+
 enumItem
-   : outerAttribute* visibility? identifier
-   (
-      enumItemTuple
-      | enumItemStruct
-      | enumItemDiscriminant
-   )?
-   ;
+    : outerAttribute* visibility? identifier (
+        enumItemTuple
+        | enumItemStruct
+        | enumItemDiscriminant
+    )?
+    ;
+
 enumItemTuple
-   : '(' tupleFields? ')'
-   ;
+    : '(' tupleFields? ')'
+    ;
+
 enumItemStruct
-   : '{' structFields? '}'
-   ;
+    : '{' structFields? '}'
+    ;
+
 enumItemDiscriminant
-   : '=' expression
-   ;
+    : '=' expression
+    ;
 
 // 6.8
 union_
-   : 'union' identifier genericParams? whereClause? '{' structFields '}'
-   ;
+    : 'union' identifier genericParams? whereClause? '{' structFields '}'
+    ;
 
 // 6.9
 constantItem
-   : 'const' (identifier | '_') ':' type_ ('=' expression)? ';'
-   ;
+    : 'const' (identifier | '_') ':' type_ ('=' expression)? ';'
+    ;
 
 // 6.10
 staticItem
-   : 'static' 'mut'? identifier ':' type_ ('=' expression)? ';'
-   ;
+    : 'static' 'mut'? identifier ':' type_ ('=' expression)? ';'
+    ;
 
 // 6.11
 trait_
-   : 'unsafe'? 'trait' identifier genericParams? (':' typeParamBounds?)? whereClause? '{' innerAttribute* associatedItem* '}'
-   ;
+    : 'unsafe'? 'trait' identifier genericParams? (':' typeParamBounds?)? whereClause? '{' innerAttribute* associatedItem* '}'
+    ;
 
 // 6.12
 implementation
-   : inherentImpl
-   | traitImpl
-   ;
+    : inherentImpl
+    | traitImpl
+    ;
+
 inherentImpl
-   : 'impl' genericParams? type_ whereClause? '{' innerAttribute* associatedItem* '}'
-   ;
+    : 'impl' genericParams? type_ whereClause? '{' innerAttribute* associatedItem* '}'
+    ;
+
 traitImpl
-   : 'unsafe'? 'impl' genericParams? '!'? typePath 'for' type_ whereClause? '{' innerAttribute* associatedItem* '}'
-   ;
+    : 'unsafe'? 'impl' genericParams? '!'? typePath 'for' type_ whereClause? '{' innerAttribute* associatedItem* '}'
+    ;
 
 // 6.13
 externBlock
-   : 'unsafe'? 'extern' abi? '{' innerAttribute* externalItem* '}'
-   ;
+    : 'unsafe'? 'extern' abi? '{' innerAttribute* externalItem* '}'
+    ;
+
 externalItem
-   : outerAttribute*
-   (
-      macroInvocationSemi
-      | visibility? ( staticItem | function_)
-   )
-   ;
+    : outerAttribute* (macroInvocationSemi | visibility? ( staticItem | function_))
+    ;
 
 // 6.14
 genericParams
-   : '<' ((genericParam ',')* genericParam ','? )?'>'
-   ;
+    : '<' ((genericParam ',')* genericParam ','?)? '>'
+    ;
+
 genericParam
-   : outerAttribute*
-   (
-      lifetimeParam
-      | typeParam
-      | constParam
-   );
+    : outerAttribute* (lifetimeParam | typeParam | constParam)
+    ;
+
 lifetimeParam
-   : outerAttribute? LIFETIME_OR_LABEL (':' lifetimeBounds)?
-   ;
+    : outerAttribute? LIFETIME_OR_LABEL (':' lifetimeBounds)?
+    ;
+
 typeParam
-   : outerAttribute? identifier (':' typeParamBounds?)? ('=' type_)?
-   ;
+    : outerAttribute? identifier (':' typeParamBounds?)? ('=' type_)?
+    ;
+
 constParam
-   : 'const' identifier ':' type_
-   ;
+    : 'const' identifier ':' type_
+    ;
 
 whereClause
-   : 'where' (whereClauseItem ',')* whereClauseItem?
-   ;
+    : 'where' (whereClauseItem ',')* whereClauseItem?
+    ;
+
 whereClauseItem
-   : lifetimeWhereClauseItem
-   | typeBoundWhereClauseItem
-   ;
+    : lifetimeWhereClauseItem
+    | typeBoundWhereClauseItem
+    ;
+
 lifetimeWhereClauseItem
-   : lifetime ':' lifetimeBounds
-   ;
+    : lifetime ':' lifetimeBounds
+    ;
+
 typeBoundWhereClauseItem
-   : forLifetimes? type_ ':' typeParamBounds?
-   ;
+    : forLifetimes? type_ ':' typeParamBounds?
+    ;
+
 forLifetimes
-   : 'for' genericParams
-   ;
+    : 'for' genericParams
+    ;
 
 // 6.15
 associatedItem
-   : outerAttribute*
-   (
-      macroInvocationSemi
-      | visibility? ( typeAlias | constantItem | function_ )
-   )
-   ;
+    : outerAttribute* (macroInvocationSemi | visibility? ( typeAlias | constantItem | function_))
+    ;
 
 // 7
 innerAttribute
-   : '#' '!' '[' attr ']'
-   ;
+    : '#' '!' '[' attr ']'
+    ;
+
 outerAttribute
-   : '#' '[' attr ']'
-   ;
+    : '#' '[' attr ']'
+    ;
+
 attr
-   : simplePath attrInput?
-   ;
+    : simplePath attrInput?
+    ;
+
 attrInput
-   : delimTokenTree
-   | '=' literalExpression
-   ; // w/o suffix
+    : delimTokenTree
+    | '=' literalExpression
+    ; // w/o suffix
 
 //metaItem
 // : simplePath ( '=' literalExpression //w | '(' metaSeq ')' )? ; metaSeq: metaItemInner (',' metaItemInner)* ','?;
@@ -375,717 +418,782 @@ attrInput
 
 // 8
 statement
-   : ';'
-   | item
-   | letStatement
-   | expressionStatement
-   | macroInvocationSemi
-   ;
+    : ';'
+    | item
+    | letStatement
+    | expressionStatement
+    | macroInvocationSemi
+    ;
 
 letStatement
-   : outerAttribute* 'let' patternNoTopAlt (':' type_)? ('=' expression)? ';'
-   ;
+    : outerAttribute* 'let' patternNoTopAlt (':' type_)? ('=' expression)? ';'
+    ;
 
 expressionStatement
-   : expression ';'
-   | expressionWithBlock ';'?
-   ;
+    : expression ';'
+    | expressionWithBlock ';'?
+    ;
 
 // 8.2
 expression
-   : outerAttribute+ expression                         # AttributedExpression // technical, remove left recursive
-   | literalExpression                                  # LiteralExpression_
-   | pathExpression                                     # PathExpression_
-   | expression '.' pathExprSegment '(' callParams? ')' # MethodCallExpression   // 8.2.10
-   | expression '.' identifier                          # FieldExpression  // 8.2.11
-   | expression '.' tupleIndex                          # TupleIndexingExpression   // 8.2.7
-   | expression '.' 'await'                             # AwaitExpression  // 8.2.18
-   | expression '(' callParams? ')'                     # CallExpression   // 8.2.9
-   | expression '[' expression ']'                      # IndexExpression  // 8.2.6
-   | expression '?'                                     # ErrorPropagationExpression   // 8.2.4
-   | ('&' | '&&') 'mut'? expression                     # BorrowExpression // 8.2.4
-   | '*' expression                                     # DereferenceExpression  // 8.2.4
-   | ('-' | '!') expression                             # NegationExpression  // 8.2.4
-   | expression 'as' typeNoBounds                       # TypeCastExpression  // 8.2.4
-   | expression ('*' | '/' | '%') expression            # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression ('+' | '-') expression                  # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression (shl | shr) expression                  # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression '&' expression                          # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression '^' expression                          # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression '|' expression                          # ArithmeticOrLogicalExpression   // 8.2.4
-   | expression comparisonOperator expression           # ComparisonExpression   // 8.2.4
-   | expression '&&' expression                         # LazyBooleanExpression  // 8.2.4
-   | expression '||' expression                         # LazyBooleanExpression  // 8.2.4
-   | expression '..' expression?                        # RangeExpression  // 8.2.14
-   | '..' expression?                                   # RangeExpression  // 8.2.14
-   | '..=' expression                                   # RangeExpression  // 8.2.14
-   | expression '..=' expression                        # RangeExpression  // 8.2.14
-   | expression '=' expression                          # AssignmentExpression   // 8.2.4
-   | expression compoundAssignOperator expression       # CompoundAssignmentExpression // 8.2.4
-   | 'continue' LIFETIME_OR_LABEL? expression?          # ContinueExpression  // 8.2.13
-   | 'break' LIFETIME_OR_LABEL? expression?             # BreakExpression  // 8.2.13
-   | 'return' expression?                               # ReturnExpression // 8.2.17
-   | '(' innerAttribute* expression ')'                 # GroupedExpression   // 8.2.5
-   | '[' innerAttribute* arrayElements? ']'             # ArrayExpression  // 8.2.6
-   | '(' innerAttribute* tupleElements? ')'             # TupleExpression  // 8.2.7
-   | structExpression                                   # StructExpression_   // 8.2.8
-   | enumerationVariantExpression                       # EnumerationVariantExpression_
-   | closureExpression                                  # ClosureExpression_  // 8.2.12
-   | expressionWithBlock                                # ExpressionWithBlock_
-   | macroInvocation                                    # MacroInvocationAsExpression
-   ;
+    : outerAttribute+ expression                         # AttributedExpression // technical, remove left recursive
+    | literalExpression                                  # LiteralExpression_
+    | pathExpression                                     # PathExpression_
+    | expression '.' pathExprSegment '(' callParams? ')' # MethodCallExpression          // 8.2.10
+    | expression '.' identifier                          # FieldExpression               // 8.2.11
+    | expression '.' tupleIndex                          # TupleIndexingExpression       // 8.2.7
+    | expression '.' 'await'                             # AwaitExpression               // 8.2.18
+    | expression '(' callParams? ')'                     # CallExpression                // 8.2.9
+    | expression '[' expression ']'                      # IndexExpression               // 8.2.6
+    | expression '?'                                     # ErrorPropagationExpression    // 8.2.4
+    | ('&' | '&&') 'mut'? expression                     # BorrowExpression              // 8.2.4
+    | '*' expression                                     # DereferenceExpression         // 8.2.4
+    | ('-' | '!') expression                             # NegationExpression            // 8.2.4
+    | expression 'as' typeNoBounds                       # TypeCastExpression            // 8.2.4
+    | expression ('*' | '/' | '%') expression            # ArithmeticOrLogicalExpression // 8.2.4
+    | expression ('+' | '-') expression                  # ArithmeticOrLogicalExpression // 8.2.4
+    | expression (shl | shr) expression                  # ArithmeticOrLogicalExpression // 8.2.4
+    | expression '&' expression                          # ArithmeticOrLogicalExpression // 8.2.4
+    | expression '^' expression                          # ArithmeticOrLogicalExpression // 8.2.4
+    | expression '|' expression                          # ArithmeticOrLogicalExpression // 8.2.4
+    | expression comparisonOperator expression           # ComparisonExpression          // 8.2.4
+    | expression '&&' expression                         # LazyBooleanExpression         // 8.2.4
+    | expression '||' expression                         # LazyBooleanExpression         // 8.2.4
+    | expression '..' expression?                        # RangeExpression               // 8.2.14
+    | '..' expression?                                   # RangeExpression               // 8.2.14
+    | '..=' expression                                   # RangeExpression               // 8.2.14
+    | expression '..=' expression                        # RangeExpression               // 8.2.14
+    | expression '=' expression                          # AssignmentExpression          // 8.2.4
+    | expression compoundAssignOperator expression       # CompoundAssignmentExpression  // 8.2.4
+    | 'continue' LIFETIME_OR_LABEL? expression?          # ContinueExpression            // 8.2.13
+    | 'break' LIFETIME_OR_LABEL? expression?             # BreakExpression               // 8.2.13
+    | 'return' expression?                               # ReturnExpression              // 8.2.17
+    | '(' innerAttribute* expression ')'                 # GroupedExpression             // 8.2.5
+    | '[' innerAttribute* arrayElements? ']'             # ArrayExpression               // 8.2.6
+    | '(' innerAttribute* tupleElements? ')'             # TupleExpression               // 8.2.7
+    | structExpression                                   # StructExpression_             // 8.2.8
+    | enumerationVariantExpression                       # EnumerationVariantExpression_
+    | closureExpression                                  # ClosureExpression_ // 8.2.12
+    | expressionWithBlock                                # ExpressionWithBlock_
+    | macroInvocation                                    # MacroInvocationAsExpression
+    ;
 
 comparisonOperator
-   : '=='
-   | '!='
-   | '>'
-   | '<'
-   | '>='
-   | '<='
-   ;
+    : '=='
+    | '!='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    ;
 
 compoundAssignOperator
-   : '+='
-   | '-='
-   | '*='
-   | '/='
-   | '%='
-   | '&='
-   | '|='
-   | '^='
-   | '<<='
-   | '>>='
-   ;
+    : '+='
+    | '-='
+    | '*='
+    | '/='
+    | '%='
+    | '&='
+    | '|='
+    | '^='
+    | '<<='
+    | '>>='
+    ;
 
 expressionWithBlock
-   : outerAttribute+ expressionWithBlock // technical
-   | blockExpression
-   | asyncBlockExpression
-   | unsafeBlockExpression
-   | loopExpression
-   | ifExpression
-   | ifLetExpression
-   | matchExpression
-   ;
+    : outerAttribute+ expressionWithBlock // technical
+    | blockExpression
+    | asyncBlockExpression
+    | unsafeBlockExpression
+    | loopExpression
+    | ifExpression
+    | ifLetExpression
+    | matchExpression
+    ;
 
 // 8.2.1
 literalExpression
-   : CHAR_LITERAL
-   | STRING_LITERAL
-   | RAW_STRING_LITERAL
-   | BYTE_LITERAL
-   | BYTE_STRING_LITERAL
-   | RAW_BYTE_STRING_LITERAL
-   | INTEGER_LITERAL
-   | FLOAT_LITERAL
-   | KW_TRUE
-   | KW_FALSE
-   ;
+    : CHAR_LITERAL
+    | STRING_LITERAL
+    | RAW_STRING_LITERAL
+    | BYTE_LITERAL
+    | BYTE_STRING_LITERAL
+    | RAW_BYTE_STRING_LITERAL
+    | INTEGER_LITERAL
+    | FLOAT_LITERAL
+    | KW_TRUE
+    | KW_FALSE
+    ;
 
 // 8.2.2
 pathExpression
-   : pathInExpression
-   | qualifiedPathInExpression
-   ;
+    : pathInExpression
+    | qualifiedPathInExpression
+    ;
 
 // 8.2.3
 blockExpression
-   : '{' innerAttribute* statements? '}'
-   ;
+    : '{' innerAttribute* statements? '}'
+    ;
+
 statements
-   : statement+ expression?
-   | expression
-   ;
+    : statement+ expression?
+    | expression
+    ;
 
 asyncBlockExpression
-   : 'async' 'move'? blockExpression
-   ;
+    : 'async' 'move'? blockExpression
+    ;
+
 unsafeBlockExpression
-   : 'unsafe' blockExpression
-   ;
+    : 'unsafe' blockExpression
+    ;
 
 // 8.2.6
 arrayElements
-   : expression (',' expression)* ','?
-   | expression ';' expression
-   ;
+    : expression (',' expression)* ','?
+    | expression ';' expression
+    ;
 
 // 8.2.7
 tupleElements
-   : (expression ',')+ expression?
-   ;
+    : (expression ',')+ expression?
+    ;
+
 tupleIndex
-   : INTEGER_LITERAL
-   ;
+    : INTEGER_LITERAL
+    ;
 
 // 8.2.8
 structExpression
-   : structExprStruct
-   | structExprTuple
-   | structExprUnit
-   ;
+    : structExprStruct
+    | structExprTuple
+    | structExprUnit
+    ;
+
 structExprStruct
-   : pathInExpression '{' innerAttribute* (structExprFields | structBase)? '}'
-   ;
+    : pathInExpression '{' innerAttribute* (structExprFields | structBase)? '}'
+    ;
+
 structExprFields
-   : structExprField (',' structExprField)* (',' structBase | ','?)
-   ;
+    : structExprField (',' structExprField)* (',' structBase | ','?)
+    ;
+
 // outerAttribute here is not in doc
 structExprField
-   : outerAttribute* (identifier | (identifier | tupleIndex) ':' expression)
-   ;
+    : outerAttribute* (identifier | (identifier | tupleIndex) ':' expression)
+    ;
+
 structBase
-   : '..' expression
-   ;
+    : '..' expression
+    ;
+
 structExprTuple
-   : pathInExpression '(' innerAttribute* (expression ( ',' expression)* ','?)? ')'
-   ;
+    : pathInExpression '(' innerAttribute* (expression ( ',' expression)* ','?)? ')'
+    ;
+
 structExprUnit
-   : pathInExpression
-   ;
+    : pathInExpression
+    ;
 
 enumerationVariantExpression
-   : enumExprStruct
-   | enumExprTuple
-   | enumExprFieldless
-   ;
+    : enumExprStruct
+    | enumExprTuple
+    | enumExprFieldless
+    ;
+
 enumExprStruct
-   : pathInExpression '{' enumExprFields? '}'
-   ;
+    : pathInExpression '{' enumExprFields? '}'
+    ;
+
 enumExprFields
-   : enumExprField (',' enumExprField)* ','?
-   ;
+    : enumExprField (',' enumExprField)* ','?
+    ;
+
 enumExprField
-   : identifier
-   | (identifier | tupleIndex) ':' expression
-   ;
+    : identifier
+    | (identifier | tupleIndex) ':' expression
+    ;
+
 enumExprTuple
-   : pathInExpression '(' (expression (',' expression)* ','?)? ')'
-   ;
+    : pathInExpression '(' (expression (',' expression)* ','?)? ')'
+    ;
+
 enumExprFieldless
-   : pathInExpression
-   ;
+    : pathInExpression
+    ;
 
 // 8.2.9
 callParams
-   : expression (',' expression)* ','?
-   ;
+    : expression (',' expression)* ','?
+    ;
 
 // 8.2.12
 closureExpression
-   : 'move'? ('||' | '|' closureParameters? '|')
-   (
-      expression
-      | '->' typeNoBounds blockExpression
-   )
-   ;
+    : 'move'? ('||' | '|' closureParameters? '|') (expression | '->' typeNoBounds blockExpression)
+    ;
+
 closureParameters
-   : closureParam (',' closureParam)* ','?
-   ;
+    : closureParam (',' closureParam)* ','?
+    ;
+
 closureParam
-   : outerAttribute* pattern (':' type_)?
-   ;
+    : outerAttribute* pattern (':' type_)?
+    ;
 
 // 8.2.13
 loopExpression
-   : loopLabel?
-   (
-      infiniteLoopExpression
-      | predicateLoopExpression
-      | predicatePatternLoopExpression
-      | iteratorLoopExpression
-   )
-   ;
+    : loopLabel? (
+        infiniteLoopExpression
+        | predicateLoopExpression
+        | predicatePatternLoopExpression
+        | iteratorLoopExpression
+    )
+    ;
+
 infiniteLoopExpression
-   : 'loop' blockExpression
-   ;
+    : 'loop' blockExpression
+    ;
+
 predicateLoopExpression
-   : 'while' expression /*except structExpression*/ blockExpression
-   ;
+    : 'while' expression /*except structExpression*/ blockExpression
+    ;
+
 predicatePatternLoopExpression
-   : 'while' 'let' pattern '=' expression blockExpression
-   ;
+    : 'while' 'let' pattern '=' expression blockExpression
+    ;
+
 iteratorLoopExpression
-   : 'for' pattern 'in' expression blockExpression
-   ;
+    : 'for' pattern 'in' expression blockExpression
+    ;
+
 loopLabel
-   : LIFETIME_OR_LABEL ':'
-   ;
+    : LIFETIME_OR_LABEL ':'
+    ;
 
 // 8.2.15
 ifExpression
-   : 'if' expression blockExpression
-   (
-      'else' (blockExpression | ifExpression | ifLetExpression)
-   )?
-   ;
+    : 'if' expression blockExpression ('else' (blockExpression | ifExpression | ifLetExpression))?
+    ;
+
 ifLetExpression
-   : 'if' 'let' pattern '=' expression blockExpression
-   (
-      'else' (blockExpression | ifExpression | ifLetExpression)
-   )?
-   ;
+    : 'if' 'let' pattern '=' expression blockExpression (
+        'else' (blockExpression | ifExpression | ifLetExpression)
+    )?
+    ;
 
 // 8.2.16
 matchExpression
-   : 'match' expression '{' innerAttribute* matchArms? '}'
-   ;
+    : 'match' expression '{' innerAttribute* matchArms? '}'
+    ;
+
 matchArms
-   : (matchArm '=>' matchArmExpression)* matchArm '=>' expression ','?
-   ;
+    : (matchArm '=>' matchArmExpression)* matchArm '=>' expression ','?
+    ;
+
 matchArmExpression
-   : expression ','
-   | expressionWithBlock ','?
-   ;
+    : expression ','
+    | expressionWithBlock ','?
+    ;
+
 matchArm
-   : outerAttribute* pattern matchArmGuard?
-   ;
+    : outerAttribute* pattern matchArmGuard?
+    ;
 
 matchArmGuard
-   : 'if' expression
-   ;
+    : 'if' expression
+    ;
 
 // 9
 pattern
-   : '|'? patternNoTopAlt ('|' patternNoTopAlt)*
-   ;
+    : '|'? patternNoTopAlt ('|' patternNoTopAlt)*
+    ;
 
 patternNoTopAlt
-   : patternWithoutRange
-   | rangePattern
-   ;
+    : patternWithoutRange
+    | rangePattern
+    ;
+
 patternWithoutRange
-   : literalPattern
-   | identifierPattern
-   | wildcardPattern
-   | restPattern
-   | referencePattern
-   | structPattern
-   | tupleStructPattern
-   | tuplePattern
-   | groupedPattern
-   | slicePattern
-   | pathPattern
-   | macroInvocation
-   ;
+    : literalPattern
+    | identifierPattern
+    | wildcardPattern
+    | restPattern
+    | referencePattern
+    | structPattern
+    | tupleStructPattern
+    | tuplePattern
+    | groupedPattern
+    | slicePattern
+    | pathPattern
+    | macroInvocation
+    ;
 
 literalPattern
-   : KW_TRUE
-   | KW_FALSE
-   | CHAR_LITERAL
-   | BYTE_LITERAL
-   | STRING_LITERAL
-   | RAW_STRING_LITERAL
-   | BYTE_STRING_LITERAL
-   | RAW_BYTE_STRING_LITERAL
-   | '-'? INTEGER_LITERAL
-   | '-'? FLOAT_LITERAL
-   ;
+    : KW_TRUE
+    | KW_FALSE
+    | CHAR_LITERAL
+    | BYTE_LITERAL
+    | STRING_LITERAL
+    | RAW_STRING_LITERAL
+    | BYTE_STRING_LITERAL
+    | RAW_BYTE_STRING_LITERAL
+    | '-'? INTEGER_LITERAL
+    | '-'? FLOAT_LITERAL
+    ;
 
 identifierPattern
-   : 'ref'? 'mut'? identifier ('@' pattern)?
-   ;
+    : 'ref'? 'mut'? identifier ('@' pattern)?
+    ;
+
 wildcardPattern
-   : '_'
-   ;
+    : '_'
+    ;
+
 restPattern
-   : '..'
-   ;
+    : '..'
+    ;
+
 rangePattern
-   : rangePatternBound '..=' rangePatternBound  # InclusiveRangePattern
-   | rangePatternBound '..'                     # HalfOpenRangePattern
-   | rangePatternBound '...' rangePatternBound  # ObsoleteRangePattern
-   ;
+    : rangePatternBound '..=' rangePatternBound # InclusiveRangePattern
+    | rangePatternBound '..'                    # HalfOpenRangePattern
+    | rangePatternBound '...' rangePatternBound # ObsoleteRangePattern
+    ;
+
 rangePatternBound
-   : CHAR_LITERAL
-   | BYTE_LITERAL
-   | '-'? INTEGER_LITERAL
-   | '-'? FLOAT_LITERAL
-   | pathPattern
-   ;
+    : CHAR_LITERAL
+    | BYTE_LITERAL
+    | '-'? INTEGER_LITERAL
+    | '-'? FLOAT_LITERAL
+    | pathPattern
+    ;
+
 referencePattern
-   : ('&' | '&&') 'mut'? patternWithoutRange
-   ;
+    : ('&' | '&&') 'mut'? patternWithoutRange
+    ;
+
 structPattern
-   : pathInExpression '{' structPatternElements? '}'
-   ;
+    : pathInExpression '{' structPatternElements? '}'
+    ;
+
 structPatternElements
-   : structPatternFields (',' structPatternEtCetera?)?
-   | structPatternEtCetera
-   ;
+    : structPatternFields (',' structPatternEtCetera?)?
+    | structPatternEtCetera
+    ;
+
 structPatternFields
-   : structPatternField (',' structPatternField)*
-   ;
+    : structPatternField (',' structPatternField)*
+    ;
+
 structPatternField
-   : outerAttribute*
-   (
-      tupleIndex ':' pattern
-      | identifier ':' pattern
-      | 'ref'? 'mut'? identifier
-   )
-   ;
+    : outerAttribute* (tupleIndex ':' pattern | identifier ':' pattern | 'ref'? 'mut'? identifier)
+    ;
+
 structPatternEtCetera
-   : outerAttribute* '..'
-   ;
+    : outerAttribute* '..'
+    ;
+
 tupleStructPattern
-   : pathInExpression '(' tupleStructItems? ')'
-   ;
+    : pathInExpression '(' tupleStructItems? ')'
+    ;
+
 tupleStructItems
-   : pattern (',' pattern)* ','?
-   ;
+    : pattern (',' pattern)* ','?
+    ;
+
 tuplePattern
-   : '(' tuplePatternItems? ')'
-   ;
+    : '(' tuplePatternItems? ')'
+    ;
+
 tuplePatternItems
-   : pattern ','
-   | restPattern
-   | pattern (',' pattern)+ ','?
-   ;
+    : pattern ','
+    | restPattern
+    | pattern (',' pattern)+ ','?
+    ;
+
 groupedPattern
-   : '(' pattern ')'
-   ;
+    : '(' pattern ')'
+    ;
+
 slicePattern
-   : '[' slicePatternItems? ']'
-   ;
+    : '[' slicePatternItems? ']'
+    ;
+
 slicePatternItems
-   : pattern (',' pattern)* ','?
-   ;
+    : pattern (',' pattern)* ','?
+    ;
+
 pathPattern
-   : pathInExpression
-   | qualifiedPathInExpression
-   ;
+    : pathInExpression
+    | qualifiedPathInExpression
+    ;
 
 // 10.1
 type_
-   : typeNoBounds
-   | implTraitType
-   | traitObjectType
-   ;
+    : typeNoBounds
+    | implTraitType
+    | traitObjectType
+    ;
+
 typeNoBounds
-   : parenthesizedType
-   | implTraitTypeOneBound
-   | traitObjectTypeOneBound
-   | typePath
-   | tupleType
-   | neverType
-   | rawPointerType
-   | referenceType
-   | arrayType
-   | sliceType
-   | inferredType
-   | qualifiedPathInType
-   | bareFunctionType
-   | macroInvocation
-   ;
+    : parenthesizedType
+    | implTraitTypeOneBound
+    | traitObjectTypeOneBound
+    | typePath
+    | tupleType
+    | neverType
+    | rawPointerType
+    | referenceType
+    | arrayType
+    | sliceType
+    | inferredType
+    | qualifiedPathInType
+    | bareFunctionType
+    | macroInvocation
+    ;
+
 parenthesizedType
-   : '(' type_ ')'
-   ;
+    : '(' type_ ')'
+    ;
 
 // 10.1.4
 neverType
-   : '!'
-   ;
+    : '!'
+    ;
 
 // 10.1.5
 tupleType
-   : '(' ((type_ ',')+ type_?)? ')'
-   ;
+    : '(' ((type_ ',')+ type_?)? ')'
+    ;
 
 // 10.1.6
 arrayType
-   : '[' type_ ';' expression ']'
-   ;
+    : '[' type_ ';' expression ']'
+    ;
 
 // 10.1.7
 sliceType
-   : '[' type_ ']'
-   ;
+    : '[' type_ ']'
+    ;
 
 // 10.1.13
 referenceType
-   : '&' lifetime? 'mut'? typeNoBounds
-   ;
+    : '&' lifetime? 'mut'? typeNoBounds
+    ;
+
 rawPointerType
-   : '*' ('mut' | 'const') typeNoBounds
-   ;
+    : '*' ('mut' | 'const') typeNoBounds
+    ;
 
 // 10.1.14
 bareFunctionType
-   : forLifetimes? functionTypeQualifiers 'fn' '(' functionParametersMaybeNamedVariadic? ')' bareFunctionReturnType?
-   ;
+    : forLifetimes? functionTypeQualifiers 'fn' '(' functionParametersMaybeNamedVariadic? ')' bareFunctionReturnType?
+    ;
+
 functionTypeQualifiers
-   : 'unsafe'? ('extern' abi?)?
-   ;
+    : 'unsafe'? ('extern' abi?)?
+    ;
+
 bareFunctionReturnType
-   : '->' typeNoBounds
-   ;
+    : '->' typeNoBounds
+    ;
+
 functionParametersMaybeNamedVariadic
-   : maybeNamedFunctionParameters
-   | maybeNamedFunctionParametersVariadic
-   ;
+    : maybeNamedFunctionParameters
+    | maybeNamedFunctionParametersVariadic
+    ;
+
 maybeNamedFunctionParameters
-   : maybeNamedParam (',' maybeNamedParam)* ','?
-   ;
+    : maybeNamedParam (',' maybeNamedParam)* ','?
+    ;
+
 maybeNamedParam
-   : outerAttribute* ((identifier | '_') ':')? type_
-   ;
+    : outerAttribute* ((identifier | '_') ':')? type_
+    ;
+
 maybeNamedFunctionParametersVariadic
-   : (maybeNamedParam ',')* maybeNamedParam ',' outerAttribute* '...'
-   ;
+    : (maybeNamedParam ',')* maybeNamedParam ',' outerAttribute* '...'
+    ;
 
 // 10.1.15
 traitObjectType
-   : 'dyn'? typeParamBounds
-   ;
+    : 'dyn'? typeParamBounds
+    ;
+
 traitObjectTypeOneBound
-   : 'dyn'? traitBound
-   ;
+    : 'dyn'? traitBound
+    ;
+
 implTraitType
-   : 'impl' typeParamBounds
-   ;
+    : 'impl' typeParamBounds
+    ;
+
 implTraitTypeOneBound
-   : 'impl' traitBound
-   ;
+    : 'impl' traitBound
+    ;
 
 // 10.1.18
 inferredType
-   : '_'
-   ;
+    : '_'
+    ;
 
 // 10.6
 typeParamBounds
-   : typeParamBound ('+' typeParamBound)* '+'?
-   ;
+    : typeParamBound ('+' typeParamBound)* '+'?
+    ;
+
 typeParamBound
-   : lifetime
-   | traitBound
-   ;
+    : lifetime
+    | traitBound
+    ;
+
 traitBound
-   : '?'? forLifetimes? typePath
-   | '(' '?'? forLifetimes? typePath ')'
-   ;
+    : '?'? forLifetimes? typePath
+    | '(' '?'? forLifetimes? typePath ')'
+    ;
+
 lifetimeBounds
-   : (lifetime '+')* lifetime?
-   ;
+    : (lifetime '+')* lifetime?
+    ;
+
 lifetime
-   : LIFETIME_OR_LABEL
-   | '\'static'
-   | '\'_'
-   ;
+    : LIFETIME_OR_LABEL
+    | '\'static'
+    | '\'_'
+    ;
 
 // 12.4
 simplePath
-   : '::'? simplePathSegment ('::' simplePathSegment)*
-   ;
+    : '::'? simplePathSegment ('::' simplePathSegment)*
+    ;
+
 simplePathSegment
-   : identifier
-   | 'super'
-   | 'self'
-   | 'crate'
-   | '$crate'
-   ;
+    : identifier
+    | 'super'
+    | 'self'
+    | 'crate'
+    | '$crate'
+    ;
 
 pathInExpression
-   : '::'? pathExprSegment ('::' pathExprSegment)*
-   ;
+    : '::'? pathExprSegment ('::' pathExprSegment)*
+    ;
+
 pathExprSegment
-   : pathIdentSegment ('::' genericArgs)?
-   ;
+    : pathIdentSegment ('::' genericArgs)?
+    ;
+
 pathIdentSegment
-   : identifier
-   | 'super'
-   | 'self'
-   | 'Self'
-   | 'crate'
-   | '$crate'
-   ;
+    : identifier
+    | 'super'
+    | 'self'
+    | 'Self'
+    | 'crate'
+    | '$crate'
+    ;
 
 //TODO: let x : T<_>=something;
 genericArgs
-   : '<' '>'
-   | '<' genericArgsLifetimes (',' genericArgsTypes)? (',' genericArgsBindings)? ','? '>'
-   | '<' genericArgsTypes (',' genericArgsBindings)? ','? '>'
-   | '<' (genericArg ',')* genericArg ','? '>'
-   ;
+    : '<' '>'
+    | '<' genericArgsLifetimes (',' genericArgsTypes)? (',' genericArgsBindings)? ','? '>'
+    | '<' genericArgsTypes (',' genericArgsBindings)? ','? '>'
+    | '<' (genericArg ',')* genericArg ','? '>'
+    ;
+
 genericArg
-   : lifetime
-   | type_
-   | genericArgsConst
-   | genericArgsBinding
-   ;
+    : lifetime
+    | type_
+    | genericArgsConst
+    | genericArgsBinding
+    ;
+
 genericArgsConst
-   : blockExpression
-   | '-'? literalExpression
-   | simplePathSegment
-   ;
+    : blockExpression
+    | '-'? literalExpression
+    | simplePathSegment
+    ;
+
 genericArgsLifetimes
-   : lifetime (',' lifetime)*
-   ;
+    : lifetime (',' lifetime)*
+    ;
+
 genericArgsTypes
-   : type_ (',' type_)*
-   ;
+    : type_ (',' type_)*
+    ;
+
 genericArgsBindings
-   : genericArgsBinding (',' genericArgsBinding)*
-   ;
+    : genericArgsBinding (',' genericArgsBinding)*
+    ;
+
 genericArgsBinding
-   : identifier '=' type_
-   ;
+    : identifier '=' type_
+    ;
 
 qualifiedPathInExpression
-   : qualifiedPathType ('::' pathExprSegment)+
-   ;
+    : qualifiedPathType ('::' pathExprSegment)+
+    ;
+
 qualifiedPathType
-   : '<' type_ ('as' typePath)? '>'
-   ;
+    : '<' type_ ('as' typePath)? '>'
+    ;
+
 qualifiedPathInType
-   : qualifiedPathType ('::' typePathSegment)+
-   ;
+    : qualifiedPathType ('::' typePathSegment)+
+    ;
 
 typePath
-   : '::'? typePathSegment ('::' typePathSegment)*
-   ;
+    : '::'? typePathSegment ('::' typePathSegment)*
+    ;
+
 typePathSegment
-   : pathIdentSegment '::'? (genericArgs | typePathFn)?
-   ;
+    : pathIdentSegment '::'? (genericArgs | typePathFn)?
+    ;
+
 typePathFn
-   : '(' typePathInputs? ')' ('->' type_)?
-   ;
+    : '(' typePathInputs? ')' ('->' type_)?
+    ;
+
 typePathInputs
-   : type_ (',' type_)* ','?
-   ;
+    : type_ (',' type_)* ','?
+    ;
 
 // 12.6
 visibility
-   : 'pub' ('(' ( 'crate' | 'self' | 'super' | 'in' simplePath) ')')?
-   ;
+    : 'pub' ('(' ( 'crate' | 'self' | 'super' | 'in' simplePath) ')')?
+    ;
 
 // technical
 identifier
-   : NON_KEYWORD_IDENTIFIER
-   | RAW_IDENTIFIER
-   | 'macro_rules'
-   ;
-keyword
-   : KW_AS
-   | KW_BREAK
-   | KW_CONST
-   | KW_CONTINUE
-   | KW_CRATE
-   | KW_ELSE
-   | KW_ENUM
-   | KW_EXTERN
-   | KW_FALSE
-   | KW_FN
-   | KW_FOR
-   | KW_IF
-   | KW_IMPL
-   | KW_IN
-   | KW_LET
-   | KW_LOOP
-   | KW_MATCH
-   | KW_MOD
-   | KW_MOVE
-   | KW_MUT
-   | KW_PUB
-   | KW_REF
-   | KW_RETURN
-   | KW_SELFVALUE
-   | KW_SELFTYPE
-   | KW_STATIC
-   | KW_STRUCT
-   | KW_SUPER
-   | KW_TRAIT
-   | KW_TRUE
-   | KW_TYPE
-   | KW_UNSAFE
-   | KW_USE
-   | KW_WHERE
-   | KW_WHILE
+    : NON_KEYWORD_IDENTIFIER
+    | RAW_IDENTIFIER
+    | 'macro_rules'
+    ;
 
-   // 2018+
-   | KW_ASYNC
-   | KW_AWAIT
-   | KW_DYN
-   // reserved
-   | KW_ABSTRACT
-   | KW_BECOME
-   | KW_BOX
-   | KW_DO
-   | KW_FINAL
-   | KW_MACRO
-   | KW_OVERRIDE
-   | KW_PRIV
-   | KW_TYPEOF
-   | KW_UNSIZED
-   | KW_VIRTUAL
-   | KW_YIELD
-   | KW_TRY
-   | KW_UNION
-   | KW_STATICLIFETIME
-   ;
+keyword
+    : KW_AS
+    | KW_BREAK
+    | KW_CONST
+    | KW_CONTINUE
+    | KW_CRATE
+    | KW_ELSE
+    | KW_ENUM
+    | KW_EXTERN
+    | KW_FALSE
+    | KW_FN
+    | KW_FOR
+    | KW_IF
+    | KW_IMPL
+    | KW_IN
+    | KW_LET
+    | KW_LOOP
+    | KW_MATCH
+    | KW_MOD
+    | KW_MOVE
+    | KW_MUT
+    | KW_PUB
+    | KW_REF
+    | KW_RETURN
+    | KW_SELFVALUE
+    | KW_SELFTYPE
+    | KW_STATIC
+    | KW_STRUCT
+    | KW_SUPER
+    | KW_TRAIT
+    | KW_TRUE
+    | KW_TYPE
+    | KW_UNSAFE
+    | KW_USE
+    | KW_WHERE
+    | KW_WHILE
+
+    // 2018+
+    | KW_ASYNC
+    | KW_AWAIT
+    | KW_DYN
+    // reserved
+    | KW_ABSTRACT
+    | KW_BECOME
+    | KW_BOX
+    | KW_DO
+    | KW_FINAL
+    | KW_MACRO
+    | KW_OVERRIDE
+    | KW_PRIV
+    | KW_TYPEOF
+    | KW_UNSIZED
+    | KW_VIRTUAL
+    | KW_YIELD
+    | KW_TRY
+    | KW_UNION
+    | KW_STATICLIFETIME
+    ;
+
 macroIdentifierLikeToken
-   : keyword
-   | identifier
-   | KW_MACRORULES
-   | KW_UNDERLINELIFETIME
-   | KW_DOLLARCRATE
-   | LIFETIME_OR_LABEL
-   ;
+    : keyword
+    | identifier
+    | KW_MACRORULES
+    | KW_UNDERLINELIFETIME
+    | KW_DOLLARCRATE
+    | LIFETIME_OR_LABEL
+    ;
+
 macroLiteralToken
-   : literalExpression
-   ;
+    : literalExpression
+    ;
+
 // macroDelimiterToken: '{' | '}' | '[' | ']' | '(' | ')';
 macroPunctuationToken
-   : '-'
-   //| '+' | '*'
-   | '/'
-   | '%'
-   | '^'
-   | '!'
-   | '&'
-   | '|'
-   | '&&'
-   | '||'
-   // already covered by '<' and '>' in macro | shl | shr
-   | '+='
-   | '-='
-   | '*='
-   | '/='
-   | '%='
-   | '^='
-   | '&='
-   | '|='
-   | '<<='
-   | '>>='
-   | '='
-   | '=='
-   | '!='
-   | '>'
-   | '<'
-   | '>='
-   | '<='
-   | '@'
-   | '_'
-   | '.'
-   | '..'
-   | '...'
-   | '..='
-   | ','
-   | ';'
-   | ':'
-   | '::'
-   | '->'
-   | '=>'
-   | '#'
-   //| '$' | '?'
-   ;
+    : '-'
+    //| '+' | '*'
+    | '/'
+    | '%'
+    | '^'
+    | '!'
+    | '&'
+    | '|'
+    | '&&'
+    | '||'
+    // already covered by '<' and '>' in macro | shl | shr
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '%='
+    | '^='
+    | '&='
+    | '|='
+    | '<<='
+    | '>>='
+    | '='
+    | '=='
+    | '!='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    | '@'
+    | '_'
+    | '.'
+    | '..'
+    | '...'
+    | '..='
+    | ','
+    | ';'
+    | ':'
+    | '::'
+    | '->'
+    | '=>'
+    | '#'
+    //| '$' | '?'
+    ;
 
 // LA can be removed, legal rust code still pass but the cost is `let c = a < < b` will pass... i hope antlr5 can add
 // some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
 
 shl
-   : '<' {this.next('<')}? '<'
-   ;
+    : '<' {this.next('<')}? '<'
+    ;
+
 shr
-   : '>' {this.next('>')}? '>'
-   ;
+    : '>' {this.next('>')}? '>'
+    ;

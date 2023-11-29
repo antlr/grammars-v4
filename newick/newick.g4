@@ -29,60 +29,63 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar newick;
 
 tree_
-   : ( (rootLeaf ';') | (rootInternal ';') | (branch ';') ) EOF
-   ;
+    : ((rootLeaf ';') | (rootInternal ';') | (branch ';')) EOF
+    ;
 
 rootLeaf
-   : name
-   | '(' branch ')' name
-   ;
+    : name
+    | '(' branch ')' name
+    ;
 
 rootInternal
-   : '(' branch ',' branchSet ')' name
-   ;
+    : '(' branch ',' branchSet ')' name
+    ;
 
 subtree
-   : leaf
-   | internal_
-   ;
+    : leaf
+    | internal_
+    ;
 
 leaf
-   : name
-   ;
+    : name
+    ;
 
 internal_
-   : '(' branchSet ')' name
-   ;
+    : '(' branchSet ')' name
+    ;
 
 branchSet
-   : branch
-   | branch ',' branchSet
-   ;
+    : branch
+    | branch ',' branchSet
+    ;
 
 branch
-   : subtree length
-   ;
+    : subtree length
+    ;
 
 name
-   : STRING?
-   ;
+    : STRING?
+    ;
 
 length
-   : (':' NUMBER)?
-   ;
+    : (':' NUMBER)?
+    ;
 
 NUMBER
-   : [0-9]+ ('.' [0-9]+)?
-   ;
+    : [0-9]+ ('.' [0-9]+)?
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9]*
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;
