@@ -30,79 +30,76 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar gml;
 
 graph
-   : kv + EOF
-   ;
+    : kv+ EOF
+    ;
 
 list_
-   : '[' kv + ']'
-   ;
+    : '[' kv+ ']'
+    ;
 
 kv
-   : key value
-   ;
+    : key value
+    ;
 
 value
-   : integer
-   | realnum
-   | stringliteral
-   | str_
-   | list_
-   ;
+    : integer
+    | realnum
+    | stringliteral
+    | str_
+    | list_
+    ;
 
 key
-   : VALUE
-   ;
+    : VALUE
+    ;
 
 integer
-   : SIGN? DIGIT +
-   ;
+    : SIGN? DIGIT+
+    ;
 
 realnum
-   : REAL
-   ;
+    : REAL
+    ;
 
 str_
-   : VALUE
-   ;
+    : VALUE
+    ;
 
 stringliteral
-   : STRINGLITERAL
-   ;
-
+    : STRINGLITERAL
+    ;
 
 STRINGLITERAL
-   : '"' ~ '"'* '"'
-   ;
-
+    : '"' ~ '"'* '"'
+    ;
 
 REAL
-   : SIGN? DIGIT* '.' DIGIT + MANTISSA?
-   ;
-
+    : SIGN? DIGIT* '.' DIGIT+ MANTISSA?
+    ;
 
 SIGN
-   : '+' | '-'
-   ;
-
+    : '+'
+    | '-'
+    ;
 
 DIGIT
-   : [0-9]
-   ;
-
+    : [0-9]
+    ;
 
 MANTISSA
-   : 'E' SIGN DIGIT
-   ;
-
+    : 'E' SIGN DIGIT
+    ;
 
 VALUE
-   : [a-zA-Z0-9] +
-   ;
-
+    : [a-zA-Z0-9]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

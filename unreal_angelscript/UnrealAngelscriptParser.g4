@@ -25,567 +25,755 @@
 	Based on the C++ grammar made by Camilo Sanchez (Camiloasc1) and Martin Mirchev (Marti2203). See the parser file.
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar UnrealAngelscriptParser;
+
 options {
-	tokenVocab = UnrealAngelscriptLexer;
+    tokenVocab = UnrealAngelscriptLexer;
 }
 
 /*Basic concepts*/
-script:
-	declarationseq? EOF;
+script
+    : declarationseq? EOF
+    ;
 
 /*Angelscript */
-annotationList:
-	annotation (Comma annotation)*;
+annotationList
+    : annotation (Comma annotation)*
+    ;
 
-annotation: 
-	Identifier (Assign expression)?;
+annotation
+    : Identifier (Assign expression)?
+    ;
 
-utype: 
-	(UClass | UStruct) LeftParen annotationList? RightParen;
+utype
+    : (UClass | UStruct) LeftParen annotationList? RightParen
+    ;
 
-uproperty:
-	UProperty LeftParen annotationList? RightParen;
+uproperty
+    : UProperty LeftParen annotationList? RightParen
+    ;
 
-ufunction:
-	UFunction LeftParen annotationList? RightParen;
+ufunction
+    : UFunction LeftParen annotationList? RightParen
+    ;
 
-moduleImport:
-	Import Identifier (Dot Identifier)* Semi
-	| Import declSpecifierSeq? declarator postFuncSpecifierSeq? From StringLiteral Semi
-	;
+moduleImport
+    : Import Identifier (Dot Identifier)* Semi
+    | Import declSpecifierSeq? declarator postFuncSpecifierSeq? From StringLiteral Semi
+    ;
 
-asGeneric:
-	Identifier Less simpleTypeSpecifierList Greater;
-	
-simpleTypeSpecifierList:
-	declSpecifierSeq (Comma declSpecifierSeq)*;
+asGeneric
+    : Identifier Less simpleTypeSpecifierList Greater
+    ;
 
-booleanLiteral: False_ | True_;
+simpleTypeSpecifierList
+    : declSpecifierSeq (Comma declSpecifierSeq)*
+    ;
+
+booleanLiteral
+    : False_
+    | True_
+    ;
 
 /*Expressions*/
 
-primaryExpression:
-	literal+
-	| This
-	| LeftParen expression RightParen
-	| idExpression
-	| lambdaExpression;
+primaryExpression
+    : literal+
+    | This
+    | LeftParen expression RightParen
+    | idExpression
+    | lambdaExpression
+    ;
 
-idExpression: unqualifiedId | qualifiedId;
+idExpression
+    : unqualifiedId
+    | qualifiedId
+    ;
 
-unqualifiedId:
-	Identifier
-	| operatorFunctionId
-	| literalOperatorId
-	| Tilde (className | decltypeSpecifier);
+unqualifiedId
+    : Identifier
+    | operatorFunctionId
+    | literalOperatorId
+    | Tilde (className | decltypeSpecifier)
+    ;
 
-qualifiedId: nestedNameSpecifier unqualifiedId;
+qualifiedId
+    : nestedNameSpecifier unqualifiedId
+    ;
 
-nestedNameSpecifier:
-	(theTypeName | namespaceName | decltypeSpecifier)? Doublecolon
-	| nestedNameSpecifier Identifier Doublecolon;
-lambdaExpression:
-	lambdaIntroducer lambdaDeclarator? compoundStatement;
+nestedNameSpecifier
+    : (theTypeName | namespaceName | decltypeSpecifier)? Doublecolon
+    | nestedNameSpecifier Identifier Doublecolon
+    ;
 
-lambdaIntroducer: LeftBracket lambdaCapture? RightBracket;
+lambdaExpression
+    : lambdaIntroducer lambdaDeclarator? compoundStatement
+    ;
 
-lambdaCapture:
-	captureList
-	| captureDefault (Comma captureList)?;
+lambdaIntroducer
+    : LeftBracket lambdaCapture? RightBracket
+    ;
 
-captureDefault: And | Assign;
+lambdaCapture
+    : captureList
+    | captureDefault (Comma captureList)?
+    ;
 
-captureList: capture (Comma capture)*;
+captureDefault
+    : And
+    | Assign
+    ;
 
-capture: simpleCapture | initcapture;
+captureList
+    : capture (Comma capture)*
+    ;
 
-simpleCapture: And? Identifier | This;
+capture
+    : simpleCapture
+    | initcapture
+    ;
 
-initcapture: And? Identifier initializer;
+simpleCapture
+    : And? Identifier
+    | This
+    ;
 
-lambdaDeclarator: LeftParen parameterDeclarationClause? RightParen;
+initcapture
+    : And? Identifier initializer
+    ;
 
-postfixExpression:
-	primaryExpression
-	| postfixExpression LeftBracket (expression | bracedInitList) RightBracket
-	| assertSpecifier LeftParen expressionList? RightParen
-	| postfixExpression LeftParen expressionList? RightParen
-	| simpleTypeSpecifier (
-		LeftParen expressionList? RightParen
-		| bracedInitList
-	)
-	| postfixExpression Dot (
-		idExpression
-		| pseudoDestructorName
-	)
-	| postfixExpression (PlusPlus | MinusMinus)
-	| Cast Less theTypeId Greater LeftParen expression RightParen
-	| LeftParen (expression | theTypeId) RightParen;
+lambdaDeclarator
+    : LeftParen parameterDeclarationClause? RightParen
+    ;
+
+postfixExpression
+    : primaryExpression
+    | postfixExpression LeftBracket (expression | bracedInitList) RightBracket
+    | assertSpecifier LeftParen expressionList? RightParen
+    | postfixExpression LeftParen expressionList? RightParen
+    | simpleTypeSpecifier ( LeftParen expressionList? RightParen | bracedInitList)
+    | postfixExpression Dot ( idExpression | pseudoDestructorName)
+    | postfixExpression (PlusPlus | MinusMinus)
+    | Cast Less theTypeId Greater LeftParen expression RightParen
+    | LeftParen (expression | theTypeId) RightParen
+    ;
+
 /*
  add a middle layer to eliminate duplicated function declarations
  */
 
-expressionList: initializerList;
+expressionList
+    : initializerList
+    ;
 
-pseudoDestructorName:
-	nestedNameSpecifier? (theTypeName Doublecolon)? Tilde theTypeName
-	| nestedNameSpecifier Doublecolon Tilde theTypeName
-	| Tilde decltypeSpecifier;
+pseudoDestructorName
+    : nestedNameSpecifier? (theTypeName Doublecolon)? Tilde theTypeName
+    | nestedNameSpecifier Doublecolon Tilde theTypeName
+    | Tilde decltypeSpecifier
+    ;
 
-unaryExpression:
-	postfixExpression
-	| (PlusPlus | MinusMinus | unaryOperator) unaryExpression
-	| LeftParen theTypeId RightParen;
+unaryExpression
+    : postfixExpression
+    | (PlusPlus | MinusMinus | unaryOperator) unaryExpression
+    | LeftParen theTypeId RightParen
+    ;
 
-unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
+unaryOperator
+    : Or
+    | Star
+    | And
+    | Plus
+    | Tilde
+    | Minus
+    | Not
+    ;
 
-newPlacement: LeftParen expressionList RightParen;
+newPlacement
+    : LeftParen expressionList RightParen
+    ;
 
-newInitializer_:
-	LeftParen expressionList? RightParen
-	| bracedInitList;
+newInitializer_
+    : LeftParen expressionList? RightParen
+    | bracedInitList
+    ;
 
-castExpression:
-	unaryExpression
-	| Cast Less theTypeId Greater LeftParen castExpression RightParen;
+castExpression
+    : unaryExpression
+    | Cast Less theTypeId Greater LeftParen castExpression RightParen
+    ;
 
-multiplicativeExpression:
-	castExpression (
-		(Star | Div | Mod) castExpression
-	)*;
+multiplicativeExpression
+    : castExpression ((Star | Div | Mod) castExpression)*
+    ;
 
-additiveExpression:
-	multiplicativeExpression (
-		(Plus | Minus) multiplicativeExpression
-	)*;
+additiveExpression
+    : multiplicativeExpression ((Plus | Minus) multiplicativeExpression)*
+    ;
 
-shiftExpression:
-	additiveExpression (shiftOperator additiveExpression)*;
+shiftExpression
+    : additiveExpression (shiftOperator additiveExpression)*
+    ;
 
-shiftOperator: Greater Greater | Less Less;
+shiftOperator
+    : Greater Greater
+    | Less Less
+    ;
 
-relationalExpression:
-	shiftExpression (
-		(Less | Greater | LessEqual | GreaterEqual) shiftExpression
-	)*;
+relationalExpression
+    : shiftExpression ((Less | Greater | LessEqual | GreaterEqual) shiftExpression)*
+    ;
 
-equalityExpression:
-	relationalExpression (
-		(Equal | NotEqual) relationalExpression
-	)*;
+equalityExpression
+    : relationalExpression ((Equal | NotEqual) relationalExpression)*
+    ;
 
-andExpression: equalityExpression (And equalityExpression)*;
+andExpression
+    : equalityExpression (And equalityExpression)*
+    ;
 
-exclusiveOrExpression: andExpression (Xor andExpression)*;
+exclusiveOrExpression
+    : andExpression (Xor andExpression)*
+    ;
 
-inclusiveOrExpression:
-	exclusiveOrExpression (Or exclusiveOrExpression)*;
+inclusiveOrExpression
+    : exclusiveOrExpression (Or exclusiveOrExpression)*
+    ;
 
-logicalAndExpression:
-	inclusiveOrExpression (AndAnd inclusiveOrExpression)*;
+logicalAndExpression
+    : inclusiveOrExpression (AndAnd inclusiveOrExpression)*
+    ;
 
-logicalOrExpression:
-	logicalAndExpression (OrOr logicalAndExpression)*;
+logicalOrExpression
+    : logicalAndExpression (OrOr logicalAndExpression)*
+    ;
 
-conditionalExpression:
-	logicalOrExpression (
-		Question expression Colon assignmentExpression
-	)?;
+conditionalExpression
+    : logicalOrExpression (Question expression Colon assignmentExpression)?
+    ;
 
-assignmentExpression:
-	conditionalExpression
-	| logicalOrExpression assignmentOperator initializerClause;
+assignmentExpression
+    : conditionalExpression
+    | logicalOrExpression assignmentOperator initializerClause
+    ;
 
-assignmentOperator:
-	Assign
-	| StarAssign
-	| DivAssign
-	| ModAssign
-	| PlusAssign
-	| MinusAssign
-	| RightShiftAssign
-	| LeftShiftAssign
-	| AndAssign
-	| XorAssign
-	| OrAssign;
+assignmentOperator
+    : Assign
+    | StarAssign
+    | DivAssign
+    | ModAssign
+    | PlusAssign
+    | MinusAssign
+    | RightShiftAssign
+    | LeftShiftAssign
+    | AndAssign
+    | XorAssign
+    | OrAssign
+    ;
 
-expression: assignmentExpression (Comma assignmentExpression)*;
+expression
+    : assignmentExpression (Comma assignmentExpression)*
+    ;
 
-constantExpression: conditionalExpression;
+constantExpression
+    : conditionalExpression
+    ;
+
 /*Statements*/
 
-statement:
-	labeledStatement
-	| declarationStatement
-	| (expressionStatement
-		| compoundStatement
-		| selectionStatement
-		| iterationStatement
-		| jumpStatement
-	);
+statement
+    : labeledStatement
+    | declarationStatement
+    | (
+        expressionStatement
+        | compoundStatement
+        | selectionStatement
+        | iterationStatement
+        | jumpStatement
+    )
+    ;
 
-labeledStatement:
-	(Identifier
-		| Case constantExpression
-		| Default
-	) Colon statement;
+labeledStatement
+    : (Identifier | Case constantExpression | Default) Colon statement
+    ;
 
-expressionStatement: expression? Semi;
+expressionStatement
+    : expression? Semi
+    ;
 
-compoundStatement: LeftBrace statementSeq? RightBrace;
+compoundStatement
+    : LeftBrace statementSeq? RightBrace
+    ;
 
-statementSeq: statement+;
+statementSeq
+    : statement+
+    ;
 
-selectionStatement:
-	If LeftParen condition RightParen statement (Else statement)?
-	| Switch LeftParen condition RightParen statement;
+selectionStatement
+    : If LeftParen condition RightParen statement (Else statement)?
+    | Switch LeftParen condition RightParen statement
+    ;
 
-condition:
-	expression
-	| declSpecifierSeq declarator (
-		Assign initializerClause
-		| bracedInitList
-	);
+condition
+    : expression
+    | declSpecifierSeq declarator ( Assign initializerClause | bracedInitList)
+    ;
 
-iterationStatement:
-	While LeftParen condition RightParen statement
-	| Do statement While LeftParen expression RightParen Semi
-	| For LeftParen (
-		forInitStatement condition? Semi expression?
-		| forRangeDeclaration Colon forRangeInitializer
-	) RightParen statement;
+iterationStatement
+    : While LeftParen condition RightParen statement
+    | Do statement While LeftParen expression RightParen Semi
+    | For LeftParen (
+        forInitStatement condition? Semi expression?
+        | forRangeDeclaration Colon forRangeInitializer
+    ) RightParen statement
+    ;
 
-forInitStatement: expressionStatement | simpleDeclaration;
+forInitStatement
+    : expressionStatement
+    | simpleDeclaration
+    ;
 
-forRangeDeclaration:
-	declSpecifierSeq Identifier;
+forRangeDeclaration
+    : declSpecifierSeq Identifier
+    ;
 
-forRangeInitializer: expression | bracedInitList;
+forRangeInitializer
+    : expression
+    | bracedInitList
+    ;
 
-jumpStatement:
-	(
-		Break
-		| Continue
-		| Return (expression | bracedInitList)?
-		| Goto Identifier
-	) Semi;
+jumpStatement
+    : (Break | Continue | Return (expression | bracedInitList)? | Goto Identifier) Semi
+    ;
 
-declarationStatement: blockDeclaration;
-
-
+declarationStatement
+    : blockDeclaration
+    ;
 
 /*Declarations*/
 
-declarationseq: declaration+;
+declarationseq
+    : declaration+
+    ;
 
-declaration:
-	moduleImport
-	| blockDeclaration
-	| functionDefinition
-	| namespaceDefinition
-	| emptyDeclaration_;
+declaration
+    : moduleImport
+    | blockDeclaration
+    | functionDefinition
+    | namespaceDefinition
+    | emptyDeclaration_
+    ;
 
-blockDeclaration:
-	simpleDeclaration
-	| namespaceAliasDefinition
-	| aliasDeclaration
-	| opaqueEnumDeclaration;
+blockDeclaration
+    : simpleDeclaration
+    | namespaceAliasDefinition
+    | aliasDeclaration
+    | opaqueEnumDeclaration
+    ;
 
-aliasDeclaration: Identifier Assign theTypeId Semi;
+aliasDeclaration
+    : Identifier Assign theTypeId Semi
+    ;
 
-simpleDeclaration:
-	declSpecifierSeq? (initDeclaratorList | assignmentExpression)? Semi;
+simpleDeclaration
+    : declSpecifierSeq? (initDeclaratorList | assignmentExpression)? Semi
+    ;
 
-emptyDeclaration_: Semi;
+emptyDeclaration_
+    : Semi
+    ;
 
-declSpecifier:
-	typeSpecifier
-	| functionSpecifier;
-	
-declSpecifierSeq: declSpecifier+?;
+declSpecifier
+    : typeSpecifier
+    | functionSpecifier
+    ;
 
-functionSpecifier: Virtual;
+declSpecifierSeq
+    : declSpecifier+?
+    ;
 
-typedefName: Identifier;
+functionSpecifier
+    : Virtual
+    ;
 
-typeSpecifier:
-	trailingTypeSpecifier
-	| classSpecifier
-	| enumSpecifier;
+typedefName
+    : Identifier
+    ;
 
-trailingTypeSpecifier:
-	simpleTypeSpecifier
-	| elaboratedTypeSpecifier
-	| Const
-	| And
-	| Out;
+typeSpecifier
+    : trailingTypeSpecifier
+    | classSpecifier
+    | enumSpecifier
+    ;
 
-typeSpecifierSeq: typeSpecifier+;
+trailingTypeSpecifier
+    : simpleTypeSpecifier
+    | elaboratedTypeSpecifier
+    | Const
+    | And
+    | Out
+    ;
 
-trailingTypeSpecifierSeq:
-	trailingTypeSpecifier+;
+typeSpecifierSeq
+    : typeSpecifier+
+    ;
 
-simpleTypeSpecifier:
-	nestedNameSpecifier? theTypeName
-	| asGeneric
-	| Int
-	| Int8
-	| Int16
-	| Int32
-	| Int64
-	| UInt
-	| UInt8
-	| UInt16
-	| UInt32
-	| UInt64
-	| Float
-	| Double
-	| Bool
-	| Void
-	| Auto
-	| decltypeSpecifier;
+trailingTypeSpecifierSeq
+    : trailingTypeSpecifier+
+    ;
 
-assertSpecifier:
-	Ensure
-	| EnsureAlways
-	| Check;
+simpleTypeSpecifier
+    : nestedNameSpecifier? theTypeName
+    | asGeneric
+    | Int
+    | Int8
+    | Int16
+    | Int32
+    | Int64
+    | UInt
+    | UInt8
+    | UInt16
+    | UInt32
+    | UInt64
+    | Float
+    | Double
+    | Bool
+    | Void
+    | Auto
+    | decltypeSpecifier
+    ;
 
-theTypeName:
-	className
-	| enumName
-	| typedefName;
+assertSpecifier
+    : Ensure
+    | EnsureAlways
+    | Check
+    ;
 
-decltypeSpecifier: LeftParen (expression | Auto) RightParen;
+theTypeName
+    : className
+    | enumName
+    | typedefName
+    ;
 
-elaboratedTypeSpecifier:
-	classKey (nestedNameSpecifier? Identifier | nestedNameSpecifier)
-	| Enum nestedNameSpecifier? Identifier;
+decltypeSpecifier
+    : LeftParen (expression | Auto) RightParen
+    ;
 
-enumName: Identifier;
+elaboratedTypeSpecifier
+    : classKey (nestedNameSpecifier? Identifier | nestedNameSpecifier)
+    | Enum nestedNameSpecifier? Identifier
+    ;
 
-enumSpecifier:
-	enumHead LeftBrace (enumeratorList Comma?)? RightBrace;
+enumName
+    : Identifier
+    ;
 
-enumHead:
-	enumkey (nestedNameSpecifier? Identifier)? enumbase?;
+enumSpecifier
+    : enumHead LeftBrace (enumeratorList Comma?)? RightBrace
+    ;
 
-opaqueEnumDeclaration:
-	enumkey Identifier enumbase? Semi;
+enumHead
+    : enumkey (nestedNameSpecifier? Identifier)? enumbase?
+    ;
 
-enumkey: Enum;
+opaqueEnumDeclaration
+    : enumkey Identifier enumbase? Semi
+    ;
 
-enumbase: Colon typeSpecifierSeq;
+enumkey
+    : Enum
+    ;
 
-enumeratorList:
-	enumeratorDefinition (Comma enumeratorDefinition)*;
+enumbase
+    : Colon typeSpecifierSeq
+    ;
 
-enumeratorDefinition: enumerator (Assign constantExpression)?;
+enumeratorList
+    : enumeratorDefinition (Comma enumeratorDefinition)*
+    ;
 
-enumerator: Identifier;
+enumeratorDefinition
+    : enumerator (Assign constantExpression)?
+    ;
 
-namespaceName: originalNamespaceName | namespaceAlias;
+enumerator
+    : Identifier
+    ;
 
-originalNamespaceName: Identifier;
+namespaceName
+    : originalNamespaceName
+    | namespaceAlias
+    ;
 
-namespaceDefinition:
-	Namespace (Identifier | originalNamespaceName)? LeftBrace namespaceBody = declarationseq
-		? RightBrace;
+originalNamespaceName
+    : Identifier
+    ;
 
-namespaceAlias: Identifier;
+namespaceDefinition
+    : Namespace (Identifier | originalNamespaceName)? LeftBrace namespaceBody = declarationseq? RightBrace
+    ;
 
-namespaceAliasDefinition: Namespace Identifier Assign qualifiednamespacespecifier Semi;
+namespaceAlias
+    : Identifier
+    ;
 
-qualifiednamespacespecifier: nestedNameSpecifier? namespaceName;
+namespaceAliasDefinition
+    : Namespace Identifier Assign qualifiednamespacespecifier Semi
+    ;
 
-balancedTokenSeq: balancedtoken+;
+qualifiednamespacespecifier
+    : nestedNameSpecifier? namespaceName
+    ;
 
-balancedtoken:
-	LeftParen balancedTokenSeq RightParen
-	| LeftBracket balancedTokenSeq RightBracket
-	| LeftBrace balancedTokenSeq RightBrace
-	| ~(
-		LeftParen
-		| RightParen
-		| LeftBrace
-		| RightBrace
-		| LeftBracket
-		| RightBracket
-	)+;
+balancedTokenSeq
+    : balancedtoken+
+    ;
 
-
+balancedtoken
+    : LeftParen balancedTokenSeq RightParen
+    | LeftBracket balancedTokenSeq RightBracket
+    | LeftBrace balancedTokenSeq RightBrace
+    | ~(LeftParen | RightParen | LeftBrace | RightBrace | LeftBracket | RightBracket)+
+    ;
 
 /*Declarators*/
 
-initDeclaratorList: initDeclarator (Comma initDeclarator)*;
+initDeclaratorList
+    : initDeclarator (Comma initDeclarator)*
+    ;
 
-initDeclarator: Identifier initializer?;
+initDeclarator
+    : Identifier initializer?
+    ;
 
-declarator:	declaratorDef parametersAndQualifiers;
+declarator
+    : declaratorDef parametersAndQualifiers
+    ;
 
-declaratorDef:
-	declaratorid | declaratorDef (parametersAndQualifiers | LeftBracket constantExpression? RightBracket);
+declaratorDef
+    : declaratorid
+    | declaratorDef (parametersAndQualifiers | LeftBracket constantExpression? RightBracket)
+    ;
 
-parametersAndQualifiers:
-	LeftParen parameterDeclarationClause? RightParen Const? refqualifier?;
+parametersAndQualifiers
+    : LeftParen parameterDeclarationClause? RightParen Const? refqualifier?
+    ;
 
-refqualifier: And | AndAnd;
+refqualifier
+    : And
+    | AndAnd
+    ;
 
-declaratorid: idExpression;
+declaratorid
+    : idExpression
+    ;
 
-theTypeId: typeSpecifierSeq;
+theTypeId
+    : typeSpecifierSeq
+    ;
 
-parameterDeclarationClause:	parameterDeclarationList;
+parameterDeclarationClause
+    : parameterDeclarationList
+    ;
 
-parameterDeclarationList:
-	parameterDeclaration (Comma parameterDeclaration)*;
+parameterDeclarationList
+    : parameterDeclaration (Comma parameterDeclaration)*
+    ;
 
-parameterDeclaration:
-	declSpecifierSeq Identifier? (Assign initializerClause)?;
+parameterDeclaration
+    : declSpecifierSeq Identifier? (Assign initializerClause)?
+    ;
 
-functionDefinition:
-	ufunction? accessSpecifier? Mixin? declSpecifierSeq? declarator postFuncSpecifierSeq? functionBody;
+functionDefinition
+    : ufunction? accessSpecifier? Mixin? declSpecifierSeq? declarator postFuncSpecifierSeq? functionBody
+    ;
 
-functionBody:
-	compoundStatement
-	| Assign Default Semi
-	| Semi;
+functionBody
+    : compoundStatement
+    | Assign Default Semi
+    | Semi
+    ;
 
-initializer:
-	braceOrEqualInitializer
-	| LeftParen expressionList RightParen;
+initializer
+    : braceOrEqualInitializer
+    | LeftParen expressionList RightParen
+    ;
 
-braceOrEqualInitializer:
-	Assign initializerClause
-	| bracedInitList;
+braceOrEqualInitializer
+    : Assign initializerClause
+    | bracedInitList
+    ;
 
-initializerClause: assignmentExpression | bracedInitList;
+initializerClause
+    : assignmentExpression
+    | bracedInitList
+    ;
 
-initializerList:
-	initializerClause (Comma initializerClause)* Comma?; // I *really* don't like that trailing commas are a thing in AS...
+initializerList
+    : initializerClause (Comma initializerClause)* Comma?
+    ; // I *really* don't like that trailing commas are a thing in AS...
 
-bracedInitList: (LeftBrace|LeftBracket) (initializerList Comma?)? (RightBrace|RightBracket);
-
-
+bracedInitList
+    : (LeftBrace | LeftBracket) (initializerList Comma?)? (RightBrace | RightBracket)
+    ;
 
 /*Classes*/
 
-className: Identifier;
+className
+    : Identifier
+    ;
 
-classSpecifier:
-	classHead LeftBrace memberSpecification? RightBrace;
+classSpecifier
+    : classHead LeftBrace memberSpecification? RightBrace
+    ;
 
-classHead:
-	utype? classKey (classHeadName classVirtSpecifier?)? baseClause?;
+classHead
+    : utype? classKey (classHeadName classVirtSpecifier?)? baseClause?
+    ;
 
-classHeadName: nestedNameSpecifier? className;
+classHeadName
+    : nestedNameSpecifier? className
+    ;
 
-classVirtSpecifier: Final;
+classVirtSpecifier
+    : Final
+    ;
 
-classKey: Class | Struct;
+classKey
+    : Class
+    | Struct
+    ;
 
-memberSpecification:
-	(memberdeclaration | accessSpecifier Colon)+;
+memberSpecification
+    : (memberdeclaration | accessSpecifier Colon)+
+    ;
 
-memberdeclaration:
-	propertyDefinition
-	| functionDefinition
-	| aliasDeclaration
-	| emptyDeclaration_;
+memberdeclaration
+    : propertyDefinition
+    | functionDefinition
+    | aliasDeclaration
+    | emptyDeclaration_
+    ;
 
-propertyDefinition:
-	uproperty? accessSpecifier? Default? declSpecifierSeq? (memberDeclaratorList | assignmentExpression)? Semi;
+propertyDefinition
+    : uproperty? accessSpecifier? Default? declSpecifierSeq? (
+        memberDeclaratorList
+        | assignmentExpression
+    )? Semi
+    ;
 
-memberDeclaratorList:
-	memberDeclarator (Comma memberDeclarator)*;
+memberDeclaratorList
+    : memberDeclarator (Comma memberDeclarator)*
+    ;
 
-memberDeclarator:
-	declarator (
-		postFuncSpecifierSeq?
-		| braceOrEqualInitializer?
-	)
-	| Identifier? Colon constantExpression
-	| Identifier;
+memberDeclarator
+    : declarator (postFuncSpecifierSeq? | braceOrEqualInitializer?)
+    | Identifier? Colon constantExpression
+    | Identifier
+    ;
 
-postFuncSpecifierSeq: virtualSpecifier+;
+postFuncSpecifierSeq
+    : virtualSpecifier+
+    ;
 
-virtualSpecifier: Override | Final | Property;
+virtualSpecifier
+    : Override
+    | Final
+    | Property
+    ;
 
 /*Derived classes*/
 
-baseClause: Colon baseSpecifierList;
+baseClause
+    : Colon baseSpecifierList
+    ;
 
-baseSpecifierList: baseSpecifier (Comma baseSpecifier)*;
+baseSpecifierList
+    : baseSpecifier (Comma baseSpecifier)*
+    ;
 
-baseSpecifier:
-	(
-		baseTypeSpecifier
-		| Virtual accessSpecifier? baseTypeSpecifier
-		| accessSpecifier Virtual? baseTypeSpecifier
-	);
+baseSpecifier
+    : (
+        baseTypeSpecifier
+        | Virtual accessSpecifier? baseTypeSpecifier
+        | accessSpecifier Virtual? baseTypeSpecifier
+    )
+    ;
 
-classOrDeclType:
-	nestedNameSpecifier? className
-	| decltypeSpecifier;
+classOrDeclType
+    : nestedNameSpecifier? className
+    | decltypeSpecifier
+    ;
 
-baseTypeSpecifier: classOrDeclType;
+baseTypeSpecifier
+    : classOrDeclType
+    ;
 
-accessSpecifier: Private | Protected | Public;
+accessSpecifier
+    : Private
+    | Protected
+    | Public
+    ;
 
 /*Overloading*/
 
-operatorFunctionId: Operator theOperator;
+operatorFunctionId
+    : Operator theOperator
+    ;
 
-literalOperatorId:
-	Operator (
-		StringLiteral Identifier
-		| UserDefinedStringLiteral
-	);
+literalOperatorId
+    : Operator (StringLiteral Identifier | UserDefinedStringLiteral)
+    ;
 
 /*Lexer*/
 
-theOperator:
-	| Plus
-	| Minus
-	| Star
-	| Div
-	| Mod
-	| Xor
-	| And
-	| Or
-	| Tilde
-	| Not
-	| Assign
-	| Greater
-	| Less
-	| GreaterEqual
-	| PlusAssign
-	| MinusAssign
-	| StarAssign
-	| ModAssign
-	| XorAssign
-	| AndAssign
-	| OrAssign
-	| Less Less
-	| Greater Greater
-	| RightShiftAssign
-	| LeftShiftAssign
-	| Equal
-	| NotEqual
-	| LessEqual
-	| AndAnd
-	| OrOr
-	| PlusPlus
-	| MinusMinus
-	| Comma
-	| LeftParen RightParen
-	| LeftBracket RightBracket;
+theOperator
+    :
+    | Plus
+    | Minus
+    | Star
+    | Div
+    | Mod
+    | Xor
+    | And
+    | Or
+    | Tilde
+    | Not
+    | Assign
+    | Greater
+    | Less
+    | GreaterEqual
+    | PlusAssign
+    | MinusAssign
+    | StarAssign
+    | ModAssign
+    | XorAssign
+    | AndAssign
+    | OrAssign
+    | Less Less
+    | Greater Greater
+    | RightShiftAssign
+    | LeftShiftAssign
+    | Equal
+    | NotEqual
+    | LessEqual
+    | AndAnd
+    | OrOr
+    | PlusPlus
+    | MinusMinus
+    | Comma
+    | LeftParen RightParen
+    | LeftBracket RightBracket
+    ;
 
-literal:
-	IntegerLiteral
-	| CharacterLiteral
-	| FloatingLiteral
-	| StringLiteral
-	| booleanLiteral
-	| UserDefinedLiteral
-	| Nullptr;
+literal
+    : IntegerLiteral
+    | CharacterLiteral
+    | FloatingLiteral
+    | StringLiteral
+    | booleanLiteral
+    | UserDefinedLiteral
+    | Nullptr
+    ;

@@ -21,9 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar PhoenixParser;
 
-options { tokenVocab=PhoenixLexer; }
+options {
+    tokenVocab = PhoenixLexer;
+}
 
 phoenix_file
     : batch* EOF
@@ -76,12 +81,11 @@ other_command
     ;
 
 alter_command
-    : ALTER (TABLE | VIEW)? table_ref
-      (
-          ADD if_not_exists? column_def_list options_?
+    : ALTER (TABLE | VIEW)? table_ref (
+        ADD if_not_exists? column_def_list options_?
         | DROP COLUMN if_exists? column_ref_list
         | SET options_
-      )
+    )
     ;
 
 alter_index_command
@@ -89,15 +93,15 @@ alter_index_command
     ;
 
 create_function_command
-    : CREATE TEMPORARY? FUNCTION func_name '(' func_argument_list ')' RETURNS data_type AS class_name (USING JAR jar_path)?
+    : CREATE TEMPORARY? FUNCTION func_name '(' func_argument_list ')' RETURNS data_type AS class_name (
+        USING JAR jar_path
+    )?
     ;
 
 create_index_command
-    : CREATE LOCAL? INDEX if_not_exists? index_name ON table_ref '(' expression_asc_desc_list ')'
-        (INCLUDE '(' column_ref_list ')')?
-        ASYNC?
-        index_options?
-        (SPLIT ON split_point_list)?
+    : CREATE LOCAL? INDEX if_not_exists? index_name ON table_ref '(' expression_asc_desc_list ')' (
+        INCLUDE '(' column_ref_list ')'
+    )? ASYNC? index_options? (SPLIT ON split_point_list)?
     ;
 
 create_schema_command
@@ -105,25 +109,23 @@ create_schema_command
     ;
 
 create_sequence_command
-    : CREATE SEQUENCE if_not_exists? sequence_ref
-        (START WITH? bind_parameter_number)?
-        (INCREMENT BY? bind_parameter_number)?
-        (MINVALUE bind_parameter_number)?
-        (MAXVALUE bind_parameter_number)?
-        CYCLE?
-        (CACHE bind_parameter_number)?
+    : CREATE SEQUENCE if_not_exists? sequence_ref (START WITH? bind_parameter_number)? (
+        INCREMENT BY? bind_parameter_number
+    )? (MINVALUE bind_parameter_number)? (MAXVALUE bind_parameter_number)? CYCLE? (
+        CACHE bind_parameter_number
+    )?
     ;
 
 create_table_command
-    : CREATE TABLE if_not_exists? table_ref '(' column_def_list constraint? ')'
-        table_options?
-        (SPLIT ON '(' split_point_list ')')?
+    : CREATE TABLE if_not_exists? table_ref '(' column_def_list constraint? ')' table_options? (
+        SPLIT ON '(' split_point_list ')'
+    )?
     ;
 
 create_view_command
-    : CREATE VIEW if_not_exists? new_table_ref ('(' column_def_list ')')?
-        (AS SELECT '*' FROM existing_table_ref (WHERE expression)? )?
-        table_options?
+    : CREATE VIEW if_not_exists? new_table_ref ('(' column_def_list ')')? (
+        AS SELECT '*' FROM existing_table_ref (WHERE expression)?
+    )? table_options?
     ;
 
 constraint
@@ -280,7 +282,7 @@ revoke_command
     ;
 
 on_schema_table
-    : ON (SCHEMA schema_name | table_ref )
+    : ON (SCHEMA schema_name | table_ref)
     ;
 
 permission_string
@@ -300,9 +302,9 @@ guide_post_options
     ;
 
 upsert_values_command
-    : UPSERT INTO table_name ('(' (column_ref_list | column_def_list) ')')?
-        VALUES '(' literal (',' literal)* ')'
-        (ON DUPLICATE KEY (IGNORE | UPDATE column_ref '=' expression))?
+    : UPSERT INTO table_name ('(' (column_ref_list | column_def_list) ')')? VALUES '(' literal (
+        ',' literal
+    )* ')' (ON DUPLICATE KEY (IGNORE | UPDATE column_ref '=' expression))?
     ;
 
 column_ref_list
@@ -319,9 +321,7 @@ upsert_select_command
 
 delete_command
     : DELETE hint? FROM table_name //TODO hint
-        where_clause?
-        order_by_clause?
-        limit_clause?
+    where_clause? order_by_clause? limit_clause?
     ;
 
 order_by_clause
@@ -341,19 +341,16 @@ where_clause
     ;
 
 select_command
-    : select_statement union_list?
-      order_by_clause?
-      limit_clause?
-      (OFFSET bind_parameter_number row_rows?)?
-      (FETCH first_next bind_parameter_number row_rows? ONLY)?
+    : select_statement union_list? order_by_clause? limit_clause? (
+        OFFSET bind_parameter_number row_rows?
+    )? (FETCH first_next bind_parameter_number row_rows? ONLY)?
     ;
 
 select_statement
     : SELECT hint? (DISTINCT | ALL)? select_expression (',' select_expression)* //TODO hint
-      FROM table_spec join_list?
-      where_clause?
-      (GROUP BY expression (',' expression)* )?
-      (HAVING expression)?
+    FROM table_spec join_list? where_clause? (GROUP BY expression (',' expression)*)? (
+        HAVING expression
+    )?
     ;
 
 union_list
@@ -483,11 +480,13 @@ name
 
 table_spec
     : aliased_table_ref
-    | '(' select_command')' (AS? table_alias)?
+    | '(' select_command ')' (AS? table_alias)?
     ;
 
 aliased_table_ref
-    : table_ref (AS? table_alias)? ('(' column_def (',' column_def)? ')')? (TABLESAMPLE '(' positive_decimal ')')?
+    : table_ref (AS? table_alias)? ('(' column_def (',' column_def)? ')')? (
+        TABLESAMPLE '(' positive_decimal ')'
+    )?
     ;
 
 table_alias
@@ -507,7 +506,7 @@ table_name
     ;
 
 column_def
-    : column_ref data_type (NOT? NULL_)? (DEFAULT literal)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP? )?
+    : column_ref data_type (NOT? NULL_)? (DEFAULT literal)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP?)?
     ;
 
 column_ref
@@ -549,7 +548,7 @@ expression
     | expression comp_op any_all LP (select_command) RP
     | expression (LIKE | ILIKE) expression
     | expression IS NOT? NULL_
-    | expression NOT? IN LP (select_command | expression_list ) RP
+    | expression NOT? IN LP (select_command | expression_list) RP
     | expression NOT? BETWEEN expression AND expression
     | NOT? EXISTS LP select_command RP
     | ID LP expression_list RP
@@ -565,7 +564,13 @@ expression
     ;
 
 comp_op
-    : EQ | GT | GE | LT | LE | NE | NE2
+    : EQ
+    | GT
+    | GE
+    | LT
+    | LE
+    | NE
+    | NE2
     ;
 
 expression_list
@@ -602,18 +607,13 @@ true_false
     ;
 
 case
-    : CASE expression
-        WHEN expression THEN expression
-        (WHEN expression THEN expression)*
-        (ELSE expression)?
-      END
+    : CASE expression WHEN expression THEN expression (WHEN expression THEN expression)* (
+        ELSE expression
+    )? END
     ;
 
 case_when
-    : CASE WHEN expression THEN expression
-        (WHEN expression THEN expression)?
-        (ELSE expression)?
-      END
+    : CASE WHEN expression THEN expression (WHEN expression THEN expression)? (ELSE expression)? END
     ;
 
 row_value_constructor

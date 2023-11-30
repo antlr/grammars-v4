@@ -25,11 +25,19 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar WrenParser;
 
-options { tokenVocab=WrenLexer; }
+options {
+    tokenVocab = WrenLexer;
+}
 
-script: fileAtom+ EOF;
+script
+    : fileAtom+ EOF
+    ;
 
 fileAtom
     : classDefinition
@@ -40,8 +48,14 @@ fileAtom
     ;
 
 // assignment
-assignment: VAR_T? expression assignOp (expression | assignment+);
-assignmentNull: VAR_T id;
+assignment
+    : VAR_T? expression assignOp (expression | assignment+)
+    ;
+
+assignmentNull
+    : VAR_T id
+    ;
+
 assignOp
     : ASSIGN
     | ADD_ASSIGN
@@ -57,16 +71,30 @@ assignOp
     | URSHIFT_ASSIGN
     ;
 
-
 // flow
-ifSt: ifCond statement elseIf* elseSt?;
-ifCond: IF_T LPAREN expression RPAREN;
-elseIf: ELSE_T ifCond statement;
-elseSt : ELSE_T statement;
+ifSt
+    : ifCond statement elseIf* elseSt?
+    ;
 
-whileSt: WHILE_T LPAREN (expression | assignment) RPAREN statement;
-forSt: FOR_T LPAREN id IN expression RPAREN statement;
+ifCond
+    : IF_T LPAREN expression RPAREN
+    ;
 
+elseIf
+    : ELSE_T ifCond statement
+    ;
+
+elseSt
+    : ELSE_T statement
+    ;
+
+whileSt
+    : WHILE_T LPAREN (expression | assignment) RPAREN statement
+    ;
+
+forSt
+    : FOR_T LPAREN id IN expression RPAREN statement
+    ;
 
 // statements
 statement
@@ -80,32 +108,61 @@ statement
     | returnSt
     ;
 
-lambdaParameters: BITOR (id (COMMA id)*) BITOR;
-block: LBRACE lambdaParameters? statement* RBRACE;
-returnSt: RETURN_T expression;
+lambdaParameters
+    : BITOR (id (COMMA id)*) BITOR
+    ;
+
+block
+    : LBRACE lambdaParameters? statement* RBRACE
+    ;
+
+returnSt
+    : RETURN_T expression
+    ;
 
 // class
-classDefinition: attributes? FOREIGN_T? CLASS_T  id inheritance? LBRACE classBody RBRACE;
-inheritance: IS id ;
+classDefinition
+    : attributes? FOREIGN_T? CLASS_T id inheritance? LBRACE classBody RBRACE
+    ;
+
+inheritance
+    : IS id
+    ;
 
 // class atributes
 attribute
     : simpleAttribute
     | groupAttribute
     ;
-attributes: attribute+;
-attributeValue: id (ASSIGN atomExpression)?;
-simpleAttribute:HASH BANG? attributeValue ;
-groupAttribute:HASH BANG? id LPAREN attributeValue (COMMA attributeValue)* RPAREN;
+
+attributes
+    : attribute+
+    ;
+
+attributeValue
+    : id (ASSIGN atomExpression)?
+    ;
+
+simpleAttribute
+    : HASH BANG? attributeValue
+    ;
+
+groupAttribute
+    : HASH BANG? id LPAREN attributeValue (COMMA attributeValue)* RPAREN
+    ;
 
 // class body
-classBody:(attributes? classBodyTpe? classStatement)*;
+classBody
+    : (attributes? classBodyTpe? classStatement)*
+    ;
+
 classBodyTpe
     : FOREIGN_T
     | STATIC_T
     | STATIC_T FOREIGN_T
     | FOREIGN_T STATIC_T
     ;
+
 // class statement
 classStatement
     : function
@@ -117,13 +174,17 @@ classStatement
     | classConstructor
     ;
 
-classConstructor: CONSTRUCT id arguments  block;
+classConstructor
+    : CONSTRUCT id arguments block
+    ;
+
 operatorGetter
     : SUB
     | TILDE
     | BANG
     | id
     ;
+
 operatorSetter
     : SUB
     | MUL
@@ -145,26 +206,68 @@ operatorSetter
     | NOTEQUAL
     | IS
     ;
-classOpGetter: operatorGetter block?;
-classOpSetter: operatorSetter oneArgument block;
-oneArgument: LPAREN id RPAREN;
-subscript: LBRACK enumeration RBRACK;
-classSubscriptGet:  subscript block;
-classSubscriptSet:  subscript ASSIGN oneArgument block;
-classSetter: id assignmentSetter block;
-assignmentSetter:ASSIGN oneArgument;
-arguments: LPAREN (id (COMMA id)*)? RPAREN;
 
-function: id arguments block?;
+classOpGetter
+    : operatorGetter block?
+    ;
+
+classOpSetter
+    : operatorSetter oneArgument block
+    ;
+
+oneArgument
+    : LPAREN id RPAREN
+    ;
+
+subscript
+    : LBRACK enumeration RBRACK
+    ;
+
+classSubscriptGet
+    : subscript block
+    ;
+
+classSubscriptSet
+    : subscript ASSIGN oneArgument block
+    ;
+
+classSetter
+    : id assignmentSetter block
+    ;
+
+assignmentSetter
+    : ASSIGN oneArgument
+    ;
+
+arguments
+    : LPAREN (id (COMMA id)*)? RPAREN
+    ;
+
+function
+    : id arguments block?
+    ;
 
 // imports
-importModule: IMPORT_T STRING_LITERAL importVariables?;
-importVariable: id (AS id)?;
-importVariables: FOR_T importVariable (COMMA importVariable);
+importModule
+    : IMPORT_T STRING_LITERAL importVariables?
+    ;
+
+importVariable
+    : id (AS id)?
+    ;
+
+importVariables
+    : FOR_T importVariable (COMMA importVariable)
+    ;
 
 // call
-call: id (callInvoke | block)? (DOT call)*;
-callInvoke:(LPAREN enumeration? RPAREN) ;
+call
+    : id (callInvoke | block)? (DOT call)*
+    ;
+
+callInvoke
+    : (LPAREN enumeration? RPAREN)
+    ;
 
 // expressions
 expression
@@ -175,16 +278,16 @@ expression
     ;
 
 compoundExpression
-     : logic
-     | arithBit
-     | arithShift
-     | arithRange
-     | arithAdd
-     | arithMul
-     | DOT call
-     | IS expression
-     | elvis
-     ;
+    : logic
+    | arithBit
+    | arithShift
+    | arithRange
+    | arithAdd
+    | arithMul
+    | DOT call
+    | IS expression
+    | elvis
+    ;
 
 atomExpression
     : boolE
@@ -202,26 +305,61 @@ atomExpression
     | importModule
     | SUB atomExpression
     ;
-enumeration: (expression (COMMA expression)*);
-pairEnumeration: (expression COLON expression (COMMA expression COLON expression)*);
-range:rangeExpression (ELLIPSIS_IN | ELLIPSIS_OUT) rangeExpression;
-listInit: LBRACK enumeration? RBRACK;
-mapInit: LBRACE pairEnumeration? RBRACE;
+
+enumeration
+    : (expression (COMMA expression)*)
+    ;
+
+pairEnumeration
+    : (expression COLON expression (COMMA expression COLON expression)*)
+    ;
+
+range
+    : rangeExpression (ELLIPSIS_IN | ELLIPSIS_OUT) rangeExpression
+    ;
+
+listInit
+    : LBRACK enumeration? RBRACK
+    ;
+
+mapInit
+    : LBRACE pairEnumeration? RBRACE
+    ;
+
 elem
     : call
     | stringE
     ;
-collectionElem: elem listInit ;
+
+collectionElem
+    : elem listInit
+    ;
+
 rangeExpression
     : call
     | numE
     ;
+
 // arithmetic expressions
-arithMul: (MUL | DIV | MOD) expression;
-arithAdd: (SUB | ADD) (arithMul | expression);
-arithRange:(ELLIPSIS_IN | ELLIPSIS_OUT) (arithAdd | expression);
-arithShift:(LSHIFT | RSHIFT) (arithRange | expression);
-arithBit: (BITAND | BITOR | CARET) (arithShift | expression);
+arithMul
+    : (MUL | DIV | MOD) expression
+    ;
+
+arithAdd
+    : (SUB | ADD) (arithMul | expression)
+    ;
+
+arithRange
+    : (ELLIPSIS_IN | ELLIPSIS_OUT) (arithAdd | expression)
+    ;
+
+arithShift
+    : (LSHIFT | RSHIFT) (arithRange | expression)
+    ;
+
+arithBit
+    : (BITAND | BITOR | CARET) (arithShift | expression)
+    ;
 
 // logic expressions
 logicOp
@@ -232,24 +370,50 @@ logicOp
     | GE
     | NOTEQUAL
     ;
+
 atomLogic
     : logicOp expression
     | (AND | OR) expression
     ;
-andLogic: atomLogic (AND expression atomLogic)*;
-logic: andLogic (OR expression andLogic)*;
-elvis: QUESTION expression COLON expression;
 
+andLogic
+    : atomLogic (AND expression atomLogic)*
+    ;
+
+logic
+    : andLogic (OR expression andLogic)*
+    ;
+
+elvis
+    : QUESTION expression COLON expression
+    ;
 
 // primitives
-id: IDENTIFIER;
-boolE: TRUE_T | FALSE_T ;
-charE: CHAR_LITERAL;
-stringE: STRING_LITERAL | TEXT_BLOCK ;
+id
+    : IDENTIFIER
+    ;
+
+boolE
+    : TRUE_T
+    | FALSE_T
+    ;
+
+charE
+    : CHAR_LITERAL
+    ;
+
+stringE
+    : STRING_LITERAL
+    | TEXT_BLOCK
+    ;
+
 numE
     : DECIMAL_LITERAL
     | HEX_LITERAL
     | FLOAT_LITERAL
     | HEX_FLOAT_LITERAL
     ;
-nullE: NULL_T;
+
+nullE
+    : NULL_T
+    ;

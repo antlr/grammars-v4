@@ -30,85 +30,81 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pdn;
 
 game
-   : tags moves EOF
-   ;
+    : tags moves EOF
+    ;
 
 tags
-   : tag*
-   ;
+    : tag*
+    ;
 
 tag
-   : '[' text string ']'
-   ;
+    : '[' text string ']'
+    ;
 
 moves
-   : move+ (result | '*')+
-   ;
+    : move+ (result | '*')+
+    ;
 
 move
-   : movenum movespec+
-   ;
+    : movenum movespec+
+    ;
 
 movespec
-   : (MOVE1 | MOVE2) (result | '*')?
-   ;
+    : (MOVE1 | MOVE2) (result | '*')?
+    ;
 
 movenum
-   : number '.'
-   ;
+    : number '.'
+    ;
 
 result
-   : '1/2-1/2'
-   | '1-0'
-   | '0-1'
-   ;
+    : '1/2-1/2'
+    | '1-0'
+    | '0-1'
+    ;
 
 text
-   : TEXT
-   ;
+    : TEXT
+    ;
 
 string
-   : STRING
-   ;
+    : STRING
+    ;
 
 number
-   : NUMBER
-   ;
-
+    : NUMBER
+    ;
 
 MOVE1
-   : ('0' .. '9') + 'x' ('0' .. '9') +
-   ;
-
+    : ('0' .. '9')+ 'x' ('0' .. '9')+
+    ;
 
 MOVE2
-   : ('0' .. '9') + '-' ('0' .. '9') +
-   ;
-
+    : ('0' .. '9')+ '-' ('0' .. '9')+
+    ;
 
 NUMBER
-   : ('0' .. '9') +
-   ;
-
+    : ('0' .. '9')+
+    ;
 
 TEXT
-   : [a-zA-Z] [a-zA-Z0-9_] +
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_]+
+    ;
 
 STRING
-   : '"' ('""' | ~ '"')* '"'
-   ;
-
+    : '"' ('""' | ~ '"')* '"'
+    ;
 
 COMMENT
-   : '{' .*? '}' -> skip
-   ;
-
+    : '{' .*? '}' -> skip
+    ;
 
 WS
-   : [ \t\r\n] + -> skip
-   ;
+    : [ \t\r\n]+ -> skip
+    ;

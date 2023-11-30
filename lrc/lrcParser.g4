@@ -29,13 +29,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar lrcParser;
-options { tokenVocab = lrcLexer; }
+
+options {
+    tokenVocab = lrcLexer;
+}
+
 lrc
-   : line* EOF
-   ;
+    : line* EOF
+    ;
 
 line
-   : LB TIMESTAMP RB TEXT
-   ;
-
+    : LB TIMESTAMP RB TEXT
+    ;

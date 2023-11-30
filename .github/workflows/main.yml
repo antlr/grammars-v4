@@ -5,14 +5,48 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      mymatrix: ${{ steps.step1.outputs.myoutput }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v3.2.0
+      with:
+        dotnet-version: '7.0.x'
+    - name: Install Trash
+      shell: bash
+      run: |
+        dotnet tool restore
+    - name: Gather targets.
+      id: step1
+      shell: bash
+      run: |
+        if [ "${{github.event_name}}" == "pull_request" ]; then
+          Before="${{github.event.pull_request.base.sha}}"
+          After="${{github.event.pull_request.head.sha}}"
+        else
+          Before="${{github.event.before}}"
+          After="${{github.event.after}}"
+        fi
+        bash _scripts/what-to-test.sh $Before $After >> $GITHUB_OUTPUT
+
   build-pwsh:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
+        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash
@@ -24,6 +58,16 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: Setup PHP
+      id: setup-php
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        ini-values: xdebug.max_nesting_level=1000
+    - name: Print PHP version
+      run: |
+        echo ${{ steps.setup-php.outputs.php-version }}
+        php --version
     - name: Install Dotnet
       uses: actions/setup-dotnet@v3.2.0
       with:
@@ -113,12 +157,13 @@ jobs:
         _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
   build-bash:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-        language: [ Cpp, CSharp, Dart, Java, JavaScript, Go, PHP, Python3, TypeScript ]
+        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash

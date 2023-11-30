@@ -1,10 +1,18 @@
-parser grammar  gvprParser;
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-options { tokenVocab = gvprLexer; superClass = GvprParserBase; }
+parser grammar gvprParser;
+
+options {
+    tokenVocab = gvprLexer;
+    superClass = GvprParserBase;
+}
 
 // Insert here @header for C++ parser.
 
-preds: pred* EOF;
+preds
+    : pred* EOF
+    ;
 
 pred
     : 'BEGIN' ('{' program '}')?
@@ -28,7 +36,7 @@ action_
     ;
 
 statement_list
-    : statement ( ( { this.IsSemiRequired() }? ';' | { this.IsSemiNotRequired() }? ) statement )* ';'?
+    : statement (( { this.IsSemiRequired() }? ';' | { this.IsSemiNotRequired() }?) statement)* ';'?
     ;
 
 statement
@@ -41,7 +49,7 @@ statement
     | 'for' '(' expr? ';' expr? ';' expr? ')' statement
     | 'forr' '(' variable ')' statement
     | UNSET '(' ID ')'
-    | UNSET '(' ID ',' expr  ')'
+    | UNSET '(' ID ',' expr ')'
     | WHILE '(' expr ')' statement
     | SWITCH '(' expr ')' '{' switch_list '}'
     | BREAK expr?
@@ -99,20 +107,20 @@ else_
 expr
     : '(' expr ')'
     | '(' declare ')' expr
-    | (INC|DEC) variable
-    | variable (INC|DEC)
+    | (INC | DEC) variable
+    | variable (INC | DEC)
     | ('!' expr | '#' ID | '~' expr | '-' expr | '+' expr | '&' variable)
-    | expr ('*'|'/'|'%') expr
-    | expr (('+'|'-') expr | IN_OP ID)
-    | expr (LSH|RSH) expr
-    | expr ('<'|'>'|LE|GE) expr
-    | expr (EQ|NE) expr
+    | expr ('*' | '/' | '%') expr
+    | expr (('+' | '-') expr | IN_OP ID)
+    | expr (LSH | RSH) expr
+    | expr ('<' | '>' | LE | GE) expr
+    | expr (EQ | NE) expr
     | expr '&' expr
     | expr '^' expr
     | expr '|' expr
     | expr AND expr
     | expr OR expr
-    | <assoc=right> expr '?' expr ':' expr
+    | <assoc = right> expr '?' expr ':' expr
     | expr ',' expr
     | array_ '[' args ']'
     | function '(' args ')'
@@ -179,7 +187,7 @@ args
     ;
 
 arg_list
-    : expr      // %prec ','
+    : expr // %prec ','
     | arg_list ',' expr
     ;
 
@@ -222,6 +230,14 @@ finitialize_
     : '(' formals ')' '{' statement_list? '}'
     ;
 
-label : ID;
-declare : (CHAR | DOUBLE | FLOAT | INT | LONG | UNSIGNED | VOID | STRING | ID) '*'? ;
-function : ID ;
+label
+    : ID
+    ;
+
+declare
+    : (CHAR | DOUBLE | FLOAT | INT | LONG | UNSIGNED | VOID | STRING | ID) '*'?
+    ;
+
+function
+    : ID
+    ;

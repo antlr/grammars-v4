@@ -32,69 +32,72 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 
-
 // http://www.eecs.qmul.ac.uk/~pm/SaR/2004ltl.pdf
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar ltl;
 
-file_ : proposition EOF ;
+file_
+    : proposition EOF
+    ;
 
 proposition
-   : 'true'
-   | 'false'
-   | ATOMIC
-   | '(' proposition ')'
-   | proposition (LTL_AND | LTL_OR | LTL_RIGHTWARDS_SINGLE_ARROW) proposition
-   | LTL_NOT proposition
-   | (LTL_GLOBALLY | LTL_FINALLY | LTL_NEXT) proposition
-   | proposition (LTL_UNTIL | LTL_WEAK | LTL_RELEASE) proposition
-   ;
+    : 'true'
+    | 'false'
+    | ATOMIC
+    | '(' proposition ')'
+    | proposition (LTL_AND | LTL_OR | LTL_RIGHTWARDS_SINGLE_ARROW) proposition
+    | LTL_NOT proposition
+    | (LTL_GLOBALLY | LTL_FINALLY | LTL_NEXT) proposition
+    | proposition (LTL_UNTIL | LTL_WEAK | LTL_RELEASE) proposition
+    ;
 
 ATOMIC
-   : [a-z]+
-   ;
+    : [a-z]+
+    ;
 
 LTL_UNTIL
-   : 'U'
-   ;
+    : 'U'
+    ;
 
 LTL_GLOBALLY
-   : 'G'
-   ;
+    : 'G'
+    ;
 
 LTL_FINALLY
-   : 'F'
-   ;
+    : 'F'
+    ;
 
 LTL_NEXT
-   : 'X'
-   ;
+    : 'X'
+    ;
 
 LTL_WEAK
-   : 'W'
-   ;
+    : 'W'
+    ;
 
 LTL_RELEASE
-   : 'R'
-   ;
+    : 'R'
+    ;
 
 LTL_RIGHTWARDS_SINGLE_ARROW
-   : '\u2192'
-   ;
+    : '\u2192'
+    ;
 
 LTL_AND
-   : '\u2227'
-   ;
+    : '\u2227'
+    ;
 
 LTL_OR
-   : '\u2228'
-   ;
+    : '\u2228'
+    ;
 
 LTL_NOT
-   : '\u2310'
-   ;
+    : '\u2310'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

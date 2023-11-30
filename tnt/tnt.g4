@@ -28,84 +28,87 @@
 /**
 * <p>http://en.wikipedia.org/wiki/Typographical_Number_Theory</p>
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tnt;
 
 equation
-   : expression '=' expression EOF
-   ;
+    : expression '=' expression EOF
+    ;
 
 atom
-   : number
-   | variable
-   ;
+    : number
+    | variable
+    ;
 
 number
-   : SUCCESSOR* ZERO
-   ;
+    : SUCCESSOR* ZERO
+    ;
 
 variable
-   : SUCCESSOR* (A | B | C | D | E) PRIME*
-   ;
+    : SUCCESSOR* (A | B | C | D | E) PRIME*
+    ;
 
 expression
-   : atom
-   | expression '+' expression
-   | expression '*' expression
-   | '(' expression ')'
-   | '~' expression
-   | forevery expression
-   | exists expression
-   ;
+    : atom
+    | expression '+' expression
+    | expression '*' expression
+    | '(' expression ')'
+    | '~' expression
+    | forevery expression
+    | exists expression
+    ;
 
 forevery
-   : FOREVERY variable ':'
-   ;
+    : FOREVERY variable ':'
+    ;
 
 exists
-   : EXISTS variable ':'
-   ;
+    : EXISTS variable ':'
+    ;
 
 ZERO
-   : '0'
-   ;
+    : '0'
+    ;
 
 SUCCESSOR
-   : 'S'
-   ;
+    : 'S'
+    ;
 
 A
-   : 'a'
-   ;
+    : 'a'
+    ;
 
 B
-   : 'b'
-   ;
+    : 'b'
+    ;
 
 C
-   : 'c'
-   ;
+    : 'c'
+    ;
 
 D
-   : 'd'
-   ;
+    : 'd'
+    ;
 
 E
-   : 'e'
-   ;
+    : 'e'
+    ;
 
 PRIME
-   : '\''
-   ;
+    : '\''
+    ;
 
 FOREVERY
-   : 'A'
-   ;
+    : 'A'
+    ;
 
 EXISTS
-   : 'E'
-   ;
+    : 'E'
+    ;
 
 WS
-   : [ \r\t\n] -> skip
-   ;
-
+    : [ \r\t\n] -> skip
+    ;
