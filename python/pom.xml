@@ -14,7 +14,6 @@
     <modules>
         <module>python</module>
         <module>python2</module>
-        <module>python3</module>
         <module>python2_7_18</module>
         <module>python3_12_0</module>
     </modules>
