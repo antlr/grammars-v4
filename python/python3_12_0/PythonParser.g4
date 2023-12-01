@@ -34,6 +34,8 @@ parser grammar PythonParser;
 
 // Python 3.12.0  https://docs.python.org/3.12/reference/grammar.html#full-grammar-specification
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab = PythonLexer;
     superClass = PythonParserBase;
@@ -509,7 +511,7 @@ capture_pattern
     ;
 
 pattern_capture_target
-    : {self.isnotEqualCurrentTokenText("_")}? NAME
+    : {this.isnotEqualCurrentTokenText("_")}? NAME
     ;
 
 wildcard_pattern
@@ -1097,19 +1099,19 @@ func_type_comment
 
 // *** Soft Keywords:  https://docs.python.org/3.12/reference/lexical_analysis.html#soft-keywords
 soft_kw_match
-    : {self.isEqualCurrentTokenText("match")}? NAME
+    : {this.isEqualCurrentTokenText("match")}? NAME
     ;
 
 soft_kw_case
-    : {self.isEqualCurrentTokenText("case")}? NAME
+    : {this.isEqualCurrentTokenText("case")}? NAME
     ;
 
 soft_kw_wildcard
-    : {self.isEqualCurrentTokenText("_")}? NAME
+    : {this.isEqualCurrentTokenText("_")}? NAME
     ;
 
 soft_kw_type
-    : {self.isEqualCurrentTokenText("type")}? NAME
+    : {this.isEqualCurrentTokenText("type")}? NAME
     ;
 
 // ========================= END OF THE GRAMMAR ===========================
