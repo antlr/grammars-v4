@@ -66,29 +66,29 @@ void PythonLexerBase::CheckNextToken()
 		
 void PythonLexerBase::SetCurrentAndFollowingTokens()
 {
-	_curToken = _ffgToken == null ?
-		    new CommonToken(base.NextToken()) :
+	_curToken = _ffgToken == nullptr ?
+		    new CommonToken(Lexer::nextToken()) :
 		    new CommonToken(_ffgToken);
 
 	HandleFStringLexerModes();
 
-	_ffgToken = _curToken.Type == Eof ?
-_curToken :
-		    base.NextToken();
+	_ffgToken = _curToken->getType() == antlr4::Token::EOF ?
+		_curToken :
+		Lexer::nextToken();
 }
 
 void PythonLexerBase::HandleStartOfInput()
 {
     // initialize the stack with a default 0 indentation length
     _indentLengths.AddLast(0); // this will never be popped off
-    while (_curToken.Type != Eof)
+    while (_curToken->getType() != antlr4::Token::EOF)
     {
-        if (_curToken.Channel == TokenConstants.DefaultChannel)
+        if (_curToken->getChannel() == DEFAULT_TOKEN_CHANNEL)
         {
-            if (_curToken.Type == PythonLexer.NEWLINE)
+            if (_curToken->getType() == PythonLexer::NEWLINE)
             {
                 // all the NEWLINE tokens must be ignored before the first statement
-                HideAndAddPendingToken(_curToken);
+                HideAndAddPendingToken(std::move(_curToken));
             }
             else
             { // We're at the first statement
@@ -98,7 +98,7 @@ void PythonLexerBase::HandleStartOfInput()
         }
         else
         {
-            AddPendingToken(_curToken); // it can be WS, EXPLICIT_LINE_JOINING, or COMMENT token
+            AddPendingToken(std::move(_curToken)); // it can be WS, EXPLICIT_LINE_JOINING, or COMMENT token
         }
         SetCurrentAndFollowingTokens();
     } // continue the processing of the EOF token with CheckNextToken()
@@ -110,30 +110,30 @@ void PythonLexerBase::HandleNEWLINEtoken()
     if (_opened > 0)
     {
         // We're in an implicit line joining, ignore the current NEWLINE token
-        HideAndAddPendingToken(_curToken);
+        HideAndAddPendingToken(std::move(_curToken));
     }
     else
     {
-        CommonToken nlToken = (CommonToken)_curToken; // save the current NEWLINE token
-        bool isLookingAhead = _ffgToken.Type == PythonLexer.WS;
+        std::unique_ptr<CommonToken> nlToken = std::move(_curToken); // save the current NEWLINE token
+        bool isLookingAhead = _ffgToken->getType() == PythonLexer::WS;
         if (isLookingAhead)
         {
             SetCurrentAndFollowingTokens(); // set the two next tokens
         }
 
-        switch (_ffgToken.Type)
+        switch (_ffgToken->getType())
         {
         case PythonLexer::NEWLINE:      // We're before a blank line
         case PythonLexer::COMMENT:      // We're before a comment
         case PythonLexer::TYPE_COMMENT: // We're before a type comment
-            HideAndAddPendingToken(nlToken);
+            HideAndAddPendingToken(std::move(nlToken));
             if (isLookingAhead)
             {
-                AddPendingToken(_curToken);  // WS token
+                AddPendingToken(std::move(_curToken));  // WS token
             }
             break;
         default:
-            AddPendingToken(nlToken);
+            AddPendingToken(std::move(nlToken));
             if (isLookingAhead)
             { // We're on whitespace(s) followed by a statement
                 int indentationLength = _ffgToken.Type == Eof ?

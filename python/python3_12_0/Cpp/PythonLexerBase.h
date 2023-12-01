@@ -14,11 +14,12 @@ public:
     int _previousPendingTokenType;
     int _lastPendingTokenTypeForDefaultChannel;
     int _opened;
+    std::unique_ptr<antlr4::CommonToken> _curToken; // current (under processing) token
+    std::unique_ptr<antlr4::Token> _ffgToken;      // following (look ahead) token
 
     void AddPendingToken(std::unique_ptr<antlr4::CommonToken> token);
 
-	std::unique_ptr<antlr4::CommonToken> _curToken; // current (under processing) token
-    void CheckNextToken();
+	void CheckNextToken();
     void SetCurrentAndFollowingTokens();
     void HandleStartOfInput();
     void HandleNEWLINEtoken();
@@ -26,6 +27,9 @@ public:
     void HandleFSTRING_MIDDLE_token();
     void HandleEOFtoken();
 	void HandleFORMAT_SPECIFICATION_MODE();
+    void HandleFStringLexerModes();
+    void HideAndAddPendingToken(std::unique_ptr<antlr4::CommonToken>);
+    void InsertLeadingIndentToken();
     void ReportLexerError(std::string errMsg);
 
     virtual void emit(std::unique_ptr<antlr4::Token> newToken) override;
