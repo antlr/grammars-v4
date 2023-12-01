@@ -3438,6 +3438,8 @@ non_reserved_words
     | EMAIL
     | MAX_CONCURRENCY_LEVEL
     | WAREHOUSE_TYPE
+    | NETWORK
+    | OUTBOUND
     ;
 
 builtin_function
