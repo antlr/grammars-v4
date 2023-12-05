@@ -77,7 +77,7 @@ NotEqual
     ;
 
 Compare
-//:   '<'
+    //:   '<'
     : LessEqual
     | Great
     | GreatEqual

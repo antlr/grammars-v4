@@ -179,7 +179,8 @@ FUNCTION options {
     | 'tanh'
     | 'deg'
     | 'pi'
-    | 'rad';
+    | 'rad'
+;
 
 LEFT_BRACE  : '{';
 RIGHT_BRACE : '}';

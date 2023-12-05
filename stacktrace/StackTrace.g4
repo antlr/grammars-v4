@@ -81,72 +81,72 @@ identifier
 
 message
     : COLON (: .)*?
-        ;
+    ;
 
-    Number
-        : Digit+
-        ;
+Number
+    : Digit+
+    ;
 
-    JavaWord
-        : (JavaCharacter)+
-        ;
+JavaWord
+    : (JavaCharacter)+
+    ;
 
-    fragment JavaCharacter
-        : (CapitalLetter | NonCapitalLetter | Symbol | Digit)
-        ;
+fragment JavaCharacter
+    : (CapitalLetter | NonCapitalLetter | Symbol | Digit)
+    ;
 
-    DOT
-        : '.'
-        ;
+DOT
+    : '.'
+    ;
 
-    AT
-        : 'at'
-        ;
+AT
+    : 'at'
+    ;
 
-    CAUSED_BY
-        : 'Caused by:'
-        ;
+CAUSED_BY
+    : 'Caused by:'
+    ;
 
-    MORE_
-        : 'more'
-        ;
+MORE_
+    : 'more'
+    ;
 
-    ELLIPSIS
-        : '...'
-        ;
+ELLIPSIS
+    : '...'
+    ;
 
-    COLON
-        : ':'
-        ;
+COLON
+    : ':'
+    ;
 
-    NATIVE_METHOD
-        : 'Native Method'
-        ;
+NATIVE_METHOD
+    : 'Native Method'
+    ;
 
-    UNKNOWN_SOURCE
-        : 'Unknown Source'
-        ;
+UNKNOWN_SOURCE
+    : 'Unknown Source'
+    ;
 
-    INIT
-        : '<init>'
-        ;
+INIT
+    : '<init>'
+    ;
 
-    NonCapitalLetter
-        : 'a' .. 'z'
-        ;
+NonCapitalLetter
+    : 'a' .. 'z'
+    ;
 
-    CapitalLetter
-        : 'A' .. 'Z'
-        ;
+CapitalLetter
+    : 'A' .. 'Z'
+    ;
 
-    Symbol
-        : '_'
-        ;
+Symbol
+    : '_'
+    ;
 
-    Digit
-        : '0' .. '9'
-        ;
+Digit
+    : '0' .. '9'
+    ;
 
-    WS
-        : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
-        ;
+WS
+    : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
+    ;

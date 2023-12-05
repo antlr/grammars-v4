@@ -125,10 +125,10 @@ attrib
     ;
 
 pseudo
-/* '::' starts a pseudo-element, ':' a pseudo-class */
-/* Exceptions: :first-line, :first-letter, :before And :after. */
-/* Note that pseudo-elements are restricted to one per selector And */
-/* occur MediaOnly in the last simple_selector_sequence. */
+    /* '::' starts a pseudo-element, ':' a pseudo-class */
+    /* Exceptions: :first-line, :first-letter, :before And :after. */
+    /* Note that pseudo-elements are restricted to one per selector And */
+    /* occur MediaOnly in the last simple_selector_sequence. */
     : ':' ':'? (ident | functionalPseudo)
     ;
 
@@ -137,8 +137,8 @@ functionalPseudo
     ;
 
 expression
-/* In CSS3, the expressions are identifiers, strings, */
-/* or of the form "an+b" */
+    /* In CSS3, the expressions are identifiers, strings, */
+    /* or of the form "an+b" */
     : (( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident) ws)+
     ;
 

@@ -267,7 +267,8 @@ fragment Digit
 fragment ULCorner_f options {
     caseInsensitive = false;
 }
-    : '\u231C';
+    : '\u231C'
+    ;
 
 ULCorner
     : ULCorner_f
@@ -276,7 +277,8 @@ ULCorner
 fragment URCorner_f options {
     caseInsensitive = false;
 }
-    : '\u231D';
+    : '\u231D'
+    ;
 
 URCorner
     : URCorner_f
@@ -441,7 +443,8 @@ number
 fragment Proper_string options {
     caseInsensitive = false;
 }
-    : ~('\u231C' | '\u231D')*;
+    : ~('\u231C' | '\u231D')*
+    ;
 
 fragment Open_string
     : Proper_string

@@ -891,7 +891,7 @@ cmd_declareDatatype
     ;
 
 cmd_declareDatatypes
-// cardinalitiees for sort_dec and datatype_dec have to be n+1
+    // cardinalitiees for sort_dec and datatype_dec have to be n+1
     : CMD_DeclareDatatypes ParOpen sort_dec+ ParClose ParOpen datatype_dec+ ParClose
     ;
 
@@ -912,7 +912,7 @@ cmd_defineFunRec
     ;
 
 cmd_defineFunsRec
-// cardinalitiees for function_dec and term have to be n+1
+    // cardinalitiees for function_dec and term have to be n+1
     : CMD_DefineFunsRec ParOpen function_dec+ ParClose ParOpen term+ ParClose
     ;
 
