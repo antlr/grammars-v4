@@ -323,6 +323,8 @@ echo Tests now ${tests[@]}
 # standard format for grammars.
 npm i -g --save-dev antlr-format-cli
 
+echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
+
 # Perform tests in order.
 for test in ${tests[@]}
 do
