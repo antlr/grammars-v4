@@ -194,6 +194,11 @@ then
                     popd > /dev/null
                     continue
                 fi
+                if [ "$g" == "." ]
+                then
+                    popd > /dev/null
+                    continue
+                fi
                 popd > /dev/null
                 echo Adding diff $g
                 grammars+=( $g )
