@@ -266,13 +266,13 @@ jobs:
         fi
         bash _scripts/test.sh -a /tmp/antlr4-complete.jar -t ${{matrix.language}} -f diff $Before $After
 
-  static-checks:
+  static-check:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        language: [ CSharp ]
+        test: [ useless-parens, format ]
     steps:
     - name: Info
       shell: bash
@@ -304,22 +304,6 @@ jobs:
         dotnet --version
         java --version
         javac --version
-    - name: Install Dart
-      if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
-    - name: Test Dart
-      if: ${{ matrix.language == 'Dart' }}
-      run: |
-        dart --version
-    - name: Install Go
-      if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v4
-      with:
-        go-version: '^1.18.0'
-    - name: Test Go
-      if: ${{ matrix.language == 'Go' }}
-      run: |
-        go version
     - name: Install Python
       uses: actions/setup-python@v4.8.0
       with:
@@ -337,12 +321,10 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v4.0.0
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
     - name: Install Trash
@@ -363,6 +345,6 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/test-static-checks.sh -t ${{matrix.language}} -f diff $Before $After
+        bash _scripts/test-static-checks.sh -t ${{matrix.test}} -f diff $Before $After
 
 

@@ -135,7 +135,7 @@ NAME
        test - tests Antlr4 grammars
 
 SYNOPSIS
-       $(basename $0) ([-g ...] | [-s ...] | [-t ...])
+       $(basename $0) ([-g ...] | [-f ...] | [-t ...])
 
 DESCRIPTION
        Tests Antlr4 grammars. Each grammar requires pom.xml and desc.xml files.
@@ -152,9 +152,9 @@ OPTIONS
            "all", or "agnostic". The default is "all".
 
        -t
-           Specifies the targets to test. Possible targets are
-           "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
-           All targets are tested by default.
+           Specifies the type of test. Possible tests are
+           "useless-parens", "format".
+           All types are tested by default.
 
 EOF
             exit 0
@@ -282,9 +282,9 @@ else
     echo Grammars to do are: ${grammars[@]}
 fi
 
-if [ "$targets" == "" ]
+if [ ${#targets[@]} -eq 0 ]
 then
-    targets=( CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
+    targets=( useless-parens format )
 fi
 
 echo grammars = ${grammars[@]}
@@ -328,30 +328,7 @@ do
         popd > /dev/null
         continue
     fi
-    desc_targets=`dotnet trxml2 -- desc.xml | grep '/desc/targets'`
-    if [ "${PIPESTATUS[0]}" -ne 0 ]
-    then
-        echo "The desc.xml for $testname is malformed. Skipping."
-        popd > /dev/null
-        continue
-    fi
-    desc_targets="${desc_targets##*=}"
-    desc_targets=`echo "$desc_targets" | tr ',' ' ' | tr ';' ' '`
-
     yes=false;
-    for t in $desc_targets
-    do
-        if [ "$t" == "+all" ]; then yes=true; fi
-        if [ "$t" == "-$target" ]; then yes=false; fi
-        if [ "$t" == "$target" ]; then yes=true; fi
-    done
-
-    if [ "$yes" == "false" ]
-    then
-        echo "Intentionally skipping grammar $testname target $target."
-        popd > /dev/null
-        continue
-    fi
 
     if [ "$filter" == "agnostic" ]
     then
@@ -365,16 +342,22 @@ do
         fi
     fi
 
-    # Find useless parentheses.
-    curl https://raw.githubusercontent.com/kaby76/g4-checks/d0e97c52787c9f47d6c3dd94f26159531fee7ee0/find-useless.sh 2> /dev/null | bash 1>&2
-
-    # This should be the last step because it modifies the grammar files.
-    # Test format for each grammar to see if follows coding standard.
-    antlr-format *.g4
-    git diff . 1>&2
-    if [ $? -ne 0 ]
+    if [ "$target" == "useless-parens" ]
     then
-        echo "Grammars do not conform to coding standard format. Reformat using antlr-format." 1>&2
+        # Find useless parentheses.
+        curl https://raw.githubusercontent.com/kaby76/g4-checks/d0e97c52787c9f47d6c3dd94f26159531fee7ee0/find-useless.sh 2> /dev/null | bash 1>&2
+    fi
+
+    if [ "$target" == "format" ]
+    then
+        # This should be the last step because it modifies the grammar files.
+        # Test format for each grammar to see if follows coding standard.
+        antlr-format *.g4
+        git diff --exit-code .
+        if [ $? -ne 0 ]
+        then
+            echo "Warning: Grammars in "$prefix/$testname" do not conform to coding standard format. Reformat using antlr-format." 1>&2
+        fi
     fi
 
     popd > /dev/null
