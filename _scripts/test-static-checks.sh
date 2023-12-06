@@ -291,6 +291,10 @@ if [[ "$order" == "grammars" ]]; then sorted="1"; else sorted="2"; fi
 
 echo Tests now ${tests[@]}
 
+# Install the Antlr formatter, which will be used to check the coding
+# standard format for grammars.
+npm i -g --save-dev antlr-format-cli
+
 # Perform tests in order.
 for test in ${tests[@]}
 do
@@ -345,7 +349,17 @@ do
         fi
     fi
 
+    # Find useless parentheses.
     curl https://raw.githubusercontent.com/kaby76/g4-checks/d0e97c52787c9f47d6c3dd94f26159531fee7ee0/find-useless.sh 2> /dev/null | bash 1>&2
+
+    # This should be the last step because it modifies the grammar files.
+    # Test format for each grammar to see if follows coding standard.
+    antlr-format *.g4
+    git diff .
+    if [ $? -ne 0 ]
+    then
+        echo "Grammars do not conform to coding standard format. Reformat using antlr-format." 1>&2
+    fi
 
     popd > /dev/null
 done
