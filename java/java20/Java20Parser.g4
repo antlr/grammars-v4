@@ -9,7 +9,7 @@ options {
 
 //=============
 
-start
+start_
     : compilationUnit EOF
     ;
 
