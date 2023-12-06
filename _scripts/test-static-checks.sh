@@ -191,7 +191,8 @@ then
                 g=${g##/}
                 if [ "$g" == "" ]
                 then
-                    g="."
+                    popd > /dev/null
+                    continue
                 fi
                 popd > /dev/null
                 echo Adding diff $g
