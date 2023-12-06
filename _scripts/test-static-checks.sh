@@ -355,7 +355,7 @@ do
     # This should be the last step because it modifies the grammar files.
     # Test format for each grammar to see if follows coding standard.
     antlr-format *.g4
-    git diff .
+    git diff . 1>&2
     if [ $? -ne 0 ]
     then
         echo "Grammars do not conform to coding standard format. Reformat using antlr-format." 1>&2
