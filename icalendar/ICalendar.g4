@@ -303,7 +303,7 @@ daylightc
 
 // 3.8.1.1 - Attachment
 attach
-   : k_attach attachparam* (COL binary | COL uri) CRLF
+   : k_attach attachparam* COL (binary | uri) CRLF
    ;
 
 attachparam
