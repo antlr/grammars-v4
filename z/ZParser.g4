@@ -286,8 +286,8 @@ postfixRel
     ;
 
 infixRel
-//	: expression ((ELEMENT_OF | EQUALS_SIGN | IP) expression)+
-//	| expression ELP expSep? (expression EREP | expressionList? SREP) expression
+    //	: expression ((ELEMENT_OF | EQUALS_SIGN | IP) expression)+
+    //	| expression ELP expSep? (expression EREP | expressionList? SREP) expression
     : expression {ZSupport.isLeftAssociative(_input)}? ((ELEMENT_OF | EQUALS_SIGN | IP) expression)+
     | <assoc = right> expression ((ELEMENT_OF | EQUALS_SIGN | IP) expression)+
     | expression {ZSupport.isLeftAssociative(_input)}? ELP expSep? (

@@ -100,7 +100,6 @@ id_
 
 // "The keywords node, edge, graph, digraph, subgraph, and strict are
 // case-independent"
-
 STRICT
     : [Ss] [Tt] [Rr] [Ii] [Cc] [Tt]
     ;
@@ -125,7 +124,8 @@ SUBGRAPH
     : [Ss] [Uu] [Bb] [Gg] [Rr] [Aa] [Pp] [Hh]
     ;
 
-/** "a numeral [-]?(.[0-9]+ | [0-9]+(.[0-9]*)? )" */ NUMBER
+/** "a numeral [-]?(.[0-9]+ | [0-9]+(.[0-9]*)? )" */
+NUMBER
     : '-'? ('.' DIGIT+ | DIGIT+ ( '.' DIGIT*)?)
     ;
 
@@ -133,13 +133,15 @@ fragment DIGIT
     : [0-9]
     ;
 
-/** "any double-quoted string ("...") possibly containing escaped quotes" */ STRING
+/** "any double-quoted string ("...") possibly containing escaped quotes" */
+STRING
     : '"' ('\\"' | .)*? '"'
     ;
 
 /** "Any string of alphabetic ([a-zA-Z\200-\377]) characters, underscores
  *  ('_') or digits ([0-9]), not beginning with a digit"
- */ ID
+ */
+ID
     : LETTER (LETTER | DIGIT)*
     ;
 
@@ -149,7 +151,8 @@ fragment LETTER
 
 /** "HTML strings, angle brackets must occur in matched pairs, and
  *  unescaped newlines are allowed."
- */ HTML_STRING
+ */
+HTML_STRING
     : '<' (TAG | ~ [<>])* '>'
     ;
 
@@ -167,7 +170,8 @@ LINE_COMMENT
 
 /** "a '#' character is considered a line output from a C preprocessor (e.g.,
  *  # 34 to indicate line 34 ) and discarded"
- */ PREPROC
+ */
+PREPROC
     : '#' ~[\r\n]* -> skip
     ;
 

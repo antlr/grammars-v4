@@ -168,7 +168,8 @@ fragment PN_CHARS_BASE options {
     | '\u2C00' ..'\u2FEF'
     | '\u3001' ..'\uD7FF'
     | '\uF900' ..'\uFDCF'
-    | '\uFDF0' ..'\uFFFD';
+    | '\uFDF0' ..'\uFFFD'
+;
 
 fragment DIGIT: '0' ..'9';
 
