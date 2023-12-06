@@ -368,7 +368,7 @@ do
         git diff --exit-code .
         if [ $? -ne 0 ]
         then
-            echo "Warning: Grammars in "$prefix/$testname" do not conform to coding standard format. Reformat using antlr-format." 1>&2
+            echo "warning: Grammars in "$prefix/$testname" do not conform to coding standard format. Reformat using antlr-format." 1>&2
         fi
     fi
 
