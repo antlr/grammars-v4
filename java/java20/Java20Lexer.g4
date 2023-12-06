@@ -4,15 +4,6 @@
 
 lexer grammar Java20Lexer;
 
-options
-{
-    superClass = JavaLexerBase;
-}
-
-// Insert here @header for C++ lexer.
-
-// Copied from Java9.g4 and adjusted.
-
 // LEXER
 
 EXPORTS    : 'exports';
