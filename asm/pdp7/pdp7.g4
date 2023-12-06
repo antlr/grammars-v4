@@ -30,67 +30,77 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pdp7;
 
 prog
-   : (line? eol)+ line? EOF
-   ;
+    : (line? eol)+ line? EOF
+    ;
 
 line
-   : declarations comment? | comment
-   ;
+    : declarations comment?
+    | comment
+    ;
 
 declarations
-   : declaration (';' declaration?)*
-   ;
+    : declaration (';' declaration?)*
+    ;
 
 //  multiple labels can occur on the same line
 declaration
-   : label+ declarationRight* | declarationRight+
-   ;
+    : label+ declarationRight*
+    | declarationRight+
+    ;
 
 declarationRight
-   : instruction | assignment | expression
-   ;
+    : instruction
+    | assignment
+    | expression
+    ;
 
 instruction
-   : opcode argument*
-   ;
+    : opcode argument*
+    ;
 
 argument
-   : expression
-   ;
+    : expression
+    ;
 
 assignment
-   :  symbol '=' expression
-   ;
+    : symbol '=' expression
+    ;
 
 // note that opcodes can be symbols.  This is because it is legal to have a 
 // variable name that is an opcode
 symbol
-    : opcode | variable | LOC | RELOC
+    : opcode
+    | variable
+    | LOC
+    | RELOC
     ;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
-   ;
+    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : atom ((TIMES | DIV) atom)*
-   ;
+    : atom ((TIMES | DIV) atom)*
+    ;
 
 atom
-   : variable
-   | LOC
-   | CHAR
-   | RELOC
-   | string
-   | DECIMAL
-   | DECIMAL_MINUS
-   | OCTAL
-   | NUMERIC_LITERAL
-   | '-' atom
-   ;
+    : variable
+    | LOC
+    | CHAR
+    | RELOC
+    | string
+    | DECIMAL
+    | DECIMAL_MINUS
+    | OCTAL
+    | NUMERIC_LITERAL
+    | '-' atom
+    ;
 
 // string chars, then potentially more than 1 octal constant, then potentially '>'
 string
@@ -98,192 +108,182 @@ string
     ;
 
 eol
-   : EOL
-   ;
+    : EOL
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 label
-   : LABEL
-   ;
+    : LABEL
+    ;
 
 variable
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 opcode
-   : 'dac'
-   | 'jms'
-   | 'dzm'
-   | 'lac'
-   | 'xor'
-   | 'add'
-   | 'tad'
-   | 'xct'
-   | 'isz'
-   | 'and'
-   | 'sad'
-   | 'jmp'
-   | 'nop'
-//   | 'i'
-   | 'law'
-   | 'cma'
-   | 'las'
-   | 'ral'
-   | 'rar'
-   | 'hlt'
-   | 'sma'
-   | 'sza'
-   | 'snl'
-   | 'skp'
-   | 'sna'
-   | 'szl'
-   | 'rtl'
-   | 'rtr'
-   | 'cil'
-   | 'rcl'
-   | 'rcr'
-   | 'cia'
-   | 'lrs'
-   | 'lrss'
-   | 'lls'
-   | 'llss'
-   | 'als'
-   | 'alss'
-   | 'mul'
-   | 'idiv'
-   | 'lacq'
-   | 'clq'
-   | 'omq'
-   | 'cmq'
-   | 'lmq'
-   | 'dscs'
-   | 'dslw'
-   | 'dslm'
-   | 'dsld'
-   | 'dsls'
-   | 'dssf'
-   | 'dsrs'
-   | 'iof'
-   | 'ion'
-   | 'caf'
-   | 'clon'
-   | 'clsf'
-   | 'clof'
-   | 'ksf'
-   | 'krb'
-   | 'tsf'
-   | 'tcf'
-   | 'tls'
-   | 'sck'
-   | 'cck'
-   | 'lck'
-   | 'rsf'
-   | 'rsa'
-   | 'rrb'
-   | 'psf'
-   | 'pcf'
-   | 'psa'
-   | 'cdf'
-   | 'rlpd'
-   | 'lda'
-   | 'wcga'
-   | 'raef'
-   | 'rlpd'
-   | 'beg'
-   | 'spb'
-   | 'cpb'
-   | 'lpb'
-   | 'wbl'
-   | 'dprs'
-   | 'dpsf'
-   | 'dpcf'
-   | 'dprc'
-   | 'crsf'
-   | 'crrb'
-   | 'sys'
-   | 'czm'
-   | 'irss'
-   | 'dsm'
-   ;
+    : 'dac'
+    | 'jms'
+    | 'dzm'
+    | 'lac'
+    | 'xor'
+    | 'add'
+    | 'tad'
+    | 'xct'
+    | 'isz'
+    | 'and'
+    | 'sad'
+    | 'jmp'
+    | 'nop'
+    //   | 'i'
+    | 'law'
+    | 'cma'
+    | 'las'
+    | 'ral'
+    | 'rar'
+    | 'hlt'
+    | 'sma'
+    | 'sza'
+    | 'snl'
+    | 'skp'
+    | 'sna'
+    | 'szl'
+    | 'rtl'
+    | 'rtr'
+    | 'cil'
+    | 'rcl'
+    | 'rcr'
+    | 'cia'
+    | 'lrs'
+    | 'lrss'
+    | 'lls'
+    | 'llss'
+    | 'als'
+    | 'alss'
+    | 'mul'
+    | 'idiv'
+    | 'lacq'
+    | 'clq'
+    | 'omq'
+    | 'cmq'
+    | 'lmq'
+    | 'dscs'
+    | 'dslw'
+    | 'dslm'
+    | 'dsld'
+    | 'dsls'
+    | 'dssf'
+    | 'dsrs'
+    | 'iof'
+    | 'ion'
+    | 'caf'
+    | 'clon'
+    | 'clsf'
+    | 'clof'
+    | 'ksf'
+    | 'krb'
+    | 'tsf'
+    | 'tcf'
+    | 'tls'
+    | 'sck'
+    | 'cck'
+    | 'lck'
+    | 'rsf'
+    | 'rsa'
+    | 'rrb'
+    | 'psf'
+    | 'pcf'
+    | 'psa'
+    | 'cdf'
+    | 'rlpd'
+    | 'lda'
+    | 'wcga'
+    | 'raef'
+    | 'rlpd'
+    | 'beg'
+    | 'spb'
+    | 'cpb'
+    | 'lpb'
+    | 'wbl'
+    | 'dprs'
+    | 'dpsf'
+    | 'dpcf'
+    | 'dprc'
+    | 'crsf'
+    | 'crrb'
+    | 'sys'
+    | 'czm'
+    | 'irss'
+    | 'dsm'
+    ;
 
 LOC
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 RELOC
-   : '..'
-   ;
-
+    : '..'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 TIMES
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIV
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 LABEL
-   : [a-zA-Z0-9.] + ':'
-   ;
-
+    : [a-zA-Z0-9.]+ ':'
+    ;
 
 // the period is considered a letter
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9.]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9.]*
+    ;
 
 NUMERIC_LITERAL
-   : [0-9][0-9a-f]*
-   ;
+    : [0-9][0-9a-f]*
+    ;
 
 DECIMAL
-   : 'd' [0-9] +
-   ;
+    : 'd' [0-9]+
+    ;
 
 OCTAL
-   : 'o' [0-7] +
-   ;
+    : 'o' [0-7]+
+    ;
 
 DECIMAL_MINUS
-   : 'dm' [0-9] +
-   ;
+    : 'dm' [0-9]+
+    ;
 
 STRING
-   : '<' [a-zA-Z0-9$*,%/:?#@.]*
-   ;
+    : '<' [a-zA-Z0-9$*,%/:?#@.]*
+    ;
 
 CHAR
-    : [a-zA-Z0-9>.] '>' 
+    : [a-zA-Z0-9>.] '>'
     ;
-      
-COMMENT
-   : '"' ~ [\r\n]*
-   ;
 
+COMMENT
+    : '"' ~ [\r\n]*
+    ;
 
 EOL
-   : [\r\n]+
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

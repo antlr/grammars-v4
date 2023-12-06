@@ -287,6 +287,8 @@ create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 create index index8 on t1(col1) comment 'test index' using btree;
+CREATE INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as double)));
+CREATE INDEX `idx_custom_field_d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8".value')) as float)));
 #end
 #begin
 -- Create logfile group

@@ -1,4 +1,3 @@
-	
 /*
  [The "BSD licence"]
  Copyright (c) 2015 Adam Taylor
@@ -38,208 +37,272 @@
    http://stl.mie.utoronto.ca/colore/
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar CLIF;
 
 //A.2.3.1 Term sequence
 termseq
-	:	(term | SEQMARK)*
-	;
+    : (term | SEQMARK)*
+    ;
 
 //A.2.3.2 Name
 interpretedname
-	:	NUMERAL
-	|	QUOTEDSTRING
-	;
-	
+    : NUMERAL
+    | QUOTEDSTRING
+    ;
+
 interpretablename
-	:	NAMECHARSEQUENCE
-	|	ENCLOSEDNAME
-	;	
-	
+    : NAMECHARSEQUENCE
+    | ENCLOSEDNAME
+    ;
+
 name
-	:	interpretedname
-	|	interpretablename
-	;
-	
-	
+    : interpretedname
+    | interpretablename
+    ;
+
 //A.2.3.3 Term
 term
-	:	name
-	|	OPEN operator_ termseq CLOSE
-	|	OPEN 'cl-comment' QUOTEDSTRING term CLOSE
-	;
-	
+    : name
+    | OPEN operator_ termseq CLOSE
+    | OPEN 'cl-comment' QUOTEDSTRING term CLOSE
+    ;
+
 operator_
-	:	term
-	;
-	
+    : term
+    ;
 
 //A.2.3.4 Equation
 equation
-	:	OPEN '=' term term CLOSE
-	;
-	
-	
+    : OPEN '=' term term CLOSE
+    ;
+
 //A.2.3.5 Sentence
 sentence
-	:	atomsent
-	|	boolsent
-	|	quantsent
-	|	commentsent
-	;
-
+    : atomsent
+    | boolsent
+    | quantsent
+    | commentsent
+    ;
 
 //A.2.3.6 Atomic sentence
 atomsent
-	:	equation
-	|	atom
-	;
-	
-atom
-	:	OPEN predicate termseq CLOSE
-	|	OPEN term OPEN 'cl-roleset' OPEN name term CLOSE CLOSE CLOSE
-	; 
-	
-predicate
-	:	term	
-	;
+    : equation
+    | atom
+    ;
 
+atom
+    : OPEN predicate termseq CLOSE
+    | OPEN term OPEN 'cl-roleset' OPEN name term CLOSE CLOSE CLOSE
+    ;
+
+predicate
+    : term
+    ;
 
 //A.2.3.7 Boolean sentence
 boolsent
-	:	OPEN ('and' | 'or') sentence* CLOSE
-	|	OPEN ('if' | 'iff') sentence sentence CLOSE
-	|	OPEN 'not' sentence CLOSE
-	;
-
+    : OPEN ('and' | 'or') sentence* CLOSE
+    | OPEN ('if' | 'iff') sentence sentence CLOSE
+    | OPEN 'not' sentence CLOSE
+    ;
 
 //A.2.3.8 Quantified sentence
 quantsent
-	:	OPEN ('forall' | 'exists') interpretablename? boundlist sentence CLOSE
-	;
-	
+    : OPEN ('forall' | 'exists') interpretablename? boundlist sentence CLOSE
+    ;
+
 boundlist
-	:	OPEN 
-		(	interpretablename 
-		|	SEQMARK 
-		|	OPEN (interpretablename | SEQMARK) term CLOSE 
-		)* 
-		CLOSE
-	;
+    : OPEN (interpretablename | SEQMARK | OPEN (interpretablename | SEQMARK) term CLOSE)* CLOSE
+    ;
 
 //A.2.3.9 Commented sentence
 commentsent
-	:	OPEN 'cl-comment' ENCLOSEDNAME sentence CLOSE
-	;
-
+    : OPEN 'cl-comment' ENCLOSEDNAME sentence CLOSE
+    ;
 
 //A.2.3.10 Module
 module
-	:	OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext? CLOSE
-	;
-
+    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext? CLOSE
+    ;
 
 //A.2.3.11 Phrase
 phrase
-	:	sentence
-	|	module
-	|	OPEN 'cl-imports' interpretablename CLOSE
-	|	OPEN 'cl-comment' ENCLOSEDNAME cltext? CLOSE
-	;
+    : sentence
+    | module
+    | OPEN 'cl-imports' interpretablename CLOSE
+    | OPEN 'cl-comment' ENCLOSEDNAME cltext? CLOSE
+    ;
 
 text
-	:	phrase+
-	;
-	
-cltext
-	:	module
-	|	namedtext
-	|	text
-	;
-	
-namedtext
-	:	OPEN 'cl-text' interpretablename text? CLOSE ;
+    : phrase+
+    ;
 
+cltext
+    : module
+    | namedtext
+    | text
+    ;
+
+namedtext
+    : OPEN 'cl-text' interpretablename text? CLOSE
+    ;
 
 //A.2.2.2 Delimiters
-OPEN			: '(';
-CLOSE			: ')'; 
-STRINGQUOTE	: '\''; 
-NAMEQUOTE	: '"'; 
-BACKSLASH	: '\\';
+OPEN
+    : '('
+    ;
 
+CLOSE
+    : ')'
+    ;
+
+STRINGQUOTE
+    : '\''
+    ;
+
+NAMEQUOTE
+    : '"'
+    ;
+
+BACKSLASH
+    : '\\'
+    ;
 
 //A.2.2.3 Characters
-fragment
-CHAR			: [0-9~!#$%^&*_+{}|:<>?`\-=[\];,./A-Za-z];
+fragment CHAR
+    : [0-9~!#$%^&*_+{}|:<>?`\-=[\];,./A-Za-z]
+    ;
 
-fragment
-DIGIT			: [0-9];
+fragment DIGIT
+    : [0-9]
+    ;
 
-fragment
-HEXA			: [0-9A-Fa-f];
-
+fragment HEXA
+    : [0-9A-Fa-f]
+    ;
 
 //A.2.2.4 Quoting within strings
-fragment
-NONASCII		
-	: '\\' 'u' HEXA HEXA HEXA HEXA 
-	| '\\' 'U' HEXA HEXA HEXA HEXA HEXA HEXA
-	;
-	
-fragment
-INNERSTRINGQUOTE	: '\'' ;
+fragment NONASCII
+    : '\\' 'u' HEXA HEXA HEXA HEXA
+    | '\\' 'U' HEXA HEXA HEXA HEXA HEXA HEXA
+    ;
 
-fragment
-INNERNAMEQUOTE		: '"' ;
+fragment INNERSTRINGQUOTE
+    : '\''
+    ;
 
-fragment
-INNERBACKSLASH		: '\\';
+fragment INNERNAMEQUOTE
+    : '"'
+    ;
 
-NUMERAL				: DIGIT+;
-SEQMARK				: '...' CHAR*;
+fragment INNERBACKSLASH
+    : '\\'
+    ;
 
+NUMERAL
+    : DIGIT+
+    ;
+
+SEQMARK
+    : '...' CHAR*
+    ;
 
 //A.2.2.5 Quoted strings
-QUOTEDSTRING : STRINGQUOTE (WHITE | OPEN | CLOSE | CHAR | NONASCII | NAMEQUOTE | INNERSTRINGQUOTE | INNERBACKSLASH )* STRINGQUOTE ;
-ENCLOSEDNAME : NAMEQUOTE (WHITE | OPEN | CLOSE | CHAR | NONASCII | STRINGQUOTE | INNERNAMEQUOTE )* NAMEQUOTE ;
+QUOTEDSTRING
+    : STRINGQUOTE (
+        WHITE
+        | OPEN
+        | CLOSE
+        | CHAR
+        | NONASCII
+        | NAMEQUOTE
+        | INNERSTRINGQUOTE
+        | INNERBACKSLASH
+    )* STRINGQUOTE
+    ;
 
+ENCLOSEDNAME
+    : NAMEQUOTE (WHITE | OPEN | CLOSE | CHAR | NONASCII | STRINGQUOTE | INNERNAMEQUOTE)* NAMEQUOTE
+    ;
 
 //A.2.2.6 Reserved tokens
-EQUAL					:	'=';
-AND					:	'and';
-OR						:	'or';
-IFF						:	'iff';
-IF						:	'if';
-FORALL				:	'forall';
-EXISTS					:	'exists';
-NOT					:	'not';
-CL_ROLESET			:	'cl-roleset';
-CL_TEXT				:	'cl-text';
-CL_IMPORTS			:	'cl-imports';
-CL_EXCLUDES			:	'cl-excludes';
-CL_MODULE			:	'cl-module';
-CL_COMMENT			:	'cl-comment';
-CL_PREFIX				:	'cl-prefix';
+EQUAL
+    : '='
+    ;
 
+AND
+    : 'and'
+    ;
+
+OR
+    : 'or'
+    ;
+
+IFF
+    : 'iff'
+    ;
+
+IF
+    : 'if'
+    ;
+
+FORALL
+    : 'forall'
+    ;
+
+EXISTS
+    : 'exists'
+    ;
+
+NOT
+    : 'not'
+    ;
+
+CL_ROLESET
+    : 'cl-roleset'
+    ;
+
+CL_TEXT
+    : 'cl-text'
+    ;
+
+CL_IMPORTS
+    : 'cl-imports'
+    ;
+
+CL_EXCLUDES
+    : 'cl-excludes'
+    ;
+
+CL_MODULE
+    : 'cl-module'
+    ;
+
+CL_COMMENT
+    : 'cl-comment'
+    ;
+
+CL_PREFIX
+    : 'cl-prefix'
+    ;
 
 //A.2.2.7 Name character sequence
 NAMECHARSEQUENCE
-	:	CHAR  (CHAR | STRINGQUOTE | NAMEQUOTE | BACKSLASH)*
-	;
-
+    : CHAR (CHAR | STRINGQUOTE | NAMEQUOTE | BACKSLASH)*
+    ;
 
 // A.2.2.1 White space
 WHITE
-	:	[ \t\n\r\u000B]							-> skip
-	;
-	
-BLOCKCOMMENT 
-	:	'/*' (BLOCKCOMMENT | .)*? '*/' 	->	skip // nesting allowed (but should it be?)
-	; 
-	
+    : [ \t\n\r\u000B] -> skip
+    ;
+
+BLOCKCOMMENT
+    : '/*' (BLOCKCOMMENT | .)*? '*/' -> skip // nesting allowed (but should it be?)
+    ;
+
 LineComment
-	:	'//' ~[\u000A\u000D]*			->	skip
-	;
-
-
+    : '//' ~[\u000A\u000D]* -> skip
+    ;

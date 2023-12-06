@@ -32,84 +32,88 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ctl;
 
-file_ : proposition EOF ;
+file_
+    : proposition EOF
+    ;
 
 proposition
-   : CTL_DOWNTACK
-   | CTL_UPTACK
-   | ATOMIC
-   | CTL_INEVITABLE (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
-   | CTL_EXISTS (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
-   | CTL_INEVITABLE '[' proposition CTL_UNTIL proposition ']'
-   | CTL_EXISTS '[' proposition CTL_UNTIL proposition ']'
-   | '(' proposition ')'
-   | proposition (CTL_AND | CTL_OR | CTL_RIGHTWARDS_DOUBLE_ARROW | CTL_LEFT_RIGHT_DOUBLE_ARROW) proposition
-   | CTL_NOT proposition
-   ;
+    : CTL_DOWNTACK
+    | CTL_UPTACK
+    | ATOMIC
+    | CTL_INEVITABLE (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
+    | CTL_EXISTS (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
+    | CTL_INEVITABLE '[' proposition CTL_UNTIL proposition ']'
+    | CTL_EXISTS '[' proposition CTL_UNTIL proposition ']'
+    | '(' proposition ')'
+    | proposition (CTL_AND | CTL_OR | CTL_RIGHTWARDS_DOUBLE_ARROW | CTL_LEFT_RIGHT_DOUBLE_ARROW) proposition
+    | CTL_NOT proposition
+    ;
 
 ATOMIC
-   : [a-z]+
-   ;
+    : [a-z]+
+    ;
 
 CTL_UNTIL
-   : 'U'
-   ;
+    : 'U'
+    ;
 
 CTL_GLOBALLY
-   : 'G'
-   ;
+    : 'G'
+    ;
 
 CTL_FINALLY
-   : 'F'
-   ;
+    : 'F'
+    ;
 
 CTL_NEXT
-   : 'X'
-   ;
+    : 'X'
+    ;
 
 CTL_INEVITABLE
-   : 'A'
-   ;
+    : 'A'
+    ;
 
 CTL_EXISTS
-   : 'E'
-   ;
+    : 'E'
+    ;
 
 CTL_PROPOSITION
-   : '\u2205'
-   ;
+    : '\u2205'
+    ;
 
 CTL_LEFT_RIGHT_DOUBLE_ARROW
-   : '\u21d4'
-   ;
+    : '\u21d4'
+    ;
 
 CTL_RIGHTWARDS_DOUBLE_ARROW
-   : '\u21d2'
-   ;
+    : '\u21d2'
+    ;
 
 CTL_AND
-   : '\u2227'
-   ;
+    : '\u2227'
+    ;
 
 CTL_OR
-   : '\u2228'
-   ;
+    : '\u2228'
+    ;
 
 CTL_DOWNTACK
-   : '\u22a4'
-   ;
+    : '\u22a4'
+    ;
 
 CTL_UPTACK
-   : '\u22a5'
-   ;
+    : '\u22a5'
+    ;
 
 CTL_NOT
-   : '\u2310'
-   ;
+    : '\u2310'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

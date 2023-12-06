@@ -26,19 +26,26 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar PromQLParser;
 
-options { tokenVocab = PromQLLexer; }
+options {
+    tokenVocab = PromQLLexer;
+}
 
-expression: vectorOperation EOF;
+expression
+    : vectorOperation EOF
+    ;
 
 // Binary operations are ordered by precedence
 
 // Unary operations have the same precedence as multiplications
 
 vectorOperation
-    : <assoc=right> vectorOperation powOp vectorOperation
-    | <assoc=right> vectorOperation subqueryOp
+    : <assoc = right> vectorOperation powOp vectorOperation
+    | <assoc = right> vectorOperation subqueryOp
     | unaryOp vectorOperation
     | vectorOperation multOp vectorOperation
     | vectorOperation addOp vectorOperation
@@ -52,16 +59,45 @@ vectorOperation
 
 // Operators
 
-unaryOp:        (ADD | SUB);
-powOp:          POW grouping?;
-multOp:         (MULT | DIV | MOD) grouping?;
-addOp:          (ADD | SUB) grouping?;
-compareOp:      (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?;
-andUnlessOp:    (AND | UNLESS) grouping?;
-orOp:           OR grouping?;
-vectorMatchOp:  (ON | UNLESS) grouping?;
-subqueryOp:     SUBQUERY_RANGE offsetOp?;
-offsetOp:       OFFSET DURATION;
+unaryOp
+    : (ADD | SUB)
+    ;
+
+powOp
+    : POW grouping?
+    ;
+
+multOp
+    : (MULT | DIV | MOD) grouping?
+    ;
+
+addOp
+    : (ADD | SUB) grouping?
+    ;
+
+compareOp
+    : (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?
+    ;
+
+andUnlessOp
+    : (AND | UNLESS) grouping?
+    ;
+
+orOp
+    : OR grouping?
+    ;
+
+vectorMatchOp
+    : (ON | UNLESS) grouping?
+    ;
+
+subqueryOp
+    : SUBQUERY_RANGE offsetOp?
+    ;
+
+offsetOp
+    : OFFSET DURATION
+    ;
 
 vector
     : function_
@@ -73,7 +109,9 @@ vector
     | parens
     ;
 
-parens: LEFT_PAREN vectorOperation RIGHT_PAREN;
+parens
+    : LEFT_PAREN vectorOperation RIGHT_PAREN
+    ;
 
 // Selectors
 
@@ -82,11 +120,24 @@ instantSelector
     | LEFT_BRACE labelMatcherList RIGHT_BRACE
     ;
 
-labelMatcher:         labelName labelMatcherOperator STRING;
-labelMatcherOperator: EQ | NE | RE | NRE;
-labelMatcherList:     labelMatcher (COMMA labelMatcher)* COMMA?;
+labelMatcher
+    : labelName labelMatcherOperator STRING
+    ;
 
-matrixSelector: instantSelector TIME_RANGE;
+labelMatcherOperator
+    : EQ
+    | NE
+    | RE
+    | NRE
+    ;
+
+labelMatcherList
+    : labelMatcher (COMMA labelMatcher)* COMMA?
+    ;
+
+matrixSelector
+    : instantSelector TIME_RANGE
+    ;
 
 offset
     : instantSelector OFFSET DURATION
@@ -95,10 +146,18 @@ offset
 
 // Functions
 
-function_: FUNCTION LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
+function_
+    : FUNCTION LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN
+    ;
 
-parameter:     literal | vectorOperation;
-parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
+parameter
+    : literal
+    | vectorOperation
+    ;
+
+parameterList
+    : LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN
+    ;
 
 // Aggregations
 
@@ -107,21 +166,48 @@ aggregation
     | AGGREGATION_OPERATOR (by | without) parameterList
     | AGGREGATION_OPERATOR parameterList ( by | without)
     ;
-by:      BY labelNameList;
-without: WITHOUT labelNameList;
+
+by
+    : BY labelNameList
+    ;
+
+without
+    : WITHOUT labelNameList
+    ;
 
 // Vector one-to-one/one-to-many joins
 
-grouping:   (on_ | ignoring) (groupLeft | groupRight)?;
-on_:         ON labelNameList;
-ignoring:   IGNORING labelNameList;
-groupLeft:  GROUP_LEFT labelNameList?;
-groupRight: GROUP_RIGHT labelNameList?;
+grouping
+    : (on_ | ignoring) (groupLeft | groupRight)?
+    ;
+
+on_
+    : ON labelNameList
+    ;
+
+ignoring
+    : IGNORING labelNameList
+    ;
+
+groupLeft
+    : GROUP_LEFT labelNameList?
+    ;
+
+groupRight
+    : GROUP_RIGHT labelNameList?
+    ;
 
 // Label names
 
-labelName:     keyword | METRIC_NAME | LABEL_NAME;
-labelNameList: LEFT_PAREN (labelName (COMMA labelName)*)? RIGHT_PAREN;
+labelName
+    : keyword
+    | METRIC_NAME
+    | LABEL_NAME
+    ;
+
+labelNameList
+    : LEFT_PAREN (labelName (COMMA labelName)*)? RIGHT_PAREN
+    ;
 
 keyword
     : AND
@@ -139,4 +225,7 @@ keyword
     | FUNCTION
     ;
 
-literal: NUMBER | STRING;
+literal
+    : NUMBER
+    | STRING
+    ;

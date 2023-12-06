@@ -29,54 +29,57 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar szf;
 
 file_
-   : header_* EOF
-   ;
+    : header_* EOF
+    ;
 
 header_
-   : HEADER_START (keyvalue_ | region_)*
-   ;
+    : HEADER_START (keyvalue_ | region_)*
+    ;
 
 region_
-   : REGION_START keyvalue_*
-   ;
+    : REGION_START keyvalue_*
+    ;
 
 keyvalue_
-   : key_ '=' value_
-   ;
+    : key_ '=' value_
+    ;
 
 key_
-   : ID
-   ;
+    : ID
+    ;
 
 value_
-   : ID
-   | NUM
-   ;
+    : ID
+    | NUM
+    ;
 
 HEADER_START
-   : '<group>'
-   ;
+    : '<group>'
+    ;
 
 REGION_START
-   : '<region>'
-   ;
+    : '<region>'
+    ;
 
 ID
-   : [a-zA-Z] [a-zA-Z0-9._/#]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9._/#]*
+    ;
 
 NUM
-   : [0-9]+ ('.' [0-9]+)?
-   ;
+    : [0-9]+ ('.' [0-9]+)?
+    ;
 
 COMMENT
-   : '//' ~ [\r\n]* -> skip
-   ;
+    : '//' ~ [\r\n]* -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

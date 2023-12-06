@@ -16,546 +16,557 @@ limitations under the License.
 Initially developed in the context of ARTIST EU project www.artist-project.eu
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ATL;
 
 /*
  * Parser Rules
  */
 unit
-   : ( module | library_ | query ) EOF
-   ;
+    : (module | library_ | query) EOF
+    ;
 
 module
-   : 'module' (STRING | IDENTIFIER) ';' 'create' targetModelPattern transformationMode sourceModelPattern ';' libraryRef* moduleElement*
-   ;
+    : 'module' (STRING | IDENTIFIER) ';' 'create' targetModelPattern transformationMode sourceModelPattern ';' libraryRef* moduleElement*
+    ;
 
 // Small change introducing targetModelPattern, sourceModelPattern, transformationMode to facilitate fetching the information via the parser
 targetModelPattern
-   : oclModel (',' oclModel)*
-   ;
+    : oclModel (',' oclModel)*
+    ;
 
 sourceModelPattern
-   : oclModel (',' oclModel)*
-   ;
+    : oclModel (',' oclModel)*
+    ;
 
 transformationMode
-   : 'refining'
-   | 'from'
-   ;
+    : 'refining'
+    | 'from'
+    ;
 
 library_
-   : 'library' (STRING | IDENTIFIER) ';' libraryRef* helper*
-   ;
+    : 'library' (STRING | IDENTIFIER) ';' libraryRef* helper*
+    ;
 
 query
-   : 'query' (STRING | IDENTIFIER) '=' oclExpression ';' libraryRef* helper*
-   ;
+    : 'query' (STRING | IDENTIFIER) '=' oclExpression ';' libraryRef* helper*
+    ;
 
 libraryRef
-   : 'uses' STRING ';'
-   ;
+    : 'uses' STRING ';'
+    ;
 
 moduleElement
-   : helper
-   | arule
-   ;
+    : helper
+    | arule
+    ;
 
 helper
-   : 'helper' oclFeatureDefinition ';'
-   ;
+    : 'helper' oclFeatureDefinition ';'
+    ;
 
 oclFeatureDefinition
-   : oclContextDefinition? 'def' ':' oclFeature
-   ;
+    : oclContextDefinition? 'def' ':' oclFeature
+    ;
 
 oclContextDefinition
-   : 'context' oclType
-   ;
+    : 'context' oclType
+    ;
 
 oclFeature
-   : operation
-   | attribute
-   ;
+    : operation
+    | attribute
+    ;
 
 operation
-   : IDENTIFIER '(' (parameter (',' parameter)*)? ')' ':' oclType '=' oclExpression
-   ;
+    : IDENTIFIER '(' (parameter (',' parameter)*)? ')' ':' oclType '=' oclExpression
+    ;
 
 parameter
-   : IDENTIFIER ':' oclType
-   ;
+    : IDENTIFIER ':' oclType
+    ;
 
 attribute
-   : IDENTIFIER ':' oclType '=' oclExpression
-   ;
+    : IDENTIFIER ':' oclType '=' oclExpression
+    ;
 
 arule
-   : calledRule
-   | matchedRule
-   ;
+    : calledRule
+    | matchedRule
+    ;
 
 matchedRule
-   : lazyMatchedRule
-   | matchedRule_abstractContents
-   ;
+    : lazyMatchedRule
+    | matchedRule_abstractContents
+    ;
 
 lazyMatchedRule
-   : 'unique'? 'lazy' 'abstract'? 'refining'? 'rule' IDENTIFIER ('extends' IDENTIFIER)? '{' inPattern ('using' '{' ruleVariableDeclaration* '}')? outPattern? actionBlock? '}'
-   ;
+    : 'unique'? 'lazy' 'abstract'? 'refining'? 'rule' IDENTIFIER ('extends' IDENTIFIER)? '{' inPattern (
+        'using' '{' ruleVariableDeclaration* '}'
+    )? outPattern? actionBlock? '}'
+    ;
 
 ruleVariableDeclaration
-   : IDENTIFIER ':' oclType '=' oclExpression ';'
-   ;
+    : IDENTIFIER ':' oclType '=' oclExpression ';'
+    ;
 
 calledRule
-   : 'entrypoint'? 'endpoint'? 'rule' IDENTIFIER '(' (parameter (',' parameter)*)? ')' '{' ('using' '{' ruleVariableDeclaration* '}')? outPattern? actionBlock? '}'
-   ;
+    : 'entrypoint'? 'endpoint'? 'rule' IDENTIFIER '(' (parameter (',' parameter)*)? ')' '{' (
+        'using' '{' ruleVariableDeclaration* '}'
+    )? outPattern? actionBlock? '}'
+    ;
 
 inPattern
-   : 'from' inPatternElement (',' inPatternElement)* ('(' oclExpression ')')?
-   ;
+    : 'from' inPatternElement (',' inPatternElement)* ('(' oclExpression ')')?
+    ;
 
 inPatternElement
-   : simpleInPatternElement
-   ;
+    : simpleInPatternElement
+    ;
 
 simpleInPatternElement
-   : IDENTIFIER ':' oclType ('in' IDENTIFIER (',' IDENTIFIER)*)?
-   ;
+    : IDENTIFIER ':' oclType ('in' IDENTIFIER (',' IDENTIFIER)*)?
+    ;
 
 outPattern
-   : 'to' outPatternElement (',' outPatternElement)*
-   ;
+    : 'to' outPatternElement (',' outPatternElement)*
+    ;
 
 outPatternElement
-   : simpleOutPatternElement
-   | forEachOutPatternElement
-   ;
+    : simpleOutPatternElement
+    | forEachOutPatternElement
+    ;
 
 simpleOutPatternElement
-   : IDENTIFIER ':' oclType ('in' IDENTIFIER)? ('mapsTo' IDENTIFIER)? ('(' (binding (',' binding)*)? ')')?
-   ;
+    : IDENTIFIER ':' oclType ('in' IDENTIFIER)? ('mapsTo' IDENTIFIER)? (
+        '(' (binding (',' binding)*)? ')'
+    )?
+    ;
 
 forEachOutPatternElement
-   : IDENTIFIER ':' 'distinct' oclType 'foreach' '(' iterator 'in' oclExpression ')' ('mapsTo' IDENTIFIER)? ('(' (binding (',' binding)*)? ')')?
-   ;
+    : IDENTIFIER ':' 'distinct' oclType 'foreach' '(' iterator 'in' oclExpression ')' (
+        'mapsTo' IDENTIFIER
+    )? ('(' (binding (',' binding)*)? ')')?
+    ;
 
 binding
-   : IDENTIFIER '<-' oclExpression
-   ;
+    : IDENTIFIER '<-' oclExpression
+    ;
 
 actionBlock
-   : 'do' '{' statement* '}'
-   ;
+    : 'do' '{' statement* '}'
+    ;
 
 statement
-   : ifStat
-   | expressionStat
-   | bindingStat
-   | forStat
-   ;
+    : ifStat
+    | expressionStat
+    | bindingStat
+    | forStat
+    ;
 
 bindingStat
-   : oclExpression '<-' oclExpression ';'
-   ;
+    : oclExpression '<-' oclExpression ';'
+    ;
 
 expressionStat
-   : oclExpression ';'
-   ;
+    : oclExpression ';'
+    ;
 
 ifStat
-   : 'if' '(' oclExpression ')' (statement | '{' statement* '}') ('else' (statement | '{' statement* '}'))?
-   ;
+    : 'if' '(' oclExpression ')' (statement | '{' statement* '}') (
+        'else' (statement | '{' statement* '}')
+    )?
+    ;
 
 forStat
-   : 'for' '(' iterator 'in' oclExpression ')' '{' statement* '}'
-   ;
+    : 'for' '(' iterator 'in' oclExpression ')' '{' statement* '}'
+    ;
 
 oclModel
-   : IDENTIFIER ':' IDENTIFIER
-   ;
+    : IDENTIFIER ':' IDENTIFIER
+    ;
 
 oclModelElement
-   : IDENTIFIER '!' (STRING | IDENTIFIER)
-   ;
+    : IDENTIFIER '!' (STRING | IDENTIFIER)
+    ;
 
 oclExpression
-   : priority_5
-   | letExp
-   ;
+    : priority_5
+    | letExp
+    ;
 
 iteratorExp
-   : IDENTIFIER '(' iterator (',' iterator)* '|' oclExpression ')'
-   ;
+    : IDENTIFIER '(' iterator (',' iterator)* '|' oclExpression ')'
+    ;
 
 iterateExp
-   : 'iterate' '(' iterator (',' iterator)* ';' variableDeclaration '|' oclExpression ')'
-   ;
+    : 'iterate' '(' iterator (',' iterator)* ';' variableDeclaration '|' oclExpression ')'
+    ;
 
 collectionOperationCallExp
-   : IDENTIFIER '(' (oclExpression (',' oclExpression)*)? ')'
-   ;
+    : IDENTIFIER '(' (oclExpression (',' oclExpression)*)? ')'
+    ;
 
 operationCallExp
-   : IDENTIFIER '(' (oclExpression (',' oclExpression)*)? ')'
-   ;
+    : IDENTIFIER '(' (oclExpression (',' oclExpression)*)? ')'
+    ;
 
 navigationOrAttributeCallExp
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 iterator
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 oclUndefinedExp
-   : 'OclUndefined'
-   ;
+    : 'OclUndefined'
+    ;
 
 primitiveExp
-   : numericExp
-   | booleanExp
-   | stringExp
-   ;
+    : numericExp
+    | booleanExp
+    | stringExp
+    ;
 
 numericExp
-   : integerExp
-   | realExp
-   ;
+    : integerExp
+    | realExp
+    ;
 
 booleanExp
-   : 'true'
-   | 'false'
-   ;
+    : 'true'
+    | 'false'
+    ;
 
 integerExp
-   : INTEGER
-   ;
+    : INTEGER
+    ;
 
 realExp
-   : FLOAT
-   ;
+    : FLOAT
+    ;
 
 stringExp
-   : STRING
-   ;
+    : STRING
+    ;
 
 ifExp
-   : 'if' oclExpression 'then' oclExpression 'else' oclExpression 'endif'
-   ;
+    : 'if' oclExpression 'then' oclExpression 'else' oclExpression 'endif'
+    ;
 
 variableExp
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 superExp
-   : 'super'
-   ;
+    : 'super'
+    ;
 
 letExp
-   : 'let' variableDeclaration 'in' oclExpression
-   ;
+    : 'let' variableDeclaration 'in' oclExpression
+    ;
 
 variableDeclaration
-   : IDENTIFIER ':' oclType '=' oclExpression
-   ;
+    : IDENTIFIER ':' oclType '=' oclExpression
+    ;
 
 enumLiteralExp
-   : '#' IDENTIFIER
-   ;
+    : '#' IDENTIFIER
+    ;
 
 collectionExp
-   : bagExp
-   | setExp
-   | orderedSetExp
-   | sequenceExp
-   ;
+    : bagExp
+    | setExp
+    | orderedSetExp
+    | sequenceExp
+    ;
 
 bagExp
-   : 'Bag' '{' (oclExpression (',' oclExpression)*)? '}'
-   ;
+    : 'Bag' '{' (oclExpression (',' oclExpression)*)? '}'
+    ;
 
 setExp
-   : 'Set' '{' (oclExpression (',' oclExpression)*)? '}'
-   ;
+    : 'Set' '{' (oclExpression (',' oclExpression)*)? '}'
+    ;
 
 orderedSetExp
-   : 'OrderedSet' '{' (oclExpression (',' oclExpression)*)? '}'
-   ;
+    : 'OrderedSet' '{' (oclExpression (',' oclExpression)*)? '}'
+    ;
 
 sequenceExp
-   : 'Sequence' '{' (oclExpression (',' oclExpression)*)? '}'
-   ;
+    : 'Sequence' '{' (oclExpression (',' oclExpression)*)? '}'
+    ;
 
 mapExp
-   : 'Map' '{' (mapElement (',' mapElement)*)? '}'
-   ;
+    : 'Map' '{' (mapElement (',' mapElement)*)? '}'
+    ;
 
 mapElement
-   : '(' oclExpression ',' oclExpression ')'
-   ;
+    : '(' oclExpression ',' oclExpression ')'
+    ;
 
 tupleExp
-   : 'Tuple' '{' (tuplePart (',' tuplePart)*)? '}'
-   ;
+    : 'Tuple' '{' (tuplePart (',' tuplePart)*)? '}'
+    ;
 
 tuplePart
-   : IDENTIFIER (':' oclType)? '=' oclExpression
-   ;
+    : IDENTIFIER (':' oclType)? '=' oclExpression
+    ;
 
 oclType
-   : oclModelElement
-   | oclAnyType
-   | tupleType
-   | mapType
-   | primitive
-   | collectionType
-   | oclType_abstractContents
-   ;
+    : oclModelElement
+    | oclAnyType
+    | tupleType
+    | mapType
+    | primitive
+    | collectionType
+    | oclType_abstractContents
+    ;
 
 oclAnyType
-   : oclAnyType_abstractContents
-   ;
+    : oclAnyType_abstractContents
+    ;
 
 tupleType
-   : 'TupleType' '(' (tupleTypeAttribute (',' tupleTypeAttribute)*)? ')'
-   ;
+    : 'TupleType' '(' (tupleTypeAttribute (',' tupleTypeAttribute)*)? ')'
+    ;
 
 tupleTypeAttribute
-   : IDENTIFIER ':' oclType
-   ;
+    : IDENTIFIER ':' oclType
+    ;
 
 mapType
-   : 'Map' '(' oclType ',' oclType ')'
-   ;
+    : 'Map' '(' oclType ',' oclType ')'
+    ;
 
 primitive
-   : numericType
-   | booleanType
-   | stringType
-   ;
+    : numericType
+    | booleanType
+    | stringType
+    ;
 
 numericType
-   : integerType
-   | realType
-   ;
+    : integerType
+    | realType
+    ;
 
 integerType
-   : 'Integer'
-   ;
+    : 'Integer'
+    ;
 
 realType
-   : 'Real'
-   ;
+    : 'Real'
+    ;
 
 booleanType
-   : 'Boolean'
-   ;
+    : 'Boolean'
+    ;
 
 stringType
-   : 'String'
-   ;
+    : 'String'
+    ;
 
 collectionType
-   : bagType
-   | setType
-   | orderedSetType
-   | sequenceType
-   | collectionType_abstractContents
-   ;
+    : bagType
+    | setType
+    | orderedSetType
+    | sequenceType
+    | collectionType_abstractContents
+    ;
 
 bagType
-   : 'Bag' '(' oclType ')'
-   ;
+    : 'Bag' '(' oclType ')'
+    ;
 
 setType
-   : 'Set' '(' oclType ')'
-   ;
+    : 'Set' '(' oclType ')'
+    ;
 
 orderedSetType
-   : 'OrderedSet' '(' oclType ')'
-   ;
+    : 'OrderedSet' '(' oclType ')'
+    ;
 
 sequenceType
-   : 'Sequence' '(' oclType ')'
-   ;
+    : 'Sequence' '(' oclType ')'
+    ;
 
 priority_0
-   : primary_oclExpression ('.' (operationCallExp | navigationOrAttributeCallExp) | '->' (iteratorExp | iterateExp | collectionOperationCallExp))*
-   ;
+    : primary_oclExpression (
+        '.' (operationCallExp | navigationOrAttributeCallExp)
+        | '->' (iteratorExp | iterateExp | collectionOperationCallExp)
+    )*
+    ;
 
 priority_1
-   : 'not' priority_0
-   | '-' priority_0
-   | priority_0
-   ;
+    : 'not' priority_0
+    | '-' priority_0
+    | priority_0
+    ;
 
 priority_2
-   : priority_1 ('*' priority_1 | '/' priority_1 | 'div' priority_1 | 'mod' priority_1)*
-   ;
+    : priority_1 ('*' priority_1 | '/' priority_1 | 'div' priority_1 | 'mod' priority_1)*
+    ;
 
 priority_3
-   : priority_2 ('+' priority_2 | '-' priority_2)*
-   ;
+    : priority_2 ('+' priority_2 | '-' priority_2)*
+    ;
 
 priority_4
-   : priority_3 ('=' priority_3 | '>' priority_3 | '<' priority_3 | '>=' priority_3 | '<=' priority_3 | '<>' priority_3)*
-   ;
+    : priority_3 (
+        '=' priority_3
+        | '>' priority_3
+        | '<' priority_3
+        | '>=' priority_3
+        | '<=' priority_3
+        | '<>' priority_3
+    )*
+    ;
 
 priority_5
-   : priority_4 ('and' priority_4 | 'or' priority_4 | 'xor' priority_4 | 'implies' priority_4)*
-   ;
+    : priority_4 ('and' priority_4 | 'or' priority_4 | 'xor' priority_4 | 'implies' priority_4)*
+    ;
 
 matchedRule_abstractContents
-   : 'nodefault'? 'abstract'? 'refining'? 'rule' IDENTIFIER ('extends' IDENTIFIER)? '{' inPattern ('using' '{' ruleVariableDeclaration* '}')? outPattern? actionBlock? '}'
-   ;
+    : 'nodefault'? 'abstract'? 'refining'? 'rule' IDENTIFIER ('extends' IDENTIFIER)? '{' inPattern (
+        'using' '{' ruleVariableDeclaration* '}'
+    )? outPattern? actionBlock? '}'
+    ;
 
 oclType_abstractContents
-   : 'OclType'
-   ;
+    : 'OclType'
+    ;
 
 oclAnyType_abstractContents
-   : 'OclAny'
-   ;
+    : 'OclAny'
+    ;
 
 collectionType_abstractContents
-   : 'Collection' '(' oclType ')'
-   ;
+    : 'Collection' '(' oclType ')'
+    ;
 
 primary_oclExpression
-   : variableExp
-   | oclUndefinedExp
-   | primitiveExp
-   | ifExp
-   | superExp
-   | enumLiteralExp
-   | collectionExp
-   | mapExp
-   | tupleExp
-   | oclType
-   | '(' oclExpression ')'
-   ;
-
+    : variableExp
+    | oclUndefinedExp
+    | primitiveExp
+    | ifExp
+    | superExp
+    | enumLiteralExp
+    | collectionExp
+    | mapExp
+    | tupleExp
+    | oclType
+    | '(' oclExpression ')'
+    ;
 
 STRING
-   : '"' DoubleStringCharacters? '"' | '\'' SingleStringCharacters? '\''
-   ;
-
+    : '"' DoubleStringCharacters? '"'
+    | '\'' SingleStringCharacters? '\''
+    ;
 
 fragment DoubleStringCharacters
-   : DoubleStringCharacter +
-   ;
-
+    : DoubleStringCharacter+
+    ;
 
 fragment DoubleStringCharacter
-   : ~ ["\\] | '\\' [btnfr"'\\]
-   ;
-
+    : ~ ["\\]
+    | '\\' [btnfr"'\\]
+    ;
 
 fragment SingleStringCharacters
-   : SingleStringCharacter +
-   ;
-
+    : SingleStringCharacter+
+    ;
 
 fragment SingleStringCharacter
-   : ~ ['\\] | '\\' [btnfr"'\\]
-   ;
+    : ~ ['\\]
+    | '\\' [btnfr"'\\]
+    ;
 
 // Integer Literals
 
 INTEGER
-   : DecimalIntegerLiteral
-   ;
-
+    : DecimalIntegerLiteral
+    ;
 
 fragment DecimalIntegerLiteral
-   : DecimalNumeral
-   ;
-
+    : DecimalNumeral
+    ;
 
 fragment DecimalNumeral
-   : '0' | NonZeroDigit Digits?
-   ;
-
+    : '0'
+    | NonZeroDigit Digits?
+    ;
 
 fragment Digits
-   : Digit Digit*
-   ;
-
+    : Digit Digit*
+    ;
 
 fragment Digit
-   : '0' | NonZeroDigit
-   ;
-
+    : '0'
+    | NonZeroDigit
+    ;
 
 fragment NonZeroDigit
-   : [1-9]
-   ;
-
+    : [1-9]
+    ;
 
 FLOAT
-   : DecimalFloatingPointLiteral
-   ;
-
+    : DecimalFloatingPointLiteral
+    ;
 
 fragment DecimalFloatingPointLiteral
-   : Digits '.' Digits? ExponentPart? FloatTypeSuffix? | '.' Digits ExponentPart? FloatTypeSuffix? | Digits ExponentPart FloatTypeSuffix? | Digits FloatTypeSuffix
-   ;
-
+    : Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    | '.' Digits ExponentPart? FloatTypeSuffix?
+    | Digits ExponentPart FloatTypeSuffix?
+    | Digits FloatTypeSuffix
+    ;
 
 fragment ExponentPart
-   : ExponentIndicator SignedInteger
-   ;
-
+    : ExponentIndicator SignedInteger
+    ;
 
 fragment ExponentIndicator
-   : [eE]
-   ;
-
+    : [eE]
+    ;
 
 fragment SignedInteger
-   : Sign? Digits
-   ;
-
+    : Sign? Digits
+    ;
 
 fragment Sign
-   : [+-]
-   ;
-
+    : [+-]
+    ;
 
 fragment FloatTypeSuffix
-   : [fFdD]
-   ;
-
+    : [fFdD]
+    ;
 
 IDENTIFIER
-   : LetterOrDigit LetterOrDigit*
-   ;
-
+    : LetterOrDigit LetterOrDigit*
+    ;
 
 fragment Letter
-   : [a-zA-Z$_]
-   ;
-
+    : [a-zA-Z$_]
+    ;
 
 fragment LetterOrDigit
-   : [a-zA-Z0-9$_]
-   ;
+    : [a-zA-Z0-9$_]
+    ;
 
 //
 // Whitespace and comments
 //
 
 WS
-   : [ \t\r\n\u000C] + -> skip
-   ;
-
+    : [ \t\r\n\u000C]+ -> skip
+    ;
 
 COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
-
+    : '/*' .*? '*/' -> skip
+    ;
 
 LINE_COMMENT
-   : '--' ~ [\r\n]* -> skip
-   ;
+    : '--' ~ [\r\n]* -> skip
+    ;

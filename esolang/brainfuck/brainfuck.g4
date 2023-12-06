@@ -1,4 +1,3 @@
-
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Tom Everett
@@ -26,62 +25,62 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar brainfuck;
 
 file_
-   : statement* EOF
-   ;
+    : statement* EOF
+    ;
 
 statement
-: opcode
-| LPAREN statement* RPAREN
-;
+    : opcode
+    | LPAREN statement* RPAREN
+    ;
 
 opcode
-   : GT | LT | PLUS | MINUS | DOT | COMMA
-   ;
-
+    : GT
+    | LT
+    | PLUS
+    | MINUS
+    | DOT
+    | COMMA
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 PLUS
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 LPAREN
-   : '['
-   ;
-
+    : '['
+    ;
 
 RPAREN
-   : ']'
-   ;
-
+    : ']'
+    ;
 
 WS
-   : . -> skip
-   ;
+    : . -> skip
+    ;

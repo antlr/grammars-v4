@@ -22,128 +22,128 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar ObjectiveCPreprocessorLexer;
 
-channels { COMMENTS_CHANNEL }
+channels {
+    COMMENTS_CHANNEL
+}
 
-SHARP:                    '#'                                        -> mode(DIRECTIVE_MODE);
-COMMENT:                  '/*' .*? '*/'                              -> type(CODE);
-LINE_COMMENT:             '//' ~[\r\n]*                              -> type(CODE);
-SLASH:                    '/'                                        -> type(CODE);
-CHARACTER_LITERAL:        '\'' (EscapeSequence | ~('\''|'\\')) '\''  -> type(CODE);
-QUOTE_STRING:             '\'' (EscapeSequence | ~('\''|'\\'))* '\'' -> type(CODE);
-STRING:                   StringFragment                             -> type(CODE);
-CODE:                     ~[#'"/]+;
+SHARP             : '#'                                          -> mode(DIRECTIVE_MODE);
+COMMENT           : '/*' .*? '*/'                                -> type(CODE);
+LINE_COMMENT      : '//' ~[\r\n]*                                -> type(CODE);
+SLASH             : '/'                                          -> type(CODE);
+CHARACTER_LITERAL : '\'' (EscapeSequence | ~('\'' | '\\')) '\''  -> type(CODE);
+QUOTE_STRING      : '\'' (EscapeSequence | ~('\'' | '\\'))* '\'' -> type(CODE);
+STRING            : StringFragment                               -> type(CODE);
+CODE              : ~[#'"/]+;
 
 mode DIRECTIVE_MODE;
 
-IMPORT:  'import' [ \t]+ -> mode(DIRECTIVE_TEXT);
-INCLUDE: 'include' [ \t]+ -> mode(DIRECTIVE_TEXT);
-PRAGMA:  'pragma' -> mode(DIRECTIVE_TEXT);
+IMPORT  : 'import' [ \t]+  -> mode(DIRECTIVE_TEXT);
+INCLUDE : 'include' [ \t]+ -> mode(DIRECTIVE_TEXT);
+PRAGMA  : 'pragma'         -> mode(DIRECTIVE_TEXT);
 
-DEFINE:  'define' [ \t]+ -> mode(DIRECTIVE_DEFINE);
-DEFINED: 'defined';
-IF:      'if';
-ELIF:    'elif';
-ELSE:    'else';
-UNDEF:   'undef';
-IFDEF:   'ifdef';
-IFNDEF:  'ifndef';
-ENDIF:   'endif';
-TRUE:     T R U E;
-FALSE:    F A L S E;
-ERROR:   'error' -> mode(DIRECTIVE_TEXT);
+DEFINE  : 'define' [ \t]+ -> mode(DIRECTIVE_DEFINE);
+DEFINED : 'defined';
+IF      : 'if';
+ELIF    : 'elif';
+ELSE    : 'else';
+UNDEF   : 'undef';
+IFDEF   : 'ifdef';
+IFNDEF  : 'ifndef';
+ENDIF   : 'endif';
+TRUE    : T R U E;
+FALSE   : F A L S E;
+ERROR   : 'error' -> mode(DIRECTIVE_TEXT);
 
-BANG:             '!' ;
-LPAREN:           '(' ;
-RPAREN:           ')' ;
-EQUAL:            '==';
-NOTEQUAL:         '!=';
-AND:              '&&';
-OR:               '||';
-LT:               '<' ;
-GT:               '>' ;
-LE:               '<=';
-GE:               '>=';
+BANG     : '!';
+LPAREN   : '(';
+RPAREN   : ')';
+EQUAL    : '==';
+NOTEQUAL : '!=';
+AND      : '&&';
+OR       : '||';
+LT       : '<';
+GT       : '>';
+LE       : '<=';
+GE       : '>=';
 
-DIRECTIVE_WHITESPACES:      [ \t]+                           -> channel(HIDDEN);
-DIRECTIVE_STRING:           StringFragment;
-CONDITIONAL_SYMBOL:         LETTER (LETTER | [0-9])*;
-DECIMAL_LITERAL:            [0-9]+;
-FLOAT:                      ([0-9]+ '.' [0-9]* | '.' [0-9]+);
-NEW_LINE:                   '\r'? '\n'                       -> mode(DEFAULT_MODE);
-DIRECITVE_COMMENT:          '/*' .*? '*/'                    -> channel(COMMENTS_CHANNEL);
-DIRECITVE_LINE_COMMENT:     '//' ~[\r\n]*                    -> channel(COMMENTS_CHANNEL);
-DIRECITVE_NEW_LINE:         '\\' '\r'? '\n'                  -> channel(HIDDEN);
+DIRECTIVE_WHITESPACES  : [ \t]+ -> channel(HIDDEN);
+DIRECTIVE_STRING       : StringFragment;
+CONDITIONAL_SYMBOL     : LETTER (LETTER | [0-9])*;
+DECIMAL_LITERAL        : [0-9]+;
+FLOAT                  : ([0-9]+ '.' [0-9]* | '.' [0-9]+);
+NEW_LINE               : '\r'? '\n'      -> mode(DEFAULT_MODE);
+DIRECITVE_COMMENT      : '/*' .*? '*/'   -> channel(COMMENTS_CHANNEL);
+DIRECITVE_LINE_COMMENT : '//' ~[\r\n]*   -> channel(COMMENTS_CHANNEL);
+DIRECITVE_NEW_LINE     : '\\' '\r'? '\n' -> channel(HIDDEN);
 
 mode DIRECTIVE_DEFINE;
 
-DIRECTIVE_DEFINE_CONDITIONAL_SYMBOL: LETTER (LETTER | [0-9])* ('(' (LETTER | [0-9,. \t])* ')')? -> type(CONDITIONAL_SYMBOL), mode(DIRECTIVE_TEXT);
+DIRECTIVE_DEFINE_CONDITIONAL_SYMBOL:
+    LETTER (LETTER | [0-9])* ('(' (LETTER | [0-9,. \t])* ')')? -> type(CONDITIONAL_SYMBOL), mode(DIRECTIVE_TEXT)
+;
 
 mode DIRECTIVE_TEXT;
 
-DIRECITVE_TEXT_NEW_LINE:         '\\' '\r'? '\n'  -> channel(HIDDEN);
-BACK_SLASH_ESCAPE:               '\\' .           -> type(TEXT);
-TEXT_NEW_LINE:                   '\r'? '\n'       -> type(NEW_LINE), mode(DEFAULT_MODE);
-DIRECTIVE_COMMENT:               '/*' .*? '*/'    -> channel(COMMENTS_CHANNEL), type(DIRECITVE_COMMENT);
-DIRECTIVE_LINE_COMMENT:          '//' ~[\r\n]*    -> channel(COMMENTS_CHANNEL), type(DIRECITVE_LINE_COMMENT);
-DIRECTIVE_SLASH:                 '/'              -> type(TEXT);
-TEXT:                            ~[\r\n\\/]+;
+DIRECITVE_TEXT_NEW_LINE : '\\' '\r'? '\n' -> channel(HIDDEN);
+BACK_SLASH_ESCAPE       : '\\' .          -> type(TEXT);
+TEXT_NEW_LINE           : '\r'? '\n'      -> type(NEW_LINE), mode(DEFAULT_MODE);
+DIRECTIVE_COMMENT       : '/*' .*? '*/'   -> channel(COMMENTS_CHANNEL), type(DIRECITVE_COMMENT);
+DIRECTIVE_LINE_COMMENT:
+    '//' ~[\r\n]* -> channel(COMMENTS_CHANNEL), type(DIRECITVE_LINE_COMMENT)
+;
+DIRECTIVE_SLASH : '/' -> type(TEXT);
+TEXT            : ~[\r\n\\/]+;
 
-fragment
-EscapeSequence
-    : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\')
+fragment EscapeSequence:
+    '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\')
     | OctalEscape
     | UnicodeEscape
-    ;
+;
 
-fragment
-OctalEscape
-    :   '\\' [0-3] [0-7] [0-7]
-    |   '\\' [0-7] [0-7]
-    |   '\\' [0-7]
-    ;
+fragment OctalEscape: '\\' [0-3] [0-7] [0-7] | '\\' [0-7] [0-7] | '\\' [0-7];
 
-fragment
-UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
-    ;
+fragment UnicodeEscape: '\\' 'u' HexDigit HexDigit HexDigit HexDigit;
 
-fragment HexDigit:          [0-9a-fA-F];
+fragment HexDigit: [0-9a-fA-F];
 
-fragment
-StringFragment: '"' (~('\\' | '"') | '\\' .)* '"';
+fragment StringFragment: '"' (~('\\' | '"') | '\\' .)* '"';
 
-fragment LETTER
-    : [$A-Za-z_]
+fragment LETTER:
+    [$A-Za-z_]
     | ~[\u0000-\u00FF\uD800-\uDBFF]
     | [\uD800-\uDBFF] [\uDC00-\uDFFF]
     | [\u00E9]
-    ;
+;
 
-fragment A: [aA];
-fragment B: [bB];
-fragment C: [cC];
-fragment D: [dD];
-fragment E: [eE];
-fragment F: [fF];
-fragment G: [gG];
-fragment H: [hH];
-fragment I: [iI];
-fragment J: [jJ];
-fragment K: [kK];
-fragment L: [lL];
-fragment M: [mM];
-fragment N: [nN];
-fragment O: [oO];
-fragment P: [pP];
-fragment Q: [qQ];
-fragment R: [rR];
-fragment S: [sS];
-fragment T: [tT];
-fragment U: [uU];
-fragment V: [vV];
-fragment W: [wW];
-fragment X: [xX];
-fragment Y: [yY];
-fragment Z: [zZ];
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];

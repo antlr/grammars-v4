@@ -28,11 +28,15 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar TypeScriptParser;
 
 options {
-    tokenVocab=TypeScriptLexer;
-    superClass=TypeScriptParserBase;
+    tokenVocab = TypeScriptLexer;
+    superClass = TypeScriptParserBase;
 }
 
 // SupportSyntax
@@ -86,21 +90,21 @@ type_
     ;
 
 unionOrIntersectionOrPrimaryType
-    : unionOrIntersectionOrPrimaryType '|' unionOrIntersectionOrPrimaryType #Union
-    | unionOrIntersectionOrPrimaryType '&' unionOrIntersectionOrPrimaryType #Intersection
-    | primaryType #Primary
+    : unionOrIntersectionOrPrimaryType '|' unionOrIntersectionOrPrimaryType # Union
+    | unionOrIntersectionOrPrimaryType '&' unionOrIntersectionOrPrimaryType # Intersection
+    | primaryType                                                           # Primary
     ;
 
 primaryType
-    : '(' type_ ')'                                 #ParenthesizedPrimType
-    | predefinedType                                #PredefinedPrimType
-    | typeReference                                 #ReferencePrimType
-    | objectType                                    #ObjectPrimType
-    | primaryType {notLineTerminator()}? '[' ']'    #ArrayPrimType
-    | '[' tupleElementTypes ']'                     #TuplePrimType
-    | typeQuery                                     #QueryPrimType
-    | This                                          #ThisPrimType
-    | typeReference Is primaryType                  #RedefinitionOfType
+    : '(' type_ ')'                              # ParenthesizedPrimType
+    | predefinedType                             # PredefinedPrimType
+    | typeReference                              # ReferencePrimType
+    | objectType                                 # ObjectPrimType
+    | primaryType {notLineTerminator()}? '[' ']' # ArrayPrimType
+    | '[' tupleElementTypes ']'                  # TuplePrimType
+    | typeQuery                                  # QueryPrimType
+    | This                                       # ThisPrimType
+    | typeReference Is primaryType               # RedefinitionOfType
     ;
 
 predefinedType
@@ -133,7 +137,7 @@ typeGeneric
     ;
 
 typeIncludeGeneric
-    :'<' typeArgumentList '<' typeArgumentList ('>' bindingPattern '>' | '>>')
+    : '<' typeArgumentList '<' typeArgumentList ('>' bindingPattern '>' | '>>')
     ;
 
 typeName
@@ -217,7 +221,12 @@ parameter
     ;
 
 optionalParameter
-    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
+    : decoratorList? (
+        accessibilityModifier? identifierOrPattern (
+            '?' typeAnnotation?
+            | typeAnnotation? initializer
+        )
+    )
     ;
 
 restParameter
@@ -244,7 +253,7 @@ constructSignature
     ;
 
 indexSignature
-    : '[' Identifier ':' (Number|String) ']' typeAnnotation
+    : '[' Identifier ':' (Number | String) ']' typeAnnotation
     ;
 
 methodSignature
@@ -256,7 +265,10 @@ typeAliasDeclaration
     ;
 
 constructorDeclaration
-    : accessibilityModifier? Constructor '(' formalParameterList? ')' ( ('{' functionBody '}') | SemiColon)?
+    : accessibilityModifier? Constructor '(' formalParameterList? ')' (
+        ('{' functionBody '}')
+        | SemiColon
+    )?
     ;
 
 // A.5 Interface
@@ -308,7 +320,8 @@ importAliasDeclaration
 // Ext.2 Additions to 1.8: Decorators
 
 decoratorList
-    : decorator+ ;
+    : decorator+
+    ;
 
 decorator
     : '@' (decoratorMemberExpression | decoratorCallExpression)
@@ -321,7 +334,8 @@ decoratorMemberExpression
     ;
 
 decoratorCallExpression
-    : decoratorMemberExpression arguments;
+    : decoratorMemberExpression arguments
+    ;
 
 // ECMAPart
 program
@@ -402,7 +416,9 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : ( identifierOrKeyWord | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
+    : (identifierOrKeyWord | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? (
+        '=' typeParameters? singleExpression
+    )? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement_
@@ -417,15 +433,13 @@ ifStatement
     : If '(' expressionSequence ')' statement (Else statement)?
     ;
 
-
 iterationStatement
-    : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
-    | While '(' expressionSequence ')' statement                                                                # WhileStatement
-    | For '(' expressionSequence? SemiColon expressionSequence? SemiColon expressionSequence? ')' statement     # ForStatement
-    | For '(' varModifier variableDeclarationList SemiColon expressionSequence? SemiColon expressionSequence? ')'
-          statement                                                                                             # ForVarStatement
-    | For '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
-    | For '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
+    : Do statement While '(' expressionSequence ')' eos                                                                     # DoStatement
+    | While '(' expressionSequence ')' statement                                                                            # WhileStatement
+    | For '(' expressionSequence? SemiColon expressionSequence? SemiColon expressionSequence? ')' statement                 # ForStatement
+    | For '(' varModifier variableDeclarationList SemiColon expressionSequence? SemiColon expressionSequence? ')' statement # ForVarStatement
+    | For '(' singleExpression (In | Identifier {this.p("of")}?) expressionSequence ')' statement                           # ForInStatement
+    | For '(' varModifier variableDeclaration (In | Identifier {this.p("of")}?) expressionSequence ')' statement            # ForVarInStatement
     ;
 
 varModifier
@@ -499,7 +513,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function_ Identifier callSignature ( ('{' functionBody '}') | SemiColon)
+    : Function_ Identifier callSignature (('{' functionBody '}') | SemiColon)
     ;
 
 //Ovveride ECMA
@@ -512,7 +526,7 @@ classHeritage
     ;
 
 classTail
-    :  '{' classElement* '}'
+    : '{' classElement* '}'
     ;
 
 classExtendsClause
@@ -532,10 +546,10 @@ classElement
     ;
 
 propertyMemberDeclaration
-    : propertyMemberBase propertyName '?'? typeAnnotation? initializer? SemiColon                   # PropertyDeclarationExpression
-    | propertyMemberBase propertyName callSignature ( ('{' functionBody '}') | SemiColon)           # MethodDeclarationExpression
-    | propertyMemberBase (getAccessor | setAccessor)                                                # GetterSetterDeclarationExpression
-    | abstractDeclaration                                                                           # AbstractMemberDeclaration
+    : propertyMemberBase propertyName '?'? typeAnnotation? initializer? SemiColon        # PropertyDeclarationExpression
+    | propertyMemberBase propertyName callSignature (('{' functionBody '}') | SemiColon) # MethodDeclarationExpression
+    | propertyMemberBase (getAccessor | setAccessor)                                     # GetterSetterDeclarationExpression
+    | abstractDeclaration                                                                # AbstractMemberDeclaration
     ;
 
 propertyMemberBase
@@ -547,7 +561,7 @@ indexMemberDeclaration
     ;
 
 generatorMethod
-    : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorFunctionDeclaration
@@ -573,15 +587,17 @@ iteratorDefinition
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
-    | arrayLiteral                              // ECMAScript 6: Parameter Context Matching
-    | objectLiteral (':' formalParameterList)?  // ECMAScript 6: Parameter Context Matching
+    | arrayLiteral                             // ECMAScript 6: Parameter Context Matching
+    | objectLiteral (':' formalParameterList)? // ECMAScript 6: Parameter Context Matching
     ;
 
 formalParameterArg
-    : decorator? accessibilityModifier? identifierOrKeyWord '?'? typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : decorator? accessibilityModifier? identifierOrKeyWord '?'? typeAnnotation? (
+        '=' singleExpression
+    )? // ECMAScript 6: Initialization
     ;
 
-lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
+lastFormalParameterArg // ECMAScript 6: Rest Parameter
     : Ellipsis Identifier typeAnnotation?
     ;
 
@@ -601,7 +617,7 @@ elementList
     : arrayElement (','+ arrayElement)*
     ;
 
-arrayElement                      // ECMAScript 6: Spread Operator
+arrayElement // ECMAScript 6: Spread Operator
     : Ellipsis? (singleExpression | Identifier) ','?
     ;
 
@@ -611,13 +627,13 @@ objectLiteral
 
 // MODIFIED
 propertyAssignment
-    : propertyName (':' |'=') singleExpression                # PropertyExpressionAssignment
-    | '[' singleExpression ']' ':' singleExpression           # ComputedPropertyExpressionAssignment
-    | getAccessor                                             # PropertyGetter
-    | setAccessor                                             # PropertySetter
-    | generatorMethod                                         # MethodProperty
-    | identifierOrKeyWord                                     # PropertyShorthand
-    | restParameter                                           # RestParameterInObject
+    : propertyName (':' | '=') singleExpression     # PropertyExpressionAssignment
+    | '[' singleExpression ']' ':' singleExpression # ComputedPropertyExpressionAssignment
+    | getAccessor                                   # PropertyGetter
+    | setAccessor                                   # PropertySetter
+    | generatorMethod                               # MethodProperty
+    | identifierOrKeyWord                           # PropertyShorthand
+    | restParameter                                 # RestParameterInObject
     ;
 
 getAccessor
@@ -625,7 +641,7 @@ getAccessor
     ;
 
 setAccessor
-    : setter '(' ( Identifier | bindingPattern) typeAnnotation? ')' '{' functionBody '}'
+    : setter '(' (Identifier | bindingPattern) typeAnnotation? ')' '{' functionBody '}'
     ;
 
 propertyName
@@ -642,7 +658,7 @@ argumentList
     : argument (',' argument)*
     ;
 
-argument                      // ECMAScript 6: Spread Operator
+argument // ECMAScript 6: Spread Operator
     : Ellipsis? (singleExpression | Identifier)
     ;
 
@@ -655,54 +671,54 @@ functionExpressionDeclaration
     ;
 
 singleExpression
-    : functionExpressionDeclaration                                          # FunctionExpression
-    | arrowFunctionDeclaration                                               # ArrowFunctionExpression   // ECMAScript 6
-    | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
-    | singleExpression '!'? '.' identifierName nestedTypeGeneric?            # MemberDotExpression
+    : functionExpressionDeclaration                               # FunctionExpression
+    | arrowFunctionDeclaration                                    # ArrowFunctionExpression // ECMAScript 6
+    | singleExpression '[' expressionSequence ']'                 # MemberIndexExpression
+    | singleExpression '!'? '.' identifierName nestedTypeGeneric? # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
-    | New singleExpression typeArguments? arguments                          # NewExpression
-    | New singleExpression typeArguments?                                    # NewExpression
-    | singleExpression arguments                                             # ArgumentsExpression
-    | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
-    | singleExpression {this.notLineTerminator()}? '--'                      # PostDecreaseExpression
-    | Delete singleExpression                                                # DeleteExpression
-    | Void singleExpression                                                  # VoidExpression
-    | Typeof singleExpression                                                # TypeofExpression
-    | '++' singleExpression                                                  # PreIncrementExpression
-    | '--' singleExpression                                                  # PreDecreaseExpression
-    | '+' singleExpression                                                   # UnaryPlusExpression
-    | '-' singleExpression                                                   # UnaryMinusExpression
-    | '~' singleExpression                                                   # BitNotExpression
-    | '!' singleExpression                                                   # NotExpression
-    | singleExpression ('*' | '/' | '%') singleExpression                    # MultiplicativeExpression
-    | singleExpression ('+' | '-') singleExpression                          # AdditiveExpression
-    | singleExpression ('<<' | '>>' | '>>>') singleExpression                # BitShiftExpression
-    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression            # RelationalExpression
-    | singleExpression Instanceof singleExpression                           # InstanceofExpression
-    | singleExpression In singleExpression                                   # InExpression
-    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression        # EqualityExpression
-    | singleExpression '&' singleExpression                                  # BitAndExpression
-    | singleExpression '^' singleExpression                                  # BitXOrExpression
-    | singleExpression '|' singleExpression                                  # BitOrExpression
-    | singleExpression '&&' singleExpression                                 # LogicalAndExpression
-    | singleExpression '||' singleExpression                                 # LogicalOrExpression
-    | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
-    | singleExpression '=' singleExpression                                  # AssignmentExpression
-    | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
-    | singleExpression templateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
-    | iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
-    | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
-    | generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
-    | yieldStatement                                                         # YieldExpression // ECMAScript 6
-    | This                                                                   # ThisExpression
-    | identifierName singleExpression?                                       # IdentifierExpression
-    | Super                                                                  # SuperExpression
-    | literal                                                                # LiteralExpression
-    | arrayLiteral                                                           # ArrayLiteralExpression
-    | objectLiteral                                                          # ObjectLiteralExpression
-    | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    | typeArguments expressionSequence?                                      # GenericTypes
-    | singleExpression As asExpression                                       # CastAsExpression
+    | New singleExpression typeArguments? arguments                   # NewExpression
+    | New singleExpression typeArguments?                             # NewExpression
+    | singleExpression arguments                                      # ArgumentsExpression
+    | singleExpression {this.notLineTerminator()}? '++'               # PostIncrementExpression
+    | singleExpression {this.notLineTerminator()}? '--'               # PostDecreaseExpression
+    | Delete singleExpression                                         # DeleteExpression
+    | Void singleExpression                                           # VoidExpression
+    | Typeof singleExpression                                         # TypeofExpression
+    | '++' singleExpression                                           # PreIncrementExpression
+    | '--' singleExpression                                           # PreDecreaseExpression
+    | '+' singleExpression                                            # UnaryPlusExpression
+    | '-' singleExpression                                            # UnaryMinusExpression
+    | '~' singleExpression                                            # BitNotExpression
+    | '!' singleExpression                                            # NotExpression
+    | singleExpression ('*' | '/' | '%') singleExpression             # MultiplicativeExpression
+    | singleExpression ('+' | '-') singleExpression                   # AdditiveExpression
+    | singleExpression ('<<' | '>>' | '>>>') singleExpression         # BitShiftExpression
+    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression     # RelationalExpression
+    | singleExpression Instanceof singleExpression                    # InstanceofExpression
+    | singleExpression In singleExpression                            # InExpression
+    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression # EqualityExpression
+    | singleExpression '&' singleExpression                           # BitAndExpression
+    | singleExpression '^' singleExpression                           # BitXOrExpression
+    | singleExpression '|' singleExpression                           # BitOrExpression
+    | singleExpression '&&' singleExpression                          # LogicalAndExpression
+    | singleExpression '||' singleExpression                          # LogicalOrExpression
+    | singleExpression '?' singleExpression ':' singleExpression      # TernaryExpression
+    | singleExpression '=' singleExpression                           # AssignmentExpression
+    | singleExpression assignmentOperator singleExpression            # AssignmentOperatorExpression
+    | singleExpression templateStringLiteral                          # TemplateStringExpression     // ECMAScript 6
+    | iteratorBlock                                                   # IteratorsExpression          // ECMAScript 6
+    | generatorBlock                                                  # GeneratorsExpression         // ECMAScript 6
+    | generatorFunctionDeclaration                                    # GeneratorsFunctionExpression // ECMAScript 6
+    | yieldStatement                                                  # YieldExpression              // ECMAScript 6
+    | This                                                            # ThisExpression
+    | identifierName singleExpression?                                # IdentifierExpression
+    | Super                                                           # SuperExpression
+    | literal                                                         # LiteralExpression
+    | arrayLiteral                                                    # ArrayLiteralExpression
+    | objectLiteral                                                   # ObjectLiteralExpression
+    | '(' expressionSequence ')'                                      # ParenthesizedExpression
+    | typeArguments expressionSequence?                               # GenericTypes
+    | singleExpression As asExpression                                # CastAsExpression
     ;
 
 asExpression
