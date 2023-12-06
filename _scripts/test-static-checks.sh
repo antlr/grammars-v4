@@ -323,8 +323,6 @@ echo Tests now ${tests[@]}
 # standard format for grammars.
 npm i -g --save-dev antlr-format-cli
 
-echo "::warning file=app.js,line=1,col=5,endColumn=7::Missing semicolon"
-
 # Perform tests in order.
 for test in ${tests[@]}
 do
@@ -359,7 +357,11 @@ do
     if [ "$target" == "useless-parens" ]
     then
         # Find useless parentheses.
-        curl https://raw.githubusercontent.com/kaby76/g4-checks/d0e97c52787c9f47d6c3dd94f26159531fee7ee0/find-useless.sh 2> /dev/null | bash 1>&2
+        curl https://raw.githubusercontent.com/kaby76/g4-scripts/9e70a6392783936ddd51cd270f6ac29fecbefef8/find-useless-parentheses.sh 2> /dev/null | bash
+        if [ $? -ne 0 ]
+        then
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::grammar contains useless parentheses. Check log for more details."
+        fi
     fi
 
     if [ "$target" == "format" ]
@@ -370,7 +372,7 @@ do
         git diff --exit-code .
         if [ $? -ne 0 ]
         then
-            echo "::warning file=$prefix/$testname grammar does not conform to coding standard format. Reformat using antlr-format."
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::one or more grammars do not conform to the Antlr grammar coding standard format for this repo. Reformat using antlr-format."
         fi
     fi
 
