@@ -260,8 +260,24 @@ echo "Number of grammars after sorting and making unique: ${#grammars[@]}"
 
 if [ "${#grammars[@]}" -eq 0 ]
 then
-    echo There are no grammars in current directory to test.
-    exit 0
+    if [ ! -d _scripts ]
+    then
+        echo There are no grammars in current directory to test.
+        exit 0
+    else
+        # There are no grammars in root directory, so we'll test every grammar.
+        directories=`find . -name desc.xml | sed 's#/desc.xml##' | sort -u`
+        for g in $directories
+        do
+            pushd $g > /dev/null 2>&1
+            g=`pwd`
+            g=${g##*$prefix/}
+            popd > /dev/null 2>&1
+            echo Adding $g
+            grammars+=( $g )
+        done
+        grammars=( $(for g in "${grammars[@]}"; do echo "${g}"; done | sort -u) )
+    fi
 else
     echo Grammars to do are: ${grammars[@]}
 fi
