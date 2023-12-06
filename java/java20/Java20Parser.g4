@@ -78,7 +78,7 @@ referenceType
 
 // replace classType in classOrInterfaceType
 
-// classOrInterfaceType   
+// classOrInterfaceType
 //         : classType
 //         | interfaceType
 //         ;
@@ -852,7 +852,7 @@ statementNoShortIf
 
 statementWithoutTrailingSubstatement
     : block
-    | emptyStatement
+    | emptyStatement_
     | expressionStatement
     | assertStatement
     | switchStatement
@@ -869,7 +869,7 @@ statementWithoutTrailingSubstatement
 // Paragraph 14.6
 // --------------
 
-emptyStatement
+emptyStatement_
     : ';'
     ;
 
@@ -1159,36 +1159,36 @@ primary
 //         | '(' expression ')'
 //         |                                  unqualifiedClassInstanceCreationExpression
 //         | expressionName              '.'  unqualifiedClassInstanceCreationExpression
-// 				             
+//
 //         | primaryNoNewArray           '.'  unqualifiedClassInstanceCreationExpression
 //         | arrayCreationExpression     '.'  unqualifiedClassInstanceCreationExpression
-// 				             
+//
 //         | primaryNoNewArray           '.'  Identifier
 //         | arrayCreationExpression     '.'  Identifier
-// 				             
+//
 //         | 'super'  '.'                     Identifier
 //         | typeName '.' 'super'        '.'  Identifier
-// 
+//
 //         | expressionName                         '[' expression ']'
 //         | primaryNoNewArray                      '[' expression ']'
 //         | arrayCreationExpressionWithInitializer '[' expression ']'
-// 	 
+//
 //         | methodName                                                 '(' argumentList? ')'
 //         | typeName                    '.'  typeArguments? Identifier '(' argumentList? ')'
 //         | expressionName              '.'  typeArguments? Identifier '(' argumentList? ')'
-// 					      
+//
 //         | primaryNoNewArray           '.'  typeArguments? Identifier '(' argumentList? ')'
 //         | arrayCreationExpression     '.'  typeArguments? Identifier '(' argumentList? ')'
-// 					      
+//
 //         | 'super'                     '.'  typeArguments? Identifier '(' argumentList? ')'
 //         | typeName       '.' 'super'  '.'  typeArguments? Identifier '(' argumentList? ')'
-// 	
+//
 //         | expressionName              '::' typeArguments? Identifier
-// 				         
+//
 //         | primaryNoNewArray           '::' typeArguments? Identifier
 //         | arrayCreationExpression     '::' typeArguments? Identifier
-// 				         
-// 				         
+//
+//
 //         | referenceType               '::' typeArguments? Identifier
 //         | 'super'                     '::' typeArguments? Identifier
 //         | typeName '.' 'super'        '::' typeArguments? Identifier
@@ -1352,7 +1352,7 @@ methodReference
 //         | postfixExpression '++'
 //         | postfixExpression '--'
 //         ;
-// 
+//
 
 postfixExpression
     : primary pfE?
