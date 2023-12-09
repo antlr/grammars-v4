@@ -118,7 +118,7 @@ jobs:
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '^1.21.0'
     - name: Test Go
@@ -126,7 +126,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.8.0
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -216,7 +216,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v4.8.0
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.10'
     - name: Test Python
