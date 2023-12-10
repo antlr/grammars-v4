@@ -116,11 +116,11 @@ moduleHeader
     ;
 
 moduleConfig
-    : BEGIN endOfLine* moduleConfigElement+ END
+    : BEGIN (WS GUID WS ambiguousIdentifier)? endOfLine* moduleConfigElement+ END
     ;
 
 moduleConfigElement
-    : ambiguousIdentifier WS? EQ WS? literal endOfLine*
+    : ambiguousIdentifier WS? EQ WS? literal (COLON literal)? endOfLine*
     ;
 
 moduleAttributes
@@ -1856,6 +1856,14 @@ R_SQUARE_BRACKET
     ;
 
 // literals
+fragment BLOCK
+    : HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT
+    ;
+
+GUID
+    : '{' BLOCK BLOCK MINUS BLOCK MINUS BLOCK MINUS BLOCK MINUS BLOCK BLOCK BLOCK '}'
+    ;
+
 STRINGLITERAL
     : '"' (~["\r\n] | '""')* '"'
     ;
@@ -1994,6 +2002,10 @@ fragment LETTER
 
 fragment DIGIT
     : [0-9]
+    ;
+
+fragment HEXDIGIT
+    : [A-F0-9]
     ;
 
 fragment LETTERORDIGIT
