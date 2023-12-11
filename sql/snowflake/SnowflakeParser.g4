@@ -3586,9 +3586,6 @@ expr
     | try_cast_expr
     | json_literal
     | trim_expression
-    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
-    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
-    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | function_call
     | subquery
     | expr IS null_not_null
@@ -3700,7 +3697,10 @@ over_clause
     ;
 
 function_call
-    : ranking_windowed_function
+    : binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
+    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
+    | ranking_windowed_function
     | aggregate_function
     //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
