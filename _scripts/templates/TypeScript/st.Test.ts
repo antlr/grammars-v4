@@ -16,7 +16,7 @@ import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
 
-<tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GrammarAutomName>';
+<tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GrammarAutomName>.js';
 } >
 import { StringBuilder, emptyString, joinString, formatString, isNullOrWhiteSpace } from 'typescript-string-operations';
 import { Timer, Time, TimerOptions } from 'timer-node';

@@ -13,7 +13,7 @@ version=`grep antlr4 package.json | awk '{print $2}' | tr -d '"' | tr -d ',' | t
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 } >
 
-npm install -g typescript ts-node
+npm install -g typescript@5.3.3 ts-node@10.9.2
 npm install
 tsc -p tsconfig.json --pretty
 exit 0
