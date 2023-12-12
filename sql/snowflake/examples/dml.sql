@@ -26,3 +26,8 @@ VALUES (
    s.c2,
    s.c3
 );
+
+insert into t(a,b)
+select 1, 2
+union
+select 3, 4;
