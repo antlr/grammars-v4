@@ -251,6 +251,11 @@ setDebugFile
     : SET DEBUG FILE TO (CHAR_STRING | identifier) (WITH APPEND)?
     ;
 
+// https://www.ibm.com/docs/en/informix-servers/14.10?topic=statements-set-deferred-prepare-statement
+setDeferredPrepareStatement
+    : SET DEFERRED_PREPARE (ENABLED | DISABLED)?
+    ;
+
 quotedString
     : CHAR_STRING
     ;
@@ -311,6 +316,7 @@ keyword
     | DEFAULT
     | DEFERRABLE
     | DEFERRED
+    | DEFERRED_PREPARE
     | DELETE
     | DESC
     | DETACH
