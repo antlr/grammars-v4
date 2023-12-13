@@ -73,6 +73,7 @@ unitStatement
         | setCollation
         | setDataskip
         | setDebugFile
+        | setDeferredPrepareStatement
     ) SCOL
     ;
 
