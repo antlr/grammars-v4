@@ -28,8 +28,7 @@ jobs:
       shell: bash
       run: |
         dotnet tool restore
-    - name: Create local changes
-      if: github.ref == 'refs/heads/master'
+    - name: Check grammar coding standards
       continue-on-error: false
       run: |
         if [ "${{github.event_name}}" == "pull_request" ]; then
@@ -39,8 +38,19 @@ jobs:
           Before="${{github.event.before}}"
           After="${{github.event.after}}"
         fi
-        # check for bad coding standard in grammar, reformat, and git commit.
-        bash _scripts/reformat.sh -c -f diff $Before $After
+        # check for bad coding standard in grammar by doing a reformat.
+        bash _scripts/reformat.sh -f diff $Before $After
+    - name: Commit changes
+      # git commit reformatting changes if any, but only if on master branch.
+      # If there were no changes, this is a no-op.
+      if: github.ref == 'refs/heads/master'
+      continue-on-error: false
+      shell: bash
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add --all
+        git commit -m "Reformat to coding standard."
     - name: Push changes
       # git push changes to "master" branch.
       # make sure to uncheck "Require a pull request before merging" in gh actions, "Branches" section.
