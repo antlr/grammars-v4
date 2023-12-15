@@ -39,14 +39,18 @@ jobs:
           Before="${{github.event.before}}"
           After="${{github.event.after}}"
         fi
-        bash _scripts/reformat.sh -f diff $Before $After
+        # check for bad coding standard in grammar, reformat, and git commit.
+        bash _scripts/reformat.sh -c -f diff $Before $After
     - name: Push changes
+      # git push changes to "master" branch.
+      # make sure to uncheck "Require a pull request before merging" in gh actions, "Branches" section.
       uses: ad-m/github-push-action@master
       if: github.ref == 'refs/heads/master'
       continue-on-error: false
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref }}
+        force_with_lease: true
     - name: Gather targets.
       id: step1
       shell: bash
@@ -183,7 +187,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        test: [ useless-parens, format ]
+        test: [ useless-parens ]
     steps:
     - name: Info
       shell: bash
