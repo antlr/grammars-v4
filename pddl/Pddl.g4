@@ -12,11 +12,13 @@
 
 grammar Pddl;
 
-/************* Start of grammar *******************/ pddlDoc
+/************* Start of grammar *******************/
+pddlDoc
     : (domain | problem) EOF
     ;
 
-/************* DOMAINS ****************************/ domain
+/************* DOMAINS ****************************/
+domain
     : '(' 'define' domainName requireDef? typesDef? constantsDef? predicatesDef? functionsDef? constraints? structureDef* ')'
     ;
 
@@ -106,7 +108,8 @@ structureDef
     | derivedDef
     ;
 
-/************* ACTIONS ****************************/ actionDef
+/************* ACTIONS ****************************/
+actionDef
     : '(' ':action' actionSymbol ':parameters' '(' typedVariableList ')' actionDefBody ')'
     ;
 
@@ -155,7 +158,8 @@ term
     | VARIABLE
     ;
 
-/************* DURATIVE ACTIONS ****************************/ durativeActionDef
+/************* DURATIVE ACTIONS ****************************/
+durativeActionDef
     : '(' ':durative-action' actionSymbol ':parameters' '(' typedVariableList ')' daDefBody ')'
     ;
 
@@ -190,11 +194,13 @@ interval
     : 'all'
     ;
 
-/************* DERIVED DEFINITIONS ****************************/ derivedDef
+/************* DERIVED DEFINITIONS ****************************/
+derivedDef
     : '(' ':derived' typedVariableList goalDesc ')'
     ;
 
-/************* EXPRESSIONS ****************************/ fExp
+/************* EXPRESSIONS ****************************/
+fExp
     : NUMBER
     | '(' binaryOp fExp fExp2 ')'
     | '(' '-' fExp ')'
@@ -259,7 +265,8 @@ assignOp
     | 'decrease'
     ;
 
-/************* DURATIONS  ****************************/ durationConstraint
+/************* DURATIONS  ****************************/
+durationConstraint
     : '(' 'and' simpleDurationConstraint+ ')'
     | '(' ')'
     | simpleDurationConstraint
@@ -305,7 +312,8 @@ fExpDA
     | fExp
     ;
 
-/************* PROBLEMS ****************************/ problem
+/************* PROBLEMS ****************************/
+problem
     : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init_ goal probConstraints? metricSpec? ')'
     // lengthSpec? This is not defined anywhere in the BNF spec ')'
     ;
@@ -380,7 +388,8 @@ metricFExp
     | '(' 'is-violated' NAME ')'
     ;
 
-/************* CONSTRAINTS ****************************/ conGD
+/************* CONSTRAINTS ****************************/
+conGD
     : '(' 'and' conGD* ')'
     | '(' 'forall' '(' typedVariableList ')' conGD ')'
     | '(' 'at' 'end' goalDesc ')'
@@ -395,7 +404,8 @@ metricFExp
     | '(' 'hold-after' NUMBER goalDesc ')'
     ;
 
-/************* LEXER ****************************/ REQUIRE_KEY
+/************* LEXER ****************************/
+REQUIRE_KEY
     : ':strips'
     | ':typing'
     | ':negative-preconditions'

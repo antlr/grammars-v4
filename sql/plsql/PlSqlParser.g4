@@ -5446,8 +5446,9 @@ table_indexed_by_part
     : (idx1 = INDEXED | idx2 = INDEX) BY type_spec
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/collection-variable.html#GUID-89A1863C-65A1-40CF-9392-86E9FDC21BE9
 varray_type_def
-    : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
+    : (VARRAY | VARYING? ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
     ;
 
 // Statements

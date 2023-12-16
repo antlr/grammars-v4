@@ -2572,6 +2572,7 @@ object_type_plural
     | STAGES
     | STREAMS
     | TASKS
+    | ALERTS
     ;
 
 // drop commands
@@ -3363,24 +3364,26 @@ id_fn
     ;
 
 id_
+//id_ is used for object name. Snowflake is very permissive
+//so we could use nearly all keyword as object name (table, column etc..)
     : ID
     | ID2
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
     | non_reserved_words
+    | object_type_plural
     | data_type
     | builtin_function
-    | ALERT
-    | ALERTS
-    | CONDITION
     | binary_builtin_function
+    | binary_or_ternary_builtin_function
+    | ternary_builtin_function
     ;
 
 keyword
-    : INT
-    | BIGINT
-    | STAGE
+//List here keyword (SnowSQL meaning) allowed as object name
+// Name of builtin function should be included in specifique section (ie builtin_function)
+    : STAGE
     | USER
     | TYPE
     | CLUSTER
@@ -3398,10 +3401,27 @@ keyword
     | DIRECTION
     | LENGTH
     | LANGUAGE
+    | KEY
+    | ALERT
+    | CONDITION
+    | ROLE
+    | ROW_NUMBER
+    | VALUE
+    | FIRST_VALUE
+    | VALUES
+    | TARGET_LAG
+    | EMAIL
+    | MAX_CONCURRENCY_LEVEL
+    | WAREHOUSE_TYPE
+    | TAG
+    | WAREHOUSE
+    | MODE
+    | ACTION
     // etc
     ;
 
 non_reserved_words
+//List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     : ORGADMIN
     | ACCOUNTADMIN
     | SECURITYADMIN
@@ -3414,23 +3434,14 @@ non_reserved_words
     | SOURCE
     | PROCEDURE_NAME
     | STATE
-    | ROLE
     | DEFINITION
     | TIMEZONE
     | LOCAL
-    | ROW_NUMBER
-    | VALUE
     | NAME
-    | TAG
-    | WAREHOUSE
     | VERSION
     | OPTION
-    | NVL2
-    | FIRST_VALUE
     | RESPECT
-    | NVL
     | RESTRICT
-    | VALUES
     | EVENT
     | DOWNSTREAM
     | DYNAMIC
@@ -3438,13 +3449,14 @@ non_reserved_words
     | EMAIL
     | MAX_CONCURRENCY_LEVEL
     | WAREHOUSE_TYPE
+    | NETWORK
+    | OUTBOUND
     ;
 
 builtin_function
 // If there is a lexer entry for a function we also need to add the token here
-// as it otherwise will not be picked up by the id_ rule
-    : IFF
-    | SUM
+// as it otherwise will not be picked up by the id_ rule (See also derived rule below)
+    : SUM
     | AVG
     | MIN
     | COUNT
@@ -3457,23 +3469,19 @@ builtin_function
     | FLATTEN
     | SPLIT_TO_TABLE
     | CAST
+    | TRY_CAST
     ;
-
-list_operator
-// lexer entry which admit a list of comma separated expr
-    : CONCAT
-    | CONCAT_WS
-    | COALESCE
-    // To complete as needed
-    ;
+//TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 
 binary_builtin_function
+// lexer entry of function name which admit 2 parameters
+// expr rule use this
     : ifnull = (IFNULL | NVL)
     | GET
     | LEFT
     | RIGHT
     | DATE_PART
-    | to_date = ( TO_DATE | DATE)
+    | to_date = (TO_DATE | DATE)
     | SPLIT
     | NULLIF
     | EQUAL_NULL
@@ -3482,6 +3490,8 @@ binary_builtin_function
     ;
 
 binary_or_ternary_builtin_function
+// lexer entry of function name which admit 2 or 3 parameters
+// expr rule use this
     : CHARINDEX
     | REPLACE
     | substring = ( SUBSTRING | SUBSTR)
@@ -3490,10 +3500,22 @@ binary_or_ternary_builtin_function
     ;
 
 ternary_builtin_function
+// lexer entry of function name which admit 3 parameters
+// expr rule use this
     : dateadd = (DATEADD | TIMEADD | TIMESTAMPADD)
-    | datefiff = ( DATEDIFF | TIMEDIFF | TIMESTAMPDIFF)
+    | datefiff = (DATEDIFF | TIMEDIFF | TIMESTAMPDIFF)
     | SPLIT_PART
     | NVL2
+    | IFF
+    ;
+
+list_function
+// lexer entry of function name which admit a list of comma separated expr
+// expr rule use this
+    : CONCAT
+    | CONCAT_WS
+    | COALESCE
+    // To complete as needed
     ;
 
 pattern
@@ -3542,8 +3564,6 @@ expr_list_sorted
 
 expr
     : object_name DOT NEXTVAL
-    | primitive_expression
-    | function_call
     | expr LSB expr RSB //array access
     | expr COLON expr   //json access
     | expr DOT (VALUE | expr)
@@ -3560,21 +3580,20 @@ expr
     | expr OR expr  //bool operation
     | arr_literal
     //    | expr time_zone
-    | expr COLON_COLON data_type //cast
     | expr over_clause
     | cast_expr
-    | json_literal
-    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
-    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
-    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
-    | subquery
+    | expr COLON_COLON data_type // Cast also
     | try_cast_expr
+    | json_literal
     | trim_expression
+    | function_call
+    | subquery
     | expr IS null_not_null
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
+    | primitive_expression //Should be latest rule as it's nearly a catch all
     ;
 
 iff_expr
@@ -3678,11 +3697,14 @@ over_clause
     ;
 
 function_call
-    : ranking_windowed_function
+    : binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
+    | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
+    | ranking_windowed_function
     | aggregate_function
     //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
-    | list_operator LR_BRACKET expr_list RR_BRACKET
+    | list_function LR_BRACKET expr_list RR_BRACKET
     | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
     | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET

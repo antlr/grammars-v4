@@ -367,13 +367,13 @@ returnStmt
 
 //BreakStmt = "break" [ Label ] .
 breakStmt
-//    : 'break' IDENTIFIER?
+    //    : 'break' IDENTIFIER?
     : 'break' //TODO: V语言目前不支持break到可以goto的label
     ;
 
 //ContinueStmt = "continue" [ Label ] .
 continueStmt
-//    : 'continue' IDENTIFIER?
+    //    : 'continue' IDENTIFIER?
     : 'continue' //TODO: V语言目前不支持continue到可以goto的label 
     ;
 

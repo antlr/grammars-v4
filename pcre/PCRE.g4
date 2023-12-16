@@ -253,7 +253,8 @@ character_class_range
 
 character_class_range_atom
     : character
-    | ~']'
+    | '\\' .
+    | ~(']' | '\\')
     ;
 
 posix_character_class

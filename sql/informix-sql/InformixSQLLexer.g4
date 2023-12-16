@@ -82,6 +82,7 @@ DATASKIP          : 'DATASKIP';
 DEFAULT           : 'DEFAULT';
 DEFERRABLE        : 'DEFERRABLE';
 DEFERRED          : 'DEFERRED';
+DEFERRED_PREPARE  : 'DEFERRED_PREPARE';
 DELETE            : 'DELETE';
 DEBUG             : 'DEBUG';
 DESC              : 'DESC';
