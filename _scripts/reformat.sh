@@ -19,6 +19,7 @@ quiet=true
 
 # Get full path of this script.
 full_path_script=$(myrealpath $0)
+full_path_scripts_dir=$(dirname $full_path_script)
 full_path_templates=$(dirname $full_path_script)/templates
 
 # Sanity checks for required environment.
@@ -334,7 +335,7 @@ do
     fi
     yes=false;
 
-    antlr-format *.g4
+    antlr-format -c $full_path_scripts_dir/repo_coding_style.json *.g4
 	if [ $? -ne 0 ]
 	then
 	    failed=1
