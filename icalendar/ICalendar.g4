@@ -306,15 +306,15 @@ daylightc
 
 // 3.8.1.1 - Attachment
 attach
-   : k_attach attachparam* COL (binary | uri) CRLF
-   ;
+    : k_attach attachparam* COL (binary | uri) CRLF
+    ;
 
 attachparam
-   : SCOL k_encoding ASSIGN k_base D6 D4
-   | SCOL k_value ASSIGN k_binary
-   | SCOL fmttypeparam
-   | SCOL other_param
-   ;
+    : SCOL k_encoding ASSIGN k_base D6 D4
+    | SCOL k_value ASSIGN k_binary
+    | SCOL fmttypeparam
+    | SCOL other_param
+    ;
 
 // 3.8.1.2 - Categories
 categories
