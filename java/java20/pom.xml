@@ -56,7 +56,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>start</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>Java20</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
