@@ -2992,7 +2992,7 @@ xml_declaration
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
 cursor_statement
-// https://msdn.microsoft.com/en-us/library/ms175035(v=sql.120).aspx
+    // https://msdn.microsoft.com/en-us/library/ms175035(v=sql.120).aspx
     : CLOSE GLOBAL? cursor_name ';'?
     // https://msdn.microsoft.com/en-us/library/ms188782(v=sql.120).aspx
     | DEALLOCATE GLOBAL? CURSOR? cursor_name ';'?
@@ -3179,7 +3179,7 @@ execute_var_string
 
 // https://msdn.microsoft.com/en-us/library/ff848791.aspx
 security_statement
-// https://msdn.microsoft.com/en-us/library/ms188354.aspx
+    // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (
@@ -3407,7 +3407,7 @@ set_statement
 
 // https://msdn.microsoft.com/en-us/library/ms174377.aspx
 transaction_statement
-// https://msdn.microsoft.com/en-us/library/ms188386.aspx
+    // https://msdn.microsoft.com/en-us/library/ms188386.aspx
     : BEGIN DISTRIBUTED (TRAN | TRANSACTION) (id_ | LOCAL_ID)?
     // https://msdn.microsoft.com/en-us/library/ms188929.aspx
     | BEGIN (TRAN | TRANSACTION) ((id_ | LOCAL_ID) (WITH MARK STRING)?)?
@@ -4087,7 +4087,7 @@ group_by_item
     ;
 
 option_clause
-// https://msdn.microsoft.com/en-us/library/ms181714.aspx
+    // https://msdn.microsoft.com/en-us/library/ms181714.aspx
     : OPTION '(' options_ += option (',' options_ += option)* ')'
     ;
 
@@ -4222,7 +4222,7 @@ change_table_version
 
 // https://msdn.microsoft.com/en-us/library/ms191472.aspx
 join_part
-// https://msdn.microsoft.com/en-us/library/ms173815(v=sql.120).aspx
+    // https://msdn.microsoft.com/en-us/library/ms173815(v=sql.120).aspx
     : join_on
     | cross_join
     | apply_
@@ -4336,8 +4336,8 @@ json_null_clause
     ;
 
 built_in_functions
-// Metadata functions
-// https://docs.microsoft.com/en-us/sql/t-sql/functions/app-name-transact-sql?view=sql-server-ver16
+    // Metadata functions
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/app-name-transact-sql?view=sql-server-ver16
     : APP_NAME '(' ')' # APP_NAME
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/applock-mode-transact-sql?view=sql-server-ver16
     | APPLOCK_MODE '(' database_principal = expression ',' resource_name = expression ',' lock_owner = expression ')' # APPLOCK_MODE

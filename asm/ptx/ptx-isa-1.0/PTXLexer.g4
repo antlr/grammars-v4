@@ -192,7 +192,7 @@ LEU  : '.leu';
 GTU  : '.gtu';
 GEU  : '.geu';
 NUM  : '.num';
-NAN_  : '.nan';
+NAN_ : '.nan';
 HI   : '.hi';
 LO   : '.lo';
 WIDE : '.wide';
