@@ -1031,7 +1031,7 @@ setOperator
     ;
 
 queryStatementExpression
-/* Would be nice to do this as a gated semantic perdicate
+    /* Would be nice to do this as a gated semantic perdicate
        But the predicate gets pushed as a lookahead decision.
        Calling rule doesnot know about topLevel
     */

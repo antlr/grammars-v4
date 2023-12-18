@@ -428,4 +428,4 @@ fragment FullWidthLetter options {
     | '\ua000' ..'\ud7ff'
     | '\uf900' ..'\ufaff'
     | '\uff00' ..'\ufff0'
-    ; // | '\u20000'..'\u2FA1F'
+; // | '\u20000'..'\u2FA1F'

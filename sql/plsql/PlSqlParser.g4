@@ -1183,8 +1183,8 @@ create_analytic_view
     ;
 
 classification_clause
-// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
-// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    // : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+    // to handle - 'rule contains a closure with at least one alternative that can match an empty string'
     : (caption_clause description_clause? | caption_clause? description_clause) classification_item*
     | caption_clause? description_clause? classification_item+
     ;
@@ -4014,7 +4014,7 @@ alter_synonym
     ;
 
 create_synonym
-// Synonym's schema cannot be specified for public synonyms
+    // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (
         AT_SIGN link_name
     )?
@@ -5446,8 +5446,9 @@ table_indexed_by_part
     : (idx1 = INDEXED | idx2 = INDEX) BY type_spec
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/collection-variable.html#GUID-89A1863C-65A1-40CF-9392-86E9FDC21BE9
 varray_type_def
-    : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
+    : (VARRAY | VARYING? ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
     ;
 
 // Statements

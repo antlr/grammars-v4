@@ -46,7 +46,7 @@ top_level
 // GRAMMAR OF A STATEMENT
 
 statement
-// : assignment_statement ';'?
+    // : assignment_statement ';'?
     : expression ';'?
     | declaration ';'?
     | loop_statement ';'?
