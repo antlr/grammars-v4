@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
@@ -173,7 +172,7 @@ copy_into_table
     ;
 
 external_location
-//(for Amazon S3)
+    //(for Amazon S3)
     : S3_PATH //'s3://<bucket>[/<path>]'
     //        ( ( STORAGE_INTEGRATION EQ id_ )?
     //        | ( CREDENTIALS EQ '(' ( AWS_KEY_ID EQ string AWS_SECRET_KEY EQ string ( AWS_TOKEN EQ string )? ) ')' )?
@@ -773,7 +772,7 @@ full_acct_list
     ;
 
 alter_failover_group
-//Source Account
+    //Source Account
     : ALTER FAILOVER GROUP if_exists? id_ RENAME TO id_
     | ALTER FAILOVER GROUP if_exists? id_ SET (OBJECT_TYPES EQ object_type_list)? replication_schedule?
     | ALTER FAILOVER GROUP if_exists? id_ SET OBJECT_TYPES EQ object_type_list
@@ -875,7 +874,7 @@ alter_procedure
     ;
 
 alter_replication_group
-//Source Account
+    //Source Account
     : ALTER REPLICATION GROUP if_exists? id_ RENAME TO id_
     | ALTER REPLICATION GROUP if_exists? id_ SET (OBJECT_TYPES EQ object_type_list)? (
         REPLICATION_SCHEDULE EQ string
@@ -1562,7 +1561,7 @@ create_external_function
     ;
 
 create_external_table
-// Partitions computed from expressions
+    // Partitions computed from expressions
     : CREATE or_replace? EXTERNAL TABLE if_not_exists? object_name '(' external_table_column_decl_list ')' cloud_provider_params3? partition_by? WITH?
         LOCATION EQ external_stage (REFRESH_ON_CREATE EQ true_false)? (AUTO_REFRESH EQ true_false)? pattern? file_format (
         AWS_SNS_TOPIC EQ string
@@ -1679,8 +1678,8 @@ column_list_in_parentheses
 create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name (
         LR_BRACKET column_list_with_comment RR_BRACKET
-    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement 
-        //NOTA MATERIALIZED VIEW accept only simple select statement at this time
+    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement
+    //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -1690,14 +1689,14 @@ create_network_policy
     ;
 
 cloud_provider_params_auto
-//(for Google Cloud Storage)
+    //(for Google Cloud Storage)
     : NOTIFICATION_PROVIDER EQ GCP_PUBSUB GCP_PUBSUB_SUBSCRIPTION_NAME EQ string
     //(for Microsoft Azure Storage)
     | NOTIFICATION_PROVIDER EQ AZURE_EVENT_GRID AZURE_STORAGE_QUEUE_PRIMARY_URI EQ string AZURE_TENANT_ID EQ string
     ;
 
 cloud_provider_params_push
-//(for Amazon SNS)
+    //(for Amazon SNS)
     : NOTIFICATION_PROVIDER EQ AWS_SNS AWS_SNS_TOPIC_ARN EQ string AWS_SNS_ROLE_ARN EQ string
     //(for Google Pub/Sub)
     | NOTIFICATION_PROVIDER EQ GCP_PUBSUB GCP_PUBSUB_TOPIC_NAME EQ string
@@ -1811,8 +1810,8 @@ implicit_none
     ;
 
 create_security_integration_snowflake_oauth
-    : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ OAUTH OAUTH_CLIENT EQ partner_application OAUTH_REDIRECT_URI EQ string 
-        //Required when OAUTH_CLIENTEQLOOKER
+    : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ OAUTH OAUTH_CLIENT EQ partner_application OAUTH_REDIRECT_URI EQ string
+    //Required when OAUTH_CLIENTEQLOOKER
     enabled_true_false? (OAUTH_ISSUE_REFRESH_TOKENS EQ true_false)? (
         OAUTH_REFRESH_TOKEN_VALIDITY EQ num
     )? (OAUTH_USE_SECONDARY_ROLES EQ implicit_none)? (BLOCKED_ROLES_LIST EQ '(' string_list ')')? comment_clause?
@@ -1909,7 +1908,7 @@ character
     ;
 
 format_type_options
-//-- If TYPE EQ CSV
+    //-- If TYPE EQ CSV
     : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE | AUTO_Q)
     | RECORD_DELIMITER EQ ( string | NONE)
     | FIELD_DELIMITER EQ ( string | NONE)
@@ -2063,7 +2062,7 @@ aws_credential_or_storage_integration
     ;
 
 external_stage_params
-//(for Amazon S3)
+    //(for Amazon S3)
     : URL EQ s3_url = (S3_PATH | S3GOV_PATH) (
         aws_credential_or_storage_integration? stage_encryption_opts_aws
         | stage_encryption_opts_aws? aws_credential_or_storage_integration
@@ -2110,7 +2109,7 @@ directory_table_internal_params
     ;
 
 directory_table_external_params
-// (for Amazon S3)
+    // (for Amazon S3)
     : DIRECTORY EQ LR_BRACKET enable refresh_on_create? auto_refresh? RR_BRACKET
     // (for Google Cloud Storage)
     | DIRECTORY EQ LR_BRACKET enable auto_refresh? refresh_on_create? notification_integration? RR_BRACKET
@@ -2158,7 +2157,7 @@ show_stages
 /* ===========  End of stage DDL section =========== */
 
 cloud_provider_params
-//(for Amazon S3)
+    //(for Amazon S3)
     : STORAGE_PROVIDER EQ S3 STORAGE_AWS_ROLE_ARN EQ string (STORAGE_AWS_OBJECT_ACL EQ string)?
     //(for Google Cloud Storage)
     | STORAGE_PROVIDER EQ GCS
@@ -2167,7 +2166,7 @@ cloud_provider_params
     ;
 
 cloud_provider_params2
-//(for Amazon S3)
+    //(for Amazon S3)
     : STORAGE_AWS_ROLE_ARN EQ string (STORAGE_AWS_OBJECT_ACL EQ string)?
     //(for Microsoft Azure)
     | AZURE_TENANT_ID EQ string
@@ -2210,7 +2209,7 @@ stream_time
     ;
 
 create_stream
-//-- table
+    //-- table
     : CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON TABLE object_name stream_time? append_only? show_initial_rows?
         comment_clause?
     //-- External table
@@ -2747,7 +2746,7 @@ arg_types
 
 // undrop commands
 undrop_command
-//: undrop_object
+    //: undrop_object
     : undrop_database
     | undrop_schema
     | undrop_table
@@ -3364,8 +3363,8 @@ id_fn
     ;
 
 id_
-//id_ is used for object name. Snowflake is very permissive
-//so we could use nearly all keyword as object name (table, column etc..)
+    //id_ is used for object name. Snowflake is very permissive
+    //so we could use nearly all keyword as object name (table, column etc..)
     : ID
     | ID2
     | DOUBLE_QUOTE_ID
@@ -3381,8 +3380,8 @@ id_
     ;
 
 keyword
-//List here keyword (SnowSQL meaning) allowed as object name
-// Name of builtin function should be included in specifique section (ie builtin_function)
+    //List here keyword (SnowSQL meaning) allowed as object name
+    // Name of builtin function should be included in specifique section (ie builtin_function)
     : STAGE
     | USER
     | TYPE
@@ -3421,7 +3420,7 @@ keyword
     ;
 
 non_reserved_words
-//List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
+    //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     : ORGADMIN
     | ACCOUNTADMIN
     | SECURITYADMIN
@@ -3454,8 +3453,8 @@ non_reserved_words
     ;
 
 builtin_function
-// If there is a lexer entry for a function we also need to add the token here
-// as it otherwise will not be picked up by the id_ rule (See also derived rule below)
+    // If there is a lexer entry for a function we also need to add the token here
+    // as it otherwise will not be picked up by the id_ rule (See also derived rule below)
     : SUM
     | AVG
     | MIN
@@ -3471,11 +3470,12 @@ builtin_function
     | CAST
     | TRY_CAST
     ;
+
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 
 binary_builtin_function
-// lexer entry of function name which admit 2 parameters
-// expr rule use this
+    // lexer entry of function name which admit 2 parameters
+    // expr rule use this
     : ifnull = (IFNULL | NVL)
     | GET
     | LEFT
@@ -3490,8 +3490,8 @@ binary_builtin_function
     ;
 
 binary_or_ternary_builtin_function
-// lexer entry of function name which admit 2 or 3 parameters
-// expr rule use this
+    // lexer entry of function name which admit 2 or 3 parameters
+    // expr rule use this
     : CHARINDEX
     | REPLACE
     | substring = ( SUBSTRING | SUBSTR)
@@ -3500,8 +3500,8 @@ binary_or_ternary_builtin_function
     ;
 
 ternary_builtin_function
-// lexer entry of function name which admit 3 parameters
-// expr rule use this
+    // lexer entry of function name which admit 3 parameters
+    // expr rule use this
     : dateadd = (DATEADD | TIMEADD | TIMESTAMPADD)
     | datefiff = (DATEDIFF | TIMEDIFF | TIMESTAMPDIFF)
     | SPLIT_PART
@@ -3510,8 +3510,8 @@ ternary_builtin_function
     ;
 
 list_function
-// lexer entry of function name which admit a list of comma separated expr
-// expr rule use this
+    // lexer entry of function name which admit a list of comma separated expr
+    // expr rule use this
     : CONCAT
     | CONCAT_WS
     | COALESCE

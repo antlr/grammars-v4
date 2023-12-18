@@ -19,6 +19,7 @@ quiet=true
 
 # Get full path of this script.
 full_path_script=$(myrealpath $0)
+full_path_scripts_dir=$(dirname $full_path_script)
 full_path_templates=$(dirname $full_path_script)/templates
 
 # Sanity checks for required environment.
@@ -61,12 +62,13 @@ function getopts-extra () {
 filter="all"
 # order="grammar" or "target"
 order="grammar"
-failed=()
+failed=""
 succeeded=()
 skipped=""
 grammars=()
 targets=()
 tests=()
+commit=""
 
 # Get "root" of the repo clone.
 cwd=`pwd`
@@ -97,12 +99,12 @@ rm -rf `find . -name 'Generated*' -type d`
 order="grammars"
 additional=()
 antlr4jar=/tmp/antlr4-complete.jar
-while getopts 'agthf' opt; do
+while getopts 'aghfc' opt; do
     case "$opt" in
         a)
             getopts-extra "$@"
             antlr4jar="${OPTARG[0]}"
-        echo Antlr4jar is $antlr4jar
+            echo Antlr4jar is $antlr4jar
             ;;
         g)
             getopts-extra "$@"
@@ -111,15 +113,11 @@ while getopts 'agthf' opt; do
                 grammars+=( "$a" )
             done
             ;;
-        t)
-            getopts-extra "$@"
-            for a in "${OPTARG[@]}"
-            do
-                targets+=( "$a" )
-            done
-            ;;
         o)
             order="$OPTARG"
+            ;;
+        c)
+            commit=1
             ;;
         f)
             getopts-extra "$@"
@@ -132,10 +130,10 @@ while getopts 'agthf' opt; do
         ?|h)
             cat - <<EOF
 NAME
-       test - tests Antlr4 grammars
+       $(basename $0) - reformats Antlr4 grammars
 
 SYNOPSIS
-       $(basename $0) ([-g ...] | [-f ...] | [-t ...])
+       $(basename $0) ([-g ...] | [-f ...])
 
 DESCRIPTION
        Tests Antlr4 grammars. Each grammar requires pom.xml and desc.xml files.
@@ -150,11 +148,6 @@ OPTIONS
        -f
            Specifies the type of testing to filter. Possible types are "diff",
            "all", or "agnostic". The default is "all".
-
-       -t
-           Specifies the type of test. Possible tests are
-           "useless-parens", "format".
-           All types are tested by default.
 
 EOF
             exit 0
@@ -296,7 +289,7 @@ fi
 
 if [ ${#targets[@]} -eq 0 ]
 then
-    targets=( useless-parens format )
+    targets=( format )
 fi
 
 echo grammars = ${grammars[@]}
@@ -317,7 +310,7 @@ done
 if [[ "$order" == "grammars" ]]; then sorted="1"; else sorted="2"; fi
 #tests=`echo $tests | fmt -w 1 | sort -t ',' -k "$sorted"`
 
-echo Tests now ${tests[@]}
+echo Reformats now ${tests[@]}
 
 # Install the Antlr formatter, which will be used to check the coding
 # standard format for grammars.
@@ -342,37 +335,34 @@ do
     fi
     yes=false;
 
-    if [ "$filter" == "agnostic" ]
+    if [ "${#additional[@]}" -eq 2 ]
     then
-        # Test whether the grammars have actions.
-        count=`dotnet trparse -- -t antlr4 *.g4 2> /dev/null | dotnet trxgrep ' //(actionBlock | argActionBlock)' | dotnet trtext -c`
-        if [ "$count" == "0" ]
+        antlrFornatDiffs=`git diff --unified=0 ${additional[0]} ${additional[1]} . 2> /dev/null | grep '^[-].*antlr-format'`
+        if [ "$antlrFormatDiffs" != "" ]
         then
-            echo "no actions => skipping $testname."
+            echo "::error file=$testname,line=0,col=0,endColumn=0::grammar has antlr-format changes."
+            failed=1
             popd > /dev/null
             continue
         fi
     fi
 
-    if [ "$target" == "useless-parens" ]
+    antlr-format -c $full_path_scripts_dir/repo_coding_style.json *.g4
+    if [ $? -ne 0 ]
     then
-        # Find useless parentheses.
-        curl https://raw.githubusercontent.com/kaby76/g4-scripts/9e70a6392783936ddd51cd270f6ac29fecbefef8/find-useless-parentheses.sh 2> /dev/null | bash
-        if [ $? -ne 0 ]
-        then
-            echo "::warning file=$testname,line=0,col=0,endColumn=0::grammar contains useless parentheses. Check log for more details."
-        fi
+        failed=1
     fi
-
-    if [ "$target" == "format" ]
+    git diff --exit-code .
+    if [ $? -ne 0 ]
     then
-        # This should be the last step because it modifies the grammar files.
-        # Test format for each grammar to see if follows coding standard.
-        antlr-format *.g4
-        git diff --exit-code .
-        if [ $? -ne 0 ]
+        echo "::warning file=$testname,line=0,col=0,endColumn=0::grammar did not conform to the Antlr grammar coding standard format for this repo."
+        if [ "$commit" != "" ]
         then
-            echo "::warning file=$testname,line=0,col=0,endColumn=0::one or more grammars do not conform to the Antlr grammar coding standard format for this repo. Reformat using antlr-format."
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::Checking in reformatted grammar."
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git add --all
+            git commit -m "Reformat to coding standard."
         fi
     fi
 

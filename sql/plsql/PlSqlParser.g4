@@ -1183,8 +1183,8 @@ create_analytic_view
     ;
 
 classification_clause
-// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
-// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    // : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+    // to handle - 'rule contains a closure with at least one alternative that can match an empty string'
     : (caption_clause description_clause? | caption_clause? description_clause) classification_item*
     | caption_clause? description_clause? classification_item+
     ;
@@ -4014,7 +4014,7 @@ alter_synonym
     ;
 
 create_synonym
-// Synonym's schema cannot be specified for public synonyms
+    // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (
         AT_SIGN link_name
     )?

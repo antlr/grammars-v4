@@ -1429,7 +1429,8 @@ fragment IdentifierStartChar options {
     |                               // letters which require multiple UTF-16 code units
     [\uD800-\uDBFF] [\uDC00-\uDFFF] {
     CheckIfUtf32Letter()
-   }?;
+   }?
+;
 
 fragment IdentifierChar: StrictIdentifierChar | '$';
 
@@ -1628,7 +1629,8 @@ fragment EscapeStringText options {
             ~ [xuU]
         )
         | ~ ['\\]
-    )*;
+    )*
+;
 
 InvalidEscapeStringConstant: InvalidEscapeStringText '\'' -> mode (AfterEscapeStringConstantMode);
 
