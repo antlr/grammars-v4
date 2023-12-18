@@ -335,11 +335,23 @@ do
     fi
     yes=false;
 
+    if [ "${#additional[@]}" -eq 2 ]
+    then
+        antlrFornatDiffs=`git diff --unified=0 ${additional[0]} ${additional[1]} . 2> /dev/null | grep '^[-].*antlr-format'`
+        if [ "$antlrFormatDiffs" != "" ]
+        then
+            echo "::error file=$testname,line=0,col=0,endColumn=0::grammar has antlr-format changes."
+            failed=1
+            popd > /dev/null
+            continue
+        fi
+    fi
+
     antlr-format -c $full_path_scripts_dir/repo_coding_style.json *.g4
-	if [ $? -ne 0 ]
-	then
-	    failed=1
-	fi
+    if [ $? -ne 0 ]
+    then
+        failed=1
+    fi
     git diff --exit-code .
     if [ $? -ne 0 ]
     then
