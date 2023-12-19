@@ -3339,7 +3339,7 @@ create_table
         relational_table
         | xmltype_table
         | object_table
-    ) (MEMOPTIMIZE FOR READ)? (MEMOPTIMIZE FOR WRITE)? (PARENT tableview_name)?
+    ) (MEMOPTIMIZE FOR READ)? (MEMOPTIMIZE FOR WRITE)? (PARENT tableview_name)? (USAGE QUEUE)?
     ;
 
 xmltype_table
