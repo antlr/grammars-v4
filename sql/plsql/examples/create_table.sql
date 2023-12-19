@@ -405,6 +405,11 @@ CREATE TABLE "D1
 "
 ("c1" INTEGER, "C2" INTEGER);
 
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+) USAGE QUEUE;
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE
