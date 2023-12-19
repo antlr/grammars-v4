@@ -2412,7 +2412,7 @@ fragment QS_SHARP  : '#' .*? '#';
 fragment QS_QUOTE  : '\'' .*? '\'';
 fragment QS_DQUOTE : '"' .*? '"';
 
-DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"';
+DELIMITED_ID: '"' (~ [\u0000"] | '"' '"')+ '"';
 
 PERCENT         : '%';
 AMPERSAND       : '&';
