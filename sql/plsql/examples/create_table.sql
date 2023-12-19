@@ -401,6 +401,10 @@ CREATE TABLE T (
     data xmltype
 );
 
+CREATE TABLE "D1
+"
+("c1" INTEGER, "C2" INTEGER);
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE
