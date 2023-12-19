@@ -1,0 +1,30 @@
+{
+    "main": {
+        "alignColons": "hanging",
+	"alignSemicolons": "hanging",
+        "alignTrailingComments": true,
+        "allowShortBlocksOnASingleLine": true,
+        "allowShortRulesOnASingleLine": false,
+        "columnLimit": 150,
+        "maxEmptyLinesToKeep": 1,
+        "minEmptyLines": 1,
+        "reflowComments": false,
+        "useTab": false
+    },
+    "lexer": {
+	"alignColons": "trailing",
+	"alignLabels": true,
+	"alignLexerCommands": true,
+	"alignSemicolons": "ownLine",
+	"alignTrailers": true,
+	"alignTrailingComments": true,
+	"allowShortBlocksOnASingleLine": true,
+	"allowShortRulesOnASingleLine": true,
+	"columnLimit": 150,
+	"maxEmptyLinesToKeep": 1,
+	"minEmptyLines": 0,
+	"reflowComments": false,
+	"singleLineOverrulesHangingColon": true,
+	"useTab": false
+    }
+}

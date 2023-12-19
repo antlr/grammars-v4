@@ -94,7 +94,7 @@ finally_clause
     ;
 
 with_item
-// NB compile.c makes sure that the default except clause is last
+    // NB compile.c makes sure that the default except clause is last
     : test (AS expr)?
     ;
 
@@ -187,7 +187,7 @@ star_expr
     ;
 
 assign_part
-// if left expression in assign is bool literal, it's mean that is Python 2 here
+    // if left expression in assign is bool literal, it's mean that is Python 2 here
     : ASSIGN (testlist_star_expr (ASSIGN testlist_star_expr)* (ASSIGN yield_expr)? | yield_expr)
     | {this.CheckVersion(3)}? COLON test (ASSIGN testlist)? {this.SetVersion(3);} // annassign Python3 rule
     | op = (
@@ -376,8 +376,8 @@ arguments
     ;
 
 arglist
-// The reason that keywords are test nodes instead of name is that using name
-// results in an ambiguity. ast.c makes sure it's a name.
+    // The reason that keywords are test nodes instead of name is that using name
+    // results in an ambiguity. ast.c makes sure it's a name.
     : argument (COMMA argument)* COMMA?
     ;
 

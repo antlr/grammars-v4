@@ -2470,9 +2470,7 @@ REMARK_COMMENT:
 PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
 // TODO: should starts with newline
-START_CMD
-//: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
-: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
+START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
     '@' '@'?
 ; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
 

@@ -820,7 +820,7 @@ number
     ;
 
 nonReserved
-// IMPORTANT: this rule must only contain tokens. Nested rules are not supported. See SqlParser.exitNonReserved
+    // IMPORTANT: this rule must only contain tokens. Nested rules are not supported. See SqlParser.exitNonReserved
     : ABSENT_
     | ADD_
     | ADMIN_

@@ -432,7 +432,7 @@ attribute_designator
     ;
 
 range_attribute_reference
-//    : prefix '\'' range_attribute_designator
+    //    : prefix '\'' range_attribute_designator
     : name '\'' range_attribute_designator
     ;
 
