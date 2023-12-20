@@ -6307,7 +6307,7 @@ unary_expression
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
 implicit_cursor_expression
-    : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' ( ERROR_INDEX | ERROR_CODE))
+    : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
     ;
 
 case_statement /*TODO [boolean isStatementParameter]
