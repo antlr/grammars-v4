@@ -51,6 +51,7 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add --all
         git commit -m "Reformat to coding standard."
+        echo "Committed reformatted code."
     - name: Push changes
       # git push changes to "master" branch.
       # make sure to uncheck "Require a pull request before merging" in gh actions, "Branches" section.
