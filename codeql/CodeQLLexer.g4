@@ -34,7 +34,7 @@ ASC:   'asc';
 AVG:   'avg';
 BOOLEAN:   'boolean';
 BY:   'by';
-CLASS:   'class';
+CLASS_:   'class';
 CONCAT:   'concat';
 COUNT:   'count';
 DATE:   'date';

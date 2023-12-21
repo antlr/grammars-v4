@@ -104,7 +104,7 @@ implements
 
 //moduleBody ::= (import | predicate | class | module | alias | select)*
 moduleBody
-    : (importDeclaration | predicate | signature | datatype | typeunion | class | module | alias | select)*
+    : (importDeclaration | predicate | signature | datatype | typeunion | class_ | module | alias | select)*
     ;
 
 //import ::= annotations 'import' importModuleExpr ('as' modulename)?
@@ -310,7 +310,7 @@ optbody
     ;
 
 //class ::= QL_DOC? annotations 'class' classname ('extends' type (',' type)*)? ('instanceof' type (',' type)*)?  '{' member* '}'
-class
+class_
     : QL_DOC? annotations 'class' classname ('extends' type (',' type)*)? ('instanceof' type (',' type)*)?  '{' member* '}'
     ;
 
