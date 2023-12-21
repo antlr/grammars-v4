@@ -306,7 +306,7 @@ head
 optbody
     : ';'
     |  '{' formula '}'
-    |  '=' literalId '(' (predicateRef '/' INT_LITERAL (',' predicateRef '/' INT_LITERAL)*)? ')' '(' (exprs)? ')'
+    |  '=' literalId '(' (predicateRef '/' INT_LITERAL (',' predicateRef '/' INT_LITERAL)*)? ')' '(' exprs? ')'
     ;
 
 //class ::= QL_DOC? annotations 'class' classname ('extends' type (',' type)*)? ('instanceof' type (',' type)*)?  '{' member* '}'
@@ -490,8 +490,8 @@ inrange
 //call ::= predicateRef (closure)? "(" (exprs)? ")"
 //     |   primary "." predicateName (closure)? "(" (exprs)? ")"
 call
-    : predicateRef (closure)? '(' (exprs)? ')'
-    | primary '.' predicateName (closure)? '(' (exprs)? ')'
+    : predicateRef closure? '(' exprs? ')'
+    | primary '.' predicateName closure? '(' exprs? ')'
     ;
 
 //closure ::= "*" | "+"
@@ -534,16 +534,16 @@ nonOpExpr
 //        |   range
 //        |   setliteral
 primary
-    : primaryBase (primaryPostfixOp)*
+    : primaryBase primaryPostfixOp*
     ;
 
 primaryPostfixOp
      : '.' '(' type ')'
-     | '.' predicateName (closure)? '(' (exprs)? ')'
+     | '.' predicateName closure? '(' exprs? ')'
      ;
 
 callwithresults_nomember
-    : predicateRef (closure)? '(' (exprs)? ')'
+    : predicateRef closure? '(' exprs? ')'
     ;
 
 primaryBase
@@ -622,9 +622,9 @@ cast
 //            |   aggid ("[" expr "]")? "(" as_exprs ("order" "by" aggorderbys)? ")"
 //            |   "unique" "(" var_decls "|" (formula)? ("|" as_exprs)? ")"
 aggregation
-    : aggid ('[' expr ']')? '(' var_decls ('|' (formula)? ('|' as_exprs ('order' 'by' aggorderbys)?)?)? ')'
+    : aggid ('[' expr ']')? '(' var_decls ('|' formula? ('|' as_exprs ('order' 'by' aggorderbys)?)?)? ')'
     | aggid ('[' expr ']')? '(' as_exprs ('order' 'by' aggorderbys)? ')'
-    | 'unique' '(' var_decls '|' (formula)? ('|' as_exprs)? ')'
+    | 'unique' '(' var_decls '|' formula? ('|' as_exprs)? ')'
     ;
 //expression_pragma ::= "pragma" "[" expression_pragma_type "]" "(" expr ")"
 expression_pragma
@@ -649,7 +649,7 @@ aggorderby
     ;
 //any ::= "any" "(" var_decls ("|" (formula)? ("|" expr)?)? ")"
 any
-    :'any' '(' var_decls ('|' (formula)? ('|' expr)?)? ')'
+    :'any' '(' var_decls ('|' formula? ('|' expr)?)? ')'
     ;
 
 //callwithresults ::= predicateRef (closure)? "(" (exprs)? ")"
