@@ -5,8 +5,7 @@ Dim Number, MyString
 1: 
  MyString = "Number equals 1" 
  GoTo 3
-2: 
- MyString = "Number equals 2" 
+2:       MyString = "Number equals 2" 
 3: 
  Debug.Print MyString
 End Sub
