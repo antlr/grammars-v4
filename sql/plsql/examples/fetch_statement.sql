@@ -21,6 +21,7 @@ AS
         CURSOR fetch_into_cursor IS
         SELECT 2 FROM dual;
 
+        -- The DDL of TEST_TB is 'CREATE TABLE TEST_TB(id NUMBER(3), value VARCHAR2(10))'
         TYPE IDList IS TABLE OF TEST_TB.ID%TYPE;
         TYPE ValueList IS TABLE OF TEST_TB.VALUE%TYPE;
 
