@@ -136,22 +136,11 @@ COLONCOLON:         '::';
 
 // Literals
 INT_LITERAL :     [0-9]+;
-
-
-FLOAT_LITERAL:      INT_LITERAL ('.' INT_LITERAL)? ;
-
-BOOL_LITERAL:       TRUE
-            |       FALSE
-            ;
-
+FLOAT_LITERAL:      INT_LITERAL '.' INT_LITERAL;
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
-
 AT:                 '@';
-// Additional symbols not defined in the lexical specification
-ELLIPSIS:           '...';
 
 // Whitespace and comments
-
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT:            '/*' ~[*]*?.*? '*/'    -> channel(HIDDEN);
 QL_DOC:            '/**' .*? '*/'    -> channel(HIDDEN);
@@ -159,12 +148,9 @@ LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
 // Identifiers
 
-// 将 LowerId 和 UpperId 定义为词法规则
-
 LOWERID: [a-z][a-zA-Z0-9_]* ;
 UPPERID: [A-Z][a-zA-Z0-9_]* ;
-// 将 AtLowerId 定义为词法规则
-ATLOWERID: '@' LOWERID ;
+ATLOWERID: AT LOWERID ;
 
 
 

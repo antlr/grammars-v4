@@ -426,19 +426,19 @@ fparen
     ;
 
 //disjunction ::= formula "or" formula
-disjunction
-    : formula 'or' formula
-    ;
+//disjunction
+//    : formula 'or' formula
+//    ;
 
 //conjunction ::= formula "and" formula
-conjunction
-    : formula 'and' formula
-    ;
+//conjunction
+//    : formula 'and' formula
+//    ;
 
 //implies ::= formula "implies" formula
-implies
-    : formula 'implies' formula
-    ;
+//implies
+//    : formula 'implies' formula
+//    ;
 
 //ifthen ::= "if" formula "then" formula "else" formula
 ifthen
@@ -590,13 +590,13 @@ unop
 //      |   expr "*" expr
 //      |   expr "/" expr
 //      |   expr "%" expr
-binop
-    : expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '%' expr
-    ;
+//binop
+//    : expr '+' expr
+//    | expr '-' expr
+//    | expr '*' expr
+//    | expr '/' expr
+//    | expr '%' expr
+//    ;
 
 //variable ::= varname | "this" | "result"
 variable
