@@ -5644,9 +5644,14 @@ open_statement
 
 fetch_statement
     : FETCH cursor_name (
-        it1 = INTO variable_name (',' variable_name)*
-        | BULK COLLECT INTO variable_name (',' variable_name)* (LIMIT (numeric | variable_name))?
+        it1 = INTO variable_or_collection (',' variable_or_collection)*
+        | BULK COLLECT INTO variable_or_collection (',' variable_or_collection)* (LIMIT (numeric | variable_or_collection))?
     )
+    ;
+
+variable_or_collection
+    : variable_name
+    | collection_expression
     ;
 
 open_for_statement
@@ -6308,6 +6313,10 @@ unary_expression
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
 implicit_cursor_expression
     : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
+    ;
+
+collection_expression
+    : collation_name ('(' expression ')' ('.' general_element_part)*)
     ;
 
 case_statement /*TODO [boolean isStatementParameter]
