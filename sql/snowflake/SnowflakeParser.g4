@@ -1142,16 +1142,11 @@ clustering_action
     ;
 
 add_col_def
-    : column_name data_type (NOT? NULL_)?
-              default_value2?
+    : column_name data_type null_not_null?
+              default_value?
               inline_constraint?
               (WITH? MASKING POLICY id_ (USING '(' column_name COMMA column_list ')' )? )?
               (COMMENT string)?
-    ;
-
-default_value2
-    : DEFAULT? expr
-    | (AUTOINCREMENT | IDENTITY) ('(' num COMMA num ')' | START num INCREMENT num)?
     ;
 
 table_column_action
@@ -3511,7 +3506,6 @@ non_reserved_words
     | NAME
     | NULLIF
     | NVL
-    | NVL2
     | OFFSET
     | OPTION
     | PARTITION
