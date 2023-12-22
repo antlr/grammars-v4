@@ -37,3 +37,4 @@ alter view vw set secure ;
 alter warehouse wh suspend ;
 alter sequence seq set ORDER COMMENT ='A comment';
 alter sequence seq set NOORDER;
+ALTER TABLE  TESTSEED ADD ident int IDENTITY START = 2 INCREMENT BY 1;
