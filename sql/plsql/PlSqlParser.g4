@@ -6316,7 +6316,7 @@ implicit_cursor_expression
     ;
 
 collection_expression
-    : collation_name ('(' expression ')' ('.' general_element_part)*)
+    : collation_name '(' expression ')' ('.' general_element_part)*
     ;
 
 case_statement /*TODO [boolean isStatementParameter]
