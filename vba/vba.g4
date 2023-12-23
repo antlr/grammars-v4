@@ -112,15 +112,15 @@ module
     ;
 
 moduleHeader
-    : VERSION WS DOUBLELITERAL WS CLASS
+    : VERSION WS DOUBLELITERAL WS CLASS?
     ;
 
 moduleConfig
-    : BEGIN endOfLine* moduleConfigElement+ END
+    : BEGIN (WS GUID WS ambiguousIdentifier)? endOfLine* moduleConfigElement+ END
     ;
 
 moduleConfigElement
-    : ambiguousIdentifier WS? EQ WS? literal endOfLine*
+    : ambiguousIdentifier WS? EQ WS? literal (COLON literal)? endOfLine*
     ;
 
 moduleAttributes
@@ -418,7 +418,7 @@ killStmt
     ;
 
 letStmt
-    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? valueStmt
+    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? typeHint? valueStmt typeHint?
     ;
 
 lineInputStmt
@@ -810,7 +810,7 @@ subscripts
     ;
 
 subscript_
-    : (valueStmt WS TO WS)? valueStmt
+    : (valueStmt WS TO WS)? typeHint? valueStmt typeHint?
     ;
 
 // atomic rules ----------------------------------
@@ -1856,6 +1856,14 @@ R_SQUARE_BRACKET
     ;
 
 // literals
+fragment BLOCK
+    : HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT
+    ;
+
+GUID
+    : '{' BLOCK BLOCK MINUS BLOCK MINUS BLOCK MINUS BLOCK MINUS BLOCK BLOCK BLOCK '}'
+    ;
+
 STRINGLITERAL
     : '"' (~["\r\n] | '""')* '"'
     ;
@@ -1869,7 +1877,7 @@ HEXLITERAL
     ;
 
 SHORTLITERAL
-    : (PLUS | MINUS)? DIGIT+ ('#' | '&' | '@')?
+    : (PLUS | MINUS)? DIGIT+
     ;
 
 INTEGERLITERAL
@@ -1994,6 +2002,10 @@ fragment LETTER
 
 fragment DIGIT
     : [0-9]
+    ;
+
+fragment HEXDIGIT
+    : [A-F0-9]
     ;
 
 fragment LETTERORDIGIT

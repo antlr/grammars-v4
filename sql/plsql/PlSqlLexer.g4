@@ -511,6 +511,8 @@ ERROR_ARGUMENT                 : 'ERROR_ARGUMENT';
 ERROR                          : 'ERROR';
 ERROR_ON_OVERLAP_TIME          : 'ERROR_ON_OVERLAP_TIME';
 ERRORS                         : 'ERRORS';
+ERROR_INDEX                    : 'ERROR_INDEX';
+ERROR_CODE                     : 'ERROR_CODE';
 ESCAPE                         : 'ESCAPE';
 ESTIMATE                       : 'ESTIMATE';
 EVAL                           : 'EVAL';
@@ -1331,6 +1333,7 @@ PERCENT_RANKM                  : 'PERCENT_RANKM';
 PERCENT_ROWCOUNT               : '%' SPACE* 'ROWCOUNT';
 PERCENT_ROWTYPE                : '%' SPACE* 'ROWTYPE';
 PERCENT_TYPE                   : '%' SPACE* 'TYPE';
+PERCENT_BULK_EXCEPTIONS        : '%' SPACE* 'BULK_EXCEPTIONS';
 PERFORMANCE                    : 'PERFORMANCE';
 PERIOD_KEYWORD                 : 'PERIOD';
 PERMANENT                      : 'PERMANENT';
@@ -2412,7 +2415,7 @@ fragment QS_SHARP  : '#' .*? '#';
 fragment QS_QUOTE  : '\'' .*? '\'';
 fragment QS_DQUOTE : '"' .*? '"';
 
-DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"';
+DELIMITED_ID: '"' (~ [\u0000"] | '"' '"')+ '"';
 
 PERCENT         : '%';
 AMPERSAND       : '&';
@@ -2467,9 +2470,7 @@ REMARK_COMMENT:
 PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
 // TODO: should starts with newline
-START_CMD
-//: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
-: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
+START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
     '@' '@'?
 ; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
 

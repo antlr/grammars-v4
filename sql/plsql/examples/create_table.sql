@@ -401,6 +401,20 @@ CREATE TABLE T (
     data xmltype
 );
 
+CREATE TABLE "D1
+"
+("c1" INTEGER, "C2" INTEGER);
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+) USAGE QUEUE;
+
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR WRITE;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR WRITE;
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE

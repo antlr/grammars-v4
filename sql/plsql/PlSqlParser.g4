@@ -1183,8 +1183,8 @@ create_analytic_view
     ;
 
 classification_clause
-// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
-// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    // : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+    // to handle - 'rule contains a closure with at least one alternative that can match an empty string'
     : (caption_clause description_clause? | caption_clause? description_clause) classification_item*
     | caption_clause? description_clause? classification_item+
     ;
@@ -3339,7 +3339,7 @@ create_table
         relational_table
         | xmltype_table
         | object_table
-    ) (MEMOPTIMIZE FOR READ)? (MEMOPTIMIZE FOR WRITE)? (PARENT tableview_name)?
+    ) memoptimize_read_write_clause? (PARENT tableview_name)? (USAGE QUEUE)?
     ;
 
 xmltype_table
@@ -4014,7 +4014,7 @@ alter_synonym
     ;
 
 create_synonym
-// Synonym's schema cannot be specified for public synonyms
+    // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (
         AT_SIGN link_name
     )?
@@ -4744,7 +4744,7 @@ modify_table_partition
     : MODIFY (
         PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (
             REBUILD? UNUSABLE LOCAL INDEXES
-        )?
+        )? shrink_clause?
         | range_partitions
     )
     ;
@@ -5446,8 +5446,9 @@ table_indexed_by_part
     : (idx1 = INDEXED | idx2 = INDEX) BY type_spec
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/collection-variable.html#GUID-89A1863C-65A1-40CF-9392-86E9FDC21BE9
 varray_type_def
-    : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
+    : (VARRAY | VARYING? ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
     ;
 
 // Statements
@@ -5522,8 +5523,9 @@ cursor_loop_param
     | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/FORALL-statement.html#GUID-C45B8241-F9DF-4C93-8577-C840A25963DB
 forall_statement
-    : FORALL index_name IN bounds_clause sql_statement (SAVE EXCEPTIONS)?
+    : FORALL index_name IN bounds_clause (SAVE EXCEPTIONS)? data_manipulation_language_statements
     ;
 
 bounds_clause
@@ -5585,7 +5587,7 @@ tps_body
     ;
 
 block
-    : DECLARE? declare_spec+ body
+    : (DECLARE declare_spec*)? body
     ;
 
 // SQL Statements
@@ -6300,6 +6302,12 @@ unary_expression
     | quantified_expression
     | standard_function
     | atom
+    | implicit_cursor_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
+implicit_cursor_expression
+    : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
     ;
 
 case_statement /*TODO [boolean isStatementParameter]
@@ -7347,6 +7355,8 @@ regular_id
     | VAR_
     | VALUE
     | COVAR_
+    | ERROR_INDEX
+    | ERROR_CODE
     ;
 
 non_reserved_keywords_in_12c

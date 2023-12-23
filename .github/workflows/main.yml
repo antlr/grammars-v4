@@ -5,9 +5,11 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -26,6 +28,39 @@ jobs:
       shell: bash
       run: |
         dotnet tool restore
+    - name: Check grammar coding standards
+      continue-on-error: false
+      run: |
+        if [ "${{github.event_name}}" == "pull_request" ]; then
+          Before="${{github.event.pull_request.base.sha}}"
+          After="${{github.event.pull_request.head.sha}}"
+        else
+          Before="${{github.event.before}}"
+          After="${{github.event.after}}"
+        fi
+        # check for bad coding standard in grammar by doing a reformat.
+        bash _scripts/reformat.sh -f diff $Before $After
+    - name: Commit changes
+      # git commit reformatting changes if any, but only if on master branch.
+      # If there were no changes, this is a no-op.
+      if: github.ref == 'refs/heads/master'
+      continue-on-error: false
+      shell: bash
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add --all
+        git commit -m "Reformat to coding standard."
+    - name: Push changes
+      # git push changes to "master" branch.
+      # make sure to uncheck "Require a pull request before merging" in gh actions, "Branches" section.
+      uses: ad-m/github-push-action@master
+      if: github.ref == 'refs/heads/master'
+      continue-on-error: false
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        force_with_lease: true
     - name: Gather targets.
       id: step1
       shell: bash
@@ -100,6 +135,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '^1.21.0'
+        cache: false
     - name: Test Go
       if: ${{ matrix.language == 'Go' }}
       run: |
@@ -122,7 +158,7 @@ jobs:
          pip install antlr4-tools
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v4.0.0
+      uses: actions/setup-node@v4.0.1
       with:
         node-version: '16.13.0'
     - name: Test JavaScript
@@ -156,13 +192,13 @@ jobs:
         }
         _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
-  static-checks:
+  static-check:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        language: [ CSharp ]
+        test: [ useless-parens ]
     steps:
     - name: Info
       shell: bash
@@ -194,22 +230,6 @@ jobs:
         dotnet --version
         java --version
         javac --version
-    - name: Install Dart
-      if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
-    - name: Test Dart
-      if: ${{ matrix.language == 'Dart' }}
-      run: |
-        dart --version
-    - name: Install Go
-      if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v5
-      with:
-        go-version: '^1.18.0'
-    - name: Test Go
-      if: ${{ matrix.language == 'Go' }}
-      run: |
-        go version
     - name: Install Python
       uses: actions/setup-python@v5.0.0
       with:
@@ -226,15 +246,6 @@ jobs:
     - name: Install Antlr tool
       run: |
          pip install antlr4-tools
-    - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v4.0.0
-      with:
-        node-version: '16.13.0'
-    - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      run: |
-        node --version
     - name: Install Trash
       shell: bash
       run: |
@@ -253,6 +264,6 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/test-static-checks.sh -t ${{matrix.language}} -f diff $Before $After
+        bash _scripts/test-static-checks.sh -t ${{matrix.test}} -f diff $Before $After
 
 
