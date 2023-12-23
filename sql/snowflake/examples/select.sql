@@ -58,3 +58,11 @@ SELECT COLLATE(c1, 'en_US-ci-as');
 
 select network from T1;
 select outbound from T1;
+
+select * from t where (t.c, t.d) in (select c, d from t2);
+
+with t as (select 1 as c, 2 as d)
+   , s as (select 1 as c, 2 as d)
+select *
+from t
+where (c,d) in (select c,d from s);
