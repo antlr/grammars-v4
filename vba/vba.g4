@@ -418,7 +418,7 @@ killStmt
     ;
 
 letStmt
-    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? typeHint? valueStmt
+    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? typeHint? valueStmt typeHint?
     ;
 
 lineInputStmt
