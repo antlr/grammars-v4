@@ -1877,7 +1877,7 @@ HEXLITERAL
     ;
 
 SHORTLITERAL
-    : (PLUS | MINUS)? DIGIT+ ('#' | '&' | '@')?
+    : (PLUS | MINUS)? DIGIT+
     ;
 
 INTEGERLITERAL
