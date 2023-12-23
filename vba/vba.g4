@@ -810,7 +810,7 @@ subscripts
     ;
 
 subscript_
-    : (valueStmt WS TO WS)? valueStmt
+    : (valueStmt WS TO WS)? typeHint? valueStmt typeHint?
     ;
 
 // atomic rules ----------------------------------
