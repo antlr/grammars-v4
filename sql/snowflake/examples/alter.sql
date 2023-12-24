@@ -38,3 +38,6 @@ alter warehouse wh suspend ;
 alter sequence seq set ORDER COMMENT ='A comment';
 alter sequence seq set NOORDER;
 ALTER TABLE  TESTSEED ADD ident int IDENTITY START = 2 INCREMENT BY 1;
+
+ALTER TABLE t ADD COLUMN c2 INTEGER NULL DEFAULT NULL COMMENT 'text';
+ALTER TABLE t ADD COLUMN c2 INTEGER NULL NULL COMMENT 'text';

@@ -2304,7 +2304,7 @@ order_noorder
     ;
 
 default_value
-    : DEFAULT expr
+    : DEFAULT? expr
     | (AUTOINCREMENT | IDENTITY) (
         LR_BRACKET num COMMA num RR_BRACKET
         | start_with
@@ -3552,6 +3552,11 @@ non_reserved_words
     | WAREHOUSE_TYPE
     | NETWORK
     | OUTBOUND
+    | INPUT
+    | PATH_
+    | OUTER
+    | RECURSIVE
+    | MODE
     ;
 
 builtin_function
@@ -3772,6 +3777,9 @@ primitive_expression
     | id_ ('.' id_)* // json field access
     | full_column_name
     | literal
+    | BOTH_Q
+    | ARRAY_Q
+    | OBJECT_Q
     //| json_literal
     //| arr_literal
     ;
@@ -3806,10 +3814,19 @@ function_call
     | aggregate_function
     //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
+    | object_name '(' param_assoc_list ')'
     | list_function LR_BRACKET expr_list RR_BRACKET
     | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
     | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    ;
+
+param_assoc_list
+    : param_assoc (',' param_assoc)*
+    ;
+
+param_assoc
+    : id_ ASSOC expr
     ;
 
 ignore_or_repect_nulls
