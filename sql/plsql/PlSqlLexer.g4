@@ -761,6 +761,7 @@ INTERVAL                       : 'INTERVAL';
 INT                            : 'INT';
 INTO                           : 'INTO';
 INVALIDATE                     : 'INVALIDATE';
+INVALIDATION                   : 'INVALIDATION';
 INVISIBLE                      : 'INVISIBLE';
 IN_XQUERY                      : 'IN_XQUERY';
 IS                             : 'IS';
