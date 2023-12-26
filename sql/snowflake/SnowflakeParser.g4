@@ -64,7 +64,10 @@ dml_command
     ;
 
 insert_statement
-    : INSERT OVERWRITE? INTO object_name column_list_in_parentheses? (values_builder | query_statement)
+    : INSERT OVERWRITE? INTO object_name column_list_in_parentheses? (
+        values_builder
+        | query_statement
+    )
     ;
 
 insert_multi_table_statement
@@ -1142,19 +1145,21 @@ clustering_action
     ;
 
 add_col_def
-    : column_name data_type null_not_null?
-              default_value?
-              inline_constraint?
-              (WITH? MASKING POLICY id_ (USING '(' column_name COMMA column_list ')' )? )?
-              (COMMENT string)?
+    : column_name data_type null_not_null? default_value? inline_constraint? (
+        WITH? MASKING POLICY id_ (USING '(' column_name COMMA column_list ')')?
+    )? (COMMENT string)?
     ;
 
 table_column_action
     : ADD COLUMN? if_not_exists? add_col_def (',' add_col_def)*
     | RENAME COLUMN column_name TO column_name
-    | alter_modify ('(' alter_column_clause (',' alter_column_clause)* ')' | alter_column_clause (',' alter_column_clause)*)
-    | alter_modify COLUMN column_name SET MASKING POLICY id_ (USING '(' column_name COMMA column_list ')' )?
-                                                                        FORCE?
+    | alter_modify (
+        '(' alter_column_clause (',' alter_column_clause)* ')'
+        | alter_column_clause (',' alter_column_clause)*
+    )
+    | alter_modify COLUMN column_name SET MASKING POLICY id_ (
+        USING '(' column_name COMMA column_list ')'
+    )? FORCE?
     | alter_modify COLUMN column_name UNSET MASKING POLICY
     | alter_modify column_set_tags (COMMA column_set_tags)*
     | alter_modify column_unset_tags (COMMA column_unset_tags)*
@@ -1163,17 +1168,18 @@ table_column_action
     ;
 
 alter_column_clause
-    : COLUMN? column_name ( DROP DEFAULT
-                          | SET DEFAULT object_name DOT NEXTVAL
-                          | ( SET? NOT NULL_ | DROP NOT NULL_ )
-                          | ( (SET DATA)? TYPE )? data_type
-                          | COMMENT string
-                          | UNSET COMMENT )
+    : COLUMN? column_name (
+        DROP DEFAULT
+        | SET DEFAULT object_name DOT NEXTVAL
+        | ( SET? NOT NULL_ | DROP NOT NULL_)
+        | ( (SET DATA)? TYPE)? data_type
+        | COMMENT string
+        | UNSET COMMENT
+    )
     ;
 
 inline_constraint
-    : null_not_null? (CONSTRAINT id_)?
-    (
+    : null_not_null? (CONSTRAINT id_)? (
         (UNIQUE | primary_key) common_constraint_properties*
         | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
     )
@@ -1655,27 +1661,22 @@ function_definition
     ;
 
 create_function
-    : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
-        RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET)
-        (LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL))?
-        (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)?
-        (VOLATILE | IMMUTABLE)?
-        (PACKAGES EQ '(' string_list ')' )?
-        (RUNTIME_VERSION EQ (string | FLOAT))?
-        (IMPORTS EQ '(' string_list ')' )?
-        (PACKAGES EQ '(' string_list ')' )?
-        (HANDLER EQ string )?
-        null_not_null?
-        comment_clause?
-        AS function_definition
-    | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET ( arg_decl (COMMA  arg_decl)* )? RR_BRACKET
-        RETURNS ( data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET )
-        null_not_null?
-        (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)?
-        (VOLATILE | IMMUTABLE)?
-        MEMOIZABLE?
-        comment_clause?
-        AS function_definition
+    : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
+        arg_decl (COMMA arg_decl)*
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) (
+        LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
+    )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
+        PACKAGES EQ '(' string_list ')'
+    )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
+        PACKAGES EQ '(' string_list ')'
+    )? (HANDLER EQ string)? null_not_null? comment_clause? AS function_definition
+    | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
+        data_type
+        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
+    ) null_not_null? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+        VOLATILE
+        | IMMUTABLE
+    )? MEMOIZABLE? comment_clause? AS function_definition
     ;
 
 create_managed_account
@@ -1702,7 +1703,7 @@ create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name (
         LR_BRACKET column_list_with_comment RR_BRACKET
     )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement
-        //NOTA MATERIALIZED VIEW accept only simple select statement at this time
+    //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -1758,37 +1759,27 @@ not_null
     ;
 
 create_procedure
-    : CREATE or_replace? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET
-        RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET)
-        not_null?
-        LANGUAGE SQL
-        (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)?
-        (VOLATILE | IMMUTABLE)? // Note: VOLATILE and IMMUTABLE are deprecated.
-        comment_clause?
-        executa_as?
-        AS procedure_definition
-    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET
-        RETURNS data_type not_null?
-        LANGUAGE JAVASCRIPT
-        (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)?
-        (VOLATILE | IMMUTABLE)? // Note: VOLATILE and IMMUTABLE are deprecated.
-        comment_clause?
-        executa_as?
-        AS procedure_definition
-    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET
-        RETURNS (data_type not_null?
-                | TABLE LR_BRACKET (col_decl (COMMA col_decl)* )? RR_BRACKET
-                )
-        LANGUAGE PYTHON
-        RUNTIME_VERSION EQ string
-        (IMPORTS EQ '(' string_list ')')?
-        PACKAGES EQ '(' string_list ')'
-        HANDLER EQ string
-//            ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
-//            ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
-        comment_clause?
-        executa_as?
-        AS procedure_definition
+    : CREATE or_replace? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
+        data_type
+        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
+    ) not_null? LANGUAGE SQL (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+        VOLATILE
+        | IMMUTABLE
+    )? // Note: VOLATILE and IMMUTABLE are deprecated.
+    comment_clause? executa_as? AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS data_type not_null? LANGUAGE
+        JAVASCRIPT (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+        VOLATILE
+        | IMMUTABLE
+    )? // Note: VOLATILE and IMMUTABLE are deprecated.
+    comment_clause? executa_as? AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
+        data_type not_null?
+        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
+    ) LANGUAGE PYTHON RUNTIME_VERSION EQ string (IMPORTS EQ '(' string_list ')')? PACKAGES EQ '(' string_list ')' HANDLER EQ string
+    //            ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+    //            ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
+    comment_clause? executa_as? AS procedure_definition
     ;
 
 create_replication_group
@@ -1854,7 +1845,7 @@ implicit_none
 
 create_security_integration_snowflake_oauth
     : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ OAUTH OAUTH_CLIENT EQ partner_application OAUTH_REDIRECT_URI EQ string
-        //Required when OAUTH_CLIENTEQLOOKER
+    //Required when OAUTH_CLIENTEQLOOKER
     enabled_true_false? (OAUTH_ISSUE_REFRESH_TOKENS EQ true_false)? (
         OAUTH_REFRESH_TOKEN_VALIDITY EQ num
     )? (OAUTH_USE_SECONDARY_ROLES EQ implicit_none)? (BLOCKED_ROLES_LIST EQ '(' string_list ')')? comment_clause?
@@ -2355,12 +2346,13 @@ column_decl_item_list_paren
     ;
 
 create_table_clause
-    : ( column_decl_item_list_paren cluster_by?
-      | cluster_by? comment_clause? column_decl_item_list_paren
-      ) stage_file_format? (
-        STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET
-    )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause?
-        with_row_access_policy? with_tags?
+    : (
+        column_decl_item_list_paren cluster_by?
+        | cluster_by? comment_clause? column_decl_item_list_paren
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? (
+        DATA_RETENTION_TIME_IN_DAYS EQ num
+    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
+        with_tags?
     ;
 
 create_table_as_select
