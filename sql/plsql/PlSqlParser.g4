@@ -5645,7 +5645,9 @@ open_statement
 fetch_statement
     : FETCH cursor_name (
         it1 = INTO variable_or_collection (',' variable_or_collection)*
-        | BULK COLLECT INTO variable_or_collection (',' variable_or_collection)* (LIMIT (numeric | variable_or_collection))?
+        | BULK COLLECT INTO variable_or_collection (',' variable_or_collection)* (
+            LIMIT (numeric | variable_or_collection)
+        )?
     )
     ;
 
