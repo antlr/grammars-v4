@@ -111,6 +111,7 @@
 				<module>clu</module>
 				<module>cmake</module>
 				<module>cobol85</module>
+				<module>codeql</module>
 				<module>cookie</module>
 				<module>cpp</module>
 				<module>cql</module>
