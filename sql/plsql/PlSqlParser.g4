@@ -1548,7 +1548,7 @@ create_index
         cluster_index_clause
         | table_index_clause
         | bitmap_join_index_clause
-    ) (USABLE | UNUSABLE)?
+    ) (USABLE | UNUSABLE)? ((DEFERRED | IMMEDIATE) INVALIDATION)?
     ;
 
 cluster_index_clause
@@ -7515,6 +7515,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | INVALIDATION
     | ISOLATE
     | IS_LEAF
     | JSON
