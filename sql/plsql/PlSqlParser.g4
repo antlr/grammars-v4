@@ -512,6 +512,7 @@ create_function_body
         '(' parameter (',' parameter)* ')'
     )? RETURN type_spec (
         invoker_rights_clause
+        | accessible_by_clause
         | parallel_enable_clause
         | result_cache_clause
         | DETERMINISTIC
@@ -538,6 +539,22 @@ partition_by_clause
 
 result_cache_clause
     : RESULT_CACHE relies_on_part?
+    ;
+
+accessible_by_clause
+    : ACCESSIBLE BY '(' accessor (',' accessor)* ')'
+    ;
+
+accessor
+    :  unitKind unitName
+    ;
+
+unitKind
+    : FUNCTION | PROCEDURE | PACKAGE | TRIGGER | TYPE
+    ;
+
+unitName
+    : function_name
     ;
 
 relies_on_part
@@ -7276,6 +7293,7 @@ regular_id
     | REGULAR_ID
     | ABSENT
     | A_LETTER
+    | ACCESSIBLE
     | AGENT
     | AGGREGATE
     | ANALYZE
