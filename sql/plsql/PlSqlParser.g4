@@ -546,15 +546,7 @@ accessible_by_clause
     ;
 
 accessor
-    :  unitKind unitName
-    ;
-
-unitKind
-    : FUNCTION | PROCEDURE | PACKAGE | TRIGGER | TYPE
-    ;
-
-unitName
-    : function_name
+    :  unitKind=(FUNCTION | PROCEDURE | PACKAGE | TRIGGER | TYPE) function_name
     ;
 
 relies_on_part
@@ -7293,7 +7285,6 @@ regular_id
     | REGULAR_ID
     | ABSENT
     | A_LETTER
-    | ACCESSIBLE
     | AGENT
     | AGGREGATE
     | ANALYZE
@@ -7390,6 +7381,7 @@ regular_id
 
 non_reserved_keywords_in_12c
     : ACL
+    | ACCESSIBLE
     | ACROSS
     | ACTION
     | ACTIONS
