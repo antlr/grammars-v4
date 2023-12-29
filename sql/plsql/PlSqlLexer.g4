@@ -38,6 +38,7 @@ ABS                            : 'ABS';
 ABSENT                         : 'ABSENT';
 ACCESS                         : 'ACCESS';
 ACCESSED                       : 'ACCESSED';
+ACCESSIBLE                     : 'ACCESSIBLE';
 ACCOUNT                        : 'ACCOUNT';
 ACL                            : 'ACL';
 ACOS                           : 'ACOS';
