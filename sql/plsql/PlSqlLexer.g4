@@ -2176,6 +2176,7 @@ USE                            : 'USE';
 USE_VECTOR_AGGREGATION         : 'USE_VECTOR_AGGREGATION';
 USE_WEAK_NAME_RESL             : 'USE_WEAK_NAME_RESL';
 USING_NO_EXPAND                : 'USING_NO_EXPAND';
+USING_NLS_COMP                 : 'USING_NLS_COMP';
 USING                          : 'USING';
 UTF16BE                        : 'UTF16BE';
 UTF16LE                        : 'UTF16LE';
