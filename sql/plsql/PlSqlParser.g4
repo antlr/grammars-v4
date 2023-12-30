@@ -513,6 +513,7 @@ create_function_body
     )? RETURN type_spec (
         invoker_rights_clause
         | accessible_by_clause
+        | default_collation_clause
         | parallel_enable_clause
         | result_cache_clause
         | DETERMINISTIC
@@ -543,6 +544,10 @@ result_cache_clause
 
 accessible_by_clause
     : ACCESSIBLE BY '(' accessor (',' accessor)* ')'
+    ;
+
+default_collation_clause
+    : DEFAULT COLLATION USING_NLS_COMP
     ;
 
 accessor
@@ -7744,6 +7749,7 @@ non_reserved_keywords_in_12c
     | USE_HIDDEN_PARTITIONS
     | USE_VECTOR_AGGREGATION
     | USING_NO_EXPAND
+    | USING_NLS_COMP
     | UTF16BE
     | UTF16LE
     | UTF32
