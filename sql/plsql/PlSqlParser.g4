@@ -6085,7 +6085,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions ')')
+    : VALUES (REGULAR_ID | '(' expressions ')' | collection_expression)
     ;
 
 merge_statement
