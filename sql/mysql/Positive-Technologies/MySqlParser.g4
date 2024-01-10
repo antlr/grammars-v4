@@ -1015,7 +1015,7 @@ querySpecification
     ;
 
 querySpecificationNointo
-    : SELECT selectSpec* selectElements fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
+    : SELECT selectSpec* selectElements fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause? unionStatement?
     ;
 
 unionParenthesis
