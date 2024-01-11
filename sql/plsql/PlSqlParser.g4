@@ -6376,7 +6376,7 @@ atom
     ;
 
 quantified_expression
-    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression ')')
+    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression (',' expression)*')')
     ;
 
 string_function
