@@ -2295,7 +2295,8 @@ order_noorder
     ;
 
 default_value
-    : DEFAULT? expr
+    : DEFAULT expr
+    | NULL_
     | (AUTOINCREMENT | IDENTITY) (
         LR_BRACKET num COMMA num RR_BRACKET
         | start_with
