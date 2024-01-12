@@ -3496,8 +3496,6 @@ non_reserved_words
     | LOCAL
     | MAX_CONCURRENCY_LEVEL
     | NAME
-    | NULLIF
-    | NVL
     | OFFSET
     | OPTION
     | PARTITION
@@ -4070,18 +4068,20 @@ at_before
     ;
 
 end
-    : END '(' TIMESTAMP ARROW string
-    | OFFSET ARROW string
-    | STATEMENT ARROW id_ ')'
+    : END LR_BRACKET (
+        TIMESTAMP ASSOC expr
+        | OFFSET ASSOC expr
+        | STATEMENT ASSOC string 
+    ) RR_BRACKET
     ;
 
 changes
-    : CHANGES '(' INFORMATION ASSOC default_append_only ')' at_before end?
+    : CHANGES LR_BRACKET INFORMATION ASSOC default_append_only RR_BRACKET at_before end?
     ;
 
 default_append_only
     : DEFAULT
-    | APPEND ONLY
+    | APPEND_ONLY
     ;
 
 partition_by
