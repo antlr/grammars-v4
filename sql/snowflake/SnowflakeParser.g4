@@ -1144,14 +1144,8 @@ clustering_action
     | DROP CLUSTERING KEY
     ;
 
-add_col_def
-    : column_name data_type null_not_null? default_value? inline_constraint? (
-        WITH? MASKING POLICY id_ (USING '(' column_name COMMA column_list ')')?
-    )? (COMMENT string)?
-    ;
-
 table_column_action
-    : ADD COLUMN? if_not_exists? add_col_def (',' add_col_def)*
+    : ADD COLUMN? if_not_exists? full_col_decl (COMMA full_col_decl)*
     | RENAME COLUMN column_name TO column_name
     | alter_modify (
         '(' alter_column_clause (',' alter_column_clause)* ')'
@@ -1179,7 +1173,7 @@ alter_column_clause
     ;
 
 inline_constraint
-    : null_not_null? (CONSTRAINT id_)? (
+    :  (CONSTRAINT id_)? (
         (UNIQUE | primary_key) common_constraint_properties*
         | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
     )
@@ -2296,7 +2290,6 @@ order_noorder
 
 default_value
     : DEFAULT expr
-    | NULL_
     | (AUTOINCREMENT | IDENTITY) (
         LR_BRACKET num COMMA num RR_BRACKET
         | start_with
@@ -2321,7 +2314,7 @@ out_of_line_constraint
     ;
 
 full_col_decl
-    : col_decl (collate | inline_constraint | default_value | null_not_null)* with_masking_policy? with_tags? (
+    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_) )* with_masking_policy? with_tags? (
         COMMENT string
     )?
     ;

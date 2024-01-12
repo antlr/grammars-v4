@@ -98,3 +98,4 @@ CREATE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1 NOORDER);
 CREATE TABLE DIRECTION (LENGTH INT,LANGUAGE INT);
 
 create table t(i int) comment ='\'test\'';
+create table T2(C_NULL INT NULL NOT NULL); --Seems to not make sense but Snowflake accept it
