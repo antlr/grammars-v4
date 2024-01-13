@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
@@ -65,7 +64,10 @@ dml_command
     ;
 
 insert_statement
-    : INSERT OVERWRITE? INTO object_name ('(' column_list ')')? (values_builder | select_statement)
+    : INSERT OVERWRITE? INTO object_name column_list_in_parentheses? (
+        values_builder
+        | query_statement
+    )
     ;
 
 insert_multi_table_statement
@@ -92,9 +94,12 @@ merge_statement
     ;
 
 merge_matches
-    : (WHEN MATCHED (AND search_condition)? THEN merge_update_delete)+ (
-        WHEN NOT MATCHED (AND search_condition)? THEN merge_insert
-    )?
+    : merge_cond+
+    ;
+
+merge_cond
+    : (WHEN MATCHED (AND search_condition)? THEN merge_update_delete)+
+    | WHEN NOT MATCHED (AND search_condition)? THEN merge_insert
     ;
 
 merge_update_delete
@@ -173,7 +178,7 @@ copy_into_table
     ;
 
 external_location
-//(for Amazon S3)
+    //(for Amazon S3)
     : S3_PATH //'s3://<bucket>[/<path>]'
     //        ( ( STORAGE_INTEGRATION EQ id_ )?
     //        | ( CREDENTIALS EQ '(' ( AWS_KEY_ID EQ string AWS_SECRET_KEY EQ string ( AWS_TOKEN EQ string )? ) ')' )?
@@ -773,7 +778,7 @@ full_acct_list
     ;
 
 alter_failover_group
-//Source Account
+    //Source Account
     : ALTER FAILOVER GROUP if_exists? id_ RENAME TO id_
     | ALTER FAILOVER GROUP if_exists? id_ SET (OBJECT_TYPES EQ object_type_list)? replication_schedule?
     | ALTER FAILOVER GROUP if_exists? id_ SET OBJECT_TYPES EQ object_type_list
@@ -875,7 +880,7 @@ alter_procedure
     ;
 
 alter_replication_group
-//Source Account
+    //Source Account
     : ALTER REPLICATION GROUP if_exists? id_ RENAME TO id_
     | ALTER REPLICATION GROUP if_exists? id_ SET (OBJECT_TYPES EQ object_type_list)? (
         REPLICATION_SCHEDULE EQ string
@@ -1140,17 +1145,12 @@ clustering_action
     ;
 
 table_column_action
-    : ADD COLUMN? if_not_exists? column_name data_type default_value? inline_constraint? (
-        WITH? MASKING POLICY id_ (USING '(' column_name COMMA column_list ')')?
-    )?
+    : ADD COLUMN? if_not_exists? full_col_decl (COMMA full_col_decl)*
     | RENAME COLUMN column_name TO column_name
-    | alter_modify '('? COLUMN? column_name DROP DEFAULT COMMA COLUMN? column_name SET DEFAULT object_name DOT NEXTVAL COMMA COLUMN? column_name (
-        SET? NOT NULL_
-        | DROP NOT NULL_
-    ) COMMA COLUMN? column_name (( SET DATA)? TYPE)? data_type COMMA COLUMN? column_name comment_clause COMMA COLUMN? column_name UNSET COMMENT
-    //  [ COMMA COLUMN? column_name ... ]
-    //  [ , ... ]
-    ')'?
+    | alter_modify (
+        '(' alter_column_clause (',' alter_column_clause)* ')'
+        | alter_column_clause (',' alter_column_clause)*
+    )
     | alter_modify COLUMN column_name SET MASKING POLICY id_ (
         USING '(' column_name COMMA column_list ')'
     )? FORCE?
@@ -1158,11 +1158,23 @@ table_column_action
     | alter_modify column_set_tags (COMMA column_set_tags)*
     | alter_modify column_unset_tags (COMMA column_unset_tags)*
     | DROP COLUMN? if_exists? column_list
+    //| DROP DEFAULT
+    ;
+
+alter_column_clause
+    : COLUMN? column_name (
+        DROP DEFAULT
+        | SET DEFAULT object_name DOT NEXTVAL
+        | ( SET? NOT NULL_ | DROP NOT NULL_)
+        | ( (SET DATA)? TYPE)? data_type
+        | COMMENT string
+        | UNSET COMMENT
+    )
     ;
 
 inline_constraint
-    : null_not_null? (CONSTRAINT id_)? (
-        ( UNIQUE | primary_key) common_constraint_properties*
+    :  (CONSTRAINT id_)? (
+        (UNIQUE | primary_key) common_constraint_properties*
         | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
     )
     ;
@@ -1228,7 +1240,7 @@ constraint_action
         VALIDATE
         | NOVALIDATE
     ) (RELY | NORELY)
-    | DROP (CONSTRAINT id_ | primary_key | UNIQUE | foreign_key) column_list_in_parentheses cascade_restrict?
+    | DROP (CONSTRAINT id_ | primary_key | UNIQUE | foreign_key) column_list_in_parentheses? cascade_restrict?
     | DROP PRIMARY KEY
     ;
 
@@ -1562,7 +1574,7 @@ create_external_function
     ;
 
 create_external_table
-// Partitions computed from expressions
+    // Partitions computed from expressions
     : CREATE or_replace? EXTERNAL TABLE if_not_exists? object_name '(' external_table_column_decl_list ')' cloud_provider_params3? partition_by? WITH?
         LOCATION EQ external_stage (REFRESH_ON_CREATE EQ true_false)? (AUTO_REFRESH EQ true_false)? pattern? file_format (
         AWS_SNS_TOPIC EQ string
@@ -1626,7 +1638,11 @@ create_file_format
     ;
 
 arg_decl
-    : arg_name arg_data_type
+    : arg_name arg_data_type arg_default_value_clause?
+    ;
+
+arg_default_value_clause
+    : DEFAULT expr
     ;
 
 col_decl
@@ -1639,14 +1655,15 @@ function_definition
     ;
 
 create_function
-    : CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
-        data_type
-        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
-    ) null_not_null? LANGUAGE JAVASCRIPT (
-        CALLED ON NULL_ INPUT
-        | RETURNS NULL_ ON NULL_ INPUT
-        | STRICT
-    )? (VOLATILE | IMMUTABLE)? comment_clause? AS function_definition
+    : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
+        arg_decl (COMMA arg_decl)*
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) (
+        LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
+    )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
+        PACKAGES EQ '(' string_list ')'
+    )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
+        PACKAGES EQ '(' string_list ')'
+    )? (HANDLER EQ string)? null_not_null? comment_clause? AS function_definition
     | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
         | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
@@ -1679,8 +1696,8 @@ column_list_in_parentheses
 create_materialized_view
     : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name (
         LR_BRACKET column_list_with_comment RR_BRACKET
-    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement 
-        //NOTA MATERIALIZED VIEW accept only simple select statement at this time
+    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement
+    //NOTA MATERIALIZED VIEW accept only simple select statement at this time
     ;
 
 create_network_policy
@@ -1690,14 +1707,14 @@ create_network_policy
     ;
 
 cloud_provider_params_auto
-//(for Google Cloud Storage)
+    //(for Google Cloud Storage)
     : NOTIFICATION_PROVIDER EQ GCP_PUBSUB GCP_PUBSUB_SUBSCRIPTION_NAME EQ string
     //(for Microsoft Azure Storage)
     | NOTIFICATION_PROVIDER EQ AZURE_EVENT_GRID AZURE_STORAGE_QUEUE_PRIMARY_URI EQ string AZURE_TENANT_ID EQ string
     ;
 
 cloud_provider_params_push
-//(for Amazon SNS)
+    //(for Amazon SNS)
     : NOTIFICATION_PROVIDER EQ AWS_SNS AWS_SNS_TOPIC_ARN EQ string AWS_SNS_ROLE_ARN EQ string
     //(for Google Pub/Sub)
     | NOTIFICATION_PROVIDER EQ GCP_PUBSUB GCP_PUBSUB_TOPIC_NAME EQ string
@@ -1731,21 +1748,31 @@ procedure_definition
     | DBL_DOLLAR
     ;
 
+not_null
+    : NOT NULL_
+    ;
+
 create_procedure
     : CREATE or_replace? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
-        | TABLE LR_BRACKET ( col_decl (COMMA col_decl)*)? RR_BRACKET
-    ) (NOT NULL_)? LANGUAGE SQL (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
+    ) not_null? LANGUAGE SQL (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
         VOLATILE
         | IMMUTABLE
     )? // Note: VOLATILE and IMMUTABLE are deprecated.
     comment_clause? executa_as? AS procedure_definition
-    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS data_type (
-        NOT NULL_
-    )? LANGUAGE JAVASCRIPT (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS data_type not_null? LANGUAGE
+        JAVASCRIPT (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
         VOLATILE
         | IMMUTABLE
     )? // Note: VOLATILE and IMMUTABLE are deprecated.
+    comment_clause? executa_as? AS procedure_definition
+    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
+        data_type not_null?
+        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
+    ) LANGUAGE PYTHON RUNTIME_VERSION EQ string (IMPORTS EQ '(' string_list ')')? PACKAGES EQ '(' string_list ')' HANDLER EQ string
+    //            ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
+    //            ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
     comment_clause? executa_as? AS procedure_definition
     ;
 
@@ -1811,8 +1838,8 @@ implicit_none
     ;
 
 create_security_integration_snowflake_oauth
-    : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ OAUTH OAUTH_CLIENT EQ partner_application OAUTH_REDIRECT_URI EQ string 
-        //Required when OAUTH_CLIENTEQLOOKER
+    : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ OAUTH OAUTH_CLIENT EQ partner_application OAUTH_REDIRECT_URI EQ string
+    //Required when OAUTH_CLIENTEQLOOKER
     enabled_true_false? (OAUTH_ISSUE_REFRESH_TOKENS EQ true_false)? (
         OAUTH_REFRESH_TOKEN_VALIDITY EQ num
     )? (OAUTH_USE_SECONDARY_ROLES EQ implicit_none)? (BLOCKED_ROLES_LIST EQ '(' string_list ')')? comment_clause?
@@ -1909,7 +1936,7 @@ character
     ;
 
 format_type_options
-//-- If TYPE EQ CSV
+    //-- If TYPE EQ CSV
     : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE | AUTO_Q)
     | RECORD_DELIMITER EQ ( string | NONE)
     | FIELD_DELIMITER EQ ( string | NONE)
@@ -2063,7 +2090,7 @@ aws_credential_or_storage_integration
     ;
 
 external_stage_params
-//(for Amazon S3)
+    //(for Amazon S3)
     : URL EQ s3_url = (S3_PATH | S3GOV_PATH) (
         aws_credential_or_storage_integration? stage_encryption_opts_aws
         | stage_encryption_opts_aws? aws_credential_or_storage_integration
@@ -2110,7 +2137,7 @@ directory_table_internal_params
     ;
 
 directory_table_external_params
-// (for Amazon S3)
+    // (for Amazon S3)
     : DIRECTORY EQ LR_BRACKET enable refresh_on_create? auto_refresh? RR_BRACKET
     // (for Google Cloud Storage)
     | DIRECTORY EQ LR_BRACKET enable auto_refresh? refresh_on_create? notification_integration? RR_BRACKET
@@ -2158,7 +2185,7 @@ show_stages
 /* ===========  End of stage DDL section =========== */
 
 cloud_provider_params
-//(for Amazon S3)
+    //(for Amazon S3)
     : STORAGE_PROVIDER EQ S3 STORAGE_AWS_ROLE_ARN EQ string (STORAGE_AWS_OBJECT_ACL EQ string)?
     //(for Google Cloud Storage)
     | STORAGE_PROVIDER EQ GCS
@@ -2167,7 +2194,7 @@ cloud_provider_params
     ;
 
 cloud_provider_params2
-//(for Amazon S3)
+    //(for Amazon S3)
     : STORAGE_AWS_ROLE_ARN EQ string (STORAGE_AWS_OBJECT_ACL EQ string)?
     //(for Microsoft Azure)
     | AZURE_TENANT_ID EQ string
@@ -2210,7 +2237,7 @@ stream_time
     ;
 
 create_stream
-//-- table
+    //-- table
     : CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON TABLE object_name stream_time? append_only? show_initial_rows?
         comment_clause?
     //-- External table
@@ -2287,7 +2314,7 @@ out_of_line_constraint
     ;
 
 full_col_decl
-    : col_decl (collate | inline_constraint | default_value | null_not_null)* with_masking_policy? with_tags? (
+    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_) )* with_masking_policy? with_tags? (
         COMMENT string
     )?
     ;
@@ -2308,11 +2335,18 @@ create_table
     ) ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
     ;
 
+column_decl_item_list_paren
+    : '(' column_decl_item_list ')'
+    ;
+
 create_table_clause
-    : '(' column_decl_item_list ')' cluster_by? stage_file_format? (
-        STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET
-    )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants?
-        with_row_access_policy? with_tags?
+    : (
+        column_decl_item_list_paren cluster_by?
+        | cluster_by? comment_clause? column_decl_item_list_paren
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? (
+        DATA_RETENTION_TIME_IN_DAYS EQ num
+    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
+        with_tags?
     ;
 
 create_table_as_select
@@ -2323,7 +2357,7 @@ create_table_as_select
     ;
 
 create_table_like
-    : CREATE or_replace? TRANSIENT? TABLE object_name LIKE object_name cluster_by? copy_grants?
+    : CREATE or_replace? TRANSIENT? TABLE if_not_exists? object_name LIKE object_name cluster_by? copy_grants?
     ;
 
 create_tag
@@ -2470,6 +2504,7 @@ task_overlap
 sql
     : EXECUTE IMMEDIATE DBL_DOLLAR
     | sql_command
+    | call
     ;
 
 call
@@ -2747,7 +2782,7 @@ arg_types
 
 // undrop commands
 undrop_command
-//: undrop_object
+    //: undrop_object
     : undrop_database
     | undrop_schema
     | undrop_table
@@ -3364,8 +3399,8 @@ id_fn
     ;
 
 id_
-//id_ is used for object name. Snowflake is very permissive
-//so we could use nearly all keyword as object name (table, column etc..)
+    //id_ is used for object name. Snowflake is very permissive
+    //so we could use nearly all keyword as object name (table, column etc..)
     : ID
     | ID2
     | DOUBLE_QUOTE_ID
@@ -3381,8 +3416,8 @@ id_
     ;
 
 keyword
-//List here keyword (SnowSQL meaning) allowed as object name
-// Name of builtin function should be included in specifique section (ie builtin_function)
+    //List here keyword (SnowSQL meaning) allowed as object name
+    // Name of builtin function should be included in specifique section (ie builtin_function)
     : STAGE
     | USER
     | TYPE
@@ -3421,22 +3456,72 @@ keyword
     ;
 
 non_reserved_words
-//List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
+    //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
     : ORGADMIN
     | ACCOUNTADMIN
     | SECURITYADMIN
     | USERADMIN
     | SYSADMIN
     | PUBLIC
+    | ACTION
+    | AES
+    | ARRAY_AGG
+    | CHECKSUM
+    | COLLECTION
+    | COMMENT
+    | CONFIGURATION
+    | DATA
+    | DEFINITION
+    | DELTA
+    | EDITION
+    | EVENT
+    | EXPIRY_DATE
+    | FIRST_NAME
+    | FIRST_VALUE
+    | FLATTEN
+    | GLOBAL
+    | IDENTIFIER
+    | IDENTITY
+    | INDEX
     | JAVASCRIPT
+    | LAST_NAME
+    | LAST_QUERY_ID
+    | LEAD
+    | LOCAL
+    | MAX_CONCURRENCY_LEVEL
+    | NAME
+    | OFFSET
+    | OPTION
+    | PARTITION
+    | PATTERN
+    | PORT
+    | PROCEDURE_NAME
+    | PROPERTY
+    | PROVIDER
+    | RANK
+    | RESPECT
+    | RESOURCE
+    | RESOURCES
+    | RESTRICT
     | RESULT
+    | ROLE
+    | ROW_NUMBER
     | INDEX
     | SOURCE
     | PROCEDURE_NAME
     | STATE
+    | STATS
+    | TAG
+    | TAGS
+    | ROLE
     | DEFINITION
     | TIMEZONE
+    | URL
     | LOCAL
+    | ROW_NUMBER
+    | VALUE
+    | VALUES
+    | VERSION
     | NAME
     | VERSION
     | OPTION
@@ -3451,11 +3536,16 @@ non_reserved_words
     | WAREHOUSE_TYPE
     | NETWORK
     | OUTBOUND
+    | INPUT
+    | PATH_
+    | OUTER
+    | RECURSIVE
+    | MODE
     ;
 
 builtin_function
-// If there is a lexer entry for a function we also need to add the token here
-// as it otherwise will not be picked up by the id_ rule (See also derived rule below)
+    // If there is a lexer entry for a function we also need to add the token here
+    // as it otherwise will not be picked up by the id_ rule (See also derived rule below)
     : SUM
     | AVG
     | MIN
@@ -3471,11 +3561,12 @@ builtin_function
     | CAST
     | TRY_CAST
     ;
+
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 
 binary_builtin_function
-// lexer entry of function name which admit 2 parameters
-// expr rule use this
+    // lexer entry of function name which admit 2 parameters
+    // expr rule use this
     : ifnull = (IFNULL | NVL)
     | GET
     | LEFT
@@ -3490,8 +3581,8 @@ binary_builtin_function
     ;
 
 binary_or_ternary_builtin_function
-// lexer entry of function name which admit 2 or 3 parameters
-// expr rule use this
+    // lexer entry of function name which admit 2 or 3 parameters
+    // expr rule use this
     : CHARINDEX
     | REPLACE
     | substring = ( SUBSTRING | SUBSTR)
@@ -3500,8 +3591,8 @@ binary_or_ternary_builtin_function
     ;
 
 ternary_builtin_function
-// lexer entry of function name which admit 3 parameters
-// expr rule use this
+    // lexer entry of function name which admit 3 parameters
+    // expr rule use this
     : dateadd = (DATEADD | TIMEADD | TIMESTAMPADD)
     | datefiff = (DATEDIFF | TIMEDIFF | TIMESTAMPDIFF)
     | SPLIT_PART
@@ -3510,8 +3601,8 @@ ternary_builtin_function
     ;
 
 list_function
-// lexer entry of function name which admit a list of comma separated expr
-// expr rule use this
+    // lexer entry of function name which admit a list of comma separated expr
+    // expr rule use this
     : CONCAT
     | CONCAT_WS
     | COALESCE
@@ -3670,6 +3761,9 @@ primitive_expression
     | id_ ('.' id_)* // json field access
     | full_column_name
     | literal
+    | BOTH_Q
+    | ARRAY_Q
+    | OBJECT_Q
     //| json_literal
     //| arr_literal
     ;
@@ -3704,10 +3798,19 @@ function_call
     | aggregate_function
     //    | aggregate_windowed_function
     | object_name '(' expr_list? ')'
+    | object_name '(' param_assoc_list ')'
     | list_function LR_BRACKET expr_list RR_BRACKET
     | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
     | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
+    ;
+
+param_assoc_list
+    : param_assoc (',' param_assoc)*
+    ;
+
+param_assoc
+    : id_ ASSOC expr
     ;
 
 ignore_or_repect_nulls
@@ -3770,7 +3873,7 @@ full_column_name
     ;
 
 bracket_expression
-    : LR_BRACKET expr RR_BRACKET
+    : LR_BRACKET expr_list RR_BRACKET
     | LR_BRACKET subquery RR_BRACKET
     ;
 
@@ -3898,11 +4001,11 @@ table_source_item_joined
     ;
 
 object_ref
-    : object_name at_before? changes? match_recognize? pivot_unpivot? as_alias? sample?
+    : object_name at_before? changes? match_recognize? pivot_unpivot? as_alias? column_list_in_parentheses? sample?
     | object_name START WITH predicate CONNECT BY prior_list?
     | TABLE '(' function_call ')' pivot_unpivot? as_alias? sample?
     | values_table sample?
-    | LATERAL? '(' subquery ')' pivot_unpivot? as_alias?
+    | LATERAL? '(' subquery ')' pivot_unpivot? as_alias? column_list_in_parentheses?
     | LATERAL (flatten_table | splited_table) as_alias?
     //| AT id_ PATH?
     //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
@@ -3959,18 +4062,20 @@ at_before
     ;
 
 end
-    : END '(' TIMESTAMP ARROW string
-    | OFFSET ARROW string
-    | STATEMENT ARROW id_ ')'
+    : END LR_BRACKET (
+        TIMESTAMP ASSOC expr
+        | OFFSET ASSOC expr
+        | STATEMENT ASSOC string 
+    ) RR_BRACKET
     ;
 
 changes
-    : CHANGES '(' INFORMATION ASSOC default_append_only ')' at_before end?
+    : CHANGES LR_BRACKET INFORMATION ASSOC default_append_only RR_BRACKET at_before end?
     ;
 
 default_append_only
     : DEFAULT
-    | APPEND ONLY
+    | APPEND_ONLY
     ;
 
 partition_by
@@ -4094,7 +4199,7 @@ predicate
     | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expr NOT? BETWEEN expr AND expr
     | expr NOT? IN '(' (subquery | expr_list) ')'
-    | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
+    | expr NOT? (LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | expr IS null_not_null

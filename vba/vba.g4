@@ -418,7 +418,7 @@ killStmt
     ;
 
 letStmt
-    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? valueStmt
+    : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? typeHint? valueStmt typeHint?
     ;
 
 lineInputStmt
@@ -810,7 +810,7 @@ subscripts
     ;
 
 subscript_
-    : (valueStmt WS TO WS)? valueStmt
+    : (valueStmt WS TO WS)? typeHint? valueStmt typeHint?
     ;
 
 // atomic rules ----------------------------------
@@ -1877,7 +1877,7 @@ HEXLITERAL
     ;
 
 SHORTLITERAL
-    : (PLUS | MINUS)? DIGIT+ ('#' | '&' | '@')?
+    : (PLUS | MINUS)? DIGIT+
     ;
 
 INTEGERLITERAL

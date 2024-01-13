@@ -597,8 +597,8 @@ methodCall
     ;
 
 expression
-// Expression order in accordance with https://introcs.cs.princeton.edu/java/11precedence/
-// Level 16, Primary, array and member access
+    // Expression order in accordance with https://introcs.cs.princeton.edu/java/11precedence/
+    // Level 16, Primary, array and member access
     : primary
     | expression '[' expression ']'
     | expression bop = '.' (

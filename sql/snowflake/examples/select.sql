@@ -58,3 +58,15 @@ SELECT COLLATE(c1, 'en_US-ci-as');
 
 select network from T1;
 select outbound from T1;
+
+select * from t where (t.c, t.d) in (select c, d from t2);
+
+with t as (select 1 as c, 2 as d)
+   , s as (select 1 as c, 2 as d)
+select *
+from t
+where (c,d) in (select c,d from s);
+SELECT C1 FROM t1  CHANGES(INFORMATION => APPEND_ONLY)  AT(STREAM => 's1')   END(TIMESTAMP => '2018-07-27 12:00:00'::TIMESTAMP);
+SELECT C1 FROM t1  CHANGES(INFORMATION => default)  AT(OFFSET  => -3*60)   END(STATEMENT  => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726');
+SELECT C1 FROM t1  CHANGES(INFORMATION => default)  AT(STATEMENT  => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726');
+SELECT C1 FROM t1  CHANGES(INFORMATION => APPEND_ONLY)  AT(TIMESTAMP => '2018-07-27 12:00:00'::TIMESTAMP)   END(OFFSET  => -60);

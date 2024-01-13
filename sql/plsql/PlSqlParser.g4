@@ -512,6 +512,8 @@ create_function_body
         '(' parameter (',' parameter)* ')'
     )? RETURN type_spec (
         invoker_rights_clause
+        | accessible_by_clause
+        | default_collation_clause
         | parallel_enable_clause
         | result_cache_clause
         | DETERMINISTIC
@@ -538,6 +540,18 @@ partition_by_clause
 
 result_cache_clause
     : RESULT_CACHE relies_on_part?
+    ;
+
+accessible_by_clause
+    : ACCESSIBLE BY '(' accessor (',' accessor)* ')'
+    ;
+
+default_collation_clause
+    : DEFAULT COLLATION USING_NLS_COMP
+    ;
+
+accessor
+    :  unitKind=(FUNCTION | PROCEDURE | PACKAGE | TRIGGER | TYPE) function_name
     ;
 
 relies_on_part
@@ -1183,8 +1197,8 @@ create_analytic_view
     ;
 
 classification_clause
-// : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
-// to handle - 'rule contains a closure with at least one alternative that can match an empty string'
+    // : (CAPTION c=quoted_string)? (DESCRIPTION d=quoted_string)? classification_item*
+    // to handle - 'rule contains a closure with at least one alternative that can match an empty string'
     : (caption_clause description_clause? | caption_clause? description_clause) classification_item*
     | caption_clause? description_clause? classification_item+
     ;
@@ -1548,7 +1562,7 @@ create_index
         cluster_index_clause
         | table_index_clause
         | bitmap_join_index_clause
-    ) (USABLE | UNUSABLE)?
+    ) (USABLE | UNUSABLE)? ((DEFERRED | IMMEDIATE) INVALIDATION)?
     ;
 
 cluster_index_clause
@@ -3339,7 +3353,7 @@ create_table
         relational_table
         | xmltype_table
         | object_table
-    ) (MEMOPTIMIZE FOR READ)? (MEMOPTIMIZE FOR WRITE)? (PARENT tableview_name)?
+    ) memoptimize_read_write_clause? (PARENT tableview_name)? (USAGE QUEUE)?
     ;
 
 xmltype_table
@@ -4014,7 +4028,7 @@ alter_synonym
     ;
 
 create_synonym
-// Synonym's schema cannot be specified for public synonyms
+    // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (
         AT_SIGN link_name
     )?
@@ -4744,7 +4758,7 @@ modify_table_partition
     : MODIFY (
         PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (
             REBUILD? UNUSABLE LOCAL INDEXES
-        )?
+        )? shrink_clause?
         | range_partitions
     )
     ;
@@ -5523,8 +5537,9 @@ cursor_loop_param
     | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
 
+//https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/FORALL-statement.html#GUID-C45B8241-F9DF-4C93-8577-C840A25963DB
 forall_statement
-    : FORALL index_name IN bounds_clause sql_statement (SAVE EXCEPTIONS)?
+    : FORALL index_name IN bounds_clause (SAVE EXCEPTIONS)? data_manipulation_language_statements
     ;
 
 bounds_clause
@@ -5586,7 +5601,7 @@ tps_body
     ;
 
 block
-    : DECLARE? declare_spec+ body
+    : (DECLARE declare_spec*)? body
     ;
 
 // SQL Statements
@@ -5643,9 +5658,16 @@ open_statement
 
 fetch_statement
     : FETCH cursor_name (
-        it1 = INTO variable_name (',' variable_name)*
-        | BULK COLLECT INTO variable_name (',' variable_name)* (LIMIT (numeric | variable_name))?
+        it1 = INTO variable_or_collection (',' variable_or_collection)*
+        | BULK COLLECT INTO variable_or_collection (',' variable_or_collection)* (
+            LIMIT (numeric | variable_or_collection)
+        )?
     )
+    ;
+
+variable_or_collection
+    : variable_name
+    | collection_expression
     ;
 
 open_for_statement
@@ -6063,7 +6085,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions ')')
+    : VALUES (REGULAR_ID | '(' expressions ')' | collection_expression)
     ;
 
 merge_statement
@@ -6255,7 +6277,8 @@ concatenation
     : model_expression (AT (LOCAL | TIME ZONE concatenation) | interval_expression)? (
         ON OVERFLOW (TRUNCATE | ERROR)
     )?
-    | concatenation op = (ASTERISK | SOLIDUS) concatenation
+    | concatenation op = DOUBLE_ASTERISK concatenation
+    | concatenation op = (ASTERISK | SOLIDUS | MOD) concatenation
     | concatenation op = (PLUS_SIGN | MINUS_SIGN) concatenation
     | concatenation BAR BAR concatenation
     ;
@@ -6301,6 +6324,16 @@ unary_expression
     | quantified_expression
     | standard_function
     | atom
+    | implicit_cursor_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
+implicit_cursor_expression
+    : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
+    ;
+
+collection_expression
+    : collation_name '(' expression ')' ('.' general_element_part)*
     ;
 
 case_statement /*TODO [boolean isStatementParameter]
@@ -7067,7 +7100,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression ('@' link_name)? function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('@' link_name)? function_argument*
     ;
 
 table_element
@@ -7348,10 +7381,13 @@ regular_id
     | VAR_
     | VALUE
     | COVAR_
+    | ERROR_INDEX
+    | ERROR_CODE
     ;
 
 non_reserved_keywords_in_12c
     : ACL
+    | ACCESSIBLE
     | ACROSS
     | ACTION
     | ACTIONS
@@ -7495,6 +7531,7 @@ non_reserved_keywords_in_12c
     | INMEMORY_PRUNING
     | INPLACE
     | INTERLEAVED
+    | INVALIDATION
     | ISOLATE
     | IS_LEAF
     | JSON
@@ -7713,6 +7750,7 @@ non_reserved_keywords_in_12c
     | USE_HIDDEN_PARTITIONS
     | USE_VECTOR_AGGREGATION
     | USING_NO_EXPAND
+    | USING_NLS_COMP
     | UTF16BE
     | UTF16LE
     | UTF32
