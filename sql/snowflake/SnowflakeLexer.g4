@@ -439,7 +439,6 @@ INTEGRATIONS : 'INTEGRATIONS';
 INTERSECT    : 'INTERSECT';
 INTO         : 'INTO';
 IS           : 'IS';
-ISNULL       : 'ISNULL';
 // ISNUMERIC:                                             'ISNUMERIC';
 // ISOLATION:                                             'ISOLATION';
 JAVA                            : 'JAVA';
