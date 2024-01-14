@@ -33,20 +33,20 @@ import org.antlr.v4.runtime.*;
 
 public abstract class PythonLexerBase extends Lexer {
     // A stack that keeps track of the indentation lengths
-    private LinkedList<Integer> _indentLengths = new LinkedList<>();
-    // A linked list where tokens are waiting to be loaded into the token stream
-    private LinkedList<Token> _pendingTokens = new LinkedList<>();
+    private Deque<Integer> _indentLengthStack;
+    // A linked where tokens are waiting to be loaded into the token stream
+    private LinkedList<Token> _pendingTokens;
 
     // last pending token types
-    private int _previousPendingTokenType = 0;
-    private int _lastPendingTokenTypeForDefaultChannel = 0;
+    private int _previousPendingTokenType;
+    private int _lastPendingTokenTypeFromDefaultChannel;
 
     // The amount of opened parentheses, square brackets or curly braces
-    private int _opened = 0;
+    private int _opened;
 
-    private boolean _wasSpaceIndentation = false;
-    private boolean _wasTabIndentation = false;
-    private boolean _wasIndentationMixedWithSpacesAndTabs = false;
+    private boolean _wasSpaceIndentation;
+    private boolean _wasTabIndentation;
+    private boolean _wasIndentationMixedWithSpacesAndTabs;
     private final int _INVALID_LENGTH = -1;
 
     private CommonToken _curToken; // current (under processing) token
@@ -56,6 +56,20 @@ public abstract class PythonLexerBase extends Lexer {
 
     protected PythonLexerBase(CharStream input) {
         super(input);
+        init();
+    }
+
+    private void init() {
+        _indentLengthStack = new ArrayDeque<>();
+        _pendingTokens = new LinkedList<>();
+        _previousPendingTokenType = 0;
+        _lastPendingTokenTypeFromDefaultChannel = 0;
+        _opened = 0;
+        _wasSpaceIndentation = false;
+        _wasTabIndentation = false;
+        _wasIndentationMixedWithSpacesAndTabs = false;
+        _curToken = null;
+        _ffgToken = null;
     }
 
     @Override
@@ -67,7 +81,7 @@ public abstract class PythonLexerBase extends Lexer {
     private void checkNextToken() {
         if (_previousPendingTokenType != EOF) {
             setCurrentAndFollowingTokens();
-            if (_indentLengths.size() == 0) { // We're at the first token
+            if (_indentLengthStack.size() == 0) { // We're at the first token
                 handleStartOfInput();
             }
 
@@ -113,13 +127,13 @@ public abstract class PythonLexerBase extends Lexer {
                     super.nextToken();
     }
 
-    // initialize the _indentLengths stack
+    // initialize the _indentLengthStack
     // hide the leading NEWLINE token(s)
     // if exists, find the first statement (not NEWLINE, not EOF token) that comes from the default channel
     // insert a leading INDENT token if necessary
     private void handleStartOfInput() {
         // initialize the stack with a default 0 indentation length
-        _indentLengths.addLast(0); // this will never be popped off
+        _indentLengthStack.push(0); // this will never be popped off
         while (_curToken.getType() != EOF) {
             if (_curToken.getChannel() == Token.DEFAULT_CHANNEL) {
                 if (_curToken.getType() == PythonLexer.NEWLINE) {
@@ -155,7 +169,7 @@ public abstract class PythonLexerBase extends Lexer {
             CommonToken nlToken = _curToken; // save the current NEWLINE token
             final boolean isLookingAhead = _ffgToken.getType() == PythonLexer.WS;
             if (isLookingAhead) {
-                setCurrentAndFollowingTokens(); // set the two next tokens
+                setCurrentAndFollowingTokens(); // set the next two tokens
             }
 
             switch (_ffgToken.getType()) {
@@ -168,7 +182,7 @@ public abstract class PythonLexerBase extends Lexer {
                     break;
                 default:
                     addPendingToken(nlToken);
-                    if (isLookingAhead) { // We're on a whitespace(s) followed by a statement
+                    if (isLookingAhead) { // We're on whitespace(s) followed by a statement
                         final int indentationLength = _ffgToken.getType() == EOF ?
                                                       0 :
                                                       getIndentationLength(_curToken.getText());
@@ -186,16 +200,16 @@ public abstract class PythonLexerBase extends Lexer {
         }
     }
 
-    private void insertIndentOrDedentToken(final int curIndentLength) {
-        int prevIndentLength = _indentLengths.peekLast();
-        if (curIndentLength > prevIndentLength) {
+    private void insertIndentOrDedentToken(final int indentLength) {
+        int prevIndentLength = _indentLengthStack.peek();
+        if (indentLength > prevIndentLength) {
             createAndAddPendingToken(PythonLexer.INDENT, Token.DEFAULT_CHANNEL, null, _ffgToken);
-            _indentLengths.addLast(curIndentLength);
+            _indentLengthStack.push(indentLength);
         } else {
-            while (curIndentLength < prevIndentLength) { // more than 1 DEDENT token may be inserted to the token stream
-                _indentLengths.removeLast();
-                prevIndentLength = _indentLengths.peekLast();
-                if (curIndentLength <= prevIndentLength) {
+            while (indentLength < prevIndentLength) { // more than 1 DEDENT token may be inserted to the token stream
+                _indentLengthStack.pop();
+                prevIndentLength = _indentLengthStack.peek();
+                if (indentLength <= prevIndentLength) {
                     createAndAddPendingToken(PythonLexer.DEDENT, Token.DEFAULT_CHANNEL, null, _ffgToken);
                 } else {
                     reportError("inconsistent dedent");
@@ -218,7 +232,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void insertTrailingTokens() {
-        switch (_lastPendingTokenTypeForDefaultChannel) {
+        switch (_lastPendingTokenTypeFromDefaultChannel) {
             case PythonLexer.NEWLINE:
             case PythonLexer.DEDENT:
                 break; // no trailing NEWLINE token is needed
@@ -230,7 +244,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void handleEOFtoken() {
-        if (_lastPendingTokenTypeForDefaultChannel > 0) {
+        if (_lastPendingTokenTypeFromDefaultChannel > 0) {
             // there was statement in the input (leading NEWLINE tokens are hidden)
             insertTrailingTokens();
         }
@@ -258,7 +272,7 @@ public abstract class PythonLexerBase extends Lexer {
         // save the last pending token type because the _pendingTokens linked list can be empty by the nextToken()
         _previousPendingTokenType = token.getType();
         if (token.getChannel() == Token.DEFAULT_CHANNEL) {
-            _lastPendingTokenTypeForDefaultChannel = _previousPendingTokenType;
+            _lastPendingTokenTypeFromDefaultChannel = _previousPendingTokenType;
         }
         _pendingTokens.addLast(token);
     }
@@ -292,7 +306,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void reportLexerError(final String errMsg) {
-        getErrorListenerDispatch().syntaxError(this, _curToken, _curToken.getLine(), _curToken.getCharPositionInLine(), _ERR_TXT + errMsg, null);
+        getErrorListenerDispatch().syntaxError(this, _curToken, _curToken.getLine(), _curToken.getCharPositionInLine(), " LEXER" + _ERR_TXT + errMsg, null);
     }
 
     private void reportError(final String errMsg) {
@@ -300,5 +314,11 @@ public abstract class PythonLexerBase extends Lexer {
 
         // the ERROR_TOKEN will raise an error in the parser
         createAndAddPendingToken(PythonLexer.ERROR_TOKEN, Token.DEFAULT_CHANNEL, _ERR_TXT + errMsg, _ffgToken);
+    }
+
+    @Override
+    public void reset() {
+        init();
+        super.reset();
     }
 }

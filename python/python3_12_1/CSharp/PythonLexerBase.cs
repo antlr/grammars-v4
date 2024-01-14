@@ -28,42 +28,57 @@ THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Antlr4.Runtime;
 
 public abstract class PythonLexerBase : Lexer
 {
     // A stack that keeps track of the indentation lengths
-    private readonly LinkedList<int> _indentLengths = new LinkedList<int>();
-    // A linked list where tokens are waiting to be loaded into the token stream
-    private readonly LinkedList<IToken> _pendingTokens = new LinkedList<IToken>();
+    private Stack<int> _indentLengthStack;
+    // A list where tokens are waiting to be loaded into the token stream
+    private LinkedList<IToken> _pendingTokens;
     // last pending token types
-    private int _previousPendingTokenType = 0;
-    private int _lastPendingTokenTypeForDefaultChannel = 0;
+    private int _previousPendingTokenType;
+    private int _lastPendingTokenTypeFromDefaultChannel;
 
     // The amount of opened parentheses, square brackets, or curly braces
-    private int _opened = 0;
+    private int _opened;
     //  The amount of opened parentheses and square brackets in the current lexer mode
-    private readonly LinkedList<int> _paren_or_bracketOpened = new LinkedList<int>();
+    private Stack<int> _paren_or_bracket_openedStack;
 
-    private bool _wasSpaceIndentation = false;
-    private bool _wasTabIndentation = false;
-    private bool _wasIndentationMixedWithSpacesAndTabs = false;
+    private bool _wasSpaceIndentation;
+    private bool _wasTabIndentation;
+    private bool _wasIndentationMixedWithSpacesAndTabs;
     private const int INVALID_LENGTH = -1;
 
-    private CommonToken _curToken = null!; // current (under processing) token
-    private IToken _ffgToken = null!;      // following (look ahead) token
+    private CommonToken _curToken; // current (under processing) token
+    private IToken _ffgToken;      // following (look ahead) token
 
     private const string _ERR_TXT = " ERROR: ";
 
     protected PythonLexerBase(ICharStream input) : base(input)
     {
+        Init();
     }
 
     protected PythonLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput) : base(input, output, errorOutput)
     {
+        Init();
+    }
+
+    private void Init()
+    {
+        _indentLengthStack = new Stack<int>();
+        _pendingTokens = new LinkedList<IToken>();
+        _previousPendingTokenType = 0;
+        _lastPendingTokenTypeFromDefaultChannel = 0;
+        _opened = 0;
+        _paren_or_bracket_openedStack = new Stack<int>();
+        _wasSpaceIndentation = false;
+        _wasTabIndentation = false;
+        _wasIndentationMixedWithSpacesAndTabs = false;
+        _curToken = null!;
+        _ffgToken = null!;
     }
 
     public override IToken NextToken() // reading the input stream until a return EOF
@@ -79,7 +94,7 @@ public abstract class PythonLexerBase : Lexer
         if (_previousPendingTokenType != Eof)
         {
             SetCurrentAndFollowingTokens();
-            if (_indentLengths.Count == 0) // We're at the first token
+            if (_indentLengthStack.Count == 0) // We're at the first token
             {
                 HandleStartOfInput();
             }
@@ -135,14 +150,14 @@ public abstract class PythonLexerBase : Lexer
                     base.NextToken();
     }
 
-    // initialize the _indentLengths stack
+    // initialize the _indentLengths
     // hide the leading NEWLINE token(s)
     // if exists, find the first statement (not NEWLINE, not EOF token) that comes from the default channel
     // insert a leading INDENT token if necessary
     private void HandleStartOfInput()
     {
         // initialize the stack with a default 0 indentation length
-        _indentLengths.AddLast(0); // this will never be popped off
+        _indentLengthStack.Push(0); // this will never be popped off
         while (_curToken.Type != Eof)
         {
             if (_curToken.Channel == TokenConstants.DefaultChannel)
@@ -194,7 +209,7 @@ public abstract class PythonLexerBase : Lexer
             bool isLookingAhead = _ffgToken.Type == PythonLexer.WS;
             if (isLookingAhead)
             {
-                SetCurrentAndFollowingTokens(); // set the two next tokens
+                SetCurrentAndFollowingTokens(); // set the next two tokens
             }
 
             switch (_ffgToken.Type)
@@ -236,22 +251,22 @@ public abstract class PythonLexerBase : Lexer
         }
     }
 
-    private void InsertIndentOrDedentToken(int curIndentLength)
+    private void InsertIndentOrDedentToken(int indentLength)
     {
         //*** https://docs.python.org/3/reference/lexical_analysis.html#indentation
-        int prevIndentLength = _indentLengths.Last.Value;
-        if (curIndentLength > prevIndentLength)
+        int prevIndentLength = _indentLengthStack.Peek();
+        if (indentLength > prevIndentLength)
         {
             CreateAndAddPendingToken(PythonLexer.INDENT, TokenConstants.DefaultChannel, null, _ffgToken);
-            _indentLengths.AddLast(curIndentLength);
+            _indentLengthStack.Push(indentLength);
         }
         else
         {
-            while (curIndentLength < prevIndentLength)
+            while (indentLength < prevIndentLength)
             { // more than 1 DEDENT token may be inserted into the token stream
-                _indentLengths.RemoveLast();
-                prevIndentLength = _indentLengths.Last.Value;
-                if (curIndentLength <= prevIndentLength)
+                _indentLengthStack.Pop();
+                prevIndentLength = _indentLengthStack.Peek();
+                if (indentLength <= prevIndentLength)
                 {
                     CreateAndAddPendingToken(PythonLexer.DEDENT, TokenConstants.DefaultChannel, null, _ffgToken);
                 }
@@ -311,19 +326,19 @@ public abstract class PythonLexerBase : Lexer
             {
                 case PythonLexer.LBRACE:
                     PushMode(PythonLexer.DEFAULT_MODE);
-                    _paren_or_bracketOpened.AddLast(0);
+                    _paren_or_bracket_openedStack.Push(0);
                     break;
                 case PythonLexer.LPAR:
                 case PythonLexer.LSQB:
                     // https://peps.python.org/pep-0498/#lambdas-inside-expressions
-                    _paren_or_bracketOpened.Last.Value += 1; // increment the last element
+                    _paren_or_bracket_openedStack.Push(_paren_or_bracket_openedStack.Pop() + 1); // increment the last element
                     break;
                 case PythonLexer.RPAR:
                 case PythonLexer.RSQB:
-                    _paren_or_bracketOpened.Last.Value -= 1; // decrement the last element
+                    _paren_or_bracket_openedStack.Push(_paren_or_bracket_openedStack.Pop() - 1); // decrement the last element
                     break;
                 case PythonLexer.COLON: // colon can only come from DEFAULT_MODE
-                    if (_paren_or_bracketOpened.Last.Value == 0)
+                    if (_paren_or_bracket_openedStack.Peek() == 0)
                     {
                         switch (ModeStack.Peek()) // check the previous lexer mode (the current is DEFAULT_MODE)
                         {
@@ -347,7 +362,7 @@ public abstract class PythonLexerBase : Lexer
                         case PythonLexer.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE:
                         case PythonLexer.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
                             PopMode();
-                            _paren_or_bracketOpened.RemoveLast();
+                            _paren_or_bracket_openedStack.Pop();
                             break;
                         default:
                             ReportLexerError("f-string: single '}' is not allowed");
@@ -375,7 +390,7 @@ public abstract class PythonLexerBase : Lexer
 
     private void InsertTrailingTokens()
     {
-        switch (_lastPendingTokenTypeForDefaultChannel)
+        switch (_lastPendingTokenTypeFromDefaultChannel)
         {
             case PythonLexer.NEWLINE:
             case PythonLexer.DEDENT:
@@ -390,7 +405,7 @@ public abstract class PythonLexerBase : Lexer
 
     private void HandleEOFtoken()
     {
-        if (_lastPendingTokenTypeForDefaultChannel > 0)
+        if (_lastPendingTokenTypeFromDefaultChannel > 0)
         { // there was a statement in the input (leading NEWLINE tokens are hidden)
             InsertTrailingTokens();
         }
@@ -423,7 +438,7 @@ public abstract class PythonLexerBase : Lexer
         _previousPendingTokenType = token.Type;
         if (token.Channel == TokenConstants.DefaultChannel)
         {
-            _lastPendingTokenTypeForDefaultChannel = _previousPendingTokenType;
+            _lastPendingTokenTypeFromDefaultChannel = _previousPendingTokenType;
         }
         _pendingTokens.AddLast(token);
     }
@@ -463,7 +478,7 @@ public abstract class PythonLexerBase : Lexer
 
     private void ReportLexerError(string errMsg)
     {
-        ErrorListenerDispatch.SyntaxError(ErrorOutput, this, _curToken.Type, _curToken.Line, _curToken.Column, _ERR_TXT + errMsg, null);
+        ErrorListenerDispatch.SyntaxError(ErrorOutput, this, _curToken.Type, _curToken.Line, _curToken.Column, " LEXER" + _ERR_TXT + errMsg, null);
     }
 
     private void ReportError(string errMsg)
@@ -472,5 +487,11 @@ public abstract class PythonLexerBase : Lexer
 
         // the ERROR_TOKEN will raise an error in the parser
         CreateAndAddPendingToken(PythonLexer.ERROR_TOKEN, TokenConstants.DefaultChannel, _ERR_TXT + errMsg, _ffgToken);
+    }
+
+    public override void Reset()
+    {
+        Init();
+        base.Reset();
     }
 }
