@@ -5260,8 +5260,8 @@ object_type_col_properties
     ;
 
 constraint_clauses
-    : ADD '(' (out_of_line_constraint* | out_of_line_ref_constraint) ')'
-    | ADD (out_of_line_constraint* | out_of_line_ref_constraint)
+    : ADD '(' (out_of_line_constraint (',' out_of_line_constraint)* | out_of_line_ref_constraint) ')'
+    | ADD (out_of_line_constraint | out_of_line_ref_constraint)
     | MODIFY (
         CONSTRAINT constraint_name
         | PRIMARY KEY
