@@ -456,6 +456,12 @@ DML                            : 'DML';
 DML_UPDATE                     : 'DML_UPDATE';
 DOCFIDELITY                    : 'DOCFIDELITY';
 DOCUMENT                       : 'DOCUMENT';
+DOLLAR_ELSE                    : '$ELSE';
+DOLLAR_ELSIF                   : '$ELSIF';
+DOLLAR_END                     : '$END';
+DOLLAR_ERROR                   : '$ERROR';
+DOLLAR_IF                      : '$IF';
+DOLLAR_THEN                    : '$THEN';
 DOMAIN_INDEX_FILTER            : 'DOMAIN_INDEX_FILTER';
 DOMAIN_INDEX_NO_SORT           : 'DOMAIN_INDEX_NO_SORT';
 DOMAIN_INDEX_SORT              : 'DOMAIN_INDEX_SORT';
@@ -2480,6 +2486,8 @@ START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
 ; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
+
+INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_' )+;
 
 SPACES: [ \t\r\n]+ -> channel(HIDDEN);
 

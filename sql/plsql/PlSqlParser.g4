@@ -711,6 +711,7 @@ package_obj_body
     | type_declaration
     | procedure_body
     | function_body
+    | selection_directive
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
@@ -5411,6 +5412,7 @@ declare_spec
     | type_declaration
     | procedure_body
     | function_body
+    | selection_directive
     ;
 
 // incorporates constant_declaration
@@ -5484,7 +5486,7 @@ varray_type_def
 // Statements
 
 seq_of_statements
-    : (statement (';' | EOF) | label_declaration)+
+    : (statement (';' | EOF) | label_declaration | selection_directive)+
     ;
 
 label_declaration
@@ -5596,6 +5598,24 @@ call_statement
 
 pipe_row_statement
     : PIPE ROW '(' expression ')'
+    ;
+
+selection_directive
+    : DOLLAR_IF condition DOLLAR_THEN selection_directive_body
+        (DOLLAR_ELSIF selection_directive_body)* (DOLLAR_ELSE selection_directive_body)?
+      DOLLAR_END
+    ;
+
+error_directive
+    : DOLLAR_ERROR concatenation DOLLAR_END
+    ;
+
+selection_directive_body
+    : ( pragma_declaration? statement ';'
+      | variable_declaration
+      | error_directive
+      | function_body
+      | procedure_body)+
     ;
 
 body
@@ -6386,6 +6406,7 @@ case_else_part
 atom
     : bind_variable
     | constant
+    | inquiry_directive
     | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
     | '(' expressions ')'
@@ -7295,6 +7316,10 @@ identifier
 id_expression
     : regular_id
     | DELIMITED_ID
+    ;
+
+inquiry_directive
+    : INQUIRY_DIRECTIVE
     ;
 
 outer_join_sign
