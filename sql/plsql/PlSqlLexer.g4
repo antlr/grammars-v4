@@ -2355,6 +2355,8 @@ LEAST            : 'LEAST';
 GREATEST         : 'GREATEST';
 TO_DATE          : 'TO_DATE';
 
+POLYMORPHIC:                  'POLYMORPHIC';
+
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
 

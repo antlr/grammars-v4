@@ -519,7 +519,8 @@ create_function_body
         | DETERMINISTIC
     )* (
         (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
-        | (PIPELINED | AGGREGATE) USING implementation_type_name
+        | aggregate_clause
+        | pipelined_using_clause
         | sql_macro_body
     ) ';'
     ;
@@ -548,6 +549,14 @@ accessible_by_clause
 
 default_collation_clause
     : DEFAULT COLLATION USING_NLS_COMP
+    ;
+
+aggregate_clause
+    : AGGREGATE USING implementation_type_name
+    ;
+
+pipelined_using_clause
+    : PIPELINED ((ROW | TABLE) POLYMORPHIC)? USING implementation_type_name
     ;
 
 accessor
