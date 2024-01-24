@@ -938,6 +938,7 @@ dml_event_nested_clause
 
 referencing_clause
     : REFERENCING referencing_element+
+    | REFERENCES referencing_element*
     ;
 
 referencing_element
