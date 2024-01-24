@@ -692,9 +692,12 @@ procedure_spec
     ;
 
 function_spec
-    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec PIPELINED? DETERMINISTIC? (
-        RESULT_CACHE
-    )? ';'
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (
+        DETERMINISTIC
+        | PIPELINED
+        | PARALLEL_ENABLE
+        | RESULT_CACHE
+    )* ';'
     ;
 
 package_obj_body
