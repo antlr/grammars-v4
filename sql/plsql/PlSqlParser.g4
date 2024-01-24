@@ -667,7 +667,7 @@ create_package_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE BODY (schema_object_name '.')? package_name (
         IS
         | AS
-    ) package_obj_body* (BEGIN seq_of_statements)? END package_name?
+    ) package_obj_body* (BEGIN seq_of_statements (EXCEPTION exception_handler+)? )? END package_name?
     ;
 
 // Create Package Specific Clauses
