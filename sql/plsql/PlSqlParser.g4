@@ -516,6 +516,7 @@ create_function_body
         | default_collation_clause
         | parallel_enable_clause
         | result_cache_clause
+        | streaming_clause // see example in section "How Table Functions Stream their Input Data" on streaming_clause in Oracle 9i: https://docs.oracle.com/cd/B10501_01/appdev.920/a96624/08_subs.htm#20554
         | DETERMINISTIC
     )* (
         (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
@@ -744,6 +745,7 @@ function_body
         invoker_rights_clause
         | parallel_enable_clause
         | result_cache_clause
+        | streaming_clause
         | DETERMINISTIC
     )* (
         (PIPELINED? DETERMINISTIC? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
