@@ -171,10 +171,11 @@ copy_into_table
     )?
     //
     /* Data load with transformation */
-    | COPY INTO object_name ('(' column_list ')')?
-               FROM '(' SELECT select_list
-                        FROM ( table_stage | user_stage | named_stage ) ')'
-    files? pattern? file_format? copy_options*
+    | COPY INTO object_name ('(' column_list ')')? FROM '(' SELECT select_list FROM (
+        table_stage
+        | user_stage
+        | named_stage
+    ) ')' files? pattern? file_format? copy_options*
     ;
 
 external_location
@@ -258,7 +259,7 @@ parallel
     ;
 
 get_dml
-    : GET (named_stage | user_stage | table_stage ) FILE_PATH parallel? pattern?
+    : GET (named_stage | user_stage | table_stage) FILE_PATH parallel? pattern?
     ;
 
 grant_ownership
@@ -448,7 +449,9 @@ stage_path
     ;
 
 put
-    : PUT FILE_PATH (table_stage | user_stage | named_stage) (PARALLEL EQ num)? (AUTO_COMPRESS EQ true_false)? (
+    : PUT FILE_PATH (table_stage | user_stage | named_stage) (PARALLEL EQ num)? (
+        AUTO_COMPRESS EQ true_false
+    )? (
         SOURCE_COMPRESSION EQ (
             AUTO_DETECT
             | GZIP
@@ -1180,7 +1183,7 @@ alter_column_clause
     ;
 
 inline_constraint
-    :  (CONSTRAINT id_)? (
+    : (CONSTRAINT id_)? (
         (UNIQUE | primary_key) common_constraint_properties*
         | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
     )
@@ -1657,8 +1660,8 @@ col_decl
     ;
 
 virtual_column_decl
-	: AS '(' function_call ')'
-	;
+    : AS '(' function_call ')'
+    ;
 
 function_definition
     : string
@@ -2325,7 +2328,7 @@ out_of_line_constraint
     ;
 
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_) )* with_masking_policy? with_tags? (
+    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
         COMMENT string
     )?
     ;
@@ -3589,7 +3592,7 @@ binary_builtin_function
     | EQUAL_NULL
     | CONTAINS
     | COLLATE
-    |TO_TIMESTAMP
+    | TO_TIMESTAMP
     ;
 
 binary_or_ternary_builtin_function
@@ -4075,11 +4078,7 @@ at_before
     ;
 
 end
-    : END LR_BRACKET (
-        TIMESTAMP ASSOC expr
-        | OFFSET ASSOC expr
-        | STATEMENT ASSOC string
-    ) RR_BRACKET
+    : END LR_BRACKET (TIMESTAMP ASSOC expr | OFFSET ASSOC expr | STATEMENT ASSOC string) RR_BRACKET
     ;
 
 changes
