@@ -1653,8 +1653,12 @@ arg_default_value_clause
     ;
 
 col_decl
-    : column_name data_type
+    : column_name data_type virtual_column_decl?
     ;
+
+virtual_column_decl
+	: AS '(' function_call ')'
+	;
 
 function_definition
     : string
@@ -3585,6 +3589,7 @@ binary_builtin_function
     | EQUAL_NULL
     | CONTAINS
     | COLLATE
+    |TO_TIMESTAMP
     ;
 
 binary_or_ternary_builtin_function
@@ -3613,6 +3618,7 @@ list_function
     : CONCAT
     | CONCAT_WS
     | COALESCE
+    | HASH
     // To complete as needed
     ;
 
