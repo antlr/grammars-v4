@@ -1135,6 +1135,7 @@ S3GOV_PATH : SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
 GCS_PATH   : SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
 AZURE_PATH : SINGLE_QUOTE 'azure://' Uri SINGLE_QUOTE;
 FILE_PATH  : 'file://' ( DIVIDE Uri | WindowsPath); //file://<path_to_file>/<filename>
+STAGE_PATH : DIVIDE Uri*;
 
 DBL_DOLLAR: '$$' (~'$' | '\\$' | '$' ~'$')*? '$$';
 
@@ -1194,6 +1195,7 @@ DIVIDE      : '/';
 MODULE      : '%';
 PLUS        : '+';
 MINUS       : '-';
+TILDA       : '~';
 
 fragment DEC_DOT_DEC : DEC_DIGIT+ DOT DEC_DIGIT+ | DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
 fragment DEC_DIGIT   : [0-9];
