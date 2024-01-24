@@ -492,7 +492,7 @@ alter_hierarchy
     ;
 
 alter_function
-    : ALTER FUNCTION function_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?
+    : ALTER FUNCTION function_name (EDITIONABLE | NONEDITIONABLE | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? )
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-JAVA.html
