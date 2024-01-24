@@ -684,7 +684,11 @@ package_obj_spec
     ;
 
 procedure_spec
-    : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? ';'
+    : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? (
+        accessible_by_clause
+        | default_collation_clause
+        | invoker_rights_clause
+    )* ';'
     ;
 
 function_spec
