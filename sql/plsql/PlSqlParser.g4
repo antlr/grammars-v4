@@ -510,7 +510,7 @@ match_string
 create_function_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? FUNCTION function_name (
         '(' parameter (',' parameter)* ')'
-    )? RETURN type_spec (
+    )? RETURN type_spec (SHARING '=' (METADATA | NONE))? (
         invoker_rights_clause
         | accessible_by_clause
         | default_collation_clause
