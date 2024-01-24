@@ -472,6 +472,7 @@ LENGTH        : 'LENGTH';
 // LEVEL:                                                 'LEVEL';
 LIKE  : 'LIKE';
 LIMIT : 'LIMIT';
+LINEAR : 'LINEAR';
 // LINENO:                                                'LINENO';
 LIST: 'LIST';
 // LISTENER_IP:                                           'LISTENER_IP';

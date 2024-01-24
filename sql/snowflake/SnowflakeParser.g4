@@ -172,8 +172,8 @@ copy_into_table
     //
     /* Data load with transformation */
     | COPY INTO object_name ('(' column_list ')')?
-    //           FROM '(' SELECT expr_list
-    //                    FROM ( table_stage | user_stage | named_stage ) ')'
+               FROM '(' SELECT select_list
+                        FROM ( table_stage | user_stage | named_stage ) ')'
     files? pattern? file_format? copy_options*
     ;
 
@@ -212,12 +212,12 @@ format_name
     ;
 
 format_type
-    : TYPE EQ (CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+    : TYPE EQ type_fileformat format_type_options*
     ;
 
 stage_file_format
     : STAGE_FILE_FORMAT EQ '(' (FORMAT_NAME EQ string)
-    | (TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options+) ')'
+    | (TYPE EQ type_fileformat format_type_options+) ')'
     ;
 
 copy_into_location
@@ -2157,13 +2157,13 @@ create_stage
     : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier stage_encryption_opts_internal? directory_table_internal_params? (
         FILE_FORMAT EQ LR_BRACKET (
             FORMAT_NAME EQ string
-            | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+            | TYPE EQ type_fileformat format_type_options*
         ) RR_BRACKET
     )? (COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET)? with_tags? comment_clause?
     | CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier external_stage_params directory_table_external_params? (
         FILE_FORMAT EQ LR_BRACKET (
             FORMAT_NAME EQ string
-            | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+            | TYPE EQ type_fileformat format_type_options*
         ) RR_BRACKET
     )? (COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET)? with_tags? comment_clause?
     ;
@@ -2275,7 +2275,7 @@ with_row_access_policy
     ;
 
 cluster_by
-    : CLUSTER BY expr_list_in_parentheses
+    : CLUSTER BY LINEAR? expr_list_in_parentheses
     ;
 
 change_tracking

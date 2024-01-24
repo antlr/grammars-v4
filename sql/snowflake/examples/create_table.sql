@@ -99,3 +99,5 @@ CREATE TABLE DIRECTION (LENGTH INT,LANGUAGE INT);
 
 create table t(i int) comment ='\'test\'';
 create table T2(C_NULL INT NULL NOT NULL); --Seems to not make sense but Snowflake accept it
+
+create table if not exists t3 cluster by LINEAR(f1) (f1 varchar, f2 number) ;
