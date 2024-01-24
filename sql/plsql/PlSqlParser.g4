@@ -891,10 +891,10 @@ compound_trigger_block
     ;
 
 timing_point_section
-    : bk = BEFORE STATEMENT IS BEGIN tps_body END BEFORE STATEMENT ';'
-    | bk = BEFORE EACH ROW IS BEGIN tps_body END BEFORE EACH ROW ';'
-    | ak = AFTER STATEMENT IS BEGIN tps_body END AFTER STATEMENT ';'
-    | ak = AFTER EACH ROW IS BEGIN tps_body END AFTER EACH ROW ';'
+    : bk=BEFORE STATEMENT IS tps_block BEFORE STATEMENT ';'
+    | bk=BEFORE EACH ROW IS tps_block BEFORE EACH ROW ';'
+    | ak=AFTER STATEMENT IS tps_block AFTER STATEMENT ';'
+    | ak=AFTER EACH ROW IS tps_block AFTER EACH ROW ';'
     ;
 
 non_dml_event
@@ -5634,8 +5634,8 @@ trigger_block
     : (DECLARE declare_spec*)? body
     ;
 
-tps_body
-    : seq_of_statements (EXCEPTION exception_handler+)?
+tps_block
+    : declare_spec* body
     ;
 
 block

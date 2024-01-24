@@ -4,6 +4,7 @@ COMPOUND TRIGGER
   v_ts        TIMESTAMP(6) := SYSTIMESTAMP;
   v_cnt        NUMBER      := 0;
 BEFORE EACH ROW IS
+  col_d_value_override INT := 1;
 BEGIN
 
   IF updating THEN
@@ -32,7 +33,7 @@ BEGIN
     INSERT INTO my_schema.h$_hub_lnk_source_l
       (id, col_a, col_b, col_c, col_d )
     VALUES
-      (:old.id, :old.col_a, :old.col_b, :old.col_c, :old.col_d )
+      (:old.id, :old.col_a, :old.col_b, :old.col_c, :col_d_value_override )
     ;
   END IF;
 
