@@ -6714,6 +6714,7 @@ over_clause_keyword
     | MAX
     | MEDIAN
     | MIN
+    | NTH_VALUE
     | NTILE
     | RATIO_TO_REPORT
     | ROW_NUMBER
@@ -6722,7 +6723,9 @@ over_clause_keyword
     | REGR_
     | STDDEV
     | VAR_
+    | VAR_POP
     | COVAR_
+    | WM_CONCAT
     ;
 
 within_or_over_clause_keyword
