@@ -6684,7 +6684,7 @@ other_function
     )? (',' quoted_string (',' quoted_string)?)? ')'
     | (TO_DSINTERVAL | TO_YMINTERVAL) '(' concatenation (DEFAULT concatenation ON CONVERSION ERROR)? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
-    | TREAT '(' expression AS REF? type_spec ')'
+    | TREAT '(' expression AS REF? type_spec ')' ('.' general_element_part)*
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | VALIDATE_CONVERSION '(' concatenation AS type_spec (',' quoted_string (',' quoted_string)?)? ')'
     | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)*
