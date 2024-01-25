@@ -2425,16 +2425,22 @@ CHAR_STRING_PERL:
         | QS_SHARP
         | QS_QUOTE
         | QS_DQUOTE
+        | QS_TILDA
+        | QS_SOLIDUS
+        | QS_RSOLIDUS
     ) '\'' -> type(CHAR_STRING)
 ;
-fragment QS_ANGLE  : '<' .*? '>';
-fragment QS_BRACE  : '{' .*? '}';
-fragment QS_BRACK  : '[' .*? ']';
-fragment QS_PAREN  : '(' .*? ')';
-fragment QS_EXCLAM : '!' .*? '!';
-fragment QS_SHARP  : '#' .*? '#';
-fragment QS_QUOTE  : '\'' .*? '\'';
-fragment QS_DQUOTE : '"' .*? '"';
+fragment QS_ANGLE    : '<' .*? '>';
+fragment QS_BRACE    : '{' .*? '}';
+fragment QS_BRACK    : '[' .*? ']';
+fragment QS_PAREN    : '(' .*? ')';
+fragment QS_EXCLAM   : '!' .*? '!';
+fragment QS_SHARP    : '#' .*? '#';
+fragment QS_QUOTE    : '\'' .*? '\'';
+fragment QS_DQUOTE   : '"' .*? '"';
+fragment QS_TILDA    : '~' .*? '~';
+fragment QS_SOLIDUS  : '/' .*? '/';
+fragment QS_RSOLIDUS : '\\' .*? '\\';
 
 DELIMITED_ID: '"' (~ [\u0000"] | '"' '"')+ '"';
 
