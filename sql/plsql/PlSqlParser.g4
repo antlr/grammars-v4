@@ -5942,6 +5942,7 @@ join_clause
         join_on_part
         | join_using_part
     )*
+    | (CROSS | OUTER) APPLY table_ref_aux
     ;
 
 join_on_part
