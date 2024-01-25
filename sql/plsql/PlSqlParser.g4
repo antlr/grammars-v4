@@ -7405,6 +7405,7 @@ outer_join_sign
 regular_id
     : non_reserved_keywords_pre12c
     | non_reserved_keywords_in_12c
+    | non_reserved_keywords_in_18c
     | REGULAR_ID
     | ABSENT
     | A_LETTER
@@ -7418,6 +7419,8 @@ regular_id
     | BOOLEAN
     | C_LETTER
     | CHAR
+    | CHARSETID
+    | CHARSETFORM
     | CLUSTER
     | CONSTRUCTOR
     | CUSTOMDATUM
@@ -7426,6 +7429,10 @@ regular_id
     | DELETE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
+    | DURATION
+    | E_LETTER
+    | ERROR_INDEX
+    | ERROR_CODE
     | E_LETTER
     | ERR
     | EXCEPTION
@@ -7433,6 +7440,7 @@ regular_id
     | EXCEPTIONS
     | EXISTS
     | EXIT
+    | EXTEND
     | FILESTORE
     | FLOAT
     | FORALL
@@ -7445,6 +7453,7 @@ regular_id
     | LANGUAGE
     | LONG
     | LOOP
+    | MAXLEN
     | MOUNTPOINT
     | M_LETTER
     | MISSING
@@ -7479,19 +7488,23 @@ regular_id
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
+    | STRUCT
     | SQLDATA
     | SQLERROR
     | SUBTYPE
     | T_LETTER
+    | TDO
     | TIMESTAMP_LTZ_UNCONSTRAINED
     | TIMESTAMP_TZ_UNCONSTRAINED
     | TIMESTAMP_UNCONSTRAINED
+    | TIMEZONE
     | TRIGGER
     | VARCHAR
     | VARCHAR2
     | VARIABLE
     | WARNING
     | WHILE
+    | WM_CONCAT
     | XMLAGG
     | YMINTERVAL_UNCONSTRAINED
     | REGR_
@@ -7500,6 +7513,11 @@ regular_id
     | COVAR_
     | ERROR_INDEX
     | ERROR_CODE
+    ;
+
+non_reserved_keywords_in_18c
+    : PERSISTABLE
+    | POLYMORPHIC
     ;
 
 non_reserved_keywords_in_12c

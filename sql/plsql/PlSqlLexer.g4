@@ -2366,6 +2366,7 @@ CHARSETFORM      : 'CHARSETFORM';
 DURATION         : 'DURATION';
 EXTEND           : 'EXTEND';
 MAXLEN           : 'MAXLEN';
+PERSISTABLE      : 'PERSISTABLE';
 POLYMORPHIC      : 'POLYMORPHIC';
 STRUCT           : 'STRUCT';
 TDO              : 'TDO';
