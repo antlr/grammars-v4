@@ -6890,7 +6890,7 @@ table_alias
     ;
 
 where_clause
-    : WHERE (CURRENT OF cursor_name | expression | quantitative_where_stmt)
+    : WHERE (CURRENT OF cursor_name | condition | quantitative_where_stmt)
     ;
 
 quantitative_where_stmt
