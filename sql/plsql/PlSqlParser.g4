@@ -5440,7 +5440,7 @@ declare_spec
 
 // incorporates constant_declaration
 variable_declaration
-    : identifier CONSTANT? type_spec (NOT NULL_)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT? NULL_)? default_value_part? ';'
     ;
 
 subtype_declaration
