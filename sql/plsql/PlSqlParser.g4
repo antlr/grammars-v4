@@ -5962,8 +5962,8 @@ query_partition_clause
     ;
 
 flashback_query_clause
-    : VERSIONS BETWEEN (SCN | TIMESTAMP) expression
-    | AS OF (SCN | TIMESTAMP | SNAPSHOT) expression
+    : VERSIONS (PERIOD_KEYWORD FOR column_name BETWEEN | BETWEEN (SCN | TIMESTAMP)) expression AND expression
+    | AS OF ((SCN | TIMESTAMP | SNAPSHOT) expression | PERIOD_KEYWORD FOR column_name expression)
     ;
 
 pivot_clause
