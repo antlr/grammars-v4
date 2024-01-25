@@ -1650,7 +1650,7 @@ global_partitioned_index
     ;
 
 index_partitioning_clause
-    : PARTITION partition_name? VALUES LESS THAN '(' literal (',' literal)* ')' segment_attributes_clause?
+    : PARTITION partition_name? VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* ) ')' segment_attributes_clause?
     ;
 
 local_partitioned_index
@@ -3722,7 +3722,7 @@ hash_subparts_by_quantity
     ;
 
 range_values_clause
-    : VALUES LESS THAN '(' literal (',' literal)* ')'
+    : VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* ) ')'
     ;
 
 list_values_clause
