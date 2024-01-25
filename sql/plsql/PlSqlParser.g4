@@ -5819,7 +5819,7 @@ explain_statement
     ;
 
 select_only_statement
-    : subquery_factoring_clause? subquery
+    : with_clause? subquery
     ;
 
 select_statement
@@ -5827,12 +5827,19 @@ select_statement
     ;
 
 // Select Specific Clauses
-
-subquery_factoring_clause
-    : WITH factoring_element (',' factoring_element)*
+with_clause
+    : WITH (function_body | procedure_body)*
+      with_factoring_clause (',' with_factoring_clause)*
+    | WITH (function_body | procedure_body)+
+      (with_factoring_clause (',' with_factoring_clause)* )?
     ;
 
-factoring_element
+with_factoring_clause
+    : subquery_factoring_clause
+    | subav_factoring_clause
+    ;
+
+subquery_factoring_clause
     : query_name paren_column_list? AS '(' subquery order_by_clause? ')' search_clause? cycle_clause?
     ;
 
@@ -5844,6 +5851,35 @@ search_clause
 
 cycle_clause
     : CYCLE column_list SET column_name TO expression DEFAULT expression
+    ;
+
+subav_factoring_clause
+    : subav_name=id_expression ANALYTIC VIEW AS '(' subav_clause ')'
+    ;
+
+subav_clause
+    : USING subav_name=object_name subav_hierarchies_clause? filter_clauses? add_calcs_clause?
+    ;
+
+subav_hierarchies_clause
+    : HIERARCHIES '(' hier_alias+=object_name (',' hier_alias+=object_name)* ')'
+    ;
+
+filter_clauses
+    : FILTER FACT '(' filter_clause (',' filter_clause)* ')'
+    ;
+
+filter_clause
+    : ( MEASURES
+      | hier_alias=object_name) TO condition
+    ;
+
+add_calcs_clause
+    : ADD MEASURES '(' add_calc_meas_clause (',' add_calc_meas_clause)* ')'
+    ;
+
+add_calc_meas_clause
+    : meas_name=id_expression AS '(' expression ')'
     ;
 
 subquery
