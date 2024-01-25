@@ -6620,7 +6620,7 @@ json_value_return_type
     : VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR)? ')')? TRUNCATE?
     | CLOB
     | DATE
-    | NUMBER '(' INTEGER (',' INTEGER)? ')'
+    | NUMBER ('(' INTEGER (',' INTEGER)? ')')?
     | TIMESTAMP (WITH TIMEZONE)?
     | SDO_GEOMETRY
     | expression (USING CASESENSITIVE MAPPING)?
