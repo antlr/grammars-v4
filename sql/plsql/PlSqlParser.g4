@@ -6777,7 +6777,7 @@ using_element
     ;
 
 collect_order_by_part
-    : ORDER BY concatenation
+    : ORDER BY concatenation (',' concatenation)*
     ;
 
 within_or_over_part
