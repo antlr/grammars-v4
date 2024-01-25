@@ -5934,7 +5934,7 @@ table_ref_aux
 table_ref_aux_internal
     : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)? # table_ref_aux_internal_two
-    | ONLY '(' dml_table_expression_clause ')'                                    # table_ref_aux_internal_three
+    | ONLY '(' dml_table_expression_clause ')'                                    # table_ref_aux_internal_thre
     ;
 
 join_clause
@@ -6270,6 +6270,7 @@ dml_table_expression_clause
     | '(' select_statement subquery_restriction_clause? ')'
     | tableview_name sample_clause?
     | json_table_clause (AS identifier)?
+    | LATERAL '(' subquery subquery_restriction_clause? ')'
     ;
 
 table_collection_expression
