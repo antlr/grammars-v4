@@ -6456,7 +6456,7 @@ TODO scope    {
 // CASE
 
 simple_case_statement
-    : label_name? ck1 = CASE expression simple_case_when_part+ case_else_part? END CASE? label_name?
+    : label_declaration? ck1 = CASE expression simple_case_when_part+ case_else_part? END CASE? label_name?
     ;
 
 simple_case_when_part
@@ -6464,7 +6464,7 @@ simple_case_when_part
     ;
 
 searched_case_statement
-    : label_name? ck1 = CASE searched_case_when_part+ case_else_part? END CASE? label_name?
+    : label_declaration? ck1 = CASE searched_case_when_part+ case_else_part? END CASE? label_name?
     ;
 
 searched_case_when_part
