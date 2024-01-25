@@ -5369,17 +5369,22 @@ invoker_rights_clause
     ;
 
 call_spec
-    : LANGUAGE (java_spec | c_spec)
+    : java_spec
+    | c_spec
     ;
 
 // Call Spec Specific Clauses
 
 java_spec
-    : JAVA NAME CHAR_STRING
+    : LANGUAGE JAVA NAME CHAR_STRING
     ;
 
 c_spec
-    : C_LETTER (NAME CHAR_STRING)? LIBRARY identifier c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
+    : (LANGUAGE C_LETTER | EXTERNAL)
+      ( NAME id_expression LIBRARY identifier
+      | LIBRARY identifier NAME id_expression
+      | LIBRARY identifier )
+      c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
     ;
 
 c_agent_in_clause
@@ -5387,7 +5392,22 @@ c_agent_in_clause
     ;
 
 c_parameters_clause
-    : PARAMETERS '(' (expressions | '.' '.' '.') ')'
+    : PARAMETERS '(' c_external_parameter (',' c_external_parameter)* ')'
+    ;
+
+c_external_parameter
+    : CONTEXT
+    | SELF (TDO | c_property)?
+    | (parameter_name | RETURN) c_property? (BY REFERENCE)? external_datatype=regular_id?
+    ;
+
+c_property
+    : INDICATOR (STRUCT | TDO)?
+    | LENGTH
+    | DURATION
+    | MAXLEN
+    | CHARSETID
+    | CHARSETFORM
     ;
 
 parameter
