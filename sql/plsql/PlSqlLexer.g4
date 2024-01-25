@@ -2364,6 +2364,7 @@ TO_DATE          : 'TO_DATE';
 CHARSETID        : 'CHARSETID';
 CHARSETFORM      : 'CHARSETFORM';
 DURATION         : 'DURATION';
+EXTEND           : 'EXTEND';
 MAXLEN           : 'MAXLEN';
 POLYMORPHIC      : 'POLYMORPHIC';
 STRUCT           : 'STRUCT';

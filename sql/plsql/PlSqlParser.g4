@@ -5670,6 +5670,7 @@ sql_statement
     | data_manipulation_language_statements
     | cursor_manipulation_statements
     | transaction_control_statements
+    | collection_method_call
     ;
 
 execute_immediate
@@ -5777,6 +5778,13 @@ rollback_statement
 
 savepoint_statement
     : SAVEPOINT savepoint_name
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/collection-method.html#GUID-7AF1A3C4-D04B-4F91-9D7B-C92C75E3A300
+collection_method_call // collection methods invocation that could be used as a statement
+    : expression '.' DELETE ('(' index+=expression (',' index+=expression)* ')')?
+    | expression '.' EXTEND ('(' number=expression (',' index+=expression)* ')')?
+    | expression '.' TRIM ('(' index+=expression ')')?
     ;
 
 // Dml
@@ -6380,6 +6388,8 @@ unary_expression
     | DISTINCT unary_expression
     | ALL unary_expression
     | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_statement /*[false]*/
+    | unary_expression '.' (COUNT | FIRST | LAST | LIMIT)
+    | unary_expression '.' (EXISTS | NEXT | PRIOR) '(' index+=expression ')'
     | quantified_expression
     | standard_function
     | atom
