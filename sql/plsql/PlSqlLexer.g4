@@ -1342,6 +1342,7 @@ PERCENT_ROWCOUNT               : '%' SPACE* 'ROWCOUNT';
 PERCENT_ROWTYPE                : '%' SPACE* 'ROWTYPE';
 PERCENT_TYPE                   : '%' SPACE* 'TYPE';
 PERCENT_BULK_EXCEPTIONS        : '%' SPACE* 'BULK_EXCEPTIONS';
+PERCENT_BULK_ROWCOUNT          : '%' SPACE* 'BULK_ROWCOUNT';
 PERFORMANCE                    : 'PERFORMANCE';
 PERIOD_KEYWORD                 : 'PERIOD';
 PERMANENT                      : 'PERMANENT';
