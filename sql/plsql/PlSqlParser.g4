@@ -754,7 +754,12 @@ function_body
     ;
 
 procedure_body
-    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS) (
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (
+        accessible_by_clause
+        | default_collation_clause
+        | invoker_rights_clause
+        | PARALLEL_ENABLE
+    )* (IS | AS) (
         DECLARE? seq_of_declare_specs? body
         | call_spec
         | EXTERNAL
