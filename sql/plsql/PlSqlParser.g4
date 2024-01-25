@@ -6672,6 +6672,7 @@ other_function
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
+    | (LEAD | LAG) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword '(' expressions cost_matrix_clause? using_clause? ')'
     | (TO_BINARY_DOUBLE | TO_BINARY_FLOAT | TO_NUMBER | TO_TIMESTAMP | TO_TIMESTAMP_TZ) '(' concatenation (
         DEFAULT concatenation ON CONVERSION ERROR
@@ -6708,10 +6709,8 @@ other_function
 over_clause_keyword
     : AVG
     | CORR
-    | LAG
     | LAG_DIFF
     | LAG_DIFF_PERCENT
-    | LEAD
     | MAX
     | MEDIAN
     | MIN
