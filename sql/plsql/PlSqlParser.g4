@@ -5509,7 +5509,7 @@ varray_type_def
 // Statements
 
 seq_of_statements
-    : (statement (';' | EOF) | label_declaration | selection_directive)+
+    : (pragma_declaration* statement (';' | EOF) | label_declaration | selection_directive)+
     ;
 
 label_declaration
