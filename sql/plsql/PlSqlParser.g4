@@ -7207,7 +7207,9 @@ bind_variable
     ;
 
 general_element
-    : general_element_part ('.' general_element_part)*
+    : general_element_part
+    | general_element ('.' general_element_part)+
+    | '(' general_element ')'
     ;
 
 general_element_part
