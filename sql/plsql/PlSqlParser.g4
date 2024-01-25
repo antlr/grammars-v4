@@ -5585,7 +5585,7 @@ forall_statement
 
 bounds_clause
     : lower_bound '..' upper_bound
-    | INDICES OF collection_name between_bound?
+    | INDICES OF general_element between_bound?
     | VALUES OF index_name
     ;
 
