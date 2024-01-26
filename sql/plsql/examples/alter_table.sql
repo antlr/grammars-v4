@@ -111,6 +111,11 @@ ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
 
 alter TABLE employee add ( constraint employee_pk UNique ( a , b ) ) ;
 
+alter table employee add (
+    constraint emp_fk foreign key (col1, col2) references other,
+    constraint emp_fk2 foreign key (col1, col2) references another
+);
+
 alter table employee
     add constraint emp_fk foreign key (col1, col2) references other;
 
