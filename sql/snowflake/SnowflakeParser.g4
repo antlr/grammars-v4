@@ -3355,8 +3355,8 @@ account_identifier
     ;
 
 schema_name
-    : id_ DOT id_
-    | id_
+    : d = id_ DOT s = id_
+    | s = id_
     ;
 
 object_type
