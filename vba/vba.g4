@@ -1958,7 +1958,7 @@ fragment AMPM
 
 // whitespace, line breaks, comments, ...
 LINE_CONTINUATION
-    : [ \t]+ UNDERSCORE '\r'? '\n' WS*
+    : [ \t]+ UNDERSCORE '\r'? '\n'
     ;
 
 NEWLINE
