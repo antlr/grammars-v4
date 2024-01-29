@@ -515,7 +515,7 @@ primaryExpression
     | ARRAY_ LSQUARE_ (expression (COMMA_ expression)*)? RSQUARE_                                                 # arrayConstructor
     | value = primaryExpression LSQUARE_ index = valueExpression RSQUARE_                                         # subscript
     | identifier                                                                                                  # columnReference
-    | base_ = primaryExpression DOT_ fieldName = identifier                                                        # dereference
+    | base_ = primaryExpression DOT_ fieldName = identifier                                                       # dereference
     | name = CURRENT_DATE_                                                                                        # specialDateTimeFunction
     | name = CURRENT_TIME_ (LPAREN_ precision = INTEGER_VALUE_ RPAREN_)?                                          # specialDateTimeFunction
     | name = CURRENT_TIMESTAMP_ (LPAREN_ precision = INTEGER_VALUE_ RPAREN_)?                                     # specialDateTimeFunction
@@ -659,17 +659,17 @@ normalForm
     ;
 
 type
-    : ROW_ LPAREN_ rowField (COMMA_ rowField)* RPAREN_                                       # rowType
-    | INTERVAL_ from = intervalField (TO_ to = intervalField)?                               # intervalType
+    : ROW_ LPAREN_ rowField (COMMA_ rowField)* RPAREN_                                        # rowType
+    | INTERVAL_ from = intervalField (TO_ to = intervalField)?                                # intervalType
     | base_ = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)? # dateTimeType
     | base_ = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_       # dateTimeType
     | base_ = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)?      # dateTimeType
     | base_ = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_            # dateTimeType
-    | DOUBLE_ PRECISION_                                                                     # doublePrecisionType
-    | ARRAY_ LT_ type GT_                                                                    # legacyArrayType
-    | MAP_ LT_ keyType = type COMMA_ valueType = type GT_                                    # legacyMapType
-    | type ARRAY_ (LSQUARE_ INTEGER_VALUE_ RSQUARE_)?                                        # arrayType
-    | identifier (LPAREN_ typeParameter (COMMA_ typeParameter)* RPAREN_)?                    # genericType
+    | DOUBLE_ PRECISION_                                                                      # doublePrecisionType
+    | ARRAY_ LT_ type GT_                                                                     # legacyArrayType
+    | MAP_ LT_ keyType = type COMMA_ valueType = type GT_                                     # legacyMapType
+    | type ARRAY_ (LSQUARE_ INTEGER_VALUE_ RSQUARE_)?                                         # arrayType
+    | identifier (LPAREN_ typeParameter (COMMA_ typeParameter)* RPAREN_)?                     # genericType
     ;
 
 rowField
