@@ -2503,7 +2503,7 @@ START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
-INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_' )+;
+INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_')+;
 
 SPACES: [ \t\r\n]+ -> channel(HIDDEN);
 

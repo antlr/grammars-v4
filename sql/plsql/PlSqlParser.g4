@@ -492,7 +492,7 @@ alter_hierarchy
     ;
 
 alter_function
-    : ALTER FUNCTION function_name (EDITIONABLE | NONEDITIONABLE | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? )
+    : ALTER FUNCTION function_name (EDITIONABLE | NONEDITIONABLE | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-JAVA.html
@@ -668,7 +668,7 @@ create_package_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE BODY (schema_object_name '.')? package_name (
         IS
         | AS
-    ) package_obj_body* (BEGIN seq_of_statements (EXCEPTION exception_handler+)? )? END package_name?
+    ) package_obj_body* (BEGIN seq_of_statements (EXCEPTION exception_handler+)?)? END package_name?
     ;
 
 // Create Package Specific Clauses
@@ -942,8 +942,7 @@ dml_event_nested_clause
     ;
 
 referencing_clause
-    : REFERENCING referencing_element+
-    | REFERENCES referencing_element*
+    : (REFERENCING referencing_element | REFERENCES) referencing_element*
     ;
 
 referencing_element
@@ -1655,7 +1654,7 @@ global_partitioned_index
     ;
 
 index_partitioning_clause
-    : PARTITION partition_name? VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* ) ')' segment_attributes_clause?
+    : PARTITION partition_name? VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)*) ')' segment_attributes_clause?
     ;
 
 local_partitioned_index
@@ -5643,7 +5642,8 @@ selection_directive_body
       | variable_declaration
       | error_directive
       | function_body
-      | procedure_body)+
+      | procedure_body
+      )+
     ;
 
 body
@@ -5787,9 +5787,9 @@ savepoint_statement
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/collection-method.html#GUID-7AF1A3C4-D04B-4F91-9D7B-C92C75E3A300
 collection_method_call // collection methods invocation that could be used as a statement
-    : expression '.' DELETE ('(' index+=expression (',' index+=expression)* ')')?
-    | expression '.' EXTEND ('(' number=expression (',' index+=expression)* ')')?
-    | expression '.' TRIM ('(' index+=expression ')')?
+    : expression '.' ( (DELETE | EXTEND) ('(' index+=expression (',' index+=expression)* ')')?
+                     | TRIM ('(' index+=expression ')')?
+                     )
     ;
 
 // Dml
@@ -5836,7 +5836,7 @@ with_clause
     : WITH (function_body | procedure_body)*
       with_factoring_clause (',' with_factoring_clause)*
     | WITH (function_body | procedure_body)+
-      (with_factoring_clause (',' with_factoring_clause)* )?
+      (with_factoring_clause (',' with_factoring_clause)*)?
     ;
 
 with_factoring_clause
@@ -5875,8 +5875,7 @@ filter_clauses
     ;
 
 filter_clause
-    : ( MEASURES
-      | hier_alias=object_name) TO condition
+    : ( MEASURES | hier_alias=object_name) TO condition
     ;
 
 add_calcs_clause
@@ -6432,8 +6431,9 @@ unary_expression
     | DISTINCT unary_expression
     | ALL unary_expression
     | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_statement /*[false]*/
-    | unary_expression '.' (COUNT | FIRST | LAST | LIMIT)
-    | unary_expression '.' (EXISTS | NEXT | PRIOR) '(' index+=expression ')'
+    | unary_expression '.' ( (COUNT | FIRST | LAST | LIMIT)
+                           | (EXISTS | NEXT | PRIOR) '(' index+=expression ')'
+                           )
     | quantified_expression
     | standard_function
     | atom
