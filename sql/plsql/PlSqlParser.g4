@@ -1654,7 +1654,13 @@ global_partitioned_index
     ;
 
 index_partitioning_clause
-    : PARTITION partition_name? VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)*) ')' segment_attributes_clause?
+    : PARTITION partition_name? VALUES LESS THAN '(' index_partitioning_values_list ')' segment_attributes_clause?
+    ;
+
+
+index_partitioning_values_list
+    : literal (',' literal)*
+    | TIMESTAMP literal (',' TIMESTAMP literal)*
     ;
 
 local_partitioned_index
