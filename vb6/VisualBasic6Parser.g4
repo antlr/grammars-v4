@@ -286,7 +286,7 @@ deleteSettingStmt
 doLoopStmt
     : DO NEWLINE+ (block NEWLINE+)? LOOP
     | DO WS (WHILE | UNTIL) WS valueStmt NEWLINE+ ( block NEWLINE+)? LOOP
-    | DO NEWLINE+ (block NEWLINE+) LOOP WS (WHILE | UNTIL) WS valueStmt
+    | DO NEWLINE+ (block NEWLINE+)? LOOP WS (WHILE | UNTIL) WS valueStmt
     ;
 
 endStmt
@@ -369,7 +369,7 @@ ifConditionStmt
     ;
 
 ifElseIfBlockStmt
-    : ELSEIF WS ifConditionStmt WS THEN NEWLINE+ (block NEWLINE+)?
+    : ELSEIF WS ifConditionStmt WS THEN (WS | NEWLINE)+ (block NEWLINE+)?
     ;
 
 ifElseBlockStmt
