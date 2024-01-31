@@ -3726,7 +3726,12 @@ hash_subparts_by_quantity
     ;
 
 range_values_clause
-    : VALUES LESS THAN '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* ) ')'
+    : VALUES LESS THAN '(' range_values_list ')'
+    ;
+
+range_values_list
+    : literal (',' literal)*
+    | TIMESTAMP literal (',' TIMESTAMP literal)*
     ;
 
 list_values_clause
@@ -5386,8 +5391,8 @@ java_spec
 c_spec
     : (LANGUAGE C_LETTER | EXTERNAL)
       ( NAME id_expression LIBRARY identifier
-      | LIBRARY identifier NAME id_expression
-      | LIBRARY identifier )
+      | LIBRARY identifier (NAME id_expression)?
+      )
       c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
     ;
 
