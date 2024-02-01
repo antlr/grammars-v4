@@ -225,7 +225,7 @@ IDENTIFIER:
     | [A-Z_] [A-Z_0-9]*
 ; // TODO check: needs more chars in set
 
-NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | '0x' HEX_DIGIT+;
+NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | ('0x' | '0X') HEX_DIGIT+;
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
