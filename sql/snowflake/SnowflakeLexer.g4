@@ -393,6 +393,7 @@ GROUPING : 'GROUPING';
 GROUPS  : 'GROUPS';
 GZIP    : 'GZIP';
 HANDLER : 'HANDLER';
+HASH    : 'HASH';
 HAVING  : 'HAVING';
 HEADER  : 'HEADER';
 HEADERS : 'HEADERS';
@@ -470,8 +471,9 @@ LEFT          : 'LEFT';
 LEN           : 'LEN';
 LENGTH        : 'LENGTH';
 // LEVEL:                                                 'LEVEL';
-LIKE  : 'LIKE';
-LIMIT : 'LIMIT';
+LIKE   : 'LIKE';
+LIMIT  : 'LIMIT';
+LINEAR : 'LINEAR';
 // LINENO:                                                'LINENO';
 LIST: 'LIST';
 // LISTENER_IP:                                           'LISTENER_IP';
@@ -968,6 +970,7 @@ TIME_OUTPUT_FORMAT          : 'TIME_OUTPUT_FORMAT';
 TO                          : 'TO';
 TO_BOOLEAN                  : 'TO_BOOLEAN';
 TO_DATE                     : 'TO_DATE';
+TO_TIMESTAMP                : 'TO_TIMESTAMP';
 TOP                         : 'TOP';
 // TRACKING:                                              'TRACKING';
 // TRACK_CAUSALITY:                                       'TRACK_CAUSALITY';
@@ -1135,6 +1138,7 @@ S3GOV_PATH : SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
 GCS_PATH   : SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
 AZURE_PATH : SINGLE_QUOTE 'azure://' Uri SINGLE_QUOTE;
 FILE_PATH  : 'file://' ( DIVIDE Uri | WindowsPath); //file://<path_to_file>/<filename>
+STAGE_PATH : DIVIDE Uri*;
 
 DBL_DOLLAR: '$$' (~'$' | '\\$' | '$' ~'$')*? '$$';
 
@@ -1194,6 +1198,7 @@ DIVIDE      : '/';
 MODULE      : '%';
 PLUS        : '+';
 MINUS       : '-';
+TILDA       : '~';
 
 fragment DEC_DOT_DEC : DEC_DIGIT+ DOT DEC_DIGIT+ | DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
 fragment DEC_DIGIT   : [0-9];
