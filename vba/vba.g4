@@ -112,7 +112,7 @@ module
     ;
 
 moduleHeader
-    : VERSION WS DOUBLELITERAL WS CLASS?
+    : VERSION WS DOUBLELITERAL (WS CLASS)?
     ;
 
 moduleConfig
