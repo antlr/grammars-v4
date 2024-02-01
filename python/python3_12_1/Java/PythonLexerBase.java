@@ -43,6 +43,8 @@ public abstract class PythonLexerBase extends Lexer {
 
     // The amount of opened parentheses, square brackets or curly braces
     private int opened;
+    //  The amount of opened parentheses and square brackets in the current lexer mode
+    private Deque<Integer> paren_or_bracket_openedStack;
 
     private boolean wasSpaceIndentation;
     private boolean wasTabIndentation;
@@ -65,6 +67,7 @@ public abstract class PythonLexerBase extends Lexer {
         this.previousPendingTokenType = 0;
         this.lastPendingTokenTypeFromDefaultChannel = 0;
         this.opened = 0;
+        this.paren_or_bracket_openedStack = new ArrayDeque<>();
         this.wasSpaceIndentation = false;
         this.wasTabIndentation = false;
         this.wasIndentationMixedWithSpacesAndTabs = false;
@@ -104,6 +107,9 @@ public abstract class PythonLexerBase extends Lexer {
                 case PythonLexer.STRING:
                     this.handleSTRINGtoken();
                     break;
+                case PythonLexer.FSTRING_MIDDLE:
+                    this.handleFSTRING_MIDDLE_token();
+                    break;
                 case PythonLexer.ERROR_TOKEN:
                     this.reportLexerError("token recognition error at: '" + this.curToken.getText() + "'");
                     this.addPendingToken(this.curToken);
@@ -114,6 +120,7 @@ public abstract class PythonLexerBase extends Lexer {
                 default:
                     this.addPendingToken(this.curToken);
             }
+            this.handleFORMAT_SPECIFICATION_MODE();
         }
     }
 
@@ -121,6 +128,8 @@ public abstract class PythonLexerBase extends Lexer {
         this.curToken = this.ffgToken == null ?
                         new CommonToken(super.nextToken()) :
                         new CommonToken(this.ffgToken);
+
+        this.handleFStringLexerModes();
 
         this.ffgToken = this.curToken.getType() == Token.EOF ?
                         this.curToken :
@@ -175,6 +184,7 @@ public abstract class PythonLexerBase extends Lexer {
             switch (this.ffgToken.getType()) {
                 case PythonLexer.NEWLINE:      // We're before a blank line
                 case PythonLexer.COMMENT:      // We're before a comment
+                case PythonLexer.TYPE_COMMENT: // We're before a type comment
                     this.hideAndAddPendingToken(nlToken);
                     if (isLookingAhead) {
                         this.addPendingToken(this.curToken);  // WS token
@@ -228,6 +238,84 @@ public abstract class PythonLexerBase extends Lexer {
             this.addPendingToken(this.curToken);                  // add the modified token with inline string literal
             this.hideAndAddPendingToken(originalSTRINGtoken); // add the original token to the hidden channel
             // this inserted hidden token allows to restore the original string literal with the \<newline> escape sequences
+        }
+    }
+
+    private void handleFSTRING_MIDDLE_token() { // replace the double braces '{{' or '}}' to single braces and hide the second braces
+        String fsMid = this.curToken.getText();
+        fsMid = fsMid.replaceAll("\\{\\{", "{_").replaceAll("}}", "}_"); // replace: {{ --> {_  and   }} --> }_
+        String[] arrOfStr = fsMid.split("(?<=[{}])_"); // split by {_  or  }_
+        for (String s : arrOfStr) {
+            if (!s.isEmpty()) {
+                this.createAndAddPendingToken(PythonLexer.FSTRING_MIDDLE, Token.DEFAULT_CHANNEL, s, this.ffgToken);
+                String lastCharacter = s.substring(s.length() - 1);
+                if ("{}".contains(lastCharacter)) {
+                    this.createAndAddPendingToken(PythonLexer.FSTRING_MIDDLE, Token.HIDDEN_CHANNEL, lastCharacter, this.ffgToken);
+                    // this inserted hidden token allows to restore the original f-string literal with the double braces
+                }
+            }
+        }
+    }
+
+    private void handleFStringLexerModes() { // https://peps.python.org/pep-0498/#specification
+        if (!this._modeStack.isEmpty()) {
+            switch (this.curToken.getType()) {
+                case PythonLexer.LBRACE:
+                    this.pushMode(PythonLexer.DEFAULT_MODE);
+                    this.paren_or_bracket_openedStack.push(0);
+                    break;
+                case PythonLexer.LPAR:
+                case PythonLexer.LSQB:
+                    // https://peps.python.org/pep-0498/#lambdas-inside-expressions
+                    this.paren_or_bracket_openedStack.push(this.paren_or_bracket_openedStack.pop() + 1); // increment the last element
+                    break;
+                case PythonLexer.RPAR:
+                case PythonLexer.RSQB:
+                    this.paren_or_bracket_openedStack.push(this.paren_or_bracket_openedStack.pop() - 1); // decrement the last element
+                    break;
+                case PythonLexer.COLON: // colon can only come from DEFAULT_MODE
+                    if (this.paren_or_bracket_openedStack.peek() == 0) {
+                        switch (_modeStack.peek()) { // check the previous lexer mode (the current is DEFAULT_MODE)
+                            case PythonLexer.SINGLE_QUOTE_FSTRING_MODE:
+                            case PythonLexer.LONG_SINGLE_QUOTE_FSTRING_MODE:
+                            case PythonLexer.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+                                this.mode(PythonLexer.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE); // continue in format spec. mode
+                                break;
+                            case PythonLexer.DOUBLE_QUOTE_FSTRING_MODE:
+                            case PythonLexer.LONG_DOUBLE_QUOTE_FSTRING_MODE:
+                            case PythonLexer.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+                                this.mode(PythonLexer.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE); // continue in format spec. mode
+                                break;
+                        }
+                    }
+                    break;
+                case PythonLexer.RBRACE:
+                    switch (this._mode) {
+                        case PythonLexer.DEFAULT_MODE:
+                        case PythonLexer.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+                        case PythonLexer.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+                            this.popMode();
+                            this.paren_or_bracket_openedStack.pop();
+                            break;
+                        default:
+                            this.reportLexerError("f-string: single '}' is not allowed");
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void handleFORMAT_SPECIFICATION_MODE() {
+        if (!this._modeStack.isEmpty() &&
+            this.ffgToken.getType() == PythonLexer.RBRACE) {
+
+            switch (this.curToken.getType()) {
+                case PythonLexer.COLON:
+                case PythonLexer.RBRACE:
+                    // insert an empty FSTRING_MIDDLE token instead of the missing format specification
+                    this.createAndAddPendingToken(PythonLexer.FSTRING_MIDDLE, Token.DEFAULT_CHANNEL, "", this.ffgToken);
+                    break;
+            }
         }
     }
 
