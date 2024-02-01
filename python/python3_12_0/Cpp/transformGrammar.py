@@ -1,8 +1,10 @@
 import sys, os, re, shutil
+from glob import glob
+from pathlib import Path
 
 def main(argv):
-    fix("Python3Lexer.g4")
-    fix("Python3Parser.g4")
+    for file in glob("./*.g4"):
+        fix(file)
 
 def fix(file_path):
     print("Altering " + file_path)
@@ -15,12 +17,15 @@ def fix(file_path):
     input_file = open(file_path + ".bak",'r')
     output_file = open(file_path, 'w')
     for x in input_file:
-        if '!this.' in x:
-            x = x.replace('!this.', 'not self.')
+        if '// Insert here @header for C++ lexer.' in x:
+            x = x.replace('// Insert here @header for C++ lexer.', '@header {#include "PythonLexerBase.h"}')
+        if '// Insert here @header for C++ parser.' in x:
+            x = x.replace('// Insert here @header for C++ parser.', '@header {#include "PythonParserBase.h"}')
         if 'this.' in x:
-            x = x.replace('this.', 'self.')
+            x = x.replace('this.', 'this->')
         output_file.write(x)
         output_file.flush()
+
     print("Writing ...")
     input_file.close()
     output_file.close()

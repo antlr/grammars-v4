@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 lexer grammar PythonLexer;
 
+// Insert here @header for C++ lexer.
+
 options {
     superClass = PythonLexerBase;
 }

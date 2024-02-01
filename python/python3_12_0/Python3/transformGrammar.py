@@ -17,15 +17,12 @@ def fix(file_path):
     input_file = open(file_path + ".bak",'r')
     output_file = open(file_path, 'w')
     for x in input_file:
-        if '// Insert here @header for C++ lexer.' in x:
-            x = x.replace('// Insert here @header for C++ lexer.', '@header {#include "Python3LexerBase.h"}')
-        if '// Insert here @header for C++ parser.' in x:
-            x = x.replace('// Insert here @header for C++ parser.', '@header {#include "Python3ParserBase.h"}')
+        if '!this.' in x:
+            x = x.replace('!this.', 'not self.')
         if 'this.' in x:
-            x = x.replace('this.', 'this->')
+            x = x.replace('this.', 'self.')
         output_file.write(x)
         output_file.flush()
-
     print("Writing ...")
     input_file.close()
     output_file.close()
