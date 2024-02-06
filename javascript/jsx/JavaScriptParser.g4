@@ -6,6 +6,7 @@
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
  * Copyright (c) 2019 by Student Main (contributor -> ES2020)
+ * Copyright (c) 2024 by Andrew Leppard (www.wegrok.review)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -71,7 +72,7 @@ statement
     ;
 
 block
-    : '{' statementList? '}'
+    : OpenBrace statementList? CloseBrace
     ;
 
 statementList
@@ -88,7 +89,7 @@ importFromBlock
     ;
 
 moduleItems
-    : '{' (aliasName ',')* (aliasName ','?)? '}'
+    : OpenBrace (aliasName ',')* (aliasName ','?)? CloseBrace
     ;
 
 importDefault
@@ -132,7 +133,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
+    : assignable (Assign singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement_
@@ -172,7 +173,7 @@ breakStatement
 
 returnStatement
     : Return ({this.notLineTerminator()}? expressionSequence)? eos
-    | Return '(' htmlElements ')' eos
+    | Return '(' jsxElements ')' eos
     ;
 
 yieldStatement
@@ -188,7 +189,7 @@ switchStatement
     ;
 
 caseBlock
-    : '{' caseClauses? (defaultClause caseClauses?)? '}'
+    : OpenBrace caseClauses? (defaultClause caseClauses?)? CloseBrace
     ;
 
 caseClauses
@@ -228,7 +229,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function_ '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' OpenBrace functionBody CloseBrace
     ;
 
 classDeclaration
@@ -236,22 +237,22 @@ classDeclaration
     ;
 
 classTail
-    : (Extends singleExpression)? '{' classElement* '}'
+    : (Extends singleExpression)? OpenBrace classElement* CloseBrace
     ;
 
 classElement
     : (Static | {this.n("static")}? identifier | Async)* (
         methodDefinition
-        | assignable '=' objectLiteral ';'
+        | assignable Assign objectLiteral ';'
     )
     | emptyStatement_
-    | '#'? propertyName '=' singleExpression
+    | '#'? propertyName Assign singleExpression
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | '*'? '#'? getter '(' ')' '{' functionBody '}'
-    | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'? '#'? propertyName '(' formalParameterList? ')' OpenBrace functionBody CloseBrace
+    | '*'? '#'? getter '(' ')' OpenBrace functionBody CloseBrace
+    | '*'? '#'? setter '(' formalParameterList? ')' OpenBrace functionBody CloseBrace
     ;
 
 formalParameterList
@@ -260,7 +261,7 @@ formalParameterList
     ;
 
 formalParameterArg
-    : assignable ('=' singleExpression)? // ECMAScript 6: Initialization
+    : assignable (Assign singleExpression)? // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg // ECMAScript 6: Rest Parameter
@@ -290,9 +291,9 @@ arrayElement
 propertyAssignment
     : propertyName ':' singleExpression                                          # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression                              # ComputedPropertyExpressionAssignment
-    | Async? '*'? propertyName '(' formalParameterList? ')' '{' functionBody '}' # FunctionProperty
-    | getter '(' ')' '{' functionBody '}'                                        # PropertyGetter
-    | setter '(' formalParameterArg ')' '{' functionBody '}'                     # PropertySetter
+    | Async? '*'? propertyName '(' formalParameterList? ')' OpenBrace functionBody CloseBrace # FunctionProperty
+    | getter '(' ')' OpenBrace functionBody CloseBrace                                        # PropertyGetter
+    | setter '(' formalParameterArg ')' OpenBrace functionBody CloseBrace                     # PropertySetter
     | Ellipsis? singleExpression                                                 # PropertyShorthand
     ;
 
@@ -342,7 +343,7 @@ singleExpression
     | singleExpression ('+' | '-') singleExpression                        # AdditiveExpression
     | singleExpression '??' singleExpression                               # CoalesceExpression
     | singleExpression ('<<' | '>>' | '>>>') singleExpression              # BitShiftExpression
-    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression          # RelationalExpression
+    | singleExpression (LessThan | MoreThan | '<=' | '>=') singleExpression # RelationalExpression
     | singleExpression Instanceof singleExpression                         # InstanceofExpression
     | singleExpression In singleExpression                                 # InExpression
     | singleExpression ('==' | '!=' | '===' | '!==') singleExpression      # EqualityExpression
@@ -352,7 +353,7 @@ singleExpression
     | singleExpression '&&' singleExpression                               # LogicalAndExpression
     | singleExpression '||' singleExpression                               # LogicalOrExpression
     | singleExpression '?' singleExpression ':' singleExpression           # TernaryExpression
-    | <assoc = right> singleExpression '=' singleExpression                # AssignmentExpression
+    | <assoc = right> singleExpression Assign singleExpression             # AssignmentExpression
     | <assoc = right> singleExpression assignmentOperator singleExpression # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                      # ImportExpression
     | singleExpression templateStringLiteral                               # TemplateStringExpression // ECMAScript 6
@@ -363,56 +364,74 @@ singleExpression
     | literal                                                              # LiteralExpression
     | arrayLiteral                                                         # ArrayLiteralExpression
     | objectLiteral                                                        # ObjectLiteralExpression
-    | htmlElements                                                         # htmlElementExpression
+    | jsxElements                                                          # jsxElementExpression
     | '(' expressionSequence ')'                                           # ParenthesizedExpression
     ;
 
-htmlElements
-    : htmlElement+
+jsxElements
+    : jsxElement+
     ;
 
-htmlElement
-    : '<' htmlTagStartName htmlAttribute* '>' htmlContent '<' '/' htmlTagClosingName '>'
-    | '<' htmlTagName htmlAttribute* htmlContent '/' '>'
-    | '<' htmlTagName htmlAttribute* '/' '>'
-    | '<' htmlTagName htmlAttribute* '>'
+jsxElementBegin
+    : JsxElementBegin
+    | JsxOpeningElementBegin
+    | JsxChildrenOpeningElementBegin
     ;
 
-htmlContent
-    : htmlChardata? ((htmlElement | objectExpressionSequence) htmlChardata?)*
+jsxElement
+    : jsxSelfClosingElement
+    | jsxOpeningElement jsxChildren jsxClosingElement
     ;
 
-htmlTagStartName
-    : htmlTagName {this.pushHtmlTagName($htmlTagName.text);}
+jsxSelfClosingElement
+    : jsxElementBegin jsxSelfClosingElementName jsxAttributes? JsxOpeningElementSlashEnd
     ;
 
-htmlTagClosingName
-    : htmlTagName {this.popHtmlTagName($htmlTagName.text)}?
+jsxOpeningElement
+    : jsxElementBegin jsxOpeningElementName jsxAttributes? JsxOpeningElementEnd
     ;
 
-htmlTagName
-    : TagName
-    | keyword
-    | Identifier
+jsxClosingElement
+    : JsxChildrenClosingElementSlashBegin jsxClosingElementName JsxClosingElementEnd
     ;
 
-htmlAttribute
-    : htmlAttributeName '=' htmlAttributeValue
-    | htmlAttributeName
+jsxChildren
+    : HtmlChardata? ((jsxElement | objectExpressionSequence) HtmlChardata?)*
     ;
 
-htmlAttributeName
-    : TagName
-    | Identifier ('-' Identifier)* // 2020/10/28 bugfix: '-' is recognized as MINUS and TagName is splited by '-'.
+jsxSelfClosingElementName
+    : JsxOpeningElementId
     ;
 
-htmlChardata
-    : ~('<' | '{')+
+jsxOpeningElementName
+    : JsxOpeningElementId {this.pushHtmlTagName($JsxOpeningElementId.text);}
     ;
 
-htmlAttributeValue
-    : AttributeValue
-    | StringLiteral
+jsxClosingElementName
+    : JsxClosingElementId {this.popHtmlTagName($JsxClosingElementId.text)}?
+    ;
+
+jsxAttributes
+    : jsxSpreadAttribute jsxAttributes?
+    | jsxAttribute jsxAttributes?
+    ;
+
+jsxSpreadAttribute
+    : JsxOpeningElementOpenBrace Ellipsis singleExpression CloseBrace
+    ;
+
+jsxAttribute
+    : jsxAttributeName JsxAssign jsxAttributeValue
+    | jsxAttributeName
+    ;
+
+jsxAttributeName
+    : JsxOpeningElementId
+    ;
+
+jsxAttributeValue
+    : JsxAttributeValue
+    | jsxElement
     | objectExpressionSequence
     ;
 
@@ -423,16 +442,22 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
+    : OpenBrace (propertyAssignment (',' propertyAssignment)* ','?)? CloseBrace
+    ;
+
+openBrace
+    : OpenBrace
+    | JsxOpeningElementOpenBrace    
+    | JsxChildrenOpenBrace
     ;
 
 objectExpressionSequence
-    : '{' expressionSequence '}'
+    : openBrace expressionSequence CloseBrace
     ;
 
 anoymousFunction
     : functionDeclaration                                                     # FunctionDecl
-    | Async? Function_ '*'? '(' formalParameterList? ')' '{' functionBody '}' # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' OpenBrace functionBody CloseBrace # AnoymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                   # ArrowFunction
     ;
 
@@ -443,7 +468,7 @@ arrowFunctionParameters
 
 arrowFunctionBody
     : singleExpression
-    | '{' functionBody '}'
+    | OpenBrace functionBody CloseBrace
     ;
 
 assignmentOperator
@@ -477,7 +502,7 @@ templateStringLiteral
 
 templateStringAtom
     : TemplateStringAtom
-    | TemplateStringStartExpression singleExpression TemplateCloseBrace
+    | TemplateStringStartExpression singleExpression CloseBrace
     ;
 
 numericLiteral
