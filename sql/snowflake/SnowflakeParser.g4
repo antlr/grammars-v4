@@ -3717,7 +3717,7 @@ try_cast_expr
 
 cast_expr
     : CAST LR_BRACKET expr AS data_type RR_BRACKET
-    | (TIMESTAMP | DATE | TIME) expr
+    | (TIMESTAMP | DATE | TIME | INTERVAL) expr
     ;
 
 json_literal

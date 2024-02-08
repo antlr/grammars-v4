@@ -438,6 +438,7 @@ INT          : 'INT';
 INTEGRATION  : 'INTEGRATION';
 INTEGRATIONS : 'INTEGRATIONS';
 INTERSECT    : 'INTERSECT';
+INTERVAL     : 'INTERVAL';
 INTO         : 'INTO';
 IS           : 'IS';
 // ISNUMERIC:                                             'ISNUMERIC';
