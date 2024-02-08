@@ -8,6 +8,7 @@ options {
     caseInsensitive = true;
 }
 
+fragment DIGIT          : [0-9];
 fragment POSITIVE_DIGIT : [1-9];
 fragment LETTER         : [a-z];
 
@@ -29,6 +30,6 @@ BUILD        : 'bld' | 'build';
 TEST         : 'test';
 EXPERIMENTAL : 'experimental';
 
-NUMBER: '0' | POSITIVE_DIGIT+;
+NUMBER: '0' | POSITIVE_DIGIT DIGIT*;
 
 IDENTIFIER: LETTER+;
