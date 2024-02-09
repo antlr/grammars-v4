@@ -7,3 +7,6 @@ CREATE TABLE DIRECTION (LENGTH INT,LANGUAGE INT);
 CREATE or replace TEMP TABLE ROLES (USERS INT,WAREHOUSES int,INTEGRATIONS int,DATABASES int,SCHEMAS int);
 CREATE or replace TEMP TABLE TABLES (VIEWS INT,STAGES int,STREAMS int,TASKS int,ALERTS int);
 CREATE or replace TEMP TABLE ACTION (MODE int);
+
+select 0 as interval;
+create table interval(internal int);

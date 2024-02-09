@@ -3496,6 +3496,7 @@ non_reserved_words
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
+    | INTERVAL
     | INDEX
     | JAVASCRIPT
     | LAST_NAME
