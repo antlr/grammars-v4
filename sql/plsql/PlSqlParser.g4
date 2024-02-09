@@ -5871,10 +5871,10 @@ subav_factoring_clause
     ;
 
 subav_clause
-    : USING subav_name=object_name subav_hierarchies_clause? filter_clauses? add_calcs_clause?
+    : USING subav_name=object_name hierarchies_clause? filter_clauses? add_calcs_clause?
     ;
 
-subav_hierarchies_clause
+hierarchies_clause
     : HIERARCHIES '(' hier_alias+=object_name (',' hier_alias+=object_name)* ')'
     ;
 
@@ -6281,7 +6281,7 @@ error_logging_reject_part
 dml_table_expression_clause
     : table_collection_expression
     | '(' select_statement subquery_restriction_clause? ')'
-    | tableview_name sample_clause?
+    | tableview_name hierarchies_clause? sample_clause?
     | json_table_clause (AS identifier)?
     | LATERAL '(' subquery subquery_restriction_clause? ')'
     ;
