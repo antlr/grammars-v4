@@ -6311,7 +6311,7 @@ condition
     ;
 
 json_condition
-    : column_name IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
+    : expression IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
     | JSON_EQUAL '(' expressions ')'
     ;
 
