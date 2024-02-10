@@ -695,8 +695,9 @@ function_spec
     : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (
         DETERMINISTIC
         | PIPELINED
-        | PARALLEL_ENABLE
+        | parallel_enable_clause
         | RESULT_CACHE
+        | streaming_clause
     )* ';'
     ;
 
@@ -741,13 +742,14 @@ alter_procedure
 
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')? RETURN type_spec (
-        invoker_rights_clause
+          PIPELINED
+        | DETERMINISTIC
+        | invoker_rights_clause
         | parallel_enable_clause
         | result_cache_clause
         | streaming_clause
-        | DETERMINISTIC
     )* (
-        (PIPELINED? DETERMINISTIC? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
+        ( (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
         | (PIPELINED | AGGREGATE) USING implementation_type_name
     ) ';'
     ;
