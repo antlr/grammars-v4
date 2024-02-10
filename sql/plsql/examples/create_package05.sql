@@ -34,8 +34,6 @@ create or replace package body pkg_fun_with_streaming is
 
   begin
 
-    initialize_item_array_prc();
-
     loop
       fetch p_changes
         into l_rec;
