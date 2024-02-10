@@ -13,4 +13,4 @@ BEGIN
 END;
 /
 
-SELECT conditional_compilation('hello') FROM DUAL;
+-- SELECT conditional_compilation('hello') FROM DUAL;
