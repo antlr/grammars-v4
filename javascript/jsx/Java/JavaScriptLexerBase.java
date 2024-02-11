@@ -148,4 +148,32 @@ public abstract class JavaScriptLexerBase extends Lexer
                 return true;
         }
     }
+
+    /**
+     * Returns {@code true} if the lexer can match a JSX opening element.
+     */
+    protected boolean IsJsxPossible() {
+        
+        if (this.lastToken == null) {
+            return false;
+        }
+        
+        switch (this.lastToken.getType()) {
+            case JavaScriptLexer.Assign:
+            case JavaScriptLexer.Colon:
+            case JavaScriptLexer.Comma:                
+            case JavaScriptLexer.Default:                
+            case JavaScriptLexer.QuestionMark:                
+            case JavaScriptLexer.Return:
+            case JavaScriptLexer.OpenBrace:
+            case JavaScriptLexer.OpenParen:
+            case JavaScriptLexer.JsxOpeningElementOpenBrace:
+            case JavaScriptLexer.JsxChildrenOpenBrace:
+            case JavaScriptLexer.Yield:
+            case JavaScriptLexer.ARROW:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
