@@ -456,6 +456,12 @@ DML                            : 'DML';
 DML_UPDATE                     : 'DML_UPDATE';
 DOCFIDELITY                    : 'DOCFIDELITY';
 DOCUMENT                       : 'DOCUMENT';
+DOLLAR_ELSE                    : '$ELSE';
+DOLLAR_ELSIF                   : '$ELSIF';
+DOLLAR_END                     : '$END';
+DOLLAR_ERROR                   : '$ERROR';
+DOLLAR_IF                      : '$IF';
+DOLLAR_THEN                    : '$THEN';
 DOMAIN_INDEX_FILTER            : 'DOMAIN_INDEX_FILTER';
 DOMAIN_INDEX_NO_SORT           : 'DOMAIN_INDEX_NO_SORT';
 DOMAIN_INDEX_SORT              : 'DOMAIN_INDEX_SORT';
@@ -1336,6 +1342,7 @@ PERCENT_ROWCOUNT               : '%' SPACE* 'ROWCOUNT';
 PERCENT_ROWTYPE                : '%' SPACE* 'ROWTYPE';
 PERCENT_TYPE                   : '%' SPACE* 'TYPE';
 PERCENT_BULK_EXCEPTIONS        : '%' SPACE* 'BULK_EXCEPTIONS';
+PERCENT_BULK_ROWCOUNT          : '%' SPACE* 'BULK_ROWCOUNT';
 PERFORMANCE                    : 'PERFORMANCE';
 PERIOD_KEYWORD                 : 'PERIOD';
 PERMANENT                      : 'PERMANENT';
@@ -2355,6 +2362,17 @@ LEAST            : 'LEAST';
 GREATEST         : 'GREATEST';
 TO_DATE          : 'TO_DATE';
 
+CHARSETID        : 'CHARSETID';
+CHARSETFORM      : 'CHARSETFORM';
+DURATION         : 'DURATION';
+EXTEND           : 'EXTEND';
+MAXLEN           : 'MAXLEN';
+PERSISTABLE      : 'PERSISTABLE';
+POLYMORPHIC      : 'POLYMORPHIC';
+STRUCT           : 'STRUCT';
+TDO              : 'TDO';
+WM_CONCAT        : 'WM_CONCAT';
+
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
 
@@ -2407,16 +2425,22 @@ CHAR_STRING_PERL:
         | QS_SHARP
         | QS_QUOTE
         | QS_DQUOTE
+        | QS_TILDA
+        | QS_SOLIDUS
+        | QS_RSOLIDUS
     ) '\'' -> type(CHAR_STRING)
 ;
-fragment QS_ANGLE  : '<' .*? '>';
-fragment QS_BRACE  : '{' .*? '}';
-fragment QS_BRACK  : '[' .*? ']';
-fragment QS_PAREN  : '(' .*? ')';
-fragment QS_EXCLAM : '!' .*? '!';
-fragment QS_SHARP  : '#' .*? '#';
-fragment QS_QUOTE  : '\'' .*? '\'';
-fragment QS_DQUOTE : '"' .*? '"';
+fragment QS_ANGLE    : '<' .*? '>';
+fragment QS_BRACE    : '{' .*? '}';
+fragment QS_BRACK    : '[' .*? ']';
+fragment QS_PAREN    : '(' .*? ')';
+fragment QS_EXCLAM   : '!' .*? '!';
+fragment QS_SHARP    : '#' .*? '#';
+fragment QS_QUOTE    : '\'' .*? '\'';
+fragment QS_DQUOTE   : '"' .*? '"';
+fragment QS_TILDA    : '~' .*? '~';
+fragment QS_SOLIDUS  : '/' .*? '/';
+fragment QS_RSOLIDUS : '\\' .*? '\\';
 
 DELIMITED_ID: '"' (~ [\u0000"] | '"' '"')+ '"';
 
@@ -2478,6 +2502,8 @@ START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
 ; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
+
+INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_')+;
 
 SPACES: [ \t\r\n]+ -> channel(HIDDEN);
 

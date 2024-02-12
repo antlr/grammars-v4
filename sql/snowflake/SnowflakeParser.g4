@@ -166,15 +166,16 @@ begin_txn
     ;
 
 copy_into_table
-    : COPY INTO object_name FROM (internal_stage | external_stage | external_location) files? pattern? file_format? copy_options* (
+    : COPY INTO object_name FROM (table_stage | user_stage | named_stage | external_location) files? pattern? file_format? copy_options* (
         VALIDATION_MODE EQ (RETURN_N_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS)
     )?
     //
     /* Data load with transformation */
-    | COPY INTO object_name ('(' column_list ')')?
-    //           FROM '(' SELECT expr_list
-    //                    FROM ( internal_stage | external_stage ) ')'
-    files? pattern? file_format? copy_options*
+    | COPY INTO object_name ('(' column_list ')')? FROM '(' SELECT select_list FROM (
+        table_stage
+        | user_stage
+        | named_stage
+    ) ')' files? pattern? file_format? copy_options*
     ;
 
 external_location
@@ -212,16 +213,16 @@ format_name
     ;
 
 format_type
-    : TYPE EQ (CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+    : TYPE EQ type_fileformat format_type_options*
     ;
 
 stage_file_format
     : STAGE_FILE_FORMAT EQ '(' (FORMAT_NAME EQ string)
-    | (TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options+) ')'
+    | (TYPE EQ type_fileformat format_type_options+) ')'
     ;
 
 copy_into_location
-    : COPY INTO (internal_stage | external_stage | external_location) FROM (
+    : COPY INTO (table_stage | user_stage | named_stage | external_location) FROM (
         object_name
         | '(' query_statement ')'
     ) partition_by? file_format? copy_options? (VALIDATION_MODE EQ RETURN_ROWS)? HEADER?
@@ -258,7 +259,7 @@ parallel
     ;
 
 get_dml
-    : GET internal_stage FILE_PATH parallel? pattern?
+    : GET (named_stage | user_stage | table_stage) FILE_PATH parallel? pattern?
     ;
 
 grant_ownership
@@ -425,23 +426,32 @@ system_defined_role
     ;
 
 list
-    : LIST (internal_stage | external_stage) pattern?
+    : LIST (user_stage | table_stage | named_stage) pattern?
     ;
 
-//    @[<namespace>.]<int_stage_name>[/<path>]
-//  | @[<namespace>.]%<table_name>[/<path>]
-//  | @~[/<path>]
-internal_stage
-    : AT id_ '/'?
+//  @~[/<path>]
+user_stage
+    : AT TILDA stage_path?
+    ;
+
+//  @[<namespace>.]%<table_name>[/<path>]
+table_stage
+    : AT schema_name? '%' id_ stage_path?
     ;
 
 //  @[<namespace>.]<ext_stage_name>[/<path>]
-external_stage
-    : AT id_ '/'?
+named_stage
+    : AT object_name stage_path?
+    ;
+
+stage_path
+    : STAGE_PATH
     ;
 
 put
-    : PUT FILE_PATH internal_stage (PARALLEL EQ num)? (AUTO_COMPRESS EQ true_false)? (
+    : PUT FILE_PATH (table_stage | user_stage | named_stage) (PARALLEL EQ num)? (
+        AUTO_COMPRESS EQ true_false
+    )? (
         SOURCE_COMPRESSION EQ (
             AUTO_DETECT
             | GZIP
@@ -456,7 +466,7 @@ put
     ;
 
 remove
-    : REMOVE (internal_stage | external_stage) pattern?
+    : REMOVE (table_stage | user_stage | named_stage) pattern?
     ;
 
 revoke_from_role
@@ -1173,7 +1183,7 @@ alter_column_clause
     ;
 
 inline_constraint
-    :  (CONSTRAINT id_)? (
+    : (CONSTRAINT id_)? (
         (UNIQUE | primary_key) common_constraint_properties*
         | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
     )
@@ -1576,15 +1586,15 @@ create_external_function
 create_external_table
     // Partitions computed from expressions
     : CREATE or_replace? EXTERNAL TABLE if_not_exists? object_name '(' external_table_column_decl_list ')' cloud_provider_params3? partition_by? WITH?
-        LOCATION EQ external_stage (REFRESH_ON_CREATE EQ true_false)? (AUTO_REFRESH EQ true_false)? pattern? file_format (
+        LOCATION EQ named_stage (REFRESH_ON_CREATE EQ true_false)? (AUTO_REFRESH EQ true_false)? pattern? file_format (
         AWS_SNS_TOPIC EQ string
     )? copy_grants? with_row_access_policy? with_tags? comment_clause?
     // Partitions added and removed manually
     | CREATE or_replace? EXTERNAL TABLE if_not_exists? object_name '(' external_table_column_decl_list ')' cloud_provider_params3? partition_by? WITH?
-        LOCATION EQ external_stage PARTITION_TYPE EQ USER_SPECIFIED file_format copy_grants? with_row_access_policy? with_tags? comment_clause?
+        LOCATION EQ named_stage PARTITION_TYPE EQ USER_SPECIFIED file_format copy_grants? with_row_access_policy? with_tags? comment_clause?
     // Delta Lake
     | CREATE or_replace? EXTERNAL TABLE if_not_exists? object_name '(' external_table_column_decl_list ')' cloud_provider_params3? partition_by? WITH?
-        LOCATION EQ external_stage PARTITION_TYPE EQ USER_SPECIFIED file_format (
+        LOCATION EQ named_stage PARTITION_TYPE EQ USER_SPECIFIED file_format (
         TABLE_FORMAT EQ DELTA
     )? copy_grants? with_row_access_policy? with_tags? comment_clause?
     ;
@@ -1646,7 +1656,11 @@ arg_default_value_clause
     ;
 
 col_decl
-    : column_name data_type
+    : column_name data_type virtual_column_decl?
+    ;
+
+virtual_column_decl
+    : AS '(' function_call ')'
     ;
 
 function_definition
@@ -2150,13 +2164,13 @@ create_stage
     : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier stage_encryption_opts_internal? directory_table_internal_params? (
         FILE_FORMAT EQ LR_BRACKET (
             FORMAT_NAME EQ string
-            | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+            | TYPE EQ type_fileformat format_type_options*
         ) RR_BRACKET
     )? (COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET)? with_tags? comment_clause?
     | CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier external_stage_params directory_table_external_params? (
         FILE_FORMAT EQ LR_BRACKET (
             FORMAT_NAME EQ string
-            | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML) format_type_options*
+            | TYPE EQ type_fileformat format_type_options*
         ) RR_BRACKET
     )? (COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET)? with_tags? comment_clause?
     ;
@@ -2268,7 +2282,7 @@ with_row_access_policy
     ;
 
 cluster_by
-    : CLUSTER BY expr_list_in_parentheses
+    : CLUSTER BY LINEAR? expr_list_in_parentheses
     ;
 
 change_tracking
@@ -2314,7 +2328,7 @@ out_of_line_constraint
     ;
 
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_) )* with_masking_policy? with_tags? (
+    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
         COMMENT string
     )?
     ;
@@ -3341,8 +3355,8 @@ account_identifier
     ;
 
 schema_name
-    : id_ DOT id_
-    | id_
+    : d = id_ DOT s = id_
+    | s = id_
     ;
 
 object_type
@@ -3482,6 +3496,7 @@ non_reserved_words
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
+    | INTERVAL
     | INDEX
     | JAVASCRIPT
     | LAST_NAME
@@ -3578,6 +3593,7 @@ binary_builtin_function
     | EQUAL_NULL
     | CONTAINS
     | COLLATE
+    | TO_TIMESTAMP
     ;
 
 binary_or_ternary_builtin_function
@@ -3606,6 +3622,7 @@ list_function
     : CONCAT
     | CONCAT_WS
     | COALESCE
+    | HASH
     // To complete as needed
     ;
 
@@ -3701,6 +3718,7 @@ try_cast_expr
 
 cast_expr
     : CAST LR_BRACKET expr AS data_type RR_BRACKET
+    | (TIMESTAMP | DATE | TIME | INTERVAL) expr
     ;
 
 json_literal
@@ -4062,11 +4080,7 @@ at_before
     ;
 
 end
-    : END LR_BRACKET (
-        TIMESTAMP ASSOC expr
-        | OFFSET ASSOC expr
-        | STATEMENT ASSOC string 
-    ) RR_BRACKET
+    : END LR_BRACKET (TIMESTAMP ASSOC expr | OFFSET ASSOC expr | STATEMENT ASSOC string) RR_BRACKET
     ;
 
 changes

@@ -492,7 +492,7 @@ alter_hierarchy
     ;
 
 alter_function
-    : ALTER FUNCTION function_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?
+    : ALTER FUNCTION function_name (EDITIONABLE | NONEDITIONABLE | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-JAVA.html
@@ -510,7 +510,7 @@ match_string
 create_function_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? FUNCTION function_name (
         '(' parameter (',' parameter)* ')'
-    )? RETURN type_spec (
+    )? RETURN type_spec (SHARING '=' (METADATA | NONE))? (
         invoker_rights_clause
         | accessible_by_clause
         | default_collation_clause
@@ -519,7 +519,8 @@ create_function_body
         | DETERMINISTIC
     )* (
         (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
-        | (PIPELINED | AGGREGATE) USING implementation_type_name
+        | aggregate_clause
+        | pipelined_using_clause
         | sql_macro_body
     ) ';'
     ;
@@ -548,6 +549,14 @@ accessible_by_clause
 
 default_collation_clause
     : DEFAULT COLLATION USING_NLS_COMP
+    ;
+
+aggregate_clause
+    : AGGREGATE USING implementation_type_name
+    ;
+
+pipelined_using_clause
+    : PIPELINED ((ROW | TABLE) POLYMORPHIC)? USING implementation_type_name
     ;
 
 accessor
@@ -658,7 +667,7 @@ create_package_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE BODY (schema_object_name '.')? package_name (
         IS
         | AS
-    ) package_obj_body* (BEGIN seq_of_statements)? END package_name?
+    ) package_obj_body* (BEGIN seq_of_statements (EXCEPTION exception_handler+)?)? END package_name?
     ;
 
 // Create Package Specific Clauses
@@ -675,13 +684,20 @@ package_obj_spec
     ;
 
 procedure_spec
-    : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? ';'
+    : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? (
+        accessible_by_clause
+        | PARALLEL_ENABLE
+    )* ';'
     ;
 
 function_spec
-    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec PIPELINED? DETERMINISTIC? (
-        RESULT_CACHE
-    )? ';'
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (
+        DETERMINISTIC
+        | PIPELINED
+        | parallel_enable_clause
+        | RESULT_CACHE
+        | streaming_clause
+    )* ';'
     ;
 
 package_obj_body
@@ -695,6 +711,7 @@ package_obj_body
     | type_declaration
     | procedure_body
     | function_body
+    | selection_directive
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/alter-pmem-filestore.html
@@ -724,18 +741,23 @@ alter_procedure
 
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')? RETURN type_spec (
-        invoker_rights_clause
+          PIPELINED
+        | DETERMINISTIC
+        | invoker_rights_clause
         | parallel_enable_clause
         | result_cache_clause
-        | DETERMINISTIC
+        | streaming_clause // see example in section "How Table Functions Stream their Input Data" on streaming_clause in Oracle 9i: https://docs.oracle.com/cd/B10501_01/appdev.920/a96624/08_subs.htm#20554
     )* (
-        (PIPELINED? DETERMINISTIC? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
+        ( (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
         | (PIPELINED | AGGREGATE) USING implementation_type_name
     ) ';'
     ;
 
 procedure_body
-    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS) (
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (
+        accessible_by_clause
+        | PARALLEL_ENABLE
+    )* (IS | AS) (
         DECLARE? seq_of_declare_specs? body
         | call_spec
         | EXTERNAL
@@ -743,7 +765,7 @@ procedure_body
     ;
 
 create_procedure_body
-    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? invoker_rights_clause? (
+    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? invoker_rights_clause? PARALLEL_ENABLE? (
         IS
         | AS
     ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
@@ -872,10 +894,10 @@ compound_trigger_block
     ;
 
 timing_point_section
-    : bk = BEFORE STATEMENT IS BEGIN tps_body END BEFORE STATEMENT ';'
-    | bk = BEFORE EACH ROW IS BEGIN tps_body END BEFORE EACH ROW ';'
-    | ak = AFTER STATEMENT IS BEGIN tps_body END AFTER STATEMENT ';'
-    | ak = AFTER EACH ROW IS BEGIN tps_body END AFTER EACH ROW ';'
+    : bk=BEFORE STATEMENT IS tps_block BEFORE STATEMENT ';'
+    | bk=BEFORE EACH ROW IS tps_block BEFORE EACH ROW ';'
+    | ak=AFTER STATEMENT IS tps_block AFTER STATEMENT ';'
+    | ak=AFTER EACH ROW IS tps_block AFTER EACH ROW ';'
     ;
 
 non_dml_event
@@ -918,7 +940,7 @@ dml_event_nested_clause
     ;
 
 referencing_clause
-    : REFERENCING referencing_element+
+    : (REFERENCING referencing_element | REFERENCES) referencing_element*
     ;
 
 referencing_element
@@ -1630,7 +1652,13 @@ global_partitioned_index
     ;
 
 index_partitioning_clause
-    : PARTITION partition_name? VALUES LESS THAN '(' literal (',' literal)* ')' segment_attributes_clause?
+    : PARTITION partition_name? VALUES LESS THAN '(' index_partitioning_values_list ')' segment_attributes_clause?
+    ;
+
+
+index_partitioning_values_list
+    : literal (',' literal)*
+    | TIMESTAMP literal (',' TIMESTAMP literal)*
     ;
 
 local_partitioned_index
@@ -3624,7 +3652,7 @@ system_partitioning
     ;
 
 range_partition_desc
-    : PARTITION partition_name? range_values_clause table_partition_description (
+    : PARTITION partition_name? range_values_clause? table_partition_description? (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*
@@ -3637,7 +3665,7 @@ range_partition_desc
     ;
 
 list_partition_desc
-    : PARTITION partition_name? list_values_clause table_partition_description (
+    : PARTITION partition_name? list_values_clause? table_partition_description? (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*
@@ -3702,7 +3730,12 @@ hash_subparts_by_quantity
     ;
 
 range_values_clause
-    : VALUES LESS THAN '(' literal (',' literal)* ')'
+    : VALUES LESS THAN '(' range_values_list ')'
+    ;
+
+range_values_list
+    : literal (',' literal)*
+    | TIMESTAMP literal (',' TIMESTAMP literal)*
     ;
 
 list_values_clause
@@ -4764,10 +4797,10 @@ modify_table_partition
     ;
 
 split_table_partition
-    : SPLIT PARTITION partition_name INTO '(' (
-        range_partition_desc (',' range_partition_desc)*
-        | list_partition_desc (',' list_partition_desc)*
-    ) ')'
+    : SPLIT partition_extended_names (
+            AT '(' literal (',' literal)* ')' INTO '(' range_partition_desc (',' range_partition_desc)*  ')'
+            | INTO '(' (range_partition_desc (',' range_partition_desc)* | list_partition_desc (',' list_partition_desc)* ) ')'
+            ) (update_global_index_clause | update_index_clauses)?
     ;
 
 truncate_table_partition
@@ -5260,8 +5293,8 @@ object_type_col_properties
     ;
 
 constraint_clauses
-    : ADD '(' (out_of_line_constraint* | out_of_line_ref_constraint) ')'
-    | ADD (out_of_line_constraint* | out_of_line_ref_constraint)
+    : ADD '(' (out_of_line_constraint (',' out_of_line_constraint)* | out_of_line_ref_constraint) ')'
+    | ADD (out_of_line_constraint | out_of_line_ref_constraint)
     | MODIFY (
         CONSTRAINT constraint_name
         | PRIMARY KEY
@@ -5349,17 +5382,22 @@ invoker_rights_clause
     ;
 
 call_spec
-    : LANGUAGE (java_spec | c_spec)
+    : java_spec
+    | c_spec
     ;
 
 // Call Spec Specific Clauses
 
 java_spec
-    : JAVA NAME CHAR_STRING
+    : LANGUAGE JAVA NAME CHAR_STRING
     ;
 
 c_spec
-    : C_LETTER (NAME CHAR_STRING)? LIBRARY identifier c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
+    : (LANGUAGE C_LETTER | EXTERNAL)
+      ( NAME id_expression LIBRARY identifier
+      | LIBRARY identifier (NAME id_expression)?
+      )
+      c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
     ;
 
 c_agent_in_clause
@@ -5367,7 +5405,22 @@ c_agent_in_clause
     ;
 
 c_parameters_clause
-    : PARAMETERS '(' (expressions | '.' '.' '.') ')'
+    : PARAMETERS '(' c_external_parameter (',' c_external_parameter)* ')'
+    ;
+
+c_external_parameter
+    : CONTEXT
+    | SELF (TDO | c_property)?
+    | (parameter_name | RETURN) c_property? (BY REFERENCE)? external_datatype=regular_id?
+    ;
+
+c_property
+    : INDICATOR (STRUCT | TDO)?
+    | LENGTH
+    | DURATION
+    | MAXLEN
+    | CHARSETID
+    | CHARSETFORM
     ;
 
 parameter
@@ -5395,11 +5448,12 @@ declare_spec
     | type_declaration
     | procedure_body
     | function_body
+    | selection_directive
     ;
 
 // incorporates constant_declaration
 variable_declaration
-    : identifier CONSTANT? type_spec (NOT NULL_)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT? NULL_)? default_value_part? ';'
     ;
 
 subtype_declaration
@@ -5468,7 +5522,7 @@ varray_type_def
 // Statements
 
 seq_of_statements
-    : (statement (';' | EOF) | label_declaration)+
+    : (pragma_declaration* statement (';' | EOF) | label_declaration | selection_directive)+
     ;
 
 label_declaration
@@ -5544,7 +5598,7 @@ forall_statement
 
 bounds_clause
     : lower_bound '..' upper_bound
-    | INDICES OF collection_name between_bound?
+    | INDICES OF general_element between_bound?
     | VALUES OF index_name
     ;
 
@@ -5582,6 +5636,25 @@ pipe_row_statement
     : PIPE ROW '(' expression ')'
     ;
 
+selection_directive
+    : DOLLAR_IF condition DOLLAR_THEN selection_directive_body
+        (DOLLAR_ELSIF selection_directive_body)* (DOLLAR_ELSE selection_directive_body)?
+      DOLLAR_END
+    ;
+
+error_directive
+    : DOLLAR_ERROR concatenation DOLLAR_END
+    ;
+
+selection_directive_body
+    : ( pragma_declaration? statement ';'
+      | variable_declaration
+      | error_directive
+      | function_body
+      | procedure_body
+      )+
+    ;
+
 body
     : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
     ;
@@ -5596,8 +5669,8 @@ trigger_block
     : (DECLARE declare_spec*)? body
     ;
 
-tps_body
-    : seq_of_statements (EXCEPTION exception_handler+)?
+tps_block
+    : declare_spec* body
     ;
 
 block
@@ -5611,6 +5684,7 @@ sql_statement
     | data_manipulation_language_statements
     | cursor_manipulation_statements
     | transaction_control_statements
+    | collection_method_call
     ;
 
 execute_immediate
@@ -5720,6 +5794,13 @@ savepoint_statement
     : SAVEPOINT savepoint_name
     ;
 
+// https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/collection-method.html#GUID-7AF1A3C4-D04B-4F91-9D7B-C92C75E3A300
+collection_method_call // collection methods invocation that could be used as a statement
+    : expression '.' ( (DELETE | EXTEND) ('(' index+=expression (',' index+=expression)* ')')?
+                     | TRIM ('(' index+=expression ')')?
+                     )
+    ;
+
 // Dml
 
 /* TODO
@@ -5752,7 +5833,7 @@ explain_statement
     ;
 
 select_only_statement
-    : subquery_factoring_clause? subquery
+    : with_clause? subquery
     ;
 
 select_statement
@@ -5760,12 +5841,19 @@ select_statement
     ;
 
 // Select Specific Clauses
-
-subquery_factoring_clause
-    : WITH factoring_element (',' factoring_element)*
+with_clause
+    : WITH (function_body | procedure_body)*
+      with_factoring_clause (',' with_factoring_clause)*
+    | WITH (function_body | procedure_body)+
+      (with_factoring_clause (',' with_factoring_clause)*)?
     ;
 
-factoring_element
+with_factoring_clause
+    : subquery_factoring_clause
+    | subav_factoring_clause
+    ;
+
+subquery_factoring_clause
     : query_name paren_column_list? AS '(' subquery order_by_clause? ')' search_clause? cycle_clause?
     ;
 
@@ -5777,6 +5865,34 @@ search_clause
 
 cycle_clause
     : CYCLE column_list SET column_name TO expression DEFAULT expression
+    ;
+
+subav_factoring_clause
+    : subav_name=id_expression ANALYTIC VIEW AS '(' subav_clause ')'
+    ;
+
+subav_clause
+    : USING subav_name=object_name hierarchies_clause? filter_clauses? add_calcs_clause?
+    ;
+
+hierarchies_clause
+    : HIERARCHIES '(' hier_alias+=object_name (',' hier_alias+=object_name)* ')'
+    ;
+
+filter_clauses
+    : FILTER FACT '(' filter_clause (',' filter_clause)* ')'
+    ;
+
+filter_clause
+    : ( MEASURES | hier_alias=object_name) TO condition
+    ;
+
+add_calcs_clause
+    : ADD MEASURES '(' add_calc_meas_clause (',' add_calc_meas_clause)* ')'
+    ;
+
+add_calc_meas_clause
+    : meas_name=id_expression AS '(' expression ')'
     ;
 
 subquery
@@ -5793,7 +5909,7 @@ subquery_operation_part
     ;
 
 query_block
-    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
+    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list into_clause? from_clause where_clause? (hierarchical_query_clause | group_by_clause)* model_clause?
         order_by_clause? fetch_clause?
     ;
 
@@ -5831,7 +5947,7 @@ table_ref_aux
 table_ref_aux_internal
     : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)? # table_ref_aux_internal_two
-    | ONLY '(' dml_table_expression_clause ')'                                    # table_ref_aux_internal_three
+    | ONLY '(' dml_table_expression_clause ')'                                    # table_ref_aux_internal_thre
     ;
 
 join_clause
@@ -5839,6 +5955,7 @@ join_clause
         join_on_part
         | join_using_part
     )*
+    | (CROSS | OUTER) APPLY table_ref_aux
     ;
 
 join_on_part
@@ -5858,8 +5975,8 @@ query_partition_clause
     ;
 
 flashback_query_clause
-    : VERSIONS BETWEEN (SCN | TIMESTAMP) expression
-    | AS OF (SCN | TIMESTAMP | SNAPSHOT) expression
+    : VERSIONS (PERIOD_KEYWORD FOR column_name BETWEEN | BETWEEN (SCN | TIMESTAMP)) expression AND expression
+    | AS OF ((SCN | TIMESTAMP | SNAPSHOT) expression | PERIOD_KEYWORD FOR column_name expression)
     ;
 
 pivot_clause
@@ -6165,8 +6282,9 @@ error_logging_reject_part
 dml_table_expression_clause
     : table_collection_expression
     | '(' select_statement subquery_restriction_clause? ')'
-    | tableview_name sample_clause?
+    | tableview_name hierarchies_clause? sample_clause?
     | json_table_clause (AS identifier)?
+    | LATERAL '(' subquery subquery_restriction_clause? ')'
     ;
 
 table_collection_expression
@@ -6193,7 +6311,7 @@ condition
     ;
 
 json_condition
-    : column_name IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
+    : expression IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
     | JSON_EQUAL '(' expressions ')'
     ;
 
@@ -6238,6 +6356,7 @@ logical_operation
 
 multiset_expression
     : relational_expression (multiset_type = (MEMBER | SUBMULTISET) OF? concatenation)?
+    | multiset_expression MULTISET multiset_operator=(EXCEPT | INTERSECT | UNION) (ALL | DISTINCT)? relational_expression
     ;
 
 relational_expression
@@ -6321,6 +6440,9 @@ unary_expression
     | DISTINCT unary_expression
     | ALL unary_expression
     | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_statement /*[false]*/
+    | unary_expression '.' ( (COUNT | FIRST | LAST | LIMIT)
+                           | (EXISTS | NEXT | PRIOR) '(' index+=expression ')'
+                           )
     | quantified_expression
     | standard_function
     | atom
@@ -6329,7 +6451,9 @@ unary_expression
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
 implicit_cursor_expression
-    : SQL PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
+    : SQL ( PERCENT_BULK_ROWCOUNT '(' index=expression ')'
+          | PERCENT_BULK_EXCEPTIONS ('.' COUNT | '(' expression ')' '.' (ERROR_INDEX | ERROR_CODE))
+          )
     ;
 
 collection_expression
@@ -6348,7 +6472,7 @@ TODO scope    {
 // CASE
 
 simple_case_statement
-    : label_name? ck1 = CASE expression simple_case_when_part+ case_else_part? END CASE? label_name?
+    : label_declaration? ck1 = CASE expression simple_case_when_part+ case_else_part? END CASE? label_name?
     ;
 
 simple_case_when_part
@@ -6356,7 +6480,7 @@ simple_case_when_part
     ;
 
 searched_case_statement
-    : label_name? ck1 = CASE searched_case_when_part+ case_else_part? END CASE? label_name?
+    : label_declaration? ck1 = CASE searched_case_when_part+ case_else_part? END CASE? label_name?
     ;
 
 searched_case_when_part
@@ -6370,13 +6494,14 @@ case_else_part
 atom
     : bind_variable
     | constant
+    | inquiry_directive
     | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
     | '(' expressions ')'
     ;
 
 quantified_expression
-    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression ')')
+    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression (',' expression)*')')
     ;
 
 string_function
@@ -6511,7 +6636,7 @@ json_value_return_type
     : VARCHAR2 ('(' UNSIGNED_INTEGER ( BYTE | CHAR)? ')')? TRUNCATE?
     | CLOB
     | DATE
-    | NUMBER '(' INTEGER (',' INTEGER)? ')'
+    | NUMBER ('(' INTEGER (',' INTEGER)? ')')?
     | TIMESTAMP (WITH TIMEZONE)?
     | SDO_GEOMETRY
     | expression (USING CASESENSITIVE MAPPING)?
@@ -6563,13 +6688,14 @@ other_function
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
+    | (LEAD | LAG) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword '(' expressions cost_matrix_clause? using_clause? ')'
     | (TO_BINARY_DOUBLE | TO_BINARY_FLOAT | TO_NUMBER | TO_TIMESTAMP | TO_TIMESTAMP_TZ) '(' concatenation (
         DEFAULT concatenation ON CONVERSION ERROR
     )? (',' quoted_string (',' quoted_string)?)? ')'
     | (TO_DSINTERVAL | TO_YMINTERVAL) '(' concatenation (DEFAULT concatenation ON CONVERSION ERROR)? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
-    | TREAT '(' expression AS REF? type_spec ')'
+    | TREAT '(' expression AS REF? type_spec ')' ('.' general_element_part)*
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | VALIDATE_CONVERSION '(' concatenation AS type_spec (',' quoted_string (',' quoted_string)?)? ')'
     | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)*
@@ -6599,13 +6725,12 @@ other_function
 over_clause_keyword
     : AVG
     | CORR
-    | LAG
     | LAG_DIFF
     | LAG_DIFF_PERCENT
-    | LEAD
     | MAX
     | MEDIAN
     | MIN
+    | NTH_VALUE
     | NTILE
     | RATIO_TO_REPORT
     | ROW_NUMBER
@@ -6614,7 +6739,9 @@ over_clause_keyword
     | REGR_
     | STDDEV
     | VAR_
+    | VAR_POP
     | COVAR_
+    | WM_CONCAT
     ;
 
 within_or_over_clause_keyword
@@ -6666,7 +6793,7 @@ using_element
     ;
 
 collect_order_by_part
-    : ORDER BY concatenation
+    : ORDER BY concatenation (',' concatenation)*
     ;
 
 within_or_over_part
@@ -6779,7 +6906,7 @@ table_alias
     ;
 
 where_clause
-    : WHERE (CURRENT OF cursor_name | expression | quantitative_where_stmt)
+    : WHERE (CURRENT OF cursor_name | condition | quantitative_where_stmt)
     ;
 
 quantitative_where_stmt
@@ -7096,7 +7223,9 @@ bind_variable
     ;
 
 general_element
-    : general_element_part ('.' general_element_part)*
+    : general_element_part
+    | general_element ('.' general_element_part)+
+    | '(' general_element ')'
     ;
 
 general_element_part
@@ -7281,6 +7410,10 @@ id_expression
     | DELIMITED_ID
     ;
 
+inquiry_directive
+    : INQUIRY_DIRECTIVE
+    ;
+
 outer_join_sign
     : '(' '+' ')'
     ;
@@ -7288,6 +7421,7 @@ outer_join_sign
 regular_id
     : non_reserved_keywords_pre12c
     | non_reserved_keywords_in_12c
+    | non_reserved_keywords_in_18c
     | REGULAR_ID
     | ABSENT
     | A_LETTER
@@ -7301,6 +7435,8 @@ regular_id
     | BOOLEAN
     | C_LETTER
     | CHAR
+    | CHARSETID
+    | CHARSETFORM
     | CLUSTER
     | CONSTRUCTOR
     | CUSTOMDATUM
@@ -7309,6 +7445,10 @@ regular_id
     | DELETE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
+    | DURATION
+    | E_LETTER
+    | ERROR_INDEX
+    | ERROR_CODE
     | E_LETTER
     | ERR
     | EXCEPTION
@@ -7316,6 +7456,7 @@ regular_id
     | EXCEPTIONS
     | EXISTS
     | EXIT
+    | EXTEND
     | FILESTORE
     | FLOAT
     | FORALL
@@ -7328,6 +7469,7 @@ regular_id
     | LANGUAGE
     | LONG
     | LOOP
+    | MAXLEN
     | MOUNTPOINT
     | M_LETTER
     | MISSING
@@ -7362,19 +7504,23 @@ regular_id
     | SIGNTYPE
     | SIMPLE_INTEGER
     | SMALLINT
+    | STRUCT
     | SQLDATA
     | SQLERROR
     | SUBTYPE
     | T_LETTER
+    | TDO
     | TIMESTAMP_LTZ_UNCONSTRAINED
     | TIMESTAMP_TZ_UNCONSTRAINED
     | TIMESTAMP_UNCONSTRAINED
+    | TIMEZONE
     | TRIGGER
     | VARCHAR
     | VARCHAR2
     | VARIABLE
     | WARNING
     | WHILE
+    | WM_CONCAT
     | XMLAGG
     | YMINTERVAL_UNCONSTRAINED
     | REGR_
@@ -7383,6 +7529,11 @@ regular_id
     | COVAR_
     | ERROR_INDEX
     | ERROR_CODE
+    ;
+
+non_reserved_keywords_in_18c
+    : PERSISTABLE
+    | POLYMORPHIC
     ;
 
 non_reserved_keywords_in_12c

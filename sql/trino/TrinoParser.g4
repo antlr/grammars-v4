@@ -32,6 +32,7 @@ statements
     | standalonePathSpecification
     | standaloneType
     | standaloneRowPattern SEMICOLON_?
+    | standaloneFunctionSpecification
     ;
 
 singleStatement
@@ -54,46 +55,54 @@ standaloneRowPattern
     : rowPattern SEMICOLON_
     ;
 
+standaloneFunctionSpecification
+    : functionSpecification SEMICOLON_
+    ;
+
 statement
-    : query                                              # statementDefault
+    : rootQuery                                          # statementDefault
     | USE_ schema = identifier                           # use
     | USE_ catalog = identifier DOT_ schema = identifier # use
+    | CREATE_ CATALOG_ (IF_ NOT_ EXISTS_)? catalog = identifier USING_ connectorName = identifier (
+        COMMENT_ string_
+    )? (AUTHORIZATION_ principal)? (WITH_ properties)?                           # createCatalog
+    | DROP_ CATALOG_ (IF_ EXISTS_)? catalog = identifier (CASCADE_ | RESTRICT_)? # dropCatalog
     | CREATE_ SCHEMA_ (IF_ NOT_ EXISTS_)? qualifiedName (AUTHORIZATION_ principal)? (
         WITH_ properties
     )?                                                                   # createSchema
     | DROP_ SCHEMA_ (IF_ EXISTS_)? qualifiedName (CASCADE_ | RESTRICT_)? # dropSchema
     | ALTER_ SCHEMA_ qualifiedName RENAME_ TO_ identifier                # renameSchema
     | ALTER_ SCHEMA_ qualifiedName SET_ AUTHORIZATION_ principal         # setSchemaAuthorization
-    | CREATE_ TABLE_ (IF_ NOT_ EXISTS_)? qualifiedName columnAliases? (COMMENT_ string_)? (
-        WITH_ properties
-    )? AS_ (query | LPAREN_ query RPAREN_) (WITH_ (NO_)? DATA_)? # createTableAsSelect
-    | CREATE_ TABLE_ (IF_ NOT_ EXISTS_)? qualifiedName LPAREN_ tableElement (COMMA_ tableElement)* RPAREN_ (
+    | CREATE_ (OR_ REPLACE_)? TABLE_ (IF_ NOT_ EXISTS_)? qualifiedName columnAliases? (
         COMMENT_ string_
-    )? (WITH_ properties)?                                                                                                        # createTable
-    | DROP_ TABLE_ (IF_ EXISTS_)? qualifiedName                                                                                   # dropTable
-    | INSERT_ INTO_ qualifiedName columnAliases? query                                                                            # insertInto
-    | DELETE_ FROM_ qualifiedName (WHERE_ booleanExpression)?                                                                     # delete
-    | TRUNCATE_ TABLE_ qualifiedName                                                                                              # truncateTable
-    | COMMENT_ ON_ TABLE_ qualifiedName IS_ (string_ | NULL_)                                                                     # commentTable
-    | COMMENT_ ON_ VIEW_ qualifiedName IS_ (string_ | NULL_)                                                                      # commentView
-    | COMMENT_ ON_ COLUMN_ qualifiedName IS_ (string_ | NULL_)                                                                    # commentColumn
-    | ALTER_ TABLE_ (IF_ EXISTS_)? from = qualifiedName RENAME_ TO_ to = qualifiedName                                            # renameTable
-    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName ADD_ COLUMN_ (IF_ NOT_ EXISTS_)? column = columnDefinition           # addColumn
-    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName RENAME_ COLUMN_ (IF_ EXISTS_)? from = identifier TO_ to = identifier # renameColumn
-    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName DROP_ COLUMN_ (IF_ EXISTS_)? column = qualifiedName                  # dropColumn
-    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName ALTER_ COLUMN_ columnName = identifier SET_ DATA_ TYPE_ type         # setColumnType
-    | ALTER_ TABLE_ tableName = qualifiedName SET_ AUTHORIZATION_ principal                                                       # setTableAuthorization
-    | ALTER_ TABLE_ tableName = qualifiedName SET_ PROPERTIES_ propertyAssignments                                                # setTableProperties
+    )? (WITH_ properties)? AS_ (rootQuery | LPAREN_ rootQuery RPAREN_) (WITH_ (NO_)? DATA_)? # createTableAsSelect
+    | CREATE_ (OR_ REPLACE_)? TABLE_ (IF_ NOT_ EXISTS_)? qualifiedName LPAREN_ tableElement (
+        COMMA_ tableElement
+    )* RPAREN_ (COMMENT_ string_)? (WITH_ properties)?                                                                               # createTable
+    | DROP_ TABLE_ (IF_ EXISTS_)? qualifiedName                                                                                      # dropTable
+    | INSERT_ INTO_ qualifiedName columnAliases? rootQuery                                                                           # insertInto
+    | DELETE_ FROM_ qualifiedName (WHERE_ booleanExpression)?                                                                        # delete
+    | TRUNCATE_ TABLE_ qualifiedName                                                                                                 # truncateTable
+    | COMMENT_ ON_ TABLE_ qualifiedName IS_ (string_ | NULL_)                                                                        # commentTable
+    | COMMENT_ ON_ VIEW_ qualifiedName IS_ (string_ | NULL_)                                                                         # commentView
+    | COMMENT_ ON_ COLUMN_ qualifiedName IS_ (string_ | NULL_)                                                                       # commentColumn
+    | ALTER_ TABLE_ (IF_ EXISTS_)? from = qualifiedName RENAME_ TO_ to = qualifiedName                                               # renameTable
+    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName ADD_ COLUMN_ (IF_ NOT_ EXISTS_)? column = columnDefinition              # addColumn
+    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName RENAME_ COLUMN_ (IF_ EXISTS_)? from = qualifiedName TO_ to = identifier # renameColumn
+    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName DROP_ COLUMN_ (IF_ EXISTS_)? column = qualifiedName                     # dropColumn
+    | ALTER_ TABLE_ (IF_ EXISTS_)? tableName = qualifiedName ALTER_ COLUMN_ columnName = qualifiedName SET_ DATA_ TYPE_ type         # setColumnType
+    | ALTER_ TABLE_ tableName = qualifiedName SET_ AUTHORIZATION_ principal                                                          # setTableAuthorization
+    | ALTER_ TABLE_ tableName = qualifiedName SET_ PROPERTIES_ propertyAssignments                                                   # setTableProperties
     | ALTER_ TABLE_ tableName = qualifiedName EXECUTE_ procedureName = identifier (
         LPAREN_ (callArgument (COMMA_ callArgument)*)? RPAREN_
     )? (WHERE_ where = booleanExpression)?       # tableExecute
     | ANALYZE_ qualifiedName (WITH_ properties)? # analyze
     | CREATE_ (OR_ REPLACE_)? MATERIALIZED_ VIEW_ (IF_ NOT_ EXISTS_)? qualifiedName (
         GRACE_ PERIOD_ interval
-    )? (COMMENT_ string_)? (WITH_ properties)? AS_ query # createMaterializedView
+    )? (COMMENT_ string_)? (WITH_ properties)? AS_ rootQuery # createMaterializedView
     | CREATE_ (OR_ REPLACE_)? VIEW_ qualifiedName (COMMENT_ string_)? (
         SECURITY_ (DEFINER_ | INVOKER_)
-    )? AS_ query                                                                                    # createView
+    )? AS_ rootQuery                                                                                # createView
     | REFRESH_ MATERIALIZED_ VIEW_ qualifiedName                                                    # refreshMaterializedView
     | DROP_ MATERIALIZED_ VIEW_ (IF_ EXISTS_)? qualifiedName                                        # dropMaterializedView
     | ALTER_ MATERIALIZED_ VIEW_ (IF_ EXISTS_)? from = qualifiedName RENAME_ TO_ to = qualifiedName # renameMaterializedView
@@ -102,6 +111,8 @@ statement
     | ALTER_ VIEW_ from = qualifiedName RENAME_ TO_ to = qualifiedName                              # renameView
     | ALTER_ VIEW_ from = qualifiedName SET_ AUTHORIZATION_ principal                               # setViewAuthorization
     | CALL_ qualifiedName LPAREN_ (callArgument (COMMA_ callArgument)*)? RPAREN_                    # call
+    | CREATE_ (OR_ REPLACE_)? functionSpecification                                                 # createFunction
+    | DROP_ FUNCTION_ (IF_ EXISTS_)? functionDeclaration                                            # dropFunction
     | CREATE_ ROLE_ name = identifier (WITH_ ADMIN_ grantor)? (IN_ catalog = identifier)?           # createRole
     | DROP_ ROLE_ name = identifier (IN_ catalog = identifier)?                                     # dropRole
     | GRANT_ roles TO_ principal (COMMA_ principal)* (WITH_ ADMIN_ OPTION_)? (GRANTED_ BY_ grantor)? (
@@ -135,32 +146,44 @@ statement
     | SHOW_ CATALOGS_ (LIKE_ pattern = string_ (ESCAPE_ escape = string_)?)? # showCatalogs
     | SHOW_ COLUMNS_ (FROM_ | IN_) qualifiedName? (
         LIKE_ pattern = string_ (ESCAPE_ escape = string_)?
-    )?                                                                        # showColumns
-    | SHOW_ STATS_ FOR_ qualifiedName                                         # showStats
-    | SHOW_ STATS_ FOR_ LPAREN_ query RPAREN_                                 # showStatsForQuery
-    | SHOW_ CURRENT_? ROLES_ ((FROM_ | IN_) identifier)?                      # showRoles
-    | SHOW_ ROLE_ GRANTS_ ((FROM_ | IN_) identifier)?                         # showRoleGrants
-    | DESCRIBE_ qualifiedName                                                 # showColumns
-    | DESC_ qualifiedName                                                     # showColumns
-    | SHOW_ FUNCTIONS_ (LIKE_ pattern = string_ (ESCAPE_ escape = string_)?)? # showFunctions
-    | SHOW_ SESSION_ (LIKE_ pattern = string_ (ESCAPE_ escape = string_)?)?   # showSession
-    | SET_ SESSION_ qualifiedName EQ_ expression                              # setSession
-    | RESET_ SESSION_ AUTHORIZATION_                                          # resetSessionAuthorization
-    | RESET_ SESSION_ qualifiedName                                           # resetSession
-    | START_ TRANSACTION_ (transactionMode (COMMA_ transactionMode)*)?        # startTransaction
-    | COMMIT_ WORK_?                                                          # commit
-    | ROLLBACK_ WORK_?                                                        # rollback
-    | PREPARE_ identifier FROM_ statement                                     # prepare
-    | DEALLOCATE_ PREPARE_ identifier                                         # deallocate
-    | EXECUTE_ identifier (USING_ expression (COMMA_ expression)*)?           # execute
-    | DESCRIBE_ INPUT_ identifier                                             # describeInput
-    | DESCRIBE_ OUTPUT_ identifier                                            # describeOutput
-    | SET_ PATH_ pathSpecification                                            # setPath
-    | SET_ TIME_ ZONE_ (LOCAL_ | expression)                                  # setTimeZone
+    )?                                                   # showColumns
+    | SHOW_ STATS_ FOR_ qualifiedName                    # showStats
+    | SHOW_ STATS_ FOR_ LPAREN_ rootQuery RPAREN_        # showStatsForQuery
+    | SHOW_ CURRENT_? ROLES_ ((FROM_ | IN_) identifier)? # showRoles
+    | SHOW_ ROLE_ GRANTS_ ((FROM_ | IN_) identifier)?    # showRoleGrants
+    | DESCRIBE_ qualifiedName                            # showColumns
+    | DESC_ qualifiedName                                # showColumns
+    | SHOW_ FUNCTIONS_ ((FROM_ | IN_) qualifiedName)? (
+        LIKE_ pattern = string_ (ESCAPE_ escape = string_)?
+    )?                                                                      # showFunctions
+    | SHOW_ SESSION_ (LIKE_ pattern = string_ (ESCAPE_ escape = string_)?)? # showSession
+    | SET_ SESSION_ AUTHORIZATION_ authorizationUser                        # setSessionAuthorization
+    | RESET_ SESSION_ AUTHORIZATION_                                        # resetSessionAuthorization
+    | SET_ SESSION_ qualifiedName EQ_ expression                            # setSession
+    | RESET_ SESSION_ qualifiedName                                         # resetSession
+    | START_ TRANSACTION_ (transactionMode (COMMA_ transactionMode)*)?      # startTransaction
+    | COMMIT_ WORK_?                                                        # commit
+    | ROLLBACK_ WORK_?                                                      # rollback
+    | PREPARE_ identifier FROM_ statement                                   # prepare
+    | DEALLOCATE_ PREPARE_ identifier                                       # deallocate
+    | EXECUTE_ identifier (USING_ expression (COMMA_ expression)*)?         # execute
+    | EXECUTE_ IMMEDIATE_ string_ (USING_ expression (COMMA_ expression)*)? # executeImmediate
+    | DESCRIBE_ INPUT_ identifier                                           # describeInput
+    | DESCRIBE_ OUTPUT_ identifier                                          # describeOutput
+    | SET_ PATH_ pathSpecification                                          # setPath
+    | SET_ TIME_ ZONE_ (LOCAL_ | expression)                                # setTimeZone
     | UPDATE_ qualifiedName SET_ updateAssignment (COMMA_ updateAssignment)* (
         WHERE_ where = booleanExpression
     )?                                                                                        # update
     | MERGE_ INTO_ qualifiedName (AS_? identifier)? USING_ relation ON_ expression mergeCase+ # merge
+    ;
+
+rootQuery
+    : withFunction? query
+    ;
+
+withFunction
+    : WITH_ functionSpecification (COMMA_ functionSpecification)*
     ;
 
 query
@@ -474,7 +497,7 @@ primaryExpression
     | ROW_ LPAREN_ expression (COMMA_ expression)* RPAREN_          # rowConstructor
     | name = LISTAGG_ LPAREN_ setQuantifier? expression (COMMA_ string_)? (
         ON_ OVERFLOW_ listAggOverflowBehavior
-    )? RPAREN_ (WITHIN_ GROUP_ LPAREN_ ORDER_ BY_ sortItem (COMMA_ sortItem)* RPAREN_)                 # listagg
+    )? RPAREN_ (WITHIN_ GROUP_ LPAREN_ ORDER_ BY_ sortItem (COMMA_ sortItem)* RPAREN_) filter?         # listagg
     | processingMode? qualifiedName LPAREN_ (label = identifier DOT_)? ASTERISK_ RPAREN_ filter? over? # functionCall
     | processingMode? qualifiedName LPAREN_ (setQuantifier? expression (COMMA_ expression)*)? (
         ORDER_ BY_ sortItem (COMMA_ sortItem)*
@@ -636,17 +659,17 @@ normalForm
     ;
 
 type
-    : ROW_ LPAREN_ rowField (COMMA_ rowField)* RPAREN_                                       # rowType
-    | INTERVAL_ from = intervalField (TO_ to = intervalField)?                               # intervalType
-    | base = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)? # dateTimeType
-    | base = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_       # dateTimeType
-    | base = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)?      # dateTimeType
-    | base = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_            # dateTimeType
-    | DOUBLE_ PRECISION_                                                                     # doublePrecisionType
-    | ARRAY_ LT_ type GT_                                                                    # legacyArrayType
-    | MAP_ LT_ keyType = type COMMA_ valueType = type GT_                                    # legacyMapType
-    | type ARRAY_ (LSQUARE_ INTEGER_VALUE_ RSQUARE_)?                                        # arrayType
-    | identifier (LPAREN_ typeParameter (COMMA_ typeParameter)* RPAREN_)?                    # genericType
+    : ROW_ LPAREN_ rowField (COMMA_ rowField)* RPAREN_                                        # rowType
+    | INTERVAL_ from = intervalField (TO_ to = intervalField)?                                # intervalType
+    | base_ = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)? # dateTimeType
+    | base_ = TIMESTAMP_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_       # dateTimeType
+    | base_ = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? (WITHOUT_ TIME_ ZONE_)?      # dateTimeType
+    | base_ = TIME_ (LPAREN_ precision = typeParameter RPAREN_)? WITH_ TIME_ ZONE_            # dateTimeType
+    | DOUBLE_ PRECISION_                                                                      # doublePrecisionType
+    | ARRAY_ LT_ type GT_                                                                     # legacyArrayType
+    | MAP_ LT_ keyType = type COMMA_ valueType = type GT_                                     # legacyMapType
+    | type ARRAY_ (LSQUARE_ INTEGER_VALUE_ RSQUARE_)?                                         # arrayType
+    | identifier (LPAREN_ typeParameter (COMMA_ typeParameter)* RPAREN_)?                     # genericType
     ;
 
 rowField
@@ -768,6 +791,65 @@ pathSpecification
     : pathElement (COMMA_ pathElement)*
     ;
 
+functionSpecification
+    : FUNCTION_ functionDeclaration returnsClause routineCharacteristic* controlStatement
+    ;
+
+functionDeclaration
+    : qualifiedName LPAREN_ (parameterDeclaration (COMMA_ parameterDeclaration)*)? RPAREN_
+    ;
+
+parameterDeclaration
+    : identifier? type
+    ;
+
+returnsClause
+    : RETURNS_ type
+    ;
+
+routineCharacteristic
+    : LANGUAGE_ identifier            # languageCharacteristic
+    | NOT_? DETERMINISTIC_            # deterministicCharacteristic
+    | RETURNS_ NULL_ ON_ NULL_ INPUT_ # returnsNullOnNullInputCharacteristic
+    | CALLED_ ON_ NULL_ INPUT_        # calledOnNullInputCharacteristic
+    | SECURITY_ (DEFINER_ | INVOKER_) # securityCharacteristic
+    | COMMENT_ string_                # commentCharacteristic
+    ;
+
+controlStatement
+    : RETURN_ valueExpression                                                              # returnStatement
+    | SET_ identifier EQ_ expression                                                       # assignmentStatement
+    | CASE_ expression caseStatementWhenClause+ elseClause? END_ CASE_                     # simpleCaseStatement
+    | CASE_ caseStatementWhenClause+ elseClause? END_ CASE_                                # searchedCaseStatement
+    | IF_ expression THEN_ sqlStatementList elseIfClause* elseClause? END_ IF_             # ifStatement
+    | ITERATE_ identifier                                                                  # iterateStatement
+    | LEAVE_ identifier                                                                    # leaveStatement
+    | BEGIN_ (variableDeclaration SEMICOLON_)* sqlStatementList? END_                      # compoundStatement
+    | (label = identifier COLON_)? LOOP_ sqlStatementList END_ LOOP_                       # loopStatement
+    | (label = identifier COLON_)? WHILE_ expression DO_ sqlStatementList END_ WHILE_      # whileStatement
+    | (label = identifier COLON_)? REPEAT_ sqlStatementList UNTIL_ expression END_ REPEAT_ # repeatStatement
+    ;
+
+caseStatementWhenClause
+    : WHEN_ expression THEN_ sqlStatementList
+    ;
+
+elseIfClause
+    : ELSEIF_ expression THEN_ sqlStatementList
+    ;
+
+elseClause
+    : ELSE_ sqlStatementList
+    ;
+
+variableDeclaration
+    : DECLARE_ identifier (COMMA_ identifier)* type (DEFAULT_ valueExpression)?
+    ;
+
+sqlStatementList
+    : (controlStatement SEMICOLON_)+
+    ;
+
 privilege
     : CREATE_
     | SELECT_
@@ -819,6 +901,11 @@ number
     | MINUS_? INTEGER_VALUE_ # integerLiteral
     ;
 
+authorizationUser
+    : identifier # identifierUser
+    | string_    # stringUser
+    ;
+
 nonReserved
     // IMPORTANT: this rule must only contain tokens. Nested rules are not supported. See SqlParser.exitNonReserved
     : ABSENT_
@@ -832,10 +919,13 @@ nonReserved
     | ASC_
     | AT_
     | AUTHORIZATION_
+    | BEGIN_
     | BERNOULLI_
     | BOTH_
     | CALL_
+    | CALLED_
     | CASCADE_
+    | CATALOG_
     | CATALOGS_
     | COLUMN_
     | COLUMNS_
@@ -849,13 +939,18 @@ nonReserved
     | DATA_
     | DATE_
     | DAY_
+    | DECLARE_
     | DEFAULT_
     | DEFINE_
     | DEFINER_
+    | DENY_
     | DESC_
     | DESCRIPTOR_
+    | DETERMINISTIC_
     | DISTRIBUTED_
+    | DO_
     | DOUBLE_
+    | ELSEIF_
     | EMPTY_
     | ENCODING_
     | ERROR_
@@ -867,10 +962,10 @@ nonReserved
     | FIRST_
     | FOLLOWING_
     | FORMAT_
+    | FUNCTION_
     | FUNCTIONS_
     | GRACE_
     | GRANT_
-    | DENY_
     | GRANTED_
     | GRANTS_
     | GRAPHVIZ_
@@ -878,24 +973,29 @@ nonReserved
     | HOUR_
     | IF_
     | IGNORE_
+    | IMMEDIATE_
     | INCLUDING_
     | INITIAL_
     | INPUT_
     | INTERVAL_
     | INVOKER_
     | IO_
+    | ITERATE_
     | ISOLATION_
     | JSON_
     | KEEP_
     | KEY_
     | KEYS_
+    | LANGUAGE_
     | LAST_
     | LATERAL_
     | LEADING_
+    | LEAVE_
     | LEVEL_
     | LIMIT_
     | LOCAL_
     | LOGICAL_
+    | LOOP_
     | MAP_
     | MATCH_
     | MATCHED_
@@ -906,6 +1006,7 @@ nonReserved
     | MERGE_
     | MINUTE_
     | MONTH_
+    | NESTED_
     | NEXT_
     | NFC_
     | NFD_
@@ -935,6 +1036,7 @@ nonReserved
     | PER_
     | PERIOD_
     | PERMUTE_
+    | PLAN_
     | POSITION_
     | PRECEDING_
     | PRECISION_
@@ -946,12 +1048,15 @@ nonReserved
     | READ_
     | REFRESH_
     | RENAME_
+    | REPEAT_
     | REPEATABLE_
     | REPLACE_
     | RESET_
     | RESPECT_
     | RESTRICT_
+    | RETURN_
     | RETURNING_
+    | RETURNS_
     | REVOKE_
     | ROLE_
     | ROLES_
@@ -995,6 +1100,7 @@ nonReserved
     | UNIQUE_
     | UNKNOWN_
     | UNMATCHED_
+    | UNTIL_
     | UPDATE_
     | USE_
     | USER_
@@ -1006,6 +1112,7 @@ nonReserved
     | VERBOSE_
     | VERSION_
     | VIEW_
+    | WHILE_
     | WINDOW_
     | WITHIN_
     | WITHOUT_

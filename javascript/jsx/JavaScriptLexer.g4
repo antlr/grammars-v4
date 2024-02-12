@@ -6,6 +6,7 @@
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
  * Copyright (c) 2019 by Student Main (contributor -> ES2020)
+ * Copyright (c) 2024 by Andrew Leppard (www.wegrok.review)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -45,13 +46,14 @@ options {
 
 HashBangLine: { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
 
+JsxElementBegin  : '<' {this.IsJsxPossible()}? -> pushMode(JSX_OPENING_ELEMENT);
+
 OpenBracket                : '[';
 CloseBracket               : ']';
 OpenParen                  : '(';
 CloseParen                 : ')';
-OpenBrace                  : '{' {this.ProcessOpenBrace();};
-TemplateCloseBrace         :     {this.IsInTemplateString()}? '}' -> popMode;
-CloseBrace                 : '}' {this.ProcessCloseBrace();};
+OpenBrace                  : '{' {this.ProcessOpenBrace();} -> pushMode(DEFAULT_MODE);
+CloseBrace                 : '}' {this.ProcessCloseBrace();} -> popMode;
 SemiColon                  : ';';
 Comma                      : ',';
 Assign                     : '=';
@@ -223,31 +225,47 @@ BackTickInside                : '`'  {this.DecreaseTemplateDepth();} -> type(Bac
 TemplateStringStartExpression : '${' -> pushMode(DEFAULT_MODE);
 TemplateStringAtom            : ~[`];
 
+// Lexer mode for JSX opening elements.
+// See https://github.com/facebook/jsx?tab=readme-ov-file
+// and https://facebook.github.io/jsx/ for more information
 //
-// html tag declarations
-//
-mode TAG;
+// e.g. <DropDownMenu...>
+//      <DropDownMenu.../>
+mode JSX_OPENING_ELEMENT;
 
-TagOpen  : LessThan -> pushMode(TAG);
-TagClose : MoreThan -> popMode;
+JsxOpeningElementBegin  : '<' -> pushMode(JSX_OPENING_ELEMENT);
+JsxOpeningElementEnd : '>' -> popMode, pushMode(JSX_CHILDREN);
+JsxOpeningElementSlashEnd: '/>' -> popMode;
+JsxAssign : '=';
+JsxOpeningElementOpenBrace: '{' {this.ProcessOpenBrace();} -> pushMode(DEFAULT_MODE);
+JsxOpeningElementId: TagNameStartChar TagNameChar*;
+JsxOpeningElementWhiteSpaces: [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
+JsxOpeningElementLineTerminator: [\r\n\u2028\u2029] -> channel(HIDDEN);
+JsxOpeningElementMultiLineComment  : '/*' .*? '*/'             -> channel(HIDDEN);
+JsxOpeningElementSingleLineComment : '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
+JsxAttributeValue: DoubleQuoteString | SingleQuoteString | AttributeChar | HexChars | DecChars;
 
-TagSlashClose: '/>' -> popMode;
+// Lexer mode for JSX child elements, e.g.
+// <DropDownMenu>
+//     <child elements>
+// </DropDownMenu>
+mode JSX_CHILDREN;
 
-TagSlash: Divide;
+HtmlChardata
+    : ~('<' | '{')+
+    ;
 
-TagName: TagNameStartChar TagNameChar*;
+JsxChildrenOpeningElementBegin  : '<' -> pushMode(JSX_OPENING_ELEMENT);
+JsxChildrenClosingElementSlashBegin: '</' -> popMode, pushMode(JSX_CLOSING_ELEMENT);
+JsxChildrenOpenBrace            : '{' {this.ProcessOpenBrace();} -> pushMode(DEFAULT_MODE);
 
-// an attribute value may have spaces b/t the '=' and the value
-AttributeValue: [ ]* Attribute -> popMode;
+// Lexer mode for JSX closing elements, e.g. </DropDownMenu>
+mode JSX_CLOSING_ELEMENT;
 
-Attribute: DoubleQuoteString | SingleQuoteString | AttributeChar | HexChars | DecChars;
-
-//
-// lexing mode for attribute values
-//
-mode ATTVALUE;
-
-TagEquals: Assign -> pushMode(ATTVALUE);
+JsxClosingElementEnd: '>' -> popMode;
+JsxClosingElementId: TagNameStartChar TagNameChar*;
+JsxClosingElementLineTerminator: [\r\n\u2028\u2029] -> channel(HIDDEN);
+JsxClosingElementWhiteSpaces: [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
 // Fragment rules
 fragment AttributeChar:
@@ -271,8 +289,8 @@ fragment HexChars: '#' [0-9a-fA-F]+;
 
 fragment DecChars: [0-9]+ '%'?;
 
-fragment DoubleQuoteString : '"' ~[<"]* '"';
-fragment SingleQuoteString : '\'' ~[<']* '\'';
+fragment DoubleQuoteString : '"' ~["]* '"';
+fragment SingleQuoteString : '\'' ~[']* '\'';
 
 fragment TagNameStartChar:
     [:a-zA-Z]
