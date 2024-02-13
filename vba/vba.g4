@@ -278,7 +278,7 @@ constStmt
     ;
 
 constSubStmt
-    : ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt (typeHint?)
+    : ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt typeHint?
     ;
 
 dateStmt
