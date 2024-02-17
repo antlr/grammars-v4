@@ -28,3 +28,8 @@ AS SELECT XMLELEMENT("Warehouse",
                                parking as "Parking",
                                VClearance as "VClearance"))
    FROM warehouse_table;
+
+CREATE VIEW THE_VIEW IF NOT EXISTS AS
+SELECT ID, NAME
+FROM THE_TABLE
+WHERE ID > 10;

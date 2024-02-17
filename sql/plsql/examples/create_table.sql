@@ -415,6 +415,8 @@ CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMO
 CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR WRITE;
 CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR WRITE;
 
+CREATE TABLE tab IF NOT EXISTS (ID number(9) primary key);
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE
