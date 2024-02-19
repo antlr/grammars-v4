@@ -118,27 +118,11 @@ predefinedType
     ;
 
 typeReference
-    : typeName nestedTypeGeneric?
+    : typeName typeGeneric?
     ;
 
-nestedTypeGeneric
-    : typeIncludeGeneric
-    | typeGeneric
-    ;
-
-// I tried recursive include, but it's not working.
-// typeGeneric
-//    : '<' typeArgumentList typeGeneric?'>'
-//    ;
-//
-// TODO: Fix recursive
-//
 typeGeneric
-    : '<' typeArgumentList '>'
-    ;
-
-typeIncludeGeneric
-    : '<' typeArgumentList '<' typeArgumentList ('>' bindingPattern '>' | '>>')
+    : '<' typeArgumentList typeGeneric?'>'
     ;
 
 typeName
@@ -741,8 +725,8 @@ singleExpression
     | Class Identifier? typeParameters? classHeritage classTail   # ClassExpression
     | singleExpression '?.'? '[' expressionSequence ']'           # MemberIndexExpression
     | singleExpression '?.' singleExpression                      # OptionalChainExpression
-    | singleExpression '!'? '.' '#'? identifierName nestedTypeGeneric? # MemberDotExpression
-    | singleExpression '?'? '.' '#'? identifierName nestedTypeGeneric? # MemberDotExpression
+    | singleExpression '!'? '.' '#'? identifierName typeGeneric?  # MemberDotExpression
+    | singleExpression '?'? '.' '#'? identifierName typeGeneric?  # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression typeArguments? arguments                   # NewExpression
     | New singleExpression typeArguments?                             # NewExpression
@@ -763,7 +747,7 @@ singleExpression
     | singleExpression ('*' | '/' | '%') singleExpression             # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                   # AdditiveExpression
     | singleExpression '??' singleExpression                          # CoalesceExpression    
-    | singleExpression ('<<' | '>>' | '>>>') singleExpression         # BitShiftExpression
+    | singleExpression ('<<' | '>' '>' | '>' '>' '>') singleExpression # BitShiftExpression
     | singleExpression ('<' | '>' | '<=' | '>=') singleExpression     # RelationalExpression
     | singleExpression Instanceof singleExpression                    # InstanceofExpression
     | singleExpression In singleExpression                            # InExpression

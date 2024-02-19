@@ -39,7 +39,6 @@ function Greet(greeting: string, ...names: string[]) {
     return greeting + " " + names.join(", ") + "!";
 }
 
-
 function Test(value: TestClass | TestClass2): value is TestClass {
     return (<TestClass>value).someFunction !== undefined;
 }
@@ -48,4 +47,11 @@ function buildName(firstName: string, lastName?: string) {
     if (lastName) return firstName + " " + lastName;
     else return firstName;
   }
-  
+
+// Try passing a nested type to the function. This tests we don't match ">>" and ">>>" symbols.
+function nestedType(map: Map<string, Map<string, Set<string>>>) {
+    // Check that we can parse these too.
+    let a = 12;
+    let b = a >> 5;
+    let c = b >>> 5;
+}
