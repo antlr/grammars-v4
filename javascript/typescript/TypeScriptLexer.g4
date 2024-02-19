@@ -171,9 +171,6 @@ Symbol  : 'symbol';
 
 TypeAlias: 'type';
 
-Get : 'get';
-Set : 'set';
-
 Constructor : 'constructor';
 Namespace   : 'namespace';
 Require     : 'require';

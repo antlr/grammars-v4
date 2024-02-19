@@ -349,11 +349,14 @@ sourceElement
 
 statement
     : block
+    | variableStatement    
     | importStatement
     | exportStatement
     | emptyStatement_
     | abstractDeclaration //ADDED
     | classDeclaration
+    | functionDeclaration
+    | expressionStatement    
     | interfaceDeclaration //ADDED
     | namespaceDeclaration //ADDED
     | ifStatement
@@ -368,13 +371,10 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration
     | arrowFunctionDeclaration
     | generatorFunctionDeclaration
-    | variableStatement
     | typeAliasDeclaration //ADDED
     | enumDeclaration      //ADDED
-    | expressionStatement
     | Export statement
     ;
 
@@ -555,7 +555,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch '(' Identifier typeAnnotation? ')' block
+    : Catch ('(' Identifier typeAnnotation? ')')? block
     ;
 
 finallyProduction
@@ -567,7 +567,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function_ Identifier callSignature (('{' functionBody '}') | SemiColon)
+    : Async? Function_ Identifier callSignature (('{' functionBody '}') | SemiColon)
     ;
 
 //Ovveride ECMA
@@ -615,11 +615,11 @@ indexMemberDeclaration
     ;
 
 generatorMethod
-    : '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : (Async {this.notLineTerminator()}?)? '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorFunctionDeclaration
-    : Function_ '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorBlock
@@ -636,6 +636,15 @@ iteratorBlock
 
 iteratorDefinition
     : '[' singleExpression ']' '(' formalParameterList? ')' '{' functionBody '}'
+    ;
+
+classElementName
+    : propertyName
+    | privateIdentifier
+    ;
+
+privateIdentifier
+    : '#' identifierName
     ;
 
 formalParameterList
@@ -687,6 +696,7 @@ propertyAssignment
     | setAccessor                                   # PropertySetter
     | generatorMethod                               # MethodProperty
     | identifierOrKeyWord                           # PropertyShorthand
+    | Ellipsis? singleExpression                    # SpreadOperator
     | restParameter                                 # RestParameterInObject
     ;
 
@@ -728,6 +738,7 @@ functionExpressionDeclaration
 singleExpression
     : functionExpressionDeclaration                               # FunctionExpression
     | arrowFunctionDeclaration                                    # ArrowFunctionExpression // ECMAScript 6
+    | Class Identifier? typeParameters? classHeritage classTail   # ClassExpression
     | singleExpression '?.'? '[' expressionSequence ']'           # MemberIndexExpression
     | singleExpression '?.' singleExpression                      # OptionalChainExpression
     | singleExpression '!'? '.' '#'? identifierName nestedTypeGeneric? # MemberDotExpression
@@ -852,11 +863,11 @@ bigintLiteral
     ;
 
 getter
-    : Get propertyName
+    : {this.n("get")}? Identifier classElementName
     ;
 
 setter
-    : Set propertyName
+    : {this.n("set")}? Identifier classElementName
     ;
 
 identifierName
@@ -924,8 +935,6 @@ keyword
     | ReadOnly
     | From
     | As
-    | Get
-    | Set
     | Require
     | TypeAlias
     | String
