@@ -6,6 +6,7 @@
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
  * Copyright (c) 2019 by Andrii Artiushok (contributor -> added TypeScript support)
+ * Copyright (c) 2024 by Andrew Leppard (www.wegrok.review)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -51,7 +52,6 @@ bindingPattern
 
 // TypeScript SPart
 // A.1 Types
-
 typeParameters
     : '<' typeParameterList? '>'
     ;
@@ -109,6 +109,7 @@ primaryType
 
 predefinedType
     : Any
+    | NullLiteral
     | Number
     | Boolean
     | String
@@ -390,19 +391,72 @@ abstractDeclaration
     ;
 
 importStatement
-    : Import (fromBlock | importAliasDeclaration)
+    : Import importFromBlock
     ;
 
-fromBlock
-    : (Multiply | multipleImportStatement) (As identifierName)? From StringLiteral eos
+importFromBlock
+    : importDefault? (importNamespace | importModuleItems) importFrom eos
+    | StringLiteral eos
     ;
 
-multipleImportStatement
-    : (identifierName ',')? '{' identifierName (',' identifierName)* '}'
+importModuleItems
+    : '{' (importAliasName ',')* (importAliasName ','?)? '}'
+    ;
+
+importAliasName
+    : moduleExportName (As importedBinding)?
+    ;
+
+moduleExportName
+    : identifierName
+    | StringLiteral
+    ;
+
+// yield and await are permitted as BindingIdentifier in the grammar
+importedBinding
+    : Identifier
+    | Yield
+    | Await
+    ;
+
+importDefault
+    : aliasName ','
+    ;
+
+importNamespace
+    : ('*' | identifierName) (As identifierName)?
+    ;
+
+importFrom
+    : From StringLiteral
+    ;
+
+aliasName
+    : identifierName (As identifierName)?
     ;
 
 exportStatement
-    : Export Default? (fromBlock | statement)
+    : Export Default? (exportFromBlock | declaration) eos # ExportDeclaration
+    | Export Default singleExpression eos                 # ExportDefaultDeclaration
+    ;
+
+exportFromBlock
+    : importNamespace importFrom eos
+    | exportModuleItems importFrom? eos
+    ;
+
+exportModuleItems
+    : '{' (exportAliasName ',')* (exportAliasName ','?)? '}'
+    ;
+
+exportAliasName
+    : moduleExportName (As moduleExportName)?
+    ;
+
+declaration
+    : variableStatement
+    | classDeclaration
+    | functionDeclaration
     ;
 
 variableStatement
@@ -501,7 +555,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch '(' Identifier ')' block
+    : Catch '(' Identifier typeAnnotation? ')' block
     ;
 
 finallyProduction
@@ -648,6 +702,7 @@ propertyName
     : identifierName
     | StringLiteral
     | numericLiteral
+    | '[' singleExpression ']'
     ;
 
 arguments
@@ -673,8 +728,10 @@ functionExpressionDeclaration
 singleExpression
     : functionExpressionDeclaration                               # FunctionExpression
     | arrowFunctionDeclaration                                    # ArrowFunctionExpression // ECMAScript 6
-    | singleExpression '[' expressionSequence ']'                 # MemberIndexExpression
-    | singleExpression '!'? '.' identifierName nestedTypeGeneric? # MemberDotExpression
+    | singleExpression '?.'? '[' expressionSequence ']'           # MemberIndexExpression
+    | singleExpression '?.' singleExpression                      # OptionalChainExpression
+    | singleExpression '!'? '.' '#'? identifierName nestedTypeGeneric? # MemberDotExpression
+    | singleExpression '?'? '.' '#'? identifierName nestedTypeGeneric? # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression typeArguments? arguments                   # NewExpression
     | New singleExpression typeArguments?                             # NewExpression
@@ -690,8 +747,11 @@ singleExpression
     | '-' singleExpression                                            # UnaryMinusExpression
     | '~' singleExpression                                            # BitNotExpression
     | '!' singleExpression                                            # NotExpression
+    | Await singleExpression                                          # AwaitExpression    
+    | <assoc = right> singleExpression '**' singleExpression          # PowerExpression    
     | singleExpression ('*' | '/' | '%') singleExpression             # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                   # AdditiveExpression
+    | singleExpression '??' singleExpression                          # CoalesceExpression    
     | singleExpression ('<<' | '>>' | '>>>') singleExpression         # BitShiftExpression
     | singleExpression ('<' | '>' | '<=' | '>=') singleExpression     # RelationalExpression
     | singleExpression Instanceof singleExpression                    # InstanceofExpression
@@ -752,6 +812,8 @@ assignmentOperator
     | '&='
     | '^='
     | '|='
+    | '**='
+    | '??='    
     ;
 
 literal
@@ -761,6 +823,7 @@ literal
     | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
+    | bigintLiteral
     ;
 
 templateStringLiteral
@@ -779,6 +842,21 @@ numericLiteral
     | OctalIntegerLiteral
     | OctalIntegerLiteral2
     | BinaryIntegerLiteral
+    ;
+
+bigintLiteral
+    : BigDecimalIntegerLiteral
+    | BigHexIntegerLiteral
+    | BigOctalIntegerLiteral
+    | BigBinaryIntegerLiteral
+    ;
+
+getter
+    : Get propertyName
+    ;
+
+setter
+    : Set propertyName
     ;
 
 identifierName
@@ -825,9 +903,6 @@ keyword
     | Delete
     | In
     | Try
-    | ReadOnly
-    | Async
-    | From
     | Class
     | Enum
     | Extends
@@ -844,6 +919,11 @@ keyword
     | Protected
     | Static
     | Yield
+    | Async
+    | Await        
+    | ReadOnly
+    | From
+    | As
     | Get
     | Set
     | Require
@@ -852,14 +932,6 @@ keyword
     | Boolean
     | Number
     | Module
-    ;
-
-getter
-    : Get propertyName
-    ;
-
-setter
-    : Set propertyName
     ;
 
 eos

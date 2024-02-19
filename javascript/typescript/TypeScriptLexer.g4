@@ -29,6 +29,7 @@ SemiColon                  : ';';
 Comma                      : ',';
 Assign                     : '=';
 QuestionMark               : '?';
+QuestionMarkDot            : '?.';
 Colon                      : ':';
 Ellipsis                   : '...';
 Dot                        : '.';
@@ -41,6 +42,9 @@ Not                        : '!';
 Multiply                   : '*';
 Divide                     : '/';
 Modulus                    : '%';
+Power                      : '**';
+NullCoalesce               : '??';
+Hashtag                    : '#';
 RightShiftArithmetic       : '>>';
 LeftShiftArithmetic        : '<<';
 RightShiftLogical          : '>>>';
@@ -68,6 +72,8 @@ RightShiftLogicalAssign    : '>>>=';
 BitAndAssign               : '&=';
 BitXorAssign               : '^=';
 BitOrAssign                : '|=';
+PowerAssign                : '**=';
+NullishCoalescingAssign    : '??=';
 ARROW                      : '=>';
 
 /// Null Literals
@@ -81,17 +87,22 @@ BooleanLiteral: 'true' | 'false';
 /// Numeric Literals
 
 DecimalLiteral:
-    DecimalIntegerLiteral '.' [0-9]* ExponentPart?
-    | '.' [0-9]+ ExponentPart?
+    DecimalIntegerLiteral '.' [0-9] [0-9_]* ExponentPart?
+    | '.' [0-9] [0-9_]* ExponentPart?
     | DecimalIntegerLiteral ExponentPart?
 ;
 
 /// Numeric Literals
 
-HexIntegerLiteral    : '0' [xX] HexDigit+;
+HexIntegerLiteral    : '0' [xX] [0-9a-fA-F] HexDigit*;
 OctalIntegerLiteral  : '0' [0-7]+ {!this.IsStrictMode()}?;
-OctalIntegerLiteral2 : '0' [oO] [0-7]+;
-BinaryIntegerLiteral : '0' [bB] [01]+;
+OctalIntegerLiteral2 : '0' [oO] [0-7] [_0-7]*;
+BinaryIntegerLiteral : '0' [bB] [01] [_01]*;
+
+BigHexIntegerLiteral     : '0' [xX] [0-9a-fA-F] HexDigit* 'n';
+BigOctalIntegerLiteral   : '0' [oO] [0-7] [_0-7]* 'n';
+BigBinaryIntegerLiteral  : '0' [bB] [01] [_01]* 'n';
+BigDecimalIntegerLiteral : DecimalIntegerLiteral 'n';
 
 /// Keywords
 
@@ -125,6 +136,7 @@ As         : 'as';
 From       : 'from';
 ReadOnly   : 'readonly';
 Async      : 'async';
+Await      : 'await';
 
 /// Future Reserved Words
 
@@ -223,7 +235,10 @@ fragment CharacterEscapeSequence: SingleEscapeCharacter | NonEscapeCharacter;
 
 fragment HexEscapeSequence: 'x' HexDigit HexDigit;
 
-fragment UnicodeEscapeSequence: 'u' HexDigit HexDigit HexDigit HexDigit;
+fragment UnicodeEscapeSequence:
+    'u' HexDigit HexDigit HexDigit HexDigit
+    | 'u' '{' HexDigit HexDigit+ '}'
+;
 
 fragment ExtendedUnicodeEscapeSequence: 'u' '{' HexDigit+ '}';
 
@@ -233,13 +248,13 @@ fragment NonEscapeCharacter: ~['"\\bfnrtv0-9xu\r\n];
 
 fragment EscapeCharacter: SingleEscapeCharacter | [0-9] | [xu];
 
-fragment LineContinuation: '\\' [\r\n\u2028\u2029];
+fragment LineContinuation: '\\' [\r\n\u2028\u2029]+;
 
-fragment HexDigit: [0-9a-fA-F];
+fragment HexDigit: [_0-9a-fA-F];
 
-fragment DecimalIntegerLiteral: '0' | [1-9] [0-9]*;
+fragment DecimalIntegerLiteral: '0' | [1-9] [0-9_]*;
 
-fragment ExponentPart: [eE] [+-]? [0-9]+;
+fragment ExponentPart: [eE] [+-]? [0-9_]+;
 
 fragment IdentifierPart: IdentifierStart | [\p{Mn}] | [\p{Nd}] | [\p{Pc}] | '\u200C' | '\u200D';
 
