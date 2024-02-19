@@ -45,9 +45,11 @@ Modulus                    : '%';
 Power                      : '**';
 NullCoalesce               : '??';
 Hashtag                    : '#';
-RightShiftArithmetic       : '>>';
 LeftShiftArithmetic        : '<<';
-RightShiftLogical          : '>>>';
+// We can't match these in the lexer because it would cause issues when parsing
+// types like Map<string, Map<string, string>>
+// RightShiftArithmetic       : '>>';
+// RightShiftLogical          : '>>>';
 LessThan                   : '<';
 MoreThan                   : '>';
 LessThanEquals             : '<=';
