@@ -1,16 +1,29 @@
+// TypeDefinition
+type Employee = {
+     id: string;
+     name: string;
+     address?: string; // Optional
+     phone?: string | null;
+};
+
 // TypeAnotation
 var age: number = 32; // number variable
 var name: string = "John";// string variable
 var isUpdated: boolean = true;// Boolean variable
 
-var employee : {
+var employee1 : {
     id: number;
     name: string;
 };
 
-employee = {
+employee1 = {
     id: 100,
     name : "John"
+}
+
+var employee2: Employee = {
+    id: 101,
+    name: "Steve"
 }
 
 function display(id:number, name:string)
