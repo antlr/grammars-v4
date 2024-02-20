@@ -1,0 +1,5 @@
+#!/bin/bash
+
+antlr4 -visitor -no-listener EiffelGrammar.g4
+javac EiffelGrammarMain.java
+
