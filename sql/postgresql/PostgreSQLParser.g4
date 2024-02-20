@@ -3125,11 +3125,11 @@ group_by_list
     ;
 
 group_by_item
-    : a_expr
-    | empty_grouping_set
+    : empty_grouping_set
     | cube_clause
     | rollup_clause
     | grouping_sets_clause
+    | a_expr
     ;
 
 empty_grouping_set
