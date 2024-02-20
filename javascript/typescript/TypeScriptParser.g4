@@ -476,8 +476,10 @@ iterationStatement
     | While '(' expressionSequence ')' statement                                                                            # WhileStatement
     | For '(' expressionSequence? SemiColon expressionSequence? SemiColon expressionSequence? ')' statement                 # ForStatement
     | For '(' varModifier variableDeclarationList SemiColon expressionSequence? SemiColon expressionSequence? ')' statement # ForVarStatement
-    | For '(' singleExpression (In | Identifier {this.p("of")}?) expressionSequence ')' statement                           # ForInStatement
-    | For '(' varModifier variableDeclaration (In | Identifier {this.p("of")}?) expressionSequence ')' statement            # ForVarInStatement
+    | For '(' singleExpression In expressionSequence ')' statement                                                          # ForInStatement
+    | For '(' varModifier variableDeclaration In expressionSequence ')' statement                                           # ForVarInStatement
+    | For Await? '(' singleExpression Identifier {this.p("of")}? expressionSequence ')' statement                           # ForOfStatement
+    | For Await? '(' varModifier variableDeclaration Identifier {this.p("of")}? expressionSequence ')' statement            # ForVarOfStatement
     ;
 
 varModifier
