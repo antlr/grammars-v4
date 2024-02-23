@@ -11,7 +11,9 @@ function processEntity(e?: Entity) {
   let s = e!.name;
   let t = e.name;
   let o = e!.obj!.i;
-  let p = e?.name;  
+  let p = e?.name;
+
+  let i = p!;
 }
 
 var e = null;
