@@ -16,3 +16,7 @@ for await (const document of array) {
 for await (const document: string of array) {
 
 };
+
+for (let [field, value] of Object.entries(object) as [string, any]) {
+
+};

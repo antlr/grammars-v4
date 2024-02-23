@@ -48,10 +48,16 @@ function buildName(firstName: string, lastName?: string) {
     else return firstName;
   }
 
-// Try passing a nested type to the function. This tests we don't match ">>" and ">>>" symbols.
+// Try passing a nested type to the function. This tests we don't match ">>" and ">>>" operators
+// when closing nested types.
 function nestedType(map: Map<string, Map<string, Set<string>>>) {
     // Check that we can parse these too.
     let a = 12;
     let b = a >> 5;
     let c = b >>> 5;
 }
+
+// Function parameter lists can have a trailing comma.
+// See https://github.com/Microsoft/TypeScript/issues/16152
+function TrailingComma(arg1: string, arg2: number,) {}
+var myFunction = function(arg1: string, arg2: number,) {};
