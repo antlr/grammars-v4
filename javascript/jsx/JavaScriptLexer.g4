@@ -161,6 +161,7 @@ In         : 'in';
 Try        : 'try';
 As         : 'as';
 From       : 'from';
+YieldStar  : 'yield*';
 
 /// Future Reserved Words
 

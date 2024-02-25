@@ -1580,7 +1580,7 @@ hier_attr_name
     ;
 
 create_index
-    : CREATE (UNIQUE | BITMAP)? INDEX index_name ON (
+    : CREATE (UNIQUE | BITMAP)? INDEX index_name (IF NOT EXISTS)? ON (
         cluster_index_clause
         | table_index_clause
         | bitmap_join_index_clause
@@ -1867,7 +1867,7 @@ alter_inmemory_join_group
     ;
 
 create_user
-    : CREATE USER user_object_name (
+    : CREATE USER user_object_name (IF NOT EXISTS)? (
         identified_by
         | identified_other_clause
         | user_tablespace_clause
@@ -1900,7 +1900,7 @@ alter_user
     ;
 
 drop_user
-    : DROP USER user_object_name CASCADE?
+    : DROP USER user_object_name (IF EXISTS)? CASCADE?
     ;
 
 alter_identified_by
@@ -2426,7 +2426,7 @@ sql_statement_shortcut
     ;
 
 drop_index
-    : DROP INDEX index_name
+    : DROP INDEX index_name (IF EXISTS)?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DISASSOCIATE-STATISTICS.html
@@ -2719,7 +2719,7 @@ alter_view_editionable
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-VIEW.html
 create_view
-    : CREATE (OR REPLACE)? (NO? FORCE)? editioning_clause? VIEW (schema_name '.')? v = id_expression (
+    : CREATE (OR REPLACE)? (NO? FORCE)? editioning_clause? VIEW (schema_name '.')? v = id_expression (IF NOT EXISTS)? (
         SHARING '=' (METADATA | EXTENDED? DATA | NONE)
     )? view_options? (DEFAULT COLLATION cn = id_expression)? (BEQUEATH (CURRENT_USER | DEFINER))? AS select_only_statement subquery_restriction_clause
         ? (CONTAINER_MAP | CONTAINERS_DEFAULT)?
@@ -2878,7 +2878,7 @@ create_tablespace
     ;
 
 permanent_tablespace_clause
-    : TABLESPACE id_expression datafile_specification? (
+    : TABLESPACE id_expression (IF NOT EXISTS)? datafile_specification? (
         MINIMUM EXTENT size_clause
         | BLOCKSIZE size_clause
         | logging_clause
@@ -2911,11 +2911,13 @@ segment_management_clause
     ;
 
 temporary_tablespace_clause
-    : TEMPORARY TABLESPACE tablespace_name = id_expression tempfile_specification? tablespace_group_clause? extent_management_clause?
+    : TEMPORARY TABLESPACE tablespace_name = id_expression
+        (IF NOT EXISTS)? tempfile_specification? tablespace_group_clause? extent_management_clause?
     ;
 
 undo_tablespace_clause
-    : UNDO TABLESPACE tablespace_name = id_expression datafile_specification? extent_management_clause? tablespace_retention_clause?
+    : UNDO TABLESPACE tablespace_name = id_expression
+        (IF NOT EXISTS)? datafile_specification? extent_management_clause? tablespace_retention_clause?
     ;
 
 tablespace_retention_clause
@@ -3377,7 +3379,7 @@ create_table
         | DUPLICATED
         | IMMUTABLE? BLOCKCHAIN
         | IMMUTABLE
-    )? TABLE (schema_name '.')? table_name (SHARING '=' (METADATA | EXTENDED? DATA | NONE))? (
+    )? TABLE (schema_name '.')? table_name (IF NOT EXISTS)? (SHARING '=' (METADATA | EXTENDED? DATA | NONE))? (
         relational_table
         | xmltype_table
         | object_table
@@ -4015,12 +4017,12 @@ truncate_table
     ;
 
 drop_table
-    : DROP TABLE tableview_name PURGE?
+    : DROP TABLE tableview_name (IF EXISTS)? PURGE?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
 drop_tablespace
-    : DROP TABLESPACE ts = id_expression ((DROP | KEEP) QUOTA?)? including_contents_clause?
+    : DROP TABLESPACE ts = id_expression (IF EXISTS)? ((DROP | KEEP) QUOTA?)? including_contents_clause?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE-SET.html
@@ -4033,7 +4035,7 @@ including_contents_clause
     ;
 
 drop_view
-    : DROP VIEW tableview_name (CASCADE CONSTRAINT)?
+    : DROP VIEW tableview_name (IF EXISTS)? (CASCADE CONSTRAINT)?
     ;
 
 comment_on_column
@@ -5909,7 +5911,7 @@ subquery_operation_part
     ;
 
 query_block
-    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list into_clause? from_clause where_clause? (hierarchical_query_clause | group_by_clause)* model_clause?
+    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list into_clause? from_clause? where_clause? (hierarchical_query_clause | group_by_clause)* model_clause?
         order_by_clause? fetch_clause?
     ;
 

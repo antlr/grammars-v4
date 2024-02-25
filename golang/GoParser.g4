@@ -32,6 +32,8 @@
 
 parser grammar GoParser;
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab = GoLexer;
     superClass = GoParserBase;
