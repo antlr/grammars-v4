@@ -169,6 +169,8 @@ Try        : 'try';
 As         : 'as';
 From       : 'from';
 Of         : 'of';
+Yield      : 'yield';
+YieldStar  : 'yield*';
 
 /// Future Reserved Words
 
@@ -182,7 +184,6 @@ Import  : 'import';
 
 Async : 'async';
 Await : 'await';
-Yield : 'yield';
 
 /// The following tokens are also considered to be FutureReservedWords
 /// when parsing strict mode

@@ -200,7 +200,7 @@ returnStatement
     ;
 
 yieldStatement
-    : Yield ({this.notLineTerminator()}? expressionSequence)? eos
+    : (Yield | YieldStar) ({this.notLineTerminator()}? expressionSequence)? eos
     ;
 
 withStatement
@@ -314,8 +314,9 @@ arrayLiteral
     : ('[' elementList ']')
     ;
 
+// JavaScript supports arrasys like [,,1,2,,].
 elementList
-    : ','* arrayElement? (','+ arrayElement)* ','* // Yes, everything is optional
+    : ','* arrayElement? (','+ arrayElement) * ','* // Yes, everything is optional
     ;
 
 arrayElement
@@ -420,7 +421,8 @@ objectLiteral
     ;
 
 anonymousFunction
-    : Async? Function_ '*'? '(' formalParameterList? ')' functionBody # AnonymousFunctionDecl
+    : functionDeclaration                                             # NamedFunction
+    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody           # ArrowFunction
     ;
 
@@ -556,6 +558,7 @@ keyword
     | Protected
     | Static
     | Yield
+    | YieldStar    
     | Async
     | Await
     | From
