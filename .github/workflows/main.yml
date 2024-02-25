@@ -23,7 +23,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v4.0.0
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Install Trash
       shell: bash
       run: |
@@ -73,7 +73,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v4.0.0
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -180,7 +180,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v4.0.0
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
