@@ -61,7 +61,8 @@ typeParameterList
     ;
 
 typeParameter
-    : Identifier constraint?
+    : identifier constraint?
+    | identifier '=' typeArgument
     | typeParameters
     ;
 
@@ -81,12 +82,13 @@ typeArgument
     : type_
     ;
 
+// Union and intersection types can have a leading '|' or '&'
+// See https://github.com/microsoft/TypeScript/pull/12386
 type_
-    : unionOrIntersectionOrPrimaryType
+    : ('|' | '&')? unionOrIntersectionOrPrimaryType
     | functionType
     | constructorType
     | typeGeneric
-    | StringLiteral
     ;
 
 unionOrIntersectionOrPrimaryType
@@ -100,20 +102,27 @@ primaryType
     | predefinedType                             # PredefinedPrimType
     | typeReference                              # ReferencePrimType
     | objectType                                 # ObjectPrimType
-    | primaryType {notLineTerminator()}? '[' ']' # ArrayPrimType
+    | primaryType {notLineTerminator()}? '[' primaryType? ']' # ArrayPrimType
     | '[' tupleElementTypes ']'                  # TuplePrimType
     | typeQuery                                  # QueryPrimType
     | This                                       # ThisPrimType
     | typeReference Is primaryType               # RedefinitionOfType
+    | KeyOf primaryType                          # KeyOfType
     ;
 
 predefinedType
     : Any
     | NullLiteral
     | Number
+    | DecimalLiteral
     | Boolean
+    | BooleanLiteral
     | String
-    | Symbol
+    | StringLiteral
+    | Unique? Symbol
+    | Never
+    | Undefined
+    | Object
     | Void
     ;
 
@@ -126,7 +135,7 @@ typeGeneric
     ;
 
 typeName
-    : Identifier
+    : identifier
     | namespaceName
     ;
 
@@ -158,8 +167,9 @@ tupleType
     : '[' tupleElementTypes ']'
     ;
 
+// Tuples can have a trailing comma. See https://github.com/Microsoft/TypeScript/issues/28893
 tupleElementTypes
-    : type_ (',' type_)*
+    : type_ (',' type_)* ','?
     ;
 
 functionType
@@ -175,7 +185,7 @@ typeQuery
     ;
 
 typeQueryExpression
-    : Identifier
+    : identifier
     | (identifierName '.')+ identifierName
     ;
 
@@ -191,9 +201,11 @@ callSignature
     : typeParameters? '(' parameterList? ')' typeAnnotation?
     ;
 
+// Function parameter list can have a trailing comma.
+// See https://github.com/Microsoft/TypeScript/issues/16152
 parameterList
     : restParameter
-    | parameter (',' parameter)* (',' restParameter)?
+    | parameter (',' parameter)* (',' restParameter)? ','?
     ;
 
 requiredParameterList
@@ -238,7 +250,7 @@ constructSignature
     ;
 
 indexSignature
-    : '[' Identifier ':' (Number | String) ']' typeAnnotation
+    : '[' identifier ':' (Number | String) ']' typeAnnotation
     ;
 
 methodSignature
@@ -246,7 +258,7 @@ methodSignature
     ;
 
 typeAliasDeclaration
-    : 'type' Identifier typeParameters? '=' type_ SemiColon
+    : Export? 'type' identifier typeParameters? '=' type_ eos
     ;
 
 constructorDeclaration
@@ -259,7 +271,7 @@ constructorDeclaration
 // A.5 Interface
 
 interfaceDeclaration
-    : Export? Declare? Interface Identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
+    : Export? Declare? Interface identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
     ;
 
 interfaceExtendsClause
@@ -273,7 +285,7 @@ classOrInterfaceTypeList
 // A.7 Interface
 
 enumDeclaration
-    : Const? Enum Identifier '{' enumBody? '}'
+    : Const? Enum identifier '{' enumBody? '}'
     ;
 
 enumBody
@@ -291,15 +303,15 @@ enumMember
 // A.8 Namespaces
 
 namespaceDeclaration
-    : Namespace namespaceName '{' statementList? '}'
+    : Declare? Namespace namespaceName '{' statementList? '}'
     ;
 
 namespaceName
-    : Identifier ('.'+ Identifier)*
+    : identifier ('.'+ identifier)*
     ;
 
 importAliasDeclaration
-    : Identifier '=' namespaceName SemiColon
+    : identifier '=' namespaceName SemiColon
     ;
 
 // Ext.2 Additions to 1.8: Decorators
@@ -313,7 +325,7 @@ decorator
     ;
 
 decoratorMemberExpression
-    : Identifier
+    : identifier
     | decoratorMemberExpression '.' identifierName
     | '(' singleExpression ')'
     ;
@@ -371,7 +383,7 @@ statementList
     ;
 
 abstractDeclaration
-    : Abstract (Identifier callSignature | variableStatement) eos
+    : Abstract (identifier callSignature | variableStatement) eos
     ;
 
 importStatement
@@ -478,8 +490,8 @@ iterationStatement
     | For '(' varModifier variableDeclarationList SemiColon expressionSequence? SemiColon expressionSequence? ')' statement # ForVarStatement
     | For '(' singleExpression In expressionSequence ')' statement                                                          # ForInStatement
     | For '(' varModifier variableDeclaration In expressionSequence ')' statement                                           # ForVarInStatement
-    | For Await? '(' singleExpression Identifier {this.p("of")}? expressionSequence ')' statement                           # ForOfStatement
-    | For Await? '(' varModifier variableDeclaration Identifier {this.p("of")}? expressionSequence ')' statement            # ForVarOfStatement
+    | For Await? '(' singleExpression identifier {this.p("of")}? expressionSequence (As type_)? ')' statement                            # ForOfStatement
+    | For Await? '(' varModifier variableDeclaration identifier {this.p("of")}? expressionSequence (As type_)? ')' statement             # ForVarOfStatement
     ;
 
 varModifier
@@ -489,11 +501,11 @@ varModifier
     ;
 
 continueStatement
-    : Continue ({this.notLineTerminator()}? Identifier)? eos
+    : Continue ({this.notLineTerminator()}? identifier)? eos
     ;
 
 breakStatement
-    : Break ({this.notLineTerminator()}? Identifier)? eos
+    : Break ({this.notLineTerminator()}? identifier)? eos
     ;
 
 returnStatement
@@ -501,7 +513,7 @@ returnStatement
     ;
 
 yieldStatement
-    : Yield ({this.notLineTerminator()}? expressionSequence)? eos
+    : (Yield | YieldStar) ({this.notLineTerminator()}? expressionSequence)? eos
     ;
 
 withStatement
@@ -529,7 +541,7 @@ defaultClause
     ;
 
 labelledStatement
-    : Identifier ':' statement
+    : identifier ':' statement
     ;
 
 throwStatement
@@ -541,7 +553,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch ('(' Identifier typeAnnotation? ')')? block
+    : Catch ('(' identifier typeAnnotation? ')')? block
     ;
 
 finallyProduction
@@ -553,12 +565,12 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function_ Identifier callSignature (('{' functionBody '}') | SemiColon)
+    : Async? Function_ identifier callSignature (('{' functionBody '}') | SemiColon)
     ;
 
 //Ovveride ECMA
 classDeclaration
-    : decoratorList? (Export Default?)? Abstract? Class Identifier typeParameters? classHeritage classTail
+    : decoratorList? (Export Default?)? Abstract? Class identifier typeParameters? classHeritage classTail
     ;
 
 classHeritage
@@ -601,11 +613,11 @@ indexMemberDeclaration
     ;
 
 generatorMethod
-    : (Async {this.notLineTerminator()}?)? '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : (Async {this.notLineTerminator()}?)? '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorFunctionDeclaration
-    : Async? Function_ '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*' identifier? '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorBlock
@@ -634,7 +646,7 @@ privateIdentifier
     ;
 
 formalParameterList
-    : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
+    : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)? ','?
     | lastFormalParameterArg
     | arrayLiteral                             // ECMAScript 6: Parameter Context Matching
     | objectLiteral (':' formalParameterList)? // ECMAScript 6: Parameter Context Matching
@@ -647,7 +659,7 @@ formalParameterArg
     ;
 
 lastFormalParameterArg // ECMAScript 6: Rest Parameter
-    : Ellipsis Identifier typeAnnotation?
+    : Ellipsis identifier typeAnnotation?
     ;
 
 functionBody
@@ -659,15 +671,16 @@ sourceElements
     ;
 
 arrayLiteral
-    : ('[' elementList? ']')
+    : ('[' elementList ']')
     ;
 
+// JavaScript supports arrasys like [,,1,2,,].
 elementList
-    : arrayElement (','+ arrayElement)*
+    : ','* arrayElement? (','+ arrayElement) * ','* // Yes, everything is optional
     ;
 
 arrayElement // ECMAScript 6: Spread Operator
-    : Ellipsis? (singleExpression | Identifier) ','?
+    : Ellipsis? (singleExpression | identifier) ','?
     ;
 
 objectLiteral
@@ -691,7 +704,7 @@ getAccessor
     ;
 
 setAccessor
-    : setter '(' (Identifier | bindingPattern) typeAnnotation? ')' '{' functionBody '}'
+    : setter '(' (identifier | bindingPattern) typeAnnotation? ')' '{' functionBody '}'
     ;
 
 propertyName
@@ -710,21 +723,16 @@ argumentList
     ;
 
 argument // ECMAScript 6: Spread Operator
-    : Ellipsis? (singleExpression | Identifier)
+    : Ellipsis? (singleExpression | identifier)
     ;
 
 expressionSequence
     : singleExpression (',' singleExpression)*
     ;
 
-functionExpressionDeclaration
-    : Function_ Identifier? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
-    ;
-
 singleExpression
-    : functionExpressionDeclaration                               # FunctionExpression
-    | arrowFunctionDeclaration                                    # ArrowFunctionExpression // ECMAScript 6
-    | Class Identifier? typeParameters? classHeritage classTail   # ClassExpression
+    : anonymousFunction                                           # FunctionExpression
+    | Class identifier? typeParameters? classHeritage classTail   # ClassExpression
     | singleExpression '?.'? '[' expressionSequence ']'           # MemberIndexExpression
     | singleExpression '?.' singleExpression                      # OptionalChainExpression
     | singleExpression '!'? '.' '#'? identifierName typeGeneric?  # MemberDotExpression
@@ -776,6 +784,8 @@ singleExpression
     | '(' expressionSequence ')'                                      # ParenthesizedExpression
     | typeArguments expressionSequence?                               # GenericTypes
     | singleExpression As asExpression                                # CastAsExpression
+// TypeScript v2.0
+    | singleExpression '!'                                            # NonNullAssertionExpression
     ;
 
 asExpression
@@ -783,12 +793,18 @@ asExpression
     | singleExpression
     ;
 
+anonymousFunction
+    : functionDeclaration 
+    | Async? Function_ '*'? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
+    | arrowFunctionDeclaration
+    ;
+
 arrowFunctionDeclaration
     : Async? arrowFunctionParameters typeAnnotation? '=>' arrowFunctionBody
     ;
 
 arrowFunctionParameters
-    : Identifier
+    : identifier
     | '(' formalParameterList? ')'
     ;
 
@@ -849,20 +865,44 @@ bigintLiteral
     ;
 
 getter
-    : {this.n("get")}? Identifier classElementName
+    : {this.n("get")}? identifier classElementName
     ;
 
 setter
-    : {this.n("set")}? Identifier classElementName
+    : {this.n("set")}? identifier classElementName
     ;
 
 identifierName
-    : Identifier
+    : identifier
     | reservedWord
     ;
 
-identifierOrKeyWord
+identifier
     : Identifier
+    | Async
+    | As
+    | From
+    | Yield
+    | Of
+    | Any
+    | Any
+    | Number
+    | Boolean
+    | String
+    | Unique
+    | Symbol
+    | Never
+    | Undefined
+    | Object
+    | KeyOf
+    | TypeAlias
+    | Constructor
+    | Namespace
+    | Abstract
+    ;
+
+identifierOrKeyWord
+    : identifier
     | TypeAlias
     | Require
     ;

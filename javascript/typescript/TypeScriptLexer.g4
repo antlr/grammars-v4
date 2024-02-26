@@ -1,3 +1,35 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
+ * Copyright (c) 2017 by Ivan Kochurkin (Positive Technologies):
+    added ECMAScript 6 support, cleared and transformed to the universal grammar.
+ * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
+ * Copyright (c) 2019 by Andrii Artiushok (contributor -> added TypeScript support)
+ * Copyright (c) 2024 by Andrew Leppard (www.wegrok.review)
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 // $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
 // $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
@@ -139,6 +171,8 @@ From       : 'from';
 ReadOnly   : 'readonly';
 Async      : 'async';
 Await      : 'await';
+Yield      : 'yield';
+YieldStar  : 'yield*';
 
 /// Future Reserved Words
 
@@ -161,15 +195,20 @@ Interface  : 'interface';
 Package    : 'package';
 Protected  : 'protected';
 Static     : 'static';
-Yield      : 'yield';
 
 //keywords:
+Any        : 'any';
+Number     : 'number';
+Never      : 'never';
+Boolean    : 'boolean';
+String     : 'string';
+Unique     : 'unique';
+Symbol     : 'symbol';
+Undefined  : 'undefined';
+Object     : 'object';
 
-Any     : 'any';
-Number  : 'number';
-Boolean : 'boolean';
-String  : 'string';
-Symbol  : 'symbol';
+Of      : 'of';
+KeyOf   : 'keyof';
 
 TypeAlias: 'type';
 

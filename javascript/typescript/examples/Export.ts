@@ -1,6 +1,3 @@
-
-
-
 namespace StringUtility
 {
     function ToCapital(str: string): string {
@@ -17,4 +14,9 @@ namespace StringUtility
     export function Eported2(str: string, length: number = 0): string {
         return str.toUpperCase();
     }
+}
+
+export type MyType = {
+    field: number;
+    field2: string;
 }
