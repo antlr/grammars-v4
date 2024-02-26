@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>amazon-states-language</artifactId>
     <packaging>jar</packaging>
@@ -35,22 +35,35 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.antlr</groupId>
+                <groupId>com.khubla.antlr</groupId>
                 <artifactId>antlr4test-maven-plugin</artifactId>
                 <version>${antlr4test-maven-plugin.version}</version>
-                <configuration>
-                    <verbose>false</verbose>
-                    <showTree>false</showTree>
-                    <entryPoint>file_</entryPoint>
-                    <grammarName>amazon-states-language</grammarName>
-                    <packageName></packageName>
-                    <exampleFiles>examples/</exampleFiles>
-                </configuration>
                 <executions>
                     <execution>
+                        <id>test-state-machines</id>
                         <goals>
                             <goal>test</goal>
                         </goals>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <showTree>false</showTree>
+                            <entryPoint>program_decl</entryPoint>
+                            <grammarName>ASL</grammarName>
+                            <exampleFiles>examples/state_machines</exampleFiles>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-intrinsic-functions</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <showTree>false</showTree>
+                            <entryPoint>func_decl</entryPoint>
+                            <grammarName>ASLIntrinsic</grammarName>
+                            <exampleFiles>examples/intrinsic_functions</exampleFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

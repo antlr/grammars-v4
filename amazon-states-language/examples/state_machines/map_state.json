@@ -8,7 +8,11 @@
         "ReaderConfig": {
           "InputType": "CSV",
           "CSVHeaderLocation": "GIVEN",
-          "CSVHeaders": "__TBD__"
+          "CSVHeaders": [
+            "H1",
+            "H2",
+            "H3"
+          ]
         },
         "Resource": "arn:aws:states:::s3:getObject",
         "Parameters": {

@@ -35,7 +35,7 @@ language specification for Amazon States Language provided by Amazon.
 
 
 ## Examples
-The `examples/` directory contains baseline examples demonstrating various types
+The `examples/state_machines` directory contains baseline examples demonstrating various types
 of State Machine definitions in JSON. Additionally, within the `examples/intrinsic_functions` 
 directory, there are examples illustrating the utilisation of intrinsic functions.
 
