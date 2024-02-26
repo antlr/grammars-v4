@@ -39,7 +39,7 @@ public abstract class JavaScriptParserBase extends Parser
     }
 
     protected boolean notLineTerminator() {
-        return !here(JavaScriptParser.LineTerminator);
+        return !lineTerminatorAhead();
     }
 
     protected boolean notOpenBraceAndNotFunction() {
