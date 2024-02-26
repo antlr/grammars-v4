@@ -1,0 +1,10 @@
+{
+  "StartAt": "FailState",
+  "States": {
+    "FailState": {
+      "Type": "Fail",
+      "ErrorPath": "States.Format('{}', $.Error)",
+      "CausePath": "States.Format('This is a custom error message for {}, caused by {}.', $.Error, $.Cause)"
+    }
+  }
+}

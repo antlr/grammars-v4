@@ -78,6 +78,7 @@
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
+                <module>amazon-states-language</module>
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
