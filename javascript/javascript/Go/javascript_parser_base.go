@@ -32,7 +32,7 @@ func (p *JavaScriptParserBase) next(str string) bool {
 }
 
 func (p *JavaScriptParserBase) notLineTerminator() bool {
-	return !p.here(JavaScriptParserLineTerminator)
+	return !p.lineTerminatorAhead()
 }
 
 func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
