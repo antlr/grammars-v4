@@ -1345,3 +1345,5 @@ Q{}apple(17);
 17 cast as apple;
 apple(17);
 $myaddress treat as element(*, USAddress);
+//hithere[text() = 'hello''world'];
+//hithere[text() = "hello""world"];

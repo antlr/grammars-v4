@@ -33,6 +33,7 @@ CREATE TABLE po_binaryxml OF XMLType
  PASSING OBJECT_VALUE RETURNING CONTENT)
  AS DATE))) ;
 
+CREATE TABLE po_binary OF XMLType;
 
 create table junk (
        me date,
@@ -394,3 +395,36 @@ CREATE TABLE print_media_demo
          NESTED TABLE ad_textdocs_ntab STORE AS nt_p2
        )
    TABLESPACE tbs_03;
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+);
+
+CREATE TABLE "D1
+"
+("c1" INTEGER, "C2" INTEGER);
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+) USAGE QUEUE;
+
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR WRITE;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR WRITE;
+
+CREATE TABLE tab IF NOT EXISTS (ID number(9) primary key);
+
+create TABLE PROCESSED AS (
+select * FROM T_ORDER_PROCESSED f)
+       --     WHERE
+       -- TO_CHAR(to_date('20'||f.nr_ano,'YYYY'),'YYYY')||'/'||TRIM(TO_CHAR(f.nr_mes,'00')) = :refCompAcad);
+;
+
+CREATE INDEX part_idx ON partitioned_by_index (part, val)
+    GLOBAL PARTITION BY RANGE (part)
+        ( PARTITION t0 VALUES LESS THAN (TIMESTAMP '2020-01-01 00:00:00')
+        , PARTITION t1 VALUES LESS THAN (MAXVALUE) )
+        ;

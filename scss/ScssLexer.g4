@@ -27,6 +27,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar ScssLexer;
 
 fragment Hex             : [0-9a-fA-F];
@@ -36,30 +40,30 @@ fragment Escape          : Unicode | '\\' ~[\r\n\f0-9a-fA-F];
 fragment Whitespace      : Space |;
 fragment Newline         : '\n' | '\r\n' | '\r' | '\f';
 fragment ZeroToFourZeros : '0'? '0'? '0'? '0'?;
-fragment DashChar        : '-' | '\\' ZeroToFourZeros '2d' NewlineOrSpace ;
+fragment DashChar        : '-' | '\\' ZeroToFourZeros '2d' NewlineOrSpace;
 
-fragment Nmstart : [_a-zA-Z] | Nonascii | Escape;
-fragment Nmchar  : [_a-zA-Z0-9\-] | Nonascii | Escape;
-fragment Nonascii: ~[\u0000-\u007f];
-fragment Name    : Nmchar+;
-fragment Url     : ( [!#$%&*-~] | Nonascii | Escape )*;
+fragment Nmstart  : [_a-zA-Z] | Nonascii | Escape;
+fragment Nmchar   : [_a-zA-Z0-9\-] | Nonascii | Escape;
+fragment Nonascii : ~[\u0000-\u007f];
+fragment Name     : Nmchar+;
+fragment Url      : ( [!#$%&*-~] | Nonascii | Escape)*;
 
 Comment          : (LineComment | MultiLineComment) -> skip;
-MultiLineComment : '/*' ~'*'* '*'+ ( ~[/*] ~'*'* '*'+ )* '/';
+MultiLineComment : '/*' ~'*'* '*'+ ( ~[/*] ~'*'* '*'+)* '/';
 LineComment      : '//' ~([\n\r\u2028\u2029])*;
 Space            : [ \t\r\n\f]+ -> skip;
 
-Uri              : 'url(' Whitespace (Url | String_) (Space (Url | String_))* Whitespace ')';
-Format           : 'format(' Whitespace String_ Whitespace ')';
+Uri    : 'url(' Whitespace (Url | String_) (Space (Url | String_))* Whitespace ')';
+Format : 'format(' Whitespace String_ Whitespace ')';
 
-AbsLength       : 'px'  | 'cm'   | 'mm'   | 'pt' | 'pc' | 'q';
-FontRelative    : 'em'  | 'ex'   | 'ch'   | 'rem';
-ViewportRelative: 'vw'  | 'vh'   | 'vmin' | 'vmax';
-Angle           : 'deg' | 'rad'  | 'grad' | 'turn';
-Resolution      : 'dpi' | 'dpcm' | 'dppx';
-Freq            : 'hz'  | 'khz'  | 'fr';
-Time            : 'ms'  | 's';
-Percentage      : '%';
+AbsLength        : 'px' | 'cm' | 'mm' | 'pt' | 'pc' | 'q';
+FontRelative     : 'em' | 'ex' | 'ch' | 'rem';
+ViewportRelative : 'vw' | 'vh' | 'vmin' | 'vmax';
+Angle            : 'deg' | 'rad' | 'grad' | 'turn';
+Resolution       : 'dpi' | 'dpcm' | 'dppx';
+Freq             : 'hz' | 'khz' | 'fr';
+Time             : 'ms' | 's';
+Percentage       : '%';
 
 Import    : '@import';
 Include   : '@include';
@@ -78,53 +82,53 @@ Extend    : '@extend';
 Warn      : '@warn';
 Error     : '@error';
 
-If        : 'if';
-AtIf      : '@if';
-AtFor     : '@for';
-AtElse    : '@else';
-AtWhile   : '@while';
-AtEach    : '@each';
+If      : 'if';
+AtIf    : '@if';
+AtFor   : '@for';
+AtElse  : '@else';
+AtWhile : '@while';
+AtEach  : '@each';
 
-From      : 'from';
-To        : 'to';
-Through   : 'through';
-Only      : 'only';
-Not       : 'not';
-And       : 'and';
-Using     : 'using';
-As        : 'as';
-With      : 'with';
-Or        : 'or';
-In        : 'in';
+From    : 'from';
+To      : 'to';
+Through : 'through';
+Only    : 'only';
+Not     : 'not';
+And     : 'and';
+Using   : 'using';
+As      : 'as';
+With    : 'with';
+Or      : 'or';
+In      : 'in';
 
 Default   : '!default';
 Important : '!important';
 
-Lparen    : '(';
-Rparen    : ')';
-Lbrack    : '[';
-Rbrack    : ']';
-BlockStart: '{';
-BlockEnd  : '}' ;
+Lparen     : '(';
+Rparen     : ')';
+Lbrack     : '[';
+Rbrack     : ']';
+BlockStart : '{';
+BlockEnd   : '}';
 
-Dot       : '.' ;
-Comma     : ',';
-Colon     : ':';
-Semi      : ';';
+Dot   : '.';
+Comma : ',';
+Colon : ':';
+Semi  : ';';
 
-Tilde     : '~';
-Under     : '_';
-Dollar    : '$';
-At        : '@';
-Amp       : '&';
-Hash      : '#';
-True      : 'true';
-False     : 'false';
+Tilde  : '~';
+Under  : '_';
+Dollar : '$';
+At     : '@';
+Amp    : '&';
+Hash   : '#';
+True   : 'true';
+False  : 'false';
 
-Plus      : '+';
-Div       : '/';
-Minus     : '-';
-Times     : '*';
+Plus  : '+';
+Div   : '/';
+Minus : '-';
+Times : '*';
 
 Eq        : '=';
 NotEq     : '!=';
@@ -147,15 +151,15 @@ PrefixMatch    : '^=';
 SuffixMatch    : '$=';
 SubstringMatch : '*=';
 
-VendorPrefix: '-mox-' | '-webkit-' | '-o-';
+VendorPrefix: '-moz-' | '-webkit-' | '-o-';
 
-Variable : '--' (Interpolation|Nmstart) (Interpolation|Nmchar)*;
-fragment Interpolation: Hash BlockStart Dollar? Ident BlockEnd;
-Number   : [0-9]+ | [0-9]* '.' [0-9]+;
-String_
-    : '"' ( ~[\n\r\f\\"] | '\\' Newline | Escape )* '"'
-    | '\'' ( ~[\n\r\f\\'] | '\\' Newline | Escape )* '\''
-    ;
+Variable               : '--' (Interpolation | Nmstart) (Interpolation | Nmchar)*;
+fragment Interpolation : Hash BlockStart Dollar? Ident BlockEnd;
+Number                 : [0-9]+ | [0-9]* '.' [0-9]+;
+String_:
+    '"' (~[\n\r\f\\"] | '\\' Newline | Escape)* '"'
+    | '\'' ( ~[\n\r\f\\'] | '\\' Newline | Escape)* '\''
+;
 
 // Give Ident least priority so that more specific rules matches first
-Ident : Nmstart Nmchar*;
+Ident: Nmstart Nmchar*;

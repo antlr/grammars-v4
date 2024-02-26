@@ -25,234 +25,236 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ANTLRv3Parser;
 
-options { tokenVocab = ANTLRv3Lexer; }
+options {
+    tokenVocab = ANTLRv3Lexer;
+}
 
 grammarDef
-   : DOC_COMMENT? (LEXER | PARSER | TREE| ) GRAMMAR id_ SEMI optionsSpec? tokensSpec? attrScope* action* rule_+
-   EOF
-   ;
+    : DOC_COMMENT? (LEXER | PARSER | TREE |) GRAMMAR id_ SEMI optionsSpec? tokensSpec? attrScope* action* rule_+ EOF
+    ;
 
 tokensSpec
-   : TOKENS LBRACE tokenSpec+ RBRACE
-   ;
+    : TOKENS LBRACE tokenSpec+ RBRACE
+    ;
 
 tokenSpec
-   : TOKEN_REF ( EQUAL (STRING_LITERAL | CHAR_LITERAL) | ) SEMI
-   ;
+    : TOKEN_REF (EQUAL (STRING_LITERAL | CHAR_LITERAL) |) SEMI
+    ;
 
 attrScope
-   : SCOPE id_ actionBlock
-   ;
+    : SCOPE id_ actionBlock
+    ;
 
 action
-   : AT (actionScopeName COLONCOLON)? id_ actionBlock
-   ;
+    : AT (actionScopeName COLONCOLON)? id_ actionBlock
+    ;
 
 actionScopeName
-   : id_
-   | LEXER
-   | PARSER
-   ;
+    : id_
+    | LEXER
+    | PARSER
+    ;
 
 optionsSpec
-   : OPTIONS LBRACE option* RBRACE
-   ;
+    : OPTIONS LBRACE option* RBRACE
+    ;
 
 option
-   : id_ EQUAL optionValue SEMI
-   ;
+    : id_ EQUAL optionValue SEMI
+    ;
 
 optionValue
-   : id_
-   | STRING_LITERAL
-   | CHAR_LITERAL
-   | INT
-   | STAR
-   ;
+    : id_
+    | STRING_LITERAL
+    | CHAR_LITERAL
+    | INT
+    | STAR
+    ;
 
 rule_
-   : DOC_COMMENT? ((PROTECTED | PUBLIC | PRIVATE | FRAGMENT))? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* COLON altList SEMI exceptionGroup?
-   ;
-   
+    : DOC_COMMENT? (PROTECTED | PUBLIC | PRIVATE | FRAGMENT)? id_ BANG? argActionBlock? (
+        RETURNS argActionBlock
+    )? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* COLON altList SEMI exceptionGroup?
+    ;
+
 ruleAction
-   : AT id_ actionBlock
-   ;
+    : AT id_ actionBlock
+    ;
 
 throwsSpec
-   : THROWS id_ (COMMA id_)*
-   ;
+    : THROWS id_ (COMMA id_)*
+    ;
 
 ruleScopeSpec
-   : SCOPE actionBlock
-   | SCOPE id_ (COMMA id_)* SEMI
-   | SCOPE actionBlock SCOPE id_ (COMMA id_)* SEMI
-   ;
+    : SCOPE actionBlock
+    | SCOPE id_ (COMMA id_)* SEMI
+    | SCOPE actionBlock SCOPE id_ (COMMA id_)* SEMI
+    ;
 
 block
-   : LPAREN ((optionsSpec)? COLON)?
-                alternative rewrite (OR alternative rewrite )*
-        RPAREN
-   ;
+    : LPAREN (optionsSpec? COLON)? alternative rewrite (OR alternative rewrite)* RPAREN
+    ;
 
 altList
-   : alternative rewrite (OR alternative rewrite )*
-   ;
+    : alternative rewrite (OR alternative rewrite)*
+    ;
 
 alternative
-   : element+
-   |
-   ;
+    : element+
+    |
+    ;
 
 exceptionGroup
-   : (exceptionHandler)+ (finallyClause)?
-   | finallyClause
-   ;
+    : exceptionHandler+ finallyClause?
+    | finallyClause
+    ;
 
 exceptionHandler
-   : CATCH argActionBlock actionBlock
-   ;
+    : CATCH argActionBlock actionBlock
+    ;
 
 finallyClause
-   : FINALLY actionBlock
-   ;
+    : FINALLY actionBlock
+    ;
 
 element
-   : elementNoOptionSpec
-   ;
+    : elementNoOptionSpec
+    ;
 
 elementNoOptionSpec
-   : id_ (EQUAL | PEQ) atom (ebnfSuffix | )
-   | id_ (EQUAL | PEQ) block (ebnfSuffix | )
-   | atom (ebnfSuffix | )
-   | ebnf
-   | actionBlock
-   | actionBlock QM ( SEMPREDOP | )
-   | treeSpec (ebnfSuffix | )
-   ;
+    : id_ (EQUAL | PEQ) atom (ebnfSuffix |)
+    | id_ (EQUAL | PEQ) block (ebnfSuffix |)
+    | atom (ebnfSuffix |)
+    | ebnf
+    | actionBlock
+    | actionBlock QM ( SEMPREDOP |)
+    | treeSpec (ebnfSuffix |)
+    ;
 
 actionBlock
-   : BEGIN_ACTION ACTION_CONTENT* END_ACTION
-   ;
+    : BEGIN_ACTION ACTION_CONTENT* END_ACTION
+    ;
 
 argActionBlock
-   : BEGIN_ARGUMENT ARGUMENT_CONTENT* END_ARGUMENT
-   ;
+    : BEGIN_ARGUMENT ARGUMENT_CONTENT* END_ARGUMENT
+    ;
 
 atom
-   : range_ ( ROOT | BANG | )
-   | terminal_
-   | notSet ( ROOT | BANG | )
-   | RULE_REF argActionBlock? ( ROOT | BANG )?
-   ;
+    : range_ (ROOT | BANG |)
+    | terminal_
+    | notSet ( ROOT | BANG |)
+    | RULE_REF argActionBlock? ( ROOT | BANG)?
+    ;
 
 notSet
-   : NOT (notTerminal | block)
-   ;
+    : NOT (notTerminal | block)
+    ;
 
 treeSpec
-   : TREE_BEGIN element (element)+ RPAREN
-   ;
+    : TREE_BEGIN element element+ RPAREN
+    ;
 
 ebnf
-   : block (QM | STAR | PLUS | SEMPREDOP | )
-   ;
+    : block (QM | STAR | PLUS | SEMPREDOP |)
+    ;
 
 range_
-   : CHAR_LITERAL RANGE CHAR_LITERAL
-   ;
+    : CHAR_LITERAL RANGE CHAR_LITERAL
+    ;
 
 terminal_
-   : (CHAR_LITERAL
-        | TOKEN_REF (argActionBlock | )
-        | STRING_LITERAL
-        | DOT
-     ) (ROOT | BANG)?
-   ;
+    : (CHAR_LITERAL | TOKEN_REF (argActionBlock |) | STRING_LITERAL | DOT) (ROOT | BANG)?
+    ;
 
 notTerminal
-   : CHAR_LITERAL
-   | TOKEN_REF
-   | STRING_LITERAL
-   ;
+    : CHAR_LITERAL
+    | TOKEN_REF
+    | STRING_LITERAL
+    ;
 
 ebnfSuffix
-   : QM
-   | STAR
-   | PLUS
-   ;
+    : QM
+    | STAR
+    | PLUS
+    ;
 
 rewrite
-   : (REWRITE actionBlock QM rewrite_alternative)* REWRITE rewrite_alternative
-   |
-   ;
+    : (REWRITE actionBlock QM rewrite_alternative)* REWRITE rewrite_alternative
+    |
+    ;
 
 rewrite_alternative
-   : rewrite_template
-   | rewrite_tree_alternative
-   |
-   ;
+    : rewrite_template
+    | rewrite_tree_alternative
+    |
+    ;
 
 rewrite_tree_block
-   : LPAREN rewrite_tree_alternative RPAREN
-   ;
+    : LPAREN rewrite_tree_alternative RPAREN
+    ;
 
 rewrite_tree_alternative
-   : rewrite_tree_element+
-   ;
+    : rewrite_tree_element+
+    ;
 
 rewrite_tree_element
-   : rewrite_tree_atom
-   | rewrite_tree_atom ebnfSuffix
-   | rewrite_tree (ebnfSuffix | )
-   | rewrite_tree_ebnf
-   ;
+    : rewrite_tree_atom
+    | rewrite_tree_atom ebnfSuffix
+    | rewrite_tree (ebnfSuffix |)
+    | rewrite_tree_ebnf
+    ;
 
 rewrite_tree_atom
-   : CHAR_LITERAL
-   | TOKEN_REF argActionBlock?
-   | RULE_REF
-   | STRING_LITERAL
-   | DOLLAR id_
-   | actionBlock
-   ;
+    : CHAR_LITERAL
+    | TOKEN_REF argActionBlock?
+    | RULE_REF
+    | STRING_LITERAL
+    | DOLLAR id_
+    | actionBlock
+    ;
 
 rewrite_tree_ebnf
-   : rewrite_tree_block ebnfSuffix
-   ;
+    : rewrite_tree_block ebnfSuffix
+    ;
 
 rewrite_tree
-   : TREE_BEGIN rewrite_tree_atom rewrite_tree_element* RPAREN
-   ;
+    : TREE_BEGIN rewrite_tree_atom rewrite_tree_element* RPAREN
+    ;
 
 rewrite_template
-   : id_ LPAREN rewrite_template_args RPAREN
-      ( DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL )
-   | rewrite_template_ref
-   | rewrite_indirect_template_head
-   | actionBlock
-   ;
+    : id_ LPAREN rewrite_template_args RPAREN (
+        DOUBLE_QUOTE_STRING_LITERAL
+        | DOUBLE_ANGLE_STRING_LITERAL
+    )
+    | rewrite_template_ref
+    | rewrite_indirect_template_head
+    | actionBlock
+    ;
 
 rewrite_template_ref
-   : id_ LPAREN rewrite_template_args RPAREN
-   ;
+    : id_ LPAREN rewrite_template_args RPAREN
+    ;
 
 rewrite_indirect_template_head
-   : LPAREN actionBlock RPAREN LPAREN rewrite_template_args RPAREN
-   ;
+    : LPAREN actionBlock RPAREN LPAREN rewrite_template_args RPAREN
+    ;
 
 rewrite_template_args
-   : rewrite_template_arg (COMMA rewrite_template_arg)*
-   |
-   ;
+    : rewrite_template_arg (COMMA rewrite_template_arg)*
+    |
+    ;
 
 rewrite_template_arg
-   : id_ EQUAL actionBlock
-   ;
+    : id_ EQUAL actionBlock
+    ;
 
 id_
-   : TOKEN_REF
-   | RULE_REF
-   ;
-
+    : TOKEN_REF
+    | RULE_REF
+    ;

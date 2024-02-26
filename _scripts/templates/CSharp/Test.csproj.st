@@ -1,0 +1,89 @@
+\<!-- Generated from trgen <version> -->
+\<Project Sdk="Microsoft.NET.Sdk" >
+  \<PropertyGroup>
+    \<TargetFramework>net7.0\</TargetFramework>
+    \<OutputType>Exe\</OutputType>
+    \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
+  \</PropertyGroup>
+  \<ItemGroup>
+<tool_grammar_files:{x |    \<Antlr4 Include="<x>">
+<if(name_space)>\<Package><name_space>\</Package><endif>\</Antlr4>
+} >  \</ItemGroup>
+  \<Import Project="Other.csproj">\</Import>
+  \<PropertyGroup>
+    \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
+  \</PropertyGroup>
+  \<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" >
+    \<NoWarn>1701;1702;3021\</NoWarn>
+  \</PropertyGroup>
+  \<PropertyGroup>
+<if(cli_bash)>
+    \<!--
+      need the CData since this blob is just going to
+      be embedded in a mini batch file by studio/msbuild
+    -->
+    \<MyTester>\<![CDATA[
+err=0
+for g in `find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+do
+  file=$g
+  x1="${g##*.}"
+  if [ "$x1" != "errors" ]
+  then
+    echo $file
+    cat $file | bin/Debug/net7.0/Test
+    status="$?"
+    if [ -f "$file".errors ]
+    then
+      if [ "$stat" = "0" ]
+      then
+        echo Expected parse fail.
+        err=1
+      else
+        echo Expected.
+      fi
+    else
+      if [ "$status" != "0" ]
+      then
+        err=1
+      fi
+    fi
+  fi
+done
+exit $err
+]]>\</MyTester>
+<elseif(cli_cmd)>
+    \<!--
+      need the CData since this blob is just going to
+      be embedded in a mini batch file by studio/msbuild
+    -->
+    \<MyTester>\<![CDATA[
+set ERR=0
+for %%G in (..\\<example_files_win>\*) do (
+  setlocal EnableDelayedExpansion
+  set FILE=%%G
+  set X1=%%~xG
+  set X2=%%~nG
+  set X3=%%~pG
+  if !X1! neq .errors (
+    echo !FILE!
+    cat !FILE! | bin\Debug\net7.0\Test.exe
+    if not exist !FILE!.errors (
+      if ERRORLEVEL 1 set ERR=1
+    ) else (
+      echo Expected.
+    )
+  )
+)
+EXIT %ERR%
+]]>\</MyTester>
+<endif>
+  \</PropertyGroup>
+  \<Target Name="Test" >
+    \<Message Text="testing" />
+    \<Exec Command="$(MyTester)" >
+       \<Output TaskParameter="ExitCode" PropertyName ="ErrorCode" />
+    \</Exec>
+    \<Message Importance="high" Text="$(ErrorCode)"/>
+  \</Target>
+\</Project>

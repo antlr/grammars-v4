@@ -3,6 +3,8 @@
 alter table ship_class add column ship_spec varchar(150) first, add somecol int after start_build;
 alter table t3 add column (c2 decimal(10, 2) comment 'comment`' null, c3 enum('abc', 'cba', 'aaa')), add index t3_i1 using btree (c2) comment 'some index';
 alter table t3 add column (c2 decimal(10, 2), c3 int);
+ALTER TABLE `deals` ADD INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as DOUBLE)));
+ALTER TABLE `deals` ADD INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as FLOAT)));
 alter table t3 alter index t3_i1 invisible;
 alter table t3 alter index t3_i1 visible;
 alter table t3 rename index t3_i1 to t3_i2;
@@ -102,5 +104,14 @@ alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 -- Alter user
 ALTER USER 'mattias.hultman' DEFAULT ROLE `prod-spain-mysql-read-only`@`%`;
 rename user user1@100.200.1.1 to user2@100.200.1.2;
+rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
+rename user user1@100.200.1.1 to user2@::1;
 alter user 'user'@'%' IDENTIFIED BY 'newpassword' RETAIN CURRENT PASSWORD;
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY RANDOM PASSWORD RETAIN CURRENT PASSWORD;
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19' RETAIN CURRENT PASSWORD;
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password';
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19';
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' AS 'REDACTED' RETAIN CURRENT PASSWORD;
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' BY '2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19' REPLACE 'current_auth_string' RETAIN CURRENT PASSWORD;
+ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' BY RANDOM PASSWORD REPLACE 'current_auth_string' RETAIN CURRENT PASSWORD;
 #end

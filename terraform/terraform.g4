@@ -29,256 +29,260 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar terraform;
 
 file_
-   : (local | module | output | provider | variable | data | resource | terraform)+ EOF
-   ;
+    : (local | module | output | provider | variable | data | resource | terraform)+ EOF
+    ;
 
 terraform
-   : 'terraform' blockbody
-   ;
+    : 'terraform' blockbody
+    ;
 
 resource
-   : 'resource' resourcetype name blockbody
-   ;
+    : 'resource' resourcetype name blockbody
+    ;
 
 data
-   : 'data' resourcetype name blockbody
-   ;
+    : 'data' resourcetype name blockbody
+    ;
 
 provider
-  : PROVIDER resourcetype blockbody
-  ;
+    : PROVIDER resourcetype blockbody
+    ;
 
 output
-  : 'output' name blockbody
-  ;
+    : 'output' name blockbody
+    ;
 
 local
-  : 'locals' blockbody
-  ;
+    : 'locals' blockbody
+    ;
 
 module
-  : 'module' name blockbody
-  ;
+    : 'module' name blockbody
+    ;
 
 variable
-   : VARIABLE name blockbody
-   ;
+    : VARIABLE name blockbody
+    ;
 
 block
-   : blocktype label* blockbody
-   ;
+    : blocktype label* blockbody
+    ;
 
 blocktype
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 resourcetype
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : STRING
-   ;
+    : STRING
+    ;
 
 label
-   : STRING
-   ;
+    : STRING
+    ;
 
 blockbody
-   : LCURL (argument | block)* RCURL
-   ;
+    : LCURL (argument | block)* RCURL
+    ;
 
 argument
-   : identifier '=' expression
-   ;
+    : identifier '=' expression
+    ;
 
 identifier
-   : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
-   ;
+    : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
+    ;
 
 identifierchain
-   : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
-   | STAR (DOT identifierchain)*
-   | inline_index (DOT identifierchain)*
-   ;
+    : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
+    | STAR (DOT identifierchain)*
+    | inline_index (DOT identifierchain)*
+    ;
 
 inline_index
-   : NATURAL_NUMBER
-   ;
+    : NATURAL_NUMBER
+    ;
 
 expression
-   : section
-   | expression operator_ expression
-   | LPAREN expression RPAREN
-   | expression '?' expression ':' expression
-   | forloop
-   ;
+    : section
+    | expression operator_ expression
+    | LPAREN expression RPAREN
+    | expression '?' expression ':' expression
+    | forloop
+    ;
 
 forloop
-   : 'for' identifier IN expression ':' expression
-   ;
+    : 'for' identifier IN expression ':' expression
+    ;
 
 section
-   : list_
-   | map_
-   | val
-   ;
+    : list_
+    | map_
+    | val
+    ;
 
 val
-   : NULL_
-   | signed_number
-   | string
-   | identifier
-   | BOOL
-   | DESCRIPTION
-   | filedecl
-   | functioncall
-   | EOF_
-   ;
+    : NULL_
+    | signed_number
+    | string
+    | identifier
+    | BOOL
+    | DESCRIPTION
+    | filedecl
+    | functioncall
+    | EOF_
+    ;
 
 functioncall
-   : functionname LPAREN functionarguments RPAREN
-   | 'jsonencode' LPAREN (.)*? RPAREN
-   ;
+    : functionname LPAREN functionarguments RPAREN
+    | 'jsonencode' LPAREN (.)*? RPAREN
+    ;
 
 functionname
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 functionarguments
-   : //no arguments
-   | expression (',' expression)*
-   ;
+    : //no arguments
+    | expression (',' expression)*
+    ;
 
 index
-   : '[' expression ']'
-   ;
+    : '[' expression ']'
+    ;
 
 filedecl
-   : 'file' '(' expression ')'
-   ;
+    : 'file' '(' expression ')'
+    ;
 
 list_
-   : '[' (expression (',' expression)* ','?)? ']'
-   ;
+    : '[' (expression (',' expression)* ','?)? ']'
+    ;
 
 map_
-   : LCURL (argument ','?)* RCURL
-   ;
+    : LCURL (argument ','?)* RCURL
+    ;
 
 string
-   : STRING
-   | MULTILINESTRING
-   ;
+    : STRING
+    | MULTILINESTRING
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 signed_number
-   : ('+' | '-')? number
-   ;
+    : ('+' | '-')? number
+    ;
 
 VARIABLE
-   : 'variable'
-   ;
+    : 'variable'
+    ;
 
 PROVIDER
-   : 'provider'
-   ;
+    : 'provider'
+    ;
 
 IN
-   : 'in'
-   ;
+    : 'in'
+    ;
 
 STAR
-   : '*'
-   ;
+    : '*'
+    ;
 
 DOT
-   : '.'
-   ;
+    : '.'
+    ;
 
 operator_
-   : '/'
-   | STAR
-   | '%'
-   | '+'
-   | '-'
-   | '>'
-   | '>='
-   | '<'
-   | '<='
-   | '=='
-   | '!='
-   | '&&'
-   | '||'
-   ;
+    : '/'
+    | STAR
+    | '%'
+    | '+'
+    | '-'
+    | '>'
+    | '>='
+    | '<'
+    | '<='
+    | '=='
+    | '!='
+    | '&&'
+    | '||'
+    ;
 
 LCURL
-   : '{'
-   ;
+    : '{'
+    ;
 
 RCURL
-   : '}'
-   ;
+    : '}'
+    ;
 
 LPAREN
-   : '('
-   ;
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
+    : ')'
+    ;
 
 EOF_
-   : '<<EOF' .*? 'EOF'
-   ;
+    : '<<EOF' .*? 'EOF'
+    ;
 
 NULL_
-   : 'nul'
-   ;
+    : 'nul'
+    ;
 
 NATURAL_NUMBER
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 number
-   : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
-   ;
+    : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
+    ;
 
 BOOL
-   : 'true'
-   | 'false'
-   ;
+    : 'true'
+    | 'false'
+    ;
 
 DESCRIPTION
-   : '<<DESCRIPTION' .*? 'DESCRIPTION'
-   ;
+    : '<<DESCRIPTION' .*? 'DESCRIPTION'
+    ;
 
 MULTILINESTRING
-   : '<<-EOF' .*? 'EOF'
-   ;
+    : '<<-EOF' .*? 'EOF'
+    ;
 
 STRING
-   : '"' ( '\\"' | ~["\r\n] )* '"'
-   ;
+    : '"' ('\\"' | ~["\r\n])* '"'
+    ;
 
 IDENTIFIER
-   : [a-zA-Z] ([a-zA-Z0-9_-])*
-   ;
+    : [a-zA-Z] ([a-zA-Z0-9_-])*
+    ;
 
 COMMENT
-  : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
-  ;
+    : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
+    ;
 
 BLOCKCOMMENT
-  : '/*' .*? '*/' -> channel(HIDDEN)
-  ;
+    : '/*' .*? '*/' -> channel(HIDDEN)
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
+    : [ \r\n\t]+ -> skip
+    ;

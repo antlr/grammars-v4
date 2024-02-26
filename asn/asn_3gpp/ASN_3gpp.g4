@@ -1,4 +1,4 @@
-    /*
+/*
  [The "BSD licence"]
  Copyright (c) 2007-2008 Terence Parr
  All rights reserved.
@@ -42,64 +42,71 @@ of the predicates since it was too much ambiguity.
 If you have some comments/improvements, send me an e-mail.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar ASN_3gpp;
 
-modules: moduleDefinition+ EOF;
+modules
+    : moduleDefinition+ EOF
+    ;
 
-moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_BRACE)?
-     DEFINITIONS_LITERAL
-     tagDefault
-     extensionDefault
-     ASSIGN_OP
-      BEGIN_LITERAL
-     moduleBody
-      END_LITERAL
-      EOF
-        ;
+moduleDefinition
+    : IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_BRACE)? DEFINITIONS_LITERAL tagDefault extensionDefault ASSIGN_OP BEGIN_LITERAL
+        moduleBody END_LITERAL EOF
+    ;
 
+tagDefault
+    : ((EXPLICIT_LITERAL | IMPLICIT_LITERAL | AUTOMATIC_LITERAL) TAGS_LITERAL)?
+    ;
 
+extensionDefault
+    : (EXTENSIBILITY_LITERAL IMPLIED_LITERAL)?
+    ;
 
-tagDefault : ( (EXPLICIT_LITERAL|IMPLICIT_LITERAL|AUTOMATIC_LITERAL) TAGS_LITERAL )?
-;
+moduleBody
+    : (exports imports assignmentList)?
+    ;
 
-extensionDefault :
-   (EXTENSIBILITY_LITERAL IMPLIED_LITERAL)?
-;
+exports
+    : (EXPORTS_LITERAL symbolsExported SEMI_COLON | EXPORTS_LITERAL ALL_LITERAL SEMI_COLON)?
+    ;
 
-moduleBody :  (exports imports assignmentList) ?
-;
-exports :   (EXPORTS_LITERAL symbolsExported SEMI_COLON
- |    EXPORTS_LITERAL ALL_LITERAL SEMI_COLON )?
-;
+symbolsExported
+    : symbolList?
+    ;
 
-symbolsExported : ( symbolList )?
-;
+imports
+    : (IMPORTS_LITERAL symbolsImported SEMI_COLON)?
+    ;
 
-imports :   (IMPORTS_LITERAL symbolsImported SEMI_COLON )?
-;
+symbolsImported
+    : symbolsFromModuleList?
+    ;
 
-symbolsImported : (symbolsFromModuleList )?
-;
+symbolsFromModuleList
+    : symbolsFromModule symbolsFromModule*
+    ;
 
-symbolsFromModuleList :
-     (symbolsFromModule) (symbolsFromModule)*
-;
+symbolsFromModule
+    : symbolList FROM_LITERAL globalModuleReference
+    ;
 
-symbolsFromModule : symbolList FROM_LITERAL globalModuleReference
-;
+globalModuleReference
+    : IDENTIFIER assignedIdentifier
+    ;
 
-globalModuleReference : IDENTIFIER assignedIdentifier
-;
+assignedIdentifier
+    :
+    ;
 
-assignedIdentifier :
-;
+symbolList
+    : symbol (COMMA symbol)*
+    ;
 
-symbolList   : (symbol) (COMMA symbol)*
-;
-
-symbol  : IDENTIFIER ((L_BRACE  R_BRACE))?
-;
+symbol
+    : IDENTIFIER (L_BRACE R_BRACE)?
+    ;
 
 //parameterizedReference :
 //  reference (L_BRACE  R_BRACE)?
@@ -110,861 +117,1061 @@ symbol  : IDENTIFIER ((L_BRACE  R_BRACE))?
 //  identifier
 //;
 
-assignmentList :  (assignment) (assignment)*
-;
+assignmentList
+    : assignment assignment*
+    ;
 
+assignment
+    : IDENTIFIER (
+        valueAssignment
+        | typeAssignment
+        | parameterizedAssignment
+        | objectClassAssignment
+    )
+    ;
 
-assignment :
- (IDENTIFIER
-	(  valueAssignment
-	 | typeAssignment
-	 | parameterizedAssignment
-	 | objectClassAssignment
-	)
- )
-	;
+sequenceType
+    : SEQUENCE_LITERAL L_BRACE (extensionAndException optionalExtensionMarker | componentTypeLists)? R_BRACE
+    ;
 
-sequenceType :SEQUENCE_LITERAL L_BRACE (extensionAndException  optionalExtensionMarker | componentTypeLists )? R_BRACE
-	;
-extensionAndException :  ELLIPSIS  exceptionSpec?
-;
-optionalExtensionMarker :  ( COMMA  ELLIPSIS )?
-;
+extensionAndException
+    : ELLIPSIS exceptionSpec?
+    ;
 
-componentTypeLists :
-   rootComponentTypeList (tag | (COMMA tag? extensionAndException  extensionAdditions   (optionalExtensionMarker|(EXTENSTIONENDMARKER  COMMA  rootComponentTypeList tag?))))?
-//  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions    optionalExtensionMarker
-//  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions     EXTENSTIONENDMARKER  COMMA  rootComponentTypeList
-  |  extensionAndException  extensionAdditions  (optionalExtensionMarker | (EXTENSTIONENDMARKER  COMMA    rootComponentTypeList tag?))
-//  |  extensionAndException  extensionAdditions  optionalExtensionMarker
-;
-rootComponentTypeList  : componentTypeList
-;
-componentTypeList  : (componentType) (COMMA tag? componentType)*
-;
-componentType  :
-  namedType (OPTIONAL_LITERAL | DEFAULT_LITERAL value )?
- |  COMPONENTS_LITERAL OF_LITERAL  asnType
-;
+optionalExtensionMarker
+    : (COMMA ELLIPSIS)?
+    ;
+
+componentTypeLists
+    : rootComponentTypeList (
+        tag
+        | COMMA tag? extensionAndException extensionAdditions (
+            optionalExtensionMarker
+            | EXTENSTIONENDMARKER COMMA rootComponentTypeList tag?
+        )
+    )?
+    //  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions    optionalExtensionMarker
+    //  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions     EXTENSTIONENDMARKER  COMMA  rootComponentTypeList
+    | extensionAndException extensionAdditions (
+        optionalExtensionMarker
+        | EXTENSTIONENDMARKER COMMA rootComponentTypeList tag?
+    )
+    //  |  extensionAndException  extensionAdditions  optionalExtensionMarker
+    ;
+
+rootComponentTypeList
+    : componentTypeList
+    ;
+
+componentTypeList
+    : componentType (COMMA tag? componentType)*
+    ;
+
+componentType
+    : namedType (OPTIONAL_LITERAL | DEFAULT_LITERAL value)?
+    | COMPONENTS_LITERAL OF_LITERAL asnType
+    ;
 
 tag
-  : needTag
-  | condTag
-  | INVALID_TAG
-  ;
+    : needTag
+    | condTag
+    | INVALID_TAG
+    ;
 
 needTag
-  : NEED_LITERAL IDENTIFIER
-  ;
+    : NEED_LITERAL IDENTIFIER
+    ;
 
 NEED_LITERAL
-  : '--' (' ' | '\t')*? 'Need'
-  ;
+    : '--' (' ' | '\t')*? 'Need'
+    ;
 
 condTag
-  : COND_LITERAL IDENTIFIER
-  ;
+    : COND_LITERAL IDENTIFIER
+    ;
 
 COND_LITERAL
-  : '--' (' ' | '\t')*? 'Cond'
-  ;
+    : '--' (' ' | '\t')*? 'Cond'
+    ;
 
 INVALID_TAG
-  : '--' ~('\n'|'\r')*
-  ;
+    : '--' ~('\n' | '\r')*
+    ;
 
-extensionAdditions  :  (COMMA  extensionAdditionList)?
-;
-extensionAdditionList  :  (extensionAddition) (COMMA  extensionAddition)*
-;
-extensionAddition  : componentType  |  extensionAdditionGroup
-;
-extensionAdditionGroup  :  DOUBLE_L_BRACKET  versionNumber  componentTypeList tag?  DOUBLE_R_BRACKET
-;
-versionNumber  :  (NUMBER  COLON )?
-;
+extensionAdditions
+    : (COMMA extensionAdditionList)?
+    ;
 
-sequenceOfType  : SEQUENCE_LITERAL (L_PARAN (constraint | sizeConstraint) R_PARAN)? OF_LITERAL (asnType | namedType )
-;
-sizeConstraint : SIZE_LITERAL constraint
-	;
+extensionAdditionList
+    : extensionAddition (COMMA extensionAddition)*
+    ;
 
-parameterizedAssignment :
- parameterList
-(ASSIGN_OP
-	(asnType
-		|	value
-		|	valueSet
-	)
-)
-|( definedObjectClass ASSIGN_OP
-	( object_
-		|	objectClass
-		|	objectSet
-	)
+extensionAddition
+    : componentType
+    | extensionAdditionGroup
+    ;
 
-)
-// parameterizedTypeAssignment
-//| parameterizedValueAssignment
-//| parameterizedValueSetTypeAssignment
-//| parameterizedObjectClassAssignment
-//| parameterizedObjectAssignment
-//| parameterizedObjectSetAssignment
-;
-parameterList : L_BRACE parameter (COMMA parameter)* R_BRACE
-;
-parameter : (paramGovernor COLON)? IDENTIFIER
-;
-paramGovernor : governor | IDENTIFIER
-;
+extensionAdditionGroup
+    : DOUBLE_L_BRACKET versionNumber componentTypeList tag? DOUBLE_R_BRACKET
+    ;
+
+versionNumber
+    : (NUMBER COLON)?
+    ;
+
+sequenceOfType
+    : SEQUENCE_LITERAL (L_PARAN (constraint | sizeConstraint) R_PARAN)? OF_LITERAL (
+        asnType
+        | namedType
+    )
+    ;
+
+sizeConstraint
+    : SIZE_LITERAL constraint
+    ;
+
+parameterizedAssignment
+    : parameterList ASSIGN_OP (asnType | value | valueSet)
+    | definedObjectClass ASSIGN_OP (object_ | objectClass | objectSet)
+
+    // parameterizedTypeAssignment
+    //| parameterizedValueAssignment
+    //| parameterizedValueSetTypeAssignment
+    //| parameterizedObjectClassAssignment
+    //| parameterizedObjectAssignment
+    //| parameterizedObjectSetAssignment
+    ;
+
+parameterList
+    : L_BRACE parameter (COMMA parameter)* R_BRACE
+    ;
+
+parameter
+    : (paramGovernor COLON)? IDENTIFIER
+    ;
+
+paramGovernor
+    : governor
+    | IDENTIFIER
+    ;
+
 //dummyGovernor : dummyReference
 //;
 
-governor : asnType | definedObjectClass
-;
+governor
+    : asnType
+    | definedObjectClass
+    ;
 
+objectClassAssignment
+    : /*IDENTIFIER*/ ASSIGN_OP objectClass
+    ;
 
-objectClassAssignment : /*IDENTIFIER*/ ASSIGN_OP objectClass
-;
+objectClass
+    : definedObjectClass
+    | objectClassDefn /*| parameterizedObjectClass */
+    ;
 
-objectClass : definedObjectClass | objectClassDefn /*| parameterizedObjectClass */
-;
-definedObjectClass :
-	(IDENTIFIER DOT)? IDENTIFIER
-	| TYPE_IDENTIFIER_LITERAL
-	|  ABSTRACT_SYNTAX_LITERAL
-;
-usefulObjectClassReference :
-   TYPE_IDENTIFIER_LITERAL
- |  ABSTRACT_SYNTAX_LITERAL
-;
+definedObjectClass
+    : (IDENTIFIER DOT)? IDENTIFIER
+    | TYPE_IDENTIFIER_LITERAL
+    | ABSTRACT_SYNTAX_LITERAL
+    ;
 
-externalObjectClassReference : IDENTIFIER DOT IDENTIFIER
-;
+usefulObjectClassReference
+    : TYPE_IDENTIFIER_LITERAL
+    | ABSTRACT_SYNTAX_LITERAL
+    ;
 
-objectClassDefn : CLASS_LITERAL L_BRACE  fieldSpec (COMMA fieldSpec  )*  R_BRACE  withSyntaxSpec?
-;
-withSyntaxSpec : WITH_LITERAL SYNTAX_LITERAL syntaxList
-;
-syntaxList : L_BRACE tokenOrGroupSpec+ R_BRACE
-;
+externalObjectClassReference
+    : IDENTIFIER DOT IDENTIFIER
+    ;
 
-tokenOrGroupSpec : requiredToken | optionalGroup
-;
+objectClassDefn
+    : CLASS_LITERAL L_BRACE fieldSpec (COMMA fieldSpec)* R_BRACE withSyntaxSpec?
+    ;
 
-optionalGroup : L_BRACKET (tokenOrGroupSpec)+ R_BRACKET
-;
+withSyntaxSpec
+    : WITH_LITERAL SYNTAX_LITERAL syntaxList
+    ;
 
-requiredToken : literal | primitiveFieldName
-;
-literal : IDENTIFIER | COMMA
-;
-primitiveFieldName :
-	AMPERSAND IDENTIFIER;
+syntaxList
+    : L_BRACE tokenOrGroupSpec+ R_BRACE
+    ;
 
+tokenOrGroupSpec
+    : requiredToken
+    | optionalGroup
+    ;
 
-fieldSpec :
-	AMPERSAND IDENTIFIER
-	(
-	  typeOptionalitySpec?
-  	| asnType (valueSetOptionalitySpec?  | UNIQUE_LITERAL? valueOptionalitySpec? )
-	| fieldName (OPTIONAL_LITERAL | (DEFAULT_LITERAL (valueSet | value)))?
-	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object_)))?
+optionalGroup
+    : L_BRACKET tokenOrGroupSpec+ R_BRACKET
+    ;
 
-	)
+requiredToken
+    : literal
+    | primitiveFieldName
+    ;
 
-//   typeFieldSpec
-//  | fixedTypeValueFieldSpec
-//  | variableTypeValueFieldSpec
-//  | fixedTypeValueSetFieldSpec
-//  | variableTypeValueSetFieldSpec
-//  | objectFieldSpec
-//  | objectSetFieldSpec
-;
+literal
+    : IDENTIFIER
+    | COMMA
+    ;
 
-typeFieldSpec : AMPERSAND IDENTIFIER typeOptionalitySpec?
-;
-typeOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL asnType)
-;
-fixedTypeValueFieldSpec : AMPERSAND IDENTIFIER asnType UNIQUE_LITERAL? valueOptionalitySpec ?
-;
-valueOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL value)
-;
+primitiveFieldName
+    : AMPERSAND IDENTIFIER
+    ;
 
-variableTypeValueFieldSpec : AMPERSAND IDENTIFIER  fieldName valueOptionalitySpec ?
-;
+fieldSpec
+    : AMPERSAND IDENTIFIER (
+        typeOptionalitySpec?
+        | asnType (valueSetOptionalitySpec? | UNIQUE_LITERAL? valueOptionalitySpec?)
+        | fieldName (OPTIONAL_LITERAL | DEFAULT_LITERAL (valueSet | value))?
+        | definedObjectClass (OPTIONAL_LITERAL | DEFAULT_LITERAL (objectSet | object_))?
+    )
 
-fixedTypeValueSetFieldSpec : AMPERSAND IDENTIFIER   asnType valueSetOptionalitySpec ?
-;
+    //   typeFieldSpec
+    //  | fixedTypeValueFieldSpec
+    //  | variableTypeValueFieldSpec
+    //  | fixedTypeValueSetFieldSpec
+    //  | variableTypeValueSetFieldSpec
+    //  | objectFieldSpec
+    //  | objectSetFieldSpec
+    ;
 
-valueSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL valueSet
-;
+typeFieldSpec
+    : AMPERSAND IDENTIFIER typeOptionalitySpec?
+    ;
 
-object_ : definedObject /*| objectDefn | objectFromObject */|  parameterizedObject
-;
-parameterizedObject : definedObject actualParameterList
-;
+typeOptionalitySpec
+    : OPTIONAL_LITERAL
+    | DEFAULT_LITERAL asnType
+    ;
 
+fixedTypeValueFieldSpec
+    : AMPERSAND IDENTIFIER asnType UNIQUE_LITERAL? valueOptionalitySpec?
+    ;
+
+valueOptionalitySpec
+    : OPTIONAL_LITERAL
+    | DEFAULT_LITERAL value
+    ;
+
+variableTypeValueFieldSpec
+    : AMPERSAND IDENTIFIER fieldName valueOptionalitySpec?
+    ;
+
+fixedTypeValueSetFieldSpec
+    : AMPERSAND IDENTIFIER asnType valueSetOptionalitySpec?
+    ;
+
+valueSetOptionalitySpec
+    : OPTIONAL_LITERAL
+    | DEFAULT_LITERAL valueSet
+    ;
+
+object_
+    : definedObject /*| objectDefn | objectFromObject */
+    | parameterizedObject
+    ;
+
+parameterizedObject
+    : definedObject actualParameterList
+    ;
 
 definedObject
-	:	IDENTIFIER (DOT)?
-	;
-objectSet : L_BRACE objectSetSpec R_BRACE
-;
-objectSetSpec :
-  rootElementSetSpec (COMMA ELLIPSIS (COMMA additionalElementSetSpec )?)?
- | ELLIPSIS (COMMA additionalElementSetSpec )?
-;
+    : IDENTIFIER DOT?
+    ;
 
+objectSet
+    : L_BRACE objectSetSpec R_BRACE
+    ;
 
-fieldName :(AMPERSAND IDENTIFIER)(AMPERSAND IDENTIFIER DOT)*
-;
-valueSet : L_BRACE elementSetSpecs R_BRACE
-;
-elementSetSpecs :
- rootElementSetSpec (COMMA ELLIPSIS (COMMA additionalElementSetSpec)?)?
-	;
-rootElementSetSpec : elementSetSpec
-;
-additionalElementSetSpec : elementSetSpec
-;
-elementSetSpec : unions | ALL_LITERAL exclusions
-;
-unions :   (intersections) (unionMark intersections)*
-;
-exclusions : EXCEPT_LITERAL elements
-;
-intersections : (intersectionElements) (intersectionMark intersectionElements)*
-;
-unionMark  :  PIPE  |  UNION_LITERAL
-;
+objectSetSpec
+    : rootElementSetSpec (COMMA ELLIPSIS (COMMA additionalElementSetSpec)?)?
+    | ELLIPSIS (COMMA additionalElementSetSpec)?
+    ;
 
-intersectionMark  :  POWER |  INTERSECTION_LITERAL
-;
+fieldName
+    : AMPERSAND IDENTIFIER (AMPERSAND IDENTIFIER DOT)*
+    ;
 
-elements  : subtypeElements
-// |  objectSetElements
-// |  L_PARAN elementSetSpec R_PARAN
-;
-objectSetElements :
-    object_ | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
-;
+valueSet
+    : L_BRACE elementSetSpecs R_BRACE
+    ;
 
-
-intersectionElements : elements (exclusions)?
-;
-subtypeElements :
-  ((value | MIN_LITERAL) LESS_THAN?  DOUBLE_DOT LESS_THAN?  (value | MAX_LITERAL) )
-  |sizeConstraint
- | (PATTERN_LITERAL value)
- | value
-;
-
-
-variableTypeValueSetFieldSpec : AMPERSAND IDENTIFIER    fieldName valueSetOptionalitySpec?
-;
-objectFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectOptionalitySpec?
-;
-objectOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL object_
-;
-objectSetFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectSetOptionalitySpec ?
-;
-objectSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL objectSet
-;
-
-typeAssignment :
-      ASSIGN_OP
-      asnType
-;
-
-valueAssignment :
-      asnType
-	  ASSIGN_OP
-       value
-;
-asnType : (builtinType | referencedType) (constraint)*
-;
-builtinType :
-   octetStringType
- | bitStringType
- | choiceType
- | enumeratedType
- | integerType
- | sequenceType
- | sequenceOfType
- | setType
- | setOfType
- | objectidentifiertype
- | objectClassFieldType
- | BOOLEAN_LITERAL
- | NULL_LITERAL
-
-	;
-
-objectClassFieldType : definedObjectClass DOT fieldName
-;
-
-
-setType :  SET_LITERAL  L_BRACE  (extensionAndException  optionalExtensionMarker  | componentTypeLists)? R_BRACE
-	;
-
-setOfType    : SET_LITERAL (constraint | sizeConstraint)? OF_LITERAL (asnType | namedType)
-;
-
-referencedType :
-  definedType
-// | selectionType
-// | typeFromObject
-// | valueSetFromObjects
-;
-definedType :
-IDENTIFIER (DOT IDENTIFIER)? actualParameterList?
-;
-
-
-constraint :L_PARAN constraintSpec  exceptionSpec? R_PARAN
-//L_PARAN value DOT_DOT value R_PARAN
-;
-
-constraintSpec : generalConstraint | subtypeConstraint
-;
-userDefinedConstraint : CONSTRAINED_LITERAL BY_LITERAL L_BRACE userDefinedConstraintParameter (COMMA userDefinedConstraintParameter)* R_BRACE
-;
-
-generalConstraint :  userDefinedConstraint | tableConstraint | contentsConstraint
-;
-userDefinedConstraintParameter :
-	governor (COLON
- 		value
- 		| valueSet
- 		| object_
- 		| objectSet
- 		)?
-;
-
-tableConstraint : /*simpleTableConstraint |*/ componentRelationConstraint
-;
-simpleTableConstraint : objectSet
-;
-
-
-contentsConstraint :
-   CONTAINING_LITERAL asnType
- |  ENCODED_LITERAL BY_LITERAL value
- |  CONTAINING_LITERAL asnType ENCODED_LITERAL BY_LITERAL value
- |  WITH_LITERAL COMPONENTS_LITERAL L_BRACE componentPresenceLists R_BRACE
-;
-
-componentPresenceLists:
-   componentPresenceList? (COMMA ELLIPSIS (COMMA componentPresenceList)?)?
-  |  ELLIPSIS (COMMA componentPresenceList)?
-;
-
-componentPresenceList: (componentPresence) (COMMA componentPresence)*
-;
-
-componentPresence: IDENTIFIER (ABSENT_LITERAL | PRESENT_LITERAL)
-;
-
-
-subtypeConstraint	:
 elementSetSpecs
-//((value | MIN_LITERAL) LESS_THAN? DOUBLE_DOT LESS_THAN?  (value | MAX_LITERAL) )
-//	| sizeConstraint
-//	| value
-	;
-value  :   builtinValue
-;
-builtinValue :
-		enumeratedValue
-	|	integerValue
-	|	choiceValue
-	|	objectIdentifierValue
-	|	booleanValue
-	|   CSTRING
-	|   BSTRING
- ;
+    : rootElementSetSpec (COMMA ELLIPSIS (COMMA additionalElementSetSpec)?)?
+    ;
 
-objectIdentifierValue : L_BRACE /*(definedValue)?*/ objIdComponentsList R_BRACE
-;
+rootElementSetSpec
+    : elementSetSpec
+    ;
+
+additionalElementSetSpec
+    : elementSetSpec
+    ;
+
+elementSetSpec
+    : unions
+    | ALL_LITERAL exclusions
+    ;
+
+unions
+    : intersections (unionMark intersections)*
+    ;
+
+exclusions
+    : EXCEPT_LITERAL elements
+    ;
+
+intersections
+    : intersectionElements (intersectionMark intersectionElements)*
+    ;
+
+unionMark
+    : PIPE
+    | UNION_LITERAL
+    ;
+
+intersectionMark
+    : POWER
+    | INTERSECTION_LITERAL
+    ;
+
+elements
+    : subtypeElements
+    // |  objectSetElements
+    // |  L_PARAN elementSetSpec R_PARAN
+    ;
+
+objectSetElements
+    : object_
+    | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
+    ;
+
+intersectionElements
+    : elements exclusions?
+    ;
+
+subtypeElements
+    : (value | MIN_LITERAL) LESS_THAN? DOUBLE_DOT LESS_THAN? (value | MAX_LITERAL)
+    | sizeConstraint
+    | PATTERN_LITERAL value
+    | value
+    ;
+
+variableTypeValueSetFieldSpec
+    : AMPERSAND IDENTIFIER fieldName valueSetOptionalitySpec?
+    ;
+
+objectFieldSpec
+    : AMPERSAND IDENTIFIER definedObjectClass objectOptionalitySpec?
+    ;
+
+objectOptionalitySpec
+    : OPTIONAL_LITERAL
+    | DEFAULT_LITERAL object_
+    ;
+
+objectSetFieldSpec
+    : AMPERSAND IDENTIFIER definedObjectClass objectSetOptionalitySpec?
+    ;
+
+objectSetOptionalitySpec
+    : OPTIONAL_LITERAL
+    | DEFAULT_LITERAL objectSet
+    ;
+
+typeAssignment
+    : ASSIGN_OP asnType
+    ;
+
+valueAssignment
+    : asnType ASSIGN_OP value
+    ;
+
+asnType
+    : (builtinType | referencedType) constraint*
+    ;
+
+builtinType
+    : octetStringType
+    | bitStringType
+    | choiceType
+    | enumeratedType
+    | integerType
+    | sequenceType
+    | sequenceOfType
+    | setType
+    | setOfType
+    | objectidentifiertype
+    | objectClassFieldType
+    | BOOLEAN_LITERAL
+    | NULL_LITERAL
+    ;
+
+objectClassFieldType
+    : definedObjectClass DOT fieldName
+    ;
+
+setType
+    : SET_LITERAL L_BRACE (extensionAndException optionalExtensionMarker | componentTypeLists)? R_BRACE
+    ;
+
+setOfType
+    : SET_LITERAL (constraint | sizeConstraint)? OF_LITERAL (asnType | namedType)
+    ;
+
+referencedType
+    : definedType
+    // | selectionType
+    // | typeFromObject
+    // | valueSetFromObjects
+    ;
+
+definedType
+    : IDENTIFIER (DOT IDENTIFIER)? actualParameterList?
+    ;
+
+constraint
+    : L_PARAN constraintSpec exceptionSpec? R_PARAN
+    //L_PARAN value DOT_DOT value R_PARAN
+    ;
+
+constraintSpec
+    : generalConstraint
+    | subtypeConstraint
+    ;
+
+userDefinedConstraint
+    : CONSTRAINED_LITERAL BY_LITERAL L_BRACE userDefinedConstraintParameter (
+        COMMA userDefinedConstraintParameter
+    )* R_BRACE
+    ;
+
+generalConstraint
+    : userDefinedConstraint
+    | tableConstraint
+    | contentsConstraint
+    ;
+
+userDefinedConstraintParameter
+    : governor (COLON value | valueSet | object_ | objectSet)?
+    ;
+
+tableConstraint
+    : /*simpleTableConstraint |*/ componentRelationConstraint
+    ;
+
+simpleTableConstraint
+    : objectSet
+    ;
+
+contentsConstraint
+    : CONTAINING_LITERAL asnType
+    | ENCODED_LITERAL BY_LITERAL value
+    | CONTAINING_LITERAL asnType ENCODED_LITERAL BY_LITERAL value
+    | WITH_LITERAL COMPONENTS_LITERAL L_BRACE componentPresenceLists R_BRACE
+    ;
+
+componentPresenceLists
+    : componentPresenceList? (COMMA ELLIPSIS (COMMA componentPresenceList)?)?
+    | ELLIPSIS (COMMA componentPresenceList)?
+    ;
+
+componentPresenceList
+    : componentPresence (COMMA componentPresence)*
+    ;
+
+componentPresence
+    : IDENTIFIER (ABSENT_LITERAL | PRESENT_LITERAL)
+    ;
+
+subtypeConstraint
+    : elementSetSpecs
+    //((value | MIN_LITERAL) LESS_THAN? DOUBLE_DOT LESS_THAN?  (value | MAX_LITERAL) )
+    //	| sizeConstraint
+    //	| value
+    ;
+
+value
+    : builtinValue
+    ;
+
+builtinValue
+    : enumeratedValue
+    | integerValue
+    | choiceValue
+    | objectIdentifierValue
+    | booleanValue
+    | CSTRING
+    | BSTRING
+    ;
+
+objectIdentifierValue
+    : L_BRACE /*(definedValue)?*/ objIdComponentsList R_BRACE
+    ;
+
 objIdComponentsList
-	: 	(objIdComponents) (objIdComponents)*
-;
-objIdComponents  :
-	    	NUMBER
-	|    	IDENTIFIER (L_PARAN (NUMBER | definedValue ) R_PARAN)?
-	|    	definedValue
-;
+    : objIdComponents objIdComponents*
+    ;
 
+objIdComponents
+    : NUMBER
+    | IDENTIFIER (L_PARAN (NUMBER | definedValue) R_PARAN)?
+    | definedValue
+    ;
 
-integerValue :  signedNumber | IDENTIFIER
-;
+integerValue
+    : signedNumber
+    | IDENTIFIER
+    ;
 
-choiceValue  :    IDENTIFIER COLON value
-;
-enumeratedValue  : IDENTIFIER
-;
+choiceValue
+    : IDENTIFIER COLON value
+    ;
 
-signedNumber :  (MINUS)? NUMBER
-;
-choiceType    : CHOICE_LITERAL L_BRACE alternativeTypeLists R_BRACE
-;
-alternativeTypeLists :   rootAlternativeTypeList (COMMA
-   extensionAndException  extensionAdditionAlternatives  optionalExtensionMarker )?
-	;
-extensionAdditionAlternatives  : (COMMA  extensionAdditionAlternativesList )?
-;
-extensionAdditionAlternativesList  : (extensionAdditionAlternative) (COMMA  extensionAdditionAlternative)*
-;
-extensionAdditionAlternative  :  extensionAdditionAlternativesGroup | namedType
-;
-extensionAdditionAlternativesGroup  :  DOUBLE_L_BRACKET  versionNumber  alternativeTypeList  DOUBLE_R_BRACKET
-;
+enumeratedValue
+    : IDENTIFIER
+    ;
 
-rootAlternativeTypeList  : alternativeTypeList
-;
-alternativeTypeList : (namedType) (COMMA namedType)*
-;
-namedType : IDENTIFIER   asnType
-;
-enumeratedType : ENUMERATED_LITERAL L_BRACE enumerations R_BRACE
-;
-enumerations :rootEnumeration (COMMA   ELLIPSIS exceptionSpec? (COMMA   additionalEnumeration )?)?
-	;
-rootEnumeration : enumeration
-;
-enumeration : enumerationItem ( COMMA enumerationItem)*
-;
-enumerationItem : IDENTIFIER | namedNumber | value
-;
-namedNumber :   IDENTIFIER L_PARAN (signedNumber | definedValue) R_PARAN
-;
-definedValue :
- // externalValueReference
- //| valuereference
-  parameterizedValue
-;
-parameterizedValue : simpleDefinedValue (actualParameterList)?
-;
-simpleDefinedValue : IDENTIFIER (DOT IDENTIFIER)?
-;
+signedNumber
+    : MINUS? NUMBER
+    ;
 
-actualParameterList : L_BRACE actualParameter (COMMA actualParameter)* R_BRACE
-;
-actualParameter : asnType | value /*| valueSet | definedObjectClass | object | objectSet*/
-;
-exceptionSpec : EXCLAM  exceptionIdentification
-;
-exceptionIdentification : signedNumber
- |     definedValue
- |     asnType COLON value
-;
-additionalEnumeration : enumeration
-;
-integerType:INTEGER_LITERAL  (L_BRACE namedNumberList R_BRACE)?
-;
-namedNumberList : (namedNumber) (COMMA namedNumber)*
-;
-objectidentifiertype  :  OBJECT_LITERAL IDENTIFIER_LITERAL
-;
-componentRelationConstraint : L_BRACE (IDENTIFIER (DOT IDENTIFIER)?) R_BRACE
-			     (L_BRACE atNotation (COMMA atNotation)* R_BRACE)?
-;
-atNotation :  (A_ROND | (A_ROND_DOT level)) componentIdList
-;
-level : (DOT level)?
-;
+choiceType
+    : CHOICE_LITERAL L_BRACE alternativeTypeLists R_BRACE
+    ;
 
-componentIdList : IDENTIFIER (DOT IDENTIFIER)*  //?????
-;
-octetStringType  :  OCTET_LITERAL STRING_LITERAL
-;
-bitStringType    : (BIT_LITERAL STRING_LITERAL) (L_BRACE namedBitList R_BRACE)?
-;
-namedBitList: (namedBit) (COMMA namedBit)*
-;
-namedBit      : IDENTIFIER L_PARAN (NUMBER | definedValue) R_PARAN
-	;
+alternativeTypeLists
+    : rootAlternativeTypeList (
+        COMMA extensionAndException extensionAdditionAlternatives optionalExtensionMarker
+    )?
+    ;
 
-booleanValue:  TRUE_LITERAL | FALSE_LITERAL | TRUE_SMALL_LITERAL | FALSE_SMALL_LITERAL
-;
+extensionAdditionAlternatives
+    : (COMMA extensionAdditionAlternativesList)?
+    ;
+
+extensionAdditionAlternativesList
+    : extensionAdditionAlternative (COMMA extensionAdditionAlternative)*
+    ;
+
+extensionAdditionAlternative
+    : extensionAdditionAlternativesGroup
+    | namedType
+    ;
+
+extensionAdditionAlternativesGroup
+    : DOUBLE_L_BRACKET versionNumber alternativeTypeList DOUBLE_R_BRACKET
+    ;
+
+rootAlternativeTypeList
+    : alternativeTypeList
+    ;
+
+alternativeTypeList
+    : namedType (COMMA namedType)*
+    ;
+
+namedType
+    : IDENTIFIER asnType
+    ;
+
+enumeratedType
+    : ENUMERATED_LITERAL L_BRACE enumerations R_BRACE
+    ;
+
+enumerations
+    : rootEnumeration (COMMA ELLIPSIS exceptionSpec? (COMMA additionalEnumeration)?)?
+    ;
+
+rootEnumeration
+    : enumeration
+    ;
+
+enumeration
+    : enumerationItem (COMMA enumerationItem)*
+    ;
+
+enumerationItem
+    : IDENTIFIER
+    | namedNumber
+    | value
+    ;
+
+namedNumber
+    : IDENTIFIER L_PARAN (signedNumber | definedValue) R_PARAN
+    ;
+
+definedValue
+    :
+    // externalValueReference
+    //| valuereference
+    parameterizedValue
+    ;
+
+parameterizedValue
+    : simpleDefinedValue actualParameterList?
+    ;
+
+simpleDefinedValue
+    : IDENTIFIER (DOT IDENTIFIER)?
+    ;
+
+actualParameterList
+    : L_BRACE actualParameter (COMMA actualParameter)* R_BRACE
+    ;
+
+actualParameter
+    : asnType
+    | value /*| valueSet | definedObjectClass | object | objectSet*/
+    ;
+
+exceptionSpec
+    : EXCLAM exceptionIdentification
+    ;
+
+exceptionIdentification
+    : signedNumber
+    | definedValue
+    | asnType COLON value
+    ;
+
+additionalEnumeration
+    : enumeration
+    ;
+
+integerType
+    : INTEGER_LITERAL (L_BRACE namedNumberList R_BRACE)?
+    ;
+
+namedNumberList
+    : namedNumber (COMMA namedNumber)*
+    ;
+
+objectidentifiertype
+    : OBJECT_LITERAL IDENTIFIER_LITERAL
+    ;
+
+componentRelationConstraint
+    : L_BRACE IDENTIFIER (DOT IDENTIFIER)? R_BRACE (L_BRACE atNotation (COMMA atNotation)* R_BRACE)?
+    ;
+
+atNotation
+    : (A_ROND | A_ROND_DOT level) componentIdList
+    ;
+
+level
+    : (DOT level)?
+    ;
+
+componentIdList
+    : IDENTIFIER (DOT IDENTIFIER)* //?????
+    ;
+
+octetStringType
+    : OCTET_LITERAL STRING_LITERAL
+    ;
+
+bitStringType
+    : BIT_LITERAL STRING_LITERAL (L_BRACE namedBitList R_BRACE)?
+    ;
+
+namedBitList
+    : namedBit (COMMA namedBit)*
+    ;
+
+namedBit
+    : IDENTIFIER L_PARAN (NUMBER | definedValue) R_PARAN
+    ;
+
+booleanValue
+    : TRUE_LITERAL
+    | FALSE_LITERAL
+    | TRUE_SMALL_LITERAL
+    | FALSE_SMALL_LITERAL
+    ;
 
 A_ROND
-	:	'@'
-	;
+    : '@'
+    ;
 
 STAR
-	:	'*'
-	;
+    : '*'
+    ;
 
 ASSIGN_OP
-	:	'::='
-	;
+    : '::='
+    ;
 
 BOOLEAN_LITERAL
-	:	'BOOLEAN'
-	;
+    : 'BOOLEAN'
+    ;
 
 TRUE_LITERAL
-	:	'TRUE'
-	;
+    : 'TRUE'
+    ;
 
 FALSE_LITERAL
-	:	'FALSE'
-	;
+    : 'FALSE'
+    ;
 
 DOT
-	:	'.'
-	;
+    : '.'
+    ;
 
 DOUBLE_DOT
-	:	'..'
-	;
+    : '..'
+    ;
+
 ELLIPSIS
-	:	'...'
-	;
+    : '...'
+    ;
 
 APOSTROPHE
-	:	'\''
-	;
+    : '\''
+    ;
 
 AMPERSAND
-	:	'&'
-	;
+    : '&'
+    ;
 
 LESS_THAN
-	:	'<'
-	;
+    : '<'
+    ;
 
 GREATER_THAN
-	:	'>'
-	;
+    : '>'
+    ;
 
 LESS_THAN_SLASH
-	:	'</'
-	;
+    : '</'
+    ;
 
 SLASH_GREATER_THAN
-	:	'/>'
-	;
+    : '/>'
+    ;
 
 TRUE_SMALL_LITERAL
-	:	'true'
-	;
+    : 'true'
+    ;
 
 FALSE_SMALL_LITERAL
-	:	'false'
-	;
+    : 'false'
+    ;
 
 INTEGER_LITERAL
-	:	'INTEGER'
-	;
+    : 'INTEGER'
+    ;
 
 L_BRACE
-	:	'{'
-	;
+    : '{'
+    ;
 
 R_BRACE
-	:	'}'
-	;
+    : '}'
+    ;
 
 COMMA
-	:	','
-	;
+    : ','
+    ;
 
 L_PARAN
-	:	'('
-	;
+    : '('
+    ;
 
 R_PARAN
-	:	')'
-	;
+    : ')'
+    ;
 
 MINUS
-	:	'-'
-	;
+    : '-'
+    ;
 
 ENUMERATED_LITERAL
-	:	'ENUMERATED'
-	;
-
+    : 'ENUMERATED'
+    ;
 
 REAL_LITERAL
-	:	'REAL'
-	;
+    : 'REAL'
+    ;
 
 PLUS_INFINITY_LITERAL
-	:	'PLUS-INFINITY'
-	;
+    : 'PLUS-INFINITY'
+    ;
 
 MINUS_INFINITY_LITERAL
-	:	'MINUS-INFINITY'
-	;
+    : 'MINUS-INFINITY'
+    ;
 
 BIT_LITERAL
-	:	'BIT'
-	;
+    : 'BIT'
+    ;
 
 STRING_LITERAL
-	:	'STRING'
-	;
+    : 'STRING'
+    ;
 
 CONTAINING_LITERAL
-	:	'CONTAINING'
-	;
+    : 'CONTAINING'
+    ;
 
 OCTET_LITERAL
-	:	'OCTET'
-	;
+    : 'OCTET'
+    ;
 
 NULL_LITERAL
-	:	'NULL'
-	;
+    : 'NULL'
+    ;
 
 SEQUENCE_LITERAL
-	:	'SEQUENCE'
-	;
+    : 'SEQUENCE'
+    ;
 
 OPTIONAL_LITERAL
-	:	'OPTIONAL'
-	;
+    : 'OPTIONAL'
+    ;
 
 DEFAULT_LITERAL
-	:	'DEFAULT'
-	;
+    : 'DEFAULT'
+    ;
 
 COMPONENTS_LITERAL
-	:	'COMPONENTS'
-	;
+    : 'COMPONENTS'
+    ;
 
 OF_LITERAL
-	:	'OF'
-	;
+    : 'OF'
+    ;
 
 SET_LITERAL
-	:	'SET'
-	;
+    : 'SET'
+    ;
 
 EXCLAM
-	:	'!'
-	;
+    : '!'
+    ;
 
 ALL_LITERAL
-	:	'ALL'
-	;
+    : 'ALL'
+    ;
 
 EXCEPT_LITERAL
-	:	'EXCEPT'
-	;
+    : 'EXCEPT'
+    ;
 
 POWER
-	:	'^'
-	;
+    : '^'
+    ;
 
 PIPE
-	:	'|'
-	;
+    : '|'
+    ;
 
 UNION_LITERAL
-	:	'UNION'
-	;
+    : 'UNION'
+    ;
 
 INTERSECTION_LITERAL
-	:	'INTERSECTION'
-	;
+    : 'INTERSECTION'
+    ;
 
 INCLUDES_LITERAL
-	:	'INCLUDES'
-	;
+    : 'INCLUDES'
+    ;
 
 MIN_LITERAL
-	:	'MIN'
-	;
+    : 'MIN'
+    ;
 
 MAX_LITERAL
-	:	'MAX'
-	;
+    : 'MAX'
+    ;
 
 SIZE_LITERAL
-	:	'SIZE'
-	;
+    : 'SIZE'
+    ;
 
 FROM_LITERAL
-	:	'FROM'
-	;
+    : 'FROM'
+    ;
 
 WITH_LITERAL
-	:	'WITH'
-	;
+    : 'WITH'
+    ;
 
 COMPONENT_LITERAL
-	:	'COMPONENT'
-	;
+    : 'COMPONENT'
+    ;
 
 PRESENT_LITERAL
-	:	'PRESENT'
-	;
+    : 'PRESENT'
+    ;
 
 ABSENT_LITERAL
-	:	'ABSENT'
-	;
+    : 'ABSENT'
+    ;
 
 PATTERN_LITERAL
-	:	'PATTERN'
-	;
+    : 'PATTERN'
+    ;
 
 TYPE_IDENTIFIER_LITERAL
-	:	'TYPE-Identifier'
-	;
+    : 'TYPE-Identifier'
+    ;
 
 ABSTRACT_SYNTAX_LITERAL
-	:	'ABSTRACT-SYNTAX'
-	;
+    : 'ABSTRACT-SYNTAX'
+    ;
 
 CLASS_LITERAL
-	:	'CLASS'
-	;
+    : 'CLASS'
+    ;
 
 UNIQUE_LITERAL
-	:	'UNIQUE'
-	;
+    : 'UNIQUE'
+    ;
 
 SYNTAX_LITERAL
-	:	'SYNTAX'
-	;
+    : 'SYNTAX'
+    ;
 
 L_BRACKET
-	:	'['
-	;
+    : '['
+    ;
 
 R_BRACKET
-	:	']'
-	;
+    : ']'
+    ;
 
 INSTANCE_LITERAL
-	:	'INSTANCE'
-	;
+    : 'INSTANCE'
+    ;
 
 SEMI_COLON
-	:	';'
-	;
+    : ';'
+    ;
 
 IMPORTS_LITERAL
-	:	'IMPORTS'
-	;
+    : 'IMPORTS'
+    ;
 
 EXPORTS_LITERAL
-	:	'EXPORTS'
-	;
+    : 'EXPORTS'
+    ;
 
 EXTENSIBILITY_LITERAL
-	:	'EXTENSIBILITY'
-	;
+    : 'EXTENSIBILITY'
+    ;
 
 IMPLIED_LITERAL
-	:	'IMPLIED'
-	;
+    : 'IMPLIED'
+    ;
 
 EXPLICIT_LITERAL
-	:	'EXPLICIT'
-	;
+    : 'EXPLICIT'
+    ;
 
 TAGS_LITERAL
-	:	'TAGS'
-	;
+    : 'TAGS'
+    ;
 
 IMPLICIT_LITERAL
-	:	'IMPLICIT'
-	;
+    : 'IMPLICIT'
+    ;
 
 AUTOMATIC_LITERAL
-	:	'AUTOMATIC'
-	;
+    : 'AUTOMATIC'
+    ;
 
 DEFINITIONS_LITERAL
-	:	'DEFINITIONS'
-	;
+    : 'DEFINITIONS'
+    ;
 
 BEGIN_LITERAL
-	:	'BEGIN'
-	;
+    : 'BEGIN'
+    ;
 
 END_LITERAL
-	:	'END'
-	;
+    : 'END'
+    ;
 
 DOUBLE_L_BRACKET
-	:	'[['
-	;
+    : '[['
+    ;
 
 DOUBLE_R_BRACKET
-	:	']]'
-	;
+    : ']]'
+    ;
 
 COLON
-	:	':'
-	;
+    : ':'
+    ;
 
 CHOICE_LITERAL
-	:	'CHOICE'
-	;
+    : 'CHOICE'
+    ;
 
 UNIVERSAL_LITERAL
-	:	'UNIVERSAL'
-	;
+    : 'UNIVERSAL'
+    ;
 
 APPLICATION_LITERAL
-	:	'APPLICATION'
-	;
+    : 'APPLICATION'
+    ;
 
 PRIVATE_LITERAL
-	:	'PRIVATE'
-	;
+    : 'PRIVATE'
+    ;
 
 EMBEDDED_LITERAL
-	:	'EMBEDDED'
-	;
+    : 'EMBEDDED'
+    ;
 
 PDV_LITERAL
-	:	'PDV'
-	;
+    : 'PDV'
+    ;
 
 EXTERNAL_LITERAL
-	:	'EXTERNAL'
-	;
+    : 'EXTERNAL'
+    ;
 
 OBJECT_LITERAL
-	:	'OBJECT'
-	;
+    : 'OBJECT'
+    ;
+
 IDENTIFIER_LITERAL
-	:	'IDENTIFIER'
-	;
+    : 'IDENTIFIER'
+    ;
+
 RELATIVE_OID_LITERAL
-	:	'RELATIVE-OID'
-	;
+    : 'RELATIVE-OID'
+    ;
 
 CHARACTER_LITERAL
-	:	'CHARACTER'
-	;
+    : 'CHARACTER'
+    ;
 
 CONSTRAINED_LITERAL
-	:	'CONSTRAINED'
-	;
+    : 'CONSTRAINED'
+    ;
 
 BY_LITERAL
-	:	'BY'
-	;
+    : 'BY'
+    ;
 
 A_ROND_DOT
-	:	'@.'
-	;
+    : '@.'
+    ;
 
 ENCODED_LITERAL
-	:	'ENCODED'
-	;
+    : 'ENCODED'
+    ;
 
 COMMENT
-    :	'--'
+    : '--'
     ;
 
 UNRESTRICTEDCHARACTERSTRINGTYPE
@@ -972,19 +1179,19 @@ UNRESTRICTEDCHARACTERSTRINGTYPE
     ;
 
 EXTENSTIONENDMARKER
-    :  COMMA  ELLIPSIS
+    : COMMA ELLIPSIS
     ;
 
 fragment DIGIT
-    : '0'..'9'
+    : '0' ..'9'
     ;
 
 fragment UPPER
-    : ('A'..'Z')
+    : 'A' ..'Z'
     ;
 
 fragment LOWER
-    : ('a'..'z')
+    : 'a' ..'z'
     ;
 
 NUMBER
@@ -992,89 +1199,83 @@ NUMBER
     ;
 
 WS
-    :  (' '|'\r'|'\t'|'\u000C'|'\n') -> skip
+    : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
     ;
 
 fragment Exponent
-    : ('e'|'E') ('+'|'-')? NUMBER
+    : ('e' | 'E') ('+' | '-')? NUMBER
     ;
 
 LINE_COMMENT
-    : {getCharPositionInLine() == 0}? (' ' | '\t')*? '--' ~('\n'|'\r')* '\r'? '\n' ->skip
+    : {getCharPositionInLine() == 0}? (' ' | '\t')*? '--' ~('\n' | '\r')* '\r'? '\n' -> skip
     ;
 
 BSTRING
-    : APOSTROPHE ('0'..'1')* '\'B'
+    : APOSTROPHE ('0' ..'1')* '\'B'
     ;
 
 fragment HEXDIGIT
-    : (DIGIT|'a'..'f'|'A'..'F')
+    : DIGIT
+    | 'a' ..'f'
+    | 'A' ..'F'
     ;
 
 HSTRING
     : APOSTROPHE HEXDIGIT* '\'H'
     ;
 
-
-
-
 //IDENTIFIER : ('a'..'z'|'A'..'Z') ('0'..'9'|'a'..'z'|'A'..'Z')* ;
 CSTRING
-    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
+    : '"' (EscapeSequence | ~('\\' | '"'))* '"'
     ;
 
-fragment
-EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'"'|APOSTROPHE|'\\')
+fragment EscapeSequence
+    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | APOSTROPHE | '\\')
     ;
-
-
 
 //fragment
 
 /**I found this char range in JavaCC's grammar, but Letter and Digit overlap.
    Still works, but...
  */
-fragment
-LETTER
-    :  '\u0024' |
-    	'\u002d' |
-     '\u0041'..'\u005a' |
-       '\u005f' |
-       '\u0061'..'\u007a' |
-       '\u00c0'..'\u00d6' |
-       '\u00d8'..'\u00f6' |
-       '\u00f8'..'\u00ff' |
-       '\u0100'..'\u1fff' |
-       '\u3040'..'\u318f' |
-       '\u3300'..'\u337f' |
-       '\u3400'..'\u3d2d' |
-       '\u4e00'..'\u9fff' |
-       '\uf900'..'\ufaff'
+fragment LETTER
+    : '\u0024'
+    | '\u002d'
+    | '\u0041' ..'\u005a'
+    | '\u005f'
+    | '\u0061' ..'\u007a'
+    | '\u00c0' ..'\u00d6'
+    | '\u00d8' ..'\u00f6'
+    | '\u00f8' ..'\u00ff'
+    | '\u0100' ..'\u1fff'
+    | '\u3040' ..'\u318f'
+    | '\u3300' ..'\u337f'
+    | '\u3400' ..'\u3d2d'
+    | '\u4e00' ..'\u9fff'
+    | '\uf900' ..'\ufaff'
     ;
 
-fragment
-JavaIDDigit
-    :  '\u0030'..'\u0039' |
-       '\u0660'..'\u0669' |
-       '\u06f0'..'\u06f9' |
-       '\u0966'..'\u096f' |
-       '\u09e6'..'\u09ef' |
-       '\u0a66'..'\u0a6f' |
-       '\u0ae6'..'\u0aef' |
-       '\u0b66'..'\u0b6f' |
-       '\u0be7'..'\u0bef' |
-       '\u0c66'..'\u0c6f' |
-       '\u0ce6'..'\u0cef' |
-       '\u0d66'..'\u0d6f' |
-       '\u0e50'..'\u0e59' |
-       '\u0ed0'..'\u0ed9' |
-       '\u1040'..'\u1049'
-   ;
+fragment JavaIDDigit
+    : '\u0030' ..'\u0039'
+    | '\u0660' ..'\u0669'
+    | '\u06f0' ..'\u06f9'
+    | '\u0966' ..'\u096f'
+    | '\u09e6' ..'\u09ef'
+    | '\u0a66' ..'\u0a6f'
+    | '\u0ae6' ..'\u0aef'
+    | '\u0b66' ..'\u0b6f'
+    | '\u0be7' ..'\u0bef'
+    | '\u0c66' ..'\u0c6f'
+    | '\u0ce6' ..'\u0cef'
+    | '\u0d66' ..'\u0d6f'
+    | '\u0e50' ..'\u0e59'
+    | '\u0ed0' ..'\u0ed9'
+    | '\u1040' ..'\u1049'
+    ;
 
 //OBJECTCLASSREFERENCE
 //	: UPPER (UPPER | LOWER | '-')
 //	;
 IDENTIFIER
-    :   LETTER (LETTER|JavaIDDigit)*
+    : LETTER (LETTER | JavaIDDigit)*
     ;

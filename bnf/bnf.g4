@@ -26,11 +26,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar bnf;
 
 rulelist
     : rule_* EOF
-;
+    ;
 
 rule_
     : lhs ASSIGN rhs
@@ -45,7 +48,7 @@ rhs
     ;
 
 alternatives
-    : alternative (BAR alternative)*
+    : alternative ('|' alternative)*
     ;
 
 alternative
@@ -61,15 +64,15 @@ element
     ;
 
 optional_
-    : REND alternatives LEND
+    : '[' alternatives ']'
     ;
 
 zeroormore
-    : RBRACE alternatives LBRACE
+    : '{' alternatives '}'
     ;
 
 oneormore
-    : RPAREN alternatives LPAREN
+    : '(' alternatives ')'
     ;
 
 text_
@@ -77,7 +80,7 @@ text_
     ;
 
 id_
-    : LT ruleid GT
+    : '<' ruleid '>'
     ;
 
 ruleid
@@ -88,44 +91,44 @@ ASSIGN
     : '::='
     ;
 
-LPAREN
+Right_Parenthesis
     : ')'
     ;
 
-RPAREN
+Left_Parenthesis
     : '('
     ;
 
-LBRACE
+Right_Curly_Bracket
     : '}'
     ;
 
-RBRACE
+Left_Curly_Bracket
     : '{'
     ;
 
-LEND
+Right_Square_Bracket
     : ']'
     ;
 
-REND
+Left_Square_Bracket
     : '['
     ;
 
-BAR
+Vertical_Line
     : '|'
     ;
 
-GT
+Greater_Than_Sign
     : '>'
     ;
 
-LT
+Less_Than_Sign
     : '<'
     ;
 
 ID
-    : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-'|' ')+
+    : ('a' ..'z' | 'A' ..'Z') ('a' ..'z' | 'A' ..'Z' | '0' ..'9' | '-' | ' ')+
     ;
 
 WS

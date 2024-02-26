@@ -1,4 +1,3 @@
-
 /** A Java stacktrace text grammar for ANTLR v3 
  *  see http://java.sun.com/javase/6/docs/api/java/lang/Throwable.html
  *
@@ -10,157 +9,144 @@
 /*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar StackTrace;
 
 startRule
-   : stackTrace EOF
-   ;
+    : stackTrace EOF
+    ;
 
 stackTrace
-   : messageLine + stackTraceLine* causedByLine?
-   ;
+    : messageLine+ stackTraceLine* causedByLine?
+    ;
 
 stackTraceLine
-   : (atLine | ellipsisLine)
-   ;
+    : (atLine | ellipsisLine)
+    ;
 
 atLine
-   : AT qualifiedMethod '(' classFile (COLON Number)? ')'
-   ;
+    : AT qualifiedMethod '(' classFile (COLON Number)? ')'
+    ;
 
 causedByLine
-   : CAUSED_BY stackTrace
-   ;
+    : CAUSED_BY stackTrace
+    ;
 
 ellipsisLine
-   : ELLIPSIS Number MORE_
-   ;
+    : ELLIPSIS Number MORE_
+    ;
 
 messageLine
-   : (qualifiedClass message?)
-   ;
+    : (qualifiedClass message?)
+    ;
 
 qualifiedClass
-   : packagePath? className innerClassName*
-   ;
+    : packagePath? className innerClassName*
+    ;
 
 innerClassName
-   : ('$' className)
-   ;
+    : ('$' className)
+    ;
 
 classFile
-   : (identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
-   ;
+    : (identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
+    ;
 
 qualifiedMethod
-   : qualifiedClass DOT (methodName | constructor)?
-   ;
+    : qualifiedClass DOT (methodName | constructor)?
+    ;
 
 constructor
-   : INIT
-   ;
+    : INIT
+    ;
 
 methodName
-   : identifier
-   ;
+    : identifier
+    ;
 
 packagePath
-   : (identifier DOT) +
-   ;
+    : (identifier DOT)+
+    ;
 
 className
-   : JavaWord
-   ;
+    : JavaWord
+    ;
 
 identifier
-   : JavaWord
-   ;
+    : JavaWord
+    ;
 
 message
-   : COLON (: .)*?
-   ;
-
+    : COLON (: .)*?
+    ;
 
 Number
-   : Digit +
-   ;
-
+    : Digit+
+    ;
 
 JavaWord
-   : (JavaCharacter) +
-   ;
-
+    : (JavaCharacter)+
+    ;
 
 fragment JavaCharacter
-   : (CapitalLetter | NonCapitalLetter | Symbol | Digit)
-   ;
-
+    : (CapitalLetter | NonCapitalLetter | Symbol | Digit)
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 AT
-   : 'at'
-   ;
-
+    : 'at'
+    ;
 
 CAUSED_BY
-   : 'Caused by:'
-   ;
-
+    : 'Caused by:'
+    ;
 
 MORE_
-   : 'more'
-   ;
-
+    : 'more'
+    ;
 
 ELLIPSIS
-   : '...'
-   ;
-
+    : '...'
+    ;
 
 COLON
-   : ':'
-   ;
-
+    : ':'
+    ;
 
 NATIVE_METHOD
-   : 'Native Method'
-   ;
-
+    : 'Native Method'
+    ;
 
 UNKNOWN_SOURCE
-   : 'Unknown Source'
-   ;
-
+    : 'Unknown Source'
+    ;
 
 INIT
-   : '<init>'
-   ;
-
+    : '<init>'
+    ;
 
 NonCapitalLetter
-   : 'a' .. 'z'
-   ;
-
+    : 'a' .. 'z'
+    ;
 
 CapitalLetter
-   : 'A' .. 'Z'
-   ;
-
+    : 'A' .. 'Z'
+    ;
 
 Symbol
-   : '_'
-   ;
-
+    : '_'
+    ;
 
 Digit
-   : '0' .. '9'
-   ;
-
+    : '0' .. '9'
+    ;
 
 WS
-   : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
-   ;
+    : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
+    ;

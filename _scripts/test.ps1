@@ -1,5 +1,4 @@
 param (
-    [string]$antlrjar='/tmp/antlr4-complete.jar',
     [string]$target='CSharp',
     [string]$pc,
     [string]$cc
@@ -21,7 +20,7 @@ function Get-GrammarSkip {
         Write-Host "Intentionally skipping grammar $Grammar target $Target."
         return $True
     }
-    $desc_targets = trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    $desc_targets = dotnet trxml2 -- "$Grammar/desc.xml" | Select-String '/desc/targets'
     if ($LASTEXITCODE -ne 0) {
         Write-Host "The desc.xml for $testname is malformed. Skipping."
         return $True
@@ -55,7 +54,6 @@ enum FailStage {
 
 function Test-Grammar {
     param (
-        $Antlrjar,
         $Directory,
         $Target = "CSharp"
     )
@@ -70,8 +68,8 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates"
-    trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "dotnet trgen -- -t $Target --template-sources-directory $templates"
+    dotnet trgen -- -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -127,6 +125,8 @@ function Test-Grammar {
         # test
         $start2 = Get-Date
         Write-Host "--- Testing files ---"
+$workingDirectory = Get-Location
+Write-Host "The pwd is  $workingDirectory"
         ./test.ps1
         $passed = $LASTEXITCODE -eq 0
 
@@ -252,7 +252,7 @@ function Get-ChangedGrammars {
             Set-Location "$old"
             continue
         }
-        $desc_targets = trxml2 desc.xml | Select-String '/desc/targets'
+        $desc_targets = dotnet trxml2 -- desc.xml | Select-String '/desc/targets'
         if ($LASTEXITCODE -ne 0) {
             Write-Host "The desc.xml for $testname is malformed. Skipping."
             Set-Location "$old"
@@ -309,8 +309,7 @@ function Test-AllGrammars {
     param (
         $PreviousCommit,
         $CurrentCommit = "HEAD",
-        $Target = "CSharp",
-        $Antlrjar = "/tmp/antlr4-complete.jar"
+        $Target = "CSharp"
     )
     
 Write-Host "target = $target"
@@ -332,7 +331,7 @@ Write-Host "CurrentCommit = $CurrentCommit"
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Antlrjar $Antlrjar -Directory $g -Target $Target
+        $state = Test-Grammar -Directory $g -Target $Target
         if (!$state.Success) {
             $success = $false
             $failedGrammars += $g
@@ -364,6 +363,7 @@ $rootdir = $PSScriptRoot
 # This has to be inserted somewhere. This script requires
 # the trgen tool to instantiate drivers from templates.
 $templates = Join-Path $rootdir "/templates/"
+Write-Host "templates dir = $templates"
 
 $diff = $true
 if (!$target) {
@@ -376,14 +376,13 @@ if (!$pc) {
         $cc = "HEAD"
     }
 }
-Write-Host "antlrjar = $antlrjar"
 Write-Host "target = $target"
 Write-Host "pc = $pc"
 Write-Host "cc = $cc"
 
 if ($diff) {
-    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc
 }
 else {
-    Test-AllGrammars -Target $target -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target
 }

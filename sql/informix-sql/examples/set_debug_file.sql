@@ -1,0 +1,5 @@
+SET DEBUG FILE TO 'file_name' ;
+SET DEBUG FILE TO 'file_name' WITH APPEND;
+SET DEBUG FILE TO fid WITH APPEND;
+
+

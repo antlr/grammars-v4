@@ -33,97 +33,96 @@
  *	-- use imported standard fragments
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar STLexer;
 
 options {
-	superClass = LexerAdaptor ;
+    superClass = LexerAdaptor;
 }
 
-import LexBasic;	// Standard set of fragments
+import LexBasic;
+// Standard set of fragments
 
 channels {
-	OFF_CHANNEL		// non-default channel for whitespace and comments
+    OFF_CHANNEL // non-default channel for whitespace and comments
 }
 
 // -----------------------------------
 // default mode = Outside
 
+DOC_COMMENT   : DocComment   -> channel(OFF_CHANNEL);
+BLOCK_COMMENT : BlockComment -> channel(OFF_CHANNEL);
+LINE_COMMENT  : LineComment  -> channel(OFF_CHANNEL);
 
-DOC_COMMENT		: DocComment		-> channel(OFF_CHANNEL)	;
-BLOCK_COMMENT	: BlockComment		-> channel(OFF_CHANNEL)	;
-LINE_COMMENT	: LineComment		-> channel(OFF_CHANNEL)	;
+TMPL_COMMENT: TmplComment -> channel(OFF_CHANNEL);
 
-TMPL_COMMENT	: TmplComment		-> channel(OFF_CHANNEL)	;
+HORZ_WS : Hws+ -> channel(OFF_CHANNEL);
+VERT_WS : Vws+ -> channel(OFF_CHANNEL);
 
-HORZ_WS			: Hws+				-> channel(OFF_CHANNEL)	;
-VERT_WS			: Vws+				-> channel(OFF_CHANNEL)	;
+ESCAPE : .      { isLDelim() }? EscSeq . { isRDelim() }?; // self contained
+LDELIM : .      { isLDelim() }? -> mode(Inside); // switch mode to inside
+RBRACE : RBrace { endsSubTemplate(); }; // conditional switch to inside
 
-ESCAPE			: . { isLDelim() }? EscSeq . { isRDelim() }?	; // self contained
-LDELIM			: . { isLDelim() }?	-> mode(Inside)				; // switch mode to inside
-RBRACE			: RBrace { endsSubTemplate(); }					; // conditional switch to inside
-
-TEXT		: . { adjText(); }	;  // have to handle weird terminals
-
+TEXT: . { adjText(); }; // have to handle weird terminals
 
 // -----------------------------------
-mode Inside ;
+mode Inside;
 
-INS_HORZ_WS	: Hws+		-> type(HORZ_WS), channel(OFF_CHANNEL)	;
-INS_VERT_WS	: Vws+		-> type(VERT_WS), channel(OFF_CHANNEL)	;
+INS_HORZ_WS : Hws+ -> type(HORZ_WS), channel(OFF_CHANNEL);
+INS_VERT_WS : Vws+ -> type(VERT_WS), channel(OFF_CHANNEL);
 
-LBRACE		: LBrace { startsSubTemplate() }?	-> mode(SubTemplate)	;
-RDELIM		: . { isRDelim() }?					-> mode(DEFAULT_MODE)	;
+LBRACE : LBrace { startsSubTemplate() }? -> mode(SubTemplate);
+RDELIM : .      { isRDelim() }? -> mode(DEFAULT_MODE);
 
-STRING		: DQuoteLiteral	;
+STRING: DQuoteLiteral;
 
-IF			: 'if'			;
-ELSEIF		: 'elseif'		;
-ELSE		: 'else'		;
-ENDIF		: 'endif'		;
-SUPER		: 'super'		;
-END			: '@end'		;
+IF     : 'if';
+ELSEIF : 'elseif';
+ELSE   : 'else';
+ENDIF  : 'endif';
+SUPER  : 'super';
+END    : '@end';
 
-TRUE		: True_			;
-FALSE		: False_			;
+TRUE  : True_;
+FALSE : False_;
 
-AT			: At			;
-ELLIPSIS	: Ellipsis		;
-DOT			: Dot			;
-COMMA		: Comma			;
-COLON		: Colon			;
-SEMI		: Semi			;
-AND			: And			;
-OR			: Or			;
-LPAREN		: LParen		;
-RPAREN		: RParen		;
-LBRACK		: LBrack		;
-RBRACK		: RBrack		;
-EQUALS		: Equal			;
-BANG		: Bang			;
-
+AT       : At;
+ELLIPSIS : Ellipsis;
+DOT      : Dot;
+COMMA    : Comma;
+COLON    : Colon;
+SEMI     : Semi;
+AND      : And;
+OR       : Or;
+LPAREN   : LParen;
+RPAREN   : RParen;
+LBRACK   : LBrack;
+RBRACK   : RBrack;
+EQUALS   : Equal;
+BANG     : Bang;
 
 // -----------------------------------
 // Unknown content in mode Inside
 
-ERR_CHAR	: .	-> skip		;
-
+ERR_CHAR: . -> skip;
 
 // -----------------------------------
-mode SubTemplate ;
+mode SubTemplate;
 
-SUB_HORZ_WS		: Hws+		-> type(HORZ_WS), channel(OFF_CHANNEL)	;
-SUB_VERT_WS		: Vws+		-> type(VERT_WS), channel(OFF_CHANNEL)	;
+SUB_HORZ_WS : Hws+ -> type(HORZ_WS), channel(OFF_CHANNEL);
+SUB_VERT_WS : Vws+ -> type(VERT_WS), channel(OFF_CHANNEL);
 
-ID				: NameStartChar NameChar*			;
-SUB_COMMA		: Comma		-> type(COMMA)			;
-PIPE			: Pipe		-> mode(DEFAULT_MODE)	;
-
+ID        : NameStartChar NameChar*;
+SUB_COMMA : Comma -> type(COMMA);
+PIPE      : Pipe  -> mode(DEFAULT_MODE);
 
 // -----------------------------------
 // Grammar specific fragments
 
-fragment TmplComment	: LTmplMark .*? RTmplMark		;
+fragment TmplComment: LTmplMark .*? RTmplMark;
 
-fragment LTmplMark		: . { isLTmplComment() }? Bang	;
-fragment RTmplMark		: Bang . { isRTmplComment() }?	;
-
+fragment LTmplMark : .      { isLTmplComment() }? Bang;
+fragment RTmplMark : Bang . { isRTmplComment() }?;

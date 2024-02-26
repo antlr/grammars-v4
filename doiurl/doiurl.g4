@@ -32,94 +32,98 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://www.doi.org
 
-
 // https://tools.ietf.org/id/draft-paskin-doi-uri-04.txt
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar doiurl;
 
 doiuri
-   : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF?
-   ;
+    : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF?
+    ;
 
 scheme
-   : 'doi'
-   ;
+    : 'doi'
+    ;
 
 encodeddoi
-   : prefix_ '/' suffix
-   ;
+    : prefix_ '/' suffix
+    ;
 
 prefix_
-   : segment
-   ;
+    : segment
+    ;
 
 suffix
-   : segment ('/' segment)*
-   ;
+    : segment ('/' segment)*
+    ;
 
 segment
-   : PCHAR+
-   ;
+    : PCHAR+
+    ;
 
 query
-   : (PCHAR | '/' | '?')*
-   ;
+    : (PCHAR | '/' | '?')*
+    ;
 
 fragment_
-   : (PCHAR | '/' | '?')*
-   ;
+    : (PCHAR | '/' | '?')*
+    ;
 
 PCHAR
-   : UNRESERVED
-   | ESCAPED
-   | ';'
-   | ':'
-   | '@'
-   | '&'
-   | '='
-   | '+'
-   | '$'
-   | ','
-   ;
+    : UNRESERVED
+    | ESCAPED
+    | ';'
+    | ':'
+    | '@'
+    | '&'
+    | '='
+    | '+'
+    | '$'
+    | ','
+    ;
 
 fragment UNRESERVED
-   : ALPHA
-   | DIGIT
-   | MARK
-   ;
+    : ALPHA
+    | DIGIT
+    | MARK
+    ;
 
 fragment ESCAPED
-   : '%' HEXDIG HEXDIG
-   ;
+    : '%' HEXDIG HEXDIG
+    ;
 
 fragment MARK
-   : '-'
-   | '_'
-   | '.'
-   | '!'
-   | '~'
-   | '*'
-   | '\''
-   | '('
-   | ')'
-   ;
-   // https://tools.ietf.org/html/rfc2234
+    : '-'
+    | '_'
+    | '.'
+    | '!'
+    | '~'
+    | '*'
+    | '\''
+    | '('
+    | ')'
+    ;
+
+// https://tools.ietf.org/html/rfc2234
 
 fragment ALPHA
-   : [a-zA-Z]
-   ;
-   // https://tools.ietf.org/html/rfc2234
+    : [a-zA-Z]
+    ;
+
+// https://tools.ietf.org/html/rfc2234
 
 fragment DIGIT
-   : [0-9]
-   ;
-   // https:tools.ietf.org/html/rfc2234
+    : [0-9]
+    ;
+
+// https:tools.ietf.org/html/rfc2234
 
 fragment HEXDIG
-   : [0-9A-F]
-   ;
+    : [0-9A-F]
+    ;
 
 WS
-   : [ \t\r\n]+ -> skip
-   ;
-
+    : [ \t\r\n]+ -> skip
+    ;

@@ -1,3 +1,6 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar Thrift;
 
 document
@@ -5,7 +8,9 @@ document
     ;
 
 header
-    : include_ | namespace_ | cpp_include
+    : include_
+    | namespace_
+    | cpp_include
     ;
 
 include_
@@ -23,13 +28,19 @@ cpp_include
     : 'cpp_include' LITERAL
     ;
 
-
 definition
-    : const_rule | typedef_ | enum_rule | senum | struct_ | union_ | exception | service
+    : const_rule
+    | typedef_
+    | enum_rule
+    | senum
+    | struct_
+    | union_
+    | exception
+    | service
     ;
 
 const_rule
-    : 'const' field_type IDENTIFIER ( '=' const_value )? list_separator?
+    : 'const' field_type IDENTIFIER ('=' const_value)? list_separator?
     ;
 
 typedef_
@@ -94,7 +105,6 @@ throws_list
     : 'throws' '(' field* ')'
     ;
 
-
 type_annotations
     : '(' type_annotation* ')'
     ;
@@ -104,12 +114,14 @@ type_annotation
     ;
 
 annotation_value
-    : integer | LITERAL
+    : integer
+    | LITERAL
     ;
 
-
 field_type
-    : base_type | IDENTIFIER | container_type
+    : base_type
+    | IDENTIFIER
+    | container_type
     ;
 
 base_type
@@ -137,11 +149,17 @@ cpp_type
     ;
 
 const_value
-    : integer | DOUBLE | LITERAL | IDENTIFIER | const_list | const_map
+    : integer
+    | DOUBLE
+    | LITERAL
+    | IDENTIFIER
+    | const_list
+    | const_map
     ;
 
 integer
-    : INTEGER | HEX_INTEGER
+    : INTEGER
+    | HEX_INTEGER
     ;
 
 INTEGER
@@ -153,7 +171,7 @@ HEX_INTEGER
     ;
 
 DOUBLE
-    : ('+' | '-')? ( DIGIT+ ('.' DIGIT+)? | '.' DIGIT+ ) (('E' | 'e') INTEGER)?
+    : ('+' | '-')? (DIGIT+ ('.' DIGIT+)? | '.' DIGIT+) (('E' | 'e') INTEGER)?
     ;
 
 const_list
@@ -169,29 +187,61 @@ const_map
     ;
 
 list_separator
-    : COMMA | ';'
+    : COMMA
+    | ';'
     ;
 
 real_base_type
-    :  TYPE_BOOL | TYPE_BYTE | TYPE_I16 | TYPE_I32 | TYPE_I64 | TYPE_DOUBLE | TYPE_STRING | TYPE_BINARY
+    : TYPE_BOOL
+    | TYPE_BYTE
+    | TYPE_I16
+    | TYPE_I32
+    | TYPE_I64
+    | TYPE_DOUBLE
+    | TYPE_STRING
+    | TYPE_BINARY
     ;
 
-TYPE_BOOL: 'bool';
-TYPE_BYTE: 'byte';
-TYPE_I16: 'i16';
-TYPE_I32: 'i32';
-TYPE_I64: 'i64';
-TYPE_DOUBLE: 'double';
-TYPE_STRING: 'string';
-TYPE_BINARY: 'binary';
+TYPE_BOOL
+    : 'bool'
+    ;
+
+TYPE_BYTE
+    : 'byte'
+    ;
+
+TYPE_I16
+    : 'i16'
+    ;
+
+TYPE_I32
+    : 'i32'
+    ;
+
+TYPE_I64
+    : 'i64'
+    ;
+
+TYPE_DOUBLE
+    : 'double'
+    ;
+
+TYPE_STRING
+    : 'string'
+    ;
+
+TYPE_BINARY
+    : 'binary'
+    ;
 
 LITERAL
-    : '"' ( ESC_SEQ | ~[\\"] )* '"'
-    | '\'' ( ESC_SEQ | ~[\\'] )* '\''
+    : '"' (ESC_SEQ | ~[\\"])* '"'
+    | '\'' ( ESC_SEQ | ~[\\'])* '\''
     ;
 
-fragment ESC_SEQ : '\\' [rnt"'\\] ;
-
+fragment ESC_SEQ
+    : '\\' [rnt"'\\]
+    ;
 
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '.' | '_')*
@@ -202,15 +252,18 @@ COMMA
     ;
 
 fragment LETTER
-    : 'A'..'Z' | 'a'..'z'
+    : 'A' ..'Z'
+    | 'a' ..'z'
     ;
 
 fragment DIGIT
-    : '0'..'9'
+    : '0' ..'9'
     ;
 
 fragment HEX_DIGIT
-    : DIGIT | 'A'..'F' | 'a'..'f'
+    : DIGIT
+    | 'A' ..'F'
+    | 'a' ..'f'
     ;
 
 WS

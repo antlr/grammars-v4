@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>css3.g4</include>
+					   <include>css3Lexer.g4</include>
+					   <include>css3Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

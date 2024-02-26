@@ -11,5 +11,4 @@ CREATE TYPE person AS OBJECT
     dateofbirth DATE,
     homeaddress address_t,
     manager     REF person );
-;
 

@@ -1,10 +1,15 @@
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 
 import java.util.BitSet;
 
-public class SwiftSupport {
+public abstract class SwiftSupport extends Parser
+{
+    protected SwiftSupport(TokenStream input)
+    {
+        super(input);
+    }
+
     /* TODO
     There is one caveat to the rules above. If the ! or ? predefined operator
      has no whitespace on the left, it is treated as a postfix operator,
@@ -183,7 +188,7 @@ public class SwiftSupport {
      * Find stop token index of next operator; return -1 if not operator.
      */
     public static int getLastOpTokenIndex(TokenStream tokens) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         int currentTokenIndex = tokens.index(); // current on-channel lookahead token index
         Token currentToken = tokens.get(currentTokenIndex);
 
@@ -235,7 +240,7 @@ public class SwiftSupport {
      * and a + b is treated as a binary operator."
      */
     public static boolean isBinaryOp(TokenStream tokens) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if (stop == -1) return false;
 
@@ -265,7 +270,7 @@ public class SwiftSupport {
      * as a prefix unary operator."
      */
     public static boolean isPrefixOp(TokenStream tokens) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if (stop == -1) return false;
 
@@ -290,7 +295,7 @@ public class SwiftSupport {
      * rather than a ++ .b)."
      */
     public static boolean isPostfixOp(TokenStream tokens) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if (stop == -1) return false;
 
@@ -306,7 +311,7 @@ public class SwiftSupport {
     }
 
     public static boolean isOperator(TokenStream tokens, String op) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if (stop == -1) return false;
 
@@ -330,7 +335,7 @@ public class SwiftSupport {
     }
 
     public static boolean isSeparatedStatement(TokenStream tokens, int indexOfPreviousStatement) {
-	SwiftSupport.fillUp(tokens);
+        SwiftSupport.fillUp(tokens);
         //System.out.println("------");
         //System.out.println("indexOfPreviousStatement: " + indexOfPreviousStatement);
 
@@ -363,10 +368,10 @@ public class SwiftSupport {
     }
     public static void fillUp(TokenStream tokens)
     {
-	for (int jj = 1;;++jj)
-	{
-	    int t = tokens.LA(jj);
-	    if (t == -1) break;
-	}
+        for (int jj = 1;;++jj)
+        {
+            int t = tokens.LA(jj);
+            if (t == -1) break;
+        }
     }
 }

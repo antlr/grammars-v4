@@ -29,350 +29,353 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar orwell;
 
 program
-   : decl+ EOF
-   ;
+    : decl+ EOF
+    ;
 
 decl
-   : syndecl
-   | condecl
-   | typedecl
-   | opdecl
-   | def_
-   ;
+    : syndecl
+    | condecl
+    | typedecl
+    | opdecl
+    | def_
+    ;
 
 syndecl
-   : tylhs '==' type_
-   ;
+    : tylhs '==' type_
+    ;
 
 condecl
-   : tylhs ':==' construct ('|' construct)*
-   ;
+    : tylhs ':==' construct ('|' construct)*
+    ;
 
 typedecl
-   : name (',' name)* '::' type_
-   ;
+    : name (',' name)* '::' type_
+    ;
 
 name
-   : var_ '(' (var_ prefix | infix) ')'
-   ;
+    : var_ '(' (var_ prefix | infix) ')'
+    ;
 
 tylhs
-   : (tyvar infix tyvar)
-   | (prefix tyvar)
-   | tylhs1
-   ;
+    : (tyvar infix tyvar)
+    | (prefix tyvar)
+    | tylhs1
+    ;
 
 tylhs1
-   : tylhsprimary tyvar*
-   ;
+    : tylhsprimary tyvar*
+    ;
 
 tylhsprimary
-   : tyname '(' (tylhs | tylhssection) ')'
-   ;
+    : tyname '(' (tylhs | tylhssection) ')'
+    ;
 
 tylhssection
-   : prefix
-   | infix
-   | (infix tyvar)
-   | (tyvar infix)
-   ;
+    : prefix
+    | infix
+    | (infix tyvar)
+    | (tyvar infix)
+    ;
 
 type_
-   : tyterm1 (infix type_)?
-   ;
+    : tyterm1 (infix type_)?
+    ;
 
 tyterm1
-   : prefix tyterm1
-   | tyterm2
-   ;
+    : prefix tyterm1
+    | tyterm2
+    ;
 
 tyterm2
-   : typrimary
-   | typrimaryname typrimary*
-   ;
+    : typrimary
+    | typrimaryname typrimary*
+    ;
 
 typrimaryname
-   : tyname
-   | '(' (type_ | tysection) ')'
-   ;
+    : tyname
+    | '(' (type_ | tysection) ')'
+    ;
 
 typrimary
-   : typrimaryname
-   | tyvar tytuple
-   | tylist
-   ;
+    : typrimaryname
+    | tyvar tytuple
+    | tylist
+    ;
 
 tysection
-   : prefix infix
-   | (infix tyterm1)
-   | (tyterm1 infix)
-   ;
+    : prefix infix
+    | (infix tyterm1)
+    | (tyterm1 infix)
+    ;
 
 tylist
-   : '[' type_ ']'
-   ;
+    : '[' type_ ']'
+    ;
 
 tytuple
-   : '(' type_ (',' type_)* ')'
-   ;
+    : '(' type_ (',' type_)* ')'
+    ;
 
 construct
-   : (con typrimary*)
-   | (typrimary infix typrimary)
-   | (prefix typrimary)
-   ;
+    : (con typrimary*)
+    | (typrimary infix typrimary)
+    | (prefix typrimary)
+    ;
 
 opdecl
-   : opkind OP+
-   ;
+    : opkind OP+
+    ;
 
 opkind
-   : (assoc DIGIT)
-   | '%prefix'
-   | '%prefixcon'
-   ;
+    : (assoc DIGIT)
+    | '%prefix'
+    | '%prefixcon'
+    ;
 
 assoc
-   : '%left'
-   | '%right'
-   | '%non'
-   | '%leftcon'
-   | '%rightcon'
-   | '%noncon'
-   ;
+    : '%left'
+    | '%right'
+    | '%non'
+    | '%leftcon'
+    | '%rightcon'
+    | '%noncon'
+    ;
 
 def_
-   : pat '=' rhs ('%else'? pat '=' rhs)*
-   ;
+    : pat '=' rhs ('%else'? pat '=' rhs)*
+    ;
 
 rhs
-   : (term | conditional) wherepart?
-   ;
+    : (term | conditional) wherepart?
+    ;
 
 conditional
-   : ifpart ('=' ifpart)* ('=' otherpart)?
-   ;
+    : ifpart ('=' ifpart)* ('=' otherpart)?
+    ;
 
 ifpart
-   : term ',' 'if' term
-   ;
+    : term ',' 'if' term
+    ;
 
 otherpart
-   : term ',' 'otherwise'
-   ;
+    : term ',' 'otherwise'
+    ;
 
 wherepart
-   : 'where' def_+
-   ;
+    : 'where' def_+
+    ;
 
 pat
-   : pat1 (infix pat)?
-   ;
+    : pat1 (infix pat)?
+    ;
 
 pat1
-   : prefix pat1
-   | pat2
-   ;
+    : prefix pat1
+    | pat2
+    ;
 
 pat2
-   : patprimary
-   | (patprimaryname patprimary*)
-   ;
+    : patprimary
+    | (patprimaryname patprimary*)
+    ;
 
 patprimaryname
-   : var_
-   | ('(' (pat | patsection) ')')
-   ;
+    : var_
+    | ('(' (pat | patsection) ')')
+    ;
 
 patprimary
-   : patprimaryname
-   | literal
-   | pattuple
-   | patlist
-   ;
+    : patprimaryname
+    | literal
+    | pattuple
+    | patlist
+    ;
 
 patsection
-   : prefix
-   | infix
-   | (infix pat1)
-   | (pat1 infix)
-   ;
+    : prefix
+    | infix
+    | (infix pat1)
+    | (pat1 infix)
+    ;
 
 pattuple
-   : '(' pat ',' pat (',' pat)* ')'
-   ;
+    : '(' pat ',' pat (',' pat)* ')'
+    ;
 
 patlist
-   : '[' (pat (',' pat)*)? ']'
-   ;
+    : '[' (pat (',' pat)*)? ']'
+    ;
 
 term
-   : term1 (infix term)?
-   ;
+    : term1 (infix term)?
+    ;
 
 term1
-   : (prefix term1)
-   | term2
-   ;
+    : (prefix term1)
+    | term2
+    ;
 
 term2
-   : primary
-   | (primaryname primary*)
-   ;
+    : primary
+    | (primaryname primary*)
+    ;
 
 primaryname
-   : var_
-   | '(' (term | section) ')'
-   ;
+    : var_
+    | '(' (term | section) ')'
+    ;
 
 primary
-   : primaryname
-   | fliteral
-   | tuple_
-   | list_
-   ;
+    : primaryname
+    | fliteral
+    | tuple_
+    | list_
+    ;
 
 section
-   : prefix
-   | infix
-   | (infix term1)
-   | (term1 infix)
-   ;
+    : prefix
+    | infix
+    | (infix term1)
+    | (term1 infix)
+    ;
 
 list_
-   : listform
-   | upto
-   | comp
-   ;
+    : listform
+    | upto
+    | comp
+    ;
 
 tuple_
-   : '(' term ',' term (',' term)* ')'
-   ;
+    : '(' term ',' term (',' term)* ')'
+    ;
 
 listform
-   : '[' (term (',' term)*)? ']'
-   ;
+    : '[' (term (',' term)*)? ']'
+    ;
 
 upto
-   : '[' term (',' term)? '..' term? ']'
-   ;
+    : '[' term (',' term)? '..' term? ']'
+    ;
 
 comp
-   : '[' term '|' (qualifier (';' qualifier)*)? ']'
-   ;
+    : '[' term '|' (qualifier (';' qualifier)*)? ']'
+    ;
 
 qualifier
-   : term
-   | pat '<-' term
-   ;
+    : term
+    | pat '<-' term
+    ;
 
 fliteral
-   : FLOAT
-   | literal
-   ;
+    : FLOAT
+    | literal
+    ;
 
 literal
-   : INTEGER
-   | CHAR
-   | STRING
-   ;
+    : INTEGER
+    | CHAR
+    | STRING
+    ;
 
 infix
-   : OP
-   ;
+    : OP
+    ;
 
 prefix
-   : OP
-   ;
+    : OP
+    ;
 
 tyname
-   : ID
-   ;
+    : ID
+    ;
 
 tyvar
-   : ID
-   ;
+    : ID
+    ;
 
 con
-   : ID
-   ;
+    : ID
+    ;
 
 var_
-   : ID
-   ;
+    : ID
+    ;
 
 INTEGER
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 FLOAT
-   : INTEGER '.' INTEGER ('e' '—'? INTEGER)?
-   ;
+    : INTEGER '.' INTEGER ('e' '—'? INTEGER)?
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 ESCCHAR
-   : '\\' (CHAR | DIGIT (DIGIT DIGIT?)?)
-   ;
+    : '\\' (CHAR | DIGIT (DIGIT DIGIT?)?)
+    ;
 
 PRAGMA
-   : '%' ID
-   ;
+    : '%' ID
+    ;
 
 OP
-   : SYMBOL+
-   | ('$' ID)
-   ;
+    : SYMBOL+
+    | ('$' ID)
+    ;
 
 ID
-   : LETTER (LETTER | SYMBOL | DIGIT | '\'' | '_')*
-   ;
+    : LETTER (LETTER | SYMBOL | DIGIT | '\'' | '_')*
+    ;
 
 fragment SYMBOL
-   : '+'
-   | '-'
-   | '*'
-   | '='
-   | '<'
-   | '>'
-   | '~'
-   | '&'
-   | '\\'
-   | '/'
-   | '^'
-   | ':'
-   | '#'
-   | '!'
-   | '.'
-   | ';'
-   | '|'
-   | '?'
-   | '@'
-   | '`'
-   | '$'
-   | '%'
-   | '{'
-   | '}'
-   ;
+    : '+'
+    | '-'
+    | '*'
+    | '='
+    | '<'
+    | '>'
+    | '~'
+    | '&'
+    | '\\'
+    | '/'
+    | '^'
+    | ':'
+    | '#'
+    | '!'
+    | '.'
+    | ';'
+    | '|'
+    | '?'
+    | '@'
+    | '`'
+    | '$'
+    | '%'
+    | '{'
+    | '}'
+    ;
 
 fragment LETTER
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 DIGIT
-   : '0' .. '9'
-   ;
+    : '0' .. '9'
+    ;
 
 CHAR
-   : [0-9a-zA-Z]
-   ;
+    : [0-9a-zA-Z]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

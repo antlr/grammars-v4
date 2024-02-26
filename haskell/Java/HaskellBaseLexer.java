@@ -28,7 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedList;
 
 public abstract class HaskellBaseLexer extends Lexer {
@@ -72,7 +73,7 @@ public abstract class HaskellBaseLexer extends Lexer {
     // A queue where extra tokens are pushed on
     private LinkedList<Token> tokenQueue = new LinkedList<>();
     // The stack that keeps key word and indent after that
-    private Stack<Pair<String, Integer>> indentStack = new Stack<>();
+    private final Deque<Pair<String, Integer>> indentStack = new ArrayDeque<>();
     // Pointer keeps last indent token
     private Token initialIndentToken = null;
     private String  lastKeyWord = "";
@@ -112,7 +113,7 @@ public abstract class HaskellBaseLexer extends Lexer {
         }
     }
 
-    private int getSavedIndent() { return indentStack.empty() ? startIndent : indentStack.peek().second(); }
+    private int getSavedIndent() { return indentStack.isEmpty() ? startIndent : indentStack.peek().second(); }
 
     private CommonToken
     createToken(int type, String text, Token next) {
@@ -127,14 +128,14 @@ public abstract class HaskellBaseLexer extends Lexer {
     }
 
     private void processINToken(Token next) {
-        while (!indentStack.empty() && !indentStack.peek().first().equals("let")) {
+        while (!indentStack.isEmpty() && !indentStack.peek().first().equals("let")) {
             tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));
             tokenQueue.offer(createToken(HaskellLexer.VCCURLY, "VCCURLY", next));
             nestedLevel--;
             indentStack.pop();
         }
 
-        if (!indentStack.empty() && indentStack.peek().first().equals("let")) {
+        if (!indentStack.isEmpty() && indentStack.peek().first().equals("let")) {
             tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));
             tokenQueue.offer(createToken(HaskellLexer.VCCURLY, "VCCURLY", next));
             nestedLevel--;
@@ -157,7 +158,7 @@ public abstract class HaskellBaseLexer extends Lexer {
         }
 
         while (indentCount < getSavedIndent()) {
-            if (!indentStack.empty() && nestedLevel > 0) {
+            if (!indentStack.isEmpty() && nestedLevel > 0) {
                 indentStack.pop();
                 nestedLevel--;
             }
@@ -298,7 +299,7 @@ public abstract class HaskellBaseLexer extends Lexer {
             }
 
             while (indentCount < getSavedIndent()) {
-                if (!indentStack.empty() && nestedLevel > 0) {
+                if (!indentStack.isEmpty() && nestedLevel > 0) {
                     indentStack.pop();
                     nestedLevel--;
                 }
@@ -360,7 +361,7 @@ public abstract class HaskellBaseLexer extends Lexer {
             lastKeyWord = next.getText();
 
             if (type == HaskellLexer.WHERE) {
-                if (!indentStack.empty() 
+                if (!indentStack.isEmpty()
                     && (indentStack.peek().first().equals("do") 
                     || indentStack.peek().first().equals("mdo"))) {
                     tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));

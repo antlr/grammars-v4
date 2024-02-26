@@ -1,0 +1,33 @@
+/* Detect directed cycle and print one if found */
+BEG_G{
+  node_t tp, hp;
+  node_t stk[node_t];
+  $tvtype = TV_prepostfwd;
+  $tvroot = fstnode($);
+}
+
+N {
+  if (stk[$]) {
+      stk[$] = NULL;
+  }
+  else if ($tvedge == NULL) {  /* current root */
+    stk[$] = $;
+  }
+  else {
+    stk[$] = $tvedge.tail;
+  }
+}
+E {
+  if (stk[$.head]) {
+     tp = $.tail;
+     hp = $.head;
+     while (tp != $.head) {
+        printf ("%s -> %s\n", tp.name, hp.name);
+        hp = tp;
+        tp = stk[tp];
+      }
+     printf ("%s -> %s\n", tp.name, hp.name);
+     exit(0);
+  }
+}
+

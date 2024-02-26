@@ -1,0 +1,14 @@
+BEGIN{
+
+  int i;
+  string s1, s2, s3;
+
+  s2="123456789012";
+
+  i=index(s2,"0");
+  print("index: ", i, "  should be 9");
+  i=index(s2,"4");
+  print("index: ", i, "  should be 3");
+  i=index(s2,"P");
+  print("index: ", i, "  should be -1");
+}

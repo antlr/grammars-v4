@@ -1,0 +1,1 @@
+line 1:1 mismatched input '||' expecting {RegularExpressionLiteral, '[', '(', '{', '++', '--', '+', '-', '~', '!', 'null', BooleanLiteral, DecimalLiteral, HexIntegerLiteral, OctalIntegerLiteral, 'typeof', 'new', 'void', 'function', 'this', 'delete', Identifier, StringLiteral}

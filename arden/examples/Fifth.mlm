@@ -1,0 +1,51 @@
+maintenance:
+title: Doses Calculation Theophylline - fuzzy;;
+mlmname: dose_calculation_theophylline_fuzzy;;
+arden: version 2.9;;
+version: ;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 2012-07-10;;
+validation: testing;;
+library:
+purpose: calculates the suggested daily doses based on the patients age;;
+explanation: ;;
+keywords: ;;
+citations:
+1. refute "Some link";
+;;
+knowledge:
+type: data_driven;;
+data: /////////////////////////////////////////
+patientAge := argument;
+AgeGroup := linguistic variable [young, middleAged, old];
+;;
+evoke: ;;
+logic: ///////////////////////////////////////
+age := new AgeGroup;
+// Age less than 20 years old:
+age.young := fuzzy set (0 years, truth value 1), (19 year, truth value 1), (20 years,
+truth value 0);
+// Age more than 20 years old and less than 40 years old:
+age.middleAge := fuzzy set (19 years, truth value 0), (20 years, truth value 1), (39
+years, truth value 1), (40 years, truth value 0);
+// Age greater than 40 years old:
+age.old := fuzzy set (39 years, truth value 0), (40 years, truth value 1);
+// Theophylline Dose
+if patientAge is equal age.young then
+dose := 8;
+elseif patientAge is equal age.middleAged then
+dose := 15;
+elseif patientAge is equal age.old then
+dose := 20;
+endif;
+conclude true;
+;;
+action: ///////////////////////////////////////
+write dose;
+;;
+resources:
+default: en;;
+language: en;;
+end:

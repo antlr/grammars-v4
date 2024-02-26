@@ -26,9 +26,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ObjectiveCParser;
 
-options { tokenVocab=ObjectiveCLexer; }
+options {
+    tokenVocab = ObjectiveCLexer;
+}
 
 translationUnit
     : topLevelDeclaration* EOF
@@ -53,28 +58,23 @@ importDeclaration
     ;
 
 classInterface
-    : IB_DESIGNABLE?
-      '@interface'
-       className=genericTypeSpecifier (':' superclassName=identifier)? (LT protocolList GT)? instanceVariables? interfaceDeclarationList?
-      '@end'
+    : IB_DESIGNABLE? '@interface' className = genericTypeSpecifier (
+        ':' superclassName = identifier
+    )? (LT protocolList GT)? instanceVariables? interfaceDeclarationList? '@end'
     ;
 
 categoryInterface
-    : '@interface'
-       categoryName=genericTypeSpecifier LP className=identifier? RP (LT protocolList GT)? instanceVariables? interfaceDeclarationList?
-      '@end'
+    : '@interface' categoryName = genericTypeSpecifier LP className = identifier? RP (
+        LT protocolList GT
+    )? instanceVariables? interfaceDeclarationList? '@end'
     ;
 
 classImplementation
-    : '@implementation'
-       className=genericTypeSpecifier (':' superclassName=identifier)? instanceVariables? implementationDefinitionList?
-      '@end'
+    : '@implementation' className = genericTypeSpecifier (':' superclassName = identifier)? instanceVariables? implementationDefinitionList? '@end'
     ;
 
 categoryImplementation
-    : '@implementation'
-       className=genericTypeSpecifier LP categoryName=identifier RP implementationDefinitionList?
-      '@end'
+    : '@implementation' className = genericTypeSpecifier LP categoryName = identifier RP implementationDefinitionList? '@end'
     ;
 
 genericTypeSpecifier
@@ -82,13 +82,11 @@ genericTypeSpecifier
     ;
 
 protocolDeclaration
-    : '@protocol'
-       protocolName (LT protocolList GT)? protocolDeclarationSection*
-      '@end'
+    : '@protocol' protocolName (LT protocolList GT)? protocolDeclarationSection* '@end'
     ;
 
 protocolDeclarationSection
-    : modifier=(REQUIRED | OPTIONAL) interfaceDeclarationList*
+    : modifier = (REQUIRED | OPTIONAL) interfaceDeclarationList*
     | interfaceDeclarationList+
     ;
 
@@ -131,7 +129,7 @@ propertyAttribute
 
 protocolName
     : LT protocolList GT
-    | ('__covariant' | '__contravariant')?  identifier
+    | ('__covariant' | '__contravariant')? identifier
     ;
 
 instanceVariables
@@ -151,11 +149,13 @@ accessModifier
     ;
 
 interfaceDeclarationList
-    : (declaration
-    | classMethodDeclaration
-    | instanceMethodDeclaration
-    | propertyDeclaration
-    | functionDeclaration)+
+    : (
+        declaration
+        | classMethodDeclaration
+        | instanceMethodDeclaration
+        | propertyDeclaration
+        | functionDeclaration
+    )+
     ;
 
 classMethodDeclaration
@@ -171,12 +171,14 @@ methodDeclaration
     ;
 
 implementationDefinitionList
-    : (functionDefinition
-    | declaration
-    | classMethodDefinition
-    | instanceMethodDefinition
-    | propertyImplementation
-    )+;
+    : (
+        functionDefinition
+        | declaration
+        | classMethodDefinition
+        | instanceMethodDefinition
+        | propertyImplementation
+    )+
+    ;
 
 classMethodDefinition
     : '+' methodDefinition
@@ -222,7 +224,10 @@ propertySynthesizeItem
     ;
 
 blockType
-    : nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP '^' (nullabilitySpecifier | typeSpecifier)? RP blockParameters?
+    : nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP '^' (
+        nullabilitySpecifier
+        | typeSpecifier
+    )? RP blockParameters?
     ;
 
 genericsSpecifier
@@ -313,7 +318,9 @@ throwStatement
     ;
 
 tryBlock
-    : '@try' tryStatement=compoundStatement catchStatement* ('@finally' finallyStatement=compoundStatement)?
+    : '@try' tryStatement = compoundStatement catchStatement* (
+        '@finally' finallyStatement = compoundStatement
+    )?
     ;
 
 catchStatement
@@ -388,7 +395,10 @@ varDeclaration
     ;
 
 typedefDeclaration
-    : attributeSpecifier? TYPEDEF (declarationSpecifiers typeDeclaratorList | declarationSpecifiers) ';'
+    : attributeSpecifier? TYPEDEF (
+        declarationSpecifiers typeDeclaratorList
+        | declarationSpecifiers
+    ) ';'
     ;
 
 typeDeclaratorList
@@ -400,14 +410,16 @@ typeDeclarator
     ;
 
 declarationSpecifiers
-    : (storageClassSpecifier
-    | attributeSpecifier
-    | arcBehaviourSpecifier
-    | nullabilitySpecifier
-    | ibOutletQualifier
-    | typePrefix
-    | typeQualifier
-    | typeSpecifier)+
+    : (
+        storageClassSpecifier
+        | attributeSpecifier
+        | arcBehaviourSpecifier
+        | nullabilitySpecifier
+        | ibOutletQualifier
+        | typePrefix
+        | typeQualifier
+        | typeSpecifier
+    )+
     ;
 
 attributeSpecifier
@@ -431,12 +443,14 @@ fieldDeclaration
     ;
 
 specifierQualifierList
-    : (arcBehaviourSpecifier
-    | nullabilitySpecifier
-    | ibOutletQualifier
-    | typePrefix
-    | typeQualifier
-    | typeSpecifier)+
+    : (
+        arcBehaviourSpecifier
+        | nullabilitySpecifier
+        | ibOutletQualifier
+        | typePrefix
+        | typeQualifier
+        | typeSpecifier
+    )+
     ;
 
 ibOutletQualifier
@@ -522,7 +536,10 @@ fieldDeclarator
     ;
 
 enumSpecifier
-    : 'enum' (identifier? ':' typeName)? (identifier ('{' enumeratorList '}')? | '{' enumeratorList '}')
+    : 'enum' (identifier? ':' typeName)? (
+        identifier ('{' enumeratorList '}')?
+        | '{' enumeratorList '}'
+    )
     | ('NS_OPTIONS' | 'NS_ENUM') LP typeName ',' identifier RP '{' enumeratorList '}'
     ;
 
@@ -620,7 +637,7 @@ labeledStatement
     ;
 
 rangeExpression
-    :  constantExpression ('...' constantExpression)?
+    : constantExpression ('...' constantExpression)?
     ;
 
 compoundStatement
@@ -628,7 +645,7 @@ compoundStatement
     ;
 
 selectionStatement
-    : IF LP expression RP ifBody=statement (ELSE elseBody=statement)?
+    : IF LP expression RP ifBody = statement (ELSE elseBody = statement)?
     | switchStatement
     ;
 
@@ -690,26 +707,33 @@ expressions
 
 expression
     : castExpression
-
-    | expression op=(MUL | DIV | MOD) expression
-    | expression op=(ADD | SUB) expression
+    | expression op = (MUL | DIV | MOD) expression
+    | expression op = (ADD | SUB) expression
     | expression (LT LT | GT GT) expression
-    | expression op=(LE | GE | LT | GT) expression
-    | expression op=(NOTEQUAL | EQUAL) expression
-    | expression op=BITAND expression
-    | expression op=BITXOR expression
-    | expression op=BITOR expression
-    | expression op=AND expression
-    | expression op=OR expression
-
-    | expression QUESTION trueExpression=expression? COLON falseExpression=expression
+    | expression op = (LE | GE | LT | GT) expression
+    | expression op = (NOTEQUAL | EQUAL) expression
+    | expression op = BITAND expression
+    | expression op = BITXOR expression
+    | expression op = BITOR expression
+    | expression op = AND expression
+    | expression op = OR expression
+    | expression QUESTION trueExpression = expression? COLON falseExpression = expression
     | LP compoundStatement RP
-
-    | unaryExpression assignmentOperator assignmentExpression=expression
+    | unaryExpression assignmentOperator assignmentExpression = expression
     ;
 
 assignmentOperator
-    : '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
+    : '='
+    | '*='
+    | '/='
+    | '%='
+    | '+='
+    | '-='
+    | '<<='
+    | '>>='
+    | '&='
+    | '^='
+    | '|='
     ;
 
 castExpression
@@ -731,7 +755,7 @@ constantExpression
 unaryExpression
     : postfixExpression
     | SIZEOF (unaryExpression | LP typeSpecifier RP)
-    | op=(INC | DEC) unaryExpression
+    | op = (INC | DEC) unaryExpression
     | unaryOperator castExpression
     ;
 
@@ -746,14 +770,14 @@ unaryOperator
 
 postfixExpression
     : primaryExpression postfix*
-    | postfixExpression (DOT | STRUCTACCESS) identifier postfix*  // TODO: get rid of property and postfix expression.
+    | postfixExpression (DOT | STRUCTACCESS) identifier postfix* // TODO: get rid of property and postfix expression.
     ;
 
 postfix
     : LBRACK expression RBRACK
     | LP argumentExpressionList? RP
-    | LP (COMMA | macroArguments+=~RP)+ RP
-    | op=(INC | DEC)
+    | LP (COMMA | macroArguments += ~RP)+ RP
+    | op = (INC | DEC)
     ;
 
 argumentExpressionList
@@ -801,7 +825,6 @@ stringLiteral
 
 identifier
     : IDENTIFIER
-
     | BOOL
     | Class
     | BYCOPY
@@ -819,7 +842,6 @@ identifier
     | ATOMIC
     | NONATOMIC
     | RETAIN
-
     | AUTORELEASING_QUALIFIER
     | BLOCK
     | BRIDGE_RETAINED
@@ -829,16 +851,13 @@ identifier
     | DEPRECATED
     | KINDOF
     | UNUSED
-
     | NS_INLINE
     | NS_ENUM
     | NS_OPTIONS
-
     | NULL_UNSPECIFIED
     | NULLABLE
     | NONNULL
     | NULL_RESETTABLE
-
     | ASSIGN
     | COPY
     | GETTER
@@ -848,7 +867,6 @@ identifier
     | READWRITE
     | WEAK
     | UNSAFE_UNRETAINED
-
     | IB_OUTLET
     | IB_OUTLET_COLLECTION
     | IB_INSPECTABLE

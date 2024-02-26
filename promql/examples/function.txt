@@ -1,1 +1,0 @@
-day_of_month(timestamp(up{job="prometheus"}))

@@ -29,176 +29,179 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar snowball;
 
 program
-   : p* EOF
-   ;
+    : p* EOF
+    ;
 
 p
-   : declaration
-   | r_definition
-   | g_definition
-   | 'backwardmode' '(' p ')'
-   ;
+    : declaration
+    | r_definition
+    | g_definition
+    | 'backwardmode' '(' p ')'
+    ;
 
 declaration
-   : 'strings' '(' s_name* ')'
-   | 'integers' '(' i_name* ')'
-   | 'booleans' '(' b_name* ')'
-   | 'routines' '(' r_name* ')'
-   | 'externals' '(' r_name* ')'
-   | 'groupings' '(' g_name* ')'
-   ;
+    : 'strings' '(' s_name* ')'
+    | 'integers' '(' i_name* ')'
+    | 'booleans' '(' b_name* ')'
+    | 'routines' '(' r_name* ')'
+    | 'externals' '(' r_name* ')'
+    | 'groupings' '(' g_name* ')'
+    ;
 
 r_definition
-   : 'define' r_name 'as' c
-   ;
+    : 'define' r_name 'as' c
+    ;
 
 g_definition
-   : 'define' g_name g (PLUS_OR_MINUS g)*
-   ;
+    : 'define' g_name g (PLUS_OR_MINUS g)*
+    ;
 
 c
-   : '(' c* ')'
-   | i_command
-   | s_command
-   | c 'or' c
-   | c 'and' c
-   | 'not' c
-   | 'test' c
-   | 'try' c
-   | 'do' c
-   | 'fail' c
-   | 'goto' c
-   | 'gopast' c
-   | 'repeat' c
-   | 'loop' ae c
-   | 'atleast' ae c
-   | s
-   | '=' s
-   | 'insert' s
-   | 'attach' s
-   | '<-' s
-   | 'delete'
-   | 'hop' ae
-   | 'next'
-   | '=>' s_name
-   | '['
-   | ']'
-   | '->' s_name
-   | 'setmark' i_name
-   | 'tomark' ae
-   | 'atmark' ae
-   | 'tolimit'
-   | 'atlimit'
-   | 'setlimit' c 'for' c
-   | 'backwards' c
-   | 'reverse' c
-   | 'substring'
-   | 'among' '(' (LITERAL_STRING r_name? | c)* ')'
-   | 'set' b_name
-   | 'unset' b_name
-   | b_name
-   | r_name
-   | g_name
-   | 'non' '-'? g_name
-   | 'true'
-   | 'false'
-   | '?'
-   ;
+    : '(' c* ')'
+    | i_command
+    | s_command
+    | c 'or' c
+    | c 'and' c
+    | 'not' c
+    | 'test' c
+    | 'try' c
+    | 'do' c
+    | 'fail' c
+    | 'goto' c
+    | 'gopast' c
+    | 'repeat' c
+    | 'loop' ae c
+    | 'atleast' ae c
+    | s
+    | '=' s
+    | 'insert' s
+    | 'attach' s
+    | '<-' s
+    | 'delete'
+    | 'hop' ae
+    | 'next'
+    | '=>' s_name
+    | '['
+    | ']'
+    | '->' s_name
+    | 'setmark' i_name
+    | 'tomark' ae
+    | 'atmark' ae
+    | 'tolimit'
+    | 'atlimit'
+    | 'setlimit' c 'for' c
+    | 'backwards' c
+    | 'reverse' c
+    | 'substring'
+    | 'among' '(' (LITERAL_STRING r_name? | c)* ')'
+    | 'set' b_name
+    | 'unset' b_name
+    | b_name
+    | r_name
+    | g_name
+    | 'non' '-'? g_name
+    | 'true'
+    | 'false'
+    | '?'
+    ;
 
 i_command
-   : '$' i_name '=' ae
-   | '$' i_name '+=' ae
-   | '$' i_name '-=' ae
-   | '$' i_name '*=' ae
-   | '$' i_name '/=' ae
-   | '$' i_name '==' ae
-   | '$' i_name '!=' ae
-   | '$' i_name '>' ae
-   | '$' i_name '>=' ae
-   | '$' i_name '<' ae
-   | '$' i_name '<=' ae
-   ;
+    : '$' i_name '=' ae
+    | '$' i_name '+=' ae
+    | '$' i_name '-=' ae
+    | '$' i_name '*=' ae
+    | '$' i_name '/=' ae
+    | '$' i_name '==' ae
+    | '$' i_name '!=' ae
+    | '$' i_name '>' ae
+    | '$' i_name '>=' ae
+    | '$' i_name '<' ae
+    | '$' i_name '<=' ae
+    ;
 
 s_command
-   : '$' s_name c
-   ;
+    : '$' s_name c
+    ;
 
 s
-   : s_name
-   | LITERAL_STRING
-   ;
+    : s_name
+    | LITERAL_STRING
+    ;
 
 g
-   : g_name
-   | LITERAL_STRING
-   ;
+    : g_name
+    | LITERAL_STRING
+    ;
 
 s_name
-   : NAME
-   ;
+    : NAME
+    ;
 
 i_name
-   : NAME
-   ;
+    : NAME
+    ;
 
 b_name
-   : NAME
-   ;
+    : NAME
+    ;
 
 r_name
-   : NAME
-   ;
+    : NAME
+    ;
 
 g_name
-   : NAME
-   ;
+    : NAME
+    ;
 
 ae
-   : '(' ae ')'
-   | ae '+' ae
-   | ae '-' ae
-   | ae '*' ae
-   | ae '/' ae
-   | '-' ae
-   | 'maxint'
-   | 'minint'
-   | 'cursor'
-   | 'limit'
-   | 'size'
-   | 'sizeof' s_name
-   | i_name
-   | NUMBER
-   ;
+    : '(' ae ')'
+    | ae '+' ae
+    | ae '-' ae
+    | ae '*' ae
+    | ae '/' ae
+    | '-' ae
+    | 'maxint'
+    | 'minint'
+    | 'cursor'
+    | 'limit'
+    | 'size'
+    | 'sizeof' s_name
+    | i_name
+    | NUMBER
+    ;
 
 LITERAL_STRING
-   : '\'' ~ '\''* '\''
-   ;
+    : '\'' ~ '\''* '\''
+    ;
 
 NUMBER
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 PLUS_OR_MINUS
-   : '+'
-   | '-'
-   ;
+    : '+'
+    | '-'
+    ;
 
 NAME
-   : LETTER (LETTER | DIGIT | '_')*
-   ;
+    : LETTER (LETTER | DIGIT | '_')*
+    ;
 
 fragment LETTER
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

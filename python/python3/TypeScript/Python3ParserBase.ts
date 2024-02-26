@@ -1,8 +1,8 @@
-import { Parser } from "antlr4ts/Parser";
+import { Parser, TokenStream } from "antlr4";
 
 export default abstract class Python3ParserBase extends Parser {
 
-    constructor(input) {
+    constructor(input: TokenStream) {
         super(input);
     }
 

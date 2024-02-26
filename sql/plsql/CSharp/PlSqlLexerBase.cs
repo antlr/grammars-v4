@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime;
 
 public class PlSqlLexerBase : Lexer
 {

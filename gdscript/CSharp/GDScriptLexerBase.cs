@@ -165,4 +165,13 @@ public abstract class GDScriptLexerBase : Lexer {
 			}
 		}
 	}
+
+	public override void Reset()
+	{
+		Tokens = new LinkedList<IToken>();
+		Indents = new Stack<int>();
+		Opened = 0;
+		LastToken = null;
+		base.Reset();
+	}
 }

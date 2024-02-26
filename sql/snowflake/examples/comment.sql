@@ -1,6 +1,7 @@
 comment on database d is 'd';
 comment on file format f is 'f';
 comment on function f is 'f';
+comment on function f2(int, number) is 'f';
 comment on integration i is 'i';
 comment on masking policy m is 'm';
 comment on network policy n is 'n';

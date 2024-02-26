@@ -1,0 +1,190 @@
+maintenance:
+title: Dosing for gentamicin in renal failure;;
+mlmname: gentamicin_dosing;;
+arden: Version 3;;
+version: 1.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-03-18;;
+validation: testing;;
+library:
+purpose:
+Suggest an appropriate gentamicin dose in the setting of renal
+insufficiency. (This MLM demonstrates a management suggestion.);;
+explanation:
+Patients with renal insufficiency require the same loading dose of
+gentamicin as those with normal renal function, but they require a
+reduced daily dose. The creatinine clearance is calculated by serum
+creatinine, age, and weight. If it is less than 30 ml/min, then an
+appropriate dose is calculated based on the clearance. If the
+ordered dose differs from the calculated dose by more than 20 %,
+then an alert is generated.;;
+keywords: gentamicin; dosing;;
+citations: ;;
+knowledge:
+type: data-driven;;
+data: /* an order for gentamicin evokes this MLM */
+gentamicin_order := event {medication_order where
+class = gentamicin};
+/* gentamicin doses */
+(loading_dose, periodic_dose, periodic_interval) :=
+read last {medication_order initial dose,
+periodic dose, interval};
+/* serum creatinine mg/dl */
+serum_creatinine := read last ({serum_creatinine}
+where it occurred within the past 1 week);
+/* birthdate */
+birthdate := read last {birthdate};
+/* weight kg */
+weight := read last ({weight}
+where it occurred within the past 3 months);
+;;
+evoke:
+gentamicin_order;;
+logic: age := (now - birthdate) / 1 year;
+creatinine_clearance := (140 - age) * (weight) /
+(72 * serum_creatinine);
+/* the algorithm can be adjusted to handle higher clearances */
+if creatinine_clearance < 30 then
+calc_loading_dose := 1.7 * weight;
+calc_daily_dose := 3 * (0.05 + creatinine_clearance / 100);
+ordered_daily_dose := periodic_dose *
+periodic_interval /(1 day);
+/* check whether order is appropriate */
+if (abs(loading_dose - calc_loading_dose) /
+calc_loading_dose > 0.2)
+or (abs(ordered_daily_dose - calc_daily_dose) /
+calc_daily_dose > 0.2) then
+conclude true;
+endif;
+endif;
+;;
+action: write "Due to renal insufficiency, the dose of gentamicin " ||
+"should be adjusted. The patient's calculated " ||
+"creatinine clearance is " || creatinine_clearance ||
+" ml/min. A single loading dose of " ||
+calc_loading_dose || " mg should be given, followed by " ||
+calc_daily_dose || " mg daily. Note that dialysis may " ||
+"necessitate additional loading doses.";
+;;
+urgency: 50;;
+end:
+
+maintenance:
+title: Monitor renal function while taking gentamicin;;
+mlmname: gentamicin_monitoring;;
+arden: Version 3;;
+version: 1.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-03-19;;
+validation: testing;;
+library:
+purpose:
+Monitor the patient's renal function when the patient is taking
+gentamicin. (This MLM demonstrates periodic monitoring.);;
+explanation:
+This MLM runs every five days after the patient is placed on
+gentamicin until the medication is stopped. If the serum creatinine
+has not been checked recently, then an alert is generated
+requesting follow-up. If the serum creatinine has been checked, is
+greater than 2.0, and has risen by more than 20 %, then an alert is
+generated warning that the patient may be developing renal
+insufficiency due to gentamicin.;;
+keywords: gentamicin; renal function;;
+citations: ;;
+knowledge:
+type: data-driven;;
+data: /* an order for gentamicin evokes this MLM */
+gentamicin_order := event {medication_order where
+class = gentamicin};
+/* check whether gentamicin has been discontinued */
+gentamicin_discontinued :=
+read exist({medication_cancellation where class = gentamicin}
+where it occurs after eventtime);
+/* baseline serum creatinine mg/dl */
+baseline_creatinine := read last ({serum_creatinine}
+where it occurred before eventtime);
+/* followup serum creatinine mg/dl */
+recent_creatinine := read last ({serum_creatinine}
+where it occurred within the past 3 days);
+;;
+evoke: every 5 days for 10 years starting 5 days after time of
+gentamicin_order until gentamicin_discontinued;;
+logic: if recent_creatinine is not present then
+no_recent_creatinine := true;
+conclude true;
+elseno_recent_creatinine := false;
+if % increase of (serum_creatinine,
+recent_creatinine) > 20 /* % */
+and recent_creatinine > 2.0 then
+conclude true;
+endif;
+endif;
+;;
+action: if no_recent_creatinine then
+write "Suggest obtaining a serum creatinine to follow up " ||
+"on renal function in the setting of gentamicin.";
+else
+write "Recent serum creatinine (" || recent_creatinine ||
+" mg/dl) has increased, possibly due to renal " ||
+"insufficiency related to gentamicin use.";
+endif;
+;;
+urgency: 50;;
+end:
+
+maintenance:
+title: Granulocytopenia and Trimethoprim/Sulfamethoxazole;;
+mlmname: anctms;;
+arden: Version 3;;
+version: 2.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-05-28;;
+validation: testing;;
+library:
+purpose:
+Detect granulocytopenia possibly due to
+trimethoprim/sulfamethoxazole;;
+explanation:
+This MLM detects patients that are currently taking
+trimethoprim/sulfamethoxazole whose absolute neutrophile count is
+less than 1000 and falling.;;
+keywords:
+granulocytopenia; agranulocytosis; trimethoprim; sulfamethoxazole;;
+citations:
+1. refute "Anti-infective drug use in relation to the risk of
+agranulocytosis and aplastic anemia. A report from the
+International Agranulocytosis and Aplastic Anemia Study.
+Archives of Internal Medicine, May 1989, 149(5):1036-40.";;
+links: MeSH_link 'Some link term' "Some link string";;
+knowledge:
+type: data-driven;;
+data: /* capitalized text within curly brackets would be replaced with */
+/* an institution's own query */
+let anc_storage be event {STORAGE OF ABSOLUTE_NEUTROPHILE_COUNT};
+let anc be read last 2 from ({ABSOLUTE_NEUTROPHILE_COUNT}
+where they occurred within the past 1 week);
+let pt_is_taking_tms be read exist
+{TRIMETHOPRIM_SULFAMETHOXAZOLE_ORDER};
+;;
+evoke: anc_storage;;
+logic: if pt_is_taking_tms
+and the last anc is less than 1000
+and the last anc is less than the first anc
+/* is anc falling? */
+then
+conclude true;
+else
+conclude false;
+endif;
+;;
+action:
+write "Caution: patient's relative granulocytopenia may be " ||
+"exacerbated by trimethoprim/sulfamethoxazole.";
+;;
+end:

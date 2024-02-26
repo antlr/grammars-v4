@@ -29,207 +29,210 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar chip8;
 
 file_
-   : instruction_* EOF
-   ;
+    : instruction_* EOF
+    ;
 
 instruction_
-   : cls
-   | ret
-   | sys
-   | jp
-   | call
-   | se
-   | sne
-   | se1
-   | ld
-   | add
-   | ld2
-   | or
-   | and
-   | xor
-   | add2
-   | sub
-   | shr
-   | subn
-   | shl
-   | sne2
-   | ld3
-   | jp2
-   | rnd
-   | drw
-   | skp
-   | sknp
-   | ld4
-   | ld5
-   | ld6
-   | ld7
-   | add3
-   | ld8
-   | ld9
-   | ld10
-   | ld11
-   ;
+    : cls
+    | ret
+    | sys
+    | jp
+    | call
+    | se
+    | sne
+    | se1
+    | ld
+    | add
+    | ld2
+    | or
+    | and
+    | xor
+    | add2
+    | sub
+    | shr
+    | subn
+    | shl
+    | sne2
+    | ld3
+    | jp2
+    | rnd
+    | drw
+    | skp
+    | sknp
+    | ld4
+    | ld5
+    | ld6
+    | ld7
+    | add3
+    | ld8
+    | ld9
+    | ld10
+    | ld11
+    ;
 
 cls
-   : 'CLS'
-   ;
+    : 'CLS'
+    ;
 
 ret
-   : 'RET'
-   ;
+    : 'RET'
+    ;
 
 sys
-   : 'SYS' ADDR
-   ;
+    : 'SYS' ADDR
+    ;
 
 jp
-   : 'JP' ADDR
-   ;
+    : 'JP' ADDR
+    ;
 
 call
-   : 'CALL' ADDR
-   ;
+    : 'CALL' ADDR
+    ;
 
 se
-   : 'SE' REGISTER ',' BYTE
-   ;
+    : 'SE' REGISTER ',' BYTE
+    ;
 
 sne
-   : 'SNE' REGISTER ',' BYTE
-   ;
+    : 'SNE' REGISTER ',' BYTE
+    ;
 
 se1
-   : 'SE' REGISTER ',' REGISTER
-   ;
+    : 'SE' REGISTER ',' REGISTER
+    ;
 
 ld
-   : 'LD' REGISTER ',' BYTE
-   ;
+    : 'LD' REGISTER ',' BYTE
+    ;
 
 add
-   : 'ADD' REGISTER ',' BYTE
-   ;
+    : 'ADD' REGISTER ',' BYTE
+    ;
 
 ld2
-   : 'LD' REGISTER ',' REGISTER
-   ;
+    : 'LD' REGISTER ',' REGISTER
+    ;
 
 or
-   : 'OR' REGISTER ',' REGISTER
-   ;
+    : 'OR' REGISTER ',' REGISTER
+    ;
 
 and
-   : 'AND' REGISTER ',' REGISTER
-   ;
+    : 'AND' REGISTER ',' REGISTER
+    ;
 
 xor
-   : 'XOR' REGISTER ',' REGISTER
-   ;
+    : 'XOR' REGISTER ',' REGISTER
+    ;
 
 add2
-   : 'ADD' REGISTER ',' REGISTER
-   ;
+    : 'ADD' REGISTER ',' REGISTER
+    ;
 
 sub
-   : 'SUB' REGISTER ',' REGISTER
-   ;
+    : 'SUB' REGISTER ',' REGISTER
+    ;
 
 shr
-   : 'SHR' REGISTER '{' ',' REGISTER '}'
-   ;
+    : 'SHR' REGISTER '{' ',' REGISTER '}'
+    ;
 
 subn
-   : 'SUBN' REGISTER ',' REGISTER
-   ;
+    : 'SUBN' REGISTER ',' REGISTER
+    ;
 
 shl
-   : 'SHL' REGISTER '{' ',' REGISTER '}'
-   ;
+    : 'SHL' REGISTER '{' ',' REGISTER '}'
+    ;
 
 sne2
-   : REGISTER ',' REGISTER
-   ;
+    : REGISTER ',' REGISTER
+    ;
 
 ld3
-   : 'LD' 'I' ',' ADDR
-   ;
+    : 'LD' 'I' ',' ADDR
+    ;
 
 jp2
-   : 'JP' 'V' '0' ',' ADDR
-   ;
+    : 'JP' 'V' '0' ',' ADDR
+    ;
 
 rnd
-   : 'RND' REGISTER ',' BYTE
-   ;
+    : 'RND' REGISTER ',' BYTE
+    ;
 
 drw
-   : 'DRW' REGISTER ',' REGISTER ',' DIGIT
-   ;
+    : 'DRW' REGISTER ',' REGISTER ',' DIGIT
+    ;
 
 skp
-   : 'SKP' REGISTER
-   ;
+    : 'SKP' REGISTER
+    ;
 
 sknp
-   : 'SKNP' REGISTER
-   ;
+    : 'SKNP' REGISTER
+    ;
 
 ld4
-   : 'LD' REGISTER ',' 'DT'
-   ;
+    : 'LD' REGISTER ',' 'DT'
+    ;
 
 ld5
-   : 'LD' REGISTER ',' 'K'
-   ;
+    : 'LD' REGISTER ',' 'K'
+    ;
 
 ld6
-   : 'LD' 'DT' ',' REGISTER
-   ;
+    : 'LD' 'DT' ',' REGISTER
+    ;
 
 ld7
-   : 'LD' 'ST' ',' REGISTER
-   ;
+    : 'LD' 'ST' ',' REGISTER
+    ;
 
 add3
-   : 'ADD' 'I' ',' REGISTER
-   ;
+    : 'ADD' 'I' ',' REGISTER
+    ;
 
 ld8
-   : 'LD' 'F' ',' REGISTER
-   ;
+    : 'LD' 'F' ',' REGISTER
+    ;
 
 ld9
-   : 'LD' 'B' ',' REGISTER
-   ;
+    : 'LD' 'B' ',' REGISTER
+    ;
 
 ld10
-   : '[' 'I' ']' ',' REGISTER
-   ;
+    : '[' 'I' ']' ',' REGISTER
+    ;
 
 ld11
-   : 'LD' REGISTER ',' '[' 'I' ']'
-   ;
+    : 'LD' REGISTER ',' '[' 'I' ']'
+    ;
 
 REGISTER
-   : 'V' DIGIT
-   ;
+    : 'V' DIGIT
+    ;
 
 ADDR
-   : DIGIT DIGIT DIGIT
-   ;
+    : DIGIT DIGIT DIGIT
+    ;
 
 BYTE
-   : DIGIT DIGIT
-   ;
+    : DIGIT DIGIT
+    ;
 
 DIGIT
-   : [0-9A-F]
-   ;
+    : [0-9A-F]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.*;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 abstract class CSharpLexerBase extends Lexer
 {
@@ -9,8 +10,8 @@ abstract class CSharpLexerBase extends Lexer
     }
 
     protected int interpolatedStringLevel;
-    protected Stack<Boolean> interpolatedVerbatiums = new Stack<Boolean>();
-    protected Stack<Integer> curlyLevels = new Stack<Integer>();
+    protected final Deque<Boolean> interpolatedVerbatiums = new ArrayDeque<>();
+    protected final Deque<Integer> curlyLevels = new ArrayDeque<>();
     protected boolean verbatium;
 
     protected void OnInterpolatedRegularStringStart()

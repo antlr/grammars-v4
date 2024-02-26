@@ -30,193 +30,190 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar b;
 
 program
-   : definition* EOF
-   ;
+    : definition* EOF
+    ;
 
 definition
-   : (name constant? (ival (',' ival)*)* ';')
-   | (name '(' (name (',' name)*)? ')' statement)
-   ;
+    : name constant? (ival (',' ival)*)* ';'
+    | name '(' (name (',' name)*)? ')' statement
+    ;
 
 ival
-   : constant
-   | name
-   ;
+    : constant
+    | name
+    ;
 
 statement
-   : externsmt
-   | autosmt
-   | (name ':' statement)
-   | casestmt
-   | blockstmt
-   | ifstmt
-   | whilestmt
-   | switchstmt
-   | gotostmt
-   | returnstmt
-   | expressionstmt
-   | nullstmt
-   ;
+    : externsmt
+    | autosmt
+    | name ':' statement
+    | casestmt
+    | blockstmt
+    | ifstmt
+    | whilestmt
+    | switchstmt
+    | gotostmt
+    | returnstmt
+    | expressionstmt
+    | nullstmt
+    ;
 
 nullstmt
-   : ';'
-   ;
+    : ';'
+    ;
 
 expressionstmt
-   : rvalue ';'
-   ;
+    : rvalue ';'
+    ;
 
 blockstmt
-   : '{' statement* '}'
-   ;
+    : '{' statement* '}'
+    ;
 
 returnstmt
-   : 'return' ('(' rvalue ')')? ';'
-   ;
+    : 'return' ('(' rvalue ')')? ';'
+    ;
 
 gotostmt
-   : 'goto' rvalue ';'
-   ;
+    : 'goto' rvalue ';'
+    ;
 
 switchstmt
-   : 'switch' rvalue statement
-   ;
+    : 'switch' rvalue statement
+    ;
 
 whilestmt
-   : 'while' '(' rvalue ')' statement
-   ;
+    : 'while' '(' rvalue ')' statement
+    ;
 
 ifstmt
-   : 'if' '(' rvalue ')' statement ('else' statement)?
-   ;
+    : 'if' '(' rvalue ')' statement ('else' statement)?
+    ;
 
 casestmt
-   : 'case' constant ':' statement
-   ;
+    : 'case' constant ':' statement
+    ;
 
 externsmt
-   : 'extrn' name (',' name)* ';'
-   ;
+    : 'extrn' name (',' name)* ';'
+    ;
 
 autosmt
-   : 'auto' name constant? (',' name constant?)* ';'
-   ;
+    : 'auto' name constant? (',' name constant?)* ';'
+    ;
 
 rvalue
-   : expression
-   | comparison
-   | ternary
-   | assignment
-   ;
+    : expression
+    | comparison
+    | ternary
+    | assignment
+    ;
 
 ternary
-   : expression '?' rvalue ':' rvalue
-   ;
+    : expression '?' rvalue ':' rvalue
+    ;
 
 comparison
-   : expression binary rvalue
-   ;
+    : expression binary rvalue
+    ;
 
 assignment
-   : name assign rvalue
-   ;
+    : name assign rvalue
+    ;
 
 expression
-   : ('(' rvalue ')')
-   | name
-   | constant
-   | (incdec name)
-   | (name incdec)
-   | (unary rvalue)
-   | ('&' name)
-   | functioninvocation
-   ;
+    : '(' rvalue ')'
+    | name
+    | constant
+    | incdec name
+    | name incdec
+    | unary rvalue
+    | '&' name
+    | functioninvocation
+    ;
 
 functioninvocation
-   : name '(' functionparameters? ')'
-   ;
+    : name '(' functionparameters? ')'
+    ;
 
 functionparameters
-   : rvalue (',' rvalue)*
-   ;
+    : rvalue (',' rvalue)*
+    ;
 
 assign
-   : '=' binary?
-   ;
+    : '=' binary?
+    ;
 
 incdec
-   : '++'
-   | '--'
-   ;
+    : '++'
+    | '--'
+    ;
 
 unary
-   : '-'
-   | '!'
-   ;
+    : '-'
+    | '!'
+    ;
 
 binary
-   : '|'
-   | '&'
-   | '=='
-   | '!='
-   | '<'
-   | '<='
-   | '>'
-   | '>='
-   | '<<'
-   | '>>'
-   | '-'
-   | '+'
-   | '%'
-   | '*'
-   | '/'
-   ;
+    : '|'
+    | '&'
+    | '=='
+    | '!='
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    | '<<'
+    | '>>'
+    | '-'
+    | '+'
+    | '%'
+    | '*'
+    | '/'
+    ;
 
 lvalue
-   : name
-   | ('*' rvalue)
-   | (rvalue '[' rvalue ']')
-   ;
+    : name
+    | '*' rvalue
+    | rvalue '[' rvalue ']'
+    ;
 
 constant
-   : INT
-   | STRING1
-   | STRING2
-   ;
+    : INT
+    | STRING1
+    | STRING2
+    ;
 
 name
-   : NAME
-   ;
-
+    : NAME
+    ;
 
 NAME
-   : [a-zA-Z] [a-zA-Z0-9_]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_]*
+    ;
 
 INT
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 STRING1
-   : '"' ~ ["\r\n]* '"'
-   ;
-
+    : '"' ~ ["\r\n]* '"'
+    ;
 
 STRING2
-   : '\'' ~ ['\r\n]* '\''
-   ;
-
+    : '\'' ~ ['\r\n]* '\''
+    ;
 
 BLOCKCOMMENT
-   : '/*' .*? '*/' -> skip
-   ;
-
+    : '/*' .*? '*/' -> skip
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

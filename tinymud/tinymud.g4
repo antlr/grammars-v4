@@ -30,320 +30,319 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tinymud;
 
 prog
-   : line + EOL* EOF
-   ;
+    : line+ EOL* EOF
+    ;
 
 line
-   : (command | action) EOL
-   ;
+    : (command | action) EOL
+    ;
 
 command
-   : bootcommand
-   | chowncommand
-   | createcommand
-   | describecommand
-   | digcommand
-   | dumpcommand
-   | failcommand
-   | findcommand
-   | forcecommand
-   | linkcommand
-   | lockcommand
-   | namecommand
-   | newpassswordcommand
-   | ofailcommand
-   | opencommand
-   | osuccesscommand
-   | passwordcommand
-   | pcreatecommand
-   | setcommand
-   | shutdowncommand
-   | statscommand
-   | successcommand
-   | teleportcommand
-   | toadcommand
-   | unlinkcommand
-   | unlockcommand
-   | wallcommand
-   ;
+    : bootcommand
+    | chowncommand
+    | createcommand
+    | describecommand
+    | digcommand
+    | dumpcommand
+    | failcommand
+    | findcommand
+    | forcecommand
+    | linkcommand
+    | lockcommand
+    | namecommand
+    | newpassswordcommand
+    | ofailcommand
+    | opencommand
+    | osuccesscommand
+    | passwordcommand
+    | pcreatecommand
+    | setcommand
+    | shutdowncommand
+    | statscommand
+    | successcommand
+    | teleportcommand
+    | toadcommand
+    | unlinkcommand
+    | unlockcommand
+    | wallcommand
+    ;
 
 bootcommand
-   : '@boot' player
-   ;
+    : '@boot' player
+    ;
 
 chowncommand
-   : '@chown' object_ '=' player
-   ;
+    : '@chown' object_ '=' player
+    ;
 
 createcommand
-   : '@create' name ('=' cost)?
-   ;
+    : '@create' name ('=' cost)?
+    ;
 
 describecommand
-   : ('@describe' | '@desc') object_ ('=' description)?
-   ;
+    : ('@describe' | '@desc') object_ ('=' description)?
+    ;
 
 digcommand
-   : '@dig' name
-   ;
+    : '@dig' name
+    ;
 
 dumpcommand
-   : '@dump'
-   ;
+    : '@dump'
+    ;
 
 failcommand
-   : '@fail' name ('=' description)?
-   ;
+    : '@fail' name ('=' description)?
+    ;
 
 findcommand
-   : '@find' name?
-   ;
+    : '@find' name?
+    ;
 
 forcecommand
-   : '@force' player '=' command
-   ;
+    : '@force' player '=' command
+    ;
 
 linkcommand
-   : '@link' object_ '=' (number | dir_ | room)
-   ;
+    : '@link' object_ '=' (number | dir_ | room)
+    ;
 
 lockcommand
-   : '@lock' object_ '=' key
-   ;
+    : '@lock' object_ '=' key
+    ;
 
 namecommand
-   : '@name' object_ '=' name password?
-   ;
+    : '@name' object_ '=' name password?
+    ;
 
 newpassswordcommand
-   : '@newpassword' player ('=' password)?
-   ;
+    : '@newpassword' player ('=' password)?
+    ;
 
 ofailcommand
-   : '@ofail' object_ ('=' message)?
-   ;
+    : '@ofail' object_ ('=' message)?
+    ;
 
 opencommand
-   : '@open' dir_ (';' dir_)* ('=' number)?
-   ;
+    : '@open' dir_ (';' dir_)* ('=' number)?
+    ;
 
 osuccesscommand
-   : ('@osuccess' | '@osucc') object_ ('=' message)?
-   ;
+    : ('@osuccess' | '@osucc') object_ ('=' message)?
+    ;
 
 passwordcommand
-   : '@password' password '=' password
-   ;
+    : '@password' password '=' password
+    ;
 
 pcreatecommand
-   : '@pcreate' name
-   ;
+    : '@pcreate' name
+    ;
 
 setcommand
-   : '@set' object_ '=' '!'? flag
-   ;
+    : '@set' object_ '=' '!'? flag
+    ;
 
 shutdowncommand
-   : '@shutdown'
-   ;
+    : '@shutdown'
+    ;
 
 statscommand
-   : '@stats' player
-   ;
+    : '@stats' player
+    ;
 
 successcommand
-   : ('@success' | '@succ') object_ ('=' message)?
-   ;
+    : ('@success' | '@succ') object_ ('=' message)?
+    ;
 
 teleportcommand
-   : '@teleport' (object_ '=')? room
-   ;
+    : '@teleport' (object_ '=')? room
+    ;
 
 toadcommand
-   : '@toad' player
-   ;
+    : '@toad' player
+    ;
 
 unlinkcommand
-   : '@unlink' dir_
-   ;
+    : '@unlink' dir_
+    ;
 
 unlockcommand
-   : '@unlock' object_
-   ;
+    : '@unlock' object_
+    ;
 
 wallcommand
-   : '@wall' message
-   ;
+    : '@wall' message
+    ;
 
 action
-   : dropaction
-   | examineaction
-   | getaction
-   | giveaction
-   | gotoaction
-   | gripeaction
-   | helpaction
-   | inventoryaction
-   | killaction
-   | lookaction
-   | newsaction
-   | pageaction
-   | quitaction
-   | robaction
-   | sayaction
-   | scoreaction
-   | whisperaction
-   | whoaction
-   ;
+    : dropaction
+    | examineaction
+    | getaction
+    | giveaction
+    | gotoaction
+    | gripeaction
+    | helpaction
+    | inventoryaction
+    | killaction
+    | lookaction
+    | newsaction
+    | pageaction
+    | quitaction
+    | robaction
+    | sayaction
+    | scoreaction
+    | whisperaction
+    | whoaction
+    ;
 
 dropaction
-   : ('drop' | 'throw') object_
-   ;
+    : ('drop' | 'throw') object_
+    ;
 
 examineaction
-   : 'examine' object_
-   ;
+    : 'examine' object_
+    ;
 
 getaction
-   : ('get' | 'take') object_
-   ;
+    : ('get' | 'take') object_
+    ;
 
 giveaction
-   : 'give' player '=' pennies
-   ;
+    : 'give' player '=' pennies
+    ;
 
 gotoaction
-   : ('go' | 'goto' | 'move') direction
-   ;
+    : ('go' | 'goto' | 'move') direction
+    ;
 
 gripeaction
-   : 'gripe' message
-   ;
+    : 'gripe' message
+    ;
 
 helpaction
-   : 'help'
-   ;
+    : 'help'
+    ;
 
 inventoryaction
-   : 'inventory'
-   | 'inv'
-   ;
+    : 'inventory'
+    | 'inv'
+    ;
 
 killaction
-   : 'kill' player ('=' cost)
-   ;
+    : 'kill' player ('=' cost)
+    ;
 
 lookaction
-   : ('look' | 'read') object_
-   ;
+    : ('look' | 'read') object_
+    ;
 
 newsaction
-   : 'news'
-   ;
+    : 'news'
+    ;
 
 pageaction
-   : 'page' player ('=' message)
-   ;
+    : 'page' player ('=' message)
+    ;
 
 quitaction
-   : 'quit'
-   ;
+    : 'quit'
+    ;
 
 robaction
-   : 'rob' player
-   ;
+    : 'rob' player
+    ;
 
 sayaction
-   : 'say' message
-   ;
+    : 'say' message
+    ;
 
 scoreaction
-   : 'score'
-   ;
+    : 'score'
+    ;
 
 whisperaction
-   : 'whisper' player '=' message
-   ;
+    : 'whisper' player '=' message
+    ;
 
 whoaction
-   : 'who' player?
-   ;
+    : 'who' player?
+    ;
 
 object_
-   : STRING
-   ;
+    : STRING
+    ;
 
 player
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : STRING
-   ;
+    : STRING
+    ;
 
 description
-   : STRING
-   ;
+    : STRING
+    ;
 
 cost
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 key
-   : STRING
-   ;
+    : STRING
+    ;
 
 password
-   : STRING
-   ;
+    : STRING
+    ;
 
 message
-   : STRING
-   ;
+    : STRING
+    ;
 
 dir_
-   : STRING
-   ;
+    : STRING
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 room
-   : STRING
-   ;
+    : STRING
+    ;
 
 flag
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 pennies
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 direction
-   : STRING
-   ;
-
+    : STRING
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_. %,']*
-   ;
-
+    : [a-zA-Z] [a-zA-Z0-9_. %,']*
+    ;
 
 NUMBER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 EOL
-   : '\r'? '\n'
-   ;
-
+    : '\r'? '\n'
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

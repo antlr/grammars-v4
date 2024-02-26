@@ -99,3 +99,11 @@ table(t.cl_attrs) c) b
 where a.cluster_id = b.id
 order by prob desc, cl_id asc, conf desc, attr asc, val asc;
 
+select
+       row_number() over (partition by hc.id_ws order by hc.lastdate desc) rn1
+     , lag(ascii(hc.status)-32, 1, -1) ignore nulls over (partition by hc.id_ws order by hc.lastdate) lag_st
+     , lead(ascii(hc.status)-32, 1, -1) ignore nulls over (partition by hc.id_ws order by hc.lastdate) lead_st
+     , var_pop(hc.price) over (partition by hc.id_reg) pr_var
+     , wm_concat(hc.code) over (partition by hc.id_reg) reg_codes
+  from history_tbl hc
+ where  hc.id_ws in  (select id_ws from ws_tbl where name like 'MX%');

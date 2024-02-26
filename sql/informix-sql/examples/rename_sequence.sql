@@ -1,0 +1,1 @@
+RENAME SEQUENCE own.oldseq TO nwseq;

@@ -56,12 +56,20 @@ class JavaScriptParserBase(Parser):
         """
         # Get the token ahead of the current index.
         assert isinstance(self.getCurrentToken(), Token)
-        possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
-        ahead = self._input.get(possibleIndexEosToken)
+
+        # Get the most recently emitted token.
+        currentToken: Token = self._input.LT(-1)
+
+        # Get the next token index.
+        nextTokenIndex = 0 if currentToken is None else currentToken.tokenIndex + 1
+
+        # Get the token after the `currentToken`. By using `_input.get(index)`,
+        # we also grab a token that is (possibly) on the HIDDEN channel.
+        nextToken: Token = self._input.get(nextTokenIndex)
 
         # Check if the token resides on the HIDDEN channel and if it's of the
         # provided type.
-        return (ahead.channel == Lexer.HIDDEN) and (ahead.type == tokenType)
+        return (nextToken.channel == Lexer.HIDDEN) and (nextToken.type == tokenType)
 
     def lineTerminatorAhead(self) -> bool:
         """
@@ -79,6 +87,8 @@ class JavaScriptParserBase(Parser):
 
         # Get the token ahead of the current index.
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if (possibleIndexEosToken < 0):
+            return False
         ahead: Token = self._input.get(possibleIndexEosToken)
 
         if ahead.channel != Lexer.HIDDEN:
@@ -92,6 +102,8 @@ class JavaScriptParserBase(Parser):
         if ahead.type == JavaScriptParser.WhiteSpaces:
             # Get the token ahead of the current whitespaces.
             possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+            if (possibleIndexEosToken < 0):
+                return False
             ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type.
@@ -99,5 +111,6 @@ class JavaScriptParserBase(Parser):
         tokenType = ahead.type
 
         # Check if the token is, or contains a line terminator.
-        return ((tokenType == JavaScriptParser.MultiLineComment and (text.contains("\r") or text.contains("\n"))) or
-                (tokenType == JavaScriptParser.LineTerminator))
+
+        return (tokenType == JavaScriptParser.MultiLineComment and (("\r" in text) or ("\n" in text))) or \
+            (tokenType == JavaScriptParser.LineTerminator)

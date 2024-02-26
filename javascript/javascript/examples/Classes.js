@@ -200,3 +200,38 @@ let Obj = {
   },
   ...functionResult()
 }
+
+//------------------------------------------------------------------------------
+// Public class fields
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields
+//------------------------------------------------------------------------------
+const PREFIX = "prefix";
+
+class ClassWithField {
+  field;
+  fieldWithInitializer = "instance field";
+  [`${PREFIX}Field`] = "prefixed field";
+}
+
+const instance = new ClassWithField();
+console.log(Object.hasOwn(instance, "field")); // true
+console.log(instance.field); // undefined
+console.log(instance.fieldWithInitializer); // "instance field"
+console.log(instance.prefixField); // "prefixed field"
+
+//------------------------------------------------------------------------------
+// Static initialization blocks
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Static_initialization_blocks
+//------------------------------------------------------------------------------
+class ClassWithStaticInitializationBlock {
+  static staticProperty1 = 'Property 1';
+  static staticProperty2;
+  static {
+    this.staticProperty2 = 'Property 2';
+  }
+}
+
+console.log(ClassWithStaticInitializationBlock.staticProperty1);
+// Expected output: "Property 1"
+console.log(ClassWithStaticInitializationBlock.staticProperty2);
+// Expected output: "Property 2"

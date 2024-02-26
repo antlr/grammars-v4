@@ -9,14 +9,10 @@
 
 # Download Antlr .jar.
 # Parameter to get-antlr.ps1 must be in double quotes.
-$antlrPath = _scripts/get-antlr.ps1 "4.11.1"
+$antlrPath = _scripts/get-antlr.ps1 "4.13.0"
 
 # Set up env as it is used in test script.
 echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-
-dotnet tool install -g trgen --version 0.19.0
-dotnet tool install -g triconv --version 0.19.0
-dotnet tool install -g trwdog --version 0.19.0
 
 # Call test script.
 $env:ANTLR_JAR_PATH="$antlrPath"

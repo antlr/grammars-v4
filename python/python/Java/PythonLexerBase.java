@@ -4,7 +4,8 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public abstract class PythonLexerBase extends Lexer {
     public static int TabSize = 8;
@@ -13,7 +14,7 @@ public abstract class PythonLexerBase extends Lexer {
     private int _opened;
 
     // The stack that keeps track of the indentation level.
-    private Stack<Integer> _indents = new Stack<>();
+    private final Deque<Integer> _indents = new ArrayDeque<>();
 
     // A circular buffer where extra tokens are pushed on (see the NEWLINE and WS lexer rules).
     private int _firstTokensInd;

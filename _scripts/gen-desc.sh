@@ -51,7 +51,7 @@ add() {
 
 setupdeps()
 {
-    trgen --version
+    dotnet trgen -- --version
     if [ $? != "0" ]
     then
         echo "Need to set up Trash."
@@ -139,7 +139,7 @@ do
         cd $root/$g
         rm -rf Generated-*
         echo "$g,$t:"
-        trgen -t "$t" --template-sources-directory "$full_path_templates"
+        dotnet trgen -- -t "$t" --template-sources-directory "$full_path_templates"
         if [ "$?" -ne 0 ]
         then
             failed=`add "$failed" "$g/$t"`

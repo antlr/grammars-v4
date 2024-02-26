@@ -6,7 +6,7 @@ is
 end show_errors;
 /
 
-show errors
+show errors;
 
 create or replace package show_errors
 is

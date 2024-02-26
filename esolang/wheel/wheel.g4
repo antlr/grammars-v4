@@ -29,46 +29,49 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar wheel;
 
 file_
-   : codon* EOF
-   ;
+    : codon* EOF
+    ;
 
 codon
-   : SYMBOL VALUE?
-   ;
+    : SYMBOL VALUE?
+    ;
 
 VALUE
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 SYMBOL
-   : '+'
-   | '-'
-   | '<'
-   | '>'
-   | 'L'
-   | 'G'
-   | 'Z'
-   | 'Y'
-   | 'D'
-   | 'I'
-   | 'V'
-   | 'C'
-   | '*'
-   | '%'
-   | '^'
-   | '#'
-   | '@'
-   | '$'
-   ;
+    : '+'
+    | '-'
+    | '<'
+    | '>'
+    | 'L'
+    | 'G'
+    | 'Z'
+    | 'Y'
+    | 'D'
+    | 'I'
+    | 'V'
+    | 'C'
+    | '*'
+    | '%'
+    | '^'
+    | '#'
+    | '@'
+    | '$'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;
