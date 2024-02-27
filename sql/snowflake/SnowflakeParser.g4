@@ -3424,6 +3424,7 @@ id_
     | object_type_plural
     | data_type
     | builtin_function
+    | unary_or_binary_builtin_function
     | binary_builtin_function
     | binary_or_ternary_builtin_function
     | ternary_builtin_function
