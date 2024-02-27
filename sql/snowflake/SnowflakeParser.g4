@@ -3956,15 +3956,23 @@ select_list
     ;
 
 select_list_elem
-    : column_elem
+    : column_elem as_alias?
+    | column_elem_star
     //    | udt_elem
-    | expression_elem
+    | expression_elem as_alias?
+    ;
+
+column_elem_star
+    : object_name_or_alias? STAR
     ;
 
 column_elem
-    : (object_name | alias DOT)? STAR
-    | (object_name | alias DOT)? column_name as_alias?
-    | (object_name | alias DOT)? DOLLAR column_position as_alias?
+    : object_name_or_alias? column_name 
+    | object_name_or_alias? DOLLAR column_position 
+    ;
+
+object_name_or_alias
+    : object_name | alias DOT
     ;
 
 as_alias
@@ -3972,7 +3980,7 @@ as_alias
     ;
 
 expression_elem
-    : (expr | predicate) as_alias?
+    : (expr | predicate)
     ;
 
 column_position
@@ -4224,15 +4232,20 @@ where_clause
     : WHERE search_condition
     ;
 
-group_item
-    : id_
+group_by_elem
+    : column_elem
     | num
-    | expr
+    | expression_elem
     ;
 
+group_by_list
+    : group_by_elem (COMMA group_by_elem)*
+    ;
+
+
 group_by_clause
-    : GROUP BY group_item (COMMA group_item)* having_clause?
-    | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_item (COMMA group_item)* RR_BRACKET
+    : GROUP BY group_by_list having_clause?
+    | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_by_list RR_BRACKET
     | GROUP BY ALL
     ;
 
