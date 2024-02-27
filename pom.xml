@@ -79,6 +79,7 @@
 				<module>alloy</module>
 				<module>alpaca</module>
                 <module>amazon-states-language</module>
+                <module>amazon-states-language-intrinsic-functions</module>
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>

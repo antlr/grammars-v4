@@ -1,10 +1,10 @@
-# Amazon States Language (ASL) ANTLR4 Grammar
+# Amazon States Language Intrinsic Functions ANTLR4 Grammar
 
-The ANTLR4 grammar for the Amazon States Language (ASL), initially developed by 
+The ANTLR4 grammar for the Intrinsic Functions of Amazon States Language (ASL), initially developed by 
 [LocalStack](github.com/localstack/localstack).
 
-The module contains lexer and parser grammars (`ASLLexer.g4` and `ASLParser.g4`) for 
-the Amazon States Language (ASL) language.
+The module includes grammars (`ASLIntrinsicLexer.g4` and `ASLIntrinsicParser.g4`) for parsing intrinsic 
+functions within ASL derivations.
 
 ## License
 ```txt
@@ -33,8 +33,7 @@ language specification for Amazon States Language provided by Amazon.
 
 
 ## Examples
-The `examples/` directory contains baseline examples demonstrating various types
-of State Machine definitions in JSON.
+The `examples/` directory contains examples illustrating the utilisation of intrinsic functions.
 
 ## Original source
 <https://github.com/localstack/localstack>
