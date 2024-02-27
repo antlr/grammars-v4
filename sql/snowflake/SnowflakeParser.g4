@@ -445,7 +445,7 @@ named_stage
     ;
 
 stage_path
-    : STAGE_PATH
+    : DIVIDE (ID (DIVIDE ID)* DIVIDE?)?
     ;
 
 put
@@ -3575,9 +3575,15 @@ builtin_function
     | SPLIT_TO_TABLE
     | CAST
     | TRY_CAST
+    | ANY_VALUE
     ;
 
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
+unary_or_binary_builtin_function
+    // lexer entry of function name which admit 1 or 2 parameters
+    // expr rule use this
+    : FLOOR
+    ;
 
 binary_builtin_function
     // lexer entry of function name which admit 2 parameters
@@ -3809,7 +3815,8 @@ over_clause
     ;
 
 function_call
-    : binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    : unary_or_binary_builtin_function LR_BRACKET expr (COMMA expr)* RR_BRACKET
+    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | ranking_windowed_function
