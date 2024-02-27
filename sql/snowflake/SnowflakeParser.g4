@@ -217,8 +217,8 @@ format_type
     ;
 
 stage_file_format
-    : STAGE_FILE_FORMAT EQ '(' (FORMAT_NAME EQ string)
-    | (TYPE EQ type_fileformat format_type_options+) ')'
+    : STAGE_FILE_FORMAT EQ LR_BRACKET FORMAT_NAME EQ string
+    | TYPE EQ type_fileformat format_type_options+ RR_BRACKET
     ;
 
 copy_into_location
@@ -286,7 +286,7 @@ grant_to_role
             SCHEMA schema_name
             | ALL SCHEMAS IN DATABASE id_
         )
-        | ( schema_privileges | ALL PRIVILEGES?) ON ( FUTURE SCHEMAS IN DATABASE id_)
+        | ( schema_privileges | ALL PRIVILEGES?) ON FUTURE SCHEMAS IN DATABASE id_
         | (schema_object_privileges | ALL PRIVILEGES?) ON (
             object_type object_name
             | ALL object_type_plural IN ( DATABASE id_ | SCHEMA schema_name)
@@ -3935,7 +3935,7 @@ select_statement
 
 set_operators
     : (UNION ALL? | (EXCEPT | MINUS_) | INTERSECT) select_statement
-    | ('(' select_statement ')')
+    | LR_BRACKET select_statement RR_BRACKET
     ;
 
 select_optional_clauses
@@ -3974,12 +3974,13 @@ column_elem_star
     ;
 
 column_elem
-    : object_name_or_alias? column_name 
-    | object_name_or_alias? DOLLAR column_position 
+    : object_name_or_alias? column_name
+    | object_name_or_alias? DOLLAR column_position
     ;
 
 object_name_or_alias
-    : object_name | alias DOT
+    : object_name
+    | alias DOT
     ;
 
 as_alias
@@ -3987,7 +3988,8 @@ as_alias
     ;
 
 expression_elem
-    : (expr | predicate)
+    : expr
+    | predicate
     ;
 
 column_position
@@ -4248,7 +4250,6 @@ group_by_elem
 group_by_list
     : group_by_elem (COMMA group_by_elem)*
     ;
-
 
 group_by_clause
     : GROUP BY group_by_list having_clause?
