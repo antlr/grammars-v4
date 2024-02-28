@@ -465,7 +465,7 @@ ELSE_DIRECTIVE                : 'else'                -> channel(DIRECTIVES), po
 ELSIF_DIRECTIVE               : 'elsif'               -> channel(DIRECTIVES), popMode, mode(ELSIF_DIRECTIVE_MODE);
 END_KEYWORDS_DIRECTIVE        : 'end_keywords'        -> channel(DIRECTIVES), popMode;
 ENDCELLDEFINE_DIRECTIVE       : 'endcelldefine'       -> channel(DIRECTIVES), popMode;
-ENDIF_DIRECTIVE               : 'endif'               -> channel(DIRECTIVES), popMode, popMode, popMode;
+ENDIF_DIRECTIVE               : 'endif'               -> channel(DIRECTIVES), mode(ENDIF_DIRECTIVE_MODE);
 FILE_DIRECTIVE                : '__FILE__'            -> channel(DIRECTIVES), popMode;
 IFDEF_DIRECTIVE               : 'ifdef'               -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE);
 IFNDEF_DIRECTIVE              : 'ifndef'              -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE);
