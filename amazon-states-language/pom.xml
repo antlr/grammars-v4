@@ -39,7 +39,7 @@
                 <configuration>
                     <verbose>false</verbose>
                     <showTree>false</showTree>
-                    <entryPoint>program_decl</entryPoint>
+                    <entryPoint>state_machine</entryPoint>
                     <grammarName>ASL</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>

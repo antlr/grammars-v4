@@ -39,7 +39,7 @@
                 <configuration>
                     <verbose>false</verbose>
                     <showTree>false</showTree>
-                    <entryPoint>func_decl</entryPoint>
+                    <entryPoint>intrinsic_function</entryPoint>
                     <grammarName>ASLIntrinsic</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>

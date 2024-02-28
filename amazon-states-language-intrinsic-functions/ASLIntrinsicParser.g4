@@ -34,7 +34,7 @@ options {
     tokenVocab = ASLIntrinsicLexer;
 }
 
-func_decl: states_func_decl;
+intrinsic_function: states_func_decl EOF;
 
 states_func_decl: States DOT state_fun_name func_arg_list;
 
@@ -68,5 +68,5 @@ func_arg:
     | (TRUE | FALSE)      # func_arg_bool
     | CONTEXT_PATH_STRING # func_arg_context_path
     | JSON_PATH_STRING    # func_arg_json_path
-    | func_decl           # func_arg_func_decl
+    | states_func_decl    # func_arg_func_decl
 ;

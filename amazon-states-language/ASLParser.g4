@@ -34,6 +34,8 @@ options {
     tokenVocab = ASLLexer;
 }
 
+state_machine: program_decl EOF;
+
 program_decl: LBRACE top_layer_stmt (COMMA top_layer_stmt)* RBRACE;
 
 top_layer_stmt: comment_decl | version_decl | startat_decl | states_decl | timeout_seconds_decl;
