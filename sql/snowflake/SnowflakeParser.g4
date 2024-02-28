@@ -3577,6 +3577,7 @@ builtin_function
     | CAST
     | TRY_CAST
     | ANY_VALUE
+    | GETDATE
     ;
 
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
@@ -3935,7 +3936,7 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | (EXCEPT | MINUS_) | INTERSECT) select_statement
+    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement //EXCEPT and MINUS have same SQL meaning
     | LR_BRACKET select_statement RR_BRACKET
     ;
 
@@ -4011,7 +4012,7 @@ into_clause
     ;
 
 var_list
-    : var (COMMA var)
+    : var (COMMA var)*
     ;
 
 var

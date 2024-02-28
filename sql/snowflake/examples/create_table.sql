@@ -105,4 +105,4 @@ create table if not exists t3 cluster by LINEAR(f1) (f1 varchar, f2 number) ;
 -- virtual columns
 create table t4 (f1 number, f2 number, f3 number as (hash(f1,f2)));
 create table t4 (f1 number, f2 number, f3 number as (concat_ws(',',f1,f2)));
-create table floor (any_value int);
+create table floor (any_value int,getdate int);
