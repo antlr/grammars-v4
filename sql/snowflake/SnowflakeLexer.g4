@@ -75,6 +75,7 @@ ALTER: 'ALTER';
 AND: 'AND';
 //ANONYMOUS:                                             'ANONYMOUS';
 ANY                  : 'ANY';
+ANY_VALUE            : 'ANY_VALUE';
 API                  : 'API';
 API_ALLOWED_PREFIXES : 'API_ALLOWED_PREFIXES';
 API_AWS_ROLE_ARN     : 'API_AWS_ROLE_ARN';
@@ -381,6 +382,7 @@ GEO                          : 'GEO';
 GEOGRAPHY_OUTPUT_FORMAT      : 'GEOGRAPHY_OUTPUT_FORMAT';
 GEOMETRY_OUTPUT_FORMAT       : 'GEOMETRY_OUTPUT_FORMAT';
 GET                          : 'GET';
+GETDATE                      : 'GETDATE';
 // GET_FILESTREAM_TRANSACTION_CONTEXT:                    'GET_FILESTREAM_TRANSACTION_CONTEXT';
 GLOBAL          : 'GLOBAL';
 GOOGLE_AUDIENCE : 'GOOGLE_AUDIENCE';
@@ -1099,6 +1101,7 @@ DOUBLE_PRECISION : 'DOUBLE PRECISION';
 FLOAT4           : 'FLOAT4';
 FLOAT8           : 'FLOAT8';
 FLOAT_           : 'FLOAT';
+FLOOR            : 'FLOOR';
 GEOGRAPHY        : 'GEOGRAPHY';
 GEOMETRY         : 'GEOMETRY';
 INTEGER          : 'INTEGER';
@@ -1139,7 +1142,6 @@ S3GOV_PATH : SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
 GCS_PATH   : SINGLE_QUOTE 'gcs://' Uri SINGLE_QUOTE;
 AZURE_PATH : SINGLE_QUOTE 'azure://' Uri SINGLE_QUOTE;
 FILE_PATH  : 'file://' ( DIVIDE Uri | WindowsPath); //file://<path_to_file>/<filename>
-STAGE_PATH : DIVIDE Uri*;
 
 DBL_DOLLAR: '$$' (~'$' | '\\$' | '$' ~'$')*? '$$';
 

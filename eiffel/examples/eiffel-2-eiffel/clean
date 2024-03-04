@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm -fv *.class
+
+rm -fv ./EiffelGrammar.tokens EiffelGrammar.interp EiffelGrammarLexer.interp EiffelGrammarBaseVisitor.java EiffelGrammarVisitor.java EiffelGrammarLexer.tokens EiffelGrammarLexer.java EiffelGrammarParser.java
+
