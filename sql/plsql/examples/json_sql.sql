@@ -9,6 +9,8 @@ ORDER BY d.department_id;
 
 SELECT JSON_OBJECT(KEY 'VALUE' VALUE COL), t.*  FROM T t;
 
+SELECT JSON_OBJECT(KEY 'VALUE' VALUE COL FORMAT JSON), t.*  FROM T t;
+
 SELECT JSON_ARRAY (
                JSON_OBJECT('percentage' VALUE .50),
                JSON_ARRAY(1,2,3),
