@@ -412,6 +412,7 @@ initializer
 
 assignable
     : identifier
+    | keyword
     | arrayLiteral
     | objectLiteral
     ;
@@ -427,7 +428,7 @@ anonymousFunction
     ;
 
 arrowFunctionParameters
-    : identifier
+    : propertyName
     | '(' formalParameterList? ')'
     ;
 
