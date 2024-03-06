@@ -565,7 +565,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function_ identifier callSignature (('{' functionBody '}') | SemiColon)
+    : Async? Function_ '*'? identifier callSignature (('{' functionBody '}') | SemiColon)
     ;
 
 //Ovveride ECMA
@@ -613,7 +613,7 @@ indexMemberDeclaration
     ;
 
 generatorMethod
-    : (Async {this.notLineTerminator()}?)? '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : (Async {this.notLineTerminator()}?)? '*'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorFunctionDeclaration
@@ -653,7 +653,7 @@ formalParameterList
     ;
 
 formalParameterArg
-    : decorator? accessibilityModifier? identifierOrKeyWord '?'? typeAnnotation? (
+    : decorator? accessibilityModifier? assignable '?'? typeAnnotation? (
         '=' singleExpression
     )? // ECMAScript 6: Initialization
     ;
@@ -704,7 +704,7 @@ getAccessor
     ;
 
 setAccessor
-    : setter '(' (identifier | bindingPattern) typeAnnotation? ')' '{' functionBody '}'
+    : setter '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 propertyName
@@ -793,6 +793,13 @@ asExpression
     | singleExpression
     ;
 
+assignable
+    : identifier
+    | keyword
+    | arrayLiteral
+    | objectLiteral
+    ;
+
 anonymousFunction
     : functionDeclaration 
     | Async? Function_ '*'? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
@@ -804,7 +811,7 @@ arrowFunctionDeclaration
     ;
 
 arrowFunctionParameters
-    : identifier
+    : propertyName
     | '(' formalParameterList? ')'
     ;
 

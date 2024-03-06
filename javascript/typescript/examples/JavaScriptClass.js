@@ -189,11 +189,12 @@ class B {
 }
 // extended object
 let Obj = {
-  // [asdfg](a){}, // @todo Support this...
+  [asdfg](a){},
+  y = ([x]: any) => x;
   * foo () {},
   f(){},
   get a(){},
-  // set a([aa]=123){}, @todo ... and this
+  set a([aa]=123){},
   ...anotherObj,
   ...{
     speradObjectLiteral
