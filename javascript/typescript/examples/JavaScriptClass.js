@@ -190,7 +190,6 @@ class B {
 // extended object
 let Obj = {
   [asdfg](a){},
-  y = ([x]: any) => x;
   * foo () {},
   f(){},
   get a(){},
