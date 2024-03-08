@@ -3,7 +3,7 @@ import {CommonToken, Lexer, Token, CharStream} from "antlr4";
 import PhpParser from "./PhpParser";
 import PhpLexer from "./PhpLexer";
 
-export class PhpLexerBase extends Lexer {
+export default abstract class PhpLexerBase extends Lexer {
     private AspTags: boolean;
     protected _scriptTag: boolean;
     protected _styleTag: boolean;
