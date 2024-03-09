@@ -46,7 +46,7 @@
 					<showTree>false</showTree>
 					<entryPoint>sql_script</entryPoint>
 					<grammarName>PlSql</grammarName>
-					<packageName></packageName>
+					<packageName>org.antlr.grammars.plsql</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
@@ -65,7 +65,7 @@
 							<showTree>false</showTree>
 							<entryPoint>sql_script</entryPoint>
 							<grammarName>PlSql</grammarName>
-							<packageName></packageName>
+							<packageName>org.antlr.grammars.plsql</packageName>
 							<exampleFiles>examples-sql-script/</exampleFiles>
 						</configuration>
 					</execution>
