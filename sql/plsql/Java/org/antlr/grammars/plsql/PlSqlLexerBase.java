@@ -1,3 +1,5 @@
+package org.antlr.grammars.plsql;
+
 import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlLexerBase extends Lexer

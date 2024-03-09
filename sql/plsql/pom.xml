@@ -24,6 +24,10 @@
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>org.antlr.grammars.plsql</argument>
+                    </arguments>
 				</configuration>
 				<executions>
 					<execution>
