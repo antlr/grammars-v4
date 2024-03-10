@@ -5481,6 +5481,7 @@ pragma_declaration
         | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
         | INLINE '(' id1 = identifier ',' expression ')'
         | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')'
+        | DEPRECATE '(' identifier ( ',' CHAR_STRING)? ')'
     ) ';'
     ;
 
@@ -7465,6 +7466,7 @@ regular_id
     | CASESENSITIVE
     | DECIMAL
     | DELETE
+    | DEPRECATE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
     | DURATION
