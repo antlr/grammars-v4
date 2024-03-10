@@ -6491,7 +6491,7 @@ searched_case_statement
     ;
 
 searched_case_when_part
-    : WHEN expression THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
+    : WHEN condition THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
 
 case_else_part
