@@ -6684,7 +6684,7 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
-    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' CHAR_STRING)? listagg_overflow_clause? ')' (
+    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' string_delimiter)? listagg_overflow_clause? ')' (
         WITHIN GROUP '(' order_by_clause ')'
     )? over_clause?
     | cursor_name (PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT)
@@ -6802,6 +6802,13 @@ collect_order_by_part
 within_or_over_part
     : WITHIN GROUP '(' order_by_clause ')'
     | over_clause
+    ;
+
+string_delimiter
+    : CHAR_STRING
+    | string_function
+    | string_delimiter BAR BAR string_delimiter
+    | '(' string_delimiter ')'
     ;
 
 cost_matrix_clause
