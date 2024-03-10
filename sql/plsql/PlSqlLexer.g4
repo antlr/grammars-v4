@@ -418,6 +418,7 @@ DELETEXML                      : 'DELETEXML';
 DEMAND                         : 'DEMAND';
 DENSE_RANKM                    : 'DENSE_RANKM';
 DEPENDENT                      : 'DEPENDENT';
+DEPRECATE                      : 'DEPRECATE';
 DEPTH                          : 'DEPTH';
 DEQUEUE                        : 'DEQUEUE';
 DEREF                          : 'DEREF';
