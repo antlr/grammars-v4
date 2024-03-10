@@ -522,7 +522,7 @@ create_function_body
         | aggregate_clause
         | pipelined_using_clause
         | sql_macro_body
-    ) ';'
+    )
     ;
 
 sql_macro_body
@@ -768,7 +768,7 @@ create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? invoker_rights_clause? PARALLEL_ENABLE? (
         IS
         | AS
-    ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
+    ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
