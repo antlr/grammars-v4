@@ -6405,6 +6405,7 @@ concatenation
     | concatenation op = (ASTERISK | SOLIDUS | MOD) concatenation
     | concatenation op = (PLUS_SIGN | MINUS_SIGN) concatenation
     | concatenation BAR BAR concatenation
+    | concatenation COLLATE column_collation_name
     ;
 
 interval_expression
