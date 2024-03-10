@@ -5505,7 +5505,7 @@ type_declaration
     ;
 
 table_type_def
-    : TABLE OF type_spec table_indexed_by_part? (NOT NULL_)?
+    : TABLE OF type_spec (NOT NULL_)? table_indexed_by_part?
     ;
 
 table_indexed_by_part

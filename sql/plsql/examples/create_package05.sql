@@ -11,7 +11,7 @@ create or replace package pkg_fun_with_streaming is
 
   type t_change_cur is ref cursor return t_change;
 
-  type t_message_tab is table of t_message;
+  type t_message_tab is table of t_message not null index by int;
 
 
   function prep_messages(p_changes t_change_cur)
