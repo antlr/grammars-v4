@@ -6814,6 +6814,7 @@ string_delimiter
     | string_function
     | string_delimiter BAR BAR string_delimiter
     | '(' string_delimiter ')'
+    | id_expression
     ;
 
 cost_matrix_clause
