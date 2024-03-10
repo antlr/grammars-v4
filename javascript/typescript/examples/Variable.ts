@@ -57,3 +57,5 @@ const codesByType = Joi.object()
 
 const post = (...args: any[]) => {
 };
+
+const function = ([x]: any) => x;
