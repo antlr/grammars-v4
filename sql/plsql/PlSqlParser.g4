@@ -4508,11 +4508,11 @@ security_clause
     ;
 
 domain
-    : regular_id
+    : id_expression
     ;
 
 database
-    : regular_id
+    : id_expression
     ;
 
 edition_name
@@ -4563,7 +4563,7 @@ replay_upgrade_clauses
     ;
 
 alter_database_link
-    : ALTER SHARED? PUBLIC? DATABASE LINK link_name (
+    : ALTER SHARED? PUBLIC? DATABASE LINK local_link_name (
         CONNECT TO user_object_name IDENTIFIED BY password_value link_authentication?
         | link_authentication
     )
@@ -4668,7 +4668,7 @@ drop_database
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
-    : CREATE SHARED? PUBLIC? DATABASE LINK dblink (
+    : CREATE SHARED? PUBLIC? DATABASE LINK link_name (
         CONNECT TO (
             CURRENT_USER
             | user_object_name IDENTIFIED BY password_value link_authentication?
@@ -4677,12 +4677,8 @@ create_database_link
     )* (USING CHAR_STRING)?
     ;
 
-dblink
-    : database_name ('.' d = id_expression)* ('@' cq = id_expression)?
-    ;
-
 drop_database_link
-    : DROP PUBLIC? DATABASE LINK dblink
+    : DROP PUBLIC? DATABASE LINK link_name
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
@@ -7061,6 +7057,14 @@ collection_name
     ;
 
 link_name
+    : database ('.' domain)* (AT_SIGN connection_qualifier)?
+    ;
+
+local_link_name
+    : identifier
+    ;
+
+connection_qualifier
     : identifier
     ;
 
@@ -7070,7 +7074,7 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)? (
-        AT_SIGN link_name (PERIOD link_name)*
+        AT_SIGN link_name
         | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause
     )?
     | xmltable outer_join_sign?
