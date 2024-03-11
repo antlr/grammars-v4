@@ -6304,7 +6304,14 @@ seed_part
 // Expression & Condition
 
 condition
-    : expression
+    : condition_part
+    | condition AND condition
+    | condition OR condition
+    | '(' condition ')'
+    ;
+
+condition_part
+    : logical_expression
     | json_condition
     ;
 
