@@ -5982,7 +5982,7 @@ pivot_clause
     ;
 
 pivot_element
-    : aggregate_function_name '(' expression ')' column_alias?
+    : (numeric_function | aggregate_function_name '(' expression ')') column_alias?
     ;
 
 pivot_for_clause
