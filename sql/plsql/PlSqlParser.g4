@@ -6304,19 +6304,7 @@ seed_part
 // Expression & Condition
 
 condition
-    : condition_part
-    | condition AND condition
-    | condition OR condition
-    | '(' condition ')'
-    ;
-
-condition_part
-    : logical_expression
-    | json_condition
-    ;
-
-json_condition
-    : expression IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
+    : expression
     | JSON_EQUAL '(' expressions ')'
     ;
 
@@ -6356,6 +6344,7 @@ logical_operation
         | A_LETTER SET
         | EMPTY_
         | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
+        | JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
     )
     ;
 
