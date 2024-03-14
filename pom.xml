@@ -44,12 +44,12 @@
 			<artifactId>antlr4-runtime</artifactId>
 			<version>${antlr.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -340,6 +340,49 @@
 				<module>yara</module>
 				<module>z</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>build</id>
+			<activation>
+				<file>
+					<exists>desc.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.2.4</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<artifactSet>
+										<includes>
+											<include>org.antlr.grammars:*</include>
+										</includes>
+									</artifactSet>
+									<relocations>
+										<relocation>
+											<pattern>org.antlr</pattern>
+											<shadedPattern>org.antlr</shadedPattern>
+										</relocation>
+										<relocation>
+											<pattern></pattern>
+											<shadedPattern>org.antlr.grammars.${artifactId}.</shadedPattern>
+										</relocation>
+									</relocations>
+									<createDependencyReducedPom>false</createDependencyReducedPom>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>deploy</id>
