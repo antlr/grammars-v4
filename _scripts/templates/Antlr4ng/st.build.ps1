@@ -14,8 +14,9 @@ if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
 
+$jarFile = Get-ChildItem ./node_modules/antlr4ng-cli/*.jar
 <tool_grammar_tuples:{x |
-$(& java -jar ./node_modules/antlr4ng-cli/*.jar <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& java -jar $jarFile.FullName <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
