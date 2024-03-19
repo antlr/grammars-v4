@@ -19,6 +19,10 @@
 		<antlr.version>4.11.1</antlr.version>
 
 		<junit.version>4.13.2</junit.version>
+
+        <packageName>org.antlr.grammars.${project.artifactId}</packageName>
+        <packagePath>org/antlr/grammars/${project.artifactId}</packagePath>
+        <packageLine>package ${packageName};</packageLine>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -52,6 +56,7 @@
 			<version>${junit.version}</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -62,6 +67,52 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/generated-sources/copy/${packagePath}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/Java</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <delimiters>
+                                <delimiter>///{*}</delimiter>
+                            </delimiters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources/copy/${packagePath}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 	</build>
 	<profiles>
 		<profile>
