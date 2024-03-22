@@ -2,6 +2,8 @@ name: Perf analysis of what has changed
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   perf:
