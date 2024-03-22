@@ -118,10 +118,10 @@ done
 
 #===========================
 echo Test each grammar and PR in turn.
-rm -f "$cwd"/p[0-1]*
 for g in ${test[@]}
 do
     echo Grammar $g
+    rm -f "$cwd"/p[0-1]*
     gg=`echo $g | tr '/' '-'`
     for ((i=0; i<${#prs[@]}; i++))
     do
@@ -173,11 +173,18 @@ do
     echo Graphing out.
     cd $cwd
     rm -f xx.m
+    echo "pkg load statistics" >> xx.m
     for ((i=0; i<${#prs[@]}; i++))
     do
         echo "p$i=["`cat "$cwd/p$i-$gg.txt"`"];" >> xx.m
         echo "mp$i=mean(p$i);" >> xx.m
         echo "sd$i=std(p$i);" >> xx.m
+        echo "printf('disp($i)');" >> xx.m
+        echo "disp($i);" >> xx.m
+        echo "printf('disp(p$i)');" >> xx.m
+        echo "disp(p$i);" >> xx.m
+        echo "printf('mp$i = %f\n', mp$i);" >> xx.m
+        echo "printf('sd$i = %f\n', sd$i);" >> xx.m
     done
     echo -n "x = [" >> xx.m
     for ((i=1; i<=${#prs[@]}; i++))
@@ -224,6 +231,9 @@ xlabel("Target");
 ylabel("Runtime (s)");
 title("Comparison of Runtimes")
 print("./times-$gg.svg", "-dsvg")
+res = ttest2(p0, p1)
+printf("disp(res);");
+disp(res);
 EOF
     cat xx.m | octave --no-gui
 

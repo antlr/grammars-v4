@@ -18,6 +18,7 @@ jobs:
     - name: Install Octave
       run: |
         sudo apt install octave
+        sudo apt install octave-statistics
         octave --version
     - name: Checkout
       uses: actions/checkout@v4
