@@ -225,6 +225,6 @@ ylabel("Runtime (s)");
 title("Comparison of Runtimes")
 print("./times-$gg.svg", "-dsvg")
 EOF
-    cat xx.m | octave.exe --no-gui
+    cat xx.m | octave --no-gui
 
 done
