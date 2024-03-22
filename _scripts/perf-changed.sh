@@ -225,6 +225,6 @@ ylabel("Runtime (s)");
 title("Comparison of Runtimes")
 print("./times-$gg.svg", "-dsvg")
 EOF
-    cat xx.m | "C:\Program Files\GNU Octave\Octave-7.2.0\octave-launch.exe" --no-gui
+    cat xx.m | octave.exe --no-gui
 
 done

@@ -15,6 +15,10 @@ jobs:
         arch
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
+    - name: Install Octave
+      run: |
+        sudo apt install octave
+        octave --version
     - name: Checkout
       uses: actions/checkout@v4
       with:
