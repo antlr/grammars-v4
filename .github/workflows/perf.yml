@@ -6,7 +6,7 @@ on:
 jobs:
   perf:
     runs-on: ubuntu-latest
-    step:
+    steps:
     - name: Info
       shell: bash
       run: |
