@@ -3,6 +3,22 @@
 set -x
 set -e
 
+# Check requirements.
+if ! command -v dotnet &> /dev/null
+then
+    echo "'dotnet' could not be found. Install Microsoft NET."
+    exit 1
+fi
+if ! command -v trxml2 &> /dev/null
+then
+    local=1
+fi
+if ! command -v dotnet -- trxml2 --version &> /dev/null
+then
+    echo "'dotnet' could not be found. Install Microsoft NET."
+    exit 1
+fi
+
 function getopts-extra () {
     OPTARG=()
     declare i=0
@@ -58,7 +74,12 @@ do
     if [ "$g" == "" ]; then continue; fi
     if [ -f desc.xml ]
     then
-        gtargets=`trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
+        if [ "$local" == "" ]
+        then
+            gtargets=`trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
+        else
+            gtargets=`dotnet -- trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
+        fi
         if [ "$gtargets" == "" ]; then continue; fi
     fi
     test=( ${test[@]} $g )
@@ -69,7 +90,6 @@ done
 echo Test each grammar changed in PR:
 echo ${test[@]}
 
-cat - > /dev/null <<EOF
 echo First, performing builds.
 for ((i=0; i<${#prs[@]}; i++))
 do
@@ -90,7 +110,6 @@ do
     done
     popd
 done
-EOF
 
 #===========================
 echo Test each grammar and PR in turn.
@@ -105,7 +124,12 @@ do
         where=`echo Generated-CSharp* | tr ' ' '\n' | head -1`
         echo $where
         cd $where
-        what=`trxml2 desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
+        if [ "$local" == "" ]
+        then
+            what=`trxml2 desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
+        else
+            what=`dotnet -- trxml2 desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
+        fi
         if [ "$what" == "" ]
         then
             dir=`pwd`
