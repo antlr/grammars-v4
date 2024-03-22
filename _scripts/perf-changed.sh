@@ -101,7 +101,12 @@ do
     do
         echo Grammar $g
         pushd $g
-        trgen -t CSharp
+        if [ "$local" == "" ]
+        then
+            trgen -t CSharp
+        else
+            dotnet trgen -- -t CSharp
+        fi
         where=`echo Generated-CSharp* | tr ' ' '\n' | head -1`
         echo $where
         cd $where
@@ -134,11 +139,21 @@ do
         then
             dir=`pwd`
             p=`realpath -s --relative-to=$dir "$cwd/${prs[1]}/$g/examples"`
-            what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
+            if [ "$local" == "" ]
+            then
+                what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
+            else
+                what=( `dotnet trglob -- $p | grep -v '.errors$' | grep -v '.tree$'` )
+            fi
         else
             dir=`pwd`
             p=`realpath -s --relative-to=$dir "$cwd/${prs[1]}/$g/$what"`
-            what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
+            if [ "$local" == "" ]
+            then
+                what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
+            else
+                what=( `dotnet trglob -- $p | grep -v '.errors$' | grep -v '.tree$'` )
+            fi
         fi
         echo what = $what
         newwhat=()
