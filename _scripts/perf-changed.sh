@@ -179,9 +179,9 @@ do
         echo "p$i=["`cat "$cwd/p$i-$gg.txt"`"];" >> xx.m
         echo "mp$i=mean(p$i);" >> xx.m
         echo "sd$i=std(p$i);" >> xx.m
-        echo "printf('disp($i)');" >> xx.m
+        echo "printf('disp($i)\n');" >> xx.m
         echo "disp($i);" >> xx.m
-        echo "printf('disp(p$i)');" >> xx.m
+        echo "printf('disp(p$i)\n');" >> xx.m
         echo "disp(p$i);" >> xx.m
         echo "printf('mp$i = %f\n', mp$i);" >> xx.m
         echo "printf('sd$i = %f\n', sd$i);" >> xx.m
@@ -231,9 +231,14 @@ xlabel("Target");
 ylabel("Runtime (s)");
 title("Comparison of Runtimes")
 print("./times-$gg.svg", "-dsvg")
-res = ttest2(p0, p1)
-printf("disp(res);");
-disp(res);
+[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'left')
+if (h)
+  printf("The PR signficantly DECREASES performance.\n");
+endif
+[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'right')
+if (h)
+  printf("The PR signficantly INCREASES performance.\n");
+endif
 EOF
     cat xx.m | octave --no-gui
 
