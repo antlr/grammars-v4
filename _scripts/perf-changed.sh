@@ -1,6 +1,6 @@
 #
 
-set -x
+# set -x
 set -e
 
 # Check requirements.
@@ -233,11 +233,15 @@ title("Comparison of Runtimes")
 print("./times-$gg.svg", "-dsvg")
 [h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'left')
 if (h)
-  printf("The PR signficantly DECREASES performance.\n");
+  printf("The PR signficantly DECREASES performance for $gg.\n");
+else
+  printf("The PR did not signficantly decrease performance for $gg.\n");
 endif
 [h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'right')
 if (h)
-  printf("The PR signficantly INCREASES performance.\n");
+  printf("The PR signficantly INCREASES performance for $gg.\n");
+else
+  printf("The PR did not signficantly increase performance for $gg.\n");
 endif
 EOF
     cat xx.m | octave --no-gui
