@@ -243,6 +243,9 @@ do
 		  printf("The PR did not signficantly increase performance for $gg.\n");
 		endif
 EOF
+	echo ========
+	cat xx.m
+	echo ========
     cat xx.m | octave --no-gui
 
 done
