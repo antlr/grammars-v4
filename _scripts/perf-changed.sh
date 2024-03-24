@@ -1,6 +1,6 @@
 #
 
-# set -x
+set -x
 set -e
 
 # Check requirements.
@@ -38,20 +38,20 @@ cwd=`pwd`
 prs=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | head -2 | awk '{print $NF}' | sed 's/[()#]//g'` )
 com=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | awk '{print $1}' | sed 's/[()#]//g' | head -2` )
 pri=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | head -2 | tail -1 | awk '{print $1}' | sed 's/[()#]//g'` )
-echo ${prs[@]}
-echo ${com[@]}
-echo ${pri[@]}
-echo ${#prs[@]}
+echo PRS = ${prs[@]}
+echo COM = ${com[@]}
+echo PRI = ${pri[@]}
+echo '#PRS' = ${#prs[@]}
 
+# The PR that is more recent is the first in the list.
 # Get grammars changed for current PR. This will focus exactly on what to
-# test.
-test=()
-i=1
-changes=`git diff --name-only ${com[$i - 1]} ${com[$i]} | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | fgrep -v .github | tr -d '\r'`
-echo $changes
+# test. Note, we only consider .g4 changes, no examples, no duplicates.
+tests=()
+changes=`git diff --name-only ${com[0]} ${com[1]} | grep '[.]g4$' | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | fgrep -v .github | fgrep -v examples | sort -u | tr -d '\r'`
+echo Changed files = $changes
 
 #############################
-echo Computing grammars changed... 1>&2
+echo Computing grammars changed...
 prefix=`pwd`
 for g in ${changes[@]}
 do
@@ -59,14 +59,14 @@ do
     pushd $g > /dev/null 2> /dev/null
     while true
     do
-    if [ -f `pwd`/desc.xml ]
-    then
-        break
-    elif [ `pwd` == "$prefix" ]
-    then
-        break
-    fi
-    cd ..
+	    if [ -f `pwd`/desc.xml ]
+	    then
+	        break
+	    elif [ `pwd` == "$prefix" ]
+	    then
+	        break
+	    fi
+	    cd ..
     done
     g=`pwd`
     g=${g##*$prefix}
@@ -82,22 +82,20 @@ do
         fi
         if [ "$gtargets" == "" ]; then continue; fi
     fi
-    test=( ${test[@]} $g )
+    tests=( ${tests[@]} $g )
     popd > /dev/null
 done
+echo Grammars to test = ${tests[@]}
 
 #############################
-echo Test each grammar changed in PR:
-echo ${test[@]}
-
-echo First, performing builds.
+echo Build each grammar changed in PR.
 for ((i=0; i<${#prs[@]}; i++))
 do
     rm -rf ./${prs[$i]}
     git clone 'https://github.com/antlr/grammars-v4.git' "${prs[$i]}"
     pushd ${prs[$i]}
     git checkout ${com[$i]}
-    for g in ${test[@]}
+    for g in ${tests[@]}
     do
         echo Grammar $g
         pushd $g
@@ -118,7 +116,7 @@ done
 
 #===========================
 echo Test each grammar and PR in turn.
-for g in ${test[@]}
+for g in ${tests[@]}
 do
     echo Grammar $g
     rm -f "$cwd"/p[0-1]*
@@ -170,6 +168,7 @@ do
         done
         popd
     done
+	
     echo Graphing out.
     cd $cwd
     rm -f xx.m
@@ -218,31 +217,31 @@ do
     done
     echo " ];" >> xx.m
     cat >> xx.m <<EOF
-bar(x,data);
-set(gca, 'XTickLabel', str, 'XTick', 1:numel(x));
-hold on
-er = errorbar(x,data,errlow,errhigh);
-hold off
-set(er, "color", [0 0 0])
-set(er, "linewidth", 3);
-set(er, "linestyle", "none");
-set(gca, "fontsize", 6)
-xlabel("Target");
-ylabel("Runtime (s)");
-title("Comparison of Runtimes")
-print("./times-$gg.svg", "-dsvg")
-[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'left')
-if (h)
-  printf("The PR signficantly DECREASES performance for $gg.\n");
-else
-  printf("The PR did not signficantly decrease performance for $gg.\n");
-endif
-[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'right')
-if (h)
-  printf("The PR signficantly INCREASES performance for $gg.\n");
-else
-  printf("The PR did not signficantly increase performance for $gg.\n");
-endif
+		bar(x,data);
+		set(gca, 'XTickLabel', str, 'XTick', 1:numel(x));
+		hold on
+		er = errorbar(x,data,errlow,errhigh);
+		hold off
+		set(er, "color", [0 0 0])
+		set(er, "linewidth", 3);
+		set(er, "linestyle", "none");
+		set(gca, "fontsize", 6)
+		xlabel("Target");
+		ylabel("Runtime (s)");
+		title("Comparison of Runtimes")
+		print("./times-$gg.svg", "-dsvg")
+		[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'left')
+		if (h)
+		  printf("The PR signficantly DECREASES performance for $gg.\n");
+		else
+		  printf("The PR did not signficantly decrease performance for $gg.\n");
+		endif
+		[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'right')
+		if (h)
+		  printf("The PR signficantly INCREASES performance for $gg.\n");
+		else
+		  printf("The PR did not signficantly increase performance for $gg.\n");
+		endif
 EOF
     cat xx.m | octave --no-gui
 
