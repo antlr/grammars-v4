@@ -30,17 +30,37 @@ function getopts-extra () {
 }
 cwd=`pwd`
 
+while getopts 'a:b:' opt; do
+    case "$opt" in
+        a)
+            after="${OPTARG}"
+            ;;
+        b)
+            before="${OPTARG}"
+            ;;
+    esac
+done
+
+if [ "$after" == "" ]
+then
+    echo "'after' not set."
+    exit 1
+fi
+if [ "$before" == "" ]
+then
+    echo "'before' not set."
+    exit 1
+fi
+
 #############################
 #############################
 # Get last commit/pr. Note, some of the PR merges don't
 # fit the pattern, but we'll ignore them. Get "prior" commit before all these
 # changes.
-prs=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | head -2 | awk '{print $NF}' | sed 's/[()#]//g'` )
-com=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | awk '{print $1}' | sed 's/[()#]//g' | head -2` )
-pri=( `git log --grep="[(][#][1-9][0-9]*[)]" --pretty=oneline | head -2 | tail -1 | awk '{print $1}' | sed 's/[()#]//g'` )
+prs=( After Before )
+com=( $after $before )
 echo PRS = ${prs[@]}
 echo COM = ${com[@]}
-echo PRI = ${pri[@]}
 echo '#PRS' = ${#prs[@]}
 
 # The PR that is more recent is the first in the list.
@@ -91,14 +111,14 @@ echo Grammars to test = ${tests[@]}
 echo Build each grammar changed in PR.
 for ((i=0; i<${#prs[@]}; i++))
 do
-    rm -rf ./${prs[$i]}
-    git clone 'https://github.com/antlr/grammars-v4.git' "${prs[$i]}"
-    pushd ${prs[$i]}
-    git checkout ${com[$i]}
+    rm -rf "$cwd/${prs[$i]}"
+	mkdir "$cwd/${prs[$i]}"
+	git checkout ${com[$i]}
     for g in ${tests[@]}
     do
         echo Grammar $g
         pushd $g
+	    gg=`echo $g | tr '/' '-'`
         if [ "$local" == "" ]
         then
             trgen -t CSharp
@@ -110,6 +130,7 @@ do
         cd $where
         make
         popd
+		cp -r $g "$cwd/${prs[$i]}/$gg"
     done
     popd
 done
@@ -123,7 +144,7 @@ do
     gg=`echo $g | tr '/' '-'`
     for ((i=0; i<${#prs[@]}; i++))
     do
-        pushd ${prs[$i]}/$g
+        pushd "$cwd/${prs[$i]}/$gg"
         where=`echo Generated-CSharp* | tr ' ' '\n' | head -1`
         echo $where
         cd $where
