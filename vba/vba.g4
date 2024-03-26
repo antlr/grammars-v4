@@ -865,7 +865,7 @@ letterrange
     ;
 
 lineLabel
-    : ambiguousIdentifier ':'
+    : ambiguousIdentifier ':' WS?
     ;
 
 literal

@@ -9,4 +9,5 @@ Dim Number, MyString
  MyString = "Number equals 2" 
 3: 
  Debug.Print MyString
+4: Debug.Print "TEST"
 End Sub
