@@ -1309,6 +1309,7 @@ postfixExpression
     : (primary | expressionName) (
         postIncrementExpression_lf_postfixExpression
         | postDecrementExpression_lf_postfixExpression
+        | methodInvocation_lf_primary
     )*
     ;
 
