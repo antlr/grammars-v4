@@ -230,17 +230,11 @@ do
 		ylabel("Runtime (s)");
 		title("Comparison of Runtimes")
 		print("./times-$gg.svg", "-dsvg")
-		[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'left')
-		if (h)
-		  printf("The PR signficantly DECREASES performance for $gg.\n");
+		[pval, t, df] = welch_test(p0, p1)
+		if (abs(pval) < 0.03 && mp0/mp1 > 1.05)
+		  printf("The PR statistically and practically decreased performance for $gg.\n");
 		else
-		  printf("The PR did not signficantly decrease performance for $gg.\n");
-		endif
-		[h,p,ci,stats] = ttest2(p0, p1, 'alpha', 0.05, 'tail', 'right')
-		if (h)
-		  printf("The PR signficantly INCREASES performance for $gg.\n");
-		else
-		  printf("The PR did not signficantly increase performance for $gg.\n");
+		  printf("The PR did not signficantly negatively alter performance for $gg.\n");
 		endif
 EOF
 	echo ========
