@@ -24,7 +24,7 @@ bool JavaScriptParserBase::next(std::string str)
 
 bool JavaScriptParserBase::notLineTerminator()
 {
-    return !here(JavaScriptParser::LineTerminator);
+    return !lineTerminatorAhead();
 }
 
 bool JavaScriptParserBase::notOpenBraceAndNotFunction()

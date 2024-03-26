@@ -49,7 +49,7 @@ public abstract class JavaScriptParserBase : Parser
 
     protected bool notLineTerminator()
     {
-        return !here(LineTerminator);
+        return !lineTerminatorAhead();
     }
 
     protected bool notOpenBraceAndNotFunction()

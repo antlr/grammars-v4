@@ -28,7 +28,7 @@ export default class JavaScriptParserBase extends antlr4.Parser {
     }
 
     notLineTerminator() {
-        return !this.here(JavaScriptParser.LineTerminator);
+        return !this.lineTerminatorAhead();
     }
 
     notOpenBraceAndNotFunction() {

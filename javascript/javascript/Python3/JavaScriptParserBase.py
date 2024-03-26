@@ -29,7 +29,7 @@ class JavaScriptParserBase(Parser):
     def notLineTerminator(self) -> bool:
         JavaScriptParser = self.parser()
 
-        return not self.here(JavaScriptParser.LineTerminator)
+        return not self.lineTerminatorAhead()
 
     def notOpenBraceAndNotFunction(self) -> bool:
         JavaScriptParser = self.parser()
