@@ -418,6 +418,7 @@ DELETEXML                      : 'DELETEXML';
 DEMAND                         : 'DEMAND';
 DENSE_RANKM                    : 'DENSE_RANKM';
 DEPENDENT                      : 'DEPENDENT';
+DEPRECATE                      : 'DEPRECATE';
 DEPTH                          : 'DEPTH';
 DEQUEUE                        : 'DEQUEUE';
 DEREF                          : 'DEREF';
@@ -2511,7 +2512,7 @@ SPACES: [ \t\r\n]+ -> channel(HIDDEN);
 
 fragment NEWLINE_EOF    : NEWLINE | EOF;
 fragment QUESTION_MARK  : '?';
-fragment SIMPLE_LETTER  : [A-Z];
+fragment SIMPLE_LETTER  : [\p{Alphabetic}\p{General_Category=Other_Letter}];
 fragment FLOAT_FRAGMENT : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+;
 fragment NEWLINE        : '\r'? '\n';
 fragment SPACE          : [ \t];

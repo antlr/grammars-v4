@@ -1,7 +1,7 @@
 \<!-- Generated from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
-    \<TargetFramework>net7.0\</TargetFramework>
+    \<TargetFramework>net8.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
     \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
   \</PropertyGroup>
@@ -31,7 +31,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo $file
-    cat $file | bin/Debug/net7.0/Test
+    cat $file | bin/Debug/net8.0/Test
     status="$?"
     if [ -f "$file".errors ]
     then
@@ -67,7 +67,7 @@ for %%G in (..\\<example_files_win>\*) do (
   set X3=%%~pG
   if !X1! neq .errors (
     echo !FILE!
-    cat !FILE! | bin\Debug\net7.0\Test.exe
+    cat !FILE! | bin\Debug\net8.0\Test.exe
     if not exist !FILE!.errors (
       if ERRORLEVEL 1 set ERR=1
     ) else (

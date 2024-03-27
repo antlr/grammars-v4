@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-	<targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
-	<test>
-		<grammar-files>GLSLLexer.g4;GLSLParser.g4</grammar-files>
-		<grammar-name>GLSL</grammar-name>
-		<entry-point>translation_unit</entry-point>
-		<inputs>examples</inputs>
-	</test>
-	<test>
-		<grammar-files>GLSLLexer.g4;GLSLPreParser.g4</grammar-files>
-		<grammar-name>GLSLPre</grammar-name>
-		<entry-point>translation_unit</entry-point>
-		<inputs>examples-pre</inputs>
-	</test>
+   <targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
 </desc>

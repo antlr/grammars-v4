@@ -1,16 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
-	<targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
-	<test>
-		<grammar-files>VerilogLexer.g4;VerilogParser.g4</grammar-files>
-		<grammar-name>Verilog</grammar-name>
-		<entry-point>source_text</entry-point>
-		<inputs>examples</inputs>
-	</test>
-	<test>
-		<grammar-files>VerilogLexer.g4;VerilogPreParser.g4</grammar-files>
-		<grammar-name>VerilogPre</grammar-name>
-		<entry-point>source_text</entry-point>
-		<inputs>examples-pre</inputs>
-	</test>
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
+   <targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
+   <grammar-name>Verilog</grammar-name>
+   <entry-point>source_text</entry-point>
 </desc>

@@ -522,7 +522,7 @@ create_function_body
         | aggregate_clause
         | pipelined_using_clause
         | sql_macro_body
-    ) ';'
+    )
     ;
 
 sql_macro_body
@@ -667,7 +667,7 @@ create_package_body
     : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? PACKAGE BODY (schema_object_name '.')? package_name (
         IS
         | AS
-    ) package_obj_body* (BEGIN seq_of_statements (EXCEPTION exception_handler+)?)? END package_name?
+    ) package_obj_body*? (BEGIN seq_of_statements (EXCEPTION exception_handler+)?)? END package_name?
     ;
 
 // Create Package Specific Clauses
@@ -768,7 +768,7 @@ create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? invoker_rights_clause? PARALLEL_ENABLE? (
         IS
         | AS
-    ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
+    ) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-RESOURCE-COST.html
@@ -4508,11 +4508,11 @@ security_clause
     ;
 
 domain
-    : regular_id
+    : id_expression
     ;
 
 database
-    : regular_id
+    : id_expression
     ;
 
 edition_name
@@ -4563,7 +4563,7 @@ replay_upgrade_clauses
     ;
 
 alter_database_link
-    : ALTER SHARED? PUBLIC? DATABASE LINK link_name (
+    : ALTER SHARED? PUBLIC? DATABASE LINK local_link_name (
         CONNECT TO user_object_name IDENTIFIED BY password_value link_authentication?
         | link_authentication
     )
@@ -4668,7 +4668,7 @@ drop_database
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-DATABASE-LINK.html
 create_database_link
-    : CREATE SHARED? PUBLIC? DATABASE LINK dblink (
+    : CREATE SHARED? PUBLIC? DATABASE LINK link_name (
         CONNECT TO (
             CURRENT_USER
             | user_object_name IDENTIFIED BY password_value link_authentication?
@@ -4677,12 +4677,8 @@ create_database_link
     )* (USING CHAR_STRING)?
     ;
 
-dblink
-    : database_name ('.' d = id_expression)* ('@' cq = id_expression)?
-    ;
-
 drop_database_link
-    : DROP PUBLIC? DATABASE LINK dblink
+    : DROP PUBLIC? DATABASE LINK link_name
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ALTER-TABLESPACE-SET.html
@@ -5485,6 +5481,7 @@ pragma_declaration
         | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
         | INLINE '(' id1 = identifier ',' expression ')'
         | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')'
+        | DEPRECATE '(' identifier ( ',' CHAR_STRING)? ')'
     ) ';'
     ;
 
@@ -5509,7 +5506,7 @@ type_declaration
     ;
 
 table_type_def
-    : TABLE OF type_spec table_indexed_by_part? (NOT NULL_)?
+    : TABLE OF type_spec (NOT NULL_)? table_indexed_by_part?
     ;
 
 table_indexed_by_part
@@ -5986,7 +5983,7 @@ pivot_clause
     ;
 
 pivot_element
-    : aggregate_function_name '(' expression ')' column_alias?
+    : (numeric_function | aggregate_function_name '(' expression ')') column_alias?
     ;
 
 pivot_for_clause
@@ -6309,11 +6306,6 @@ seed_part
 
 condition
     : expression
-    | json_condition
-    ;
-
-json_condition
-    : expression IS NOT? JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
     | JSON_EQUAL '(' expressions ')'
     ;
 
@@ -6353,6 +6345,7 @@ logical_operation
         | A_LETTER SET
         | EMPTY_
         | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'
+        | JSON (FORMAT JSON)? (STRICT | LAX)? ((WITH | WITHOUT) UNIQUE KEYS)?
     )
     ;
 
@@ -6402,6 +6395,7 @@ concatenation
     | concatenation op = (ASTERISK | SOLIDUS | MOD) concatenation
     | concatenation op = (PLUS_SIGN | MINUS_SIGN) concatenation
     | concatenation BAR BAR concatenation
+    | concatenation COLLATE column_collation_name
     ;
 
 interval_expression
@@ -6486,7 +6480,7 @@ searched_case_statement
     ;
 
 searched_case_when_part
-    : WHEN expression THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
+    : WHEN condition THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
 
 case_else_part
@@ -6555,9 +6549,10 @@ json_object_content
     ;
 
 json_object_entry
-    : KEY? expression (VALUE | IS)? expression
-    | expression ':' expression (FORMAT JSON)?
-    | identifier
+    : (KEY? expression (VALUE | IS)? expression
+        | expression ':' expression
+        | identifier
+    ) (FORMAT JSON)?
     ;
 
 json_table_clause
@@ -6683,7 +6678,7 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
-    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' CHAR_STRING)? listagg_overflow_clause? ')' (
+    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' string_delimiter)? listagg_overflow_clause? ')' (
         WITHIN GROUP '(' order_by_clause ')'
     )? over_clause?
     | cursor_name (PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT)
@@ -6801,6 +6796,14 @@ collect_order_by_part
 within_or_over_part
     : WITHIN GROUP '(' order_by_clause ')'
     | over_clause
+    ;
+
+string_delimiter
+    : CHAR_STRING
+    | string_function
+    | string_delimiter BAR BAR string_delimiter
+    | '(' string_delimiter ')'
+    | id_expression
     ;
 
 cost_matrix_clause
@@ -7053,6 +7056,14 @@ collection_name
     ;
 
 link_name
+    : database ('.' domain)* (AT_SIGN connection_qualifier)?
+    ;
+
+local_link_name
+    : identifier
+    ;
+
+connection_qualifier
     : identifier
     ;
 
@@ -7062,7 +7073,7 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)? (
-        AT_SIGN link_name (PERIOD link_name)*
+        AT_SIGN link_name
         | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause
     )?
     | xmltable outer_join_sign?
@@ -7389,7 +7400,7 @@ constant
     ;
 
 numeric
-    : UNSIGNED_INTEGER
+    : UNSIGNED_INTEGER '.'?
     | APPROXIMATE_NUM_LIT
     ;
 
@@ -7445,6 +7456,7 @@ regular_id
     | CASESENSITIVE
     | DECIMAL
     | DELETE
+    | DEPRECATE
     | DETERMINISTIC
     | DSINTERVAL_UNCONSTRAINED
     | DURATION
