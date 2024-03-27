@@ -3941,7 +3941,7 @@ set_operators
     ;
 
 select_optional_clauses
-    : into_clause? from_clause? where_clause? group_by_clause? qualify_clause? order_by_clause?
+    : into_clause? from_clause? where_clause? (group_by_clause | having_clause)? qualify_clause? order_by_clause?
     ;
 
 select_clause
