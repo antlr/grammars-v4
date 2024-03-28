@@ -188,8 +188,8 @@ do
         # Format is in seconds, in floating point format.
         runtime=`bash run.sh ${what[@]} 2>&1 | grep "Total Time" | awk '{print $3}'`
         times=`python -c "print(min(40,600/$runtime))"`
-        for j in {1..$times}
-        do
+        for ((j=1;j<=times;j++)); do
+            echo $j
             bash run.sh ${what[@]} 2>&1 | grep "Total Time" | awk '{print $3}' >> "$cwd/p$i-$gg.txt"
         done
         popd
