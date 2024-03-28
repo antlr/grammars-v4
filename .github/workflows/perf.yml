@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: [ master ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   perf:
     runs-on: ubuntu-latest
