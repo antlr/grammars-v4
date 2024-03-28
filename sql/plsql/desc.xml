@@ -3,18 +3,18 @@
    <antlr-version>^4.12.0</antlr-version>
    <targets>CSharp;Java;JavaScript;Python3</targets>
    <test>
+      <name>full</name>
+      <targets>CSharp;Java</targets>
+      <inputs>examples</inputs>
+   </test>
+   <test>
       <name>hw</name>
       <targets>JavaScript;Python3</targets>
       <inputs>hw-examples</inputs>
    </test>
    <test>
-      <name>full</name>
+      <name>examples-sql-script</name>
       <targets>CSharp;Java</targets>
-      <inputs>examples</inputs>
+      <inputs>examples-sql-script</inputs>
    </test>
-    <test>
-        <name>examples-sql-script</name>
-        <targets>CSharp;Java</targets>
-        <inputs>examples-sql-script</inputs>
-    </test>
 </desc>
