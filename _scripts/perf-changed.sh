@@ -184,7 +184,11 @@ do
             what=( ${newwhat[@]} )
             if [ ${#what[@]} -eq 0 ]; then popd; continue; fi
         fi
-        for j in {1..40}
+        # Try first and scale number of times to work in 10 minutes tops.
+        # Format is in seconds, in floating point format.
+        runtime=`bash run.sh ${what[@]} 2>&1 | grep "Total Time" | awk '{print $3}'`
+        times=`python -c "print(min(40,600/$runtime))"
+        for j in {1..$times}
         do
             bash run.sh ${what[@]} 2>&1 | grep "Total Time" | awk '{print $3}' >> "$cwd/p$i-$gg.txt"
         done
