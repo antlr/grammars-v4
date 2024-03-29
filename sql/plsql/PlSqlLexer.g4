@@ -2363,16 +2363,16 @@ LEAST            : 'LEAST';
 GREATEST         : 'GREATEST';
 TO_DATE          : 'TO_DATE';
 
-CHARSETID        : 'CHARSETID';
-CHARSETFORM      : 'CHARSETFORM';
-DURATION         : 'DURATION';
-EXTEND           : 'EXTEND';
-MAXLEN           : 'MAXLEN';
-PERSISTABLE      : 'PERSISTABLE';
-POLYMORPHIC      : 'POLYMORPHIC';
-STRUCT           : 'STRUCT';
-TDO              : 'TDO';
-WM_CONCAT        : 'WM_CONCAT';
+CHARSETID   : 'CHARSETID';
+CHARSETFORM : 'CHARSETFORM';
+DURATION    : 'DURATION';
+EXTEND      : 'EXTEND';
+MAXLEN      : 'MAXLEN';
+PERSISTABLE : 'PERSISTABLE';
+POLYMORPHIC : 'POLYMORPHIC';
+STRUCT      : 'STRUCT';
+TDO         : 'TDO';
+WM_CONCAT   : 'WM_CONCAT';
 
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
