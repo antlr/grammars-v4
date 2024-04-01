@@ -7143,7 +7143,7 @@ paren_column_list
 
 // NOTE: In reality this applies to aggregate functions only
 keep_clause
-    : KEEP '(' DENSE_RANK (FIRST | LAST) order_by_clause ')' over_clause?
+    : KEEP '(' DENSE_RANK (FIRST | LAST) (query_partition_clause | order_by_clause) ')' over_clause?
     ;
 
 function_argument
