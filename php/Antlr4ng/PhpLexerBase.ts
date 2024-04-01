@@ -11,8 +11,6 @@ export default abstract class PhpLexerBase extends Lexer {
     private _htmlNameText: string | undefined;
     private _phpScript: boolean;
     private _insideString: boolean;
-    protected _mode: number
-    protected _channel: number
 
     protected static MIN_CHAR_VALUE = 0x0000;
     protected static MAX_CHAR_VALUE = 0x10FFFF;
@@ -33,7 +31,7 @@ export default abstract class PhpLexerBase extends Lexer {
         let token = super.nextToken()
 
         if (token.type === PhpParser.PHPEnd || token.type === PhpLexer.PHPEndSingleLineComment) {
-            if (this._mode === PhpLexer.SingleLineCommentMode) {
+            if (this.mode === PhpLexer.SingleLineCommentMode) {
                 // SingleLineCommentMode for such allowed syntax:
                 // // <?php echo "Hello world"; // comment ?>
                 this.popMode();
@@ -47,10 +45,9 @@ export default abstract class PhpLexerBase extends Lexer {
                 // Add semicolon to the end of statement if it is absent.
                 // For example: <?php echo "Hello world" ?>
                 if (this._prevTokenType === PhpLexer.SemiColon || this._prevTokenType === PhpLexer.Colon || this._prevTokenType === PhpLexer.OpenCurlyBracket || this._prevTokenType === PhpLexer.CloseCurlyBracket) {
-                    token.channel = PhpLexer.SKIP;
+                    token.channel = 4; // Damn tool does not generate constants for declared channels.
                 } else {
                     token.type = PhpLexer.SemiColon;
-                    token.text = ';';
                 }
             }
         }
@@ -65,16 +62,16 @@ export default abstract class PhpLexerBase extends Lexer {
             }
         }
 
-        else if (this._mode === PhpLexer.HereDoc) {
+        else if (this.mode === PhpLexer.HereDoc) {
             // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
             if (token.type === PhpLexer.StartHereDoc || token.type === PhpLexer.StartNowDoc) {
-                this._heredocIdentifier = token.text.slice(3).trim().replace(/\'$/, '');
+                this._heredocIdentifier = token.text.slice(3).trim().replace(/\'/, '').replace(/\'/, '');
             }
 
-            if (token.type === PhpLexer.HereDocText) {
+            else if (token.type === PhpLexer.HereDocText) {
                 if (this.CheckHeredocEnd(token.text)) {
                     this.popMode()
-                    const heredocIdentifier = this.GetHeredocEnd(token.text)
+                    const heredocIdentifier = this.GetHeredocIdentifier(token.text)
                     if (token.text.trim().endsWith(';')) {
                         token.text = `${heredocIdentifier};\n`;
                         token.type = PhpLexer.SemiColon;
@@ -86,8 +83,8 @@ export default abstract class PhpLexerBase extends Lexer {
             }
         }
 
-        else if (this._mode === PhpLexer.PHP) {
-            if (this._channel === PhpLexer.HIDDEN) {
+        else if (this.mode === PhpLexer.PHP) {
+            if (!(this.channel === PhpLexer.HIDDEN)) {
                 this._prevTokenType = token.type;
             }
         }
@@ -95,12 +92,12 @@ export default abstract class PhpLexerBase extends Lexer {
         return token;
     }
 
-    GetHeredocEnd(text: string): string {
+    GetHeredocIdentifier(text: string): string {
         return text.trim().replace(/\;$/, "");
     }
 
     CheckHeredocEnd(text: string): boolean {
-        return this.GetHeredocEnd(text) === this._heredocIdentifier;
+        return this.GetHeredocIdentifier(text) === this._heredocIdentifier;
     }
 
     IsNewLineOrStart(pos: number): boolean {
@@ -134,7 +131,7 @@ export default abstract class PhpLexerBase extends Lexer {
     PopModeOnCurlyBracketClose() {
         if (this._insideString) {
             this._insideString = false;
-            this.skip;
+	    this.channel = 4; // Tool does not generate a constant for declared channels.
             this.popMode();
         }
     }
