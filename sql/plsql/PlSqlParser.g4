@@ -520,6 +520,7 @@ create_function_body
         | default_collation_clause
         | parallel_enable_clause
         | result_cache_clause
+        | PIPELINED
         | DETERMINISTIC
     )* (
         (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
