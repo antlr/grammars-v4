@@ -523,7 +523,7 @@ create_function_body
         | PIPELINED
         | DETERMINISTIC
     )* (
-        (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
+        ((IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
         | aggregate_clause
         | pipelined_using_clause
         | sql_macro_body
