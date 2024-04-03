@@ -12,12 +12,12 @@
  *
  *
  * Modified to add Multi-Agent PDDL (MAPDDL),
- * following most of the specification by Kovacs, 2012.
+ * following some of the specification by Kovacs, 2012.
  * https://home.mit.bme.hu/~dkovacs/pubs/d.l.kovacs_2012_ICAPS-WIPC.pdf
  * Agents have the capability (in this implementation) to carry out
  * whichever actions they please, future work sees the addition of
  * agents to the goal condition.
- * Stewart Anderson 2024-03-29
+ * Stewart Anderson 2024-04-03
  * (stewart.anderson@abdn.ac.uk)
  *
  * This file carries the same license from the original.
