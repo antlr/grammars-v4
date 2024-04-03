@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // http://php.net/manual/en/language.operators.execution.php
 $mistakes = `echo "norzbibbit flagnbaggel koolalalooper" | {$this->aspell_path} list`;

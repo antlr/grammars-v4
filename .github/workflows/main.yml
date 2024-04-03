@@ -108,7 +108,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.0.0
+      uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -124,12 +124,10 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v4.0.2
       with:
-        node-version: '16.13.0'
+        node-version: '21.7.1'
     - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
     - name: Update paths
@@ -198,7 +196,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.0.0
+      uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.10'
     - name: Test Python

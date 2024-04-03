@@ -79,3 +79,5 @@ SELECT 1+2, 1*2, 1/2, 1/ 2, 1 / 2,1 /2, 1%2,1-2,1||2;
 SELECT FLOOR(1.2,1), FLOOR(3.1416,-1),FLOOR(2.6);
 SELECT ANY_VALUE(C1),C2 FROM T GROUP BY C2;
 SELECT id, name INTO :id_variable, :name_variable FROM some_data WHERE id = 1;
+
+select * from snowflake.information_schema.tables having table_catalog = '' limit 1;
