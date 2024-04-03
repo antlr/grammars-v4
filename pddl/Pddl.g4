@@ -23,8 +23,8 @@
  * This file carries the same license from the original.
  */
 
- // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
- // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar Pddl;
 
@@ -49,45 +49,38 @@ tokens {
     EFFECT,
     AND_GD,
     OR_GD,
-	NOT_GD,
-	IMPLY_GD,
-	EXISTS_GD,
-	FORALL_GD,
-	COMPARISON_GD,
-	AND_EFFECT,
-	FORALL_EFFECT,
-	WHEN_EFFECT,
-	ASSIGN_EFFECT,
-	NOT_EFFECT,
-	PRED_HEAD,
-	GOAL,
-	BINARY_OP,
-	UNARY_MINUS,
-	INIT_EQ,
-	INIT_AT,
-	NOT_PRED_INIT,
-	PRED_INST,
-	PROBLEM_CONSTRAINT,
-	PROBLEM_METRIC
+    NOT_GD,
+    IMPLY_GD,
+    EXISTS_GD,
+    FORALL_GD,
+    COMPARISON_GD,
+    AND_EFFECT,
+    FORALL_EFFECT,
+    WHEN_EFFECT,
+    ASSIGN_EFFECT,
+    NOT_EFFECT,
+    PRED_HEAD,
+    GOAL,
+    BINARY_OP,
+    UNARY_MINUS,
+    INIT_EQ,
+    INIT_AT,
+    NOT_PRED_INIT,
+    PRED_INST,
+    PROBLEM_CONSTRAINT,
+    PROBLEM_METRIC
 }
-
 
 /************* Start of grammar *******************/
 
-pddlDoc : domain | problem;
+pddlDoc
+    : (domain | problem) EOF
+    ;
 
 /************* DOMAINS ****************************/
 
 domain
-    : '(' 'define' domainName
-      requireDef?
-      typesDef?
-      constantsDef?
-      predicatesDef?
-      functionsDef?
-      constraints?
-      structureDef*
-      ')'
+    : '(' 'define' domainName requireDef? typesDef? constantsDef? predicatesDef? functionsDef? constraints? structureDef* ')'
     ;
 
 domainName
@@ -95,12 +88,12 @@ domainName
     ;
 
 requireDef
-	: '(' ':requirements' REQUIRE_KEY+ ')'
-	;
+    : '(' ':requirements' REQUIRE_KEY+ ')'
+    ;
 
 typesDef
-	: '(' ':types' typedNameList ')'
-	;
+    : '(' ':types' typedNameList ')'
+    ;
 
 // If have any typed names, they must come FIRST!
 typedNameList
@@ -108,35 +101,41 @@ typedNameList
     ;
 
 singleTypeNameList
-    : (name+ '-' t=r_type)
-	;
+    : (name+ '-' t = r_type)
+    ;
 
 r_type
-	: ( '(' 'either' primType+ ')' )
-	| primType
-	;
+    : ('(' 'either' primType+ ')')
+    | primType
+    ;
 
-primType : name ;
+primType
+    : name
+    ;
 
 functionsDef
-	: '(' ':functions' functionList ')'
-	;
+    : '(' ':functions' functionList ')'
+    ;
 
 functionList
-	: (atomicFunctionSkeleton+ ('-' functionType)? )*
-	;
+    : (atomicFunctionSkeleton+ ('-' functionType)?)*
+    ;
 
 atomicFunctionSkeleton
-	: '(' functionSymbol typedVariableList ')'
-	;
+    : '(' functionSymbol typedVariableList ')'
+    ;
 
-functionSymbol : name ;
+functionSymbol
+    : name
+    ;
 
-functionType : 'number' ; // Currently in PDDL only numeric functions are allowed
+functionType
+    : 'number'
+    ; // Currently in PDDL only numeric functions are allowed
 
 constantsDef
-	: '(' ':constants' typedNameList ')'
-	;
+    : '(' ':constants' typedNameList ')'
+    ;
 
 predicatesDef
     : '(' ':predicates' (atomicFormulaSkeleton | privatePredicates)* ')'
@@ -151,10 +150,12 @@ singleTypedPredicate
     ;
 
 atomicFormulaSkeleton
-	: '(' predicate typedVariableList ')'
-	;
+    : '(' predicate typedVariableList ')'
+    ;
 
-predicate : name ;
+predicate
+    : name
+    ;
 
 // If have any typed variables, they must come FIRST!
 typedVariableList
@@ -162,26 +163,23 @@ typedVariableList
     ;
 
 singleTypeVarList
-    : (VARIABLE+ '-' t=r_type)
+    : (VARIABLE+ '-' t = r_type)
     ;
 
 constraints
-	: '(' ':constraints' conGD ')'
-	;
+    : '(' ':constraints' conGD ')'
+    ;
 
 structureDef
-	: actionDef
-	| durativeActionDef
-	| derivedDef
-	;
-
+    : actionDef
+    | durativeActionDef
+    | derivedDef
+    ;
 
 /************* ACTIONS ****************************/
 
 actionDef
-    : '(' ':action' actionSymbol
-          parametersDecl*
-          actionDefBody ')'
+    : '(' ':action' actionSymbol parametersDecl* actionDefBody ')'
     ;
 
 parametersDecl
@@ -189,16 +187,16 @@ parametersDecl
     | ':agent' typedVariableList
     ;
 
-actionSymbol : name ;
-
+actionSymbol
+    : name
+    ;
 
 // Should allow preGD instead of goalDesc for preconditions -
 // but I can't get the LL(*) parsing to work
 // This means 'preference' preconditions cannot be used
 actionDefBody
-	: ( ':precondition' (('(' ')') | precondition))?
-	  ( ':effect' (('(' ')') | effect))?
-	;
+    : (':precondition' (('(' ')') | precondition))? (':effect' (('(' ')') | effect))?
+    ;
 
 // to ease Listener implementation
 precondition
@@ -217,157 +215,192 @@ precondition
 //	;
 
 goalDesc
-	: atomicTermFormula
-	| '(' 'and' goalDesc* ')'
-	| '(' 'or' goalDesc* ')'
-	| '(' 'not' goalDesc ')'
-	| '(' 'imply' goalDesc goalDesc ')'
-	| '(' 'exists' '(' typedVariableList ')' goalDesc ')'
-	| '(' 'forall' '(' typedVariableList ')' goalDesc ')'
+    : atomicTermFormula
+    | '(' 'and' goalDesc* ')'
+    | '(' 'or' goalDesc* ')'
+    | '(' 'not' goalDesc ')'
+    | '(' 'imply' goalDesc goalDesc ')'
+    | '(' 'exists' '(' typedVariableList ')' goalDesc ')'
+    | '(' 'forall' '(' typedVariableList ')' goalDesc ')'
     | fComp
     ;
 
 fComp
-	: '(' binaryComp fExp fExp ')'
-	;
+    : '(' binaryComp fExp fExp ')'
+    ;
 
 atomicTermFormula
-	: '(' predicate term* ')'
-	;
+    : '(' predicate term* ')'
+    ;
 
-term : name | VARIABLE ;
+term
+    : name
+    | VARIABLE
+    ;
 
 /************* DURATIVE ACTIONS ****************************/
 
 durativeActionDef
-	: '(' ':durative-action' actionSymbol
-           parametersDecl*
-           daDefBody ')'
+    : '(' ':durative-action' actionSymbol parametersDecl* daDefBody ')'
     ;
 
 daDefBody
-	: ':duration' durationConstraint
-	  ':condition' (('(' ')') | daGD)
-	  ':effect' (('(' ')') | daEffect)
-	;
+    : ':duration' durationConstraint ':condition' (('(' ')') | daGD) ':effect' (
+        ('(' ')')
+        | daEffect
+    )
+    ;
 
 daGD
-	: prefTimedGD
-	| '(' 'and' daGD* ')'
-	| '(' 'forall' '(' typedVariableList ')' daGD ')'
-	;
+    : prefTimedGD
+    | '(' 'and' daGD* ')'
+    | '(' 'forall' '(' typedVariableList ')' daGD ')'
+    ;
 
 prefTimedGD
-	: timedGD
-	| '(' 'preference' name? timedGD ')'
-	;
+    : timedGD
+    | '(' 'preference' name? timedGD ')'
+    ;
 
 timedGD
-	: '(' 'at' timeSpecifier goalDesc ')'
-	| '(' 'over' interval goalDesc ')'
-	;
+    : '(' 'at' timeSpecifier goalDesc ')'
+    | '(' 'over' interval goalDesc ')'
+    ;
 
-timeSpecifier : 'start' | 'end' ;
-interval : 'all' ;
+timeSpecifier
+    : 'start'
+    | 'end'
+    ;
+
+interval
+    : 'all'
+    ;
 
 /************* DERIVED DEFINITIONS ****************************/
 
 derivedDef
-	: '(' ':derived' typedVariableList goalDesc ')'
-	;
+    : '(' ':derived' typedVariableList goalDesc ')'
+    ;
 
 /************* EXPRESSIONS ****************************/
 
 fExp
-	: NUMBER
-	| '(' binaryOp fExp fExp2 ')'
-	| '(' '-' fExp ')'
-	| fHead
-	;
+    : NUMBER
+    | '(' binaryOp fExp fExp2 ')'
+    | '(' '-' fExp ')'
+    | fHead
+    ;
 
 // This is purely a workaround for an ANTLR bug in tree construction
 // http://www.antlr.org/wiki/display/ANTLR3/multiple+occurences+of+a+token+mix+up+the+list+management+in+tree+rewrites
-fExp2 : fExp ;
+fExp2
+    : fExp
+    ;
 
 fHead
-	: '(' functionSymbol term* ')'
-	| functionSymbol
-	;
+    : '(' functionSymbol term* ')'
+    | functionSymbol
+    ;
 
 effect
-	: '(' 'and' cEffect* ')'
-	| cEffect
-	;
+    : '(' 'and' cEffect* ')'
+    | cEffect
+    ;
 
 cEffect
-	: '(' 'forall' '(' typedVariableList ')' effect ')'
-	| '(' 'when' goalDesc condEffect ')'
-	| pEffect
-	;
+    : '(' 'forall' '(' typedVariableList ')' effect ')'
+    | '(' 'when' goalDesc condEffect ')'
+    | pEffect
+    ;
 
 pEffect
-	: '(' assignOp fHead fExp ')'
-	| '(' 'not' atomicTermFormula ')'
-	| atomicTermFormula
-	;
-
+    : '(' assignOp fHead fExp ')'
+    | '(' 'not' atomicTermFormula ')'
+    | atomicTermFormula
+    ;
 
 // TODO: why is this different from the "and cEffect" above? Does it matter?
 condEffect
-	: '(' 'and' pEffect* ')'
-	| pEffect
-	;
+    : '(' 'and' pEffect* ')'
+    | pEffect
+    ;
 
 // TODO: should these be uppercase & lexer section?
-binaryOp : '*' | '+' | '-' | '/' ;
+binaryOp
+    : '*'
+    | '+'
+    | '-'
+    | '/'
+    ;
 
-binaryComp : '>' | '<' | '=' | '>=' | '<=' ;
+binaryComp
+    : '>'
+    | '<'
+    | '='
+    | '>='
+    | '<='
+    ;
 
-assignOp : 'assign' | 'scale-up' | 'scale-down' | 'increase' | 'decrease' ;
-
+assignOp
+    : 'assign'
+    | 'scale-up'
+    | 'scale-down'
+    | 'increase'
+    | 'decrease'
+    ;
 
 /************* DURATIONS  ****************************/
 
 durationConstraint
-	: '(' 'and' simpleDurationConstraint+ ')'
-	| '(' ')'
-	| simpleDurationConstraint
-	;
+    : '(' 'and' simpleDurationConstraint+ ')'
+    | '(' ')'
+    | simpleDurationConstraint
+    ;
 
 simpleDurationConstraint
-	: '(' durOp '?duration' durValue ')'
-	| '(' 'at' timeSpecifier simpleDurationConstraint ')'
-	;
+    : '(' durOp '?duration' durValue ')'
+    | '(' 'at' timeSpecifier simpleDurationConstraint ')'
+    ;
 
-durOp : '<=' | '>=' | '=' ;
+durOp
+    : '<='
+    | '>='
+    | '='
+    ;
 
-durValue : NUMBER | fExp ;
+durValue
+    : NUMBER
+    | fExp
+    ;
 
 daEffect
-	: '(' 'and' daEffect* ')'
-	| timedEffect
-	| '(' 'forall' '(' typedVariableList ')' daEffect ')'
-	| '(' 'when' daGD timedEffect ')'
-	| '(' assignOp fHead fExpDA ')'
-	;
+    : '(' 'and' daEffect* ')'
+    | timedEffect
+    | '(' 'forall' '(' typedVariableList ')' daEffect ')'
+    | '(' 'when' daGD timedEffect ')'
+    | '(' assignOp fHead fExpDA ')'
+    ;
 
 timedEffect
-	: '(' 'at' timeSpecifier cEffect ')'
-	| '(' 'at' timeSpecifier fAssignDA ')'
-	| '(' assignOpT fHead fExp ')' /* fExpT in BNF but not making sense */
-	;
+    : '(' 'at' timeSpecifier cEffect ')'
+    | '(' 'at' timeSpecifier fAssignDA ')'
+    | '(' assignOpT fHead fExp ')' /* fExpT in BNF but not making sense */
+    ;
 
 fAssignDA
-	: '(' assignOp fHead fExpDA ')'
-	;
+    : '(' assignOp fHead fExpDA ')'
+    ;
 
 fExpDA
-	: '(' ((binaryOp fExpDA fExpDA) | ('-' fExpDA)) ')'
-	| '?duration'
-	| fExp
-	;
+    : '(' ((binaryOp fExpDA fExpDA) | ('-' fExpDA)) ')'
+    | '?duration'
+    | fExp
+    ;
 
-assignOpT : 'increase' | 'decrease' ;
+assignOpT
+    : 'increase'
+    | 'decrease'
+    ;
 
 /*
  * We should have fExpT according to:
@@ -383,16 +416,9 @@ fExpT
 /************* PROBLEMS ****************************/
 
 problem
-	: '(' 'define' problemDecl
-	  problemDomain
-      requireDef?
-      objectDecl?
-      init
-      goal
-      probConstraints?
-      metricSpec?
-      // lengthSpec? This is not defined anywhere in the BNF spec
-      ')'
+    : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init goal probConstraints? metricSpec?
+    // lengthSpec? This is not defined anywhere in the BNF spec
+    ')'
     ;
 
 problemDecl
@@ -400,8 +426,8 @@ problemDecl
     ;
 
 problemDomain
-	: '(' ':domain' name ')'
-	;
+    : '(' ':domain' name ')'
+    ;
 
 objectDecl
     : '(' ':objects' objectList? ')'
@@ -425,23 +451,23 @@ objectName
     ;
 
 init
-	: '(' ':init' initEl* ')'
-	;
+    : '(' ':init' initEl* ')'
+    ;
 
 initEl
-	: nameLiteral
-	| '(' '=' fHead NUMBER ')'
-	| '(' 'at' NUMBER nameLiteral ')'
-	;
+    : nameLiteral
+    | '(' '=' fHead NUMBER ')'
+    | '(' 'at' NUMBER nameLiteral ')'
+    ;
 
 nameLiteral
-	: atomicNameFormula
-	| '(' 'not' atomicNameFormula ')'
-	;
+    : atomicNameFormula
+    | '(' 'not' atomicNameFormula ')'
+    ;
 
 atomicNameFormula
-	: '(' predicate name* ')'
-	;
+    : '(' predicate name* ')'
+    ;
 
 // Should allow preGD instead of goalDesc -
 // but I can't get the LL(*) parsing to work
@@ -452,54 +478,54 @@ goal
     ;
 
 probConstraints
-	: '(' ':constraints'  prefConGD ')'
-	;
+    : '(' ':constraints' prefConGD ')'
+    ;
 
 prefConGD
-	: '(' 'and' prefConGD* ')'
-	| '(' 'forall' '(' typedVariableList ')' prefConGD ')'
-	| '(' 'preference' name? conGD ')'
-	| conGD
-	;
+    : '(' 'and' prefConGD* ')'
+    | '(' 'forall' '(' typedVariableList ')' prefConGD ')'
+    | '(' 'preference' name? conGD ')'
+    | conGD
+    ;
 
 metricSpec
-	: '(' ':metric' optimization metricFExp ')'
-	;
+    : '(' ':metric' optimization metricFExp ')'
+    ;
 
-optimization : 'minimize' | 'maximize' ;
+optimization
+    : 'minimize'
+    | 'maximize'
+    ;
 
 metricFExp
-	: '(' binaryOp metricFExp metricFExp ')'
-	| '(' ('*'|'/') metricFExp metricFExp+ ')'
-	| '(' '-' metricFExp ')'
-	| NUMBER
-	| '(' functionSymbol name* ')'
-	| functionSymbol
+    : '(' binaryOp metricFExp metricFExp ')'
+    | '(' ('*' | '/') metricFExp metricFExp+ ')'
+    | '(' '-' metricFExp ')'
+    | NUMBER
+    | '(' functionSymbol name* ')'
+    | functionSymbol
     | 'total-time'
-	| '(' 'is-violated' name ')'
-	;
+    | '(' 'is-violated' name ')'
+    ;
 
 /************* CONSTRAINTS ****************************/
 
 conGD
-	: '(' 'and' conGD* ')'
-	| '(' 'forall' '(' typedVariableList ')' conGD ')'
-	| '(' 'at' 'end' goalDesc ')'
-	| '(' 'always' goalDesc ')'
-	| '(' 'sometime' goalDesc ')'
- 	| '(' 'within' NUMBER goalDesc ')'
-	| '(' 'at-most-once' goalDesc ')'
-	| '(' 'sometime-after' goalDesc goalDesc ')'
-	| '(' 'sometime-before' goalDesc goalDesc ')'
-	| '(' 'always-within' NUMBER goalDesc goalDesc ')'
-	| '(' 'hold-during' NUMBER NUMBER goalDesc ')'
-	| '(' 'hold-after' NUMBER goalDesc ')'
-	;
-
-
+    : '(' 'and' conGD* ')'
+    | '(' 'forall' '(' typedVariableList ')' conGD ')'
+    | '(' 'at' 'end' goalDesc ')'
+    | '(' 'always' goalDesc ')'
+    | '(' 'sometime' goalDesc ')'
+    | '(' 'within' NUMBER goalDesc ')'
+    | '(' 'at-most-once' goalDesc ')'
+    | '(' 'sometime-after' goalDesc goalDesc ')'
+    | '(' 'sometime-before' goalDesc goalDesc ')'
+    | '(' 'always-within' NUMBER goalDesc goalDesc ')'
+    | '(' 'hold-during' NUMBER NUMBER goalDesc ')'
+    | '(' 'hold-after' NUMBER goalDesc ')'
+    ;
 
 /************* LEXER ****************************/
-
 
 REQUIRE_KEY
     : ':strips'
@@ -527,32 +553,43 @@ REQUIRE_KEY
  * may need more to specify
  */
 name
-	: NAME
-	| 'at'
-	| 'over'
-	;
+    : NAME
+    | 'at'
+    | 'over'
+    ;
 
-NAME:    LETTER ANY_CHAR* ;
+NAME
+    : LETTER ANY_CHAR*
+    ;
 
-fragment LETTER:	'a'..'z' | 'A'..'Z';
+fragment LETTER
+    : 'a' ..'z'
+    | 'A' ..'Z'
+    ;
 
-fragment ANY_CHAR: LETTER | '0'..'9' | '-' | '_';
+fragment ANY_CHAR
+    : LETTER
+    | '0' ..'9'
+    | '-'
+    | '_'
+    ;
 
-VARIABLE : '?' LETTER ANY_CHAR* ;
+VARIABLE
+    : '?' LETTER ANY_CHAR*
+    ;
 
-NUMBER : DIGIT+ ('.' DIGIT+)? ;
+NUMBER
+    : DIGIT+ ('.' DIGIT+)?
+    ;
 
-fragment DIGIT: '0'..'9';
+fragment DIGIT
+    : '0' ..'9'
+    ;
 
 LINE_COMMENT
-    : ';' ~('\n'|'\r')* '\r'? '\n' -> skip
+    : ';' ~('\n' | '\r')* '\r'? '\n' -> skip
     ;
 
 WHITESPACE
-    :   (   ' '
-        |   '\t'
-        |   '\r'
-        |   '\n'
-        )+
-        -> skip
+    : (' ' | '\t' | '\r' | '\n')+ -> skip
     ;
