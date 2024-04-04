@@ -1,90 +1,29 @@
 /**
- * PDDL grammar for ANTLR v4
- *
+ * PDDL grammar for ANTLR v3
  * Zeyn Saigol
  * School of Computer Science
  * University of Birmingham
  *
- * modified for v4 and made it language agnostic by
- * Hernán M. Foffani
- * Now part of the project
- * https://bitbucket.org/hfoffani/pddl-parser
- *
- *
- * Modified to add Multi-Agent PDDL (MAPDDL),
- * following some of the specification by Kovacs, 2012.
- * https://home.mit.bme.hu/~dkovacs/pubs/d.l.kovacs_2012_ICAPS-WIPC.pdf
- * Agents have the capability (in this implementation) to carry out
- * whichever actions they please, future work sees the addition of
- * agents to the goal condition.
- * Stewart Anderson 2024-04-03
- * (stewart.anderson@abdn.ac.uk)
- *
- * This file carries the same license from the original.
+ * $Id: Pddl.g 120 2008-10-02 14:59:50Z zas $
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-grammar Pddl;
-
-tokens {
-    DOMAIN,
-    DOMAIN_NAME,
-    REQUIREMENTS,
-    TYPES,
-    EITHER_TYPE,
-    CONSTANTS,
-    FUNCTIONS,
-    PREDICATES,
-    ACTION,
-    DURATIVE_ACTION,
-    PROBLEM,
-    PROBLEM_NAME,
-    PROBLEM_DOMAIN,
-    OBJECTS,
-    INIT,
-    FUNC_HEAD,
-    PRECONDITION,
-    EFFECT,
-    AND_GD,
-    OR_GD,
-    NOT_GD,
-    IMPLY_GD,
-    EXISTS_GD,
-    FORALL_GD,
-    COMPARISON_GD,
-    AND_EFFECT,
-    FORALL_EFFECT,
-    WHEN_EFFECT,
-    ASSIGN_EFFECT,
-    NOT_EFFECT,
-    PRED_HEAD,
-    GOAL,
-    BINARY_OP,
-    UNARY_MINUS,
-    INIT_EQ,
-    INIT_AT,
-    NOT_PRED_INIT,
-    PRED_INST,
-    PROBLEM_CONSTRAINT,
-    PROBLEM_METRIC
-}
+grammar SingleAgentPDDL;
 
 /************* Start of grammar *******************/
-
 pddlDoc
     : (domain | problem) EOF
     ;
 
 /************* DOMAINS ****************************/
-
 domain
     : '(' 'define' domainName requireDef? typesDef? constantsDef? predicatesDef? functionsDef? constraints? structureDef* ')'
     ;
 
 domainName
-    : '(' 'domain' name ')'
+    : '(' 'domain' NAME ')'
     ;
 
 requireDef
@@ -97,20 +36,20 @@ typesDef
 
 // If have any typed names, they must come FIRST!
 typedNameList
-    : (name* | singleTypeNameList+ name*)
+    : (NAME* | singleTypeNameList+ NAME*)
     ;
 
 singleTypeNameList
-    : (name+ '-' t = r_type)
+    : (NAME+ '-' t = type_)
     ;
 
-r_type
+type_
     : ('(' 'either' primType+ ')')
     | primType
     ;
 
 primType
-    : name
+    : NAME
     ;
 
 functionsDef
@@ -118,7 +57,7 @@ functionsDef
     ;
 
 functionList
-    : (atomicFunctionSkeleton+ ('-' functionType)?)*
+    : (atomicFunctionSkeleton+ ( '-' functionType)?)*
     ;
 
 atomicFunctionSkeleton
@@ -126,27 +65,20 @@ atomicFunctionSkeleton
     ;
 
 functionSymbol
-    : name
+    : NAME
     ;
 
 functionType
     : 'number'
-    ; // Currently in PDDL only numeric functions are allowed
+    ;
 
+// Currently in PDDL only numeric functions are allowed
 constantsDef
     : '(' ':constants' typedNameList ')'
     ;
 
 predicatesDef
-    : '(' ':predicates' (atomicFormulaSkeleton | privatePredicates)* ')'
-    ;
-
-privatePredicates
-    : '(' ':private' typedVariableList (atomicFormulaSkeleton | singleTypedPredicate)* ')'
-    ;
-
-singleTypedPredicate
-    : '(' predicate typedVariableList ')'
+    : '(' ':predicates' atomicFormulaSkeleton+ ')'
     ;
 
 atomicFormulaSkeleton
@@ -154,7 +86,7 @@ atomicFormulaSkeleton
     ;
 
 predicate
-    : name
+    : NAME
     ;
 
 // If have any typed variables, they must come FIRST!
@@ -163,7 +95,7 @@ typedVariableList
     ;
 
 singleTypeVarList
-    : (VARIABLE+ '-' t = r_type)
+    : (VARIABLE+ '-' t = type_)
     ;
 
 constraints
@@ -177,30 +109,19 @@ structureDef
     ;
 
 /************* ACTIONS ****************************/
-
 actionDef
-    : '(' ':action' actionSymbol parametersDecl* actionDefBody ')'
-    ;
-
-parametersDecl
-    : ':parameters' '(' typedVariableList ')'
-    | ':agent' typedVariableList
+    : '(' ':action' actionSymbol ':parameters' '(' typedVariableList ')' actionDefBody ')'
     ;
 
 actionSymbol
-    : name
+    : NAME
     ;
 
 // Should allow preGD instead of goalDesc for preconditions -
 // but I can't get the LL(*) parsing to work
 // This means 'preference' preconditions cannot be used
 actionDefBody
-    : (':precondition' (('(' ')') | precondition))? (':effect' (('(' ')') | effect))?
-    ;
-
-// to ease Listener implementation
-precondition
-    : goalDesc
+    : (':precondition' ( ( '(' ')') | goalDesc))? (':effect' ( ( '(' ')') | effect))?
     ;
 
 //preGD
@@ -210,10 +131,9 @@ precondition
 //	;
 //
 //prefGD
-//	: '(' 'preference' name? goalDesc ')'
+//	: '(' 'preference' NAME? goalDesc ')'
 //	| goalDesc
 //	;
-
 goalDesc
     : atomicTermFormula
     | '(' 'and' goalDesc* ')'
@@ -234,21 +154,19 @@ atomicTermFormula
     ;
 
 term
-    : name
+    : NAME
     | VARIABLE
     ;
 
 /************* DURATIVE ACTIONS ****************************/
-
 durativeActionDef
-    : '(' ':durative-action' actionSymbol parametersDecl* daDefBody ')'
+    : '(' ':durative-action' actionSymbol ':parameters' '(' typedVariableList ')' daDefBody ')'
     ;
 
 daDefBody
-    : ':duration' durationConstraint ':condition' (('(' ')') | daGD) ':effect' (
-        ('(' ')')
-        | daEffect
-    )
+    : ':duration' durationConstraint
+    | ':condition' ( ( '(' ')') | daGD)
+    | ':effect' ( ( '(' ')') | daEffect)
     ;
 
 daGD
@@ -259,7 +177,7 @@ daGD
 
 prefTimedGD
     : timedGD
-    | '(' 'preference' name? timedGD ')'
+    | '(' 'preference' NAME? timedGD ')'
     ;
 
 timedGD
@@ -277,13 +195,11 @@ interval
     ;
 
 /************* DERIVED DEFINITIONS ****************************/
-
 derivedDef
     : '(' ':derived' typedVariableList goalDesc ')'
     ;
 
 /************* EXPRESSIONS ****************************/
-
 fExp
     : NUMBER
     | '(' binaryOp fExp fExp2 ')'
@@ -350,7 +266,6 @@ assignOp
     ;
 
 /************* DURATIONS  ****************************/
-
 durationConstraint
     : '(' 'and' simpleDurationConstraint+ ')'
     | '(' ')'
@@ -382,9 +297,9 @@ daEffect
     ;
 
 timedEffect
-    : '(' 'at' timeSpecifier cEffect ')'
+    : '(' 'at' timeSpecifier daEffect ')'
     | '(' 'at' timeSpecifier fAssignDA ')'
-    | '(' assignOpT fHead fExp ')' /* fExpT in BNF but not making sense */
+    | '(' assignOp fHead fExp ')'
     ;
 
 fAssignDA
@@ -392,65 +307,30 @@ fAssignDA
     ;
 
 fExpDA
-    : '(' ((binaryOp fExpDA fExpDA) | ('-' fExpDA)) ')'
+    : '(' (( binaryOp fExpDA fExpDA) | ( '-' fExpDA)) ')'
     | '?duration'
     | fExp
     ;
 
-assignOpT
-    : 'increase'
-    | 'decrease'
-    ;
-
-/*
- * We should have fExpT according to:
- * http://www.plg.inf.uc3m.es/ipc2011-deterministic/attachments/OtherContributions/kovacs-pddl-3.1-2011.pdf
-
-fExpT
-	: '(*' fExp #t ')'
-	| '(*' #t fExp ')'
-	| #t
-	;
- */
-
 /************* PROBLEMS ****************************/
-
 problem
-    : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init goal probConstraints? metricSpec?
-    // lengthSpec? This is not defined anywhere in the BNF spec
-    ')'
+    : '(' 'define' problemDecl problemDomain requireDef? objectDecl? init_ goal probConstraints? metricSpec? ')'
+    // lengthSpec? This is not defined anywhere in the BNF spec ')'
     ;
 
 problemDecl
-    : '(' 'problem' name ')'
+    : '(' 'problem' NAME ')'
     ;
 
 problemDomain
-    : '(' ':domain' name ')'
+    : '(' ':domain' NAME ')'
     ;
 
 objectDecl
-    : '(' ':objects' objectList? ')'
+    : '(' ':objects' typedNameList ')'
     ;
 
-objectList
-    : objectDeclaration+
-    ;
-
-objectDeclaration
-    : objectName '-' objectType
-    | '(' ':private' objectName objectList? ')'
-    ;
-
-objectType
-    : NAME
-    ;
-
-objectName
-    : NAME
-    ;
-
-init
+init_
     : '(' ':init' initEl* ')'
     ;
 
@@ -466,13 +346,13 @@ nameLiteral
     ;
 
 atomicNameFormula
-    : '(' predicate name* ')'
+    : '(' predicate NAME* ')'
     ;
 
 // Should allow preGD instead of goalDesc -
 // but I can't get the LL(*) parsing to work
 // This means 'preference' preconditions cannot be used
-//goal : '(' ':goal' preGD ')'
+//goal : '(' ':goal' preGD ')'  -> ^(GOAL preGD);
 goal
     : '(' ':goal' goalDesc ')'
     ;
@@ -484,7 +364,7 @@ probConstraints
 prefConGD
     : '(' 'and' prefConGD* ')'
     | '(' 'forall' '(' typedVariableList ')' prefConGD ')'
-    | '(' 'preference' name? conGD ')'
+    | '(' 'preference' NAME? conGD ')'
     | conGD
     ;
 
@@ -499,17 +379,16 @@ optimization
 
 metricFExp
     : '(' binaryOp metricFExp metricFExp ')'
-    | '(' ('*' | '/') metricFExp metricFExp+ ')'
+    | '(' ( '*' | '/') metricFExp metricFExp+ ')'
     | '(' '-' metricFExp ')'
     | NUMBER
-    | '(' functionSymbol name* ')'
+    | '(' functionSymbol NAME* ')'
     | functionSymbol
     | 'total-time'
-    | '(' 'is-violated' name ')'
+    | '(' 'is-violated' NAME ')'
     ;
 
 /************* CONSTRAINTS ****************************/
-
 conGD
     : '(' 'and' conGD* ')'
     | '(' 'forall' '(' typedVariableList ')' conGD ')'
@@ -526,7 +405,6 @@ conGD
     ;
 
 /************* LEXER ****************************/
-
 REQUIRE_KEY
     : ':strips'
     | ':typing'
@@ -544,18 +422,166 @@ REQUIRE_KEY
     | ':timed-initial-literals'
     | ':preferences'
     | ':constraints'
-    | ':multi-agent'
-    | ':unfactored-privacy'
     ;
 
-/*
- * allowing keywords as identifier where allowed
- * may need more to specify
- */
-name
-    : NAME
-    | 'at'
-    | 'over'
+DOMAIN
+    : 'DOMAIN'
+    ;
+
+DOMAIN_NAME
+    : 'DOMAIN_NAME'
+    ;
+
+REQUIREMENTS
+    : 'REQUIREMENTS'
+    ;
+
+TYPES
+    : 'TYPES'
+    ;
+
+EITHER_TYPE
+    : 'EITHER_TYPE'
+    ;
+
+CONSTANTS
+    : 'CONSTANTS'
+    ;
+
+FUNCTIONS
+    : 'FUNCTIONS'
+    ;
+
+PREDICATES
+    : 'PREDICATES'
+    ;
+
+ACTION
+    : 'ACTION'
+    ;
+
+DURATIVE_ACTION
+    : 'DURATIVE_ACTION'
+    ;
+
+PROBLEM
+    : 'PROBLEM'
+    ;
+
+PROBLEM_NAME
+    : 'PROBLEM_NAME'
+    ;
+
+PROBLEM_DOMAIN
+    : 'PROBLEM_DOMAIN'
+    ;
+
+OBJECTS
+    : 'OBJECTS'
+    ;
+
+INIT
+    : 'INIT'
+    ;
+
+FUNC_HEAD
+    : 'FUNC_HEAD'
+    ;
+
+PRECONDITION
+    : 'PRECONDITION'
+    ;
+
+EFFECT
+    : 'EFFECT'
+    ;
+
+AND_GD
+    : 'AND_GD'
+    ;
+
+OR_GD
+    : 'OR_GD'
+    ;
+
+NOT_GD
+    : 'NOT_GD'
+    ;
+
+IMPLY_GD
+    : 'IMPLY_GD'
+    ;
+
+EXISTS_GD
+    : 'EXISTS_GD'
+    ;
+
+FORALL_GD
+    : 'FORALL_GD'
+    ;
+
+COMPARISON_GD
+    : 'COMPARISON_GD'
+    ;
+
+AND_EFFECT
+    : 'AND_EFFECT'
+    ;
+
+FORALL_EFFECT
+    : 'FORALL_EFFECT'
+    ;
+
+WHEN_EFFECT
+    : 'WHEN_EFFECT'
+    ;
+
+ASSIGN_EFFECT
+    : 'ASSIGN_EFFECT'
+    ;
+
+NOT_EFFECT
+    : 'NOT_EFFECT'
+    ;
+
+PRED_HEAD
+    : 'PRED_HEAD'
+    ;
+
+GOAL
+    : 'GOAL'
+    ;
+
+BINARY_OP
+    : 'BINARY_OP'
+    ;
+
+UNARY_MINUS
+    : 'UNARY_MINUS'
+    ;
+
+INIT_EQ
+    : 'INIT_EQ'
+    ;
+
+INIT_AT
+    : 'INIT_AT'
+    ;
+
+NOT_PRED_INIT
+    : 'NOT_PRED_INIT'
+    ;
+
+PRED_INST
+    : 'PRED_INST'
+    ;
+
+PROBLEM_CONSTRAINT
+    : 'PROBLEM_CONSTRAINT'
+    ;
+
+PROBLEM_METRIC
+    : 'PROBLEM_METRIC'
     ;
 
 NAME
@@ -563,13 +589,13 @@ NAME
     ;
 
 fragment LETTER
-    : 'a' ..'z'
-    | 'A' ..'Z'
+    : 'a' .. 'z'
+    | 'A' .. 'Z'
     ;
 
 fragment ANY_CHAR
     : LETTER
-    | '0' ..'9'
+    | '0' .. '9'
     | '-'
     | '_'
     ;
@@ -583,11 +609,11 @@ NUMBER
     ;
 
 fragment DIGIT
-    : '0' ..'9'
+    : '0' .. '9'
     ;
 
 LINE_COMMENT
-    : ';' ~('\n' | '\r')* '\r'? '\n' -> skip
+    : ';' ~ ('\n' | '\r')* '\r'? '\n' -> skip
     ;
 
 WHITESPACE
