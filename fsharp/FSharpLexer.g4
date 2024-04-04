@@ -1,13 +1,14 @@
 lexer grammar FSharpLexer;
 
-WHITE_SPACE: [ \t\r\n]+ -> skip ;
-COMMENT:( ('//'.*?([\n]| EOF))  | ('(*' .*? '*)') )-> skip ;
+WHITE_SPACE: [ \t\r\n]+ -> channel(HIDDEN) ;
+LINECOMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
+BLOCKCOMMENT: ('(*' .*? '*)') -> channel(HIDDEN);
 
 INT: [0-9]+('uy'|'y'|'s'|'us'|'u'|'L')?;
 
 FLOAT: [0-9]+'.'[0-9]+ ('f'|'m')?;
 
-INTERPOLATIONSIGN: ('%s'|'%d'|'%f'|'%c');
+INTERPOLATIONSIGN: '%s'|'%d'|'%f'|'%c';
 
 CHAR: '\''(~[\\']|'\\'['"nt\\]|'\\u'[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])'\'';
 
@@ -15,7 +16,7 @@ STRING: DOUBLE_QUOTES (~[\\"]|'\\'[\\"'unt])* DOUBLE_QUOTES;
 
 INTERPOLATED_STRING: DOLLAR STRING;
 
-BOOL: ('true' | 'false');
+BOOL: 'true' | 'false';
 
 UNIT: '(' ' '* ')';
 
