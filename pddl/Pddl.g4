@@ -26,7 +26,7 @@
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-grammar MultiAgentPDDL;
+grammar Pddl;
 
 tokens {
     DOMAIN,
@@ -438,7 +438,7 @@ objectList
     ;
 
 objectDeclaration
-    : objectName '-' objectType
+    : objectName+ '-' objectType
     | '(' ':private' objectName objectList? ')'
     ;
 
