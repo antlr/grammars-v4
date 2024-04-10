@@ -31,130 +31,118 @@
  https://hyperledger.github.io/composer/v0.19/reference/cto_language.html
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar CtoLexer;
 
 // Keywords
-ABSTRACT:           'abstract';
-ASSET:              'asset';
-CONCEPT:            'concept';
-DEFAULT:            'default';
-ENUM:               'enum';
-EVENT:              'event';
-EXTENDS:            'extends';
-IDENTIFIED:         'identified by';
-IMPORT:             'import';
-NAMESPACE:          'namespace';
-OPTIONAL:           'optional';
-PARTICIPANT:        'participant';
-RANGE:              'range';
-REGEX:              'regex';
-TRANSACTION:        'transaction';
+ABSTRACT    : 'abstract';
+ASSET       : 'asset';
+CONCEPT     : 'concept';
+DEFAULT     : 'default';
+ENUM        : 'enum';
+EVENT       : 'event';
+EXTENDS     : 'extends';
+IDENTIFIED  : 'identified by';
+IMPORT      : 'import';
+NAMESPACE   : 'namespace';
+OPTIONAL    : 'optional';
+PARTICIPANT : 'participant';
+RANGE       : 'range';
+REGEX       : 'regex';
+TRANSACTION : 'transaction';
 
 //primitive types
-BOOLEAN:            'Boolean';
-DATE_TIME:          'DateTime';
-DOUBLE:             'Double';
-INTEGER:            'Integer';
-LONG:               'Long';
-STRING:             'String';
+BOOLEAN   : 'Boolean';
+DATE_TIME : 'DateTime';
+DOUBLE    : 'Double';
+INTEGER   : 'Integer';
+LONG      : 'Long';
+STRING    : 'String';
 
 // Separators
-LPAREN:             '(';
-RPAREN:             ')';
-LBRACE:             '{';
-RBRACE:             '}';
-LBRACK:             '[';
-RBRACK:             ']';
-SEMI:               ';';
-COMMA:              ',';
-DOT:                '.';
-COLON:              ':';
+LPAREN : '(';
+RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
+LBRACK : '[';
+RBRACK : ']';
+SEMI   : ';';
+COMMA  : ',';
+DOT    : '.';
+COLON  : ':';
 
 // Operators
-ASSIGN:             '=';
-MUL:                '*';
+ASSIGN : '=';
+MUL    : '*';
 
 // Additional symbols
-AT:                 '@';
-ELLIPSIS:           '...';
-REF:                '--> ';
-VAR:                'o ';
+AT       : '@';
+ELLIPSIS : '...';
+REF      : '--> ';
+VAR      : 'o ';
 
 // Literals
-DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
-OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
-FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
-             |       Digits (ExponentPart [fFdD]? | [fFdD])
-             ;
-BOOL_LITERAL:       'true'
-            |       'false'
-            ;
-DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
+DECIMAL_LITERAL : ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
+OCT_LITERAL     : '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
+FLOAT_LITERAL:
+    (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
+    | Digits (ExponentPart [fFdD]? | [fFdD])
+;
+BOOL_LITERAL      : 'true' | 'false';
+DATE_TIME_LITERAL : Bound FullDate 'T' FullTime Bound;
 
 // Whitespace and comments
-WS:                 [ \t\r\n\u000C]+ -> skip;
-LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
-COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
+WS           : [ \t\r\n\u000C]+ -> skip;
+LINE_COMMENT : '//' ~[\r\n]*    -> channel(HIDDEN);
+COMMENT      : '/*' .*? '*/'    -> channel(HIDDEN);
 
 //REGEX Expr
-REGEX_EXPR:         '/'.*?'/';
+REGEX_EXPR: '/' .*? '/';
 
-fragment Bound: '"' | '\'';
-fragment FullDate: Year '-' Month '-' Day;
-fragment Year: Digit Digit Digit Digit;
-fragment Month: [0][0-9]|[1][0-2];
-fragment Day: [0-2][0-9]|[0-3][01];
+fragment Bound    : '"' | '\'';
+fragment FullDate : Year '-' Month '-' Day;
+fragment Year     : Digit Digit Digit Digit;
+fragment Month    : [0][0-9]| [1][0-2];
+fragment Day      : [0-2][0-9]| [0-3][01];
 
-fragment FullTime 
-    : PartialTime TimeOffset;
-fragment TimeOffset
-    : 'Z' | TimeNumOffset;
-fragment TimeNumOffset 
-    : '-' [01][0-2] (':' HalfHour)?
+fragment FullTime   : PartialTime TimeOffset;
+fragment TimeOffset : 'Z' | TimeNumOffset;
+fragment TimeNumOffset:
+    '-' [01][0-2] (':' HalfHour)?
     | '+' [01][0-5] (':' (HalfHour | [4][5]))?
-    ;
-fragment HalfHour: [0][0] | [3][0];
-fragment PartialTime 
-    : [0-2][0-3] ':' Sixty ':' Sixty ('.' [0-9]*)?;
-fragment Sixty: [0-5] Digit;
-fragment Digit: [0-9];
+;
+fragment HalfHour    : [0][0] | [3][0];
+fragment PartialTime : [0-2][0-3] ':' Sixty ':' Sixty ('.' [0-9]*)?;
+fragment Sixty       : [0-5] Digit;
+fragment Digit       : [0-9];
 
+IDENTIFIER: LetterOrDigit+;
 
-IDENTIFIER:         LetterOrDigit+;
-
-CHAR_LITERAL:       '\'' (~["\\\r\n] | EscapeSequence)* '\'';
-STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
+CHAR_LITERAL   : '\'' (~["\\\r\n] | EscapeSequence)* '\'';
+STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
 
 // Fragment rules
-fragment ExponentPart
-    : [eE] [+-]? Digits
-    ;
+fragment ExponentPart: [eE] [+-]? Digits;
 
-fragment EscapeSequence
-    : '\\' [btnfr"'\\]
+fragment EscapeSequence:
+    '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
-    ;
+;
 
-fragment HexDigits
-    : HexDigit ((HexDigit | '_')* HexDigit)?
-    ;
+fragment HexDigits: HexDigit ((HexDigit | '_')* HexDigit)?;
 
-fragment HexDigit
-    : [0-9a-fA-F]
-    ;
+fragment HexDigit: [0-9a-fA-F];
 
-fragment Digits
-    : [0-9] ([0-9_]* [0-9])?
-    ;
+fragment Digits: [0-9] ([0-9_]* [0-9])?;
 
-fragment LetterOrDigit
-    : Letter
-    | [0-9]
-    ;
+fragment LetterOrDigit: Letter | [0-9];
 
-fragment Letter
-    : [a-zA-Z$_] // these are below 0x7F
-    | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
+fragment Letter:
+    [a-zA-Z$_]                        // these are below 0x7F
+    | ~[\u0000-\u007F\uD800-\uDBFF]   // covers all characters above 0x7F which are not a surrogate
     | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-    ;
+;

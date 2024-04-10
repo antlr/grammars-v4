@@ -287,6 +287,8 @@ create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 create index index8 on t1(col1) comment 'test index' using btree;
+CREATE INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as double)));
+CREATE INDEX `idx_custom_field_d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8".value')) as float)));
 #end
 #begin
 -- Create logfile group
@@ -681,5 +683,53 @@ BEGIN
 SELECT
     @Ν_greece
      ,@N_latin;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
+
+#begin
+CREATE DEFINER=`PEUSER`@`%` PROCEDURE `SANDBOX`.`TEST_UNION`( )
+BEGIN
+SELECT ID ,SUM(COL_1) AS SUM_COL_1
+FROM (
+    (SELECT ID ,COL_1 FROM TEST_AUTO_INC
+    UNION ALL
+    SELECT ID ,COL_1 FROM TEST_AUTO_INC TAI)
+    UNION ALL
+    (SELECT ID ,COL_1 FROM TEST_AUTO_INC TAI)
+)SS
+GROUP BY 1
+ORDER BY 1
+;
 END
 #end

@@ -29,72 +29,75 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar fasta;
 
 sequence
-   : section+ EOF
-   ;
+    : section+ EOF
+    ;
 
 section
-   : descriptionline
-   | sequencelines
-   | commentline
-   ;
+    : descriptionline
+    | sequencelines
+    | commentline
+    ;
 
 sequencelines
-   : SEQUENCELINE+
-   ;
+    : SEQUENCELINE+
+    ;
 
 descriptionline
-   : DESCRIPTIONLINE
-   ;
+    : DESCRIPTIONLINE
+    ;
 
 commentline
-   : COMMENTLINE
-   ;
+    : COMMENTLINE
+    ;
 
 COMMENTLINE
-   : ';' .*? EOL
-   ;
+    : ';' .*? EOL
+    ;
 
 DESCRIPTIONLINE
-   : '>' TEXT ('|' TEXT)* EOL
-   ;
+    : '>' TEXT ('|' TEXT)* EOL
+    ;
 
 TEXT
-   : (DIGIT | LETTER | SYMBOL)+
-   ;
+    : (DIGIT | LETTER | SYMBOL)+
+    ;
 
 EOL
-   : '\r'? '\n'
-   ;
+    : '\r'? '\n'
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 fragment LETTER
-   : [A-Za-z]
-   ;
+    : [A-Za-z]
+    ;
 
 fragment SYMBOL
-   : '.'
-   | '-'
-   | '+'
-   | '_'
-   | ' '
-   | '['
-   | ']'
-   | '('
-   | ')'
-   | ','
-   | '/'
-   | ':'
-   | '&'
-   | '\''
-   ;
+    : '.'
+    | '-'
+    | '+'
+    | '_'
+    | ' '
+    | '['
+    | ']'
+    | '('
+    | ')'
+    | ','
+    | '/'
+    | ':'
+    | '&'
+    | '\''
+    ;
 
 SEQUENCELINE
-   : LETTER+ EOL
-   ;
-
+    : LETTER+ EOL
+    ;

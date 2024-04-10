@@ -30,90 +30,85 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar clf;
 
 log
-   : (line? EOL) + line? EOF
-   ;
+    : (line? EOL)+ line? EOF
+    ;
 
 // combined log format has the referer and useragent fields
 line
-   : host logname username datetimetz request statuscode bytes (referer useragent)?
-   ;
+    : host logname username datetimetz request statuscode bytes (referer useragent)?
+    ;
 
 host
-   : STRING
-   | IP
-   ;
+    : STRING
+    | IP
+    ;
 
 logname
-   : STRING
-   ;
+    : STRING
+    ;
 
 username
-   : STRING
-   ;
+    : STRING
+    ;
 
 datetimetz
-   : '[' DATE ':' TIME TZ ']'
-   ;
-
+    : '[' DATE ':' TIME TZ ']'
+    ;
 
 DATE
-   : [0-9] + '/' STRING '/' [0-9] +
-   ;
-
+    : [0-9]+ '/' STRING '/' [0-9]+
+    ;
 
 TIME
-   : [0-9] + ':' [0-9] + ':' [0-9] +
-   ;
-
+    : [0-9]+ ':' [0-9]+ ':' [0-9]+
+    ;
 
 TZ
-   : '-' [0-9] +
-   ;
+    : '-' [0-9]+
+    ;
 
 referer
-   : LITERAL
-   ;
+    : LITERAL
+    ;
 
 request
-   : LITERAL
-   ;
+    : LITERAL
+    ;
 
 useragent
-   : LITERAL
-   ;
+    : LITERAL
+    ;
 
 statuscode
-   : STRING
-   ;
+    : STRING
+    ;
 
 bytes
-   : STRING
-   ;
-
+    : STRING
+    ;
 
 LITERAL
-   : '"' ~ '"'* '"'
-   ;
-
+    : '"' ~ '"'* '"'
+    ;
 
 IP
-   : [0-9] + '.' [0-9] + '.' [0-9] + '.' [0-9] +
-   ;
-
+    : [0-9]+ '.' [0-9]+ '.' [0-9]+ '.' [0-9]+
+    ;
 
 STRING
-   : [a-zA-Z0-9();._-] +
-   ;
-
+    : [a-zA-Z0-9();._-]+
+    ;
 
 EOL
-   : '\r'? '\n'
-   ;
-
+    : '\r'? '\n'
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

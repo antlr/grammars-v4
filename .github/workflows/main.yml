@@ -5,14 +5,50 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      mymatrix: ${{ steps.step1.outputs.myoutput }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: '8.0.x'
+    - name: Install Trash
+      shell: bash
+      run: |
+        dotnet tool restore
+    - name: Gather targets.
+      id: step1
+      shell: bash
+      run: |
+        if [ "${{github.event_name}}" == "pull_request" ]; then
+          Before="${{github.event.pull_request.base.sha}}"
+          After="${{github.event.pull_request.head.sha}}"
+        else
+          Before="${{github.event.before}}"
+          After="${{github.event.after}}"
+        fi
+        bash _scripts/what-to-test.sh $Before $After >> $GITHUB_OUTPUT
+
   build-pwsh:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [ CSharp, Dart, Java, JavaScript, Go, Python3, TypeScript ]
+        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - name: Info
       shell: bash
@@ -24,10 +60,20 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.2.0
+    - name: Setup PHP
+      id: setup-php
+      uses: shivammathur/setup-php@v2
       with:
-        dotnet-version: '7.0.x'
+        php-version: '8.2'
+        ini-values: xdebug.max_nesting_level=1000
+    - name: Print PHP version
+      run: |
+        echo ${{ steps.setup-php.outputs.php-version }}
+        php --version
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -35,7 +81,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -53,15 +99,16 @@ jobs:
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '^1.21.0'
+        cache: false
     - name: Test Go
       if: ${{ matrix.language == 'Go' }}
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v4.7.1
+      uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -77,12 +124,10 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v4.0.0
+      uses: actions/setup-node@v4.0.2
       with:
-        node-version: '16.13.0'
+        node-version: '21.7.1'
     - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
     - name: Update paths
@@ -112,122 +157,13 @@ jobs:
         }
         _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
 
-  build-bash:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-        language: [ Cpp, CSharp, Dart, Java, JavaScript, Go, PHP, Python3, TypeScript ]
-    steps:
-    - name: Info
-      shell: bash
-      run: |
-        arch
-        uname -a
-        if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Setup PHP
-      id: setup-php
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        ini-values: xdebug.max_nesting_level=1000
-    - name: Print PHP version
-      run: |
-        echo ${{ steps.setup-php.outputs.php-version }}
-        php --version
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.2.0
-      with:
-        dotnet-version: '7.0.x'
-    - name: Test Dotnet
-      run: |
-        dotnet --version
-        dotnet --info
-        dotnet --list-runtimes
-        dotnet --list-sdks
-    - name: Install Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'zulu'
-    - name: Test Java
-      run: |
-        dotnet --version
-        java --version
-        javac --version
-    - name: Install Dart
-      if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
-    - name: Test Dart
-      if: ${{ matrix.language == 'Dart' }}
-      run: |
-        dart --version
-    - name: Install Go
-      if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v4
-      with:
-        go-version: '^1.18.0'
-    - name: Test Go
-      if: ${{ matrix.language == 'Go' }}
-      run: |
-        go version
-    - name: Install Python
-      uses: actions/setup-python@v4.7.1
-      with:
-        python-version: '3.10'
-    - name: Test Python
-      run: |
-        python --version
-    - name: Upgrade Pip.
-      run: |
-        python -m ensurepip --upgrade
-    - name: Test Pip.
-      run: |
-        pip --version
-    - name: Install Antlr tool
-      run: |
-         pip install antlr4-tools
-    - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v4.0.0
-      with:
-        node-version: '16.13.0'
-    - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      run: |
-        node --version
-    - name: Install Trash
-      shell: bash
-      run: |
-        dotnet tool restore
-    - name: Test Trash install
-      shell: bash
-      run: |
-        dotnet trgen -- --help
-    - name: Test
-      shell: bash
-      run: |
-        if [ "${{github.event_name}}" == "pull_request" ]; then
-            Before="${{github.event.pull_request.base.sha}}"
-            After="${{github.event.pull_request.head.sha}}"
-        else
-            Before="${{github.event.before}}"
-            After="${{github.event.after}}"
-        fi
-        bash _scripts/test.sh -a /tmp/antlr4-complete.jar -t ${{matrix.language}} -f diff $Before $After
-
-  static-checks:
+  static-check:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        language: [ CSharp ]
+        test: [ useless-parens, format ]
     steps:
     - name: Info
       shell: bash
@@ -240,9 +176,9 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.2.0
+      uses: actions/setup-dotnet@v4.0.0
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -250,7 +186,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -259,24 +195,8 @@ jobs:
         dotnet --version
         java --version
         javac --version
-    - name: Install Dart
-      if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
-    - name: Test Dart
-      if: ${{ matrix.language == 'Dart' }}
-      run: |
-        dart --version
-    - name: Install Go
-      if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v4
-      with:
-        go-version: '^1.18.0'
-    - name: Test Go
-      if: ${{ matrix.language == 'Go' }}
-      run: |
-        go version
     - name: Install Python
-      uses: actions/setup-python@v4.7.1
+      uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -291,15 +211,6 @@ jobs:
     - name: Install Antlr tool
       run: |
          pip install antlr4-tools
-    - name: Install JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v4.0.0
-      with:
-        node-version: '16.13.0'
-    - name: Test JavaScript
-      if: ${{ matrix.language == 'JavaScript' }}
-      run: |
-        node --version
     - name: Install Trash
       shell: bash
       run: |
@@ -318,6 +229,6 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/test-static-checks.sh -t ${{matrix.language}} -f diff $Before $After
+        bash _scripts/test-static-checks.sh -t ${{matrix.test}} -f diff $Before $After
 
 

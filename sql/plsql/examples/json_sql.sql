@@ -9,6 +9,8 @@ ORDER BY d.department_id;
 
 SELECT JSON_OBJECT(KEY 'VALUE' VALUE COL), t.*  FROM T t;
 
+SELECT JSON_OBJECT(KEY 'VALUE' VALUE COL FORMAT JSON), t.*  FROM T t;
+
 SELECT JSON_ARRAY (
                JSON_OBJECT('percentage' VALUE .50),
                JSON_ARRAY(1,2,3),
@@ -33,5 +35,10 @@ SELECT JSON_SERIALIZE ('{a:[1,2,3,4]}' RETURNING VARCHAR2(3) TRUNCATE ERROR ON E
 
 SELECT JSON_VALUE('{a:100}', '$.a') AS value FROM DUAL;
 
+SELECT JSON_VALUE('{"level": 10}', '$.level' RETURNING NUMBER) FROM DUAL;
 
+SELECT 1 FROM DUAL WHERE '{"a": 1, "b": [1, 2, 3]}' IS JSON;
 
+SELECT * FROM employees WHERE (doc IS JSON);
+
+SELECT * FROM employees WHERE dept = 2 AND (doc IS JSON);

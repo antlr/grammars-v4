@@ -26,3 +26,16 @@ VALUES (
    s.c2,
    s.c3
 );
+
+insert into t(a,b)
+select 1, 2
+union
+select 3, 4;
+
+SELECT * FROM t, TABLE(flatten(
+    INPUT => t.c
+    , PATH => ''
+    , OUTER => true
+    , RECURSIVE => true
+    , MODE => 'both'
+));

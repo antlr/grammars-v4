@@ -14,35 +14,115 @@
 /*
  * For parsing propeties file (like GeoTools epsg.properties), use starting rule "propsFile". For parsing single WKT CRS definition, use starting rule "wkt".
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar wktcrsv1;
 
-propsFile: propRow* EOF;
+propsFile
+    : propRow* EOF
+    ;
 
-propRow:     commentLine | epsgDefLine;
-commentLine: COMMENT_LINE;
-epsgDefLine: epsgCode EQ wkt;
+propRow
+    : commentLine
+    | epsgDefLine
+    ;
 
-wkt:           compdcs | projcs | geogcs | vertcs | geoccs | localcs;
-compdcs:       'COMPD_CS' LPAR name COMMA (projcs | geogcs) COMMA vertcs COMMA authority RPAR;
-projcs:        'PROJCS' LPAR name COMMA geogcs COMMA projection COMMA (parameter COMMA)+ unit COMMA (axis COMMA)* authority RPAR;
-geoccs:        'GEOCCS' LPAR name COMMA datum COMMA primem COMMA unit COMMA (axis COMMA)+ authority RPAR;
-geogcs:        'GEOGCS' LPAR name COMMA datum COMMA primem COMMA unit (COMMA axis)* (COMMA authority)? RPAR;
-vertcs:        'VERT_CS' LPAR name COMMA vertdatum COMMA unit COMMA axis COMMA authority RPAR;
-localcs:       'LOCAL_CS' LPAR name COMMA localdatum COMMA unit COMMA (axis COMMA)+ authority RPAR;
-datum:         'DATUM' LPAR name COMMA spheroid (COMMA towgs84)? (COMMA authority)? RPAR;
-vertdatum:     'VERT_DATUM' LPAR name COMMA type COMMA authority RPAR;
-localdatum:    'LOCAL_DATUM' LPAR name COMMA type (COMMA authority)? RPAR;
-spheroid:      'SPHEROID' LPAR name COMMA semiMajorAxis COMMA inverseFlattening (COMMA authority)? RPAR;
-towgs84:       'TOWGS84' LPAR dx COMMA dy COMMA dz (COMMA ex COMMA ey COMMA ez (COMMA ppm)?)? RPAR;
-authority:     'AUTHORITY' LPAR authorityName COMMA code RPAR;
-primem:        'PRIMEM' LPAR name COMMA longitude (COMMA authority)? RPAR;
-unit:          'UNIT' LPAR name COMMA conversionFactor (COMMA authority)? RPAR;
-axis:          'AXIS' LPAR name COMMA axisOrient RPAR;
-projection:    'PROJECTION' LPAR name (COMMA authority)? RPAR;
-parameter:     'PARAMETER' LPAR name COMMA value RPAR;
-authorityName: '"EPSG"' | '"ESRI"';
-axisOrient:
-    'EAST'
+commentLine
+    : COMMENT_LINE
+    ;
+
+epsgDefLine
+    : epsgCode EQ wkt
+    ;
+
+wkt
+    : compdcs
+    | projcs
+    | geogcs
+    | vertcs
+    | geoccs
+    | localcs
+    ;
+
+compdcs
+    : 'COMPD_CS' LPAR name COMMA (projcs | geogcs) COMMA vertcs COMMA authority RPAR
+    ;
+
+projcs
+    : 'PROJCS' LPAR name COMMA geogcs COMMA projection COMMA (parameter COMMA)+ unit COMMA (
+        axis COMMA
+    )* authority RPAR
+    ;
+
+geoccs
+    : 'GEOCCS' LPAR name COMMA datum COMMA primem COMMA unit COMMA (axis COMMA)+ authority RPAR
+    ;
+
+geogcs
+    : 'GEOGCS' LPAR name COMMA datum COMMA primem COMMA unit (COMMA axis)* (COMMA authority)? RPAR
+    ;
+
+vertcs
+    : 'VERT_CS' LPAR name COMMA vertdatum COMMA unit COMMA axis COMMA authority RPAR
+    ;
+
+localcs
+    : 'LOCAL_CS' LPAR name COMMA localdatum COMMA unit COMMA (axis COMMA)+ authority RPAR
+    ;
+
+datum
+    : 'DATUM' LPAR name COMMA spheroid (COMMA towgs84)? (COMMA authority)? RPAR
+    ;
+
+vertdatum
+    : 'VERT_DATUM' LPAR name COMMA type COMMA authority RPAR
+    ;
+
+localdatum
+    : 'LOCAL_DATUM' LPAR name COMMA type (COMMA authority)? RPAR
+    ;
+
+spheroid
+    : 'SPHEROID' LPAR name COMMA semiMajorAxis COMMA inverseFlattening (COMMA authority)? RPAR
+    ;
+
+towgs84
+    : 'TOWGS84' LPAR dx COMMA dy COMMA dz (COMMA ex COMMA ey COMMA ez (COMMA ppm)?)? RPAR
+    ;
+
+authority
+    : 'AUTHORITY' LPAR authorityName COMMA code RPAR
+    ;
+
+primem
+    : 'PRIMEM' LPAR name COMMA longitude (COMMA authority)? RPAR
+    ;
+
+unit
+    : 'UNIT' LPAR name COMMA conversionFactor (COMMA authority)? RPAR
+    ;
+
+axis
+    : 'AXIS' LPAR name COMMA axisOrient RPAR
+    ;
+
+projection
+    : 'PROJECTION' LPAR name (COMMA authority)? RPAR
+    ;
+
+parameter
+    : 'PARAMETER' LPAR name COMMA value RPAR
+    ;
+
+authorityName
+    : '"EPSG"'
+    | '"ESRI"'
+    ;
+
+axisOrient
+    : 'EAST'
     | 'WEST'
     | 'NORTH'
     | 'SOUTH'
@@ -53,37 +133,125 @@ axisOrient:
     | 'GEOCENTRIC_X'
     | 'GEOCENTRIC_Y'
     | 'GEOCENTRIC_Z'
-    | name;
+    | name
+    ;
 
-epsgCode:          PKEY | NUMBER;
-name:              TEXT;
-number:            NUMBER;
-type:              NUMBER;
-semiMajorAxis:     NUMBER;
-inverseFlattening: NUMBER;
-dx:              NUMBER;
-dy:              NUMBER;
-dz:              NUMBER;
-ex:              NUMBER;
-ey:              NUMBER;
-ez:              NUMBER;
-ppm:               NUMBER;
-code:              TEXT;
-longitude:         NUMBER;
-conversionFactor:  NUMBER;
-value:             NUMBER;
+epsgCode
+    : PKEY
+    | NUMBER
+    ;
 
-NUMBER:       PM? INT ('.' INT)? EXP?;
-TEXT:         '"' ('""' | ~'"')* '"';
-PKEY:         [A-Z] [0-9A-Z]+;
-COMMENT_LINE: '#' ~[\r\n]*;
-WS:           [ \r\n\t]+ -> skip;
+name
+    : TEXT
+    ;
 
-COMMA: ',';
-LPAR:  '[' | '(';
-RPAR:  ']' | ')';
-EQ:    '=';
+number
+    : NUMBER
+    ;
 
-fragment INT: [0-9]+;
-fragment EXP: [Ee] PM? INT;
-fragment PM:  '+' | '-';
+type
+    : NUMBER
+    ;
+
+semiMajorAxis
+    : NUMBER
+    ;
+
+inverseFlattening
+    : NUMBER
+    ;
+
+dx
+    : NUMBER
+    ;
+
+dy
+    : NUMBER
+    ;
+
+dz
+    : NUMBER
+    ;
+
+ex
+    : NUMBER
+    ;
+
+ey
+    : NUMBER
+    ;
+
+ez
+    : NUMBER
+    ;
+
+ppm
+    : NUMBER
+    ;
+
+code
+    : TEXT
+    ;
+
+longitude
+    : NUMBER
+    ;
+
+conversionFactor
+    : NUMBER
+    ;
+
+value
+    : NUMBER
+    ;
+
+NUMBER
+    : PM? INT ('.' INT)? EXP?
+    ;
+
+TEXT
+    : '"' ('""' | ~'"')* '"'
+    ;
+
+PKEY
+    : [A-Z] [0-9A-Z]+
+    ;
+
+COMMENT_LINE
+    : '#' ~[\r\n]*
+    ;
+
+WS
+    : [ \r\n\t]+ -> skip
+    ;
+
+COMMA
+    : ','
+    ;
+
+LPAR
+    : '['
+    | '('
+    ;
+
+RPAR
+    : ']'
+    | ')'
+    ;
+
+EQ
+    : '='
+    ;
+
+fragment INT
+    : [0-9]+
+    ;
+
+fragment EXP
+    : [Ee] PM? INT
+    ;
+
+fragment PM
+    : '+'
+    | '-'
+    ;

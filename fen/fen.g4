@@ -30,73 +30,73 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar fen;
 
 fen
-   : placement ' ' color ' ' castling ' ' enpassant ' ' halfmoveclock ' ' fullmoveclock EOF
-   ;
+    : placement ' ' color ' ' castling ' ' enpassant ' ' halfmoveclock ' ' fullmoveclock EOF
+    ;
 
 color
-   : 'w'
-   | 'b'
-   ;
+    : 'w'
+    | 'b'
+    ;
 
 castling
-   : '-'
-   | ('Q' | 'K' | 'k' | 'q') +
-   ;
+    : '-'
+    | ('Q' | 'K' | 'k' | 'q')+
+    ;
 
 enpassant
-   : '-'
-   | position
-   ;
+    : '-'
+    | position
+    ;
 
 position
-   : ('a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h') NUMBER
-   ;
+    : ('a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h') NUMBER
+    ;
 
 halfmoveclock
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 fullmoveclock
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 placement
-   : rank ('/' rank) +
-   ;
+    : rank ('/' rank)+
+    ;
 
 rank
-   : (piece | NUMBER) +
-   ;
+    : (piece | NUMBER)+
+    ;
 
 piece
-   : 'p'
-   | 'r'
-   | 'n'
-   | 'b'
-   | 'q'
-   | 'k'
-   | 'P'
-   | 'R'
-   | 'N'
-   | 'B'
-   | 'Q'
-   | 'K'
-   ;
-
+    : 'p'
+    | 'r'
+    | 'n'
+    | 'b'
+    | 'q'
+    | 'k'
+    | 'P'
+    | 'R'
+    | 'N'
+    | 'B'
+    | 'Q'
+    | 'K'
+    ;
 
 fragment DIGIT
-   : '0' .. '9'
-   ;
-
+    : '0' .. '9'
+    ;
 
 NUMBER
-   : DIGIT +
-   ;
-
+    : DIGIT+
+    ;
 
 WS
-   : [\r\n\t] + -> skip
-   ;
+    : [\r\n\t]+ -> skip
+    ;

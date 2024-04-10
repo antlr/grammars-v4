@@ -29,92 +29,95 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ron;
 
 ron_
-   : value* EOF
-   ;
+    : value* EOF
+    ;
 
 classname
-   : ID
-   ;
+    : ID
+    ;
 
 value
-   : classname? (number | STRING | BOOLEAN | CHAR | ID | tuple | list | struct | map)
-   ;
+    : classname? (number | STRING | BOOLEAN | CHAR | ID | tuple | list | struct | map)
+    ;
 
 values
-   : value (',' value)* ','?
-   ;
+    : value (',' value)* ','?
+    ;
 
 number
-   : DECIMAL
-   | HEX
-   | BINARY
-   ;
+    : DECIMAL
+    | HEX
+    | BINARY
+    ;
 
 tuple
-   : '(' values ')'
-   ;
+    : '(' values ')'
+    ;
 
 list
-   : '[' values ']'
-   ;
+    : '[' values ']'
+    ;
 
 struct
-   : '(' structitem (',' structitem)* ')' ','?
-   ;
+    : '(' structitem (',' structitem)* ')' ','?
+    ;
 
 structitem
-   : ID ':' (value | struct) ','?
-   ;
+    : ID ':' (value | struct) ','?
+    ;
 
 map
-   : '{' mapitem (',' mapitem)* '}' ','?
-   ;
+    : '{' mapitem (',' mapitem)* '}' ','?
+    ;
 
 mapitem
-   : (ID | STRING | number) ':' value ','?
-   ;
+    : (ID | STRING | number) ':' value ','?
+    ;
 
 DECIMAL
-   : [0-9]+ ('.' [0-9]+)?
-   ;
+    : [0-9]+ ('.' [0-9]+)?
+    ;
 
 HEX
-   : ('0x' | '0X') [0-9A-F]+
-   ;
+    : ('0x' | '0X') [0-9A-F]+
+    ;
 
 BINARY
-   : ('0b' | '0B') [0-1]+
-   ;
+    : ('0b' | '0B') [0-1]+
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 BOOLEAN
-   : 'true'
-   | 'false'
-   ;
+    : 'true'
+    | 'false'
+    ;
 
 CHAR
-   : '\'' ~ '\'' '\''
-   ;
+    : '\'' ~ '\'' '\''
+    ;
 
 ID
-   : [a-zA-Z_]+
-   ;
+    : [a-zA-Z_]+
+    ;
 
 LINE_COMMENT
-   : '//' ~ [\r\n]* -> skip
-   ;
+    : '//' ~ [\r\n]* -> skip
+    ;
 
 MULTILINE_COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
+    : '/*' .*? '*/' -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

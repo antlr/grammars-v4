@@ -16,6 +16,7 @@ SELECT IFNULL(DATEADD(DAY, -1, CAST(ColDate as date)), CAST('2999-12-31' as date
 SELECT RES FROM (SELECT LEFT('COL1',1) AS RES UNION SELECT RIGHT('COL1',1)) as TableRes;
 SELECT to_date(select dateadd(d,-((date_part(dw,getdate())+1)%7+1),getdate())) AS Res;
 SELECT TRY_CAST("150" as INT);
+SELECT CAST("150" as INT);
 SELECT LEN(COL1), LENGTH (COL2) from t;
 SELECT REPLACE('abcd', 'bc'), CHARINDEX('abcd','c') F;
 SELECT * FROM (SELECT 1 as col1 ,'FuturCol2' as col2 union SELECT 2,'FuturCol3') PIVOT (sum(col1) FOR col2 in ('FuturCol2','FuturCol3'));
@@ -54,3 +55,29 @@ SELECT * FROM splittable, LATERAL SPLIT_TO_TABLE(splittable.v, '.');
 with t as (select 1 as c, 2 as d)
 select * from t group by all;
 SELECT COLLATE(c1, 'en_US-ci-as');
+
+select network from T1;
+select outbound from T1;
+
+select * from t where (t.c, t.d) in (select c, d from t2);
+
+with t as (select 1 as c, 2 as d)
+   , s as (select 1 as c, 2 as d)
+select *
+from t
+where (c,d) in (select c,d from s);
+SELECT C1 FROM t1  CHANGES(INFORMATION => APPEND_ONLY)  AT(STREAM => 's1')   END(TIMESTAMP => '2018-07-27 12:00:00'::TIMESTAMP);
+SELECT C1 FROM t1  CHANGES(INFORMATION => default)  AT(OFFSET  => -3*60)   END(STATEMENT  => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726');
+SELECT C1 FROM t1  CHANGES(INFORMATION => default)  AT(STATEMENT  => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726');
+SELECT C1 FROM t1  CHANGES(INFORMATION => APPEND_ONLY)  AT(TIMESTAMP => '2018-07-27 12:00:00'::TIMESTAMP)   END(OFFSET  => -60);
+
+select * from t where t.dt > CURRENT_TIMESTAMP - INTERVAL '90 days';
+
+SELECT T.$1 AS Val FROM (VALUES ('V1'),('V2')) AS T GROUP BY T.$1;
+SELECT C1, C2, MAX(C3) FROM T GROUP BY C1,C2;
+SELECT 1+2, 1*2, 1/2, 1/ 2, 1 / 2,1 /2, 1%2,1-2,1||2;
+SELECT FLOOR(1.2,1), FLOOR(3.1416,-1),FLOOR(2.6);
+SELECT ANY_VALUE(C1),C2 FROM T GROUP BY C2;
+SELECT id, name INTO :id_variable, :name_variable FROM some_data WHERE id = 1;
+
+select * from snowflake.information_schema.tables having table_catalog = '' limit 1;

@@ -1,30 +1,35 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar css3Parser;
 
 options {
-    tokenVocab=css3Lexer;
+    tokenVocab = css3Lexer;
 }
 
 stylesheet
-    : ws ( charset ( Comment | Space | Cdo | Cdc )* )* ( imports ( Comment | Space | Cdo | Cdc )* )* ( namespace_ ( Comment | Space | Cdo | Cdc )* )* ( nestedStatement ( Comment | Space | Cdo | Cdc )* )* EOF
+    : ws (charset ( Comment | Space | Cdo | Cdc)*)* (imports ( Comment | Space | Cdo | Cdc)*)* (
+        namespace_ ( Comment | Space | Cdo | Cdc)*
+    )* (nestedStatement ( Comment | Space | Cdo | Cdc)*)* EOF
     ;
 
 charset
-    : Charset ws String_ ws ';' ws    # goodCharset
-    | Charset ws String_ ws           # badCharset
+    : Charset ws String_ ws ';' ws # goodCharset
+    | Charset ws String_ ws        # badCharset
     ;
 
 imports
-    : Import ws ( String_ | url ) ws mediaQueryList ';' ws     # goodImport
-    | Import ws ( String_ | url ) ws ';' ws                    # goodImport
-    | Import ws ( String_ | url ) ws mediaQueryList            # badImport
-    | Import ws ( String_ | url ) ws                           # badImport
+    : Import ws (String_ | url) ws mediaQueryList ';' ws # goodImport
+    | Import ws ( String_ | url) ws ';' ws               # goodImport
+    | Import ws ( String_ | url) ws mediaQueryList       # badImport
+    | Import ws ( String_ | url) ws                      # badImport
     ;
 
 // Namespaces
 // https://www.w3.org/TR/css-namespaces-3/
 namespace_
-    : Namespace ws (namespacePrefix ws)? ( String_ | url ) ws ';' ws    # goodNamespace
-    | Namespace ws (namespacePrefix ws)? ( String_ | url ) ws           # badNamespace
+    : Namespace ws (namespacePrefix ws)? (String_ | url) ws ';' ws # goodNamespace
+    | Namespace ws (namespacePrefix ws)? ( String_ | url) ws       # badNamespace
     ;
 
 namespacePrefix
@@ -38,12 +43,12 @@ media
     ;
 
 mediaQueryList
-    : ( mediaQuery ( Comma ws mediaQuery )* )? ws
+    : (mediaQuery ( Comma ws mediaQuery)*)? ws
     ;
 
 mediaQuery
-    : ( MediaOnly | Not )? ws mediaType ws ( And ws mediaExpression )*
-    | mediaExpression ( And ws mediaExpression )*
+    : (MediaOnly | Not)? ws mediaType ws (And ws mediaExpression)*
+    | mediaExpression ( And ws mediaExpression)*
     ;
 
 mediaType
@@ -51,7 +56,8 @@ mediaType
     ;
 
 mediaExpression
-    : '(' ws mediaFeature ( ':' ws expr )? ')' ws    // Grammar allows for 'and(', which gets tokenized as Function. In practice, people always insert space before '(' to have it work on Chrome.
+    : '(' ws mediaFeature (':' ws expr)? ')' ws
+    // Grammar allows for 'and(', which gets tokenized as Function. In practice, people always insert space before '(' to have it work on Chrome.
     ;
 
 mediaFeature
@@ -60,7 +66,7 @@ mediaFeature
 
 // Page
 page
-    : Page ws pseudoPage? '{' ws declaration? ( ';' ws declaration? )* '}' ws
+    : Page ws pseudoPage? '{' ws declaration? (';' ws declaration?)* '}' ws
     ;
 
 pseudoPage
@@ -70,11 +76,11 @@ pseudoPage
 // Selectors
 // https://www.w3.org/TR/css3-selectors/
 selectorGroup
-    : selector ( Comma ws selector )*
+    : selector (Comma ws selector)*
     ;
 
 selector
-    : simpleSelectorSequence ws ( combinator simpleSelectorSequence ws )*
+    : simpleSelectorSequence ws (combinator simpleSelectorSequence ws)*
     ;
 
 combinator
@@ -85,8 +91,8 @@ combinator
     ;
 
 simpleSelectorSequence
-    : ( typeSelector | universal ) ( Hash | className | attrib | pseudo | negation )*
-    | ( Hash | className | attrib | pseudo | negation )+
+    : (typeSelector | universal) (Hash | className | attrib | pseudo | negation)*
+    | ( Hash | className | attrib | pseudo | negation)+
     ;
 
 typeSelector
@@ -94,7 +100,7 @@ typeSelector
     ;
 
 typeNamespacePrefix
-    : ( ident | '*' )? '|'
+    : (ident | '*')? '|'
     ;
 
 elementName
@@ -110,7 +116,12 @@ className
     ;
 
 attrib
-    : '[' ws typeNamespacePrefix? ident ws ( ( PrefixMatch | SuffixMatch | SubstringMatch | '=' | Includes | DashMatch ) ws ( ident | String_ ) ws )? ']'
+    : '[' ws typeNamespacePrefix? ident ws (
+        (PrefixMatch | SuffixMatch | SubstringMatch | '=' | Includes | DashMatch) ws (
+            ident
+            | String_
+        ) ws
+    )? ']'
     ;
 
 pseudo
@@ -118,7 +129,7 @@ pseudo
     /* Exceptions: :first-line, :first-letter, :before And :after. */
     /* Note that pseudo-elements are restricted to one per selector And */
     /* occur MediaOnly in the last simple_selector_sequence. */
-    : ':' ':'? ( ident | functionalPseudo )
+    : ':' ':'? (ident | functionalPseudo)
     ;
 
 functionalPseudo
@@ -128,7 +139,7 @@ functionalPseudo
 expression
     /* In CSS3, the expressions are identifiers, strings, */
     /* or of the form "an+b" */
-    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident ) ws )+
+    : (( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident) ws)+
     ;
 
 negation
@@ -146,31 +157,31 @@ negationArg
 
 // Rules
 operator_
-    : '/' ws      # goodOperator
-    | Comma ws    # goodOperator
-    | Space ws    # goodOperator
-    | '=' ws      # badOperator  // IE filter and DXImageTransform function
+    : '/' ws   # goodOperator
+    | Comma ws # goodOperator
+    | Space ws # goodOperator
+    | '=' ws   # badOperator // IE filter and DXImageTransform function
     ;
 
 property_
-    : ident ws       # goodProperty
-    | Variable ws    # goodProperty
-    | '*' ident      # badProperty  // IE hacks
-    | '_' ident      # badProperty  // IE hacks
+    : ident ws    # goodProperty
+    | Variable ws # goodProperty
+    | '*' ident   # badProperty // IE hacks
+    | '_' ident   # badProperty // IE hacks
     ;
 
 ruleset
-    : selectorGroup '{' ws declarationList? '}' ws    # knownRuleset
-    | any_* '{' ws declarationList? '}' ws             # unknownRuleset
+    : selectorGroup '{' ws declarationList? '}' ws # knownRuleset
+    | any_* '{' ws declarationList? '}' ws         # unknownRuleset
     ;
 
 declarationList
-    : ( ';' ws )* declaration ws ( ';' ws declaration? )*
+    : (';' ws)* declaration ws (';' ws declaration?)*
     ;
 
 declaration
-    : property_ ':' ws expr prio?    # knownDeclaration
-    | property_ ':' ws value         # unknownDeclaration
+    : property_ ':' ws expr prio? # knownDeclaration
+    | property_ ':' ws value      # unknownDeclaration
     ;
 
 prio
@@ -178,27 +189,27 @@ prio
     ;
 
 value
-    : ( any_ | block | AtKeyword ws )+
+    : (any_ | block | AtKeyword ws)+
     ;
 
 expr
-    : term ( operator_? term )*
+    : term (operator_? term)*
     ;
 
 term
-    : number ws              # knownTerm
-    | percentage ws          # knownTerm
-    | dimension ws           # knownTerm
-    | String_ ws              # knownTerm
-    | UnicodeRange ws        # knownTerm
-    | ident ws               # knownTerm
-    | var_                   # knownTerm
-    | url ws                 # knownTerm
-    | hexcolor               # knownTerm
-    | calc                   # knownTerm
-    | function_              # knownTerm
-    | unknownDimension ws    # unknownTerm
-    | dxImageTransform       # badTerm
+    : number ws           # knownTerm
+    | percentage ws       # knownTerm
+    | dimension ws        # knownTerm
+    | String_ ws          # knownTerm
+    | UnicodeRange ws     # knownTerm
+    | ident ws            # knownTerm
+    | var_                # knownTerm
+    | url ws              # knownTerm
+    | hexcolor            # knownTerm
+    | calc                # knownTerm
+    | function_           # knownTerm
+    | unknownDimension ws # unknownTerm
+    | dxImageTransform    # badTerm
     ;
 
 function_
@@ -206,7 +217,7 @@ function_
     ;
 
 dxImageTransform
-    : DxImageTransform ws expr ')' ws    // IE DXImageTransform function
+    : DxImageTransform ws expr ')' ws // IE DXImageTransform function
     ;
 
 hexcolor
@@ -214,19 +225,19 @@ hexcolor
     ;
 
 number
-    : ( Plus | Minus )? Number
+    : (Plus | Minus)? Number
     ;
 
 percentage
-    : ( Plus | Minus )? Percentage
+    : (Plus | Minus)? Percentage
     ;
 
 dimension
-    : ( Plus | Minus )? Dimension
+    : (Plus | Minus)? Dimension
     ;
 
 unknownDimension
-    : ( Plus | Minus )? UnknownDimension
+    : (Plus | Minus)? UnknownDimension
     ;
 
 // Error handling
@@ -244,13 +255,13 @@ any_
     | Includes ws
     | DashMatch ws
     | ':' ws
-    | Function_ ws ( any_ | unused )* ')' ws
-    | '(' ws ( any_ | unused )* ')' ws
-    | '[' ws ( any_ | unused )* ']' ws
+    | Function_ ws ( any_ | unused)* ')' ws
+    | '(' ws ( any_ | unused)* ')' ws
+    | '[' ws ( any_ | unused)* ']' ws
     ;
 
 atRule
-    : AtKeyword ws any_* ( block | ';' ws )    # unknownAtRule
+    : AtKeyword ws any_* (block | ';' ws) # unknownAtRule
     ;
 
 unused
@@ -262,7 +273,7 @@ unused
     ;
 
 block
-    : '{' ws (  declarationList | nestedStatement | any_ | block | AtKeyword ws | ';' ws )* '}' ws
+    : '{' ws (declarationList | nestedStatement | any_ | block | AtKeyword ws | ';' ws)* '}' ws
     ;
 
 // Conditional
@@ -306,11 +317,11 @@ supportsNegation
     ;
 
 supportsConjunction
-    : supportsConditionInParens ( ws Space ws And ws Space ws supportsConditionInParens )+
+    : supportsConditionInParens (ws Space ws And ws Space ws supportsConditionInParens)+
     ;
 
 supportsDisjunction
-    : supportsConditionInParens ( ws Space ws Or ws Space ws supportsConditionInParens )+
+    : supportsConditionInParens (ws Space ws Or ws Space ws supportsConditionInParens)+
     ;
 
 supportsDeclarationCondition
@@ -318,7 +329,7 @@ supportsDeclarationCondition
     ;
 
 generalEnclosed
-    : ( Function_ | '(' ) ( any_ | unused )* ')'
+    : (Function_ | '(') (any_ | unused)* ')'
     ;
 
 // Url
@@ -341,11 +352,11 @@ calc
     ;
 
 calcSum
-    : calcProduct ( Space ws ( Plus | Minus ) ws Space ws calcProduct )*
+    : calcProduct (Space ws ( Plus | Minus) ws Space ws calcProduct)*
     ;
 
 calcProduct
-    : calcValue ( '*' ws calcValue | '/' ws number ws )*
+    : calcValue ('*' ws calcValue | '/' ws number ws)*
     ;
 
 calcValue
@@ -359,12 +370,12 @@ calcValue
 // Font face
 // https://www.w3.org/TR/2013/CR-css-fonts-3-20131003/#font-face-rule
 fontFaceRule
-    : FontFace ws '{' ws fontFaceDeclaration? ( ';' ws fontFaceDeclaration? )* '}' ws
+    : FontFace ws '{' ws fontFaceDeclaration? (';' ws fontFaceDeclaration?)* '}' ws
     ;
 
 fontFaceDeclaration
-    : property_ ':' ws expr     # knownFontFaceDeclaration
-    | property_ ':' ws value    # unknownFontFaceDeclaration
+    : property_ ':' ws expr  # knownFontFaceDeclaration
+    | property_ ':' ws value # unknownFontFaceDeclaration
     ;
 
 // Animations
@@ -374,11 +385,11 @@ keyframesRule
     ;
 
 keyframeBlock
-    : ( keyframeSelector '{' ws declarationList? '}' ws )
+    : (keyframeSelector '{' ws declarationList? '}' ws)
     ;
 
 keyframeSelector
-    : ( From | To | Percentage ) ws ( Comma ws ( From | To | Percentage ) ws )*
+    : (From | To | Percentage) ws (Comma ws ( From | To | Percentage) ws)*
     ;
 
 // Viewport
@@ -400,16 +411,16 @@ fontFeatureValuesRule
     ;
 
 fontFamilyNameList
-    : fontFamilyName ( ws Comma ws fontFamilyName )*
+    : fontFamilyName (ws Comma ws fontFamilyName)*
     ;
 
 fontFamilyName
     : String_
-    | ident ( ws ident )*
+    | ident ( ws ident)*
     ;
 
 featureValueBlock
-    : featureType ws '{' ws featureValueDefinition? ( ws ';' ws featureValueDefinition? )* '}' ws
+    : featureType ws '{' ws featureValueDefinition? (ws ';' ws featureValueDefinition?)* '}' ws
     ;
 
 featureType
@@ -417,7 +428,7 @@ featureType
     ;
 
 featureValueDefinition
-    : ident ws ':' ws number ( ws number )*
+    : ident ws ':' ws number (ws number)*
     ;
 
 // The specific words can be identifiers too
@@ -434,5 +445,5 @@ ident
 // Comments might be part of CSS hacks, thus pass them to visitor to decide whether to skip
 // Spaces are significant around '+' '-' '(', thus they should not be skipped
 ws
-    : ( Comment | Space )*
+    : (Comment | Space)*
     ;

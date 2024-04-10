@@ -12,11 +12,17 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
+if [ "$global" == "" ]
+then
+    files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+else
+    files2=`trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+fi
 
 files=()
 for f in $files2
 do
+    if [ -d "$f" ]; then continue; fi
     if [ "$global" == "" ]
     then
         dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
@@ -46,9 +52,9 @@ for f in ${files[*]}
 do
     if [ "$global" == "" ]
     then
-        dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+        dotnet trwdog -- ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
     else
-        trwdog ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+        trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
     fi
     xxx="$?"
     if [ "$xxx" -ne 0 ]

@@ -401,7 +401,30 @@ CREATE TABLE T (
     data xmltype
 );
 
+CREATE TABLE "D1
+"
+("c1" INTEGER, "C2" INTEGER);
+
+CREATE TABLE T (
+    id number(9,0) primary key,
+    data xmltype
+) USAGE QUEUE;
+
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR READ;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTIMIZE FOR WRITE;
+CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR WRITE;
+
+CREATE TABLE tab IF NOT EXISTS (ID number(9) primary key);
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE
        -- TO_CHAR(to_date('20'||f.nr_ano,'YYYY'),'YYYY')||'/'||TRIM(TO_CHAR(f.nr_mes,'00')) = :refCompAcad);
+;
+
+CREATE INDEX part_idx ON partitioned_by_index (part, val)
+    GLOBAL PARTITION BY RANGE (part)
+        ( PARTITION t0 VALUES LESS THAN (TIMESTAMP '2020-01-01 00:00:00')
+        , PARTITION t1 VALUES LESS THAN (MAXVALUE) )
+        ;

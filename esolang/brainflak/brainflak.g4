@@ -1,4 +1,3 @@
-
 /*
  [The "BSD licence"]
  Copyright (c) 2020 Tom Everett
@@ -26,68 +25,71 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar brainflak;
 
 file_
-   : statement+ EOF
-   ;
+    : statement+ EOF
+    ;
 
 statement
-   : parenstmt
-   | bracestmt
-   | bracketstmt
-   | gtltstmt
-   ;
+    : parenstmt
+    | bracestmt
+    | bracketstmt
+    | gtltstmt
+    ;
 
 parenstmt
-   : LPAREN statement* RPAREN
-   ;
+    : LPAREN statement* RPAREN
+    ;
 
 bracestmt
-   : LBRACE statement* RBRACE
-   ;
+    : LBRACE statement* RBRACE
+    ;
 
 bracketstmt
-   : LBRACK statement* RBRACK
-   ;
+    : LBRACK statement* RBRACK
+    ;
 
 gtltstmt
-   : LT statement* GT
-   ;
+    : LT statement* GT
+    ;
 
 LPAREN
-   : '('
-   ;
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
+    : ')'
+    ;
 
 GT
-   : '>'
-   ;
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
+    : '<'
+    ;
 
 LBRACE
-   : '{'
-   ;
+    : '{'
+    ;
 
 RBRACE
-   : '}'
-   ;
+    : '}'
+    ;
 
 LBRACK
-   : '['
-   ;
+    : '['
+    ;
 
 RBRACK
-   : ']'
-   ;
+    : ']'
+    ;
 
 WS
-   : . -> skip
-   ;
-
+    : . -> skip
+    ;

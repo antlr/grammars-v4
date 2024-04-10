@@ -1,0 +1,27 @@
+/* Determine if a graph is bipartite or not.
+ */
+BEG_G{
+  int vc, c, color[node_t];
+  node_t v;
+  edge_t e;
+  $tvtype = TV_dfs;
+  $tvroot = fstnode($);
+}
+N{
+  if ($tvedge == NULL)
+    color[$] = 1;
+  if (color[$] == 1)
+    c = 2;
+  else
+    c = 1;
+  for (e = fstedge($); e; e = nxtedge(e,$)) {
+    v = opp(e,$);
+    vc = color[v];
+    if (vc == 0)
+      color[v] = c;
+    else if (vc != c) {
+      printf(2, "Not bipartite\n");
+      exit(1);
+    }
+  }
+}

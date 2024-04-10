@@ -30,292 +30,254 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar pl0;
 
 program
-   : block '.' EOF
-   ;
+    : block '.' EOF
+    ;
 
 block
-   : consts? vars_? procedure* statement
-   ;
+    : consts? vars_? procedure* statement
+    ;
 
 consts
-   : CONST ident '=' number (',' ident '=' number)* ';'
-   ;
+    : CONST ident '=' number (',' ident '=' number)* ';'
+    ;
 
 vars_
-   : VAR ident (',' ident)* ';'
-   ;
+    : VAR ident (',' ident)* ';'
+    ;
 
 procedure
-   : PROCEDURE ident ';' block ';'
-   ;
+    : PROCEDURE ident ';' block ';'
+    ;
 
 statement
-   : (assignstmt | callstmt | writestmt | qstmt | bangstmt | beginstmt | ifstmt | whilestmt)?
-   ;
+    : (assignstmt | callstmt | writestmt | qstmt | bangstmt | beginstmt | ifstmt | whilestmt)?
+    ;
 
 assignstmt
-   : ident ':=' expression
-   ;
+    : ident ':=' expression
+    ;
 
 callstmt
-   : CALL ident
-   ;
+    : CALL ident
+    ;
 
 writestmt
-   : WRITE ident
-   ;
+    : WRITE ident
+    ;
 
 qstmt
-   : '?' ident
-   ;
+    : '?' ident
+    ;
 
 bangstmt
-   : '!' expression
-   ;
+    : '!' expression
+    ;
 
 beginstmt
-   : BEGIN statement (';' statement)* END
-   ;
+    : BEGIN statement (';' statement)* END
+    ;
 
 ifstmt
-   : IF condition THEN statement
-   ;
+    : IF condition THEN statement
+    ;
 
 whilestmt
-   : WHILE condition DO statement
-   ;
+    : WHILE condition DO statement
+    ;
 
 condition
-   : ODD expression
-   | expression ('=' | '#' | '<' | '<=' | '>' | '>=') expression
-   ;
+    : ODD expression
+    | expression ('=' | '#' | '<' | '<=' | '>' | '>=') expression
+    ;
 
 expression
-   : ('+' | '-')? term (('+' | '-') term)*
-   ;
+    : ('+' | '-')? term (('+' | '-') term)*
+    ;
 
 term
-   : factor (('*' | '/') factor)*
-   ;
+    : factor (('*' | '/') factor)*
+    ;
 
 factor
-   : ident
-   | number
-   | '(' expression ')'
-   ;
+    : ident
+    | number
+    | '(' expression ')'
+    ;
 
 ident
-   : STRING
-   ;
+    : STRING
+    ;
 
 number
-   : NUMBER
-   ;
-
+    : NUMBER
+    ;
 
 WRITE
-   : W R I T E
-   ;
-
+    : W R I T E
+    ;
 
 WHILE
-   : W H I L E
-   ;
-
+    : W H I L E
+    ;
 
 DO
-   : D O
-   ;
-
+    : D O
+    ;
 
 IF
-   : I F
-   ;
-
+    : I F
+    ;
 
 THEN
-   : T H E N
-   ;
-
+    : T H E N
+    ;
 
 ODD
-   : O D D
-   ;
-
+    : O D D
+    ;
 
 BEGIN
-   : B E G I N
-   ;
-
+    : B E G I N
+    ;
 
 END
-   : E N D
-   ;
-
+    : E N D
+    ;
 
 CALL
-   : C A L L
-   ;
-
+    : C A L L
+    ;
 
 CONST
-   : C O N S T
-   ;
-
+    : C O N S T
+    ;
 
 VAR
-   : V A R
-   ;
-
+    : V A R
+    ;
 
 PROCEDURE
-   : P R O C E D U R E
-   ;
-
+    : P R O C E D U R E
+    ;
 
 fragment A
-   : ('a' | 'A')
-   ;
-
+    : ('a' | 'A')
+    ;
 
 fragment B
-   : ('b' | 'B')
-   ;
-
+    : ('b' | 'B')
+    ;
 
 fragment C
-   : ('c' | 'C')
-   ;
-
+    : ('c' | 'C')
+    ;
 
 fragment D
-   : ('d' | 'D')
-   ;
-
+    : ('d' | 'D')
+    ;
 
 fragment E
-   : ('e' | 'E')
-   ;
-
+    : ('e' | 'E')
+    ;
 
 fragment F
-   : ('f' | 'F')
-   ;
-
+    : ('f' | 'F')
+    ;
 
 fragment G
-   : ('g' | 'G')
-   ;
-
+    : ('g' | 'G')
+    ;
 
 fragment H
-   : ('h' | 'H')
-   ;
-
+    : ('h' | 'H')
+    ;
 
 fragment I
-   : ('i' | 'I')
-   ;
-
+    : ('i' | 'I')
+    ;
 
 fragment J
-   : ('j' | 'J')
-   ;
-
+    : ('j' | 'J')
+    ;
 
 fragment K
-   : ('k' | 'K')
-   ;
-
+    : ('k' | 'K')
+    ;
 
 fragment L
-   : ('l' | 'L')
-   ;
-
+    : ('l' | 'L')
+    ;
 
 fragment M
-   : ('m' | 'M')
-   ;
-
+    : ('m' | 'M')
+    ;
 
 fragment N
-   : ('n' | 'N')
-   ;
-
+    : ('n' | 'N')
+    ;
 
 fragment O
-   : ('o' | 'O')
-   ;
-
+    : ('o' | 'O')
+    ;
 
 fragment P
-   : ('p' | 'P')
-   ;
-
+    : ('p' | 'P')
+    ;
 
 fragment Q
-   : ('q' | 'Q')
-   ;
-
+    : ('q' | 'Q')
+    ;
 
 fragment R
-   : ('r' | 'R')
-   ;
-
+    : ('r' | 'R')
+    ;
 
 fragment S
-   : ('s' | 'S')
-   ;
-
+    : ('s' | 'S')
+    ;
 
 fragment T
-   : ('t' | 'T')
-   ;
-
+    : ('t' | 'T')
+    ;
 
 fragment U
-   : ('u' | 'U')
-   ;
-
+    : ('u' | 'U')
+    ;
 
 fragment V
-   : ('v' | 'V')
-   ;
-
+    : ('v' | 'V')
+    ;
 
 fragment W
-   : ('w' | 'W')
-   ;
-
+    : ('w' | 'W')
+    ;
 
 fragment X
-   : ('x' | 'X')
-   ;
-
+    : ('x' | 'X')
+    ;
 
 fragment Y
-   : ('y' | 'Y')
-   ;
-
+    : ('y' | 'Y')
+    ;
 
 fragment Z
-   : ('z' | 'Z')
-   ;
-
+    : ('z' | 'Z')
+    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z]*
-   ;
-
+    : [a-zA-Z] [a-zA-Z]*
+    ;
 
 NUMBER
-   : [0-9] +
-   ;
-
+    : [0-9]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
+    : [ \t\r\n] -> skip
+    ;

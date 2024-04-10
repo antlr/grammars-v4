@@ -26,289 +26,297 @@ COOL grammar derived from:
 http://sist.shanghaitech.edu.cn/faculty/songfu/course/spring2017/cs131/COOL/COOLAid.pdf
 
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar COOL;
 
 program
-   : (classDefine ';')+ EOF
-   ;
-
+    : (classDefine ';')+ EOF
+    ;
 
 classDefine
-   : CLASS TYPEID (INHERITS TYPEID)? '{' (feature ';')* '}'
-   ;
+    : CLASS TYPEID (INHERITS TYPEID)? '{' (feature ';')* '}'
+    ;
 
 feature
-   : OBJECTID '(' (formal (',' formal)*)? ')' ':' TYPEID '{' expression '}' # method
-   | OBJECTID ':' TYPEID (ASSIGNMENT expression)? # property
-   ;
+    : OBJECTID '(' (formal (',' formal)*)? ')' ':' TYPEID '{' expression '}' # method
+    | OBJECTID ':' TYPEID (ASSIGNMENT expression)?                           # property
+    ;
 
 formal
-   : OBJECTID ':' TYPEID
-   ;
+    : OBJECTID ':' TYPEID
+    ;
+
 /* method argument */
-   
-   
+
 expression
-   : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)? ')' # methodCall
-   | OBJECTID '(' (expression (',' expression)*)? ')' # ownMethodCall
-   | IF expression THEN expression ELSE expression FI # if
-   | WHILE expression LOOP expression POOL # while
-   | '{' (expression ';')+ '}' # block
-   | LET OBJECTID ':' TYPEID (ASSIGNMENT expression)? (',' OBJECTID ':' TYPEID (ASSIGNMENT expression)?)* IN expression # letIn
-   | CASE expression OF (OBJECTID ':' TYPEID CASE_ARROW expression ';')+ ESAC # case
-   | NEW TYPEID # new
-   | INTEGER_NEGATIVE expression # negative
-   | ISVOID expression # isvoid
-   | expression MULTIPLY expression # multiply
-   | expression DIVISION expression # division
-   | expression ADD expression # add
-   | expression MINUS expression # minus
-   | expression LESS_THAN expression # lessThan
-   | expression LESS_EQUAL expression # lessEqual
-   | expression EQUAL expression # equal
-   | NOT expression # boolNot
-   | '(' expression ')' # parentheses
-   | OBJECTID # id
-   | INT # int
-   | STRING # string
-   | TRUE # true
-   | FALSE # false
-   | OBJECTID ASSIGNMENT expression # assignment
-   ;
-   // key words
-   
+    : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)? ')' # methodCall
+    | OBJECTID '(' (expression (',' expression)*)? ')'                              # ownMethodCall
+    | IF expression THEN expression ELSE expression FI                              # if
+    | WHILE expression LOOP expression POOL                                         # while
+    | '{' (expression ';')+ '}'                                                     # block
+    | LET OBJECTID ':' TYPEID (ASSIGNMENT expression)? (
+        ',' OBJECTID ':' TYPEID (ASSIGNMENT expression)?
+    )* IN expression                                                           # letIn
+    | CASE expression OF (OBJECTID ':' TYPEID CASE_ARROW expression ';')+ ESAC # case
+    | NEW TYPEID                                                               # new
+    | INTEGER_NEGATIVE expression                                              # negative
+    | ISVOID expression                                                        # isvoid
+    | expression MULTIPLY expression                                           # multiply
+    | expression DIVISION expression                                           # division
+    | expression ADD expression                                                # add
+    | expression MINUS expression                                              # minus
+    | expression LESS_THAN expression                                          # lessThan
+    | expression LESS_EQUAL expression                                         # lessEqual
+    | expression EQUAL expression                                              # equal
+    | NOT expression                                                           # boolNot
+    | '(' expression ')'                                                       # parentheses
+    | OBJECTID                                                                 # id
+    | INT                                                                      # int
+    | STRING                                                                   # string
+    | TRUE                                                                     # true
+    | FALSE                                                                    # false
+    | OBJECTID ASSIGNMENT expression                                           # assignment
+    ;
+
+// key words
+
 CLASS
-   : C L A S S
-   ;
+    : C L A S S
+    ;
 
 ELSE
-   : E L S E
-   ;
+    : E L S E
+    ;
 
 FALSE
-   : 'f' A L S E
-   ;
+    : 'f' A L S E
+    ;
 
 FI
-   : F I
-   ;
+    : F I
+    ;
 
 IF
-   : I F
-   ;
+    : I F
+    ;
 
 IN
-   : I N
-   ;
+    : I N
+    ;
 
 INHERITS
-   : I N H E R I T S
-   ;
+    : I N H E R I T S
+    ;
 
 ISVOID
-   : I S V O I D
-   ;
+    : I S V O I D
+    ;
 
 LET
-   : L E T
-   ;
+    : L E T
+    ;
 
 LOOP
-   : L O O P
-   ;
+    : L O O P
+    ;
 
 POOL
-   : P O O L
-   ;
+    : P O O L
+    ;
 
 THEN
-   : T H E N
-   ;
+    : T H E N
+    ;
 
 WHILE
-   : W H I L E
-   ;
+    : W H I L E
+    ;
 
 CASE
-   : C A S E
-   ;
+    : C A S E
+    ;
 
 ESAC
-   : E S A C
-   ;
+    : E S A C
+    ;
 
 NEW
-   : N E W
-   ;
+    : N E W
+    ;
 
 OF
-   : O F
-   ;
+    : O F
+    ;
 
 NOT
-   : N O T
-   ;
+    : N O T
+    ;
 
 TRUE
-   : 't' R U E
-   ;
-   // primitives
-   
+    : 't' R U E
+    ;
+
+// primitives
+
 STRING
-   : '"' (ESC | ~ ["\\])* '"'
-   ;
+    : '"' (ESC | ~ ["\\])* '"'
+    ;
 
 INT
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 TYPEID
-   : [A-Z] [_0-9A-Za-z]*
-   ;
+    : [A-Z] [_0-9A-Za-z]*
+    ;
 
 OBJECTID
-   : [a-z] [_0-9A-Za-z]*
-   ;
+    : [a-z] [_0-9A-Za-z]*
+    ;
 
 ASSIGNMENT
-   : '<-'
-   ;
+    : '<-'
+    ;
 
 CASE_ARROW
-   : '=>'
-   ;
+    : '=>'
+    ;
 
 ADD
-   : '+'
-   ;
+    : '+'
+    ;
 
 MINUS
-   : '-'
-   ;
+    : '-'
+    ;
 
 MULTIPLY
-   : '*'
-   ;
+    : '*'
+    ;
 
 DIVISION
-   : '/'
-   ;
+    : '/'
+    ;
 
 LESS_THAN
-   : '<'
-   ;
+    : '<'
+    ;
 
 LESS_EQUAL
-   : '<='
-   ;
+    : '<='
+    ;
 
 EQUAL
-   : '='
-   ;
+    : '='
+    ;
 
 INTEGER_NEGATIVE
-   : '~'
-   ;
+    : '~'
+    ;
 
 fragment A
-   : [aA]
-   ;
+    : [aA]
+    ;
 
 fragment C
-   : [cC]
-   ;
+    : [cC]
+    ;
 
 fragment D
-   : [dD]
-   ;
+    : [dD]
+    ;
 
 fragment E
-   : [eE]
-   ;
+    : [eE]
+    ;
 
 fragment F
-   : [fF]
-   ;
+    : [fF]
+    ;
 
 fragment H
-   : [hH]
-   ;
+    : [hH]
+    ;
 
 fragment I
-   : [iI]
-   ;
+    : [iI]
+    ;
 
 fragment L
-   : [lL]
-   ;
+    : [lL]
+    ;
 
 fragment N
-   : [nN]
-   ;
+    : [nN]
+    ;
 
 fragment O
-   : [oO]
-   ;
+    : [oO]
+    ;
 
 fragment P
-   : [pP]
-   ;
+    : [pP]
+    ;
 
 fragment R
-   : [rR]
-   ;
+    : [rR]
+    ;
 
 fragment S
-   : [sS]
-   ;
+    : [sS]
+    ;
 
 fragment T
-   : [tT]
-   ;
+    : [tT]
+    ;
 
 fragment U
-   : [uU]
-   ;
+    : [uU]
+    ;
 
 fragment V
-   : [vV]
-   ;
+    : [vV]
+    ;
 
 fragment W
-   : [wW]
-   ;
+    : [wW]
+    ;
 
 fragment ESC
-   : '\\' (["\\/bfnrt] | UNICODE)
-   ;
+    : '\\' (["\\/bfnrt] | UNICODE)
+    ;
 
 fragment UNICODE
-   : 'u' HEX HEX HEX HEX
-   ;
+    : 'u' HEX HEX HEX HEX
+    ;
 
 fragment HEX
-   : [0-9a-fA-F]
-   ;
-   // comments
-   
+    : [0-9a-fA-F]
+    ;
+
+// comments
+
 OPEN_COMMENT
-   : '(*'
-   ;
+    : '(*'
+    ;
 
 CLOSE_COMMENT
-   : '*)'
-   ;
+    : '*)'
+    ;
 
 COMMENT
-   : OPEN_COMMENT (COMMENT | .)*? CLOSE_COMMENT -> skip
-   ;
+    : OPEN_COMMENT (COMMENT | .)*? CLOSE_COMMENT -> skip
+    ;
 
 ONE_LINE_COMMENT
-   : '--' (~ '\n')* '\n'? -> skip
-   ;
-   // skip spaces, tabs, newlines, note that \v is not suppoted in antlr
-   
-WHITESPACE
-   : [ \t\r\n\f]+ -> skip
-   ;
+    : '--' (~ '\n')* '\n'? -> skip
+    ;
 
+// skip spaces, tabs, newlines, note that \v is not suppoted in antlr
+
+WHITESPACE
+    : [ \t\r\n\f]+ -> skip
+    ;
