@@ -1,6 +1,8 @@
 CREATE OR REPLACE PACKAGE pkg_prc_with_properties AS
   PROCEDURE access_prc_with_properties;
 
+  PRAGMA DEPRECATE(prc_with_properties, 'no more supported');
+
   PROCEDURE prc_with_properties
     PARALLEL_ENABLE
     ACCESSIBLE BY (PROCEDURE access_prc_with_properties);

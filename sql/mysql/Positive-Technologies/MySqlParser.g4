@@ -3011,6 +3011,7 @@ keywordsCanBeId
     | RESOURCE_GROUP_USER
     | RESUME
     | RETURNED_SQLSTATE
+    | RETURNING
     | RETURNS
     | REUSE
     | ROLE
