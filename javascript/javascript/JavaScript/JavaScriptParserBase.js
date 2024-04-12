@@ -43,22 +43,6 @@ export default class JavaScriptParserBase extends antlr4.Parser {
         return this._input.LT(1).type === JavaScriptParser.CloseBrace;
     }
 
-    here(type) {
-        // Get the most recently emitted token.
-        const currentToken = this._input.LT(-1);
-
-        // Get the next token index.
-        const nextTokenIndex = currentToken == null ? 0 : currentToken.tokenIndex + 1;
-
-        // Get the token after the `currentToken`. By using `_input.get(index)`,
-        // we also grab a token that is (possibly) on the HIDDEN channel.
-        const nextToken = this._input.get(nextTokenIndex);
-
-        // Check if the token resides on the HIDDEN channel and if it's of the
-        // provided type.
-        return nextToken.channel === antlr4.Lexer.HIDDEN && nextToken.type === type;
-    }
-
     lineTerminatorAhead() {
         let possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
         if (possibleIndexEosToken < 0) return false;

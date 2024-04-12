@@ -53,36 +53,6 @@ public abstract class JavaScriptParserBase extends Parser
 
     /**
      * Returns {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     *
-     * @param type
-     *         the type of the token on the {@code HIDDEN} channel
-     *         to check.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     */
-    private boolean here(final int type) {
-
-        // Get the most recently emitted token.
-        Token currentToken = _input.LT(-1);
-
-        // Get the next token index.
-        int nextTokenIndex = currentToken == null ? 0 : currentToken.getTokenIndex() + 1;
-
-        // Get the token after the `currentToken`. By using `_input.get(index)`,
-        // we also grab a token that is (possibly) on the HIDDEN channel.
-        Token nextToken = _input.get(nextTokenIndex);
-
-        // Check if the token resides on the HIDDEN channel and if it's of the
-        // provided type.
-        return (nextToken.getChannel() == Lexer.HIDDEN) && (nextToken.getType() == type);
-    }
-
-    /**
-     * Returns {@code true} iff on the current index of the parser's
      * token stream a token exists on the {@code HIDDEN} channel which
      * either is a line terminator, or is a multi line comment that
      * contains a line terminator.

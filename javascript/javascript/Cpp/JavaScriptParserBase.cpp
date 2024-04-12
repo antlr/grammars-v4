@@ -39,23 +39,6 @@ bool JavaScriptParserBase::closeBrace()
     return _input->LT(1)->getType() == JavaScriptParser::CloseBrace;
 }
 
-bool JavaScriptParserBase::here(int type)
-{
-    // Get the most recently emitted token.
-    auto currentToken = _input->LT(-1);
-
-    // Get the next token index.
-    int nextTokenIndex = currentToken == nullptr ? 0 : currentToken->getTokenIndex() + 1;
-
-    // Get the token after the `currentToken`. By using `_input.get(index)`,
-    // we also grab a token that is (possibly) on the HIDDEN channel.
-    auto nextToken = _input->get(nextTokenIndex);
-
-    // Check if the token resides on the HIDDEN channel and if it's of the
-    // provided type.
-    return (nextToken->getChannel() == Lexer::HIDDEN) && (nextToken->getType() == type);
-}
-
 bool JavaScriptParserBase::lineTerminatorAhead()
 {
     // Get the token ahead of the current index.
