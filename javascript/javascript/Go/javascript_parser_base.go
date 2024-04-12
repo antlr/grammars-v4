@@ -58,7 +58,7 @@ func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 
 	if ahead.GetChannel() != antlr.LexerHidden {
 		// We're only interested in tokens on the HIDDEN channel.
-		return true
+		return false
 	}
 
 	if ahead.GetTokenType() == JavaScriptParserLineTerminator {
