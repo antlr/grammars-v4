@@ -2385,7 +2385,7 @@ xml_index_option
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_or_alter_procedure
-    : ((CREATE (OR (ALTER | REPLACE))?) | ALTER) proc = (PROC | PROCEDURE) procName = func_proc_name_schema (
+    : ((CREATE (OR ALTER)?) | ALTER) proc = (PROC | PROCEDURE) procName = func_proc_name_schema (
         ';' DECIMAL
     )? ('('? procedure_param (',' procedure_param)* ')'?)? (
         WITH procedure_option (',' procedure_option)*
@@ -2403,7 +2403,7 @@ create_or_alter_trigger
     ;
 
 create_or_alter_dml_trigger
-    : (CREATE (OR (ALTER | REPLACE))? | ALTER) TRIGGER simple_name ON table_name (
+    : (CREATE (OR ALTER)? | ALTER) TRIGGER simple_name ON table_name (
         WITH dml_trigger_option (',' dml_trigger_option)*
     )? (FOR | AFTER | INSTEAD OF) dml_trigger_operation (',' dml_trigger_operation)* (WITH APPEND)? (
         NOT FOR REPLICATION
@@ -2420,7 +2420,7 @@ dml_trigger_operation
     ;
 
 create_or_alter_ddl_trigger
-    : (CREATE (OR (ALTER | REPLACE))? | ALTER) TRIGGER simple_name ON (ALL SERVER | DATABASE) (
+    : (CREATE (OR ALTER)? | ALTER) TRIGGER simple_name ON (ALL SERVER | DATABASE) (
         WITH dml_trigger_option (',' dml_trigger_option)*
     )? (FOR | AFTER) ddl_trigger_operation (',' ddl_trigger_operation)* AS sql_clauses+
     ;
@@ -2568,7 +2568,7 @@ create_table_index_option
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
 create_view
-    : (CREATE (OR (ALTER | REPLACE))? | ALTER) VIEW simple_name ('(' column_name_list ')')? (
+    : (CREATE (OR ALTER)? | ALTER) VIEW simple_name ('(' column_name_list ')')? (
         WITH view_attribute (',' view_attribute)*
     )? AS select_statement_standalone (WITH CHECK OPTION)? ';'?
     ;

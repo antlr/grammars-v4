@@ -10,7 +10,7 @@ FROM xyz
 ;
 GO
 
-CREATE OR REPLACE VIEW xyz_view
+CREATE VIEW xyz_view
 AS
 SELECT
     ccc,
