@@ -95,10 +95,10 @@ collate_seq
 
 user_seq
    : seq1
-   | user_seq alt seq1
+   | user_seq alt_ seq1
    ;
 
-alt
+alt_
    : '|'
    | '/'
    ;
@@ -265,7 +265,7 @@ token_attr
 
 token_exp
    : token_exp1
-   | token_exp alt token_exp1
+   | token_exp alt_ token_exp1
    ;
 
 token_exp1
@@ -333,7 +333,7 @@ opt_picture
 
 picture
    : pic1
-   | picture alt pic1
+   | picture alt_ pic1
    ;
 
 pic1
