@@ -1,0 +1,26 @@
+module compress_blanks;
+
+    !+
+    !   This SCAN program will read the file bound to the logical name
+    !   SCN$INPUT.  One or more tabs or spaces found in the file will
+    !   be compressed to a single space.  The result of the translation
+    !   is placed in the file bound to the logical name SCN$OUTPUT.
+    !-
+
+    token blanks	{ { ' ' | s'ht' }... };
+
+    macro compress trigger { blanks };
+
+    	answer ' ';
+
+    end macro;
+
+    procedure main main;
+
+    	start scan 
+	    input file 'scn$input'
+	    output file 'scn$output';
+
+    end procedure;
+
+end module;

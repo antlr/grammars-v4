@@ -1,0 +1,121 @@
+MODULE global_replace;
+
+    !+
+    !   Replace a specified string with another specified string in a set
+    !   of files.  The match on the string to be replaced may be made
+    !   optionally caseless.
+    !-
+ 
+    !+
+    !   Declare the characteristics of the search.  To change the
+    !   search string, replacement string, or caseless switch, just change
+    !   any of these CONSTANT definitions and rebuild the program.
+    !-
+
+    CONSTANT search_string	= 'old';	! string to be replaced
+    CONSTANT replacement_string	= 'new';	! string to replace with
+    CONSTANT caseless_search	= TRUE;		! TRUE if search is caseless
+
+    TOKEN search_token CASELESS		{ search_string };
+
+    DECLARE
+	    replacement_count : INTEGER;	! number of replacements
+
+    !+
+    !   Macro replace_string will be triggered as each occurrence of
+    !   search_string is encountered in the input stream.  Note that
+    !   the token search_token is caseless, so the body of the macro
+    !   will check to see if a caseless match is allowed.
+    !-
+
+    MACRO replace_string TRIGGER { str: search_token };
+
+	IF NOT caseless_search
+	THEN
+	    IF str <> search_string
+	    THEN
+		FAIL;
+	    END IF;
+	END IF;
+
+	replacement_count = replacement_count + 1;
+
+	ANSWER replacement_string;
+
+    END MACRO;
+
+    EXTERNAL PROCEDURE lib$find_file ( STRING,
+    				       STRING,
+    				       INTEGER ) OF INTEGER;
+    
+    EXTERNAL PROCEDURE lib$find_file_end ( INTEGER ) OF INTEGER;
+    
+    PROCEDURE replace_file ( in_file_name : STRING );
+
+	DECLARE out_file_name, plural_string : STRING;
+
+    !+
+    !    The new file will be a new version of the input file.
+    !-
+
+	out_file_name = in_file_name [
+				1 .. index ( in_file_name, ';' ) - 1 ];
+
+    !+
+    !    Display the name of each file as it is processed.
+    !-
+
+	WRITE 'processing: ', in_file_name;
+
+	replacement_count = 0;
+
+	START SCAN
+		INPUT FILE in_file_name
+		OUTPUT FILE out_file_name;
+
+    !+
+    !    Output the number of substitutions for this file.
+    !-
+
+	IF replacement_count = 1
+	THEN
+	    plural_string = '';
+	ELSE
+	    plural_string = 's';
+	END IF;
+
+	WRITE replacement_count, ' substitution', plural_string, ' performed.';
+
+    END PROCEDURE /* replace_file */ ;
+     
+    PROCEDURE main MAIN;
+     
+	DECLARE file_spec, full_file_name, file_name : STRING;
+	DECLARE context: INTEGER;
+
+    !+
+    !    Get the optionally wildcarded file specification to be processed.
+    !-
+
+	READ PROMPT ( 'Enter file specification to process: ' ) file_spec;
+
+	context = 0;
+
+	WHILE (lib$find_file ( file_spec, full_file_name, context ) AND 1) = 1;
+
+	    CALL replace_file ( full_file_name );
+
+	END WHILE;
+
+    !+
+    !    Free the find_file context
+    !-
+
+	IF (lib$find_file_end ( context ) AND 1) <> 1
+	THEN
+	    WRITE 'Error freeing the find_file context.';
+	END IF;
+
+    END PROCEDURE /* main */;
+ 
+END MODULE /* global_replace */ ;
