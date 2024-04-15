@@ -8,7 +8,7 @@ text strings and text files. The primary applications for VAX SCAN are
 filters, translators, extractors/analyzers, and preprocessors."
 
 Digital Equipment (DEC) having decided not to continue the product or port
-it to their new hardware plaforms (ALPHA and Itanium) made the source
+it to their new hardware platforms (ALPHA and Itanium) made the source
 code FREEWARE.
 
 This ANTLR4 grammar is based on the BNF provided in the source code.
