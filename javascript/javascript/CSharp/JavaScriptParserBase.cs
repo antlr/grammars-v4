@@ -49,7 +49,7 @@ public abstract class JavaScriptParserBase : Parser
 
     protected bool notLineTerminator()
     {
-        return !here(LineTerminator);
+        return !lineTerminatorAhead();
     }
 
     protected bool notOpenBraceAndNotFunction()
@@ -61,30 +61,6 @@ public abstract class JavaScriptParserBase : Parser
     protected bool closeBrace()
     {
         return ((ITokenStream)this.InputStream).LT(1).Type == CloseBrace;
-    }
-
-    /// <summary>Returns true if on the current index of the parser's
-    /// token stream a token of the given type exists on the
-    /// Hidden channel.
-    /// </summary>
-    /// <param name="type">
-    /// The type of the token on the Hidden channel to check.
-    /// </param>
-    protected bool here(int type)
-    {
-        // Get the most recently emitted token.
-        IToken currentToken = ((ITokenStream)this.InputStream).LT(-1);
-
-        // Get the next token index.
-        int nextTokenIndex = currentToken == null ? 0 : currentToken.TokenIndex + 1;
-
-        // Get the token after the `currentToken`. By using `_input.get(index)`,
-        // we also grab a token that is (possibly) on the HIDDEN channel.
-        IToken nextToken = ((ITokenStream)this.InputStream).Get(nextTokenIndex);
-
-        // Check if the token resides on the HIDDEN channel and if it's of the
-        // provided type.
-        return (nextToken.Channel == Lexer.Hidden) && (nextToken.Type == type);
     }
 
     /// <summary>
