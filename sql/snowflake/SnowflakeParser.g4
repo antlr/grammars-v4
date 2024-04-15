@@ -1671,13 +1671,13 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
         arg_decl (COMMA arg_decl)*
-    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) (
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) null_not_null? (
         LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
     )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
         PACKAGES EQ '(' string_list ')'
     )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
         PACKAGES EQ '(' string_list ')'
-    )? (HANDLER EQ string)? null_not_null? comment_clause? AS function_definition
+    )? (HANDLER EQ string)? comment_clause? AS function_definition
     | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
         | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
