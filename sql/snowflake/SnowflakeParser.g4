@@ -3467,6 +3467,7 @@ keyword
     | WAREHOUSE
     | MODE
     | ACTION
+    | ACCOUNT
     // etc
     ;
 
