@@ -900,57 +900,6 @@ id
 * Lexer
 */
    
-   
-AMPERSAND
-   : '&'
-   ;
-/*APOSTROPHE	: '\'\''; */
-   
-   
-ATSIGN
-   : '@'
-   ;
-
-BACKSLASH
-   : '\\'
-   ;
-
-BAR
-   : '|'
-   ;
-
-COLON
-   : ':'
-   ;
-
-LEFT_BRACKET
-   : '{'
-   ;
-
-LEFT_PAREN
-   : '('
-   ;
-
-MINUS
-   : '-'
-   ;
-
-RIGHT_BRACKET
-   : '}'
-   ;
-
-RIGHT_PAREN
-   : ')'
-   ;
-
-SEMICOLON
-   : ';'
-   ;
-
-UNDERSCORE
-   : '_'
-   ;
-
 ALIAS
    : 'ALIAS'
    ;
