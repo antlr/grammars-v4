@@ -249,7 +249,7 @@ drop_stmt
     + -
     << >> & |
     < <= > >=
-    = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP
+    = == != <> IS IS NOT IS DISTINCT FROM IS NOT DISTINCT FROM IN LIKE GLOB MATCH REGEXP
     AND
     OR
  */
@@ -270,6 +270,7 @@ expr
         | NOT_EQ2
         | IS_
         | IS_ NOT_
+        | IS_ NOT_? DISTINCT_ FROM_
         | IN_
         | LIKE_
         | GLOB_
