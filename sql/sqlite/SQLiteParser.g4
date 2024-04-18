@@ -422,7 +422,7 @@ result_column
 
 join_operator
     : COMMA
-    | NATURAL_? (LEFT_ OUTER_? | INNER_ | CROSS_)? JOIN_
+    | NATURAL_? ((LEFT_ | RIGHT_ | FULL_) OUTER_? | INNER_ | CROSS_)? JOIN_
 ;
 
 join_constraint
