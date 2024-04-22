@@ -1,28 +1,55 @@
 grammar YamlGrammar;
 
-yaml: document+;
+yaml
+   : document+
+   ;
 
-document: key_value_pairs EOF;
+document
+   : key_value_pairs EOF
+   ;
 
-key_value_pairs: key_value_pair
-              | key_value_pairs key_value_pair;
+key_value_pairs
+   : key_value_pair
+   | key_value_pairs key_value_pair
+   ;
 
-key_value_pair: key ':' value;
+key_value_pair
+   : key ':' value
+   ;
 
-key: STRING;
+key
+   : STRING
+   ;
 
-value: STRING
-     | NUMBER
-     | BOOLEAN
-     | list
-     | key_value_pairs;
+value
+   : STRING
+   | NUMBER
+   | BOOLEAN
+   | list
+   | key_value_pairs
+   ;
 
-list: '[' value (',' value)* ']';
+list
+   : '[' value (',' value)* ']'
+   ;
 
-STRING: '"' ~["]* '"';
-NUMBER: ('-'? [0-9]+ '.' [0-9]+);
-BOOLEAN: ('true' | 'false');
+STRING
+   : '"' ~ ["]* '"'
+   ;
 
-WS: [ \t\r\n]+ -> skip;
+NUMBER
+   : ('-'? [0-9]+ '.' [0-9]+)
+   ;
 
-COMMENT: '#' ~[\r\n]* -> skip;
+BOOLEAN
+   : ('true' | 'false')
+   ;
+
+WS
+   : [ \t\r\n]+ -> skip
+   ;
+
+COMMENT
+   : '#' ~ [\r\n]* -> skip
+   ;
+
