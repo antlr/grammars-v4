@@ -3468,6 +3468,7 @@ keyword
     | MODE
     | ACTION
     | ACCOUNT
+    | SEQUENCE
     // etc
     ;
 
