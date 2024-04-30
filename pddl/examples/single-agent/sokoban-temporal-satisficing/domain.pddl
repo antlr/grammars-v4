@@ -1,16 +1,21 @@
 (define (domain sokoban-temporal)
   (:requirements :typing :durative-actions)
-  (:types thing location direction - object
-          player stone - thing)
+  (:types
+  thing - object
+  location - object
+  direction - object
+  player - thing
+  stone - thing
+  )
   (:predicates (clear ?l - location)
 	       (at ?t - thing ?l - location)
 	       (at-goal ?s - stone)
 	       (IS-GOAL ?l - location)
 	       (IS-NONGOAL ?l - location)
-               (MOVE-DIR ?from ?to - location ?dir - direction))
+               (MOVE-DIR ?from - location ?to - location ?dir - direction))
 
   (:durative-action move
-   :parameters (?p - player ?from ?to - location ?dir - direction)
+   :parameters (?p - player ?from - location ?to - location ?dir - direction)
    :duration  (= ?duration 1)
    :condition (and (at start (at ?p ?from))
                    (at start (clear ?to))
@@ -25,7 +30,7 @@
 
   (:durative-action push-to-nongoal
    :parameters (?p - player ?s - stone
-                ?ppos ?from ?to - location
+                ?ppos - location ?from - location ?to - location
                 ?dir - direction)
    :duration (= ?duration 1)
    :condition (and (at start (at ?p ?ppos))
@@ -47,7 +52,7 @@
 
   (:durative-action push-to-goal
    :parameters (?p - player ?s - stone
-                ?ppos ?from ?to - location
+                ?ppos - location ?from - location ?to - location
                 ?dir - direction)
    :duration  (= ?duration 1)
    :condition (and (at start (at ?p ?ppos))

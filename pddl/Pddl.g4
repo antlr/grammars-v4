@@ -544,6 +544,7 @@ REQUIRE_KEY
     | ':timed-initial-literals'
     | ':preferences'
     | ':constraints'
+    | ':numeric-fluents'
     | ':multi-agent'
     | ':unfactored-privacy'
     ;

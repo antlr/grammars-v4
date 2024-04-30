@@ -38,7 +38,7 @@ p1 p2 p3 p4 p5  - product
 (shipped o5)
 ))
 
-(:metric minimize (total-time))
+(:metric minimize (total-cost))
 
 )
 

@@ -694,5 +694,5 @@ hud_bradley bradley_ainley hud_brigh a629 ainley_greet ainley_brigh greet_halifa
 (at tow_truck9 garage_huddersfield)
 (at tow_truck10 garage_brighouse)
 ))
-(:metric minimize (total-time))
+(:metric minimize (total-cost))
 )
