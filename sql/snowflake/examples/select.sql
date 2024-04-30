@@ -81,3 +81,8 @@ SELECT ANY_VALUE(C1),C2 FROM T GROUP BY C2;
 SELECT id, name INTO :id_variable, :name_variable FROM some_data WHERE id = 1;
 
 select * from snowflake.information_schema.tables having table_catalog = '' limit 1;
+
+SELECT n, scale, ROUND(n, scale) FROM t;
+SELECT ROUND(2.5, 0), ROUND(2.5, 0, 'HALF_TO_EVEN'), CEIL(2.5, 0), FLOOR(2.5, 0), TRUNC(3.14,-1), TRUNCATE(3.14116,2);
+SELECT ROUND( EXPR => -2.5, SCALE => 0, ROUNDING_MODE => 'HALF_AWAY_FROM_ZERO_Q');
+SELECT EXPR, SCALE, ROUNDING_MODE, SEQUENCE FROM t;

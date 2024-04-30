@@ -222,8 +222,8 @@ IDENTIFIER:
     '"' (~'"' | '""')* '"'
     | '`' (~'`' | '``')* '`'
     | '[' ~']'* ']'
-    | [A-Z_] [A-Z_0-9]*
-; // TODO check: needs more chars in set
+    | [A-Z_\u007F-\uFFFF] [A-Z_0-9\u007F-\uFFFF]*
+;
 
 NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | '0x' HEX_DIGIT+;
 
