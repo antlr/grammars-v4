@@ -1,0 +1,25 @@
+commandline ::= list
+          |  list ";"
+          |  list "&"
+
+list     ::=  conditional
+          |   list ";" conditional
+          |   list "&" conditional
+
+conditional ::=  pipeline
+          |   conditional "&&" pipeline
+          |   conditional "||" pipeline
+
+pipeline ::=  command
+          |   pipeline "|" command
+
+command  ::=  word
+          |   redirection
+          |   command word
+          |   command redirection
+
+redirection  ::=  redirectionop filename
+redirectionop  ::=  "<"  |  ">"  |  "2>"
+list     ::=  conditional
+          |   list ";" conditional
+          |   list "&" conditional
