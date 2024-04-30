@@ -71,7 +71,6 @@
        (higher ?e0 Zero)
        (next ?e0 ?e1)
        (neighbor ?sender ?receiver)
-       (not (= ?sender ?receiver))
        (is-message-at ?m ?sender)
        (not (is-message-at ?m ?receiver))
        (not (sending ?sender ?receiver ?m))
@@ -117,3 +116,4 @@
  )
 
 )
+
