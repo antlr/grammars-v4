@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "trcaret": {
-      "version": "0.22.0",
+      "version": "0.23.0",
       "commands": [
         "trcaret"
       ]
@@ -21,7 +21,7 @@
       ]
     },
     "trglob": {
-      "version": "0.22.0",
+      "version": "0.23.0",
       "commands": [
         "trglob"
       ]
@@ -45,19 +45,19 @@
       ]
     },
     "trwdog": {
-      "version": "0.22.0",
+      "version": "0.23.0",
       "commands": [
         "trwdog"
       ]
     },
     "trxgrep": {
-      "version": "0.22.0",
+      "version": "0.23.0",
       "commands": [
         "trxgrep"
       ]
     },
     "trxml": {
-      "version": "0.22.0",
+      "version": "0.23.0",
       "commands": [
         "trxml"
       ]
