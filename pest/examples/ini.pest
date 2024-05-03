@@ -1,0 +1,14 @@
+file = {
+    SOI ~
+    ((section | property)? ~ NEWLINE)* ~
+    EOI
+}
+
+char = { ASCII_ALPHANUMERIC | "." | "_" | "/" }
+
+section = { "[" ~ name ~ "]" }
+property = { name ~ "=" ~ value }
+    name = @{ char+ }
+    value = @{ char* }
+
+WHITESPACE = _{ " " }
