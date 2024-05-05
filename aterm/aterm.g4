@@ -47,15 +47,15 @@ termlist: term_ (',' term_)* ;
 
 annotation: '{' termlist? '}';
 
-num_: INT | REAL;
+num_: INT_ | REAL;
 
-REAL: INT '.' NAT EXP_?;
+REAL: INT_ '.' NAT EXP_?;
 
-INT: ('+' |'-')? NAT;
+INT_: ('+' |'-')? NAT;
 
 NAT: [0-9]+;
 
-EXP_: (('e'|'E') INT) | 'ε';
+EXP_: (('e'|'E') INT_) | 'ε';
 
 AFUN : STRING_ | ID_;
 
