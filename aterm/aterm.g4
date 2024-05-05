@@ -47,9 +47,9 @@ termlist: term_ (',' term_)* ;
 
 annotation: '{' termlist? '}';
 
-num_: INT_ | REAL;
+num_: INT_ | REAL_;
 
-REAL: INT_ '.' NAT EXP_?;
+REAL_: INT_ '.' NAT EXP_?;
 
 INT_: ('+' |'-')? NAT;
 
