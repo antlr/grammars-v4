@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar aterm;
 
-term_: (num| function_ | placeholder | list_ ) annotation?;
+term_: (num_| function_ | placeholder | list_ ) annotation?;
 
 function_: AFUN ( '(' termlist? ')')?;
 
@@ -47,21 +47,21 @@ termlist: term_ (',' term_)* ;
 
 annotation: '{' termlist? '}';
 
-num: INT | REAL;
+num_: INT | REAL;
 
-REAL: INT '.' NAT EXP?;
+REAL: INT '.' NAT EXP_?;
 
 INT: ('+' |'-')? NAT;
 
 NAT: [0-9]+;
 
-EXP: (('e'|'E') INT) | 'ε';
+EXP_: (('e'|'E') INT) | 'ε';
 
-AFUN : STRING | ID;
+AFUN : STRING_ | ID_;
 
-ID: [a-zA-Z][a-zA-Z0-9]*;
+ID_: [a-zA-Z][a-zA-Z0-9]*;
 
-STRING: '"' ~'"'* '"';
+STRING_: '"' ~'"'* '"';
 
 WS
     : [ \r\n\t]+ -> skip
