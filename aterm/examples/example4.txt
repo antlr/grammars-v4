@@ -1,0 +1,1 @@
+exam(pair(yellow,9),10, "any")
