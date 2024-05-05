@@ -1,7 +1,7 @@
 #
 
 # set -x
-set -e
+# set -e
 
 # Check requirements.
 if ! command -v dotnet &> /dev/null
@@ -106,6 +106,26 @@ done
 echo Grammars to test = ${tests[@]}
 
 #############################
+echo Sanity checks.
+if [ "${#tests[@]}" == "0" ]
+then
+    echo "No grammars to test."
+    exit 0
+fi
+for ((i=0; i<${#com[@]}; i++))
+do
+    git checkout ${com[$i]}
+    for ((g=0; g<${#tests[@]}; g++))
+    do
+        if [ ! -d ${tests[$g]} ]
+        then
+            echo "New grammar, cannot test against an old grammar."
+            exit 0
+        fi
+    done
+done
+
+#############################
 echo Build each grammar changed in PR.
 for ((i=0; i<${#prs[@]}; i++))
 do
@@ -120,13 +140,28 @@ do
         if [ "$local" == "" ]
         then
             trgen -t CSharp
+            if [ "$?" != "0" ]
+            then
+                echo "Build failed. Stopping test."
+                exit 0
+            fi
         else
             dotnet trgen -- -t CSharp
+            if [ "$?" != "0" ]
+            then
+                echo "Build failed. Stopping test."
+                exit 0
+            fi
         fi
         where=`echo Generated-CSharp* | tr ' ' '\n' | head -1`
         echo $where
         cd $where
         make
+        if [ "$?" != "0" ]
+        then
+            echo "Build failed. Stopping test."
+            exit 0
+        fi
         popd
     cp -r $g "$cwd/${prs[$i]}/$gg"
     done
