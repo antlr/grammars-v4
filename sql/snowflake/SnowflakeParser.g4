@@ -217,8 +217,8 @@ format_type
     ;
 
 stage_file_format
-    : STAGE_FILE_FORMAT EQ '(' (FORMAT_NAME EQ string)
-    | (TYPE EQ type_fileformat format_type_options+) ')'
+    : STAGE_FILE_FORMAT EQ LR_BRACKET FORMAT_NAME EQ string
+    | TYPE EQ type_fileformat format_type_options+ RR_BRACKET
     ;
 
 copy_into_location
@@ -286,7 +286,7 @@ grant_to_role
             SCHEMA schema_name
             | ALL SCHEMAS IN DATABASE id_
         )
-        | ( schema_privileges | ALL PRIVILEGES?) ON ( FUTURE SCHEMAS IN DATABASE id_)
+        | ( schema_privileges | ALL PRIVILEGES?) ON FUTURE SCHEMAS IN DATABASE id_
         | (schema_object_privileges | ALL PRIVILEGES?) ON (
             object_type object_name
             | ALL object_type_plural IN ( DATABASE id_ | SCHEMA schema_name)
@@ -445,7 +445,7 @@ named_stage
     ;
 
 stage_path
-    : STAGE_PATH
+    : DIVIDE (ID (DIVIDE ID)* DIVIDE?)?
     ;
 
 put
@@ -1671,13 +1671,13 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
         arg_decl (COMMA arg_decl)*
-    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) (
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) null_not_null? (
         LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
     )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
         PACKAGES EQ '(' string_list ')'
     )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
         PACKAGES EQ '(' string_list ')'
-    )? (HANDLER EQ string)? null_not_null? comment_clause? AS function_definition
+    )? (HANDLER EQ string)? comment_clause? AS function_definition
     | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
         | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
@@ -3424,6 +3424,7 @@ id_
     | object_type_plural
     | data_type
     | builtin_function
+    | unary_or_binary_builtin_function
     | binary_builtin_function
     | binary_or_ternary_builtin_function
     | ternary_builtin_function
@@ -3466,6 +3467,8 @@ keyword
     | WAREHOUSE
     | MODE
     | ACTION
+    | ACCOUNT
+    | SEQUENCE
     // etc
     ;
 
@@ -3556,6 +3559,9 @@ non_reserved_words
     | OUTER
     | RECURSIVE
     | MODE
+    | EXPR
+    | SCALE
+    | ROUNDING_MODE
     ;
 
 builtin_function
@@ -3575,9 +3581,20 @@ builtin_function
     | SPLIT_TO_TABLE
     | CAST
     | TRY_CAST
+    | ANY_VALUE
+    | GETDATE
     ;
 
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
+unary_or_binary_builtin_function
+    // lexer entry of function name which admit 1, 2 or more parameters
+    // expr rule use this
+    : FLOOR
+    | TRUNCATE
+    | TRUNC
+    | CEIL
+    | ROUND
+    ;
 
 binary_builtin_function
     // lexer entry of function name which admit 2 parameters
@@ -3809,7 +3826,9 @@ over_clause
     ;
 
 function_call
-    : binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
+    : round_expr
+    | unary_or_binary_builtin_function LR_BRACKET expr (COMMA expr)* RR_BRACKET
+    | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
     | ranking_windowed_function
@@ -3927,12 +3946,12 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | (EXCEPT | MINUS_) | INTERSECT) select_statement
-    | ('(' select_statement ')')
+    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement //EXCEPT and MINUS have same SQL meaning
+    | LR_BRACKET select_statement RR_BRACKET
     ;
 
 select_optional_clauses
-    : into_clause? from_clause? where_clause? group_by_clause? qualify_clause? order_by_clause?
+    : into_clause? from_clause? where_clause? (group_by_clause | having_clause)? qualify_clause? order_by_clause?
     ;
 
 select_clause
@@ -3956,15 +3975,24 @@ select_list
     ;
 
 select_list_elem
-    : column_elem
+    : column_elem as_alias?
+    | column_elem_star
     //    | udt_elem
-    | expression_elem
+    | expression_elem as_alias?
+    ;
+
+column_elem_star
+    : object_name_or_alias? STAR
     ;
 
 column_elem
-    : (object_name | alias DOT)? STAR
-    | (object_name | alias DOT)? column_name as_alias?
-    | (object_name | alias DOT)? DOLLAR column_position as_alias?
+    : object_name_or_alias? column_name
+    | object_name_or_alias? DOLLAR column_position
+    ;
+
+object_name_or_alias
+    : object_name
+    | alias DOT
     ;
 
 as_alias
@@ -3972,7 +4000,8 @@ as_alias
     ;
 
 expression_elem
-    : (expr | predicate) as_alias?
+    : expr
+    | predicate
     ;
 
 column_position
@@ -3993,7 +4022,7 @@ into_clause
     ;
 
 var_list
-    : var (COMMA var)
+    : var (COMMA var)*
     ;
 
 var
@@ -4224,15 +4253,19 @@ where_clause
     : WHERE search_condition
     ;
 
-group_item
-    : id_
+group_by_elem
+    : column_elem
     | num
-    | expr
+    | expression_elem
+    ;
+
+group_by_list
+    : group_by_elem (COMMA group_by_elem)*
     ;
 
 group_by_clause
-    : GROUP BY group_item (COMMA group_item)* having_clause?
-    | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_item (COMMA group_item)* RR_BRACKET
+    : GROUP BY group_by_list having_clause?
+    | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_by_list RR_BRACKET
     | GROUP BY ALL
     ;
 
@@ -4265,4 +4298,14 @@ first_next
 limit_clause
     : LIMIT num (OFFSET num)?
     | (OFFSET num)? row_rows? FETCH first_next? num row_rows? ONLY?
+    ;
+
+round_mode
+    : HALF_AWAY_FROM_ZERO_Q
+    | HALF_TO_EVEN_Q
+    ;
+
+round_expr
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;

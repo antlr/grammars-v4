@@ -69,10 +69,8 @@ fragment INT
 
 fragment EXP
     // exponent number permits leading 0s (e.g. `1e01`)
-    : [Ee] [+\-]? [0-9]+
+    : [Ee] [+-]? [0-9]+
     ;
-
-// \- since - means "range" inside [...]
 
 WS
     : [ \t\n\r]+ -> skip

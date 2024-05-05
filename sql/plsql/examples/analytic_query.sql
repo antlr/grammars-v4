@@ -40,6 +40,18 @@ select deptno
      , listagg(UNIQUE edepartment, ',' ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as edepartments
 from emp;
 
+select deptno
+     , ename
+     , hiredate
+     , listagg(UNIQUE ename, (',') || TO_CHAR(13) ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as employees
+from emp;
+
+select deptno
+     , ename
+     , hiredate
+     , listagg(UNIQUE ename, d ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as employees
+from emp;
+
  select metric_id ,bsln_guid ,timegroup ,obs_value as obs_value 
  , cume_dist () over (partition by metric_id, bsln_guid, timegroup order by obs_value ) as cume_dist 
  , count(1) over (partition by metric_id, bsln_guid, timegroup ) as n 

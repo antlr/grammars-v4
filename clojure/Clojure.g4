@@ -2,7 +2,7 @@
    work so that rather than reading "a bunch of crap in parens" some
    syntactic information is preserved and recovered. Dec. 14 2014.
 
-   Converted to ANTLR 4 by Terence Parr. Unsure of provence. I see
+   Converted to ANTLR 4 by Terence Parr. Unsure of provenance. I see
    it commited by matthias.koester for clojure-eclipse project on
    Oct 5, 2009:
 
