@@ -26,4 +26,26 @@ public class Fortran90LexerBase : Lexer
     {
         return this.Column == 0;
     }
+
+    public bool VerifyNotOperator()
+    {
+	    var c1 = this.InputStream.LA(1);
+        if (c1 == 'a')
+        {
+            var c2 = this.InputStream.LA(2);
+            if (c2 == 'n')
+            {
+                var c3 = this.InputStream.LA(3);
+                if (c3 == 'd')
+                {
+                    var c4 = this.InputStream.LA(4);
+                    if (c4 == '.')
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }
