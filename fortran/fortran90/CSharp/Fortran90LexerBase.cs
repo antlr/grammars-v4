@@ -29,7 +29,7 @@ public class Fortran90LexerBase : Lexer
 
     public bool VerifyNotOperator()
     {
-	    var c1 = this.InputStream.LA(1);
+        var c1 = this.InputStream.LA(1);
         if (c1 == 'a')
         {
             var c2 = this.InputStream.LA(2);
@@ -43,6 +43,18 @@ public class Fortran90LexerBase : Lexer
                     {
                         return false;
                     }
+                }
+            }
+        }
+        else if (c1 == 'o')
+        {
+            var c2 = this.InputStream.LA(2);
+            if (c2 == 'r')
+            {
+                var c3 = this.InputStream.LA(3);
+                if (c3 == '.')
+                {
+                    return false;
                 }
             }
         }
