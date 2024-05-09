@@ -1,44 +1,40 @@
-import 'package:antlr4/antlr4.dart';
-import 'dart:io';
-import 'dart:convert';
+import {CommonToken, Lexer, Token, CharStream} from "antlr4ng";
 
-abstract class Fortran90LexerBase extends Lexer
-{
-    Fortran90LexerBase(CharStream input) : super(input)
-    {
+export default abstract class Fortran90LexerBase extends Lexer {
+    constructor(input: CharStream) {
+        super(input);
     }
 
-    bool IsColumnZero()
-    {
-        return charPositionInLine == 0;
+    IsColumnZero(): boolean {
+        return this.column == 0;
     }
 
-    bool VerifyNotOperator()
+    VerifyNotOperator(): boolean
     {
         var c1 = this.inputStream.LA(1);
-        if (c1 == "a".codeUnitAt(0))
+        if (c1 == 'a'.charCodeAt(0))
         {
             var c2 = this.inputStream.LA(2);
-            if (c2 == "n".codeUnitAt(0))
+            if (c2 == 'n'.charCodeAt(0))
             {
                 var c3 = this.inputStream.LA(3);
-                if (c3 == "d".codeUnitAt(0))
+                if (c3 == 'd'.charCodeAt(0))
                 {
                     var c4 = this.inputStream.LA(4);
-                    if (c4 == ".".codeUnitAt(0))
+                    if (c4 == '.'.charCodeAt(0))
                     {
                         return false;
                     }
                 }
             }
         }
-        else if (c1 == 'o')
+        else if (c1 == 'o'.charCodeAt(0))
         {
             var c2 = this.inputStream.LA(2);
-            if (c2 == "r".codeUnitAt(0))
+            if (c2 == 'r'.charCodeAt(0))
             {
                 var c3 = this.inputStream.LA(3);
-                if (c3 == ".".codeUnitAt(0))
+                if (c3 == '.'.charCodeAt(0))
                 {
                     return false;
                 }

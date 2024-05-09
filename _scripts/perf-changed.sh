@@ -301,5 +301,7 @@ EOF
     cat xx.m
     echo ========
     cat xx.m | octave --no-gui
+    if [ $? -ne 0 ]; then continue; fi
 
 done
+exit 0

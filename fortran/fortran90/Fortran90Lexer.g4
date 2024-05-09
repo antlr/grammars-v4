@@ -436,7 +436,7 @@ SCON:
     | ('"') (~('"') | '""')* ('"')
 ;
 
-RDCON: NUM+ '.' NUM* EXPON? | NUM* '.' NUM+ EXPON? | NUM+ EXPON;
+RDCON: NUM+ '.' { this.VerifyNotOperator() }? NUM* EXPON? | NUM* '.' NUM+ EXPON? | NUM+ EXPON;
 
 DEALLOCATE: 'DEALLOCATE' | 'deallocate';
 
