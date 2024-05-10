@@ -165,6 +165,7 @@ compoundStatement
     | iterateStatement
     | returnStatement
     | cursorStatement
+    | withStatement dmlStatement
     ;
 
 administrationStatement

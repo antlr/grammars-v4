@@ -520,9 +520,10 @@ create_function_body
         | default_collation_clause
         | parallel_enable_clause
         | result_cache_clause
+        | PIPELINED
         | DETERMINISTIC
     )* (
-        (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
+        ((IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
         | aggregate_clause
         | pipelined_using_clause
         | sql_macro_body
@@ -5915,7 +5916,7 @@ query_block
     : SELECT (DISTINCT | UNIQUE | ALL)? selected_list into_clause? from_clause? where_clause? (
         hierarchical_query_clause
         | group_by_clause
-    )* model_clause? order_by_clause? fetch_clause?
+    )* model_clause? order_by_clause? offset_clause? fetch_clause?
     ;
 
 selected_list
@@ -7143,7 +7144,7 @@ paren_column_list
 
 // NOTE: In reality this applies to aggregate functions only
 keep_clause
-    : KEEP '(' DENSE_RANK (FIRST | LAST) order_by_clause ')' over_clause?
+    : KEEP '(' DENSE_RANK (FIRST | LAST) (query_partition_clause | order_by_clause) ')' over_clause?
     ;
 
 function_argument

@@ -1,0 +1,21 @@
+dotgraph = { strict? ~ (graph | digraph) ~ ident? ~ "{" ~ stmt_list ~ "}" }
+
+stmt_list = { (stmt ~ ";"? ~ stmt_list)? }
+stmt      = { subgraph | edge_stmt | attr_stmt | id_eq | node_stmt }
+
+attr_stmt = { (graph | node | edge) ~ attr_list }
+attr_list = { "[" ~ a_list ~ "]" ~ attr_list? }
+a_list    = { ident ~ "=" ~ ident ~ (";" | ",")? ~ a_list? }
+
+edge_stmt =  { node_id ~ edge_rhs ~ attr_list? }
+edge_rhs  =  { edgeop ~ node_id ~ edge_rhs? }
+edgeop    = _{ "--" | "->" }
+
+node_stmt = { node_id ~ attr_list? }
+node_id   = { ident ~ port? }
+port      = { ":" ~ ident }
+
+ident     = _{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+

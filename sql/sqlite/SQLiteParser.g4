@@ -249,7 +249,7 @@ drop_stmt
     + -
     << >> & |
     < <= > >=
-    = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP
+    = == != <> IS IS NOT IS DISTINCT FROM IS NOT DISTINCT FROM IN LIKE GLOB MATCH REGEXP
     AND
     OR
  */
@@ -270,6 +270,7 @@ expr
         | NOT_EQ2
         | IS_
         | IS_ NOT_
+        | IS_ NOT_? DISTINCT_ FROM_
         | IN_
         | LIKE_
         | GLOB_
@@ -421,7 +422,7 @@ result_column
 
 join_operator
     : COMMA
-    | NATURAL_? (LEFT_ OUTER_? | INNER_ | CROSS_)? JOIN_
+    | NATURAL_? ((LEFT_ | RIGHT_ | FULL_) OUTER_? | INNER_ | CROSS_)? JOIN_
 ;
 
 join_constraint

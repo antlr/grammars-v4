@@ -1671,13 +1671,13 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
         arg_decl (COMMA arg_decl)*
-    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) (
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) null_not_null? (
         LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
     )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
         PACKAGES EQ '(' string_list ')'
     )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
         PACKAGES EQ '(' string_list ')'
-    )? (HANDLER EQ string)? null_not_null? comment_clause? AS function_definition
+    )? (HANDLER EQ string)? comment_clause? AS function_definition
     | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
         | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
@@ -3467,6 +3467,8 @@ keyword
     | WAREHOUSE
     | MODE
     | ACTION
+    | ACCOUNT
+    | SEQUENCE
     // etc
     ;
 
@@ -3557,6 +3559,9 @@ non_reserved_words
     | OUTER
     | RECURSIVE
     | MODE
+    | EXPR
+    | SCALE
+    | ROUNDING_MODE
     ;
 
 builtin_function
@@ -3582,9 +3587,13 @@ builtin_function
 
 //TODO : Split builtin between NoParam func,special_builtin_func (like CAST), unary_builtin_function and unary_or_binary_builtin_function for better AST
 unary_or_binary_builtin_function
-    // lexer entry of function name which admit 1 or 2 parameters
+    // lexer entry of function name which admit 1, 2 or more parameters
     // expr rule use this
     : FLOOR
+    | TRUNCATE
+    | TRUNC
+    | CEIL
+    | ROUND
     ;
 
 binary_builtin_function
@@ -3817,7 +3826,8 @@ over_clause
     ;
 
 function_call
-    : unary_or_binary_builtin_function LR_BRACKET expr (COMMA expr)* RR_BRACKET
+    : round_expr
+    | unary_or_binary_builtin_function LR_BRACKET expr (COMMA expr)* RR_BRACKET
     | binary_builtin_function LR_BRACKET expr COMMA expr RR_BRACKET
     | binary_or_ternary_builtin_function LR_BRACKET expr COMMA expr (COMMA expr)* RR_BRACKET
     | ternary_builtin_function LR_BRACKET expr COMMA expr COMMA expr RR_BRACKET
@@ -4288,4 +4298,14 @@ first_next
 limit_clause
     : LIMIT num (OFFSET num)?
     | (OFFSET num)? row_rows? FETCH first_next? num row_rows? ONLY?
+    ;
+
+round_mode
+    : HALF_AWAY_FROM_ZERO_Q
+    | HALF_TO_EVEN_Q
+    ;
+
+round_expr
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;
