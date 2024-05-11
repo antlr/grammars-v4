@@ -751,7 +751,7 @@ function_body
         | invoker_rights_clause
         | parallel_enable_clause
         | result_cache_clause
-        | streaming_clause 
+        | streaming_clause
             // see example in section "How Table Functions Stream their Input Data" on streaming_clause in Oracle 9i: https://docs.oracle.com/cd/B10501_01/appdev.920/a96624/08_subs.htm#20554
     )* (
         ( (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
@@ -4276,7 +4276,7 @@ general_recovery
 
 //Need to come back to
 full_database_recovery
-    : STANDBY? DATABASE (
+    : STANDBY? DATABASE? (
         (
             UNTIL (CANCEL | TIME CHAR_STRING | CHANGE UNSIGNED_INTEGER | CONSISTENT)
             | USING BACKUP CONTROLFILE
