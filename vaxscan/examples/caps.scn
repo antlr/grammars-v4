@@ -1,0 +1,93 @@
+!
+!			  COPYRIGHT (c) 1989 BY
+!	      DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASS.
+!
+! THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
+! ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
+! INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
+! COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
+! OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
+! TRANSFERRED.
+!
+! THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
+! AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
+! CORPORATION.
+!
+! DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
+! SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.
+!
+
+MODULE process_basic_identifiers;
+
+    !+
+    !   This SCAN program will transform a BASIC program
+    !   printing all the BASIC keyword in upper case and 
+    !   printing all the identifiers in lower case
+    !-
+
+    SET alpha	( 'a'..'z' OR 'A'..'Z' );
+    SET other	( alpha OR '0'..'9' OR '$' OR '_' OR '.' OR '%' );
+
+    TOKEN id	{ alpha [ other ]... };
+
+    DECLARE keyword: TREE( string ) OF INTEGER;
+
+    MACRO match_id TRIGGER { id_text: id };
+
+	IF EXISTS( keyword( UPPER( id_text ) ))
+	THEN
+	    ANSWER UPPER( id_text );
+	ELSE
+	    ANSWER LOWER( id_text );
+	END IF;
+
+    END MACRO;
+
+    PROCEDURE process_ids MAIN;
+
+    !+
+    !   This is a representative list of BASIC keywords.
+    !   You can add more if you desire.
+    !-
+    
+	keyword( 'TYPE' ) = 0;
+	keyword( 'EXPLICIT' ) = 0;
+	keyword( 'DECLARE' ) = 0;
+	keyword( 'INTEGER' ) = 0;
+	keyword( 'CONSTANT' ) = 0;
+	keyword( 'STRING' ) = 0;
+	keyword( 'EDIT$' ) = 0;
+	keyword( 'ON' ) = 0;
+	keyword( 'ERROR' ) = 0;
+	keyword( 'GOTO' ) = 0;
+	keyword( 'OPEN' ) = 0;
+	keyword( 'FOR' ) = 0;
+	keyword( 'INPUT' ) = 0;
+	keyword( 'AS' ) = 0;
+	keyword( 'OUTPUT' ) = 0;
+	keyword( 'NOMARGIN' ) = 0;
+	keyword( 'WHILE' ) = 0;
+	keyword( 'LINPUT' ) = 0;
+	keyword( 'OR' ) = 0;
+	keyword( 'POS' ) = 0;
+	keyword( 'LEFT$' ) = 0;
+	keyword( 'RIGHT$' ) = 0;
+	keyword( 'SEG$' ) = 0;
+	keyword( 'LEN' ) = 0;
+	keyword( 'END' ) = 0;
+	keyword( 'NEXT' ) = 0;
+	keyword( 'PRINT' ) = 0;
+	keyword( 'CLOSE' ) = 0;
+	keyword( 'RESUME' ) = 0;
+	keyword( 'OPTION' ) = 0;
+	keyword( 'IF' ) = 0;
+	keyword( 'THEN' ) = 0;
+	keyword( 'ELSE' ) = 0;
+
+	START SCAN
+	    INPUT FILE  'caps.bas'
+	    OUTPUT FILE 'new_caps.bas';
+
+    END PROCEDURE;
+
+END MODULE;
