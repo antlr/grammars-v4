@@ -1,0 +1,24 @@
+MODULE encrypt;
+ 
+    SET alpha ( 'a'..'f' OR 'A'..'F' );
+    TOKEN word { alpha };
+
+    CONSTANT alphas = 'abcedefABCDEF';
+    CONSTANT ours   = '!@#$%^&*()_+\';
+     
+    MACRO find_word TRIGGER { w: word };
+     
+	w = ours[ INDEX( alphas, w ) ];
+	ANSWER w;
+     
+    END MACRO /* find_word */;
+     
+    PROCEDURE main_proc MAIN;
+     
+	START SCAN
+	    INPUT FILE 'sys$input'
+	    OUTPUT FILE 'sys$output';
+     
+    END PROCEDURE /* main_proc */;
+ 
+END MODULE /* encrypt */;

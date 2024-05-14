@@ -2512,7 +2512,7 @@ SPACES: [ \t\r\n]+ -> channel(HIDDEN);
 
 fragment NEWLINE_EOF    : NEWLINE | EOF;
 fragment QUESTION_MARK  : '?';
-fragment SIMPLE_LETTER  : [\p{Alphabetic}\p{General_Category=Other_Letter}];
+fragment SIMPLE_LETTER  : [\p{Letter}];
 fragment FLOAT_FRAGMENT : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+;
 fragment NEWLINE        : '\r'? '\n';
 fragment SPACE          : [ \t];

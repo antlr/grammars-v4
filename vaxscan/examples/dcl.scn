@@ -1,0 +1,92 @@
+MODULE dcl_command_line_parser;
+
+    !+
+    !   This program illustrates using SCAN to parse a DCL command.
+    !   In this example, the components of the command are printed
+    !   on the terminal.  In actual use, it would be more convenient
+    !   to save them in a data structure.
+    !-
+
+    TOKEN space IGNORE	    { { ' ' | s'ht' }... | '-' | s'eol' };
+    TOKEN slash ALIAS '/'   { '/' };
+    TOKEN equal ALIAS '='   { '=' };
+    TOKEN lp ALIAS '('      { '(' };
+    TOKEN rp ALIAS ')'      { ')' };
+    TOKEN comma ALIAS ','   { ',' };
+    TOKEN prompt_sign	    { {s'sos' | s'eol'} '$' };
+    
+    SET alpha		    ( 'a'..'z' OR 'A'..'Z' );
+    SET digit		    ( '0'..'9' );
+    SET other		    ( '_' OR '$' OR ':' OR '.' OR ';' );
+    SET non_quote	    ( NOT ( '''' OR s'eol' OR s'eos' OR s'sos' ));
+    
+    TOKEN verb		    { alpha [ alpha | digit | other ]... };
+    TOKEN spec		    { { alpha | digit | other }... };
+    TOKEN strg		    { '''' non_quote... '''' };
+
+    GROUP verb_spec	    ( verb OR spec );
+
+    DECLARE indent,spec_count: integer;
+    CONSTANT tabs = '                                       ';
+
+    MACRO command_line TRIGGER 
+	{ prompt_sign command [ specification  [ ',' ] ]... };
+
+        MACRO command SYNTAX{ v:verb [ '/' qualifier ]...  };
+	    indent = 0;
+	    spec_count = 1;
+	    WRITE 'command: ',v;
+	END MACRO;
+	
+	MACRO specification SYNTAX { s:verb_spec [ '/' qualifier ]... };
+	    WRITE 'spec: ', spec_count, '  ', s;
+	    spec_count = spec_count + 1;
+	END MACRO;
+
+        MACRO qualifier SYNTAX { field };
+	END MACRO;
+
+    END MACRO;
+    
+    MACRO field SYNTAX { v:verb change_indent
+				vv: { '=' single_value
+				    | '=' '(' item_list ')'
+				    | no_value } };
+        
+	MACRO change_indent SYNTAX { };
+	     indent = indent + 1;
+	END MACRO;
+	
+	MACRO single_value SYNTAX { s:{ verb_spec | strg } };
+	     ANSWER s;
+	END MACRO;
+	
+	MACRO item_list SYNTAX { f: field \ ',' };
+	     ANSWER 'list above';
+	END MACRO;
+
+	MACRO no_value SYNTAX {  };
+	     ANSWER 'none';
+	END MACRO;
+
+	vv = trim( vv );
+	IF vv[1] = '='
+	THEN
+	    vv = vv[ 2.. ];
+	END IF;
+
+	WRITE tabs[ 1 .. indent ], 'qualifier: ', v, '  value: ', vv; 
+
+	indent = indent - 1;
+
+    END MACRO;
+	
+    PROCEDURE parse_command main ( );
+	
+	START SCAN
+	    INPUT  FILE 'dcl.dat'
+	    OUTPUT FILE 'sys$output';
+	    
+    END PROCEDURE;
+
+END MODULE;

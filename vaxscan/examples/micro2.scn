@@ -1,0 +1,121 @@
+MODULE micro_trans IDENT 'V1.0';
+
+    INCLUDE FILE 'KEYS.INC';
+
+    SET alpha		    ( 'a'..'z' OR 'A'..'Z' );
+    SET digit		    ( '0'..'9' );
+    SET other		    ( alpha OR digit OR '.' );
+    SET typer		    ( '$' OR '%' OR '!' or '#' );
+    SET non_quote	    ( NOT( '"' ) );
+    SET non_eol		    ( NOT( s'eol' OR ':' ) );
+    SET hex_digit	    ( digit OR 'A'..'F' );
+
+    TOKEN id		    { alpha [ other... ] [ typer ] };
+    TOKEN sol		    { s'sos' | s'eol' };
+    TOKEN str		    { '"' [non_quote...] '"' };
+    TOKEN int		    { digit... };
+    TOKEN real		    { [ digit... ] '.' [ digit... ]
+			      [ { 'D' | 'E' } { '+' | '-' } digit... ]
+			      [ { '!' | '#' } ] };
+    TOKEN radix		    { '&' { 'H' | 'O' } hex_digit... };
+    TOKEN colon ALIAS ':'   { ':' };
+    TOKEN amp ALIAS '&'	    { '&' };
+    TOKEN comment	    { { '''' | '!' } [ non_eol...] };
+    TOKEN space IGNORE	    { { ' ' | s'ht' }... };
+    TOKEN punct		    { ';' | '=' | '+' | '-' | '*' | '/' | '^'
+			      '(' | ')' | '[' | ']' | ',' | '?' | '<'
+			      '>' | '\' | '@' | '_' };
+
+    DECLARE indent,if_nesting: INTEGER;
+
+    CONSTANT blanks = '                                                ';     
+
+    PROCEDURE find_keyword( i: string ) of integer;
+
+	DECLARE pos: INTEGER;
+	DECLARE str: STRING( key_length+1 );
+
+	str = ' ';
+	str[ 2.. ] = lower( i );
+	pos = index( keyword, str );
+
+	IF pos > 0
+	THEN
+	    i = upper( i );
+	    RETURN (pos + key_length )/key_length;
+	END IF;
+	
+	i = lower( i );
+
+	RETURN not_key;
+
+    END PROCEDURE;
+
+    MACRO found_id TRIGGER { i: id };
+
+	CASE find_keyword( i ) FROM 0 TO max_key;
+
+	[ then_key ]:
+	    if_nesting = if_nesting + 1;
+	    indent = indent + 4;
+	    ANSWER s'eol' & s'ht', blanks[ 1 .. indent ];
+
+	[ else_key ]:
+	    ANSWER s'eol' & s'ht', blanks[ 1 .. indent ];
+
+	[ inrange ]:
+	END CASE;
+
+	ANSWER i;
+
+    END MACRO;
+
+    MACRO new_line TRIGGER { s:sol l:[ int ] i: [ id ] };
+
+	DECLARE post_incr, post_decr: BOOLEAN;
+
+	IF length( l ) > 0
+	THEN
+	    indent = indent - 4*if_nesting;
+	    if_nesting = 0;
+	END IF;
+
+	CASE find_keyword( i ) FROM 0 TO max_key;
+
+	[ inrange ]:
+
+	[ then_key ]:
+	    if_nesting = if_nesting + 1;
+	    indent = indent + 4;
+
+	[ while_key, for_key ]:
+	    post_incr = true;
+
+	[ next_key, wend_key ]:
+	    post_decr = true;
+
+	END CASE;
+
+	ANSWER s, l, s'ht', blanks[ 1 .. indent ], i;
+
+	IF post_incr
+	THEN
+	    indent = indent + 4;
+	END IF;
+
+	IF post_decr
+	THEN
+	    indent = indent - 4;
+	END IF;
+
+    END MACRO;
+
+    PROCEDURE main MAIN;
+     
+	START SCAN
+	    INPUT FILE 'micro.tm1'
+	    OUTPUT FILE 'sys$output';
+     
+    END PROCEDURE /* main */;
+
+END MODULE /* micro_trans */;

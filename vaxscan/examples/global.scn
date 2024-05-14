@@ -1,0 +1,163 @@
+MODULE global_replace IDENT '1.0';
+
+!  ****************  Untested and uncommented  *******************
+
+!++
+!   This program performs a global replacement of one or more character
+!   strings in a file.
+!--
+
+    TYPE rep_block : RECORD
+			 next_rep_block: POINTER TO rep_block,
+			 old : VARYING STRING (80),
+			 new : VARYING STRING (80),
+		     END RECORD;
+
+    DECLARE head : POINTER TO rep_block;
+    DECLARE mask : DYNAMIC STRING;
+
+    SET sol ( s'sos' OR s'eol' );
+    SET non_sol ( NOT sol AND NOT s'eos' );
+
+    TOKEN start_line { sol };
+    TOKEN rest_line { non_sol... };
+
+    !++
+    !   read replacement sequences
+    !--
+
+    PROCEDURE read_replacements ( head: POINTER TO rep_block,
+				  mask : DYNAMIC STRING);
+
+	DECLARE old_str: DYNAMIC STRING;
+	DECLARE f: FIXED STRING (1);
+	DECLARE tail, new : POINTER TO rep_block;
+
+	WHILE true;
+
+	    READ PROMPT ('string to locate: ') old_str;
+
+	    IF ENDFILE( ) OR (LENGTH( old_str ) = 0)
+	    THEN
+		RETURN;
+	    END IF;
+
+	    ALLOCATE new;
+	    new ->.old = old_str;
+	    READ PROMPT ('replacement: ') new->.new;
+
+	    f = old_str[ 1 ];
+
+	    IF INDEX( mask, f ) = 0
+	    THEN
+		mask = mask & f;
+	    END IF;
+
+	    IF head = NIL 
+	    THEN
+		head = new;
+	    ELSE
+		tail -> .next_rep_block = new;
+	    END IF;
+
+	    tail = new;
+	    
+	END WHILE;
+
+    END PROCEDURE /* read_replacements */;
+
+    !++
+    !   perform the replacements on a line
+    !--
+
+    PROCEDURE do_replacements ( text : DYNAMIC STRING,
+				count : INTEGER);
+
+	DECLARE s, c, e, cl : INTEGER;
+	DECLARE cur : POINTER TO rep_block;
+
+	e = LENGTH( text );
+	s = 1;
+
+	WHILE s <= e;
+	    c = MEMBER( text[ s.. ], mask );
+	    IF c = 0
+	    THEN
+		RETURN;
+	    END IF;
+	    
+	    s = s + c - 1;
+
+	    cur = head;
+	    WHILE cur <> NIL;
+		cl = LENGTH( cur -> .old );
+
+		IF s + cl - 1 > e
+		THEN
+		    GOTO next_replacement;
+		END IF;
+
+		IF cur -> .old == text[ s..s+cl-1] 
+		THEN
+		    IF s = e
+		    THEN
+		       text = text[ 1..s-1 ] & cur -> .new;
+		    ELSE
+		       text = text[ 1..s-1 ] & cur -> .new & text[ s+cl.. ];
+		    END IF;
+		    s = s + LENGTH( cur -> .new );
+		    e = LENGTH( text );
+		    count = count + 1;
+		    GOTO next_search;
+		END IF;
+next_replacement:
+		cur = cur -> .next_rep_block;
+
+	    END WHILE;
+
+	    s = s + 1;
+next_search:
+	    ;
+
+	END WHILE;
+
+    END PROCEDURE /* do_replacements */;
+
+    !++
+    !   main procedure
+    !--
+
+    PROCEDURE main MAIN;
+
+	DECLARE file_to_search : DYNAMIC STRING;
+
+	READ PROMPT ('file to be processed: ') file_to_search;
+	CALL read_replacements( head, mask );
+
+	START SCAN
+	    INPUT FILE file_to_search
+	    OUTPUT FILE 'sys$output';
+
+    END PROCEDURE /* main */;
+
+    MACRO find_line TRIGGER { s: start_line r: rest_line };
+
+	DECLARE count : INTEGER;
+
+	IF MEMBER( r, mask ) = 0
+	THEN
+	    FAIL;
+	END IF;
+
+	CALL do_replacements( r, count );
+
+	IF count > 0
+	THEN
+	    ANSWER s, r;
+	ELSE
+	    FAIL;
+	END IF;
+
+    END MACRO /* find_line */;
+
+END MODULE /* global_replace */;

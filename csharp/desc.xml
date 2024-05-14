@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-   <targets>Java</targets>
+   <targets>CSharp;Java</targets>
    <grammar-name>CSharp</grammar-name>
+   <inputs>examples/**/*.cs</inputs>
 </desc>
