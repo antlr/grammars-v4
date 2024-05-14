@@ -31,167 +31,434 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+
+
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar action;
 
-file_ : program EOF;
+file_
+   : program EOF
+   ;
 
-program :  ('MODULE' progmodule+ )+;
-progmodule : systemdecls* routinelist;
+program
+   : ('MODULE' progmodule+)+
+   ;
 
-systemdecls : definedecl | typedecl |
-                       vardecl;
+progmodule
+   : systemdecls* routinelist
+   ;
 
-definedecl : 'DEFINE' deflist;
-deflist : def (',' def)*;
-def : IDENTIFIER '=' STRCONST;
+systemdecls
+   : definedecl
+   | typedecl
+   | vardecl
+   ;
 
+definedecl
+   : 'DEFINE' deflist
+   ;
 
-typedecl : 'TYPE' typeerecidentlist;
-typeerecidentlist : typerecident+ ;
+deflist
+   : def (',' def)*
+   ;
 
-typerecident : recname '=' fieldinit+;
-recname : IDENTIFIER;
-fieldinit : funddecl;
+def
+   : IDENTIFIER '=' STRCONST
+   ;
 
-vardecl :basevardecl+;
-basevardecl : funddecl | pointerdecl |
-                             arraydecl | recorddecl;
+typedecl
+   : 'TYPE' typeerecidentlist
+   ;
 
- funddecl : basefunddecl +;
- basefunddecl : fundtype fundidentlist;
+typeerecidentlist
+   : typerecident+
+   ;
 
- fundtype : 'CARD' | 'CHAR' | 'BYTE' | 'INT';
- fundidentlist : fundident (','
-                           fundident);
- fundident : IDENTIFIER ('='initopts)?;
- initopts : addr | value+;
- addr : COMPCONST;
- value : NUMCONST;
+typerecident
+   : recname '=' fieldinit+
+   ;
 
+recname
+   : IDENTIFIER
+   ;
 
- pointerdecl : ptrtype 'POINTER' ptridentlist;
- ptrtype : fundtype | recname;
- ptridentlist : ptrident (','
-                         ptrident)*;
- ptrident : IDENTIFIER ('='value)?;
+fieldinit
+   : funddecl
+   ;
 
+vardecl
+   : basevardecl+
+   ;
 
- arraydecl : fundtype 'ARRAY' arridentlist;
- arridentlist : arrident (',' arrident)*
-                         ;
- arrident : IDENTIFIER ('(' dim')' )? ('=' arrinitopts)?;
- dim :  NUMCONST;
- arrinitopts : addr | value+ | STRCONST;
- valuelist :  value+;
+basevardecl
+   : funddecl
+   | pointerdecl
+   | arraydecl
+   | recorddecl
+   ;
 
- recorddecl : IDENTIFIER recidentlist;
- recidentlist : recident (','
-                         recident)*;
- recident : IDENTIFIER ('=' address)?;
-address : COMPCONST;
+funddecl
+   : basefunddecl+
+   ;
 
+basefunddecl
+   : fundtype fundidentlist
+   ;
 
- memreference : memcontents | '@' IDENTIFIER;
- memcontents : fundref | arrref | ptrref |
-                         recref;
- fundref : IDENTIFIER;
- arrref : IDENTIFIER'('arithexp')';
- ptrref : IDENTIFIER '^';
- recref : IDENTIFIER '.' IDENTIFIER;
+fundtype
+   : 'CARD'
+   | 'CHAR'
+   | 'BYTE'
+   | 'INT'
+   ;
 
+fundidentlist
+   : fundident (',' fundident)
+   ;
 
- routinelist : routine+;
- routine : procroutine | funcroutine;
+fundident
+   : IDENTIFIER ('=' initopts)?
+   ;
 
- procroutine : procdecl ?systemdecls?
-                        stmtlist? 'RETURN'?;
- procdecl : PROC IDENTIFIER ('='addr)? '('paramdecl? ')';
+initopts
+   : addr
+   | value+
+   ;
 
- funcroutine : funcdecl systemdecls?
-                        stmtlist? ('RETURN' '(' arithexp')')?;
- funcdecl : fundtype 'FUNC' IDENTIFIER ('.' addr)?
-                        '('paramdecl?')';
+addr
+   : COMPCONST
+   ;
 
-routinecall : funccall | proccall;
-funccall : IDENTIFIER'(' params? ')';
-proccall : IDENTIFIER'(' params? ')';
-params: paramdecl (',' paramdecl)*;
-paramdecl :vardecl;
+value
+   : NUMCONST
+   ;
 
-stmtlist : stmt+;
-stmt : simpstmt | strucstmt | codeblock;
-simpstmt : assignstmt | exitstmt | routinecall;
-strucstmt : ifstmt | doloop | whileloop |
-                    forloop;
+pointerdecl
+   : ptrtype 'POINTER' ptridentlist
+   ;
 
-assignstmt : memcontents '=' arithexp;
+ptrtype
+   : fundtype
+   | recname
+   ;
 
-exitstmt : 'EXIT';
+ptridentlist
+   : ptrident (',' ptrident)*
+   ;
 
-ifstmt : 'IF' condexp 'THEN' stmtlist?
-                       elseifexten* elseexten? 'FI';
-elseifexten : 'ELSEIF' condexp 'THEN' stmtlist?;
-elseexten : 'ELSE' stmtlist?;
+ptrident
+   : IDENTIFIER ('=' value)?
+   ;
 
-doloop : 'DO' stmtlist? untilstmt? 'OD';
+arraydecl
+   : fundtype 'ARRAY' arridentlist
+   ;
 
-untilstmt : 'UNTIL' condexp;
+arridentlist
+   : arrident (',' arrident)*
+   ;
 
-whileloop : 'WHILE' condexp doloop;
+arrident
+   : IDENTIFIER ('(' dim ')')? ('=' arrinitopts)?
+   ;
 
-forloop : FOR IDENTIFIER=start TO finish
-                   ('STEP' inc)? doloop;
-start : arithexp;
-finish : arithexp;
-inc : arithexp;
+dim
+   : NUMCONST
+   ;
 
-codeblock : compconstlist+;
-compconstlist :  COMPCONST +
-                        ;
+arrinitopts
+   : addr
+   | value+
+   | STRCONST
+   ;
 
+valuelist
+   : value+
+   ;
 
-complexrel : complexrel  SPECIALOP simprelexp |
-                  simprelexp SPECIALOP simprelexp;
-simprelexp : arithexp RELOP arithexp;
+recorddecl
+   : IDENTIFIER recidentlist
+   ;
 
-arithexp : arithexp ADDOP multexp |
-                    multexp;
-multexp : multexp MULTOP valuevalue | valuevalue;
-valuevalue : NUMCONST | memreference | (arithexp);
+recidentlist
+   : recident (',' recident)*
+   ;
 
+recident
+   : IDENTIFIER ('=' address)?
+   ;
 
+address
+   : COMPCONST
+   ;
 
+memreference
+   : memcontents
+   | '@' IDENTIFIER
+   ;
 
-FUNDTYPE : 'CARD' | 'CHAR' | 'BYTE' | 'INT';
+memcontents
+   : fundref
+   | arrref
+   | ptrref
+   | recref
+   ;
 
+fundref
+   : IDENTIFIER
+   ;
 
-SPECIALOP : 'AND' | 'OR' | '&' | '%';
-RELOP : 'XOR' | '!' | '=' | '#' | '<>' | '<' | '<=' | '>' | '>=';
-ADDOP: '+' | '-';
-MULTOP : '*' | '/' | 'MOD' | 'LSH' | 'RSH';
-UNARYOP: '@' | '-';
+arrref
+   : IDENTIFIER '(' arithexp ')'
+   ;
 
+ptrref
+   : IDENTIFIER '^'
+   ;
 
-NUMCONST: DECNUM | HEXNUM | CHAR;
-DECNUM : DIGIT+;
-HEXNUM : HEXDIGIT+ | '$' HEXNUM;
-//CHAR : '<any printable character>';
-HEXDIGIT :[0-9A-F];
-DIGIT : [0-9];
+recref
+   : IDENTIFIER '.' IDENTIFIER
+   ;
 
-STRCONST: '"' ~'"'* '"';
+routinelist
+   : routine+
+   ;
 
-IDENTIFIER : [a-zA-Z][a-zA-Z0=9]+;
+routine
+   : procroutine
+   | funcroutine
+   ;
 
-COMPCONST: BASECOMPCONST+;
+procroutine
+   : procdecl? systemdecls? stmtlist? 'RETURN'?
+   ;
 
-BASECOMPCONST : IDENTIFIER| NUMCONST |
-               PTRREF | '*';
+procdecl
+   : PROC IDENTIFIER ('=' addr)? '(' paramdecl? ')'
+   ;
 
+funcroutine
+   : funcdecl systemdecls? stmtlist? ('RETURN' '(' arithexp ')')?
+   ;
 
+funcdecl
+   : fundtype 'FUNC' IDENTIFIER ('.' addr)? '(' paramdecl? ')'
+   ;
+
+routinecall
+   : funccall
+   | proccall
+   ;
+
+funccall
+   : IDENTIFIER '(' params? ')'
+   ;
+
+proccall
+   : IDENTIFIER '(' params? ')'
+   ;
+
+params
+   : paramdecl (',' paramdecl)*
+   ;
+
+paramdecl
+   : vardecl
+   ;
+
+stmtlist
+   : stmt+
+   ;
+
+stmt
+   : simpstmt
+   | strucstmt
+   | codeblock
+   ;
+
+simpstmt
+   : assignstmt
+   | exitstmt
+   | routinecall
+   ;
+
+strucstmt
+   : ifstmt
+   | doloop
+   | whileloop
+   | forloop
+   ;
+
+assignstmt
+   : memcontents '=' arithexp
+   ;
+
+exitstmt
+   : 'EXIT'
+   ;
+
+ifstmt
+   : 'IF' condexp 'THEN' stmtlist? elseifexten* elseexten? 'FI'
+   ;
+
+elseifexten
+   : 'ELSEIF' condexp 'THEN' stmtlist?
+   ;
+
+elseexten
+   : 'ELSE' stmtlist?
+   ;
+
+doloop
+   : 'DO' stmtlist? untilstmt? 'OD'
+   ;
+
+untilstmt
+   : 'UNTIL' condexp
+   ;
+
+whileloop
+   : 'WHILE' condexp doloop
+   ;
+
+forloop
+   : FOR IDENTIFIER = start TO finish ('STEP' inc)? doloop
+   ;
+
+start
+   : arithexp
+   ;
+
+finish
+   : arithexp
+   ;
+
+inc
+   : arithexp
+   ;
+
+codeblock
+   : compconstlist+
+   ;
+
+compconstlist
+   : COMPCONST+
+   ;
+
+complexrel
+   : complexrel SPECIALOP simprelexp
+   | simprelexp SPECIALOP simprelexp
+   ;
+
+simprelexp
+   : arithexp RELOP arithexp
+   ;
+
+arithexp
+   : arithexp ADDOP multexp
+   | multexp
+   ;
+
+multexp
+   : multexp MULTOP valuevalue
+   | valuevalue
+   ;
+
+valuevalue
+   : NUMCONST
+   | memreference
+   | (arithexp)
+   ;
+
+FUNDTYPE
+   : 'CARD'
+   | 'CHAR'
+   | 'BYTE'
+   | 'INT'
+   ;
+
+SPECIALOP
+   : 'AND'
+   | 'OR'
+   | '&'
+   | '%'
+   ;
+
+RELOP
+   : 'XOR'
+   | '!'
+   | '='
+   | '#'
+   | '<>'
+   | '<'
+   | '<='
+   | '>'
+   | '>='
+   ;
+
+ADDOP
+   : '+'
+   | '-'
+   ;
+
+MULTOP
+   : '*'
+   | '/'
+   | 'MOD'
+   | 'LSH'
+   | 'RSH'
+   ;
+
+UNARYOP
+   : '@'
+   | '-'
+   ;
+
+NUMCONST
+   : DECNUM
+   | HEXNUM
+   | CHAR
+   ;
+
+DECNUM
+   : DIGIT+
+   ;
+
+HEXNUM
+   : HEXDIGIT+
+   | '$' HEXNUM
+   ;
+   //CHAR : '<any printable character>';
+   
+HEXDIGIT
+   : [0-9A-F]
+   ;
+
+DIGIT
+   : [0-9]
+   ;
+
+STRCONST
+   : '"' ~ '"'* '"'
+   ;
+
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0=9]+
+   ;
+
+COMPCONST
+   : BASECOMPCONST+
+   ;
+
+BASECOMPCONST
+   : IDENTIFIER
+   | NUMCONST
+   | PTRREF
+   | '*'
+   ;
 
 WS
-    : [ \r\n\t]+ -> skip
-    ;
+   : [ \r\n\t]+ -> skip
+   ;
+
