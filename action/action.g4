@@ -231,11 +231,11 @@ routine
    ;
 
 procroutine
-   : procdecl? systemdecls? stmtlist? 'RETURN'?
+   : procdecl systemdecls? stmtlist? 'RETURN'?
    ;
 
 procdecl
-   : PROC IDENTIFIER ('=' addr)? '(' paramdecl? ')'
+   : 'PROC' IDENTIFIER ('=' addr)? '(' paramdecl? ')'
    ;
 
 funcroutine
@@ -323,7 +323,7 @@ whileloop
    ;
 
 forloop
-   : FOR IDENTIFIER = start TO finish ('STEP' inc)? doloop
+   : 'FOR' IDENTIFIER '=' start 'TO' finish ('STEP' inc)? doloop
    ;
 
 start
@@ -344,6 +344,13 @@ codeblock
 
 compconstlist
    : COMPCONST+
+   ;
+
+condexp
+   : complexrel
+   | simprelexp
+   | arithexp
+   | multexp
    ;
 
 complexrel
@@ -368,7 +375,7 @@ multexp
 valuevalue
    : NUMCONST
    | memreference
-   | (arithexp)
+   | '(' arithexp ')'
    ;
 
 FUNDTYPE
@@ -403,7 +410,7 @@ ADDOP
    ;
 
 MULTOP
-   : '*'
+   : MUL
    | '/'
    | 'MOD'
    | 'LSH'
@@ -429,8 +436,12 @@ HEXNUM
    : HEXDIGIT+
    | '$' HEXNUM
    ;
-   //CHAR : '<any printable character>';
-   
+   // extend this
+
+CHAR
+   : [a-zA-Z0-9]
+   ;
+
 HEXDIGIT
    : [0-9A-F]
    ;
@@ -451,11 +462,13 @@ COMPCONST
    : BASECOMPCONST+
    ;
 
+fragment MUL: '*';
+
 BASECOMPCONST
    : IDENTIFIER
    | NUMCONST
-   | PTRREF
-   | '*'
+   | '^'
+   | MUL
    ;
 
 WS
