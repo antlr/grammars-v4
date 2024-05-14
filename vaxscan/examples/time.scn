@@ -1,0 +1,65 @@
+MODULE change_times;
+    !+
+    !   This is a very simple program that locates all occurrences of times
+    !   of the form:
+    !   		a date  dd-mmm-yyyy   or
+    !   		a time  hh:mm:ss.xxxx
+    !   and replaces them with:
+    !   		"dd-mmm-yyyy"
+    !   		"hh:mm:ss.xxxx"
+    !   Presumably, this could be used as a filter program to get rid
+    !   of all date and time dependencies in a file.
+    !-
+
+    CONSTANT h = 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh';
+    CONSTANT m = 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm';
+    CONSTANT s = 'ssssssssssssssssssssssssssssssssssssssss';
+    CONSTANT x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+    CONSTANT y = 'yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy';
+    CONSTANT d = 'dddddddddddddddddddddddddddddddddddddddd';
+
+    SET digit 			( '0' .. '9' );
+    TOKEN integer 		{ digit... };
+    TOKEN colon ALIAS ':' 	{':'};
+    TOKEN dot ALIAS '.' 	{'.'};
+    TOKEN month CASELESS 	{ 'jan' | 'feb' | 'mar' | 'apr' 
+				| 'may' | 'jun' | 'jul' | 'aug' 
+				| 'sep' | 'oct' | 'nov' | 'dec' };
+    TOKEN dash ALIAS '-' 	{ '-' };
+    
+    MACRO replace_date TRIGGER 
+	{ dd:integer '-' month '-' yy:integer };
+	
+	ANSWER d[ 1..length(dd) ], '-mmm-', y[ 1..length(yy) ];
+
+    END MACRO;
+
+    MACRO replace_time TRIGGER 
+	{ hh:integer ':' mm:integer 
+	[ ':' ss:integer [ '.' xx:integer ] ] };
+	
+	ANSWER h[ 1..length( hh ) ], ':', m[ 1..length( mm ) ];
+
+	IF ss <> ''
+	THEN
+	    ANSWER ':', s[ 1..length(ss) ];
+	END IF;
+
+	IF xx <> ''
+	THEN
+	    ANSWER ':', x[ 1..length(xx) ];
+	END IF;
+    END MACRO;
+
+    PROCEDURE main_routine MAIN (  );
+	!+
+	!   Start the picture matching process.  The input stream and
+	!   the output stream are defined via the logical names
+	!   TIME.DAT and SYS$OUTPUT.
+	!-
+	START SCAN
+	    INPUT FILE 'TIME.DAT'
+	    OUTPUT FILE 'SYS$OUTPUT';
+    END PROCEDURE;
+
+END MODULE;

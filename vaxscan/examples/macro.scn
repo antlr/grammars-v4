@@ -1,0 +1,221 @@
+MODULE macros;
+ 
+    !+
+    !   This program is a preprocessor for providing macro expansion.
+    !
+    !   The macros it you can defined are of the form:
+    !		MACRO macro_name [ ( arg_name,... ) ];
+    !		    text with embedded use of arg_names
+    !		    that can go on for several lines
+    !		END MACRO;
+    !
+    !   You reference a macro as follows:
+    !
+    !	   	macro_name [ ( arg,... ) ]
+    !
+    !   where the argument can be sequences of tokens with balanced
+    !   parentheses.  For example:
+    !
+    !		poly( a+b*c, poly( a,c,d) )
+    !-
+
+    SET alpha ( 'a'..'z' OR 'A'..'Z' );
+    SET digit( '0'..'9' );
+    SET other ( alpha OR digit OR '$' OR '_' );
+    SET non_quote ( NOT( '''' OR s'eol' ) );
+    SET non_star ( NOT( '*' OR s'eol' ) );
+    SET non_slash ( NOT( '/' OR s'eol' ) );
+    SET non_bang ( NOT( '!' OR s'eol' ) );
+    SET punct_char ( '&' OR '*' OR '+' OR '-' OR '/' OR '\' OR '=' OR '{' OR 
+ 		     '}' OR '[' OR ']' OR '.' OR '>' OR '<' OR '|' OR '^' );
+
+    TOKEN macro_key CASELESS { 'macro' };
+    TOKEN end_macro_key CASELESS { 'end' { ' ' | s'ht' }... 'macro' };
+    TOKEN id CASELESS { alpha [ other ... ] };
+
+    TOKEN lp ALIAS '(' { '(' };
+    TOKEN rp ALIAS ')' { ')' };
+    TOKEN semi ALIAS ';' { ';' };
+    TOKEN comma ALIAS ',' { ',' };
+
+    TOKEN string { '''' [ non_quote | '''''' ]... '''' };
+    TOKEN com1 { '!' [ non_bang ... ] };
+    TOKEN com2 { '/*' [ non_star | '*' non_slash ]... '*/' };
+    TOKEN space IGNORE { { ' ' | s'ht' | s'eol' }... };
+    TOKEN integer { digit... };
+    TOKEN punct { punct_char };
+
+    GROUP rest ( NOT( end_macro_key )  );
+    GROUP mac_group ( NOT( comma OR '(' OR ')' OR ';' ));
+
+    TYPE subs_data: RECORD
+			arg : INTEGER,
+			position : INTEGER,
+		    END RECORD;
+
+    TYPE subs : TREE( INTEGER ) OF subs_data;
+
+    TYPE macro_symbol : RECORD
+			    text_ptr: POINTER TO STRING,
+			    subs_ptr : POINTER TO subs,
+			END RECORD;
+
+    DECLARE macros : TREE ( STRING ) OF macro_symbol;
+     
+    MACRO find_macro TRIGGER { macro_key n:id 
+				[ '(' { p:id \ ',' } ')' ] ';'
+				[ r:rest... ]
+			       end_macro_key ';' };
+
+	DECLARE args: TREE( STRING ) OF INTEGER;
+	DECLARE pp: TREEPTR( INTEGER) TO STRING;
+	DECLARE pr: TREEPTR( INTEGER) TO STRING;
+	DECLARE arg: STRING;
+	DECLARE count: INTEGER;
+	DECLARE subs_ptr: POINTER TO subs;
+	DECLARE text_ptr: POINTER TO STRING;
+
+        n = upper( n );
+
+	IF EXISTS( macros( n ) ) 
+	THEN
+	    WRITE 'Macro: ', n, ' was defined more than once';
+	    RETURN;
+	END IF;
+
+	pp = first( p );
+
+	WHILE pp <> NIL;
+
+	    arg = upper( value( pp ) );
+
+	    IF exists( args( arg ))
+	    THEN
+		WRITE 'Duplicate argument: ',arg, ' in Macro: ', n;
+	    ELSE
+		args( arg ) = subscript( pp );
+	    END IF;
+
+	    pp = NEXT( pp );
+
+	END WHILE;
+
+	ALLOCATE subs_ptr;
+
+	pr = first( r );
+	
+	ALLOCATE text_ptr;
+
+	text_ptr-> = '';
+
+	WHILE pr <> NIL;
+	    arg = upper( value( pr ) );
+	    IF EXISTS( args( arg ) ) 
+	    THEN
+		count = count + 1;
+		subs_ptr ->( count ).arg = args( arg );
+		subs_ptr ->( count ).position = length( text_ptr-> );
+	    ELSE
+		text_ptr-> = text_ptr-> & ' ' & value( pr );
+	    END IF;
+
+	    pr = NEXT( pr );
+
+	END WHILE;
+
+	macros( n ).text_ptr = text_ptr;
+	macros( n ).subs_ptr = subs_ptr;
+
+    END MACRO /* find_macro */;
+     
+    MACRO mac_arg SYNTAX { m:{{ mac_group | 
+			        '(' { mac_group \ ',' } ')' }...
+			     } };
+     
+	ANSWER m;
+     
+    END MACRO /* mac_arg */;
+     
+    MACRO find_reference TRIGGER { i:id [ '(' { m:mac_arg \ ',' } ')' ] };
+     
+	DECLARE mtp: TREEPTR( STRING ) TO macro_symbol;
+	DECLARE mp:  POINTER TO macro_symbol;
+	DECLARE stp: TREEPTR( INTEGER ) TO subs_data;
+	DECLARE text,buffer: STRING;
+	DECLARE arg,pos,las_pos: INTEGER;
+     
+	i = upper( i );
+
+	mtp = TREEPTR( macros( i ) );
+
+	IF mtp = NIL
+	THEN
+	    FAIL;
+	END IF;
+
+	mp = VALUEPTR( mtp );
+	text = mp->.text_ptr->;
+	stp = first( mp->.subs_ptr-> );
+	
+	WHILE stp >< NIL;
+	    pos = valueptr( stp )->.position;
+	    arg = valueptr( stp )->.arg;
+
+	    IF pos > las_pos
+	    THEN
+		buffer = buffer & text[ las_pos+1 .. pos ];
+	    END IF;
+
+	    IF exists( m( arg ))
+	    THEN
+	        buffer = buffer & ' ' & m( arg );
+	    END IF;
+
+	    las_pos = pos;
+	    stp = NEXT( stp );
+	END WHILE; 
+
+	IF length( text ) > las_pos
+	THEN
+	    buffer = buffer & text[ las_pos+1 .. ];
+	END IF;	
+
+	ANSWER TRIGGER buffer;
+     
+    END MACRO /* find_reference */;
+     
+    PROCEDURE main MAIN;
+
+!	DECLARE mtp: TREEPTR( STRING ) TO macro_symbol;
+!	DECLARE mp:  POINTER TO macro_symbol;
+!	DECLARE stp: TREEPTR( INTEGER ) TO subs_data;
+     
+	START SCAN
+	    INPUT FILE 'macro.dat'
+	    OUTPUT FILE 'sys$output';
+
+!	mtp = first( macros );     
+
+!	WHILE mtp <> NIL;
+
+!	    WRITE 'macro: ', subscript( mtp );
+!	    mp = valueptr( mtp );
+!	    WRITE 'text: ', mp->.text_ptr->;	    
+
+!	    stp = first( mp->.subs_ptr-> );
+
+!	    WHILE stp <> NIL;
+
+!		WRITE s'ht' & 'arg: ', valueptr( stp )->.arg, 
+!		      ' at: ', valueptr( stp )->.position;
+!		stp = NEXT( stp );
+
+!	    END WHILE;
+
+!	    mtp = NEXT( mtp );
+
+!	END WHILE;
+
+    END PROCEDURE /* main */;
+ 
+END MODULE /* macros */;
