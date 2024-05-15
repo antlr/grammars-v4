@@ -167,7 +167,7 @@ arrinitopts
    | STRCONST
    ;
    //arrayvaluelist  : arrayvalue+;
-   
+
 arrayvalue
    : compconst
    ;
@@ -317,14 +317,14 @@ whileloop
    ;
 
 forloop
-   : 'FOR' IDENTIFIER EQ start 'TO' finish ('STEP' inc)? doloop
+   : 'FOR' IDENTIFIER EQ start_ 'TO' finish_ ('STEP' inc)? doloop
    ;
 
-start
+start_
    : arithexp
    ;
 
-finish
+finish_
    : arithexp
    ;
 
@@ -454,7 +454,7 @@ fragment HEXNUM
    | '$' HEXNUM
    ;
    // extend this
-   
+
 fragment CHAR
    : [a-zA-Z0-9]
    ;
