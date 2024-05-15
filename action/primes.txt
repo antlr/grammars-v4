@@ -1,0 +1,41 @@
+DEFINE size = "8190",
+       ON = "1",
+       OFF = "0"
+
+BYTE ARRAY flags(size+1)
+
+CARD count, i, k, prime
+
+BYTE DISPLAY=$22F,
+     iter,
+     tick=20,
+     tock=19
+
+PROC Primes()
+   DISPLAY = 0 ;comment this line to leave diaplay on
+   tick = 0
+   tock = 0
+   FOR iter=1 TO 10
+      DO
+      count = 0
+      ; turn flags on (non-zero)
+      SetBlock(flags, size, ON)
+      FOR i = 0 TO size
+         DO
+         IF flags(i) THEN
+            prime = i+i+3
+            ;PrintCE(prime) ;Uncomment to print primes
+            k = prime + i
+            WHILE k <= size
+               DO
+               flags(k) = OFF
+               k ==+ prime
+               OD
+            count ==+ 1
+         FI
+         OD
+      OD
+   i=tick+256*tock
+   DISPLAY = $22 ;turn diaplay back on
+   PrintF("%U Primes done in %U ticks %E", count, i)
+RETURN

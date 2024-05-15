@@ -29,16 +29,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-
-
-// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
-
 grammar action;
 
 file_
-   : program EOF
+   : program? EOF
    ;
 
 program
@@ -114,7 +108,7 @@ fundtype
    ;
 
 fundidentlist
-   : fundident (',' fundident)
+   : fundident (',' fundident)*
    ;
 
 fundident
@@ -164,7 +158,7 @@ arrident
    ;
 
 dim
-   : NUMCONST
+   : arithexp
    ;
 
 arrinitopts
@@ -172,11 +166,7 @@ arrinitopts
    | arrayvalue+
    | STRCONST
    ;
-   //arrayvaluelist
-   
-   //   : arrayvalue+
-   
-   //   ;
+   //arrayvaluelist  : arrayvalue+;
    
 arrayvalue
    : COMPCONST
@@ -264,6 +254,7 @@ param
    | COMPCONST
    | STRCONST
    | NUMCONST
+   | arithexp
    ;
 
 paramdecl
@@ -276,17 +267,14 @@ stmtlist
 
 stmt
    : simpstmt
-   // | strucstmt
-   
-   // | codeblock
-   
+   | strucstmt
+   | codeblock
    ;
 
 simpstmt
-   : //assignstmt
-   
-   // | exitstmt
-   routinecall
+   : assignstmt
+   | exitstmt
+   | routinecall
    ;
 
 strucstmt
@@ -428,55 +416,59 @@ UNARYOP
    | '-'
    ;
 
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0-9]*
+   ;
+
 NUMCONST
    : DECNUM
    | HEXNUM
    | CHAR
    ;
 
-DECNUM
-   : DIGIT+
-   ;
-
-HEXNUM
-   : HEXDIGIT+
-   | '$' HEXNUM
-   ;
-   // extend this
-   
-CHAR
-   : [a-zA-Z0-9]
-   ;
-
-HEXDIGIT
-   : [0-9A-F]
-   ;
-
-DIGIT
-   : [0-9]
-   ;
-
 STRCONST
    : '"' ~ '"'* '"'
-   ;
-
-IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0=9]+
    ;
 
 COMPCONST
    : BASECOMPCONST+
    ;
 
-fragment MUL
-   : '*'
-   ;
-
-BASECOMPCONST
+fragment BASECOMPCONST
    : IDENTIFIER
    | NUMCONST
    | '^'
    | MUL
+   ;
+
+fragment DECNUM
+   : DIGIT+
+   ;
+
+fragment HEXNUM
+   : HEXDIGIT+
+   | '$' HEXNUM
+   ;
+   // extend this
+   
+fragment CHAR
+   : [a-zA-Z0-9]
+   ;
+
+fragment HEXDIGIT
+   : [0-9A-F]
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+fragment MUL
+   : '*'
+   ;
+
+COMMENT
+   : ';' ~ ('\r' | '\n')* -> skip
    ;
 
 WS
