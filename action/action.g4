@@ -121,7 +121,7 @@ initopts
    ;
 
 addr
-   : COMPCONST
+   : compconst
    ;
 
 value
@@ -169,7 +169,7 @@ arrinitopts
    //arrayvaluelist  : arrayvalue+;
    
 arrayvalue
-   : COMPCONST
+   : compconst
    ;
 
 recorddecl
@@ -185,7 +185,7 @@ recident
    ;
 
 address
-   : COMPCONST
+   : compconst
    ;
 
 memreference
@@ -251,7 +251,7 @@ params
 
 param
    : IDENTIFIER
-   | COMPCONST
+   | compconst
    | STRCONST
    | NUMCONST
    | arithexp
@@ -337,7 +337,7 @@ codeblock
    ;
 
 compconstlist
-   : COMPCONST+
+   : compconst+
    ;
 
 condexp
@@ -357,12 +357,12 @@ simprelexp
    ;
 
 arithexp
-   : arithexp ADDOP multexp
+   : arithexp ADDOP arithexp
    | multexp
    ;
 
 multexp
-   : multexp MULTOP valuevalue
+   : multexp MULTOP arithexp
    | valuevalue
    ;
 
@@ -370,6 +370,25 @@ valuevalue
    : NUMCONST
    | memreference
    | '(' arithexp ')'
+   ;
+
+compconst
+   : basecompconst+
+   ;
+
+basecompconst
+   : IDENTIFIER
+   | NUMCONST
+   | '^'
+   | MUL
+   ;
+
+MULTOP
+   : MUL
+   | '/'
+   | 'MOD'
+   | 'LSH'
+   | 'RSH'
    ;
 
 EQ
@@ -407,14 +426,6 @@ ADDOP
    | '-'
    ;
 
-MULTOP
-   : MUL
-   | '/'
-   | 'MOD'
-   | 'LSH'
-   | 'RSH'
-   ;
-
 UNARYOP
    : '@'
    | '-'
@@ -432,17 +443,6 @@ NUMCONST
 
 STRCONST
    : '"' ~ '"'* '"'
-   ;
-
-COMPCONST
-   : BASECOMPCONST+
-   ;
-
-fragment BASECOMPCONST
-   : IDENTIFIER
-   | NUMCONST
-   | '^'
-   | MUL
    ;
 
 fragment DECNUM
@@ -467,7 +467,7 @@ fragment DIGIT
    : [0-9]
    ;
 
-fragment MUL
+MUL
    : '*'
    ;
 
