@@ -1,0 +1,6 @@
+; This comment has a ; semi-
+;colon in it
+
+;this is a 3 line comment
+;
+;with a blank line in it
