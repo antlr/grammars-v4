@@ -285,7 +285,7 @@ strucstmt
    ;
 
 assignstmt
-   : memcontents EQ arithexp
+   : memcontents (EQ | '==+' | '==-') arithexp
    ;
 
 exitstmt
