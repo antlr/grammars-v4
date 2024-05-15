@@ -42,7 +42,7 @@ file_
    ;
 
 program
-   : ('MODULE' progmodule+)+
+   : ('MODULE'? progmodule+)+
    ;
 
 progmodule
@@ -169,12 +169,17 @@ dim
 
 arrinitopts
    : addr
-   | value+
+   | arrayvalue+
    | STRCONST
    ;
-
-valuelist
-   : value+
+   //arrayvaluelist
+   
+   //   : arrayvalue+
+   
+   //   ;
+   
+arrayvalue
+   : COMPCONST
    ;
 
 recorddecl
@@ -247,20 +252,18 @@ funcdecl
    ;
 
 routinecall
-   : funccall
-   | proccall
-   ;
-
-funccall
-   : IDENTIFIER '(' params? ')'
-   ;
-
-proccall
    : IDENTIFIER '(' params? ')'
    ;
 
 params
-   : paramdecl (',' paramdecl)*
+   : param (',' param)*
+   ;
+
+param
+   : IDENTIFIER
+   | COMPCONST
+   | STRCONST
+   | NUMCONST
    ;
 
 paramdecl
@@ -273,14 +276,17 @@ stmtlist
 
 stmt
    : simpstmt
-   | strucstmt
-   | codeblock
+   // | strucstmt
+   
+   // | codeblock
+   
    ;
 
 simpstmt
-   : assignstmt
-   | exitstmt
-   | routinecall
+   : //assignstmt
+   
+   // | exitstmt
+   routinecall
    ;
 
 strucstmt
@@ -437,7 +443,7 @@ HEXNUM
    | '$' HEXNUM
    ;
    // extend this
-
+   
 CHAR
    : [a-zA-Z0-9]
    ;
@@ -462,7 +468,9 @@ COMPCONST
    : BASECOMPCONST+
    ;
 
-fragment MUL: '*';
+fragment MUL
+   : '*'
+   ;
 
 BASECOMPCONST
    : IDENTIFIER
