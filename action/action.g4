@@ -58,7 +58,7 @@ deflist
    ;
 
 def
-   : IDENTIFIER '=' STRCONST
+   : IDENTIFIER EQ STRCONST
    ;
 
 typedecl
@@ -70,7 +70,7 @@ typeerecidentlist
    ;
 
 typerecident
-   : recname '=' fieldinit+
+   : recname EQ fieldinit+
    ;
 
 recname
@@ -112,7 +112,7 @@ fundidentlist
    ;
 
 fundident
-   : IDENTIFIER ('=' initopts)?
+   : IDENTIFIER (EQ initopts)?
    ;
 
 initopts
@@ -142,7 +142,7 @@ ptridentlist
    ;
 
 ptrident
-   : IDENTIFIER ('=' value)?
+   : IDENTIFIER (EQ value)?
    ;
 
 arraydecl
@@ -154,7 +154,7 @@ arridentlist
    ;
 
 arrident
-   : IDENTIFIER ('(' dim ')')? ('=' arrinitopts)?
+   : IDENTIFIER ('(' dim ')')? (EQ arrinitopts)?
    ;
 
 dim
@@ -181,7 +181,7 @@ recidentlist
    ;
 
 recident
-   : IDENTIFIER ('=' address)?
+   : IDENTIFIER (EQ address)?
    ;
 
 address
@@ -230,7 +230,7 @@ procroutine
    ;
 
 procdecl
-   : 'PROC' IDENTIFIER ('=' addr)? '(' paramdecl? ')'
+   : 'PROC' IDENTIFIER (EQ addr)? '(' paramdecl? ')'
    ;
 
 funcroutine
@@ -285,7 +285,7 @@ strucstmt
    ;
 
 assignstmt
-   : memcontents '=' arithexp
+   : memcontents EQ arithexp
    ;
 
 exitstmt
@@ -317,7 +317,7 @@ whileloop
    ;
 
 forloop
-   : 'FOR' IDENTIFIER '=' start 'TO' finish ('STEP' inc)? doloop
+   : 'FOR' IDENTIFIER EQ start 'TO' finish ('STEP' inc)? doloop
    ;
 
 start
@@ -372,6 +372,10 @@ valuevalue
    | '(' arithexp ')'
    ;
 
+EQ
+   : '='
+   ;
+
 FUNDTYPE
    : 'CARD'
    | 'CHAR'
@@ -389,7 +393,7 @@ SPECIALOP
 RELOP
    : 'XOR'
    | '!'
-   | '='
+   | EQ
    | '#'
    | '<>'
    | '<'
