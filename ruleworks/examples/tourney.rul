@@ -1,0 +1,385 @@
+;;;+
+;;;				TOURNEY.RUL
+;;;
+;;;  This program solves the problem of how to schedule 16 bridge players
+;;;  for 15 nights.  Each night there are 4 games happening, with 4 players
+;;;  at each game.  The constraint is that no two people can be partners
+;;;  more than once, or adversaries more than twice.
+;;;
+;;;  This program schedules the first five nights in such a way that no two
+;;;  players are in the same game twice.  The second five nights have the
+;;;  identical schedule as the first five nights but south and east are
+;;;  reversed so that partners become adversaries and vice versa.  The third
+;;;  five nights are similar to the first but south and west are reversed.
+;;;
+;;;  Author:  Bill Barabash,	Creation date: 12-Jan-1984
+;;;
+;;;  Modified by:
+;;;	WB	Bill Barabash
+;;;
+;;;  REVISION HISTORY:
+;;;	24-Sep-1991	WB	Converted to DEC OPS5 V4.0 new constructs.
+;;;	28-Aug-1996	JB	Converted to RuleWorks
+;;;-
+
+;;;+
+;;;  Working Memory Element definitions
+;;;-
+
+
+(entry-block |main| (strategy mea))
+
+(object-class player
+  ^number
+  ^nights-scheduled)
+
+(object-class foursome
+  ^night
+  ^group
+  ^north
+  ^south
+  ^east
+  ^west)
+
+(object-class context
+  ^name)
+
+(object-class scheduling
+  ^night)
+
+(object-class already-played
+  ^player1
+  ^player2)
+
+(object-class candidate
+  ^group
+  ^chosen
+  ^south
+  ^east
+  ^west)
+
+;;;+
+;;;  Initialize working memory with a template for each player and each
+;;;  foursome for the first five nights.
+;;;-
+(on-entry
+  (make player ^number 1 ^nights-scheduled 0)
+  (make player ^number 2 ^nights-scheduled 0)
+  (make player ^number 3 ^nights-scheduled 0)
+  (make player ^number 4 ^nights-scheduled 0)
+  (make player ^number 5 ^nights-scheduled 0)
+  (make player ^number 6 ^nights-scheduled 0)
+  (make player ^number 7 ^nights-scheduled 0)
+  (make player ^number 8 ^nights-scheduled 0)
+  (make player ^number 9 ^nights-scheduled 0)
+  (make player ^number 10 ^nights-scheduled 0)
+  (make player ^number 11 ^nights-scheduled 0)
+  (make player ^number 12 ^nights-scheduled 0)
+  (make player ^number 13 ^nights-scheduled 0)
+  (make player ^number 14 ^nights-scheduled 0)
+  (make player ^number 15 ^nights-scheduled 0)
+  (make player ^number 16 ^nights-scheduled 0)
+  (make foursome ^night 1 ^group a ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 1 ^group b ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 1 ^group c ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 1 ^group d ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 2 ^group a ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 2 ^group b ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 2 ^group c ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 2 ^group d ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 3 ^group a ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 3 ^group b ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 3 ^group c ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 3 ^group d ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 4 ^group a ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 4 ^group b ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 4 ^group c ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 4 ^group d ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 5 ^group a ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 5 ^group b ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 5 ^group c ^north nil ^south nil ^east nil ^west nil)
+  (make foursome ^night 5 ^group d ^north nil ^south nil ^east nil ^west nil)
+  (make context ^name north)
+  (make scheduling ^night 1)
+  (write (tabto 32) |Tournament Schedule| (crlf) (crlf)
+	 (tabto 15) |N  S  E  W|
+	 (tabto 42) |N  S  E  W|
+	 (tabto 68) |N  S  E  W| (crlf)
+	 (tabto 15) |=  =  =  =|
+	 (tabto 42) |=  =  =  =|
+	 (tabto 68) |=  =  =  =| (crlf))
+;  (debug)
+)
+
+;;;+
+;;;  Schedule a north player for a game.  Pick the one that has already played
+;;;  the largest number of people already chosen as tonight's norths.
+;;;-
+(rule north:pick-one-1
+  (context ^name north)
+  (scheduling ^night <n>)
+  (foursome ^$id <THE-FOURSOME> ^night <n> ^north nil)
+  (player ^$id <THE-PLAYER> ^number <p> ^nights-scheduled < <n>)
+  (foursome ^night <n> ^north { <p1> <> nil })
+  (foursome ^night <n> ^north { <p2> <> <p1> <> nil })
+  (foursome ^night <n> ^north { <p3> <> <p2> <> <p1> <> nil })
+  (already-played ^player1 <p> ^player2 <p1>)
+  (already-played ^player1 <p> ^player2 <p2>)
+  (already-played ^player1 <p> ^player2 <p3>)
+-->
+  (modify <THE-PLAYER> ^nights-scheduled <n>)
+  (modify <THE-FOURSOME> ^north <p>) )
+
+(rule north:pick-one-2
+  (context ^name north)
+  (scheduling ^night <n>)
+  (foursome ^$id <THE-FOURSOME> ^night <n> ^north nil)
+  (player ^$id <THE-PLAYER> ^number <p> ^nights-scheduled < <n>)
+  (foursome ^night <n> ^north { <p1> <> nil })
+  (foursome ^night <n> ^north { <p2> <> <p1> <> nil })
+  (already-played ^player1 <p> ^player2 <p1>)
+  (already-played ^player1 <p> ^player2 <p2>)
+-->
+  (modify <THE-PLAYER> ^nights-scheduled <n>)
+  (modify <THE-FOURSOME> ^north <p>) )
+
+(rule north:pick-one-3
+  (context ^name north)
+  (scheduling ^night <n>)
+  (foursome ^$id <THE-FOURSOME> ^night <n> ^north nil)
+  (player ^$id <THE-PLAYER> ^number <p> ^nights-scheduled < <n>)
+  (foursome ^night <n> ^north { <p1> <> nil })
+  (already-played ^player1 <p> ^player2 <p1>)
+-->
+  (modify <THE-PLAYER> ^nights-scheduled <n>)
+  (modify <THE-FOURSOME> ^north <p>) )
+
+(rule north:pick-one-4
+  (context ^name north)
+  (scheduling ^night <n>)
+  (foursome ^$id <THE-FOURSOME> ^night <n> ^north nil)
+  (player ^$id <THE-PLAYER> ^number <p> ^nights-scheduled < <n>)
+-->
+  (modify <THE-PLAYER> ^nights-scheduled <n>)
+  (modify <THE-FOURSOME> ^north <p>) )
+
+(rule north:done
+  (context ^$id <THE-CONTEXT> ^name north)
+-->
+  (modify <THE-CONTEXT> ^name make-candidates))
+
+;;;+
+;;;  Start scheduling south, east and west players.  For the 1st two nights,
+;;;  heuristics must limit the staggering number of possiblities.  For the
+;;;  third thru fifth nights in the schedule, we must exhaustively enumerate
+;;;  all possible south-east-west candidates, because the number of possibil-
+;;;  ities becomes limited so we can't be picky.
+;;;
+;;;  Make south-east-west candidates for each foursome.  The heuristic that
+;;;  limits the choices is embodied in the "-(candidate...)" conditions, and
+;;;  prevents two s-e-w candidates from being made that are identical in two
+;;;  of the three positions.
+;;;
+;;;  There is no reason why this heuristic should work other than that I've
+;;;  tried it and found that it does.  The requirement that the player numbers
+;;;  for south, east and west be in decreasing order eliminates duplicates.
+;;;-
+(rule make-candidates:make-candidate
+  (context ^name make-candidates)
+  (scheduling ^night { <n> < 3 })
+  (foursome ^night <n> ^group <g> ^north <yankee>)
+  (player ^number <redneck> ^nights-scheduled < <n>)
+  (player ^number { <oriental> < <redneck> } ^nights-scheduled < <n>)
+  (player ^number { <cowboy> < <oriental> } ^nights-scheduled < <n>)
+  - (already-played ^player1 <yankee> ^player2 <redneck>)
+  - (already-played ^player1 <yankee> ^player2 <oriental>)
+  - (already-played ^player1 <yankee> ^player2 <cowboy>)
+  - (already-played ^player1 <redneck> ^player2 <oriental>)
+  - (already-played ^player1 <redneck> ^player2 <cowboy>)
+  - (already-played ^player1 <oriental> ^player2 <cowboy>)
+  - (candidate ^group <g> ^chosen no ^south <redneck> ^east <oriental>)
+  - (candidate ^group <g> ^chosen no ^south <redneck> ^west <cowboy>)
+  - (candidate ^group <g> ^chosen no ^east <oriental> ^west <cowboy>)
+-->
+  (make candidate ^group <g> ^chosen no
+	 ^south <redneck> ^east <oriental> ^west <cowboy>))
+
+;;;+
+;;;  Nights 3, 4 and 5.  No heuristics are used to eliminate legal choices so
+;;;  all possible candidates are generated.  The number of possibilities is
+;;;  now small enough that the use of heuristics would probably eliminate the
+;;;  winning candidates.
+;;;-
+(rule make-candidates:make-candidate-late
+  (context ^name make-candidates)
+  (scheduling ^night { <n> > 2 })
+  (foursome ^night <n> ^group <g> ^north <yankee>)
+  (player ^number <redneck> ^nights-scheduled < <n>)
+  (player ^number { <oriental> < <redneck> } ^nights-scheduled < <n>)
+  (player ^number { <cowboy> < <oriental> } ^nights-scheduled < <n>)
+  - (already-played ^player1 <yankee> ^player2 <redneck>)
+  - (already-played ^player1 <yankee> ^player2 <oriental>)
+  - (already-played ^player1 <yankee> ^player2 <cowboy>)
+  - (already-played ^player1 <redneck> ^player2 <oriental>)
+  - (already-played ^player1 <redneck> ^player2 <cowboy>)
+  - (already-played ^player1 <oriental> ^player2 <cowboy>)
+-->
+  (make candidate ^group <g> ^chosen no
+	^south <redneck> ^east <oriental> ^west <cowboy>))
+
+;;;+
+;;;  Finished generating candidates.
+;;;-
+(rule make-candidates:done
+  (context ^$id <THE-CONTEXT> ^name make-candidates)
+-->
+  (modify <THE-CONTEXT> ^name make-choice)) 
+
+;;;+
+;;;  Schedule the rest of the players (south, east and west).
+;;;  The RuleWorks pattern matcher earns its pay here.
+;;;-
+(rule make-choice:doit
+  (context ^$id <THE-CONTEXT> ^name make-choice)
+  (candidate ^$id <WINNER-A> ^group a ^chosen no
+	^south <sa>
+	^east  <ea>
+	^west  <wa>)
+  (candidate ^$id <WINNER-B> ^group b ^chosen no
+	^south { <sb> <> <sa> <> <ea> <> <wa> }
+	^east  { <eb> <> <sa> <> <ea> <> <wa> }
+	^west  { <wb> <> <sa> <> <ea> <> <wa> })
+  (candidate ^$id <WINNER-C> ^group c ^chosen no
+	^south { <sc> <> <sa> <> <ea> <> <wa> <> <sb> <> <eb> <> <wb> }
+	^east  { <ec> <> <sa> <> <ea> <> <wa> <> <sb> <> <eb> <> <wb> }
+	^west  { <wc> <> <sa> <> <ea> <> <wa> <> <sb> <> <eb> <> <wb> })
+  (candidate ^$id <WINNER-D> ^group d ^chosen no
+	^south { <sd>
+			<> <sa> <> <ea> <> <wa>
+			<> <sb> <> <eb> <> <wb>
+			<> <sc> <> <ec> <> <wc> }
+	^east  { <ed>
+			<> <sa> <> <ea> <> <wa>
+			<> <sb> <> <eb> <> <wb>
+			<> <sc> <> <ec> <> <wc> }
+	^west  { <wd>
+			<> <sa> <> <ea> <> <wa>
+			<> <sb> <> <eb> <> <wb>
+			<> <sc> <> <ec> <> <wc> })
+--> 
+  (modify <WINNER-A> ^chosen yes)
+  (modify <WINNER-B> ^chosen yes)
+  (modify <WINNER-C> ^chosen yes)
+  (modify <WINNER-D> ^chosen yes)
+  (modify <THE-CONTEXT> ^name remove-candidates))
+
+;;;+
+;;;  Remove all unsuccessful candidates.
+;;;-
+(rule remove-candidates:bye
+  (context ^name remove-candidates)
+  (candidate ^$id <THE-CANDIDATE> ^chosen no)
+-->
+  (remove <THE-CANDIDATE>))
+
+(rule remove-candidates:done
+  (context ^$id <THE-CONTEXT> ^name remove-candidates)
+-->
+  (modify <THE-CONTEXT> ^name apply-choice))
+
+;;;+
+;;;  Go apply the choice.  Empty slots in the night's foursomes are filled in,
+;;;  and working memory elements are made showing that the players in each
+;;;  foursome have indeed played one another.
+;;;-
+(rule apply-choice:doit
+  (context ^name apply-choice)
+  (scheduling ^night <n>)
+  (foursome ^$id <THE-FOURSOME> ^night <n> ^group <g> ^north <yankee>)
+  (candidate ^$id <THE-CHOICE> ^group <g> ^chosen yes
+			^south <redneck> ^east <oriental> ^west <cowboy>)
+-->
+  (modify <THE-FOURSOME> ^south <redneck> ^east <oriental> ^west <cowboy>)
+  (remove <THE-CHOICE>)
+  (make already-played ^player1 <yankee> ^player2 <redneck>)
+  (make already-played ^player2 <yankee> ^player1 <redneck>)
+  (make already-played ^player1 <yankee> ^player2 <oriental>)
+  (make already-played ^player2 <yankee> ^player1 <oriental>)
+  (make already-played ^player1 <yankee> ^player2 <cowboy>)
+  (make already-played ^player2 <yankee> ^player1 <cowboy>)
+  (make already-played ^player1 <redneck> ^player2 <oriental>)
+  (make already-played ^player2 <redneck> ^player1 <oriental>)
+  (make already-played ^player1 <redneck> ^player2 <cowboy>)
+  (make already-played ^player2 <redneck> ^player1 <cowboy>)
+  (make already-played ^player1 <oriental> ^player2 <cowboy>)
+  (make already-played ^player2 <oriental> ^player1 <cowboy>))
+
+(rule apply-choice:done
+  (context ^$id <THE-CONTEXT> ^name apply-choice)
+-->
+  (modify <THE-CONTEXT> ^name report))
+
+;;;+
+;;;  Print the schedule for tonight and the two permutations based on
+;;;  tonight.
+;;;-
+(rule report:night-schedule
+  (context ^$id <THE-CONTEXT> ^name report)
+  (scheduling ^night <n>)
+  (foursome ^night <n> ^group a ^north <an> ^south <as> ^east <ae> ^west <aw>)
+  (foursome ^night <n> ^group b ^north <bn> ^south <bs> ^east <be> ^west <bw>)
+  (foursome ^night <n> ^group c ^north <cn> ^south <cs> ^east <ce> ^west <cw>)
+  (foursome ^night <n> ^group d ^north <dn> ^south <ds> ^east <de> ^west <dw>)
+-->
+  (modify <THE-CONTEXT> ^name next-night)
+  (bind <n2> (<n> + 5))
+  (bind <n3> (<n> + 10))
+  (write (crlf) (rjust 1) |#| (rjust 1) <n> (rjust 1) : (tabto 5)
+	|Group A:| (rjust 3) <an> (rjust 3) <as> (rjust 3) <ae> (rjust 3) <aw>
+	(tabto 27) (rjust 1) |#| (rjust 2) <n2> (rjust 1) : (tabto 32)
+	|Group A:| (rjust 3) <an> (rjust 3) <ae> (rjust 3) <as> (rjust 3) <aw>
+	(tabto 53) (rjust 1) |#| (rjust 2) <n3> (rjust 1) : (tabto 58)
+	|Group A:| (rjust 3) <an> (rjust 3) <aw> (rjust 3) <ae> (rjust 3) <as>
+    (crlf)
+	(tabto 5)
+	|Group B:| (rjust 3) <bn> (rjust 3) <bs> (rjust 3) <be> (rjust 3) <bw>
+	(tabto 32)
+	|Group B:| (rjust 3) <bn> (rjust 3) <be> (rjust 3) <bs> (rjust 3) <bw>
+	(tabto 58)
+	|Group B:| (rjust 3) <bn> (rjust 3) <bw> (rjust 3) <be> (rjust 3) <bs>
+    (crlf)
+	(tabto 5)
+	|Group C:| (rjust 3) <cn> (rjust 3) <cs> (rjust 3) <ce> (rjust 3) <cw>
+	(tabto 32)
+	|Group C:| (rjust 3) <cn> (rjust 3) <ce> (rjust 3) <cs> (rjust 3) <cw>
+	(tabto 58)
+	|Group C:| (rjust 3) <cn> (rjust 3) <cw> (rjust 3) <ce> (rjust 3) <cs>
+    (crlf)
+	(tabto 5)
+	|Group D:| (rjust 3) <dn> (rjust 3) <ds> (rjust 3) <de> (rjust 3) <dw>
+	(tabto 32)
+	|Group D:| (rjust 3) <dn> (rjust 3) <de> (rjust 3) <ds> (rjust 3) <dw>
+	(tabto 58)
+	|Group D:| (rjust 3) <dn> (rjust 3) <dw> (rjust 3) <de> (rjust 3) <ds>
+    (crlf)))
+
+;;;+
+;;;  Start scheduling the next night of games.
+;;;-
+(rule next-night:more
+  (context ^$id <THE-CONTEXT> ^name next-night)
+  (scheduling ^$id <THE-NIGHT> ^night { <n> < 5 })
+-->
+  (modify <THE-CONTEXT> ^name north)
+  (modify <THE-NIGHT> ^night (<n> + 1)))
+
+;;;+
+;;;  Finished scheduling all nights.
+;;;-
+(rule next-night:done
+  (context ^name next-night)
+-->
+  (quit))
+
+(end-block |main|)
+
