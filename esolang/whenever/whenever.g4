@@ -38,11 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar whenever;
 
 program_
-   : line* EOF
+   : line* EOL* EOF
    ;
 
 line
-   : linenumber addremove? ugh* statement_list? ';' EOL
+   : linenumber ugh* statement_list? ';' EOL
    ;
 
 ugh
@@ -80,9 +80,7 @@ statement_list
    ;
 
 statement
-   : print_statement
-   | read_statement
-   | decl_statement
+   : addremove? (print_statement | read_statement | decl_statement)?
    ;
 
 decl_statement
@@ -98,7 +96,7 @@ read_statement
    ;
 
 expression
-   : term (COMPARE term)?
+   : term (COMPARE term)*
    ;
 
 term
@@ -116,7 +114,7 @@ add_term
 value
    : NUMBER
    | func
-   | string_exp
+   | QUOTED_STRING
    ;
 
 func
@@ -132,15 +130,14 @@ func_u
    : 'U' '(' term ')'
    ;
 
-string_exp
-   : QUOTED_STRING ('+' QUOTED_STRING)*
-   ;
-
 COMPARE
    : '<'
    | '>'
    | '>='
    | '<='
+   | '=='
+   | '||'
+   | '&&'
    ;
 
 NOT
@@ -150,8 +147,6 @@ NOT
 MULT_OP
    : '*'
    | '/'
-   | '||'
-   | '&&'
    ;
 
 ADD_OP
