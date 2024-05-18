@@ -15,8 +15,10 @@ options {
     caseInsensitive = true;
 }
 
-program
-    : TOK_LPAREN program_line* TOK_RPAREN
+program: program_construct+ EOF ;
+
+program_construct
+    : TOK_LPAREN program_line+ TOK_RPAREN
     ;
 
 program_line
