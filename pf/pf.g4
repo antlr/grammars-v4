@@ -48,7 +48,7 @@ option
    ;
 
 pf_rule
-   : action direction? logging? 'quick'? onspec? af? protospec? hosts? filteropts?
+   : action direction? logging? 'quick'? onspec? af? protospec? hosts filteropts?
    ;
 
 onspec
@@ -56,7 +56,8 @@ onspec
    ;
 
 direction
-   : 'in' | 'out'
+   : 'in'
+   | 'out'
    ;
 
 logging
@@ -165,7 +166,7 @@ queue_rule
    ;
 
 anchor_rule
-   : 'anchor' (STRING)? (('in' | 'out'))? ('on' ifspec)? (af)? (protospec)? (hosts)? (filteropts)? ('{')?
+   : 'anchor' STRING? (('in' | 'out'))? ('on' ifspec)? af? protospec? hosts? filteropts? ('{')?
    ;
 
 anchor_close
@@ -244,13 +245,15 @@ proto_list
 
 hosts
    : 'all'
-   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' QUOTED_STRING) port? os? ('to' ('any' | 'no-route' | 'self' | host | '{' host_list '}')? | 'route' STRING) (port)?
+   | fromspec? tospec?
    ;
 
-ipspec
-   : 'any'
-   | host
-   | '{' host_list '}'
+fromspec
+   : 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | host_list | 'route' (STRING | QUOTED_STRING)) port? os?
+   ;
+
+tospec
+   : 'to' ('any' | 'no-route' | 'self' | host | host_list | 'route' (STRING | QUOTED_STRING)) port?
    ;
 
 host
@@ -266,7 +269,7 @@ address
    ;
 
 host_list
-   : host (',' host)?
+   : '{' host (',' host)? '}'
    ;
 
 redirhost_list
