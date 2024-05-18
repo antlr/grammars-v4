@@ -36,7 +36,11 @@ file_
    ;
 
 line
-   : (option | pf_rule | antispoof_rule | queue_rule | anchor_rule | anchor_close | load_anchor | table_rule | include)
+   : (option | pf_rule | antispoof_rule | queue_rule | anchor_rule | anchor_close | load_anchor | table_rule | include | var)
+   ;
+
+var
+   : STRING '=' QUOTED_STRING
    ;
 
 option
@@ -44,7 +48,19 @@ option
    ;
 
 pf_rule
-   : action (('in' | 'out'))? ('log' ('(' logopts ')')?)? ('quick')? ('on' (ifspec | 'rdomain' NUMBER))? (af)? (protospec)? (hosts)? (filteropts)?
+   : action direction? logging? 'quick'? onspec? af? protospec? hosts? filteropts?
+   ;
+
+onspec
+   : 'on' (ifspec | 'rdomain' NUMBER)
+   ;
+
+direction
+   : 'in' | 'out'
+   ;
+
+logging
+   : 'log' ('(' logopts ')')?
    ;
 
 logopts
@@ -77,7 +93,7 @@ filteropt
    | 'divert-packet' 'port' port
    | 'divert-reply'
    | 'divert-to' host 'port' port
-   | 'label' STRING
+   | 'label' QUOTED_STRING
    | 'tag' STRING
    | ('!')? 'tagged' STRING
    | 'max-pkt-rate' NUMBER '/' seconds
@@ -228,7 +244,7 @@ proto_list
 
 hosts
    : 'all'
-   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' QUOTED_STRING) (port)? (os)? 'to' ('any' | 'no-route' | 'self' | host | '{' host_list '}' | 'route' STRING) (port)?
+   | 'from' ('any' | 'no-route' | 'urpf-failed' | 'self' | host | '{' host_list '}' | 'route' QUOTED_STRING) port? os? ('to' ('any' | 'no-route' | 'self' | host | '{' host_list '}')? | 'route' STRING) (port)?
    ;
 
 ipspec

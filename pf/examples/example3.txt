@@ -1,8 +1,1 @@
-pass in all
-pass in from any to any
-pass in proto tcp from any port < 1024 to any
-pass in proto tcp from any to any port 25
-pass in proto tcp from 10.0.0.0/8 port >= 1024 \
-      to ! 10.1.2.3 port != ssh
-pass in proto tcp from any os "OpenBSD"
 pass in proto tcp from route "DTAG"
