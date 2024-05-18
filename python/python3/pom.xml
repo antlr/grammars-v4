@@ -47,7 +47,7 @@
 					<entryPoint>file_input</entryPoint>
 					<grammarName>Python3</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>large/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

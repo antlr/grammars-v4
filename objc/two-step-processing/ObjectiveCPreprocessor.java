@@ -10,7 +10,7 @@ import java.util.*;
  * Created by ikochurkin on 28.07.2016.
  */
 public class ObjectiveCPreprocessor extends ObjectiveCPreprocessorParserBaseVisitor<String> {
-    private Stack<Boolean> _conditions = new Stack<Boolean>();
+    private final Deque<Boolean> _conditions = new ArrayDeque<Boolean>();
     private boolean _compilied = true;
     private CommonTokenStream _tokensStream;
 

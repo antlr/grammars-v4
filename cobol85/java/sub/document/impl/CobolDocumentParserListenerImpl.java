@@ -10,9 +10,10 @@ package io.proleap.cobol.preprocessor.sub.document.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Stack;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -39,7 +40,7 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 
 	private final static Logger LOG = LogManager.getLogger(CobolDocumentParserListenerImpl.class);
 
-	private final Stack<CobolDocumentContext> contexts = new Stack<CobolDocumentContext>();
+	private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
 	private final List<File> copyFiles;
 

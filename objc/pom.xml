@@ -18,8 +18,7 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>one-step-processing/ObjectiveCLexer.g4</include>
-						<include>one-step-processing/ObjectiveCPreprocessorParser.g4</include>
+						<include>ObjectiveCLexer.g4</include>
 						<include>ObjectiveCParser.g4</include>
 					</includes>
 					<visitor>true</visitor>

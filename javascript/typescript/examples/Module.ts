@@ -11,3 +11,17 @@ export class Employee {
     }
 }
 let companyName:string = "XYZ";
+
+
+module.exports.routes = {
+    "GET /lookup/:lookupId": {
+        controller: "LookupReferenceController"
+    },
+    "POST /lookup": {
+        controller: "LookupReferenceController"
+    },
+
+'/health': function(req, res) {
+    return res.json({status: 'UP', version: sails.config.version});
+}
+}

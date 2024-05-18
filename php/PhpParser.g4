@@ -23,9 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar PhpParser;
 
-options { tokenVocab=PhpLexer; }
+options {
+    tokenVocab = PhpLexer;
+}
 
 // HTML
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
@@ -58,12 +63,9 @@ htmlElement
     | HtmlDecimal
     | HtmlQuoteString
     | HtmlDoubleQuoteString
-
     | StyleBody
-
     | HtmlScriptOpen
     | HtmlScriptClose
-
     | XmlStart XmlText* XmlClose
     ;
 
@@ -91,6 +93,7 @@ topStatement
     | functionDeclaration
     | classDeclaration
     | globalConstantDeclaration
+    | enumDeclaration
     ;
 
 useDeclaration
@@ -106,7 +109,10 @@ useDeclarationContent
     ;
 
 namespaceDeclaration
-    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* CloseCurlyBracket | namespaceNameList SemiColon)
+    : Namespace (
+        namespaceNameList? OpenCurlyBracket namespaceStatement* CloseCurlyBracket
+        | namespaceNameList SemiColon
+    )
     ;
 
 namespaceStatement
@@ -118,14 +124,18 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (
+        ':' QuestionMark? typeHint
+    )? blockStatement
     ;
 
 classDeclaration
     : attributes? Private? modifier? Partial? (
-      classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
-    | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* CloseCurlyBracket
+        classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (
+            Implements interfaceList
+        )?
+        | Interface identifier typeParameterListInBrackets? (Extends interfaceList)?
+    ) OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
 
 classEntryType
@@ -251,7 +261,10 @@ doWhileStatement
     ;
 
 forStatement
-    : For '(' forInit? SemiColon expressionList? SemiColon forUpdate? ')' (statement | ':' innerStatementList EndFor SemiColon )
+    : For '(' forInit? SemiColon expressionList? SemiColon forUpdate? ')' (
+        statement
+        | ':' innerStatementList EndFor SemiColon
+    )
     ;
 
 forInit
@@ -263,7 +276,10 @@ forUpdate
     ;
 
 switchStatement
-    : Switch parentheses (OpenCurlyBracket SemiColon? switchBlock* CloseCurlyBracket | ':' SemiColon? switchBlock* EndSwitch SemiColon)
+    : Switch parentheses (
+        OpenCurlyBracket SemiColon? switchBlock* CloseCurlyBracket
+        | ':' SemiColon? switchBlock* EndSwitch SemiColon
+    )
     ;
 
 switchBlock
@@ -291,11 +307,12 @@ unsetStatement
     ;
 
 foreachStatement
-    : Foreach
-        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+    : Foreach (
+        '(' expression As arrayDestructuring ')'
+        | '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
         | '(' expression As assignable ('=>' '&'? chain)? ')'
-        | '(' chain As List '(' assignmentList ')' ')' )
-      (statement | ':' innerStatementList EndForeach SemiColon)
+        | '(' chain As List '(' assignmentList ')' ')'
+    ) (statement | ':' innerStatementList EndForeach SemiColon)
     ;
 
 tryCatchFinally
@@ -303,7 +320,7 @@ tryCatchFinally
     ;
 
 catchClause
-    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName ')' blockStatement
+    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName? ')' blockStatement
     ;
 
 finallyStatement
@@ -327,7 +344,13 @@ inlineHtmlStatement
     ;
 
 declareList
-    : identifierInitializer (',' identifierInitializer)*
+    : directive (',' directive)*
+    ;
+
+directive
+    : Ticks Eq (numericConstant | Real)
+    | Encoding Eq SingleQuoteString
+    | StrictTypes Eq numericConstant
     ;
 
 formalParameterList
@@ -335,7 +358,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes? memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier* QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -364,10 +387,16 @@ staticVariableStatement
     ;
 
 classStatement
-    : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
-                  | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
-                                     | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
-                                       baseCtorCall? methodBody))
+    : attributes? (
+        propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
+        | memberModifiers? (
+            Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
+            | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (
+                baseCtorCall
+                | returnTypeDecl
+            )? methodBody
+        )
+    )
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
@@ -397,6 +426,10 @@ baseCtorCall
     : ':' identifier arguments?
     ;
 
+returnTypeDecl
+    : ':' QuestionMark? typeHint
+    ;
+
 methodBody
     : SemiColon
     | blockStatement
@@ -423,6 +456,16 @@ globalConstantDeclaration
     : attributes? Const identifierInitializer (',' identifierInitializer)* SemiColon
     ;
 
+enumDeclaration
+    : Enum_ identifier (Colon (IntType | StringType))? (Implements interfaceList)? OpenCurlyBracket enumItem* CloseCurlyBracket
+    ;
+
+enumItem
+    : Case identifier (Eq expression)? SemiColon
+    | memberModifiers? functionDeclaration
+    | Use qualifiedNamespaceNameList traitAdaptations
+    ;
+
 expressionList
     : expression (',' expression)*
     ;
@@ -434,70 +477,54 @@ parentheses
 // Expressions
 // Grouped by priorities: http://php.net/manual/en/language.operators.precedence.php
 expression
-    : Clone expression                                          #CloneExpression
-    | newExpr                                                   #NewExpression
-
-    | stringConstant '[' expression ']'                         #IndexerExpression
-
-    | '(' castOperation ')' expression                          #CastExpression
-    | ('~' | '@') expression                                    #UnaryOperatorExpression
-
-    | ('!' | '+' | '-') expression                              #UnaryOperatorExpression
-
-    | ('++' | '--') chain                                       #PrefixIncDecExpression
-    | chain ('++' | '--')                                       #PostfixIncDecExpression
-
-    | Print expression                                          #PrintExpression
-
-    | arrayCreation                                             #ArrayCreationExpression
-    | chain                                                     #ChainExpression
-    | constant                                                  #ScalarExpression
-    | string                                                    #ScalarExpression
-    | Label                                                     #ScalarExpression
-
-    | BackQuoteString                                           #BackQuoteStringExpression
-    | parentheses                                               #ParenthesisExpression
-
-    | Yield                                                     #SpecialWordExpression
-    | List '(' assignmentList ')' Eq expression                 #SpecialWordExpression
-    | IsSet '(' chainList ')'                                   #SpecialWordExpression
-    | Empty '(' chain ')'                                       #SpecialWordExpression
-    | Eval '(' expression ')'                                   #SpecialWordExpression
-    | Exit ( '(' ')' | parentheses )?                           #SpecialWordExpression
-    | (Include | IncludeOnce) expression                        #SpecialWordExpression
-    | (Require | RequireOnce) expression                        #SpecialWordExpression
-
-    | lambdaFunctionExpr                                        #LambdaFunctionExpression
-    | matchExpr                                                 #MatchExpression
-
-    | <assoc=right> expression op='**' expression               #ArithmeticExpression
-    | expression InstanceOf typeRef                             #InstanceOfExpression
-    | expression op=('*' | Divide | '%') expression             #ArithmeticExpression
-
-    | expression op=('+' | '-' | '.') expression                #ArithmeticExpression
-
-    | expression op=('<<' | '>>') expression                    #ComparisonExpression
-    | expression op=(Less | '<=' | Greater | '>=') expression   #ComparisonExpression
-    | expression op=('===' | '!==' | '==' | IsNotEq) expression #ComparisonExpression
-
-    | expression op='&' expression                              #BitwiseExpression
-    | expression op='^' expression                              #BitwiseExpression
-    | expression op='|' expression                              #BitwiseExpression
-    | expression op='&&' expression                             #BitwiseExpression
-    | expression op='||' expression                             #BitwiseExpression
-
-    | expression op=QuestionMark expression? ':' expression     #ConditionalExpression
-    | expression op='??' expression                             #NullCoalescingExpression
-    | expression op='<=>' expression                            #SpaceshipExpression
-
-    | Throw expression                                          #SpecialWordExpression
-
-    | assignable assignmentOperator attributes? expression      #AssignmentExpression
-    | assignable Eq attributes? '&' (chain | newExpr)           #AssignmentExpression
-
-    | expression op=LogicalAnd expression                       #LogicalExpression
-    | expression op=LogicalXor expression                       #LogicalExpression
-    | expression op=LogicalOr expression                        #LogicalExpression
+    : Clone expression                                            # CloneExpression
+    | newExpr                                                     # NewExpression
+    | stringConstant '[' expression ']'                           # IndexerExpression
+    | '(' castOperation ')' expression                            # CastExpression
+    | ('~' | '@') expression                                      # UnaryOperatorExpression
+    | ('!' | '+' | '-') expression                                # UnaryOperatorExpression
+    | ('++' | '--') chain                                         # PrefixIncDecExpression
+    | chain ('++' | '--')                                         # PostfixIncDecExpression
+    | Print expression                                            # PrintExpression
+    | arrayCreation                                               # ArrayCreationExpression
+    | chain                                                       # ChainExpression
+    | constant                                                    # ScalarExpression
+    | string                                                      # ScalarExpression
+    | Label                                                       # ScalarExpression
+    | BackQuoteString                                             # BackQuoteStringExpression
+    | parentheses                                                 # ParenthesisExpression
+    | Yield                                                       # SpecialWordExpression
+    | List '(' assignmentList ')' Eq expression                   # SpecialWordExpression
+    | IsSet '(' chainList ')'                                     # SpecialWordExpression
+    | Empty '(' chain ')'                                         # SpecialWordExpression
+    | Eval '(' expression ')'                                     # SpecialWordExpression
+    | Exit ( '(' ')' | parentheses)?                              # SpecialWordExpression
+    | (Include | IncludeOnce) expression                          # SpecialWordExpression
+    | (Require | RequireOnce) expression                          # SpecialWordExpression
+    | lambdaFunctionExpr                                          # LambdaFunctionExpression
+    | matchExpr                                                   # MatchExpression
+    | <assoc = right> expression op = '**' expression             # ArithmeticExpression
+    | expression InstanceOf typeRef                               # InstanceOfExpression
+    | expression op = ('*' | Divide | '%') expression             # ArithmeticExpression
+    | expression op = ('+' | '-' | '.') expression                # ArithmeticExpression
+    | expression op = ('<<' | '>>') expression                    # ComparisonExpression
+    | expression op = (Less | '<=' | Greater | '>=') expression   # ComparisonExpression
+    | expression op = ('===' | '!==' | '==' | IsNotEq) expression # ComparisonExpression
+    | expression op = '&' expression                              # BitwiseExpression
+    | expression op = '^' expression                              # BitwiseExpression
+    | expression op = '|' expression                              # BitwiseExpression
+    | expression op = '&&' expression                             # BitwiseExpression
+    | expression op = '||' expression                             # BitwiseExpression
+    | expression op = QuestionMark expression? ':' expression     # ConditionalExpression
+    | expression op = '??' expression                             # NullCoalescingExpression
+    | expression op = '<=>' expression                            # SpaceshipExpression
+    | Throw expression                                            # SpecialWordExpression
+    | arrayDestructuring Eq expression                            # ArrayDestructExpression
+    | assignable assignmentOperator attributes? expression        # AssignmentExpression
+    | assignable Eq attributes? '&' (chain | newExpr)             # AssignmentExpression
+    | expression op = LogicalAnd expression                       # LogicalExpression
+    | expression op = LogicalXor expression                       # LogicalExpression
+    | expression op = LogicalOr expression                        # LogicalExpression
     ;
 
 assignable
@@ -509,9 +536,22 @@ arrayCreation
     : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
     ;
 
+arrayDestructuring
+    : '[' ','* indexedDestructItem (','+ indexedDestructItem)* ','* ']'
+    | '[' keyedDestructItem (','+ keyedDestructItem)* ','? ']'
+    ;
+
+indexedDestructItem
+    : '&'? chain
+    ;
+
+keyedDestructItem
+    : (expression '=>')? '&'? chain
+    ;
+
 lambdaFunctionExpr
     : Static? Function_ '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
-    | LambdaFn '(' formalParameterList')' '=>' expression
+    | LambdaFn '(' formalParameterList ')' '=>' expression
     ;
 
 matchExpr
@@ -578,9 +618,11 @@ typeRef
 
 anonymousClass
     : attributes? Private? modifier? Partial? (
-      classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
-    | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* CloseCurlyBracket
+        classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (
+            Implements interfaceList
+        )?
+        | Interface identifier typeParameterListInBrackets? (Extends interfaceList)?
+    ) OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
 
 indirectTypeRef
@@ -598,7 +640,7 @@ namespaceNameList
 
 namespaceNameTail
     : identifier (As identifier)?
-    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? CloseCurlyBracket
+    | OpenCurlyBracket namespaceNameTail (',' namespaceNameTail)* ','? CloseCurlyBracket
     ;
 
 qualifiedNamespaceNameList
@@ -606,7 +648,7 @@ qualifiedNamespaceNameList
     ;
 
 arguments
-    : '(' ( actualArgument (',' actualArgument)* | yieldExpression)? ','? ')'
+    : '(' (actualArgument (',' actualArgument)* | yieldExpression)? ','? ')'
     ;
 
 actualArgument
@@ -624,6 +666,7 @@ constantInitializer
     | Array '(' (arrayItemList ','?)? ')'
     | '[' (arrayItemList ','?)? ']'
     | ('+' | '-') constantInitializer
+    | (string | constant) ('.' (string | constant))*
     ;
 
 constant
@@ -650,7 +693,10 @@ numericConstant
 
 classConstant
     : (Class | Parent_) '::' (identifier | Constructor | Get | Set)
-    | (qualifiedStaticTypeRef | keyedVariable | string) '::' (identifier | keyedVariable) // 'foo'::$bar works in php7
+    | (qualifiedStaticTypeRef | keyedVariable | string) '::' (
+        identifier
+        | keyedVariable
+    ) // 'foo'::$bar works in php7
     ;
 
 stringConstant
@@ -701,7 +747,7 @@ functionCallName
     ;
 
 actualArguments
-    : genericDynamicArgs? arguments squareCurlyExpression*
+    : genericDynamicArgs? arguments+ squareCurlyExpression*
     ;
 
 chainBase
@@ -733,7 +779,7 @@ assignmentList
 
 assignmentListElement
     : chain
-    | List '('  assignmentList ')'
+    | List '(' assignmentList ')'
     | arrayItem
     ;
 
@@ -744,7 +790,6 @@ modifier
 
 identifier
     : Label
-
     | Abstract
     | Array
     | As
@@ -798,6 +843,7 @@ identifier
     | Interface
     | IntType
     | IsSet
+    | LambdaFn
     | List
     | LogicalAnd
     | LogicalOr
@@ -812,6 +858,7 @@ identifier
     | Private
     | Protected
     | Public
+    | Readonly
     | Require
     | RequireOnce
     | Resource
@@ -831,7 +878,11 @@ identifier
     | While
     | Yield
     | From
-
+    | Enum_
+    | Match_
+    | Ticks
+    | Encoding
+    | StrictTypes
     | Get
     | Set
     | Call
@@ -865,6 +916,7 @@ memberModifier
     | Static
     | Abstract
     | Final
+    | Readonly
     ;
 
 magicConstant

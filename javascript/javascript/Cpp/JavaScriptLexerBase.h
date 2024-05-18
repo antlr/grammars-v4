@@ -29,4 +29,5 @@ public:
     void IncreaseTemplateDepth();
     void DecreaseTemplateDepth();
     bool IsRegexPossible();
+    virtual void reset() override;
 };

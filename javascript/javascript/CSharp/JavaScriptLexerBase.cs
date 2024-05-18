@@ -168,4 +168,14 @@ public abstract class JavaScriptLexerBase : Lexer
                 return true;
         }
     }
+
+    public override void Reset()
+    {
+        scopeStrictModes.Clear();
+        _lastToken = null;
+        _useStrictDefault = false;
+        _useStrictCurrent = false;
+        _templateDepth = 0;
+        base.Reset();
+    }
 }
