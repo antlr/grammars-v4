@@ -42,7 +42,7 @@ program_
    ;
 
 line
-   : linenumber ugh* statement_list? ';' EOL
+   : linenumber ugh* statement_list ';' EOL
    ;
 
 ugh
