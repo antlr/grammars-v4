@@ -26,72 +26,74 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar PromQLLexer;
 
-channels { WHITESPACE, COMMENTS }
+channels {
+    WHITESPACE,
+    COMMENTS
+}
 
 // All keywords in PromQL are case insensitive, it is just function,
 // label and metric names that are not.
-options { caseInsensitive=true; }
+options {
+    caseInsensitive = true;
+}
 
 fragment NUMERAL: [0-9]+ ('.' [0-9]+)?;
 
-fragment SCIENTIFIC_NUMBER
-   : NUMERAL ('e' [-+]? NUMERAL)?
-   ;
+fragment SCIENTIFIC_NUMBER: NUMERAL ('e' [-+]? NUMERAL)?;
 
-NUMBER
-    : NUMERAL
-    | SCIENTIFIC_NUMBER;
+NUMBER: NUMERAL | SCIENTIFIC_NUMBER;
 
-STRING
-    : '\'' (~('\'' | '\\') | '\\' .)* '\''
-    | '"' (~('"' | '\\') | '\\' .)* '"'
-    ;
+STRING: '\'' (~('\'' | '\\') | '\\' .)* '\'' | '"' (~('"' | '\\') | '\\' .)* '"';
 
 // Binary operators
 
-ADD:  '+';
-SUB:  '-';
-MULT: '*';
-DIV:  '/';
-MOD:  '%';
-POW:  '^';
+ADD  : '+';
+SUB  : '-';
+MULT : '*';
+DIV  : '/';
+MOD  : '%';
+POW  : '^';
 
-AND:    'and';
-OR:     'or';
-UNLESS: 'unless';
+AND    : 'and';
+OR     : 'or';
+UNLESS : 'unless';
 
 // Comparison operators
 
-EQ:  '=';
-DEQ: '==';
-NE:  '!=';
-GT:  '>';
-LT:  '<';
-GE:  '>=';
-LE:  '<=';
-RE:  '=~';
-NRE: '!~';
+EQ  : '=';
+DEQ : '==';
+NE  : '!=';
+GT  : '>';
+LT  : '<';
+GE  : '>=';
+LE  : '<=';
+RE  : '=~';
+NRE : '!~';
 
 // Aggregation modifiers
 
-BY:      'by';
-WITHOUT: 'without';
+BY      : 'by';
+WITHOUT : 'without';
 
 // Join modifiers
 
-ON:          'on';
-IGNORING:    'ignoring';
-GROUP_LEFT:  'group_left';
-GROUP_RIGHT: 'group_right';
+ON          : 'on';
+IGNORING    : 'ignoring';
+GROUP_LEFT  : 'group_left';
+GROUP_RIGHT : 'group_right';
 
 OFFSET: 'offset';
 
 BOOL: 'bool';
 
-AGGREGATION_OPERATOR
-    : 'sum'
+AGGREGATION_OPERATOR:
+    'sum'
     | 'min'
     | 'max'
     | 'avg'
@@ -103,10 +105,12 @@ AGGREGATION_OPERATOR
     | 'bottomk'
     | 'topk'
     | 'quantile'
-    ;
+;
 
-FUNCTION options { caseInsensitive=false; }
-    : 'abs'
+FUNCTION options {
+    caseInsensitive = false;
+}:
+    'abs'
     | 'absent'
     | 'absent_over_time'
     | 'ceil'
@@ -176,36 +180,30 @@ FUNCTION options { caseInsensitive=false; }
     | 'deg'
     | 'pi'
     | 'rad'
-    ;
+;
 
-LEFT_BRACE:  '{';
-RIGHT_BRACE: '}';
+LEFT_BRACE  : '{';
+RIGHT_BRACE : '}';
 
-LEFT_PAREN:  '(';
-RIGHT_PAREN: ')';
+LEFT_PAREN  : '(';
+RIGHT_PAREN : ')';
 
-LEFT_BRACKET:  '[';
-RIGHT_BRACKET: ']';
+LEFT_BRACKET  : '[';
+RIGHT_BRACKET : ']';
 
 COMMA: ',';
 
 AT: '@';
 
-SUBQUERY_RANGE
-     : LEFT_BRACKET DURATION ':' DURATION? RIGHT_BRACKET;
+SUBQUERY_RANGE: LEFT_BRACKET DURATION ':' DURATION? RIGHT_BRACKET;
 
-TIME_RANGE
-    : LEFT_BRACKET DURATION RIGHT_BRACKET;
+TIME_RANGE: LEFT_BRACKET DURATION RIGHT_BRACKET;
 
 // The proper order (longest to the shortest) must be validated after parsing
 DURATION: ([0-9]+ ('ms' | [smhdwy]))+;
 
-METRIC_NAME: [a-z_:] [a-z0-9_:]*;
-LABEL_NAME:  [a-z_] [a-z0-9_]*;
+METRIC_NAME : [a-z_:] [a-z0-9_:]*;
+LABEL_NAME  : [a-z_] [a-z0-9_]*;
 
-
-
-WS: [\r\t\n ]+ -> channel(WHITESPACE);
-SL_COMMENT
-    : '#' .*? '\n' -> channel(COMMENTS)
-    ;
+WS         : [\r\t\n ]+   -> channel(WHITESPACE);
+SL_COMMENT : '#' .*? '\n' -> channel(COMMENTS);

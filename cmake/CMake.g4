@@ -8,90 +8,92 @@ https://cmake.org/cmake/help/v3.12/manual/cmake-language.7.html
 
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar CMake;
 
 file_
-	: command_invocation* EOF
-	;
+    : command_invocation* EOF
+    ;
 
 command_invocation
-	: Identifier '(' (single_argument|compound_argument)* ')'
-	;
+    : Identifier '(' (single_argument | compound_argument)* ')'
+    ;
 
 single_argument
-	: Identifier | Unquoted_argument | Bracket_argument | Quoted_argument
-	;
+    : Identifier
+    | Unquoted_argument
+    | Bracket_argument
+    | Quoted_argument
+    ;
 
 compound_argument
-	: '(' (single_argument|compound_argument)* ')'
-	;
+    : '(' (single_argument | compound_argument)* ')'
+    ;
 
 Identifier
-	: [A-Za-z_][A-Za-z0-9_]*
-	;
+    : [A-Za-z_][A-Za-z0-9_]*
+    ;
 
 Unquoted_argument
-	: (~[ \t\r\n()#"\\] | Escape_sequence)+
-	;
+    : (~[ \t\r\n()#"\\] | Escape_sequence)+
+    ;
 
 Escape_sequence
-	: Escape_identity | Escape_encoded | Escape_semicolon
-	;
+    : Escape_identity
+    | Escape_encoded
+    | Escape_semicolon
+    ;
 
-fragment
-Escape_identity
-	: '\\' ~[A-Za-z0-9;]
-	;
+fragment Escape_identity
+    : '\\' ~[A-Za-z0-9;]
+    ;
 
-fragment
-Escape_encoded
-	: '\\t' | '\\r' | '\\n'
-	;
+fragment Escape_encoded
+    : '\\t'
+    | '\\r'
+    | '\\n'
+    ;
 
-fragment
-Escape_semicolon
-	: '\\;'
-	;
+fragment Escape_semicolon
+    : '\\;'
+    ;
 
 Quoted_argument
-	: '"' (~[\\"] | Escape_sequence | Quoted_cont)* '"'
-	;
+    : '"' (~[\\"] | Escape_sequence | Quoted_cont)* '"'
+    ;
 
-fragment
-Quoted_cont
-	: '\\' ('\r' '\n'? | '\n')
-	;
+fragment Quoted_cont
+    : '\\' ('\r' '\n'? | '\n')
+    ;
 
 Bracket_argument
-	: '[' Bracket_arg_nested ']'
-	;
+    : '[' Bracket_arg_nested ']'
+    ;
 
-fragment
-Bracket_arg_nested
-	: '=' Bracket_arg_nested '='
-	| '[' .*? ']'
-	;
+fragment Bracket_arg_nested
+    : '=' Bracket_arg_nested '='
+    | '[' .*? ']'
+    ;
 
 Bracket_comment
-	: '#[' Bracket_arg_nested ']'
-	-> skip
-	;
+    : '#[' Bracket_arg_nested ']' -> skip
+    ;
 
 Line_comment
-	: '#' (  // #
-	  	  | '[' '='*   // #[==
-		  | '[' '='* ~('=' | '[' | '\r' | '\n') ~('\r' | '\n')*  // #[==xx
-		  | ~('[' | '\r' | '\n') ~('\r' | '\n')*  // #xx
-		  ) ('\r' '\n'? | '\n' | EOF)
-    -> skip
-	;
+    : '#' (
+        // #
+        | '[' '='*                                            // #[==
+        | '[' '='* ~('=' | '[' | '\r' | '\n') ~('\r' | '\n')* // #[==xx
+        | ~('[' | '\r' | '\n') ~('\r' | '\n')*                // #xx
+    ) ('\r' '\n'? | '\n' | EOF) -> skip
+    ;
 
 Newline
-	: ('\r' '\n'? | '\n')+
-	-> skip
-	;
+    : ('\r' '\n'? | '\n')+ -> skip
+    ;
 
 Space
-	: [ \t]+
-	-> skip
-	;
+    : [ \t]+ -> skip
+    ;

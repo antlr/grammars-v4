@@ -29,107 +29,110 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar guitartab;
 
 tab
-   : string+ EOF
-   ;
+    : string+ EOF
+    ;
 
 string
-   : note (position FRET)+
-   ;
+    : note (position FRET)+
+    ;
 
 position
-   : (FINGER | BARLNE)+
-   ;
+    : (FINGER | BARLNE)+
+    ;
 
 note
-   : BA
-   | BB
-   | BC
-   | BD
-   | BE
-   | BF
-   | BG
-   | LA
-   | LB
-   | LC
-   | LD
-   | LE
-   | LF
-   | LG
-   ;
+    : BA
+    | BB
+    | BC
+    | BD
+    | BE
+    | BF
+    | BG
+    | LA
+    | LB
+    | LC
+    | LD
+    | LE
+    | LF
+    | LG
+    ;
 
 BA
-   : 'A'
-   ;
+    : 'A'
+    ;
 
 BB
-   : 'B'
-   ;
+    : 'B'
+    ;
 
 BC
-   : 'C'
-   ;
+    : 'C'
+    ;
 
 BD
-   : 'D'
-   ;
+    : 'D'
+    ;
 
 BE
-   : 'E'
-   ;
+    : 'E'
+    ;
 
 BF
-   : 'F'
-   ;
+    : 'F'
+    ;
 
 BG
-   : 'G'
-   ;
+    : 'G'
+    ;
 
 LA
-   : 'a'
-   ;
+    : 'a'
+    ;
 
 LB
-   : 'b'
-   ;
+    : 'b'
+    ;
 
 LC
-   : 'c'
-   ;
+    : 'c'
+    ;
 
 LD
-   : 'd'
-   ;
+    : 'd'
+    ;
 
 LE
-   : 'e'
-   ;
+    : 'e'
+    ;
 
 LF
-   : 'f'
-   ;
+    : 'f'
+    ;
 
 LG
-   : 'g'
-   ;
+    : 'g'
+    ;
 
 FINGER
-   : 'x'
-   | 'o'
-   ;
+    : 'x'
+    | 'o'
+    ;
 
 BARLNE
-   : '-'
-   ;
+    : '-'
+    ;
 
 FRET
-   : '|'
-   ;
+    : '|'
+    ;
 
 WHITESPACE
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

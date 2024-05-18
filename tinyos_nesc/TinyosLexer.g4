@@ -16,6 +16,9 @@
     Antlr4 TinyOS(nesC) by Hussein Marah, 2020.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar TinyosLexer;
 
@@ -23,138 +26,114 @@ channels{
     WHITESPACE
 }
 
-ABSTRACT:           'abstract';
-AS:                 'as';
-ASYNC:              'async';
-ATOMIC:             'atomic';
-BOOLEAN:            'boolean';
-BREAK:              'break';
-CALL:               'call';
-CASE:               'case';
-CHAR:               'char';
-COFIGURATION:       'configuration';
-COMMAND:            'command';
-COMPONENT:          'component';
-COMPONENTS:         'components';
-CONTINUE:           'continue';
-DO:                 'do';
-DOUBLE:             'double';
-DEFINED:            'defined';
-DEFINE:             'define';
-DEFAULT:            'default';
-ELSE:               'else';
-ENUM:               'enum';
-EVENT:              'event';
-EXTENDS:            'extends';
-ELIF:               'elif';
-ENDIF:              'endif';
-ERROR:              'error';
-FALSE:              'false';
-FINAL:              'final';
-FOR:                'for';
-GENERIC:            'generic';
-IF:                 'if';
-IMPLEMENTATION:     'implementation';
-INCLUDE:            'include';
-INCLUDES:           'includes';
-INTERFACE:          'interface';
-LOG:                'log';
-LONG:               'long';
-MODULE:             'module';
-NEW:                'new';
-POST:               'post';
-PROVIDES:           'provides';
-RETURN:             'return';
-SHORT:              'short';
-SIGNAL:             'signal';
-STATIC:             'static';
-SWITCH:             'switch';
-TASK:               'task';
-TRUE:               'true';
-USES:               'uses';
-VOID:               'void';
-WHILE:              'while';
-TYPEDEF:            'typedef';
+ABSTRACT       : 'abstract';
+AS             : 'as';
+ASYNC          : 'async';
+ATOMIC         : 'atomic';
+BOOLEAN        : 'boolean';
+BREAK          : 'break';
+CALL           : 'call';
+CASE           : 'case';
+CHAR           : 'char';
+COFIGURATION   : 'configuration';
+COMMAND        : 'command';
+COMPONENT      : 'component';
+COMPONENTS     : 'components';
+CONTINUE       : 'continue';
+DO             : 'do';
+DOUBLE         : 'double';
+DEFINED        : 'defined';
+DEFINE         : 'define';
+DEFAULT        : 'default';
+ELSE           : 'else';
+ENUM           : 'enum';
+EVENT          : 'event';
+EXTENDS        : 'extends';
+ELIF           : 'elif';
+ENDIF          : 'endif';
+ERROR          : 'error';
+FALSE          : 'false';
+FINAL          : 'final';
+FOR            : 'for';
+GENERIC        : 'generic';
+IF             : 'if';
+IMPLEMENTATION : 'implementation';
+INCLUDE        : 'include';
+INCLUDES       : 'includes';
+INTERFACE      : 'interface';
+LOG            : 'log';
+LONG           : 'long';
+MODULE         : 'module';
+NEW            : 'new';
+POST           : 'post';
+PROVIDES       : 'provides';
+RETURN         : 'return';
+SHORT          : 'short';
+SIGNAL         : 'signal';
+STATIC         : 'static';
+SWITCH         : 'switch';
+TASK           : 'task';
+TRUE           : 'true';
+USES           : 'uses';
+VOID           : 'void';
+WHILE          : 'while';
+TYPEDEF        : 'typedef';
 
-
-
-OR : '||';
-AND : '&&';
-EQ : '==';
-NEQ : '!=';
-GT : '>';
-LT : '<';
-GTEQ : '>=';
-LTEQ : '<=';
-PLUS : '+';
+OR    : '||';
+AND   : '&&';
+EQ    : '==';
+NEQ   : '!=';
+GT    : '>';
+LT    : '<';
+GTEQ  : '>=';
+LTEQ  : '<=';
+PLUS  : '+';
 MINUS : '-';
-MULT : '*';
-DIV : '/';
-MOD : '%';
-POW : '^';
-NOT : '!';
+MULT  : '*';
+DIV   : '/';
+MOD   : '%';
+POW   : '^';
+NOT   : '!';
 
-ASSIGN:          '=';
-TILDE:           '~';
-QUESTION:        '?';
-COLON:           ':';
-INC:             '++';
-DEC:             '--';
-BITAND:          '&';
-BITOR:           '|';
-HASHTAG:         '#';
+ASSIGN   : '=';
+TILDE    : '~';
+QUESTION : '?';
+COLON    : ':';
+INC      : '++';
+DEC      : '--';
+BITAND   : '&';
+BITOR    : '|';
+HASHTAG  : '#';
 
+SCOL         : ';';
+OBRACK       : '[';
+CBRACK       : ']';
+OPAR         : '(';
+CPAR         : ')';
+OBRACE       : '{';
+CBRACE       : '}';
+FORWARDARROW : '->';
+BACKARROW    : '<-';
+COLONCOLON   : '::';
+AT           : '@';
+COMMA        : ',';
+DOT          : '.';
+UNDERSCORE   : '_';
 
+ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 
+INT: [0-9]+;
 
-SCOL:            ';';
-OBRACK:          '[';
-CBRACK:          ']';
-OPAR:            '(';
-CPAR:            ')';
-OBRACE:          '{';
-CBRACE:          '}';
-FORWARDARROW:    '->';
-BACKARROW:       '<-';
-COLONCOLON:      '::';
-AT:              '@';
-COMMA:           ',';
-DOT:             '.';
-UNDERSCORE:      '_';
+FLOAT: [0-9]+ '.' [0-9]* | '.' [0-9]+;
 
-ID
-: [a-zA-Z_] [a-zA-Z_0-9]*
-;
+STRING: '"' (~["\r\n] | '""')* '"';
 
-INT
-: [0-9]+
-;
+COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
-FLOAT
-: [0-9]+ '.' [0-9]*
-| '.' [0-9]+
-;
+LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
 
-STRING
-: '"' (~["\r\n] | '""')* '"'
-;
+SPACE: (' ' | '\t' | '\r' | '\n')+ -> channel(WHITESPACE);
 
-COMMENT
-: '/*' .*? '*/'   -> channel(HIDDEN)
-;
+OTHER: .;
 
-LINE_COMMENT
-: '//' ~[\r\n]*   -> channel(HIDDEN)
-;
-
-SPACE
-:   (' ' | '\t' | '\r' | '\n')+   -> channel(WHITESPACE)
-;
-
-OTHER
-: .
-;
-
-HEX
-:'0x' ([a-fA-F0-9])+
-;
+HEX: '0x' ([a-fA-F0-9])+;

@@ -33,92 +33,118 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * http://fms.komkon.org/comp/CPUs/z80.txt
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar asmZ80;
 
-options { caseInsensitive = true; }
+options {
+    caseInsensitive = true;
+}
 
 prog
-   : EOL* ((line EOL)* line EOL*)? EOF
-   ;
+    : EOL* ((line EOL)* line EOL*)? EOF
+    ;
 
 line
-   : lbl? (instruction | directive) comment?
-   | lbl comment?
-   | comment
-   ;
+    : lbl? (instruction | directive) comment?
+    | lbl comment?
+    | comment
+    ;
 
 instruction
-   : opcode expressionlist?
-   ;
+    : opcode expressionlist?
+    ;
 
 opcode
-   : OPCODE
-   ;
+    : OPCODE
+    ;
 
 register_
-   : REGISTER
-   ;
+    : REGISTER
+    ;
 
 directive
-   : argument? assemblerdirective expressionlist
-   ;
+    : argument? assemblerdirective expressionlist
+    ;
 
 assemblerdirective
-   : ASSEMBLER_DIRECTIVE
-   ;
+    : ASSEMBLER_DIRECTIVE
+    ;
 
 lbl
-   : label ':'?
-   ;
+    : label ':'?
+    ;
 
 expressionlist
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 label
-   : name
-   ;
+    : name
+    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
-   ;
+    : multiplyingExpression (('+' | '-') multiplyingExpression)*
+    ;
 
 multiplyingExpression
-   : argument (('*' | '/') argument)*
-   ;
+    : argument (('*' | '/') argument)*
+    ;
 
 argument
-   : number
-   | register_
-   | dollar
-   | name
-   | string_
-   | '(' expression ')'
-   ;
+    : number
+    | register_
+    | dollar
+    | name
+    | string_
+    | '(' expression ')'
+    ;
 
 dollar
-   : '$'
-   ;
+    : '$'
+    ;
 
 string_
-   : STRING
-   ;
+    : STRING
+    ;
 
 name
-   : NAME
-   ;
+    : NAME
+    ;
 
 number
-   : NUMBER
-   ;
+    : NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 REGISTER
-   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H' | 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL' | 'AF' | 'BC' | 'DE' | 'HL' | 'PC' | 'SP' | 'IX' | 'IY'
-   ;
+    : 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    | 'H'
+    | 'L'
+    | 'I'
+    | 'R'
+    | 'IXH'
+    | 'IXL'
+    | 'IYH'
+    | 'IYL'
+    | 'AF'
+    | 'BC'
+    | 'DE'
+    | 'HL'
+    | 'PC'
+    | 'SP'
+    | 'IX'
+    | 'IY'
+    ;
 
 ASSEMBLER_DIRECTIVE
     : 'ORG'
@@ -200,28 +226,28 @@ OPCODE
     | 'SRL'
     | 'SUB'
     | 'XOR'
-   ;
+    ;
 
 NAME
-   : [A-Z] [A-Z0-9."]*
-   ;
+    : [A-Z] [A-Z0-9."]*
+    ;
 
 NUMBER
-   : '$'? [0-9A-F]+ 'H'?
-   ;
+    : '$'? [0-9A-F]+ 'H'?
+    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
-   ;
+    : ';' ~ [\r\n]*
+    ;
 
 STRING
-   : '\u0027' ~'\u0027'* '\u0027'
-   ;
+    : '\u0027' ~'\u0027'* '\u0027'
+    ;
 
 EOL
-   : [\r\n] +
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

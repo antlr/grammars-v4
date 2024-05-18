@@ -47,6 +47,7 @@ create table t1 if not exists (v varchar(16777216));
 create table if not exists t2(i int) as select(v) from t1;
 create table t2 if not exists (i int) as select(v) from t1;
 CREATE OR REPLACE TABLE TESTSEED (IDENT int DEFAULT SEQID.NEXTVAL,mycol string);
+CREATE OR REPLACE TABLE TESTSEED (IDENT int DEFAULT SCHEM.SEQID.NEXTVAL,mycol string);
 CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START 2);
 CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START WITH = 2);
 CREATE OR REPLACE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1);
@@ -92,3 +93,16 @@ create table tc3 (c char(4), c2 character(2));
 create or replace table tz1(i TIMESTAMPLTZ);
 create or replace table tz2(i TIMESTAMPNTZ);
 create or replace table tz3(i TIMESTAMPTZ);
+CREATE TABLE TESTSEED2 (ident int IDENTITY INCREMENT 2 ORDER);
+CREATE TABLE TESTSEED2 (ident int IDENTITY START = 2 INCREMENT BY 1 NOORDER);
+CREATE TABLE DIRECTION (LENGTH INT,LANGUAGE INT);
+
+create table t(i int) comment ='\'test\'';
+create table T2(C_NULL INT NULL NOT NULL); --Seems to not make sense but Snowflake accept it
+
+create table if not exists t3 cluster by LINEAR(f1) (f1 varchar, f2 number) ;
+
+-- virtual columns
+create table t4 (f1 number, f2 number, f3 number as (hash(f1,f2)));
+create table t4 (f1 number, f2 number, f3 number as (concat_ws(',',f1,f2)));
+create table floor (any_value int,getdate int);

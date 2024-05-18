@@ -1,245 +1,212 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
+
 lexer grammar TJSLexer;
 
-channels { ERROR }
+channels {
+    ERROR
+}
 
-options { superClass=TJSBaseLexer; }
-MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
-SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-RegularExpressionLiteral:       {this.IsRegexPossible()}? '/' RegularExpressionFirstChar RegularExpressionChar* '/' IdentifierPart*;
-OctetLiteral:                   '<%' .*? '%>';
+options {
+    superClass = TJSBaseLexer;
+}
+MultiLineComment  : '/*' .*? '*/'             -> channel(HIDDEN);
+SingleLineComment : '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
+RegularExpressionLiteral:
+    {this.IsRegexPossible()}? '/' RegularExpressionFirstChar RegularExpressionChar* '/' IdentifierPart*
+;
+OctetLiteral: '<%' .*? '%>';
 
-OpenBracket:                    '[';
-CloseBracket:                   ']';
-OpenParen:                      '(';
-CloseParen:                     ')';
-OpenBrace:                      '{';
-CloseBrace:                     '}';
-SemiColon:                      ';';
-Comma:                          ',';
-Assign:                         '=';
+OpenBracket  : '[';
+CloseBracket : ']';
+OpenParen    : '(';
+CloseParen   : ')';
+OpenBrace    : '{';
+CloseBrace   : '}';
+SemiColon    : ';';
+Comma        : ',';
+Assign       : '=';
 
-Swap:                           '<->';
+Swap: '<->';
 
-QuestionMark:                   '?';
-Colon:                          ':';
-Ellipsis:                       '...';
-Dot:                            '.';
-PlusPlus:                       '++';
-MinusMinus:                     '--';
-Plus:                           '+';
-Minus:                          '-';
-BitNot:                         '~';
-Not:                            '!';
-Multiply:                       '*';
-Divide:                         '/';
-Modulus:                        '%';
-IntDivide:                      '\\';
-RightShiftArithmetic:           '>>';
-LeftShiftArithmetic:            '<<';
-RightShiftLogical:              '>>>';
-LessThan:                       '<';
-MoreThan:                       '>';
-LessThanEquals:                 '<=';
-GreaterThanEquals:              '>=';
-Equals_:                        '==';
-NotEquals:                      '!=';
-IdentityEquals:                 '===';
-IdentityNotEquals:              '!==';
-BitAnd:                         '&';
-BitXOr:                         '^';
-BitOr:                          '|';
-And:                            '&&';
-Or:                             '||';
-MultiplyAssign:                 '*=';
-DivideAssign:                   '/=';
-ModulusAssign:                  '%=';
-IntDivideAssign:                '\\=';
-PlusAssign:                     '+=';
-MinusAssign:                    '-=';
-LeftShiftArithmeticAssign:      '<<=';
-RightShiftArithmeticAssign:     '>>=';
-RightShiftLogicalAssign:        '>>>=';
-BitAndAssign:                   '&=';
-BitXorAssign:                   '^=';
-BitOrAssign:                    '|=';
-AndAssign:                      '&&=';
-OrAssign:                       '||=';
-ARROW:                          '=>';
+QuestionMark               : '?';
+Colon                      : ':';
+Ellipsis                   : '...';
+Dot                        : '.';
+PlusPlus                   : '++';
+MinusMinus                 : '--';
+Plus                       : '+';
+Minus                      : '-';
+BitNot                     : '~';
+Not                        : '!';
+Multiply                   : '*';
+Divide                     : '/';
+Modulus                    : '%';
+IntDivide                  : '\\';
+RightShiftArithmetic       : '>>';
+LeftShiftArithmetic        : '<<';
+RightShiftLogical          : '>>>';
+LessThan                   : '<';
+MoreThan                   : '>';
+LessThanEquals             : '<=';
+GreaterThanEquals          : '>=';
+Equals_                    : '==';
+NotEquals                  : '!=';
+IdentityEquals             : '===';
+IdentityNotEquals          : '!==';
+BitAnd                     : '&';
+BitXOr                     : '^';
+BitOr                      : '|';
+And                        : '&&';
+Or                         : '||';
+MultiplyAssign             : '*=';
+DivideAssign               : '/=';
+ModulusAssign              : '%=';
+IntDivideAssign            : '\\=';
+PlusAssign                 : '+=';
+MinusAssign                : '-=';
+LeftShiftArithmeticAssign  : '<<=';
+RightShiftArithmeticAssign : '>>=';
+RightShiftLogicalAssign    : '>>>=';
+BitAndAssign               : '&=';
+BitXorAssign               : '^=';
+BitOrAssign                : '|=';
+AndAssign                  : '&&=';
+OrAssign                   : '||=';
+ARROW                      : '=>';
 
-TObjStart:                      '%[';
+TObjStart: '%[';
 /// Null Literals
 
-NullLiteral:                    'null';
+NullLiteral: 'null';
 
 /// Boolean Literals
 
-BooleanLiteral:                 'true'
-              |                 'false';
+BooleanLiteral: 'true' | 'false';
 
 /// Numeric Literals
 
-DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* ExponentPart?
-              |                 '.' DecimalDigit+ ExponentPart?
-              |                 DecimalIntegerLiteral ExponentPart?
-              ;
+DecimalLiteral:
+    DecimalIntegerLiteral '.' DecimalDigit* ExponentPart?
+    | '.' DecimalDigit+ ExponentPart?
+    | DecimalIntegerLiteral ExponentPart?
+;
 
-HexIntegerLiteral:              '0' [xX] HexDigit+ ('.'HexDigit+)? ExponentPart?;
-OctalIntegerLiteral:            '0' OctalDigit+ ('.'OctalDigit+)? ExponentPart?;
-OctalIntegerLiteral2:           '0' [oO] OctalDigit+('.'OctalDigit+)? ExponentPart?;
-BinaryIntegerLiteral:           '0' [bB] BinaryDigit+('.'BinaryDigit+)? ExponentPart?;
+HexIntegerLiteral    : '0' [xX] HexDigit+ ('.' HexDigit+)? ExponentPart?;
+OctalIntegerLiteral  : '0' OctalDigit+ ('.' OctalDigit+)? ExponentPart?;
+OctalIntegerLiteral2 : '0' [oO] OctalDigit+ ('.' OctalDigit+)? ExponentPart?;
+BinaryIntegerLiteral : '0' [bB] BinaryDigit+ ('.' BinaryDigit+)? ExponentPart?;
 
-NonIdentHexByte:                DecimalDigit HexDigit?;
+NonIdentHexByte: DecimalDigit HexDigit?;
 /// Keywords
 
-Break:                          'break';
-Do:                             'do';
-Instanceof:                     'instanceof';
-Typeof:                         'typeof';
-Case:                           'case';
-Else:                           'else';
-New:                            'new';
-Var:                            'var';
-Catch:                          'catch';
-Finally:                        'finally';
-Return:                         'return';
-Void:                           'void';
-Continue:                       'continue';
-For:                            'for';
-Switch:                         'switch';
-While:                          'while';
-Debugger:                       'debugger';
-Function_:                       'function';
-This:                           'this';
-With:                           'with';
-Default:                        'default';
-If:                             'if';
-Throw:                          'throw';
-Delete:                         'delete';
-In:                             'in';
-Try:                            'try';
+Break      : 'break';
+Do         : 'do';
+Instanceof : 'instanceof';
+Typeof     : 'typeof';
+Case       : 'case';
+Else       : 'else';
+New        : 'new';
+Var        : 'var';
+Catch      : 'catch';
+Finally    : 'finally';
+Return     : 'return';
+Void       : 'void';
+Continue   : 'continue';
+For        : 'for';
+Switch     : 'switch';
+While      : 'while';
+Debugger   : 'debugger';
+Function_  : 'function';
+This       : 'this';
+With       : 'with';
+Default    : 'default';
+If         : 'if';
+Throw      : 'throw';
+Delete     : 'delete';
+In         : 'in';
+Try        : 'try';
 
-Class:                          'class';
-Enum:                           'enum';
-Extends:                        'extends';
-Super:                          'super';
-Const:                          'const';
-Export:                         'export';
-Import:                         'import';
+Class   : 'class';
+Enum    : 'enum';
+Extends : 'extends';
+Super   : 'super';
+Const   : 'const';
+Export  : 'export';
+Import  : 'import';
 
-Static:                         'static';
+Static: 'static';
 
 // TJS2
-String:                         'string';
-Int:                            'int';
-Real:                           'real';
-Incontextof:                    'incontextof';
-Isvalid:                        'isvalid';
-Invalidate:                     'invalidate';
-Property:                       'property';
-Getter:                         'getter';
-Setter:                         'setter';
+String      : 'string';
+Int         : 'int';
+Real        : 'real';
+Incontextof : 'incontextof';
+Isvalid     : 'isvalid';
+Invalidate  : 'invalidate';
+Property    : 'property';
+Getter      : 'getter';
+Setter      : 'setter';
 
 /// Identifier Names and Identifiers
 
-Identifier:                     IdentifierStart IdentifierPart*;
+Identifier: IdentifierStart IdentifierPart*;
 
 /// String Literals
-StringLiteral:                  ('"' DoubleStringCharacter* '"'
-             |                  '\'' SingleStringCharacter* '\'')
-             ;
+StringLiteral: ('"' DoubleStringCharacter* '"' | '\'' SingleStringCharacter* '\'');
 
-TemplateStringLiteral:          ('@"' ('\\"' | ~'"')* '"'      // TJS use @"str ${Val} ,str &val; ."
-                     |          '@\'' ('\\\'' | ~'\'')* '\'' ) // instead of `str ${Val} .`
-                     ;
+TemplateStringLiteral:
+    (
+        '@"' ('\\"' | ~'"')* '"' // TJS use @"str ${Val} ,str &val; ."
+        | '@\'' ('\\\'' | ~'\'')* '\''
+    ) // instead of `str ${Val} .`
+;
 
-WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
+WhiteSpaces: [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
-LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
+LineTerminator: [\r\n\u2028\u2029] -> channel(HIDDEN);
 
-UnexpectedCharacter:            . -> channel(ERROR);
+UnexpectedCharacter: . -> channel(ERROR);
 
 // Fragment rules
 
-fragment DoubleStringCharacter
-    : ~["\\\r\n]
-    | '\\' EscapeSequence
-    | LineContinuation
-    ;
-fragment SingleStringCharacter
-    : ~['\\\r\n]
-    | '\\' EscapeSequence
-    | LineContinuation
-    ;
-fragment EscapeSequence
-    : CharacterEscapeSequence
+fragment DoubleStringCharacter : ~["\\\r\n] | '\\' EscapeSequence | LineContinuation;
+fragment SingleStringCharacter : ~['\\\r\n] | '\\' EscapeSequence | LineContinuation;
+fragment EscapeSequence:
+    CharacterEscapeSequence
     | '0' // no digit ahead! TODO
     | HexEscapeSequence
     | UnicodeEscapeSequence
     | ExtendedUnicodeEscapeSequence
-    ;
-fragment CharacterEscapeSequence
-    : SingleEscapeCharacter
-    | NonEscapeCharacter
-    ;
-fragment HexEscapeSequence
-    : 'x' HexDigit HexDigit
-    ;
-fragment UnicodeEscapeSequence
-    : 'u' HexDigit HexDigit HexDigit HexDigit
-    ;
-fragment ExtendedUnicodeEscapeSequence
-    : 'u' '{' HexDigit+ '}'
-    ;
-fragment SingleEscapeCharacter
-    : ['"\\bfnrtv]
-    ;
+;
+fragment CharacterEscapeSequence       : SingleEscapeCharacter | NonEscapeCharacter;
+fragment HexEscapeSequence             : 'x' HexDigit HexDigit;
+fragment UnicodeEscapeSequence         : 'u' HexDigit HexDigit HexDigit HexDigit;
+fragment ExtendedUnicodeEscapeSequence : 'u' '{' HexDigit+ '}';
+fragment SingleEscapeCharacter         : ['"\\bfnrtv];
 
-fragment NonEscapeCharacter
-    : ~['"\\bfnrtv0-9xu\r\n]
-    ;
-fragment EscapeCharacter
-    : SingleEscapeCharacter
-    | [0-9]
-    | [xu]
-    ;
-fragment LineContinuation
-    : '\\' [\r\n\u2028\u2029]
-    ;
-fragment HexDigit
-    : [0-9a-fA-F]
-    ;
-fragment OctalDigit
-    : [0-7]
-    ;
-fragment BinaryDigit
-    : [01]
-    ;
+fragment NonEscapeCharacter : ~['"\\bfnrtv0-9xu\r\n];
+fragment EscapeCharacter    : SingleEscapeCharacter | [0-9] | [xu];
+fragment LineContinuation   : '\\' [\r\n\u2028\u2029];
+fragment HexDigit           : [0-9a-fA-F];
+fragment OctalDigit         : [0-7];
+fragment BinaryDigit        : [01];
 
-fragment DecimalIntegerLiteral
-    : '0'
-    | [1-9] DecimalDigit*
-    ;
-fragment DecimalDigit
-    : [0-9]
-    ;
-fragment ExponentPart
-    : [eEpP] [+-]? DecimalDigit+
-    ;
-fragment IdentifierPart
-    : IdentifierStart
+fragment DecimalIntegerLiteral : '0' | [1-9] DecimalDigit*;
+fragment DecimalDigit          : [0-9];
+fragment ExponentPart          : [eEpP] [+-]? DecimalDigit+;
+fragment IdentifierPart:
+    IdentifierStart
     | UnicodeCombiningMark
     | UnicodeDigit
     | UnicodeConnectorPunctuation
     | '\u200C'
     | '\u200D'
-    ;
-fragment IdentifierStart
-    : UnicodeLetter
-    | [$_]
-    | '\\' UnicodeEscapeSequence
-    ;
-fragment UnicodeLetter
-    : [\u0041-\u005A]
+;
+fragment IdentifierStart: UnicodeLetter | [$_] | '\\' UnicodeEscapeSequence;
+fragment UnicodeLetter:
+    [\u0041-\u005A]
     | [\u0061-\u007A]
     | [\u00AA]
     | [\u00B5]
@@ -498,15 +465,15 @@ fragment UnicodeLetter
     | [\uFFCA-\uFFCF]
     | [\uFFD2-\uFFD7]
     | [\uFFDA-\uFFDC]
-    ;
-fragment UnicodeCombiningMark
-    : [\u0300-\u034E]
+;
+fragment UnicodeCombiningMark:
+    [\u0300-\u034E]
     | [\u0360-\u0362]
     | [\u0483-\u0486]
     | [\u0591-\u05A1]
     | [\u05A3-\u05B9]
     | [\u05BB-\u05BD]
-    | [\u05BF] 
+    | [\u05BF]
     | [\u05C1-\u05C2]
     | [\u05C4]
     | [\u064B-\u0655]
@@ -600,9 +567,9 @@ fragment UnicodeCombiningMark
     | [\u3099-\u309A]
     | [\uFB1E]
     | [\uFE20-\uFE23]
-    ;
-fragment UnicodeDigit
-    : [\u0030-\u0039]
+;
+fragment UnicodeDigit:
+    [\u0030-\u0039]
     | [\u0660-\u0669]
     | [\u06F0-\u06F9]
     | [\u0966-\u096F]
@@ -622,30 +589,25 @@ fragment UnicodeDigit
     | [\u17E0-\u17E9]
     | [\u1810-\u1819]
     | [\uFF10-\uFF19]
-    ;
-fragment UnicodeConnectorPunctuation
-    : [\u005F]
+;
+fragment UnicodeConnectorPunctuation:
+    [\u005F]
     | [\u203F-\u2040]
     | [\u30FB]
     | [\uFE33-\uFE34]
     | [\uFE4D-\uFE4F]
     | [\uFF3F]
     | [\uFF65]
-    ;
-fragment RegularExpressionFirstChar
-    : ~[*\r\n\u2028\u2029\\/[]
+;
+fragment RegularExpressionFirstChar:
+    ~[*\r\n\u2028\u2029\\/[]
     | RegularExpressionBackslashSequence
     | '[' RegularExpressionClassChar* ']'
-    ;
-fragment RegularExpressionChar
-    : ~[\r\n\u2028\u2029\\/[]
+;
+fragment RegularExpressionChar:
+    ~[\r\n\u2028\u2029\\/[]
     | RegularExpressionBackslashSequence
     | '[' RegularExpressionClassChar* ']'
-    ;
-fragment RegularExpressionClassChar
-    : ~[\r\n\u2028\u2029\]\\]
-    | RegularExpressionBackslashSequence
-    ;
-fragment RegularExpressionBackslashSequence
-    : '\\' ~[\r\n\u2028\u2029]
-    ;
+;
+fragment RegularExpressionClassChar         : ~[\r\n\u2028\u2029\]\\] | RegularExpressionBackslashSequence;
+fragment RegularExpressionBackslashSequence : '\\' ~[\r\n\u2028\u2029];

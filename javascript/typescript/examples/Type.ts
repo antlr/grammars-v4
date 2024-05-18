@@ -1,16 +1,46 @@
+// TypeDefinition
+
+// TypeAlias
+type Employee = {
+     type: "employee" | "manager";
+     typeId: 1 | 2;
+     id: string;
+     name: string;
+     address?: string; // Optional
+     phone?: string | null;
+}
+
+// https://github.com/microsoft/TypeScript/pull/12386
+type EmployeeType =
+     | "employee"
+     | "manager";
+
+type EmployeeNameType = Employee["name"];
+
+// keyof
+type EmployeeMap = Map<string, string>;
+type EmployeeMapKey = keyof EmployeeMap;
+
 // TypeAnotation
 var age: number = 32; // number variable
 var name: string = "John";// string variable
 var isUpdated: boolean = true;// Boolean variable
 
-var employee : {
+var employee1 : {
     id: number;
     name: string;
 };
 
-employee = {
+employee1 = {
     id: 100,
     name : "John"
+}
+
+var employee2: Employee = {
+    type: "employee",
+    typeId: 1,
+    id: 101,
+    name: "Steve"
 }
 
 function display(id:number, name:string)

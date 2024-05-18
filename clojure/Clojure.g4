@@ -2,7 +2,7 @@
    work so that rather than reading "a bunch of crap in parens" some
    syntactic information is preserved and recovered. Dec. 14 2014.
 
-   Converted to ANTLR 4 by Terence Parr. Unsure of provence. I see
+   Converted to ANTLR 4 by Terence Parr. Unsure of provenance. I see
    it commited by matthias.koester for clojure-eclipse project on
    Oct 5, 2009:
 
@@ -23,26 +23,42 @@
    crap in parens" but I guess that is LISP for you ;)
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar Clojure;
 
-file_: form * EOF;
+file_
+    : form* EOF
+    ;
 
-form: literal
+form
+    : literal
     | list_
     | vector
     | map_
     | reader_macro
     ;
 
-forms: form* ;
+forms
+    : form*
+    ;
 
-list_: '(' forms ')' ;
+list_
+    : '(' forms ')'
+    ;
 
-vector: '[' forms ']' ;
+vector
+    : '[' forms ']'
+    ;
 
-map_: '{' (form form)* '}' ;
+map_
+    : '{' (form form)* '}'
+    ;
 
-set_: '#{' forms '}' ;
+set_
+    : '#{' forms '}'
+    ;
 
 reader_macro
     : lambda_
@@ -130,10 +146,22 @@ literal
     | param_name
     ;
 
-string_: STRING;
-hex_: HEX;
-bin_: BIN;
-bign: BIGN;
+string_
+    : STRING
+    ;
+
+hex_
+    : HEX
+    ;
+
+bin_
+    : BIN
+    ;
+
+bign
+    : BIGN
+    ;
+
 number
     : FLOAT
     | hex_
@@ -147,26 +175,59 @@ character
     | u_hex_quad
     | any_char
     ;
-named_char: CHAR_NAMED ;
-any_char: CHAR_ANY ;
-u_hex_quad: CHAR_U ;
 
-nil_: NIL;
+named_char
+    : CHAR_NAMED
+    ;
 
-keyword: macro_keyword | simple_keyword;
-simple_keyword: ':' symbol;
-macro_keyword: ':' ':' symbol;
+any_char
+    : CHAR_ANY
+    ;
 
-symbol: ns_symbol | simple_sym;
-simple_sym: SYMBOL;
-ns_symbol: NS_SYMBOL;
+u_hex_quad
+    : CHAR_U
+    ;
 
-param_name: PARAM_NAME;
+nil_
+    : NIL
+    ;
+
+keyword
+    : macro_keyword
+    | simple_keyword
+    ;
+
+simple_keyword
+    : ':' symbol
+    ;
+
+macro_keyword
+    : ':' ':' symbol
+    ;
+
+symbol
+    : ns_symbol
+    | simple_sym
+    ;
+
+simple_sym
+    : SYMBOL
+    ;
+
+ns_symbol
+    : NS_SYMBOL
+    ;
+
+param_name
+    : PARAM_NAME
+    ;
 
 // Lexers
 //--------------------------------------------------------------------
 
-STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
+STRING
+    : '"' (~'"' | '\\' '"')* '"'
+    ;
 
 // FIXME: Doesn't deal with arbitrary read radixes, BigNums
 FLOAT
@@ -175,44 +236,60 @@ FLOAT
     | '-'? 'NaN'
     ;
 
-fragment
-FLOAT_TAIL
+fragment FLOAT_TAIL
     : FLOAT_DECIMAL FLOAT_EXP
     | FLOAT_DECIMAL
     | FLOAT_EXP
     ;
 
-fragment
-FLOAT_DECIMAL
+fragment FLOAT_DECIMAL
     : '.' [0-9]+
     ;
 
-fragment
-FLOAT_EXP
+fragment FLOAT_EXP
     : [eE] '-'? [0-9]+
     ;
-fragment
-HEXD: [0-9a-fA-F] ;
-HEX: '0' [xX] HEXD+ ;
-BIN: '0' [bB] [10]+ ;
-LONG: '-'? [0-9]+[lL]?;
-BIGN: '-'? [0-9]+[nN];
+
+fragment HEXD
+    : [0-9a-fA-F]
+    ;
+
+HEX
+    : '0' [xX] HEXD+
+    ;
+
+BIN
+    : '0' [bB] [10]+
+    ;
+
+LONG
+    : '-'? [0-9]+ [lL]?
+    ;
+
+BIGN
+    : '-'? [0-9]+ [nN]
+    ;
 
 CHAR_U
-    : '\\' 'u'[0-9D-Fd-f] HEXD HEXD HEXD ;
+    : '\\' 'u' [0-9D-Fd-f] HEXD HEXD HEXD
+    ;
+
 CHAR_NAMED
-    : '\\' ( 'newline'
-           | 'return'
-           | 'space'
-           | 'tab'
-           | 'formfeed'
-           | 'backspace' ) ;
+    : '\\' ('newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace')
+    ;
+
 CHAR_ANY
-    : '\\' . ;
+    : '\\' .
+    ;
 
-NIL : 'nil';
+NIL
+    : 'nil'
+    ;
 
-BOOLEAN : 'true' | 'false' ;
+BOOLEAN
+    : 'true'
+    | 'false'
+    ;
 
 SYMBOL
     : '.'
@@ -224,38 +301,57 @@ NS_SYMBOL
     : NAME '/' SYMBOL
     ;
 
-PARAM_NAME: '%' ('1'..'9' '0'..'9'* | '&')? ;
+PARAM_NAME
+    : '%' ('1' ..'9' '0' ..'9'* | '&')?
+    ;
 
 // Fragments
 //--------------------------------------------------------------------
 
-fragment
-NAME: SYMBOL_HEAD SYMBOL_REST* (':' SYMBOL_REST+)* ;
-
-fragment
-SYMBOL_HEAD
-    : ~('0' .. '9'
-        | '^' | '`' | '\'' | '"' | '#' | '~' | '@' | ':' | '/' | '%' | '(' | ')' | '[' | ']' | '{' | '}' // FIXME: could be one group
-        | [ \n\r\t,] // FIXME: could be WS
-        )
+fragment NAME
+    : SYMBOL_HEAD SYMBOL_REST* (':' SYMBOL_REST+)*
     ;
 
-fragment
-SYMBOL_REST
+fragment SYMBOL_HEAD
+    : ~(
+        '0' .. '9'
+        | '^'
+        | '`'
+        | '\''
+        | '"'
+        | '#'
+        | '~'
+        | '@'
+        | ':'
+        | '/'
+        | '%'
+        | '('
+        | ')'
+        | '['
+        | ']'
+        | '{'
+        | '}'        // FIXME: could be one group
+        | [ \n\r\t,] // FIXME: could be WS
+    )
+    ;
+
+fragment SYMBOL_REST
     : SYMBOL_HEAD
-    | '0'..'9'
+    | '0' ..'9'
     | '.'
     ;
 
 // Discard
 //--------------------------------------------------------------------
 
-fragment
-WS : [ \n\r\t,] ;
+fragment WS
+    : [ \n\r\t,]
+    ;
 
-fragment
-COMMENT: ';' ~[\r\n]* ;
+fragment COMMENT
+    : ';' ~[\r\n]*
+    ;
 
 TRASH
-    : ( WS | COMMENT ) -> channel(HIDDEN)
+    : (WS | COMMENT) -> channel(HIDDEN)
     ;

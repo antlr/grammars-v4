@@ -32,110 +32,112 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // http://user.it.uu.se/~andersa/gedcom/ch1.html
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar gedcom;
 
 gedcom
-   : line+ EOF
-   ;
+    : line+ EOF
+    ;
 
 line
-   : level opt_xref_id? tag line_value? EOL
-   ;
+    : level opt_xref_id? tag line_value? EOL
+    ;
 
 level
-   : DIGIT+
-   ;
+    : DIGIT+
+    ;
 
 opt_xref_id
-   : pointer
-   ;
+    : pointer
+    ;
 
 tag
-   : alphanum+
-   ;
+    : alphanum+
+    ;
 
 line_value
-   : line_item+
-   ;
+    : line_item+
+    ;
 
 line_item
-   : pointer
-   | escape
-   | anychar
-   ;
+    : pointer
+    | escape
+    | anychar
+    ;
 
 escape
-   : '@' '#' escape_text '@' non_at
-   ;
+    : '@' '#' escape_text '@' non_at
+    ;
 
 non_at
-   : ALPHA
-   | DIGIT
-   | otherchar
-   | '#'
-   ;
+    : ALPHA
+    | DIGIT
+    | otherchar
+    | '#'
+    ;
 
 escape_text
-   : anychar+
-   ;
+    : anychar+
+    ;
 
 pointer
-   : '@' alphanum pointer_string '@'
-   ;
+    : '@' alphanum pointer_string '@'
+    ;
 
 pointer_string
-   : pointer_char+
-   ;
+    : pointer_char+
+    ;
 
 pointer_char
-   : ALPHA
-   | DIGIT
-   | otherchar
-   | '#'
-   ;
+    : ALPHA
+    | DIGIT
+    | otherchar
+    | '#'
+    ;
 
 alphanum
-   : ALPHA
-   | DIGIT
-   ;
+    : ALPHA
+    | DIGIT
+    ;
 
 anychar
-   : ALPHA
-   | DIGIT
-   | otherchar
-   | '#'
-   | '@@'
-   ;
+    : ALPHA
+    | DIGIT
+    | otherchar
+    | '#'
+    | '@@'
+    ;
 
 ALPHA
-   : [a-zA-Z_]
-   ;
+    : [a-zA-Z_]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 otherchar
-   : '!'
-   | '"'
-   | '$'
-   | '&'
-   | '\''
-   | '('
-   | ')'
-   | '*'
-   | '+'
-   | '-'
-   | ','
-   | '.'
-   | '/'
-   ;
+    : '!'
+    | '"'
+    | '$'
+    | '&'
+    | '\''
+    | '('
+    | ')'
+    | '*'
+    | '+'
+    | '-'
+    | ','
+    | '.'
+    | '/'
+    ;
 
 EOL
-   : [\r\n]+
-   ;
+    : [\r\n]+
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
-
+    : [ \t] -> skip
+    ;

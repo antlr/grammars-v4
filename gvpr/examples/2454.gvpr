@@ -1,0 +1,20 @@
+BEGIN {
+  double x,y;
+  int cnt, sz;
+
+  char* rotateE (char* p) {
+    char* newpos = "";
+    print("// starting", p);
+    while (sscanf (p, "%lf,%lf%n", &x, &y, &sz) == 2) {
+      print("// after sscanf 3  -  ", sz);
+      p = substr(p, sz);
+    }
+    print("// returning: ", newpos);
+    return newpos;
+  }
+}
+BEG_G {
+}
+E {
+  $.pos = rotateE($.pos);
+}

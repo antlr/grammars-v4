@@ -1,0 +1,255 @@
+  MODULE use_braces;
+
+    !+
+    !   This program is designed to convert programs written in
+    !   SCAN E1.0 syntax to SCAN V1.0 syntax.
+    !-
+ 
+    EXTERNAL PROCEDURE lib$find_file ( STRING,
+    				       STRING,
+    				       INTEGER ) OF INTEGER;
+
+    EXTERNAL PROCEDURE lib$find_file_end ( INTEGER ) OF INTEGER;
+    
+    SET alpha 		( 'a' .. 'z' );
+    SET other 		( '0' .. '9' OR '$' OR '_' );
+    SET quote 		( '''' );
+    SET non_quote 	( NOT quote );
+    SET non_eol 	( NOT s'eol' );
+    SET non_star 	( NOT ( '*' OR s'eol' ));
+
+    TOKEN lp ALIAS '(' 		{ '(' };
+    TOKEN rp ALIAS ')' 		{ ')' };
+    TOKEN semi ALIAS ';' 	{ ';' };
+    TOKEN comma ALIAS ',' 	{ ',' };
+    TOKEN colon ALIAS ':' 	{ ':' };
+    TOKEN declare_key CASELESS 	{ 'declare' };
+    TOKEN common_key CASELESS 	{ 'common' };
+    TOKEN module_key CASELESS 	{ 'module' };
+    TOKEN macro_key CASELESS 	{ 'macro' };
+    TOKEN token_key CASELESS 	{ 'token' };
+    TOKEN trigger_key CASELESS 	{ 'trigger' };
+    TOKEN syntax_key CASELESS 	{ 'syntax' };
+    TOKEN expose_key CASELESS 	{ 'expose' };
+    TOKEN open_key CASELESS 	{ 'open' };
+    TOKEN close_key CASELESS 	{ 'close' };
+    TOKEN read_key CASELESS 	{ 'read' };
+    TOKEN write_key CASELESS 	{ 'write' };
+    TOKEN file_key CASELESS 	{ 'file' };
+    TOKEN endfile_key CASELESS 	{ 'endfile' };
+    TOKEN treeptr_key CASELESS 	{ 'treeptr' };
+    TOKEN tree_key CASELESS 	{ 'tree' };
+    TOKEN to_key CASELESS 	{ 'to' };
+    TOKEN of_key CASELESS 	{ 'of' };
+    TOKEN id CASELESS 		{ alpha [ alpha | other ]... };
+    TOKEN str 			{ quote [ non_quote | 
+				  quote quote ]... quote };
+    TOKEN spaces IGNORE 	{ {' ' | s'ht'}... };
+    TOKEN com1 IGNORE 		{ '!' non_eol... };
+    TOKEN com2 IGNORE 		{ '/*' [ non_star... | '*' ]... 
+				  { s'eol' | '*/' } };
+
+    GROUP non_semi ( NOT ';' );
+
+    DECLARE depth : STATIC INTEGER;
+    DECLARE files : TREE( STRING ) OF INTEGER;
+    DECLARE changed : BOOLEAN;
+
+    MACRO macro_stmt TRIGGER { x:{ macro_key id }
+			       y:{[ t: trigger_key
+				  | s: syntax_key 
+				  | e: expose_key ]...} };
+
+        ANSWER x;
+	IF (FIRST( t ) = NIL) AND (FIRST( s ) = NIL)
+	THEN
+	    ANSWER ' syntax';
+	    changed = true;
+	END IF;
+
+	ANSWER y;
+     
+	depth = depth + 1;
+     
+    END MACRO /* macro_stmt */;
+     
+    MACRO token_stmt TRIGGER { x:{ token_key id } };
+     
+	depth = depth + 1;
+        ANSWER x;
+     
+    END MACRO /* token_stmt */;
+     
+    MACRO left_paren TRIGGER { '(' };
+     
+	IF depth > 0 
+	THEN
+	    ANSWER '{';
+	    changed = true;
+	ELSE
+	    ANSWER '(';
+	END IF;
+     
+    END MACRO /* left_paren */;
+
+    MACRO right_paren TRIGGER { ')' };
+     
+	IF depth > 0 
+	THEN
+	    ANSWER '}';
+	    changed = true;
+	ELSE
+	    ANSWER ')';
+	END IF;
+     
+    END MACRO /* right_paren */;
+
+    MACRO semicolon TRIGGER { ';' };
+     
+	IF depth > 0 
+	THEN
+	    depth = depth - 1;
+	END IF;
+	ANSWER ';';
+     
+    END MACRO /* semicolon */;
+
+    MACRO open_statement TRIGGER { k:{open_key | close_key} i: id };
+
+	ANSWER k, ' file( ', i, ' )';
+	changed = true;
+	i = lower( i );
+	IF NOT exists( files( i ) )
+	THEN
+	    files( lower( i ) ) = 0;
+	END IF;
+
+    END MACRO;
+     
+    MACRO read_statement TRIGGER { k:{read_key | 
+					write_key} file_key i: id };
+
+	ANSWER k, ' file( ', i, ' )';
+	i = lower( i );
+	IF NOT exists( files( i ) )
+	THEN
+	    files( lower( i ) ) = 0;
+	END IF;
+	changed = true;
+
+    END MACRO;
+     
+    MACRO endfile_bif TRIGGER { k:{ endfile_key '(' i: id ')' } };
+
+	ANSWER k;
+	i = lower( i );
+	IF NOT exists( files( i ) )
+	THEN
+	    files( lower( i ) ) = 0;
+	END IF;
+	changed = true;
+
+    END MACRO;
+     
+    MACRO dcl_file TRIGGER { k:{ declare_key  i:id ':' 
+				 common_key file_key ';' } };
+
+	ANSWER k;
+	i = lower( i );
+	files( lower( i ) ) = 1;
+	changed = true;
+
+    END MACRO;
+     
+    MACRO treeptr_dcl TRIGGER { k1:treeptr_key k2:to_key k3:tree_key
+				'(' { i:id \ ',' } ')' k4:of_key };
+
+	DECLARE ip: TREEPTR( INTEGER ) TO STRING;
+
+	ANSWER k1, '( ', i( 1 ), ' ) ', k2;
+	ip = next( i( 1 ) );
+	
+	IF ip >< nil
+	THEN
+	    ANSWER ' ', k3, '( ';
+	    WHILE true;
+		ANSWER value( ip );
+		ip = NEXT( ip );
+		IF ip = NIL
+		THEN
+		    goto done;
+		END IF;
+		ANSWER ',';
+		END WHILE ;
+  done:	    ANSWER ' ) ', k4;
+	END IF;
+	changed = true;
+
+    END MACRO;
+     
+    MACRO module_statement TRIGGER 
+	{ s:{ module_key id [ non_semi ]... ';'} };
+
+	DECLARE i: treeptr( string ) to integer;
+
+	ANSWER s;     
+
+	i = first( files );
+	WHILE i <> NIL;
+	    IF value( i ) = 0
+	    THEN
+		ANSWER s'eol' & '    declare ', 
+		subscript( i ), ': common file;';
+	    END IF;
+	    i = next( i );
+	END WHILE;
+     
+    END MACRO;
+
+    PROCEDURE main MAIN;
+     
+	DECLARE file_spec,full_file_name: STRING;
+	DECLARE context: INTEGER;
+
+	READ PROMPT('file spec to process:') file_spec;
+
+	context = 0;
+
+	WHILE (lib$find_file ( file_spec, full_file_name, context ) AND 1) = 1;
+
+	    changed = false;
+
+	    WRITE 'processing: ', full_file_name;
+	    full_file_name = 
+		full_file_name[ 1 .. index( full_file_name, ';')-1];
+	    START SCAN
+		INPUT FILE full_file_name
+		OUTPUT FILE full_file_name;
+
+	    IF first( files ) <> NIL
+	    THEN
+		START SCAN
+		    INPUT FILE full_file_name
+		    OUTPUT FILE full_file_name;
+		PRUNE files;
+	    END IF;
+
+	    IF changed
+	    THEN
+	   	WRITE full_file_name, ' was modified';
+	    END IF;
+	    
+	END WHILE;
+
+    !+
+    !    Free the find_file context
+    !-
+
+	IF (lib$find_file_end ( context ) AND 1) <> 1
+	THEN
+	    WRITE 'Error freeing the find_file context.';
+	END IF;
+
+    END PROCEDURE /* main */;
+ 
+  END MODULE /* use_braces */;

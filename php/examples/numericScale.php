@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $a = 1234;       // decimal
 $b = 0123;       // octal (83 in decimal)
 $c = 0x1A;       // hex (26 in decimal)

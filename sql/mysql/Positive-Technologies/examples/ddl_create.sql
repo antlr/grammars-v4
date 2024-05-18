@@ -2,6 +2,7 @@
 -- Create User
 CREATE USER 'test_crm_debezium'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9' PASSWORD EXPIRE NEVER COMMENT '-';
 CREATE USER 'jim'@'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
+CREATE USER 'jim' @'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
@@ -286,6 +287,8 @@ create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 create index index8 on t1(col1) comment 'test index' using btree;
+CREATE INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as double)));
+CREATE INDEX `idx_custom_field_d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8".value')) as float)));
 #end
 #begin
 -- Create logfile group
@@ -597,6 +600,96 @@ END IF;
 END
 #end
 #begin
+-- delimiter //
+CREATE DEFINER=`reportwriter`@`%` PROCEDURE `sp_ds_DAL_TX_Impoundment`(IN pDateFrom datetime, IN pDateTo datetime)
+BEGIN
+
+    SET @goliveDate = '2023-05-02 02:00:00';
+    set @pRegion = 'DAL-TX';
+-- set @pDateFrom = '2023-02-01 00:00:00';
+-- set @pDateTo = '2023-03-10 00:00:00';
+    set @pDateFrom = pDateFrom;
+    set @pDateTo = pDateTo;
+
+    set @contractAmount = 21.03;
+
+with
+Temp1 as
+(
+    select l.code                                                            as lotCode
+         , fi.Id                                                             AS FeeItemID
+         , fi.unitBillingPrice                                               as billingPrice
+         , eq.equipmentClass
+         , a.customerCode
+         , v.impoundStatus
+         , tc.companyCode                                                    AS impoundCompany
+         , b.companyCode                                                     AS towOperator
+         , v.id                                                              AS vehicleId
+         , re.reasoncode
+         , v.towReferenceNumber
+
+         , fn_CalculateTimeZoneOffset(regionCode, v.clearedDate, 'DISPLAY')  AS towDate
+         , fn_CalculateTimeZoneOffset(regionCode, v.releaseDate, 'DISPLAY')  AS releaseDate
+         , fn_CalculateTimeZoneOffset(regionCode, fi.createdDate, 'DISPLAY') AS feeDate
+
+         , f.code
+         , fi.totalBillingPricePretax
+
+    from ims_vehicle v
+             join ref_region r
+                  on v.regionId = r.regionId
+
+             INNER JOIN ims_fee_event fe ON v.id = fe.vehicleId
+             INNER JOIN ims_fee_item fi ON fe.id = fi.feeEventId
+             INNER JOIN ims_fee f ON fi.feeId = f.id
+             INNER JOIN ims_fee_category fc ON f.feeCategoryEnumCode = fc.enumcode
+
+             INNER JOIN ref_customer a ON v.accountId = a.customerId
+             INNER JOIN ref_reason re ON v.reasonId = re.reasonId
+             INNER JOIN ref_tow_company tc ON v.currentImpoundOperatorId = tc.towCompanyId
+
+             JOIN ref_tow_company b ON v.towOperatorId = b.towCompanyId
+             left join ref_lot l on v.currentLotId = l.id
+             join ref_equipment eq
+                  on v.equipmentId = eq.id
+
+    where r.regionCode = @pRegion
+      and v.releaseDate >= @pDateFrom
+      and v.releaseDate < @pDateTo
+      and v.clearedDate >= @goliveDate
+      and b.companyCode != 'ART-DAL-TX'
+      and v.impoundStatus = 'RELEASED'
+)
+
+    select lotCode
+         , Temp1.vehicleId         as "Vehicle ID"
+         , towReferenceNumber      as "Tow Reference Number"
+         , equipmentClass          as "Class"
+         , impoundStatus           as "Status"
+         , customerCode            as "Customer"
+         , impoundCompany          as "Impound Company"
+         , towOperator             as "Tow Operator"
+         , towDate                 as "Tow Date"
+         , releaseDate             as "Release Date"
+         , billingPrice            as "Auto Pound Authorized Fee"
+
+         , billingPrice - @contractAmount   as "rev threshold"
+
+-- ,DATEDIFF(s.timeTo, s.timeFrom) as "Storage Days"
+         , null                    as "Storage Days"
+         , null                    as timeFrom
+         , null                    as timeTo
+         , billingPrice            as "Authorized Impoundment Fee"
+
+         , (billingPrice - @contractAmount)/2 + @contractAmount as "rev share amount"
+    from Temp1
+
+    where code in ('ImpoundmentFee')
+      and lotCode like '%PEAKA%';
+
+END; -- //-- delimiter ;
+#end
+#begin
 -- Create Role
 create role 'RL_COMPLIANCE_NSA';
 create role if not exists 'RL_COMPLIANCE_NSA';
@@ -680,5 +773,53 @@ BEGIN
 SELECT
     @Ν_greece
      ,@N_latin;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
+
+#begin
+CREATE PROCEDURE test_union()
+BEGIN
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    (SELECT id FROM test_auto_inc)
+    UNION ALL
+    SELECT id FROM test_auto_inc ORDER BY id;
+END
+#end
+
+#begin
+CREATE DEFINER=`PEUSER`@`%` PROCEDURE `SANDBOX`.`TEST_UNION`( )
+BEGIN
+SELECT ID ,SUM(COL_1) AS SUM_COL_1
+FROM (
+    (SELECT ID ,COL_1 FROM TEST_AUTO_INC
+    UNION ALL
+    SELECT ID ,COL_1 FROM TEST_AUTO_INC TAI)
+    UNION ALL
+    (SELECT ID ,COL_1 FROM TEST_AUTO_INC TAI)
+)SS
+GROUP BY 1
+ORDER BY 1
+;
 END
 #end

@@ -25,39 +25,42 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar domain;
 
 domain
-   : (subdomain | ' ') EOF
-   ;
+    : (subdomain | ' ') EOF
+    ;
 
 subdomain
-   : LABEL ('.' LABEL)*
-   ;
+    : LABEL ('.' LABEL)*
+    ;
 
 LABEL
-   : LETTER (LDH_STR* LET_DIG)*
-   ;
+    : LETTER (LDH_STR* LET_DIG)*
+    ;
 
 LDH_STR
-   : LET_DIG_HYP LDH_STR?
-   ;
+    : LET_DIG_HYP LDH_STR?
+    ;
 
 LET_DIG_HYP
-   : LET_DIG
-   | '-'
-   ;
+    : LET_DIG
+    | '-'
+    ;
 
 LET_DIG
-   : LETTER
-   | DIGIT
-   ;
+    : LETTER
+    | DIGIT
+    ;
 
 LETTER
-   : [a-zA-Z]
-   ;
+    : [a-zA-Z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
-
+    : [0-9]
+    ;

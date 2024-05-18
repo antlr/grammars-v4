@@ -1,0 +1,270 @@
+MODULE translate_record;
+
+    !+
+    !   This program will read a BASIC source program extract all the 
+    !   record definitions and output CDDL equivalent record definitions.
+    !-
+	    
+    TYPE
+	dcl_line:
+	    RECORD
+	    next: POINTER to dcl_line,
+	    indent: INTEGER,
+	    text: VARYING STRING( 118 ),
+	    END RECORD;
+
+    FORWARD PROCEDURE allocate_line( varying string( 128 ) );
+    
+    SET alpha 			( 'a'..'z' OR 'A'..'Z' );
+    SET digit 			( '0'..'9' );
+    SET other 			( '$' OR '_' OR '%' );
+    SET non_eol			( NOT( s'eol' OR s'eos' ) );
+    SET sol			( s'sos' OR s'eol' );
+    
+    TOKEN comment IGNORE	{ '!' non_eol... };
+    TOKEN line_no IGNORE	{ sol digit... };
+    TOKEN continue IGNORE	{ '&' sol };
+    TOKEN space IGNORE		{ { ' ' | s'ht' }... | s'vt' | s'eol' };
+    
+    TOKEN integer		{ digit... };
+    TOKEN record_key CASELESS	{ 'record' };
+    TOKEN end_key CASELESS	{ 'end' };
+    TOKEN group_key CASELESS	{ 'group' };
+    TOKEN string_key CASELESS	{ 'string' };
+    TOKEN integer_key CASELESS	{ 'integer' };
+    TOKEN real_key CASELESS	{ 'real' };
+    TOKEN byte_key CASELESS	{ 'byte' };
+    TOKEN word_key CASELESS	{ 'word' };
+    TOKEN long_key CASELESS	{ 'long' };
+    TOKEN rfa_key CASELESS	{ 'rfa' };
+    TOKEN single_key CASELESS	{ 'single' };
+    TOKEN double_key CASELESS	{ 'double' };
+    TOKEN hfloat_key CASELESS	{ 'hfloat' };
+    TOKEN gfloat_key CASELESS	{ 'gfloat' };
+    TOKEN decimal_key CASELESS	{ 'decimal' };
+    TOKEN id 			{ alpha [ alpha | digit | other ]... };
+    TOKEN lp ALIAS '('		{ '(' };
+    TOKEN rp ALIAS ')'		{ ')' };
+    TOKEN comma ALIAS ','	{ ',' };
+    TOKEN equals ALIAS '='	{ '=' };
+
+    CONSTANT blanks = '                                               ';
+
+    DECLARE name: VARYING STRING(31);
+    DECLARE cdd_dt: VARYING STRING( 20 );
+    DECLARE subs: STRING;
+    DECLARE subs_count: INTEGER;
+    DECLARE leng: VARYING STRING( 10 );
+    DECLARE indent:   INTEGER;
+    DECLARE fptr,lptr,aptr: pointer to dcl_line;
+
+    MACRO record_statement TRIGGER 
+	{ record_key r: id init_record component... end_key record_key [ id ]};
+
+	MACRO init_record SYNTAX { };
+
+	    aptr = fptr;
+	    lptr = NIL;
+	    fptr = NIL;
+	    indent = 4;
+	    CALL allocate_line( lower( r ) & ' STRUCTURE.' );
+	    indent = 8;
+
+	END MACRO;
+    
+	indent = 4;
+	CALL allocate_line( 'END ' & lower( r ) & ' STRUCTURE.' );
+
+	WHILE fptr <> NIL;
+	    WRITE blanks[ 1..fptr->.indent ], fptr -> .text;
+	    fptr = fptr -> .next;
+	END WHILE;
+
+	
+    END MACRO;
+
+    MACRO component SYNTAX { { element \ ',' }
+			   | group_dcl };
+    END MACRO;
+
+    MACRO element SYNTAX { [ data_type ] item };
+
+	DECLARE dcl: VARYING STRING( 128 );
+		
+	dcl = name & ' DATATYPE ' & cdd_dt & leng;
+	
+	IF subs_count > 0
+	THEN
+	    dcl = dcl & ' ARRAY' & subs;
+	END IF;
+
+	dcl = dcl & '.';
+
+	CALL allocate_line( dcl );
+
+    END MACRO;
+
+    MACRO data_type SYNTAX {	[ integer_key ] *,long: long_key 
+			   |	[ integer_key ] *,word: word_key 
+			   |	[ integer_key ] *,byte: byte_key 
+			   |                    *,int:  integer_key
+			   |	[ real_key ]    *,sing: single_key 
+			   |	[ real_key ]    *,doub: double_key 
+			   |	[ real_key ]    *,gflo: gfloat_key 
+			   |	[ real_key ]    *,hflo: hfloat_key 
+			   |                    *,real: real_key
+			   |                    *,rfa:  rfa_key
+			   |                    *,stri: string_key  }; 
+
+	IF (long <> 0) OR (int <> 0)
+	THEN
+	    cdd_dt = 'SIGNED LONGWORD';
+	    RETURN;
+	END IF;
+
+	IF (word <> 0)
+	THEN
+	    cdd_dt = 'SIGNED WORD';
+	    RETURN;
+	END IF;
+
+	IF (byte <> 0)
+	THEN
+	    cdd_dt = 'SIGNED BYTE';
+	    RETURN;
+	END IF;
+
+	IF (sing <> 0) OR (real <> 0)
+	THEN
+	    cdd_dt = 'F_FLOATING';
+	    RETURN;
+	END IF;
+
+	IF (doub <> 0)
+	THEN
+	    cdd_dt = 'D_FLOATING';
+	    RETURN;
+	END IF;
+
+	IF (gflo <> 0)
+	THEN
+	    cdd_dt = 'G_FLOATING';
+	    RETURN;
+	END IF;
+
+	IF (hflo <> 0)
+	THEN
+	    cdd_dt = 'H_FLOATING';
+	    RETURN;
+	END IF;
+
+	IF (rfa <> 0)
+	THEN
+	    cdd_dt = 'UNSPECIFIED SIZE IS 8';
+	    RETURN;
+	END IF;
+
+	IF (stri <> 0)
+	THEN
+	    cdd_dt = 'TEXT SIZE ';
+	    RETURN;
+	END IF;
+
+    END MACRO;
+    
+    MACRO item SYNTAX { n:id subs_dcl [ '=' l:integer ] };
+	
+	IF cdd_dt[ 1..4 ] = 'TEXT'
+	THEN
+	    IF l = ''
+	    THEN
+	    	leng = '16';
+	    ELSE
+	    	leng = l;
+	    END IF;
+	ELSE
+	    leng = '';
+	END IF;
+	    
+	name = lower( n );
+	
+    END MACRO;
+
+    MACRO subs_dcl SYNTAX { [ '(' { s:integer \ ',' } ')' ] };
+
+	DECLARE tptr: TREEPTR( INTEGER ) TO STRING;
+	
+	tptr = first( s );
+	subs = '';
+	subs_count = 0;
+	    
+	WHILE tptr <> nil;
+	    subs = subs & ' 0:' & value( tptr );
+	    subs_count = subs_count + 1;
+	    tptr = next( tptr );
+	END WHILE;
+	
+    END MACRO;
+
+
+    MACRO group_dcl SYNTAX { group_key g:id subs_dcl init_group
+			     component...
+			     end_key group_key };
+	
+	DECLARE dcl: varying string( 128 );
+	
+	MACRO init_group SYNTAX {  };
+	    
+	    dcl = lower( g ) & ' STRUCTURE';
+
+	    IF subs_count > 0
+	    THEN
+		dcl = dcl & ' ARRAY' & subs;
+	    END IF;
+
+	    dcl = dcl & '.';
+
+	    CALL allocate_line( dcl );
+
+	    indent = indent + 4;
+	    
+	END MACRO;
+
+	indent = indent - 4;
+	CALL allocate_line( 'END ' & lower( g ) & ' STRUCTURE.' );
+
+    END MACRO;
+    
+
+    PROCEDURE main MAIN;
+
+	START SCAN
+	    OUTPUT FILE 'nl:';
+
+    END PROCEDURE;
+
+    PROCEDURE allocate_line( text: varying string( 128 ) );
+
+	IF aptr = NIL
+	THEN
+	   ALLOCATE aptr;
+	END IF;
+
+	IF fptr = NIL
+	THEN
+	   fptr = aptr;
+	   lptr = aptr;
+	ELSE
+	   lptr -> .next = aptr;
+	   lptr = lptr -> .next;
+	END IF;
+
+	aptr = aptr -> .next;
+
+	lptr -> .indent = indent;
+	lptr -> .text = text;
+	lptr -> .next = NIL;
+
+    END PROCEDURE;
+	
+END MODULE;

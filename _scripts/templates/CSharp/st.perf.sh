@@ -41,7 +41,7 @@ do
     # Loop from 1 to n and execute the body of the loop each time
     for ((i=1; i\<=n; i++))
     do
-        trwdog ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
+        trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then
@@ -53,7 +53,7 @@ done
 # Loop from 1 to n and execute the body of the loop each time
 for ((i=1; i\<=n; i++))
 do
-    echo "${files[*]}" | trwdog ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
+    echo "${files[*]}" | trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then

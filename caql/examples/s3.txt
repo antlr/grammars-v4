@@ -1,0 +1,1 @@
+metric(AC853FCC-5C29-4F9E-867C-69BC699C5DBF,"duration|ST[service:www]") | label("Some static name")

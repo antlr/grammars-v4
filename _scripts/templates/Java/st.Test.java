@@ -25,6 +25,7 @@ public class Test {
     static boolean show_tree = false;
     static boolean show_tokens = false;
     static boolean show_trace = false;
+    static boolean show_diagnostic = false;
     static int error_code = 0;
     static java.nio.charset.Charset charset = null;
     static int string_instance = 0;
@@ -37,7 +38,11 @@ public class Test {
         List\<String> inputs = new ArrayList\<String>();
         for (int i = 0; i \< args.length; ++i)
         {
-            if (args[i].equals("-profile"))
+            if (args[i].equals("-d"))
+            {
+                show_diagnostic = true;
+            }
+            else if (args[i].equals("-profile"))
             {
                 show_profile = true;
             }
@@ -169,6 +174,10 @@ public class Test {
         lexer.removeErrorListeners();
         parser.addErrorListener(listener_parser);
         lexer.addErrorListener(listener_lexer);
+        if (show_diagnostic)
+        {
+            parser.addErrorListener(new MyDiagnosticErrorListener());
+        }
         if (show_trace)
         {
             parser.setTrace(true);

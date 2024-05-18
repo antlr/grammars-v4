@@ -29,484 +29,488 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 http://java.lykkenborg.no/2012/02/bcpl-grammar.html
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar bcpl;
 
 element
-   : CHARACTERCONSTANT
-   | STRINGCONSTANT
-   | NUMBER
-   | IDENTIFIER
-   | 'TRUE'
-   | 'FALSE'
-   ;
+    : CHARACTERCONSTANT
+    | STRINGCONSTANT
+    | NUMBER
+    | IDENTIFIER
+    | 'TRUE'
+    | 'FALSE'
+    ;
 
 primaryE
-   : primaryE '(' expression_list ')'
-   | primaryE '(' ')'
-   | '(' expression ')'
-   | element
-   ;
+    : primaryE '(' expression_list ')'
+    | primaryE '(' ')'
+    | '(' expression ')'
+    | element
+    ;
 
 vectorE
-   : (vectorE '!' primaryE)
-   | primaryE
-   ;
+    : (vectorE '!' primaryE)
+    | primaryE
+    ;
 
 addressE
-   : ADDRESSOP addressE
-   | vectorE
-   ;
+    : ADDRESSOP addressE
+    | vectorE
+    ;
 
 multE
-   : (multE MULTOP addressE)
-   | addressE
-   ;
+    : (multE MULTOP addressE)
+    | addressE
+    ;
 
 addE
-   : addE ADDOP multE
-   | ADDOP multE
-   | multE
-   ;
+    : addE ADDOP multE
+    | ADDOP multE
+    | multE
+    ;
 
 relE
-   : addE (RELOP addE)*
-   ;
+    : addE (RELOP addE)*
+    ;
 
 shiftE
-   : shiftE SHIFTOP addE
-   | relE
-   ;
+    : shiftE SHIFTOP addE
+    | relE
+    ;
 
 notE
-   : NOTOP shiftE
-   | shiftE
-   ;
+    : NOTOP shiftE
+    | shiftE
+    ;
 
 andE
-   : notE (ADDOP notE)*
-   ;
+    : notE (ADDOP notE)*
+    ;
 
 orE
-   : andE (OROP andE)*
-   ;
+    : andE (OROP andE)*
+    ;
 
 eqvE
-   : orE (EQVOP orE)*
-   ;
-   // ugh
+    : orE (EQVOP orE)*
+    ;
+
+// ugh
 
 name
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 conditionalE
-   : eqvE '->' conditionalE ',' conditionalE
-   | eqvE
-   ;
+    : eqvE '->' conditionalE ',' conditionalE
+    | eqvE
+    ;
 
 expression
-   : conditionalE
-   | 'TABLE' constant_expression (',' constant_expression)*
-   | 'VALOF' command
-   ;
+    : conditionalE
+    | 'TABLE' constant_expression (',' constant_expression)*
+    | 'VALOF' command
+    ;
 
 c_element
-   : CHARACTERCONSTANT
-   | NUMBER
-   | IDENTIFIER
-   | 'TRUE'
-   | 'FALSE'
-   | '(' constant_expression ')'
-   ;
+    : CHARACTERCONSTANT
+    | NUMBER
+    | IDENTIFIER
+    | 'TRUE'
+    | 'FALSE'
+    | '(' constant_expression ')'
+    ;
 
 c_multE
-   : c_multE MULTOP c_element
-   | c_element
-   ;
+    : c_multE MULTOP c_element
+    | c_element
+    ;
 
 c_addE
-   : c_addE ADDOP c_multE
-   | ADDOP c_multE
-   | c_multE
-   ;
+    : c_addE ADDOP c_multE
+    | ADDOP c_multE
+    | c_multE
+    ;
 
 c_shiftE
-   : c_shiftE SHIFTOP c_addE
-   | c_addE
-   ;
+    : c_shiftE SHIFTOP c_addE
+    | c_addE
+    ;
 
 c_andE
-   : c_andE ANDOP c_shiftE
-   | c_shiftE
-   ;
+    : c_andE ANDOP c_shiftE
+    | c_shiftE
+    ;
 
 constant_expression
-   : constant_expression OROP c_andE
-   | c_andE
-   ;
+    : constant_expression OROP c_andE
+    | c_andE
+    ;
 
 expression_list
-   : expression (',' expression)*
-   ;
+    : expression (',' expression)*
+    ;
 
 name_list
-   : name (',' name)*
-   ;
+    : name (',' name)*
+    ;
 
 manifest_item
-   : IDENTIFIER '=' constant_expression
-   ;
+    : IDENTIFIER '=' constant_expression
+    ;
 
 manifest_list
-   : manifest_item (';' manifest_item)*
-   ;
+    : manifest_item (';' manifest_item)*
+    ;
 
 manifest_declaration
-   : 'MANIFEST' '$(' manifest_list '$)'
-   ;
+    : 'MANIFEST' '$(' manifest_list '$)'
+    ;
 
 static_declaration
-   : 'STATIC' '$(' manifest_list '$)'
-   ;
+    : 'STATIC' '$(' manifest_list '$)'
+    ;
 
 global_item
-   : IDENTIFIER ':' constant_expression
-   ;
+    : IDENTIFIER ':' constant_expression
+    ;
 
 global_list
-   : global_item (';' global_item)*
-   ;
+    : global_item (';' global_item)*
+    ;
 
 global_declaration
-   : 'GLOBAL' '$(' global_list '$)'
-   ;
+    : 'GLOBAL' '$(' global_list '$)'
+    ;
 
 simple_definition
-   : name_list '=' expression_list
-   ;
+    : name_list '=' expression_list
+    ;
 
 vector_definition
-   : IDENTIFIER '=' 'VEC' constant_expression
-   ;
+    : IDENTIFIER '=' 'VEC' constant_expression
+    ;
 
 function_definition
-   : IDENTIFIER '(' name_list ')' '=' expression
-   | IDENTIFIER '(' ')' '=' expression
-   ;
+    : IDENTIFIER '(' name_list ')' '=' expression
+    | IDENTIFIER '(' ')' '=' expression
+    ;
 
 routine_definition
-   : IDENTIFIER '(' name_list ')' 'BE' command
-   | IDENTIFIER '(' ')' 'BE' command
-   ;
+    : IDENTIFIER '(' name_list ')' 'BE' command
+    | IDENTIFIER '(' ')' 'BE' command
+    ;
 
 definition
-   : simple_definition
-   | vector_definition
-   | function_definition
-   | routine_definition
-   ;
+    : simple_definition
+    | vector_definition
+    | function_definition
+    | routine_definition
+    ;
 
 simultaneous_declaration
-   : 'LET' definition ('AND' definition)*
-   ;
+    : 'LET' definition ('AND' definition)*
+    ;
 
 declaration
-   : simultaneous_declaration
-   | manifest_declaration
-   | static_declaration
-   | global_declaration
-   ;
+    : simultaneous_declaration
+    | manifest_declaration
+    | static_declaration
+    | global_declaration
+    ;
 
 lhse
-   : IDENTIFIER
-   | vectorE '!' primaryE
-   | '!' primaryE
-   ;
+    : IDENTIFIER
+    | vectorE '!' primaryE
+    | '!' primaryE
+    ;
 
 left_hand_side_list
-   : lhse (',' lhse)*
-   ;
+    : lhse (',' lhse)*
+    ;
 
 assignment
-   : left_hand_side_list ':=' expression_list
-   ;
+    : left_hand_side_list ':=' expression_list
+    ;
 
 simple_command
-   : 'BREAK'
-   | 'LOOP'
-   | 'ENDCASE'
-   | 'RETURN'
-   | 'FINISH'
-   ;
+    : 'BREAK'
+    | 'LOOP'
+    | 'ENDCASE'
+    | 'RETURN'
+    | 'FINISH'
+    ;
 
 goto_command
-   : 'GOTO' expression
-   ;
+    : 'GOTO' expression
+    ;
 
 routine_command
-   : primaryE '(' expression_list ')'
-   | primaryE '(' ')'
-   ;
+    : primaryE '(' expression_list ')'
+    | primaryE '(' ')'
+    ;
 
 resultis_command
-   : 'RESULTIS' expression
-   ;
+    : 'RESULTIS' expression
+    ;
 
 switchon_command
-   : 'SWITCHON' expression 'INTO' compound_command
-   ;
+    : 'SWITCHON' expression 'INTO' compound_command
+    ;
 
 repeatable_command
-   : assignment
-   | simple_command
-   | goto_command
-   | routine_command
-   | resultis_command
-   | repeated_command
-   | switchon_command
-   | compound_command
-   | block
-   ;
+    : assignment
+    | simple_command
+    | goto_command
+    | routine_command
+    | resultis_command
+    | repeated_command
+    | switchon_command
+    | compound_command
+    | block
+    ;
 
 repeated_command
-   : repeatable_command 'REPEAT'
-   | repeatable_command 'REPEATUNTIL' expression
-   | repeatable_command 'REPEATWHILE' expression
-   ;
+    : repeatable_command 'REPEAT'
+    | repeatable_command 'REPEATUNTIL' expression
+    | repeatable_command 'REPEATWHILE' expression
+    ;
 
 until_command
-   : 'UNTIL' expression 'DO' command
-   ;
+    : 'UNTIL' expression 'DO' command
+    ;
 
 while_command
-   : 'WHILE' expression 'DO' command
-   ;
+    : 'WHILE' expression 'DO' command
+    ;
 
 for_command
-   : 'FOR' IDENTIFIER '=' expression 'TO' expression 'BY' constant_expression 'DO' command
-   | 'FOR' IDENTIFIER ':' expression 'TO' expression 'DO' command
-   ;
+    : 'FOR' IDENTIFIER '=' expression 'TO' expression 'BY' constant_expression 'DO' command
+    | 'FOR' IDENTIFIER ':' expression 'TO' expression 'DO' command
+    ;
 
 repetitive_command
-   : repeated_command
-   | until_command
-   | while_command
-   | for_command
-   ;
+    : repeated_command
+    | until_command
+    | while_command
+    | for_command
+    ;
 
 test_command
-   : 'TEST' expression 'THEN' command 'ELSE' command
-   ;
+    : 'TEST' expression 'THEN' command 'ELSE' command
+    ;
 
 if_command
-   : 'IF' expression 'THEN' command
-   ;
+    : 'IF' expression 'THEN' command
+    ;
 
 unless_command
-   : 'UNLESS' expression 'THEN' command
-   ;
+    : 'UNLESS' expression 'THEN' command
+    ;
 
 unlabelled_command
-   : repeatable_command
-   | repetitive_command
-   | test_command
-   | if_command
-   ;
+    : repeatable_command
+    | repetitive_command
+    | test_command
+    | if_command
+    ;
 
 label_prefix
-   : IDENTIFIER ':'
-   ;
+    : IDENTIFIER ':'
+    ;
 
 case_prefix
-   : 'CASE' constant_expression ':'
-   ;
+    : 'CASE' constant_expression ':'
+    ;
 
 default_prefix
-   : 'DEFAULT' ':'
-   ;
+    : 'DEFAULT' ':'
+    ;
 
 prefix
-   : label_prefix
-   | case_prefix
-   | default_prefix
-   ;
+    : label_prefix
+    | case_prefix
+    | default_prefix
+    ;
 
 command
-   : unlabelled_command
-   | prefix command
-   | prefix
-   ;
+    : unlabelled_command
+    | prefix command
+    | prefix
+    ;
 
 command_list
-   : command (';' command)*
-   ;
+    : command (';' command)*
+    ;
 
 declaration_part
-   : declaration (';' declaration)*
-   ;
+    : declaration (';' declaration)*
+    ;
 
 block
-   : '$(' declaration_part ';' command_list '$)'
-   ;
+    : '$(' declaration_part ';' command_list '$)'
+    ;
 
 compound_command
-   : '$(' command_list '$)'
-   ;
+    : '$(' command_list '$)'
+    ;
 
 program
-   : declaration_part
-   ;
+    : declaration_part
+    ;
 
 LETTER
-   : 'A'
-   | 'B'
-   | 'C'
-   | 'D'
-   | 'E'
-   | 'F'
-   | 'G'
-   | 'H'
-   | 'I'
-   | 'J'
-   | 'K'
-   | 'L'
-   | 'M'
-   | 'N'
-   | 'O'
-   | 'P'
-   | 'Q'
-   | 'R'
-   | 'S'
-   | 'T'
-   | 'U'
-   | 'V'
-   | 'W'
-   | 'X'
-   | 'Y'
-   | 'Z'
-   ;
+    : 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    | 'G'
+    | 'H'
+    | 'I'
+    | 'J'
+    | 'K'
+    | 'L'
+    | 'M'
+    | 'N'
+    | 'O'
+    | 'P'
+    | 'Q'
+    | 'R'
+    | 'S'
+    | 'T'
+    | 'U'
+    | 'V'
+    | 'W'
+    | 'X'
+    | 'Y'
+    | 'Z'
+    ;
 
 OCTALDIGIT
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   ;
+    : '0'
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    ;
 
 HEXDIGIT
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   | '8'
-   | '9'
-   | 'A'
-   | 'B'
-   | 'C'
-   | 'D'
-   | 'E'
-   | 'F'
-   ;
+    : '0'
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    ;
 
 DIGIT
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   | '8'
-   | '9'
-   ;
+    : '0'
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    ;
 
 STRINGCONSTANT
-   : '"' ('\'"' | ~ '"')* '"'
-   ;
+    : '"' ('\'"' | ~ '"')* '"'
+    ;
 
 CHARACTERCONSTANT
-   : '\'' (DIGIT | LETTER) '\''
-   ;
+    : '\'' (DIGIT | LETTER) '\''
+    ;
 
 OCTALNUMBER
-   : '#' OCTALDIGIT+
-   ;
+    : '#' OCTALDIGIT+
+    ;
 
 HEXNUMBER
-   : '#X' HEXDIGIT+
-   ;
+    : '#X' HEXDIGIT+
+    ;
 
 NUMBER
-   : OCTALNUMBER
-   | HEXNUMBER
-   | DIGIT+
-   ;
+    : OCTALNUMBER
+    | HEXNUMBER
+    | DIGIT+
+    ;
 
 IDENTIFIER
-   : LETTER (LETTER | DIGIT | '.')*
-   ;
+    : LETTER (LETTER | DIGIT | '.')*
+    ;
 
 ADDRESSOP
-   : '@'
-   | '!'
-   ;
+    : '@'
+    | '!'
+    ;
 
 MULTOP
-   : '*'
-   | '/'
-   | 'REM'
-   ;
+    : '*'
+    | '/'
+    | 'REM'
+    ;
 
 ADDOP
-   : '+'
-   | '-'
-   ;
+    : '+'
+    | '-'
+    ;
 
 RELOP
-   : '='
-   | '¬='
-   | '<='
-   | '>='
-   | '<'
-   | '>'
-   ;
+    : '='
+    | '¬='
+    | '<='
+    | '>='
+    | '<'
+    | '>'
+    ;
 
 SHIFTOP
-   : '<<'
-   | '>>'
-   ;
+    : '<<'
+    | '>>'
+    ;
 
 ANDOP
-   : '&'
-   ;
+    : '&'
+    ;
 
 OROP
-   : '|'
-   ;
+    : '|'
+    ;
 
 EQVOP
-   : 'EQV'
-   | 'NEQV'
-   ;
+    : 'EQV'
+    | 'NEQV'
+    ;
 
 NOTOP
-   : '¬'
-   ;
+    : '¬'
+    ;
 
 STRING
-   :
-   ;
+    :
+    ;
 
 WS
-   : [ \r\n] -> skip
-   ;
-
+    : [ \r\n] -> skip
+    ;

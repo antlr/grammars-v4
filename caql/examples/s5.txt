@@ -1,0 +1,1 @@
+find("...") | label("This is output stream %d")

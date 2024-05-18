@@ -29,88 +29,93 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar metric;
 
-file_ : uom EOF ;
+file_
+    : uom EOF
+    ;
 
 uom
-   : measure (('*' | '/') measure)*
-   ;
+    : measure (('*' | '/') measure)*
+    ;
 
 measure
-   : prefix_? unit exponent?
-   ;
+    : prefix_? unit exponent?
+    ;
 
 exponent
-   : ('^' INTE)
-   ;
+    : ('^' INTE)
+    ;
 
 prefix_
-   : 'E'
-   | 'P'
-   | 'T'
-   | 'G'
-   | 'M'
-   | 'k'
-   | 'h'
-   | 'da'
-   | 'd'
-   | 'c'
-   | 'm'
-   | 'µ'
-   | 'n'
-   | 'p'
-   | 'f'
-   | 'a'
-   ;
+    : 'E'
+    | 'P'
+    | 'T'
+    | 'G'
+    | 'M'
+    | 'k'
+    | 'h'
+    | 'da'
+    | 'd'
+    | 'c'
+    | 'm'
+    | 'µ'
+    | 'n'
+    | 'p'
+    | 'f'
+    | 'a'
+    ;
 
 unit
-   : baseunit
-   | derivedunit
-   ;
+    : baseunit
+    | derivedunit
+    ;
 
 baseunit
-   : 'm'
-   | 'g'
-   | 's'
-   | 'A'
-   | 'K'
-   | 'mol'
-   | 'cd'
-   ;
+    : 'm'
+    | 'g'
+    | 's'
+    | 'A'
+    | 'K'
+    | 'mol'
+    | 'cd'
+    ;
 
 derivedunit
-   : 'rad'
-   | 'Hz'
-   | 'sr'
-   | 'rad'
-   | 'N'
-   | 'Pa'
-   | 'J'
-   | 'W'
-   | 'C'
-   | 'V'
-   | 'F'
-   | 'Ω'
-   | 'S'
-   | 'Wb'
-   | 'rad'
-   | 'T'
-   | 'H'
-   | '˚C'
-   | 'lm'
-   | 'lx'
-   | 'Bq'
-   | 'Gy'
-   | 'Sv'
-   | 'kat'
-   ;
+    : 'rad'
+    | 'Hz'
+    | 'sr'
+    | 'rad'
+    | 'N'
+    | 'Pa'
+    | 'J'
+    | 'W'
+    | 'C'
+    | 'V'
+    | 'F'
+    | 'Ω'
+    | 'S'
+    | 'Wb'
+    | 'rad'
+    | 'T'
+    | 'H'
+    | '˚C'
+    | 'lm'
+    | 'lx'
+    | 'Bq'
+    | 'Gy'
+    | 'Sv'
+    | 'kat'
+    ;
 
 INTE
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 WS
-   : [ \t\r\n] -> skip
-   ;
-
+    : [ \t\r\n] -> skip
+    ;

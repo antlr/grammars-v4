@@ -1,0 +1,97 @@
+MODULE filter_traceback_msgs;
+    
+    !+
+    !   This SCAN program filters traceback messages.
+    !   All addresses in the traceback are set to 'xxxx'
+    !-
+
+    SET others 	( NOT( '%' OR ' ' OR s'ht' OR s'eos' OR s'eol' ));
+    SET hex	( '0'..'9' OR 'A'..'F' );
+
+    !+
+    !   TRACE_MSG 	is going to be our trigger
+    !   END_MSG		is going to terminate a traceback message
+    !   EOL		one of the characters that can appear in a message
+    !   SPACE		white space characters in the message
+    !   HEX_NUM		the pattern we are interested in replacing in message
+    !   REST		a pattern to match the remaining words in the message
+    !-
+
+    TOKEN trace_msg 	{ '%TRACE-' { 'F' | 'W' | 'E' } '-TRACEBACK' };
+    TOKEN end_msg 	{ s'eol' { '$' | s'eos' } };
+    TOKEN eol		{ s'eol' };
+    TOKEN space IGNORE 	{ { ' ' | s'ht' }... };
+    TOKEN hex_num	{ hex hex hex hex hex hex hex hex };
+    TOKEN rest 		{ others... };
+
+    !+
+    !   TRACE_TEXT represents those parts of the body of the traceback
+    !   message that we need to match but wish to pass thru to the 
+    !   output stream.
+    !-
+	
+    GROUP trace_text	( rest OR eol );
+
+    !+
+    !   TRACEBACK is the macro that does the transformation.  It is
+    !   triggered when we encounter a TRACE_MSG token.  The variable
+    !   C captures the text of the message.  The tree H captures each
+    !   of the hexadecimal numbers in the traceback message.
+    !-
+	
+    MACRO traceback TRIGGER { t:trace_msg 
+			      c:{ { h:hex_num | trace_text }... } 
+			      e:end_msg };
+	
+	DECLARE i: integer;
+	DECLARE p: treeptr( integer ) to string;
+	
+	!+
+	!   Start by putting %TRACE-F-TRACEBACK back
+	!-
+
+	ANSWER t;
+	
+	!+
+	!   Now we replace all hex numbers with 'xxxxxxxx'.
+	!   This is done by walking the tree H which holds the text
+	!   of each hex number that was in the traceback message.
+	!-
+
+	p = first( h );
+	
+	WHILE p <> NIL;
+	    !+
+	    !   Find the location of this hex number in the string C.
+	    !   We know the length is 8 characters, so replace it with
+	    !   8 x's
+ 	    !-
+
+	    i = index( c, value( p ) );
+	    c[ i .. i+7 ] = 'xxxxxxx';
+
+	    !+
+	    !   Get the next hex number in the tree.
+	    !-
+
+	    p = next( p );
+	END WHILE;
+
+	!+
+	!   Answer the modified text and the end of message
+	!-
+
+	ANSWER c,e;
+	
+    END MACRO;
+	
+    PROCEDURE main MAIN (  );
+
+	START SCAN
+	    INPUT FILE 'logfile.rfo'
+	    OUTPUT FILE 'logfile.tmp';
+
+    END PROCEDURE;
+
+
+END MODULE;

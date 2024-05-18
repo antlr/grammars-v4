@@ -1,0 +1,131 @@
+MODULE micro_trans IDENT 'V1.0';
+
+    INCLUDE FILE 'keys.inc';
+
+    FORWARD PROCEDURE process_id( string );
+
+    SET alpha		    ( 'a'..'z' OR 'A'..'Z' );
+    SET digit		    ( '0'..'9' );
+    SET other		    ( alpha OR digit OR '.' );
+    SET typer		    ( '$' OR '%' OR '!' or '#' );
+    SET non_quote	    ( NOT( '"' ) );
+    SET non_eol		    ( NOT( s'eol' OR ':') );
+    SET hex_digit	    ( digit OR 'A'..'F' );
+ 
+    TOKEN start_line	    { s'sos' | s'eol' };
+    TOKEN line_number	    { { s'sos' | s'eol' } digit... };
+    TOKEN id		    { alpha [ other... ] [ typer ] };
+    TOKEN str		    { '"' [non_quote...] '"' };
+    TOKEN int		    { digit... };
+    TOKEN real		    { [ digit... ] '.' [ digit... ]
+			      [ { 'D' | 'E' } { '+' | '-' } digit... ]
+			      [ { '!' | '#' } ] };
+    TOKEN radix		    { '&' { 'H' | 'O' } hex_digit... };
+    TOKEN colon ALIAS ':'   { ':' };
+    TOKEN amp ALIAS '&'	    { '&' };
+    TOKEN comment	    { { '''' | '!' } [ non_eol...] };
+    TOKEN space IGNORE	    { { ' ' | s'ht' }... };
+    TOKEN punct		    { ';' | '=' | '+' | '-' | '*' | '/' | '^'
+			      '(' | ')' | '[' | ']' | ',' | '?' | '<'
+			      '>' | '\' | '@' | '_' };
+
+    GROUP rest		    ( NOT( line_number OR start_line OR ':' ) );
+     
+
+    MACRO new_line TRIGGER  { l:{line_number stmt} };
+     
+	ANSWER l;
+     
+    END MACRO /* new_line */;
+     
+    MACRO new_stmt TRIGGER { ':' s:stmt };
+     
+	ANSWER s'eol', s;
+     
+    END MACRO /* new_stmt */;
+     
+    MACRO comment_line TRIGGER  { l:line_number c:comment };
+     
+	ANSWER l, s'ht', c;
+     
+    END MACRO /* comment_line */;
+     
+    MACRO number_at_start_line TRIGGER  { l:line_number };
+     
+	ANSWER ' ', l[ 2 .. ];
+     
+    END MACRO /* number_at_start_line */;
+     
+    MACRO stmt SYNTAX { i:{ id | '&'} [{ r:rest | start_line}... ] };
+
+	DECLARE p : TREEPTR( INTEGER ) TO DYNAMIC STRING;
+	DECLARE rest,id: DYNAMIC STRING;
+	DECLARE pos: INTEGER;
+
+	i = trim( i );
+
+	IF i = '&'
+	THEN
+	    i = 'PRINT';
+	END IF;
+
+	CALL process_id( i );
+
+	p = first( r );
+	WHILE p <> NIL;
+	    id = trim( value( p ) );
+
+	    IF member( id[ 1 ], 'abcdefghijklmnopqrstuvwxyz' &
+				'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ) = 1
+	    THEN
+		CALL process_id( id );
+	    END IF;
+
+	    IF id = '&'
+	    THEN
+		id = 'PRINT';
+	    END IF;
+
+	    rest = rest & ' ' & id;
+	    p = NEXT( p );
+	END WHILE;
+     
+	ANSWER s'ht', i, rest;
+
+    END MACRO /* stmt */;
+     
+    PROCEDURE main MAIN;
+     
+	START SCAN
+	    INPUT FILE 'micro.dat'
+	    OUTPUT FILE 'micro.tm1';
+     
+    END PROCEDURE /* main */;
+
+    PROCEDURE process_id( id: string );
+
+	DECLARE i,p: INTEGER;
+	DECLARE key: VARYING STRING( key_length );
+
+	id = lower( id ) & ' ';
+	FOR i = 1 TO LENGTH( keyword ) STEP key_length;
+
+	    key = trim( keyword[ i .. i + key_length - 1 ] );
+
+	    WHILE true;
+		p = index( id, key );
+		IF p = 0
+		THEN
+		    GOTO next_key;
+		END IF;
+		id = id[ 1 .. p-1 ] & ' ' & upper(key ) & ' ' &
+		     id[ p + length( key ) .. ];
+	    END WHILE;
+next_key:   ;
+	END FOR;
+
+	id = trim( id );
+	    
+    END PROCEDURE;
+ 
+END MODULE /* micro_trans */;

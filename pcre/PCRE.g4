@@ -31,182 +31,189 @@
  * Based on http://www.pcre.org/pcre.txt
  * (REVISION Last updated: 14 June 2021)
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar PCRE;
 
 pcre
- :  alternation? EOF
- ;
+    : alternation? EOF
+    ;
 
 alternation
- : expr ( '|' expr? )*
- ;
+    : expr ('|' expr?)*
+    ;
 
 expr
- : element+
- ;
+    : element+
+    ;
 
 element
- : atom quantifier?
- ;
+    : atom quantifier?
+    ;
 
 atom
- : option_setting
- | backtracking_control
- | callout
- | capture
- | atomic_group
- | lookaround
- | backreference
- | subroutine_reference
- | conditional_pattern
- | comment
- | character
- | character_type
- | character_class
- | posix_character_class
- | letter
- | digit
- | anchor
- | match_point_reset
- | quoting
- | other
- ;
+    : option_setting
+    | backtracking_control
+    | callout
+    | capture
+    | atomic_group
+    | lookaround
+    | backreference
+    | subroutine_reference
+    | conditional_pattern
+    | comment
+    | character
+    | character_type
+    | character_class
+    | posix_character_class
+    | letter
+    | digit
+    | anchor
+    | match_point_reset
+    | quoting
+    | other
+    ;
 
 capture
- : '(' ( alternation
-       | '?' ( '<' name '>' alternation
-             | '\'' name '\'' alternation
-             | 'P' '<' name '>' alternation
-             | ( option_setting_flag+ ( '-' option_setting_flag+ )? )? ':' alternation
-             | '|' alternation
-             )
-       )
-   ')'
- ;
+    : '(' (
+        alternation
+        | '?' (
+            '<' name '>' alternation
+            | '\'' name '\'' alternation
+            | 'P' '<' name '>' alternation
+            | ( option_setting_flag+ ( '-' option_setting_flag+)?)? ':' alternation
+            | '|' alternation
+        )
+    ) ')'
+    ;
 
 atomic_group
- : '(' '?' '>' alternation ')'
- ;
+    : '(' '?' '>' alternation ')'
+    ;
 
 lookaround
- : '(' '?' ( '=' | '!' | '<' '=' | '<' '!' ) alternation ')'
- ;
+    : '(' '?' ('=' | '!' | '<' '=' | '<' '!') alternation ')'
+    ;
 
 backreference
- : '\\' ( 'g' digits
+    : '\\' (
+        'g' digits
         | 'g' '{' '-'? digits '}'
         | 'g' '{' name '}'
         | 'k' '<' name '>'
         | 'k' '\'' name '\''
         | 'k' '{' name '}'
-        )
- | '(' '?' 'P' '=' name ')'
- ;
+    )
+    | '(' '?' 'P' '=' name ')'
+    ;
 
 subroutine_reference
- : '(' '?' ( 'R'
-           | ( '+' | '-' )? digits
-           | '&' name
-           | 'P' '>' name
-           )
-   ')'
- | '\\' 'g' ( '<' name '>'
-            | '\'' name '\''
-            | '<' ( '+' | '-' )? digits '>'
-            | '\'' ( '+' | '-' )? digits '\''
-            )
- ;
+    : '(' '?' ('R' | ( '+' | '-')? digits | '&' name | 'P' '>' name) ')'
+    | '\\' 'g' (
+        '<' name '>'
+        | '\'' name '\''
+        | '<' ( '+' | '-')? digits '>'
+        | '\'' ( '+' | '-')? digits '\''
+    )
+    ;
 
 conditional_pattern
- : '(' '?' ( '(' ( ( '+' | '-' )? digits
-                 | '<' name '>'
-                 | '\'' name '\''
-                 | 'R' digits?
-                 | 'R' '&' name
-                 | name
-                 )
-             ')'
-           | callout
-           | lookaround
-           )
-           expr
-   ( '|' no_pattern=expr )? ')'
- ;
+    : '(' '?' (
+        '(' (
+            ( '+' | '-')? digits
+            | '<' name '>'
+            | '\'' name '\''
+            | 'R' digits?
+            | 'R' '&' name
+            | name
+        ) ')'
+        | callout
+        | lookaround
+    ) expr ('|' no_pattern = expr)? ')'
+    ;
 
 comment
- : '(' '?' '#' ~')'+ ')'
- ;
+    : '(' '?' '#' ~')'+ ')'
+    ;
 
 quantifier
- : ( '?' | '*' | '+' ) ( possessive='+' | lazy='?' )?
- | '{' from=digits ( ',' to=digits? )? '}' ( possessive='+' | lazy='?' )?
- ;
+    : ('?' | '*' | '+') (possessive = '+' | lazy = '?')?
+    | '{' from = digits ( ',' to = digits?)? '}' ( possessive = '+' | lazy = '?')?
+    ;
 
 option_setting
- : '(' ( '*' ( utf ( '8' | '1' '6' | '3' '2' )?
-             | ucp
-             | no_auto_possess
-             | no_start_opt
-             | newline_conventions
-             | limit_match '=' digits
-             | limit_recursion '=' digits
-             | bsr_anycrlf
-             | bsr_unicode
-             )
-       | '?' ( option_setting_flag+ ( '-' option_setting_flag+ )?
-             | '-' option_setting_flag+
-             )
-       )
-   ')'
- ;
+    : '(' (
+        '*' (
+            utf ( '8' | '1' '6' | '3' '2')?
+            | ucp
+            | no_auto_possess
+            | no_start_opt
+            | newline_conventions
+            | limit_match '=' digits
+            | limit_recursion '=' digits
+            | bsr_anycrlf
+            | bsr_unicode
+        )
+        | '?' (option_setting_flag+ ( '-' option_setting_flag+)? | '-' option_setting_flag+)
+    ) ')'
+    ;
 
 option_setting_flag
- : 'i' | 'J' | 'm' | 's' | 'U' | 'x'
- ;
+    : 'i'
+    | 'J'
+    | 'm'
+    | 's'
+    | 'U'
+    | 'x'
+    ;
 
 backtracking_control
- : '(' '*' ( accept_
-           | fail
-           | mark? ':' name
-           | commit
-           | prune ( ':' name )?
-           | skip ( ':' name )?
-           | then ( ':' name )?
-           )
-   ')'
- ;
+    : '(' '*' (
+        accept_
+        | fail
+        | mark? ':' name
+        | commit
+        | prune ( ':' name)?
+        | skip ( ':' name)?
+        | then ( ':' name)?
+    ) ')'
+    ;
 
 callout
- : '(' '?' 'C' digits? ')'
- ;
+    : '(' '?' 'C' digits? ')'
+    ;
 
 newline_conventions
- : cr
- | lf
- | crlf
- | anycrlf
- | any
- ;
+    : cr
+    | lf
+    | crlf
+    | anycrlf
+    | any
+    ;
 
 character
- : '\\' ( 'a'
+    : '\\' (
+        'a'
         | 'c' .
         | 'e'
         | 'f'
         | 'n'
         | 'r'
         | 't'
-        | digit ( digit digit? )? // can also be a backreference
+        | digit (digit digit?)? // can also be a backreference
         | 'o' '{' digit digit digit+ '}'
         | 'x' hex hex
         | 'x' '{' hex hex hex+ '}'
-        | 'u' hex hex hex hex ( hex hex hex hex )?
-        )
- ;
+        | 'u' hex hex hex hex ( hex hex hex hex)?
+    )
+    ;
 
 character_type
- : '.'
- | '\\' ( 'C'
+    : '.'
+    | '\\' (
+        'C'
         | 'd'
         | 'D'
         | 'h'
@@ -223,226 +230,615 @@ character_type
         | 'w'
         | 'W'
         | 'X'
-        )
- ;
+    )
+    ;
 
 character_class
- : '[' negate='^'? ']' character_class_atom* ']'
- | '[' negate='^'? character_class_atom+ ']'
- ;
+    : '[' negate = '^'? ']' character_class_atom* ']'
+    | '[' negate = '^'? character_class_atom+ ']'
+    ;
 
 character_class_atom
- : character_class_range
- | posix_character_class
- | character
- | character_type
- | '\\' .
- | ~( '\\' | ']' )
- ;
+    : character_class_range
+    | posix_character_class
+    | character
+    | character_type
+    | '\\' .
+    | ~( '\\' | ']')
+    ;
 
 character_class_range
- : character_class_range_atom '-' character_class_range_atom
- ;
+    : character_class_range_atom '-' character_class_range_atom
+    ;
 
 character_class_range_atom
- : character
- | ~']'
- ;
+    : character
+    | '\\' .
+    | ~(']' | '\\')
+    ;
 
 posix_character_class
- : '[:' negate='^'? letters ':]'
- ;
+    : '[:' negate = '^'? letters ':]'
+    ;
 
 anchor
- : '\\' ( 'b' | 'B' | 'A' | 'z' | 'Z' | 'G' )
- | '^'
- | '$'
- ;
+    : '\\' ('b' | 'B' | 'A' | 'z' | 'Z' | 'G')
+    | '^'
+    | '$'
+    ;
 
 match_point_reset
- : '\\' 'K'
- ;
+    : '\\' 'K'
+    ;
 
 quoting
- : '\\' .
- | '\\' 'Q' .*? '\\' 'E'
- ;
+    : '\\' ('Q' .*? '\\' 'E' | .)
+    ;
 
 // Helper rules
-digits : digit+;
-digit : D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9;
-hex : digit | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
-letters : letter+;
+digits
+    : digit+
+    ;
+
+digit
+    : D0
+    | D1
+    | D2
+    | D3
+    | D4
+    | D5
+    | D6
+    | D7
+    | D8
+    | D9
+    ;
+
+hex
+    : digit
+    | 'a'
+    | 'b'
+    | 'c'
+    | 'd'
+    | 'e'
+    | 'f'
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    ;
+
+letters
+    : letter+
+    ;
 
 letter
- : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
- | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
- | '_'
- ;
+    : 'a'
+    | 'b'
+    | 'c'
+    | 'd'
+    | 'e'
+    | 'f'
+    | 'g'
+    | 'h'
+    | 'i'
+    | 'j'
+    | 'k'
+    | 'l'
+    | 'm'
+    | 'n'
+    | 'o'
+    | 'p'
+    | 'q'
+    | 'r'
+    | 's'
+    | 't'
+    | 'u'
+    | 'v'
+    | 'w'
+    | 'x'
+    | 'y'
+    | 'z'
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+    | 'F'
+    | 'G'
+    | 'H'
+    | 'I'
+    | 'J'
+    | 'K'
+    | 'L'
+    | 'M'
+    | 'N'
+    | 'O'
+    | 'P'
+    | 'Q'
+    | 'R'
+    | 'S'
+    | 'T'
+    | 'U'
+    | 'V'
+    | 'W'
+    | 'X'
+    | 'Y'
+    | 'Z'
+    | '_'
+    ;
 
 name
- : letter ( letter | digit )*
- ;
+    : letter (letter | digit)*
+    ;
 
 other
- : '}'
- | ']'
- | ','
- | '-'
- | '_'
- | '='
- | '&'
- | '<'
- | '>'
- | '\''
- | ':'
- | '#'
- | '!'
- | OTHER
- ;
+    : '}'
+    | ']'
+    | ','
+    | '-'
+    | '_'
+    | '='
+    | '&'
+    | '<'
+    | '>'
+    | '\''
+    | ':'
+    | '#'
+    | '!'
+    | OTHER
+    ;
 
-utf : 'U' 'T' 'F';
-ucp : 'U' 'C' 'P';
-no_auto_possess : 'N' 'O' '_' 'A' 'U' 'T' 'O' '_' 'P' 'O' 'S' 'S' 'E' 'S' 'S';
-no_start_opt : 'N' 'O' '_' 'S' 'T' 'A' 'R' 'T' '_' 'O' 'P' 'T';
-cr : 'C' 'R';
-lf : 'L' 'F';
-crlf : 'C' 'R' 'L' 'F';
-anycrlf : 'A' 'N' 'Y' 'C' 'R' 'L' 'F';
-any : 'A' 'N' 'Y';
-limit_match : 'L' 'I' 'M' 'I' 'T' '_' 'M' 'A' 'T' 'C' 'H';
-limit_recursion : 'L' 'I' 'M' 'I' 'T' '_' 'R' 'E' 'C' 'U' 'R' 'S' 'I' 'O' 'N';
-bsr_anycrlf : 'B' 'S' 'R' '_' 'A' 'N' 'Y' 'C' 'R' 'L' 'F';
-bsr_unicode : 'B' 'S' 'R' '_' 'U' 'N' 'I' 'C' 'O' 'D' 'E';
-accept_ : 'A' 'C' 'C' 'E' 'P' 'T';
-fail : 'F' ( 'A' 'I' 'L' )?;
-mark : 'M' 'A' 'R' 'K';
-commit : 'C' 'O' 'M' 'M' 'I' 'T';
-prune : 'P' 'R' 'U' 'N' 'E';
-skip : 'S' 'K' 'I' 'P';
-then : 'T' 'H' 'E' 'N';
+utf
+    : 'U' 'T' 'F'
+    ;
+
+ucp
+    : 'U' 'C' 'P'
+    ;
+
+no_auto_possess
+    : 'N' 'O' '_' 'A' 'U' 'T' 'O' '_' 'P' 'O' 'S' 'S' 'E' 'S' 'S'
+    ;
+
+no_start_opt
+    : 'N' 'O' '_' 'S' 'T' 'A' 'R' 'T' '_' 'O' 'P' 'T'
+    ;
+
+cr
+    : 'C' 'R'
+    ;
+
+lf
+    : 'L' 'F'
+    ;
+
+crlf
+    : 'C' 'R' 'L' 'F'
+    ;
+
+anycrlf
+    : 'A' 'N' 'Y' 'C' 'R' 'L' 'F'
+    ;
+
+any
+    : 'A' 'N' 'Y'
+    ;
+
+limit_match
+    : 'L' 'I' 'M' 'I' 'T' '_' 'M' 'A' 'T' 'C' 'H'
+    ;
+
+limit_recursion
+    : 'L' 'I' 'M' 'I' 'T' '_' 'R' 'E' 'C' 'U' 'R' 'S' 'I' 'O' 'N'
+    ;
+
+bsr_anycrlf
+    : 'B' 'S' 'R' '_' 'A' 'N' 'Y' 'C' 'R' 'L' 'F'
+    ;
+
+bsr_unicode
+    : 'B' 'S' 'R' '_' 'U' 'N' 'I' 'C' 'O' 'D' 'E'
+    ;
+
+accept_
+    : 'A' 'C' 'C' 'E' 'P' 'T'
+    ;
+
+fail
+    : 'F' ('A' 'I' 'L')?
+    ;
+
+mark
+    : 'M' 'A' 'R' 'K'
+    ;
+
+commit
+    : 'C' 'O' 'M' 'M' 'I' 'T'
+    ;
+
+prune
+    : 'P' 'R' 'U' 'N' 'E'
+    ;
+
+skip
+    : 'S' 'K' 'I' 'P'
+    ;
+
+then
+    : 'T' 'H' 'E' 'N'
+    ;
 
 /// \      general escape character with several uses
-BSlash : '\\';
+BSlash
+    : '\\'
+    ;
 
 /// $      assert end of string (or line, in multiline mode)
-Dollar : '$';
+Dollar
+    : '$'
+    ;
 
 /// .      match any character except newline (by default)
-Dot : '.';
+Dot
+    : '.'
+    ;
 
 /// [      start character class definition
-OBrack : '[';
+OBrack
+    : '['
+    ;
 
 /// ^      assert start of string (or line, in multiline mode)
-Caret : '^';
+Caret
+    : '^'
+    ;
 
 /// |      start of alternative branch
-Pipe : '|';
+Pipe
+    : '|'
+    ;
 
 /// ?      extends the meaning of (, also 0 or 1 quantifier.txt, also quantifier.txt minimizer
-QMark : '?';
+QMark
+    : '?'
+    ;
 
 /// *      0 or more quantifier.txt
-Star : '*';
+Star
+    : '*'
+    ;
 
 /// +      1 or more quantifier.txt, also "possessive quantifier.txt"
-Plus : '+';
+Plus
+    : '+'
+    ;
 
 /// {      start min/max quantifier.txt
-OBrace : '{';
+OBrace
+    : '{'
+    ;
 
-CBrace : '}';
+CBrace
+    : '}'
+    ;
 
 /// (      start subpattern
-OPar : '(';
+OPar
+    : '('
+    ;
 
 /// )      end subpattern
-CPar : ')';
+CPar
+    : ')'
+    ;
 
 /// ]      terminates the character class
-CBrack : ']';
+CBrack
+    : ']'
+    ;
 
-OPosixBrack : '[:';
-CPosixBrack : ':]';
+OPosixBrack
+    : '[:'
+    ;
 
-Comma : ',';
-Dash : '-';
-UScore : '_';
-Eq : '=';
-Amp : '&';
-Lt : '<';
-Gt : '>';
-Quote : '\'';
-Col : ':';
-Hash : '#';
-Excl : '!';
+CPosixBrack
+    : ':]'
+    ;
 
-Au : 'A';
-Bu : 'B';
-Cu : 'C';
-Du : 'D';
-Eu : 'E';
-Fu : 'F';
-Gu : 'G';
-Hu : 'H';
-Iu : 'I';
-Ju : 'J';
-Ku : 'K';
-Lu : 'L';
-Mu : 'M';
-Nu : 'N';
-Ou : 'O';
-Pu : 'P';
-Qu : 'Q';
-Ru : 'R';
-Su : 'S';
-Tu : 'T';
-Uu : 'U';
-Vu : 'V';
-Wu : 'W';
-Xu : 'X';
-Yu : 'Y';
-Zu : 'Z';
+Comma
+    : ','
+    ;
 
-Al : 'a';
-Bl : 'b';
-Cl : 'c';
-Dl : 'd';
-El : 'e';
-Fl : 'f';
-Gl : 'g';
-Hl : 'h';
-Il : 'i';
-Jl : 'j';
-Kl : 'k';
-Ll : 'l';
-Ml : 'm';
-Nl : 'n';
-Ol : 'o';
-Pl : 'p';
-Ql : 'q';
-Rl : 'r';
-Sl : 's';
-Tl : 't';
-Ul : 'u';
-Vl : 'v';
-Wl : 'w';
-Xl : 'x';
-Yl : 'y';
-Zl : 'z';
+Dash
+    : '-'
+    ;
 
-D0 : '0';
-D1 : '1';
-D2 : '2';
-D3 : '3';
-D4 : '4';
-D5 : '5';
-D6 : '6';
-D7 : '7';
-D8 : '8';
-D9 : '9';
+UScore
+    : '_'
+    ;
+
+Eq
+    : '='
+    ;
+
+Amp
+    : '&'
+    ;
+
+Lt
+    : '<'
+    ;
+
+Gt
+    : '>'
+    ;
+
+Quote
+    : '\''
+    ;
+
+Col
+    : ':'
+    ;
+
+Hash
+    : '#'
+    ;
+
+Excl
+    : '!'
+    ;
+
+Au
+    : 'A'
+    ;
+
+Bu
+    : 'B'
+    ;
+
+Cu
+    : 'C'
+    ;
+
+Du
+    : 'D'
+    ;
+
+Eu
+    : 'E'
+    ;
+
+Fu
+    : 'F'
+    ;
+
+Gu
+    : 'G'
+    ;
+
+Hu
+    : 'H'
+    ;
+
+Iu
+    : 'I'
+    ;
+
+Ju
+    : 'J'
+    ;
+
+Ku
+    : 'K'
+    ;
+
+Lu
+    : 'L'
+    ;
+
+Mu
+    : 'M'
+    ;
+
+Nu
+    : 'N'
+    ;
+
+Ou
+    : 'O'
+    ;
+
+Pu
+    : 'P'
+    ;
+
+Qu
+    : 'Q'
+    ;
+
+Ru
+    : 'R'
+    ;
+
+Su
+    : 'S'
+    ;
+
+Tu
+    : 'T'
+    ;
+
+Uu
+    : 'U'
+    ;
+
+Vu
+    : 'V'
+    ;
+
+Wu
+    : 'W'
+    ;
+
+Xu
+    : 'X'
+    ;
+
+Yu
+    : 'Y'
+    ;
+
+Zu
+    : 'Z'
+    ;
+
+Al
+    : 'a'
+    ;
+
+Bl
+    : 'b'
+    ;
+
+Cl
+    : 'c'
+    ;
+
+Dl
+    : 'd'
+    ;
+
+El
+    : 'e'
+    ;
+
+Fl
+    : 'f'
+    ;
+
+Gl
+    : 'g'
+    ;
+
+Hl
+    : 'h'
+    ;
+
+Il
+    : 'i'
+    ;
+
+Jl
+    : 'j'
+    ;
+
+Kl
+    : 'k'
+    ;
+
+Ll
+    : 'l'
+    ;
+
+Ml
+    : 'm'
+    ;
+
+Nl
+    : 'n'
+    ;
+
+Ol
+    : 'o'
+    ;
+
+Pl
+    : 'p'
+    ;
+
+Ql
+    : 'q'
+    ;
+
+Rl
+    : 'r'
+    ;
+
+Sl
+    : 's'
+    ;
+
+Tl
+    : 't'
+    ;
+
+Ul
+    : 'u'
+    ;
+
+Vl
+    : 'v'
+    ;
+
+Wl
+    : 'w'
+    ;
+
+Xl
+    : 'x'
+    ;
+
+Yl
+    : 'y'
+    ;
+
+Zl
+    : 'z'
+    ;
+
+D0
+    : '0'
+    ;
+
+D1
+    : '1'
+    ;
+
+D2
+    : '2'
+    ;
+
+D3
+    : '3'
+    ;
+
+D4
+    : '4'
+    ;
+
+D5
+    : '5'
+    ;
+
+D6
+    : '6'
+    ;
+
+D7
+    : '7'
+    ;
+
+D8
+    : '8'
+    ;
+
+D9
+    : '9'
+    ;
 
 OTHER
- : .
- ;
+    : .
+    ;

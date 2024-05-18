@@ -29,7 +29,7 @@ class JavaScriptParserBase(Parser):
     def notLineTerminator(self) -> bool:
         JavaScriptParser = self.parser()
 
-        return not self.here(JavaScriptParser.LineTerminator)
+        return not self.lineTerminatorAhead()
 
     def notOpenBraceAndNotFunction(self) -> bool:
         JavaScriptParser = self.parser()
@@ -41,27 +41,6 @@ class JavaScriptParserBase(Parser):
         JavaScriptParser = self.parser()
 
         return self._input.LT(1).type == JavaScriptParser.CloseBrace
-
-    def here(self, tokenType: int) -> bool:
-        """
-        Returns {@code true} iff on the current index of the parser's
-        token stream a token of the given {@code type} exists on the
-        {@code HIDDEN} channel.
-        :param:type:
-                   the type of the token on the {@code HIDDEN} channel
-                   to check.
-        :return:{@code true} iff on the current index of the parser's
-            token stream a token of the given {@code type} exists on the
-            {@code HIDDEN} channel.
-        """
-        # Get the token ahead of the current index.
-        assert isinstance(self.getCurrentToken(), Token)
-        possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
-        ahead = self._input.get(possibleIndexEosToken)
-
-        # Check if the token resides on the HIDDEN channel and if it's of the
-        # provided type.
-        return (ahead.channel == Lexer.HIDDEN) and (ahead.type == tokenType)
 
     def lineTerminatorAhead(self) -> bool:
         """
@@ -79,6 +58,8 @@ class JavaScriptParserBase(Parser):
 
         # Get the token ahead of the current index.
         possibleIndexEosToken: Token = self.getCurrentToken().tokenIndex - 1
+        if (possibleIndexEosToken < 0):
+            return False
         ahead: Token = self._input.get(possibleIndexEosToken)
 
         if ahead.channel != Lexer.HIDDEN:
@@ -92,6 +73,8 @@ class JavaScriptParserBase(Parser):
         if ahead.type == JavaScriptParser.WhiteSpaces:
             # Get the token ahead of the current whitespaces.
             possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+            if (possibleIndexEosToken < 0):
+                return False
             ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type.

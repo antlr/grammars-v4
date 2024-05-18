@@ -1,19 +1,7 @@
 # Generated from trgen <version>
 
-$TestDirectory = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
-Write-Host "Test cases here: $TestDirectory"
-
-# People often specify a test file directory, but sometimes no
-# tests are provided. Git won't check in an empty directory.
-# Test if the test file directory does not exist, or it is just
-# an empty directory.
-if (!(Test-Path -Path "$TestDirectory")) {
-    Write-Host "No test cases provided."
-    exit 0
-} elseif (!(Test-Path "$TestDirectory/*")) {
-    Write-Host "No test cases provided."
-    exit 0
-}
+$Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
+Write-Host "Test cases here: $Tests"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
@@ -22,9 +10,9 @@ if (Test-Path -Path "tests.txt" -PathType Leaf) {
     Remove-Item "tests.txt"
 }
 $files = New-Object System.Collections.Generic.List[string]
-foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-    $file = $item.fullname
-    $ext = $item.Extension
+$allFiles = $(& dotnet trglob -- "$Tests" ; $last = $LASTEXITCODE )
+foreach ($file in $allFiles) {
+    $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
         continue
     } elseif ($ext -eq ".errors") {
@@ -37,8 +25,8 @@ foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
         {
             continue
         }
-        $files.Add($item)
-        Write-Host "Test case: $item"
+        $files.Add($file)
+        Write-Host "Test case: $file"
     }
 }
 foreach ($file in $files) {
@@ -52,10 +40,10 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
+Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog -- ./bin/Debug/net7.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
+get-content "tests.txt" | dotnet trwdog -- ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -79,7 +67,7 @@ if ( $size -eq 0 ) {
 }
 
 $old = Get-Location
-Set-Location ../<example_files_unix>
+Set-Location ..
 
 # Check if any .errors/.tree files have changed. That's not good.
 git config --global pager.diff false
