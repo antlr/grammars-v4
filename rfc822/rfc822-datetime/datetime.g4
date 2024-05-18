@@ -26,98 +26,96 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar datetime;
 
 date_time
-   : (day ',')? date time EOF
-   ;
+    : (day ',')? date time EOF
+    ;
 
 day
-   : 'Mon'
-   | 'Tue'
-   | 'Wed'
-   | 'Thu'
-   | 'Fri'
-   | 'Sat'
-   | 'Sun'
-   ;
+    : 'Mon'
+    | 'Tue'
+    | 'Wed'
+    | 'Thu'
+    | 'Fri'
+    | 'Sat'
+    | 'Sun'
+    ;
 
 date
-   : two_digit + month two_digit
-   ;
+    : two_digit+ month two_digit
+    ;
 
 month
-   : 'Jan'
-   | 'Feb'
-   | 'Mar'
-   | 'Apr'
-   | 'May'
-   | 'Jun'
-   | 'Jul'
-   | 'Aug'
-   | 'Sep'
-   | 'Oct'
-   | 'Nov'
-   | 'Dec'
-   ;
+    : 'Jan'
+    | 'Feb'
+    | 'Mar'
+    | 'Apr'
+    | 'May'
+    | 'Jun'
+    | 'Jul'
+    | 'Aug'
+    | 'Sep'
+    | 'Oct'
+    | 'Nov'
+    | 'Dec'
+    ;
 
 time
-   : hour zone
-   ;
+    : hour zone
+    ;
 
 hour
-   : two_digit ':' two_digit (':' two_digit)?
-   ;
+    : two_digit ':' two_digit (':' two_digit)?
+    ;
 
 zone
-   : 'UT'
-   | 'GMT'
-   | 'EST'
-   | 'EDT'
-   | 'CST'
-   | 'CDT'
-   | 'MST'
-   | 'MDT'
-   | 'PST'
-   | 'PDT'
-   | ALPHA
-   | (('+' | '-') four_digit)
-   ;
+    : 'UT'
+    | 'GMT'
+    | 'EST'
+    | 'EDT'
+    | 'CST'
+    | 'CDT'
+    | 'MST'
+    | 'MDT'
+    | 'PST'
+    | 'PDT'
+    | ALPHA
+    | (('+' | '-') four_digit)
+    ;
 
 two_digit
-   : alphanumeric alphanumeric
-   ;
+    : alphanumeric alphanumeric
+    ;
 
 four_digit
-   : alphanumeric alphanumeric alphanumeric alphanumeric
-   ;
+    : alphanumeric alphanumeric alphanumeric alphanumeric
+    ;
 
 alphanumeric
-   : ALPHA
-   | DIGIT
-   ;
-
+    : ALPHA
+    | DIGIT
+    ;
 
 fragment CHAR
-   : [\u0000-\u007F]
-   ;
-
+    : [\u0000-\u007F]
+    ;
 
 ALPHA
-   : [a-zA-Z]
-   ;
-
+    : [a-zA-Z]
+    ;
 
 DIGIT
-   : [0-9]
-   ;
-
+    : [0-9]
+    ;
 
 fragment NOTALPHANUMERIC
-   : ~ [a-zA-Z0-9]
-   ;
-
+    : ~ [a-zA-Z0-9]
+    ;
 
 WS
-   : [ \r\n\t] -> skip
-   ;
+    : [ \r\n\t] -> skip
+    ;

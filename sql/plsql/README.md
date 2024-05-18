@@ -1,9 +1,21 @@
-An ANTLR4 grammar for PL/SQL
+# PL/SQL grammar
 
-## Usage, important note
+This grammar is for recognizing the latest version of PL/SQL.
 
-As SQL grammar are normally not case sensitive but this grammar implementation is, you must use a custom [character stream](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/CharStream.java) that converts all characters to uppercase before sending them to the lexer.
+## Authors
 
-You could find more information [here](https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md#custom-character-streams-approach) with implementations for various target languages.
+Various
 
-https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Introduction-to-Oracle-SQL.html
+## Links
+
+Oracle® Database; Database PL/SQL Language Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/23/lnpls/index.html) [pdf](https://docs.oracle.com/en/database/oracle/oracle-database/23/lnpls/database-pl-sql-language-reference.pdf)
+
+SQL Language Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/index.html) [pdf](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/sql-language-reference.pdf)
+
+Oracle's SQL*Plus®
+User's Guide and Reference [html](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqpug/index.html#SQL*Plus%C2%AE)
+
+[wikipedia](https://en.wikipedia.org/wiki/PL/SQL)
+
+[pldb](https://pldb.pub/concepts/pl-sql.html)
+

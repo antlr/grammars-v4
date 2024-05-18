@@ -1,0 +1,72 @@
+maintenance:
+title: Fractional excretion of sodium;;
+mlmname: fractional_na;;
+arden: Version 3;;
+version: 1.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.
+(hripcsak@cucis.cis.columbia.edu);;
+specialist: ;;
+date: 1991-03-13;;
+validation: testing;;
+library:
+purpose:
+Calculate the fractional excretion of sodium whenever urine
+electrolytes are stored. (This MLM demonstrates data
+interpretation across independent laboratory results.);;
+explanation:
+The fractional excretion of sodium is calculated from the urine
+sodium and creatinine and the most recent serum sodium and
+creatinine (where they occurred within the past 24 hours). A
+value less than 1.0 % is considered low.;;
+keywords: fractional excretion; serum sodium; azotemia;;                  
+citations:
+1. refute "Steiner RW. Interpreting the fractional excretion of sodium.
+Am J Med 1984;77:699-702.";;
+knowledge:
+type: data-driven;;
+data: let (urine_na, urine_creat) be read last
+({urine electrolytes where evoking}
+where they occurred within the past 24 hours);
+let (serum_na, serum_creat) be read last
+({serum electrolytes where they are not null}
+where they occurred within the past 24 hours);
+let urine_electrolyte_storage be event
+{storage of urine electrolytes};
+;;
+evoke: urine_electrolyte_storage;;
+logic: /* calculate fractional excretion of sodium */
+let fractional_na be 100 * (urine_na / urine_creat) /
+(serum_na / serum_creat);
+/* if the frational Na is invalid (e.g., if the */
+/* urine or serum sample is QNS) then stop here */
+if fractional_na is null then
+conclude false;
+endif;
+/* check whether the fractional Na is low */
+let low_fractional_na be fractional_na < 1.0;
+/* send the message */
+conclude true;
+;;
+action: if low_fractional_na then
+write "The calculated fractional excretion of sodium is low ("
+|| fractional_na || "). If the patient is azotemic, " ||
+"this number may indicate: volume depletion, " ||
+"hepatic failure, congestive heart failure, acute " ||
+"glomerulonephritis, oliguric myoglobinuric or " ||
+"hemoglobinuric renal failure, oliguric contrast " ||
+"nephrotoxicity, polyuric renal failure with severe " ||
+"burns, renal transplant rejection, 10 % of cases " ||
+"with non-oliguric acute tubular necrosis, and " ||
+"several other forms of renal injury.";
+else
+write "The calculated fractional excretion of sodium is " ||
+"not low (" || fractional_na || "). If the patient " ||
+"is azotemic, this may indicate: acute renal " ||
+"parenchymal injury, volume depletion coexisting " ||
+"with diurectic use or pre-existing chronic renal " ||
+"disease, and up to 10 % of cases of uncomplicated " ||
+"volume depletion.";
+endif;
+;;
+end:

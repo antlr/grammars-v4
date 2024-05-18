@@ -34,14 +34,16 @@ options {
     tokenVocab = SQLiteLexer;
 }
 
-parse: (sql_stmt_list)* EOF
+parse
+    : (sql_stmt_list)* EOF
 ;
 
-sql_stmt_list:
-    SCOL* sql_stmt (SCOL+ sql_stmt)* SCOL*
+sql_stmt_list
+    : SCOL* sql_stmt (SCOL+ sql_stmt)* SCOL*
 ;
 
-sql_stmt: (EXPLAIN_ (QUERY_ PLAN_)?)? (
+sql_stmt
+    : (EXPLAIN_ (QUERY_ PLAN_)?)? (
         alter_table_stmt
         | analyze_stmt
         | attach_stmt
@@ -69,8 +71,8 @@ sql_stmt: (EXPLAIN_ (QUERY_ PLAN_)?)? (
     )
 ;
 
-alter_table_stmt:
-    ALTER_ TABLE_ (schema_name DOT)? table_name (
+alter_table_stmt
+    : ALTER_ TABLE_ (schema_name DOT)? table_name (
         RENAME_ (
             TO_ new_table_name = table_name
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
@@ -80,47 +82,46 @@ alter_table_stmt:
     )
 ;
 
-analyze_stmt:
-    ANALYZE_ (schema_name | (schema_name DOT)? table_or_index_name)?
+analyze_stmt
+    : ANALYZE_ (schema_name | (schema_name DOT)? table_or_index_name)?
 ;
 
-attach_stmt:
-    ATTACH_ DATABASE_? expr AS_ schema_name
+attach_stmt
+    : ATTACH_ DATABASE_? expr AS_ schema_name
 ;
 
-begin_stmt:
-    BEGIN_ (DEFERRED_ | IMMEDIATE_ | EXCLUSIVE_)? (
-        TRANSACTION_ transaction_name?
-    )?
+begin_stmt
+    : BEGIN_ (DEFERRED_ | IMMEDIATE_ | EXCLUSIVE_)? (TRANSACTION_ transaction_name?)?
 ;
 
-commit_stmt: (COMMIT_ | END_) TRANSACTION_?
+commit_stmt
+    : (COMMIT_ | END_) TRANSACTION_?
 ;
 
-rollback_stmt:
-    ROLLBACK_ TRANSACTION_? (TO_ SAVEPOINT_? savepoint_name)?
+rollback_stmt
+    : ROLLBACK_ TRANSACTION_? (TO_ SAVEPOINT_? savepoint_name)?
 ;
 
-savepoint_stmt:
-    SAVEPOINT_ savepoint_name
+savepoint_stmt
+    : SAVEPOINT_ savepoint_name
 ;
 
-release_stmt:
-    RELEASE_ SAVEPOINT_? savepoint_name
+release_stmt
+    : RELEASE_ SAVEPOINT_? savepoint_name
 ;
 
-create_index_stmt:
-    CREATE_ UNIQUE_? INDEX_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? index_name ON_ table_name OPEN_PAR
-        indexed_column (COMMA indexed_column)* CLOSE_PAR (WHERE_ expr)?
+create_index_stmt
+    : CREATE_ UNIQUE_? INDEX_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? index_name ON_ table_name OPEN_PAR indexed_column (
+        COMMA indexed_column
+    )* CLOSE_PAR (WHERE_ expr)?
 ;
 
-indexed_column: (column_name | expr) (COLLATE_ collation_name)? asc_desc?
+indexed_column
+    : (column_name | expr) (COLLATE_ collation_name)? asc_desc?
 ;
 
-create_table_stmt:
-    CREATE_ (TEMP_ | TEMPORARY_)? TABLE_ (IF_ NOT_ EXISTS_)? (
-        schema_name DOT
-    )? table_name (
+create_table_stmt
+    : CREATE_ (TEMP_ | TEMPORARY_)? TABLE_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? table_name (
         OPEN_PAR column_def (COMMA column_def)*? (COMMA table_constraint)* CLOSE_PAR (
             WITHOUT_ row_ROW_ID = IDENTIFIER
         )?
@@ -128,47 +129,43 @@ create_table_stmt:
     )
 ;
 
-column_def:
-    column_name type_name? column_constraint*
+column_def
+    : column_name type_name? column_constraint*
 ;
 
-type_name:
-    name+? (
+type_name
+    : name+? (
         OPEN_PAR signed_number CLOSE_PAR
         | OPEN_PAR signed_number COMMA signed_number CLOSE_PAR
     )?
 ;
 
-column_constraint: (CONSTRAINT_ name)? (
+column_constraint
+    : (CONSTRAINT_ name)? (
         (PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?)
         | (NOT_? NULL_ | UNIQUE_) conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | DEFAULT_ (signed_number | literal_value | OPEN_PAR expr CLOSE_PAR)
         | COLLATE_ collation_name
         | foreign_key_clause
-        | (GENERATED_ ALWAYS_)? AS_ OPEN_PAR expr CLOSE_PAR (
-            STORED_
-            | VIRTUAL_
-        )?
+        | (GENERATED_ ALWAYS_)? AS_ OPEN_PAR expr CLOSE_PAR (STORED_ | VIRTUAL_)?
     )
 ;
 
-signed_number: (PLUS | MINUS)? NUMERIC_LITERAL
+signed_number
+    : (PLUS | MINUS)? NUMERIC_LITERAL
 ;
 
-table_constraint: (CONSTRAINT_ name)? (
-        (PRIMARY_ KEY_ | UNIQUE_) OPEN_PAR indexed_column (
-            COMMA indexed_column
-        )* CLOSE_PAR conflict_clause?
+table_constraint
+    : (CONSTRAINT_ name)? (
+        (PRIMARY_ KEY_ | UNIQUE_) OPEN_PAR indexed_column (COMMA indexed_column)* CLOSE_PAR conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | FOREIGN_ KEY_ OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR foreign_key_clause
     )
 ;
 
-foreign_key_clause:
-    REFERENCES_ foreign_table (
-        OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
-    )? (
+foreign_key_clause
+    : REFERENCES_ foreign_table (OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR)? (
         ON_ (DELETE_ | UPDATE_) (
             SET_ (NULL_ | DEFAULT_)
             | CASCADE_
@@ -179,76 +176,70 @@ foreign_key_clause:
     )* (NOT_? DEFERRABLE_ (INITIALLY_ (DEFERRED_ | IMMEDIATE_))?)?
 ;
 
-conflict_clause:
-    ON_ CONFLICT_ (
-        ROLLBACK_
-        | ABORT_
-        | FAIL_
-        | IGNORE_
-        | REPLACE_
-    )
+conflict_clause
+    : ON_ CONFLICT_ (ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_ | REPLACE_)
 ;
 
-create_trigger_stmt:
-    CREATE_ (TEMP_ | TEMPORARY_)? TRIGGER_ (IF_ NOT_ EXISTS_)? (
-        schema_name DOT
-    )? trigger_name (BEFORE_ | AFTER_ | INSTEAD_ OF_)? (
-        DELETE_
-        | INSERT_
-        | UPDATE_ (OF_ column_name ( COMMA column_name)*)?
-    ) ON_ table_name (FOR_ EACH_ ROW_)? (WHEN_ expr)? BEGIN_ (
+create_trigger_stmt
+    : CREATE_ (TEMP_ | TEMPORARY_)? TRIGGER_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? trigger_name (
+        BEFORE_
+        | AFTER_
+        | INSTEAD_ OF_
+    )? (DELETE_ | INSERT_ | UPDATE_ (OF_ column_name ( COMMA column_name)*)?) ON_ table_name (
+        FOR_ EACH_ ROW_
+    )? (WHEN_ expr)? BEGIN_ (
         (update_stmt | insert_stmt | delete_stmt | select_stmt) SCOL
     )+ END_
 ;
 
-create_view_stmt:
-    CREATE_ (TEMP_ | TEMPORARY_)? VIEW_ (IF_ NOT_ EXISTS_)? (
-        schema_name DOT
-    )? view_name (OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR)? AS_ select_stmt
+create_view_stmt
+    : CREATE_ (TEMP_ | TEMPORARY_)? VIEW_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? view_name (
+        OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
+    )? AS_ select_stmt
 ;
 
-create_virtual_table_stmt:
-    CREATE_ VIRTUAL_ TABLE_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? table_name USING_ module_name (
+create_virtual_table_stmt
+    : CREATE_ VIRTUAL_ TABLE_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? table_name USING_ module_name (
         OPEN_PAR module_argument (COMMA module_argument)* CLOSE_PAR
     )?
 ;
 
-with_clause:
-    WITH_ RECURSIVE_? cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR (
+with_clause
+    : WITH_ RECURSIVE_? cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR (
         COMMA cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR
     )*
 ;
 
-cte_table_name:
-    table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)?
+cte_table_name
+    : table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)?
 ;
 
-recursive_cte:
-    cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
+recursive_cte
+    : cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
 ;
 
-common_table_expression:
-    table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)? AS_ OPEN_PAR select_stmt CLOSE_PAR
+common_table_expression
+    : table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)? AS_ OPEN_PAR select_stmt CLOSE_PAR
 ;
 
-delete_stmt:
-    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause?
+delete_stmt
+    : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause?
 ;
 
-delete_stmt_limited:
-    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? (
+delete_stmt_limited
+    : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? (
         order_by_stmt? limit_stmt
     )?
 ;
 
-detach_stmt:
-    DETACH_ DATABASE_? schema_name
+detach_stmt
+    : DETACH_ DATABASE_? schema_name
 ;
 
-drop_stmt:
-    DROP_ object = (INDEX_ | TABLE_ | TRIGGER_ | VIEW_) (
-        IF_ EXISTS_
-    )? (schema_name DOT)? any_name
+drop_stmt
+    : DROP_ object = (INDEX_ | TABLE_ | TRIGGER_ | VIEW_) (IF_ EXISTS_)? (
+        schema_name DOT
+    )? any_name
 ;
 
 /*
@@ -258,12 +249,12 @@ drop_stmt:
     + -
     << >> & |
     < <= > >=
-    = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP
+    = == != <> IS IS NOT IS DISTINCT FROM IS NOT DISTINCT FROM IN LIKE GLOB MATCH REGEXP
     AND
     OR
  */
-expr:
-    literal_value
+expr
+    : literal_value
     | BIND_PARAMETER
     | ((schema_name DOT)? table_name DOT)? column_name
     | unary_operator expr
@@ -279,6 +270,7 @@ expr:
         | NOT_EQ2
         | IS_
         | IS_ NOT_
+        | IS_ NOT_? DISTINCT_ FROM_
         | IN_
         | LIKE_
         | GLOB_
@@ -291,9 +283,7 @@ expr:
     | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
     | expr COLLATE_ collation_name
-    | expr NOT_? (LIKE_ | GLOB_ | REGEXP_ | MATCH_) expr (
-        ESCAPE_ expr
-    )?
+    | expr NOT_? (LIKE_ | GLOB_ | REGEXP_ | MATCH_) expr (ESCAPE_ expr)?
     | expr ( ISNULL_ | NOTNULL_ | NOT_ NULL_)
     | expr IS_ NOT_? expr
     | expr NOT_? BETWEEN_ expr AND_ expr
@@ -307,15 +297,12 @@ expr:
     | raise_function
 ;
 
-raise_function:
-    RAISE_ OPEN_PAR (
-        IGNORE_
-        | (ROLLBACK_ | ABORT_ | FAIL_) COMMA error_message
-    ) CLOSE_PAR
+raise_function
+    : RAISE_ OPEN_PAR (IGNORE_ | (ROLLBACK_ | ABORT_ | FAIL_) COMMA error_message) CLOSE_PAR
 ;
 
-literal_value:
-    NUMERIC_LITERAL
+literal_value
+    : NUMERIC_LITERAL
     | STRING_LITERAL
     | BLOB_LITERAL
     | NULL_
@@ -326,41 +313,30 @@ literal_value:
     | CURRENT_TIMESTAMP_
 ;
 
-value_row:
-    OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+value_row
+    : OPEN_PAR expr (COMMA expr)* CLOSE_PAR
 ;
 
-values_clause:
-    VALUES_ value_row (COMMA value_row)*
+values_clause
+    : VALUES_ value_row (COMMA value_row)*
 ;
 
-insert_stmt:
-    with_clause? (
+insert_stmt
+    : with_clause? (
         INSERT_
         | REPLACE_
-        | INSERT_ OR_ (
-            REPLACE_
-            | ROLLBACK_
-            | ABORT_
-            | FAIL_
-            | IGNORE_
-        )
+        | INSERT_ OR_ ( REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
     ) INTO_ (schema_name DOT)? table_name (AS_ table_alias)? (
         OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
-    )? (
-        (
-            ( values_clause | select_stmt ) upsert_clause?
-        )
-        | DEFAULT_ VALUES_
-    ) returning_clause?
+    )? (( ( values_clause | select_stmt) upsert_clause?) | DEFAULT_ VALUES_) returning_clause?
 ;
 
-returning_clause:
-    RETURNING_ result_column (COMMA result_column)*
+returning_clause
+    : RETURNING_ result_column (COMMA result_column)*
 ;
 
-upsert_clause:
-    ON_ CONFLICT_ (
+upsert_clause
+    : ON_ CONFLICT_ (
         OPEN_PAR indexed_column (COMMA indexed_column)* CLOSE_PAR (WHERE_ expr)?
     )? DO_ (
         NOTHING_
@@ -372,62 +348,60 @@ upsert_clause:
     )
 ;
 
-pragma_stmt:
-    PRAGMA_ (schema_name DOT)? pragma_name (
+pragma_stmt
+    : PRAGMA_ (schema_name DOT)? pragma_name (
         ASSIGN pragma_value
         | OPEN_PAR pragma_value CLOSE_PAR
     )?
 ;
 
-pragma_value:
-    signed_number
+pragma_value
+    : signed_number
     | name
     | STRING_LITERAL
 ;
 
-reindex_stmt:
-    REINDEX_ (collation_name | (schema_name DOT)? (table_name | index_name))?
+reindex_stmt
+    : REINDEX_ (collation_name | (schema_name DOT)? (table_name | index_name))?
 ;
 
-select_stmt:
-    common_table_stmt? select_core (compound_operator select_core)* order_by_stmt? limit_stmt?
+select_stmt
+    : common_table_stmt? select_core (compound_operator select_core)* order_by_stmt? limit_stmt?
 ;
 
-join_clause:
-    table_or_subquery (join_operator table_or_subquery join_constraint?)*
+join_clause
+    : table_or_subquery (join_operator table_or_subquery join_constraint?)*
 ;
 
-select_core:
-    (
+select_core
+    : (
         SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
             FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-        )? (WHERE_ whereExpr=expr)? (
-          GROUP_ BY_ groupByExpr+=expr (COMMA groupByExpr+=expr)* (
-              HAVING_ havingExpr=expr
-          )?)? (
-            WINDOW_ window_name AS_ window_defn (
-                COMMA window_name AS_ window_defn
-            )*
-        )?
+        )? (WHERE_ whereExpr = expr)? (
+            GROUP_ BY_ groupByExpr += expr (COMMA groupByExpr += expr)* (
+                HAVING_ havingExpr = expr
+            )?
+        )? (WINDOW_ window_name AS_ window_defn ( COMMA window_name AS_ window_defn)*)?
     )
     | values_clause
 ;
 
-factored_select_stmt:
-    select_stmt
+factored_select_stmt
+    : select_stmt
 ;
 
-simple_select_stmt:
-    common_table_stmt? select_core order_by_stmt? limit_stmt?
+simple_select_stmt
+    : common_table_stmt? select_core order_by_stmt? limit_stmt?
 ;
 
-compound_select_stmt:
-    common_table_stmt? select_core (
+compound_select_stmt
+    : common_table_stmt? select_core (
         (UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core
     )+ order_by_stmt? limit_stmt?
 ;
 
-table_or_subquery: (
+table_or_subquery
+    : (
         (schema_name DOT)? table_name (AS_? table_alias)? (
             INDEXED_ BY_ index_name
             | NOT_ INDEXED_
@@ -440,72 +414,73 @@ table_or_subquery: (
     | OPEN_PAR select_stmt CLOSE_PAR (AS_? table_alias)?
 ;
 
-result_column:
-    STAR
+result_column
+    : STAR
     | table_name DOT STAR
     | expr ( AS_? column_alias)?
 ;
 
-join_operator:
-    COMMA
-    | NATURAL_? (LEFT_ OUTER_? | INNER_ | CROSS_)? JOIN_
+join_operator
+    : COMMA
+    | NATURAL_? ((LEFT_ | RIGHT_ | FULL_) OUTER_? | INNER_ | CROSS_)? JOIN_
 ;
 
-join_constraint:
-    ON_ expr
+join_constraint
+    : ON_ expr
     | USING_ OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
 ;
 
-compound_operator:
-    UNION_ ALL_?
+compound_operator
+    : UNION_ ALL_?
     | INTERSECT_
     | EXCEPT_
 ;
 
-update_stmt:
-    with_clause? UPDATE_ (
-        OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_)
-    )? qualified_table_name SET_ (column_name | column_name_list) ASSIGN expr (
-        COMMA (column_name | column_name_list) ASSIGN expr
-    )* (
+update_stmt
+    : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
+        column_name
+        | column_name_list
+    ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
         FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
     )? (WHERE_ expr)? returning_clause?
 ;
 
-column_name_list:
-    OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
+column_name_list
+    : OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
 ;
 
-update_stmt_limited:
-    with_clause? UPDATE_ (
-        OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_)
-    )? qualified_table_name SET_ (column_name | column_name_list) ASSIGN expr (
-        COMMA (column_name | column_name_list) ASSIGN expr
-    )* (WHERE_ expr)? returning_clause? (order_by_stmt? limit_stmt)?
+update_stmt_limited
+    : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
+        column_name
+        | column_name_list
+    ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (WHERE_ expr)? returning_clause? (
+        order_by_stmt? limit_stmt
+    )?
 ;
 
-qualified_table_name: (schema_name DOT)? table_name (AS_ alias)? (
+qualified_table_name
+    : (schema_name DOT)? table_name (AS_ alias)? (
         INDEXED_ BY_ index_name
         | NOT_ INDEXED_
     )?
 ;
 
-vacuum_stmt:
-    VACUUM_ schema_name? (INTO_ filename)?
+vacuum_stmt
+    : VACUUM_ schema_name? (INTO_ filename)?
 ;
 
-filter_clause:
-    FILTER_ OPEN_PAR WHERE_ expr CLOSE_PAR
+filter_clause
+    : FILTER_ OPEN_PAR WHERE_ expr CLOSE_PAR
 ;
 
-window_defn:
-    OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? (
+window_defn
+    : OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? (
         ORDER_ BY_ ordering_term (COMMA ordering_term)*
     ) frame_spec? CLOSE_PAR
 ;
 
-over_clause:
-    OVER_ (
+over_clause
+    : OVER_ (
         window_name
         | OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? (
             ORDER_ BY_ ordering_term (COMMA ordering_term)*
@@ -513,150 +488,144 @@ over_clause:
     )
 ;
 
-frame_spec:
-    frame_clause (
-        EXCLUDE_ (
-            NO_ OTHERS_
-            | CURRENT_ ROW_
-            | GROUP_
-            | TIES_
-        )
-    )?
+frame_spec
+    : frame_clause (EXCLUDE_ ( NO_ OTHERS_ | CURRENT_ ROW_ | GROUP_ | TIES_))?
 ;
 
-frame_clause: (RANGE_ | ROWS_ | GROUPS_) (
+frame_clause
+    : (RANGE_ | ROWS_ | GROUPS_) (
         frame_single
         | BETWEEN_ frame_left AND_ frame_right
     )
 ;
 
-simple_function_invocation:
-    simple_func OPEN_PAR (expr (COMMA expr)* | STAR) CLOSE_PAR
+simple_function_invocation
+    : simple_func OPEN_PAR (expr (COMMA expr)* | STAR) CLOSE_PAR
 ;
 
-aggregate_function_invocation:
-    aggregate_func OPEN_PAR (DISTINCT_? expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause?
+aggregate_function_invocation
+    : aggregate_func OPEN_PAR (DISTINCT_? expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause?
 ;
 
-window_function_invocation:
-    window_function OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
+window_function_invocation
+    : window_function OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
         window_defn
         | window_name
     )
 ;
 
-common_table_stmt: //additional structures
+common_table_stmt
+    : //additional structures
     WITH_ RECURSIVE_? common_table_expression (COMMA common_table_expression)*
 ;
 
-order_by_stmt:
-    ORDER_ BY_ ordering_term (COMMA ordering_term)*
+order_by_stmt
+    : ORDER_ BY_ ordering_term (COMMA ordering_term)*
 ;
 
-limit_stmt:
-    LIMIT_ expr ((OFFSET_ | COMMA) expr)?
+limit_stmt
+    : LIMIT_ expr ((OFFSET_ | COMMA) expr)?
 ;
 
-ordering_term:
-    expr (COLLATE_ collation_name)? asc_desc? (NULLS_ (FIRST_ | LAST_))?
+ordering_term
+    : expr (COLLATE_ collation_name)? asc_desc? (NULLS_ (FIRST_ | LAST_))?
 ;
 
-asc_desc:
-    ASC_
+asc_desc
+    : ASC_
     | DESC_
 ;
 
-frame_left:
-    expr PRECEDING_
+frame_left
+    : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
     | UNBOUNDED_ PRECEDING_
 ;
 
-frame_right:
-    expr PRECEDING_
+frame_right
+    : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
     | UNBOUNDED_ FOLLOWING_
 ;
 
-frame_single:
-    expr PRECEDING_
+frame_single
+    : expr PRECEDING_
     | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
 ;
 
 // unknown
 
-window_function:
-    (FIRST_VALUE_ | LAST_VALUE_) OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc frame_clause
-        ? CLOSE_PAR
-    | (CUME_DIST_ | PERCENT_RANK_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr? CLOSE_PAR
-    | (DENSE_RANK_ | RANK_ | ROW_NUMBER_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
+window_function
+    : (FIRST_VALUE_ | LAST_VALUE_) OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc frame_clause?
         CLOSE_PAR
-    | (LAG_ | LEAD_) OPEN_PAR expr offset? default_value? CLOSE_PAR OVER_ OPEN_PAR partition_by?
-        order_by_expr_asc_desc CLOSE_PAR
-    | NTH_VALUE_ OPEN_PAR expr COMMA signed_number CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
-        frame_clause? CLOSE_PAR
+    | (CUME_DIST_ | PERCENT_RANK_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr? CLOSE_PAR
+    | (DENSE_RANK_ | RANK_ | ROW_NUMBER_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
+    | (LAG_ | LEAD_) OPEN_PAR expr offset? default_value? CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
+    | NTH_VALUE_ OPEN_PAR expr COMMA signed_number CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc frame_clause?
+        CLOSE_PAR
     | NTILE_ OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
 ;
 
-offset:
-    COMMA signed_number
+offset
+    : COMMA signed_number
 ;
 
-default_value:
-    COMMA signed_number
+default_value
+    : COMMA signed_number
 ;
 
-partition_by:
-    PARTITION_ BY_ expr+
+partition_by
+    : PARTITION_ BY_ expr+
 ;
 
-order_by_expr:
-    ORDER_ BY_ expr+
+order_by_expr
+    : ORDER_ BY_ expr+
 ;
 
-order_by_expr_asc_desc:
-    ORDER_ BY_ expr_asc_desc
+order_by_expr_asc_desc
+    : ORDER_ BY_ expr_asc_desc
 ;
 
-expr_asc_desc:
-    expr asc_desc? (COMMA expr asc_desc?)*
+expr_asc_desc
+    : expr asc_desc? (COMMA expr asc_desc?)*
 ;
 
 //TODO BOTH OF THESE HAVE TO BE REWORKED TO FOLLOW THE SPEC
-initial_select:
-    select_stmt
+initial_select
+    : select_stmt
 ;
 
-recursive_select:
-    select_stmt
+recursive_select
+    : select_stmt
 ;
 
-unary_operator:
-    MINUS
+unary_operator
+    : MINUS
     | PLUS
     | TILDE
     | NOT_
 ;
 
-error_message:
-    STRING_LITERAL
+error_message
+    : STRING_LITERAL
 ;
 
-module_argument: // TODO check what exactly is permitted here
+module_argument
+    : // TODO check what exactly is permitted here
     expr
     | column_def
 ;
 
-column_alias:
-    IDENTIFIER
+column_alias
+    : IDENTIFIER
     | STRING_LITERAL
 ;
 
-keyword:
-    ABORT_
+keyword
+    : ABORT_
     | ACTION_
     | ADD_
     | AFTER_
@@ -815,100 +784,100 @@ keyword:
 
 // TODO: check all names below
 
-name:
-    any_name
+name
+    : any_name
 ;
 
-function_name:
-    any_name
+function_name
+    : any_name
 ;
 
-schema_name:
-    any_name
+schema_name
+    : any_name
 ;
 
-table_name:
-    any_name
+table_name
+    : any_name
 ;
 
-table_or_index_name:
-    any_name
+table_or_index_name
+    : any_name
 ;
 
-column_name:
-    any_name
+column_name
+    : any_name
 ;
 
-collation_name:
-    any_name
+collation_name
+    : any_name
 ;
 
-foreign_table:
-    any_name
+foreign_table
+    : any_name
 ;
 
-index_name:
-    any_name
+index_name
+    : any_name
 ;
 
-trigger_name:
-    any_name
+trigger_name
+    : any_name
 ;
 
-view_name:
-    any_name
+view_name
+    : any_name
 ;
 
-module_name:
-    any_name
+module_name
+    : any_name
 ;
 
-pragma_name:
-    any_name
+pragma_name
+    : any_name
 ;
 
-savepoint_name:
-    any_name
+savepoint_name
+    : any_name
 ;
 
-table_alias:
-    any_name
+table_alias
+    : any_name
 ;
 
-transaction_name:
-    any_name
+transaction_name
+    : any_name
 ;
 
-window_name:
-    any_name
+window_name
+    : any_name
 ;
 
-alias:
-    any_name
+alias
+    : any_name
 ;
 
-filename:
-    any_name
+filename
+    : any_name
 ;
 
-base_window_name:
-    any_name
+base_window_name
+    : any_name
 ;
 
-simple_func:
-    any_name
+simple_func
+    : any_name
 ;
 
-aggregate_func:
-    any_name
+aggregate_func
+    : any_name
 ;
 
-table_function_name:
-    any_name
+table_function_name
+    : any_name
 ;
 
-any_name:
-    IDENTIFIER
+any_name
+    : IDENTIFIER
     | keyword
     | STRING_LITERAL
     | OPEN_PAR any_name CLOSE_PAR

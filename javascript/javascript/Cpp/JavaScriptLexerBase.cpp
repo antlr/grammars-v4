@@ -110,3 +110,14 @@ bool JavaScriptLexerBase::IsRegexPossible()
             return true;
     }
 }
+
+void JavaScriptLexerBase::reset()
+{
+    while(!scopeStrictModes.empty()) scopeStrictModes.pop();
+    lastToken = false;
+    lastTokenType = 0;
+    useStrictDefault = false;
+    useStrictCurrent = false;
+    _templateDepth = 0;
+    Lexer::reset();
+}

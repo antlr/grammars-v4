@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
-   <targets>CSharp;Dart;Go</targets>
+    <targets>CSharp;Dart;Go;Java</targets>
+    <test>
+        <targets>CSharp;Dart;Java</targets>
+        <inputs>examples/slow</inputs>
+    </test>
+    <test>
+        <targets>CSharp;Dart;Go;Java</targets>
+        <inputs>examples/fast</inputs>
+    </test>
 </desc>

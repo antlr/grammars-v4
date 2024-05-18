@@ -54,3 +54,8 @@ const codesByType = Joi.object()
     skip: Joi.number().optional(),
   })
   .required();
+
+const post = (...args: any[]) => {
+};
+
+const function = ([x]: any) => x;

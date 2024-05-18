@@ -1,0 +1,1 @@
+(program (sourceElements (sourceElement (statement (expressionStatement (expressionSequence (singleExpression (singleExpression (singleExpression new (identifier Date) (arguments ( ))) . (identifierName (identifier getTime))) (arguments ( )))) (eos <EOF>))))) <EOF>)

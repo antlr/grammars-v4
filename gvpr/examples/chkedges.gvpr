@@ -1,0 +1,40 @@
+/* Looks for multiedges and loops, and output
+ * those found along with counts. If the -d flag
+ * is given, edge direction is taken into account.
+ */
+BEGIN{
+  char* ename; 
+  char* n; 
+  int doDir, cnt[]; 
+  int loopcnt[];
+  int nloops, nmulti;
+  if ((ARGC > 0) && (ARGV[0] == "-d"))
+    doDir = 1;
+  else
+    doDir = 0;
+}
+BEG_G{unset(cnt); unset(loopcnt); nloops = nmulti = 0;}
+E{
+  if (doDir || (tail.name <= head.name)) ename=tail.name+"_"+head.name;
+  else ename = head.name+"_"+tail.name;
+  if (tail == head) {
+    loopcnt[ename] += 1;
+    if (loopcnt[ename] == 1) nloops += 1;
+  }
+  else {
+    cnt[ename] += 1;
+    if (cnt[ename] == 2) nmulti += 1;
+  }
+}
+END_G{
+  printf ("graph %s: %d loops %d multiedges\n", $.name, nloops, nmulti);
+  for (cnt[n]) {
+    if (cnt[n] > 1)
+      printf ("%s : %d\n", n, cnt[n]);
+  }
+  for (loopcnt[n]) {
+    if (loopcnt[n] > 0)
+      printf ("%s : %d\n", n, loopcnt[n]);
+  }
+}
+

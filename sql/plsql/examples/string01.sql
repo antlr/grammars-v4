@@ -12,6 +12,9 @@ select
 , q'#name like #smth #'
 , q''name like 'smth ''
 , q'(name like )) )'
+, q'~name like ~~~ ~'
+, q'/name like // /'
+, q'\name like \\ \'
 , n'nchar literal'
 from dual
 

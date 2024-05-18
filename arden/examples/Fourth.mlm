@@ -1,0 +1,237 @@
+maintenance:
+title: Cardiology MLM from CARE, p. 85;;
+mlmname: care_cardiology_mlm;;
+arden: Version 3;;
+version: 1.00;;
+institution: Regenstrief Institute;;
+author: Clement J. McDonald, M.D.; George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-05-28;;
+validation: testing;;
+library:
+purpose:
+Recommend higher beta-blocker dosage if it is currently low and the
+patient is having excessive angina or premature ventricular
+beats.;;
+explanation:
+If the patient is not bradycardic and is taking less than 360 mg of
+propanolol or less than 200 mg of metoprolol, then if the patient
+is having more than 4 episodes of angina per month or more than 5
+premature ventricular beats per minute, recommend a higher dose.;;
+keywords:
+beta-blocker, angina; premature ventricular beats; bradycardia;;
+citations:
+1. support "McDonald CJ. Action-oriented decisions in ambulatory medicine.
+Chicago: Year Book Medical Publishers, 1981, p. 85.";
+2. refute "Prichard NC, Gillam PM. Assessment of propranolol in angina
+pectoris: clinical dose response curve and effect on
+electrocardiogram at rest and on exercise. Br Heart J,
+33:473-480 (1971)." ;
+3. support "Jackson G, Atkinson L, Oram S. Reassessment of failed beta-
+blocker treatment in angina pectoris by peak exercise heart rate
+measurements. Br Med J, 3:616-619 (1975)."
+;;
+knowledge:
+type: data-driven;;
+data: let last_clinic_visit be read last {CLINIC_VISIT};
+let (beta_meds, beta_doses, beta_statuses) be read
+{MEDICATION, DOSE, STATUS
+where the beta_statuses are ‘current’
+and beta_meds are a kind of ‘beta_blocker’};
+let low_dose_beta_use be false;
+/* if patient is on one beta blocker, check if it is low dose */
+if the count ofbeta_meds = 1 then
+if (last beta_meds = "propanolol"
+and
+last beta_doses < 360)
+or (the last beta_meds = "metoprolol"
+and
+the last beta_doses <= 200) then
+let low_dose_beta_use be true;
+endif;
+endif;
+let cutoff_time be the maximum of
+((1 month ago),(time of last_clinic_visit),
+(time of last beta_meds));
+/* a system-specific query to angina frequency, PVC frequency, */
+/* and pulse rate would replace capitalized terms */
+let angina_frequency be read last ({ANGINA_FREQUENCY}
+where it occurred after cutoff_time);
+let premature_beat_frequency be read last
+({PREMATURE_BEAT_FREQUENCY}
+where it occurred after cutoff_time);
+let last_pulse_rate be read last {PULSE_RATE};
+;;
+evoke: /* this MLM is called directly */;;
+logic: if last_pulse_rate is greater than 60 and
+low_dose_beta_use then
+if angina_frequency is greater than 4 then
+let msg be
+"Increased dose of beta blockers may be " ||
+"needed to control angina.";
+conclude true;
+elseif premature_beat_frequency is greater than 5 then
+let msg be
+"Increased dose of beta blockers may " ||
+"be needed to control PVC's.";
+conclude true;
+endif;
+endif;
+conclude false;
+;;
+action: write msg;;
+end:
+
+maintenance:
+title: Allergy_test_with_while_loop;;
+filename: test_for_allergies_while_loop;;
+version: 0.00;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 1997-11-06;;
+validation: testing;;
+library:
+purpose:
+Illustrates the use of a WHILE-LOOP that processes an entire list
+;;
+explanation:
+;;
+keywords:
+;;
+knowledge:
+type: data-driven;;
+data: /* Receives four arguments from the calling MLM: */
+(med_orders,
+med_allergens,
+patient_allergies,
+patient_reactions) := ARGUMENT;
+;;
+evoke: ;;
+logic: /* Initializes variables */
+a_list:= ();
+m_list:= ();
+r_list:= ();
+num:= 1;
+/* Checks each allergen in the medications to determine */
+/* if the patient is allergic to it */
+while num <= (count med_allergen) do
+allergen:= last(first num from med_allergens);
+allergy_found:= (patient_allergies = allergen);
+reaction:= patient_reactions where allergy_found;
+medication:= med_orders where (med_allergens = allergen);
+/* Adds the allergen, medication, and reaction to */
+/* variables that will be returned to the calling MLM */
+If any allergy_found then
+a_list:= a_list, allergen;
+m_list:= m_list, medication;
+r_list:= r_list, reaction;
+endif;
+/* Increments the counter that is used to stop the while-loop */
+num:= num + 1;
+enddo;
+/* Concludes true if the patient is allergic to one of */
+/* the medications */
+If exist m_list then
+conclude true;
+endif;
+;;
+action: /* Returns three lists to the calling MLM */
+return m_list, a_list, r_list;
+;;
+end:
+
+maintenance:
+title: Increased body temperature - crisp;;
+mlmname: increased_body_temperature_crisp;;
+arden: version 3;;
+version: ;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 2011-07-06;;
+validation: testing;;
+library:
+purpose: detects an increased body temperatur over a day - absolute criterion;;
+explanation: Check if maximum of body temperature is increased with
+crisp logic.
+reads parameter: "TempMax" (in degree Celsius).
+;;
+keywords: body temperature, temperature, data to symbol conversion;;
+citations: ;;
+knowledge:
+type: data_driven;;
+data: /////////////////////////////////////////
+readParam := interface {read param}; // read single parameter
+;;
+evoke: ;;
+logic: ///////////////////////////////////////
+// read precondition from host
+paramTempMax := call readParam with "TempMax";
+// calculation of result
+if paramTempMax is present then
+if paramTempMax >= 38 then
+tempratureIncreased := 1;
+time tempratureIncreased := time paramTempMax;
+else
+tempratureIncreased := 0;
+time tempratureIncreased := time paramTempMax;
+endif;
+endif;
+conclude true;
+;;
+action: ///////////////////////////////////////
+write tempratureIncreased;
+;;
+end:
+
+maintenance:
+title: Increased body temperature - fuzzy simulation;;
+mlmname: increased_body_temperature_fuzzy_simulation;;
+arden: version 3;;
+version: ;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 2011-07-06;;
+validation: testing;;
+library:
+purpose: detects an increased body temperatur over a day - absolute criterion;;
+explanation: Check if maximum of body temperature is increased with
+explicit coded fuzzy logic.
+reads parameter: "TempMax" (in degree Celsius).
+;;
+keywords: body temperature, temperature, data to symbol conversion;;
+citations: ;;
+knowledge:
+type: data_driven;;
+data: /////////////////////////////////////////
+// interface
+readParam := interface {read param}; // read single parameter
+;;
+evoke: ;;
+logic: ///////////////////////////////////////
+// read precondition from host
+paramTempMax := call readParam with "TempMax";
+// calculation of result
+if paramTempMax is present then
+if paramTempMax >= 38 then
+tempratureIncreased := 1;
+time tempratureIncreased := time paramTempMax;
+elseif paramTempMax > 37.5 then
+tempratureIncreased := (paramTempMax - 37.5) / 0.5;
+time tempratureIncreased := time paramTempMax;
+else
+tempratureIncreased := 0;
+time tempratureIncreased := time paramTempMax;
+endif;
+endif;
+conclude true;
+;;
+action: ///////////////////////////////////////
+write tempratureIncreased;
+;;
+resources:
+default: en;;
+language: en;;
+end:

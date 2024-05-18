@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>rulelist</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>bnf</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
