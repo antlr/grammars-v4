@@ -823,3 +823,8 @@ ORDER BY 1
 ;
 END
 #end
+#begin
+-- Create trigger 7
+-- delimiter //
+CREATE TRIGGER IF NOT EXISTS `my_trigger` BEFORE INSERT ON `my_table` FOR EACH ROW BEGIN SET NEW.my_col = CONCAT(NEW.mycol, NEW.id); END; -- //-- delimiter ;
+#end
