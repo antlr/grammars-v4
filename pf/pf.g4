@@ -44,11 +44,11 @@ var
    ;
 
 option
-   : 'set' (('timeout' (timeout | '{' timeout_list '}'))? | ('ruleset-optimization' ('none' | 'basic' | 'profile')?)? | ('optimization' ('default' | 'normal' | 'high-latency' | 'satellite' | 'aggressive' | 'conservative')?)? ('limit' (limit_item | '{' limit_list '}'))? | ('loginterface' (interface_name | 'none'))? | ('block-policy' ('drop' | 'return'))? | ('state-policy' ('if-bound' | 'floating'))? ('state-defaults' state_opts)? ('fingerprints' filename)? | ('skip on' ifspec)? | ('debug' ('emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug'))? | ('reassemble' ('yes' | 'no') ('no-df')?)?)
+   : 'set' (('timeout' (timeout | '{' timeout_list '}'))? | ('ruleset-optimization' ('none' | 'basic' | 'profile')?)? | ('optimization' ('default' | 'normal' | 'high-latency' | 'satellite' | 'aggressive' | 'conservative')?)? ('limit' (limit_item | '{' limit_list '}'))? | ('loginterface' (interface_name | 'none'))? | ('block-policy' ('drop' | 'return'))? | ('state-policy' ('if-bound' | 'floating'))? ('state-defaults' state_opts)? ('fingerprints' filename)? | ('skip on' ifspec)? | ('debug' ('emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug' | 'urgent'))? | ('reassemble' ('yes' | 'no') ('no-df')?)?)
    ;
 
 pf_rule
-   : action direction? logging? 'quick'? onspec? af? protospec? hosts filteropts?
+   : action direction? (logging | 'quick')* onspec? af? protospec? hosts filteropts?
    ;
 
 onspec
@@ -141,7 +141,7 @@ tableopt
    : 'persist'
    | 'const'
    | 'counters'
-   | 'file' STRING
+   | 'file' QUOTED_STRING
    | '{' (tableaddrs)? '}'
    ;
 
@@ -166,7 +166,7 @@ queue_rule
    ;
 
 anchor_rule
-   : 'anchor' STRING? (('in' | 'out'))? ('on' ifspec)? af? protospec? hosts filteropts? ('{')?
+   : 'anchor' (STRING | QUOTED_STRING)? (('in' | 'out'))? ('on' ifspec)? af? protospec? hosts filteropts? ('{')?
    ;
 
 anchor_close
@@ -269,7 +269,7 @@ address
    ;
 
 host_list
-   : '{' host (',' host)? '}'
+   : '{' host (','? host)? '}'
    ;
 
 redirhost_list
@@ -317,7 +317,7 @@ os_list
    ;
 
 flags
-   : 'flags' ((flag_set)? '/' flag_set | 'any')
+   : 'flags' flag_set ('/' flag_set)*
    ;
 
 flag_set
@@ -474,6 +474,10 @@ QUOTED_STRING
 
 CONTINUATION
    : '\\' -> skip
+   ;
+
+COMMENT
+   : '#' ~ ('\r' | '\n')* -> skip
    ;
 
 WS
