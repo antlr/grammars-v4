@@ -38,96 +38,96 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar whenever;
 
 program_
-   : line* EOL* EOF
+   : line_* EOL* EOF
    ;
 
-line
-   : linenumber ugh* statement_list ';' EOL
+line_
+   : linenumber_ when_* statement_list_ ';' EOL
    ;
 
-ugh
-   : again
-   | defer
-   | forget
+when_
+   : again_
+   | defer_
+   | forget_
    ;
 
-defer
-   : 'defer' '(' expression ')'
+defer_
+   : 'defer' '(' expression_ ')'
    ;
 
-again
-   : 'again' '(' expression ')'
+again_
+   : 'again' '(' expression_ ')'
    ;
 
-forget
-   : 'forget' '(' expression ')'
+forget_
+   : 'forget' '(' expression_ ')'
    ;
 
-linenumber
-   : term
+linenumber_
+   : term_
    ;
 
-addremove
-   : termlist '#' termlist
+addremove_
+   : termlist_ '#' termlist_
    ;
 
-termlist
-   : term (',' term)*
+termlist_
+   : term_ (',' term_)*
    ;
 
-statement_list
-   : statement (',' statement)*
+statement_list_
+   : statement_ (',' statement_)*
    ;
 
-statement
-   : addremove? (print_statement | read_statement | decl_statement)?
+statement_
+   : addremove_? (print_statement_ | read_statement_ | decl_statement_)?
    ;
 
-decl_statement
-   : term (',' term)*
+decl_statement_
+   : term_ (',' term_)*
    ;
 
-print_statement
-   : 'print' '(' term ')'
+print_statement_
+   : 'print' '(' term_ ')'
    ;
 
-read_statement
+read_statement_
    : 'read' '(' ')'
    ;
 
-expression
-   : term (COMPARE term)*
+expression_
+   : term_ (COMPARE term_)*
    ;
 
-term
-   : NOT? mult_term
+term_
+   : NOT? mult_term_
    ;
 
-mult_term
-   : add_term (MULT_OP add_term)*
+mult_term_
+   : add_term_ (MULT_OP add_term_)*
    ;
 
-add_term
-   : value (ADD_OP value)*
+add_term_
+   : value_ (ADD_OP value_)*
    ;
 
-value
+value_
    : NUMBER
-   | func
+   | func_
    | QUOTED_STRING
    ;
 
-func
-   : func_n
-   | func_u
+func_
+   : func_n_
+   | func_u_
    ;
 
-func_n
-   : 'N' '(' term ')'
+func_n_
+   : 'N' '(' term_ ')'
    ;
 
-func_u
-   : 'U' '(' term ')'
+func_u_
+   : 'U' '(' term_ ')'
    ;
 
 COMPARE
