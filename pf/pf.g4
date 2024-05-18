@@ -87,7 +87,7 @@ filteropt
    | icmp6_type
    | 'tos' tos
    | ('no' | 'keep' | 'modulate' | 'synproxy') 'state' ('(' state_opts ')')?
-   | 'scrub' '(' scrubopts ')'
+   | 'scrub' '(' scrubopts ')'?
    | 'fragment'
    | 'allow-opts'
    | 'once'
@@ -96,7 +96,7 @@ filteropt
    | 'divert-to' host 'port' port
    | 'label' QUOTED_STRING
    | 'tag' STRING
-   | ('!')? 'tagged' STRING
+   | '!'? 'tagged' STRING
    | 'max-pkt-rate' NUMBER '/' seconds
    | 'set delay' NUMBER
    | 'set prio' (NUMBER | '(' NUMBER ((',')? NUMBER)? ')')
@@ -108,7 +108,7 @@ filteropt
    | 'binat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
    | 'rdr-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)?
    | 'nat-to' (redirhost | '{' redirhost_list '}') (portspec)? (pooltype)? ('static-port')?
-   | (route)
+   | route
    | ('set tos' tos)
    | (('!')? 'received-on' (interface_name | interface_group))
    ;
@@ -199,6 +199,7 @@ action
    : 'pass'
    | 'match'
    | 'block' return?
+   | 'scrub'
    ;
 
 return
@@ -321,7 +322,7 @@ flags
    ;
 
 flag_set
-   : ('F' | 'S' | 'R' | 'P' | 'A' | 'U' | 'E' | 'W' |'SA')
+   : ('F' | 'S' | 'R' | 'P' | 'A' | 'U' | 'E' | 'W' | 'SA')
    ;
 
 icmp_type
@@ -337,7 +338,7 @@ icmp_type_code
    ;
 
 icmp_list
-   : icmp_type_code (',' icmp_type_code)?
+   : icmp_type_code (',' icmp_type_code)*
    ;
 
 tos
@@ -353,7 +354,7 @@ state_opt
    ;
 
 timeout_list
-   : timeout (',' timeout)?
+   : timeout (',' timeout)*
    ;
 
 timeout
@@ -361,7 +362,7 @@ timeout
    ;
 
 limit_list
-   : limit_item (',' limit_item)?
+   : limit_item (',' limit_item)*
    ;
 
 limit_item
@@ -446,6 +447,10 @@ hex_key
 
 string_key
    : QUOTED_STRING
+   ;
+
+ARROW
+   : '->'
    ;
 
 IPV4_DOTTED_QUAD
