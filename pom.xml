@@ -284,6 +284,7 @@
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
+                <module>pf</module>
 				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
