@@ -97,7 +97,7 @@ startup_actions
     ;
 
 startup_action
-    : action
+    : action_
     | at_command
     //              |  disable_command
     //              |  enable_command
@@ -125,11 +125,11 @@ actions
     ;
 
 action_line
-    : TOK_LPAREN action TOK_RPAREN
+    : TOK_LPAREN action_ TOK_RPAREN
     | TOK_LPAREN construct_keyword
     ;
 
-action
+action_
     : addstate_action
     | after_action
     | bind_action
@@ -709,7 +709,7 @@ opt_method_param_decls
     ;
 
 opt_method_returns_plus_actions
-    : TOK_LPAREN action TOK_RPAREN opt_method_actions
+    : TOK_LPAREN action_ TOK_RPAREN opt_method_actions
     | TOK_LPAREN TOK_RETURNS method_return_param TOK_RPAREN opt_actions
     ;
 
