@@ -22,5 +22,6 @@
         <module>sickbay</module>
         <module>snowball</module>
         <module>wheel</module>
+        <module>whenever</module>
     </modules>
 </project>
