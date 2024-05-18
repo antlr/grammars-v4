@@ -321,7 +321,7 @@ flags
    ;
 
 flag_set
-   : ('F' | 'S' | 'R' | 'P' | 'A' | 'U' | 'E' | 'W')+
+   : ('F' | 'S' | 'R' | 'P' | 'A' | 'U' | 'E' | 'W' |'SA')
    ;
 
 icmp_type
@@ -345,7 +345,7 @@ tos
    ;
 
 state_opts
-   : state_opt (',' state_opt)?
+   : state_opt (','? state_opt)*
    ;
 
 state_opt
@@ -461,7 +461,7 @@ NUMBER
    ;
 
 HEX
-   : '0' ('X' | 'x') [0-9a-f]+
+   : '0' ('X' | 'x') [0-9a-fA-F]+
    ;
 
 STRING
