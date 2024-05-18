@@ -166,7 +166,7 @@ queue_rule
    ;
 
 anchor_rule
-   : 'anchor' STRING? (('in' | 'out'))? ('on' ifspec)? af? protospec? hosts? filteropts? ('{')?
+   : 'anchor' STRING? (('in' | 'out'))? ('on' ifspec)? af? protospec? hosts filteropts? ('{')?
    ;
 
 anchor_close
