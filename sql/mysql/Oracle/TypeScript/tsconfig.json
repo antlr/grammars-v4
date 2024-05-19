@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "moduleResolution": "Node16",
+        "target": "ES2022",
+        "module": "Node16",
+        "outDir": "./lib",
+        "declaration": false,
+        "esModuleInterop": true,
+        "isolatedModules": true,
+        "noImplicitAny": true,
+        "noImplicitOverride": false,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "removeComments": false,
+    },
+    "ts-node": {
+        "esm": true,
+        "experimentalSpecifierResolution": "node"
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules/**/*.*",
+    ],
+}

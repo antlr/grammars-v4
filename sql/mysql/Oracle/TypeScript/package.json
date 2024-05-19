@@ -1,0 +1,22 @@
+{
+    "name": "antlr4-typescript-demo",
+    "version": "1.0.0",
+    "description": "A demonstration of how to use the ANTLR4 TypeScript runtime in a Node.js environment.",
+    "type": "module",
+    "author": "Mike Lischke",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/antlr/grammars-v4"
+    },
+    "scripts": {
+        "generate": "antlr4ng -Dlanguage=TypeScript -o ./generated -no-visitor -no-listener -package antlr4 -Xexact-output-dir ../MySQLLexer.g4 ../MySQLParser.g4",
+        "demo": "node --no-warnings=ExperimentalWarning --loader ts-node/esm demo.ts"
+    },
+    "devDependencies": {
+        "antlr4ng": "3.0.4",
+        "antlr4ng-cli": "2.0.0",
+        "ts-node": "^10.9.2",
+        "typescript": "5.4.3"
+    }
+}
