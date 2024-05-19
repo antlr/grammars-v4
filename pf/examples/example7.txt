@@ -1,0 +1,3 @@
+
+
+pass out on fxp0 proto tcp to any port $tcp_pass keep state

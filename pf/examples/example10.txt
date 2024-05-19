@@ -1,0 +1,7 @@
+
+table <bruteforce>
+block in quick from <bruteforce>
+pass in inet proto tcp from any to any port ssh \
+flags S/SA keep state \
+(max-src-conn 10 max-src-conn-rate 10/30, \
+overload <bruteforce> flush global)
