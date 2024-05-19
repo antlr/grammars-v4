@@ -1,7 +1,6 @@
 # Generated from trgen <version>
 
-version=`grep 'github.com/antlr4-go/antlr/v4' go.mod | awk '{print $2}' | sed 's/v//'`
-
+version="4.13.1"
 export GO111MODULE=on
 for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@v$version; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 

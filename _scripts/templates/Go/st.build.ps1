@@ -1,7 +1,6 @@
 # Generated from trgen <version>
 
-$version = Select-String -Path "go.mod" -Pattern "github.com/antlr4-go/antlr/v4" | ForEach-Object { $_.Line.Split(" ")[1] } | ForEach-Object { $_ -replace 'v' }
-
+$version="4.13.1"
 $env:GO111MODULE = "on"
 For ($i=0; $i -le 5; $i++) {
 	$(& go get github.com/antlr4-go/antlr/v4@v$version ; $compile_exit_code = $LASTEXITCODE) | Write-Host
