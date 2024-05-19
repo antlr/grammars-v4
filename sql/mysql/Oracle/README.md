@@ -6,7 +6,7 @@ For more than a decade, the MySQL GUI development tools team at Oracle has provi
 [MySQL Workbench](https://github.com/mysql/mysql-workbench), which uses ANTLR4 for all MySQL code parsing tasks. This requires to translate all changes from the
 [MySQL server grammar](https://github.com/mysql/mysql-server/blob/8.0/sql/sql_yacc.yy) to ANTLR4, which is an ongoing effort to always stay up-to-date with the lastest and greatest server features (like the Multi Language Extension (MLE) for stored routines). The current grammar supports all MySQL versions starting with 8.0.
 
-Meanwhile, development has been focused on the [MySQL Shell for VS Code extension](https://marketplace.visualstudio.com/items?itemName=Oracle.mysql-shell-for-vs-code), which is the original source of the grammar you can find here.
+Meanwhile, development focus has been shifted to the [MySQL Shell for VS Code extension](https://marketplace.visualstudio.com/items?itemName=Oracle.mysql-shell-for-vs-code), which is the original source of the grammar you can find here.
 
 Parser generated from this grammar are very fast (given the high ambiquity of the MySQL language). For details see the [ANTLR4 runtime benchmarks](https://github.com/mike-lischke/antlr4-runtime-benchmarks/tree/main/src/mysql) repository.
 

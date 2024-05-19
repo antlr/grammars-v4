@@ -5367,6 +5367,17 @@
   ]
  },
  {
+  "name": "MySQL",
+  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql\\mysql\\Oracle/MySQLLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql\\mysql\\Oracle/MySQLParser.g4",
+  "start": "root",
+  "example": [
+   "/bitrix_queries_cut.sql",
+   "/sakila-data.sql",
+   "/statements.sql",
+  ]
+ },
+ {
   "name": "Phoenix",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql\\phoenix/PhoenixLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql\\phoenix/PhoenixParser.g4",
