@@ -29,5 +29,5 @@ out
 # Ignore downloaded temporaries create by _scripts/get-antlr.ps1
 antlr4-*-complete.jar
 
-sql/mysql/Oracle/TypeScript/node_modules
+node_modules
 package-lock.json
