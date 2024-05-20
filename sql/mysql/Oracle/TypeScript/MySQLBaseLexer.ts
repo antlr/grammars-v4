@@ -6,7 +6,7 @@
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
 import { Lexer, Token } from "antlr4ng";
-import { MySQLLexer } from "./generated/MySQLLexer.js";
+import { MySQLLexer } from "./MySQLLexer.js";
 
 /** SQL modes that control parsing behavior. */
 export enum SqlMode {

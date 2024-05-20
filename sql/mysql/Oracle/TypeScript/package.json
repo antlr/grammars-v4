@@ -10,7 +10,7 @@
         "url": "https://github.com/antlr/grammars-v4"
     },
     "scripts": {
-        "generate": "antlr4ng -Dlanguage=TypeScript -o ./generated -no-visitor -no-listener -package antlr4 -Xexact-output-dir ../MySQLLexer.g4 ../MySQLParser.g4",
+        "generate": "antlr4ng -Dlanguage=TypeScript -o . -no-visitor -no-listener -package antlr4 -Xexact-output-dir ../MySQLLexer.g4 ../MySQLParser.g4",
         "demo": "node --no-warnings=ExperimentalWarning --loader ts-node/esm demo.ts"
     },
     "devDependencies": {

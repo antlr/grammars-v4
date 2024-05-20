@@ -6,8 +6,8 @@
 
 import { CharStream, CommonTokenStream, } from "antlr4ng";
 
-import { MySQLLexer } from "./generated/MySQLLexer.js";
-import { MySQLParser } from "./generated/MySQLParser.js";
+import { MySQLLexer } from "./MySQLLexer.js";
+import { MySQLParser } from "./MySQLParser.js";
 
 // A list of character sets supported by MySQL. These are used for the lexer to handle string repertoires.
 const charSets = new Set<string>([
