@@ -29,3 +29,5 @@ out
 # Ignore downloaded temporaries create by _scripts/get-antlr.ps1
 antlr4-*-complete.jar
 
+node_modules
+package-lock.json
