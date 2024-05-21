@@ -12,9 +12,6 @@ export abstract class MySQLBaseRecognizer extends Parser {
     public serverVersion = 0;
     public sqlModes = new Set<SqlMode>();
 
-    /** Enable MRS specific language parts. */
-    public supportMrs = true;
-
     /** Enable Multi Language Extension support. */
     public supportMle = true;
 
