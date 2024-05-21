@@ -49,7 +49,7 @@ tokens {
 
 /* eslint-disable @typescript-eslint/no-unused-vars, no-useless-escape */
 
-import { MySQLBaseLexer, SqlMode } from "./MySQLBaseLexer.js";
+import { MySQLBaseLexer, SqlMode } from "../MySQLBaseLexer.js";
 }
 
 //-------------------------------------------------------------------------------------------------

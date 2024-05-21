@@ -27,9 +27,9 @@ String repertoires require a list of character set identifiers, which must be pr
 
 ## Using the Grammar
 
-To provide the full feature set the MySQL grammar needs some support code, which is implemented in base classes for both, the MySQL Parser (named `MySQLBaseRecognizer`) and the MySQL Lexer (named `MySQLBaseLexer`). You can find a TypeScript implementation of both classes in the Antlr4ng/ folder, which should be easy to port over to different runtime languages.
+To provide the full feature set the MySQL grammar needs some support code, which is implemented in base classes for both, the MySQL Parser (named `MySQLBaseRecognizer`) and the MySQL Lexer (named `MySQLBaseLexer`). You can find a TypeScript implementation of both classes in the TypeScript/ folder, which should be easy to port over to different runtime languages.
 
-This folder also contains a demo script that shows how to set up the MySQL lexer and parser and parse some input. It needs the TS runtime antlr4ng (and some additional modules to allow running the demo). For this run the node module installation in the Antlr4ng/ folder:
+This folder also contains a demo script that shows how to set up the MySQL lexer and parser and parse some input. It needs the TS runtime antlr4ng (and some additional modules to allow running the demo). For this run the node module installation in the TypeScript/ folder:
 
 ```bash
 npm i

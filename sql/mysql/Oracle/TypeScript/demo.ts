@@ -6,8 +6,8 @@
 
 import { CharStream, CommonTokenStream, } from "antlr4ng";
 
-import { MySQLLexer } from "./MySQLLexer.js";
-import { MySQLParser } from "./MySQLParser.js";
+import { MySQLLexer } from "./generated/MySQLLexer.js";
+import { MySQLParser } from "./generated/MySQLParser.js";
 
 // A list of character sets supported by MySQL. These are used for the lexer to handle string repertoires.
 const charSets = new Set<string>([
@@ -17,13 +17,15 @@ const charSets = new Set<string>([
     "_cp1251", "_cp1256", "_cp1257", "_binary", "_geostd8", "_cp932", "_eucjpms", "_utf8mb4", "_utf16", "_utf32",
 ]);
 
-const lexer = new MySQLLexer(CharStream.fromString("select * from sakila.actor where actor_id = 1;"));
+const lexer = new MySQLLexer(CharStream.fromString("select *, _latin1'😁' from sakila.actor where actor_id = 1;"));
 const tokenStream = new CommonTokenStream(lexer);
 const parser = new MySQLParser(tokenStream);
 lexer.serverVersion = 80200;
 lexer.sqlModeFromString("ANSI_QUOTES");
+lexer.charSets = charSets;
 parser.serverVersion = lexer.serverVersion;
 parser.sqlModes = lexer.sqlModes;
+
 const tree = parser.query();
 
 console.log(tree.toStringTree(parser));

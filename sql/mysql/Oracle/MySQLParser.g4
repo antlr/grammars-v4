@@ -36,8 +36,8 @@ options {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-useless-escape, no-lone-blocks */
 
-import { MySQLBaseRecognizer } from "./MySQLBaseRecognizer.js";
-import { SqlMode } from "./MySQLBaseLexer.js";
+import { MySQLBaseRecognizer } from "../MySQLBaseRecognizer.js";
+import { SqlMode } from "../MySQLBaseLexer.js";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
