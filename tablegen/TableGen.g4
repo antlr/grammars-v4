@@ -2,7 +2,7 @@ grammar TableGen;
 
 // TableGenFile ::=  (Statement | IncludeDirective | PreprocessorDirective)*
 tableGenFile
-    :   (statement | includeDirective | preprocessorDirective)*
+    :   (statement | includeDirective | preprocessorDirective)* EOF
     ;
 
 preprocessorDirective
