@@ -1,4 +1,4 @@
-/*	
+/*
  * Fortran 90 grammar for ANTLR 4.8
  * Adadpted from Fortran 90 PCCTS grammar by Cyrille MIDINGOYI
  * Original PCCTS grammar by Terence Parr
@@ -497,7 +497,152 @@ entityDecl
     ;
 
 objectName
+    : name
+    ;
+
+name
     : NAME
+    | ACCESS
+    | ACCESSSPEC
+    | ACTION
+    | ADVANCE
+    | AIF
+    | ALLOCATABLE
+    | ALLOCATE
+    | ASSIGNMENT
+    | ASSIGNSTMT
+    | BACKSPACE
+    | BLOCK
+    | BLOCKDATA
+    | CALL
+    | CASE
+    | CCON
+    | CHARACTER
+    | CLOSE
+    | CODEROOT
+    | COMMON
+    | COMPLEX
+    | CONCATOP
+    | CONTAINS
+    | CONTINUE
+    | CTRLDIRECT
+    | CTRLREC
+    | CYCLE
+    | DATA
+    | DEALLOCATE
+    | DEFAULT
+    | DELIM
+    | DIMENSION
+    | DIRECT
+    | DO
+    | DOBLOCK
+    | DOUBLE
+    | DOUBLEPRECISION
+    | ELSE
+    | ELSEBLOCK
+    | ELSEIF
+    | ELSEWHERE
+    | END
+    | ENDBLOCK
+    | ENDBLOCKDATA
+    | ENDDO
+    | ENDFILE
+    | ENDIF
+    | ENDINTERFACE
+    | ENDMODULE
+    | ENDSELECT
+    | ENDTYPE
+    | ENDWHERE
+    | ENTRY
+    | EQUIVALENCE
+    | ERR
+    | EXIST
+    | EXTERNAL
+    | FILE
+    | FMT
+    | FORM
+    | FORMAT
+    | FORMATTED
+    | FUNCTION
+    | GO
+    | GOTO
+    | HOLLERITH
+    | IF
+    | IMPLICIT
+    | IN
+    | INCLUDE
+    | INOUT
+    | INQUIRE
+    | INTEGER
+    | INTENT
+    | INTERFACE
+    | INTRINSIC
+    | IOLENGTH
+    | IOSTART
+    | IOSTAT
+    | KIND
+    | LABEL
+    | LEN
+    | LET
+    | LOGICAL
+    | MODULE
+    | NAME_
+    | NAMED
+    | NAMELIST
+    | NEXTREC
+    | NML
+    | NONE
+    | NULLIFY
+    | NUMBER
+    | ONLY
+    | OPEN
+    | OPENED
+    | OPERATOR
+    | OPTIONAL
+    | OUT
+    | PAD
+    | PARAMETER
+    | PAUSE
+    | POINTER
+    | POSITION
+    | PRECISION
+    | PRINT
+    | PRIVATE
+    | PROCEDURE
+    | PROGRAM
+    | READ
+    | READWRITE
+    | REAL
+    | REC
+    | RECL
+    | RECURSIVE
+    | RESULT
+    | RETURN
+    | REWIND
+    | SAVE
+    | SELECT
+    | SELECTCASE
+    | SEQUENCE
+    | SEQUENTIAL
+    | SIZE
+    | SPOFF
+    | SPON
+    | STAT
+    | STATUS
+    | STOP
+    | SUBPROGRAMBLOCK
+    | SUBROUTINE
+    | TARGET
+    | THEN
+    | THENBLOCK
+    | TO
+    | TYPE
+    | UNFORMATTED
+    | UNIT
+    | USE
+    | WHERE
+    | WHILE
+    | WRITE
     ;
 
 arraySpec
