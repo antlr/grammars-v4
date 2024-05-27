@@ -42,11 +42,7 @@ tokens {
 
 //-------------------------------------------------------------------------------------------------
 
-@header {/*
- * Copyright (c) 2020, 2024, Oracle and/or its affiliates.
- * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
+@header {
 /* eslint-disable @typescript-eslint/no-unused-vars, no-useless-escape */
 
 import { MySQLBaseLexer, SqlMode } from "../MySQLBaseLexer.js";
