@@ -1,3 +1,3 @@
-integer(4) :: form
-call some_routine(form)
-end
+    integer(4) :: form
+    call some_routine(form)
+    end

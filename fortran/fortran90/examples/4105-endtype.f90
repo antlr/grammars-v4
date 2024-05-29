@@ -1,3 +1,3 @@
-integer(4) :: endtype
-call some_routine(endtype)
-end
+    integer(4) :: endtype
+    call some_routine(endtype)
+    end

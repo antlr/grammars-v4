@@ -1,3 +1,3 @@
-integer(4) :: if
-call some_routine(if)
-end
+    integer(4) :: if
+    call some_routine(if)
+    end

@@ -1,3 +1,3 @@
-integer(4) :: common
-call some_routine(common)
-end
+    integer(4) :: common
+    call some_routine(common)
+    end
