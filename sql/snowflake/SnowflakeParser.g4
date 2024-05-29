@@ -1075,10 +1075,10 @@ alter_session
     ;
 
 alter_session_policy
-    : ALTER SESSION POLICY if_exists? id_ (UNSET | SET) (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
+    : ALTER SESSION POLICY if_exists? id_ SET session_policy_params*
+    | ALTER SESSION POLICY if_exists? id_ UNSET (SESSION_IDLE_TIMEOUT_MINS | SESSION_UI_IDLE_TIMEOUT_MINS | COMMENT)
     | ALTER SESSION POLICY if_exists? id_ RENAME TO id_
+    | ALTER SESSION POLICY if_exists? id_ (set_tags | unset_tags)
     ;
 
 alter_share
@@ -1915,9 +1915,13 @@ create_sequence
     ;
 
 create_session_policy
-    : CREATE or_replace? SESSION POLICY if_exists? id_ (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
+    : CREATE or_replace? SESSION POLICY if_not_exists? id_ session_policy_params*
+    ;
+
+session_policy_params
+    : SESSION_IDLE_TIMEOUT_MINS EQ num
+    | SESSION_UI_IDLE_TIMEOUT_MINS EQ num
+    | comment_clause
     ;
 
 create_share
@@ -2610,18 +2614,20 @@ object_type_name
     ;
 
 object_type_plural
-    : ROLES
-    | USERS
-    | WAREHOUSES
-    | INTEGRATIONS
+    : ALERTS
     | DATABASES
+    | INTEGRATIONS
+    | POLICIES
+    | ROLES
     | SCHEMAS
-    | TABLES
-    | VIEWS
     | STAGES
     | STREAMS
+    | TABLES
+    | TAGS
     | TASKS
-    | ALERTS
+    | USERS
+    | VIEWS
+    | WAREHOUSES
     ;
 
 // drop commands
@@ -3433,135 +3439,117 @@ id_
 keyword
     //List here keyword (SnowSQL meaning) allowed as object name
     // Name of builtin function should be included in specifique section (ie builtin_function)
-    : STAGE
-    | USER
-    | TYPE
-    | CLUSTER
-    | TEMP
-    | FUNCTION
-    | REGION
-    | ROLLUP
-    | AT_KEYWORD
-    | TIMESTAMP
-    | IF
-    | COPY_OPTIONS_
-    | COMMENT
-    | ORDER
-    | NOORDER
-    | DIRECTION
-    | LENGTH
-    | LANGUAGE
-    | KEY
+    // please add in alphabetic order for easy reading
+    : ACCOUNT
     | ALERT
-    | CONDITION
-    | ROLE
-    | ROW_NUMBER
-    | VALUE
-    | FIRST_VALUE
-    | VALUES
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
-    | WAREHOUSE_TYPE
-    | TAG
-    | WAREHOUSE
-    | MODE
     | ACTION
-    | ACCOUNT
+    | AT_KEYWORD
+    | CLUSTER
+    | COMMENT
+    | CONDITION
+    | COPY_OPTIONS_
+    | DIRECTION
+    | EMAIL
+    | FIRST_VALUE
+    | FLATTEN
+    | FUNCTION
+    | IF
+    | JOIN
+    | KEY
+    | LANGUAGE
+    | LENGTH
+    | MAX_CONCURRENCY_LEVEL
+    | MODE
+    | NOORDER
+    | ORDER
+    | OUTER
+    | POLICY
+    | RECURSIVE
+    | REGION
+    | ROLE
+    | ROLLUP
+    | ROW_NUMBER
     | SEQUENCE
+    | SESSION
+    | STAGE
+    | TAG
+    | TARGET_LAG
+    | TEMP
+    | TYPE
+    | USER
+    | VALUE
+    | VALUES
+    | WAREHOUSE
+    | WAREHOUSE_TYPE
     // etc
     ;
 
 non_reserved_words
     //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
-    : ORGADMIN
-    | ACCOUNTADMIN
-    | SECURITYADMIN
-    | USERADMIN
-    | SYSADMIN
-    | PUBLIC
-    | ACTION
+    // please add in alphabetic order for easy reading
+    : ACCOUNTADMIN
     | AES
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
-    | COMMENT
     | CONFIGURATION
     | DATA
     | DEFINITION
     | DELTA
+    | DOWNSTREAM
+    | DYNAMIC
     | EDITION
+    | EMAIL
     | EVENT
     | EXPIRY_DATE
+    | EXPR
     | FIRST_NAME
     | FIRST_VALUE
-    | FLATTEN
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
-    | INTERVAL
     | INDEX
+    | INPUT
+    | INTERVAL
     | JAVASCRIPT
     | LAST_NAME
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
-    | MAX_CONCURRENCY_LEVEL
     | NAME
+    | NETWORK
     | OFFSET
     | OPTION
+    | ORGADMIN
+    | OUTBOUND
     | PARTITION
+    | PATH_
     | PATTERN
     | PORT
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
+    | PUBLIC
     | RANK
-    | RESPECT
     | RESOURCE
     | RESOURCES
+    | RESPECT
     | RESTRICT
     | RESULT
-    | ROLE
-    | ROW_NUMBER
-    | INDEX
+    | ROUNDING_MODE
+    | SCALE
+    | SECURITYADMIN
     | SOURCE
-    | PROCEDURE_NAME
     | STATE
     | STATS
-    | TAG
-    | TAGS
-    | ROLE
-    | DEFINITION
+    | SYSADMIN
     | TIMEZONE
     | URL
-    | LOCAL
-    | ROW_NUMBER
+    | USERADMIN
     | VALUE
     | VALUES
     | VERSION
-    | NAME
-    | VERSION
-    | OPTION
-    | RESPECT
-    | RESTRICT
-    | EVENT
-    | DOWNSTREAM
-    | DYNAMIC
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
     | WAREHOUSE_TYPE
-    | NETWORK
-    | OUTBOUND
-    | INPUT
-    | PATH_
-    | OUTER
-    | RECURSIVE
-    | MODE
-    | EXPR
-    | SCALE
-    | ROUNDING_MODE
     ;
 
 builtin_function
