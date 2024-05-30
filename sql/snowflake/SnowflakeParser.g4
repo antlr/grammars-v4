@@ -546,6 +546,7 @@ alter_command
     | alter_materialized_view
     | alter_network_policy
     | alter_notification_integration
+    | alter_password_policy
     | alter_pipe
     | alter_procedure
     | alter_replication_group
@@ -1075,10 +1076,17 @@ alter_session
     ;
 
 alter_session_policy
-    : ALTER SESSION POLICY if_exists? id_ SET session_policy_params*
-    | ALTER SESSION POLICY if_exists? id_ UNSET (SESSION_IDLE_TIMEOUT_MINS | SESSION_UI_IDLE_TIMEOUT_MINS | COMMENT)
-    | ALTER SESSION POLICY if_exists? id_ RENAME TO id_
-    | ALTER SESSION POLICY if_exists? id_ (set_tags | unset_tags)
+    : ALTER SESSION POLICY if_exists? object_name SET session_policy_params*
+    | ALTER SESSION POLICY if_exists? object_name UNSET (session_policy_param_name | COMMENT)
+    | ALTER SESSION POLICY if_exists? object_name RENAME TO object_name
+    | ALTER SESSION POLICY if_exists? object_name (set_tags | unset_tags)
+    ;
+
+alter_password_policy
+    : ALTER PASSWORD POLICY if_exists? object_name SET password_policy_params*
+    | ALTER PASSWORD POLICY if_exists? object_name UNSET (password_policy_param_name | COMMENT)
+    | ALTER PASSWORD POLICY if_exists? object_name RENAME TO object_name
+    | ALTER PASSWORD POLICY if_exists? object_name (set_tags | unset_tags)
     ;
 
 alter_share
@@ -1446,6 +1454,7 @@ create_command
     | create_materialized_view
     | create_network_policy
     | create_notification_integration
+    | create_password_policy
     | create_pipe
     | create_procedure
     | create_replication_group
@@ -1915,13 +1924,40 @@ create_sequence
     ;
 
 create_session_policy
-    : CREATE or_replace? SESSION POLICY if_not_exists? id_ session_policy_params*
+    : CREATE or_replace? SESSION POLICY if_not_exists? object_name session_policy_params*
     ;
 
 session_policy_params
-    : SESSION_IDLE_TIMEOUT_MINS EQ num
-    | SESSION_UI_IDLE_TIMEOUT_MINS EQ num
+    : session_policy_param_name EQ num
     | comment_clause
+    ;
+
+session_policy_param_name
+    : SESSION_IDLE_TIMEOUT_MINS
+    | SESSION_UI_IDLE_TIMEOUT_MINS
+    ;
+
+create_password_policy
+    : CREATE or_replace? PASSWORD POLICY if_not_exists? object_name password_policy_params*
+    ;
+
+password_policy_params
+    : password_policy_param_name EQ num
+    | comment_clause
+    ;
+
+password_policy_param_name
+    : PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
     ;
 
 create_share
@@ -2647,6 +2683,7 @@ drop_command
     | drop_masking_policy
     | drop_materialized_view
     | drop_network_policy
+    | drop_password_policy
     | drop_pipe
     | drop_procedure
     | drop_replication_group
@@ -2756,7 +2793,11 @@ drop_sequence
     ;
 
 drop_session_policy
-    : DROP SESSION POLICY if_exists? id_
+    : DROP SESSION POLICY if_exists? object_name
+    ;
+
+drop_password_policy
+    : DROP PASSWORD POLICY if_exists? object_name
     ;
 
 drop_share
@@ -2893,6 +2934,7 @@ describe_command
     | describe_masking_policy
     | describe_materialized_view
     | describe_network_policy
+    | describe_password_policy
     | describe_pipe
     | describe_procedure
     | describe_result
@@ -2985,7 +3027,11 @@ describe_sequence
     ;
 
 describe_session_policy
-    : describe SESSION POLICY id_
+    : describe SESSION POLICY object_name
+    ;
+
+describe_password_policy
+    : describe PASSWORD POLICY object_name
     ;
 
 describe_share
@@ -3048,6 +3094,7 @@ show_command
     | show_objects
     | show_organization_accounts
     | show_parameters
+    | show_password_policies
     | show_pipes
     | show_primary_keys
     | show_procedures
@@ -3292,6 +3339,10 @@ show_session_policies
     : SHOW SESSION POLICIES
     ;
 
+show_password_policies
+    : SHOW PASSWORD POLICIES
+    ;
+
 show_shares
     : SHOW SHARES like_pattern?
     ;
@@ -3523,6 +3574,18 @@ non_reserved_words
     | ORGADMIN
     | OUTBOUND
     | PARTITION
+    | PASSWORD
+    | PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
     | PATH_
     | PATTERN
     | PORT
