@@ -126,7 +126,7 @@ jobs:
     - name: Install JavaScript
       uses: actions/setup-node@v4.0.2
       with:
-        node-version: '21.7.1'
+        node-version: '21.7.3'
     - name: Test JavaScript
       run: |
         node --version

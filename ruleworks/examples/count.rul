@@ -1,0 +1,46 @@
+
+;
+;	Silly little counting example
+;
+;	Accepts an optional argument, that defaults to 10
+;
+	
+(entry-block |main|
+	(accepts <argc> long
+		 <argv> [2] asciz)
+	(returns long))
+
+    (object-class iterator  ^count)
+    (object-class limit  ^value)
+	
+    (on-entry
+	(write (crlf) |  Count recieved a total of| <argc> |argument(s)|(crlf))
+	(if (<argc> > 1) then
+	    (write | The second argument was| (nth   <argv> 2) (crlf))
+	    (bind <num-arg> (integer (nth   <argv> 2)))
+	  else
+	    (bind <num-arg> 10))
+	(write | Will now count up to| <num-arg> (crlf))
+	(make limit     ^value <num-arg>)
+	(make iterator  ^count 1))
+	
+    (on-exit  (write (crlf) |  All done counting| (crlf) (crlf)))
+	
+    (rule increment-rule
+	(limit ^value <lim>)
+	(iterator  ^$id <it>  ^count { <num>  <= <lim> })
+      -->
+	(write |   | <num> (crlf))
+	(modify <it>  ^count (<num> + 1))
+    )
+	
+    (rule now-done
+	(limit ^$id <limit-id>  ^value <lim>)
+	(iterator  ^$id <it>  ^count > <lim>)
+      -->
+	(remove <it>)
+	(remove <limit-id>)
+    )
+	
+(end-block |main|)
+
