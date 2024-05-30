@@ -31,8 +31,7 @@ options {
     tokenVocab = MySQLLexer;
 }
 
-@header {/* Copyright (c) 2020, 2024, Oracle and/or its affiliates. */
-
+@header {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-useless-escape, no-lone-blocks */
 
