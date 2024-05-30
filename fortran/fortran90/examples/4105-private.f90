@@ -1,3 +1,3 @@
-integer(4) :: private
-call some_routine(private)
-end
+    integer(4) :: private
+    call some_routine(private)
+    end

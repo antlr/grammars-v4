@@ -1,3 +1,3 @@
-integer(4) :: elseif
-call some_routine(elseif)
-end
+    integer(4) :: elseif
+    call some_routine(elseif)
+    end

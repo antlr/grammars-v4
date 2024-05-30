@@ -1,3 +1,3 @@
-integer(4) :: ctrldirect
-call some_routine(ctrldirect)
-end
+    integer(4) :: ctrldirect
+    call some_routine(ctrldirect)
+    end

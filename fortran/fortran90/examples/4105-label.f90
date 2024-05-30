@@ -1,3 +1,3 @@
-integer(4) :: label
-call some_routine(label)
-end
+    integer(4) :: label
+    call some_routine(label)
+    end

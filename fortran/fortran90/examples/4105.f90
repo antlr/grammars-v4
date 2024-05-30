@@ -1,3 +1,3 @@
-integer(4) :: status
-call some_routine(status)
-end
+    integer(4) :: status
+    call some_routine(status)
+    end

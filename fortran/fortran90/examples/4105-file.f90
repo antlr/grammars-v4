@@ -1,3 +1,3 @@
-integer(4) :: file
-call some_routine(file)
-end
+    integer(4) :: file
+    call some_routine(file)
+    end
