@@ -64,7 +64,7 @@ classInterface
     ;
 
 categoryInterface
-    : '@interface' categoryName = genericTypeSpecifier LP className = identifier? RP (
+    : '@interface' className = genericTypeSpecifier LP categoryName = identifier? RP (
         LT protocolList GT
     )? instanceVariables? interfaceDeclarationList? '@end'
     ;
