@@ -546,6 +546,7 @@ alter_command
     | alter_materialized_view
     | alter_network_policy
     | alter_notification_integration
+    | alter_password_policy
     | alter_pipe
     | alter_procedure
     | alter_replication_group
@@ -1075,10 +1076,17 @@ alter_session
     ;
 
 alter_session_policy
-    : ALTER SESSION POLICY if_exists? id_ (UNSET | SET) (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
-    | ALTER SESSION POLICY if_exists? id_ RENAME TO id_
+    : ALTER SESSION POLICY if_exists? object_name SET session_policy_params*
+    | ALTER SESSION POLICY if_exists? object_name UNSET (session_policy_param_name | COMMENT)
+    | ALTER SESSION POLICY if_exists? object_name RENAME TO object_name
+    | ALTER SESSION POLICY if_exists? object_name (set_tags | unset_tags)
+    ;
+
+alter_password_policy
+    : ALTER PASSWORD POLICY if_exists? object_name SET password_policy_params*
+    | ALTER PASSWORD POLICY if_exists? object_name UNSET (password_policy_param_name | COMMENT)
+    | ALTER PASSWORD POLICY if_exists? object_name RENAME TO object_name
+    | ALTER PASSWORD POLICY if_exists? object_name (set_tags | unset_tags)
     ;
 
 alter_share
@@ -1446,6 +1454,7 @@ create_command
     | create_materialized_view
     | create_network_policy
     | create_notification_integration
+    | create_password_policy
     | create_pipe
     | create_procedure
     | create_replication_group
@@ -1915,9 +1924,40 @@ create_sequence
     ;
 
 create_session_policy
-    : CREATE or_replace? SESSION POLICY if_exists? id_ (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
+    : CREATE or_replace? SESSION POLICY if_not_exists? object_name session_policy_params*
+    ;
+
+session_policy_params
+    : session_policy_param_name EQ num
+    | comment_clause
+    ;
+
+session_policy_param_name
+    : SESSION_IDLE_TIMEOUT_MINS
+    | SESSION_UI_IDLE_TIMEOUT_MINS
+    ;
+
+create_password_policy
+    : CREATE or_replace? PASSWORD POLICY if_not_exists? object_name password_policy_params*
+    ;
+
+password_policy_params
+    : password_policy_param_name EQ num
+    | comment_clause
+    ;
+
+password_policy_param_name
+    : PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
     ;
 
 create_share
@@ -2610,18 +2650,20 @@ object_type_name
     ;
 
 object_type_plural
-    : ROLES
-    | USERS
-    | WAREHOUSES
-    | INTEGRATIONS
+    : ALERTS
     | DATABASES
+    | INTEGRATIONS
+    | POLICIES
+    | ROLES
     | SCHEMAS
-    | TABLES
-    | VIEWS
     | STAGES
     | STREAMS
+    | TABLES
+    | TAGS
     | TASKS
-    | ALERTS
+    | USERS
+    | VIEWS
+    | WAREHOUSES
     ;
 
 // drop commands
@@ -2641,6 +2683,7 @@ drop_command
     | drop_masking_policy
     | drop_materialized_view
     | drop_network_policy
+    | drop_password_policy
     | drop_pipe
     | drop_procedure
     | drop_replication_group
@@ -2750,7 +2793,11 @@ drop_sequence
     ;
 
 drop_session_policy
-    : DROP SESSION POLICY if_exists? id_
+    : DROP SESSION POLICY if_exists? object_name
+    ;
+
+drop_password_policy
+    : DROP PASSWORD POLICY if_exists? object_name
     ;
 
 drop_share
@@ -2887,6 +2934,7 @@ describe_command
     | describe_masking_policy
     | describe_materialized_view
     | describe_network_policy
+    | describe_password_policy
     | describe_pipe
     | describe_procedure
     | describe_result
@@ -2979,7 +3027,11 @@ describe_sequence
     ;
 
 describe_session_policy
-    : describe SESSION POLICY id_
+    : describe SESSION POLICY object_name
+    ;
+
+describe_password_policy
+    : describe PASSWORD POLICY object_name
     ;
 
 describe_share
@@ -3042,6 +3094,7 @@ show_command
     | show_objects
     | show_organization_accounts
     | show_parameters
+    | show_password_policies
     | show_pipes
     | show_primary_keys
     | show_procedures
@@ -3286,6 +3339,10 @@ show_session_policies
     : SHOW SESSION POLICIES
     ;
 
+show_password_policies
+    : SHOW PASSWORD POLICIES
+    ;
+
 show_shares
     : SHOW SHARES like_pattern?
     ;
@@ -3433,135 +3490,129 @@ id_
 keyword
     //List here keyword (SnowSQL meaning) allowed as object name
     // Name of builtin function should be included in specifique section (ie builtin_function)
-    : STAGE
-    | USER
-    | TYPE
-    | CLUSTER
-    | TEMP
-    | FUNCTION
-    | REGION
-    | ROLLUP
-    | AT_KEYWORD
-    | TIMESTAMP
-    | IF
-    | COPY_OPTIONS_
-    | COMMENT
-    | ORDER
-    | NOORDER
-    | DIRECTION
-    | LENGTH
-    | LANGUAGE
-    | KEY
+    // please add in alphabetic order for easy reading
+    : ACCOUNT
     | ALERT
-    | CONDITION
-    | ROLE
-    | ROW_NUMBER
-    | VALUE
-    | FIRST_VALUE
-    | VALUES
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
-    | WAREHOUSE_TYPE
-    | TAG
-    | WAREHOUSE
-    | MODE
     | ACTION
-    | ACCOUNT
+    | AT_KEYWORD
+    | CLUSTER
+    | COMMENT
+    | CONDITION
+    | COPY_OPTIONS_
+    | DIRECTION
+    | EMAIL
+    | FIRST_VALUE
+    | FLATTEN
+    | FUNCTION
+    | IF
+    | JOIN
+    | KEY
+    | LANGUAGE
+    | LENGTH
+    | MAX_CONCURRENCY_LEVEL
+    | MODE
+    | NOORDER
+    | ORDER
+    | OUTER
+    | POLICY
+    | RECURSIVE
+    | REGION
+    | ROLE
+    | ROLLUP
+    | ROW_NUMBER
     | SEQUENCE
+    | SESSION
+    | STAGE
+    | TAG
+    | TARGET_LAG
+    | TEMP
+    | TYPE
+    | USER
+    | VALUE
+    | VALUES
+    | WAREHOUSE
+    | WAREHOUSE_TYPE
     // etc
     ;
 
 non_reserved_words
     //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
-    : ORGADMIN
-    | ACCOUNTADMIN
-    | SECURITYADMIN
-    | USERADMIN
-    | SYSADMIN
-    | PUBLIC
-    | ACTION
+    // please add in alphabetic order for easy reading
+    : ACCOUNTADMIN
     | AES
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
-    | COMMENT
     | CONFIGURATION
     | DATA
     | DEFINITION
     | DELTA
+    | DOWNSTREAM
+    | DYNAMIC
     | EDITION
+    | EMAIL
     | EVENT
     | EXPIRY_DATE
+    | EXPR
     | FIRST_NAME
     | FIRST_VALUE
-    | FLATTEN
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
-    | INTERVAL
     | INDEX
+    | INPUT
+    | INTERVAL
     | JAVASCRIPT
     | LAST_NAME
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
-    | MAX_CONCURRENCY_LEVEL
     | NAME
+    | NETWORK
     | OFFSET
     | OPTION
+    | ORGADMIN
+    | OUTBOUND
     | PARTITION
+    | PASSWORD
+    | PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
+    | PATH_
     | PATTERN
     | PORT
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
+    | PUBLIC
     | RANK
-    | RESPECT
     | RESOURCE
     | RESOURCES
+    | RESPECT
     | RESTRICT
     | RESULT
-    | ROLE
-    | ROW_NUMBER
-    | INDEX
+    | ROUNDING_MODE
+    | SCALE
+    | SECURITYADMIN
     | SOURCE
-    | PROCEDURE_NAME
     | STATE
     | STATS
-    | TAG
-    | TAGS
-    | ROLE
-    | DEFINITION
+    | SYSADMIN
     | TIMEZONE
     | URL
-    | LOCAL
-    | ROW_NUMBER
+    | USERADMIN
     | VALUE
     | VALUES
     | VERSION
-    | NAME
-    | VERSION
-    | OPTION
-    | RESPECT
-    | RESTRICT
-    | EVENT
-    | DOWNSTREAM
-    | DYNAMIC
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
     | WAREHOUSE_TYPE
-    | NETWORK
-    | OUTBOUND
-    | INPUT
-    | PATH_
-    | OUTER
-    | RECURSIVE
-    | MODE
-    | EXPR
-    | SCALE
-    | ROUNDING_MODE
     ;
 
 builtin_function
