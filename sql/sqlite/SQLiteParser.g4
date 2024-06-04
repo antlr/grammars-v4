@@ -587,6 +587,7 @@ order_by_expr
 
 order_by_expr_asc_desc
     : ORDER_ BY_ expr_asc_desc
+    |
 ;
 
 expr_asc_desc
