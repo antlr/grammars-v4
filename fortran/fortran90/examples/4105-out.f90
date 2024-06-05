@@ -1,3 +1,3 @@
-integer(4) :: out
-call some_routine(out)
-end
+    integer(4) :: out
+    call some_routine(out)
+    end

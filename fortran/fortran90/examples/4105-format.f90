@@ -1,3 +1,3 @@
-integer(4) :: format
-call some_routine(format)
-end
+    integer(4) :: format
+    call some_routine(format)
+    end

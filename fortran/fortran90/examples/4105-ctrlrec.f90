@@ -1,3 +1,3 @@
-integer(4) :: ctrlrec
-call some_routine(ctrlrec)
-end
+    integer(4) :: ctrlrec
+    call some_routine(ctrlrec)
+    end

@@ -1,3 +1,3 @@
-integer(4) :: pointer
-call some_routine(pointer)
-end
+    integer(4) :: pointer
+    call some_routine(pointer)
+    end

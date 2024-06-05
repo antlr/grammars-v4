@@ -1,3 +1,3 @@
-integer(4) :: none
-call some_routine(none)
-end
+    integer(4) :: none
+    call some_routine(none)
+    end

@@ -1,3 +1,3 @@
-integer(4) :: operator
-call some_routine(operator)
-end
+    integer(4) :: operator
+    call some_routine(operator)
+    end

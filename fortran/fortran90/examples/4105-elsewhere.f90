@@ -1,3 +1,3 @@
-integer(4) :: elsewhere
-call some_routine(elsewhere)
-end
+    integer(4) :: elsewhere
+    call some_routine(elsewhere)
+    end

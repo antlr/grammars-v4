@@ -1,3 +1,3 @@
-integer(4) :: contains
-call some_routine(contains)
-end
+    integer(4) :: contains
+    call some_routine(contains)
+    end

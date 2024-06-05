@@ -1919,7 +1919,7 @@ functionArg
     ;
 
 nameDataRef
-    : (NAME | REAL | SIZE) complexDataRefTail*
+    : name complexDataRefTail*
     ;
 
 complexDataRefTail

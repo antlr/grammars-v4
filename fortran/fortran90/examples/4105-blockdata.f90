@@ -1,3 +1,3 @@
-integer(4) :: blockdata
-call some_routine(blockdata)
-end
+    integer(4) :: blockdata
+    call some_routine(blockdata)
+    end

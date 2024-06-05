@@ -1,3 +1,3 @@
-integer(4) :: len
-call some_routine(len)
-end
+    integer(4) :: len
+    call some_routine(len)
+    end
