@@ -1,0 +1,1 @@
+(program (likePatternElement (likePatternChar a)) (likePatternElement (likePatternCharlist [ (charList (charListElement (charRange (charlistChar L) - (charlistChar P)))) ])) (likePatternElement (wildcard #)) (likePatternElement (likePatternCharlist [ ! (charList (charListElement (charRange (charlistChar c) - (charlistChar e)))) ])) <EOF>)
