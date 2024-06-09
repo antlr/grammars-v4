@@ -3657,7 +3657,7 @@ system_partitioning
     ;
 
 range_partition_desc
-    : PARTITION partition_name? range_values_clause? table_partition_description? (
+    : PARTITION partition_name? range_values_clause? table_partition_description (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*
@@ -3670,7 +3670,7 @@ range_partition_desc
     ;
 
 list_partition_desc
-    : PARTITION partition_name? list_values_clause? table_partition_description? (
+    : PARTITION partition_name? list_values_clause? table_partition_description (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*
