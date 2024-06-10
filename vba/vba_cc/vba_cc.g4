@@ -92,7 +92,7 @@ literalExpression
     | INTEGERLITERAL
     | STRINGLITERAL
     | DATELITERAL
-    | EMPTY
+    | EMPTY_
     | NULL_
     | NOTHING
     ;
@@ -119,9 +119,9 @@ ccFunc
     ;
 
 reservedKeywords
-    : WIN16
-    | WIN32
-    | WIN64
+    : WIN16_
+    | WIN32_
+    | WIN64_
     | VBA6
     | VBA7
     | MAC
@@ -148,7 +148,7 @@ ENDIF
     | '#ENDIF'
     ;
 
-EMPTY
+EMPTY_
     : 'EMPTY'
     ;
 
@@ -168,15 +168,15 @@ THEN
     : 'THEN'
     ;
 
-WIN16
+WIN16_
     : 'WIN16'
     ;
 
-WIN32
+WIN32_
     : 'WIN32'
     ;
 
-WIN64
+WIN64_
     : 'WIN64'
     ;
 
