@@ -13,6 +13,7 @@
 
     <modules>
         <module>vba6</module>
+        <module>vba_cc</module>
         <module>vba_like</module>
     </modules>
 </project>
