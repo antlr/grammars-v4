@@ -417,6 +417,14 @@ CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMO
 
 CREATE TABLE tab IF NOT EXISTS (ID number(9) primary key);
 
+CREATE TABLE T1 (
+ "NAME" VARCHAR(10) NOT NULL,
+ "ID" INT NOT NULL,
+ "ADDRESS" VARCHAR(255),
+ "SQ_NUMBER" NUMBER(10),
+ "PQ_NUMBER" NUMBER(10),
+ CONSTRAINTS UQ1 UNIQUE ("SQ_NUMBER", "PQ_NUMBER"));
+
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)
        --     WHERE
