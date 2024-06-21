@@ -4022,7 +4022,7 @@ select_list_top
     ;
 
 select_list
-    : select_list_elem (COMMA select_list_elem)*
+    : select_list_elem (COMMA select_list_elem)* COMMA?
     ;
 
 select_list_elem
