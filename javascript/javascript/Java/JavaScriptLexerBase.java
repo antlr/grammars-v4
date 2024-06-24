@@ -159,7 +159,7 @@ public abstract class JavaScriptLexerBase extends Lexer
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
 	    this.currentDepth = 0;
-	    this.templateDepthStack = new Stack<Integer>();
+	    this.templateDepthStack = new ArrayDeque<Integer>();
         super.reset();
     }
 }
