@@ -732,7 +732,7 @@ x_prop
 
 // 3.8.8.3 - Request Status
 rstatus
-    : k_request_status rstatparam* COL statcode SCOL text (SCOL text)?
+    : k_request_status rstatparam* COL statcode SCOL text (SCOL text)? CRLF
     ;
 
 rstatparam
