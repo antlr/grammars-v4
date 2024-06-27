@@ -725,7 +725,7 @@ iana_prop
     : iana_token (SCOL icalparameter)* COL value CRLF
     ;
 
-// 3.8.8.2 - Non-Standard Propertie
+// 3.8.8.2 - Non-Standard Properties
 x_prop
     : x_name (SCOL icalparameter)* COL value CRLF
     ;
