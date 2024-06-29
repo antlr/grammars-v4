@@ -15,7 +15,9 @@ public:
 
     bool useStrictDefault = false;
     bool useStrictCurrent = false;
-    int _templateDepth = 0;
+
+    int currentDepth = 0;
+    std::stack<int> templateDepthStack;
 
     bool IsStartOfFile();
     bool getStrictDefault();
@@ -26,8 +28,8 @@ public:
     void ProcessOpenBrace();
     void ProcessCloseBrace();
     void ProcessStringLiteral();
-    void IncreaseTemplateDepth();
-    void DecreaseTemplateDepth();
+	void ProcessTemplateOpenBrace();
+	void ProcessTemplateCloseBrace();
     bool IsRegexPossible();
     virtual void reset() override;
 };
