@@ -545,7 +545,7 @@ partition_by_clause
     ;
 
 result_cache_clause
-    : RESULT_CACHE relies_on_part?
+    : RESULT_CACHE relies_on_part? ('(' MODE (DEFAULT | FORCE ) ')')?
     ;
 
 accessible_by_clause
@@ -3494,7 +3494,7 @@ table_properties
     : column_properties? read_only_clause? indexing_clause? table_partitioning_clauses? attribute_clustering_clause? (
         CACHE
         | NOCACHE
-    )? result_cache_clause? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? enable_disable_clause* row_movement_clause?
+    )? result_cache_clause? parallel_clause? monitoring_nomonitoring? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? enable_disable_clause* row_movement_clause?
         logical_replication_clause? flashback_archive_clause? physical_properties? (ROW ARCHIVAL)? (
         AS select_only_statement
         | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name
