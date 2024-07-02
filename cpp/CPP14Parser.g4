@@ -711,9 +711,7 @@ abstractPackDeclarator
     ;
 
 noPointerAbstractPackDeclarator
-    : noPointerAbstractPackDeclarator parametersAndQualifiers
-    | noPointerAbstractPackDeclarator LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-    | Ellipsis
+    : Ellipsis ( parametersAndQualifiers | LeftBracket constantExpression? RightBracket attributeSpecifierSeq? )*
     ;
 
 parameterDeclarationClause
