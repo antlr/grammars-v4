@@ -699,8 +699,7 @@ abstractDeclarator
     ;
 
 pointerAbstractDeclarator
-    : noPointerAbstractDeclarator
-    | pointerOperator pointerAbstractDeclarator?
+    : pointerOperator* ( noPointerAbstractDeclarator | pointerOperator )
     ;
 
 noPointerAbstractDeclarator
