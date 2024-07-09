@@ -3,3 +3,9 @@ WITH A AS (
 )
 SELECT A,B,C
 FROM A
+
+---column supports of keyword
+SELECT of from A;
+
+---column supports user keyword
+SELECT user from A;

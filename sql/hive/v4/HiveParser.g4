@@ -2622,6 +2622,7 @@ nonReserved
     | KW_NOVALIDATE
     | KW_NO_DROP
     | KW_NULLS
+    | KW_OF
     | KW_OFFLINE
     | KW_OFFSET
     | KW_OPERATOR
@@ -2715,6 +2716,7 @@ nonReserved
     | KW_URI
     | KW_URL
     | KW_USE
+    | KW_USER
     | KW_UTC
     | KW_UTCTIMESTAMP
     | KW_VALIDATE
