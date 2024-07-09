@@ -2537,6 +2537,7 @@ nonReserved
     | KW_COST
     | KW_CRON
     | KW_DATA
+    | KW_DATE
     | KW_DATABASES
     | KW_DATETIME
     | KW_DAY
@@ -2622,6 +2623,7 @@ nonReserved
     | KW_NOVALIDATE
     | KW_NO_DROP
     | KW_NULLS
+    | KW_OF
     | KW_OFFLINE
     | KW_OFFSET
     | KW_OPERATOR
@@ -2694,8 +2696,10 @@ nonReserved
     | KW_SYSTEM_VERSION
     | KW_TABLES
     | KW_TBLPROPERTIES
+    | KW_TIME
     | KW_TEMPORARY
     | KW_TERMINATED
+    | KW_TIMESTAMP
     | KW_TIMESTAMPTZ
     | KW_TINYINT
     | KW_TOUCH
@@ -2715,6 +2719,7 @@ nonReserved
     | KW_URI
     | KW_URL
     | KW_USE
+    | KW_USER
     | KW_UTC
     | KW_UTCTIMESTAMP
     | KW_VALIDATE
