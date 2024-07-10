@@ -79,7 +79,7 @@ expr
     | expr ('<-' | '<<-' | '=' | '->' | '->>' | ':=') expr
     | 'function' '(' formlist? ')' expr // define function
     | expr '(' sublist ')'              // call function
-    | '{' NL* exprlist '}'                  // compound statement
+    | '{' exprlist '}'                  // compound statement
     | 'if' '(' expr ')' expr
     | 'if' '(' expr ')' expr NL* 'else' expr
     | 'for' '(' ID 'in' expr ')' expr
