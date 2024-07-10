@@ -79,9 +79,9 @@ expr
     | expr ('<-' | '<<-' | '=' | '->' | '->>' | ':=') expr
     | 'function' '(' formlist? ')' expr // define function
     | expr '(' sublist ')'              // call function
-    | '{' exprlist '}'                  // compound statement
+    | '{' NL* exprlist '}'                  // compound statement
     | 'if' '(' expr ')' expr
-    | 'if' '(' expr ')' expr 'else' expr
+    | 'if' '(' expr ')' expr NL* 'else' expr
     | 'for' '(' ID 'in' expr ')' expr
     | 'while' '(' expr ')' expr
     | 'repeat' expr
@@ -101,11 +101,16 @@ expr
     | 'NaN'
     | 'TRUE'
     | 'FALSE'
+    | NL expr
+    ;
+
+ifCont
+    : 'else' expr
+    |
     ;
 
 exprlist
     : expr ((';' | NL) expr?)*
-    |
     ;
 
 formlist
