@@ -104,11 +104,6 @@ expr
     | NL expr
     ;
 
-ifCont
-    : 'else' expr
-    |
-    ;
-
 exprlist
     : expr ((';' | NL) expr?)*
     ;
