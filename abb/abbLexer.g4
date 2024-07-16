@@ -1,107 +1,257 @@
 // $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+
+
 // $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+
+
 // $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar abbLexer;
 
-options {
-    caseInsensitive = true;
-}
 
-MODULE    : 'module';
-ENDMODULE : 'endmodule';
-PROC      : 'PROC';
-ENDPROC   : 'ENDPROC';
-LOCAL     : 'LOCAL';
-CONST     : 'CONST';
-PERS      : 'PERS';
-VAR       : 'VAR';
-TOOLDATA  : 'TOOLDATA';
-WOBJDATA  : 'WOBJDATA';
-SPEEDDATA : 'SPEEDDATA';
-ZONEDATA  : 'ZONEDATA';
-CLOCK     : 'CLOCK';
-BOOL      : 'BOOL';
-ON_CALL   : '\\ON';
-OFF_CALL  : '\\OFF';
+options { caseInsensitive = true; }
+MODULE
+   : 'module'
+   ;
 
-SLASH                : '/';
-EQUALS               : ':=';
-COMMA                : ',';
-CURLY_OPEN           : '{';
-CURLY_CLOSE          : '}';
-COLON                : ':';
-SEMICOLON            : ';';
-BRACKET_OPEN         : '(';
-BRACKET_CLOSE        : ')';
-SQUARE_OPEN          : '[';
-SQUARE_CLOSE         : ']';
-DOT                  : '.';
-DOUBLEDOT            : '..';
-REL_BIGGER           : '>';
-REL_BIGGER_OR_EQUAL  : '>=';
-REL_SMALLER          : '<';
-REL_SMALLER_OR_EQUAL : '<=';
-REL_EQUAL            : '==';
-REL_NOTEQUAL         : '<>';
-PLUS                 : '+';
-MINUS                : '-';
-MULTIPLY             : '*';
-PERCENT              : '%';
-HASH                 : '#';
+ENDMODULE
+   : 'endmodule'
+   ;
 
-WS: (' ' | '\t' | '\u000C') -> skip;
+PROC
+   : 'PROC'
+   ;
 
-NEWLINE: '\r'? '\n';
+ENDPROC
+   : 'ENDPROC'
+   ;
 
-LINE_COMMENT: '!' ~ ('\n' | '\r')* -> skip;
+LOCAL
+   : 'LOCAL'
+   ;
 
-BOOLLITERAL: 'FALSE' | 'TRUE';
+CONST
+   : 'CONST'
+   ;
 
-CHARLITERAL: '\'' (EscapeSequence | ~ ('\'' | '\\' | '\r' | '\n')) '\'';
+PERS
+   : 'PERS'
+   ;
 
-STRINGLITERAL: '"' (EscapeSequence | ~ ('\\' | '"' | '\r' | '\n'))* '"';
+VAR
+   : 'VAR'
+   ;
 
-fragment EscapeSequence:
-    '\\' (
-        'b'
-        | 't'
-        | 'n'
-        | 'f'
-        | 'r'
-        | '"'
-        | '\''
-        | '\\'
-        | '0' .. '3' '0' .. '7' '0' .. '7'
-        | '0' .. '7' '0' .. '7'
-        | '0' .. '7'
-    )
-;
+TOOLDATA
+   : 'TOOLDATA'
+   ;
 
-FLOATLITERAL:
-    ('0' .. '9')+ '.' ('0' .. '9')* Exponent?
-    | '.' ('0' .. '9')+ Exponent?
-    | ('0' .. '9')+ Exponent
-;
+WOBJDATA
+   : 'WOBJDATA'
+   ;
 
-fragment Exponent: 'E' ('+' | '-')? ('0' .. '9')+;
+SPEEDDATA
+   : 'SPEEDDATA'
+   ;
 
-INTLITERAL: ('0' .. '9')+ | HexPrefix HexDigit+ HexSuffix | BinPrefix BinDigit+ BinSuffix;
+ZONEDATA
+   : 'ZONEDATA'
+   ;
 
-fragment HexPrefix: '\'' 'H';
+CLOCK
+   : 'CLOCK'
+   ;
 
-fragment HexDigit: '0' .. '9' | 'A' .. 'F';
+BOOL
+   : 'BOOL'
+   ;
 
-fragment HexSuffix: '\'';
+ON_CALL
+   : '\\ON'
+   ;
 
-fragment BinPrefix: '\'' 'B';
+OFF_CALL
+   : '\\OFF'
+   ;
 
-fragment BinDigit: '0' | '1';
+SLASH
+   : '/'
+   ;
 
-fragment BinSuffix: '\'';
+EQUALS
+   : ':='
+   ;
 
-IDENTIFIER: IdentifierStart IdentifierPart*;
+COMMA
+   : ','
+   ;
 
-fragment IdentifierStart: 'A' .. 'Z' | '_';
+CURLY_OPEN
+   : '{'
+   ;
 
-fragment IdentifierPart: IdentifierStart | '0' .. '9';
+CURLY_CLOSE
+   : '}'
+   ;
+
+COLON
+   : ':'
+   ;
+
+SEMICOLON
+   : ';'
+   ;
+
+BRACKET_OPEN
+   : '('
+   ;
+
+BRACKET_CLOSE
+   : ')'
+   ;
+
+SQUARE_OPEN
+   : '['
+   ;
+
+SQUARE_CLOSE
+   : ']'
+   ;
+
+DOT
+   : '.'
+   ;
+
+DOUBLEDOT
+   : '..'
+   ;
+
+REL_BIGGER
+   : '>'
+   ;
+
+REL_BIGGER_OR_EQUAL
+   : '>='
+   ;
+
+REL_SMALLER
+   : '<'
+   ;
+
+REL_SMALLER_OR_EQUAL
+   : '<='
+   ;
+
+REL_EQUAL
+   : '=='
+   ;
+
+REL_NOTEQUAL
+   : '<>'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+MINUS
+   : '-'
+   ;
+
+MULTIPLY
+   : '*'
+   ;
+
+PERCENT
+   : '%'
+   ;
+
+HASH
+   : '#'
+   ;
+
+WS
+   : (' ' | '\t' | '\u000C') -> skip
+   ;
+
+NEWLINE
+   : '\r'? '\n'
+   ;
+
+LINE_COMMENT
+   : '!' ~ ('\n' | '\r')* -> skip
+   ;
+
+BOOLLITERAL
+   : 'FALSE'
+   | 'TRUE'
+   ;
+
+CHARLITERAL
+   : '\'' (EscapeSequence | ~ ('\'' | '\\' | '\r' | '\n')) '\''
+   ;
+
+STRINGLITERAL
+   : '"' (EscapeSequence | ~ ('\\' | '"' | '\r' | '\n'))* '"'
+   ;
+
+fragment EscapeSequence
+   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' | '0' .. '3' '0' .. '7' '0' .. '7' | '0' .. '7' '0' .. '7' | '0' .. '7')
+   ;
+
+FLOATLITERAL
+   : ('0' .. '9')+ '.' ('0' .. '9')* Exponent?
+   | '.' ('0' .. '9')+ Exponent?
+   | ('0' .. '9')+ Exponent
+   ;
+
+fragment Exponent
+   : 'E' ('+' | '-')? ('0' .. '9')+
+   ;
+
+INTLITERAL
+   : ('0' .. '9')+
+   | HexPrefix HexDigit+ HexSuffix
+   | BinPrefix BinDigit+ BinSuffix
+   ;
+
+fragment HexPrefix
+   : '\'' 'H'
+   ;
+
+fragment HexDigit
+   : '0' .. '9'
+   | 'A' .. 'F'
+   ;
+
+fragment HexSuffix
+   : '\''
+   ;
+
+fragment BinPrefix
+   : '\'' 'B'
+   ;
+
+fragment BinDigit
+   : '0'
+   | '1'
+   ;
+
+fragment BinSuffix
+   : '\''
+   ;
+
+IDENTIFIER
+   : IdentifierStart IdentifierPart*
+   ;
+
+fragment IdentifierStart
+   : 'A' .. 'Z'
+   | '_'
+   ;
+
+fragment IdentifierPart
+   : IdentifierStart
+   | '0' .. '9'
+   ;
+

@@ -27,405 +27,777 @@
 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+
+
 // $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+
+
 // $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar ANTLRv2Lexer;
 
-options {
-    superClass = LexerAdaptor;
-}
 
-channels {
-    OFF_CHANNEL
-}
+options { superClass = LexerAdaptor; }
+channels { OFF_CHANNEL }
+tokens { DOC_COMMENT , PARSER , LEXER , RULE , BLOCK , OPTIONAL , CLOSURE , POSITIVE_CLOSURE , SYNPRED , RANGE , CHAR_RANGE , EPSILON , ALT , EOR , EOB , EOA , // end of alt
+ID , ARG , ARGLIST , RET , LEXER_GRAMMAR , PARSER_GRAMMAR , TREE_GRAMMAR , COMBINED_GRAMMAR , INITACTION , LABEL , // $x used in rewrite rules
+TEMPLATE , SCOPE , SEMPRED , GATED_SEMPRED , // {p}? =>
+SYN_SEMPRED , // (...) =>   it's a manually-specified synpred converted to sempred
+BACKTRACK_SEMPRED , // auto backtracking mode syn pred converted to sempred
+FRAGMENT , TREE_BEGIN , ROOT , BANG , RANGE , REWRITE , ACTION_CONTENT }
+DOC_COMMENT
+   : '/**' .*? ('*/' | EOF) -> channel (OFF_CHANNEL)
+   ;
 
-tokens {
-    DOC_COMMENT,
-    PARSER,
-    LEXER,
-    RULE,
-    BLOCK,
-    OPTIONAL,
-    CLOSURE,
-    POSITIVE_CLOSURE,
-    SYNPRED,
-    RANGE,
-    CHAR_RANGE,
-    EPSILON,
-    ALT,
-    EOR,
-    EOB,
-    EOA, // end of alt
-    ID,
-    ARG,
-    ARGLIST,
-    RET,
-    LEXER_GRAMMAR,
-    PARSER_GRAMMAR,
-    TREE_GRAMMAR,
-    COMBINED_GRAMMAR,
-    INITACTION,
-    LABEL, // $x used in rewrite rules
-    TEMPLATE,
-    SCOPE,
-    SEMPRED,
-    GATED_SEMPRED,     // {p}? =>
-    SYN_SEMPRED,       // (...) =>   it's a manually-specified synpred converted to sempred
-    BACKTRACK_SEMPRED, // auto backtracking mode syn pred converted to sempred
-    FRAGMENT,
-    TREE_BEGIN,
-    ROOT,
-    BANG,
-    RANGE,
-    REWRITE,
-    ACTION_CONTENT
-}
+SL_COMMENT
+   : '//' ~ [\r\n]* -> channel (OFF_CHANNEL)
+   ;
 
-DOC_COMMENT: '/**' .*? ('*/' | EOF) -> channel(OFF_CHANNEL);
+ML_COMMENT
+   : '/*' .*? '*/' -> channel (OFF_CHANNEL)
+   ;
 
-SL_COMMENT: '//' ~ [\r\n]* -> channel(OFF_CHANNEL);
+INT
+   : '0' .. '9'+
+   ;
 
-ML_COMMENT: '/*' .*? '*/' -> channel(OFF_CHANNEL);
+CHAR_LITERAL
+   : '\'' LITERAL_CHAR '\''
+   ;
 
-INT: '0' .. '9'+;
+fragment LITERAL_CHAR
+   : ESC
+   | ~ ('\'' | '\\')
+   ;
 
-CHAR_LITERAL: '\'' LITERAL_CHAR '\'';
+STRING_LITERAL
+   : '"' LIT_STR* '"'
+   ;
 
-fragment LITERAL_CHAR: ESC | ~ ('\'' | '\\');
+fragment LIT_STR
+   : ESC
+   | ~ ('\\' | '"')
+   ;
 
-STRING_LITERAL: '"' LIT_STR* '"';
+fragment ESC
+   : '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | OctDigit (OctDigit OctDigit?)? | .)
+   ;
 
-fragment LIT_STR: ESC | ~ ('\\' | '"');
+fragment XDIGIT
+   : '0' .. '9'
+   | 'a' .. 'f'
+   | 'A' .. 'F'
+   ;
 
-fragment ESC:
-    '\\' (
-        'n'
-        | 'r'
-        | 't'
-        | 'b'
-        | 'f'
-        | '"'
-        | '\''
-        | '\\'
-        | '>'
-        | 'u' XDIGIT XDIGIT XDIGIT XDIGIT
-        | OctDigit (OctDigit OctDigit?)?
-        | .
-    )
-;
+BEGIN_ARGUMENT
+   : LBrack
+   { this.handleBeginArgument(); }
+   ;
 
-fragment XDIGIT: '0' .. '9' | 'a' .. 'f' | 'A' .. 'F';
+BEGIN_ACTION
+   : LBrace -> pushMode (Actionx)
+   ;
 
-BEGIN_ARGUMENT: LBrack { this.handleBeginArgument(); };
+OPTIONS
+   : 'options' -> pushMode (Options)
+   ;
 
-BEGIN_ACTION: LBrace -> pushMode (Actionx);
+TOKENS
+   : 'tokens' -> pushMode (Tokens)
+   ;
 
-OPTIONS: 'options' -> pushMode (Options);
+HEADER
+   : 'header'
+   ;
 
-TOKENS: 'tokens' -> pushMode (Tokens);
+CLASS
+   : 'class'
+   ;
 
-HEADER               : 'header';
-CLASS                : 'class';
-EXTENDS              : 'extends';
-LEXCLASS             : 'lexclass';
-TREEPARSER           : 'treeparser';
-EXCEPTION            : 'exception';
-CATCH                : 'catch';
-FINALLY              : 'finally';
-FRAGMENT             : 'fragment';
-GRAMMAR              : 'grammar';
-LEXER                : 'Lexer';
-PARSER               : 'Parser';
-PRIVATE              : 'private';
-PROTECTED            : 'protected';
-PUBLIC               : 'public';
-RETURNS              : 'returns';
-SCOPE                : 'scope';
-THROWS               : 'throws';
-TREE                 : 'tree';
-fragment WS_LOOP     : (WS | SL_COMMENT | ML_COMMENT)*;
-OPEN_ELEMENT_OPTION  : Lt;
-CLOSE_ELEMENT_OPTION : Gt;
-AT                   : At;
-BANG                 : '!';
-COLON                : Colon;
-COLONCOLON           : DColon;
-COMMA                : Comma;
-DOT                  : Dot;
-EQUAL                : Equal;
-LBRACE               : LBrace;
-LBRACK               : LBrack;
-LPAREN               : LParen;
-OR                   : Pipe;
-PLUS                 : Plus;
-QM                   : Question;
-RANGE                : Range;
-RBRACE               : RBrace;
-RBRACK               : RBrack;
-REWRITE              : RArrow;
-ROOT                 : '^';
-RPAREN               : RParen;
-SEMI                 : Semi;
-SEMPREDOP            : '=>';
-STAR                 : Star;
-TREE_BEGIN           : '^(';
-DOLLAR               : Dollar;
-PEQ                  : PlusAssign;
-NOT                  : Tilde;
+EXTENDS
+   : 'extends'
+   ;
 
-WS: (' ' | '\t' | '\r'? '\n')+ -> channel(OFF_CHANNEL);
+LEXCLASS
+   : 'lexclass'
+   ;
 
-TOKEN_REF: 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*;
+TREEPARSER
+   : 'treeparser'
+   ;
 
-RULE_REF: 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*;
+EXCEPTION
+   : 'exception'
+   ;
 
-// ======================================================
-// Lexer fragments
-//
-// -----------------------------------
-// Whitespace & Comments
+CATCH
+   : 'catch'
+   ;
 
-fragment Ws: Hws | Vws;
+FINALLY
+   : 'finally'
+   ;
 
-fragment Hws: [ \t];
+FRAGMENT
+   : 'fragment'
+   ;
 
-fragment Vws: [\r\n\f];
+GRAMMAR
+   : 'grammar'
+   ;
 
-fragment BlockComment: '/*' .*? ('*/' | EOF);
+LEXER
+   : 'Lexer'
+   ;
 
-fragment DocComment: '/**' .*? ('*/' | EOF);
+PARSER
+   : 'Parser'
+   ;
 
-fragment LineComment: '//' ~ [\r\n]*;
+PRIVATE
+   : 'private'
+   ;
 
-// -----------------------------------
-// Escapes
-// Any kind of escaped character that we can embed within ANTLR literal strings.
+PROTECTED
+   : 'protected'
+   ;
 
-fragment EscSeq: Esc ([btnfr"'\\] | UnicodeEsc | OctEsc | . | EOF);
+PUBLIC
+   : 'public'
+   ;
 
-fragment EscAny: Esc .;
+RETURNS
+   : 'returns'
+   ;
 
-fragment UnicodeEsc: 'u' (HexDigit (HexDigit (HexDigit HexDigit?)?)?)?;
+SCOPE
+   : 'scope'
+   ;
 
-fragment OctEsc: OctDigit (OctDigit OctDigit?)?;
+THROWS
+   : 'throws'
+   ;
 
-// -----------------------------------
-// Numerals
+TREE
+   : 'tree'
+   ;
 
-fragment DecimalNumeral: '0' | [1-9] DecDigit*;
-// -----------------------------------
-// Digits
+fragment WS_LOOP
+   : (WS | SL_COMMENT | ML_COMMENT)*
+   ;
 
-fragment HexDigit: [0-9a-fA-F];
+OPEN_ELEMENT_OPTION
+   : Lt
+   ;
 
-fragment DecDigit: [0-9];
+CLOSE_ELEMENT_OPTION
+   : Gt
+   ;
 
-fragment OctDigit: [0-7];
+AT
+   : At
+   ;
 
-// -----------------------------------
-// Literals
+BANG
+   : '!'
+   ;
 
-fragment BoolLiteral: 'true' | 'false';
+COLON
+   : Colon
+   ;
 
-fragment CharLiteral: SQuote (EscSeq | ~ ['\r\n\\]) SQuote;
+COLONCOLON
+   : DColon
+   ;
 
-fragment SQuoteLiteral: SQuote (EscSeq | ~ ['\r\n\\])* SQuote;
+COMMA
+   : Comma
+   ;
 
-fragment DQuoteLiteral: DQuote (EscSeq | ~ ["\r\n\\])* DQuote;
+DOT
+   : Dot
+   ;
 
-fragment USQuoteLiteral: SQuote (EscSeq | ~ ['\r\n\\])*;
-// -----------------------------------
-// Character ranges
+EQUAL
+   : Equal
+   ;
 
-fragment NameChar:
-    NameStartChar
-    | '0' .. '9'
-    | Underscore
-    | '\u00B7'
-    | '\u0300' .. '\u036F'
-    | '\u203F' .. '\u2040'
-;
+LBRACE
+   : LBrace
+   ;
 
-fragment NameStartChar:
-    'A' .. 'Z'
-    | 'a' .. 'z'
-    | '\u00C0' .. '\u00D6'
-    | '\u00D8' .. '\u00F6'
-    | '\u00F8' .. '\u02FF'
-    | '\u0370' .. '\u037D'
-    | '\u037F' .. '\u1FFF'
-    | '\u200C' .. '\u200D'
-    | '\u2070' .. '\u218F'
-    | '\u2C00' .. '\u2FEF'
-    | '\u3001' .. '\uD7FF'
-    | '\uF900' .. '\uFDCF'
-    | '\uFDF0' .. '\uFFFD'
-;
+LBRACK
+   : LBrack
+   ;
 
-// ignores | ['\u10000-'\uEFFFF] ;
+LPAREN
+   : LParen
+   ;
 
-// -----------------------------------
-// Types
+OR
+   : Pipe
+   ;
 
-fragment Int: 'int';
+PLUS
+   : Plus
+   ;
 
-// -----------------------------------
-// Symbols
+QM
+   : Question
+   ;
 
-fragment Esc        : '\\';
-fragment Colon      : ':';
-fragment DColon     : '::';
-fragment SQuote     : '\'';
-fragment DQuote     : '"';
-fragment LParen     : '(';
-fragment RParen     : ')';
-fragment LBrace     : '{';
-fragment RBrace     : '}';
-fragment LBrack     : '[';
-fragment RBrack     : ']';
-fragment RArrow     : '->';
-fragment Lt         : '<';
-fragment Gt         : '>';
-fragment Equal      : '=';
-fragment Question   : '?';
-fragment Star       : '*';
-fragment Plus       : '+';
-fragment PlusAssign : '+=';
-fragment Underscore : '_';
-fragment Pipe       : '|';
-fragment Dollar     : '$';
-fragment Comma      : ',';
-fragment Semi       : ';';
-fragment Dot        : '.';
-fragment Range      : '..';
-fragment At         : '@';
-fragment Pound      : '#';
-fragment Tilde      : '~';
+RANGE
+   : Range
+   ;
 
-// ======================================================
-// Lexer modes
-// -------------------------
-// Arguments
+RBRACE
+   : RBrace
+   ;
 
+RBRACK
+   : RBrack
+   ;
+
+REWRITE
+   : RArrow
+   ;
+
+ROOT
+   : '^'
+   ;
+
+RPAREN
+   : RParen
+   ;
+
+SEMI
+   : Semi
+   ;
+
+SEMPREDOP
+   : '=>'
+   ;
+
+STAR
+   : Star
+   ;
+
+TREE_BEGIN
+   : '^('
+   ;
+
+DOLLAR
+   : Dollar
+   ;
+
+PEQ
+   : PlusAssign
+   ;
+
+NOT
+   : Tilde
+   ;
+
+WS
+   : (' ' | '\t' | '\r'? '\n')+ -> channel (OFF_CHANNEL)
+   ;
+
+TOKEN_REF
+   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
+
+RULE_REF
+   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
+   // ======================================================
+   
+   // Lexer fragments
+   
+   //
+   
+   // -----------------------------------
+   
+   // Whitespace & Comments
+   
+fragment Ws
+   : Hws
+   | Vws
+   ;
+
+fragment Hws
+   : [ \t]
+   ;
+
+fragment Vws
+   : [\r\n\f]
+   ;
+
+fragment BlockComment
+   : '/*' .*? ('*/' | EOF)
+   ;
+
+fragment DocComment
+   : '/**' .*? ('*/' | EOF)
+   ;
+
+fragment LineComment
+   : '//' ~ [\r\n]*
+   ;
+   // -----------------------------------
+   
+   // Escapes
+   
+   // Any kind of escaped character that we can embed within ANTLR literal strings.
+   
+fragment EscSeq
+   : Esc ([btnfr"'\\] | UnicodeEsc | OctEsc | . | EOF)
+   ;
+
+fragment EscAny
+   : Esc .
+   ;
+
+fragment UnicodeEsc
+   : 'u' (HexDigit (HexDigit (HexDigit HexDigit?)?)?)?
+   ;
+
+fragment OctEsc
+   : OctDigit (OctDigit OctDigit?)?
+   ;
+   // -----------------------------------
+   
+   // Numerals
+   
+fragment DecimalNumeral
+   : '0'
+   | [1-9] DecDigit*
+   ;
+   // -----------------------------------
+   
+   // Digits
+   
+fragment HexDigit
+   : [0-9a-fA-F]
+   ;
+
+fragment DecDigit
+   : [0-9]
+   ;
+
+fragment OctDigit
+   : [0-7]
+   ;
+   // -----------------------------------
+   
+   // Literals
+   
+fragment BoolLiteral
+   : 'true'
+   | 'false'
+   ;
+
+fragment CharLiteral
+   : SQuote (EscSeq | ~ ['\r\n\\]) SQuote
+   ;
+
+fragment SQuoteLiteral
+   : SQuote (EscSeq | ~ ['\r\n\\])* SQuote
+   ;
+
+fragment DQuoteLiteral
+   : DQuote (EscSeq | ~ ["\r\n\\])* DQuote
+   ;
+
+fragment USQuoteLiteral
+   : SQuote (EscSeq | ~ ['\r\n\\])*
+   ;
+   // -----------------------------------
+   
+   // Character ranges
+   
+fragment NameChar
+   : NameStartChar
+   | '0' .. '9'
+   | Underscore
+   | '\u00B7'
+   | '\u0300' .. '\u036F'
+   | '\u203F' .. '\u2040'
+   ;
+
+fragment NameStartChar
+   : 'A' .. 'Z'
+   | 'a' .. 'z'
+   | '\u00C0' .. '\u00D6'
+   | '\u00D8' .. '\u00F6'
+   | '\u00F8' .. '\u02FF'
+   | '\u0370' .. '\u037D'
+   | '\u037F' .. '\u1FFF'
+   | '\u200C' .. '\u200D'
+   | '\u2070' .. '\u218F'
+   | '\u2C00' .. '\u2FEF'
+   | '\u3001' .. '\uD7FF'
+   | '\uF900' .. '\uFDCF'
+   | '\uFDF0' .. '\uFFFD'
+   ;
+   // ignores | ['\u10000-'\uEFFFF] ;
+   
+   // -----------------------------------
+   
+   // Types
+   
+fragment Int
+   : 'int'
+   ;
+   // -----------------------------------
+   
+   // Symbols
+   
+fragment Esc
+   : '\\'
+   ;
+
+fragment Colon
+   : ':'
+   ;
+
+fragment DColon
+   : '::'
+   ;
+
+fragment SQuote
+   : '\''
+   ;
+
+fragment DQuote
+   : '"'
+   ;
+
+fragment LParen
+   : '('
+   ;
+
+fragment RParen
+   : ')'
+   ;
+
+fragment LBrace
+   : '{'
+   ;
+
+fragment RBrace
+   : '}'
+   ;
+
+fragment LBrack
+   : '['
+   ;
+
+fragment RBrack
+   : ']'
+   ;
+
+fragment RArrow
+   : '->'
+   ;
+
+fragment Lt
+   : '<'
+   ;
+
+fragment Gt
+   : '>'
+   ;
+
+fragment Equal
+   : '='
+   ;
+
+fragment Question
+   : '?'
+   ;
+
+fragment Star
+   : '*'
+   ;
+
+fragment Plus
+   : '+'
+   ;
+
+fragment PlusAssign
+   : '+='
+   ;
+
+fragment Underscore
+   : '_'
+   ;
+
+fragment Pipe
+   : '|'
+   ;
+
+fragment Dollar
+   : '$'
+   ;
+
+fragment Comma
+   : ','
+   ;
+
+fragment Semi
+   : ';'
+   ;
+
+fragment Dot
+   : '.'
+   ;
+
+fragment Range
+   : '..'
+   ;
+
+fragment At
+   : '@'
+   ;
+
+fragment Pound
+   : '#'
+   ;
+
+fragment Tilde
+   : '~'
+   ;
+   // ======================================================
+   
+   // Lexer modes
+   
+   // -------------------------
+   
+   // Arguments
+   
 mode Argument;
 // E.g., [int x, List<String> a[]]
-NESTED_ARGUMENT: LBrack -> type (ARGUMENT_CONTENT), pushMode (Argument);
 
-ARGUMENT_ESCAPE: EscAny -> type (ARGUMENT_CONTENT);
+NESTED_ARGUMENT
+   : LBrack -> type (ARGUMENT_CONTENT) , pushMode (Argument)
+   ;
 
-ARGUMENT_STRING_LITERAL: DQuoteLiteral -> type (ARGUMENT_CONTENT);
+ARGUMENT_ESCAPE
+   : EscAny -> type (ARGUMENT_CONTENT)
+   ;
 
-ARGUMENT_CHAR_LITERAL: SQuoteLiteral -> type (ARGUMENT_CONTENT);
+ARGUMENT_STRING_LITERAL
+   : DQuoteLiteral -> type (ARGUMENT_CONTENT)
+   ;
 
-END_ARGUMENT: RBrack { this.handleEndArgument(); };
-// added this to return non-EOF token type here. EOF does something weird
+ARGUMENT_CHAR_LITERAL
+   : SQuoteLiteral -> type (ARGUMENT_CONTENT)
+   ;
 
-UNTERMINATED_ARGUMENT: EOF -> popMode;
+END_ARGUMENT
+   : RBrack
+   { this.handleEndArgument(); }
+   ;
+   // added this to return non-EOF token type here. EOF does something weird
+   
+UNTERMINATED_ARGUMENT
+   : EOF -> popMode
+   ;
 
-ARGUMENT_CONTENT: .;
-
-// -------------------------
-// Actions
-//
-// Many language targets use {} as block delimiters and so we
-// must recursively match {} delimited blocks to balance the
-// braces. Additionally, we must make some assumptions about
-// literal string representation in the target language. We assume
-// that they are delimited by ' or " and so consume these
-// in their own alts so as not to inadvertantly match {}.
-
+ARGUMENT_CONTENT
+   : .
+   ;
+   // -------------------------
+   
+   // Actions
+   
+   //
+   
+   // Many language targets use {} as block delimiters and so we
+   
+   // must recursively match {} delimited blocks to balance the
+   
+   // braces. Additionally, we must make some assumptions about
+   
+   // literal string representation in the target language. We assume
+   
+   // that they are delimited by ' or " and so consume these
+   
+   // in their own alts so as not to inadvertantly match {}.
+   
 mode Actionx;
-NESTED_ACTION: LBrace -> type (ACTION_CONTENT), pushMode (Actionx);
+NESTED_ACTION
+   : LBrace -> type (ACTION_CONTENT) , pushMode (Actionx)
+   ;
 
-ACTION_ESCAPE: EscAny -> type (ACTION_CONTENT);
+ACTION_ESCAPE
+   : EscAny -> type (ACTION_CONTENT)
+   ;
 
-ACTION_STRING_LITERAL: DQuoteLiteral -> type (ACTION_CONTENT);
+ACTION_STRING_LITERAL
+   : DQuoteLiteral -> type (ACTION_CONTENT)
+   ;
 
-ACTION_CHAR_LITERAL: SQuoteLiteral -> type (ACTION_CONTENT);
+ACTION_CHAR_LITERAL
+   : SQuoteLiteral -> type (ACTION_CONTENT)
+   ;
 
-ACTION_DOC_COMMENT: DocComment -> type (ACTION_CONTENT);
+ACTION_DOC_COMMENT
+   : DocComment -> type (ACTION_CONTENT)
+   ;
 
-ACTION_BLOCK_COMMENT: BlockComment -> type (ACTION_CONTENT);
+ACTION_BLOCK_COMMENT
+   : BlockComment -> type (ACTION_CONTENT)
+   ;
 
-ACTION_LINE_COMMENT: LineComment -> type (ACTION_CONTENT);
+ACTION_LINE_COMMENT
+   : LineComment -> type (ACTION_CONTENT)
+   ;
 
-END_ACTION: RBrace { this.handleEndAction(); };
+END_ACTION
+   : RBrace
+   { this.handleEndAction(); }
+   ;
 
-UNTERMINATED_ACTION: EOF -> popMode;
+UNTERMINATED_ACTION
+   : EOF -> popMode
+   ;
 
-ACTION_CONTENT: .;
-
-// -------------------------
-
+ACTION_CONTENT
+   : .
+   ;
+   // -------------------------
+   
 mode Options;
-OPT_DOC_COMMENT: DocComment -> type (DOC_COMMENT), channel (OFF_CHANNEL);
+OPT_DOC_COMMENT
+   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-OPT_BLOCK_COMMENT: BlockComment -> type (ML_COMMENT), channel (OFF_CHANNEL);
+OPT_BLOCK_COMMENT
+   : BlockComment -> type (ML_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-OPT_LINE_COMMENT: LineComment -> type (SL_COMMENT), channel (OFF_CHANNEL);
+OPT_LINE_COMMENT
+   : LineComment -> type (SL_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-OPT_LBRACE: LBrace { this.handleOptionsLBrace(); };
+OPT_LBRACE
+   : LBrace
+   { this.handleOptionsLBrace(); }
+   ;
 
-OPT_RBRACE: RBrace -> type (RBRACE), popMode;
+OPT_RBRACE
+   : RBrace -> type (RBRACE) , popMode
+   ;
 
-OPT_ID: Id -> type (ID);
+OPT_ID
+   : Id -> type (ID)
+   ;
 
-OPT_DOT: Dot -> type (DOT);
+OPT_DOT
+   : Dot -> type (DOT)
+   ;
 
-OPT_ASSIGN: Equal -> type (EQUAL);
+OPT_ASSIGN
+   : Equal -> type (EQUAL)
+   ;
 
-OPT_STRING_LITERAL: SQuoteLiteral -> type (CHAR_LITERAL);
+OPT_STRING_LITERAL
+   : SQuoteLiteral -> type (CHAR_LITERAL)
+   ;
 
-OPT_STRING_LITERAL2: DQuoteLiteral -> type (STRING_LITERAL);
+OPT_STRING_LITERAL2
+   : DQuoteLiteral -> type (STRING_LITERAL)
+   ;
 
-OPT_RANGE: Range -> type(RANGE);
+OPT_RANGE
+   : Range -> type (RANGE)
+   ;
 
-OPT_INT: DecimalNumeral -> type (INT);
+OPT_INT
+   : DecimalNumeral -> type (INT)
+   ;
 
-OPT_STAR: Star -> type (STAR);
+OPT_STAR
+   : Star -> type (STAR)
+   ;
 
-OPT_SEMI: Semi -> type (SEMI);
+OPT_SEMI
+   : Semi -> type (SEMI)
+   ;
 
-OPT_WS: Ws+ -> type (WS), channel (OFF_CHANNEL);
-
-// -------------------------
-
+OPT_WS
+   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
+   ;
+   // -------------------------
+   
 mode Tokens;
-TOK_DOC_COMMENT: DocComment -> type (DOC_COMMENT), channel (OFF_CHANNEL);
+TOK_DOC_COMMENT
+   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-TOK_BLOCK_COMMENT: BlockComment -> type (ML_COMMENT), channel (OFF_CHANNEL);
+TOK_BLOCK_COMMENT
+   : BlockComment -> type (ML_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-TOK_LINE_COMMENT: LineComment -> type (SL_COMMENT), channel (OFF_CHANNEL);
+TOK_LINE_COMMENT
+   : LineComment -> type (SL_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-TOK_LBRACE: LBrace -> type (LBRACE);
+TOK_LBRACE
+   : LBrace -> type (LBRACE)
+   ;
 
-TOK_RBRACE: RBrace -> type (RBRACE), popMode;
+TOK_RBRACE
+   : RBrace -> type (RBRACE) , popMode
+   ;
 
-TOK_ID: Id -> type (TOKEN_REF);
+TOK_ID
+   : Id -> type (TOKEN_REF)
+   ;
 
-TOK_EQ: Equal -> type (EQUAL);
+TOK_EQ
+   : Equal -> type (EQUAL)
+   ;
 
-TOK_CL: '\'' LITERAL_CHAR '\'' -> type(CHAR_LITERAL);
+TOK_CL
+   : '\'' LITERAL_CHAR '\'' -> type (CHAR_LITERAL)
+   ;
 
-TOK_SL: '"' LIT_STR* '"' -> type(STRING_LITERAL);
+TOK_SL
+   : '"' LIT_STR* '"' -> type (STRING_LITERAL)
+   ;
 
-TOK_SEMI: Semi -> type (SEMI);
+TOK_SEMI
+   : Semi -> type (SEMI)
+   ;
 
-TOK_RANGE: Range -> type(RANGE);
+TOK_RANGE
+   : Range -> type (RANGE)
+   ;
 
-TOK_WS: Ws+ -> type (WS), channel (OFF_CHANNEL);
-
-// -------------------------
-
+TOK_WS
+   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
+   ;
+   // -------------------------
+   
 mode LexerCharSet;
-LEXER_CHAR_SET_BODY: (~ [\]\\] | EscAny)+ -> more;
+LEXER_CHAR_SET_BODY
+   : (~ [\]\\] | EscAny)+ -> more
+   ;
 
-LEXER_CHAR_SET: RBrack -> popMode;
+LEXER_CHAR_SET
+   : RBrack -> popMode
+   ;
 
-UNTERMINATED_CHAR_SET: EOF -> popMode;
+UNTERMINATED_CHAR_SET
+   : EOF -> popMode
+   ;
+   // ------------------------------------------------------------------------------
+   
+   // Grammar specific Keywords, Punctuation, etc.
+   
+fragment Id
+   : NameStartChar NameChar*
+   ;
 
-// ------------------------------------------------------------------------------
-// Grammar specific Keywords, Punctuation, etc.
-
-fragment Id: NameStartChar NameChar*;
