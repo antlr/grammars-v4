@@ -51,7 +51,7 @@ operation
     | operation OR operation
     | expression LIKE value
     | expression IN LPAREN (expression (COMMA expression)*)? RPAREN
-    | NOT expression
+    | NOT operation
     | expression (OUTPUT | OUTPUTNEW) id
     | expression expression OUTPUT id COMMA id
     | expression expression expression (OUTPUT | OUTPUTNEW) id COMMA id COMMA id
