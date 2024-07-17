@@ -1,0 +1,1 @@
+index=web sourcetype=access_combined | rex field=_raw "user=(?<user>\w+)" | table _time user status

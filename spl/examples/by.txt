@@ -1,0 +1,1 @@
+index=web sourcetype=test | timechart count by status

@@ -1,0 +1,1 @@
+index=web productID=*.html [ search index=users | fields user ]
