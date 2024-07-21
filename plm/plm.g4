@@ -73,7 +73,7 @@ factoredelement
    ;
 
 variableelement
-   : variablenamespecifier arrayspecifier? (variabletype | variableattributes?)
+   : variablenamespecifier arrayspecifier? (variabletype | variableattributes)
    ;
 
 variablenamespecifier
@@ -133,7 +133,7 @@ literalelement
    ;
 
 factoredvariableelement
-   : '(' variablenamespecifier (',' variablenamespecifier)* ')' explicitdimension? variabletype variableattributes?
+   : '(' variablenamespecifier (',' variablenamespecifier)* ')' explicitdimension? variabletype variableattributes
    ;
 
 factoredlabelelement
@@ -545,8 +545,6 @@ BASICTYPE
 IDENTIFIER
    : (LETTER | '_') (LETTER | DECIMALDIGIT | '$' | '_')*
    ;
-
-
 
 ARITHMETICOPERASTOR
    : '+'
