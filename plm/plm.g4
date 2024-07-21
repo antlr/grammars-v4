@@ -233,7 +233,7 @@ labeldefinition
    ;
 
 assignmentstatement
-   : leftpart '=' expression
+   : leftpart '=' expression ';'
    ;
 
 leftpart
