@@ -10,9 +10,14 @@
  * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar KotlinParser;
 
-options { tokenVocab = KotlinLexer; }
+options {
+    tokenVocab = KotlinLexer;
+}
 
 kotlinFile
     : shebangLine? NL* fileAnnotation* packageHeader importList topLevelObject* EOF
@@ -47,11 +52,12 @@ topLevelObject
     ;
 
 classDeclaration
-    : modifiers? ('class' | 'interface') NL* simpleIdentifier
-    (NL* typeParameters)? (NL* primaryConstructor)?
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* typeConstraints)?
-    (NL* classBody | NL* enumClassBody)?
+    : modifiers? ('class' | 'interface') NL* simpleIdentifier (NL* typeParameters)? (
+        NL* primaryConstructor
+    )? (NL* ':' NL* delegationSpecifiers)? (NL* typeConstraints)? (
+        NL* classBody
+        | NL* enumClassBody
+    )?
     ;
 
 primaryConstructor
@@ -59,11 +65,11 @@ primaryConstructor
     ;
 
 classParameters
-    : '(' NL* (classParameter (NL* ',' NL* classParameter)*)? NL* ')'
+    : '(' NL* (classParameter (NL* ',' NL* classParameter)*)? NL* ','? ')'
     ;
 
 classParameter
-    : modifiers? ('val' | 'var')? NL* simpleIdentifier ':' NL* type (NL* '=' NL* expression)?
+    : modifiers? ('val' | 'var')? NL* simpleIdentifier ':' NL* type_ (NL* '=' NL* expression)?
     ;
 
 delegationSpecifiers
@@ -130,16 +136,13 @@ enumEntry
     ;
 
 functionDeclaration
-    : modifiers?
-    'fun' (NL* typeParameters)? (NL* receiverType NL* '.')? NL* simpleIdentifier
-    NL* functionValueParameters
-    (NL* ':' NL* type)?
-    (NL* typeConstraints)?
-    (NL* functionBody)?
+    : modifiers? 'fun' (NL* typeParameters)? (NL* receiverType NL* '.')? NL* simpleIdentifier NL* functionValueParameters (
+        NL* ':' NL* type_
+    )? (NL* typeConstraints)? (NL* functionBody)?
     ;
 
 functionValueParameters
-    : '(' NL* (functionValueParameter (NL* ',' NL* functionValueParameter)*)? NL* ')'
+    : '(' NL* (functionValueParameter (NL* ',' NL* functionValueParameter)*)? NL* ','? ')'
     ;
 
 functionValueParameter
@@ -147,11 +150,11 @@ functionValueParameter
     ;
 
 parameter
-    : simpleIdentifier NL* ':' NL* type
+    : simpleIdentifier NL* ':' NL* type_
     ;
 
 setterParameter
-    : simpleIdentifier NL* (':' NL* type)?
+    : simpleIdentifier NL* (':' NL* type_)?
     ;
 
 functionBody
@@ -160,27 +163,22 @@ functionBody
     ;
 
 objectDeclaration
-    : modifiers? 'object'
-    NL* simpleIdentifier
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* classBody)?
+    : modifiers? 'object' NL* simpleIdentifier (NL* ':' NL* delegationSpecifiers)? (NL* classBody)?
     ;
 
 companionObject
-    : modifiers? 'companion' NL* 'object'
-    (NL* simpleIdentifier)?
-    (NL* ':' NL* delegationSpecifiers)?
-    (NL* classBody)?
+    : modifiers? 'companion' NL* 'object' (NL* simpleIdentifier)? (
+        NL* ':' NL* delegationSpecifiers
+    )? (NL* classBody)?
     ;
 
 propertyDeclaration
-    : modifiers? ('val' | 'var')
-    (NL* typeParameters)?
-    (NL* receiverType NL* '.')?
-    (NL* (multiVariableDeclaration | variableDeclaration))
-    (NL* typeConstraints)?
-    (NL* ('=' NL* expression | propertyDelegate))?
-    (NL+ ';')? NL* (getter? (NL* semi? setter)? | setter? (NL* semi? getter)?)
+    : modifiers? ('val' | 'var') (NL* typeParameters)? (NL* receiverType NL* '.')? (
+        NL* (multiVariableDeclaration | variableDeclaration)
+    ) (NL* typeConstraints)? (NL* ('=' NL* expression | propertyDelegate))? (NL+ ';')? NL* (
+        getter? (NL* semi? setter)?
+        | setter? (NL* semi? getter)?
+    )
     /*
         XXX: actually, it's not that simple. You can put semi only on the same line as getter, but any other semicolons
         between property and getter are forbidden
@@ -193,7 +191,7 @@ multiVariableDeclaration
     ;
 
 variableDeclaration
-    : annotation* NL* simpleIdentifier (NL* ':' NL* type)?
+    : annotation* NL* simpleIdentifier (NL* ':' NL* type_)?
     ;
 
 propertyDelegate
@@ -202,24 +200,26 @@ propertyDelegate
 
 getter
     : modifiers? 'get'
-    | modifiers? 'get' NL* '(' NL* ')' (NL* ':' NL* type)? NL* functionBody
+    | modifiers? 'get' NL* '(' NL* ')' (NL* ':' NL* type_)? NL* functionBody
     ;
 
 setter
     : modifiers? 'set'
-    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (NL* ':' NL* type)? NL* functionBody
+    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (
+        NL* ':' NL* type_
+    )? NL* functionBody
     ;
 
 typeAlias
-    : modifiers? 'typealias' NL* simpleIdentifier (NL* typeParameters)? NL* '=' NL* type
+    : modifiers? 'typealias' NL* simpleIdentifier (NL* typeParameters)? NL* '=' NL* type_
     ;
 
 typeParameters
-    : '<' NL* typeParameter (NL* ',' NL* typeParameter)* NL* '>'
+    : '<' NL* typeParameter (NL* ',' NL* typeParameter)* NL* ','? '>'
     ;
 
 typeParameter
-    : typeParameterModifiers? NL* simpleIdentifier (NL* ':' NL* type)?
+    : typeParameterModifiers? NL* simpleIdentifier (NL* ':' NL* type_)?
     ;
 
 typeParameterModifiers
@@ -232,12 +232,8 @@ typeParameterModifier
     | annotation
     ;
 
-type
-    : typeModifiers?
-    ( parenthesizedType
-    | nullableType
-    | typeReference
-    | functionType)
+type_
+    : typeModifiers? (parenthesizedType | nullableType | typeReference | functionType)
     ;
 
 typeModifiers
@@ -245,11 +241,12 @@ typeModifiers
     ;
 
 typeModifier
-    : annotation | 'suspend' NL*
+    : annotation
+    | 'suspend' NL*
     ;
 
 parenthesizedType
-    : '(' NL* type NL* ')'
+    : '(' NL* type_ NL* ')'
     ;
 
 nullableType
@@ -262,14 +259,11 @@ typeReference
     ;
 
 functionType
-    : (receiverType NL* '.' NL*)? functionTypeParameters NL* '->' NL* type
+    : (receiverType NL* '.' NL*)? functionTypeParameters NL* '->' NL* type_
     ;
 
 receiverType
-    : typeModifiers?
-    ( parenthesizedType
-    | nullableType
-    | typeReference)
+    : typeModifiers? (parenthesizedType | nullableType | typeReference)
     ;
 
 userType
@@ -286,7 +280,7 @@ simpleUserType
     ;
 
 functionTypeParameters
-    : '(' NL* (parameter | type)? (NL* ',' NL* (parameter | type))* NL* ')'
+    : '(' NL* (parameter | type_)? (NL* ',' NL* (parameter | type_))* NL* ')'
     ;
 
 typeConstraints
@@ -294,7 +288,7 @@ typeConstraints
     ;
 
 typeConstraint
-    : annotation* simpleIdentifier NL* ':' NL* type
+    : annotation* simpleIdentifier NL* ':' NL* type_
     ;
 
 block
@@ -302,15 +296,11 @@ block
     ;
 
 statements
-    : (statement (semis statement)* semis?)?
+    : (statement ((';' | NL)+ statement)* semis?)?
     ;
 
 statement
-    : (label | annotation)*
-    ( declaration
-    | assignment
-    | loopStatement
-    | expression)
+    : (label | annotation)* (declaration | assignment | loopStatement | expression)
     ;
 
 declaration
@@ -347,7 +337,7 @@ comparison
     ;
 
 infixOperation
-    : elvisExpression (/* NO NL! */ inOperator NL* elvisExpression | isOperator NL* type)*
+    : elvisExpression (/* NO NL! */ inOperator NL* elvisExpression | isOperator NL* type_)*
     ;
 
 elvisExpression
@@ -371,7 +361,7 @@ multiplicativeExpression
     ;
 
 asExpression
-    : prefixUnaryExpression (NL* asOperator NL* type)?
+    : prefixUnaryExpression (NL* asOperator NL* type_)?
     ;
 
 prefixUnaryExpression
@@ -431,15 +421,16 @@ annotatedLambda
 
 valueArguments
     : '(' NL* ')'
-    | '(' NL* valueArgument (NL* ',' NL* valueArgument)* NL* ')'
+    | '(' NL* valueArgument (NL* ',' NL* valueArgument)* NL* ','? ')'
     ;
 
 typeArguments
-    : '<' NL* typeProjection (NL* ',' NL* typeProjection)* NL* '>'
+    : '<' NL* typeProjection (NL* ',' NL* typeProjection)* NL* ','? '>'
     ;
 
 typeProjection
-    : typeProjectionModifiers? type | '*'
+    : typeProjectionModifiers? type_
+    | '*'
     ;
 
 typeProjectionModifiers
@@ -477,7 +468,7 @@ parenthesizedExpression
     ;
 
 collectionLiteral
-    : '[' NL* expression (NL* ',' NL* expression)* NL* ']'
+    : '[' NL* expression (NL* ',' NL* expression)* NL* ','? ']'
     | '[' NL* ']'
     ;
 
@@ -531,21 +522,18 @@ lambdaLiteral // anonymous functions?
     ;
 
 lambdaParameters
-    : lambdaParameter (NL* COMMA NL* lambdaParameter)*
+    : lambdaParameter (NL* COMMA NL* lambdaParameter)* COMMA?
     ;
 
 lambdaParameter
     : variableDeclaration
-    | multiVariableDeclaration (NL* COLON NL* type)?
+    | multiVariableDeclaration (NL* COLON NL* type_)?
     ;
 
 anonymousFunction
-    : 'fun'
-    (NL* type NL* '.')?
-    NL* functionValueParameters
-    (NL* ':' NL* type)?
-    (NL* typeConstraints)?
-    (NL* functionBody)?
+    : 'fun' (NL* type_ NL* '.')? NL* functionValueParameters (NL* ':' NL* type_)? (
+        NL* typeConstraints
+    )? (NL* functionBody)?
     ;
 
 functionLiteral
@@ -564,7 +552,7 @@ thisExpression
     ;
 
 superExpression
-    : 'super' ('<' NL* type NL* '>')? ('@' simpleIdentifier)?
+    : 'super' ('<' NL* type_ NL* '>')? ('@' simpleIdentifier)?
     | SUPER_AT
     ;
 
@@ -574,7 +562,9 @@ controlStructureBody
     ;
 
 ifExpression
-    : 'if' NL* '(' NL* expression NL* ')' NL* controlStructureBody (';'? NL* 'else' NL* controlStructureBody)?
+    : 'if' NL* '(' NL* expression NL* ')' NL* controlStructureBody (
+        ';'? NL* 'else' NL* controlStructureBody
+    )?
     | 'if' NL* '(' NL* expression NL* ')' NL* (';' NL*)? 'else' NL* controlStructureBody
     ;
 
@@ -598,7 +588,7 @@ rangeTest
     ;
 
 typeTest
-    : isOperator NL* type
+    : isOperator NL* type_
     ;
 
 tryExpression
@@ -635,8 +625,10 @@ doWhileStatement
 jumpExpression
     : 'throw' NL* expression
     | ('return' | RETURN_AT) expression?
-    | 'continue' | CONTINUE_AT
-    | 'break' | BREAK_AT
+    | 'continue'
+    | CONTINUE_AT
+    | 'break'
+    | BREAK_AT
     ;
 
 callableReference // ?:: here is not an actual operator, it's just a lexer hack to avoid (?: + :) vs (? + ::) ambiguity
@@ -666,15 +658,18 @@ comparisonOperator
     ;
 
 inOperator
-    : 'in' | NOT_IN
+    : 'in'
+    | NOT_IN
     ;
 
 isOperator
-    : 'is' | NOT_IS
+    : 'is'
+    | NOT_IS
     ;
 
 additiveOperator
-    : '+' | '-'
+    : '+'
+    | '-'
     ;
 
 multiplicativeOperator
@@ -703,7 +698,9 @@ postfixUnaryOperator
     ;
 
 memberAccessOperator
-    : '.' | safeNav | '::'
+    : '.'
+    | safeNav
+    | '::'
     ;
 
 modifiers
@@ -711,14 +708,16 @@ modifiers
     ;
 
 modifier
-    : (classModifier
-    | memberModifier
-    | visibilityModifier
-    | functionModifier
-    | propertyModifier
-    | inheritanceModifier
-    | parameterModifier
-    | platformModifier) NL*
+    : (
+        classModifier
+        | memberModifier
+        | visibilityModifier
+        | functionModifier
+        | propertyModifier
+        | inheritanceModifier
+        | parameterModifier
+        | platformModifier
+    ) NL*
     ;
 
 classModifier
@@ -885,7 +884,9 @@ excl
 
 semi
     : (';' | NL) NL* // actually, it's WS or comment between ';', here it's handled in lexer (see ;; token)
-    | EOF;
+    | EOF
+    ;
+
 semis // writing this as "semi+" sends antlr into infinite loop or smth
     : (';' | NL)+
     | EOF

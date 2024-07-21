@@ -7,16 +7,22 @@
 # to native line endings on checkout.
 *.abnf text
 *.agc text
+*.alg text
+*.asm text
 *.asn text
 *.b text
 *.bas text
+*.bcpl text
 *.bnf text
 *.c text
+*.cc text
 *.cl text
 *.cpp text
 *.cs text
+*.csproj text
 *.css text
 *.csv text
+*.dart text
 *.dgs text
 *.dot text
 *.erl text
@@ -25,6 +31,8 @@
 *.ffn text
 *.fna text
 *.g text
+*.g2 text
+*.g3 text
 *.g4 text
 *.g42 text
 *.gff text
@@ -39,7 +47,9 @@
 *.java text
 *.js text
 *.json text
+json/examples/*.json text
 *.kt text
+*.lark text
 *.lua text
 *.m text
 *.map text
@@ -58,6 +68,7 @@
 *.py text
 *.rb text
 *.s text
+*.scala text
 *.sh text
 *.smt2 text
 *.sno text
@@ -78,7 +89,30 @@ access_log text
 
 # Declare files that will always have LF line endings on checkout.
 # Unicode input files end with *.txt, but should not be converted on Windows
-/unicode/graphemes/examples/*.txt eol=lf
+unicode/graphemes/examples/*.txt eol=lf
+# T-SQL tests with trees can fail with multiline strings
+sql/tsql/examples/*.sql eol=lf
+# Rexx places EOL on default channel, so the .tree's contain EOL.
+# Make sure EOL's are consistent regardless of OS.
+rexx/examples/* eol=lf
+# All grammars that contain parser rules for token NEWLINE must have
+# standard Unix endings.
+abb/examples/*.sys eol=lf
+asl/examples/* eol=lf
+css3/examples/*.css eol=lf
+gdscript/examples/*.gd eol=lf
+haskell/examples/*.hs eol=lf
+hypertalk/example-scripts/*.txt eol=lf
+hypertalk/example-scriptlets/*.txt eol=lf
+javadoc/examples/**/*.java eol=lf
+kuka/examples/*.txt eol=lf
+mckeeman-form/examples/*.txt eol=lf
+objc/examples/* eol=lf
+properties/examples/* eol=lf
+r/examples/*.txt eol=lf
+# vb6/examples/**/*.vb eol=lf
+vba/examples/*.bas eol=lf
+z/examples/*.utf8 eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
 # Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
@@ -89,5 +123,19 @@ access_log text
 *.pdf binary
 *.png binary
 
+# All input for parsers are to be ignored. Issue #2667
+**/examples/** linguist-vendored
+**/example-scripts/** linguist-vendored
+**/example-scriptlets/** linguist-vendored
+**/examples-sql-script/** linguist-vendored
+**/examples_todo/** linguist-vendored
+**/example/test_scripts/** linguist-vendored
+agc/notworking/** linguist-vendored
+asm/asmMASM/helloworld2.asm linguist-vendored
+basic/print.bas linguist-vendored
+erlang/src/** linguist-vendored
+solidity/test.sol linguist-vendored
+sql/postgresql/examples.errors/** linguist-vendored
+v/failed_examples/** linguist-vendored
 
-**/examples/* linguist-vendored
+lua/examples/* eol=lf

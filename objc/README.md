@@ -17,7 +17,7 @@ for different programming languages (including Objective-C).
 ## Two-step processing
 
 1. Preprocessor lexer (ObjectiveCPreprocessorLexer.g4).
-2. Preprocessor parser (ObjectiveCPreprocessorLexer.g4).
+2. Preprocessor parser (ObjectiveCPreprocessorParser.g4).
 3. Visitor class for removing preprocessor directives from code (ObjectiveCPreprocessor.java).
 4. Lexer (ObjectiveCLexer.g4).
 5. Parser (ObjectiveCParser.g4).

@@ -1,124 +1,205 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
- * A Protocol Buffers 3 grammar for ANTLR v4.
+ * A Protocol Buffers 3 grammar
  *
- * Derived and adapted from:
- * https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
+ * Original source: https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
+ * Original source is published under Apache License 2.0.
  *
- * @author Marco Willemart
+ * Changes from the source above:
+ * - rewrite to antlr
+ * - extract some group to rule.
+ *
+ * @author anatawa12
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar Protobuf3;
 
-//
-// Proto file
-//
-
 proto
-    :   syntax (   importStatement
-               |   packageStatement
-               |   option
-               |   topLevelDef
-               |   emptyStatement
-               )*
-        EOF
+    : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
     ;
 
-//
 // Syntax
-//
 
 syntax
-    :   'syntax' '=' ('"proto3"' | '\'proto3\'' ) ';'
+    : SYNTAX EQ (PROTO3_LIT_SINGLE | PROTO3_LIT_DOBULE) SEMI
     ;
 
-//
 // Import Statement
-//
 
 importStatement
-    :   'import' ('weak' | 'public')? StrLit ';'
+    : IMPORT (WEAK | PUBLIC)? strLit SEMI
     ;
 
-//
 // Package
-//
 
 packageStatement
-    :   'package' fullIdent ';'
+    : PACKAGE fullIdent SEMI
     ;
 
-//
 // Option
-//
 
-option
-    :   'option' optionName '=' (constant | optionBody)  ';'
+optionStatement
+    : OPTION optionName EQ constant SEMI
     ;
 
 optionName
-    :   (Ident | '(' fullIdent ')' ) ('.' (Ident | reservedWord))*
+    : fullIdent
+    | LP fullIdent RP ( DOT fullIdent)?
     ;
 
-optionBody
-    : '{'
-        (optionBodyVariable)*
-      '}'
+// Normal Field
+fieldLabel
+    : OPTIONAL
+    | REPEATED
     ;
 
-optionBodyVariable
-    : optionName ':' constant
+field
+    : fieldLabel? type_ fieldName EQ fieldNumber (LB fieldOptions RB)? SEMI
     ;
 
-//
+fieldOptions
+    : fieldOption (COMMA fieldOption)*
+    ;
+
+fieldOption
+    : optionName EQ constant
+    ;
+
+fieldNumber
+    : intLit
+    ;
+
+// Oneof and oneof field
+
+oneof
+    : ONEOF oneofName LC (optionStatement | oneofField | emptyStatement_)* RC
+    ;
+
+oneofField
+    : type_ fieldName EQ fieldNumber (LB fieldOptions RB)? SEMI
+    ;
+
+// Map field
+
+mapField
+    : MAP LT keyType COMMA type_ GT mapName EQ fieldNumber (LB fieldOptions RB)? SEMI
+    ;
+
+keyType
+    : INT32
+    | INT64
+    | UINT32
+    | UINT64
+    | SINT32
+    | SINT64
+    | FIXED32
+    | FIXED64
+    | SFIXED32
+    | SFIXED64
+    | BOOL
+    | STRING
+    ;
+
+// field types
+
+type_
+    : DOUBLE
+    | FLOAT
+    | INT32
+    | INT64
+    | UINT32
+    | UINT64
+    | SINT32
+    | SINT64
+    | FIXED32
+    | FIXED64
+    | SFIXED32
+    | SFIXED64
+    | BOOL
+    | STRING
+    | BYTES
+    | messageType
+    | enumType
+    ;
+
+// Reserved
+
+reserved
+    : RESERVED (ranges | reservedFieldNames) SEMI
+    ;
+
+ranges
+    : range_ (COMMA range_)*
+    ;
+
+range_
+    : intLit (TO ( intLit | MAX))?
+    ;
+
+reservedFieldNames
+    : strLit (COMMA strLit)*
+    ;
+
 // Top Level definitions
-//
 
 topLevelDef
-   :   message
-   |   enumDefinition
-   |   extend
-   |   service
-   ;
-
-// Message definition
-
-message
-    :   'message' messageName messageBody
+    : messageDef
+    | enumDef
+    | extendDef
+    | serviceDef
     ;
 
-messageBody
-    :   '{' (   field
-            |   enumDefinition
-            |   message
-            |   extend
-            |   option
-            |   oneof
-            |   mapField
-            |   reserved
-            |   emptyStatement
-            )*
-       '}'
-    ;
+// enum
 
-// Enum definition
-
-enumDefinition
-    :   'enum' enumName enumBody
+enumDef
+    : ENUM enumName enumBody
     ;
 
 enumBody
-    :   '{' (   option
-            |   enumField
-            |   emptyStatement
-            )*
-        '}'
+    : LC enumElement* RC
+    ;
+
+enumElement
+    : optionStatement
+    | enumField
+    | emptyStatement_
     ;
 
 enumField
-    :   Ident '=' '-'? IntLit ('[' enumValueOption (','  enumValueOption)* ']')? ';'
+    : ident EQ (MINUS)? intLit enumValueOptions? SEMI
+    ;
+
+enumValueOptions
+    : LB enumValueOption (COMMA enumValueOption)* RB
     ;
 
 enumValueOption
-    :   optionName '=' constant
+    : optionName EQ constant
+    ;
+
+// message
+
+messageDef
+    : MESSAGE messageName messageBody
+    ;
+
+messageBody
+    : LC messageElement* RC
+    ;
+
+messageElement
+    : field
+    | enumDef
+    | messageDef
+    | extendDef
+    | optionStatement
+    | oneof
+    | mapField
+    | reserved
+    | emptyStatement_
     ;
 
 // Extend definition
@@ -126,384 +207,456 @@ enumValueOption
 // NB: not defined in the spec but supported by protoc and covered by protobuf3 tests
 //     see e.g. php/tests/proto/test_import_descriptor_proto.proto
 //     of https://github.com/protocolbuffers/protobuf
-//
+// it also was discussed here: https://github.com/protocolbuffers/protobuf/issues/4610
 
-extend
-    :   'extend' messageType '{' ( field
-                                 | emptyStatement
-                                 ) '}'
+extendDef
+    : EXTEND messageType LC (field | emptyStatement_)* RC
     ;
 
-// Service definition
+// service
 
-service
-    :   'service' serviceName '{' (   option
-                                  |   rpc
-                                  // not defined in the protobuf specification
-                                  //|   stream
-                                  |   emptyStatement
-                                  )*
-        '}'
+serviceDef
+    : SERVICE serviceName LC serviceElement* RC
+    ;
+
+serviceElement
+    : optionStatement
+    | rpc
+    | emptyStatement_
     ;
 
 rpc
-    :   'rpc' rpcName '(' 'stream'? messageType ')'
-        'returns' '(' 'stream'? messageType ')' (('{' (option | emptyStatement)* '}') | ';')
+    : RPC rpcName LP (STREAM)? messageType RP RETURNS LP (STREAM)? messageType RP (
+        LC ( optionStatement | emptyStatement_)* RC
+        | SEMI
+    )
     ;
 
-//
-// Reserved
-//
+// lexical
 
-reserved
-    :   'reserved' (ranges | fieldNames) ';'
+constant
+    : fullIdent
+    | (MINUS | PLUS)? intLit
+    | ( MINUS | PLUS)? floatLit
+    | strLit
+    | boolLit
+    | blockLit
     ;
 
-ranges
-    :   rangeRule (',' rangeRule)*
+// not specified in specification but used in tests
+blockLit
+    : LC (ident COLON constant)* RC
     ;
 
-    rangeRule
-    :   IntLit
-    |   IntLit 'to' IntLit
+emptyStatement_
+    : SEMI
     ;
 
-fieldNames
-    :   StrLit (',' StrLit)*
-    ;
-
-//
-// Fields
-//
-
-typeRule
-    :   (   'double'
-        |   'float'
-        |   'int32'
-        |   'int64'
-        |   'uint32'
-        |   'uint64'
-        |   'sint32'
-        |   'sint64'
-        |   'fixed32'
-        |   'fixed64'
-        |   'sfixed32'
-        |   'sfixed64'
-        |   'bool'
-        |   'string'
-        |   'bytes'
-        )
-    |   messageOrEnumType
-    ;
-
-fieldNumber
-    : IntLit
-    ;
-
-// Normal field
-
-field
-    :   'repeated'? typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
-    ;
-
-fieldOptions
-    :   fieldOption (','  fieldOption)*
-    ;
-
-fieldOption
-    :   optionName '=' constant
-    ;
-
-// Oneof and oneof field
-
-oneof
-    :   'oneof' oneofName '{' (oneofField | emptyStatement)* '}'
-    ;
-
-oneofField
-    :   typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
-    ;
-
-// Map field
-
-mapField
-    :   'map' '<' keyType ',' typeRule '>' mapName '=' fieldNumber ('[' fieldOptions ']')? ';'
-    ;
-
-keyType
-    :   'int32'
-    |   'int64'
-    |   'uint32'
-    |   'uint64'
-    |   'sint32'
-    |   'sint64'
-    |   'fixed32'
-    |   'fixed64'
-    |   'sfixed32'
-    |   'sfixed64'
-    |   'bool'
-    |   'string'
-    ;
-
-reservedWord
-    :   EXTEND
-    |   MESSAGE
-    |   OPTION
-    |   PACKAGE
-    |   RPC
-    |   SERVICE
-    |   STREAM
-    |   STRING
-    |   SYNTAX
-    |   WEAK
-    ;
-//
 // Lexical elements
-//
 
-// Keywords
-
-BOOL            : 'bool';
-BYTES           : 'bytes';
-DOUBLE          : 'double';
-ENUM            : 'enum';
-EXTEND          : 'extend';
-FIXED32         : 'fixed32';
-FIXED64         : 'fixed64';
-FLOAT           : 'float';
-IMPORT          : 'import';
-INT32           : 'int32';
-INT64           : 'int64';
-MAP             : 'map';
-MESSAGE         : 'message';
-ONEOF           : 'oneof';
-OPTION          : 'option';
-PACKAGE         : 'package';
-PROTO3_DOUBLE   : '"proto3"';
-PROTO3_SINGLE   : '\'proto3\'';
-PUBLIC          : 'public';
-REPEATED        : 'repeated';
-RESERVED        : 'reserved';
-RETURNS         : 'returns';
-RPC             : 'rpc';
-SERVICE         : 'service';
-SFIXED32        : 'sfixed32';
-SFIXED64        : 'sfixed64';
-SINT32          : 'sint32';
-SINT64          : 'sint64';
-STREAM          : 'stream';
-STRING          : 'string';
-SYNTAX          : 'syntax';
-TO              : 'to';
-UINT32          : 'uint32';
-UINT64          : 'uint64';
-WEAK            : 'weak';
-
-// Letters and digits
-
-fragment
-Letter
-    :   [A-Za-z_]
-    ;
-
-fragment
-DecimalDigit
-    :   [0-9]
-    ;
-
-fragment
-OctalDigit
-    :   [0-7]
-    ;
-
-fragment
-HexDigit
-    :   [0-9A-Fa-f]
-    ;
-
-// Identifiers
-
-Ident
-    :   Letter (Letter | DecimalDigit)*
+ident
+    : IDENTIFIER
+    | keywords
     ;
 
 fullIdent
-    :   Ident ('.' Ident)*
+    : ident (DOT ident)*
     ;
 
 messageName
-    :   Ident
+    : ident
     ;
 
 enumName
-    :   Ident
-    ;
-
-messageOrEnumName
-    :   Ident
+    : ident
     ;
 
 fieldName
-    :   Ident
-    |   reservedWord
+    : ident
     ;
 
 oneofName
-    :   Ident
+    : ident
     ;
 
 mapName
-    :   Ident
+    : ident
     ;
 
 serviceName
-    :   Ident
+    : ident
     ;
 
 rpcName
-    :   Ident
+    : ident
     ;
 
 messageType
-    :   '.'? (Ident '.')* messageName
+    : (DOT)? (ident DOT)* messageName
     ;
 
-messageOrEnumType
-    :   '.'? ( (Ident | reservedWord) '.')* messageOrEnumName
+enumType
+    : (DOT)? (ident DOT)* enumName
     ;
 
-// Integer literals
-
-IntLit
-    :   DecimalLit
-    |   OctalLit
-    |   HexLit
+intLit
+    : INT_LIT
     ;
 
-fragment
-DecimalLit
-    :   [1-9] DecimalDigit*
+strLit
+    : STR_LIT
+    | PROTO3_LIT_SINGLE
+    | PROTO3_LIT_DOBULE
     ;
 
-fragment
-OctalLit
-    :   '0' OctalDigit*
+boolLit
+    : BOOL_LIT
     ;
 
-fragment
-HexLit
-    :   '0' ('x' | 'X') HexDigit+
+floatLit
+    : FLOAT_LIT
     ;
 
-// Floating-point literals
-
-FloatLit
-    :   (   Decimals '.' Decimals? Exponent?
-        |   Decimals Exponent
-        |   '.' Decimals Exponent?
-        )
-    |   'inf'
-    |   'nan'
+// keywords
+SYNTAX
+    : 'syntax'
     ;
 
-fragment
-Decimals
-    :   DecimalDigit+
+IMPORT
+    : 'import'
     ;
 
-fragment
-Exponent
-    :   ('e' | 'E') ('+' | '-')? Decimals
+WEAK
+    : 'weak'
     ;
 
-// Boolean
-
-BoolLit
-    :   'true'
-    |   'false'
+PUBLIC
+    : 'public'
     ;
 
-// String literals
-
-StrLit
-    :   '\'' CharValue* '\''
-    |   '"' CharValue* '"'
+PACKAGE
+    : 'package'
     ;
 
-fragment
-CharValue
-    :   HexEscape
-    |   OctEscape
-    |   CharEscape
-    |   ~[\u0000\n\\]
+OPTION
+    : 'option'
     ;
 
-fragment
-HexEscape
-    :   '\\' ('x' | 'X') HexDigit HexDigit
+OPTIONAL
+    : 'optional'
     ;
 
-fragment
-OctEscape
-    :   '\\' OctalDigit OctalDigit OctalDigit
+REPEATED
+    : 'repeated'
     ;
 
-fragment
-CharEscape
-    :   '\\' [abfnrtv\\'"]
+ONEOF
+    : 'oneof'
     ;
 
-Quote
-    :   '\''
-    |   '"'
+MAP
+    : 'map'
     ;
 
-// Empty Statement
-
-emptyStatement
-    :   ';'
+INT32
+    : 'int32'
     ;
 
-// Constant
-
-constant
-    :   fullIdent
-    |   ('-' | '+')? IntLit
-    |   ('-' | '+')? FloatLit
-    |   (   StrLit
-        |   BoolLit
-        )
+INT64
+    : 'int64'
     ;
 
-// Separators
-
-LPAREN          : '(';
-RPAREN          : ')';
-LBRACE          : '{';
-RBRACE          : '}';
-LBRACK          : '[';
-RBRACK          : ']';
-LCHEVR          : '<';
-RCHEVR          : '>';
-SEMI            : ';';
-COMMA           : ',';
-DOT             : '.';
-MINUS           : '-';
-PLUS            : '+';
-
-// Operators
-
-ASSIGN          : '=';
-
-// Whitespace and comments
-
-WS  :   [ \t\r\n\u000C]+ -> skip
+UINT32
+    : 'uint32'
     ;
 
-COMMENT
-    :   '/*' .*? '*/' -> skip
+UINT64
+    : 'uint64'
+    ;
+
+SINT32
+    : 'sint32'
+    ;
+
+SINT64
+    : 'sint64'
+    ;
+
+FIXED32
+    : 'fixed32'
+    ;
+
+FIXED64
+    : 'fixed64'
+    ;
+
+SFIXED32
+    : 'sfixed32'
+    ;
+
+SFIXED64
+    : 'sfixed64'
+    ;
+
+BOOL
+    : 'bool'
+    ;
+
+STRING
+    : 'string'
+    ;
+
+DOUBLE
+    : 'double'
+    ;
+
+FLOAT
+    : 'float'
+    ;
+
+BYTES
+    : 'bytes'
+    ;
+
+RESERVED
+    : 'reserved'
+    ;
+
+TO
+    : 'to'
+    ;
+
+MAX
+    : 'max'
+    ;
+
+ENUM
+    : 'enum'
+    ;
+
+MESSAGE
+    : 'message'
+    ;
+
+SERVICE
+    : 'service'
+    ;
+
+EXTEND
+    : 'extend'
+    ;
+
+RPC
+    : 'rpc'
+    ;
+
+STREAM
+    : 'stream'
+    ;
+
+RETURNS
+    : 'returns'
+    ;
+
+PROTO3_LIT_SINGLE
+    : '"proto3"'
+    ;
+
+PROTO3_LIT_DOBULE
+    : '\'proto3\''
+    ;
+
+// symbols
+
+SEMI
+    : ';'
+    ;
+
+EQ
+    : '='
+    ;
+
+LP
+    : '('
+    ;
+
+RP
+    : ')'
+    ;
+
+LB
+    : '['
+    ;
+
+RB
+    : ']'
+    ;
+
+LC
+    : '{'
+    ;
+
+RC
+    : '}'
+    ;
+
+LT
+    : '<'
+    ;
+
+GT
+    : '>'
+    ;
+
+DOT
+    : '.'
+    ;
+
+COMMA
+    : ','
+    ;
+
+COLON
+    : ':'
+    ;
+
+PLUS
+    : '+'
+    ;
+
+MINUS
+    : '-'
+    ;
+
+STR_LIT
+    : ('\'' ( CHAR_VALUE)*? '\'')
+    | ( '"' ( CHAR_VALUE)*? '"')
+    ;
+
+fragment CHAR_VALUE
+    : HEX_ESCAPE
+    | OCT_ESCAPE
+    | CHAR_ESCAPE
+    | ~[\u0000\n\\]
+    ;
+
+fragment HEX_ESCAPE
+    : '\\' ('x' | 'X') HEX_DIGIT HEX_DIGIT
+    ;
+
+fragment OCT_ESCAPE
+    : '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
+    ;
+
+fragment CHAR_ESCAPE
+    : '\\' ('a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\\' | '\'' | '"')
+    ;
+
+BOOL_LIT
+    : 'true'
+    | 'false'
+    ;
+
+FLOAT_LIT
+    : (DECIMALS DOT DECIMALS? EXPONENT? | DECIMALS EXPONENT | DOT DECIMALS EXPONENT?)
+    | 'inf'
+    | 'nan'
+    ;
+
+fragment EXPONENT
+    : ('e' | 'E') (PLUS | MINUS)? DECIMALS
+    ;
+
+fragment DECIMALS
+    : DECIMAL_DIGIT+
+    ;
+
+INT_LIT
+    : DECIMAL_LIT
+    | OCTAL_LIT
+    | HEX_LIT
+    ;
+
+fragment DECIMAL_LIT
+    : ([1-9]) DECIMAL_DIGIT*
+    ;
+
+fragment OCTAL_LIT
+    : '0' OCTAL_DIGIT*
+    ;
+
+fragment HEX_LIT
+    : '0' ('x' | 'X') HEX_DIGIT+
+    ;
+
+IDENTIFIER
+    : LETTER (LETTER | DECIMAL_DIGIT)*
+    ;
+
+fragment LETTER
+    : [A-Za-z_]
+    ;
+
+fragment DECIMAL_DIGIT
+    : [0-9]
+    ;
+
+fragment OCTAL_DIGIT
+    : [0-7]
+    ;
+
+fragment HEX_DIGIT
+    : [0-9A-Fa-f]
+    ;
+
+// comments
+WS
+    : [ \t\r\n\u000C]+ -> skip
     ;
 
 LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
+    : '//' ~[\r\n]* -> channel(HIDDEN)
+    ;
+
+COMMENT
+    : '/*' .*? '*/' -> channel(HIDDEN)
+    ;
+
+keywords
+    : SYNTAX
+    | IMPORT
+    | WEAK
+    | PUBLIC
+    | PACKAGE
+    | OPTION
+    | OPTIONAL
+    | REPEATED
+    | ONEOF
+    | MAP
+    | INT32
+    | INT64
+    | UINT32
+    | UINT64
+    | SINT32
+    | SINT64
+    | FIXED32
+    | FIXED64
+    | SFIXED32
+    | SFIXED64
+    | BOOL
+    | STRING
+    | DOUBLE
+    | FLOAT
+    | BYTES
+    | RESERVED
+    | TO
+    | MAX
+    | ENUM
+    | MESSAGE
+    | SERVICE
+    | EXTEND
+    | RPC
+    | STREAM
+    | RETURNS
+    | BOOL_LIT
     ;

@@ -2,10 +2,6 @@
 
 using namespace antlr4;
 
-JavaScriptLexerBase::JavaScriptLexerBase(CharStream *input) : Lexer(input)
-{
-}
-
 bool JavaScriptLexerBase::getStrictDefault()
 {
     return useStrictDefault;
@@ -14,7 +10,7 @@ bool JavaScriptLexerBase::getStrictDefault()
 bool JavaScriptLexerBase::IsStartOfFile(){
     // No token has been produced yet: at the start of the input,
     // no division is possible, so a regex literal _is_ possible.
-    return lastToken;
+    return !lastToken;
 }
 
 void JavaScriptLexerBase::setUseStrictDefault(bool value)
@@ -26,6 +22,11 @@ void JavaScriptLexerBase::setUseStrictDefault(bool value)
 bool JavaScriptLexerBase::IsStrictMode()
 {
     return useStrictCurrent;
+}
+
+bool JavaScriptLexerBase::IsInTemplateString()
+{
+    return !templateDepthStack.empty() && templateDepthStack.top() == currentDepth;
 }
 
 std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
@@ -42,6 +43,7 @@ std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
 
 void JavaScriptLexerBase::ProcessOpenBrace()
 {
+    currentDepth++;
     useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.top() ? true : useStrictDefault;
     scopeStrictModes.push(useStrictCurrent);
 }
@@ -54,11 +56,12 @@ void JavaScriptLexerBase::ProcessCloseBrace()
     } else {
         useStrictCurrent = useStrictDefault;
     }
+    currentDepth--;
 }
 
 void JavaScriptLexerBase::ProcessStringLiteral()
 {
-    if (lastToken || lastTokenType == JavaScriptLexer::OpenBrace)
+    if (!lastToken || lastTokenType == JavaScriptLexer::OpenBrace)
     {
         std::string text = getText();
         if (text == "\"use strict\"" || text == "'use strict'")
@@ -71,9 +74,19 @@ void JavaScriptLexerBase::ProcessStringLiteral()
     }
 }
 
+void JavaScriptLexerBase::ProcessTemplateOpenBrace() {
+    currentDepth++;
+    templateDepthStack.push(currentDepth);
+}
+
+void JavaScriptLexerBase::ProcessTemplateCloseBrace() {
+    templateDepthStack.pop();
+    currentDepth--;
+}
+
 bool JavaScriptLexerBase::IsRegexPossible()
 {
-    if (lastToken) {
+    if (!lastToken) {
         // No token has been produced yet: at the start of the input,
         // no division is possible, so a regex literal _is_ possible.
         return true;
@@ -98,4 +111,16 @@ bool JavaScriptLexerBase::IsRegexPossible()
             // In all other cases, a regex literal _is_ possible.
             return true;
     }
+}
+
+void JavaScriptLexerBase::reset()
+{
+    while(!scopeStrictModes.empty()) scopeStrictModes.pop();
+    lastToken = false;
+    lastTokenType = 0;
+    useStrictDefault = false;
+    useStrictCurrent = false;
+    currentDepth = 0;
+    while(!templateDepthStack.empty()) templateDepthStack.pop();
+    Lexer::reset();
 }

@@ -1,0 +1,4 @@
+SHOW TABLES;
+SHOW TABLES FROM a;
+SHOW TABLES FROM "awesome schema";
+SHOW TABLES IN a LIKE '%$_%' ESCAPE '$';

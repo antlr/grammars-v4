@@ -1,0 +1,12 @@
+module robdata(sysmodule)
+
+	PERS tooldata tMain:=[TRUE,[[0.0,0.0,700.0],[1.0,0.0,0.0,0.0]],[0.0,[5.0,0,95.5],[1,0,0,0],0.228,0.094,0]];
+	PERS wobjdata wobjMain:= [FALSE, TRUE, "", [[0, 0, 0],[1, 0, 0, 0]],[[0, 0, 0],[1, 0, 0, 0]]];
+	CONST speeddata v200:=[200,500,5000,1000];
+	
+	PROC ConfigOn()
+		ConfJ\On;
+		ConfL\On;
+	ENDPROC
+  
+endmodule

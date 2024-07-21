@@ -7,7 +7,6 @@
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<build>
 		<plugins>
@@ -17,7 +16,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>STParser.g4</grammars>
 					<includes>
 						<include>STGLexer.g4</include>
 						<include>STGParser.g4</include>
@@ -51,7 +49,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>template</entryPoint>
+					<entryPoint>template_</entryPoint>
 					<grammarName>ST</grammarName>
 					<packageName>org.antlr.parser.st4</packageName>
 					<exampleFiles>examples/</exampleFiles>

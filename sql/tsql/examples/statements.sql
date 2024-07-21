@@ -566,3 +566,16 @@ GO;
 -- Moving queue internal table to another filegroup
 ALTER QUEUE ExpenseQueue MOVE TO [NewFilegroup]
 GO;
+
+DECLARE @var AS dbo.tableType
+GO
+
+--Execute statement
+EXECUTE ( 'Operation', @var OUTPUT) AT linkedServerName
+GO
+
+exec('selectSELECT * FROM ' + @SCHEMA + '.' + @TABLE + ' where ID = ' + @ID)
+GO
+
+EXEC(@sql + @where)
+GO

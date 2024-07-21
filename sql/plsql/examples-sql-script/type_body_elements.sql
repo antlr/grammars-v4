@@ -28,3 +28,5 @@ is
 
 end;
 /
+create or replace TYPE CLNOBJREPORTCOLUMN force is table of varchar2(4000);
+/
