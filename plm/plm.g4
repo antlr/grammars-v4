@@ -243,7 +243,7 @@ leftpart
    ;
 
 callstatement
-   : 'CALL' simplevariable parameterlist? ';'
+   : 'CALL' simplevariable '(' parameterlist? ')' ';'
    ;
 
 parameterlist
