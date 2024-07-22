@@ -215,7 +215,6 @@ SQL_SMALL_RESULT              : 'SQL_SMALL_RESULT';
 SSL                           : 'SSL';
 STACKED                       : 'STACKED';
 STARTING                      : 'STARTING';
-STATEMENT                     : 'STATEMENT';
 STRAIGHT_JOIN                 : 'STRAIGHT_JOIN';
 TABLE                         : 'TABLE';
 TERMINATED                    : 'TERMINATED';
