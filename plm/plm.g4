@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar plm;
 
 compilation
-   : module
+   : module EOF
    ;
 
 module
@@ -49,7 +49,7 @@ declaration
    ;
 
 declarestatement
-   : 'DECLARE' declareelementlist ';'
+   : 'DECLARE'  declareelementlist  ';'
    ;
 
 declareelementlist
@@ -65,6 +65,7 @@ unfactoredelement
    : variableelement
    | literalelement
    | labelelement
+   | address
    ;
 
 factoredelement
@@ -79,6 +80,7 @@ variableelement
 variablenamespecifier
    : nonbasedname
    | basedname 'BASED' basespecifier
+   | address // 8080 only
    ;
 
 nonbasedname
@@ -527,6 +529,10 @@ multiplyingoperator
    | 'MOD'
    ;
 
+address
+   : DECIMALNUMBER
+   ;
+
 BASICTYPE
    : 'ADDRESS'
    | 'BYTE'
@@ -606,6 +612,10 @@ FRACTIONALPART
    : '.' DIGITSTRING
    ;
 
+DIGITSTRING
+   : DECIMALDIGIT (DECIMALDIGIT | '$')*
+   ;
+
 fragment OCTALDIGIT
    : BINARYDIGIT
    | '2'
@@ -616,9 +626,7 @@ fragment OCTALDIGIT
    | '7'
    ;
 
-DIGITSTRING
-   : DECIMALDIGIT (DECIMALDIGIT | '$')*
-   ;
+
 
 fragment DECIMALDIGIT
    : OCTALDIGIT
