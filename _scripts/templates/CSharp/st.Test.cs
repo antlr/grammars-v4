@@ -284,10 +284,10 @@ public class Program
         {
             if (tee)
             {
-                System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
+                System.IO.File.WriteAllText(input_name + ".tree", ToStringTree(tree, parser));
             } else
             {
-                System.Console.Error.WriteLine(tree.ToStringTree(parser));
+                System.Console.Error.WriteLine(ToStringTree(tree, parser));
             }
         }
         if (show_profile)
@@ -299,6 +299,83 @@ public class Program
             System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
         }
         if (tee) output.Close();
+    }
+
+    public static string ToStringTree(ITree tree, Parser recog)
+    {
+	    StringBuilder sb = new StringBuilder();
+	    string[] ruleNames = recog != null ? recog.RuleNames : null;
+	    IList\<string> ruleNamesList = ruleNames != null ? ruleNames.ToList() : null;
+	    ToStringTree(sb, tree, 0, ruleNamesList);
+	    return sb.ToString();
+    }
+
+    public static void ToStringTree(StringBuilder sb, ITree t, int indent, IList\<string> ruleNames)
+    {
+	    string s = Antlr4.Runtime.Misc.Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
+	    if (t.ChildCount == 0)
+	    {
+		    for (int i = 0; i \< indent; ++i) sb.Append(" ");
+		    sb.AppendLine(s);
+		    return;
+	    }
+	    s = Antlr4.Runtime.Misc.Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
+	    for (int i = 0; i \< indent; ++i) sb.Append(' ');
+	    sb.AppendLine(s);
+	    for (int i = 0; i \< t.ChildCount; i++)
+	    {
+		    ToStringTree(sb, t.GetChild(i), indent+1, ruleNames);
+	    }
+    }
+
+    public static string GetNodeText(ITree t, Parser recog)
+    {
+	    string[] ruleNames = recog != null ? recog.RuleNames : null;
+	    IList\<string> ruleNamesList = ruleNames != null ? ruleNames.ToList() : null;
+	    return GetNodeText(t, ruleNamesList);
+    }
+
+    public static string GetNodeText(ITree t, IList\<string> ruleNames)
+    {
+	    if (ruleNames != null)
+	    {
+		    if (t is RuleContext)
+		    {
+			    int ruleIndex = ((RuleContext)t).RuleIndex;
+			    string ruleName = ruleNames[ruleIndex];
+			    int altNumber = ((RuleContext)t).getAltNumber();
+			    if ( altNumber!= Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
+				    return ruleName+":"+altNumber;
+			    }
+			    return ruleName;
+		    }
+		    else
+		    {
+			    if (t is IErrorNode)
+			    {
+				    return t.ToString();
+			    }
+			    else
+			    {
+				    if (t is ITerminalNode)
+				    {
+					    IToken symbol = ((ITerminalNode)t).Symbol;
+					    if (symbol != null)
+					    {
+						    string s = symbol.Text;
+						    return s;
+					    }
+				    }
+			    }
+		    }
+	    }
+	    // no recog for rule names
+	    object payload = t.Payload;
+	    if (payload is IToken)
+	    {
+		    return ((IToken)payload).Text;
+	    }
+	    return t.Payload.ToString();
     }
 }
 
