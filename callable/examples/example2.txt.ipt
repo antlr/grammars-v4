@@ -1,0 +1,12 @@
+program
+ line
+  PRINT
+  (
+  f_inner
+   f_arg
+    line
+     INPUT
+     (
+     )
+  )
+ <EOF>

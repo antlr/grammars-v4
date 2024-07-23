@@ -1,0 +1,9 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     quoting
+      \
+      x
+ <EOF>

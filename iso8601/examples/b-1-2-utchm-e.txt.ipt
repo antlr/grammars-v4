@@ -1,0 +1,19 @@
+iso
+ time
+  localTime
+   localTimeExtended
+    specificMinuteLocalTimeExtended
+     hour
+      int2
+       2
+       3
+     :
+     minuteFraction
+      dec2
+       2
+       0
+  timeZone
+   timeZoneBasic
+    timeZoneUtc
+     Z
+ <EOF>

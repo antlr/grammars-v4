@@ -1,0 +1,27 @@
+inf
+ section
+  sectionheader
+   [
+   string
+    autorun
+   ]
+   \n
+  line
+   stringlist
+    string
+     open
+   =
+   stringlist
+    string
+     example.bat
+   \n
+  line
+   stringlist
+    string
+     icon
+   =
+   stringlist
+    string
+     cd.ico
+   \n
+ <EOF>

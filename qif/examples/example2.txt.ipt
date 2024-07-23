@@ -1,0 +1,26 @@
+qif
+ record
+  recordtype
+   !Type:
+   Bank
+  date
+   D
+   12/03/95
+  total
+   T
+   4,706.57
+  state_
+   C
+   X
+  payee
+   P
+   Opening Balance
+  accountorcategory
+   L
+   account
+    [
+    New Bank
+    ]
+  eor
+   ^
+ <EOF>

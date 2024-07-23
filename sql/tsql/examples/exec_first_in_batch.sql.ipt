@@ -1,0 +1,27 @@
+tsql_file
+ batch
+  execute_body_batch
+   func_proc_name_server_database_schema
+    func_proc_name_database_schema
+     func_proc_name_schema
+      id_
+       thisisaprocedurecall
+  sql_clauses
+   dml_clause
+    select_statement_standalone
+     select_statement
+      query_expression
+       query_specification
+        select
+        select_list
+         select_list_elem
+          asterisk
+           *
+        from
+        table_sources
+         table_source
+          table_source_item
+           full_table_name
+            id_
+             xyz
+ <EOF>

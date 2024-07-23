@@ -1,0 +1,27 @@
+tsvFile
+ hdr
+  row
+   field
+    x\ty
+   \n
+ row
+  field
+   5\t90
+  \n
+ row
+  field
+   25\t30
+  \n
+ row
+  field
+   45\t50
+  \n
+ row
+  field
+   65\t55
+  \n
+ row
+  field
+   85\t25
+  \n
+ <EOF>

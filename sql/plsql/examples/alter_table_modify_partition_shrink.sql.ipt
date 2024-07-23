@@ -1,0 +1,26 @@
+sql_script
+ unit_statement
+  alter_table
+   ALTER
+   TABLE
+   tableview_name
+    identifier
+     id_expression
+      regular_id
+       tft_tsm
+    .
+    id_expression
+     regular_id
+      t_act_trade_detail
+   alter_table_partitioning
+    modify_table_partition
+     MODIFY
+     PARTITION
+     partition_name
+      regular_id
+       SYS_P41089
+     shrink_clause
+      SHRINK
+      SPACE
+ ;
+ <EOF>

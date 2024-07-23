@@ -1,0 +1,40 @@
+parse
+ block
+  expression
+   if
+    if
+    expression
+     bool_
+      true
+    do
+    \n
+    block
+     expression
+      "This works!"
+     eoe
+      \n
+    end
+  eoe
+   \n
+   \n
+  expression
+   if
+    if
+    expression
+     nil
+    do
+    \n
+    block
+     expression
+      "This won't be seen"
+     eoe
+      \n
+    else
+    \n
+    block
+     expression
+      "This will"
+     eoe
+      \n
+    end
+ <EOF>

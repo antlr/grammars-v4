@@ -1,1 +1,0 @@
-(gtin (supplemental_code (supplemental_code_2 (any_digit 2) (any_digit 2))) <EOF>)

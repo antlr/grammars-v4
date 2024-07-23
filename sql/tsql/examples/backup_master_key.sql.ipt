@@ -1,0 +1,21 @@
+tsql_file
+ batch
+  sql_clauses
+   backup_statement
+    backup_master_key
+     BACKUP
+     MASTER
+     KEY
+     TO
+     FILE
+     =
+     'c:\temp\exportedmasterkey'
+     ENCRYPTION
+     BY
+     PASSWORD
+     =
+     'sd092735kjn$&adsg'
+   ;
+  go_statement
+   GO
+ <EOF>

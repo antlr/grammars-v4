@@ -1,0 +1,27 @@
+root
+ cqls
+  cql
+   truncate
+    kwTruncate
+     TRUNCATE
+    keyspace
+     cycling
+    .
+    table
+     user_activity
+  statementSeparator
+   ;
+  cql
+   truncate
+    kwTruncate
+     TRUNCATE
+    kwTable
+     TABLE
+    keyspace
+     cycling
+    .
+    table
+     user_activity
+  statementSeparator
+   ;
+ <EOF>

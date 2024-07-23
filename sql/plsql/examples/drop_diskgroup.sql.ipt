@@ -1,0 +1,12 @@
+sql_script
+ unit_statement
+  drop_diskgroup
+   DROP
+   DISKGROUP
+   id_expression
+    regular_id
+     dgroup_01
+   INCLUDING
+   CONTENTS
+ ;
+ <EOF>

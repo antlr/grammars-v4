@@ -1,0 +1,28 @@
+start_
+ item
+  token
+   WS_INLINE
+   token_params
+   :
+   expansions
+    alias
+     expansion
+      expr
+       atom
+        value
+         /[ \t\xa0]/
+       +
+ item
+  token
+   WS
+   token_params
+   :
+   expansions
+    alias
+     expansion
+      expr
+       atom
+        value
+         /[ \t\xa0\f\r\n]/
+       +
+ <EOF>

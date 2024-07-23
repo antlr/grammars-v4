@@ -1,0 +1,34 @@
+program
+ line
+  routinedecl
+   identifier
+    math
+   (
+   )
+   \n
+ line
+  code
+    
+   command
+    write_
+     write
+      
+     arglist
+      arg
+       expression
+        term
+         (
+         expression
+          term
+           1
+          +
+          expression
+           term
+            2
+         )
+        *
+        expression
+         term
+          3
+   \n
+ eof

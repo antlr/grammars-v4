@@ -1,0 +1,15 @@
+script
+ query
+  regularQuery
+   singleQuery
+    singlePartQ
+     updatingStatement
+      createSt
+       CREATE
+       pattern
+        patternPart
+         patternElem
+          nodePattern
+           (
+           )
+ <EOF>

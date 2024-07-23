@@ -1,0 +1,14 @@
+start_
+ chunk
+  block
+   stat
+    local
+    function
+    name_s
+    funcbody
+     (
+     parlist
+     )
+     block
+     end
+ <EOF>

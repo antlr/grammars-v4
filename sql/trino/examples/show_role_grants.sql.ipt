@@ -1,0 +1,20 @@
+parse
+ statements
+  singleStatement
+   statement
+    SHOW
+    ROLE
+    GRANTS
+   ;
+ statements
+  singleStatement
+   statement
+    SHOW
+    ROLE
+    GRANTS
+    FROM
+    identifier
+     nonReserved
+      catalog
+   ;
+ <EOF>

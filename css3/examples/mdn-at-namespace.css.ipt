@@ -1,0 +1,99 @@
+stylesheet
+ ws
+ namespace_
+  @namespace
+  ws
+    
+  "http://www.w3.org/1999/xhtml"
+  ws
+  ;
+  ws
+   \n
+ namespace_
+  @namespace
+  ws
+    
+  namespacePrefix
+   ident
+    svg
+  ws
+    
+  "http://www.w3.org/2000/svg"
+  ws
+  ;
+  ws
+   \n
+ namespace_
+  @namespace
+  ws
+    
+  url
+   url(http://www.w3.org/1999/xhtml)
+  ws
+  ;
+  ws
+   \n
+ namespace_
+  @namespace
+  ws
+    
+  namespacePrefix
+   ident
+    svg
+  ws
+    
+  url
+   url(http://www.w3.org/2000/svg)
+  ws
+  ;
+  ws
+   \n\n
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      className
+       .
+       ident
+        c
+     ws
+       
+   {
+   ws
+    \n  
+   declarationList
+    declaration
+     property_
+      ident
+       color
+      ws
+     :
+     ws
+       
+     expr
+      term
+       ident
+        black
+       ws
+    ws
+    ;
+    ws
+     \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      #c
+     ws
+       
+   {
+   ws
+   }
+   ws
+    \n
+ <EOF>

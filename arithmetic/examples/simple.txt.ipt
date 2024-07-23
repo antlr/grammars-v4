@@ -1,0 +1,19 @@
+file_
+ equation
+  expression
+   atom
+    scientific
+     3
+  relop
+   =
+  expression
+   expression
+    atom
+     scientific
+      2
+   +
+   expression
+    atom
+     scientific
+      1
+ <EOF>

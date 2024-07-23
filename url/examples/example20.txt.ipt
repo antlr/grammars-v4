@@ -1,0 +1,22 @@
+url
+ uri
+  scheme
+   string
+    file
+  ://
+  host
+   hostname
+    string
+     hostname
+  /
+  path
+   string
+    path
+   /
+   string
+    to
+   /
+   string
+    the%20file.txt
+  \n
+ <EOF>

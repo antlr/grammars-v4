@@ -1,0 +1,28 @@
+document
+ prolog
+  <?xml 
+  attribute
+   version
+   =
+   "1.0"
+  attribute
+   encoding
+   =
+   "ISO-8859-1"
+  ?>
+ misc
+  \n\n
+ element
+  <
+  _description
+  >
+  content
+   chardata
+    \n    This is a simple description.\n
+  <
+  /
+  _description
+  >
+ misc
+  \n
+ <EOF>

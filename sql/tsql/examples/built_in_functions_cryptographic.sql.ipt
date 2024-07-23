@@ -1,0 +1,26 @@
+tsql_file
+ batch
+  sql_clauses
+   dml_clause
+    select_statement_standalone
+     select_statement
+      query_expression
+       query_specification
+        SELECT
+        select_list
+         select_list_elem
+          expression_elem
+           expression
+            function_call
+             built_in_functions
+              Cert_ID
+              (
+              expression
+               primitive_expression
+                primitive_constant
+                 'ABerglundCert3'
+              )
+      ;
+  go_statement
+   GO
+ <EOF>

@@ -1,0 +1,17 @@
+aterm_
+ term_
+  function_
+   afun
+    f
+   args_
+    (
+    termlist
+     term_
+      afun
+       a
+     ,
+     term_
+      afun
+       b
+    )
+ <EOF>

@@ -1,0 +1,21 @@
+program
+ macro
+  active
+   #
+   (
+   name
+    string
+     ps
+   ,
+   arglist
+    arg
+     macro
+      neutral
+       ##
+       (
+       name
+        string
+         rs
+       )
+   )
+ <EOF>

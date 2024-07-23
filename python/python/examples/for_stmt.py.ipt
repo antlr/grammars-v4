@@ -1,0 +1,162 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    for
+    exprlist
+     expr
+      atom
+       name
+        x
+    in
+    testlist
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           range
+         trailer
+          arguments
+           (
+           arglist
+            argument
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  number
+                   integer
+                    1
+           )
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+  stmt
+   compound_stmt
+    for
+    exprlist
+     expr
+      atom
+       name
+        x
+    in
+    testlist
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           range
+         trailer
+          arguments
+           (
+           arglist
+            argument
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  number
+                   integer
+                    1
+           )
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        testlist_star_expr
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               name
+                x
+       
+     
+    else_clause
+     else
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    funcdef
+     async
+     def
+     name
+      f
+     (
+     )
+     :
+     suite
+      
+      
+      stmt
+       compound_stmt
+        async
+        for
+        exprlist
+         expr
+          atom
+           name
+            _
+        in
+        testlist
+         test
+          logical_test
+           comparison
+            expr
+             atom
+              name
+               range
+             trailer
+              arguments
+               (
+               arglist
+                argument
+                 test
+                  logical_test
+                   comparison
+                    expr
+                     atom
+                      number
+                       integer
+                        5
+               )
+        :
+        suite
+         
+         
+         stmt
+          simple_stmt
+           small_stmt
+            pass
+           
+         
+      
+ <EOF>

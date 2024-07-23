@@ -1,0 +1,11 @@
+smiles
+ chain
+  branched_atom
+   atom
+    bracket_atom
+     [
+     symbol
+      element_symbols
+       U
+     ]
+ <EOF>

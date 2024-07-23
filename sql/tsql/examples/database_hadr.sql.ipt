@@ -1,0 +1,20 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    alter_database
+     ALTER
+     DATABASE
+     id_
+      AccountsDb1
+     SET
+     database_optionspec
+      hadr_options
+       HADR
+       AVAILABILITY
+       GROUP
+       =
+       id_
+        AccountsAG
+     ;
+ <EOF>

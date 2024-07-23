@@ -1,0 +1,18 @@
+root
+ cqls
+  cql
+   dropMaterializedView
+    kwDrop
+     DROP
+    kwMaterialized
+     MATERIALIZED
+    kwView
+     VIEW
+    keyspace
+     cycling
+    .
+    materializedView
+     cyclist_by_age
+  statementSeparator
+   ;
+ <EOF>

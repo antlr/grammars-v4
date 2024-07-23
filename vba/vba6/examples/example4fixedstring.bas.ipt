@@ -1,0 +1,43 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     visibility
+      Public
+      
+     Sub
+      
+     ambiguousIdentifier
+      Module
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \n
+           
+     block
+      blockStmt
+       eraseStmt
+        Erase
+         
+        valueStmt
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            array
+        ,
+         
+        valueStmt
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            list
+      endOfStatement
+       endOfLine
+        \n
+     End Sub
+   endOfLine
+    \n
+ <EOF>

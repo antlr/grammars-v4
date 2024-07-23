@@ -1,0 +1,11 @@
+document
+ line
+  markup
+   bold
+    **
+    markup
+     text_
+      bold
+    **
+ \n
+ <EOF>

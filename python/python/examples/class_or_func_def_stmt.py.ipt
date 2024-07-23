@@ -1,0 +1,98 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    decorator
+     @
+     dotted_name
+      name
+       decorator
+     
+    classdef
+     class
+     name
+      foo
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    decorator
+     @
+     dotted_name
+      name
+       accepts
+     (
+     arglist
+      argument
+       test
+        logical_test
+         comparison
+          expr
+           atom
+            name
+             int
+      ,
+      argument
+       test
+        logical_test
+         comparison
+          expr
+           atom
+            name
+             int
+     )
+     
+    decorator
+     @
+     dotted_name
+      name
+       returns
+     (
+     arglist
+      argument
+       test
+        logical_test
+         comparison
+          expr
+           atom
+            name
+             float
+     )
+     
+    funcdef
+     def
+     name
+      bar
+     (
+     typedargslist
+      def_parameters
+       def_parameter
+        named_parameter
+         name
+          low
+       ,
+       def_parameter
+        named_parameter
+         name
+          high
+     )
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+ <EOF>

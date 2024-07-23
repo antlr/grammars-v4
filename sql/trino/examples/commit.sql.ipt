@@ -1,0 +1,13 @@
+parse
+ statements
+  singleStatement
+   statement
+    COMMIT
+   ;
+ statements
+  singleStatement
+   statement
+    COMMIT
+    WORK
+   ;
+ <EOF>

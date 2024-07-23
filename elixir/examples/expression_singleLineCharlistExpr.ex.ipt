@@ -1,0 +1,10 @@
+parse
+ block
+  expression
+   ''
+  eoe
+   \n
+   \n
+  expression
+   'dasdas'
+ <EOF>

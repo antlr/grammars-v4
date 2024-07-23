@@ -1,0 +1,267 @@
+program
+ line
+  routinedecl
+   identifier
+    sampleproc
+   (
+   paramlist
+    param
+     variable
+      identifier
+       z
+   )
+    
+   \n
+ line
+  code
+    
+    
+    
+    
+    
+    
+    
+   command
+    write_
+     write
+      
+     arglist
+      arg
+       "This is a sample procedure"
+      ,
+      arg
+       !
+   \n
+ line
+  code
+    
+    
+    
+    
+    
+    
+    
+   command
+    new_
+     new
+      
+     arglist
+      arg
+       expression
+        term
+         variable
+          identifier
+           a
+      ,
+      arg
+       expression
+        term
+         variable
+          identifier
+           b
+      ,
+      arg
+       expression
+        term
+         variable
+          identifier
+           c
+   \n
+ line
+  code
+    
+   subproc
+    identifier
+     dosets
+     
+    command
+     set_
+      set
+       
+      assign
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             a
+       =
+       arg
+        expression
+         term
+          10
+      ,
+      assign
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             b
+       =
+       arg
+        expression
+         term
+          20
+      ,
+      assign
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             c
+       =
+       arg
+        expression
+         term
+          30
+   \n
+ line
+  code
+    
+    
+    
+    
+    
+    
+    
+   command
+    do_
+     do
+      
+     identifier
+      subproc
+     (
+     paramlist
+      param
+       variable
+        identifier
+         b
+     )
+   \n
+ line
+  code
+    
+    
+    
+    
+    
+    
+    
+   if_
+    if
+     
+    condition
+     term
+      variable
+       identifier
+        z
+     
+    command
+     set_
+      set
+       
+      assign
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             c
+       =
+       arg
+        expression
+         term
+          variable
+           identifier
+            a
+         +
+         expression
+          term
+           variable
+            identifier
+             c
+          +
+          expression
+           term
+            variable
+             identifier
+              z
+   \n
+ line
+  code
+    
+    
+    
+    
+    
+    
+    
+   command
+    quit_
+     quit
+      
+     term
+      variable
+       identifier
+        c
+   \n
+ line
+  code
+    
+   subproc
+    identifier
+     subproc
+    (
+    paramlist
+     param
+      variable
+       identifier
+        y
+    )
+     
+    command
+     set_
+      set
+       
+      assign
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             a
+       =
+       arg
+        expression
+         term
+          (
+          expression
+           term
+            variable
+             identifier
+              a
+           +
+           expression
+            term
+             variable
+              identifier
+               y
+          )
+         *
+         expression
+          term
+           2
+     
+    command
+     quit_
+      quit
+   \n
+ eof
+   

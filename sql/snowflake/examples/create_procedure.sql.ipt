@@ -1,0 +1,45 @@
+snowflake_file
+ batch
+  sql_command
+   ddl_command
+    create_command
+     create_procedure
+      create
+      procedure
+      object_name
+       id_
+        p
+      (
+      )
+      returns
+      data_type
+       int
+      language
+      sql
+      as
+      procedure_definition
+       string
+        ' '
+  ;
+  sql_command
+   ddl_command
+    create_command
+     create_procedure
+      CREATE
+      SECURE
+      PROCEDURE
+      object_name
+       id_
+        P
+      (
+      )
+      returns
+      data_type
+       string
+      language
+      javascript
+      as
+      procedure_definition
+       $$ $$
+  ;
+ <EOF>

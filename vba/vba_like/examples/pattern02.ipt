@@ -1,0 +1,16 @@
+program
+ likePatternElement
+  likePatternChar
+   a
+ likePatternElement
+  likePatternChar
+    
+ likePatternElement
+  likePatternCharlist
+   [
+   charList
+    charListElement
+     charlistChar
+      *
+   <missing ']'>
+ <EOF>

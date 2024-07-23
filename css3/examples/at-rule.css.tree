@@ -1,1 +1,0 @@
-(stylesheet ws (nestedStatement (atRule @foo (ws  ) (block { (ws \n    ) (nestedStatement (atRule @bar (ws  ) (block { ws } (ws \n)))) } ws))) <EOF>)

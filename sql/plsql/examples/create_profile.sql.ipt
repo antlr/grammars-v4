@@ -1,0 +1,23 @@
+sql_script
+ unit_statement
+  create_profile
+   CREATE
+   MANDATORY
+   PROFILE
+   id_expression
+    regular_id
+     c##cdb_profile
+   LIMIT
+   password_parameters
+    PASSWORD_VERIFY_FUNCTION
+    function_name
+     identifier
+      id_expression
+       regular_id
+        my_mandatory_function
+   container_clause
+    CONTAINER
+    =
+    ALL
+ ;
+ <EOF>

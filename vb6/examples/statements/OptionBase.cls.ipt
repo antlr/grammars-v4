@@ -1,0 +1,11 @@
+startRule
+ module
+  \r\n
+  moduleOptions
+   moduleOption
+    Option base
+     
+    integerLiteral
+     1
+   \r\n
+ <EOF>

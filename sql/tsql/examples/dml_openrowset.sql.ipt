@@ -1,0 +1,32 @@
+tsql_file
+ batch
+  sql_clauses
+   dml_clause
+    select_statement_standalone
+     select_statement
+      query_expression
+       query_specification
+        SELECT
+        select_list
+         select_list_elem
+          asterisk
+           *
+        FROM
+        table_sources
+         table_source
+          table_source_item
+           rowset_function
+            OPENROWSET
+            (
+            'SQLOLEDB'
+            ,
+            'Server=.\SQLEXPRESS;Trusted_Connection=yes;'
+            ,
+            'SET FMTONLY OFF;SET NOCOUNT ON;exec(''RESTORE headeronly FROM  DISK = N''''C:\Temp\Dev\SQL2012Backup.bak'''''')'
+            )
+           as_table_alias
+            table_alias
+             id_
+              keyword
+               GO
+ <EOF>

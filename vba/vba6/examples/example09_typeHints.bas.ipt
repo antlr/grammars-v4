@@ -1,0 +1,114 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     Sub
+      
+     ambiguousIdentifier
+      TypehintsDemo
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+        
+       \n
+     block
+      blockStmt
+       variableStmt
+        Dim
+         
+        variableListStmt
+         variableSubStmt
+          ambiguousIdentifier
+           Number
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Number
+         
+        =
+         
+        typeHint
+         #
+        valueStmt
+         literal
+          1
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           OtherNumber
+         
+        =
+         
+        typeHint
+         &
+        valueStmt
+         literal
+          10
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       implicitCallStmt_InBlock
+        iCS_B_MemberProcedureCall
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            Debug
+         .
+         ambiguousIdentifier
+          ambiguousKeyword
+           Print
+          
+         argsCall
+          argCall
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               Number
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       implicitCallStmt_InBlock
+        iCS_B_MemberProcedureCall
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            Debug
+         .
+         ambiguousIdentifier
+          ambiguousKeyword
+           Print
+          
+         argsCall
+          argCall
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               OtherNumber
+      endOfStatement
+       endOfLine
+        \n
+     End Sub
+   endOfLine
+    \n
+ <EOF>

@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_context
+   DROP
+   CONTEXT
+   id_expression
+    regular_id
+     hr_context
+ ;
+ <EOF>

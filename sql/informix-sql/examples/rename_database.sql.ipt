@@ -1,0 +1,17 @@
+sqlScript
+ unitStatement
+  renameDatabase
+   RENAME
+   DATABASE
+   identifier
+    anyName
+     own
+    .
+    anyName
+     olddb
+   TO
+   identifier
+    anyName
+     nwdb
+  ;
+ <EOF>

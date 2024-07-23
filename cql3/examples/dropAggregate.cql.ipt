@@ -1,0 +1,21 @@
+root
+ cqls
+  cql
+   dropAggregate
+    kwDrop
+     DROP
+    kwAggregate
+     AGGREGATE
+    ifExist
+     kwIf
+      IF
+     kwExists
+      EXISTS
+    keyspace
+     cycling
+    .
+    aggregate
+     avgState
+  statementSeparator
+   ;
+ <EOF>

@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_audit_policy
+   DROP
+   AUDIT
+   POLICY
+   id_expression
+    regular_id
+     table_pol
+ ;
+ <EOF>

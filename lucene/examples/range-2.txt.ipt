@@ -1,0 +1,17 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      fieldName
+       title
+      :
+      term
+       termRangeExpr
+        {
+        Aida
+        TO
+        Carmen
+        }
+ <EOF>

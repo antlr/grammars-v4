@@ -1,0 +1,7 @@
+grammarSpec
+ grammarDecl
+  grammarType
+  identifier
+  <missing SEMI>
+ rules
+ <EOF>

@@ -1,0 +1,19 @@
+iso
+ recurring
+  recurringBasic
+   recurringCount
+    R
+    int_
+     2
+   /
+   durationBasic
+    intervalBasic
+     intervalT
+      P
+      int_
+       1
+      Y
+      dec
+       6
+      M
+ <EOF>

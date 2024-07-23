@@ -1,0 +1,13 @@
+prog
+ statementlist
+  statement
+   incrementstmt
+    var_
+     xi
+    :=
+    var_
+     xi
+    +
+    number
+     1
+ <EOF>

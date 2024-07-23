@@ -1,0 +1,15 @@
+intrinsic_function
+ states_func_decl
+  States
+  .
+  state_fun_name
+   ArrayPartition
+  func_arg_list
+   (
+   func_arg
+    $.FunctionInput.fst
+   ,
+   func_arg
+    $.FunctionInput.snd
+   )
+ <EOF>

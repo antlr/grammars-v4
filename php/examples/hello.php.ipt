@@ -1,0 +1,16 @@
+htmlDocument
+ phpBlock
+  topStatement
+   statement
+    echoStatement
+     echo
+     expressionList
+      expression
+       string
+        '<p>Hello World</p>'
+     ;
+  topStatement
+   statement
+    emptyStatement_
+     ?>
+ <EOF>

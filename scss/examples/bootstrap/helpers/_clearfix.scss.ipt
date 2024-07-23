@@ -1,0 +1,24 @@
+stylesheet
+ statement
+  ruleset
+   selectorGroup
+    selector
+     selectorSequence
+      className
+       .
+       identifier
+        clearfix
+   block
+    {
+    statement
+     includeDeclaration
+      @include
+      functionCall
+       identifier
+        clearfix
+       (
+       parameters
+       )
+      ;
+    }
+ <EOF>

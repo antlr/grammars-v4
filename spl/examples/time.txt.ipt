@@ -1,0 +1,33 @@
+query
+ initCommand
+  operation
+   id
+    index
+   =
+   expression
+    value
+     id
+      my_index
+  operation
+   expression
+    value
+     "login failure"
+  operation
+   id
+    function
+     earliest
+   =
+   expression
+    value
+     date
+      -24h@h
+  operation
+   id
+    function
+     latest
+   =
+   expression
+    value
+     date
+      @h
+ <EOF>

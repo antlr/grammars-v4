@@ -1,0 +1,25 @@
+htmlDocument
+ phpBlock
+  topStatement
+   statement
+    echoStatement
+     echo
+     expressionList
+      expression
+       chain
+        chainOrigin
+         chainBase
+          keyedVariable
+           $_SERVER
+           squareCurlyExpression
+            [
+            expression
+             string
+              'HTTP_USER_AGENT'
+            ]
+     ;
+  topStatement
+   statement
+    emptyStatement_
+     ?>
+ <EOF>

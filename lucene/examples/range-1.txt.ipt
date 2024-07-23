@@ -1,0 +1,17 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      fieldName
+       mod_date
+      :
+      term
+       termRangeExpr
+        [
+        20020101
+        TO
+        20030101
+        ]
+ <EOF>

@@ -1,0 +1,16 @@
+expression
+ thousands
+  thous_part
+   M
+  hundreds
+   hun_part
+    CM
+   tens
+    tens_part
+     L
+     tens_rep
+      XX
+    ones
+     ones_rep
+      II
+ <EOF>

@@ -1,0 +1,25 @@
+expression
+ vectorOperation
+  vector
+   aggregation
+    count_values
+    parameterList
+     (
+     parameter
+      literal
+       'pod'
+     ,
+     parameter
+      vectorOperation
+       vector
+        instantSelector
+         container_cpu_usage_seconds_total
+     )
+    by
+     by
+     labelNameList
+      (
+      labelName
+       node
+      )
+ <EOF>

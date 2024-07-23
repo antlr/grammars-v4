@@ -1,0 +1,20 @@
+root
+ cqls
+  cql
+   dropTrigger
+    kwDrop
+     DROP
+    kwTrigger
+     TRIGGER
+    trigger
+     trigger_name
+    kwOn
+     ON
+    keyspace
+     ks
+    .
+    table
+     table_name
+  statementSeparator
+   ;
+ <EOF>

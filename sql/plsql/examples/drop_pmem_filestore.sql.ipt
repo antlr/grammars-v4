@@ -1,0 +1,13 @@
+sql_script
+ unit_statement
+  drop_pmem_filestore
+   DROP
+   PMEM
+   FILESTORE
+   id_expression
+    regular_id
+     cloud_db_1
+   EXCLUDING
+   CONTENTS
+ ;
+ <EOF>

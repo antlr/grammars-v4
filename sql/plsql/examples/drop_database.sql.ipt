@@ -1,0 +1,15 @@
+sql_script
+ unit_statement
+  drop_database
+   DROP
+   DATABASE
+ ;
+ unit_statement
+  drop_database
+   DROP
+   DATABASE
+   INCLUDING
+   BACKUPS
+   NOPROMPT
+ ;
+ <EOF>

@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_flashback_archive
+   DROP
+   FLASHBACK
+   ARCHIVE
+   id_expression
+    regular_id
+     test_archive2
+ ;
+ <EOF>

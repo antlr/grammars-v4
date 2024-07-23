@@ -1,0 +1,24 @@
+stmt
+ command
+  dml_command
+   insert_into
+    insert
+    into
+    destination_table
+     id_
+      t
+    select_statement
+     select
+     select_list
+      select_item
+       expression
+        primitive_expression
+         literal
+          number
+           int_number
+            1
+       as
+       alias
+        id_
+         c
+ <EOF>

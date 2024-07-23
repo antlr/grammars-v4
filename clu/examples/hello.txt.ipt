@@ -1,0 +1,35 @@
+module
+ procedure
+  idn
+   start_up
+  =
+  proc
+  args
+   (
+   )
+  routine_body
+   statement
+    invocation
+     primary
+      type_spec
+       idn
+        stressam
+      $
+      name
+       putl
+     (
+     expression_list
+      expression
+       primary
+        idn
+         po
+      ,
+      expression
+       primary
+        string_literal
+         "Hello, World!"
+     )
+  end
+  idn
+   start_up
+ <EOF>

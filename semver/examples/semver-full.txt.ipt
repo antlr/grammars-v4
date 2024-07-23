@@ -1,0 +1,20 @@
+semver
+ versionCore
+  2
+  .
+  0
+  .
+  0
+ -
+ preRelease
+  tag
+   rc
+  .
+  1
+ +
+ build
+  tag
+   build
+  .
+  123
+ <EOF>

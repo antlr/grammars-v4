@@ -1,0 +1,52 @@
+start_
+ prods
+  prod
+   xlhs
+    <
+    postalcode
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+     xelem
+      ws
+        
+      <
+      number
+      >
+     xelem
+      ws
+        
+      <
+      letter
+      >
+     xelem
+      ws
+        
+      <
+      number
+      >
+     xelem
+      ws
+        
+      <
+      letter
+      >
+     xelem
+      ws
+        
+      <
+      number
+      >
+ ws
+  \n
+ <EOF>

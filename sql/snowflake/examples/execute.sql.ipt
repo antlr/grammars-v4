@@ -1,0 +1,10 @@
+snowflake_file
+ batch
+  sql_command
+   other_command
+    execute_immediate
+     EXECUTE
+     IMMEDIATE
+     $$\nBEGIN\n    select 1 as c;\n    select 2 as d;\n    select '$' as e;\nEND\n$$
+  ;
+ <EOF>

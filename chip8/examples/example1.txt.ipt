@@ -1,0 +1,18 @@
+file_
+ instruction_
+  cls
+   CLS
+ instruction_
+  ret
+   RET
+ instruction_
+  jp
+   JP
+   123
+ instruction_
+  or
+   OR
+   V1
+   ,
+   V3
+ <EOF>

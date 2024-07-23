@@ -1,0 +1,23 @@
+iso
+ date
+  dateExtended
+   datePreciseExtended
+    calendarDateExtended
+     year
+      sint4p
+       -
+       0
+       0
+       0
+       2
+     -
+     month
+      int2
+       0
+       4
+     -
+     day
+      int2
+       1
+       2
+ <EOF>

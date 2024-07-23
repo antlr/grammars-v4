@@ -1,0 +1,9 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     match_point_reset
+      \
+      K
+ <EOF>

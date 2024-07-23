@@ -1,0 +1,9 @@
+expression
+ vectorOperation
+  vector
+   offset
+    instantSelector
+     container_cpu_usage_seconds_total
+    offset
+    1y5m900ms
+ <EOF>

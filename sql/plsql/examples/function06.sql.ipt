@@ -1,0 +1,17 @@
+sql_script
+ unit_statement
+  call_statement
+   call
+   routine_name
+    identifier
+     id_expression
+      regular_id
+       dbms_scheduler
+    .
+    id_expression
+     regular_id
+      auto_purge
+   function_argument
+    (
+    )
+ <EOF>

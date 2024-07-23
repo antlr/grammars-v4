@@ -1,0 +1,535 @@
+grammar_
+ rule_
+  json
+  \n
+  alternative
+       
+   item
+    element
+   \n
+ \n
+ rule_
+  value
+  \n
+  alternative
+       
+   item
+    object
+   \n
+  alternative
+       
+   item
+    array
+   \n
+  alternative
+       
+   item
+    string
+   \n
+  alternative
+       
+   item
+    number
+   \n
+  alternative
+       
+   item
+    "true"
+   \n
+  alternative
+       
+   item
+    "false"
+   \n
+  alternative
+       
+   item
+    "null"
+   \n
+ \n
+ rule_
+  object
+  \n
+  alternative
+       
+   item
+    '{'
+    
+   item
+    ws
+    
+   item
+    '}'
+   \n
+  alternative
+       
+   item
+    '{'
+    
+   item
+    members
+    
+   item
+    '}'
+   \n
+ \n
+ rule_
+  members
+  \n
+  alternative
+       
+   item
+    member
+   \n
+  alternative
+       
+   item
+    member
+    
+   item
+    ','
+    
+   item
+    members
+   \n
+ \n
+ rule_
+  member
+  \n
+  alternative
+       
+   item
+    ws
+    
+   item
+    string
+    
+   item
+    ws
+    
+   item
+    ':'
+    
+   item
+    element
+   \n
+ \n
+ rule_
+  array
+  \n
+  alternative
+       
+   item
+    '['
+    
+   item
+    ws
+    
+   item
+    ']'
+   \n
+  alternative
+       
+   item
+    '['
+    
+   item
+    elements
+    
+   item
+    ']'
+   \n
+ \n
+ rule_
+  elements
+  \n
+  alternative
+       
+   item
+    element
+   \n
+  alternative
+       
+   item
+    element
+    
+   item
+    ','
+    
+   item
+    elements
+   \n
+ \n
+ rule_
+  element
+  \n
+  alternative
+       
+   item
+    ws
+    
+   item
+    value
+    
+   item
+    ws
+   \n
+ \n
+ rule_
+  string
+  \n
+  alternative
+       
+   item
+    '"'
+    
+   item
+    characters
+    
+   item
+    '"'
+   \n
+ \n
+ rule_
+  characters
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    character
+    
+   item
+    characters
+   \n
+ \n
+ rule_
+  character
+  \n
+  alternative
+       
+   item
+    range_
+     '0020'
+      
+     .
+      
+     '10FFFF'
+    exclude
+      
+     -
+      
+     '"'
+     exclude
+       
+      -
+       
+      '\'
+   \n
+  alternative
+       
+   item
+    '\'
+    
+   item
+    escape
+   \n
+ \n
+ rule_
+  escape
+  \n
+  alternative
+       
+   item
+    '"'
+   \n
+  alternative
+       
+   item
+    '\'
+   \n
+  alternative
+       
+   item
+    '/'
+   \n
+  alternative
+       
+   item
+    'b'
+   \n
+  alternative
+       
+   item
+    'f'
+   \n
+  alternative
+       
+   item
+    'n'
+   \n
+  alternative
+       
+   item
+    'r'
+   \n
+  alternative
+       
+   item
+    't'
+   \n
+  alternative
+       
+   item
+    'u'
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+   \n
+ \n
+ rule_
+  hex
+  \n
+  alternative
+       
+   item
+    digit
+   \n
+  alternative
+       
+   item
+    range_
+     'A'
+      
+     .
+      
+     'F'
+   \n
+  alternative
+       
+   item
+    range_
+     'a'
+      
+     .
+      
+     'f'
+   \n
+ \n
+ rule_
+  number
+  \n
+  alternative
+       
+   item
+    integer
+    
+   item
+    fraction
+    
+   item
+    exponent
+   \n
+ \n
+ rule_
+  integer
+  \n
+  alternative
+       
+   item
+    digit
+   \n
+  alternative
+       
+   item
+    onenine
+    
+   item
+    digits
+   \n
+  alternative
+       
+   item
+    '-'
+    
+   item
+    digit
+   \n
+  alternative
+       
+   item
+    '-'
+    
+   item
+    onenine
+    
+   item
+    digits
+   \n
+ \n
+ rule_
+  digits
+  \n
+  alternative
+       
+   item
+    digit
+   \n
+  alternative
+       
+   item
+    digit
+    
+   item
+    digits
+   \n
+ \n
+ rule_
+  digit
+  \n
+  alternative
+       
+   item
+    '0'
+   \n
+  alternative
+       
+   item
+    onenine
+   \n
+ \n
+ rule_
+  onenine
+  \n
+  alternative
+       
+   item
+    range_
+     '1'
+      
+     .
+      
+     '9'
+   \n
+ \n
+ rule_
+  fraction
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    '.'
+    
+   item
+    digits
+   \n
+ \n
+ rule_
+  exponent
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    'E'
+    
+   item
+    sign
+    
+   item
+    digits
+   \n
+  alternative
+       
+   item
+    'e'
+    
+   item
+    sign
+    
+   item
+    digits
+   \n
+ \n
+ rule_
+  sign
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    '+'
+   \n
+  alternative
+       
+   item
+    '-'
+   \n
+ \n
+ rule_
+  ws
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    '0020'
+    
+   item
+    ws
+   \n
+  alternative
+       
+   item
+    '000A'
+    
+   item
+    ws
+   \n
+  alternative
+       
+   item
+    '000D'
+    
+   item
+    ws
+   \n
+  alternative
+       
+   item
+    '0009'
+    
+   item
+    ws
+   \n
+ <EOF>

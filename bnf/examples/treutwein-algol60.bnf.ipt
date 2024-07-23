@@ -1,0 +1,6815 @@
+start_
+ prods
+  prod
+   xlhs
+    <
+    empty
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+       \n\n
+      <
+      basic
+       
+      symbol
+      >
+     xelem
+      ::=
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      logical
+       
+      value
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      special
+       
+      symbol
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      delimiter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    letter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      A
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      B
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      C
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      D
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      E
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      F
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      G
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      H
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      I
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      J
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      K
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      L
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      M
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      N
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      O
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      P
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      Q
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      R
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      S
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      T
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      U
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      Y
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      W
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      X
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      Y
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      Z
+  \n\n
+  prod
+   xlhs
+    <
+    digit
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      0
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      1
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      2
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      3
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      4
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      5
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      6
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      7
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      8
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      9
+  \n\n
+  prod
+   xlhs
+    <
+    logical
+     
+    value
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      TRUE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FALSE
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    special
+     
+    symbol
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      any
+       
+      symbol
+       
+      in
+       
+      CDC
+       
+      6
+      4
+      -
+      charaeter
+       
+      set
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    delimiter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      operator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      separator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      bracket
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      declarator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      specificator
+       
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      operator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      relational
+       
+      operator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      logical
+       
+      operator
+       
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      sequential
+       
+      operator
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    arithmetic
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      +
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      -
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      *
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      /
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      /
+     xelem
+      /
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      *
+     xelem
+      *
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ^
+  \n\n
+  prod
+   xlhs
+    <
+    relational
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+       
+      |
+       
+      #
+      le
+      #
+       
+      |
+       
+      =
+       
+      |
+       
+      #
+      ge
+      #
+       
+      |
+       
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ~
+     xelem
+      =
+  \n\n
+  prod
+   xlhs
+    <
+    logical
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      EQUIV
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      IMPL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      and
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      OR
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ~
+  \n\n
+  prod
+   xlhs
+    <
+    sequential
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      GO
+     xelem
+      ws
+        
+      TO
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      IF
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      THEN
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      ELSE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FOR
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      DO
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    separator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ,
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      .
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      :
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ;
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      :
+     xelem
+      =
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      STEP
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      UNTIL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      WHILE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      COMMENT
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      CODE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      ALGOL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FORTRAN
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      RJ
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    bracket
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      )
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ]
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      [
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      (
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      )
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      BEGIN
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      END
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    declarator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      OWN
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      BOOLEAN
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      INTEGER
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      REAL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      ARRAY
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      SWITCH
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    specificator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      STRING
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      LABEL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      VALUE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      VARIABLE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      SIMPLE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FORMAT
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      LIST
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+     xelem
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+       
+      identifier
+      >
+     xelem
+      <
+      digit
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    ld
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+  \n\n
+  prod
+   xlhs
+    <
+     
+    tail
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+     xelem
+      <
+      ld
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    external
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+     xelem
+      <
+      tail
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    unsigned
+     
+    integer
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+     xelem
+      <
+      digit
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    integer
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      +
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      -
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    decimal
+     
+    fraction
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      .
+     xelem
+      <
+      unsigned
+       
+      integer
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    exponent
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      <
+      integer
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    decimal
+     
+    number
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      decimal
+       
+      fraction
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      integer
+      >
+     xelem
+      <
+      decimal
+       
+      fraction
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    unsigned
+     
+    number
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      decimal
+       
+      number
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      exponent
+       
+      part
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      decimal
+       
+      number
+      >
+     xelem
+      <
+      exponent
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    number
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      number
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      +
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      number
+       
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      -
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      number
+       
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    proper
+     
+    string
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      any
+       
+      sequence
+       
+      of
+       
+      characters
+       
+      not
+       
+      containing
+       
+      #
+      (
+      #
+       
+      or
+       
+      #
+      )
+      #
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    open
+     
+    string
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      proper
+       
+      string
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      proper
+       
+      string
+      >
+     xelem
+      #
+     xelem
+      (
+     xelem
+      #
+     xelem
+      <
+       
+      open
+       
+      string
+      >
+     xelem
+      #
+     xelem
+      )
+     xelem
+      #
+     xelem
+      <
+      open
+       
+      string
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    string
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      (
+     xelem
+      #
+     xelem
+      <
+      open
+       
+      string
+      >
+     xelem
+      #
+     xelem
+      )
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      (
+     xelem
+      #
+     xelem
+      <
+      open
+       
+      string
+      >
+     xelem
+      #
+     xelem
+      )
+     xelem
+      #
+     xelem
+      <
+      string
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    variable
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    simple
+     
+    variable
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      variable
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    subscript
+     
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    subscript
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      subscript
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      subscript
+       
+      list
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      subscript
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    array
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    subscripted
+     
+    variable
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      [
+     xelem
+      ws
+        
+      <
+      subscript
+       
+      list
+      >
+     xelem
+      ]
+  \n\n
+  prod
+   xlhs
+    <
+    variable
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      variable
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      subscripted
+       
+      variable
+      >
+  \n\n
+  prod
+   xlhs
+    <
+     
+    procedure
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      string
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      switch
+       
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    letter
+     
+    string
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+       
+      string
+      >
+     xelem
+      <
+      letter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    parameter
+     
+    delimiter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      ,
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      )
+     xelem
+      <
+      letter
+       
+      string
+      >
+     xelem
+      :
+     xelem
+      (
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+       
+      list
+      >
+     xelem
+      ws
+        
+      <
+      parameter
+       
+      delimiter
+      >
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+       
+      list
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    function
+     
+    designator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      designational
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    adding
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      +
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      -
+  \n\n
+  prod
+   xlhs
+    <
+     
+    multiplying
+     
+    operator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      *
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      /
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      /
+     xelem
+      /
+  \n\n
+  prod
+   xlhs
+    <
+    primary
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unsigned
+       
+      number
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      variable
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      function
+       
+      designator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      <
+      arithmetic
+       
+      expression
+      >
+     xelem
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    factor
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      primary
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      factor
+      >
+     xelem
+      ws
+        
+      *
+     xelem
+      *
+     xelem
+      ws
+        
+      <
+      primary
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      factor
+      >
+     xelem
+      ws
+        
+      ^
+     xelem
+      ws
+        
+      <
+      primary
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    term
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      factor
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      term
+      >
+     xelem
+      ws
+        
+      <
+      multiplying
+       
+      operator
+      >
+     xelem
+      ws
+        
+      <
+      factor
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    simple
+     
+    arithmetic
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      term
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      adding
+       
+      operator
+       
+      >
+     xelem
+      ws
+        
+      <
+      term
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      arithmetic
+      >
+     xelem
+      ws
+        
+      <
+      adding
+       
+      operator
+      >
+     xelem
+      ws
+        
+      <
+      term
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    if
+     
+    clause
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      IF
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      expression
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      THEN
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    arithmetic
+     
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      arithmetic
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      clause
+      >
+     xelem
+      ws
+        
+      <
+      simple
+       
+      arithmetic
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      ELSE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    relational
+     
+    operator
+     
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+       
+      |
+       
+      #
+      le
+      #
+       
+      |
+       
+      =
+       
+      |
+       
+      #
+      ge
+      #
+       
+      |
+       
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ~
+     xelem
+      =
+  \n\n
+  prod
+   xlhs
+    <
+    relation
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      arithmetic
+       
+      expression
+      >
+     xelem
+      ws
+        
+      <
+      relational
+       
+      operator
+      >
+     xelem
+      ws
+        
+      <
+      simple
+       
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    Boolean
+     
+    primary
+    >
+   assign
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      logical
+       
+      value
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      variable
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      function
+       
+      designator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      relation
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      <
+      Boolean
+       
+      expression
+      >
+     xelem
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    Boolean
+     
+    secondary
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      primary
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      ~
+     xelem
+      <
+      Boolean
+       
+      primary
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    Boolean
+     
+    factor
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      secondary
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      factor
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      or
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      secondary
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    Boolean
+     
+    term
+    >
+   assign
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      factor
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      term
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      and
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      factor
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    implication
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      term
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      implication
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      impl
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      term
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    simple
+     
+    Boolean
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      implication
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      Boolean
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      equiv
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      implication
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    Boolean
+     
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      Boolean
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      clause
+      >
+     xelem
+      ws
+        
+      <
+      simple
+       
+      Boolean
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      ELSE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+       
+      Boolean
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    label
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    switch
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    switch
+     
+    designator
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      switch
+       
+      identifier
+      >
+     xelem
+      [
+     xelem
+      <
+      subscript
+       
+      expression
+      >
+     xelem
+      ]
+  \n\n
+  prod
+   xlhs
+    <
+    subscript
+     
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    simple
+     
+    designational
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      switeh
+       
+      designator
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      <
+      designational
+       
+      expression
+      >
+     xelem
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    designational
+     
+    expression
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      designational
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      clause
+      >
+     xelem
+      ws
+        
+      <
+      simple
+       
+      designational
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      ELSE
+     xelem
+      #
+     xelem
+      <
+      designational
+       
+      expression
+      >
+  \n\n\n
+  prod
+   xlhs
+    <
+    compound
+     
+    tail
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      statement
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      END
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      statement
+      >
+     xelem
+      ;
+     xelem
+      ws
+        
+      <
+      compound
+       
+      tail
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    block
+     
+    head
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      BEGIN
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      declaration
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      block
+       
+      head
+       
+      >
+     xelem
+      ;
+     xelem
+      ws
+        
+      <
+       
+      declaration
+       
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    unlabeled
+     
+    compound
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      BEGIN
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      compound
+       
+      tail
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    unlabeled
+     
+    block
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      block
+       
+      head
+      >
+     xelem
+      ;
+     xelem
+      ws
+        
+      <
+      compound
+       
+      tail
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    compound
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unlabeled
+       
+      compound
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+     xelem
+      :
+     xelem
+      ws
+        
+      <
+      compound
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    block
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unlabeled
+       
+      block
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+     xelem
+      :
+     xelem
+      ws
+        
+      <
+      block
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    program
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      block
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      compound
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    unlabelled
+     
+    basic
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      assignment
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      go
+       
+      to
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      dummy
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    basic
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unlabelled
+       
+      basic
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+     xelem
+      :
+     xelem
+      <
+      basic
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    destination
+    >
+   assign
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      variable
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    left
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      destination
+      >
+     xelem
+      ws
+        
+      :
+     xelem
+      =
+  \n\n
+  prod
+   xlhs
+    <
+    left
+     
+    part
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      left
+       
+      part
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      left
+       
+      part
+       
+      list
+      >
+     xelem
+      <
+      left
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    assignment
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      left
+       
+      part
+       
+      list
+      >
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      left
+       
+      part
+       
+      list
+      >
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    go
+     
+    to
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      GO
+     xelem
+      ws
+        
+      TO
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      designational
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    dummy
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    procedure
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      string
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      identifier
+       
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      switch
+       
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    letter
+     
+    string
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+       
+      string
+      >
+     xelem
+      <
+      letter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    parameter
+     
+    delimiter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      ,
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      )
+     xelem
+      <
+      letter
+       
+      string
+      >
+     xelem
+      :
+     xelem
+      (
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+       
+      list
+       
+      >
+     xelem
+      ws
+        
+      <
+      parameter
+       
+      delimiter
+      >
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    actual
+     
+    parameter
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      <
+      actual
+       
+      parameter
+       
+      list
+      >
+     xelem
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    procedure
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      <
+      actual
+       
+      parameter
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      unconditional
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      conditional
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      for
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    for
+     
+    list
+     
+    element
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      STEP
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      UNTIL
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      WHILE
+     xelem
+      #
+     xelem
+      <
+       
+      Boolean
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    for
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      for
+       
+      list
+       
+      element
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      for
+       
+      list
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      for
+       
+      list
+       
+      element
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    for
+     
+    clause
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FOR
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      variable
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      :
+     xelem
+      =
+     xelem
+      ws
+        
+      <
+      for
+       
+      list
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      DO
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    for
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      for
+       
+      clause
+      >
+     xelem
+      <
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+     xelem
+      :
+     xelem
+      <
+      for
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    if
+     
+    clause
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      IF
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      Boolean
+       
+      expression
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      THEN
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    unconditional
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      basic
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      compound
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      block
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    if
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      clause
+      >
+     xelem
+      ws
+        
+      <
+      unconditional
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    conditional
+     
+    statement
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      statement
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      ELSE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      if
+       
+      clause
+      >
+     xelem
+      ws
+        
+      <
+      for
+       
+      statement
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      label
+      >
+     xelem
+      :
+     xelem
+      ws
+        
+      <
+      conditional
+       
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    declaration
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+       
+      declaration
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      declaration
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      switch
+       
+      declaration
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      declaration
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    type
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      variable
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      simple
+       
+      variable
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      type
+       
+      list
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    type
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      REAL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      INTEGER
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      BOOLEAN
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    local
+     
+    or
+     
+    own
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      OWN
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    type
+     
+    declaration
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      local
+       
+      or
+       
+      own
+      >
+     xelem
+      ws
+        
+      <
+      type
+      >
+     xelem
+      ws
+        
+      <
+      type
+       
+      list
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    lower
+     
+    bound
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    upper
+     
+    bound
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      arithmetic
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    bound
+     
+    pair
+    >
+   assign
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      lower
+       
+      bound
+      >
+     xelem
+      :
+     xelem
+      ws
+        
+      <
+      upper
+       
+      bound
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    bound
+     
+    pair
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      bound
+       
+      pair
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      bound
+       
+      pair
+       
+      list
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      bound
+       
+      pair
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    array
+     
+    segment
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      identifier
+      >
+     xelem
+      [
+     xelem
+      <
+      bound
+       
+      pair
+       
+      list
+      >
+     xelem
+      ]
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      identifier
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      array
+       
+      segment
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    array
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      segment
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      list
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      array
+       
+      segment
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    array
+     
+    declarer
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+       
+      type
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      ARRAY
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      ARRAY
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    array
+     
+    declaration
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      local
+       
+      or
+       
+      own
+      >
+     xelem
+      <
+      array
+       
+      declarer
+      >
+     xelem
+      ws
+        
+      <
+      array
+       
+      list
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    switch
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      designational
+       
+      expression
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      switch
+       
+      list
+      >
+     xelem
+      ws
+        
+      <
+      designational
+       
+      expression
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    switch
+     
+    declaration
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      SWITCH
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      switch
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      :
+     xelem
+      =
+     xelem
+      ws
+        
+      <
+      switch
+       
+      list
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    formal
+     
+    parameter
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    formal
+     
+    parameter
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      formal
+       
+      parameter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      formal
+       
+      parameter
+       
+      list
+      >
+     xelem
+      ws
+        
+      <
+      parameter
+       
+      delimiter
+      >
+     xelem
+      ws
+        
+      <
+      formal
+       
+      parameter
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    formal
+     
+    parameter
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      <
+      formal
+       
+      parameter
+       
+      list
+      >
+     xelem
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    identifier
+     
+    list
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ,
+     xelem
+      ws
+        
+      <
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    value
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      VALUE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ;
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    specifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      STRING
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      declarer
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      LABEL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      SWITCH
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+     xelem
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      VARIABLE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      #
+     xelem
+      SIMPLE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FORMAT
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      LIST
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    specification
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      separate
+       
+      specifier
+      >
+     xelem
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ;
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      separate
+       
+      specification
+       
+      part
+      >
+     xelem
+      ws
+        
+      <
+      separate
+       
+      specifier
+      >
+     xelem
+      ws
+        
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ;
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    procedure
+     
+    heading
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      <
+      formal
+       
+      parameter
+       
+      part
+      >
+     xelem
+      ;
+     xelem
+      ws
+        
+      <
+      value
+       
+      part
+      >
+     xelem
+      ws
+        
+      <
+      separate
+       
+      specification
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    code
+     
+    number
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+     xelem
+      <
+      digit
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    code
+     
+    identifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      code
+       
+      number
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      external
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    code
+     
+    specifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      RJ
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    code
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      CODE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      code
+       
+      specifier
+      >
+     xelem
+      ws
+        
+      <
+      code
+       
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      ALGOL
+     xelem
+      #
+     xelem
+      <
+      code
+       
+      specifier
+      >
+     xelem
+      <
+      code
+       
+      identifier
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      FORTRAN
+     xelem
+      #
+     xelem
+      <
+      code
+       
+      identifier
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    procedure
+     
+    body
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      code
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    procedure
+     
+    declaration
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      separate
+       
+      procedure
+       
+      heading
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    separate
+     
+    procedure
+     
+    body
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+     xelem
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      separate
+       
+      procedure
+       
+      heading
+      >
+     xelem
+      ws
+        
+      <
+      separate
+       
+      procedure
+       
+      body
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    specifier
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      STRING
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      array
+       
+      declarer
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      LABEL
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      SWITCH
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+  \n\n
+  prod
+   xlhs
+    <
+    specification
+     
+    part
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      empty
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      specifier
+      >
+     xelem
+      ws
+        
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ;
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      specification
+       
+      part
+      >
+     xelem
+      ws
+        
+      <
+      specifier
+      >
+     xelem
+      ws
+        
+      <
+      identifier
+       
+      list
+      >
+     xelem
+      ;
+  \n\n
+  prod
+   xlhs
+    <
+    procedure
+     
+    heading
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      identifier
+      >
+     xelem
+      ws
+        
+      <
+      formal
+       
+      parameter
+       
+      part
+      >
+     xelem
+      ;
+     xelem
+      ws
+        
+      <
+      value
+       
+      part
+      >
+     xelem
+      ws
+        
+      <
+      specification
+       
+      part
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    procedure
+     
+    body
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      statement
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    procedure
+     
+    declaration
+    >
+   assign
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      heading
+      >
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      body
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      type
+      >
+     xelem
+      ws
+        
+      #
+     xelem
+      PROCEDURE
+     xelem
+      #
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      heading
+      >
+     xelem
+      ws
+        
+      <
+      procedure
+       
+      body
+      >
+ <EOF>

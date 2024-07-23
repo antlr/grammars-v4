@@ -1,0 +1,19 @@
+program
+ statement
+  query
+   literal
+    predicate_sym
+     parent
+    (
+    terms_
+     term_
+      constant
+       john
+     ,
+     terms_
+      term_
+       constant
+        douglas
+    )
+   ?
+ <EOF>

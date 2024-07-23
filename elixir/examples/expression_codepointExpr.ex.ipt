@@ -1,0 +1,10 @@
+parse
+ block
+  expression
+   ?\s
+  eoe
+   \n
+   \n
+  expression
+   ?i
+ <EOF>

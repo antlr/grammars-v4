@@ -1,0 +1,15 @@
+sql_script
+ unit_statement
+  alter_hierarchy
+   ALTER
+   HIERARCHY
+   id_expression
+    regular_id
+     product_hier
+   RENAME
+   TO
+   id_expression
+    regular_id
+     myproduct_hier
+ ;
+ <EOF>

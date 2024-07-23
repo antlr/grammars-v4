@@ -1,0 +1,163 @@
+stylesheet
+ ws
+ nestedStatement
+  page
+   @page
+   ws
+     
+   pseudoPage
+    :
+    ident
+     first
+    ws
+      
+   {
+   ws
+    \n  
+   declaration
+    property_
+     ident
+      margin-left
+     ws
+    :
+    ws
+      
+    expr
+     term
+      percentage
+       50%
+      ws
+   ;
+   ws
+    \n  
+   declaration
+    property_
+     ident
+      margin-top
+     ws
+    :
+    ws
+      
+    expr
+     term
+      percentage
+       50%
+      ws
+   ;
+   ws
+    \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      typeSelector
+       elementName
+        ident
+         p
+     ws
+       
+   {
+   ws
+    \n  
+   declarationList
+    declaration
+     property_
+      ident
+       page-break-after
+      ws
+     :
+     ws
+       
+     expr
+      term
+       ident
+        always
+       ws
+    ws
+    ;
+    ws
+     \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  page
+   @page
+   ws
+     
+   pseudoPage
+    :
+    ident
+     left
+    ws
+      
+   {
+   ws
+    \n  
+   declaration
+    property_
+     ident
+      margin
+     ws
+    :
+    ws
+      
+    expr
+     term
+      dimension
+       2in
+      ws
+        
+     term
+      dimension
+       3in
+      ws
+   ;
+   ws
+    \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  page
+   @page
+   ws
+     
+   pseudoPage
+    :
+    ident
+     right
+    ws
+      
+   {
+   ws
+    \n  
+   declaration
+    property_
+     ident
+      margin
+     ws
+    :
+    ws
+      
+    expr
+     term
+      dimension
+       2in
+      ws
+        
+     term
+      dimension
+       3in
+      ws
+   ;
+   ws
+    \n
+   }
+   ws
+    \n
+ <EOF>

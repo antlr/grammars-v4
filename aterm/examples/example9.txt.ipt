@@ -1,0 +1,21 @@
+aterm_
+ term_
+  function_
+   afun
+    "test!"
+   args_
+    (
+    termlist
+     term_
+      num_
+       1
+     ,
+     term_
+      num_
+       2.1
+     ,
+     term_
+      afun
+       "Hello world!"
+    )
+ <EOF>

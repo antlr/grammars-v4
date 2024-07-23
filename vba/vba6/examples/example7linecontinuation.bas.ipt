@@ -1,0 +1,104 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     Sub
+      
+     ambiguousIdentifier
+      TestLineContinuedMemberCalls
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \n
+      endOfLine
+       comment
+        '   Valid line continuation syntax with
+      endOfLine
+       \n
+      endOfLine
+       comment
+        '   method / property chaining.
+      endOfLine
+       \n
+           
+     block
+      blockStmt
+       withStmt
+        With
+         
+        implicitCallStmt_InStmt
+         iCS_S_MembersCall
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            A
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             B
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             B
+        endOfStatement
+         endOfLine
+          \n
+              
+        End With
+      endOfStatement
+       endOfLine
+        \n\n
+            
+      blockStmt
+       withStmt
+        With
+         
+        implicitCallStmt_InStmt
+         iCS_S_MembersCall
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            A
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             B
+        endOfStatement
+         endOfLine
+          \n
+              
+        End With
+      endOfStatement
+       endOfLine
+        \n\n
+            
+      blockStmt
+       withStmt
+        With
+         
+        implicitCallStmt_InStmt
+         iCS_S_MembersCall
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            A
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             B
+        endOfStatement
+         endOfLine
+          \n
+              
+        End With
+      endOfStatement
+       endOfLine
+        \n
+     End Sub
+   endOfLine
+    \n
+ <EOF>

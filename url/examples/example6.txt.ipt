@@ -1,0 +1,21 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     abc.com
+  :
+  port
+   80
+  /
+  path
+   string
+    ~smith
+   /
+   string
+    home.html
+ <EOF>

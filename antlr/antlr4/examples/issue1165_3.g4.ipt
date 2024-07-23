@@ -1,0 +1,39 @@
+grammarSpec
+ grammarDecl
+  grammarType
+   grammar
+  identifier
+   issue1165_3
+  ;
+ prequelConstruct
+  tokensSpec
+   tokens {
+   idList
+    identifier
+     foo
+    ,
+    identifier
+     bar
+   }
+ rules
+  ruleSpec
+   lexerRuleSpec
+    WS
+    :
+    lexerRuleBlock
+     lexerAltList
+      lexerAlt
+       lexerElements
+        lexerElement
+         lexerAtom
+          [ \t\r\n]
+         ebnfSuffix
+          +
+       lexerCommands
+        ->
+        lexerCommand
+         lexerCommandName
+          identifier
+           skip
+    ;
+ <EOF>

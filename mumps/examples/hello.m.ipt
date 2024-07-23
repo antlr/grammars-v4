@@ -1,0 +1,32 @@
+program
+ line
+  routinedecl
+   identifier
+    hello
+   (
+   )
+   \n
+ line
+  code
+    
+    
+   command
+    write_
+     write
+      
+     arglist
+      arg
+       "Hello, World!"
+      ,
+      arg
+       !
+   \n
+ line
+  code
+    
+    
+   command
+    quit_
+     quit
+   \n
+ eof

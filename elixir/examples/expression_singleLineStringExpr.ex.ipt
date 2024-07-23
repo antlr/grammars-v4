@@ -1,0 +1,25 @@
+parse
+ block
+  expression
+   ""
+  eoe
+   \n
+   \n
+  expression
+   "foo"
+  eoe
+   \n
+   \n
+  expression
+   "foo\"bar"
+  eoe
+   \n
+   \n
+  expression
+   "\u0061"
+  eoe
+   \n
+   \n
+  expression
+   "hello\nworld"
+ <EOF>

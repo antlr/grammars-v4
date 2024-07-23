@@ -1,0 +1,28 @@
+log
+ line
+  host
+   127.0.0.1
+  logname
+   -
+  username
+   frank
+  datetimetz
+   [
+   10/Oct/2000
+   :
+   13:55:36
+   -0700
+   ]
+  request
+   "GET /apache_pb.gif HTTP/1.0"
+  statuscode
+   200
+  bytes
+   2326
+  referer
+   "http://www.example.com/start.html"
+  useragent
+   "Mozilla/4.08 [en] (Win98; I ;Nav)"
+ \n
+ \n
+ <EOF>

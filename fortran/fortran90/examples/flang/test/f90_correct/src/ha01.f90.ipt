@@ -1,0 +1,19 @@
+program
+ executableProgram
+  programUnit
+   mainProgram
+    programStmt
+     program
+     p
+    mainRange
+     body
+      bodyConstruct
+       executableConstruct
+        actionStmt
+         stopStmt
+          stop
+          42
+     endProgramStmt
+      end
+      program
+ <EOF>

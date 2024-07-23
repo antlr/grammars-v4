@@ -1,0 +1,1104 @@
+document
+ line
+  markup
+   title
+    =
+    markup
+     text_
+       Top-level heading (1)
+ \n
+ line
+  markup
+   title
+    =
+    =
+    markup
+     text_
+       This a test for creole 0.1 (2)
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       This is a Subheading (3)
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    =
+    markup
+     text_
+       Subsub (4)
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    =
+    =
+    markup
+     text_
+       Subsubsub (5)
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    The ending equal signs should not be displayed:
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    markup
+     text_
+       Top-level heading (1) 
+    =
+ \n
+ line
+  markup
+   title
+    =
+    =
+    markup
+     text_
+       This a test for creole 0.1 (2) 
+    =
+    =
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       This is a Subheading (3) 
+    =
+    =
+    =
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    =
+    markup
+     text_
+       Subsub (4) 
+    =
+    =
+    =
+    =
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    =
+    =
+    markup
+     text_
+       Subsubsub (5) 
+    =
+    =
+    =
+    =
+    =
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can make things 
+  markup
+   bold
+    **
+    markup
+     text_
+      bold
+    markup
+     bold
+      **
+      markup
+       text_
+         or 
+        /
+        /
+        italic
+        /
+        /
+         or 
+      markup
+       bold
+        **
+        markup
+         italics
+          /
+          /
+          markup
+           text_
+            both
+            /
+            /
+          markup
+           bold
+            **
+            markup
+             text_
+               or 
+              /
+              /
+            markup
+             bold
+              **
+              markup
+               text_
+                both
+              **
+          /
+          /
+        markup
+         text_
+          .
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Character formatting extends across line breaks: 
+  markup
+   bold
+    **
+    markup
+     text_
+      bold,
+ \n
+ line
+  markup
+   text_
+    this is still bold. This line deliberately does not end in star-star.
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Not bold. Character formatting does not cross paragraph boundaries.
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can use 
+  markup
+   href
+    [[
+    text_
+     internal links
+    ]]
+  markup
+   text_
+     or 
+  markup
+   href
+    [[
+    text_
+     http:
+     /
+     /
+     www.wikicreole.org
+    |
+    markup
+     text_
+      external links
+    ]]
+  markup
+   text_
+    ,
+ \n
+ line
+  markup
+   text_
+    give the link a 
+  markup
+   href
+    [[
+    text_
+     internal links
+    |
+    markup
+     text_
+      different
+    ]]
+  markup
+   text_
+     name.
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Here's another sentence: This wisdom is taken from 
+  markup
+   href
+    [[
+    text_
+     Ward Cunningham's
+    ]]
+ \n
+ line
+  markup
+   href
+    [[
+    text_
+     http:
+     /
+     /
+     www.c2.com
+     /
+     doc
+     /
+     wikisym
+     /
+     WikiSym2006.pdf
+    |
+    markup
+     text_
+      Presentation at the Wikisym 06
+    ]]
+  markup
+   text_
+    .
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Here's a external link without a description: 
+  markup
+   href
+    [[
+    text_
+     http:
+     /
+     /
+     www.wikicreole.org
+    ]]
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Be careful that italic links are rendered properly:  
+    /
+    /
+  markup
+   href
+    [[
+    text_
+     http:
+     /
+     /
+     my.book.example
+     /
+    |
+    markup
+     text_
+      My Book Title
+    ]]
+  markup
+   text_
+    /
+    /
+     
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Free links without braces should be rendered as well, like http:
+    /
+    /
+    www.wikicreole.org
+    /
+     and http:
+    /
+    /
+    www.wikicreole.org
+    /
+    users
+    /
+    ~example. 
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Creole1.0 specifies that http:
+    /
+    /
+    bar and ftp:
+    /
+    /
+    bar should not render italic,
+ \n
+ line
+  markup
+   text_
+    something like foo:
+    /
+    /
+    bar should render as italic.
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can use this to draw a line to separate the page:
+ \n
+ line
+  markup
+   hline
+    ----
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can use lists, start it at the first column for now, please...
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    unnumbered lists are like
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       item a
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       item b
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       
+  markup
+   bold
+    **
+    markup
+     text_
+      bold item c
+    **
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    blank space is also permitted before lists like:
+ \n
+ line
+  markup
+   text_
+      
+  markup
+   listitem
+    *
+    markup
+     text_
+         item a
+ \n
+ line
+  markup
+   text_
+     
+  markup
+   listitem
+    *
+    markup
+     text_
+       item b
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       item c
+ \n
+ line
+  markup
+   text_
+     
+  markup
+   bold
+    **
+    markup
+     text_
+       item c.a
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    or you can number them
+ \n
+ line
+  markup
+   listitem
+    #
+    markup
+     text_
+       
+  markup
+   href
+    [[
+    text_
+     item 1
+    ]]
+ \n
+ line
+  markup
+   listitem
+    #
+    markup
+     text_
+       item 2
+ \n
+ line
+  markup
+   listitem
+    #
+    markup
+     text_
+       
+      /
+      /
+       italic item 3 
+      /
+      /
+ \n
+ line
+  markup
+   text_
+        
+  markup
+   listitem
+    #
+    #
+    markup
+     text_
+       item 3.1
+ \n
+ line
+  markup
+   text_
+      
+  markup
+   listitem
+    #
+    #
+    markup
+     text_
+       item 3.2
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    up to five levels
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       1
+ \n
+ line
+  markup
+   bold
+    **
+    markup
+     text_
+       2
+ \n
+ line
+  markup
+   bold
+    **
+    markup
+     listitem
+      *
+      markup
+       text_
+         3
+ \n
+ line
+  markup
+   bold
+    **
+    markup
+     bold
+      **
+      markup
+       text_
+         4
+ \n
+ line
+  markup
+   bold
+    **
+    markup
+     bold
+      **
+      markup
+       listitem
+        *
+        markup
+         text_
+           5
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       You can have
+ \n
+ line
+  markup
+   text_
+    multiline list items
+ \n
+ line
+  markup
+   listitem
+    *
+    markup
+     text_
+       this is a second multiline
+ \n
+ line
+  markup
+   text_
+    list item
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can use nowiki syntax if you would like do stuff like this:
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   nowiki
+    {{{\nGuitar Chord C:\n \n||---|---|---|\n||-0-|---|---|\n||---|---|---|\n||---|-0-|---|\n||---|---|-0-|\n||---|---|---|\n}}}
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can also use it inline nowiki 
+  markup
+   nowiki
+    {{{ in a sentence }}}
+  markup
+   text_
+     like this.
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    markup
+     text_
+       Escapes 
+    =
+ \n
+ line
+  markup
+   text_
+    Normal Link: http:
+    /
+    /
+    wikicreole.org
+    /
+     - now same link, but escaped: ~http:
+    /
+    /
+    wikicreole.org
+    /
+     
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Normal asterisks: ~
+  markup
+   bold
+    **
+    markup
+     text_
+      not bold~
+    **
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    a tilde alone: ~
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    a tilde escapes itself: ~~xxx
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       Creole 0.2 
+    =
+    =
+    =
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    This should be a flower with the ALT text "this is a flower" if your wiki supports ALT text on images:
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   href
+    {{
+    text_
+     Red-Flower.jpg
+    |
+    markup
+     text_
+      here is a red flower
+    }}
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       Creole 0.4 
+    =
+    =
+    =
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    Tables are done like this:
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   tableheader
+    |=
+    markup
+     text_
+      header col1
+    |=
+    markup
+     text_
+      header col2
+    |
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   tablerow
+    |
+    markup
+     text_
+      col1
+    |
+    markup
+     text_
+      col2
+    |
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   tablerow
+    |
+    markup
+     text_
+      you         
+    |
+    markup
+     text_
+      can         
+    |
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   tablerow
+    |
+    markup
+     text_
+      also        
+    |
+    markup
+     text_
+      align\\ it. 
+    |
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    You can format an address by simply forcing linebreaks:
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    My contact dates:\\
+ \n
+ line
+  markup
+   text_
+    Pone: xyz\\
+ \n
+ line
+  markup
+   text_
+    Fax: +45\\
+ \n
+ line
+  markup
+   text_
+    Mobile: abc
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       Creole 0.5 
+    =
+    =
+    =
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   tableheader
+    |=
+    markup
+     text_
+       Header title               
+    |=
+    markup
+     text_
+       Another header title     
+    |
+ \n
+ line
+  markup
+   tablerow
+    |
+    markup
+     text_
+       
+    markup
+     nowiki
+      {{{ //not italic text// }}}
+    markup
+     text_
+       
+    |
+    markup
+     text_
+       
+    markup
+     nowiki
+      {{{ **not bold text** }}}
+    markup
+     text_
+       
+    |
+ \n
+ line
+  markup
+   tablerow
+    |
+    markup
+     text_
+       
+      /
+      /
+      italic text
+      /
+      /
+                   
+    |
+    markup
+     text_
+       
+    markup
+     bold
+      **
+      markup
+       text_
+          bold text 
+      markup
+       bold
+        **
+        markup
+         text_
+                    
+    |
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   title
+    =
+    =
+    =
+    markup
+     text_
+       Creole 1.0 
+    =
+    =
+    =
+ \n
+ line
+  markup
+   text_
+     
+ \n
+ line
+  markup
+   text_
+    If interwiki links are setup in your wiki, this links to the WikiCreole page about Creole 1.0 test cases: 
+  markup
+   href
+    [[
+    text_
+     WikiCreole:Creole1.0TestCases
+    ]]
+  markup
+   text_
+    .
+ \n
+ <EOF>

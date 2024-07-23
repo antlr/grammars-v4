@@ -1,0 +1,22 @@
+root
+ regExp
+  branch
+   piece
+    atom
+     charClass
+      charClassExpr
+       [
+       charGroup
+        posCharGroup
+         charRange
+          seRange
+           charOrEsc
+            a
+           -
+           charOrEsc
+            z
+       ]
+   piece
+    atom
+     \n
+ <EOF>

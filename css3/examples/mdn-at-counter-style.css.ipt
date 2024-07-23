@@ -1,0 +1,192 @@
+stylesheet
+ ws
+ nestedStatement
+  counterStyle
+   @counter-style
+   ws
+     
+   ident
+    circled-alpha
+   ws
+     
+   {
+   ws
+    \n  
+   declarationList
+    declaration
+     property_
+      ident
+       system
+      ws
+     :
+     ws
+       
+     expr
+      term
+       ident
+        fixed
+       ws
+    ws
+    ;
+    ws
+     \n  
+    declaration
+     property_
+      ident
+       symbols
+      ws
+     :
+     ws
+       
+     expr
+      term
+       ident
+        Ⓐ
+       ws
+         
+      term
+       ident
+        Ⓑ
+       ws
+         
+      term
+       ident
+        Ⓒ
+       ws
+         
+      term
+       ident
+        Ⓓ
+       ws
+         
+      term
+       ident
+        Ⓔ
+       ws
+         
+      term
+       ident
+        Ⓕ
+       ws
+         
+      term
+       ident
+        Ⓖ
+       ws
+         
+      term
+       ident
+        Ⓗ
+       ws
+         
+      term
+       ident
+        Ⓘ
+       ws
+         
+      term
+       ident
+        Ⓙ
+       ws
+         
+      term
+       ident
+        Ⓚ
+       ws
+         
+      term
+       ident
+        Ⓛ
+       ws
+         
+      term
+       ident
+        Ⓜ
+       ws
+         
+      term
+       ident
+        Ⓝ
+       ws
+         
+      term
+       ident
+        Ⓞ
+       ws
+         
+      term
+       ident
+        Ⓟ
+       ws
+         
+      term
+       ident
+        Ⓠ
+       ws
+         
+      term
+       ident
+        Ⓡ
+       ws
+         
+      term
+       ident
+        Ⓢ
+       ws
+         
+      term
+       ident
+        Ⓣ
+       ws
+         
+      term
+       ident
+        Ⓤ
+       ws
+         
+      term
+       ident
+        Ⓥ
+       ws
+         
+      term
+       ident
+        Ⓦ
+       ws
+         
+      term
+       ident
+        Ⓧ
+       ws
+         
+      term
+       ident
+        Ⓨ
+       ws
+         
+      term
+       ident
+        Ⓩ
+       ws
+    ;
+    ws
+     \n  
+    declaration
+     property_
+      ident
+       suffix
+      ws
+     :
+     ws
+       
+     expr
+      term
+       " "
+       ws
+    ;
+    ws
+     \n
+   }
+   ws
+    \n
+ <EOF>

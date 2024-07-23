@@ -1,0 +1,14 @@
+start_
+ item
+  token
+   NESTED_TERMINAL
+   token_params
+   :
+   expansions
+    alias
+     expansion
+      expr
+       atom
+        value
+         "N"
+ <EOF>

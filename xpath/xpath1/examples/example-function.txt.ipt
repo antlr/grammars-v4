@@ -1,0 +1,23 @@
+main
+ expr
+  orExpr
+   andExpr
+    equalityExpr
+     relationalExpr
+      additiveExpr
+       multiplicativeExpr
+        unaryExprNoRoot
+         unionExprNoRoot
+          pathExprNoRoot
+           filterExpr
+            primaryExpr
+             functionCall
+              functionName
+               nCName
+                foo
+               :
+               nCName
+                comment
+              (
+              )
+ <EOF>

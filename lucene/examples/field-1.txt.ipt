@@ -1,0 +1,21 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      fieldName
+       title
+      :
+      term
+       quotedTerm
+        "The Right Way"
+    AND
+    modClause
+     clause
+      fieldName
+       text
+      :
+      term
+       go
+ <EOF>

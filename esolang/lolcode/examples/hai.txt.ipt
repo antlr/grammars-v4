@@ -1,0 +1,13 @@
+program
+ HAI
+ code_block
+  statement
+   expression
+    1.3
+  statement
+   print_block
+    VISIBLE
+    expression
+     "Hai world!"
+ KTHXBYE
+ <EOF>

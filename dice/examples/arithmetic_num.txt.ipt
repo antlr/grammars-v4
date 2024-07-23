@@ -1,0 +1,18 @@
+file_
+ notation
+  addOp
+   multOp
+    operand
+     number
+      1
+   +
+   multOp
+    operand
+     number
+      2
+   -
+   multOp
+    operand
+     number
+      3
+ <EOF>

@@ -1,0 +1,8 @@
+startRule
+ module
+  \r\n
+  moduleOptions
+   moduleOption
+    Option Private Module
+   \r\n
+ <EOF>

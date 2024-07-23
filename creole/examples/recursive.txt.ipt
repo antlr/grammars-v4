@@ -1,0 +1,55 @@
+document
+ line
+  markup
+   bold
+    **
+    markup
+     italics
+      /
+      /
+      markup
+       text_
+        bold italics
+      /
+      /
+    **
+ \n
+ line
+  markup
+   italics
+    /
+    /
+    markup
+     bold
+      **
+      markup
+       text_
+        bold italics
+      **
+    /
+    /
+ \n
+ line
+  markup
+   italics
+    /
+    /
+    markup
+     text_
+      This is 
+    markup
+     bold
+      **
+      markup
+       text_
+        also
+      markup
+       bold
+        **
+        markup
+         text_
+           good.
+    /
+    /
+ \n
+ <EOF>

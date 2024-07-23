@@ -1,0 +1,22 @@
+sqlScript
+ unitStatement
+  dropAccessMethod
+   DROP
+   ACCESS_METHOD
+   identifier
+    anyName
+     T_tree
+   RESTRICT
+  ;
+ unitStatement
+  dropAccessMethod
+   DROP
+   ACCESS_METHOD
+   IF
+   EXISTS
+   identifier
+    anyName
+     T_tree
+   RESTRICT
+  ;
+ <EOF>

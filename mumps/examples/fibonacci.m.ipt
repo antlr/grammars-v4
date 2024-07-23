@@ -1,0 +1,172 @@
+program
+ line
+  code
+   label
+    identifier
+     FIBONACCI
+     
+   \n
+ line
+  code
+    
+   command
+    set_
+     SET
+      
+     assign
+      (
+      arglist
+       arg
+        expression
+         term
+          variable
+           identifier
+            A
+       ,
+       arg
+        expression
+         term
+          variable
+           identifier
+            B
+      )
+      =
+      arg
+       expression
+        term
+         1
+   \n
+ line
+  code
+    
+   command
+    for_
+     FOR
+      
+     term
+      variable
+       identifier
+        I
+     =
+     term
+      1
+     :
+     term
+      1
+      
+     command
+      set_
+       SET
+        
+       assign
+        arglist
+         arg
+          expression
+           term
+            variable
+             identifier
+              S
+        =
+        arg
+         expression
+          term
+           variable
+            identifier
+             A
+          +
+          expression
+           term
+            variable
+             identifier
+              B
+      
+     command
+      write_
+       WRITE
+        
+       arglist
+        arg
+         !
+        ,
+        arg
+         expression
+          term
+           variable
+            identifier
+             S
+      
+     command
+      set_
+       SET
+        
+       assign
+        arglist
+         arg
+          expression
+           term
+            variable
+             identifier
+              A
+        =
+        arg
+         expression
+          term
+           variable
+            identifier
+             B
+      
+     command
+      set_
+       SET
+        
+       assign
+        arglist
+         arg
+          expression
+           term
+            variable
+             identifier
+              B
+        =
+        arg
+         expression
+          term
+           variable
+            identifier
+             S
+      
+     command
+      quit_
+       QUIT
+     :
+     condition
+      term
+       variable
+        identifier
+         S
+      >
+      term
+       100
+   \n
+ line
+  code
+    
+   command
+    write_
+     WRITE
+      
+     arglist
+      arg
+       !
+      ,
+      arg
+       "Result= "
+      ,
+      arg
+       expression
+        term
+         variable
+          identifier
+           S
+   \n
+ eof

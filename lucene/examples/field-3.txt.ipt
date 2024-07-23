@@ -1,0 +1,24 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      fieldName
+       title
+      :
+      term
+       Do
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       it
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       right
+ <EOF>

@@ -1,0 +1,18 @@
+iso
+ date
+  dateExtended
+   datePreciseExtended
+    ordinalDateExtended
+     year
+      int4
+       1
+       9
+       8
+       5
+     -
+     ordinalDay
+      int3
+       1
+       0
+       2
+ <EOF>

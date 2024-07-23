@@ -1,0 +1,19 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       quotedTerm
+        "jakarta apache"
+        ^
+        4
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       quotedTerm
+        "Apache Lucene"
+ <EOF>

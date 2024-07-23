@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  create_edition
+   CREATE
+   EDITION
+   id_expression
+    regular_id
+     test_ed
+ ;
+ <EOF>

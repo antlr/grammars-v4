@@ -1,0 +1,10 @@
+sqlScript
+ unitStatement
+  dropTrustedContext
+   DROP
+   TRUSTED
+   CONTEXT
+   anyName
+    cntx1
+  ;
+ <EOF>

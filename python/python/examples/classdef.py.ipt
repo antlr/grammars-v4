@@ -1,0 +1,57 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    classdef
+     class
+     name
+      foo
+     :
+     suite
+      simple_stmt
+       small_stmt
+        pass
+       
+  stmt
+   compound_stmt
+    classdef
+     class
+     name
+      bar
+     (
+     )
+     :
+     suite
+      simple_stmt
+       small_stmt
+        pass
+       
+  stmt
+   compound_stmt
+    classdef
+     class
+     name
+      baz
+     (
+     arglist
+      argument
+       test
+        logical_test
+         comparison
+          expr
+           atom
+            name
+             foo
+     )
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+ <EOF>

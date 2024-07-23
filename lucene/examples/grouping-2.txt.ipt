@@ -1,0 +1,31 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      fieldName
+       title
+      :
+      groupingExpr
+       (
+       query
+        disjQuery
+         conjQuery
+          modClause
+           modifier
+            +
+           clause
+            term
+             return
+        disjQuery
+         conjQuery
+          modClause
+           modifier
+            +
+           clause
+            term
+             quotedTerm
+              "pink panther"
+       )
+ <EOF>

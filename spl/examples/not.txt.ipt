@@ -1,0 +1,19 @@
+query
+ initCommand
+  operation
+   id
+    index
+   =
+   expression
+    value
+     "your_index"
+  operation
+   NOT
+   operation
+    id
+     field_name
+    =
+    expression
+     value
+      "value_to_exclude"
+ <EOF>

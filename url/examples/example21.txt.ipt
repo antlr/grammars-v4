@@ -1,0 +1,23 @@
+url
+ uri
+  scheme
+   string
+    https
+  ://
+  host
+   hostname
+    string
+     github.com
+  /
+  path
+   string
+    dpaukov
+   /
+   string
+    combinatoricslib3
+  frag
+   #
+   string
+    3-simple-permutations
+  \n
+ <EOF>

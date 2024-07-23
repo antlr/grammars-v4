@@ -1,0 +1,18 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     www.baidu.com
+  query
+   ?
+   search
+    searchparameter
+     string
+      a
+  \n
+ <EOF>

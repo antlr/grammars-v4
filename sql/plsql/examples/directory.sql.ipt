@@ -1,0 +1,26 @@
+sql_script
+ unit_statement
+  create_directory
+   CREATE
+   DIRECTORY
+   directory_name
+    regular_id
+     mydir
+   AS
+   directory_path
+    '/scratch/data/file_data'
+ ;
+ unit_statement
+  create_directory
+   CREATE
+   OR
+   REPLACE
+   DIRECTORY
+   directory_name
+    regular_id
+     bfile_dir
+   AS
+   directory_path
+    '/usr/bin/bfile_dir'
+ ;
+ <EOF>

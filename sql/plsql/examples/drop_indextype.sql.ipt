@@ -1,0 +1,19 @@
+sql_script
+ unit_statement
+  drop_indextype
+   DROP
+   INDEXTYPE
+   id_expression
+    regular_id
+     position_indextype
+   FORCE
+ ;
+ unit_statement
+  drop_indextype
+   DROP
+   INDEXTYPE
+   id_expression
+    regular_id
+     position_indextype
+ ;
+ <EOF>

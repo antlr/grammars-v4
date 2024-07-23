@@ -1,0 +1,65 @@
+program
+ inheritance
+  extends
+  Object
+ \n
+ topLevelDecl
+  methodDecl
+   func
+   f
+   (
+   parList
+    parameter
+     p1
+    ,
+    parameter
+     p2
+    ,
+    parameter
+     p3
+   )
+   :
+   stmtOrSuite
+     
+        
+    suite
+     stmt
+      pass
+      stmtEnd
+       \n
+    \n
+ topLevelDecl
+  methodDecl
+   func
+   f2
+   (
+   )
+   :
+   stmtOrSuite
+     
+        
+    suite
+     stmt
+      exprStmt
+       expression
+        expression
+         literal
+          f
+        (
+        argList
+         expression
+          literal
+           1
+         ,
+         expression
+          literal
+           2
+         ,
+         expression
+          literal
+           3
+        )
+       stmtEnd
+        \n
+    \n
+ <EOF>

@@ -1,0 +1,53 @@
+program
+ line
+  \n
+ line
+  code
+    
+   command
+    for_
+     FOR
+      
+     term
+      variable
+       identifier
+        I
+     =
+     term
+      1
+     :
+     term
+      1
+     :
+     term
+      100
+      
+     command
+      write_
+       WRITE
+        
+       arglist
+        arg
+         expression
+          term
+           variable
+            identifier
+             I
+        ,
+        arg
+         !
+      
+     command
+      quit_
+       QUIT
+     :
+     condition
+      term
+       variable
+        identifier
+         I
+      =
+      term
+       56
+   \n
+ eof

@@ -1,0 +1,27 @@
+stmt
+ command
+  ddl_command
+   create_table_as
+    create
+    table
+    table_name
+     id_
+      t
+    as
+    query
+     select
+      select_statement
+       select
+       select_list
+        select_item
+         expression
+          primitive_expression
+           literal
+            number
+             int_number
+              1
+         as
+         alias
+          id_
+           c
+ <EOF>

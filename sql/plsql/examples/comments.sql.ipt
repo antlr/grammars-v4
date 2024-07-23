@@ -1,0 +1,27 @@
+sql_script
+ unit_statement
+  data_manipulation_language_statements
+   select_statement
+    select_only_statement
+     subquery
+      subquery_basic_elements
+       query_block
+        select
+        selected_list
+         *
+        from_clause
+         from
+         table_ref_list
+          table_ref
+           table_ref_aux
+            table_ref_aux_internal
+             dml_table_expression_clause
+              tableview_name
+               identifier
+                id_expression
+                 regular_id
+                  dual
+ ;
+ sql_plus_command
+  prompt . ## Hello world
+ <EOF>

@@ -1,0 +1,44 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    propertyGetStmt
+     visibility
+      Public
+      
+     Property Get
+      
+     ambiguousIdentifier
+      HelloWorld
+     argList
+      (
+      )
+      
+     asTypeClause
+      As
+       
+      type_
+       baseType
+        String
+     endOfStatement
+      endOfLine
+       \n
+           
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           HelloWorld
+         
+        =
+         
+        valueStmt
+         literal
+          "Hello, World"
+      endOfStatement
+       endOfLine
+        \n
+     End Property
+ <EOF>

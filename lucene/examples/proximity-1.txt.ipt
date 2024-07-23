@@ -1,0 +1,14 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       term
+        quotedTerm
+         "jakarta apache"
+       fuzzy
+        ~
+        10
+ <EOF>

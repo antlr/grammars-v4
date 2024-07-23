@@ -1,0 +1,297 @@
+stylesheet
+ ws
+ nestedStatement
+  media
+   @media
+   ws
+     
+   mediaQueryList
+    mediaQuery
+     ws
+     mediaType
+      ident
+       print
+     ws
+       
+    ws
+   groupRuleBody
+    {
+    ws
+     \n  
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         typeSelector
+          elementName
+           ident
+            body
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          font-size
+         ws
+        :
+        ws
+          
+        expr
+         term
+          dimension
+           10pt
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n
+   ws
+ nestedStatement
+  media
+   @media
+   ws
+     
+   mediaQueryList
+    mediaQuery
+     ws
+     mediaType
+      ident
+       screen
+     ws
+       
+    ws
+   groupRuleBody
+    {
+    ws
+     \n  
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         typeSelector
+          elementName
+           ident
+            body
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          font-size
+         ws
+        :
+        ws
+          
+        expr
+         term
+          dimension
+           13px
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n
+   ws
+ nestedStatement
+  media
+   @media
+   ws
+     
+   mediaQueryList
+    mediaQuery
+     ws
+     mediaType
+      ident
+       screen
+     ws
+    ,
+    ws
+      
+    mediaQuery
+     ws
+     mediaType
+      ident
+       print
+     ws
+       
+    ws
+   groupRuleBody
+    {
+    ws
+     \n  
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         typeSelector
+          elementName
+           ident
+            body
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          line-height
+         ws
+        :
+        ws
+          
+        expr
+         term
+          number
+           1.2
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n
+   ws
+ nestedStatement
+  media
+   @media
+   ws
+     
+   mediaQueryList
+    mediaQuery
+     only
+     ws
+       
+     mediaType
+      ident
+       screen
+     ws
+       \n  
+     and
+     ws
+       
+     mediaExpression
+      (
+      ws
+      mediaFeature
+       ident
+        min-device-width
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         320px
+        ws
+      )
+      ws
+        \n  
+     and
+     ws
+       
+     mediaExpression
+      (
+      ws
+      mediaFeature
+       ident
+        max-device-width
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         480px
+        ws
+      )
+      ws
+       \n  
+     and
+     ws
+       
+     mediaExpression
+      (
+      ws
+      mediaFeature
+       ident
+        -webkit-min-device-pixel-ratio
+       ws
+      :
+      ws
+        
+      expr
+       term
+        number
+         2
+        ws
+      )
+      ws
+        
+    ws
+   groupRuleBody
+    {
+    ws
+     \n    
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         typeSelector
+          elementName
+           ident
+            body
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          line-height
+         ws
+        :
+        ws
+          
+        expr
+         term
+          number
+           1.4
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n
+   ws
+ <EOF>

@@ -1,0 +1,18 @@
+chunk
+ block
+  stat
+   local
+   Direction
+   =
+   newtype
+    enum
+    str
+     "north"
+    str
+     "south"
+    str
+     "east"
+    str
+     "west"
+    end
+ <EOF>

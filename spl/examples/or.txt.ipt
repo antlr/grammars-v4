@@ -1,0 +1,26 @@
+query
+ initCommand
+  operation
+   id
+    index
+   =
+   expression
+    value
+     id
+      main
+  operation
+   (
+   operation
+    operation
+     expression
+      value
+       id
+        error
+    OR
+    operation
+     expression
+      value
+       id
+        warning
+   )
+ <EOF>

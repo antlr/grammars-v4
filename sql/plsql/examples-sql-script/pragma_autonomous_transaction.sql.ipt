@@ -1,0 +1,22 @@
+sql_script
+ unit_statement
+  anonymous_block
+   declare
+   seq_of_declare_specs
+    declare_spec
+     pragma_declaration
+      pragma
+      autonomous_transaction
+      ;
+   begin
+   seq_of_statements
+    statement
+     sql_statement
+      transaction_control_statements
+       commit_statement
+        commit
+    ;
+   end
+ ;
+ /
+ <EOF>

@@ -1,0 +1,10 @@
+arangodb_query
+ data_query
+  data_access_query
+   return_expr
+    RETURN
+    expr
+     literal
+      numeric_literal
+       1
+ <EOF>

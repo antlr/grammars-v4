@@ -1,0 +1,23 @@
+log
+ line
+  host
+   130.130.255.25
+  logname
+   -
+  username
+   -
+  datetimetz
+   [
+   20/Oct/2012
+   :
+   15:03:25
+   -0700
+   ]
+  request
+   "GET /index.html HTTP/1.1"
+  statuscode
+   200
+  bytes
+   1402
+ \n
+ <EOF>

@@ -1,0 +1,15 @@
+parse
+ block
+  expression
+   0xcafebabe
+  eoe
+   \n
+   \n
+  expression
+   0xC_A_F_E
+  eoe
+   \n
+   \n
+  expression
+   0x1234567890abcdefABCDEF
+ <EOF>

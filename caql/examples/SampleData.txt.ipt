@@ -1,0 +1,21 @@
+start_
+ expression
+  vectorOperation
+   (
+   vectorOperation
+    name
+     find
+    (
+    '*Mon_MCS_Info.num_of_active*video*clients`gauge*'
+    ,
+    'or(__check_name:\"host1\",\n__check_name:\"host2\",__check_name:\"host3\")'
+    )
+    metricsAggregation
+     |
+     name
+      stats:sum
+     parameterList
+      (
+      )
+   )
+ <EOF>

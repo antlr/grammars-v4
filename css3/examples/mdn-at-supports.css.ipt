@@ -1,0 +1,589 @@
+stylesheet
+ ws
+ nestedStatement
+  supportsRule
+   @supports
+   ws
+     
+   supportsCondition
+    supportsConditionInParens
+     supportsDeclarationCondition
+      (
+      ws
+      declaration
+       property_
+        ident
+         animation-name
+        ws
+       :
+       ws
+         
+       expr
+        term
+         ident
+          test
+         ws
+      )
+   ws
+     
+   groupRuleBody
+    {
+    ws
+     \n    
+     /* specific CSS applied when animations are supported unprefixed */
+     \n    
+    nestedStatement
+     keyframesRule
+      @keyframes
+      ws
+       
+      ws
+      ident
+       identifier
+      ws
+        
+      {
+      ws
+        
+       /* @supports being a CSS conditional group at-rule, it can includes other relevant at-rules */
+       \n        
+      keyframeBlock
+       keyframeSelector
+        0%
+        ws
+          
+       {
+       ws
+         
+       declarationList
+        declaration
+         property_
+          ident
+           top
+          ws
+         :
+         ws
+           
+         expr
+          term
+           number
+            0
+           ws
+        ws
+        ;
+        ws
+          
+        declaration
+         property_
+          ident
+           left
+          ws
+         :
+         ws
+           
+         expr
+          term
+           number
+            0
+           ws
+        ;
+        ws
+          
+       }
+       ws
+        \n        
+      keyframeBlock
+       keyframeSelector
+        30%
+        ws
+          
+       {
+       ws
+         
+       declarationList
+        declaration
+         property_
+          ident
+           top
+          ws
+         :
+         ws
+           
+         expr
+          term
+           dimension
+            50px
+           ws
+        ws
+        ;
+        ws
+          
+       }
+       ws
+        \n        
+      keyframeBlock
+       keyframeSelector
+        68%
+        ws
+        ,
+        ws
+          
+        72%
+        ws
+          
+       {
+       ws
+         
+       declarationList
+        declaration
+         property_
+          ident
+           left
+          ws
+         :
+         ws
+           
+         expr
+          term
+           dimension
+            50px
+           ws
+        ws
+        ;
+        ws
+          
+       }
+       ws
+        \n        
+      keyframeBlock
+       keyframeSelector
+        100%
+        ws
+          
+       {
+       ws
+         
+       declarationList
+        declaration
+         property_
+          ident
+           top
+          ws
+         :
+         ws
+           
+         expr
+          term
+           dimension
+            100px
+           ws
+        ws
+        ;
+        ws
+          
+        declaration
+         property_
+          ident
+           left
+          ws
+         :
+         ws
+           
+         expr
+          term
+           percentage
+            100%
+           ws
+        ;
+        ws
+          
+       }
+       ws
+        \n    
+      }
+      ws
+       \n    \n    
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         className
+          .
+          ident
+           example
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          color
+         ws
+        :
+        ws
+          
+        expr
+         term
+          ident
+           red
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n\n
+ nestedStatement
+  supportsRule
+   @supports
+   ws
+     
+   supportsCondition
+    supportsConditionInParens
+     (
+     ws
+       
+     supportsCondition
+      supportsDisjunction
+       supportsConditionInParens
+        supportsDeclarationCondition
+         (
+         ws
+         declaration
+          property_
+           ident
+            perspective
+           ws
+          :
+          ws
+            
+          expr
+           term
+            dimension
+             10px
+            ws
+         )
+       ws
+        
+       ws
+       or
+       ws
+        
+       ws
+       supportsConditionInParens
+        supportsDeclarationCondition
+         (
+         ws
+         declaration
+          property_
+           ident
+            -moz-perspective
+           ws
+          :
+          ws
+            
+          expr
+           term
+            dimension
+             10px
+            ws
+         )
+       ws
+        
+       ws
+       or
+       ws
+        
+       ws
+       supportsConditionInParens
+        supportsDeclarationCondition
+         (
+         ws
+         declaration
+          property_
+           ident
+            -webkit-perspective
+           ws
+          :
+          ws
+            
+          expr
+           term
+            dimension
+             10px
+            ws
+         )
+       ws
+        
+       ws
+       or
+       ws
+       \n            
+       ws
+       supportsConditionInParens
+        supportsDeclarationCondition
+         (
+         ws
+         declaration
+          property_
+           ident
+            -ms-perspective
+           ws
+          :
+          ws
+            
+          expr
+           term
+            dimension
+             10px
+            ws
+         )
+       ws
+        
+       ws
+       or
+       ws
+        
+       ws
+       supportsConditionInParens
+        supportsDeclarationCondition
+         (
+         ws
+         declaration
+          property_
+           ident
+            -o-perspective
+           ws
+          :
+          ws
+            
+          expr
+           term
+            dimension
+             10px
+            ws
+         )
+     ws
+       
+     )
+   ws
+     
+   groupRuleBody
+    {
+    ws
+     \n    
+     /* specific CSS applied when 3D transforms, eventually prefixed, are supported */
+     \n    
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         className
+          .
+          ident
+           example
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          color
+         ws
+        :
+        ws
+          
+        expr
+         term
+          ident
+           green
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n\n
+ nestedStatement
+  supportsRule
+   @supports
+   ws
+     
+   supportsCondition
+    supportsNegation
+     not
+     ws
+      
+     ws
+     supportsConditionInParens
+      (
+      ws
+      supportsCondition
+       supportsDisjunction
+        supportsConditionInParens
+         supportsDeclarationCondition
+          (
+          ws
+          declaration
+           property_
+            ident
+             text-align-last
+            ws
+           :
+           ws
+           expr
+            term
+             ident
+              justify
+             ws
+          )
+        ws
+         
+        ws
+        or
+        ws
+         
+        ws
+        supportsConditionInParens
+         supportsDeclarationCondition
+          (
+          ws
+          declaration
+           property_
+            ident
+             -moz-text-align-last
+            ws
+           :
+           ws
+           expr
+            term
+             ident
+              justify
+             ws
+          )
+      ws
+        
+      )
+   ws
+   groupRuleBody
+    {
+    ws
+     \n    
+     /* specific CSS applied to simulate text-align-last:justify */
+     \n    
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         className
+          .
+          ident
+           example
+        ws
+          
+      {
+      ws
+        
+      declarationList
+       declaration
+        property_
+         ident
+          color
+         ws
+        :
+        ws
+          
+        expr
+         term
+          ident
+           blue
+          ws
+            
+       ws
+      }
+      ws
+       \n
+    }
+    ws
+     \n\n
+ nestedStatement
+  supportsRule
+   @supports
+   ws
+     
+   supportsCondition
+    supportsConditionInParens
+     supportsDeclarationCondition
+      (
+      ws
+      declaration
+       property_
+        --foo
+        ws
+       :
+       ws
+         
+       expr
+        term
+         ident
+          green
+         ws
+      )
+   ws
+     
+   groupRuleBody
+    {
+    ws
+     \n  
+    nestedStatement
+     ruleset
+      selectorGroup
+       selector
+        simpleSelectorSequence
+         typeSelector
+          elementName
+           ident
+            body
+        ws
+          
+      {
+      ws
+       \n    
+      declarationList
+       declaration
+        property_
+         ident
+          color
+         ws
+        :
+        ws
+          
+        expr
+         term
+          ident
+           green
+          ws
+       ws
+       ;
+       ws
+        \n  
+      }
+      ws
+       \n
+    }
+    ws
+     \n
+ <EOF>

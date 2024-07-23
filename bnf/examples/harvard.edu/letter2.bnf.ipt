@@ -1,0 +1,420 @@
+start_
+ prods
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      a
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      b
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      c
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      d
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      e
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      f
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      g
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      h
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      i
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      j
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      k
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      l
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      m
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      n
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      o
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      p
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      q
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      r
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      s
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      t
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      u
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      v
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      w
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      x
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      y
+      "
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      z
+      "
+ ws
+  \n
+ <EOF>

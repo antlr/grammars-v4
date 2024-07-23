@@ -1,0 +1,69 @@
+searchCrit
+ searchExp
+  searchExp
+   relExp
+    upnp:class
+     
+    derivedfrom
+     
+    quotedVal
+     "
+     escapedQuote
+      o
+      b
+      j
+      e
+      c
+      t
+      .
+      i
+      t
+      e
+      m
+      .
+      a
+      u
+      d
+      i
+      o
+      I
+      t
+      e
+      m
+      .
+      m
+      u
+      s
+      i
+      c
+      T
+      r
+      a
+      c
+      k
+     "
+   
+  and
+   
+  searchExp
+   (
+   searchExp
+    relExp
+     upnp:genre
+      
+     contains
+      
+     quotedVal
+      "
+      escapedQuote
+       F
+       i
+       n
+       d
+       T
+       h
+       i
+       s
+      "
+   )
+ <EOF>

@@ -1,0 +1,12 @@
+intrinsic_function
+ states_func_decl
+  States
+  .
+  state_fun_name
+   JsonToString
+  func_arg_list
+   (
+   func_arg
+    $.FunctionInput
+   )
+ <EOF>

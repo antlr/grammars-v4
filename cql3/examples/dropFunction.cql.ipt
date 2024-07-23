@@ -1,0 +1,21 @@
+root
+ cqls
+  cql
+   dropFunction
+    kwDrop
+     DROP
+    kwFunction
+     FUNCTION
+    ifExist
+     kwIf
+      IF
+     kwExists
+      EXISTS
+    keyspace
+     cycling
+    .
+    function_
+     fLog
+  statementSeparator
+   ;
+ <EOF>

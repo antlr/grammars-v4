@@ -1,0 +1,13 @@
+sql_script
+ unit_statement
+  truncate_cluster
+   TRUNCATE
+   CLUSTER
+   cluster_name
+    id_expression
+     regular_id
+      personnel
+   REUSE
+   STORAGE
+ ;
+ <EOF>

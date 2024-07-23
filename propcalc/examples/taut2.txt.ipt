@@ -1,0 +1,23 @@
+proposition
+ expression
+  relExpression
+   atom
+    variable
+     p
+ |-
+ expression
+  relExpression
+   atom
+    (
+    expression
+     relExpression
+      atom
+       variable
+        p
+     v
+     relExpression
+      atom
+       variable
+        p
+    )
+ <EOF>

@@ -1,0 +1,25 @@
+htmlDocument
+ phpBlock
+  topStatement
+   statement
+    expressionStatement
+     expression
+      assignable
+       chain
+        chainOrigin
+         chainBase
+          keyedVariable
+           $x
+      assignmentOperator
+       =
+      expression
+       constant
+        literalConstant
+         numericConstant
+          0
+     ;
+  topStatement
+   statement
+    emptyStatement_
+     ?>
+ <EOF>

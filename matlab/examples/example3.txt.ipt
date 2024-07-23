@@ -1,0 +1,28 @@
+file_
+ statement_list
+  statement_list
+   statement
+    assignment_statement
+     assignment_expression
+      postfix_expression
+       primary_expression
+        a
+      =
+      expression
+       or_expression
+        and_expression
+         equality_expression
+          relational_expression
+           additive_expression
+            multiplicative_expression
+             unary_expression
+              postfix_expression
+               primary_expression
+                'A string with ''apostrophes'''
+     eostmt
+      ;
+  statement
+   expression_statement
+    eostmt
+     \n\n
+ <EOF>

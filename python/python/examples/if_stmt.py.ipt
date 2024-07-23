@@ -1,0 +1,190 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    if
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            5
+    :
+    suite
+     simple_stmt
+      small_stmt
+       pass
+      
+  stmt
+   compound_stmt
+    if
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            4
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    elif_clause
+     elif
+     test
+      logical_test
+       comparison
+        comparison
+         expr
+          atom
+           name
+            x
+        ==
+        comparison
+         expr
+          atom
+           number
+            integer
+             3
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    if
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            7
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    else_clause
+     else
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    if
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            4
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    elif_clause
+     elif
+     test
+      logical_test
+       comparison
+        comparison
+         expr
+          atom
+           name
+            x
+        ==
+        comparison
+         expr
+          atom
+           number
+            integer
+             3
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+    else_clause
+     else
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+ <EOF>

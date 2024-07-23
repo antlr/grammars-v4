@@ -1,0 +1,25 @@
+program
+ BEGIN
+ stmt_list
+  stmt
+   write_stmt
+    WRITE
+    expr_list
+     expr
+      expr
+       expr
+        factor
+         integer
+          1
+       op
+        +
+       factor
+        integer
+         2
+      op
+       -
+      factor
+       integer
+        3
+ END
+ <EOF>

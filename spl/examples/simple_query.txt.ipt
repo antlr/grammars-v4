@@ -1,0 +1,17 @@
+query
+ initCommand
+  operation
+   id
+    source
+   =
+   expression
+    value
+     "error.log"
+  operation
+   id
+    status
+   =
+   expression
+    value
+     404
+ <EOF>

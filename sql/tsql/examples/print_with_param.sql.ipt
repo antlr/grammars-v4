@@ -1,0 +1,33 @@
+tsql_file
+ batch
+  sql_clauses
+   cfl_statement
+    print_statement
+     print
+     expression
+      full_column_name
+       id_
+        "Error!"
+  sql_clauses
+   cfl_statement
+    print_statement
+     print
+     expression
+      full_column_name
+       id_
+        "Error: %1!"
+     ,
+     @anfEnd
+  sql_clauses
+   cfl_statement
+    print_statement
+     print
+     expression
+      full_column_name
+       id_
+        "Error: %1! %2!"
+     ,
+     @anfEnd
+     ,
+     @asd
+ <EOF>

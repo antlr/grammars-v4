@@ -1,0 +1,17 @@
+sql_script
+ unit_statement
+  create_context
+   CREATE
+   CONTEXT
+   oracle_namespace
+    id_expression
+     regular_id
+      hr_context
+   USING
+   package_name
+    identifier
+     id_expression
+      regular_id
+       emp_mgmt
+ ;
+ <EOF>

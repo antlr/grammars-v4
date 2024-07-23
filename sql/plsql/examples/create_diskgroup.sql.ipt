@@ -1,0 +1,15 @@
+sql_script
+ unit_statement
+  create_diskgroup
+   CREATE
+   DISKGROUP
+   id_expression
+    regular_id
+     dgroup_01
+   EXTERNAL
+   REDUNDANCY
+   DISK
+   qualified_disk_clause
+    '/devices/disks/c*'
+ ;
+ <EOF>

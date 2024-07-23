@@ -1,0 +1,26 @@
+expression
+ signedAtom
+  variable
+   a
+ term
+  signedAtom
+   variable
+    a
+ term
+  oper
+   *
+ term
+  signedAtom
+   variable
+    A
+ term
+  signedAtom
+   variable
+    A
+ term
+  oper
+   *
+ term
+  oper
+   +
+ <EOF>

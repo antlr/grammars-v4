@@ -1,0 +1,13 @@
+parse
+ statements
+  singleStatement
+   statement
+    ROLLBACK
+   ;
+ statements
+  singleStatement
+   statement
+    ROLLBACK
+    WORK
+   ;
+ <EOF>

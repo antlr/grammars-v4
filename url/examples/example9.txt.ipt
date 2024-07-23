@@ -1,0 +1,19 @@
+url
+ uri
+  scheme
+   string
+    ftps
+  ://
+  host
+   hostname
+    string
+     example.com
+  /
+  path
+   string
+    pub
+   /
+   string
+    file.txt
+  \n
+ <EOF>

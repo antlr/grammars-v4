@@ -1,0 +1,15 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    alter_message_type
+     ALTER
+     MESSAGE
+     TYPE
+     id_
+      [//Adventure-Works.com/Expenses/SubmitExpense]
+     VALIDATION
+     =
+     WELL_FORMED_XML
+   ;
+ <EOF>

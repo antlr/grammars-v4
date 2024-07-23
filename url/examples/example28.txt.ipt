@@ -1,0 +1,15 @@
+url
+ uri
+  scheme
+   string
+    https
+  ://
+  host
+   hostname
+    string
+     github.com
+  /
+  path
+   string
+    1
+ <EOF>

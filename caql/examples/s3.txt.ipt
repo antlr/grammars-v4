@@ -1,0 +1,21 @@
+start_
+ expression
+  vectorOperation
+   name
+    metric
+   (
+   AC853FCC-5C29-4F9E-867C-69BC699C5DBF
+   ,
+   "duration|ST[service:www]"
+   )
+   metricsAggregation
+    |
+    name
+     label
+    parameterList
+     (
+     parameter
+      literal
+       "Some static name"
+     )
+ <EOF>

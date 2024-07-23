@@ -1,0 +1,16 @@
+iso
+ date
+  dateBasic
+   specificWeekWeekDateBasic
+    year
+     int4
+      1
+      9
+      8
+      5
+    W
+    week
+     int2
+      1
+      5
+ <EOF>

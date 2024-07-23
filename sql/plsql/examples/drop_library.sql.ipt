@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_library
+   DROP
+   LIBRARY
+   library_name
+    regular_id
+     ext_lib
+ ;
+ <EOF>

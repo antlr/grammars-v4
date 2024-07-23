@@ -1,0 +1,16 @@
+file_
+ line
+  comment
+   ; imp
+  \n
+ line
+  instruction
+   opcode
+    MOV
+   number
+    0
+   ,
+   number
+    1
+  \n
+ <EOF>

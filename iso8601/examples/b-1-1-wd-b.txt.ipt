@@ -1,0 +1,19 @@
+iso
+ date
+  dateBasic
+   datePreciseBasic
+    weekDateBasic
+     year
+      int4
+       1
+       9
+       8
+       5
+     W
+     week
+      int2
+       1
+       5
+     weekDay
+      5
+ <EOF>

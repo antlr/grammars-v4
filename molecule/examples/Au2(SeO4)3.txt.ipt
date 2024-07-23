@@ -1,0 +1,26 @@
+molecule
+ part_
+  structure
+   symbol
+    element
+     Au
+   count
+    2
+  structure
+   symbol
+    group
+     (
+     structure
+      symbol
+       element
+        Se
+     structure
+      symbol
+       element
+        O
+      count
+       4
+     )
+   count
+    3
+ <EOF>

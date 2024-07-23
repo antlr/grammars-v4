@@ -1,0 +1,8 @@
+program
+ classDefine
+  class
+  A
+  {
+  }
+ ;
+ <EOF>

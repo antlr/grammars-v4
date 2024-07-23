@@ -1,0 +1,17 @@
+preds
+ pred
+  N
+  [
+  program
+   statement_list
+    statement
+     expr
+      expr
+       variable
+        layer
+      ==
+      expr
+       constant
+        "(*a*)"
+  ]
+ <EOF>

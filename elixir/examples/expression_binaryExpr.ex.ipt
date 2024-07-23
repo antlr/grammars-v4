@@ -1,0 +1,20 @@
+parse
+ block
+  expression
+   0b0
+  eoe
+   \n
+   \n
+  expression
+   0b00010101000101011101001010101010
+  eoe
+   \n
+   \n
+  expression
+   0b000_1010_1000
+  eoe
+   \n
+   \n
+  expression
+   0b0_0_0_0_0
+ <EOF>

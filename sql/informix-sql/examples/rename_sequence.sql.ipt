@@ -1,0 +1,17 @@
+sqlScript
+ unitStatement
+  renameSequence
+   RENAME
+   SEQUENCE
+   identifier
+    anyName
+     own
+    .
+    anyName
+     oldseq
+   TO
+   identifier
+    anyName
+     nwseq
+  ;
+ <EOF>

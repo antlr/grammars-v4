@@ -1,0 +1,15 @@
+expression
+ signedAtom
+  scientific
+   2344.23
+ term
+  oper
+   ^
+ term
+  signedAtom
+   scientific
+    345
+ term
+  oper
+   /
+ <EOF>

@@ -1,0 +1,13 @@
+prog
+ program_lines
+  prefix_exp
+   +
+   prefix_exp
+    number
+     digits
+      1
+   prefix_exp
+    number
+     digits
+      1
+ <EOF>

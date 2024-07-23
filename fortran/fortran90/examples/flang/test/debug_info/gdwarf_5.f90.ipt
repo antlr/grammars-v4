@@ -1,0 +1,36 @@
+program
+ executableProgram
+  programUnit
+   mainProgram
+    programStmt
+     program
+     main
+    mainRange
+     body
+      bodyConstruct
+       executableConstruct
+        actionStmt
+         printStmt
+          print
+          formatIdentifier
+           *
+          ,
+          outputItemList
+           expression
+            level5Expr
+             equivOperand
+              orOperand
+               andOperand
+                level4Expr
+                 level3Expr
+                  level2Expr
+                   addOperand
+                    multOperand
+                     level1Expr
+                      primary
+                       "hello world !!"
+     endProgramStmt
+      end
+      program
+      main
+ <EOF>

@@ -1,0 +1,17 @@
+program
+ statement
+  targetScopeDecl
+   targetScope
+   =
+   expression
+    binaryExpression
+     equalityExpression
+      relationalExpression
+       additiveExpression
+        multiplicativeExpression
+         unaryExpression
+          memberExpression
+           primaryExpression
+            interpString
+             'test'
+ <EOF>

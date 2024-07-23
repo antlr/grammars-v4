@@ -1,0 +1,84 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    funcdef
+     def
+     name
+      f
+     (
+     )
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         yield_expr
+          yield
+        
+      stmt
+       simple_stmt
+        small_stmt
+         yield_expr
+          yield
+          yield_arg
+           from
+           test
+            logical_test
+             comparison
+              expr
+               atom
+                name
+                 g
+        
+      stmt
+       simple_stmt
+        small_stmt
+         yield_expr
+          yield
+          yield_arg
+           testlist
+            test
+             logical_test
+              comparison
+               expr
+                atom
+                 name
+                  x
+            ,
+            test
+             logical_test
+              comparison
+               expr
+                atom
+                 name
+                  a
+            ,
+            test
+             logical_test
+              comparison
+               expr
+                atom
+                 name
+                  b
+             if
+             logical_test
+              comparison
+               expr
+                atom
+                 name
+                  x
+             else
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  name
+                   a
+        
+      
+ <EOF>

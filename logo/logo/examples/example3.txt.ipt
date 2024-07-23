@@ -1,0 +1,22 @@
+prog
+ line
+  cmd
+   make
+    make
+    "first_programmer
+    value
+     "Ada_Lovelace
+ \n
+ line
+  print_
+   print
+   value
+    expression
+     multiplyingExpression
+      signExpression
+       deref
+        :
+        name
+         first_programmer
+ \n
+ <EOF>

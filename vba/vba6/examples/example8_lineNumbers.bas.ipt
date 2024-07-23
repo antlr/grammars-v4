@@ -1,0 +1,187 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     Sub
+      
+     ambiguousIdentifier
+      GotoStatementDemo
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+        
+       \n
+     block
+      blockStmt
+       variableStmt
+        Dim
+         
+        variableListStmt
+         variableSubStmt
+          ambiguousIdentifier
+           Number
+         ,
+          
+         variableSubStmt
+          ambiguousIdentifier
+           MyString
+      endOfStatement
+       endOfLine
+         
+        \n
+         
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Number
+         
+        =
+         
+        valueStmt
+         literal
+          1
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       ifThenElseStmt
+        If
+         
+        ifConditionStmt
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Number
+           
+          =
+           
+          valueStmt
+           literal
+            1
+         
+        Then
+         
+        blockStmt
+         goToStmt
+          GoTo
+           
+          valueStmt
+           literal
+            1
+         
+        Else
+         
+        blockStmt
+         goToStmt
+          GoTo
+           
+          valueStmt
+           literal
+            2
+      endOfStatement
+       endOfLine
+        \n
+      blockStmt
+       lineNumber
+        1
+        :
+         
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           MyString
+         
+        =
+         
+        valueStmt
+         literal
+          "Number equals 1"
+      endOfStatement
+       endOfLine
+         
+        \n
+         
+      blockStmt
+       goToStmt
+        GoTo
+         
+        valueStmt
+         literal
+          3
+      endOfStatement
+       endOfLine
+        \n
+      blockStmt
+       lineNumber
+        2
+        :
+         
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           MyString
+         
+        =
+         
+        valueStmt
+         literal
+          "Number equals 2"
+      endOfStatement
+       endOfLine
+         
+        \n
+      blockStmt
+       lineNumber
+        3
+        :
+         
+      endOfStatement
+       endOfLine
+        \n
+         
+      blockStmt
+       implicitCallStmt_InBlock
+        iCS_B_MemberProcedureCall
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            Debug
+         .
+         ambiguousIdentifier
+          ambiguousKeyword
+           Print
+          
+         argsCall
+          argCall
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               MyString
+      endOfStatement
+       endOfLine
+        \n
+     End Sub
+   endOfLine
+    \n
+ <EOF>

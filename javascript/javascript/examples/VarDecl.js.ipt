@@ -1,0 +1,19 @@
+program
+ sourceElements
+  sourceElement
+   statement
+    variableStatement
+     variableDeclarationList
+      varModifier
+       var
+      variableDeclaration
+       assignable
+        identifier
+         as
+       =
+       singleExpression
+        literal
+         "test"
+     eos
+      ;
+ <EOF>

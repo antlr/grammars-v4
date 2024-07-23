@@ -1,0 +1,18 @@
+sqlScript
+ unitStatement
+  dropRole
+   DROP
+   ROLE
+   anyName
+    engineer
+  ;
+ unitStatement
+  dropRole
+   DROP
+   ROLE
+   IF
+   EXISTS
+   anyName
+    engineer
+  ;
+ <EOF>

@@ -1,0 +1,66 @@
+start_
+ prods
+  prod
+   xlhs
+    <
+    fullname
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      title
+      >
+     xelem
+      <
+      name
+      >
+     xelem
+      <
+      name
+      >
+  \n
+  prod
+   xlhs
+    <
+    title
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      Mr
+    or
+     |
+    xalt
+     xelem
+      Mrs
+    or
+     |
+    xalt
+     xelem
+      Ms
+    or
+     |
+    xalt
+     xelem
+      Miss
+    or
+     |
+    xalt
+     xelem
+      Dr
+ ws
+  \n
+ <EOF>

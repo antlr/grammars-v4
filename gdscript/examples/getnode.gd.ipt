@@ -1,0 +1,79 @@
+program
+ inheritance
+  extends
+  Object
+ \n
+ topLevelDecl
+  methodDecl
+   func
+   method
+   (
+   parList
+    parameter
+     args
+   )
+   :
+   stmtOrSuite
+     
+        
+    suite
+     stmt
+      varDeclStmt
+       var
+       a
+       stmtEnd
+         
+     stmt
+      assignmentStmt
+       expression
+        literal
+         a
+       =
+       expression
+        $
+        '.'
+       stmtEnd
+         
+     stmt
+      assignmentStmt
+       expression
+        literal
+         a
+       =
+       expression
+        $
+        NodePath
+       stmtEnd
+         
+     stmt
+      assignmentStmt
+       expression
+        literal
+         a
+       =
+       expression
+        $
+        NodePath
+        /
+        Path
+        /
+        PathPathPath
+       stmtEnd
+         
+     stmt
+      assignmentStmt
+       expression
+        literal
+         a
+       =
+       expression
+        $
+        'NodePath/as/string/123456789[][][]'
+       stmtEnd
+         
+     stmt
+      pass
+      stmtEnd
+       s
+    s
+  pass

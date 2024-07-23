@@ -1,0 +1,14 @@
+file_
+ ql_statement
+  select_statement
+   select_clause
+    SELECT
+    select_expression
+     f
+   from_clause
+    FROM
+    identification_variable_declaration
+     range_variable_declaration
+      abstract_schema_name
+      Country
+ <EOF>

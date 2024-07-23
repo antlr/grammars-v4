@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_attribute_dimension
+   DROP
+   ATTRIBUTE
+   DIMENSION
+   id_expression
+    regular_id
+     product_attr_dim
+ ;
+ <EOF>

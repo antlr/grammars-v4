@@ -1,0 +1,92 @@
+htmlDocument
+ phpBlock
+  topStatement
+   statement
+    expressionStatement
+     expression
+      chain
+       chainOrigin
+        functionCall
+         functionCallName
+          qualifiedNamespaceName
+           namespaceNameList
+            identifier
+             foo
+         actualArguments
+          arguments
+           (
+           actualArgument
+            expression
+             string
+              <<< HEREDOC
+              \n
+              Heredoc line 1.\n
+              Heredoc line 2.\n
+           HEREDOC\n;
+     ;
+  topStatement
+   statement
+    expressionStatement
+     expression
+      chain
+       chainOrigin
+        functionCall
+         functionCallName
+          qualifiedNamespaceName
+           namespaceNameList
+            identifier
+             foo
+         actualArguments
+          arguments
+           (
+           actualArgument
+            expression
+             string
+              <<< 'NOWDOC'
+              \n
+              Nowdoc line 1.\n
+              Nowdoc line 2.\n
+           NOWDOC\n;
+     ;
+  topStatement
+   statement
+    expressionStatement
+     expression
+      assignable
+       chain
+        chainOrigin
+         chainBase
+          keyedVariable
+           $str
+      assignmentOperator
+       =
+      expression
+       string
+        "
+        interpolatedStringPart
+         asdf
+        "
+     ;
+  topStatement
+   statement
+    expressionStatement
+     expression
+      assignable
+       chain
+        chainOrigin
+         chainBase
+          keyedVariable
+           $str1
+      assignmentOperator
+       =
+      expression
+       string
+        <<<HEREDOC1
+        \n
+        Hello world!\n
+     HEREDOC1;\n
+  topStatement
+   statement
+    emptyStatement_
+     ?>
+ <EOF>

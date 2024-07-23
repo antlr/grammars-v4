@@ -1,0 +1,17 @@
+aterm_
+ term_
+  function_
+   afun
+    exam
+   args_
+    (
+    termlist
+     term_
+      placeholder
+       <
+       term_
+        afun
+         blob
+       >
+    )
+ <EOF>

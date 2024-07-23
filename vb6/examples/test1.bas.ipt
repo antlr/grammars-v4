@@ -1,0 +1,144 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     visibility
+      Public
+      
+     Sub
+      
+     ambiguousIdentifier
+      Test1
+     argList
+      (
+      )
+     \n    
+     block
+      blockStmt
+       ifThenElseStmt
+        ifBlockStmt
+         If
+          
+         ifConditionStmt
+          valueStmt
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               i
+            
+           =
+            
+           valueStmt
+            literal
+             integerLiteral
+              1
+          
+         Then
+         \n        
+         block
+          blockStmt
+           implicitCallStmt_InBlock
+            iCS_B_ProcedureCall
+             certainIdentifier
+              Statment
+         \n    
+        ifElseIfBlockStmt
+         ElseIf
+          
+         ifConditionStmt
+          valueStmt
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               i
+            
+           =
+            
+           valueStmt
+            literal
+             integerLiteral
+              2
+          
+         Then
+          
+         block
+          blockStmt
+           implicitCallStmt_InBlock
+            iCS_B_ProcedureCall
+             certainIdentifier
+              Statment
+         \n    
+        ifElseIfBlockStmt
+         ElseIf
+          
+         ifConditionStmt
+          valueStmt
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               i
+            
+           =
+            
+           valueStmt
+            literal
+             integerLiteral
+              3
+          
+         Then
+          
+         block
+          blockStmt
+           implicitCallStmt_InBlock
+            iCS_B_ProcedureCall
+             certainIdentifier
+              Statment
+         \n    
+        End If
+     \n
+     End Sub
+   \n
+   \n
+   moduleBodyElement
+    subStmt
+     visibility
+      Public
+      
+     Sub
+      
+     ambiguousIdentifier
+      Test2
+     argList
+      (
+      )
+     \n    
+     block
+      blockStmt
+       doLoopStmt
+        Do
+        \n    
+        Loop
+         
+        Until
+         
+        valueStmt
+         valueStmt
+          implicitCallStmt_InStmt
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             i
+          
+         >=
+          
+         valueStmt
+          literal
+           integerLiteral
+            1
+     \n
+     End Sub
+  \n
+ <EOF>

@@ -1,0 +1,13 @@
+sql_script
+ unit_statement
+  drop_rollback_segment
+   DROP
+   ROLLBACK
+   SEGMENT
+   rollback_segment_name
+    identifier
+     id_expression
+      regular_id
+       rbs_one
+ ;
+ <EOF>

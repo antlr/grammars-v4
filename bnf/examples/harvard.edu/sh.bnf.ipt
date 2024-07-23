@@ -1,0 +1,367 @@
+start_
+ prods
+  prod
+   xlhs
+    commandline
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      list
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      list
+     xelem
+      ws
+        
+      "
+      ;
+      "
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      list
+     xelem
+      ws
+        
+      "
+      &
+      "
+  \n\n
+  prod
+   xlhs
+    list
+   assign
+    ws
+          
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      conditional
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      list
+     xelem
+      ws
+        
+      "
+      ;
+      "
+     xelem
+      ws
+        
+      conditional
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      list
+     xelem
+      ws
+        
+      "
+      &
+      "
+     xelem
+      ws
+        
+      conditional
+  \n\n
+  prod
+   xlhs
+    conditional
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      pipeline
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      conditional
+     xelem
+      ws
+        
+      "
+      &
+      &
+      "
+     xelem
+      ws
+        
+      pipeline
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      conditional
+     xelem
+      ws
+        
+      "
+      |
+      |
+      "
+     xelem
+      ws
+        
+      pipeline
+  \n\n
+  prod
+   xlhs
+    pipeline
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      command
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      pipeline
+     xelem
+      ws
+        
+      "
+      |
+      "
+     xelem
+      ws
+        
+      command
+  \n\n
+  prod
+   xlhs
+    command
+   assign
+    ws
+       
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      word
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      redirection
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      command
+     xelem
+      ws
+        
+      word
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      command
+     xelem
+      ws
+        
+      redirection
+  \n\n
+  prod
+   xlhs
+    redirection
+   assign
+    ws
+       
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      redirectionop
+     xelem
+      ws
+        
+      filename
+  \n
+  prod
+   xlhs
+    redirectionop
+   assign
+    ws
+       
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      "
+      <
+      "
+    or
+     ws
+        
+     |
+    xalt
+     xelem
+      ws
+         
+      "
+      >
+      "
+    or
+     ws
+        
+     |
+    xalt
+     xelem
+      ws
+         
+      "
+      2
+      >
+      "
+  \n
+  prod
+   xlhs
+    list
+   assign
+    ws
+          
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+         
+      conditional
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      list
+     xelem
+      ws
+        
+      "
+      ;
+      "
+     xelem
+      ws
+        
+      conditional
+     xelem
+      ws
+       \n
+                
+    or
+     |
+    xalt
+     xelem
+      ws
+          
+      list
+     xelem
+      ws
+        
+      "
+      &
+      "
+     xelem
+      ws
+        
+      conditional
+ <EOF>

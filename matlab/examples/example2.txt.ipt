@@ -1,0 +1,23 @@
+file_
+ statement_list
+  statement
+   assignment_statement
+    assignment_expression
+     postfix_expression
+      primary_expression
+       x
+     =
+     expression
+      or_expression
+       and_expression
+        equality_expression
+         relational_expression
+          additive_expression
+           multiplicative_expression
+            unary_expression
+             postfix_expression
+              primary_expression
+               17
+    eostmt
+     \n
+ <EOF>

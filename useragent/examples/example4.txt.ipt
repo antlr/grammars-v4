@@ -1,0 +1,28 @@
+prog
+ product
+  name
+   Mozilla
+  /
+  version
+   5
+   .
+   0
+ comment
+  (Windows; U; Windows NT 6.1; x64; fr; rv:1.9.2.13)
+ product
+  name
+   Gecko
+  /
+  version
+   20101203
+ product
+  name
+   Firebird
+  /
+  version
+   3
+   .
+   6
+   .
+   13
+ <EOF>

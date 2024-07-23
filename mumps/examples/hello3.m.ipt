@@ -1,0 +1,44 @@
+program
+ line
+  routinedecl
+   identifier
+    hello
+   (
+   paramlist
+    param
+     variable
+      identifier
+       who
+   )
+   \n
+ line
+  code
+    
+    
+   command
+    write_
+     write
+      
+     arglist
+      arg
+       "Hello "
+      ,
+      arg
+       expression
+        term
+         variable
+          identifier
+           who
+      ,
+      arg
+       !
+   \n
+ line
+  code
+    
+    
+   command
+    quit_
+     quit
+   \n
+ eof

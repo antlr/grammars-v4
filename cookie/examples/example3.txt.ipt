@@ -1,0 +1,22 @@
+cookie
+ av_pairs
+  av_pair
+   attr
+    token
+     sessionToken
+   =
+   value
+    word
+     token
+      abc123
+  ;
+  av_pair
+   attr
+    token
+      Expires
+   =
+   value
+    word
+     token
+      Wed, 09 Jun 2021 10:18:14 GMT
+ <EOF>

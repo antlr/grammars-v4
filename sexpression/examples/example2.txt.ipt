@@ -1,0 +1,26 @@
+sexpr
+ item
+  list_
+   (
+   item
+    list_
+     (
+     item
+      atom
+       milk
+     item
+      atom
+       juice
+     )
+   item
+    list_
+     (
+     item
+      atom
+       honey
+     item
+      atom
+       marmalade
+     )
+   )
+ <EOF>
