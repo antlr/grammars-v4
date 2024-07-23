@@ -284,7 +284,7 @@ public class Program
         {
             if (tee)
             {
-                System.IO.File.WriteAllText(input_name + ".tree", ToStringTree(tree, parser));
+                System.IO.File.WriteAllText(input_name + ".ipt", ToStringTree(tree, parser));
             } else
             {
                 System.Console.Error.WriteLine(ToStringTree(tree, parser));
