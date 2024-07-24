@@ -1,1 +1,15 @@
 translation_unit
+ external_declaration
+  function_definition
+   function_prototype
+    fully_specified_type
+     type_specifier
+      type_specifier_nonarray
+       int
+    main
+    (
+    )
+   compound_statement_no_new_scope
+    {
+    }
+ <EOF>

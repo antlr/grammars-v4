@@ -1,1 +1,26 @@
 translation_unit
+ external_declaration
+  declaration
+   precision
+   precision_qualifier
+    highp
+   type_specifier
+    type_specifier_nonarray
+     float
+   ;
+ external_declaration
+  declaration
+   init_declarator_list
+    single_declaration
+     fully_specified_type
+      type_qualifier
+       single_type_qualifier
+        storage_qualifier
+         in
+      type_specifier
+       type_specifier_nonarray
+        vec2
+     typeless_declaration
+      iv3
+   ;
+ <EOF>
