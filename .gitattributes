@@ -6,7 +6,6 @@
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
 *.abnf text
-*.agc text
 *.alg text
 *.asm text
 *.asn text
@@ -91,6 +90,7 @@ access_log text
 # standard Unix endings.
 # vb6/examples/**/*.vb eol=lf
 abb/examples/*.sys eol=lf
+agc/examples/**/* eol=lf
 antlr/antlr2/examples/**/*.g2 eol=lf
 antlr/antlr3/examples/**/*.g eol=lf
 antlr/antlr4/examples/**/*.g4 eol=lf

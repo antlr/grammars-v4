@@ -88,7 +88,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname
     $ext = $item.Extension
     if ($ext -eq ".ipt") {
-        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
+        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "\r\n", "\n"))
         git diff --exit-code $file *>> $old/updated.txt
 	$st = $LASTEXITCODE
         if ($st -ne 0) {
