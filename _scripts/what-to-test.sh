@@ -44,8 +44,8 @@ do
 done
 
 ttargets=""
-# remove temporarily TODO add back: "TypeScript"
-for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "PHP" "Python3" "TypeScript" "Antlr4ng"
+#for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "PHP" "Python3" "TypeScript" "Antlr4ng"
+for t in "CSharp"
 do
     if [ ${targets[$t]} -ne 0 ]
     then
