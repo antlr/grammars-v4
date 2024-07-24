@@ -87,32 +87,125 @@ json/examples/*.json text
 *.yml text
 access_log text
 
-# Declare files that will always have LF line endings on checkout.
-# Unicode input files end with *.txt, but should not be converted on Windows
-unicode/graphemes/examples/*.txt eol=lf
-# T-SQL tests with trees can fail with multiline strings
-sql/tsql/examples/*.sql eol=lf
-# Rexx places EOL on default channel, so the .tree's contain EOL.
-# Make sure EOL's are consistent regardless of OS.
-rexx/examples/* eol=lf
 # All grammars that contain parser rules for token NEWLINE must have
 # standard Unix endings.
-abb/examples/*.sys eol=lf
-asl/examples/* eol=lf
-css3/examples/*.css eol=lf
-gdscript/examples/*.gd eol=lf
-haskell/examples/*.hs eol=lf
-hypertalk/example-scripts/*.txt eol=lf
-hypertalk/example-scriptlets/*.txt eol=lf
-javadoc/examples/**/*.java eol=lf
-kuka/examples/*.txt eol=lf
-mckeeman-form/examples/*.txt eol=lf
-objc/examples/* eol=lf
-properties/examples/* eol=lf
-r/examples/*.txt eol=lf
 # vb6/examples/**/*.vb eol=lf
+abb/examples/*.sys eol=lf
+antlr/antlr2/examples/**/*.g2 eol=lf
+antlr/antlr3/examples/**/*.g eol=lf
+antlr/antlr4/examples/**/*.g4 eol=lf
+arden/examples/**/*.mlm eol=lf
+asl/examples/* eol=lf
+asm/asm6502/examples/* eol=lf
+asm/asm8080/examples/* eol=lf
+asm/asm8086/examples/* eol=lf
+asm/asmMASM/examples/**/*.asm eol=lf
+asm/asmRISCV/examples/**/*.S eol=lf
+asm/asmZ80/examples/*.z80 eol=lf
+asm/nasm/examples/**/*.asm eol=lf
+asm/pdp7/examples/**/*.s eol=lf
+asm/ptx/ptx-isa-2.1/examples/**/*.ptx eol=lf
+awk/examples/**/*.awk eol=lf
+bcpl/examples/**/*.b eol=lf
+bcpl/examples/**/*.bcpl eol=lf
+bicep/examples/**/*.txt eol=lf
+bison/examples/**/*.y eol=lf
+bnf/examples/**/*.bnf eol=lf
+c/examples/**/*.c eol=lf
+callable/examples/**/*.txt eol=lf
+caql/examples/**/*.txt eol=lf
+clf/examples/**/* eol=lf
+cmake/examples/**/*.txt eol=lf
+cobol85/examples/**/*.txt eol=lf
+cpp/examples/**/*.cc eol=lf
+cpp/examples/**/*.cpp eol=lf
+cql3/examples/**/*.cql eol=lf
+creole/examples/**/*.txt eol=lf
+csharp/examples/**/*.cs eol=lf
+css3/examples/*.css eol=lf
+csv/examples/*.csv eol=lf
+databank/examples/*.db eol=lf
+elixir/examples/*.ex eol=lf
+esolang/sickbay/examples/**/* eol=lf
+fasta/examples/**/* eol=lf
+fol/examples/**/* eol=lf
+fortran/fortran77/examples/**/* eol=lf
+gdscript/examples/*.gd eol=lf
+gedcom/examples/**/* eol=lf
+gff3/examples/**/* eol=lf
+golang/examples/**/* eol=lf
+graphstream-dgs/examples/**/* eol=lf
+haskell/examples/*.hs eol=lf
+hypertalk/example-scriptlets/*.txt eol=lf
+hypertalk/example-scripts/*.txt eol=lf
+icalendar/examples/**/* eol=lf
+inf/examples/**/* eol=lf
+informix/examples/**/* eol=lf
+java/java/examples/**/* eol=lf
+javadoc/examples/**/*.java eol=lf
+javascript/javascript/examples/**/* eol=lf
+javascript/typescript/examples/**/* eol=lf
+json5/examples/**/* eol=lf
+kotlin/kotlin-formal/examples/**/* eol=lf
+kuka/examples/*.txt eol=lf
+logo/logo/examples/**/* eol=lf
+lua/examples/**/* eol=lf
+matlab/examples/**/* eol=lf
+mckeeman-form/examples/*.txt eol=lf
+modelica/examples/**/* eol=lf
+moo/examples/**/* eol=lf
+muddb/examples/**/* eol=lf
+mumps/examples/**/* eol=lf
+objc/examples/* eol=lf
+pcre/examples/**/* eol=lf
+pegen/examples/**/* eol=lf
+php/examples/**/* eol=lf
+ply/examples/**/* eol=lf
+properties/examples/* eol=lf
+python/python/examples/**/* eol=lf
+python/python2_7_18/examples/**/* eol=lf
+python/python3/examples/**/* eol=lf
+python/python3_12_1/examples/**/* eol=lf
+r/examples/*.txt eol=lf
+recfile/examples/**/* eol=lf
+redcode/examples/**/* eol=lf
+rexx/examples/* eol=lf
+robotwars/examples/**/* eol=lf
+ruby/examples/**/* eol=lf
+rust/examples/**/* eol=lf
+scala/examples/**/* eol=lf
+sgf/examples/**/* eol=lf
+smalltalk/examples/**/* eol=lf
+smtlibv2/examples/**/* eol=lf
+snobol/examples/**/* eol=lf
+spass/examples/**/* eol=lf
+sql/informix-sql/examples/**/* eol=lf
+sql/mariadb/examples/**/* eol=lf
+sql/mysql/Positive-Technologies/examples/**/* eol=lf
+sql/plsql/examples/**/* eol=lf
+sql/postgresql/examples/**/* eol=lf
+sql/snowflake/examples/**/* eol=lf
+sql/tsql/examples/*.sql eol=lf
+swift-fin/examples/**/* eol=lf
+terraform/examples/**/* eol=lf
+tinybasic/examples/**/* eol=lf
+tinymud/examples/**/* eol=lf
+toml/examples/**/* eol=lf
+tsv/examples/**/* eol=lf
+turtle/examples/**/* eol=lf
+unicode/graphemes/examples/*.txt eol=lf
+url/examples/**/* eol=lf
+vb6/examples/**/* eol=lf
 vba/examples/*.bas eol=lf
+vba/vba6/examples/**/* eol=lf
+vba/vba_cc/examples/**/* eol=lf
+vba/vba_like/examples/**/* eol=lf
+wavefront/examples/**/* eol=lf
+xml/examples/**/* eol=lf
+xsd-regex/examples/**/* eol=lf
+xyz/examples/**/* eol=lf
 z/examples/*.utf8 eol=lf
+
 
 # Declare files that will always have CRLF line endings on checkout.
 # Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
