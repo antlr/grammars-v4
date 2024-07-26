@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gtin</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com GTIN grammar</name>
+	<name>GTIN grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>microc</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com MicroC grammar</name>
+	<name>MicroC grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

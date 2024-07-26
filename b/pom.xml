@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>b</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com B grammar</name>
+	<name>B grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

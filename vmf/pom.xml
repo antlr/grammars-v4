@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vmf</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com vmf grammar</name>
+	<name>vmf grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

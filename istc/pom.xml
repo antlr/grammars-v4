@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>istc</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com ISTC grammar</name>
+	<name>ISTC grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

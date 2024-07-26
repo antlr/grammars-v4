@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>muddb</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com muddb grammar</name>
+	<name>muddb grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

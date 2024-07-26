@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>aterm</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com ATerm grammar</name>
+	<name>ATerm grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

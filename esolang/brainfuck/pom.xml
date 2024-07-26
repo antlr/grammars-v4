@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>brainfuck</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Brainfuck grammar</name>
+	<name>Brainfuck grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>esolangparent</artifactId>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dgol</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com DGOL grammar</name>
+	<name>DGOL grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>esolangparent</artifactId>

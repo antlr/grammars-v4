@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>action</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Action! grammar</name>
+	<name>Action! grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

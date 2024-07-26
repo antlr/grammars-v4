@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>brainflack</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Brainflak grammar</name>
+	<name>Brainflak grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>esolangparent</artifactId>

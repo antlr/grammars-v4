@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>alef</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Alef grammar</name>
+	<name>Alef grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

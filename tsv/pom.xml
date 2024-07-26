@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tsv</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com TSV grammar</name>
+	<name>TSV grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

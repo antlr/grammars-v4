@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tcp</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com TCP grammar</name>
+	<name>TCP grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

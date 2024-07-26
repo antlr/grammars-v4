@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>joss</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com JOSS grammar</name>
+	<name>JOSS grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

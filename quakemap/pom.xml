@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>quakemap</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Quake map grammar</name>
+	<name>Quake map grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

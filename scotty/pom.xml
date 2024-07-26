@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>scotty</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Scotty grammar</name>
+	<name>Scotty grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

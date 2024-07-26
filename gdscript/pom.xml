@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>gdscript</artifactId>
     <packaging>jar</packaging>
-    <name>Python3 grammar</name>
+    <name>gdscript grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>grammarsv4</artifactId>
@@ -14,7 +14,6 @@
         <src.dir>Java</src.dir>
     </properties>
     <build>
-        <sourceDirectory>${src.dir}</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.antlr</groupId>

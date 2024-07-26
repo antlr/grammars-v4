@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>snobol</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com SNOBOL grammar</name>
+	<name>SNOBOL grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

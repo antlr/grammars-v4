@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>refal</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Refal grammar</name>
+	<name>Refal grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

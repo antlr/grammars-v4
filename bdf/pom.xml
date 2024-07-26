@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>bdf</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com BDF grammar</name>
+	<name>BDF grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

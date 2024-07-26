@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>rfc822</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com RFC822 grammar</name>
+	<name>RFC822 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>rfc822parent</artifactId>

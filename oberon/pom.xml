@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>oberon</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com oberon grammar</name>
+	<name>oberon grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>grammarsv4</artifactId>

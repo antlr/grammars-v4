@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>algol60</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com algol60 grammar</name>
+	<name>algol60 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

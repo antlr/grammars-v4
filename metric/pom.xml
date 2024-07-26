@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>metric</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com metric grammar</name>
+	<name>metric grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

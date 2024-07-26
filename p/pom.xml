@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>p</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com p grammar</name>
+	<name>p grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

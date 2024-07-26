@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PMMN</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Portable Minsky Machine Notation grammar</name>
+	<name>Portable Minsky Machine Notation grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

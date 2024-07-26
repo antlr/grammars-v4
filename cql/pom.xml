@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cql</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Z39.5 CQL grammar</name>
+	<name>Z39.5 CQL grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

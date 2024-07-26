@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>bibcode</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Bibcode grammar</name>
+	<name>Bibcode grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

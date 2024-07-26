@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mumps</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com MUMPS grammar</name>
+	<name>MUMPS grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

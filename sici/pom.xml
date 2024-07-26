@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sici</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com SICI grammar</name>
+	<name>SICI grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

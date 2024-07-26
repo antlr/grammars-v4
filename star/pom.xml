@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>star</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com star grammar</name>
+	<name>star grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

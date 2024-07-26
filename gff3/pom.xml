@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gff3</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com gff3 grammar</name>
+	<name>gff3 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

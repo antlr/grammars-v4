@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>lisa</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com LISA grammar</name>
+	<name>LISA grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

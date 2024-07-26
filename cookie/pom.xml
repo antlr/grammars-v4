@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cookie</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com cookie grammar</name>
+	<name>cookie grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

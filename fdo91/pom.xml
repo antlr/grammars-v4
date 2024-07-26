@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fdo91</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com FDO91 grammar</name>
+	<name>FDO91 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>

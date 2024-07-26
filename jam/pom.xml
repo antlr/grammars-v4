@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jam</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com JAM grammar</name>
+	<name>JAM grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
