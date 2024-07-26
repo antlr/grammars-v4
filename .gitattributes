@@ -105,6 +105,7 @@ asm/asmZ80/examples/*.z80 eol=lf
 asm/nasm/examples/**/*.asm eol=lf
 asm/pdp7/examples/**/*.s eol=lf
 asm/ptx/ptx-isa-2.1/examples/**/*.ptx eol=lf
+asm/ptx/ptx-isa-2.1/examples-small/**/*.ptx eol=lf
 awk/examples/**/*.awk eol=lf
 bcpl/examples/**/*.b eol=lf
 bcpl/examples/**/*.bcpl eol=lf

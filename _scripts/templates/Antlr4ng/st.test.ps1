@@ -67,7 +67,7 @@ if ( $size -eq 0 ) {
 }
 
 $old = Get-Location
-Set-Location ..
+Set-Location "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 
 # Check if any .errors/.ipt files have changed. That's not good.
 git config --global pager.diff false
