@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>sieve</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Sieve grammar</name>
+	<name>Sieve grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>start</entryPoint>
+					<entryPoint>start_</entryPoint>
 					<grammarName>sieve</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
