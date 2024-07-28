@@ -1,0 +1,657 @@
+MODULE $dstdef;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	007D	Keith Knowles	17-Sep-1986	(273 SVCG D)
+/*
+/*		Add DST$K_VS_ALLOC_SPLIT.
+/*
+/*	006D	Ian Stocks	16-Jan-1986	(147 SVCG D)
+/*
+/*		Added the DST$K_<language_codes>, which should eventually
+/*		replace the tbt_code_* definitions in VCGSRCDEF.MAR
+/*
+/*	005	Tom Benson	14-Feb-18985	(172 VCG)
+/*
+/*		Added some DSC$K_ constants not defined in STARLET
+/*		which are needed by C.
+/*
+/*	004	Tom Benson	30-Jan-1985	(162 VCG)
+/*
+/*		Added dst$k_edit_source, used by Ada.
+/*
+/*	003	Caroline Davidson 05-Mar-1984	(009 VCG)
+/*
+/*		Added DST$K_STK_RTN_NOFP and DST$K_MS_MECH_RTN_NOFP
+/*		for PL/I.
+/*
+/*	002	Caroline Davidson 24-Feb-1984	(008 VCG)
+/*
+/*		Changed the include file into an SDL file with all 
+/*		non-internal Debug-32 literals as defined in the 
+/*		DSTRECRDS.REQ.
+/*
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*************************************************************************
+/*
+/* Define all Additional Debug Symbol Table record type codes.  
+/*
+{  Note that the BLISS Special Cases record has code zero (for historical 
+{  reasons).  All other type codes are in the range DST$K_LOWEST to 
+{  DST$K_HIGHEST.
+{
+CONSTANT  DST$K_BLI	EQUALS 0;	/* BLISS Special Cases Record
+
+CONSTANT DST$K_EDIT_SOURCE EQUALS 139;	/* A004 for referencing dsts in other
+					/*      modules
+
+CONSTANT (
+	DST$K_VERSION,			/* Version Number Record
+	DST$K_COBOLGBL,			/* COBOL Global Attribute Record
+	DST$K_SOURCE,			/* Source File Correlation Record
+	DST$K_STATLINK,			/* Static Link Record
+	DST$K_VARVAL,			/* Variant Value Record
+	DST$K_BOOL,			/* Atomic object of type BOOLEAN,
+/*      				    Allocated one byte.
+/*					    low order bit = 1 if TRUE,
+/*					    low order bit = 0 if FALSE.
+	DST$K_EXTRNXT,			/* External-Is-Next Record (Obsolete)
+	DST$K_GLOBNXT,			/* Global-Is-Next record (Obsolete)
+	DST$K_DTYPE_UBS,		/* DEBUG internal use only (unaligned
+/*      				    	bit string) (Obsolete)
+	DST$K_PROLOG,			/* Prolog Record
+	DST$K_SEPTYP,			/* Separate Type Specification Record
+	DST$K_ENUMELT,			/* Enumerated Type Element Record
+	DST$K_ENUMBEG,			/* Enumerated Type Begin Record
+	DST$K_ENUMEND,			/* Enumerated Type End Record
+	DST$K_VARBEG,			/* Variant Set Begin Record
+	DST$K_VAREND,			/* Variant Set End Record
+	DST$K_OVERLOAD,			/* Overloaded Symbol record
+	DST$K_DEF_LNUM,			/* Definition Line Number Record
+	DST$K_RECBEG,			/* Record Begin Record
+	DST$K_RECEND,			/* Record End Record
+	DST$K_CONTIN,			/* Continuation Record
+	DST$K_VALSPEC,			/* Value Specification Record
+	DST$K_TYPSPEC,			/* Type Specification Record
+	DST$K_BLKBEG,			/* Block Begin Record
+	DST$K_BLKEND,			/* Block End Record
+	DST$K_COB_HACK,			/* COBOL Hack Record (Obsolete)
+	, 				{  Reserved to DEBUG, 179
+	, 				{  Reserved to DEBUG, 180
+	DST$K_ENTRY,			/* Entry Point Record
+	DST$K_LINE_NUM_REL_R11,		/* Threaded Code PC-Correlation
+/*      				    	Record (Obsolete)
+	DST$K_BLIFLD,			/* BLISS Field Record
+	DST$K_PSECT,			/* PSECT Record
+	DST$K_LINE_NUM,			/* Line Number PC-Correlation Record
+	DST$K_LBLORLIT,			/* Label-or-Literal Record
+	DST$K_LABEL, 			/* Label Record
+	DST$K_MODBEG,			/* Module Begin Record
+	DST$K_MODEND,			/* Module End Record
+	DST$K_RTNBEG,			/* Routine Begin Record
+	DST$K_RTNEND			/* Routine End Record
+		) EQUALS 153  INCREMENT 1  COUNTER #max_rec ;
+
+/*
+/* Define lowest numbered DST record in this range--used for range checking
+/*
+CONSTANT  DST$K_LOWEST		EQUALS 153;
+
+/*
+/* Define highest numbered DST record in this range--used for range checking
+/*
+CONSTANT  DST$K_HIGHEST		EQUALS #max_rec ;
+
+/*
+/* Define the size in bytes of the Module Begin DST Record.
+/*
+CONSTANT  DST$K_MODBEG_SIZE	EQUALS 8;
+
+/*
+/* Define the size in bytes of the Module End DST Record.
+/*
+CONSTANT  DST$K_MODEND_SIZE	EQUALS 2;
+
+/*
+/* Define the size in bytes of the Routine Begin DST record.
+/*
+CONSTANT  DST$K_RTNBEG_SIZE	EQUALS 8;
+
+/*
+/* Define all special values that may appear in the DST$B_VFLAGS field.  
+/*
+{  If one of these values appears in that field, the DST$L_VALUE field has some
+{  special meaning indicated by the special value.  In such cases, the 
+{  DST$B_VFLAGS subfields have no meaning.  Not all of these special values may
+{  appear in a Standard Data DST record (see the comments below), but they are
+{  all listed here for completeness.  Note that these values (with one 
+{  exception) all have the top four bits set--hence they cannot be normal 
+{  VFLAGS values since the REGNUM field cannot contain 15 (indicating the PC) 
+{  in a normal VFLAGS value.
+{
+CONSTANT  DST$K_VFLAGS_NOVAL	EQUALS  128; /* A flag which indicates that no value
+/*      				    	is specified, i.e. the object
+/*      				    	being described is a type.  This
+/*      					value may only appear in a Record
+/*      					Begin DST record.
+CONSTANT (
+	DST$K_VFLAGS_UNALLOC,		/* This value is DST$B_VFLAGS signals a
+/*      					data item that was never 
+/*      					allocated (and hence has no
+/*      					address). For example, PASCAL
+/*    						does not allocate variables
+/*    						that are not referenced.
+	DST$K_VFLAGS_DSC,		/* This value in DST$B_VFLAGS signals a
+/*						Descriptor Format DST record
+	DST$K_VFLAGS_TVS,		/* This value in DST$B_VFLAGS signals a
+/*						Trailing Value Spec DST record
+	,				{  UNUSED
+	DST$K_VS_FOLLOWS,		/* Value Specification Follows (allowed
+/*						only in a Trailing Value Spec)
+	,				{  UNUSED
+	DST$K_VFLAGS_BITOFFS		/* A flag indicating that DST$L_VALUE
+/*						contains a bit offset (used
+/*						only for record components)
+		) EQUALS 249 INCREMENT 1 ;
+
+/*
+/* Define all possible values that may appear in the DST$V_VALKIND field.  
+/*
+{
+{  Provided the DBG$B_VFLAGS field does not have one of the above special 
+{  values, the DBG$V_VALKIND field indicates what kind of value or address 
+{  is computed by the value computation.  
+{
+CONSTANT (
+	DST$K_VALKIND_LITERAL,		/* DST$L_VALUE contains a literal value
+	DST$K_VALKIND_ADDR,		/* Computation produces the address of
+/*						the data object
+	DST$K_VALKIND_DESC,		/* Computation produces the address of a
+/*						VAX Standard Descriptor for the
+/*						data object
+	DST$K_VALKIND_REG		/* Value is contained in the register
+/*						whose number is in DST$L_VALUE
+		) EQUALS 0 INCREMENT 1 ;
+
+/*
+/* The following literal values may appear in the DST$B_VS_ALLOC field.
+/*
+CONSTANT ( 
+	DST$K_VS_ALLOC_STAT,	 	/* Value is static
+	DST$K_VS_ALLOC_DYN,		/* Value is dynamic
+    	DST$K_VS_ALLOC_SPLIT		/* Value varies according to PC.
+		) EQUALS 1 INCREMENT 1;
+
+/*
+/* The following values may appear in the DST$B_MS_KIND field.
+/*
+CONSTANT ( 
+	DST$K_MS_BYTADDR,		/* The value is a byte address
+	DST$K_MS_BITADDR,		/* The value is a bit address (a longword
+/*						byte address plus a longword bit
+/*						offset from the byte address)
+	DST$K_MS_BITOFFS,		/* The value is a bit offset (normally a
+/*						bit offset from the start of a
+/*						record--used for record components)
+	DST$K_MS_RVAL,			/* The value is a literal value (constant)
+	DST$K_MS_REG,			/* The value is a register number (the
+/*						address is a register address)
+	DST$K_MS_DSC			/* The value is a VAX standard descriptor
+		) EQUALS 1 INCREMENT 1 ;
+
+/*
+/* The following values may appear in the DST$B_MS_MECH field.
+/*
+CONSTANT ( 
+	DST$K_MS_MECH_RTNCALL,		/* Routine call on a compiler-generated
+/*						thunk
+	DST$K_MS_MECH_STK,		/* DST Stack Machine routine
+	DST$K_MS_MECH_RTN_NOFP		/* Same as "1" but no FP passed in
+		) EQUALS 1  INCREMENT 1  COUNTER #max_ms_mech ;
+
+/*
+/* Define lower bound for range checking of MS_MECH
+/*
+CONSTANT DST$K_MS_MECH_MIN	EQUALS 1;
+
+/*
+/* Define maximum bound for range checking of MS_MECH
+/*
+CONSTANT DST$K_MS_MECH_MAX	EQUALS #max_ms_mech;
+
+/*
+/* Lower bound for range checking
+/*
+CONSTANT  DST$K_STK_LOW		EQUALS 0; 
+
+/*
+/* Define the Push Register instructions.
+/*
+{  These instructions push the indicated register value on the Stack Machine 
+{  stack.  The register values are taken from the scope (call frame) of the 
+{  symbol for which the value is being computed.
+{
+CONSTANT (
+	DST$K_STK_PUSHR0,		/* Push the value of register R0
+	DST$K_STK_PUSHR1,		/* Push the value of register R1
+	DST$K_STK_PUSHR2,		/* Push the value of register R2
+	DST$K_STK_PUSHR3,		/* Push the value of register R3
+	DST$K_STK_PUSHR4,		/* Push the value of register R4
+	DST$K_STK_PUSHR5,		/* Push the value of register R5
+	DST$K_STK_PUSHR6,		/* Push the value of register R6
+	DST$K_STK_PUSHR7,		/* Push the value of register R7
+	DST$K_STK_PUSHR8,		/* Push the value of register R8
+	DST$K_STK_PUSHR9,		/* Push the value of register R9
+	DST$K_STK_PUSHR10,		/* Push the value of register R10
+	DST$K_STK_PUSHR11,		/* Push the value of register R11
+	DST$K_STK_PUSHRAP,		/* Push the value of the AP
+	DST$K_STK_PUSHRFP,		/* Push the value of the FP
+	DST$K_STK_PUSHRSP,		/* Push the value of the SP
+	DST$K_STK_PUSHRPC		/* Push the value of the PC
+		) EQUALS 0 INCREMENT 1 ;
+
+/*
+/* Define the Push Immediate instructions.
+/*
+{  These instructions are used to push constant values on the Stack Machine 
+{  stack.  The constant value to push comes immediately after the instruction 
+{  op-code.  For the signed and unsigned instructions, the value to push is 
+{  zero-extended or sign-extended to 32 bits as appropriate.  In the case of 
+{  the Push Immediate Variable instruction, the byte after the op-code gives 
+{  the byte length of the constant value to push.  The constant value to push 
+{  then follows immediately after that length byte.  The constant value is 
+{  zero-extended to the nearest longword boundary on the high-address end and 
+{  the resulting block is pushed onto the stack.
+{
+CONSTANT  DST$K_STK_PUSHIMB	EQUALS 16;	/* Push Immediate Byte (signed)
+CONSTANT  DST$K_STK_PUSHIMW	EQUALS 17;	/* Push Immediate Word (signed)
+CONSTANT  DST$K_STK_PUSHIML	EQUALS 18;	/* Push Immediate Longword (signed)
+
+CONSTANT  DST$K_STK_PUSHIM_VAR	EQUALS 24;	/* Push Immediate Variable
+CONSTANT  DST$K_STK_PUSHIMBU	EQUALS 25;	/* Push Immediate Byte Unsigned
+CONSTANT  DST$K_STK_PUSHIMWU	EQUALS 26;	/* Puch Immediate Word Unsigned
+
+/*
+/*  Define the Push Indirect instructions.  
+/*
+{  For these instructions, the top stack cell is popped and the one, two, or 
+{  four bytes at the address given by the popped cell are sign extended to 32 
+{  bits and pushed on the stack.  For the unsigned instructions, the value is 
+{  instead zero-extended to 32 bits and pushed on the stack.
+{
+CONSTANT  DST$K_STK_PUSHINB	EQUALS 20;	/* Push Indirect Byte (signed)
+CONSTANT  DST$K_STK_PUSHINW 	EQUALS 21;	/* Push Indirect Word (signed)
+CONSTANT  DST$K_STK_PUSHINL	EQUALS 22;	/* Push Indirect Longword (signed)
+
+CONSTANT  DST$K_STK_PUSHINBU	EQUALS 27;	/* Push Indirect Byte Unsigned
+CONSTANT  DST$K_STK_PUSHINWU	EQUALS 28;	/* Push Indirect Word Unsigned
+
+/*
+/* Define the Stop instruction.  
+/*
+{  This instruction stops the DST Stack Machine and is required at the end of 
+{  every DST Stack Machine routine.  Whatever value is left at the top of the 
+{  stack when the Stop instruction is executed is taken to be the value of the
+{  Stack Machine routine.  This value may be a longword (a byte address, for 
+{  example), two longwords (byte address and bit offset), any size literal 
+{  value (an H-Floating CONSTANT, for instance), or a full VAX Standard 
+{  Descriptor, depending on the value of the DST$B_MS_KIND field.
+{
+CONSTANT  DST$K_STK_STOP	EQUALS	23;	/* Stop the Stack Machine
+
+/*
+/* Define the arithmetic and logical instructions.  
+/*
+{  These instruction pop the top two cells on the stack, perform the indicated 
+{  operation on these operands, and push the result back onto the stack.
+{
+CONSTANT  DST$K_STK_ADD		EQUALS 19; /* Add--The top two cells on the stack
+/*						are popped from the stack and
+/*						added together.  The resulting
+/*						sum is pushed onto the stack.
+CONSTANT (
+	DST$K_STK_SUB,			/* Subtract--The second cell on the stack
+/*						is subtracted from the top cell.
+/*						Both are popped from the stack.
+/*						The resulting difference is then
+/*						pushed onto the stack.
+	DST$K_STK_MULT,			/* Multiply--The top two stack cells are
+/*						popped from the stack and multi-
+/*						plied.  The resulting product is
+/*						then pushed onto the stack.
+	DST$K_STK_DIV,			/* Divide--The top stack cell is divided
+/*						by the second stack cell.  Both
+/*						are popped from the stack.  Their
+/*						quotient is then pushed onto the
+/*						stack.
+	DST$K_STK_LSH,			/* Logical Shift--Shift the second stack
+/*						cell by the number of bits given
+/*						by the top stack cell; pop both
+/*						operands and push the shifted
+/*						second cell on the stack
+	DST$K_STK_ROT,			/* Rotate--Rotate the second stack cell
+/*						by the number of bits given by
+/*						the top stack cell; pop both
+/*						operands and push the rotated
+/*						second cell on the stack
+
+/*
+/* Define the Copy and Exchange instructions.  
+/*
+{  These instructions make a copy of the top stack cell or exchange the top two
+{  cells on the stack.
+{
+	DST$K_STK_COP,			/* Copy--A copy of the top stack cell
+/*						is pushed onto the stack, 34
+	DST$K_STK_EXCH,			/* Exchange--The top two stack cells 
+/*						are interchanged, 35
+
+/*
+/* Define the Store instructions.  
+/*
+{  Following the op-code, these instructions contain a byte which is 
+{  interpreted as a signed offset into the stack.  The low-order byte, word, or
+{  longword of the top stack cell is stored into the byte, word, or longword 
+{  given by the current stack pointer plus four plus the signed offset into the
+{  stack.  (In short, the offset is an offset from the second stack cell.)  
+{  After that, the top stack cell is popped.  These instructions permit values 
+{  to be stored into stack locations other than the top or second stack cell.
+{
+	DST$K_STK_STO_B,		/* Store Byte into Stack, 36
+	DST$K_STK_STO_W,		/* Store Word into Stack, 37
+	DST$K_STK_STO_L,		/* Store Longword into Stack,38
+
+/*
+/* Define the Pop instruction.  
+/*
+{  This instruction simply pops the top stack cell, meaning that the top stack 
+{  cell is removed from the stack and discarded.
+{
+	DST$K_STK_POP,			/* Pop Top Stack Cell, 39
+
+/*
+/*  Define the Routine Call instructions.  
+/*
+{  These instructions call a compiler-generated routine (a thunk) whose address
+{  is given by the top stack cell.  Before the call actually occurs, the top 
+{  stack cell is popped.  The value that is returned by the thunk is then 
+{  pushed onto the stack.
+{
+{  The Routine Call instruction works as follows.  The address of the thunk to
+{  to be called is taken from the top stack cell.  The top cell is then popped.
+{  The thunk, which is called with a CALL instruction, gets two arguments.  The
+{  first argument is the address of a vector of register values for the scope
+{  (call frame) of the symbol to which this Value Specification belongs.  This
+{  vector contains the values of registers R0 - R11, AP, FP, SP, PC, and PSL in
+{  that order; the called thunk is free to read any value it wants from this
+{  vector but may not store into it.  The second parameter is a pointer to the
+{  top of the DST Stack Machine stack after the thunk address has been popped.
+{  A Stack Machine routine can thus compute arguments to the thunk and push 
+{  them on the stack before pushing the thunk address and calling the thunk.  
+{  In addition, the value of FP in the symbol's scope is passed to the thunk in
+{  register R1.  The routine's value is expected to be returned in register R0.
+{  This value is pushed onto the stack.
+{
+{  The Routine Call With Alternate Return instruction works this same way except
+{  that the address of an octaword buffer (4 longwords) is passed to the thunk
+{  as the first argument, with the register vector being the second argument and
+{  the stack address being the third argument.  In this case, the routine value
+{  is expected to be returned to the octaword buffer, not in register R0.  The
+{  whole octaword buffer is then pushed onto the stack.
+{
+	DST$K_STK_RTNCALL,		/* Routine Call (value returned in R0)
+	DST$K_STK_RTNCALL_ALT,		/* Routine Call With Alternate Return
+
+/*
+/* Define the Push Record Address instructions.  
+/*
+{  These instructions push the address of the outer-most or inner-most record 
+{  structure for which the current symbol is a record component.  They are used
+{  for constructing VAX Standard Descriptors on the Stack Machine stack when 
+{  some part of the descriptor depends on some other component of the same 
+{  record.  In PL/I, for instance, the subscript bounds of an array component 
+{  of a record may depend on another component of that record.  In such cases, 
+{  the only way to get the address of that other component in the current 
+{  record is to use one of the Push Record Address instructions.  The Push 
+{  Outer Record Address instruction pushes the address of the outer-most record
+{  of which the current symbol is a component while the Push Inner Record 
+{  Address instruction pushes the address of the inner-most record of which the
+{  current symbol is a component.
+{
+	DST$K_STK_PUSH_OUTER_REC,	/* Push Outer Record Address, 42
+	DST$K_STK_PUSH_INNER_REC,	/* Push Inner Record Address,43
+
+/*
+/*  Define NEW Routine Call instruction, added for PL/I.  
+/*
+	DST$K_STK_RTN_NOFP		/* Routine Call - no FP passed in
+
+		) EQUALS 29  INCREMENT 1  COUNTER #max_stk;
+
+/*
+/* Define the highest op-code value accepted by the DST Stack Machine.  
+/*
+{  This value is used for op-code range checking.
+{
+CONSTANT  DST$K_STK_HIGH	EQUALS  #max_stk; 
+
+/*
+/* The following are the values that may appear in the DST$B_TS_KIND field.
+/*
+CONSTANT (
+	DST$K_TS_ATOM,			/* Atomic Type Spec
+	DST$K_TS_DSC,			/* VAX Standard Desciptor Type Spec
+	DST$K_TS_IND,			/* Indirect Type Spec
+	DST$K_TS_TPTR,			/* Typed Pointer Type Spec
+	DST$K_TS_PTR,			/* Pointer Type Spec
+	DST$K_TS_PIC,			/* Pictured Type Spec
+	DST$K_TS_ARRAY,			/* Array Type Spec
+	DST$K_TS_SET,			/* Set Type Spec
+	DST$K_TS_SUBRANGE,		/* Subrange Type Spec
+	,				{  Unused--available for future use
+	DST$K_TS_FILE,			/* File Type Spec
+	DST$K_TS_AREA,			/* Area Type Spec (PL/I)
+	DST$K_TS_OFFSET,		/* Offset Type Spec (PL/I)
+	DST$K_TS_NOV_LENG,		/* Novel Length Type Spec
+	DST$K_TS_IND_TSPEC,		/* DEBUG internally generated pointer to
+/*						Type Spec (cannot appear in DST)
+	DST$K_TS_SELF_REL_LABEL,	/* Self-Relative Label Type Spec (PL/I)
+	DST$K_TS_RFA,			/* Record File Address Type Spec (BASIC)
+	DST$K_TS_TASK			/* Task Type Spec (ADA)
+		) EQUALS 1  INCREMENT 1  COUNTER #max_task;
+
+/*
+/* Define lowest Type Spec kind
+/*
+CONSTANT  DST$K_TS_DTYPE_LOWEST		EQUALS 1;
+
+/* 
+/* Define highest Type Spec kind
+/*
+CONSTANT  DST$K_TS_DTYPE_HIGHEST	EQUALS #max_task;
+
+/*
+/* The following set of literals give the lengths in bytes of those Type
+/* Specifications which have a fixed length.
+/*
+CONSTANT (
+	DST$K_TS_PTR_LENG,		/* Pointer Type Spec length
+	DST$K_TS_AREA_LENG,		/* Area Type Spec length
+	DST$K_TS_TASK_LENG		/* Task Type Spec length
+		) EQUALS 3;
+CONSTANT(
+	DST$K_TS_ATOM_LENG,		/* Atomic Type Spec length
+	DST$K_TS_FILE_LENG		/* File Type Spec length
+		) EQUALS 4;
+CONSTANT(
+	DST$K_TS_IND_LENG,		/* Indirect Type Spec length
+	DST$K_TS_OFFSET_LENG		/* Offset Type Spec length
+		) EQUALS 7;
+CONSTANT
+	DST$K_TS_NOV_LENG_LENG	EQUALS 11; /* Novel Length Type Spec length
+
+/*
+/* Define the possible values of the DST$B_VARVAL_RNGKIND field.
+/*
+CONSTANT (
+	DST$K_VARVAL_SINGLE,		/* The range consists of a single value
+	DST$K_VARVAL_RANGE		/* The range is given by a lower and an
+/*						upper bound (two value specs).
+		) EQUALS 1 INCREMENT 1;
+
+/*
+/* These are the possible values of the DST$B_BLI_STRUC field.
+/*
+CONSTANT (
+	DST$K_BLI_NOSTRUC,		/* Not a BLISS structure
+	DST$K_BLI_VEC,			/* BLISS Vector
+	DST$K_BLI_BITVEC,		/* BLISS Bitvector
+	DST$K_BLI_BLOCK,		/* BLISS Block
+	DST$K_BLI_BLKVEC		/* BLISS Blockvector
+		) EQUALS 0 INCREMENT 1;
+
+/*
+/* Define the command codes allowed in Line Number PC-Correlation commands.
+/*
+{  If the command code is zero or negative, the command is a one-byte Delta-PC
+{  command.  Here we define the command-code range for the Delta-PC command.
+{
+CONSTANT  DST$K_DELTA_PC_LOW 	EQUALS -128; /* The lower bound on Delta-PC commands
+CONSTANT  DST$K_DELTA_PC_HIGH	EQUALS  0;   /* The upper bound on Delta-PC commands
+
+/*
+/* Define the PC-correlation command codes other than the Delta-PC command.
+/*
+{  These command codes are always positive.
+{
+CONSTANT (
+	DST$K_DELTA_PC_W,		/* Delta-PC Word command
+	DST$K_INCR_LINUM,		/* Increment Line Number Byte command
+	DST$K_INCR_LINUM_W,		/* Increment Line Number Word command
+	DST$K_SET_LINUM_INCR,		/* Set Line Number Increment Byte command
+	DST$K_SET_LINUM_INCR_W,		/* Set Line Number Increment Word command
+	DST$K_RESET_LINUM_INCR,		/* Reset Line Number Increment command
+	DST$K_BEG_STMT_MODE,		/* Begin Statement Mode command
+	DST$K_END_STMT_MODE,		/* End Statement Mode command
+	DST$K_SET_LINUM,		/* Set Line Number Word command
+	DST$K_SET_PC,			/* Set Relative PC Byte command
+	DST$K_SET_PC_W,			/* Set Relative PC Word command
+	DST$K_SET_PC_L,			/* Set Relative PC Longword command
+	DST$K_SET_STMTNUM,		/* Set Statement Number Byte command
+	DST$K_TERM,			/* Terminate Line Byte command
+	DST$K_TERM_W,			/* Terminate Line Word command
+	DST$K_SET_ABS_PC,		/* Set Absolute PC Longword command
+	DST$K_DELTA_PC_L,		/* Delta-PC Longword command
+	DST$K_INCR_LINUM_L,		/* Increment Line Number Longword command
+	DST$K_SET_LINUM_B,		/* Set Line Number Byte command
+	DST$K_SET_LINUM_L,		/* Set Line Number Longword command
+	DST$K_TERM_L			/* Terminate Line Longword command
+		) EQUALS 1 INCREMENT 1 ;
+
+/*
+/* Smallest value allowed in the first byte of a PC-correlation command
+/*
+CONSTANT  DST$K_PCCOR_LOW	EQUALS -128; 
+
+/*
+/* Largest value allowed in the first byte of a PC-correlation command
+/*
+CONSTANT  DST$K_PCCOR_HIGH	EQUALS 21;
+
+/*
+/* Define the command codes for all the Source File Correlation commands.
+/*
+CONSTANT (
+	DST$K_SRC_DECLFILE,		/* Declare a source file for this module
+	DST$K_SRC_SETFILE,		/* Set the current source file (word)
+	DST$K_SRC_SETREC_L,		/* Set source record number (longword)
+	DST$K_SRC_SETREC_W,		/* Set source record number (word)
+	DST$K_SRC_SETLNUM_L,		/* Set listing line number (longword)
+	DST$K_SRC_SETLNUM_W,		/* Set listing line number (word)
+	DST$K_SRC_INCRLNUM_B,		/* Increment listing line number (byte)
+	,				{  Unused--available for future use
+	,				{  Unused--available for future use
+	DST$K_SRC_DEFLINES_W,		/* Define N separate lines (word)
+	DST$K_SRC_DEFLINES_B,		/* Define N separate lines (byte)
+	,				{  Unused--available for future use
+	,				{  Unused--available for future use
+	,				{  Unused--available for future use
+	,				{  Unused--available for future use
+	DST$K_SRC_FORMFEED		/* Count Form-Feeds as source records
+		) EQUALS 1 INCREMENT 1 ;
+
+/*
+/* Minimum command code for CASE ranges
+/*
+CONSTANT  DST$K_SRC_MIN_CMD	EQUALS  1;
+
+/*
+/* Maximum command code for CASE ranges
+/*
+CONSTANT  DST$K_SRC_MAX_CMD	EQUALS 16; 
+
+
+/*	INTERNAL TYPE CODES FOR DEBUG  (BEGIN A005)
+/*
+/*
+/*	The following definitions are used internally in DEBUG, but are not
+/*	supported in the DST.  They should be deleted here if they are made
+/*	into standard VAX type codes declared in STARLET.REQ.  These numbers
+/*	may change from one release of DEBUG to the next because they must
+/*	always be larger than DSC$K_DTYPE_HIGHEST.
+/*
+/*
+/* Define DEBUG-internal type codes.
+/*
+
+CONSTANT	DSC$K_DTYPE_AC	EQUALS 38;	/* ASCIC Text
+
+CONSTANT	DSC$K_DTYPE_AZ	EQUALS 39;	/* ASCIZ Text
+
+CONSTANT	DSC$K_DTYPE_TF	EQUALS 40;	/* Boolean True/False (length in bits)
+
+CONSTANT	DSC$K_DTYPE_SV	EQUALS 41;	/* Signed bit-field (aligned)
+
+CONSTANT	DSC$K_DTYPE_SVU	EQUALS 42;	/* Signed bit-field (unaligned)
+
+CONSTANT    	DSC$K_DTYPE_FIXED EQUALS 43;	/* Fixed binary, used for FIXED in ADA
+					/*      and FIXED BINARY in PL/I.  This
+					/*      code is used the type conversion
+					/*      tables in DBGEVALOP.
+
+CONSTANT	DSC$K_DTYPE_TASK EQUALS 44;	/* Task type in ADA. This actually
+    					/* has its own fcode, but we need
+    					/* a dtype code as well in order
+    					/* to implement EXAMINE/TASK  (END A005)
+
+/* A006D
+/* Define all the language codes that may appear in the DST$L_MODBEG_LANGUAGE
+/* field of the Module Begin DST record.  (Note that DEBUG may not actually
+/* support all languages that have language codes.)
+/*
+CONSTANT (
+	DST$K_MACRO,		/* Macro
+	DST$K_FORTRAN,		/* Fortran
+	DST$K_BLISS,		/* Bliss
+	DST$K_COBOL,		/* Cobol
+	DST$K_BASIC,		/* Basic
+	DST$K_PLI,		/* PL/I
+	DST$K_PASCAL,		/* Pascal
+	DST$K_C	,		/* C
+	DST$K_RPG,		/* RPG
+	DST$K_ADA,		/* Ada
+	DST$K_UNKNOWN,		/* Language Unknown
+	DST$K_SCAN,		/* Scan
+	DST$K_DIBOL,		/* Dibol
+	DST$K_MODULA		/* Modula
+	) EQUALS 0  INCREMENT 1;
+
+/* End of A006D
+
+END_MODULE;

@@ -1,0 +1,118 @@
+	module $defins;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	004	Peter Craig	20-May-1988	VCG V4-474
+/*
+/*		Read has become a reserved word.  Added quotation marks.
+/*
+/*	003	Caroline Davidson 19-Nov-1984	(120 VCG)
+/*
+/*		Added the peephole class, ilock, for the interlock instructions.
+/*
+/*	002	Tom Benson	10-Jul-1984	(061 VCG)
+/*
+/*		Changed CPFX class to CFXL (convert fixed bin to larger - CVTBW,
+/*		CVTBL, CVTWL), added CFXS (convert fixed bin to smaller - CVTWB,
+/*		CVTLB, CVTLW)
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define instruction descriptor data base
+/*
+AGGREGATE vcg_instr_descr STRUCTURE;
+
+	ins_b_number	BYTE;			{ Number of operands
+
+	ins_b_addrspec STRUCTURE DIMENSION 0:5 PREFIX "ins_";{ Start of address specifiers
+		context	BITFIELD LENGTH 3 MASK;	{ Context of operand specifier
+		access	BITFIELD LENGTH 3 MASK;	{ Operand access type
+		vield	BITFIELD MASK;		{ vield address operand
+		"address" BITFIELD MASK;	{ address operand
+		END;
+	END;
+/*
+/* Define grand/huge floating opcode offset value
+/*
+CONSTANT ins_k_op_offset EQUALS (256-50);
+
+/*
+/* Define operand attribute definitions
+/*
+CONSTANT (
+	branch,			{ branch access type
+	modify,			{ modify access type
+	"read",			{ read access type M004
+	write,			{ write access type
+	) EQUALS 1 INCREMENT 1 PREFIX "ins_";
+
+/*
+/* Define instruction class codes
+/*
+CONSTANT (
+	none,			{ instruction has no class at all
+	br_cond,		{ conditional branch
+	add_cm_br,		{ add compare branch
+	br_byte,		{ branch with byte displacement
+	br_word,		{ branch with word displacement
+	jump,			{ jump with general address specifier
+	) EQUALS 0 INCREMENT 1 PREFIX "ins_";
+
+/*
+/* Define some operand modes
+/*
+CONSTANT ins_k_pc_rel		EQUALS (%XF);
+CONSTANT ins_k_abs_mode		EQUALS (%X9F);
+CONSTANT ins_k_immed_mode	EQUALS (%X8F);
+/*
+/* Define peephole optimization codes
+/*
+CONSTANT (
+	adcb,			{ add compare and branch
+	adr2,			{ 2 address address
+	call,			{ subroutine call - general destination
+	cfxl,			{ convert precision fixed bin to larger (M002)
+	cfxs,			{ convert precision fixed bin to smaller (A002)
+	clrg,			{ clear register data
+	cmfl,			{ compare floating binary
+	cmfx,			{ compare fixed binary
+	cndb,			{ conditional branch
+	cpfl,			{ convert precision floating binary
+	cvfl,			{ convert to floating binary
+	cvfx,			{ convert to fixed binary
+	flt2,			{ floating binary 2 address
+	fix2,			{ fixed binary 2 address
+	flt3,			{ floating binary 3 address
+	fix3,			{ fixed binary 3 address
+	goto,			{ unconditional branch
+	mcfx,			{ move complement fixed binary
+	mnfl,			{ move negated floating binary
+	mnfx,			{ move negated fixed binary
+	mvfl,			{ move floating binary
+	mvfx,			{ move fixed binary
+	mzfx,			{ move fixed binary zero extended
+	null,			{ null class
+	psw,			{ bicpsw, bispsw
+	scal,			{ subroutine call - branch destination
+	stak,			{ implicit stack
+	shft,			{ arithmetic shift instructions
+	tsfl,			{ floating binary test
+	tsfx,			{ fixed binary test
+	strg,			{ string
+	unfx,			{ unary fixed binary
+	veld,			{ field
+	case,			{ case instructions
+	ilock,			{ interlock instructions, *A003*
+	peep,			{ total number of peephole classes
+	) EQUALS 0 INCREMENT 1 PREFIX "ins_";
+
+/*
+/*
+END_MODULE;
