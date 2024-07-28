@@ -1,0 +1,123 @@
+module vcgblkdef ident "Added for parsing only." ;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* definition of block node
+/*
+/* Modifications:
+/*
+/*	006	Jeff Zeeb	19-May-1988	VCG V4-473
+/*
+/*		Moved blk_a_alt_symnode_head to the common portion of
+/*		the block node.
+/*
+/*	005D	Keith Knowles	29-Jan-1987	(338 SVCG D)
+/*
+/*		Add blk_v_return_keeping_locals.
+/*
+/*	004D	Tom Benson	02-Mar-1985	(180 SVCG D)
+/*		
+/*		Added BLK_A_ALT_SYMNODE_HEAD to the block node. This points to
+/*		the chain of alternate lifetime symbol nodes for symbols within
+/*		the block.
+/*
+/*	003	Ian Stocks	07-Feb-1984	(171 VCG)
+/*
+/*		Added check_stack bit. This is used only by ADA,
+/*		to request stack limit checking in a multi-tasking environment.
+/*
+/*	002	Tom Benson	16-Nov-1984	(122 VCG)
+/*
+/*		Removed debug_output and fixup_tbt bits. These were used only
+/*		by Ada.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+AGGREGATE vcg_blk STRUCTURE PREFIX "blk_";
+/*
+/* general fields
+	filler			WORD;
+	block_type		BYTE;	{ Block type code
+	gflags			STRUCTURE;
+	    save_parent_ptr	BITFIELD;{ Set if any subblock has a display level extending above this block
+	    save_ap		BITFIELD;{ Set if any subblock makes an up-level reference to a parameter of this block
+	    needs_parent_ptr	BITFIELD;{ Set if this block needs a parent pointer for any purpose
+	    is_thunk		BITFIELD;{ Set to indicate this block is a thunk
+	    does_io		BITFIELD;{ Set to inhibit SP addressing of stack locals (for example if the block does PL/I IO)
+	    is_options_main	BITFIELD;{ Set if this block is options main needed by the allocator (PL/I Only)
+	    on_unit		BITFIELD;{ Set if this block has an on-unit needed by write tree (PL/I Only)
+	    volatile_routine	BITFIELD;{ Set if this block can be called asynchronously and make uplevel references
+	    END;
+#blk_address_fields = .;
+	father			ADDRESS(vcg_blk);{ Pointer to the blocknode that immediately contains this block
+	next			ADDRESS(vcg_blk);{ Pointer to the next blocknode
+	variable_list		ADDRESS;{ Pointer to first symbol declared in this block
+	name			ADDRESS;{ Pointer to the token node which gives the name of this block or 0
+	max_display_level	WORD;	{ Maximum up-level addressing for references in this block
+	nesting_level		WORD;	{ Number of blocks containing this block
+	operator_id		LONGWORD;{ ID of last N-tuple in the block
+	first_line_number	LONGWORD;{ Line number of the first line in this block
+	bflags			STRUCTURE;
+
+	    				 {Note - DUMPSYM does not look at any
+					 {bits in vcg_blk_spare2
+	    vcg_blk_spare2	BITFIELD LENGTH 16; { M003
+	    return_keeping_locals bitfield;	{ A005D
+	    vcg_blk_spare3	BITFIELD LENGTH 23-^;  { A003
+					 { A003
+	    check_stack 	BITFIELD;{Set if stack limit checking is desired
+					 {in this frame. ADA ONLY
+/*
+/* fields set by WRITETREE
+	    auto_alloc		BITFIELD;{ Set if this block contains an alloc_auto_op
+	    flush_at_call	BITFIELD;{ Set if calls to arbitrary procedures can result in up-level references to symbols
+					 { declared in this block
+	    has_local_on_unit	BITFIELD;{ Set if an ON-unit in this block can transfer control to a label in this block
+	    has_on_unit		BITFIELD;{ Set if this block contains an ON_OP
+	    has_stack_temp	BITFIELD;{ Set if an operator in this block requires a stack temporary
+	    uses_ap		BITFIELD;{ Set if block has an argument list
+	    aliased_labels	BITFIELD;{ Set if any label in this block has the alias bit set
+	    has_auto_init 	BITFIELD;{ Set if automatic variables are initialized in this block
+	    END;
+	number_of_nodes		LONGWORD;{ Number of flow graph nodes needed by the optimizer for this block
+	number_of_edges		LONGWORD;{ Number of flow graph edges needed by the optimizer for this block
+	dynamic_size UNION	LONGWORD;{ Number of bytes to zero on frame;
+	    start_node		LONGWORD;{ Local to WTREE
+	    END;
+/*
+/* Set by the optimizer:
+	alt_symnode_head	ADDRESS; { A004D address of chain of   M006
+					 { alternate lifetime symnodes
+/*
+#blk_general_size_byte = .;		 { Must be a multiple of 4
+	number_of_labels	LONGWORD;{ Number of labels in this block
+/*
+/* Fields set by the back end
+	number_of_operators	LONGWORD;{ Highest operator id in this block
+/*
+/* Field set by the Allocator
+	stack_location		LONGWORD;{ Location counter to allocate space within the stack frame of this block
+/*
+#blk_min_size_byte = .;		{ Must be a multiple of 4
+/*
+				END;	{ End of common block node definition
+/*
+/* block type codes
+CONSTANT (undetermined,imaginary,subroutine,function,
+	begin_block,fmt_block,sub_and_function
+	) EQUALS 0 INCREMENT 1 PREFIX "blk_";
+/*
+/* block node sizes
+CONSTANT blk_k_min_size_byte	EQUALS #blk_min_size_byte;
+CONSTANT blk_k_min_size_word	EQUALS (#blk_min_size_byte+1)/2;
+CONSTANT blk_k_min_size_long	EQUALS (#blk_min_size_byte+3)/4;
+/*
+CONSTANT blk_k_general_size_byte EQUALS #blk_general_size_byte;
+CONSTANT blk_k_general_size_word EQUALS (#blk_general_size_byte+1)/2;
+CONSTANT blk_k_general_size_long EQUALS (#blk_general_size_byte+3)/4;
+
+end_module vcgblkdef;

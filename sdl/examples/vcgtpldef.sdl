@@ -1,0 +1,625 @@
+	module $vcgtpldef;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* define operator node for all compilers and VAX PL/I backend
+/*
+/*
+/* Modifications:
+/*
+/*	024D	Peter Craig	 9-Jun-1987	(378 SVCG D)
+/*
+/*		Added the new operator callg_function_op.
+/*		This generates a call to a function which
+/*		returns a value, using the callg instruction.
+/*
+/*	023D	Peter Craig	16-Jan-1987	(328 SVCG D)
+/*
+/*		Added the new operators present_op and 
+/*		actualcount_op.  These are used by the
+/*		front end only.
+/*
+/*	022D	Peter Craig	31-Oct-1986	(296 SVCG D)
+/*
+/*		Added the PLI specific non-value producing
+/*		operators onchar_pv_op and onsource_pv_op.
+/*		Used to support pseudovariables associated
+/*		with the conversion condition.
+/*
+/*	021D	Keith Knowles	 3-Nov-1986	(294 SVCG D)
+/*
+/*		Added reference_op.  Used by front-end only.
+/*
+/*	020D	Kent Glossop	 2-Jun-1986	(288 SVCG D)
+/*
+/*		Added the CONDITION_ data type.
+/*
+/*	019D	Kent Glossop	 2-Jun-1986	(224 SVCG D)
+/*
+/*		Added the operators DATETIME_OP, and MAXLENGTH_OP.
+/*
+/*		Several additions and some changes to make things more obvious.
+/*
+/*		- The operator ALLOC_AREA_OP has been renamed to ALLOC_HEAP_OP.
+/*		  This is to allow for the new area operators, and to eliminate
+/*		  possible confusion since the current ALLOC_AREA_OP has
+/*		  nothing whatsoever to do with areas...
+/*
+/*		- The function of the operator FREE_OP has been taken over by
+/*		  the operator FREE_HEAP_OP.  This was done because the front
+/*		  end needs a new operator parallel to ALLOCATE_OP for the
+/*		  FREE statement once allocate in area support is added.
+/*
+/*		- The totally new operators ALLOC_AREA_OP and FREE_AREA_OP
+/*		  have been added.
+/*
+/*		The new situation is thus:
+/*
+/*		ALLOCATE_OP/FREE_OP represent their respective statements in
+/*		the front end only.  They are not recognized by the VCG except
+/*		for dumping purposes.
+/*
+/*		ALLOC_HEAP_OP/FREE_HEAP_OP are the 2 operators that generate
+/*		calls to PLI$ALLOCHEEP and PLI$FREEHEEP, and thus are used
+/*		to allocate and free based and controlled storage.
+/*
+/*		ALLOC_AREA_OP/FREE_AREA_OP are the 2 operators that generate
+/*		calls to PLI$ALLOCATE_IN_AREA and PLI$FREE_IN_AREA, and thus
+/*		are used to allocate and free based storage (only) in areas.
+/*
+/*	018D	Tom Benson	02-Mar-1986	(180 SVCG D)
+/*
+/*		Added ASSIGN_LIFETIME tuple, used in split-lifetime DST
+/*		generation.
+/*
+/*	017D	Tom Benson	17-Feb-1986	(178 SVCG D)
+/*
+/*		Added UPDATE_BASE_OP, which takes one operand - the ID of
+/*		the corresponding LOOP_TOP_OP, which has at least one
+/*		ADDR_BASE_OP as an operand.
+/*		Also added definitions of FIRST_CONDITIONAL_BRANCH_OP and
+/*		LAST_CONDITIONAL_BRANCH_OP.
+/*
+/*	016D	Tom Benson	22-Jan-1986	(155 SVCG D)
+/*
+/*		Added VCG_V_NO_AUTO_CANDIDATE, which means that a REF cannot
+/*		be an AUTO_CANDIDATE. NO_AUTO, which used to mean this, now
+/*		means that it cannot be AUTO_CANDIDATE or AUTO_BASED.
+/*
+/*	015D	Tom Benson	03-Jan-1986	(151 SVCG D)
+/*
+/*		Added MATCH_BASE_OP, AUTO_CANDIDATE_OP, AUTO_BASED_OP, and 
+/*		TPL_V_NO_AUTO which indicates that a REF cannot be an 
+/*		AUTO_INC/DEC candidate.
+/*
+/*	014	Keith Knowles	11-Nov-1985	(125 SVCG D)
+/*
+/*		Added ENCODE_OP and DECODE_OP.
+/*
+/*	013	Tom Benson	18-Oct-1985	(088 SVCG D)
+/*
+/*		Added the MOVABLE_ASSIGN_OP.
+/*
+/*	012	Keith Knowles	14-Oct-1985	(084 SVCG D)
+/*
+/*		Added definition of TPL_V_LONG_CHAR field.
+/*
+/*	011	Keith Knowles	27-Aug-1985	(049 SVCG D)
+/*
+/*		Add ASIND_OP and ACOSD_OP.
+/*
+/*	010	Keith Knowles	 3-Jul-1985	(027 SVCG D)
+/*
+/*		Added support for the FREE_FILE_OP and RELEASE_RECORD_OP
+/*		operators.
+/*
+/*	010	Tom Benson	10-Jul-1985	(025 SVCG M)
+/*
+/*		Add the PL/I front end specific VAL_OP, which will never be
+/*		seen by the VCG. (also added free_file and release_record,
+/*		which are new in the development stream, added here as
+/*		placeholders.)
+/*
+/*	009	Tom Benson	22-Oct-1984	(117 VCG)
+/*
+/*		1. Added PARAM_ADDR_OP.
+/*		2. Added ELN operators. Non-value producing: SAFE_WRITE_OP,
+/*		WRITE_PROC_REG_OP. Value producing: SAFE_READ_OP, 
+/*		READ_PROC_REG_OP, ADD_INTERLOCKED_OP, SET_INTERLOCKED_OP, 
+/*		INSERT_ENTRY_OP, REMOVE_ENTRY_OP.
+/*
+/*	008	Tom Benson	02-Nov-1984	(114 VCG)
+/*
+/*		Added ASSERT_OP (Ada specific).
+/*
+/*	007	Tom Benson	02-Oct-1984	(108 VCG)
+/*
+/*		Added PL/I front end specific operators select_top, when,
+/*		otherwise, and select_bottom.
+/*
+/*	006	Tom Benson	18-Sep-1984	(095 VCG)
+/*
+/*		Added bit NO_PROPAGATE, replacing VCG_TPL_SPARE. This is
+/*		used only during live analysis in the optimizer in assignment
+/*		operators. (It could be overlayed on LOAD_EFA, since that is
+/*		used only on REF ops...)
+/*
+/*	005	Caroline Davidson 14-Sept-1984	(092 VCG)
+/*
+/*		Added RESTORE_STACK_BASE_OP.
+/*
+/*	004	Tom Benson	21-Aug-1984	(076 VCG)
+/*
+/*		Removed store_frame_op, separate_call_op, and save_excp_name_op.
+/*		Added array_length_op, and add_, div_, mul_, and 
+/*		sub_no_overflow_ops. (all ADA specific)
+/*
+/*	003	Tom Benson	18-Jul-1984	(067 VCG)
+/*
+/*		Added VALUE_ADDR_OP.
+/*
+/*	002	Caroline Davidson 09-July-1984	(060 VCG)
+/*
+/*		Added SET_STACK_BASE_OP and PROLOGUE_END_OP.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+CONSTANT operand_size		EQUALS 2 ;
+#max_arguments = 255;
+CONSTANT max_arguments		EQUALS #max_arguments;
+/*
+/*
+/*
+AGGREGATE vcg_operator STRUCTURE PREFIX "tpl_";
+	variable_size		BITFIELD ;{ if set, size can't be determined at compile-time
+	size_units		BITFIELD LENGTH 3;{ code for size units(bits, bytes, words, etc.)
+	offset_units		BITFIELD LENGTH 3;{ code for offset units(bytes, words, etc.)
+	large			BITFIELD ;{ Large operand node
+	context			BITFIELD LENGTH 3;{ context
+	volatile		BITFIELD ;{ If set this tuple's limit is it's id
+	no_propagate		BITFIELD ;{ A006 If set value cannot be propagated (optimizer only)
+	load_efa		BITFIELD ;{ Load the effective address(ref_op only)
+	alias_var		BITFIELD ;{ aliased variable flag
+	"alias"			BITFIELD ;{ aliased
+	count			WORD	 ;{ reference count
+	id			LONGWORD ;{ operator tuple id
+	size STRUCTURE		LONGWORD ;{ size of the result
+	    prec		BYTE	 ;{ precision of the result
+	    scale		BYTE	 ;{ scale of the result
+	    force_d_float	BITFIELD ;{ override the g_float command switch
+	    force_g_float	BITFIELD ;{ override the g_gfloat command switch
+	    long_char		BITFIELD ;{ A012 string may be longer than 64K
+	    no_auto		BITFIELD ;{ A015D REF may not be AUTO_ at all
+	    no_auto_candidate	BITFIELD ;{ A016D REF may no be AUTO_CANDIDATE
+	    size_spare_bits	BITFIELD LENGTH 11;
+	    END;
+	opcode			WORD	 ;{ tuple opcode
+	type			BYTE UNSIGNED;{ data type code
+	number			BYTE UNSIGNED;{ number of operands
+#tpl_min_size_byte = .;
+	operand			LONGWORD DIMENSION 0:#max_arguments;
+	END;
+
+/*
+/* Define tuple node size
+CONSTANT tpl_k_min_size_byte	EQUALS (((#tpl_min_size_byte+3)/4)*4);
+CONSTANT tpl_k_min_size_word	EQUALS (((#tpl_min_size_byte+3)/4)*2);
+CONSTANT tpl_k_min_size_long	EQUALS ((#tpl_min_size_byte+3)/4);
+CONSTANT tpl_k_operand_size_byte EQUALS 4;
+CONSTANT tpl_k_operand_size_word EQUALS 2;
+CONSTANT tpl_k_operand_size_long EQUALS 1;
+CONSTANT operator_size		EQUALS (((#tpl_min_size_byte+3)/4)*2);
+/*
+/* COMMON operators, 1 - 255
+/*
+/*   non-value producing, range: 1 - 99
+/*
+CONSTANT (
+	assign_op,
+	return_op,
+	call_op,
+	procedure_op,
+	begin_op,
+	entry_op,
+	loop_top_op,
+	loop_bottom_op,
+	block_end_op,
+	label_op,
+	allocate_op,
+	loop_body_op,
+	nop_op,
+	use_op,
+	stmnt_id_op,
+	goto_op,
+	branch_op,
+	branch_true_op,
+	branch_false_op,
+	branch_eq_op,
+	branch_ne_op,
+	branch_lt_op,
+	branch_gt_op,
+	branch_le_op,
+	branch_ge_op,
+	branch_equ_op,
+	branch_neu_op,
+	branch_ltu_op,
+	branch_gtu_op,
+	branch_leu_op,
+	branch_geu_op,
+	branch_save_op,
+	branch_switch_op,
+	free_op,
+	sets_op,
+	call_begin_op,
+	increment_usage_op,
+	add_compare_branch_op,
+	set_stack_base_op,			{ *M002* - changed the name
+	insert_op,
+	move_op,
+	sref_op,	
+	list_node_op,	
+	case_op,
+	signal_op,
+	signal_stop_op,
+	callg_op,
+	epilogue_op,
+	asn_stgdsc_op,
+	prologue_end_op,			{ *A002* - added operator
+	restore_stack_base_op,			{ *A005* - added operator
+	safe_write_op,				{ A009
+	write_proc_reg_op,			{ A009
+	movable_assign_op,			{ A013
+	update_base_op,				{ A017D
+	assign_lifetime_op,			{ A018D
+		) EQUALS 1 INCREMENT 1;
+CONSTANT first_conditional_branch_op EQUALS 18;	{ A017D
+CONSTANT last_conditional_branch_op EQUALS 31;	{ A017D
+/*
+/*	value producing, range: 100 - 255
+/*
+CONSTANT (
+	ref_op,
+	value_op,
+	integer_op,
+	constant_op,
+	param_ptr_op,
+	range_op,
+	cond_op,
+	alloc_temp_op,
+	alloc_auto_op,
+	add_op,
+	sub_op,
+	mult_op,
+	div_op,
+	power_op,
+	plus_op,
+	minus_op,
+	eq_op,
+	ne_op,
+	lt_op,
+	gt_op,
+	le_op,
+	ge_op,
+	equ_op,
+	neu_op,
+	ltu_op,
+	gtu_op,
+	leu_op,
+	geu_op,
+	and_op,
+	or_op,
+	not_op,
+	cat_op,
+	call_function_op,
+	shift_op,
+	convert_op,
+	arg_ref_op,
+	arg_value_op,
+	global_val_op,
+	add_offset_op,
+	call_function_storage_op,
+	udiv_op,
+	save_op,
+	save_result_op,
+	assign_regtemp_op,
+	bld_structure_op,
+	addr_base_op,
+	auto_dec_op,
+	auto_inc_op,
+	extract_op,
+	extractz_op,
+	xor_op,
+	umod_op,
+	push_op,
+	rem_op,
+	value_addr_op,		{ A003
+	param_addr_op,		{ A009
+	safe_read_op, 		{ A009
+	read_proc_reg_op, 	{ A009
+	add_interlocked_op, 	{ A009
+	set_interlocked_op, 	{ A009
+	insert_entry_op, 	{ A009
+	remove_entry_op,	{ A009
+	match_base_op,		{ A015D
+	auto_candidate_op,	{ A015D
+	auto_based_op,		{ A015D
+	callg_function_op,	{ A024D
+		) EQUALS 100 INCREMENT 1; 
+CONSTANT immediate_op 	EQUALS 102;		/* same as integer
+CONSTANT first_common_value_producing_op EQUALS 100;
+CONSTANT last_common_value_producing_op EQUALS 255;
+/*
+/* common built-in functions, WARNING!  Do not use 254 and 255 positions!
+/*					They have special meanings in CODETBL!
+/*
+CONSTANT (
+	abs_op,
+	asin_op,
+	atan_op,
+	atand_op,
+	atanh_op,
+	bit_op,
+	bool_op,
+	byte_op,
+	ceil_op,
+	character_op,
+	complex_op,
+	conjg_op,
+	copy_op,
+	cos_op,
+	cosd_op,
+	cosh_op,
+	date_op,
+	decat_op,
+	decimal_op,
+	dimension_op,
+	display_op,
+	erf_op,
+	erfc_op,
+	every_op,
+	exp_op,
+	extend_op,
+	fixed_op,
+	float_op,
+	floor_op,
+	flush_op,
+	hbound_op,
+	imag_op,
+	lbound_op,
+	length_op,
+	lineno_op,
+	log_op,
+	log10_op,
+	log2_op,
+	max_op,
+	min_op,
+	mod_op,
+	next_volume_op,
+	node_address_op,
+	prod_op,
+	rank_op,
+	real_op,
+	rewind_op,
+	round_op,
+	sign_op,
+	sin_op,
+	sind_op,
+	sinh_op,
+	some_op,
+	spaceblock_op,
+	sqrt_op,
+	subtract_op,
+	sum_op,
+	tan_op,
+	tand_op,
+	tanh_op,
+	time_op,
+	translate_op,
+	trunc_op,
+	unspec_op,
+	valid_op,
+	verify_op,
+	and_then_op,
+	or_else_op,
+	trim_op,
+	search_op,
+	asind_op,		/* A011
+	acosd_op,		/* A011
+	datetime_op,		/* A019D
+	maxlength_op,		/* A019D
+		) EQUALS 170 INCREMENT 1;
+/*
+/* define C specific operators, 256 - 319
+/*
+/* 	non-value producing, range: 256 - 287
+/*
+CONSTANT (
+	log_and_op,
+	log_or_op,
+	cond_expr_op,
+	pre_inc_op,
+	post_inc_op,
+	pre_dec_op,
+	post_dec_op,
+	rshift_op,
+	lshift_op,
+	urshift_op,
+		) EQUALS 256 INCREMENT 1;
+/*
+/* define ADA specific operators, 320 - 383
+/*
+/*	non-value producing, range: 320 - 351
+/*
+CONSTANT (
+	array_length_op,	{ A004
+	add_no_overflow_op,	{ A004
+	sub_no_overflow_op,	{ A004
+	mul_no_overflow_op,	{ A004
+	div_no_overflow_op,	{ A004
+	assert_op,		{ A008
+		) EQUALS 320 INCREMENT 1;
+/*
+/* define PL/I specific operators  384 - 511
+/*
+/*	non-value producing, range: 384 - first_pli_value_producing_op-1
+/*
+CONSTANT (
+	open_op,
+	close_op,
+	get_op,
+	put_op,
+	edit_input_op,
+	edit_output_op,
+	list_input_op,
+	list_output_op,
+	read_op,
+	write_op,
+	rewrite_op,
+	delete_op,
+	format_op,
+	stop_op,
+	on_op,
+	revert_op,
+	undefined_400_op,
+	exit_op,
+	error_op,
+	assign_repeat_op,
+	leave_op,
+	descriptor_op,
+	free_tree_op,
+	add_ptr_op,
+	sub_ptr_op,
+	list_op,	
+	star_op,	
+	environ_op,	
+	do_op,
+	byname_op,	
+	get_string_op,
+	put_string_op,
+	new_sref_op,
+	select_top_op,		{ A006
+	when_op,		{ A006
+	otherwise_op,		{ A006
+	select_bottom_op,	{ A006
+	free_file_op,		{ A010
+	release_record_op,	{ A010
+	val_op,			{ A010
+	free_heap_op,		{ A019D
+	free_area_op,		{ A019D
+	reference_op,		{ A021D
+	onchar_pv_op,		{ A022D
+	onsource_pv_op,		{ A022D
+		) EQUALS 384 INCREMENT 1;
+/*
+/*	value producing, range: first_pli_value_producing_op - 511
+/*
+/*	N.B.	These grow downwards towards 384.  The value of
+/*		first_pli_value_producing_op must be updated.
+/*
+CONSTANT (
+	cond_null_op,
+	convert_units_op,
+	alloc_heap_op,
+	decode_op,		{ A014
+	encode_op,		{ A014
+	alloc_area_op,		{ A019D
+	present_op,		{ A023D
+	actualcount_op,		{ A023D
+		) EQUALS 450 INCREMENT -1; 
+/*
+/* 	built-in function opcodes
+/*
+CONSTANT (
+	acos_op,
+	addition_op,
+	addr_op,
+	after_op,
+	allocation_op,
+	before_op,
+	binary_op,
+	collate_op,
+	divide_op,
+	dot_op,
+	empty_op,
+	index_op,
+	multiply_op,
+	null_op,
+	offset_op,
+	onchar_op,
+	oncode_op,
+	onfield_op,
+	onfile_op,
+	onkey_op,
+	oncndarg_op,
+	onsource_op,
+	pageno_op,
+	pointer_op,
+	precision_op,
+	resig_op,
+	reverse_op,
+	size_op,
+	string_op,
+	substr_op,
+	,
+	,
+	high_op,
+	low_op
+		) EQUALS 451 INCREMENT 1;
+/*
+#hb_tuple_number = 511;
+CONSTANT vcg$k_hb_tuple_number EQUALS #hb_tuple_number;
+ITEM	vcg$gvt_tuple_name CHARACTER LENGTH 22 VARYING DIMENSION #hb_tuple_number GLOBAL;
+CONSTANT first_pli_value_producing_op EQUALS 445;
+CONSTANT last_pli_value_producing_op EQUALS 511;
+/* 
+/* data type codes
+/*
+CONSTANT (
+	pictured_,
+	fixed_bin_,
+	float_bin_,
+	fixed_dec_,
+	float_dec_,
+	complex_fixed_bin_,
+	complex_float_bin_,
+	complex_fixed_dec_,
+	complex_float_dec_,
+	char_,
+	char_var_,
+	bit_,
+	bit_var_,
+	bit_aligned_,
+	pointer_,
+	offset_,
+	area_,
+	file_,
+	label_,
+	entry_,
+	format_,
+	data_,
+	structure_,
+	bif_,
+	union_,
+	,
+	array_,
+	any_type_,
+	abstract_type_,
+	condition_,
+		) EQUALS 1 INCREMENT 1;
+CONSTANT unsigned_ EQUALS 1;
+/*
+/* Context codes
+CONSTANT (
+	"bit",
+	"byte",
+	"word",
+	"long",
+	"quad",
+	"octa",
+	) EQUALS 0 INCREMENT 1 PREFIX "ctx_";
+/*
+/*
+END_MODULE;
