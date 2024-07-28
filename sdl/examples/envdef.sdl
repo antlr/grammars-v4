@@ -1,0 +1,35 @@
+	module $defenv;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define environment index data base
+/*
+AGGREGATE vcg_env_descr STRUCTURE;
+	env_u_flags	UNION;
+	    env_w_flags	WORD;
+	    env_r_flags	STRUCTURE PREFIX "env_";
+		def		BITFIELD;		{ If set, a definition
+		nested		BITFIELD;		{ If set, nested environment
+		spare_bits	BITFIELD LENGTH 14;
+		END;
+	    END;
+	env_w_parent_index WORD;			{ For nested environments the parent's environment index number
+	env_vt_name	CHARACTER LENGTH 32 VARYING;{ Name of the environment
+#env_length = .;
+	END;
+/*
+/* Define the length of a environment index descriptor
+/*
+CONSTANT env_k_length EQUALS (#env_length);
+/*
+/*
+END_MODULE;

@@ -545,7 +545,7 @@ partition_by_clause
     ;
 
 result_cache_clause
-    : RESULT_CACHE relies_on_part?
+    : RESULT_CACHE relies_on_part? ('(' MODE (DEFAULT | FORCE ) ')')?
     ;
 
 accessible_by_clause
@@ -751,7 +751,7 @@ function_body
         | invoker_rights_clause
         | parallel_enable_clause
         | result_cache_clause
-        | streaming_clause 
+        | streaming_clause
             // see example in section "How Table Functions Stream their Input Data" on streaming_clause in Oracle 9i: https://docs.oracle.com/cd/B10501_01/appdev.920/a96624/08_subs.htm#20554
     )* (
         ( (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec))
@@ -2777,7 +2777,7 @@ out_of_line_ref_constraint
 
 out_of_line_constraint
     : (
-        (CONSTRAINT constraint_name)? (
+        ((CONSTRAINT | CONSTRAINTS) constraint_name)? (
             UNIQUE '(' column_name (',' column_name)* ')'
             | PRIMARY KEY '(' column_name (',' column_name)* ')'
             | foreign_key_clause
@@ -3494,7 +3494,7 @@ table_properties
     : column_properties? read_only_clause? indexing_clause? table_partitioning_clauses? attribute_clustering_clause? (
         CACHE
         | NOCACHE
-    )? result_cache_clause? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? enable_disable_clause* row_movement_clause?
+    )? result_cache_clause? parallel_clause? monitoring_nomonitoring? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? enable_disable_clause* row_movement_clause?
         logical_replication_clause? flashback_archive_clause? physical_properties? (ROW ARCHIVAL)? (
         AS select_only_statement
         | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name
@@ -3657,7 +3657,7 @@ system_partitioning
     ;
 
 range_partition_desc
-    : PARTITION partition_name? range_values_clause? table_partition_description? (
+    : PARTITION partition_name? range_values_clause? table_partition_description (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*
@@ -3670,7 +3670,7 @@ range_partition_desc
     ;
 
 list_partition_desc
-    : PARTITION partition_name? list_values_clause? table_partition_description? (
+    : PARTITION partition_name? list_values_clause? table_partition_description (
         (
             '(' (
                 range_subpartition_desc (',' range_subpartition_desc)*

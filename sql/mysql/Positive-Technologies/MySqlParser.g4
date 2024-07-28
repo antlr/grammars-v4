@@ -3488,4 +3488,5 @@ functionNameBase
     | JSON_STORAGE_SIZE
     | JSON_ARRAYAGG
     | JSON_OBJECTAGG
+    | STATEMENT
     ;

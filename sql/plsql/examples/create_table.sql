@@ -369,6 +369,19 @@ CREATE TABLE T_ORDER
     COLUMN1  VARCHAR2(10)
 );
 
+CREATE TABLE DWH_INT_DBT.sensors_raw (
+  SOURCE                 VARCHAR2(50),
+  EVENTTS                VARCHAR2(30))
+  STORAGE (
+    BUFFER_POOL      DEFAULT
+    FLASH_CACHE      DEFAULT
+    CELL_FLASH_CACHE DEFAULT)
+  NOCOMPRESS
+  NOCACHE
+  RESULT_CACHE (MODE DEFAULT)
+  NOPARALLEL
+  NOMONITORING;
+
 -- see as https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6
 CREATE TABLE print_media_demo
 ( product_id NUMBER(6)
@@ -416,6 +429,14 @@ CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) MEMOPTI
 CREATE TABLE tab (ID number(9) primary key, data xmltype, data2 xmltype) NO MEMOPTIMIZE FOR WRITE;
 
 CREATE TABLE tab IF NOT EXISTS (ID number(9) primary key);
+
+CREATE TABLE T1 (
+ "NAME" VARCHAR(10) NOT NULL,
+ "ID" INT NOT NULL,
+ "ADDRESS" VARCHAR(255),
+ "SQ_NUMBER" NUMBER(10),
+ "PQ_NUMBER" NUMBER(10),
+ CONSTRAINTS UQ1 UNIQUE ("SQ_NUMBER", "PQ_NUMBER"));
 
 create TABLE PROCESSED AS (
 select * FROM T_ORDER_PROCESSED f)

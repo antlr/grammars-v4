@@ -21,7 +21,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.0
+      uses: actions/setup-dotnet@v4.0.1
       with:
         dotnet-version: '8.0.x'
     - name: Install Trash
@@ -71,7 +71,7 @@ jobs:
         echo ${{ steps.setup-php.outputs.php-version }}
         php --version
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.0
+      uses: actions/setup-dotnet@v4.0.1
       with:
         dotnet-version: '8.0.x'
     - name: Test Dotnet
@@ -108,7 +108,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.1.0
+      uses: actions/setup-python@v5.1.1
       with:
         python-version: '3.10'
     - name: Test Python
@@ -124,7 +124,7 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@v4.0.3
       with:
         node-version: '21.7.3'
     - name: Test JavaScript
@@ -176,7 +176,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.0
+      uses: actions/setup-dotnet@v4.0.1
       with:
         dotnet-version: '8.0.x'
     - name: Test Dotnet
@@ -196,7 +196,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.1.0
+      uses: actions/setup-python@v5.1.1
       with:
         python-version: '3.10'
     - name: Test Python

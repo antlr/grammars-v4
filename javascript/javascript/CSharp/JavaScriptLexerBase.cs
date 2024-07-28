@@ -30,15 +30,14 @@ public abstract class JavaScriptLexerBase : Lexer
     private bool _useStrictCurrent = false;
 
     /// <summary>
-    /// Keeps track of the the current depth of nested template string backticks.
-    /// E.g. after the X in:
-    ///
-    /// `${a ? `${X
-    ///
-    /// templateDepth will be 2. This variable is needed to determine if a `}` is a
-    /// plain CloseBrace, or one that closes an expression inside a template string.
+    /// Current nesting depth
     /// </summary>
-    private int _templateDepth = 0;
+    private int _currentDepth = 0;
+
+    /// <summary>
+    /// Preserve nesting depth of template literals
+    /// </summary>
+    private Stack<int> templateDepthStack = new Stack<int>();
 
     public JavaScriptLexerBase(ICharStream input)
         : base(input)
@@ -73,7 +72,7 @@ public abstract class JavaScriptLexerBase : Lexer
 
     public bool IsInTemplateString()
     {
-        return _templateDepth > 0;
+        return templateDepthStack.Count > 0 && templateDepthStack.Peek() == _currentDepth;
     }
 
     /// <summary>
@@ -102,6 +101,7 @@ public abstract class JavaScriptLexerBase : Lexer
 
     protected void ProcessOpenBrace()
     {
+        _currentDepth++;
         _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
         scopeStrictModes.Push(_useStrictCurrent);
     }
@@ -109,6 +109,7 @@ public abstract class JavaScriptLexerBase : Lexer
     protected void ProcessCloseBrace()
     {
         _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
+        _currentDepth--;
     }
 
     protected void ProcessStringLiteral()
@@ -125,14 +126,14 @@ public abstract class JavaScriptLexerBase : Lexer
         }
     }
 
-    public void IncreaseTemplateDepth()
-    {
-        _templateDepth++;
+    protected void ProcessTemplateOpenBrace() {
+        _currentDepth++;
+        templateDepthStack.Push(_currentDepth);
     }
 
-    public void DecreaseTemplateDepth()
-    {
-        _templateDepth--;
+    protected void ProcessTemplateCloseBrace() {
+        templateDepthStack.Pop();
+        _currentDepth--;
     }
 
     /// <summary>
@@ -175,7 +176,8 @@ public abstract class JavaScriptLexerBase : Lexer
         _lastToken = null;
         _useStrictDefault = false;
         _useStrictCurrent = false;
-        _templateDepth = 0;
+        _currentDepth = 0;
+        templateDepthStack.Clear();
         base.Reset();
     }
 }

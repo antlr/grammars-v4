@@ -56,30 +56,30 @@ def main(argv):
     i = 1
     while i \< len(argv):
         arg = argv[i]
-        if arg in ("-tokens"):
+        if arg == "-tokens":
             show_tokens = True
-        elif arg in ("-tree"):
+        elif arg == "-tree":
             show_tree = True
-        elif arg in ("-prefix"):
+        elif arg == "-prefix":
             i = i + 1
             prefix = argv[i] + " "
-        elif arg in ("-input"):
+        elif arg == "-input":
             i = i + 1
             inputs.append(argv[i])
             is_fns.append(False)
-        elif arg in ("-encoding"):
+        elif arg == "-encoding":
             i = i + 1
             encoding = argv[i]
-        elif arg in ("-tee"):
+        elif arg == "-tee":
             tee = True
-        elif arg in ("-x"):
+        elif arg == "-x":
             while f := sys.stdin.readline():
                 f = f.strip()
                 inputs.append(f)
                 is_fns.append(True)
-        elif arg in ("-q"):
+        elif arg == "-q":
             quiet = True
-        elif arg in ("-trace"):
+        elif arg == "-trace":
             show_trace = True
         else:
             inputs.append(argv[i])
