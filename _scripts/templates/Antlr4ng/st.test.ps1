@@ -66,8 +66,30 @@ if ( $size -eq 0 ) {
     exit 1
 }
 
+function func {
+    param (
+        [string]$p
+    )
+
+    # Find the index of the first asterisk (*)
+    $index = $p.IndexOf('*')
+
+    if ($index -eq -1) {
+        # No asterisk found, return the entire path
+        return $p
+    } else {
+        # Asterisk found, return the path up to but not including the asterisk
+        $path = $p.Substring(0, $index)
+        # Ensure the path ends with a directory separator
+        if ($path -notmatch '[\\/]$') {
+            $path += '\'
+        }
+        return $path
+    }
+}
+
 $old = Get-Location
-Set-Location "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
+Set-Location func("<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>")
 
 # Check if any .errors/.ipt files have changed. That's not good.
 git config --global pager.diff false
