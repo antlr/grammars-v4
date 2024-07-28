@@ -2067,7 +2067,7 @@
  {
   "name": "Kotlin",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin/KotlinLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin/KotlinLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin/KotlinParser.g4",
   "start": "kotlinFile",
   "example": [
    "/bad_property.kt",
@@ -5484,6 +5484,29 @@
   ]
  },
  {
+  "name": "SPL",
+  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/spl/SPLLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/spl/SPLParser.g4",
+  "start": "expression",
+  "example": [
+   "by.txt",
+   "complex_query_1.txt",
+   "complex_query_2.txt",
+   "in.txt",
+   "join.txt",
+   "like_1.txt",
+   "like_2.txt",
+   "not.txt",
+   "or.txt",
+   "outputnew.txt",
+   "regex.txt",
+   "simple_query.txt",
+   "time.txt",
+   "wildcard_1.txt",
+   "wildcard_2.txt"
+  ]
+ },
+ {
   "name": "Athena",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/athena/AthenaLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/athena/AthenaParser.g4",
@@ -5728,7 +5751,9 @@
    "iff.sql",
    "materialized_views.sql",
    "other.sql",
+   "password_policy.sql",
    "select.sql",
+   "session_policy.sql",
    "show.sql",
    "tables.sql",
    "tags.sql",
@@ -6449,7 +6474,7 @@
  {
   "name": "vba",
   "lexer": "",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba6/vba.g4",
   "start": "startRule",
   "example": [
    "example09_typeHints.bas",
@@ -6462,6 +6487,26 @@
    "example6dateliteral.bas",
    "example7linecontinuation.bas",
    "example8_lineNumbers.bas"
+  ]
+ },
+ {
+  "name": "vba_cc",
+  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba_cc/vbaLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba_cc/vbaParser.g4",
+  "start": "startRule",
+  "example": [
+   "cc.bas"
+  ]
+ },
+ {
+  "name": "vba_like",
+  "lexer": "",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba_like/vba_like.g4",
+  "start": "program",
+  "example": [
+   "pattern01",
+   "pattern02",
+   "pattern03"
   ]
  },
  {
