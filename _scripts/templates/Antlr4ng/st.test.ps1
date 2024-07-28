@@ -80,16 +80,12 @@ function func {
     } else {
         # Asterisk found, return the path up to but not including the asterisk
         $path = $p.Substring(0, $index)
-        # Ensure the path ends with a directory separator
-        if ($path -notmatch '[\\/]$') {
-            $path += '\'
-        }
         return $path
     }
 }
 
 $old = Get-Location
-Set-Location func("<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>")
+Set-Location (func("<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"))
 
 # Check if any .errors/.ipt files have changed. That's not good.
 git config --global pager.diff false
