@@ -1,0 +1,22 @@
+document
+ header
+  include_
+   include
+   "ThriftTest.thrift"
+ definition
+  struct_
+   struct
+   IncludeTest
+   {
+   field
+    field_id
+     integer
+      1
+     :
+    field_req
+     required
+    field_type
+     ThriftTest.Bools
+    bools
+   }
+ <EOF>

@@ -45,7 +45,7 @@ done
 
 ttargets=""
 #for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "PHP" "Python3" "TypeScript" "Antlr4ng"
-for t in "Antlr4ng"
+for t in "Go"
 do
     if [ ${targets[$t]} -ne 0 ]
     then
