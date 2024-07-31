@@ -49,7 +49,7 @@ $ java TestR sample.R
 grammar R;
 
 prog
-    : (expr (';' | NL)* | NL)* EOF
+    : (expr)* EOF
     ;
 
 /*
@@ -60,52 +60,29 @@ expr_or_assign
 */
 
 expr
-    : expr '[[' sublist ']' ']' // '[[' follows R's yacc grammar
-    | expr '[' sublist ']'
-    | expr ('::' | ':::') expr
-    | expr ('$' | '@') expr
+    : expr expressionPrefixedExpression
+    | ADD_SUB expr
+    | NOT expr
     | <assoc = right> expr '^' expr
-    | ('-' | '+') expr
-    | expr ':' expr
-    | expr USER_OP expr // anything wrappedin %: '%' .* '%'
-    | expr ('*' | '/') expr
-    | expr ('+' | '-') expr
-    | expr ('>' | '>=' | '<' | '<=' | '==' | '!=') expr
-    | '!' expr
-    | expr ('&' | '&&') expr
-    | expr ('|' | '||') expr
     | '~' expr
-    | expr '~' expr
-    | expr ('<-' | '<<-' | '=' | '->' | '->>' | ':=') expr
-    | 'function' '(' formlist? ')' expr // define function
-    | expr '(' sublist ')'              // call function
-    | '{' exprlist '}'                  // compound statement
-    | 'if' '(' expr ')' expr
-    | 'if' '(' expr ')' expr NL* 'else' expr
-    | 'for' '(' ID 'in' expr ')' expr
-    | 'while' '(' expr ')' expr
-    | 'repeat' expr
-    | '?' expr // get help on expr, usually string or ID
-    | 'next'
-    | 'break'
-    | '(' expr ')'
+    | function
+    | CURLY_L exprlist CURLY_R                  // compound statement
+    | if
+    | for
+    | while
+    | REPEAT expr
+    | HELP expr // get help on expr, usually string or ID
+    | NEXT
+    | BREAK
+    | PAREN_L expr PAREN_R
+    | literal
     | ID
-    | STRING
-    | HEX
-    | INT
-    | FLOAT
-    | COMPLEX
-    | 'NULL'
-    | 'NA'
-    | 'Inf'
-    | 'NaN'
-    | 'TRUE'
-    | 'FALSE'
-    | NL expr
+    | NA
+    | COMMENT
     ;
 
 exprlist
-    : expr ((';' | NL) expr?)*
+    : expr (expr)*
     ;
 
 formlist
@@ -114,7 +91,7 @@ formlist
 
 form
     : ID
-    | ID '=' expr
+    | ID EQUALS expr
     | '...'
     | '.'
     ;
@@ -125,16 +102,108 @@ sublist
 
 sub
     : expr
-    | ID '='
-    | ID '=' expr
-    | STRING '='
-    | STRING '=' expr
-    | 'NULL' '='
-    | 'NULL' '=' expr
+    | ID EQUALS
+    | ID EQUALS expr
+    | STRING EQUALS
+    | STRING EQUALS expr
+    | NULL EQUALS
+    | NULL EQUALS expr
     | '...'
     | '.'
     |
     ;
+
+if
+    : IF PAREN_L expr PAREN_R expr (else)?
+    ;
+
+else
+    : ELSE expr
+    ;
+
+for
+    : FOR PAREN_L ID IN expr PAREN_R expr
+    ;
+
+while
+    : WHILE PAREN_L expr PAREN_R expr
+    ;
+
+function
+    : FUNCTION PAREN_L formlist? PAREN_R expr // define function
+    ;
+
+expressionPrefixedExpression
+    : '[[' sublist ']' ']' // '[[' follows R's yacc grammar
+    | '[' sublist ']'
+    | ('::' | ':::') expr
+    | ('$' | '@') expr
+    | ':' expr
+    | USER_OP expr // anything wrappedin %: '%' .* '%'
+    | mathemathicalExpression
+    | logicalExpression
+    | '~' expr
+    | ASSIGN expr
+    | PAREN_L sublist PAREN_R              // call function
+    ;
+
+mathemathicalExpression
+    : MULT_DIV expr
+    | ADD_SUB expr
+    ;
+
+logicalExpression
+    : COMPARATOR expr
+    | AND expr
+    | OR expr
+    ;
+
+literal
+    : STRING
+    | HEX
+    | INT
+    | FLOAT
+    | COMPLEX
+    | NULL
+    | INF
+    | NAN
+    | TRUE
+    | FALSE
+    ;
+
+IF: 'if';
+FOR: 'for';
+WHILE: 'while';
+REPEAT: 'repeat';
+FUNCTION: 'function';
+ELSE: 'else';
+IN: 'in';
+
+HELP: '?';
+NEXT: 'next';
+BREAK: 'break';
+
+NULL: 'NULL';
+NA: 'NA';
+INF: 'inf';
+NAN: 'NaN';
+TRUE: 'TRUE';
+FALSE: 'FALSE';
+
+NOT: '!';
+
+MULT_DIV: '*' | '/';
+ADD_SUB: '+' | '-';
+COMPARATOR: '>' | '>=' | '<' | '<=' | '==' | '!=';
+ASSIGN: '<-' | '<<-' | '=' | '->' | '->>' | ':=';
+AND: '&&' | '&';
+OR: '||' | '|';
+EQUALS: '=';
+
+PAREN_L: '(';
+PAREN_R: ')';
+CURLY_L: '{';
+CURLY_R: '}';
 
 HEX
     : '0' ('x' | 'X') HEXDIGIT+ [Ll]?
@@ -209,14 +278,14 @@ USER_OP
     ;
 
 COMMENT
-    : '#' .*? '\r'? '\n' -> type(NL)
+    : '#' .*? '\r'? '\n'
     ;
 
 // Match both UNIX and Windows newlines
-NL
+/*NL
     : '\r'? '\n'
-    ;
+    ;*/
 
 WS
-    : [ \t\u000C]+ -> skip
+    : ([ \t\u000C]+ | '\r\n' | '\n' | ';') -> skip
     ;
