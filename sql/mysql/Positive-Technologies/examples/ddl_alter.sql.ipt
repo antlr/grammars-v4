@@ -1237,6 +1237,41 @@ root
       fullId
        uid
         simpleId
+         table1
+     alterSpecification
+      add
+      column
+      uid
+       simpleId
+        keywordsCanBeId
+         yes
+      columnDefinition
+       dataType
+        varchar
+        lengthOneDimension
+         (
+         decimalLiteral
+          255
+         )
+       columnConstraint
+        default
+        defaultValue
+         constant
+          stringLiteral
+           ''
+       columnConstraint
+        nullNotnull
+         null
+  ;
+  sqlStatement
+   ddlStatement
+    alterTable
+     alter
+     table
+     tableName
+      fullId
+       uid
+        simpleId
          add_test
      alterSpecification
       add
