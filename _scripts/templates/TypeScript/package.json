@@ -17,7 +17,7 @@
   },
   "type": "module",
   "devDependencies": {
-    "@types/node": "^20.2.5"
+    "@types/node": "^22.0.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
