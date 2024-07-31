@@ -3122,6 +3122,7 @@ keywordsCanBeId
     | XA
     | XA_RECOVER_ADMIN
     | XML
+    | YES
     ;
 
 functionNameBase

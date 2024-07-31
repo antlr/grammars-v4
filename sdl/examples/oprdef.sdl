@@ -1,0 +1,208 @@
+	module $defopr;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	009	Peter Craig	 2-May-1988	VCG V4-472
+/*
+/*		Renamed the opr_a_subopr field to opr_a_rel_temp
+/*		meaning "related temporary".  This new field will
+/*		point to a temporary that is used by the operator
+/*		but does not contain the value of the operator.
+/*
+/*	008	Keith Knowles	27-Apr-1988	VCG V4-470
+/*
+/*		Move opr_v_force_d_float, opr_v_force_g_float, and
+/*		opr_v_long_char out of opr_l_size overlay.  None of
+/*		them are time-independent of opr_l_size.
+/*
+/*	007	Keith Knowles	16-Dec-1985	(135 SVCG D)
+/*
+/*		Acquire a new flag OPR_V_COINCIDENT_LABEL.  Bindcode will use
+/*		this flag to mark subsequent labels in a sequence of labels
+/*		assigned to the same address.
+/*
+/*	006	Keith Knowles	 5-Nov-1985	(119 SVCG D)
+/*
+/*		Added OPR_V_ALIGN_LABEL and OPR_V_FORWARD_REF.
+/*
+/*	005	Keith Knowles	14-Oct-1985	(084 SVCG D)
+/*
+/*		Added definition of OPR_V_LONG_CHAR field, which corresponds
+/*		to TPL_V_LONG_CHAR.
+/*
+/*	005	Keith Knowles	18-Jul-1986	(246 SVCG M)
+/*
+/*		Added the decr_visited flag.  This flag is set when the node
+/*		is visited by decr_usage.
+/*
+/*	004	Tom Benson	23-Jul-1985	(030 SVCG M)
+/*
+/*		Added new OPR_V_STK_TMP_ADDR field, used only in the register
+/*		allocator.
+/*
+/*	003	Tom Benson	15-Jan-1985	(146 VCG)
+/*
+/*		Added definition of OPR_V_VOLATILE field, which corresponds
+/*		to TPL_V_VOLATILE.
+/*
+/*	002	Tom Benson	03-Dec-1984	(132 VCG)
+/*
+/*		Added field OPR_L_PSECT_ID which overlays OPR_L_SYMBOL. This
+/*		is used in t_reg nodes which correspond to external constants.
+/*		These have no symbol node, only a token node. EMITITEM will
+/*		fill in the PSECT_ID field, allowing REGISTER to use it to
+/*		fill in the COP_W_PSECT field in the operand node. (For 
+/*		other externals, the OPR_L_SYMBOL field is used to fetch the
+/*		PSECT info from the symbol node itself.) The PSECT_ID field
+/*		will receive the NEGATED PSECT number, so it can be
+/*		distinguished from a symbol node address.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define operand node data structure (3 flavors)
+/*
+AGGREGATE vcg_t_reg_node STRUCTURE;
+	opr_l_flink	ADDRESS;	{ forward link
+	opr_l_blink	ADDRESS;	{ backward link
+	opr_w_tlength	WORD;		{ length of temporary in bytes
+	opr_b_register	BYTE;		{ allocated register number
+	opr_u_tflags UNION;		{ temporary status flags
+	    opr_b_tflags	BYTE;	{
+	    opr_r_tflags STRUCTURE PREFIX "opr_";
+		in_reg	BITFIELD MASK;	{ operand in register
+		in_temp	BITFIELD MASK;	{ operand in temporary
+		alloc	BITFIELD MASK;	{ register or temporary allocated
+		fix_reg	BITFIELD MASK;	{ fixed register desired
+		fix_mem	BITFIELD MASK;	{ fixed memory desired
+		fix_bas	BITFIELD MASK;	{ fixed base register
+		suff_weight BITFIELD MASK;{ has sufficient weight to warrant assignment to a hardware register(register.mar only)
+		stk_tmp_addr BITFIELD MASK; { A004 addr pushed on stack
+		END;
+	    END;
+	opr_l_temp	LONGWORD;	{ address of register or temporary node
+	opr_u_flags UNION;		{ operator flags
+	    opr_b_flags		BYTE;	{
+	    opr_r_flags STRUCTURE PREFIX "opr_";
+		var_size	BITFIELD MASK;		{ variable size length
+		size_unit	BITFIELD LENGTH 3 MASK;	{ size units
+		offs_unit	BITFIELD LENGTH 3 MASK;	{ offset units
+		large		BITFIELD MASK;		{ large operand node
+		END;
+	    END;
+	opr_u_uflags UNION;		{ context type and alias flags
+	    opr_b_uflags	BYTE;	{
+		opr_r_uflags STRUCTURE PREFIX "opr_";
+		context		BITFIELD LENGTH 3 MASK;	{ context type
+		volatile	BITFIELD MASK;		{ A003 volatile
+		decr_visited	BITFIELD LENGTH 1 MASK;	{ M005M M003 unused flags
+		load_efa	BITFIELD MASK;		{ load effective address
+		alias_var	BITFIELD MASK;		{ alaised variable flag
+		"alias"		BITFIELD MASK;		{ alias flag
+		END;
+	    END;
+	opr_w_reg_mask	WORD;		{ register node possible register mask
+	opr_l_offset	LONGWORD;	{ register temporary stack offset
+	opr_reg_skip_1	longword;	{ A008D matches the more_flags field
+	opr_reg_skip_2	quadword;	{ A008D
+	opr_l_weight	LONGWORD;	{ register allocation weight factor
+	opr_w_opcode	WORD;		{ operator code
+	opr_w_order	WORD;		{ register temporary order index
+#opr_length = .;
+	opr_l_final_use	LONGWORD;	{ operand index of final use register temporary
+	opr_l_first_use	LONGWORD;	{ operand index of first use register temporary
+	opr_u_sym	UNION;		{ A002 overlay symbol and psect fields
+	   opr_l_symbol		ADDRESS;{ address of the label symbol node
+	   opr_l_psect_id	LONGWORD;{ A002 psect number of external const
+	   END;
+#opr_regtemp = .;
+#opr_smlopnds = . + (15-3)*4;
+#opr_bigopnds = . + (256-3)*4;
+	END;
+
+AGGREGATE vcg_label_node STRUCTURE;	{ These fields have special meaning for labels
+	lab_node_skip1	QUADWORD;	{ forward link
+	opr_l_refcnt	LONGWORD;	{ label reference
+	opr_l_value	LONGWORD;	{ label location value
+	opr_u_lflags UNION;		{ A006D+
+	    opr_b_lflags	BYTE;	{
+	    opr_r_lflags STRUCTURE PREFIX "opr_";
+		align_label	BITFIELD;{ => align label on a boundary
+		forward_ref	BITFIELD;{ instruction makes forward ref
+		coincident_label BITFIELD;{ A007D => label coincides with
+					{ A007D ...previous label
+		spare_lflags	BITFIELD LENGTH 5 FILL;
+		END;			{
+	    END;			{ A006D-
+	lab_node_skip2	BYTE FILL;	{ M006D skip over flag fields
+	opr_w_member	WORD;		{ label table member number(going away)
+	opr_l_ident	LONGWORD;	{ operand ident
+	lab_node_skip5	longword;	{ A008D matches the more_flags field
+	lab_node_skip6	quadword;	{ A008D
+	opr_l_indlab	ADDRESS;	{ address of indirect label node
+	lab_node_skip3	WORD;		{ overlays opcode field
+	opr_b_type	BYTE;		{ data type of result
+	opr_b_number	BYTE;		{ number of operands
+	opr_u_labseq UNION;		{ label sequence number
+	    opr_l_labseq LONGWORD;	{
+	    opr_r_labseq STRUCTURE PREFIX "opr_";
+		seqn	BITFIELD LENGTH 31 MASK;	{ sequence number
+		cgen	BITFIELD MASK;			{ code gen label
+		END;
+	    opr_l_caslink ADDRESS;	{ address of next member in the case table(going away)
+	    END;
+	opr_l_code	ADDRESS;	{ address of defining code block
+	lab_node_skip4	LONGWORD;	{ skip over symbol field
+	END;
+
+AGGREGATE vcg_operand_node STRUCTURE;	{ These fields are special to non-label operands
+	op_node_skip1	QUADWORD;	{ Skip over flink and blink
+	opr_l_alloc	QUADWORD;	{ allocation descriptor
+	op_node_skip2	WORD;		{ unchecked flags overlay
+	opr_w_count	WORD;		{ usage count
+	op_node_skip3	LONGWORD;	{ skip over value
+	opr_u_more_flags union;		{ A008D+ expand structure by one whole longword.
+	    opr_b_more_flags byte;	{
+	    opr_r_more_flags structure prefix "opr_";
+		force_d_float	bitfield mask;		{ override g_float command switch
+		force_g_float	bitfield mask;		{ override g_float command switch
+		long_char	bitfield;		{ A005 string may be longer than 64k
+		end;
+	    end;
+	opr_skip5	byte;		{ Warning: these fields are initialized from fields
+	opr_skip6	word;		{ in the corresponding tuple.  This is done in
+					{ getntuple.
+	opr_a_reserve	address;	{ associated reserve cell
+	opr_a_rel_temp	address;	{ related temporary M009
+					{ A008D-
+	opr_u_size UNION;		{ operand size
+	    opr_l_size LONGWORD;	{
+	    opr_r_size STRUCTURE PREFIX "opr_";
+		prec		BYTE;			{ precision
+		scale		BYTE;			{ scale factor
+/*D008D		force_d_float	BITFIELD MASK;		{ override g_float command switch
+/*D008D		force_g_float	BITFIELD MASK;		{ override g_float command switch
+/*D008D		long_char	BITFIELD;		{ A005 string may be longer than 64K
+		END;
+	    END;
+	op_node_skip4	LONGWORD;	{ skip over opcode, type, and number fields
+	opr_l_op1	LONGWORD;	{ operand 1
+	opr_l_flinkt	LONGWORD;	{ operand 2/temporary forward link
+	opr_l_blinkt	LONGWORD;	{ operand 3/temporary backward link
+	END;
+/*
+/* Define the length of the constant parts of the operand node
+/*
+CONSTANT opr_k_length	EQUALS (#opr_length);
+CONSTANT opr_k_regtemp	EQUALS (#opr_regtemp);
+CONSTANT opr_k_smlopnds	EQUALS (#opr_smlopnds);
+CONSTANT opr_k_bigopnds	EQUALS (#opr_bigopnds);
+/*
+/*
+END_MODULE;

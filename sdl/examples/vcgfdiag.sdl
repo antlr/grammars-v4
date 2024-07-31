@@ -1,0 +1,123 @@
+MODULE $vcgfdiag;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	007	Keith Knowles	22-May-1986	(220 SVCG D)
+/*
+/*		Modified the sld record to accomodate 32-bit source line
+/*		numbers.
+/*
+/*	006	Keith Knowles	17-Feb-1986	(179 SVCG D)
+/*
+/*		Add FDIAG_L_SCA_EVENT and SLD_W_SCA_DEFINED for SCA support.
+/*		Also FDIAG_V_CMDLINE_FILE.
+/*
+/*	005	Caroline Davidson 28-June-1984	(053 VCG)
+/*
+/*		Move the reset_info field so that it is valid for both files
+/*		and libraries.  (It's used by C for their #line statement.)
+/*
+/*	004	Caroline Davidson 06-June-1984	(047 VCG)
+/*
+/*		Added bit to fdiag_r_flags to indicate when a library contains
+/*		a module which includes a module from the same library.
+/*
+/*	003	Caroline Davidson 16-Apr-1984	(025 VCG)
+/*
+/*		Added fields for PSE support. The fdiag block has an additional
+/*		bit field to be used when emitting the define_file record.  The
+/*		source line debugging record has an additional word size field
+/*		for the define_lines record.
+/*
+/*	002	Caroline Davidson 24-Feb-1984	(008 VCG)
+/*
+/*		Removed definition DST constants for source correlation.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*************************************************************************
+/*
+ITEM vcg$ga_file_diag_head ADDRESS GLOBAL;
+/*
+/* 
+AGGREGATE fdiag_block STRUCTURE PREFIX fdiag_ ;
+	next		ADDRESS	; /* pointer to next fdiag block
+	ptr UNION ;
+	    file_blk	ADDRESS	; /* pointer to file contrl block
+	    libr_rsa	ADDRESS ; /* pointer to libr resultant name
+	    END;
+	name UNION ; 		  /* name string descriptor
+	    name_desc	QUADWORD;
+	    sld STRUCTURE ;
+		name_size	BYTE UNSIGNED	; 
+		spare_3_byte	BITFIELD LENGTH 24 ; 
+		name_addr	ADDRESS		; 
+		END;
+	    END;
+	sca_event	LONGWORD; /* A006D SCA event index of file definition
+	date_time	QUADWORD; /* holds revision/insertion date and time 
+	reset_info	ADDRESS ; /* for reset. diagn. file and line ( M005 )
+	index		WORD 	; /* unique file index
+	flags	STRUCTURE ;
+	    rnd_file	BITFIELD MASK;	/* use rfa's in src rec 
+	    deleted	BITFIELD MASK;	/* file not available
+	    library	BITFIELD MASK;	/* file is a library module!
+	    psedef	BITFIELD MASK;	/* file defined for PSE ( A003 )
+	    library_enabled BITFIELD MASK; /* library used during 2 reads ( A004 )
+	    cmdline_file BITFIELD MASK;	/* A006D specified on the cmd-line
+	    bit_spare	BITFIELD LENGTH 8-^; /* spare bits
+	    END;
+	type UNION ;
+
+	    file_type STRUCTURE ;
+		rfo		BYTE	; /* file's record format and origin
+		ebk		LONGWORD; /* file's end of block number
+		ffb		WORD	; /* file's first free byte in eob
+		word_spare1	WORD	; /* spare word
+#const_size=.;
+		END;
+	    libr_type STRUCTURE ;
+		lib_nam_size	BYTE UNSIGNED 		; /* library name size
+		mod_name	CHARACTER LENGTH 34	; /* libr module name
+		END;
+	    END;
+	END;
+/*
+CONSTANT fdiag_c_bln EQUALS #const_size ; /* longword allignment for alloc
+/*
+/*
+/* appended MODULE $SRCDEF to this sdl file for source line debugging 
+/*
+ITEM	sld_a_head_line_ptr	ADDRESS GLOBAL;
+ITEM	sld_a_tail_line_ptr	ADDRESS GLOBAL;
+/*
+AGGREGATE sld_line_rec		STRUCTURE;
+     sld_a_next_line_ptr 	ADDRESS;    /* address of next sld line record
+     sld_l_first_line		LONGWORD;   /* first listing line 
+     sld_l_first_rec		LONGWORD;   /* starting source record number
+     sld_l_def_line		LONGWORD;   /* M007 number of lines read
+     sld_l_lse_defined		LONGWORD;   /* M007 lines defined for PSE ( A003 )
+     sld_l_sca_defined		LONGWORD;   /* M007 A006 lines defined for SCA
+     sld_w_file_id		WORD;	    /* index of fdiag block
+  END;
+/*
+CONSTANT sld_k_line_size EQUALS .;
+/*
+/*
+AGGREGATE reset_block STRUCTURE PREFIX reset_ ;
+     flink		ADDRESS; /* next reset block
+     src_line		LONGWORD; /* source line this took effect 
+     new_line		LONGWORD; /* new source line number 
+     name_desc		QUADWORD; /* new file name descriptor
+#rsize = .;
+     name		CHARACTER ;
+  END;
+
+CONSTANT reset_block_size EQUALS #rsize;
+/*
+/*
+END_MODULE;

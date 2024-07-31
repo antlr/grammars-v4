@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>bnf.g4</include>
+					   <include>bnfLexer.g4</include>
+					   <include>bnfParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

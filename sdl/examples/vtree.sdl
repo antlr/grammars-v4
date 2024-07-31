@@ -1,0 +1,184 @@
+MODULE vtree;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	002	Keith Knowles	10-Oct-1986	(280 SVCG M)
+/*
+/*		Added new entry point VCG$LIST_APPEND_IN_P_SPACE.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+#max_args = 255;
+
+AGGREGATE vtree_node STRUCTURE PREFIX vt_;
+
+opcode		WORD;
+number		WORD;
+type		WORD;
+spare_word	WORD;
+spare_byte	BYTE;
+context		BYTE;
+size_units	BYTE;
+offset_units	BYTE;
+size_info	UNION;
+    size ADDRESS;		/* like an operand
+	size_fields STRUCTURE;	/* subfields of constant size case
+	    pq_or_value UNION;	/* the word containing the constant size
+		pq STRUCTURE;	/* describes p and q bytes
+		    prec	BYTE;
+		    scale	BYTE;
+		    END;
+		size_value	WORD; /* constant size as an integer
+		END;
+	    force_d_float	BITFIELD;/* overrides g_float command switch
+	    force_g_float	BITFIELD;/* overrides g_float command switch
+	    size_fields_fill	BITFIELD LENGTH 13;
+	    constant_size	BITFIELD; /* the constant size flag
+	    END;
+	END;
+vcg_bits	STRUCTURE;
+	reduced			BITFIELD;
+	"alias"			BITFIELD;  /* marks an aliasing addr_op
+	addressing_op		BITFIELD;  /* marks value_ops used in address computation
+					   /* set by write_tree
+	global_save_result	BITFIELD;
+	expanded		BITFIELD;
+	vcg_spare_bits		BITFIELD LENGTH 3;
+	END;
+lang_bits	UNION;
+	pli_bits	STRUCTURE;
+		resolved	BITFIELD;
+		psv		BITFIELD;
+		mark1		BITFIELD;
+		pli_spare_bits	BITFIELD LENGTH 5;
+		END;
+
+	/* Add definition for C 
+
+	END;
+vtree_spare	WORD;		/*
+tuple_id	LONGWORD;	/* private to write_tree 
+sym_ptr		ADDRESS;	/* pointer to symbol node, for ref_ops, etc.
+tuple_ptr	ADDRESS;	/* private to write_tree 
+pre_tree	ADDRESS;	/* auxillary tree emitted before this tree 
+post_tree	ADDRESS;	/* auxillary tree emitted after this tree 
+sets_list	ADDRESS;	/* list of symbol nodes "set" by this operator 
+link1		ADDRESS;	/* links related save result ops
+
+vcg_spare	ADDRESS DIMENSION 4;
+lang_spare	ADDRESS DIMENSION 4;
+
+#vtnode_size = .;  /* size of vtree_node head in bytes, MUST BE A MULTIPLE OF 4
+
+variable_part	UNION;
+	operand ADDRESS DIMENSION 0 : #max_args;  /* zero-origin indexing
+	immediate_int	LONGWORD;  /* any integer or the null pointer/offset 
+	immediate_logical	LONGWORD UNSIGNED; /* bit strings as bit(32) aligned 
+	immediate_f	F_FLOATING;
+	immediate_d	D_FLOATING;
+				/* g_float and h_float hard to use
+	immediate_char	CHARACTER LENGTH 4*(#max_args+1);
+	END;
+END;
+
+CONSTANT vtnode_k_size EQUALS (#vtnode_size+3)/4;  /* size in long words 
+
+/* The following declaration for list nodes takes up less space than a
+/*   vtree_node. List nodes are only accessed by routines that expect
+ /*  such nodes or that will test for them via opcode 
+
+AGGREGATE vtree_list_node STRUCTURE PREFIX vtlist_;
+
+opcode		WORD;
+spare		WORD;
+next		ADDRESS;
+previous	ADDRESS;
+element		ADDRESS;	/* encoded like a vtree operand 
+head_or_tail	ADDRESS;	/* in head points to tail and vice-versa 
+
+#vtlist_node_size = .;
+
+END;
+
+CONSTANT vtlist_node_k_size EQUALS (#vtlist_node_size+3)/4; /*size in long words 
+
+/* Context codes for reduce tree
+
+CONSTANT (no_context,byte_context,word_context,long_context,quad_context,
+octa_context) EQUALS 0 INCREMENT 1 PREFIX wtree_;
+
+/* Head of list for write_group
+
+ITEM vcg$gl_wgroup_list ADDRESS GLOBAL;
+
+/* Entry Definitions
+
+ENTRY vcg$encode_operand PARAMETER(LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$allocate_t_space PARAMETER(LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$free_t_space;
+
+ENTRY vcg$allocate_p_space PARAMETER(LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$free_tree_buffers;
+
+ENTRY vcg$allocate_t_node PARAMETER(LONGWORD VALUE, LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$allocate_p_node PARAMETER(LONGWORD VALUE, LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$create_int PARAMETER(LONGWORD VALUE, LONGWORD VALUE, LONGWORD VALUE) VARIABLE RETURNS ADDRESS;
+
+ENTRY vcg$create_ptree_node PARAMETER(LONGWORD VALUE, LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$free_ptree_node PARAMETER(ADDRESS VALUE);
+
+ENTRY vcg$free_ptree PARAMETER(ADDRESS VALUE);
+
+ENTRY vcg$copy_tree PARAMETER(ADDRESS VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$save_tree PARAMETER(ADDRESS VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$emit PARAMETER(ADDRESS VALUE);
+
+ENTRY vcg$list_append PARAMETER(ADDRESS VALUE, ADDRESS);
+
+ENTRY vcg$list_append_in_p_space PARAMETER(ADDRESS VALUE, ADDRESS);
+
+ENTRY vcg$list_prepend PARAMETER(ADDRESS VALUE, ADDRESS);
+
+ENTRY vcg$list_insert PARAMETER(ADDRESS VALUE, ADDRESS);
+
+/*  ENTRY vcg$list_delete PARAMETER(ADDRESS VALUE);
+
+/*  ENTRY vcg$store_immediate_value PARAMETER(ADDRESS VALUE) RETURNS ADDRESS;
+
+/*  ENTRY vcg$constant_range_check PARAMETER(LONGWORD VALUE, LONGWORD VALUE, LONGWORD VALUE);
+
+/*  ENTRY vcg$range_check PARAMETER(ADDRESS VALUE, ADDRESS VALUE, ADDRESS VALUE,
+/*		LONGWORD VALUE, ADDRESS);
+
+ENTRY vcg$init_write_tree;
+
+ENTRY vcg$write_group;
+
+ENTRY vcg$reduce_tree PARAMETER(ADDRESS VALUE, LONGWORD VALUE) RETURNS ADDRESS;
+
+ENTRY vcg$create_tree VARIABLE PARAMETER(LONGWORD VALUE, ADDRESS VALUE )
+	RETURNS ADDRESS;
+
+ENTRY vcg$create_exp VARIABLE PARAMETER(LONGWORD VALUE, LONGWORD VALUE,
+	LONGWORD VALUE,	ADDRESS VALUE, ADDRESS VALUE ) RETURNS ADDRESS;
+
+ENTRY vcg$create_csize_exp VARIABLE PARAMETER(LONGWORD VALUE, LONGWORD VALUE,
+	LONGWORD VALUE,	LONGWORD VALUE, ADDRESS VALUE ) RETURNS ADDRESS;
+ENTRY vcg$emit_tree VARIABLE PARAMETER(LONGWORD VALUE, ADDRESS VALUE );
+
+
+END_MODULE;

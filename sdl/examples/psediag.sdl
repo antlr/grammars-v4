@@ -1,0 +1,647 @@
+MODULE PSE$DIAG;
+{	Version X0.28
+{
+{			  COPYRIGHT © 1984, 1996 BY
+{	      DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASS.
+{
+{ THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
+{ ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
+{ INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
+{ COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
+{ OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
+{ TRANSFERRED.
+{
+{ THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
+{ AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
+{ CORPORATION.
+{
+{ DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
+{ SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.
+
+{++
+{ FACILITY:
+{   PSE Program Support Environment.
+{
+{ ABSTRACT:
+{   This module defines all the Diagnostic file records
+{	for the data file that compilers supporting the PSE must
+{	generate. It also declares the literals that are used to define the
+{	record types, and the editor & language support package versions.
+{
+{ ENVIRONMENT:
+{   VAX/VMS user mode.
+{
+{ AUTHOR:
+{   Tracy Talcott, Technical Languages & Environments
+{   Paul S. Winalski, Technical Languages & Environments
+{   Ward Clark, Technical Languages & Environments
+{
+{ CREATION DATE: 12-Feb-1984
+{
+{ MODIFICATION HISTORY:
+{
+{   X0.2   20-Feb-84  PSW  remove length fields
+{
+{   X0.3   28-Feb-84  TT   Remove VARYING. This because VCG will put out a
+{	  		   length word if Varying is specified. Thus, we
+{	  		   end up with a record of:  Length Length Text.
+{
+{			   In the correlation commands where the length
+{			   wasn't explicit we don't want VARYING because
+{			   that'll leave a word for the count and Debug-32
+{			   uses only a byte. Solve that one with explicit
+{			   unions for File Name and Library Module Name.
+{			   B_file_name will still give you ASCIC like
+{			   Debug, but you can also get directly to the
+{			   length and text if you want.
+{
+{			   The source correlation information record was
+{			   malformed. To Wit: It should simply be a byte
+{			   string rather than one of characters.
+{
+{   X0.4    1-Mar-84  TT   Generic record had an extra PSE$ on it.
+{
+{   X0.5    3-Mar-84  TT   All sorts of minor format changes to placate
+{			   the Cbdoc tool. Cbdoc complains but never gives
+{			   any idea where the problem is. Not worth hunting
+{			   for it. Since the Cbdoc output file name depends
+{			   on the contents of a comment, to get same use
+{			   the /Output qualifier.
+{
+{			   File_name and Libmodname weren't right as we had
+{			   fixed pointers into variable length strings. Use
+{			   a dummy name (Pse$file_spec_type) as a
+{			   placeholder.
+{
+{			   All variables are now unsigned.
+{
+{   X0.6    7-Mar-84  TT   Reword description of file name and library name
+{			   due to a user being confused.
+{
+{   X0.7    7-Mar-84  TT   SDL ignores value of Prefix on Aggregate decls
+{			   so PSE$ must be explicitly tacked on.
+{
+{   X0.8   13-Mar-84  PSW  add RECTY_ to front of DIAG_START and DIAG_END
+{			   constant definitions
+{
+{   X0.9   21-Mar-84  TT   Added constants that tell the size of the
+{		     	   fixed portion of the structures in bytes. If
+{			   there's a field within the structure for the
+{		     	   length, that field IS counted in the size.
+{			   IE, for the file spec in the Define File
+{			   command, the command length includes the count
+{		     	   byte and the byte of zero for the unused spec.
+{
+{			   Make the Command Type start at 1 rather than 0.
+{			   To lower chances of getting trash in the
+{			   records the spec will require any trailing space
+{		      	   to be filled with binary zero.
+{                          
+{			   Also, move some comments to strange places
+{			   so they get attached to the correct chunks of
+{			   code.
+{                    
+{   X0.10  21-Mar-84  TT   Increase size of the command length field in the
+{			   Define File source coreelation command from byte
+{			   to word to accomodate VMS V4 file specs without
+{			   the need of a continuation record.
+{
+{			   Change the starting line number in a region from
+{			   unsigned to signed to permit a region to be the
+{			   start of the buffer. This was requested by VCG
+{			   for C.
+{
+{   X0.11  21-Mar-84  TT   Aggregates give you the size for free, so
+{			   delete the CONSTANT for the generic record.
+{
+{   X0.12  23-Mar-84  TT   Mucho changes. UNION is gone because it made
+{			   life difficult for C. Bliss folk can still map
+{			   things to PSE$INFORMATION_RECORD and
+{			   PSE$CORRELATE_COMMAND, but these macros are in
+{			   a separate require file - INFODEFS.R32. To use
+{			   these field sets, you must require this file.
+{			   The other change is that when you map to the
+{			   above, DON'T use REF as it's part of the macro.
+{
+{			   Cleaned up boundary conditions on string length
+{			   and lowered Lib Mod Name length from 252 (a full
+{			   file spec) to 39 (the maximum VMS V4 length of a
+{			   file name). Added maximum physical record length
+{			   for general reference by compiler people.
+{
+{			   Under Source token:
+{			     Pse$b_token_seq_num --> Pse$w_token_seq_num
+{			     Pse$l_token_type    --> Pse$w_token_type
+{
+{			   Under Generated Construct token:
+{			     Pse$l_gen_constr_token_type -->
+{			  		Pse$w_gen_constr_token_type
+{
+{			   The above field length changes were to remove
+{			   inconsistancies between the field lengths in
+{			   the above records.
+{
+{   X0.13  26-Mar-84  TT   Def File Size --> Def File Cmd Size.
+{
+{   X0.14  26-Mar-84  TT   Src Correlat Rec --> Src Correlate Rec Str
+{
+{			   Design change. Only one correlation command
+{			   allowed per record. This means that the Command
+{			   Length field in Define File can disappear.
+{			   Also, although the names for command and record
+{			   type will be unchanged, there will be only one
+{			   set of numbers to identify them. ANY
+{			   record/command can now be uniquely identified
+{			   by the first word. Generic_command is history
+{			   as Generic_record can access all the info.
+{			   Src_correlat_rec_str is also gone. Record type
+{			   literals will be 1- rather than 0-origined.
+{
+{   X0.15  28-Mar-84  TT   Error in the spec.
+{			    Pse$w_rms_rfo --> Pse$b_rms_rfo.
+{
+{   X0.16  30-Mar-84  PSW  Rename module PSEDIAG.  Bring field and
+{			   structure names in line with VMS naming
+{			   conventions.  Merge the short and long forms
+{			   of correlation records.  Since we are no longer
+{			   concerned with debugger compatibility, we don't
+{			   need multiple forms.
+{
+{   X0.17   2-Apr-84  WWC  Revise documentation to conform to CBDOC
+{			   conventions.
+{
+{   X0.18   2-Apr-84  WWC  Minor revisions resulting from Review Board
+{			   meeting.
+{
+{   X0.19   3-Apr-84  WWC  Remove trailing "_" from TAGs
+{
+{   X0.20   6-Apr-84  PSW  add missing "(marker)" comments to generic record
+{			   definition.  Add comment about end-of-line region
+{			   indicators to region record.
+{   X0.21  26-Apr-84  PSW  put in constants for the start and end of the
+{			   correction record types so that we can use the
+{			   CASE statement with them.
+{
+{   X0.22  29-Jun-84  PSW  Remove comment about NAM$W_FID from DEFINE_FILE
+{			   record definition.
+{
+{   X0.23   2-Aug-84  TMC  Add PSE$K_PLCH_INIT constant.
+{
+{   X0.24  15-Nov-84  PSW  add constants bracketing the source correlation
+{			   record types
+{
+{   X0.25   4-Dec-84  PSW  add REGION_TITLE record, bump version to 2
+{
+{   X0.26  27-Dec-84  WWC  XAB$W_RFO --> XAB$B_RFO
+{
+{   X0.27  18-Feb-85  PSW  add LINE_CORRECTION record, bump version to 3
+{
+{   X0.28  22-Feb-85  PSW  remove EOF_TOKEN record
+{
+{ END OF MODIFICATION HISTORY
+{--
+
+{++
+{  To generate a Bliss require file with Field sets from this file:
+{	$ SDL PSEDIAG /LANG=BLISSF
+{
+{  General layout of this SDL file:
+{	There are aggregates for each diagnostic and correlation record.
+{	Records can be uniquely identified by their first word -
+{	the Record Type word.  The type can always be accessed by 
+{	PSE$W_GENERIC_RECTY.
+{
+{	General layout of the file:
+{
+{	  CONSTANTs that define the literals in the LSE spec and some literals
+{	    for maximum lengths of text, etc.
+{
+{	  AGGREGATE for a generic (unknown) record.
+{	    Record Type	(word)     	All records have this first.
+{
+{	  AGGREGATEs for diagnostic records.
+{
+{	  AGGREGATEs for correlation records.
+{
+{	  Additional AGGREGATEs for the file specs and such.
+{
+{	  CONSTANTs telling the size of the fixed portion of the records.
+{--
+
+{+
+{ Notes on using the require file that PSEDIAG.SDL produces:
+{
+{   What's Defined here:
+{	1. All records that can appear in the data file produced by the
+{	    compilers or language support packages.
+{
+{	2. All constants that can appear anywhere within those records.
+{
+{
+{   The basic procedure:
+{
+{	 You don't know what kind of a record you have.
+{	   You can associate any record with the generic record, look at the
+{	   record type (Pse$w_generic_recty) and go from there.
+{
+{	 The first word in EVERY record is the record type and it uniquely
+{	   identifies the record. The main reason for this is that at some
+{	   point in the future, information records may be interspersed with
+{	   other records and we must be able to tell everything apart.
+{	 NOTE: This also means there are RESTRICTIONS....
+{
+{	**RESTRICTIONS**: There can never be more than 32767 (1 - 32767) types
+{			  of records as we MUST be able to identify any record
+{			  by its type word. The record type field MUST be the
+{			  SAME word in every record; namely, the first word.
+{
+{	Once you know what kind of record you have, you can then map that
+{	record structure to it.  All of the aggregates have names of the
+{	form $PSE_xxx_REC, where "xxx" is the aggregate type.  The maximum
+{	size of a record is given in a constant with the name PSE$S_xxx_RECSIZE.
+{-
+
+{+
+{   PSEDIAG.SDL initialization
+{
+{   This section defines constants used PSE Diagnostic Record definitions.
+{-
+#max_record_len = 2048;		/* maximum physical record length supported by LSEDIT
+#max_text_len = 256;		/* maximum length of a string of text
+#max_filespec_len = 252;	/* NAM$C_MAXRSS = 252 (VMS V4.0)
+#max_filename_len = 39;		/* Name in a source file library (VMS V4.0).
+
+/*++
+/*   $PSE_GENERIC_REC - Generic (unknown) Record
+/*
+/*   This record consists of a single field which identifies the type of
+/*   diagnostic record.
+/*--
+    AGGREGATE generic_rec STRUCTURE TAG $pse PREFIX pse$;
+	generic_recty	WORD UNSIGNED;		/* record type code:
+	    CONSTANT ( recty_source_region_start, /*    source region start (marker)
+		recty_source_region_end,	/*    source region end (marker)
+		recty_suppld_region_start,	/*    supplied text region start (marker)
+		recty_suppld_region_end,	/*    supplied text region end (marker)
+		recty_module_start,		/*    module start (marker)
+		recty_module_end,		/*    module end (marker)
+		recty_diag_start,		/*    diagnostic start (marker)
+		recty_diag_end,			/*    diagnostic end (marker)
+		recty_diag_group_start,		/*    diagnostic group start (marker)
+		recty_diag_group_end,		/*    diagnostic group end (marker)
+		recty_corr_start,		/*    correction start (marker)
+		recty_corr_end,			/*    correction end (marker)
+		recty_corr_group_start,		/*    correction group start (marker)
+		recty_corr_group_end,		/*    correction group end (marker)
+		recty_token_group_start,	/*    token group start (marker)
+		recty_token_group_end,		/*    token group end (marker)
+		recty_unused,			/*    reserved for future use
+		recty_version,			/*    version
+		recty_condition,		/*    condition value
+		recty_region,			/*    simple region
+		recty_text,			/*    text
+		recty_token,			/*    token
+		recty_gen_text_token,		/*    generated text token (marker)
+		recty_gen_constr_token,		/*    generated construct token (marker)
+		recty_eol_corr,			/*    end-of-line correction (marker)
+		recty_merge_corr,		/*    merge correction (marker)
+		recty_replace_corr,		/*    replacement correction (marker)
+		recty_insert_corr,		/*    insertion correction (marker)
+		recty_delete_corr,		/*    deletion correction (marker)
+		recty_scope_corr,		/*    scope correction (marker)
+{+
+{    NOTE:  The various source correlation record types must be kept contiguous.
+{    Be sure to update the definitions of PSE$K_FIRST_SRC_CORR and
+{    PSE$K_LAST_SRC_CORR if you change the first or last element in this list.
+{-
+		recty_define_file,		/*    define file
+		recty_set_file,			/*    set file
+		recty_set_line,			/*    set line
+		recty_set_record,		/*    set record
+		recty_incr_line,		/*    increment line
+		recty_define_lines,		/*    define lines
+		recty_count_formfeed,		/*    count formfeeds (marker)
+{+
+{    End of source correlation record types required to be contiguous.
+{-
+		recty_region_title,		/*    region title
+		recty_line_corr )		/*    insert line correction
+		EQUALS 1 INCREMENT 1 PREFIX pse$ COUNTER #max_recty;
+
+	CONSTANT num_rectys EQUALS #max_recty;
+	
+	CONSTANT first_src_corr EQUALS pse$k_recty_define_file;
+	CONSTANT last_src_corr EQUALS pse$k_recty_count_formfeed;
+
+	CONSTANT max_record_len EQUALS #max_record_len; /* largest physical record that LSEDIT will accept
+
+	CONSTANT generic_recsize EQUALS . TAG s;	/* length of record
+	END generic_rec;
+
+/*++
+/*   $PSE_VERSION_REC - Editor and Interface Versions
+/*
+/*   This record tells LSEDIT the version of the PSE interface used
+/*   in subsequent records.
+/*   It also tells LSEDIT the version of the language support package.
+/*--
+    AGGREGATE version_rec STRUCTURE TAG $pse PREFIX pse$;
+	version_recty		WORD UNSIGNED;	/* record type = PSE$K_RECTY_VERSION
+
+	version_interface	WORD UNSIGNED;	/* interface version:
+	    CONSTANT interface EQUALS 1;	/*    number
+
+	version_lang		WORD UNSIGNED;	/* language support package version = PSE$K_LANGUAGE_VERSION
+	    CONSTANT language_version EQUALS 3; /*    number
+	
+	CONSTANT version_recsize EQUALS . TAG s;	/* length of record
+	END version_rec;
+
+/*++
+/*   $PSE_CONDITION_REC - Compiler-issued Condition Value and Severity
+/*
+/*   Supplies the condition value and severity for a compiler-issued
+/*   diagnostic.
+/*--
+    AGGREGATE condition_rec STRUCTURE TAG $pse PREFIX pse$;
+	condition_recty		WORD UNSIGNED;	/* record type = PSE$K_RECTY_CONDITION
+
+	condition_fill		WORD UNSIGNED;	/* padding--not used
+	condition		LONGWORD UNSIGNED;	/* Condition value
+	
+	CONSTANT condition_recsize EQUALS . TAG s;	/* length of record
+	END condition_rec;
+
+/*++
+/*   $PSE_REGION_REC - Region Definition
+/*
+/*   Specifies the coordinates, importance level, and nesting level
+/*   for a region.
+/*--
+    AGGREGATE region_rec STRUCTURE TAG $pse PREFIX pse$;
+	region_recty		WORD UNSIGNED;	/* record type = PSE$K_RECTY_REGION
+
+	region_importance	BYTE UNSIGNED;	/* region importance level
+	region_level		BYTE UNSIGNED;	/* region nesting level
+
+	region_sline		LONGWORD;	/* starting line number
+						/*   0 = before line 1
+	region_eline		LONGWORD;	/* ending line number
+						/*   -1 = after last line
+	region_schar		WORD UNSIGNED;	/* starting character offset
+	region_echar		WORD UNSIGNED;	/* ending character offset
+						/*   65535 = end-of-line
+	
+	region_type		BYTE UNSIGNED;	/* region type:
+	    CONSTANT ( primary_region,		/*    primary region
+		secondary_region )		/*    secondary region
+		EQUALS 0 INCREMENT 1 PREFIX pse$;
+
+	CONSTANT region_recsize EQUALS . TAG s;	/* length of record
+	END region_rec;
+
+/*++
+/*   $PSE_TEXT_REC - Supplied Text
+/*
+/*   Contains the supplied text (the result of a macro expansion, for example),
+/*   and can also contain the text of diagnostic messages.
+/*--
+    AGGREGATE text_rec STRUCTURE TAG $pse PREFIX pse$;
+	text_recty	WORD UNSIGNED;	/* record type = PSE$K_RECTY_TEXT
+
+	text_len	WORD UNSIGNED;	/* length of PSE$T_TEXT_TEXT
+
+	CONSTANT text_fixed EQUALS . TAG s;	/* length of fixed portion of record
+
+	text_text	CHARACTER LENGTH #max_text_len;	/* actual bytes of text
+	CONSTANT max_text_len EQUALS #max_text_len;	/* maximum length of a string of text
+	
+	CONSTANT text_recsize EQUALS . TAG s;	/* length of record
+	END text_rec;
+
+/*++
+/*   $PSE_TOKEN_REC - Correction Token in Supplied Source
+/*
+/*   Specifies a correction token in the supplied source.
+/*
+/*   NOTE: Construct typing is not implemented in LSEDIT V1.0.
+/*
+/*	   The TOKEN_SEQ_NUM fields in TOKEN_REC, GEN_TEXT_TOKEN_REC, and
+/*	   GEN_CONS_TOKEN_REC must be at the same offset.
+/*--
+    AGGREGATE token_rec STRUCTURE TAG $pse PREFIX pse$;
+	token_recty	WORD UNSIGNED;	/* record type = PSE$K_RECTY_TOKEN
+
+	token_seq_num	WORD UNSIGNED;	/* token sequence number
+	token_sline	LONGWORD;	/* starting line of token
+					/*   0 = before line 1
+	token_eline	LONGWORD;	/* ending line of token
+					/*   -1 = after last line
+	token_schar	WORD UNSIGNED;	/* starting character of token
+	token_echar	WORD UNSIGNED;	/* ending character of token
+					/*   65535 = end-of-line
+
+	token_type	WORD UNSIGNED;	/* construct type (not implemented in LSEDIT V1.0)
+	
+	CONSTANT token_recsize EQUALS . TAG s;	/* length of record
+	END token_rec;
+
+/*++
+/*   $PSE_GEN_TEXT_TOKEN_REC - Generated Text for Token Insertion or Replacement
+/*
+/*   Reports generated text for token insertion or replacement as part of
+/*   a correction.
+/*
+/*   NOTE: Construct typing is not implemented in LSEDIT V1.0.
+/*
+/*	   The TOKEN_SEQ_NUM fields in TOKEN_REC, GEN_TEXT_TOKEN_REC, and
+/*	   GEN_CONS_TOKEN_REC must be at the same offset.
+/*--
+    AGGREGATE gen_text_token_rec STRUCTURE TAG $pse PREFIX pse$;
+	gen_text_token_recty	WORD UNSIGNED;	/* record type = PSE$K_RECTY_GEN_TEXT_TOKEN
+
+	gen_text_token_seq_num	WORD UNSIGNED;	/* token sequence number
+	gen_text_token_type	WORD UNSIGNED;	/* construct type (not implemented in LSEDIT V1.0)
+	gen_text_token_len	WORD UNSIGNED;	/* length of PSE$T_GEN_TEXT_TOKEN_TEXT
+
+	CONSTANT gen_text_fixed EQUALS . TAG s; /* length of fixed portion of record
+
+	gen_text_token_text	CHARACTER LENGTH #max_text_len;	/* text of the generated token
+	
+	CONSTANT gen_text_recsize EQUALS . TAG s;	/* length of record
+	END gen_text_token_rec;
+
+/*++
+/*   $PSE_GEN_CONS_TOKEN_REC - Insert Placeholder in Supplied Text
+/*
+/*   Indicates that the placeholder for a construct should be inserted in
+/*   the supplied text.
+/*
+/*   NOTE:  Construct typing is not implemented in LSEDIT V1.0.
+/*
+/*	   The TOKEN_SEQ_NUM fields in TOKEN_REC, GEN_TEXT_TOKEN_REC, and
+/*	   GEN_CONS_TOKEN_REC must be at the same offset.
+/*--
+    AGGREGATE gen_cons_token_rec STRUCTURE TAG $pse PREFIX pse$;
+	gen_cons_token_recty	WORD UNSIGNED;	/* record type = PSE$K_RECTY_GEN_CONSTR_TOKEN
+
+	gen_cons_token_seq_num	WORD UNSIGNED;	/* token sequence number
+	gen_cons_token_type	WORD UNSIGNED;	/* construct type (not implemented in LSEDIT V1.0)
+
+	gen_cons_token_plch	BYTE UNSIGNED;	/* placeholder type:
+	    CONSTANT ( plch_req,		/*    required
+		plch_reql,			/*    required list
+		plch_opt,			/*    optional
+		plch_optl,			/*    optional list
+		plch_init )			/*    initialization value
+		EQUALS 0 INCREMENT 1 PREFIX pse$;
+
+	gen_cons_token_fill	BYTE UNSIGNED;	/* padding--not used
+	
+	gen_cons_token_len	WORD UNSIGNED;	/* length of PSE$T_GEN_CONS_TOKEN_TEXT
+
+	CONSTANT gen_cons_fixed EQUALS . TAG s; /* length of fixed portion of record
+
+	gen_cons_token_text	CHARACTER LENGTH #max_text_len;	/* token text
+	
+	CONSTANT gen_cons_token_recsize EQUALS . TAG s;	/* length of record
+	END gen_cons_token_rec;
+
+/*++
+/*   $PSE_DEFINE_FILE_REC - Define a File
+/*
+/*   Specifies a file number and a full file name specification.
+/*--
+    AGGREGATE define_file_rec STRUCTURE TAG $pse PREFIX pse$;
+	define_file_recty	WORD UNSIGNED;		/* record type = PSE$K_RECTY_DEFINE_FILE
+
+	define_file_rms_ffb	WORD UNSIGNED;		/* first free byte of the end-of-file block (from XAB$W_FFB in $XABFHC)
+	define_file_rms_ebk	LONGWORD UNSIGNED;	/* end-of-file block number (from XAB$L_EBK in $XABFHC)
+	define_file_rms_cdt	QUADWORD UNSIGNED;	/* creation date and time of the source file (from XAB$Q_CDT in $XABDAT)
+	define_file_id		WORD UNSIGNED;		/* file identification number to be assigned to the file
+	define_file_flags	BITFIELD LENGTH 8;	/* flags (reserved for future use - must be zero)
+	define_file_rms_rfo	BYTE UNSIGNED;		/* file organization and record format (from XAB$B_RFO in $XABFHC)
+
+	CONSTANT define_file_fixed EQUALS . TAG s;	/* length of fixed portion of record
+
+	define_file_spec	BYTE UNSIGNED;		/* beginning of a $PSE_FILE_NAME block
+	
+	CONSTANT define_file_recsize EQUALS . TAG s;	/* length of record
+	END define_file_rec;
+/*++
+/*   $PSE_FILE_NAME - File Name Block
+/*
+/*   This block is part of the variable-length $PSE_DEFINE_FILE_REC record.
+/*   This first field in this block overlays the PSE$B_DEFINE_FILE_SPEC field.
+/*--
+    AGGREGATE file_name STRUCTURE TAG $pse PREFIX pse$;
+	file_name_length	BYTE UNSIGNED;		/* length of PSE$T_FILE_NAME_TEXT
+
+	CONSTANT file_name_fixed EQUALS . TAG s;	/* length of fixed portion of record
+	
+	file_name_text		CHARACTER LENGTH #max_filespec_len; /* file specification
+	CONSTANT max_filespec_len EQUALS #max_filespec_len;	/* maximum length of a file spec
+	END file_name;
+
+/*++
+/*   $PSE_LIBMODNAME - Library Module Name
+/*
+/*   This block is part of the variable-length $PSE_DEFINE_FILE_REC record.
+/*   This first field in this block follows the last byte of the $PSE_FILE_NAME block.
+/*--
+    AGGREGATE libmodname STRUCTURE TAG $pse PREFIX pse$;
+	libmodname_length	BYTE UNSIGNED;		/* length of PSE$T_LIBMODNAME_TEXT
+
+	CONSTANT libmodname_fixed EQUALS . TAG s;	/* length of fixed portion of record
+	
+	libmodname_text		CHARACTER LENGTH #max_filename_len; /* module name
+	CONSTANT max_filename_len EQUALS #max_filename_len;	/* maximum length of a file name
+	END libmodname;
+
+/*++
+/*   $PSE_SET_FILE_REC - Specify a File
+/*
+/*   Specifies the file to which subsequent commands apply.
+/*--
+    AGGREGATE set_file_rec STRUCTURE TAG $pse PREFIX pse$;
+	set_file_recty		WORD UNSIGNED;	/* record type = PSE$K_RECTY_SET_FILE
+
+	set_file_id		WORD UNSIGNED;	/* file identification number
+	
+	CONSTANT set_file_recsize EQUALS . TAG s;	/* length of record
+	END set_file_rec;
+
+/*++
+/*   $PSE_SET_LINE_REC - Set Current Line Marker
+/*
+/*   Specifies the compilation line to set the current line marker to.
+/*--
+    AGGREGATE set_line_rec STRUCTURE TAG $pse PREFIX pse$;
+	set_line_recty		WORD UNSIGNED;		/* record type = PSE$K_RECTY_SET_LINE
+
+	set_line_fill		WORD UNSIGNED;		/* padding--not used
+	set_line		LONGWORD;		/* compilation listing line number
+	
+	CONSTANT set_line_recsize EQUALS . TAG s;	/* length of record
+	END set_line_rec;
+
+/*++
+/*   $PSE_SET_RECORD_REC - Set Current Record Number
+/*
+/*   Specifies the source file record number to which the current record
+/*   number is to be set.
+/*--
+    AGGREGATE set_record_rec STRUCTURE TAG $pse PREFIX pse$;
+	set_record_recty	WORD UNSIGNED;		/* record type = PSE$K_RECTY_SET_RECORD
+
+	set_record		LONGWORD;	/* source record number
+	
+	CONSTANT set_record_recsize EQUALS . TAG s;	/* length of record
+	END set_record_rec;
+
+/*++
+/*   $PSE_INCR_LINE_REC - Increment Current Line Marker
+/*
+/*   Specifies the number of lines by which to increment the current
+/*   compilation listing line number. The File Record Number is not
+/*   affected by this command.
+/*--
+    AGGREGATE incr_line_rec STRUCTURE TAG $pse PREFIX pse$;
+	incr_line_recty		WORD UNSIGNED;	/* record type = PSE$K_RECTY_INCR_LINE
+
+	incr_line_increment	BYTE UNSIGNED;	/* increment count
+	
+	CONSTANT incr_line_recsize EQUALS . TAG s;	/* length of record
+	END incr_line_rec;
+
+/*++
+/*   $PSE_DEFINE_LINES_REC - Define a Group of Lines
+/*
+/*   Defines a fixed number of source record numbers and compilation
+/*   listing line numbers. The numbers are created by incrementing line
+/*   numbers and record numbers in unison.
+/*--
+    AGGREGATE define_lines_rec STRUCTURE TAG $pse PREFIX pse$;
+	define_lines_recty	WORD UNSIGNED;		/* record type = PSE$K_RECTY_DEFINE_LINES
+
+	define_lines_count	LONGWORD UNSIGNED;	/* number of lines to define
+	
+	CONSTANT define_lines_recsize EQUALS . TAG s;	/* length of record
+	END define_lines_rec;
+
+/*++
+/*   $PSE_REGION_TITLE_REC - Set Region Title
+/*
+/*   Sets the legend text for a complex region (source region or supplied
+/*   text region).
+/*--
+    AGGREGATE region_title_rec STRUCTURE TAG $pse PREFIX pse$;
+	region_title_recty	WORD UNSIGNED;		/* record type = PSE$K_RECTY_REGION_TITLE
+
+	region_title_length	BYTE;			/* length of title text
+	region_title_text	CHARACTER LENGTH 14;	/* title text
+	
+	CONSTANT region_title_recsize EQUALS . TAG s;	/* length of record
+	END region_title_rec;
+
+END_MODULE;
