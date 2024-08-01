@@ -134,16 +134,16 @@ function
     ;
 
 expressionPrefixedExpression
-    : '[[' sublist ']' ']' // '[[' follows R's yacc grammar
-    | '[' sublist ']'
-    | ('::' | ':::') expr
-    | ('$' | '@') expr
-    | ':' expr
+    : LIST_ACCESS_START sublist LIST_ACCESS_END // '[[' follows R's yacc grammar
+    | ARRAY_ACCESS_START sublist ARRAY_ACCESS_END
+    | NAMESPACE_ACCESS expr
+    | COMPONENT_ACCESS expr
+    | RANGE_OPERATOR expr
     | USER_OP expr // anything wrappedin %: '%' .* '%'
     | mathemathicalExpression
     | logicalExpression
     | '~' expr
-    | ASSIGN expr
+    | (ASSIGN | EQUALS) expr
     | PAREN_L sublist PAREN_R              // call function
     ;
 
@@ -179,6 +179,13 @@ FUNCTION: 'function';
 ELSE: 'else';
 IN: 'in';
 
+LIST_ACCESS_START: '[[';
+LIST_ACCESS_END: ']]';
+ARRAY_ACCESS_START: '[';
+ARRAY_ACCESS_END: ']';
+NAMESPACE_ACCESS: ':::' | '::';
+COMPONENT_ACCESS: '$' | '@';
+
 HELP: '?';
 NEXT: 'next';
 BREAK: 'break';
@@ -191,14 +198,15 @@ TRUE: 'TRUE';
 FALSE: 'FALSE';
 
 NOT: '!';
+RANGE_OPERATOR: ':';
 
 MULT_DIV: '*' | '/';
 ADD_SUB: '+' | '-';
 COMPARATOR: '>' | '>=' | '<' | '<=' | '==' | '!=';
-ASSIGN: '<-' | '<<-' | '=' | '->' | '->>' | ':=';
+ASSIGN: '<-' | '<<-' | '->' | '->>' | ':=';
+EQUALS: '=';
 AND: '&&' | '&';
 OR: '||' | '|';
-EQUALS: '=';
 
 PAREN_L: '(';
 PAREN_R: ')';
