@@ -1,5 +1,5 @@
 select * from (
- select times_purchased as "puchase frequency", state_code
+ select times_purchased as "purchase frequency", state_code
  from customers t
  )
  pivot xml
