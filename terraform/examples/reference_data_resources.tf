@@ -38,7 +38,7 @@ resource "aws_acm_certificate" "ecs_certificate" {
   }
 
   lifecycle {
-    //due to AWS service limits we are not allowed to issue more than x certifactes
+    //due to AWS service limits we are not allowed to issue more than x certificates
     prevent_destroy = true
   }
 }
