@@ -1,0 +1,14 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     character
+      \
+      x
+      hex
+       digit
+        9
+      hex
+       f
+ <EOF>

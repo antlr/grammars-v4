@@ -1,0 +1,16 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     example.com
+  /
+  path
+   string
+    %E5%BC%95%E3%81%8D%E5%89%B2%E3%82%8A.html
+  \n
+ <EOF>

@@ -1,0 +1,13 @@
+parse
+ block
+  expression
+   expression
+    variables
+     variable
+      a
+   |
+   expression
+    list
+     [
+     ]
+ <EOF>

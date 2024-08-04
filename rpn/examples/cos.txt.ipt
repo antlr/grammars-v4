@@ -1,0 +1,9 @@
+expression
+ signedAtom
+  variable
+   a
+ term
+  signedAtom
+   variable
+    cos
+ <EOF>

@@ -1,0 +1,41 @@
+qif
+ record
+  recordtype
+   !Type:
+   Bank
+  date
+   D
+   03/03/10
+  total
+   T
+   -379.00
+  payee
+   P
+   CITY OF SPRINGFIELD
+  eor
+   ^
+ record
+  date
+   D
+   03/04/10
+  total
+   T
+   -20.28
+  payee
+   P
+   YOUR LOCAL SUPERMARKET
+  eor
+   ^
+ record
+  date
+   D
+   03/03/10
+  total
+   T
+   -421.35
+  payee
+   P
+   SPRINGFIELD WATER UTILITY
+  eor
+   ^
+ <EOF>

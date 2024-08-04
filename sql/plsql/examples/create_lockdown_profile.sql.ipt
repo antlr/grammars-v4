@@ -1,0 +1,16 @@
+sql_script
+ unit_statement
+  create_lockdown_profile
+   CREATE
+   LOCKDOWN
+   PROFILE
+   id_expression
+    regular_id
+     hr_prof
+   dynamic_base_profile
+    INCLUDING
+    id_expression
+     regular_id
+      PRIVATE_DBAAS
+ ;
+ <EOF>

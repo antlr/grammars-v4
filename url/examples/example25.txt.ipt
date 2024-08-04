@@ -1,0 +1,16 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     www.baidu.com
+  frag
+   #
+   string
+    a
+  \n
+ <EOF>

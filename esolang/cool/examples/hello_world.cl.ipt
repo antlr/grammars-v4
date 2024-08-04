@@ -1,0 +1,25 @@
+program
+ classDefine
+  class
+  Main
+  inherits
+  IO
+  {
+  feature
+   main
+   (
+   )
+   :
+   SELF_TYPE
+   {
+   expression
+    out_string
+    (
+    expression
+     "Hello, World.\n"
+    )
+   }
+  ;
+  }
+ ;
+ <EOF>

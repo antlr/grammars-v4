@@ -1,0 +1,18 @@
+aterm_
+ term_
+  list_
+   [
+   termlist
+    term_
+     num_
+      1
+    ,
+    term_
+     num_
+      2
+    ,
+    term_
+     afun
+      "abc"
+   ]
+ <EOF>

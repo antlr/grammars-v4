@@ -1,0 +1,26 @@
+expression
+ signedAtom
+  scientific
+   2
+ term
+  signedAtom
+   scientific
+    2
+ term
+  oper
+   *
+ term
+  signedAtom
+   scientific
+    3
+ term
+  signedAtom
+   scientific
+    3
+ term
+  oper
+   *
+ term
+  oper
+   +
+ <EOF>

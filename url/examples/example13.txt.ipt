@@ -1,0 +1,19 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     svn.example.com
+  /
+  path
+   string
+    svn
+   /
+   string
+    project
+  \n
+ <EOF>

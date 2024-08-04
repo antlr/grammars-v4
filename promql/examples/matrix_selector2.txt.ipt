@@ -1,0 +1,9 @@
+expression
+ vectorOperation
+  vectorOperation
+   vector
+    instantSelector
+     container_cpu_usage_seconds_total
+  subqueryOp
+   [5m:]
+ <EOF>

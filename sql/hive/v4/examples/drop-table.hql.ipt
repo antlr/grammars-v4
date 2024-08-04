@@ -1,0 +1,13 @@
+statement
+ execStatement
+  ddlStatement
+   dropTableStatement
+    drop
+    table
+    ifExists
+     if
+     exists
+    tableName
+     id_
+      t
+ <EOF>

@@ -1,0 +1,10 @@
+parse
+ statements
+  singleStatement
+   statement
+    DEALLOCATE
+    PREPARE
+    identifier
+     myquery
+   ;
+ <EOF>

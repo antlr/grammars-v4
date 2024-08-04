@@ -1,0 +1,668 @@
+grammarDef
+ grammar
+ id_
+  SimpleCalc
+ ;
+ tokensSpec
+  tokens
+  {
+  tokenSpec
+   PLUS
+   =
+   '+'
+   ;
+  tokenSpec
+   MINUS
+   =
+   '-'
+   ;
+  tokenSpec
+   MULT
+   =
+   '*'
+   ;
+  tokenSpec
+   DIV
+   =
+   '/'
+   ;
+  }
+ action
+  @
+  id_
+   members
+  actionBlock
+   {
+   \n
+    
+    
+    
+    
+   p
+   u
+   b
+   l
+   i
+   c
+    
+   s
+   t
+   a
+   t
+   i
+   c
+    
+   v
+   o
+   i
+   d
+    
+   m
+   a
+   i
+   n
+   (
+   S
+   t
+   r
+   i
+   n
+   g
+   [
+   ]
+    
+   a
+   r
+   g
+   s
+   )
+    
+   t
+   h
+   r
+   o
+   w
+   s
+    
+   E
+   x
+   c
+   e
+   p
+   t
+   i
+   o
+   n
+    
+   {
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   S
+   i
+   m
+   p
+   l
+   e
+   C
+   a
+   l
+   c
+   L
+   e
+   x
+   e
+   r
+    
+   l
+   e
+   x
+    
+   =
+    
+   n
+   e
+   w
+    
+   S
+   i
+   m
+   p
+   l
+   e
+   C
+   a
+   l
+   c
+   L
+   e
+   x
+   e
+   r
+   (
+   n
+   e
+   w
+    
+   A
+   N
+   T
+   L
+   R
+   F
+   i
+   l
+   e
+   S
+   t
+   r
+   e
+   a
+   m
+   (
+   a
+   r
+   g
+   s
+   [
+   0
+   ]
+   )
+   )
+   ;
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   C
+   o
+   m
+   m
+   o
+   n
+   T
+   o
+   k
+   e
+   n
+   S
+   t
+   r
+   e
+   a
+   m
+    
+   t
+   o
+   k
+   e
+   n
+   s
+    
+   =
+    
+   n
+   e
+   w
+    
+   C
+   o
+   m
+   m
+   o
+   n
+   T
+   o
+   k
+   e
+   n
+   S
+   t
+   r
+   e
+   a
+   m
+   (
+   l
+   e
+   x
+   )
+   ;
+   \n
+    
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   S
+   i
+   m
+   p
+   l
+   e
+   C
+   a
+   l
+   c
+   P
+   a
+   r
+   s
+   e
+   r
+    
+   p
+   a
+   r
+   s
+   e
+   r
+    
+   =
+    
+   n
+   e
+   w
+    
+   S
+   i
+   m
+   p
+   l
+   e
+   C
+   a
+   l
+   c
+   P
+   a
+   r
+   s
+   e
+   r
+   (
+   t
+   o
+   k
+   e
+   n
+   s
+   )
+   ;
+   \n
+    
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   t
+   r
+   y
+    
+   {
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   p
+   a
+   r
+   s
+   e
+   r
+   .
+   e
+   x
+   p
+   r
+   (
+   )
+   ;
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   }
+    
+   c
+   a
+   t
+   c
+   h
+    
+   (
+   R
+   e
+   c
+   o
+   g
+   n
+   i
+   t
+   i
+   o
+   n
+   E
+   x
+   c
+   e
+   p
+   t
+   i
+   o
+   n
+    
+   e
+   )
+    
+    
+   {
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   e
+   .
+   p
+   r
+   i
+   n
+   t
+   S
+   t
+   a
+   c
+   k
+   T
+   r
+   a
+   c
+   e
+   (
+   )
+   ;
+   \n
+    
+    
+    
+    
+    
+    
+    
+    
+   }
+   \n
+    
+    
+    
+    
+   }
+   \n
+   }
+ rule_
+  id_
+   expr
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      atom
+       term
+    element
+     elementNoOptionSpec
+      ebnf
+       block
+        (
+        alternative
+         element
+          elementNoOptionSpec
+           ebnf
+            block
+             (
+             alternative
+              element
+               elementNoOptionSpec
+                atom
+                 terminal_
+                  PLUS
+             rewrite
+             |
+             alternative
+              element
+               elementNoOptionSpec
+                atom
+                 terminal_
+                  MINUS
+             rewrite
+             )
+         element
+          elementNoOptionSpec
+           atom
+            term
+        rewrite
+        )
+       *
+   rewrite
+  ;
+ rule_
+  id_
+   term
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      atom
+       factor
+    element
+     elementNoOptionSpec
+      ebnf
+       block
+        (
+        alternative
+         element
+          elementNoOptionSpec
+           ebnf
+            block
+             (
+             alternative
+              element
+               elementNoOptionSpec
+                atom
+                 terminal_
+                  MULT
+             rewrite
+             |
+             alternative
+              element
+               elementNoOptionSpec
+                atom
+                 terminal_
+                  DIV
+             rewrite
+             )
+         element
+          elementNoOptionSpec
+           atom
+            factor
+        rewrite
+        )
+       *
+   rewrite
+  ;
+ rule_
+  id_
+   factor
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      atom
+       terminal_
+        NUMBER
+   rewrite
+  ;
+ rule_
+  id_
+   NUMBER
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      ebnf
+       block
+        (
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             DIGIT
+        rewrite
+        )
+       +
+   rewrite
+  ;
+ rule_
+  id_
+   WHITESPACE
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      ebnf
+       block
+        (
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             '\t'
+        rewrite
+        |
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             ' '
+        rewrite
+        |
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             '\r'
+        rewrite
+        |
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             '\n'
+        rewrite
+        |
+        alternative
+         element
+          elementNoOptionSpec
+           atom
+            terminal_
+             '\u000C'
+        rewrite
+        )
+       +
+    element
+     elementNoOptionSpec
+      actionBlock
+       {
+        
+       $
+       c
+       h
+       a
+       n
+       n
+       e
+       l
+        
+       =
+        
+       H
+       I
+       D
+       D
+       E
+       N
+       ;
+        
+       }
+   rewrite
+  ;
+ rule_
+  fragment
+  id_
+   DIGIT
+  :
+  altList
+   alternative
+    element
+     elementNoOptionSpec
+      atom
+       range_
+        '0'
+        ..
+        '9'
+   rewrite
+  ;
+ <EOF>

@@ -1,0 +1,11 @@
+stmt
+ command
+  ddl_command
+   msck
+    msck
+    repair
+    table
+    table_name
+     id_
+      t1
+ <EOF>

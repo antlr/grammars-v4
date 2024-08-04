@@ -1,0 +1,22 @@
+file_
+ statement
+  parenstmt
+   (
+   statement
+    parenstmt
+     (
+     statement
+      parenstmt
+       (
+       )
+     statement
+      parenstmt
+       (
+       )
+     statement
+      parenstmt
+       (
+       )
+     )
+   )
+ <EOF>

@@ -1,0 +1,56 @@
+program
+ line
+  routinedecl
+   identifier
+    horolog
+   (
+   )
+   \n
+ line
+  code
+   label
+    identifier
+     MYLABEL
+     
+   \n
+ line
+  code
+    
+   command
+    write_
+     WRITE
+      
+     arglist
+      arg
+       !
+      ,
+      arg
+       "Hello World"
+   \n
+ line
+  code
+    
+   command
+    write_
+     WRITE
+      
+     arglist
+      arg
+       !
+      ,
+      arg
+       expression
+        term
+         function_
+          $
+          identifier
+           HOROLOG
+   \n
+ line
+  code
+    
+   command
+    quit_
+     QUIT
+   \n
+ eof

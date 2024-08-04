@@ -1,0 +1,15 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       jakarta
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       apache
+ <EOF>

@@ -1,0 +1,27 @@
+iso
+ recurring
+  recurringBasic
+   recurringCount
+    R
+    int_
+     2
+   /
+   durationBasic
+    intervalBasic
+     intervalYMDBasic
+      P
+      intervalYMDTimeBasic
+       dateBasic
+        specificMonthCalendarDate
+         year
+          int4
+           0
+           0
+           0
+           1
+         -
+         month
+          int2
+           0
+           6
+ <EOF>

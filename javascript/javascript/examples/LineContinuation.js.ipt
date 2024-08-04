@@ -1,0 +1,19 @@
+program
+ sourceElements
+  sourceElement
+   statement
+    variableStatement
+     variableDeclarationList
+      varModifier
+       var
+      variableDeclaration
+       assignable
+        identifier
+         sql
+       =
+       singleExpression
+        literal
+         "line 1 \\n\tsome other line \\nthe last line"
+     eos
+      <EOF>
+ <EOF>

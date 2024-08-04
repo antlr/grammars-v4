@@ -1,0 +1,12 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       term
+        roam
+       fuzzy
+        ~
+ <EOF>

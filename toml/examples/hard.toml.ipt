@@ -1,0 +1,319 @@
+document
+ expression
+  comment
+   # Test file for TOML
+ \n
+ expression
+  comment
+   # Only this one tries to emulate a TOML file written by a user of the kind of parser writers probably hate
+ \n
+ expression
+  comment
+   # This part you'll really hate
+ \n\n
+ expression
+  table
+   standard_table
+    [
+    key
+     simple_key
+      unquoted_key
+       the
+    ]
+  comment
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      test_string
+   =
+   value
+    string
+     "You'll hate me after this - #"
+  comment
+   # " Annoying, isn't it?
+ \n\n
+ expression
+  table
+   standard_table
+    [
+    key
+     dotted_key
+      simple_key
+       unquoted_key
+        the
+      .
+      simple_key
+       unquoted_key
+        hard
+    ]
+  comment
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      test_array
+   =
+   value
+    array_
+     [
+     array_values
+      comment_or_nl
+      value
+       string
+        "] "
+      nl_or_comment
+      ,
+      array_values
+       comment_or_nl
+       value
+        string
+         " # "
+       nl_or_comment
+      comment_or_nl
+     comment_or_nl
+     ]
+  comment
+   # ] There you go, parse this!
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      test_array2
+   =
+   value
+    array_
+     [
+     array_values
+      comment_or_nl
+      value
+       string
+        "Test #11 ]proved that"
+      nl_or_comment
+      ,
+      array_values
+       comment_or_nl
+       value
+        string
+         "Experiment #9 was a success"
+       nl_or_comment
+      comment_or_nl
+     comment_or_nl
+     ]
+  comment
+ \n
+ expression
+  comment
+   # You didn't think it'd as easy as chucking out the last #, did you?
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      another_test_string
+   =
+   value
+    string
+     " Same thing, but with a string #"
+  comment
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      harder_test_string
+   =
+   value
+    string
+     " And when \"'s are in the string, along with # \""
+  comment
+   # "and comments are there too"
+ \n
+ expression
+  comment
+   # Things will get harder
+ \n\n
+ expression
+  table
+   standard_table
+    [
+    key
+     dotted_key
+      simple_key
+       unquoted_key
+        the
+      .
+      simple_key
+       unquoted_key
+        hard
+      .
+      simple_key
+       quoted_key
+        "bit#"
+    ]
+  comment
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     quoted_key
+      "what?"
+   =
+   value
+    string
+     "You don't think some user won't do that?"
+  comment
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      multi_line_array
+   =
+   value
+    array_
+     [
+     array_values
+      comment_or_nl
+       \n
+      value
+       string
+        "]"
+      nl_or_comment
+      ,
+     comment_or_nl
+      \n
+      # ] Oh yes I did
+      \n
+     ]
+  comment
+ \n\n
+ expression
+  comment
+   # A key can look like a number
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      1
+   =
+   value
+    string
+     "first"
+  comment
+ \n
+ expression
+  comment
+   # Just a "normal" dotted key for a nested table
+ \n
+ expression
+  key_value
+   key
+    dotted_key
+     simple_key
+      unquoted_key
+       -6
+     .
+     simple_key
+      unquoted_key
+       674e-11
+   =
+   value
+    string
+     '100% a good reason, trust me'
+  comment
+ \n
+ expression
+  key_value
+   key
+    dotted_key
+     simple_key
+      unquoted_key
+       10
+     .
+     simple_key
+      unquoted_key
+       0
+     .
+     simple_key
+      unquoted_key
+       0
+     .
+     simple_key
+      unquoted_key
+       0
+   =
+   value
+    string
+     'private'
+  comment
+   # This works.
+ \n
+ expression
+  comment
+   # Even things that look like dates work as keys
+ \n
+ expression
+  key_value
+   key
+    simple_key
+     unquoted_key
+      2000-01-01
+   =
+   value
+    string
+     "Some Day"
+  comment
+ \n\n
+ expression
+  comment
+   # Each of the following keygroups/key value pairs should produce an error. Uncomment to them to test
+ \n\n
+ expression
+  comment
+   #[error]   if you didn't catch this, your parser is broken
+ \n
+ expression
+  comment
+   #string = "Anything other than tabs, spaces and newline after a keygroup or key value pair has ended should produce an error unless it is a comment"   like this
+ \n
+ expression
+  comment
+   #array = [
+ \n
+ expression
+  comment
+   #         "This might most likely happen in multiline arrays",
+ \n
+ expression
+  comment
+   #         Like here,
+ \n
+ expression
+  comment
+   #         "or here,
+ \n
+ expression
+  comment
+   #         and here"
+ \n
+ expression
+  comment
+   #         ]     End of array comment, forgot the #
+ \n
+ expression
+  comment
+   #number = 3.14  pi <--again forgot the #         
+ <EOF>

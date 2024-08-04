@@ -1,0 +1,110 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    while
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            3
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        testlist_star_expr
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               name
+                x
+        assign_part
+         +=
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               number
+                integer
+                 1
+       
+     
+  stmt
+   compound_stmt
+    while
+    test
+     logical_test
+      comparison
+       comparison
+        expr
+         atom
+          name
+           x
+       ==
+       comparison
+        expr
+         atom
+          number
+           integer
+            3
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        testlist_star_expr
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               name
+                x
+        assign_part
+         +=
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               number
+                integer
+                 1
+       
+     
+    else_clause
+     else
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+ <EOF>

@@ -1,0 +1,23 @@
+doiuri
+ scheme
+  doi
+ :
+ encodeddoi
+  prefix_
+   segment
+    1
+    0
+    .
+    1
+    3
+    9
+    2
+  /
+  suffix
+   segment
+    B
+    C
+    1
+    .
+    0
+ <EOF>

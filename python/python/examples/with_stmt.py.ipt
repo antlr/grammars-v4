@@ -1,0 +1,154 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    with
+    with_item
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           open
+         trailer
+          arguments
+           (
+           arglist
+            argument
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  "with_stmt.py"
+           )
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+  stmt
+   compound_stmt
+    with
+    with_item
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           open
+         trailer
+          arguments
+           (
+           arglist
+            argument
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  "with_stmt.py"
+           )
+     as
+     expr
+      atom
+       name
+        a
+    ,
+    with_item
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           open
+         trailer
+          arguments
+           (
+           arglist
+            argument
+             test
+              logical_test
+               comparison
+                expr
+                 atom
+                  "with_stmt.py"
+           )
+     as
+     expr
+      atom
+       name
+        b
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+  stmt
+   compound_stmt
+    funcdef
+     async
+     def
+     name
+      f
+     (
+     )
+     :
+     suite
+      
+      
+      stmt
+       compound_stmt
+        async
+        with
+        with_item
+         test
+          logical_test
+           comparison
+            expr
+             atom
+              name
+               open
+             trailer
+              arguments
+               (
+               arglist
+                argument
+                 test
+                  logical_test
+                   comparison
+                    expr
+                     atom
+                      "with_stmt.py"
+               )
+         as
+         expr
+          atom
+           name
+            f
+        :
+        suite
+         
+         
+         stmt
+          simple_stmt
+           small_stmt
+            pass
+           
+         
+      
+ <EOF>

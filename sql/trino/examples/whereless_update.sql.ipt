@@ -1,0 +1,21 @@
+parse
+ statements
+  singleStatement
+   statement
+    UPDATE
+    qualifiedName
+     identifier
+      foo_tablen
+    SET
+    updateAssignment
+     identifier
+      bar
+     =
+     expression
+      booleanExpression
+       valueExpression
+        primaryExpression
+         number
+          23
+   ;
+ <EOF>

@@ -1,0 +1,24 @@
+sql_script
+ unit_statement
+  create_package_body
+   create
+   or
+   replace
+   package
+   body
+   package_name
+    identifier
+     id_expression
+      regular_id
+       pkgtest
+   is
+   begin
+   seq_of_statements
+    statement
+     null_statement
+      null
+    ;
+   end
+ ;
+ /
+ <EOF>

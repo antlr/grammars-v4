@@ -1,0 +1,20 @@
+sqlScript
+ unitStatement
+  dropDatabase
+   DROP
+   DATABASE
+   identifier
+    anyName
+     stores_demo
+  ;
+ unitStatement
+  dropDatabase
+   DROP
+   DATABASE
+   IF
+   EXISTS
+   identifier
+    anyName
+     stores_demo
+  ;
+ <EOF>

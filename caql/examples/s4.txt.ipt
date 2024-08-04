@@ -1,0 +1,31 @@
+start_
+ expression
+  vectorOperation
+   name
+    histogram:percentile
+   (
+   50
+   ,
+   95
+   ,
+   99
+   )
+   metricsAggregation
+    |
+    name
+     label
+    parameterList
+     (
+     parameter
+      literal
+       "Median"
+     ,
+     parameter
+      literal
+       "95th Percentile"
+     ,
+     parameter
+      literal
+       "99th Percentile"
+     )
+ <EOF>

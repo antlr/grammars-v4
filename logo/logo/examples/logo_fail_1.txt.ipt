@@ -1,0 +1,20 @@
+prog
+ line
+  print_
+   print
+   value
+    "if
+ \n
+ line
+  print_
+   print
+   value
+    "print
+ \n
+ line
+  print_
+   print
+   value
+    "repeat
+ \n
+ <EOF>

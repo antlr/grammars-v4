@@ -1,0 +1,45 @@
+htmlDocument
+ phpBlock
+  topStatement
+   statement
+    echoStatement
+     echo
+     expressionList
+      expression
+       matchExpr
+        match
+        (
+        expression
+         constant
+          literalConstant
+           8.0
+        )
+        {
+        matchItem
+         expression
+          string
+           '8.0'
+         =>
+         expression
+          string
+           "
+           interpolatedStringPart
+            Oh no!
+           "
+        ,
+        matchItem
+         expression
+          constant
+           literalConstant
+            8.0
+         =>
+         expression
+          string
+           "
+           interpolatedStringPart
+            This is what I expected
+           "
+        ,
+        }
+     ;
+ <EOF>

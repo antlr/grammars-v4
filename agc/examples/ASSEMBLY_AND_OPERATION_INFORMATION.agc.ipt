@@ -1,0 +1,2294 @@
+prog
+ line
+  comment_line
+   comment
+    ### FILE="Main.annotation"
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Copyright:\tPublic domain.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Filename:\tASSEMBLY_AND_OPERATION_INFORMATION.agc
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Purpose:\tPart of the source code for Solarium build 55. This
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t\tis for the Command Module's (CM) Apollo Guidance
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t\tComputer (AGC), for Apollo 4.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Assembler:\tyaYUL --block1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Contact:\tJim Lawton <jim DOT lawton AT gmail DOT com>
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Website:\twww.ibiblio.org/apollo/index.html
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Page scans:\twww.ibiblio.org/apollo/ScansForConversion/Solarium055/
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # Mod history:\t2009-09-11 JL\tCreated.
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 1
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # TABLE OF LOG CARDS\t\t(ALL LOG CARDS ARE TWO SPACED)
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # ASSEMBLY AND OPERATIONS INFORMATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # ERASABLE ASSIGNMENTS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # INTERRUPT TRANSFER ROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # FIXED-FIXED INTERPRETER SECTION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # BANK 03 INTERPRETER SECTION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # EXECUTIVE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # WAITLIST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # RESTART CONTROL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 501 RESTART TABLES AND ROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # FRESH START AND RESTART
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # DOWN-TELEMETRY PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # T4RUPT OUTPUT CONTROL PROGRAMS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # MODE SWITCHING AND MARK ROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # IMU COMPENSATION PACKAGE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # IRIG PULSE-TORQUING ROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # EXTENDED VERBS FOR MODING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # AGC SELF-CHECK
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # INTER-BANK COMMUNICATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # ALARM AND DISPLAY PROCEDURES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # ORBITAL INTEGRATION PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # ORBITAL INTEGRATION FOR 501
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRELAUNCH ALIGNMENT PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # INFLIGHT ALIGNMENT PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # RTB OP CODES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # IMU PERFORMANCE TESTS 1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # IMU PERFORMANCE TESTS 2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # INFLIGHT ALIGNMENT SUBROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # KEYRUPT, UPRUPT, FRESH START
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PINBALL GAME  BUTTONS AND LIGHTS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 501 MISSION CONTROL PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # POWERED FLIGHT SUBROUTINES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # TIME OF FREE FALL CALCULATIONS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # DUMMY 501 INITIALIZATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # RE-ENTRY CONTROL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # AVERAGE G INTEGRATOR
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # VERIFICATION ASSISTANCE PROGRAMS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # SUM-CHECK END OF RECORD MARKS
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 2
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # TABLE OF ERROR CODES
+   eol
+    \n\n\n
+ line
+  comment_line
+   comment
+    # OPTICS SUB-SYSTEM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00101    ZERO CDU SWITCH ALTERED BEFORE EXPIRATION OF 30 SECOND WAIT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00102    COMPUTER UNABLE TO ACHIEVE DESIRED OPTICS MODE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00103    SXT-ON SWITCH TURNED ON WITH OPTICS NOT IN ZERO CDU MODE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00104    NO VAC AREA AVAILABLE FOR MARKS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00105    INTERNAL MARKS REQUEST WITH MARK SYSTEM BUSY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00106    SXT-ON SWITCH NOT IN DESIRED STATE AT MARK TIME OR MARK WITH ALL REQUESTED MARKS ACCEPTED
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00107    MARK ACCEPT WITH MARK SYSTEM NOT IN USE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00110    MARK ACCEPT WITH ALL REQUESTED MARKS ACCEPTED, OR NO MARKS SINCE INITIALIZATION OR LAST MARK ACCEPT
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # IMU SUB-SYSTEM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00201    CDU ZERO SWITCH ALTERED BEFORE EXPIRATION OF 30 SECOND WAIT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00202    COMPUTER UNABLE TO ACHIEVE DESIRED MODE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00203    NO IMU MODE INDICATED TO COMPUTER
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00204    MODE SWITCH WITH TRNSW IN COMPUTER CONTROL, BUT COMPUTER NOT COMMANDING
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # GENERAL MISSION PROGRAM ERRORS (ERROR RETURN ON IMUSTALL, ETC.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00301    CURTAINS PROGRAM
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # PROCEDURAL DIFFICULTY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00401    DESIRED GIMBAL ANGLES YIELD GIMBAL LOCK (MGA GREATER THAN 60 DEGREES).
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00402    STAR OUT OF FIELD OF VIEW
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00403    STAR OUT OF FIELD OF VIEW
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # COMPUTER HARDWARE MALFUNCTION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01101    RUPT2 OCCURRED
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01102    AGC SELF TEST ERROR (Q IN SFAIL)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01103    UNUSED CCS BRANCH EXECUTED
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01104    C-RELAY FAILED DURING C-RELAY TEST
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # LIST OVERFLOWS (ALL ABORTS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01201    EXECUTIVE OVERFLOW - NO VAC AREAS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01202    EXECUTIVE OVERFLOW - NO CORE SETS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01203    WAITLIST OVERFLOW - TOO MANY TASKS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01204    SLIGHT VARIATION OF 01203
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01205    MASTER CONTROL OVERFLOW - TOO MANY JOBS WAITING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01206    KEYBOARD + DISPLAY WAITING LINE OVERFLOW
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01207    NO VAC AREA FOR MARKS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01210    SOMETHING ALREADY WAITING IN IMUSTALL
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # INTERPRETER ERRORS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01301    ARCCOS-ARCSIN INPUT ANGLE TOO LARGE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01302    SQRT CALLED WITH NEGATIVE ARGUMENT
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # DISPLAY ALARMS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01401    (VG) INCREASING - LOSS OF CONTROL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    ## Page 3
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01402    (DELV) TOO LOW - ENGINE NOT ON
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01403    501 ABORT, WILL OVERSHOOT TARGET.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01404    501 ABORT, PRESENT SMA LESS THAN RE/2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01405    501 ABORT, COT SQ(GAMMA EI) NEGATIVE.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01406    501 ABORT, FREE-FALL ANGLE EXCEEDS ---
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01407    COMMANDED CDUZ EXCEEDS 60 DEGREES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01411    TIME TO INCORPORATE AVE G UPDATE ALREADY PAST
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # KEYBOARD AND DISPLAY PROGRAM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01501    KEYBOARD AND DISPLAY ALARM DURING INTERNAL USE (NVSUB). ABORT
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 4
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # VERB DEFINITIONS
+   eol
+    \n\n\n\n
+ line
+  comment_line
+   comment
+    #  REGULAR VERBS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01  DISPLAY OCTAL COMP 1 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 02  DISPLAY OCTAL COMP 2 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 03  DISPLAY OCTAL COMP 3 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 04  DISPLAY OCTAL COMP 1,2 (R1,R2)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 05  DISPLAY OCTAL COMP 1,2,3 (R1,R2,R3)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 06  DECIMAL DISPLAY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 07  DP DECIMAL DISPLAY (R1,R2)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 10  REQUEST WAITLIST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 11  MONITOR OCTAL COMP 1 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 12  MONITOR OCTAL COMP 2 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 13  MONITOR OCTAL COMP 3 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 14  MONITOR OCTAL COMP 1,2 (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 15  MONITOR OCTAL COMP 1,2,3 (R1,R2,R3)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 16  MONITOR DECIMAL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 17  MONITOR DP DECIMAL (R1,R2)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 20  REQUEST EXECUTIVE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 21  LOAD COMP 1  (R1)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 22  LOAD COMP 2  (R2)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 23  LOAD COMP 3  (R3)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 24  LOAD COMP 1,2 (R1,R2)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 25  LOAD COMP 1,2,3 (R1,R2,R3)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 26  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 27  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 30  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 31  BANK DISPLAY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 32  C(R2) INTO R3, C(R1) INTO R2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 33  PROCEED WITHOUT DATA
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 34  TERMINATE CURRENT TEST OR LOAD REQUEST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 35  RELEASE DISPLAY SYSTEM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 36  FRESH START
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 37  CHANGE MAJOR MODE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # END OF REGULAR VERBS
+   eol
+    \n\n\n\n
+ line
+  comment_line
+   comment
+    # EXTENDED VERBS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 40  ZERO (USED WITH NOUN ICDU OR OCDU)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 41  COARSE ALIGN (USED WITH NOUN ICDU OR OCDU)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 42  FINE ALIGN IMU
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 43  LOCK IMU
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 44  SET IMU TO ATTITUDE CONTROL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 45  SET IMU TO RE-ENTRY CONTROL
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 46  RETURN IMU TO COARSE ALIGN
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 47  OPTICAL TRACKER ON (NOT IN USE YET)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 50  PLEASE PERFORM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    ## Page 5
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 51  PLEASE MARK
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 52  MARK REJECT (UNTIL BUTTON AVAILABLE)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 53  FREE (USED WITH NOUN ICDU OR OCDU)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 54  PULSE TORQUE GYROS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 55  ALIGN TIME
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 56  PERFORM BANKSUM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 57  DO SYSTEM TEST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 60  PREPARE FOR STANDBY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 61  RECOVER FROM STANDBY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 62  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 63  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 64  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 65  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 66  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 67  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 70  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 71  DO TFFMIN UPDATE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 72  ABORT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 73  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 74  ILLEGAL VERB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 75  MANUAL I/O FOR FLIGHTS
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 76  DO RVT UPDATE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 77  DO L/O TIME UPDATE
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 6
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # NORMAL NOUNS\t\t\t\t\t\tSCALE AND DECIMAL POINT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 00  NOT IN USE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 01  SPECIFY MACHINE ADDRESS (FRACTIONAL)\t\t(.XXXXX)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 02  SPECIFY MACHINE ADDRESS (WHOLE)\t\t\t(XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 03  SPECIFY MACHINE ADDRESS (DEGREES)\t\t\t(XXX.XXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 04  SPECIFY MACHINE ADDRESS (HOURS)\t\t\t(XXX.XXHOURS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 05  SPECIFY MACHINE ADDRESS (SECONDS)\t\t\t(XXX.XXSECONDS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 06  SPECIFY MACHINE ADDRESS (GYRO DEGREES)\t\t(XX.XXXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 07  SPECIFY MACHINE ADDRESS (Y OPT DEGREES)\t\t(XXX.XXDEG OR XX.XXXDEG)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 10  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 11  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 12  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 13  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 14  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 15  INCREMENT MACHINE ADDRESS\t\t\t\t(OCTAL ONLY)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 16  TIME SECONDS\t\t\t\t\t(XXX.XXSECONDS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 17  TIME HOURS\t\t\t\t\t(XXX.XXHOURS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 20  ICDU\t\t\t\t\t\t(XXX.XXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 21  PIPAS\t\t\t\t\t\t(XXXXX.PULSES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 22  NEW ANGLES I\t\t\t\t\t(XXX.XXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 23  DELTA ANGLES I\t\t\t\t\t(XXX.XXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 24  DELTA TIME (SECONDS)\t\t\t\t(XXX.XXSECONDS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 25  CHECKLIST\t\t\t\t\t\t(XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 26  PRIO/DELAY\t\t\t\t\t(XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 27  SELF TEST ON/OFF SWITCH\t\t\t\t(XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 30  STAR NUMBERS\t\t\t\t\t(XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 31  FAILREG, SFAIL, ERCOUNT\t\t\t\t(OCTAL ONLY)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 32  DECISION TIME (MIDCOURSE)\t\t\t\t(XXX.XXHOURS (INTERNAL UNITS = WEEKS))
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 33  EPHEMERIS TIME (MIDCOURSE)\t\t\t(XXX.XXHOURS (INTERNAL UNITS = WEEKS))
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 34  MEASURED QUANTITY (MIDCOURSE)\t\t\t(XXXX.XKILOMETERS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 35  ROLL, PITCH, YAW\t\t\t\t\t(XXX.XXDEGREES)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 36  LANDMARK DATA 1\t\t\t\t\t(OCTAL ONLY)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 37  LANDMARK DATA 2\t\t\t\t\t(OCTAL ONLY)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 40  VG FOR 501\t\t\t\t\t(XXXX.X METERS/SEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 41  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 42  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 43  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 44  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 45  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 46  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 47  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 50  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 51  SPARE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 52  GYRO BIAS DRIFT\t\t\t\t\t(.BBXXXXXMILLIRAD/SEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 53  GYRO INPUT AXIS ACCELERATION DRIFT\t\t(.BBXXXXX(MILLIRAD/SEC)/(CM/SEC SEC))
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 54  GYRO SPIN AXIS ACCELERATION DRIFT\t\t\t(.BBXXXXX(MILLIRAD/SEC)/(CM/SEC SEC))
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # END OF NORMAL NOUNS
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 7
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # MIXED NOUNS\t\t\t\t\t\tSCALE AND DECIMAL POINT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 55  OCDU\t\t\t\t\t\t(XXX.XXDEG, XXX.XXDEG OR XX.XXXDEG)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 56  UNCALLED MARK DATA (OCDU & TIME(SECONDS))\t\t(XXX.XXDEG, XXX.XXDEG OR XX.XXXDEG, XXX.XXSEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 57  NEW ANGLES OCDU\t\t\t\t\t(XXX.XXDEG, XXX.XXDEG OR XX.XXXDEG)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 60  IMU MODE STATUS (IN3, WASKSET, OLDERR)\t\t(OCTAL ONLY)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 61  TARGET AZIMUTH AND ELEVATION\t\t\t(XXX.XXDEG, XX.XXXDEG)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 62  RE-ENTRY VARIABLES\t\t\t\t(XXX.XXSEC, XXXXX., XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 63  OCDUX AND TIME\t\t\t\t\t(XXX.XXDEG, XXX.XXSEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 64  OCDUY AND TIME\t\t\t\t\t(XXX.XXDEG OR XX.XXXDEG, XXX.XXSEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 65  SAMPLED TIME (HOURS AND SECONDS)\t\t\t(XXX.XXHOURS, XXX.XXSEC)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #         (FETCHED IN INTERRUPT)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 66  SYSTEM TES RESULTS\t\t\t\t(XXXX., .XXXXX, XXXXX.)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 67  DELTA GYRO ANGLES\t\t\t\t\t(XX.XXXDEG  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 70  PIPA BIAS\t\t\t\t\t\t(X.XXXXCM/SEC SEC  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 71  PIPA SCALE FACTOR ERROR\t\t\t\t(XXXXX.PARTS/MILLION  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 72  DELTA POSITION\t\t\t\t\t(XXXX.XKILOMETERS  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 73  DELTA VELOCITY\t\t\t\t\t(XXXX.XMETERS/SEC  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 74  MEASUREMENT DATA (MIDCOURSE)\t\t\t(XXX.XXHOURS (INTERNAL UNITS=WEEKS), XXXX.XKILOMETERS, XXXXX.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 75  MEASUREMENT DEVIATIONS (MIDCOURSE)\t\t(XXXX.XKILOMETERS, XXXX,XMETERS/SEC, XXXX.XKILOMETERS)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 76  POSITION VECTOR\t\t\t\t\t(XXXX.XKILOMETERS  FOR EACH)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # 77  VELOCITY VECTOR\t\t\t\t\t(XXXX.XMETERS/SEC  FOR EACH)
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 8
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # MAJOR MODES FOR FLIGHT 501
+   eol
+    \n\n\n\n
+ line
+  comment_line
+   comment
+    #\t00\tIDLING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t0X\tPRELAUNCH
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t01\tINITIALIZATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t02\tGYROCOMPASSING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t03\tOPTICAL VERIFICATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t04\tINERTIAL REFERENCE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t05\tVERTICAL ERECT.  (COUNTING)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t06\tVERTICAL ERECT.  (UNCONDITIONAL)
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t07\tSYSTEM TEST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t1X\tBOOSTER MONITOR
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t11\tFIRST STAGE BOOSTER MONITORING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t14\tSIV-B BOOSTER MONITOR WITH TUMBLE MON. ON
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t2X\tCOASTING PHASE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t21\tMANEUVER TO COLDSOAK ATTITUDE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t22\tHOLD ATTITUDE DURING ORBITAL INTEGRATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t23\tHOLD ATTITUDE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t24\tHOLD ATTITUDE WITH STATE VECTOR UPDATE ALLOWED.
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t26\tHOLD SPS2 ATTITUDE AND WAIT FOR TFF = TFFMIN
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t27\tR, V, T UPDATING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t3X\tPRE-THRUSTING PHASES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t31\tPRE-SPS1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t32\tPRE-SPS2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t4X\tTHRUSTING PHASES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    ## Page 9
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t41\tSPS1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t42\tSPS2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t5X\tALIGNMENT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t6X\tENTRY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t61\tCM/SM SEPARATION MANEUVER
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t62\tPRE-ENTRY MANEUVER
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t63\tINITIATE ENTRY STEERING
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t64\t.05 G INDICATION
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t65\tUP-CONTROL PHASE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t66\tBALLISTIC PHASE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t67\tFINAL PHASE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t7X\tABORT PHASES
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t71\tPOST-TUMBLE ATTITUDE RECOVERY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t72\tFREE-FALL ENTRY ABORT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t73\tABORT BURN
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t74\tTUMBLE ARREST BURN
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #\t77\tG+N FLUSHED
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    ## Page 10
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # JOB PRIORITIES FOR 501
+   eol
+    \n\n
+ line
+  comment_line
+   comment
+    # PRIO37 = DOALARM
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO36 = NWJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO35 = BIASONLY
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = 1/GYRO
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ENEMA
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MODE32
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MODE26
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO33 = POSTBY3
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = CHARIN
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO32 = MKVB50
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MKVB51
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = REMKVB51
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO31 = SPITGYRO
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MONDO
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = FREDSPDO
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO27 = SPITGYRO
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ENEMA
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = S4BSMSEP
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO25 = ABORTEST
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = REDO4.21
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = BEGIN501
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO24 = LIFTOFF
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO23 = MANUJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO22 = TUMBJOB1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = TUMBJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO21 = CGJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO20 = TOP1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = TSELECT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = PRAWAKE
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = STARTPL2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = GYRDRFT2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = CDUXJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO16 = SERVICER
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ENTRYTOP
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO15 = SMOOTHER
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO14 = CHKOPT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = UPTHETA1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO13 = SOAKJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO12 = TARGJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = SOAKINIT
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ATTIJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ATTIJOB1 -1
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ATTIJOB2
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = SEPMANU
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = ENTAJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO10 = ROLLJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO7  = MODE23
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MODE44
+   eol
+    \n
+ line
+  comment_line
+   comment
+    ## Page 11
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO6  = UPJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO5  = MONITJOB
+   eol
+    \n
+ line
+  comment_line
+   comment
+    #        = MARKDISP
+   eol
+    \n
+ line
+  comment_line
+   comment
+    # PRIO2  = FXFXCHK
+   eol
+    \n
+ <EOF>

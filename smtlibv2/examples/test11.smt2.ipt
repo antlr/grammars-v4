@@ -1,0 +1,18 @@
+start_
+ general_response
+  specific_success_response
+   get_assertions_response
+    (
+    term
+     qual_identifer
+      identifier
+       symbol
+        simpleSymbol
+         predefSymbol
+          error
+    term
+     spec_constant
+      string
+       "simplifier failed: canceled"
+    )
+ <EOF>

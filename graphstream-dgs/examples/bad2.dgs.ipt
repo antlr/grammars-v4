@@ -1,0 +1,23 @@
+dgs
+ header
+  DGS004
+  \n
+  identifier
+   bad
+  0
+  0
+  \n
+ \n
+ event
+  an
+   an
+   identifier
+    A
+   attributes
+  \n
+ \n
+ \n
+  This is a bad example because lines should start with\n
+  a DGS directive, a '#' or be empty.\n
+ \n
+ <EOF>

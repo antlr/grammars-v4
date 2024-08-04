@@ -1,0 +1,16 @@
+parse
+ statements
+  singleStatement
+   statement
+    ALTER
+    VIEW
+    qualifiedName
+     identifier
+      a
+    RENAME
+    TO
+    qualifiedName
+     identifier
+      b
+   ;
+ <EOF>

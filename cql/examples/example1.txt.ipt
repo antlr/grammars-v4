@@ -1,0 +1,18 @@
+cql
+ sortedQuery
+  scopedClause
+   searchClause
+    index
+     term
+      identifier
+       dc.title
+    relation
+     comparitor
+      namedComparitor
+       identifier
+        any
+    searchTerm
+     term
+      identifier
+       fish
+ <EOF>

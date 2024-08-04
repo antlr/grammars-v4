@@ -1,0 +1,9 @@
+grammarSpec
+ grammarDecl
+  grammarType
+   grammar
+  identifier
+   two
+  ;
+ rules
+ <EOF>

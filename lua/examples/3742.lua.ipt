@@ -1,0 +1,14 @@
+start_
+ chunk
+  block
+   stat
+    local
+    attnamelist
+     A
+     attrib
+    =
+    explist
+     exp
+      number
+       10
+ <EOF>

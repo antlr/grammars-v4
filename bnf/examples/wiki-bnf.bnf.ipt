@@ -1,0 +1,1689 @@
+start_
+ prods
+  prod
+   xlhs
+    ws
+      
+    <
+    syntax
+    >
+   assign
+    ws
+              
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      rule
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      rule
+      >
+     xelem
+      ws
+        
+      <
+      syntax
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    rule
+    >
+   assign
+    ws
+                
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      "
+      <
+      "
+     xelem
+      ws
+        
+      <
+      rule-name
+      >
+     xelem
+      ws
+        
+      "
+      >
+      "
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      "
+      ::=
+      "
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      <
+      expression
+      >
+     xelem
+      ws
+        
+      <
+      line-end
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    opt-whitespace
+    >
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+       
+      "
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    expression
+    >
+   assign
+    ws
+          
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      list
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      list
+      >
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      "
+      |
+      "
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      <
+      expression
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    line-end
+    >
+   assign
+    ws
+            
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      <
+      EOL
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      line-end
+      >
+     xelem
+      ws
+        
+      <
+      line-end
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    list
+    >
+   assign
+    ws
+                
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      term
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      term
+      >
+     xelem
+      ws
+        
+      <
+      opt-whitespace
+      >
+     xelem
+      ws
+        
+      <
+      list
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    term
+    >
+   assign
+    ws
+                
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      literal
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      <
+      "
+     xelem
+      ws
+        
+      <
+      rule-name
+      >
+     xelem
+      ws
+        
+      "
+      >
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    literal
+    >
+   assign
+    ws
+             
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      '
+      "
+      '
+     xelem
+      ws
+        
+      <
+      text1
+      >
+     xelem
+      ws
+        
+      '
+      "
+      '
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      '
+      "
+     xelem
+      ws
+        
+      <
+      text2
+      >
+     xelem
+      ws
+        
+      "
+      '
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    text1
+    >
+   assign
+    ws
+               
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      character1
+      >
+     xelem
+      ws
+        
+      <
+      text1
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    text2
+    >
+   assign
+    ws
+               
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      character2
+      >
+     xelem
+      ws
+        
+      <
+      text2
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    character
+    >
+   assign
+    ws
+           
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      symbol
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    letter
+    >
+   assign
+    ws
+              
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      A
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      B
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      C
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      D
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      E
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      F
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      G
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      H
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      I
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      J
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      K
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      L
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      M
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      N
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      O
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      P
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      Q
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      R
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      S
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      T
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      U
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      V
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      W
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      X
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      Y
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      Z
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      a
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      b
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      c
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      d
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      e
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      f
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      g
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      h
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      i
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      j
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      k
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      l
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      m
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      n
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      o
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      p
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      q
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      r
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      s
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      t
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      u
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      v
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      w
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      x
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      y
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      z
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    digit
+    >
+   assign
+    ws
+               
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      0
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      1
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      2
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      3
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      4
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      5
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      6
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      7
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      8
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      9
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    symbol
+    >
+   assign
+    ws
+              
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      |
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+       
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      !
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      #
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      $
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      %
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      &
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      (
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      )
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      *
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      +
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ,
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      -
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      .
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      /
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      :
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ;
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      >
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      =
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      <
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ?
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      @
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      [
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      \
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ]
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ^
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      _
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      `
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      {
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      }
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      ~
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    character1
+    >
+   assign
+    ws
+          
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      character
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      '
+      "
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    character2
+    >
+   assign
+    ws
+          
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      character
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      '
+      "
+      '
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    rule-name
+    >
+   assign
+    ws
+           
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      rule-name
+      >
+     xelem
+      ws
+        
+      <
+      rule-char
+      >
+  \n
+  prod
+   xlhs
+    ws
+      
+    <
+    rule-char
+    >
+   assign
+    ws
+           
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      letter
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      <
+      digit
+      >
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      -
+      "
+ ws
+  \n
+ <EOF>

@@ -1,0 +1,18 @@
+start_
+ chunk
+  block
+   stat
+    functioncall
+     functioncall
+      print
+      args
+       (
+       explist
+        exp
+         string
+          "hi"
+       )
+     args
+      string
+       "there"
+ <EOF>

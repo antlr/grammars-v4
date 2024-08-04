@@ -1,0 +1,14 @@
+script
+ func_
+  type_
+   scope
+   datatype
+    void
+  main
+  paramlist
+   (
+   )
+  statblock
+   {
+   }
+ <EOF>

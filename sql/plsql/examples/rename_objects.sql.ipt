@@ -1,0 +1,15 @@
+sql_script
+ unit_statement
+  rename_object
+   RENAME
+   object_name
+    id_expression
+     regular_id
+      FOO
+   TO
+   object_name
+    id_expression
+     regular_id
+      BAR
+ ;
+ <EOF>

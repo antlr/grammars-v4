@@ -1,0 +1,457 @@
+grammar_
+ rule_
+  grammar
+  \n
+  alternative
+       
+   item
+    rules
+   \n
+ \n
+ rule_
+  space
+  \n
+  alternative
+       
+   item
+    '0020'
+   \n
+ \n
+ rule_
+  newline
+  \n
+  alternative
+       
+   item
+    '000A'
+   \n
+ \n
+ rule_
+  name
+  \n
+  alternative
+       
+   item
+    letter
+   \n
+  alternative
+       
+   item
+    letter
+    
+   item
+    name
+   \n
+ \n
+ rule_
+  letter
+  \n
+  alternative
+       
+   item
+    range_
+     'a'
+      
+     .
+      
+     'z'
+   \n
+  alternative
+       
+   item
+    range_
+     'A'
+      
+     .
+      
+     'Z'
+   \n
+  alternative
+       
+   item
+    '_'
+   \n
+ \n
+ rule_
+  indentation
+  \n
+  alternative
+       
+   item
+    space
+    
+   item
+    space
+    
+   item
+    space
+    
+   item
+    space
+   \n
+ \n
+ rule_
+  rules
+  \n
+  alternative
+       
+   item
+    rule
+   \n
+  alternative
+       
+   item
+    rule
+    
+   item
+    newline
+    
+   item
+    rules
+   \n
+ \n
+ rule_
+  rule
+  \n
+  alternative
+       
+   item
+    name
+    
+   item
+    newline
+    
+   item
+    nothing
+    
+   item
+    alternatives
+   \n
+ \n
+ rule_
+  nothing
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    indentation
+    
+   item
+    '"'
+    
+   item
+    '"'
+    
+   item
+    newline
+   \n
+ \n
+ rule_
+  alternatives
+  \n
+  alternative
+       
+   item
+    alternative
+   \n
+  alternative
+       
+   item
+    alternative
+    
+   item
+    alternatives
+   \n
+ \n
+ rule_
+  alternative
+  \n
+  alternative
+       
+   item
+    indentation
+    
+   item
+    items
+    
+   item
+    newline
+   \n
+ \n
+ rule_
+  items
+  \n
+  alternative
+       
+   item
+    item
+   \n
+  alternative
+       
+   item
+    item
+    
+   item
+    space
+    
+   item
+    items
+   \n
+ \n
+ rule_
+  item
+  \n
+  alternative
+       
+   item
+    literal
+   \n
+  alternative
+       
+   item
+    name
+   \n
+ \n
+ rule_
+  literal
+  \n
+  alternative
+       
+   item
+    singleton
+   \n
+  alternative
+       
+   item
+    range
+    
+   item
+    exclude
+   \n
+  alternative
+       
+   item
+    '"'
+    
+   item
+    characters
+    
+   item
+    '"'
+   \n
+ \n
+ rule_
+  singleton
+  \n
+  alternative
+       
+   item
+    '''
+    
+   item
+    codepoint
+    
+   item
+    '''
+   \n
+ \n
+ rule_
+  codepoint
+  \n
+  alternative
+       
+   item
+    range_
+     ' '
+      
+     .
+      
+     '10FFFF'
+   \n
+  alternative
+       
+   item
+    hexcode
+   \n
+ \n
+ rule_
+  hexcode
+  \n
+  alternative
+       
+   item
+    "10"
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+   \n
+  alternative
+       
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+   \n
+  alternative
+       
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+    
+   item
+    hex
+   \n
+ \n
+ rule_
+  hex
+  \n
+  alternative
+       
+   item
+    range_
+     '0'
+      
+     .
+      
+     '9'
+   \n
+  alternative
+       
+   item
+    range_
+     'A'
+      
+     .
+      
+     'F'
+   \n
+ \n
+ rule_
+  range
+  \n
+  alternative
+       
+   item
+    singleton
+    
+   item
+    space
+    
+   item
+    '.'
+    
+   item
+    space
+    
+   item
+    singleton
+   \n
+ \n
+ rule_
+  exclude
+  \n
+  alternative
+       
+   item
+    ""
+   \n
+  alternative
+       
+   item
+    space
+    
+   item
+    '-'
+    
+   item
+    space
+    
+   item
+    singleton
+    
+   item
+    exclude
+   \n
+  alternative
+       
+   item
+    space
+    
+   item
+    '-'
+    
+   item
+    space
+    
+   item
+    range
+    
+   item
+    exclude
+   \n
+ \n
+ rule_
+  characters
+  \n
+  alternative
+       
+   item
+    character
+   \n
+  alternative
+       
+   item
+    character
+    
+   item
+    characters
+   \n
+ \n
+ rule_
+  character
+  \n
+  alternative
+       
+   item
+    range_
+     ' '
+      
+     .
+      
+     '10FFFF'
+    exclude
+      
+     -
+      
+     '"'
+   \n
+ <EOF>

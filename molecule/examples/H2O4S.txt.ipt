@@ -1,0 +1,19 @@
+molecule
+ part_
+  structure
+   symbol
+    element
+     H
+   count
+    2
+  structure
+   symbol
+    element
+     O
+   count
+    4
+  structure
+   symbol
+    element
+     S
+ <EOF>

@@ -1,0 +1,21 @@
+start_
+ chunk
+  block
+   stat
+    function
+    funcname
+     func1
+    funcbody
+     (
+     parlist
+     )
+     block
+      retstat
+       return
+       explist
+        exp
+         number
+          1
+       ;
+     end
+ <EOF>

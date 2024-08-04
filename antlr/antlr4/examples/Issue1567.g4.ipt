@@ -1,0 +1,74 @@
+grammarSpec
+ grammarDecl
+  grammarType
+   grammar
+  identifier
+   Sample
+  ;
+ prequelConstruct
+  optionsSpec
+   options {
+   option
+    identifier
+     foo
+    =
+    optionValue
+     actionBlock
+      {
+      }
+   ;
+   }
+ prequelConstruct
+  action_
+   @
+   identifier
+    members
+   actionBlock
+    {
+    \n
+     
+     
+     
+     
+    i
+    n
+    t
+     
+    m
+    e
+    t
+    h
+    o
+    d
+    (
+    )
+     
+    {
+    \n
+     
+     
+     
+     
+     
+     
+     
+     
+    r
+    e
+    t
+    u
+    r
+    n
+     
+    1
+    ;
+    \n
+     
+     
+     
+     
+    }
+    \n
+    }
+ rules
+ <EOF>

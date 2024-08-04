@@ -1,0 +1,392 @@
+start_
+ prods
+  prod
+   xlhs
+    <
+    rulelist
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      rules
+      >
+     xelem
+      ws
+        
+      <
+      EOF
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    rules
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      rule
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      rule
+      >
+     xelem
+      ws
+        
+      <
+      rules
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    rule
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      lhs
+      >
+     xelem
+      ws
+        
+      <
+      ASSIGN
+      >
+     xelem
+      ws
+        
+      <
+      rhs
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    lhs
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      id
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    rhs
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      alternatives
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    alternatives
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      alternative
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      alternative
+      >
+     xelem
+      ws
+        
+      <
+      bar
+      >
+     xelem
+      ws
+        
+      <
+      alternatives
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    alternative
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      optional
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      zeroormore
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      oneormore
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      text
+      >
+     xelem
+      ws
+        
+      o
+     xelem
+      ̅
+     xelem
+      r
+     xelem
+      ̅
+     xelem
+      ws
+        
+      <
+      id
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    optional
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      [
+     xelem
+      ws
+        
+      <
+      alternatives
+      >
+     xelem
+      ws
+        
+      ]
+  \n\n
+  prod
+   xlhs
+    <
+    zeroormore
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      {
+     xelem
+      ws
+        
+      <
+      alternatives
+      >
+     xelem
+      ws
+        
+      }
+  \n\n
+  prod
+   xlhs
+    <
+    oneormore
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      (
+     xelem
+      ws
+        
+      <
+      alternatives
+      >
+     xelem
+      ws
+        
+      )
+  \n\n
+  prod
+   xlhs
+    <
+    text
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      TEXT
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    id
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      ID
+      >
+  \n\n
+  prod
+   xlhs
+    <
+    bar
+    >
+   assign
+    ws
+      
+    :≡
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      <
+      BAR
+      >
+ <EOF>

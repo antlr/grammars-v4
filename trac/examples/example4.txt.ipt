@@ -1,0 +1,19 @@
+program
+ macro
+  active
+   #
+   (
+   name
+    string
+     read string
+   ,
+   arglist
+    arg
+     string
+      handle
+    ,
+    arg
+     string
+      default
+   )
+ <EOF>

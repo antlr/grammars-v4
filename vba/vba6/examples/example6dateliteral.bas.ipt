@@ -1,0 +1,41 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    functionStmt
+     Function
+      
+     ambiguousIdentifier
+      D
+     argList
+      (
+      )
+      
+     asTypeClause
+      As
+       
+      type_
+       baseType
+        Date
+     endOfStatement
+      endOfLine
+       \n
+           
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           D
+         
+        =
+         
+        valueStmt
+         literal
+          #01/Oct/2022#
+      endOfStatement
+       endOfLine
+        \n
+     End Function
+ <EOF>

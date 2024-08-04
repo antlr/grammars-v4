@@ -1,0 +1,17 @@
+command_line
+ storage_command
+  storage_command_name
+   set
+  key
+   Test
+  flags
+   0
+  exptime
+   100
+  bytes
+   10
+ retrieval_command
+  get
+  key
+   Test
+ <EOF>

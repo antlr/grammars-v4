@@ -1,0 +1,157 @@
+root
+ file_input
+  
+  stmt
+   compound_stmt
+    try
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    except_clause
+     except
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    try
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    except_clause
+     except
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           Exception
+     as
+     name
+      ex
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+    except_clause
+     except
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+    else_clause
+     else
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    try
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    except_clause
+     except
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           Exception
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+    finally_clause
+     finally
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+  stmt
+   compound_stmt
+    try
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        pass
+       
+     
+    finally_clause
+     finally
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         pass
+        
+      
+ <EOF>

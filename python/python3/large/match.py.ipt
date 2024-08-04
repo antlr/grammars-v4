@@ -1,0 +1,181 @@
+file_input
+ stmt
+  simple_stmts
+   simple_stmt
+    expr_stmt
+     testlist_star_expr
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              name
+               command
+     =
+     testlist_star_expr
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              'Hello, World!'
+   \n
+ stmt
+  compound_stmt
+   match_stmt
+    match
+    subject_expr
+     test
+      or_test
+       and_test
+        not_test
+         comparison
+          expr
+           atom_expr
+            atom
+             name
+              command
+    :
+     
+        
+    case_block
+     case
+     patterns
+      pattern
+       or_pattern
+        closed_pattern
+         literal_pattern
+          strings
+           'Hello, World!'
+     :
+     block
+       
+              
+      stmt
+       simple_stmts
+        simple_stmt
+         expr_stmt
+          testlist_star_expr
+           test
+            or_test
+             and_test
+              not_test
+               comparison
+                expr
+                 atom_expr
+                  atom
+                   name
+                    print
+                  trailer
+                   (
+                   arglist
+                    argument
+                     test
+                      or_test
+                       and_test
+                        not_test
+                         comparison
+                          expr
+                           atom_expr
+                            atom
+                             'Hello to you too!'
+                   )
+         
+       
+    case_block
+     case
+     patterns
+      pattern
+       or_pattern
+        closed_pattern
+         literal_pattern
+          strings
+           'Goodbye, World!'
+     :
+     block
+       
+              
+      stmt
+       simple_stmts
+        simple_stmt
+         expr_stmt
+          testlist_star_expr
+           test
+            or_test
+             and_test
+              not_test
+               comparison
+                expr
+                 atom_expr
+                  atom
+                   name
+                    print
+                  trailer
+                   (
+                   arglist
+                    argument
+                     test
+                      or_test
+                       and_test
+                        not_test
+                         comparison
+                          expr
+                           atom_expr
+                            atom
+                             'See you later'
+                   )
+         
+       
+    case_block
+     case
+     patterns
+      pattern
+       or_pattern
+        closed_pattern
+         capture_pattern
+          pattern_capture_target
+           name
+            other
+     :
+     block
+       
+              
+      stmt
+       simple_stmts
+        simple_stmt
+         expr_stmt
+          testlist_star_expr
+           test
+            or_test
+             and_test
+              not_test
+               comparison
+                expr
+                 atom_expr
+                  atom
+                   name
+                    print
+                  trailer
+                   (
+                   arglist
+                    argument
+                     test
+                      or_test
+                       and_test
+                        not_test
+                         comparison
+                          expr
+                           atom_expr
+                            atom
+                             'No match found'
+                   )
+        \n
+      \n
+    \n
+ <EOF>

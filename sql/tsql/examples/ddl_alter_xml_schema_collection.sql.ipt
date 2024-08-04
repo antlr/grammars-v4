@@ -1,0 +1,26 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    create_xml_schema_collection
+     CREATE
+     XML
+     SCHEMA
+     COLLECTION
+     id_
+      MyColl
+     AS
+     '\n   <schema\n    xmlns="http://www.w3.org/2001/XMLSchema"\n    targetNamespace="https://MySchema/test_xml_schema">\n      <element name="root" type="string"/>\n  </schema>'
+  sql_clauses
+   ddl_clause
+    alter_xml_schema_collection
+     ALTER
+     XML
+     SCHEMA
+     COLLECTION
+     id_
+      MyColl
+     ADD
+     '\n  <schema xmlns="http://www.w3.org/2001/XMLSchema"\n         targetNamespace="https://MySchema/test_xml_schema">\n     <element name="anotherElement" type="byte"/>\n </schema>'
+   ;
+ <EOF>

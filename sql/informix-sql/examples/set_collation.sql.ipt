@@ -1,0 +1,15 @@
+sqlScript
+ unitStatement
+  setCollation
+   SET
+   COLLATION
+   quotedString
+    q'{select deptno, sum(sal) budget\n     from emp\n     where job = budget.job\n     group by deptno}'
+  ;
+ unitStatement
+  setCollation
+   SET
+   NO
+   COLLATION
+  ;
+ <EOF>

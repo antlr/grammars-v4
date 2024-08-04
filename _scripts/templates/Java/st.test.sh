@@ -10,13 +10,13 @@ SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
 # Get a list of test files from the test directory. Do not include any
-# .errors or .tree files. Pay close attention to remove only file names
-# that end with the suffix .errors or .tree.
+# .errors or .ipt files. Pay close attention to remove only file names
+# that end with the suffix .errors or .ipt.
 if [ "$global" == "" ]
 then
-    files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+    files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.ipt$'`
 else
-    files2=`trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+    files2=`trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.ipt$'`
 fi
 
 files=()
@@ -95,9 +95,10 @@ then
     exit 1
 fi
 
-# rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree' -size 0`
+# rm -rf `find ../<example_files_unix> -type f -name '*.errors' -o
+# -name '*.ipt' -size 0`
 
-# For Unix environments, convert the newline in the .errors and .trees
+# For Unix environments, convert the newline in the .errors and .ipts
 # to Unix style.
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -112,7 +113,7 @@ then
     gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
     if [ "$gen" != "" ]
     then
-        dos2unix $gen
+        dos2unix -f $gen
     fi
 fi
 
@@ -132,7 +133,7 @@ do
         updated=$xxx
     fi
 done
-for f in `find . -name '*.tree'`
+for f in `find . -name '*.ipt'`
 do
     git diff --exit-code $f >> $old/updated.txt 2>&1
     xxx=$?

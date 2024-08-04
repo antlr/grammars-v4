@@ -1,0 +1,19 @@
+sqlScript
+ unitStatement
+  setDeferredPrepareStatement
+   set
+   deferred_prepare
+  ;
+ unitStatement
+  setDeferredPrepareStatement
+   set
+   deferred_prepare
+   enabled
+  ;
+ unitStatement
+  setDeferredPrepareStatement
+   set
+   deferred_prepare
+   DISABLED
+  ;
+ <EOF>

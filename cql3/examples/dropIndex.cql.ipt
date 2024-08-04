@@ -1,0 +1,16 @@
+root
+ cqls
+  cql
+   dropIndex
+    kwDrop
+     DROP
+    kwIndex
+     INDEX
+    keyspace
+     cycling
+    .
+    indexName
+     ryear
+  statementSeparator
+   ;
+ <EOF>

@@ -1,0 +1,37 @@
+root
+ cqls
+  cql
+   alterMaterializedView
+    kwAlter
+     ALTER
+    kwMaterialized
+     MATERIALIZED
+    kwView
+     VIEW
+    keyspace
+     cycling
+    .
+    materializedView
+     cyclist_by_age
+    kwWith
+     WITH
+    tableOptions
+     tableOptionItem
+      tableOptionName
+       comment
+      =
+      tableOptionValue
+       stringLiteral
+        'A most excellent and useful view'
+     kwAnd
+      AND
+     tableOptionItem
+      tableOptionName
+       bloom_filter_fp_chance
+      =
+      tableOptionValue
+       floatLiteral
+        0.02
+  statementSeparator
+   ;
+ <EOF>

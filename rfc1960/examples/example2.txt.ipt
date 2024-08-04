@@ -1,0 +1,20 @@
+file_
+ filter_
+  (
+  filtercomp
+   not_
+    !
+    filter_
+     (
+     filtercomp
+      item
+       simple
+        attr
+         cn
+        filtertype
+         =
+        value
+         Tim Howes
+     )
+  )
+ <EOF>

@@ -1,0 +1,18 @@
+parse
+ block
+  expression
+   expression
+    variables
+     variable
+      mu
+   when
+   expression
+    expression
+     variables
+      variable
+       x
+    relOp
+     >
+    expression
+     0
+ <EOF>

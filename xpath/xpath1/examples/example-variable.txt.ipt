@@ -1,0 +1,19 @@
+main
+ expr
+  orExpr
+   andExpr
+    equalityExpr
+     relationalExpr
+      additiveExpr
+       multiplicativeExpr
+        unaryExprNoRoot
+         unionExprNoRoot
+          pathExprNoRoot
+           filterExpr
+            primaryExpr
+             variableReference
+              $
+              qName
+               nCName
+                comment
+ <EOF>

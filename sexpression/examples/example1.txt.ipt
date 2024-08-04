@@ -1,0 +1,27 @@
+sexpr
+ item
+  list_
+   (
+   item
+    list_
+     (
+     item
+      list_
+       (
+       item
+        atom
+         S
+       )
+     item
+      list_
+       (
+       item
+        atom
+         NP
+       item
+        atom
+         VP
+       )
+     )
+   )
+ <EOF>

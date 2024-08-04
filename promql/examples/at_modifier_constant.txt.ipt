@@ -1,0 +1,12 @@
+expression
+ vectorOperation
+  vectorOperation
+   vector
+    instantSelector
+     http_requests_total
+  @
+  vectorOperation
+   vector
+    literal
+     1609746000
+ <EOF>

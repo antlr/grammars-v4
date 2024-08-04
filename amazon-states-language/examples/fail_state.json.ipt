@@ -1,0 +1,46 @@
+state_machine
+ program_decl
+  {
+  top_layer_stmt
+   startat_decl
+    "StartAt"
+    :
+    keyword_or_string
+     "FailState"
+  ,
+  top_layer_stmt
+   states_decl
+    "States"
+    :
+    {
+    state_decl
+     state_name
+      keyword_or_string
+       "FailState"
+     :
+     state_decl_body
+      {
+      state_stmt
+       type_decl
+        "Type"
+        :
+        state_type
+         "Fail"
+      ,
+      state_stmt
+       error_path_decl
+        "ErrorPath"
+        :
+        intrinsic_func
+         "States.Format('{}', $.Error)"
+      ,
+      state_stmt
+       cause_path_decl
+        "CausePath"
+        :
+        intrinsic_func
+         "States.Format('This is a custom error message for {}, caused by {}.', $.Error, $.Cause)"
+      }
+    }
+  }
+ <EOF>

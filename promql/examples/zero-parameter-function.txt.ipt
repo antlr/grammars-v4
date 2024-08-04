@@ -1,0 +1,22 @@
+expression
+ vectorOperation
+  vectorOperation
+   vectorOperation
+    vector
+     function_
+      time
+      (
+      )
+   addOp
+    -
+   vectorOperation
+    vector
+     instantSelector
+      kube_cronjob_next_schedule_time
+  compareOp
+   >
+  vectorOperation
+   vector
+    literal
+     3600
+ <EOF>

@@ -1,0 +1,10 @@
+parse
+ block
+  expression
+   expression
+    1
+   addOp
+    +
+   expression
+    2
+ <EOF>

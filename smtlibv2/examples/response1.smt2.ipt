@@ -1,0 +1,21 @@
+start_
+ general_response
+  specific_success_response
+   get_assertions_response
+    (
+    term
+     qual_identifer
+      identifier
+       symbol
+        simpleSymbol
+         predefSymbol
+          false
+    term
+     qual_identifer
+      identifier
+       symbol
+        simpleSymbol
+         predefSymbol
+          true
+    )
+ <EOF>

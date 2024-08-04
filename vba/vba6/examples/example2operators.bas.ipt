@@ -1,0 +1,347 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     visibility
+      Public
+      
+     Sub
+      
+     ambiguousIdentifier
+      Module
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \n
+           
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           X
+         
+        =
+         
+        valueStmt
+         literal
+          0
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Y
+         
+        =
+         
+        valueStmt
+         literal
+          1
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Z
+         
+        =
+         
+        valueStmt
+         literal
+          2
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Test1
+         
+        =
+         
+        valueStmt
+         valueStmt
+          implicitCallStmt_InStmt
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             X
+          
+         +
+          
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Y
+           
+          *
+           
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Test2
+         
+        =
+         
+        valueStmt
+         valueStmt
+          implicitCallStmt_InStmt
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             X
+          
+         -
+          
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Y
+           
+          *
+           
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Test3
+         
+        =
+         
+        valueStmt
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+           
+          +
+           
+          valueStmt
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               X
+            
+           *
+            
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               Y
+          
+         -
+          
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Y
+           
+          *
+           
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Test4
+         
+        =
+         
+        valueStmt
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+           
+          +
+           
+          valueStmt
+           valueStmt
+            valueStmt
+             implicitCallStmt_InStmt
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                X
+             
+            *
+             
+            valueStmt
+             implicitCallStmt_InStmt
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                Y
+            
+           Mod
+            
+           valueStmt
+            valueStmt
+             implicitCallStmt_InStmt
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                Z
+             
+            *
+             
+            valueStmt
+             literal
+              2
+          
+         +
+          
+         valueStmt
+          valueStmt
+           literal
+            5
+           
+          *
+           
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+      endOfStatement
+       endOfLine
+        \n
+            
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Test5
+         
+        =
+         
+        valueStmt
+         valueStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              Z
+           
+          +
+           
+          valueStmt
+           valueStmt
+            valueStmt
+             valueStmt
+              implicitCallStmt_InStmt
+               iCS_S_VariableOrProcedureCall
+                ambiguousIdentifier
+                 X
+              
+             ^
+              
+             valueStmt
+              literal
+               3
+             
+            *
+             
+            valueStmt
+             implicitCallStmt_InStmt
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                Y
+            
+           Mod
+            
+           valueStmt
+            valueStmt
+             implicitCallStmt_InStmt
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                Z
+             
+            *
+             
+            valueStmt
+             literal
+              2
+          
+         +
+          
+         valueStmt
+          valueStmt
+           literal
+            5
+           
+          *
+           
+          valueStmt
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               Z
+            
+           ^
+            
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               X
+      endOfStatement
+       endOfLine
+        \n
+     End Sub
+ <EOF>

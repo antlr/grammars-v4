@@ -1,0 +1,1253 @@
+grammar_
+ header_
+  header
+  actionBlock
+   {
+   \n
+   p
+   a
+   c
+   k
+   a
+   g
+   e
+    
+   a
+   n
+   t
+   l
+   r
+   .
+   g
+   r
+   a
+   m
+   m
+   a
+   r
+   s
+   .
+   d
+   o
+   t
+   ;
+   \n
+   }
+ classDef
+  parserSpec
+   class
+   id_
+    DotParser
+   extends
+   Parser
+   ;
+   parserOptionsSpec
+    options
+    {
+    option
+     id_
+      importVocab
+     =
+     optionValue
+      qualifiedID
+       id_
+        Dot
+     ;
+    option
+     id_
+      buildAST
+     =
+     optionValue
+      qualifiedID
+       id_
+        true
+     ;
+    option
+     id_
+      defaultErrorHandler
+     =
+     optionValue
+      qualifiedID
+       id_
+        true
+     ;
+    }
+   actionBlock
+    {
+    \n
+    }
+  rules
+   rule_
+    id_
+     graph
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              STRICT_LITERAL
+              ast_type_spec
+         )
+         ?
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              GRAPH_LITERAL
+              ast_type_spec
+               ^
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              DIGRAPH_LITERAL
+              ast_type_spec
+               ^
+         )
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              ID
+              ast_type_spec
+         )
+         ?
+      element
+       elementNoOptionSpec
+        terminal_
+         O_BRACKET
+         ast_type_spec
+          !
+      element
+       elementNoOptionSpec
+        rule_ref_or_keyword_as
+         stmt_list
+      element
+       elementNoOptionSpec
+        terminal_
+         C_BRACKET
+         ast_type_spec
+          !
+    ;
+   rule_
+    protected
+    id_
+     stmt_list
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              stmt
+           element
+            elementNoOptionSpec
+             terminal_
+              SEMI_COLON
+              ast_type_spec
+               !
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              stmt_list
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     stmt
+    ruleAction
+     actionBlock
+      {
+      S
+      t
+      r
+      i
+      n
+      g
+       
+      c
+      u
+      r
+      r
+      e
+      n
+      t
+      I
+      d
+       
+      =
+       
+      n
+      u
+      l
+      l
+      ;
+      }
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             id_
+              i
+             :
+             terminal_
+              ID
+              ast_type_spec
+               ^
+           element
+            elementNoOptionSpec
+             actionBlock
+              {
+              c
+              u
+              r
+              r
+              e
+              n
+              t
+              I
+              d
+               
+              =
+               
+              i
+              .
+              g
+              e
+              t
+              T
+              e
+              x
+              t
+              (
+              )
+              ;
+              }
+           element
+            elementNoOptionSpec
+             ebnf
+              (
+              block
+               alternative
+                element
+                 elementNoOptionSpec
+                  terminal_
+                   EQUAL
+                   ast_type_spec
+                    !
+                element
+                 elementNoOptionSpec
+                  terminal_
+                   ID
+                   ast_type_spec
+               |
+               alternative
+                element
+                 elementNoOptionSpec
+                  rule_ref_or_keyword_as
+                   node_or_edge_stmt
+                  argActionBlock
+                   [
+                   c
+                   u
+                   r
+                   r
+                   e
+                   n
+                   t
+                   I
+                   d
+                   ]
+              )
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              attr_stmt
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              subgraph
+         )
+    ;
+   rule_
+    protected
+    id_
+     node_or_edge_stmt
+    argActionBlock
+     [
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     i
+     d
+     ]
+    ruleAction
+     actionBlock
+      {
+       
+      S
+      t
+      r
+      i
+      n
+      g
+       
+      p
+       
+      =
+       
+      n
+      u
+      l
+      l
+      ;
+       
+      }
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             id_
+              p
+             =
+             rule_ref_or_keyword_as
+              port
+         )
+         ?
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             ebnf
+              (
+              block
+               alternative
+                element
+                 elementNoOptionSpec
+                  rule_ref_or_keyword_as
+                   edgeRHS
+              )
+              =>
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              edge_stmt
+             argActionBlock
+              [
+              i
+              d
+              ,
+               
+              p
+              ]
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              node_stmt
+             argActionBlock
+              [
+              i
+              d
+              ,
+               
+              p
+              ]
+         )
+    ;
+   rule_
+    protected
+    id_
+     edge_stmt
+    argActionBlock
+     [
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     i
+     d
+     ,
+      
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     p
+     o
+     r
+     t
+     ]
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        rule_ref_or_keyword_as
+         edgeRHS
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              attr_list
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     node_stmt
+    argActionBlock
+     [
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     i
+     d
+     ,
+      
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     p
+     o
+     r
+     t
+     ]
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              attr_list
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     attr_stmt
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              GRAPH_LITERAL
+              ast_type_spec
+               ^
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              NODE_LITERAL
+              ast_type_spec
+               ^
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              EDGE_LITERAL
+              ast_type_spec
+               ^
+         )
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              attr_list
+         )
+    ;
+   rule_
+    protected
+    id_
+     attr_list
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         O_SQR_BRACKET
+         ast_type_spec
+          !
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              a_list
+         )
+         ?
+      element
+       elementNoOptionSpec
+        terminal_
+         C_SQR_BRACKET
+         ast_type_spec
+          !
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              attr_list
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     a_list
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              arg
+         )
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              COMMA
+              ast_type_spec
+               !
+         )
+         ?
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              a_list
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     arg
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         ID
+         ast_type_spec
+          ^
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              EQUAL
+              ast_type_spec
+               !
+           element
+            elementNoOptionSpec
+             terminal_
+              ID
+              ast_type_spec
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     edgeRHS
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         EDGEOP_LITERAL
+         ast_type_spec
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              node_id
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              subgraph
+         )
+         ?
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             rule_ref_or_keyword_as
+              edgeRHS
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     node_id
+    ruleAction
+     actionBlock
+      {
+       
+      S
+      t
+      r
+      i
+      n
+      g
+       
+      p
+       
+      =
+       
+      n
+      u
+      l
+      l
+      ;
+       
+      }
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         ID
+         ast_type_spec
+          ^
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             id_
+              p
+             =
+             rule_ref_or_keyword_as
+              port
+         )
+         ?
+    ;
+   rule_
+    protected
+    id_
+     port
+    returns
+    argActionBlock
+     [
+     S
+     t
+     r
+     i
+     n
+     g
+      
+     r
+     e
+     s
+     u
+     l
+     t
+      
+     =
+      
+     n
+     u
+     l
+     l
+     ]
+    ruleAction
+     actionBlock
+      {
+      S
+      t
+      r
+      i
+      n
+      g
+       
+      c
+      o
+      m
+      p
+      a
+      s
+      s
+       
+      =
+       
+      n
+      u
+      l
+      l
+      ;
+      }
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         COLON
+         ast_type_spec
+          !
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             id_
+              i
+             :
+             terminal_
+              ID
+              ast_type_spec
+               ^
+           element
+            elementNoOptionSpec
+             ebnf
+              (
+              block
+               alternative
+                element
+                 elementNoOptionSpec
+                  terminal_
+                   COLON
+                   ast_type_spec
+                    !
+                element
+                 elementNoOptionSpec
+                  id_
+                   c1
+                  :
+                  terminal_
+                   COMPASS_PT
+                   ast_type_spec
+                element
+                 elementNoOptionSpec
+                  actionBlock
+                   {
+                   c
+                   o
+                   m
+                   p
+                   a
+                   s
+                   s
+                    
+                   =
+                    
+                   c
+                   1
+                   .
+                   g
+                   e
+                   t
+                   T
+                   e
+                   x
+                   t
+                   (
+                   )
+                   ;
+                   }
+              )
+              ?
+           element
+            elementNoOptionSpec
+             actionBlock
+              {
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              r
+              e
+              s
+              u
+              l
+              t
+               
+              =
+               
+              i
+              .
+              g
+              e
+              t
+              T
+              e
+              x
+              t
+              (
+              )
+              ;
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              i
+              f
+               
+               
+              (
+              c
+              o
+              m
+              p
+              a
+              s
+              s
+               
+              !
+              =
+               
+              n
+              u
+              l
+              l
+              )
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              {
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              r
+              e
+              s
+              u
+              l
+              t
+               
+              +
+              =
+               
+              ":"
+               
+              +
+               
+              c
+              o
+              m
+              p
+              a
+              s
+              s
+              ;
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              }
+              \n
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+              }
+          |
+          alternative
+           element
+            elementNoOptionSpec
+             id_
+              c2
+             :
+             terminal_
+              COMPASS_PT
+              ast_type_spec
+               ^
+           element
+            elementNoOptionSpec
+             actionBlock
+              {
+               
+              r
+              e
+              s
+              u
+              l
+              t
+               
+              =
+               
+              c
+              2
+              .
+              g
+              e
+              t
+              T
+              e
+              x
+              t
+              (
+              )
+              ;
+               
+              }
+         )
+    ;
+   rule_
+    protected
+    id_
+     subgraph
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              SUBGRAPH_LITERAL
+              ast_type_spec
+               ^
+           element
+            elementNoOptionSpec
+             ebnf
+              (
+              block
+               alternative
+                element
+                 elementNoOptionSpec
+                  ebnf
+                   (
+                   block
+                    alternative
+                     element
+                      elementNoOptionSpec
+                       terminal_
+                        ID
+                        ast_type_spec
+                   )
+                   =>
+                element
+                 elementNoOptionSpec
+                  ebnf
+                   (
+                   block
+                    alternative
+                     element
+                      elementNoOptionSpec
+                       ebnf
+                        (
+                        block
+                         alternative
+                          element
+                           elementNoOptionSpec
+                            terminal_
+                             O_BRACKET
+                             ast_type_spec
+                        )
+                        =>
+                     element
+                      elementNoOptionSpec
+                       rule_ref_or_keyword_as
+                        subgraph_ext
+                    |
+                    alternative
+                     element
+                      elementNoOptionSpec
+                       rule_ref_or_keyword_as
+                        subgraph_simple
+                   )
+               |
+               alternative
+                element
+                 elementNoOptionSpec
+                  rule_ref_or_keyword_as
+                   subgraph_ext
+              )
+         )
+    ;
+   rule_
+    protected
+    id_
+     subgraph_ext
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        ebnf
+         (
+         block
+          alternative
+           element
+            elementNoOptionSpec
+             terminal_
+              SUBGRAPH_LITERAL
+              ast_type_spec
+               ^
+           element
+            elementNoOptionSpec
+             ebnf
+              (
+              block
+               alternative
+                element
+                 elementNoOptionSpec
+                  terminal_
+                   ID
+                   ast_type_spec
+              )
+              ?
+         )
+         ?
+      element
+       elementNoOptionSpec
+        terminal_
+         O_BRACKET
+         ast_type_spec
+          !
+      element
+       elementNoOptionSpec
+        rule_ref_or_keyword_as
+         stmt_list
+      element
+       elementNoOptionSpec
+        terminal_
+         C_BRACKET
+         ast_type_spec
+          !
+    ;
+   rule_
+    protected
+    id_
+     subgraph_simple
+    :
+    altList
+     alternative
+      element
+       elementNoOptionSpec
+        terminal_
+         SUBGRAPH_LITERAL
+         ast_type_spec
+      element
+       elementNoOptionSpec
+        terminal_
+         ID
+         ast_type_spec
+          ^
+    ;
+ <EOF>

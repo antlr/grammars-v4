@@ -1,0 +1,32 @@
+crate
+ item
+  visItem
+   function_
+    functionQualifiers
+    fn
+    identifier
+     main
+    (
+    )
+    blockExpression
+     {
+     statements
+      statement
+       item
+        macroItem
+         macroInvocationSemi
+          simplePath
+           simplePathSegment
+            identifier
+             print
+          !
+          (
+          tokenTree
+           tokenTreeToken
+            macroLiteralToken
+             literalExpression
+              "Hello world!"
+          )
+          ;
+     }
+ <EOF>

@@ -1,0 +1,8 @@
+data
+ values
+  value
+   integer
+    i
+    42
+    e
+ <EOF>

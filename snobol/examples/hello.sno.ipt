@@ -1,0 +1,17 @@
+prog
+ lin
+  line
+   subject
+    OUTPUT
+   =
+   expression
+    multiplyingExpression
+     powExpression
+      atom
+       "Hello World!"
+  \n
+ lin
+  line
+   END
+  \n
+ <EOF>

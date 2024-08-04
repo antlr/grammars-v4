@@ -1,0 +1,12 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     www.khubla.com
+  \n
+ <EOF>

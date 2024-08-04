@@ -1,0 +1,541 @@
+stylesheet
+ ws
+ nestedStatement
+  keyframesRule
+   @keyframes
+   ws
+    
+   ws
+   ident
+    identifier
+   ws
+     
+   {
+   ws
+    \n  
+   keyframeBlock
+    keyframeSelector
+     0%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        number
+         0
+        ws
+     ws
+     ;
+     ws
+       
+     declaration
+      property_
+       ident
+        left
+       ws
+      :
+      ws
+        
+      expr
+       term
+        number
+         0
+        ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     30%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         50px
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     68%
+     ws
+     ,
+     ws
+       
+     72%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        left
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         50px
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     100%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         100px
+        ws
+     ws
+     ;
+     ws
+       
+     declaration
+      property_
+       ident
+        left
+       ws
+      :
+      ws
+        
+      expr
+       term
+        percentage
+         100%
+        ws
+     ;
+     ws
+       
+    }
+    ws
+     \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  keyframesRule
+   @keyframes
+   ws
+    
+   ws
+   ident
+    identifier
+   ws
+     
+   {
+   ws
+    \n  
+   keyframeBlock
+    keyframeSelector
+     0%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        number
+         0
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     50%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         30px
+        ws
+     ws
+     ;
+     ws
+       
+     declaration
+      property_
+       ident
+        left
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         20px
+        ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     50%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         10px
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     100%
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        number
+         0
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  keyframesRule
+   @keyframes
+   ws
+    
+   ws
+   ident
+    important1
+   ws
+     
+   {
+   ws
+    \n  
+   keyframeBlock
+    keyframeSelector
+     from
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        margin-top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         50px
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     50%
+     ws
+        
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        margin-top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         150px
+        ws
+          
+      prio
+       !important
+       ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+      
+     /* ignored */
+     \n  
+   keyframeBlock
+    keyframeSelector
+     to
+     ws
+         
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        margin-top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         100px
+        ws
+     ws
+     ;
+     ws
+       
+    }
+    ws
+     \n
+   }
+   ws
+    \n\n
+ nestedStatement
+  keyframesRule
+   @keyframes
+   ws
+    
+   ws
+   ident
+    important2
+   ws
+     
+   {
+   ws
+    \n  
+   keyframeBlock
+    keyframeSelector
+     from
+     ws
+       
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        margin-top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         50px
+        ws
+     ws
+     ;
+     ws
+      \n         
+     declaration
+      property_
+       ident
+        margin-bottom
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         100px
+        ws
+     ;
+     ws
+       
+    }
+    ws
+     \n  
+   keyframeBlock
+    keyframeSelector
+     to
+     ws
+         
+    {
+    ws
+      
+    declarationList
+     declaration
+      property_
+       ident
+        margin-top
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         150px
+        ws
+          
+      prio
+       !important
+       ws
+     ws
+     ;
+     ws
+       
+      /* ignored */
+      \n         
+     declaration
+      property_
+       ident
+        margin-bottom
+       ws
+      :
+      ws
+        
+      expr
+       term
+        dimension
+         50px
+        ws
+     ;
+     ws
+       
+    }
+    ws
+     \n
+   }
+   ws
+    \n
+ <EOF>

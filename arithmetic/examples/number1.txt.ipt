@@ -1,0 +1,13 @@
+file_
+ equation
+  expression
+   atom
+    variable
+     x
+  relop
+   =
+  expression
+   atom
+    scientific
+     12
+ <EOF>

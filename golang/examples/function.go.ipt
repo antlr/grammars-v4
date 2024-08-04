@@ -1,0 +1,16 @@
+sourceFile
+ packageClause
+  package
+  samples
+ eos
+  \n\n
+ functionDecl
+  func
+  BodylessFunction
+  signature
+   parameters
+    (
+    )
+ eos
+  \n
+ <EOF>

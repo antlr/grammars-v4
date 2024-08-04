@@ -1,0 +1,14 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    create_xml_schema_collection
+     CREATE
+     XML
+     SCHEMA
+     COLLECTION
+     id_
+      MyCollection
+     AS
+     @MySchemaCollection
+ <EOF>

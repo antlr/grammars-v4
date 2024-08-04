@@ -1,0 +1,9 @@
+parse
+ statements
+  singleStatement
+   statement
+    EXECUTE
+    identifier
+     myquery
+   ;
+ <EOF>

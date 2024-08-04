@@ -1,0 +1,39 @@
+prog
+ line
+  comment
+   ;In logo, characters in [] after print command should be output as a string.
+ \n
+ line
+  print_
+   print
+   quotedstring
+    [
+    hello
+    world
+    ]
+  comment
+   ;should display "hello world"
+ \n
+ line
+  print_
+   print
+   quotedstring
+    [
+    if
+    1
+    >
+    0
+    quotedstring
+     [
+     print
+     quotedstring
+      [
+      1
+      >
+      0
+      ]
+     ]
+    ]
+  comment
+   ;should display "if 1>0 [print[1>0]]
+ <EOF>

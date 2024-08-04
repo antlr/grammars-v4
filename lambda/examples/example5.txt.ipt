@@ -1,0 +1,22 @@
+file_
+ expression
+  application
+   (
+   expression
+    application
+     (
+     expression
+      function_
+       λ
+       a
+       .
+       scope
+        expression
+         a
+     expression
+      b
+     )
+   expression
+    c
+   )
+ <EOF>

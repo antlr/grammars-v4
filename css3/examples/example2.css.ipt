@@ -1,0 +1,105 @@
+stylesheet
+ ws
+  \t\t
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      typeSelector
+       elementName
+        ident
+         body
+     ws
+       
+   {
+   ws
+    \n\t\t\t
+   declarationList
+    declaration
+     property_
+      ident
+       font-family
+      ws
+     :
+     ws
+       
+     expr
+      term
+       ident
+        Arial
+       ws
+      operator_
+       ,
+       ws
+         
+      term
+       ident
+        Helvetica
+       ws
+      operator_
+       ,
+       ws
+         
+      term
+       ident
+        sans-serif
+       ws
+    ws
+    ;
+    ws
+     \n\t\t
+   }
+   ws
+    \n\t\t
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      typeSelector
+       elementName
+        ident
+         h1
+     ws
+       
+   {
+   ws
+    \n\t\t\t
+   declarationList
+    declaration
+     property_
+      ident
+       font-family
+      ws
+     :
+     ws
+       
+     expr
+      term
+       "Times New Roman"
+       ws
+      operator_
+       ,
+       ws
+         
+      term
+       ident
+        Times
+       ws
+      operator_
+       ,
+       ws
+         
+      term
+       ident
+        serif
+       ws
+    ws
+    ;
+    ws
+     \n\t\t
+   }
+   ws
+    \n\t\t
+ <EOF>

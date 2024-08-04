@@ -1,0 +1,22 @@
+sql_script
+ unit_statement
+  alter_resource_cost
+   ALTER
+   RESOURCE
+   COST
+   CPU_PER_SESSION
+   100
+   CONNECT_TIME
+   1
+ ;
+ unit_statement
+  alter_resource_cost
+   ALTER
+   RESOURCE
+   COST
+   LOGICAL_READS_PER_SESSION
+   2
+   CONNECT_TIME
+   0
+ ;
+ <EOF>

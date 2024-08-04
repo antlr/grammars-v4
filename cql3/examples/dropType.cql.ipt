@@ -1,0 +1,16 @@
+root
+ cqls
+  cql
+   dropType
+    kwDrop
+     DROP
+    kwType
+     TYPE
+    keyspace
+     cycling
+    .
+    type_
+     basic_info
+  statementSeparator
+   ;
+ <EOF>

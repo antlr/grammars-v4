@@ -1,0 +1,20 @@
+tsql_file
+ batch
+  sql_clauses
+   another_statement
+    reconfigure_statement
+     RECONFIGURE
+     WITH
+     OVERRIDE
+   ;
+  go_statement
+   GO
+ batch
+  sql_clauses
+   another_statement
+    reconfigure_statement
+     RECONFIGURE
+   ;
+  go_statement
+   GO
+ <EOF>

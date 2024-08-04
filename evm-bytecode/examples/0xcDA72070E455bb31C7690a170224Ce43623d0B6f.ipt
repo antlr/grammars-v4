@@ -1,0 +1,1830 @@
+program
+ opcodes
+  PUSH1 0x80
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x04
+ opcodes
+  CALLDATASIZE
+ opcodes
+  LT
+ opcodes
+  PUSH2 0x004e
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  CALLDATALOAD
+ opcodes
+  PUSH1 0xe0
+ opcodes
+  SHR
+ opcodes
+  DUP1
+ opcodes
+  PUSH4 0x3659cfe6
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x0067
+ opcodes
+  JUMPI
+ opcodes
+  DUP1
+ opcodes
+  PUSH4 0x4f1ef286
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x00b8
+ opcodes
+  JUMPI
+ opcodes
+  DUP1
+ opcodes
+  PUSH4 0x5c60da1b
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x0151
+ opcodes
+  JUMPI
+ opcodes
+  DUP1
+ opcodes
+  PUSH4 0x8f283970
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x01a8
+ opcodes
+  JUMPI
+ opcodes
+  DUP1
+ opcodes
+  PUSH4 0xf851a440
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x01f9
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x005d
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLDATASIZE
+ opcodes
+  PUSH2 0x005d
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x005b
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  STOP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0065
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  STOP
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLVALUE
+ opcodes
+  DUP1
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x0073
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x00b6
+ opcodes
+  PUSH1 0x04
+ opcodes
+  DUP1
+ opcodes
+  CALLDATASIZE
+ opcodes
+  SUB
+ opcodes
+  PUSH1 0x20
+ opcodes
+  DUP2
+ opcodes
+  LT
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x008a
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP2
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  CALLDATALOAD
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  SWAP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  SWAP3
+ opcodes
+  SWAP2
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x026a
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  STOP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x014f
+ opcodes
+  PUSH1 0x04
+ opcodes
+  DUP1
+ opcodes
+  CALLDATASIZE
+ opcodes
+  SUB
+ opcodes
+  PUSH1 0x40
+ opcodes
+  DUP2
+ opcodes
+  LT
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x00ce
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP2
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  CALLDATALOAD
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  SWAP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  SWAP3
+ opcodes
+  SWAP2
+ opcodes
+  SWAP1
+ opcodes
+  DUP1
+ opcodes
+  CALLDATALOAD
+ opcodes
+  SWAP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  PUSH5 0x0100000000
+ opcodes
+  DUP2
+ opcodes
+  GT
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x010b
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP3
+ opcodes
+  ADD
+ opcodes
+  DUP4
+ opcodes
+  PUSH1 0x20
+ opcodes
+  DUP3
+ opcodes
+  ADD
+ opcodes
+  GT
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x011d
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP1
+ opcodes
+  CALLDATALOAD
+ opcodes
+  SWAP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  DUP5
+ opcodes
+  PUSH1 0x01
+ opcodes
+  DUP4
+ opcodes
+  MUL
+ opcodes
+  DUP5
+ opcodes
+  ADD
+ opcodes
+  GT
+ opcodes
+  PUSH5 0x0100000000
+ opcodes
+  DUP4
+ opcodes
+  GT
+ opcodes
+  OR
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x013f
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  SWAP1
+ opcodes
+  SWAP2
+ opcodes
+  SWAP3
+ opcodes
+  SWAP4
+ opcodes
+  SWAP2
+ opcodes
+  SWAP3
+ opcodes
+  SWAP4
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x02bf
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  STOP
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLVALUE
+ opcodes
+  DUP1
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x015d
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x0166
+ opcodes
+  PUSH2 0x0395
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  DUP3
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  RETURN
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLVALUE
+ opcodes
+  DUP1
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x01b4
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x01f7
+ opcodes
+  PUSH1 0x04
+ opcodes
+  DUP1
+ opcodes
+  CALLDATASIZE
+ opcodes
+  SUB
+ opcodes
+  PUSH1 0x20
+ opcodes
+  DUP2
+ opcodes
+  LT
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x01cb
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP2
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  CALLDATALOAD
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  SWAP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP1
+ opcodes
+  SWAP3
+ opcodes
+  SWAP2
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x03ed
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  STOP
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLVALUE
+ opcodes
+  DUP1
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x0205
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x020e
+ opcodes
+  PUSH2 0x0566
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  DUP3
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  RETURN
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0258
+ opcodes
+  PUSH2 0x05d1
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0268
+ opcodes
+  PUSH2 0x0263
+ opcodes
+  PUSH2 0x0667
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0698
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0272
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x02b3
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x02ae
+ opcodes
+  DUP2
+ opcodes
+  PUSH2 0x06ef
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x02bc
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x02bb
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x02c7
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x0387
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x0303
+ opcodes
+  DUP4
+ opcodes
+  PUSH2 0x06ef
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP4
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP4
+ opcodes
+  DUP4
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  DUP4
+ opcodes
+  DUP4
+ opcodes
+  DUP1
+ opcodes
+  DUP3
+ opcodes
+  DUP5
+ opcodes
+  CALLDATACOPY
+ opcodes
+  DUP1
+ opcodes
+  DUP4
+ opcodes
+  ADD
+ opcodes
+  SWAP3
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  SWAP3
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  DUP4
+ opcodes
+  SUB
+ opcodes
+  DUP2
+ opcodes
+  DUP6
+ opcodes
+  GAS
+ opcodes
+  DELEGATECALL
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  DUP1
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP2
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x036e
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x1f
+ opcodes
+  NOT
+ opcodes
+  PUSH1 0x3f
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  ADD
+ opcodes
+  AND
+ opcodes
+  DUP3
+ opcodes
+  ADD
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MSTORE
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  DUP3
+ opcodes
+  MSTORE
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH1 0x20
+ opcodes
+  DUP5
+ opcodes
+  ADD
+ opcodes
+  RETURNDATACOPY
+ opcodes
+  PUSH2 0x0373
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x60
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  DUP1
+ opcodes
+  PUSH2 0x0381
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x0390
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x038f
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH2 0x039f
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x03e1
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x03da
+ opcodes
+  PUSH2 0x0667
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x03ea
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x03e9
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMPDEST
+ opcodes
+  SWAP1
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x03f5
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x055a
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP2
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x04ae
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  PUSH32 0x08c379a000000000000000000000000000000000000000000000000000000000
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x04
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP3
+ opcodes
+  DUP2
+ opcodes
+  SUB
+ opcodes
+  DUP3
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x36
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  PUSH2 0x082f
+ opcodes
+  PUSH1 0x36
+ opcodes
+  SWAP2
+ opcodes
+  CODECOPY
+ opcodes
+  PUSH1 0x40
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH32 0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f
+ opcodes
+  PUSH2 0x04d7
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP3
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  DUP4
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP3
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  SWAP3
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  LOG1
+ opcodes
+  PUSH2 0x0555
+ opcodes
+  DUP2
+ opcodes
+  PUSH2 0x073e
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0563
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0562
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMPDEST
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH2 0x0570
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x05b2
+ opcodes
+  JUMPI
+ opcodes
+  PUSH2 0x05ab
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  PUSH2 0x05bb
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x05ba
+ opcodes
+  PUSH2 0x0250
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMPDEST
+ opcodes
+  SWAP1
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  DUP3
+ opcodes
+  EXTCODESIZE
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP2
+ opcodes
+  GT
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  SWAP2
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x05d9
+ opcodes
+  PUSH2 0x06be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  CALLER
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  EQ
+ opcodes
+  ISZERO
+ opcodes
+  PUSH2 0x065d
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  PUSH32 0x08c379a000000000000000000000000000000000000000000000000000000000
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x04
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP3
+ opcodes
+  DUP2
+ opcodes
+  SUB
+ opcodes
+  DUP3
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x32
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  PUSH2 0x07fd
+ opcodes
+  PUSH1 0x32
+ opcodes
+  SWAP2
+ opcodes
+  CODECOPY
+ opcodes
+  PUSH1 0x40
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0665
+ opcodes
+  PUSH2 0x076d
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  PUSH32 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+ opcodes
+  PUSH1 0x00
+ opcodes
+  SHL
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  DUP1
+ opcodes
+  SLOAD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  SWAP1
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  CALLDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  CALLDATACOPY
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  CALLDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP5
+ opcodes
+  GAS
+ opcodes
+  DELEGATECALL
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  RETURNDATACOPY
+ opcodes
+  DUP1
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP2
+ opcodes
+  EQ
+ opcodes
+  PUSH2 0x06b9
+ opcodes
+  JUMPI
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  RETURN
+ opcodes
+  JUMPDEST
+ opcodes
+  RETURNDATASIZE
+ opcodes
+  PUSH1 0x00
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  DUP1
+ opcodes
+  PUSH32 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
+ opcodes
+  PUSH1 0x00
+ opcodes
+  SHL
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  DUP1
+ opcodes
+  SLOAD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  SWAP1
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x06f8
+ opcodes
+  DUP2
+ opcodes
+  PUSH2 0x076f
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  DUP1
+ opcodes
+  PUSH20 0xffffffffffffffffffffffffffffffffffffffff
+ opcodes
+  AND
+ opcodes
+  PUSH32 0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  LOG2
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH32 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
+ opcodes
+  PUSH1 0x00
+ opcodes
+  SHL
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  DUP2
+ opcodes
+  DUP2
+ opcodes
+  SSTORE
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x0778
+ opcodes
+  DUP2
+ opcodes
+  PUSH2 0x05be
+ opcodes
+  JUMP
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH2 0x07cd
+ opcodes
+  JUMPI
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  PUSH32 0x08c379a000000000000000000000000000000000000000000000000000000000
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x04
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  DUP1
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP3
+ opcodes
+  DUP2
+ opcodes
+  SUB
+ opcodes
+  DUP3
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x3b
+ opcodes
+  DUP2
+ opcodes
+  MSTORE
+ opcodes
+  PUSH1 0x20
+ opcodes
+  ADD
+ opcodes
+  DUP1
+ opcodes
+  PUSH2 0x0865
+ opcodes
+  PUSH1 0x3b
+ opcodes
+  SWAP2
+ opcodes
+  CODECOPY
+ opcodes
+  PUSH1 0x40
+ opcodes
+  ADD
+ opcodes
+  SWAP2
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  PUSH1 0x40
+ opcodes
+  MLOAD
+ opcodes
+  DUP1
+ opcodes
+  SWAP2
+ opcodes
+  SUB
+ opcodes
+  SWAP1
+ opcodes
+  REVERT
+ opcodes
+  JUMPDEST
+ opcodes
+  PUSH1 0x00
+ opcodes
+  PUSH32 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+ opcodes
+  PUSH1 0x00
+ opcodes
+  SHL
+ opcodes
+  SWAP1
+ opcodes
+  POP
+ opcodes
+  DUP2
+ opcodes
+  DUP2
+ opcodes
+  SSTORE
+ opcodes
+  POP
+ opcodes
+  POP
+ opcodes
+  JUMP
+ opcodes
+  'fe'(Unknown Opcode)
+ opcodes
+  NUMBER
+ opcodes
+  PUSH2 0x6e6e
+ opcodes
+  PUSH16 0x742063616c6c2066616c6c6261636b20
+ opcodes
+  PUSH7 0x756e6374696f6e
+ opcodes
+  SHA3
+ opcodes
+  PUSH7 0x726f6d20746865
+ opcodes
+  SHA3
+ opcodes
+  PUSH17 0x726f78792061646d696e43616e6e6f7420
+ opcodes
+  PUSH4 0x68616e67
+ opcodes
+  PUSH6 0x207468652061
+ opcodes
+  PUSH5 0x6d696e206f
+ opcodes
+  PUSH7 0x20612070726f78
+ opcodes
+  PUSH26 0x20746f20746865207a65726f206164647265737343616e6e6f74
+ opcodes
+  SHA3
+ opcodes
+  PUSH20 0x657420612070726f787920696d706c656d656e74
+ opcodes
+  PUSH2 0x7469
+ opcodes
+  PUSH16 0x6e20746f2061206e6f6e2d636f6e7472
+ opcodes
+  PUSH2 0x6374
+ opcodes
+  SHA3
+ opcodes
+  PUSH2 0x6464
+ <EOF>

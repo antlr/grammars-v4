@@ -1,0 +1,25 @@
+start_
+ item
+  rule_
+   start
+   rule_params
+   :
+   expansions
+    alias
+     expansion
+      expr
+       atom
+        value
+         name
+          rule_to_import
+ item
+  statement
+   %import
+   import_path
+    .
+    name
+     test_relative_import_of_nested_grammar__grammar_to_import
+    .
+    name
+     rule_to_import
+ <EOF>

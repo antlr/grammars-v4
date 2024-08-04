@@ -1,0 +1,10 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     character
+      \
+      c
+      0
+ <EOF>

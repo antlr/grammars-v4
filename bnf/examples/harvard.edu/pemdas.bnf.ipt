@@ -1,0 +1,216 @@
+start_
+ prods
+  prod
+   xlhs
+    expr
+   assign
+    ws
+        
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      factor
+     xelem
+      ws
+       \n
+              
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      expr
+     xelem
+      ws
+        
+      "
+      +
+      "
+     xelem
+      ws
+        
+      factor
+  \n
+  prod
+   xlhs
+    factor
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      number
+     xelem
+      ws
+       \n
+              
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      factor
+     xelem
+      ws
+        
+      "
+      *
+      "
+     xelem
+      ws
+        
+      number
+  \n
+  prod
+   xlhs
+    number
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      digit
+     xelem
+      ws
+       \n
+              
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      number
+     xelem
+      ws
+        
+      digit
+  \n
+  prod
+   xlhs
+    digit
+   assign
+    ws
+       
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      0
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      1
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      2
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      3
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      4
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      5
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      6
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      7
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      8
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      9
+      "
+ <EOF>

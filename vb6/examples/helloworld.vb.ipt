@@ -1,0 +1,162 @@
+startRule
+ module
+  moduleBody
+   moduleBodyElement
+    subStmt
+     visibility
+      Private
+      
+     Sub
+      
+     ambiguousIdentifier
+      cmdClear_Click
+     argList
+      (
+      )
+     \n    
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_MembersCall
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            txtHello
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             ambiguousKeyword
+              Text
+         
+        =
+         
+        valueStmt
+         literal
+          ""
+     \n
+     End Sub
+   \n 
+   \n
+   moduleBodyElement
+    subStmt
+     visibility
+      Private
+      
+     Sub
+      
+     ambiguousIdentifier
+      cmdExit_Click
+     argList
+      (
+      )
+     \n    
+     block
+      blockStmt
+       endStmt
+        End
+     \n
+     End Sub
+   \n 
+   \n
+   moduleBodyElement
+    subStmt
+     visibility
+      Private
+      
+     Sub
+      
+     ambiguousIdentifier
+      cmdHello_Click
+     argList
+      (
+      )
+     \n    
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_MembersCall
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            txtHello
+          iCS_S_MemberCall
+           .
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             ambiguousKeyword
+              Text
+         
+        =
+         
+        valueStmt
+         literal
+          "Hello World!"
+      \n    
+      blockStmt
+       withStmt
+        With
+         
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           txtHello
+        \n        
+        block
+         blockStmt
+          letStmt
+           implicitCallStmt_InStmt
+            iCS_S_MembersCall
+             iCS_S_MemberCall
+              .
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                Font
+            
+           =
+            
+           valueStmt
+            literal
+             "Arial"
+         \n        
+         blockStmt
+          letStmt
+           implicitCallStmt_InStmt
+            iCS_S_MembersCall
+             iCS_S_MemberCall
+              .
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                FontSize
+            
+           =
+            
+           valueStmt
+            literal
+             integerLiteral
+              16
+         \n        
+         blockStmt
+          letStmt
+           implicitCallStmt_InStmt
+            iCS_S_MembersCall
+             iCS_S_MemberCall
+              .
+              iCS_S_VariableOrProcedureCall
+               ambiguousIdentifier
+                ForeColor
+            
+           =
+            
+           valueStmt
+            implicitCallStmt_InStmt
+             iCS_S_VariableOrProcedureCall
+              ambiguousIdentifier
+               vbBlue
+        \n    
+        End With
+     \n
+     End Sub
+  \n
+  \n
+ <EOF>

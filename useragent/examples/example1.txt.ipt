@@ -1,0 +1,30 @@
+prog
+ product
+  name
+   Mozilla
+  /
+  version
+   5
+   .
+   0
+ comment
+  (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us)
+ product
+  name
+   AppleWebKit
+  /
+  version
+   531
+   .
+   21
+   .
+   10
+ comment
+  (KHTML, like Gecko)
+ product
+  name
+   Mobile
+  /
+  version
+   7B405
+ <EOF>

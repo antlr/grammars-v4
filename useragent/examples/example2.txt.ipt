@@ -1,0 +1,12 @@
+prog
+ product
+  name
+   Googlebot
+  /
+  version
+   2
+   .
+   1
+ comment
+  (+http://www.google.com/bot.html)
+ <EOF>

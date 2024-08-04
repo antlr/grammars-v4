@@ -1,0 +1,27 @@
+program
+ decl
+  def_
+   pat
+    pat1
+     pat2
+      patprimaryname
+       var_
+        power
+      patprimary
+       patprimaryname
+        var_
+         x
+      patprimary
+       patprimaryname
+        var_
+         n
+   =
+   rhs
+    term
+     term1
+      term2
+       primary
+        fliteral
+         literal
+          1
+ <EOF>

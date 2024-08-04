@@ -1,0 +1,20 @@
+script
+ sequence
+  ws
+    
+  statements
+   expressions
+    expression
+     binarySend
+      unarySend
+       operand
+        literal
+         parsetimeLiteral
+          string
+           'Hello World!'
+       ws
+        \n
+         
+        \n
+        \n
+ <EOF>

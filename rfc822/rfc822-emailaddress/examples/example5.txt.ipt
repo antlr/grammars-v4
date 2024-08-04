@@ -1,0 +1,27 @@
+emailaddress
+ mailbox
+  addrspec
+   localpart
+    word
+     atom
+      x
+   @
+   domain
+    subdomain
+     domainref
+      atom
+       e
+       x
+       a
+       m
+       p
+       l
+       e
+    .
+    subdomain
+     domainref
+      atom
+       c
+       o
+       m
+ <EOF>

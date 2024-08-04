@@ -1,0 +1,202 @@
+stylesheet
+ ws
+ nestedStatement
+  fontFeatureValuesRule
+   @font-feature-values
+   ws
+     
+   fontFamilyNameList
+    fontFamilyName
+     ident
+      Font
+     ws
+       
+     ident
+      One
+   ws
+     
+   {
+   ws
+     
+    /* How to activate nice-style in Font One */
+    \n  
+   featureValueBlock
+    featureType
+     @styleset
+    ws
+      
+    {
+    ws
+     \n    
+    featureValueDefinition
+     ident
+      nice-style
+     ws
+     :
+     ws
+       
+     number
+      12
+    ws
+    ;
+    ws
+     \n  
+    }
+    ws
+     \n
+   }
+   ws
+    \n \n
+ nestedStatement
+  fontFeatureValuesRule
+   @font-feature-values
+   ws
+     
+   fontFamilyNameList
+    fontFamilyName
+     ident
+      Font
+     ws
+       
+     ident
+      Two
+   ws
+     
+   {
+   ws
+     
+    /* How to activate nice-style in Font Two */
+    \n  
+   featureValueBlock
+    featureType
+     @styleset
+    ws
+      
+    {
+    ws
+     \n    
+    featureValueDefinition
+     ident
+      nice-style
+     ws
+     :
+     ws
+       
+     number
+      4
+    ws
+    ;
+    ws
+     \n  
+    }
+    ws
+     \n
+   }
+   ws
+     \n\n
+ nestedStatement
+  ruleset
+   selectorGroup
+    selector
+     simpleSelectorSequence
+      className
+       .
+       ident
+        nice-look
+     ws
+       
+   {
+   ws
+     
+   declarationList
+    declaration
+     property_
+      ident
+       font-variant-alternates
+      ws
+     :
+     ws
+       
+     expr
+      term
+       function_
+        styleset(
+        ws
+        expr
+         term
+          ident
+           nice-style
+          ws
+        )
+        ws
+    ws
+    ;
+    ws
+      
+   }
+   ws
+     
+    /* Independent of the font */
+    \n\n
+ nestedStatement
+  media
+   @media
+   ws
+     
+   mediaQueryList
+    mediaQuery
+     ws
+     mediaType
+      ident
+       print
+     ws
+       
+    ws
+   groupRuleBody
+    {
+    ws
+     \n  
+    nestedStatement
+     fontFeatureValuesRule
+      @font-feature-values
+      ws
+        
+      fontFamilyNameList
+       fontFamilyName
+        'Font Three'
+      ws
+        
+      {
+      ws
+       \n    
+      featureValueBlock
+       featureType
+        @styleset
+       ws
+         
+       {
+       ws
+        \n      
+       featureValueDefinition
+        ident
+         nice-style
+        ws
+        :
+        ws
+          
+        number
+         4
+       ws
+       ;
+       ws
+        \n    
+       }
+       ws
+        \n  
+      }
+      ws
+        \n
+    }
+    ws
+   ws
+ <EOF>

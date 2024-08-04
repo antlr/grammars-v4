@@ -1,0 +1,23 @@
+file_
+ program
+  progmodule
+   routinelist
+    routine
+     procroutine
+      procdecl
+       PROC
+       hello
+       (
+       )
+      stmtlist
+       stmt
+        simpstmt
+         routinecall
+          PrintE
+          (
+          params
+           param
+            "Hello World"
+          )
+      RETURN
+ <EOF>

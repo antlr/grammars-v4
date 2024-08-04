@@ -1,0 +1,13 @@
+document
+ line
+  markup
+   italics
+    /
+    /
+    markup
+     text_
+      italics
+    /
+    /
+ \n
+ <EOF>

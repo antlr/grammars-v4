@@ -1,0 +1,20 @@
+parse
+ block
+  expression
+   :atom
+  eoe
+   \n
+   \n
+  expression
+   :+
+  eoe
+   \n
+   \n
+  expression
+   :'mu'
+  eoe
+   \n
+   \n
+  expression
+   :"foo"
+ <EOF>

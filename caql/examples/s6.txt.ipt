@@ -1,0 +1,18 @@
+start_
+ expression
+  vectorOperation
+   name
+    find
+   (
+   "count"
+   ,
+   "and(service:www,code:200)"
+   )
+   metricsAggregation
+    |
+    name
+     stats:sum
+    parameterList
+     (
+     )
+ <EOF>

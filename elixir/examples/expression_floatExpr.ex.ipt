@@ -1,0 +1,25 @@
+parse
+ block
+  expression
+   1.2
+  eoe
+   \n
+   \n
+  expression
+   3333333.444e10
+  eoe
+   \n
+   \n
+  expression
+   3333333.444E10
+  eoe
+   \n
+   \n
+  expression
+   10.0E-10
+  eoe
+   \n
+   \n
+  expression
+   10.0e+10
+ <EOF>

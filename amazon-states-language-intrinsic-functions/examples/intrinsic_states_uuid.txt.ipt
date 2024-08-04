@@ -1,0 +1,10 @@
+intrinsic_function
+ states_func_decl
+  States
+  .
+  state_fun_name
+   UUID
+  func_arg_list
+   (
+   )
+ <EOF>

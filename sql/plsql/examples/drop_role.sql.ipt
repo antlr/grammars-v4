@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_role
+   drop
+   role
+   role_name
+    id_expression
+     regular_id
+      TEST_ROLE_AAA
+ ;
+ <EOF>

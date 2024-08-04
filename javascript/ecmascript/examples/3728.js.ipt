@@ -1,0 +1,15 @@
+program
+ sourceElements
+  sourceElement
+   statement
+    expressionStatement
+     expressionSequence
+      singleExpression
+       (
+       expressionSequence
+        singleExpression
+         ||
+       <missing ')'>
+     eos
+      <EOF>
+ <EOF>

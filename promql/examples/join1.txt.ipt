@@ -1,0 +1,13 @@
+expression
+ vectorOperation
+  vectorOperation
+   vector
+    instantSelector
+     container_cpu_usage_seconds_total
+  multOp
+   *
+  vectorOperation
+   vector
+    instantSelector
+     kube_pod_info
+ <EOF>

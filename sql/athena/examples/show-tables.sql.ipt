@@ -1,0 +1,11 @@
+stmt
+ command
+  ddl_command
+   show_tables
+    show
+    tables
+    in
+    database_name
+     id_
+      db
+ <EOF>

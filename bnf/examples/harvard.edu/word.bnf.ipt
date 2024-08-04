@@ -1,0 +1,330 @@
+start_
+ prods
+  prod
+   xlhs
+    word
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      letter
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      word
+     xelem
+      ws
+        
+      letter
+  \n
+  prod
+   xlhs
+    letter
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      a
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      b
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      c
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      d
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      e
+      "
+     xelem
+      ws
+       \n
+      \t
+    or
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      f
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      g
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      h
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      i
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      j
+      "
+     xelem
+      ws
+       \n
+      \t
+    or
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      k
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      l
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      m
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      n
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      o
+      "
+     xelem
+      ws
+       \n
+      \t
+    or
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      p
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      q
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      r
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      s
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      t
+      "
+     xelem
+      ws
+       \n
+      \t
+    or
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      u
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      v
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      w
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      x
+      "
+    or
+     ws
+       
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      y
+      "
+     xelem
+      ws
+       \n
+      \t
+    or
+     |
+    xalt
+     xelem
+      ws
+        
+      "
+      z
+      "
+ <EOF>

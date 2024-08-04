@@ -1,0 +1,27 @@
+file_
+ local
+  locals
+  blockbody
+   {
+   argument
+    identifier
+     identifierchain
+      a
+    =
+    expression
+     section
+      val
+       string
+        "test"
+   argument
+    identifier
+     identifierchain
+      b
+    =
+    expression
+     section
+      val
+       string
+        "\"test\""
+   }
+ <EOF>

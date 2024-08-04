@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_outline
+   DROP
+   OUTLINE
+   id_expression
+    regular_id
+     salaries
+ ;
+ <EOF>

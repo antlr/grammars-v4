@@ -201,9 +201,9 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         result = "success"
     }
     if show_tree {
-        ss := tree.ToStringTree(parser.RuleNames, parser)
+        ss := MyToStringTree(tree, 0, parser.RuleNames)
         if tee {
-            f, _ := os.Create(input_name + ".tree")
+            f, _ := os.Create(input_name + ".ipt")
             f.Write([]byte(ss))
             f.Close()
         } else {
@@ -222,4 +222,21 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         fmt.Fprintf(os.Stderr, "%.3f", elapsed.Seconds())
         fmt.Fprintln(os.Stderr)
     }
+}
+
+func MyToStringTree(tree antlr.Tree, indent int, ruleNames []string) string {
+	s := antlr.TreesGetNodeText(tree, ruleNames, nil)
+	s = antlr.EscapeWhitespace(s, false)
+	c := tree.GetChildCount()
+	res := ""
+        for i := 0; i \< indent; i = i + 1 {
+                res += " "
+        }
+	res += s
+	res += "\n"
+	for i := 0; i \< c; i++ {
+		s = MyToStringTree(tree.GetChild(i), indent+1, ruleNames)
+		res += s
+	}
+	return res
 }

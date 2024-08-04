@@ -1,0 +1,36 @@
+source_text
+ description
+  module_declaration
+   module_header
+    module_keyword
+     module
+    module_identifier
+     identifier
+      simple_identifier
+       top
+    ;
+   module_item
+    module_common_item
+     initial_construct
+      initial
+      statement_or_null
+       statement
+        statement_item
+         subroutine_call_statement
+          subroutine_call
+           system_tf_call
+            system_tf_identifier
+             $system
+            arg_list
+             (
+             list_of_arguments
+              ordered_arg
+               expression
+                primary
+                 primary_literal
+                  string_literal
+                   "mv design.v adder.v"
+             )
+          ;
+   endmodule
+ <EOF>

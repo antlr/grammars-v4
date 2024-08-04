@@ -1,0 +1,47 @@
+parse
+ statements
+  singleStatement
+   statement
+    ALTER
+    SCHEMA
+    qualifiedName
+     identifier
+      foo
+    RENAME
+    TO
+    identifier
+     bar
+   ;
+ statements
+  singleStatement
+   statement
+    ALTER
+    SCHEMA
+    qualifiedName
+     identifier
+      foo
+     .
+     identifier
+      bar
+    RENAME
+    TO
+    identifier
+     baz
+   ;
+ statements
+  singleStatement
+   statement
+    ALTER
+    SCHEMA
+    qualifiedName
+     identifier
+      "awesome schema"
+     .
+     identifier
+      "awesome table"
+    RENAME
+    TO
+    identifier
+     "even more awesome table"
+   ;
+ <EOF>

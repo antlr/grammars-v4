@@ -1,0 +1,21 @@
+main
+ expr
+  orExpr
+   andExpr
+    equalityExpr
+     relationalExpr
+      additiveExpr
+       multiplicativeExpr
+        unaryExprNoRoot
+         unionExprNoRoot
+          pathExprNoRoot
+           locationPath
+            relativeLocationPath
+             step
+              axisSpecifier
+              nodeTest
+               nameTest
+                qName
+                 nCName
+                  and
+ <EOF>

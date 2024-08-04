@@ -1,0 +1,17 @@
+sql_script
+ unit_statement
+  alter_function
+   ALTER
+   FUNCTION
+   function_name
+    identifier
+     id_expression
+      regular_id
+       my_schema
+    .
+    id_expression
+     regular_id
+      my_fun
+   EDITIONABLE
+ ;
+ <EOF>

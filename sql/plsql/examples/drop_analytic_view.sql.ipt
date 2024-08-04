@@ -1,0 +1,26 @@
+sql_script
+ unit_statement
+  drop_analytic_view
+   DROP
+   ANALYTIC
+   VIEW
+   id_expression
+    regular_id
+     sales_av
+ ;
+ unit_statement
+  drop_analytic_view
+   DROP
+   ANALYTIC
+   VIEW
+   schema_name
+    identifier
+     id_expression
+      regular_id
+       sch
+   .
+   id_expression
+    regular_id
+     sales_av
+ ;
+ <EOF>

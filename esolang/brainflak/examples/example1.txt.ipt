@@ -1,0 +1,14 @@
+file_
+ statement
+  parenstmt
+   (
+   )
+ statement
+  parenstmt
+   (
+   )
+ statement
+  bracestmt
+   {
+   }
+ <EOF>

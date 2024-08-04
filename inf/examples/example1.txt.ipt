@@ -1,0 +1,18 @@
+inf
+ section
+  sectionheader
+   [
+   string
+    autorun
+   ]
+   \n
+  line
+   stringlist
+    string
+     open
+   =
+   stringlist
+    string
+     example.exe
+   \n
+ <EOF>

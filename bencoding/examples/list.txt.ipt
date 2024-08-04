@@ -1,0 +1,23 @@
+data
+ values
+  value
+   list
+    l
+    values
+     value
+      integer
+       i
+       1
+       e
+     value
+      integer
+       i
+       2
+       e
+     value
+      integer
+       i
+       3
+       e
+    e
+ <EOF>

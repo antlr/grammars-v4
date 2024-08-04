@@ -1,0 +1,12 @@
+expression
+ signedAtom
+  variable
+   a
+ term
+  signedAtom
+   scientific
+    4
+ term
+  oper
+   *
+ <EOF>

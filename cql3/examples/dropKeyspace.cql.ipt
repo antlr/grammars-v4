@@ -1,0 +1,13 @@
+root
+ cqls
+  cql
+   dropKeyspace
+    kwDrop
+     DROP
+    kwKeyspace
+     KEYSPACE
+    keyspace
+     cycling
+  statementSeparator
+   ;
+ <EOF>

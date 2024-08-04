@@ -1,0 +1,16 @@
+equation
+ expression
+  ~
+  expression
+   atom
+    number
+     S
+     0
+ =
+ expression
+  atom
+   number
+    S
+    S
+    0
+ <EOF>

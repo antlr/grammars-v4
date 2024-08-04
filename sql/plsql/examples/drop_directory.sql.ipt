@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_directory
+   DROP
+   DIRECTORY
+   id_expression
+    regular_id
+     bfile_dir
+ ;
+ <EOF>

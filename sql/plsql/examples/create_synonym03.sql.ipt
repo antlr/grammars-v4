@@ -1,0 +1,19 @@
+sql_script
+ unit_statement
+  create_synonym
+   create
+   or
+   replace
+   public
+   synonym
+   synonym_name
+    identifier
+     id_expression
+      regular_id
+       depts
+   for
+   schema_object_name
+    id_expression
+     regular_id
+      departments
+ <EOF>

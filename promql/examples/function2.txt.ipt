@@ -1,0 +1,22 @@
+expression
+ vectorOperation
+  vector
+   function_
+    sin
+    (
+    parameter
+     vectorOperation
+      vector
+       function_
+        rate
+        (
+        parameter
+         vectorOperation
+          vector
+           matrixSelector
+            instantSelector
+             http_requests_total
+            [5m]
+        )
+    )
+ <EOF>

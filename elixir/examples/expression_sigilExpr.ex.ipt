@@ -1,0 +1,100 @@
+parse
+ block
+  expression
+   ~r/hello/imsx
+  eoe
+   \n
+   \n
+  expression
+   ~r|hello|
+  eoe
+   \n
+   \n
+  expression
+   ~r"hello"
+  eoe
+   \n
+   \n
+  expression
+   ~r'hello'
+  eoe
+   \n
+   \n
+  expression
+   ~r(hello)
+  eoe
+   \n
+   \n
+  expression
+   ~r[hello]
+  eoe
+   \n
+   \n
+  expression
+   ~r{hello}
+  eoe
+   \n
+   \n
+  expression
+   ~r<hello>
+  eoe
+   \n
+   \n
+  expression
+   ~w(foo bar bat)
+  eoe
+   \n
+   \n
+  expression
+   ~w(foo bar bat)a
+  eoe
+   \n
+   \n
+  expression
+   ~w(foo bar b\)at)acs
+  eoe
+   \n
+   \n
+  expression
+   ~s(this is a string with "double" quotes, not 'single' ones)
+  eoe
+   \n
+   \n
+  expression
+   ~s(String with escape codes \x26 #{"inter" <> "polation"})
+  eoe
+   \n
+   \n
+  expression
+   ~S(String without escape codes \x26 without #{interpolation})
+  eoe
+   \n
+   \n
+  expression
+   ~S"""\nConverts double-quotes to single-quotes.\n## Examples\n    iex> convert("\"foo\"")\n    "'foo'"\n"""
+  eoe
+   \n
+   \n
+  expression
+   ~s/ab \u{1F600} cd/
+  eoe
+   \n
+   \n
+  expression
+   ~c(this is a char list containing "double quotes")
+  eoe
+   \n
+   \n
+  expression
+   ~D[2019-10-31]
+  eoe
+   \n
+   \n
+  expression
+   ~T[23:00:07.0]
+  eoe
+   \n
+   \n
+  expression
+   ~i(42)n
+ <EOF>

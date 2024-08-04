@@ -1,0 +1,15 @@
+sql_script
+ unit_statement
+  alter_tablespace_set
+   ALTER
+   TABLESPACE
+   SET
+   id_expression
+    regular_id
+     ts1
+   alter_tablespace_attrs
+    tablespace_logging_clauses
+     FORCE
+     LOGGING
+ ;
+ <EOF>

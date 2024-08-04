@@ -1,0 +1,27 @@
+script
+ query
+  regularQuery
+   singleQuery
+    singlePartQ
+     returnSt
+      RETURN
+      projectionBody
+       projectionItems
+        projectionItem
+         expression
+          xorExpression
+           andExpression
+            notExpression
+             comparisonExpression
+              addSubExpression
+               multDivExpression
+                powerExpression
+                 unaryAddSubExpression
+                  atomicExpression
+                   propertyOrLabelExpression
+                    propertyExpression
+                     atom
+                      literal
+                       numLit
+                        -1.5e10
+ <EOF>

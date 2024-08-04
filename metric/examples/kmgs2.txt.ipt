@@ -1,0 +1,22 @@
+file_
+ uom
+  measure
+   prefix_
+    k
+   unit
+    baseunit
+     g
+  *
+  measure
+   unit
+    baseunit
+     m
+  /
+  measure
+   unit
+    baseunit
+     s
+   exponent
+    ^
+    2
+ <EOF>

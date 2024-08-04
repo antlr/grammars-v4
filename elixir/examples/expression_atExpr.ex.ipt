@@ -1,0 +1,9 @@
+parse
+ block
+  expression
+   @
+   expression
+    variables
+     variable
+      foo
+ <EOF>

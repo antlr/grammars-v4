@@ -1,0 +1,24 @@
+parse
+ block
+  expression
+   expression
+    variables
+     variable
+      a
+   mulOp
+    *
+   expression
+    variables
+     variable
+      b
+  eoe
+   \n
+   \n
+  expression
+   expression
+    9
+   mulOp
+    /
+   expression
+    3.0
+ <EOF>

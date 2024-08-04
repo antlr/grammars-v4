@@ -1,0 +1,15 @@
+expression
+ vectorOperation
+  vector
+   function_
+    last_over_time
+    (
+    parameter
+     vectorOperation
+      vector
+       matrixSelector
+        instantSelector
+         container_cpu_usage_seconds_total
+        [1m]
+    )
+ <EOF>

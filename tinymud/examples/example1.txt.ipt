@@ -1,0 +1,43 @@
+prog
+ line
+  command
+   describecommand
+    @desc
+    object_
+     me
+    =
+    description
+     Igor is a ferret with an evil glint in his eye.
+  \n
+ line
+  command
+   lockcommand
+    @lock
+    object_
+     me
+    =
+    key
+     me
+  \n
+ line
+  command
+   failcommand
+    @fail
+    name
+     me
+    =
+    description
+     Igor chomps you on the knee with his little sharp teeth.
+  \n
+ line
+  command
+   ofailcommand
+    @ofail
+    object_
+     me
+    =
+    message
+     howls in pain as Igor bites them.
+  \n
+ \n
+ <EOF>

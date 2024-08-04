@@ -1,0 +1,14 @@
+expression
+ vectorOperation
+  vector
+   instantSelector
+    {
+    labelMatcherList
+     labelMatcher
+      labelName
+       __name__
+      labelMatcherOperator
+       =
+      'container_cpu_usage_seconds_total'
+    }
+ <EOF>

@@ -1,0 +1,18 @@
+iso
+ recurring
+  recurringBasic
+   recurringCount
+    R
+    int_
+     8
+   /
+   durationBasic
+    intervalBasic
+     intervalT
+      P
+      T
+      dec
+       7
+       2
+      H
+ <EOF>

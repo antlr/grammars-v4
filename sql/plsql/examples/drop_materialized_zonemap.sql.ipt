@@ -1,0 +1,13 @@
+sql_script
+ unit_statement
+  drop_materialized_zonemap
+   DROP
+   MATERIALIZED
+   ZONEMAP
+   zonemap_name
+    identifier
+     id_expression
+      regular_id
+       sales_zmap
+ ;
+ <EOF>

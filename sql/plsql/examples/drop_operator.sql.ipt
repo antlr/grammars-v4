@@ -1,0 +1,12 @@
+sql_script
+ unit_statement
+  drop_operator
+   DROP
+   OPERATOR
+   operator_name
+    identifier
+     id_expression
+      regular_id
+       eq_op
+ ;
+ <EOF>

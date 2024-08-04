@@ -1,0 +1,9 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       \(1\+1\)\:2
+ <EOF>

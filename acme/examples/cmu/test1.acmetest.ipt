@@ -1,0 +1,18 @@
+acmeCompUnit
+ acmeFamilyDeclaration
+  Family
+  identifier
+   foo
+  =
+  acmeFamilyBody
+   {
+   }
+ acmeSystemDeclaration
+  System
+  identifier
+   soo
+  =
+  acmeSystemBody
+   {
+   }
+ <EOF>

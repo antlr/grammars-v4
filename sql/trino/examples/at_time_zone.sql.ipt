@@ -1,0 +1,30 @@
+parse
+ statements
+  singleStatement
+   statement
+    rootQuery
+     query
+      queryNoWith
+       queryTerm
+        queryPrimary
+         querySpecification
+          SELECT
+          selectItem
+           expression
+            booleanExpression
+             valueExpression
+              valueExpression
+               primaryExpression
+                identifier
+                 nonReserved
+                  timestamp
+                string_
+                 '2012-10-31 01:00 UTC'
+              AT
+              timeZoneSpecifier
+               TIME
+               ZONE
+               string_
+                'America/Los_Angeles'
+   ;
+ <EOF>

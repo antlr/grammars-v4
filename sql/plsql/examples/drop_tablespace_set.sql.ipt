@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_tablespace_set
+   DROP
+   TABLESPACE
+   SET
+   id_expression
+    regular_id
+     ts1
+ ;
+ <EOF>

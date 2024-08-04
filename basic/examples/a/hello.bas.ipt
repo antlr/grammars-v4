@@ -1,0 +1,13 @@
+prog
+ line
+  linenumber
+   100
+  amprstmt
+   statement
+    printstmt1
+     PRINT
+     printlist
+      expression
+       func_
+        "Hello world"
+ <EOF>

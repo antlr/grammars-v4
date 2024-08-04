@@ -1,0 +1,17 @@
+file_
+ atom
+  command
+   uni_start_stream
+ atom
+  command
+   sm_send_token_raw
+  arglist
+   <
+   arg
+    literal
+     "token"
+   >
+ atom
+  command
+   uni_end_stream
+ <EOF>

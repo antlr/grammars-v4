@@ -1,0 +1,42 @@
+prog
+ product
+  name
+   Mozilla
+  /
+  version
+   5
+   .
+   0
+ comment
+  (Windows NT 6.1)
+ product
+  name
+   AppleWebKit
+  /
+  version
+   537
+   .
+   36
+ comment
+  (KHTML, like Gecko)
+ product
+  name
+   Chrome
+  /
+  version
+   41
+   .
+   0
+   .
+   2228
+   .
+   0
+ product
+  name
+   Safari
+  /
+  version
+   537
+   .
+   36
+ <EOF>

@@ -1,0 +1,26 @@
+program
+ sourceElements
+  sourceElement
+   statement
+    classDeclaration
+     class
+     identifier
+      ClassWithoutExplicitStrictMode
+     classTail
+      {
+      classElement
+       identifier
+        static
+       methodDefinition
+        classElementName
+         propertyName
+          identifierName
+           identifier
+            myStaticMethod
+        (
+        )
+        functionBody
+         {
+         }
+      }
+ <EOF>

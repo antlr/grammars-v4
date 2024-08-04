@@ -1,0 +1,46 @@
+prog
+ lin
+  line
+   subject
+    OUTPUT
+   =
+   expression
+    multiplyingExpression
+     powExpression
+      atom
+       "What is your name?"
+  \n
+ lin
+  line
+   subject
+    Username
+   =
+   expression
+    multiplyingExpression
+     powExpression
+      atom
+       subject
+        INPUT
+  \n
+ lin
+  line
+   subject
+    OUTPUT
+   =
+   expression
+    multiplyingExpression
+     powExpression
+      atom
+       "Thank you, "
+   expression
+    multiplyingExpression
+     powExpression
+      atom
+       subject
+        Username
+  \n
+ lin
+  line
+   END
+  \n
+ <EOF>

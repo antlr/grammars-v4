@@ -1,0 +1,23 @@
+root
+ cqls
+  cql
+   listRoles
+    kwList
+     LIST
+    kwRoles
+     ROLES
+  statementSeparator
+   ;
+  cql
+   listRoles
+    kwList
+     LIST
+    kwRoles
+     ROLES
+    kwOf
+     OF
+    role
+     manager
+  statementSeparator
+   ;
+ <EOF>

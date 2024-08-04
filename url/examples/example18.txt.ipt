@@ -1,0 +1,19 @@
+url
+ uri
+  scheme
+   string
+    file
+  ://
+  host
+   hostname
+    string
+     localhost
+  /
+  path
+   string
+    etc
+   /
+   string
+    fstab
+  \n
+ <EOF>

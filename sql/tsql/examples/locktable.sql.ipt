@@ -1,0 +1,16 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    lock_table
+     lock
+     table
+     table_name
+      id_
+       xyz
+     in
+     exclusive
+     mode
+     wait
+     30
+ <EOF>

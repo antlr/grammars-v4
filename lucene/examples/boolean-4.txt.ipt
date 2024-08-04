@@ -1,0 +1,17 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     modifier
+      +
+     clause
+      term
+       jakarta
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       lucene
+ <EOF>

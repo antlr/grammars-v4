@@ -1,0 +1,18 @@
+root
+ cqls
+  cql
+   dropRole
+    kwDrop
+     DROP
+    kwRole
+     ROLE
+    ifExist
+     kwIf
+      IF
+     kwExists
+      EXISTS
+    role
+     team_manager
+  statementSeparator
+   ;
+ <EOF>

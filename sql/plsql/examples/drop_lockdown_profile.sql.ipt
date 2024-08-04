@@ -1,0 +1,11 @@
+sql_script
+ unit_statement
+  drop_lockdown_profile
+   DROP
+   LOCKDOWN
+   PROFILE
+   id_expression
+    regular_id
+     hr_prof
+ ;
+ <EOF>

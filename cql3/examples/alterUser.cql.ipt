@@ -1,0 +1,20 @@
+root
+ cqls
+  cql
+   alterUser
+    kwAlter
+     ALTER
+    kwUser
+     USER
+    user
+     moss
+    kwWith
+     WITH
+    userPassword
+     kwPassword
+      PASSWORD
+     stringLiteral
+      'bestReceiver'
+  statementSeparator
+   ;
+ <EOF>

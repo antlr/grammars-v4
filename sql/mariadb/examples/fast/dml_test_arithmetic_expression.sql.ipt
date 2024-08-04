@@ -1,0 +1,17 @@
+root
+ sqlStatements
+  sqlStatement
+   dmlStatement
+    selectStatement
+     querySpecification
+      select
+      selectElements
+       selectElement
+        expression
+         predicate
+          expressionAtom
+           constant
+            decimalLiteral
+             5
+      fromClause
+ <EOF>

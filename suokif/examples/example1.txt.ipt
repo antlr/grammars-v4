@@ -1,0 +1,13 @@
+top_level
+ sentence
+  relsent
+   (
+   instance
+   argument
+    sentence
+     Cat
+   argument
+    sentence
+     Animal
+   )
+ <EOF>

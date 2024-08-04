@@ -1,0 +1,15 @@
+file_
+ atom
+  command
+   man_start_object
+  arglist
+   <
+   arg
+    literal
+     ind_group
+   ,
+   arg
+    literal
+     "Hello World"
+   >
+ <EOF>

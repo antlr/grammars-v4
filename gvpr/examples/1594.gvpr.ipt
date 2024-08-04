@@ -1,0 +1,17 @@
+preds
+ pred
+  BEGIN
+  {
+  program
+   statement_list
+    statement
+     expr
+      constant
+       0
+   action_list
+    action_
+     label
+      p0p0
+     <missing ':'>
+  }
+ <EOF>

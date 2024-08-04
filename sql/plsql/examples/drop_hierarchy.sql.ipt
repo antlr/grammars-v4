@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_hierarchy
+   DROP
+   HIERARCHY
+   id_expression
+    regular_id
+     product_hier
+ ;
+ <EOF>

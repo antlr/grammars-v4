@@ -1,0 +1,232 @@
+startRule
+ module
+  moduleHeader
+   VERSION
+    
+   doubleLiteral
+    1.0
+    
+   CLASS
+  \n
+  moduleConfig
+   BEGIN
+   \n
+   moduleConfigElement
+    ambiguousIdentifier
+     MultiUse
+     
+    =
+     
+    literal
+     integerLiteral
+      -
+      1
+    \n
+   moduleConfigElement
+    ambiguousIdentifier
+     Persistable
+     
+    =
+     
+    literal
+     integerLiteral
+      0
+    \n
+   moduleConfigElement
+    ambiguousIdentifier
+     DataBindingBehavior
+     
+    =
+     
+    literal
+     integerLiteral
+      0
+    \n
+   moduleConfigElement
+    ambiguousIdentifier
+     DataSourceBehavior
+     
+    =
+     
+    literal
+     integerLiteral
+      0
+    \n
+   moduleConfigElement
+    ambiguousIdentifier
+     MTSTransactionMode
+     
+    =
+     
+    literal
+     integerLiteral
+      0
+    \n
+   END
+   \n
+  moduleAttributes
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Name
+     
+    =
+     
+    literal
+     "ConstDirective"
+   \n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_GlobalNameSpace
+     
+    =
+     
+    literal
+     False
+   \n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Creatable
+     
+    =
+     
+    literal
+     True
+   \n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_PredeclaredId
+     
+    =
+     
+    literal
+     False
+   \n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Exposed
+     
+    =
+     
+    literal
+     True
+   \n
+  moduleBody
+   moduleBodyElement
+    moduleBlock
+     block
+      blockStmt
+       constStmt
+        Const
+         
+        constSubStmt
+         ambiguousIdentifier
+          EvalDirective
+          
+         =
+          
+         valueStmt
+          literal
+           integerLiteral
+            0
+   \n
+   \n
+   moduleBodyElement
+    functionStmt
+     visibility
+      Public
+      
+     Function
+      
+     ambiguousIdentifier
+      EvalConstDirective
+     argList
+      (
+      )
+      
+     asTypeClause
+      As
+       
+      type_
+       baseType
+        Long
+     \n
+     block
+      blockStmt
+       macroIfThenElseStmt
+        macroIfBlockStmt
+         #If
+          
+         ifConditionStmt
+          valueStmt
+           implicitCallStmt_InStmt
+            iCS_S_VariableOrProcedureCall
+             ambiguousIdentifier
+              EvalDirective
+          
+         Then
+         \n
+         moduleBody
+          moduleBodyElement
+           moduleBlock
+            block
+             blockStmt
+              letStmt
+               implicitCallStmt_InStmt
+                iCS_S_VariableOrProcedureCall
+                 ambiguousIdentifier
+                  EvalConstDirective
+                
+               =
+                
+               valueStmt
+                literal
+                 integerLiteral
+                  1
+         \n
+        macroElseBlockStmt
+         #Else
+         \n
+         moduleBody
+          moduleBodyElement
+           moduleBlock
+            block
+             blockStmt
+              letStmt
+               implicitCallStmt_InStmt
+                iCS_S_VariableOrProcedureCall
+                 ambiguousIdentifier
+                  EvalConstDirective
+                
+               =
+                
+               valueStmt
+                literal
+                 integerLiteral
+                  0
+         \n
+        #End If
+     \n
+     End Function
+  \n
+  \n
+ <EOF>

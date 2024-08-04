@@ -1,0 +1,10 @@
+sql_script
+ unit_statement
+  drop_java
+   DROP
+   JAVA
+   CLASS
+   id_expression
+    "Agent"
+ ;
+ <EOF>

@@ -1,0 +1,69 @@
+searchCrit
+ searchExp
+  (
+  searchExp
+   searchExp
+    relExp
+     upnp:class
+      
+     =
+      
+     quotedVal
+      "
+      escapedQuote
+       o
+       b
+       j
+       e
+       c
+       t
+       .
+       c
+       o
+       n
+       t
+       a
+       i
+       n
+       e
+       r
+       .
+       a
+       l
+       b
+       u
+       m
+       .
+       m
+       u
+       s
+       i
+       c
+       A
+       l
+       b
+       u
+       m
+      "
+    
+   and
+    
+   searchExp
+    relExp
+     dc:title
+      
+     contains
+      
+     quotedVal
+      "
+      escapedQuote
+       c
+       a
+       p
+        
+       \"
+       a
+       \"
+      "
+  )
+ <EOF>

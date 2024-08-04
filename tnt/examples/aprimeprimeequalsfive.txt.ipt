@@ -1,0 +1,17 @@
+equation
+ expression
+  atom
+   variable
+    a
+    '
+    '
+ =
+ expression
+  atom
+   number
+    S
+    S
+    S
+    S
+    0
+ <EOF>

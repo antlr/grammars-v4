@@ -1,0 +1,15 @@
+expression
+ vectorOperation
+  vector
+   instantSelector
+    container_cpu_usage_seconds_total
+    {
+    labelMatcherList
+     labelMatcher
+      labelName
+       job
+      labelMatcherOperator
+       =
+      'kubelet'
+    }
+ <EOF>

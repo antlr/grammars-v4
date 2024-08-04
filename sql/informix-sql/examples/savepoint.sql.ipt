@@ -1,0 +1,17 @@
+sqlScript
+ unitStatement
+  savepointStmt
+   SAVEPOINT
+   identifier
+    anyName
+     spt
+  ;
+ unitStatement
+  savepointStmt
+   SAVEPOINT
+   identifier
+    anyName
+     spt
+   UNIQUE
+  ;
+ <EOF>

@@ -1,0 +1,12 @@
+modelUnit
+ namespaceDeclaration
+ typeDeclaration
+  enumDeclaration
+   enum
+   Foo
+   {
+   enumConstant
+    o 
+    BAR
+   }
+ <EOF>

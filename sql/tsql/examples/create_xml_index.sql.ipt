@@ -1,0 +1,22 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    create_xml_index
+     CREATE
+     PRIMARY
+     XML
+     INDEX
+     id_
+      s1_ti_x
+     ON
+     table_name
+      id_
+       ti_x
+     (
+     id_
+      keyword
+       xmldata
+     )
+     ;
+ <EOF>

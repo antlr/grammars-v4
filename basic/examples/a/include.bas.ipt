@@ -1,0 +1,12 @@
+prog
+ line
+  linenumber
+   10
+  amprstmt
+   statement
+    includestmt
+     INCLUDE
+     expression
+      func_
+       "abc.bas"
+ <EOF>

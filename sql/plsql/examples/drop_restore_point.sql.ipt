@@ -1,0 +1,26 @@
+sql_script
+ unit_statement
+  drop_restore_point
+   DROP
+   RESTORE
+   POINT
+   id_expression
+    regular_id
+     good_data
+ ;
+ unit_statement
+  drop_restore_point
+   DROP
+   RESTORE
+   POINT
+   id_expression
+    regular_id
+     rp
+   for
+   pluggable
+   database
+   id_expression
+    regular_id
+     pdb
+ ;
+ <EOF>

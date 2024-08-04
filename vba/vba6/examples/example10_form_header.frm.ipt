@@ -1,0 +1,364 @@
+startRule
+ module
+  moduleHeader
+   VERSION
+    
+   5.00
+  endOfLine
+   \r\n
+  moduleConfig
+   Begin
+    
+   {C62A69F0-16DC-11CE-9E98-00AA00574A4F}
+    
+   ambiguousIdentifier
+    Login
+   endOfLine
+     
+    \r\n
+       
+   moduleConfigElement
+    ambiguousIdentifier
+     Caption
+             
+    =
+       
+    literal
+     "Please Log In"
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     ClientHeight
+        
+    =
+       
+    literal
+     1920
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     ClientLeft
+          
+    =
+       
+    literal
+     120
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     ClientTop
+           
+    =
+       
+    literal
+     465
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     ClientWidth
+         
+    =
+       
+    literal
+     2295
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     OleObjectBlob
+       
+    =
+       
+    literal
+     "Login.frx"
+    :
+    literal
+     0000
+    endOfLine
+     \r\n
+        
+   moduleConfigElement
+    ambiguousIdentifier
+     StartUpPosition
+     
+    =
+       
+    literal
+     1
+    endOfLine
+       
+     comment
+      'CenterOwner
+    endOfLine
+     \r\n
+   End
+  endOfLine
+   \r\n
+  moduleAttributes
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Name
+     
+    =
+     
+    literal
+     "Login"
+   endOfLine
+    \r\n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_GlobalNameSpace
+     
+    =
+     
+    literal
+     False
+   endOfLine
+    \r\n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Creatable
+     
+    =
+     
+    literal
+     False
+   endOfLine
+    \r\n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_PredeclaredId
+     
+    =
+     
+    literal
+     True
+   endOfLine
+    \r\n
+   attributeStmt
+    Attribute
+     
+    implicitCallStmt_InStmt
+     iCS_S_VariableOrProcedureCall
+      ambiguousIdentifier
+       VB_Exposed
+     
+    =
+     
+    literal
+     False
+   endOfLine
+    \r\n
+  moduleDeclarations
+   moduleDeclarationsElement
+    variableStmt
+     visibility
+      Public
+      
+     variableListStmt
+      variableSubStmt
+       ambiguousIdentifier
+        Ready
+        
+       asTypeClause
+        As
+         
+        type_
+         baseType
+          Boolean
+   endOfLine
+    \r\n\r\n
+  moduleBody
+   moduleBodyElement
+    subStmt
+     visibility
+      Private
+      
+     Sub
+      
+     ambiguousIdentifier
+      Form_Load
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \r\n
+     block
+      blockStmt
+       implicitCallStmt_InBlock
+        iCS_B_MemberProcedureCall
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            ambiguousKeyword
+             Me
+         .
+         ambiguousIdentifier
+          Show
+      endOfStatement
+       endOfLine
+        \r\n
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Ready
+         
+        =
+         
+        valueStmt
+         literal
+          False
+      endOfStatement
+       endOfLine
+        \r\n
+      blockStmt
+       explicitCallStmt
+        eCS_ProcedureCall
+         Call
+          
+         ambiguousIdentifier
+          Wait
+      endOfStatement
+       endOfLine
+        \r\n
+       endOfLine
+        comment
+         'Label1.Visible = True
+       endOfLine
+        \r\n
+     End Sub
+   endOfLine
+    \r\n\r\n
+   moduleBodyElement
+    functionStmt
+     visibility
+      Public
+      
+     Function
+      
+     ambiguousIdentifier
+      Wait
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \r\n
+     block
+      blockStmt
+       doLoopStmt
+        Do
+         
+        While
+         
+        valueStmt
+         valueStmt
+          implicitCallStmt_InStmt
+           iCS_S_VariableOrProcedureCall
+            ambiguousIdentifier
+             Ready
+          
+         =
+          
+         valueStmt
+          literal
+           False
+        endOfStatement
+         endOfLine
+          \r\n
+              
+        block
+         blockStmt
+          implicitCallStmt_InBlock
+           iCS_B_ProcedureCall
+            certainIdentifier
+             DoEvents
+         endOfStatement
+          endOfLine
+           \r\n
+        Loop
+      endOfStatement
+       endOfLine
+        \r\n
+     End Function
+   endOfLine
+    \r\n\r\n
+   moduleBodyElement
+    subStmt
+     visibility
+      Private
+      
+     Sub
+      
+     ambiguousIdentifier
+      LoginButton_Click
+     argList
+      (
+      )
+     endOfStatement
+      endOfLine
+       \r\n
+           
+     block
+      blockStmt
+       letStmt
+        implicitCallStmt_InStmt
+         iCS_S_VariableOrProcedureCall
+          ambiguousIdentifier
+           Ready
+         
+        =
+         
+        valueStmt
+         literal
+          True
+      endOfStatement
+       endOfLine
+        \r\n
+            
+      blockStmt
+       implicitCallStmt_InBlock
+        iCS_B_MemberProcedureCall
+         implicitCallStmt_InStmt
+          iCS_S_VariableOrProcedureCall
+           ambiguousIdentifier
+            ambiguousKeyword
+             Me
+         .
+         ambiguousIdentifier
+          Hide
+      endOfStatement
+       endOfLine
+        \r\n
+     End Sub
+   endOfLine
+    \r\n
+ <EOF>

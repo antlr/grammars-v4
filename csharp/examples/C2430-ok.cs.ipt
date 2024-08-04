@@ -1,0 +1,12 @@
+compilation_unit
+ namespace_member_declarations
+  namespace_member_declaration
+   type_declaration
+    class_definition
+     class
+     identifier
+      foo
+     class_body
+      {
+      }
+ <EOF>

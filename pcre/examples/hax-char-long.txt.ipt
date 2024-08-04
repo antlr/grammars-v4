@@ -1,0 +1,19 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     character
+      \
+      x
+      {
+      hex
+       C
+      hex
+       A
+      hex
+       F
+      hex
+       E
+      }
+ <EOF>

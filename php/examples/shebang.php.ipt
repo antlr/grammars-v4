@@ -1,0 +1,36 @@
+htmlDocument
+ inlineHtml
+  htmlElement
+   #!/usr/bin/env php\n<
+  htmlElement
+   html
+  htmlElement
+   >
+  htmlElement
+   \n    test 
+  htmlElement
+   # test\n<
+  htmlElement
+   /
+  htmlElement
+   html
+  htmlElement
+   >
+ phpBlock
+  topStatement
+   statement
+    echoStatement
+     echo
+     expressionList
+      expression
+       string
+        "
+        interpolatedStringPart
+         test
+        "
+     ;
+  topStatement
+   statement
+    emptyStatement_
+     ?>
+ <EOF>

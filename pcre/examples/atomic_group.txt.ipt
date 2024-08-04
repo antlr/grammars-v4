@@ -1,0 +1,17 @@
+pcre
+ alternation
+  expr
+   element
+    atom
+     atomic_group
+      (
+      ?
+      >
+      alternation
+       expr
+        element
+         atom
+          letter
+           X
+      )
+ <EOF>

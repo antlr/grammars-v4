@@ -1,0 +1,14 @@
+parse
+ sql_stmt_list
+  sql_stmt
+   select_stmt
+    select_core
+     select
+     result_column
+      *
+     from
+     table_or_subquery
+      table_name
+       any_name
+        x
+ <EOF>

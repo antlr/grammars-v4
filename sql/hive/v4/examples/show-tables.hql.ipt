@@ -1,0 +1,18 @@
+statement
+ execStatement
+  ddlStatement
+   showStatement
+    show
+    extended
+    tables
+    from_in
+     in
+    id_
+     db
+    showTablesFilterExpr
+     where
+     id_
+      t
+     =
+     't'
+ <EOF>

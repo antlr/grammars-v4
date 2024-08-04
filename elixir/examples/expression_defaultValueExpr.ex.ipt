@@ -1,0 +1,25 @@
+parse
+ block
+  expression
+   expression
+    variables
+     variable
+      foo
+   \\
+   expression
+    "val"
+  eoe
+   \n
+   \n
+  expression
+   expression
+    variables
+     variable
+      mu
+   \\
+   expression
+    unaryOp
+     -
+    expression
+     1
+ <EOF>

@@ -1,0 +1,13 @@
+iso
+ duration
+  durationBasic
+   intervalBasic
+    intervalT
+     P
+     int_
+      1
+     Y
+     dec
+      6
+     M
+ <EOF>

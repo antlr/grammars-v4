@@ -1,0 +1,13 @@
+root
+ regExp
+  branch
+   piece
+    atom
+     charClass
+      .
+    quantifier
+     *
+   piece
+    atom
+     \n
+ <EOF>

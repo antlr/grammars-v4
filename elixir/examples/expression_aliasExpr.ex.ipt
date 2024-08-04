@@ -1,0 +1,5 @@
+parse
+ block
+  expression
+   Foo
+ <EOF>

@@ -1,0 +1,22 @@
+query
+ initCommand
+  operation
+   id
+    index
+   =
+   expression
+    value
+     "your_index"
+ |
+ nextCommand
+  command
+   search
+  operation
+   expression
+    value
+     id
+      field_name
+   LIKE
+   value
+    "%pattern%"
+ <EOF>

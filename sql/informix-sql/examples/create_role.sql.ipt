@@ -1,0 +1,19 @@
+sqlScript
+ unitStatement
+  createRole
+   CREATE
+   ROLE
+   anyName
+    engineer
+  ;
+ unitStatement
+  createRole
+   CREATE
+   ROLE
+   IF
+   NOT
+   EXISTS
+   anyName
+    engineer
+  ;
+ <EOF>

@@ -1,0 +1,15 @@
+url
+ uri
+  scheme
+   string
+    http
+  ://
+  host
+   hostname
+    string
+     www.example.com
+  :
+  port
+   8080
+  \n
+ <EOF>

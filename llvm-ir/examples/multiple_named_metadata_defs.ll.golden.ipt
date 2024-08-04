@@ -1,0 +1,24 @@
+compilationUnit
+ topLevelEntity
+  namedMetadataDef
+   !foo
+   =
+   !
+   {
+   metadataNode
+    diExpression
+     !DIExpression
+     (
+     diExpressionField
+      1
+     )
+   ,
+   metadataNode
+    diExpression
+     !DIExpression
+     (
+     diExpressionField
+      2
+     )
+   }
+ <EOF>

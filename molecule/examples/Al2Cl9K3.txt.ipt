@@ -1,0 +1,21 @@
+molecule
+ part_
+  structure
+   symbol
+    element
+     Al
+   count
+    2
+  structure
+   symbol
+    element
+     Cl
+   count
+    9
+  structure
+   symbol
+    element
+     K
+   count
+    3
+ <EOF>

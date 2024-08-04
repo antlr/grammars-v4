@@ -1,0 +1,9 @@
+topLevelQuery
+ query
+  disjQuery
+   conjQuery
+    modClause
+     clause
+      term
+       test*
+ <EOF>

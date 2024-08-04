@@ -1,0 +1,19 @@
+root
+ cqls
+  cql
+   createUser
+    kwCreate
+     CREATE
+    kwUser
+     USER
+    user
+     newuser
+    kwWith
+     WITH
+    kwPassword
+     PASSWORD
+    stringLiteral
+     'password'
+  statementSeparator
+   ;
+ <EOF>

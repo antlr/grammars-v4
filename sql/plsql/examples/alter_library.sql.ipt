@@ -1,0 +1,14 @@
+sql_script
+ unit_statement
+  alter_library
+   ALTER
+   LIBRARY
+   library_name
+    regular_id
+     hr
+    .
+    regular_id
+     my_ext_lib
+   COMPILE
+ ;
+ <EOF>

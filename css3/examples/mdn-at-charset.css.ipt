@@ -1,0 +1,19 @@
+stylesheet
+ ws
+ charset
+  @charset 
+  ws
+  "UTF-8"
+  ws
+  ;
+  ws
+   \n
+ charset
+  @charset 
+  ws
+  "iso-8859-15"
+  ws
+  ;
+  ws
+   \n
+ <EOF>

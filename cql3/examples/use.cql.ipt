@@ -1,0 +1,27 @@
+root
+ cqls
+  cql
+   use_
+    kwUse
+     USE
+    keyspace
+     key_name
+  statementSeparator
+   ;
+  cql
+   use_
+    kwUse
+     USE
+    keyspace
+     PortfolioDemo
+  statementSeparator
+   ;
+  cql
+   use_
+    kwUse
+     USE
+    keyspace
+     "Excalibur"
+  statementSeparator
+   ;
+ <EOF>

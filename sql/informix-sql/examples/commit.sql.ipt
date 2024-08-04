@@ -1,0 +1,11 @@
+sqlScript
+ unitStatement
+  commitWorkStmt
+   COMMIT
+  ;
+ unitStatement
+  commitWorkStmt
+   COMMIT
+   WORK
+  ;
+ <EOF>

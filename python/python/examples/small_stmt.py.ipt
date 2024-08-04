@@ -1,0 +1,293 @@
+root
+ file_input
+  
+  stmt
+   simple_stmt
+    small_stmt
+     del
+     exprlist
+      expr
+       atom
+        name
+         x
+      ,
+      expr
+       atom
+        name
+         d
+       trailer
+        arguments
+         [
+         subscriptlist
+          subscript
+           test
+            logical_test
+             comparison
+              expr
+               atom
+                number
+                 integer
+                  1
+         ]
+      ,
+      expr
+       await
+       atom
+        name
+         f
+    
+  stmt
+   compound_stmt
+    for
+    exprlist
+     expr
+      atom
+       name
+        i
+    in
+    testlist
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           u
+    :
+    suite
+     simple_stmt
+      small_stmt
+       pass
+      
+  stmt
+   compound_stmt
+    for
+    exprlist
+     expr
+      atom
+       name
+        i
+    in
+    testlist
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           u
+    :
+    suite
+     simple_stmt
+      small_stmt
+       break
+      
+  stmt
+   compound_stmt
+    for
+    exprlist
+     expr
+      atom
+       name
+        i
+    in
+    testlist
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           u
+    :
+    suite
+     simple_stmt
+      small_stmt
+       continue
+      
+  stmt
+   compound_stmt
+    funcdef
+     def
+     name
+      f
+     (
+     )
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         return
+        
+      
+  stmt
+   compound_stmt
+    funcdef
+     def
+     name
+      g
+     (
+     )
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         return
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               number
+                integer
+                 1
+          ,
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               number
+                integer
+                 3
+        
+      
+  stmt
+   simple_stmt
+    small_stmt
+     raise
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           a
+     from
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           b
+    
+  stmt
+   simple_stmt
+    small_stmt
+     raise
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           a
+    
+  stmt
+   compound_stmt
+    try
+    :
+    suite
+     
+     
+     stmt
+      simple_stmt
+       small_stmt
+        testlist_star_expr
+         testlist
+          test
+           logical_test
+            comparison
+             expr
+              atom
+               name
+                a
+       
+     
+    except_clause
+     except
+     :
+     suite
+      
+      
+      stmt
+       simple_stmt
+        small_stmt
+         raise
+        
+      
+  stmt
+   simple_stmt
+    small_stmt
+     global
+     name
+      a
+    
+  stmt
+   simple_stmt
+    small_stmt
+     global
+     name
+      a
+     ,
+     name
+      b
+    
+  stmt
+   simple_stmt
+    small_stmt
+     assert
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           a
+    
+  stmt
+   simple_stmt
+    small_stmt
+     assert
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           a
+     ,
+     test
+      logical_test
+       comparison
+        expr
+         atom
+          name
+           b
+    
+  stmt
+   simple_stmt
+    small_stmt
+     nonlocal
+     name
+      a
+    
+  stmt
+   simple_stmt
+    small_stmt
+     nonlocal
+     name
+      a
+     ,
+     name
+      v
+    
+ <EOF>

@@ -1,0 +1,15 @@
+dgs
+ header
+  DGS004
+  \n
+  identifier
+   bad
+  0
+  0
+  \n
+ \n
+ \n
+  This is a bad example because first line\n
+  contains some spaces after "DGS004".\n
+ \n
+ <EOF>

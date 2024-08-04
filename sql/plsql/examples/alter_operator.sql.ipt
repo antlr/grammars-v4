@@ -1,0 +1,13 @@
+sql_script
+ unit_statement
+  alter_operator
+   ALTER
+   OPERATOR
+   operator_name
+    identifier
+     id_expression
+      regular_id
+       eq_op
+   COMPILE
+ ;
+ <EOF>

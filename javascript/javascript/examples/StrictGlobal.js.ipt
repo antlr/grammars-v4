@@ -1,0 +1,30 @@
+program
+ sourceElements
+  sourceElement
+   statement
+    expressionStatement
+     expressionSequence
+      singleExpression
+       literal
+        "use strict"
+     eos
+      ;
+  sourceElement
+   statement
+    variableStatement
+     variableDeclarationList
+      varModifier
+       let_
+        let
+      variableDeclaration
+       assignable
+        identifier
+         a
+       =
+       singleExpression
+        literal
+         numericLiteral
+          42
+     eos
+      ;
+ <EOF>

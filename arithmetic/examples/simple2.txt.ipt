@@ -1,0 +1,19 @@
+file_
+ equation
+  expression
+   atom
+    variable
+     c
+  relop
+   =
+  expression
+   expression
+    atom
+     variable
+      a
+   +
+   expression
+    atom
+     variable
+      b
+ <EOF>

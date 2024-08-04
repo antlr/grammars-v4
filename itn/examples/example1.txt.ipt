@@ -1,0 +1,54 @@
+itinerary
+ line
+  longitude
+   490843
+  |
+  latitude
+   5237653
+  |
+  descr
+   Amsterdam Central Station
+  |
+  flag
+   4
+  |
+ line
+  longitude
+   496283
+  |
+  latitude
+   5226712
+  |
+  descr
+   Abcoude Park and Ride
+  |
+  flag
+   0
+  |
+ line
+  longitude
+   507226
+  |
+  latitude
+   5208633
+  |
+  descr
+   Stadsbaan Utrecht
+  |
+  flag
+   0
+  |
+ line
+  longitude
+   509797
+  |
+  latitude
+   5199465
+  |
+  descr
+   Company in Vianen
+  |
+  flag
+   2
+  |
+ <EOF>

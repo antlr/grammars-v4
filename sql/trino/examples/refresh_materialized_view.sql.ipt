@@ -1,0 +1,22 @@
+parse
+ statements
+  singleStatement
+   statement
+    REFRESH
+    MATERIALIZED
+    VIEW
+    qualifiedName
+     identifier
+      test
+   ;
+ statements
+  singleStatement
+   statement
+    REFRESH
+    MATERIALIZED
+    VIEW
+    qualifiedName
+     identifier
+      "some name that contains space"
+   ;
+ <EOF>

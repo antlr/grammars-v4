@@ -1,0 +1,18 @@
+root
+ cqls
+  cql
+   dropUser
+    kwDrop
+     DROP
+    kwUser
+     USER
+    ifExist
+     kwIf
+      IF
+     kwExists
+      EXISTS
+    user
+     boone
+  statementSeparator
+   ;
+ <EOF>

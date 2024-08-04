@@ -1,0 +1,18 @@
+expression
+ vectorOperation
+  vectorOperation
+   vector
+    function_
+     rate
+     (
+     parameter
+      vectorOperation
+       vector
+        matrixSelector
+         instantSelector
+          http_requests_total
+         [5m]
+     )
+  subqueryOp
+   [30m:1m]
+ <EOF>

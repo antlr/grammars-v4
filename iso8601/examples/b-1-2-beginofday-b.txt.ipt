@@ -1,0 +1,18 @@
+iso
+ time
+  localTime
+   localTimeBasic
+    localTimePreciseBasic
+     hour
+      int2
+       0
+       0
+     minute
+      int2
+       0
+       0
+     secondFraction
+      dec2
+       0
+       0
+ <EOF>

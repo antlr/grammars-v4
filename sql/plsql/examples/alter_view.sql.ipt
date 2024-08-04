@@ -1,0 +1,25 @@
+sql_script
+ unit_statement
+  alter_view
+   ALTER
+   VIEW
+   tableview_name
+    identifier
+     id_expression
+      regular_id
+       customer_ro
+   COMPILE
+ ;
+ unit_statement
+  alter_view
+   ALTER
+   VIEW
+   tableview_name
+    identifier
+     id_expression
+      regular_id
+       customer_ro
+   alter_view_editionable
+    EDITIONABLE
+ ;
+ <EOF>

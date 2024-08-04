@@ -1,0 +1,715 @@
+propertiesFile
+ row
+  comment
+   # You are reading a comment in ".properties" file.
+   eol
+    \n
+ row
+  comment
+   ! The exclamation mark can also be used for comments.
+   eol
+    \n
+ row
+  comment
+   # Lines with "properties" contain a key and a value separated by a delimiting character.
+   eol
+    \n
+ row
+  comment
+   # There are 3 delimiting characters: '=' (equal), ':' (colon) and whitespace (space, \t and \f).
+   eol
+    \n
+ row
+  line
+   key
+    w
+    e
+    b
+    s
+    i
+    t
+    e
+     
+   =
+   key
+     
+    h
+    t
+    t
+    p
+    s
+    :
+    /
+    /
+    e
+    n
+    .
+    w
+    i
+    k
+    i
+    p
+    e
+    d
+    i
+    a
+    .
+    o
+    r
+    g
+    /
+   eol
+    \n
+ row
+  line
+   key
+    l
+    a
+    n
+    g
+    u
+    a
+    g
+    e
+     
+   :
+   key
+     
+    E
+    n
+    g
+    l
+    i
+    s
+    h
+   eol
+    \n
+ row
+  comment
+   # A word on a line will just create a key with no value.
+   eol
+    \n
+ row
+  line
+   key
+    e
+    m
+    p
+    t
+    y
+   eol
+    \n
+ row
+  comment
+   # White space that appears between the key, the value and the delimiter is ignored.
+   eol
+    \n
+ row
+  comment
+   # This means that the following are equivalent (other than for readability).
+   eol
+    \n
+ row
+  line
+   key
+    h
+    e
+    l
+    l
+    o
+   =
+   key
+    h
+    e
+    l
+    l
+    o
+   eol
+    \n
+ row
+  line
+   key
+    h
+    e
+    l
+    l
+    o
+     
+   =
+   key
+     
+    h
+    e
+    l
+    l
+    o
+   eol
+    \n
+ row
+  comment
+   # Keys with the same name will be overwritten by the key that is the furthest in a file.
+   eol
+    \n
+ row
+  comment
+   # For example the final value for "duplicateKey" will be "second".
+   eol
+    \n
+ row
+  line
+   key
+    d
+    u
+    p
+    l
+    i
+    c
+    a
+    t
+    e
+    K
+    e
+    y
+     
+   =
+   key
+     
+    f
+    i
+    r
+    s
+    t
+   eol
+    \n
+ row
+  line
+   key
+    d
+    u
+    p
+    l
+    i
+    c
+    a
+    t
+    e
+    K
+    e
+    y
+     
+   =
+   key
+     
+    s
+    e
+    c
+    o
+    n
+    d
+   eol
+    \n
+ row
+  comment
+   # To use the delimiter characters inside a key, you need to escape them with a \.
+   eol
+    \n
+ row
+  comment
+   # However, there is no need to do this in the value.
+   eol
+    \n
+ row
+  line
+   key
+    d
+    e
+    l
+    i
+    m
+    i
+    t
+    e
+    r
+    C
+    h
+    a
+    r
+    a
+    c
+    t
+    e
+    r
+    s
+    \:
+    \=
+    \ 
+   =
+   key
+     
+    T
+    h
+    i
+    s
+     
+    i
+    s
+     
+    t
+    h
+    e
+     
+    v
+    a
+    l
+    u
+    e
+     
+    f
+    o
+    r
+     
+    t
+    h
+    e
+     
+    k
+    e
+    y
+     
+    "
+    d
+    e
+    l
+    i
+    m
+    i
+    t
+    e
+    r
+    C
+    h
+    a
+    r
+    a
+    c
+    t
+    e
+    r
+    s
+    \:
+    \=
+    \ 
+    "
+   eol
+    \n
+ row
+  comment
+   # Adding a \ at the end of a line means that the value continues to the next line.
+   eol
+    \n
+ row
+  line
+   key
+    m
+    u
+    l
+    t
+    i
+    l
+    i
+    n
+    e
+     
+   =
+   key
+     
+    T
+    h
+    i
+    s
+     
+    l
+    i
+    n
+    e
+     
+    \\n
+    c
+    o
+    n
+    t
+    i
+    n
+    u
+    e
+    s
+   eol
+    \n
+ row
+  comment
+   # If you want your value to include a \, it should be escaped by another \.
+   eol
+    \n
+ row
+  line
+   key
+    p
+    a
+    t
+    h
+     
+   =
+   key
+     
+    c
+    :
+    \\
+    w
+    i
+    k
+    i
+    \\
+    t
+    e
+    m
+    p
+    l
+    a
+    t
+    e
+    s
+   eol
+    \n
+ row
+  comment
+   # This means that if the number of \ at the end of the line is even, the next line is not included in the value.
+   eol
+    \n
+ row
+  comment
+   # In the following example, the value for "evenKey" is "This is on one line\".
+   eol
+    \n
+ row
+  line
+   key
+    e
+    v
+    e
+    n
+    K
+    e
+    y
+     
+   =
+   key
+     
+    T
+    h
+    i
+    s
+     
+    i
+    s
+     
+    o
+    n
+     
+    o
+    n
+    e
+     
+    l
+    i
+    n
+    e
+    \\
+   eol
+    \n
+ row
+  comment
+   # This line is a normal comment and is not included in the value for "evenKey"
+   eol
+    \n
+ row
+  comment
+   # If the number of \ is odd, then the next line is included in the value.
+   eol
+    \n
+ row
+  comment
+   # In the following example, the value for "oddKey" is "This is line one and\#This is line two".
+   eol
+    \n
+ row
+  line
+   key
+    o
+    d
+    d
+    K
+    e
+    y
+     
+   =
+   key
+     
+    T
+    h
+    i
+    s
+     
+    i
+    s
+     
+    l
+    i
+    n
+    e
+     
+    o
+    n
+    e
+     
+    a
+    n
+    d
+    \\
+    \\n
+    #
+     
+    T
+    h
+    i
+    s
+     
+    i
+    s
+     
+    l
+    i
+    n
+    e
+     
+    t
+    w
+    o
+   eol
+    \n
+ row
+  comment
+   # White space characters are removed before each line.
+   eol
+    \n
+ row
+  comment
+   # Make sure to add your spaces before your \ if you need them on the next line.
+   eol
+    \n
+ row
+  comment
+   # In the following example, the value for "welcome" is "Welcome to Wikipedia!".
+   eol
+    \n
+ row
+  line
+   key
+    w
+    e
+    l
+    c
+    o
+    m
+    e
+     
+   =
+   key
+     
+    W
+    e
+    l
+    c
+    o
+    m
+    e
+     
+    t
+    o
+     
+    \\n
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+    W
+    i
+    k
+    i
+    p
+    e
+    d
+    i
+    a
+    !
+   eol
+    \n
+ row
+  comment
+   # If you need to add newlines and carriage returns, they need to be escaped using \n and \r respectively.
+   eol
+    \n
+ row
+  comment
+   # You can also optionally escape tabs with \t for readability purposes.
+   eol
+    \n
+ row
+  line
+   key
+    v
+    a
+    l
+    u
+    e
+    W
+    i
+    t
+    h
+    E
+    s
+    c
+    a
+    p
+    e
+    s
+     
+   =
+   key
+     
+    T
+    h
+    i
+    s
+     
+    i
+    s
+     
+    a
+     
+    n
+    e
+    w
+    l
+    i
+    n
+    e
+    \n
+     
+    a
+    n
+    d
+     
+    a
+     
+    c
+    a
+    r
+    r
+    i
+    a
+    g
+    e
+     
+    r
+    e
+    t
+    u
+    r
+    n
+    \r
+     
+    a
+    n
+    d
+     
+    a
+     
+    t
+    a
+    b
+    \t
+    .
+   eol
+    \n
+ row
+  comment
+   # You can also use Unicode escape characters (maximum of four hexadecimal digits).
+   eol
+    \n
+ row
+  comment
+   # In the following example, the value for "encodedHelloInJapanese" is "こんにちは".
+   eol
+    \n
+ row
+  line
+   key
+    e
+    n
+    c
+    o
+    d
+    e
+    d
+    H
+    e
+    l
+    l
+    o
+    I
+    n
+    J
+    a
+    p
+    a
+    n
+    e
+    s
+    e
+     
+   =
+   key
+     
+    \u
+    3
+    0
+    5
+    3
+    \u
+    3
+    0
+    9
+    3
+    \u
+    3
+    0
+    6
+    b
+    \u
+    3
+    0
+    6
+    1
+    \u
+    3
+    0
+    6
+    f
+   eol
+    <EOF>

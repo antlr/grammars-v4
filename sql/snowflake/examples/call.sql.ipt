@@ -1,0 +1,37 @@
+snowflake_file
+ batch
+  sql_command
+   other_command
+    call
+     call
+     object_name
+      id_
+       my_stored_proc
+     (
+     expr_list
+      expr
+       primitive_expression
+        id_
+         arg_1
+     )
+  ;
+  sql_command
+   other_command
+    call
+     call
+     object_name
+      id_
+       non_reserved_words
+        public
+      .
+      id_
+       some_store_procedure
+     (
+     expr_list
+      expr
+       primitive_expression
+        literal
+         'some input'
+     )
+  ;
+ <EOF>

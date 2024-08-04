@@ -1,0 +1,18 @@
+script
+ query
+  regularQuery
+   singleQuery
+    singlePartQ
+     updatingStatement
+      removeSt
+       REMOVE
+       removeItem
+        propertyExpression
+         atom
+          literal
+           null
+         .
+         name
+          symbol
+           p
+ <EOF>

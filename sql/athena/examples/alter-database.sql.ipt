@@ -1,0 +1,21 @@
+stmt
+ command
+  ddl_command
+   alter_database
+    alter
+    db_schema
+     database
+    database_name
+     id_
+      db
+    set
+    dbproperties
+    (
+    kv_pair
+     string
+      'p1'
+     =
+     string
+      'v1'
+    )
+ <EOF>

@@ -1,0 +1,21 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    alter_database
+     ALTER
+     DATABASE
+     id_
+      ADVENTUREWORKS2012
+     SET
+     database_optionspec
+      database_mirroring_option
+       mirroring_set_option
+        mirroring_partner
+         PARTNER
+        partner_option
+         FAILOVER
+     ;
+  go_statement
+   GO
+ <EOF>

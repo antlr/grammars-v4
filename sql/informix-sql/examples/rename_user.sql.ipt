@@ -1,0 +1,14 @@
+sqlScript
+ unitStatement
+  renameUser
+   RENAME
+   USER
+   identifier
+    anyName
+     bill
+   TO
+   identifier
+    anyName
+     bob
+  ;
+ <EOF>

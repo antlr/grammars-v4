@@ -1,0 +1,14 @@
+prog
+ line
+  cmd
+   make
+    make
+    "size
+    value
+     expression
+      multiplyingExpression
+       signExpression
+        number
+         60
+ \n
+ <EOF>

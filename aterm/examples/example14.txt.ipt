@@ -1,0 +1,14 @@
+aterm_
+ term_
+  placeholder
+   <
+   term_
+    list_
+     [
+     termlist
+      term_
+       num_
+        3
+     ]
+   >
+ <EOF>

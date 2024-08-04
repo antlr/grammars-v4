@@ -1,0 +1,16 @@
+sql_script
+ unit_statement
+  alter_attribute_dimension
+   ALTER
+   ATTRIBUTE
+   DIMENSION
+   id_expression
+    regular_id
+     product_attr_dim
+   RENAME
+   TO
+   id_expression
+    regular_id
+     my_product_attr_dim
+ ;
+ <EOF>

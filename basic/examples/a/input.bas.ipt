@@ -1,0 +1,30 @@
+prog
+ line
+  linenumber
+   10
+  amprstmt
+   statement
+    inputstmt
+     INPUT
+     "Input a number "
+     ,
+     varlist
+      vardecl
+       var_
+        varname
+         num
+ line
+  linenumber
+   20
+  amprstmt
+   statement
+    printstmt1
+     PRINT
+     printlist
+      expression
+       func_
+        vardecl
+         var_
+          varname
+           num
+ <EOF>

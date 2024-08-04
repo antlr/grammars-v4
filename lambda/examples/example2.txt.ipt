@@ -1,0 +1,10 @@
+file_
+ expression
+  function_
+   λ
+   a
+   .
+   scope
+    expression
+     ab
+ <EOF>

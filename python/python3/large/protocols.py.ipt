@@ -1,0 +1,634 @@
+file_input
+ stmt
+  simple_stmts
+   simple_stmt
+    expr_stmt
+     testlist_star_expr
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              """Abstract Protocol class."""
+   \n
+ stmt
+  simple_stmts
+   simple_stmt
+    expr_stmt
+     testlist_star_expr
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              name
+               __all__
+     =
+     testlist_star_expr
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              [
+              testlist_comp
+               test
+                or_test
+                 and_test
+                  not_test
+                   comparison
+                    expr
+                     atom_expr
+                      atom
+                       'BaseProtocol'
+               ,
+               test
+                or_test
+                 and_test
+                  not_test
+                   comparison
+                    expr
+                     atom_expr
+                      atom
+                       'Protocol'
+               ,
+               test
+                or_test
+                 and_test
+                  not_test
+                   comparison
+                    expr
+                     atom_expr
+                      atom
+                       'DatagramProtocol'
+               ,
+               test
+                or_test
+                 and_test
+                  not_test
+                   comparison
+                    expr
+                     atom_expr
+                      atom
+                       'SubprocessProtocol'
+              ]
+   \n
+ stmt
+  compound_stmt
+   classdef
+    class
+    name
+     BaseProtocol
+    :
+    block
+      
+         
+     stmt
+      simple_stmts
+       simple_stmt
+        expr_stmt
+         testlist_star_expr
+          test
+           or_test
+            and_test
+             not_test
+              comparison
+               expr
+                atom_expr
+                 atom
+                  """Common base class for protocol interfaces.\n\n    Usually user implements protocols that derived from BaseProtocol\n    like Protocol or ProcessProtocol.\n\n    The only case when BaseProtocol should be implemented directly is\n    write-only transport like write pipe\n    """
+        
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         connection_made
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            transport
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when a connection is made.\n\n        The argument is the transport representing the pipe connection.\n        To receive data, wait for data_received() calls.\n        When the connection is closed, connection_lost() is called.\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         connection_lost
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            exc
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when the connection is lost or closed.\n\n        The argument is an exception object or None (the latter\n        meaning a regular EOF is received or the connection was\n        aborted or closed).\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         pause_writing
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when the transport's buffer goes over the high-water mark.\n\n        Pause and resume calls are paired -- pause_writing() is called\n        once when the buffer goes strictly over the high-water mark\n        (even if subsequent writes increases the buffer size even\n        more), and eventually resume_writing() is called once when the\n        buffer size reaches the low-water mark.\n\n        Note that if the buffer size equals the high-water mark,\n        pause_writing() is not called -- it must go strictly over.\n        Conversely, resume_writing() is called when the buffer size is\n        equal or lower than the low-water mark.  These end conditions\n        are important to ensure that things go as expected when either\n        mark is zero.\n\n        NOTE: This is the only Protocol callback that is not called\n        through EventLoop.call_soon() -- if it were, it would have no\n        effect when it's most needed (when the app keeps writing\n        without yielding until pause_writing() is called).\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         resume_writing
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when the transport's buffer drains below the low-water mark.\n\n        See pause_writing() for details.\n        """
+           \n
+         \n
+     \n
+ stmt
+  compound_stmt
+   classdef
+    class
+    name
+     Protocol
+    (
+    arglist
+     argument
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              name
+               BaseProtocol
+    )
+    :
+    block
+      
+         
+     stmt
+      simple_stmts
+       simple_stmt
+        expr_stmt
+         testlist_star_expr
+          test
+           or_test
+            and_test
+             not_test
+              comparison
+               expr
+                atom_expr
+                 atom
+                  """Interface for stream protocol.\n\n    The user should implement this interface.  They can inherit from\n    this class but don't need to.  The implementations here do\n    nothing (they don't raise exceptions).\n\n    When the user wants to requests a transport, they pass a protocol\n    factory to a utility function (e.g., EventLoop.create_connection()).\n\n    When the connection is made successfully, connection_made() is\n    called with a suitable transport object.  Then data_received()\n    will be called 0 or more times with data (bytes) received from the\n    transport; finally, connection_lost() will be called exactly once\n    with either an exception object or None as an argument.\n\n    State machine of calls:\n\n      start -> CM [-> DR*] [-> ER?] -> CL -> end\n\n    * CM: connection_made()\n    * DR: data_received()\n    * ER: eof_received()\n    * CL: connection_lost()\n    """
+        
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         data_received
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            data
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when some data is received.\n\n        The argument is a bytes object.\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         eof_received
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when the other end calls write_eof() or equivalent.\n\n        If this returns a false value (including None), the transport\n        will close itself.  If it returns a true value, closing the\n        transport is up to the protocol.\n        """
+           \n
+         \n
+     \n
+ stmt
+  compound_stmt
+   classdef
+    class
+    name
+     DatagramProtocol
+    (
+    arglist
+     argument
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              name
+               BaseProtocol
+    )
+    :
+    block
+      
+         
+     stmt
+      simple_stmts
+       simple_stmt
+        expr_stmt
+         testlist_star_expr
+          test
+           or_test
+            and_test
+             not_test
+              comparison
+               expr
+                atom_expr
+                 atom
+                  """Interface for datagram protocol."""
+        
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         datagram_received
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            data
+          ,
+          tfpdef
+           name
+            addr
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when some datagram is received."""
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         error_received
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            exc
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when a send or receive operation raises an OSError.\n\n        (Other than BlockingIOError or InterruptedError.)\n        """
+           \n
+         \n
+     \n
+ stmt
+  compound_stmt
+   classdef
+    class
+    name
+     SubprocessProtocol
+    (
+    arglist
+     argument
+      test
+       or_test
+        and_test
+         not_test
+          comparison
+           expr
+            atom_expr
+             atom
+              name
+               BaseProtocol
+    )
+    :
+    block
+      
+         
+     stmt
+      simple_stmts
+       simple_stmt
+        expr_stmt
+         testlist_star_expr
+          test
+           or_test
+            and_test
+             not_test
+              comparison
+               expr
+                atom_expr
+                 atom
+                  """Interface for protocol for subprocess calls."""
+        
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         pipe_data_received
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            fd
+          ,
+          tfpdef
+           name
+            data
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when the subprocess writes data into stdout/stderr pipe.\n\n        fd is int file descriptor.\n        data is bytes object.\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         pipe_connection_lost
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+          ,
+          tfpdef
+           name
+            fd
+          ,
+          tfpdef
+           name
+            exc
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when a file descriptor associated with the child process is\n        closed.\n\n        fd is the int file descriptor that was closed.\n        """
+            
+          
+     stmt
+      compound_stmt
+       funcdef
+        def
+        name
+         process_exited
+        parameters
+         (
+         typedargslist
+          tfpdef
+           name
+            self
+         )
+        :
+        block
+          
+                 
+         stmt
+          simple_stmts
+           simple_stmt
+            expr_stmt
+             testlist_star_expr
+              test
+               or_test
+                and_test
+                 not_test
+                  comparison
+                   expr
+                    atom_expr
+                     atom
+                      """Called when subprocess has exited."""
+           \n
+         \n
+     \n
+ <EOF>

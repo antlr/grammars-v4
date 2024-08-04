@@ -1,0 +1,68 @@
+startRule
+ compilationUnit
+  programUnit
+   identificationDivision
+    IDENTIFICATION
+    DIVISION
+    . \n
+    programIdParagraph
+     PROGRAM-ID
+     . 
+     programName
+      cobolWord
+       HelloWorld
+     . \n\n\n
+   environmentDivision
+    ENVIRONMENT
+    DIVISION
+    . \n
+    environmentDivisionBody
+     configurationSection
+      CONFIGURATION
+      SECTION
+      . \n
+    environmentDivisionBody
+     inputOutputSection
+      INPUT-OUTPUT
+      SECTION
+      . \n\n
+   dataDivision
+    DATA
+    DIVISION
+    . \n
+    dataDivisionSection
+     fileSection
+      FILE
+      SECTION
+      . \n
+    dataDivisionSection
+     workingStorageSection
+      WORKING-STORAGE
+      SECTION
+      . \n
+    dataDivisionSection
+     linkageSection
+      LINKAGE
+      SECTION
+      . \n\n
+   procedureDivision
+    PROCEDURE
+    DIVISION
+    . \n
+    procedureDivisionBody
+     paragraphs
+      sentence
+       statement
+        displayStatement
+         DISPLAY
+         displayOperand
+          literal
+           "Hello World"
+       . \n
+      sentence
+       statement
+        stopStatement
+         STOP
+         RUN
+       .\n\n
+ <EOF>

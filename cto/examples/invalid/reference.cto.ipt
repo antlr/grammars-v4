@@ -1,0 +1,32 @@
+modelUnit
+ namespaceDeclaration
+  namespace
+  qualifiedName
+   org
+   .
+   sample
+   .
+   invalid
+ typeDeclaration
+  assetDeclaration
+   asset
+   Foo
+   extendsOrIdentified
+    identified
+     identified by
+     id
+   classBody
+    {
+    classBodyDeclaration
+     fieldDeclaration
+      stringField
+       o 
+       String
+      identifier
+       id
+      optional
+    default
+    =
+    "0815"
+    }
+ <EOF>

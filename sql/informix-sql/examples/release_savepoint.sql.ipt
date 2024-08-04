@@ -1,0 +1,10 @@
+sqlScript
+ unitStatement
+  releaseSavepoint
+   RELEASE
+   SAVEPOINT
+   identifier
+    anyName
+     sp45
+  ;
+ <EOF>

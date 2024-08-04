@@ -1,0 +1,23 @@
+script
+ query
+  regularQuery
+   singleQuery
+    singlePartQ
+     readingStatement
+      queryCallSt
+       CALL
+       invocationName
+        symbol
+         test
+        .
+        symbol
+         proc
+       parenExpressionChain
+        (
+        )
+     returnSt
+      RETURN
+      projectionBody
+       projectionItems
+        *
+ <EOF>

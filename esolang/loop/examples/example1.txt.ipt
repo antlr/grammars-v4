@@ -1,0 +1,11 @@
+prog
+ statementlist
+  statement
+   assignstmt
+    var_
+     xi
+    :=
+    number
+     0
+    ;
+ <EOF>

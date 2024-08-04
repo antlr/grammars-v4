@@ -1,0 +1,12 @@
+tsql_file
+ batch
+  sql_clauses
+   ddl_clause
+    alter_service_master_key
+     ALTER
+     SERVICE
+     MASTER
+     KEY
+     REGENERATE
+   ;
+ <EOF>

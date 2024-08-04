@@ -1,0 +1,12 @@
+sql_script
+ unit_statement
+  alter_outline
+   ALTER
+   OUTLINE
+   id_expression
+    regular_id
+     salaries
+   outline_options
+    REBUILD
+ ;
+ <EOF>

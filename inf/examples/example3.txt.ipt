@@ -1,0 +1,36 @@
+inf
+ section
+  sectionheader
+   [
+   string
+    Strings
+   ]
+   \n
+  line
+   stringlist
+    string
+     Provider
+   =
+   stringlist
+    string
+     "My Device Provider"
+   \n
+  line
+   stringlist
+    string
+     MediaDescription
+   =
+   stringlist
+    string
+     "My Device Installation Media"
+   \n
+  line
+   stringlist
+    string
+     USB\MyDevice.DeviceDesc
+   =
+   stringlist
+    string
+     "My Device Description"
+   \n
+ <EOF>

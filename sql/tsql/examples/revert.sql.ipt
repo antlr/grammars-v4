@@ -1,0 +1,17 @@
+tsql_file
+ batch
+  sql_clauses
+   another_statement
+    security_statement
+     REVERT
+     ;
+  sql_clauses
+   another_statement
+    security_statement
+     REVERT
+     WITH
+     COOKIE
+     =
+     @cookie
+     ;
+ <EOF>

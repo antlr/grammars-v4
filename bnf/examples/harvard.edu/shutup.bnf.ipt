@@ -1,0 +1,14 @@
+start_
+ prods
+  prod
+   xlhs
+    shutup
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      \n
+ <EOF>

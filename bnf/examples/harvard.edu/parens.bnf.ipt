@@ -1,0 +1,81 @@
+start_
+ prods
+  prod
+   xlhs
+    parens
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      (
+      "
+     xelem
+      ws
+        
+      parens
+     xelem
+      ws
+        
+      "
+      )
+      "
+     xelem
+      ws
+       \n
+              
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      parens
+     xelem
+      ws
+        
+      parens
+     xelem
+      ws
+       \n
+              
+    or
+     |
+    xalt
+     xelem
+      ws
+         
+      "
+      "
+  \n
+  prod
+   xlhs
+    parens2
+   assign
+    ws
+      
+    ::=
+   xrhs
+    xalt
+     xelem
+      ws
+        
+      "
+      (
+      "
+     xelem
+      ws
+        
+      parens2
+     xelem
+      ws
+        
+      "
+      )
+      "
+ <EOF>

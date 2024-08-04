@@ -1,0 +1,20 @@
+equation
+ expression
+  ~
+  expression
+   exists
+    E
+    variable
+     c
+    :
+   expression
+    atom
+     variable
+      S
+      c
+ =
+ expression
+  atom
+   number
+    0
+ <EOF>

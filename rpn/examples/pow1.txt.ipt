@@ -1,0 +1,14 @@
+expression
+ signedAtom
+  -
+  signedAtom
+   scientific
+    12.3e-13.2
+ term
+  signedAtom
+   scientific
+    2
+ term
+  oper
+   ^
+ <EOF>

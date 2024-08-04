@@ -1,0 +1,17 @@
+drill_file
+ batch
+  sql_command
+   ddl_command
+    drop_command
+     drop_view
+      drop
+      view
+      workspace
+       name
+        wk
+      .
+      view_name
+       name
+        vw
+  ;
+ <EOF>

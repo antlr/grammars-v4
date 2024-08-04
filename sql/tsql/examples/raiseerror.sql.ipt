@@ -1,0 +1,43 @@
+tsql_file
+ batch
+  sql_clauses
+   cfl_statement
+    raiseerror_statement
+     raiserror
+     721350
+     "Fehler %1!."
+     ,
+     @err
+  sql_clauses
+   cfl_statement
+    raiseerror_statement
+     raiserror
+     72958
+     'Quartal %1!.'
+     ,
+     @quartal
+  sql_clauses
+   cfl_statement
+    raiseerror_statement
+     raiserror
+     641523
+     'Sülz.'
+  sql_clauses
+   cfl_statement
+    raiseerror_statement
+     raiserror
+     (
+     N'%s'
+     ,
+     constant_LOCAL_ID
+      constant
+       10
+     ,
+     constant_LOCAL_ID
+      constant
+       1
+     ,
+     NULL
+     )
+     ;
+ <EOF>
