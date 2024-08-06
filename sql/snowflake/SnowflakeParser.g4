@@ -752,11 +752,17 @@ account_id_list
     ;
 
 alter_dynamic_table
-    : ALTER DYNAMIC TABLE if_exists? object_name (resume_suspend | REFRESH | SET dynamic_table_settable_params+)
+    : ALTER DYNAMIC TABLE if_exists? object_name (
+        resume_suspend 
+        | REFRESH 
+        | SET dynamic_table_settable_params+
+    )
     | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
     | ALTER DYNAMIC TABLE if_exists? object_name (set_tags | unset_tags)
     | ALTER DYNAMIC TABLE if_exists? object_name search_optimization_action
-    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (COMMA dynamic_table_unsettable_params)*
+    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (
+        COMMA dynamic_table_unsettable_params
+    )*
     | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
     ;
 
@@ -1159,7 +1165,9 @@ alter_table
 
 rls_operations
     : ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
-    | DROP ROW ACCESS POLICY object_name (COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses)?
+    | DROP ROW ACCESS POLICY object_name (
+        COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    )?
     | DROP ALL ROW ACCESS POLICIES
     ;
 
@@ -1580,13 +1588,9 @@ compression
 create_dynamic_table
     : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
         LR_BRACKET materialized_col_decl_list RR_BRACKET
-    )?
-    dynamic_table_settable_params+
-    (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))?
-    (INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE ))?
-    cluster_by?
-        with_row_access_policy? with_tags?
-        AS query_statement
+    )? dynamic_table_settable_params+ (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))?
+    (INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE ))? cluster_by? 
+    with_row_access_policy? with_tags? AS query_statement
     ;
 
 dynamic_table_settable_params
@@ -1599,7 +1603,7 @@ dynamic_table_settable_params
 
 dynamic_table_unsettable_params
     : data_retention_params
-    | DEFAULT_DDL_COLLATION_ 
+    | DEFAULT_DDL_COLLATION_
     | COMMENT
     ;
 
@@ -2406,6 +2410,7 @@ out_of_line_constraint
         | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
     )
     ;
+
 //For classic table
 full_col_decl
     : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
