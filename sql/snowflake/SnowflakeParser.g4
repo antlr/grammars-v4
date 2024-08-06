@@ -1154,10 +1154,7 @@ alter_table
         |
     )
     //[ , ... ]
-    | ALTER TABLE if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_ COMMA ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER TABLE if_exists? object_name rls_operations
     ;
 
 rls_operations
