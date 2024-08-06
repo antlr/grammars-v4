@@ -1567,14 +1567,34 @@ compression
     : COMPRESSION EQ compression_type
     ;
 
+//TODO : Check and allow options reorder 
+//(ie DATA_RETENTION_TIME_IN_DAYS could be before or after REFRESH_MODE and so on)
 create_dynamic_table
-    : CREATE or_replace? DYNAMIC TABLE id_ TARGET_LAG EQ (string | DOWNSTREAM) WAREHOUSE EQ wh = id_ AS query_statement
+    : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
+        LR_BRACKET materialized_col_decl_list RR_BRACKET
+    )?
+    dynamic_table_settable_params+
+    (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))?
+    (INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE ))?
+    cluster_by?
+        with_row_access_policy? with_tags? comment_clause?
+        AS query_statement
+    ;
+
+dynamic_table_settable_params
+    : TARGET_LAG EQ (string | DOWNSTREAM)
+    | WAREHOUSE EQ wh = id_
+    | data_retention_params
+    ;
+
+data_retention_params
+    : DATA_RETENTION_TIME_IN_DAYS EQ num
+    | MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num
     ;
 
 create_event_table
-    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? (
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? 
+        data_retention_params* change_tracking? (
         DEFAULT_DDL_COLLATION_ EQ string
     )? copy_grants? with_row_access_policy? with_tags? (WITH? comment_clause)?
     ;
@@ -2366,11 +2386,20 @@ out_of_line_constraint
         | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
     )
     ;
-
+//For classic table
 full_col_decl
     : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
         COMMENT string
     )?
+    ;
+
+//Column declaration for materialized table
+materialized_col_decl
+    : column_name data_type? with_masking_policy? with_tags? (COMMENT string)?
+    ;
+
+materialized_col_decl_list
+    : materialized_col_decl (COMMA materialized_col_decl)*
     ;
 
 column_decl_item
@@ -3559,7 +3588,9 @@ non_reserved_words
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
+    | INCREMENTAL
     | INDEX
+    | INITIALIZE
     | INPUT
     | INTERVAL
     | JAVASCRIPT
@@ -3570,6 +3601,9 @@ non_reserved_words
     | NAME
     | NETWORK
     | OFFSET
+    | ON_CREATE
+    | ON_ERROR
+    | ON_SCHEDULE
     | OPTION
     | ORGADMIN
     | OUTBOUND
@@ -3594,6 +3628,7 @@ non_reserved_words
     | PROVIDER
     | PUBLIC
     | RANK
+    | REFRESH_MODE
     | RESOURCE
     | RESOURCES
     | RESPECT
