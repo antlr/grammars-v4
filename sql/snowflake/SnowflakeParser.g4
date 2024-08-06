@@ -753,8 +753,8 @@ account_id_list
 
 alter_dynamic_table
     : ALTER DYNAMIC TABLE if_exists? object_name (
-        resume_suspend 
-        | REFRESH 
+        resume_suspend
+        | REFRESH
         | SET dynamic_table_settable_params+
     )
     | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
@@ -1588,9 +1588,9 @@ compression
 create_dynamic_table
     : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
         LR_BRACKET materialized_col_decl_list RR_BRACKET
-    )? dynamic_table_settable_params+ (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))?
-    (INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE ))? cluster_by? 
-    with_row_access_policy? with_tags? AS query_statement
+    )? dynamic_table_settable_params+ (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))? (
+        INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE )
+    )? cluster_by? with_row_access_policy? with_tags? AS query_statement
     ;
 
 dynamic_table_settable_params
@@ -1617,8 +1617,7 @@ set_data_retention_params
     ;
 
 create_event_table
-    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? 
-        data_retention_params* change_tracking? (
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? data_retention_params* change_tracking? (
         DEFAULT_DDL_COLLATION_ EQ string
     )? copy_grants? with_row_access_policy? with_tags? (WITH? comment_clause)?
     ;
@@ -4417,6 +4416,8 @@ round_mode
     ;
 
 round_expr
-    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (
+        COMMA ROUNDING_MODE ASSOC round_mode
+    )* RR_BRACKET
     | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;
