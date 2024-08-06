@@ -752,7 +752,12 @@ account_id_list
     ;
 
 alter_dynamic_table
-    : ALTER DYNAMIC TABLE id_ (resume_suspend | REFRESH | SET WAREHOUSE EQ id_)
+    : ALTER DYNAMIC TABLE if_exists? object_name (resume_suspend | REFRESH | SET dynamic_table_settable_params+)
+    | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
+    | ALTER DYNAMIC TABLE if_exists? object_name (set_tags | unset_tags)
+    | ALTER DYNAMIC TABLE if_exists? object_name search_optimization_action
+    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (COMMA dynamic_table_unsettable_params)*
+    | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
     ;
 
 alter_external_table
@@ -1153,6 +1158,12 @@ alter_table
     | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_
     | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_ COMMA ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
     | ALTER TABLE if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    ;
+
+rls_operations
+    : ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    | DROP ROW ACCESS POLICY object_name (COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses)?
+    | DROP ALL ROW ACCESS POLICIES
     ;
 
 clustering_action
@@ -1577,19 +1588,31 @@ create_dynamic_table
     (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))?
     (INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE ))?
     cluster_by?
-        with_row_access_policy? with_tags? comment_clause?
+        with_row_access_policy? with_tags?
         AS query_statement
     ;
 
 dynamic_table_settable_params
     : TARGET_LAG EQ (string | DOWNSTREAM)
     | WAREHOUSE EQ wh = id_
-    | data_retention_params
+    | set_data_retention_params
+    | DEFAULT_DDL_COLLATION_ EQ STRING
+    | comment_clause
+    ;
+
+dynamic_table_unsettable_params
+    : data_retention_params
+    | DEFAULT_DDL_COLLATION_ 
+    | COMMENT
     ;
 
 data_retention_params
-    : DATA_RETENTION_TIME_IN_DAYS EQ num
-    | MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num
+    : DATA_RETENTION_TIME_IN_DAYS
+    | MAX_DATA_EXTENSION_TIME_IN_DAYS
+    ;
+
+set_data_retention_params
+    : data_retention_params EQ num
     ;
 
 create_event_table
