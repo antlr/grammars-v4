@@ -237,10 +237,6 @@ blockType
     : NS_NOESCAPE? nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP NS_NOESCAPE? '^'
         nullabilitySpecifier? RP blockParameters?
     ;
-
-genericsSpecifierList
-    : LT (genericsSpecifier (',' genericsSpecifier)*)? GT
-    ;
     
 genericsSpecifier
     : genericsType = typeSpecifier (':' genericsConformanceType = typeSpecifier)?
@@ -422,9 +418,7 @@ declarationSpecifiers
         | NS_NOESCAPE
         | typePrefix
         | typeQualifier
-    )* typeSpecifier (
-        attributeSpecifier
-    )*
+    )* typeSpecifier attributeSpecifier*
     ;
 
 attributeSpecifier
@@ -508,12 +502,7 @@ typeSpecifierModifier
 
 typeSpecifier
     : 'void' typeQualifier*
-    | typeSpecifierModifier* 'char' typeQualifier*
-    | typeSpecifierModifier* 'short' typeQualifier*
-    | typeSpecifierModifier* 'int' typeQualifier*
-    | typeSpecifierModifier* 'long' typeQualifier*
-    | typeSpecifierModifier* 'float' typeQualifier*
-    | typeSpecifierModifier* 'double' typeQualifier*
+    | typeSpecifierModifier* ('char' | 'short' | 'int' | 'long' | 'float' | 'double') typeQualifier*
     | typeofExpression
     | structOrUnionSpecifier
     | enumSpecifier
