@@ -930,25 +930,6 @@ magicConstant
     | Dir__
     ;
 
-magicMethod
-    : Get
-    | Set
-    | Call
-    | CallStatic
-    | Constructor
-    | Destruct
-    | Wakeup
-    | Sleep
-    | Autoload
-    | IsSet__
-    | Unset__
-    | ToString__
-    | Invoke
-    | SetState
-    | Clone__
-    | DebugInfo
-    ;
-
 primitiveType
     : BoolType
     | IntType
