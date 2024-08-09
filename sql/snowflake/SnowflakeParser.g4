@@ -1595,6 +1595,7 @@ create_dynamic_table
 
 dynamic_table_settable_params
     : TARGET_LAG EQ (string | DOWNSTREAM)
+    | LAG EQ (string | DOWNSTREAM) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
     | WAREHOUSE EQ wh = id_
     | set_data_retention_params
     | DEFAULT_DDL_COLLATION_ EQ STRING
@@ -3560,6 +3561,7 @@ keyword
     | IF
     | JOIN
     | KEY
+    | LAG
     | LANGUAGE
     | LENGTH
     | MAX_CONCURRENCY_LEVEL
