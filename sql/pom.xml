@@ -27,5 +27,6 @@
         <module>trino</module>
         <module>tsql</module>
         <module>informix-sql</module>
+        <module>starrocks</module>
     </modules>
 </project>
