@@ -42,7 +42,7 @@
 					<entryPoint>translationUnit</entryPoint>
 					<grammarName>ObjectiveC</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples_todo/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
