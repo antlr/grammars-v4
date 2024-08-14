@@ -499,8 +499,6 @@ expression
     | Empty '(' chain ')'                                         # SpecialWordExpression
     | Eval '(' expression ')'                                     # SpecialWordExpression
     | Exit ( '(' ')' | parentheses)?                              # SpecialWordExpression
-    | (Include | IncludeOnce) expression                          # SpecialWordExpression
-    | (Require | RequireOnce) expression                          # SpecialWordExpression
     | lambdaFunctionExpr                                          # LambdaFunctionExpression
     | matchExpr                                                   # MatchExpression
     | <assoc = right> expression op = '**' expression             # ArithmeticExpression
@@ -518,6 +516,8 @@ expression
     | expression op = QuestionMark expression? ':' expression     # ConditionalExpression
     | expression op = '??' expression                             # NullCoalescingExpression
     | expression op = '<=>' expression                            # SpaceshipExpression
+    | (Include | IncludeOnce) expression                          # IncludeExpression
+    | (Require | RequireOnce) expression                          # RequireExpression
     | Throw expression                                            # SpecialWordExpression
     | arrayDestructuring Eq expression                            # ArrayDestructExpression
     | assignable assignmentOperator attributes? expression        # AssignmentExpression
