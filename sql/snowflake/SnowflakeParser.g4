@@ -1592,7 +1592,7 @@ create_dynamic_table
 dynamic_table_params
     : dynamic_table_settable_params
     | REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL)
-    | INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE )
+    | INITIALIZE EQ (ON_CREATE | ON_SCHEDULE)
     | cluster_by
     | with_row_access_policy
     | with_tags
@@ -1600,7 +1600,10 @@ dynamic_table_params
 
 dynamic_table_settable_params
     : TARGET_LAG EQ (string | DOWNSTREAM)
-    | LAG EQ (string | DOWNSTREAM) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
+    | LAG EQ (
+        string 
+        | DOWNSTREAM
+    ) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
     | WAREHOUSE EQ wh = id_
     | set_data_retention_params
     | DEFAULT_DDL_COLLATION_ EQ STRING
