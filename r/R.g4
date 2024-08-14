@@ -49,7 +49,7 @@ $ java TestR sample.R
 grammar R;
 
 prog
-    : (expr)* EOF
+    : (expr (SEMICOLON | NL)* | NL)* EOF
     ;
 
 /*
@@ -66,23 +66,22 @@ expr
     | <assoc = right> expr '^' expr
     | '~' expr
     | function
-    | CURLY_L exprlist CURLY_R                  // compound statement
+    | compoundStatement
     | if
     | for
     | while
-    | REPEAT expr
-    | HELP expr // get help on expr, usually string or ID
+    | repeat
     | NEXT
     | BREAK
     | PAREN_L expr PAREN_R
+    | help
     | literal
     | ID
-    | NA
-    | COMMENT
+    | NL expr
     ;
 
 exprlist
-    : expr (expr)*
+    : expr ((SEMICOLON | NL) expr?)*
     ;
 
 formlist
@@ -113,8 +112,12 @@ sub
     |
     ;
 
+compoundStatement
+    : CURLY_L exprlist CURLY_R                  // compound statement
+    ;
+
 if
-    : IF PAREN_L expr PAREN_R expr (else)?
+    : IF PAREN_L expr PAREN_R expr NL* (else)?
     ;
 
 else
@@ -129,14 +132,21 @@ while
     : WHILE PAREN_L expr PAREN_R expr
     ;
 
+repeat
+    : REPEAT expr
+    ;
+
 function
     : FUNCTION PAREN_L formlist? PAREN_R expr // define function
     ;
 
+help
+    : HELP expr // get help on expr, usually string or ID
+    ;
+
 expressionPrefixedExpression
-    : LIST_ACCESS_START sublist LIST_ACCESS_END // '[[' follows R's yacc grammar
-    | ARRAY_ACCESS_START sublist ARRAY_ACCESS_END
-    | NAMESPACE_ACCESS expr
+    : indexExpression
+    | namespaceAccess
     | COMPONENT_ACCESS expr
     | RANGE_OPERATOR expr
     | USER_OP expr // anything wrappedin %: '%' .* '%'
@@ -144,7 +154,20 @@ expressionPrefixedExpression
     | logicalExpression
     | '~' expr
     | (ASSIGN | EQUALS) expr
-    | PAREN_L sublist PAREN_R              // call function
+    | functionCall
+    ;
+
+indexExpression
+    : LIST_ACCESS_START sublist LIST_ACCESS_END // '[[' follows R's yacc grammar
+    | ARRAY_ACCESS_START sublist ARRAY_ACCESS_END
+    ;
+
+namespaceAccess
+    : NAMESPACE_ACCESS expr
+    ;
+
+functionCall
+    : PAREN_L sublist PAREN_R              // call function
     ;
 
 mathemathicalExpression
@@ -159,15 +182,28 @@ logicalExpression
     ;
 
 literal
+    : stringLiteral
+    | numberLiteral
+    | boolLiteral
+    | NULL
+    | INF
+    | NA
+    | NAN
+    ;
+
+stringLiteral
     : STRING
-    | HEX
+    ;
+
+numberLiteral
+    : HEX
     | INT
     | FLOAT
     | COMPLEX
-    | NULL
-    | INF
-    | NAN
-    | TRUE
+    ;
+
+boolLiteral
+    : TRUE
     | FALSE
     ;
 
@@ -286,14 +322,16 @@ USER_OP
     ;
 
 COMMENT
-    : '#' .*? '\r'? '\n'
+    : '#' .*? '\r'? '\n' -> type(NL)
     ;
 
 // Match both UNIX and Windows newlines
-/*NL
+NL
     : '\r'? '\n'
-    ;*/
+    ;
+
+SEMICOLON: ';';
 
 WS
-    : ([ \t\u000C]+ | '\r\n' | '\n' | ';') -> skip
+    : [ \t\u000C]+ -> skip
     ;
