@@ -1583,14 +1583,19 @@ compression
     : COMPRESSION EQ compression_type
     ;
 
-//TODO : Check and allow options reorder 
-//(ie DATA_RETENTION_TIME_IN_DAYS could be before or after REFRESH_MODE and so on)
 create_dynamic_table
     : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
         LR_BRACKET materialized_col_decl_list RR_BRACKET
-    )? dynamic_table_settable_params+ (REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL))? (
-        INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE )
-    )? cluster_by? with_row_access_policy? with_tags? AS query_statement
+    )? dynamic_table_params+ AS query_statement
+    ;
+
+dynamic_table_params
+    : dynamic_table_settable_params
+    | REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL)
+    | INITIALIZE EQ ( ON_CREATE | ON_SCHEDULE )
+    | cluster_by
+    | with_row_access_policy
+    | with_tags
     ;
 
 dynamic_table_settable_params
@@ -3605,8 +3610,11 @@ non_reserved_words
     | DOWNSTREAM
     | DYNAMIC
     | EDITION
+    | ENABLED
     | EMAIL
+    | EMPTY_
     | EVENT
+    | EXCHANGE
     | EXPIRY_DATE
     | EXPR
     | FIRST_NAME
