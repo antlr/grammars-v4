@@ -49,7 +49,7 @@ $ java TestR sample.R
 grammar R;
 
 prog
-    : (expr (';' | NL)* | NL)* EOF
+    : (expr (SEMICOLON | NL)* | NL)* EOF
     ;
 
 /*
@@ -60,56 +60,56 @@ expr_or_assign
 */
 
 expr
-    : expr '[[' sublist ']' ']' // '[[' follows R's yacc grammar
-    | expr '[' sublist ']'
-    | expr ('::' | ':::') expr
-    | expr ('$' | '@') expr
+    : expr LIST_ACCESS_START sublist LIST_ACCESS_END // '[[' follows R's yacc grammar
+    | expr ARRAY_ACCESS_START sublist ARRAY_ACCESS_END
+    | expr NAMESPACE_ACCESS expr
+    | expr COMPONENT_ACCESS expr
     | <assoc = right> expr '^' expr
-    | ('-' | '+') expr
-    | expr ':' expr
+    | ADD_SUB expr
+    | expr RANGE_OPERATOR expr
     | expr USER_OP expr // anything wrappedin %: '%' .* '%'
-    | expr ('*' | '/') expr
-    | expr ('+' | '-') expr
-    | expr ('>' | '>=' | '<' | '<=' | '==' | '!=') expr
-    | '!' expr
-    | expr ('&' | '&&') expr
-    | expr ('|' | '||') expr
+    | expr MULT_DIV expr
+    | expr ADD_SUB expr
+    | expr COMPARATOR expr
+    | NOT expr
+    | expr AND expr
+    | expr OR expr
     | '~' expr
     | expr '~' expr
-    | expr ('<-' | '<<-' | '=' | '->' | '->>' | ':=') expr
-    | 'function' '(' formlist? ')' expr // define function
-    | expr '(' sublist ')'              // call function
-    | '{' exprlist '}'                  // compound statement
-    | 'if' '(' expr ')' expr
-    | 'if' '(' expr ')' expr NL* 'else' expr
-    | 'for' '(' ID 'in' expr ')' expr
-    | 'while' '(' expr ')' expr
-    | 'repeat' expr
-    | '?' expr // get help on expr, usually string or ID
-    | 'next'
-    | 'break'
-    | '(' expr ')'
+    | expr ASSIGN expr
+    | FUNCTION PAREN_L formlist? PAREN_R expr // define function
+    | expr PAREN_L sublist PAREN_R              // call function
+    | CURLY_L exprlist CURLY_R                  // compound statement
+    | IF PAREN_L expr PAREN_R expr
+    | IF PAREN_L expr PAREN_R expr NL* ELSE expr
+    | FOR PAREN_L ID IN expr PAREN_R expr
+    | WHILE PAREN_L expr PAREN_R expr
+    | REPEAT expr
+    | HELP expr // get help on expr, usually string or ID
+    | NEXT
+    | BREAK
+    | PAREN_L expr PAREN_R
     | ID
     | STRING
     | HEX
     | INT
     | FLOAT
     | COMPLEX
-    | 'NULL'
-    | 'NA'
-    | 'Inf'
-    | 'NaN'
-    | 'TRUE'
-    | 'FALSE'
+    | NULL
+    | NA
+    | INF
+    | NAN
+    | TRUE
+    | FALSE
     | NL expr
     ;
 
 exprlist
-    : expr ((';' | NL) expr?)*
+    : expr ((SEMICOLON | NL) expr?)*
     ;
 
 formlist
-    : form (',' form)*
+    : form (SEMICOLON form)*
     ;
 
 form
@@ -125,16 +125,58 @@ sublist
 
 sub
     : expr
-    | ID '='
-    | ID '=' expr
-    | STRING '='
-    | STRING '=' expr
-    | 'NULL' '='
-    | 'NULL' '=' expr
+    | ID EQUALS
+    | ID EQUALS expr
+    | STRING EQUALS
+    | STRING EQUALS expr
+    | NULL EQUALS
+    | NULL EQUALS expr
     | '...'
     | '.'
     |
     ;
+
+IF: 'if';
+FOR: 'for';
+WHILE: 'while';
+REPEAT: 'repeat';
+FUNCTION: 'function';
+ELSE: 'else';
+IN: 'in';
+
+LIST_ACCESS_START: '[[';
+LIST_ACCESS_END: ']]';
+ARRAY_ACCESS_START: '[';
+ARRAY_ACCESS_END: ']';
+NAMESPACE_ACCESS: ':::' | '::';
+COMPONENT_ACCESS: '$' | '@';
+
+HELP: '?';
+NEXT: 'next';
+BREAK: 'break';
+
+NULL: 'NULL';
+NA: 'NA';
+INF: 'inf';
+NAN: 'NaN';
+TRUE: 'TRUE';
+FALSE: 'FALSE';
+
+NOT: '!';
+RANGE_OPERATOR: ':';
+
+MULT_DIV: '*' | '/';
+ADD_SUB: '+' | '-';
+COMPARATOR: '>' | '>=' | '<' | '<=' | '==' | '!=';
+ASSIGN: '<-' | '<<-' | '->' | '->>' | ':=';
+EQUALS: '=';
+AND: '&&' | '&';
+OR: '||' | '|';
+
+PAREN_L: '(';
+PAREN_R: ')';
+CURLY_L: '{';
+CURLY_R: '}';
 
 HEX
     : '0' ('x' | 'X') HEXDIGIT+ [Ll]?
@@ -216,6 +258,8 @@ COMMENT
 NL
     : '\r'? '\n'
     ;
+
+SEMICOLON: ';';
 
 WS
     : [ \t\u000C]+ -> skip
