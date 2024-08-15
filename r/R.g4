@@ -60,48 +60,48 @@ expr_or_assign
 */
 
 expr
-    : expr LIST_ACCESS_START sublist LIST_ACCESS_END // '[[' follows R's yacc grammar
-    | expr ARRAY_ACCESS_START sublist ARRAY_ACCESS_END
-    | expr NAMESPACE_ACCESS expr
-    | expr COMPONENT_ACCESS expr
-    | <assoc = right> expr '^' expr
-    | ADD_SUB expr
-    | expr RANGE_OPERATOR expr
-    | expr USER_OP expr // anything wrappedin %: '%' .* '%'
-    | expr MULT_DIV expr
-    | expr ADD_SUB expr
-    | expr COMPARATOR expr
-    | NOT expr
-    | expr AND expr
-    | expr OR expr
-    | '~' expr
-    | expr '~' expr
-    | expr ASSIGN expr
-    | FUNCTION PAREN_L formlist? PAREN_R expr // define function
-    | expr PAREN_L sublist PAREN_R              // call function
-    | CURLY_L exprlist CURLY_R                  // compound statement
-    | IF PAREN_L expr PAREN_R expr
-    | IF PAREN_L expr PAREN_R expr NL* ELSE expr
-    | FOR PAREN_L ID IN expr PAREN_R expr
-    | WHILE PAREN_L expr PAREN_R expr
-    | REPEAT expr
-    | HELP expr // get help on expr, usually string or ID
-    | NEXT
-    | BREAK
-    | PAREN_L expr PAREN_R
-    | ID
-    | STRING
-    | HEX
-    | INT
-    | FLOAT
-    | COMPLEX
-    | NULL
-    | NA
-    | INF
-    | NAN
-    | TRUE
-    | FALSE
-    | NL expr
+    : expr LIST_ACCESS_START sublist LIST_ACCESS_END #ListAccess // '[[' follows R's yacc grammar
+    | expr ARRAY_ACCESS_START sublist ARRAY_ACCESS_END #ArrayAccess
+    | expr NAMESPACE_ACCESS expr #NamespaceAccess
+    | expr COMPONENT_ACCESS expr #ComponentAccess
+    | <assoc = right> expr '^' expr #Exponent
+    | ADD_SUB expr #Sign
+    | expr RANGE_OPERATOR expr #Range
+    | expr USER_OP expr #UserDefinedOperation // anything wrappedin %: '%' .* '%'
+    | expr MULT_DIV expr #MultOrDiv
+    | expr ADD_SUB expr #AddOrSub
+    | expr COMPARATOR expr #Comparison
+    | NOT expr #Not
+    | expr AND expr #And
+    | expr OR expr #Or
+    | '~' expr #ModelFormulaePrefix
+    | expr '~' expr #ModelFormulaeInfix
+    | expr ASSIGN expr #Assignment
+    | FUNCTION PAREN_L formlist? PAREN_R expr #FunctionDefinition // define function
+    | expr PAREN_L sublist PAREN_R #FunctionCall              // call function
+    | CURLY_L exprlist CURLY_R #CompoundStatement                  // compound statement
+    | IF PAREN_L expr PAREN_R expr #If
+    | IF PAREN_L expr PAREN_R expr NL* ELSE expr #IfElse
+    | FOR PAREN_L ID IN expr PAREN_R expr #For
+    | WHILE PAREN_L expr PAREN_R expr #While
+    | REPEAT expr #Repeat
+    | HELP expr #Help // get help on expr, usually string or ID
+    | NEXT #Next
+    | BREAK #Break
+    | PAREN_L expr PAREN_R #BracketTerm
+    | ID #Id
+    | STRING #String
+    | HEX #Hex
+    | INT #Int
+    | FLOAT #Float
+    | COMPLEX #Complex
+    | NULL #Null
+    | NA #Na
+    | INF #Inf
+    | NAN #Nan
+    | TRUE #True
+    | FALSE #False
+    | NL expr #Newline
     ;
 
 exprlist
@@ -114,7 +114,7 @@ formlist
 
 form
     : ID
-    | ID '=' expr
+    | ID EQUALS expr
     | '...'
     | '.'
     ;
