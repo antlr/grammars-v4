@@ -3,7 +3,7 @@ from glob import glob
 from pathlib import Path
 
 def main(argv):
-    for file in glob("./*.g4"):
+    for file in glob("*.g4"):
         fix(file)
 
 def fix(file_path):

@@ -1193,9 +1193,9 @@ macroPunctuationToken
 // some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
 
 shl
-    : LT {$parser.next('<')}? LT
+    : LT {this.next('<')}? LT
     ;
 
 shr
-    : GT {$parser.next('>')}? GT
+    : GT {this.next('>')}? GT
     ;
