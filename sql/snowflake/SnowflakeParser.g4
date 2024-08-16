@@ -752,7 +752,18 @@ account_id_list
     ;
 
 alter_dynamic_table
-    : ALTER DYNAMIC TABLE id_ (resume_suspend | REFRESH | SET WAREHOUSE EQ id_)
+    : ALTER DYNAMIC TABLE if_exists? object_name (
+        resume_suspend
+        | REFRESH
+        | SET dynamic_table_settable_params+
+    )
+    | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
+    | ALTER DYNAMIC TABLE if_exists? object_name (set_tags | unset_tags)
+    | ALTER DYNAMIC TABLE if_exists? object_name search_optimization_action
+    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (
+        COMMA dynamic_table_unsettable_params
+    )*
+    | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
     ;
 
 alter_external_table
@@ -1149,10 +1160,15 @@ alter_table
         |
     )
     //[ , ... ]
-    | ALTER TABLE if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_ COMMA ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER TABLE if_exists? object_name rls_operations
+    ;
+
+rls_operations
+    : ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    | DROP ROW ACCESS POLICY object_name (
+        COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    )?
+    | DROP ALL ROW ACCESS POLICIES
     ;
 
 clustering_action
@@ -1568,13 +1584,49 @@ compression
     ;
 
 create_dynamic_table
-    : CREATE or_replace? DYNAMIC TABLE id_ TARGET_LAG EQ (string | DOWNSTREAM) WAREHOUSE EQ wh = id_ AS query_statement
+    : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
+        LR_BRACKET materialized_col_decl_list RR_BRACKET
+    )? dynamic_table_params+ AS query_statement
+    ;
+
+dynamic_table_params
+    : dynamic_table_settable_params
+    | REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL)
+    | INITIALIZE EQ (ON_CREATE | ON_SCHEDULE)
+    | cluster_by
+    | with_row_access_policy
+    | with_tags
+    ;
+
+dynamic_table_settable_params
+    : TARGET_LAG EQ (string | DOWNSTREAM)
+    | LAG EQ (
+        string 
+        | DOWNSTREAM
+    ) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
+    | WAREHOUSE EQ wh = id_
+    | set_data_retention_params
+    | DEFAULT_DDL_COLLATION_ EQ STRING
+    | comment_clause
+    ;
+
+dynamic_table_unsettable_params
+    : data_retention_params
+    | DEFAULT_DDL_COLLATION_
+    | COMMENT
+    ;
+
+data_retention_params
+    : DATA_RETENTION_TIME_IN_DAYS
+    | MAX_DATA_EXTENSION_TIME_IN_DAYS
+    ;
+
+set_data_retention_params
+    : data_retention_params EQ num
     ;
 
 create_event_table
-    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? (
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? data_retention_params* change_tracking? (
         DEFAULT_DDL_COLLATION_ EQ string
     )? copy_grants? with_row_access_policy? with_tags? (WITH? comment_clause)?
     ;
@@ -2005,7 +2057,7 @@ format_type_options
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q)
     | TRIM_SPACE EQ true_false
     | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE)
-    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
+    | NULL_IF EQ LR_BRACKET string_list* RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
     | EMPTY_FIELD_AS_NULL EQ true_false
@@ -2367,10 +2419,20 @@ out_of_line_constraint
     )
     ;
 
+//For classic table
 full_col_decl
     : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
         COMMENT string
     )?
+    ;
+
+//Column declaration for materialized table
+materialized_col_decl
+    : column_name data_type? with_masking_policy? with_tags? (COMMENT string)?
+    ;
+
+materialized_col_decl_list
+    : materialized_col_decl (COMMA materialized_col_decl)*
     ;
 
 column_decl_item
@@ -3507,6 +3569,7 @@ keyword
     | IF
     | JOIN
     | KEY
+    | LAG
     | LANGUAGE
     | LENGTH
     | MAX_CONCURRENCY_LEVEL
@@ -3550,8 +3613,11 @@ non_reserved_words
     | DOWNSTREAM
     | DYNAMIC
     | EDITION
+    | ENABLED
     | EMAIL
+    | EMPTY_
     | EVENT
+    | EXCHANGE
     | EXPIRY_DATE
     | EXPR
     | FIRST_NAME
@@ -3559,7 +3625,9 @@ non_reserved_words
     | GLOBAL
     | IDENTIFIER
     | IDENTITY
+    | INCREMENTAL
     | INDEX
+    | INITIALIZE
     | INPUT
     | INTERVAL
     | JAVASCRIPT
@@ -3570,6 +3638,9 @@ non_reserved_words
     | NAME
     | NETWORK
     | OFFSET
+    | ON_CREATE
+    | ON_ERROR
+    | ON_SCHEDULE
     | OPTION
     | ORGADMIN
     | OUTBOUND
@@ -3594,6 +3665,7 @@ non_reserved_words
     | PROVIDER
     | PUBLIC
     | RANK
+    | REFRESH_MODE
     | RESOURCE
     | RESOURCES
     | RESPECT
@@ -4357,6 +4429,8 @@ round_mode
     ;
 
 round_expr
-    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (
+        COMMA ROUNDING_MODE ASSOC round_mode
+    )* RR_BRACKET
     | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;
