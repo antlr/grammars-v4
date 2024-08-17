@@ -1,0 +1,52 @@
+MODULE $vcgfile;
+
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Define file storage used by the compiler
+/* 
+/*
+/* Modifications:
+/*
+/*	003	Keith Knowles	10-Feb-1986	(179 SVCG D)
+/*
+/*		Added vcg$gl_analysis_data_file for SCA support.
+/*
+/*	002	Caroline Davidson 16-Apr-1984	(025 VCG)
+/*
+/*		Added globals to define the PSE data file.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+ITEM vcg$gl_console_file	LONGWORD GLOBAL;
+ITEM vcg$gl_object_file		LONGWORD GLOBAL;
+ITEM vcg$gl_error_file	 	LONGWORD GLOBAL;
+ITEM vcg$gl_listing_file	LONGWORD GLOBAL;
+ITEM vcg$gl_terminal_file	LONGWORD GLOBAL;
+ITEM vcg$gl_pse_data_file	LONGWORD GLOBAL; /* A002
+ITEM vcg$gl_analysis_data_file	LONGWORD GLOBAL;
+
+ITEM vcg$gl_console_fab		LONGWORD GLOBAL;
+ITEM vcg$gl_object_fab		LONGWORD GLOBAL;
+ITEM vcg$gl_error_fab		LONGWORD GLOBAL;
+ITEM vcg$gl_listing_fab		LONGWORD GLOBAL;
+ITEM vcg$gl_terminal_fab	LONGWORD GLOBAL;
+ITEM vcg$gl_pse_data_file_fab	LONGWORD GLOBAL; /* A002
+ITEM vcg$gl_analysis_data_fab	LONGWORD GLOBAL;
+
+ITEM vcg$gl_console_rab		LONGWORD GLOBAL;
+ITEM vcg$gl_object_rab		LONGWORD GLOBAL;
+ITEM vcg$gl_error_rab	 	LONGWORD GLOBAL;
+ITEM vcg$gl_listing_rab		LONGWORD GLOBAL;
+ITEM vcg$gl_terminal_rab	LONGWORD GLOBAL;
+ITEM vcg$gl_pse_data_file_rab	LONGWORD GLOBAL; /* A002
+ITEM vcg$gl_analysis_data_rab	LONGWORD GLOBAL;
+
+ITEM vcg$gl_xabdat		LONGWORD GLOBAL;
+CONSTANT rms_success	EQUALS 65537;
+
+END_MODULE;

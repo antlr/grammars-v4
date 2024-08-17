@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4": "4.13.1",
+    "antlr4": "4.13.2",
     "buffer": "^6.0.3",
     "fs-extra": "^11.1.1",
     "timer-node": "^5.0.6",
@@ -17,7 +17,7 @@
   },
   "type": "module",
   "devDependencies": {
-    "@types/node": "^20.2.5"
+    "@types/node": "^22.0.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"

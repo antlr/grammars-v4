@@ -3122,6 +3122,7 @@ keywordsCanBeId
     | XA
     | XA_RECOVER_ADMIN
     | XML
+    | YES
     ;
 
 functionNameBase
@@ -3488,4 +3489,5 @@ functionNameBase
     | JSON_STORAGE_SIZE
     | JSON_ARRAYAGG
     | JSON_OBJECTAGG
+    | STATEMENT
     ;

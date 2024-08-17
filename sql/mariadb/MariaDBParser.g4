@@ -832,7 +832,7 @@ dropSequence // sequence is MariaDB-specific only
 //    Other DDL statements
 
 renameTable
-    : RENAME TABLE renameTableClause (',' renameTableClause)*
+    : RENAME TABLE ifExists? renameTableClause (',' renameTableClause)*
     ;
 
 renameTableClause
@@ -3199,6 +3199,7 @@ keywordsCanBeId
     | XA
     | XA_RECOVER_ADMIN
     | XML
+    | YES
     // MariaDB-specific only
     | BINLOG_MONITOR
     | BINLOG_REPLAY

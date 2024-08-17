@@ -961,15 +961,6 @@
   ]
  },
  {
-  "name": "Cobol85",
-  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/cobol85/Cobol85Preprocessor.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/cobol85/Cobol85Preprocessor.g4",
-  "start": "startRule",
-  "example": [
-   "example1.txt"
-  ]
- },
- {
   "name": "CodeQL",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/codeql/CodeQLLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/codeql/CodeQLParser.g4",
@@ -1811,7 +1802,7 @@
   "name": "icon",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/icon/icon.g4",
-  "start": "start",
+  "start": "start_",
   "example": [
    "hello.txt"
   ]
@@ -2065,127 +2056,6 @@
   ]
  },
  {
-  "name": "Kotlin",
-  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin/KotlinLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin/KotlinLexer.g4",
-  "start": "kotlinFile",
-  "example": [
-   "/bad_property.kt",
-   "/fix-3206.kt",
-   "/fix-3208.kt",
-   "/fix-3210.kt",
-   "/fix-3215.kt",
-   "/fix-3218.kt",
-   "/fix-3220.kt",
-   "/fix-3223.kt",
-   "/fix-3225.kt",
-   "/fix-3228.kt",
-   "/fix-3230.kt",
-   "/fix-3233.kt",
-   "/fix-3235.kt",
-   "/fix-3238.kt",
-   "/fix-3240.kt",
-   "/fix-3242.kt",
-   "/fun_on_same_line.kt"
-  ]
- },
- {
-  "name": "Kotlin",
-  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin-formal/KotlinLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kotlin/kotlin-formal/KotlinParser.g4",
-  "start": "kotlinFile",
-  "example": [
-   "Test.kt",
-   "fuzzer/accessorNames.kt-2063861338.kt_minimized.kt",
-   "fuzzer/accessorNames.kt-450790955.kt_minimized.kt",
-   "fuzzer/accessorStability.kt1537823044.kt_minimized.kt",
-   "fuzzer/anonymousObjectInline.kt-1790992532.kt_minimized.kt",
-   "fuzzer/booleanNotIntrinsic.kt-1767516354.kt_minimized.kt",
-   "fuzzer/booleanNotIntrinsic.kt1942524773.kt_minimized.kt",
-   "fuzzer/boundObjectMemberReferences.kt-2007612581.kt_minimized.kt",
-   "fuzzer/callableReference.kt120298636.kt_minimized.kt",
-   "fuzzer/captureInlinable.kt1545900110.kt_minimized.kt",
-   "fuzzer/classLevel2.kt-940486080.kt_minimized.kt",
-   "fuzzer/constClosureOptimization.kt-1709832008.kt_minimized.kt",
-   "fuzzer/constClosureOptimization.kt2031980589.kt_minimized.kt",
-   "fuzzer/constClosureOptimization.kt2139860259.kt_minimized.kt",
-   "fuzzer/constructors.kt1308727874.kt_minimized.kt",
-   "fuzzer/coroutineNonLocalReturn.kt1282322481.kt_minimized.kt",
-   "fuzzer/delegation3.kt-2141195578.kt_minimized.kt",
-   "fuzzer/destructuringInLambdas.kt535844929.kt_minimized.kt",
-   "fuzzer/equalsHashCode.kt-476210170.kt_minimized.kt",
-   "fuzzer/equalsHashCodeToString.kt-1836720748.kt_minimized.kt",
-   "fuzzer/extension.kt149450740.kt_minimized.kt",
-   "fuzzer/extensionComponents.kt652698361.kt_minimized.kt",
-   "fuzzer/extensionToPrimitive.kt1764434937.kt_minimized.kt",
-   "fuzzer/fakeGenericCovariantOverrideWithDelegation.kt326423031.kt_minimized.kt",
-   "fuzzer/falseSmartCast.kt-117076066.kt_minimized.kt",
-   "fuzzer/floatingPointParameters.kt-1592337109.kt_minimized.kt",
-   "fuzzer/forEachLine.kt1372029956.kt_minimized.kt",
-   "fuzzer/genericMember.kt1456593491.kt_minimized.kt",
-   "fuzzer/genericOverriddenProperty.kt-1818173800.kt_minimized.kt",
-   "fuzzer/hiddenSuperOverrideIn1.0.kt-127445899.kt_minimized.kt",
-   "fuzzer/hiddenSuperOverrideIn1.0.kt414448909.kt_minimized.kt",
-   "fuzzer/inline.kt1551051720.kt_minimized.kt",
-   "fuzzer/inlineChain.kt1292125550.kt_minimized.kt",
-   "fuzzer/inlineReifiedFun.kt280870791.kt_minimized.kt",
-   "fuzzer/inlineSimpleChain.kt1926719601.kt_minimized.kt",
-   "fuzzer/inlineTryCatch.kt329001800.kt_minimized.kt",
-   "fuzzer/inlineTryExpr.kt21287552.kt_minimized.kt",
-   "fuzzer/innerClassConstructor.kt-672345767.kt_minimized.kt",
-   "fuzzer/innerConstructorFromClass.kt1493067669.kt_minimized.kt",
-   "fuzzer/innerConstructorFromTopLevelOneStringArg.kt-1018510954.kt_minimized.kt",
-   "fuzzer/innerConstructorFromTopLevelOneStringArg.kt-988335090.kt_minimized.kt",
-   "fuzzer/intReturnComplex2.kt-1067726526.kt_minimized.kt",
-   "fuzzer/intReturnComplex3.kt195226209.kt_minimized.kt",
-   "fuzzer/isOptional.kt-258774014.kt_minimized.kt",
-   "fuzzer/isOptional.kt1441624899.kt_minimized.kt",
-   "fuzzer/jaggedDeep.kt-1286643848.kt_minimized.kt",
-   "fuzzer/kt12200.kt1140639944.kt_minimized.kt",
-   "fuzzer/kt14564_2.kt-2053804782.kt_minimized.kt",
-   "fuzzer/kt15446.kt-1543246343.kt_minimized.kt",
-   "fuzzer/localCallableRef.kt-1908189166.kt_minimized.kt",
-   "fuzzer/localFunctionName.kt2092654901.kt_minimized.kt",
-   "fuzzer/localVal.kt881595124.kt_minimized.kt",
-   "fuzzer/mergeNullAndString.kt307227927.kt_minimized.kt",
-   "fuzzer/nestedConstructorFromClass.kt1142035378.kt_minimized.kt",
-   "fuzzer/nestedConstructorFromClass.kt2126945740.kt_minimized.kt",
-   "fuzzer/nestedConstructorFromTopLevelNoArgs.kt-1466328465.kt_minimized.kt",
-   "fuzzer/nestedConstructorFromTopLevelOneStringArg.kt-115154643.kt_minimized.kt",
-   "fuzzer/noInlineLambda.kt684659113.kt_minimized.kt",
-   "fuzzer/noSynAccessorToDirectFieldAccess.kt221709996.kt_minimized.kt",
-   "fuzzer/notLocalReturn.kt1142069763.kt_minimized.kt",
-   "fuzzer/nullSpilling.kt-591733258.kt_minimized.kt",
-   "fuzzer/ordinaryMethodIsInvokedWhenNoDefaultValuesAreUsed.kt1196254124.kt_minimized.kt",
-   "fuzzer/overloadBinaryOperator.kt-1996536027.kt_minimized.kt",
-   "fuzzer/overriddenInSubclass.kt-2065603588.kt_minimized.kt",
-   "fuzzer/overrideAnyWithPrimitive.kt751000263.kt_minimized.kt",
-   "fuzzer/parameterizedTypes.kt-377370271.kt_minimized.kt",
-   "fuzzer/parametersToString.kt77997164.kt_minimized.kt",
-   "fuzzer/platformName.kt-2011393841.kt_minimized.kt",
-   "fuzzer/returnByLabel.kt2103823849.kt_minimized.kt",
-   "fuzzer/simpleClosure.kt1434818323.kt_minimized.kt",
-   "fuzzer/simpleConstructor.kt-128512192.kt_minimized.kt",
-   "fuzzer/simpleMemberFunciton.kt-685257244.kt_minimized.kt",
-   "fuzzer/simpleNames.kt1579925425.kt_minimized.kt",
-   "fuzzer/specialCalls.kt1923177524.kt_minimized.kt",
-   "fuzzer/splitedExceptionTable.kt1758318721.kt_minimized.kt",
-   "fuzzer/startCoroutine.kt-766753550.kt_minimized.kt",
-   "fuzzer/subclosuresWithinInitializers.kt-449018151.kt_minimized.kt",
-   "fuzzer/suspendWithWhen.kt1896074245.kt_minimized.kt",
-   "fuzzer/tailrec.kt-177463727.kt_minimized.kt",
-   "fuzzer/typeAliasAsBareType.kt1285308530.kt_minimized.kt",
-   "fuzzer/typeEqualsHashCode.kt646203909.kt_minimized.kt",
-   "fuzzer/typeParameterInLambda.kt-230697731.kt_minimized.kt",
-   "fuzzer/typeParametersSubstitution2.kt-539642710.kt_minimized.kt",
-   "fuzzer/unit.kt-1416893130.kt_minimized.kt",
-   "fuzzer/unit.kt-687248556.kt_minimized.kt",
-   "fuzzer/unit.kt470935645.kt_minimized.kt",
-   "fuzzer/unreachableMarker.kt270499899.kt_minimized.kt",
-   "fuzzer/useSiteVariance.kt-1106475858.kt_minimized.kt"
-  ]
- },
- {
   "name": "KQuery",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/kquery/KQuery.g4",
@@ -2227,7 +2097,7 @@
   "name": "Lark",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/lark/LarkLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/lark/LarkParser.g4",
-  "start": "start",
+  "start": "start_",
   "example": [
    "ab.lark",
    "common.lark",
@@ -2661,15 +2531,6 @@
   "start": "specification",
   "example": [
    "bondApp.km3"
-  ]
- },
- {
-  "name": "oncrpcv2",
-  "lexer": "",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/oncrpc/oncrpcv2.g4",
-  "start": "oncrpcv2Specification",
-  "example": [
-   "CalculatorService.x"
   ]
  },
  {
@@ -5377,7 +5238,7 @@
   "name": "sieve",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sieve/sieve.g4",
-  "start": "start",
+  "start": "start_",
   "example": [
    "example1.txt"
   ]
@@ -5415,7 +5276,7 @@
   "name": "SMTLIBv2",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/smtlibv2/SMTLIBv2.g4",
-  "start": "start",
+  "start": "start_",
   "example": [
    "kaluzalong.smt2",
    "pisa-000.smt2",
@@ -5484,6 +5345,29 @@
   ]
  },
  {
+  "name": "SPL",
+  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/spl/SPLLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/spl/SPLParser.g4",
+  "start": "expression",
+  "example": [
+   "by.txt",
+   "complex_query_1.txt",
+   "complex_query_2.txt",
+   "in.txt",
+   "join.txt",
+   "like_1.txt",
+   "like_2.txt",
+   "not.txt",
+   "or.txt",
+   "outputnew.txt",
+   "regex.txt",
+   "simple_query.txt",
+   "time.txt",
+   "wildcard_1.txt",
+   "wildcard_2.txt"
+  ]
+ },
+ {
   "name": "Athena",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/athena/AthenaLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/athena/AthenaParser.g4",
@@ -5525,41 +5409,6 @@
    "drop.sql",
    "other.sql",
    "select.sql"
-  ]
- },
- {
-  "name": "Hive",
-  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/hive/v2/HiveLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/hive/v2/HintParser.g4",
-  "start": "statements",
-  "example": [
-   "ddl.sql",
-   "expression.sql",
-   "indexes.sql",
-   "select.sql",
-   "transform_1.sql",
-   "transform_2.sql",
-   "transform_3.sql",
-   "transform_4.sql",
-   "transform_5.sql",
-   "transform_6.sql"
-  ]
- },
- {
-  "name": "Hive",
-  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/hive/v3/HiveLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/sql/hive/v3/HintParser.g4",
-  "start": "statements",
-  "example": [
-   "ddl.sql",
-   "expression.sql",
-   "select.sql",
-   "transform_1.sql",
-   "transform_2.sql",
-   "transform_3.sql",
-   "transform_4.sql",
-   "transform_5.sql",
-   "transform_6.sql"
   ]
  },
  {
@@ -5728,7 +5577,9 @@
    "iff.sql",
    "materialized_views.sql",
    "other.sql",
+   "password_policy.sql",
    "select.sql",
+   "session_policy.sql",
    "show.sql",
    "tables.sql",
    "tags.sql",
@@ -6449,7 +6300,7 @@
  {
   "name": "vba",
   "lexer": "",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba6/vba.g4",
   "start": "startRule",
   "example": [
    "example09_typeHints.bas",
@@ -6462,6 +6313,26 @@
    "example6dateliteral.bas",
    "example7linecontinuation.bas",
    "example8_lineNumbers.bas"
+  ]
+ },
+ {
+  "name": "vba_cc",
+  "lexer": "",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba_cc/vba_cc.g4",
+  "start": "startRule",
+  "example": [
+   "cc.bas"
+  ]
+ },
+ {
+  "name": "vba_like",
+  "lexer": "",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/vba/vba_like/vba_like.g4",
+  "start": "program",
+  "example": [
+   "pattern01",
+   "pattern02",
+   "pattern03"
   ]
  },
  {
@@ -6653,7 +6524,7 @@
   "name": "WavefrontOBJ",
   "lexer": "",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/wavefront/WavefrontOBJ.g4",
-  "start": "start",
+  "start": "start_",
   "example": [
    "b1_14_bezier_in_u_direction_with_b_spline_in_v_direction_with_basis_matrix.txt",
    "b1_14_cubic_bezier_surface_with_basis_matrix.txt",

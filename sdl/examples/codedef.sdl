@@ -1,0 +1,264 @@
+module $defcod;
+
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	005M	Peter Craig	19-Nov-1986	(315 SVCG M)
+/*
+/*		Created a new variant of the code cell data structure for
+/*		use with the new code cell type cod_k_reserve.  The purpose
+/*		of the reserve cell is just to reserve space in the code
+/*		cell numbering scheme, and hold information about the current
+/*		location in intermediate code cell list so that instructions
+/*		can later be inserted at that point in the list.  Such cells
+/*		may now be required during local code generation and are
+/*		cleaned up by a later phase.  A variant is needed so that
+/*		reserve cells can indicate an arbitrary number of operands
+/*		that do not occupy any space at the end of the cell, and so
+/*		that overloaded fields in the reserve cell can be given more
+/*		appropriate names.
+/*
+/*	008D	Keith Knowles	29-Jan-1987	(338 SVCG D)
+/*
+/*		Add cod_k_copy_frame code-cell type to mark instructions
+/*		used for copying the call frame.  The register allocator
+/*		has to fill in a literal/immediate value in operand 1.
+/*
+/*	007D	Tom Benson	20-Jan-1986	(151 SVCG D)
+/*
+/*		Added cop_v_auto_candidate and cop_v_auto_based, used for
+/*		indicating auto-inc/dec candidates and operands which use
+/*		auto_candidate registers. Also added addr_base and update_base
+/*		code cell types.
+/*
+/*	006D	Ian Stocks	16-Sep-1985	(109 SVCG D)
+/*
+/*		Add COD_A_AUX_INFO field for use by PRE_PEEP
+/*		Add COP_V_ALIGN_LABEL field
+/*		Delete dummy $DEFPRO, $DEFCOP
+/*
+/*	005	Ian Stocks	05-Apr-1986	(004 SVCG D)
+/*
+/*		Merge $DEFCOD, $DEFCOP. Eliminate COD_* version of the
+/*		operand field names, so there is a single copy defining these.
+/*		Set SPARE fields to FILL
+/*		Set BLINK/FLINK fields to point at code-cell-operators.
+/*		Merge in PSECTDEF.SDL as well
+/*		Make counters, instruction modes, unsigned
+/*		Make register masks into unsigned word
+/*
+/*	004	Tom Benson	27-Nov-1984	(126 VCG)
+/*
+/*		Overlay COD_W_PSECT with COD_W_BASE (same for COP_) so that
+/*		operand size can be shrunk back to 3 longwords. These fields
+/*		are mutually exclusive except for external symbol and constant
+/*		references. In these cases, EMITITEM will set the _PSECT field
+/*		and the _RELOC bit, and later may set the _BASE_USE bit and
+/*		the _BASE field, overwriting _PSECT. Therefore, in REGISTER,
+/*		after _BASE is used to fetch the regtemp address, _RELOC will
+/*		be tested. If it's set, _PSECT will be filled in properly by
+/*		getting the symbol address from the regtemp node, and the psect
+/*		number from the symbol node.
+/*		
+/*		identical.
+/*
+/*	003	Tom Benson	26-Nov-1984	(125 VCG)
+/*
+/*		modify code cell declarations so that COD_R_BASE is 3 bytes
+/*		in length rather than 2, and eliminate subfields which will
+/*		no longer be used. Total size of operand is now 4 longwords
+/*		rather than 3.
+/*
+/*	002	Caroline Davidson 28-June-1984	(054 VCG)
+/*
+/*		Added new code cell type to indicate end of prologue code.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/* Modifications to PROLOGDEF.SDL, prior to merge:
+/*
+/*	002	Tom Benson	26-Nov-1984	(125 VCG)
+/*
+/*		Increased pro_base from 6 to 7 and pro_index from 6 to 8.
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define prolog descriptor structure
+/*
+
+#pro_base = 7;		{ M002 number of bits in base field of register index
+CONSTANT pro_k_base EQUALS (#pro_base);
+
+#pro_index = 8;		{ M002 number of bits in index field of register index
+CONSTANT pro_k_index EQUALS (#pro_index);
+
+#pro_scale = 10;	{ weight scale shift factor
+CONSTANT pro_k_scale EQUALS (#pro_scale);
+
+AGGREGATE vcg_prolog_descr STRUCTURE;
+	pro_l_flink	ADDRESS(vcg_prolog_descr); { prolog descriptor forward link - M005
+	pro_l_blink	ADDRESS(vcg_prolog_descr); { prolog descriptor backward link - M005
+	pro_w_reg_mask	WORD UNSIGNED;		   { accumulated register mask - M005
+	pro_w_res_mask	WORD UNSIGNED;		   { reserved register mask - M005
+	pro_w_entr_cnt	WORD UNSIGNED;		   { entry count
+	pro_w_reg_state	WORD UNSIGNED;		   { machine register state - M005
+	pro_w_ident	WORD UNSIGNED;	{ highest display ident + 1 - M005
+	pro_w_reg_count	WORD UNSIGNED;	{ register counter - M005
+	pro_l_stk_size	LONGWORD;	{ size of local stack required
+	pro_l_counter	LONGWORD;	{ operand specifier/instruction opcode counter
+	pro_l_blocknode	ADDRESS;	{ address of block node
+	pro_l_stmnt_ops	LONGWORD;	{ number of statement ops in the block 
+	pro_l_startaddr	LONGWORD;	{ offset in code psect of routine start
+	pro_q_allochead STRUCTURE QUADWORD;{ explicit register allocation listhead
+		pro_a_alloc_flink ADDRESS; { Forward link
+		pro_a_alloc_blink ADDRESS; { Backward link
+		END;
+	pro_q_finalhead STRUCTURE QUADWORD;{ explicit register final use listhead
+		pro_a_final_flink ADDRESS; { Forward link
+		pro_a_final_blink ADDRESS; { Backward link
+		END;
+	pro_q_firsthead STRUCTURE QUADWORD;{ explicit register first use listhead
+		pro_a_first_flink ADDRESS; { Forward link
+		pro_a_first_blink ADDRESS; { Backward link
+		END;
+	pro_q_killhead STRUCTURE QUADWORD;{ kill register listhead
+		pro_a_kill_flink ADDRESS; { Forward link
+		pro_a_kill_blink ADDRESS; { Backward link
+		END;
+	pro_q_temphead STRUCTURE QUADWORD;{ temporary allocation listhead
+		pro_a_temp_flink ADDRESS; { Forward link
+		pro_a_temp_blink ADDRESS; { Backward link
+		END;
+	pro_l_register LONGWORD DIMENSION 1@#pro_base;	{ register pointer block pointers
+	pro_al_held_reg	LONGWORD DIMENSION 16; { held register temporary pointer array
+#pro_length = .;
+	END;
+/*
+/* Define the length of a prolog descriptor
+/*
+CONSTANT pro_k_length EQUALS (#pro_length);
+
+/*
+/* Define the code cell operand structure
+/*
+AGGREGATE vcg_code_cell_operand STRUCTURE;
+
+	cop_b_uflags STRUCTURE PREFIX "cop_";		{ Unchecked flags
+		context		BITFIELD LENGTH 3 MASK;	{ operand context
+		last_use	BITFIELD MASK;		{ last use of operand
+		alias_var	BITFIELD MASK;		{ aliased variable flag
+		ext_pst		BITFIELD MASK;		{ external psect flag
+		auto_based	BITFIELD MASK;		{ A007D based on ADDR_BASE
+		auto_candidate	BITFIELD MASK;		{ A007D may be auto-inc/dec
+		END;
+
+	cop_b_flags STRUCTURE PREFIX "cop_";		{ Checked operand flags
+		extern		BITFIELD MASK;		{ external symbol
+		reloc		BITFIELD MASK;		{ relocation required
+		label		BITFIELD MASK;		{ label reference
+		temp		BITFIELD MASK;		{ temporary operand
+		unbound		BITFIELD MASK;		{ unbound operand flag
+		index_use	BITFIELD MASK;		{ index field used
+		base_use	BITFIELD MASK;		{ base field used
+		align_label	BITFIELD MASK;		{ longword align - A006D
+		END;
+
+	cop_r_base UNION;				{ M004
+		cop_w_psect	WORD UNSIGNED;		{ M004 Relocation psect number
+		cop_w_base	WORD UNSIGNED;		{ M005 M003 base index field
+		END;
+	cop_b_addr1	BYTE UNSIGNED;			{ M005 M003 address specifier 1
+
+
+	cop_b_addr2	BYTE UNSIGNED;		{ M005 M004 address specifier 2
+	cop_w_index	WORD UNSIGNED;		{ M005 M003 index register index field
+
+	cop_l_more_data UNION;
+	        cop_l_displ	LONGWORD;
+		cop_a_displ	ADDRESS;		{ pointer form of cop_l_displ
+		cop_a_prolog	ADDRESS(vcg_prolog_descr);{ M005 points to prolog		A005
+		cop_l_stmnt	LONGWORD;		{ stmnt number			A005
+		cop_l_immdat	LONGWORD;		{ immediate data		A005
+		END;
+
+	#cop_length = .;
+END;
+
+/*
+/* Define length of code cell operand structure
+/*
+CONSTANT cop_k_length EQUALS (#cop_length);
+/*
+/*
+
+/*
+/* Define code cell type codes
+/*
+CONSTANT (
+	instr,			{ instruction
+	branch,			{ branch
+	prolog,			{ program prolog
+	label,			{ label reference
+	stmnt,			{ statement
+	blkend,			{ block end
+	immdat,			{ immediate data
+	cndmov,			{ conditional move
+	lodbas,			{ load static base
+	case_table,		{ case table
+	no_peep,		{ instruction which should not be peepholed
+	end_of_prolog,		{ end of prologue code ( A002 )
+	addr_base,		{ A007D address base for auto_inc/dec
+	update_base,		{ A007D update value for addr_base
+	copy_frame,		{ A008D instruction for allocating/copying frame
+	reserve,		{ reserve operand numbers ( A005M )
+	) EQUALS 0 INCREMENT 1 PREFIX "cod_";
+
+/*
+/* define the code cell structure for the VAX-11 Code Generator
+/*
+AGGREGATE vcg_code_cell_operator STRUCTURE;
+	cod_l_flink		ADDRESS(vcg_code_cell_operator);	{ Forward link  M005
+	cod_l_blink		ADDRESS(vcg_code_cell_operator);	{ Backward link	 M005
+	cod_b_type		BYTE;		{ Code cell type code
+	cod_b_number		BYTE UNSIGNED;	{ M005 Number of operands
+	cod_w_opcode		WORD UNSIGNED;	{ M005 Machine opcode
+	cod_l_last_long_word UNION;			{ M006D
+	    cod_b_tbytes		BYTE UNSIGNED;	{ Total bytes generated for instruction
+	    cod_a_aux_info		ADDRESS;	{ For pre-peep; A006D
+	    END;					{ M006D
+    
+#cod_length = .;
+
+END;
+/*
+/* Define length of code cell operator structure
+/*
+CONSTANT cod_k_length EQUALS (#cod_length);
+
+/* A005M +
+/*
+/* define a variant of the code cell structure for use
+/* with reserve cells
+/*
+AGGREGATE vcg_reserve_cell STRUCTURE;
+	res_l_flink		ADDRESS;	{ Forward link
+	res_l_blink		ADDRESS;	{ Backward link
+	res_b_type		BYTE;		{ Code cell type code
+	res_b_number		BYTE UNSIGNED;	{ M005M Count of cell numbers reserved
+	res_w_spare1		WORD;		{ Spare
+	res_l_saved_counter	ADDRESS;	{ Value of code cell counter
+	END;
+/* A005M -
+
+end_module;

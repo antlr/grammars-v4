@@ -86,3 +86,6 @@ SELECT n, scale, ROUND(n, scale) FROM t;
 SELECT ROUND(2.5, 0), ROUND(2.5, 0, 'HALF_TO_EVEN'), CEIL(2.5, 0), FLOOR(2.5, 0), TRUNC(3.14,-1), TRUNCATE(3.14116,2);
 SELECT ROUND( EXPR => -2.5, SCALE => 0, ROUNDING_MODE => 'HALF_AWAY_FROM_ZERO_Q');
 SELECT EXPR, SCALE, ROUNDING_MODE, SEQUENCE FROM t;
+
+select 'a', 'b',;
+with t as (select 'a', 'b',) select * from t;
