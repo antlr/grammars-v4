@@ -5,8 +5,8 @@ public abstract class RustLexerBase extends Lexer{
         super(input);
     }
 
-    Token lt1;
-    Token lt2;
+    Token current;
+    Token previous;
 
     @Override
     public Token nextToken() {
@@ -14,8 +14,8 @@ public abstract class RustLexerBase extends Lexer{
 
         if (next.getChannel() == Token.DEFAULT_CHANNEL) {
             // Keep track of the last token on the default channel.
-            this.lt2 = this.lt1;
-            this.lt1 = next;
+            this.previous = this.current;
+            this.current = next;
         }
 
         return next;
@@ -46,9 +46,9 @@ public abstract class RustLexerBase extends Lexer{
     }
 
     public boolean floatLiteralPossible(){
-        if(this.lt1 == null || this.lt2 == null) return true;
-        if(this.lt1.getType() != RustLexer.DOT) return true;
-        switch (this.lt2.getType()){
+        if(this.current == null || this.previous == null) return true;
+        if(this.current.getType() != RustLexer.DOT) return true;
+        switch (this.previous.getType()){
             case RustLexer.CHAR_LITERAL:
             case RustLexer.STRING_LITERAL:
             case RustLexer.RAW_STRING_LITERAL:
