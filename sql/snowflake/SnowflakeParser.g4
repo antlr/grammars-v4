@@ -2343,16 +2343,17 @@ stream_time
     ;
 
 create_stream
-    //-- table
-    : CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON TABLE object_name stream_time? append_only? show_initial_rows?
+    //-- table or view
+    : CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON (
+        TABLE
+        |VIEW
+     ) object_name stream_time? append_only? show_initial_rows?
         comment_clause?
     //-- External table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only? comment_clause?
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON EXTERNAL TABLE object_name
+        stream_time? insert_only? comment_clause?
     //-- Directory table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON STAGE object_name comment_clause?
-    //-- View
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON VIEW object_name stream_time? append_only? show_initial_rows?
-        comment_clause?
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON STAGE object_name comment_clause?
     ;
 
 temporary
