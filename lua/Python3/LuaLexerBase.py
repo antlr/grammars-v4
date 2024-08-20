@@ -22,7 +22,7 @@ class LuaLexerBase(Lexer):
                 self.read_long_string(cs, sep)
                 return
 
-        while cs.LA(1) != 12 and cs.LA(1) != -1:  # '\n'
+        while cs.LA(1) != 10 and cs.LA(1) != -1:  # '\n'
             cs.consume()
 
     def read_long_string(self, cs:InputStream, sep:int):
