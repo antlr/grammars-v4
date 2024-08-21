@@ -49,7 +49,7 @@ $ java TestR sample.R
 grammar R;
 
 prog
-    : (expr (SEMICOLON | NL)* | NL)* EOF
+    : (expr (SEMICOLON | NL)* )* EOF
     ;
 
 /*
@@ -76,7 +76,7 @@ expr
     | expr OR expr #Or
     | '~' expr #ModelFormulaePrefix
     | expr '~' expr #ModelFormulaeInfix
-    | expr ASSIGN expr #Assignment
+    | expr (ASSIGN | EQUALS) expr #Assignment
     | FUNCTION PAREN_L formlist? PAREN_R expr #FunctionDefinition // define function
     | expr PAREN_L sublist PAREN_R #FunctionCall              // call function
     | CURLY_L exprlist CURLY_R #CompoundStatement                  // compound statement
@@ -101,7 +101,7 @@ expr
     | NAN #Nan
     | TRUE #True
     | FALSE #False
-    | NL expr #Newline
+    | NL+ expr #Newline
     ;
 
 exprlist
@@ -109,7 +109,7 @@ exprlist
     ;
 
 formlist
-    : form (SEMICOLON form)*
+    : form (',' form)*
     ;
 
 form
