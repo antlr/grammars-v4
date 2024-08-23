@@ -49,7 +49,7 @@ $ java TestR sample.R
 grammar R;
 
 prog
-    : (expr (SEMICOLON | NL)* )* EOF
+    : ((SEMICOLON | NL)+ | expr )* EOF
     ;
 
 /*
