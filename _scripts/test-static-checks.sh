@@ -357,7 +357,7 @@ do
     if [ "$target" == "useless-parens" ]
     then
         # Find useless parentheses.
-        curl https://raw.githubusercontent.com/kaby76/g4-scripts/9e70a6392783936ddd51cd270f6ac29fecbefef8/find-useless-parentheses.sh 2> /dev/null | bash
+        curl https://raw.githubusercontent.com/kaby76/g4-scripts/5d94da10c285fbbd69eac3b3a429b8ccec4513fa/find-useless-parentheses.sh 2> /dev/null | bash
         if [ $? -ne 0 ]
         then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::grammar contains useless parentheses. Check log for more details."
