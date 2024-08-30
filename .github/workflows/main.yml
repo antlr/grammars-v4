@@ -108,7 +108,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -196,7 +196,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: '3.10'
     - name: Test Python
