@@ -2348,7 +2348,7 @@ create_stream
     : CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON (
         TABLE
         |VIEW
-     ) object_name stream_time? append_only? show_initial_rows? comment_clause?
+    ) object_name stream_time? append_only? show_initial_rows? comment_clause?
     //-- External table
     | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only?
         comment_clause?
@@ -2459,9 +2459,8 @@ create_table_clause
     : (
         column_decl_item_list_paren cluster_by?
         | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params?
-        change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
-        with_tags?
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking?
+        default_ddl_collation? copy_grants? comment_clause? with_row_access_policy? with_tags?
     ;
 
 create_table_as_select
