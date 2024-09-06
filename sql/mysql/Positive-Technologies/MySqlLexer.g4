@@ -288,6 +288,7 @@ LONGTEXT   : 'LONGTEXT';
 ENUM       : 'ENUM';
 VARYING    : 'VARYING';
 SERIAL     : 'SERIAL';
+VECTOR     : 'VECTOR';
 
 // Interval type Keywords
 
@@ -958,6 +959,7 @@ DES_DECRYPT                       : 'DES_DECRYPT';
 DES_ENCRYPT                       : 'DES_ENCRYPT';
 DIMENSION                         : 'DIMENSION';
 DISJOINT                          : 'DISJOINT';
+DISTANCE                          : 'DISTANCE';
 ELT                               : 'ELT';
 ENCODE                            : 'ENCODE';
 ENCRYPT                           : 'ENCRYPT';
@@ -1161,6 +1163,7 @@ ST_UNION                          : 'ST_UNION';
 ST_WITHIN                         : 'ST_WITHIN';
 ST_X                              : 'ST_X';
 ST_Y                              : 'ST_Y';
+STRING_TO_VECTOR                  : 'STRING_TO_VECTOR';
 SUBDATE                           : 'SUBDATE';
 SUBSTRING_INDEX                   : 'SUBSTRING_INDEX';
 SUBTIME                           : 'SUBTIME';
@@ -1186,6 +1189,8 @@ UPPER                             : 'UPPER';
 UUID                              : 'UUID';
 UUID_SHORT                        : 'UUID_SHORT';
 VALIDATE_PASSWORD_STRENGTH        : 'VALIDATE_PASSWORD_STRENGTH';
+VECTOR_DIM                        : 'VECTOR_DIM';
+VECTOR_TO_STRING                  : 'VECTOR_TO_STRING';
 VERSION                           : 'VERSION';
 WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS : 'WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS';
 WEEKDAY                           : 'WEEKDAY';
