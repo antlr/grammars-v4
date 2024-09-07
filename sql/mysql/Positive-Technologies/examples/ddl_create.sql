@@ -230,6 +230,7 @@ CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = IN
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
+CREATE TABLE TableWithVector (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, vec1 VECTOR, vec2 VECTOR);
 #end
 #begin
 -- Rename table

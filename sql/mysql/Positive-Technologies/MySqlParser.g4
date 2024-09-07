@@ -2224,7 +2224,7 @@ dataType
         | ZEROFILL
     )*                                                                                                      # dimensionDataType
     | typeName = (DATE | TINYBLOB | MEDIUMBLOB | LONGBLOB | BOOL | BOOLEAN | SERIAL)                        # simpleDataType
-    | typeName = (BIT | TIME | TIMESTAMP | DATETIME | BINARY | VARBINARY | BLOB | YEAR) lengthOneDimension? # dimensionDataType
+    | typeName = (BIT | TIME | TIMESTAMP | DATETIME | BINARY | VARBINARY | BLOB | YEAR | VECTOR) lengthOneDimension? # dimensionDataType
     | typeName = (ENUM | SET) collectionOptions BINARY? (charSet charsetName)?                              # collectionDataType
     | typeName = (
         GEOMETRYCOLLECTION
@@ -3193,6 +3193,7 @@ functionNameBase
     | DES_ENCRYPT
     | DIMENSION
     | DISJOINT
+    | DISTANCE
     | ELT
     | ENCODE
     | ENCRYPT
@@ -3422,6 +3423,7 @@ functionNameBase
     | ST_WITHIN
     | ST_X
     | ST_Y
+    | STRING_TO_VECTOR
     | SUBDATE
     | SUBSTRING_INDEX
     | SUBTIME
@@ -3448,6 +3450,8 @@ functionNameBase
     | UUID
     | UUID_SHORT
     | VALIDATE_PASSWORD_STRENGTH
+    | VECTOR_DIM
+    | VECTOR_TO_STRING
     | VERSION
     | VISIBLE
     | WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS
