@@ -100,6 +100,9 @@ GRANT FLUSH_OPTIMIZER_COSTS, FLUSH_STATUS, FLUSH_TABLES, FLUSH_USER_RESOURCES, P
 REVOKE reader FROM 'mysqluser'@'localhost'
 REVOKE reader FROM topreader
 REVOKE `cloudsqlsuperuser`@`%` FROM `sarmonitoring`@`10.90.29.%`
+REVOKE IF EXISTS SELECT ON test.t1 FROM jerry@localhost;
+REVOKE IF EXISTS Bogus ON test FROM jerry@localhost IGNORE UNKNOWN USER;
+
 -- Set Role
 SET ROLE DEFAULT;
 SET ROLE 'role1', 'role2';
