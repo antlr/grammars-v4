@@ -3691,6 +3691,7 @@ non_reserved_words
     | VALUES
     | VERSION
     | WAREHOUSE_TYPE
+    | FREQUENCY
     ;
 
 builtin_function
