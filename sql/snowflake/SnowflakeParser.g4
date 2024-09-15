@@ -4052,7 +4052,7 @@ switch_section
 
 // select
 query_statement
-    : with_expression? select_statement set_operators*
+    : with_expression? select_statement_in_parentheses set_operators*
     ;
 
 with_expression
@@ -4060,7 +4060,7 @@ with_expression
     ;
 
 common_table_expression
-    : id_ ('(' columns = column_list ')')? AS '(' select_statement set_operators* ')'
+    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS select_statement_in_parentheses
     ;
 
 select_statement
@@ -4069,8 +4069,14 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement //EXCEPT and MINUS have same SQL meaning
-    | LR_BRACKET select_statement RR_BRACKET
+    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
+    | select_statement_in_parentheses
+    ;
+
+select_statement_in_parentheses
+    : LR_BRACKET select_statement_in_parentheses RR_BRACKET
+    | select_statement_in_parentheses set_operators
+    | select_statement
     ;
 
 select_optional_clauses

@@ -89,3 +89,24 @@ SELECT EXPR, SCALE, ROUNDING_MODE, SEQUENCE FROM t;
 
 select 'a', 'b',;
 with t as (select 'a', 'b',) select * from t;
+
+with a as((
+    ((
+        select 10 as c
+    ))
+    union
+    ((
+        select 11 as d
+    ))
+))
+   , b as (((
+    ((select 2 as e))
+)))
+select *
+from a
+union
+((select 1 as c));
+
+(((select 10 as c)))
+union
+((select 11 as d));
