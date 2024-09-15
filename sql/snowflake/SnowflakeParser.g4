@@ -1721,7 +1721,8 @@ col_decl
     ;
 
 virtual_column_decl
-    : AS '(' function_call ')'
+    : AS LR_BRACKET function_call RR_BRACKET
+    | AS function_call
     ;
 
 function_definition
@@ -2347,7 +2348,7 @@ create_stream
     : CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON (
         TABLE
         |VIEW
-     ) object_name stream_time? append_only? show_initial_rows? comment_clause?
+    ) object_name stream_time? append_only? show_initial_rows? comment_clause?
     //-- External table
     | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only?
         comment_clause?
@@ -2361,7 +2362,8 @@ temporary
     ;
 
 table_type
-    : (( LOCAL | GLOBAL)? temporary | VOLATILE)
+    : (LOCAL | GLOBAL)? temporary
+    | VOLATILE
     | TRANSIENT
     ;
 
@@ -2416,14 +2418,12 @@ out_of_line_constraint
     : (CONSTRAINT id_)? (
         (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
         | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
-    )
+    ) inline_comment_clause?
     ;
 
 //For classic table
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
-        COMMENT string
-    )?
+    : col_decl (collate | inline_constraint | null_not_null | default_value)* with_masking_policy? with_tags? inline_comment_clause?
     ;
 
 //Column declaration for materialized table
@@ -2445,24 +2445,22 @@ column_decl_item_list
     ;
 
 create_table
-    : CREATE or_replace? table_type? TABLE (
+    : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
+    ) (comment_clause? create_table_clause | create_table_clause comment_clause?)
     ;
 
 column_decl_item_list_paren
-    : '(' column_decl_item_list ')'
+    : LR_BRACKET column_decl_item_list RR_BRACKET
     ;
 
 create_table_clause
     : (
         column_decl_item_list_paren cluster_by?
         | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
-        with_tags?
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking?
+        default_ddl_collation? copy_grants? comment_clause? with_row_access_policy? with_tags?
     ;
 
 create_table_as_select
@@ -2962,6 +2960,10 @@ comment_clause
     : COMMENT EQ string
     ;
 
+inline_comment_clause
+    : COMMENT string
+    ;
+
 if_suspended
     : IF SUSPENDED
     ;
@@ -2976,6 +2978,10 @@ if_not_exists
 
 or_replace
     : OR REPLACE
+    ;
+
+or_alter
+    : OR ALTER
     ;
 
 describe
@@ -3685,6 +3691,7 @@ non_reserved_words
     | VALUES
     | VERSION
     | WAREHOUSE_TYPE
+    | FREQUENCY
     ;
 
 builtin_function
