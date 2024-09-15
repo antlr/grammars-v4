@@ -3,7 +3,7 @@
 #
 # EXPECTATIONS:
 #   - inserted ERROR_TOKEN instead of the WS token
-#   - lexer error message: "line 11:0 inconsistent use of tabs and spaces in indentation"
+#   - lexer error message: "line 11:0  LEXER ERROR: inconsistent use of tabs and spaces in indentation"
 
 if True:
     i = 0  # indented by spaces

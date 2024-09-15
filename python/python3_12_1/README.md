@@ -1,4 +1,4 @@
-# Python 3.12.1 parser
+# Python 3.12.6 parser
 
 ### About files:
  - PythonParser.g4

@@ -4,7 +4,7 @@
 # EXPECTATIONS:
 #   - inserted leading INDENT token
 #   - hidden NEWLINE tokens (channel=1) before the first statement
-#   - lexer error message: "line 10:3 first statement indented"
+#   - lexer error message: "line 10:3  LEXER ERROR: first statement indented"
 
 
    i = 1   # first statement begins with space
