@@ -1,0 +1,1 @@
+(root (stmt (importDirective import (ref foo (refOperand (refOperandDot . bar))))) <EOF>)

@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead unify))) (stmt (regoRules (ruleHead partial))) (stmt (regoRules (ruleHead ground))) (stmt (regoRules (ruleHead array))) <EOF>)

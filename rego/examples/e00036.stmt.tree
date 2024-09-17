@@ -1,0 +1,1 @@
+(root (stmt (regoRules default p = (term (array_ [ (exprTermList (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref data (refOperand (refOperandDot . foo))))))))))) ])))) <EOF>)

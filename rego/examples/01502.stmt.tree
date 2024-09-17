@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead clock))) (stmt (regoRules (ruleHead leap))) (stmt (regoRules (ruleHead day))) <EOF>)

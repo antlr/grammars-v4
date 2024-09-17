@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead to_number))) (stmt (regoRules (ruleHead ref))) (stmt (regoRules (ruleHead dest))) <EOF>)

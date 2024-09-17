@@ -66,9 +66,9 @@ done
 # Group parsing.
 if [ "$global" == "" ]
 then
-    echo "${files[*]}" | dotnet trwdog -- sh -c "ts-node Test.js -q -x -tee -tree" > parse.txt 2>&1
+    echo "${files[*]}" | dotnet trwdog -- sh -c "npx tsx Test.js -q -x -tee -tree" > parse.txt 2>&1
 else
-    echo "${files[*]}" | trwdog sh -c "ts-node Test.js -q -x -tee -tree" > parse.txt 2>&1
+    echo "${files[*]}" | trwdog sh -c "npx tsx Test.js -q -x -tee -tree" > parse.txt 2>&1
 fi
 status="$?"
 <endif>

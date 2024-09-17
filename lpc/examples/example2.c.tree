@@ -1,0 +1,1 @@
+(lpc_program (program program (defination (data_type type_modifier_list (opt_basic_type (basic_type (atomic_type mixed)))) (name_list (new_name optional_star (identifier a) = (expr0 0))) ;) possible_semi_colon) <EOF>)

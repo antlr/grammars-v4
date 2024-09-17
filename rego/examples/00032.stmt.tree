@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead Query))) (stmt (regoRules (ruleHead was))) (stmt (regoBody (query (literal not (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref unregistered))))))))))))) <EOF>)

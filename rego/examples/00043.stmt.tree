@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead Invalid))) (stmt (regoRules (ruleHead watch))) (stmt (regoRules (ruleHead channel))) (stmt (regoRules (ruleHead present))) (stmt (regoRules (ruleHead in))) (stmt (regoRules (ruleHead new))) (stmt (regoRules (ruleHead watcher))) <EOF>)

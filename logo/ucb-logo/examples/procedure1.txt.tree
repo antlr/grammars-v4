@@ -1,0 +1,1 @@
+(parse (instruction (procedure_def to random_walk variables (body_def repeat 100 [ fd random 80 rt 90 ] end))) <EOF>)

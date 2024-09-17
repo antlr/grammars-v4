@@ -1,0 +1,1 @@
+(root (stmt (regoPackage package (ref test (refOperand (refOperandDot . l1)) (refOperand (refOperandDot . l3))))) (stmt (regoRules (ruleHead g ( (exprTermList (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref x))))))))) ) = (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref x))))))))))) <EOF>)

@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead foo))) : (stmt (regoRules (ruleHead bar))) , (stmt (regoRules (ruleHead baz))) : (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (array_ [ ]))))))))))))) , (stmt (regoRules (ruleHead qux))) : (stmt (regoRules (ruleHead corge))) } <EOF>)

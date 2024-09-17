@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead s1 [ (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (scalar "c")))))))) ]) (ruleBody (nonEmptyBraceEnclosedBody { (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (scalar true))))))))))) })))) <EOF>)

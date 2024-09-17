@@ -1,0 +1,1 @@
+(parse (instruction (procedure_def to spiral (variables :size :angle) (body_def if :size > 100 [ stop ] forward :size right :angle spiral :size + 2 :angle end))) <EOF>)

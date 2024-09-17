@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead conflicting))) (stmt (regoRules (ruleHead input))) (stmt (regoRules (ruleHead documents))) <EOF>)

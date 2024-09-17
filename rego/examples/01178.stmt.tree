@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead yaml))) (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref round)))) - (arithExpr (factorExpr (term (ref trip))))))))))))) <EOF>)

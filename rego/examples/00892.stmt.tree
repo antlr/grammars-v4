@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead set))) (stmt (regoRules (ruleHead comprehension))) <EOF>)

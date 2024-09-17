@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead timestamp))) (stmt (regoRules (ruleHead too))) (stmt (regoRules (ruleHead big))) <EOF>)

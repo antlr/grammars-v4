@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead encode_object))) (stmt (regoRules (ruleHead array))) <EOF>)

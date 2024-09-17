@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead array))) (stmt (regoRules (ruleHead dereference))) (stmt (regoRules (ruleHead embedded))) <EOF>)

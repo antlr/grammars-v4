@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead parse))) (stmt (regoRules (ruleHead duration))) (stmt (regoRules (ruleHead nanos))) <EOF>)

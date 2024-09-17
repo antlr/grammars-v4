@@ -1,0 +1,1 @@
+(parse (instruction (procedure_call repeat (expressions (expression 8) (expression (list_ [ rt 45 repeat 6 (list_ [ repeat 90 (list_ [ fd 1 rt 2 ]) rt 90 ]) ]))))) (instruction (procedure_call ht expressions)) <EOF>)

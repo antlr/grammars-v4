@@ -1,0 +1,1 @@
+(root (stmt (regoPackage package (ref topdown (refOperand (refOperandDot . a)) (refOperand (refOperandDot . b)) (refOperand (refOperandDot . c)) (refOperand (refOperandDot . empty))))) <EOF>)

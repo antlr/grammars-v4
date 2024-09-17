@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead falsy_else_negation))) <EOF>)

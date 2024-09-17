@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead existing))) (stmt (regoRules (ruleHead ref))) (stmt (regoRules (ruleHead binding))) <EOF>)

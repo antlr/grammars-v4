@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead weekday))) (stmt (regoRules (ruleHead too))) (stmt (regoRules (ruleHead big))) <EOF>)

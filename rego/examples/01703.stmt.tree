@@ -1,0 +1,1 @@
+(root (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (object_ { (objectItem (scalar "l2") : (term (object_ { (objectItem (scalar "p") : (term (scalar true))) }))) , (objectItem (scalar "l3") : (term (object_ { }))) }))))))))))))) <EOF>)

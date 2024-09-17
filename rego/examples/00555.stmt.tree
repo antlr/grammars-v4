@@ -1,0 +1,1 @@
+(root (stmt (regoPackage package (ref topdown (refOperand (refOperandDot . missing)) (refOperand (refOperandDot . input)) (refOperand (refOperandDot . value))))) (stmt (regoRules (ruleHead p = (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref input (refOperand (refOperandDot . deadbeef))))))))))))) <EOF>)

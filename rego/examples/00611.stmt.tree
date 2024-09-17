@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead two))) (stmt (regoRules (ruleHead deep))) (stmt (regoRules (ruleHead repeated))) (stmt (regoRules (ruleHead var))) <EOF>)

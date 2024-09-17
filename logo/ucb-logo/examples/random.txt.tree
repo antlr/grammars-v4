@@ -1,0 +1,1 @@
+(parse (instruction (procedure_call repeat (expressions (expression 100) (expression (list_ [ fd random 80 rt 90 ]))))) (instruction (procedure_call repeat (expressions (expression 1000) (expression (list_ [ fd 4 rt random 360 ]))))) <EOF>)

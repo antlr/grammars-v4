@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead avoids))) (stmt (regoRules (ruleHead indexer))) <EOF>)

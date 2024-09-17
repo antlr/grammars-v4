@@ -1,0 +1,1 @@
+(root (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref rs256)))) - (arithExpr (factorExpr (term (ref key)))) - (arithExpr (factorExpr (term (ref wrong))))))))))))) <EOF>)

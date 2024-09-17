@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead Unexpected))) (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref notification))) % (factorExpr (term (ref v))))))))))))) <EOF>)

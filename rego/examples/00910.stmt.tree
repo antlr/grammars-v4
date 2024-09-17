@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead divide))) (stmt (regoRules (ruleHead by))) (stmt (regoRules (ruleHead zero))) <EOF>)

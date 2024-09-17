@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead function))) (stmt (regoRules (ruleHead input))) (stmt (regoRules (ruleHead no))) (stmt (regoRules (ruleHead match))) <EOF>)

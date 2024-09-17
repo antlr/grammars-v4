@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead no))) (stmt (regoRules (ruleHead suffix))) <EOF>)

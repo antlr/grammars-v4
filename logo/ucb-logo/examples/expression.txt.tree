@@ -1,0 +1,1 @@
+(parse (instruction (procedure_call make (expressions (expression "size) (expression (expression 81) / (expression 9))))) (instruction (procedure_call print (expressions (expression (expression 2) * (expression 3))))) (instruction (procedure_call print (expressions (expression (expression :size) - (expression 4))))) <EOF>)

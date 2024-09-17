@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead partially))) (stmt (regoRules (ruleHead ground))) (stmt (regoRules (ruleHead path))) <EOF>)

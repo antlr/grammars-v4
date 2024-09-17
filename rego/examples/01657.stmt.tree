@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead always_true))) <EOF>)

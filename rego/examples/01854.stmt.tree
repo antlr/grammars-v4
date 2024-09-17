@@ -1,0 +1,1 @@
+(root (stmt (regoPackage package (ref topdown (refOperand (refOperandDot . system))))) (stmt (regoRules (ruleHead bar = (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (scalar "goodbye"))))))))))) <EOF>)

@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead ref))) (stmt (regoRules (ruleHead undefined ( (exprTermList (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref path))))))))) )))) <EOF>)

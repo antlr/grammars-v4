@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead encoded))) (stmt (regoRules (ruleHead JWT))) (stmt (regoRules (ruleHead had))) (stmt (regoRules (ruleHead no))) (stmt (regoRules (ruleHead period))) (stmt (regoRules (ruleHead separators))) <EOF>)

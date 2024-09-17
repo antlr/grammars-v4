@@ -1,0 +1,1 @@
+(root (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (object_ { (objectItem (scalar "alg") : (term (scalar "ES256"))) , (objectItem (scalar "typ") : (term (scalar "JWT"))) }))))))))))))) <EOF>)

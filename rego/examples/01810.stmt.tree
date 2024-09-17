@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead test_rule_chain))) <EOF>)

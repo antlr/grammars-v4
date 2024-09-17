@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead modulo))) (stmt (regoRules (ruleHead by))) (stmt (regoRules (ruleHead zero))) <EOF>)

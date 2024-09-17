@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead virtual_doc_exact_value))) <EOF>)

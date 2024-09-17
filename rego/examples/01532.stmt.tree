@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead match))) (stmt (regoRules (ruleHead and))) (stmt (regoRules (ruleHead filter))) <EOF>)

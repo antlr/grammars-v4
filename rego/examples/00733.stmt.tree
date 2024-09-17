@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead p = (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref fixture (refOperand (refOperandDot . r)) (refOperand (refOperandCanonical [ (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (object_ { (objectItem (scalar "foo") : (term (scalar "baz"))) })))))))) ]))))))))))))) <EOF>)

@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead Invalid))) (stmt (regoRules (ruleHead watch))) (stmt (regoRules (ruleHead channel))) (stmt (regoRules (ruleHead was))) (stmt (regoBody (query (literal not (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref closed))))))))))))) <EOF>)

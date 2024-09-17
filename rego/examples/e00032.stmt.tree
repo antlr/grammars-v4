@@ -1,0 +1,1 @@
+(root (stmt (importDirective import (ref input (refOperand (refOperandDot . foo)) (refOperand (refOperandCanonical [ (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (scalar 0)))))))) ]))))) <EOF>)

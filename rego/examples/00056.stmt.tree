@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead x3 = (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref data (refOperand (refOperandDot . x0)))))) + (arithExpr (factorExpr (term (scalar 1))))))))))) <EOF>)

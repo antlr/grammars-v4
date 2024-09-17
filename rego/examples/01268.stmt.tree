@@ -1,0 +1,1 @@
+(root (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (ref eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 (refOperand (refOperandDot . eyJzdWIiOiIwIiwia))))) / (factorExpr (term (ref XNzIjoib3BhIn0 (refOperand (refOperandDot . XmVoLoHI3pxMtMO_WRONMSJzGUDP9pDjy8Jp0_tdRXY))))))))))))))) <EOF>)

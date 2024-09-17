@@ -1,0 +1,1 @@
+(root (stmt (regoBody (query (literal (literalExpr (exprTerm (relationExpr (bitwiseOrExpr (bitwiseAndExpr (arithExpr (factorExpr (term (object_ { (objectItem (scalar "new") : (term (scalar "I am a user created field"))) , (objectItem (scalar "iss") : (term (scalar "opa"))) }))))))))))))) <EOF>)

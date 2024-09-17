@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead encode))) (stmt (regoRules (ruleHead empty))) <EOF>)

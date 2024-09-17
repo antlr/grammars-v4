@@ -1,0 +1,1 @@
+(parse (instruction (procedure_call make (expressions (expression "angle) (expression 0)))) (instruction (procedure_call repeat (expressions (expression 1000) (expression (list_ [ fd 3 rt :angle make "angle :angle + 7 ]))))) <EOF>)

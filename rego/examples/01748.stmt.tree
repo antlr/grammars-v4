@@ -1,0 +1,1 @@
+(root (stmt (regoRules (ruleHead negation_invalidate))) <EOF>)

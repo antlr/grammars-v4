@@ -1,0 +1,1 @@
+(root (stmt (regoRules default p = (term (scalar 0)))) <EOF>)
