@@ -110,3 +110,19 @@ union
 (((select 10 as c)))
 union
 ((select 11 as d));
+
+SELECT SUM(cs) OVER() AS ta FROM t;
+
+SELECT old, start_date from t;
+
+
+with a as (
+    with b as (
+        select 't' as c
+    )
+    (select * from b)
+    union
+    (select * from b)
+)
+select *
+from a;

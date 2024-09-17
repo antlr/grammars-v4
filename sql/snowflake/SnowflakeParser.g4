@@ -3644,6 +3644,7 @@ non_reserved_words
     | NAME
     | NETWORK
     | OFFSET
+    | OLD
     | ON_CREATE
     | ON_ERROR
     | ON_SCHEDULE
@@ -3681,6 +3682,7 @@ non_reserved_words
     | SCALE
     | SECURITYADMIN
     | SOURCE
+    | START_DATE
     | STATE
     | STATS
     | SYSADMIN
@@ -3953,6 +3955,7 @@ asc_desc
 over_clause
     : OVER '(' partition_by order_by_expr? ')'
     | OVER '(' order_by_expr ')'
+    | OVER '(' ')'
     ;
 
 function_call
@@ -4084,6 +4087,7 @@ select_statement_in_parentheses
     : LR_BRACKET select_statement_in_parentheses RR_BRACKET
     | select_statement_in_parentheses set_operators
     | select_statement
+    | with_expression
     ;
 
 select_optional_clauses
