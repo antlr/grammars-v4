@@ -40,10 +40,10 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- pwsh -command "ts-node Test.js -q -tee -tree $_" *>> parse.txt }
+Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- pwsh -command "npx tsx Test.js -q -tee -tree $_" *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog -- pwsh -command "ts-node Test.js -q -x -tee -tree" *> parse.txt
+get-content "tests.txt" | dotnet trwdog -- pwsh -command "npx tsx Test.js -q -x -tee -tree" *> parse.txt
 $status=$LASTEXITCODE
 <endif>
 
@@ -66,8 +66,26 @@ if ( $size -eq 0 ) {
     exit 1
 }
 
+function func {
+    param (
+        [string]$p
+    )
+
+    # Find the index of the first asterisk (*)
+    $index = $p.IndexOf('*')
+
+    if ($index -eq -1) {
+        # No asterisk found, return the entire path
+        return $p
+    } else {
+        # Asterisk found, return the path up to but not including the asterisk
+        $path = $p.Substring(0, $index)
+        return $path
+    }
+}
+
 $old = Get-Location
-Set-Location ..
+Set-Location (func("<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"))
 
 # Check if any .errors/.tree files have changed. That's not good.
 git config --global pager.diff false
@@ -88,6 +106,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname
     $ext = $item.Extension
     if ($ext -eq ".tree") {
+        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
         git diff --exit-code $file *>> $old/updated.txt
 	$st = $LASTEXITCODE
         if ($st -ne 0) {

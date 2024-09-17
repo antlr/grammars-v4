@@ -47,9 +47,9 @@ for f in ${files[*]}
 do
     if [ "$global" == "" ]
     then
-        dotnet trwdog -- sh -c "ts-node Test.js -q -tee -tree $f" >> parse.txt 2>&1
+        dotnet trwdog -- sh -c "npx tsx Test.js -q -tee -tree $f" >> parse.txt 2>&1
     else
-        trwdog sh -c "ts-node Test.js -q -tee -tree $f" >> parse.txt 2>&1
+        trwdog sh -c "npx tsx Test.js -q -tee -tree $f" >> parse.txt 2>&1
     fi
     xxx="$?"
     if [ "$xxx" -ne 0 ]

@@ -40,10 +40,10 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- pwsh -command "ts-node Test.js -q -tee -tree $_" *>> parse.txt }
+Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- pwsh -command "npx tsx Test.js -q -tee -tree $_" *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog -- pwsh -command "ts-node Test.js -q -x -tee -tree" *> parse.txt
+get-content "tests.txt" | dotnet trwdog -- pwsh -command "npx tsx Test.js -q -x -tee -tree" *> parse.txt
 $status=$LASTEXITCODE
 <endif>
 
