@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
    <targets>CSharp;Dart;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
+   <grammar-name>GLSL</grammar-name>
+   <entry-point>translation_unit</entry-point>
 </desc>
