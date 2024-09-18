@@ -153,7 +153,7 @@ OPTIONS
 
        -t
            Specifies the targets to test. Possible targets are
-           "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "PHP", "Python3".
+           "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "Python3".
            All targets are tested by default.
 
 EOF
@@ -268,7 +268,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( CSharp Cpp Dart Go Java JavaScript PHP Python3 TypeScript )
+    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
 fi
 
 echo grammars = ${grammars[@]}

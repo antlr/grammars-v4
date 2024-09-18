@@ -1,8 +1,5 @@
 # Generated from trgen <version>
 
-# comment for local dotnet tools.
-global=""
-
 # glob patterns
 shopt -s globstar
 
@@ -12,23 +9,12 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-if [ "$global" == "" ]
-then
-    files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
-else
-    files2=`trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
-fi
-
+files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    if [ "$global" == "" ]
-    then
-        dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
-    else
-        triconv -f utf-8 $f > /dev/null 2>&1
-    fi
+    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
@@ -50,12 +36,7 @@ fi
 rm -f parse.txt
 for f in ${files[*]}
 do
-    if [ "$global" == "" ]
-    then
-        dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $f >> parse.txt
-    else
-        trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $f >> parse.txt
-    fi
+    dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -tee -tree $f >> parse.txt
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -64,12 +45,7 @@ do
 done
 <else>
 # Group parsing.
-if [ "$global" == "" ]
-then
-    echo "${files[*]}" | dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree > parse.txt 2>&1
-else
-    echo "${files[*]}" | trwdog ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree > parse.txt 2>&1
-fi
+echo "${files[*]}" | dotnet trwdog -- ./build/<if(os_win)>Release/<endif><exec_name> -q -x -tee -tree > parse.txt 2>&1
 status="$?"
 <endif>
 

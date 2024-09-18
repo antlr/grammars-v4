@@ -16,13 +16,22 @@ rmrf('build')
 New-Item -Path 'build' -ItemType Directory
 Set-Location 'build'
 
-$(& cmake .. <cmake_target> ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<if(test.IsWindows)>
+$(& cmake .. -G "Visual Studio 17 2022" -A x64 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<else>$(& cmake .. ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<endif>
 if($compile_exit_code -ne 0){
     Write-Host "Failed first cmake call $compile_exit_code."
     exit $compile_exit_code
 }
 
-$(& <if(os_win)>cmake --build . --config Release<else>make<endif> ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<if(test.IsWindows)>
+$(& cmake --build . --config Release ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<else>
+$make = which make
+$(& $make ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<endif>
+
 if($compile_exit_code -ne 0){
     Write-Host "Failed second cmake call $compile_exit_code."
     exit $compile_exit_code
