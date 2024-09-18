@@ -85,7 +85,7 @@ then
     gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
     if [ "$gen" != "" ]
     then
-        dos2unix $gen
+        dos2unix -f $gen
     fi
 fi
 
