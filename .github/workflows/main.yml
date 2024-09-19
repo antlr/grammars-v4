@@ -124,7 +124,7 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v4.0.3
+      uses: actions/setup-node@v4.0.4
       with:
         node-version: '21.7.3'
     - name: Test JavaScript
