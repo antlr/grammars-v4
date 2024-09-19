@@ -3559,9 +3559,10 @@ keyword
     //List here keyword (SnowSQL meaning) allowed as object name
     // Name of builtin function should be included in specifique section (ie builtin_function)
     // please add in alphabetic order for easy reading
+    // https://docs.snowflake.com/en/sql-reference/reserved-keywords
     : ACCOUNT
-    | ALERT
     | ACTION
+    | ALERT
     | AT_KEYWORD
     | CLUSTER
     | COMMENT
@@ -3595,6 +3596,7 @@ keyword
     | TAG
     | TARGET_LAG
     | TEMP
+    | TIMESTAMP
     | TYPE
     | USER
     | VALUE
@@ -3609,29 +3611,40 @@ non_reserved_words
     // please add in alphabetic order for easy reading
     : ACCOUNTADMIN
     | AES
+    | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
+    | COMMENT
     | CONFIGURATION
     | DATA
+    | DAYS
     | DEFINITION
     | DELTA
+    | DISPLAY_NAME
     | DOWNSTREAM
     | DYNAMIC
     | EDITION
-    | ENABLED
     | EMAIL
     | EMPTY_
+    | ENABLED
+    | ERROR_INTEGRATION
     | EVENT
     | EXCHANGE
     | EXPIRY_DATE
     | EXPR
+    | FILE
+    | FILES
     | FIRST_NAME
     | FIRST_VALUE
+    | FREQUENCY
     | GLOBAL
+    | HIGH
+    | HOURS
     | IDENTIFIER
     | IDENTITY
     | INCREMENTAL
+    | IMPORTED
     | INDEX
     | INITIALIZE
     | INPUT
@@ -3641,8 +3654,14 @@ non_reserved_words
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
+    | LOW
+    | MAX_CONCURRENCY_LEVEL
+    | MEDIUM
+    | MODE
     | NAME
     | NETWORK
+    | NULLIF
+    | NVL
     | OFFSET
     | OLD
     | ON_CREATE
@@ -3651,6 +3670,8 @@ non_reserved_words
     | OPTION
     | ORGADMIN
     | OUTBOUND
+    | OUTER
+    | OWNER
     | PARTITION
     | PASSWORD
     | PASSWORD_HISTORY
@@ -3667,33 +3688,47 @@ non_reserved_words
     | PATH_
     | PATTERN
     | PORT
+    | PRIORITY
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
     | PUBLIC
+    | QUARTER
+    | QUERY
+    | QUERY_TAG
     | RANK
+    | RECURSIVE
+    | REFERENCES
     | REFRESH_MODE
     | RESOURCE
     | RESOURCES
     | RESPECT
     | RESTRICT
     | RESULT
+    | ROLE
     | ROUNDING_MODE
+    | ROW_NUMBER
     | SCALE
+    | SCHEDULE
     | SECURITYADMIN
     | SOURCE
     | START_DATE
     | STATE
     | STATS
+    | STATUS
     | SYSADMIN
+    | TAG
+    | TAGS
+    | TARGET_LAG
     | TIMEZONE
     | URL
     | USERADMIN
     | VALUE
     | VALUES
     | VERSION
+    | VISIBILITY
     | WAREHOUSE_TYPE
-    | FREQUENCY
+    | YEAR
     ;
 
 builtin_function
@@ -3704,6 +3739,7 @@ builtin_function
     | MIN
     | COUNT
     | CURRENT_TIMESTAMP
+    | CURRENT_TIME
     | CURRENT_DATE
     | UPPER
     | LOWER
@@ -3831,7 +3867,7 @@ expr
     | op = ( PLUS | MINUS) expr
     | expr op = (STAR | DIVIDE | MODULE) expr
     | expr op = (PLUS | MINUS | PIPE_PIPE) expr
-    | expr comparison_operator expr
+    | l = expr comparison_operator r = expr
     | op = NOT+ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
@@ -3926,10 +3962,14 @@ primitive_expression
     : DEFAULT //?
     | NULL_
     | id_ ('.' id_)* // json field access
+    | id_ '.' STAR
     | full_column_name
     | literal
-    | BOTH_Q
     | ARRAY_Q
+    | AUTO_Q
+    | AZURE_Q
+    | BOTH_Q
+    | NONE_Q
     | OBJECT_Q
     //| json_literal
     //| arr_literal
