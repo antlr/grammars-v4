@@ -1,7 +1,7 @@
 maintenance:
 title: Doses Calculation Theophylline - fuzzy;;
 mlmname: dose_calculation_theophylline_fuzzy;;
-arden: version 2.9;;
+arden: version 3;;
 version: ;;
 institution: ;;
 author: ;;
@@ -13,7 +13,7 @@ purpose: calculates the suggested daily doses based on the patients age;;
 explanation: ;;
 keywords: ;;
 citations:
-1. refute "Some link";
+http://library.buffalo.edu/libraries/projects/cases/drug_dosing/drug_dosing_notes.html
 ;;
 knowledge:
 type: data_driven;;
