@@ -152,37 +152,37 @@ languageSlot
    ;
 
 dataStatement
-   : identifierBecomes (expr | newObjectPhrase | callPhrase | fuzzySetPhrase) # DataIdentifierOrObjectAssign
-   | (IDENTIFIER ASSIGN | LET IDENTIFIER BE) dataIdentifierAssign # DataIdentifierAssignPhrase
-   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) (READ (AS IDENTIFIER)? readPhrase | ARGUMENT | callPhrase) # DataDataVarList
-   | (fhirObject ASSIGN | LET fhirObject BE) READ AS LATEST? fhirObject fhirReadPhrase? # DataFhir
-   | IF expr THEN (dataStatement SC)* dataElseIf AGGREGATE? # DataIf
-   | FOR identifierOrObjectRef IN expr DO (dataStatement SC)* ENDDO # DataFor
-   | WHILE expr DO (dataStatement SC)* ENDDO # DataWhile
-   | SWITCH identifierOrObjectRef dataSwitchCases ENDSWITCH AGGREGATE? # DataSwitch
-   | (timeBecomes | applicabilityBecomes) expr # DataTimeOrApplicabilityAssign
-   | BREAKLOOP # DataBreakLoop
-   | INCLUDE IDENTIFIER # DataInclude
+   : identifierBecomes (expr | newObjectPhrase | callPhrase | fuzzySetPhrase)
+   | (IDENTIFIER ASSIGN | LET IDENTIFIER BE) dataIdentifierAssign
+   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) (READ (AS IDENTIFIER)? readPhrase | ARGUMENT | callPhrase)
+   | (fhirObject ASSIGN | LET fhirObject BE) READ AS LATEST? fhirObject fhirReadPhrase?
+   | IF expr THEN (dataStatement SC)* dataElseIf AGGREGATE?
+   | FOR identifierOrObjectRef IN expr DO (dataStatement SC)* ENDDO
+   | WHILE expr DO (dataStatement SC)* ENDDO
+   | SWITCH identifierOrObjectRef dataSwitchCases ENDSWITCH AGGREGATE?
+   | (timeBecomes | applicabilityBecomes) expr
+   | BREAKLOOP
+   | INCLUDE IDENTIFIER
    ;
 
 dataElseIf
-   : ENDIF # DataEndIf
-   | ELSE (dataStatement SC)* ENDIF # DataElse
-   | ELSEIF expr THEN (dataStatement SC)* dataElseIf # DataElseIfRecursive
+   : ENDIF
+   | ELSE (dataStatement SC)* ENDIF
+   | ELSEIF expr THEN (dataStatement SC)* dataElseIf
    ;
 
 dataSwitchCases
-   : CASE exprFactor (dataStatement SC)* dataSwitchCases? # DataSwitchCase
-   | DEFAULT (dataStatement SC)* # DataSwitchDefault
+   : CASE exprFactor (dataStatement SC)* dataSwitchCases?
+   | DEFAULT (dataStatement SC)*
    ;
 
 dataIdentifierAssign
-   : READ (AS IDENTIFIER)? readPhrase # DataRead
-   | MLM (TERM (FROM INSTITUTION STRING)? | MLM_SELF) # DataMlm
-   | (INTERFACE | EVENT | MESSAGE | DESTINATION) mappingFactor # DataInterface
-   | (MESSAGE | DESTINATION) AS IDENTIFIER mappingFactor? # DataMessage
-   | ARGUMENT # DataArgument
-   | (OBJECT | LINGUISTIC VARIABLE) objectDefinition # DataObject
+   : READ (AS IDENTIFIER)? readPhrase
+   | MLM (TERM (FROM INSTITUTION STRING)? | MLM_SELF)
+   | (INTERFACE | EVENT | MESSAGE | DESTINATION) mappingFactor
+   | (MESSAGE | DESTINATION) AS IDENTIFIER mappingFactor?
+   | ARGUMENT
+   | (OBJECT | LINGUISTIC VARIABLE) objectDefinition
    ;
 
 identifierBecomes
@@ -205,9 +205,9 @@ dataVarList
    ;
 
 identifierOrObjectRef
-   : IDENTIFIER # IdentifierRefIdentifier
-   | identifierOrObjectRef LBRACK expr RBRACK # IdentifierRefBrack
-   | identifierOrObjectRef DOT IDENTIFIER # IdentifierRefObject
+   : IDENTIFIER
+   | identifierOrObjectRef LBRACK expr RBRACK
+   | identifierOrObjectRef DOT IDENTIFIER
    ;
 
 newObjectPhrase
@@ -223,8 +223,8 @@ objectInitElement
    ;
 
 fuzzySetPhrase
-   : FUZZY SET fuzzySetInitElement (COMMA fuzzySetInitElement)* # FuzzySet
-   | exprNegation FUZZIFIED BY exprNegation # FuzzifiedBy
+   : FUZZY SET fuzzySetInitElement (COMMA fuzzySetInitElement)*
+   | exprNegation FUZZIFIED BY exprNegation
    ;
 
 fuzzySetInitElement
@@ -232,9 +232,9 @@ fuzzySetInitElement
    ;
 
 readPhrase
-   : (ofReadFuncOp OF?)? mappingFactor (WHERE exprOr)? # OfReadFuncOpReadWhere
-   | fromOfFuncOp OF? mappingFactor (WHERE exprOr)? # FromOfFuncOpReadWhere
-   | fromOfFuncOp exprFactor FROM mappingFactor (WHERE exprOr)? # FromOfFuncOpFromReadWhere
+   : (ofReadFuncOp OF?)? mappingFactor (WHERE exprOr)?
+   | fromOfFuncOp OF? mappingFactor (WHERE exprOr)?
+   | fromOfFuncOp exprFactor FROM mappingFactor (WHERE exprOr)?
    ;
 
 mappingFactor
@@ -254,16 +254,16 @@ fhirReadPhrase
    ;
 
 fhirAccessPhrase
-   : IT (DOT IDENTIFIER)+ fhirCompOp exprFactor # FhirCompOpAccess
-   | FIND exprFactor IN IT (DOT IDENTIFIER)+ # FhirFindInAccess
+   : IT (DOT IDENTIFIER)+ fhirCompOp exprFactor
+   | FIND exprFactor IN IT (DOT IDENTIFIER)+
    ;
 
 fhirCompOp
-   : simpleCompOp # FhirCompOpSimple
-   | NOT? EQUAL # FhirCompOpNot
-   | LESS THAN (OR EQUAL)? # FhirCompOpLess
-   | GREATER THAN (OR EQUAL)? # FhirCompOpGreater
-   | IS (IN | NOT) # FhirCompOpIs
+   : simpleCompOp
+   | NOT? EQUAL
+   | LESS THAN (OR EQUAL)?
+   | GREATER THAN (OR EQUAL)?
+   | IS (IN | NOT)
    ;
 
 objectDefinition
@@ -271,16 +271,16 @@ objectDefinition
    ;
 
 evokeStatement
-   : simpleTrigger # EvokeSimple
-   | delayedEventTrigger # EvokeDelayedEvent
-   | constantTimeTrigger # EvokeConstantTime
-   | EVERY evokeDuration FOR evokeDuration STARTING startingDelay (UNTIL expr)? # EvokePeriodicEvent
-   | EVERY evokeDuration FOR evokeDuration STARTING constantTimeTrigger (UNTIL expr)? # EvokePeriodicConstantTime
+   : simpleTrigger
+   | delayedEventTrigger
+   | constantTimeTrigger
+   | EVERY evokeDuration FOR evokeDuration STARTING startingDelay (UNTIL expr)?
+   | EVERY evokeDuration FOR evokeDuration STARTING constantTimeTrigger (UNTIL expr)?
    ;
 
 simpleTrigger
-   : eventOr # SimpleEventOr
-   | ANY OF? LPAREN eventList RPAREN # SimpleEventList
+   : eventOr
+   | ANY OF? LPAREN eventList RPAREN
    ;
 
 delayedEventTrigger
@@ -288,8 +288,8 @@ delayedEventTrigger
    ;
 
 constantTimeTrigger
-   : evokeTimeOr # ConstantTimeOr
-   | evokeDuration AFTER evokeTime # ConstantAfter
+   : evokeTimeOr
+   | evokeDuration AFTER evokeTime
    ;
 
 eventOr
@@ -305,13 +305,13 @@ evokeTimeOr
    ;
 
 evokeTimeExpr
-   : evokeTime # EvokeExprTime
-   | evokeDuration # EvokeExprDuration
+   : evokeTime
+   | evokeDuration
    ;
 
 evokeTime
-   : (ISO_DATE_TIME | ISO_DATE) # EvokeIso
-   | (TODAY | TOMORROW | WEEKDAYLITERAL) ATTIME TIME_OF_DAY # EvokeRelative
+   : (ISO_DATE_TIME | ISO_DATE)
+   | (TODAY | TOMORROW | WEEKDAYLITERAL) ATTIME TIME_OF_DAY
    ;
 
 evokeDuration
@@ -319,66 +319,66 @@ evokeDuration
    ;
 
 startingDelay
-   : delayedEventTrigger # StartingDelayed
-   | TIME OF? IDENTIFIER # StartingEvent
+   : delayedEventTrigger
+   | TIME OF? IDENTIFIER
    ;
 
 logicStatement
-   : (identifierBecomes | timeBecomes | applicabilityBecomes) expr # LogicIdentifierAssignSimple
-   | identifierBecomes (newObjectPhrase | callPhrase | fuzzySetPhrase) # LogicIdentifierAssignComplex
-   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) callPhrase # LogicDataVarList
-   | IF expr THEN (logicStatement SC)* logicElseIf AGGREGATE? # LogicIf
-   | FOR identifierOrObjectRef IN expr DO (logicStatement SC)* ENDDO # LogicFor
-   | WHILE expr DO (logicStatement SC)* ENDDO # LogicWhile
-   | SWITCH identifierOrObjectRef logicSwitchCases ENDSWITCH AGGREGATE? # LogicSwitch
-   | BREAKLOOP # LogicBreakLoop
-   | CONCLUDE expr # LogicConclude
+   : (identifierBecomes | timeBecomes | applicabilityBecomes) expr
+   | identifierBecomes (newObjectPhrase | callPhrase | fuzzySetPhrase)
+   | (LPAREN dataVarList RPAREN ASSIGN | LET LPAREN dataVarList RPAREN BE) callPhrase
+   | IF expr THEN (logicStatement SC)* logicElseIf AGGREGATE?
+   | FOR identifierOrObjectRef IN expr DO (logicStatement SC)* ENDDO
+   | WHILE expr DO (logicStatement SC)* ENDDO
+   | SWITCH identifierOrObjectRef logicSwitchCases ENDSWITCH AGGREGATE?
+   | BREAKLOOP
+   | CONCLUDE expr
    ;
 
 logicElseIf
-   : ENDIF # LogicEndIf
-   | ELSE (logicStatement SC)* ENDIF # LogicElse
-   | ELSEIF expr THEN (logicStatement SC)* logicElseIf # LogicElseIfRecursive
+   : ENDIF
+   | ELSE (logicStatement SC)* ENDIF
+   | ELSEIF expr THEN (logicStatement SC)* logicElseIf
    ;
 
 logicSwitchCases
-   : CASE exprFactor (logicStatement SC)* logicSwitchCases? # LogicSwitchCase
-   | DEFAULT (logicStatement SC)* # LogicSwitchDefault
+   : CASE exprFactor (logicStatement SC)* logicSwitchCases?
+   | DEFAULT (logicStatement SC)*
    ;
 
 actionStatement
-   : (identifierBecomes | applicabilityBecomes) (expr | CONCLUDE) # ActionIdentifierAssign
-   | IF expr THEN (actionStatement SC)* actionElseIf AGGREGATE? # ActionIf
-   | FOR identifierOrObjectRef IN expr DO (actionStatement SC)* ENDDO # ActionFor
-   | WHILE expr DO (actionStatement SC)* ENDDO # ActionWhile
-   | SWITCH identifierOrObjectRef actionSwitchCases ENDSWITCH AGGREGATE? # ActionSwitch
-   | timeBecomes expr # ActionTimeAssign
-   | identifierBecomes newObjectPhrase # ActionIdentifierAssignObject
-   | callPhrase (DELAY expr)? # ActionCallPhrase
-   | WRITE expr (AT IDENTIFIER)? # ActionWrite
-   | RETURN expr # ActionReturn
-   | BREAKLOOP # ActionBreakLoop
+   : (identifierBecomes | applicabilityBecomes) (expr | CONCLUDE)
+   | IF expr THEN (actionStatement SC)* actionElseIf AGGREGATE?
+   | FOR identifierOrObjectRef IN expr DO (actionStatement SC)* ENDDO
+   | WHILE expr DO (actionStatement SC)* ENDDO
+   | SWITCH identifierOrObjectRef actionSwitchCases ENDSWITCH AGGREGATE?
+   | timeBecomes expr
+   | identifierBecomes newObjectPhrase
+   | callPhrase (DELAY expr)?
+   | WRITE expr (AT IDENTIFIER)?
+   | RETURN expr
+   | BREAKLOOP
    ;
 
 actionElseIf
-   : ENDIF # ActionEndIf
-   | ELSE (actionStatement SC)* ENDIF # ActionElse
-   | ELSEIF expr THEN (actionStatement SC)* actionElseIf # ActionElseIfRecursive
+   : ENDIF
+   | ELSE (actionStatement SC)* ENDIF
+   | ELSEIF expr THEN (actionStatement SC)* actionElseIf
    ;
 
 actionSwitchCases
-   : CASE exprFactor (actionStatement SC)* actionSwitchCases? # ActionSwitchCase
-   | DEFAULT (actionStatement SC)* # ActionSwitchDefault
+   : CASE exprFactor (actionStatement SC)* actionSwitchCases?
+   | DEFAULT (actionStatement SC)*
    ;
 
 expr
-   : COMMA? exprMerge # ListUnary
-   | expr COMMA exprMerge # ListBinary
+   : COMMA? exprMerge
+   | expr COMMA exprMerge
    ;
 
 exprMerge
-   : exprSort # ToExprSort
-   | exprMerge MERGE exprSort # MergeBinary
+   : exprSort
+   | exprMerge MERGE exprSort
    ;
 
 exprSort
@@ -398,13 +398,13 @@ exprWhere
    ;
 
 exprOr
-   : exprAnd # ToAnd
-   | exprOr OR exprAnd # OrBinary
+   : exprAnd
+   | exprOr OR exprAnd
    ;
 
 exprAnd
-   : exprRange # ToRange
-   | exprAnd AND exprRange # AndBinary
+   : exprRange
+   | exprAnd AND exprRange
    ;
 
 exprRange
@@ -416,20 +416,20 @@ exprNot
    ;
 
 exprComparison
-   : exprString (simpleCompOp exprString)? # SimpleComparisonBinary
-   | FIND exprString IN? STRINGOP exprComparison (STARTING AT exprString)? # FindInStringTernary
-   | exprString IS NOT? mainCompOp # ComparisonIsMainCompOp
-   | exprString NOT? IN exprString # InBinary
-   | exprString OCCUR NOT? (binaryCompOpOccur exprString | ternaryCompOp | AT exprString) # ComparisonOccur
-   | exprString MATCHES PATTERN exprString # MatchesPatternBinary
+   : exprString (simpleCompOp exprString)?
+   | FIND exprString IN? STRINGOP exprComparison (STARTING AT exprString)?
+   | exprString IS NOT? mainCompOp
+   | exprString NOT? IN exprString
+   | exprString OCCUR NOT? (binaryCompOpOccur exprString | ternaryCompOp | AT exprString)
+   | exprString MATCHES PATTERN exprString
    ;
 
 exprString
-   : exprPlus # ToExprPlus
-   | exprString (DOR | FORMATTED WITH) exprPlus # DorFormattedWithBinary
-   | TRIM (LEFT | RIGHT)? exprString # TrimUnary
-   | (UPPERCASE | LOWERCASE) exprString # StringCaseUnary
-   | SUBSTRING exprPlus CHARACTERS (STARTING AT exprPlus)? FROM exprString # SubstringCharactersTernary
+   : exprPlus
+   | exprString (DOR | FORMATTED WITH) exprPlus
+   | TRIM (LEFT | RIGHT)? exprString
+   | (UPPERCASE | LOWERCASE) exprString
+   | SUBSTRING exprPlus CHARACTERS (STARTING AT exprPlus)? FROM exprString
    ;
 
 exprPlus
@@ -449,8 +449,8 @@ exprAtTime
    ;
 
 exprBefore
-   : exprAgo # ToExprAgo
-   | exprAgo (BEFORE | AFTER | FROM) exprAgo # BeforeAfterFrom
+   : exprAgo
+   | exprAgo (BEFORE | AFTER | FROM) exprAgo
    ;
 
 exprAgo
@@ -458,19 +458,19 @@ exprAgo
    ;
 
 exprFunction
-   : exprNegation (AS (NUMBEROP | TIME | STRINGOP | TRUTHVALUE))? # AsUnary
-   | (ofReadFuncOp | ofNoReadFuncOp) OF? exprFunction # FuncOpsUnary
-   | fromOfFuncOp OF? exprFunction (USING exprFunction)? # FromOfFuncOpUnary
-   | REPLACE timePart OF? exprNegation WITH exprFunction # ReplaceWithBinary
-   | fromOfFuncOp exprNegation FROM exprFunction (USING exprFunction)? # FromOfFuncOpBinary
-   | NEAREST exprNegation FROM exprFunction # NearestFromBinary
-   | INDEX indexFromOfFuncOp OF? exprFunction # IndexUnary
-   | INDEX (MINIMUM | MAXIMUM) OF? exprNegation FROM exprFunction # IndexFromMinMax
-   | AT (LEAST | MOST) exprNegation OF? ((ISTRUE | ARETRUE)? FROM)? exprFunction # AtLeastMostBinary
-   | INDEX OF? exprNegation FROM exprFunction # IndexFromBinary
-   | INDEX NEAREST exprNegation FROM exprFunction # IndexNearestBinary
-   | ATTRIBUTE exprNegation FROM exprFunction # AttributeFromBinary
-   | SUBLIST exprNegation ELEMENTS (STARTING AT exprNegation)? FROM exprFunction # SublistTernary
+   : exprNegation (AS (NUMBEROP | TIME | STRINGOP | TRUTHVALUE))?
+   | (ofReadFuncOp | ofNoReadFuncOp) OF? exprFunction
+   | fromOfFuncOp OF? exprFunction (USING exprFunction)?
+   | REPLACE timePart OF? exprNegation WITH exprFunction
+   | fromOfFuncOp exprNegation FROM exprFunction (USING exprFunction)?
+   | NEAREST exprNegation FROM exprFunction
+   | INDEX indexFromOfFuncOp OF? exprFunction
+   | INDEX (MINIMUM | MAXIMUM) OF? exprNegation FROM exprFunction
+   | AT (LEAST | MOST) exprNegation OF? ((ISTRUE | ARETRUE)? FROM)? exprFunction
+   | INDEX OF? exprNegation FROM exprFunction
+   | INDEX NEAREST exprNegation FROM exprFunction
+   | ATTRIBUTE exprNegation FROM exprFunction
+   | SUBLIST exprNegation ELEMENTS (STARTING AT exprNegation)? FROM exprFunction
    ;
 
 exprNegation
@@ -482,17 +482,17 @@ exprDuration
    ;
 
 exprFactor
-   : exprAtom # ToAtom
-   | exprFactor LBRACK expr RBRACK # FactorBrack
-   | exprFactor DOT IDENTIFIER # FactorDot
+   : exprAtom
+   | exprFactor LBRACK expr RBRACK
+   | exprFactor DOT IDENTIFIER
    ;
 
 exprAtom
-   : (IDENTIFIER | NUMBER | NULL | IT) # AtomMisc
-   | (STRING | (LOCALIZED TERM (BY exprAtom)?)) # AtomString
-   | (NOW | ISO_DATE_TIME | ISO_DATE | EVENTTIME | TRIGGERTIME | CURRENTTIME | TIME_OF_DAY | TODAY | TOMORROW | WEEKDAYLITERAL) # AtomTime
-   | ((TRUTHVALUE? (TRUE | FALSE)) | TRUTHVALUE NUMBER) # AtomBoolean
-   | LPAREN (expr | fuzzySetPhrase)? RPAREN # AtomRecursive
+   : (IDENTIFIER | NUMBER | NULL | IT)
+   | (STRING | (LOCALIZED TERM (BY exprAtom)?))
+   | (NOW | ISO_DATE_TIME | ISO_DATE | EVENTTIME | TRIGGERTIME | CURRENTTIME | TIME_OF_DAY | TODAY | TOMORROW | WEEKDAYLITERAL)
+   | ((TRUTHVALUE? (TRUE | FALSE)) | TRUTHVALUE NUMBER)
+   | LPAREN (expr | fuzzySetPhrase)? RPAREN
    ;
 
 simpleCompOp
@@ -500,10 +500,10 @@ simpleCompOp
    ;
 
 mainCompOp
-   : unaryCompOp # ToUnaryCompOp
-   | binaryCompOp exprString # ToBinaryCompOp
-   | binaryCompOpOccur exprString # ToBinaryCompOpOccur
-   | ternaryCompOp # ToTernaryCompOp
+   : unaryCompOp
+   | binaryCompOp exprString
+   | binaryCompOpOccur exprString
+   | ternaryCompOp
    ;
 
 unaryCompOp
