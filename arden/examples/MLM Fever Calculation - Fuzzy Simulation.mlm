@@ -1,0 +1,50 @@
+maintenance:
+title: Increased body temperature - fuzzy simulation;;
+mlmname: increased_body_temperature_fuzzy_simulation;;
+arden: version 3;;
+version: ;;
+institution: ;;
+author: ;;
+specialist: ;;
+date: 2011-07-06;;
+validation: testing;;
+library:
+purpose: detects an increased body temperatur over a day - absolute criterion;;
+explanation: Check if maximum of body temperature is increased with
+explicit coded fuzzy logic.
+reads parameter: "TempMax" (in degree Celsius).
+;;
+keywords: body temperature, temperature, data to symbol conversion;;
+citations: ;;
+knowledge:
+type: data_driven;;
+data: /////////////////////////////////////////
+// interface
+readParam := interface {read param}; // read single parameter
+;;
+evoke: ;;
+logic: ///////////////////////////////////////
+// read precondition from host
+paramTempMax := call readParam with "TempMax";
+// calculation of result
+if paramTempMax is present then
+if paramTempMax >= 38 then
+tempratureIncreased := 1;
+time tempratureIncreased := time paramTempMax;
+elseif paramTempMax > 37.5 then
+tempratureIncreased := (paramTempMax - 37.5) / 0.5;
+time tempratureIncreased := time paramTempMax;
+else
+tempratureIncreased := 0;
+time tempratureIncreased := time paramTempMax;
+endif;
+endif;
+conclude true;
+;;
+action: ///////////////////////////////////////
+write tempratureIncreased;
+;;
+resources:
+default: en;;
+language: en;;
+end:

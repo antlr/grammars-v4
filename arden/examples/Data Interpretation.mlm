@@ -19,22 +19,25 @@ The fractional excretion of sodium is calculated from the urine
 sodium and creatinine and the most recent serum sodium and
 creatinine (where they occurred within the past 24 hours). A
 value less than 1.0 % is considered low.;;
-keywords: fractional excretion; serum sodium; azotemia;;                  
+keywords: fractional excretion; serum sodium; azotemia;;
 citations:
-1. refute "Steiner RW. Interpreting the fractional excretion of sodium.
-Am J Med 1984;77:699-702.";;
+1. Steiner RW. Interpreting the fractional excretion of sodium.
+Am J Med 1984;77:699-702.;;
 knowledge:
 type: data-driven;;
-data: let (urine_na, urine_creat) be read last
-({urine electrolytes where evoking}
-where they occurred within the past 24 hours);
+data:
+let (urine_na, urine_creat) be read last
+{urine electrolytes where evoking}
+where they occurred within the past 24 hours;
 let (serum_na, serum_creat) be read last
-({serum electrolytes where they are not null}
-where they occurred within the past 24 hours);
+{serum electrolytes where they are not null}
+where they occurred within the past 24 hours;
 let urine_electrolyte_storage be event
 {storage of urine electrolytes};
 ;;
-evoke: urine_electrolyte_storage;;
+evoke:
+urine_electrolyte_storage;
+;;
 logic: /* calculate fractional excretion of sodium */
 let fractional_na be 100 * (urine_na / urine_creat) /
 (serum_na / serum_creat);
@@ -69,4 +72,7 @@ write "The calculated fractional excretion of sodium is " ||
 "volume depletion.";
 endif;
 ;;
+resources:
+default: en;;
+language: en;;
 end:

@@ -137,6 +137,7 @@
 				<module>apex</module>
 				<module>apt</module>
 				<module>aql</module>
+                <module>arden</module>
 				<module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
