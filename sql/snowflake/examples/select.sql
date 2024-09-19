@@ -126,3 +126,5 @@ with a as (
 )
 select *
 from a;
+
+select count(t.*) as ca from t9 as t;
