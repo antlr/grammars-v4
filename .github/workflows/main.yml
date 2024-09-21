@@ -130,6 +130,13 @@ jobs:
     - name: Test JavaScript
       run: |
         node --version
+    - name: ts-node typescript tsx
+      run: |
+        npm i -g ts-node typescript tsx
+        ts-node --version
+        tsc --version
+        npx -v
+        npx tsx -v
     - name: Update paths
       shell: pwsh
       run: |

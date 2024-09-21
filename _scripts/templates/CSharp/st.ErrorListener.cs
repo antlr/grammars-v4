@@ -47,6 +47,10 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
     public override void ReportAmbiguity​(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
         bool exact, BitSet ambigAlts, ATNConfigSet configs)
     {
+        string decisionDescription = GetDecisionDescription(recognizer, dfa);
+        string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
+        string msg = $"ReportAmbiguity​ d={decisionDescription}, input='{text}'";
+        System.Console.WriteLine(msg);
         NewMethod(recognizer, dfa, startIndex, stopIndex, configs);
     }
 
@@ -78,7 +82,7 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
     {
         string decisionDescription = GetDecisionDescription(recognizer, dfa);
         string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
-        string msg = $"reportAttemptingFullContext d={decisionDescription}, input='{text}'";
+        string msg = $"ReportAttemptingFullContext d={decisionDescription}, input='{text}'";
         System.Console.WriteLine(msg);
         NewMethod(recognizer, dfa, startIndex, stopIndex, configs);
     }
@@ -88,7 +92,7 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
     {
         string decisionDescription = GetDecisionDescription(recognizer, dfa);
         string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
-        string msg = $"reportContextSensitivity d={decisionDescription}, input='{text}'";
+        string msg = $"ReportContextSensitivity d={decisionDescription}, input='{text}'";
         System.Console.WriteLine(msg);
         NewMethod(recognizer, dfa, startIndex, stopIndex, configs);
     }

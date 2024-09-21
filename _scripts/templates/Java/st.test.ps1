@@ -69,7 +69,7 @@ if ( $size -eq 0 ) {
 }
 
 $old = Get-Location
-Set-Location ..
+Set-Location "<if(os_win)>../<example_dir_win><else>../<example_dir_unix><endif>"
 
 # Check if any .errors/.tree files have changed. That's not good.
 git config --global pager.diff false
@@ -90,6 +90,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname
     $ext = $item.Extension
     if ($ext -eq ".tree") {
+        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
         git diff --exit-code $file *>> $old/updated.txt
 	$st = $LASTEXITCODE
         if ($st -ne 0) {
