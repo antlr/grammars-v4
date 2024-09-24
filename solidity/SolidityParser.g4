@@ -198,7 +198,7 @@ parameterDeclaration
  * Note that specifying internal or public visibility is deprecated.
  */
 constructorDefinition
-    locals[boolean payableSet = false, boolean visibilitySet = false]
+    locals[bool payableSet = false, bool visibilitySet = false]
     : Constructor LParen (arguments = parameterList)? RParen (
         modifierInvocation
         | {!$payableSet}? Payable {$payableSet = true;}
@@ -233,10 +233,10 @@ overrideSpecifier
  */
 functionDefinition
     locals[
-	boolean visibilitySet = false,
-	boolean mutabilitySet = false,
-	boolean virtualSet = false,
-	boolean overrideSpecifierSet = false,
+	bool visibilitySet = false,
+	bool mutabilitySet = false,
+	bool virtualSet = false,
+	bool overrideSpecifierSet = false,
 ]
     : Function (identifier | Fallback | Receive) LParen (arguments = parameterList)? RParen (
         {!$visibilitySet}? visibility {$visibilitySet = true;}
@@ -254,8 +254,8 @@ functionDefinition
  */
 modifierDefinition
     locals[
-	boolean virtualSet = false,
-	boolean overrideSpecifierSet = false
+	bool virtualSet = false,
+	bool overrideSpecifierSet = false
 ]
     : Modifier name = identifier (LParen (arguments = parameterList)? RParen)? (
         {!$virtualSet}? Virtual {$virtualSet = true;}
@@ -268,11 +268,11 @@ modifierDefinition
  */
 fallbackFunctionDefinition
     locals[
-	boolean visibilitySet = false,
-	boolean mutabilitySet = false,
-	boolean virtualSet = false,
-	boolean overrideSpecifierSet = false,
-	boolean hasParameters = false
+	bool visibilitySet = false,
+	bool mutabilitySet = false,
+	bool virtualSet = false,
+	bool overrideSpecifierSet = false,
+	bool hasParameters = false
 ]
     : kind = Fallback LParen (parameterList { $hasParameters = true; })? RParen (
         {!$visibilitySet}? External {$visibilitySet = true;}
@@ -291,10 +291,10 @@ fallbackFunctionDefinition
  */
 receiveFunctionDefinition
     locals[
-	boolean visibilitySet = false,
-	boolean mutabilitySet = false,
-	boolean virtualSet = false,
-	boolean overrideSpecifierSet = false
+	bool visibilitySet = false,
+	bool mutabilitySet = false,
+	bool virtualSet = false,
+	bool overrideSpecifierSet = false
 ]
     : kind = Receive LParen RParen (
         {!$visibilitySet}? External {$visibilitySet = true;}
@@ -337,7 +337,7 @@ userDefinedValueTypeDefinition
  * The declaration of a state variable.
  */
 stateVariableDeclaration
-    locals[boolean constantnessSet = false, boolean visibilitySet = false, boolean overrideSpecifierSet = false, boolean locationSet = false]
+    locals[bool constantnessSet = false, bool visibilitySet = false, bool overrideSpecifierSet = false, bool locationSet = false]
     : type = typeName (
         {!$visibilitySet}? Public {$visibilitySet = true;}
         | {!$visibilitySet}? Private {$visibilitySet = true;}
@@ -436,7 +436,7 @@ typeName
     | typeName LBrack expression? RBrack
     ;
 
-elementaryTypeName[boolean allowAddressPayable]
+elementaryTypeName[bool allowAddressPayable]
     : Address
     | {$allowAddressPayable}? Address Payable
     | Bool
@@ -450,7 +450,7 @@ elementaryTypeName[boolean allowAddressPayable]
     ;
 
 functionTypeName
-    locals[boolean visibilitySet = false, boolean mutabilitySet = false]
+    locals[bool visibilitySet = false, bool mutabilitySet = false]
     : Function LParen (arguments = parameterList)? RParen (
         {!$visibilitySet}? visibility {$visibilitySet = true;}
         | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
@@ -548,7 +548,7 @@ identifier
 literal
     : stringLiteral
     | numberLiteral
-    | booleanLiteral
+    | boolLiteral
     | hexStringLiteral
     | unicodeStringLiteral
     ;
@@ -557,7 +557,7 @@ literalWithSubDenomination
     : numberLiteral SubDenomination
     ;
 
-booleanLiteral
+boolLiteral
     : True
     | False
     ;
@@ -841,7 +841,7 @@ yulFunctionCall
     : (YulIdentifier | YulEVMBuiltin) YulLParen (yulExpression (YulComma yulExpression)*)? YulRParen
     ;
 
-yulBoolean
+yulbool
     : YulTrue
     | YulFalse
     ;
@@ -850,7 +850,7 @@ yulLiteral
     : YulDecimalNumber
     | YulStringLiteral
     | YulHexNumber
-    | yulBoolean
+    | yulbool
     | YulHexStringLiteral
     ;
 
