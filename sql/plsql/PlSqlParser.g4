@@ -2783,7 +2783,9 @@ out_of_line_constraint
             | foreign_key_clause
             | CHECK '(' condition ')'
         )
-    ) constraint_state?
+    )
+    constraint_state?
+    parallel_clause?
     ;
 
 constraint_state
