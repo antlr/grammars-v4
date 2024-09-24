@@ -114,11 +114,11 @@ contract test {
 contract test
 {}
 contract c {
-    enum foo { }
+    enum foo { Foo }
 }
 contract test {
   uint256 stateVar;
-  function functionName(bytes20 arg1, address addr) constant
+  function functionName(bytes20 arg1, address addr)
     returns (int id)
   { }
 }
