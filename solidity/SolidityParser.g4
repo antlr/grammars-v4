@@ -533,8 +533,8 @@ literalWithSubDenomination
     ;
 
 boolLiteral
-    : True
-    | False
+    : TrueLiteral
+    | FalseLiteral
     ;
 
 /**

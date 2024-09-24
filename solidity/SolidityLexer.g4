@@ -143,7 +143,7 @@ Fallback
     : 'fallback'
     ;
 
-False
+FalseLiteral
     : 'false'
     ;
 
@@ -369,7 +369,7 @@ Transient
     : 'transient'
     ; // not a real keyword
 
-True
+TrueLiteral
     : 'true'
     ;
 
