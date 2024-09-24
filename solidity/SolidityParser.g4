@@ -1,5 +1,5 @@
-// Copyright 2016-2017 Federico Bond <federicobond@gmail.com>
-// Copyright 2024 Dmitry Litovchenko <i@dlitovchenko.ru>
+// Copyright 2016-2017 Federico Bond <federicobond@gmail.com> Copyright 2024 Dmitry Litovchenko
+// <i@dlitovchenko.ru>
 // 
 // This program is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -10,7 +10,8 @@
 // General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License along with this program. If
-// not, see <http://www.gnu.org/licenses/>. Copied from https://github.com/ethereum/solidity/blob/60cea4d70012332adcfdcedd8b4f53f556405841/docs/grammar/SolidityParser.g4
+// not, see <http://www.gnu.org/licenses/>. Copied from
+// https://github.com/ethereum/solidity/blob/60cea4d70012332adcfdcedd8b4f53f556405841/docs/grammar/SolidityParser.g4
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
@@ -198,12 +199,11 @@ parameterDeclaration
  * Note that specifying internal or public visibility is deprecated.
  */
 constructorDefinition
-    locals[bool payableSet = false, bool visibilitySet = false]
     : Constructor LParen (arguments = parameterList)? RParen (
         modifierInvocation
-        | {!$payableSet}? Payable {$payableSet = true;}
-        | {!$visibilitySet}? Internal {$visibilitySet = true;}
-        | {!$visibilitySet}? Public {$visibilitySet = true;}
+        | Payable
+        | Internal
+        | Public
     )* body = block
     ;
 
@@ -232,18 +232,12 @@ overrideSpecifier
  * e.g. functions in interfaces have to be unimplemented, i.e. may not contain a body block.
  */
 functionDefinition
-    locals[
-	bool visibilitySet = false,
-	bool mutabilitySet = false,
-	bool virtualSet = false,
-	bool overrideSpecifierSet = false,
-]
     : Function (identifier | Fallback | Receive) LParen (arguments = parameterList)? RParen (
-        {!$visibilitySet}? visibility {$visibilitySet = true;}
-        | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+        visibility
+        | stateMutability
         | modifierInvocation
-        | {!$virtualSet}? Virtual {$virtualSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+        | Virtual
+        | overrideSpecifier
     )* (Returns LParen returnParameters = parameterList RParen)? (Semicolon | body = block)
     ;
 
@@ -253,13 +247,9 @@ functionDefinition
  * but is used as placeholder statement for the body of a function to which the modifier is applied.
  */
 modifierDefinition
-    locals[
-	bool virtualSet = false,
-	bool overrideSpecifierSet = false
-]
     : Modifier name = identifier (LParen (arguments = parameterList)? RParen)? (
-        {!$virtualSet}? Virtual {$virtualSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+        Virtual
+        | overrideSpecifier
     )* (Semicolon | body = block)
     ;
 
@@ -267,41 +257,25 @@ modifierDefinition
  * Definition of the special fallback function.
  */
 fallbackFunctionDefinition
-    locals[
-	bool visibilitySet = false,
-	bool mutabilitySet = false,
-	bool virtualSet = false,
-	bool overrideSpecifierSet = false,
-	bool hasParameters = false
-]
-    : kind = Fallback LParen (parameterList { $hasParameters = true; })? RParen (
-        {!$visibilitySet}? External {$visibilitySet = true;}
-        | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
+    : kind = Fallback LParen (parameterList)? RParen (
+        External
+        | stateMutability
         | modifierInvocation
-        | {!$virtualSet}? Virtual {$virtualSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
-    )* (
-        {$hasParameters}? Returns LParen returnParameters = parameterList RParen
-        | {!$hasParameters}?
-    ) (Semicolon | body = block)
+        | Virtual
+        | overrideSpecifier
+    )* (Returns LParen returnParameters = parameterList RParen)? (Semicolon | body = block)
     ;
 
 /**
  * Definition of the special receive function.
  */
 receiveFunctionDefinition
-    locals[
-	bool visibilitySet = false,
-	bool mutabilitySet = false,
-	bool virtualSet = false,
-	bool overrideSpecifierSet = false
-]
     : kind = Receive LParen RParen (
-        {!$visibilitySet}? External {$visibilitySet = true;}
-        | {!$mutabilitySet}? Payable {$mutabilitySet = true;}
+        External
+        | Payable
         | modifierInvocation
-        | {!$virtualSet}? Virtual {$virtualSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
+        | Virtual
+        | overrideSpecifier
     )* (Semicolon | body = block)
     ;
 
@@ -330,22 +304,21 @@ enumDefinition
  * Definition of a user defined value type. Can occur at top-level within a source unit or within a contract, library or interface.
  */
 userDefinedValueTypeDefinition
-    : Type name = identifier Is elementaryTypeName[true] Semicolon
+    : Type name = identifier Is (elementaryTypeName | addressPayable) Semicolon
     ;
 
 /**
  * The declaration of a state variable.
  */
 stateVariableDeclaration
-    locals[bool constantnessSet = false, bool visibilitySet = false, bool overrideSpecifierSet = false, bool locationSet = false]
     : type = typeName (
-        {!$visibilitySet}? Public {$visibilitySet = true;}
-        | {!$visibilitySet}? Private {$visibilitySet = true;}
-        | {!$visibilitySet}? Internal {$visibilitySet = true;}
-        | {!$constantnessSet}? Constant {$constantnessSet = true;}
-        | {!$overrideSpecifierSet}? overrideSpecifier {$overrideSpecifierSet = true;}
-        | {!$constantnessSet}? Immutable {$constantnessSet = true;}
-        | {!$locationSet}? Transient {$locationSet = true;}
+        Public
+        | Private
+        | Internal
+        | Constant
+        | overrideSpecifier
+        | Immutable
+        | Transient
     )* name = identifier (Assign initialValue = expression)? Semicolon
     ;
 
@@ -429,16 +402,16 @@ usingAliases
  * (e.g. a contract or struct) or an array type.
  */
 typeName
-    : elementaryTypeName[true]
+    : elementaryTypeName
+    | addressPayable
     | functionTypeName
     | mappingType
     | identifierPath
     | typeName LBrack expression? RBrack
     ;
 
-elementaryTypeName[bool allowAddressPayable]
+elementaryTypeName
     : Address
-    | {$allowAddressPayable}? Address Payable
     | Bool
     | String
     | Bytes
@@ -449,12 +422,14 @@ elementaryTypeName[bool allowAddressPayable]
     | Ufixed
     ;
 
+addressPayable
+    : Address Payable
+    ;
+
 functionTypeName
-    locals[bool visibilitySet = false, bool mutabilitySet = false]
-    : Function LParen (arguments = parameterList)? RParen (
-        {!$visibilitySet}? visibility {$visibilitySet = true;}
-        | {!$mutabilitySet}? stateMutability {$mutabilitySet = true;}
-    )* (Returns LParen returnParameters = parameterList RParen)?
+    : Function LParen (arguments = parameterList)? RParen (visibility | stateMutability)* (
+        Returns LParen returnParameters = parameterList RParen
+    )?
     ;
 
 /**
@@ -503,7 +478,7 @@ expression
     | New typeName                                                                          # NewExpr
     | tupleExpression                                                                       # Tuple
     | inlineArrayExpression                                                                 # InlineArray
-    | (identifier | literal | literalWithSubDenomination | elementaryTypeName[false])       # PrimaryExpression
+    | (identifier | literal | literalWithSubDenomination | elementaryTypeName)              # PrimaryExpression
     ;
 
 //@doc:inline
@@ -747,7 +722,7 @@ mappingType
  * Only elementary types or user defined types are viable as mapping keys.
  */
 mappingKeyType
-    : elementaryTypeName[false]
+    : elementaryTypeName
     | identifierPath
     ;
 
