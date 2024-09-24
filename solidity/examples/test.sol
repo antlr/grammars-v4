@@ -152,7 +152,7 @@ contract c {
     function x() external {}
 }
 contract c {
-    function() { }
+    function c() { }
 }
 contract test {
     function fun(uint256 a) {
@@ -204,7 +204,7 @@ contract test {
         if (a >= 8) {
             return;
         } else {
-            var b = 7;
+            uint32 b = 7;
         }
     }
 }
@@ -237,8 +237,8 @@ library Lib {
 contract test {
     function test() {
         a = 1 wei;
-        a = 2 szabo;
-        a = 3 finney;
+        // a = 2 szabo; szabo and finney removed in 0.7.0
+        a = 3 gwei;
         a = 4 ether;
 
         a = 1 seconds;
@@ -254,7 +254,7 @@ contract test {
 contract c {
     function c ()
     {
-        a = 1 wei * 100 wei + 7 szabo - 3;
+        a = 1 wei * 100 wei + 7 gwei - 3;
     }
     uint256 a;
 }
@@ -299,13 +299,13 @@ contract c {
 }
 contract C {
     function f() {
-        var (a,b,c) = g();
-        var (d) = 2;
-        var (,e) = 3;
-        var (f,) = 4;
-        var (x,,) = g();
-        var (,y,) = g();
-        var (,,) = g();
+        (a,b,c) = g();
+        (d) = 2;
+        (,e) = 3;
+        (f,) = 4;
+        (x,,) = g();
+        (,y,) = g();
+        (,,) = g();
     }
     function g() returns (uint, uint, uint) {}
 }
@@ -369,7 +369,7 @@ contract test {
 }
 contract c {
     function fun() returns (uint r) {
-        var _ = 8;
+        uint32 _ = 8;
         return _ + 1;
     }
 }
@@ -398,20 +398,20 @@ contract test {
 contract C {
     function f() {
         uint a = (1);
-        var (b,) = 1;
-        var (c,d) = (1, 2 + a);
-        var (e,) = (1, 2, b);
+        (b,) = 1;
+        (c,d) = (1, 2 + a);
+        (e,) = (1, 2, b);
         (a) = 3;
     }
 }
 contract test {
   function fun() {
-    var x = new uint64[](3);
+    uint64[] x = new uint64[](3);
   }
 }
 contract test {
     function f() {
-        uint a = +10;
+        uint a = 10; // +integer removed latest version
         a--;
 
         a = ~a;
@@ -434,14 +434,14 @@ contract C {
 }
 contract test {
     function fun(uint256 a) {
-        var b = 5;
+        int b = 5;
         uint256 c;
         mapping(address=>bytes32) d;
     }
 }
 contract test {
     function fun(uint256 a) {
-        var b = 2;
+        int b = 2;
         uint256 c = 0x87;
         mapping(address=>bytes32) d;
         bytes32 name = "Solidity";
@@ -464,13 +464,14 @@ contract test {
 }
 
 contract test {
-  function() {
+    //anonymous function not allowed in la
+  function x() { 
 		assembly {
 			mstore(0x40, 0x60) // store the "free memory pointer"
 			// function dispatcher
 			switch div(calldataload(0), exp(2, 226))
 			case 0xb3de648b {
-				let (r) := f(calldataload(4))
+				let r, x := f(calldataload(4))
 				let ret := $allocate(0x20)
 				mstore(ret, r)
 				return(ret, 0x20)
@@ -518,7 +519,8 @@ contract test {
 }
 
 contract test {
-  function foo() public returns (byte b) {
+    //from version 0.8.0 byte alias for bytes1 removed 
+  function foo() public returns (bytes1 b) {
     assembly {
       n := byte(0x0)
     }
@@ -526,7 +528,7 @@ contract test {
 }
 
 contract test {
-    function() {
+    function x() {
         emit EventCalled(1, 2, 3);
     }
 }
@@ -536,7 +538,7 @@ contract test {
 }
 
 contract test {
-  function () payable {
+  function x() payable {
     (bytes32 a, uint b) = foo();
   }
 }
@@ -546,7 +548,7 @@ contract test {
 }
 
 contract test {
-  function () {
+  function x() {
     return();
   }
 }
