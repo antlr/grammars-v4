@@ -21,3 +21,7 @@ by [Positive Technologies](https://github.com/PositiveTechnologies).
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)
+
+## Issues
+
+* The grammar is very old and there are many ambiguities: primaryType Decision 11; singleExpression Decision 236; etc.
