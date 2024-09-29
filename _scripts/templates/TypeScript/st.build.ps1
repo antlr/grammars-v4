@@ -16,7 +16,7 @@ if($compile_exit_code -ne 0){
 \}
 }>
 
-$(& npm install -g typescript@5.3.3 ts-node@10.9.2 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+$(& npm install -g typescript ts-node ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

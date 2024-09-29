@@ -28,5 +28,6 @@
         <module>tsql</module>
         <module>informix-sql</module>
         <module>starrocks</module>
+        <module>clickhouse</module>
     </modules>
 </project>

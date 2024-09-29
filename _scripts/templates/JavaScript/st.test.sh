@@ -1,8 +1,5 @@
 # Generated from trgen <version>
 
-# comment for local dotnet tools.
-global=""
-
 # glob patterns
 shopt -s globstar
 
@@ -12,23 +9,12 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-if [ "$global" == "" ]
-then
-    files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
-else
-    files2=`trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
-fi
-
+files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    if [ "$global" == "" ]
-    then
-        dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
-    else
-        triconv -f utf-8 $f > /dev/null 2>&1
-    fi
+    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
@@ -50,12 +36,7 @@ fi
 rm -f parse.txt
 for f in ${files[*]}
 do
-    if [ "$global" == "" ]
-    then
-        dotnet trwdog -- node Test.js -q -tee -tree $f >> parse.txt 2>&1
-    else
-        trwdog node Test.js -q -tee -tree $f >> parse.txt 2>&1
-    fi
+    dotnet trwdog -- node Test.js -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -64,12 +45,7 @@ do
 done
 <else>
 # Group parsing.
-if [ "$global" == "" ]
-then
-    echo "${files[*]}" | dotnet trwdog -- node Test.js -q -x -tee -tree > parse.txt 2>&1
-else
-    echo "${files[*]}" | trwdog node Test.js -q -x -tee -tree > parse.txt 2>&1
-fi
+echo "${files[*]}" | dotnet trwdog -- node Test.js -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -109,7 +85,7 @@ then
     gen=`find ../<example_files_unix> -type f -name '*.errors' -o -name '*.tree'`
     if [ "$gen" != "" ]
     then
-        dos2unix $gen
+        dos2unix -f $gen
     fi
 fi
 
