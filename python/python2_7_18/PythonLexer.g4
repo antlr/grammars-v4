@@ -131,7 +131,7 @@ NUMBER
 STRING : STRING_LITERAL;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#physical-lines
-NEWLINE : OS_INDEPENDENT_NL;
+NEWLINE : '\r'? '\n'; // Unix, Windows
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#comments
 COMMENT : '#' ~[\r\n]*               -> channel(HIDDEN);
@@ -142,7 +142,7 @@ WS : [ \t\f]+                        -> channel(HIDDEN);
 // https://docs.python.org/2.7/reference/lexical_analysis.html#explicit-line-joining
 EXPLICIT_LINE_JOINING : '\\' NEWLINE -> channel(HIDDEN);
 
-ERROR_TOKEN : . ; // catch unrecognized characters and redirect these errors to the parser
+ERRORTOKEN : . ; // catch unrecognized characters and redirect these errors to the parser
 
 
 /*
@@ -173,10 +173,10 @@ fragment LONG_STRING_ITEM : LONG_STRING_CHAR | ESCAPE_SEQ;
 fragment SHORT_STRING_CHAR_NO_SINGLE_QUOTE : ~[\\\r\n'];      // <any source character except "\" or newline or single quote>
 fragment SHORT_STRING_CHAR_NO_DOUBLE_QUOTE : ~[\\\r\n"];      // <any source character except "\" or newline or double quote>
 fragment LONG_STRING_CHAR  : ~'\\';                           // <any source character except "\">
-fragment ESCAPE_SEQ
-   : '\\' OS_INDEPENDENT_NL // \<newline> escape sequence
-   | '\\' [\u0000-\u007F]                                    // "\" <any ASCII character>
-   ; // the \<newline> (not \n) escape sequences will be removed from the string literals by the PythonLexerBase class
+fragment ESCAPE_SEQ // https://docs.python.org/2.7/reference/lexical_analysis.html#string-literals
+   : '\\' '\r' '\n'  // for the two-character Windows line break: \<newline> escape sequence (string literal line continuation)
+   | '\\' [\u0000-\u007F]                                     // "\" <any ASCII character>
+   ;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#integer-and-long-integer-literals
 fragment LONG_INTEGER    : INTEGER ('l' | 'L');
@@ -200,9 +200,6 @@ fragment EXPONENT       : ('e' | 'E') ('+' | '-')? DIGIT+;
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#imaginary-literals
 fragment IMAG_NUMBER : (FLOAT_NUMBER | INT_PART) ('j' | 'J');
-
-// https://docs.python.org/2.7/reference/lexical_analysis.html#physical-lines
-fragment OS_INDEPENDENT_NL : '\r'? '\n'; // Unix, Windows
 
 // https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 fragment IDENTIFIER : (LETTER | '_') (LETTER | DIGIT | '_')*;

@@ -43,6 +43,8 @@ class PythonLexerBase(Lexer):
 
         # The amount of opened parentheses, square brackets or curly braces
         self.__opened: int
+        # The amount of opened parentheses and square brackets in the current lexer mode
+        self.__paren_or_bracket_opened_stack: list[int]
 
         self.__was_space_indentation: bool
         self.__was_tab_indentation: bool
@@ -70,6 +72,7 @@ class PythonLexerBase(Lexer):
         self.__previous_pending_token_type = 0
         self.__last_pending_token_type_from_default_channel = 0
         self.__opened = 0
+        self.__paren_or_bracket_opened_stack = []
         self.__was_space_indentation = False
         self.__was_tab_indentation = False
         self.__was_indentation_mixed_with_spaces_and_tabs = False
@@ -91,6 +94,8 @@ class PythonLexerBase(Lexer):
                     self.__add_pending_token(self.__cur_token)
                 case self.NEWLINE:
                     self.__handle_NEWLINE_token()
+                case self.FSTRING_MIDDLE:
+                    self.__handle_FSTRING_MIDDLE_token()
                 case self.ERRORTOKEN:
                     self.__report_lexer_error("token recognition error at: '" + self.__cur_token.text + "'")
                     self.__add_pending_token(self.__cur_token)
@@ -98,11 +103,14 @@ class PythonLexerBase(Lexer):
                     self.__handle_EOF_token()
                 case other:
                     self.__add_pending_token(self.__cur_token)
+            self.__handle_FORMAT_SPECIFICATION_MODE()
 
     def __set_current_and_following_tokens(self) -> None:
         self.__cur_token = super().nextToken() if self.__ffg_token is None else \
                             self.__ffg_token
 
+        self.__handle_fstring_lexer_modes()
+        
         self.__ffg_token = self.__cur_token if self.__cur_token.type == Token.EOF else \
                             super().nextToken()
 
@@ -177,6 +185,62 @@ class PythonLexerBase(Lexer):
                     self.__create_and_add_pending_token(self.DEDENT, Token.DEFAULT_CHANNEL, None, self.__ffg_token)
                 else:
                     self.__report_error("inconsistent dedent")
+
+    def __handle_FSTRING_MIDDLE_token(self) -> None: # replace the double braces '{{' or '}}' to single braces and hide the second braces
+            fs_mid: str = self.__cur_token.text
+            fs_mid = fs_mid.replace("{{", "{_").replace("}}", "}_") # replace: {{ --> {_  and   }} --> }_
+            arr_of_str: list[str] = re.split(r"(?<=[{}])_", fs_mid) # split by {_  or  }_
+            s: str
+            for s in arr_of_str:
+                if s:
+                    self.__create_and_add_pending_token(self.FSTRING_MIDDLE, Token.DEFAULT_CHANNEL, s, self.__ffg_token)
+                    last_character: str = s[-1:]
+                    if last_character in "{}":
+                        self.__create_and_add_pending_token(self.FSTRING_MIDDLE, Token.HIDDEN_CHANNEL, last_character, self.__ffg_token)
+
+    def __handle_fstring_lexer_modes(self) -> None:
+        if self._modeStack:
+            match self.__cur_token.type:
+                case self.LBRACE:
+                    self.pushMode(Lexer.DEFAULT_MODE)
+                    self.__paren_or_bracket_opened_stack.append(0)
+                case self.LPAR | self.LSQB:
+                    # https://peps.python.org/pep-0498/#lambdas-inside-expressions
+                    self.__paren_or_bracket_opened_stack[-1] += 1 # increment the last element (peek() + 1)
+                case self.RPAR | self.RSQB:
+                    self.__paren_or_bracket_opened_stack[-1] -= 1 # decrement the last element (peek() - 1)
+                case self.COLON:
+                    if self.__paren_or_bracket_opened_stack[-1] == 0:
+                        match self._modeStack[-1]: # check the previous lexer mode (the current is DEFAULT_MODE)
+                            case self.SINGLE_QUOTE_FSTRING_MODE \
+                                | self.LONG_SINGLE_QUOTE_FSTRING_MODE \
+                                | self.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+
+                                self.mode(self.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE) # continue in format spec. mode
+                            case self.DOUBLE_QUOTE_FSTRING_MODE \
+                                | self.LONG_DOUBLE_QUOTE_FSTRING_MODE \
+                                | self.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+
+                                self.mode(self.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE) # continue in format spec. mode
+                case self.RBRACE:
+                    match self._mode:
+                        case Lexer.DEFAULT_MODE \
+                            | self.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE \
+                            | self.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
+
+                            self.popMode()
+                            self.__paren_or_bracket_opened_stack.pop()
+                        case other:
+                            self.__report_lexer_error("f-string: single '}' is not allowed")
+
+    def __handle_FORMAT_SPECIFICATION_MODE(self) -> None:
+        if len(self._modeStack) != 0 \
+           and self.__ffg_token.type == self.RBRACE:
+            
+            match self.__cur_token.type:
+                case self.COLON | self.RBRACE:
+                    # insert an empty FSTRING_MIDDLE token instead of the missing format specification
+                    self.__create_and_add_pending_token(self.FSTRING_MIDDLE, Token.DEFAULT_CHANNEL, "", self.__ffg_token)
 
     def __insert_trailing_tokens(self) -> None:
         match self.__last_pending_token_type_from_default_channel:

@@ -1,3 +1,7 @@
+# PEG grammar for Python
+
+
+
 # ========================= START OF THE GRAMMAR =========================
 
 # General grammatical elements and rules:
@@ -494,9 +498,7 @@ type_param_seq: ','.type_param+ [',']
 
 type_param:
     | NAME [type_param_bound] 
-    | '*' NAME ':' expression 
     | '*' NAME 
-    | '**' NAME ':' expression 
     | '**' NAME 
 
 type_param_bound: ':' expression 

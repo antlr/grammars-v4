@@ -49,16 +49,28 @@ public abstract class PythonLexerBase extends Lexer {
     private boolean wasSpaceIndentation;
     private boolean wasTabIndentation;
     private boolean wasIndentationMixedWithSpacesAndTabs;
-    private final int INVALID_LENGTH = -1;
 
-    private CommonToken curToken; // current (under processing) token
+    private Token curToken; // current (under processing) token
     private Token ffgToken; // following (look ahead) token
 
+    private final int INVALID_LENGTH = -1;
     private final String ERR_TXT = " ERROR: ";
 
     protected PythonLexerBase(CharStream input) {
         super(input);
         this.init();
+    }
+
+    @Override
+    public Token nextToken() { // reading the input stream until a return EOF
+        this.checkNextToken();
+        return this.pendingTokens.pollFirst(); // add the queued token to the token stream
+    }
+
+    @Override
+    public void reset() {
+        this.init();
+        super.reset();
     }
 
     private void init() {
@@ -73,12 +85,6 @@ public abstract class PythonLexerBase extends Lexer {
         this.wasIndentationMixedWithSpacesAndTabs = false;
         this.curToken = null;
         this.ffgToken = null;
-    }
-
-    @Override
-    public Token nextToken() { // reading the input stream until a return EOF
-        this.checkNextToken();
-        return this.pendingTokens.pollFirst(); // add the queued token to the token stream
     }
 
     private void checkNextToken() {
@@ -104,13 +110,10 @@ public abstract class PythonLexerBase extends Lexer {
                 case PythonLexer.NEWLINE:
                     this.handleNEWLINEtoken();
                     break;
-                case PythonLexer.STRING:
-                    this.handleSTRINGtoken();
-                    break;
                 case PythonLexer.FSTRING_MIDDLE:
                     this.handleFSTRING_MIDDLE_token();
                     break;
-                case PythonLexer.ERROR_TOKEN:
+                case PythonLexer.ERRORTOKEN:
                     this.reportLexerError("token recognition error at: '" + this.curToken.getText() + "'");
                     this.addPendingToken(this.curToken);
                     break;
@@ -126,8 +129,8 @@ public abstract class PythonLexerBase extends Lexer {
 
     private void setCurrentAndFollowingTokens() {
         this.curToken = this.ffgToken == null ?
-                        new CommonToken(super.nextToken()) :
-                        new CommonToken(this.ffgToken);
+                        super.nextToken() :
+                        this.ffgToken;
 
         this.handleFStringLexerModes();
 
@@ -156,7 +159,8 @@ public abstract class PythonLexerBase extends Lexer {
                 this.addPendingToken(this.curToken); // it can be WS, EXPLICIT_LINE_JOINING or COMMENT token
             }
             this.setCurrentAndFollowingTokens();
-        } // continue the processing of the EOF token with checkNextToken()
+        }
+        // continue the processing of the EOF token with checkNextToken()
     }
 
     private void insertLeadingIndentToken() {
@@ -175,19 +179,18 @@ public abstract class PythonLexerBase extends Lexer {
         if (this.opened > 0) { // We're in an implicit line joining, ignore the current NEWLINE token
             this.hideAndAddPendingToken(this.curToken);
         } else {
-            CommonToken nlToken = new CommonToken(this.curToken); // save the current NEWLINE token
+            final Token nlToken = new CommonToken(this.curToken); // save the current NEWLINE token
             final boolean isLookingAhead = this.ffgToken.getType() == PythonLexer.WS;
             if (isLookingAhead) {
                 this.setCurrentAndFollowingTokens(); // set the next two tokens
             }
 
             switch (this.ffgToken.getType()) {
-                case PythonLexer.NEWLINE:      // We're before a blank line
-                case PythonLexer.COMMENT:      // We're before a comment
-                case PythonLexer.TYPE_COMMENT: // We're before a type comment
+                case PythonLexer.NEWLINE: // We're before a blank line
+                case PythonLexer.COMMENT: // We're before a comment
                     this.hideAndAddPendingToken(nlToken);
                     if (isLookingAhead) {
-                        this.addPendingToken(this.curToken);  // WS token
+                        this.addPendingToken(this.curToken); // WS token
                     }
                     break;
                 default:
@@ -228,19 +231,6 @@ public abstract class PythonLexerBase extends Lexer {
         }
     }
 
-    private void handleSTRINGtoken() { // remove the \<newline> escape sequences from the string literal
-        final String line_joinFreeStringLiteral = this.curToken.getText().replaceAll("\\\\\\r?\\n", "");
-        if (this.curToken.getText().length() == line_joinFreeStringLiteral.length()) {
-            this.addPendingToken(this.curToken);
-        } else {
-            CommonToken originalSTRINGtoken = new CommonToken(this.curToken); // backup the original token
-            this.curToken.setText(line_joinFreeStringLiteral);
-            this.addPendingToken(this.curToken);                  // add the modified token with inline string literal
-            this.hideAndAddPendingToken(originalSTRINGtoken); // add the original token to the hidden channel
-            // this inserted hidden token allows to restore the original string literal with the \<newline> escape sequences
-        }
-    }
-
     private void handleFSTRING_MIDDLE_token() { // replace the double braces '{{' or '}}' to single braces and hide the second braces
         String fsMid = this.curToken.getText();
         fsMid = fsMid.replaceAll("\\{\\{", "{_").replaceAll("}}", "}_"); // replace: {{ --> {_  and   }} --> }_
@@ -248,7 +238,7 @@ public abstract class PythonLexerBase extends Lexer {
         for (String s : arrOfStr) {
             if (!s.isEmpty()) {
                 this.createAndAddPendingToken(PythonLexer.FSTRING_MIDDLE, Token.DEFAULT_CHANNEL, s, this.ffgToken);
-                String lastCharacter = s.substring(s.length() - 1);
+                final String lastCharacter = s.substring(s.length() - 1);
                 if ("{}".contains(lastCharacter)) {
                     this.createAndAddPendingToken(PythonLexer.FSTRING_MIDDLE, Token.HIDDEN_CHANNEL, lastCharacter, this.ffgToken);
                     // this inserted hidden token allows to restore the original f-string literal with the double braces
@@ -261,7 +251,7 @@ public abstract class PythonLexerBase extends Lexer {
         if (!this._modeStack.isEmpty()) {
             switch (this.curToken.getType()) {
                 case PythonLexer.LBRACE:
-                    this.pushMode(PythonLexer.DEFAULT_MODE);
+                    this.pushMode(Lexer.DEFAULT_MODE);
                     this.paren_or_bracket_openedStack.push(0);
                     break;
                 case PythonLexer.LPAR:
@@ -291,7 +281,7 @@ public abstract class PythonLexerBase extends Lexer {
                     break;
                 case PythonLexer.RBRACE:
                     switch (this._mode) {
-                        case PythonLexer.DEFAULT_MODE:
+                        case Lexer.DEFAULT_MODE:
                         case PythonLexer.SINGLE_QUOTE_FORMAT_SPECIFICATION_MODE:
                         case PythonLexer.DOUBLE_QUOTE_FORMAT_SPECIFICATION_MODE:
                             this.popMode();
@@ -339,36 +329,37 @@ public abstract class PythonLexerBase extends Lexer {
         this.addPendingToken(this.curToken);
     }
 
-    private void hideAndAddPendingToken(CommonToken cToken) {
-        cToken.setChannel(Token.HIDDEN_CHANNEL);
-        this.addPendingToken(cToken);
+    private void hideAndAddPendingToken(final Token tkn) {
+        CommonToken ctkn = new CommonToken(tkn);
+        ctkn.setChannel(Token.HIDDEN_CHANNEL);
+        this.addPendingToken(ctkn);
     }
 
-    private void createAndAddPendingToken(final int type, final int channel, final String text, Token baseToken) {
-        CommonToken cToken = new CommonToken(baseToken);
-        cToken.setType(type);
-        cToken.setChannel(channel);
-        cToken.setStopIndex(baseToken.getStartIndex() - 1);
-        cToken.setText(text == null
-                       ? "<" + this.getVocabulary().getSymbolicName(type) + ">"
-                       : text);
+    private void createAndAddPendingToken(final int ttype, final int channel, final String text, Token sampleToken) {
+        CommonToken ctkn = new CommonToken(sampleToken);
+        ctkn.setType(ttype);
+        ctkn.setChannel(channel);
+        ctkn.setStopIndex(sampleToken.getStartIndex() - 1);
+        ctkn.setText(text == null
+                     ? "<" + this.getVocabulary().getDisplayName(ttype) + ">"
+                     : text);
 
-        this.addPendingToken(cToken);
+        this.addPendingToken(ctkn);
     }
 
-    private void addPendingToken(final Token token) {
+    private void addPendingToken(final Token tkn) {
         // save the last pending token type because the pendingTokens linked list can be empty by the nextToken()
-        this.previousPendingTokenType = token.getType();
-        if (token.getChannel() == Token.DEFAULT_CHANNEL) {
+        this.previousPendingTokenType = tkn.getType();
+        if (tkn.getChannel() == Token.DEFAULT_CHANNEL) {
             this.lastPendingTokenTypeFromDefaultChannel = this.previousPendingTokenType;
         }
-        this.pendingTokens.addLast(token);
+        this.pendingTokens.addLast(tkn);
     }
 
-    private int getIndentationLength(final String textWS) { // the textWS may contain spaces, tabs or form feeds
+    private int getIndentationLength(final String indentText) { // the indentText may contain spaces, tabs or form feeds
         final int TAB_LENGTH = 8; // the standard number of spaces to replace a tab to spaces
         int length = 0;
-        for (char ch : textWS.toCharArray()) {
+        for (char ch : indentText.toCharArray()) {
             switch (ch) {
                 case ' ':
                     this.wasSpaceIndentation = true;
@@ -387,7 +378,7 @@ public abstract class PythonLexerBase extends Lexer {
         if (this.wasTabIndentation && this.wasSpaceIndentation) {
             if (!(this.wasIndentationMixedWithSpacesAndTabs)) {
                 this.wasIndentationMixedWithSpacesAndTabs = true;
-                return this.INVALID_LENGTH; // only for the first inconsistent indent
+                length = this.INVALID_LENGTH; // only for the first inconsistent indent
             }
         }
         return length;
@@ -400,13 +391,7 @@ public abstract class PythonLexerBase extends Lexer {
     private void reportError(final String errMsg) {
         this.reportLexerError(errMsg);
 
-        // the ERROR_TOKEN will raise an error in the parser
-        this.createAndAddPendingToken(PythonLexer.ERROR_TOKEN, Token.DEFAULT_CHANNEL, this.ERR_TXT + errMsg, this.ffgToken);
-    }
-
-    @Override
-    public void reset() {
-        this.init();
-        super.reset();
+        // the ERRORTOKEN will raise an error in the parser
+        this.createAndAddPendingToken(PythonLexer.ERRORTOKEN, Token.DEFAULT_CHANNEL, this.ERR_TXT + errMsg, this.ffgToken);
     }
 }

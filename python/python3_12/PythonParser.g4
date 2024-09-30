@@ -27,7 +27,7 @@ THE SOFTWARE.
   *
   */
 
-parser grammar PythonParser; // Python 3.12.1  https://docs.python.org/3.12/reference/grammar.html#full-grammar-specification
+parser grammar PythonParser; // Python 3.12.6  https://docs.python.org/3.12/reference/grammar.html#full-grammar-specification
 options {
     tokenVocab=PythonLexer;
     superClass=PythonParserBase;
@@ -475,8 +475,8 @@ type_param_seq: type_param (',' type_param)* ','?;
 
 type_param
     : NAME type_param_bound?
-    | '*'  NAME (':' expression)?
-    | '**' NAME (':' expression)?
+    | '*'  NAME
+    | '**' NAME
     ;
 
 
