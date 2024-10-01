@@ -1,8 +1,6 @@
 import { Parser, TokenStream, BufferedTokenStream } from 'antlr4';
 import GoLexer from './GoLexer';
 
-console.log(Parser)
-
 export default abstract class GoParserBase extends Parser {
   constructor(input: TokenStream) {
     super(input);
