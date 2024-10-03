@@ -221,8 +221,8 @@ DOUBLE_QUOTE : '"';
 fragment DECIMAL_DIGIT: [0-9];
 
 POSITIVE_DECIMAL_LITERAL : DECIMAL_DIGIT+;
-DECIMAL_LITERAL          : [-]? POSITIVE_DECIMAL_LITERAL;
-DECIMAL_SCORE_LITERAL    : ([(]? DECIMAL_LITERAL) | ([+ | -]? 'inf');
+DECIMAL_LITERAL          : '-'? POSITIVE_DECIMAL_LITERAL;
+DECIMAL_SCORE_LITERAL    : ([(]? DECIMAL_LITERAL) | (('+' | '-')? 'inf');
 
 // Identifiers
 // Should be at the very bottom, for it is the most general token

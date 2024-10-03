@@ -1,0 +1,1 @@
+ZINCRBY test 1 key
