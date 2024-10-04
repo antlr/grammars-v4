@@ -59,7 +59,7 @@ attr_list
     ;
 
 a_list
-    : (id_ ( '=' id_)? ','?)+
+    : (id_ ( '=' id_)? (';' | ',')?)+
     ;
 
 edge_stmt
