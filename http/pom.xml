@@ -40,11 +40,13 @@
 					<showTree>false</showTree>
 					<entryPoint>http_message</entryPoint>
 					<grammarName>http</grammarName>
+					<testFileExtension>.http</testFileExtension>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
+					    <id>test-http</id>
 						<goals>
 							<goal>test</goal>
 						</goals>
