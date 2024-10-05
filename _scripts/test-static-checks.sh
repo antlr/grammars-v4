@@ -296,7 +296,7 @@ fi
 
 if [ ${#targets[@]} -eq 0 ]
 then
-    targets=( useless-parens format )
+    targets=( useless-parens format ambiguity )
 fi
 
 echo grammars = ${grammars[@]}
@@ -374,6 +374,22 @@ do
         then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::one or more grammars do not conform to the Antlr grammar coding standard format for this repo. Reformat using antlr-format."
         fi
+    fi
+
+    if [ "$target" == "ambiguity" ]
+    then
+        dotnet trgen -- -t CSharp --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+	if [ $? -ne 0 ]
+	then
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, non-zero return from trgen."
+	elif [ ! -d Generated-CSharp ]
+	then
+            echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, no Generated-CSharp directory."
+	else
+	    cd Generated-CSharp
+	    bash build.sh
+	    bash test-ambiguity.sh
+	fi
     fi
 
     popd > /dev/null
