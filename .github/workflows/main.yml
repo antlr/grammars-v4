@@ -170,7 +170,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        test: [ useless-parens, format ]
+        test: [ useless-parens, format, ambiguity ]
     steps:
     - name: Info
       shell: bash
