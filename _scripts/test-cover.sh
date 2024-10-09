@@ -308,7 +308,7 @@ do
         popd > /dev/null
         continue
     fi
-    desc_targets=`dotnet trxml2 -- desc.xml | grep '/desc/targets'`
+    desc_targets=`dotnet trxml2 desc.xml | grep '/desc/targets'`
     if [ "${PIPESTATUS[0]}" -ne 0 ]
     then
         echo "The desc.xml for $testname is malformed. Skipping."
@@ -336,7 +336,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trparse -- -t antlr4 *.g4 2> /dev/null | dotnet trxgrep -- ' //(actionBlock | argActionBlock)' | dotnet trtext -- -c`
+        count=`dotnet trparse -t ANTLRv4 *.g4 2> /dev/null | dotnet trxgrep -- ' //(actionBlock | argActionBlock)' | dotnet trtext -- -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -348,7 +348,7 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -- -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`
