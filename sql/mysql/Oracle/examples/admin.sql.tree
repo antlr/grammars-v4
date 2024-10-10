@@ -1,0 +1,1 @@
+(query (simpleStatement (setStatement SET (startOptionValueList (optionType GLOBAL) (startOptionValueListFollowingOptionType (optionValueFollowingOptionType (lvalueVariable (identifier (pureIdentifier v1))) (equal =) (setExprOrDefault (expr (boolPri (predicate (bitExpr (simpleExpr (literalOrNull (literal (numLiteral (int64Literal 1))))))))))) optionValueListContinued)))) ;)

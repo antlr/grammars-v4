@@ -1,0 +1,1 @@
+(query (simpleStatement (otherAdministrativeStatement KILL CONNECTION (expr (boolPri (predicate (bitExpr (simpleExpr (literalOrNull (literal (numLiteral (int64Literal 12345))))))))))) ;)

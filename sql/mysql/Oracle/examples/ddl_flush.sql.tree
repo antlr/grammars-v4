@@ -1,0 +1,1 @@
+(query (simpleStatement (otherAdministrativeStatement flush (flushOption hosts) , (flushOption status))) ;)

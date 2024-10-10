@@ -1,0 +1,1 @@
+(query TABLE t ; TABLE t LIMIT 3 ; TABLE t ORDER BY b LIMIT 3 ;)

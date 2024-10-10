@@ -1,0 +1,1 @@
+(query (simpleStatement (dropStatement drop (dropTable temporary table (ifExists if exists) (tableRefList (tableRef (qualifiedIdentifier (identifier (pureIdentifier temp_t1)))))))) ;)

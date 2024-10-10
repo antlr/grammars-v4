@@ -1,0 +1,1 @@
+(query (simpleStatement (setStatement SET (startOptionValueList (optionValueNoOptionType NAMES (charsetName (textOrIdentifier (textStringLiteral 'utf8')))) optionValueListContinued))) ;)

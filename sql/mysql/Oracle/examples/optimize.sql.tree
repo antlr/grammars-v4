@@ -1,0 +1,1 @@
+(query (simpleStatement (tableAdministrationStatement OPTIMIZE TABLE (tableRefList (tableRef (qualifiedIdentifier (identifier (pureIdentifier t1))))))) ;)

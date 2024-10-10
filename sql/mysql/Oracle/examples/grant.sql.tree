@@ -1,0 +1,1 @@
+(query (simpleStatement (accountManagementStatement (grantStatement GRANT ALL ON (grantIdentifier * . *) TO (grantTargetList (createUserList (createUser (user (userIdentifierOrText (textOrIdentifier (identifier (pureIdentifier `foo2`))) (userVariable @ (textOrIdentifier (identifier (pureIdentifier `%`)))))))))))) ;)

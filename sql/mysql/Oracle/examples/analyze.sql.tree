@@ -1,0 +1,1 @@
+(query (simpleStatement (tableAdministrationStatement ANALYZE TABLE (tableRefList (tableRef (qualifiedIdentifier (identifier (pureIdentifier t1))))))) ;)
