@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Antlr4.Build.Tasks;
 using Antlr4.Runtime;
 
 /** SQL modes that control parsing behavior. */
@@ -22,7 +21,7 @@ public enum SqlMode {
 };
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
-public abstract class MySQLLexerBase : Lexer {
+public class MySQLLexerBase : Lexer {
     public int serverVersion = 0;
     public HashSet<SqlMode> sqlModes = new HashSet<SqlMode>();
 
@@ -44,7 +43,20 @@ public abstract class MySQLLexerBase : Lexer {
     static string unsignedLongLongString = "18446744073709551615";
     static int unsignedLongLongLength = 20;
 
-    protected MySQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput) : base(input, output, errorOutput)
+    public override string[] RuleNames => throw new NotImplementedException();
+
+    public override IVocabulary Vocabulary => throw new NotImplementedException();
+
+    public override string GrammarFileName => throw new NotImplementedException();
+
+
+    protected MySQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
+	: base(input, output, errorOutput)
+    {
+    }
+
+    public MySQLLexerBase(ICharStream input)
+        : base(input)
     {
     }
 
