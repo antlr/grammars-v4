@@ -6,12 +6,12 @@ IFS=$(echo -en "\n\b")
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
+    dotnet triconv -f utf-8 $f > /dev/null 2>&1
     if [ "$?" = "0" ]
     then
         files+=( $f )
@@ -32,7 +32,7 @@ fi
 # Individual parsing: NOT SUPPORTED!
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog -- dotnet trcover -- -x
+echo "${files[*]}" | dotnet trwdog dotnet trcover -x
 status=$?
 <endif>
 
