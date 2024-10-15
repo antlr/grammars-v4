@@ -17,3 +17,41 @@ Anastasiya Shadrina a.shadrina5@mail.ru
 
 ## Origin source
 <https://github.com/shadrina/kotlin-grammar-antlr4>
+
+## Issues
+The grammar has ambiguities in:
+```
+callSuffix
+callableReference
+classBody
+classDeclaration
+classMemberDeclaration
+controlStructureBody
+delegationSpecifier
+delegationSpecifiers
+enumEntries
+functionDeclaration
+functionLiteral
+ifExpression
+importHeader
+jumpExpression
+kotlinFile
+modifier
+objectLiteral
+postfixUnaryExpression
+propertyDeclaration
+receiverType
+secondaryConstructor
+semi
+simpleUserType
+statement
+statements
+superExpression
+type
+typeRHS
+typeReference
+userType
+valueArgument
+whenEntry
+whenExpression
+```

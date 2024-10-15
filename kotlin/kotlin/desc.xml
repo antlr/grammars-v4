@@ -3,4 +3,12 @@
    <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript;Python3</targets>
    <grammar-files>KotlinLexer.g4;KotlinParser.g4</grammar-files>
    <grammar-name>Kotlin</grammar-name>
+   <test>
+      <entry-point>kotlinFile</entry-point>
+      <inputs>examples/kotlinFile</inputs>
+   </test>
+   <test>
+      <entry-point>script</entry-point>
+      <inputs>examples/script</inputs>
+   </test>
 </desc>
