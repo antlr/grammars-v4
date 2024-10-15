@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>clickhouse</artifactId>
     <packaging>jar</packaging>
-    <name>Clickhouse grammar</name>
+    <name>ClickHouse grammar</name>
     <parent>
         <groupId>org.antlr.grammars</groupId>
         <artifactId>sqlparent</artifactId>
@@ -18,8 +18,8 @@
                 <configuration>
                     <sourceDirectory>${basedir}</sourceDirectory>
                     <includes>
-                        <include>ClickhouseLexer.g4</include>
-                        <include>ClickhouseParser.g4</include>
+                        <include>ClickHouseLexer.g4</include>
+                        <include>ClickHouseParser.g4</include>
                     </includes>
                     <visitor>true</visitor>
                     <listener>true</listener>
@@ -40,7 +40,7 @@
                     <verbose>true</verbose>
                     <showTree>true</showTree>
                     <entryPoint>queryStmt</entryPoint>
-                    <grammarName>clickhouse</grammarName>
+                    <grammarName>ClickHouse</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples</exampleFiles>
                 </configuration>
