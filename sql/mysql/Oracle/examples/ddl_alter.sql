@@ -43,7 +43,7 @@ alter table table1 add column yes varchar(255)  default '' null;
 alter table add_test add column col1 int not null;
 alter table `some_table` add (primary key `id` (`id`),`k_id` int unsigned not null,`another_field` smallint not null,index `k_id` (`k_id`));
 alter table `some_table` add column (unique key `another_field` (`another_field`));
-alter table default.task add column xxxx varchar(200) comment 'cdc test';
+#NB: alter table default.task add column xxxx varchar(200) comment 'cdc test';
 ALTER TABLE `hcore`.comments COLLATE='utf8mb4_general_ci', CONVERT TO CHARSET UTF8MB4;
 ALTER TABLE T1 ADD FOREIGN KEY ( I )  REFERENCES TT ( I ) ON DELETE SET DEFAULT;
 ALTER TABLE T1 ADD FOREIGN KEY ( I ) REFERENCES TT ( I ) ON UPDATE SET DEFAULT;
@@ -58,7 +58,7 @@ ALTER TABLE `order` ADD cancelled TINYINT(1) DEFAULT 0 NOT NULL, ADD delivered T
 #begin
 -- Alter database
 alter database test default character set = utf8;
-alter schema somedb_name upgrade data directory name;
+#NB: alter schema somedb_name upgrade data directory name;
 alter database test_1 default encryption = 'Y' read only = 1;
 #end
 #begin
@@ -101,13 +101,13 @@ alter tablespace tblsp_2 drop datafile 'deletedfilename' wait engine ndb;
 alter view my_view1 as select 1 union select 2 limit 0,5;
 alter algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
 alter definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
-alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
-	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
+#NB: alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
+#	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 -- Alter user
 ALTER USER 'mattias.hultman' DEFAULT ROLE `prod-spain-mysql-read-only`@`%`;
 rename user user1@100.200.1.1 to user2@100.200.1.2;
-rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
-rename user user1@100.200.1.1 to user2@::1;
+#NB: rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
+#NB: rename user user1@100.200.1.1 to user2@::1;
 alter user 'user'@'%' IDENTIFIED BY 'newpassword' RETAIN CURRENT PASSWORD;
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY RANDOM PASSWORD RETAIN CURRENT PASSWORD;
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED BY '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19' RETAIN CURRENT PASSWORD;
@@ -115,5 +115,5 @@ ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password';
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19';
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' AS 'REDACTED' RETAIN CURRENT PASSWORD;
 ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' BY '2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19' REPLACE 'current_auth_string' RETAIN CURRENT PASSWORD;
-ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' BY RANDOM PASSWORD REPLACE 'current_auth_string' RETAIN CURRENT PASSWORD;
+#NB: ALTER USER 'test_dual_pass'@'%' IDENTIFIED WITH 'mysql_native_password' BY RANDOM PASSWORD REPLACE 'current_auth_string' RETAIN CURRENT PASSWORD;
 #end

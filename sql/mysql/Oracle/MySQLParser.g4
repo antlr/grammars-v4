@@ -27,22 +27,20 @@ parser grammar MySQLParser;
 // $antlr-format alignColons hanging
 
 options {
-    superClass = MySQLBaseRecognizer;
+    superClass = MySQLParserBase;
     tokenVocab = MySQLLexer;
 }
 
-@header {
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-useless-escape, no-lone-blocks */
-
-import { MySQLBaseRecognizer } from "../MySQLBaseRecognizer.js";
-import { SqlMode } from "../MySQLBaseLexer.js";
-}
+// Insert here @header for parser.
 
 //----------------------------------------------------------------------------------------------------------------------
 
+queries
+    : query* EOF
+    ;
+
 query
-    : ((simpleStatement | beginWork) SEMICOLON_SYMBOL?)? EOF
+    : (simpleStatement | beginWork) SEMICOLON_SYMBOL
     ;
 
 simpleStatement

@@ -1,0 +1,2 @@
+line 4:9 mismatched input 'TABLES' expecting {LOCAL_SYMBOL, NO_WRITE_TO_BINLOG_SYMBOL, TABLE_SYMBOL}
+line 5:9 mismatched input 'TABLES' expecting {LOCAL_SYMBOL, NO_WRITE_TO_BINLOG_SYMBOL, TABLE_SYMBOL}

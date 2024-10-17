@@ -4,9 +4,9 @@
 
 import { Parser } from "antlr4ng";
 
-import { SqlMode } from "./MySQLBaseLexer.js";
+import { SqlMode } from "./MySQLLexerBase.js";
 
-export abstract class MySQLBaseRecognizer extends Parser {
+export abstract class MySQLParserBase extends Parser {
 
     // To parameterize the parsing process.
     public serverVersion = 0;

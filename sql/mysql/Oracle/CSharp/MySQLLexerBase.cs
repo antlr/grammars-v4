@@ -297,43 +297,65 @@ public class MySQLLexerBase : Lexer {
         //++this.TokenStartCharIndex;
     }
 
-    public bool isServerVersionLt80024()
+
+    // Version-related methods
+    public bool isServerVersionLt80024() => serverVersion < 80024;
+    public bool isServerVersionGe80024() => serverVersion >= 80024;
+    public bool isServerVersionGe80011() => serverVersion >= 80011;
+    public bool isServerVersionGe80013() => serverVersion >= 80013;
+    public bool isServerVersionLt80014() => serverVersion < 80014;
+    public bool isServerVersionGe80014() => serverVersion >= 80014;
+    public bool isServerVersionGe80017() => serverVersion >= 80017;
+    public bool isServerVersionLt80031() => serverVersion < 80031;
+
+    // Functions for specific token types
+    public void doLogicalOr()
     {
-	    return this.serverVersion < 80024;
+        Type = isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
     }
 
-    public bool isServerVersionGe80024()
+    public void doIntNumber()
     {
-	    return this.serverVersion >= 80024;
+        Type = determineNumericType(Text);
     }
 
-    public bool isServerVersionGe80011()
-    {
-	    return this.serverVersion >= 80011;
-    }
+    public void doAdddate() => Type = determineFunction(MySQLLexer.ADDDATE_SYMBOL);
+    public void doBitAnd() => Type = determineFunction(MySQLLexer.BIT_AND_SYMBOL);
+    public void doBitOr() => Type = determineFunction(MySQLLexer.BIT_OR_SYMBOL);
+    public void doBitXor() => Type = determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
+    public void doCast() => Type = determineFunction(MySQLLexer.CAST_SYMBOL);
+    public void doCount() => Type = determineFunction(MySQLLexer.COUNT_SYMBOL);
+    public void doCurdate() => Type = determineFunction(MySQLLexer.CURDATE_SYMBOL);
+    public void doCurrentDate() => Type = determineFunction(MySQLLexer.CURDATE_SYMBOL);
+    public void doCurrentTime() => Type = determineFunction(MySQLLexer.CURTIME_SYMBOL);
+    public void doCurtime() => Type = determineFunction(MySQLLexer.CURTIME_SYMBOL);
+    public void doDateAdd() => Type = determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
+    public void doDateSub() => Type = determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
+    public void doExtract() => Type = determineFunction(MySQLLexer.EXTRACT_SYMBOL);
+    public void doGroupConcat() => Type = determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
+    public void doMax() => Type = determineFunction(MySQLLexer.MAX_SYMBOL);
+    public void doMid() => Type = determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    public void doMin() => Type = determineFunction(MySQLLexer.MIN_SYMBOL);
+    public void doNot() => Type = isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL : MySQLLexer.NOT_SYMBOL;
+    public void doNow() => Type = determineFunction(MySQLLexer.NOW_SYMBOL);
+    public void doPosition() => Type = determineFunction(MySQLLexer.POSITION_SYMBOL);
+    public void doSessionUser() => Type = determineFunction(MySQLLexer.USER_SYMBOL);
+    public void doStddevSamp() => Type = determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
+    public void doStddev() => Type = determineFunction(MySQLLexer.STD_SYMBOL);
+    public void doStddevPop() => Type = determineFunction(MySQLLexer.STD_SYMBOL);
+    public void doStd() => Type = determineFunction(MySQLLexer.STD_SYMBOL);
+    public void doSubdate() => Type = determineFunction(MySQLLexer.SUBDATE_SYMBOL);
+    public void doSubstr() => Type = determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    public void doSubstring() => Type = determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    public void doSum() => Type = determineFunction(MySQLLexer.SUM_SYMBOL);
+    public void doSysdate() => Type = determineFunction(MySQLLexer.SYSDATE_SYMBOL);
+    public void doSystemUser() => Type = determineFunction(MySQLLexer.USER_SYMBOL);
+    public void doTrim() => Type = determineFunction(MySQLLexer.TRIM_SYMBOL);
+    public void doVariance() => Type = determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+    public void doVarPop() => Type = determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+    public void doVarSamp() => Type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
+    public void doUnderscoreCharset() => Type = checkCharset(Text);
 
-    public bool isServerVersionGe80013()
-    {
-	    return this.serverVersion >= 80013;
-    }
+    public bool isVersionComment() => checkMySQLVersion(Text);
 
-    public bool isServerVersionLt80014()
-    {
-	    return this.serverVersion < 80014;
-    }
-
-    public bool isServerVersionGe80014()
-    {
-	    return this.serverVersion >= 80014;
-    }
-
-    public bool isServerVersionGe80017()
-    {
-	    return this.serverVersion >= 80017;
-    }
-
-    public bool isServerVersionLt80031()
-    {
-	    return this.serverVersion < 80031;
-    }
 }

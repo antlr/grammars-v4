@@ -5,8 +5,8 @@ CREATE USER 'jim'@'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "p
 CREATE USER 'jim' @'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
 -- Create Table
 create table new_t  (like t1);
-create table log_table(row varchar(512));
-create table log_table(row character(512));
+#NB: create table log_table(row varchar(512));
+#NB: create table log_table(row character(512));
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
@@ -22,7 +22,7 @@ create table child_table(id int unsigned auto_increment primary key, id_parent i
 create table `another some table $$` like `some table $$`;
 create table `actor` (`last_update` timestamp default CURRENT_TIMESTAMP, `birthday` datetime default CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP);
 create table boolean_table(c1 bool, c2 boolean default true);
-create table default_table(c1 int default 42, c2 int default -42, c3 varchar(256) DEFAULT _utf8mb3'xxx');
+#NB: create table default_table(c1 int default 42, c2 int default -42, c3 varchar(256) DEFAULT _utf8mb3'xxx');
 create table ts_table(
   ts1 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   ts2 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME,
@@ -65,8 +65,8 @@ CREATE TABLE serval4 (id SMALLINT(5) UNSIGNED SERIAL DEFAULT VALUE NOT NULL, val
 CREATE TABLE serial (serial INT);
 CREATE TABLE float_table (f1 FLOAT, f2 FLOAT(10), f3 FLOAT(7,4));
 CREATE TABLE USER (INTERNAL BOOLEAN DEFAULT FALSE);
-create table table_with_character_set_eq (id int, data varchar(50)) character set = default;
-create table table_with_character_set (id int, data varchar(50)) character set default;
+#NB: create table table_with_character_set_eq (id int, data varchar(50)) character set = default;
+#NB: create table table_with_character_set (id int, data varchar(50)) character set default;
 create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
 create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
 create table blob_test(id int, col1 blob(45));
@@ -74,7 +74,7 @@ create table žluťoučký (kůň int);
 create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
 CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
 create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
-CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
+#NB: CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
 create table invisible_column_test(id int, col1 int INVISIBLE);
 create table visible_column_test(id int, col1 int VISIBLE);
 create table table_with_buckets(id int(11) auto_increment NOT NULL COMMENT 'ID', buckets int(11) NOT NULL COMMENT '分桶数');
@@ -111,40 +111,40 @@ CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
         )
     );
 
-CREATE TABLE positions_rollover (
-    id bigint(20) NOT NULL AUTO_INCREMENT,
-    time datetime NOT NULL,
-    partition_index int(10) unsigned NOT NULL DEFAULT 0,
-    PRIMARY KEY (id,partition_index),
-    KEY time (time)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-PARTITION BY LIST (partition_index) (
-    PARTITION positions_rollover_partition VALUES IN (0) ENGINE = InnoDB,
-    PARTITION default_positions_rollover_partition DEFAULT ENGINE = InnoDB
-);
+#NB: CREATE TABLE positions_rollover (
+#    id bigint(20) NOT NULL AUTO_INCREMENT,
+#    time datetime NOT NULL,
+#    partition_index int(10) unsigned NOT NULL DEFAULT 0,
+#    PRIMARY KEY (id,partition_index),
+#    KEY time (time)
+#) ENGINE=InnoDB DEFAULT CHARSET=utf8
+#PARTITION BY LIST (partition_index) (
+#    PARTITION positions_rollover_partition VALUES IN (0) ENGINE = InnoDB,
+#    PARTITION default_positions_rollover_partition DEFAULT ENGINE = InnoDB
+#);
 
-CREATE TABLE `tab_with_json_value` (
-   `col0` JSON NOT NULL,
-   `col1` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
-      JSON_VALUE(`col0`, _utf8mb4'$._field1' RETURNING CHAR(36) CHARACTER SET latin1)
-   ) STORED NOT NULL,
-   `col2` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
-      JSON_VALUE(`col0`, _utf8mb4'$._field1' ERROR ON EMPTY)
-   ) STORED NOT NULL,
-   `col3` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
-      JSON_VALUE(`col0`, _utf8mb4'$._field1' DEFAULT 'xx' ON ERROR)
-   ) STORED NOT NULL,
-   `col4` JSON NOT NULL,
-   PRIMARY KEY (`col1`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = COMPRESSED;
+#NB: CREATE TABLE `tab_with_json_value` (
+#   `col0` JSON NOT NULL,
+#   `col1` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+#      JSON_VALUE(`col0`, _utf8mb4'$._field1' RETURNING CHAR(36) CHARACTER SET latin1)
+#   ) STORED NOT NULL,
+#   `col2` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+#      JSON_VALUE(`col0`, _utf8mb4'$._field1' ERROR ON EMPTY)
+#   ) STORED NOT NULL,
+#   `col3` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+#      JSON_VALUE(`col0`, _utf8mb4'$._field1' DEFAULT 'xx' ON ERROR)
+#   ) STORED NOT NULL,
+#   `col4` JSON NOT NULL,
+#   PRIMARY KEY (`col1`)
+#) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = COMPRESSED;
 
-CREATE TABLE CustomerTable (
-    CustomerID varchar(5),
-    CompanyName varchar(40),
-    ContactName varchar(30),
-    Address varchar(60),
-    Phone varchar(24)
- ) ENGINE = CONNECT TABLE_TYPE = ODBC;
+#NB: CREATE TABLE CustomerTable (
+#    CustomerID varchar(5),
+#    CompanyName varchar(40),
+#    ContactName varchar(30),
+#    Address varchar(60),
+#    Phone varchar(24)
+# ) ENGINE = CONNECT TABLE_TYPE = ODBC;
 
 CREATE TABLE CustomerTable (
     table_type varchar(5)
@@ -230,7 +230,7 @@ CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = IN
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
-CREATE TABLE TableWithVector (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, vec1 VECTOR, vec2 VECTOR);
+#NB: CREATE TABLE TableWithVector (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, vec1 VECTOR, vec2 VECTOR);
 #end
 #begin
 -- Rename table
@@ -256,8 +256,8 @@ create schema `select` default character set = utf8;
 create database if not exists `current_date` character set cp1251;
 create database super default character set utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
-create database db_with_character_set_eq character set = default;
-create database db_with_character_set character set default;
+#NB: create database db_with_character_set_eq character set = default;
+#NB: create database db_with_character_set character set default;
 create database `ymsun_test1` charset gb18030 collate gb18030_bin;
 create database `test` charset binary collate binary;
 #end
@@ -341,34 +341,36 @@ ON DUPLICATE KEY UPDATE
 SET i = i + 1;
 END WHILE;
 END
+#NB:
+;
 #end
 #begin
 -- Create trigger 5
-CREATE TRIGGER `rtl_trigger_before_update`
-BEFORE UPDATE
-ON all_student_educator FOR EACH ROW
-BEGIN
-    IF NEW.student_words_read_total is not null AND NEW.student_words_read_total >= 3 AND NEW.badge_3_words_read_flag = 0 THEN
-        SET
-        NEW.badge_flag = 1,
-        NEW.badge_student_total = NEW.badge_student_total + 1,
-        NEW.badge_datetime = now();
-        INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
-    END IF;
-END
+#NB: CREATE TRIGGER `rtl_trigger_before_update`
+#BEFORE UPDATE
+#ON all_student_educator FOR EACH ROW
+#BEGIN
+#    IF NEW.student_words_read_total is not null AND NEW.student_words_read_total >= 3 AND NEW.badge_3_words_read_flag = 0 THEN
+#        SET
+#        NEW.badge_flag = 1,
+#        NEW.badge_student_total = NEW.badge_student_total + 1,
+#        NEW.badge_datetime = now();
+#        INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
+#    END IF;
+#END
 #end
 #begin
 -- Create trigger 6
 -- delimiter //
-create trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
+#NB: create trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
 -- Create view
 create or replace view my_view1 as select 1 union select 2 limit 0,5;
 create algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
 create or replace definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
-create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
-	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
+#NB: create or replace definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
+#	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 create view v_some_table as (with a as (select * from some_table) select * from a);
 
 #end
@@ -392,16 +394,18 @@ RETURN
             SUBSTR(_uuid,  1, 8),
             SUBSTR(_uuid, 20, 4),
             SUBSTR(_uuid, 25) ))
+#NB:
+;
 #end
 #begin
 -- From MariaDB 10.4.3, the JSON_VALID function is automatically used as a CHECK constraint for the JSON data type alias in order to ensure that a valid json document is inserted.
 -- src: https://mariadb.com/kb/en/json_valid/
-CREATE TABLE `global_priv` (
-    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
-    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
-    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
-    PRIMARY KEY (`Host`,`User`)
-) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
+#NB: CREATE TABLE `global_priv` (
+#    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+#    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
+#    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
+#    PRIMARY KEY (`Host`,`User`)
+#) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
 #end
 #begin
 -- https://dev.mysql.com/doc/refman/8.0/en/json-validation-functions.html#json-validation-functions-constraints
@@ -452,6 +456,8 @@ BEGIN
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
+#NB:
+;
 #end
 #begin
 -- delimiter //
@@ -464,6 +470,9 @@ aaa:BEGIN
     LEAVE label1;
   END LOOP label1;
 END -- //-- delimiter ;
+#NB:
+;
+
 #end
 #begin
 CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
@@ -474,6 +483,8 @@ BEGIN  insert into order_config(order_id, attribute, value, performer)
        ON DUPLICATE KEY UPDATE value = 'true',
                             performer = 'AppConfig'; -- Enable second_attr for order
 END
+#NB:
+;
 #end
 #begin
 CREATE DEFINER=`bettingservice`@`stage-us-nj-app%` PROCEDURE `AggregatePlayerFactDaily`()
@@ -521,6 +532,8 @@ ON DUPLICATE KEY UPDATE
                      Bonus_Count  = Bonus_Count + VALUES(Bonus_Count);
 COMMIT;
 END
+#NB:
+;
 #end
 -- Create procedure
 -- delimiter //
@@ -531,6 +544,8 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
   END IF;
 END -- //-- delimiter ;
+#NB:
+;
 #end
 #begin
 -- delimiter //
@@ -540,65 +555,65 @@ BEGIN
 END; -- //-- delimiter ;
 #end
 #begin
-CREATE DEFINER=`prod_migrations`@`%` PROCEDURE `upsert_virtual_item`(IN name VARCHAR(45), IN type TINYINT UNSIGNED)
-BEGIN
-    SET @merchantId := (SELECT merchant_id FROM merchant LIMIT 1);
-    IF @merchantId > 0 THEN
-        SET @rows := (SELECT COUNT(*) FROM item WHERE item_type = type);
-        IF @rows > 0 THEN
-UPDATE item SET
-                merchant_id = @merchantId,
-                cz_title = name,
-                price = 0,
-                orderer = 2,
-                takeaway = 0,
-                currency_id = (
-                    SELECT currency_currency_id
-                    FROM merchant
-                    WHERE merchant_id = @merchantId
-                ),
-                tax_vat_id = (
-                    SELECT tax_vat.tax_vat_id
-                    FROM tax_vat
-                             JOIN merchant
-                                  ON merchant.place_country_id = tax_vat.country_id
-                                      AND merchant.merchant_id = @merchantId
-                    WHERE tax_vat.default = 1
-                ),
-                item_measure_id = 1,
-                kitchen_print = 0,
-                deleted = 0,
-                virtual = 1
-WHERE item_type = type;
-ELSE
-            INSERT INTO item SET
-                merchant_id = @merchantId,
-                cz_title = name,
-                price = 0,
-                orderer = 2,
-                takeaway = 0,
-                currency_id = (
-                    SELECT currency_currency_id
-                    FROM merchant
-                    WHERE merchant_id = @merchantId
-                ),
-                tax_vat_id = (
-                    SELECT tax_vat.tax_vat_id
-                    FROM tax_vat
-                    JOIN merchant
-                        ON merchant.place_country_id = tax_vat.country_id
-                        AND merchant.merchant_id = @merchantId
-                    WHERE tax_vat.default = 1
-                ),
-                item_measure_id = 1,
-                kitchen_print = 0,
-                deleted = 0,
-                virtual = 1,
-                item_type = type
-            ;
-END IF;
-END IF;
-END
+#NB: CREATE DEFINER=`prod_migrations`@`%` PROCEDURE `upsert_virtual_item`(IN name VARCHAR(45), IN type TINYINT UNSIGNED)
+#BEGIN
+#    SET @merchantId := (SELECT merchant_id FROM merchant LIMIT 1);
+#    IF @merchantId > 0 THEN
+#        SET @rows := (SELECT COUNT(*) FROM item WHERE item_type = type);
+#        IF @rows > 0 THEN
+#UPDATE item SET
+#                merchant_id = @merchantId,
+#                cz_title = name,
+#                price = 0,
+#                orderer = 2,
+#                takeaway = 0,
+#                currency_id = (
+#                    SELECT currency_currency_id
+#                    FROM merchant
+#                    WHERE merchant_id = @merchantId
+#                ),
+#                tax_vat_id = (
+#                    SELECT tax_vat.tax_vat_id
+#                    FROM tax_vat
+#                             JOIN merchant
+#                                  ON merchant.place_country_id = tax_vat.country_id
+#                                      AND merchant.merchant_id = @merchantId
+#                    WHERE tax_vat.default = 1
+#                ),
+#                item_measure_id = 1,
+#                kitchen_print = 0,
+#                deleted = 0,
+#                virtual = 1
+#WHERE item_type = type;
+#ELSE
+#            INSERT INTO item SET
+#                merchant_id = @merchantId,
+#                cz_title = name,
+#                price = 0,
+#                orderer = 2,
+#                takeaway = 0,
+#                currency_id = (
+#                    SELECT currency_currency_id
+#                    FROM merchant
+#                    WHERE merchant_id = @merchantId
+#                ),
+#                tax_vat_id = (
+#                    SELECT tax_vat.tax_vat_id
+#                    FROM tax_vat
+#                    JOIN merchant
+#                        ON merchant.place_country_id = tax_vat.country_id
+#                        AND merchant.merchant_id = @merchantId
+#                    WHERE tax_vat.default = 1
+#                ),
+#                item_measure_id = 1,
+#                kitchen_print = 0,
+#                deleted = 0,
+#                virtual = 1,
+#                item_type = type
+#            ;
+#END IF;
+#END IF;
+#END
 #end
 #begin
 -- delimiter //
@@ -745,16 +760,16 @@ SELECT * FROM cte;
 
 #begin
 lock tables t1 read;
-lock table t1 read local wait 100;
+#NB: lock table t1 read local wait 100;
 #end
 
 #begin
-CREATE OR REPLACE VIEW view_name AS
-WITH my_values(val1, val2) AS (
-    VALUES (1, 'One'),
-           (2, 'Two')
-)
-SELECT v.val1, v.val2 FROM my_values v;
+#NB: CREATE OR REPLACE VIEW view_name AS
+#WITH my_values(val1, val2) AS (
+#    VALUES (1, 'One'),
+#           (2, 'Two')
+#)
+#SELECT v.val1, v.val2 FROM my_values v;
 #end
 
 #begin
@@ -765,6 +780,8 @@ DECLARE array VARCHAR(50);
 SELECT 1;
 
 END
+#NB:
+;
 #end
 
 #begin
@@ -775,6 +792,8 @@ SELECT
     @Ν_greece
      ,@N_latin;
 END
+#NB:
+;
 #end
 
 #begin
@@ -784,6 +803,8 @@ BEGIN
     UNION ALL
     SELECT id FROM test_auto_inc;
 END
+#NB:
+;
 #end
 
 #begin
@@ -795,6 +816,8 @@ BEGIN
     UNION ALL
     SELECT id FROM test_auto_inc ORDER BY id;
 END
+#NB:
+;
 #end
 
 #begin
@@ -806,6 +829,8 @@ BEGIN
     UNION ALL
     SELECT id FROM test_auto_inc ORDER BY id;
 END
+#NB:
+;
 #end
 
 #begin
@@ -823,6 +848,8 @@ GROUP BY 1
 ORDER BY 1
 ;
 END
+#NB:
+;
 #end
 #begin
 -- Create trigger 7

@@ -6,7 +6,7 @@
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
 import { Lexer, Token } from "antlr4ng";
-import { MySQLLexer } from "./generated/MySQLLexer.js";
+import { MySQLLexer } from "./MySQLLexer.js";
 
 /** SQL modes that control parsing behavior. */
 export enum SqlMode {
@@ -19,7 +19,7 @@ export enum SqlMode {
 }
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
-export abstract class MySQLBaseLexer extends Lexer {
+export abstract class MySQLLexerBase extends Lexer {
     public serverVersion = 0;
     public sqlModes = new Set<SqlMode>();
 
@@ -172,7 +172,7 @@ export abstract class MySQLBaseLexer extends Lexer {
         // server parser (as a digit is used to trigger processing in the lexer) nor in our parser
         // as our rules are defined without signs. But we do it anyway for maximum compatibility.
         let length = text.length - 1;
-        if (length < MySQLBaseLexer.#longLength) { // quick normal case
+        if (length < MySQLLexerBase.#longLength) { // quick normal case
             return MySQLLexer.INT_NUMBER;
         }
 
@@ -192,7 +192,7 @@ export abstract class MySQLBaseLexer extends Lexer {
             --length;
         }
 
-        if (length < MySQLBaseLexer.#longLength) {
+        if (length < MySQLLexerBase.#longLength) {
             return MySQLLexer.INT_NUMBER;
         }
 
@@ -200,35 +200,35 @@ export abstract class MySQLBaseLexer extends Lexer {
         let bigger: number;
         let cmp: string;
         if (negative) {
-            if (length === MySQLBaseLexer.#longLength) {
-                cmp = MySQLBaseLexer.#signedLongString.substring(1);
+            if (length === MySQLLexerBase.#longLength) {
+                cmp = MySQLLexerBase.#signedLongString.substring(1);
                 smaller = MySQLLexer.INT_NUMBER; // If <= signed_long_str
                 bigger = MySQLLexer.LONG_NUMBER; // If >= signed_long_str
-            } else if (length < MySQLBaseLexer.#signedLongLongLength) {
+            } else if (length < MySQLLexerBase.#signedLongLongLength) {
                 return MySQLLexer.LONG_NUMBER;
-            } else if (length > MySQLBaseLexer.#signedLongLongLength) {
+            } else if (length > MySQLLexerBase.#signedLongLongLength) {
                 return MySQLLexer.DECIMAL_NUMBER;
             } else {
-                cmp = MySQLBaseLexer.#signedLongLongString.substring(1);
+                cmp = MySQLLexerBase.#signedLongLongString.substring(1);
                 smaller = MySQLLexer.LONG_NUMBER; // If <= signed_longlong_str
                 bigger = MySQLLexer.DECIMAL_NUMBER;
             }
         } else {
-            if (length === MySQLBaseLexer.#longLength) {
-                cmp = MySQLBaseLexer.#longString;
+            if (length === MySQLLexerBase.#longLength) {
+                cmp = MySQLLexerBase.#longString;
                 smaller = MySQLLexer.INT_NUMBER;
                 bigger = MySQLLexer.LONG_NUMBER;
-            } else if (length < MySQLBaseLexer.#longLongLength) {
+            } else if (length < MySQLLexerBase.#longLongLength) {
                 return MySQLLexer.LONG_NUMBER;
-            } else if (length > MySQLBaseLexer.#longLongLength) {
-                if (length > MySQLBaseLexer.#unsignedLongLongLength) {
+            } else if (length > MySQLLexerBase.#longLongLength) {
+                if (length > MySQLLexerBase.#unsignedLongLongLength) {
                     return MySQLLexer.DECIMAL_NUMBER;
                 }
-                cmp = MySQLBaseLexer.#unsignedLongLongString;
+                cmp = MySQLLexerBase.#unsignedLongLongString;
                 smaller = MySQLLexer.ULONGLONG_NUMBER;
                 bigger = MySQLLexer.DECIMAL_NUMBER;
             } else {
-                cmp = MySQLBaseLexer.#longLongString;
+                cmp = MySQLLexerBase.#longLongString;
                 smaller = MySQLLexer.LONG_NUMBER;
                 bigger = MySQLLexer.ULONGLONG_NUMBER;
             }
@@ -264,5 +264,240 @@ export abstract class MySQLBaseLexer extends Lexer {
 
         ++this.column;
         ++this.tokenStartCharIndex;
+    }
+
+    public isServerVersionLt80024(): boolean
+    {
+        return this.serverVersion < 80024;
+    }
+
+    public isServerVersionGe80024(): boolean
+    {
+        return this.serverVersion >= 80024;
+    }
+
+    public isServerVersionGe80011(): boolean
+    {
+        return this.serverVersion >= 80011;
+    }
+
+    public isServerVersionGe80013(): boolean
+    {
+        return this.serverVersion >= 80013;
+    }
+
+    public isServerVersionLt80014(): boolean
+    {
+        return this.serverVersion < 80014;
+    }
+
+    public isServerVersionGe80014(): boolean
+    {
+        return this.serverVersion >= 80014;
+    }
+
+    public isServerVersionGe80017(): boolean
+    {
+        return this.serverVersion >= 80017;
+    }
+
+    public isServerVersionLt80031(): boolean
+    {
+        return this.serverVersion < 80031;
+    }
+
+    public doLogicalOr(): void
+    {
+	this.type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
+    }
+
+    public doIntNumber(): void
+    {
+	this.type = this.determineNumericType(this.text);
+    }
+
+    public doAdddate(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL);
+    }
+
+    public doBitAnd(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL);
+    }
+
+    public doBitOr(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL);
+    }
+
+    public doBitXor(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
+    }
+
+    public doCast(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.CAST_SYMBOL);
+    }
+
+    public doCount(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.COUNT_SYMBOL);
+    }
+
+    public doCurdate(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
+    }
+
+    public doCurrentDate(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
+    }
+
+    public doCurrentTime(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
+    }
+
+    public doCurtime(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
+    }
+
+    public doDateAdd(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
+    }
+
+    public doDateSub(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
+    }
+
+    public doExtract(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL);
+    }
+
+    public doGroupConcat(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
+    }
+
+    public doMax(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.MAX_SYMBOL);
+    }
+
+    public doMid(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    }
+
+    public doMin(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.MIN_SYMBOL);
+    }
+
+    public doNot(): void
+    {
+	this.type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL: MySQLLexer.NOT_SYMBOL;
+    }
+
+    public doNow(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.NOW_SYMBOL);
+    }
+
+    public doPosition(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.POSITION_SYMBOL);
+    }
+
+    public doSessionUser(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.USER_SYMBOL);
+    }
+
+    public doStddevSamp(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
+    }
+
+    public doStddev(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+    }
+
+    public doStddevPop(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+    }
+
+    public doStd(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+    }
+
+    public doSubdate(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL);
+    }
+
+    public doSubstr(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    }
+
+    public doSubstring(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+    }
+
+    public doSum(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SUM_SYMBOL);
+    }
+
+    public doSysdate(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL);
+    }
+
+    public doSystemUser(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.USER_SYMBOL);
+    }
+
+    public doTrim(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.TRIM_SYMBOL);
+    }
+
+    public doVariance(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+    }
+
+    public doVarPop(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+    }
+
+    public doVarSamp(): void
+    {
+	this.type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
+    }
+
+    public doUnderscoreCharset(): void
+    {
+	this.type = this.checkCharset(this.text);
+    }
+
+    public isVersionComment(): boolean
+    {
+	return this.checkMySQLVersion(this.text);
     }
 }
