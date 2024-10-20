@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Channels;
 using Antlr4.Runtime;
 
 /** SQL modes that control parsing behavior. */
@@ -42,6 +43,8 @@ public class MySQLLexerBase : Lexer {
     static int signedLongLongLength = 19;
     static string unsignedLongLongString = "18446744073709551615";
     static int unsignedLongLongLength = 20;
+
+    private bool JustEmitedDot = false;
 
     public override string[] RuleNames => throw new NotImplementedException();
 
@@ -129,6 +132,7 @@ public class MySQLLexerBase : Lexer {
         // Let the main lexer class run the next token recognition.
         // This might create additional tokens again.
         var next = base.NextToken();
+
         pending = this.pendingTokens.DequeueBottom();
         if (pending != null) {
             this.pendingTokens.Push(next);
@@ -294,7 +298,7 @@ public class MySQLLexerBase : Lexer {
         ));
 
         ++this.Column;
-        //++this.TokenStartCharIndex;
+        this.JustEmitedDot = true;
     }
 
 
@@ -356,6 +360,15 @@ public class MySQLLexerBase : Lexer {
     public void doVarSamp() => Type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
     public void doUnderscoreCharset() => Type = checkCharset(Text);
 
-    public bool isVersionComment() => checkMySQLVersion(Text);
+	public bool isVersionComment() => checkMySQLVersion(Text);
+
+    public override IToken Emit()
+    {
+        IToken t = this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream),
+                this.Type, (this.Text!=null?(this.JustEmitedDot?this.Text.Substring(1):this.Text):null), this.Channel, this.TokenStartCharIndex + (this.JustEmitedDot?1:0), CharIndex - 1, this.TokenStartLine, this.TokenStartColumn);
+        this.JustEmitedDot = false;
+        base.Emit(t);
+        return t;
+    }
 
 }
