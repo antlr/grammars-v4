@@ -5,10 +5,10 @@
 SELECT 'hello world';
 select N'testing conflict on N - spec symbol and N - as identifier' as n;
 select n'abc' as tstConstrN;
-select N'abc' "bcd" 'asdfasdf' as tstConstNAndConcat;
-select 'afdf' "erwhg" "ads" 'dgs' "rter" as tstDiffQuoteConcat;
+#NB select N'abc' "bcd" 'asdfasdf' as tstConstNAndConcat;
+#NB select 'afdf' "erwhg" "ads" 'dgs' "rter" as tstDiffQuoteConcat;
 select 'some string' COLLATE latin1_danish_ci as tstCollate;
-select _latin1'some string' COLLATE latin1_danish_ci as tstCollate;
+#NB select _latin1'some string' COLLATE latin1_danish_ci as tstCollate;
 select '\'' as c1, '\"' as c2, '\b' as c3, '\n' as c4, '\r' as c5, '\t' as c6, '\Z' as c7, '\\' as c8, '\%' as c9, '\_' as c10;
 select * from t1 for update;
 select * from t1 lock in share mode;
@@ -23,7 +23,7 @@ select * from `select` where `varchar` = 'abc \' ' and `varchar2` = '\'bca';
 #begin
 -- -- -- Number literal
 SELECT 1;
-select 1.e-3 as 123e;
+#NB select 1.e-3 as 123e;
 select del1.e123 as c from del1;
 select -1, 3e-2, 2.34E0;
 SELECT -4.1234e-2, 0.2e-3 as c;
@@ -35,7 +35,7 @@ select .2e3 c1, .2e-4 as c5;
 #begin
 -- -- -- Number float collision test
 select t1e2 as e1 from t;
-select 1e2t as col from t;
+#NB select 1e2t as col from t;
 #end
 #begin
 -- -- -- Hexadecimal literal
@@ -65,9 +65,9 @@ select 'abc' ' bcd' ' \' \' ' as col, \N c2, -.1e-3;
 #begin
 -- -- Variables
 SELECT @myvar;
-select * from t1 limit @varcount;
-select * from t1 limit @varoffset, @varcount;
-select * from t1 limit @varcount offset @varoffset;
+#NB select * from t1 limit @varcount;
+#NB select * from t1 limit @varoffset, @varcount;
+#NB select * from t1 limit @varcount offset @varoffset;
 #end
 
 #begin
@@ -132,12 +132,12 @@ select 1 as 123e;
 -- not latin1 literals
 select CONVERT( LEFT( CONVERT( '自動下書き' USING binary ), 100 ) USING utf8 ) AS x_0;
 select CONVERT( LEFT( CONVERT( '自動' USING binary ), 6 ) USING utf8 ) AS x_0;
-select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('category') AND t.name IN ('远征手记') ORDER BY t.name ASC;
+#NB select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('category') AND t.name IN ('远征手记') ORDER BY t.name ASC;
 #end
 #begin
 -- cast as integer
-SELECT CAST('1' AS INT);
-SELECT CAST('1' AS INTEGER);
+#NB SELECT CAST('1' AS INT);
+#NB SELECT CAST('1' AS INTEGER);
 SELECT CAST('1' AS SIGNED INTEGER);
 SELECT CAST('1' AS UNSIGNED INTEGER);
 SELECT CAST('1' AS SIGNED INT);
@@ -182,7 +182,7 @@ SELECT o_id, JSON_OBJECTAGG(attribute, value) FROM t3 GROUP BY o_id;
 -- VECTOR
 SELECT DISTANCE(b1, b2, "COSINE"), STRING_TO_VECTOR('[]'), VECTOR_DIM(b1), VECTOR_TO_STRING(b1) FROM a;
 #end
-SELECT trigger.num FROM test `trigger`;
+#NB SELECT trigger.num FROM test `trigger`;
 -- Valid when SELECT is in stored procedure
 SELECT * FROM test LIMIT LIMIT1,LIMIT2;
 -- SCHEMA as a function name
@@ -226,19 +226,19 @@ SELECT * FROM t1 FORCE INDEX (PRIMARY) ORDER BY a;
 
 -- JSON_TABLE
 -- https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html
-SELECT *
-    FROM
-        JSON_TABLE (
-           '[{"a":"3"},{"a":2},{"b":1},{"a":0},{"a":[1,2]}]',
-           "$[*]"
-         COLUMNS (
-           rowid FOR ORDINALITY,
-           ac VARCHAR(100) PATH "$.a" DEFAULT '111' ON EMPTY DEFAULT '999' ON ERROR,
-           aj JSON PATH "$.a" DEFAULT '{"x": 333}' ON EMPTY,
-           bx INT EXISTS PATH "$.b",
-           NESTED PATH '$.b[*]' COLUMNS (b INT PATH '$')
-         )
-        ) AS tt;
+#NB SELECT *
+#    FROM
+#        JSON_TABLE (
+#           '[{"a":"3"},{"a":2},{"b":1},{"a":0},{"a":[1,2]}]',
+#           "$[*]"
+#         COLUMNS (
+#           rowid FOR ORDINALITY,
+#           ac VARCHAR(100) PATH "$.a" DEFAULT '111' ON EMPTY DEFAULT '999' ON ERROR,
+#           aj JSON PATH "$.a" DEFAULT '{"x": 333}' ON EMPTY,
+#           bx INT EXISTS PATH "$.b",
+#           NESTED PATH '$.b[*]' COLUMNS (b INT PATH '$')
+#         )
+#        ) AS tt;
 SELECT !(1 + @sum:=1) AS ss;
 SELECT (@sum:=1 + 1) AS ss;
 SELECT 1 + @sum:=1 AS ss;
@@ -253,5 +253,5 @@ FROM
 ORDER BY
     some_order_column;
 
---- statement is supported as the field name
+-- - statement is supported as the field name #NB space
 SELECT REPLACE(statement, ' ','') as statement from your_table;

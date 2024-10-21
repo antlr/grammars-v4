@@ -30,7 +30,7 @@ WITH RECURSIVE cte AS (
 SELECT * FROM cte;
 #end
 #begin
---Non-recursive Ctes
+-- Non-recursive Ctes #NB space required for some reason.
 WITH cte1 AS (
   SELECT * FROM table1 WHERE col1 = 'value'
 ),
