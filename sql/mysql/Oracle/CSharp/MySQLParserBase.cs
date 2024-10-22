@@ -30,4 +30,14 @@ public abstract class MySQLParserBase : Parser {
         return this.sqlModes.Contains(mode);
     }
 
+    public bool isPureIdentifier()
+    {
+        return this.isSqlModeActive(SqlMode.AnsiQuotes);
+    }
+
+    public bool isTextStringLiteral()
+    {
+        return !this.isSqlModeActive(SqlMode.AnsiQuotes);
+    }
+    
 }

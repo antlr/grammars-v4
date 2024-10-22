@@ -360,7 +360,22 @@ public class MySQLLexerBase : Lexer {
     public void doVarSamp() => Type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
     public void doUnderscoreCharset() => Type = checkCharset(Text);
 
-	public bool isVersionComment() => checkMySQLVersion(Text);
+    public bool isVersionComment() => checkMySQLVersion(Text);
+
+    public bool isBackTickQuotedId()
+    {
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public bool isDoubleQuotedText()
+    {
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public bool isSingleQuotedText()
+    {
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
 
     public override IToken Emit()
     {
