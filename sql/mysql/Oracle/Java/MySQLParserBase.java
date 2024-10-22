@@ -29,4 +29,14 @@ public abstract class MySQLParserBase extends Parser {
     public boolean isSqlModeActive(SqlMode mode) {
 	return this.sqlModes.contains(mode);
     }
+
+    public boolean isPureIdentifier()
+    {
+	return this.isSqlModeActive(SqlMode.AnsiQuotes);
+    }
+
+    public boolean isTextStringLiteral()
+    {
+	return !this.isSqlModeActive(SqlMode.AnsiQuotes);
+    }
 }

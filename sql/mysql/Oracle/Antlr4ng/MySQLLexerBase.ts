@@ -500,4 +500,19 @@ export abstract class MySQLLexerBase extends Lexer {
     {
 	return this.checkMySQLVersion(this.text);
     }
+
+    public isBackTickQuotedId(): boolean
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public isDoubleQuotedText(): boolean
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public isSingleQuotedText(): boolean
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
 }

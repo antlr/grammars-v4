@@ -282,6 +282,21 @@ public abstract class MySQLLexerBase extends Lexer {
         return checkMySQLVersion(this.getText());
     }
 
+    public boolean isBackTickQuotedId()
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public boolean isDoubleQuotedText()
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public boolean isSingleQuotedText()
+    {
+	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
     @Override
     public Token emit() {
         Token t = this._factory.create(this._tokenFactorySourcePair,
