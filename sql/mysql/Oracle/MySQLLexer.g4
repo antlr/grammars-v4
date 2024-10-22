@@ -3618,18 +3618,18 @@ fragment DOUBLE_QUOTE
     ;
 
 BACK_TICK_QUOTED_ID
-    : BACK_TICK (({!this.isSqlModeActive(SqlMode.NoBackslashEscapes)}? '\\')? .)*? BACK_TICK
+    : BACK_TICK (({this.isBackTickQuotedId()}? '\\')? .)*? BACK_TICK
     ;
 
 DOUBLE_QUOTED_TEXT
     : (
-        DOUBLE_QUOTE (({!this.isSqlModeActive(SqlMode.NoBackslashEscapes)}? '\\')? .)*? DOUBLE_QUOTE
+        DOUBLE_QUOTE (({this.isDoubleQuotedText()}? '\\')? .)*? DOUBLE_QUOTE
     )+
     ;
 
 SINGLE_QUOTED_TEXT
     : (
-        SINGLE_QUOTE (({!this.isSqlModeActive(SqlMode.NoBackslashEscapes)}? '\\')? .)*? SINGLE_QUOTE
+        SINGLE_QUOTE (({this.isSingleQuotedText()}? '\\')? .)*? SINGLE_QUOTE
     )+
     ;
 
