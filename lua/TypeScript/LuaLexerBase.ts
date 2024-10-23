@@ -20,7 +20,7 @@ export default abstract class BisonLexerBase extends Lexer {
                 return;
             }
         }
-        while (cs.LA(1) !== 12 /* '\n' */ && cs.LA(1) !== -1) {
+        while (cs.LA(1) !== 10 /* '\n' */ && cs.LA(1) !== -1) {
             cs.consume();
         }
     }
