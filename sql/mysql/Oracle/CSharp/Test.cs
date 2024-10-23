@@ -26,6 +26,8 @@ public class Program
         ICharStream str = new AntlrInputStream(input);
         CharStream = str;
         var lexer = new MySQLLexer(str);
+	lexer.serverVersion = 80200;
+	lexer.sqlModeFromString("ANSI_QUOTES");
         Lexer = lexer;
         CommonTokenStream tokens = null;
         if (HeatMap) {
@@ -36,6 +38,8 @@ public class Program
         }
         TokenStream = tokens;
         var parser = new MyParser(tokens);
+	parser.serverVersion = lexer.serverVersion;
+	parser.sqlModes = lexer.sqlModes;
         Parser = parser;
         var listener_lexer = new ErrorListener<int>(false, false, System.Console.Error);
         var listener_parser = new ErrorListener<IToken>(false, false, System.Console.Error);
@@ -101,6 +105,8 @@ public class Program
         ICharStream str = new AntlrInputStream(input);
         CharStream = str;
         var lexer = new MySQLLexer(str);
+	lexer.serverVersion = 80200;
+	lexer.sqlModeFromString("ANSI_QUOTES");
         Lexer = lexer;
         CommonTokenStream tokens = null;
         if (show_hit) {
@@ -111,6 +117,8 @@ public class Program
         }
         TokenStream = tokens;
         var parser = new MySQLParser(tokens);
+	parser.serverVersion = lexer.serverVersion;
+	parser.sqlModes = lexer.sqlModes;
         Parser = parser;
         var listener_lexer = new ErrorListener<int>(false, false, System.Console.Error);
         var listener_parser = new ErrorListener<IToken>(false, false, System.Console.Error);
@@ -305,6 +313,8 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         var parser = new MyParser(tokens);
+	parser.serverVersion = lexer.serverVersion;
+	parser.sqlModes = lexer.sqlModes;
         var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener<int>(quiet, tee, output);
         var listener_parser = new ErrorListener<IToken>(quiet, tee, output);
@@ -312,9 +322,6 @@ public class Program
         parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
         parser.AddErrorListener(listener_parser);
-//lexer.charSets = charSets;
-parser.serverVersion = lexer.serverVersion;
-parser.sqlModes = lexer.sqlModes;
         if (show_diagnostic)
         {
             parser.AddErrorListener(new MyDiagnosticErrorListener());
