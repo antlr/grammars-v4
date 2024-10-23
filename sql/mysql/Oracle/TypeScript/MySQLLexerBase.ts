@@ -292,6 +292,11 @@ export default abstract class MySQLLexerBase extends Lexer {
         return this.serverVersion >= 80017;
     }
 
+
+    public isServerVersionGe80018(): boolean { return this.serverVersion >= 80018; }
+
+    public isMasterCompressionAlgorithm(): boolean { return this.serverVersion >= 80018 && this.isServerVersionLt80024(); }
+
     public isServerVersionLt80031(): boolean
     {
         return this.serverVersion < 80031;
@@ -513,5 +518,20 @@ export default abstract class MySQLLexerBase extends Lexer {
 	if (t.type == MySQLLexer.WHITESPACE)
 		t.channel = Token.HIDDEN_CHANNEL;
         return t;
+    }
+
+    public startInVersionComment(): void
+    {
+	this.inVersionComment = true;
+    }
+
+    public endInVersionComment(): void
+    {
+	this.inVersionComment = false;
+    }
+
+    public isInVersionComment(): boolean
+    {
+	return this.inVersionComment;
     }
 }

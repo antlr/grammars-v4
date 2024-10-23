@@ -3209,11 +3209,11 @@ MEMBER_SYMBOL
     ;                                                                                     // SQL-2003-R
 
 RANDOM_SYMBOL
-    : R A N D O M                                                                         {this.serverVersion >= 80018}?
+    : R A N D O M                                                                         {this.isServerVersionGe80018()}?
     ;                                                                                     // MYSQL
 
 MASTER_COMPRESSION_ALGORITHM_SYMBOL
-    : M A S T E R '_' C O M P R E S S I O N '_' A L G O R I T H M                         {this.serverVersion >= 80018 && this.isServerVersionLt80024()}?
+    : M A S T E R '_' C O M P R E S S I O N '_' A L G O R I T H M                         {this.isMasterCompressionAlgorithm()}?
     ;                                                                                     // MYSQL
 
 MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL
@@ -3653,11 +3653,11 @@ VERSION_COMMENT_START
 // this.inVersionComment is a variable in the base lexer.
 // TODO: use a lexer mode instead of a member variable.
 MYSQL_COMMENT_START
-    : '/*!' { this.inVersionComment = true; } -> channel(HIDDEN)
+    : '/*!' { this.startInVersionComment(); } -> channel(HIDDEN)
     ;
 
 VERSION_COMMENT_END
-    : '*/' {this.inVersionComment}? { this.inVersionComment = false; } -> channel(HIDDEN)
+    : '*/' {this.isInVersionComment()}? { this.endInVersionComment(); } -> channel(HIDDEN)
     ;
 
 BLOCK_COMMENT

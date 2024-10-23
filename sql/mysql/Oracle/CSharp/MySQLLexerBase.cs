@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Channels;
 using Antlr4.Runtime;
+using static System.Net.WebRequestMethods;
 
 /** SQL modes that control parsing behavior. */
 public enum SqlMode {
@@ -310,6 +311,10 @@ public class MySQLLexerBase : Lexer {
     public bool isServerVersionLt80014() => serverVersion < 80014;
     public bool isServerVersionGe80014() => serverVersion >= 80014;
     public bool isServerVersionGe80017() => serverVersion >= 80017;
+    public bool isServerVersionGe80018() => serverVersion >= 80018;
+
+    public bool isMasterCompressionAlgorithm() => serverVersion >= 80018 && isServerVersionLt80024();
+
     public bool isServerVersionLt80031() => serverVersion < 80031;
 
     // Functions for specific token types
@@ -386,4 +391,18 @@ public class MySQLLexerBase : Lexer {
         return t;
     }
 
+    public void startInVersionComment()
+    {
+        inVersionComment = true;
+    }
+
+    public void endInVersionComment()
+    {
+        inVersionComment = false;
+    }
+
+    public bool isInVersionComment()
+    {
+        return inVersionComment;
+    }
 }

@@ -231,6 +231,8 @@ public abstract class MySQLLexerBase extends Lexer {
     public boolean isServerVersionLt80014() { return serverVersion < 80014; }
     public boolean isServerVersionGe80014() { return serverVersion >= 80014; }
     public boolean isServerVersionGe80017() { return serverVersion >= 80017; }
+    public boolean isServerVersionGe80018() { return serverVersion >= 80018; }
+    public boolean isMasterCompressionAlgorithm() { return serverVersion >= 80018 && isServerVersionLt80024(); }
     public boolean isServerVersionLt80031() { return serverVersion < 80031; }
 
     public void doLogicalOr() {
@@ -304,5 +306,20 @@ public abstract class MySQLLexerBase extends Lexer {
         this.justEmitedDot = false;
         super.emit(t);
         return t;
+    }
+
+    public void startInVersionComment()
+    {
+	inVersionComment = true;
+    }
+
+    public void endInVersionComment()
+    {
+	inVersionComment = false;
+    }
+
+    public boolean isInVersionComment()
+    {
+	return inVersionComment;
     }
 }

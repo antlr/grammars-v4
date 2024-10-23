@@ -39,5 +39,14 @@ public abstract class MySQLParserBase : Parser {
     {
         return !this.isSqlModeActive(SqlMode.AnsiQuotes);
     }
-    
+
+    public bool isStoredRoutineBody()
+    {
+        return serverVersion >= 80032 && supportMle;
+    }
+
+    public bool isSelectStatementWithInto()
+    {
+        return serverVersion >= 80024 && serverVersion < 80031;
+    }
 }

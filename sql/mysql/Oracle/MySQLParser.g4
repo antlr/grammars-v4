@@ -495,7 +495,7 @@ routineString
 
 storedRoutineBody
     : compoundStatement
-    | {this.serverVersion >= 80032 && this.supportMle}? AS_SYMBOL routineString
+    | {this.isStoredRoutineBody()}? AS_SYMBOL routineString
     ;
 
 createFunction
@@ -1059,7 +1059,7 @@ selectStatementWithInto
     : OPEN_PAR_SYMBOL selectStatementWithInto CLOSE_PAR_SYMBOL
     | queryExpression intoClause lockingClauseList?
     | queryExpression lockingClauseList intoClause
-    | {this.serverVersion >= 80024 && this.serverVersion < 80031}? queryExpressionParens intoClause
+    | {this.isSelectStatementWithInto()}? queryExpressionParens intoClause
     ;
 
 queryExpression

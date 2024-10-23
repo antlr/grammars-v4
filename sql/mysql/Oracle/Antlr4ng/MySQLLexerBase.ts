@@ -301,6 +301,11 @@ export abstract class MySQLLexerBase extends Lexer {
         return this.serverVersion >= 80017;
     }
 
+
+    public isServerVersionGe80018(): boolean { return this.serverVersion >= 80018; }
+
+    public isMasterCompressionAlgorithm(): boolean { return this.serverVersion >= 80018 && this.isServerVersionLt80024(); }
+
     public isServerVersionLt80031(): boolean
     {
         return this.serverVersion < 80031;
@@ -514,5 +519,20 @@ export abstract class MySQLLexerBase extends Lexer {
     public isSingleQuotedText(): boolean
     {
 	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+    }
+
+    public startInVersionComment(): void
+    {
+	this.inVersionComment = true;
+    }
+
+    public endInVersionComment(): void
+    {
+	this.inVersionComment = false;
+    }
+
+    public isInVersionComment(): boolean
+    {
+	return this.inVersionComment;
     }
 }
