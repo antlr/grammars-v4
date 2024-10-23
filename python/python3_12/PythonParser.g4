@@ -27,6 +27,11 @@ THE SOFTWARE.
   *
   */
 
+  /*
+   * Contributors :
+   * [Willie Shen](https://github.com/Willie169) : Fix that `case [a, *_] if a == 0:` throws error `rule soft_kw__not__wildcard failed predicate: {this.isnotEqualToCurrentTokenText("_")}?`
+  */
+
 parser grammar PythonParser; // Python 3.12.6  https://docs.python.org/3.12/reference/grammar.html#full-grammar-specification
 options {
     tokenVocab=PythonLexer;
@@ -427,8 +432,7 @@ maybe_star_pattern
     | pattern;
 
 star_pattern
-    : '*' pattern_capture_target
-    | '*' wildcard_pattern;
+    : '*' NAME;
 
 mapping_pattern
     : LBRACE RBRACE
