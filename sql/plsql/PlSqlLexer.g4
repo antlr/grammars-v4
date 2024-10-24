@@ -1377,6 +1377,7 @@ POOL_2K                        : 'POOL_2K';
 POOL_32K                       : 'POOL_32K';
 POOL_4K                        : 'POOL_4K';
 POOL_8K                        : 'POOL_8K';
+POSITION                       : 'POSITION';
 POSITIVEN                      : 'POSITIVEN';
 POSITIVE                       : 'POSITIVE';
 POST_TRANSACTION               : 'POST_TRANSACTION';

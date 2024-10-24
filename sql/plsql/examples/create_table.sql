@@ -449,3 +449,39 @@ CREATE INDEX part_idx ON partitioned_by_index (part, val)
         ( PARTITION t0 VALUES LESS THAN (TIMESTAMP '2020-01-01 00:00:00')
         , PARTITION t1 VALUES LESS THAN (MAXVALUE) )
         ;
+
+CREATE TABLE TBHSP27E (
+ compid VARCHAR2(20) default '' not null,
+ empno VARCHAR2(20) default '' not null,
+ salarymonth VARCHAR2(10) default '' not null,
+ position VARCHAR2(10) default '' not null,
+ posttype VARCHAR2(10) default '',
+ deptno VARCHAR2(10) default '',
+ startdate VARCHAR2(8) default '',
+ enddate VARCHAR2(8) default '',
+ accounttype VARCHAR2(10) default '',
+ attendrate NUMBER(10,4) default 0,
+ meritscore VARCHAR2(10) default '',
+ excitationfactor NUMBER(20,2) default 0,
+ basesalary NUMBER(20,4) default 0,
+ issuesalary NUMBER(20,4) default 0,
+ createempno VARCHAR2(10) default '',
+ createdate VARCHAR2(8) default '',
+ createtime VARCHAR2(6) default '',
+ updateempno VARCHAR2(10) default '',
+ updatedate VARCHAR2(8) default '',
+ updatetime VARCHAR2(6) default '',
+ tenurerate NUMBER(10,4)
+)
+tablespace ERPDATA
+ pctfree 10
+ initrans 1
+ maxtrans 255
+ storage
+ (
+  initial 64K
+  next 1M
+  minextents 1
+  maxextents unlimited
+ )
+;
