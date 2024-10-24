@@ -139,3 +139,5 @@ sql/postgresql/examples.errors/** linguist-vendored
 v/failed_examples/** linguist-vendored
 
 lua/examples/* eol=lf
+
+sql/mysql/Oracle/examples/*.sql eol=lf

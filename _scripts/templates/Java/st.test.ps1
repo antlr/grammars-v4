@@ -10,7 +10,7 @@ if (Test-Path -Path "tests.txt" -PathType Leaf) {
     Remove-Item "tests.txt"
 }
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob -- "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -20,7 +20,7 @@ foreach ($file in $allFiles) {
     } elseif ($ext -eq ".tree") {
         continue
     } else {
-        $(& dotnet triconv -- -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
+        $(& dotnet triconv -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
         if ($last -ne 0)
         {
             continue
@@ -42,10 +42,10 @@ $version = Select-String -Path "build.sh" -Pattern "version=" | ForEach-Object {
 $JAR = python -c "import os; from pathlib import Path; print(os.path.join(Path.home(), '.m2', 'repository', 'org', 'antlr', 'antlr4', '$version', ('antlr4-' + '$version' + '-complete.jar')))"
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
+Get-Content "tests.txt" | ForEach-Object { dotnet trwdog java -cp "$JAR<if(path_sep_semi)>;<else>:<endif>." Test -q -tee -tree *>> parse.txt }
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog -- java -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
+get-content "tests.txt" | dotnet trwdog java -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." Test -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -69,7 +69,7 @@ if ( $size -eq 0 ) {
 }
 
 $old = Get-Location
-Set-Location ..
+Set-Location "<if(os_win)>../<example_dir_win><else>../<example_dir_unix><endif>"
 
 # Check if any .errors/.tree files have changed. That's not good.
 git config --global pager.diff false
@@ -90,6 +90,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname
     $ext = $item.Extension
     if ($ext -eq ".tree") {
+        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
         git diff --exit-code $file *>> $old/updated.txt
 	$st = $LASTEXITCODE
         if ($st -ne 0) {

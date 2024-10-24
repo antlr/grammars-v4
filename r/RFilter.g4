@@ -45,7 +45,7 @@ protected int curlies = 0;
 
 // TODO: MAKE THIS GET ONE COMMAND ONLY
 stream
-    : (elem | NL | ';')* EOF
+    : (elem | NL | SEMICOLON)* EOF
     ;
 
 eat
@@ -55,15 +55,15 @@ eat
 elem
     : op eat?
     | atom
-    | '{' eat? {curlies++;} (elem | NL | ';')* {curlies--;} '}'
-    | '(' (elem | eat)* ')'
-    | '[' (elem | eat)* ']'
-    | '[[' (elem | eat)* ']' ']'
-    | 'function' eat? '(' (elem | eat)* ')' eat?
-    | 'for' eat? '(' (elem | eat)* ')' eat?
-    | 'while' eat? '(' (elem | eat)* ')' eat?
-    | 'if' eat? '(' (elem | eat)* ')' eat?
-    | 'else' {
+    | CURLY_L eat? {curlies++;} (elem | NL | SEMICOLON)* {curlies--;} CURLY_R
+    | PAREN_L (elem | eat)* PAREN_R
+    | ARRAY_ACCESS_START (elem | eat)* ARRAY_ACCESS_END
+    | LIST_ACCESS_START (elem | eat)* LIST_ACCESS_END
+    | FUNCTION eat? PAREN_L (elem | eat)* PAREN_R eat?
+    | FOR eat? PAREN_L (elem | eat)* PAREN_R eat?
+    | WHILE eat? PAREN_L (elem | eat)* PAREN_R eat?
+    | IF eat? PAREN_L (elem | eat)* PAREN_R eat?
+    | ELSE {
         // ``inside a compound expression, a newline before else is discarded,
         // whereas at the outermost level, the newline terminates the if
         // construction and a subsequent else causes a syntax error.''
@@ -89,53 +89,40 @@ elem
     ;
 
 atom
-    : 'next'
-    | 'break'
+    : NEXT
+    | BREAK
     | ID
     | STRING
     | HEX
     | INT
     | FLOAT
     | COMPLEX
-    | 'NULL'
-    | 'NA'
-    | 'Inf'
-    | 'NaN'
-    | 'TRUE'
-    | 'FALSE'
+    | NULL
+    | NA
+    | INF
+    | NAN
+    | TRUE
+    | FALSE
     ;
 
 op
-    : '+'
-    | '-'
-    | '*'
-    | '/'
+    : ADD_SUB
+    | MULT_DIV
     | '^'
-    | '<'
-    | '<='
-    | '>='
-    | '>'
-    | '=='
-    | '!='
-    | '&'
-    | '&&'
+    | COMPARATOR
+    | AND
     | USER_OP
-    | 'repeat'
-    | 'in'
-    | '?'
-    | '!'
-    | '='
-    | ':'
+    | REPEAT
+    | IN
+    | HELP
+    | NOT
+    | EQUALS
+    | RANGE_OPERATOR
     | '~'
-    | '$'
-    | '@'
-    | '<-'
-    | '->'
-    | '='
-    | '::'
-    | ':::'
+    | COMPONENT_ACCESS
+    | ASSIGN
+    | NAMESPACE_ACCESS
     | ','
     | '...'
-    | '||'
-    | '|'
+    | OR
     ;

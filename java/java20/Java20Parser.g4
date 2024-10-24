@@ -13,6 +13,84 @@ start_
     : compilationUnit EOF
     ;
 
+// Paragraph 3.8 Identifiers
+// -------------
+
+identifier
+    : Identifier
+    | contextualKeyword
+    ;
+
+typeIdentifier
+    : Identifier
+    | contextualKeywordMinusForTypeIdentifier
+    ;
+
+unqualifiedMethodIdentifier
+    : Identifier
+    | contextualKeywordMinusForUnqualifiedMethodIdentifier
+    ;
+
+// 3.9 Keywords
+
+contextualKeyword
+    : 'exports'
+    | 'module'
+    | 'non-sealed'
+    | 'open'
+    | 'opens'
+    | 'permits'
+    | 'provides'
+    | 'record'
+    | 'requires'
+    | 'sealed'
+    | 'to'
+    | 'transitive'
+    | 'uses'
+    | 'var'
+    | 'with'
+    | 'yield'
+    ;
+
+contextualKeywordMinusForTypeIdentifier
+    : 'exports'
+    | 'module'
+    | 'non-sealed'
+    | 'open'
+    | 'opens'
+//  | 'permits'
+    | 'provides'
+//  | 'record'
+    | 'requires'
+//  | 'sealed'
+    | 'to'
+    | 'transitive'
+    | 'uses'
+//  | 'var'
+    | 'with'
+//  | 'yield'
+    ;
+
+
+contextualKeywordMinusForUnqualifiedMethodIdentifier
+    : 'exports'
+    | 'module'
+    | 'non-sealed'
+    | 'open'
+    | 'opens'
+    | 'permits'
+    | 'provides'
+    | 'record'
+    | 'requires'
+    | 'sealed'
+    | 'to'
+    | 'transitive'
+    | 'uses'
+    | 'var'
+    | 'with'
+//  | 'yield'
+    ;
+
 // Paragraph 3.10
 // --------------
 
@@ -24,17 +102,6 @@ literal
     | StringLiteral
     | TextBlock
     | NullLiteral
-    ;
-
-// Paragraph 3.8
-// -------------
-
-typeIdentifier
-    : Identifier
-    ;
-
-unqualifiedMethodIdentifier
-    : Identifier
     ;
 
 // Paragraph 4.1 // Type is not used.
@@ -172,12 +239,12 @@ wildcardBounds
 // -------------
 
 moduleName
-    : Identifier ('.' moduleName)?
+    : identifier ('.' moduleName)?
     // left recursion --> right recursion
     ;
 
 packageName
-    : Identifier ('.' packageName)?
+    : identifier ('.' packageName)?
     // left recursion --> right recursion
     ;
 
@@ -186,12 +253,12 @@ typeName
     ;
 
 packageOrTypeName
-    : Identifier ('.' packageOrTypeName)?
+    : identifier ('.' packageOrTypeName)?
     // left recursion --> right recursion
     ;
 
 expressionName
-    : (ambiguousName '.')? Identifier
+    : (ambiguousName '.')? identifier
     ;
 
 methodName
@@ -199,7 +266,7 @@ methodName
     ;
 
 ambiguousName
-    : Identifier ('.' ambiguousName)?
+    : identifier ('.' ambiguousName)?
     // left recursion --> right recursion
     ;
 
@@ -223,7 +290,7 @@ modularCompilationUnit
 // -------------
 
 packageDeclaration
-    : packageModifier* 'package' Identifier ('.' Identifier)* ';'
+    : packageModifier* 'package' identifier ('.' identifier)* ';'
     ;
 
 packageModifier
@@ -249,7 +316,7 @@ typeImportOnDemandDeclaration
     ;
 
 singleStaticImportDeclaration
-    : 'import' 'static' typeName '.' Identifier ';'
+    : 'import' 'static' typeName '.' identifier ';'
     ;
 
 staticImportOnDemandDeclaration
@@ -269,7 +336,7 @@ topLevelClassOrInterfaceDeclaration
 // -------------
 
 moduleDeclaration
-    : annotation* 'open'? 'module' Identifier ('.' Identifier)* '{' moduleDirective* '}'
+    : annotation* 'open'? 'module' identifier ('.' identifier)* '{' moduleDirective* '}'
     ;
 
 moduleDirective
@@ -381,7 +448,7 @@ variableDeclarator
     ;
 
 variableDeclaratorId
-    : Identifier dims?
+    : identifier dims?
     ;
 
 variableInitializer
@@ -468,11 +535,11 @@ result
     ;
 
 methodDeclarator
-    : Identifier '(' (receiverParameter ',')? formalParameterList? ')' dims?
+    : identifier '(' (receiverParameter ',')? formalParameterList? ')' dims?
     ;
 
 receiverParameter
-    : annotation* unannType (Identifier '.')? 'this'
+    : annotation* unannType (identifier '.')? 'this'
     ;
 
 formalParameterList
@@ -485,7 +552,7 @@ formalParameter
     ;
 
 variableArityParameter
-    : variableModifier* unannType annotation* '...' Identifier
+    : variableModifier* unannType annotation* '...' identifier
     ;
 
 variableModifier
@@ -574,7 +641,7 @@ enumConstantList
     ;
 
 enumConstant
-    : enumConstantModifier* Identifier ('(' argumentList? ')')? classBody?
+    : enumConstantModifier* identifier ('(' argumentList? ')')? classBody?
     ;
 
 enumConstantModifier
@@ -601,12 +668,12 @@ recordComponentList
     ;
 
 recordComponent
-    : recordComponentModifier* unannType Identifier
+    : recordComponentModifier* unannType identifier
     | variableArityRecordComponent
     ;
 
 variableArityRecordComponent
-    : recordComponentModifier* unannType annotation* '...' Identifier
+    : recordComponentModifier* unannType annotation* '...' identifier
     ;
 
 recordComponentModifier
@@ -721,7 +788,7 @@ annotationInterfaceMemberDeclaration
     ;
 
 annotationInterfaceElementDeclaration
-    : annotationInterfaceElementModifier* unannType Identifier '(' ')' dims? defaultValue? ';'
+    : annotationInterfaceElementModifier* unannType identifier '(' ')' dims? defaultValue? ';'
     ;
 
 annotationInterfaceElementModifier
@@ -752,7 +819,7 @@ elementValuePairList
     ;
 
 elementValuePair
-    : Identifier '=' elementValue
+    : identifier '=' elementValue
     ;
 
 elementValue
@@ -877,11 +944,11 @@ emptyStatement_
 // --------------
 
 labeledStatement
-    : Identifier ':' statement
+    : identifier ':' statement
     ;
 
 labeledStatementNoShortIf
-    : Identifier ':' statementNoShortIf
+    : identifier ':' statementNoShortIf
     ;
 
 // Paragraph 14.8
@@ -1016,14 +1083,14 @@ enhancedForStatementNoShortIf
 // ---------------
 
 breakStatement
-    : 'break' Identifier? ';'
+    : 'break' identifier? ';'
     ;
 
 // Paragraph 14.16
 // ---------------
 
 continueStatement
-    : 'continue' Identifier? ';'
+    : 'continue' identifier? ';'
     ;
 
 // Paragraph 14.17
@@ -1206,32 +1273,32 @@ primaryNoNewArray
     | unqualifiedClassInstanceCreationExpression pNNA?
     | expressionName '.' unqualifiedClassInstanceCreationExpression pNNA?
     | arrayCreationExpression '.' unqualifiedClassInstanceCreationExpression pNNA?
-    | arrayCreationExpression '.' Identifier pNNA?
-    | 'super' '.' Identifier pNNA?
-    | typeName '.' 'super' '.' Identifier pNNA?
+    | arrayCreationExpression '.' identifier pNNA?
+    | 'super' '.' identifier pNNA?
+    | typeName '.' 'super' '.' identifier pNNA?
     | expressionName '[' expression ']' pNNA?
     | arrayCreationExpressionWithInitializer '[' expression ']' pNNA?
     | methodName '(' argumentList? ')' pNNA?
-    | typeName '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | expressionName '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | arrayCreationExpression '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | 'super' '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | expressionName '::' typeArguments? Identifier pNNA?
-    | arrayCreationExpression '::' typeArguments? Identifier pNNA?
-    | referenceType '::' typeArguments? Identifier pNNA?
-    | 'super' '::' typeArguments? Identifier pNNA?
-    | typeName '.' 'super' '::' typeArguments? Identifier pNNA?
+    | typeName '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | expressionName '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | arrayCreationExpression '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | 'super' '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | typeName '.' 'super' '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | expressionName '::' typeArguments? identifier pNNA?
+    | arrayCreationExpression '::' typeArguments? identifier pNNA?
+    | referenceType '::' typeArguments? identifier pNNA?
+    | 'super' '::' typeArguments? identifier pNNA?
+    | typeName '.' 'super' '::' typeArguments? identifier pNNA?
     | classType '::' typeArguments? 'new' pNNA?
     | arrayType '::' 'new' pNNA?
     ;
 
 pNNA
     : '.' unqualifiedClassInstanceCreationExpression pNNA?
-    | '.' Identifier pNNA?
+    | '.' identifier pNNA?
     | '[' expression ']' pNNA?
-    | '.' typeArguments? Identifier '(' argumentList? ')' pNNA?
-    | '::' typeArguments? Identifier pNNA?
+    | '.' typeArguments? identifier '(' argumentList? ')' pNNA?
+    | '::' typeArguments? identifier pNNA?
     ;
 
 classLiteral
@@ -1255,7 +1322,7 @@ unqualifiedClassInstanceCreationExpression
     ;
 
 classOrInterfaceTypeToInstantiate
-    : annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond?
+    : annotation* identifier ('.' annotation* identifier)* typeArgumentsOrDiamond?
     ;
 
 typeArgumentsOrDiamond
@@ -1299,9 +1366,9 @@ arrayAccess
 // ---------------
 
 fieldAccess
-    : primary '.' Identifier
-    | 'super' '.' Identifier
-    | typeName '.' 'super' '.' Identifier
+    : primary '.' identifier
+    | 'super' '.' identifier
+    | typeName '.' 'super' '.' identifier
     ;
 
 // Paragraph 15.12
@@ -1309,11 +1376,11 @@ fieldAccess
 
 methodInvocation
     : methodName '(' argumentList? ')'
-    | typeName '.' typeArguments? Identifier '(' argumentList? ')'
-    | expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-    | primary '.' typeArguments? Identifier '(' argumentList? ')'
-    | 'super' '.' typeArguments? Identifier '(' argumentList? ')'
-    | typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+    | typeName '.' typeArguments? identifier '(' argumentList? ')'
+    | expressionName '.' typeArguments? identifier '(' argumentList? ')'
+    | primary '.' typeArguments? identifier '(' argumentList? ')'
+    | 'super' '.' typeArguments? identifier '(' argumentList? ')'
+    | typeName '.' 'super' '.' typeArguments? identifier '(' argumentList? ')'
     ;
 
 argumentList
@@ -1324,11 +1391,11 @@ argumentList
 // ---------------
 
 methodReference
-    : expressionName '::' typeArguments? Identifier
-    | primary '::' typeArguments? Identifier
-    | referenceType '::' typeArguments? Identifier
-    | 'super' '::' typeArguments? Identifier
-    | typeName '.' 'super' '::' typeArguments? Identifier
+    : expressionName '::' typeArguments? identifier
+    | primary '::' typeArguments? identifier
+    | referenceType '::' typeArguments? identifier
+    | 'super' '::' typeArguments? identifier
+    | typeName '.' 'super' '::' typeArguments? identifier
     | classType '::' typeArguments? 'new'
     | arrayType '::' 'new'
     ;
@@ -1550,12 +1617,12 @@ lambdaExpression
 
 lambdaParameters
     : '(' lambdaParameterList? ')'
-    | Identifier
+    | identifier
     ;
 
 lambdaParameterList
     : lambdaParameter (',' lambdaParameter)*
-    | Identifier ( ',' Identifier)*
+    | identifier ( ',' identifier)*
     ;
 
 lambdaParameter

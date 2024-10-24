@@ -27,22 +27,20 @@ parser grammar MySQLParser;
 // $antlr-format alignColons hanging
 
 options {
-    superClass = MySQLBaseRecognizer;
+    superClass = MySQLParserBase;
     tokenVocab = MySQLLexer;
 }
 
-@header {
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-useless-escape, no-lone-blocks */
-
-import { MySQLBaseRecognizer } from "../MySQLBaseRecognizer.js";
-import { SqlMode } from "../MySQLBaseLexer.js";
-}
+// Insert here @header for parser.
 
 //----------------------------------------------------------------------------------------------------------------------
 
+queries
+    : query* EOF
+    ;
+
 query
-    : ((simpleStatement | beginWork) SEMICOLON_SYMBOL?)? EOF
+    : (simpleStatement | beginWork) SEMICOLON_SYMBOL
     ;
 
 simpleStatement
@@ -497,7 +495,7 @@ routineString
 
 storedRoutineBody
     : compoundStatement
-    | {this.serverVersion >= 80032 && this.supportMle}? AS_SYMBOL routineString
+    | {this.isStoredRoutineBody()}? AS_SYMBOL routineString
     ;
 
 createFunction
@@ -1061,7 +1059,7 @@ selectStatementWithInto
     : OPEN_PAR_SYMBOL selectStatementWithInto CLOSE_PAR_SYMBOL
     | queryExpression intoClause lockingClauseList?
     | queryExpression lockingClauseList intoClause
-    | {this.serverVersion >= 80024 && this.serverVersion < 80031}? queryExpressionParens intoClause
+    | {this.isSelectStatementWithInto()}? queryExpressionParens intoClause
     ;
 
 queryExpression
@@ -4410,7 +4408,7 @@ windowName
 // Identifiers excluding keywords (except if they are quoted). IDENT_sys in sql_yacc.yy.
 pureIdentifier
     : (IDENTIFIER | BACK_TICK_QUOTED_ID)
-    | {this.isSqlModeActive(SqlMode.AnsiQuotes)}? DOUBLE_QUOTED_TEXT
+    | {this.isPureIdentifier()}? DOUBLE_QUOTED_TEXT
     ;
 
 // Identifiers including a certain set of keywords, which are allowed also if not quoted.
@@ -4512,7 +4510,7 @@ stringList
 // TEXT_STRING_validated in sql_yacc.yy.
 textStringLiteral
     : value = SINGLE_QUOTED_TEXT
-    | {!this.isSqlModeActive(SqlMode.AnsiQuotes)}? value = DOUBLE_QUOTED_TEXT
+    | {this.isTextStringLiteral()}? value = DOUBLE_QUOTED_TEXT
     ;
 
 textString

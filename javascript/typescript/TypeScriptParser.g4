@@ -102,7 +102,7 @@ primaryType
     | predefinedType                             # PredefinedPrimType
     | typeReference                              # ReferencePrimType
     | objectType                                 # ObjectPrimType
-    | primaryType {notLineTerminator()}? '[' primaryType? ']' # ArrayPrimType
+    | primaryType {this.notLineTerminator()}? '[' primaryType? ']' # ArrayPrimType
     | '[' tupleElementTypes ']'                  # TuplePrimType
     | typeQuery                                  # QueryPrimType
     | This                                       # ThisPrimType
@@ -160,7 +160,7 @@ typeMember
     ;
 
 arrayType
-    : primaryType {notLineTerminator()}? '[' ']'
+    : primaryType {this.notLineTerminator()}? '[' ']'
     ;
 
 tupleType

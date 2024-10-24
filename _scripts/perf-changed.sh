@@ -13,7 +13,7 @@ if ! command -v trxml2 &> /dev/null
 then
     local=1
 fi
-if ! command -v dotnet trxml2 -- --version &> /dev/null
+if ! command -v dotnet trxml2 --version &> /dev/null
 then
     echo "'dotnet' could not be found. Install Microsoft NET."
     exit 1
@@ -96,7 +96,7 @@ do
         then
             gtargets=`trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
         else
-            gtargets=`dotnet trxml2 -- desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
+            gtargets=`dotnet trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F '=' '{print $2}' | tr ';' '\n' | fgrep -e 'Java' | fgrep -v 'JavaScript'`
         fi
         if [ "$gtargets" == "" ]; then continue; fi
     fi
@@ -146,7 +146,7 @@ do
                 exit 0
             fi
         else
-            dotnet trgen -- -t CSharp
+            dotnet trgen -t CSharp
             if [ "$?" != "0" ]
             then
                 echo "Build failed. Stopping test."
@@ -187,7 +187,7 @@ do
             then
                 what=`trxml2 desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
             else
-                what=`dotnet trxml2 -- desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
+                what=`dotnet trxml2 desc.xml | grep inputs | head -1 | sed 's%^[^=]*=%%'`
             fi
             if [ "$what" == "" ]
             then
@@ -197,7 +197,7 @@ do
                 then
                     what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
                 else
-                    what=( `dotnet trglob -- $p | grep -v '.errors$' | grep -v '.tree$'` )
+                    what=( `dotnet trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
                 fi
             else
                 dir=`pwd`
@@ -206,7 +206,7 @@ do
                 then
                     what=( `trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
                 else
-                    what=( `dotnet trglob -- $p | grep -v '.errors$' | grep -v '.tree$'` )
+                    what=( `dotnet trglob $p | grep -v '.errors$' | grep -v '.tree$'` )
                 fi
             fi
             echo what = $what

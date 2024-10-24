@@ -752,7 +752,18 @@ account_id_list
     ;
 
 alter_dynamic_table
-    : ALTER DYNAMIC TABLE id_ (resume_suspend | REFRESH | SET WAREHOUSE EQ id_)
+    : ALTER DYNAMIC TABLE if_exists? object_name (
+        resume_suspend
+        | REFRESH
+        | SET dynamic_table_settable_params+
+    )
+    | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
+    | ALTER DYNAMIC TABLE if_exists? object_name (set_tags | unset_tags)
+    | ALTER DYNAMIC TABLE if_exists? object_name search_optimization_action
+    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (
+        COMMA dynamic_table_unsettable_params
+    )*
+    | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
     ;
 
 alter_external_table
@@ -1149,10 +1160,15 @@ alter_table
         |
     )
     //[ , ... ]
-    | ALTER TABLE if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_ COMMA ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER TABLE if_exists? object_name rls_operations
+    ;
+
+rls_operations
+    : ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    | DROP ROW ACCESS POLICY object_name (
+        COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    )?
+    | DROP ALL ROW ACCESS POLICIES
     ;
 
 clustering_action
@@ -1568,13 +1584,49 @@ compression
     ;
 
 create_dynamic_table
-    : CREATE or_replace? DYNAMIC TABLE id_ TARGET_LAG EQ (string | DOWNSTREAM) WAREHOUSE EQ wh = id_ AS query_statement
+    : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
+        LR_BRACKET materialized_col_decl_list RR_BRACKET
+    )? dynamic_table_params+ AS query_statement
+    ;
+
+dynamic_table_params
+    : dynamic_table_settable_params
+    | REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL)
+    | INITIALIZE EQ (ON_CREATE | ON_SCHEDULE)
+    | cluster_by
+    | with_row_access_policy
+    | with_tags
+    ;
+
+dynamic_table_settable_params
+    : TARGET_LAG EQ (string | DOWNSTREAM)
+    | LAG EQ (
+        string
+        | DOWNSTREAM
+    ) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
+    | WAREHOUSE EQ wh = id_
+    | set_data_retention_params
+    | DEFAULT_DDL_COLLATION_ EQ STRING
+    | comment_clause
+    ;
+
+dynamic_table_unsettable_params
+    : data_retention_params
+    | DEFAULT_DDL_COLLATION_
+    | COMMENT
+    ;
+
+data_retention_params
+    : DATA_RETENTION_TIME_IN_DAYS
+    | MAX_DATA_EXTENSION_TIME_IN_DAYS
+    ;
+
+set_data_retention_params
+    : data_retention_params EQ num
     ;
 
 create_event_table
-    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? (
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? data_retention_params* change_tracking? (
         DEFAULT_DDL_COLLATION_ EQ string
     )? copy_grants? with_row_access_policy? with_tags? (WITH? comment_clause)?
     ;
@@ -1669,7 +1721,8 @@ col_decl
     ;
 
 virtual_column_decl
-    : AS '(' function_call ')'
+    : AS LR_BRACKET function_call RR_BRACKET
+    | AS function_call
     ;
 
 function_definition
@@ -2005,7 +2058,7 @@ format_type_options
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q)
     | TRIM_SPACE EQ true_false
     | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE)
-    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
+    | NULL_IF EQ LR_BRACKET string_list* RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
     | EMPTY_FIELD_AS_NULL EQ true_false
@@ -2291,16 +2344,16 @@ stream_time
     ;
 
 create_stream
-    //-- table
-    : CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON TABLE object_name stream_time? append_only? show_initial_rows?
-        comment_clause?
+    //-- table or view
+    : CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON (
+        TABLE
+        | VIEW
+    ) object_name stream_time? append_only? show_initial_rows? comment_clause?
     //-- External table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only? comment_clause?
-    //-- Directory table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON STAGE object_name comment_clause?
-    //-- View
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON VIEW object_name stream_time? append_only? show_initial_rows?
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only?
         comment_clause?
+    //-- Directory table
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON STAGE object_name comment_clause?
     ;
 
 temporary
@@ -2309,7 +2362,8 @@ temporary
     ;
 
 table_type
-    : (( LOCAL | GLOBAL)? temporary | VOLATILE)
+    : (LOCAL | GLOBAL)? temporary
+    | VOLATILE
     | TRANSIENT
     ;
 
@@ -2364,13 +2418,21 @@ out_of_line_constraint
     : (CONSTRAINT id_)? (
         (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
         | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
-    )
+    ) inline_comment_clause?
     ;
 
+//For classic table
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
-        COMMENT string
-    )?
+    : col_decl (collate | inline_constraint | null_not_null | default_value)* with_masking_policy? with_tags? inline_comment_clause?
+    ;
+
+//Column declaration for materialized table
+materialized_col_decl
+    : column_name data_type? with_masking_policy? with_tags? (COMMENT string)?
+    ;
+
+materialized_col_decl_list
+    : materialized_col_decl (COMMA materialized_col_decl)*
     ;
 
 column_decl_item
@@ -2383,24 +2445,22 @@ column_decl_item_list
     ;
 
 create_table
-    : CREATE or_replace? table_type? TABLE (
+    : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
+    ) (comment_clause? create_table_clause | create_table_clause comment_clause?)
     ;
 
 column_decl_item_list_paren
-    : '(' column_decl_item_list ')'
+    : LR_BRACKET column_decl_item_list RR_BRACKET
     ;
 
 create_table_clause
     : (
         column_decl_item_list_paren cluster_by?
         | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
-        with_tags?
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking? default_ddl_collation
+        ? copy_grants? comment_clause? with_row_access_policy? with_tags?
     ;
 
 create_table_as_select
@@ -2900,6 +2960,10 @@ comment_clause
     : COMMENT EQ string
     ;
 
+inline_comment_clause
+    : COMMENT string
+    ;
+
 if_suspended
     : IF SUSPENDED
     ;
@@ -2914,6 +2978,10 @@ if_not_exists
 
 or_replace
     : OR REPLACE
+    ;
+
+or_alter
+    : OR ALTER
     ;
 
 describe
@@ -3491,9 +3559,10 @@ keyword
     //List here keyword (SnowSQL meaning) allowed as object name
     // Name of builtin function should be included in specifique section (ie builtin_function)
     // please add in alphabetic order for easy reading
+    // https://docs.snowflake.com/en/sql-reference/reserved-keywords
     : ACCOUNT
-    | ALERT
     | ACTION
+    | ALERT
     | AT_KEYWORD
     | CLUSTER
     | COMMENT
@@ -3507,6 +3576,7 @@ keyword
     | IF
     | JOIN
     | KEY
+    | LAG
     | LANGUAGE
     | LENGTH
     | MAX_CONCURRENCY_LEVEL
@@ -3526,6 +3596,7 @@ keyword
     | TAG
     | TARGET_LAG
     | TEMP
+    | TIMESTAMP
     | TYPE
     | USER
     | VALUE
@@ -3540,26 +3611,42 @@ non_reserved_words
     // please add in alphabetic order for easy reading
     : ACCOUNTADMIN
     | AES
+    | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
+    | COMMENT
     | CONFIGURATION
     | DATA
+    | DAYS
     | DEFINITION
     | DELTA
+    | DISPLAY_NAME
     | DOWNSTREAM
     | DYNAMIC
     | EDITION
     | EMAIL
+    | EMPTY_
+    | ENABLED
+    | ERROR_INTEGRATION
     | EVENT
+    | EXCHANGE
     | EXPIRY_DATE
     | EXPR
+    | FILE
+    | FILES
     | FIRST_NAME
     | FIRST_VALUE
+    | FREQUENCY
     | GLOBAL
+    | HIGH
+    | HOURS
     | IDENTIFIER
     | IDENTITY
+    | INCREMENTAL
+    | IMPORTED
     | INDEX
+    | INITIALIZE
     | INPUT
     | INTERVAL
     | JAVASCRIPT
@@ -3567,12 +3654,24 @@ non_reserved_words
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
+    | LOW
+    | MAX_CONCURRENCY_LEVEL
+    | MEDIUM
+    | MODE
     | NAME
     | NETWORK
+    | NULLIF
+    | NVL
     | OFFSET
+    | OLD
+    | ON_CREATE
+    | ON_ERROR
+    | ON_SCHEDULE
     | OPTION
     | ORGADMIN
     | OUTBOUND
+    | OUTER
+    | OWNER
     | PARTITION
     | PASSWORD
     | PASSWORD_HISTORY
@@ -3589,30 +3688,47 @@ non_reserved_words
     | PATH_
     | PATTERN
     | PORT
+    | PRIORITY
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
     | PUBLIC
+    | QUARTER
+    | QUERY
+    | QUERY_TAG
     | RANK
+    | RECURSIVE
+    | REFERENCES
+    | REFRESH_MODE
     | RESOURCE
     | RESOURCES
     | RESPECT
     | RESTRICT
     | RESULT
+    | ROLE
     | ROUNDING_MODE
+    | ROW_NUMBER
     | SCALE
+    | SCHEDULE
     | SECURITYADMIN
     | SOURCE
+    | START_DATE
     | STATE
     | STATS
+    | STATUS
     | SYSADMIN
+    | TAG
+    | TAGS
+    | TARGET_LAG
     | TIMEZONE
     | URL
     | USERADMIN
     | VALUE
     | VALUES
     | VERSION
+    | VISIBILITY
     | WAREHOUSE_TYPE
+    | YEAR
     ;
 
 builtin_function
@@ -3623,6 +3739,7 @@ builtin_function
     | MIN
     | COUNT
     | CURRENT_TIMESTAMP
+    | CURRENT_TIME
     | CURRENT_DATE
     | UPPER
     | LOWER
@@ -3750,7 +3867,7 @@ expr
     | op = ( PLUS | MINUS) expr
     | expr op = (STAR | DIVIDE | MODULE) expr
     | expr op = (PLUS | MINUS | PIPE_PIPE) expr
-    | expr comparison_operator expr
+    | l = expr comparison_operator r = expr
     | op = NOT+ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
@@ -3845,10 +3962,14 @@ primitive_expression
     : DEFAULT //?
     | NULL_
     | id_ ('.' id_)* // json field access
+    | id_ '.' STAR
     | full_column_name
     | literal
-    | BOTH_Q
     | ARRAY_Q
+    | AUTO_Q
+    | AZURE_Q
+    | BOTH_Q
+    | NONE_Q
     | OBJECT_Q
     //| json_literal
     //| arr_literal
@@ -3874,6 +3995,7 @@ asc_desc
 over_clause
     : OVER '(' partition_by order_by_expr? ')'
     | OVER '(' order_by_expr ')'
+    | OVER '(' ')'
     ;
 
 function_call
@@ -3980,15 +4102,15 @@ switch_section
 
 // select
 query_statement
-    : with_expression? select_statement set_operators*
+    : with_expression? select_statement_in_parentheses set_operators*
     ;
 
 with_expression
-    : WITH common_table_expression (COMMA common_table_expression)*
+    : WITH RECURSIVE? common_table_expression (COMMA common_table_expression)*
     ;
 
 common_table_expression
-    : id_ ('(' columns = column_list ')')? AS '(' select_statement set_operators* ')'
+    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS select_statement_in_parentheses
     ;
 
 select_statement
@@ -3997,8 +4119,15 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement //EXCEPT and MINUS have same SQL meaning
-    | LR_BRACKET select_statement RR_BRACKET
+    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
+    | select_statement_in_parentheses
+    ;
+
+select_statement_in_parentheses
+    : LR_BRACKET select_statement_in_parentheses RR_BRACKET
+    | select_statement_in_parentheses set_operators
+    | select_statement
+    | with_expression
     ;
 
 select_optional_clauses
@@ -4357,6 +4486,8 @@ round_mode
     ;
 
 round_expr
-    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (
+        COMMA ROUNDING_MODE ASSOC round_mode
+    )* RR_BRACKET
     | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;

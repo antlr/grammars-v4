@@ -51,6 +51,7 @@ topLevelDeclaration
     | protocolDeclarationList
     | classDeclarationList
     | functionDefinition
+    | ';'
     ;
 
 importDeclaration
@@ -60,7 +61,7 @@ importDeclaration
 classInterface
     : IB_DESIGNABLE? '@interface' className = genericTypeSpecifier (
         ':' superclassName = identifier
-    )? (LT protocolList GT)? instanceVariables? interfaceDeclarationList? '@end'
+    )? (LT (protocolList | genericConformanceList) GT)* instanceVariables? interfaceDeclarationList? '@end'
     ;
 
 categoryInterface
@@ -78,11 +79,19 @@ categoryImplementation
     ;
 
 genericTypeSpecifier
-    : identifier ((LT protocolList GT) | genericsSpecifier)?
+    : identifier (LT (protocolList | genericConformanceList) GT)?
+    ;
+
+genericConformanceList
+    : genericConformance (',' genericConformance)*
+    ;
+
+genericConformance
+    : genericsType = declarationSpecifiers (':' genericsParentType = declarationSpecifiers)?
     ;
 
 protocolDeclaration
-    : '@protocol' protocolName (LT protocolList GT)? protocolDeclarationSection* '@end'
+    : macro? '@protocol' protocolName (LT protocolList GT)? protocolDeclarationSection* '@end'
     ;
 
 protocolDeclarationSection
@@ -95,7 +104,7 @@ protocolDeclarationList
     ;
 
 classDeclarationList
-    : '@class' identifier (',' identifier)* ';'
+    : '@class' genericTypeSpecifier (',' genericTypeSpecifier)* ';'
     ;
 
 protocolList
@@ -155,6 +164,7 @@ interfaceDeclarationList
         | instanceMethodDeclaration
         | propertyDeclaration
         | functionDeclaration
+        | ';'
     )+
     ;
 
@@ -167,7 +177,7 @@ instanceMethodDeclaration
     ;
 
 methodDeclaration
-    : methodType? methodSelector macro? ';'
+    : methodType? methodSelector macro* ';'
     ;
 
 implementationDefinitionList
@@ -224,19 +234,12 @@ propertySynthesizeItem
     ;
 
 blockType
-    : nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP '^' (
-        nullabilitySpecifier
-        | typeSpecifier
-    )? RP blockParameters?
+    : NS_NOESCAPE? nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP NS_NOESCAPE? '^'
+        nullabilitySpecifier? RP blockParameters?
     ;
-
+    
 genericsSpecifier
-    : LT (typeSpecifierWithPrefixes (',' typeSpecifierWithPrefixes)*)? GT
-    ;
-
-typeSpecifierWithPrefixes
-    : typePrefix* typeSpecifier
-    | typeName
+    : genericsType = typeSpecifier (':' genericsConformanceType = typeSpecifier)?
     ;
 
 dictionaryExpression
@@ -297,6 +300,7 @@ selectorExpression
 
 selectorName
     : selector
+    | UNDERSCORE
     | (selector? ':')+
     ;
 
@@ -376,37 +380,32 @@ attributeParameterAssignment
     ;
 
 declaration
-    : functionCallExpression
-    | enumDeclaration
-    | varDeclaration
-    | typedefDeclaration
+    : (
+        functionCallExpression
+        | enumDeclaration
+        | varDeclaration
+        | typedefDeclaration
+    ) macro? ';'
     ;
 
 functionCallExpression
-    : attributeSpecifier? identifier attributeSpecifier? LP directDeclarator RP ';'
+    : attributeSpecifier? identifier attributeSpecifier? LP declarator RP
     ;
 
 enumDeclaration
-    : attributeSpecifier? TYPEDEF? enumSpecifier identifier? ';'
+    : attributeSpecifier? TYPEDEF? (enumSpecifier identifier | nsEnumOrOptionSpecifier)
     ;
 
 varDeclaration
-    : (declarationSpecifiers initDeclaratorList | declarationSpecifiers) ';'
+    : declarationSpecifiers initDeclaratorList?
     ;
 
 typedefDeclaration
-    : attributeSpecifier? TYPEDEF (
-        declarationSpecifiers typeDeclaratorList
-        | declarationSpecifiers
-    ) ';'
+    : attributeSpecifier? TYPEDEF declarationSpecifiers typeDeclaratorList?
     ;
 
 typeDeclaratorList
-    : typeDeclarator (',' typeDeclarator)*
-    ;
-
-typeDeclarator
-    : pointer? directDeclarator
+    : declarator (',' declarator)*
     ;
 
 declarationSpecifiers
@@ -416,10 +415,10 @@ declarationSpecifiers
         | arcBehaviourSpecifier
         | nullabilitySpecifier
         | ibOutletQualifier
+        | NS_NOESCAPE
         | typePrefix
         | typeQualifier
-        | typeSpecifier
-    )+
+    )* typeSpecifier attributeSpecifier*
     ;
 
 attributeSpecifier
@@ -439,18 +438,7 @@ structOrUnionSpecifier
     ;
 
 fieldDeclaration
-    : specifierQualifierList fieldDeclaratorList macro? ';'
-    ;
-
-specifierQualifierList
-    : (
-        arcBehaviourSpecifier
-        | nullabilitySpecifier
-        | ibOutletQualifier
-        | typePrefix
-        | typeQualifier
-        | typeSpecifier
-    )+
+    : declarationSpecifiers fieldDeclaratorList macro? ';'
     ;
 
 ibOutletQualifier
@@ -504,22 +492,25 @@ protocolQualifier
     | 'byref'
     | 'oneway'
     ;
-
-typeSpecifier
-    : 'void'
-    | 'char'
-    | 'short'
-    | 'int'
+    
+typeSpecifierModifier
+    : 'short'
     | 'long'
-    | 'float'
-    | 'double'
     | 'signed'
     | 'unsigned'
+    ;
+
+typeSpecifier
+    : 'void' typeQualifier*
+    | typeSpecifierModifier* ('char' | 'short' | 'int' | 'long' | 'float' | 'double') typeQualifier*
     | typeofExpression
-    | genericTypeSpecifier
     | structOrUnionSpecifier
     | enumSpecifier
-    | identifier pointer?
+    | nsEnumOrOptionSpecifier
+    | 'id' (LT protocolList GT)? (arcBehaviourSpecifier | nullabilitySpecifier | typeQualifier)*
+    | genericTypeSpecifier (arcBehaviourSpecifier | nullabilitySpecifier | typeQualifier)*
+    | identifier (arcBehaviourSpecifier | nullabilitySpecifier | typeQualifier)*
+    | typeSpecifier '*' (arcBehaviourSpecifier | nullabilitySpecifier | typeQualifier)*
     ;
 
 typeofExpression
@@ -540,7 +531,10 @@ enumSpecifier
         identifier ('{' enumeratorList '}')?
         | '{' enumeratorList '}'
     )
-    | ('NS_OPTIONS' | 'NS_ENUM') LP typeName ',' identifier RP '{' enumeratorList '}'
+    ;
+    
+nsEnumOrOptionSpecifier
+    : ('NS_OPTIONS' | 'NS_ENUM' | 'NS_CLOSED_ENUM' | 'NS_ERROR_ENUM') LP typeName ',' identifier RP ('{' enumeratorList '}')?
     ;
 
 enumeratorList
@@ -556,7 +550,7 @@ enumeratorIdentifier
     | 'default'
     ;
 
-directDeclarator
+declarator
     : (identifier | LP declarator RP) declaratorSuffix*
     | LP '^' nullabilitySpecifier? identifier? RP blockParameters
     ;
@@ -569,12 +563,52 @@ parameterList
     : parameterDeclarationList (',' '...')?
     ;
 
-pointer
-    : '*' declarationSpecifiers? pointer?
-    ;
-
 macro
     : identifier (LP primaryExpression (',' primaryExpression)* RP)?
+    | NS_UNAVAILABLE
+    | NS_SWIFT_NAME LP (swiftAliasExpression | swiftSelectorExpression) RP
+    | API_AVAILABLE LP apiAvailableOsVersion (',' apiAvailableOsVersion)* RP
+    | API_UNAVAILABLE LP identifier (',' identifier)* RP
+    | NS_SWIFT_UNAVAILABLE LP stringLiteral RP
+    | ATTRIBUTE LP LP clangAttribute (',' clangAttribute)* RP RP
+    ;
+
+// A list of __attribute__ are elaborated https://nshipster.com/__attribute__/
+clangAttribute
+    : identifier
+    | identifier LP clangAttributeArgument (',' clangAttributeArgument)* RP
+    ;
+    
+clangAttributeArgument
+    : identifier
+    | DECIMAL_LITERAL
+    | stringLiteral
+    | identifier '=' version
+    | identifier '=' stringLiteral
+    ;
+    
+swiftAliasExpression
+    : identifier ('.' identifier)*
+    ;
+
+swiftSelectorExpression
+    : identifier LP (swiftSelector ':')* RP
+    ;
+    
+// Swift selector may use reserved words
+swiftSelector
+    : identifier
+    | UNDERSCORE
+    | 'for'
+    ;
+
+apiAvailableOsVersion
+    : identifier LP version RP
+    ;
+    
+version
+    : FLOATING_POINT_LITERAL
+    | DECIMAL_LITERAL ('.' DECIMAL_LITERAL)*
     ;
 
 arrayInitializer
@@ -590,13 +624,12 @@ initializerList
     ;
 
 typeName
-    : specifierQualifierList abstractDeclarator?
+    : declarationSpecifiers abstractDeclarator?
     | blockType
     ;
 
 abstractDeclarator
-    : pointer abstractDeclarator?
-    | LP abstractDeclarator? RP abstractDeclaratorSuffix+
+    : LP abstractDeclarator? RP abstractDeclaratorSuffix+
     | ('[' constantExpression? ']')+
     ;
 
@@ -612,10 +645,6 @@ parameterDeclarationList
 parameterDeclaration
     : declarationSpecifiers declarator
     | 'void'
-    ;
-
-declarator
-    : pointer? directDeclarator
     ;
 
 statement
@@ -842,6 +871,7 @@ identifier
     | ATOMIC
     | NONATOMIC
     | RETAIN
+    | REGISTER
     | AUTORELEASING_QUALIFIER
     | BLOCK
     | BRIDGE_RETAINED
@@ -854,6 +884,7 @@ identifier
     | NS_INLINE
     | NS_ENUM
     | NS_OPTIONS
+    | NS_SWIFT_NAME
     | NULL_UNSPECIFIED
     | NULLABLE
     | NONNULL
