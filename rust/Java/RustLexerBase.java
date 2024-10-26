@@ -29,7 +29,7 @@ public abstract class RustLexerBase extends Lexer{
         return _input.LA(1) == expect;
     }
 
-    public boolean next(int expect){
+    public boolean nexti(int expect){
         return _input.LA(1) == expect;
     }
 

@@ -31,7 +31,7 @@ export default abstract class RustLexerBase extends Lexer {
         return this._input.LA(1) === expect.charCodeAt(0);
     }
     nexti(expect: number): boolean {
-        return this._input.LA(1) === input;
+        return this._input.LA(1) === expect;
     }
 
 

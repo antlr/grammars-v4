@@ -36,7 +36,7 @@ public abstract class RustLexerBase : Lexer {
     }
 
 
-    public bool next(int expect){
+    public bool nexti(int expect){
         return _input.LA(1) == expect;
     }
 
