@@ -35,6 +35,11 @@ public abstract class RustLexerBase : Lexer {
         return _input.LA(1) == expect;
     }
 
+
+    public bool next(int expect){
+        return _input.LA(1) == expect;
+    }
+
     public bool floatDotPossible(){
         int next = _input.LA(1);
         // only block . _ identifier after float

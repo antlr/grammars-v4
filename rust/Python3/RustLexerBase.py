@@ -57,6 +57,12 @@ class RustLexerBase(Lexer):
         else:
             return self._input.LA(1) == expect
 
+     def nexti(self, expect) -> bool:
+        if isinstance(expect, str):
+            return chr(self._input.LA(1)) == expect
+        else:
+            return self._input.LA(1) == expect
+
     def floatDotPossible(self):
         next = chr(self._input.LA(1))
         # print(f'INFO: floatpossible ? {next} = {chr(next)}')
