@@ -133,7 +133,7 @@ OUTER_BLOCK_DOC:
 
 BLOCK_COMMENT_OR_DOC: ( BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC) -> channel (HIDDEN);
 
-SHEBANG: {this.SOF()}? '\ufeff'? '#!' {this._input.LA(1) != 97}? ~[\r\n]* -> channel(HIDDEN);
+SHEBANG: {this.SOF()}? '\ufeff'? '#!' {this.next(97)}? ~[\r\n]* -> channel(HIDDEN);
 // Shebang not in first line and #! cannot be followed by a '[' character shebang
 
 
