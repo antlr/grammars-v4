@@ -391,15 +391,16 @@ createTable
     ;
 
 withElement
-    : kwWith tableOptions? clusteringOrder?
-    ;
-
-clusteringOrder
-    : kwClustering kwOrder kwBy syntaxBracketLr column orderDirection? syntaxBracketRr
+    : kwWith tableOptions?
     ;
 
 tableOptions
-    : tableOptionItem (kwAnd tableOptionItem)*
+    : clusteringOrder (kwAnd tableOptionItem)*
+    | tableOptionItem (kwAnd tableOptionItem)*
+    ;
+
+clusteringOrder
+    : kwClustering kwOrder kwBy syntaxBracketLr (column orderDirection?) (syntaxComma column orderDirection?)* syntaxBracketRr
     ;
 
 tableOptionItem
