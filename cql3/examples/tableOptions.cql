@@ -1,4 +1,4 @@
-CREATE TABLE cycling.race_winners (
+CREATE TABLE alphabet (
    a int,
    b int,
    c int,
