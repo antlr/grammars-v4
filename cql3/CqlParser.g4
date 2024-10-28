@@ -391,11 +391,12 @@ createTable
     ;
 
 withElement
-    : kwWith tableOptions?
+    : kwWith tableOptions
     ;
 
 tableOptions
-    : clusteringOrder (kwAnd tableOptionItem)*
+    : kwCompact kwStorage (kwAnd tableOptions)?
+    | clusteringOrder (kwAnd tableOptions)?
     | tableOptionItem (kwAnd tableOptionItem)*
     ;
 
