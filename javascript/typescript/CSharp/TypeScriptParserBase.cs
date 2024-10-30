@@ -53,10 +53,10 @@ public abstract class TypeScriptParserBase : Parser
         return !here(LineTerminator);
     }
 
-    protected bool notOpenBraceAndNotFunction()
+    protected bool notOpenBraceAndNotFunctionAndNotInterface()
     {
         int nextTokenType = _input.LT(1).Type;
-        return nextTokenType != OpenBrace && nextTokenType != Function_;
+        return nextTokenType != OpenBrace && nextTokenType != Function_ && nextTokenType != Interface;
     }
 
     protected bool closeBrace()

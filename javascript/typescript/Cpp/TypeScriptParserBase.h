@@ -10,7 +10,7 @@ public:
     bool n(std::string str);
     bool next(std::string str);
     bool notLineTerminator();
-    bool notOpenBraceAndNotFunction();
+    bool notOpenBraceAndNotFunctionAndNotInterface();
     bool closeBrace();
     bool here(int type);
     bool lineTerminatorAhead();

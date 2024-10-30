@@ -43,9 +43,10 @@ export default abstract class TypeScriptParserBase extends Parser {
         return !this.here(TypeScriptParser.LineTerminator);
     }
 
-    protected notOpenBraceAndNotFunction():boolean {
+    protected notOpenBraceAndNotFunctionAndNotInterface():boolean {
         const nextTokenType:number = this._input.LT(1).type;
-        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_;
+        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_
+            && nextTokenType != TypeScriptParser.Interface;
     }
 
     protected closeBrace():boolean {
