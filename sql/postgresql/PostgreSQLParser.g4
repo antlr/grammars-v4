@@ -3555,7 +3555,7 @@ a_expr
 /*19*/
 
 a_expr_qual
-    : a_expr_lessless qual_op?
+    : a_expr_lessless ({ this.OnlyAcceptableOps() }? qual_op | )
     ;
 
 /*18*/

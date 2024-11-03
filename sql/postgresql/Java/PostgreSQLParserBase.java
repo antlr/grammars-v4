@@ -121,4 +121,11 @@ public abstract class PostgreSQLParserBase extends Parser {
         parser.addErrorListener(listener_parser);
         return parser;
     }
+
+    public boolean OnlyAcceptableOps()
+    {
+	var c = ((CommonTokenStream)this.getInputStream()).LT(1);
+	var text = c.getText();
+	return text == "!" || text == "!!";
+    }
 }
