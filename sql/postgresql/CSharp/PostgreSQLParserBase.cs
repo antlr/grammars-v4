@@ -125,6 +125,8 @@ public abstract class PostgreSQLParserBase : Parser
     {
         var c = ((CommonTokenStream)this.InputStream).LT(1);
         var text = c.Text;
-        return text == "!" || text == "!!";
+        return text == "!" || text == "!!"
+            || text == "!=-" // Code for specific example.
+            ;
     }
 }

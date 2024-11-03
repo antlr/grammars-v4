@@ -126,6 +126,8 @@ public abstract class PostgreSQLParserBase extends Parser {
     {
 	var c = ((CommonTokenStream)this.getInputStream()).LT(1);
 	var text = c.getText();
-	return text == "!" || text == "!!";
+	return text.equals("!") || text.equals("!!")
+            || text.equals("!=-")
+            ;
     }
 }
