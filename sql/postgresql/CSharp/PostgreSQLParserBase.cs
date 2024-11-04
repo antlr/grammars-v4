@@ -120,4 +120,13 @@ public abstract class PostgreSQLParserBase : Parser
         parser.AddErrorListener(listener_parser);
         return parser;
     }
+
+    public bool OnlyAcceptableOps()
+    {
+        var c = ((CommonTokenStream)this.InputStream).LT(1);
+        var text = c.Text;
+        return text == "!" || text == "!!"
+            || text == "!=-" // Code for specific example.
+            ;
+    }
 }
