@@ -42,9 +42,10 @@ public abstract class TypeScriptParserBase extends Parser
         return !here(TypeScriptParser.LineTerminator);
     }
 
-    protected boolean notOpenBraceAndNotFunction() {
+    protected boolean notOpenBraceAndNotFunctionAndNotInterface() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_;
+        return nextTokenType != TypeScriptParser.OpenBrace && nextTokenType != TypeScriptParser.Function_
+                && nextTokenType != TypeScriptParser.Interface;
     }
 
     protected boolean closeBrace() {

@@ -345,14 +345,14 @@ sourceElement
 
 statement
     : block
-    | variableStatement    
+    | variableStatement
     | importStatement
     | exportStatement
     | emptyStatement_
     | abstractDeclaration //ADDED
     | classDeclaration
     | functionDeclaration
-    | expressionStatement    
+    | expressionStatement
     | interfaceDeclaration //ADDED
     | namespaceDeclaration //ADDED
     | ifStatement
@@ -476,7 +476,7 @@ emptyStatement_
     ;
 
 expressionStatement
-    : {this.notOpenBraceAndNotFunction()}? expressionSequence SemiColon?
+    : {this.notOpenBraceAndNotFunctionAndNotInterface()}? expressionSequence SemiColon?
     ;
 
 ifStatement
@@ -752,11 +752,11 @@ singleExpression
     | '-' singleExpression                                            # UnaryMinusExpression
     | '~' singleExpression                                            # BitNotExpression
     | '!' singleExpression                                            # NotExpression
-    | Await singleExpression                                          # AwaitExpression    
-    | <assoc = right> singleExpression '**' singleExpression          # PowerExpression    
+    | Await singleExpression                                          # AwaitExpression
+    | <assoc = right> singleExpression '**' singleExpression          # PowerExpression
     | singleExpression ('*' | '/' | '%') singleExpression             # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                   # AdditiveExpression
-    | singleExpression '??' singleExpression                          # CoalesceExpression    
+    | singleExpression '??' singleExpression                          # CoalesceExpression
     | singleExpression ('<<' | '>' '>' | '>' '>' '>') singleExpression # BitShiftExpression
     | singleExpression ('<' | '>' | '<=' | '>=') singleExpression     # RelationalExpression
     | singleExpression Instanceof singleExpression                    # InstanceofExpression
@@ -801,7 +801,7 @@ assignable
     ;
 
 anonymousFunction
-    : functionDeclaration 
+    : functionDeclaration
     | Async? Function_ '*'? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
     | arrowFunctionDeclaration
     ;
@@ -833,7 +833,7 @@ assignmentOperator
     | '^='
     | '|='
     | '**='
-    | '??='    
+    | '??='
     ;
 
 literal
@@ -964,7 +964,7 @@ keyword
     | Static
     | Yield
     | Async
-    | Await        
+    | Await
     | ReadOnly
     | From
     | As
