@@ -1588,9 +1588,8 @@ UnterminatedBlockComment:
 
 // http://www.postgresql.org/docs/9.3/static/app-psql.html
 
-MetaCommand: '\\' (~ [\r\n\\"] | '"' ~ [\r\n"]* '"')* ('"' ~ [\r\n"]*)?;
+MetaCommand: '\\' -> pushMode(META), more ;
 
-EndMetaCommand: '\\\\';
 //
 
 // ERROR
@@ -1681,3 +1680,7 @@ DollarText:
 ;
 
 EndDollarStringConstant: ('$' Tag? '$') {isTag()}? {popTag();} -> popMode;
+
+mode META;
+MetaSemi : { this.IsSemiColon() }? ';' -> type(SEMI), popMode ;
+MetaOther : ~[;\r\n\\"] .*? ('\\\\' | [\r\n]+) -> type(SEMI), popMode ;

@@ -78,4 +78,9 @@ public abstract class PostgreSQLLexerBase extends Lexer {
         }
         return Character.isLetter(c[0]);
     }
+
+    public boolean IsSemiColon()
+    {
+	return  ';' == (char)getInputStream().LA(1);
+    }
 }

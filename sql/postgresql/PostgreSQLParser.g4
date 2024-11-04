@@ -48,7 +48,7 @@ stmtblock
     ;
 
 stmtmulti
-    : (stmt SEMI?)*
+    : stmt? (SEMI stmt?)*
     ;
 
 stmt
@@ -176,11 +176,6 @@ stmt
     | variablesetstmt
     | variableshowstmt
     | viewstmt
-    | plsqlconsolecommand
-    ;
-
-plsqlconsolecommand
-    : MetaCommand EndMetaCommand?
     ;
 
 callstmt

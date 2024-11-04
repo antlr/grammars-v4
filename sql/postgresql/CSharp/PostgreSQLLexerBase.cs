@@ -85,4 +85,8 @@ public class PostgreSQLLexerBase : Lexer
         return Char.IsLetter(Char.ConvertFromUtf32(Char.ConvertToUtf32((char)InputStream.LA(-2), (char)InputStream.LA(-1))).Substring(0)[0]);
     }
 
+    public bool IsSemiColon()
+    {
+        return  ';' == (char)InputStream.LA(1);
+    }
 }
