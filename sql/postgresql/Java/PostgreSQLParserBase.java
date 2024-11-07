@@ -63,13 +63,14 @@ public abstract class PostgreSQLParserBase extends Parser {
         }
         if (func_as != null) {
             String txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            PostgreSQLParser ph = getPostgreSQLParser(txt);
             switch (lang) {
                 case "plpgsql":
-                    func_as.func_as().Definition = ph.plsqlroot();
+                    //NB: Cannot be done this way.
+                    //PostgreSQLParser ph = getPostgreSQLParser(txt);
+                    //func_as.func_as().Definition = ph.plsqlroot();
                     break;
                 case "sql":
-                    func_as.func_as().Definition = ph.root();
+                    //func_as.func_as().Definition = ph.root();
                     break;
             }
         }
@@ -124,9 +125,9 @@ public abstract class PostgreSQLParserBase extends Parser {
 
     public boolean OnlyAcceptableOps()
     {
-	var c = ((CommonTokenStream)this.getInputStream()).LT(1);
-	var text = c.getText();
-	return text.equals("!") || text.equals("!!")
+        var c = ((CommonTokenStream)this.getInputStream()).LT(1);
+        var text = c.getText();
+        return text.equals("!") || text.equals("!!")
             || text.equals("!=-")
             ;
     }

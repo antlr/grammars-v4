@@ -56,14 +56,21 @@ public abstract class PostgreSQLParserBase : Parser
         if (func_as != null)
         {
             var txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            var ph = getPostgreSQLParser(txt);
             switch (lang)
             {
                 case "plpgsql":
-                    func_as.func_as().Definition = ph.plsqlroot();
+                    // Mutate tree.
+                    // NB: cannot use locals this way because
+                    // it does not work with ToStringTree().
+                    // var ph = getPostgreSQLParser(txt);
+                    // func_as.func_as().Definition = ph.plsqlroot();
                     break;
                 case "sql":
-                    func_as.func_as().Definition = ph.root();
+                    // Mutate tree.
+                    // NB: cannot use locals this way because
+                    // it does not work with ToStringTree().
+                    // func_as.func_as().Definition = ph.root();
+                    // ph.root();
                     break;
             }
         }
