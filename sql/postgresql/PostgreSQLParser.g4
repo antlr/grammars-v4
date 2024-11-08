@@ -285,7 +285,7 @@ set_rest
     ;
 
 generic_set
-    : var_name (TO | EQUAL) var_list
+    : var_name (TO | EQUAL) (var_list | DEFAULT)
     ;
 
 set_rest_more
@@ -3190,20 +3190,20 @@ from_list
 
 table_ref
     : (
-        relation_expr alias_clause_? tablesample_clause?
+        relation_expr alias_clause? tablesample_clause?
         | func_table func_alias_clause?
-        | xmltable alias_clause_?
-        | select_with_parens alias_clause_?
+        | xmltable alias_clause?
+        | select_with_parens alias_clause?
         | LATERAL_P (
-            xmltable alias_clause_?
+            xmltable alias_clause?
             | func_table func_alias_clause?
-            | select_with_parens alias_clause_?
+            | select_with_parens alias_clause?
         )
         | OPEN_PAREN table_ref (
             CROSS JOIN table_ref
             | NATURAL join_type? JOIN table_ref
             | join_type? JOIN table_ref join_qual
-        )? CLOSE_PAREN alias_clause_?
+        )? CLOSE_PAREN alias_clause?
     ) (
         CROSS JOIN table_ref
         | NATURAL join_type? JOIN table_ref
@@ -3213,15 +3213,6 @@ table_ref
 
 alias_clause
     : AS? colid (OPEN_PAREN name_list CLOSE_PAREN)?
-    ;
-
-alias_clause_
-    : table_alias_clause
-    
-    ;
-
-table_alias_clause
-    : AS? table_alias (OPEN_PAREN name_list CLOSE_PAREN)?
     ;
 
 func_alias_clause
@@ -3360,6 +3351,7 @@ simpletypename
     | character
     | constdatetime
     | constinterval (interval_? | OPEN_PAREN iconst CLOSE_PAREN)
+    | jsonType
     ;
 
 consttypename
@@ -3468,6 +3460,10 @@ interval_
 
 interval_second
     : SECOND_P (OPEN_PAREN iconst CLOSE_PAREN)?
+    ;
+
+jsonType
+    : JSON
     ;
 
 escape_
@@ -3717,6 +3713,7 @@ c_expr
     | explicit_row                                                     # c_expr_expr
     | implicit_row                                                     # c_expr_expr
     | row OVERLAPS row /* 14*/                                         # c_expr_expr
+    | DEFAULT                                                          # c_expr_expr
     ;
 
 plsqlvariablename
@@ -4194,22 +4191,12 @@ colid
     : identifier
     | unreserved_keyword
     | col_name_keyword
-    | plsql_unreserved_keyword
-    | LEFT
-    | RIGHT
-    ;
-
-table_alias
-    : identifier
-    | unreserved_keyword
-    | col_name_keyword
-    | plsql_unreserved_keyword
+    | QUERY //NB: Non-standard from official source.
     ;
 
 type_function_name
     : identifier
     | unreserved_keyword
-    | plsql_unreserved_keyword
     | type_func_name_keyword
     ;
 
@@ -4222,11 +4209,11 @@ nonreservedword
 
 collabel
     : identifier
-    | plsql_unreserved_keyword
     | unreserved_keyword
     | col_name_keyword
     | type_func_name_keyword
     | reserved_keyword
+    | EXIT //NB: not in gram.y official source.
     ;
 
 identifier
@@ -4235,7 +4222,6 @@ identifier
     | UnicodeQuotedIdentifier
     | plsqlvariablename
     | plsqlidentifier
-    | plsql_unreserved_keyword
     ;
 
 plsqlidentifier
@@ -4244,6 +4230,7 @@ plsqlidentifier
 
 unreserved_keyword
     : ABORT_P
+    | ABSENT
     | ABSOLUTE_P
     | ACCESS
     | ACTION
@@ -4254,14 +4241,17 @@ unreserved_keyword
     | ALSO
     | ALTER
     | ALWAYS
+    | ASENSITIVE
     | ASSERTION
     | ASSIGNMENT
     | AT
+    | ATOMIC
     | ATTACH
     | ATTRIBUTE
     | BACKWARD
     | BEFORE
     | BEGIN_P
+    | BREADTH
     | BY
     | CACHE
     | CALL
@@ -4280,6 +4270,8 @@ unreserved_keyword
     | COMMENTS
     | COMMIT
     | COMMITTED
+    | COMPRESSION
+    | CONDITIONAL
     | CONFIGURATION
     | CONFLICT
     | CONNECTION
@@ -4306,6 +4298,7 @@ unreserved_keyword
     | DELIMITER
     | DELIMITERS
     | DEPENDS
+    | DEPTH
     | DETACH
     | DICTIONARY
     | DISABLE_P
@@ -4315,10 +4308,12 @@ unreserved_keyword
     | DOUBLE_P
     | DROP
     | EACH
+    | EMPTY_P
     | ENABLE_P
     | ENCODING
     | ENCRYPTED
     | ENUM_P
+    | ERROR
     | ESCAPE
     | EVENT
     | EXCLUDE
@@ -4331,9 +4326,11 @@ unreserved_keyword
     | EXTERNAL
     | FAMILY
     | FILTER
+    | FINALIZE
     | FIRST_P
     | FOLLOWING
     | FORCE
+    | FORMAT
     | FORWARD
     | FUNCTION
     | FUNCTIONS
@@ -4354,6 +4351,7 @@ unreserved_keyword
     | INCLUDE
     | INCLUDING
     | INCREMENT
+    | INDENT
     | INDEX
     | INDEXES
     | INHERIT
@@ -4365,7 +4363,9 @@ unreserved_keyword
     | INSTEAD
     | INVOKER
     | ISOLATION
+    | KEEP
     | KEY
+    | KEYS
     | LABEL
     | LANGUAGE
     | LARGE_P
@@ -4381,8 +4381,10 @@ unreserved_keyword
     | LOGGED
     | MAPPING
     | MATCH
+    | MATCHED
     | MATERIALIZED
     | MAXVALUE
+    | MERGE
     | METHOD
     | MINUTE_P
     | MINVALUE
@@ -4391,6 +4393,7 @@ unreserved_keyword
     | MOVE
     | NAME_P
     | NAMES
+    | NESTED
     | NEW
     | NEXT
     | NFC
@@ -4408,6 +4411,7 @@ unreserved_keyword
     | OFF
     | OIDS
     | OLD
+    | OMIT
     | OPERATOR
     | OPTION
     | OPTIONS
@@ -4418,11 +4422,15 @@ unreserved_keyword
     | OWNED
     | OWNER
     | PARALLEL
+    | PARAMETER
     | PARSER
     | PARTIAL
     | PARTITION
     | PASSING
     | PASSWORD
+    | PATH
+    | PERIOD
+    | PLAN
     | PLANS
     | POLICY
     | PRECEDING
@@ -4437,10 +4445,11 @@ unreserved_keyword
     | PROGRAM
     | PUBLICATION
     | QUOTE
+    | QUOTES
     | RANGE
     | READ
     | REASSIGN
-    | RECHECK
+//    | RECHECK
     | RECURSIVE
     | REF
     | REFERENCING
@@ -4450,10 +4459,12 @@ unreserved_keyword
     | RELEASE
     | RENAME
     | REPEATABLE
+    | REPLACE
     | REPLICA
     | RESET
     | RESTART
     | RESTRICT
+    | RETURN
     | RETURNS
     | REVOKE
     | ROLE
@@ -4464,6 +4475,7 @@ unreserved_keyword
     | ROWS
     | RULE
     | SAVEPOINT
+    | SCALAR
     | SCHEMA
     | SCHEMAS
     | SCROLL
@@ -4482,6 +4494,7 @@ unreserved_keyword
     | SIMPLE
     | SKIP_P
     | SNAPSHOT
+    | SOURCE
     | SQL_P
     | STABLE
     | STANDALONE_P
@@ -4493,6 +4506,7 @@ unreserved_keyword
     | STORAGE
     | STORED
     | STRICT_P
+    | STRING_P
     | STRIP_P
     | SUBSCRIPTION
     | SUPPORT
@@ -4500,6 +4514,7 @@ unreserved_keyword
     | SYSTEM_P
     | TABLES
     | TABLESPACE
+    | TARGET
     | TEMP
     | TEMPLATE
     | TEMPORARY
@@ -4515,6 +4530,7 @@ unreserved_keyword
     | UESCAPE
     | UNBOUNDED
     | UNCOMMITTED
+    | UNCONDITIONAL
     | UNENCRYPTED
     | UNKNOWN
     | UNLISTEN
@@ -4562,7 +4578,19 @@ col_name_keyword
     | INT_P
     | INTEGER
     | INTERVAL
+    | JSON
+    | JSON_ARRAY
+    | JSON_ARRAYAGG
+    | JSON_EXISTS
+    | JSON_OBJECT
+    | JSON_OBJECTAGG
+    | JSON_QUERY
+    | JSON_SCALAR
+    | JSON_SERIALIZE
+    | JSON_TABLE
+    | JSON_VALUE
     | LEAST
+    | MERGE_ACTION
     | NATIONAL
     | NCHAR
     | NONE
@@ -4612,11 +4640,13 @@ type_func_name_keyword
     | IS
     | ISNULL
     | JOIN
+    | LEFT
     | LIKE
     | NATURAL
     | NOTNULL
     | OUTER_P
     | OVERLAPS
+    | RIGHT
     | SIMILAR
     | TABLESAMPLE
     | VERBOSE
@@ -4646,7 +4676,7 @@ reserved_keyword
     | CURRENT_TIME
     | CURRENT_TIMESTAMP
     | CURRENT_USER
-    //                 | DEFAULT
+    | DEFAULT
     | DEFERRABLE
     | DESC
     | DISTINCT
@@ -4665,13 +4695,7 @@ reserved_keyword
     | IN_P
     | INITIALLY
     | INTERSECT
-    /*
-from pl_gram.y, line ~2982
-	 * Fortunately, INTO is a fully reserved word in the main grammar, so
-	 * at least we need not worry about it appearing as an identifier.
-*/
-
-    //                 | INTO
+    | INTO
     | LATERAL_P
     | LEADING
     | LIMIT
@@ -4692,6 +4716,7 @@ from pl_gram.y, line ~2982
     | SESSION_USER
     | SOME
     | SYMMETRIC
+    | SYSTEM_USER
     | TABLE
     | THEN
     | TO
@@ -4706,6 +4731,462 @@ from pl_gram.y, line ~2982
     | WHERE
     | WINDOW
     | WITH
+    ;
+
+bare_label_keyword
+    : 
+    | ABORT_P
+    | ABSENT
+    | ABSOLUTE_P
+    | ACCESS
+    | ACTION
+    | ADD_P
+    | ADMIN
+    | AFTER
+    | AGGREGATE
+    | ALL
+    | ALSO
+    | ALTER
+    | ALWAYS
+    | ANALYSE
+    | ANALYZE
+    | AND
+    | ANY
+    | ASC
+    | ASENSITIVE
+    | ASSERTION
+    | ASSIGNMENT
+    | ASYMMETRIC
+    | AT
+    | ATOMIC
+    | ATTACH
+    | ATTRIBUTE
+    | AUTHORIZATION
+    | BACKWARD
+    | BEFORE
+    | BEGIN_P
+    | BETWEEN
+    | BIGINT
+    | BINARY
+    | BIT
+    | BOOLEAN_P
+    | BOTH
+    | BREADTH
+    | BY
+    | CACHE
+    | CALL
+    | CALLED
+    | CASCADE
+    | CASCADED
+    | CASE
+    | CAST
+    | CATALOG
+    | CHAIN
+    | CHARACTERISTICS
+    | CHECK
+    | CHECKPOINT
+    | CLASS
+    | CLOSE
+    | CLUSTER
+    | COALESCE
+    | COLLATE
+    | COLLATION
+    | COLUMN
+    | COLUMNS
+    | COMMENT
+    | COMMENTS
+    | COMMIT
+    | COMMITTED
+    | COMPRESSION
+    | CONCURRENTLY
+    | CONDITIONAL
+    | CONFIGURATION
+    | CONFLICT
+    | CONNECTION
+    | CONSTRAINT
+    | CONSTRAINTS
+    | CONTENT_P
+    | CONTINUE_P
+    | CONVERSION_P
+    | COPY
+    | COST
+    | CROSS
+    | CSV
+    | CUBE
+    | CURRENT_CATALOG
+    | CURRENT_DATE
+    | CURRENT_P
+    | CURRENT_ROLE
+    | CURRENT_SCHEMA
+    | CURRENT_TIME
+    | CURRENT_TIMESTAMP
+    | CURRENT_USER
+    | CURSOR
+    | CYCLE
+    | DATA_P
+    | DATABASE
+    | DEALLOCATE
+    | DEC
+    | DECIMAL_P
+    | DECLARE
+    | DEFAULT
+    | DEFAULTS
+    | DEFERRABLE
+    | DEFERRED
+    | DEFINER
+    | DELETE_P
+    | DELIMITER
+    | DELIMITERS
+    | DEPENDS
+    | DEPTH
+    | DESC
+    | DETACH
+    | DICTIONARY
+    | DISABLE_P
+    | DISCARD
+    | DISTINCT
+    | DO
+    | DOCUMENT_P
+    | DOMAIN_P
+    | DOUBLE_P
+    | DROP
+    | EACH
+    | ELSE
+    | EMPTY_P
+    | ENABLE_P
+    | ENCODING
+    | ENCRYPTED
+    | END_P
+    | ENUM_P
+    | ERROR
+    | ESCAPE
+    | EVENT
+    | EXCLUDE
+    | EXCLUDING
+    | EXCLUSIVE
+    | EXECUTE
+    | EXISTS
+    | EXPLAIN
+    | EXPRESSION
+    | EXTENSION
+    | EXTERNAL
+    | EXTRACT
+    | FALSE_P
+    | FAMILY
+    | FINALIZE
+    | FIRST_P
+    | FLOAT_P
+    | FOLLOWING
+    | FORCE
+    | FOREIGN
+    | FORMAT
+    | FORWARD
+    | FREEZE
+    | FULL
+    | FUNCTION
+    | FUNCTIONS
+    | GENERATED
+    | GLOBAL
+    | GRANTED
+    | GREATEST
+    | GROUPING
+    | GROUPS
+    | HANDLER
+    | HEADER_P
+    | HOLD
+    | IDENTITY_P
+    | IF_P
+    | ILIKE
+    | IMMEDIATE
+    | IMMUTABLE
+    | IMPLICIT_P
+    | IMPORT_P
+    | IN_P
+    | INCLUDE
+    | INCLUDING
+    | INCREMENT
+    | INDENT
+    | INDEX
+    | INDEXES
+    | INHERIT
+    | INHERITS
+    | INITIALLY
+    | INLINE_P
+    | INNER_P
+    | INOUT
+    | INPUT_P
+    | INSENSITIVE
+    | INSERT
+    | INSTEAD
+    | INT_P
+    | INTEGER
+    | INTERVAL
+    | INVOKER
+    | IS
+    | ISOLATION
+    | JOIN
+    | JSON
+    | JSON_ARRAY
+    | JSON_ARRAYAGG
+    | JSON_EXISTS
+    | JSON_OBJECT
+    | JSON_OBJECTAGG
+    | JSON_QUERY
+    | JSON_SCALAR
+    | JSON_SERIALIZE
+    | JSON_TABLE
+    | JSON_VALUE
+    | KEEP
+    | KEY
+    | KEYS
+    | LABEL
+    | LANGUAGE
+    | LARGE_P
+    | LAST_P
+    | LATERAL_P
+    | LEADING
+    | LEAKPROOF
+    | LEAST
+    | LEFT
+    | LEVEL
+    | LIKE
+    | LISTEN
+    | LOAD
+    | LOCAL
+    | LOCALTIME
+    | LOCALTIMESTAMP
+    | LOCATION
+    | LOCK_P
+    | LOCKED
+    | LOGGED
+    | MAPPING
+    | MATCH
+    | MATCHED
+    | MATERIALIZED
+    | MAXVALUE
+    | MERGE
+    | MERGE_ACTION
+    | METHOD
+    | MINVALUE
+    | MODE
+    | MOVE
+    | NAME_P
+    | NAMES
+    | NATIONAL
+    | NATURAL
+    | NCHAR
+    | NESTED
+    | NEW
+    | NEXT
+    | NFC
+    | NFD
+    | NFKC
+    | NFKD
+    | NO
+    | NONE
+    | NORMALIZE
+    | NORMALIZED
+    | NOT
+    | NOTHING
+    | NOTIFY
+    | NOWAIT
+    | NULL_P
+    | NULLIF
+    | NULLS_P
+    | NUMERIC
+    | OBJECT_P
+    | OF
+    | OFF
+    | OIDS
+    | OLD
+    | OMIT
+    | ONLY
+    | OPERATOR
+    | OPTION
+    | OPTIONS
+    | OR
+    | ORDINALITY
+    | OTHERS
+    | OUT_P
+    | OUTER_P
+    | OVERLAY
+    | OVERRIDING
+    | OWNED
+    | OWNER
+    | PARALLEL
+    | PARAMETER
+    | PARSER
+    | PARTIAL
+    | PARTITION
+    | PASSING
+    | PASSWORD
+    | PATH
+    | PERIOD
+    | PLACING
+    | PLAN
+    | PLANS
+    | POLICY
+    | POSITION
+    | PRECEDING
+    | PREPARE
+    | PREPARED
+    | PRESERVE
+    | PRIMARY
+    | PRIOR
+    | PRIVILEGES
+    | PROCEDURAL
+    | PROCEDURE
+    | PROCEDURES
+    | PROGRAM
+    | PUBLICATION
+    | QUOTE
+    | QUOTES
+    | RANGE
+    | READ
+    | REAL
+    | REASSIGN
+    | RECURSIVE
+    | REF
+    | REFERENCES
+    | REFERENCING
+    | REFRESH
+    | REINDEX
+    | RELATIVE_P
+    | RELEASE
+    | RENAME
+    | REPEATABLE
+    | REPLACE
+    | REPLICA
+    | RESET
+    | RESTART
+    | RESTRICT
+    | RETURN
+    | RETURNS
+    | REVOKE
+    | RIGHT
+    | ROLE
+    | ROLLBACK
+    | ROLLUP
+    | ROUTINE
+    | ROUTINES
+    | ROW
+    | ROWS
+    | RULE
+    | SAVEPOINT
+    | SCALAR
+    | SCHEMA
+    | SCHEMAS
+    | SCROLL
+    | SEARCH
+    | SECURITY
+    | SELECT
+    | SEQUENCE
+    | SEQUENCES
+    | SERIALIZABLE
+    | SERVER
+    | SESSION
+    | SESSION_USER
+    | SET
+    | SETOF
+    | SETS
+    | SHARE
+    | SHOW
+    | SIMILAR
+    | SIMPLE
+    | SKIP_P
+    | SMALLINT
+    | SNAPSHOT
+    | SOME
+    | SOURCE
+    | SQL_P
+    | STABLE
+    | STANDALONE_P
+    | START
+    | STATEMENT
+    | STATISTICS
+    | STDIN
+    | STDOUT
+    | STORAGE
+    | STORED
+    | STRICT_P
+    | STRING_P
+    | STRIP_P
+    | SUBSCRIPTION
+    | SUBSTRING
+    | SUPPORT
+    | SYMMETRIC
+    | SYSID
+    | SYSTEM_P
+    | SYSTEM_USER
+    | TABLE
+    | TABLES
+    | TABLESAMPLE
+    | TABLESPACE
+    | TARGET
+    | TEMP
+    | TEMPLATE
+    | TEMPORARY
+    | TEXT_P
+    | THEN
+    | TIES
+    | TIME
+    | TIMESTAMP
+    | TRAILING
+    | TRANSACTION
+    | TRANSFORM
+    | TREAT
+    | TRIGGER
+    | TRIM
+    | TRUE_P
+    | TRUNCATE
+    | TRUSTED
+    | TYPE_P
+    | TYPES_P
+    | UESCAPE
+    | UNBOUNDED
+    | UNCOMMITTED
+    | UNCONDITIONAL
+    | UNENCRYPTED
+    | UNIQUE
+    | UNKNOWN
+    | UNLISTEN
+    | UNLOGGED
+    | UNTIL
+    | UPDATE
+    | USER
+    | USING
+    | VACUUM
+    | VALID
+    | VALIDATE
+    | VALIDATOR
+    | VALUE_P
+    | VALUES
+    | VARCHAR
+    | VARIADIC
+    | VERBOSE
+    | VERSION_P
+    | VIEW
+    | VIEWS
+    | VOLATILE
+    | WHEN
+    | WHITESPACE_P
+    | WORK
+    | WRAPPER
+    | WRITE
+    | XML_P
+    | XMLATTRIBUTES
+    | XMLCONCAT
+    | XMLELEMENT
+    | XMLEXISTS
+    | XMLFOREST
+    | XMLNAMESPACES
+    | XMLPARSE
+    | XMLPI
+    | XMLROOT
+    | XMLSERIALIZE
+    | XMLTABLE
+    | YES_P
+    | ZONE
     ;
 
 builtin_function_name
@@ -4868,7 +5349,6 @@ sharp
 option_value
     : sconst
     | reserved_keyword
-    | plsql_unreserved_keyword
     | unreserved_keyword
     ;
 
@@ -5451,7 +5931,6 @@ exitcond_
 
 any_identifier
     : colid
-    | plsql_unreserved_keyword
     ;
 
 plsql_unreserved_keyword
