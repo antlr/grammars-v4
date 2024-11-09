@@ -2973,8 +2973,14 @@ simple_select_intersect
 
 simple_select_pramary
     : (
-        SELECT (all_clause_? into_clause? target_list_? | distinct_clause target_list) into_clause? from_clause? where_clause? group_clause?
-            having_clause? window_clause?
+        SELECT
+	( all_clause_? (target_list_ | into_clause)*
+		from_clause? where_clause?
+		group_clause? having_clause? window_clause?
+	| distinct_clause target_list
+		into_clause? from_clause? where_clause?
+		group_clause? having_clause? window_clause?
+        )
     )
     | values_clause
     | TABLE relation_expr
@@ -3005,8 +3011,8 @@ with_clause_
     ;
 
 into_clause
-    : INTO (strict_? opttempTableName | into_target)
-    
+//    : INTO (strict_? opttempTableName | into_target)
+    : INTO opttempTableName
     ;
 
 strict_
