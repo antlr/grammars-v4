@@ -2045,7 +2045,6 @@ createfunc_opt_item
 //    | AS 'obj_file', 'link_symbol'
 
 func_as
-    locals[ParserRuleContext Definition]
     :
     /* |AS 'definition'*/ def = sconst
     /*| AS 'obj_file', 'link_symbol'*/
