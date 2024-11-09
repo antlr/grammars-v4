@@ -4922,8 +4922,7 @@ reserved_keyword
     ;
 
 bare_label_keyword
-    : 
-    | ABORT_P
+    : ABORT_P
     | ABSENT
     | ABSOLUTE_P
     | ACCESS

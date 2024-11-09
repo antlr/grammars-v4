@@ -1,7 +1,7 @@
 # PostgreSQL grammar
 
 PostgreSQL sql/pgsql grammar based on the
-[Bison grammar at the Github mirror](https://github.com/postgres/postgres/blob/9be4e5d293b554d8a0800790c57fc707a3b5cf0f/src/backend/parser/gram.y).
+Bison grammar at the Github mirror: [src/backend/parser/gram.y](https://github.com/postgres/postgres/blob/9be4e5d293b554d8a0800790c57fc707a3b5cf0f/src/backend/parser/gram.y).
 
 Lexer was derived from https://github.com/tunnelvisionlabs/antlr4-grammar-postgresql/blob/master/src/com/tunnelvisionlabs/postgresql/PostgreSqlLexer.g4.
 
