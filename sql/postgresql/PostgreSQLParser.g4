@@ -1835,6 +1835,10 @@ unique_
     
     ;
 
+single_name_
+    : colid
+    ;
+
 concurrently_
     : CONCURRENTLY
     
@@ -1950,9 +1954,6 @@ arg_class
 
 param_name
     : type_function_name
-    | builtin_function_name
-    | LEFT
-    | RIGHT
     ;
 
 func_return
@@ -1961,7 +1962,7 @@ func_return
 
 func_type
     : typename
-    | SETOF? (builtin_function_name | type_function_name | LEFT | RIGHT) attrs PERCENT TYPE_P
+    | SETOF? type_function_name attrs PERCENT TYPE_P
     ;
 
 func_arg_with_default
@@ -2159,34 +2160,23 @@ droptransformstmt
     ;
 
 reindexstmt
-    : REINDEX reindex_target_type concurrently_? qualified_name
-    | REINDEX reindex_target_multitable concurrently_? name
-    | REINDEX OPEN_PAREN reindex_option_list CLOSE_PAREN reindex_target_type concurrently_? qualified_name
-    | REINDEX OPEN_PAREN reindex_option_list CLOSE_PAREN reindex_target_multitable concurrently_? name
+    : REINDEX reindex_option_list? reindex_target_relation concurrently_? qualified_name
+    | REINDEX reindex_option_list? SCHEMA concurrently_? name
+    | REINDEX reindex_option_list? reindex_target_all concurrently_? single_name_?
     ;
 
-reindex_target_type
+reindex_target_relation
     : INDEX
     | TABLE
-    | SCHEMA
-    | DATABASE
-    | SYSTEM_P
     ;
 
-reindex_target_multitable
-    : SCHEMA
-    | SYSTEM_P
+reindex_target_all
+    : SYSTEM_P
     | DATABASE
     ;
 
 reindex_option_list
-    : reindex_option_elem (COMMA reindex_option_elem)*
-    ;
-
-reindex_option_elem
-    : VERBOSE
-    | TABLESPACE
-    | CONCURRENTLY
+    : OPEN_PAREN utility_option_list CLOSE_PAREN
     ;
 
 altertblspcstmt
@@ -2649,6 +2639,10 @@ analyzestmt
     | analyze_keyword OPEN_PAREN vac_analyze_option_list CLOSE_PAREN vacuum_relation_list_?
     ;
 
+utility_option_list
+    : utility_option_elem ( ',' utility_option_elem)*
+    ;
+
 vac_analyze_option_list
     : vac_analyze_option_elem (COMMA vac_analyze_option_elem)*
     ;
@@ -2656,6 +2650,21 @@ vac_analyze_option_list
 analyze_keyword
     : ANALYZE
     | ANALYSE
+    ;
+
+utility_option_elem
+    : utility_option_name utility_option_arg?
+    ;
+
+utility_option_name
+    : nonreservedword
+    | analyze_keyword
+    | FORMAT_LA
+    ;
+
+utility_option_arg
+    : boolean_or_string_
+    | numericonly
     ;
 
 vac_analyze_option_elem
@@ -2963,8 +2972,8 @@ simple_select_intersect
 simple_select_pramary
     : (
         SELECT
-	( all_clause_? (target_list_ | into_clause)*
-		from_clause? where_clause?
+	( all_clause_? target_list_?
+		into_clause? from_clause? where_clause?
 		group_clause? having_clause? window_clause?
 	| distinct_clause target_list
 		into_clause? from_clause? where_clause?
@@ -3357,7 +3366,7 @@ consttypename
     ;
 
 generictype
-    : (builtin_function_name | type_function_name | LEFT | RIGHT) attrs? type_modifiers_?
+    : type_function_name attrs? type_modifiers_?
     ;
 
 type_modifiers_
@@ -4050,7 +4059,6 @@ substr_list
     | a_expr FROM a_expr
     | a_expr FOR a_expr
     | a_expr SIMILAR a_expr ESCAPE a_expr
-    | expr_list
     ;
 
 trim_list
@@ -4304,11 +4312,8 @@ file_name
     ;
 
 func_name
-    : builtin_function_name
-    | type_function_name
+    : type_function_name
     | colid indirection
-    | LEFT
-    | RIGHT
     ;
 
 aexprconst
@@ -4377,18 +4382,35 @@ role_list
     : rolespec (COMMA rolespec)*
     ;
 
+/*
+ * Name classification hierarchy.
+ *
+ * IDENT is the lexeme returned by the lexer for identifiers that match
+ * no known keyword.  In most cases, we can accept certain keywords as
+ * names, not only IDENTs.	We prefer to accept as many such keywords
+ * as possible to minimize the impact of "reserved words" on programmers.
+ * So, we divide names into several possible classes.  The classification
+ * is chosen in part to make keywords acceptable as names wherever possible.
+ */
+
+/* Column identifier --- names that can be column, table, etc names.
+ */
 colid
     : identifier
     | unreserved_keyword
     | col_name_keyword
     ;
 
+/* Type/function identifier --- names that can be type or function names.
+ */
 type_function_name
     : identifier
     | unreserved_keyword
     | type_func_name_keyword
     ;
 
+/* Any not-fully-reserved word --- these names can be, eg, role names.
+ */
 nonreservedword
     : identifier
     | unreserved_keyword
@@ -4396,6 +4418,9 @@ nonreservedword
     | type_func_name_keyword
     ;
 
+/* Column label --- allowed labels in "AS" clauses.
+ * This presently includes *all* Postgres keywords.
+ */
 colLabel
     : identifier
     | unreserved_keyword
@@ -4405,23 +4430,29 @@ colLabel
     | EXIT //NB: not in gram.y official source.
     ;
 
+/* Bare column label --- names that can be column labels without writing "AS".
+ * This classification is orthogonal to the other keyword categories.
+ */
 bareColLabel
     : identifier
     | bare_label_keyword
     ;
 
-identifier
-    : Identifier uescape_?
-    | QuotedIdentifier
-    | UnicodeQuotedIdentifier
-    | plsqlvariablename
-    | plsqlidentifier
-    ;
+/*
+ * Keyword category lists.  Generally, every keyword present in
+ * the Postgres grammar should appear in exactly one of these lists.
+ *
+ * Put a new keyword into the first list that it can go into without causing
+ * shift or reduce conflicts.  The earlier lists define "less reserved"
+ * categories of keywords.
+ *
+ * Make sure that each keyword's category in kwlist.h matches where
+ * it is listed here.  (Someday we may be able to generate these lists and
+ * kwlist.h's table from one source of truth.)
+ */
 
-plsqlidentifier
-    : PLSQLIDENTIFIER
-    ;
-
+/* "Unreserved" keywords --- available for use as any kind of name.
+ */
 unreserved_keyword
     : ABORT_P
     | ABSENT
@@ -4753,6 +4784,16 @@ unreserved_keyword
     | ZONE
     ;
 
+/* Column identifier --- keywords that can be column, table, etc names.
+ *
+ * Many of these keywords will in fact be recognized as type or function
+ * names too; but they have special productions for the purpose, and so
+ * can't be treated as "generic" type or function names.
+ *
+ * The type names appearing here are not usable as function names
+ * because they can be followed by '(' in typename productions, which
+ * looks too much like a function call for an LR(1) parser.
+ */
 col_name_keyword
     : BETWEEN
     | BIGINT
@@ -4817,9 +4858,18 @@ col_name_keyword
     | XMLROOT
     | XMLSERIALIZE
     | XMLTABLE
-    | builtin_function_name
     ;
 
+/* Type/function identifier --- keywords that can be type or function names.
+ *
+ * Most of these are keywords that are used as operators in expressions;
+ * in general such keywords can't be column names because they would be
+ * ambiguous with variables, but they are unambiguous as function identifiers.
+ *
+ * Do not include POSITION, SUBSTRING, etc here since they have explicit
+ * productions in a_expr to support the goofy SQL9x argument syntax.
+ * - thomas 2000-11-28
+ */
 type_func_name_keyword
     : AUTHORIZATION
     | BINARY
@@ -4846,6 +4896,12 @@ type_func_name_keyword
     | VERBOSE
     ;
 
+/* Reserved keyword --- these keywords are usable only as a ColLabel.
+ *
+ * Keywords appear here if they could not be distinguished from variable,
+ * type, or function names in some contexts.  Don't put things here unless
+ * forced to.
+ */
 reserved_keyword
     : ALL
     | ANALYSE
@@ -4927,6 +4983,15 @@ reserved_keyword
     | WITH
     ;
 
+/*
+ * While all keywords can be used as column labels when preceded by AS,
+ * not all of them can be used as a "bare" column label without AS.
+ * Those that can be used as a bare label must be listed here,
+ * in addition to appearing in one of the category lists above.
+ *
+ * Always add a new keyword to this list if possible.  Mark it BARE_LABEL
+ * in kwlist.h if it is included here, or AS_LABEL if it is not.
+ */
 bare_label_keyword
     : ABORT_P
     | ABSENT
@@ -5382,138 +5447,15 @@ bare_label_keyword
     | ZONE
     ;
 
-builtin_function_name
-    : XMLCOMMENT
-    | XML_IS_WELL_FORMED
-    | XML_IS_WELL_FORMED_DOCUMENT
-    | XML_IS_WELL_FORMED_CONTENT
-    | XMLAGG
-    | XPATH
-    | XPATH_EXISTS
-    | ABS
-    | CBRT
-    | CEIL
-    | CEILING
-    | DEGREES
-    | DIV
-    | EXP
-    | FACTORIAL
-    | FLOOR
-    | GCD
-    | LCM
-    | LN
-    | LOG
-    | LOG10
-    | MIN_SCALE
-    | MOD
-    | PI
-    | POWER
-    | RADIANS
-    | ROUND
-    | SCALE
-    | SIGN
-    | SQRT
-    | TRIM_SCALE
-    | TRUNC
-    | WIDTH_BUCKET
-    | RANDOM
-    | SETSEED
-    | ACOS
-    | ACOSD
-    | ACOSH
-    | ASIN
-    | ASIND
-    | ASINH
-    | ATAN
-    | ATAND
-    | ATANH
-    | ATAN2
-    | ATAN2D
-    | COS
-    | COSD
-    | COSH
-    | COT
-    | COTD
-    | SIN
-    | SIND
-    | SINH
-    | TAN
-    | TAND
-    | TANH
-    | BIT_LENGTH
-    | CHAR_LENGTH
-    | CHARACTER_LENGTH
-    | LOWER
-    | OCTET_LENGTH
-    | OCTET_LENGTH
-    | UPPER
-    | ASCII
-    | BTRIM
-    | CHR
-    | CONCAT
-    | CONCAT_WS
-    | FORMAT
-    | INITCAP
-    | LENGTH
-    | LPAD
-    | LTRIM
-    | MD5
-    | PARSE_IDENT
-    | PG_CLIENT_ENCODING
-    | QUOTE_IDENT
-    | QUOTE_LITERAL
-    | QUOTE_NULLABLE
-    | REGEXP_COUNT
-    | REGEXP_INSTR
-    | REGEXP_LIKE
-    | REGEXP_MATCH
-    | REGEXP_MATCHES
-    | REGEXP_REPLACE
-    | REGEXP_SPLIT_TO_ARRAY
-    | REGEXP_SPLIT_TO_TABLE
-    | REGEXP_SUBSTR
-    | REPEAT
-    | REPLACE
-    | REVERSE
-    | RPAD
-    | RTRIM
-    | SPLIT_PART
-    | STARTS_WITH
-    | STRING_TO_ARRAY
-    | STRING_TO_TABLE
-    | STRPOS
-    | SUBSTR
-    | TO_ASCII
-    | TO_HEX
-    | TRANSLATE
-    | UNISTR
-    | AGE
-    | DATE_BIN
-    | DATE_PART
-    | DATE_TRUNC
-    | ISFINITE
-    | JUSTIFY_DAYS
-    | JUSTIFY_HOURS
-    | JUSTIFY_INTERVAL
-    | MAKE_DATE
-    | MAKE_INTERVAL
-    | MAKE_TIME
-    | MAKE_TIMESTAMP
-    | MAKE_TIMESTAMPTZ
-    | CLOCK_TIMESTAMP
-    | NOW
-    | STATEMENT_TIMESTAMP
-    | TIMEOFDAY
-    | TRANSACTION_TIMESTAMP
-    | TO_TIMESTAMP
-    | JUSTIFY_INTERVAL
-    | JUSTIFY_INTERVAL
-    | TO_CHAR
-    | TO_DATE
-    | TO_NUMBER
-    ;
-
 
 any_identifier
     : colid
     ;
+
+identifier
+    : Identifier uescape_?
+    | QuotedIdentifier
+    | UnicodeQuotedIdentifier
+    | PLSQLVARIABLENAME
+    ;
+
