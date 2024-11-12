@@ -10,9 +10,6 @@ at https://github.com/postgres/postgres/tree/master/src/test/regress/sql.
 
 # Issues
 
-* There are two warnings from the Antlr Tool in the parser grammar
-(`rule stmt_case contains an optional block with at least one alternative that can match an empty string`
-and `rule stmt_return contains an optional block with at least one alternative that can match an empty string`).
 * There are two warnings from the Antlr Tool in the lexer grammar
 (`non-fragment lexer rule AfterEscapeStringConstantMode_NotContinued can match the empty string` and `non-fragment lexer rule AfterEscapeStringConstantWithNewlineMode_NotContinued can match the empty string`).
 * The grammar is ambiguous.
