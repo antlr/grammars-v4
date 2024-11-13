@@ -29,6 +29,8 @@ options {
     superClass = PostgreSQLParserBase;
 }
 
+// Insert here @header for C++ parser.
+
 root
     : stmtblock EOF
     ;
@@ -1996,7 +1998,7 @@ aggregate_with_argtypes_list
 
 createfunc_opt_list
     : createfunc_opt_item+ {
-                ParseRoutineBody(_localctx);
+                this.ParseRoutineBody();
             }
     //                    | createfunc_opt_list createfunc_opt_item
     ;
