@@ -31,26 +31,26 @@ type PostgreSQLLexerBase struct {
 	stack StringStack
 }
 
-func (receiver *PostgreSQLLexerBase) pushTag() {
+func (receiver *PostgreSQLLexerBase) PushTag() {
 	receiver.stack.Push(receiver.GetText())
 }
 
-func (receiver *PostgreSQLLexerBase) isTag() bool {
+func (receiver *PostgreSQLLexerBase) IsTag() bool {
 	if receiver.stack.IsEmpty() {
 		return false
 	}
 	return receiver.GetText() == receiver.stack.PeekOrEmpty()
 }
 
-func (receiver *PostgreSQLLexerBase) popTag() {
+func (receiver *PostgreSQLLexerBase) PopTag() {
 	_, _ = receiver.stack.Pop()
 }
 
-func (receiver *PostgreSQLLexerBase) checkLA(c int) bool {
-	return receiver.GetInputStream().LA(1) != c
+func (receiver *PostgreSQLLexerBase) CheckLaMinus() bool {
+	return receiver.GetInputStream().LA(1) != '-'
 }
 
-func (receiver *PostgreSQLLexerBase) charIsLetter() bool {
+func (receiver *PostgreSQLLexerBase) CharIsLetter() bool {
 	c := receiver.GetInputStream().LA(-1)
 	return unicode.IsLetter(rune(c))
 }

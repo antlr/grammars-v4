@@ -201,7 +201,7 @@ func GetRoutineBodyString(rule *SconstContext) string {
 	return result.String()
 }
 
-func getPostgreSQLParser(script string) *PostgreSQLParser {
+func GetPostgreSQLParser(script string) *PostgreSQLParser {
 	stream := antlr.NewInputStream(script)
 	lexer := NewPostgreSQLLexer(stream)
 	tokenStream := antlr.NewCommonTokenStream(lexer, 0)

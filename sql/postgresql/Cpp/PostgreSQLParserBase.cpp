@@ -8,6 +8,10 @@ void PostgreSQLParserBase::ParseRoutineBody()
 
 bool PostgreSQLParserBase::OnlyAcceptableOps()
 {
-	return true;
+	auto c = ((CommonTokenStream*)this->getInputStream())->LT(1);
+	auto text = c->getText();
+	return text == "!" || text == "!!"
+			|| text == "!=-" // Code for specific example.
+			;
 }
 

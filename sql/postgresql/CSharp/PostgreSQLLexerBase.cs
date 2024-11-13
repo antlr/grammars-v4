@@ -27,21 +27,27 @@ using System.IO;
 
 public abstract class PostgreSQLLexerBase : Lexer
 {
-    protected static Stack<string> tags = new Stack<string>();
+    protected Stack<string> tags = new Stack<string>();
 
-	public PostgreSQLLexerBase(ICharStream input)
-		: base(input)
+    public PostgreSQLLexerBase(ICharStream input)
+        : base(input)
     {
     }
 
     public PostgreSQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-		: base(input, output, errorOutput)
+        : base(input, output, errorOutput)
     {
     }
 
-    public void PushTag() { tags.Push(this.Text); }
+    public void PushTag()
+    {
+        tags.Push(this.Text);
+    }
 
-    public bool IsTag() { return this.Text.Equals(tags.Peek()); }
+    public bool IsTag()
+    {
+        return this.Text.Equals(tags.Peek());
+    }
 
     public void PopTag()
     {
@@ -53,15 +59,15 @@ public abstract class PostgreSQLLexerBase : Lexer
         Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
     }
 
-	public bool CheckLaMinus()
-	{
-		return this.InputStream.LA(1) != '-';
-	}
+    public bool CheckLaMinus()
+    {
+        return this.InputStream.LA(1) != '-';
+    }
 
-	public bool CheckLaStar()
-	{
-		return this.InputStream.LA(1) != '*';
-	}
+    public bool CheckLaStar()
+    {
+        return this.InputStream.LA(1) != '*';
+    }
 
     public bool CharIsLetter()
     {
