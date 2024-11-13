@@ -27,7 +27,7 @@ using System.IO;
 
 public abstract class PostgreSQLLexerBase : Lexer
 {
-    protected static Queue<string> tags = new Queue<string>();
+    protected static Stack<string> tags = new Stack<string>();
 
 	public PostgreSQLLexerBase(ICharStream input)
 		: base(input)
@@ -39,13 +39,13 @@ public abstract class PostgreSQLLexerBase : Lexer
     {
     }
 
-    public void PushTag() { tags.Enqueue(this.Text); }
+    public void PushTag() { tags.Push(this.Text); }
 
     public bool IsTag() { return this.Text.Equals(tags.Peek()); }
 
     public void PopTag()
     {
-        tags.Dequeue();
+        tags.Pop();
     }
 
     public void UnterminatedBlockCommentDebugAssert()

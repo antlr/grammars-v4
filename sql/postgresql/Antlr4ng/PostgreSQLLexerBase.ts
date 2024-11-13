@@ -20,74 +20,96 @@ THE SOFTWARE.
 */
 
 import { CommonToken, Lexer, CharStream, Token, CommonTokenStream } from "antlr4ng";
-//import { PostgreSQLLexer } from './PostgreSQLLexer.js';
+import { PostgreSQLLexer } from './PostgreSQLLexer.js';
+
+
+interface IStack<T> {
+  push(item: T): void;
+  pop(): T | undefined;
+  peek(): T | undefined;
+  size(): number;
+}
+
+class Stack<T> implements IStack<T> {
+  private storage: T[] = [];
+
+  constructor(private capacity: number = Infinity) {}
+
+  push(item: T): void {
+    if (this.size() === this.capacity) {
+      throw Error("Stack has reached max capacity, you cannot add more items");
+    }
+    this.storage.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.storage.pop();
+  }
+
+  peek(): T | undefined {
+    return this.storage[this.size() - 1];
+  }
+
+  size(): number {
+    return this.storage.length;
+  }
+}
+
 
 export abstract class PostgreSQLLexerBase extends Lexer {
-//    protected static tags: Queue<string> = new Queue<string>();
+    protected tags: Stack<string> = new Stack();
 
     constructor(input: CharStream) {
         super(input);
     }
 
     public PushTag(): void {
-//        PostgreSQLLexerBase.tags.enqueue(this.input.toString());
+        this.tags.push(this.text);
     }
 
     public IsTag(): boolean {
-    return true;
-//        return this.input.toString() === PostgreSQLLexerBase.tags.peek();
+        return this.text === this.tags.peek();
     }
 
     public PopTag(): void {
-//        PostgreSQLLexerBase.tags.dequeue();
+	this.tags.pop();
     }
 
     public UnterminatedBlockCommentDebugAssert(): void {
-//        console.assert(this.inputStream.LA(1) === -1 /*EOF*/);
-    }
-
-    public CheckLaPlus(): boolean {
-return true;
-//        return this.inputStream.LA(1) !== '+'.charCodeAt(0);
+        console.assert(this.inputStream.LA(1) === -1 /*EOF*/);
     }
 
     public CheckLaMinus(): boolean {
-return true;
-//        return this.inputStream.LA(1) !== '-'.charCodeAt(0);
+        return this.inputStream.LA(1) !== '-'.charCodeAt(0);
     }
 
     public CheckLaStar(): boolean {
-return true;
-
-//        return this.inputStream.LA(1) !== '*'.charCodeAt(0);
+        return this.inputStream.LA(1) !== '*'.charCodeAt(0);
     }
 
     public CharIsLetter(): boolean {
-return true;
-//        return /^[a-zA-Z]$/.test(String.fromCharCode(this.inputStream.LA(-1)));
+        return /^[a-zA-Z]$/.test(String.fromCharCode(this.inputStream.LA(-1)));
     }
 
     public HandleNumericFail(): void {
-//        this.inputStream.seek(this.inputStream.index - 2);
+        this.inputStream.seek(this.inputStream.index - 2);
         // Assuming PostgreSQLLexer.Integral to be an enum or token type
-//        this.Type = PostgreSQLLexer.Integral; // Adjust as per actual token type definition
+        this.type = PostgreSQLLexer.Integral; // Adjust as per actual token type definition
     }
 
     public HandleLessLessGreaterGreater(): void {
-//        if (this.input.toString() === "<<") this.Type = PostgreSQLLexer.LESS_LESS;
-//        if (this.input.toString() === ">>") this.Type = PostgreSQLLexer.GREATER_GREATER;
+        if (this.text.toString() === "<<") this.type = PostgreSQLLexer.LESS_LESS;
+        if (this.text.toString() === ">>") this.type = PostgreSQLLexer.GREATER_GREATER;
     }
 
     public CheckIfUtf32Letter(): boolean {
-return true;
-//        const highSurrogate = String.fromCharCode(this.inputStream.LA(-2));
-//        const lowSurrogate = String.fromCharCode(this.inputStream.LA(-1));
-//        const combined = highSurrogate + lowSurrogate;
-//        return /^[a-zA-Z]$/.test(combined);
+        const highSurrogate = String.fromCharCode(this.inputStream.LA(-2));
+        const lowSurrogate = String.fromCharCode(this.inputStream.LA(-1));
+        const combined = highSurrogate + lowSurrogate;
+        return /^[a-zA-Z]$/.test(combined);
     }
 
     public IsSemiColon(): boolean {
-return true;
-//        return ';' === String.fromCharCode(this.inputStream.LA(1));
+        return ';' === String.fromCharCode(this.inputStream.LA(1));
     }
 }

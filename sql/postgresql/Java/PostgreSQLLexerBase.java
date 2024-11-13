@@ -22,34 +22,41 @@ THE SOFTWARE.
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Stack;
 
 public abstract class PostgreSQLLexerBase extends Lexer {
-    protected final Deque<String> tags = new ArrayDeque<>();
+    protected final Stack<String> tags = new Stack<>();
 
     protected PostgreSQLLexerBase(CharStream input) {
         super(input);
 
     }
 
-    public void pushTag() {
+    public void PushTag() {
         tags.push(getText());
     }
 
-    public boolean isTag() {
+    public boolean IsTag() {
         return getText().equals(tags.peek());
     }
 
-    public void popTag() {
+    public void PopTag() {
         tags.pop();
     }
 
-    public boolean checkLA(int c) {
-        return getInputStream().LA(1) != c;
+    public void UnterminatedBlockCommentDebugAssert() {
+	//Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
     }
 
-    public boolean charIsLetter() {
+    public boolean CheckLaMinus() {
+	return getInputStream().LA(1) != '-';
+    }
+
+    public boolean CheckLaStar() {
+	return getInputStream().LA(1) != '*';
+    }
+
+    public boolean CharIsLetter() {
         return Character.isLetter(getInputStream().LA(-1));
     }
 
@@ -61,10 +68,6 @@ public abstract class PostgreSQLLexerBase extends Lexer {
     public void HandleLessLessGreaterGreater() {
         if (getText() == "<<") setType(PostgreSQLLexer.LESS_LESS);
         if (getText() == ">>") setType(PostgreSQLLexer.GREATER_GREATER);
-    }
-
-    public void UnterminatedBlockCommentDebugAssert() {
-        //Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
     }
 
     public boolean CheckIfUtf32Letter() {
