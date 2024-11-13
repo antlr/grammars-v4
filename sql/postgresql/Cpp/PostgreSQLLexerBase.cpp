@@ -41,7 +41,7 @@ bool PostgreSQLLexerBase::CheckLaStar()
 
 bool PostgreSQLLexerBase::CharIsLetter()
 {
-	return std::isalpha(static_cast<char>(this->getInputStream()->LA(-1)));
+	return std::iswalpha(static_cast<char>(this->getInputStream()->LA(-1)));
 }
 
 void PostgreSQLLexerBase::HandleNumericFail()
