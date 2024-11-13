@@ -72,7 +72,7 @@ bool PostgreSQLLexerBase::CheckIfUtf32Letter()
 {
 	char high = static_cast<char>(this->getInputStream()->LA(-2));
 	char low = static_cast<char>(this->getInputStream()->LA(-1));
-	return std::iswalpha(toCodePoint(high, low), std::locale());
+	return std::iswalpha(toCodePoint(high, low));
 }
 
 bool PostgreSQLLexerBase::IsSemiColon()
