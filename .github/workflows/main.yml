@@ -167,7 +167,7 @@ jobs:
         } elseif ("${{ matrix.os }}" -eq "windows-latest") {
             _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
         } elseif ("${{ matrix.os }}" -eq "macos-latest") {
-            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After" -buildonly:true
+            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After" -buildonly:1
         }
 
   static-check:
