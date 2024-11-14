@@ -1461,7 +1461,9 @@ DollarText:
     '$' ~ '$'*
 ;
 
-EndDollarStringConstant: ('$' Tag? '$') {this.IsTag()}? {this.PopTag();} -> popMode;
+// NB: Next rule on two lines in order to make transformGrammar.py easy.
+EndDollarStringConstant: ('$' Tag? '$') {this.IsTag()}?
+    {this.PopTag();} -> popMode;
 
 mode META;
 MetaSemi : {this.IsSemiColon()}? ';' -> type(SEMI), popMode ;

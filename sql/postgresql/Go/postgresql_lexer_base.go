@@ -21,70 +21,78 @@ THE SOFTWARE.
 package parser
 
 import (
-	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"unicode"
+    "github.com/antlr4-go/antlr/v4"
+    "unicode"
 )
 
 type PostgreSQLLexerBase struct {
-	*antlr.BaseLexer
+    *antlr.BaseLexer
 
-	stack StringStack
+    stack StringStack
 }
 
 func (receiver *PostgreSQLLexerBase) PushTag() {
-	receiver.stack.Push(receiver.GetText())
+    receiver.stack.Push(receiver.GetText())
 }
 
 func (receiver *PostgreSQLLexerBase) IsTag() bool {
-	if receiver.stack.IsEmpty() {
-		return false
-	}
-	return receiver.GetText() == receiver.stack.PeekOrEmpty()
+    if receiver.stack.IsEmpty() {
+        return false
+    }
+    return receiver.GetText() == receiver.stack.PeekOrEmpty()
 }
 
 func (receiver *PostgreSQLLexerBase) PopTag() {
-	_, _ = receiver.stack.Pop()
+    _, _ = receiver.stack.Pop()
 }
 
 func (receiver *PostgreSQLLexerBase) CheckLaMinus() bool {
-	return receiver.GetInputStream().LA(1) != '-'
+    return receiver.GetInputStream().LA(1) != '-'
+}
+
+func (receiver *PostgreSQLLexerBase) CheckLaStar() bool {
+    return receiver.GetInputStream().LA(1) != '*'
 }
 
 func (receiver *PostgreSQLLexerBase) CharIsLetter() bool {
-	c := receiver.GetInputStream().LA(-1)
-	return unicode.IsLetter(rune(c))
+    c := receiver.GetInputStream().LA(-1)
+    return unicode.IsLetter(rune(c))
 }
 
 func (receiver *PostgreSQLLexerBase) HandleNumericFail() {
-	index := receiver.GetInputStream().Index() - 2
-	receiver.GetInputStream().Seek(index)
-	receiver.SetType(PostgreSQLLexerIntegral)
+    index := receiver.GetInputStream().Index() - 2
+    receiver.GetInputStream().Seek(index)
+    receiver.SetType(PostgreSQLLexerIntegral)
 }
 
 func (receiver *PostgreSQLLexerBase) HandleLessLessGreaterGreater() {
-	if receiver.GetText() == "<<" {
-		receiver.SetType(PostgreSQLLexerLESS_LESS)
-	}
-	if receiver.GetText() == ">>" {
-		receiver.SetType(PostgreSQLLexerGREATER_GREATER)
-	}
+    if receiver.GetText() == "<<" {
+        receiver.SetType(PostgreSQLLexerLESS_LESS)
+    }
+    if receiver.GetText() == ">>" {
+        receiver.SetType(PostgreSQLLexerGREATER_GREATER)
+    }
 }
 
 func (receiver *PostgreSQLLexerBase) UnterminatedBlockCommentDebugAssert() {
-	//Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
+    //Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
 }
 
 func (receiver *PostgreSQLLexerBase) CheckIfUtf32Letter() bool {
-	codePoint := receiver.GetInputStream().LA(-2)<<8 + receiver.GetInputStream().LA(-1)
-	var c []rune
-	if codePoint < 0x10000 {
-		c = []rune{rune(codePoint)}
-	} else {
-		codePoint -= 0x10000
-		c = []rune{
-			(rune)(codePoint/0x400 + 0xd800),
-			(rune)(codePoint%0x400 + 0xdc00),
-		}
-	}
-	return unicode.IsLetter(c[0])
+    codePoint := receiver.GetInputStream().LA(-2)<<8 + receiver.GetInputStream().LA(-1)
+    var c []rune
+    if codePoint < 0x10000 {
+        c = []rune{rune(codePoint)}
+    } else {
+        codePoint -= 0x10000
+        c = []rune{
+            (rune)(codePoint/0x400 + 0xd800),
+            (rune)(codePoint%0x400 + 0xdc00),
+        }
+    }
+    return unicode.IsLetter(c[0])
+}
+
+func (receiver *PostgreSQLLexerBase) IsSemiColon() bool {
+    return receiver.GetInputStream().LA(1) == ';'
 }
