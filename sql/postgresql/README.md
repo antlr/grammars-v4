@@ -8,6 +8,13 @@ Lexer was derived from https://github.com/tunnelvisionlabs/antlr4-grammar-postgr
 Sample SQL tests are derived from the sources
 at https://github.com/postgres/postgres/tree/master/src/test/regress/sql.
 
+# Target Agnostic
+
+This grammar is target agnostic. Therefore the grammar contains certain patterns
+that may not work for a give target. If the file transformGrammar.py exists
+for the target, run `python transformGrammar.py` from the command line to alter the
+.g4 files for the specific target.
+
 # Issues
 
 * There are two warnings from the Antlr Tool in the lexer grammar
