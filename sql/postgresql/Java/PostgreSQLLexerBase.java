@@ -45,15 +45,15 @@ public abstract class PostgreSQLLexerBase extends Lexer {
     }
 
     public void UnterminatedBlockCommentDebugAssert() {
-	//Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
+        //Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
     }
 
     public boolean CheckLaMinus() {
-	return getInputStream().LA(1) != '-';
+        return getInputStream().LA(1) != '-';
     }
 
     public boolean CheckLaStar() {
-	return getInputStream().LA(1) != '*';
+        return getInputStream().LA(1) != '*';
     }
 
     public boolean CharIsLetter() {
@@ -84,6 +84,6 @@ public abstract class PostgreSQLLexerBase extends Lexer {
 
     public boolean IsSemiColon()
     {
-	return  ';' == (char)getInputStream().LA(1);
+        return  ';' == (char)getInputStream().LA(1);
     }
 }

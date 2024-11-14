@@ -37,7 +37,7 @@ public abstract class PostgreSQLParserBase extends Parser {
     }
 
     public void ParseRoutineBody() {
-	PostgreSQLParser.Createfunc_opt_listContext _localctx = (PostgreSQLParser.Createfunc_opt_listContext) this.getContext();
+        PostgreSQLParser.Createfunc_opt_listContext _localctx = (PostgreSQLParser.Createfunc_opt_listContext) this.getContext();
         String lang = null;
         for (PostgreSQLParser.Createfunc_opt_itemContext coi : _localctx.createfunc_opt_item()) {
             if (coi.LANGUAGE() != null) {
