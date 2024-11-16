@@ -2,5 +2,9 @@
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
     <antlr-version>^4.11</antlr-version>
     <entry-point>sql_script</entry-point>
-    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;PHP;Python3;TypeScript;Antlr4ng</targets>
+
+    <!-- Cpp - many conflicts with Windows builds -->
+    <!-- Dart - conflicts with 'depth' rule -->
+    <!-- PHP - fails on examples/dml/select/select.sql, idk why -->
+    <targets>CSharp;Go;Java;JavaScript;Python3;TypeScript;Antlr4ng</targets>
 </desc>
