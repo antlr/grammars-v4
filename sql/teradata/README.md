@@ -23,11 +23,6 @@ in `group_by_spec` and `ordinary_grouping_set` rules.
 - 4.0.0 - all rules should consist of smaller rules appropriate for easy analysis and interpretation 
 of interesting parts of the parsed SQL.  
 
-## Code style guidelines  
-
-Please, follow simple rules in this section when contributing to the grammar.  
-
-### Naming  
+## Naming  
 - Rules for SQL statements should have suffix `_stat`.  
 - Please, do not use obscure abbreviations, ambiguous names and names similar to existing ones.
-
