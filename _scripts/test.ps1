@@ -1,7 +1,8 @@
 param (
     [string]$target='CSharp',
     [string]$pc,
-    [string]$cc
+    [string]$cc,
+    [bool]$buildonly=$false
 )
 
 function Get-GrammarSkip {
@@ -123,22 +124,23 @@ function Test-Grammar {
         }
 
         # test
-        $start2 = Get-Date
-        Write-Host "--- Testing files ---"
-$workingDirectory = Get-Location
-Write-Host "The pwd is  $workingDirectory"
-        ./test.ps1
-        $passed = $LASTEXITCODE -eq 0
-
-        if (! $passed) {
-            $success = $false
-            $failStage = [FailStage]::Test
-            Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
-            Set-Location $cwd
-            return @{
-                Success     = $success
-                Stage       = $failStage
-                FailedCases = $failedList
+        if (! $buildonly) {
+            $start2 = Get-Date
+            Write-Host "--- Testing files ---"
+            $workingDirectory = Get-Location
+            Write-Host "The pwd is  $workingDirectory"
+            ./test.ps1
+            $passed = $LASTEXITCODE -eq 0
+            if (! $passed) {
+                $success = $false
+                $failStage = [FailStage]::Test
+                Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+                Set-Location $cwd
+                return @{
+                    Success     = $success
+                    Stage       = $failStage
+                    FailedCases = $failedList
+                }
             }
         }
     }
