@@ -3339,8 +3339,10 @@ xml_namespace_el
     ;
 
 typename
-    : SETOF? simpletypename (opt_array_bounds | ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
-    | qualified_name PERCENT (ROWTYPE | TYPE_P)
+    : SETOF? simpletypename
+	( opt_array_bounds
+	| ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?
+	)
     ;
 
 opt_array_bounds
@@ -3653,7 +3655,7 @@ a_expr_mul
 /* 5*/
 
 a_expr_caret
-    : a_expr_unary_sign (CARET a_expr)?
+    : a_expr_unary_sign (CARET a_expr_unary_sign)?
     ;
 
 /* 4*/
@@ -3709,7 +3711,6 @@ c_expr
     | /*22*/ UNIQUE select_with_parens                                 # c_expr_expr
     | columnref                                                        # c_expr_expr
     | aexprconst                                                       # c_expr_expr
-    | plsqlvariablename                                                # c_expr_expr
     | OPEN_PAREN a_expr_in_parens = a_expr CLOSE_PAREN opt_indirection # c_expr_expr
     | case_expr                                                        # c_expr_case
     | func_expr                                                        # c_expr_expr
@@ -4797,7 +4798,7 @@ unreserved_keyword
 col_name_keyword
     : BETWEEN
     | BIGINT
-    | bit
+    | BIT
     | BOOLEAN_P
     | CHAR_P
     | character
@@ -4831,7 +4832,7 @@ col_name_keyword
     | NONE
     | NORMALIZE
     | NULLIF
-    | numeric
+    | NUMERIC
     | OUT_P
     | OVERLAY
     | POSITION
