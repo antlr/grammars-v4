@@ -39,7 +39,7 @@ options {
 }
 
 compilationUnit
-    : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')*
+    : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
     | moduleDeclaration EOF
     ;
 
@@ -599,8 +599,8 @@ methodCall
 expression
     // Expression order in accordance with https://introcs.cs.princeton.edu/java/11precedence/
     // Level 16, Primary, array and member access
-    : primary
-    | expression '[' expression ']'
+    : primary                                                       #PrimaryExpression
+    | expression '[' expression ']'                                 #SquareBracketExpression
     | expression bop = '.' (
         identifier
         | methodCall
@@ -608,37 +608,50 @@ expression
         | NEW nonWildcardTypeArguments? innerCreator
         | SUPER superSuffix
         | explicitGenericInvocation
-    )
+    )                                                               #MemberReferenceExpression
     // Method calls and method references are part of primary, and hence level 16 precedence
-    | methodCall
-    | expression '::' typeArguments? identifier
-    | typeType '::' (typeArguments? identifier | NEW)
-    | classType '::' typeArguments? NEW
-    | switchExpression // Java17
+    | methodCall                                                    #MethodCallExpression
+    | expression '::' typeArguments? identifier                     #MethodReferenceExpression
+    | typeType '::' (typeArguments? identifier | NEW)               #MethodReferenceExpression
+    | classType '::' typeArguments? NEW                             #MethodReferenceExpression
+    
+    // Java17
+    | switchExpression                                              #ExpressionSwitch
 
     // Level 15 Post-increment/decrement operators
-    | expression postfix = ('++' | '--')
+    | expression postfix = ('++' | '--')                            #PostIncrementDecrementOperatorExpression
 
     // Level 14, Unary operators
-    | prefix = ('+' | '-' | '++' | '--' | '~' | '!') expression
+    | prefix = ('+' | '-' | '++' | '--' | '~' | '!') expression     #UnaryOperatorExpression
 
     // Level 13 Cast and object creation
-    | '(' annotation* typeType ('&' typeType)* ')' expression
-    | NEW creator
+    | '(' annotation* typeType ('&' typeType)* ')' expression       #CastExpression
+    | NEW creator                                                   #ObjectCreationExpression
 
     // Level 12 to 1, Remaining operators
-    | expression bop = ('*' | '/' | '%') expression           // Level 12, Multiplicative operators
-    | expression bop = ('+' | '-') expression                 // Level 11, Additive operators
-    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression // Level 10, Shift operators
-    | expression bop = ('<=' | '>=' | '>' | '<') expression   // Level 9, Relational operators
-    | expression bop = INSTANCEOF (typeType | pattern)
-    | expression bop = ('==' | '!=') expression                      // Level 8, Equality Operators
-    | expression bop = '&' expression                                // Level 7, Bitwise AND
-    | expression bop = '^' expression                                // Level 6, Bitwise XOR
-    | expression bop = '|' expression                                // Level 5, Bitwise OR
-    | expression bop = '&&' expression                               // Level 4, Logic AND
-    | expression bop = '||' expression                               // Level 3, Logic OR
-    | <assoc = right> expression bop = '?' expression ':' expression // Level 2, Ternary
+    // Level 12, Multiplicative operators
+    | expression bop = ('*' | '/' | '%') expression           #BinaryOperatorExpression
+    // Level 11, Additive operators
+    | expression bop = ('+' | '-') expression                 #BinaryOperatorExpression
+    // Level 10, Shift operators
+    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression #BinaryOperatorExpression
+    // Level 9, Relational operators
+    | expression bop = ('<=' | '>=' | '>' | '<') expression   #BinaryOperatorExpression
+    | expression bop = INSTANCEOF (typeType | pattern)        #InstanceOfOperatorExpression
+    // Level 8, Equality Operators
+    | expression bop = ('==' | '!=') expression               #BinaryOperatorExpression
+    // Level 7, Bitwise AND
+    | expression bop = '&' expression                         #BinaryOperatorExpression
+    // Level 6, Bitwise XOR
+    | expression bop = '^' expression                         #BinaryOperatorExpression
+    // Level 5, Bitwise OR
+    | expression bop = '|' expression                         #BinaryOperatorExpression
+    // Level 4, Logic AND
+    | expression bop = '&&' expression                        #BinaryOperatorExpression
+    // Level 3, Logic OR
+    | expression bop = '||' expression                        #BinaryOperatorExpression
+    // Level 2, Ternary
+    | <assoc = right> expression bop = '?' expression ':' expression #TernaryExpression
     // Level 1, Assignment
     | <assoc = right> expression bop = (
         '='
@@ -653,10 +666,10 @@ expression
         | '>>>='
         | '<<='
         | '%='
-    ) expression
+    ) expression                                              #BinaryOperatorExpression
 
-    // Level 0, Lambda Expression
-    | lambdaExpression // Java8
+    // Level 0, Lambda Expression // Java8
+    | lambdaExpression                                        #ExpressionLambda
     ;
 
 // Java17
