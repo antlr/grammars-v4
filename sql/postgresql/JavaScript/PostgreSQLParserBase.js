@@ -1,6 +1,7 @@
 /*
 PostgreSQL grammar.
 The MIT License (MIT).
+Copyright (c) 2021-2023, Oleksii Kovalov (Oleksii.Kovalov@outlook.com).
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -18,12 +19,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package parser
+import antlr4 from 'antlr4';
 
-type PostgreSQLParseError struct {
-	Number  int
-	Offset  int
-	Line    int
-	Column  int
-	Message string
+export default class PostgreSQLParserBase extends antlr4.Parser {
+
+	constructor(input) {
+		super(input);
+	}
+
+	ParseRoutineBody() {
+	}
+
+	OnlyAcceptableOps() {
+		const c = this._input.LT(1);
+		const text = c.text;
+		return text === '!' || text === '!!' || text === '!=-'; // Code for specific example
+	}
 }

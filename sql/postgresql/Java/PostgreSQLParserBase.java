@@ -31,12 +31,13 @@ public abstract class PostgreSQLParserBase extends Parser {
     }
 
     ParserRuleContext GetParsedSqlTree(String script, int line) {
-        PostgreSQLParser ph = getPostgreSQLParser(script);
+        PostgreSQLParser ph = GetPostgreSQLParser(script);
         ParserRuleContext result = ph.root();
         return result;
     }
 
-    public void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx) {
+    public void ParseRoutineBody() {
+        PostgreSQLParser.Createfunc_opt_listContext _localctx = (PostgreSQLParser.Createfunc_opt_listContext) this.getContext();
         String lang = null;
         for (PostgreSQLParser.Createfunc_opt_itemContext coi : _localctx.createfunc_opt_item()) {
             if (coi.LANGUAGE() != null) {
@@ -66,7 +67,7 @@ public abstract class PostgreSQLParserBase extends Parser {
             switch (lang) {
                 case "plpgsql":
                     //NB: Cannot be done this way.
-                    //PostgreSQLParser ph = getPostgreSQLParser(txt);
+                    //PostgreSQLParser ph = GetPostgreSQLParser(txt);
                     //func_as.func_as().Definition = ph.plsqlroot();
                     break;
                 case "sql":
@@ -109,7 +110,7 @@ public abstract class PostgreSQLParserBase extends Parser {
         return result;
     }
 
-    public PostgreSQLParser getPostgreSQLParser(String script) {
+    public PostgreSQLParser GetPostgreSQLParser(String script) {
         CharStream charStream = CharStreams.fromString(script);
         Lexer lexer = new PostgreSQLLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

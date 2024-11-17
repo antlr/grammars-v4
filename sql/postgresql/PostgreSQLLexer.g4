@@ -43,21 +43,9 @@ options {
     caseInsensitive = true;
 }
 
-@header {
-}
-@members {
-/* This field stores the tags which are used to detect the end of a dollar-quoted string literal.
- */
-}
-//
 
-// SPECIAL CHARACTERS (4.1.4)
+// Insert here @header for C++ lexer.
 
-//
-
-// Note that Asterisk is a valid operator, but does not have the type Operator due to its syntactic use in locations
-
-// that are not expressions.
 
 Dollar: '$';
 
@@ -127,16 +115,14 @@ Operator:
     (
         (
             OperatorCharacter
-            | ('+' | '-' {checkLA('-')}?)+ (OperatorCharacter | '/' {checkLA('*')}?)
-            | '/'        {checkLA('*')}?
+            | ('+' | '-' {this.CheckLaMinus()}? )+ (OperatorCharacter | '/' {this.CheckLaStar()}? )
+            | '/'        {this.CheckLaStar()}?
         )+
         | // special handling for the single-character operators + and -
         [+-]
     )
     //TODO somehow rewrite this part without using Actions
-    {
-    HandleLessLessGreaterGreater();
-   }
+    {this.HandleLessLessGreaterGreater();}
 ;
 /* This rule handles operators which end with + or -, and sets the token type to Operator. It is comprised of four
  * parts, in order:
@@ -150,9 +136,9 @@ Operator:
  */
 
 OperatorEndingWithPlusMinus:
-    (OperatorCharacterNotAllowPlusMinusAtEnd | '-' {checkLA('-')}? | '/' {checkLA('*')}?)* OperatorCharacterAllowPlusMinusAtEnd Operator? (
+    (OperatorCharacterNotAllowPlusMinusAtEnd | '-' {this.CheckLaMinus()}? | '/' {this.CheckLaStar()}? )* OperatorCharacterAllowPlusMinusAtEnd Operator? (
         '+'
-        | '-' {checkLA('-')}?
+        | '-' {this.CheckLaMinus()}?
     )+        -> type (Operator)
 ;
 // Each of the following fragment rules omits the +, -, and / characters, which must always be handled in a special way
@@ -1229,11 +1215,9 @@ fragment IdentifierStartChar options {
     | // these are the valid characters from 0x80 to 0xFF
     [\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]
     |                               // these are the letters above 0xFF which only need a single UTF-16 code unit
-    [\u0100-\uD7FF\uE000-\uFFFF]    {charIsLetter()}?
+    [\u0100-\uD7FF\uE000-\uFFFF]    {this.CharIsLetter()}?
     |                               // letters which require multiple UTF-16 code units
-    [\uD800-\uDBFF] [\uDC00-\uDFFF] {
-    CheckIfUtf32Letter()
-   }?
+    [\uD800-\uDBFF] [\uDC00-\uDFFF] {this.CheckIfUtf32Letter()}?
 ;
 
 fragment IdentifierChar: StrictIdentifierChar | '$';
@@ -1306,7 +1290,7 @@ UnicodeEscapeStringConstant: UnterminatedUnicodeEscapeStringConstant '\'';
 UnterminatedUnicodeEscapeStringConstant: 'U' '&' UnterminatedStringConstant;
 // Dollar-quoted String Constants (4.1.2.4)
 
-BeginDollarStringConstant: '$' Tag? '$' {pushTag();} -> pushMode (DollarQuotedStringMode);
+BeginDollarStringConstant: '$' Tag? '$' {this.PushTag();} -> pushMode (DollarQuotedStringMode);
 /* "The tag, if any, of a dollar-quoted string follows the same rules as an
  * unquoted identifier, except that it cannot contain a dollar sign."
  */
@@ -1333,7 +1317,7 @@ InvalidUnterminatedHexadecimalStringConstant: 'X' UnterminatedStringConstant;
 
 Integral: Digits;
 
-NumericFail: Digits '..' {HandleNumericFail();};
+NumericFail: Digits '..' {this.HandleNumericFail();};
 
 Numeric:
     Digits '.' Digits? /*? replaced with + to solve problem with DOT_DOT .. but this surely must be rewriten */ (
@@ -1380,9 +1364,7 @@ UnterminatedBlockComment:
     // Handle the case of / or * characters at the end of the file, or a nested unterminated block comment
     ('/'+ | '*'+ | '/'* UnterminatedBlockComment)?
     // Optional assertion to make sure this rule is working as intended
-    {
-            UnterminatedBlockCommentDebugAssert();
-   }
+    {this.UnterminatedBlockCommentDebugAssert();}
 ;
 //
 
@@ -1417,9 +1399,7 @@ UnterminatedEscapeStringConstant:
     '\\'? EOF
 ;
 
-fragment EscapeStringText options {
-    caseInsensitive = false;
-}:
+fragment EscapeStringText options { caseInsensitive = false; }:
     (
         '\'\''
         | '\\' (
@@ -1453,7 +1433,6 @@ AfterEscapeStringConstantMode_Newline:
 ;
 
 AfterEscapeStringConstantMode_NotContinued:
-     {} // intentionally empty
      -> skip, popMode
 ;
 
@@ -1469,7 +1448,6 @@ AfterEscapeStringConstantWithNewlineMode_Continued:
 ;
 
 AfterEscapeStringConstantWithNewlineMode_NotContinued:
-     {} // intentionally empty
      -> skip, popMode
 ;
 
@@ -1483,8 +1461,10 @@ DollarText:
     '$' ~ '$'*
 ;
 
-EndDollarStringConstant: ('$' Tag? '$') {isTag()}? {popTag();} -> popMode;
+// NB: Next rule on two lines in order to make transformGrammar.py easy.
+EndDollarStringConstant: ('$' Tag? '$') {this.IsTag()}?
+    {this.PopTag();} -> popMode;
 
 mode META;
-MetaSemi : { this.IsSemiColon() }? ';' -> type(SEMI), popMode ;
+MetaSemi : {this.IsSemiColon()}? ';' -> type(SEMI), popMode ;
 MetaOther : ~[;\r\n\\"] .*? ('\\\\' | [\r\n]+) -> type(SEMI), popMode ;

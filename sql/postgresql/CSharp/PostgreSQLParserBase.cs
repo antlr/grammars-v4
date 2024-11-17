@@ -28,11 +28,13 @@ using System.Text;
 
 public abstract class PostgreSQLParserBase : Parser
 {
-    public PostgreSQLParserBase(ITokenStream input) : base(input)
+    public PostgreSQLParserBase(ITokenStream input)
+        : base(input)
     {
     }
 
-    public PostgreSQLParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : base(input, output, errorOutput)
+    public PostgreSQLParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
+        : base(input, output, errorOutput)
     {
     }
 
@@ -43,8 +45,9 @@ public abstract class PostgreSQLParserBase : Parser
         return result;
     }
 
-    internal void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx)
+    internal void ParseRoutineBody()
     {
+        PostgreSQLParser.Createfunc_opt_listContext _localctx = this.Context as PostgreSQLParser.Createfunc_opt_listContext;
         var lang =
             _localctx
                 .createfunc_opt_item()
@@ -81,7 +84,7 @@ public abstract class PostgreSQLParserBase : Parser
         return string.IsNullOrEmpty(s) ? s : s.Substring(1, s.Length - 2);
     }
 
-    public string unquote(string s)
+    private string unquote(string s)
     {
         var r = new StringBuilder(s.Length);
         var i = 0;
@@ -95,7 +98,7 @@ public abstract class PostgreSQLParserBase : Parser
         return r.ToString();
     }
 
-    public string GetRoutineBodyString(PostgreSQLParser.SconstContext rule)
+    private string GetRoutineBodyString(PostgreSQLParser.SconstContext rule)
     {
         var anysconst = rule.anysconst();
         var StringConstant = anysconst.StringConstant();
@@ -113,7 +116,7 @@ public abstract class PostgreSQLParserBase : Parser
         return result;
     }
 
-    public PostgreSQLParser getPostgreSQLParser(string script)
+    private PostgreSQLParser getPostgreSQLParser(string script)
     {
         var charStream = CharStreams.fromString(script);
         var lexer = new PostgreSQLLexer(charStream);

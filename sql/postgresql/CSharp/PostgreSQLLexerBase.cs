@@ -25,32 +25,33 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-public class PostgreSQLLexerBase : Lexer
+public abstract class PostgreSQLLexerBase : Lexer
 {
-    protected static Queue<string> tags = new Queue<string>();
+    protected Stack<string> tags = new Stack<string>();
 
-    public PostgreSQLLexerBase(ICharStream input) : base(input)
+    public PostgreSQLLexerBase(ICharStream input)
+        : base(input)
     {
     }
+
     public PostgreSQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-    : base(input, output, errorOutput)
+        : base(input, output, errorOutput)
     {
     }
 
-    private IIntStream getInputStream() { return InputStream; }
-    public override string[] RuleNames => throw new NotImplementedException();
-
-    public override IVocabulary Vocabulary => throw new NotImplementedException();
-
-    public override string GrammarFileName => throw new NotImplementedException();
-
-    public void pushTag() { tags.Enqueue(this.Text); }
-
-    public bool isTag() { return this.Text.Equals(tags.Peek()); }
-
-    public void popTag()
+    public void PushTag()
     {
-        tags.Dequeue();
+        tags.Push(this.Text);
+    }
+
+    public bool IsTag()
+    {
+        return this.Text.Equals(tags.Peek());
+    }
+
+    public void PopTag()
+    {
+        tags.Pop();
     }
 
     public void UnterminatedBlockCommentDebugAssert()
@@ -58,19 +59,24 @@ public class PostgreSQLLexerBase : Lexer
         Debug.Assert(InputStream.LA(1) == -1 /*EOF*/);
     }
 
-    public bool checkLA(int c)
+    public bool CheckLaMinus()
     {
-        return getInputStream().LA(1) != c;
+        return this.InputStream.LA(1) != '-';
     }
 
-    public bool charIsLetter()
+    public bool CheckLaStar()
+    {
+        return this.InputStream.LA(1) != '*';
+    }
+
+    public bool CharIsLetter()
     {
         return Char.IsLetter((char)InputStream.LA(-1));
     }
 
     public void HandleNumericFail()
     {
-        InputStream.Seek(getInputStream().Index - 2);
+        InputStream.Seek(this.InputStream.Index - 2);
         Type = PostgreSQLLexer.Integral;
     }
 

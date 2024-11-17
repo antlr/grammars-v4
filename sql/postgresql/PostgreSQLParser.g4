@@ -29,6 +29,8 @@ options {
     superClass = PostgreSQLParserBase;
 }
 
+// Insert here @header for C++ parser.
+
 root
     : stmtblock EOF
     ;
@@ -1544,8 +1546,8 @@ reassignownedstmt
     ;
 
 dropstmt
-    : DROP object_type_any_name IF_P EXISTS any_name_list drop_behavior_?
-    | DROP object_type_any_name any_name_list drop_behavior_?
+    : DROP object_type_any_name IF_P EXISTS any_name_list_ drop_behavior_?
+    | DROP object_type_any_name any_name_list_ drop_behavior_?
     | DROP drop_type_name IF_P EXISTS name_list drop_behavior_?
     | DROP drop_type_name name_list drop_behavior_?
     | DROP object_type_name_on_any_name name ON any_name drop_behavior_?
@@ -1554,8 +1556,8 @@ dropstmt
     | DROP TYPE_P IF_P EXISTS type_name_list drop_behavior_?
     | DROP DOMAIN_P type_name_list drop_behavior_?
     | DROP DOMAIN_P IF_P EXISTS type_name_list drop_behavior_?
-    | DROP INDEX CONCURRENTLY any_name_list drop_behavior_?
-    | DROP INDEX CONCURRENTLY IF_P EXISTS any_name_list drop_behavior_?
+    | DROP INDEX CONCURRENTLY any_name_list_ drop_behavior_?
+    | DROP INDEX CONCURRENTLY IF_P EXISTS any_name_list_ drop_behavior_?
     ;
 
 object_type_any_name
@@ -1599,7 +1601,7 @@ object_type_name_on_any_name
     | TRIGGER
     ;
 
-any_name_list
+any_name_list_
     : any_name (COMMA any_name)*
     ;
 
@@ -1746,12 +1748,12 @@ privilege_target
     | PROCEDURE function_with_argtypes_list
     | ROUTINE function_with_argtypes_list
     | DATABASE name_list
-    | DOMAIN_P any_name_list
+    | DOMAIN_P any_name_list_
     | LANGUAGE name_list
     | LARGE_P OBJECT_P numericonly_list
     | SCHEMA name_list
     | TABLESPACE name_list
-    | TYPE_P any_name_list
+    | TYPE_P any_name_list_
     | ALL TABLES IN_P SCHEMA name_list
     | ALL SEQUENCES IN_P SCHEMA name_list
     | ALL FUNCTIONS IN_P SCHEMA name_list
@@ -1995,9 +1997,7 @@ aggregate_with_argtypes_list
     ;
 
 createfunc_opt_list
-    : createfunc_opt_item+ {
-                ParseRoutineBody(_localctx);
-            }
+    : createfunc_opt_item+ {this.ParseRoutineBody();}
     //                    | createfunc_opt_list createfunc_opt_item
     ;
 
@@ -2599,8 +2599,8 @@ altertsdictionarystmt
     ;
 
 altertsconfigurationstmt
-    : ALTER TEXT_P SEARCH CONFIGURATION any_name ADD_P MAPPING FOR name_list any_with any_name_list
-    | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list any_with any_name_list
+    : ALTER TEXT_P SEARCH CONFIGURATION any_name ADD_P MAPPING FOR name_list any_with any_name_list_
+    | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list any_with any_name_list_
     | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING REPLACE any_name any_with any_name
     | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list REPLACE any_name any_with any_name
     | ALTER TEXT_P SEARCH CONFIGURATION any_name DROP MAPPING FOR name_list
@@ -3547,7 +3547,7 @@ a_expr
 /*19*/
 
 a_expr_qual
-    : a_expr_lessless ({ this.OnlyAcceptableOps() }? qual_op | )
+    : a_expr_lessless ({this.OnlyAcceptableOps()}? qual_op | )
     ;
 
 /*18*/
