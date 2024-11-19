@@ -3477,9 +3477,28 @@ escape_
     
     ;
 
-//precendence accroding to Table 4.2. Operator Precedence (highest to lowest)
+// Precedence according to Table 4.2. Operator Precedence (highest to lowest)
+// https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-PRECEDENCE
+// (captured on Nov 19, 2024).
+//
+// Operator/Element                Associativity   Description
+// .                               left            table/column name separator
+// ::                              left            PostgreSQL-style typecast
+// [ ]                             left            array element selection
+// + -                             right           unary plus, unary minus
+// COLLATE                         left            collation selection
+// AT                              left            AT TIME ZONE, AT LOCAL
+// ^                               left            exponentiation
+// * / %                           left            multiplication, division, modulo
+// + -                             left            addition, subtraction
+// (any other operator)            left            all other native and user-defined operators
+// BETWEEN IN LIKE ILIKE SIMILAR                   range containment, set membership, string matching
+// < > = <= >= <>                                  comparison operators
+// IS ISNULL NOTNULL                               IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc.
+// NOT                             right           logical negation
+// AND                             left            logical conjunction
+// OR                              left            logical disjunction
 
-//https://www.postgresql.org/docs/12/sql-syntax-lexical.html#SQL-PRECEDENCE
 
 /*
 original version of a_expr, for info
@@ -3532,154 +3551,31 @@ original version of a_expr, for info
 ;
 */
 
-a_expr
-    : a_expr_qual
-    ;
-
-/*23*/
-
-/*moved to c_expr*/
-
-/*22*/
-
-/*moved to c_expr*/
-
-/*19*/
-
-a_expr_qual
-    : a_expr_lessless ({this.OnlyAcceptableOps()}? qual_op | )
-    ;
-
-/*18*/
-
-a_expr_lessless
-    : a_expr_or ((LESS_LESS | GREATER_GREATER) a_expr_or)*
-    ;
-
-/*17*/
-
-a_expr_or
-    : a_expr_and (OR a_expr_and)*
-    ;
-
-/*16*/
-
-a_expr_and
-    : a_expr_between (AND a_expr_between)*
-    ;
-
-/*21*/
-
-a_expr_between
-    : a_expr_in (NOT? BETWEEN SYMMETRIC? a_expr_in AND a_expr_in)?
-    ;
-
-/*20*/
-
-a_expr_in
-    : a_expr_unary_not (NOT? IN_P in_expr)?
-    ;
-
-/*15*/
-
-a_expr_unary_not
-    : NOT? a_expr_isnull
-    ;
-
-/*14*/
-
-/*moved to c_expr*/
-
-/*13*/
-
-a_expr_isnull
-    : a_expr_is_not (ISNULL | NOTNULL)?
-    ;
-
-/*12*/
-
-a_expr_is_not
-    : a_expr_compare (
-        IS NOT? (
-            NULL_P
-            | TRUE_P
-            | FALSE_P
-            | UNKNOWN
-            | DISTINCT FROM a_expr
-            | OF OPEN_PAREN type_list CLOSE_PAREN
-            | DOCUMENT_P
-            | unicode_normal_form? NORMALIZED
-        )
-    )?
-    ;
-
-/*11*/
-
-a_expr_compare
-    : a_expr_like (
-        (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr_like
-        | subquery_Op sub_type (select_with_parens | OPEN_PAREN a_expr CLOSE_PAREN) /*21*/
-    )?
-    ;
-
-/*10*/
-
-a_expr_like
-    : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO) a_expr_qual_op escape_?)?
-    ;
-
-/* 8*/
-
-a_expr_qual_op
-    : a_expr_unary_qualop (qual_op a_expr_unary_qualop)*
-    ;
-
-/* 9*/
-
-a_expr_unary_qualop
-    : qual_op? a_expr_add
-    ;
-
-/* 7*/
-
-a_expr_add
-    : a_expr_mul ((MINUS | PLUS) a_expr_mul)*
-    ;
-
-/* 6*/
-
-a_expr_mul
-    : a_expr_caret ((STAR | SLASH | PERCENT) a_expr_caret)*
-    ;
-
-/* 5*/
-
-a_expr_caret
-    : a_expr_unary_sign (CARET a_expr_unary_sign)?
-    ;
-
-/* 4*/
-
-a_expr_unary_sign
-    : (MINUS | PLUS)? a_expr_at_time_zone /* */
-    ;
-
-/* 3*/
-
-a_expr_at_time_zone
-    : a_expr_collate (AT TIME ZONE a_expr)?
-    ;
-
-/* 2*/
-
-a_expr_collate
-    : a_expr_typecast (COLLATE any_name)?
-    ;
-
-/* 1*/
-
-a_expr_typecast
-    : c_expr (TYPECAST typename)*
+a_expr:
+    a_expr TYPECAST typename
+    | a_expr COLLATE any_name
+    | a_expr AT TIME ZONE a_expr
+    | (MINUS | PLUS) a_expr
+    | a_expr CARET a_expr?
+    | a_expr (STAR | SLASH | PERCENT) a_expr
+    | a_expr (MINUS | PLUS) a_expr
+    | qual_op a_expr
+    | a_expr qual_op a_expr
+    | a_expr NOT? (LIKE | ILIKE | SIMILAR TO) a_expr escape_?
+    | a_expr (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr
+    | a_expr IS NOT? (NULL_P | TRUE_P | FALSE_P | UNKNOWN | OF OPEN_PAREN type_list CLOSE_PAREN | DOCUMENT_P | unicode_normal_form? NORMALIZED )
+    | a_expr IS NOT? DISTINCT FROM a_expr
+    | a_expr (ISNULL | NOTNULL)
+    | NOT a_expr
+    | a_expr NOT? IN_P in_expr
+    | a_expr NOT? BETWEEN SYMMETRIC? a_expr AND a_expr
+    | a_expr AND a_expr
+    | a_expr OR a_expr
+    | a_expr (LESS_LESS | GREATER_GREATER) a_expr
+    | a_expr {this.OnlyAcceptableOps()}? qual_op
+    | c_expr
+    | a_expr (all_op | OPERATOR OPEN_PAREN any_operator CLOSE_PAREN | LIKE | NOT LIKE | ILIKE | NOT ILIKE ) sub_type select_with_parens
+    | a_expr (all_op | OPERATOR OPEN_PAREN any_operator CLOSE_PAREN | LIKE | NOT LIKE | ILIKE | NOT ILIKE ) sub_type '(' a_expr ')'
     ;
 
 b_expr
