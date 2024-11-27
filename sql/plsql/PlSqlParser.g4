@@ -1010,7 +1010,7 @@ dependent_exceptions_part
     ;
 
 create_type
-    : CREATE (OR REPLACE)? TYPE (type_definition | type_body)
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE (type_definition | type_body)
     ;
 
 // Create Type Specific Clauses
