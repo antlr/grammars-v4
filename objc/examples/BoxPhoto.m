@@ -29,6 +29,13 @@ static NSSet *s_allowedExtensions;
     }
 }
 
+- (void)quirkyExpressions
+{
+    @    try { // The space after @ is intentional
+       typeof(self) __weak weakSelf = self;
+    } @catch (...) {} // Ellipsis is intentional
+}
+
 -(NSString*)stringValue:(NSDictionary*)photo name:(NSString*)name
 {
     id rawValue = photo[name];

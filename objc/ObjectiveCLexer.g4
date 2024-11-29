@@ -101,12 +101,12 @@ SELF            : 'self';
 SUPER           : 'super';
 YES             : 'YES';
 AUTORELEASEPOOL : '@autoreleasepool';
-CATCH           : '@catch';
+CATCH           : 'catch';
 CLASS           : '@class';
 DYNAMIC         : '@dynamic';
 ENCODE          : '@encode';
 END             : '@end';
-FINALLY         : '@finally';
+FINALLY         : 'finally';
 IMPLEMENTATION  : '@implementation';
 INTERFACE       : '@interface';
 IMPORT          : '@import';
@@ -122,14 +122,19 @@ SELECTOR        : '@selector';
 SYNCHRONIZED    : '@synchronized';
 SYNTHESIZE      : '@synthesize';
 THROW           : '@throw';
-TRY             : '@try';
+TRY             : 'try';
 ATOMIC          : 'atomic';
 NONATOMIC       : 'nonatomic';
 RETAIN          : 'retain';
+DIRECT          : 'direct';
 
 // Attributes with `__` prefix
 
+INLINE_ATTR                 : '__inline__';
 ATTRIBUTE                   : '__attribute__';
+EXTENSION                   : '__extension__';
+STATIC_ASSERT               : '_Static_assert';
+ALIGN_OF                    : '_Alignof';
 AUTORELEASING_QUALIFIER     : '__autoreleasing';
 BLOCK                       : '__block';
 BRIDGE                      : '__bridge';
