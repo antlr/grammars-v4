@@ -17,6 +17,8 @@ public abstract class MySQLParserBase extends Parser {
 
     protected MySQLParserBase(TokenStream input) {
 	super(input);
+	this.serverVersion = 80200;
+	this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**

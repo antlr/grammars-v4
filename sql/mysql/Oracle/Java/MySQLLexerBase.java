@@ -14,6 +14,8 @@ public abstract class MySQLLexerBase extends Lexer {
 
     public MySQLLexerBase(CharStream input) {
 	super(input);
+	this.serverVersion = 80200;
+	this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     public int serverVersion = 0;
