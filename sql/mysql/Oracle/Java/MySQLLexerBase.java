@@ -25,7 +25,7 @@ public abstract class MySQLLexerBase extends Lexer {
     public Set<String> charSets = new HashSet<>(); // Used to check repertoires.
     protected boolean inVersionComment = false;
 
-    private Deque<Token> pendingTokens = new ArrayDeque<>();
+    private Queue<Token> pendingTokens = new LinkedList<>();
 
     static String longString = "2147483647";
     static int longLength = 10;
@@ -100,16 +100,16 @@ public abstract class MySQLLexerBase extends Lexer {
 
     @Override
     public Token nextToken() {
-        Token pending = pendingTokens.pollLast();
+        Token pending = pendingTokens.poll();
         if (pending != null) {
             return pending;
         }
 
         Token next = super.nextToken();
 
-        pending = pendingTokens.pollLast();
+        pending = pendingTokens.poll();
         if (pending != null) {
-            pendingTokens.push(next);
+            pendingTokens.add(next);
             return pending;
         }
 
@@ -218,7 +218,7 @@ public abstract class MySQLLexerBase extends Lexer {
     }
 
     protected void emitDot() {
-        pendingTokens.push(this._factory.create(this._tokenFactorySourcePair, MySQLLexer.DOT_SYMBOL,
+        pendingTokens.add(this._factory.create(this._tokenFactorySourcePair, MySQLLexer.DOT_SYMBOL,
                 this.getText(), this._channel, this._tokenStartCharIndex, this._tokenStartCharIndex, this.getLine(), this.getCharPositionInLine()));
         ++this._tokenStartCharPositionInLine;
         this.justEmitedDot = true;

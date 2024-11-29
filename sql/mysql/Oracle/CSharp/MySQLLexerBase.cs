@@ -33,7 +33,7 @@ public class MySQLLexerBase : Lexer {
     public HashSet<string> charSets = new HashSet<string>(); // Used to check repertoires.
     protected bool inVersionComment = false;
 
-    private StackQueue<IToken> pendingTokens  = new StackQueue<IToken>();
+    private Queue<IToken> pendingTokens  = new Queue<IToken>();
 
     static string longString = "2147483647";
     static int longLength = 10;
@@ -55,13 +55,17 @@ public class MySQLLexerBase : Lexer {
 
 
     protected MySQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-	: base(input, output, errorOutput)
+        : base(input, output, errorOutput)
     {
+        this.serverVersion = 80200;
+        this.sqlModeFromString("ANSI_QUOTES");
     }
 
     public MySQLLexerBase(ICharStream input)
         : base(input)
     {
+        this.serverVersion = 80200;
+        this.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**
@@ -125,8 +129,9 @@ public class MySQLLexerBase : Lexer {
     public override IToken NextToken()
     {
         // First respond with pending tokens to the next token request, if there are any.
-        var pending = this.pendingTokens.DequeueBottom();
-        if (pending != null) {
+        IToken pending;
+        var not_empty = this.pendingTokens.TryDequeue(out pending);
+        if (not_empty) {
             return pending;
         }
 
@@ -134,10 +139,9 @@ public class MySQLLexerBase : Lexer {
         // This might create additional tokens again.
         var next = base.NextToken();
 
-        pending = this.pendingTokens.DequeueBottom();
-        if (pending != null) {
-            this.pendingTokens.Push(next);
-
+        not_empty = this.pendingTokens.TryDequeue(out pending);
+        if (not_empty) {
+            this.pendingTokens.Enqueue(next);
             return pending;
         }
 
@@ -293,7 +297,7 @@ public class MySQLLexerBase : Lexer {
      */
     protected void emitDot()
     {
-        this.pendingTokens.Push(this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
+        this.pendingTokens.Enqueue(this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
             this.Text, this.Channel, this.TokenStartCharIndex, this.TokenStartCharIndex, this.Line,
             this.Column
         ));
