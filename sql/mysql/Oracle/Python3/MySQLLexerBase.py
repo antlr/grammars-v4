@@ -3,9 +3,9 @@ import re
 from collections import deque
 import sys
 if sys.version_info[1] > 5:
-	from typing import TextIO
+    from typing import TextIO
 else:
-	from typing.io import TextIO
+    from typing.io import TextIO
 from SqlMode import SqlMode
 from MySQLParser import MySQLParser
 
@@ -29,6 +29,8 @@ class MySQLLexerBase(Lexer):
         self.inVersionComment = False
         self.pendingTokens = deque()
         self.justEmitedDot = False
+        self.serverVersion = 80200;
+        self.sqlModeFromString("ANSI_QUOTES");
 
     def isSqlModeActive(self, mode):
         return mode in self.sqlModes
