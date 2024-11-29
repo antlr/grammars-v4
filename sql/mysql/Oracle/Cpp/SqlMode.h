@@ -1,9 +1,11 @@
+#pragma once
+
 /** SQL modes that control parsing behavior. */
-public enum SqlMode {
+enum SqlMode {
     NoMode,
     AnsiQuotes,
     HighNotPrecedence,
     PipesAsConcat,
     IgnoreSpace,
     NoBackslashEscapes
-}
+};
