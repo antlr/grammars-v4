@@ -9,6 +9,7 @@ import { CharStream, Lexer, Token } from "antlr4";
 import { CommonToken } from "antlr4";
 import MySQLLexer from "./MySQLLexer";
 import SqlMode from "./SqlMode";
+import SqlModes from "./SqlModes";
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 export default abstract class MySQLLexerBase extends Lexer {
@@ -36,7 +37,7 @@ export default abstract class MySQLLexerBase extends Lexer {
     constructor(input: CharStream) {
         super(input);
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**

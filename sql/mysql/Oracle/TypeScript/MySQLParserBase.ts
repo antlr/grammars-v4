@@ -5,6 +5,7 @@
 import { Parser, TokenStream } from "antlr4";
 import MySQLParser from "./MySQLParser";
 import SqlMode from "./SqlMode";
+import SqlModes from "./SqlModes";
 
 export default abstract class MySQLParserBase extends Parser {
 
@@ -18,7 +19,7 @@ export default abstract class MySQLParserBase extends Parser {
     constructor(input: TokenStream) {
         super(input);
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**

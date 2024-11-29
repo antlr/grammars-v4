@@ -8,6 +8,7 @@
 import { CharStream, Lexer, Token } from "antlr4ng";
 import { MySQLLexer } from "./MySQLLexer.js";
 import SqlMode from "./SqlMode.js";
+import SqlModes from "./SqlModes.js";
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 export abstract class MySQLLexerBase extends Lexer {
