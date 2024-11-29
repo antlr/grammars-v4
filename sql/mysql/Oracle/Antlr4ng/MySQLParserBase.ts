@@ -3,7 +3,7 @@
  */
 
 import { Parser, TokenStream } from "antlr4ng";
-import { SqlMode } from "./MySQLLexerBase.js";
+import SqlMode from "./SqlMode.js";
 
 export abstract class MySQLParserBase extends Parser {
 

@@ -7,16 +7,7 @@
 
 import { CharStream, Lexer, Token } from "antlr4ng";
 import { MySQLLexer } from "./MySQLLexer.js";
-
-/** SQL modes that control parsing behavior. */
-export enum SqlMode {
-    NoMode,
-    AnsiQuotes,
-    HighNotPrecedence,
-    PipesAsConcat,
-    IgnoreSpace,
-    NoBackslashEscapes,
-}
+import SqlMode from "./SqlMode.js";
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 export abstract class MySQLLexerBase extends Lexer {
@@ -44,7 +35,7 @@ export abstract class MySQLLexerBase extends Lexer {
     constructor(input: CharStream) {
         super(input);
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**
@@ -56,33 +47,6 @@ export abstract class MySQLLexerBase extends Lexer {
      */
     public isSqlModeActive(mode: SqlMode): boolean {
         return this.sqlModes.has(mode);
-    }
-
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public sqlModeFromString(modes: string): void {
-        this.sqlModes = new Set<SqlMode>();
-
-        const parts = modes.toUpperCase().split(",");
-        parts.forEach((mode: string) => {
-            if (mode === "ANSI" || mode === "DB2" || mode === "MAXDB" || mode === "MSSQL" || mode === "ORACLE" ||
-                mode === "POSTGRESQL") {
-                this.sqlModes.add(SqlMode.AnsiQuotes).add(SqlMode.PipesAsConcat).add(SqlMode.IgnoreSpace);
-            } else if (mode === "ANSI_QUOTES") {
-                this.sqlModes.add(SqlMode.AnsiQuotes);
-            } else if (mode === "PIPES_AS_CONCAT") {
-                this.sqlModes.add(SqlMode.PipesAsConcat);
-            } else if (mode === "NO_BACKSLASH_ESCAPES") {
-                this.sqlModes.add(SqlMode.NoBackslashEscapes);
-            } else if (mode === "IGNORE_SPACE") {
-                this.sqlModes.add(SqlMode.IgnoreSpace);
-            } else if (mode === "HIGH_NOT_PRECEDENCE" || mode === "MYSQL323" || mode === "MYSQL40") {
-                this.sqlModes.add(SqlMode.HighNotPrecedence);
-            }
-        });
     }
 
     /**
