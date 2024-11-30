@@ -6,6 +6,7 @@
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
 #pragma once
+
 #include "antlr4-runtime.h"
 #include <string>
 #include "SqlMode.h"
@@ -29,7 +30,7 @@ class MySQLLexerBase : public antlr4::Lexer
         bool inVersionComment;
 
     private:
-        std::queue<antlr4::Token> pendingTokens;
+		std::queue<std::unique_ptr<antlr4::Token>> pendingTokens;
         static std::string longString;
         static int longLength;
         static std::string signedLongString;
@@ -114,7 +115,6 @@ class MySQLLexerBase : public antlr4::Lexer
         bool isBackTickQuotedId();
         bool isDoubleQuotedText();
         bool isSingleQuotedText();
-		antlr4::Token* emit() override;
         void startInVersionComment();
         void endInVersionComment();
         bool isInVersionComment();

@@ -52,48 +52,6 @@ public abstract class MySQLLexerBase extends Lexer {
         return this.sqlModes.contains(mode);
     }
 
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public void sqlModeFromString(String modes) {
-        this.sqlModes = new HashSet<>();
-
-        String[] parts = modes.toUpperCase().split(",");
-        for (String mode : parts) {
-            switch (mode) {
-                case "ANSI":
-                case "DB2":
-                case "MAXDB":
-                case "MSSQL":
-                case "ORACLE":
-                case "POSTGRESQL":
-                    this.sqlModes.add(SqlMode.AnsiQuotes);
-                    this.sqlModes.add(SqlMode.PipesAsConcat);
-                    this.sqlModes.add(SqlMode.IgnoreSpace);
-                    break;
-                case "ANSI_QUOTES":
-                    this.sqlModes.add(SqlMode.AnsiQuotes);
-                    break;
-                case "PIPES_AS_CONCAT":
-                    this.sqlModes.add(SqlMode.PipesAsConcat);
-                    break;
-                case "NO_BACKSLASH_ESCAPES":
-                    this.sqlModes.add(SqlMode.NoBackslashEscapes);
-                    break;
-                case "IGNORE_SPACE":
-                    this.sqlModes.add(SqlMode.IgnoreSpace);
-                    break;
-                case "HIGH_NOT_PRECEDENCE":
-                case "MYSQL323":
-                case "MYSQL40":
-                    this.sqlModes.add(SqlMode.HighNotPrecedence);
-                    break;
-            }
-        }
-    }
-
     @Override
     public void reset() {
         this.inVersionComment = false;

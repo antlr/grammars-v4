@@ -52,33 +52,6 @@ export default abstract class MySQLLexerBase extends Lexer {
     }
 
     /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public sqlModeFromString(modes: string): void {
-        this.sqlModes = new Set<SqlMode>();
-
-        const parts = modes.toUpperCase().split(",");
-        parts.forEach((mode: string) => {
-            if (mode === "ANSI" || mode === "DB2" || mode === "MAXDB" || mode === "MSSQL" || mode === "ORACLE" ||
-                mode === "POSTGRESQL") {
-                this.sqlModes.add(SqlMode.AnsiQuotes).add(SqlMode.PipesAsConcat).add(SqlMode.IgnoreSpace);
-            } else if (mode === "ANSI_QUOTES") {
-                this.sqlModes.add(SqlMode.AnsiQuotes);
-            } else if (mode === "PIPES_AS_CONCAT") {
-                this.sqlModes.add(SqlMode.PipesAsConcat);
-            } else if (mode === "NO_BACKSLASH_ESCAPES") {
-                this.sqlModes.add(SqlMode.NoBackslashEscapes);
-            } else if (mode === "IGNORE_SPACE") {
-                this.sqlModes.add(SqlMode.IgnoreSpace);
-            } else if (mode === "HIGH_NOT_PRECEDENCE" || mode === "MYSQL323" || mode === "MYSQL40") {
-                this.sqlModes.add(SqlMode.HighNotPrecedence);
-            }
-        });
-    }
-
-    /**
      * Resets the lexer by setting initial values to transient member, resetting the input stream position etc.
      */
     public reset(): void {

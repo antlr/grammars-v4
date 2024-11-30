@@ -18,7 +18,7 @@ public abstract class MySQLParserBase : Parser {
     protected MySQLParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : base(input, output, errorOutput)
     {
         this.serverVersion = 80200;
-    this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**

@@ -1,6 +1,10 @@
 /** SQL modes that control parsing behavior. */
-#include once
+#pragma once
+
 #include "SqlMode.h"
+
+#include <set>
+#include <string>
 
 class SqlModes {
 
@@ -10,5 +14,5 @@ class SqlModes {
      * @param modes The input string to parse.
      */
 	public:
-		static std::set<SqlMode> sqlModeFromString(std::string modes);
-}
+		static std::set<SqlMode> sqlModeFromString(const std::string& modes);
+};

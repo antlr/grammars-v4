@@ -6,6 +6,7 @@
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
 #pragma once
+
 #include "antlr4-runtime.h"
 #include <string>
 #include "SqlMode.h"
@@ -22,7 +23,7 @@ class MySQLParserBase : public antlr4::Parser {
         /** Enable Multi Language Extension support. */
         bool supportMle;
 
-    protected:
+	protected:
         MySQLParserBase(antlr4::TokenStream* input);
 
     public:

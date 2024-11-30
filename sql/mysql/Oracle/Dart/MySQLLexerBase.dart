@@ -92,7 +92,7 @@ abstract class MySQLLexerBase extends Lexer
     {
         // First respond with pending tokens to the next token request, if there are any.
         if (! this.pendingTokens.isEmpty) {
-			var pending = this.pendingTokens.removeFirst();
+            var pending = this.pendingTokens.removeFirst();
             return pending;
         }
 
@@ -101,7 +101,7 @@ abstract class MySQLLexerBase extends Lexer
         var next = super.nextToken();
 
         if (! this.pendingTokens.isEmpty) {
-			var pending = this.pendingTokens.removeFirst();
+            var pending = this.pendingTokens.removeFirst();
             this.pendingTokens.add(next);
             return pending;
         }
