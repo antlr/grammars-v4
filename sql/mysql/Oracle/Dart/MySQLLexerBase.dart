@@ -5,24 +5,16 @@ import 'dart:convert';
 import 'dart:collection';
 import 'MySQLLexer.dart';
 import 'MySQLParser.dart';
-
-/** SQL modes that control parsing behavior. */
-enum SqlMode {
-  noMode,
-  ansiQuotes,
-  highNotPrecedence,
-  pipesAsConcat,
-  ignoreSpace,
-  noBackslashEscapes,
-}
+import 'SqlMode.dart';
+import 'SqlModes.dart';
 
 /** Base lexer class providing functions needed in actions. */
 abstract class MySQLLexerBase extends Lexer
 {
     int serverVersion = 0;
-    Set<SqlMode> sqlModes = {};
+    HashSet<SqlMode> sqlModes = HashSet<SqlMode>();
     bool supportMle = true;
-    Set<String> charSets = {};
+    HashSet<String> charSets = HashSet<String>();
     bool inVersionComment = false;
     Queue<Token> pendingTokens = Queue<Token>();
 
@@ -41,36 +33,11 @@ abstract class MySQLLexerBase extends Lexer
     MySQLLexerBase(CharStream input) : super(input)
     {
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     bool isSqlModeActive(SqlMode mode) {
         return sqlModes.contains(mode);
-    }
-
-    void sqlModeFromString(String modes) {
-        sqlModes.clear();
-        List<String> parts = modes.toUpperCase().split(',');
-
-        for (String mode in parts) {
-            if (['ANSI', 'DB2', 'MAXDB', 'MSSQL', 'ORACLE', 'POSTGRESQL']
-                .contains(mode)) {
-                sqlModes.add(SqlMode.ansiQuotes);
-                sqlModes.add(SqlMode.pipesAsConcat);
-                sqlModes.add(SqlMode.ignoreSpace);
-            } else if (mode == 'ANSI_QUOTES') {
-                sqlModes.add(SqlMode.ansiQuotes);
-            } else if (mode == 'PIPES_AS_CONCAT') {
-                sqlModes.add(SqlMode.pipesAsConcat);
-            } else if (mode == 'NO_BACKSLASH_ESCAPES') {
-                sqlModes.add(SqlMode.noBackslashEscapes);
-            } else if (mode == 'IGNORE_SPACE') {
-                sqlModes.add(SqlMode.ignoreSpace);
-            } else if (['HIGH_NOT_PRECEDENCE', 'MYSQL323', 'MYSQL40']
-                .contains(mode)) {
-                sqlModes.add(SqlMode.highNotPrecedence);
-            }
-        }
     }
 
     /**
@@ -115,19 +82,19 @@ abstract class MySQLLexerBase extends Lexer
      * @param text The text from a matched token.
      * @returns True if so the number matches, otherwise false.
      */
-	bool checkMySQLVersion(String text) {
-		if (text.length < 8) {
-			return false;
-		}
+    bool checkMySQLVersion(String text) {
+        if (text.length < 8) {
+            return false;
+        }
 
-		int version = int.parse(text.substring(3));
-		if (version <= serverVersion) {
-			inVersionComment = true;
-			return true;
-		}
+        int version = int.parse(text.substring(3));
+        if (version <= serverVersion) {
+            inVersionComment = true;
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * Called when a keyword was consumed that represents an internal MySQL function and checks if that keyword is
@@ -137,21 +104,21 @@ abstract class MySQLLexerBase extends Lexer
      *
      * @returns If a function call is found then return the proposed token type, otherwise just IDENTIFIER.
      */
-	int determineFunction(int proposed) {
+    int determineFunction(int proposed) {
         var input = this.inputStream.LA(1) ?? 0;
-		if (isSqlModeActive(SqlMode.ignoreSpace)) {
-			while ([' ', '\t', '\r', '\n'].contains(String.fromCharCode(input))) {
-				// Consume logic based on InputStream equivalent.
+        if (isSqlModeActive(SqlMode.ignoreSpace)) {
+            while ([' ', '\t', '\r', '\n'].contains(String.fromCharCode(input))) {
+                // Consume logic based on InputStream equivalent.
                 this.interpreter?.consume(this.inputStream);
                 this.channel = Lexer.HIDDEN;
                 this.type = MySQLLexer.TOKEN_WHITESPACE;
-				var c = this.inputStream.LA(1);
+                var c = this.inputStream.LA(1);
                 input = c ?? 0;
-			}
-		}
-		var r = input == '('.codeUnitAt(0) ? proposed : MySQLLexer.TOKEN_IDENTIFIER;
-		return r;
-	}
+            }
+        }
+        var r = input == '('.codeUnitAt(0) ? proposed : MySQLLexer.TOKEN_IDENTIFIER;
+        return r;
+    }
 
     /**
      * Checks the given text and determines the smallest number type from it. Code has been taken from sql_lex.cc.
@@ -233,7 +200,7 @@ abstract class MySQLLexerBase extends Lexer
             //
         }
 
-		var i = text[index - 1].compareTo(cmp[otherIndex - 1]);
+        var i = text[index - 1].compareTo(cmp[otherIndex - 1]);
         return i <= 0 ? smaller : bigger;
     }
 
@@ -246,9 +213,9 @@ abstract class MySQLLexerBase extends Lexer
      */
     int checkCharset(String text)
     {
-		var z = this.charSets.contains(text);
+        var z = this.charSets.contains(text);
         var r = z ? MySQLLexer.TOKEN_UNDERSCORE_CHARSET : MySQLLexer.TOKEN_IDENTIFIER;
-		return r;
+        return r;
     }
 
     /**
@@ -258,14 +225,14 @@ abstract class MySQLLexerBase extends Lexer
     {
         var ctf = this.tokenFactory;
         Token t = ctf.create(
-			MySQLLexer.TOKEN_DOT_SYMBOL,
-			this.text,
-			Pair<TokenSource?, CharStream?>(this, this.inputStream),
+            MySQLLexer.TOKEN_DOT_SYMBOL,
+            this.text,
+            Pair<TokenSource?, CharStream?>(this, this.inputStream),
             this.channel,
-			this.tokenStartCharIndex,
-			this.tokenStartCharIndex,
-			this.line,
-			this.charPositionInLine);
+            this.tokenStartCharIndex,
+            this.tokenStartCharIndex,
+            this.line,
+            this.charPositionInLine);
         this.pendingTokens.add(t);
         ++this.charPositionInLine;
         ++this.tokenStartCharIndex;
@@ -356,14 +323,14 @@ abstract class MySQLLexerBase extends Lexer
     {
         var ctf = this.tokenFactory;
         Token t = ctf.create(
-			this.type,
-			(this.text!=null?(this.justEmitedDot?this.text.substring(1):this.text):null),
-			Pair<TokenSource?, CharStream?>(this, this.inputStream),
+            this.type,
+            (this.text!=null?(this.justEmitedDot?this.text.substring(1):this.text):null),
+            Pair<TokenSource?, CharStream?>(this, this.inputStream),
             this.channel,
-			this.tokenStartCharIndex + (this.justEmitedDot?1:0),
-			CharIndex - 1, 
-			this.line,
-			this.charPositionInLine);
+            this.tokenStartCharIndex + (this.justEmitedDot?1:0),
+            CharIndex - 1, 
+            this.line,
+            this.charPositionInLine);
         this.justEmitedDot = false;
         super.emit(t);
         return t;
