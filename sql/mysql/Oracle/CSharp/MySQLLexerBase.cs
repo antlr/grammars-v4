@@ -5,22 +5,10 @@
 /* eslint-disable no-underscore-dangle */
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
+using Antlr4.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Channels;
-using Antlr4.Runtime;
-using static System.Net.WebRequestMethods;
-
-/** SQL modes that control parsing behavior. */
-public enum SqlMode {
-    NoMode,
-    AnsiQuotes,
-    HighNotPrecedence,
-    PipesAsConcat,
-    IgnoreSpace,
-    NoBackslashEscapes,
-};
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 public class MySQLLexerBase : Lexer {
@@ -58,14 +46,14 @@ public class MySQLLexerBase : Lexer {
         : base(input, output, errorOutput)
     {
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     public MySQLLexerBase(ICharStream input)
         : base(input)
     {
         this.serverVersion = 80200;
-        this.sqlModeFromString("ANSI_QUOTES");
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**
@@ -78,37 +66,6 @@ public class MySQLLexerBase : Lexer {
     public bool isSqlModeActive(SqlMode mode)
     {
         return this.sqlModes.Contains(mode);
-    }
-
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public void sqlModeFromString(string modes)
-    {
-        this.sqlModes = new HashSet<SqlMode>();
-
-        var parts = modes.ToUpper().Split(",");
-        foreach (var mode in parts)
-        {
-            if (mode == "ANSI" || mode == "DB2" || mode == "MAXDB" || mode == "MSSQL" || mode == "ORACLE" ||
-                mode == "POSTGRESQL") {
-                this.sqlModes.Add(SqlMode.AnsiQuotes);
-                this.sqlModes.Add(SqlMode.PipesAsConcat);
-                this.sqlModes.Add(SqlMode.IgnoreSpace);
-            } else if (mode == "ANSI_QUOTES") {
-                this.sqlModes.Add(SqlMode.AnsiQuotes);
-            } else if (mode == "PIPES_AS_CONCAT") {
-                this.sqlModes.Add(SqlMode.PipesAsConcat);
-            } else if (mode == "NO_BACKSLASH_ESCAPES") {
-                this.sqlModes.Add(SqlMode.NoBackslashEscapes);
-            } else if (mode == "IGNORE_SPACE") {
-                this.sqlModes.Add(SqlMode.IgnoreSpace);
-            } else if (mode == "HIGH_NOT_PRECEDENCE" || mode == "MYSQL323" || mode == "MYSQL40") {
-                this.sqlModes.Add(SqlMode.HighNotPrecedence);
-            }
-        }
     }
 
     /**
