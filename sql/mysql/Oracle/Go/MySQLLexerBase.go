@@ -5,6 +5,7 @@ import (
     "github.com/antlr4-go/antlr/v4"
 )
 
+
 type MySQLLexerBase struct {
     *antlr.BaseLexer
     serverVersion int
@@ -43,6 +44,7 @@ func init() {
         unsignedLongLongString: "18446744073709551615",
         unsignedLongLongLength: 20,
     }
+	StaticMySQLLexerBase.sqlModes = sqlModeFromString("ANSI_QUOTES");
 }
 
 func NewMySQLLexerBase(input antlr.CharStream) *MySQLLexerBase {
@@ -61,7 +63,7 @@ func NewMySQLLexerBase(input antlr.CharStream) *MySQLLexerBase {
         unsignedLongLongString: "18446744073709551615",
         unsignedLongLongLength: 20,
     }
-    r.sqlModes = make(map[SqlMode]bool)
+	r.sqlModes = sqlModeFromString("ANSI_QUOTES");
     return r
 }
 
@@ -86,8 +88,8 @@ func (l *MySQLLexerBase) MakeCommonToken(ttype int, text string) antlr.Token {
 
 func (m *MySQLLexerBase) emitDot() {
     m.pendingTokens = append(m.pendingTokens, m.MakeCommonToken(MySQLLexerDOT_SYMBOL, m.GetText()))
-//    ++this.Column;
-//    m.justEmitedDot = true
+    m.TokenStartColumn = m.TokenStartColumn + 1
+    m.TokenStartCharIndex = m.TokenStartCharIndex + 1
 }
 
 func (m *MySQLLexerBase) isServerVersionLt80024() bool { return m.serverVersion < 80024 }
@@ -110,7 +112,7 @@ func (m *MySQLLexerBase) doLogicalOr() {
 }
 
 func (m *MySQLLexerBase) isSqlModeActive(mode SqlMode) bool {
-    return m.sqlModes[mode]
+    return StaticMySQLLexerBase.sqlModes[mode]
 }
 
  
@@ -304,3 +306,27 @@ func (m *MySQLLexerBase) checkCharset(text string) int {
     }
 }
 
+/**
+ * Implements the multi token feature required in our lexer.
+ * A lexer rule can emit more than a single token, if needed.
+ *
+ * @returns The next token in the token stream.
+ */
+func (m *MySQLLexerBase) NextToken() antlr.Token {
+    if len(m.pendingTokens) != 0 {
+        pending := m.pendingTokens[0]
+        m.pendingTokens = m.pendingTokens[1:]
+        return pending
+    }
+
+    // Let the main lexer class run the next token recognition.
+    // This might create additional tokens again.
+    next := m.BaseLexer.NextToken() // Get next token
+    if len(m.pendingTokens) != 0 {
+        pending := m.pendingTokens[0]
+        m.pendingTokens = m.pendingTokens[1:]
+        m.pendingTokens = append(m.pendingTokens, next)
+        return pending
+    }
+    return next
+}

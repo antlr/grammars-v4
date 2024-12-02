@@ -11,6 +11,16 @@ type MySQLParserBase struct {
     supportMle bool
 }
 
+var StaticMySQLParserBase MySQLParserBase
+
+func init() {
+    StaticMySQLParserBase = MySQLParserBase {
+        supportMle:     true,
+        serverVersion: 80200,
+    }
+    StaticMySQLParserBase.sqlModes = sqlModeFromString("ANSI_QUOTES");
+}
+
 func NewMySQLParserBase(input antlr.InputStream) *MySQLParserBase {
     r := &MySQLParserBase{
         supportMle:     true,
@@ -22,7 +32,7 @@ func NewMySQLParserBase(input antlr.InputStream) *MySQLParserBase {
 
 // isSqlModeActive determines if the given SQL mode is currently active in the lexer.
 func (m *MySQLParserBase) isSqlModeActive(mode SqlMode) bool {
-    return m.sqlModes[mode]
+    return StaticMySQLParserBase.sqlModes[mode]
 }
 
 // isPureIdentifier checks if the lexer is in ANSI_QUOTES mode.
