@@ -22,6 +22,7 @@ export abstract class MySQLLexerBase extends Lexer {
     protected inVersionComment = false;
 
     private pendingTokens: Token[] = [];
+    private justEmittedDot: boolean;
 
     static #longString = "2147483647";
     static #longLength = 10;
@@ -77,7 +78,6 @@ export abstract class MySQLLexerBase extends Lexer {
         pending = this.pendingTokens.shift();
         if (pending) {
             this.pendingTokens.push(next);
-
             return pending;
         }
 
@@ -99,7 +99,6 @@ export abstract class MySQLLexerBase extends Lexer {
         const version = parseInt(text.substring(3), 10);
         if (version <= this.serverVersion) {
             this.inVersionComment = true;
-
             return true;
         }
 
@@ -229,12 +228,21 @@ export abstract class MySQLLexerBase extends Lexer {
      */
     protected emitDot(): void {
         this.pendingTokens.push(this.tokenFactory.create([this, this.inputStream], MySQLLexer.DOT_SYMBOL,
-            this.text, this.channel, this.tokenStartCharIndex, this.tokenStartCharIndex, this.line,
-            this.column,
+            ".", this.channel, this.tokenStartCharIndex, this.tokenStartCharIndex, this.line,
+            this.column - this.text.length,
         ));
-
-        ++this.column;
         ++this.tokenStartCharIndex;
+        this.justEmittedDot = true;
+    }
+
+    public override emit(): Token
+    {
+        let t = super.emit();
+        if (this.justEmittedDot) {
+            t.column = t.column + 1;
+            this.justEmittedDot = false;
+        }
+        return t;
     }
 
     public isServerVersionLt80024(): boolean
