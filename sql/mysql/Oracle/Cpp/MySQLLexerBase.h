@@ -30,7 +30,7 @@ class MySQLLexerBase : public antlr4::Lexer
         bool inVersionComment;
 
     private:
-		std::queue<std::unique_ptr<antlr4::Token>> pendingTokens;
+        std::queue<std::unique_ptr<antlr4::Token>> pendingTokens;
         static std::string longString;
         static int longLength;
         static std::string signedLongString;
@@ -41,7 +41,7 @@ class MySQLLexerBase : public antlr4::Lexer
         static std::string unsignedLongLongString;
         static int unsignedLongLongLength;
 
-        bool justEmitedDot;
+        bool justEmittedDot;
 
         /**
          * Determines if the given SQL mode is currently active in the lexer.
@@ -53,7 +53,8 @@ class MySQLLexerBase : public antlr4::Lexer
     public:
         bool isSqlModeActive(SqlMode mode);
         void reset();
-		std::unique_ptr<antlr4::Token> nextToken() override;
+        std::unique_ptr<antlr4::Token> nextToken() override;
+        antlr4::Token * emit() override;
 
     protected:
         bool checkMySQLVersion(std::string text);
