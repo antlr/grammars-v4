@@ -16,7 +16,9 @@ public class MySQLLexerBase : Lexer {
     public HashSet<SqlMode> sqlModes = new HashSet<SqlMode>();
 
     /** Enable Multi Language Extension support. */
-    public bool supportMle = true;
+	public bool supportMle = true;
+
+	bool justEmittedDot = false;
 
     public HashSet<string> charSets = new HashSet<string>(); // Used to check repertoires.
     protected bool inVersionComment = false;
@@ -32,8 +34,6 @@ public class MySQLLexerBase : Lexer {
     static int signedLongLongLength = 19;
     static string unsignedLongLongString = "18446744073709551615";
     static int unsignedLongLongLength = 20;
-
-    private bool JustEmitedDot = false;
 
     public override string[] RuleNames => throw new NotImplementedException();
 
@@ -254,15 +254,28 @@ public class MySQLLexerBase : Lexer {
      */
     protected void emitDot()
     {
-        this.pendingTokens.Enqueue(this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
-            this.Text, this.Channel, this.TokenStartCharIndex, this.TokenStartCharIndex, this.Line,
-            this.Column
-        ));
-
+        var len = this.Text.Length;
+        var t = this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
+            ".", this.Channel, this.TokenStartCharIndex, this.TokenStartCharIndex, this.Line, this.Column) as CommonToken;
+        this.pendingTokens.Enqueue(t);
+        t.Column = t.Column - len;
         ++this.Column;
-        this.JustEmitedDot = true;
+        this.justEmittedDot = true;
     }
 
+    public override IToken Emit()
+    {
+        var t = base.Emit();
+		if (this.justEmittedDot) {
+			var p = t as CommonToken;
+			p.Text = p.Text.Substring(1);
+			p.Column = p.Column + 1;
+            p.StartIndex = p.StartIndex + 1;
+            this.Column = this.Column - 1;
+            this.justEmittedDot = false;
+        }
+        return t;
+    }
 
     // Version-related methods
     public bool isServerVersionLt80024() => serverVersion < 80024;
@@ -341,15 +354,6 @@ public class MySQLLexerBase : Lexer {
     public bool isSingleQuotedText()
     {
         return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public override IToken Emit()
-    {
-        IToken t = this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream),
-                this.Type, (this.Text!=null?(this.JustEmitedDot?this.Text.Substring(1):this.Text):null), this.Channel, this.TokenStartCharIndex + (this.JustEmitedDot?1:0), CharIndex - 1, this.TokenStartLine, this.TokenStartColumn);
-        this.JustEmitedDot = false;
-        base.Emit(t);
-        return t;
     }
 
     public void startInVersionComment()
