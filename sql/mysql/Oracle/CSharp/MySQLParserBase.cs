@@ -21,13 +21,6 @@ public abstract class MySQLParserBase : Parser {
         this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
-    /**
-     * Determines if the given SQL mode is currently active in the lexer.
-     *
-     * @param mode The mode to check.
-     *
-     * @returns True if the mode is one of the currently active modes.
-     */
     public bool isSqlModeActive(SqlMode mode) { return this.sqlModes.Contains(mode); }
     public bool isPureIdentifier() { return this.isSqlModeActive(SqlMode.AnsiQuotes); }
     public bool isTextStringLiteral() { return !this.isSqlModeActive(SqlMode.AnsiQuotes); }
