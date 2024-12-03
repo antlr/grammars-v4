@@ -150,6 +150,18 @@ class MySQLLexerBase(Lexer):
         self._tokenStartColumn += 1
         self.justEmitedDot = True
 
+    def emit(self):
+        t = super().emit()
+        if self.justEmitedDot:
+            text = t.text
+            text = text[1:]
+            t.text = text
+            t.start = t.start + 1
+            # print(f"hi {text}", file=sys.stderr)
+            #print(f"hi {t.text}", file=sys.stderr)
+            self.justEmitedDot = False
+        return t
+
     def isServerVersionLt80024(self):
         return self.serverVersion < 80024
 
@@ -306,22 +318,6 @@ class MySQLLexerBase(Lexer):
 
     def isSingleQuotedText(self):
         return not self.isSqlModeActive(SqlMode.NoBackslashEscapes)
-
-    def emit(self):
-        if self._text is None:
-            text = self._text
-        elif self._text is NoneType:
-            text = self._text
-        elif self.justEmitedDot:
-            text = self._text[1:]
-        else:
-            text = self._text
-        token = self._factory.create(self._tokenFactorySourcePair, self._type, self._text, self._channel, self._tokenStartCharIndex,
-                         self.getCharIndex()-1, self._tokenStartLine, self._tokenStartColumn)
-        self.emitToken(token)
-        self.justEmitedDot = False
-        self.emitToken(token)
-        return token
 
     def startInVersionComment(self):
         self.inVersionComment = True
