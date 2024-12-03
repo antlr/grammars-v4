@@ -28,7 +28,7 @@ abstract class MySQLLexerBase extends Lexer
     static const String unsignedLongLongString = "18446744073709551615";
     static const int unsignedLongLongLength = 20;
 
-    bool justEmitedDot = false;
+    bool justEmittedDot = false;
 
     MySQLLexerBase(CharStream input) : super(input)
     {
@@ -223,23 +223,35 @@ abstract class MySQLLexerBase extends Lexer
      */
     void emitDot()
     {
+        var len = this.text.length;
         var ctf = this.tokenFactory;
         Token t = ctf.create(
             MySQLLexer.TOKEN_DOT_SYMBOL,
-            this.text,
+            ".",
             Pair<TokenSource?, CharStream?>(this, this.inputStream),
             this.channel,
             this.tokenStartCharIndex,
             this.tokenStartCharIndex,
             this.line,
-            this.charPositionInLine);
+            this.charPositionInLine - len);
         this.pendingTokens.add(t);
         ++this.charPositionInLine;
         ++this.tokenStartCharIndex;
-        this.justEmitedDot = true;
+        this.justEmittedDot = true;
     }
 
-    // Version-related methods
+    @override Token emit()
+    {
+        var t = super.emit();
+        if (this.justEmittedDot) {
+            var p = t as CommonToken;
+            p.charPositionInLine = p.charPositionInLine + 1;
+            this.charPositionInLine = this.charPositionInLine - 1;
+            this.justEmittedDot = false;
+        }
+        return t;
+    }
+
     bool isServerVersionLt80024() => serverVersion < 80024;
     bool isServerVersionGe80024() => serverVersion >= 80024;
     bool isServerVersionGe80011() => serverVersion >= 80011;
@@ -248,22 +260,10 @@ abstract class MySQLLexerBase extends Lexer
     bool isServerVersionGe80014() => serverVersion >= 80014;
     bool isServerVersionGe80017() => serverVersion >= 80017;
     bool isServerVersionGe80018() => serverVersion >= 80018;
-
     bool isMasterCompressionAlgorithm() => serverVersion >= 80018 && isServerVersionLt80024();
-
     bool isServerVersionLt80031() => serverVersion < 80031;
-
-    // Functions for specific token types
-    void doLogicalOr()
-    {
-        this.type = isSqlModeActive(SqlMode.pipesAsConcat) ? MySQLLexer.TOKEN_CONCAT_PIPES_SYMBOL : MySQLLexer.TOKEN_LOGICAL_OR_OPERATOR;
-    }
-
-    void doIntNumber()
-    {
-        this.type = determineNumericType(this.text);
-    }
-
+    void doLogicalOr() { this.type = isSqlModeActive(SqlMode.pipesAsConcat) ? MySQLLexer.TOKEN_CONCAT_PIPES_SYMBOL : MySQLLexer.TOKEN_LOGICAL_OR_OPERATOR; }
+    void doIntNumber() { this.type = determineNumericType(this.text); }
     void doAdddate() => this.type = determineFunction(MySQLLexer.TOKEN_ADDDATE_SYMBOL);
     void doBitAnd() => this.type = determineFunction(MySQLLexer.TOKEN_BIT_AND_SYMBOL);
     void doBitOr() => this.type = determineFunction(MySQLLexer.TOKEN_BIT_OR_SYMBOL);
@@ -300,55 +300,11 @@ abstract class MySQLLexerBase extends Lexer
     void doVarPop() => this.type = determineFunction(MySQLLexer.TOKEN_VARIANCE_SYMBOL);
     void doVarSamp() => this.type = determineFunction(MySQLLexer.TOKEN_VAR_SAMP_SYMBOL);
     void doUnderscoreCharset() => this.type = checkCharset(this.text);
-
     bool isVersionComment() => checkMySQLVersion(this.text);
-
-    bool isBackTickQuotedId()
-    {
-        return !this.isSqlModeActive(SqlMode.noBackslashEscapes);
-    }
-
-    bool isDoubleQuotedText()
-    {
-        return !this.isSqlModeActive(SqlMode.noBackslashEscapes);
-    }
-
-    bool isSingleQuotedText()
-    {
-        return !this.isSqlModeActive(SqlMode.noBackslashEscapes);
-    }
-
-/*
-    @override Token emit()
-    {
-        var ctf = this.tokenFactory;
-        Token t = ctf.create(
-            this.type,
-            (this.text!=null?(this.justEmitedDot?this.text.substring(1):this.text):null),
-            Pair<TokenSource?, CharStream?>(this, this.inputStream),
-            this.channel,
-            this.tokenStartCharIndex + (this.justEmitedDot?1:0),
-            CharIndex - 1, 
-            this.line,
-            this.charPositionInLine);
-        this.justEmitedDot = false;
-        super.emit(t);
-        return t;
-    }
-*/
-
-    void startInVersionComment()
-    {
-        inVersionComment = true;
-    }
-
-    void endInVersionComment()
-    {
-        inVersionComment = false;
-    }
-
-    bool isInVersionComment()
-    {
-        return inVersionComment;
-    }
+    bool isBackTickQuotedId() { return !this.isSqlModeActive(SqlMode.noBackslashEscapes); }
+    bool isDoubleQuotedText() { return !this.isSqlModeActive(SqlMode.noBackslashEscapes); }
+    bool isSingleQuotedText() { return !this.isSqlModeActive(SqlMode.noBackslashEscapes); }
+    void startInVersionComment() { inVersionComment = true; }
+    void endInVersionComment() { inVersionComment = false; }
+    bool isInVersionComment() { return inVersionComment; }
 }
