@@ -19,6 +19,8 @@ export default abstract class MySQLLexerBase extends Lexer {
     /** Enable Multi Language Extension support. */
     public supportMle = true;
 
+    public justEmittedDot = false;
+
     public charSets: Set<string> = new Set(); // Used to check repertoires.
     protected inVersionComment = false;
 
@@ -229,11 +231,25 @@ export default abstract class MySQLLexerBase extends Lexer {
      * Creates a DOT token in the token stream.
      */
     protected emitDot(): void {
+	let len = this.text.length;
         let t = new CommonToken([this, this._input],
                 MySQLLexer.DOT_SYMBOL, 0, this._tokenStartCharIndex, this._tokenStartCharIndex);
         this.pendingTokens.push(t);
-        ++this.column;
+	t.text = ".";
+	t.column = t.column - len;
+//        ++this.column;
         ++this._tokenStartCharIndex;
+	this.justEmittedDot = true;
+    }
+
+    public override emit(): Token
+    {
+        let t = super.emit();
+        if (this.justEmittedDot) {
+            t.column = t.column + 1;
+            this.justEmittedDot = false;
+        }
+        return t;
     }
 
     public isServerVersionLt80024(): boolean
@@ -489,14 +505,6 @@ export default abstract class MySQLLexerBase extends Lexer {
     public isSingleQuotedText(): boolean
     {
         return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public override emit(): Token
-    {
-        let t = super.emit();
-        if (t.type == MySQLLexer.WHITESPACE)
-                t.channel = Token.HIDDEN_CHANNEL;
-        return t;
     }
 
     public startInVersionComment(): void
