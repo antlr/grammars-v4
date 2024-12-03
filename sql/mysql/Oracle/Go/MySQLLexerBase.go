@@ -68,40 +68,45 @@ func NewMySQLLexerBase(input antlr.CharStream) *MySQLLexerBase {
 }
 
 func (l *MySQLLexerBase) MakeCommonToken(ttype int, text string) antlr.Token {
-    stop := l.TokenStartCharIndex - 1
-    start := stop
-    if len(text) != 0 {
-        start = stop - len(text) + 1
-    }
     ctf := l.GetTokenFactory()
     t := ctf.Create(
         l.GetTokenSourceCharStreamPair(),
         ttype,
         text,
         antlr.TokenDefaultChannel,
-        start,
-        l.TokenStartCharIndex-1,
+        l.TokenStartCharIndex,
+        l.TokenStartCharIndex,
         l.TokenStartLine,
         l.TokenStartColumn)
     return t
 }
 
 func (m *MySQLLexerBase) emitDot() {
-    m.pendingTokens = append(m.pendingTokens, m.MakeCommonToken(MySQLLexerDOT_SYMBOL, m.GetText()))
+    ctf := m.GetTokenFactory()
+    t := ctf.Create(
+        m.GetTokenSourceCharStreamPair(),
+        MySQLLexerDOT_SYMBOL,
+		".",
+        antlr.TokenDefaultChannel,
+        m.TokenStartCharIndex,
+        m.TokenStartCharIndex,
+        m.Interpreter.GetLine(),
+        m.Interpreter.GetCharPositionInLine() - len(m.GetText()))
+    m.pendingTokens = append(m.pendingTokens, t)
     m.TokenStartColumn = m.TokenStartColumn + 1
     m.TokenStartCharIndex = m.TokenStartCharIndex + 1
 }
 
-func (m *MySQLLexerBase) isServerVersionLt80024() bool { return m.serverVersion < 80024 }
-func (m *MySQLLexerBase) isServerVersionGe80024() bool { return m.serverVersion >= 80024 }
-func (m *MySQLLexerBase) isServerVersionGe80011() bool { return m.serverVersion >= 80011 }
-func (m *MySQLLexerBase) isServerVersionGe80013() bool { return m.serverVersion >= 80013 }
-func (m *MySQLLexerBase) isServerVersionLt80014() bool { return m.serverVersion < 80014 }
-func (m *MySQLLexerBase) isServerVersionGe80014() bool { return m.serverVersion >= 80014 }
-func (m *MySQLLexerBase) isServerVersionGe80017() bool { return m.serverVersion >= 80017 }
-func (m *MySQLLexerBase) isServerVersionGe80018() bool { return m.serverVersion >= 80018 }
-func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return m.serverVersion >= 80018 && m.isServerVersionLt80024() }
-func (m *MySQLLexerBase) isServerVersionLt80031() bool { return m.serverVersion < 80031 }
+func (m *MySQLLexerBase) isServerVersionLt80024() bool { return StaticMySQLLexerBase.serverVersion < 80024 }
+func (m *MySQLLexerBase) isServerVersionGe80024() bool { return StaticMySQLLexerBase.serverVersion >= 80024 }
+func (m *MySQLLexerBase) isServerVersionGe80011() bool { return StaticMySQLLexerBase.serverVersion >= 80011 }
+func (m *MySQLLexerBase) isServerVersionGe80013() bool { return StaticMySQLLexerBase.serverVersion >= 80013 }
+func (m *MySQLLexerBase) isServerVersionLt80014() bool { return StaticMySQLLexerBase.serverVersion < 80014 }
+func (m *MySQLLexerBase) isServerVersionGe80014() bool { return StaticMySQLLexerBase.serverVersion >= 80014 }
+func (m *MySQLLexerBase) isServerVersionGe80017() bool { return StaticMySQLLexerBase.serverVersion >= 80017 }
+func (m *MySQLLexerBase) isServerVersionGe80018() bool { return StaticMySQLLexerBase.serverVersion >= 80018 }
+func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return StaticMySQLLexerBase.serverVersion >= 80018 && m.isServerVersionLt80024() }
+func (m *MySQLLexerBase) isServerVersionLt80031() bool { return StaticMySQLLexerBase.serverVersion < 80031 }
 
 func (m *MySQLLexerBase) doLogicalOr() {
     if m.isSqlModeActive(PipesAsConcat) {
