@@ -44,7 +44,8 @@ external_function_data_type
 numeric_data_type
     : BYTEINT
     | SMALLINT
-    | (INTEGER|INT)
+    | INTEGER
+    | INT
     | BIGINT
     | (DECIMAL|DEC|NUMERIC) ('('precision=integer_literal? (',' scale=integer_literal)? ')' )?
     | ( FLOAT ('(' precision=integer_literal ')')?

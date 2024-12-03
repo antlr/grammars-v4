@@ -385,7 +385,6 @@ operation
     | CREATE USER
     | CREATE VIEW
     | DATABASE
-    | DELETE
     | DROP
     | DROP AUTHORIZATION
     | DROP DATABASE
@@ -405,20 +404,17 @@ operation
     | EXECUTE PROCEDURE
     | GRANT
     | INDEX
-    | INSERT
     | MACRO
     | PROCEDURE
     | REFERENCES
     | RESTORE
     | ROLLBACK DATABASE
     | ROLLFORWARD DATABASE
-    | SELECT
     | TABLE
     | TRIGGER
     | UDTMETHOD
     | UDTTYPE
     | UDTUSAGE
-    | UPDATE
     | USER
     | VIEW
     | DELETE
@@ -725,7 +721,7 @@ procedure_stat
       | procedure_cursor_control_stat
       | assignment_stat
       | condition_stat
-      | (label_name ':')? iteration_stat (label_name)?
+      | (label_name ':')? iteration_stat label_name?
       | diagnostic_stat
       | print_stat
       | ITERATE label_name
@@ -826,7 +822,7 @@ compound_stat
       cursor_declaration*
       condition_handler*
       procedure_stat*
-      END (label_name)?
+      END label_name?
     ;
 
 // Only stored procedure forms, except DECLARE CURSOR
