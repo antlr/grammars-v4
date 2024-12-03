@@ -16,9 +16,9 @@ public class MySQLLexerBase : Lexer {
     public HashSet<SqlMode> sqlModes = new HashSet<SqlMode>();
 
     /** Enable Multi Language Extension support. */
-	public bool supportMle = true;
+    public bool supportMle = true;
 
-	bool justEmittedDot = false;
+    bool justEmittedDot = false;
 
     public HashSet<string> charSets = new HashSet<string>(); // Used to check repertoires.
     protected bool inVersionComment = false;
@@ -266,10 +266,10 @@ public class MySQLLexerBase : Lexer {
     public override IToken Emit()
     {
         var t = base.Emit();
-		if (this.justEmittedDot) {
-			var p = t as CommonToken;
-			p.Text = p.Text.Substring(1);
-			p.Column = p.Column + 1;
+        if (this.justEmittedDot) {
+            var p = t as CommonToken;
+            p.Text = p.Text.Substring(1);
+            p.Column = p.Column + 1;
             p.StartIndex = p.StartIndex + 1;
             this.Column = this.Column - 1;
             this.justEmittedDot = false;
