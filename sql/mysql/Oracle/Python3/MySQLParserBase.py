@@ -6,15 +6,15 @@ if sys.version_info[1] > 5:
 else:
     from typing.io import TextIO
 from SqlMode import SqlMode
+from SqlModes import SqlModes
 
 class MySQLParserBase(Parser):
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
         self.serverVersion = 0
-        self.sqlModes = set()
+        self.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES")
         self.supportMle = True
         self.serverVersion = 80200;
-        self.sqlModeFromString("ANSI_QUOTES");
 
     def isSqlModeActive(self, mode):
         """
@@ -44,23 +44,6 @@ class MySQLParserBase(Parser):
 
     def isSelectStatementWithInto(self):
         return self.serverVersion >= 80024 and self.serverVersion < 80031;
-
-    def sqlModeFromString(self, modes):
-        self.sqlModes.clear()
-        parts = modes.upper().split(",")
-        for mode in parts:
-            if mode in {"ANSI", "DB2", "MAXDB", "MSSQL", "ORACLE", "POSTGRESQL"}:
-                self.sqlModes.update({SqlMode.AnsiQuotes, SqlMode.PipesAsConcat, SqlMode.IgnoreSpace})
-            elif mode == "ANSI_QUOTES":
-                self.sqlModes.add(SqlMode.AnsiQuotes)
-            elif mode == "PIPES_AS_CONCAT":
-                self.sqlModes.add(SqlMode.PipesAsConcat)
-            elif mode == "NO_BACKSLASH_ESCAPES":
-                self.sqlModes.add(SqlMode.NoBackslashEscapes)
-            elif mode == "IGNORE_SPACE":
-                self.sqlModes.add(SqlMode.IgnoreSpace)
-            elif mode in {"HIGH_NOT_PRECEDENCE", "MYSQL323", "MYSQL40"}:
-                self.sqlModes.add(SqlMode.HighNotPrecedence)
 
     def isServerVersionGe80004(self):
         return self.serverVersion >= 80004
