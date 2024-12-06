@@ -13,7 +13,9 @@ import java.util.*;
 public abstract class MySQLLexerBase extends Lexer {
 
     public MySQLLexerBase(CharStream input) {
-	super(input);
+        super(input);
+        this.serverVersion = 80200;
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     public int serverVersion = 0;
@@ -25,7 +27,7 @@ public abstract class MySQLLexerBase extends Lexer {
     public Set<String> charSets = new HashSet<>(); // Used to check repertoires.
     protected boolean inVersionComment = false;
 
-    private Deque<Token> pendingTokens = new ArrayDeque<>();
+    private Queue<Token> pendingTokens = new LinkedList<>();
 
     static String longString = "2147483647";
     static int longLength = 10;
@@ -37,60 +39,9 @@ public abstract class MySQLLexerBase extends Lexer {
     static String unsignedLongLongString = "18446744073709551615";
     static int unsignedLongLongLength = 20;
 
-    private boolean justEmitedDot = false;
+    private boolean justEmittedDot = false;
 
-    /**
-     * Determines if the given SQL mode is currently active in the lexer.
-     *
-     * @param mode The mode to check.
-     *
-     * @returns True if the mode is one of the currently active modes.
-     */
-    public boolean isSqlModeActive(SqlMode mode) {
-        return this.sqlModes.contains(mode);
-    }
-
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public void sqlModeFromString(String modes) {
-        this.sqlModes = new HashSet<>();
-
-        String[] parts = modes.toUpperCase().split(",");
-        for (String mode : parts) {
-            switch (mode) {
-                case "ANSI":
-                case "DB2":
-                case "MAXDB":
-                case "MSSQL":
-                case "ORACLE":
-                case "POSTGRESQL":
-                    this.sqlModes.add(SqlMode.AnsiQuotes);
-                    this.sqlModes.add(SqlMode.PipesAsConcat);
-                    this.sqlModes.add(SqlMode.IgnoreSpace);
-                    break;
-                case "ANSI_QUOTES":
-                    this.sqlModes.add(SqlMode.AnsiQuotes);
-                    break;
-                case "PIPES_AS_CONCAT":
-                    this.sqlModes.add(SqlMode.PipesAsConcat);
-                    break;
-                case "NO_BACKSLASH_ESCAPES":
-                    this.sqlModes.add(SqlMode.NoBackslashEscapes);
-                    break;
-                case "IGNORE_SPACE":
-                    this.sqlModes.add(SqlMode.IgnoreSpace);
-                    break;
-                case "HIGH_NOT_PRECEDENCE":
-                case "MYSQL323":
-                case "MYSQL40":
-                    this.sqlModes.add(SqlMode.HighNotPrecedence);
-                    break;
-            }
-        }
-    }
+    public boolean isSqlModeActive(SqlMode mode) { return this.sqlModes.contains(mode); }
 
     @Override
     public void reset() {
@@ -100,16 +51,16 @@ public abstract class MySQLLexerBase extends Lexer {
 
     @Override
     public Token nextToken() {
-        Token pending = pendingTokens.pollLast();
+        Token pending = pendingTokens.poll();
         if (pending != null) {
             return pending;
         }
 
         Token next = super.nextToken();
 
-        pending = pendingTokens.pollLast();
+        pending = pendingTokens.poll();
         if (pending != null) {
-            pendingTokens.push(next);
+            pendingTokens.add(next);
             return pending;
         }
 
@@ -218,10 +169,23 @@ public abstract class MySQLLexerBase extends Lexer {
     }
 
     protected void emitDot() {
-        pendingTokens.push(this._factory.create(this._tokenFactorySourcePair, MySQLLexer.DOT_SYMBOL,
-                this.getText(), this._channel, this._tokenStartCharIndex, this._tokenStartCharIndex, this.getLine(), this.getCharPositionInLine()));
+        var len = this.getText().length();
+        pendingTokens.add(this._factory.create(this._tokenFactorySourcePair, MySQLLexer.DOT_SYMBOL,
+                ".", this._channel, this._tokenStartCharIndex, this._tokenStartCharIndex, this.getLine(), this.getCharPositionInLine() - len));
         ++this._tokenStartCharPositionInLine;
-        this.justEmitedDot = true;
+        this.justEmittedDot = true;
+    }
+
+    @Override
+    public Token emit() {
+        var t = super.emit();
+        if (this.justEmittedDot) {
+            var p = (CommonToken)t;
+            p.setText(p.getText().substring(1));
+            p.setStartIndex(p.getStartIndex() + 1);
+            this.justEmittedDot = false;
+        }
+        return t;
     }
 
     public boolean isServerVersionLt80024() { return serverVersion < 80024; }
@@ -234,15 +198,8 @@ public abstract class MySQLLexerBase extends Lexer {
     public boolean isServerVersionGe80018() { return serverVersion >= 80018; }
     public boolean isMasterCompressionAlgorithm() { return serverVersion >= 80018 && isServerVersionLt80024(); }
     public boolean isServerVersionLt80031() { return serverVersion < 80031; }
-
-    public void doLogicalOr() {
-        this._type = isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
-    }
-
-    public void doIntNumber() {
-        this._type = determineNumericType(this.getText());
-    }
-
+    public void doLogicalOr() { this._type = isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR; }
+    public void doIntNumber() { this._type = determineNumericType(this.getText()); }
     public void doAdddate() { this._type = determineFunction(MySQLLexer.ADDDATE_SYMBOL); }
     public void doBitAnd() { this._type = determineFunction(MySQLLexer.BIT_AND_SYMBOL); }
     public void doBitOr() { this._type = determineFunction(MySQLLexer.BIT_OR_SYMBOL); }
@@ -279,47 +236,11 @@ public abstract class MySQLLexerBase extends Lexer {
     public void doVarPop() { this._type = determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
     public void doVarSamp() { this._type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL); }
     public void doUnderscoreCharset() { this._type = checkCharset(this.getText()); }
-
-    public boolean isVersionComment() {
-        return checkMySQLVersion(this.getText());
-    }
-
-    public boolean isBackTickQuotedId()
-    {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public boolean isDoubleQuotedText()
-    {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public boolean isSingleQuotedText()
-    {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    @Override
-    public Token emit() {
-        Token t = this._factory.create(this._tokenFactorySourcePair,
-                this._type, this.getText() != null ? (this.justEmitedDot ? this.getText().substring(1) : this.getText()) : null, this._channel, this._tokenStartCharIndex + (this.justEmitedDot ? 1 : 0), this.getCharIndex() - 1, this.getLine(), this.getCharPositionInLine());
-        this.justEmitedDot = false;
-        super.emit(t);
-        return t;
-    }
-
-    public void startInVersionComment()
-    {
-	inVersionComment = true;
-    }
-
-    public void endInVersionComment()
-    {
-	inVersionComment = false;
-    }
-
-    public boolean isInVersionComment()
-    {
-	return inVersionComment;
-    }
+    public boolean isVersionComment() { return checkMySQLVersion(this.getText()); }
+    public boolean isBackTickQuotedId() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public boolean isDoubleQuotedText() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public boolean isSingleQuotedText() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public void startInVersionComment() { inVersionComment = true; }
+    public void endInVersionComment() { inVersionComment = false; }
+    public boolean isInVersionComment() { return inVersionComment; }
 }

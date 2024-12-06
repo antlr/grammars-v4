@@ -18,29 +18,11 @@ def fix(file_path):
     output_file = open(file_path, 'w')
     for x in input_file:
         if '// Insert here @header for lexer.' in x:
-            x = x.replace('// Insert here @header for lexer.', '''
-@header {
-// Modified by transformGrammar.py
-// This code is automatically inserted because it is for the Antlr4ng target. It cannot be
-// in the .g4 directly, so we look for a specific comment in the .g4 and put it there.
-
-/* eslint-disable @typescript-eslint/no-unused-vars, no-useless-escape */
-
-import { MySQLLexerBase } from "./MySQLLexerBase.js";
-}
-'''
-            )
+            x = x.replace('// Insert here @header for lexer.', '@header {#include "MySQLLexerBase.h"}')
         if '// Insert here @header for parser.' in x:
-            x = x.replace('// Insert here @header for parser.', '''
-@header {
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-useless-escape, no-lone-blocks */
-
-import { MySQLParserBase } from "./MySQLParserBase.js";
-}
-'''
-            )
-
+            x = x.replace('// Insert here @header for parser.', '@header {#include "MySQLParserBase.h"}')
+        if 'this.' in x:
+            x = x.replace('this.', 'this->')
         output_file.write(x)
         output_file.flush()
 

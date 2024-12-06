@@ -5,22 +5,10 @@
 /* eslint-disable no-underscore-dangle */
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
+using Antlr4.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Channels;
-using Antlr4.Runtime;
-using static System.Net.WebRequestMethods;
-
-/** SQL modes that control parsing behavior. */
-public enum SqlMode {
-    NoMode,
-    AnsiQuotes,
-    HighNotPrecedence,
-    PipesAsConcat,
-    IgnoreSpace,
-    NoBackslashEscapes,
-};
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 public class MySQLLexerBase : Lexer {
@@ -30,10 +18,12 @@ public class MySQLLexerBase : Lexer {
     /** Enable Multi Language Extension support. */
     public bool supportMle = true;
 
+    bool justEmittedDot = false;
+
     public HashSet<string> charSets = new HashSet<string>(); // Used to check repertoires.
     protected bool inVersionComment = false;
 
-    private StackQueue<IToken> pendingTokens  = new StackQueue<IToken>();
+    private Queue<IToken> pendingTokens  = new Queue<IToken>();
 
     static string longString = "2147483647";
     static int longLength = 10;
@@ -45,8 +35,6 @@ public class MySQLLexerBase : Lexer {
     static string unsignedLongLongString = "18446744073709551615";
     static int unsignedLongLongLength = 20;
 
-    private bool JustEmitedDot = false;
-
     public override string[] RuleNames => throw new NotImplementedException();
 
     public override IVocabulary Vocabulary => throw new NotImplementedException();
@@ -55,13 +43,17 @@ public class MySQLLexerBase : Lexer {
 
 
     protected MySQLLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-	: base(input, output, errorOutput)
+        : base(input, output, errorOutput)
     {
+        this.serverVersion = 80200;
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     public MySQLLexerBase(ICharStream input)
         : base(input)
     {
+        this.serverVersion = 80200;
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
     }
 
     /**
@@ -74,37 +66,6 @@ public class MySQLLexerBase : Lexer {
     public bool isSqlModeActive(SqlMode mode)
     {
         return this.sqlModes.Contains(mode);
-    }
-
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public void sqlModeFromString(string modes)
-    {
-        this.sqlModes = new HashSet<SqlMode>();
-
-        var parts = modes.ToUpper().Split(",");
-        foreach (var mode in parts)
-        {
-            if (mode == "ANSI" || mode == "DB2" || mode == "MAXDB" || mode == "MSSQL" || mode == "ORACLE" ||
-                mode == "POSTGRESQL") {
-                this.sqlModes.Add(SqlMode.AnsiQuotes);
-                this.sqlModes.Add(SqlMode.PipesAsConcat);
-                this.sqlModes.Add(SqlMode.IgnoreSpace);
-            } else if (mode == "ANSI_QUOTES") {
-                this.sqlModes.Add(SqlMode.AnsiQuotes);
-            } else if (mode == "PIPES_AS_CONCAT") {
-                this.sqlModes.Add(SqlMode.PipesAsConcat);
-            } else if (mode == "NO_BACKSLASH_ESCAPES") {
-                this.sqlModes.Add(SqlMode.NoBackslashEscapes);
-            } else if (mode == "IGNORE_SPACE") {
-                this.sqlModes.Add(SqlMode.IgnoreSpace);
-            } else if (mode == "HIGH_NOT_PRECEDENCE" || mode == "MYSQL323" || mode == "MYSQL40") {
-                this.sqlModes.Add(SqlMode.HighNotPrecedence);
-            }
-        }
     }
 
     /**
@@ -125,8 +86,9 @@ public class MySQLLexerBase : Lexer {
     public override IToken NextToken()
     {
         // First respond with pending tokens to the next token request, if there are any.
-        var pending = this.pendingTokens.DequeueBottom();
-        if (pending != null) {
+        IToken pending;
+        var not_empty = this.pendingTokens.TryDequeue(out pending);
+        if (not_empty) {
             return pending;
         }
 
@@ -134,10 +96,9 @@ public class MySQLLexerBase : Lexer {
         // This might create additional tokens again.
         var next = base.NextToken();
 
-        pending = this.pendingTokens.DequeueBottom();
-        if (pending != null) {
-            this.pendingTokens.Push(next);
-
+        not_empty = this.pendingTokens.TryDequeue(out pending);
+        if (not_empty) {
+            this.pendingTokens.Enqueue(next);
             return pending;
         }
 
@@ -293,15 +254,28 @@ public class MySQLLexerBase : Lexer {
      */
     protected void emitDot()
     {
-        this.pendingTokens.Push(this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
-            this.Text, this.Channel, this.TokenStartCharIndex, this.TokenStartCharIndex, this.Line,
-            this.Column
-        ));
-
+        var len = this.Text.Length;
+        var t = this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream), MySQLLexer.DOT_SYMBOL,
+            ".", this.Channel, this.TokenStartCharIndex, this.TokenStartCharIndex, this.Line, this.Column) as CommonToken;
+        this.pendingTokens.Enqueue(t);
+        t.Column = t.Column - len;
         ++this.Column;
-        this.JustEmitedDot = true;
+        this.justEmittedDot = true;
     }
 
+    public override IToken Emit()
+    {
+        var t = base.Emit();
+        if (this.justEmittedDot) {
+            var p = t as CommonToken;
+            p.Text = p.Text.Substring(1);
+            p.Column = p.Column + 1;
+            p.StartIndex = p.StartIndex + 1;
+            this.Column = this.Column - 1;
+            this.justEmittedDot = false;
+        }
+        return t;
+    }
 
     // Version-related methods
     public bool isServerVersionLt80024() => serverVersion < 80024;
@@ -380,15 +354,6 @@ public class MySQLLexerBase : Lexer {
     public bool isSingleQuotedText()
     {
         return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public override IToken Emit()
-    {
-        IToken t = this.TokenFactory.Create(new Tuple<ITokenSource, ICharStream>(this, (ICharStream)this.InputStream),
-                this.Type, (this.Text!=null?(this.JustEmitedDot?this.Text.Substring(1):this.Text):null), this.Channel, this.TokenStartCharIndex + (this.JustEmitedDot?1:0), CharIndex - 1, this.TokenStartLine, this.TokenStartColumn);
-        this.JustEmitedDot = false;
-        base.Emit(t);
-        return t;
     }
 
     public void startInVersionComment()
