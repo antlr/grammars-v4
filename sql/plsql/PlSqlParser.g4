@@ -6359,7 +6359,7 @@ logical_operation
     ;
 
 multiset_expression
-    : relational_expression (multiset_type = (MEMBER | SUBMULTISET) OF? concatenation)?
+    : relational_expression (multiset_type = NOT? (MEMBER | SUBMULTISET) OF? concatenation)?
     | multiset_expression MULTISET multiset_operator = (EXCEPT | INTERSECT | UNION) (
         ALL
         | DISTINCT
