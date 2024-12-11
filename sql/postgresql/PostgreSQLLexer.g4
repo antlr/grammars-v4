@@ -1317,6 +1317,10 @@ InvalidUnterminatedHexadecimalStringConstant: 'X' UnterminatedStringConstant;
 
 Integral: Digits;
 
+HexadecimalIntegral: '0x' Digits;
+
+BinaryIntegral: '0b' Digits;
+
 NumericFail: Digits '..' {this.HandleNumericFail();};
 
 Numeric:
