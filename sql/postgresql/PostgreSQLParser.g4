@@ -4345,6 +4345,9 @@ fconst
 
 iconst
     : Integral
+    | BinaryIntegral
+    | OctalIntegral
+    | HexadecimalIntegral
     ;
 
 sconst
