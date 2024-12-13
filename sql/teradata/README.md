@@ -1,6 +1,17 @@
 # Teradata SQL Grammar  
 
 An [ANTLR4](https://www.antlr.org/) grammar for Teradata SQL. Based on a grammar of Teradata Database version 17.10.  
+This grammar was written using vendor's official documentation:  
+- [SQL Fundamentals](https://docs.teradata.com/r/SQL-Fundamentals/July-2021)  
+- [SQL Data Types and Literals](https://docs.teradata.com/r/SQL-Data-Types-and-Literals/July-2021)
+- [SQL Functions, Expressions, and Predicates](https://docs.teradata.com/r/SQL-Functions-Expressions-and-Predicates/July-2021)
+- [SQL Operators and User-Defined Functions](https://docs.teradata.com/r/SQL-Operators-and-User-Defined-Functions/July-2021)
+- [SQL Date and Time Functions and Expressions](https://docs.teradata.com/r/SQL-Date-and-Time-Functions-and-Expressions/July-2021)
+- [SQL Data Manipulation Language](https://docs.teradata.com/r/SQL-Data-Manipulation-Language/July-2021)
+- [SQL Data Definition Language Syntax and Examples](https://docs.teradata.com/r/SQL-Data-Definition-Language-Syntax-and-Examples/July-2021)
+- [SQL Data Definition Language Detailed Topics](https://docs.teradata.com/r/SQL-Data-Definition-Language-Detailed-Topics/July-2021)
+- [SQL Stored Procedures and Embedded SQL](https://docs.teradata.com/r/SQL-Stored-Procedures-and-Embedded-SQL/July-2021)
+- [SQL Data Control Language](https://docs.teradata.com/r/SQL-Data-Control-Language/July-2021)  
 
 Work in progress!
 
