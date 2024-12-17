@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
    <antlr-version>^4.12.0</antlr-version>
-   <targets>CSharp;Java;JavaScript;Python3</targets>
+   <targets>CSharp;Java;JavaScript;Python3;TypeScript</targets>
    <test>
       <name>full</name>
       <targets>CSharp;Java</targets>
@@ -9,7 +9,7 @@
    </test>
    <test>
       <name>hw</name>
-      <targets>JavaScript;Python3</targets>
+      <targets>JavaScript;Python3;TypeScript</targets>
       <inputs>hw-examples</inputs>
    </test>
    <test>
