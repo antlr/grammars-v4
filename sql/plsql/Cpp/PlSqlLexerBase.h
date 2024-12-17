@@ -1,12 +1,12 @@
-#ifndef PLSQLLEXERBASE_H
-#define PLSQLLEXERBASE_H
+#pragma once
+#include "antlr4-runtime.h"
 
 #include "antlr4-runtime.h"
 
 class PlSqlLexerBase : public antlr4::Lexer
 {
 public:
-  PlSqlLexerBase(antlr4::CharStream *input) : Lexer(input), self(*this) { }
+  PlSqlLexerBase(antlr4::CharStream *input) : Lexer(input), self(*this) { };
 
 public:
   PlSqlLexerBase & self;
@@ -16,7 +16,5 @@ public:
   {
     int la = _input->LA(pos);
     return la == -1 || la == '\n';
-  }
+  };
 };
-
-#endif

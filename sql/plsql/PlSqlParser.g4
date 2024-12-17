@@ -28,9 +28,7 @@ options {
     superClass = PlSqlParserBase;
 }
 
-@parser::postinclude {
-#include <PlSqlParserBase.h>
-}
+// Insert here @header for C++ parser.
 
 sql_script
     : sql_plus_command_no_semicolon? (
@@ -3610,7 +3608,7 @@ hash_partitions_by_quantity
     : PARTITIONS hash_partition_quantity (STORE IN '(' tablespace (',' tablespace)* ')')? (
         table_compression
         | key_compression
-    )? (OVERFLOW STORE IN '(' tablespace (',' tablespace)* ')')?
+    )? (OVERFLOW_ STORE IN '(' tablespace (',' tablespace)* ')')?
     ;
 
 hash_partition_quantity
@@ -3751,14 +3749,14 @@ list_values_clause
 
 table_partition_description
     : deferred_segment_creation? segment_attributes_clause? (table_compression | key_compression)? (
-        OVERFLOW segment_attributes_clause?
+        OVERFLOW_ segment_attributes_clause?
     )? (lob_storage_clause | varray_col_properties | nested_table_col_properties)*
     ;
 
 partitioning_storage_clause
     : (
         TABLESPACE tablespace
-        | OVERFLOW (TABLESPACE tablespace)?
+        | OVERFLOW_ (TABLESPACE tablespace)?
         | table_compression
         | key_compression
         | lob_partitioning_storage
@@ -4877,7 +4875,7 @@ alter_mapping_table_clause
 
 alter_overflow_clause
     : add_overflow_clause
-    | OVERFLOW (
+    | OVERFLOW_ (
         segment_attributes_clause
         | allocate_extent_clause
         | shrink_clause
@@ -4886,7 +4884,7 @@ alter_overflow_clause
     ;
 
 add_overflow_clause
-    : ADD OVERFLOW segment_attributes_clause? (
+    : ADD OVERFLOW_ segment_attributes_clause? (
         '(' PARTITION segment_attributes_clause? (',' PARTITION segment_attributes_clause?)* ')'
     )?
     ;
@@ -4975,7 +4973,7 @@ key_compression
     ;
 
 index_org_overflow_clause
-    : (INCLUDING column_name)? OVERFLOW segment_attributes_clause?
+    : (INCLUDING column_name)? OVERFLOW_ segment_attributes_clause?
     ;
 
 column_clauses
@@ -6348,7 +6346,7 @@ unary_logical_operation
 logical_operation
     : (
         NULL_
-        | NAN
+        | NAN_
         | PRESENT
         | INFINITE
         | A_LETTER SET
@@ -6401,7 +6399,7 @@ between_elements
 
 concatenation
     : model_expression (AT (LOCAL | TIME ZONE concatenation) | interval_expression)? (
-        ON OVERFLOW (TRUNCATE | ERROR)
+        ON OVERFLOW_ (TRUNCATE | ERROR)
     )?
     | concatenation op = DOUBLE_ASTERISK concatenation
     | concatenation op = (ASTERISK | SOLIDUS | MOD) concatenation
@@ -6681,7 +6679,7 @@ numeric_function
     ;
 
 listagg_overflow_clause
-    : ON OVERFLOW (ERROR | TRUNCATE) CHAR_STRING? ((WITH | WITHOUT) COUNT)?
+    : ON OVERFLOW_ (ERROR | TRUNCATE) CHAR_STRING? ((WITH | WITHOUT) COUNT)?
     ;
 
 other_function
@@ -8632,7 +8630,7 @@ non_reserved_keywords_pre12c
     | NAMED
     | NAME
     | NAMESPACE
-    | NAN
+    | NAN_
     | NANVL
     | NATIONAL
     | NATIVE_FULL_OUTER_JOIN
@@ -8872,7 +8870,7 @@ non_reserved_keywords_pre12c
     | OUTLINE_LEAF
     | OUTLINE
     | OUT_OF_LINE
-    | OVERFLOW
+    | OVERFLOW_
     | OVERFLOW_NOMOVE
     | OVERLAPS
     | OVER
