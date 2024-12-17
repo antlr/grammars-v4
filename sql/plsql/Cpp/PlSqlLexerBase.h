@@ -1,8 +1,6 @@
 #pragma once
 #include "antlr4-runtime.h"
 
-#include "antlr4-runtime.h"
-
 class PlSqlLexerBase : public antlr4::Lexer
 {
 public:
