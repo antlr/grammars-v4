@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using System.IO;
@@ -20,7 +21,7 @@ public class MyParser : <parser_name> {
             input);
     }
 
-    public List\<ParserRuleContext> getAllPossibleParseTrees(
+    public List\<Tuple\<string, ParserRuleContext>> getAllPossibleParseTrees(
         int decision,
         BitSet alts,
         int startIndex,
@@ -28,8 +29,8 @@ public class MyParser : <parser_name> {
         int startRuleIndex)
     {
         _ParserInterpreter.Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;
-        var trees = new List\<ParserRuleContext>();
-        
+        var trees = new List\<Tuple\<string,ParserRuleContext>>();
+
         if ( stopIndex>=(_tokens.Size - 1) ) { // if we are pointing at EOF token
             // EOF is not in tree, so must be 1 less than last non-EOF token
             stopIndex = _tokens.Size - 2;
@@ -45,7 +46,7 @@ public class MyParser : <parser_name> {
             _ParserInterpreter.Reset();
             _ParserInterpreter.AddDecisionOverride(decision, startIndex, alt);
             ParserRuleContext t = _ParserInterpreter.Parse(startRuleIndex);
-            trees.Add(t);
+            trees.Add(new Tuple\<string, ParserRuleContext>("d=" + decision + ".a=" + alt, t));
             alt = alts.NextSetBit(alt+1);
         }
         return trees;

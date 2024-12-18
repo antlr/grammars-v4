@@ -124,7 +124,7 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        if (!quiet) console.error('Total Time: ' + t);
+        if (!quiet) console.error(prefix + 'Total Time: ' + t);
     }
     process.exitCode = error_code;
 }
@@ -165,7 +165,7 @@ function DoParse(str, input_name, row_number) {
         for (var i = 0; ; ++i) {
             var ro_token = lexer.nextToken();
             var token = ro_token;
-            token.TokenIndex = i;
+            token.tokenIndex = i;
             console.error(token.toString());
             if (token.type === antlr4.Token.EOF)
                 break;
