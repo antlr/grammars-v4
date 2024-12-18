@@ -87,7 +87,7 @@ void main(List\<String> args) async {
         }
         s.stop();
         var et = s.elapsedMilliseconds / 1000.0;
-        if (!quiet) stderr.writeln("Total Time: " + et.toString());
+        if (!quiet) stderr.writeln(prefix + "Total Time: " + et.toString());
     }
     exit(error_code);
 }
@@ -128,11 +128,13 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         for (int i = 0; ; ++i)
         {
             var token = lexer.nextToken();
+            var wtoken = token as CommonToken;
+            wtoken.tokenIndex = i;
             stderr.writeln(token.toString());
             if (token.type == -1)
                 break;
         }
-        lexer.reset();
+        lexer.reset(true);
     }
     var tokens = CommonTokenStream(lexer);
     var parser = <parser_name>(tokens);

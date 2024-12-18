@@ -98,7 +98,7 @@ def main(argv):
         diff = end_time - start_time
         diff_time = diff.total_seconds()
         if (not quiet):
-            print(f'Total Time: {diff_time}', file=sys.stderr);
+            print(f'{prefix}Total Time: {diff_time}', file=sys.stderr);
     sys.exit(error_code)
 
 def ParseStdin():
@@ -151,7 +151,7 @@ def DoParse(str, input_name, row_number):
         while True:
             ro_token = lexer.nextToken()
             token = ro_token
-            # token.TokenIndex = i
+            token.tokenIndex = i
             i = i + 1
             print(token, file=sys.stderr)
             if (token.type == -1):
