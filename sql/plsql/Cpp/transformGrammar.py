@@ -5,6 +5,11 @@ from pathlib import Path
 def main(argv):
     for file in glob("./*.g4"):
         fix(file)
+    print("This is what CMakeLists.txt looks like")
+    foobar_file = open("CMakeLists.txt",'r')
+    for x in foobar_file:
+        print(x)
+    foobar_file.close()
 
 def fix(file_path):
     print("Altering " + file_path)
