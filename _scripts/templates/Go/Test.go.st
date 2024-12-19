@@ -111,7 +111,7 @@ func main() {
         }
         elapsed := time.Since(start)
         if ! quiet {
-            fmt.Fprintf(os.Stderr, "Total Time: %.3f s", elapsed.Seconds())
+            fmt.Fprintf(os.Stderr, "%sTotal Time: %.3f", prefix, elapsed.Seconds())
             fmt.Fprintln(os.Stderr)
         }
     }
@@ -155,16 +155,14 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         j := 0
         for {
             t := lexer.NextToken()
-            fmt.Fprintf(os.Stderr, "%d ", j)
-            fmt.Fprintf(os.Stderr, " ")
-            // missing fmt.Println(t.String())
-            fmt.Fprintf(os.Stderr, "%d ", t.GetText())
+            t.SetTokenIndex(j)
+            fmt.Fprintf(os.Stderr, "%s\n", t.String())
             if t.GetTokenType() == antlr.TokenEOF {
                 break
             }
             j = j + 1
         }
-        // missing lexer.Reset()
+        lexer.Reset()
     }
     // Requires additional 0??
     var tokens = antlr.NewCommonTokenStream(lexer, 0)

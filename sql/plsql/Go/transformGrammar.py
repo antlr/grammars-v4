@@ -3,10 +3,12 @@ from glob import glob
 from pathlib import Path
 
 def main(argv):
-    fixLexer("parser/PlSqlLexer.g4")
-    fixParser("parser/PlSqlParser.g4")
+    for file in glob("./parser/*Lexer.g4"):
+        fix_lexer(file)
+    for file in glob("./parser/*Parser.g4"):
+        fix_parser(file)
 
-def fixLexer(file_path):
+def fix_lexer(file_path):
     print("Altering " + file_path)
     if not os.path.exists(file_path):
         print(f"Could not find file: {file_path}")
@@ -18,8 +20,10 @@ def fixLexer(file_path):
     input_file = open(file_path + ".bak",'r')
     output_file = open(file_path, 'w')
     for x in input_file:
-        if 'self.' in x:
-            x = x.replace('self.', 'this.')
+        if 'this.' in x and '}?' in x:
+            x = x.replace('this.', 'p.')
+        elif 'this.' in x:
+            x = x.replace('this.', 'l.')
         output_file.write(x)
         output_file.flush()
 
@@ -27,7 +31,7 @@ def fixLexer(file_path):
     input_file.close()
     output_file.close()
 
-def fixParser(file_path):
+def fix_parser(file_path):
     print("Altering " + file_path)
     if not os.path.exists(file_path):
         print(f"Could not find file: {file_path}")
@@ -39,14 +43,14 @@ def fixParser(file_path):
     input_file = open(file_path + ".bak",'r')
     output_file = open(file_path, 'w')
     for x in input_file:
-        if 'self.' in x:
-            x = x.replace('self.', 'p.')
+        if 'this.' in x:
+            x = x.replace('this.', 'p.')
         output_file.write(x)
         output_file.flush()
 
     print("Writing ...")
     input_file.close()
     output_file.close()
-    
+
 if __name__ == '__main__':
     main(sys.argv)

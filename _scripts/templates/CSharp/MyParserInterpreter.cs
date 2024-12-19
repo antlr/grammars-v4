@@ -28,8 +28,6 @@ using Antlr4.Runtime.Sharpen;
 /// </remarks>
 public class MyParserInterpreter : Parser
 {
-    private readonly string _grammarFileName;
-
     private readonly ATN _atn;
 
     private readonly DFA[] _decisionToDFA;
