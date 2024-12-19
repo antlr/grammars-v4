@@ -11,18 +11,27 @@ type PlSqlParserBase struct {
     _isVersion10 bool
 }
 
+var StaticConfig PlSqlParserBase
+
+func init() {
+    StaticConfig = PlSqlParserBase {
+        _isVersion12: true,
+	_isVersion10: false,
+    }
+}
+
 func (p *PlSqlParserBase) isVersion12() bool {
-    return p._isVersion12;
+    return StaticConfig._isVersion12;
 }
 
 func (p *PlSqlParserBase) setVersion12(value bool) {
-    p._isVersion12 = value;
+    StaticConfig._isVersion12 = value;
 }
 
 func (p *PlSqlParserBase) isVersion10() bool {
-    return p._isVersion10;
+    return StaticConfig._isVersion10;
 }
 
 func (p *PlSqlParserBase) setVersion10(value bool) {
-    p._isVersion10 = value;
+    StaticConfig._isVersion10 = value;
 }

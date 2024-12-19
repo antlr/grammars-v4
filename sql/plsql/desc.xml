@@ -4,7 +4,7 @@
    <targets>Antlr4ng;Cpp;CSharp;Java;JavaScript;Python3;TypeScript</targets>
    <test>
       <name>full</name>
-      <targets>Antlr4ng;Cpp;CSharp;Java</targets>
+      <targets>Antlr4ng;Cpp;CSharp;Go;Java</targets>
       <inputs>examples</inputs>
    </test>
    <test>
@@ -14,7 +14,7 @@
    </test>
    <test>
       <name>examples-sql-script</name>
-      <targets>Antlr4ng;Cpp;CSharp;Java</targets>
+      <targets>Antlr4ng;Cpp;CSharp;Go;Java</targets>
       <inputs>examples-sql-script</inputs>
    </test>
 </desc>
