@@ -59,16 +59,15 @@ public class Program
         return tree;
     }
 
-    public static List\<Tuple\<int, List\<IParseTree>>> Parse3()
+    public static List\<Tuple\<string, IParseTree>> Parse3()
     {
         Parser.Profile = true;
         var tree = Parser.<start_symbol>();
         var decisions = Parser.ParseInfo.getDecisionInfo().Where(d => d.ambiguities.Any()).ToList();
-        var result = new List\<Tuple\<int, List\<IParseTree>>>();
+        var result = new List\<Tuple\<string, IParseTree>>();
         foreach (var decision in decisions)
         {
             var am = decision.ambiguities;
-            var trees = new List\<IParseTree>();
             foreach (AmbiguityInfo ai in am)
             {
                 var parser_decision = ai.decision;
@@ -79,15 +78,17 @@ public class Program
                         .Where(pair => (pair.value == "<start_symbol>"))
                         .Select(pair => pair.index).First();
                 var parser_startRuleIndex = p;
-                var parser_trees = ((MyParser)Parser).getAllPossibleParseTrees(
+                var parse_trees = ((MyParser)Parser).getAllPossibleParseTrees(
                     parser_decision,
                     parser_alts,
                     parser_startIndex,
                     parser_stopIndex,
-                    parser_startRuleIndex);
-                trees.AddRange(parser_trees);
+                parser_startRuleIndex);
+                foreach (var t in parse_trees)
+                {
+                    result.Add(new Tuple\<string, IParseTree>(t.Item1, t.Item2));
+                }
             }
-            result.Add(new Tuple\<int, List\<IParseTree>>(decision.decision, trees));
         }
         Input = Lexer.InputStream.ToString();
         TokenStream = Parser.TokenStream;
@@ -244,7 +245,7 @@ public class Program
                     ParseString(inputs[f], f);
             }
             DateTime after = DateTime.Now;
-            if (!quiet) System.Console.Error.WriteLine("Total Time: " + (after - before).TotalSeconds);
+            if (!quiet) System.Console.Error.WriteLine(prefix + "Total Time: " + (after - before).TotalSeconds);
         }
         Environment.ExitCode = exit_code;
     }
@@ -373,15 +374,15 @@ public class Program
                             .Where(pair => (pair.value == "<start_symbol>"))
                             .Select(pair => pair.index).First();
                     var parser_startRuleIndex = p;
-                    var parser_trees = parser.getAllPossibleParseTrees(
+                    var parse_trees = parser.getAllPossibleParseTrees(
                         parser_decision,
                         parser_alts,
                         parser_startIndex,
                         parser_stopIndex,
                         parser_startRuleIndex);
-                    foreach (var parser_tree in parser_trees)
+                    foreach (var tuple in parse_trees)
                     {
-                        System.Console.WriteLine(parser_tree.ToStringTree(parser));
+                        System.Console.WriteLine(tuple.Item1 + " " + tuple.Item2.ToStringTree(parser));
                         System.Console.WriteLine();
                     }
                 }
