@@ -11,6 +11,7 @@ abstract class PlSqlLexerBase extends Lexer
     bool IsNewlineAtPos(int pos)
     {
         int la = inputStream.LA(pos)!;
-        return la == -1 || la == '\n';
+		if (la == -1) return true;
+		return '\n' == String.fromCharCode(inputStream.LA(pos)!);
     }
 }
