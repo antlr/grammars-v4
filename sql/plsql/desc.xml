@@ -3,11 +3,12 @@
    <antlr-version>^4.12.0</antlr-version>
    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
    <test>
-      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
       <inputs>examples/**/*.sql</inputs>
    </test>
    <test>
-      <targets>JavaScript;Python3;TypeScript</targets>
-      <inputs>examples/hw-examples/**/*.sql</inputs>
+      <name>more</name>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <inputs>examples-more/**/*.sql</inputs>
    </test>
 </desc>
