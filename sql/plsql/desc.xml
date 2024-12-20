@@ -3,18 +3,11 @@
    <antlr-version>^4.12.0</antlr-version>
    <targets>Antlr4ng;Cpp;CSharp;Java;JavaScript;Python3;TypeScript</targets>
    <test>
-      <name>full</name>
-      <targets>Antlr4ng;Cpp;CSharp;Go;Java</targets>
-      <inputs>examples</inputs>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <inputs>examples/**/*.sql</inputs>
    </test>
    <test>
-      <name>hw</name>
       <targets>JavaScript;Python3;TypeScript</targets>
-      <inputs>hw-examples</inputs>
-   </test>
-   <test>
-      <name>examples-sql-script</name>
-      <targets>Antlr4ng;Cpp;CSharp;Go;Java</targets>
-      <inputs>examples-sql-script</inputs>
+      <inputs>examples/hw-examples/**/*.sql</inputs>
    </test>
 </desc>

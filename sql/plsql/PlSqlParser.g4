@@ -5404,7 +5404,7 @@ c_spec
     ;
 
 c_agent_in_clause
-    : AGENT IN '(' expressions ')'
+    : AGENT IN '(' expressions_ ')'
     ;
 
 c_parameters_clause
@@ -5592,7 +5592,7 @@ loop_statement
 
 cursor_loop_param
     : index_name IN REVERSE? lower_bound range_separator = '..' upper_bound
-    | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
+    | record_name IN (cursor_name ('(' expressions_? ')')? | '(' select_statement ')')
     ;
 
 //https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/FORALL-statement.html#GUID-C45B8241-F9DF-4C93-8577-C840A25963DB
@@ -5732,7 +5732,7 @@ close_statement
     ;
 
 open_statement
-    : OPEN cursor_name ('(' expressions? ')')?
+    : OPEN cursor_name ('(' expressions_? ')')?
     ;
 
 fetch_statement
@@ -5977,7 +5977,7 @@ outer_join_type
     ;
 
 query_partition_clause
-    : PARTITION BY (('(' (subquery | expressions)? ')') | expressions)
+    : PARTITION BY (('(' (subquery | expressions_)? ')') | expressions_)
     ;
 
 flashback_query_clause
@@ -6007,7 +6007,7 @@ pivot_in_clause_element
 
 pivot_in_clause_elements
     : expression
-    | '(' expressions? ')'
+    | '(' expressions_? ')'
     ;
 
 unpivot_clause
@@ -6052,7 +6052,7 @@ grouping_sets_clause
 
 grouping_sets_elements
     : rollup_cube_clause
-    | '(' expressions? ')'
+    | '(' expressions_? ')'
     | expression
     ;
 
@@ -6208,7 +6208,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions ')' | collection_expression)
+    : VALUES (REGULAR_ID | '(' expressions_ ')' | collection_expression)
     ;
 
 merge_statement
@@ -6270,7 +6270,7 @@ general_table_ref
     ;
 
 static_returning_clause
-    : (RETURNING | RETURN) expressions into_clause
+    : (RETURNING | RETURN) expressions_ into_clause
     ;
 
 error_logging_clause
@@ -6313,10 +6313,10 @@ seed_part
 
 condition
     : expression
-    | JSON_EQUAL '(' expressions ')'
+    | JSON_EQUAL '(' expressions_ ')'
     ;
 
-expressions
+expressions_
     : expression (',' expression)*
     ;
 
@@ -6426,7 +6426,7 @@ model_expression_element
 
 single_column_for_loop
     : FOR column_name (
-        IN '(' expressions? ')'
+        IN '(' expressions_? ')'
         | (LIKE expression)? FROM fromExpr = expression TO toExpr = expression action_type = (
             INCREMENT
             | DECREMENT
@@ -6435,7 +6435,7 @@ single_column_for_loop
     ;
 
 multi_column_for_loop
-    : FOR paren_column_list IN '(' (subquery | '(' expressions? ')') ')'
+    : FOR paren_column_list IN '(' (subquery | '(' expressions_? ')') ')'
     ;
 
 unary_expression
@@ -6505,7 +6505,7 @@ atom
     | inquiry_directive
     | general_element outer_join_sign?
     | '(' subquery ')' subquery_operation_part*
-    | '(' expressions ')'
+    | '(' expressions_ ')'
     ;
 
 quantified_expression
@@ -6520,7 +6520,7 @@ string_function
     | TO_CHAR '(' (table_element | standard_function | expression) (',' quoted_string)? (
         ',' quoted_string
     )? ')'
-    | DECODE '(' expressions ')'
+    | DECODE '(' expressions_ ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? expression? FROM)? concatenation ')'
@@ -6674,8 +6674,8 @@ numeric_function
     | ROUND '(' expression (',' UNSIGNED_INTEGER)? ')'
     | AVG '(' (DISTINCT | ALL)? expression ')'
     | MAX '(' (DISTINCT | ALL)? expression ')'
-    | LEAST '(' expressions ')'
-    | GREATEST '(' expressions ')'
+    | LEAST '(' expressions_ ')'
+    | GREATEST '(' expressions_ ')'
     ;
 
 listagg_overflow_clause
@@ -6700,7 +6700,7 @@ other_function
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | (LEAD | LAG) function_argument_analytic respect_or_ignore_nulls? over_clause
-    | standard_prediction_function_keyword '(' expressions cost_matrix_clause? using_clause? ')'
+    | standard_prediction_function_keyword '(' expressions_ cost_matrix_clause? using_clause? ')'
     | (TO_BINARY_DOUBLE | TO_BINARY_FLOAT | TO_NUMBER | TO_TIMESTAMP | TO_TIMESTAMP_TZ) '(' concatenation (
         DEFAULT concatenation ON CONVERSION ERROR
     )? (',' quoted_string (',' quoted_string)?)? ')'
@@ -6823,7 +6823,7 @@ string_delimiter
 cost_matrix_clause
     : COST (
         MODEL AUTO?
-        | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions? ')'
+        | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions_? ')'
     )
     ;
 
@@ -6911,7 +6911,7 @@ timing_command
 // Common
 
 partition_extension_clause
-    : (SUBPARTITION | PARTITION) FOR? '(' expressions? ')'
+    : (SUBPARTITION | PARTITION) FOR? '(' expressions_? ')'
     ;
 
 column_alias

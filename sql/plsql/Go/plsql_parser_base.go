@@ -16,7 +16,7 @@ var StaticConfig PlSqlParserBase
 func init() {
     StaticConfig = PlSqlParserBase {
         _isVersion12: true,
-	_isVersion10: false,
+	_isVersion10: true,
     }
 }
 
