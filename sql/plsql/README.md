@@ -19,3 +19,8 @@ User's Guide and Reference [html](https://docs.oracle.com/en/database/oracle/ora
 
 [pldb](https://pldb.pub/concepts/pl-sql.html)
 
+## Issues
+* The grammar is ambiguous, but generally performs well.
+
+## Performance
+<img src="./times.svg">
