@@ -7,11 +7,9 @@ class PlSqlParserBase : public antlr4::Parser
 {
     bool _isVersion12 = true;
     bool _isVersion10 = true;
-  public:
-    PlSqlParserBase & self;
 
   public:
-    PlSqlParserBase(antlr4::TokenStream *input) : Parser(input), self(*this) { }
+    PlSqlParserBase(antlr4::TokenStream *input) : Parser(input) { }
 
     bool isVersion12()
     {

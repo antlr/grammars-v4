@@ -4,16 +4,14 @@ import 'dart:convert';
 
 abstract class PlSqlLexerBase extends Lexer
 {
-    PlSqlLexerBase self;
-
     PlSqlLexerBase(CharStream input) : super(input)
-	{
-        self = this;
+    {
     }
 
     bool IsNewlineAtPos(int pos)
     {
-        int la = inputStream.LA(pos);
-        return la == -1 || la == '\n';
+        int la = inputStream.LA(pos)!;
+		if (la == -1) return true;
+		return '\n' == String.fromCharCode(inputStream.LA(pos)!);
     }
 }
