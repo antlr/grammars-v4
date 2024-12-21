@@ -24,6 +24,6 @@ User's Guide and Reference [html](https://docs.oracle.com/en/database/oracle/ora
 
 ## Performance
 <img src="./times.svg">
-[data.zip](/sql/plsql/data.zip)
-[te.sh](/sql/plsql/te.sh)
-[gr.sh](/sql/plsql/gr.sh)
+<a href="/sql/plsql/data.zip">data.zip</a>
+<a href="/sql/plsql/te.sh">te.sh</a>
+<a href="/sql/plsql/gr.sh">gr.sh</a>
