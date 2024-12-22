@@ -1,1 +1,0 @@
-ALTER OUTLINE salaries REBUILD;

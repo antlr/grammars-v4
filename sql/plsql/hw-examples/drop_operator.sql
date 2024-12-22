@@ -1,1 +1,0 @@
-DROP OPERATOR eq_op;
