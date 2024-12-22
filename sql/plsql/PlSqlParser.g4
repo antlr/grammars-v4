@@ -5986,7 +5986,7 @@ flashback_query_clause
     ;
 
 pivot_clause
-    : PIVOT XML? '(' pivot_element (',' pivot_element)* pivot_for_clause pivot_in_clause ')'
+    : PIVOT XML? '(' pivot_element (',' pivot_element)* pivot_for_clause pivot_in_clause ')' table_alias?
     ;
 
 pivot_element
@@ -6011,7 +6011,7 @@ pivot_in_clause_elements
     ;
 
 unpivot_clause
-    : UNPIVOT ((INCLUDE | EXCLUDE) NULLS)? '(' (column_name | paren_column_list) pivot_for_clause unpivot_in_clause ')'
+    : UNPIVOT ((INCLUDE | EXCLUDE) NULLS)? '(' (column_name | paren_column_list) pivot_for_clause unpivot_in_clause ')' table_alias?
     ;
 
 unpivot_in_clause
