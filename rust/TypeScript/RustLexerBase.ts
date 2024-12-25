@@ -30,6 +30,10 @@ export default abstract class RustLexerBase extends Lexer {
     next(expect: string): boolean {
         return this._input.LA(1) === expect.charCodeAt(0);
     }
+    nexti(expect: number): boolean {
+        return this._input.LA(1) === expect;
+    }
+
 
     // Determine if a float dot is possible based on the next character
     floatDotPossible(): boolean {
