@@ -1,0 +1,2 @@
+-- Stopping UDT Logging And SQL Text
+END LOGGING DENIALS WITH TEXT ON UDTTYPE;
