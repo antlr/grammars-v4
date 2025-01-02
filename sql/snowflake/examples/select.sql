@@ -128,3 +128,7 @@ select *
 from a;
 
 select count(t.*) as ca from t9 as t;
+
+SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
+FROM t1 as a
+JOIN t2 as b USING (col5, col6);
