@@ -4156,7 +4156,7 @@ select_list
 
 select_list_elem
     : column_elem as_alias?
-    | column_elem_star
+    | column_elem_star exclude_clause?
     //    | udt_elem
     | expression_elem as_alias?
     ;
@@ -4173,6 +4173,10 @@ column_elem
 object_name_or_alias
     : object_name
     | alias DOT
+    ;
+
+exclude_clause
+    : EXCLUDE (column_name | column_list_in_parentheses)
     ;
 
 as_alias
