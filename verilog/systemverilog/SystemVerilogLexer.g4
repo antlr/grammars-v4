@@ -1,26 +1,23 @@
 /*
-MIT License
-
-Copyright (c) 2022 Mustafa Said Ağca
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ MIT License
+ 
+ Copyright (c) 2022 Mustafa Said Ağca
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ associated documentation files (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all copies or
+ substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
@@ -465,7 +462,7 @@ ELSE_DIRECTIVE                : 'else'                -> channel(DIRECTIVES), po
 ELSIF_DIRECTIVE               : 'elsif'               -> channel(DIRECTIVES), popMode, mode(ELSIF_DIRECTIVE_MODE);
 END_KEYWORDS_DIRECTIVE        : 'end_keywords'        -> channel(DIRECTIVES), popMode;
 ENDCELLDEFINE_DIRECTIVE       : 'endcelldefine'       -> channel(DIRECTIVES), popMode;
-ENDIF_DIRECTIVE               : 'endif'               -> channel(DIRECTIVES), popMode, popMode, popMode;
+ENDIF_DIRECTIVE               : 'endif'               -> channel(DIRECTIVES), mode(ENDIF_DIRECTIVE_MODE);
 FILE_DIRECTIVE                : '__FILE__'            -> channel(DIRECTIVES), popMode;
 IFDEF_DIRECTIVE               : 'ifdef'               -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE);
 IFNDEF_DIRECTIVE              : 'ifndef'              -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE);
@@ -534,6 +531,10 @@ mode ELSIF_DIRECTIVE_MODE;
 IDENTIFIER_0 : IDENTIFIER -> channel(DIRECTIVES), type(MACRO_IDENTIFIER);
 NEWLINE_9    : NEWLINE    -> channel(HIDDEN), type(WHITE_SPACE), mode(SOURCE_TEXT_MODE);
 SPACE_TAB_8  : SPACE_TAB  -> channel(HIDDEN), type(WHITE_SPACE);
+
+mode ENDIF_DIRECTIVE_MODE;
+NEWLINE_13   : NEWLINE   -> channel(HIDDEN), type(WHITE_SPACE), popMode, popMode, popMode;
+SPACE_TAB_12 : SPACE_TAB -> channel(HIDDEN), type(WHITE_SPACE);
 
 mode FILENAME_MODE;
 DQ_1: DQ -> channel(DIRECTIVES), type(DQ), popMode;
