@@ -20,10 +20,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.2.0
-      with:
-        dotnet-version: '8.0.x'
+    - name: Test Dotnet
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Install Trash
       shell: bash
       run: |
@@ -70,10 +72,6 @@ jobs:
       run: |
         echo ${{ steps.setup-php.outputs.php-version }}
         php --version
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.2.0
-      with:
-        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -188,10 +186,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.2.0
-      with:
-        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
