@@ -489,7 +489,7 @@ arrayDimsAndInits : ( '[' expression ']' )+ ( '[' ']' )*
 statement : labeledStatement
  | assertStatement
 | block
-|	emptyStatement
+|	emptyStatement_
 |	statementExpression ';'
 |	switchStatement
 |	ifStatement
@@ -517,7 +517,7 @@ blockStatement : localVariableDeclaration ';'
 
 localVariableDeclaration : modifiers type variableDeclarator ( ',' variableDeclarator )* ;
 
-emptyStatement : ';' ;
+emptyStatement_ : ';' ;
 
 statementExpression : preIncrementExpression
  | preDecrementExpression
