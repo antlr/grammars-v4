@@ -5,8 +5,16 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 
 $version = Select-String -Path "build.sh" -Pattern "version=" | ForEach-Object { $_.Line -split "=" | Select-Object -Last 1 }
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
+<if(original_tool)>
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<elseif(antlrng_tool)>
+$(& pwsh .node_modules/.bin/antlr4ng.ps1  <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<endif>
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

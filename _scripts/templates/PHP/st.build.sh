@@ -30,8 +30,16 @@ tool_version=`grep 'public const VERSION' src/RuntimeMetaData.php | awk '{print 
 cd ..
 rm -rf antlr4-php-runtime
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
+<if(original_tool)>
 antlr4 -v $tool_version -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<elseif(antlrng_tool)>
+pwsh node_modules/.bin/antlr4ng.ps1 -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<endif>
 }>
 
 composer install

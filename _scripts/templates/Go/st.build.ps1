@@ -17,8 +17,16 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
     $(& python3 transformGrammar.py ) 2>&1 | Write-Host
 }
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
+<if(original_tool)>
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<elseif(antlrng_tool)>
+$(& pwsh .node_modules/.bin/antlr4ng.ps1 <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<endif>
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

@@ -14,8 +14,16 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 # Go has no version, just the latest version.
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
+<if(original_tool)>
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<elseif(antlrng_tool)>
+pwsh node_modules/.bin/antlr4ng.ps1 -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<endif>
 } >
 
 go build Test.go

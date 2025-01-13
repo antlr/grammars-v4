@@ -18,13 +18,21 @@ Set-Location -Path antlr-php-runtime
 git checkout $commit_version
 
 # Extract the tool version this damn runtime version corresponds to.
-$tool_version = (Get-Content -Path src/RuntimeMetaData.php | Select-String 'public const VERSION').ToString().Split()[-1].Trim("';")
+$version = (Get-Content -Path src/RuntimeMetaData.php | Select-String 'public const VERSION').ToString().Split()[-1].Trim("';")
 
 Set-Location ..
 Remove-Item -Recurse -Force antlr-php-runtime -ErrorAction SilentlyContinue
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
-antlr4 -v $tool_version -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<if(original_tool)>
+$(& antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<elseif(antlrng_tool)>
+$(& pwsh .node_modules/.bin/antlr4ng.ps1 -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<endif>
 $compile_exit_code = $LASTEXITCODE
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
