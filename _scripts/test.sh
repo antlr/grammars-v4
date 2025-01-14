@@ -67,6 +67,7 @@ skipped=""
 grammars=()
 targets=()
 tests=()
+generators=()
 
 # Get "root" of the repo clone.
 cwd=`pwd`
@@ -97,7 +98,7 @@ rm -rf `find . -name 'Generated*' -type d`
 order="grammars"
 additional=()
 antlr4jar=/tmp/antlr4-complete.jar
-while getopts 'agthf' opt; do
+while getopts 'agnthf' opt; do
     case "$opt" in
         a)
             getopts-extra "$@"
@@ -118,6 +119,13 @@ while getopts 'agthf' opt; do
                 targets+=( "$a" )
             done
             ;;
+	n)
+            getopts-extra "$@"
+            for a in "${OPTARG[@]}"
+            do
+                generators+=( "$a" )
+            done
+	    ;;
         o)
             order="$OPTARG"
             ;;
@@ -268,20 +276,28 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
+    targets=( CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
+fi
+if [ "$generators" == "" ]
+then
+    generators=( antlr-ng original )
 fi
 
 echo grammars = ${grammars[@]}
 echo targets = ${targets[@]}
 echo order = $order
 echo filter = $filter
+echo generators = ${generators[@]}
 
 # Compute cross product
 for g in ${grammars[@]}
 do
     for t in ${targets[@]}
     do
-        tests+=( "$g,$t" )
+	for n in ${generators[@]}
+	do
+	    tests+=( "$g,$t,$n" )
+        done
     done
 done
 
@@ -297,10 +313,11 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=${all[0]}
     target=${all[1]}
+    generator=${all[2]}
     pushd "$prefix/$testname" > /dev/null
 
     echo ""
-    echo "$testname,$target:"
+    echo "$testname,$target,$generator:"
 
     if [ ! -f desc.xml ]
     then
@@ -348,7 +365,7 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    bad=`dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`
