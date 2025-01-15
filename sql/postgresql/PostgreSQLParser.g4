@@ -29,18 +29,10 @@ options {
     superClass = PostgreSQLParserBase;
 }
 
-@header {
-}
-
-@members {
-}
+// Insert here @header for C++ parser.
 
 root
     : stmtblock EOF
-    ;
-
-plsqlroot
-    : pl_function
     ;
 
 stmtblock
@@ -285,7 +277,7 @@ set_rest
     ;
 
 generic_set
-    : var_name (TO | EQUAL) var_list
+    : var_name (TO | EQUAL) (var_list | DEFAULT)
     ;
 
 set_rest_more
@@ -528,7 +520,7 @@ reloption_list
     ;
 
 reloption_elem
-    : collabel (EQUAL def_arg | DOT collabel (EQUAL def_arg)?)?
+    : colLabel (EQUAL def_arg | DOT colLabel (EQUAL def_arg)?)?
     ;
 
 alter_identity_column_option_list
@@ -639,7 +631,7 @@ copy_generic_opt_list
     ;
 
 copy_generic_opt_elem
-    : collabel copy_generic_opt_arg?
+    : colLabel copy_generic_opt_arg?
     ;
 
 copy_generic_opt_arg
@@ -1142,7 +1134,7 @@ generic_option_elem
     ;
 
 generic_option_name
-    : collabel
+    : colLabel
     ;
 
 generic_option_arg
@@ -1354,7 +1346,7 @@ triggerfuncarg
     : iconst
     | fconst
     | sconst
-    | collabel
+    | colLabel
     ;
 
 optconstrfromtable
@@ -1376,8 +1368,8 @@ constraintattributeElem
     ;
 
 createeventtrigstmt
-    : CREATE EVENT TRIGGER name ON collabel EXECUTE function_or_procedure func_name OPEN_PAREN CLOSE_PAREN
-    | CREATE EVENT TRIGGER name ON collabel WHEN event_trigger_when_list EXECUTE function_or_procedure func_name OPEN_PAREN CLOSE_PAREN
+    : CREATE EVENT TRIGGER name ON colLabel EXECUTE function_or_procedure func_name OPEN_PAREN CLOSE_PAREN
+    | CREATE EVENT TRIGGER name ON colLabel WHEN event_trigger_when_list EXECUTE function_or_procedure func_name OPEN_PAREN CLOSE_PAREN
     ;
 
 event_trigger_when_list
@@ -1435,7 +1427,7 @@ def_list
     ;
 
 def_elem
-    : collabel (EQUAL def_arg)?
+    : colLabel (EQUAL def_arg)?
     ;
 
 def_arg
@@ -1554,8 +1546,8 @@ reassignownedstmt
     ;
 
 dropstmt
-    : DROP object_type_any_name IF_P EXISTS any_name_list drop_behavior_?
-    | DROP object_type_any_name any_name_list drop_behavior_?
+    : DROP object_type_any_name IF_P EXISTS any_name_list_ drop_behavior_?
+    | DROP object_type_any_name any_name_list_ drop_behavior_?
     | DROP drop_type_name IF_P EXISTS name_list drop_behavior_?
     | DROP drop_type_name name_list drop_behavior_?
     | DROP object_type_name_on_any_name name ON any_name drop_behavior_?
@@ -1564,8 +1556,8 @@ dropstmt
     | DROP TYPE_P IF_P EXISTS type_name_list drop_behavior_?
     | DROP DOMAIN_P type_name_list drop_behavior_?
     | DROP DOMAIN_P IF_P EXISTS type_name_list drop_behavior_?
-    | DROP INDEX CONCURRENTLY any_name_list drop_behavior_?
-    | DROP INDEX CONCURRENTLY IF_P EXISTS any_name_list drop_behavior_?
+    | DROP INDEX CONCURRENTLY any_name_list_ drop_behavior_?
+    | DROP INDEX CONCURRENTLY IF_P EXISTS any_name_list_ drop_behavior_?
     ;
 
 object_type_any_name
@@ -1609,7 +1601,7 @@ object_type_name_on_any_name
     | TRIGGER
     ;
 
-any_name_list
+any_name_list_
     : any_name (COMMA any_name)*
     ;
 
@@ -1756,12 +1748,12 @@ privilege_target
     | PROCEDURE function_with_argtypes_list
     | ROUTINE function_with_argtypes_list
     | DATABASE name_list
-    | DOMAIN_P any_name_list
+    | DOMAIN_P any_name_list_
     | LANGUAGE name_list
     | LARGE_P OBJECT_P numericonly_list
     | SCHEMA name_list
     | TABLESPACE name_list
-    | TYPE_P any_name_list
+    | TYPE_P any_name_list_
     | ALL TABLES IN_P SCHEMA name_list
     | ALL SEQUENCES IN_P SCHEMA name_list
     | ALL FUNCTIONS IN_P SCHEMA name_list
@@ -1843,6 +1835,10 @@ indexstmt
 unique_
     : UNIQUE
     
+    ;
+
+single_name_
+    : colid
     ;
 
 concurrently_
@@ -1960,9 +1956,6 @@ arg_class
 
 param_name
     : type_function_name
-    | builtin_function_name
-    | LEFT
-    | RIGHT
     ;
 
 func_return
@@ -1971,7 +1964,7 @@ func_return
 
 func_type
     : typename
-    | SETOF? (builtin_function_name | type_function_name | LEFT | RIGHT) attrs PERCENT TYPE_P
+    | SETOF? type_function_name attrs PERCENT TYPE_P
     ;
 
 func_arg_with_default
@@ -2004,9 +1997,7 @@ aggregate_with_argtypes_list
     ;
 
 createfunc_opt_list
-    : createfunc_opt_item+ {
-                ParseRoutineBody(_localctx);
-            }
+    : createfunc_opt_item+ {this.ParseRoutineBody();}
     //                    | createfunc_opt_list createfunc_opt_item
     ;
 
@@ -2045,7 +2036,6 @@ createfunc_opt_item
 //    | AS 'obj_file', 'link_symbol'
 
 func_as
-    locals[ParserRuleContext Definition]
     :
     /* |AS 'definition'*/ def = sconst
     /*| AS 'obj_file', 'link_symbol'*/
@@ -2170,34 +2160,23 @@ droptransformstmt
     ;
 
 reindexstmt
-    : REINDEX reindex_target_type concurrently_? qualified_name
-    | REINDEX reindex_target_multitable concurrently_? name
-    | REINDEX OPEN_PAREN reindex_option_list CLOSE_PAREN reindex_target_type concurrently_? qualified_name
-    | REINDEX OPEN_PAREN reindex_option_list CLOSE_PAREN reindex_target_multitable concurrently_? name
+    : REINDEX reindex_option_list? reindex_target_relation concurrently_? qualified_name
+    | REINDEX reindex_option_list? SCHEMA concurrently_? name
+    | REINDEX reindex_option_list? reindex_target_all concurrently_? single_name_?
     ;
 
-reindex_target_type
+reindex_target_relation
     : INDEX
     | TABLE
-    | SCHEMA
-    | DATABASE
-    | SYSTEM_P
     ;
 
-reindex_target_multitable
-    : SCHEMA
-    | SYSTEM_P
+reindex_target_all
+    : SYSTEM_P
     | DATABASE
     ;
 
 reindex_option_list
-    : reindex_option_elem (COMMA reindex_option_elem)*
-    ;
-
-reindex_option_elem
-    : VERBOSE
-    | TABLESPACE
-    | CONCURRENTLY
+    : OPEN_PAREN utility_option_list CLOSE_PAREN
     ;
 
 altertblspcstmt
@@ -2326,8 +2305,8 @@ operator_def_list
     ;
 
 operator_def_elem
-    : collabel EQUAL NONE
-    | collabel EQUAL operator_def_arg
+    : colLabel EQUAL NONE
+    | colLabel EQUAL operator_def_arg
     ;
 
 operator_def_arg
@@ -2399,7 +2378,7 @@ publication_name_list
     ;
 
 publication_name_item
-    : collabel
+    : colLabel
     ;
 
 altersubscriptionstmt
@@ -2620,8 +2599,8 @@ altertsdictionarystmt
     ;
 
 altertsconfigurationstmt
-    : ALTER TEXT_P SEARCH CONFIGURATION any_name ADD_P MAPPING FOR name_list any_with any_name_list
-    | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list any_with any_name_list
+    : ALTER TEXT_P SEARCH CONFIGURATION any_name ADD_P MAPPING FOR name_list any_with any_name_list_
+    | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list any_with any_name_list_
     | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING REPLACE any_name any_with any_name
     | ALTER TEXT_P SEARCH CONFIGURATION any_name ALTER MAPPING FOR name_list REPLACE any_name any_with any_name
     | ALTER TEXT_P SEARCH CONFIGURATION any_name DROP MAPPING FOR name_list
@@ -2660,6 +2639,10 @@ analyzestmt
     | analyze_keyword OPEN_PAREN vac_analyze_option_list CLOSE_PAREN vacuum_relation_list_?
     ;
 
+utility_option_list
+    : utility_option_elem ( ',' utility_option_elem)*
+    ;
+
 vac_analyze_option_list
     : vac_analyze_option_elem (COMMA vac_analyze_option_elem)*
     ;
@@ -2667,6 +2650,21 @@ vac_analyze_option_list
 analyze_keyword
     : ANALYZE
     | ANALYSE
+    ;
+
+utility_option_elem
+    : utility_option_name utility_option_arg?
+    ;
+
+utility_option_name
+    : nonreservedword
+    | analyze_keyword
+    | FORMAT_LA
+    ;
+
+utility_option_arg
+    : boolean_or_string_
+    | numericonly
     ;
 
 vac_analyze_option_elem
@@ -2973,8 +2971,14 @@ simple_select_intersect
 
 simple_select_pramary
     : (
-        SELECT (all_clause_? into_clause? target_list_? | distinct_clause target_list) into_clause? from_clause? where_clause? group_clause?
-            having_clause? window_clause?
+        SELECT
+	( all_clause_? target_list_?
+		into_clause? from_clause? where_clause?
+		group_clause? having_clause? window_clause?
+	| distinct_clause target_list
+		into_clause? from_clause? where_clause?
+		group_clause? having_clause? window_clause?
+        )
     )
     | values_clause
     | TABLE relation_expr
@@ -3005,8 +3009,7 @@ with_clause_
     ;
 
 into_clause
-    : INTO (strict_? opttempTableName | into_target)
-    
+    : INTO opttempTableName
     ;
 
 strict_
@@ -3190,20 +3193,20 @@ from_list
 
 table_ref
     : (
-        relation_expr alias_clause_? tablesample_clause?
+        relation_expr alias_clause? tablesample_clause?
         | func_table func_alias_clause?
-        | xmltable alias_clause_?
-        | select_with_parens alias_clause_?
+        | xmltable alias_clause?
+        | select_with_parens alias_clause?
         | LATERAL_P (
-            xmltable alias_clause_?
+            xmltable alias_clause?
             | func_table func_alias_clause?
-            | select_with_parens alias_clause_?
+            | select_with_parens alias_clause?
         )
         | OPEN_PAREN table_ref (
             CROSS JOIN table_ref
             | NATURAL join_type? JOIN table_ref
             | join_type? JOIN table_ref join_qual
-        )? CLOSE_PAREN alias_clause_?
+        )? CLOSE_PAREN alias_clause?
     ) (
         CROSS JOIN table_ref
         | NATURAL join_type? JOIN table_ref
@@ -3213,15 +3216,6 @@ table_ref
 
 alias_clause
     : AS? colid (OPEN_PAREN name_list CLOSE_PAREN)?
-    ;
-
-alias_clause_
-    : table_alias_clause
-    
-    ;
-
-table_alias_clause
-    : AS? table_alias (OPEN_PAREN name_list CLOSE_PAREN)?
     ;
 
 func_alias_clause
@@ -3340,13 +3334,15 @@ xml_namespace_list
     ;
 
 xml_namespace_el
-    : b_expr AS collabel
+    : b_expr AS colLabel
     | DEFAULT b_expr
     ;
 
 typename
-    : SETOF? simpletypename (opt_array_bounds | ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
-    | qualified_name PERCENT (ROWTYPE | TYPE_P)
+    : SETOF? simpletypename
+	( opt_array_bounds
+	| ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?
+	)
     ;
 
 opt_array_bounds
@@ -3360,6 +3356,7 @@ simpletypename
     | character
     | constdatetime
     | constinterval (interval_? | OPEN_PAREN iconst CLOSE_PAREN)
+    | jsonType
     ;
 
 consttypename
@@ -3367,10 +3364,11 @@ consttypename
     | constbit
     | constcharacter
     | constdatetime
+    | jsonType
     ;
 
 generictype
-    : (builtin_function_name | type_function_name | LEFT | RIGHT) attrs? type_modifiers_?
+    : type_function_name attrs? type_modifiers_?
     ;
 
 type_modifiers_
@@ -3470,6 +3468,10 @@ interval_second
     : SECOND_P (OPEN_PAREN iconst CLOSE_PAREN)?
     ;
 
+jsonType
+    : JSON
+    ;
+
 escape_
     : ESCAPE a_expr
     
@@ -3545,7 +3547,7 @@ a_expr
 /*19*/
 
 a_expr_qual
-    : a_expr_lessless ({ this.OnlyAcceptableOps() }? qual_op | )
+    : a_expr_lessless ({this.OnlyAcceptableOps()}? qual_op | )
     ;
 
 /*18*/
@@ -3653,7 +3655,7 @@ a_expr_mul
 /* 5*/
 
 a_expr_caret
-    : a_expr_unary_sign (CARET a_expr)?
+    : a_expr_unary_sign (CARET a_expr_unary_sign)?
     ;
 
 /* 4*/
@@ -3709,7 +3711,6 @@ c_expr
     | /*22*/ UNIQUE select_with_parens                                 # c_expr_expr
     | columnref                                                        # c_expr_expr
     | aexprconst                                                       # c_expr_expr
-    | plsqlvariablename                                                # c_expr_expr
     | OPEN_PAREN a_expr_in_parens = a_expr CLOSE_PAREN opt_indirection # c_expr_expr
     | case_expr                                                        # c_expr_case
     | func_expr                                                        # c_expr_expr
@@ -3717,6 +3718,7 @@ c_expr
     | explicit_row                                                     # c_expr_expr
     | implicit_row                                                     # c_expr_expr
     | row OVERLAPS row /* 14*/                                         # c_expr_expr
+    | DEFAULT                                                          # c_expr_expr
     ;
 
 plsqlvariablename
@@ -3753,15 +3755,16 @@ func_expr_common_subexpr
     | CURRENT_ROLE
     | CURRENT_USER
     | SESSION_USER
+    | SYSTEM_USER
     | USER
     | CURRENT_CATALOG
     | CURRENT_SCHEMA
     | CAST OPEN_PAREN a_expr AS typename CLOSE_PAREN
     | EXTRACT OPEN_PAREN extract_list? CLOSE_PAREN
     | NORMALIZE OPEN_PAREN a_expr (COMMA unicode_normal_form)? CLOSE_PAREN
-    | OVERLAY OPEN_PAREN overlay_list CLOSE_PAREN
+    | OVERLAY OPEN_PAREN (overlay_list | func_arg_list? ) CLOSE_PAREN
     | POSITION OPEN_PAREN position_list? CLOSE_PAREN
-    | SUBSTRING OPEN_PAREN substr_list CLOSE_PAREN
+    | SUBSTRING OPEN_PAREN (substr_list | func_arg_list?) CLOSE_PAREN
     | TREAT OPEN_PAREN a_expr AS typename CLOSE_PAREN
     | TRIM OPEN_PAREN (BOTH | LEADING | TRAILING)? trim_list CLOSE_PAREN
     | NULLIF OPEN_PAREN a_expr COMMA a_expr CLOSE_PAREN
@@ -3769,14 +3772,52 @@ func_expr_common_subexpr
     | GREATEST OPEN_PAREN expr_list CLOSE_PAREN
     | LEAST OPEN_PAREN expr_list CLOSE_PAREN
     | XMLCONCAT OPEN_PAREN expr_list CLOSE_PAREN
-    | XMLELEMENT OPEN_PAREN NAME_P collabel (COMMA (xml_attributes | expr_list))? CLOSE_PAREN
+    | XMLELEMENT OPEN_PAREN NAME_P colLabel (COMMA (xml_attributes | expr_list))? CLOSE_PAREN
     | XMLEXISTS OPEN_PAREN c_expr xmlexists_argument CLOSE_PAREN
     | XMLFOREST OPEN_PAREN xml_attribute_list CLOSE_PAREN
     | XMLPARSE OPEN_PAREN document_or_content a_expr xml_whitespace_option? CLOSE_PAREN
-    | XMLPI OPEN_PAREN NAME_P collabel (COMMA a_expr)? CLOSE_PAREN
+    | XMLPI OPEN_PAREN NAME_P colLabel (COMMA a_expr)? CLOSE_PAREN
     | XMLROOT OPEN_PAREN XML_P a_expr COMMA xml_root_version xml_root_standalone_? CLOSE_PAREN
     | XMLSERIALIZE OPEN_PAREN document_or_content a_expr AS simpletypename CLOSE_PAREN
+    | JSON_OBJECT OPEN_PAREN (func_arg_list
+		| json_name_and_value_list
+		  json_object_constructor_null_clause?
+		  json_key_uniqueness_constraint?
+		  json_returning_clause?
+		| json_returning_clause? )
+		CLOSE_PAREN
+    | JSON_ARRAY OPEN_PAREN (json_value_expr_list
+		  json_array_constructor_null_clause?
+		  json_returning_clause?
+		| select_no_parens
+		  json_format_clause?
+		  json_returning_clause?
+		| json_returning_clause?
+		)
+		CLOSE_PAREN
+    | JSON '(' json_value_expr json_key_uniqueness_constraint? ')'
+    | JSON_SCALAR '(' a_expr ')'
+    | JSON_SERIALIZE '(' json_value_expr json_returning_clause? ')'
+    | MERGE_ACTION '(' ')'
+    | JSON_QUERY '('
+		json_value_expr ',' a_expr json_passing_clause?
+		json_returning_clause?
+		json_wrapper_behavior
+		json_quotes_clause?
+		json_behavior_clause?
+		')'
+    | JSON_EXISTS '('
+		json_value_expr ',' a_expr json_passing_clause?
+		json_on_error_clause?
+		')'
+    | JSON_VALUE '('
+		json_value_expr ',' a_expr json_passing_clause?
+		json_returning_clause?
+		json_behavior_clause?
+		')'
     ;
+
+/* SQL/XML support */
 
 xml_root_version
     : VERSION_P a_expr
@@ -3787,7 +3828,6 @@ xml_root_standalone_
     : COMMA STANDALONE_P YES_P
     | COMMA STANDALONE_P NO
     | COMMA STANDALONE_P NO VALUE_P
-    
     ;
 
 xml_attributes
@@ -3799,7 +3839,7 @@ xml_attribute_list
     ;
 
 xml_attribute_el
-    : a_expr (AS collabel)?
+    : a_expr (AS colLabel)?
     ;
 
 document_or_content
@@ -4020,7 +4060,6 @@ substr_list
     | a_expr FROM a_expr
     | a_expr FOR a_expr
     | a_expr SIMILAR a_expr ESCAPE a_expr
-    | expr_list
     ;
 
 trim_list
@@ -4078,6 +4117,163 @@ opt_indirection
     : indirection_el*
     ;
 
+/* SQL/JSON support */
+json_passing_clause:
+			PASSING json_arguments
+		;
+
+json_arguments:
+			json_argument
+			| json_arguments ',' json_argument
+		;
+
+json_argument:
+			json_value_expr AS colLabel
+		;
+
+/* ARRAY is a noise word */
+json_wrapper_behavior:
+			  WITHOUT WRAPPER
+			| WITHOUT ARRAY	WRAPPER
+			| WITH WRAPPER
+			| WITH ARRAY WRAPPER
+			| WITH CONDITIONAL ARRAY WRAPPER
+			| WITH UNCONDITIONAL ARRAY WRAPPER
+			| WITH CONDITIONAL WRAPPER
+			| WITH UNCONDITIONAL WRAPPER
+			|
+		;
+
+json_behavior:
+			DEFAULT a_expr
+			| json_behavior_type
+		;
+
+json_behavior_type:
+			ERROR
+			| NULL_P
+			| TRUE_P
+			| FALSE_P
+			| UNKNOWN
+			| EMPTY_P ARRAY
+			| EMPTY_P OBJECT_P
+			/* non-standard, for Oracle compatibility only */
+			| EMPTY_P
+		;
+
+json_behavior_clause:
+			json_behavior ON EMPTY_P
+			| json_behavior ON ERROR
+			| json_behavior ON EMPTY_P json_behavior ON ERROR
+		;
+
+json_on_error_clause:
+			json_behavior ON ERROR
+		;
+
+json_value_expr:
+			a_expr json_format_clause?
+		;
+
+json_format_clause:
+			FORMAT_LA JSON ENCODING name
+			| FORMAT_LA JSON
+		;
+
+
+json_quotes_clause:
+			KEEP QUOTES ON SCALAR STRING_P
+			| KEEP QUOTES
+			| OMIT QUOTES ON SCALAR STRING_P
+			| OMIT QUOTES
+		;
+
+json_returning_clause:
+			RETURNING typename json_format_clause?
+		;
+
+/*
+ * We must assign the only-JSON production a precedence less than IDENT in
+ * order to favor shifting over reduction when JSON is followed by VALUE_P,
+ * OBJECT_P, or SCALAR.  (ARRAY doesn't need that treatment, because it's a
+ * fully reserved word.)  Because json_predicate_type_constraint is always
+ * followed by json_key_uniqueness_constraint_opt, we also need the only-JSON
+ * production to have precedence less than WITH and WITHOUT.  UNBOUNDED isn't
+ * really related to this syntax, but it's a convenient choice because it
+ * already has a precedence less than IDENT for other reasons.
+ */
+json_predicate_type_constraint:
+			JSON
+			| JSON VALUE_P
+			| JSON ARRAY
+			| JSON OBJECT_P
+			| JSON SCALAR
+		;
+
+/*
+ * KEYS is a noise word here.  To avoid shift/reduce conflicts, assign the
+ * KEYS-less productions a precedence less than IDENT (i.e., less than KEYS).
+ * This prevents reducing them when the next token is KEYS.
+ */
+json_key_uniqueness_constraint:
+			WITH UNIQUE KEYS
+			| WITH UNIQUE
+			| WITHOUT UNIQUE KEYS
+			| WITHOUT UNIQUE
+		;
+
+json_name_and_value_list:
+			json_name_and_value
+			| json_name_and_value_list ',' json_name_and_value
+		;
+
+json_name_and_value:
+			c_expr VALUE_P json_value_expr
+			|
+			a_expr ':' json_value_expr
+		;
+
+/* empty means false for objects, true for arrays */
+json_object_constructor_null_clause:
+			NULL_P ON NULL_P
+			| ABSENT ON NULL_P
+		;
+
+json_array_constructor_null_clause:
+			NULL_P ON NULL_P
+			| ABSENT ON NULL_P
+		;
+
+json_value_expr_list:
+			json_value_expr
+			| json_value_expr_list ',' json_value_expr
+		;
+
+json_aggregate_func:
+			JSON_OBJECTAGG '('
+				json_name_and_value
+				json_object_constructor_null_clause?
+				json_key_uniqueness_constraint?
+				json_returning_clause
+			')'
+			| JSON_ARRAYAGG '('
+				json_value_expr
+				json_array_aggregate_order_by_clause?
+				json_array_constructor_null_clause?
+				json_returning_clause
+			')'
+		;
+
+json_array_aggregate_order_by_clause:
+			ORDER BY sortby_list
+		;
+
+/*****************************************************************************
+ *
+ *	target list for SELECT
+ *
+ *****************************************************************************/
+
 target_list_
     : target_list
     
@@ -4088,7 +4284,7 @@ target_list
     ;
 
 target_el
-    : a_expr (AS collabel | identifier |) # target_label
+    : a_expr (AS colLabel | bareColLabel |) # target_label
     | STAR                                # target_star
     ;
 
@@ -4109,7 +4305,7 @@ name
     ;
 
 attr_name
-    : collabel
+    : colLabel
     ;
 
 file_name
@@ -4117,11 +4313,8 @@ file_name
     ;
 
 func_name
-    : builtin_function_name
-    | type_function_name
+    : type_function_name
     | colid indirection
-    | LEFT
-    | RIGHT
     ;
 
 aexprconst
@@ -4152,6 +4345,9 @@ fconst
 
 iconst
     : Integral
+    | BinaryIntegral
+    | OctalIntegral
+    | HexadecimalIntegral
     ;
 
 sconst
@@ -4190,29 +4386,35 @@ role_list
     : rolespec (COMMA rolespec)*
     ;
 
+/*
+ * Name classification hierarchy.
+ *
+ * IDENT is the lexeme returned by the lexer for identifiers that match
+ * no known keyword.  In most cases, we can accept certain keywords as
+ * names, not only IDENTs.	We prefer to accept as many such keywords
+ * as possible to minimize the impact of "reserved words" on programmers.
+ * So, we divide names into several possible classes.  The classification
+ * is chosen in part to make keywords acceptable as names wherever possible.
+ */
+
+/* Column identifier --- names that can be column, table, etc names.
+ */
 colid
     : identifier
     | unreserved_keyword
     | col_name_keyword
-    | plsql_unreserved_keyword
-    | LEFT
-    | RIGHT
     ;
 
-table_alias
-    : identifier
-    | unreserved_keyword
-    | col_name_keyword
-    | plsql_unreserved_keyword
-    ;
-
+/* Type/function identifier --- names that can be type or function names.
+ */
 type_function_name
     : identifier
     | unreserved_keyword
-    | plsql_unreserved_keyword
     | type_func_name_keyword
     ;
 
+/* Any not-fully-reserved word --- these names can be, eg, role names.
+ */
 nonreservedword
     : identifier
     | unreserved_keyword
@@ -4220,30 +4422,44 @@ nonreservedword
     | type_func_name_keyword
     ;
 
-collabel
+/* Column label --- allowed labels in "AS" clauses.
+ * This presently includes *all* Postgres keywords.
+ */
+colLabel
     : identifier
-    | plsql_unreserved_keyword
     | unreserved_keyword
     | col_name_keyword
     | type_func_name_keyword
     | reserved_keyword
+    | EXIT //NB: not in gram.y official source.
     ;
 
-identifier
-    : Identifier uescape_?
-    | QuotedIdentifier
-    | UnicodeQuotedIdentifier
-    | plsqlvariablename
-    | plsqlidentifier
-    | plsql_unreserved_keyword
+/* Bare column label --- names that can be column labels without writing "AS".
+ * This classification is orthogonal to the other keyword categories.
+ */
+bareColLabel
+    : identifier
+    | bare_label_keyword
     ;
 
-plsqlidentifier
-    : PLSQLIDENTIFIER
-    ;
+/*
+ * Keyword category lists.  Generally, every keyword present in
+ * the Postgres grammar should appear in exactly one of these lists.
+ *
+ * Put a new keyword into the first list that it can go into without causing
+ * shift or reduce conflicts.  The earlier lists define "less reserved"
+ * categories of keywords.
+ *
+ * Make sure that each keyword's category in kwlist.h matches where
+ * it is listed here.  (Someday we may be able to generate these lists and
+ * kwlist.h's table from one source of truth.)
+ */
 
+/* "Unreserved" keywords --- available for use as any kind of name.
+ */
 unreserved_keyword
     : ABORT_P
+    | ABSENT
     | ABSOLUTE_P
     | ACCESS
     | ACTION
@@ -4254,14 +4470,17 @@ unreserved_keyword
     | ALSO
     | ALTER
     | ALWAYS
+    | ASENSITIVE
     | ASSERTION
     | ASSIGNMENT
     | AT
+    | ATOMIC
     | ATTACH
     | ATTRIBUTE
     | BACKWARD
     | BEFORE
     | BEGIN_P
+    | BREADTH
     | BY
     | CACHE
     | CALL
@@ -4280,6 +4499,8 @@ unreserved_keyword
     | COMMENTS
     | COMMIT
     | COMMITTED
+    | COMPRESSION
+    | CONDITIONAL
     | CONFIGURATION
     | CONFLICT
     | CONNECTION
@@ -4306,6 +4527,7 @@ unreserved_keyword
     | DELIMITER
     | DELIMITERS
     | DEPENDS
+    | DEPTH
     | DETACH
     | DICTIONARY
     | DISABLE_P
@@ -4315,10 +4537,12 @@ unreserved_keyword
     | DOUBLE_P
     | DROP
     | EACH
+    | EMPTY_P
     | ENABLE_P
     | ENCODING
     | ENCRYPTED
     | ENUM_P
+    | ERROR
     | ESCAPE
     | EVENT
     | EXCLUDE
@@ -4331,9 +4555,11 @@ unreserved_keyword
     | EXTERNAL
     | FAMILY
     | FILTER
+    | FINALIZE
     | FIRST_P
     | FOLLOWING
     | FORCE
+    | FORMAT
     | FORWARD
     | FUNCTION
     | FUNCTIONS
@@ -4354,6 +4580,7 @@ unreserved_keyword
     | INCLUDE
     | INCLUDING
     | INCREMENT
+    | INDENT
     | INDEX
     | INDEXES
     | INHERIT
@@ -4365,7 +4592,9 @@ unreserved_keyword
     | INSTEAD
     | INVOKER
     | ISOLATION
+    | KEEP
     | KEY
+    | KEYS
     | LABEL
     | LANGUAGE
     | LARGE_P
@@ -4381,8 +4610,10 @@ unreserved_keyword
     | LOGGED
     | MAPPING
     | MATCH
+    | MATCHED
     | MATERIALIZED
     | MAXVALUE
+    | MERGE
     | METHOD
     | MINUTE_P
     | MINVALUE
@@ -4391,6 +4622,7 @@ unreserved_keyword
     | MOVE
     | NAME_P
     | NAMES
+    | NESTED
     | NEW
     | NEXT
     | NFC
@@ -4408,6 +4640,7 @@ unreserved_keyword
     | OFF
     | OIDS
     | OLD
+    | OMIT
     | OPERATOR
     | OPTION
     | OPTIONS
@@ -4418,11 +4651,15 @@ unreserved_keyword
     | OWNED
     | OWNER
     | PARALLEL
+    | PARAMETER
     | PARSER
     | PARTIAL
     | PARTITION
     | PASSING
     | PASSWORD
+    | PATH
+    | PERIOD
+    | PLAN
     | PLANS
     | POLICY
     | PRECEDING
@@ -4437,10 +4674,11 @@ unreserved_keyword
     | PROGRAM
     | PUBLICATION
     | QUOTE
+    | QUOTES
     | RANGE
     | READ
     | REASSIGN
-    | RECHECK
+//    | RECHECK
     | RECURSIVE
     | REF
     | REFERENCING
@@ -4450,10 +4688,12 @@ unreserved_keyword
     | RELEASE
     | RENAME
     | REPEATABLE
+    | REPLACE
     | REPLICA
     | RESET
     | RESTART
     | RESTRICT
+    | RETURN
     | RETURNS
     | REVOKE
     | ROLE
@@ -4464,6 +4704,7 @@ unreserved_keyword
     | ROWS
     | RULE
     | SAVEPOINT
+    | SCALAR
     | SCHEMA
     | SCHEMAS
     | SCROLL
@@ -4482,6 +4723,7 @@ unreserved_keyword
     | SIMPLE
     | SKIP_P
     | SNAPSHOT
+    | SOURCE
     | SQL_P
     | STABLE
     | STANDALONE_P
@@ -4493,6 +4735,7 @@ unreserved_keyword
     | STORAGE
     | STORED
     | STRICT_P
+    | STRING_P
     | STRIP_P
     | SUBSCRIPTION
     | SUPPORT
@@ -4500,6 +4743,7 @@ unreserved_keyword
     | SYSTEM_P
     | TABLES
     | TABLESPACE
+    | TARGET
     | TEMP
     | TEMPLATE
     | TEMPORARY
@@ -4515,6 +4759,7 @@ unreserved_keyword
     | UESCAPE
     | UNBOUNDED
     | UNCOMMITTED
+    | UNCONDITIONAL
     | UNENCRYPTED
     | UNKNOWN
     | UNLISTEN
@@ -4543,10 +4788,20 @@ unreserved_keyword
     | ZONE
     ;
 
+/* Column identifier --- keywords that can be column, table, etc names.
+ *
+ * Many of these keywords will in fact be recognized as type or function
+ * names too; but they have special productions for the purpose, and so
+ * can't be treated as "generic" type or function names.
+ *
+ * The type names appearing here are not usable as function names
+ * because they can be followed by '(' in typename productions, which
+ * looks too much like a function call for an LR(1) parser.
+ */
 col_name_keyword
     : BETWEEN
     | BIGINT
-    | bit
+    | BIT
     | BOOLEAN_P
     | CHAR_P
     | character
@@ -4562,13 +4817,25 @@ col_name_keyword
     | INT_P
     | INTEGER
     | INTERVAL
+    | JSON
+    | JSON_ARRAY
+    | JSON_ARRAYAGG
+    | JSON_EXISTS
+    | JSON_OBJECT
+    | JSON_OBJECTAGG
+    | JSON_QUERY
+    | JSON_SCALAR
+    | JSON_SERIALIZE
+    | JSON_TABLE
+    | JSON_VALUE
     | LEAST
+    | MERGE_ACTION
     | NATIONAL
     | NCHAR
     | NONE
     | NORMALIZE
     | NULLIF
-    | numeric
+    | NUMERIC
     | OUT_P
     | OVERLAY
     | POSITION
@@ -4595,9 +4862,18 @@ col_name_keyword
     | XMLROOT
     | XMLSERIALIZE
     | XMLTABLE
-    | builtin_function_name
     ;
 
+/* Type/function identifier --- keywords that can be type or function names.
+ *
+ * Most of these are keywords that are used as operators in expressions;
+ * in general such keywords can't be column names because they would be
+ * ambiguous with variables, but they are unambiguous as function identifiers.
+ *
+ * Do not include POSITION, SUBSTRING, etc here since they have explicit
+ * productions in a_expr to support the goofy SQL9x argument syntax.
+ * - thomas 2000-11-28
+ */
 type_func_name_keyword
     : AUTHORIZATION
     | BINARY
@@ -4612,16 +4888,24 @@ type_func_name_keyword
     | IS
     | ISNULL
     | JOIN
+    | LEFT
     | LIKE
     | NATURAL
     | NOTNULL
     | OUTER_P
     | OVERLAPS
+    | RIGHT
     | SIMILAR
     | TABLESAMPLE
     | VERBOSE
     ;
 
+/* Reserved keyword --- these keywords are usable only as a ColLabel.
+ *
+ * Keywords appear here if they could not be distinguished from variable,
+ * type, or function names in some contexts.  Don't put things here unless
+ * forced to.
+ */
 reserved_keyword
     : ALL
     | ANALYSE
@@ -4646,7 +4930,7 @@ reserved_keyword
     | CURRENT_TIME
     | CURRENT_TIMESTAMP
     | CURRENT_USER
-    //                 | DEFAULT
+    | DEFAULT
     | DEFERRABLE
     | DESC
     | DISTINCT
@@ -4665,13 +4949,7 @@ reserved_keyword
     | IN_P
     | INITIALLY
     | INTERSECT
-    /*
-from pl_gram.y, line ~2982
-	 * Fortunately, INTO is a fully reserved word in the main grammar, so
-	 * at least we need not worry about it appearing as an identifier.
-*/
-
-    //                 | INTO
+    | INTO
     | LATERAL_P
     | LEADING
     | LIMIT
@@ -4692,6 +4970,7 @@ from pl_gram.y, line ~2982
     | SESSION_USER
     | SOME
     | SYMMETRIC
+    | SYSTEM_USER
     | TABLE
     | THEN
     | TO
@@ -4708,867 +4987,479 @@ from pl_gram.y, line ~2982
     | WITH
     ;
 
-builtin_function_name
-    : XMLCOMMENT
-    | XML_IS_WELL_FORMED
-    | XML_IS_WELL_FORMED_DOCUMENT
-    | XML_IS_WELL_FORMED_CONTENT
-    | XMLAGG
-    | XPATH
-    | XPATH_EXISTS
-    | ABS
-    | CBRT
-    | CEIL
-    | CEILING
-    | DEGREES
-    | DIV
-    | EXP
-    | FACTORIAL
-    | FLOOR
-    | GCD
-    | LCM
-    | LN
-    | LOG
-    | LOG10
-    | MIN_SCALE
-    | MOD
-    | PI
-    | POWER
-    | RADIANS
-    | ROUND
-    | SCALE
-    | SIGN
-    | SQRT
-    | TRIM_SCALE
-    | TRUNC
-    | WIDTH_BUCKET
-    | RANDOM
-    | SETSEED
-    | ACOS
-    | ACOSD
-    | ACOSH
-    | ASIN
-    | ASIND
-    | ASINH
-    | ATAN
-    | ATAND
-    | ATANH
-    | ATAN2
-    | ATAN2D
-    | COS
-    | COSD
-    | COSH
-    | COT
-    | COTD
-    | SIN
-    | SIND
-    | SINH
-    | TAN
-    | TAND
-    | TANH
-    | BIT_LENGTH
-    | CHAR_LENGTH
-    | CHARACTER_LENGTH
-    | LOWER
-    | OCTET_LENGTH
-    | OCTET_LENGTH
-    | UPPER
-    | ASCII
-    | BTRIM
-    | CHR
-    | CONCAT
-    | CONCAT_WS
-    | FORMAT
-    | INITCAP
-    | LENGTH
-    | LPAD
-    | LTRIM
-    | MD5
-    | PARSE_IDENT
-    | PG_CLIENT_ENCODING
-    | QUOTE_IDENT
-    | QUOTE_LITERAL
-    | QUOTE_NULLABLE
-    | REGEXP_COUNT
-    | REGEXP_INSTR
-    | REGEXP_LIKE
-    | REGEXP_MATCH
-    | REGEXP_MATCHES
-    | REGEXP_REPLACE
-    | REGEXP_SPLIT_TO_ARRAY
-    | REGEXP_SPLIT_TO_TABLE
-    | REGEXP_SUBSTR
-    | REPEAT
-    | REPLACE
-    | REVERSE
-    | RPAD
-    | RTRIM
-    | SPLIT_PART
-    | STARTS_WITH
-    | STRING_TO_ARRAY
-    | STRING_TO_TABLE
-    | STRPOS
-    | SUBSTR
-    | TO_ASCII
-    | TO_HEX
-    | TRANSLATE
-    | UNISTR
-    | AGE
-    | DATE_BIN
-    | DATE_PART
-    | DATE_TRUNC
-    | ISFINITE
-    | JUSTIFY_DAYS
-    | JUSTIFY_HOURS
-    | JUSTIFY_INTERVAL
-    | MAKE_DATE
-    | MAKE_INTERVAL
-    | MAKE_TIME
-    | MAKE_TIMESTAMP
-    | MAKE_TIMESTAMPTZ
-    | CLOCK_TIMESTAMP
-    | NOW
-    | STATEMENT_TIMESTAMP
-    | TIMEOFDAY
-    | TRANSACTION_TIMESTAMP
-    | TO_TIMESTAMP
-    | JUSTIFY_INTERVAL
-    | JUSTIFY_INTERVAL
-    | TO_CHAR
-    | TO_DATE
-    | TO_NUMBER
-    ;
-
-/************************************************************************************************************************************************************/
-/*PL/SQL GRAMMAR */
-
-/*PLSQL grammar */
-
-/************************************************************************************************************************************************************/
-pl_function
-    : comp_options pl_block semi_?
-    ;
-
-comp_options
-    : comp_option*
-    ;
-
-comp_option
-    : sharp OPTION DUMP
-    | sharp PRINT_STRICT_PARAMS option_value
-    | sharp VARIABLE_CONFLICT ERROR
-    | sharp VARIABLE_CONFLICT USE_VARIABLE
-    | sharp VARIABLE_CONFLICT USE_COLUMN
-    ;
-
-sharp
-    : Operator
-    ;
-
-option_value
-    : sconst
-    | reserved_keyword
-    | plsql_unreserved_keyword
-    | unreserved_keyword
-    ;
-
-semi_
-    :
-     SEMI
-    ;
-
-// exception_sect means opt_exception_sect in original grammar, don't be confused!
-
-pl_block
-    : decl_sect BEGIN_P proc_sect exception_sect? END_P label_?
-    ;
-
-decl_sect
-    : block_label_? (decl_start decl_stmts?)?
-    ;
-
-decl_start
-    : DECLARE
-    ;
-
-decl_stmts
-    : decl_stmt+
-    ;
-
-label_decl
-    : LESS_LESS any_identifier GREATER_GREATER
-    ;
-
-decl_stmt
-    : decl_statement
-    | DECLARE
-    | label_decl
-    ;
-
-decl_statement
-    : decl_varname (
-        ALIAS FOR decl_aliasitem
-        | decl_const? decl_datatype decl_collate? decl_notnull? decl_defval?
-        | scrollable_? CURSOR decl_cursor_args? decl_is_for decl_cursor_query
-    ) SEMI
-    ;
-
-scrollable_
-    :
-     NO SCROLL
-    | SCROLL
-    ;
-
-decl_cursor_query
-    : selectstmt
-    ;
-
-decl_cursor_args
-    :
-     OPEN_PAREN decl_cursor_arglist CLOSE_PAREN
-    ;
-
-decl_cursor_arglist
-    : decl_cursor_arg (COMMA decl_cursor_arg)*
-    ;
-
-decl_cursor_arg
-    : decl_varname decl_datatype
-    ;
-
-decl_is_for
-    : IS
-    | FOR
-    ;
-
-decl_aliasitem
-    : PARAM
-    | colid
-    ;
-
-decl_varname
-    : any_identifier
-    ;
-
-decl_const
-    :
-     CONSTANT
-    ;
-
-decl_datatype
-    : typename
-    ; //TODO: $$ = read_datatype(yychar);
-
-decl_collate
-    :
-     COLLATE any_name
-    ;
-
-decl_notnull
-    :
-     NOT NULL_P
-    ;
-
-decl_defval
-    :
-     decl_defkey sql_expression
-    ;
-
-decl_defkey
-    : assign_operator
-    | DEFAULT
-    ;
-
-assign_operator
-    : EQUAL
-    | COLON_EQUALS
-    ;
-
-proc_sect
-    : proc_stmt*
-    ;
-
-proc_stmt
-    : pl_block SEMI
-    | stmt_return
-    | stmt_raise
-    | stmt_assign
-    | stmt_if
-    | stmt_case
-    | stmt_loop
-    | stmt_while
-    | stmt_for
-    | stmt_foreach_a
-    | stmt_exit
-    | stmt_assert
-    | stmt_execsql
-    | stmt_dynexecute
-    | stmt_perform
-    | stmt_call
-    | stmt_getdiag
-    | stmt_open
-    | stmt_fetch
-    | stmt_move
-    | stmt_close
-    | stmt_null
-    | stmt_commit
-    | stmt_rollback
-    | stmt_set
-    ;
-
-stmt_perform
-    : PERFORM expr_until_semi SEMI
-    ;
-
-stmt_call
-    : CALL any_identifier OPEN_PAREN expr_list_? CLOSE_PAREN SEMI
-    | DO any_identifier OPEN_PAREN expr_list_? CLOSE_PAREN SEMI
-    ;
-
-expr_list_
-    :
-     expr_list
-    ;
-
-stmt_assign
-    : assign_var assign_operator sql_expression SEMI
-    ;
-
-stmt_getdiag
-    : GET getdiag_area_opt? DIAGNOSTICS getdiag_list SEMI
-    ;
-
-getdiag_area_opt
-    :
-     CURRENT_P
-    | STACKED
-    ;
-
-getdiag_list
-    : getdiag_list_item (COMMA getdiag_list_item)*
-    ;
-
-getdiag_list_item
-    : getdiag_target assign_operator getdiag_item
-    ;
-
-getdiag_item
-    : colid
-    ;
-
-getdiag_target
-    : assign_var
-    ;
-
-assign_var
-    : (any_name | PARAM) (OPEN_BRACKET expr_until_rightbracket CLOSE_BRACKET)*
-    ;
-
-stmt_if
-    : IF_P expr_until_then THEN proc_sect stmt_elsifs stmt_else? END_P IF_P SEMI
-    ;
-
-stmt_elsifs
-    : (ELSIF a_expr THEN proc_sect)*
-    ;
-
-stmt_else
-    :
-     ELSE proc_sect
-    ;
-
-stmt_case
-    : CASE opt_expr_until_when? case_when_list case_else_? END_P CASE SEMI
-    ;
-
-opt_expr_until_when
-    :
-     sql_expression
-    ;
-
-case_when_list
-    : case_when+
-    ;
-
-case_when
-    : WHEN expr_list THEN proc_sect
-    ;
-
-case_else_
-    :
-     ELSE proc_sect
-    ;
-
-stmt_loop
-    : loop_label_? loop_body
-    ;
-
-stmt_while
-    : loop_label_? WHILE expr_until_loop loop_body
-    ;
-
-stmt_for
-    : loop_label_? FOR for_control loop_body
-    ;
-
-//TODO: rewrite using read_sql_expression logic?
-
-for_control
-    : for_variable IN_P (
-        cursor_name cursor_parameters_?
-        | selectstmt
-        | explainstmt
-        | EXECUTE a_expr for_using_expression_?
-        | reverse_? a_expr DOT_DOT a_expr by_expression_?
-    )
-    ;
-
-for_using_expression_
-    :
-     USING expr_list
-    ;
-
-cursor_parameters_
-    :
-     OPEN_PAREN a_expr (COMMA a_expr)* CLOSE_PAREN
-    ;
-
-reverse_
-    :
-     REVERSE
-    ;
-
-by_expression_
-    :
-     BY a_expr
-    ;
-
-for_variable
-    : any_name_list
-    ;
-
-stmt_foreach_a
-    : loop_label_? FOREACH for_variable foreach_slice? IN_P ARRAY a_expr loop_body
-    ;
-
-foreach_slice
-    :
-     SLICE iconst
-    ;
-
-stmt_exit
-    : exit_type label_? exitcond_? SEMI
-    ;
-
-exit_type
-    : EXIT
-    | CONTINUE_P
-    ;
-
-//todo implement RETURN statement according to initial grammar line 1754
-
-stmt_return
-    : RETURN (
-        NEXT sql_expression
-        | QUERY (EXECUTE a_expr for_using_expression_? | selectstmt)
-        | opt_return_result?
-    ) SEMI
-    ;
-
-opt_return_result
-    :
-     sql_expression
-    ;
-
-//https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html
-
-//RAISE [ level ] 'format' [, expression [, ... ]] [ USING option = expression [, ... ] ];
-
-//RAISE [ level ] condition_name [ USING option = expression [, ... ] ];
-
-//RAISE [ level ] SQLSTATE 'sqlstate' [ USING option = expression [, ... ] ];
-
-//RAISE [ level ] USING option = expression [, ... ];
-
-//RAISE ;
-
-stmt_raise
-    : RAISE stmt_raise_level_? sconst raise_list_? raise_using_? SEMI
-    | RAISE stmt_raise_level_? identifier raise_using_? SEMI
-    | RAISE stmt_raise_level_? SQLSTATE sconst raise_using_? SEMI
-    | RAISE stmt_raise_level_? raise_using_? SEMI
-    | RAISE
-    ;
-
-stmt_raise_level_
-    :
-    
-     DEBUG
-    | LOG
-    | INFO
-    | NOTICE
-    | WARNING
-    | EXCEPTION
-    ;
-
-raise_list_
-    :
-     (COMMA a_expr)+
-    ;
-
-raise_using_
-    :
-     USING raise_using_elem_list_
-    ;
-
-raise_using_elem_
-    : identifier EQUAL a_expr
-    ;
-
-raise_using_elem_list_
-    : raise_using_elem_ (COMMA raise_using_elem_)*
-    ;
-
-//todo imnplement
-
-stmt_assert
-    : ASSERT sql_expression stmt_assert_message_? SEMI
-    ;
-
-stmt_assert_message_
-    :
-     COMMA sql_expression
-    ;
-
-loop_body
-    : LOOP proc_sect END_P LOOP label_? SEMI
-    ;
-
-//TODO: looks like all other statements like INSERT/SELECT/UPDATE/DELETE are handled here;
-
-//pls take a look at original grammar
-
-stmt_execsql
-    : make_execsql_stmt SEMI
-    /*K_IMPORT
-            | K_INSERT
-            | t_word
-            | t_cword
-*/
-    ;
-
-//https://www.postgresql.org/docs/current/plpgsql-statements.html#PLPGSQL-STATEMENTS-SQL-NORESULT
-
-//EXECUTE command-string [ INTO [STRICT] target ] [ USING expression [, ... ] ];
-
-stmt_dynexecute
-    : EXECUTE a_expr (
-        /*this is silly, but i have to time to find nice way to code */ execute_into_? execute_using_?
-        | execute_using_? execute_into_?
-        |
-    ) SEMI
-    ;
-
-execute_using_
-    :
-     USING execute_using_list_
-    ;
-
-execute_using_list_
-    : a_expr (COMMA a_expr)*
-    ;
-
-execute_into_
-    :
-     INTO STRICT_P? into_target
-    ;
-
-//https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
-
-//OPEN unbound_cursorvar [ [ NO ] SCROLL ] FOR query;
-
-//OPEN unbound_cursorvar [ [ NO ] SCROLL ] FOR EXECUTE query_string
-
-//                                     [ USING expression [, ... ] ];
-
-//OPEN bound_cursorvar [ ( [ argument_name := ] argument_value [, ...] ) ];
-
-stmt_open
-    : OPEN (
-        cursor_variable scroll_option_? FOR (selectstmt | EXECUTE sql_expression open_using_?)
-        | colid (OPEN_PAREN open_bound_list_ CLOSE_PAREN)?
-    ) SEMI
-    ;
-
-open_bound_list_item_
-    : colid COLON_EQUALS a_expr
-    | a_expr
-    ;
-
-open_bound_list_
-    : open_bound_list_item_ (COMMA open_bound_list_item_)*
-    ;
-
-open_using_
-    :
-     USING expr_list
-    ;
-
-scroll_option_
-    :
-     scroll_option_no_? SCROLL
-    ;
-
-scroll_option_no_
-    :
-     NO
-    ;
-
-//https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
-
-//FETCH [ direction { FROM | IN } ] cursor INTO target;
-
-stmt_fetch
-    : FETCH direction = fetch_direction_ cursor_from_? cursor_variable INTO into_target SEMI
-    ;
-
-into_target
-    : expr_list
-    ;
-
-cursor_from_
-    :
-     FROM
-    | IN_P
-    ;
-
-fetch_direction_
-    :
-    
-     NEXT
-    | PRIOR
-    | FIRST_P
-    | LAST_P
-    | ABSOLUTE_P a_expr
-    | RELATIVE_P a_expr
-    | a_expr
+/*
+ * While all keywords can be used as column labels when preceded by AS,
+ * not all of them can be used as a "bare" column label without AS.
+ * Those that can be used as a bare label must be listed here,
+ * in addition to appearing in one of the category lists above.
+ *
+ * Always add a new keyword to this list if possible.  Mark it BARE_LABEL
+ * in kwlist.h if it is included here, or AS_LABEL if it is not.
+ */
+bare_label_keyword
+    : ABORT_P
+    | ABSENT
+    | ABSOLUTE_P
+    | ACCESS
+    | ACTION
+    | ADD_P
+    | ADMIN
+    | AFTER
+    | AGGREGATE
     | ALL
-    | (FORWARD | BACKWARD) (a_expr | ALL)?
+    | ALSO
+    | ALTER
+    | ALWAYS
+    | ANALYSE
+    | ANALYZE
+    | AND
+    | ANY
+    | ASC
+    | ASENSITIVE
+    | ASSERTION
+    | ASSIGNMENT
+    | ASYMMETRIC
+    | AT
+    | ATOMIC
+    | ATTACH
+    | ATTRIBUTE
+    | AUTHORIZATION
+    | BACKWARD
+    | BEFORE
+    | BEGIN_P
+    | BETWEEN
+    | BIGINT
+    | BINARY
+    | BIT
+    | BOOLEAN_P
+    | BOTH
+    | BREADTH
+    | BY
+    | CACHE
+    | CALL
+    | CALLED
+    | CASCADE
+    | CASCADED
+    | CASE
+    | CAST
+    | CATALOG
+    | CHAIN
+    | CHARACTERISTICS
+    | CHECK
+    | CHECKPOINT
+    | CLASS
+    | CLOSE
+    | CLUSTER
+    | COALESCE
+    | COLLATE
+    | COLLATION
+    | COLUMN
+    | COLUMNS
+    | COMMENT
+    | COMMENTS
+    | COMMIT
+    | COMMITTED
+    | COMPRESSION
+    | CONCURRENTLY
+    | CONDITIONAL
+    | CONFIGURATION
+    | CONFLICT
+    | CONNECTION
+    | CONSTRAINT
+    | CONSTRAINTS
+    | CONTENT_P
+    | CONTINUE_P
+    | CONVERSION_P
+    | COPY
+    | COST
+    | CROSS
+    | CSV
+    | CUBE
+    | CURRENT_CATALOG
+    | CURRENT_DATE
+    | CURRENT_P
+    | CURRENT_ROLE
+    | CURRENT_SCHEMA
+    | CURRENT_TIME
+    | CURRENT_TIMESTAMP
+    | CURRENT_USER
+    | CURSOR
+    | CYCLE
+    | DATA_P
+    | DATABASE
+    | DEALLOCATE
+    | DEC
+    | DECIMAL_P
+    | DECLARE
+    | DEFAULT
+    | DEFAULTS
+    | DEFERRABLE
+    | DEFERRED
+    | DEFINER
+    | DELETE_P
+    | DELIMITER
+    | DELIMITERS
+    | DEPENDS
+    | DEPTH
+    | DESC
+    | DETACH
+    | DICTIONARY
+    | DISABLE_P
+    | DISCARD
+    | DISTINCT
+    | DO
+    | DOCUMENT_P
+    | DOMAIN_P
+    | DOUBLE_P
+    | DROP
+    | EACH
+    | ELSE
+    | EMPTY_P
+    | ENABLE_P
+    | ENCODING
+    | ENCRYPTED
+    | END_P
+    | ENUM_P
+    | ERROR
+    | ESCAPE
+    | EVENT
+    | EXCLUDE
+    | EXCLUDING
+    | EXCLUSIVE
+    | EXECUTE
+    | EXISTS
+    | EXPLAIN
+    | EXPRESSION
+    | EXTENSION
+    | EXTERNAL
+    | EXTRACT
+    | FALSE_P
+    | FAMILY
+    | FINALIZE
+    | FIRST_P
+    | FLOAT_P
+    | FOLLOWING
+    | FORCE
+    | FOREIGN
+    | FORMAT
+    | FORWARD
+    | FREEZE
+    | FULL
+    | FUNCTION
+    | FUNCTIONS
+    | GENERATED
+    | GLOBAL
+    | GRANTED
+    | GREATEST
+    | GROUPING
+    | GROUPS
+    | HANDLER
+    | HEADER_P
+    | HOLD
+    | IDENTITY_P
+    | IF_P
+    | ILIKE
+    | IMMEDIATE
+    | IMMUTABLE
+    | IMPLICIT_P
+    | IMPORT_P
+    | IN_P
+    | INCLUDE
+    | INCLUDING
+    | INCREMENT
+    | INDENT
+    | INDEX
+    | INDEXES
+    | INHERIT
+    | INHERITS
+    | INITIALLY
+    | INLINE_P
+    | INNER_P
+    | INOUT
+    | INPUT_P
+    | INSENSITIVE
+    | INSERT
+    | INSTEAD
+    | INT_P
+    | INTEGER
+    | INTERVAL
+    | INVOKER
+    | IS
+    | ISOLATION
+    | JOIN
+    | JSON
+    | JSON_ARRAY
+    | JSON_ARRAYAGG
+    | JSON_EXISTS
+    | JSON_OBJECT
+    | JSON_OBJECTAGG
+    | JSON_QUERY
+    | JSON_SCALAR
+    | JSON_SERIALIZE
+    | JSON_TABLE
+    | JSON_VALUE
+    | KEEP
+    | KEY
+    | KEYS
+    | LABEL
+    | LANGUAGE
+    | LARGE_P
+    | LAST_P
+    | LATERAL_P
+    | LEADING
+    | LEAKPROOF
+    | LEAST
+    | LEFT
+    | LEVEL
+    | LIKE
+    | LISTEN
+    | LOAD
+    | LOCAL
+    | LOCALTIME
+    | LOCALTIMESTAMP
+    | LOCATION
+    | LOCK_P
+    | LOCKED
+    | LOGGED
+    | MAPPING
+    | MATCH
+    | MATCHED
+    | MATERIALIZED
+    | MAXVALUE
+    | MERGE
+    | MERGE_ACTION
+    | METHOD
+    | MINVALUE
+    | MODE
+    | MOVE
+    | NAME_P
+    | NAMES
+    | NATIONAL
+    | NATURAL
+    | NCHAR
+    | NESTED
+    | NEW
+    | NEXT
+    | NFC
+    | NFD
+    | NFKC
+    | NFKD
+    | NO
+    | NONE
+    | NORMALIZE
+    | NORMALIZED
+    | NOT
+    | NOTHING
+    | NOTIFY
+    | NOWAIT
+    | NULL_P
+    | NULLIF
+    | NULLS_P
+    | NUMERIC
+    | OBJECT_P
+    | OF
+    | OFF
+    | OIDS
+    | OLD
+    | OMIT
+    | ONLY
+    | OPERATOR
+    | OPTION
+    | OPTIONS
+    | OR
+    | ORDINALITY
+    | OTHERS
+    | OUT_P
+    | OUTER_P
+    | OVERLAY
+    | OVERRIDING
+    | OWNED
+    | OWNER
+    | PARALLEL
+    | PARAMETER
+    | PARSER
+    | PARTIAL
+    | PARTITION
+    | PASSING
+    | PASSWORD
+    | PATH
+    | PERIOD
+    | PLACING
+    | PLAN
+    | PLANS
+    | POLICY
+    | POSITION
+    | PRECEDING
+    | PREPARE
+    | PREPARED
+    | PRESERVE
+    | PRIMARY
+    | PRIOR
+    | PRIVILEGES
+    | PROCEDURAL
+    | PROCEDURE
+    | PROCEDURES
+    | PROGRAM
+    | PUBLICATION
+    | QUOTE
+    | QUOTES
+    | RANGE
+    | READ
+    | REAL
+    | REASSIGN
+    | RECURSIVE
+    | REF
+    | REFERENCES
+    | REFERENCING
+    | REFRESH
+    | REINDEX
+    | RELATIVE_P
+    | RELEASE
+    | RENAME
+    | REPEATABLE
+    | REPLACE
+    | REPLICA
+    | RESET
+    | RESTART
+    | RESTRICT
+    | RETURN
+    | RETURNS
+    | REVOKE
+    | RIGHT
+    | ROLE
+    | ROLLBACK
+    | ROLLUP
+    | ROUTINE
+    | ROUTINES
+    | ROW
+    | ROWS
+    | RULE
+    | SAVEPOINT
+    | SCALAR
+    | SCHEMA
+    | SCHEMAS
+    | SCROLL
+    | SEARCH
+    | SECURITY
+    | SELECT
+    | SEQUENCE
+    | SEQUENCES
+    | SERIALIZABLE
+    | SERVER
+    | SESSION
+    | SESSION_USER
+    | SET
+    | SETOF
+    | SETS
+    | SHARE
+    | SHOW
+    | SIMILAR
+    | SIMPLE
+    | SKIP_P
+    | SMALLINT
+    | SNAPSHOT
+    | SOME
+    | SOURCE
+    | SQL_P
+    | STABLE
+    | STANDALONE_P
+    | START
+    | STATEMENT
+    | STATISTICS
+    | STDIN
+    | STDOUT
+    | STORAGE
+    | STORED
+    | STRICT_P
+    | STRING_P
+    | STRIP_P
+    | SUBSCRIPTION
+    | SUBSTRING
+    | SUPPORT
+    | SYMMETRIC
+    | SYSID
+    | SYSTEM_P
+    | SYSTEM_USER
+    | TABLE
+    | TABLES
+    | TABLESAMPLE
+    | TABLESPACE
+    | TARGET
+    | TEMP
+    | TEMPLATE
+    | TEMPORARY
+    | TEXT_P
+    | THEN
+    | TIES
+    | TIME
+    | TIMESTAMP
+    | TRAILING
+    | TRANSACTION
+    | TRANSFORM
+    | TREAT
+    | TRIGGER
+    | TRIM
+    | TRUE_P
+    | TRUNCATE
+    | TRUSTED
+    | TYPE_P
+    | TYPES_P
+    | UESCAPE
+    | UNBOUNDED
+    | UNCOMMITTED
+    | UNCONDITIONAL
+    | UNENCRYPTED
+    | UNIQUE
+    | UNKNOWN
+    | UNLISTEN
+    | UNLOGGED
+    | UNTIL
+    | UPDATE
+    | USER
+    | USING
+    | VACUUM
+    | VALID
+    | VALIDATE
+    | VALIDATOR
+    | VALUE_P
+    | VALUES
+    | VARCHAR
+    | VARIADIC
+    | VERBOSE
+    | VERSION_P
+    | VIEW
+    | VIEWS
+    | VOLATILE
+    | WHEN
+    | WHITESPACE_P
+    | WORK
+    | WRAPPER
+    | WRITE
+    | XML_P
+    | XMLATTRIBUTES
+    | XMLCONCAT
+    | XMLELEMENT
+    | XMLEXISTS
+    | XMLFOREST
+    | XMLNAMESPACES
+    | XMLPARSE
+    | XMLPI
+    | XMLROOT
+    | XMLSERIALIZE
+    | XMLTABLE
+    | YES_P
+    | ZONE
     ;
 
-//https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
-
-//MOVE [ direction { FROM | IN } ] cursor;
-
-stmt_move
-    : MOVE fetch_direction_? cursor_variable SEMI
-    ;
-
-stmt_close
-    : CLOSE cursor_variable SEMI
-    ;
-
-stmt_null
-    : NULL_P SEMI
-    ;
-
-stmt_commit
-    : COMMIT plsql_opt_transaction_chain? SEMI
-    ;
-
-stmt_rollback
-    : ROLLBACK plsql_opt_transaction_chain? SEMI
-    ;
-
-plsql_opt_transaction_chain
-    : AND NO? CHAIN
-    
-    ;
-
-stmt_set
-    : SET any_name TO DEFAULT SEMI
-    | RESET (any_name | ALL) SEMI
-    ;
-
-cursor_variable
-    : colid
-    | PARAM
-    ;
-
-exception_sect
-    :
-     EXCEPTION proc_exceptions
-    ;
-
-proc_exceptions
-    : proc_exception+
-    ;
-
-proc_exception
-    : WHEN proc_conditions THEN proc_sect
-    ;
-
-proc_conditions
-    : proc_condition (OR proc_condition)*
-    ;
-
-proc_condition
-    : any_identifier
-    | SQLSTATE sconst
-    ;
-
-//expr_until_semi:
-
-//;
-
-//expr_until_rightbracket:
-
-//;
-
-//expr_until_loop:
-
-//;
-
-block_label_
-    :
-     label_decl
-    ;
-
-loop_label_
-    :
-     label_decl
-    ;
-
-label_
-    :
-     any_identifier
-    ;
-
-exitcond_
-    : WHEN expr_until_semi
-    
-    ;
 
 any_identifier
     : colid
-    | plsql_unreserved_keyword
     ;
 
-plsql_unreserved_keyword
-    : ABSOLUTE_P
-    | ALIAS
-    | AND
-    | ARRAY
-    | ASSERT
-    | BACKWARD
-    | CALL
-    | CHAIN
-    | CLOSE
-    | COLLATE
-    | COLUMN
-    //| COLUMN_NAME
-    | COMMIT
-    | CONSTANT
-    | CONSTRAINT
-    //| CONSTRAINT_NAME
-    | CONTINUE_P
-    | CURRENT_P
-    | CURSOR
-    //| DATATYPE
-    | DEBUG
-    | DEFAULT
-    //| DETAIL
-    | DIAGNOSTICS
-    | DO
-    | DUMP
-    | ELSIF
-    //| ERRCODE
-    | ERROR
-    | EXCEPTION
-    | EXIT
-    | FETCH
-    | FIRST_P
-    | FORWARD
-    | GET
-    //| HINT
-
-    //| IMPORT
-    | INFO
-    | INSERT
-    | IS
-    | LAST_P
-    //| MESSAGE
-
-    //| MESSAGE_TEXT
-    | MOVE
-    | NEXT
-    | NO
-    | NOTICE
-    | OPEN
-    | OPTION
-    | PERFORM
-    //| PG_CONTEXT
-
-    //| PG_DATATYPE_NAME
-
-    //| PG_EXCEPTION_CONTEXT
-
-    //| PG_EXCEPTION_DETAIL
-
-    //| PG_EXCEPTION_HINT
-    | PRINT_STRICT_PARAMS
-    | PRIOR
-    | QUERY
-    | RAISE
-    | RELATIVE_P
-    | RESET
-    | RETURN
-    //| RETURNED_SQLSTATE
-    | ROLLBACK
-    //| ROW_COUNT
-    | ROWTYPE
-    | SCHEMA
-    //| SCHEMA_NAME
-    | SCROLL
-    | SET
-    | SLICE
-    | SQLSTATE
-    | STACKED
-    | TABLE
-    //| TABLE_NAME
-    | TYPE_P
-    | USE_COLUMN
-    | USE_VARIABLE
-    | VARIABLE_CONFLICT
-    | WARNING
-    | OUTER_P
+identifier
+    : Identifier uescape_?
+    | QuotedIdentifier
+    | UnicodeQuotedIdentifier
+    | PLSQLVARIABLENAME
     ;
 
-sql_expression
-    : target_list_? into_clause? from_clause? where_clause? group_clause? having_clause? window_clause?
-    ;
-
-expr_until_then
-    : sql_expression
-    ;
-
-expr_until_semi
-    : sql_expression
-    ;
-
-expr_until_rightbracket
-    : a_expr
-    ;
-
-expr_until_loop
-    : a_expr
-    ;
-
-make_execsql_stmt
-    : stmt returning_clause_into_?
-    ;
-
-returning_clause_into_
-    : INTO strict_? into_target
-    
-    ;

@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4ng": "3.0.4",
+    "antlr4ng": "3.0.9",
     "antlr4ng-cli": "2.0.0",
     "buffer": "^6.0.3",
     "fs-extra": "^11.1.1",

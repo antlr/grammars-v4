@@ -31,12 +31,13 @@ public abstract class PostgreSQLParserBase extends Parser {
     }
 
     ParserRuleContext GetParsedSqlTree(String script, int line) {
-        PostgreSQLParser ph = getPostgreSQLParser(script);
+        PostgreSQLParser ph = GetPostgreSQLParser(script);
         ParserRuleContext result = ph.root();
         return result;
     }
 
-    public void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx) {
+    public void ParseRoutineBody() {
+        PostgreSQLParser.Createfunc_opt_listContext _localctx = (PostgreSQLParser.Createfunc_opt_listContext) this.getContext();
         String lang = null;
         for (PostgreSQLParser.Createfunc_opt_itemContext coi : _localctx.createfunc_opt_item()) {
             if (coi.LANGUAGE() != null) {
@@ -63,13 +64,14 @@ public abstract class PostgreSQLParserBase extends Parser {
         }
         if (func_as != null) {
             String txt = GetRoutineBodyString(func_as.func_as().sconst(0));
-            PostgreSQLParser ph = getPostgreSQLParser(txt);
             switch (lang) {
                 case "plpgsql":
-                    func_as.func_as().Definition = ph.plsqlroot();
+                    //NB: Cannot be done this way.
+                    //PostgreSQLParser ph = GetPostgreSQLParser(txt);
+                    //func_as.func_as().Definition = ph.plsqlroot();
                     break;
                 case "sql":
-                    func_as.func_as().Definition = ph.root();
+                    //func_as.func_as().Definition = ph.root();
                     break;
             }
         }
@@ -108,7 +110,7 @@ public abstract class PostgreSQLParserBase extends Parser {
         return result;
     }
 
-    public PostgreSQLParser getPostgreSQLParser(String script) {
+    public PostgreSQLParser GetPostgreSQLParser(String script) {
         CharStream charStream = CharStreams.fromString(script);
         Lexer lexer = new PostgreSQLLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -124,9 +126,9 @@ public abstract class PostgreSQLParserBase extends Parser {
 
     public boolean OnlyAcceptableOps()
     {
-	var c = ((CommonTokenStream)this.getInputStream()).LT(1);
-	var text = c.getText();
-	return text.equals("!") || text.equals("!!")
+        var c = ((CommonTokenStream)this.getInputStream()).LT(1);
+        var text = c.getText();
+        return text.equals("!") || text.equals("!!")
             || text.equals("!=-")
             ;
     }

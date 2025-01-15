@@ -26,7 +26,7 @@ def fix(file_path):
 
 /* eslint-disable @typescript-eslint/no-unused-vars, no-useless-escape */
 
-import { MySQLLexerBase, SqlMode } from "./MySQLLexerBase.js";
+import { MySQLLexerBase } from "./MySQLLexerBase.js";
 }
 '''
             )
@@ -37,7 +37,6 @@ import { MySQLLexerBase, SqlMode } from "./MySQLLexerBase.js";
 /* eslint-disable no-useless-escape, no-lone-blocks */
 
 import { MySQLParserBase } from "./MySQLParserBase.js";
-import { SqlMode } from "./MySQLLexerBase.js";
 }
 '''
             )

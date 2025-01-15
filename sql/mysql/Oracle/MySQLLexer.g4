@@ -3657,7 +3657,8 @@ MYSQL_COMMENT_START
     ;
 
 VERSION_COMMENT_END
-    : '*/' {this.isInVersionComment()}? { this.endInVersionComment(); } -> channel(HIDDEN)
+    : '*/' {this.isInVersionComment()}?
+      { this.endInVersionComment(); } -> channel(HIDDEN)
     ;
 
 BLOCK_COMMENT

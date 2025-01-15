@@ -3,10 +3,11 @@ import re
 from collections import deque
 import sys
 if sys.version_info[1] > 5:
-	from typing import TextIO
+    from typing import TextIO
 else:
-	from typing.io import TextIO
+    from typing.io import TextIO
 from SqlMode import SqlMode
+from SqlModes import SqlModes
 from MySQLParser import MySQLParser
 
 class MySQLLexerBase(Lexer):
@@ -23,32 +24,16 @@ class MySQLLexerBase(Lexer):
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)
         self.serverVersion = 0
-        self.sqlModes = set()
+        self.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES")
         self.supportMle = True
         self.charSets = set()
         self.inVersionComment = False
         self.pendingTokens = deque()
         self.justEmitedDot = False
+        self.serverVersion = 80200;
 
     def isSqlModeActive(self, mode):
         return mode in self.sqlModes
-
-    def sqlModeFromString(self, modes):
-        self.sqlModes.clear()
-        parts = modes.upper().split(",")
-        for mode in parts:
-            if mode in {"ANSI", "DB2", "MAXDB", "MSSQL", "ORACLE", "POSTGRESQL"}:
-                self.sqlModes.update({SqlMode.AnsiQuotes, SqlMode.PipesAsConcat, SqlMode.IgnoreSpace})
-            elif mode == "ANSI_QUOTES":
-                self.sqlModes.add(SqlMode.AnsiQuotes)
-            elif mode == "PIPES_AS_CONCAT":
-                self.sqlModes.add(SqlMode.PipesAsConcat)
-            elif mode == "NO_BACKSLASH_ESCAPES":
-                self.sqlModes.add(SqlMode.NoBackslashEscapes)
-            elif mode == "IGNORE_SPACE":
-                self.sqlModes.add(SqlMode.IgnoreSpace)
-            elif mode in {"HIGH_NOT_PRECEDENCE", "MYSQL323", "MYSQL40"}:
-                self.sqlModes.add(SqlMode.HighNotPrecedence)
 
     def reset(self):
         self.inVersionComment = False
@@ -147,6 +132,18 @@ class MySQLLexerBase(Lexer):
         self.pendingTokens.append(self._factory.create(self._tokenFactorySourcePair, self.DOT_SYMBOL, self._text, self._channel, self._tokenStartCharIndex, self._tokenStartCharIndex, self._tokenStartLine, self._tokenStartColumn))
         self._tokenStartColumn += 1
         self.justEmitedDot = True
+
+    def emit(self):
+        t = super().emit()
+        if self.justEmitedDot:
+            text = t.text
+            text = text[1:]
+            t.text = text
+            t.start = t.start + 1
+            # print(f"hi {text}", file=sys.stderr)
+            #print(f"hi {t.text}", file=sys.stderr)
+            self.justEmitedDot = False
+        return t
 
     def isServerVersionLt80024(self):
         return self.serverVersion < 80024
@@ -304,22 +301,6 @@ class MySQLLexerBase(Lexer):
 
     def isSingleQuotedText(self):
         return not self.isSqlModeActive(SqlMode.NoBackslashEscapes)
-
-    def emit(self):
-        if self._text is None:
-            text = self._text
-        elif self._text is NoneType:
-            text = self._text
-        elif self.justEmitedDot:
-            text = self._text[1:]
-        else:
-            text = self._text
-        token = self._factory.create(self._tokenFactorySourcePair, self._type, self._text, self._channel, self._tokenStartCharIndex,
-                         self.getCharIndex()-1, self._tokenStartLine, self._tokenStartColumn)
-        self.emitToken(token)
-        self.justEmitedDot = False
-        self.emitToken(token)
-        return token
 
     def startInVersionComment(self):
         self.inVersionComment = True

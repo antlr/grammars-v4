@@ -5,11 +5,11 @@
 /* eslint-disable no-underscore-dangle */
 /* cspell: ignore antlr, longlong, ULONGLONG, MAXDB */
 
-import { Lexer } from "antlr4";
-import { Token } from "antlr4";
+import { CharStream, Lexer, Token } from "antlr4";
 import { CommonToken } from "antlr4";
 import MySQLLexer from "./MySQLLexer";
 import SqlMode from "./SqlMode";
+import SqlModes from "./SqlModes";
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
 export default abstract class MySQLLexerBase extends Lexer {
@@ -18,6 +18,8 @@ export default abstract class MySQLLexerBase extends Lexer {
 
     /** Enable Multi Language Extension support. */
     public supportMle = true;
+
+    public justEmittedDot = false;
 
     public charSets: Set<string> = new Set(); // Used to check repertoires.
     protected inVersionComment = false;
@@ -34,6 +36,12 @@ export default abstract class MySQLLexerBase extends Lexer {
     static #unsignedLongLongString = "18446744073709551615";
     static #unsignedLongLongLength = 20;
 
+    constructor(input: CharStream) {
+        super(input);
+        this.serverVersion = 80200;
+        this.sqlModes = SqlModes.sqlModeFromString("ANSI_QUOTES");
+    }
+
     /**
      * Determines if the given SQL mode is currently active in the lexer.
      *
@@ -43,33 +51,6 @@ export default abstract class MySQLLexerBase extends Lexer {
      */
     public isSqlModeActive(mode: SqlMode): boolean {
         return this.sqlModes.has(mode);
-    }
-
-    /**
-     * Converts a mode string into individual mode flags.
-     *
-     * @param modes The input string to parse.
-     */
-    public sqlModeFromString(modes: string): void {
-        this.sqlModes = new Set<SqlMode>();
-
-        const parts = modes.toUpperCase().split(",");
-        parts.forEach((mode: string) => {
-            if (mode === "ANSI" || mode === "DB2" || mode === "MAXDB" || mode === "MSSQL" || mode === "ORACLE" ||
-                mode === "POSTGRESQL") {
-                this.sqlModes.add(SqlMode.AnsiQuotes).add(SqlMode.PipesAsConcat).add(SqlMode.IgnoreSpace);
-            } else if (mode === "ANSI_QUOTES") {
-                this.sqlModes.add(SqlMode.AnsiQuotes);
-            } else if (mode === "PIPES_AS_CONCAT") {
-                this.sqlModes.add(SqlMode.PipesAsConcat);
-            } else if (mode === "NO_BACKSLASH_ESCAPES") {
-                this.sqlModes.add(SqlMode.NoBackslashEscapes);
-            } else if (mode === "IGNORE_SPACE") {
-                this.sqlModes.add(SqlMode.IgnoreSpace);
-            } else if (mode === "HIGH_NOT_PRECEDENCE" || mode === "MYSQL323" || mode === "MYSQL40") {
-                this.sqlModes.add(SqlMode.HighNotPrecedence);
-            }
-        });
     }
 
     /**
@@ -250,11 +231,25 @@ export default abstract class MySQLLexerBase extends Lexer {
      * Creates a DOT token in the token stream.
      */
     protected emitDot(): void {
-	let t = new CommonToken([this, this._input],
-		MySQLLexer.DOT_SYMBOL, 0, this._tokenStartCharIndex, this._tokenStartCharIndex);
+	let len = this.text.length;
+        let t = new CommonToken([this, this._input],
+                MySQLLexer.DOT_SYMBOL, 0, this._tokenStartCharIndex, this._tokenStartCharIndex);
         this.pendingTokens.push(t);
-        ++this.column;
+	t.text = ".";
+	t.column = t.column - len;
+//        ++this.column;
         ++this._tokenStartCharIndex;
+	this.justEmittedDot = true;
+    }
+
+    public override emit(): Token
+    {
+        let t = super.emit();
+        if (this.justEmittedDot) {
+            t.column = t.column + 1;
+            this.justEmittedDot = false;
+        }
+        return t;
     }
 
     public isServerVersionLt80024(): boolean
@@ -304,234 +299,226 @@ export default abstract class MySQLLexerBase extends Lexer {
 
     public doLogicalOr(): void
     {
-	this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
+        this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
     }
 
     public doIntNumber(): void
     {
-	this._type = this.determineNumericType(this.text);
+        this._type = this.determineNumericType(this.text);
     }
 
     public doAdddate(): void
     {
-	this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL);
     }
 
     public doBitAnd(): void
     {
-	this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL);
     }
 
     public doBitOr(): void
     {
-	this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL);
     }
 
     public doBitXor(): void
     {
-	this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
     }
 
     public doCast(): void
     {
-	this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL);
     }
 
     public doCount(): void
     {
-	this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL);
     }
 
     public doCurdate(): void
     {
-	this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
     }
 
     public doCurrentDate(): void
     {
-	this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
     }
 
     public doCurrentTime(): void
     {
-	this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
     }
 
     public doCurtime(): void
     {
-	this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
     }
 
     public doDateAdd(): void
     {
-	this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
     }
 
     public doDateSub(): void
     {
-	this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
     }
 
     public doExtract(): void
     {
-	this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL);
     }
 
     public doGroupConcat(): void
     {
-	this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
     }
 
     public doMax(): void
     {
-	this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL);
     }
 
     public doMid(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
     }
 
     public doMin(): void
     {
-	this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL);
     }
 
     public doNot(): void
     {
-	this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL: MySQLLexer.NOT_SYMBOL;
+        this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL: MySQLLexer.NOT_SYMBOL;
     }
 
     public doNow(): void
     {
-	this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL);
     }
 
     public doPosition(): void
     {
-	this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL);
     }
 
     public doSessionUser(): void
     {
-	this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
     }
 
     public doStddevSamp(): void
     {
-	this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
     }
 
     public doStddev(): void
     {
-	this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
     }
 
     public doStddevPop(): void
     {
-	this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
     }
 
     public doStd(): void
     {
-	this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
     }
 
     public doSubdate(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL);
     }
 
     public doSubstr(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
     }
 
     public doSubstring(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
     }
 
     public doSum(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL);
     }
 
     public doSysdate(): void
     {
-	this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL);
     }
 
     public doSystemUser(): void
     {
-	this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
     }
 
     public doTrim(): void
     {
-	this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL);
     }
 
     public doVariance(): void
     {
-	this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
     }
 
     public doVarPop(): void
     {
-	this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
     }
 
     public doVarSamp(): void
     {
-	this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
+        this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
     }
 
     public doUnderscoreCharset(): void
     {
-	this._type = this.checkCharset(this.text);
+        this._type = this.checkCharset(this.text);
     }
 
     public isVersionComment(): boolean
     {
-	return this.checkMySQLVersion(this.text);
+        return this.checkMySQLVersion(this.text);
     }
 
     public isBackTickQuotedId(): boolean
     {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
     }
 
     public isDoubleQuotedText(): boolean
     {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
     }
 
     public isSingleQuotedText(): boolean
     {
-	return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public override emit(): Token
-    {
-	let t = super.emit();
-	if (t.type == MySQLLexer.WHITESPACE)
-		t.channel = Token.HIDDEN_CHANNEL;
-        return t;
+        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
     }
 
     public startInVersionComment(): void
     {
-	this.inVersionComment = true;
+        this.inVersionComment = true;
     }
 
     public endInVersionComment(): void
     {
-	this.inVersionComment = false;
+        this.inVersionComment = false;
     }
 
     public isInVersionComment(): boolean
     {
-	return this.inVersionComment;
+        return this.inVersionComment;
     }
 }

@@ -43,21 +43,9 @@ options {
     caseInsensitive = true;
 }
 
-@header {
-}
-@members {
-/* This field stores the tags which are used to detect the end of a dollar-quoted string literal.
- */
-}
-//
 
-// SPECIAL CHARACTERS (4.1.4)
+// Insert here @header for C++ lexer.
 
-//
-
-// Note that Asterisk is a valid operator, but does not have the type Operator due to its syntactic use in locations
-
-// that are not expressions.
 
 Dollar: '$';
 
@@ -127,16 +115,14 @@ Operator:
     (
         (
             OperatorCharacter
-            | ('+' | '-' {checkLA('-')}?)+ (OperatorCharacter | '/' {checkLA('*')}?)
-            | '/'        {checkLA('*')}?
+            | ('+' | '-' {this.CheckLaMinus()}? )+ (OperatorCharacter | '/' {this.CheckLaStar()}? )
+            | '/'        {this.CheckLaStar()}?
         )+
         | // special handling for the single-character operators + and -
         [+-]
     )
     //TODO somehow rewrite this part without using Actions
-    {
-    HandleLessLessGreaterGreater();
-   }
+    {this.HandleLessLessGreaterGreater();}
 ;
 /* This rule handles operators which end with + or -, and sets the token type to Operator. It is comprised of four
  * parts, in order:
@@ -150,9 +136,9 @@ Operator:
  */
 
 OperatorEndingWithPlusMinus:
-    (OperatorCharacterNotAllowPlusMinusAtEnd | '-' {checkLA('-')}? | '/' {checkLA('*')}?)* OperatorCharacterAllowPlusMinusAtEnd Operator? (
+    (OperatorCharacterNotAllowPlusMinusAtEnd | '-' {this.CheckLaMinus()}? | '/' {this.CheckLaStar()}? )* OperatorCharacterAllowPlusMinusAtEnd Operator? (
         '+'
-        | '-' {checkLA('-')}?
+        | '-' {this.CheckLaMinus()}?
     )+        -> type (Operator)
 ;
 // Each of the following fragment rules omits the +, -, and / characters, which must always be handled in a special way
@@ -169,6 +155,51 @@ fragment OperatorCharacterAllowPlusMinusAtEnd: [~!@%^&|`?#];
 //
 
 // KEYWORDS (Appendix C)
+
+
+
+JSON: 'JSON';
+JSON_ARRAY: 'JSON_ARRAY';
+JSON_ARRAYAGG: 'JSON_ARRAYAGG';
+JSON_EXISTS: 'JSON_EXISTS';
+JSON_OBJECT: 'JSON_OBJECT';
+JSON_OBJECTAGG: 'JSON_OBJECTAGG';
+JSON_QUERY: 'JSON_QUERY';
+JSON_SCALAR: 'JSON_SCALAR';
+JSON_SERIALIZE: 'JSON_SERIALIZE';
+JSON_TABLE: 'JSON_TABLE';
+JSON_VALUE: 'JSON_VALUE';
+MERGE_ACTION: 'MERGE_ACTION';
+
+SYSTEM_USER: 'SYSTEM_USER';
+
+ABSENT: 'ABSENT';
+ASENSITIVE: 'ASENSITIVE';
+ATOMIC: 'ATOMIC';
+BREADTH: 'BREATH';
+COMPRESSION: 'COMPRESSION';
+CONDITIONAL: 'CONDITIONAL';
+DEPTH: 'DEPTH';
+EMPTY_P: 'EMPTY';
+FINALIZE: 'FINALIZE';
+INDENT: 'INDENT';
+KEEP: 'KEEP';
+KEYS: 'KEYS';
+NESTED: 'NESTED';
+OMIT: 'OMIT';
+PARAMETER: 'PARAMETER';
+PATH: 'PATH';
+PLAN: 'PLAN';
+QUOTES: 'QUOTES';
+SCALAR: 'SCALAR';
+SOURCE: 'SOURCE';
+STRING_P: 'STRING';
+TARGET: 'TARGET';
+UNCONDITIONAL: 'UNCONDITIONAL';
+
+PERIOD: 'PERIOD';
+
+FORMAT_LA: 'FORMAT_LA';
 
 //
 
@@ -1121,17 +1152,11 @@ NORMALIZE: 'NORMALIZE';
 
 DUMP: 'DUMP';
 
-PRINT_STRICT_PARAMS: 'PRINT_STRICT_PARAMS';
-
-VARIABLE_CONFLICT: 'VARIABLE_CONFLICT';
-
 ERROR: 'ERROR';
 
 USE_VARIABLE: 'USE_VARIABLE';
 
 USE_COLUMN: 'USE_COLUMN';
-
-ALIAS: 'ALIAS';
 
 CONSTANT: 'CONSTANT';
 
@@ -1147,8 +1172,6 @@ ELSIF: 'ELSIF';
 
 WHILE: 'WHILE';
 
-REVERSE: 'REVERSE';
-
 FOREACH: 'FOREACH';
 
 SLICE: 'SLICE';
@@ -1157,15 +1180,11 @@ EXIT: 'EXIT';
 
 RETURN: 'RETURN';
 
-QUERY: 'QUERY';
-
 RAISE: 'RAISE';
 
 SQLSTATE: 'SQLSTATE';
 
 DEBUG: 'DEBUG';
-
-LOG: 'LOG';
 
 INFO: 'INFO';
 
@@ -1180,241 +1199,12 @@ ASSERT: 'ASSERT';
 LOOP: 'LOOP';
 
 OPEN: 'OPEN';
-//
-
-// IDENTIFIERS (4.1.1)
-
-//
-
-ABS: 'ABS';
-
-CBRT: 'CBRT';
-
-CEIL: 'CEIL';
-
-CEILING: 'CEILING';
-
-DEGREES: 'DEGREES';
-
-DIV: 'DIV';
-
-EXP: 'EXP';
-
-FACTORIAL: 'FACTORIAL';
-
-FLOOR: 'FLOOR';
-
-GCD: 'GCD';
-
-LCM: 'LCM';
-
-LN: 'LN';
-
-LOG10: 'LOG10';
-
-MIN_SCALE: 'MIN_SCALE';
-
-MOD: 'MOD';
-
-PI: 'PI';
-
-POWER: 'POWER';
-
-RADIANS: 'RADIANS';
-
-ROUND: 'ROUND';
-
-SCALE: 'SCALE';
-
-SIGN: 'SIGN';
-
-SQRT: 'SQRT';
-
-TRIM_SCALE: 'TRIM_SCALE';
-
-TRUNC: 'TRUNC';
-
-WIDTH_BUCKET: 'WIDTH_BUCKET';
-
-RANDOM: 'RANDOM';
-
-SETSEED: 'SETSEED';
-
-ACOS: 'ACOS';
-
-ACOSD: 'ACOSD';
-
-ASIN: 'ASIN';
-
-ASIND: 'ASIND';
-
-ATAN: 'ATAN';
-
-ATAND: 'ATAND';
-
-ATAN2: 'ATAN2';
-
-ATAN2D: 'ATAN2D';
-
-COS: 'COS';
-
-COSD: 'COSD';
-
-COT: 'COT';
-
-COTD: 'COTD';
-
-SIN: 'SIN';
-
-SIND: 'SIND';
-
-TAN: 'TAN';
-
-TAND: 'TAND';
-
-SINH: 'SINH';
-
-COSH: 'COSH';
-
-TANH: 'TANH';
-
-ASINH: 'ASINH';
-
-ACOSH: 'ACOSH';
-
-ATANH: 'ATANH';
-
-BIT_LENGTH: 'BIT_LENGTH';
-
-CHAR_LENGTH: 'CHAR_LENGTH';
-
-CHARACTER_LENGTH: 'CHARACTER_LENGTH';
-
-LOWER: 'LOWER';
-
-OCTET_LENGTH: 'OCTET_LENGTH';
-
-UPPER: 'UPPER';
-
-ASCII: 'ASCII';
-
-BTRIM: 'BTRIM';
-
-CHR: 'CHR';
-
-CONCAT: 'CONCAT';
-
-CONCAT_WS: 'CONCAT_WS';
 
 FORMAT: 'FORMAT';
 
-INITCAP: 'INITCAP';
 
-LENGTH: 'LENGTH';
 
-LPAD: 'LPAD';
 
-LTRIM: 'LTRIM';
-
-MD5: 'MD5';
-
-PARSE_IDENT: 'PARSE_IDENT';
-
-PG_CLIENT_ENCODING: 'PG_CLIENT_ENCODING';
-
-QUOTE_IDENT: 'QUOTE_IDENT';
-
-QUOTE_LITERAL: 'QUOTE_LITERAL';
-
-QUOTE_NULLABLE: 'QUOTE_NULLABLE';
-
-REGEXP_COUNT: 'REGEXP_COUNT';
-
-REGEXP_INSTR: 'REGEXP_INSTR';
-
-REGEXP_LIKE: 'REGEXP_LIKE';
-
-REGEXP_MATCH: 'REGEXP_MATCH';
-
-REGEXP_MATCHES: 'REGEXP_MATCHES';
-
-REGEXP_REPLACE: 'REGEXP_REPLACE';
-
-REGEXP_SPLIT_TO_ARRAY: 'REGEXP_SPLIT_TO_ARRAY';
-
-REGEXP_SPLIT_TO_TABLE: 'REGEXP_SPLIT_TO_TABLE';
-
-REGEXP_SUBSTR: 'REGEXP_SUBSTR';
-
-REPEAT: 'REPEAT';
-
-RPAD: 'RPAD';
-
-RTRIM: 'RTRIM';
-
-SPLIT_PART: 'SPLIT_PART';
-
-STARTS_WITH: 'STARTS_WITH';
-
-STRING_TO_ARRAY: 'STRING_TO_ARRAY';
-
-STRING_TO_TABLE: 'STRING_TO_TABLE';
-
-STRPOS: 'STRPOS';
-
-SUBSTR: 'SUBSTR';
-
-TO_ASCII: 'TO_ASCII';
-
-TO_HEX: 'TO_HEX';
-
-TRANSLATE: 'TRANSLATE';
-
-UNISTR: 'UNISTR';
-
-AGE: 'AGE';
-
-CLOCK_TIMESTAMP: 'CLOCK_TIMESTAMP';
-
-DATE_BIN: 'DATE_BIN';
-
-DATE_PART: 'DATE_PART';
-
-DATE_TRUNC: 'DATE_TRUNC';
-
-ISFINITE: 'ISFINITE';
-
-JUSTIFY_DAYS: 'JUSTIFY_DAYS';
-
-JUSTIFY_HOURS: 'JUSTIFY_HOURS';
-
-JUSTIFY_INTERVAL: 'JUSTIFY_INTERVAL';
-
-MAKE_DATE: 'MAKE_DATE';
-
-MAKE_INTERVAL: 'MAKE_INTERVAL';
-
-MAKE_TIME: 'MAKE_TIME';
-
-MAKE_TIMESTAMP: 'MAKE_TIMESTAMP';
-
-MAKE_TIMESTAMPTZ: 'MAKE_TIMESTAMPTZ';
-
-NOW: 'NOW';
-
-STATEMENT_TIMESTAMP: 'STATEMENT_TIMESTAMP';
-
-TIMEOFDAY: 'TIMEOFDAY';
-
-TRANSACTION_TIMESTAMP: 'TRANSACTION_TIMESTAMP';
-
-TO_TIMESTAMP: 'TO_TIMESTAMP';
-
-TO_CHAR: 'TO_CHAR';
-
-TO_DATE: 'TO_DATE';
-
-TO_NUMBER: 'TO_NUMBER';
 
 Identifier: IdentifierStartChar IdentifierChar*;
 
@@ -1425,11 +1215,9 @@ fragment IdentifierStartChar options {
     | // these are the valid characters from 0x80 to 0xFF
     [\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]
     |                               // these are the letters above 0xFF which only need a single UTF-16 code unit
-    [\u0100-\uD7FF\uE000-\uFFFF]    {charIsLetter()}?
+    [\u0100-\uD7FF\uE000-\uFFFF]    {this.CharIsLetter()}?
     |                               // letters which require multiple UTF-16 code units
-    [\uD800-\uDBFF] [\uDC00-\uDFFF] {
-    CheckIfUtf32Letter()
-   }?
+    [\uD800-\uDBFF] [\uDC00-\uDFFF] {this.CheckIfUtf32Letter()}?
 ;
 
 fragment IdentifierChar: StrictIdentifierChar | '$';
@@ -1502,7 +1290,7 @@ UnicodeEscapeStringConstant: UnterminatedUnicodeEscapeStringConstant '\'';
 UnterminatedUnicodeEscapeStringConstant: 'U' '&' UnterminatedStringConstant;
 // Dollar-quoted String Constants (4.1.2.4)
 
-BeginDollarStringConstant: '$' Tag? '$' {pushTag();} -> pushMode (DollarQuotedStringMode);
+BeginDollarStringConstant: '$' Tag? '$' {this.PushTag();} -> pushMode (DollarQuotedStringMode);
 /* "The tag, if any, of a dollar-quoted string follows the same rules as an
  * unquoted identifier, except that it cannot contain a dollar sign."
  */
@@ -1529,7 +1317,13 @@ InvalidUnterminatedHexadecimalStringConstant: 'X' UnterminatedStringConstant;
 
 Integral: Digits;
 
-NumericFail: Digits '..' {HandleNumericFail();};
+BinaryIntegral: '0b' Digits;
+
+OctalIntegral: '0o' Digits;
+
+HexadecimalIntegral: '0x' Digits;
+
+NumericFail: Digits '..' {this.HandleNumericFail();};
 
 Numeric:
     Digits '.' Digits? /*? replaced with + to solve problem with DOT_DOT .. but this surely must be rewriten */ (
@@ -1576,9 +1370,7 @@ UnterminatedBlockComment:
     // Handle the case of / or * characters at the end of the file, or a nested unterminated block comment
     ('/'+ | '*'+ | '/'* UnterminatedBlockComment)?
     // Optional assertion to make sure this rule is working as intended
-    {
-            UnterminatedBlockCommentDebugAssert();
-   }
+    {this.UnterminatedBlockCommentDebugAssert();}
 ;
 //
 
@@ -1613,9 +1405,7 @@ UnterminatedEscapeStringConstant:
     '\\'? EOF
 ;
 
-fragment EscapeStringText options {
-    caseInsensitive = false;
-}:
+fragment EscapeStringText options { caseInsensitive = false; }:
     (
         '\'\''
         | '\\' (
@@ -1649,7 +1439,6 @@ AfterEscapeStringConstantMode_Newline:
 ;
 
 AfterEscapeStringConstantMode_NotContinued:
-     {} // intentionally empty
      -> skip, popMode
 ;
 
@@ -1665,7 +1454,6 @@ AfterEscapeStringConstantWithNewlineMode_Continued:
 ;
 
 AfterEscapeStringConstantWithNewlineMode_NotContinued:
-     {} // intentionally empty
      -> skip, popMode
 ;
 
@@ -1679,8 +1467,10 @@ DollarText:
     '$' ~ '$'*
 ;
 
-EndDollarStringConstant: ('$' Tag? '$') {isTag()}? {popTag();} -> popMode;
+// NB: Next rule on two lines in order to make transformGrammar.py easy.
+EndDollarStringConstant: ('$' Tag? '$') {this.IsTag()}?
+    {this.PopTag();} -> popMode;
 
 mode META;
-MetaSemi : { this.IsSemiColon() }? ';' -> type(SEMI), popMode ;
+MetaSemi : {this.IsSemiColon()}? ';' -> type(SEMI), popMode ;
 MetaOther : ~[;\r\n\\"] .*? ('\\\\' | [\r\n]+) -> type(SEMI), popMode ;

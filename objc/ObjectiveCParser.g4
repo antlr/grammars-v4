@@ -130,6 +130,7 @@ propertyAttribute
     | COPY
     | READONLY
     | READWRITE
+    | DIRECT
     | GETTER '=' identifier
     | SETTER '=' identifier ':'
     | nullabilitySpecifier
@@ -137,8 +138,7 @@ propertyAttribute
     ;
 
 protocolName
-    : LT protocolList GT
-    | ('__covariant' | '__contravariant')? identifier
+    : ('__covariant' | '__contravariant')? identifier
     ;
 
 instanceVariables
@@ -187,6 +187,7 @@ implementationDefinitionList
         | classMethodDefinition
         | instanceMethodDefinition
         | propertyImplementation
+        | ';'
     )+
     ;
 
@@ -237,12 +238,16 @@ blockType
     : NS_NOESCAPE? nullabilitySpecifier? typeSpecifier nullabilitySpecifier? LP NS_NOESCAPE? '^'
         nullabilitySpecifier? RP blockParameters?
     ;
+
+genericsSpecifierList
+    : LT (genericsSpecifier (',' genericsSpecifier)*)? GT
+    ;
     
 genericsSpecifier
     : genericsType = typeSpecifier (':' genericsConformanceType = typeSpecifier)?
     ;
 
-dictionaryExpression
+dictionaryLiteralExpression
     : '@' '{' (dictionaryPair (',' dictionaryPair)* ','?)? '}'
     ;
 
@@ -250,13 +255,13 @@ dictionaryPair
     : castExpression ':' expression
     ;
 
-arrayExpression
-    : '@' '[' (expressions ','?)? ']'
+arrayLiteralExpression
+    : '@' '[' assignmentExpression? (',' assignmentExpression)* ','? ']'
     ;
 
-boxExpression
-    : '@' LP expression RP
-    | '@' (constant | identifier)
+boxedExpression
+    : '@' LP constantExpression RP
+    | '@' constant
     ;
 
 blockParameters
@@ -291,7 +296,7 @@ keywordArgument
     ;
 
 keywordArgumentType
-    : expressions nullabilitySpecifier? ('{' initializerList '}')?
+    : expression nullabilitySpecifier? ('{' initializerList '}')?
     ;
 
 selectorExpression
@@ -322,17 +327,17 @@ throwStatement
     ;
 
 tryBlock
-    : '@try' tryStatement = compoundStatement catchStatement* (
-        '@finally' finallyStatement = compoundStatement
+    : '@' TRY tryStatement = compoundStatement catchStatement* (
+        '@' FINALLY finallyStatement = compoundStatement
     )?
     ;
 
 catchStatement
-    : '@catch' LP typeVariableDeclarator RP compoundStatement
+    : '@' CATCH LP (typeVariableDeclarator | '...') RP compoundStatement
     ;
 
 synchronizedStatement
-    : '@synchronized' LP expression RP compoundStatement
+    : '@synchronized' LP identifier RP compoundStatement
     ;
 
 autoreleaseStatement
@@ -418,7 +423,9 @@ declarationSpecifiers
         | NS_NOESCAPE
         | typePrefix
         | typeQualifier
-    )* typeSpecifier attributeSpecifier*
+    )* typeSpecifier (
+        attributeSpecifier
+    )*
     ;
 
 attributeSpecifier
@@ -474,6 +481,7 @@ typePrefix
     | BLOCK
     | INLINE
     | NS_INLINE
+    | INLINE_ATTR
     | KINDOF
     ;
 
@@ -493,17 +501,21 @@ protocolQualifier
     | 'oneway'
     ;
     
-typeSpecifierModifier
-    : 'short'
-    | 'long'
-    | 'signed'
+
+numericSignModifier
+    : 'signed'
     | 'unsigned'
     ;
 
 typeSpecifier
     : 'void' typeQualifier*
-    | typeSpecifierModifier* ('char' | 'short' | 'int' | 'long' | 'float' | 'double') typeQualifier*
-    | typeofExpression
+    | numericSignModifier? 'char' typeQualifier*
+    | numericSignModifier? 'short' typeQualifier*
+    | numericSignModifier? ('short' | 'long' | 'long' 'long')? 'int' typeQualifier*
+    | numericSignModifier? 'long'? 'long' typeQualifier*
+    | 'float' typeQualifier*
+    | 'long'? 'double' typeQualifier*
+    | typeofExpression (arcBehaviourSpecifier | nullabilitySpecifier | typeQualifier)*
     | structOrUnionSpecifier
     | enumSpecifier
     | nsEnumOrOptionSpecifier
@@ -542,7 +554,7 @@ enumeratorList
     ;
 
 enumerator
-    : enumeratorIdentifier ('=' expression)?
+    : enumeratorIdentifier ('=' assignmentExpression)?
     ;
 
 enumeratorIdentifier
@@ -612,13 +624,19 @@ version
     ;
 
 arrayInitializer
-    : '{' (expressions ','?)? '}'
+    : '{' (expression ','?)? '}'
     ;
 
+// Designated struct initializer
+// e.g. struct point_t a = { .y = 2, .x = 1 };
 structInitializer
-    : '{' ('.' expression (',' '.' expression)* ','?)? '}'
+    : '{' ('.' structAssignmentExpression (',' '.' structAssignmentExpression)* ','?)? '}'
     ;
-
+    
+structAssignmentExpression
+    : identifier '=' assignmentExpression
+    ;
+    
 initializerList
     : initializer (',' initializer)* ','?
     ;
@@ -657,7 +675,7 @@ statement
     | autoreleaseStatement ';'?
     | throwStatement ';'?
     | tryBlock ';'?
-    | expressions ';'?
+    | expression ';'?
     | ';'
     ;
 
@@ -711,12 +729,12 @@ doStatement
     ;
 
 forStatement
-    : 'for' LP forLoopInitializer? ';' expression? ';' expressions? RP statement
+    : 'for' LP forLoopInitializer? ';' expression? ';' expression? RP statement
     ;
 
 forLoopInitializer
     : declarationSpecifiers initDeclaratorList
-    | expressions
+    | expression
     ;
 
 forInStatement
@@ -730,27 +748,68 @@ jumpStatement
     | RETURN expression?
     ;
 
-expressions
-    : expression (',' expression)*
+castExpression
+    : (LP typeName RP) castExpression
+    | unaryExpression
     ;
 
-expression
-    : castExpression
-    | expression op = (MUL | DIV | MOD) expression
-    | expression op = (ADD | SUB) expression
-    | expression (LT LT | GT GT) expression
-    | expression op = (LE | GE | LT | GT) expression
-    | expression op = (NOTEQUAL | EQUAL) expression
-    | expression op = BITAND expression
-    | expression op = BITXOR expression
-    | expression op = BITOR expression
-    | expression op = AND expression
-    | expression op = OR expression
-    | expression QUESTION trueExpression = expression? COLON falseExpression = expression
-    | LP compoundStatement RP
-    | unaryExpression assignmentOperator assignmentExpression = expression
+multiplicativeExpression
+    : castExpression (('*' | '/' | '%') castExpression)*
     ;
 
+additiveExpression
+    : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
+    ;
+
+shiftExpression
+    : additiveExpression ((leftShiftOperator | rightShiftOperator) additiveExpression)*
+    ;
+    
+leftShiftOperator
+    : LT LT
+    ;
+    
+rightShiftOperator
+    : GT GT
+    ;
+
+relationalExpression
+    : shiftExpression ((LT | GT | LE | GE) shiftExpression)*
+    ;
+
+equalityExpression
+    : relationalExpression ((EQUAL | NOTEQUAL) relationalExpression)*
+    ;
+
+andExpression
+    : equalityExpression (BITAND equalityExpression)*
+    ;
+
+exclusiveOrExpression
+    : andExpression (BITXOR andExpression)*
+    ;
+
+inclusiveOrExpression
+    : exclusiveOrExpression (BITOR exclusiveOrExpression)*
+    ;
+
+logicalAndExpression
+    : inclusiveOrExpression (AND inclusiveOrExpression)*
+    ;
+
+logicalOrExpression
+    : logicalAndExpression (OR logicalAndExpression)*
+    ;
+    
+conditionalExpression
+    : logicalOrExpression ('?' ifExpr = conditionalExpression? ':' elseExpr = conditionalExpression)?
+    ;
+    
+assignmentExpression
+    : conditionalExpression
+    | unaryExpression assignmentOperator assignmentExpression
+    ;
+    
 assignmentOperator
     : '='
     | '*='
@@ -764,28 +823,29 @@ assignmentOperator
     | '^='
     | '|='
     ;
-
-castExpression
-    : unaryExpression
-    | (LP typeName RP) (castExpression | initializer)
+    
+expression
+    : assignmentExpression (',' assignmentExpression)*
     ;
 
+constantExpression
+    : conditionalExpression
+    ;
+    
 initializer
-    : expression
+    : assignmentExpression
     | arrayInitializer
     | structInitializer
     ;
 
-constantExpression
-    : identifier
-    | constant
-    ;
-
+// The expression that is allowed on the left-hand-side of the assignment operator
 unaryExpression
-    : postfixExpression
-    | SIZEOF (unaryExpression | LP typeSpecifier RP)
-    | op = (INC | DEC) unaryExpression
-    | unaryOperator castExpression
+    : ('++' | '--')* (
+        postfixExpression
+        | unaryOperator castExpression
+        | ('sizeof' | '_Alignof') LP typeName RP
+        | AND identifier // GCC extension address of label
+    )
     ;
 
 unaryOperator
@@ -798,8 +858,13 @@ unaryOperator
     ;
 
 postfixExpression
-    : primaryExpression postfix*
-    | postfixExpression (DOT | STRUCTACCESS) identifier postfix* // TODO: get rid of property and postfix expression.
+    : (primaryExpression | '__extension__'? LP typeName RP '{' initializerList ','? '}') (
+        '[' expression ']'
+        | LP argumentExpressionList? RP
+        | ('.' | '->') identifier
+        | '++'
+        | '--'
+    )*
     ;
 
 postfix
@@ -827,10 +892,11 @@ primaryExpression
     | selectorExpression
     | protocolExpression
     | encodeExpression
-    | dictionaryExpression
-    | arrayExpression
-    | boxExpression
+    | dictionaryLiteralExpression
+    | arrayLiteralExpression
+    | boxedExpression
     | blockExpression
+    | '__extension__'? LP compoundStatement RP
     ;
 
 constant
