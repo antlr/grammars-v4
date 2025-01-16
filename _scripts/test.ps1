@@ -16,14 +16,9 @@ function Get-GrammarSkip {
         Write-Host "skip"
         return $True
     }
-    $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
-    if ("$lines" -eq "") {
-        Write-Host "Intentionally skipping grammar $Grammar target $Target."
-        return $True
-    }
     $desc_targets = dotnet trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        Write-Host "Skipping testing of $Grammar."
         return $True
     }
     $desc_targets = $desc_targets -replace '.*='
@@ -39,6 +34,7 @@ function Get-GrammarSkip {
         if ($t -eq '+all') { $yes = $true }
         if ($t -eq "-$target") { $yes = $false }
         if ($t -eq $target) { $yes = $true }
+        if ($t -eq "*") { $yes = $true }
     }
     if (! $yes) { 
         return $True
