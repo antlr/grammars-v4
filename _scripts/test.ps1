@@ -270,6 +270,7 @@ function Get-ChangedGrammars {
             if ($t -eq '+all') { $yes = $true }
             if ($t -eq "-$target") { $yes = $false }
             if ($t -eq $target) { $yes = $true }
+	    if ($t -eq "*") { $yes = true }
         }
         if (! $yes) { 
             Set-Location "$old"
