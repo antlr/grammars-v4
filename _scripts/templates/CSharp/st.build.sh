@@ -9,10 +9,10 @@ npm i antlr-ng
 version=`dotnet trxml2 Other.csproj | fgrep 'PackageReference/@Version' | awk -F= '{print $2}'`
 
 <tool_grammar_tuples:{x |
-<if(original_tool)>
+<if(antlrng_tool)>
+node node_modules/antlr-ng/dist/cli/runner.js --encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<else>
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
-<elseif(antlrng_tool)>
-pwsh node_modules/.bin/antlr4ng.ps1 -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 <endif>
 } >
 

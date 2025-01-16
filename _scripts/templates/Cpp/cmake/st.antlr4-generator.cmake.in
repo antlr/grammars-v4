@@ -135,10 +135,10 @@ function(antlr4_generate
     ${CMAKE_COMMAND} -E make_directory ${Antlr4_GeneratedSrcDir}
     COMMAND
     # Generate files
-<if(original_tool)>
+<if(antlrng_tool)>
+    node node_modules/antlr-ng/dist/cli/runner.js -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
+<else>
     antlr4 -v $(ANTLR4_TAG) -Werror -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
-<elseif(antlrng_tool)>
-    pwsh ../node_modules/.bin/antlr4ng.ps1  -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
 <endif>
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     MAIN_DEPENDENCY "${Antlr4_InputFile}"

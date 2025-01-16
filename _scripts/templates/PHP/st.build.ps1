@@ -28,10 +28,10 @@ npm i antlr-ng
 <endif>
 
 <tool_grammar_tuples:{x |
-<if(original_tool)>
+<if(antlrng_tool)>
+$(& node node_modules/antlr-ng/dist/cli/runner.js --encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<else>
 $(& antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
-<elseif(antlrng_tool)>
-$(& pwsh .node_modules/.bin/antlr4ng.ps1 -encoding <antlr_encoding> -Dlanguage=PHP <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <endif>
 $compile_exit_code = $LASTEXITCODE
 if($compile_exit_code -ne 0){

@@ -280,7 +280,7 @@ then
 fi
 if [ "$generators" == "" ]
 then
-    generators=( antlr-ng original )
+    generators=( antlr-ng official )
 fi
 
 echo grammars = ${grammars[@]}
@@ -338,9 +338,11 @@ do
     yes=false;
     for t in $desc_targets
     do
+echo t = $t
         if [ "$t" == "+all" ]; then yes=true; fi
         if [ "$t" == "-$target" ]; then yes=false; fi
         if [ "$t" == "$target" ]; then yes=true; fi
+	if [ "$t" == "*" ]; then yes=true; fi
     done
 
     if [ "$yes" == "false" ]

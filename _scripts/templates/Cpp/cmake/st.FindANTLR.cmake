@@ -1,10 +1,10 @@
 find_package(Java QUIET COMPONENTS Runtime)
 
   execute_process(
-<if(original_tool)>
+<if(antlrng_tool)>
+      COMMAND node node_modules/dist/cli/runner.js
+<else>
       COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
-<elseif(antlrng_tool)>
-      COMMAND pwsh<if(os_win)>.exe<else><endif> ../node_modules/.bin/antlr4ng.ps1
 <endif>
       OUTPUT_VARIABLE ANTLR_COMMAND_OUTPUT
       ERROR_VARIABLE ANTLR_COMMAND_ERROR
@@ -101,11 +101,10 @@ find_package(Java QUIET COMPONENTS Runtime)
 
     add_custom_command(
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
-<if(original_tool)>
-        COMMAND antlr4<if(os_win)>.exe<else><endif>
-                -v ${ANTLR4_TAG}
-<elseif(antlrng_tool)>
-        COMMAND pwsh<if(os_win)>.exe<else><endif> node_modules/.bin/antlr4ng.ps1
+<if(antlrng_tool)>
+        COMMAND node node_modules/dist/cli/runner.js
+<else>
+        COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
 <endif>
                 ${InputFile}
                 -o ${ANTLR_${Name}_OUTPUT_DIR}
