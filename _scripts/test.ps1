@@ -229,6 +229,7 @@ function Get-ChangedGrammars {
     )
     $prefix = Get-Location
     $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
+    Write-Host "Diffs are $diff"
     $grammars = Get-Grammars | Resolve-Path -Relative
     $changed = @()
     foreach ($d in $diff) {
