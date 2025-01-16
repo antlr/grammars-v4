@@ -231,10 +231,12 @@ function Get-ChangedGrammars {
     $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
     Write-Host "Diffs are $diff"
     $grammars = Get-Grammars | Resolve-Path -Relative
+    Write-Host "Get-Grammars returned $grammars"
     $changed = @()
     foreach ($d in $diff) {
         $old = Get-Location
         if (!(Test-Path -Path "$d")) {
+            Write-Host "Path $d does not exist. Skip."
             continue
         }
         Set-Location $d
