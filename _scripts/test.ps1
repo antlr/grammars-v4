@@ -66,7 +66,7 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
+    Write-Host "dotnet trgen -t $Target -g $Generator --template-sources-directory $templates"
     dotnet trgen -t $Target -g $Generator --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
