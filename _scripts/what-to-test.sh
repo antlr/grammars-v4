@@ -35,6 +35,7 @@ do
     if [ -f desc.xml ]
     then
         gtargets=`dotnet trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
+	if [ "$gtargets" == "*" ]; then $gtargets="Antlr4ng Cpp CSharp Dart Go Java JavaScript Python3 TypeScript"; fi
         for t in $gtargets
         do
             targets[$t]=`expr ${targets[$t]} + 1`
