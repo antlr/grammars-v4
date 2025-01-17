@@ -52,7 +52,8 @@ enum FailStage {
 function Test-Grammar {
     param (
         $Directory,
-        $Target = "CSharp"
+        $Target = "CSharp",
+	$Generator = "official"
     )
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
@@ -66,7 +67,7 @@ function Test-Grammar {
     Write-Host "Building"
     # codegen
     Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
-    dotnet trgen -t $Target --template-sources-directory $templates | Write-Host
+    dotnet trgen -t $Target -g $Generator --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -314,9 +315,11 @@ function Test-AllGrammars {
         $Target = "CSharp"
     )
     
-Write-Host "target = $target"
-Write-Host "previouscommit = $PreviousCommit"
-Write-Host "CurrentCommit = $CurrentCommit"
+    Write-Host "target = $target"
+    Write-Host "previouscommit = $PreviousCommit"
+    Write-Host "CurrentCommit = $CurrentCommit"
+
+    $generators = @( "antlr-ng" , "official" )
 
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
 
@@ -333,12 +336,14 @@ Write-Host "CurrentCommit = $CurrentCommit"
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Directory $g -Target $Target
-        if (!$state.Success) {
-            $success = $false
-            $failedGrammars += $g
-            $failedCases += $state.FailedCases
-            Write-Host "$g failed" -ForegroundColor Red
+	foreach ($n in $generators) {
+            $state = Test-Grammar -Directory $g -Target $Target -Generator $n
+            if (!$state.Success) {
+                $success = $false
+                $failedGrammars += $g
+                $failedCases += $state.FailedCases
+                Write-Host "$g failed" -ForegroundColor Red
+            }
         }        
     }
     Write-Host "finished in $((Get-Date)-$t)" -ForegroundColor Yellow
