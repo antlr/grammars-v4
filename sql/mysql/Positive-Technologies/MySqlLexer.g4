@@ -768,6 +768,9 @@ WEEK        : 'WEEK';
 SECOND      : 'SECOND';
 MICROSECOND : 'MICROSECOND';
 
+// Azure Database for MySQL Single Server instance:
+FIREWALL_RULES: 'FIREWALL_RULES';
+
 // PRIVILEGES
 
 ADMIN                       : 'ADMIN';
@@ -1089,6 +1092,7 @@ ROW_COUNT                         : 'ROW_COUNT';
 RPAD                              : 'RPAD';
 RTRIM                             : 'RTRIM';
 SEC_TO_TIME                       : 'SEC_TO_TIME';
+SECONDARY_ENGINE                  : 'SECONDARY_ENGINE';
 SECONDARY_ENGINE_ATTRIBUTE        : 'SECONDARY_ENGINE_ATTRIBUTE';
 SESSION_USER                      : 'SESSION_USER';
 SHA                               : 'SHA';

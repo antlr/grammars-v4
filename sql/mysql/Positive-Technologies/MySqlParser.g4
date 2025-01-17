@@ -445,6 +445,7 @@ columnConstraint
     | INVISIBLE                                                     # invisibilityColumnConstraint
     | (AUTO_INCREMENT | ON UPDATE currentTimestamp)                 # autoIncrementColumnConstraint
     | PRIMARY? KEY                                                  # primaryKeyColumnConstraint
+    | CLUSTERING KEY                                                # clusteringKeyColumnConstraint // Tokudb-specific only
     | UNIQUE KEY?                                                   # uniqueKeyColumnConstraint
     | COMMENT STRING_LITERAL                                        # commentColumnConstraint
     | COLUMN_FORMAT colformat = (FIXED | DYNAMIC | DEFAULT)         # formatColumnConstraint
@@ -461,6 +462,8 @@ tableConstraint
     | (CONSTRAINT name = uid?)? UNIQUE indexFormat = (INDEX | KEY)? index = uid? indexType? indexColumnNames indexOption* # uniqueKeyTableConstraint
     | (CONSTRAINT name = uid?)? FOREIGN KEY index = uid? indexColumnNames referenceDefinition                             # foreignKeyTableConstraint
     | (CONSTRAINT name = uid?)? CHECK '(' expression ')'                                                                  # checkTableConstraint
+    | CLUSTERING KEY index = uid? indexColumnNames                                                                        # clusteringKeyTableConstraint
+    // Tokudb-specific only
     ;
 
 referenceDefinition
@@ -520,6 +523,8 @@ tableOption
         | ID
     )                                                             # tableOptionRowFormat
     | START TRANSACTION                                           # tableOptionStartTransaction
+    | SECONDARY_ENGINE '='? (ID | STRING_LITERAL)                 # tableOptionSecondaryEngine
+    // HeatWave-specific only
     | SECONDARY_ENGINE_ATTRIBUTE '='? STRING_LITERAL              # tableOptionSecondaryEngineAttribute
     | STATS_AUTO_RECALC '='? extBoolValue = (DEFAULT | '0' | '1') # tableOptionRecalculation
     | STATS_PERSISTENT '='? extBoolValue = (DEFAULT | '0' | '1')  # tableOptionPersistent
@@ -1871,6 +1876,8 @@ cacheIndexStatement
 
 flushStatement
     : FLUSH flushFormat = (NO_WRITE_TO_BINLOG | LOCAL)? flushOption (',' flushOption)*
+    // Specific for Azure Database for MySQL Single Server instance.
+    | FLUSH FIREWALL_RULES
     ;
 
 killStatement
