@@ -34,10 +34,10 @@ using Antlr4.Runtime;
 public abstract class PythonLexerBase : Lexer
 {
     // A stack that keeps track of the indentation lengths
-    private Stack<int> indentLengthStack;
+    private Stack<int> indentLengthStack = new();
     // A list where tokens are waiting to be loaded into the token stream
-    private LinkedList<IToken> pendingTokens;
-    
+    private LinkedList<IToken> pendingTokens = new();
+
     // last pending token types
     private int previousPendingTokenType;
     private int lastPendingTokenTypeFromDefaultChannel;
@@ -49,26 +49,24 @@ public abstract class PythonLexerBase : Lexer
     private bool wasTabIndentation;
     private bool wasIndentationMixedWithSpacesAndTabs;
 
-    private IToken curToken; // current (under processing) token
-    private IToken ffgToken; // following (look ahead) token
+    private IToken curToken = null!; // current (under processing) token
+    private IToken ffgToken = null!; // following (look ahead) token
 
     private const int INVALID_LENGTH = -1;
     private const string ERR_TXT = " ERROR: ";
 
     protected PythonLexerBase(ICharStream input) : base(input)
     {
-        this.Init();
     }
 
     protected PythonLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput) : base(input, output, errorOutput)
     {
-        this.Init();
     }
 
     public override IToken NextToken() // reading the input stream until a return EOF
     {
         this.CheckNextToken();
-        IToken firstPendingToken = this.pendingTokens.First.Value;
+        IToken firstPendingToken = this.pendingTokens.First!.Value;
         this.pendingTokens.RemoveFirst();
         return firstPendingToken; // add the queued token to the token stream
     }
@@ -78,11 +76,11 @@ public abstract class PythonLexerBase : Lexer
         this.Init();
         base.Reset();
     }
-    
+
     private void Init()
     {
-        this.indentLengthStack = new Stack<int>();
-        this.pendingTokens = new LinkedList<IToken>();
+        this.indentLengthStack = new();
+        this.pendingTokens = new();
         this.previousPendingTokenType = 0;
         this.lastPendingTokenTypeFromDefaultChannel = 0;
         this.opened = 0;
@@ -180,7 +178,7 @@ public abstract class PythonLexerBase : Lexer
     {
         if (this.previousPendingTokenType == PythonLexer.WS)
         {
-            var prevToken = this.pendingTokens.Last.Value;
+            var prevToken = this.pendingTokens.Last!.Value;
             if (this.GetIndentationLength(prevToken.Text) != 0) // there is an "indentation" before the first statement
             {
                 const string errMsg = "first statement indented";
@@ -302,7 +300,7 @@ public abstract class PythonLexerBase : Lexer
         this.AddPendingToken(ctkn);
     }
 
-    private void CreateAndAddPendingToken(int ttype, int channel, string text, IToken sampleToken)
+    private void CreateAndAddPendingToken(int ttype, int channel, string? text, IToken sampleToken)
     {
         CommonToken ctkn = new CommonToken(sampleToken);
         ctkn.Type = ttype;
