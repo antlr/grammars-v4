@@ -10,6 +10,7 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 version=`grep antlr4-python3-runtime requirements.txt | awk -F= '{print $3}' | tr -d '\r' | tr -d '\n'`
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

@@ -6,6 +6,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 $version = Select-String -Path "build.sh" -Pattern "version=" | ForEach-Object { $_.Line -split "=" | Select-Object -Last 1 }
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

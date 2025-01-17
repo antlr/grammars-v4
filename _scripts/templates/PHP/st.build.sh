@@ -31,6 +31,7 @@ cd ..
 rm -rf antlr4-php-runtime
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

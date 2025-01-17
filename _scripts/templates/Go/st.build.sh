@@ -15,6 +15,7 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # Go has no version, just the latest version.
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

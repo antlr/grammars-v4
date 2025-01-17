@@ -10,6 +10,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 $version = Select-String -Path "pubspec.yaml" -Pattern "antlr4" | ForEach-Object {$_.Line.Split(" ")[3]}
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

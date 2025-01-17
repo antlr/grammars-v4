@@ -24,6 +24,7 @@ Set-Location ..
 Remove-Item -Recurse -Force antlr-php-runtime -ErrorAction SilentlyContinue
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

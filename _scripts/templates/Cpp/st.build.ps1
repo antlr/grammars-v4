@@ -16,6 +16,11 @@ rmrf('build')
 New-Item -Path 'build' -ItemType Directory
 Set-Location 'build'
 
+<if(antlrng_tool)>
+npm init -y
+npm i antlr-ng
+<endif>
+
 <if(test.IsWindows)>
 $(& cmake .. -G "Visual Studio 17 2022" -A x64 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 <else>$(& cmake .. ; $compile_exit_code = $LASTEXITCODE ) | Write-Host

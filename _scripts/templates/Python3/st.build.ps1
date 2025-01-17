@@ -10,6 +10,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 $version = (Select-String -Path "requirements.txt" -Pattern "antlr4" | ForEach-Object {$_.Line.Split("=")[2]}) -replace '"|,|\r|\n'
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

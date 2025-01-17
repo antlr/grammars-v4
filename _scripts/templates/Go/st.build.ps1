@@ -18,6 +18,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 }
 
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 

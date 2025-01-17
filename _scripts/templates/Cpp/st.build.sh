@@ -3,6 +3,7 @@ set -e
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 rm -rf node_modules
 <if(antlrng_tool)>
+npm init -y
 npm i antlr-ng
 <endif>
 rm -rf build
