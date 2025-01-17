@@ -2,7 +2,7 @@ find_package(Java QUIET COMPONENTS Runtime)
 
   execute_process(
 <if(antlrng_tool)>
-      COMMAND node node_modules/antlr-ng/dist/cli/runner.js
+      COMMAND node node_modules/antlr-ng/dist/cli/runner.js --version
 <else>
       COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
 <endif>
