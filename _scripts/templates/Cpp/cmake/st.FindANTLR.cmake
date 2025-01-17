@@ -81,7 +81,7 @@ find_package(Java QUIET COMPONENTS Runtime)
     add_custom_command(
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
 <if(antlrng_tool)>
-        COMMAND node node_modules/antlr-ng/dist/cli/runner.js
+        COMMAND node build/node_modules/antlr-ng/dist/cli/runner.js
 <else>
         COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
 <endif>

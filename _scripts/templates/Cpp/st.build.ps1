@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 function rmrf([string]$Path) {
     try {
-        Remove-Item -Recurse -ErrorAction:Stop $Path
+        Remove-Item -Recurse -ErrorAction:Stop -force $Path
     } catch [System.Management.Automation.ItemNotFoundException] {
         # Ignore
         $Error.Clear()
