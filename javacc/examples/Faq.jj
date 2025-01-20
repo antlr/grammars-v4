@@ -1,0 +1,225 @@
+/* Copyright (c) 2006, Sun Microsystems, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+PARSER_BEGIN(Faq)
+
+import java.io.*;
+
+public class Faq {
+
+  static int count = 0;
+
+  static int beginAt = 1;
+
+  static PrintWriter indstr;
+
+  static {
+    try {
+      indstr = new PrintWriter(new FileWriter("index.html"));
+      indstr.println("<title>Selected list of emails from the JavaCC mailing list</title>");
+      indstr.println("<h2>Selected list of emails from the JavaCC mailing list</h2>");
+    } catch (IOException e) {
+      throw new Error();
+    }
+  }
+
+  static String fix(String s) {
+    String retval = "";
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      if (c == '<') {
+        retval += "&lt;";
+      } else if (c == '>') {
+        retval += "&gt;";
+      } else {
+        retval += c;
+      }
+    }
+    return retval;
+  }
+
+  public static void main(String args[]) throws ParseException {
+    if (args.length == 1) {
+      beginAt = Integer.parseInt(args[0]);
+    }
+    Faq parser = new Faq(System.in);
+    parser.MailFile();
+  }
+
+}
+
+PARSER_END(Faq)
+
+
+// PARSER SPECIFICATIONS BEGIN HERE
+
+void MailFile() :
+	{
+	}
+{
+  (
+	{
+	  count++;
+	}
+    MailMessage()
+	{
+	  System.out.print(count + ".");
+	  System.out.flush();
+	}
+  )*
+  <EOF>
+	{
+	  System.out.println("");
+	  indstr.close();
+	}
+}
+
+void MailMessage() :
+	{
+	  PrintWriter msgstr = null;
+	  Token subj=null, from=null, date=null, body;
+	  if (count >= beginAt) {
+	    try {
+	      msgstr = new PrintWriter(new FileWriter(count + ".html"));
+	    } catch (IOException e) {
+	      throw new Error();
+	    }
+	  }
+	}
+{
+  ( subj=<SUBJECT> | from=<FROM> | date=<DATE> )+
+	{
+	  indstr.print("<a href=\"" + count + ".html\">");
+	  if (subj == null) {
+	    indstr.println("no subject</a><br>");
+	  } else {
+	    indstr.println(fix(subj.image) + "</a><br>");
+	  }
+	  if (count >= beginAt) {
+	    msgstr.println("<title>" + ((subj==null) ? "no subject" : fix(subj.image)) + "</title>");
+	    msgstr.println("Subject: " + ((subj==null) ? "no subject" : fix(subj.image)) + "<br>");
+	    msgstr.println("From: " + ((from==null) ? "" : fix(from.image)) + "<br>");
+	    msgstr.println("Date: " + ((date==null) ? "" : fix(date.image)) + "<br>");
+            msgstr.println("<br>");
+	  }
+	}
+  ( body=<BODY>
+	{
+	  if (count >= beginAt) {
+	    msgstr.print(fix(body.image) + "<br>");
+	  }
+	}
+  )*
+  <END>
+	{
+	  if (count >= beginAt) {
+	    msgstr.close();
+	  }
+	}
+}
+
+
+// LEXICAL SPECIFICATIONS BEGIN HERE
+
+TOKEN:
+{
+  <#EOL: "\n" | "\r" | "\r\n">
+|
+  <#TWOEOLS: (("\n"|"\r\n") <EOL>) | ("\r\r" [ "\n" ])>
+|
+  <#NOT_EOL: ~["\n","\r"]>
+}
+
+<DEFAULT>
+SKIP:
+{
+  < <EOL> "*** EOOH ***" <EOL> > : MAILHEADER
+|
+  <~[]>
+}
+
+<MAILHEADER>
+SKIP:
+{
+  <_TWOEOLS: <TWOEOLS>> : MAILBODY
+    // We cannot have just a reference to a regular expression in a
+    // lexical specification - i.e., we cannot simply have <TWOEOLS>.
+|
+  "Subject: " : MAILSUBJECT
+|
+  "From: " : MAILFROM
+|
+  "Date: " : MAILDATE
+|
+  <~[]>
+}
+
+<MAILSUBJECT>
+TOKEN:
+{
+  <SUBJECT: ( <NOT_EOL> )+>
+}
+
+<MAILSUBJECT>
+SKIP:
+{
+  <_EOL1: <EOL>> : MAILHEADER
+}
+
+<MAILFROM>
+TOKEN:
+{
+  <FROM: ( <NOT_EOL> )+>
+}
+
+<MAILFROM>
+SKIP:
+{
+  <_EOL2: <EOL>> : MAILHEADER
+}
+
+<MAILDATE>
+TOKEN:
+{
+  <DATE: ( <NOT_EOL> )+>
+}
+
+<MAILDATE>
+SKIP:
+{
+  <_EOL3: <EOL>> : MAILHEADER
+}
+
+<MAILBODY>
+TOKEN:
+{
+  <BODY: (~["\n","\r","\u001f"])* <EOL>>
+|
+  <END: "\u001f"> : DEFAULT
+}

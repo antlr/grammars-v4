@@ -1,0 +1,186 @@
+/* Copyright (c) 2006, Sun Microsystems, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+PARSER_BEGIN(Digest)
+
+import java.io.*;
+
+public class Digest {
+
+  static int count = 0;
+
+  static String buffer = "";
+
+  public static void main(String args[]) throws ParseException {
+    Digest parser = new Digest(System.in);
+    System.out.println("DIGEST OF RECENT MESSAGES FROM THE JAVACC MAILING LIST");
+    System.out.println("----------------------------------------------------------------------");
+    System.out.println("");
+    System.out.println("MESSAGE SUMMARY:");
+    System.out.println("");
+    parser.MailFile();
+    if (count == 0) {
+      System.out.println("There have been no messages since the last digest posting.");
+      System.out.println("");
+      System.out.println("----------------------------------------------------------------------");
+    } else {
+      System.out.println("");
+      System.out.println("----------------------------------------------------------------------");
+      System.out.println("");
+      System.out.println(buffer);
+    }
+  }
+
+}
+
+PARSER_END(Digest)
+
+
+// PARSER SPECIFICATIONS BEGIN HERE
+
+void MailFile() :
+	{
+	}
+{
+  (
+	{
+	  count++;
+	}
+    MailMessage()
+  )*
+  <EOF>
+}
+
+void MailMessage() :
+	{
+	  Token subj=null, from=null, date=null, body;
+	}
+{
+  ( subj=<SUBJECT> | from=<FROM> | date=<DATE> )+
+	{
+	  System.out.println(count + ". " + ((subj==null) ? "no subject" : subj.image));
+	  buffer += "\n";
+	  buffer += "Message " + count + ":\n";
+	  buffer += "\n";
+	  buffer += "Subject: " + ((subj==null) ? "no subject" : subj.image) + "\n";
+	  buffer += "From: " + ((from==null) ? "" : from.image) + "\n";
+	  buffer += "Date: " + ((date==null) ? "" : date.image) + "\n";
+	  buffer += "\n";
+	}
+  ( body=<BODY>
+	{
+	  buffer += body.image;
+	}
+  )*
+  <END>
+	{
+	  buffer += "\n";
+	  buffer += "----------------------------------------------------------------------\n";
+	}
+}
+
+
+// LEXICAL SPECIFICATIONS BEGIN HERE
+
+TOKEN:
+{
+  <#EOL: "\n" | "\r" | "\r\n">
+|
+  <#TWOEOLS: (("\n"|"\r\n") <EOL>) | ("\r\r" [ "\n" ])>
+|
+  <#NOT_EOL: ~["\n","\r"]>
+}
+
+<DEFAULT>
+SKIP:
+{
+  < <EOL> "*** EOOH ***" <EOL> > : MAILHEADER
+|
+  <~[]>
+}
+
+<MAILHEADER>
+SKIP:
+{
+  <_TWOEOLS: <TWOEOLS>> : MAILBODY
+    // We cannot have just a reference to a regular expression in a
+    // lexical specification - i.e., we cannot simply have <TWOEOLS>.
+|
+  "Subject: " : MAILSUBJECT
+|
+  "From: " : MAILFROM
+|
+  "Date: " : MAILDATE
+|
+  <~[]>
+}
+
+<MAILSUBJECT>
+TOKEN:
+{
+  <SUBJECT: ( <NOT_EOL> )+>
+}
+
+<MAILSUBJECT>
+SKIP:
+{
+  <_EOL1: <EOL>> : MAILHEADER
+}
+
+<MAILFROM>
+TOKEN:
+{
+  <FROM: ( <NOT_EOL> )+>
+}
+
+<MAILFROM>
+SKIP:
+{
+  <_EOL2: <EOL>> : MAILHEADER
+}
+
+<MAILDATE>
+TOKEN:
+{
+  <DATE: ( <NOT_EOL> )+>
+}
+
+<MAILDATE>
+SKIP:
+{
+  <_EOL3: <EOL>> : MAILHEADER
+}
+
+<MAILBODY>
+TOKEN:
+{
+  <BODY: (~["\n","\r","\u001f"])* <EOL>>
+|
+  <END: "\u001f"> : DEFAULT
+}

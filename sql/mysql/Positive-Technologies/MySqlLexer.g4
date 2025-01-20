@@ -437,7 +437,7 @@ COMMIT                      : 'COMMIT';
 COMPACT                     : 'COMPACT';
 COMPLETION                  : 'COMPLETION';
 COMPRESSED                  : 'COMPRESSED';
-COMPRESSION                 : 'COMPRESSION';
+COMPRESSION                 : 'COMPRESSION' | QUOTE_SYMB? 'COMPRESSION' QUOTE_SYMB?;
 CONCURRENT                  : 'CONCURRENT';
 CONNECT                     : 'CONNECT';
 CONNECTION                  : 'CONNECTION';
@@ -768,6 +768,9 @@ WEEK        : 'WEEK';
 SECOND      : 'SECOND';
 MICROSECOND : 'MICROSECOND';
 
+// Azure Database for MySQL Single Server instance:
+FIREWALL_RULES: 'FIREWALL_RULES';
+
 // PRIVILEGES
 
 ADMIN                       : 'ADMIN';
@@ -1089,6 +1092,7 @@ ROW_COUNT                         : 'ROW_COUNT';
 RPAD                              : 'RPAD';
 RTRIM                             : 'RTRIM';
 SEC_TO_TIME                       : 'SEC_TO_TIME';
+SECONDARY_ENGINE                  : 'SECONDARY_ENGINE';
 SECONDARY_ENGINE_ATTRIBUTE        : 'SECONDARY_ENGINE_ATTRIBUTE';
 SESSION_USER                      : 'SESSION_USER';
 SHA                               : 'SHA';
@@ -1169,6 +1173,7 @@ SUBSTRING_INDEX                   : 'SUBSTRING_INDEX';
 SUBTIME                           : 'SUBTIME';
 SYSTEM_USER                       : 'SYSTEM_USER';
 TAN                               : 'TAN';
+TELEMETRY_LOG_ADMIN               : 'TELEMETRY_LOG_ADMIN';
 TIMEDIFF                          : 'TIMEDIFF';
 TIMESTAMPADD                      : 'TIMESTAMPADD';
 TIMESTAMPDIFF                     : 'TIMESTAMPDIFF';
@@ -1272,9 +1277,9 @@ DECIMAL_LITERAL               : DEC_DIGIT+;
 HEXADECIMAL_LITERAL           : 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\'' | '0X' HEX_DIGIT+;
 
 REAL_LITERAL:
-    DEC_DIGIT* '.' DEC_DIGIT+
+    (DEC_DIGIT+)? '.' DEC_DIGIT*
     | DEC_DIGIT+ '.' EXPONENT_NUM_PART
-    | DEC_DIGIT* '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
+    | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
     | DEC_DIGIT+ EXPONENT_NUM_PART
 ;
 NULL_SPEC_LITERAL   : '\\' 'N';

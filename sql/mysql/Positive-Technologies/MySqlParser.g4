@@ -237,7 +237,7 @@ createLogfileGroup
     ;
 
 createProcedure
-    : CREATE ownerStatement? PROCEDURE fullId '(' procedureParameter? (',' procedureParameter)* ')' routineOption* routineBody
+    : CREATE ownerStatement? PROCEDURE ifNotExists? fullId '(' procedureParameter? (',' procedureParameter)* ')' routineOption* routineBody
     ;
 
 createFunction
@@ -286,11 +286,12 @@ createTablespaceNdb
     ;
 
 createTrigger
-    : CREATE ownerStatement? TRIGGER ifNotExists? thisTrigger = fullId triggerTime = (BEFORE | AFTER) triggerEvent = (
-        INSERT
-        | UPDATE
-        | DELETE
-    ) ON tableName FOR EACH ROW (triggerPlace = (FOLLOWS | PRECEDES) otherTrigger = fullId)? routineBody
+    : CREATE ownerStatement? TRIGGER ifNotExists? thisTrigger = fullId triggerTime = (
+        BEFORE
+        | AFTER
+    ) triggerEvent = (INSERT | UPDATE | DELETE) ON tableName FOR EACH ROW (
+        triggerPlace = (FOLLOWS | PRECEDES) otherTrigger = fullId
+    )? routineBody
     ;
 
 withClause
@@ -444,6 +445,7 @@ columnConstraint
     | INVISIBLE                                                     # invisibilityColumnConstraint
     | (AUTO_INCREMENT | ON UPDATE currentTimestamp)                 # autoIncrementColumnConstraint
     | PRIMARY? KEY                                                  # primaryKeyColumnConstraint
+    | CLUSTERING KEY                                                # clusteringKeyColumnConstraint // Tokudb-specific only
     | UNIQUE KEY?                                                   # uniqueKeyColumnConstraint
     | COMMENT STRING_LITERAL                                        # commentColumnConstraint
     | COLUMN_FORMAT colformat = (FIXED | DYNAMIC | DEFAULT)         # formatColumnConstraint
@@ -460,6 +462,8 @@ tableConstraint
     | (CONSTRAINT name = uid?)? UNIQUE indexFormat = (INDEX | KEY)? index = uid? indexType? indexColumnNames indexOption* # uniqueKeyTableConstraint
     | (CONSTRAINT name = uid?)? FOREIGN KEY index = uid? indexColumnNames referenceDefinition                             # foreignKeyTableConstraint
     | (CONSTRAINT name = uid?)? CHECK '(' expression ')'                                                                  # checkTableConstraint
+    | CLUSTERING KEY index = uid? indexColumnNames                                                                        # clusteringKeyTableConstraint
+    // Tokudb-specific only
     ;
 
 referenceDefinition
@@ -519,6 +523,8 @@ tableOption
         | ID
     )                                                             # tableOptionRowFormat
     | START TRANSACTION                                           # tableOptionStartTransaction
+    | SECONDARY_ENGINE '='? (ID | STRING_LITERAL)                 # tableOptionSecondaryEngine
+    // HeatWave-specific only
     | SECONDARY_ENGINE_ATTRIBUTE '='? STRING_LITERAL              # tableOptionSecondaryEngineAttribute
     | STATS_AUTO_RECALC '='? extBoolValue = (DEFAULT | '0' | '1') # tableOptionRecalculation
     | STATS_PERSISTENT '='? extBoolValue = (DEFAULT | '0' | '1')  # tableOptionPersistent
@@ -632,7 +638,7 @@ alterServer
     ;
 
 alterTable
-    : ALTER intimeAction = (ONLINE | OFFLINE)? IGNORE? TABLE tableName waitNowaitClause? (
+    : ALTER intimeAction = (ONLINE | OFFLINE)? IGNORE? TABLE tableName (
         alterSpecification (',' alterSpecification)*
     )? partitionDefinitions?
     ;
@@ -685,7 +691,7 @@ alterSpecification
         | DROP DEFAULT
     )                                                                           # alterByAlterColumnDefault
     | ALTER INDEX uid (VISIBLE | INVISIBLE)                                     # alterByAlterIndexVisibility
-    | DROP FOREIGN KEY uid                                                      # alterByDropForeignKey
+    | DROP FOREIGN KEY uid dottedId?                                            # alterByDropForeignKey
     | DISABLE KEYS                                                              # alterByDisableKeys
     | ENABLE KEYS                                                               # alterByEnableKeys
     | RENAME renameFormat = (TO | AS)? (uid | fullId)                           # alterByRename
@@ -939,7 +945,7 @@ handlerCloseStatement
     ;
 
 singleUpdateStatement
-    : UPDATE priority = LOW_PRIORITY? IGNORE? tableName (AS? uid)? SET updatedElement (
+    : UPDATE priority = LOW_PRIORITY? IGNORE? tableSources (AS? uid)? SET updatedElement (
         ',' updatedElement
     )* (WHERE expression)? orderByClause? limitClause?
     ;
@@ -1011,12 +1017,12 @@ queryExpressionNointo
     ;
 
 querySpecification
-    : SELECT selectSpec* selectElements selectIntoExpression? fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause?
-    | SELECT selectSpec* selectElements fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
+    : SELECT selectSpec* selectElements selectIntoExpression? fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
+    | SELECT selectSpec* selectElements fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
-    : SELECT selectSpec* selectElements fromClause groupByClause? havingClause? windowClause? orderByClause? limitClause? unionStatement?
+    : SELECT selectSpec* selectElements fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause? unionStatement?
     ;
 
 unionParenthesis
@@ -1039,7 +1045,7 @@ lateralStatement
 
 // https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html
 jsonTable
-    : JSON_TABLE '(' STRING_LITERAL ',' STRING_LITERAL COLUMNS '(' jsonColumnList ')' ')' (AS? uid)?
+    : JSON_TABLE '(' expression ',' STRING_LITERAL COLUMNS '(' jsonColumnList ')' ')' (AS? uid)?
     ;
 
 jsonColumnList
@@ -1171,7 +1177,7 @@ releaseStatement
     ;
 
 lockTables
-    : LOCK (TABLE | TABLES) lockTableElement (',' lockTableElement)* waitNowaitClause?
+    : LOCK (TABLE | TABLES) lockTableElement (',' lockTableElement)*
     ;
 
 unlockTables
@@ -1541,16 +1547,17 @@ renameUser
     ;
 
 revokeStatement
-    : REVOKE ifExists? (privelegeClause | uid) (',' privelegeClause | uid)*
-      ON
-      privilegeObject=(TABLE | FUNCTION | PROCEDURE)?
-      privilegeLevel
-      FROM userName (',' userName)* (IGNORE UNKNOWN USER)?          #detailRevoke
-    | REVOKE ifExists? ALL PRIVILEGES? ',' GRANT OPTION
-      FROM userName (',' userName)*  (IGNORE UNKNOWN USER)?         #shortRevoke
-    | REVOKE ifExists? (userName | uid) (',' (userName | uid))*
-      FROM (userName | uid) (',' (userName | uid))*
-      (IGNORE UNKNOWN USER)?                                        #roleRevoke
+    : REVOKE ifExists? (privelegeClause | uid) (',' privelegeClause | uid)* ON privilegeObject = (
+        TABLE
+        | FUNCTION
+        | PROCEDURE
+    )? privilegeLevel FROM userName (',' userName)* (IGNORE UNKNOWN USER)? # detailRevoke
+    | REVOKE ifExists? ALL PRIVILEGES? ',' GRANT OPTION FROM userName (',' userName)* (
+        IGNORE UNKNOWN USER
+    )? # shortRevoke
+    | REVOKE ifExists? (userName | uid) (',' (userName | uid))* FROM (userName | uid) (
+        ',' (userName | uid)
+    )* (IGNORE UNKNOWN USER)? # roleRevoke
     ;
 
 revokeProxy
@@ -1681,6 +1688,7 @@ privilege
     | SYSTEM_USER
     | SYSTEM_VARIABLES_ADMIN
     | TABLE_ENCRYPTION_ADMIN
+    | TELEMETRY_LOG_ADMIN
     | TP_CONNECTION_ADMIN
     | VERSION_TOKEN_ADMIN
     | XA_RECOVER_ADMIN
@@ -1868,6 +1876,8 @@ cacheIndexStatement
 
 flushStatement
     : FLUSH flushFormat = (NO_WRITE_TO_BINLOG | LOCAL)? flushOption (',' flushOption)*
+    // Specific for Azure Database for MySQL Single Server instance.
+    | FLUSH FIREWALL_RULES
     ;
 
 killStatement
@@ -2222,10 +2232,10 @@ dataType
         SIGNED
         | UNSIGNED
         | ZEROFILL
-    )*                                                                                                      # dimensionDataType
-    | typeName = (DATE | TINYBLOB | MEDIUMBLOB | LONGBLOB | BOOL | BOOLEAN | SERIAL)                        # simpleDataType
+    )*                                                                                                               # dimensionDataType
+    | typeName = (DATE | TINYBLOB | MEDIUMBLOB | LONGBLOB | BOOL | BOOLEAN | SERIAL)                                 # simpleDataType
     | typeName = (BIT | TIME | TIMESTAMP | DATETIME | BINARY | VARBINARY | BLOB | YEAR | VECTOR) lengthOneDimension? # dimensionDataType
-    | typeName = (ENUM | SET) collectionOptions BINARY? (charSet charsetName)?                              # collectionDataType
+    | typeName = (ENUM | SET) collectionOptions BINARY? (charSet charsetName)?                                       # collectionDataType
     | typeName = (
         GEOMETRYCOLLECTION
         | GEOMCOLLECTION
@@ -2243,7 +2253,11 @@ dataType
     ;
 
 collectionOptions
-    : '(' STRING_LITERAL (',' STRING_LITERAL)* ')'
+    : '(' collectionOption (',' collectionOption)* ')'
+    ;
+
+collectionOption
+    : STRING_LITERAL
     ;
 
 convertedDataType
@@ -2341,11 +2355,6 @@ orReplace
     : OR REPLACE
     ;
 
-waitNowaitClause
-    : WAIT decimalLiteral
-    | NOWAIT
-    ;
-
 //    Functions
 
 functionCall
@@ -2439,7 +2448,7 @@ nonAggregateWindowedFunction
     ;
 
 overClause
-    : OVER ('(' windowSpec ')' | windowName)
+    : OVER ('(' windowSpec? ')' | windowName)
     ;
 
 windowSpec
@@ -2715,6 +2724,7 @@ keywordsCanBeId
     | AGGREGATE
     | ALGORITHM
     | ANY
+    | APPLICATION_PASSWORD_ADMIN
     | ARRAY
     | AT
     | AUDIT_ADMIN
@@ -2838,11 +2848,16 @@ keywordsCanBeId
     | FIRST
     | FIXED
     | FLUSH
+    | FLUSH_OPTIMIZER_COSTS
+    | FLUSH_STATUS
+    | FLUSH_TABLES
+    | FLUSH_USER_RESOURCES
     | FOLLOWS
     | FOUND
     | FULL
     | FUNCTION
     | GENERAL
+    | GEOMETRY
     | GLOBAL
     | GRANTS
     | GROUP
@@ -2862,6 +2877,7 @@ keywordsCanBeId
     | INDEXES
     | INITIAL_SIZE
     | INNODB_REDO_LOG_ARCHIVE
+    | INNODB_REDO_LOG_ENABLE
     | INPLACE
     | INSERT_METHOD
     | INSTALL
@@ -2934,6 +2950,7 @@ keywordsCanBeId
     | MYSQL_ERRNO
     | NAME
     | NAMES
+    | NATIONAL
     | NCHAR
     | NDB_STORED_USER
     | NESTED
@@ -3082,10 +3099,12 @@ keywordsCanBeId
     | SWAPS
     | SWITCHES
     | SYSTEM_VARIABLES_ADMIN
+    | SYSTEM_USER
     | TABLE_NAME
     | TABLESPACE
     | TABLE_ENCRYPTION_ADMIN
     | TABLE_TYPE
+    | TELEMETRY_LOG_ADMIN
     | TEMPORARY
     | TEMPTABLE
     | THAN
