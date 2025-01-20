@@ -1186,7 +1186,7 @@ closure_parameter_list
     ;
 
 closure_parameter
-    : closure_parameter_name = identifier (type_annotation range_operator?)?
+    : UNDERSCORE? identifier (type_annotation range_operator?)?
     ;
 
 capture_list
