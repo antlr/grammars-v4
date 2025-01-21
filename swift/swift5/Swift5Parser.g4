@@ -1186,7 +1186,7 @@ closure_parameter_list
     ;
 
 closure_parameter
-    : UNDERSCORE? identifier (type_annotation range_operator?)?
+    : UNDERSCORE? closure_parameter_name = identifier (type_annotation range_operator?)?
     ;
 
 capture_list
@@ -1573,6 +1573,7 @@ identifier
     )
     | Identifier
     | BACKTICK (keyword | Identifier | DOLLAR) BACKTICK
+    | UNDERSCORE
     ;
 
 identifier_list

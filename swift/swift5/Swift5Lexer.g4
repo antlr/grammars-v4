@@ -151,6 +151,8 @@ HASH_IMAGE_LITERAL : '#imageLiteral';
 GETTER             : 'getter';
 SETTER             : 'setter';
 
+UNDERSCORE : '_';
+
 Identifier:
     Identifier_head Identifier_characters?
     | Implicit_parameter_name
@@ -249,7 +251,6 @@ COLON      : ':';
 SEMI       : ';';
 LT         : '<';
 GT         : '>';
-UNDERSCORE : '_';
 BANG       : '!';
 QUESTION   : '?';
 AT         : '@';

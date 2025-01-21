@@ -98,13 +98,13 @@ print(mappedNumbers)
 let sortedNumbers = numbers.sorted { $0 > $1 }
 print(sortedNumbers)
 
-//: Accepts trailing closure with 2 string parameters and call it
+// : Accepts trailing closure with 2 string parameters and call it
 func printTwoStrings(_ closure: (String, String) -> Void) {
     closure("Hello", "World")
 }
 
-//: Closure parameter name with an underscore before (closures don't have external parameter names, but explicit supression of external parameter name with underscore is allowed) 
-printTwoStrings { (_ x :String, _ y: String) in
+//: Closure parameter name with an underscore before (closures don't have external parameter names, but underscore is allowed) 
+printTwoStrings { (_ x: String, _ y: String) in
     print(x, y)
 }
 
