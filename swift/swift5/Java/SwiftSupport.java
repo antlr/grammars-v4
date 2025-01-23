@@ -133,8 +133,8 @@ public abstract class SwiftSupport extends Parser
 
         leftWS.set(Swift5Parser.WS);
         leftWS.set(Swift5Parser.LPAREN);
-        leftWS.set(Swift5Parser.Interpolataion_multi_line);
-        leftWS.set(Swift5Parser.Interpolataion_single_line);
+        leftWS.set(Swift5Parser.Interpolation_multi_line);
+        leftWS.set(Swift5Parser.Interpolation_single_line);
         leftWS.set(Swift5Parser.LBRACK);
         leftWS.set(Swift5Parser.LCURLY);
         leftWS.set(Swift5Parser.COMMA);

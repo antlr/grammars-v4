@@ -1811,10 +1811,10 @@ static_string_literal
 interpolated_string_literal
     : Single_line_string_open (
         Quoted_single_line_text
-        | Interpolataion_single_line (expression | tuple_element COMMA tuple_element_list) RPAREN
+        | Interpolation_single_line (expression | tuple_element COMMA tuple_element_list) RPAREN
     )* Single_line_string_close
     | Multi_line_string_open (
         Quoted_multi_line_text
-        | Interpolataion_multi_line (expression | tuple_element COMMA tuple_element_list) RPAREN
+        | Interpolation_multi_line (expression | tuple_element COMMA tuple_element_list) RPAREN
     )* Multi_line_string_close
     ;
