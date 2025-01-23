@@ -146,8 +146,8 @@ SwiftSupport::OperatorCharacter::OperatorCharacter()
 SwiftSupport::LeftWS::LeftWS() {
     set(Swift5Parser::WS);
     set(Swift5Parser::LPAREN);
-    set(Swift5Parser::Interpolataion_multi_line);
-    set(Swift5Parser::Interpolataion_single_line);
+    set(Swift5Parser::Interpolation_multi_line);
+    set(Swift5Parser::Interpolation_single_line);
     set(Swift5Parser::LBRACK);
     set(Swift5Parser::LCURLY);
     set(Swift5Parser::COMMA);
