@@ -348,7 +348,7 @@ MULTILINE_COMMENT
 fragment EscapeSequence
     : '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
-    | '\\' 'u' '+' HexDigit HexDigit HexDigit HexDigit
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
 fragment HexDigits
