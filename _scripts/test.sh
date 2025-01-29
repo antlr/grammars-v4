@@ -276,7 +276,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
+    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
 fi
 if [ "$generators" == "" ]
 then
