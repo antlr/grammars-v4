@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 function rmrf([string]$Path) {
     try {
-        Remove-Item -Recurse -ErrorAction:Stop $Path
+        Remove-Item -Recurse -ErrorAction:Stop -force $Path
     } catch [System.Management.Automation.ItemNotFoundException] {
         # Ignore
         $Error.Clear()
@@ -15,6 +15,11 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 rmrf('build')
 New-Item -Path 'build' -ItemType Directory
 Set-Location 'build'
+
+<if(antlrng_tool)>
+npm init -y
+npm i antlr-ng
+<endif>
 
 <if(test.IsWindows)>
 $(& cmake .. -G "Visual Studio 17 2022" -A x64 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
