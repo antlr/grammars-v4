@@ -58,6 +58,7 @@ jobs:
         arch
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
+        export
     - name: Checkout
       uses: actions/checkout@v4
       with:
