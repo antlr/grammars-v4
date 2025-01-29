@@ -15,7 +15,7 @@ npm i antlr-ng
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
-$(& node node_modules/antlr-ng/dist/cli/runner.js --encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& tsx /tmp/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <else>
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <endif>

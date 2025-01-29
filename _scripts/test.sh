@@ -289,7 +289,17 @@ echo order = $order
 echo filter = $filter
 echo generators = ${generators[@]}
 
-# Compute cross product
+# Set up the antlr-ng tool. This is done in a common area in order
+# to eliminate the npm dependence to the antlr-ng package, and
+# just use tags and git.
+
+
+# Compute cross product of "grammar x target x generator"
+# Note, some combinations cannot happen, so try to eliminate those
+# immediately from consideration.
+#
+# The result is "tests", an array of strings with comma separators
+# between each of the elements of the tuple.
 for g in ${grammars[@]}
 do
     for t in ${targets[@]}

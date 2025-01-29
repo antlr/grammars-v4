@@ -15,7 +15,7 @@ npm i antlr-ng
 # Download Antlr4 Jar.
 antlr4 -v $version
 # Run tool.
-$(& node node_modules/antlr-ng/dist/cli/runner.js --encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } >  <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& tsx /tmp/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } >  <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <else>
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <endif>

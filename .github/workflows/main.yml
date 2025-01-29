@@ -149,6 +149,15 @@ jobs:
       shell: bash
       run: |
         dotnet trgen --help
+    - name: Install Antlr-ng
+      shell: bash
+      run: |
+        cd /tmp
+        git clone https://github.com/mike-lischke/antlr-ng.git
+        cd antlr-ng
+        git checkout 27676950c547854a62c826345b22b57b8b8c8a98
+        npm i
+        npm run build
     - name: Test
       shell: pwsh
       run: |
