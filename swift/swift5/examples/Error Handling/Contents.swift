@@ -8,11 +8,19 @@ enum PrinterError: Error {
     case onFire
 }
 
+// One more error
+enum JustError: Error {
+    case someError
+}
+
 //: Use `throw` to throw an error and `throws` to mark a function that can throw an error. If you throw an error in a function, the function returns immediately and the code that called the function handles the error.
 //:
 func send(job: Int, toPrinter printerName: String) throws -> String {
     if printerName == "Never Has Toner" {
         throw PrinterError.noToner
+    }
+    if printerName == "Throw error" {
+            throw JustError.someError
     }
     return "Job sent"
 }
@@ -36,6 +44,22 @@ do {
     print(printerResponse)
 } catch PrinterError.onFire {
     print("I'll just put this over here, with the rest of the fire.")
+} catch let printerError as PrinterError {
+    print("Printer error: \(printerError).")
+} catch {
+    print(error)
+}
+
+//: - Experiment:
+//: Change the printer name to `"Throw error"`, so that the `send(job:toPrinter:)` function throws an error.
+//:
+//: You can catch multiple error cases inside a single catch block
+//:
+do {
+    let printerResponse = try send(job: 1440, toPrinter: "Gutenberg")
+    print(printerResponse)
+} catch is JustError, PrinterError.noToner {
+    print("Error.")
 } catch let printerError as PrinterError {
     print("Printer error: \(printerError).")
 } catch {

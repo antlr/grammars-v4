@@ -220,7 +220,7 @@ catch_clause
     ;
 
 catch_pattern_list
-    : catch_pattern (catch_pattern COMMA catch_pattern)*
+    : catch_pattern (COMMA catch_pattern)*
     ;
 
 catch_pattern
