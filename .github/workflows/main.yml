@@ -153,11 +153,7 @@ jobs:
     - name: Install Antlr-ng
       shell: bash
       run: |
-        if ("${{ matrix.os }}" -eq "windows-latest"); then
-           cd $TEMP
-        else
-           cd $TMPDIR
-        fi
+        cd $HOME
         git clone https://github.com/mike-lischke/antlr-ng.git
         cd antlr-ng
         git checkout 27676950c547854a62c826345b22b57b8b8c8a98

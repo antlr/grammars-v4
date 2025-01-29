@@ -16,7 +16,7 @@ if($compile_exit_code -ne 0){
 
 $jarFile = Get-ChildItem ./node_modules/antlr4ng-cli/*.jar
 <tool_grammar_tuples:{x |
-$(& tsx <if(os_win)>$TEMP<else>$TMPDIR<endif>/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } >  <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } >  <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
