@@ -15,7 +15,7 @@ npm i antlr-ng
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
-tsx /tmp/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+tsx <if(os_win)>$TEMP<else>$TMPDIR<endif>/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 <else>
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Java <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 <endif>
