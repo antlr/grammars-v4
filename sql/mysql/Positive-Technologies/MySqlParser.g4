@@ -978,6 +978,7 @@ tableSource
 
 tableSourceItem
     : tableName (PARTITION '(' uidList ')')? (AS? alias = uid)? (indexHint (',' indexHint)*)? # atomTableItem
+    | sequenceFunctionName '(' DECIMAL_LITERAL ')' (AS? alias = uid)?                         # sequenceTableItem
     | (selectStatement | '(' parenthesisSubquery = selectStatement ')') AS? alias = uid       # subqueryTableItem
     | '(' tableSources ')'                                                                    # tableSourcesItem
     ;
@@ -2487,6 +2488,11 @@ partitionClause
     : PARTITION BY expression (',' expression)*
     ;
 
+sequenceFunctionName
+    : SEQUENCE_TABLE
+    | PERCONA_SEQUENCE_TABLE
+    ;
+
 scalarFunctionName
     : functionNameBase
     | ASCII
@@ -2988,6 +2994,7 @@ keywordsCanBeId
     | PASSWORDLESS_USER_ADMIN
     | PASSWORD_LOCK_TIME
     | PATH
+    | PERCONA_SEQUENCE_TABLE
     | PERSIST_RO_VARIABLES_ADMIN
     | PHASE
     | PLUGINS
@@ -3050,6 +3057,7 @@ keywordsCanBeId
     | SCHEMA_NAME
     | SECURITY
     | SECONDARY_ENGINE_ATTRIBUTE
+    | SEQUENCE_TABLE
     | SERIAL
     | SERVER
     | SESSION

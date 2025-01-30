@@ -270,6 +270,9 @@ CREATE TABLE `TABLE1` (
 PRIMARY KEY (`COL1`, `COL2`, `COL3`),
 CLUSTERING KEY `CLKEY1` (`COL3`, `COL2`))
 ENGINE=TOKUDB DEFAULT CHARSET=CP1251;
+
+CREATE TABLE T1 (NAME VARCHAR(36), SEQUENCE_TABLE BIGINT NOT NULL);
+
 #end
 #begin
 -- Rename table
@@ -891,5 +894,17 @@ BEGIN
         JOIN TEST_JOIN_LIMIT JL ON JL.ID = AI.ID
     SET AI.COL_1 = NULL
     LIMIT 500;
+END
+#end
+
+#begin
+CREATE DEFINER=`bcadmin`@`%` PROCEDURE `sp_next_available_otc_instance_strategy_id`()
+BEGIN
+  SELECT MIN(st.value) AS strategy_id
+  FROM SEQUENCE_TABLE(100000) ST
+  JOIN btc_quant.stratId_ranges r ON r.stratId0 <= st.value AND st.value < r.stratId1
+  LEFT JOIN otc_instance i ON i.strategy_id=st.value
+  WHERE r.category = 'otc' AND now() BETWEEN validFromDate AND COALESCE(validToDate, now())
+  AND i.strategy_id IS NULL;
 END
 #end
