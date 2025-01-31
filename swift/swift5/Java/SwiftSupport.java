@@ -252,6 +252,10 @@ public abstract class SwiftSupport extends Parser
         boolean nextIsWS = isRightOperatorWS(nextToken);
         //String text = tokens.getText(Interval.of(start, stop));
         //System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+        // accept only '??'' as binary operator
+        if (currentToken.getType() == Swift5Lexer.QUESTION && start == stop) {
+            return false;
+        }
         if (prevIsWS) {
             return nextIsWS;
         } else {

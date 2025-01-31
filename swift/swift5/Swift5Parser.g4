@@ -1326,7 +1326,7 @@ forced_value_suffix
     ;
 
 optional_chaining_suffix
-    : {!this.isBinaryOp(_input)}? QUESTION
+    : {!this.isBinaryOp(_input) && _input.get(_input.index()-1).getType()!=WS}? QUESTION
     ;
 
 // Function Call Expression
@@ -1565,6 +1565,7 @@ identifier
         | SELF_BIG
         | SET
         | CLASS
+        | STRUCT
         | GETTER
         | SETTER
         | OPERATOR

@@ -108,7 +108,17 @@ printTwoStrings { (_ x: String, _ y: String) in
     print(x, y)
 }
 
+// : Accepts 'struct' as external parameter name
+public func create<T>(struct s: T) {
+    print(s)
+}
 
+create(struct: 1)
+
+// : Return expression with two QUESTION tokens
+public func GetString<T>(_ s: T, _ val: Int) -> String? {
+    return val == 0 ? s as? String : nil
+}
 
 
 //: [Previous](@previous) | [Next](@next)
