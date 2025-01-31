@@ -1186,7 +1186,7 @@ closure_parameter_list
     ;
 
 closure_parameter
-    : closure_parameter_name = identifier (type_annotation range_operator?)?
+    : UNDERSCORE? closure_parameter_name = identifier (type_annotation range_operator?)?
     ;
 
 capture_list
@@ -1326,7 +1326,7 @@ forced_value_suffix
     ;
 
 optional_chaining_suffix
-    : {!this.isBinaryOp(_input)}? QUESTION
+    : {!this.isBinaryOp(_input) && _input.get(_input.index()-1).getType()!=WS}? QUESTION
     ;
 
 // Function Call Expression
@@ -1565,6 +1565,7 @@ identifier
         | SELF_BIG
         | SET
         | CLASS
+        | STRUCT
         | GETTER
         | SETTER
         | OPERATOR
@@ -1573,6 +1574,7 @@ identifier
     )
     | Identifier
     | BACKTICK (keyword | Identifier | DOLLAR) BACKTICK
+    | UNDERSCORE
     ;
 
 identifier_list
@@ -1810,10 +1812,10 @@ static_string_literal
 interpolated_string_literal
     : Single_line_string_open (
         Quoted_single_line_text
-        | Interpolataion_single_line (expression | tuple_element COMMA tuple_element_list) RPAREN
+        | Interpolation_single_line (expression | tuple_element COMMA tuple_element_list) RPAREN
     )* Single_line_string_close
     | Multi_line_string_open (
         Quoted_multi_line_text
-        | Interpolataion_multi_line (expression | tuple_element COMMA tuple_element_list) RPAREN
+        | Interpolation_multi_line (expression | tuple_element COMMA tuple_element_list) RPAREN
     )* Multi_line_string_close
     ;

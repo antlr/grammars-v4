@@ -98,6 +98,27 @@ print(mappedNumbers)
 let sortedNumbers = numbers.sorted { $0 > $1 }
 print(sortedNumbers)
 
+// : Accepts trailing closure with 2 string parameters and call it
+func printTwoStrings(_ closure: (String, String) -> Void) {
+    closure("Hello", "World")
+}
+
+//: Closure parameter name with an underscore before (closures don't have external parameter names, but underscore is allowed) 
+printTwoStrings { (_ x: String, _ y: String) in
+    print(x, y)
+}
+
+// : Accepts 'struct' as external parameter name
+public func create<T>(struct s: T) {
+    print(s)
+}
+
+create(struct: 1)
+
+// : Return expression with two QUESTION tokens
+public func GetString<T>(_ s: T, _ val: Int) -> String? {
+    return val == 0 ? s as? String : nil
+}
 
 
 //: [Previous](@previous) | [Next](@next)
