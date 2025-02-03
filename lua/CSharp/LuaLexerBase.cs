@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using Antlr4.Runtime;
-using Microsoft.Build.Utilities;
 
 public abstract class LuaLexerBase : Lexer
 {

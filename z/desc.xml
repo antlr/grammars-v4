@@ -2,4 +2,5 @@
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
    <antlr-version>^4.7</antlr-version>
    <targets>Java</targets>
+   <grammar-name>Z</grammar-name>
 </desc>
