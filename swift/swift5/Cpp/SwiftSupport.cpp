@@ -146,8 +146,8 @@ SwiftSupport::OperatorCharacter::OperatorCharacter()
 SwiftSupport::LeftWS::LeftWS() {
     set(Swift5Parser::WS);
     set(Swift5Parser::LPAREN);
-    set(Swift5Parser::Interpolataion_multi_line);
-    set(Swift5Parser::Interpolataion_single_line);
+    set(Swift5Parser::Interpolation_multi_line);
+    set(Swift5Parser::Interpolation_single_line);
     set(Swift5Parser::LBRACK);
     set(Swift5Parser::LCURLY);
     set(Swift5Parser::COMMA);
@@ -248,6 +248,10 @@ bool SwiftSupport::isBinaryOp(antlr4::TokenStream* tokens) {
     bool nextIsWS = isRightOperatorWS(nextToken);
     //String text = tokens.getText(Interval.of(start, stop));
     //System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+    // accept only '??'' as binary operator
+    if (currentToken->getType() == Swift5Lexer::QUESTION && start == stop) {
+        return false;
+    }
     if (prevIsWS) {
         return nextIsWS;
     } else {
