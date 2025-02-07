@@ -278,14 +278,21 @@ public class MySQLLexerBase : Lexer {
     }
 
     // Version-related methods
-    public bool isServerVersionLt80024() => serverVersion < 80024;
-    public bool isServerVersionGe80024() => serverVersion >= 80024;
     public bool isServerVersionGe80011() => serverVersion >= 80011;
     public bool isServerVersionGe80013() => serverVersion >= 80013;
     public bool isServerVersionLt80014() => serverVersion < 80014;
     public bool isServerVersionGe80014() => serverVersion >= 80014;
+    public bool isServerVersionGe80016() => serverVersion >= 80016;
     public bool isServerVersionGe80017() => serverVersion >= 80017;
     public bool isServerVersionGe80018() => serverVersion >= 80018;
+    public bool isServerVersionLt80021() => serverVersion < 80021;
+    public bool isServerVersionGe80021() => serverVersion >= 80021;
+    public bool isServerVersionLt80022() => serverVersion < 80022;
+    public bool isServerVersionGe80022() => serverVersion >= 80022;
+    public bool isServerVersionLt80023() => serverVersion < 80023;
+    public bool isServerVersionGe80023() => serverVersion >= 80023;
+    public bool isServerVersionLt80024() => serverVersion < 80024;
+    public bool isServerVersionGe80024() => serverVersion >= 80024;
 
     public bool isMasterCompressionAlgorithm() => serverVersion >= 80018 && isServerVersionLt80024();
 
@@ -338,7 +345,8 @@ public class MySQLLexerBase : Lexer {
     public void doVarPop() => Type = determineFunction(MySQLLexer.VARIANCE_SYMBOL);
     public void doVarSamp() => Type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
     public void doUnderscoreCharset() => Type = checkCharset(Text);
-
+    public bool doDollarQuotedStringText() => this.serverVersion >= 80034 && this.supportMle;
+    
     public bool isVersionComment() => checkMySQLVersion(Text);
 
     public bool isBackTickQuotedId()

@@ -162,273 +162,69 @@ antlr4::Token* MySQLLexerBase::emit() {
     return t;
 }
 
-bool MySQLLexerBase::isServerVersionLt80024()
-{
-    return this->serverVersion < 80024;
-
-}
-
-bool MySQLLexerBase::isServerVersionGe80024()
-{
-    return this->serverVersion >= 80024;
-}
-
-bool MySQLLexerBase::isServerVersionGe80011()
-{
-    return this->serverVersion >= 80011;
-}
-
-bool MySQLLexerBase::isServerVersionGe80013()
-{
-    return this->serverVersion >= 80013;
-}
-
-bool MySQLLexerBase::isServerVersionLt80014()
-{
-    return this->serverVersion < 80014;
-}
-
-bool MySQLLexerBase::isServerVersionGe80014()
-{
-    return this->serverVersion >= 80014;
-}
-
-bool MySQLLexerBase::isServerVersionGe80017()
-{
-    return this->serverVersion >= 80017;
-}
-
-bool MySQLLexerBase::isServerVersionGe80018() { return this->serverVersion >= 80018; }
-
 bool MySQLLexerBase::isMasterCompressionAlgorithm() { return this->serverVersion >= 80018 && this->isServerVersionLt80024(); }
-
-bool MySQLLexerBase::isServerVersionLt80031()    {
-    return this->serverVersion < 80031;
-}
-
-void MySQLLexerBase::doLogicalOr()    {
-    this->type = this->isSqlModeActive(SqlMode::PipesAsConcat) ? MySQLLexer::CONCAT_PIPES_SYMBOL : MySQLLexer::LOGICAL_OR_OPERATOR;
-}
-
-void MySQLLexerBase::doIntNumber()
-{
-    this->type = this->determineNumericType(this->getText());
-}
-
-void MySQLLexerBase::doAdddate()
-{
-    this->type = this->determineFunction(MySQLLexer::ADDDATE_SYMBOL);
-}
-
-void MySQLLexerBase::doBitAnd()
-{
-    this->type = this->determineFunction(MySQLLexer::BIT_AND_SYMBOL);
-}
-
-void MySQLLexerBase::doBitOr()
-{
-    this->type = this->determineFunction(MySQLLexer::BIT_OR_SYMBOL);
-}
-
-void MySQLLexerBase::doBitXor()
-{
-    this->type = this->determineFunction(MySQLLexer::BIT_XOR_SYMBOL);
-}
-
-void MySQLLexerBase::doCast()
-{
-    this->type = this->determineFunction(MySQLLexer::CAST_SYMBOL);
-}
-
-void MySQLLexerBase::doCount()
-{
-    this->type = this->determineFunction(MySQLLexer::COUNT_SYMBOL);
-}
-
-void MySQLLexerBase::doCurdate()
-{
-    this->type = this->determineFunction(MySQLLexer::CURDATE_SYMBOL);
-}
-
-void MySQLLexerBase::doCurrentDate()
-{
-    this->type = this->determineFunction(MySQLLexer::CURDATE_SYMBOL);
-}
-
-void MySQLLexerBase::doCurrentTime()
-{
-    this->type = this->determineFunction(MySQLLexer::CURTIME_SYMBOL);
-}
-
-void MySQLLexerBase::doCurtime()
-{
-    this->type = this->determineFunction(MySQLLexer::CURTIME_SYMBOL);
-}
-
-void MySQLLexerBase::doDateAdd()
-{
-    this->type = this->determineFunction(MySQLLexer::DATE_ADD_SYMBOL);
-}
-
-void MySQLLexerBase::doDateSub()
-{
-    this->type = this->determineFunction(MySQLLexer::DATE_SUB_SYMBOL);
-}
-
-void MySQLLexerBase::doExtract()
-{
-    this->type = this->determineFunction(MySQLLexer::EXTRACT_SYMBOL);
-}
-
-void MySQLLexerBase::doGroupConcat()
-{
-    this->type = this->determineFunction(MySQLLexer::GROUP_CONCAT_SYMBOL);
-}
-
-void MySQLLexerBase::doMax()
-{
-    this->type = this->determineFunction(MySQLLexer::MAX_SYMBOL);
-}
-
-void MySQLLexerBase::doMid()
-{
-    this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL);
-}
-
-void MySQLLexerBase::doMin()
-{
-    this->type = this->determineFunction(MySQLLexer::MIN_SYMBOL);
-}
-
-void MySQLLexerBase::doNot()
-{
-    this->type = this->isSqlModeActive(SqlMode::HighNotPrecedence) ? MySQLLexer::NOT2_SYMBOL: MySQLLexer::NOT_SYMBOL;
-}
-
-void MySQLLexerBase::doNow()
-{
-    this->type = this->determineFunction(MySQLLexer::NOW_SYMBOL);
-}
-
-void MySQLLexerBase::doPosition()
-{
-    this->type = this->determineFunction(MySQLLexer::POSITION_SYMBOL);
-}
-
-void MySQLLexerBase::doSessionUser()
-{
-    this->type = this->determineFunction(MySQLLexer::USER_SYMBOL);
-}
-
-void MySQLLexerBase::doStddevSamp()
-{
-    this->type = this->determineFunction(MySQLLexer::STDDEV_SAMP_SYMBOL);
-}
-
-void MySQLLexerBase::doStddev()
-{
-    this->type = this->determineFunction(MySQLLexer::STD_SYMBOL);
-}
-
-void MySQLLexerBase::doStddevPop()
-{
-    this->type = this->determineFunction(MySQLLexer::STD_SYMBOL);
-}
-
-void MySQLLexerBase::doStd()
-{
-    this->type = this->determineFunction(MySQLLexer::STD_SYMBOL);
-}
-
-void MySQLLexerBase::doSubdate()
-{
-    this->type = this->determineFunction(MySQLLexer::SUBDATE_SYMBOL);
-}
-
-void MySQLLexerBase::doSubstr()
-{
-    this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL);
-}
-
-void MySQLLexerBase::doSubstring()
-{
-    this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL);
-}
-
-void MySQLLexerBase::doSum()
-{
-    this->type = this->determineFunction(MySQLLexer::SUM_SYMBOL);
-}
-
-void MySQLLexerBase::doSysdate()
-{
-    this->type = this->determineFunction(MySQLLexer::SYSDATE_SYMBOL);
-}
-
-void MySQLLexerBase::doSystemUser()
-{
-    this->type = this->determineFunction(MySQLLexer::USER_SYMBOL);
-}
-
-void MySQLLexerBase::doTrim()
-{
-    this->type = this->determineFunction(MySQLLexer::TRIM_SYMBOL);
-}
-
-void MySQLLexerBase::doVariance()
-{
-    this->type = this->determineFunction(MySQLLexer::VARIANCE_SYMBOL);
-}
-
-void MySQLLexerBase::doVarPop()
-{
-    this->type = this->determineFunction(MySQLLexer::VARIANCE_SYMBOL);
-}
-
-void MySQLLexerBase::doVarSamp()
-{
-    this->type = this->determineFunction(MySQLLexer::VAR_SAMP_SYMBOL);
-}
-
-void MySQLLexerBase::doUnderscoreCharset()
-{
-    this->type = this->checkCharset(this->getText());
-}
-
-bool MySQLLexerBase::isVersionComment() {
-    return inVersionComment;
-}
-
-bool MySQLLexerBase::isBackTickQuotedId()
-{
-    return !this->isSqlModeActive(SqlMode::NoBackslashEscapes);
-}
-
-bool MySQLLexerBase::isDoubleQuotedText()
-{
-    return !this->isSqlModeActive(SqlMode::NoBackslashEscapes);
-}
-
-bool MySQLLexerBase::isSingleQuotedText()
-{
-    return !this->isSqlModeActive(SqlMode::NoBackslashEscapes);
-}
-
-void MySQLLexerBase::startInVersionComment()
-{
-    inVersionComment = true;
-}
-
-void MySQLLexerBase::endInVersionComment()
-{
-    inVersionComment = false;
-}
-
-bool MySQLLexerBase::isInVersionComment()
-{
-    return inVersionComment;
-}
-
+bool MySQLLexerBase::isServerVersionGe80011() { return this->serverVersion >= 80011; }
+bool MySQLLexerBase::isServerVersionGe80013() { return this->serverVersion >= 80013; }
+bool MySQLLexerBase::isServerVersionLt80014() { return this->serverVersion < 80014; }
+bool MySQLLexerBase::isServerVersionGe80014() { return this->serverVersion >= 80014; }
+bool MySQLLexerBase::isServerVersionGe80016() { return this->serverVersion >= 80016; }
+bool MySQLLexerBase::isServerVersionGe80017() { return this->serverVersion >= 80017; }
+bool MySQLLexerBase::isServerVersionGe80018() { return this->serverVersion >= 80018; }
+bool MySQLLexerBase::isServerVersionLt80021() { return this->serverVersion < 80021; }
+bool MySQLLexerBase::isServerVersionGe80021() { return this->serverVersion >= 80021; }
+bool MySQLLexerBase::isServerVersionLt80022() { return this->serverVersion < 80022; }
+bool MySQLLexerBase::isServerVersionGe80022() { return this->serverVersion >= 80022; }
+bool MySQLLexerBase::isServerVersionLt80023() { return this->serverVersion < 80023; }
+bool MySQLLexerBase::isServerVersionGe80023() { return this->serverVersion >= 80023; }
+bool MySQLLexerBase::isServerVersionLt80024() { return this->serverVersion < 80024; }
+bool MySQLLexerBase::isServerVersionGe80024() { return this->serverVersion >= 80024; }
+bool MySQLLexerBase::isServerVersionLt80031() { return this->serverVersion < 80031; }
+void MySQLLexerBase::doLogicalOr() { this->type = this->isSqlModeActive(SqlMode::PipesAsConcat) ? MySQLLexer::CONCAT_PIPES_SYMBOL : MySQLLexer::LOGICAL_OR_OPERATOR; }
+void MySQLLexerBase::doIntNumber() { this->type = this->determineNumericType(this->getText()); }
+void MySQLLexerBase::doAdddate() { this->type = this->determineFunction(MySQLLexer::ADDDATE_SYMBOL); }
+void MySQLLexerBase::doBitAnd() { this->type = this->determineFunction(MySQLLexer::BIT_AND_SYMBOL); }
+void MySQLLexerBase::doBitOr() { this->type = this->determineFunction(MySQLLexer::BIT_OR_SYMBOL); }
+void MySQLLexerBase::doBitXor() { this->type = this->determineFunction(MySQLLexer::BIT_XOR_SYMBOL); }
+void MySQLLexerBase::doCast() { this->type = this->determineFunction(MySQLLexer::CAST_SYMBOL); }
+void MySQLLexerBase::doCount() { this->type = this->determineFunction(MySQLLexer::COUNT_SYMBOL); }
+void MySQLLexerBase::doCurdate() { this->type = this->determineFunction(MySQLLexer::CURDATE_SYMBOL); }
+void MySQLLexerBase::doCurrentDate() { this->type = this->determineFunction(MySQLLexer::CURDATE_SYMBOL); }
+void MySQLLexerBase::doCurrentTime() { this->type = this->determineFunction(MySQLLexer::CURTIME_SYMBOL); }
+void MySQLLexerBase::doCurtime() { this->type = this->determineFunction(MySQLLexer::CURTIME_SYMBOL); }
+void MySQLLexerBase::doDateAdd() { this->type = this->determineFunction(MySQLLexer::DATE_ADD_SYMBOL); }
+void MySQLLexerBase::doDateSub() { this->type = this->determineFunction(MySQLLexer::DATE_SUB_SYMBOL); }
+void MySQLLexerBase::doExtract() { this->type = this->determineFunction(MySQLLexer::EXTRACT_SYMBOL); }
+void MySQLLexerBase::doGroupConcat() { this->type = this->determineFunction(MySQLLexer::GROUP_CONCAT_SYMBOL); }
+void MySQLLexerBase::doMax() { this->type = this->determineFunction(MySQLLexer::MAX_SYMBOL); }
+void MySQLLexerBase::doMid() { this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL); }
+void MySQLLexerBase::doMin() { this->type = this->determineFunction(MySQLLexer::MIN_SYMBOL); }
+void MySQLLexerBase::doNot() { this->type = this->isSqlModeActive(SqlMode::HighNotPrecedence) ? MySQLLexer::NOT2_SYMBOL: MySQLLexer::NOT_SYMBOL; }
+void MySQLLexerBase::doNow() { this->type = this->determineFunction(MySQLLexer::NOW_SYMBOL); }
+void MySQLLexerBase::doPosition() { this->type = this->determineFunction(MySQLLexer::POSITION_SYMBOL); }
+void MySQLLexerBase::doSessionUser() { this->type = this->determineFunction(MySQLLexer::USER_SYMBOL); }
+void MySQLLexerBase::doStddevSamp() { this->type = this->determineFunction(MySQLLexer::STDDEV_SAMP_SYMBOL); }
+void MySQLLexerBase::doStddev() { this->type = this->determineFunction(MySQLLexer::STD_SYMBOL); }
+void MySQLLexerBase::doStddevPop() { this->type = this->determineFunction(MySQLLexer::STD_SYMBOL);}
+void MySQLLexerBase::doStd() { this->type = this->determineFunction(MySQLLexer::STD_SYMBOL); }
+void MySQLLexerBase::doSubdate() { this->type = this->determineFunction(MySQLLexer::SUBDATE_SYMBOL); }
+void MySQLLexerBase::doSubstr() { this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL); }
+void MySQLLexerBase::doSubstring() { this->type = this->determineFunction(MySQLLexer::SUBSTRING_SYMBOL); }
+void MySQLLexerBase::doSum() { this->type = this->determineFunction(MySQLLexer::SUM_SYMBOL); }
+void MySQLLexerBase::doSysdate() { this->type = this->determineFunction(MySQLLexer::SYSDATE_SYMBOL); }
+void MySQLLexerBase::doSystemUser() { this->type = this->determineFunction(MySQLLexer::USER_SYMBOL); }
+void MySQLLexerBase::doTrim() { this->type = this->determineFunction(MySQLLexer::TRIM_SYMBOL); }
+void MySQLLexerBase::doVariance() { this->type = this->determineFunction(MySQLLexer::VARIANCE_SYMBOL); }
+void MySQLLexerBase::doVarPop() { this->type = this->determineFunction(MySQLLexer::VARIANCE_SYMBOL); }
+void MySQLLexerBase::doVarSamp() { this->type = this->determineFunction(MySQLLexer::VAR_SAMP_SYMBOL); }
+void MySQLLexerBase::doUnderscoreCharset() { this->type = this->checkCharset(this->getText()); }
+bool MySQLLexerBase::doDollarQuotedStringText() { return this->serverVersion >= 80034 && this->supportMle; }
+bool MySQLLexerBase::isVersionComment() { return inVersionComment; }
+bool MySQLLexerBase::isBackTickQuotedId() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
+bool MySQLLexerBase::isDoubleQuotedText() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
+bool MySQLLexerBase::isSingleQuotedText() { return !this->isSqlModeActive(SqlMode::NoBackslashEscapes); }
+void MySQLLexerBase::startInVersionComment() { inVersionComment = true; }
+void MySQLLexerBase::endInVersionComment() { inVersionComment = false; }
+bool MySQLLexerBase::isInVersionComment() { return inVersionComment; }
 std::string MySQLLexerBase::longString = "2147483647";
 int MySQLLexerBase::longLength = 10;
 std::string MySQLLexerBase::signedLongString = "-2147483648";

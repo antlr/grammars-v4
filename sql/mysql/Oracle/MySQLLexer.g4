@@ -353,6 +353,8 @@ DOT_IDENTIFIER
 
 // $antlr-format groupedAlignments off, alignTrailers on
 
+// Version information for keywords was taken from https://dev.mysql.com/doc/mysqld-version-reference/en/keywords.html.
+
 ACCESSIBLE_SYMBOL
     : A C C E S S I B L E
     ;
@@ -3153,7 +3155,7 @@ OPTIONAL_SYMBOL
     ;                                                                                     // MYSQL
 
 SECONDARY_SYMBOL
-    : S E C O N D A R Y                                                                   {this.isServerVersionGe80013()}?
+    : S E C O N D A R Y                                                                   {this.isServerVersionGe80016()}?
     ;                                                                                     // MYSQL
 
 SECONDARY_ENGINE_SYMBOL
@@ -3245,7 +3247,7 @@ REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL
     ;                                                                                     // MYSQL
 
 STREAM_SYMBOL
-    : S T R E A M                                                                         {this.serverVersion >= 80019}?
+    : S T R E A M                                                                         {this.serverVersion >= 80020}?
     ;                                                                                     // MYSQL
 
 OFF_SYMBOL
@@ -3253,7 +3255,7 @@ OFF_SYMBOL
     ;                                                                                     // SQL-1999-R
 
 RETURNING_SYMBOL
-    : R E T U R N I N G                                                                   {this.isServerVersionGe80024()}?
+    : R E T U R N I N G                                                                   {this.isServerVersionGe80021()}?
     ;                                                                                     // SQL-2016-N
 
 JSON_VALUE_SYMBOL
@@ -3261,7 +3263,7 @@ JSON_VALUE_SYMBOL
     ;                                                                                     // SQL-2016-R
 
 TLS_SYMBOL
-    : T L S                                                                               {this.isServerVersionGe80024()}?
+    : T L S                                                                               {this.isServerVersionGe80021()}?
     ;                                                                                     // MYSQL
 
 ATTRIBUTE_SYMBOL
@@ -3281,7 +3283,7 @@ SOURCE_CONNECTION_AUTO_FAILOVER_SYMBOL
     ;                                                                                     // MYSQL
 
 ZONE_SYMBOL
-    : Z O N E                                                                             {this.isServerVersionGe80024()}?
+    : Z O N E                                                                             {this.isServerVersionGe80022()}?
     ;                                                                                     // SQL-2003-N
 
 GRAMMAR_SELECTOR_DERIVED_EXPR
@@ -3289,11 +3291,11 @@ GRAMMAR_SELECTOR_DERIVED_EXPR
     ;                                                                                     // synthetic token: starts derived table expressions.
 
 REPLICA_SYMBOL
-    : R E P L I C A                                                                       {this.isServerVersionGe80024()}?
+    : R E P L I C A                                                                       {this.isServerVersionGe80022()}?
     ;
 
 REPLICAS_SYMBOL
-    : R E P L I C A S                                                                     {this.isServerVersionGe80024()}?
+    : R E P L I C A S                                                                     {this.isServerVersionGe80022()}?
     ;
 
 ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS_SYMBOL
@@ -3305,107 +3307,107 @@ GET_SOURCE_PUBLIC_KEY_SYMBOL
     ;                                                                                     // MYSQL
 
 SOURCE_AUTO_POSITION_SYMBOL
-    : S O U R C E '_' A U T O '_' P O S I T I O N                                         {this.isServerVersionGe80024()}?
+    : S O U R C E '_' A U T O '_' P O S I T I O N                                         {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_BIND_SYMBOL
-    : S O U R C E '_' B I N D                                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' B I N D                                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_COMPRESSION_ALGORITHM_SYMBOL
-    : S O U R C E '_' C O M P R E S S I O N '_' A L G O R I T H M                         {this.isServerVersionGe80024()}?
+    : S O U R C E '_' C O M P R E S S I O N '_' A L G O R I T H M                         {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_CONNECT_RETRY_SYMBOL
-    : S O U R C E '_' C O N N E C T '_' R E T R Y                                         {this.isServerVersionGe80024()}?
+    : S O U R C E '_' C O N N E C T '_' R E T R Y                                         {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_DELAY_SYMBOL
-    : S O U R C E '_' D E L A Y                                                           {this.isServerVersionGe80024()}?
+    : S O U R C E '_' D E L A Y                                                           {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_HEARTBEAT_PERIOD_SYMBOL
-    : S O U R C E '_' H E A R T B E A T '_' P E R I O D                                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' H E A R T B E A T '_' P E R I O D                                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_HOST_SYMBOL
-    : S O U R C E '_' H O S T                                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' H O S T                                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_LOG_FILE_SYMBOL
-    : S O U R C E '_' L O G '_' F I L E                                                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' L O G '_' F I L E                                                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_LOG_POS_SYMBOL
-    : S O U R C E '_' L O G '_' P O S                                                     {this.isServerVersionGe80024()}?
+    : S O U R C E '_' L O G '_' P O S                                                     {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_PASSWORD_SYMBOL
-    : S O U R C E '_' P A S S W O R D                                                     {this.isServerVersionGe80024()}?
+    : S O U R C E '_' P A S S W O R D                                                     {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_PORT_SYMBOL
-    : S O U R C E '_' P O R T                                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' P O R T                                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_PUBLIC_KEY_PATH_SYMBOL
-    : S O U R C E '_' P U B L I C '_' K E Y '_' P A T H                                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' P U B L I C '_' K E Y '_' P A T H                                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_RETRY_COUNT_SYMBOL
-    : S O U R C E '_' R E T R Y '_' C O U N T                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' R E T R Y '_' C O U N T                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_SYMBOL
-    : S O U R C E '_' S S L                                                               {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L                                                               {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CA_SYMBOL
-    : S O U R C E '_' S S L '_' C A                                                       {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C A                                                       {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CAPATH_SYMBOL
-    : S O U R C E '_' S S L '_' C A P A T H                                               {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C A P A T H                                               {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CERT_SYMBOL
-    : S O U R C E '_' S S L '_' C E R T                                                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C E R T                                                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CIPHER_SYMBOL
-    : S O U R C E '_' S S L '_' C I P H E R                                               {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C I P H E R                                               {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CRL_SYMBOL
-    : S O U R C E '_' S S L '_' C R L                                                     {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C R L                                                     {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_CRLPATH_SYMBOL
-    : S O U R C E '_' S S L '_' C R L P A T H                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C R L P A T H                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_KEY_SYMBOL
-    : S O U R C E '_' S S L '_' C R L P A T H                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' C R L P A T H                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_VERIFY_SERVER_CERT_SYMBOL
-    : S O U R C E '_' S S L '_' V E R I F Y '_' S E R V E R '_' C E R T                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' S S L '_' V E R I F Y '_' S E R V E R '_' C E R T                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_TLS_CIPHERSUITES_SYMBOL
-    : S O U R C E '_' T L S '_' C I P H E R S U I T E S                                   {this.isServerVersionGe80024()}?
+    : S O U R C E '_' T L S '_' C I P H E R S U I T E S                                   {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_TLS_VERSION_SYMBOL
-    : S O U R C E '_' T L S '_' V E R S I O N                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' T L S '_' V E R S I O N                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_USER_SYMBOL
-    : S O U R C E '_' U S E R                                                             {this.isServerVersionGe80024()}?
+    : S O U R C E '_' U S E R                                                             {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_ZSTD_COMPRESSION_LEVEL_SYMBOL
-    : S O U R C E '_' Z S T D '_' C O M P R E S S I O N '_' L E V E L                     {this.isServerVersionGe80024()}?
+    : S O U R C E '_' Z S T D '_' C O M P R E S S I O N '_' L E V E L                     {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 ST_COLLECT_SYMBOL
@@ -3457,11 +3459,11 @@ INTERSECT_SYMBOL
     ;                                                                                     // SQL-1992-R
 
 BULK_SYMBOL
-    : B U L K                                                                             {this.serverVersion >= 80200}?
+    : B U L K                                                                             {this.serverVersion >= 80032}?
     ;                                                                                     // MYSQL
 
 URL_SYMBOL
-    : U R L                                                                               {this.serverVersion >= 80200}?
+    : U R L                                                                               {this.serverVersion >= 80032}?
     ;                                                                                     // MYSQL
 
 GENERATE_SYMBOL
@@ -3588,6 +3590,10 @@ UNDERSCORE_CHARSET
     : UNDERLINE_SYMBOL [a-z0-9]+ { this.doUnderscoreCharset(); }
     ;
 
+// TODO: check in the semantic phase that starting and ending tags are the same.
+DOLLAR_QUOTED_STRING_TEXT
+   : '$' DOLLAR_QUOTE_TAG_CHAR* '$' .*? '$' DOLLAR_QUOTE_TAG_CHAR* '$' {this.doDollarQuotedStringText()}?;
+
 // Identifiers might start with a digit, even though it is discouraged, and may not consist entirely of digits only.
 // All keywords above are automatically excluded.
 IDENTIFIER
@@ -3631,11 +3637,6 @@ SINGLE_QUOTED_TEXT
     : (
         SINGLE_QUOTE (({this.isSingleQuotedText()}? '\\')? .)*? SINGLE_QUOTE
     )+
-    ;
-
-// TODO: check in the semantic phase that starting and ending tags are the same.
-DOLLAR_QUOTED_STRING_TEXT
-    : '$' DOLLAR_QUOTE_TAG_CHAR* '$' .*? '$' DOLLAR_QUOTE_TAG_CHAR* '$' {this.supportMle}?
     ;
 
 // There are 3 types of block comments:
