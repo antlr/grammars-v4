@@ -31,7 +31,7 @@ THE SOFTWARE.
   * Contributors : [Willie Shen](https://github.com/Willie169)
   */
 
-// Python 3.13.1  https://docs.python.org/3.13/reference/grammar.html#full-grammar-specification
+// Python 3.13.2  https://docs.python.org/3.13/reference/grammar.html#full-grammar-specification
 
 parser grammar PythonParser;
 
