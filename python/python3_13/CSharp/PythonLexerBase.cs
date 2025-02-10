@@ -33,6 +33,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
 
+[assembly: CLSCompliant(true)]
+
 public abstract class PythonLexerBase : Lexer
 {
     // A stack that keeps track of the indentation lengths
