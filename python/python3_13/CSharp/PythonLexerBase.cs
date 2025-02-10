@@ -27,8 +27,11 @@ THE SOFTWARE.
 
 #nullable enable
 using Antlr4.Runtime;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Collections.Generic;
 
 public abstract class PythonLexerBase : Lexer
 {
