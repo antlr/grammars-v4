@@ -156,7 +156,7 @@ jobs:
         cd $HOME
         git clone https://github.com/mike-lischke/antlr-ng.git
         cd antlr-ng
-        git checkout 27676950c547854a62c826345b22b57b8b8c8a98
+        git checkout c1ac333a9c544da98b3adbdd76310351f81bcfaa
         npm i
         npm run build
     - name: Test

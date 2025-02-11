@@ -92,8 +92,6 @@ fi
 prefix=`pwd`
 popd > /dev/null 2>&1
 
-rm -rf `find . -name 'Generated*' -type d`
-
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
@@ -280,7 +278,7 @@ then
 fi
 if [ "$generators" == "" ]
 then
-    generators=( antlr-ng official )
+    generators=( antlr-ng )
 fi
 
 echo grammars = ${grammars[@]}
@@ -348,7 +346,6 @@ do
     yes=false;
     for t in $desc_targets
     do
-echo t = $t
         if [ "$t" == "+all" ]; then yes=true; fi
         if [ "$t" == "-$target" ]; then yes=false; fi
         if [ "$t" == "$target" ]; then yes=true; fi
@@ -376,9 +373,12 @@ echo t = $t
 
     # Generate driver source code.
 
-    if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
-    for i in $bad; do failed+=( "$testname/$target" ); done
+    if [ $quiet != "true" ] ; then echo "Generating driver for $testname."; fi
+
+    rm -rf `find . -name "Generated-$target*" -type d`
+    echo dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+    dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+    if [ "$?" != "0" ] ; then failed+=( "$testname/$target" ); continue; fi
 
     for d in `echo Generated-$target-* Generated-$target`
     do

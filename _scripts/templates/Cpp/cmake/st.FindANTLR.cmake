@@ -18,7 +18,7 @@ find_package(Java QUIET COMPONENTS Runtime)
       set(ANTLR_${Name}_OUTPUT_DIR ${ANTLR_TARGET_OUTPUT_DIRECTORY})
     else()
       set(ANTLR_${Name}_OUTPUT_DIR
-          ${CMAKE_CURRENT_BINARY_DIR}/antlr4cpp_generated_src/${ANTLR_INPUT})
+          ${CMAKE_CURRENT_BINARY_DIR}/antlr4cpp_generated_src)
     endif()
 
     unset(ANTLR_${Name}_CXX_OUTPUTS)
@@ -81,14 +81,16 @@ find_package(Java QUIET COMPONENTS Runtime)
     add_custom_command(
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
 <if(antlrng_tool)>
-        COMMAND node build/node_modules/antlr-ng/dist/cli/runner.js
+        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts
 <else>
         COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
 <endif>
-                ${InputFile}
                 -o ${ANTLR_${Name}_OUTPUT_DIR}
                 -Dlanguage=Cpp
-                ${ANTLR_TARGET_COMPILE_FLAGS}
+<if(antlrng_tool)>
+                --lib ${ANTLR_${Name}_OUTPUT_DIR}
+<endif>
+                ${InputFile}
         DEPENDS ${InputFile}
                 ${ANTLR_TARGET_DEPENDS}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
