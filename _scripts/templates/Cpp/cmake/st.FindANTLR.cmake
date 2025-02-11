@@ -81,7 +81,7 @@ find_package(Java QUIET COMPONENTS Runtime)
     add_custom_command(
         OUTPUT ${ANTLR_${Name}_OUTPUTS}
 <if(antlrng_tool)>
-        COMMAND pwsh -c tsx $ENV{HOME}/antlr-ng/cli/runner.ts
+        COMMAND pwsh -c tsx ${HOME}/antlr-ng/cli/runner.ts
 <else>
         COMMAND antlr4<if(os_win)>.exe<else><endif> -v ${ANTLR4_TAG}
 <endif>

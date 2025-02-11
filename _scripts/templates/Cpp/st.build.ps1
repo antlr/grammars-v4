@@ -24,8 +24,8 @@ npm i antlr-ng
 echo HOME $HOME
 
 <if(test.IsWindows)>
-$(& cmake .. -G "Visual Studio 17 2022" -A x64 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
-<else>$(& cmake .. ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+$(& cmake .. -G "Visual Studio 17 2022" -A x64 -DHOME=$HOME ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+<else>$(& cmake .. -DHOME=$HOME ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 <endif>
 if($compile_exit_code -ne 0){
     Write-Host "Failed first cmake call $compile_exit_code."
