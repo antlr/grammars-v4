@@ -21,6 +21,8 @@ npm init -y
 npm i antlr-ng
 <endif>
 
+echo HOME $HOME
+
 <if(test.IsWindows)>
 $(& cmake .. -G "Visual Studio 17 2022" -A x64 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 <else>$(& cmake .. ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
