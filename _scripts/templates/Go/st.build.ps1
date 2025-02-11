@@ -24,7 +24,7 @@ npm i antlr-ng
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
-$(& tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Go -lib parser --package parser <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Go --lib parser --package parser <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <else>
 $(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <if(os_win)>-o parser<endif> -lib parser -package parser  <x.AntlrArgs>  <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <endif>
