@@ -65,6 +65,8 @@ function Test-Grammar {
     $success = $true
     $start = Get-Date
     Write-Host "Building"
+    Write-Host "HOME"
+    Write-Host $HOME
     # codegen
     Write-Host "dotnet trgen -t $Target -g $Generator --template-sources-directory $templates"
     dotnet trgen -t $Target -g $Generator --template-sources-directory $templates | Write-Host
