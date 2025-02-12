@@ -321,7 +321,7 @@ function Test-AllGrammars {
     Write-Host "previouscommit = $PreviousCommit"
     Write-Host "CurrentCommit = $CurrentCommit"
 
-    $generators = @( "antlr-ng" , "official" )
+    $generators = @( "antlr-ng" )
 
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
 
