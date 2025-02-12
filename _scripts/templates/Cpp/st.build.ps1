@@ -33,7 +33,6 @@ if($compile_exit_code -ne 0){
 }
 
 <if(test.IsWindows)>
-Select-String -Path .\Test.vcxproj -Pattern "tsx"
 $(& cmake --build . --config Release ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 <else>
 $make = which make
