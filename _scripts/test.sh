@@ -243,7 +243,7 @@ elif [ "$filter" == "all" ]
 then
     grammars=()
     # Test grammars for the enclosing directories.
-    directories=`find . -name desc.xml | sed 's#/desc.xml##' | sort -u`
+    directories=`find . -name desc.xml | sed 's#/desc.xml##' | grep -v 'Generated-*' | sort -u`
     for g in $directories
     do
         pushd $g > /dev/null 2>&1
@@ -308,6 +308,7 @@ do
         done
     done
 done
+echo ${tests[@]}
 
 # Sort the list of <grammar, target> tuples if needed.
 if [[ "$order" == "grammars" ]]; then sorted="1"; else sorted="2"; fi
