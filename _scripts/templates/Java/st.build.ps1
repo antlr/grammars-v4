@@ -26,7 +26,7 @@ if($compile_exit_code -ne 0){
 # Download Antlr4 Jar. Although it is not required for antlr-ng, it
 # is required by the generated code, which still uses the "official"
 # Antlr4 runtime wound up in the jar.
-$(& antlr4 -v $version | $last = $LASTEXITCODE ) | Out-Null
+$(& antlr4 -v $version ; $last = $LASTEXITCODE ) | Out-Null
 <endif>
 $JAR = python -c "import os; from pathlib import Path; print(os.path.join(Path.home(), '.m2', 'repository', 'org', 'antlr', 'antlr4', '$version', ('antlr4-' + '$version' + '-complete.jar')))"
 $(& javac -cp "${JAR}<if(path_sep_semi)>;<else>:<endif>." <tool_grammar_tuples:{x|<x.GeneratedFileName> }> Test.java ErrorListener.java ; $compile_exit_code = $LASTEXITCODE) | Write-Host
