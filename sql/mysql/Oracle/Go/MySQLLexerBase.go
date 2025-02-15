@@ -97,15 +97,22 @@ func (m *MySQLLexerBase) emitDot() {
     m.TokenStartCharIndex = m.TokenStartCharIndex + 1
 }
 
-func (m *MySQLLexerBase) isServerVersionLt80024() bool { return StaticMySQLLexerBase.serverVersion < 80024 }
-func (m *MySQLLexerBase) isServerVersionGe80024() bool { return StaticMySQLLexerBase.serverVersion >= 80024 }
+func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return StaticMySQLLexerBase.serverVersion >= 80018 && m.isServerVersionLt80024() }
 func (m *MySQLLexerBase) isServerVersionGe80011() bool { return StaticMySQLLexerBase.serverVersion >= 80011 }
 func (m *MySQLLexerBase) isServerVersionGe80013() bool { return StaticMySQLLexerBase.serverVersion >= 80013 }
 func (m *MySQLLexerBase) isServerVersionLt80014() bool { return StaticMySQLLexerBase.serverVersion < 80014 }
 func (m *MySQLLexerBase) isServerVersionGe80014() bool { return StaticMySQLLexerBase.serverVersion >= 80014 }
+func (m *MySQLLexerBase) isServerVersionGe80016() bool { return StaticMySQLLexerBase.serverVersion >= 80016 }
 func (m *MySQLLexerBase) isServerVersionGe80017() bool { return StaticMySQLLexerBase.serverVersion >= 80017 }
 func (m *MySQLLexerBase) isServerVersionGe80018() bool { return StaticMySQLLexerBase.serverVersion >= 80018 }
-func (m *MySQLLexerBase) isMasterCompressionAlgorithm() bool { return StaticMySQLLexerBase.serverVersion >= 80018 && m.isServerVersionLt80024() }
+func (m *MySQLLexerBase) isServerVersionLt80021() bool { return StaticMySQLLexerBase.serverVersion < 80021 }
+func (m *MySQLLexerBase) isServerVersionGe80021() bool { return StaticMySQLLexerBase.serverVersion >= 80021 }
+func (m *MySQLLexerBase) isServerVersionLt80022() bool { return StaticMySQLLexerBase.serverVersion < 80022 }
+func (m *MySQLLexerBase) isServerVersionGe80022() bool { return StaticMySQLLexerBase.serverVersion >= 80022 }
+func (m *MySQLLexerBase) isServerVersionLt80023() bool { return StaticMySQLLexerBase.serverVersion < 80023 }
+func (m *MySQLLexerBase) isServerVersionGe80023() bool { return StaticMySQLLexerBase.serverVersion >= 80023 }
+func (m *MySQLLexerBase) isServerVersionLt80024() bool { return StaticMySQLLexerBase.serverVersion < 80024 }
+func (m *MySQLLexerBase) isServerVersionGe80024() bool { return StaticMySQLLexerBase.serverVersion >= 80024 }
 func (m *MySQLLexerBase) isServerVersionLt80031() bool { return StaticMySQLLexerBase.serverVersion < 80031 }
 
 func (m *MySQLLexerBase) doLogicalOr() {
@@ -116,14 +123,8 @@ func (m *MySQLLexerBase) doLogicalOr() {
     }
 }
 
-func (m *MySQLLexerBase) isSqlModeActive(mode SqlMode) bool {
-    return StaticMySQLLexerBase.sqlModes[mode]
-}
-
- 
-func (m *MySQLLexerBase) doIntNumber() {
-    m.SetType(m.determineNumericType(m.GetText()));
-}
+func (m *MySQLLexerBase) isSqlModeActive(mode SqlMode) bool { return StaticMySQLLexerBase.sqlModes[mode]; }
+func (m *MySQLLexerBase) doIntNumber() { m.SetType(m.determineNumericType(m.GetText())); }
 
 func (m *MySQLLexerBase) determineNumericType(text string) int {
     length := len(text) - 1
@@ -256,7 +257,6 @@ func (m *MySQLLexerBase) doCurtime() { m.SetType(m.determineFunction(MySQLLexerC
 func (m *MySQLLexerBase) doDateAdd() { m.SetType(m.determineFunction(MySQLLexerDATE_ADD_SYMBOL)) }
 func (m *MySQLLexerBase) doDateSub() { m.SetType(m.determineFunction(MySQLLexerDATE_SUB_SYMBOL)) }
 func (m *MySQLLexerBase) doExtract() { m.SetType(m.determineFunction(MySQLLexerEXTRACT_SYMBOL)) }
-
 func (m *MySQLLexerBase) doGroupConcat() { m.SetType(m.determineFunction(MySQLLexerGROUP_CONCAT_SYMBOL)) }
 func (m *MySQLLexerBase) doMax() { m.SetType(m.determineFunction(MySQLLexerMAX_SYMBOL)) }
 func (m *MySQLLexerBase) doMid() { m.SetType(m.determineFunction(MySQLLexerSUBSTRING_SYMBOL)) }
@@ -288,6 +288,7 @@ func (m *MySQLLexerBase) doVariance() { m.SetType(m.determineFunction(MySQLLexer
 func (m *MySQLLexerBase) doVarPop() { m.SetType(m.determineFunction(MySQLLexerVARIANCE_SYMBOL)) }
 func (m *MySQLLexerBase) doVarSamp() { m.SetType(m.determineFunction(MySQLLexerVAR_SAMP_SYMBOL)) }
 func (m *MySQLLexerBase) doUnderscoreCharset() { m.SetType(m.checkCharset(m.GetText())) }
+func (m *MySQLLexerBase) doDollarQuotedStringText() bool { return StaticMySQLLexerBase.serverVersion >= 80034 && StaticMySQLLexerBase.supportMle; }
 func (m *MySQLLexerBase) isVersionComment() bool { return m.checkMySQLVersion(m.GetText()) }
 func (m *MySQLLexerBase) isBackTickQuotedId() bool { return ! m.isSqlModeActive(NoBackslashEscapes) }
 func (m *MySQLLexerBase) isDoubleQuotedText() bool { return !m.isSqlModeActive(NoBackslashEscapes) }

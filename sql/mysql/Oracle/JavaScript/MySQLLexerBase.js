@@ -221,167 +221,69 @@ class MySQLLexerBase extends Lexer {
         }
         return t;
     }
-    isServerVersionLt80024() {
-        return this.serverVersion < 80024;
-    }
-    isServerVersionGe80024() {
-        return this.serverVersion >= 80024;
-    }
-    isServerVersionGe80011() {
-        return this.serverVersion >= 80011;
-    }
-    isServerVersionGe80013() {
-        return this.serverVersion >= 80013;
-    }
-    isServerVersionLt80014() {
-        return this.serverVersion < 80014;
-    }
-    isServerVersionGe80014() {
-        return this.serverVersion >= 80014;
-    }
-    isServerVersionGe80017() {
-        return this.serverVersion >= 80017;
-    }
-    isServerVersionGe80018() { return this.serverVersion >= 80018; }
     isMasterCompressionAlgorithm() { return this.serverVersion >= 80018 && this.isServerVersionLt80024(); }
-    isServerVersionLt80031() {
-        return this.serverVersion < 80031;
-    }
-    doLogicalOr() {
-        this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
-    }
-    doIntNumber() {
-        this._type = this.determineNumericType(this.text);
-    }
-    doAdddate() {
-        this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL);
-    }
-    doBitAnd() {
-        this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL);
-    }
-    doBitOr() {
-        this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL);
-    }
-    doBitXor() {
-        this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
-    }
-    doCast() {
-        this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL);
-    }
-    doCount() {
-        this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL);
-    }
-    doCurdate() {
-        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
-    }
-    doCurrentDate() {
-        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
-    }
-    doCurrentTime() {
-        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
-    }
-    doCurtime() {
-        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
-    }
-    doDateAdd() {
-        this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
-    }
-    doDateSub() {
-        this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
-    }
-    doExtract() {
-        this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL);
-    }
-    doGroupConcat() {
-        this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
-    }
-    doMax() {
-        this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL);
-    }
-    doMid() {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-    doMin() {
-        this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL);
-    }
-    doNot() {
-        this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL : MySQLLexer.NOT_SYMBOL;
-    }
-    doNow() {
-        this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL);
-    }
-    doPosition() {
-        this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL);
-    }
-    doSessionUser() {
-        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
-    }
-    doStddevSamp() {
-        this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
-    }
-    doStddev() {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-    doStddevPop() {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-    doStd() {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-    doSubdate() {
-        this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL);
-    }
-    doSubstr() {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-    doSubstring() {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-    doSum() {
-        this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL);
-    }
-    doSysdate() {
-        this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL);
-    }
-    doSystemUser() {
-        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
-    }
-    doTrim() {
-        this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL);
-    }
-    doVariance() {
-        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
-    }
-    doVarPop() {
-        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
-    }
-    doVarSamp() {
-        this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
-    }
-    doUnderscoreCharset() {
-        this._type = this.checkCharset(this.text);
-    }
-    isVersionComment() {
-        return this.checkMySQLVersion(this.text);
-    }
-    isBackTickQuotedId() {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-    isDoubleQuotedText() {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-    isSingleQuotedText() {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-    startInVersionComment() {
-        this.inVersionComment = true;
-    }
-    endInVersionComment() {
-        this.inVersionComment = false;
-    }
-    isInVersionComment() {
-        return this.inVersionComment;
-    }
+    isServerVersionGe80011() { return this.serverVersion >= 80011; }
+    isServerVersionGe80013() { return this.serverVersion >= 80013; }
+    isServerVersionLt80014() { return this.serverVersion < 80014; }
+    isServerVersionGe80014() { return this.serverVersion >= 80014; }
+    isServerVersionGe80016() { return this.serverVersion >= 80016; }
+    isServerVersionGe80017() { return this.serverVersion >= 80017; }
+    isServerVersionGe80018() { return this.serverVersion >= 80018; }
+    isServerVersionLt80021() { return this.serverVersion < 80021; }
+    isServerVersionGe80021() { return this.serverVersion >= 80021; }
+    isServerVersionLt80022() { return this.serverVersion < 80022; }
+    isServerVersionGe80022() { return this.serverVersion >= 80022; }
+    isServerVersionLt80023() { return this.serverVersion < 80023; }
+    isServerVersionGe80023() { return this.serverVersion >= 80023; }
+    isServerVersionLt80024() { return this.serverVersion < 80024; }
+    isServerVersionGe80024() { return this.serverVersion >= 80024; }
+    isServerVersionLt80031() { return this.serverVersion < 80031; }
+    doLogicalOr() { this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR; }
+    doIntNumber() { this._type = this.determineNumericType(this.text); }
+    doAdddate() { this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL); }
+    doBitAnd() { this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL); }
+    doBitOr() { this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL); }
+    doBitXor() { this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL); }
+    doCast() { this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL); }
+    doCount() { this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL); }
+    doCurdate() { this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL); }
+    doCurrentDate() { this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL); }
+    doCurrentTime() { this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL); }
+    doCurtime() { this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL); }
+    doDateAdd() { this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL); }
+    doDateSub() { this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL); }
+    doExtract() { this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL); }
+    doGroupConcat() { this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL); }
+    doMax() { this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL); }
+    doMid() { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    doMin() { this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL); }
+    doNot() { this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL : MySQLLexer.NOT_SYMBOL; }
+    doNow() { this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL); }
+    doPosition() { this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL); }
+    doSessionUser() { this._type = this.determineFunction(MySQLLexer.USER_SYMBOL); }
+    doStddevSamp() { this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL); }
+    doStddev() { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    doStddevPop() { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    doStd() { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    doSubdate() { this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL); }
+    doSubstr() { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    doSubstring() { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    doSum() { this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL); }
+    doSysdate() { this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL); }
+    doSystemUser() { this._type = this.determineFunction(MySQLLexer.USER_SYMBOL); }
+    doTrim() { this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL); }
+    doVariance() { this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
+    doVarPop() { this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
+    doVarSamp() { this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL); }
+    doUnderscoreCharset() { this._type = this.checkCharset(this.text); }
+    doDollarQuotedStringText() { return this.serverVersion >= 80034 && this.supportMle; }
+    isVersionComment() {  return this.checkMySQLVersion(this.text); }
+    isBackTickQuotedId() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    isDoubleQuotedText() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    isSingleQuotedText() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    startInVersionComment() { this.inVersionComment = true; }
+    endInVersionComment() { this.inVersionComment = false; }
+    isInVersionComment() { return this.inVersionComment; }
 }
 _a = MySQLLexerBase;
 _MySQLLexerBase_longString = { value: "2147483647" };

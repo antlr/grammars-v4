@@ -145,11 +145,8 @@ class MySQLLexerBase(Lexer):
             self.justEmitedDot = False
         return t
 
-    def isServerVersionLt80024(self):
-        return self.serverVersion < 80024
-
-    def isServerVersionGe80024(self):
-        return self.serverVersion >= 80024
+    def isMasterCompressionAlgorithm(self):
+        return self.serverVersion >= 80018 and self.isServerVersionLt80024();
 
     def isServerVersionGe80011(self):
         return self.serverVersion >= 80011
@@ -163,14 +160,38 @@ class MySQLLexerBase(Lexer):
     def isServerVersionGe80014(self):
         return self.serverVersion >= 80014
 
+    def isServerVersionGe80016(self):
+        return self.serverVersion >= 80016
+
     def isServerVersionGe80017(self):
         return self.serverVersion >= 80017
 
     def isServerVersionGe80018(self):
         return self.serverVersion >= 80018
 
-    def isMasterCompressionAlgorithm(self):
-        return self.serverVersion >= 80018 and self.isServerVersionLt80024();
+    def isServerVersionLt80021(self):
+        return self.serverVersion < 80021
+
+    def isServerVersionGe80021(self):
+        return self.serverVersion >= 80021
+
+    def isServerVersionLt80022(self):
+        return self.serverVersion < 80022
+
+    def isServerVersionGe80022(self):
+        return self.serverVersion >= 80022
+
+    def isServerVersionLt80023(self):
+        return self.serverVersion < 80023
+
+    def isServerVersionGe80023(self):
+        return self.serverVersion >= 80023
+
+    def isServerVersionLt80024(self):
+        return self.serverVersion < 80024
+
+    def isServerVersionGe80024(self):
+        return self.serverVersion >= 80024
 
     def isServerVersionLt80031(self):
         return self.serverVersion < 80031
@@ -289,6 +310,9 @@ class MySQLLexerBase(Lexer):
 
     def doUnderscoreCharset(self):
         self._type = self.checkCharset(self._text)
+
+    def doDollarQuotedStringText(self):
+        return self.serverVersion >= 80034 and self.supportMle;
 
     def isVersionComment(self):
         return self.checkMySQLVersion(self._text)
