@@ -12,7 +12,8 @@ Includes updates to commit https://github.com/mysql/mysql-shell-plugins/commit/d
 
 ## License
 
-Like all of Oracle's open source, this grammar is released under the GPLv2.
+* [BSD3](https://opensource.org/license/bsd-3-clause)
+* Copyright © 2025, Oracle and/or its affiliates
 
 ## Target Agnostic
 
