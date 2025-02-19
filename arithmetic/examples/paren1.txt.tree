@@ -1,0 +1,1 @@
+(file_ (equation (expression (atom (variable a))) (relop =) (expression (expression ( (expression (expression - (atom (scientific 12.3e-13))) + (expression (atom (scientific 7)))) )) / (expression (atom (variable u))))) <EOF>)

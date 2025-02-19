@@ -16,14 +16,9 @@ function Get-GrammarSkip {
         Write-Host "skip"
         return $True
     }
-    $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
-    if ("$lines" -eq "") {
-        Write-Host "Intentionally skipping grammar $Grammar target $Target."
-        return $True
-    }
     $desc_targets = dotnet trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        Write-Host "Skipping testing of $Grammar."
         return $True
     }
     $desc_targets = $desc_targets -replace '.*='
@@ -39,6 +34,7 @@ function Get-GrammarSkip {
         if ($t -eq '+all') { $yes = $true }
         if ($t -eq "-$target") { $yes = $false }
         if ($t -eq $target) { $yes = $true }
+        if ($t -eq "*") { $yes = $true }
     }
     if (! $yes) { 
         return $True
@@ -56,7 +52,8 @@ enum FailStage {
 function Test-Grammar {
     param (
         $Directory,
-        $Target = "CSharp"
+        $Target = "CSharp",
+	$Generator = "official"
     )
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
@@ -68,9 +65,11 @@ function Test-Grammar {
     $success = $true
     $start = Get-Date
     Write-Host "Building"
+    Write-Host "HOME"
+    Write-Host $HOME
     # codegen
-    Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
-    dotnet trgen -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "dotnet trgen -t $Target -g $Generator --template-sources-directory $templates"
+    dotnet trgen -t $Target -g $Generator --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -229,11 +228,14 @@ function Get-ChangedGrammars {
     )
     $prefix = Get-Location
     $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
+    Write-Host "Diffs are $diff"
     $grammars = Get-Grammars | Resolve-Path -Relative
+    Write-Host "Get-Grammars returned $grammars"
     $changed = @()
     foreach ($d in $diff) {
         $old = Get-Location
         if (!(Test-Path -Path "$d")) {
+            Write-Host "Path $d does not exist. Skip."
             continue
         }
         Set-Location $d
@@ -267,6 +269,7 @@ function Get-ChangedGrammars {
             if ($t -eq '+all') { $yes = $true }
             if ($t -eq "-$target") { $yes = $false }
             if ($t -eq $target) { $yes = $true }
+	    if ($t -eq "*") { $yes = $true }
         }
         if (! $yes) { 
             Set-Location "$old"
@@ -314,9 +317,11 @@ function Test-AllGrammars {
         $Target = "CSharp"
     )
     
-Write-Host "target = $target"
-Write-Host "previouscommit = $PreviousCommit"
-Write-Host "CurrentCommit = $CurrentCommit"
+    Write-Host "target = $target"
+    Write-Host "previouscommit = $PreviousCommit"
+    Write-Host "CurrentCommit = $CurrentCommit"
+
+    $generators = @( "antlr-ng" )
 
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
 
@@ -333,12 +338,14 @@ Write-Host "CurrentCommit = $CurrentCommit"
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Directory $g -Target $Target
-        if (!$state.Success) {
-            $success = $false
-            $failedGrammars += $g
-            $failedCases += $state.FailedCases
-            Write-Host "$g failed" -ForegroundColor Red
+	foreach ($n in $generators) {
+            $state = Test-Grammar -Directory $g -Target $Target -Generator $n
+            if (!$state.Success) {
+                $success = $false
+                $failedGrammars += $g
+                $failedCases += $state.FailedCases
+                Write-Host "$g failed" -ForegroundColor Red
+            }
         }        
     }
     Write-Host "finished in $((Get-Date)-$t)" -ForegroundColor Yellow

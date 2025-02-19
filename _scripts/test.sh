@@ -67,6 +67,7 @@ skipped=""
 grammars=()
 targets=()
 tests=()
+generators=()
 
 # Get "root" of the repo clone.
 cwd=`pwd`
@@ -91,13 +92,11 @@ fi
 prefix=`pwd`
 popd > /dev/null 2>&1
 
-rm -rf `find . -name 'Generated*' -type d`
-
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
 antlr4jar=/tmp/antlr4-complete.jar
-while getopts 'agthf' opt; do
+while getopts 'agnthf' opt; do
     case "$opt" in
         a)
             getopts-extra "$@"
@@ -118,6 +117,13 @@ while getopts 'agthf' opt; do
                 targets+=( "$a" )
             done
             ;;
+	n)
+            getopts-extra "$@"
+            for a in "${OPTARG[@]}"
+            do
+                generators+=( "$a" )
+            done
+	    ;;
         o)
             order="$OPTARG"
             ;;
@@ -237,7 +243,7 @@ elif [ "$filter" == "all" ]
 then
     grammars=()
     # Test grammars for the enclosing directories.
-    directories=`find . -name desc.xml | sed 's#/desc.xml##' | sort -u`
+    directories=`find . -name desc.xml | sed 's#/desc.xml##' | grep -v 'Generated-*' | sort -u`
     for g in $directories
     do
         pushd $g > /dev/null 2>&1
@@ -270,20 +276,39 @@ if [ "$targets" == "" ]
 then
     targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
 fi
+if [ "$generators" == "" ]
+then
+    generators=( antlr-ng )
+fi
 
 echo grammars = ${grammars[@]}
 echo targets = ${targets[@]}
 echo order = $order
 echo filter = $filter
+echo generators = ${generators[@]}
 
-# Compute cross product
+# Set up the antlr-ng tool. This is done in a common area in order
+# to eliminate the npm dependence to the antlr-ng package, and
+# just use tags and git.
+
+
+# Compute cross product of "grammar x target x generator"
+# Note, some combinations cannot happen, so try to eliminate those
+# immediately from consideration.
+#
+# The result is "tests", an array of strings with comma separators
+# between each of the elements of the tuple.
 for g in ${grammars[@]}
 do
     for t in ${targets[@]}
     do
-        tests+=( "$g,$t" )
+	for n in ${generators[@]}
+	do
+	    tests+=( "$g,$t,$n" )
+        done
     done
 done
+echo ${tests[@]}
 
 # Sort the list of <grammar, target> tuples if needed.
 if [[ "$order" == "grammars" ]]; then sorted="1"; else sorted="2"; fi
@@ -297,10 +322,11 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=${all[0]}
     target=${all[1]}
+    generator=${all[2]}
     pushd "$prefix/$testname" > /dev/null
 
     echo ""
-    echo "$testname,$target:"
+    echo "$testname,$target,$generator:"
 
     if [ ! -f desc.xml ]
     then
@@ -324,6 +350,7 @@ do
         if [ "$t" == "+all" ]; then yes=true; fi
         if [ "$t" == "-$target" ]; then yes=false; fi
         if [ "$t" == "$target" ]; then yes=true; fi
+	if [ "$t" == "*" ]; then yes=true; fi
     done
 
     if [ "$yes" == "false" ]
@@ -347,9 +374,12 @@ do
 
     # Generate driver source code.
 
-    if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
-    for i in $bad; do failed+=( "$testname/$target" ); done
+    if [ $quiet != "true" ] ; then echo "Generating driver for $testname."; fi
+
+    rm -rf `find . -name "Generated-$target*" -type d`
+    echo dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+    dotnet trgen -t "$target" -g "$generator" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+    if [ "$?" != "0" ] ; then failed+=( "$testname/$target" ); continue; fi
 
     for d in `echo Generated-$target-* Generated-$target`
     do
@@ -412,3 +442,4 @@ then
 else
     exit 1
 fi
+
