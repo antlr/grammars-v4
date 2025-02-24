@@ -8,9 +8,12 @@ https://github.com/mysql/mysql-shell-plugins/tree/8928ada7d9e37a4075291880738983
 
 This grammar is set to recognize version "8.0.200".
 
+Includes updates to commit https://github.com/mysql/mysql-shell-plugins/commit/d0271b1244d9686c30ce95bae92f4cf4c135d36d.
+
 ## License
 
-Like all of Oracle's open source, this grammar is released under the GPLv2.
+* [BSD3](https://opensource.org/license/bsd-3-clause)
+* Copyright © 2025, Oracle and/or its affiliates
 
 ## Target Agnostic
 

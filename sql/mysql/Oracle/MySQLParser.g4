@@ -1,7 +1,7 @@
 parser grammar MySQLParser;
 
 /*
- * Copyright © 2024, Oracle and/or its affiliates
+ * Copyright © 2025, Oracle and/or its affiliates
  */
 
 /*
