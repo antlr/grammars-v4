@@ -135,11 +135,11 @@ actionScopeName
     ;
 
 actionBlock
-    : BEGIN_ACTION ACTION_CONTENT* END_ACTION
+    : BEGIN_ACTION ACTION_CONTENT*? END_ACTION
     ;
 
 argActionBlock
-    : BEGIN_ARGUMENT ARGUMENT_CONTENT* END_ARGUMENT
+    : BEGIN_ARGUMENT ARGUMENT_CONTENT*? END_ARGUMENT
     ;
 
 modeSpec
@@ -302,7 +302,7 @@ element
     : labeledElement (ebnfSuffix |)
     | atom (ebnfSuffix |)
     | ebnf
-    | actionBlock (QUESTION predicateOptions?)?
+    | actionBlock QUESTION? predicateOptions?
     ;
 
 predicateOptions
