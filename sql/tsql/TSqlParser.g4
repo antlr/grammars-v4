@@ -5120,6 +5120,7 @@ full_table_name
         | database = id_ '.' schema = id_? '.'
         | schema = id_ '.'
     )? table = id_
+    | openquery
     ;
 
 table_name
