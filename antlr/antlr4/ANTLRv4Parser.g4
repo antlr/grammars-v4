@@ -184,7 +184,7 @@ ruleReturns
 // --------------
 // Exception spec
 throwsSpec
-    : THROWS identifier (COMMA identifier)*
+    : THROWS qualifiedIdentifier (COMMA qualifiedIdentifier)*
     ;
 
 localsSpec
@@ -311,7 +311,7 @@ predicateOptions
 
 predicateOption
     : elementOption
-    | identifier ASSIGN actionBlock
+    | identifier ASSIGN (actionBlock | INT | STRING_LITERAL)
     ;
 
 labeledElement
@@ -340,14 +340,18 @@ lexerAtom
     | terminalDef
     | notSet
     | LEXER_CHAR_SET
-    | DOT elementOptions?
+    | wildcard
     ;
 
 atom
     : terminalDef
     | ruleref
     | notSet
-    | DOT elementOptions?
+    | wildcard
+    ;
+
+wildcard
+    : DOT elementOptions?
     ;
 
 // --------------------
@@ -398,11 +402,15 @@ elementOptions
     ;
 
 elementOption
-    : identifier
-    | identifier ASSIGN (identifier | STRING_LITERAL)
+    : qualifiedIdentifier
+    | identifier ASSIGN (qualifiedIdentifier | STRING_LITERAL | INT)
     ;
 
 identifier
     : RULE_REF
     | TOKEN_REF
+    ;
+
+qualifiedIdentifier
+    : identifier (DOT identifier)*
     ;
