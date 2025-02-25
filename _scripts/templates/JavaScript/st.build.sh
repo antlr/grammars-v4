@@ -9,8 +9,16 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 version=`grep antlr4 package.json | awk '{print $2}' | tr -d '"' | tr -d ',' | tr -d '\r' | tr -d '\n'`
 
+<if(antlrng_tool)>
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
+<if(antlrng_tool)>
+tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<else>
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=JavaScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<endif>
 } >
 
 npm install

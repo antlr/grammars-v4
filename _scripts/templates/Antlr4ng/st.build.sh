@@ -1,5 +1,6 @@
 # Generated from trgen <version>
 set -e
+set -x
 rm -rf node_modules package-lock.json
 npm install -g typescript ts-node
 npm install
@@ -12,8 +13,12 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 version=`grep antlr4 package.json | awk '{print $2}' | tr -d '"' | tr -d ',' | tr -d '\r' | tr -d '\n'`
 
+ls node_modules
+ls node_modules/.bin
+find . -name '*.ps1'
+
 <tool_grammar_tuples:{x |
-java -jar ./node_modules/antlr4ng-cli/*.jar -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
 } >
 
 tsc -p tsconfig.json --pretty
