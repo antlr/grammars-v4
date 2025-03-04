@@ -11,9 +11,9 @@ version=`dotnet trxml2 Other.csproj | fgrep 'PackageReference/@Version' | awk -F
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
-tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <else>
-antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=CSharp <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 } >
 

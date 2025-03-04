@@ -96,7 +96,7 @@ else()
       antlr4_runtime
       PREFIX <temp_dir>/antlr4_runtime
       GIT_REPOSITORY ${ANTLR4_GIT_REPOSITORY}
-      GIT_TAG ${ANTLR4_TAG}
+      GIT_TAG df4d68c09cdef73e023b8838a8bc7ca4dff1d1de # ${ANTLR4_TAG}
       DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
       BUILD_COMMAND ""
       BUILD_IN_SOURCE 1
