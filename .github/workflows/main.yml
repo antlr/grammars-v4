@@ -58,6 +58,7 @@ jobs:
         arch
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
+        export
     - name: Checkout
       uses: actions/checkout@v4
       with:
@@ -149,6 +150,16 @@ jobs:
       shell: bash
       run: |
         dotnet trgen --help
+    - name: Install Antlr-ng
+      shell: pwsh
+      run: |
+        cd $HOME
+        git clone https://github.com/mike-lischke/antlr-ng.git
+        cd antlr-ng
+        echo HOME $HOME
+        git checkout 4975d4a7b556e34c38c2e53b9815c8c4c802236f
+        npm i
+        npm run build
     - name: Test
       shell: pwsh
       run: |
