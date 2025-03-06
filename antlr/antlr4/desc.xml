@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
    <targets>CSharp;Java;JavaScript</targets>
-   <grammar-files>ANTLRv4Lexer.g4;ANTLRv4Parser.g4</grammar-files>
+   <!-- NB: TypeScript port does not exist because there isn't access
+   to modeStack.length! -->
 </desc>
