@@ -59,6 +59,9 @@ export abstract class LexerAdaptor extends Lexer {
         } else if (this.type === ANTLRv4Lexer.SEMI
             && this.currentRuleType === LexerAdaptor.OPTIONS_CONSTRUCT) {
             // ';' in options { .... }. Don't change anything.
+        } else if (this.type == ANTLRv4Lexer.END_ACTION && this.currentRuleType == ANTLRv4Lexer.AT) {
+            // exit action
+            this.currentRuleType = Token.INVALID_TYPE;
         } else if (this.type === ANTLRv4Lexer.ID) {
             const firstChar = this.inputStream.getTextFromRange(this.tokenStartCharIndex, this.tokenStartCharIndex);
             const c = firstChar.charAt(0);
