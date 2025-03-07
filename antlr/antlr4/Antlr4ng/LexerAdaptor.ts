@@ -97,5 +97,17 @@ export abstract class LexerAdaptor extends Lexer {
         }
     }
 
+    protected handleEndAction(): void
+    {
+        var oldMode = this.mode;
+        var newMode = this.popMode();
+        var isActionWithinAction = this.modeStack.length > 0
+           && newMode == ANTLRv4Lexer.TargetLanguageAction
+           && oldMode == newMode;
+
+        if (isActionWithinAction) {
+            this.type = ANTLRv4Lexer.ACTION_CONTENT;
+        }
+    }
 }
 
