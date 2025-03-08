@@ -58,8 +58,6 @@ public abstract class LexerAdaptor extends Lexer {
      */
     private int _currentRuleType = Token.INVALID_TYPE;
 
-    private boolean insideOptionsBlock = false;
-
     public int getCurrentRuleType() {
         return _currentRuleType;
     }
@@ -145,7 +143,6 @@ public abstract class LexerAdaptor extends Lexer {
     @Override
     public void reset() {
         setCurrentRuleType(Token.INVALID_TYPE);
-        insideOptionsBlock = false;
         super.reset();
     }   
 }

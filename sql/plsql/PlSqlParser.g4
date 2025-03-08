@@ -81,6 +81,7 @@ unit_statement
     | create_cluster
     | create_context
     | create_controlfile
+    | create_schema
     | create_database
     | create_database_link
     | create_dimension
@@ -4582,6 +4583,11 @@ password_value
 
 link_authentication
     : AUTHENTICATED BY user_object_name IDENTIFIED BY password_value
+    ;
+
+//https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/CREATE-SCHEMA.html
+create_schema
+    : CREATE SCHEMA AUTHORIZATION schema_name (create_table | create_view | grant_statement)*
     ;
 
 // added by zrh
