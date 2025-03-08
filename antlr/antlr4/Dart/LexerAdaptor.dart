@@ -77,14 +77,16 @@ abstract class LexerAdaptor extends Lexer
     void handleEndArgument()
     {
         popMode();
-	bool empty = false;
+	bool notempty = true;
+	var zzz = mode_;
 	try {
 		var xxx = popMode();
 		pushMode(xxx);
 	} catch (error, stackTrace) {
-		empty = true;
+		notempty = true;
 	}
-        if (!empty)
+	mode_ = zzz;
+        if (notempty)
         {
             type = ANTLRv4Lexer.TOKEN_ARGUMENT_CONTENT;
         }
@@ -94,14 +96,16 @@ abstract class LexerAdaptor extends Lexer
     {
         var oldMode = mode_;
         var newMode = popMode();
-	bool empty = false;
+	bool notempty = true;
+	var zzz = mode_;
 	try {
 		var xxx = popMode();
 		pushMode(xxx);
 	} catch (error, stackTrace) {
-		empty = true;
+		notempty = true;
 	}
-        if ((!empty) && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
+	mode_ = zzz;
+        if (notempty && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
         {
             type = ANTLRv4Lexer.TOKEN_ACTION_CONTENT;
         }
