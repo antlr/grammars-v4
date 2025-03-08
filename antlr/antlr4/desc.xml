@@ -3,5 +3,13 @@
    <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
    <!-- NB: TypeScript port does not exist because there isn't access
    to modeStack.length! -->
-   <inputs>examples/**/*.g4</inputs>
+   <test>
+      <!-- Subdivide fast ports from slow ports. -->
+      <targets>Cpp;CSharp;Dart;Java;</targets>
+      <inputs>examples/**/*.g4</inputs>
+   </test>
+   <test>
+      <targets>Antlr4ng;JavaScript;Python3;TypeScript</targets>
+      <inputs>examples/*.g4</inputs>
+   </test>
 </desc>
