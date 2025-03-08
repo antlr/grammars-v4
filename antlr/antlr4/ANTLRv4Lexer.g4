@@ -54,6 +54,7 @@ options {
     tokenVocab = predefined;
 }
 
+// Insert here @header for lexer.
 
 // Standard set of fragments
 tokens {
