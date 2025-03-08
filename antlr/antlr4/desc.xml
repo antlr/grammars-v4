@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
-   <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript</targets>
+   <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
    <!-- NB: TypeScript port does not exist because there isn't access
    to modeStack.length! -->
 </desc>
