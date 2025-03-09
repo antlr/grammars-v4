@@ -30,15 +30,16 @@ classifier
     : classDefinition
     | interfaceDefinition
     | usecaseDefinition
+    | datatypeDefinition
     | enumeration
     ;
 
 interfaceDefinition
-    : 'interface' ID ('extends' ID)? '{' classBody? '}'
+    : 'interface' identifier ('extends' identifier)? '{' classBody? '}'
     ;
 
 classDefinition
-    : 'class' ID ('extends' ID)? ('implements' idList)? '{' classBody? '}'
+    : 'class' identifier ('extends' identifier)? ('implements' idList)? '{' classBody? '}'
     ;
 
 classBody
@@ -53,14 +54,12 @@ classBodyElement
     ;
 
 attributeDefinition
-    : 'attribute' ID ('identity' | 'derived')? ':' type ';'
-    | 'static' 'attribute' ID ':' type ';'
+    : 'attribute' identifier ('identity' | 'derived')? ':' type ';'
+    | 'static' 'attribute' identifier ':' type ';'
     ;
 
 operationDefinition
-    : ('static')? 'operation' ID '(' parameterDeclarations? ')' ':' type 'pre:' expression 'post:' expression (
-        'activity:' statement
-    )? ';'
+    : ('static')? 'operation' identifier '(' parameterDeclarations? ')' ':' type 'pre:' expression 'post:' expression ('activity:' statementList)? ';'
     ;
 
 parameterDeclarations
@@ -68,16 +67,16 @@ parameterDeclarations
     ;
 
 parameterDeclaration
-    : ID ':' type
+    : identifier ':' type
     ;
 
 idList
-    : (ID ',')* ID
+    : (identifier ',')* identifier
     ;
 
 usecaseDefinition
-    : 'usecase' ID (':' type)? '{' usecaseBody? '}'
-    | 'usecase' ID '(' parameterDeclarations ')' (':' type)? '{' usecaseBody? '}'
+    : 'usecase' identifier (':' type)? '{' usecaseBody? '}'
+    | 'usecase' identifier '(' parameterDeclarations ')' (':' type)? '{' usecaseBody? '}'
     ;
 
 usecaseBody
@@ -85,11 +84,11 @@ usecaseBody
     ;
 
 usecaseBodyElement
-    : 'parameter' ID ':' type ';'
+    : 'parameter' identifier ':' type ';'
     | 'precondition' expression ';'
-    | 'extends' ID ';'
-    | 'extendedBy' ID ';'
-    | 'activity:' statement ';'
+    | 'extends' identifier ';'
+    | 'extendedBy' identifier ';'
+    | 'activity:' statementList ';'
     | '::' expression
     | stereotype
     ;
@@ -99,17 +98,22 @@ invariant
     ;
 
 stereotype
-    : 'stereotype' ID ';'
-    | 'stereotype' ID '=' STRING_LITERAL ';'
-    | 'stereotype' ID '=' ID ';'
+    : 'stereotype' identifier ';'
+    | 'stereotype' identifier '=' STRING1_LITERAL ';'
+    | 'stereotype' identifier '=' STRING2_LITERAL ';'
+    | 'stereotype' identifier '=' identifier ';'
     ;
 
+datatypeDefinition
+      : 'datatype' identifier '=' type
+      ; 
+
 enumeration
-    : 'enumeration' ID '{' enumerationLiteral+ '}'
+    : 'enumeration' identifier '{' enumerationLiteral+ '}'
     ;
 
 enumerationLiteral
-    : 'literal' ID
+    : 'literal' identifier
     ;
 
 type
@@ -117,9 +121,10 @@ type
     | 'Set' '(' type ')'
     | 'Bag' '(' type ')'
     | 'OrderedSet' '(' type ')'
+    | 'Ref' '(' type ')'  
     | 'Map' '(' type ',' type ')'
     | 'Function' '(' type ',' type ')'
-    | ID
+    | identifier
     ;
 
 expressionList
@@ -143,7 +148,8 @@ basicExpression
     | ID '@pre'
     | INT
     | FLOAT_LITERAL
-    | STRING_LITERAL
+    | STRING1_LITERAL
+    | STRING2_LITERAL
     | ID
     | '(' expression ')'
     ;
@@ -153,7 +159,7 @@ conditionalExpression
     ;
 
 lambdaExpression
-    : 'lambda' ID ':' type 'in' expression
+    : 'lambda' identifier ':' type 'in' expression
     ;
 
 // A let is just an application of a lambda:
@@ -194,7 +200,7 @@ factorExpression
 // ->subrange is used for ->substring and ->subSequence
 
 factor2Expression
-    : ('-' | '+') factor2Expression
+    : ('-' | '+' | '?' | '!') factor2Expression
     | factor2Expression '->size()'
     | factor2Expression '->copy()'
     | factor2Expression (
@@ -244,6 +250,7 @@ factor2Expression
     | factor2Expression '->toInteger()'
     | factor2Expression '->toReal()'
     | factor2Expression '->toBoolean()'
+    | factor2Expression '->display()' 
     | factor2Expression '->toUpperCase()'
     | factor2Expression '->toLowerCase()'
     | factor2Expression ('->unionAll()' | '->intersectAll()' | '->concatenateAll()')
@@ -322,8 +329,13 @@ statement
     | statement ';' statement
     | 'execute' expression
     | 'call' basicExpression
-    | '(' statement ')'
+    | '(' statementList ')'
     ;
+
+
+statementList
+   : statement (';' statement)*  
+   ;  
 
 identifier
     : ID
@@ -333,9 +345,12 @@ FLOAT_LITERAL
     : Digits '.' Digits
     ;
 
-STRING_LITERAL
+STRING1_LITERAL
     : '"' (~["\\\r\n] | EscapeSequence)* '"'
     ;
+
+STRING2_LITERAL
+    : '\'' (~['\\\r\n] | EscapeSequence)* '\'';
 
 NULL_LITERAL
     : 'null'
@@ -348,7 +363,7 @@ MULTILINE_COMMENT
 fragment EscapeSequence
     : '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
-    | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
 fragment HexDigits
@@ -372,7 +387,7 @@ INT
     ;
 
 ID
-    : [a-zA-Z$]+ [a-zA-Z0-9_$]*
+    : [a-zA-Z_$]+ [a-zA-Z0-9_$]*
     ; // match identifiers
 
 WS
