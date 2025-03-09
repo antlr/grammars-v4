@@ -239,31 +239,31 @@ function Get-ChangedGrammars {
         Set-Location $d
         while ($True) {
             if (Test-Path -Path "desc.xml" -PathType Leaf) {
-		Write-Host "break"
+		# Write-Host "break"
                 break
             }
             $cwd = Get-Location
             if ("$cwd" -eq "$prefix") {
-		Write-Host "break"
+		# Write-Host "break"
                 break
             }
             $newloc = Get-Location | Split-Path
             Set-Location "$newloc"
-	    Write-Host "in loop"
-	    Write-Host "At dir $newloc"
+	    # Write-Host "in loop"
+	    # Write-Host "At dir $newloc"
         }
         # g=${g##*$prefix/} not needed.
         if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
             Write-Host "No desc.xml for $d"
             Set-Location "$old"
-	    Write-Host "At1 $old"
+	    # Write-Host "At1 $old"
             continue
         }
         $desc_targets = dotnet trxml2 desc.xml | Select-String '/desc/targets'
         if ($LASTEXITCODE -ne 0) {
             Write-Host "The desc.xml for $testname is malformed. Skipping."
             Set-Location "$old"
-	    Write-Host "At2 $old"
+	    # Write-Host "At2 $old"
             continue
         }
         $desc_targets = $desc_targets -replace '.*='
@@ -276,7 +276,7 @@ function Get-ChangedGrammars {
         }
         if (! $yes) { 
             Set-Location "$old"
-	    Write-Host "At3 $old"
+	    # Write-Host "At3 $old"
             continue
         }
         $g = Get-Location
@@ -287,7 +287,7 @@ function Get-ChangedGrammars {
         $g = "./" + $g
 	if ($changed -contains $g) {
 		# $g is already in the $changed array
-		Write-Host "$g is already in $changed"
+		# Write-Host "$g is already in $changed"
 		continue
 	} else {
 		# $g is not yet in $changed
