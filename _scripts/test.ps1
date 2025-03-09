@@ -247,6 +247,7 @@ function Get-ChangedGrammars {
             }
             $newloc = Get-Location | Split-Path
             Set-Location "$newloc"
+	    Write-Host "in loop"
         }
         # g=${g##*$prefix/} not needed.
         if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
@@ -281,6 +282,7 @@ function Get-ChangedGrammars {
         Write-Host "Adding diff $g"
         $changed += $g
     }
+    Write-Host "Finished Get-ChangedGrammars"
     return $changed | Get-Unique
 }
 
