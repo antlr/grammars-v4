@@ -287,7 +287,7 @@ function Get-ChangedGrammars {
         $g = "./" + $g
 	if ($changed -contains $g) {
 		# $g is already in the $changed array
-		Write-Host "$g is already in `\$changed`"
+		Write-Host "$g is already in $changed"
 		continue
 	} else {
 		# $g is not yet in $changed
