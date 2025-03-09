@@ -285,8 +285,15 @@ function Get-ChangedGrammars {
         $g = $g -replace "\\","/"
         $g = $g -replace "$pattern/",""
         $g = "./" + $g
-        Write-Host "Adding diff $g"
-        $changed += $g
+	if ($changed -contains $g) {
+		# $g is already in the $changed array
+		Write-Host "$g is already in `\$changed`"
+		continue
+	} else {
+		# $g is not yet in $changed
+		Write-Host "Adding diff $g"
+		$changed += $g
+	}
     }
     Write-Host "Finished Get-ChangedGrammars"
     return $changed | Get-Unique
