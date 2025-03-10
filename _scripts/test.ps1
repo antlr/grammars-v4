@@ -251,7 +251,6 @@ function Get-GitChangedDirectories {
 	}
     }
     Write-Host "results $results"
-exit
 
     return $results
 }
