@@ -219,9 +219,10 @@ function Get-GitChangedDirectories {
     foreach ($item in $diff) {
         $dirs += Join-Path "." $item
     }
+    Write-Host "dirs $dirs"
 
-    $newdirs1 = $dirs | Split-Path | Get-Unique
-    Write-Host "newdirs1 = $newdirs1"
+    $newdirs = $dirs | Split-Path | Get-Unique
+    Write-Host "newdirs = $newdirs"
 
     # Find all grammar directories (i.e., enclosing directory containing
     # a desc.xml). Then, find all grammar directories that are changed
@@ -241,7 +242,7 @@ function Get-GitChangedDirectories {
     # git dirs changed.
     $results = @()
     foreach ($gdir in $gdirs) {
-	foreach ($dir in $dirs) {
+	foreach ($dir in $newdirs) {
 		# Check either exact match or if $gdir + '\' is the start of $dir
 		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\")) {
 			$results += $gdir
@@ -250,6 +251,7 @@ function Get-GitChangedDirectories {
 	}
     }
     Write-Host "results $results"
+exit
 
     return $results
 }
