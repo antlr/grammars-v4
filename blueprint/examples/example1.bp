@@ -1,0 +1,25 @@
+// comment
+cc_binary {
+    name: "example1",
+    srcs: [
+        "example1.c",
+        "example2.c",
+    ],
+    cflags: ["-Wall"],
+}
+
+foo = "bar"
+
+/*
+ * comments
+ * comments
+ */
+cc_library {
+    name: "example2",
+    enable: select((arch(), os()), {
+		(any @ bar, default): true,
+	}),
+	foobar: {
+	    value: foo + "bar",
+	},
+}
