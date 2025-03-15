@@ -83,7 +83,7 @@ abstract class LexerAdaptor extends Lexer
 		var xxx = popMode();
 		pushMode(xxx);
 	} catch (error, stackTrace) {
-		notempty = true;
+		notempty = false;
 	}
 	mode_ = zzz;
         if (notempty)
@@ -102,7 +102,7 @@ abstract class LexerAdaptor extends Lexer
 		var xxx = popMode();
 		pushMode(xxx);
 	} catch (error, stackTrace) {
-		notempty = true;
+		notempty = false;
 	}
 	mode_ = zzz;
         if (notempty && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
