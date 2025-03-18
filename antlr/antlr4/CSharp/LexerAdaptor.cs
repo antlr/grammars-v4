@@ -93,17 +93,6 @@ public abstract class LexerAdaptor : Lexer
         }
     }
 
-    protected void handleEndAction()
-    {
-        var oldMode = CurrentMode;
-        var newMode = PopMode();
-
-        if (ModeStack.Count > 0 && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
-        {
-            Type = ANTLRv4Lexer.ACTION_CONTENT;
-        }
-    }
-
     private bool InLexerRule
     {
         get { return CurrentRuleType == ANTLRv4Lexer.TOKEN_REF; }
@@ -137,9 +126,9 @@ public abstract class LexerAdaptor : Lexer
         else if (Type == ANTLRv4Lexer.SEMI && CurrentRuleType == OPTIONS_CONSTRUCT)
         { // ';' in options { .... }. Don't change anything.
         }
-        else if (Type == ANTLRv4Lexer.END_ACTION && CurrentRuleType == ANTLRv4Lexer.AT)
+        else if (Type == ANTLRv4Lexer.ACTION && CurrentRuleType == ANTLRv4Lexer.AT)
         {
-            // exit action
+            // Exit action
             CurrentRuleType = TokenConstants.InvalidType;
         }
         else if (Type == ANTLRv4Lexer.ID)
