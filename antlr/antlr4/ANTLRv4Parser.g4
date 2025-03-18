@@ -135,7 +135,7 @@ actionScopeName
     ;
 
 actionBlock
-    : BEGIN_ACTION ACTION_CONTENT*? END_ACTION
+    : ACTION
     ;
 
 argActionBlock
