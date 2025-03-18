@@ -61,7 +61,7 @@ class LexerAdaptor(Lexer):
         otherwise, it's a normal argument list and we switch to Argument mode.
         """
         if self.inLexerRule():
-            self.pushMode(3); # NB!!!!!!!!!: hardwire ANTLRv4Parser.LexerCharSet)
+            self.pushMode(2); # NB!!!!!!!!!: hardwire ANTLRv4Parser.LexerCharSet)
             self.more()
         else:
             self.pushMode(1); # NB!!!!!!!!!: hardwire ANTLRv4Lexer.Argument)
