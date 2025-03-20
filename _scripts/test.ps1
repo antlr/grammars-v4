@@ -207,7 +207,9 @@ function Get-GitChangedDirectories {
         Write-Error "which commit to diff?"
         exit 1
     }
-    $diff = git diff $PreviousCommit $CurrentCommit --name-only | Where-Object { $_ -notmatch "_scripts" -and $_ -notmatch "\.github" }
+
+    # Find all directories that changed.
+    $diff = git diff $PreviousCommit $CurrentCommit --name-only | Where-Object { $_ -notmatch "_scripts" -and $_ -notmatch "\.github" -and $_ -notmatch "\.git"}
 
     if ($diff -is "string") {
         $diff = @($diff)
@@ -217,9 +219,40 @@ function Get-GitChangedDirectories {
     foreach ($item in $diff) {
         $dirs += Join-Path "." $item
     }
+    Write-Host "dirs $dirs"
 
     $newdirs = $dirs | Split-Path | Get-Unique
-    return $newdirs
+    Write-Host "newdirs = $newdirs"
+
+    # Find all grammar directories (i.e., enclosing directory containing
+    # a desc.xml). Then, find all grammar directories that are changed
+    # by considering all changes.
+    
+    $gdirs = Get-ChildItem -Path . -Filter desc.xml -Recurse | 
+	ForEach-Object {
+		# Get the relative path
+		$relativePath = Resolve-Path -LiteralPath $_.FullName -Relative
+
+		# Strip off "desc.xml" by getting just the parent directory
+		[System.IO.Path]::GetDirectoryName($relativePath)
+	}
+    Write-Host "gdirs $gdirs"
+
+    # Find all grammar directories that are on each path in the list of
+    # git dirs changed.
+    $results = @()
+    foreach ($gdir in $gdirs) {
+	foreach ($dir in $newdirs) {
+		# Check either exact match or if $gdir + '\' is the start of $dir
+		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\")) {
+			$results += $gdir
+			break  # No need to check more once we find a match
+		}
+	}
+    }
+    Write-Host "results $results"
+
+    return $results
 }
 
 function Get-ChangedGrammars {
@@ -228,59 +261,8 @@ function Get-ChangedGrammars {
         $CurrentCommit = "HEAD"
     )
     $prefix = Get-Location
-    $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
-    $grammars = Get-Grammars | Resolve-Path -Relative
-    $changed = @()
-    foreach ($d in $diff) {
-        $old = Get-Location
-        if (!(Test-Path -Path "$d")) {
-            continue
-        }
-        Set-Location $d
-        while ($True) {
-            if (Test-Path -Path "desc.xml" -PathType Leaf) {
-                break
-            }
-            $cwd = Get-Location
-            if ("$cwd" -eq "$prefix") {
-                break
-            }
-            $newloc = Get-Location | Split-Path
-            Set-Location "$newloc"
-        }
-        # g=${g##*$prefix/} not needed.
-        if (! (Test-Path -Path "desc.xml" -PathType Leaf)) {
-            Write-Host "No desc.xml for $d"
-            Set-Location "$old"
-            continue
-        }
-        $desc_targets = dotnet trxml2 desc.xml | Select-String '/desc/targets'
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "The desc.xml for $testname is malformed. Skipping."
-            Set-Location "$old"
-            continue
-        }
-        $desc_targets = $desc_targets -replace '.*='
-        $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
-        $yes = $false
-        foreach ($t in $desc_targets.Split(' ')) {
-            if ($t -eq '+all') { $yes = $true }
-            if ($t -eq "-$target") { $yes = $false }
-            if ($t -eq $target) { $yes = $true }
-        }
-        if (! $yes) { 
-            Set-Location "$old"
-            continue
-        }
-        $g = Get-Location
-        Set-Location "$old"
-        $pattern = "$prefix" -replace "\\","/"
-        $g = $g -replace "\\","/"
-        $g = $g -replace "$pattern/",""
-        $g = "./" + $g
-        Write-Host "Adding diff $g"
-        $changed += $g
-    }
+    $changed = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
+    Write-Host "Finished Get-ChangedGrammars"
     return $changed | Get-Unique
 }
 

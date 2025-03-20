@@ -6453,7 +6453,7 @@ unary_expression
     | /*TODO {input.LT(1).getText().equalsIgnoreCase("new") && !input.LT(2).getText().equals(".")}?*/ NEW unary_expression
     | DISTINCT unary_expression
     | ALL unary_expression
-    | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_statement /*[false]*/
+    | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_expression
     | unary_expression '.' (
         (COUNT | FIRST | LAST | LIMIT)
         | (EXISTS | NEXT | PRIOR) '(' index += expression ')'
@@ -6476,35 +6476,49 @@ collection_expression
     : collation_name '(' expression ')' ('.' general_element_part)*
     ;
 
-case_statement /*TODO [boolean isStatementParameter]
-TODO scope    {
-    boolean isStatement;
-}
-@init    {$case_statement::isStatement = $isStatementParameter;}*/
+// CASE statement
+case_statement
     : searched_case_statement
     | simple_case_statement
     ;
 
-// CASE
-
 simple_case_statement
-    : label_declaration? ck1 = CASE expression simple_case_when_part+ case_else_part? END CASE? label_name?
-    ;
-
-simple_case_when_part
-    : WHEN expression THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
+    : label_declaration? ck1 = CASE expression case_when_part_statement+ case_else_part_statement? END CASE? label_name?
     ;
 
 searched_case_statement
-    : label_declaration? ck1 = CASE searched_case_when_part+ case_else_part? END CASE? label_name?
+    : label_declaration? ck1 = CASE case_when_part_statement+ case_else_part_statement? END CASE? label_name?
     ;
 
-searched_case_when_part
-    : WHEN condition THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
+case_when_part_statement
+    : WHEN expression THEN seq_of_statements
     ;
 
-case_else_part
-    : ELSE (/*{$case_statement::isStatement}?*/ seq_of_statements | expression)
+case_else_part_statement
+    : ELSE seq_of_statements
+    ;
+
+
+// CASE expression
+case_expression
+    : searched_case_expression
+    | simple_case_expression
+    ;
+
+simple_case_expression
+    : ck1 = CASE expression case_when_part_expression+ case_else_part_expression? END CASE?
+    ;
+
+searched_case_expression
+    : ck1 = CASE case_when_part_expression+ case_else_part_expression? END CASE?
+    ;
+
+case_when_part_expression
+    : WHEN expression THEN expression
+    ;
+
+case_else_part_expression
+    : ELSE expression
     ;
 
 atom
