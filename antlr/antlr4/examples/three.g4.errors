@@ -1,1 +1,1 @@
-line 4:0 mismatched input '<EOF>' expecting {'grammar', 'lexer', 'parser'}
+line 4:0 mismatched input '<EOF>' expecting {'lexer', 'parser', 'grammar'}

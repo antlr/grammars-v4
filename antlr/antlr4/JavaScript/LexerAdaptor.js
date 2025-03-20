@@ -56,19 +56,6 @@ export default class LexerAdaptor extends antlr4.Lexer
         }
     }
 
-    handleEndAction()
-    {
-        var oldMode = this._mode;
-        var newMode = this.popMode();
-        var isActionWithinAction = this._modeStack.length > 0
-           && newMode == ANTLRv4Lexer.TargetLanguageAction
-           && oldMode == newMode;
-
-        if (isActionWithinAction) {
-            this._type = ANTLRv4Lexer.ACTION_CONTENT;
-        }
-    }
-
     emit()
     {
         if ((this._type == ANTLRv4Lexer.OPTIONS || this._type == ANTLRv4Lexer.TOKENS || this._type == ANTLRv4Lexer.CHANNELS)
@@ -83,7 +70,7 @@ export default class LexerAdaptor extends antlr4.Lexer
         } else if (this._type == ANTLRv4Lexer.AT && this.getCurrentRuleType() == antlr4.Token.INVALID_TYPE) { // enter action
             this.setCurrentRuleType(ANTLRv4Lexer.AT);
         } else if (this._type == ANTLRv4Lexer.SEMI && this.getCurrentRuleType() == this.OPTIONS_CONSTRUCT) { // ';' in options { .... }. Don't change anything.
-        } else if (this._type == ANTLRv4Lexer.END_ACTION && this.getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
+        } else if (this._type == ANTLRv4Lexer.ACTION && this.getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
             this.setCurrentRuleType(antlr4.Token.INVALID_TYPE);
         } else if (this._type == ANTLRv4Lexer.ID) {
             var firstChar = this._input.getText(this._tokenStartCharIndex, this._tokenStartCharIndex);

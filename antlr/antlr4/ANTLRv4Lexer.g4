@@ -116,10 +116,35 @@ BEGIN_ARGUMENT
     : '[' { this.handleBeginArgument(); }
     ;
 
-// -------------------------
-// Target Language Actions
-BEGIN_ACTION
-    : '{' -> pushMode (TargetLanguageAction)
+// Many language targets use {} as block delimiters and so we
+// must recursively match {} delimited blocks to balance the
+// braces. Additionally, we must make some assumptions about
+// literal string representation in the target language. We assume
+// that they are delimited by ' or " and so consume these
+// in their own alts so as not to inadvertently match {}.
+ACTION
+    : NESTED_ACTION
+    ;
+
+fragment NESTED_ACTION
+    : // Action and other blocks start with opening {
+    '{' (
+        NESTED_ACTION          // embedded {} block
+        | STRING_LITERAL       // single quoted string
+        | DoubleQuoteLiteral   // double quoted string
+        | TripleQuoteLiteral   // string literal with triple quotes
+        | BacktickQuoteLiteral // backtick quoted string
+        | '/*' .*? '*/'        // block comment
+        | '//' ~[\r\n]*        // line comment
+        | '\\' .               // Escape sequence
+        | ~(
+            '\\'
+            | '"'
+            | '\''
+            | '`'
+            | '{'
+        ) // Some other single character that is not handled above
+    )*? '}'
     ;
 
 // -------------------------
@@ -318,7 +343,7 @@ ARGUMENT_ESCAPE
     ;
 
 ARGUMENT_STRING_LITERAL
-    : DQuoteLiteral -> type (ARGUMENT_CONTENT)
+    : DoubleQuoteLiteral -> type (ARGUMENT_CONTENT)
     ;
 
 ARGUMENT_CHAR_LITERAL
@@ -335,57 +360,6 @@ UNTERMINATED_ARGUMENT
     ;
 
 ARGUMENT_CONTENT
-    : .
-    ;
-
-// -------------------------
-// Target Language Actions
-//
-// Many language targets use {} as block delimiters and so we
-// must recursively match {} delimited blocks to balance the
-// braces. Additionally, we must make some assumptions about
-// literal string representation in the target language. We assume
-// that they are delimited by ' or " and so consume these
-// in their own alts so as not to inadvertently match {}.
-mode TargetLanguageAction;
-
-NESTED_ACTION
-    : '{' -> type (ACTION_CONTENT), pushMode (TargetLanguageAction)
-    ;
-
-ACTION_ESCAPE
-    : '\\' . -> type (ACTION_CONTENT)
-    ;
-
-ACTION_STRING_LITERAL
-    : DQuoteLiteral -> type (ACTION_CONTENT)
-    ;
-
-ACTION_CHAR_LITERAL
-    : STRING_LITERAL -> type (ACTION_CONTENT)
-    ;
-
-ACTION_DOC_COMMENT
-    : DOC_COMMENT -> type (ACTION_CONTENT)
-    ;
-
-ACTION_BLOCK_COMMENT
-    : BLOCK_COMMENT -> type (ACTION_CONTENT)
-    ;
-
-ACTION_LINE_COMMENT
-    : LINE_COMMENT -> type (ACTION_CONTENT)
-    ;
-
-END_ACTION
-    : '}' { this.handleEndAction(); }
-    ;
-
-UNTERMINATED_ACTION
-    : EOF -> popMode
-    ;
-
-ACTION_CONTENT
     : .
     ;
 
@@ -419,8 +393,16 @@ fragment UnicodeESC
     : 'u' (HexDigit (HexDigit (HexDigit HexDigit?)?)?)?
     ;
 
-fragment DQuoteLiteral
-    : '"' (ESC_SEQUENCE | ~ ["\r\n\\])* '"'
+fragment DoubleQuoteLiteral
+    : '"' (ESC_SEQUENCE | ~["\r\n\\])*? '"'
+    ;
+
+fragment TripleQuoteLiteral
+    : '"""' (ESC_SEQUENCE | .)*? '"""'
+    ;
+
+fragment BacktickQuoteLiteral
+    : '`' (ESC_SEQUENCE | ~["\r\n\\])*? '`'
     ;
 
 // -----------------------------------

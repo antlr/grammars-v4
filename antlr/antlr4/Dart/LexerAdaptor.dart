@@ -77,37 +77,18 @@ abstract class LexerAdaptor extends Lexer
     void handleEndArgument()
     {
         popMode();
-	bool notempty = true;
-	var zzz = mode_;
-	try {
-		var xxx = popMode();
-		pushMode(xxx);
-	} catch (error, stackTrace) {
-		notempty = false;
-	}
-	mode_ = zzz;
+        bool notempty = true;
+        var zzz = mode_;
+        try {
+            var xxx = popMode();
+            pushMode(xxx);
+        } catch (error, stackTrace) {
+            notempty = false;
+        }
+        mode_ = zzz;
         if (notempty)
         {
             type = ANTLRv4Lexer.TOKEN_ARGUMENT_CONTENT;
-        }
-    }
-
-    void handleEndAction()
-    {
-        var oldMode = mode_;
-        var newMode = popMode();
-	bool notempty = true;
-	var zzz = mode_;
-	try {
-		var xxx = popMode();
-		pushMode(xxx);
-	} catch (error, stackTrace) {
-		notempty = false;
-	}
-	mode_ = zzz;
-        if (notempty && newMode == ANTLRv4Lexer.TargetLanguageAction && oldMode == newMode)
-        {
-            type = ANTLRv4Lexer.TOKEN_ACTION_CONTENT;
         }
     }
 
@@ -117,11 +98,11 @@ abstract class LexerAdaptor extends Lexer
     }
 
     bool isUpperCase(String ch) {
-	return ch.length == 1 && ch == ch.toUpperCase() && ch != ch.toLowerCase();
+        return ch.length == 1 && ch == ch.toUpperCase() && ch != ch.toLowerCase();
     }
 
     bool isLowerCase(String ch) {
-	return ch.length == 1 && ch == ch.toLowerCase() && ch != ch.toUpperCase();
+        return ch.length == 1 && ch == ch.toLowerCase() && ch != ch.toUpperCase();
     }
 
     @override Token emit()
@@ -152,9 +133,9 @@ abstract class LexerAdaptor extends Lexer
         else if (type == ANTLRv4Lexer.TOKEN_SEMI && CurrentRuleType == OPTIONS_CONSTRUCT)
         { // ';' in options { .... }. Don't change anything.
         }
-        else if (type == ANTLRv4Lexer.TOKEN_END_ACTION && CurrentRuleType == ANTLRv4Lexer.TOKEN_AT)
+        else if (type == ANTLRv4Lexer.TOKEN_ACTION && CurrentRuleType == ANTLRv4Lexer.TOKEN_AT)
         {
-            // exit action
+            // Exit action
             CurrentRuleType = Token.INVALID_TYPE;
         }
         else if (type == ANTLRv4Lexer.TOKEN_ID)
