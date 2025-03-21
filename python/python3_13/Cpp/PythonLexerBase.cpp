@@ -148,7 +148,7 @@ void PythonLexerBase::setCurrentAndFollowingTokens() {
     if (this->ffgToken) {
         this->curToken = this->cloneToken(this->ffgToken);
     } else {
-        this->curToken = PythonLexer::nextToken();
+        this->curToken = antlr4::Lexer::nextToken();
     }
 
     this->checkCurToken(); // ffgToken cannot be used in this method and its sub methods (ffgToken is not yet set)!
@@ -156,7 +156,7 @@ void PythonLexerBase::setCurrentAndFollowingTokens() {
     if (this->curToken->getType() == PythonLexer::EOF) {
         this->ffgToken = this->cloneToken(this->curToken);
     } else {
-        this->ffgToken = PythonLexer::nextToken();
+        this->ffgToken = antlr4::Lexer::nextToken();
     }
 }
 
@@ -259,7 +259,7 @@ void PythonLexerBase::insertLeadingIndentToken() {
             // insert an INDENT token before the first statement to raise an 'unexpected indent' error later by the parser    
             this->createAndAddPendingToken(
                 PythonLexer::INDENT, 
-                Token::DEFAULT_CHANNEL, 
+                antlr4::Token::DEFAULT_CHANNEL, 
                 PythonLexerBase::ERR_TXT + errMsg, 
                 this->curToken
             );
@@ -311,7 +311,7 @@ void PythonLexerBase::insertIndentOrDedentToken(size_t indentLength) {
     auto prevIndentLength = this->indentLengthStack.top();
 
     if (indentLength > prevIndentLength) {
-        this->createAndAddPendingToken(PythonLexer::INDENT, Token::DEFAULT_CHANNEL, this->ffgToken);
+        this->createAndAddPendingToken(PythonLexer::INDENT, antlr4::Token::DEFAULT_CHANNEL, this->ffgToken);
         this->indentLengthStack.push(indentLength);
     } else {
         while (indentLength < prevIndentLength) { // more than 1 DEDENT token may be inserted to the token stream
@@ -319,7 +319,7 @@ void PythonLexerBase::insertIndentOrDedentToken(size_t indentLength) {
             prevIndentLength = this->indentLengthStack.top();
 
             if (indentLength <= prevIndentLength) {
-                this->createAndAddPendingToken(PythonLexer::DEDENT, Token::DEFAULT_CHANNEL, this->ffgToken);
+                this->createAndAddPendingToken(PythonLexer::DEDENT, antlr4::Token::DEFAULT_CHANNEL, this->ffgToken);
             } else {
                 this->reportError("inconsistent dedent");
             }
@@ -351,7 +351,7 @@ void PythonLexerBase::checkCurToken() {
         case PythonLexer::NEWLINE:
             // append the current brace expression with the current newline
             this->appendToBraceExpression(this->curToken->getText());
-            this->curToken = this->cloneToken(this->curToken, Token::HIDDEN_CHANNEL);
+            this->curToken = this->cloneToken(this->curToken, antlr4::Token::HIDDEN_CHANNEL);
             break;
         case PythonLexer::LBRACE:
             // the outermost brace expression cannot be a dictionary comprehension or a set comprehension
@@ -502,9 +502,9 @@ void PythonLexerBase::handleFSTRING_MIDDLEtokenWithDoubleBrace() {
     auto lastTwoChars = this->getLastTwoCharsOfTheCurTokenText();
 
     if (lastTwoChars == "{{") {
-        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::LBRACE, "{", Token::HIDDEN_CHANNEL);
+        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::LBRACE, "{", antlr4::Token::HIDDEN_CHANNEL);
     } else if (lastTwoChars == "}}") {
-        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::RBRACE, "}", Token::HIDDEN_CHANNEL);
+        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::RBRACE, "}", antlr4::Token::HIDDEN_CHANNEL);
     }
 }
 
@@ -618,7 +618,7 @@ void PythonLexerBase::handleFORMAT_SPECIFICATION_MODE() {
 bool PythonLexerBase::isDictionaryComprehensionOrSetComprehension(const std::string &code) {
     auto inputStream = std::make_unique<antlr4::ANTLRInputStream>(code);
     auto lexer = std::make_unique<PythonLexer>(inputStream.get());
-    auto tokenStream = std::make_unique<CommonTokenStream>(lexer.get());
+    auto tokenStream = std::make_unique<antlr4::CommonTokenStream>(lexer.get());
     auto parser = std::make_unique<PythonParser>(tokenStream.get());
 
     // Disable error listeners to suppress console output

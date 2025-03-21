@@ -116,4 +116,3 @@ THE SOFTWARE.
      const ssize_t INVALID_LENGTH = -1;
      const std::string ERR_TXT = " ERROR: ";
  };
- 
