@@ -1,12 +1,12 @@
 #include "PythonLexerBase.h"
-
-using namespace antlr4;
+#include "PythonLexer.h"
+#include "PythonParser.h"
 
 // reading the input stream until a return EOF
-std::unique_ptr<Token> PythonLexerBase::nextToken() {
+std::unique_ptr<antlr4::Token> PythonLexerBase::nextToken() {
     this->checkNextToken();
     
-    std::unique_ptr<Token> next;
+    std::unique_ptr<antlr4::Token> next;
 
     if (!this->pendingTokens.empty())
     {
@@ -22,8 +22,8 @@ void PythonLexerBase::reset() {
     Lexer::reset();
 }
 
-std::unique_ptr<Token> PythonLexerBase::cloneToken(
-    const std::unique_ptr<Token> &source, 
+std::unique_ptr<antlr4::Token> PythonLexerBase::cloneToken(
+    const std::unique_ptr<antlr4::Token> &source, 
     size_t channel, 
     const std::string &text, 
     size_t type
@@ -40,7 +40,7 @@ std::unique_ptr<Token> PythonLexerBase::cloneToken(
     );
 }
 
-std::unique_ptr<Token> PythonLexerBase::cloneToken(const std::unique_ptr<Token> &source, size_t channel) {
+std::unique_ptr<antlr4::Token> PythonLexerBase::cloneToken(const std::unique_ptr<antlr4::Token> &source, size_t channel) {
     return this->cloneToken(
         source,
         channel,
@@ -49,7 +49,7 @@ std::unique_ptr<Token> PythonLexerBase::cloneToken(const std::unique_ptr<Token> 
     );
 }
 
-std::unique_ptr<Token> PythonLexerBase::cloneToken(const std::unique_ptr<Token> &source, const std::string &text) {
+std::unique_ptr<antlr4::Token> PythonLexerBase::cloneToken(const std::unique_ptr<antlr4::Token> &source, const std::string &text) {
     return this->cloneToken(
         source,
         source->getChannel(),
@@ -58,7 +58,7 @@ std::unique_ptr<Token> PythonLexerBase::cloneToken(const std::unique_ptr<Token> 
     );
 }
 
-std::unique_ptr<Token> PythonLexerBase::cloneToken(const std::unique_ptr<Token>& source) {
+std::unique_ptr<antlr4::Token> PythonLexerBase::cloneToken(const std::unique_ptr<antlr4::Token>& source) {
     return this->_factory->create(
         { this, this->_input }, 
         source->getType(), 
@@ -93,7 +93,7 @@ void PythonLexerBase::init() {
 }
 
 void PythonLexerBase::checkNextToken() {
-    if (this->previousPendingTokenType == Token::EOF) {
+    if (this->previousPendingTokenType == antlr4::Token::EOF) {
         return;
     }
 
@@ -154,7 +154,7 @@ void PythonLexerBase::setCurrentAndFollowingTokens() {
     this->checkCurToken(); // ffgToken cannot be used in this method and its sub methods (ffgToken is not yet set)!
 
     if (this->curToken->getType() == PythonLexer::EOF) {
-        this->ffgToken = this->cloneToken(this->ffgToken);
+        this->ffgToken = this->cloneToken(this->curToken);
     } else {
         this->ffgToken = PythonLexer::nextToken();
     }
@@ -199,11 +199,11 @@ void PythonLexerBase::insertENCODINGtoken() { // https://peps.python.org/pep-026
         encodingName = "utf-8"; // default Python source code encoding
     }
 
-    std::unique_ptr<Token> encodingToken = this->_factory->create(
+    std::unique_ptr<antlr4::Token> encodingToken = this->_factory->create(
         {this, this->_input},
         PythonLexer::ENCODING,
         encodingName,
-        Token::HIDDEN_CHANNEL,
+        antlr4::Token::HIDDEN_CHANNEL,
         0,
         0,
         0,
@@ -232,7 +232,7 @@ void PythonLexerBase::handleStartOfInput() {
     this->indentLengthStack.push(0); // this will never be popped off
 
     while (this->curToken->getType() != PythonLexer::EOF) {
-        if (this->curToken->getChannel() == Token::DEFAULT_CHANNEL) {
+        if (this->curToken->getChannel() == antlr4::Token::DEFAULT_CHANNEL) {
             if (this->curToken->getType() == PythonLexer::NEWLINE) {
                 // all the NEWLINE tokens must be ignored before the first statement
                 this->hideAndAddPendingToken(this->curToken);
@@ -514,7 +514,7 @@ void PythonLexerBase::handleFSTRING_MIDDLEtokenWithQuoteAndLBrace() {
     auto lastTwoChars = this->getLastTwoCharsOfTheCurTokenText();
 
     if (lastTwoChars == "\"{" || lastTwoChars == "'{" || lastTwoChars == "\\{") {
-        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::LBRACE, "{", Token::DEFAULT_CHANNEL);
+        this->trimLastCharAddPendingTokenSetCurToken(PythonLexer::LBRACE, "{", antlr4::Token::DEFAULT_CHANNEL);
     }
 }
 
@@ -560,7 +560,7 @@ void PythonLexerBase::handleCOLONEQUALtokenInFString() {
             );
         } else {
             this->addPendingToken(this->curToken);
-            this->createNewCurToken(PythonLexer::FSTRING_MIDDLE, "=", Token::DEFAULT_CHANNEL);
+            this->createNewCurToken(PythonLexer::FSTRING_MIDDLE, "=", antlr4::Token::DEFAULT_CHANNEL);
         }
     }
 
@@ -603,12 +603,12 @@ void PythonLexerBase::handleFORMAT_SPECIFICATION_MODE() {
         // insert an empty FSTRING_MIDDLE token instead of the missing format specification
         switch (this->curToken->getType()) {
             case PythonLexer::COLON:
-                this->createAndAddPendingToken(PythonLexer::FSTRING_MIDDLE, Token::DEFAULT_CHANNEL, "", this->ffgToken);
+                this->createAndAddPendingToken(PythonLexer::FSTRING_MIDDLE, antlr4::Token::DEFAULT_CHANNEL, "", this->ffgToken);
                 break;
             case PythonLexer::RBRACE:
                 // only if the previous brace expression is not a dictionary comprehension or set comprehension
                 if (!this->isDictionaryComprehensionOrSetComprehension(this->prevBraceExpression)) {
-                    this->createAndAddPendingToken(PythonLexer::FSTRING_MIDDLE, Token::DEFAULT_CHANNEL, "", this->ffgToken);
+                    this->createAndAddPendingToken(PythonLexer::FSTRING_MIDDLE, antlr4::Token::DEFAULT_CHANNEL, "", this->ffgToken);
                 }
                 break;
         }
@@ -616,7 +616,7 @@ void PythonLexerBase::handleFORMAT_SPECIFICATION_MODE() {
 }
 
 bool PythonLexerBase::isDictionaryComprehensionOrSetComprehension(const std::string &code) {
-    auto inputStream = std::make_unique<ANTLRInputStream>(code);
+    auto inputStream = std::make_unique<antlr4::ANTLRInputStream>(code);
     auto lexer = std::make_unique<PythonLexer>(inputStream.get());
     auto tokenStream = std::make_unique<CommonTokenStream>(lexer.get());
     auto parser = std::make_unique<PythonParser>(tokenStream.get());
@@ -645,7 +645,7 @@ void PythonLexerBase::insertTrailingTokens() {
             break; // no trailing NEWLINE token is needed
         default:
             // insert an extra trailing NEWLINE token that serves as the end of the last statement
-            this->createAndAddPendingToken(PythonLexer::NEWLINE, Token::DEFAULT_CHANNEL, this->ffgToken); // ffgToken is EOF
+            this->createAndAddPendingToken(PythonLexer::NEWLINE, antlr4::Token::DEFAULT_CHANNEL, this->ffgToken); // ffgToken is EOF
             break;
     }
     this->insertIndentOrDedentToken(0); // Now insert as much trailing DEDENT tokens as needed
@@ -659,15 +659,15 @@ void PythonLexerBase::handleEOFtoken() {
     this->addPendingToken(this->curToken);
 }
 
-void PythonLexerBase::hideAndAddPendingToken(const std::unique_ptr<Token> &tkn) {
-    this->addPendingToken(this->cloneToken(tkn, Token::HIDDEN_CHANNEL));
+void PythonLexerBase::hideAndAddPendingToken(const std::unique_ptr<antlr4::Token> &tkn) {
+    this->addPendingToken(this->cloneToken(tkn, antlr4::Token::HIDDEN_CHANNEL));
 }
 
 void PythonLexerBase::createAndAddPendingToken(
     size_t type, 
     size_t channel, 
     const std::string &text, 
-    const std::unique_ptr<Token> &sampleToken
+    const std::unique_ptr<antlr4::Token> &sampleToken
 ) {
     this->addPendingToken(
         this->_factory->create(
@@ -686,7 +686,7 @@ void PythonLexerBase::createAndAddPendingToken(
 void PythonLexerBase::createAndAddPendingToken(
     size_t type, 
     size_t channel, 
-    const std::unique_ptr<Token> &sampleToken
+    const std::unique_ptr<antlr4::Token> &sampleToken
 ) {
     this->createAndAddPendingToken(
         type, 
@@ -696,10 +696,10 @@ void PythonLexerBase::createAndAddPendingToken(
     );
 }
 
-void PythonLexerBase::addPendingToken(const std::unique_ptr<Token> &tkn) {
+void PythonLexerBase::addPendingToken(const std::unique_ptr<antlr4::Token> &tkn) {
     // save the last pending token type because the pendingTokens list can be empty by the nextToken()
     this->previousPendingTokenType = tkn->getType();
-    if (tkn->getChannel() == Token::DEFAULT_CHANNEL) {
+    if (tkn->getChannel() == antlr4::Token::DEFAULT_CHANNEL) {
         this->lastPendingTokenTypeFromDefaultChannel = this->previousPendingTokenType;
     }
 
@@ -750,5 +750,5 @@ void PythonLexerBase::reportError(const std::string &errMsg) {
     this->reportLexerError(errMsg);
 
     // the ERRORTOKEN will raise an error in the parser
-    this->createAndAddPendingToken(PythonLexer::ERRORTOKEN, Token::DEFAULT_CHANNEL, PythonLexerBase::ERR_TXT + errMsg, this->ffgToken);
+    this->createAndAddPendingToken(PythonLexer::ERRORTOKEN, antlr4::Token::DEFAULT_CHANNEL, PythonLexerBase::ERR_TXT + errMsg, this->ffgToken);
 }
