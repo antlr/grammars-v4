@@ -32,6 +32,8 @@ lexer grammar PythonLexer;
 
 options { superClass=PythonLexerBase; }
 
+// Insert here @header for C++ lexer.
+
 tokens {
     ENCODING // https://docs.python.org/3.13/reference/lexical_analysis.html#encoding-declarations
   , INDENT, DEDENT // https://docs.python.org/3.13/reference/lexical_analysis.html#indentation
