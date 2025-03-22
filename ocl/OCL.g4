@@ -18,95 +18,21 @@
 
 grammar OCL;
 
-specification
-    : 'package' ID '{' classifier* '}' EOF
+multipleContextSpecifications
+    : (singleInvariant | singleDerivedAttribute)+ EOF
     ;
 
-expressions
-    : expression (';' expression)* ';'? EOF
+contextSpecification
+    : (singleInvariant | singleDerivedAttribute) EOF
     ;
 
-classifier
-    : classDefinition
-    | interfaceDefinition
-    | usecaseDefinition
-    | datatypeDefinition
-    | enumeration
+singleInvariant
+    : 'context' ID 'inv' ID? ':' expression
     ;
 
-interfaceDefinition
-    : 'interface' identifier ('extends' identifier)? '{' classBody? '}'
+singleDerivedAttribute
+    : 'context' ID '::' ID ':' type ('init:' expression)? 'derive:' expression
     ;
-
-classDefinition
-    : 'class' identifier ('extends' identifier)? ('implements' idList)? '{' classBody? '}'
-    ;
-
-classBody
-    : classBodyElement+
-    ;
-
-classBodyElement
-    : attributeDefinition
-    | operationDefinition
-    | invariant
-    | stereotype
-    ;
-
-attributeDefinition
-    : 'attribute' identifier ('identity' | 'derived')? ':' type ';'
-    | 'static' 'attribute' identifier ':' type ';'
-    ;
-
-operationDefinition
-    : ('static')? 'operation' identifier '(' parameterDeclarations? ')' ':' type 'pre:' expression 'post:' expression ('activity:' statementList)? ';'
-    ;
-
-parameterDeclarations
-    : (parameterDeclaration ',')* parameterDeclaration
-    ;
-
-parameterDeclaration
-    : identifier ':' type
-    ;
-
-idList
-    : (identifier ',')* identifier
-    ;
-
-usecaseDefinition
-    : 'usecase' identifier (':' type)? '{' usecaseBody? '}'
-    | 'usecase' identifier '(' parameterDeclarations ')' (':' type)? '{' usecaseBody? '}'
-    ;
-
-usecaseBody
-    : usecaseBodyElement+
-    ;
-
-usecaseBodyElement
-    : 'parameter' identifier ':' type ';'
-    | 'precondition' expression ';'
-    | 'extends' identifier ';'
-    | 'extendedBy' identifier ';'
-    | 'activity:' statementList ';'
-    | '::' expression
-    | stereotype
-    ;
-
-invariant
-    : 'invariant' expression ';'
-    ;
-
-stereotype
-    : 'stereotype' identifier ';'
-    | 'stereotype' identifier '=' STRING1_LITERAL ';'
-    | 'stereotype' identifier '=' STRING2_LITERAL ';'
-    | 'stereotype' identifier '=' identifier ';'
-    ;
-
-datatypeDefinition
-      : 'datatype' identifier '=' type
-      ; 
 
 enumeration
     : 'enumeration' identifier '{' enumerationLiteral+ '}'
@@ -150,6 +76,7 @@ basicExpression
     | FLOAT_LITERAL
     | STRING1_LITERAL
     | STRING2_LITERAL
+    | ENUMERATION_LITERAL
     | ID
     | '(' expression ')'
     ;
@@ -185,9 +112,8 @@ equalityExpression
     ;
 
 additiveExpression
-    : additiveExpression '+' additiveExpression
-    | additiveExpression '-' factorExpression
-    | factorExpression ('..' | '|->') factorExpression
+    : additiveExpression ('+' | '-') additiveExpression
+    | additiveExpression ('..' | '|->' | '.') additiveExpression
     | factorExpression
     ;
 
@@ -283,17 +209,18 @@ factor2Expression
         | '->equalsIgnoreCase'
     ) '(' expression ')'
     | factor2Expression ('->oclAsType' | '->oclIsTypeOf' | '->oclIsKindOf' | '->oclAsSet') '(' expression ')'
-    | factor2Expression '->collect' '(' identifier '|' expression ')'
-    | factor2Expression '->select' '(' identifier '|' expression ')'
-    | factor2Expression '->reject' '(' identifier '|' expression ')'
-    | factor2Expression '->forAll' '(' identifier '|' expression ')'
-    | factor2Expression '->exists' '(' identifier '|' expression ')'
-    | factor2Expression '->exists1' '(' identifier '|' expression ')'
-    | factor2Expression '->one' '(' identifier '|' expression ')'
-    | factor2Expression '->any' '(' identifier '|' expression ')'
-    | factor2Expression '->closure' '(' identifier '|' expression ')'
-    | factor2Expression '->sortedBy' '(' identifier '|' expression ')'
-    | factor2Expression '->isUnique' '(' identifier '|' expression ')'
+    | factor2Expression '->collect' '(' identOptType '|' expression ')'
+    | factor2Expression '->select' '(' identOptType '|' expression ')'
+    | factor2Expression '->reject' '(' identOptType '|' expression ')'
+    | factor2Expression '->forAll' '(' identOptType '|' expression ')'
+    | factor2Expression '->exists' '(' identOptType '|' expression ')'
+    | factor2Expression '->exists1' '(' identOptType '|' expression ')'
+    | factor2Expression '->one' '(' identOptType '|' expression ')'
+    | factor2Expression '->any' '(' identOptType '|' expression ')'
+    | factor2Expression '->closure' '(' identOptType '|' expression ')'
+    | factor2Expression '->sortedBy' '(' identOptType '|' expression ')'    
+    | factor2Expression '->sortedBy' '(' identifier ')'
+    | factor2Expression '->isUnique' '(' identOptType '|' expression ')'
     | factor2Expression '->subrange' '(' expression ',' expression ')'
     | factor2Expression '->replace' '(' expression ',' expression ')'
     | factor2Expression '->replaceAll' '(' expression ',' expression ')'
@@ -307,6 +234,10 @@ factor2Expression
     | basicExpression
     ;
 
+identOptType
+    : ID (':' type)?
+    ;    
+
 setExpression
     : 'OrderedSet{' expressionList? '}'
     | 'Bag{' expressionList? '}'
@@ -314,28 +245,6 @@ setExpression
     | 'Sequence{' expressionList? '}'
     | 'Map{' expressionList? '}'
     ;
-
-statement
-    : 'skip'
-    | 'return'
-    | 'continue'
-    | 'break'
-    | 'var' ID ':' type
-    | 'if' expression 'then' statement 'else' statement
-    | 'while' expression 'do' statement
-    | 'for' ID ':' expression 'do' statement
-    | 'return' expression
-    | basicExpression ':=' expression
-    | statement ';' statement
-    | 'execute' expression
-    | 'call' basicExpression
-    | '(' statementList ')'
-    ;
-
-
-statementList
-   : statement (';' statement)*  
-   ;  
 
 identifier
     : ID
@@ -351,6 +260,10 @@ STRING1_LITERAL
 
 STRING2_LITERAL
     : '\'' (~['\\\r\n] | EscapeSequence)* '\'';
+
+ENUMERATION_LITERAL
+    : ID '::' ID
+    ;
 
 NULL_LITERAL
     : 'null'

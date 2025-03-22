@@ -1,0 +1,15 @@
+context ProductionOrder
+inv: 
+    self.processes->exists(p : ProductionOrder | 
+        (p.type = 'Sublimation' or p.type = 'Tailoring') and 
+        p.order < self.processes->select(proc | proc.type = 'Preparation')->first().order
+    )
+
+context Person inv: 
+    statistics->sortedBy(totalSalary)->last().wellpaidEmployees->includes(self)
+
+context MyContext inv:
+    history->last().bindings->any(p | name = n).value
+
+context Company inv:
+    self.employee->select(p : Person | p.age > 50 ).notEmpty()
