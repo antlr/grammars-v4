@@ -13,3 +13,6 @@ context MyContext inv:
 
 context Company inv:
     self.employee->select(p : Person | p.age > 50 ).notEmpty()
+
+context MyClass::derivedAttribute: Integer  
+    derive: attribute1 + attribute2
