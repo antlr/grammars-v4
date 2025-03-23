@@ -16,3 +16,6 @@ context Company inv:
 
 context MyClass::derivedAttribute: Integer  
     derive: attribute1 + attribute2
+
+context Product::lowestPrice: Price 
+    derive: sellingPrice->sortedBy(valueInEUR)->first()
