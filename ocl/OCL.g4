@@ -31,7 +31,7 @@ singleInvariant
     ;
 
 singleDerivedAttribute
-    : 'context' ID '::' ID ':' type ('init:' expression)? 'derive:' expression
+    : 'context' qualified_name ':' type ('init:' expression)? 'derive:' expression
     ;
 
 enumeration
@@ -248,6 +248,10 @@ setExpression
 
 identifier
     : ID
+    ;
+
+qualified_name
+    : ENUMERATION_LITERAL
     ;
 
 FLOAT_LITERAL
