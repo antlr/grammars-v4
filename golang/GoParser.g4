@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"] Copyright (c) 2017 Sasa Coh, Michał Błotniak
- Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies 
- Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com,Positive Technologies All rights reserved. 
+ Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies
+ Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com,Positive Technologies All rights reserved.
  Copyright (c) 2021 Martin Mirchev, mirchevmartin2203@gmail.com
  Copyright (c) 2023 Dmitry Litovchenko, i@dlitovchenko.ru
 
@@ -91,7 +91,7 @@ typeSpec
     ;
 
 aliasDecl
-    : IDENTIFIER ASSIGN type_
+    : IDENTIFIER typeParameters? ASSIGN type_
     ;
 
 typeDef
