@@ -1,4 +1,4 @@
-import { Parser, TokenStream, BufferedTokenStream } from 'antlr4';
+import { Parser, TokenStream, BufferedTokenStream, Token } from 'antlr4';
 import GoLexer from './GoLexer';
 
 export default abstract class GoParserBase extends Parser {
