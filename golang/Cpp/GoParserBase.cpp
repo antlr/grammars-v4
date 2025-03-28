@@ -4,14 +4,14 @@
 bool GoParserBase::closingBracket()
 {
     antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
-    int nextTokenType = stream->LA(1);
-    return nextTokenType == GoParser::R_CURLY || nextTokenType == GoParser::R_PAREN;
+    int la = stream->LA(1);
+    return la == GoParser::R_CURLY || la == GoParser::R_PAREN || la == antlr4::Token::EOF;
 }
 
 bool GoParserBase::isType()
 {
     antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
-    int nextTokenType = stream->LA(1);
-    return nextTokenType != GoParser::IDENTIFIER;
+    int la = stream->LA(1);
+    return la != GoParser::IDENTIFIER;
 }
 
