@@ -12,7 +12,13 @@ type GoParserBase struct {
 
 // Returns true if the current Token is a closing bracket (")" or "}")
 func (p *GoParserBase) closingBracket() bool {
-	stream := p.GetTokenStream()
-	prevTokenType := stream.LA(1)
-	return prevTokenType == GoParserR_PAREN || prevTokenType == GoParserR_CURLY;
+    stream := p.GetTokenStream()
+    nextTokenType := stream.LA(1)
+    return nextTokenType == GoParserR_PAREN || nextTokenType == GoParserR_CURLY;
+}
+
+func (p *GoParserBase) isType() bool {
+    stream := p.GetTokenStream()
+    nextTokenType := stream.LA(1)
+    return nextTokenType != GoParserIDENTIFIER;
 }

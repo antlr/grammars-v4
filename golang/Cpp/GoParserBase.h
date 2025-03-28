@@ -18,4 +18,6 @@ protected:
      * Returns true if the current Token is a closing bracket (")" or "}")
      */
     bool closingBracket();
+
+    bool isType();
 };
