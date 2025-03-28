@@ -29,4 +29,9 @@ public abstract class GoParserBase : Parser
             return TokenStream;
         }
     }
+
+    public bool isType()
+    {
+	    return false;
+    }
 }

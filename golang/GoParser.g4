@@ -44,15 +44,21 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName = IDENTIFIER
+    : PACKAGE packageName
     ;
+
+packageName
+    : identifier
+    ;
+
+identifier : IDENTIFIER ;
 
 importDecl
     : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN)
     ;
 
 importSpec
-    : alias = (DOT | IDENTIFIER)? importPath
+    : (DOT | packageName)? importPath
     ;
 
 importPath
@@ -137,11 +143,11 @@ varSpec
     ;
 
 block
-    : L_CURLY statementList? R_CURLY
+    : L_CURLY statementList R_CURLY
     ;
 
 statementList
-    : ((SEMI? | EOS? | {this.closingBracket()}?) statement eos)+
+    : ( (SEMI | EOS | /* {this.closingBracket()}? */ ) statement eos)*
     ;
 
 statement
@@ -236,7 +242,7 @@ exprSwitchStmt
     ;
 
 exprCaseClause
-    : exprSwitchCase COLON statementList?
+    : exprSwitchCase COLON statementList
     ;
 
 exprSwitchCase
@@ -253,7 +259,7 @@ typeSwitchGuard
     ;
 
 typeCaseClause
-    : typeSwitchCase COLON statementList?
+    : typeSwitchCase COLON statementList
     ;
 
 typeSwitchCase
@@ -270,7 +276,7 @@ selectStmt
     ;
 
 commClause
-    : commCase COLON statementList?
+    : commCase COLON statementList
     ;
 
 commCase
@@ -283,7 +289,11 @@ recvStmt
     ;
 
 forStmt
-    : FOR (expression? | forClause | rangeClause?) block
+    : FOR (condition | forClause | rangeClause)? block
+    ;
+
+condition
+    : expression
     ;
 
 forClause
@@ -402,7 +412,7 @@ expression
 
 primaryExpr
     : operand
-    | conversion
+    | { this.isType() }? conversion
     | methodExpr
     | primaryExpr ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments)
     ;
@@ -525,7 +535,6 @@ methodExpr
 
 eos
     : SEMI
-    | EOF
     | EOS
     | {this.closingBracket()}?
     ;
