@@ -18,14 +18,14 @@ public abstract class GoParserBase extends Parser
     protected boolean closingBracket()
     {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
-        int nextTokenType = stream.LA(1);
-        return nextTokenType == GoParser.R_CURLY || nextTokenType == GoParser.R_PAREN;
+        int la = stream.LA(1);
+        return la == GoLexer.R_PAREN || la == GoLexer.R_CURLY || la == Token.EOF;
     }
 
     protected boolean isType()
     {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         int nextTokenType = stream.LA(1);
-        return nextTokenType != GoParser.IDENTIFIER;
+        return nextTokenType != GoLexer.IDENTIFIER;
     }
 }

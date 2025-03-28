@@ -32,7 +32,7 @@
 
 parser grammar GoParser;
 
-// Insert here @header for C++ parser.
+// Insert here @header.
 
 options {
     tokenVocab = GoLexer;

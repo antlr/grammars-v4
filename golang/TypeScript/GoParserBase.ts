@@ -8,13 +8,13 @@ export default abstract class GoParserBase extends Parser {
 
     protected closingBracket(): boolean {
         const stream = this._input as BufferedTokenStream;
-        const nextTokenType = stream.LA(1);
-        return nextTokenType === GoLexer.R_CURLY || nextTokenType === GoLexer.R_PAREN;
+        const la = stream.LA(1);
+        return la === GoLexer.R_CURLY || la === GoLexer.R_PAREN || la === Token.EOF;
     }
 
     protected isType(): boolean {
         const stream = this._input as BufferedTokenStream;
-        const nextTokenType = stream.LA(1);
-        return nextTokenType !== GoLexer.IDENTIFIER;
+        const la = stream.LA(1);
+        return la !== GoLexer.IDENTIFIER;
     }
 }
