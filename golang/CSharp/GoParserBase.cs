@@ -19,7 +19,7 @@ public abstract class GoParserBase : Parser
     protected bool closingBracket()
     {
         int la = tokenStream.LA(1);
-        return la == GoLexer.R_PAREN || la == GoLexer.R_CURLY;
+        return la == GoLexer.R_PAREN || la == GoLexer.R_CURLY || la == Eof;
     }
 
     private ITokenStream tokenStream
@@ -32,6 +32,7 @@ public abstract class GoParserBase : Parser
 
     public bool isType()
     {
-	    return false;
+	    int la = tokenStream.LA(1);
+	    return la != GoLexer.IDENTIFIER;
     }
 }
