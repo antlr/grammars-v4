@@ -21,6 +21,6 @@ export default abstract class GoParserBase extends Parser {
     protected isNotReceive(): boolean {
         const stream = this._input as BufferedTokenStream;
         const la = stream.LA(2);
-        return la !== GoLexer.RECEIVER;
+        return la !== GoLexer.RECEIVE;
     }   
 }
