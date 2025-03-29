@@ -17,5 +17,11 @@ export default class GoParserBase extends Parser {
         const la = stream.LA(1);
         return la !== GoLexer.IDENTIFIER;
     }
+
+    isNotReceive() {
+        const stream = this._input;
+        const la = stream.LA(2);
+        return la !== GoLexer.RECEIVE;
+    }
 }
 
