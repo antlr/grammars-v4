@@ -19,4 +19,10 @@ abstract class GoParserBase extends Parser
         var la = tokenStream.LA(1);
         return la != GoLexer.TOKEN_IDENTIFIER;
     }
+
+    bool isNotReceive()
+    {
+        var la = tokenStream.LA(1);
+        return la != GoLexer.TOKEN_RECEIVE;
+    }
 }

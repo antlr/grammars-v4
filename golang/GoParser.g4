@@ -364,7 +364,7 @@ mapType
     ;
 
 channelType
-    : (CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType
+    : ({this.isNotReceive()}? CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType
     ;
 
 methodSpec

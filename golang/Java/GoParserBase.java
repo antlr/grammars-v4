@@ -25,7 +25,14 @@ public abstract class GoParserBase extends Parser
     protected boolean isType()
     {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
-        int nextTokenType = stream.LA(1);
-        return nextTokenType != GoLexer.IDENTIFIER;
+        int la = stream.LA(1);
+        return la != GoLexer.IDENTIFIER;
+    }
+
+    protected boolean isNotReceive()
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        int la = stream.LA(2);
+        return la != GoLexer.RECEIVE;
     }
 }
