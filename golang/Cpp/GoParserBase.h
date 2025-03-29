@@ -20,4 +20,5 @@ protected:
     bool closingBracket();
 
     bool isType();
+    bool isNotReceive();
 };

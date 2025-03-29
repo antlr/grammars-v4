@@ -15,3 +15,10 @@ bool GoParserBase::isType()
     return la != GoParser::IDENTIFIER;
 }
 
+bool GoParserBase::isNotReceive()
+{
+    antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
+    int la = stream->LA(2);
+    return la != GoParser::RECEIVE;
+}
+

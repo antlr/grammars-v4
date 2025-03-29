@@ -32,7 +32,13 @@ public abstract class GoParserBase : Parser
 
     public bool isType()
     {
-	    int la = tokenStream.LA(1);
-	    return la != GoLexer.IDENTIFIER;
+        int la = tokenStream.LA(1);
+        return la != GoLexer.IDENTIFIER;
+    }
+
+    public bool isNotReceive()
+    {
+        int la = tokenStream.LA(2);
+        return la != GoLexer.RECEIVE;
     }
 }

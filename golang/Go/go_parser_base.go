@@ -22,3 +22,9 @@ func (p *GoParserBase) isType() bool {
     la := stream.LA(1)
     return la != GoParserIDENTIFIER;
 }
+
+func (p *GoParserBase) isNotReceive() bool {
+    stream := p.GetTokenStream()
+    la := stream.LA(2)
+    return la != GoParserRECEIVE;
+}
