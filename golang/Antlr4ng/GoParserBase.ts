@@ -1,5 +1,5 @@
-import { Parser, TokenStream, BufferedTokenStream, Token } from 'antlr4';
-import GoLexer from './GoLexer';
+import { Parser, TokenStream, BufferedTokenStream, Token } from 'antlr4ng';
+import { GoLexer } from './GoLexer.js';
 
 export default abstract class GoParserBase extends Parser {
     constructor(input: TokenStream) {
@@ -7,19 +7,19 @@ export default abstract class GoParserBase extends Parser {
     }
 
     protected closingBracket(): boolean {
-        const stream = this._input as BufferedTokenStream;
+        const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LA(1);
         return la === GoLexer.R_CURLY || la === GoLexer.R_PAREN || la === Token.EOF;
     }
 
     protected isType(): boolean {
-        const stream = this._input as BufferedTokenStream;
+        const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LA(1);
         return la !== GoLexer.IDENTIFIER;
     }
 
     protected isNotReceive(): boolean {
-        const stream = this._input as BufferedTokenStream;
+        const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LA(2);
         return la !== GoLexer.RECEIVE;
     }   

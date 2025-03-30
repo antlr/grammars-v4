@@ -11,7 +11,7 @@ def main():
         transform_grammar(file)
 
 def transform_grammar(file_path):
-    """Transforms the grammar to fit for the c++ target"""
+    """Transforms the grammar to fit for the target"""
     print("Altering " + file_path)
     if not Path(file_path).is_file:
         print(f"Could not find file: {file_path}")
@@ -22,10 +22,7 @@ def transform_grammar(file_path):
         with open(file_path, 'w', encoding="utf-8") as output_file:
             for line in input_file:
                 line = re.sub(r"(\/\/ Insert here @header\.)",\
-                    '@header {#include "GoParserBase.h"}', line)
-                line = re.sub(r"(this\.)", 'this->', line)
-                line = re.sub(r"(_input\.)", '_input->', line)
-                line = re.sub(r"(\.getType\(\))", '->getType()', line)
+                    '@header {import GoParserBase from "./GoParserBase.js"}', line)
                 output_file.write(line)
 
     print("Writing ...")

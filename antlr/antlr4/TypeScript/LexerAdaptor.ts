@@ -58,8 +58,8 @@ export default abstract class LexerAdaptor extends Lexer {
         } else if (this._type === ANTLRv4Lexer.SEMI
             && this.currentRuleType === LexerAdaptor.OPTIONS_CONSTRUCT) {
             // ';' in options { .... }. Don't change anything.
-        } else if (this._type == ANTLRv4Lexer.END_ACTION && this.currentRuleType == ANTLRv4Lexer.AT) {
-            // exit action
+        } else if (this._type == ANTLRv4Lexer.ACTION && this.currentRuleType == ANTLRv4Lexer.AT) {
+            // Exit action
             this.currentRuleType = Token.INVALID_TYPE;
         } else if (this._type === ANTLRv4Lexer.ID) {
             const firstChar = this._input.getText(this._tokenStartCharIndex, this._tokenStartCharIndex);
@@ -96,19 +96,6 @@ export default abstract class LexerAdaptor extends Lexer {
         this.popMode();
         if (this.getModeStack().length > 0) {
             this._type = ANTLRv4Lexer.ARGUMENT_CONTENT;
-        }
-    }
-
-    protected handleEndAction(): void
-    {
-        var oldMode = this.getMode();
-        var newMode = this.popMode();
-        var isActionWithinAction = this.getModeStack().length > 0
-           && newMode == ANTLRv4Lexer.TargetLanguageAction
-           && oldMode == newMode;
-
-        if (isActionWithinAction) {
-            this._type = ANTLRv4Lexer.ACTION_CONTENT;
         }
     }
 }

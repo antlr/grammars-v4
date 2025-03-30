@@ -57,7 +57,6 @@ class LexerAdaptor : public antlr4::Lexer
     public: void setCurrentRuleType(int ruleType);
     protected: void handleBeginArgument();
     protected: void handleEndArgument();
-    protected: void handleEndAction();
     public: antlr4::Token* emit();
     private: bool inLexerRule();
     private: bool inParserRule();

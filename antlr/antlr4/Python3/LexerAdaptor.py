@@ -61,7 +61,7 @@ class LexerAdaptor(Lexer):
         otherwise, it's a normal argument list and we switch to Argument mode.
         """
         if self.inLexerRule():
-            self.pushMode(3); # NB!!!!!!!!!: hardwire ANTLRv4Parser.LexerCharSet)
+            self.pushMode(2); # NB!!!!!!!!!: hardwire ANTLRv4Parser.LexerCharSet)
             self.more()
         else:
             self.pushMode(1); # NB!!!!!!!!!: hardwire ANTLRv4Lexer.Argument)
@@ -74,23 +74,6 @@ class LexerAdaptor(Lexer):
         self.popMode()
         if len(self._modeStack) > 0:
             self.type = ANTLRv4Parser.ARGUMENT_CONTENT
-
-    def handleEndAction(self):
-        """
-        Handle the end of an action (e.g., '}'). If we're still nested inside a TargetLanguageAction
-        mode, emit ACTION_CONTENT. Otherwise, pop out completely.
-        """
-        oldMode = self._mode
-        newMode = self.popMode()
-
-        # Detect a '}' that closes one layer of nested actions but still within the same mode.
-        isActionWithinAction = (
-            len(self._modeStack) > 0
-            and newMode == 2 # NB!!!!!!! hardwire ANTLRv4Parser.TargetLanguageAction
-            and oldMode == newMode
-        )
-        if isActionWithinAction:
-            self.type = ANTLRv4Parser.ACTION_CONTENT
 
     def emit(self):
         """
@@ -142,7 +125,7 @@ class LexerAdaptor(Lexer):
             pass
 
         elif (
-            self._type == ANTLRv4Parser.END_ACTION
+            self._type == ANTLRv4Parser.ACTION
             and self.getCurrentRuleType() == ANTLRv4Parser.AT
         ):
             # Exiting an action block
