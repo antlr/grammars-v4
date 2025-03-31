@@ -4,16 +4,16 @@
    <test>
       <name>spec</name>
       <entry-point>specification</entry-point>
-      <inputs>examples/UML-RSDS/bondApp.km3</inputs>
+      <inputs>examples/specification/*.km3</inputs>
    </test>
    <test>
       <name>expr</name>
       <entry-point>expressions</entry-point>
-      <inputs>examples/OCL/expressionExamples.txt</inputs>
+      <inputs>examples/expressions/*.txt</inputs>
    </test>
    <test>
       <name>contextspecs</name>
       <entry-point>multipleContextSpecifications</entry-point>
-      <inputs>examples/OCL/contextExamples.txt</inputs>
+      <inputs>examples/multipleContextSpecifications/*.txt</inputs>
    </test>
 </desc>
