@@ -111,9 +111,12 @@ public abstract class GoParserBase : Parser
     public bool isMethodExpr()
     {
         var la = tokenStream.LT(1);
-        if (la.Text == "hMd5")
-        { }
-        bool result = true;
+		bool result = true;
+		// See if it looks like a method expr.
+		if (la.Type == GoParser.STAR) {
+			if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+			return result;
+		}
         if (la.Type != GoParser.IDENTIFIER) {
             result = false;
             if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
