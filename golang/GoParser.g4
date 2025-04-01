@@ -54,11 +54,11 @@ packageName
 identifier : IDENTIFIER ;
 
 importDecl
-    : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN)
+    : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN) 
     ;
 
 importSpec
-    : (DOT | packageName)? importPath
+    : (DOT | packageName)? importPath { this.addImportSpec(); }
     ;
 
 importPath
@@ -410,11 +410,20 @@ expression
     | expression LOGICAL_OR expression
     ;
 
+/*
 primaryExpr
-    : operand
+    : { this.isOperand() }? operand
     | { this.isType() }? conversion
-    | methodExpr
+    | { this.isMethodExpr() }? methodExpr
     | primaryExpr ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments)
+    ;
+*/
+
+primaryExpr :
+    ( { this.isOperand() }? operand
+    | { this.isConversion() }? conversion
+    | { this.isMethodExpr() }? methodExpr )
+    ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments )*
     ;
 
 conversion
