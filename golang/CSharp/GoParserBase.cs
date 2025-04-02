@@ -6,8 +6,8 @@ using Antlr4.Runtime;
 
 public abstract class GoParserBase : Parser
 {
-	const bool debug = false;
-	
+    const bool debug = false;
+    
     protected GoParserBase(ITokenStream input)
         : base(input)
     {
@@ -19,18 +19,18 @@ public abstract class GoParserBase : Parser
     }
 
 
-    protected bool closingBracket()
-    {
-        int la = tokenStream.LA(1);
-        return la == GoLexer.R_PAREN || la == GoLexer.R_CURLY || la == Eof;
-    }
-
     private ITokenStream tokenStream
     {
         get
         {
             return TokenStream;
         }
+    }
+
+    protected bool closingBracket()
+    {
+        var la = tokenStream.LT(1);
+        return la.Type == GoLexer.R_PAREN || la.Type == GoLexer.R_CURLY || la.Type == Eof;
     }
 
     public bool isNotReceive()
@@ -57,11 +57,11 @@ public abstract class GoParserBase : Parser
         else
         {
             var name = importSpec.importPath().GetText();
-			name = name.Replace("\"", "");
-			name = name.Replace("\\", "/");
-			string[] pathArr = name.Split('/');
-			string[] fileArr = pathArr.Last().Split('.');
-			string fileName = fileArr.Last().ToString();
+            name = name.Replace("\"", "");
+            name = name.Replace("\\", "/");
+            string[] pathArr = name.Split('/');
+            string[] fileArr = pathArr.Last().Split('.');
+            string fileName = fileArr.Last().ToString();
             if (debug) System.Console.WriteLine("Entering " + fileName);
             table.Add(fileName);
         }
@@ -111,12 +111,12 @@ public abstract class GoParserBase : Parser
     public bool isMethodExpr()
     {
         var la = tokenStream.LT(1);
-		bool result = true;
-		// See if it looks like a method expr.
-		if (la.Type == GoParser.STAR) {
-			if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
-			return result;
-		}
+        bool result = true;
+        // See if it looks like a method expr.
+        if (la.Type == GoParser.STAR) {
+            if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+            return result;
+        }
         if (la.Type != GoParser.IDENTIFIER) {
             result = false;
             if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);

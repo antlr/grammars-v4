@@ -54,7 +54,7 @@ packageName
 identifier : IDENTIFIER ;
 
 importDecl
-    : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN) 
+    : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN)
     ;
 
 importSpec
@@ -229,7 +229,7 @@ deferStmt
     ;
 
 ifStmt
-    : IF (expression | eos expression | simpleStmt eos expression) block (ELSE (ifStmt | block))?
+    : IF (expression | (SEMI | EOS) expression | simpleStmt (SEMI | EOS) expression) block (ELSE (ifStmt | block))?
     ;
 
 switchStmt
@@ -409,15 +409,6 @@ expression
     | expression LOGICAL_AND expression
     | expression LOGICAL_OR expression
     ;
-
-/*
-primaryExpr
-    : { this.isOperand() }? operand
-    | { this.isType() }? conversion
-    | { this.isMethodExpr() }? methodExpr
-    | primaryExpr ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments)
-    ;
-*/
 
 primaryExpr :
     ( { this.isOperand() }? operand
