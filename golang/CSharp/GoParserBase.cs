@@ -35,8 +35,8 @@ public abstract class GoParserBase : Parser
 
     public bool isNotReceive()
     {
-        int la = tokenStream.LA(2);
-        return la != GoLexer.RECEIVE;
+        var la = tokenStream.LT(2);
+        return la.Type != GoLexer.RECEIVE;
     }
 
     List<string> table = new List<string>();
