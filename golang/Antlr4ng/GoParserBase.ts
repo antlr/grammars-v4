@@ -16,14 +16,14 @@ export default abstract class GoParserBase extends Parser {
     protected closingBracket(): boolean {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
-        return la.type === GoLexer.R_CURLY || la.type === GoLexer.R_PAREN || la.type === Token.EOF;
+        return la.type === GoParser.R_CURLY || la.type === GoParser.R_PAREN || la.type === Token.EOF;
     }
 
     public isNotReceive(): boolean
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(2);
-        return la.type !== GoLexer.RECEIVE;
+        return la.type !== GoParser.RECEIVE;
     }
 
     public addImportSpec(): void
@@ -57,7 +57,7 @@ export default abstract class GoParserBase extends Parser {
     protected isType(): boolean {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LA(1);
-        return la !== GoLexer.IDENTIFIER;
+        return la !== GoParser.IDENTIFIER;
     }
 
     public isOperand(): boolean
@@ -96,7 +96,7 @@ export default abstract class GoParserBase extends Parser {
     {
         const stream = this.inputStream as BufferedTokenStream;
         const la = stream.LT(1);
-        var result = la.type !== GoLexer.IDENTIFIER;
+        var result = la.type !== GoParser.IDENTIFIER;
         if (this.debug) console.log("isConversion Returning " + result + " for " + la);
         return result;
     }

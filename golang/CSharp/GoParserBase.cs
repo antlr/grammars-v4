@@ -7,7 +7,8 @@ using Antlr4.Runtime;
 public abstract class GoParserBase : Parser
 {
     const bool debug = false;
-    
+    HashSet<string> table = new HashSet<string>();
+
     protected GoParserBase(ITokenStream input)
         : base(input)
     {
@@ -30,16 +31,14 @@ public abstract class GoParserBase : Parser
     protected bool closingBracket()
     {
         var la = tokenStream.LT(1);
-        return la.Type == GoLexer.R_PAREN || la.Type == GoLexer.R_CURLY || la.Type == Eof;
+        return la.Type == GoParser.R_PAREN || la.Type == GoParser.R_CURLY || la.Type == Eof;
     }
 
     public bool isNotReceive()
     {
         var la = tokenStream.LT(2);
-        return la.Type != GoLexer.RECEIVE;
+        return la.Type != GoParser.RECEIVE;
     }
-
-    List<string> table = new List<string>();
 
     public void addImportSpec()
     {
@@ -101,9 +100,7 @@ public abstract class GoParserBase : Parser
     public bool isConversion()
     {
         var la = tokenStream.LT(1);
-        if (la.Text == "hMd5")
-        { }
-        var result = la.Type != GoLexer.IDENTIFIER;
+        var result = la.Type != GoParser.IDENTIFIER;
         if (debug) System.Console.WriteLine("isConversion Returning " + result + " for " + la);
         return result;
     }
