@@ -5,6 +5,7 @@ import { GoParser, ImportSpecContext } from './GoParser.js';
 export default abstract class GoParserBase extends Parser {
 
     debug: boolean;
+    table: Set<string>;
 
     constructor(input: TokenStream) {
         super(input);
@@ -24,8 +25,6 @@ export default abstract class GoParserBase extends Parser {
         const la = stream.LT(2);
         return la.type !== GoLexer.RECEIVE;
     }
-
-    table: Set<string>;
 
     public addImportSpec(): void
     {
@@ -63,7 +62,8 @@ export default abstract class GoParserBase extends Parser {
 
     public isOperand(): boolean
     {
-        const la = this.tokenStream.LT(1);
+        const stream = this.inputStream as BufferedTokenStream;
+        const la = stream.LT(1);
         if (la.text === "err") return true;
         var result = true;
         if (la.type !== GoParser.IDENTIFIER) {
@@ -71,7 +71,7 @@ export default abstract class GoParserBase extends Parser {
             return result;
         }
         result = this.table.has(la.text);
-        var la2 = this.tokenStream.LT(2);
+        var la2 = stream.LT(2);
         // If it's not followed by a '.', then it really should be
         // considered as operand.
         if (la2.type !== GoParser.DOT) {
@@ -81,7 +81,7 @@ export default abstract class GoParserBase extends Parser {
         }
         // If it's followed by '.', and then followed by '(', then
         // it is a typeAssertion, and so la must be an operand.
-        var la3 = this.tokenStream.LT(3);
+        var la3 = stream.LT(3);
         if (la3.type === GoParser.L_PAREN)
         {
             result = true;
@@ -94,7 +94,8 @@ export default abstract class GoParserBase extends Parser {
 
     public isConversion(): boolean
     {
-        var la = this.tokenStream.LT(1);
+        const stream = this.inputStream as BufferedTokenStream;
+        const la = stream.LT(1);
         var result = la.type !== GoLexer.IDENTIFIER;
         if (this.debug) console.log("isConversion Returning " + result + " for " + la);
         return result;
@@ -102,7 +103,8 @@ export default abstract class GoParserBase extends Parser {
 
     public isMethodExpr(): boolean
     {
-        var la = this.tokenStream.LT(1);
+        const stream = this.inputStream as BufferedTokenStream;
+        const la = stream.LT(1);
         var result = true;
         // See if it looks like a method expr.
         if (la.type === GoParser.STAR) {
