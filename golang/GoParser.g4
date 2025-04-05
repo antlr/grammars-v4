@@ -44,7 +44,7 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName { this.myreset(); }
+    : PACKAGE packageName {this.myreset();}
     ;
 
 packageName
@@ -58,7 +58,7 @@ importDecl
     ;
 
 importSpec
-    : (DOT | packageName)? importPath { this.addImportSpec(); }
+    : (DOT | packageName)? importPath {this.addImportSpec();}
     ;
 
 importPath
@@ -411,9 +411,9 @@ expression
     ;
 
 primaryExpr :
-    ( { this.isOperand() }? operand
-    | { this.isConversion() }? conversion
-    | { this.isMethodExpr() }? methodExpr )
+    ( {this.isOperand()}? operand
+    | {this.isConversion()}? conversion
+    | {this.isMethodExpr()}? methodExpr )
     ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments )*
     ;
 
