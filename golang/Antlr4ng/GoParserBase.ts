@@ -9,6 +9,9 @@ export default abstract class GoParserBase extends Parser {
 
     constructor(input: TokenStream) {
         super(input);
+    }
+
+    protected myreset(): void {
         this.debug = false;
         this.table = new Set<string>();
     }

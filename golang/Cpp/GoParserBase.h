@@ -16,6 +16,7 @@ public:
     virtual ~GoParserBase() {}
 
 protected:
+    void myreset();
     bool closingBracket();
     bool isNotReceive();
     void addImportSpec();

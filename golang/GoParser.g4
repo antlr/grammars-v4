@@ -44,7 +44,7 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName
+    : PACKAGE packageName { this.myreset(); }
     ;
 
 packageName

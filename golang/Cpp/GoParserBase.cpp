@@ -1,6 +1,11 @@
 #include "GoParserBase.h"
 #include "GoParser.h"
 
+void GoParserBase::myreset()
+{
+    table.clear();
+}
+
 bool GoParserBase::closingBracket()
 {
     antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
@@ -10,49 +15,49 @@ bool GoParserBase::closingBracket()
 
 bool GoParserBase::isNotReceive()
 {
-	antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
-	auto la = stream->LT(2);
-	return la->getType() != GoParser::RECEIVE;
+    antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
+    auto la = stream->LT(2);
+    return la->getType() != GoParser::RECEIVE;
 }
 
 std::vector<std::string> split(const std::string& str, char delimiter)
 {
-	std::vector<std::string> tokens;
-	std::stringstream ss(str);
-	std::string token;
+    std::vector<std::string> tokens;
+    std::stringstream ss(str);
+    std::string token;
 
-	while (std::getline(ss, token, delimiter))
-	{
-		tokens.push_back(token);
-	}
+    while (std::getline(ss, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
 
-	return tokens;
+    return tokens;
 }
 
 void GoParserBase::addImportSpec()
 {
-	antlr4::ParserRuleContext* ctx = this->_ctx;
-	auto count = ctx->children.size();
-	auto importSpec = dynamic_cast<GoParser::ImportSpecContext*>(ctx);
-	if (importSpec == nullptr) return;
-	auto packageName = importSpec->packageName();
-	if (packageName != nullptr)
-	{
-		auto name = packageName->getText();
-		if (debug) std::cout << "Entering " << name;
-		table.insert(name);
-	}
-	else
-	{
-		auto name = importSpec->importPath()->getText();
-		name.erase(std::remove(name.begin(), name.end(), '\"'), name.end());
-		std::replace(name.begin(), name.end(), '\\', '/');
-		auto pathArr = split(name, '/');
-		auto fileArr = split(pathArr[pathArr.size()-1], '.');
-		auto fileName = fileArr[fileArr.size()-1];
-		if (this->debug) std::cout << "Entering " << fileName << std::endl;
-		table.insert(fileName);
-	}
+    antlr4::ParserRuleContext* ctx = this->_ctx;
+    auto count = ctx->children.size();
+    auto importSpec = dynamic_cast<GoParser::ImportSpecContext*>(ctx);
+    if (importSpec == nullptr) return;
+    auto packageName = importSpec->packageName();
+    if (packageName != nullptr)
+    {
+        auto name = packageName->getText();
+        if (debug) std::cout << "Entering " << name;
+        table.insert(name);
+    }
+    else
+    {
+        auto name = importSpec->importPath()->getText();
+        name.erase(std::remove(name.begin(), name.end(), '\"'), name.end());
+        std::replace(name.begin(), name.end(), '\\', '/');
+        auto pathArr = split(name, '/');
+        auto fileArr = split(pathArr[pathArr.size()-1], '.');
+        auto fileName = fileArr[fileArr.size()-1];
+        if (this->debug) std::cout << "Entering " << fileName << std::endl;
+        table.insert(fileName);
+    }
 }
 
 bool GoParserBase::isOperand()

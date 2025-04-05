@@ -19,13 +19,17 @@ public abstract class GoParserBase : Parser
     {
     }
 
-
     private ITokenStream tokenStream
     {
         get
         {
             return TokenStream;
         }
+    }
+
+    protected void myreset()
+    {
+        table = new HashSet<string>();
     }
 
     protected bool closingBracket()

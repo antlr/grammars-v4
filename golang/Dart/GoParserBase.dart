@@ -9,6 +9,11 @@ abstract class GoParserBase extends Parser
 
     GoParserBase(TokenStream input) : super(input);
 
+    void myreset()
+    {
+        table = new HashSet<String>();
+    }
+
     bool closingBracket()
     {
         final la = this.tokenStream.LT(1);
@@ -53,6 +58,9 @@ abstract class GoParserBase extends Parser
     {
         final la = this.tokenStream.LT(1);
         bool result = true;
+        if (la?.text == "err") {
+            return true;
+        }
         if (la?.type != GoParser.TOKEN_IDENTIFIER) {
             if (debug) {
                 print('isOperand Returning $result for ${la?.text}');
