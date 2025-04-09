@@ -20,6 +20,7 @@
         <module>loop</module>
         <module>nanofuck</module>
         <module>sickbay</module>
+        <module>skull</module>
         <module>snowball</module>
         <module>wheel</module>
     </modules>
