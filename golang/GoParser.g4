@@ -44,7 +44,7 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName
+    : PACKAGE packageName {this.myreset();}
     ;
 
 packageName
@@ -58,7 +58,7 @@ importDecl
     ;
 
 importSpec
-    : (DOT | packageName)? importPath
+    : (DOT | packageName)? importPath {this.addImportSpec();}
     ;
 
 importPath
@@ -229,7 +229,7 @@ deferStmt
     ;
 
 ifStmt
-    : IF (expression | eos expression | simpleStmt eos expression) block (ELSE (ifStmt | block))?
+    : IF (expression | (SEMI | EOS) expression | simpleStmt (SEMI | EOS) expression) block (ELSE (ifStmt | block))?
     ;
 
 switchStmt
@@ -410,11 +410,11 @@ expression
     | expression LOGICAL_OR expression
     ;
 
-primaryExpr
-    : operand
-    | { this.isType() }? conversion
-    | methodExpr
-    | primaryExpr ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments)
+primaryExpr :
+    ( {this.isOperand()}? operand
+    | {this.isConversion()}? conversion
+    | {this.isMethodExpr()}? methodExpr )
+    ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments )*
     ;
 
 conversion
