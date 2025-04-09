@@ -1,0 +1,291 @@
+0ox;                   //Increment the block x by 1 9 times
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{                   //While block x is not 0
+  0oy;                 //Increment the block y by 1 8 times
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;                 //Decrement block x by 1
+};
+1iy;                   //Output block y (H)
+0iy{                   //Reset block y to 0
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+0oy;
+1iy;                   //Output block y (e)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+1iy;                   //Output block y (l)
+1iy;                   //Output block y again
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+0oy;
+1iy;                   //Output block y (o)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+1iy;                   //Output block y (space)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+1oy;
+1iy;                   //Output block y (W)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+0oy;
+1iy;                   //Output block y (o)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+0oy;
+0oy;
+1iy;                   //Output block y (r)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+1iy;                   //Output block y (l)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+1iy;                   //Output block y (d)
+0iy{
+  1oy;
+};
+0ox;
+0ox;
+0ox;
+0ox;
+0ix{
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  0oy;
+  1ox;
+};
+0oy;
+1iy;                   //Output block y (!)
+0iy{
+  1oy;
+};
