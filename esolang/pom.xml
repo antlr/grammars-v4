@@ -12,6 +12,7 @@
     </parent>
 
 	<modules>
+        <module>bio</module>
         <module>brainfuck</module>
         <module>brainflak</module>
         <module>cool</module>
