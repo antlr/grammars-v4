@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>asm8080</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com 8080 grammar</name>
+	<name>ASM 8080 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>asmparent</artifactId>
@@ -40,7 +40,6 @@
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>asm8080</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

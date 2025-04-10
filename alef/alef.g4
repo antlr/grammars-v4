@@ -32,602 +32,604 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // http://doc.cat-v.org/plan_9/2nd_edition/papers/alef/ref
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar alef;
 
 program
-   : decllist? EOF
-   ;
+    : decllist? EOF
+    ;
 
 decllist
-   : decl+
-   ;
+    : decl+
+    ;
 
 decl
-   : tname vardecllist? ';'
-   | tname vardecl '(' arglist? ')' block
-   | tname adtfunc '(' arglist? ')' block
-   | tname vardecl '(' arglist? ')' ';'
-   | typespec ';'
-   | TYPEDEF ztname vardecl zargs? ';'
-   | TYPEDEF IDENTIFIER ';'
-   ;
+    : tname vardecllist? ';'
+    | tname vardecl '(' arglist? ')' block
+    | tname adtfunc '(' arglist? ')' block
+    | tname vardecl '(' arglist? ')' ';'
+    | typespec ';'
+    | TYPEDEF ztname vardecl zargs? ';'
+    | TYPEDEF IDENTIFIER ';'
+    ;
 
 zargs
-   : '(' arglist? ')'
-   ;
+    : '(' arglist? ')'
+    ;
 
 ztname
-   : tname
-   | AGGR
-   | ADT
-   | UNION
-   ;
+    : tname
+    | AGGR
+    | ADT
+    | UNION
+    ;
 
 adtfunc
-   : typename '.' name
-   | indsp typename '.' name
-   ;
+    : typename '.' name
+    | indsp typename '.' name
+    ;
 
 typespec
-   : AGGR ztag? '{' memberlist '}' ztag?
-   | UNION ztag? '{' memberlist '}' ztag?
-   | ADT ztag? zpolytype? '{' memberlist '}' ztag?
-   | ENUM ztag? '{' setlist '}'
-   ;
+    : AGGR ztag? '{' memberlist '}' ztag?
+    | UNION ztag? '{' memberlist '}' ztag?
+    | ADT ztag? zpolytype? '{' memberlist '}' ztag?
+    | ENUM ztag? '{' setlist '}'
+    ;
 
 ztag
-   : name
-   | typename
-   ;
+    : name
+    | typename
+    ;
 
 zpolytype
-   : '[' polytype ']'
-   ;
+    : '[' polytype ']'
+    ;
 
 polytype
-   : name
-   | name ',' polytype
-   ;
+    : name
+    | name ',' polytype
+    ;
 
 setlist
-   : sname?
-   | setlist ',' setlist
-   ;
+    : sname?
+    | setlist ',' setlist
+    ;
 
 sname
-   : name ('=' expr_)?
-   ;
+    : name ('=' expr_)?
+    ;
 
 name
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 memberlist
-   : decl
-   | memberlist decl
-   ;
+    : decl
+    | memberlist decl
+    ;
 
 vardecllist
-   : ivardecl (',' ivardecl)*
-   ;
+    : ivardecl (',' ivardecl)*
+    ;
 
 ivardecl
-   : vardecl zinit?
-   ;
+    : vardecl zinit?
+    ;
 
 zinit
-   : '=' zelist
-   ;
+    : '=' zelist
+    ;
 
 zelist
-   : zexpr?
-   | '[' expr_ ']' expr_
-   | '.' stag expr_
-   | '{' zelist '}'
-   | '[' expr_ ']' '{' zelist '}'
-   | zelist ',' zelist
-   ;
+    : zexpr?
+    | '[' expr_ ']' expr_
+    | '.' stag expr_
+    | '{' zelist '}'
+    | '[' expr_ ']' '{' zelist '}'
+    | zelist ',' zelist
+    ;
 
 vardecl
-   : IDENTIFIER arrayspec?
-   | indsp IDENTIFIER arrayspec?
-   | '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
-   | indsp '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
-   ;
+    : IDENTIFIER arrayspec?
+    | indsp IDENTIFIER arrayspec?
+    | '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
+    | indsp '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
+    ;
 
 arrayspec
-   : ('[' zexpr? ']')+
-   ;
+    : ('[' zexpr? ']')+
+    ;
 
 indsp
-   : '*'+
-   ;
+    : '*'+
+    ;
 
 arglist
-   : arglistp* ',' arg
-   ;
+    : arglistp* ',' arg
+    ;
 
 arglistp
-   : arg
-   | '*' xtname
-   | '.' xtname
-   ;
+    : arg
+    | '*' xtname
+    | '.' xtname
+    ;
 
 arg
-   : xtname
-   | xtname indsp arrayspec?
-   | xtname '(' indsp ')' '(' arglist? ')'
-   | xtname indsp '(' indsp ')' '(' arglist? ')'
-   | TUPLE tuplearg
-   | xtname vardecl
-   | '.' '.' '.'
-   ;
+    : xtname
+    | xtname indsp arrayspec?
+    | xtname '(' indsp ')' '(' arglist? ')'
+    | xtname indsp '(' indsp ')' '(' arglist? ')'
+    | TUPLE tuplearg
+    | xtname vardecl
+    | '.' '.' '.'
+    ;
 
 tuplearg
-   : tname
-   | tname '(' indsp ')' '(' arglist? ')'
-   | tname vardecl
-   ;
+    : tname
+    | tname '(' indsp ')' '(' arglist? ')'
+    | tname vardecl
+    ;
 
 autolist
-   : autodecl+
-   ;
+    : autodecl+
+    ;
 
 autodecl
-   : xtname vardecllist? ';'
-   | TUPLE tname vardecllist? ';'
-   ;
+    : xtname vardecllist? ';'
+    | TUPLE tname vardecllist? ';'
+    ;
 
 block
-   : '{' autolist? slist? '}'
-   | '!' '{' autolist? slist? '}'
-   ;
+    : '{' autolist? slist? '}'
+    | '!' '{' autolist? slist? '}'
+    ;
 
 slist
-   : stmnt+
-   ;
+    : stmnt+
+    ;
 
 tbody
-   : '{' ctlist? '}'
-   | '!' '{' clist? '}'
-   ;
+    : '{' ctlist? '}'
+    | '!' '{' clist? '}'
+    ;
 
 ctlist
-   : tcase+
-   ;
+    : tcase+
+    ;
 
 tcase
-   : CASE typecast ':' slist?
-   | DEFAULT ':' slist?
-   ;
+    : CASE typecast ':' slist?
+    | DEFAULT ':' slist?
+    ;
 
 cbody
-   : '{' clist? '}'
-   | '!' '{' clist? '}'
-   ;
+    : '{' clist? '}'
+    | '!' '{' clist? '}'
+    ;
 
 clist
-   : case_+
-   ;
+    : case_+
+    ;
 
 case_
-   : CASE expr_ ':' slist?
-   | DEFAULT ':' slist?
-   ;
+    : CASE expr_ ':' slist?
+    | DEFAULT ':' slist?
+    ;
 
 rbody
-   : stmnt
-   | IDENTIFIER block
-   ;
+    : stmnt
+    | IDENTIFIER block
+    ;
 
 zlab
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 stmnt
-   : nlstmnt
-   | IDENTIFIER ':' stmnt
-   ;
+    : nlstmnt
+    | IDENTIFIER ':' stmnt
+    ;
 
 info
-   : ',' STRING_CONST
-   ;
+    : ',' STRING_CONST
+    ;
 
 nlstmnt
-   : zexpr? ';'
-   | block
-   | CHECK expr_ info? ';'
-   | ALLOC elist ';'
-   | UNALLOC elist ';'
-   | RESCUE rbody
-   | RAISE zlab? ';'
-   | GOTO IDENTIFIER ';'
-   | PROC elist ';'
-   | TASK elist ';'
-   | BECOME expr_ ';'
-   | ALT cbody
-   | RETURN zexpr? ';'
-   | FOR '(' zexpr? ';' zexpr? ';' zexpr? ')' stmnt
-   | WHILE '(' expr_ ')' stmnt
-   | DO stmnt WHILE '(' expr_ ')'
-   | IF '(' expr_ ')' stmnt
-   | IF '(' expr_ ')' stmnt ELSE stmnt
-   | PAR block
-   | SWITCH expr_ cbody
-   | TYPEOF expr_ tbody
-   | CONTINUE zconst? ';'
-   | BREAK zconst? ';'
-   ;
+    : zexpr? ';'
+    | block
+    | CHECK expr_ info? ';'
+    | ALLOC elist ';'
+    | UNALLOC elist ';'
+    | RESCUE rbody
+    | RAISE zlab? ';'
+    | GOTO IDENTIFIER ';'
+    | PROC elist ';'
+    | TASK elist ';'
+    | BECOME expr_ ';'
+    | ALT cbody
+    | RETURN zexpr? ';'
+    | FOR '(' zexpr? ';' zexpr? ';' zexpr? ')' stmnt
+    | WHILE '(' expr_ ')' stmnt
+    | DO stmnt WHILE '(' expr_ ')'
+    | IF '(' expr_ ')' stmnt
+    | IF '(' expr_ ')' stmnt ELSE stmnt
+    | PAR block
+    | SWITCH expr_ cbody
+    | TYPEOF expr_ tbody
+    | CONTINUE zconst? ';'
+    | BREAK zconst? ';'
+    ;
 
 zconst
-   : CONSTANT
-   ;
+    : CONSTANT
+    ;
 
 zexpr
-   : expr_
-   ;
+    : expr_
+    ;
 
 expr_
-   : castexpr
-   | expr_ '*' expr_
-   | expr_ '/' expr_
-   | expr_ '%' expr_
-   | expr_ '+' expr_
-   | expr_ '-' expr_
-   | expr_ '>>' expr_
-   | expr_ '<<' expr_
-   | expr_ '<' expr_
-   | expr_ '>' expr_
-   | expr_ '<=' expr_
-   | expr_ '>=' expr_
-   | expr_ '==' expr_
-   | expr_ '!=' expr_
-   | expr_ '&' expr_
-   | expr_ '^' expr_
-   | expr_ '|' expr_
-   | expr_ '&&' expr_
-   | expr_ '||' expr_
-   | expr_ '=' expr_
-   | expr_ ':=' expr_
-   | expr_ '<-' '=' expr_
-   | expr_ '+=' expr_
-   | expr_ '-=' expr_
-   | expr_ '*=' expr_
-   | expr_ '/=' expr_
-   | expr_ '%=' expr_
-   | expr_ '>>=' expr_
-   | expr_ '<<=' expr_
-   | expr_ '&=' expr_
-   | expr_ '|=' expr_
-   | expr_ '^=' expr_
-   | expr_ '::' expr_
-   ;
+    : castexpr
+    | expr_ '*' expr_
+    | expr_ '/' expr_
+    | expr_ '%' expr_
+    | expr_ '+' expr_
+    | expr_ '-' expr_
+    | expr_ '>>' expr_
+    | expr_ '<<' expr_
+    | expr_ '<' expr_
+    | expr_ '>' expr_
+    | expr_ '<=' expr_
+    | expr_ '>=' expr_
+    | expr_ '==' expr_
+    | expr_ '!=' expr_
+    | expr_ '&' expr_
+    | expr_ '^' expr_
+    | expr_ '|' expr_
+    | expr_ '&&' expr_
+    | expr_ '||' expr_
+    | expr_ '=' expr_
+    | expr_ ':=' expr_
+    | expr_ '<-' '=' expr_
+    | expr_ '+=' expr_
+    | expr_ '-=' expr_
+    | expr_ '*=' expr_
+    | expr_ '/=' expr_
+    | expr_ '%=' expr_
+    | expr_ '>>=' expr_
+    | expr_ '<<=' expr_
+    | expr_ '&=' expr_
+    | expr_ '|=' expr_
+    | expr_ '^=' expr_
+    | expr_ '::' expr_
+    ;
 
 castexpr
-   : monexpr
-   | '(' typecast ')' castexpr
-   | '(' ALLOC typecast ')' castexpr
-   ;
+    : monexpr
+    | '(' typecast ')' castexpr
+    | '(' ALLOC typecast ')' castexpr
+    ;
 
 typecast
-   : xtname
-   | xtname indsp
-   | xtname '(' indsp ')' '(' arglist? ')'
-   | TUPLE tname
-   ;
+    : xtname
+    | xtname indsp
+    | xtname '(' indsp ')' '(' arglist? ')'
+    | TUPLE tname
+    ;
 
 monexpr
-   : term_
-   | '*' castexpr
-   | '&' castexpr
-   | '+' castexpr
-   | '-' castexpr
-   | '--' castexpr
-   | ZEROX castexpr
-   | '++' castexpr
-   | '!' castexpr
-   | '~' castexpr
-   | SIZEOF monexpr
-   | '<-' castexpr
-   | '?' castexpr
-   ;
+    : term_
+    | '*' castexpr
+    | '&' castexpr
+    | '+' castexpr
+    | '-' castexpr
+    | '--' castexpr
+    | ZEROX castexpr
+    | '++' castexpr
+    | '!' castexpr
+    | '~' castexpr
+    | SIZEOF monexpr
+    | '<-' castexpr
+    | '?' castexpr
+    ;
 
 ztelist
-   : telist
-   ;
+    : telist
+    ;
 
 telist
-   : tcomp (',' tcomp)*
-   ;
+    : tcomp (',' tcomp)*
+    ;
 
 tcomp
-   : expr_
-   | '{' ztelist? '}'
-   ;
+    : expr_
+    | '{' ztelist? '}'
+    ;
 
 term_
-   : '(' telist ')'
-   | SIZEOF '(' typecast ')'
-   | term_ '(' zarlist? ')'
-   | term_ '[' expr_ ']'
-   | term_ '.' stag
-   | '.' typename '.' stag
-   | term_ '->' stag
-   | term_ '--'
-   | term_ '++'
-   | term_ '?'
-   | name
-   | '.' '.' '.'
-   | ARITHMETIC_CONST
-   | NIL
-   | CONSTANT
-   | enum_member
-   | STRING_CONST
-   | '$' STRING_CONST
-   ;
+    : '(' telist ')'
+    | SIZEOF '(' typecast ')'
+    | term_ '(' zarlist? ')'
+    | term_ '[' expr_ ']'
+    | term_ '.' stag
+    | '.' typename '.' stag
+    | term_ '->' stag
+    | term_ '--'
+    | term_ '++'
+    | term_ '?'
+    | name
+    | '.' '.' '.'
+    | ARITHMETIC_CONST
+    | NIL
+    | CONSTANT
+    | enum_member
+    | STRING_CONST
+    | '$' STRING_CONST
+    ;
 
 stag
-   : IDENTIFIER
-   | typename
-   ;
+    : IDENTIFIER
+    | typename
+    ;
 
 zarlist
-   : elist
-   ;
+    : elist
+    ;
 
 elist
-   : expr_
-   | elist ',' expr_
-   ;
+    : expr_
+    | elist ',' expr_
+    ;
 
 tlist
-   : typecast
-   | typecast ',' tlist
-   ;
+    : typecast
+    | typecast ',' tlist
+    ;
 
 tname
-   : sclass? xtname
-   | sclass? TUPLE '(' tlist ')'
-   | sclass? '(' tlist ')'
-   ;
+    : sclass? xtname
+    | sclass? TUPLE '(' tlist ')'
+    | sclass? '(' tlist ')'
+    ;
 
 variant
-   : typecast
-   | typecast ',' variant
-   ;
+    : typecast
+    | typecast ',' variant
+    ;
 
 xtname
-   : INT
-   | UINT
-   | SINT
-   | USINT
-   | BYTE
-   | FLOAT
-   | VOID
-   | typename
-   | typename '[' variant ']'
-   | CHAN '(' variant ')' bufdim?
-   ;
+    : INT
+    | UINT
+    | SINT
+    | USINT
+    | BYTE
+    | FLOAT
+    | VOID
+    | typename
+    | typename '[' variant ']'
+    | CHAN '(' variant ')' bufdim?
+    ;
 
 bufdim
-   : '[' expr_ ']'
-   ;
+    : '[' expr_ ']'
+    ;
 
 sclass
-   : EXTERN
-   | INTERN
-   | PRIVATE
-   ;
+    : EXTERN
+    | INTERN
+    | PRIVATE
+    ;
 
 typename
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 enum_member
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 ADT
-   : 'adt'
-   ;
+    : 'adt'
+    ;
 
 AGGR
-   : 'aggr'
-   ;
+    : 'aggr'
+    ;
 
 ALLOC
-   : 'alloc'
-   ;
+    : 'alloc'
+    ;
 
 ALT
-   : 'alt'
-   ;
+    : 'alt'
+    ;
 
 BECOME
-   : 'become'
-   ;
+    : 'become'
+    ;
 
 BREAK
-   : 'break'
-   ;
+    : 'break'
+    ;
 
 BYTE
-   : 'byte'
-   ;
+    : 'byte'
+    ;
 
 CASE
-   : 'case'
-   ;
+    : 'case'
+    ;
 
 CHAN
-   : 'chan'
-   ;
+    : 'chan'
+    ;
 
 CHECK
-   : 'check'
-   ;
+    : 'check'
+    ;
 
 CONTINUE
-   : 'continue'
-   ;
+    : 'continue'
+    ;
 
 DEFAULT
-   : 'default'
-   ;
+    : 'default'
+    ;
 
 DO
-   : 'do'
-   ;
+    : 'do'
+    ;
 
 ELSE
-   : 'else'
-   ;
+    : 'else'
+    ;
 
 ENUM
-   : 'enum'
-   ;
+    : 'enum'
+    ;
 
 EXTERN
-   : 'extern'
-   ;
+    : 'extern'
+    ;
 
 FLOAT
-   : 'float'
-   ;
+    : 'float'
+    ;
 
 FOR
-   : 'for'
-   ;
+    : 'for'
+    ;
 
 GOTO
-   : 'goto'
-   ;
+    : 'goto'
+    ;
 
 IF
-   : 'if'
-   ;
+    : 'if'
+    ;
 
 INT
-   : 'int'
-   ;
+    : 'int'
+    ;
 
 INTERN
-   : 'intern'
-   ;
+    : 'intern'
+    ;
 
 LINT
-   : 'lint'
-   ;
+    : 'lint'
+    ;
 
 NIL
-   : 'nil'
-   ;
+    : 'nil'
+    ;
 
 PAR
-   : 'par'
-   ;
+    : 'par'
+    ;
 
 PROC
-   : 'proc'
-   ;
+    : 'proc'
+    ;
 
 RAISE
-   : 'raise'
-   ;
+    : 'raise'
+    ;
 
 RESCUE
-   : 'rescue'
-   ;
+    : 'rescue'
+    ;
 
 RETURN
-   : 'return'
-   ;
+    : 'return'
+    ;
 
 SINT
-   : 'sint'
-   ;
+    : 'sint'
+    ;
 
 SIZEOF
-   : 'sizeof'
-   ;
+    : 'sizeof'
+    ;
 
 SWITCH
-   : 'switch'
-   ;
+    : 'switch'
+    ;
 
 TASK
-   : 'task'
-   ;
+    : 'task'
+    ;
 
 TUPLE
-   : 'tuple'
-   ;
+    : 'tuple'
+    ;
 
 TYPEDEF
-   : 'typedef'
-   ;
+    : 'typedef'
+    ;
 
 TYPEOF
-   : 'typeof'
-   ;
+    : 'typeof'
+    ;
 
 UINT
-   : 'uint'
-   ;
+    : 'uint'
+    ;
 
 ULINT
-   : 'ulint'
-   ;
+    : 'ulint'
+    ;
 
 UNALLOC
-   : 'unalloc'
-   ;
+    : 'unalloc'
+    ;
 
 UNION
-   : 'union'
-   ;
+    : 'union'
+    ;
 
 USINT
-   : 'usint'
-   ;
+    : 'usint'
+    ;
 
 VOID
-   : 'void'
-   ;
+    : 'void'
+    ;
 
 WHILE
-   : 'while'
-   ;
+    : 'while'
+    ;
 
 ZEROX
-   : 'zerox'
-   ;
+    : 'zerox'
+    ;
 
 PRIVATE
-   : 'private'
-   ;
+    : 'private'
+    ;
 
 IDENTIFIER
-   : [a-zA-Z_] [a-zA-Z_0-9]*
-   ;
+    : [a-zA-Z_] [a-zA-Z_0-9]*
+    ;
 
 STRING_CONST
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 CONSTANT
-   : '\'' ~ '\''* '\''
-   ;
+    : '\'' ~ '\''* '\''
+    ;
 
 ARITHMETIC_CONST
-   : DIGIT+ ('.' DIGIT*)? ('e' DIGIT+)?
-   ;
+    : DIGIT+ ('.' DIGIT*)? ('e' DIGIT+)?
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

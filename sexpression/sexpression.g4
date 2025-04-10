@@ -26,68 +26,71 @@ THE SOFTWARE.
 /*
 Port to Antlr4 by Tom Everett
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar sexpression;
 
 sexpr
-   : item* EOF
-   ;
+    : item* EOF
+    ;
 
 item
-   : atom
-   | list_
-   | LPAREN item DOT item RPAREN
-   ;
+    : atom
+    | list_
+    | LPAREN item DOT item RPAREN
+    ;
 
 list_
-   : LPAREN item* RPAREN
-   ;
+    : LPAREN item* RPAREN
+    ;
 
 atom
-   : STRING
-   | SYMBOL
-   | NUMBER
-   | DOT
-   ;
+    : STRING
+    | SYMBOL
+    | NUMBER
+    | DOT
+    ;
 
 STRING
-   : '"' ('\\' . | ~ ('\\' | '"'))* '"'
-   ;
+    : '"' ('\\' . | ~ ('\\' | '"'))* '"'
+    ;
 
 WHITESPACE
-   : (' ' | '\n' | '\t' | '\r')+ -> skip
-   ;
+    : (' ' | '\n' | '\t' | '\r')+ -> skip
+    ;
 
 NUMBER
-   : ('+' | '-')? (DIGIT)+ ('.' (DIGIT)+)?
-   ;
+    : ('+' | '-')? (DIGIT)+ ('.' (DIGIT)+)?
+    ;
 
 SYMBOL
-   : SYMBOL_START (SYMBOL_START | DIGIT)*
-   ;
+    : SYMBOL_START (SYMBOL_START | DIGIT)*
+    ;
 
 LPAREN
-   : '('
-   ;
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
+    : ')'
+    ;
 
 DOT
-   : '.'
-   ;
+    : '.'
+    ;
 
 fragment SYMBOL_START
-   : ('a' .. 'z')
-   | ('A' .. 'Z')
-   | '+'
-   | '-'
-   | '*'
-   | '/'
-   | '.'
-   ;
+    : ('a' .. 'z')
+    | ('A' .. 'Z')
+    | '+'
+    | '-'
+    | '*'
+    | '/'
+    | '.'
+    ;
 
 fragment DIGIT
-   : ('0' .. '9')
-   ;
-
+    : ('0' .. '9')
+    ;

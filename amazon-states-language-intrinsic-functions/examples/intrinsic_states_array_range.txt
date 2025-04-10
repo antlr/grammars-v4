@@ -1,0 +1,1 @@
+States.ArrayRange($.FunctionInput.fst, $.FunctionInput.snd, $.FunctionInput.trd)
