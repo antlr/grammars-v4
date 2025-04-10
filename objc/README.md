@@ -30,6 +30,13 @@ during parsing of the ordinary Objective-C code.
 
 # Testing
 
+You should use Maven to test Objective-C grammar.
+
+1. Clone grammars-v4. `git clone https://github.com/antlr/grammars-v4.git`
+2. Make sure you have Maven installed. [See the documentation](https://maven.apache.org/).
+3. `cd grammars-v4/objc`.
+4. Execute `mvn clean test`.
+
 ## One-step processing
 
 Successful parsing and conversion of complete projects,

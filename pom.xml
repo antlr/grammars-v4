@@ -10,9 +10,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
+
+		<!-- The Antlr tool version is specified with
+		antlr.version. The Antlr runtime is tied to the
+		version of antlr4test-maven-plugin.version. When Antlr
+		is release, the plugin has to be updated. -->
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
 		<antlr.version>4.11.1</antlr.version>
+
 		<junit.version>4.13.2</junit.version>
+
+        <packageName>org.antlr.grammars.${project.artifactId}</packageName>
+        <packagePath>org/antlr/grammars/${project.artifactId}</packagePath>
+        <packageLine>package ${packageName};</packageLine>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -46,16 +56,63 @@
 			<version>${junit.version}</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.11.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/generated-sources/copy/${packagePath}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/Java</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <delimiters>
+                                <delimiter>///{*}</delimiter>
+                            </delimiters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources/copy/${packagePath}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 	</build>
 	<profiles>
 		<profile>
@@ -67,16 +124,20 @@
 				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
+                <module>action</module>
 				<module>ada</module>
 				<module>alef</module>
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
+                <module>amazon-states-language</module>
+                <module>amazon-states-language-intrinsic-functions</module>
 				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
 				<module>aql</module>
+                <module>arden</module>
 				<module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
@@ -84,12 +145,14 @@
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!-- <module>aspectj</module> -->
+                <module>aterm</module>
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
 				<module>bcl</module>
 				<module>bcpl</module>
 				<module>bdf</module>
+				<module>bencoding</module>
 				<module>bibcode</module>
 				<module>bicep</module>
 				<module>bnf</module>
@@ -103,7 +166,7 @@
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
-				<module>cobol85</module>
+				<module>codeql</module>
 				<module>cookie</module>
 				<module>cpp</module>
 				<module>cql</module>
@@ -125,6 +188,7 @@
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>
+				<module>elixir</module>
 				<module>erlang</module>
 				<module>esolang</module>
 				<module>evm-bytecode</module>
@@ -135,7 +199,7 @@
 				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
-				<module>fortran77</module>
+				<module>fortran</module>
 				<module>fusion-tables</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
@@ -165,6 +229,7 @@
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
+				<module>javacc</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>joss</module>
@@ -220,6 +285,8 @@
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
+                <module>pf</module>
+				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
@@ -255,14 +322,14 @@
 				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
-                <module>ron</module>
+				<module>ron</module>
 				<module>rpn</module>
 				<module>ruby</module>
 				<module>rust</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
-                <module>semver</module>
+				<module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
@@ -318,6 +385,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wkt-crs-v1</module>
 				<module>wln</module>
 				<module>wren</module>
 				<module>xml</module>
@@ -346,7 +414,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.2.1</version>
+						<version>3.3.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -375,7 +443,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

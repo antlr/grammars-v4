@@ -3,8 +3,8 @@
 This directory contains scripts for CI testing.
 
 * regtest.sh -- This is a Bash-based script to test any target. To
-run, cd to grammar-vs/ or a grammar directory, then type `bash regtest.sh <target>`
-where `<target>` is Antlr4cs, Cpp, CSharp, Dart, Go, Java, PHP, or Python3.
+run, cd to grammar-vs/ or a grammar directory, then type `bash _scripts/test.sh <target>`
+where `<target>` is Cpp, CSharp, Dart, Go, Java, PHP, or Python3.
 To test the target, you will need the NET SDK installed (required for the trgen
 driver generator), access to the internet, and to toolchain for the target
 you want to test. You will also need to set the Antlr4 tool.
@@ -80,10 +80,6 @@ All the templates are in the "per-target directory" standard:
 Here is the structure of the default templates:
 
     templates/
-        Antlr4cs/
-            Program.cs
-            Test.csproj
-            makefile
         CSharp/
             ErrorListener.cs
             Program.cs
@@ -154,7 +150,7 @@ Trgen will construct and pass to the template evaluator the following attributes
 To generate the driver code from templates for a grammar, you will need
 to have the NET SDK installed. Afterwards, install `trgen`:
 
-    dotnet tool install -g trgen --version 0.5.3
+    dotnet tool install -g trgen --version 0.20.19
 
 To create a driver program:
 
@@ -166,7 +162,7 @@ You will need to pass to trgen
 to the templates. If you do not pass the --template-sources-directory option,
 the tool will use the default templates contained with the tool. You can
 generate a different target using `-t`. Acceptable targets are
-Antlr4cs, Cpp, CSharp, Dart, Go, Java, JavaScript, Python3.
+Cpp, CSharp, Dart, Go, Java, JavaScript, Python3.
 The "files" directory in the templates
 directory indicates what files are included in generation, and obtained
 via "find . -type f > files".

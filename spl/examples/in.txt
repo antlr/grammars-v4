@@ -1,0 +1,1 @@
+index="your_index" field_name IN ("value1", "value2", "value3")

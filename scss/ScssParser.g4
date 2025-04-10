@@ -27,12 +27,18 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar ScssParser;
 
-options { tokenVocab=ScssLexer; }
+options {
+    tokenVocab = ScssLexer;
+}
 
 stylesheet
-    : statement* EOF;
+    : statement* EOF
+    ;
 
 statement
     : importDeclaration
@@ -76,7 +82,8 @@ asClause
     ;
 
 withClause
-    : With Lparen parameters Rparen;
+    : With Lparen parameters Rparen
+    ;
 
 // Declarations
 variableDeclaration
@@ -94,8 +101,8 @@ variableValue
     ;
 
 variableName
-    : ( ( Minus Minus ) Dollar | plusMinus Dollar | Dollar) identifier
-    | plusMinus? namespace_? Dollar ( identifier | measurment )
+    : (( Minus Minus) Dollar | plusMinus Dollar | Dollar) identifier
+    | plusMinus? namespace_? Dollar ( identifier | measurment)
     | Variable
     ;
 
@@ -108,38 +115,41 @@ propertyDeclaration
     ;
 
 prio
-    : Important | Default
+    : Important
+    | Default
     ;
 
 propertyValue
-    : ( value
+    : (
+        value
         | value? prio? block
         | variableName
         | listSpaceSeparated
         | listCommaSeparated
         | expression
         | functionCall
-      ) prio?;
+    ) prio?
+    ;
 
 mediaDeclaration
     : Media mediaQueryList block
     ;
 
 mediaQueryList
-    : ( mediaQuery ( Comma mediaQuery )* )?
+    : (mediaQuery ( Comma mediaQuery)*)?
     ;
 
 mediaQuery
-    : ( Only | Not )? ( identifier | value ) ( And mediaExpression )*
-    | mediaExpression ( And mediaExpression )*
+    : (Only | Not)? (identifier | value) (And mediaExpression)*
+    | mediaExpression ( And mediaExpression)*
     ;
 
 mediaExpression
-    : Lparen identifier ( Colon value )? Rparen
+    : Lparen identifier (Colon value)? Rparen
     ;
 
 mixinDeclaration
-    : Mixin ( identifier| identifier Lparen parameters Rparen ) block
+    : Mixin (identifier | identifier Lparen parameters Rparen) block
     ;
 
 contentDeclaration
@@ -164,8 +174,7 @@ percentageStatement
     ;
 
 includeDeclaration
-    : Include namespace_? (identifier | functionCall)
-    ( Semi | Using Lparen parameters Rparen )? block?
+    : Include namespace_? (identifier | functionCall) (Semi | Using Lparen parameters Rparen)? block?
     ;
 
 interpolationDeclaration
@@ -173,8 +182,16 @@ interpolationDeclaration
     ;
 
 extendDeclaration
-    : Extend ( Percentage | parentRef )?
-    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parentRef )+ Semi?
+    : Extend (Percentage | parentRef)? (
+        id
+        | typeSelector
+        | universal
+        | className
+        | attrib
+        | pseudo
+        | interpolation
+        | parentRef
+    )+ Semi?
     ;
 
 warndingDeclaration
@@ -186,7 +203,7 @@ errorDeclaration
     ;
 
 atStatementDeclaration
-    : At ( identifier Lparen parameters Rparen | identifier ) block
+    : At (identifier Lparen parameters Rparen | identifier) block
     ;
 
 // Structure
@@ -200,11 +217,11 @@ block
 
 // Selectors
 selectorGroup
-    : selector ( Comma selector )*
+    : selector (Comma selector)*
     ;
 
 selector
-    : combinator? selectorSequence ( combinator selectorSequence )*
+    : combinator? selectorSequence (combinator selectorSequence)*
     ;
 
 combinator
@@ -215,8 +232,25 @@ combinator
     ;
 
 selectorSequence
-    : ( typeSelector | universal ) ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )*
-    | ( typeSelector| id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )+
+    : (typeSelector | universal) (
+        id
+        | className
+        | attrib
+        | pseudo
+        | negation
+        | interpolation ( variableName | Percentage)?
+        | parentRef
+    )*
+    | (
+        typeSelector
+        | id
+        | className
+        | attrib
+        | pseudo
+        | negation
+        | interpolation ( variableName | Percentage)?
+        | parentRef
+    )+
     ;
 
 id
@@ -224,11 +258,11 @@ id
     ;
 
 typeSelector
-    : typeNamespacePrefix? ( Percentage | parentRef )? ( identifier | variableName )
+    : typeNamespacePrefix? (Percentage | parentRef)? (identifier | variableName)
     ;
 
 typeNamespacePrefix
-    : ( identifier | Times )? Pipe
+    : (identifier | Times)? Pipe
     ;
 
 universal
@@ -236,11 +270,11 @@ universal
     ;
 
 className
-    : Dot ( Minus | identifier | interpolation )+
+    : Dot (Minus | identifier | interpolation)+
     ;
 
 interpolation
-    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parentRef ) BlockEnd measurment?
+    : namespace_? Hash BlockStart namespace_? (ifExpression | value | parentRef) BlockEnd measurment?
     ;
 
 parentRef
@@ -248,13 +282,16 @@ parentRef
     ;
 
 attrib
-    : Lbrack typeNamespacePrefix? identifier
-    ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch )
-    ( identifier | String_ ) )? Rbrack
+    : Lbrack typeNamespacePrefix? identifier (
+        (PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch) (
+            identifier
+            | String_
+        )
+    )? Rbrack
     ;
 
 pseudo
-    : Colon Colon? ( interpolation | identifier | functionalPseudo )
+    : Colon Colon? (interpolation | identifier | functionalPseudo)
     ;
 
 functionalPseudo
@@ -262,7 +299,7 @@ functionalPseudo
     ;
 
 pseudoParameter
-    : ( ( value | className | interpolation ) Comma?)
+    : (( value | className | interpolation) Comma?)
     ;
 
 negation
@@ -320,8 +357,7 @@ value
 
 // Function
 functionDeclaration
-    : Function ( namespace_? identifier )?
-    Lparen parameters Rparen BlockStart functionBody? BlockEnd
+    : Function (namespace_? identifier)? Lparen parameters Rparen BlockStart functionBody? BlockEnd
     ;
 
 parameters
@@ -329,7 +365,7 @@ parameters
     ;
 
 parameter
-    : ( value | variableDeclaration | listSpaceSeparated | mapDeclaration ) arglist? prio?
+    : (value | variableDeclaration | listSpaceSeparated | mapDeclaration) arglist? prio?
     ;
 
 functionBody
@@ -350,7 +386,7 @@ functionCall
     ;
 
 expression
-    : Not? expressionPart (operator_ Not? expressionPart )*
+    : Not? expressionPart (operator_ Not? expressionPart)*
     ;
 
 expressionPart
@@ -376,17 +412,14 @@ expressionPart
     ;
 
 ifExpression
-    : If Lparen ( expression | parentRef ) Comma value Comma value Rparen measurment? prio?
+    : If Lparen (expression | parentRef) Comma value Comma value Rparen measurment? prio?
     ;
-
 
 // List & Map
 listDeclaration
-    : ( listBracketed
-        | listCommaSeparated
-        | listSpaceSeparated
-      )
-    | Lparen listDeclaration Rparen;
+    : (listBracketed | listCommaSeparated | listSpaceSeparated)
+    | Lparen listDeclaration Rparen
+    ;
 
 listCommaSeparated
     : listElement (Comma listElement)* Comma?
@@ -397,7 +430,7 @@ listSpaceSeparated
     ;
 
 listBracketed
-    : Lbrack ( listSpaceSeparated | listCommaSeparated ) Rbrack
+    : Lbrack (listSpaceSeparated | listCommaSeparated) Rbrack
     ;
 
 listElement
@@ -442,7 +475,7 @@ elseStatement
     ;
 
 forDeclaration
-    : AtFor variableName From Number ( To | Through ) through block
+    : AtFor variableName From Number (To | Through) through block
     ;
 
 through
@@ -487,15 +520,15 @@ repeat
 
 // Primitives
 unit
-    : ( length | dimension | percentage | degree )
+    : (length | dimension | percentage | degree)
     ;
 
 length
-    : plusMinus? Number ( AbsLength | FontRelative | ViewportRelative )
+    : plusMinus? Number (AbsLength | FontRelative | ViewportRelative)
     ;
 
 dimension
-    : plusMinus? Number ( Time | Freq | Resolution | Angle)
+    : plusMinus? Number (Time | Freq | Resolution | Angle)
     ;
 
 percentage
@@ -535,7 +568,7 @@ hexcolor
     ;
 
 color
-    : ( Number | Ident )+
+    : (Number | Ident)+
     ;
 
 boolean
@@ -548,7 +581,7 @@ number
     ;
 
 identifier
-    : ( VendorPrefix  | Minus )? Ident
+    : (VendorPrefix | Minus)? Ident
     | From
     | To
     ;

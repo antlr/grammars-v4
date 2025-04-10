@@ -1,4 +1,4 @@
-![CI](https://github.com/antlr/grammars-v4/workflows/CI/badge.svg)
+![CI](https://github.com/antlr/grammars-v4/actions/workflows/main.yml/badge.svg)
 
 # Grammars-v4
 

@@ -21,9 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar YaraParser;
 
-options { tokenVocab=YaraLexer; }
+options {
+    tokenVocab = YaraLexer;
+}
 
 startRule
     : decl+ EOF
@@ -44,12 +49,7 @@ include_decl
     ;
 
 rule_decl
-    : rule_modifier* RULE id_ tags?
-        LCB
-            meta_section?
-            strings_section?
-            condition_section
-        RCB
+    : rule_modifier* RULE id_ tags? LCB meta_section? strings_section? condition_section RCB
     ;
 
 rule_modifier
@@ -84,15 +84,13 @@ bool_expr
 expr
     : expr LSB expr RSB
     | expr DOT expr
-    | ('-'|'~') expr
+    | ('-' | '~') expr
     | fn4 LP expr RP
-
-    | expr ('*'|'\\'|'%') expr
-    | expr ('+'|'-') expr
-    | expr ('<<'|'>>') expr
-    | expr ('&'|'^'|'|') expr
-    | expr ('<'|'<='|'>'|'>='|'=='|'!=') expr
-
+    | expr ('*' | '\\' | '%') expr
+    | expr ('+' | '-') expr
+    | expr ('<<' | '>>') expr
+    | expr ('&' | '^' | '|') expr
+    | expr ('<' | '<=' | '>' | '>=' | '==' | '!=') expr
     | (number | ALL | ANY | NONE) OF (string_set | LP ID RP | THEM) (IN range)? // number could be an expr
     | (COUNT_REF | STRING_ID) IN range
     | (number | ALL | ANY | NONE) id_? IN range
@@ -105,7 +103,10 @@ expr
     | LP expr RP
     | literal
     | pos_fn
-    | '$' | '#' | '@' | '!'
+    | '$'
+    | '#'
+    | '@'
+    | '!'
     ;
 
 literal
@@ -165,17 +166,16 @@ range
     ;
 
 true_false
-    : TRUE | FALSE
+    : TRUE
+    | FALSE
     ;
 
 strings_section
-    : STRINGS COLON
-        string_def+
+    : STRINGS COLON string_def+
     ;
 
 meta_section
-    : META COLON
-        meta_def+
+    : META COLON meta_def+
     ;
 
 string_def

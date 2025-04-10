@@ -1,4 +1,13 @@
 show columns like 'na%';
+show channels;
+show channels in account;
+show channels in database;
+show channels in database d1;
+show channels like 'c1%';
+show channels like 'c1%' in account;
+show channels like 'c1%' in database;
+show channels like 'c1%' in database d1;
+
 show connections like 'na%';
 show databases like 'na%';
 show databases in failover group grp;
@@ -47,3 +56,4 @@ show users like 'na%';
 show variables like 'na%';
 show views like 'na%';
 show warehouses like 'na%';
+show password policies;

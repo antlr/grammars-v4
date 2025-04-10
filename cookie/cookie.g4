@@ -26,61 +26,60 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar cookie;
 
 cookie
-   : av_pairs* EOF
-   ;
+    : av_pairs* EOF
+    ;
 
 name
-   : attr
-   ;
+    : attr
+    ;
 
 av_pairs
-   : av_pair (';' av_pair)*
-   ;
+    : av_pair (';' av_pair)*
+    ;
 
 av_pair
-   : attr ('=' value)?
-   ;
+    : attr ('=' value)?
+    ;
 
 attr
-   : token
-   ;
+    : token
+    ;
 
 value
-   : word
-   ;
+    : word
+    ;
 
 word
-   : token
-   | quoted_string
-   ;
+    : token
+    | quoted_string
+    ;
 
 token
-   : TOKEN
-   ;
+    : TOKEN
+    ;
 
 quoted_string
-   : STRING
-   ;
-
+    : STRING
+    ;
 
 STRING
-   : '"' (~ ('"' | '\n'))* '"'
-   ;
-
+    : '"' (~ ('"' | '\n'))* '"'
+    ;
 
 TOKEN
-   : ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '-' | ' ' | '/' | '_' | ':' | ',')+
-   ;
-
+    : ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '-' | ' ' | '/' | '_' | ':' | ',')+
+    ;
 
 DIGIT
-   : '0' .. '9'
-   ;
-
+    : '0' .. '9'
+    ;
 
 WS
-   : [\t\r\n] -> skip
-   ;
+    : [\t\r\n] -> skip
+    ;

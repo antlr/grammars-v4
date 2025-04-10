@@ -1,8 +1,8 @@
 param (
-    [string]$antlrjar='/tmp/antlr4-complete.jar',
     [string]$target='CSharp',
     [string]$pc,
-    [string]$cc
+    [string]$cc,
+    [bool]$buildonly=$false
 )
 
 function Get-GrammarSkip {
@@ -12,12 +12,35 @@ function Get-GrammarSkip {
     )
     Write-Host "Target $Target Grammar $Grammar"
     if (-not(Test-Path "$Grammar/desc.xml" -PathType Leaf)) {
+        Write-Host "$Grammar/desc.xml does not exist."
         Write-Host "skip"
         return $True
     }
     $lines = Get-Content -Path "$Grammar/desc.xml" | Select-String $Target
     if ("$lines" -eq "") {
-        Write-Host "skip"
+        Write-Host "Intentionally skipping grammar $Grammar target $Target."
+        return $True
+    }
+    $desc_targets = dotnet trxml2 "$Grammar/desc.xml" | Select-String '/desc/targets'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "The desc.xml for $testname is malformed. Skipping."
+        return $True
+    }
+    $desc_targets = $desc_targets -replace '.*='
+    $desc_targets = $desc_targets -replace ',', ' ' -replace ';', ' '
+    $yes = $false
+    foreach ($t in $desc_targets.Split(' ')) {
+        if ($t -eq '+all') { $yes = $true }
+        if ($t -eq "-$target") { $yes = $false }
+        if ($t -eq $target) { $yes = $true }
+    }
+    if (! $yes) { 
         return $True
     }
     return $False
@@ -32,13 +55,13 @@ enum FailStage {
 
 function Test-Grammar {
     param (
-        $Antlrjar,
         $Directory,
         $Target = "CSharp"
     )
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
     Set-Location $Directory
+    $zzz = Get-Location
 
     $failStage = [FailStage]::Success
     
@@ -46,66 +69,83 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates"
-    trgen --antlr-tool-path $Antlrjar -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
+    dotnet trgen -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
-    $targetgenerated = "Generated-$Target"
-    if (Test-Path $targetgenerated) {
-        Set-Location $targetgenerated
-    }
-    else {
-        $failStage = [FailStage]::CodeGeneration
-        Write-Host "No code generated" -ForegroundColor Red
-    }
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
+    $dirs = Get-ChildItem -Path "Generated-$Target*"
+    foreach ($m in $dirs) {
+        $targetgenerated = $m.Name
+        Write-Host "targetgenerated is $targetgenerated"
+        Set-Location $zzz
+        if (Test-Path $targetgenerated) {
+            Set-Location $targetgenerated
+        }
+        else {
+            $failStage = [FailStage]::CodeGeneration
+            Write-Host "No code generated" -ForegroundColor Red
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+
+        # build
+
+        # see _scripts/templates/*/tester.psm1
+        ./build.ps1
+        $buildResult = $LASTEXITCODE
+
+        if ($buildResult -ne 0) {
+            $failStage = [FailStage]::Compile
+            Write-Host "Build failed" -ForegroundColor Red
+        }
+
+        Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+        if ($failStage -ne [FailStage]::Success) {
+            Set-Location $cwd
+            return @{
+                Success     = $false
+                Stage       = $failStage
+                FailedCases = @()
+            }
+        }
+
+        # test
+        if (! $buildonly) {
+            $start2 = Get-Date
+            Write-Host "--- Testing files ---"
+            $workingDirectory = Get-Location
+            Write-Host "The pwd is  $workingDirectory"
+            ./test.ps1
+            $passed = $LASTEXITCODE -eq 0
+            if (! $passed) {
+                $success = $false
+                $failStage = [FailStage]::Test
+                Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+                Set-Location $cwd
+                return @{
+                    Success     = $success
+                    Stage       = $failStage
+                    FailedCases = $failedList
+                }
+            }
         }
     }
-    $hasTransform = Test-Path transformGrammar.py
-    if ($hasTransform) {
-        python3 transformGrammar.py
-    }
 
-    # build
-
-    # see _scripts/templates/*/tester.psm1
-    ./build.ps1
-    $buildResult = $LASTEXITCODE
-
-    if ($buildResult -ne 0) {
-        $failStage = [FailStage]::Compile
-        Write-Host "Build failed" -ForegroundColor Red
-    }
-
-    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
-    if ($failStage -ne [FailStage]::Success) {
-        Set-Location $cwd
-        return @{
-            Success     = $false
-            Stage       = $failStage
-            FailedCases = @()
-        }
-    }
-
-    # test
-    $start2 = Get-Date
-    Write-Host "--- Testing files ---"
-    ./test.ps1
-    $passed = $LASTEXITCODE -eq 0
-
-    if (! $passed) {
-        $success = $false
-        $failStage = [FailStage]::Test
-    }
-
-    Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+    Write-Host "Test completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     Set-Location $cwd
     return @{
         Success     = $success
@@ -167,26 +207,52 @@ function Get-GitChangedDirectories {
         Write-Error "which commit to diff?"
         exit 1
     }
-    $diff = git diff $PreviousCommit $CurrentCommit --name-only
+
+    # Find all directories that changed.
+    $diff = git diff $PreviousCommit $CurrentCommit --name-only | Where-Object { $_ -notmatch "_scripts" -and $_ -notmatch "\.github" -and $_ -notmatch "\.git"}
+
     if ($diff -is "string") {
         $diff = @($diff)
-    }
-    $treatAsRootDir = @(".github/", "_scripts/")
-    foreach ($item in $diff) {
-        foreach ($j in $treatAsRootDir) {
-            if ($item.StartsWith($j)) {
-                $diff += "README.md"
-                break;
-            }
-        }
     }
 
     $dirs = @()
     foreach ($item in $diff) {
         $dirs += Join-Path "." $item
     }
+    Write-Host "dirs $dirs"
+
+    $newdirs = $dirs | Split-Path | Get-Unique
+    Write-Host "newdirs = $newdirs"
+
+    # Find all grammar directories (i.e., enclosing directory containing
+    # a desc.xml). Then, find all grammar directories that are changed
+    # by considering all changes.
     
-    return $dirs | Split-Path | Get-Unique
+    $gdirs = Get-ChildItem -Path . -Filter desc.xml -Recurse | 
+	ForEach-Object {
+		# Get the relative path
+		$relativePath = Resolve-Path -LiteralPath $_.FullName -Relative
+
+		# Strip off "desc.xml" by getting just the parent directory
+		[System.IO.Path]::GetDirectoryName($relativePath)
+	}
+    Write-Host "gdirs $gdirs"
+
+    # Find all grammar directories that are on each path in the list of
+    # git dirs changed.
+    $results = @()
+    foreach ($gdir in $gdirs) {
+	foreach ($dir in $newdirs) {
+		# Check either exact match or if $gdir + '\' is the start of $dir
+		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\")) {
+			$results += $gdir
+			break  # No need to check more once we find a match
+		}
+	}
+    }
+    Write-Host "results $results"
+
+    return $results
 }
 
 function Get-ChangedGrammars {
@@ -194,16 +260,9 @@ function Get-ChangedGrammars {
         $PreviousCommit,
         $CurrentCommit = "HEAD"
     )
-    $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
-    $grammars = Get-Grammars | Resolve-Path -Relative
-    $changed = @()
-    foreach ($g in $grammars) {
-        foreach ($d in $diff) {
-            if ($d.StartsWith($g) -or $g.StartsWith($d)) {
-                $changed += $g
-            } 
-        }
-    }
+    $prefix = Get-Location
+    $changed = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
+    Write-Host "Finished Get-ChangedGrammars"
     return $changed | Get-Unique
 }
 
@@ -234,14 +293,18 @@ function Test-AllGrammars {
     param (
         $PreviousCommit,
         $CurrentCommit = "HEAD",
-        $Target = "CSharp",
-        $Antlrjar = "/tmp/antlr4-complete.jar"
+        $Target = "CSharp"
     )
     
+Write-Host "target = $target"
+Write-Host "previouscommit = $PreviousCommit"
+Write-Host "CurrentCommit = $CurrentCommit"
+
     $grammars = Get-GrammarsNeedsTest -PreviousCommit $PreviousCommit -CurrentCommit $CurrentCommit -Target $Target
-    
+
     Write-Host "Grammars to be tested with $Target target:"
     Write-Host "$grammars"
+
     # Try adding to path for Ubuntu.
     # Write-Host "PATH is $env:PATH"
     # $env:PATH += ":/home/runner/.dotnet/tools"
@@ -252,7 +315,7 @@ function Test-AllGrammars {
     $failedGrammars = @()
     $failedCases = @()
     foreach ($g in $grammars) {
-        $state = Test-Grammar -Antlrjar $Antlrjar -Directory $g -Target $Target
+        $state = Test-Grammar -Directory $g -Target $Target
         if (!$state.Success) {
             $success = $false
             $failedGrammars += $g
@@ -284,6 +347,7 @@ $rootdir = $PSScriptRoot
 # This has to be inserted somewhere. This script requires
 # the trgen tool to instantiate drivers from templates.
 $templates = Join-Path $rootdir "/templates/"
+Write-Host "templates dir = $templates"
 
 $diff = $true
 if (!$target) {
@@ -296,14 +360,13 @@ if (!$pc) {
         $cc = "HEAD"
     }
 }
-Write-Host "antlrjar = $antlrjar"
 Write-Host "target = $target"
 Write-Host "pc = $pc"
 Write-Host "cc = $cc"
 
 if ($diff) {
-    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target -PreviousCommit $pc -CurrentCommit $cc
 }
 else {
-    Test-AllGrammars -Target $target -Antlrjar $antlrjar
+    Test-AllGrammars -Target $target
 }

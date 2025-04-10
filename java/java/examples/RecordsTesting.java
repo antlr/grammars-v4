@@ -12,4 +12,8 @@ public class RecordsTesting {
             this.c = c;
         }
     }
+    interface InnerInterface{
+        record PoolKey(Name name, BsmKey bsmKey, Object dynamicType) {}
+    }
 }
+

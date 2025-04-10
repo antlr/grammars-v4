@@ -16,8 +16,11 @@
 
    @author Canwei He
 */
-parser grammar ResourcePlanParser;
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
+parser grammar ResourcePlanParser;
 
 resourcePlanDdlStatements
     : createResourcePlanStatement
@@ -37,65 +40,59 @@ resourcePlanDdlStatements
     ;
 
 rpAssign
-  : (KW_QUERY_PARALLELISM EQUAL Number)
-  | (KW_DEFAULT KW_POOL EQUAL poolPath)
-  ;
+    : (KW_QUERY_PARALLELISM EQUAL Number)
+    | (KW_DEFAULT KW_POOL EQUAL poolPath)
+    ;
 
 rpAssignList
-  : rpAssign (COMMA rpAssign)*
-  ;
+    : rpAssign (COMMA rpAssign)*
+    ;
 
 rpUnassign
-  : (KW_QUERY_PARALLELISM)
-  | (KW_DEFAULT KW_POOL)
-  ;
+    : (KW_QUERY_PARALLELISM)
+    | (KW_DEFAULT KW_POOL)
+    ;
 
 rpUnassignList
-  : rpUnassign (COMMA rpUnassign)*
-  ;
+    : rpUnassign (COMMA rpUnassign)*
+    ;
 
 createResourcePlanStatement
     : KW_CREATE KW_RESOURCE KW_PLAN (
-          (identifier KW_LIKE identifier)
+        (identifier KW_LIKE identifier)
         | (identifier (KW_WITH rpAssignList)?)
-      )
+    )
     ;
-
 
 withReplace
     : KW_WITH KW_REPLACE
     ;
 
-
 activate
     : KW_ACTIVATE withReplace?
     ;
-
 
 enable
     : KW_ENABLE
     ;
 
-
 disable
     : KW_DISABLE
     ;
-
 
 unmanaged
     : KW_UNMANAGED
     ;
 
-
 alterResourcePlanStatement
     : KW_ALTER KW_RESOURCE KW_PLAN identifier (
-          (KW_VALIDATE)
+        (KW_VALIDATE)
         | (KW_DISABLE)
         | (KW_SET rpAssignList)
         | (KW_UNSET rpUnassignList)
         | (KW_RENAME KW_TO identifier)
         | ((activate enable? | enable activate?))
-      )
+    )
     ;
 
 /** It might make sense to make this more generic, if something else could be enabled/disabled.
@@ -106,9 +103,9 @@ globalWmStatement
 
 replaceResourcePlanStatement
     : KW_REPLACE (
-          (KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH identifier)
+        (KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH identifier)
         | (KW_RESOURCE KW_PLAN identifier KW_WITH identifier)
-      )
+    )
     ;
 
 dropResourcePlanStatement
@@ -124,7 +121,8 @@ triggerExpression
     ;
 
 triggerExpressionStandalone
-    : triggerExpression EOF ;
+    : triggerExpression EOF
+    ;
 
 /*
   The rules triggerOrExpression and triggerAndExpression are not being used right now.
@@ -142,7 +140,6 @@ triggerAtomExpression
     : identifier comparisionOperator triggerLiteral
     ;
 
-
 triggerLiteral
     : Number
     | StringLiteral
@@ -158,23 +155,22 @@ triggerActionExpression
     ;
 
 triggerActionExpressionStandalone
-    : triggerActionExpression EOF ;
+    : triggerActionExpression EOF
+    ;
 
 createTriggerStatement
-    : KW_CREATE KW_TRIGGER identifier DOT identifier
-      KW_WHEN triggerExpression KW_DO triggerActionExpression
+    : KW_CREATE KW_TRIGGER identifier DOT identifier KW_WHEN triggerExpression KW_DO triggerActionExpression
     ;
 
 alterTriggerStatement
     : KW_ALTER KW_TRIGGER identifier DOT identifier (
         (KW_WHEN triggerExpression KW_DO triggerActionExpression)
-      | (KW_ADD KW_TO KW_POOL poolPath)
-      | (KW_DROP KW_FROM KW_POOL poolPath)
-      | (KW_ADD KW_TO KW_UNMANAGED)
-      | (KW_DROP KW_FROM KW_UNMANAGED)
+        | (KW_ADD KW_TO KW_POOL poolPath)
+        | (KW_DROP KW_FROM KW_POOL poolPath)
+        | (KW_ADD KW_TO KW_UNMANAGED)
+        | (KW_DROP KW_FROM KW_UNMANAGED)
     )
     ;
-
 
 dropTriggerStatement
     : KW_DROP KW_TRIGGER identifier DOT identifier
@@ -183,10 +179,10 @@ dropTriggerStatement
 poolAssign
     : (
         (KW_ALLOC_FRACTION EQUAL Number)
-      | (KW_QUERY_PARALLELISM EQUAL Number)
-      | (KW_SCHEDULING_POLICY EQUAL StringLiteral)
-      | (KW_PATH EQUAL poolPath)
-      )
+        | (KW_QUERY_PARALLELISM EQUAL Number)
+        | (KW_SCHEDULING_POLICY EQUAL StringLiteral)
+        | (KW_PATH EQUAL poolPath)
+    )
     ;
 
 poolAssignList
@@ -194,8 +190,7 @@ poolAssignList
     ;
 
 createPoolStatement
-    : KW_CREATE KW_POOL identifier DOT poolPath
-      KW_WITH poolAssignList
+    : KW_CREATE KW_POOL identifier DOT poolPath KW_WITH poolAssignList
     ;
 
 alterPoolStatement
@@ -204,7 +199,7 @@ alterPoolStatement
         | (KW_UNSET KW_SCHEDULING_POLICY)
         | (KW_ADD KW_TRIGGER identifier)
         | (KW_DROP KW_TRIGGER identifier)
-      )
+    )
     ;
 
 dropPoolStatement
@@ -212,20 +207,23 @@ dropPoolStatement
     ;
 
 createMappingStatement
-    : (KW_CREATE (KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING StringLiteral
-         KW_IN identifier ((KW_TO poolPath) | unmanaged)
-         (KW_WITH KW_ORDER Number)?)
+    : (
+        KW_CREATE (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING StringLiteral KW_IN identifier (
+            (KW_TO poolPath)
+            | unmanaged
+        ) (KW_WITH KW_ORDER Number)?
+    )
     ;
 
 alterMappingStatement
-    : (KW_ALTER (KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING StringLiteral
-         KW_IN identifier ((KW_TO poolPath) | unmanaged)
-         (KW_WITH KW_ORDER Number)?)
+    : (
+        KW_ALTER (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING StringLiteral KW_IN identifier (
+            (KW_TO poolPath)
+            | unmanaged
+        ) (KW_WITH KW_ORDER Number)?
+    )
     ;
 
 dropMappingStatement
-    : KW_DROP (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING
-         StringLiteral KW_IN identifier
+    : KW_DROP (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING StringLiteral KW_IN identifier
     ;
