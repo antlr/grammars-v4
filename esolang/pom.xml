@@ -12,6 +12,7 @@
     </parent>
 
 	<modules>
+        <module>barrous</module>
         <module>bio</module>
         <module>brainfuck</module>
         <module>brainflak</module>
