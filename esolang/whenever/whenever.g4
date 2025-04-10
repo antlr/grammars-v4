@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar whenever;
 
 program_
-   : line_* EOL* EOF
+   : line_* EOL? EOF
    ;
 
 line_
@@ -163,7 +163,7 @@ NUMBER
    ;
 
 EOL
-   : [\r\n]
+   : [\r\n]+
    ;
 
 WHITESPACE
