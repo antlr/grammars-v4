@@ -20,10 +20,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.1
-      with:
-        dotnet-version: '8.0.x'
+    - name: Test Dotnet
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Install Trash
       shell: bash
       run: |
@@ -56,6 +58,7 @@ jobs:
         arch
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
+        export
     - name: Checkout
       uses: actions/checkout@v4
       with:
@@ -70,10 +73,6 @@ jobs:
       run: |
         echo ${{ steps.setup-php.outputs.php-version }}
         php --version
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.1
-      with:
-        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -108,7 +107,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.5.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -117,19 +116,26 @@ jobs:
     - name: Upgrade Pip.
       run: |
         python -m ensurepip --upgrade
-    - name: Test Pip.
+    - name: Test Pip
       run: |
         pip --version
     - name: Install Antlr tool
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v4.0.3
+      uses: actions/setup-node@v4.3.0
       with:
-        node-version: '21.7.3'
+        node-version: '22.12.0'
     - name: Test JavaScript
       run: |
         node --version
+    - name: ts-node typescript tsx
+      run: |
+        npm i -g ts-node typescript tsx
+        ts-node --version
+        tsc --version
+        npx -v
+        npx tsx -v
     - name: Update paths
       shell: pwsh
       run: |
@@ -143,7 +149,17 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen -- --help
+        dotnet trgen --help
+    - name: Install Antlr-ng
+      shell: pwsh
+      run: |
+        cd $HOME
+        git clone https://github.com/mike-lischke/antlr-ng.git
+        cd antlr-ng
+        echo HOME $HOME
+        git checkout 4975d4a7b556e34c38c2e53b9815c8c4c802236f
+        npm i
+        npm run build
     - name: Test
       shell: pwsh
       run: |
@@ -155,7 +171,13 @@ jobs:
             $Before = "${{ github.event.before }}"
             $After = "${{ github.event.after }}"
         }
-        _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
+        if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
+        } elseif ("${{ matrix.os }}" -eq "windows-latest") {
+            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After"
+        } elseif ("${{ matrix.os }}" -eq "macos-latest") {
+            _scripts/test.ps1 -target ${{ matrix.language }} -pc "$Before" -cc "$After" -buildonly:1
+        }
 
   static-check:
     runs-on: ${{ matrix.os }}
@@ -163,7 +185,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        test: [ useless-parens, format ]
+        test: [ useless-parens, format, ambiguity ]
     steps:
     - name: Info
       shell: bash
@@ -175,10 +197,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install Dotnet
-      uses: actions/setup-dotnet@v4.0.1
-      with:
-        dotnet-version: '8.0.x'
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -196,7 +214,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.5.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -218,7 +236,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen -- --help
+        dotnet trgen --help
     - name: Test
       shell: bash
       run: |

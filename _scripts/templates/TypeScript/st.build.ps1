@@ -10,13 +10,13 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 $version = (Select-String -Path "package.json" -Pattern "antlr4" | ForEach-Object {$_.Line.Split(" ")[5]}) -replace '"|,|\r|\n'
 
 <tool_grammar_tuples:{x |
-$(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& antlr4 -v $version <x.GrammarFileNameTarget> -encoding <antlr_encoding> -Dlanguage=TypeScript <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
 }>
 
-$(& npm install -g typescript@5.3.3 ts-node@10.9.2 ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
+$(& npm install -g typescript ts-node ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}

@@ -1,0 +1,58 @@
+maintenance:
+title: Granulocytopenia and Trimethoprim/Sulfamethoxazole;;
+mlmname: anctms;;
+arden: Version 3;;
+version: 2.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-05-28;;
+validation: testing;;
+library:
+purpose:
+Detect granulocytopenia possibly due to
+trimethoprim/sulfamethoxazole;;
+explanation:
+This MLM detects patients that are currently taking
+trimethoprim/sulfamethoxazole whose absolute neutrophile count is
+less than 1000 and falling.;;
+keywords:
+granulocytopenia; agranulocytosis; trimethoprim; sulfamethoxazole;;
+citations:
+1. Anti-infective drug use in relation to the risk of
+agranulocytosis and aplastic anemia. A report from the
+International Agranulocytosis and Aplastic Anemia Study.
+Archives of Internal Medicine, May 1989, 149(5):1036-40.;;
+links: "CTIM .34.56.78";
+"MeSH agranulocytosis/ci and sulfamethoxazole/ae";;
+knowledge:
+type: data-driven;;
+data:
+/* capitalized text within curly brackets would be replaced with */
+/* an institution's own query */
+let anc_storage be event {STORAGE OF ABSOLUTE_NEUTROPHILE_COUNT};
+let anc be read last 2 from {ABSOLUTE_NEUTROPHILE_COUNT}
+where they occurred within the past 1 week;
+let pt_is_taking_tms be read exist
+{TRIMETHOPRIM_SULFAMETHOXAZOLE_ORDER};
+;;
+evoke: anc_storage;
+;;
+logic:
+if pt_is_taking_tms
+and the last anc is less than 1000
+and the last anc is less than the first anc
+/* is anc falling? */
+then
+conclude true;
+else
+conclude false;
+endif;
+;;
+action: write "Caution: patient's relative granulocytopenia may be " ||
+"exacerbated by trimethoprim/sulfamethoxazole.";
+;;
+resources:
+default: en;;
+language: en;;
+end:

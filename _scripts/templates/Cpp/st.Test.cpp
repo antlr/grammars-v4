@@ -60,6 +60,8 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         for (int i = 0; ; ++i)
         {
             auto token = lexer->nextToken();
+            auto ctoken = (antlr4::CommonToken*)(token.get());
+            ctoken->setTokenIndex(i);
             std::cerr \<\< token->toString() \<\< std::endl;
             if (token->getType() == antlr4::IntStream::EOF)
                 break;
@@ -219,7 +221,7 @@ int TryParse(std::vector\<std::string>& args)
         }
         auto after = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
-        if (! quiet) std::cerr \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+        if (! quiet) std::cerr \<\< prefix \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
     }
     return error_code;
 }

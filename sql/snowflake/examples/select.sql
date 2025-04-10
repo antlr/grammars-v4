@@ -89,3 +89,46 @@ SELECT EXPR, SCALE, ROUNDING_MODE, SEQUENCE FROM t;
 
 select 'a', 'b',;
 with t as (select 'a', 'b',) select * from t;
+
+with a as((
+    ((
+        select 10 as c
+    ))
+    union
+    ((
+        select 11 as d
+    ))
+))
+   , b as (((
+    ((select 2 as e))
+)))
+select *
+from a
+union
+((select 1 as c));
+
+(((select 10 as c)))
+union
+((select 11 as d));
+
+SELECT SUM(cs) OVER() AS ta FROM t;
+
+SELECT old, start_date from t;
+
+
+with a as (
+    with b as (
+        select 't' as c
+    )
+    (select * from b)
+    union
+    (select * from b)
+)
+select *
+from a;
+
+select count(t.*) as ca from t9 as t;
+
+SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
+FROM t1 as a
+JOIN t2 as b USING (col5, col6);

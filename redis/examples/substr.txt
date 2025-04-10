@@ -1,0 +1,1 @@
+SUBSTR test -1 -3

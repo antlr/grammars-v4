@@ -19,3 +19,11 @@ User's Guide and Reference [html](https://docs.oracle.com/en/database/oracle/ora
 
 [pldb](https://pldb.pub/concepts/pl-sql.html)
 
+## Issues
+* The grammar is ambiguous, but generally performs well.
+
+## Performance
+<img src="./times.svg">
+<a href="/sql/plsql/data.zip">data.zip</a>
+<a href="/sql/plsql/te.sh">te.sh</a>
+<a href="/sql/plsql/gr.sh">gr.sh</a>

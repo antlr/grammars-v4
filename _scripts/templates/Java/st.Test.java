@@ -17,6 +17,8 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.io.File;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 
 public class Test {
 
@@ -115,7 +117,7 @@ public class Test {
             }
             Instant finish = Instant.now();
             long timeElapsed = Duration.between(start, finish).toMillis();
-            if (!quiet) System.err.println("Total Time: " + (timeElapsed * 1.0) / 1000.0);
+            if (!quiet) System.err.println(prefix + "Total Time: " + (timeElapsed * 1.0) / 1000.0);
         }
         java.lang.System.exit(error_code);
     }
@@ -221,4 +223,64 @@ public class Test {
         }
         if (tee) output.close();
     }
+
+    public static String toStringTree(Tree tree, Parser recog) {
+	StringBuilder sb = new StringBuilder();
+	String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+	List\<String> ruleNamesList = ruleNames != null ? List.of(ruleNames) : null;
+	toStringTree(sb, tree, 0, ruleNamesList);
+	return sb.toString();
+    }
+
+    public static void toStringTree(StringBuilder sb, Tree t, int indent, List\<String> ruleNames) {
+	String s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+	if (t.getChildCount() == 0) {
+	    for (int i = 0; i \< indent; ++i) sb.append(" ");
+	    sb.append(s).append(System.lineSeparator());
+	    return;
+	}
+	s = org.antlr.v4.runtime.misc.Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+	for (int i = 0; i \< indent; ++i) sb.append(' ');
+	sb.append(s).append(System.lineSeparator());
+	for (int i = 0; i \< t.getChildCount(); i++) {
+	    toStringTree(sb, t.getChild(i), indent + 1, ruleNames);
+	}
+    }
+
+    public static String getNodeText(Tree t, Parser recog) {
+	String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+	List\<String> ruleNamesList = ruleNames != null ? java.util.Arrays.asList(ruleNames) : null;
+	return getNodeText(t, ruleNamesList);
+    }
+    
+    public static String getNodeText(Tree t, List\<String> ruleNames) {
+	if ( ruleNames!=null ) {
+	    if ( t instanceof RuleContext ) {
+		int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
+		String ruleName = ruleNames.get(ruleIndex);
+		int altNumber = ((RuleContext) t).getAltNumber();
+		if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
+		    return ruleName+":"+altNumber;
+		}
+		return ruleName;
+	    }
+	    else if ( t instanceof ErrorNode) {
+		return t.toString();
+	    }
+	    else if ( t instanceof TerminalNode) {
+		Token symbol = ((TerminalNode)t).getSymbol();
+		if (symbol != null) {
+		    String s = symbol.getText();
+		    return s;
+		}
+	    }
+	}
+		// no recog for rule names
+	Object payload = t.getPayload();
+	if ( payload instanceof Token ) {
+	    return ((Token)payload).getText();
+	}
+	return t.getPayload().toString();
+    }
+
 }

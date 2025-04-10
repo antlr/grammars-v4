@@ -25,12 +25,18 @@ alter table table1 add primary key (id);
 alter table table1 add primary key table_pk (id);
 alter table table1 add primary key `table_pk` (id);
 alter table table1 add primary key `table_pk` (`id`);
+alter table table1 add column yes varchar(255)  default '' null;
 alter table add_test add column if not exists col1 varchar(255);
 alter table add_test add column if not exists col4 varchar(255);
 alter table add_test add index if not exists ix_add_test_col1 using btree (col1) comment 'test index';
 alter table add_test add index if not exists ix_add_test_col4 using btree (col4) comment 'test index';
 alter table add_test alter index ix_add_test_col1 invisible;
 alter table add_test alter index ix_add_test_col1 visible;
+alter table add_test alter index if exists ix_add_test_col1 ignored;
+alter table add_test alter index ix_add_test_col1 ignored;
+alter table add_test alter index ix_add_test_col1 not ignored;
+alter table add_test alter key if exists fk ignored;
+alter table add_test alter key if exists fk not ignored;
 alter table add_test change column if exists col8 col9 tinyint;
 alter table add_test change column if exists col3 col5 tinyint;
 alter table add_test modify column if exists col9 tinyint;
@@ -127,6 +133,11 @@ rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
 #end
 ALTER TABLE t1 ADD PARTITION (PARTITION p3 VALUES LESS THAN (2002));
 ALTER TABLE t1 ADD PARTITION IF NOT EXISTS (PARTITION p3 VALUES LESS THAN (2002));
+ALTER TABLE my_table
+    ADD CONSTRAINT my_table_to_dealers_fk
+        FOREIGN KEY IF NOT EXISTS (dealer_id) REFERENCES n_dealers (id),
+    ADD CONSTRAINT my_table_trigger_ranking_class_version_dealer_uk UNIQUE KEY IF NOT EXISTS (trigger_id, ranking_criteria, classification_id, version, dealer_id),
+    ADD CONSTRAINT trigger_classification_to_trigger_name_fk FOREIGN KEY IF NOT EXISTS (trigger_id) REFERENCES n_vulnerability_triggers (id);
 -- Alter sequence
 ALTER SEQUENCE IF EXISTS s2 start=100;
 ALTER SEQUENCE s1 CACHE=1000 NOCYCLE RESTART WITH 1;

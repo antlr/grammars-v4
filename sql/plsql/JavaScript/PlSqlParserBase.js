@@ -7,7 +7,7 @@ export default class PlSqlParserBase extends antlr4.Parser {
 
   constructor(input) {
     super(input);
-    this._isVersion10 = false;
+    this._isVersion10 = true;
     this._isVersion12 = true;
   }
 

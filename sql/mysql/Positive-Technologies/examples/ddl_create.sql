@@ -1,4 +1,15 @@
 #begin
+GET DIAGNOSTICS @p1 = NUMBER, @p2 = ROW_COUNT;
+GET DIAGNOSTICS CONDITION 1 @p1 = MYSQL_ERRNO;
+GET DIAGNOSTICS CONDITION 1 @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+GET DIAGNOSTICS CONDITION 1 @p3 = RETURNED_SQLSTATE, @p4 = MESSAGE_TEXT;
+GET DIAGNOSTICS CONDITION 1 @p5 = SCHEMA_NAME, @p6 = TABLE_NAME;
+GET DIAGNOSTICS CONDITION 1 @errno = MYSQL_ERRNO;
+GET DIAGNOSTICS @cno = NUMBER;
+GET DIAGNOSTICS CONDITION @cno @errno = MYSQL_ERRNO;
+GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO, msg = MESSAGE_TEXT;
+GET STACKED DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO, msg = MESSAGE_TEXT;
+GET CURRENT DIAGNOSTICS errcount = NUMBER;
 -- Create User
 CREATE USER 'test_crm_debezium'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9' PASSWORD EXPIRE NEVER COMMENT '-';
 CREATE USER 'jim'@'localhost' ATTRIBUTE '{"fname": "James", "lname": "Scott", "phone": "123-456-7890"}';
@@ -69,8 +80,13 @@ create table table_with_character_set_eq (id int, data varchar(50)) character se
 create table table_with_character_set (id int, data varchar(50)) character set default;
 create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
 create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
+create table table_with_keyword_as_column_name (geometry int, national int);
+create table transactional_table(name varchar(255), class_id int, id int) transactional=1;
+create table transactional(name varchar(255), class_id int, id int);
+create table add_test(col1 varchar(255), col2 int, col3 int);
 create table blob_test(id int, col1 blob(45));
 create table žluťoučký (kůň int);
+CREATE TABLE staff (PRIMARY KEY (staff_num), staff_num INT(5) NOT NULL, first_name VARCHAR(100) NOT NULL, pens_in_drawer INT(2) NOT NULL, CONSTRAINT pens_in_drawer_range CHECK(pens_in_drawer BETWEEN 1 AND 99));
 create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
 CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
 create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
@@ -79,6 +95,7 @@ create table invisible_column_test(id int, col1 int INVISIBLE);
 create table visible_column_test(id int, col1 int VISIBLE);
 create table table_with_buckets(id int(11) auto_increment NOT NULL COMMENT 'ID', buckets int(11) NOT NULL COMMENT '分桶数');
 CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
+create table statement(id int);
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) )
@@ -209,6 +226,14 @@ CREATE TABLE `daily_intelligences`(
 PRIMARY KEY (`id`)
 ) ENGINE=innodb DEFAULT CHAR SET=utf8 COMMENT '';
 
+CREATE TABLE IF NOT EXISTS `contract_center`.`ent_folder_letter_relationship` (
+`id` BIGINT(19) UNSIGNED NOT NULL COMMENT '唯一标识',
+`layer` TINYINT(4) UNSIGNED DEFAULT _UTF8MB4'0' COMMENT '文档所属层级，0-主关联文档， 1-次关联文档',
+`deleted` TINYINT(1) NOT NULL DEFAULT _UTF8MB4'0' COMMENT '0-有效记录, 1-删除',
+`data_create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() COMMENT '创建时间',
+`data_update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP() COMMENT '更新时间',
+PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARACTER SET = UTF8MB4;
+
 CREATE TABLE `auth_realm_clients` (
 `pk_realm` int unsigned NOT NULL DEFAULT '0',
 `fk_realm` int unsigned DEFAULT NULL,
@@ -229,6 +254,24 @@ CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` big
 CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
+
+CREATE TABLE TableWithVector (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, vec1 VECTOR, vec2 VECTOR);
+
+CREATE TABLE PARTICIPATE_ACTIVITIES (
+    ID BIGINT NOT NULL AUTO_INCREMENT,
+    USER_ID BIGINT NOT NULL,
+    PRIMARY KEY (ID) USING BTREE)
+ENGINE=INNODB AUTO_INCREMENT=1979503 DEFAULT CHARSET=UTF8MB4 COLLATE=UTF8MB4_GENERAL_CI SECONDARY_ENGINE=RAPID;
+
+CREATE TABLE `TABLE1` (
+`COL1` INT(10) UNSIGNED NOT NULL,
+`COL2` VARCHAR(32) NOT NULL,
+`COL3` ENUM (`VAR1`,`VAR2`, `VAR3`) NOT NULL,
+PRIMARY KEY (`COL1`, `COL2`, `COL3`),
+CLUSTERING KEY `CLKEY1` (`COL3`, `COL2`))
+ENGINE=TOKUDB DEFAULT CHARSET=CP1251;
+
+CREATE TABLE T1 (NAME VARCHAR(36), SEQUENCE_TABLE BIGINT NOT NULL);
 
 #end
 #begin
@@ -287,6 +330,7 @@ create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 create index index8 on t1(col1) comment 'test index' using btree;
+create index myindex on t1(col1) comment 'test index' comment 'some test' using btree;
 CREATE INDEX `idx_custom_field_30c4f4a7c529ccf0825b2fac732bebfd843ed764` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."30c4f4a7c529ccf0825b2fac732bebfd843ed764".value')) as double)));
 CREATE INDEX `idx_custom_field_d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8` ON `deals` ((cast(json_unquote(json_extract(`custom_fields`,_utf8mb4'$."d3bb7ad91ba729aaa20df0af037cb7ed8ce3ffc8".value')) as float)));
 #end
@@ -362,6 +406,9 @@ END
 create trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
+-- Create trigger 7
+-- delimiter //
+CREATE TRIGGER IF NOT EXISTS `my_trigger` BEFORE INSERT ON `my_table` FOR EACH ROW BEGIN SET NEW.my_col = CONCAT(NEW.mycol, NEW.id); END; -- //-- delimiter ;
 -- Create view
 create or replace view my_view1 as select 1 union select 2 limit 0,5;
 create algorithm = merge view my_view2(col1, col2) as select * from t2 with check option;
@@ -393,14 +440,13 @@ RETURN
             SUBSTR(_uuid, 25) ))
 #end
 #begin
--- From MariaDB 10.4.3, the JSON_VALID function is automatically used as a CHECK constraint for the JSON data type alias in order to ensure that a valid json document is inserted.
--- src: https://mariadb.com/kb/en/json_valid/
-CREATE TABLE `global_priv` (
-    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
-    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
-    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
-    PRIMARY KEY (`Host`,`User`)
-) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
+-- Use UTC_TIMESTAMP without parenthesis
+CREATE FUNCTION IF NOT EXISTS myfunc(a INT) RETURNS INT
+BEGIN
+    DECLARE result INT;
+    SET result = UTC_TIMESTAMP;
+    RETURN result;
+END;
 #end
 #begin
 -- https://dev.mysql.com/doc/refman/8.0/en/json-validation-functions.html#json-validation-functions-constraints
@@ -475,6 +521,17 @@ BEGIN  insert into order_config(order_id, attribute, value, performer)
 END
 #end
 #begin
+-- Create procedure
+-- delimiter //
+CREATE PROCEDURE makesignal(p1 INT)
+BEGIN
+  DECLARE error_text VARCHAR(255);
+  IF (error_text != 'OK') THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
+  END IF;
+END -- //-- delimiter ;
+#end
+#begin
 CREATE DEFINER=`bettingservice`@`stage-us-nj-app%` PROCEDURE `AggregatePlayerFactDaily`()
 BEGIN
     DECLARE CID_min BIGINT;
@@ -535,6 +592,7 @@ END -- //-- delimiter ;
 -- delimiter //
 CREATE PROCEDURE set_unique_check()
 BEGIN
+    SET unique_checks=off;
     SET unique_checks=on;
 END; -- //-- delimiter ;
 #end
@@ -741,10 +799,15 @@ WITH RECURSIVE cte (n) AS
 )
 SELECT * FROM cte;
 #end
-
+#begin
+CREATE VIEW `invoice_payments_stats` AS
+SELECT
+    `i`.`id` AS `id`
+FROM (`invoices` `i` JOIN lateral (SELECT MAX(`ip`.`date`) AS `latest_payment` FROM `invoice_payments` `ip`) `ps`);
+#end
 #begin
 lock tables t1 read;
-lock table t1 read local wait 100;
+lock table t1 read local;
 #end
 
 #begin
@@ -823,8 +886,25 @@ ORDER BY 1
 ;
 END
 #end
+
 #begin
--- Create trigger 7
--- delimiter //
-CREATE TRIGGER IF NOT EXISTS `my_trigger` BEFORE INSERT ON `my_table` FOR EACH ROW BEGIN SET NEW.my_col = CONCAT(NEW.mycol, NEW.id); END; -- //-- delimiter ;
+CREATE PROCEDURE TEST_UPDATE()
+BEGIN
+    UPDATE TEST_AUTO_INC AI
+        JOIN TEST_JOIN_LIMIT JL ON JL.ID = AI.ID
+    SET AI.COL_1 = NULL
+    LIMIT 500;
+END
+#end
+
+#begin
+CREATE DEFINER=`bcadmin`@`%` PROCEDURE `sp_next_available_otc_instance_strategy_id`()
+BEGIN
+  SELECT MIN(st.value) AS strategy_id
+  FROM SEQUENCE_TABLE(100000) ST
+  JOIN btc_quant.stratId_ranges r ON r.stratId0 <= st.value AND st.value < r.stratId1
+  LEFT JOIN otc_instance i ON i.strategy_id=st.value
+  WHERE r.category = 'otc' AND now() BETWEEN validFromDate AND COALESCE(validToDate, now())
+  AND i.strategy_id IS NULL;
+END
 #end

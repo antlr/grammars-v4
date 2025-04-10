@@ -1,14 +1,21 @@
 // Generated from trgen <version>
 
 import { ATNSimulator } from 'antlr4ng';
+import { BaseErrorListener } from 'antlr4ng';
 import { CharStream } from 'antlr4ng';
 import { CommonTokenStream } from 'antlr4ng';
 import { ConsoleErrorListener } from 'antlr4ng';
-import { BaseErrorListener } from 'antlr4ng';
+import { ErrorNode } from 'antlr4ng';
 //import { InputStream } from 'antlr4ng';
+import { Parser } from 'antlr4ng';
+import { ParserRuleContext } from 'antlr4ng';
+import { ParseTree } from 'antlr4ng';
 import { Recognizer } from 'antlr4ng';
 import { RecognitionException } from 'antlr4ng';
+import { TerminalNode } from 'antlr4ng';
 import { Token } from 'antlr4ng';
+import { Trees } from 'antlr4ng';
+import { escapeWhitespace } from 'antlr4ng';
 import { readFileSync } from 'fs';
 import { writeFileSync } from 'fs';
 import { openSync } from 'fs';
@@ -16,6 +23,7 @@ import { readSync } from 'fs';
 import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
+import { isToken } from 'antlr4ng';
 
 <tool_grammar_tuples: {x | import { <x.GrammarAutomName> \} from './<x.GrammarAutomName>.js';
 } >
@@ -141,7 +149,7 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        if (!quiet) console.error('Total Time: ' + t);
+        if (!quiet) console.error(prefix + 'Total Time: ' + t);
     }
     process.exitCode = error_code;
 }
@@ -219,6 +227,56 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     if (tee) {
         closeSync(output);
     }
+}
+
+function toStringTree(tree: ParseTree, recog?: Parser | null): string {
+    var sb = new StringBuilder();
+	let ruleNames = recog.ruleNames;
+	toStringTree2(sb, tree, 0, ruleNames);
+	return sb.toString();
+}
+
+function toStringTree2(sb: StringBuilder, tree: ParseTree, indent: number, ruleNames: string[] | null): void {
+	let s = getNodeText(tree, ruleNames);
+	s = escapeWhitespace(s!, false);
+	const c = tree.getChildCount();
+	if (c === 0) {
+	    for (let i = 0; i \< indent; ++i) sb.Append(" ");
+		sb.Append(s); sb.AppendLine("");
+		return;
+	}
+    for (let i = 0; i \< indent; ++i) sb.Append(" ");
+	sb.Append(s); sb.AppendLine("");
+	for (let i = 0; i \< c; i++) {
+		toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
+	}
+}
+
+function getNodeText(t: ParseTree, ruleNames: string[] | null, recog?: Parser | null): string | undefined {
+	if (ruleNames !== null) {
+		if (t instanceof ParserRuleContext) {
+			const context = t.ruleContext;
+			const altNumber = context.getAltNumber();
+			// use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+			if (altNumber !== 0) {
+				return ruleNames[t.ruleIndex] + ":" + altNumber;
+			}
+
+			return ruleNames[t.ruleIndex];
+		} else if (t instanceof ErrorNode) {
+			return t.toString();
+		} else if (t instanceof TerminalNode) {
+			if (t.symbol !== null) {
+				return t.symbol.text;
+			}
+		}
+	}
+	const payload = t.getPayload();
+	if (isToken(payload)) {
+		return payload.text;
+	}
+
+	return String(t.getPayload());
 }
 
 

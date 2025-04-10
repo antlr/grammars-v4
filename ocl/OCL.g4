@@ -18,98 +18,28 @@
 
 grammar OCL;
 
-specification
-    : 'package' ID '{' classifier* '}' EOF
+multipleContextSpecifications
+    : (singleInvariant | singleDerivedAttribute)+ EOF
     ;
 
-expressions
-    : expression (';' expression)* ';'? EOF
+contextSpecification
+    : (singleInvariant | singleDerivedAttribute) EOF
     ;
 
-classifier
-    : classDefinition
-    | interfaceDefinition
-    | usecaseDefinition
-    | enumeration
+singleInvariant
+    : 'context' ID 'inv' ID? ':' expression
     ;
 
-interfaceDefinition
-    : 'interface' ID ('extends' ID)? '{' classBody? '}'
-    ;
-
-classDefinition
-    : 'class' ID ('extends' ID)? ('implements' idList)? '{' classBody? '}'
-    ;
-
-classBody
-    : classBodyElement+
-    ;
-
-classBodyElement
-    : attributeDefinition
-    | operationDefinition
-    | invariant
-    | stereotype
-    ;
-
-attributeDefinition
-    : 'attribute' ID ('identity' | 'derived')? ':' type ';'
-    | 'static' 'attribute' ID ':' type ';'
-    ;
-
-operationDefinition
-    : ('static')? 'operation' ID '(' parameterDeclarations? ')' ':' type 'pre:' expression 'post:' expression (
-        'activity:' statement
-    )? ';'
-    ;
-
-parameterDeclarations
-    : (parameterDeclaration ',')* parameterDeclaration
-    ;
-
-parameterDeclaration
-    : ID ':' type
-    ;
-
-idList
-    : (ID ',')* ID
-    ;
-
-usecaseDefinition
-    : 'usecase' ID (':' type)? '{' usecaseBody? '}'
-    | 'usecase' ID '(' parameterDeclarations ')' (':' type)? '{' usecaseBody? '}'
-    ;
-
-usecaseBody
-    : usecaseBodyElement+
-    ;
-
-usecaseBodyElement
-    : 'parameter' ID ':' type ';'
-    | 'precondition' expression ';'
-    | 'extends' ID ';'
-    | 'extendedBy' ID ';'
-    | 'activity:' statement ';'
-    | '::' expression
-    | stereotype
-    ;
-
-invariant
-    : 'invariant' expression ';'
-    ;
-
-stereotype
-    : 'stereotype' ID ';'
-    | 'stereotype' ID '=' STRING_LITERAL ';'
-    | 'stereotype' ID '=' ID ';'
+singleDerivedAttribute
+    : 'context' qualified_name ':' type ('init:' expression)? 'derive:' expression
     ;
 
 enumeration
-    : 'enumeration' ID '{' enumerationLiteral+ '}'
+    : 'enumeration' identifier '{' enumerationLiteral+ '}'
     ;
 
 enumerationLiteral
-    : 'literal' ID
+    : 'literal' identifier
     ;
 
 type
@@ -117,9 +47,10 @@ type
     | 'Set' '(' type ')'
     | 'Bag' '(' type ')'
     | 'OrderedSet' '(' type ')'
+    | 'Ref' '(' type ')'  
     | 'Map' '(' type ',' type ')'
     | 'Function' '(' type ',' type ')'
-    | ID
+    | identifier
     ;
 
 expressionList
@@ -143,7 +74,9 @@ basicExpression
     | ID '@pre'
     | INT
     | FLOAT_LITERAL
-    | STRING_LITERAL
+    | STRING1_LITERAL
+    | STRING2_LITERAL
+    | ENUMERATION_LITERAL
     | ID
     | '(' expression ')'
     ;
@@ -153,7 +86,7 @@ conditionalExpression
     ;
 
 lambdaExpression
-    : 'lambda' ID ':' type 'in' expression
+    : 'lambda' identifier ':' type 'in' expression
     ;
 
 // A let is just an application of a lambda:
@@ -179,9 +112,8 @@ equalityExpression
     ;
 
 additiveExpression
-    : additiveExpression '+' additiveExpression
-    | additiveExpression '-' factorExpression
-    | factorExpression ('..' | '|->') factorExpression
+    : additiveExpression ('+' | '-') additiveExpression
+    | additiveExpression ('..' | '|->' | '.') additiveExpression
     | factorExpression
     ;
 
@@ -194,7 +126,7 @@ factorExpression
 // ->subrange is used for ->substring and ->subSequence
 
 factor2Expression
-    : ('-' | '+') factor2Expression
+    : ('-' | '+' | '?' | '!') factor2Expression
     | factor2Expression '->size()'
     | factor2Expression '->copy()'
     | factor2Expression (
@@ -244,6 +176,7 @@ factor2Expression
     | factor2Expression '->toInteger()'
     | factor2Expression '->toReal()'
     | factor2Expression '->toBoolean()'
+    | factor2Expression '->display()' 
     | factor2Expression '->toUpperCase()'
     | factor2Expression '->toLowerCase()'
     | factor2Expression ('->unionAll()' | '->intersectAll()' | '->concatenateAll()')
@@ -276,17 +209,18 @@ factor2Expression
         | '->equalsIgnoreCase'
     ) '(' expression ')'
     | factor2Expression ('->oclAsType' | '->oclIsTypeOf' | '->oclIsKindOf' | '->oclAsSet') '(' expression ')'
-    | factor2Expression '->collect' '(' identifier '|' expression ')'
-    | factor2Expression '->select' '(' identifier '|' expression ')'
-    | factor2Expression '->reject' '(' identifier '|' expression ')'
-    | factor2Expression '->forAll' '(' identifier '|' expression ')'
-    | factor2Expression '->exists' '(' identifier '|' expression ')'
-    | factor2Expression '->exists1' '(' identifier '|' expression ')'
-    | factor2Expression '->one' '(' identifier '|' expression ')'
-    | factor2Expression '->any' '(' identifier '|' expression ')'
-    | factor2Expression '->closure' '(' identifier '|' expression ')'
-    | factor2Expression '->sortedBy' '(' identifier '|' expression ')'
-    | factor2Expression '->isUnique' '(' identifier '|' expression ')'
+    | factor2Expression '->collect' '(' identOptType '|' expression ')'
+    | factor2Expression '->select' '(' identOptType '|' expression ')'
+    | factor2Expression '->reject' '(' identOptType '|' expression ')'
+    | factor2Expression '->forAll' '(' identOptType '|' expression ')'
+    | factor2Expression '->exists' '(' identOptType '|' expression ')'
+    | factor2Expression '->exists1' '(' identOptType '|' expression ')'
+    | factor2Expression '->one' '(' identOptType '|' expression ')'
+    | factor2Expression '->any' '(' identOptType '|' expression ')'
+    | factor2Expression '->closure' '(' identOptType '|' expression ')'
+    | factor2Expression '->sortedBy' '(' identOptType '|' expression ')'    
+    | factor2Expression '->sortedBy' '(' identifier ')'
+    | factor2Expression '->isUnique' '(' identOptType '|' expression ')'
     | factor2Expression '->subrange' '(' expression ',' expression ')'
     | factor2Expression '->replace' '(' expression ',' expression ')'
     | factor2Expression '->replaceAll' '(' expression ',' expression ')'
@@ -300,6 +234,10 @@ factor2Expression
     | basicExpression
     ;
 
+identOptType
+    : ID (':' type)?
+    ;    
+
 setExpression
     : 'OrderedSet{' expressionList? '}'
     | 'Bag{' expressionList? '}'
@@ -308,33 +246,27 @@ setExpression
     | 'Map{' expressionList? '}'
     ;
 
-statement
-    : 'skip'
-    | 'return'
-    | 'continue'
-    | 'break'
-    | 'var' ID ':' type
-    | 'if' expression 'then' statement 'else' statement
-    | 'while' expression 'do' statement
-    | 'for' ID ':' expression 'do' statement
-    | 'return' expression
-    | basicExpression ':=' expression
-    | statement ';' statement
-    | 'execute' expression
-    | 'call' basicExpression
-    | '(' statement ')'
-    ;
-
 identifier
     : ID
+    ;
+
+qualified_name
+    : ENUMERATION_LITERAL
     ;
 
 FLOAT_LITERAL
     : Digits '.' Digits
     ;
 
-STRING_LITERAL
+STRING1_LITERAL
     : '"' (~["\\\r\n] | EscapeSequence)* '"'
+    ;
+
+STRING2_LITERAL
+    : '\'' (~['\\\r\n] | EscapeSequence)* '\'';
+
+ENUMERATION_LITERAL
+    : ID '::' ID
     ;
 
 NULL_LITERAL
@@ -348,7 +280,7 @@ MULTILINE_COMMENT
 fragment EscapeSequence
     : '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
-    | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
 fragment HexDigits
@@ -372,7 +304,7 @@ INT
     ;
 
 ID
-    : [a-zA-Z$]+ [a-zA-Z0-9_$]*
+    : [a-zA-Z_$]+ [a-zA-Z0-9_$]*
     ; // match identifiers
 
 WS

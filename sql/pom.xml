@@ -24,8 +24,11 @@
         <module>postgresql</module>
         <module>snowflake</module>
         <module>sqlite</module>
+        <module>teradata</module>
         <module>trino</module>
         <module>tsql</module>
         <module>informix-sql</module>
+        <module>starrocks</module>
+        <module>clickhouse</module>
     </modules>
 </project>

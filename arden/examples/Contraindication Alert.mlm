@@ -1,0 +1,45 @@
+maintenance:
+title: Check for penicillin allergy;;
+mlmname: pen_allergy;;
+arden: version 3;;
+version: 1.00;;
+institution: Columbia-Presbyterian Medical Center;;
+author: George Hripcsak, M.D.;;
+specialist: ;;
+date: 1991-03-18;;
+validation: testing;;
+library:
+purpose:
+When a penicillin is prescribed, check for an allergy. (This MLM
+demonstrates checking for contraindications.);;
+explanation:
+This MLM is evoked when a penicillin medication is ordered. An
+alert is generated because the patient has an allergy to penicillin
+recorded.;;
+keywords: penicillin; allergy;;
+citations: ;;
+knowledge:
+type: data-driven;;
+data: /* an order for a penicillin evokes this MLM */
+penicillin_order := event {medication_order where
+class = penicillin};
+/* find allergies */
+penicillin_allergy := read last {allergy where
+agent_class = penicillin};
+;;
+evoke: penicillin_order;
+;;
+logic: if exist(penicillin_allergy)then
+conclude true;
+endif;
+;;
+action:
+write "Caution, the patient has the following allergy to penicillin
+documented:"
+|| penicillin_allergy;
+;;
+urgency: 50;;
+resources: 
+default: en;;
+language: en;;
+end:
