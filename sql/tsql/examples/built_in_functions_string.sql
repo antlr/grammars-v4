@@ -496,6 +496,10 @@ SET @json = FORMATMESSAGE('{ "id": %d,"name": "%s", "surname": "%s" }',
     17, STRING_ESCAPE(@name,'json'), STRING_ESCAPE(@surname,'json') );
 
 SELECT STUFF('abcdef', 2, 3, 'ijklmn');
+
+DECLARE @VAR INT;
+SET @VAR = 3;
+SELECT STUFF('abcdef', 2, @VAR, 'ijklmn');
 GO
 
 SELECT name, SUBSTRING(name, 1, 1) AS Initial ,

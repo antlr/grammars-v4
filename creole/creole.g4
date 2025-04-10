@@ -29,137 +29,139 @@
 * examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar creole;
 
 document
-   : (line? CR)* EOF
-   ;
+    : (line? CR)* EOF
+    ;
 
 line
-   : markup +
-   ;
+    : markup+
+    ;
 
 markup
-   : bold
-   | italics
-   | href
-   | title
-   | hline
-   | text_
-   | listitem
-   | image
-   | tablerow
-   | tableheader
-   | nowiki
-   ;
+    : bold
+    | italics
+    | href
+    | title
+    | hline
+    | text_
+    | listitem
+    | image
+    | tablerow
+    | tableheader
+    | nowiki
+    ;
 
 text_
-   : (TEXT | RSLASH) + ('\\\\' text_)*
-   ;
+    : (TEXT | RSLASH)+ ('\\\\' text_)*
+    ;
 
 bold
-   : '**' markup + '**'?
-   ;
+    : '**' markup+ '**'?
+    ;
 
 italics
-   : RSLASH RSLASH markup + RSLASH RSLASH
-   ;
+    : RSLASH RSLASH markup+ RSLASH RSLASH
+    ;
 
 href
-   : LBRACKET text_ ('|' markup +)? RBRACKET
-   | LBRACE text_ '|' markup + RBRACE
-   ;
+    : LBRACKET text_ ('|' markup+)? RBRACKET
+    | LBRACE text_ '|' markup+ RBRACE
+    ;
 
 image
-   : LBRACE text_ RBRACE
-   ;
+    : LBRACE text_ RBRACE
+    ;
 
 hline
-   : '----'
-   ;
+    : '----'
+    ;
 
 listitem
-   : ('*' + markup)
-   | ('#' + markup)
-   ;
+    : ('*'+ markup)
+    | ('#'+ markup)
+    ;
 
 tableheader
-   : ('|=' markup +) + '|' WS*
-   ;
+    : ('|=' markup+)+ '|' WS*
+    ;
 
 tablerow
-   : ('|' markup +) + '|' WS*
-   ;
+    : ('|' markup+)+ '|' WS*
+    ;
 
 title
-   : '=' + markup '='*
-   ;
+    : '='+ markup '='*
+    ;
 
 nowiki
-   : NOWIKI
-   ;
-
+    : NOWIKI
+    ;
 
 HASH
-   : '#'
-   ;
-
+    : '#'
+    ;
 
 LBRACKET
-   : '[['
-   ;
-
+    : '[['
+    ;
 
 RBRACKET
-   : ']]'
-   ;
-
+    : ']]'
+    ;
 
 LBRACE
-   : '{{'
-   ;
-
+    : '{{'
+    ;
 
 RBRACE
-   : '}}'
-   ;
-
+    : '}}'
+    ;
 
 TEXT
-   : (LETTERS | DIGITS | SYMBOL | WS) +
-   ;
-
+    : (LETTERS | DIGITS | SYMBOL | WS)+
+    ;
 
 WS
-   : [ \t]
-   ;
-
+    : [ \t]
+    ;
 
 CR
-   : '\r'? '\n' | EOF
-   ;
-
+    : '\r'? '\n'
+    | EOF
+    ;
 
 NOWIKI
-   : '{{{' .*? '}}}'
-   ;
-
+    : '{{{' .*? '}}}'
+    ;
 
 RSLASH
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 fragment LETTERS
-   : [a-zA-Z]
-   ;
-
+    : [a-zA-Z]
+    ;
 
 fragment DIGITS
-   : [0-9]
-   ;
-
+    : [0-9]
+    ;
 
 fragment SYMBOL
-   : '.' | ';' | ':' | ',' | '(' | ')' | '-' | '\\' | '\'' | '~' | '"' | '+'
-   ;
+    : '.'
+    | ';'
+    | ':'
+    | ','
+    | '('
+    | ')'
+    | '-'
+    | '\\'
+    | '\''
+    | '~'
+    | '"'
+    | '+'
+    ;

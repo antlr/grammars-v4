@@ -10,7 +10,6 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
-		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -22,6 +21,10 @@
 						<include>PlSqlLexer.g4</include>
 						<include>PlSqlParser.g4</include>
 					</includes>
+					<arguments>
+						<argument>-package</argument>
+						<argument>${packageName}</argument>
+					</arguments>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -42,7 +45,7 @@
 					<showTree>false</showTree>
 					<entryPoint>sql_script</entryPoint>
 					<grammarName>PlSql</grammarName>
-					<packageName></packageName>
+					<packageName>${packageName}</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
@@ -61,7 +64,7 @@
 							<showTree>false</showTree>
 							<entryPoint>sql_script</entryPoint>
 							<grammarName>PlSql</grammarName>
-							<packageName></packageName>
+							<packageName>${packageName}</packageName>
 							<exampleFiles>examples-sql-script/</exampleFiles>
 						</configuration>
 					</execution>

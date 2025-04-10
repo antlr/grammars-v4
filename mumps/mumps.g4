@@ -30,25 +30,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar mumps;
 
 program
-   : line + eof
-   ;
+    : line+ eof
+    ;
 
 eof
-   : SPACE* CR?
-   ;
+    : SPACE* CR?
+    ;
 
 line
-   : code
-   | routinedecl
-   | CR
-   ;
+    : code
+    | routinedecl
+    | CR
+    ;
 
 code
-   : (label | (SPACE + DOT +) | SPACE +) (command + | if_ | subproc)? SPACE* CR
-   ;
+    : (label | (SPACE+ DOT+) | SPACE+) (command+ | if_ | subproc)? SPACE* CR
+    ;
 
 /*
 * A line may begin with a label. If so, the label must begin in column one.
@@ -58,70 +61,70 @@ code
 * some number of blanks, possibly zero, before the first command.
 */
 label
-   : identifier SPACE +
-   ;
+    : identifier SPACE+
+    ;
 
 routinedecl
-   : PERCENT? identifier (LPAREN paramlist? RPAREN)? SPACE* CR
-   ;
+    : PERCENT? identifier (LPAREN paramlist? RPAREN)? SPACE* CR
+    ;
 
 paramlist
-   : param (COMMA param)*
-   ;
+    : param (COMMA param)*
+    ;
 
 param
-   : variable
-   ;
+    : variable
+    ;
 
 subproc
-   : identifier (LPAREN paramlist? RPAREN)? (SPACE* command) +
-   ;
+    : identifier (LPAREN paramlist? RPAREN)? (SPACE* command)+
+    ;
 
 command
-   : set_
-   | for_
-   | write_
-   | read_
-   | quit_
-   | halt_
-   | hang_
-   | new_
-   | break_
-   | do_
-   | kill_
-   | view_
-   | merge_
-   | xecute_
-   | (CLOSE | ELSE | GOTO | JOB | LOCK | OPEN | TCOMMIT | TRESTART | TROLLBACK | TSTART | USE)
-   ;
+    : set_
+    | for_
+    | write_
+    | read_
+    | quit_
+    | halt_
+    | hang_
+    | new_
+    | break_
+    | do_
+    | kill_
+    | view_
+    | merge_
+    | xecute_
+    | (CLOSE | ELSE | GOTO | JOB | LOCK | OPEN | TCOMMIT | TRESTART | TROLLBACK | TSTART | USE)
+    ;
 
 postcondition
-   : COLON expression
-   ;
+    : COLON expression
+    ;
 
 expression
-   : term (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE | INTDIVIDE | MODULO | EXPONENT) expression)*
-   ;
+    : term (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE | INTDIVIDE | MODULO | EXPONENT) expression)*
+    ;
 
 term
-   : variable
-   | function_
-   | NUMBER
-   | LPAREN expression RPAREN
-   ;
+    : variable
+    | function_
+    | NUMBER
+    | LPAREN expression RPAREN
+    ;
 
 condition
-   : term
-   | (term (NGT | NLT | LT | GT | EQUALS) term)
-   ;
+    : term
+    | (term (NGT | NLT | LT | GT | EQUALS) term)
+    ;
 
 identifier
-   : IDENTIFIER
-   ;
+    : IDENTIFIER
+    ;
 
 variable
-   : (CARAT | AMPERSAND)* identifier
-   ;
+    : (CARAT | AMPERSAND)* identifier
+    ;
 
 function_
     : DOLLAR identifier (LPAREN arglist RPAREN)?
@@ -137,510 +140,426 @@ function_
 * command word and its post-conditional, if present, and the argument.
 */
 break_
-   : BREAK postcondition?
-   ;
+    : BREAK postcondition?
+    ;
 
 do_
-   : DO postcondition? SPACE + identifier (LPAREN paramlist? RPAREN)?
-   ;
+    : DO postcondition? SPACE+ identifier (LPAREN paramlist? RPAREN)?
+    ;
 
 for_
-   : FOR SPACE + term EQUALS term COLON (term COLON)? term SPACE + (command SPACE?)* COLON SPACE* condition
-   ;
+    : FOR SPACE+ term EQUALS term COLON (term COLON)? term SPACE+ (command SPACE?)* COLON SPACE* condition
+    ;
 
 halt_
-   : HALT postcondition?
-   ;
+    : HALT postcondition?
+    ;
 
 hang_
-   : HANG postcondition? SPACE + term
-   ;
+    : HANG postcondition? SPACE+ term
+    ;
 
 if_
-   : IF SPACE + condition SPACE* command
-   ;
+    : IF SPACE+ condition SPACE* command
+    ;
 
 kill_
-   : KILL postcondition? SPACE + arglist
-   ;
+    : KILL postcondition? SPACE+ arglist
+    ;
 
 merge_
-   : MERGE postcondition? SPACE + term EQUALS term (',' term EQUALS term)*
-   ;
+    : MERGE postcondition? SPACE+ term EQUALS term (',' term EQUALS term)*
+    ;
 
 new_
-   : NEW postcondition? SPACE + arglist
-   ;
+    : NEW postcondition? SPACE+ arglist
+    ;
 
 quit_
-   : QUIT postcondition? (SPACE + term)?
-   ;
+    : QUIT postcondition? (SPACE+ term)?
+    ;
 
 read_
-   : READ postcondition? SPACE + arglist
-   ;
+    : READ postcondition? SPACE+ arglist
+    ;
 
 set_
-   : SET postcondition? SPACE + assign (',' assign)*
-   ;
+    : SET postcondition? SPACE+ assign (',' assign)*
+    ;
 
 view_
-   : VIEW postcondition? SPACE + IDENTIFIER
-   ;
+    : VIEW postcondition? SPACE+ IDENTIFIER
+    ;
 
 write_
-   : WRITE postcondition? SPACE + arglist
-   ;
+    : WRITE postcondition? SPACE+ arglist
+    ;
 
 xecute_
-   : XECUTE postcondition? SPACE + STRING_LITERAL
-   ;
+    : XECUTE postcondition? SPACE+ STRING_LITERAL
+    ;
 
 assign
-   : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
-   ;
+    : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
+    ;
 
 arglist
-   : arg (SPACE* COMMA arg)*
-   ;
+    : arg (SPACE* COMMA arg)*
+    ;
 
 arg
-   : expression
-   | (BANG | STRING_LITERAL)
-   ;
+    : expression
+    | (BANG | STRING_LITERAL)
+    ;
 
 /*
 * Command Tokens
 */
 
 BREAK
-   : B R E A K
-   ;
-
+    : B R E A K
+    ;
 
 CLOSE
-   : C L O S E
-   ;
-
+    : C L O S E
+    ;
 
 DO
-   : D O
-   ;
-
+    : D O
+    ;
 
 ELSE
-   : E L S E
-   ;
-
+    : E L S E
+    ;
 
 FOR
-   : F O R
-   ;
-
+    : F O R
+    ;
 
 GOTO
-   : G O T O
-   ;
-
+    : G O T O
+    ;
 
 HALT
-   : H A L T
-   ;
-
+    : H A L T
+    ;
 
 HANG
-   : H A N G
-   ;
-
+    : H A N G
+    ;
 
 IF
-   : I F
-   ;
-
+    : I F
+    ;
 
 JOB
-   : J O B
-   ;
-
+    : J O B
+    ;
 
 KILL
-   : K I L L
-   ;
-
+    : K I L L
+    ;
 
 LOCK
-   : L O C K
-   ;
-
+    : L O C K
+    ;
 
 MERGE
-   : M E R G E
-   ;
-
+    : M E R G E
+    ;
 
 NEW
-   : N E W
-   ;
-
+    : N E W
+    ;
 
 OPEN
-   : O P E N
-   ;
-
+    : O P E N
+    ;
 
 QUIT
-   : Q U I T
-   ;
-
+    : Q U I T
+    ;
 
 READ
-   : R E A D
-   ;
-
+    : R E A D
+    ;
 
 SET
-   : S E T
-   ;
-
+    : S E T
+    ;
 
 TCOMMIT
-   : T C O M M I T
-   ;
-
+    : T C O M M I T
+    ;
 
 TRESTART
-   : T R E S T A R T
-   ;
-
+    : T R E S T A R T
+    ;
 
 TROLLBACK
-   : T R O L L B A C K
-   ;
-
+    : T R O L L B A C K
+    ;
 
 TSTART
-   : T S T A R T
-   ;
-
+    : T S T A R T
+    ;
 
 USE
-   : U S E
-   ;
-
+    : U S E
+    ;
 
 VIEW
-   : V I E W
-   ;
-
+    : V I E W
+    ;
 
 WRITE
-   : W R I T E
-   ;
-
+    : W R I T E
+    ;
 
 XECUTE
-   : X E C U T E
-   ;
-
+    : X E C U T E
+    ;
 
 COLON
-   : ':'
-   ;
-
+    : ':'
+    ;
 
 COMMA
-   : ','
-   ;
-
+    : ','
+    ;
 
 DOLLAR
-   : '$'
-   ;
-
+    : '$'
+    ;
 
 PERCENT
-   : '%'
-   ;
-
+    : '%'
+    ;
 
 AMPERSAND
-   : '&'
-   ;
-
+    : '&'
+    ;
 
 INDIRECT
-   : '@'
-   ;
-
+    : '@'
+    ;
 
 CARAT
-   : '^'
-   ;
-
+    : '^'
+    ;
 
 BANG
-   : '!'
-   ;
-
+    : '!'
+    ;
 
 LPAREN
-   : '('
-   ;
-
+    : '('
+    ;
 
 RPAREN
-   : ')'
-   ;
-
+    : ')'
+    ;
 
 LBRACE
-   : '{'
-   ;
-
+    : '{'
+    ;
 
 RBRACE
-   : '}'
-   ;
-
+    : '}'
+    ;
 
 NGT
-   : '\'>'
-   ;
-
+    : '\'>'
+    ;
 
 NLT
-   : '\'<'
-   ;
-
+    : '\'<'
+    ;
 
 GT
-   : '>'
-   ;
-
+    : '>'
+    ;
 
 LT
-   : '<'
-   ;
-
+    : '<'
+    ;
 
 ADD
-   : '+'
-   ;
-
+    : '+'
+    ;
 
 SUBTRACT
-   : '-'
-   ;
-
+    : '-'
+    ;
 
 MULTIPLY
-   : '*'
-   ;
-
+    : '*'
+    ;
 
 DIVIDE
-   : '/'
-   ;
-
+    : '/'
+    ;
 
 INTDIVIDE
-   : '\\'
-   ;
-
+    : '\\'
+    ;
 
 MODULO
-   : '#'
-   ;
-
+    : '#'
+    ;
 
 EXPONENT
-   : '**'
-   ;
-
+    : '**'
+    ;
 
 EQUALS
-   : '='
-   ;
-
+    : '='
+    ;
 
 QUESTION
-   : '?'
-   ;
-
+    : '?'
+    ;
 
 DOT
-   : '.'
-   ;
-
+    : '.'
+    ;
 
 CONCAT
-   : '_'
-   ;
-
+    : '_'
+    ;
 
 IDENTIFIER
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9')*
-   ;
-
+    : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9')*
+    ;
 
 STRING_LITERAL
-   : '"' ('""' | ~'"')* '"'
-   ;
-
+    : '"' ('""' | ~'"')* '"'
+    ;
 
 NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
+    : ('0' .. '9')+ ('.' ('0' .. '9')+)?
+    ;
 
 NOT
-   : '\''
-   ;
-
+    : '\''
+    ;
 
 fragment A
-   : ('a' | 'A')
-   ;
-
+    : ('a' | 'A')
+    ;
 
 fragment B
-   : ('b' | 'B')
-   ;
-
+    : ('b' | 'B')
+    ;
 
 fragment C
-   : ('c' | 'C')
-   ;
-
+    : ('c' | 'C')
+    ;
 
 fragment D
-   : ('d' | 'D')
-   ;
-
+    : ('d' | 'D')
+    ;
 
 fragment E
-   : ('e' | 'E')
-   ;
-
+    : ('e' | 'E')
+    ;
 
 fragment F
-   : ('f' | 'F')
-   ;
-
+    : ('f' | 'F')
+    ;
 
 fragment G
-   : ('g' | 'G')
-   ;
-
+    : ('g' | 'G')
+    ;
 
 fragment H
-   : ('h' | 'H')
-   ;
-
+    : ('h' | 'H')
+    ;
 
 fragment I
-   : ('i' | 'I')
-   ;
-
+    : ('i' | 'I')
+    ;
 
 fragment J
-   : ('j' | 'J')
-   ;
-
+    : ('j' | 'J')
+    ;
 
 fragment K
-   : ('k' | 'K')
-   ;
-
+    : ('k' | 'K')
+    ;
 
 fragment L
-   : ('l' | 'L')
-   ;
-
+    : ('l' | 'L')
+    ;
 
 fragment M
-   : ('m' | 'M')
-   ;
-
+    : ('m' | 'M')
+    ;
 
 fragment N
-   : ('n' | 'N')
-   ;
-
+    : ('n' | 'N')
+    ;
 
 fragment O
-   : ('o' | 'O')
-   ;
-
+    : ('o' | 'O')
+    ;
 
 fragment P
-   : ('p' | 'P')
-   ;
-
+    : ('p' | 'P')
+    ;
 
 fragment Q
-   : ('q' | 'Q')
-   ;
-
+    : ('q' | 'Q')
+    ;
 
 fragment R
-   : ('r' | 'R')
-   ;
-
+    : ('r' | 'R')
+    ;
 
 fragment S
-   : ('s' | 'S')
-   ;
-
+    : ('s' | 'S')
+    ;
 
 fragment T
-   : ('t' | 'T')
-   ;
-
+    : ('t' | 'T')
+    ;
 
 fragment U
-   : ('u' | 'U')
-   ;
-
+    : ('u' | 'U')
+    ;
 
 fragment V
-   : ('v' | 'V')
-   ;
-
+    : ('v' | 'V')
+    ;
 
 fragment W
-   : ('w' | 'W')
-   ;
-
+    : ('w' | 'W')
+    ;
 
 fragment X
-   : ('x' | 'X')
-   ;
-
+    : ('x' | 'X')
+    ;
 
 fragment Y
-   : ('y' | 'Y')
-   ;
-
+    : ('y' | 'Y')
+    ;
 
 fragment Z
-   : ('z' | 'Z')
-   ;
-
+    : ('z' | 'Z')
+    ;
 
 COMMENT
-   : ';' ~[\r\n]* -> skip
-   ;
+    : ';' ~[\r\n]* -> skip
+    ;
 
 SPACE
-   : ' '
-   ;
+    : ' '
+    ;
 
 CR
-   : [\r\n]+
-   ;
-
+    : [\r\n]+
+    ;
 
 WS
-   : [\t] -> skip
-   ;
+    : [\t] -> skip
+    ;
