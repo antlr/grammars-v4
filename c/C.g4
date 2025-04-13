@@ -346,10 +346,6 @@ gccAttribute
     ('(' argumentExpressionList? ')')?
     ;
 
-nestedParenthesesBlock
-    : (~('(' | ')') | '(' nestedParenthesesBlock ')')*
-    ;
-
 pointer
     : (('*' | '^') typeQualifierList?)+ // ^ - Blocks language extension
     ;
