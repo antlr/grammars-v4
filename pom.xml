@@ -213,6 +213,7 @@
 				<module>guido</module>
 				<module>guitartab</module>
 				<module>haskell</module>
+				<module>hexpat</module>
 				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
