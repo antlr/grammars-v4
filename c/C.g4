@@ -228,7 +228,7 @@ typeSpecifier
     ;
 
 structOrUnionSpecifier
-    : structOrUnion Identifier? '{' structDeclarationList '}'
+    : structOrUnion Identifier? '{' structDeclarationList? '}'
     | structOrUnion Identifier
     ;
 
