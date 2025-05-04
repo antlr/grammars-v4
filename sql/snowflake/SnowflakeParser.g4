@@ -554,6 +554,7 @@ alter_command
     | alter_role
     | alter_row_access_policy
     | alter_schema
+    | alter_secret
     | alter_security_integration_external_oauth
     | alter_security_integration_snowflake_oauth
     | alter_security_integration_saml2
@@ -987,6 +988,50 @@ alter_sequence
     | ALTER SEQUENCE if_exists? object_name SET? ( INCREMENT BY? EQ? num)?
     | ALTER SEQUENCE if_exists? object_name SET (order_noorder? comment_clause | order_noorder)
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
+    ;
+
+alter_secret
+    : ALTER SECRET if_exists? object_name secret_opts
+    ;
+
+secret_opts
+    : UNSET COMMENT
+    | SET secret_set_opts
+    ;
+
+secret_set_opts
+    : secret_oauth_client_creds_opts+
+    | secret_oauth_auth_code_opts+
+    | secret_basic_auth_opts+
+    | secret_generic_string_opts+
+    | secret_api_auth_opts+
+    ;
+
+secret_oauth_client_creds_opts
+    : OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET
+    | comment_clause
+    ;
+
+secret_oauth_auth_code_opts
+    : OAUTH_REFRESH_TOKEN EQ t=string
+    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet=string
+    | comment_clause
+    ;
+
+secret_api_auth_opts
+    : API_AUTHENTICATION EQ aa=string
+    | comment_clause
+    ;
+
+secret_basic_auth_opts
+    : USERNAME EQ u=string
+    | PASSWORD EQ p=string
+    | comment_clause
+    ;
+
+secret_generic_string_opts
+    : SECRET_STRING EQ ss=string
+    | comment_clause
     ;
 
 alter_security_integration_external_oauth
@@ -1478,6 +1523,7 @@ create_command
     | create_role
     | create_row_access_policy
     | create_schema
+    | create_secret
     | create_security_integration_external_oauth
     | create_security_integration_snowflake_oauth
     | create_security_integration_saml2
@@ -1884,6 +1930,18 @@ create_schema
     : CREATE or_replace? TRANSIENT? SCHEMA if_not_exists? schema_name clone_at_before? (
         WITH MANAGED ACCESS
     )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? with_tags? comment_clause?
+    ;
+
+create_secret
+    : CREATE or_replace? SECRET if_not_exists? s=object_name (
+        TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
+        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt=string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et=string API_AUTHENTICATION EQ aa=id_ |
+        TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
+        TYPE EQ PASSWORD USERNAME EQ u=string PASSWORD EQ p=string |
+        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss=string |
+        TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
+    )
+    comment_clause?
     ;
 
 create_security_integration_external_oauth
@@ -2751,6 +2809,7 @@ drop_command
     | drop_role
     | drop_row_access_policy
     | drop_schema
+    | drop_secret
     | drop_sequence
     | drop_session_policy
     | drop_share
@@ -2846,6 +2905,10 @@ drop_row_access_policy
 
 drop_schema
     : DROP SCHEMA if_exists? schema_name cascade_restrict?
+    ;
+
+drop_secret
+    : DROP SECRET if_exists? object_name
     ;
 
 drop_sequence
@@ -3174,6 +3237,7 @@ show_command
     | show_roles
     | show_row_access_policies
     | show_schemas
+    | show_secrets
     | show_sequences
     | show_session_policies
     | show_shares
@@ -3397,6 +3461,10 @@ show_row_access_policies
 
 show_schemas
     : SHOW TERSE? SCHEMAS HISTORY? like_pattern? (IN ( ACCOUNT | DATABASE id_?))? starts_with? limit_rows?
+    ;
+
+show_secrets
+    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
     ;
 
 show_sequences
@@ -4131,7 +4199,7 @@ select_statement_in_parentheses
     ;
 
 select_optional_clauses
-    : into_clause? from_clause? where_clause? (group_by_clause | having_clause)? qualify_clause? order_by_clause?
+    : into_clause? from_clause? where_clause? (group_by_clause having_clause? | having_clause)? qualify_clause? order_by_clause?
     ;
 
 select_clause
