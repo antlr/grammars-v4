@@ -23,8 +23,12 @@ Russian algorithmic language primarily used for teaching programming in schools.
 ## Grammar Files
 
 * `KumirLexer.g4`: Defines the tokens for the Kumir language. Uses UTF-8 encoding. Handles case-insensitivity for
-  Cyrillic keywords.
-* `KumirParser.g4`: Defines the parsing rules based on the tokens from the lexer. Uses `tokenVocab` option.
+  Cyrillic keywords. It is recommended to use UTF-8 encoding **without BOM** for Kumir source files.
+* `KumirParser.g4`: Defines the parsing rules based on the tokens from the lexer. Uses `tokenVocab` option. The `algorithmNameTokens` rule has been refined to robustly capture complex algorithm names without relying on target-specific semantic predicates.
+
+## Integration with grammars-v4
+
+* `desc.xml`: This file is provided for integration with the `antlr/grammars-v4` testing infrastructure. It specifies Python 3 as the target language for this grammar and points to the example files located in the `examples/` directory.
 
 ## Origin and Testing
 

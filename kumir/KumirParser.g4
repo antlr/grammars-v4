@@ -172,17 +172,10 @@ parameterList
  * It consumes any token (.) as long as the lookahead (LA(1)) is not one of the
  * stop tokens (LPAREN, ALG_BEGIN, PRE_CONDITION, POST_CONDITION, SEMICOLON, EOF).
  * This allows names like "Сумма И счетчик" or "Факториал 100".
- * The predicate {...}? implements the lookahead check.
  * The `+` ensures at least one token is consumed for the name.
  */
 algorithmNameTokens
-    : ( {self._input.LA(1) != self.LPAREN and \
-         self._input.LA(1) != self.ALG_BEGIN and \
-         self._input.LA(1) != self.PRE_CONDITION and \
-         self._input.LA(1) != self.POST_CONDITION and \
-         self._input.LA(1) != self.SEMICOLON and \
-         self._input.LA(1) != self.EOF}? . // Consume ANY token if lookahead is not a stop token
-      )+
+    : ~(LPAREN | ALG_BEGIN | PRE_CONDITION | POST_CONDITION | SEMICOLON | EOF)+
     ;
 
 /**
