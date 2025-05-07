@@ -1,0 +1,8 @@
+:NUM:       // set mode to NUM
+{0[+4]}      // set cell 0 to 4
+{1[+2]}      // set cell 1 to 2
+{0{         // while cell 0 is not 0
+  {0[-1]}   // subtract cell 0 by 1
+  {1[+1]}   // add 1 to cell 1
+}}          // end while
+|1|         // print cell 1 (6)

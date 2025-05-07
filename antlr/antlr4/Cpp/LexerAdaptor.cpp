@@ -25,108 +25,87 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+//package org.antlr.parser.antlr4;
+
+#include "antlr4-runtime.h"
 #include "LexerAdaptor.h"
 #include "ANTLRv4Lexer.h"
-#include "ctype.h"
+#include <cctype>
 
-//using namespace antlr4;
-
-LexerAdaptor::LexerAdaptor(antlr4::CharStream *input) : Lexer(input) {
-	currentRuleType = antlr4::Token::INVALID_TYPE;
-	_insideOptionsBlock = false;
-	PREQUEL_CONSTRUCT = -10;
-	OPTIONS_CONSTRUCT = -11;
-//	stream = input;
+LexerAdaptor::LexerAdaptor(antlr4::CharStream* input) : antlr4::Lexer(input)
+{
 }
 
 int LexerAdaptor::getCurrentRuleType() {
-	return currentRuleType;
+    return this->_currentRuleType;
 }
 
 void LexerAdaptor::setCurrentRuleType(int ruleType) {
-	currentRuleType = ruleType;
+    this->_currentRuleType = ruleType;
 }
 
 void LexerAdaptor::handleBeginArgument() {
-	if (inLexerRule()) {
-		pushMode(ANTLRv4Lexer::LexerCharSet);
-		more();
-	} else {
-		pushMode(ANTLRv4Lexer::Argument);
-	}
+    if (this->inLexerRule()) {
+        this->pushMode(ANTLRv4Lexer::LexerCharSet);
+        this->more();
+    } else {
+        this->pushMode(ANTLRv4Lexer::Argument);
+    }
 }
 
 void LexerAdaptor::handleEndArgument() {
-	popMode();
-	if (modeStack.size() > 0) {
-		setType(ANTLRv4Lexer::ARGUMENT_CONTENT);
-	}
-}
-
-void LexerAdaptor::handleEndAction() {
-	auto oldMode = mode;
-	auto newMode = popMode();
-
-	if (modeStack.size() > 0 && newMode == ANTLRv4Lexer::TargetLanguageAction && oldMode == newMode) {
-		setType(ANTLRv4Lexer::ACTION_CONTENT);
-	}
+    this->popMode();
+    if (this->modeStack.size() > 0) {
+        this->setType(ANTLRv4Lexer::ARGUMENT_CONTENT);
+    }
 }
 
 antlr4::Token* LexerAdaptor::emit() {
-	if ((type == ANTLRv4Lexer::OPTIONS || type == ANTLRv4Lexer::TOKENS || type == ANTLRv4Lexer::CHANNELS) && currentRuleType == antlr4::Token::INVALID_TYPE)
-	{
-		// enter prequel construct ending with an RBRACE
-		currentRuleType = PREQUEL_CONSTRUCT;
-	}
-	else if (type == ANTLRv4Lexer::OPTIONS && currentRuleType == ANTLRv4Lexer::TOKEN_REF)
-	{
-		currentRuleType = OPTIONS_CONSTRUCT;
-	}
-	else if (type == ANTLRv4Lexer::RBRACE && currentRuleType == PREQUEL_CONSTRUCT)
-	{
-		// exit prequel construct
-		currentRuleType = antlr4::Token::INVALID_TYPE;
-	}
-	else if (type == ANTLRv4Lexer::RBRACE && currentRuleType == OPTIONS_CONSTRUCT)
-	{ // exit options
-		currentRuleType = ANTLRv4Lexer::TOKEN_REF;
-	}
-	else if (type == ANTLRv4Lexer::AT && currentRuleType == antlr4::Token::INVALID_TYPE)
-	{
-		// enter action
-		currentRuleType = ANTLRv4Lexer::AT;
-	}
-	else if (type == ANTLRv4Lexer::SEMI && currentRuleType == OPTIONS_CONSTRUCT)
-	{ // ';' in options { .... }. Don't change anything.
-	}
-	else if (type == ANTLRv4Lexer::END_ACTION && currentRuleType == ANTLRv4Lexer::AT)
-	{
-		// exit action
-		currentRuleType = antlr4::Token::INVALID_TYPE;
-	}
-	else if (type == ANTLRv4Lexer::ID)
-	{
-		std::string firstChar = _input->getText(antlr4::misc::Interval(tokenStartCharIndex, tokenStartCharIndex));
-		if (isupper(firstChar.at(0))) {
-			type = ANTLRv4Lexer::TOKEN_REF;
-		} else {
-			type = ANTLRv4Lexer::RULE_REF;
-		}
+    if ((this->type == ANTLRv4Lexer::OPTIONS || this->type == ANTLRv4Lexer::TOKENS || this->type == ANTLRv4Lexer::CHANNELS)
+          && getCurrentRuleType() == antlr4::Token::INVALID_TYPE) { // enter prequel construct ending with an RBRACE
+        setCurrentRuleType(PREQUEL_CONSTRUCT);
+    } else if (this->type == ANTLRv4Lexer::OPTIONS && getCurrentRuleType() == ANTLRv4Lexer::TOKEN_REF)
+    {
+        setCurrentRuleType(OPTIONS_CONSTRUCT);
+    } else if (this->type == ANTLRv4Lexer::RBRACE && getCurrentRuleType() == PREQUEL_CONSTRUCT) { // exit prequel construct
+        setCurrentRuleType(antlr4::Token::INVALID_TYPE);
+    } else if (this->type == ANTLRv4Lexer::RBRACE && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+    { // exit options
+        setCurrentRuleType(ANTLRv4Lexer::TOKEN_REF);
+    } else if (this->type == ANTLRv4Lexer::AT && getCurrentRuleType() == antlr4::Token::INVALID_TYPE) { // enter action
+        setCurrentRuleType(ANTLRv4Lexer::AT);
+    } else if (this->type == ANTLRv4Lexer::SEMI && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+    { // ';' in options { .... }. Don't change anything.
+    } else if (this->type == ANTLRv4Lexer::ACTION && getCurrentRuleType() == ANTLRv4Lexer::AT) { // exit action
+        // Exit action.
+            setCurrentRuleType(antlr4::Token::INVALID_TYPE);
+    } else if (this->type == ANTLRv4Lexer::ID) {
+        auto firstChar = _input->getText(antlr4::misc::Interval(this->tokenStartCharIndex, this->tokenStartCharIndex));
+        if (std::isupper(firstChar[0])) {
+            this->type = ANTLRv4Lexer::TOKEN_REF;
+        } else {
+            this->type = ANTLRv4Lexer::RULE_REF;
+        }
 
-		if (currentRuleType == antlr4::Token::INVALID_TYPE) { // if outside of rule def
-			currentRuleType = type; // set to inside lexer or parser rule
-		}
-	} else if (type == ANTLRv4Lexer::SEMI) { // exit rule def
-		currentRuleType = antlr4::Token::INVALID_TYPE;
-	}
+        if (getCurrentRuleType() == antlr4::Token::INVALID_TYPE) { // if outside of rule def
+            setCurrentRuleType(this->type); // set to inside lexer or parser rule
+        }
+    } else if (this->type == ANTLRv4Lexer::SEMI) { // exit rule def
+        setCurrentRuleType(antlr4::Token::INVALID_TYPE);
+    }
 
-	return Lexer::emit();
+    return Lexer::emit();
 }
 
 bool LexerAdaptor::inLexerRule() {
-	return currentRuleType == ANTLRv4Lexer::TOKEN_REF;
+    return getCurrentRuleType() == ANTLRv4Lexer::TOKEN_REF;
 }
 
 bool LexerAdaptor::inParserRule() { // not used, but added for clarity
-	return currentRuleType == ANTLRv4Lexer::RULE_REF;
+    return getCurrentRuleType() == ANTLRv4Lexer::RULE_REF;
 }
+
+void LexerAdaptor::reset() {
+    setCurrentRuleType(antlr4::Token::INVALID_TYPE);
+    Lexer::reset();
+}   

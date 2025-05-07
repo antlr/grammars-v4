@@ -252,15 +252,22 @@ abstract class MySQLLexerBase extends Lexer
         return t;
     }
 
-    bool isServerVersionLt80024() => serverVersion < 80024;
-    bool isServerVersionGe80024() => serverVersion >= 80024;
+    bool isMasterCompressionAlgorithm() => serverVersion >= 80018 && isServerVersionLt80024();
     bool isServerVersionGe80011() => serverVersion >= 80011;
     bool isServerVersionGe80013() => serverVersion >= 80013;
     bool isServerVersionLt80014() => serverVersion < 80014;
     bool isServerVersionGe80014() => serverVersion >= 80014;
+    bool isServerVersionGe80016() => serverVersion >= 80016;
     bool isServerVersionGe80017() => serverVersion >= 80017;
     bool isServerVersionGe80018() => serverVersion >= 80018;
-    bool isMasterCompressionAlgorithm() => serverVersion >= 80018 && isServerVersionLt80024();
+    bool isServerVersionLt80021() => serverVersion < 80021;
+    bool isServerVersionGe80021() => serverVersion >= 80021;
+    bool isServerVersionLt80022() => serverVersion < 80022;
+    bool isServerVersionGe80022() => serverVersion >= 80022;
+    bool isServerVersionLt80023() => serverVersion < 80023;
+    bool isServerVersionGe80023() => serverVersion >= 80023;
+    bool isServerVersionLt80024() => serverVersion < 80024;
+    bool isServerVersionGe80024() => serverVersion >= 80024;
     bool isServerVersionLt80031() => serverVersion < 80031;
     void doLogicalOr() { this.type = isSqlModeActive(SqlMode.pipesAsConcat) ? MySQLLexer.TOKEN_CONCAT_PIPES_SYMBOL : MySQLLexer.TOKEN_LOGICAL_OR_OPERATOR; }
     void doIntNumber() { this.type = determineNumericType(this.text); }
@@ -300,6 +307,7 @@ abstract class MySQLLexerBase extends Lexer
     void doVarPop() => this.type = determineFunction(MySQLLexer.TOKEN_VARIANCE_SYMBOL);
     void doVarSamp() => this.type = determineFunction(MySQLLexer.TOKEN_VAR_SAMP_SYMBOL);
     void doUnderscoreCharset() => this.type = checkCharset(this.text);
+    bool doDollarQuotedStringText() => this.serverVersion >= 80034 && this.supportMle;
     bool isVersionComment() => checkMySQLVersion(this.text);
     bool isBackTickQuotedId() { return !this.isSqlModeActive(SqlMode.noBackslashEscapes); }
     bool isDoubleQuotedText() { return !this.isSqlModeActive(SqlMode.noBackslashEscapes); }

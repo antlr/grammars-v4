@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024, Oracle and/or its affiliates
+ * Copyright © 2025, Oracle and/or its affiliates
  */
 
 /* eslint-disable no-underscore-dangle */
@@ -252,273 +252,67 @@ export default abstract class MySQLLexerBase extends Lexer {
         return t;
     }
 
-    public isServerVersionLt80024(): boolean
-    {
-        return this.serverVersion < 80024;
-    }
-
-    public isServerVersionGe80024(): boolean
-    {
-        return this.serverVersion >= 80024;
-    }
-
-    public isServerVersionGe80011(): boolean
-    {
-        return this.serverVersion >= 80011;
-    }
-
-    public isServerVersionGe80013(): boolean
-    {
-        return this.serverVersion >= 80013;
-    }
-
-    public isServerVersionLt80014(): boolean
-    {
-        return this.serverVersion < 80014;
-    }
-
-    public isServerVersionGe80014(): boolean
-    {
-        return this.serverVersion >= 80014;
-    }
-
-    public isServerVersionGe80017(): boolean
-    {
-        return this.serverVersion >= 80017;
-    }
-
-
-    public isServerVersionGe80018(): boolean { return this.serverVersion >= 80018; }
-
     public isMasterCompressionAlgorithm(): boolean { return this.serverVersion >= 80018 && this.isServerVersionLt80024(); }
-
-    public isServerVersionLt80031(): boolean
-    {
-        return this.serverVersion < 80031;
-    }
-
-    public doLogicalOr(): void
-    {
-        this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR;
-    }
-
-    public doIntNumber(): void
-    {
-        this._type = this.determineNumericType(this.text);
-    }
-
-    public doAdddate(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL);
-    }
-
-    public doBitAnd(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL);
-    }
-
-    public doBitOr(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL);
-    }
-
-    public doBitXor(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL);
-    }
-
-    public doCast(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL);
-    }
-
-    public doCount(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL);
-    }
-
-    public doCurdate(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
-    }
-
-    public doCurrentDate(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL);
-    }
-
-    public doCurrentTime(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
-    }
-
-    public doCurtime(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL);
-    }
-
-    public doDateAdd(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL);
-    }
-
-    public doDateSub(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL);
-    }
-
-    public doExtract(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL);
-    }
-
-    public doGroupConcat(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL);
-    }
-
-    public doMax(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL);
-    }
-
-    public doMid(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-
-    public doMin(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL);
-    }
-
-    public doNot(): void
-    {
-        this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL: MySQLLexer.NOT_SYMBOL;
-    }
-
-    public doNow(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL);
-    }
-
-    public doPosition(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL);
-    }
-
-    public doSessionUser(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
-    }
-
-    public doStddevSamp(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL);
-    }
-
-    public doStddev(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-
-    public doStddevPop(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-
-    public doStd(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.STD_SYMBOL);
-    }
-
-    public doSubdate(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL);
-    }
-
-    public doSubstr(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-
-    public doSubstring(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL);
-    }
-
-    public doSum(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL);
-    }
-
-    public doSysdate(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL);
-    }
-
-    public doSystemUser(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.USER_SYMBOL);
-    }
-
-    public doTrim(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL);
-    }
-
-    public doVariance(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
-    }
-
-    public doVarPop(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL);
-    }
-
-    public doVarSamp(): void
-    {
-        this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL);
-    }
-
-    public doUnderscoreCharset(): void
-    {
-        this._type = this.checkCharset(this.text);
-    }
-
-    public isVersionComment(): boolean
-    {
-        return this.checkMySQLVersion(this.text);
-    }
-
-    public isBackTickQuotedId(): boolean
-    {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public isDoubleQuotedText(): boolean
-    {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public isSingleQuotedText(): boolean
-    {
-        return !this.isSqlModeActive(SqlMode.NoBackslashEscapes);
-    }
-
-    public startInVersionComment(): void
-    {
-        this.inVersionComment = true;
-    }
-
-    public endInVersionComment(): void
-    {
-        this.inVersionComment = false;
-    }
-
-    public isInVersionComment(): boolean
-    {
-        return this.inVersionComment;
-    }
+    public isServerVersionGe80011(): boolean { return this.serverVersion >= 80011; }
+    public isServerVersionGe80013(): boolean { return this.serverVersion >= 80013; }
+    public isServerVersionLt80014(): boolean { return this.serverVersion < 80014; }
+    public isServerVersionGe80014(): boolean { return this.serverVersion >= 80014; }
+    public isServerVersionGe80016(): boolean { return this.serverVersion >= 80016; }
+    public isServerVersionGe80017(): boolean { return this.serverVersion >= 80017; }
+    public isServerVersionGe80018(): boolean { return this.serverVersion >= 80018; }
+    public isServerVersionLt80021(): boolean { return this.serverVersion < 80021; }
+    public isServerVersionGe80021(): boolean { return this.serverVersion >= 80021; }
+    public isServerVersionLt80022(): boolean { return this.serverVersion < 80022; }
+    public isServerVersionGe80022(): boolean { return this.serverVersion >= 80022; }
+    public isServerVersionLt80023(): boolean { return this.serverVersion < 80023; }
+    public isServerVersionGe80023(): boolean { return this.serverVersion >= 80023; }
+    public isServerVersionLt80024(): boolean { return this.serverVersion < 80024; }
+    public isServerVersionGe80024(): boolean { return this.serverVersion >= 80024; }
+    public isServerVersionLt80031(): boolean { return this.serverVersion < 80031; }
+    public doLogicalOr(): void { this._type = this.isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR; }
+    public doIntNumber(): void { this._type = this.determineNumericType(this.text); }
+    public doAdddate(): void { this._type = this.determineFunction(MySQLLexer.ADDDATE_SYMBOL); }
+    public doBitAnd(): void { this._type = this.determineFunction(MySQLLexer.BIT_AND_SYMBOL); }
+    public doBitOr(): void { this._type = this.determineFunction(MySQLLexer.BIT_OR_SYMBOL); }
+    public doBitXor(): void { this._type = this.determineFunction(MySQLLexer.BIT_XOR_SYMBOL); }
+    public doCast(): void { this._type = this.determineFunction(MySQLLexer.CAST_SYMBOL); }
+    public doCount(): void { this._type = this.determineFunction(MySQLLexer.COUNT_SYMBOL); }
+    public doCurdate(): void { this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL); }
+    public doCurrentDate(): void { this._type = this.determineFunction(MySQLLexer.CURDATE_SYMBOL); }
+    public doCurrentTime(): void { this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL); }
+    public doCurtime(): void { this._type = this.determineFunction(MySQLLexer.CURTIME_SYMBOL); }
+    public doDateAdd(): void { this._type = this.determineFunction(MySQLLexer.DATE_ADD_SYMBOL); }
+    public doDateSub(): void { this._type = this.determineFunction(MySQLLexer.DATE_SUB_SYMBOL); }
+    public doExtract(): void { this._type = this.determineFunction(MySQLLexer.EXTRACT_SYMBOL); }
+    public doGroupConcat(): void { this._type = this.determineFunction(MySQLLexer.GROUP_CONCAT_SYMBOL); }
+    public doMax(): void { this._type = this.determineFunction(MySQLLexer.MAX_SYMBOL); }
+    public doMid(): void { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    public doMin(): void { this._type = this.determineFunction(MySQLLexer.MIN_SYMBOL); }
+    public doNot(): void { this._type = this.isSqlModeActive(SqlMode.HighNotPrecedence) ? MySQLLexer.NOT2_SYMBOL: MySQLLexer.NOT_SYMBOL; }
+    public doNow(): void { this._type = this.determineFunction(MySQLLexer.NOW_SYMBOL); }
+    public doPosition(): void { this._type = this.determineFunction(MySQLLexer.POSITION_SYMBOL); }
+    public doSessionUser(): void { this._type = this.determineFunction(MySQLLexer.USER_SYMBOL); }
+    public doStddevSamp(): void { this._type = this.determineFunction(MySQLLexer.STDDEV_SAMP_SYMBOL); }
+    public doStddev(): void { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    public doStddevPop(): void { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    public doStd(): void { this._type = this.determineFunction(MySQLLexer.STD_SYMBOL); }
+    public doSubdate(): void { this._type = this.determineFunction(MySQLLexer.SUBDATE_SYMBOL); }
+    public doSubstr(): void { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    public doSubstring(): void { this._type = this.determineFunction(MySQLLexer.SUBSTRING_SYMBOL); }
+    public doSum(): void { this._type = this.determineFunction(MySQLLexer.SUM_SYMBOL); }
+    public doSysdate(): void { this._type = this.determineFunction(MySQLLexer.SYSDATE_SYMBOL); }
+    public doSystemUser(): void { this._type = this.determineFunction(MySQLLexer.USER_SYMBOL); }
+    public doTrim(): void { this._type = this.determineFunction(MySQLLexer.TRIM_SYMBOL); }
+    public doVariance(): void { this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
+    public doVarPop(): void { this._type = this.determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
+    public doVarSamp(): void { this._type = this.determineFunction(MySQLLexer.VAR_SAMP_SYMBOL); }
+    public doUnderscoreCharset(): void { this._type = this.checkCharset(this.text); }
+    public doDollarQuotedStringText(): boolean { return this.serverVersion >= 80034 && this.supportMle; }
+    public isVersionComment(): boolean { return this.checkMySQLVersion(this.text); }
+    public isBackTickQuotedId(): boolean { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public isDoubleQuotedText(): boolean { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public isSingleQuotedText(): boolean { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
+    public startInVersionComment(): void { this.inVersionComment = true; }
+    public endInVersionComment(): void { this.inVersionComment = false; }
+    public isInVersionComment(): boolean { return this.inVersionComment; }
 }

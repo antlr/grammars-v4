@@ -12,6 +12,8 @@
     </parent>
 
 	<modules>
+        <module>barrous</module>
+        <module>bio</module>
         <module>brainfuck</module>
         <module>brainflak</module>
         <module>cool</module>
@@ -20,7 +22,9 @@
         <module>loop</module>
         <module>nanofuck</module>
         <module>sickbay</module>
+        <module>skull</module>
         <module>snowball</module>
         <module>wheel</module>
+        <module>whenever</module>
     </modules>
 </project>

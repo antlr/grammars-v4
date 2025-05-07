@@ -64,15 +64,22 @@ class MySQLLexerBase : public antlr4::Lexer
         void emitDot();
 
     public:
-        bool isServerVersionLt80024();
-        bool isServerVersionGe80024();
+        bool isMasterCompressionAlgorithm();
         bool isServerVersionGe80011();
         bool isServerVersionGe80013();
         bool isServerVersionLt80014();
         bool isServerVersionGe80014();
+        bool isServerVersionGe80016();
         bool isServerVersionGe80017();
         bool isServerVersionGe80018();
-        bool isMasterCompressionAlgorithm();
+        bool isServerVersionLt80021();
+        bool isServerVersionGe80021();
+        bool isServerVersionLt80022();
+        bool isServerVersionGe80022();
+        bool isServerVersionLt80023();
+        bool isServerVersionGe80023();
+        bool isServerVersionLt80024();
+        bool isServerVersionGe80024();
         bool isServerVersionLt80031();
         void doLogicalOr();
         void doIntNumber();
@@ -112,6 +119,7 @@ class MySQLLexerBase : public antlr4::Lexer
         void doVarPop();
         void doVarSamp();
         void doUnderscoreCharset();
+        bool doDollarQuotedStringText();
         bool isVersionComment();
         bool isBackTickQuotedId();
         bool isDoubleQuotedText();

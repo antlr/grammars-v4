@@ -1991,7 +1991,7 @@ WS
 
 // identifier
 IDENTIFIER
-    : ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; ]+
+    : ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; <>]+
     | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET
     ;
 

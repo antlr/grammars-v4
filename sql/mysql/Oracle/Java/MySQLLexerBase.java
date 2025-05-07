@@ -188,15 +188,22 @@ public abstract class MySQLLexerBase extends Lexer {
         return t;
     }
 
-    public boolean isServerVersionLt80024() { return serverVersion < 80024; }
-    public boolean isServerVersionGe80024() { return serverVersion >= 80024; }
+    public boolean isMasterCompressionAlgorithm() { return serverVersion >= 80018 && isServerVersionLt80024(); }
     public boolean isServerVersionGe80011() { return serverVersion >= 80011; }
     public boolean isServerVersionGe80013() { return serverVersion >= 80013; }
     public boolean isServerVersionLt80014() { return serverVersion < 80014; }
     public boolean isServerVersionGe80014() { return serverVersion >= 80014; }
+    public boolean isServerVersionGe80016() { return serverVersion >= 80016; }
     public boolean isServerVersionGe80017() { return serverVersion >= 80017; }
     public boolean isServerVersionGe80018() { return serverVersion >= 80018; }
-    public boolean isMasterCompressionAlgorithm() { return serverVersion >= 80018 && isServerVersionLt80024(); }
+    public boolean isServerVersionLt80021() { return serverVersion < 80021; }
+    public boolean isServerVersionGe80021() { return serverVersion >= 80021; }
+    public boolean isServerVersionLt80022() { return serverVersion < 80022; }
+    public boolean isServerVersionGe80022() { return serverVersion >= 80022; }
+    public boolean isServerVersionLt80023() { return serverVersion < 80023; }
+    public boolean isServerVersionGe80023() { return serverVersion >= 80023; }
+    public boolean isServerVersionLt80024() { return serverVersion < 80024; }
+    public boolean isServerVersionGe80024() { return serverVersion >= 80024; }
     public boolean isServerVersionLt80031() { return serverVersion < 80031; }
     public void doLogicalOr() { this._type = isSqlModeActive(SqlMode.PipesAsConcat) ? MySQLLexer.CONCAT_PIPES_SYMBOL : MySQLLexer.LOGICAL_OR_OPERATOR; }
     public void doIntNumber() { this._type = determineNumericType(this.getText()); }
@@ -236,6 +243,7 @@ public abstract class MySQLLexerBase extends Lexer {
     public void doVarPop() { this._type = determineFunction(MySQLLexer.VARIANCE_SYMBOL); }
     public void doVarSamp() { this._type = determineFunction(MySQLLexer.VAR_SAMP_SYMBOL); }
     public void doUnderscoreCharset() { this._type = checkCharset(this.getText()); }
+    public boolean doDollarQuotedStringText() { return this.serverVersion >= 80034 && this.supportMle; }
     public boolean isVersionComment() { return checkMySQLVersion(this.getText()); }
     public boolean isBackTickQuotedId() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }
     public boolean isDoubleQuotedText() { return !this.isSqlModeActive(SqlMode.NoBackslashEscapes); }

@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"] Copyright (c) 2017 Sasa Coh, Michał Błotniak
- Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies 
- Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com,Positive Technologies All rights reserved. 
+ Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies
+ Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com,Positive Technologies All rights reserved.
  Copyright (c) 2021 Martin Mirchev, mirchevmartin2203@gmail.com
  Copyright (c) 2023 Dmitry Litovchenko, i@dlitovchenko.ru
 
@@ -32,7 +32,7 @@
 
 parser grammar GoParser;
 
-// Insert here @header for C++ parser.
+// Insert here @header.
 
 options {
     tokenVocab = GoLexer;
@@ -44,15 +44,21 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName = IDENTIFIER
+    : PACKAGE packageName {this.myreset();}
     ;
+
+packageName
+    : identifier
+    ;
+
+identifier : IDENTIFIER ;
 
 importDecl
     : IMPORT (importSpec | L_PAREN (importSpec eos)* R_PAREN)
     ;
 
 importSpec
-    : alias = (DOT | IDENTIFIER)? importPath
+    : (DOT | packageName)? importPath {this.addImportSpec();}
     ;
 
 importPath
@@ -91,7 +97,7 @@ typeSpec
     ;
 
 aliasDecl
-    : IDENTIFIER ASSIGN type_
+    : IDENTIFIER typeParameters? ASSIGN type_
     ;
 
 typeDef
@@ -137,11 +143,11 @@ varSpec
     ;
 
 block
-    : L_CURLY statementList? R_CURLY
+    : L_CURLY statementList R_CURLY
     ;
 
 statementList
-    : ((SEMI? | EOS? | {this.closingBracket()}?) statement eos)+
+    : ( (SEMI | EOS | /* {this.closingBracket()}? */ ) statement eos)*
     ;
 
 statement
@@ -223,7 +229,7 @@ deferStmt
     ;
 
 ifStmt
-    : IF (expression | eos expression | simpleStmt eos expression) block (ELSE (ifStmt | block))?
+    : IF (expression | (SEMI | EOS) expression | simpleStmt (SEMI | EOS) expression) block (ELSE (ifStmt | block))?
     ;
 
 switchStmt
@@ -236,7 +242,7 @@ exprSwitchStmt
     ;
 
 exprCaseClause
-    : exprSwitchCase COLON statementList?
+    : exprSwitchCase COLON statementList
     ;
 
 exprSwitchCase
@@ -253,7 +259,7 @@ typeSwitchGuard
     ;
 
 typeCaseClause
-    : typeSwitchCase COLON statementList?
+    : typeSwitchCase COLON statementList
     ;
 
 typeSwitchCase
@@ -270,7 +276,7 @@ selectStmt
     ;
 
 commClause
-    : commCase COLON statementList?
+    : commCase COLON statementList
     ;
 
 commCase
@@ -283,7 +289,11 @@ recvStmt
     ;
 
 forStmt
-    : FOR (expression? | forClause | rangeClause?) block
+    : FOR (condition | forClause | rangeClause)? block
+    ;
+
+condition
+    : expression
     ;
 
 forClause
@@ -354,7 +364,7 @@ mapType
     ;
 
 channelType
-    : (CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType
+    : ({this.isNotReceive()}? CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType
     ;
 
 methodSpec
@@ -400,11 +410,11 @@ expression
     | expression LOGICAL_OR expression
     ;
 
-primaryExpr
-    : operand
-    | conversion
-    | methodExpr
-    | primaryExpr ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments)
+primaryExpr :
+    ( {this.isOperand()}? operand
+    | {this.isConversion()}? conversion
+    | {this.isMethodExpr()}? methodExpr )
+    ( DOT IDENTIFIER | index | slice_ | typeAssertion | arguments )*
     ;
 
 conversion
@@ -525,7 +535,6 @@ methodExpr
 
 eos
     : SEMI
-    | EOF
     | EOS
     | {this.closingBracket()}?
     ;
