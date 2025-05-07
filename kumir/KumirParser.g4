@@ -67,8 +67,8 @@ powerExpression // Handles exponentiation (**)
     : unaryExpression (POWER powerExpression)?
     ;
 
-multiplicativeExpression // Handles *, /
-    : powerExpression ((MUL | DIV) powerExpression)*
+multiplicativeExpression // Handles *, /, div, mod
+    : powerExpression ((MUL | DIV | DIV_OP | MOD_OP) powerExpression)*
     ;
 
 additiveExpression // Handles +, -
@@ -196,7 +196,7 @@ algorithmName: ID+ ;
  * Uses algorithmNameTokens to capture the potentially complex name.
  */
 algorithmHeader
-    : ALG_HEADER (typeSpecifier)? algorithmNameTokens (LPAREN parameterList? RPAREN)? SEMICOLON?
+    : ALG_HEADER typeSpecifier? algorithmNameTokens (LPAREN parameterList? RPAREN)? SEMICOLON?
     ;
 
 // Pre-condition block (дано)
@@ -245,8 +245,7 @@ ioArgumentList
     ;
 
 ioStatement
-    : INPUT ioArgumentList
-    | OUTPUT ioArgumentList
+    : (INPUT | OUTPUT) ioArgumentList
     ;
 
 // If statement (если ... то ... иначе ... все)
@@ -318,7 +317,6 @@ statement
     | pauseStatement SEMICOLON?
     | stopStatement SEMICOLON?
     | assertionStatement SEMICOLON?
-    | procedureCallStatement SEMICOLON?
     | SEMICOLON // Allow empty statements
     ;
 
@@ -329,7 +327,7 @@ algorithmDefinition
     : algorithmHeader (preCondition | postCondition | variableDeclaration)*
       ALG_BEGIN
       algorithmBody
-      ALG_END (algorithmName)? SEMICOLON? // Use stricter 'algorithmName' for check after 'кон'
+      ALG_END algorithmName? SEMICOLON? // Use stricter 'algorithmName' for check after 'кон'
     ;
 
 /*
@@ -366,7 +364,7 @@ implicitModuleBody // Content of a file without explicit 'модуль' header/f
     ;
 
 moduleDefinition // Either an explicit or implicit module structure
-    : moduleHeader moduleBody ENDMODULE (qualifiedIdentifier)? SEMICOLON?
+    : moduleHeader moduleBody ENDMODULE qualifiedIdentifier? SEMICOLON?
     | implicitModuleBody
     ;
 
@@ -381,7 +379,7 @@ moduleDefinition // Either an explicit or implicit module structure
  * followed by one or more module or algorithm definitions.
  */
 program
-    : programItem* (moduleDefinition | algorithmDefinition)+ EOF
+    : programItem* moduleDefinition+ EOF
     ;
 
 // End of KumirParser.g4

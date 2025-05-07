@@ -7,148 +7,137 @@
 
 lexer grammar KumirLexer;
 
+options { caseInsensitive = true; }
+
 // --- Keywords (Core Language) ---
 // Keywords are case-insensitive (both lowercase and uppercase Cyrillic are matched).
-MODULE              : ('модуль' | 'МОДУЛЬ');
-ENDMODULE           : ('конец' WS 'модуля' | 'КОНЕЦ' WS 'МОДУЛЯ' | 'конецмодуля' | 'КОНЕЦМОДУЛЯ' | 'конец_модуля' | 'КОНЕЦ_МОДУЛЯ'); // Handles space, no space, underscore
-ALG_HEADER          : ('алг' | 'АЛГ');
-ALG_BEGIN           : ('нач' | 'НАЧ');
-ALG_END             : ('кон' | 'КОН');
-PRE_CONDITION       : ('дано' | 'ДАНО');
-POST_CONDITION      : ('надо' | 'НАДО');
-ASSERTION           : ('утв' | 'УТВ');
-LOOP                : ('нц' | 'НЦ');
-ENDLOOP_COND        : ('кц' WS 'при') | 'кц_при' | ('КЦ' WS 'ПРИ') | 'КЦ_ПРИ'; // Handles space and underscore for 'кц при'
-ENDLOOP             : ('кц' | 'КЦ');
-IF                  : ('если' | 'ЕСЛИ');
-THEN                : ('то' | 'ТО');
-ELSE                : ('иначе' | 'ИНАЧЕ');
-FI                  : ('все' | 'ВСЕ'); // End of 'if' or 'switch' block
-SWITCH              : ('выбор' | 'ВЫБОР');
-CASE                : ('при' | 'ПРИ'); // Used in 'switch' and 'endloop conditional'
-INPUT               : ('ввод' | 'ВВОД');
-OUTPUT              : ('вывод' | 'ВЫВОД');
-ASSIGN              : ':='; // Assignment operator
-EXIT                : ('выход' | 'ВЫХОД');
-PAUSE               : ('пауза' | 'ПАУЗА');
-STOP                : ('стоп' | 'СТОП');
-IMPORT              : ('использовать' | 'ИСПОЛЬЗОВАТЬ');
-FOR                 : ('для' | 'ДЛЯ');
-WHILE               : ('пока' | 'ПОКА');
-TIMES               : ('раз' | 'РАЗ'); // Used in 'N times' loop
-FROM                : ('от' | 'ОТ'); // Used in 'for' loop
-TO                  : ('до' | 'ДО'); // Used in 'for' loop
-STEP                : ('шаг' | 'ШАГ'); // Used in 'for' loop
-NEWLINE_CONST       : ('нс' | 'НС'); // Newline constant for I/O
-NOT                 : ('не' | 'НЕ'); // Logical NOT
-AND                 : ('и' | 'И'); // Logical AND
-OR                  : ('или' | 'ИЛИ'); // Logical OR
-OUT_PARAM           : ('рез' | 'РЕЗ'); // Output parameter modifier
-IN_PARAM            : ('арг' | 'АРГ'); // Input parameter modifier
-INOUT_PARAM         : ('аргрез' | 'АРГРЕЗ' | 'арг' WS 'рез' | 'АРГ' WS 'РЕЗ' | 'арг_рез' | 'АРГ_РЕЗ'); // In/Out parameter modifier (various spellings)
-RETURN_VALUE        : ('знач' | 'ЗНАЧ'); // Special variable for function return value
+MODULE              : 'модуль';
+ENDMODULE           : ('конец' WS 'модуля' | 'конецмодуля' | 'конец_модуля');
+ALG_HEADER          : 'алг';
+ALG_BEGIN           : 'нач';
+ALG_END             : 'кон';
+PRE_CONDITION       : 'дано';
+POST_CONDITION      : 'надо';
+ASSERTION           : 'утв';
+LOOP                : 'нц';
+ENDLOOP_COND        : ('кц' WS 'при' | 'кц_при');
+ENDLOOP             : 'кц';
+IF                  : 'если';
+THEN                : 'то';
+ELSE                : 'иначе';
+FI                  : 'все';
+SWITCH              : 'выбор';
+CASE                : 'при';
+INPUT               : 'ввод';
+OUTPUT              : 'вывод';
+ASSIGN              : ':=';
+EXIT                : 'выход';
+PAUSE               : 'пауза';
+STOP                : 'стоп';
+IMPORT              : 'использовать';
+FOR                 : 'для';
+WHILE               : 'пока';
+TIMES               : 'раз';
+FROM                : 'от';
+TO                  : 'до';
+STEP                : 'шаг';
+NEWLINE_CONST       : 'нс';
+NOT                 : 'не';
+AND                 : 'и';
+OR                  : 'или';
+OUT_PARAM           : 'рез';
+IN_PARAM            : 'арг';
+INOUT_PARAM         : ('аргрез' | 'арг' WS 'рез' | 'арг_рез');
+RETURN_VALUE        : 'знач';
 
 // --- Data Types ---
-INTEGER_TYPE        : ('цел' | 'ЦЕЛ');
-REAL_TYPE           : ('вещ' | 'ВЕЩ');
-BOOLEAN_TYPE        : ('лог' | 'ЛОГ');
-CHAR_TYPE           : ('сим' | 'СИМ');
-STRING_TYPE         : ('лит' | 'ЛИТ');
-TABLE_SUFFIX        : 'таб' | 'ТАБ'; // Suffix for tables (e.g., "цел таб")
+INTEGER_TYPE        : 'цел';
+REAL_TYPE           : 'вещ';
+BOOLEAN_TYPE        : 'лог';
+CHAR_TYPE           : 'сим';
+STRING_TYPE         : 'лит';
+TABLE_SUFFIX        : 'таб';
 // Actor-specific types
-KOMPL_TYPE          : ('компл' | 'КОМПЛ'); // Complex numbers
-COLOR_TYPE          : ('цвет' | 'ЦВЕТ');   // Color type (Painter actor)
-SCANCODE_TYPE       : ('сканкод' | 'СКАНКОД'); // Key scancode (Keyboard actor)
-FILE_TYPE           : ('файл' | 'ФАЙЛ');   // File type
+KOMPL_TYPE          : 'компл';
+COLOR_TYPE          : 'цвет';
+SCANCODE_TYPE       : 'сканкод';
+FILE_TYPE           : 'файл';
 // Explicit array/table types (handle variations with space, no space, underscore)
-INTEGER_ARRAY_TYPE  : ('цел' WS? 'таб' | 'ЦЕЛ' WS? 'ТАБ' | 'цел_таб' | 'ЦЕЛ_ТАБ');
-REAL_ARRAY_TYPE     : ('вещ' WS? 'таб' | 'ВЕЩ' WS? 'ТАБ' | 'вещ_таб' | 'ВЕЩ_ТАБ');
-CHAR_ARRAY_TYPE     : ('сим' WS? 'таб' | 'СИМ' WS? 'ТАБ' | 'сим_таб' | 'СИМ_ТАБ');
-STRING_ARRAY_TYPE   : ('лит' WS? 'таб' | 'ЛИТ' WS? 'ТАБ' | 'лит_таб' | 'ЛИТ_ТАБ');
-BOOLEAN_ARRAY_TYPE  : ('лог' WS? 'таб' | 'ЛОГ' WS? 'ТАБ' | 'лог_таб' | 'ЛОГ_ТАБ');
+INTEGER_ARRAY_TYPE  : ('цел' WS? 'таб' | 'цел_таб');
+REAL_ARRAY_TYPE     : ('вещ' WS? 'таб' | 'вещ_таб');
+CHAR_ARRAY_TYPE     : ('сим' WS? 'таб' | 'сим_таб');
+STRING_ARRAY_TYPE   : ('лит' WS? 'таб' | 'лит_таб');
+BOOLEAN_ARRAY_TYPE  : ('лог' WS? 'таб' | 'лог_таб');
 
 // --- Constants ---
-TRUE                : ('да' | 'ДА');
-FALSE               : ('нет' | 'НЕТ');
+TRUE                : 'да';
+FALSE               : 'нет';
 // Color constants
-PROZRACHNIY         : ('прозрачный' | 'ПРОЗРАЧНЫЙ');
-BELIY               : ('белый' | 'БЕЛЫЙ');
-CHERNIY             : ('чёрный' | 'черный' | 'ЧЁРНЫЙ' | 'ЧЕРНЫЙ');
-SERIY               : ('серый' | 'СЕРЫЙ');
-FIOLETOVIY          : ('фиолетовый' | 'ФИОЛЕТОВЫЙ');
-SINIY               : ('синий' | 'СИНИЙ');
-GOLUBOY             : ('голубой' | 'ГОЛУБОЙ');
-ZELENIY             : ('зелёный' | 'зеленый' | 'ЗЕЛЁНЫЙ' | 'ЗЕЛЕНЫЙ');
-ZHELTIY             : ('жёлтый' | 'желтый' | 'ЖЁЛТЫЙ' | 'ЖЕЛТЫЙ');
-ORANZHEVIY          : ('оранжевый' | 'ОРАНЖЕВЫЙ');
-KRASNIY             : ('красный' | 'КРАСНЫЙ');
+PROZRACHNIY         : 'прозрачный';
+BELIY               : 'белый';
+CHERNIY             : 'чёрный' | 'черный';
+SERIY               : 'серый';
+FIOLETOVIY          : 'фиолетовый';
+SINIY               : 'синий';
+GOLUBOY             : 'голубой';
+ZELENIY             : 'зелёный' | 'зеленый';
+ZHELTIY             : 'жёлтый' | 'желтый';
+ORANZHEVIY          : 'оранжевый';
+KRASNIY             : 'красный';
 
 // --- Operators ---
-POWER               : '**'; // Power operator
-GE                  : '>=' | '≥'; // Greater than or equal
-LE                  : '<=' | '≤'; // Less than or equal
-NE                  : '<>' | '≠'; // Not equal
+POWER               : '**';
+GE                  : '>=' | '≥';
+LE                  : '<=' | '≤';
+NE                  : '<>' | '≠';
 PLUS                : '+';
 MINUS               : '-';
 MUL                 : '*';
 DIV                 : '/';
-EQ                  : '='; // Equal (used in comparisons and initialization)
+EQ                  : '=';
 LT                  : '<';
 GT                  : '>';
-LPAREN              : '('; // Left parenthesis
-RPAREN              : ')'; // Right parenthesis
-LBRACK              : '['; // Left square bracket (arrays)
-RBRACK              : ']'; // Right square bracket (arrays)
-LBRACE              : '{'; // Left curly brace (array literals)
-RBRACE              : '}'; // Right curly brace (array literals)
-COMMA               : ','; // Comma
-COLON               : ':'; // Colon (array bounds, output format)
-SEMICOLON           : ';'; // Semicolon (statement separator)
-ATAT                : '@@'; // Double at-sign (special teacher functions)
-AT                  : '@';  // At-sign (used in identifiers)
+LPAREN              : '(';
+RPAREN              : ')';
+LBRACK              : '[';
+RBRACK              : ']';
+LBRACE              : '{';
+RBRACE              : '}';
+COMMA               : ',';
+COLON               : ':';
+SEMICOLON           : ';';
+ATAT                : '@@';
+AT                  : '@';
+DIV_OP              : 'div';
+MOD_OP              : 'mod';
 
 // --- Literals ---
-// Character literal: single character in single quotes
 CHAR_LITERAL        : '\'' ( EscapeSequence | ~['\\\r\n] ) '\'' ;
-// String literal: sequence of characters in double or single quotes
 STRING              : '"' ( EscapeSequence | ~["\\\r\n] )*? '"'
                     | '\'' ( EscapeSequence | ~['\\\r\n] )*? '\''
                     ;
-// Real literal: with decimal point or in exponential form
-REAL                : (DIGIT+ '.' DIGIT* | '.' DIGIT+) ExpFragment? // 123. , .5 , 123.45
-                    | DIGIT+ ExpFragment                          // 123e4
+REAL                : (DIGIT+ '.' DIGIT* | '.' DIGIT+) ExpFragment?
+                    | DIGIT+ ExpFragment
                     ;
-// Integer literal: decimal or hexadecimal (starts with $)
 INTEGER             : DecInteger | HexInteger ;
 
 // --- Identifier ---
-// Variable, algorithm, module name, etc.
-// Starts with a letter, followed by letters, digits, '_', or '@'.
 ID                  : LETTER (LETTER | DIGIT | '_' | '@')* ;
 
 // --- Comments ---
-// Comments starting with '|' or '#' are ignored by the parser.
-// The comment text is sent to the HIDDEN channel.
-// Does NOT consume the trailing newline.
-LINE_COMMENT        : '|' ~[\r\n]* -> channel(HIDDEN); // Single-line comment
-DOC_COMMENT         : '#' ~[\r\n]* -> channel(HIDDEN); // Documentation comment
+LINE_COMMENT        : '|' ~[\r\n]* -> channel(HIDDEN);
+DOC_COMMENT         : '#' ~[\r\n]* -> channel(HIDDEN);
 
 // --- Whitespace ---
-// Spaces, tabs, newlines are skipped by the lexer.
 WS                  : [ \t\r\n]+ -> skip;
 
 // --- Fragments ---
-// Fragments are helper rules for the lexer and do not produce tokens themselves.
 fragment DIGIT      : [0-9];
 fragment HEX_DIGIT  : [0-9a-fA-F];
-// Letter (Latin or Cyrillic, including ё/Ё)
 fragment LETTER     : [a-zA-Zа-яА-ЯёЁ];
 fragment DecInteger : DIGIT+;
 fragment HexInteger : '$' HEX_DIGIT+;
-// Exponential part of a real number (e.g., e+10, E-5, е-3)
-fragment ExpFragment: [eEеЕ] [+-]? DIGIT+;
-// Escape sequences within strings/chars (e.g., \n, \t, \')
+fragment ExpFragment: [eE] [+-]? DIGIT+;
 fragment EscapeSequence
-                    : '\\' [btnfr"'\\] // \b, \t, \n, \f, \r, \", \', \\
+                    : '\\' [btnfr"'\\]
                     ;
-// End of KumirLexer.g4
