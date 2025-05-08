@@ -542,6 +542,7 @@ alter_command
     | alter_failover_group
     | alter_file_format
     | alter_function
+    | alter_git_repository
     | alter_masking_policy
     | alter_materialized_view
     | alter_network_policy
@@ -854,6 +855,24 @@ alter_function_signature
 
 data_type_list
     : data_type (COMMA data_type)*
+    ;
+
+alter_git_repository
+    : ALTER GIT REPOSITORY id_ (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY id_ FETCH
+    ;
+
+alter_git_set_opts
+    : GIT_CREDENTIALS EQ sn=object_name
+    | API_INTEGRATION EQ ai=id_
+    | comment_clause
+    | tag_decl_list
+    ;
+
+alter_git_unset_opts
+    : GIT_CREDENTIALS
+    | COMMENT
+    | tag_list
     ;
 
 alter_masking_policy
@@ -1491,7 +1510,11 @@ tag_decl_list
     ;
 
 unset_tags
-    : UNSET TAG object_name (COMMA object_name)*
+    : UNSET tag_list
+    ;
+
+tag_list
+    : TAG object_name (COMMA object_name)*
     ;
 
 // create commands
@@ -1509,6 +1532,7 @@ create_command
     | create_failover_group
     | create_file_format
     | create_function
+    | create_git_repository
     //| create_integration
     | create_managed_account
     | create_masking_policy
@@ -1793,6 +1817,19 @@ create_function
         VOLATILE
         | IMMUTABLE
     )? MEMOIZABLE? comment_clause? AS function_definition
+    ;
+
+create_git_repository
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? id_
+        create_git_opts+
+    ;
+
+create_git_opts
+    : ORIGIN EQ string
+    | API_INTEGRATION EQ ai=id_
+    | GIT_CREDENTIALS EQ sn=object_name
+    | comment_clause
+    | with_tags
     ;
 
 create_managed_account
@@ -2796,6 +2833,7 @@ drop_command
     | drop_failover_group
     | drop_file_format
     | drop_function
+    | drop_git_repository
     | drop_integration
     | drop_managed_account
     | drop_masking_policy
@@ -2857,6 +2895,10 @@ drop_file_format
 
 drop_function
     : DROP FUNCTION if_exists? object_name arg_types
+    ;
+
+drop_git_repository
+    : DROP GIT REPOSITORY if_exists? id_
     ;
 
 drop_integration
@@ -3061,6 +3103,7 @@ describe_command
     | describe_external_table
     | describe_file_format
     | describe_function
+    | describe_git_repository
     | describe_integration
     | describe_masking_policy
     | describe_materialized_view
@@ -3111,6 +3154,10 @@ describe_file_format
 
 describe_function
     : describe FUNCTION object_name arg_types
+    ;
+
+describe_git_repository
+    : describe GIT REPOSITORY id_
     ;
 
 describe_integration
@@ -3214,6 +3261,9 @@ show_command
     | show_failover_groups
     | show_file_formats
     | show_functions
+    | show_git_branches
+    | show_git_repositories
+    | show_git_tags
     | show_global_accounts
     | show_grants
     | show_integrations
@@ -3342,6 +3392,24 @@ show_functions
     : SHOW FUNCTIONS like_pattern? (
         IN ( ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA id_ | id_)
     )?
+    ;
+
+show_git_branches
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? rn=id_
+    ;
+
+show_git_repositories
+    : SHOW GIT REPOSITORIES like_pattern?
+        (IN (ACCOUNT
+            | DATABASE d=id_?
+            | SCHEMA s=schema_name?
+            | schema_name
+            )
+        )?
+    ;
+
+show_git_tags
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? rn=id_
     ;
 
 show_global_accounts
