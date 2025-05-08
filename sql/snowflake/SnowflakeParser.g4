@@ -858,8 +858,8 @@ data_type_list
     ;
 
 alter_git_repository
-    : ALTER GIT REPOSITORY id_ (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
-    | ALTER GIT REPOSITORY id_ FETCH
+    : ALTER GIT REPOSITORY r=object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY r=object_name FETCH
     ;
 
 alter_git_set_opts
@@ -1820,7 +1820,7 @@ create_function
     ;
 
 create_git_repository
-    : CREATE or_replace? GIT REPOSITORY if_not_exists? id_
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? r=object_name
         create_git_opts+
     ;
 
@@ -2898,7 +2898,7 @@ drop_function
     ;
 
 drop_git_repository
-    : DROP GIT REPOSITORY if_exists? id_
+    : DROP GIT REPOSITORY if_exists? r=object_name
     ;
 
 drop_integration
@@ -3157,7 +3157,7 @@ describe_function
     ;
 
 describe_git_repository
-    : describe GIT REPOSITORY id_
+    : describe GIT REPOSITORY r=object_name
     ;
 
 describe_integration
@@ -3395,7 +3395,7 @@ show_functions
     ;
 
 show_git_branches
-    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? rn=id_
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r=object_name
     ;
 
 show_git_repositories
@@ -3409,7 +3409,7 @@ show_git_repositories
     ;
 
 show_git_tags
-    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? rn=id_
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r=object_name
     ;
 
 show_global_accounts
