@@ -536,6 +536,7 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    | alter_dataset
     | alter_dynamic_table
     //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
@@ -752,6 +753,17 @@ account_id_list
     : account_identifier (COMMA account_identifier)*
     ;
 
+alter_dataset
+    : ALTER DATASET ds=object_name
+        ADD VERSION v=string
+        FROM query_statement
+        (PARTITION BY id_list)?
+        comment_clause?
+        (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds=object_name
+        DROP VERSION v=string
+    ;
+
 alter_dynamic_table
     : ALTER DYNAMIC TABLE if_exists? object_name (
         resume_suspend
@@ -765,6 +777,10 @@ alter_dynamic_table
         COMMA dynamic_table_unsettable_params
     )*
     | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
+    ;
+
+id_list
+    : id_ (COMMA id_)*
     ;
 
 alter_external_table
@@ -1502,6 +1518,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_dataset
     | create_dynamic_table
     | create_event_table
     | create_external_function
@@ -1627,6 +1644,10 @@ compression_type
 
 compression
     : COMPRESSION EQ compression_type
+    ;
+
+create_dataset
+    : CREATE or_replace? DATASET if_not_exists? ds=object_name
     ;
 
 create_dynamic_table
@@ -3206,6 +3227,7 @@ show_command
     | show_databases
     | show_databases_in_failover_group
     | show_databases_in_replication_group
+    | show_datasets
     | show_delegated_authorizations
     | show_dynamic_tables
     | show_event_tables
@@ -3252,6 +3274,7 @@ show_command
     | show_user_functions
     | show_users
     | show_variables
+    | show_versions_in_dataset
     | show_views
     | show_warehouses
     ;
@@ -3302,6 +3325,14 @@ show_databases_in_failover_group
 
 show_databases_in_replication_group
     : SHOW DATABASES IN REPLICATION GROUP id_
+    ;
+
+show_datasets
+    : SHOW DATASETS
+        like_pattern?
+        (IN (SCHEMA s=schema_name | DATABASE d=id_ | ACCOUNT))?
+        (STARTS WITH sw=string)?
+        (LIMIT num (FROM f=string)? )?
     ;
 
 show_delegated_authorizations
@@ -3528,6 +3559,10 @@ show_users
 
 show_variables
     : SHOW VARIABLES like_pattern?
+    ;
+
+show_versions_in_dataset
+    : SHOW VERSIONS like_pattern? IN DATASET ds=object_name (LIMIT num)?
     ;
 
 show_views
