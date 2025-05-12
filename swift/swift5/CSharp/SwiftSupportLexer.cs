@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
 
-namespace SwiftParseTree;
-
 public class SwiftLexerStack : Stack<int>
 {
     public void push(int v) => Push(v);
