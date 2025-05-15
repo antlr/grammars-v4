@@ -44,7 +44,7 @@ sourceFile
     ;
 
 packageClause
-    : PACKAGE packageName {this.myreset();}
+    : PACKAGE packageName {this.DefinePackageClause();}
     ;
 
 packageName
@@ -58,7 +58,7 @@ importDecl
     ;
 
 importSpec
-    : (DOT | packageName)? importPath {this.addImportSpec();}
+    : (DOT | packageName)? importPath {this.DefineImportSpec();}
     ;
 
 importPath
@@ -101,7 +101,7 @@ aliasDecl
     ;
 
 typeDef
-    : IDENTIFIER typeParameters? type_
+    : IDENTIFIER typeParameters? type_ { this.BindTypeToName(); }
     ;
 
 typeParameters
@@ -123,7 +123,15 @@ typeTerm
 // Function declarations
 
 functionDecl
-    : FUNC IDENTIFIER typeParameters? signature block?
+    : FUNC IDENTIFIER enterFunctionDecl typeParameters? signature block? exitFunctionDecl
+    ;
+
+enterFunctionDecl
+    :  { this.EnterFunctionDecl(); }
+    ;
+
+exitFunctionDecl
+    : { this.ExitFunctionDecl(); }
     ;
 
 methodDecl
@@ -143,8 +151,16 @@ varSpec
     ;
 
 block
-    : L_CURLY statementList R_CURLY
+    : L_CURLY enterBlock statementList R_CURLY exitScope
     ;
+
+enterBlock
+	: { this.EnterBlock(); }
+    ;
+
+exitScope
+	: { this.ExitScope(); }
+	;
 
 statementList
     : ( (SEMI | EOS | /* {this.closingBracket()}? */ ) statement eos)*
@@ -197,7 +213,7 @@ assign_op
     ;
 
 shortVarDecl
-    : identifierList DECLARE_ASSIGN expressionList
+    : identifierList { this.ShortVarDecl(); } DECLARE_ASSIGN expressionList
     ;
 
 labeledStmt
@@ -309,9 +325,9 @@ goStmt
     ;
 
 type_
-    : typeName typeArgs?
-    | typeLit
-    | L_PAREN type_ R_PAREN
+    : typeName typeArgs? { this.AssignChildToParent(0); }
+    | typeLit { this.AssignChildToParent(0); }
+    | L_PAREN type_ R_PAREN { this.AssignChildToParent(1); }
     ;
 
 typeArgs
@@ -324,14 +340,14 @@ typeName
     ;
 
 typeLit
-    : arrayType
+    : ( arrayType
     | structType
     | pointerType
     | functionType
     | interfaceType
     | sliceType
     | mapType
-    | channelType
+    | channelType ) { this.AssignChildToParent(0); }
     ;
 
 arrayType
@@ -351,8 +367,16 @@ pointerType
     ;
 
 interfaceType
-    : INTERFACE L_CURLY ((methodSpec | typeElement) eos)* R_CURLY
+    : INTERFACE L_CURLY enterInterface ((methodSpec | typeElement) eos)* { this.DefineInterfaceType(); } R_CURLY exitInterface
     ;
+
+enterInterface
+    : { this.EnterInterface(); }
+	;
+
+exitInterface
+    : { this.ExitInterface(); }
+	;
 
 sliceType
     : L_BRACKET R_BRACKET elementType
@@ -390,7 +414,7 @@ parameters
     ;
 
 parameterDecl
-    : identifierList? ELLIPSIS? type_
+    : identifierList? ELLIPSIS? type_ { this.AddParameterDecl(); }
     ;
 
 expression
@@ -493,8 +517,16 @@ element
     ;
 
 structType
-    : STRUCT L_CURLY (fieldDecl eos)* R_CURLY
+    : STRUCT L_CURLY enterStruct (fieldDecl eos)* { this.DefineStructType(); } R_CURLY exitStruct
     ;
+
+enterStruct
+    : { this.EnterStruct(); }
+	;
+
+exitStruct
+    : { this.ExitStruct(); }
+	;
 
 fieldDecl
     : (identifierList type_ | embeddedField) tag = string_?
@@ -526,7 +558,7 @@ typeAssertion
     ;
 
 arguments
-    : L_PAREN ((expressionList | type_ (COMMA expressionList)?) ELLIPSIS? COMMA?)? R_PAREN
+    : L_PAREN ((expressionList | { this.IsType() }? type_ (COMMA expressionList)?) ELLIPSIS? COMMA?)? R_PAREN
     ;
 
 methodExpr

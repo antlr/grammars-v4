@@ -1,0 +1,18 @@
+public enum GoClassification {
+    GoVariable,
+    GoField,
+    GoParameterType,
+    GoArrayType,
+    GoStructType,
+    GoPointerType,
+    GoFunctionType,
+    GoInterfaceType,
+    GoSliceType,
+    GoMapType,
+    GoChannelType,
+    GoPackage,
+    GoMethod,
+    GoScope,
+    GoBlock,
+    GoBasicType,
+};
