@@ -1,4 +1,3 @@
-
 public class Sym
 {
     public ulong Value { get; set; }

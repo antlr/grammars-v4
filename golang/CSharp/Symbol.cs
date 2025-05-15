@@ -1,19 +1,17 @@
-
 using System.Collections.Generic;
 
 public class Symbol {
     public string Name { get; set; }
     public Symbol Type { get; set; }
-    // Additional properties as needed
     public GoClassification Classification { get; set; }
     public Dictionary<string, Symbol> Members { get; } = new();
     public Symbol Parent { get; set; }
 
     public override string ToString()
     {
-	    return Name
-		+ (Type != null ? (" (with type " + Type.ToString() + ")") : "")
-		+ (Parent != null ? (" of " + Parent.ToString()) : "");
+        return Name
+            + (Type != null ? (" (with type " + Type.ToString() + ")") : "")
+            + (Parent != null ? (" of " + Parent.ToString()) : "");
     }
 
     public static Symbol Go_bool = new Symbol() { Name = "bool", Classification = GoClassification.GoBasicType };

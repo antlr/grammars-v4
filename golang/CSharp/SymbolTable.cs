@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 
 public class SymbolTable {
     private Stack<Symbol> scopeStack = new Stack<Symbol>();
@@ -28,21 +24,21 @@ public class SymbolTable {
     public Symbol CurrentScope()
     {
         var current_scope = scopeStack.Peek();
-	return current_scope;
+        return current_scope;
     }
     
     public bool Define(Symbol symbol) {
         var currentScope = scopeStack.Peek();
-	    return this.DefineInScope(currentScope, symbol);
+        return this.DefineInScope(currentScope, symbol);
     }
 
     public bool DefineInScope(Symbol currentScope, Symbol symbol) {
-	    if (currentScope.Members.ContainsKey(symbol.Name)) {
-		    return false; // Symbol already defined in the current scope
-	    }
+        if (currentScope.Members.ContainsKey(symbol.Name)) {
+            return false; // Symbol already defined in the current scope
+        }
         symbol.Parent = currentScope;
-	    currentScope.Members[symbol.Name] = symbol;
-	    return true;
+        currentScope.Members[symbol.Name] = symbol;
+        return true;
     }
 
     public Symbol Resolve(string name) {

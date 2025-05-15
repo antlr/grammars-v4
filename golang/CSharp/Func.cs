@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 public class Func
 {
@@ -11,6 +8,5 @@ public class Func
     public List<Sym> Params { get; set; } = new List<Sym>();
     public List<Sym> Locals { get; set; } = new List<Sym>();
     public int FrameSize { get; set; }
-//    public LineTable LineTable { get; set; }
     public Obj Obj { get; set; }
 }

@@ -1,10 +1,9 @@
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 
 public abstract class GoParserBase : Parser
 {
@@ -89,17 +88,17 @@ public abstract class GoParserBase : Parser
     }
 
     protected void DefinePackageClause()
-	{
-		// Grab package name, and start a scope.
-		var ctx = this.Context;
-		var tctx = (GoParser.PackageClauseContext) ctx;
-		var identifier = tctx.packageName().identifier();
-		var name = identifier.IDENTIFIER().GetText();
+    {
+        // Grab package name, and start a scope.
+        var ctx = this.Context;
+        var tctx = (GoParser.PackageClauseContext) ctx;
+        var identifier = tctx.packageName().identifier();
+        var name = identifier.IDENTIFIER().GetText();
         var newScope = new Symbol() { Name = "<package>", Classification = GoClassification.GoPackage };
-		var sym = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage };
-		symbolTable.Define(sym);
-		symbolTable.EnterScope(newScope);
-		if (debug) System.Console.WriteLine("defined " + sym);
+        var sym = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage };
+        symbolTable.Define(sym);
+        symbolTable.EnterScope(newScope);
+        if (debug) System.Console.WriteLine("defined " + sym);
     }
 
     protected bool closingBracket()
@@ -120,18 +119,18 @@ public abstract class GoParserBase : Parser
         var count = ctx.ChildCount;
         var importSpec = ctx as GoParser.ImportSpecContext;
         if (importSpec == null) return;
-		var packageName = importSpec.packageName();
-		var parent_scope = symbolTable.CurrentScope().Parent;
+        var packageName = importSpec.packageName();
+        var parent_scope = symbolTable.CurrentScope().Parent;
         if (packageName != null)
         {
             var name = packageName.GetText();
-			// Import declarations occur after the packageClause.
-			// So, add the package to the *parent* of the
-			// packageClause, i.e., the global scope.
-			var newScope = new Symbol() { Name = "<package>", Classification = GoClassification.GoPackage };
-			var symbol = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage};
+            // Import declarations occur after the packageClause.
+            // So, add the package to the *parent* of the
+            // packageClause, i.e., the global scope.
+            var newScope = new Symbol() { Name = "<package>", Classification = GoClassification.GoPackage };
+            var symbol = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage};
             symbolTable.DefineInScope(parent_scope, symbol);
-			if (debug) System.Console.WriteLine("defined " + symbol);
+            if (debug) System.Console.WriteLine("defined " + symbol);
         }
         else
         {
@@ -141,10 +140,10 @@ public abstract class GoParserBase : Parser
             string[] pathArr = fname.Split('/');
             string[] fileArr = pathArr.Last().Split('.');
             string name = fileArr.Last().ToString();
-			var newScope = new Symbol() { Name = "<package>", Classification = GoClassification.GoPackage };
-			var symbol = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage};
+            var newScope = new Symbol() { Name = "<package>", Classification = GoClassification.GoPackage };
+            var symbol = new Symbol() { Name = name, Type = newScope, Classification = GoClassification.GoPackage};
             symbolTable.DefineInScope(parent_scope, symbol);
-			if (debug) System.Console.WriteLine("defined " + symbol);
+            if (debug) System.Console.WriteLine("defined " + symbol);
         }
     }
 
@@ -221,47 +220,47 @@ public abstract class GoParserBase : Parser
     public void ExitStruct()
     {
         if (debug) System.Console.WriteLine("ExitStruct");
-		symbolTable.ExitScope();
+        symbolTable.ExitScope();
     }
             
-	public void ExitFunctionDecl()
-	{
-		if (debug) System.Console.WriteLine("ExitFunctionDecl");
-		symbolTable.ExitScope();
-	}
+    public void ExitFunctionDecl()
+    {
+        if (debug) System.Console.WriteLine("ExitFunctionDecl");
+        symbolTable.ExitScope();
+    }
 
     public void EnterInterface()
     {
         var newScope = new Symbol() { Name = "<interface>", Classification = GoClassification.GoInterfaceType };
         if (debug) System.Console.WriteLine("EnterInterface " + newScope);
-		symbolTable.EnterScope(newScope);
+        symbolTable.EnterScope(newScope);
     }
 
-	public void EnterStruct()
-	{
+    public void EnterStruct()
+    {
         var newScope = new Symbol() { Name = "<struct>", Classification = GoClassification.GoStructType };
         if (debug) System.Console.WriteLine("EnterStruct " + newScope);
-		symbolTable.EnterScope(newScope);
-	}
+        symbolTable.EnterScope(newScope);
+    }
 
-	public void EnterBlock()
-	{
+    public void EnterBlock()
+    {
         var newScope = new Symbol() { Name = "<block>", Classification = GoClassification.GoBlock };
         if (debug) System.Console.WriteLine("EnterBlock " + newScope);
         symbolTable.EnterScope(newScope);
-	}
+    }
 
     public void ExitScope()
     {
         if (debug) System.Console.WriteLine("ExitScope " + symbolTable.CurrentScope());
-		symbolTable.ExitScope();
+        symbolTable.ExitScope();
     }
 
-	public void ExitInterface()
-	{
-		if (debug) System.Console.WriteLine("ExitInterface " + symbolTable.CurrentScope());
-		symbolTable.ExitScope();
-	}
+    public void ExitInterface()
+    {
+        if (debug) System.Console.WriteLine("ExitInterface " + symbolTable.CurrentScope());
+        symbolTable.ExitScope();
+    }
 
     public void ShortVarDecl()
     {
@@ -274,18 +273,18 @@ public abstract class GoParserBase : Parser
             var id_name = id.GetText();
             var sym = new Symbol() { Name = id_name, Classification = GoClassification.GoVariable };
             symbolTable.Define(sym);
-			if (debug) System.Console.WriteLine("defined " + sym);
+            if (debug) System.Console.WriteLine("defined " + sym);
         }
     }
 
-	public void DefineInterfaceType()
-	{
-		var ctx = this.Context;
-		var tctx = (GoParser.InterfaceTypeContext) ctx;
-		var method_specs = tctx.methodSpec();
-		foreach (var method_spec in method_specs)
-		{
-			var name = method_spec.IDENTIFIER().GetText();
+    public void DefineInterfaceType()
+    {
+        var ctx = this.Context;
+        var tctx = (GoParser.InterfaceTypeContext) ctx;
+        var method_specs = tctx.methodSpec();
+        foreach (var method_spec in method_specs)
+        {
+            var name = method_spec.IDENTIFIER().GetText();
             var method = new Symbol() { Name = name, Classification = GoClassification.GoMethod };
             symbolTable.Define(method);
             if (debug) System.Console.WriteLine("defined " + method);
@@ -296,25 +295,25 @@ public abstract class GoParserBase : Parser
         // Bind the interface type to parent.
         var symbol = symbolTable.CurrentScope();
         this.ContextToSymbolMap[ctx] = symbol;
-	}
+    }
 
-	public void DefineStructType()
-	{
-		var ctx = this.Context;
-		var tctx = (GoParser.StructTypeContext) ctx;
-		// Bind the interface type to parent.
-		var symbol = symbolTable.CurrentScope();
-		this.ContextToSymbolMap[ctx] = symbol;
-	}
+    public void DefineStructType()
+    {
+        var ctx = this.Context;
+        var tctx = (GoParser.StructTypeContext) ctx;
+        // Bind the interface type to parent.
+        var symbol = symbolTable.CurrentScope();
+        this.ContextToSymbolMap[ctx] = symbol;
+    }
 
     public void AssignChildToParent(int c)
     {
         var ctx = this.Context;
         var child = ctx.GetChild(c);
         if (debug) System.Console.WriteLine("assigning to " + ctx + " from " + child);
-		var found = this.ContextToSymbolMap.TryGetValue(child, out Symbol symbol);
-		if (symbol != null)
-			this.ContextToSymbolMap[ctx] = symbol;
+        var found = this.ContextToSymbolMap.TryGetValue(child, out Symbol symbol);
+        if (symbol != null)
+            this.ContextToSymbolMap[ctx] = symbol;
     }
 
     public void BindTypeToName()
@@ -334,44 +333,44 @@ public abstract class GoParserBase : Parser
         }
     }
 
-	public void AddParameterDecl()
-	{
-		var ctx = this.Context;
-		var tctx = (GoParser.ParameterDeclContext) ctx;
-		var identifier_list = tctx.identifierList();
-		if (identifier_list == null) return;
-		var identifiers = identifier_list.IDENTIFIER();
-		foreach (var identifier in identifiers)
-		{
-			var name = identifier.GetText();
-			var variable = new Symbol() { Name = name, Classification = GoClassification.GoVariable };
-			symbolTable.Define(variable);
-			if (debug) System.Console.WriteLine("defined " + variable);
-		}
-	}
+    public void AddParameterDecl()
+    {
+        var ctx = this.Context;
+        var tctx = (GoParser.ParameterDeclContext) ctx;
+        var identifier_list = tctx.identifierList();
+        if (identifier_list == null) return;
+        var identifiers = identifier_list.IDENTIFIER();
+        foreach (var identifier in identifiers)
+        {
+            var name = identifier.GetText();
+            var variable = new Symbol() { Name = name, Classification = GoClassification.GoVariable };
+            symbolTable.Define(variable);
+            if (debug) System.Console.WriteLine("defined " + variable);
+        }
+    }
 
-	public bool IsType()
-	{
-		var la = tokenStream.LT(1);
-		var id = la.Text;
-		var sym = symbolTable.Resolve(la.Text);
-		if (sym == null) return false;
-		bool is_type = false;
-		switch (sym.Classification)
-		{
-			case GoClassification.GoParameterType:
-			case GoClassification.GoArrayType:
-			case GoClassification.GoStructType:
-			case GoClassification.GoPointerType:
-			case GoClassification.GoFunctionType:
-			case GoClassification.GoInterfaceType:
-			case GoClassification.GoSliceType:
-			case GoClassification.GoMapType:
-			case GoClassification.GoChannelType:
-				is_type = true;
-				break;
-		}
-		if (debug) System.Console.WriteLine("testing " + sym + " return is_type " + is_type);
-		return is_type;
-	}
+    public bool IsType()
+    {
+        var la = tokenStream.LT(1);
+        var id = la.Text;
+        var sym = symbolTable.Resolve(la.Text);
+        if (sym == null) return false;
+        bool is_type = false;
+        switch (sym.Classification)
+        {
+            case GoClassification.GoParameterType:
+            case GoClassification.GoArrayType:
+            case GoClassification.GoStructType:
+            case GoClassification.GoPointerType:
+            case GoClassification.GoFunctionType:
+            case GoClassification.GoInterfaceType:
+            case GoClassification.GoSliceType:
+            case GoClassification.GoMapType:
+            case GoClassification.GoChannelType:
+                is_type = true;
+                break;
+        }
+        if (debug) System.Console.WriteLine("testing " + sym + " return is_type " + is_type);
+        return is_type;
+    }
 }
