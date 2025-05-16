@@ -536,12 +536,14 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    | alter_dataset
     | alter_dynamic_table
     //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
     | alter_failover_group
     | alter_file_format
     | alter_function
+    | alter_git_repository
     | alter_masking_policy
     | alter_materialized_view
     | alter_network_policy
@@ -554,6 +556,7 @@ alter_command
     | alter_role
     | alter_row_access_policy
     | alter_schema
+    | alter_secret
     | alter_security_integration_external_oauth
     | alter_security_integration_snowflake_oauth
     | alter_security_integration_saml2
@@ -751,6 +754,17 @@ account_id_list
     : account_identifier (COMMA account_identifier)*
     ;
 
+alter_dataset
+    : ALTER DATASET ds=object_name
+        ADD VERSION v=string
+        FROM query_statement
+        (PARTITION BY id_list)?
+        comment_clause?
+        (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds=object_name
+        DROP VERSION v=string
+    ;
+
 alter_dynamic_table
     : ALTER DYNAMIC TABLE if_exists? object_name (
         resume_suspend
@@ -764,6 +778,10 @@ alter_dynamic_table
         COMMA dynamic_table_unsettable_params
     )*
     | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
+    ;
+
+id_list
+    : id_ (COMMA id_)*
     ;
 
 alter_external_table
@@ -853,6 +871,24 @@ alter_function_signature
 
 data_type_list
     : data_type (COMMA data_type)*
+    ;
+
+alter_git_repository
+    : ALTER GIT REPOSITORY r=object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY r=object_name FETCH
+    ;
+
+alter_git_set_opts
+    : GIT_CREDENTIALS EQ sn=object_name
+    | API_INTEGRATION EQ ai=id_
+    | comment_clause
+    | tag_decl_list
+    ;
+
+alter_git_unset_opts
+    : GIT_CREDENTIALS
+    | COMMENT
+    | tag_list
     ;
 
 alter_masking_policy
@@ -987,6 +1023,50 @@ alter_sequence
     | ALTER SEQUENCE if_exists? object_name SET? ( INCREMENT BY? EQ? num)?
     | ALTER SEQUENCE if_exists? object_name SET (order_noorder? comment_clause | order_noorder)
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
+    ;
+
+alter_secret
+    : ALTER SECRET if_exists? object_name secret_opts
+    ;
+
+secret_opts
+    : UNSET COMMENT
+    | SET secret_set_opts
+    ;
+
+secret_set_opts
+    : secret_oauth_client_creds_opts+
+    | secret_oauth_auth_code_opts+
+    | secret_basic_auth_opts+
+    | secret_generic_string_opts+
+    | secret_api_auth_opts+
+    ;
+
+secret_oauth_client_creds_opts
+    : OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET
+    | comment_clause
+    ;
+
+secret_oauth_auth_code_opts
+    : OAUTH_REFRESH_TOKEN EQ t=string
+    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet=string
+    | comment_clause
+    ;
+
+secret_api_auth_opts
+    : API_AUTHENTICATION EQ aa=string
+    | comment_clause
+    ;
+
+secret_basic_auth_opts
+    : USERNAME EQ u=string
+    | PASSWORD EQ p=string
+    | comment_clause
+    ;
+
+secret_generic_string_opts
+    : SECRET_STRING EQ ss=string
+    | comment_clause
     ;
 
 alter_security_integration_external_oauth
@@ -1446,7 +1526,11 @@ tag_decl_list
     ;
 
 unset_tags
-    : UNSET TAG object_name (COMMA object_name)*
+    : UNSET tag_list
+    ;
+
+tag_list
+    : TAG object_name (COMMA object_name)*
     ;
 
 // create commands
@@ -1457,6 +1541,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_dataset
     | create_dynamic_table
     | create_event_table
     | create_external_function
@@ -1464,6 +1549,7 @@ create_command
     | create_failover_group
     | create_file_format
     | create_function
+    | create_git_repository
     //| create_integration
     | create_managed_account
     | create_masking_policy
@@ -1478,6 +1564,7 @@ create_command
     | create_role
     | create_row_access_policy
     | create_schema
+    | create_secret
     | create_security_integration_external_oauth
     | create_security_integration_snowflake_oauth
     | create_security_integration_saml2
@@ -1581,6 +1668,10 @@ compression_type
 
 compression
     : COMPRESSION EQ compression_type
+    ;
+
+create_dataset
+    : CREATE or_replace? DATASET if_not_exists? ds=object_name
     ;
 
 create_dynamic_table
@@ -1749,6 +1840,19 @@ create_function
     )? MEMOIZABLE? comment_clause? AS function_definition
     ;
 
+create_git_repository
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? r=object_name
+        create_git_opts+
+    ;
+
+create_git_opts
+    : ORIGIN EQ string
+    | API_INTEGRATION EQ ai=id_
+    | GIT_CREDENTIALS EQ sn=object_name
+    | comment_clause
+    | with_tags
+    ;
+
 create_managed_account
     : CREATE MANAGED ACCOUNT id_ ADMIN_NAME EQ id_ COMMA ADMIN_PASSWORD EQ string COMMA TYPE EQ READER (
         COMMA comment_clause
@@ -1884,6 +1988,18 @@ create_schema
     : CREATE or_replace? TRANSIENT? SCHEMA if_not_exists? schema_name clone_at_before? (
         WITH MANAGED ACCESS
     )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? with_tags? comment_clause?
+    ;
+
+create_secret
+    : CREATE or_replace? SECRET if_not_exists? s=object_name (
+        TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
+        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt=string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et=string API_AUTHENTICATION EQ aa=id_ |
+        TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
+        TYPE EQ PASSWORD USERNAME EQ u=string PASSWORD EQ p=string |
+        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss=string |
+        TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
+    )
+    comment_clause?
     ;
 
 create_security_integration_external_oauth
@@ -2738,6 +2854,7 @@ drop_command
     | drop_failover_group
     | drop_file_format
     | drop_function
+    | drop_git_repository
     | drop_integration
     | drop_managed_account
     | drop_masking_policy
@@ -2751,6 +2868,7 @@ drop_command
     | drop_role
     | drop_row_access_policy
     | drop_schema
+    | drop_secret
     | drop_sequence
     | drop_session_policy
     | drop_share
@@ -2800,6 +2918,10 @@ drop_function
     : DROP FUNCTION if_exists? object_name arg_types
     ;
 
+drop_git_repository
+    : DROP GIT REPOSITORY if_exists? r=object_name
+    ;
+
 drop_integration
     : DROP (API | NOTIFICATION | SECURITY | STORAGE)? INTEGRATION if_exists? id_
     ;
@@ -2846,6 +2968,10 @@ drop_row_access_policy
 
 drop_schema
     : DROP SCHEMA if_exists? schema_name cascade_restrict?
+    ;
+
+drop_secret
+    : DROP SECRET if_exists? object_name
     ;
 
 drop_sequence
@@ -2998,6 +3124,7 @@ describe_command
     | describe_external_table
     | describe_file_format
     | describe_function
+    | describe_git_repository
     | describe_integration
     | describe_masking_policy
     | describe_materialized_view
@@ -3048,6 +3175,10 @@ describe_file_format
 
 describe_function
     : describe FUNCTION object_name arg_types
+    ;
+
+describe_git_repository
+    : describe GIT REPOSITORY r=object_name
     ;
 
 describe_integration
@@ -3143,6 +3274,7 @@ show_command
     | show_databases
     | show_databases_in_failover_group
     | show_databases_in_replication_group
+    | show_datasets
     | show_delegated_authorizations
     | show_dynamic_tables
     | show_event_tables
@@ -3151,6 +3283,9 @@ show_command
     | show_failover_groups
     | show_file_formats
     | show_functions
+    | show_git_branches
+    | show_git_repositories
+    | show_git_tags
     | show_global_accounts
     | show_grants
     | show_integrations
@@ -3174,6 +3309,7 @@ show_command
     | show_roles
     | show_row_access_policies
     | show_schemas
+    | show_secrets
     | show_sequences
     | show_session_policies
     | show_shares
@@ -3188,6 +3324,7 @@ show_command
     | show_user_functions
     | show_users
     | show_variables
+    | show_versions_in_dataset
     | show_views
     | show_warehouses
     ;
@@ -3240,6 +3377,14 @@ show_databases_in_replication_group
     : SHOW DATABASES IN REPLICATION GROUP id_
     ;
 
+show_datasets
+    : SHOW DATASETS
+        like_pattern?
+        (IN (SCHEMA s=schema_name | DATABASE d=id_ | ACCOUNT))?
+        (STARTS WITH sw=string)?
+        (LIMIT num (FROM f=string)? )?
+    ;
+
 show_delegated_authorizations
     : SHOW DELEGATED AUTHORIZATIONS
     | SHOW DELEGATED AUTHORIZATIONS BY USER id_
@@ -3278,6 +3423,24 @@ show_functions
     : SHOW FUNCTIONS like_pattern? (
         IN ( ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA id_ | id_)
     )?
+    ;
+
+show_git_branches
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r=object_name
+    ;
+
+show_git_repositories
+    : SHOW GIT REPOSITORIES like_pattern?
+        (IN (ACCOUNT
+            | DATABASE d=id_?
+            | SCHEMA s=schema_name?
+            | schema_name
+            )
+        )?
+    ;
+
+show_git_tags
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r=object_name
     ;
 
 show_global_accounts
@@ -3399,6 +3562,10 @@ show_schemas
     : SHOW TERSE? SCHEMAS HISTORY? like_pattern? (IN ( ACCOUNT | DATABASE id_?))? starts_with? limit_rows?
     ;
 
+show_secrets
+    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
+    ;
+
 show_sequences
     : SHOW SEQUENCES like_pattern? in_obj?
     ;
@@ -3460,6 +3627,10 @@ show_users
 
 show_variables
     : SHOW VARIABLES like_pattern?
+    ;
+
+show_versions_in_dataset
+    : SHOW VERSIONS like_pattern? IN DATASET ds=object_name (LIMIT num)?
     ;
 
 show_views
@@ -4131,7 +4302,7 @@ select_statement_in_parentheses
     ;
 
 select_optional_clauses
-    : into_clause? from_clause? where_clause? (group_by_clause | having_clause)? qualify_clause? order_by_clause?
+    : into_clause? from_clause? where_clause? (group_by_clause having_clause? | having_clause)? qualify_clause? order_by_clause?
     ;
 
 select_clause
