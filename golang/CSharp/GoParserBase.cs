@@ -110,7 +110,9 @@ public abstract class GoParserBase : Parser
     public bool isNotReceive()
     {
         var la = tokenStream.LT(2);
-        return la.Type != GoParser.RECEIVE;
+        var result = la.Type != GoParser.RECEIVE;
+        if (debug) System.Console.WriteLine("isNotReceive returning " + result);
+        return result;
     }
 
     public void DefineImportSpec()
@@ -162,7 +164,7 @@ public abstract class GoParserBase : Parser
         // If it's not followed by a '.', then it really should be
         // considered as operand.
         if (la2.Type != GoParser.DOT) {
-            if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+            if (debug) System.Console.WriteLine("isOperand Returning " + true + " for " + la);
             return true;
         }
         // If it's followed by '.', and then followed by '(', then
@@ -170,7 +172,7 @@ public abstract class GoParserBase : Parser
         var la3 = tokenStream.LT(3);
         if (la3.Type == GoParser.L_PAREN)
         {
-            if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+            if (debug) System.Console.WriteLine("isOperand Returning " + true + " for " + la);
             return true;
         }
         if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
@@ -352,9 +354,29 @@ public abstract class GoParserBase : Parser
     public bool IsType()
     {
         var la = tokenStream.LT(1);
+        /* Defer to parser for certain types. */
+        if (la.Type == GoParser.CHAN)
+        {
+            if (debug) System.Console.WriteLine("IsType testing " + la.Text + " return " + true);
+            return true;
+        }
+        if (la.Type == GoParser.L_BRACKET)
+        {
+            if (debug) System.Console.WriteLine("IsType testing " + la.Text + " return " + true);
+            return true;
+        }
+        if (la.Type == GoParser.MAP)
+        {
+            if (debug) System.Console.WriteLine("IsType testing " + la.Text + " return " + true);
+            return true;
+        }
         var id = la.Text;
-        var sym = symbolTable.Resolve(la.Text);
-        if (sym == null) return false;
+        var sym = symbolTable.Resolve(id);
+        if (sym == null)
+        {
+            if (debug) System.Console.WriteLine("IsType testing " + la.Text + " return " + false);
+            return false;
+        }
         bool is_type = false;
         switch (sym.Classification)
         {
@@ -370,7 +392,7 @@ public abstract class GoParserBase : Parser
                 is_type = true;
                 break;
         }
-        if (debug) System.Console.WriteLine("testing " + sym + " return is_type " + is_type);
+        if (debug) System.Console.WriteLine("testing " + sym + " return " + is_type);
         return is_type;
     }
 }
