@@ -11,64 +11,6 @@ public abstract class GoParserBase : Parser
     SymbolTable symbolTable = new SymbolTable();
     Dictionary<IParseTree, Symbol> ContextToSymbolMap = new Dictionary<IParseTree, Symbol>();
 
-    /*
-
-    // A Sym represents a single symbol table entry.
-    class Sym {
-        uint64 Value;
-        byte Type;
-        string Name;
-        uint64 GoType;
-        // If this symbol is a function symbol, the corresponding Func
-        Func Func;
-        string goVersion;
-    };
-
-    // IsStatic reports whether this symbol is static (not visible outside its file).
-    bool IsStatic(Sym s) { return s.Type >= 'a' }
-
-    // nameWithoutInst returns s.Name if s.Name has no brackets (does not reference an
-    // instantiated type, function, or method). If s.Name contains brackets, then it
-    // returns s.Name with all the contents between (and including) the outermost left
-    // and right bracket removed. This is useful to ignore any extra slashes or dots
-    // inside the brackets from the string searches below, where needed.
-    string nameWithoutInst(Sym s)
-    {
-        var start = strings.Index(s.Name, "[");
-        if (start < 0) {
-            return s.Name;
-        }
-        var end = strings.LastIndex(s.Name, "]");
-        if (end < 0) {
-            // Malformed name, should contain closing bracket too.
-            return s.Name;
-        }
-        return s.Name[0:start] + s.Name[end+1:];
-    }
-
-    
-    enum GoClassification {
-        GoVariable,
-        GoField,
-        GoParameterType,
-        GoArrayType,
-        GoStructType,
-        GoPointerType,
-        GoFunctionType,
-        GoInterfaceType,
-        GoSliceType,
-        GoMapType,
-        GoChannelType,
-    };
-
-    class Frame {
-        Dictionary<string, GoClassification> table = new Dictionary<string, GoClassification>();
-        Dictionary<string, string> type = new Dictionary<string, string>();
-    };
-    
-    Stack<Frame> table = new HashSet<Frame>();
-*/
-    
     protected GoParserBase(ITokenStream input)
         : base(input)
     {
@@ -284,18 +226,20 @@ public abstract class GoParserBase : Parser
         var ctx = this.Context;
         var tctx = (GoParser.InterfaceTypeContext) ctx;
         var method_specs = tctx.methodSpec();
+        var symbol = symbolTable.CurrentScope();
         foreach (var method_spec in method_specs)
         {
             var name = method_spec.IDENTIFIER().GetText();
             var method = new Symbol() { Name = name, Classification = GoClassification.GoMethod };
             symbolTable.Define(method);
+            method.Parent = symbol;
+            this.ContextToSymbolMap[method_spec] = method;
             if (debug) System.Console.WriteLine("defined " + method);
             // Assert parent of method is in interface scope.
             if (method.Parent.Classification != GoClassification.GoInterfaceType)
                 throw new Exception("interface type definition error.");
         }
         // Bind the interface type to parent.
-        var symbol = symbolTable.CurrentScope();
         this.ContextToSymbolMap[ctx] = symbol;
     }
 
