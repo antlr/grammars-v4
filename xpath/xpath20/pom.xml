@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>XPath20.g4</include>
+					   <include>XPath20Lexer.g4</include>
+					   <include>XPath20Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

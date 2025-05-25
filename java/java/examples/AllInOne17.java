@@ -351,6 +351,13 @@ class Records {
 
     }
 
+    static record R0(int x) {
+        R0 {
+            if (x > 3) throw Exception("new", null);
+            x *= 3;
+        }
+    }
+
     final record R1(@Dummy2 @Dummy int x) {
 
         R1(int x) {

@@ -29,145 +29,150 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar refal;
 
-file_ : program EOF;
+file_
+    : program EOF
+    ;
 
 program
-   : f_definition (';'? program)?
-   | external_decl ';' program
-   | program external_decl ';'
-   ;
+    : f_definition (';'? program)?
+    | external_decl ';' program
+    | program external_decl ';'
+    ;
 
 f_definition
-   : '$ENTRY'? f_name '{' block_ '}'
-   ;
+    : '$ENTRY'? f_name '{' block_ '}'
+    ;
 
 external_decl
-   : ('$EXTERNAL' | '$EXTERN' | '$EXTRN') f_name_list
-   ;
+    : ('$EXTERNAL' | '$EXTERN' | '$EXTRN') f_name_list
+    ;
 
 f_name_list
-   : f_name (',' f_name_list ';')?
-   ;
+    : f_name (',' f_name_list ';')?
+    ;
 
 f_name
-   : identifier
-   ;
+    : identifier
+    ;
 
 block_
-   : sentence (';' block_?)?
-   ;
+    : sentence (';' block_?)?
+    ;
 
 sentence
-   : left_side conditions ('=' right_side | ',' block_ending)
-   ;
+    : left_side conditions ('=' right_side | ',' block_ending)
+    ;
 
 left_side
-   : pattern
-   ;
+    : pattern
+    ;
 
 conditions
-   : (',' arg_ ':' pattern conditions)?
-   ;
+    : (',' arg_ ':' pattern conditions)?
+    ;
 
 pattern
-   : expression_
-   ;
+    : expression_
+    ;
 
 arg_
-   : expression_
-   ;
+    : expression_
+    ;
 
 right_side
-   : expression_
-   ;
+    : expression_
+    ;
 
 expression_
-   : (term_ expression_)?
-   ;
+    : (term_ expression_)?
+    ;
 
 term_
-   : symbol
-   | variable
-   | '<' expression_ '>'
-   ;
+    : symbol
+    | variable
+    | '<' expression_ '>'
+    ;
 
 block_ending
-   : arg_ ':' '{' block_ '}'
-   ;
+    : arg_ ':' '{' block_ '}'
+    ;
 
 symbol
-   : identifier
-   | DIGITS
-   | STRING
-   | STRING2
-   | CHAR
-   ;
+    : identifier
+    | DIGITS
+    | STRING
+    | STRING2
+    | CHAR
+    ;
 
 identifier
-   : IDENTIFER
-   | STRING
-   ;
+    : IDENTIFER
+    | STRING
+    ;
 
 variable
-   : svar
-   | tvar
-   | evar
-   ;
+    : svar
+    | tvar
+    | evar
+    ;
 
 svar
-   : 's' '.' index
-   ;
+    : 's' '.' index
+    ;
 
 tvar
-   : 't' '.' index
-   ;
+    : 't' '.' index
+    ;
 
 evar
-   : 'e' '.' index
-   ;
+    : 'e' '.' index
+    ;
 
 index
-   : identifier
-   | DIGITS
-   ;
+    : identifier
+    | DIGITS
+    ;
 
 DIGITS
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 IDENTIFER
-   : [a-zA-Z] [a-zA-Z0-9_-]*
-   ;
+    : [a-zA-Z] [a-zA-Z0-9_-]*
+    ;
 
 STRING
-   : '"' ~ '"'* '"'
-   ;
+    : '"' ~ '"'* '"'
+    ;
 
 STRING2
-   : '\'' ~ '\''* '\''
-   ;
+    : '\'' ~ '\''* '\''
+    ;
 
 CHAR
-   : '\\\''
-   | '\\"'
-   | '\\\\'
-   | '\\n'
-   | '\\r'
-   | '\\t'
-   | '\\x' [0-9] [0-9]
-   ;
+    : '\\\''
+    | '\\"'
+    | '\\\\'
+    | '\\n'
+    | '\\r'
+    | '\\t'
+    | '\\x' [0-9] [0-9]
+    ;
 
 LINE_COMMENT
-   : '*' ~ [\r\n]* -> skip
-   ;
+    : '*' ~ [\r\n]* -> skip
+    ;
 
 BLOCK_COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
+    : '/*' .*? '*/' -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;
