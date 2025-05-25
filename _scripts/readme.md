@@ -3,12 +3,11 @@
 This directory contains scripts for CI testing.
 
 * regtest.sh -- This is a Bash-based script to test any target. To
-run, cd to grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is CSharp, Java, Cpp, Dart, Go, or one
-of the other targets. To test the target, you will need the NET SDK installed,
-access to the internet, and to toolchain for the target you want to test.
-For CSharp, it will download the Antlr4 tool and runtime. For the other
-targets, you will need to download the Antlr4 tool antlr-4.9.2-complete.jar and
-place it in /tmp.
+run, cd to grammar-vs/ or a grammar directory, then type `bash _scripts/test.sh <target>`
+where `<target>` is Cpp, CSharp, Dart, Go, Java, PHP, or Python3.
+To test the target, you will need the NET SDK installed (required for the trgen
+driver generator), access to the internet, and to toolchain for the target
+you want to test. You will also need to set the Antlr4 tool.
 
 * test.ps1 -- this is a Powershell script for testing, similar to regtest.sh.
 
@@ -26,7 +25,7 @@ and provide a symbolic linked file for "make" once installed. I don't know why,
 but the package doesn't define just a plain old "make.exe".
 
     cd to a grammar directory, e.g., `cd abnf`.
-    trgen -t CSharp --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar
+    trgen -t CSharp --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar
     make
     make test
 
@@ -41,7 +40,7 @@ a "~/.trgen.rc" file to override defaults for that program.
 For example,
 
     {
-        "antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.2-complete.jar"
+        "antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.3-complete.jar"
     }
 
 For the trwdog tool, you may want to override the default 5 minute timeout
@@ -69,7 +68,7 @@ the trgen tool may not add the new template files into your generated code.
 ## What version of trgen do I use?
 
 You should take care to specify a version when installing the trgen tool.
-I change the tool often, and there may be regressions. Currently version 0.7.0
+I change the tool often, and there may be regressions. Currently version 0.13.2
 works well.
 
 ## Structure
@@ -81,10 +80,6 @@ All the templates are in the "per-target directory" standard:
 Here is the structure of the default templates:
 
     templates/
-        Antlr4cs/
-            Program.cs
-            Test.csproj
-            makefile
         CSharp/
             ErrorListener.cs
             Program.cs
@@ -155,7 +150,7 @@ Trgen will construct and pass to the template evaluator the following attributes
 To generate the driver code from templates for a grammar, you will need
 to have the NET SDK installed. Afterwards, install `trgen`:
 
-    dotnet tool install -g trgen --version 0.5.3
+    dotnet tool install -g trgen --version 0.20.19
 
 To create a driver program:
 
@@ -167,7 +162,7 @@ You will need to pass to trgen
 to the templates. If you do not pass the --template-sources-directory option,
 the tool will use the default templates contained with the tool. You can
 generate a different target using `-t`. Acceptable targets are
-Antlr4cs, Cpp, CSharp, Dart, Go, Java, JavaScript, Python3.
+Cpp, CSharp, Dart, Go, Java, JavaScript, Python3.
 The "files" directory in the templates
 directory indicates what files are included in generation, and obtained
 via "find . -type f > files".

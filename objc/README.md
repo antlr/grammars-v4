@@ -17,7 +17,7 @@ for different programming languages (including Objective-C).
 ## Two-step processing
 
 1. Preprocessor lexer (ObjectiveCPreprocessorLexer.g4).
-2. Preprocessor parser (ObjectiveCPreprocessorLexer.g4).
+2. Preprocessor parser (ObjectiveCPreprocessorParser.g4).
 3. Visitor class for removing preprocessor directives from code (ObjectiveCPreprocessor.java).
 4. Lexer (ObjectiveCLexer.g4).
 5. Parser (ObjectiveCParser.g4).
@@ -29,6 +29,13 @@ during parsing of the ordinary Objective-C code.
 `ObjectiveCParser` is shared by both one-step and two-step processing.
 
 # Testing
+
+You should use Maven to test Objective-C grammar.
+
+1. Clone grammars-v4. `git clone https://github.com/antlr/grammars-v4.git`
+2. Make sure you have Maven installed. [See the documentation](https://maven.apache.org/).
+3. `cd grammars-v4/objc`.
+4. Execute `mvn clean test`.
 
 ## One-step processing
 

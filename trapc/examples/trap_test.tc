@@ -1,0 +1,11 @@
+// trap_test.tc
+#include "gets_input.h"
+
+int main()
+{   gets_input();
+    trap
+    {   puts("ERROR: invalid input");
+        return 1;
+    }
+    return 0;
+}

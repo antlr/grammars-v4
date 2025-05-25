@@ -38,6 +38,7 @@ public abstract class LexerAdaptor extends Lexer {
      *  Generic type for OPTIONS, TOKENS and CHANNELS
      */
     private static final int PREQUEL_CONSTRUCT = -10;
+    private static final int OPTIONS_CONSTRUCT = -11;
 
     public LexerAdaptor(CharStream input) {
         super(input);
@@ -56,8 +57,6 @@ public abstract class LexerAdaptor extends Lexer {
      * can only occur in lexical rules and arg actions cannot occur.
      */
     private int _currentRuleType = Token.INVALID_TYPE;
-
-    private boolean insideOptionsBlock = false;
 
     public int getCurrentRuleType() {
         return _currentRuleType;
@@ -83,38 +82,24 @@ public abstract class LexerAdaptor extends Lexer {
         }
     }
 
-    protected void handleEndAction() {
-        int oldMode = _mode;
-        int newMode = popMode();
-        boolean isActionWithinAction = _modeStack.size() > 0
-            && newMode == ANTLRv4Lexer.TargetLanguageAction
-            && oldMode == newMode;
-
-        if (isActionWithinAction) {
-            setType(ANTLRv4Lexer.ACTION_CONTENT);
-        }
-    }
-
-    protected void handleOptionsLBrace() {
-        if (insideOptionsBlock) {
-            setType(ANTLRv4Lexer.BEGIN_ACTION);
-            pushMode(ANTLRv4Lexer.TargetLanguageAction);
-        } else {
-            setType(ANTLRv4Lexer.LBRACE);
-            insideOptionsBlock = true;
-        }
-    }
-
     @Override
     public Token emit() {
         if ((_type == ANTLRv4Lexer.OPTIONS || _type == ANTLRv4Lexer.TOKENS || _type == ANTLRv4Lexer.CHANNELS)
                 && getCurrentRuleType() == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
             setCurrentRuleType(PREQUEL_CONSTRUCT);
+        } else if (_type == ANTLRv4Lexer.OPTIONS && getCurrentRuleType() == ANTLRv4Lexer.TOKEN_REF)
+        {
+            setCurrentRuleType(OPTIONS_CONSTRUCT);
         } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == PREQUEL_CONSTRUCT) { // exit prequel construct
             setCurrentRuleType(Token.INVALID_TYPE);
+        } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+        { // exit options
+            setCurrentRuleType(ANTLRv4Lexer.TOKEN_REF);
         } else if (_type == ANTLRv4Lexer.AT && getCurrentRuleType() == Token.INVALID_TYPE) { // enter action
             setCurrentRuleType(ANTLRv4Lexer.AT);
-        } else if (_type == ANTLRv4Lexer.END_ACTION && getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
+        } else if (_type == ANTLRv4Lexer.SEMI && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+        { // ';' in options { .... }. Don't change anything.
+        } else if (_type == ANTLRv4Lexer.ACTION && getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
             setCurrentRuleType(Token.INVALID_TYPE);
         } else if (_type == ANTLRv4Lexer.ID) {
             String firstChar = _input.getText(Interval.of(_tokenStartCharIndex, _tokenStartCharIndex));
@@ -146,7 +131,6 @@ public abstract class LexerAdaptor extends Lexer {
     @Override
     public void reset() {
         setCurrentRuleType(Token.INVALID_TYPE);
-        insideOptionsBlock = false;
         super.reset();
     }   
 }

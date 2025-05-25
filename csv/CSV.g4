@@ -26,12 +26,22 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar CSV;
 
-csvFile: hdr row+ ;
-hdr : row ;
+csvFile
+    : hdr row+ EOF
+    ;
 
-row : field (',' field)* '\r'? '\n' ;
+hdr
+    : row
+    ;
+
+row
+    : field (',' field)* '\r'? '\n'
+    ;
 
 field
     : TEXT
@@ -39,5 +49,10 @@ field
     |
     ;
 
-TEXT   : ~[,\n\r"]+ ;
-STRING : '"' ('""'|~'"')* '"' ; // quote-quote is an escaped quote
+TEXT
+    : ~[,\n\r"]+
+    ;
+
+STRING
+    : '"' ('""' | ~'"')* '"'
+    ; // quote-quote is an escaped quote

@@ -19,7 +19,7 @@
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 					   <include>DiceNotationLexer.g4</include>
-					   <include>DiceNotation.g4</include>
+					   <include>DiceNotationParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,9 +39,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>notation</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>DiceNotation</grammarName>
-               <lexerName>DiceNotationLexer</lexerName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

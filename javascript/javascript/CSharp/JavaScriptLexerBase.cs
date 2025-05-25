@@ -29,6 +29,16 @@ public abstract class JavaScriptLexerBase : Lexer
     /// </summary>
     private bool _useStrictCurrent = false;
 
+    /// <summary>
+    /// Current nesting depth
+    /// </summary>
+    private int _currentDepth = 0;
+
+    /// <summary>
+    /// Preserve nesting depth of template literals
+    /// </summary>
+    private Stack<int> templateDepthStack = new Stack<int>();
+
     public JavaScriptLexerBase(ICharStream input)
         : base(input)
     {
@@ -60,6 +70,11 @@ public abstract class JavaScriptLexerBase : Lexer
         return _useStrictCurrent;
     }
 
+    public bool IsInTemplateString()
+    {
+        return templateDepthStack.Count > 0 && templateDepthStack.Peek() == _currentDepth;
+    }
+
     /// <summary>
     /// Return the next token from the character stream and records this last
     /// token in case it resides on the default channel. This recorded token
@@ -86,6 +101,7 @@ public abstract class JavaScriptLexerBase : Lexer
 
     protected void ProcessOpenBrace()
     {
+        _currentDepth++;
         _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
         scopeStrictModes.Push(_useStrictCurrent);
     }
@@ -93,6 +109,7 @@ public abstract class JavaScriptLexerBase : Lexer
     protected void ProcessCloseBrace()
     {
         _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
+        _currentDepth--;
     }
 
     protected void ProcessStringLiteral()
@@ -107,6 +124,16 @@ public abstract class JavaScriptLexerBase : Lexer
                 scopeStrictModes.Push(_useStrictCurrent);
             }
         }
+    }
+
+    protected void ProcessTemplateOpenBrace() {
+        _currentDepth++;
+        templateDepthStack.Push(_currentDepth);
+    }
+
+    protected void ProcessTemplateCloseBrace() {
+        templateDepthStack.Pop();
+        _currentDepth--;
     }
 
     /// <summary>
@@ -141,5 +168,16 @@ public abstract class JavaScriptLexerBase : Lexer
                 // In all other cases, a regex literal _is_ possible.
                 return true;
         }
+    }
+
+    public override void Reset()
+    {
+        scopeStrictModes.Clear();
+        _lastToken = null;
+        _useStrictDefault = false;
+        _useStrictCurrent = false;
+        _currentDepth = 0;
+        templateDepthStack.Clear();
+        base.Reset();
     }
 }

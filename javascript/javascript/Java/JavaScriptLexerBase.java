@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
@@ -12,7 +13,7 @@ public abstract class JavaScriptLexerBase extends Lexer
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)
      */
-    private Stack<Boolean> scopeStrictModes = new Stack<Boolean>();
+    private final Deque<Boolean> scopeStrictModes = new ArrayDeque<>();
 
     private Token lastToken = null;
     /**
@@ -25,6 +26,15 @@ public abstract class JavaScriptLexerBase extends Lexer
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
     private boolean useStrictCurrent = false;
+    /**
+     * Preserves depth due to braces including template literals.
+     */
+	private int currentDepth = 0;
+
+    /**
+     * Preserves the starting depth of template literals to correctly handle braces inside template literals.
+     */
+	private Deque<Integer> templateDepthStack = new ArrayDeque<Integer>();
 
     public JavaScriptLexerBase(CharStream input) {
         super(input);
@@ -45,6 +55,10 @@ public abstract class JavaScriptLexerBase extends Lexer
 
     public boolean IsStrictMode() {
         return useStrictCurrent;
+    }
+
+    public boolean IsInTemplateString() {
+		return !templateDepthStack.isEmpty() && templateDepthStack.peek() == currentDepth;
     }
 
     /**
@@ -70,6 +84,7 @@ public abstract class JavaScriptLexerBase extends Lexer
 
     protected void ProcessOpenBrace()
     {
+		currentDepth++;
         useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.peek() ? true : useStrictDefault;
         scopeStrictModes.push(useStrictCurrent);
     }
@@ -77,7 +92,18 @@ public abstract class JavaScriptLexerBase extends Lexer
     protected void ProcessCloseBrace()
     {
         useStrictCurrent = scopeStrictModes.size() > 0 ? scopeStrictModes.pop() : useStrictDefault;
+		currentDepth--;
     }
+
+	protected void ProcessTemplateOpenBrace() {
+		currentDepth++;
+		this.templateDepthStack.push(currentDepth);
+	}
+
+	protected void ProcessTemplateCloseBrace() {
+		this.templateDepthStack.pop();
+		currentDepth--;
+	}
 
     protected void ProcessStringLiteral()
     {
@@ -124,5 +150,16 @@ public abstract class JavaScriptLexerBase extends Lexer
                 // In all other cases, a regex literal _is_ possible.
                 return true;
         }
+    }
+
+    @Override
+    public void reset() {
+        this.scopeStrictModes.clear();
+        this.lastToken = null;
+        this.useStrictDefault = false;
+        this.useStrictCurrent = false;
+	    this.currentDepth = 0;
+	    this.templateDepthStack = new ArrayDeque<Integer>();
+        super.reset();
     }
 }

@@ -13,6 +13,7 @@
 
 	<modules>
 		<module>xpath1</module>
+		<module>xpath20</module>
 		<module>xpath31</module>
 	</modules>
 </project>

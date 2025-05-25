@@ -1,0 +1,24 @@
+:ASC:     // set mode to ASCII (without this code the program would just output every cell as a number)
+{0[+72]}   // set cell 0 to the ASCII value 72 (H)
+{1[+101]}  // set cell 1 to the ASCII value 101(e)
+{2[+108]}  // set cell 2 to the ASCII value 108(l)
+{3[+111]}  // set cell 3 to the ASCII value 111(o)
+{4[+32]}   // set cell 4 to the ASCII value 32 (space)
+{5[+87]}   // set cell 5 to the ASCII value 87 (W)
+{6[+114]}  // set cell 6 to the ASCII value 114(r)
+{7[+100]}  // set cell 7 to the ASCII value 100(d)
+{8[+33]}   // set cell 8 to the ASCII value 33 (!)
+{9[+10]}   // set cell 9 to the ASCII value 10 (newline)
+|0|       // H
+|1|       // e
+|2|       // l
+|2|       // l
+|3|       // o
+|4|       // 
+|5|       // W
+|3|       // o
+|6|       // r
+|2|       // l
+|7|       // d
+|8|       // !
+|9|       // newline

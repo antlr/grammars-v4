@@ -1,0 +1,5 @@
+%import .grammars.three_rules_using_same_token.a
+%import .grammars.three_rules_using_same_token.b
+%import .grammars.three_rules_using_same_token.c -> d
+
+start: a b d

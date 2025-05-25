@@ -1,0 +1,430 @@
+// NOTE: this program uses the "+" operator to concatenate strings.  This is undocumented!!
+/********************************************************************************
+RadialLayout - a radial layout engine for Graphviz
+radialLayout.gvpr takes a super-subset of Graphviz input and creates an enhanced output with explicit positioning for all nodes.  Positioning for each node is based on new angle & distance attributes.  This output can be fed into `neato -n` (see https://graphviz.org/faq/#FaqDotWithNodeCoords) to route all defined edges.
+New node attributes:
+  -  radialangle - angle from the origin line units: radians, degrees, or "fraction" (3/17) (divide 360 into 17 slices, and position at 3rd). By default, angles are in counter-clockwise direction and are degrees.
+  -  radialdistance distance from 0,0 in direction/angle specified by radialangle units: inches or points (in or pt). No unit defaults to inches.  (e.g. 72pt == 1in == 1)
+New graph attributes:
+  -  radialclockwise used to request clockwise angle measurements (default is counterclockwise). Values: true or false, false is default
+  -  radialstart set origin line, where default origin line is a line heading from the center of the graph to the right or (a line from 0,0 toward 999999,0) or (a line going due East). Legal values: (clock points) 1oc, 2oc, ..., 12oc and (compass points) n, s, e, w, ne, ne, se, sw
+Of note:
+    All nodes must have both radialangle & radialdistance values
+    clusters do not (easily) work - a neato issue
+    there is a gvpr problem setting label="" (no label).  Set a node or edge label to "" like this: `{node [label=""] X Y Z}`
+    gvpr is documented here: https://graphviz.org/pdf/gvpr.1.pdf
+    neato -n is documented here: https://graphviz.org/pdf/gvpr.1.pdf
+    Only lightly tested!!
+How to use:
+  `gvpr -c -f radialLayout.gvpr myfile.gv | neato -n -Tpng >myfile.png`
+Which Graphviz attributes do not apply?
+- attributes that only apply to a subset of the Graphviz engines (e.g. neato only)
+- attributes that affect positioning (e.g. rank, nodesep, weight)
+- attribute applicability (early guess):
+ -  _background - yes
+ -  Damping  - no
+ -  URL - yes
+ -  area - yes
+ -  arrowhead - yes
+ -  arrowsize - yes
+ -  arrowtail - yes
+ -  bgcolor - yes
+ -  center - yes
+ -  charset - yes
+ -  class - yes
+ -  clusterrank - no
+ -  color - yes
+ -  colorscheme - yes
+ -  comment - yes
+ -  compound - yes
+ -  concentrate - yes
+ -  constraint - no
+ -  defaultdist - yes
+ -  decorate - yes
+ -  dim - yes
+ -  dimen - yes
+ -  dir - yes
+ -  diredgeconstraints - yes
+ -  distortion - yes
+ -  dpi - yes
+ -  edgeURL - yes
+ -  edgehref - yes
+ -  edgetarget - yes
+ -  edgetooltip - yes
+ -  epsilon - no
+ -  esep - no
+ -  fillcolor - yes
+ -  fixedsize - yes
+ -  fontcolor - yes
+ -  fontnames - yes
+ -  fontname - yes
+ -  fontpath - yes
+ -  fontsize - yes
+ -  forcelabels - yes
+ -  gradientangle - yes
+ -  group - no
+ -  headURL - yes
+ -  headclip - yes
+ -  headhref - yes
+ -  headlabel - yes
+ -  headport - yes
+ -  headtarget - yes
+ -  headtooltip - yes
+ -  height - yes
+ -  href - yes
+ -  id - yes
+ -  image - yes
+ -  imagepath - yes
+ -  imagepos - yes
+ -  imagescale - yes
+ -  inputscale - yes
+ -  K - no
+ -  label - yes
+ -  labelURL - yes
+ -  labelangle - yes
+ -  labeldistance - yes
+ -  labelfloat - yes
+ -  labelfontcolor - yes
+ -  labelfontname - yes
+ -  labelfontsize - yes
+ -  labelhref - yes
+ -  labeljust - yes
+ -  labelloc - yes
+ -  labeltarget - yes
+ -  labeltooltip - yes
+ -  label_scheme - yes
+ -  landscape - yes
+ -  layer - yes
+ -  layers - yes
+ -  layerlistsep - yes
+ -  layerselect - yes
+ -  layersep - yes
+ -  layout - must be neato
+ -  len - no
+ -  levels - no
+ -  levelsgap - no
+ -  lhead - yes
+ -  ltail - yes
+ -  margin - yes
+ -  maxiter - no
+ -  mclimit - no
+ -  mindist - no
+ -  minlen - no
+ -  mode - no
+ -  model - no
+ -  mosek - no
+ -  newrank - no
+ -  nodesep - no
+ -  nojustify - yes
+ -  normalize - no
+ -  notranslate - yes
+ -  ordering - no
+ -  orientation - yes
+ -  outputorder - yes
+ -  overlap - no
+ -  overlap_scaling - no
+ -  overlap_shrink - no
+ -  pack - no
+ -  packmode - no
+ -  pad - no
+ -  pagedir - yes
+ -  pencolor - yes
+ -  penwidth - yes
+ -  peripheries - yes
+ -  pin - no
+ -  quadtree - no
+ -  quantum - no
+ -  rank - no
+ -  rankdir - no
+ -  ranksep - no
+ -  regular - yes
+ -  remincross - no
+ -  repulsiveforce - no
+ -  resolution - yes
+ -  root - no
+ -  rotate - yes
+ -  rotation - no
+ -  samehead - yes
+ -  sametail - yes
+ -  samplepoints - yes
+ -  searchsize - no
+ -  sep - yes
+ -  shape - yes
+ -  shapefile - yes
+ -  showboxes - yes
+ -  sides - yes
+ -  skew - yes
+ -  smoothing - yes
+ -  sortv - no
+ -  start - no
+ -  style - yes
+ -  stylesheet - yes
+ -  tailURL - yes
+ -  tailclip - yes
+ -  tailhref - yes
+ -  taillabel - yes
+ -  tailport - yes
+ -  tailtarget - yes
+ -  tailtooltip - yes
+ -  target - yes
+ -  tooltip - yes
+ -  truecolor - yes
+ -  xdotversion - yes
+ -  viewport - yes
+ -  voro_margin - no
+ -  weight - yno
+ -  width - yes
+ -  xlabel - yes
+ -  z - yes
+********************************************************************/
+BEGIN{
+  int clockwise, noLabel[];
+  float x,y, start;   
+  float theta, D, pi=3.14159265;  
+  float deg2rad=3.14159/180.;
+  string numstr="?([+-])@(+([0-9])?(.*([0-9]))|\.+([0-9]))";
+  string wrkStr, thetaS, errStr;
+  node_t aNode;
+  graph_t theRoot;
+  ////////////////////////////////////////////////////////////////////////////
+  // do NOT call with direct output from sprintf
+  // - there is a bug - string will be empty
+  void doErrs(string eString){
+     printf(2, "(%s) Error: %s\n", $F, eString);
+  }
+/////////////////////////////////////////////////////////////////////////
+// NOTE: returns string "" if invalid input (yuck)
+/////////////////////////////////////////////////////////////////////////
+string computeAngle(string Astr){
+  int Alen, Aerr;
+  float Afloat;
+  string Awrk, Atok[int], ASrslt;
+  Aerr=0;
+  Awrk=Astr;
+//  Alen=length(Astr)-1;
+  switch(Astr){
+    case "n":
+    case "12oc":
+      Afloat=90*deg2rad;
+      break;
+    case "1oc":
+      Afloat=60*deg2rad;
+      break;
+    case "ne":
+      Afloat=45*deg2rad;
+      break;
+    case "2oc":
+      Afloat=30*deg2rad;
+      break;
+    case "e":
+    case "3oc":
+      Afloat=0;          
+      break;
+    case "4oc":
+      Afloat=330*deg2rad;
+      break;
+    case "se":
+      Afloat=-45*deg2rad;
+      break;
+    case "5oc":
+      Afloat=300*deg2rad;
+      break;
+    case "s":
+    case "6oc":
+      Afloat=270*deg2rad;
+      break;
+    case "7oc":
+      Afloat=240*deg2rad;
+      break;
+    case "sw":
+      Afloat=-105*deg2rad;
+      break;
+    case "8oc":
+      Afloat=210*deg2rad;
+      break;
+    case "w":
+    case "9oc":
+      Afloat=180*deg2rad;
+      break;
+    case "10oc":
+      Afloat=150*deg2rad;
+      break;
+    case "nw":
+      Afloat=-45*deg2rad;
+      break;
+    case "11oc":
+      Afloat=120*deg2rad;
+      break;
+    default:
+      if (Astr=="*(?)@(r|rad|rads|radians)"){
+        //print("//  RADIANs: ", Astr);
+        Alen=index(Astr,"r");
+        //print("//  Alen: ", Alen);
+        Awrk=substr(Astr,0,Alen);
+        //print("//  radians  work: ", Awrk);
+        if (Awrk==numstr)
+          Afloat=(float)Awrk;
+        else{
+          Aerr=1;
+        }
+      }else if (Astr=="*(?)@(d|deg|degrees)"){
+        //print("//  DEGREES: ", Astr);
+        Alen=index(Astr,"d");
+        Awrk=substr(Astr,0,Alen);
+        if (Awrk==numstr)
+          Afloat=((float)Awrk)*deg2rad;
+        else{
+          Aerr=1;
+        }
+      }else if (Astr==numstr + "([/])" + numstr){  
+        //print("//  Nth: ", Astr);
+        split(Astr,Atok,"/");
+	if ((int)Atok[1]<=0){
+	  Aerr=1;
+	  Afloat=0;
+          print("//  error bad denominator: ", Astr);	  
+        }else{
+          Afloat=2*pi*((float)Atok[0]/(float)Atok[1]);
+	}
+      }else if (Astr==numstr){
+        //print("//  default (degrees): ", Astr);
+        Afloat=(float)Astr*deg2rad;
+      }else{
+        Aerr=1;
+            break;
+      }
+  }
+  if (Aerr==1){
+    print ("// error !!");
+    ASrslt="";
+  }else{
+    ASrslt=(string)Afloat;
+  }
+  //print("//  returning: >", Afloat, "<");
+  return ASrslt;
+}
+////////////////////////////////////////////////////////////////////////
+float computeStartAngle(string Astr){
+  string a1;
+  a1=computeAngle(Astr);
+  if (a1==""){
+    errStr=sprintf("Invalid value for \"radialstart\" %s", theRoot.radialstart);
+    doErrs(errStr);
+  }else
+    return (float)a1;
+}
+/////////////////////////////////////////////////////////////////////////
+float computeNodeAngle(string Astr, node_t Anode){
+  string a2;
+  a2=computeAngle(Astr);
+  if (a2==""){
+    errStr=sprintf("Node \"%s\" has bad radialangle attribute: %s", Anode.name, Astr);
+    doErrs(errStr);
+//    doErrs("Node \"" + Anode.name + "\" has bad radialangle attribute: "+Astr);
+  }else
+    return (float)a2;
+}
+//////////////////////////////////////////////////////////////////////////// 
+// return points
+float computeDistance(string Dstr, node_t Dnode){
+  int Dlen;
+  float Drslt;
+  string Dwrk, Dtok[int];
+  //print("//  RAW DISTANCE: ", Dstr);
+  Dwrk=Dstr;
+  Dlen=length(Dstr)-1;
+  if (Dstr=="*(?)@(in|inch|inches)"){  
+    //print("//  INCHES ", Dstr);
+    Dlen=index(Dstr,"i");
+    Dwrk=substr(Dstr,0,Dlen);
+    //print("//  work: ", Dwrk);
+    if (Dwrk==numstr)
+      Drslt=72.*(float)Dwrk;  // return points
+    else{
+      errStr=sprintf("Node \"%s\" has bad radialdistance attribute: %s", Dnode.name, Dstr);
+      doErrs(errStr);
+//      doErrs("Node \"" + Dnode.name + "\" has bad radialdistance attribute: "+Dstr);
+      Drslt=0;      
+    }
+  }else if (Dstr=="*(?)@(pt|point|points)"){
+    //print("//  POINTS: ", Dstr);
+    Dlen=index(Dstr,"p");
+    Dwrk=substr(Dstr,0,Dlen);
+    if (Dwrk==numstr)
+      Drslt=((float)Dwrk);
+    else{
+      errStr=sprintf("Node \"%s\" has bad radialdistance attribute: %s", Dnode.name, Dstr);
+      doErrs(errStr);
+      //doErrs("Node \"" + Dnode.name + "\" has bad radialdistance attribute: "+Dstr);
+      Drslt=0;
+    }
+  }else if (Dstr==numstr){
+    //print("//  default (inches): ", Dstr);
+    Drslt=72.*(float)Dstr;
+  }else {
+      errStr=sprintf("Node \"%s\" has bad radialdistance attribute: %s", Dnode.name, Dstr);
+      doErrs(errStr);
+      //doErrs("Node \"" + Dnode.name + "\" has bad radialdistance attribute: "+Dstr);
+      Drslt=0;            
+  }
+  //print("//  DISTANCE: returning: ", Drslt);
+  return Drslt;
+}
+}  // end BEGIN
+//////////////////////////////////////////////////////////////////////////// 
+BEG_G{
+  theRoot=$G;
+  $G.bb="";     // maybe we should compute new value
+  clockwise=0;
+  // first, determine direction /////////////////////////////////////////
+  if (hasAttr($, "radialclockwise"))
+    if ($.radialclockwise=="@(1|yes|true)")
+      clockwise=1;
+    else if ($.radialclockwise=="@(0|no|false)")
+      clockwise=0;
+    else{
+      errStr=sprintf("Invalid value for \"radialclockwise\" %s", $.radialclockwise);
+      doErrs(errStr);
+      //doErrs("Invalid value for \"radialclockwise\" " + $.radialclockwise);
+    }
+  // next, determine starting angle /////////////////////////////////////////
+  start=0;
+  if (hasAttr($, "radialstart")){
+    wrkStr=$.radialstart;
+    start=computeStartAngle(wrkStr);
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+N{
+  //print("// NODE: ", $.name);
+  if (hasAttr($, "label") && $.label==""){
+    print("// EMPTY label: ", $.name);
+    noLabel[$]=1;
+  }
+  if (isAttr($G, "N", "label") && $.label==""){
+    print("// isAttr - EMPTY label: ", $.name);
+    noLabel[$]=1;
+  }
+  $.pin="true";  // needed???  (maybe later processing??)
+  if (hasAttr($, "radialangle") && $.radialangle!=""){
+    theta=computeNodeAngle($.radialangle, $);
+    } else {
+       errStr=sprintf("Node \"%s\" is missing radialangle attribute", $.name);
+       doErrs(errStr);
+       //doErrs("Node \"" +  $.name + "\" is missing radialangle attribute" );
+    }
+  if (hasAttr($, "radialdistance") && $.radialdistance!=""){
+    D=computeDistance($.radialdistance, $);
+    } else {
+       errStr=sprintf("Node \"%s\" is missing radialdistance attribute", $.name);
+       doErrs(errStr);
+       //doErrs("Node \"" + $.name + "\" is missing radialdistance attribute");
+    }
+  if (clockwise==1)
+    theta=-theta;  // clockwise
+  x=0+(D*cos(theta+start));
+  y=0+(D*sin(theta+start));
+  $.pos=(string)x + "," + (string)y;
+  //$.label=$.angle + " + " + $.distance;
+}
+////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package demo;
+
+service Demo {
+    // Sends a greeting
+    rpc Demo(DemoReq) returns (DemoResp) {}
+}
+
+// The request message containing the user's name.
+message DemoReq {
+    optional string name = 1;
+}
+
+// The response message containing the greetings
+message DemoResp {
+    optional string message = 1;
+}
