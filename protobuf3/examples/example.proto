@@ -18,6 +18,7 @@ message outer {
   repeated inner inner_message = 2;
   EnumAllowingAlias enum_field =3;
   map<int32, string> my_map = 4;
+  optional int32 optional_field = 5;
 }
 
 message Foo {

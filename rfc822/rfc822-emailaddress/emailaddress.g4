@@ -30,114 +30,164 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar emailaddress;
 
 emailaddress
-    : (mailbox
-    |  group ) EOF ;
+    : (mailbox | group) EOF
+    ;
 
-group       
-    :  phrase ':' mailbox* ';';
+group
+    : phrase ':' mailbox* ';'
+    ;
 
-mailbox     
-    :  addrspec                   
-    |  (phrase routeaddr );
+mailbox
+    : addrspec
+    | (phrase routeaddr)
+    ;
 
-routeaddr  
-    :  '<' route* addrspec '>';
+routeaddr
+    : '<' route* addrspec '>'
+    ;
 
-route       
-    :  '@' domain ':';          
+route
+    : '@' domain ':'
+    ;
 
-addrspec   
-    :  localpart '@' domain;
+addrspec
+    : localpart '@' domain
+    ;
 
-localpart  
-    :  word ('.' word)*;          
-                                           
-domain      
-    :  subdomain ('.' subdomain)*;
+localpart
+    : word ('.' word)*
+    ;
 
-subdomain 
-    :  domainref | domainliteral;
+domain
+    : subdomain ('.' subdomain)*
+    ;
 
-domainref  
-    : atom;
+subdomain
+    : domainref
+    | domainliteral
+    ;
 
-phrase      
-    :  word+;
+domainref
+    : atom
+    ;
 
-word        
-    :  atom | quotedstring;
+phrase
+    : word+
+    ;
+
+word
+    : atom
+    | quotedstring
+    ;
 
 lwspchar
-    : SPACE | HTAB;
+    : SPACE
+    | HTAB
+    ;
 
 lwsp
-    : (CRLF? lwspchar)+;
+    : (CRLF? lwspchar)+
+    ;
 
 delimeters
-    : SPECIALS 
+    : SPECIALS
     | lwsp
-    | comment;
+    | comment
+    ;
 
 //text        
- //   : CHAR+;
+//   : CHAR+;
 
-atom        
-    : CHAR+;
+atom
+    : CHAR+
+    ;
 
-quotedpair 
-    :  '\\' CHAR; 
+quotedpair
+    : '\\' CHAR
+    ;
 
 domainliteral
-    : '[' (DTEXT | quotedpair)* ']';
+    : '[' (DTEXT | quotedpair)* ']'
+    ;
 
-quotedstring 
-    : '\'' (QTEXT | quotedpair)* '\'';
+quotedstring
+    : '\'' (QTEXT | quotedpair)* '\''
+    ;
 
-comment     
-    : '(' (CTEXT | quotedpair | comment)* ')';
+comment
+    : '(' (CTEXT | quotedpair | comment)* ')'
+    ;
 
 CHAR
-    : [\u0000-\u0127];
-   
+    : [\u0000-\u0127]
+    ;
+
 ALPHA
-    : [\u0065-\u0090]; 
+    : [\u0065-\u0090]
+    ;
 
 DIGIT
-    : [\u0048-\u0057];
+    : [\u0048-\u0057]
+    ;
 
 CTL
-    : [\u0000-\u0031]; 
+    : [\u0000-\u0031]
+    ;
 
 CR
-    : '\n';
+    : '\n'
+    ;
 
 LF
-    : '\r';
+    : '\r'
+    ;
 
 SPACE
-    : ' ';
+    : ' '
+    ;
 
 HTAB
-    : '\t';
+    : '\t'
+    ;
 
 CRLF
-    : '\r\n'; 
+    : '\r\n'
+    ;
 
 SPECIALS
-    : '(' | ')' | '<' | '>' | '@'  |  ',' | ';' | ':' | '\\' | '\''|  '.' | '[' | ']' ;             
+    : '('
+    | ')'
+    | '<'
+    | '>'
+    | '@'
+    | ','
+    | ';'
+    | ':'
+    | '\\'
+    | '\''
+    | '.'
+    | '['
+    | ']'
+    ;
 
 QUOTE
-    : '"';
+    : '"'
+    ;
 
 QTEXT
-    : ~[\r\n];
+    : ~[\r\n]
+    ;
 
 DTEXT
-    : ~[[\]\n\\];
+    : ~[[\]\n\\]
+    ;
 
 CTEXT
-    : ~[()\n\\];
-    
+    : ~[()\n\\]
+    ;

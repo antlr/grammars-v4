@@ -1,0 +1,6 @@
+FOR u IN users
+  COLLECT age = u.age WITH COUNT INTO length
+  RETURN {
+    "age" : age,
+    "count" : length
+  }

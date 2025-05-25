@@ -1,4 +1,8 @@
 /* Based on documentation provided at https://docs.racket-lang.org/htdp-langs/intermediate-lam.html */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ISL;
 
 program
@@ -18,7 +22,8 @@ definition
     | '(' 'define-struct' name '(' name* ')' ')'
     ;
 
-expr: '(' 'begin' expr+ ')'
+expr
+    : '(' 'begin' expr+ ')'
     | '(' 'begin0' expr+ ')'
     | '(' 'set!' NAME expr ')'
     | '(' 'delay' expr ')'
@@ -29,13 +34,13 @@ expr: '(' 'begin' expr+ ')'
     | '(' 'shared' '(' ('[' name expr ']')* ')' expr ')'
     | '(' 'let' '(' ('[' name expr ']')* ')' expr ')'
     | '(' 'let*' '(' ('[' name expr ']')* ')' expr ')'
-    | '(' 'recur' name '(' ('[' name expr']')* ')' expr ')'
+    | '(' 'recur' name '(' ('[' name expr ']')* ')' expr ')'
     | '(' expr expr* ')'
     | '(' 'cond' ('[' expr expr ']')+ ')'
-    | '(' 'cond' ('[' expr expr ']')*  '[' 'else ' expr ']' ')'
-    | '(' 'if'  expr expr expr ')'
+    | '(' 'cond' ('[' expr expr ']')* '[' 'else ' expr ']' ')'
+    | '(' 'if' expr expr expr ')'
     | '(' 'and' expr expr expr+ ')'
-    | '(' 'or'  expr expr expr+ ')'
+    | '(' 'or' expr expr expr+ ')'
     | '(' 'time' expr ')'
     | name
     | '’' quoted
@@ -86,10 +91,12 @@ libraryRequire
     | '(' 'require' '(' name STRING pkg ')' ')'
     ;
 
-pkg: '(' STRING STRING NUMBER NUMBER ')'
-   ;
+pkg
+    : '(' STRING STRING NUMBER NUMBER ')'
+    ;
 
-name: SYMBOL
+name
+    : SYMBOL
     | NAME
     ;
 
@@ -100,7 +107,8 @@ SYMBOL
 
 // A name or a variable is a sequence of characters not including a space or one of the following:
 //   " , ' ` ( ) [ ] { } | ; #
-NAME: ([$%&!*+\\^_~] | [--:<-Za-z])+
+NAME
+    : ([$%&!*+\\^_~] | [--:<-Za-z])+
     ;
 
 // A number is a number such as 123, 3/2, or 5.5.
@@ -110,9 +118,10 @@ NUMBER
     | INT '/' INT
     ;
 
-INT: [1-9] [0-9]*
-   | '0'
-   ;
+INT
+    : [1-9] [0-9]*
+    | '0'
+    ;
 
 BOOLEAN
     : '#true'
@@ -137,12 +146,14 @@ CHARACTER
     | '#' '\u005C' 'space'
     ;
 
-LANG: '#lang' ~ ('\n' | '\r')* '\r'? '\n' -> channel (HIDDEN)
+LANG
+    : '#lang' ~ ('\n' | '\r')* '\r'? '\n' -> channel (HIDDEN)
     ;
 
 COMMENT
     : ';' ~ ('\n' | '\r')* '\r'? '\n' -> channel (HIDDEN)
     ;
 
-WS: (' ' | '\r' | '\t' | '\u000C' | '\n') -> channel (HIDDEN)
-  ;
+WS
+    : (' ' | '\r' | '\t' | '\u000C' | '\n') -> channel (HIDDEN)
+    ;

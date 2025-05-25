@@ -1,0 +1,40 @@
+BEG_G
+ {
+  int i;
+  int found;
+  graph_t subgraphs[int];
+  graph_t subgraph;
+  subgraph = fstsubg($);
+  i = 0;
+  while (subgraph != NULL)
+   {
+    if (substr(subgraph.name, 0, 1) != "%")
+     {
+      subgraphs[i++] = subgraph;
+     }
+    subgraph = nxtsubg(subgraph);
+   }
+ }
+
+N[layer=="(*a*)"]
+ {
+  found = 0;
+  for (i = 0; i < #subgraphs; ++i)
+   {
+    if (isSubnode(subgraphs[i], $))
+     {
+      graph_t sg = subg($T, subgraphs[i].name);
+      copyA(subgraphs[i], sg);
+      subnode(sg, $);
+      ++found;
+      break;
+     }
+   }
+  if (found  == 0)
+   {
+    node_t newnode = node($T, $.name);
+    copyA($, newnode);
+   }
+ }
+
+E[layer=="(*a*)"]
