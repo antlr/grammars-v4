@@ -1,3 +1,6 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar ReStructuredText;
 
 // Copyright (C) 2011 Bart Kiers
@@ -27,445 +30,450 @@ grammar ReStructuredText;
  */
 
 parse
-  :  (element | empty_line)+? EOF
-  ;
+    : (element | empty_line)+? EOF
+    ;
 
 element
-  :  section | sectionElement
-  ;
-  
+    : section
+    | sectionElement
+    ;
+
 sectionElement
-  :  listItemBullet | listItemEnumerated | paragraph | lineBlock | comment
-  ;
+    : listItemBullet
+    | listItemEnumerated
+    | paragraph
+    | lineBlock
+    | comment
+    ;
 
 comment
-  :  Space* Comment Space* (commentLineNoBreak commentParagraphs?)?
-  ;
-  
+    : Space* Comment Space* (commentLineNoBreak commentParagraphs?)?
+    ;
+
 commentParagraphs
-  : main=commentParagraph commentRest
-  ;
+    : main = commentParagraph commentRest
+    ;
 
 commentRest
-  : (empty_line commentParagraph)*
-  ;
+    : (empty_line commentParagraph)*
+    ;
 
 commentParagraph
-  :  commentLine+
-  ;
+    : commentLine+
+    ;
 
 commentLineNoBreak
-  :  commentLineAtoms
-  ;
+    : commentLineAtoms
+    ;
 
 commentLine
-  :  LineBreak Space Space Space commentLineNoBreak
-  ;
+    : LineBreak Space Space Space commentLineNoBreak
+    ;
 
 commentLineAtoms
-  :  ~(LineBreak)+
-  ;
+    : ~(LineBreak)+
+    ;
 
 paragraph
-  :  lines
-  ;
+    : lines
+    ;
 
 section
-  :  (LineBreak overline=SectionSeparator)? title LineBreak? SectionSeparator (LineBreak)* sectionElement*
-  ;
+    : (LineBreak overline = SectionSeparator)? title LineBreak? SectionSeparator (LineBreak)* sectionElement*
+    ;
 
 title
-  :  LineBreak textStart
-  |  LineBreak lineSpecial Space+ (paragraphNoBreak)?
-  |  lineNormal
-  |  lineStar
-  ;
+    : LineBreak textStart
+    | LineBreak lineSpecial Space+ (paragraphNoBreak)?
+    | lineNormal
+    | lineStar
+    ;
 
 lineBlock
-  :  LineBreak lineBlockLine LineBreak? lineBlockLine*
-  ;
+    : LineBreak lineBlockLine LineBreak? lineBlockLine*
+    ;
 
 lineBlockLine
-  :  Block Space indentation? span*? starText
-  |  Block Space indentation? span+
-  ;
+    : Block Space indentation? span*? starText
+    | Block Space indentation? span+
+    ;
 
 listItemBullet
-  :  bulletCrossLine
-  |  bulletSimple
-  |  LineBreak Space* special=(Minus | Plus)
-  ;
+    : bulletCrossLine
+    | bulletSimple
+    | LineBreak Space* special = (Minus | Plus)
+    ;
 
 bulletCrossLine
-  :  LineBreak Space* bullet Space* (paragraph+)? 
-  ;
+    : LineBreak Space* bullet Space* (paragraph+)?
+    ;
 
-bulletSimple 
-  :  LineBreak Space* bullet Space+ paragraphNoBreak paragraph* 
-  ;
+bulletSimple
+    : LineBreak Space* bullet Space+ paragraphNoBreak paragraph*
+    ;
 
 bullet
-  :  Star 
-  |  Minus 
-  |  Plus
-  ;
+    : Star
+    | Minus
+    | Plus
+    ;
 
 listItemEnumerated
-  :  LineBreak enumerated=lineSpecial Space+ (paragraphNoBreak paragraph*)?
-  ;
-  
+    : LineBreak enumerated = lineSpecial Space+ (paragraphNoBreak paragraph*)?
+    ;
+
 paragraphNoBreak
-  :  lineNoBreak lines*
-  ;
+    : lineNoBreak lines*
+    ;
 
 lineNoBreak
-  :  indentation? spanLineStartNoStar span*?
-  ;
-  
+    : indentation? spanLineStartNoStar span*?
+    ;
+
 lines
-  :  linesStar
-  |  linesNormal
-  ;
+    : linesStar
+    | linesNormal
+    ;
 
 linesNormal
-  :  lineNormal (linesStar | linesNormal?)
-  ;
-  
+    : lineNormal (linesStar | linesNormal?)
+    ;
+
 linesStar
-  :  lineStar
-  |  lineStar lineNoBreak linesNormal??  
-  |  lineStar lineNoBreak linesStar
-  ;
+    : lineStar
+    | lineStar lineNoBreak linesNormal??
+    | lineStar lineNoBreak linesStar
+    ;
 
 lineNormal
-  :  LineBreak indentation? spanLineStartNoStar+? (span*? spanNoStar+?)?
-  |  lineSpecial
-  ;
-  
+    : LineBreak indentation? spanLineStartNoStar+? (span*? spanNoStar+?)?
+    | lineSpecial
+    ;
+
 lineStar
-  :  LineBreak indentation? spanLineStartNoStar*? starText
-  |  LineBreak indentation? text_fragment+ starText
-  ;
- 
+    : LineBreak indentation? spanLineStartNoStar*? starText
+    | LineBreak indentation? text_fragment+ starText
+    ;
+
 lineSpecial
-  :  Numbers Dot
-  |  LineBreak indentation? Numbers
-  |  LineBreak indentation? SectionSeparator (Space+ SectionSeparator) Space* // for table.
-  //|  Alphabet Dot
-  ;
-  
+    : Numbers Dot
+    | LineBreak indentation? Numbers
+    | LineBreak indentation? SectionSeparator (Space+ SectionSeparator) Space* // for table.
+    //|  Alphabet Dot
+    ;
+
 empty_line
-  :  LineBreak Space*
-  ;
+    : LineBreak Space*
+    ;
 
 indentation
-  :  Space+
-  ;
+    : Space+
+    ;
 
 spanLineStartNoStar
-  :  reference
-  |  referenceIn
-  |  hyperlinkTarget
-  |  hyperlink
-  |  hyperlinkDoc
-  |  backTickText
-  |  quotedLiteral
-  |  textLineStart
-  ;
+    : reference
+    | referenceIn
+    | hyperlinkTarget
+    | hyperlink
+    | hyperlinkDoc
+    | backTickText
+    | quotedLiteral
+    | textLineStart
+    ;
 
 textLineStart
-  :  lineStart_fragment+ text_fragment*
-  ;
-  
+    : lineStart_fragment+ text_fragment*
+    ;
+
 lineStart_fragment
-  :  (Minus ~(Space | LineBreak | Star))
-  |  (Plus ~(Space | Star))
-  |  (Numbers Dot ~(Space | LineBreak | Star))
-  |  (Numbers ~(Dot | LineBreak | Star))
-  //|  (Alphabet Dot ~(Space | LineBreak | Star))
-  |  (Alphabet Dot)
-  |  (Block ~(Space | Star))
-  |  (UnderScore ~(Space | Star))
-  |  (Alphabet ~(Dot | LineBreak | Star))
-  |  Alphabet
-  |  separator separator
-  |  TimeStar
-   |  SquareLeft
-    |  SquareRight
-    |  RoundLeft
-    |  RoundRight
-    |  SemiColon
-    |  Colon
-    |  QuotationDouble
-    |  QuotationSingle
-    |  Dot
-    |  UnderScore
-    |  AngleLeft
-    |  AngleRight
-    |  Any
-  ;
-  
+    : (Minus ~(Space | LineBreak | Star))
+    | (Plus ~(Space | Star))
+    | (Numbers Dot ~(Space | LineBreak | Star))
+    | (Numbers ~(Dot | LineBreak | Star))
+    //|  (Alphabet Dot ~(Space | LineBreak | Star))
+    | (Alphabet Dot)
+    | (Block ~(Space | Star))
+    | (UnderScore ~(Space | Star))
+    | (Alphabet ~(Dot | LineBreak | Star))
+    | Alphabet
+    | separator separator
+    | TimeStar
+    | SquareLeft
+    | SquareRight
+    | RoundLeft
+    | RoundRight
+    | SemiColon
+    | Colon
+    | QuotationDouble
+    | QuotationSingle
+    | Dot
+    | UnderScore
+    | AngleLeft
+    | AngleRight
+    | Any
+    ;
+
 text
-  :  textStart+ text_fragment*
-  ;
+    : textStart+ text_fragment*
+    ;
 
 textStart
-  :  forcedText
-  |  lineStart_fragment
-  |  text_fragment_start text_fragment_start+
-  |  Space
-  ;
+    : forcedText
+    | lineStart_fragment
+    | text_fragment_start text_fragment_start+
+    | Space
+    ;
 
-forcedText 
-  :  RoundLeft Star RoundRight 
-  |  SquareLeft Star SquareRight 
-  |  QuotationSingle Star QuotationSingle 
-  |  QuotationSingle QuotationDouble Star QuotationDouble QuotationSingle
-  ;
+forcedText
+    : RoundLeft Star RoundRight
+    | SquareLeft Star SquareRight
+    | QuotationSingle Star QuotationSingle
+    | QuotationSingle QuotationDouble Star QuotationDouble QuotationSingle
+    ;
 
 spanNoStar
-  :  reference
-  |  referenceIn
-  |  hyperlinkTarget
-  |  hyperlink
-  |  hyperlinkDoc
-  |  backTickText
-  |  quotedLiteral
-  |  text
-  ;
+    : reference
+    | referenceIn
+    | hyperlinkTarget
+    | hyperlink
+    | hyperlinkDoc
+    | backTickText
+    | quotedLiteral
+    | text
+    ;
 
 span
-  :  starText
-  |  spanNoStar
-  ;
+    : starText
+    | spanNoStar
+    ;
 
 quotedLiteral
-  : AngleRight Space lineNoBreak
-  ;
+    : AngleRight Space lineNoBreak
+    ;
 
 text_fragment_start
-  :  SemiColon
-  |  Numbers
-  |  Alphabet
-  |  Space
-  |  SquareLeft
-  |  SquareRight
-  |  RoundLeft
-  |  RoundRight
-  |  Colon
-  |  separator
-  |  AngleLeft
-  |  AngleRight
-  |  QuotationDouble
-  |  Dot
-  |  Star Space
-  |  Any
-  ;
+    : SemiColon
+    | Numbers
+    | Alphabet
+    | Space
+    | SquareLeft
+    | SquareRight
+    | RoundLeft
+    | RoundRight
+    | Colon
+    | separator
+    | AngleLeft
+    | AngleRight
+    | QuotationDouble
+    | Dot
+    | Star Space
+    | Any
+    ;
 
 text_fragment
-  :  text_fragment_start
-  |  forcedText
-  |  Block
-  |  Literal
-  |  Comment
-  |  Dot
-  |  Quote
-  ;
+    : text_fragment_start
+    | forcedText
+    | Block
+    | Literal
+    | Comment
+    | Dot
+    | Quote
+    ;
 
 starText
-  :  Star+ LineBreak
-  |  Star+ starNoSpace starAtoms (LineBreak Star* starNoSpace starAtoms)* Star* LineBreak
-  |  Star+ starNoSpace starAtoms Star* LineBreak
-  |  Star+ Space+ starAtoms Star+ LineBreak
-  ;
+    : Star+ LineBreak
+    | Star+ starNoSpace starAtoms (LineBreak Star* starNoSpace starAtoms)* Star* LineBreak
+    | Star+ starNoSpace starAtoms Star* LineBreak
+    | Star+ Space+ starAtoms Star+ LineBreak
+    ;
 
 starAtoms
-  :  starAtom* (Star* starAtom)*
-  ;
+    : starAtom* (Star* starAtom)*
+    ;
 
 starNoSpace
-  :  ~(Star | LineBreak | Space | SectionSeparator)
-  ;
+    : ~(Star | LineBreak | Space | SectionSeparator)
+    ;
 
 starAtom
-  :  ~(Star | LineBreak)
-  ;
+    : ~(Star | LineBreak)
+    ;
 
 backTickText
-  :  (Colon titled=Alphabet Colon)? body UnderScore?
-  ;
+    : (Colon titled = Alphabet Colon)? body UnderScore?
+    ;
 
 body
-  :  BackTick BackTick* backTickAtoms BackTick+
-  |  BackTick backTickNoSpace backTickAtoms BackTick+
-  |  BackTick BackTick
-  ;
+    : BackTick BackTick* backTickAtoms BackTick+
+    | BackTick backTickNoSpace backTickAtoms BackTick+
+    | BackTick BackTick
+    ;
 
 backTickAtoms
-  :  backTickAtom+
-  ;
+    : backTickAtom+
+    ;
 
 backTickNoSpace
-  :  ~(BackTick | LineBreak | Space)
-  ;
+    : ~(BackTick | LineBreak | Space)
+    ;
 
 backTickAtom
-  :  ~(BackTick | LineBreak)
-  |  BackTick ~(BackTick | LineBreak)
-  ;
+    : ~(BackTick | LineBreak)
+    | BackTick ~(BackTick | LineBreak)
+    ;
 
 reference
-  :  Any+ UnderScore
-  ;
+    : Any+ UnderScore
+    ;
 
 referenceIn
-  :  UnderScore hyperlinkAtom+ Colon Space url
-  ;
+    : UnderScore hyperlinkAtom+ Colon Space url
+    ;
 
 hyperlinkTarget
-  :  UnderScore Any+
-  ;
-  
+    : UnderScore Any+
+    ;
+
 hyperlink
-  :  BackTick hyperlinkAtom+ Space AngleLeft url AngleRight BackTick UnderScore Space
-  ;
- 
+    : BackTick hyperlinkAtom+ Space AngleLeft url AngleRight BackTick UnderScore Space
+    ;
+
 hyperlinkDoc
-  :  ':doc:' BackTick hyperlinkAtom+ Space AngleLeft url AngleRight BackTick
-  |  ':doc:' BackTick url BackTick
-  ;
+    : ':doc:' BackTick hyperlinkAtom+ Space AngleLeft url AngleRight BackTick
+    | ':doc:' BackTick url BackTick
+    ;
 
 url
-  :  urlAtom+
-  ;
-  
+    : urlAtom+
+    ;
+
 urlAtom
-  :  ~( LineBreak | BackTick )
-  ;
-  
+    : ~(LineBreak | BackTick)
+    ;
+
 hyperlinkAtom
-  :  ~( LineBreak | AngleLeft | AngleRight | BackTick | Star )
-  ;
+    : ~(LineBreak | AngleLeft | AngleRight | BackTick | Star)
+    ;
 
 separator
-  :  (Minus | Equal | Plus | Hat)
-  ;
+    : (Minus | Equal | Plus | Hat)
+    ;
 
 SectionSeparator
-  :  (Minus | Equal | Plus | Hat) (Minus | Equal | Plus | Hat) (Minus | Equal | Plus | Hat)+
-  ;
+    : (Minus | Equal | Plus | Hat) (Minus | Equal | Plus | Hat) (Minus | Equal | Plus | Hat)+
+    ;
 
 Literal
-  :  Colon LineBreak LineBreak* Colon Colon
-  ;
+    : Colon LineBreak LineBreak* Colon Colon
+    ;
 
 TimeStar
-  : Numbers Star
-  | 'x' Star
-  ;
+    : Numbers Star
+    | 'x' Star
+    ;
 
 Alphabet
-  : [A-Za-z]+
-  ;
-  
+    : [A-Za-z]+
+    ;
+
 Numbers
-  : [0-9]+
-  ;
+    : [0-9]+
+    ;
 
 Quote
-  :  Colon Colon
-  ;
+    : Colon Colon
+    ;
 
 SquareLeft
-  :  '['
-  ;
+    : '['
+    ;
 
 SquareRight
-  :  ']'
-  ;
+    : ']'
+    ;
 
 RoundLeft
-  :  '('
-  ;
-  
+    : '('
+    ;
+
 RoundRight
-  :  ')'
-  ;
-  
+    : ')'
+    ;
+
 AngleLeft
-  :  '<'
-  ;
+    : '<'
+    ;
 
 AngleRight
-  :  '>'
-  ;
+    : '>'
+    ;
 
 Hat
-  :  '^'
-  ;
-  
+    : '^'
+    ;
+
 QuotationDouble
-  :  '"'
-  ;
+    : '"'
+    ;
 
 QuotationSingle
-  :  '\''
-  ;
+    : '\''
+    ;
 
 Dot
-  :  '.'
-  ;
-  
+    : '.'
+    ;
+
 SemiColon
-  :  ';'
-  ;
-  
+    : ';'
+    ;
+
 Colon
-  :  ':'
-  ;
+    : ':'
+    ;
 
 Equal
-  :  '='
-  ;
+    : '='
+    ;
 
 Plus
-  :  '+'
-  ;
+    : '+'
+    ;
 
 Minus
-  :  '-'
-  ;
+    : '-'
+    ;
 
 Block
-  :  '|'
-  ;
+    : '|'
+    ;
 
 Comment
-  :  ('.. ' LineBreak?)
-  |  ('..' LineBreak)
-  ;
+    : ('.. ' LineBreak?)
+    | ('..' LineBreak)
+    ;
 
 UnderScore
-  :  '_'
-  ;
+    : '_'
+    ;
 
 BackTick
-  :  '`'
-  ;
+    : '`'
+    ;
 
 Star
-  :  '*'
-  ;
+    : '*'
+    ;
 
 Space
-  :  ' ' 
-  |  '\t'
-  ;
+    : ' '
+    | '\t'
+    ;
 
 LineBreak
-  :  '\r'? '\n'
-  ;
+    : '\r'? '\n'
+    ;
 
 Any
-  :  .
-  ;
+    : .
+    ;

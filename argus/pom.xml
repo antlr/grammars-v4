@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>module</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>argus</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

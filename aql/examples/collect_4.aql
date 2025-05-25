@@ -1,0 +1,8 @@
+FOR u IN users
+  COLLECT ageGroup = FLOOR(u.age / 5) * 5
+  AGGREGATE minAge = MIN(u.age), maxAge = MAX(u.age)
+  RETURN {
+    ageGroup,
+    minAge,
+    maxAge
+  }

@@ -1,0 +1,29 @@
+MODULE opr_descriptor IDENT "Version 2.0";
+
+/* define constants and node {structure} for operators;
+
+#max_args = 10;
+
+CONSTANT (fixed_binary,floating,char,untyped) EQUALS 1 INCREMENT 1;
+
+{ This is a local comment
+
+AGGREGATE operator STRUCTURE
+PREFIX "opr_";
+
+	flink ADDRESS;
+	blink ADDRESS;
+	opcount WORD;
+	optype CHARACTER LENGTH 1;
+	id WORD;
+	operands LONGWORD DIMENSION 0:#max_args-1;
+
+END operator;
+
+#opsize = .;
+
+CONSTANT opr_node_size EQUALS #opsize / 2;
+
+ITEM current_node_ptr ADDRESS GLOBAL;
+
+END_MODULE opr_descriptor;

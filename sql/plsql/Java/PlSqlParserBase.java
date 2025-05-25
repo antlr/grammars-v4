@@ -1,14 +1,14 @@
+///{packageLine}
+
 import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlParserBase extends Parser
 {
     private boolean _isVersion12 = true;
     private boolean _isVersion10 = true;
-    public PlSqlParserBase self;
 
     public PlSqlParserBase(TokenStream input) {
         super(input);
-        self = this;
     }
 
     public boolean isVersion12() {

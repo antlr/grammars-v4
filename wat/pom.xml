@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>module_</entryPoint>
+					<entryPoint>module</entryPoint>
 					<grammarName>Wat</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

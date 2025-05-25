@@ -2892,11 +2892,26 @@ select indexrelid::regclass, indisclustered from pg_index
   order by indexrelid::regclass::text;
 -- Constraint index remains clustered.
 alter table alttype_cluster cluster on alttype_cluster_pkey;
-select indexrelid::regclass, indisclustered from pg_index
-  where indrelid = 'alttype_cluster'::regclass
-  order by indexrelid::regclass::text;
-alter table alttype_cluster alter a type int;
-select indexrelid::regclass, indisclustered from pg_index
-  where indrelid = 'alttype_cluster'::regclass
-  order by indexrelid::regclass::text;
+select indexrelid::regclass, indisclustered
+from pg_index
+where indrelid = 'alttype_cluster'::regclass
+order by indexrelid::regclass:: text;
+alter table alttype_cluster
+    alter a type int;
+select indexrelid::regclass, indisclustered
+from pg_index
+where indrelid = 'alttype_cluster'::regclass
+order by indexrelid::regclass:: text;
 drop table alttype_cluster;
+
+-- test comment on schema table column
+create schema alter11;
+create table alter11.alter_table
+(
+    a int
+);
+comment on column alter11.alter_table.a is 'test comment with schema.table.column';
+drop table alter11.alter_table;
+drop schema alter11;
+-- end test comment on schema table column
+

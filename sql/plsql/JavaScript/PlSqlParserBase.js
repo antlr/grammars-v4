@@ -1,12 +1,13 @@
-import { Parser } from "antlr4";
+import antlr4 from 'antlr4';
+import JavaScriptLexer from './PlSqlParser.js';
 
-export default class PlSqlParserBase extends Parser {
+export default class PlSqlParserBase extends antlr4.Parser {
   _isVersion10;
   _isVersion12;
 
   constructor(input) {
     super(input);
-    this._isVersion10 = false;
+    this._isVersion10 = true;
     this._isVersion12 = true;
   }
 

@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>notation</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>DiceNotation</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

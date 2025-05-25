@@ -12,6 +12,5 @@ public:
     bool notLineTerminator();
     bool notOpenBraceAndNotFunction();
     bool closeBrace();
-    bool here(int type);
     bool lineTerminatorAhead();
 };
