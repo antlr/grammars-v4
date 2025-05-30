@@ -32,7 +32,7 @@ block
 stat
     : ';'
     | varlist '=' explist
-    | functioncall
+    | prefixexp
     | label
     | 'break'
     | 'goto' NAME
@@ -100,27 +100,41 @@ exp
     | exp ('&' | '|' | '~' | '<<' | '>>') exp
     ;
 
-// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name 
-var
+// Defines the most basic elements that can start a prefix expression chain
+primaryexp
     : NAME
-    | prefixexp ('[' exp ']' | '.' NAME)
+    | '(' exp ')'
+    | functiondef  // If 'function() ... end' can be directly called/indexed
+    // You might also consider adding 'string', 'tableconstructor', 'number',
+    // 'nil', 'true', 'false', '...' here if they can start a chain
+    // (e.g., "foo":sub(), {a=1}.a, (123):tostring() via metatables)
     ;
 
-// prefixexp ::= var | functioncall | '(' exp ')'
+// This is the core rule for handling chained expressions (vars, calls, indexing, member access).
 prefixexp
-    : NAME ('[' exp ']' | '.' NAME)*
-    | functioncall ('[' exp ']' | '.' NAME)*
-    | '(' exp ')' ('[' exp ']' | '.' NAME)*
+    : primaryexp
+      (   args             // Suffix for function call, e.g., primaryexp()
+        | ':' NAME args    // Suffix for method call, e.g., primaryexp:name()
+        | '[' exp ']'      // Suffix for table indexing, e.g., primaryexp[exp]
+        | '.' NAME         // Suffix for member access, e.g., primaryexp.name
+      )*
     ;
 
-// functioncall ::=  prefixexp args | prefixexp ':' Name args;
-functioncall
-    : NAME ('[' exp ']' | '.' NAME)* args
-    | functioncall ('[' exp ']' | '.' NAME)* args
-    | '(' exp ')' ('[' exp ']' | '.' NAME)* args
-    | NAME ('[' exp ']' | '.' NAME)* ':' NAME args
-    | functioncall ('[' exp ']' | '.' NAME)* ':' NAME args
-    | '(' exp ')' ('[' exp ']' | '.' NAME)* ':' NAME args
+// The 'var' rule, used for the left-hand side of assignments (varlist).
+// A 'var' is a path that can be assigned to. It's a primary expression
+// (NAME or parenthesized expression) followed by a chain of *only*
+// indexing or member access operations.
+var
+    : ( NAME | '(' exp ')' ) // Base of the var
+      (   '[' exp ']'        // Indexing suffix
+        | '.' NAME           // Member access suffix
+      )* // Zero or more of these suffixes
+    // This definition means:
+    // - NAME itself is a var.
+    // - NAME.foo, NAME[exp] are vars.
+    // - (exp).foo, (exp)[exp] are vars.
+    // - (exp) itself is NOT a var by this rule alone (it needs a suffix to become one here, or NAME).
+    // - Critically, NAME() is a prefixexp but not matched by this `var` rule if `args` is not a suffix here.
     ;
 
 args
