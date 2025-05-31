@@ -1,0 +1,6 @@
+script.Name = "Okay"
+script.Child = "Oops"
+script.Child.Name = "Okay"
+script.Child.Name.UhOh = "Oops"
+script.Child.Grandchild = "Oops"
+script.Child.Grandchild.Name = "Okay"

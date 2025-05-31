@@ -1,0 +1,1 @@
+-- selene: allow(lint_thatll_never_be_created)
