@@ -17,8 +17,8 @@ def fix(file_path):
     input_file = open(file_path + ".bak",'r')
     output_file = open(file_path, 'w')
     for x in input_file:
-        if '// Insert here @header for C++ lexer.' in x:
-            x = x.replace('// Insert here @header for C++ lexer.', '@header {#include "LuaLexerBase.h"}')
+        if '// Insert here @header for lexer.' in x:
+            x = x.replace('// Insert here @header for lexer.', '@header {#include "LuaLexerBase.h"}')
         if 'this.' in x:
             x = x.replace('this.', 'this->')
         output_file.write(x)

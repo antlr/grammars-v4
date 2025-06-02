@@ -1,7 +1,8 @@
-import { CommonToken, Lexer, CharStream, Token } from "antlr4";
-import LuaLexer from './LuaLexer';
+import { CommonToken, Lexer, CharStream, Token, CommonTokenStream } from "antlr4ng";
 
-export default abstract class LuaLexerBase extends Lexer {
+export abstract class LuaLexerBase extends Lexer {
+    self : LuaLexerBase;
+
     start_line: number;
     start_col: number;
 
@@ -12,7 +13,7 @@ export default abstract class LuaLexerBase extends Lexer {
     HandleComment() {
         this.start_line = this.line;
         this.start_col = this.column - 2;
-        let cs = this._input;
+        let cs = this.inputStream;
         if (cs.LA(1) === 91) { /* '[' */
             let sep = this.skip_sep(cs);
             if (sep >= 2) {
@@ -69,7 +70,7 @@ export default abstract class LuaLexerBase extends Lexer {
     }
 
     IsLine1Col0() {
-        let cs = this._input;
+        let cs = this.inputStream;
         return cs.index === 1;
     }
 
