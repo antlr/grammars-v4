@@ -15,12 +15,12 @@ export default class BisonLexerBase extends Lexer {
             }
         }
         while (cs.LA(1) !== 10 /* '\n' */ && cs.LA(1) !== -1) {
-            cs.consume();
+            this._interp.consume(cs);
         }
     }
     read_long_string(cs, sep) {
         let done = false;
-        cs.consume();
+        this._interp.consume(cs);
         for (;;) {
             let c = cs.LA(1);
             switch (c) {
@@ -31,7 +31,7 @@ export default class BisonLexerBase extends Lexer {
                     break;
                 case 93: /* ']' */
                     if (this.skip_sep(cs) === sep) {
-                        cs.consume();
+                        this._interp.consume(cs);
                         done = true;
                     }
                     break;
@@ -40,7 +40,7 @@ export default class BisonLexerBase extends Lexer {
                         done = true;
                         break;
                     }
-                    cs.consume();
+                    this._interp.consume(cs);
                     break;
             }
             if (done)
@@ -50,9 +50,9 @@ export default class BisonLexerBase extends Lexer {
     skip_sep(cs) {
         let count = 0;
         let s = cs.LA(1);
-        cs.consume();
+        this._interp.consume(cs);
         while (cs.LA(1) === 61 /* '=' */) {
-            cs.consume();
+            this._interp.consume(cs);
             count++;
         }
         if (cs.LA(1) === s)
