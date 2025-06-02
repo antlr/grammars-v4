@@ -32,7 +32,7 @@ options {
 
 sql_script
     : sql_plus_command_no_semicolon? (
-        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
+        (sql_plus_command | unit_statement) (SEMICOLON? '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
     ) EOF
     ;
 
@@ -74,6 +74,7 @@ unit_statement
     | alter_type
     | alter_user
     | alter_view
+    | anonymous_block
     | call_statement
     | create_analytic_view
     | create_attribute_dimension
@@ -159,7 +160,6 @@ unit_statement
     | drop_view
     | administer_key_management
     | analyze
-    | anonymous_block
     | associate_statistics
     | audit_traditional
     | comment_on_column
@@ -5384,7 +5384,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements (EXCEPTION exception_handler+)? END
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements (EXCEPTION exception_handler+)? END SEMICOLON
     ;
 
 // Common DDL Clauses
@@ -5558,6 +5558,7 @@ statement
     | sql_statement
     | call_statement
     | pipe_row_statement
+    | grant_statement
     ;
 
 swallow_to_semi
@@ -6923,7 +6924,10 @@ whenever_command
     ;
 
 set_command
-    : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id)
+    : SET (
+        regular_id (ON | OFF))+
+        | (regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id)
+     )
     ;
 
 timing_command
