@@ -6925,8 +6925,8 @@ whenever_command
 
 set_command
     : SET (
-        regular_id (ON | OFF))+
-        | (regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id)
+        (regular_id (ON | OFF))+
+        | (regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id))
      )
     ;
 
