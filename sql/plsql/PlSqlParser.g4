@@ -5495,6 +5495,7 @@ pragma_declaration
         | INLINE '(' id1 = identifier ',' expression ')'
         | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')'
         | DEPRECATE '(' identifier ( ',' CHAR_STRING)? ')'
+        | UDF
     ) ';'
     ;
 
@@ -7571,6 +7572,7 @@ regular_id
     | TIMESTAMP_UNCONSTRAINED
     | TIMEZONE
     | TRIGGER
+    | UDF
     | VARCHAR
     | VARCHAR2
     | VARIABLE

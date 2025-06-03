@@ -2112,6 +2112,7 @@ TZ_OFFSET                      : 'TZ_OFFSET';
 UB2                            : 'UB2';
 UBA                            : 'UBA';
 UCS2                           : 'UCS2';
+UDF                            : 'UDF';
 UID                            : 'UID';
 UNARCHIVED                     : 'UNARCHIVED';
 UNBOUNDED                      : 'UNBOUNDED';
