@@ -32,7 +32,7 @@ options {
 
 sql_script
     : sql_plus_command_no_semicolon? (
-        (sql_plus_command | unit_statement) (SEMICOLON? '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
+        (((sql_plus_command SEMICOLON? '/'?) | (unit_statement SEMICOLON '/'?))* (sql_plus_command | unit_statement)) SEMICOLON? '/'?
     ) EOF
     ;
 
@@ -6910,6 +6910,8 @@ sql_plus_command
     | whenever_command
     | timing_command
     | start_command
+    | set_command
+    | clear_command
     ;
 
 start_command
@@ -6932,6 +6934,10 @@ set_command
 
 timing_command
     : TIMING (START timing_text = id_expression* | SHOW | STOP)?
+    ;
+
+clear_command
+    : CLEAR (COLUMN? regular_id) | ALL
     ;
 
 // Common
