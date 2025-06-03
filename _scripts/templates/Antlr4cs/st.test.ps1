@@ -20,11 +20,6 @@ foreach ($file in $allFiles) {
     } elseif ($ext -eq ".tree") {
         continue
     } else {
-        $(& dotnet triconv -- -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
-        if ($last -ne 0)
-        {
-            continue
-        }
         $files.Add($file)
         Write-Host "Test case: $file"
     }

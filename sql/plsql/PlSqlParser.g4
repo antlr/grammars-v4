@@ -32,7 +32,7 @@ options {
 
 sql_script
     : sql_plus_command_no_semicolon? (
-        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
+        (((sql_plus_command SEMICOLON? '/'?) | (unit_statement SEMICOLON '/'?))* (sql_plus_command | unit_statement)) SEMICOLON? '/'?
     ) EOF
     ;
 
@@ -74,6 +74,7 @@ unit_statement
     | alter_type
     | alter_user
     | alter_view
+    | anonymous_block
     | call_statement
     | create_analytic_view
     | create_attribute_dimension
@@ -159,7 +160,6 @@ unit_statement
     | drop_view
     | administer_key_management
     | analyze
-    | anonymous_block
     | associate_statistics
     | audit_traditional
     | comment_on_column
@@ -5495,6 +5495,7 @@ pragma_declaration
         | INLINE '(' id1 = identifier ',' expression ')'
         | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')'
         | DEPRECATE '(' identifier ( ',' CHAR_STRING)? ')'
+        | UDF
     ) ';'
     ;
 
@@ -5558,6 +5559,7 @@ statement
     | sql_statement
     | call_statement
     | pipe_row_statement
+    | grant_statement
     ;
 
 swallow_to_semi
@@ -6909,6 +6911,8 @@ sql_plus_command
     | whenever_command
     | timing_command
     | start_command
+    | set_command
+    | clear_command
     ;
 
 start_command
@@ -6923,11 +6927,18 @@ whenever_command
     ;
 
 set_command
-    : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id)
+    : SET (
+        (regular_id (ON | OFF))+
+        | (regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/ numeric | regular_id))
+     )
     ;
 
 timing_command
     : TIMING (START timing_text = id_expression* | SHOW | STOP)?
+    ;
+
+clear_command
+    : CLEAR (COLUMN? regular_id) | ALL
     ;
 
 // Common
@@ -7561,6 +7572,7 @@ regular_id
     | TIMESTAMP_UNCONSTRAINED
     | TIMEZONE
     | TRIGGER
+    | UDF
     | VARCHAR
     | VARCHAR2
     | VARIABLE

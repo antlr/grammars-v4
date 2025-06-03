@@ -22,13 +22,13 @@ func (l *LuaLexerBase) HandleComment() {
         }
     }
     for cs.LA(1) != '\n' && cs.LA(1) != -1 {
-        cs.Consume()
+        l.Interpreter.Consume(cs)
     }
 }
 
 func (l *LuaLexerBase) read_long_string(cs antlr.CharStream, sep int) {
     done := false
-    cs.Consume()
+    l.Interpreter.Consume(cs)
     for {
         c := cs.LA(1)
         switch c {
@@ -38,7 +38,7 @@ func (l *LuaLexerBase) read_long_string(cs antlr.CharStream, sep int) {
             listener.SyntaxError(l, nil, l.start_line, l.start_col, "unfinished long comment", nil)
         case ']':
             if l.skip_sep(cs) == sep {
-                cs.Consume()
+                l.Interpreter.Consume(cs)
                 done = true
             }
         default:
@@ -46,7 +46,7 @@ func (l *LuaLexerBase) read_long_string(cs antlr.CharStream, sep int) {
                 done = true
                 break
             }
-            cs.Consume()
+            l.Interpreter.Consume(cs)
         }
         if done {
             break
@@ -57,9 +57,9 @@ func (l *LuaLexerBase) read_long_string(cs antlr.CharStream, sep int) {
 func (l *LuaLexerBase) skip_sep(cs antlr.CharStream) int {
     count := 0
     s := cs.LA(1)
-    cs.Consume()
+    l.Interpreter.Consume(cs)
     for cs.LA(1) == '=' {
-        cs.Consume()
+        l.Interpreter.Consume(cs)
         count++
     }
     if cs.LA(1) == s {

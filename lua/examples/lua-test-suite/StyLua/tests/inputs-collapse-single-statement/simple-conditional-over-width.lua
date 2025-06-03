@@ -1,0 +1,3 @@
+if thisIsAVeryLongConditionthisIsAVeryLongConditionThisIsAVeryLongCondition then
+	return thisIsAVeryLongReturnedExpression
+end

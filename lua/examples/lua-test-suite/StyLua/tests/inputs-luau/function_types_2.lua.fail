@@ -1,0 +1,2 @@
+local function foo(bar: Instance, baz: Instance, qux: Instance, quux: Instance, corge: Instance, grault: Instance, garply: Instance, waldo: Instance, fred: Instance, plugh: Instance, xyzzy: Instance, thud: Instance)
+end

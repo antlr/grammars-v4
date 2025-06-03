@@ -1,0 +1,40 @@
+return {
+  name = "luvit/lit",
+  version = "3.9.0",
+  homepage = "https://github.com/luvit/lit",
+  description = "The Luvit Invention Toolkit is a luvi app that handles dependencies and luvi builds.",
+  tags = {"lit", "meta"},
+  license = "Apache 2",
+  author = { name = "Tim Caswell" },
+  luvi = {
+    version = "v2.15.0",
+    flavor = "regular",
+  },
+  dependencies = {
+    "luvit/pretty-print@2.0.1",
+    "luvit/http-codec@3.0.5",
+    "luvit/json@2.5.2",
+    "luvit/resource@2.1.0",
+    "luvit/secure-socket@1.2.2",
+    "luvit/coro-fs@2.2.2",
+    "luvit/coro-net@3.3.0",
+    "luvit/coro-http@3.1.0",
+    "luvit/coro-wrapper@3.1.0",
+    "luvit/coro-spawn@3.0.1",
+    "luvit/coro-split@2.0.0",
+    "luvit/coro-websocket@3.1.0",
+    "luvit/md5@1.0.2",
+    "luvit/semver@2.0.0",
+    "creationix/git@2.0.7",
+    "luvit/prompt@2.0.0",
+    "luvit/ssh-rsa@2.0.0",
+    "creationix/weblit-app@3.2.0",
+    "creationix/weblit-auto-headers@2.1.0",
+    "creationix/weblit-websocket@3.0.0",
+  },
+  files = {
+    "commands/README",
+    "**.lua",
+    "!test*"
+  }
+}

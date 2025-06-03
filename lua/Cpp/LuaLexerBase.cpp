@@ -23,14 +23,14 @@ void LuaLexerBase::HandleComment()
     }
     while (cs->LA(1) != '\n' && cs->LA(1) != -1)
     {
-        cs->consume();
+        this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
     }
 }
 
 void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
 {
     bool done = false;
-    cs->consume();
+    this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
     for (; ; )
     {
         auto c = cs->LA(1);
@@ -46,7 +46,7 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
             case ']':
                 if (skip_sep(cs) == sep)
                 {
-                    cs->consume();
+                    this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
                     done = true;
                 }
                 break;
@@ -56,7 +56,7 @@ void LuaLexerBase::read_long_string(antlr4::CharStream * cs, int sep)
                     done = true;
                     break;
                 }
-                cs->consume();
+                this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
                 break;
         }
         if (done) break;
@@ -68,10 +68,10 @@ int LuaLexerBase::skip_sep(antlr4::CharStream * cs)
     int count = 0;
     size_t s = cs->LA(1);
     char ss = (char)s;
-    cs->consume();
+    this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
     while (cs->LA(1) == '=')
     {
-        cs->consume();
+        this->getInterpreter<antlr4::atn::LexerATNSimulator>()->consume(cs);
         count++;
     }
     if (cs->LA(1) == s) count += 2;
