@@ -37,14 +37,14 @@ abstract class LuaLexerBase extends Lexer
             var yo2 = '\n'.codeUnitAt(0);
             if (c2 == yo2) break;
             if (c2 == -1) break;
-            cs.consume();
+            this.interpreter?.consume(cs);
         }
     }
 
     void read_long_string(CharStream cs, int sep)
     {
         bool done = false;
-        cs.consume();
+        this.interpreter?.consume(cs);
         for (; ; )
         {
             var c = cs.LA(1);
@@ -58,7 +58,7 @@ abstract class LuaLexerBase extends Lexer
             } else if (c == yo) {
                 if (skip_sep(cs) == sep)
                 {
-                    cs.consume();
+                    this.interpreter?.consume(cs);
                     done = true;
                 }
             } else {
@@ -66,7 +66,7 @@ abstract class LuaLexerBase extends Lexer
                 {
                     done = true;
                 } else {
-                    cs.consume();
+                    this.interpreter?.consume(cs);
                 }
             }
             if (done) break;
@@ -77,11 +77,11 @@ abstract class LuaLexerBase extends Lexer
     {
         int count = 0;
         var s = cs.LA(1);
-        cs.consume();
+        this.interpreter?.consume(cs);
         var yoeq = '='.codeUnitAt(0);
         while (cs.LA(1) == yoeq)
         {
-            cs.consume();
+            this.interpreter?.consume(cs);
             count++;
         }
         if (cs.LA(1) == s) count += 2;
