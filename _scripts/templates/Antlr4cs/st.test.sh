@@ -14,11 +14,7 @@ files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    dotnet triconv -- -f utf-8 $f > /dev/null 2>&1
-    if [ "$?" = "0" ]
-    then
         files+=( $f )
-    fi
 done
 
 # People often specify a test file directory, but sometimes no

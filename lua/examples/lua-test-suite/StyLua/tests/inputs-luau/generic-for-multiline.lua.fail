@@ -1,0 +1,3 @@
+for _id: number, transform: Components.Transform, angularControls: Components.AngularControls, characterModel: Components.CharacterModel in world:query(Transform, AngularControls, CharacterModel) do
+    -- ...
+end
