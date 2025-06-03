@@ -1,5 +1,5 @@
 import { Lexer } from "antlr4";
-export default class BisonLexerBase extends Lexer {
+export default class LuaLexerBase extends Lexer {
     constructor(input) {
         super(input);
     }
