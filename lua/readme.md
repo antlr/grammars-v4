@@ -36,9 +36,7 @@ refactorings that were done to bring the grammar.
 
 ==> left factor prefixexp
 
-========================
-`var ::=  Name | prefixexp ( '[' exp ']' | '.' Name )`
-========================
+_`var ::=  Name | prefixexp ( '[' exp ']' | '.' Name )`_
 
 `prefixexp ::= var | functioncall | '(' exp ')'`
 
@@ -62,9 +60,7 @@ refactorings that were done to bring the grammar.
  or https://en.wikipedia.org/wiki/Left_recursion#Removing_direct_left_recursion
  or use Trash.
 
-========================
-`prefixexp ::= ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )*`
-========================
+_`prefixexp ::= ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )*`_
 
 `functioncall ::=  prefixexp args | prefixexp ':' Name args`
 
@@ -78,6 +74,4 @@ refactorings that were done to bring the grammar.
 
  ==> unfolding prefixexp
 
-========================
-`functioncall ::= ( ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )* ) ( args | ':' Name args )`
-========================
+_`functioncall ::= ( ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )* ) ( args | ':' Name args )`_
