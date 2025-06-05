@@ -32,20 +32,20 @@ mutual left recursion. This must be removed in order for
 Antlr4 to accept the grammar. The following steps are the
 refactorings that were done to bring the grammar.
 
-|----|----|
+| ---- | ---- |
 | Refactoring | Rule |
 | | `var ::= Name | prefixexp '[' exp ']' | prefixexp '.' Name` |
 | left factor prefixexp | _`var ::=  Name | prefixexp ( '[' exp ']' | '.' Name )`_ |
-|----|----|
+| ---- | ---- |
 | | `prefixexp ::= var | functioncall | '(' exp ')'` |
 | add parentheses | `prefixexp ::= ( var ) | functioncall | '(' exp ')'` |
 | unfolding "var" | `prefixexp ::= ( Name | prefixexp ( '[' exp ']' | '.' Name ) ) | functioncall | '(' exp ')'` |
 | ungroup | `prefixexp ::= Name | prefixexp ( '[' exp ']' | '.' Name ) | functioncall | '(' exp ')'` |
 | reorder alts (for immediate left recursion removal) | `prefixexp ::= prefixexp ( '[' exp ']' | '.' Name ) | Name | functioncall | '(' exp ')'` |
 | remove immediate left recursion (please follow Aho, Sethi, Ulman, ISBN 0-201-10088-6, 1988 print, pp47-48, or https://en.wikipedia.org/wiki/Left_recursion | _`prefixexp ::= ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )*`_ |
-|----|----|
+| ---- | ---- |
 | | `functioncall ::=  prefixexp args | prefixexp ':' Name args` |
 | left factor | `functioncall ::= prefixexp ( args | ':' Name args )` |
 | add parentheses | `functioncall ::= ( prefixexp ) ( args | ':' Name args )` |
 | unfolding prefixexp | _`functioncall ::= ( ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )* ) ( args | ':' Name args )`_ |
-|----|----|
+| ---- | ---- |
