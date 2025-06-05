@@ -34,18 +34,18 @@ refactorings that were done to bring the grammar.
 
 | ---- | ---- |
 | Refactoring | Rule |
-| | `var ::= Name | prefixexp '[' exp ']' | prefixexp '.' Name` |
-| left factor prefixexp | _`var ::=  Name | prefixexp ( '[' exp ']' | '.' Name )`_ |
+| | var ::= Name &vert; prefixexp '[' exp ']' &vert; prefixexp '.' Name |
+| left factor prefixexp | var ::=  Name &vert; prefixexp ( '[' exp ']' &vert; '.' Name ) |
 | ---- | ---- |
-| | `prefixexp ::= var | functioncall | '(' exp ')'` |
-| add parentheses | `prefixexp ::= ( var ) | functioncall | '(' exp ')'` |
-| unfolding "var" | `prefixexp ::= ( Name | prefixexp ( '[' exp ']' | '.' Name ) ) | functioncall | '(' exp ')'` |
-| ungroup | `prefixexp ::= Name | prefixexp ( '[' exp ']' | '.' Name ) | functioncall | '(' exp ')'` |
-| reorder alts (for immediate left recursion removal) | `prefixexp ::= prefixexp ( '[' exp ']' | '.' Name ) | Name | functioncall | '(' exp ')'` |
-| remove immediate left recursion (please follow Aho, Sethi, Ulman, ISBN 0-201-10088-6, 1988 print, pp47-48, or https://en.wikipedia.org/wiki/Left_recursion | _`prefixexp ::= ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )*`_ |
+| | prefixexp ::= var &vert; functioncall &vert; '(' exp ')' |
+| add parentheses | prefixexp ::= ( var ) &vert; functioncall &vert; '(' exp ')' |
+| unfold var | prefixexp ::= ( Name &vert; prefixexp ( '[' exp ']' &vert; '.' Name ) ) &vert; functioncall &vert; '(' exp ')' |
+| ungroup | prefixexp ::= Name &vert; prefixexp ( '[' exp ']' &vert; '.' Name ) &vert; functioncall &vert; '(' exp ')' |
+| reorder alts (for immediate left recursion removal) | prefixexp ::= prefixexp ( '[' exp ']' &vert; '.' Name ) &vert; Name &vert; functioncall &vert; '(' exp ')' |
+| remove immediate left recursion | prefixexp ::= ( Name &vert; functioncall &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* |
 | ---- | ---- |
-| | `functioncall ::=  prefixexp args | prefixexp ':' Name args` |
-| left factor | `functioncall ::= prefixexp ( args | ':' Name args )` |
-| add parentheses | `functioncall ::= ( prefixexp ) ( args | ':' Name args )` |
-| unfolding prefixexp | _`functioncall ::= ( ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )* ) ( args | ':' Name args )`_ |
+| | functioncall ::=  prefixexp args &vert; prefixexp ':' Name args |
+| left factor | functioncall ::= prefixexp ( args &vert; ':' Name args ) |
+| add parentheses | functioncall ::= ( prefixexp ) ( args &vert; ':' Name args ) |
+| unfold prefixexp | functioncall ::= ( ( Name &vert; functioncall &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
 | ---- | ---- |
