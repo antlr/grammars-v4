@@ -49,4 +49,10 @@ refactorings that were done to bring the grammar.
 | left factor | functioncall ::= prefixexp ( args &vert; ':' Name args ) |
 | add parentheses | functioncall ::= ( prefixexp ) ( args &vert; ':' Name args ) |
 | unfold prefixexp | functioncall ::= ( ( Name &vert; functioncall &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
-|| | |
+| reorder | functioncall ::= ( ( functioncall &vert; Name &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
+| group | functioncall ::= ( ( functioncall &vert; ( Name  &vert; '(' exp ')' ) ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
+| distribute | functioncall ::= ( functioncall ( '[' exp ']' &vert; '.' Name )* &vert; ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
+| distribute | functioncall ::= functioncall ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) &vert; ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) |
+| parentheses | functioncall ::= functioncall ( ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) &vert; ( ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) |
+| remove left recursion | functioncall ::= ( ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) ( ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) )* |
+
