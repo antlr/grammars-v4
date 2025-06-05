@@ -42,7 +42,7 @@ refactorings that were done to bring the grammar.
 | add parentheses | prefixexp ::= ( var ) &vert; functioncall &vert; '(' exp ')' |
 | unfold var | prefixexp ::= ( Name &vert; prefixexp ( '[' exp ']' &vert; '.' Name ) ) &vert; functioncall &vert; '(' exp ')' |
 | ungroup | prefixexp ::= Name &vert; prefixexp ( '[' exp ']' &vert; '.' Name ) &vert; functioncall &vert; '(' exp ')' |
-| reorder alts (for immediate left recursion removal) | prefixexp ::= prefixexp ( '[' exp ']' &vert; '.' Name ) &vert; Name &vert; functioncall &vert; '(' exp ')' |
+| reorder alts | prefixexp ::= prefixexp ( '[' exp ']' &vert; '.' Name ) &vert; Name &vert; functioncall &vert; '(' exp ')' |
 | remove immediate left recursion | prefixexp ::= ( Name &vert; functioncall &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* |
 | | |
 | - | functioncall ::=  prefixexp args &vert; prefixexp ':' Name args |
