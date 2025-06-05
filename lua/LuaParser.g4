@@ -15,6 +15,7 @@ parser grammar LuaParser;
 
 options {
     tokenVocab = LuaLexer;
+    superClass = LuaParserBase;
 }
 
 start_
@@ -109,7 +110,7 @@ var
 // prefixexp ::= var | functioncall | '(' exp ')'
 prefixexp
     : (
-        NAME
+        { this.IsFunctionCall() }? NAME
         | functioncall
 	| '(' exp ')' )
       ( '[' exp ']' | '.' NAME )*
