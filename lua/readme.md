@@ -4,6 +4,8 @@
 
 Kazunori Sakamoto, Alexander Alexeev, others
 
+In particular, efforts by Matt Hargett pushed for the refinement of the grammar.
+
 ## Specification
 
 [Manual](https://www.lua.org/manual/5.4/manual.html)
@@ -23,3 +25,59 @@ Kazunori Sakamoto, Alexander Alexeev, others
 [Wikipedia](https://en.wikipedia.org/wiki/Lua_(programming_language))
 
 [pldb.pub](https://pldb.pub/concepts/lua.html)
+
+### Notes on mutual recursion removal
+The EBNF grammar specified in the Lua Manual contains
+mutual left recursion. This must be removed in order for
+Antlr4 to accept the grammar. The following steps are the
+refactorings that were done to bring the grammar.
+
+`var ::= Name | prefixexp '[' exp ']' | prefixexp '.' Name`
+
+==> left factor prefixexp
+
+========================
+`var ::=  Name | prefixexp ( '[' exp ']' | '.' Name )`
+========================
+
+`prefixexp ::= var | functioncall | '(' exp ')'`
+
+  ==> add parentheses
+
+`prefixexp ::= ( var ) | functioncall | '(' exp ')'`
+
+  ==> unfolding "var"
+
+`prefixexp ::= ( Name | prefixexp ( '[' exp ']' | '.' Name ) ) | functioncall | '(' exp ')'`
+
+  ==> ungrouping.
+
+`prefixexp ::= Name | prefixexp ( '[' exp ']' | '.' Name ) | functioncall | '(' exp ')'`
+
+  ==> reorder alts (for immediate left recursion removal)
+
+`prefixexp ::= prefixexp ( '[' exp ']' | '.' Name ) | Name | functioncall | '(' exp ')'`
+
+ ==> remove immediate left recursion (please follow Aho, Sethi, Ulman, ISBN 0-201-10088-6, 1988 print, pp47-48,
+ or https://en.wikipedia.org/wiki/Left_recursion#Removing_direct_left_recursion
+ or use Trash.
+
+========================
+`prefixexp ::= ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )*`
+========================
+
+`functioncall ::=  prefixexp args | prefixexp ':' Name args`
+
+ ==> left factor
+
+`functioncall ::= prefixexp ( args | ':' Name args )`
+
+ ==> add parentheses
+
+`functioncall ::= ( prefixexp ) ( args | ':' Name args )`
+
+ ==> unfolding prefixexp
+
+========================
+`functioncall ::= ( ( Name | functioncall | '(' exp ')' ) ( '[' exp ']' | '.' Name )* ) ( args | ':' Name args )`
+========================
