@@ -49,12 +49,13 @@ refactorings that were done to bring the grammar.
 | left factor | functioncall ::= prefixexp ( args &vert; ':' Name args ) |
 | add parentheses | functioncall ::= ( prefixexp ) ( args &vert; ':' Name args ) |
 | unfold prefixexp | functioncall ::= ( ( Name &vert; functioncall &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
-| reorder | functioncall ::= ( ( functioncall &vert; Name &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
-| group | functioncall ::= ( ( functioncall &vert; ( Name  &vert; '(' exp ')' ) ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
-| distribute | functioncall ::= ( functioncall ( '[' exp ']' &vert; '.' Name )* &vert; ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
-| distribute | functioncall ::= functioncall ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) &vert; ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) |
-| parentheses | functioncall ::= functioncall ( ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) &vert; ( ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) |
-| remove left recursion | functioncall ::= ( ( Name  &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) ( ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) )* |
+| reorder | functioncall ::= ( ( functioncall &vert;   Name &vert; '(' exp ')'   )   ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
+| group | functioncall ::=   ( ( functioncall &vert; ( Name &vert; '(' exp ')' ) ) ( '[' exp ']' &vert; '.' Name )* ) ( args &vert; ':' Name args ) |
+| fold    | functioncall ::=    ( ( functioncall &vert;  b ) c ) d <br> b ::= ( Name &vert; '(' exp ')' ) <br> c ::= ( '[' exp ']' &vert; '.' Name )* <br> d ::= ( args &vert; ':' Name args ) |
+| unparen | functioncall ::=    ( functioncall &vert; b ) c d |
+| distribute | functioncall ::= functioncall c d &vert; b c d |
+| remove left recursion | functioncall ::= ( b c d) ( c d )* |
+| unfold | functioncall ::= ( ( Name &vert; '(' exp ')' ) ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) ) ( ( '[' exp ']' &vert; '.' Name )* ( args &vert; ':' Name args ) )* |
 
 ### Validating test suite files
 The Lua files in the examples/lua-test-suite is a collection of source code

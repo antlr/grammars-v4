@@ -57,7 +57,7 @@ attrib
     ;
 
 retstat
-    : ('return' explist? | 'break' | 'continue') ';'?
+    : 'return' explist? ';'?
     ;
 
 label
@@ -109,11 +109,9 @@ var
 
 // prefixexp ::= var | functioncall | '(' exp ')'
 prefixexp
-    : (
-        { this.IsFunctionCall() }? NAME
-        | functioncall
-	| '(' exp ')' )
-      ( '[' exp ']' | '.' NAME )*
+    : { this.IsFunctionCall() }? NAME ( '[' exp ']' | '.' NAME )*
+    | functioncall ( '[' exp ']' | '.' NAME )*
+    | '(' exp ')' ( '[' exp ']' | '.' NAME )*
     ;
 
 // functioncall ::=  prefixexp args | prefixexp ':' Name args;
