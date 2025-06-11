@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-<!--   <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;Python3</targets>
-   -->
-   <targets>CSharp</targets>   
+   <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3</targets>
    <test>
       <targets>CSharp</targets>
       <inputs>examples/**/*.lua</inputs>
    </test>
-<!--   <test>
-      <targets>Cpp;CSharp;Dart;Go;Java;JavaScript;Python3</targets>
+   <test>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3</targets>
       <inputs>examples/*.lua</inputs>
    </test> -->
 </desc>
