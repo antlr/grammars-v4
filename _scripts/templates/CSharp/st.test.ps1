@@ -19,15 +19,27 @@ foreach ($file in $allFiles) {
         continue
     } elseif ($ext -eq ".tree") {
         continue
+    } elseif ($ext -eq ".trq") {
+        continue
     } else {
         $files.Add($file)
         Write-Host "Test case: $file"
     }
 }
+
+$filePath = "tests.txt"
+$writer = New-Object System.IO.StreamWriter($filePath, $true) # $true for append
 foreach ($file in $files) {
-    Add-Content "tests.txt" $file
+    $writer.WriteLine($file)
 }
+$writer.Dispose()
+
 if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
+    Write-Host "No test cases provided."
+    exit 0
+}
+$size = (Get-Item -Path "tests.txt").Length
+if ( $size -eq 0 ) {
     Write-Host "No test cases provided."
     exit 0
 }
@@ -61,6 +73,23 @@ if ( $size -eq 0 ) {
     exit 1
 }
 
+# Validate parse trees via trquery assertions.
+# Execute trquery parse tree validation.
+Write-Host "Checking any trquery parse tree assertions..."
+$assertions_err = 0
+foreach ($file in $files) {
+    $trq = "$file.trq"
+    if (Test-Path $trq -PathType Leaf) {
+        Write-Host "Assert test case: $trq"
+        dotnet trparse $file | dotnet trquery -c $trq
+        $xxx = $LASTEXITCODE
+        if ( $xxx -ne 0 ) {
+            $assertions_err = $xxx
+        }
+    }
+}
+Write-Host "Finished checking parse tree assertions."
+
 $old = Get-Location
 Set-Location "<if(os_win)>../<example_dir_win><else>../<example_dir_unix><endif>"
 
@@ -73,7 +102,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $ext = $item.Extension
     if ($ext -eq ".errors") {
         git diff --exit-code $file *>> $old/updated.txt
-	$st = $LASTEXITCODE
+        $st = $LASTEXITCODE
         if ($st -ne 0) {
             $updated = $st
         }
@@ -85,7 +114,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     if ($ext -eq ".tree") {
         [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
         git diff --exit-code $file *>> $old/updated.txt
-	$st = $LASTEXITCODE
+        $st = $LASTEXITCODE
         if ($st -ne 0) {
             $updated = $st
         }
@@ -162,6 +191,15 @@ if ( $updated -eq 1 ) {
 if ( $new_errors_txt.Count -gt 0 ) {
     Write-Host "New errors in output."
     Get-Content "$old/new_errors.txt" | Write-Host
+    Write-Host "Test failed."
+    Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
+    Remove-Item -Force -Path $old/new_errors.txt -errorAction ignore 2>&1 | Out-Null
+    exit 1
+}
+
+# Test assertions errors.
+if ( "$assertions_err" -ne 0 ) {
     Write-Host "Test failed."
     Remove-Item -Force -Path $old/updated.txt -errorAction ignore 2>&1 | Out-Null
     Remove-Item -Force -Path $old/new_errors2.txt -errorAction ignore 2>&1 | Out-Null
