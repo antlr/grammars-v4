@@ -18,6 +18,8 @@ options {
     superClass = LuaParserBase;
 }
 
+// Insert here @header for parser.
+
 start_
     : chunk EOF
     ;

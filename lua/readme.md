@@ -86,3 +86,12 @@ do
 	luac54.exe $i
 done
 ```
+
+### Scraped rules from lparser.c
+
+```
+statement : ... | exprstat | ...
+
+exprstat : suffixedexp {la = '=' || la = ','}? restassign?
+
+suffixedexp : primaryexp ( {la = '.'}? fieldsel | {la = '['}?  '[' expr ']' 
