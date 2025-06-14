@@ -19,15 +19,27 @@ foreach ($file in $allFiles) {
         continue
     } elseif ($ext -eq ".tree") {
         continue
+    } elseif ($ext -eq ".trq") {
+        continue
     } else {
         $files.Add($file)
         Write-Host "Test case: $file"
     }
 }
+
+$filePath = "tests.txt"
+$writer = New-Object System.IO.StreamWriter($filePath, $true) # $true for append
 foreach ($file in $files) {
-    Add-Content "tests.txt" $file
+    $writer.WriteLine($file)
 }
+$writer.Dispose()
+
 if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
+    Write-Host "No test cases provided."
+    exit 0
+}
+$size = (Get-Item -Path "tests.txt").Length
+if ( $size -eq 0 ) {
     Write-Host "No test cases provided."
     exit 0
 }

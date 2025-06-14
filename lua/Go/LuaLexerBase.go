@@ -73,9 +73,9 @@ func (l *LuaLexerBase) skip_sep(cs antlr.CharStream) int {
 }
 
 func (l *LuaLexerBase) IsLine1Col0() bool {
-	cs := l.GetInputStream().(antlr.CharStream)
-	if cs.Index() == 1 {
-		return true
-	}
-	return false
+    cs := l.GetInputStream().(antlr.CharStream)
+    if cs.Index() == 1 {
+        return true
+    }
+    return false
 }
