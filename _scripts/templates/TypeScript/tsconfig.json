@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "ES2020",
     "moduleResolution": "node",
-    "target": "ES6",
+    "target": "ESNext",
     "noImplicitAny": true,
   },
   "ts-node": {
