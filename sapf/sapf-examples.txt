@@ -1,0 +1,2218 @@
+
+;;;; analog bubbles
+
+((.4 0 lfsaw) 2 * ([8 7.23] 0 lfsaw) .25 * 9.667 + + exp2) 0 sinosc .04 * .2 0 4 combn play
+
+(([.4 [8 7.23]] 0 lfsaw) [24 3] * +/ 81 + nnhz) 0 sinosc 4c * .2 0 4 combn play
+
+(
+	[.4 [8 7.23]]	; LFO freq
+	0 lfsaw			; sawtooth LFO
+	[24 3] *		; modulation depth in semitones
+	+/				; add mono and stereo LFOs
+	81 +			; midi note offset
+	nnhz			; convert note number to Hertz
+	0 sinosc		; sine wave oscillator
+	4c *			; scale amplitude
+	.2 0 4 combn	; comb delay
+	play
+)
+
+; a sound as a form. a longer way to write the same example, but now parameterizable.
+{
+    :rate1      .4           ; Hz
+    :rate2      [8 7.23]     ; Hz
+    :depth1     24           ; semitones
+    :depth2     3            ; semitones
+    :center     80           ; semitones
+    :db         -28          ; dB
+    :delay      .2           ; seconds
+    :maxdelay   0            ; seconds
+    :decay      4            ; seconds
+    :out        \o[
+                    o.center
+                    o.rate1 0 lfsaw o.depth1 * +
+                    o.rate2 0 lfsaw o.depth2 * +
+                    nnhz 0 sinosc o.db dbamp *
+                    o.delay o.maxdelay o.decay combn
+                ]
+} = analog_bubbles
+
+analog_bubbles.out play
+
+{analog_bubbles :rate1 -.2 :decay 8}.out play	; change parameters
+
+analog_bubbles.out +/ 5 T 100 0 sgram		; plot spectrogram. +/ to mix to mono
+
+;;;; moto rev
+.2 0 11 31 lfo [0 3c] .1 lfpulse 1h .1 rlpf .4 clip2 play
+
+;;;; sample and hold liquidities
+\[	1 2h xmousex aa 1/ = ckt
+	0 impulse = ck
+	1h 8k xmousey = f
+	f .5 * white f + ck sah 0 sinosc ck 1.2 ckt * decay .1 ckt * lag * 1 rand2s ck seq pan2
+	aa .3 0 2 combn +
+] ! play
+
+;; more verbose:
+\[
+	1 2h xmousex = clockRate
+	clockRate 1/ = clockPeriod
+	clockRate 0 impulse = clock
+	1h 8k xmousey = centerFreq
+	((.5 1.5 rands) clock seq) (centerFreq clock sah) * = freq
+	(clock (1.2 clockPeriod *) decay) (.1 clockPeriod *) lag = amp
+	(1 rand2s) clock seq = panpos
+	(freq 0 sinosc) amp * panpos pan2 = in
+	(in .3 0 2 combn) in + aa pr cr
+] ! play
+
+;;;; sweepy noise
+(3c 2X white) ((4 60 xmousex 0 lfsaw) 1.2 + (2h 8k xmousey) *) 2m lag .1 rlpf aa .3 0 2 combn + play
+
+\[
+	4 60 xmousex = rate
+	2h 8k xmousey = centerFreq
+	rate 0 lfsaw = lfo
+	(lfo 1.2 + centerFreq *) 2m lag = fc
+	3c 2X white = in
+	in fc .1 rlpf aa .3 0 2 combn +
+] play
+
+
+
+;;;; sweepy noise as a form
+{
+	:rate1		4		; hz
+	:rate2		60		; hz
+	:freq1		2h		; hz
+	:freq2		8k		; hz
+	:rq			.1		; 1/Q
+	:delay		.3		; seconds
+	:maxdelay	0		; seconds
+	:decay		2		; seconds
+	:out		\o[
+					(3c 2X white)
+					((o.rate1 o.rate2 xmousex 0 lfsaw) 1.2 + (o.freq1 o.freq2 xmousey) *) 2m lag
+					o.rq rlpf softclip aa o.delay o.maxdelay o.decay combn +
+				]
+} = sweepy
+
+sweepy.out play
+
+{sweepy :rate1 -.1  :rate2 -30 :freq1 2h :rq .02 }.out play
+
+
+;;;; lots of sine lfos
+((.027 0 .05 .2 xlfo) 0 40 4k xlfo) [-.2 .2] + 0 saw    (.17 0 1h 6k xlfo) .1 rlpf   (.041 0 2 20 xlfo) [0 .25] sinosc biuni *    .2 *  .3 0 3 combn  play
+
+
+;;;; hell is busy
+\[ ((4h 2k rand) 0 sinosc) ((1 11 rand) 0 (0 .7 rand) lfpulse) 4m lag 4c * * rpan2 4 quadenv *] .5 1 2 ola play
+
+;; hell is busy - as a form
+
+; create a base sound
+{
+        :freq   1k      ; hz
+        :rate   4       ; hz
+        :duty   .3      ; 0 to 1
+        :db     -28     ; dB
+        :dur    4       ; seconds
+        :out    \o[
+                	(o.freq 0 sinosc) (o.rate 0 o.duty lfpulse) 4m lag (o.db dbamp) * * rpan2 (o.dur quadenv) *
+        		]
+} = busytone
+
+; play the base sound
+busytone.out play
+
+; create a texture by overriding some fields with streams
+{ busytone
+        :freq 4h 2k rands @
+        :rate 1 11 rands @
+        :duty 0 .7 rands @
+}.out .5 1 2 ola play
+
+; The @ operators cause the form to expand to a stream of forms.
+; The . operator will evaluate the 'out' field of each form in the stream creating a stream of stereo pairs.
+; This stream is then played by ola.
+
+
+
+;;;; pond life
+\[((20 50 rand 0 sinosc 1h 4h rand 5h 25h linrand *+) 0 sinosc) (((3 1 9 rand /) 0  (.2 .5 rand) lfpulse) 4m lag 4c *) * rpan2] 8 4 8 2 oltx play
+
+;;;; pulse width modulation and resonant filter
+(((#[48 54 64] cyc 4 1 steps) [0 .5] +) 0 (.2 urand sinosc .98 * biuni) pulse) ((.14 urand sinosc) 100 6k biexp) .1 rlpf .3 * .27 0 2 combn play
+
+;;;; scratchy
+.5 2X brown .49 - 0 | 20 * 5k 1 rhpf play
+
+;;;; rain
+\[2 .2 dust2 .25 decay .05 lfnoise3 8h 13k biexp .18 bpf .08 lfnoise3 pan2 .08 .01 apverb6] 16 X +/ .01 2X pink + .005 2X brown + play
+
+;;;; chorusing saws
+\[ 30 100 irand nnhz = f  \[\[.995 1.005 rand f *] 2X urand lfsaw .04 *] 10 X +/ 8m lag] 4 4 4 2 oltx = a a [.5 .47] 0 4 combn a reverse + play
+
+\[ 30 100 irand nnhz = f  \[\[.995 1.005 rand f *] 2X urand   saw .04 *] 10 X +/ 8m lag] 4 4 4 2 oltx = a a [.5 .47] 0 4 combn a reverse + play
+
+;;; hard sync sawtooth with LFO
+\[ 30 80 irand nnhz = f (f [0 .2] +) (.2 urand sinosc 1 5 bilin f *) ssaw .05 *] 4 4 4 2 oltx aa .3 0 4 combn reverse + play
+
+;;;; bang on a can
+\[32 = n 4 10 xrand urand impulse .2 2 xrand urand .1 .5 rand lfpulse * n 30 6k nrands .5 2 xmousex * n .1 1 nrands n .1 4 nxrands klank ] 5X splay 12m lag .1 * play
+
+;;;; rocks on rails
+\[ 20 = p (1h 4m dust) (8 3k 3h xline) .2 resonz (p 2h 32h nlinrands) 1 (p .2 1.2 nrands) klank 8 rsweeppan2] 2 3 4 2 oltx .2 * play
+
+;;;; bouncing lightbulbs, pencils, cans and other assorted objects
+\[ 4 = n (4 3 7 rand 6h xline 0 impulse 4 9c 9u xline * 1m decay) (n 4h 84h nrands) (n nurands) (n .01 .11 nrands) klank rpan2 3 1m fadeout] .6 1.2 randz 1 2 ola play
+
+\[ 6 = n (5 3 7 rand 6h xline 0 impulse 5 9c 9u xline * .1m 1m decay2) (n 2h 12k nxrands) (n nurands) (n .01 1 nrands) klank rpan2 4.5 1m fadeout] .4 1.8 randz 1 2 ola play
+
+\[`nrands = n 4 5 6h xline 0 impulse 4 9c 9u xline * 1m decay 4 4h 8k n 4 0 1 n 4 1c .11 n klank rpan2 3 1m fadeout] .9 1 2 ola play;tweet
+
+;;;; various rhythms with the above timbre
+\[ 4 = n (#[1 2 3 4 6 8] pick 0 impulse .4m 4m decay2 3c 9c rand *) (n 4h 84h nrands) (n nurands) (n .02 .21 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola play
+
+\[ 4 = n (#[1 1 0 0 0 0 0 0] muss cyc 8 0 impulse iseq .4m 4m decay2 6c *) (n 4h 84h nrands) (n nurands) (n .02 .21 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola play
+
+\[ 4 = n (3/8 coinz 8 0 impulse iseq .4m 4m decay2 6c *) (n 4h 84h nrands) (n nurands) (n .02 .21 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola play
+
+\[ 4 = n (3/8 coinz 12 N cyc 8 0 impulse iseq .4m 4m decay2 6c *) (n 4h 84h nrands) (n nurands) (n .02 .21 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola play
+
+\[ 4 = n (3/8 coinz [3 4 6 8 12] pick N cyc 8 0 impulse iseq .4m 4m decay2 6c *) (n 4h 84h nrands) (n nurands) (n .02 .21 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola play
+
+\[ 4 = n (3/8 coinz [4 8 16] pick N cyc 8 0 impulse iseq 2m 4m decay2 1c *) (n 2h 24h nxrands) (n nurands) (n .02 .41 nrands) klank rpan2 12 1m fadeout] 2 1 2 ola aa 5c 2 apverb6 -.3 fade2 play
+
+;;;; klang -- lots of sines.
+\[60 = n \[n 40 10k nlinrands 1 n / 0 klang] 2X] 4 4 2 xftx play
+
+;;;; klank - bank of resonators excited by impulses
+\[15 = p (.7 4c dust) (p 80 10k nlinrands) (p 1 nrand2s) (p .2 8.2 nrands) klank rpan2] 6 6 5 2 oltx play
+
+;;;; klank - excited by noise bursts
+\[8 = p .6 1m dust 3.1 decay white = s \[s (p 80 10k nlinrands) (p 1 nrand2s) (p .2 8.2 nrands) klank] 2X] 8 8 5 2 oltx play
+
+;;;; klank - excited by noise bursts - longer
+\[8 = p .1 1m dust 3.1 decay white = s \[s (p 80 7k nlinrands) (p 1 nrand2s) (p 6.2 12.2 nrands) klank] 2X] 16 16 6 2 oltx play
+
+
+;;;; resonators at random frequencies excited by BrownNoise
+\[32 = p 1m brown = s \[s p 80 10k nlinrands  p 1 nrand2s  p .5 2.5 nrands klank] 2X] 6 6 2 xftx play
+
+
+;;;; gustav tomita
+84 -2 by [0 4 7 11] aa reverse 2ple cyc 24 N + mirror2 cyc nnhz $/ [0 1] @ + @ 1/5 1/8 0 sinosc 2/3 3/2 biexp steps 4c lag 0 saw 1k lpf2 aa 5c 2 apverb6 + .2 * play
+
+;;;; dominant chord arpeggios
+nat @ 0 3 to + $/ [0 4 7 10 12] degkey 48 + 48 N mirror2 0 6 to mirror1 @ + $/ nnhz .1 1 steps 2c lag 0 sinosc 5 ^ .2 * 5c 2 apverb6 play
+
+;;;; analog daze
+\[
+	#[-5 3 0 3 -3 5 2 5] 12 / = pattern
+	\octave clockRate pwmrate fltrate[
+		((pattern octave + ohz cyc (clockRate 0 impulse) seq) 5c lag) 0 (pwmrate urand sinosc .4 * .5 +) lfpulse
+		fltrate urand sinosc 14h * 2k + 1/15 rlpf .1 *  ] = f
+	2 0 impulse .15 decay .3 lfnoise1 6k * 8k + 2X lfnoise0 7c * * ;; "snare"
+	[1 8 .31 .2 f  0 2 .13 .11 f] + = g
+	g .375 0 5 combn g reverse + .5 *
+] = daze
+daze play
+
+;;;; choip choip choip
+\[
+	12 = t
+	\[
+		(t 1 30 xrxline) 0 impulse = impulses
+		(t 6h 8k xrxline) = freq
+		(t 1c .5 xrxline) impulses * 1c .2 decay2 (impulses 5c .5 decay2 -.9 freq * * freq +) 0 sinosc * t rsweeppan2
+	] t 2 - 1 8 2 oltx 5c 4 apverb4
+] = choip
+choip play
+
+choip +/ 20 T 100 0 sgram
+
+;;;; deep trip
+\[\[
+	0 .3 rand lfnoise1 5 * 5/6 + ohz = freq
+	(0 8 rand lfnoise1) (0 40 rand 0 sinosc) .1 * * 0 | (0 .5 rand freq * lfnoise3) * = amp
+	(freq 0 sinosc) amp * (0 5 rand lfnoise1) pan2 = s
+	\[ s \[.2 .5 rand] 2X 0 20 combn] 2X +/ s +
+] 12 4 4 2 oltx] = deep-trip
+deep-trip play
+
+deep-trip +/ 30 T 100 0 sgram
+
+\[\[
+	0 .3 rand lfnoise1 5 * 5/6 + ohz = freq
+	[(freq 0 sinosc)  (0 .5 rand freq * lfnoise3) (0 8 rand lfnoise1) (0 40 rand 0 sinosc) .1] */ (0 5 rand lfnoise1) pan2 = s
+	\[ s \[.2 .5 rand] 2X 0 20 combn] 2X +/ s +
+] 12 4 4 2 oltx]  = deep-trip-2
+deep-trip-2 play
+
+
+;;;; fast LFOs with slow beats
+\[
+	40 240 rand = a0   a0 brand + = a1
+	[a0 a1] = a   0 2k rand = b   [a0 brand +  a1 brand +] = c
+	a 0 sinosc urand b * * b + 0 sinosc  c 0 sinosc 5c * 5c + *
+] 8 4 4 2 oltx play
+
+;;;; reverberated sine percussion
+\[ 10 = d  7 = c
+	\[2 d / .2 dust 2h 32h rand .003 resonz] d X +/ = s
+	(s .048 aa delayn) (c 0 .1 nrands lfnoise1 4c * 5c +) .1 15 combl +/ 5c 1 apverb4 .2 * s +
+] = rsp
+rsp play
+
+;;;; resonators tuned in a harmonic series with pitch ratios from a just scale
+\[
+	12 = p
+	1m brown = source
+	\[ji-major pick 120 * = freq  \[source ((p 1 1 nby freq *) (p .5 nrand2s) +) (p 1 1 nby 1/) (p .5 4.5 nrands) klank] 2X] 1 7 2 xftx
+] = all-harm-klank .3 *
+all-harm-klank play
+
+;;;; similar to above, but tuned to odd harmonics only, shorter ring times, and using a different noise source
+\[
+	12 = p
+	8k lfnoise3 1m * = source
+	\[ji-major pick 120 * = freq  \[source ((p 1 2 nby freq *) (p .5 nrand2s) +)  (p 1 2 nby 1/) (p .2 1 nrands)  klank] 2X] 1 7 2 xftx
+] = odd-harm-klank
+odd-harm-klank play
+
+;;;; cymbalism
+\[ 15 = p
+	5h 25h rand = f1   5h 8k rand = f2
+	.5 3.5 rand 0 impulse 4m decay 3c white * = source
+	\[source (p f1 f1 f2 + nrands) 1 (p 1 5 nrands) klank] 2X
+] 4 4 2 xftx .25 * play
+
+;;;; synthetic piano
+\[
+	6 36 90 nirands sort @ \pch
+	[3k lfnoise3 (.1 .5 rand urand impulse .1 * 8m 4c decay2) * (pch [-2c 0 1c] + nnhz 1/) aa 6 combl +/] ! splay
+] ! play
+
+
+\[
+	12 36 90 nirands sort @ \pch
+	[3k lfnoise3 (.05 .25 rand urand impulse .1 * 8m 4c decay2) * (pch [-2c 0 1c] + nnhz 1/) aa 6 combl +/] ! splay
+] ! play
+\[
+	24 36 90 nirands sort @ \pch
+	[3k lfnoise3 (.025 .125 rand urand impulse .1 * 8m 4c decay2) * (pch [-2c 0 1c] + nnhz 1/) aa 6 combl +/] ! splay
+] ! play
+
+
+;;;; uplink
+\[
+	\[
+		\[(0 20 rand 0 urand lfpulse) (0 4 rand 0 urand lfpulse 0 8k rand * 0 2k rand +) *] 2X +/ = freq
+		freq 0 .5 pulse 4c *  .8 rand2 pan2
+	] 4 1 5 2 oltx
+] = uplink
+uplink play
+
+\[
+	\[
+		\[(0 40 rand 0 urand lfpulse) (0 8 rand 0 urand lfpulse 0 12k rand * 40 4k xrand +) *] 2X +/ = freq
+		freq 0 1c 99c rand pulse 4c *  .8 rand2 pan2
+	] 4 1 5 2 oltx
+] = uplink
+uplink play
+
+;;;; data space
+\[
+	\[
+		\[(0 100 rand 0 urand lfpulse) (0 40 rand 0 urand lfpulse 0 8k rand * 0 2k rand +) *] 3X +/ = freq
+		freq 0 .5 lfpulse 4c *  0 3 rand lfnoise0 .8 * 4m lag pan2  .1 .35 rand aa 3 combl
+	] 6 1 4 2 oltx
+] = data-space
+data-space play
+
+;;;; tremulate
+
+\[
+	5h 9h xrand = f
+	30 90 xrand = r
+	[1/1 6/5 3/2 9/5] f * 0 sinosc r 4X lfnoise3 0 | .2 * * brands pan2 +/
+] 2 .5 2 xftx .1 .1 1 combn play
+
+;;;; clapping music - steve reich
+([1 1 1 0 1 1 0 1 0 1 1 0] 12 ncyc [(13 0s) (0 -12 to)] rot @ $/ @) (5.6 0 impulse) iseq .1m 8c decay2 2 * white [1k 8h] .2 bpf [-1 1] 1m itd +/ play
+
+
+;;;; birdies
+\[ ((\[.4 .5 rand 0  .1 .9 rand lfpulse 4 7 rand *] 2X +/ 2 +) 0 lfsaw (-1k -1.8k rand)(28h 52h rand) *+ 5c lag) 0 sinosc  (.2 .7 rand) 0 .4 lfpulse 2c * .3 lag * rpan2] 7 4 4 2 oltx 2c 1.5 apverb4 play
+
+;;;; babbling brook
+\[ \a b c d [ \[(1 brown)(1 brown a lpf b c *+) 3c rhpf d *] 2X] = f  (10 2h 4h 6m f) (14 4h 8h 10m f) +] ! play
+
+;;;; alien meadow
+\[(0 20 rand 0 sinosc) 0 5k rand aa .1 * ba *+ 0 sinosc 0 20 rand 0 sinosc 5c aa *+ * rpan2] 6 2 6 2 oltx play
+
+;;;; saucer base
+\[0 20 rand 0 sinosc 0 1k rand aa 1.1 * *+ 0 sinosc 0 5k rand aa 1.1 * *+ 0 sinosc .1 * rpan2] 6 2 4 2 oltx play
+
+;;;; tarmac
+\[
+	\a b [[1 0][a b]?] = c  ; make a boolean array
+	[1 2 c 2 1 c 2 2 c 3 3 c 3 5 c 4 4 c 5 3 c 6 10 c] @ Z = beats
+	\[
+		8 0 impulse = i
+		5c .5 rand = d
+		(beats pick muss cyc i iseq) 4m d decay2 = env
+		((0 3 rand lfnoise1 .8m * 2.2m + pink)(4 50 4k nlinrands)1(4 .2 12 nrands)klank randsign) (i 4m d decay2 0 5k rand * 1h 2h rand +) .2 rlpf  urand lfnoise1 pan2 env *
+	] 12 3 6 2 oltx 4c 16 apverb4
+] = tarmac
+tarmac play
+
+;;;; bowed garage door springs
+\[ (0 3 rand lfnoise1 .4m * 1.1m + pink) (4 50 2k nrands)1(4 .2 12 nrands) klank abs randsign urand lfnoise1 pan2] 8 3 4 2 oltx 4c 16 apverb6 play
+
+;;;; sawed cymbals
+\[
+	15 = p
+	\[
+		1k 3k xrand = f1
+		f1 f1 8k + rand = f2
+		12 0 6h rxline 0 lfsaw .2m * = in
+		\[p f1 f2 nrands] 2X = freqs
+		\[p 2 6 nrands] 2X = ringTimes
+		in freqs @  1  ringTimes @  klank
+		in freqs @  1  2c klank -
+	] 4 4 3 2 oltx
+] ! play
+
+;;;;
+
+\[
+	15 = p
+	\[
+		2h 3k xrand = f1
+		f1 f1 4k + xrand = f2
+		12 0 6h rand 0 6h rand xline 0 lfsaw .1m * = in
+		\[p f1 f2 nrands] 2X = freqs
+		\[p 2 6 nrands] 2X = ringTimes
+		in freqs @  1  ringTimes @  klank
+		in freqs @  1  2c klank - tanh .7 *
+	] 4 4 3 2 oltx tanh 5c 5 apverb6
+] ! play
+
+
+;;;; sawed cymbals 2
+\[
+	15 = p
+	\[
+		2h 3k xrand = f1
+		f1 f1 4k + xrand = f2
+		12 0 6h rxline 0 lfsaw .1m * = in
+		\[p f1 f2 nrands] 2X = freqs
+		\[p 2 6 nrands] 2X = ringTimes
+		in freqs @  1  ringTimes @  klank
+		in freqs @  1  2c klank - tanh .7 *
+	] 4 4 3 2 oltx tanh
+] ! play
+
+;;;; unusual cymbals
+\[
+	24 = p
+	\[
+		2h 3k xrand = f1
+		f1 f1 4k + xrand = f2
+		12 .3 12 xrxline 0 impulse 1c * = in
+		\[p f1 f2 nrands] 2X = freqs
+		freqs 2 rand2s + = freq2s
+		\[p 1 5 nxrands] 2X = ringTimes
+		\[p 8m .5 nxrands] 2X = atkTimes
+		in freqs @  1  ringTimes @  klank
+		in freq2s @  1  atkTimes @ klank - tanh .7 * un2 .8 rand2 bal2
+	] 4 4 6 2 oltx tanh
+] ! play
+
+;;;; ostinoodles
+\[ 	6 irand2 81 + = root  #[0 2 4 5 7 9 11 12] = major
+	\[ #[0 1 2 3] 16 irand2 + muss major degkey root + nnhz cyc = sequence
+	12 4 24 xrxline 0 impulse = trig
+	(sequence trig seq 0 sinosc ^5) (trig 4m .3 decay2 5c *) *  rpan2] 6 3 6 2 oltx 4c 6 apverb6
+] ! play
+
+\[ 	6 rand2 81 + = root  #[0 2 4 5 7 9 11 12] = major
+	\[ 4 0 6 nirandz 16 irand2 + major degkey root + nnhz cyc = sequence
+	12 4 24 xrxline 0 impulse = trig
+	(sequence trig seq 0 sinosc ^5) (trig 4m .3 decay2 5c *) *  rpan2] 6 3 6 2 oltx 4c 6 apverb6
+] ! play
+
+\[ 	6 rand2 78 + = root  8 16 to 8 / log2 12 * = harmonics
+	\[ [3 4 6 8] pick 0 8 nirandz 4 [0 0 0 0 1 2 -1 -2] npicks @ + $/  20 irand2 + harmonics degkey root + nnhz cyc = sequence
+	[.25 .5 .75 1 2 3 4 6 8] pick 0 impulse = trig
+	(sequence trig seq 0 .1 .5 rand pulse 1k 4k rand lpf2) (trig 1m 2c xrand .2 1.6 rand decay2 5c *) *  rpan2] 8 8 8 2 oltx 4c 8 apverb6
+] ! play
+
+\[ 	6 rand2 78 + = root  8 16 to 8 / log2 12 * = harmonics
+	\[ [4 8] pick 0 8 nirandz 4 [0 0 0 0 1 2 -1 -2] npicks @ + $/  20 irand2 + harmonics degkey root + nnhz cyc = sequence
+	[.25 .5 1 2 4 8] pick 0 impulse = trig
+	(sequence trig seq 0 .1 .5 rand pulse 1k 4k rand lpf2) (trig 1m 2c xrand .2 1.6 rand decay2 5c *) *  rpan2] 8 8 8 2 oltx 4c 8 apverb6
+] ! play
+
+\[ 	6 rand2 78 + = root  1 16 to 8 / log2 12 * = harmonics
+	\[ [4 8] pick 0 8 nirandz 4 [0 0 0 0 1 2 -1 -2] npicks @ + $/  20 irand2 + harmonics degkey root + nnhz cyc = sequence
+	[.25 .5 1 2 4 8] pick 0 impulse = trig
+	(sequence trig seq 0 .04 .96 rand pulse .6 lfnoise3 4h 8k biexp .1 .4 rand rlpf2) (trig 1m 2c xrand .2 1.6 rand decay2 5c *) *  rpan2] 8 8 8 2 oltx 4c 8 apverb6
+] ! play  ;;;; ***
+
+\[ 	6 rand2 66 + = root  1 16 to 8 / log2 12 * = harmonics
+	\[
+		[4 8] pick 0 8 nirandz 4 [0 0 0 0 1 2 -1 -2] npicks @ + $/  24 irand2 + harmonics degkey root + nnhz cyc = sequence
+		[.125 .25 .5 1 2 4 8 16] [2 3 4 5 5 4 3 2] sumto1 wpick 0 impulse = trig
+		(sequence trig seq 0 .15 lfnoise3 .96 * pulse .6 lfnoise3 4h 8k biexp .1 .4 rand rlpf2) (trig 1m 2c xrand .2 1.6 rand decay2) *
+		.3 lfnoise3 .1 * + .3 lfnoise3 .5 32 biexp * tanh 5h 8k xrand lpf1 5c * rpan2
+	] 8 8 8 2 oltx
+	[.5 .5] lfnoise3 3m * 3m flange 4c 8 apverb6
+] ! play   ;;; modulate all the things at once
+
+
+\[ 	6 rand2 78 + = root  8 16 to 8 / log2 12 * = harmonics
+	\[ [3 9] pick 0 8 nirandz [3 6] pick [0 0 0 0 1 2 -1 -2] npicks @ + $/  20 irand2 + harmonics degkey root + nnhz cyc = sequence
+	[1/9 1/3 1 3 9] pick 0 impulse = trig
+	trig 1m 2c xrand .2 1.6 rand decay2 = env
+	(sequence trig seq 0 .1 .5 rand pulse 1k 4k rand env * 1h + .3 rlpf) (env 5c *) *  rpan2] 9 9 9 2 oltx 4c 8 apverb6
+] ! play
+
+\[ 	6 rand2 78 + = root  8 16 to 8 / log2 12 * = harmonics
+	\[ 3 6 irand 0 8 nirandz 2 8 irand [0 0 0 0 0 0 1 2 -1 -2 3 -3] npicks @ + $/  20 irand2 + harmonics degkey root + nnhz cyc = sequence
+	[.25 .5 .75 1 2 3 4 6 8 12] pick 0 impulse = trig
+	trig 1m 2c xrand .2 1.6 rand decay2 = env
+	(sequence trig seq 0 .1 .5 rand pulse 1k 4k rand env * 1h + .2 .7071 rand rlpf) (env 5c *) *  rpan2]
+	16 8 8 2 oltx 4c 8 apverb6
+] ! play
+
+;;;; contamination zone
+\[ 	8h 8k xrand = f
+	0 3 rand lfnoise1 .8m * 2.2m + pink = source
+	(source (4 50 2k nrands)1(4 .2 .4 nrands)() klank abs randsign) (0 1 linrand 0 sinosc .7 f * * f +) .1 rlpf urand lfnoise1 pan2 (0 15 linrand 0 .2 .4 rand lfpulse 4m lag) *
+] 8 3 4 2 oltx 4c 15 apverb6 play
+
+;;;; ritual hymn in praise of the god of the LS-3000 life support unit.
+\[ 20 = n \[ \[(n -36 24 nirands) 12 / ohz n 5 nrand2s +] 3X $/ 1  3 n * 0 2pi nrands klang .2 n / *] 2X ] 4 4 2 xftx play
+
+;;;; the church of chance
+\[
+	8 = n ; number of notes
+	[1 2 4 5 6] = h ; harmonics
+	[0 2 4 5 7 9] = s ; scale pitches
+	\[
+		24 35 irand = k ; root pitch
+		n s npicks n 0 5 nirands 12 * + k + nnhz @ h * $/ = freqs
+		\[freqs .4 rand2z +] 2X @ 1 freqs size 0 2pi nrands klang .1 n / *
+	] 6 3 2 xftx
+] ! play
+
+
+;;;; modal space
+\[
+	((-7 22 mousex floor) #[0 2 3 5 7 9 10 12] degkey 72 + 3 2X lfnoise1 4c * + nnhz 0 sinosc .1 *) ;; lead
+	([48 55] nnhz 0 .15 lfpulse  .1 0 sinosc 10 72 *+ nnhz .1 rlpf .1 *) ;; drone
+	+ aa .31 0 2 combn +
+] ! play
+
+;;;; modal space - sin^5 + lag
+\[
+	(-7 22 mousex floor #[0 2 3 5 7 9 10 12] degkey 60 + 3 2X lfnoise1 4c * + nnhz [.1 .2] lag2 0 sinosc ^5 .1 *) ;; lead
+	([48 55] nnhz 0 .15 lfpulse  .1 0 sinosc 10 72 *+ nnhz .1 rlpf .1 *) ;; drone
+	+ aa .31 0 2 combn +
+] ! play
+
+;;;; noise modulated sines
+\[ 60 1h irand nnhz = f  [0 .2] f + 0 sinosc  [.15 .16] f * lfnoise3 .1 * *] 4 4 4 2 oltx aa .5 0 1 combn reverse + play
+
+;;;; noise modulated sawtooths
+\[ 60 1h irand nnhz = f  [0 .2] f + 0 lfsaw  [.15 .16] f * lfnoise3 .1 * *] 4 4 4 2 oltx aa .5 0 1 combn reverse + play
+
+;; harmonic arpeggio
+1 16 toz 64 * cyc .1 1 steps \[\[.4 rand2] 2 X] 7 X + 0 saw +/ .05 0 sinosc 3000 * 3300 + .3 rlpf2 .01 * .3 0 2 combn play
+
+;;;; splay bells
+16 \n[1c 0 sinosc .45 * .55 + ^2 .2 n X dust 2 decay 3m lag2 n 2h 2k expdiv 0 sinosc * 8m splayd]! play
+
+;;;; jitter beats
+((5 .8 -.1 nby .03 6 X $ coinz) ([1 .5][5 6] ?) * @) 1.1 ((5 1 2 ngrow) 16 6 X $ @) imps (5 1.6 .5 ngrow .9 6 X $ 3 *) decay 4m lag 1 11 to 64 * 0 sinosc ^3 * brands 11 N .7m itd +/ .3 * play
+
+((5 .8 .3 lindiv .02 6 X $ coinz) ([1 .5][5 6] ?) * @) 1.1 ((0 4 to exp2) 16 6 X $ @) imps (5 5 .5 ngrow 2 6 X $) decay 4m lag 1 11 to 64 * 0 sinosc ^5 * brands .7m itd +/ .2 * play
+
+;;;; bowed pipes
+2 20 to 120 * @ \f [.3 2X brown 1k lpf2 .6 lfnoise3 3m * 3m flange .025 .25 xrand urand 1c lfpulse * f recip aa -8 f 8 * lpcombc] ! +/ .04 * play
+
+2 20 to 120 * @ \f [.3 2X brown .6 lfnoise3 3m * 3m flange .01 .2 xrand urand .0031 lfpulse * f recip aa -3 f 6 * lpcombc] ! +/ .04 * play
+
+2 20 to 120 * @ \f [.3 2X brown .6 lfnoise3 3m * 3m flange .2 4 xrand 0 .2 lfpulse * f recip aa -3 f 6 * lpcombc] ! +/ .04 * play
+
+2 20 to 120 * @ \f [.3 2X brown .6 lfnoise3 3m * 3m flange .1 1 xrand urand .04 lfpulse * f recip aa -3 f 6 * lpcombc] ! +/ aa .8 aa delayn 3k lpf + .04 * play
+
+1 16 to 80 * @ \f [.3 2X brown .6 lfnoise3 3m * 3m flange 1c .3 xrand urand .1 .02 rand lfpulse * f recip aa -3 f 6 * lpcombc] ! +/ aa 2 aa delayn 3k lpf + .04 * play
+
+1 16 to 60 * @ \f [.3 2X brown un2 rbal2 .6 lfnoise3 3m * 3m flange 1c .1 xrand urand .05 .01 rand lfpulse * f recip aa -3 f 6 * lpcombc] ! +/ aa 2 aa delayn 3k lpf 8h lpf1 + aa 5c 3 apverb6 .5 fade2 .02 * play
+
+;;;; random pitches
+1 48 ilinrandz 1 48 ilinrandz &  50 * brandz + 1 8 steps [0 1] + 0 saw  6/8 0 12 combn .2 * play
+
+;;;; flange pipe
+.3 2X brown .6 lfnoise3 3m * 3m flange 300 [0 1] + recip aa -3 3k lpcombc .0625 * play
+
+;;;; fifth tube
+.2 2X pink .7 0 .5 lfpulse 1/300 1/200 unilin .05 -2 5k lpcombc .08 0 2 combn play
+
+;;;; harmonic clouds
+\[ 30 4000 xrand 64 round = f f 1 2X rand2 + 0 saw 1 6 rand f * lpf2 8 octenv * .04 * ] .4 1 2 ola play
+
+;;;; harmonic clouds 2
+\[ \[30 4000 xrand 40 round = f f 1 2X rand2 + 0 saw 1 6 rand f * lpf2 ] 6 X +/ [2.4 .4 aaa] pick octenv * .04 * ] .2 1 2 ola .04 aa .3 alpasn play
+
+;;;; harmonic clouds 3
+\[ \[30 4000 xrand 40 round = f f 1 2X rand2 + 0 saw 1 6 rand f * lpf2 ] 6 X +/ [2.4 .4 aaa] pick octenv * .04 * ] #[.1 .2 .4] pickz 1 2 ola play
+
+;; construct Harry Partch's 43 tone scale and play it in ascending order.
+#[1 3 5 7 9 11] aa @ / $/ #[81/80 33/32 21/20 16/15 32/27 21/16 27/20] aa 1/ $ $  log2 frac exp2 sort change mirror0 3h * .4 2X rand2z + @ 3 0 impulse seq 0 saw .15 *  play
+
+;;;; drone
+[1h 2h 3h] .5 *.5 2X 3X rand2 + 0 sinosc ^7 [7 6 5] 2 * 1/ urands sinosc & [.3 .15 .1] * +/ .1 0 .1m 4m lfo 4m flange .067 0 5h 6k lfo .1 rlpf aa .3 0 3 combn +  play
+
+[1h 2h 3h] .5 *.5 2X 3X rand2 + 0 sinosc ^7 [7 6 5] 2 * 1/ 0 sinosc & [.3 .15 .1] * +/ .1 0 .1m 4m lfo 4m flange .067 0 1k 12k lfo .2 rlpf aa .3 0 3 combn +  play
+
+;;;; plectra dances
+\[1 8 irandz 4 N 0 6 irandz 8 N @ + $/ cyc] 3 X [40 80 160] .2 rand2z + * @ 1 [1.5 3 6]@ steps 0 saw [1.5 3 6] 0 impulse [3 1.5 .75] decay 8m lag * 3 1 nrand2s 5m  itd +/ aa .33 0 4 combn + .1 * play
+
+\[1 8 irandz 4 N 1 6 irandz 8 N @ + $/] 3 X [40 80 160] .2 rand2z + * cyc @ 1 [1.5 3 6]@ steps 0 saw 3k lpf [1.5 3 6] 0 impulse [3 1.5 .75] decay 8m lag * +/ aa .3 0 1 combn + .1 * play
+
+;;;; plucking
+\[6k lfnoise3 #[0 1 0] -3 #[4m 2c] 1 curves * 7 0 ilinrand 8 choff] #[.1 .2] pickz 1 8 ola 1 8 to 100 * 1/ aa 5 8k lpcombc .2 * 4m splayd play
+
+\[6k lfnoise3 #[0 1 0] -3 #[4m 2c] 1 curves * 0 7 irand 8 choff] #[.1 .2 .4 .8]#[8 4 2 1] sumto1 wpickz 1 8 ola 1 8 to 100 * 1/ aa 5 8k lpcombc .2 * 4m splayd play
+
+;;;; mouse control of filter
+400 [1/1 5/4 7/5 7/4] 2m ldv * 0 saw brands pan2 +/ 200 12k xmousex lpf play
+
+;;;; data anomalies
+\[ 0 .2 rand 2 X white 1m 10m rand T @ 1 8 linrand ncyc 0 2 X white 1m 10m rand T $$ @ 1 3 rand ncyc ] 20 X flop @ $/ play
+
+\[\[ 0 .2 rand 2 X white .1m 3m rand T @ 1 20 linrand ncyc 0 2 X white .1m 8m rand T $$ @ 1 20 rand ncyc ] 1 3 rand X $/ @ 1 4 rand ncyc ] 80 X flop @ $/ 2k 1 bpf play
+
+\[
+	\[
+		0 .2 rand 2 X white .1m 8m linrand T ;; short bit of stereo random amplitude white noise
+
+		@ 1 10 linrand ncyc  ;; cycled some number of times
+		0 2 X white .1m 8m linrand T  ;; short bit of silence
+		$$ @ 1 10 rand ncyc ;; concatenate and cycle that
+		\[3h 8k xrand] 2X .3 bpf
+	] 1 3 rand X $/ @ 1 4 rand ncyc
+] 1k X flop @ $/ aa 5c 4 apverb6 .5 fade2 play
+
+\[\[
+	8m 80m xrand = s
+	\[
+	\[
+		[\[0 .2 rand 2X white .1m 8m linrand T @ 1 10 linrand ncyc]
+		\[\[1h 4k xrand] 2X 0 sinosc 0 3 ilinrand 2 * 1 + ^ 0 .2 rand * 1m 50m xrand T]
+		\[\[1h 1k xrand] 2X lfnoise3 0 .2 rand * 1m 50m xrand T]
+		] [.45 .35 .2] wpick !
+
+		0 2 X white .1m s xrand T  ;; short bit of silence
+		$$ @ 1 10 rand ncyc ;; concatenate and cycle that
+		= x .1 coin \[ x \[.1 1 xrand 3h 4k xrxline hang] 2X .05 .7 xrand bpf 2 *]\[x] if
+	] 1 3 rand X $/ @ 1 12 xrand ncyc
+		[\[.1 2 xrand 3h 4k xrxline hang] \[3h 4k xrand]] [.4 .6] wpick 2X .05 .7 xrand bpf
+	] 1 3 rand X 1 12 xrand ncyc $/
+		= x .2 coin \[ .2 2h xrand urand sinosc x * ]\[x] if
+] 1k X flop @ $/
+.41 2X lfnoise3 3m * 3m flangep
+.5 2X lfnoise3 3m * 3m flangep
+aa 5c 4 apverb6 .5 fade2 .7 * tanh ] ! play
+
+;;;; jam
+\[ 256 [.5 .5 1 1 1 2] pick * [1/1 5/4 3/2 15/8 9/4 45/16 27/8] pick * brand 2X + 0 .05 .95 rand [`vsaw `pulse] pick ! #[0 1 0] -2 #[[2m 8m 32m] pick [.25 .5 1] pick] 1 curves = env env 2h 6k xrand * 1h + lpf2 env *] .1 1 2 ola aa .3 0 2 combn + .2 * play
+
+;;;; MIDI control. see help for starting MIDI and connecting a device.
+(1 1 2h 2k xmctl) 0 (1 2 2h 12k xmctl) sawf .2 * play
+(1 1 50 2k xmctl) [1 1.501] * 0 saw +/ (1 2 2h 20k xmctl) (1 3 1 .01 xmctl) rlpf (1 4 .01 4 mctl)  * softclip (1 5 .0001 .5 xmctl) * play
+
+;;;; shepard tone
+\[ 80 = t \[ t 16 16384 xline 0 sinosc ^7 t hanenv * .1 * 2X] 8 1 2 ola 4c 2 apverb6 t T> 1 fadein] ! play
+
+;;;; narrow band filtered Crackle noise
+
+\[
+	[0 1 1 0][2 5 2] 1 lines = e
+	80 2k xrand = rf
+	1 1.2 rand rf * = rf2
+	1.97 2 rand crackle .03 * 9 rf rf2 xline  .2 resonz e * rpan2
+] 1 1 2 ola play
+
+;;;; harmonic swimming
+
+\[
+	50 = f
+	20 = p
+	0 = z
+	60 0 -2c line = offset
+	\i[i f * 0 sinosc 2 2 10 nrands lfnoise1 2c * offset + 0 | * ] p X  +/
+] ! play
+
+;;;; police state ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	4 = n
+	\[2c aa .1 + rand urand sinosc 0 600 rand * 1k 1.3k rand + 0 sinosc 1h 120 rand lfnoise3 .1 * * rpan2] n X +/
+	.4 2X lfnoise3 90 * 620 + lfnoise3 .3 2X lfnoise3 .15 * .18 + *
+	+
+	.3 .3 3 combn
+] ! play
+
+;;;; what was I thinking? ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	.1 0 5c lfpulse 8 0 impulse 500 * * 2 decay 80 | 0 .157 lfnoise1 .4 * .5 + pulse 4c *  .2 lfnoise1 2k * 24h + .2 rlpf = z
+	.6 z * = y
+	\[ \[ y .3 lfnoise1 .01 .06 bilin .06 1 combl ] 2X +/ ] 2X z +
+] ! play
+
+;;;; alien froggies ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	\hi[ 0 hi linrands 0 hi linrands -] = bilinrands
+	.2 bilinrands exp *\ 11 * 1 30 fold = rates
+	rates @  \rate [ .1 .9 rand = p  rate .5 lfsaw 0 p 1/ bilin aa 1 < * = s  s pi * sin sq  2h 3k xrand 0 sinosc * rpan2 ] ! = sounds
+	sounds .5 .25 5 2 oltx .05 *
+] ! play
+
+;;;; strummable guitar ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	#[52 57 62 67 71 76] = pch
+	0 1 mousex = mx
+	\i[
+		((mx i .1 .25 *+ > 0 -^i) 5c decay pink) (pch i at nnhz 1/) aa 4 combl
+	] pch size X splay 12k lpf .997 leakdc
+] ! play
+
+;;;; strummable 12 string guitar ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	#[52 57 62 67 71 76] = pch
+	0 1 mousex = mx
+	\i[
+		i .1 .25 *+ = pos
+		pch i at nnhz 1/ = period
+		((mx pos >  0 -^i) 5c decay pink) period aa 4 combl
+		((mx pos 15m + >  0 -^i) 5c decay pink) period half aa 4 combl +
+	] pch size X splay 12k lpf .997 leakdc
+] ! play
+
+;;;; bidirectional strummable guitar ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	#[52 57 62 67 71 76] = pch
+	pch 7 + = pch2
+	0 1 mousex = mx
+	\i[
+		mx i .1 .25 *+ > 0 -^i = trigger
+		(trigger 0 | 5c decay pink) pch i at nnhz 1/ aa 4 combl
+		(trigger neg 0 | 5c decay brown .5 *) pch2 i at nnhz 1/ half aa -4 combl +
+	] pch size X splay 12k lpf .997 leakdc
+] ! play
+
+
+;;;; strummable metals ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	15 = n
+	0 1 mousex = mx
+	n 3h 8k nlinrands = partials
+	2 1/5 ^ = interval
+	\i[
+		mx i .1 .25 *+ > -^ 0 replacehead = trigger
+		(trigger 5c decay pink 4c *) (partials interval i ^ *) 1 (n 1 4 nrands) klank
+	] 6X splay 12k lpf .997 leakdc .3 *
+] ! play
+
+;;;; Bach, WTC Prelude 1 in C ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	([[60 64 67 72 76][60 62 69 74 77][59 62 67 74 77][60 64 67 72 76]
+	 [60 64 69 76 81][60 62 66 69 74][59 62 67 74 79][59 60 64 67 72]
+	 [57 60 64 67 72][50 57 62 66 72][55 59 62 67 71][55 58 64 67 73]
+	 [53 57 62 69 74][53 56 62 65 71][52 55 60 67 72][52 53 57 60 65]
+	 [50 53 57 60 65][43 50 55 59 65][48 52 55 60 64][48 55 58 60 64]
+	 [41 53 57 60 64][42 48 57 60 63][44 53 59 60 62][43 53 55 59 62]
+	 [43 52 55 60 64][43 50 55 60 65][43 50 55 59 65][43 51 57 60 66]
+	 [43 52 55 60 67][43 50 55 60 65][43 50 55 59 65][36 48 55 58 64]]
+	 @ [0 2] 4 to $/ at @ 2 ncyc
+
+	[[36 48 53 57  60 65 60 57  60 57 53 57  53 50 53 50]
+	 [36 47 67 71  74 77 74 71  74 71 67 71  62 65 64 62]
+	  60 16 X]
+
+	 $ $/ nnhz) = pitches
+
+	.2 = dur
+	pitches size 2 - dur * = susTime
+	2 dur * = fadeTime
+	pitches hang dur 1 steps 3c lag [0 1] + = freq
+	freq 0 saw susTime fadeTime fadeout @ 3 mum $ 1k lpf aa 5c 2 apverb6 + .2 *
+] = bach-prelude
+bach-prelude play
+
+;;;; percussion solo in 10/8 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	[	0 10 X
+		[9 0 0 0 0 0 0 0 0 0] aa
+		[9 0 0 2 0 0 0 2 0 0] aa
+		[9 0 0 2 0 0 0 2 0 2] aa
+	] $/ Z = intro
+	30 [
+		[9 0 0 7 0 2 0 7 0 0]
+		[9 2 0 7 0 2 0 7 0 0]
+		[9 0 0 7 0 2 0 7 0 2]
+		[9 0 0 7 2 2 0 7 0 0]
+		[9 0 0 7 0 2 2 7 2 0]
+		[9 2 2 7 2 2 2 7 2 2]
+		[9 2 2 7 2 2 2 7 0 0]
+		[9 0 0 7 2 2 2 7 0 0]
+		[9 0 4 0 4 0 4 0 4 0]
+		[9 0 0 4 0 0 4 0 4 0]
+		[9 0 2 7 0 2 0 7 0 0]
+		[9 0 0 7 0 0 0 7 0 0]
+		[9 7 7 0 0 2 2 2 0 0]
+		[9 0 0 0 0 0 0 0 0 0]
+	] npicks $/ Z = solo
+	[ [20 0 2 5 0 2 9
+	   15 0 2 5 0 2 9
+	   15 0 2 5 0 2] aaa [50]
+	] $/ Z = tehai
+
+	intro solo tehai 40 0z $ $ $ .1 * = sequence
+	((sequence 8 0 impulse iseq 2m .1 decay2 white) -1 ohz .6 ringz 2 * distort 8c *) ([[0 .04][7 7.04]] 12 / ohz 0 saw +/ 4 ohz lpf 7m *) +
+] = mridangam
+mridangam play
+
+;;;; Berlin 1977 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	2 20 xmousex = clockRate   clockRate 1/ = clockTime   clockRate 0 impulse = clock
+	clock 16 0 pdiv = clock16
+	clock 16 -1 pdiv = clock16b
+	#[-12 -7 -5 0 2 5] 12 / exp2 pickz = roots
+ 	roots clock16 seq = root
+ 	roots clock16b seq = rootb
+	#[-5 0 3 2 0 7 3 -2] 12 / ohz cyc clock seq root * = freq
+	#[-12 -17 -24] 12 / ohz pickz clock16b seq rootb * = freq2
+
+	clock clockTime 5c *  clockTime 2 * decay2 = env1
+	clock16b (clockTime 16 5c * *) (clockTime 16 2 * *) decay2 8c 2c *+ = amp16
+
+	env1   .1 2c *+  = amp
+	env1  .17 0 sinosc * 8h 14h *+ = filt
+
+	(freq 0  8c [0 .25] sinosc .45 .5 *+  lfpulse amp *)  filt  .15 rlpf
+
+	(freq2 0 .12 [0 .25] sinosc .48 .5 *+ lfpulse amp16 *) (.21 0 sinosc 4 8 *+ freq2 *) 7c rlpf +
+
+	aa [.2 .17] 0 2 combn (-1 1 mousey) fade2
+] = berlin77
+berlin77 play
+
+;;;; random events ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	\in [#[0 1 .2 0] -2 #[4m .2 .8] 1 curves in * rpan2] = e
+	[
+		\[0 6 irand 200 600 *+ 0 sinosc .1 * e]
+		\[0 6 irand 100 300 *+ 0 .1 lfpulse .1 * e]
+		\[.05 white e]
+		\[.1 pink e]
+		\[.15 brown e]
+	] picks .2 1 2 ola
+] ! play
+
+;;;; random events - elaborated
+
+\[
+	\in [#[0 1 .2 0] -2 #[4m .2 .8] 1 curves in * rpan2] = e
+	[
+		\[0]
+		\[0 16 irand 200 200 *+ 0 sinosc 40 lfnoise3 * .2 * e]
+		\[0 16 irand 100 100 *+ 0 .1 lfpulse 1k 8k xrand lpf .1 * e]
+		\[0 6 irand 50 50 *+ 0 .4 lfpulse 3h 2k xrand .3 rlpf .15 * e]
+		\[.05 white .002 .01 xrand aa flangep e]
+		\[.2 violet e]
+		\[.25 brown 2h 8h xrand lpf e]
+	] picks [.1 .2 .4 .8] [8 4 2 1] sumto1 wpicks 1 2 ola
+	.3 aa 4 alpasn
+	aa 3c .7 apverb6 -.2 fade2
+] ! play
+
+;;;; random events - elaborated 2
+
+\[
+	\in [#[0 1 .2 0] -2 #[1m 6m rand .2 .8] 1 curves in * rpan2] = e
+	\in [#[0 1 1 0] -2 #[1m 6m rand 5c .1] 1 curves in * rpan2] = e2
+	[
+		\[0]
+		\[0 32 ilinrand 200 200 *+ 0 sinosc 20 80 xrand lfnoise3 * .2 * e]
+		\[0 32 ilinrand 100 100 *+ 0 .1 lfpulse 2k 9k xrand lpf .1 * e]
+		\[0 6 ilinrand 50 50 *+ 0 .4 lfpulse 5h 2k xrand .3 rlpf .15 * e]
+	] [4 4 3 2] sumto1 wpicks [.1 .2 .4 .8] [8 4 2 1] sumto1 wpicks 1 2 ola
+	.3 aa 4 alpasn
+	[
+		\[0]
+		\[.05 white .002 .01 xrand aa flangep e2 8k lpf]
+		\[.2 violet e2]
+		\[.25 brown 2h 8h xrand lpf e2]
+	] [4 4 3 2] sumto1 wpicks [.1 .2 .4 .8] [8 4 2 1] sumto1 wpicks 1 2 ola 1.5 * +
+	aa 3c .7 apverb6 -.2 fade2
+] ! play
+
+;;;; cave drops ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[ 16 0 impulse = clock   2k 12k randz clock seq 0 sinosc clock 2m 4c decay2 * 2 2c 5c nrands 0  2 combn 4 .2 0 line *] ! play
+
+
+\[
+	12 24 1 xline 0 impulse = clock
+	2k 12k randz clock seq 0 sinosc  clock 2m 4c decay2 * = x
+	x \[2c 5c xrand] 2X 0  2 combn
+	x \[2c 5c xrand] 2X 0  2 combn + 12 .2 0 line *
+] ! play
+
+;;;; beat subdivisions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; chromatic beat subdivisions
+\[
+	.3 (1 12 irandz aa 1/ ba ?) 1 imps = t                         ;; lead's clock
+	t  4m .5 decay2 = e 	                                       ;; lead's envelope
+	4 48 72 iwalkz nnhz = p                                      ;; lead's pitches
+	.2 lfnoise3 5h 6k biexp = b                                    ;; lead's brightness
+	p t seq 2c lag [0 .2] +  0 saw  e b * 5h + .25 rlpf e .3 * *   ;; lead
+	.2 #[.5 1] hangz 1 imps 4m .1 decay2 white +                 ;; snare
+	4 1 1 imps 4m 1 decay2 24 nnhz 0 sinosc * distort .7 * +     ;; bass drum
+	aa 4c .5 apverb6 -.6 fade2                                     ;; reverb & wet/dry mix
+] ! play
+
+;; chromatic beat subdivisions - pulse wave
+\[
+	.3 (1 12 irandz aa 1/ ba ?) 1 imps = t                         ;; lead's clock
+	t  4c 2 decay2 = e 	                                           ;; lead's envelope
+	7 36 84 iwalkz nnhz = p                                      ;; lead's pitches
+	.2 lfnoise3 5h 1k biexp = b                                    ;; lead's brightness
+	p t seq 2c lag [0 .2] +  0 .2 pulse  b .25 rlpf e .3 * *       ;; lead
+	.2 #[.5 1] hangz 1 imps 4m .1 decay2 white +                 ;; snare
+	4 1 1 imps 4m 1 decay2 24 nnhz 0 sinosc * distort .7 * +     ;; bass drum
+	aa 4c .5 apverb6 -.6 fade2                                     ;; reverb & wet/dry mix
+] ! play
+
+;; chromatic beat subdivisions - pulse wave - tuplets across two measures
+\[
+	.3 (1 24 irandz aa 1/ *2 ba ?) 1 imps = t                      ;; lead's clock
+	t  4c 2 decay2 = e 	                                           ;; lead's envelope
+	7 36 84 iwalkz nnhz = p                                      ;; lead's pitches
+	.2 lfnoise3 5h 1k biexp = b                                    ;; lead's brightness
+	p t seq 2c lag [0 .2] +  0 .2 pulse  b .25 rlpf e .3 * *       ;; lead
+	.2 #[.5 1] hangz 1 imps 4m .1 decay2 white +                 ;; snare
+	4 1 1 imps 4m 1 decay2 24 nnhz 0 sinosc * distort .7 * +     ;; bass drum
+	aa 4c .5 apverb6 -.6 fade2                                     ;; reverb & wet/dry mix
+] ! play
+
+
+;; modal beat subdivisions
+\[
+	#[0 2 4 5 7 9 10 12] = mixolydian
+	.3 (1 12 irandz aa 1/ ba ?) 1 imps = t                           ;; lead's clock
+	t  4m .5 decay2 = e 	                                         ;; lead's envelope
+	3 14 iwalk2z mixolydian degkey 60 + nnhz = p                ;; lead's pitches
+	.2 lfnoise3 5h 6k biexp = b                                      ;; lead's brightness
+	(p t seq 2c lag [0 .2] +) 0 saw (e b * 5h +) .25 rlpf e .3 * *   ;; lead
+	aa .25 0 2 combn .6 * +                                         ;; lead's echo
+	.2 #[.5 1] hangz 1 imps 4m .1 decay2 white +                   ;; snare
+	4 1 1 imps 4m 1 decay2 24 nnhz 0 sinosc * distort .7 * +       ;; bass drum
+	aa 4c .5 apverb6 -.6 fade2                                       ;; reverb & wet/dry mix
+] ! play
+
+;; {de,a}ccelerandi
+\[
+	#[0 2 3 5 7 9 10 12] = dorian
+	.3 (\[(4 12 irand) 1 (.2 rand2 exp2) ngrowz sumto1] inf X $/) 1 imps = t   ;; lead's clock
+	t  4m .5 decay2 = e 	                                                   ;; lead's envelope
+	3 14 iwalk2z dorian degkey 60 + nnhz = p                              ;; lead's pitches
+	.2 lfnoise3 5h 6k biexp = b                                                ;; lead's brightness
+	(p t seq 2c lag [0 .2] +) 0 saw (e b * 5h +) .25 rlpf e .3 * *             ;; lead
+	aa .25 0 2 combn .6 * +                                                   ;; lead's echo
+	.2 #[.5 1] hangz 1 imps 4m .1 decay2 white +                             ;; snare
+	4 1 1 imps 4m 1 decay2 24 nnhz 0 sinosc * distort .7 * +                 ;; bass drum
+	aa 4c .5 apverb6 -.6 fade2                                                 ;; reverb & wet/dry mix
+] ! play
+
+;;;; dancing shadows ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	;; create an algorhythmic rhythm pattern
+	\[
+		[ ;; choose one of the following patterns at random
+			[2.0 0.0 2.0 0.0 1.0 0.0 1.0 1.0] 2 ncyc
+			[2.0 0.0 1.0 0.0 1.0 0.0 1.0 0.0] 2 ncyc
+			[2.0 0.0 1.0 1.0 1.0 1.0 1.0 0.0] 2 ncyc
+			[2.0 0.3 0.3 1.0 0.3 0.3 1.0 0.3] 2 ncyc
+			[2.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0] 2 ncyc
+			[2.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0]
+			[2.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0]
+			[0.0 1.0 0.0 1.0 0.0 1.0 0.0 1.0] 2 ncyc
+
+			[1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0] 2 ncyc
+			[1.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0] 2 ncyc
+			[1.0 0.0 0.0 1.0 0.0 1.0 0.0 0.0] 2 ncyc
+
+			[1.0 1.0 0.0 0.0 1.0 1.0 0.0 0.0] 2 ncyc
+			[0.0 0.0 1.0 1.0 0.0 0.0 1.0 1.0] 2 ncyc
+
+			[0.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0] 2 ncyc
+			[2.0 0.0 1.0 1.0 0.0 1.0 0.0 0.0] 2 ncyc
+
+			[0.0 0.0 1.0 0.0 1.0 1.0 0.0 1.0] 2 ncyc
+			[2.0 1.0 0.0 1.0 0.0 0.0 1.0 0.0] 2 ncyc
+
+			[1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0
+			 0.0 1.0 0.0 0.0 1.0 0.0 1.0 0.0]
+		] picks $/ Z
+	] = pat
+
+	\[
+		5 5.5 rand = rate
+		rate 0 impulse = trig
+		5 0 12 nrandz sort 12 add = notes
+		2 0 7 iwalkz notes degkey 84 + nnhz .3 coinz seq = melody
+		20 = n
+		\[
+			0 38 irand notes degkey 24 + nnhz = freq
+			pat trig iseq (40 sqrt 6 * freq sqrt n * /) *  5m 6 rate / decay2 = env
+			freq 0 sinosc 0 .5 rand lfnoise1 * env * rpan2
+		] n X +/
+
+		2m white (melody trig seq 5c lag) 4m .4 formlet
+		+
+	] 45 2 .95 2 oltx
+] ! play
+
+
+;;;; native algorhythms ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	8 = n
+	[
+		[2 0 2 0 1 0 1 1]
+		[2 0 1 0 1 0 1 0]
+		[2 0 1 1 1 1 1 0]
+		[2 .3 .3 1 .3 .3 1 .3]
+		[2 0 .3 0 .3 0 .3 0]
+		[2 0 0 1 0 0 0 0]
+		[2 0 0 0 0 0 0 0]
+		[0 1 0 1 0 1 0 1]
+		[1 0 0 1 0 0 1 0  0 1 0 0 1 0 1 0]
+	] = pat
+	\[
+		((pat picks $/ Z 8 0 impulse iseq) .1 decay 1c pink *) (n 1 5 nlinrands 40 340 rand *) 1 (n .4 1 nlinrands) klank rpan2
+	] 8 4 4 2 oltx .1 *
+] ! play
+
+;;;; native algorhythms 2
+\[
+	6 = n
+	[
+		[2 0 2 0 1 0 1 1]
+		[2 0 1 0 1 0 1 0]
+		[2 0 1 1 1 1 1 0]
+		[2 .3 .3 1 .3 .3 1 .3]
+		[2 0 .3 0 .3 0 .3 0]
+		[2 0 0 1 0 0 0 0]
+		[2 0 0 0 0 0 0 0]
+		[0 1 0 1 0 1 0 1]
+		[1 0 0 1 0 0 1 0  0 1 0 0 1 0 1 0]
+	] = pat
+	\[
+		((pat picks $/ Z 6 0 impulse iseq) .1 decay 1c pink * 8h lpf2) (n 1 5 nlinrands 10 180 rand *) 1 (n .1 .6 nlinrands) klank tanh rpan2
+	] 8 4 4 2 oltx 10 hpf2 aa .03 1 apverb6 -.2 fade2 .2 *
+] ! play
+
+;;;; a:b polyrhythm
+
+\a b r[
+	\n r[
+		n r * 0 impulse .1 decay 1c pink * 12h lpf (n 1 5 nlinrands 40 340 rand *) 1 (n .4 1 nlinrands) klank rpan2
+	] = f
+	a r f  b r f + play
+] = g
+3 5 .3 g
+
+;;;; async rhythms
+
+\[
+	8 = n
+	\[
+		urandz sq .7 coinz * (.25 10 xrand 0 impulse) iseq .1 decay 1c pink * 8h 3k xrand lpf (n 1 5 nlinrands 40 340 rand *) 1 (n .4 1 nlinrands) klank rpan2
+	] 8 4 8 2 oltx .4 * aa 3c 3 apverb6 .1 lfnoise3 .7 * fade2
+] ! play
+
+;;;; sync rhythms
+
+\[
+	8 = n
+	\i[
+		i pr cr
+		i 200 < \[
+			[1 2 2 3 3 4 4 6 8] pick = d
+			urandz sq .2 .8 xrand coinz * (8 d / 0 impulse) iseq .1 decay 1c pink * 8h 3k xrand lpf (n 1 5 nlinrands 40 340 rand *) 1 (n .4 1 nlinrands) klank rpan2
+		] \[ inf 0z 2X ] if
+	] 12 4 8 2 oltx tanh .4 * aa 3c 3 apverb6 .1 lfnoise3 .7 * fade2 416 .1 fadeout
+] ! play
+
+
+;;;; algorhythmic  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	8 0 impulse = t
+	#[1 0 .2 0 .4 0 .2 0] cyc t iseq 1m .5 decay2 80 0 sinosc * .5 *			;; bass drum
+	2 0 .12 lfpulse 10k * .1 lag 1 dust2 2 0 sinosc 4h 4k *+ .2 resonz 5c * +	;; shaker
+	\[
+		\[[[5 1s 11 0s $ muss  1h 4k xrand 16 XZ] 4X] cyc .8 coins 1 cons keepWhile] inf X $/ $/ flop @ $/ = [beats freqs]
+		freqs t seq 1m lag = freq
+		beats t iseq 2m .3 decay2  .1 white freq 8m resonz * rpan2
+	] 8X +/ 4c * +
+] ! play
+
+;;;; algorhythmic 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	8 0 impulse = t
+	#[1 0 .2 0 .4 0 .2 0] cyc t iseq 1m .7 decay2 60 0 sinosc * .7 *			;; bass drum
+	2 0 .12 lfpulse 10k * .1 lag 1 dust2 2 0 sinosc 4h 4k *+ .2 resonz 5c * +	;; shaker
+	\[
+		\[[[5 1s 11 0s $ muss  1h 4k xrand 60 round 16 XZ] 4X] cyc .8 coins 1 cons keepWhile] inf X $/ $/ flop @ $/ = [beats freqs]
+		freqs t seq 1m lag = freq
+		beats t iseq 2m .3 decay2  .1 white * freq 8m resonz rpan2
+	] 8X +/ 4c * +
+] ! play
+
+;;;; example from SC3d5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	8 0 impulse = clock
+	#[.4 .1 .2 .1] cyc clock iseq = trig
+	#[.4 0 .1 .1 .4 .1 .1 .1] cyc clock iseq = trig2
+	#[24 26 24 22] 60 - 12 / cyc clock 64 0 pdiv seq = root
+	#[33 33 35 36 45 47 38 40 33 33 35 36 47 48 50 52] 12 / cyc  clock seq root + ohz = freq
+
+	(.4 2X gray)  (trig 5m .7 decay2) *  (2h 8k xmousex)  .2 rlpf distort
+	((freq [1 1.505] *)  0  (0 1 mousey) vsaw)  (trig2 5m 1.4 decay2) * .5 *
+	+ .26 0 4 combn softclip
+] ! play
+
+;;;; example from SC3d5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	#[0 2 3 5 7 8 10 12] = scale
+	12 0 impulse = clock
+	#[57 59 62 55] cyc  clock 128 0 pdiv seq = root
+
+	([#[0 0 1 2 7 8 9 8  10 10 1 2 1 2 3 4  0 0 1 2 7 8 9 8  11 11 1 2 1 2 3 4]
+	 #[0 0 1 2 7 8 3 4  0 0 1 2 1 2 3 4  0 0 1 2 7 8 3 4  0 0 1 2 1 2 3 4] 2X $/ ] picks $/ scale degkey 12 - clock seq) root + nnhz = freq
+
+	(.4 2X gray (#[.4 .1 .2 .1] cyc clock iseq) 5m .3 decay2 *) (2h 8k xmousex) .2 rlpf distort
+
+	((freq [1 1.505] *) 0 (0 1 mousey) vsaw ((#[.4 0 .1 .1 .4 .1 .1 .1] cyc clock iseq) 5m .8 decay2) *) (2h 8k xmousex) .1 rlpf distort
+	+
+	[
+		(root 24 + nnhz) 0 sinosc ((#[1] 0 27 XZ 1 4XZ $z $z .2 * cyc clock iseq) 5m .2 decay2) *
+		(root 24 7 + + nnhz) 0 sinosc ((#[1] 0 31 XZ 1 4XZ $z $z .3 * cyc clock iseq) 5m .2 decay2) *
+	]
+	+
+	.4 * = z
+	(z .51 0 4 combn) .8 * z reverse + softclip
+] ! play
+
+
+;;;; example from SC3d5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	0 = z   .1 = a   .2 = b   .4 = c
+	[
+		[c z z z z z z z] 2 ncyc
+		[c z z b z z b z c z z z b z b a] 2 ncyc
+		[
+			[c z z b z z b z c z b z c z b z] 2 ncyc
+			[c z a b z a b z c z b z c a b a] 2 ncyc
+			[c a a b z a b a c z b z c a b a] 2 ncyc
+			[c a a b z a b a c z b z z b a a] 2 ncyc
+			[c z z z z z z z] 2 ncyc
+			[c z z b z z b z c z z z b z b a] 2 ncyc
+		] picks $/
+	] $/ Z = p
+
+	[
+		[c z b z a a a a b z b z z z b z] 2 ncyc
+		[c z z z z z z z b z b z z z c z] 2 ncyc
+		[c z z z a z z z b z b z a z c z] 2 ncyc
+	] picks $/ Z = q
+
+	9 0 impulse = clock
+
+	;; bass drum
+	80 0 sinosc  clock 16 0 pdiv 5m .6 decay2 * .8 *
+
+	;; drum
+	(p clock iseq 5m 5c decay2 white) (4 80 5h nrands) 1 (4 5c .5 nrands) klank distort .2 *
+
+	;; metallic
+	(q clock iseq 5m 5c decay2 white) (4 35h 40h nrands) 1 (4 5c .5 nrands) klank distort .1 *
+
+	+ + 3c 3 apverb6
+] ! play
+
+
+;;;; example from SC3d5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\[
+	\a b t [a [4 4 4 3] ? b @ add t + $/] = f
+	[
+		[0 2 3 2] [-2 -2 -2  3]  0 f
+		[5 3 5 6] [ 6  6  6  0]  0 f
+		[0 2 3 2] [-2 -2 -2 -5]  2 f
+		[0 2 3 2] [-2 -2 -2 -1] -1 f
+	] $/ 36 + cyc = p
+
+	12 0 impulse = clock
+	[.3 .1 .2 .1] cyc clock iseq = trigger
+	(2 2X pink) (trigger 5m .15 decay2 .3 *) * = x
+
+	.1 0 tri 1/18k 1/50 biexp = flangelfo
+	x \x[x flangelfo 1/50 flange] 3 chain 2h 8k mousey .2 rlpf distort = x2
+
+	trigger 2 0 pdiv = trigger2
+	p trigger2 seq nnhz = freq
+	trigger2 2m 1 decay2 = env2
+	([1 1.505] freq * 0 lfsaw env2 8 * *) (1h 8h xmousex 1 env2 2 * + *) .1 rlpf distort 8c * = y
+	x2 y + .33 0 2 combn .5 * x2 y + + 3c 4 apverb4
+] ! play
+
+
+
+;;;; hockettuplets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	#[0 2 4 5 7 9 11 12] = major
+	4 rand2 61 + = root
+	\[
+		16 irand2 = offset
+		offset 7 < \[ 1 3 irand ]\[[1 2 3 4 6] pick] if = r
+		#[0 3 4 6] offset + muss major degkey root + nnhz cyc = sequence
+		r 0 impulse 3 * = trig
+		sequence trig seq = f
+
+		f 0 .1 .9 rand pulse  trig 4m 2 r / decay2 .1 * *  1k 10k rand lpf rpan2
+	] 8 4 6 2 oltx   4c 4 apverb4
+] ! play
+
+;;;; inharmonic warbulence ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	\[
+		24 96 irand nnhz = f
+		5h f / 1 & = a
+		25.6 .1 20 xrxline = r
+		12 = n
+		\[ 1 n 1 + irand = g   f g * 0 sinosc  .9 1.1 rand r *  urand sinosc 8c -4c *+ 0 | * 2 g / *  rpan2] n X  +/
+	] 12.8 6.4 6 2 oltx = x
+	\[ x \[.1 .3 rand] 2X 0 8 combn] 5X +/ .3 *
+] ! play
+
+
+;;;; arachnid espresso ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	[
+		#[1 1 0 0 0 0 0 0]
+		#[1 1 1 0 0 0 0 0]
+		#[1 1 1 1 0 0 0 0]
+	] = patterns
+	[[1 1][1 1][-1 2]] = sp
+	[8 4 2] = rates
+	\[
+		rates pick = r
+		r 0 impulse = c
+		sp pick = [reflect oct]
+		(1 4 irand 24 96 nirandz nnhz oct *) cyc c seq (.1 r /) lag = f
+		patterns pick muss cyc   c  iseq = t
+		t  .3 .9 rand r /  gate = e
+		(f 24 * 12k &) lfnoise3 (e .04 *) * = in
+		in f 1/ .1  (90 240 xrand f / .5 &) combc rpan2
+	] 23 .5 5 2 oltx  .03 3 apverb6
+] ! play
+
+
+;;;; pentatonic pipes and bells ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	8 = dur
+	\[[0 1 1 0][.2 dur 2 - 1] 1 lines hang] = env
+	\[[1 1 0][dur 1c] 1 lines] = env2
+	[0 3 5 7 10 12] = mode
+
+	\[
+		36 47 irand = root
+		\[
+			0 20 irand mode degkey root + nnhz = f
+			env pink f 2m resonz 1m * rpan2
+		] 5 X +/
+		\[
+			0 10 irand mode degkey root + 36 + nnhz = f
+			.3 1.4 rand 0 1 rand impulse 5m 2 decay2 [f f 2 rand2 +] 0 sinosc +/ * rpan2 .1 *
+		] 4 X +/
+		$ env2 *
+	] dur 1 4 ola 2 clump = [mix1 mix2]
+
+	mix1 .3 .3 8 combn
+	mix1 .1 .3 rand .3 8 combn +
+	mix1 .1 .3 rand .3 8 combn +
+	mix1 reverse +
+	mix2 5c 8 apverb6 + .5 *
+] ! play
+
+;; slower pentatonic pipes and bells ;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	12 = dur
+	\[[0 1 1 0][1 dur 4 - 2] 1 lines hang] = env
+	\[[1 1 0][dur 1] 1 lines] = env2
+	[0 3 5 7 10 12] = mode
+
+	\[
+		36 47 irand = root
+		\[
+			0 20 irand mode degkey root + nnhz = f
+			env pink f 1.5m resonz 1m * rpan2
+		] 5 X +/
+		\[
+			0 10 irand mode degkey root + 36 + nnhz = f
+			.3 1.4 rand 0 1 rand impulse 5m 2 decay2 [f f 2 rand2 +] 0 sinosc +/ * rpan2 .1 *
+		] 4 X +/
+		$ env2 *
+	] dur 1 + 1 4 ola 2 clump = [mix1 mix2]
+
+	mix1 .3 .3 8 combn
+	mix1 .1 .3 rand .3 8 combn +
+	mix1 .1 .3 rand .3 8 combn +
+	mix1 reverse +
+	mix2 5c 8 apverb6 + .2 *
+] ! play
+
+;;;; sidereal time ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	15 = p   ;; number of partials per channel
+	12 40 3h xrxline                                         ;; frequency
+	0 .1 .9 rand lfpulse .2 8 rand lfnoise3 2m * 0 | * = in  ;; excitation
+	\[in (p 1h 6k nxrands) 1 (p 2 6 nrands) klank] 2X        ;; resonator
+	 distort .1 * aa .1 .6 rand .6 8 combn reverse +         ;; distort & echo
+] 4 4 6 2 oltx play
+
+
+;;;; early space music LP, side 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	[0 2 4 5 7 9 11] = scale
+	7 24 12 nby 3 - = octave
+	6 = n
+
+	\[[
+		\[
+			scale pick octave pick + nnhz = f
+			\[4 6 xrand 0 sinosc 8m * 1 + f * 2 .99 1.01 nrands * 0 saw] 8 X +/ .2 * 632 lpf1 = x
+			.3 coin \[ x .3 .8 rand 0 sinosc .5 3 rand * 4 12 rand + f * .1 rlpf ]\[ x ] if
+		]
+		\[
+			12 \[4 12 xrand [1 .9 1.1 rand] *] 2X un2 xline randsign = rates
+			.25 .5 xrand randsign 0 tri 4 30 linrand *
+			rates 0 lfsaw 2 16 rand * 40 120 rand + nnhz 0 sinosc .02 * .15 .3 rand .3 4 combn
+		]
+	] pick !] 4 4 n 2 oltx aa [.5 .47] .5 7 combn reverse + .3 *
+] ! play
+
+;;;; early space music LP, side 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\[
+	6 = n
+	\[[
+		\[ [0 0] ] ;; silence
+		\[
+			0 20 rand = a   30 5k rand = b   0 20 rand = c
+			a 0 sinosc .1 * 1 + b * 0 sinosc c 0 sinosc 8c * 8c + * rpan2
+		]
+		\[
+			[40 240 rand aa 1 rand2 +] = a
+			a (2 1 nrand2s) + = c
+			a 0 sinosc urand * 1 + (50 24h xrand) * 0 sinosc c 0 sinosc .13 * .13 + *
+		]
+		\[
+			60 100 irand nnhz = f
+			f [0 .2] + 0 sinosc [.15 .16] f * lfnoise3 .2 * *
+		]
+		\[
+			24 96 irand nnhz = f
+			10 .1 20 xrxline = r
+			\i[
+				(f i * 0 sinosc) (.9 1.1 rand r * urand sinosc) .5 * -5c + 0 | * i ++ 1/ * rpan2
+			] 12 X +/ (.2 1.2 xrand 0 .1 .2 rand lfpulse 2c lag2) *
+		]
+		\[
+			2 1 -4 to ^ picks = durs
+			(200 800 rands durs 1 steps) (durs .5 * durs 1 steps) lag = f
+			7m pink f 2m resonz rpan2
+		]
+		\[
+			(1c .3 rand lfnoise1) 60 * 70 + nnhz = f
+			f 0 sinosc
+			(1c .5 rand f * lfnoise3) (1c 8 rand lfnoise1) (0 40 rand 0 sinosc) * 0 | * *
+			(1c 5 rand lfnoise1) pan2
+		]
+		\[
+			15 = p
+			((10 40 300 xrxline) 0 (.1 .9 rand) lfpulse 4m lag) ((1c 8 rand) lfnoise3) 0 | * 2m * = in
+			\[in  p 1h 6k nxrands  1  p 2 6 nrands klank] 2X distort
+		]
+	] pick !] 2 4 n 2 oltx = out
+	\[out 2 .1 .3 nrands .3 8 combn] 5X +/ .06 *
+] ! play
+
+
+
+;;;; multiple random voices ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[2 3 4 5 6]@ [15 11 9 7 3]@ [-16 -20 -24 -28 -32]@
+\o h a [
+	-6 6 irands +\ (o 12 * [0 12] + un2) ifold nnhz .1 3 xrands .125 round 1 steps 2c lag [-.5 .5] + 0 sinosc h ^ -.5 | +/ a dbamp *
+	.15 lfnoise3 0 | *
+	rpan2
+] ! +/ 5c 3 apverb6 play
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;; tinnitus masking/soothing
+
+\[	2 = rate
+ 	rate 1/ = ckt
+	rate .2 dust = ck
+	13k = f
+	f .4 * white f + ck sah 0 sinosc ck 1.2 ckt * decay .1 ckt * lag * 1 rand2s ck seq pan2
+	5c 4 apverb6 5c 4 apverb6
+	.15 2X violet .1 2X brown .2 lfnoise3 100 300 biexp lpf2 + .05 lfnoise3 .8 1 biexp * +
+] ! play
+
+;;;; tinnitus masking/soothing 2
+
+\[
+	\x freq amount [ freq 0 sinosc 1 amount - 1 bilin x * ] = amsin
+	\[[.2 .29] lfnoise3 [.4 1.25] 12k * un2 biexp 0 sinosc 2 4 16 nrands 2 0 1 nrands amsin 2 1 3 nxrands  lfnoise3 0 | sq * aa .3 .6 xrand 0 1 4 xrand combn reverse + ] 12 4 8 3 oltx 12k .6 bsf 11k lpf2  .04 *
+	.2 2X violet 12k .6 bsf 11k lpf2
+	.1 2X brown .2 lfnoise3 100 400 biexp lpf2
+	+ .05 lfnoise3 .8 1 biexp * +
+] ! play
+
+\[
+	\x freq amount [ freq 0 sinosc 1 amount - 1 bilin x * ] = amsin
+	\[2 .1 .5 nxrands lfnoise3 [.2 1.25] 12k * un2 biexp 0 sinosc 2 4 16 nrands 2 0 1 nrands amsin 2 1 3 nxrands  lfnoise3 0 | sq * aa .3 .6 xrand 0 1 4 xrand combn reverse + ] 12 4 12 3 oltx 12k .6 bsf 11k lpf2  .02 *
+	.2 2X violet 12k .6 bsf 11k lpf2
+	.1 2X brown .2 lfnoise3 100 400 biexp lpf2
+	+ .05 lfnoise3 .8 1 biexp * + .2 *
+] ! play
+
+;;;;
+
+\[.1 lfnoise3 9k 14k biexp [0 10 rand2] muss + 0 sinosc 8 12 xrand lfnoise3 biuni sq * .17 lfnoise3 biuni sq *] 8 X +/ .03 3 apverb6 .1 * play
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; physical therapy exercise timer
+\[
+	250 = f
+	1 [30 10 5 1] / 0 impulse 2c [8 4 3 1] decay2  f [.5 2 3 4] * @ [0 2] + 0 sinosc * [.4 .3 .2 .1] * +/ .5 * aa 5c 4 apverb4 0 fade2
+	f 2 12 to * 0 sinosc 80 11 X lfnoise3 * .1 11 X lfnoise3 .2 - 0 | 2 ^ * splay .15 * aa 5c 9 apverb4 .5 fade2 +
+] ! play
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; plucky pentatonic pulse demo
+-10 5 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@ .1 -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] pulse-syn @ +/  .2 1 2 ola .3 0 2 combn play
+
+
+;; using several wavetables
+\[
+	\i[(invz 1 2 rand ^ .1 i ++ * coinz 1 cons *) urandz 2 wavefill] 9 X = w
+	\[512 -10 5 nirands 128 0 15 nirands $] inf X $/ = pchpat
+	(pchpat aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@) -6 .1 (brands @)(1 96 irands @) [1m .1 .3 .5] w picks 32 ? @ osc-syn @ +/
+	.2 1 2 ola
+	.3 0 2 combn
+] = usewaves
+usewaves play
+
+\[
+	\i[invz .1 i ++ * coinz 1 cons * 32 64 irand N 0 2 wavefill] 8 X = w
+	(-10 5 irands [0 2 5 7 9 12] degkey 12 / ohz @) -6 .1 (-1 1 rands @) (1 64 irands @) [1m .1 .3 .5] w picks 16 ? @ osc-syn
+	.2 1 2 ola
+	.3 0 2 combn
+] = usewaves1
+usewaves1 play
+
+;;;; wavetables with missing fundamentals
+\[
+	\i[(invz 1 2 rand ^ .1 i ++ * coinz 0 cons *) urandz 2 wavefill] 9 X = w
+	\[512 -10 5 nirands 128 0 15 nirands $] inf X $/ = pchpat
+	(pchpat aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@) -6 .1 (brands @)(1 96 irands @) [1m .1 .3 .5] w picks 32 ? @ osc-syn @ +/
+	.2 1 2 ola
+	.3 0 2 combn
+] = nofundies
+nofundies play
+
+
+;;;; three detuned wavetable oscillators
+\[
+	\i[invz 1 2 rand ^ .1 i ++ * coinz 1 cons * 32 48 irand N 0 2 wavefill] 8 X = w
+	(-10 5 irands [0 2 5 7 9 12] degkey @ [-.03 0 .03] + 12 / ohz @) -6 .1 (-1 1 rands @) (1 48 irands @) [8m .1 .4 .8] w picks 16 ? @ osc-syn @ +/
+	.25 1 2 ola
+	.375 aa 2 combn
+] = usewaves2
+usewaves2 play
+
+;;;; pick position
+\[
+	\[2pi ordz * 1 4 rand / 0 2pi rand + sin invz .25 1.5 rand ^ * urandz 0 2 rand wavefill] 10 X = w
+	(-10 5 irands [0 2 4 7 9 12] degkey 12 / ohz @) -6 .1 (-1 1 rands @) (1 64 irands @) [1m .1 .3 .5] w picks 32 ? @ osc-syn
+	.2 1 2 ola
+	.3 aa 2 combn
+] = pickpos
+pickpos play
+
+;;;; repetitious bass player
+\[
+	[\[2pi ordz * 1 4 rand / 0 2pi rand + sin invz .25 1.5 rand ^ * urandz 0 2 rand wavefill] 10 X = w
+	(-13 -6 irands [0 5 7 10 12] degkey 12 / ohz @) -3 .1 (-1 1 rands @) (1 64 irands @) [1m .1 .4 .8] w picks 12 ? @ osc-syn
+	[.11 .22 .44] picks] flop 6 16 irands clump 3 8 irands ? $/ flop un2 1 2 ola
+	.33 aa 2 combn
+] = repbass
+repbass play
+
+;;;; new age formants
+\[
+	\[0 12 irand 0z 3 11 irand hanning $ .5 cons urandz 2 wavefill] 9 X = w
+	\[512 -10 8 nirands 128 0 15 nirands $] inf X $/ = pchpat
+	(pchpat aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey \[1 12 xrand 0 sinosc .05 *] 2X + 12 / ohz flop @@) -6 .1 (brands @)(1 96 irands @) [2c .4 .6 2] w picks @ osc-syn @ +/
+	[.4 .8 .12 .16 .24 .32 .48 .64 .96 1.28 1.92 2.56 3.84 5.12] picks 1 2 ola aa 4c 6 apverb6 0 fade2
+] = formants
+formants play
+
+;;;;
+\[
+	\[0 12 irand 0z 3 11 irand hanning $ .5 cons urandz 2 wavefill] 9 X = w
+	\[512 -14 8 nirands 128 0 15 nirands $] inf X $/ = pchpat
+	(pchpat aaa [2 3 4 5] picks + ba [2 3 4 5] picks + 3ple [0 2 3 5 7 9 10 12] degkey \[1 12 xrand 0 sinosc .05 *] 3X + 12 / ohz flop @@) -6 .1 (brands @)(1 96 irands @) [2c .4 .6 2] w picks @ osc-syn @ +/
+	[.32 .48 .64 .96 1.28 1.92 2.56 3.84 5.12] picks 1 2 ola aa 4c 6 apverb6 0 fade2  .2 *
+] = formants3
+formants3 play
+
+;;;; tape loop version
+\[
+	\[0 12 irand 0z 3 11 irand hanning $ .5 cons urandz 2 wavefill] 9 X = w
+	\[512 -14 8 nirands 128 0 15 nirands $] inf X $/ = pchpat
+	(pchpat aaa [2 3 4 5] picks + ba [2 3 4 5] picks + 3ple [0 2 3 5 7 9 10 12] degkey \[1 12 xrand 0 sinosc .05 *] 3X + 12 / ohz flop @@) -6 .1 (brands @)(1 96 irands @) [2c .4 .6 2] w picks @ osc-syn @ +/
+	[.32 .48 .64 .96 1.28 1.92 2.56 3.84 5.12] picks 1 2 ola aa 4c 6 apverb6 .25 fade2 aa 3.84 0 120 combn + .25 * tanh
+] = formants3c
+formants3c play
+
+;;;; scale runs
+\[
+	[0 2 4 5 7 9 11 12] = scale
+	\[2pi ordz * 1 4 rand / 0 2pi rand + sin invz .25 1.5 rand ^ * urandz 0 2 rand wavefill] 10 X = w
+	([-1 1] picks 2 8 irands ? +\ -14 7 fold [2 3 4 6 8] picks clump 1 4 irands ? $/ scale degkey 12 / ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = runs1
+runs1 play
+
+\[
+	[0 2 4 5 7 9 11 12] = scale
+	\[(invz 1 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	([-1 1] picks 2 8 irands ? +\ -10 16 fold [2 3 4 6] picks clump 1 4 irands ? $/ scale degkey 12 / ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = runs2
+runs2 play
+
+\[
+	[0 2 4 5 7 9 11 12] = scale
+	\[(invz 1 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	([-1 1] picks 2 8 irands ? +\ -14 7 fold [2 3 4 6] picks clump 2 4 irands clump @ 2 6 irands ? @ muss $/ $/
+	scale degkey 12 / ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = runs3
+runs3 play
+
+;;;;;
+
+;; zizle 1
+\[
+	24 108 irand nnhz 0 1 rand sinosc
+	(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ .1 * 0 |
+	(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ .1 * abs * * rpan2
+] 4 4 12 2 oltx play
+
+
+;; zizle 2
+\[
+	24 128 irand nnhz 0 1 rand tri 1k lpf1
+	(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+	(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ abs * * rpan2
+] 4 4 12 2 oltx play
+
+
+;; zizle 3
+\[
+	1 32 irand 80 * 0 1 rand .1 lfpulse 2k lpf1
+	(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+	(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ abs * * rpan2
+	\x[x 2 1m 5c nrands 5c 1m 3 rand alpasn] 2 chain
+] 4 4 12 2 oltx play
+
+;; zizle 4
+\[
+	1 32 ilinrand 80 * 0 1 rand .1 lfpulse 2k lpf1
+	(1/8 2 0 6 nirands 2^ *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+	(2 1 6 nirands 4 *) (2 0 1 nrands) sinosc +/ abs * * rpan2
+	\x[x 2 1m 5c nrands 5c 1m 4 rand alpasn] 2 chain
+] 8 4 12 2 oltx play
+
+;; zizle 5
+\[
+	1 100 rand 120 * 0 1 rand .5 lfpulse 2k lpf1 2h hpf1
+	(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+	(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ abs * * rpan2
+] 4 4 12 2 oltx play
+
+;; zizle 6
+\[
+	50 6h xrand 0 1 rand .5 lfpulse
+	(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+	(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ abs * * 1h 2k xrand .2 rlpf rpan2
+] 4 4 12 2 oltx \x[ x 2 .1 .2 nrands .2 2 alpasn ] 4 chain distort play
+
+;; zizle 7
+\[
+	.33 coin
+	\[	1h 6k xrand 0 sinosc 4 24 xrand 2X lfnoise3 7c * *
+	]
+	\[	50 6h xrand 0 1 rand .5 lfpulse
+		(.3 8 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ 4c * 0 |
+		(6 24 xrand [.7 1.3 rand 1] *) (2 0 1 nrands) sinosc +/ abs * * 1h 2k xrand .2 rlpf rpan2
+	] if
+] 4 4 12 2 oltx \x[ x 2 .1 .2 nrands lfnoise3 5c * .15 + .2 2 alpasn ] 4 chain distort play
+
+;;;;;
+
+;; slonimsky-esque exercises
+
+\[
+	\[(invz 1 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	(-12 12 to @2 1 12 to @1 \a b[[0 a] b by flop 48 b idiv ++ N mirror1 $/] ! $/ muss $/ 12 / -- ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = slonimskyesquercises1
+slonimskyesquercises1 play
+
+\[
+	\[(invz 1 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	(-12 12 to @2 1 12 to @1 \a b[[0 a a b + b] b 2 * by flop 48 b 2 * idiv ++ N mirror1 $/] ! $/ muss $/ 12 / -- ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = slonimskyesquercises2
+slonimskyesquercises2 play
+
+\[
+	\[(invz 1 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	(-12 12 to @3 -12 12 to @2 2 12 to @1 \a b c[[0 a b] c by flop 48 c idiv ++ N mirror1 $/] ! $/ $/ muss $/ 12 / -- ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [1m .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = slonimskyesquercises3
+slonimskyesquercises3 play
+
+\[
+	\[(invz .5 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	(1 12 to @3 1 12 to @2 2 12 to @1 \a b c[[0 a b] c by flop 48 c idiv ++ N mirror1 $/] ! $/ $/ muss $/ 12 / 2 - ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [8c .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = slonimskyesquercises3b
+slonimskyesquercises3b play
+
+
+\[
+	\[(invz .5 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	(1 12 to @4 1 12 to @3 1 12 to @2 2 12 to @1 \a b c d[[0 a b c] d by flop 48 d idiv ++ N mirror1 $/] ! $/ $/ $/ muss $/ 12 / 2 - ohz @) -6 .1 (-1 1 rands @) (5 64 irands @) [8c .1 .3 .5] w picks 64 ? @ osc-syn
+	.1 1 2 ola
+	.15 aa .6 combn
+] = slonimskyesquercises4
+slonimskyesquercises4 play
+
+
+;; tri-diatonic runs
+\[
+	[0 2 4 5 7 9 11 12] = scale
+	[.12 .12 .12 .12 .12 .12 .12 .12 .12 .24 .24 .24 .48] picks = durs
+	\[(invz .5 2 rand ^ .1 .9 randz coinz 1 cons *) urandz 2 wavefill] 12 X = w
+	([-1 1] picks 3 8 irands ? +\ -14 14 fold [3 4 6 8] picks clump 1 3 irands ? $/ scale degkey [0 -12 24 irands -12 24 irands] flop 64 ? + 12 / ohz @@) -6 durs @
+	(-1 1 rands @) (5 64 irands @) [2c .3 .3 .5] w picks 64 ? @ osc-syn @ +/
+	durs 1 2 ola
+	.15 aa .6 combn
+] = tri-diatonic-runs
+tri-diatonic-runs play
+
+;; slow hexatonic dyads
+s -10 10 irands aa [2 3 4 6 8] picks + 2ple [0 2 4 5 7 9 12] degkey 12 / ohz flop @@ 21 .01 .5 lindiv mirror0 cyc @ -12 2 brands @ 8 1 to 2 ? mirror0 cyc @ [.4 .1 .9 .5] pulse-syn @ +/  2 1 2 ola .4 aa 4 combn play
+
+;; harmonic fm
+s -3 3 rands 1/12 round ohz @ 1 4 irands @ 1 4 irands @ 0 1 linrands @ 0 .99 rands @ -12 .3 brands @ [8m 3 0 .1] fm-syn #[.05 .1 .2 .4 .8 1.6] #[4 4 2 1 1 1] sumto1 wpickz 1 2 ola .4 * play
+
+;; inharmonic fm
+s -3 3 rands 1/12 round ohz @ 1 7 irands @ 1m 5 rands @ 0 1 linrands @ 0 -12 .3 brands @ [8m 3 0 .1] fm-syn #[.05 .1 .2 .4 .8 1.6] #[4 4 2 1 1 1] sumto1 wpickz 1 2 ola .5 * play
+
+;; 4 note chord arpeggiator
+
+\notes [notes #[1 2 4] @ * $/ cyc #[100 150 200 150] 48 4 XZ ? cyc * .4 2X rand2z + @ 5 0 impulse seq 1c lag2 0 saw .15 * .09 0 4k 5k sinoscm .3 rlpf2 .3 0 6 combn] = arper
+
+#[1/1 7/6 3/2 7/4] arper play 		; septimal subminor seventh
+
+#[1/1 5/4 3/2 15/8] arper play 		; major seventh
+
+#[1/1 5/4 3/2 7/4] arper play 		; dominant seventh
+
+#[1/1 6/5 3/2 9/5] arper play 		; minor seventh
+
+#[1/1 5/4 7/5 7/4] arper play 		; dominant seventh, flat fifth
+
+#[1/1 6/5 7/5 9/5] arper play		; half diminished seventh
+
+#[1/1 6/5 7/5 17/10] arper play		; diminished seventh
+
+#[1/1 5/4 25/16 15/8] arper play	; augmented major seventh
+
+#[1/1 11/9 3/2 11/6] arper play		; neutral seventh
+
+#[1/1 9/7 11/7 13/7] arper play 	; awful seventh
+
+#[1/1 4/3 3/2 16/9] arper play 		; suspended seventh
+
+#[1/1 81/64 3/2 243/128] arper play ; pythagorean major seventh
+
+;; ZP example
+
+.2 2X pink ZP = x play
+
+[400 401] 0 sinosc .2 * x set
+
+[300 301] 0 saw 4k lpf .2 * x set
+
+[200 201] 0 saw 4k lpf .2 * x set
+
+.2 2X brown x set
+
+.2 2X white x set
+
+;; P example
+
+48 72 irands P = a nnhz .2 1 steps 0 sinosc .2 * play
+
+[60 64 67 72] cyc a set
+
+72 84 irands a set
+
+;; rcyc
+
+[1/1 5/4 3/2 5/4] R = r
+r rcyc .2 1 steps 256 * 0 sinosc ^5 .2 * play
+
+[10/9 4/3 5/3 4/3] r set
+
+[1/1 5/4 3/2 5/4] r set
+
+[10/9 4/3 5/3 4/3] r set
+
+[5/4 3/2 15/8 3/2] r set
+
+[4/3 5/3 2/1 5/3] r set
+
+[3/2 15/8 9/4 15/8] r set
+
+;;;; other patterns
+(-12 12 irands 12 / ohz @) .2 -6 .1 (brands @) (0 (pi 64 /) by sin 1 32 bilin @) [3m .1 .3 .5] pulse-syn .1 1 2 ola aa 5c 2 apverb4 -.25 fade2  play
+
+(-10 0 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@) -6 .1 (brands @) (16 1 to 2 ? mirror0 cyc @) [1m .1 .3 .5] square-syn @ +/  .1 1 2 ola play
+
+-10 0 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] square-syn @ +/  .2 1 2 ola .3 aa 2 combn play
+
+-10 5 irands aa [2 3 4 5] picks + 2ple [0 2 4 6 8 10 12] degkey 12 / ohz flop @@ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] square-syn @ +/  .2 1 2 ola .3 aa 2 combn play
+
+-10 5 irands aa [2 3 4 5] picks + 2ple [0 2 4 5 7 9 12] degkey 12 / ohz flop @@ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] square-syn @ +/  .2 1 2 ola .3 aa 2 combn play
+
+-10 5 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@ 21 .01 .5 lindiv mirror0 cyc @ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] pulse-syn @ +/  .2 1 2 ola .3 aa 2 combn play
+
+-10 10 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@ 21 .01 .5 lindiv mirror0 cyc @ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] pulse-syn @ +/  #[.1 .2 .4] pickz 1 2 ola .3 aa 2 combn play
+
+-10 10 irands aa [2 3 4 5] picks + 2ple [0 2 5 7 9 12] degkey 12 / ohz flop @@ 21 .01 .5 lindiv mirror0 cyc @ -6 .1 brands @ 16 1 to 2 ? mirror0 cyc @ [1m .1 .3 .5] pulse-syn @ +/  #[.1 .2 .4 .8] #[1 8 1 1] sumto1 wpickz 1 2 ola .3 aa 2 combn play
+
+-15 -5 irands [0 2 5 7 9 12] degkey 12 / ohz @ -6 .2 brands @ 64 32 to mirror0 cyc @ .2 .7 rands @ [5c .1 .3 .5] saw-rsyn @ +/  #[.2 .4 .8]#[4 2 1] sumto1 wpickz 1 2 ola play
+
+;;;; generate files demonstrating the difference between 12 tone equal temperament and just intonation for various seventh chords
+
+[[0 4 7 10] 12 / exp2  [1/1 5/4 3/2 7/4]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "dominant7-12edo-to-just-tuning" >sfo
+
+[[0 4 7 11] 12 / exp2  [1/1 5/4 3/2 15/8]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "major7-12edo-to-just-tuning" >sfo
+
+[[0 3 7 10] 12 / exp2  [1/1 6/5 3/2 9/5]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "minor7-12edo-to-just-tuning" >sfo
+
+[[0 3 6 10] 12 / exp2  [1/1 6/5 7/5 9/5]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "halfdim7-12edo-to-just-tuning" >sfo
+
+[[0 5 7 10] 12 / exp2  [1/1 4/3 3/2 16/9]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "sus7-12edo-to-just-tuning" >sfo
+
+[[0 4 8 11] 12 / exp2  [1/1 5/4 25/16 15/8]] flop @ 2 ? @ cyc @ [3 1] cyc 1 xlines 0 ohz * 0 saw 6k lpf .2 * splay 22 1 fadeout "augmaj7-12edo-to-just-tuning" >sfo
+
+
+;;;; generate a list of all heptatonic scales rooted on a dim, min, maj or aug triad.
+
+[0 [1 2 3]@1 [3 4]@2 [5 6]@3 [6 7 8]@4 [8 9]@5 [10 11]@6] 5 flatten ; generate a list of scales
+\p[p S size p size ==] ?                                            ; remove scales with duplicates
+\p[p [2 4] at = q q [3 8] equals q [4 6] equals | not] ?            ; throw out root triads [0 3 8] and [0 4 6].
+
+
+;;;; modified from an sc tweet by batuhan bozkurt
+(2 lfnoise1 3 4 biexp [0 .1] saw 2k lpf) (32 lfnoise0 ++ 4k * 146 + 1/256 lag) (1 lfnoise1 ++ 5c * 1c + 1.4427 *) bpf 4 * tanh = a
+a (a abs 2 lag 9 *) 9 (a abs 1 lag 1h *) combc 5c 3 apverb6 play
+
+
+
+;;;; a computationally expensive snare drum
+\[
+	(111 0 tri aa 175 freqShift ba 224 freqShift + [0 1 0] -2 [1m .4] 1 curves *)
+	(180 0 sinosc 330 0 sinosc + [0 1 0] -2 [1m .2] 1 curves hang *)
+	(.0015 1.5 toosh 6k lpf 1h hpf [0 1 0] -2 [1m .4] 1 curves hang *) + + .3 *
+] = snare
+snare play
+
+;;;; smooth noise
+\[ [\[.2 white [27 24 22 29 31] pick 2 + 12 / ohz 1c resonz rpan2] 0] pick ! ] .2 3.8 2 2 oltx play
+;;;; pulsed noise
+\[ 8 0 sinosc white 5c * [27 24 22 29 31] pick 2 + 12 / ohz 1c resonz rpan2] .2 3.8 2 2 oltx play
+;;;; noise beats
+#[2 1 1 2 1 1 2 1] cyc 8 0 impulse iseq .4m .2 decay2 .1 * 2X white 52h .2 resonz 5c 4 apverb4 play
+;;;;
+(((1 0 .3 lfpulse 4m lag)(3h 22h mousex [1 1.1] * lfnoise0) * .1 *) 800 lpf abs) [.2 .17] aa 5 combn play
+
+;;;;;
+
+0 10 to mirror1 [0 3.86 7.01 10.88 14.04 12] degkey 7 - @ 70 12 0 blah .2 1 2 ola .4 * play
+
+;;;; harmonic series, slightly detuned
+1 64 to 80 * 4 2X rand2s flop + 0 sinosc 1 64 to 1/ * +/ .1 * play
+
+;;;; chebyshev waveshaping    Tn(x) = cos(n * acos(x)) for -1 <= x <= x
+\x n [x 1 clip2 acos n * cos] = cheby
+([100 101] 0 sinosc 0 1 mousex *) (1 30 mousey) cheby .2 * play
+
+
+;;;; shifting sine cloud
+\[ 50 = n \[ \[50 8k xrand 0 sinosc 1/20 1/5 xrand urand sinosc biuni *] n X splay] 60 2 2 xftx n 1/ .8 * *] ! play
+
+;;;; absolute value distortion
+100 0 sinosc  .2 0 sinosc biuni bab + abs - .2 * play
+
+
+;;;; "if one can't tell the difference between a dead end and a good lead in music then one doesn't have what it takes to be a composer of any worth" -- some guy I disagree with on facebook.
+\[\[\[1 8 xrand 1/ 0 sinosc 100 400 biexp 1 8 xrand 0 .01 .5 rand lfpulse * 1c lag] 4X +/ 80 800 xrand + 0 tri 0 |] 4X splay] 8 2 2 xftx .2 * play
+
+\i[\[\[1 8 xrand 1/ 0 sinosc 100 400 biexp 1 8 xrand 0 .01 .5 rand lfpulse * 1c lag] 4X +/ 80 800 xrand + 0 tri 0 |] 4X splay i 2pi/20 * sin 200 8k biexp lpf2 ] 8 2 2 xftx .2 * play
+
+\i[\[\[.1 80 xrand 1/ 0 sinosc 10 4000 biexp .1 80 xrand 0 .01 .5 rand lfpulse * 1c lag] 4X +/ 8 8000 xrand + 0 tri 0 |] 4X splay i 2pi/20 * sin 100 16k biexp lpf2 ] 8 2 2 xftx .2 * play
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Baker, Cooper, Fletcher, Miller, and Smith live on different floors of an apartment house that contains only five floors.
+; Baker does not live on the top floor. Cooper does not live on the bottom floor.
+; Fletcher does not live on either the top or the bottom floor. Miller lives on a higher floor than does Cooper.
+; Smith does not live on a floor adjacent to Fletcher's. Fletcher does not live on a floor adjacent to Cooper's.
+; Where does everyone live?
+
+; this solution checks all permutations instead of throwing out out permutations that cannot work in outer loops, which would be more efficient.
+
+1 5 to perms \p[
+	p un5 \baker cooper fletcher miller smith [
+		baker 5 !=
+		cooper 1 != &
+		fletcher 1 != & fletcher 5 != &
+		miller cooper > &
+		smith fletcher absdif 1 != &
+		fletcher cooper absdif 1 != &
+	] !
+] ? @ grade ['baker 'cooper 'fletcher 'miller 'smith] ba at
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; programming examples from Project Euler ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;; Multiples of 3 and 5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\n [[0 1][n -- 1] ? cyc] = f  1 999 to 3 f 5 f | ? +/
+
+;;;; Even Fibonacci numbers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0 1 fib aa 2 % cmpl ? aa 4M <= keepWhile +/
+
+;;;; Largest prime factor ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+primes aa 600851475143 ba / frac 0 == ? |/
+
+;;;; Smallest multiple ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+primes 20 log primes log / floor aa 0 > keepWhile ^ */
+
+;;;; Sum square difference ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1 100 to = a a +/ sq a sq +/ -
+
+;;;; 10001st prime ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+primes 10000 skip head
+
+;;;; Largest product in a series ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[
+"73167176531330624919225119674426574742355349194934"
+"96983520312774506326239578318016984801869478851843"
+"85861560789112949495459501737958331952853208805511"
+"12540698747158523863050715693290963295227443043557"
+"66896648950445244523161731856403098711121722383113"
+"62229893423380308135336276614282806444486645238749"
+"30358907296290491560440772390713810515859307960866"
+"70172427121883998797908792274921901699720888093776"
+"65727333001053367881220235421809751254540594752243"
+"52584907711670556013604839586446706324415722155397"
+"53697817977846174064955149290862569321978468622482"
+"83972241375657056057490261407972968652414535100474"
+"82166370484403199890008895243450658541227588666881"
+"16427171479924442928230863465674813919123162824586"
+"17866458359124566529476545682848912883142607690042"
+"24219022671055626321111109370544217506941658960408"
+"07198403850962455444362981230987879927244284909188"
+"84580156166097919133875499200524063689912560717606"
+"05886116467109405077541002256983155200055935729725"
+"71636269561882670428252483600823257530420752963450"
+] $/ V "0" V cyc - = s
+0 1000 13 - to = a  a a 12 + to = inx
+s inx at @ */ |/
+
+;;;; Special Pythagorean triplet ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1 998 to @ \a [
+	a 998 a - to @ \b [ 1000 a - b - = c
+		b sq a sq + c sq ==
+		\[[[a b c]]]\[[]] if
+	] ! $/
+] ! $/ head */
+
+;;;; Summation of primes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+primes aa 2M < keepWhile +/
+
+;;;; incomplete
+[
+[08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08]
+[49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00]
+[81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65]
+[52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91]
+[22 31 16 71 51 67 63 89 41 92 36 54 22 40 40 28 66 33 13 80]
+[24 47 32 60 99 03 45 02 44 75 33 53 78 36 84 20 35 17 12 50]
+[32 98 81 28 64 23 67 10 26 38 40 67 59 54 70 66 18 38 64 70]
+[67 26 20 68 02 62 12 20 95 63 94 39 63 08 40 91 66 49 94 21]
+[24 55 58 05 66 73 99 26 97 17 78 78 96 83 14 88 34 89 63 72]
+[21 36 23 09 75 00 76 44 20 45 35 14 00 61 33 97 34 31 33 95]
+[78 17 53 28 22 75 31 67 15 94 03 80 04 62 16 14 09 53 56 92]
+[16 39 05 42 96 35 31 47 55 58 88 24 00 17 54 24 36 29 85 57]
+[86 56 00 48 35 71 89 07 05 44 44 37 44 60 21 58 51 54 17 58]
+[19 80 81 68 05 94 47 69 28 73 92 13 86 52 17 77 04 89 55 40]
+[04 52 08 83 97 35 99 16 07 97 57 32 16 26 26 79 33 27 98 66]
+[88 36 68 87 57 62 20 72 03 46 33 67 46 55 12 32 63 93 53 69]
+[04 42 16 73 38 25 39 11 24 94 72 18 08 46 29 32 40 62 76 36]
+[20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16]
+[20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54]
+[01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48]
+] = g
+\x [ x @ \gg[ gg 0 16 to N> @ 4 N @ */ |/ ] ! |/] = f
+[g f g flop f] |/   ;;; horizontal and vertical products
+
+;;;; Longest Collatz sequence ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\n [n even? \[n 2 /]\[n 3 * ++]if] = hailNext
+\a [a `hailNext iter aa 1 != keepWhile 1 add] = hail
+\n[1 n to aa @ hail @ size aa |/ aa "length = " pr pr ba find at "   value = " pr pr cr] = longestHail
+100000 longestHail  ;; very slow. result: length = 525   value = 837799
+
+;;;; Lattice paths
+\n [[1] \a[a 0 cons aa -1 rot +] n chain \a[a +^ tail] n chain head] = latticePaths
+20 latticePaths
+
+;;;; Maximum path sum I ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[
+[75]
+[95 64]
+[17 47 82]
+[18 35 87 10]
+[20 04 82 47 65]
+[19 01 23 75 03 34]
+[88 02 77 73 07 63 67]
+[99 65 04 28 06 16 70 92]
+[41 41 26 56 83 40 80 70 33]
+[41 48 72 33 47 32 37 16 94 29]
+[53 71 44 65 25 43 91 52 97 51 14]
+[70 11 33 28 77 73 17 78 39 68 17 57]
+[91 71 52 38 17 14 91 43 58 50 27 29 48]
+[63 66 04 68 89 53 67 30 73 16 69 87 40 31]
+[04 62 98 27 23 09 70 98 73 93 38 53 60 04 23]
+] = t
+\a n[a 0 a size n - to @ 0 n -- to + at] = slide
+t reverse \a b[a b 2 slide @ |/ +] reduce1 head
+
+;;;; Counting Sundays ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1 [31 28 31 30 31 30 31 31 30 31 30 31] to $/ = normalyeardays
+1 [31 29 31 30 31 30 31 31 30 31 30 31] to $/ = leapyeardays
+[normalyeardays leapyeardays][3 1] ? $/ 24 ncyc normalyeardays 4 ncyc $ 1 == = firsts
+1 7 to -1 rot cyc firsts ? 7 == +/
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; programming examples from Rosetta Code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;; 100 doors              http://rosettacode.org/wiki/100_doors
+0 99 to 0s @ [1] $ @ cyc 100 0s \a b[a b - abs] reduce 10 clump 10 N prall  ; unoptimized
+
+1 2 2 by spread 10 clump 10 N prall  ; optimized
+
+;;;; power set              http://rosettacode.org/wiki/Power_set
+\s f[s empty \[[s]]\[s tail f = t t t @ \a[a s head cons]! $]if] Y = powerset
+[1 2 3 4 5] powerset
+
+;;;; fizzbuzz               http://rosettacode.org/wiki/FizzBuzz
+\a b n[[a b] n -- 0s 1 add cyc sel] = f 1 100 to "fizz" 3 f "buzz" 5 f "fizzbuzz" 15 f prall
+
+;;;; factorial              http://rosettacode.org/wiki/Factorial
+\n f[n 2 < \[1]\[n n -- f *]if] Y = factorial  ;; recursive version
+7 factorial
+
+\n[1 n to */] = factorial    ;; iterative version
+
+;;;; anonymous recursion    http://rosettacode.org/wiki/Anonymous_recursion
+\n [n 0 < \["outOfRange"] \[ n \n f[n 2 < \[n]\[n 1 - f n 2 - f +]if] Y !]if] = fibon
+9 fibon
+
+;;;; accumulator factory    http://rosettacode.org/wiki/Accumulator_factory
+\x[x R = r \y[r y + aa r set]] = accumulator
+5 accumulator = a
+3 a
+
+;;;; happy numbers          http://rosettacode.org/wiki/Happy_numbers
+\n[n str Z 48 - ^2 +/] = sumSqDigits
+\n[n `sumSqDigits iter] = happySeq
+\a[a [] \x z f[x head = h h 1 == \[1]\[h z find 0 >= \[0]\[x tail z h cons f]if]if]Y !] = isHappy
+ord \x[x happySeq isHappy] ? 8 N        ; find first eight happy numbers
+
+;;;; Harshad sequence       http://rosettacode.org/wiki/Harshad_or_Niven_series
+\n[n str Z 48 - +/] = sumDigits
+\[ord aaa @ sumDigits imod 0 == ?] = harshads
+harshads 20 N 	; first twenty
+harshads aa 1k <= skipWhile head  ; first greater than 1000
+
+;;;; hailstone sequence     http://rosettacode.org/wiki/Hailstone_sequence
+\n [n even? \[n 2 /]\[n 3 * ++]if] = hailNext
+\a [a `hailNext iter aa 1 != keepWhile 1 add] = hail
+\n[1 n to aa @ hail @ size aa |/ aa "length = " pr pr ba find at "   value = " pr pr cr] = longestHail
+1000 longestHail
+10000 longestHail
+100000 longestHail
+
+;;;; flatten a list         http://rosettacode.org/wiki/Flatten_a_list
+[[1] 2 [[3 4] 5] [[[]]] [[[6]]] 7 8 []] flat  ; built-in
+
+;;;; floyd's triangle       http://rosettacode.org/wiki/Floyd%27s_triangle
+\n[ord aa clump n N] = floyd
+10 floyd prall
+
+;;;; fibonacci sequence     http://rosettacode.org/wiki/Fibonacci_sequence
+0 1 fib  ; built-in
+
+;;;; sort integers          http://rosettacode.org/wiki/Sort_an_integer_array
+[27 37 94 84 12 93 87 66 79 29 81 29 68 81 48] sort  ; built-in
+
+;;;; reverse a string       http://rosettacode.org/wiki/Reverse_a_string
+"reverse a string" Z reverse unspell
+
+;;;; sum of a series        http://rosettacode.org/wiki/Sum_of_a_series
+1 10k to ^2 1/ +/
+
+;;;; catalan numbers        http://rosettacode.org/wiki/Catalan_numbers
+1 \c i[i ++ = n 4 n * 2 - n ++ / c *] iter
+
+;;;; pascal's triangle      http://rosettacode.org/wiki/Pascal%27s_triangle
+[1] \a[a a 0 cons +>] iter 10 N prall
+
+;;;; sum of squares         http://rosettacode.org/wiki/Sum_of_squares
+[1 2 3 4 5 6] ^2 +/
+
+;;;; hamming numbers        http://rosettacode.org/wiki/Hamming_numbers
+\[0 R = r \[5 r * 3 r * 2 r * `cmp mergec `cmp mergec] 1 cons aa r set] = hamming
+;; creates a reference cycle!
+hamming 20 N prall
+hamming 1690 N> head
+
+;;;; Kaprekar numbers       http://rosettacode.org/wiki/Kaprekar_numbers
+\m[2 m to \n[n ^2 aa log10 ceil 1 10 ngrow divmod abab + n == cab * 0 > & |/] ? 1 cons] = kaps
+10000 kaps
+1000000 kaps aa prall size
+
+;;;; Perfect numbers        http://rosettacode.org/wiki/Perfect_numbers
+1 10000 to \n[n factors -1 drop +/ n ==] ?
+
+;;;; Pythagorean triples    http://rosettacode.org/wiki/Pythagorean_triples
+\n [
+	1 n to @ \a [
+		a n to @ \b [
+			b n to @ \c [
+				(a b c + + n <) (b sq a sq + c sq ==) &
+				\[[[a b c]]]\[[]] if
+			] ! $/
+		] ! $/
+	] ! $/
+] = nonprimitive
+
+\n[ n nonprimitive \x[x un2 gcd 1 ==] ?] = primitive
+
+100 nonprimitive aa size
+100 primitive aa size
+
+;;;; forward difference     http://rosettacode.org/wiki/Forward_difference#Factor
+\x[x -^ tail] = fwdDiff
+[90 47 58 29 22 32 55 5 55 73] `fwdDiff iter `nonempty keepWhile
+
+;;;; vector products        http://rosettacode.org/wiki/Vector_products
+\a b[a b * +/] = dotPr
+\a b[a[1 2 0]at b[2 0 1]at * a[2 0 1]at b[1 2 0]at * -] = crossPr
+\a b c[a b c crossPr dotPr] = scalarTriplePr
+\a b c[a b c crossPr crossPr] = vecTriplePr
+
+[3 4 5] = a
+[4 3 5] = b
+[-5 -12 -13] = c
+a b dotPr
+a b crossPr
+a b c scalarTriplePr
+a b c vecTriplePr
+
+;;;; largest int from concatenated ints       http://rosettacode.org/wiki/Largest_int_from_concatenated_ints
+[1 34 3 98 9 76 45 4] @ str sort> $/
+[54 546 548 60] @ str sort> $/
+
+;;;; spiral matrix          http://rosettacode.org/wiki/Spiral_matrix
+;; using Tuttle's algorithm from here: http://www.jsoftware.com/papers/play132.htm
+\n[n even? .5 - sgn [1 n neg -1 n] * cyc 1 n -- to 2 ? n -- add ? n -- 3 * cons +\ grade n clump] = evolute
+\n[n ^2 -- n evolute -] = involute
+7 involute prall
+
+;;;; price fraction         http://rosettacode.org/wiki/Price_fraction
+[.06 .11 .16 .21 .26 .31 .36 .41 .46 .51 .56 .61 .66 .71 .76 .81 .86 .91 .96 1.01] = a
+[.10 .18 .26 .32 .38 .44 .50 .54 .58 .62 .66 .70 .74 .78 .82 .86 .90 .94 .98 1.00] = b
+\n[n 0 < n 1.01 >= | \["outOfRange"]\[b a n < skipWhile head]if] = priceFrac
+102 0 .01 nby aa @ priceFrac 2ple flop prall
+
+;;;; constrained random points on a circle    http://rosettacode.org/wiki/Constrained_random_points_on_a_circle
+0 15 irands @ 0 15 irands @ \x y[x y hypot = h h 10 >= h 15 <= & \[[[x y]]]\[[]]if]! $/ 100 N
+;; need plotting code..
+
+;;;; repeat a string        http://rosettacode.org/wiki/Repeat_a_string
+"ha" 5 X $/
+"*" 5 X $/
+
+;;;; arithmetic mean        http://rosettacode.org/wiki/Averages/Arithmetic_mean
+\s [ s +/ s size /] = mean
+
+;;;; best shuffle           http://rosettacode.org/wiki/Best_shuffle
+\s[s V = v
+	v permswr muss aa @ v == @ +/ grade head at = w
+	[v unspell ", " w unspell ", (" v w == +/ ")"] $/ pr cr
+] = bestshuf
+
+"a" bestshuf
+"up" bestshuf
+"elk" bestshuf
+"seesaw" bestshuf
+"grrrrrr" bestshuf
+"abracadabra" bestshuf
+
+;;;; arabic to roman numerals    http://rosettacode.org/wiki/Roman_numerals/Encode
+\x[ x 3999 > x 1 < | \["outOfRange"]
+	\["M" x 1k idiv X
+	 [["" "C" "CC" "CCC" "CD" "D" "DC" "DCC" "DCCC" "CM"] x 1h idiv 10 imod at
+ 	  ["" "X" "XX" "XXX" "XL" "L" "LX" "LXX" "LXXX" "XC"] x 10 idiv 10 imod at
+ 	  ["" "I" "II" "III" "IV" "V" "VI" "VII" "VIII" "IX"] x 10 imod at] $ $/]if] = arabicToRoman
+1987 arabicToRoman
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+.2 0 .5 lfpulse 10 * 8 +  0 .5 lfpulse 400 * 900 + 9m lag 0 sinosc 0.37 0 .1 lfpulse 8m lag * .4 * [.3 .25] aa 3 combn play
+
+;;;;;;;;;;;;;;
+
+256 #[4 5 6 7 9 11] 4 / cyc * .1 1 steps \[\[.4 rand2] 2 X] 7 X + 0 saw +/ .05 0 sinosc 3000 * 3300 + .3 rlpf2 .01 * play
+
+;;; pause test
+(.4 0 lfsaw 2 * [8 7.23] 0 lfsaw .25 * 9.667 + + exp2 0 sinosc .04 * .2 0 4 combn) (1/20 0 sinosc .2 200 biexp 0 sinosc) pause play
+
+;;;; check oscillator phases
+\[
+	.5 2X mum = mm
+	\a [a .5 T  mm] = r
+	[0 .25] = p
+	[
+		2 p sinosc            r
+		2 p 0 sinoscfb        r
+		2 p 1 0 sinoscm       r
+		2 p par               r
+		2 p lfsaw             r
+		2 p saw               r
+		2 p .5 lfpulse        r
+		2 p .5 pulse          r
+		2 p impulse           r
+	]  flop @ $/
+	"osc-phase-test" >sfo
+] !
+
+;; thread closures
+\[ 	1 = a  [1 a] pr cr
+	\[ 1 sleep   [2 a] pr cr   2 sleep [2 a] pr cr   "thread 2 done" pr cr] go
+	2 = a  [1 a] pr cr
+	\[2 sleep    [3 a] pr cr   2 sleep [3 a] pr cr   "thread 3 done" pr cr] go
+	"thread 1 done" pr cr
+] !
+
+;;;; native algorhythms - softened attack
+\[
+	8 = n
+	[
+		[2 0 2 0 1 0 1 1]
+		[2 0 1 0 1 0 1 0]
+		[2 0 1 1 1 1 1 0]
+		[2 .3 .3 1 .3 .3 1 .3]
+		[2 0 .3 0 .3 0 .3 0]
+		[2 0 0 1 0 0 0 0]
+		[2 0 0 0 0 0 0 0]
+		[0 1 0 1 0 1 0 1]
+		[1 0 0 1 0 0 1 0  0 1 0 0 1 0 1 0]
+	] picks $/ Z = pat
+	\[
+		((pat 10 0 impulse iseq) 5c decay 1c pink *) (n 1 5 nlinrands 40 340 rand *) 2X @ [1 -1] @ [(n .4 1 nlinrands) 4m] @ klank +/ rpan2
+	] 8 4 4 2 oltx
+] ! play
+
+
+;; chromatic sequence
+[0 -1 by  [0 2 6] 0 5 by @ + $/] 12 / 1 - ohz @  .25 [3 1] * @ 1 steps 8c lag [.3 0] + 0 saw 6k lpf1 .2 * play
