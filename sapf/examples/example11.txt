@@ -1,0 +1,2 @@
+  ;; play a sine wave at 800 Hz and initial phase of zero.
+    800 0 sinosc .3 * play

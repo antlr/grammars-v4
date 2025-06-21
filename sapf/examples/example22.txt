@@ -1,0 +1,2 @@
+{sweepy :rate1 -.1  :rate2 -30 :freq1 2h :rq .02 }.out play
+

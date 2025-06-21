@@ -1,0 +1,3 @@
+ \a b
+        "(a b --> sum product) returns the sum and product of a and b."
+        [a b + a b *]
