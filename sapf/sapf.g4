@@ -42,11 +42,7 @@ file_
    ;
 
 line
-   : exprline EOL
-   ;
-
-exprline
-   : expression*
+   : expression* EOL
    ;
 
 expression
@@ -92,7 +88,7 @@ number
    ;
 
 word
-   : LITERAL
+   : ('`' | '\'' | ',' | '.')? LITERAL
    ;
 
 DIGITS
@@ -100,7 +96,7 @@ DIGITS
    ;
 
 LITERAL
-   : [a-zA-Z]+
+   : [a-zA-Z_]+
    ;
 
 STRING
