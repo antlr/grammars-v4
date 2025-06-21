@@ -64,7 +64,7 @@ key
    ;
 
 function
-   : '\\' LITERAL+ STRING? list ('=' word)?
+   : '\\' LITERAL* STRING? list ('=' word)?
    ;
 
 atom
