@@ -451,6 +451,7 @@ integer
 
 operandName
     : IDENTIFIER
+    | qualifiedIdent
     ;
 
 qualifiedIdent
