@@ -42,13 +42,16 @@ file_
    ;
 
 line
-   : expression* EOL
+   : exprline EOL
+   ;
+
+exprline
+   : expression*
    ;
 
 expression
-   : expression expression (TIMES | DIV)
-   | expression expression (PLUS | MINUS)
-   | LPAREN expression RPAREN
+   : expression expression (TIMES | DIV | PLUS | MINUS)+
+   | LPAREN expression+ RPAREN
    | (PLUS | MINUS)* atom
    ;
 
@@ -63,7 +66,7 @@ atom
    ;
 
 decimal
-   : '-'? ((DIGITS '.') | ('.' DIGITS) | (DIGITS '.' DIGITS) | DIGITS)
+   : '-'? ((DIGITS '.' DIGITS) | (DIGITS '.') | ('.' DIGITS) | DIGITS)
    ;
 
 scientific
