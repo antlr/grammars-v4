@@ -52,7 +52,7 @@ expression
    ;
 
 list
-   : LBRACK expression+ RBRACK
+   : '#'? LBRACK expression+ RBRACK
    ;
 
 form
@@ -63,11 +63,16 @@ key
    : ':' LITERAL
    ;
 
+function
+   : '\\' LITERAL+ STRING? list ('=' word)?
+   ;
+
 atom
    : number
    | list
    | word
    | form
+   | function
    ;
 
 decimal
