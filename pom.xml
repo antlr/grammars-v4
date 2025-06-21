@@ -327,6 +327,7 @@
 				<module>rpn</module>
 				<module>ruby</module>
 				<module>rust</module>
+                <module>sapf</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
