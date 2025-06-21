@@ -16,16 +16,42 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 						<include>Cobol85.g4</include>
+						<include>Cobol85Preprocessor.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
+					<arguments>
+						<argument>-package</argument>
+						<argument>io.proleap.cobol</argument>
+					</arguments>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.khubla.antlr</groupId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
+				<configuration>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
+					<entryPoint>startRule</entryPoint>
+					<grammarName>Cobol85</grammarName>
+					<packageName>io.proleap.cobol</packageName>
+					<exampleFiles>examples/</exampleFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
 						</goals>
 					</execution>
 				</executions>

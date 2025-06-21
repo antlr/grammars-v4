@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
-import org.codehaus.plexus.util.StringUtils;
 
 import io.proleap.cobol.Cobol85PreprocessorParser.PseudoTextContext;
 import io.proleap.cobol.Cobol85PreprocessorParser.ReplaceableContext;
@@ -50,7 +49,7 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
 		if (replaceable == null) {
 			result = null;
 		} else {
-			final String[] parts = StringUtils.split(replaceable);
+			final String[] parts = replaceable.split("[ \t\n\r\f]");
 			final String[] regexParts = new String[parts.length];
 			final String regexSeparator = "[\\r\\n\\s]+";
 
@@ -59,7 +58,7 @@ public class CobolReplacementMapping implements Comparable<CobolReplacementMappi
 				regexParts[i] = Pattern.quote(part);
 			}
 
-			result = StringUtils.join(regexParts, regexSeparator);
+			result = String.join(regexSeparator, regexParts);
 		}
 
 		return result;

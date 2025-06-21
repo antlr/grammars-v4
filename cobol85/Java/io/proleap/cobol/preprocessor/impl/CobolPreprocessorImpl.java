@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
 
 import io.proleap.cobol.preprocessor.CobolPreprocessor;
 import io.proleap.cobol.preprocessor.sub.CobolLine;
@@ -30,7 +28,7 @@ import io.proleap.cobol.preprocessor.sub.line.writer.impl.CobolLineWriterImpl;
 
 public class CobolPreprocessorImpl implements CobolPreprocessor {
 
-	private final static Logger LOG = LogManager.getLogger(CobolPreprocessorImpl.class);
+	private final static Logger LOG = Logger.getLogger(CobolPreprocessorImpl.class.getSimpleName());
 
 	protected CobolCommentEntriesMarkerImpl createCommentEntriesMarker() {
 		return new CobolCommentEntriesMarkerImpl();
@@ -68,7 +66,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 	@Override
 	public String process(final File cobolFile, final List<File> copyFiles, final CobolSourceFormatEnum format,
 			final CobolDialect dialect) throws IOException {
-		LOG.info("Preprocessing file {}.", cobolFile.getName());
+		LOG.info(String.format("Preprocessing file %s.", cobolFile.getName()));
 
 		final InputStream inputStream = new FileInputStream(cobolFile);
 		final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -100,7 +98,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 		final List<CobolLine> rewrittenLines = rewriteLines(lines);
 		final String result = parseDocument(rewrittenLines, copyFiles, format, dialect);
 
-		LOG.debug("Processed input:\n\n{}\n\n", result);
+		LOG.fine(String.format("Processed input:\n\n%s\n\n", result));
 
 		return result;
 	}
