@@ -42,7 +42,7 @@ file_
    ;
 
 line
-   : expression* EOL
+   : expression+
    ;
 
 expression
@@ -55,10 +55,19 @@ list
    : LBRACK expression+ RBRACK
    ;
 
+form
+   : LCURL (key | expression)+ RCURL ('=' word)?
+   ;
+
+key
+   : ':' LITERAL
+   ;
+
 atom
    : number
    | list
    | word
+   | form
    ;
 
 decimal
@@ -107,6 +116,14 @@ EACH
    : '@'
    ;
 
+LCURL
+   : '{'
+   ;
+
+RCURL
+   : '}'
+   ;
+
 LBRACK
    : '['
    ;
@@ -143,11 +160,7 @@ COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
 
-EOL
-   : [\r\n]+
-   ;
-
 WS
-   : [ \t]+ -> skip
+   : [ \t\r\n]+ -> skip
    ;
 
