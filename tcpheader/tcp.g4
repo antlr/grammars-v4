@@ -29,61 +29,64 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar tcp;
 
 segmentheader
-   : sourceport destinationport sequencenumber acknumber flags windowsize checksum urgent
-   ;
+    : sourceport destinationport sequencenumber acknumber flags windowsize checksum urgent
+    ;
 
 sourceport
-   : word_
-   ;
+    : word_
+    ;
 
 destinationport
-   : word_
-   ;
+    : word_
+    ;
 
 sequencenumber
-   : dword_
-   ;
+    : dword_
+    ;
 
 acknumber
-   : dword_
-   ;
+    : dword_
+    ;
 
 flags
-   : word_
-   ;
+    : word_
+    ;
 
 windowsize
-   : word_
-   ;
+    : word_
+    ;
 
 checksum
-   : word_
-   ;
+    : word_
+    ;
 
 urgent
-   : word_
-   ;
+    : word_
+    ;
 
 dword_
-   : BYTE BYTE BYTE BYTE
-   ;
+    : BYTE BYTE BYTE BYTE
+    ;
 
 word_
-   : BYTE BYTE
-   ;
+    : BYTE BYTE
+    ;
 
 byte_
-   : BYTE
-   ;
+    : BYTE
+    ;
 
 BYTE
-   : '\u0000' .. '\u00FF'
-   ;
+    : '\u0000' .. '\u00FF'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

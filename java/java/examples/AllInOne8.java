@@ -211,4 +211,69 @@ public class Annos {
             }
         }
     }
+
+}
+
+class Issue1897 {
+    @Target({ElementType.TYPE, ElementType.TYPE_USE})
+    @interface Dum1 {
+    }
+
+    @Target(ElementType.TYPE_USE)
+    @interface Dum2 {
+    }
+
+    @Target(ElementType.TYPE_USE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Dum3 {
+    }
+
+    abstract class C {
+        // https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1
+        void f(@Dum1 @Dum2 C this) {
+
+        }
+
+        void d(C this, int i, int j) {
+
+        }
+
+        void e(C this, int i, int j, int... k) {
+
+        }
+
+        void c(C this, int... k) {
+
+        }
+
+        abstract void am(C this);
+
+        class D {
+
+            class E {
+                E(Issue1897.C.D D.this) {
+                }
+            }
+
+            class GE {
+                <TY> GE(Issue1897.C.D D.this) {
+
+                }
+            }
+
+            void b(Issue1897.C.@Dum3 D Issue1897.C.D.this) {
+
+            }
+
+            void b2(Issue1897.C.@Dum3 D this) {
+            }
+
+            void b3(@Dum1 D this) {
+            }
+        }
+
+        void b(Issue1897.C Issue1897.C.this) {
+
+        }
+    }
 }

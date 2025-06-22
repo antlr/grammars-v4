@@ -1,5 +1,8 @@
 import java.util.List;
 import org.antlr.v4.runtime.*;
+import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
@@ -7,122 +10,119 @@ import org.antlr.v4.runtime.*;
  */
 public abstract class GoParserBase extends Parser
 {
+    private static final boolean debug = false;
+    private Set<String> table = new HashSet<>();
+
     protected GoParserBase(TokenStream input) {
         super(input);
     }
 
+    protected void myreset()
+    {
+        table = new HashSet<String>();
+    }
+
     /**
-     * Returns {@code true} iff on the current index of the parser's
-     * token stream a token exists on the {@code HIDDEN} channel which
-     * either is a line terminator, or is a multi line comment that
-     * contains a line terminator.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token exists on the {@code HIDDEN} channel which
-     * either is a line terminator, or is a multi line comment that
-     * contains a line terminator.
+     * Returns true if the current Token is a closing bracket (")" or "}")
      */
-    protected boolean lineTerminatorAhead() {
-        // Get the token ahead of the current index.
-        int offset = 1;
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - offset;
-
-        if (possibleIndexEosToken == -1)
-        {
-            return true;
-        }
-
-        Token ahead = _input.get(possibleIndexEosToken);
-
-        while(ahead.getChannel() == Lexer.HIDDEN )
-        {
-            if(ahead.getType() == GoLexer.TERMINATOR){
-                return true;
-            }
-            else if(ahead.getType() == GoLexer.WS){
-                possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - ++offset;
-                ahead = _input.get(possibleIndexEosToken);
-            }
-            else if(ahead.getType() == GoLexer.COMMENT || ahead.getType() == GoLexer.LINE_COMMENT ){
-                if(ahead.getText().contains("\r") || ahead.getText().contains("\n")){
-                    return true;
-                }
-                else{
-                    possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - ++offset;
-                    ahead = _input.get(possibleIndexEosToken);
-                }
-            }
-        }
-
-        return false;
-    }
-
-     /**
-     * Returns {@code true} if no line terminator exists between the specified
-     * token offset and the prior one on the {@code HIDDEN} channel.
-     *
-     * @return {@code true} if no line terminator exists between the specified
-     * token offset and the prior one on the {@code HIDDEN} channel.
-     */
-    protected boolean noTerminatorBetween(int tokenOffset) {
-        BufferedTokenStream stream = (BufferedTokenStream)_input;
-        List<Token> tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex());
-        
-        if (tokens == null) {
-            return true;
-        }
-
-        for (Token token : tokens) {
-            if (token.getText().contains("\n"))
-                return false;
-        }
-
-        return true;
-    }
-
-     /**
-     * Returns {@code true} if no line terminator exists after any encounterd
-     * parameters beyond the specified token offset and the next on the
-     * {@code HIDDEN} channel.
-     *
-     * @return {@code true} if no line terminator exists after any encounterd
-     * parameters beyond the specified token offset and the next on the
-     * {@code HIDDEN} channel.
-     */
-    protected boolean noTerminatorAfterParams(int tokenOffset) {
-        BufferedTokenStream stream = (BufferedTokenStream)_input;
-        int leftParams = 1;
-        int rightParams = 0;
-
-        if (stream.LT(tokenOffset).getType() == GoLexer.L_PAREN) {
-            // Scan past parameters
-            while (leftParams != rightParams) {
-                tokenOffset++;
-                int valueType = stream.LT(tokenOffset).getType();
-
-                if (valueType == GoLexer.L_PAREN){
-                    leftParams++;
-                }
-                else if (valueType == GoLexer.R_PAREN) {
-                    rightParams++;
-                }
-            }
-
-            tokenOffset++;
-            return noTerminatorBetween(tokenOffset);
-        }
-
-        return true;
-    }
-
-    protected boolean checkPreviousTokenText(String text)
+    protected boolean closingBracket()
     {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
-        String prevTokenText = stream.LT(1).getText();
-        
-        if (prevTokenText == null)
-            return false;
-        
-        return prevTokenText.equals(text);
+        var la = stream.LT(1);
+        return la.getType() == GoLexer.R_PAREN || la.getType() == GoLexer.R_CURLY || la.getType() == Token.EOF;
+    }
+
+
+    protected boolean isNotReceive()
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(2);
+        return la.getType() != GoLexer.RECEIVE;
+    }
+
+    public void addImportSpec() {
+        if (!(this._ctx instanceof GoParser.ImportSpecContext)) {
+            return;
+        }
+        GoParser.ImportSpecContext importSpec = (GoParser.ImportSpecContext) this._ctx;
+        if (importSpec == null) {
+            return;
+        }
+        GoParser.PackageNameContext packageName = importSpec.packageName();
+        if (packageName != null) {
+            String name = packageName.getText();
+            if (debug) System.out.println("Entering " + name);
+            table.add(name);
+        } else {
+            String name = importSpec.importPath().getText();
+            name = name.replace("\"", "");
+            name = name.replace("\\", "/");
+            String[] pathArr = name.split("/");
+            String[] fileArr = pathArr[pathArr.length - 1].split("\\.");
+            String fileName = fileArr[fileArr.length - 1];
+            if (debug) System.out.println("Entering " + fileName);
+            table.add(fileName);
+        }
+    }
+
+    public boolean isOperand() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(1);
+        if ("err".equals(la.getText())) {
+            return true;
+        }
+        boolean result = true;
+        if (la.getType() != GoParser.IDENTIFIER) {
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        result = table.contains(la.getText());
+        Token la2 = stream.LT(2);
+        if (la2.getType() != GoParser.DOT) {
+            result = true;
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        Token la3 = stream.LT(3);
+        if (la3.getType() == GoParser.L_PAREN) {
+            result = true;
+            if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        if (debug) System.out.println("isOperand Returning " + result + " for " + la);
+        return result;
+    }
+
+    public boolean isMethodExpr() {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        Token la = stream.LT(1);
+        boolean result = true;
+
+        // If '*' => definitely a method expression
+        if (la.getType() == GoParser.STAR) {
+            if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+            return result;
+        }
+
+        // If not an identifier, can't be a method expr
+        if (la.getType() != GoParser.IDENTIFIER) {
+            result = false;
+            if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+            return result;
+        }
+
+        // If it's an identifier not in the table => method expr
+        result = !table.contains(la.getText());
+        if (debug) System.out.println("isMethodExpr Returning " + result + " for " + la);
+        return result;
+    }
+    
+    protected boolean isConversion()
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        var la = stream.LT(1);
+        var result = la.getType() != GoLexer.IDENTIFIER;
+        if (debug) System.out.println("isConversion Returning " + result + " for " + la);
+        return result;
     }
 }

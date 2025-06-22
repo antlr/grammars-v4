@@ -1,4 +1,3 @@
-
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr
@@ -29,153 +28,170 @@
 /** Derived from http://www.graphviz.org/doc/info/lang.html.
     Comments pulled from spec.
  */
+ /*
+  Modified by: Andrzej Borucki (2025) : character set
+ */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+// Andrzej Borucki: characters
+
 grammar DOT;
 
+options {
+    caseInsensitive = true;
+}
+
 graph
-   : STRICT? ( GRAPH | DIGRAPH ) id_? '{' stmt_list '}'
-   ;
+    : STRICT? (GRAPH | DIGRAPH) id_? '{' stmt_list '}' EOF
+    ;
 
 stmt_list
-   : ( stmt ';'? )*
-   ;
+    : (stmt ';'?)*
+    ;
 
 stmt
-   : node_stmt | edge_stmt | attr_stmt | id_ '=' id_ | subgraph
-   ;
+    : node_stmt
+    | edge_stmt
+    | attr_stmt
+    | id_ '=' id_
+    | subgraph
+    ;
 
 attr_stmt
-   : ( GRAPH | NODE | EDGE ) attr_list
-   ;
+    : (GRAPH | NODE | EDGE) attr_list
+    ;
 
 attr_list
-   : ( '[' a_list? ']' )+
-   ;
+    : ('[' a_list? ']')+
+    ;
 
 a_list
-   : ( id_ ( '=' id_ )? ','? )+
-   ;
+    : (id_ ( '=' id_)? (';' | ',')?)+
+    ;
 
 edge_stmt
-   : ( node_id | subgraph ) edgeRHS attr_list?
-   ;
+    : (node_id | subgraph) edgeRHS attr_list?
+    ;
 
 edgeRHS
-   : ( edgeop ( node_id | subgraph ) )+
-   ;
+    : (edgeop ( node_id | subgraph))+
+    ;
 
 edgeop
-   : '->' | '--'
-   ;
+    : '->'
+    | '--'
+    ;
 
 node_stmt
-   : node_id attr_list?
-   ;
+    : node_id attr_list?
+    ;
 
 node_id
-   : id_ port?
-   ;
+    : id_ port?
+    ;
 
 port
-   : ':' id_ ( ':' id_ )?
-   ;
+    : ':' id_ (':' id_)?
+    ;
 
 subgraph
-   : ( SUBGRAPH id_? )? '{' stmt_list '}'
-   ;
+    : (SUBGRAPH id_?)? '{' stmt_list '}'
+    ;
 
 id_
-   : ID | STRING | HTML_STRING | NUMBER
-   ;
+    : ID
+    | STRING
+    | HTML_STRING
+    | NUMBER
+    ;
 
 // "The keywords node, edge, graph, digraph, subgraph, and strict are
 // case-independent"
-
 STRICT
-   : [Ss] [Tt] [Rr] [Ii] [Cc] [Tt]
-   ;
-
+    : 'strict'
+    ;
 
 GRAPH
-   : [Gg] [Rr] [Aa] [Pp] [Hh]
-   ;
-
+    : 'graph'
+    ;
 
 DIGRAPH
-   : [Dd] [Ii] [Gg] [Rr] [Aa] [Pp] [Hh]
-   ;
-
+    : 'digraph'
+    ;
 
 NODE
-   : [Nn] [Oo] [Dd] [Ee]
-   ;
-
+    : 'node'
+    ;
 
 EDGE
-   : [Ee] [Dd] [Gg] [Ee]
-   ;
-
+    : 'edge'
+    ;
 
 SUBGRAPH
-   : [Ss] [Uu] [Bb] [Gg] [Rr] [Aa] [Pp] [Hh]
-   ;
+    : 'subgraph'
+    ;
 
-
-/** "a numeral [-]?(.[0-9]+ | [0-9]+(.[0-9]*)? )" */ NUMBER
-   : '-'? ( '.' DIGIT+ | DIGIT+ ( '.' DIGIT* )? )
-   ;
-
+/** "a numeral [-]?(.[0-9]+ | [0-9]+(.[0-9]*)? )" */
+NUMBER
+    : '-'? ('.' DIGIT+ | DIGIT+ ( '.' DIGIT*)?)
+    ;
 
 fragment DIGIT
-   : [0-9]
-   ;
+    : [0-9]
+    ;
 
+/** "any double-quoted string ("...") possibly containing escaped quotes" */
+STRING
+    : '"' Char* '"'
+    ;
 
-/** "any double-quoted string ("...") possibly containing escaped quotes" */ STRING
-   : '"' ( '\\"' | . )*? '"'
-   ;
+fragment Char
+    : ~["\\]
+    | ESC
+    ;
 
+fragment ESC
+    : '\\' .
+    ;
 
 /** "Any string of alphabetic ([a-zA-Z\200-\377]) characters, underscores
  *  ('_') or digits ([0-9]), not beginning with a digit"
- */ ID
-   : LETTER ( LETTER | DIGIT )*
-   ;
-
+ */
+ID
+    : LETTER (LETTER | DIGIT)*
+    ;
 
 fragment LETTER
-   : [a-zA-Z\u0080-\u00FF_]
-   ;
-
+    : [a-z_]  // caseInsensitive = true
+    ;
 
 /** "HTML strings, angle brackets must occur in matched pairs, and
  *  unescaped newlines are allowed."
- */ HTML_STRING
-   : '<' ( TAG | ~ [<>] )* '>'
-   ;
-
+ */
+HTML_STRING
+    : '<' (TAG | ~ [<>])* '>'
+    ;
 
 fragment TAG
-   : '<' .*? '>'
-   ;
-
+    : '<' .*? '>'
+    ;
 
 COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
-
+    : '/*' .*? '*/' -> skip
+    ;
 
 LINE_COMMENT
-   : '//' .*? '\r'? '\n' -> skip
-   ;
-
+    : '//' .*? '\r'? '\n' -> skip
+    ;
 
 /** "a '#' character is considered a line output from a C preprocessor (e.g.,
  *  # 34 to indicate line 34 ) and discarded"
- */ PREPROC
-   : '#' ~[\r\n]* -> skip
-   ;
-
+ */
+PREPROC
+    : '#' ~[\r\n]* -> skip
+    ;
 
 WS
-   : [ \t\n\r]+ -> skip
-   ;
+    : [ \t\n\r]+ -> skip
+    ;
