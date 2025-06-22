@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 
 $workingDirectory = Get-Location
-$filePath = "$workingDirectory\tests.txt"
+$filePath = "$workingDirectory/tests.txt"
 
 $Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $Tests"
@@ -43,7 +43,7 @@ if (-not(Test-Path -Path "$filePath" -PathType Leaf)) {
 }
 $size = (Get-Item -Path "$filePath").Length
 if ( $size -eq 0 ) {
-    Write-Host "No test cases provided."
+    Write-Host "Test cases file empty."
     exit 0
 }
 

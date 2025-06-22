@@ -1,7 +1,7 @@
 # Generated from trgen <version>
 
 $workingDirectory = Get-Location
-$filePath = "$workingDirectory\tests.txt"
+$filePath = "$workingDirectory/tests.txt"
 
 $Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $Tests"
