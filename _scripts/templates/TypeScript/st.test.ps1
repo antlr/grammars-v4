@@ -1,14 +1,18 @@
 # Generated from trgen <version>
 
+$workingDirectory = Get-Location
+$filePath = "$workingDirectory\tests.txt"
+
 $Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $Tests"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-if (Test-Path -Path "tests.txt" -PathType Leaf) {
-    Remove-Item "tests.txt"
+if (Test-Path -Path "$filePath" -PathType Leaf) {
+    Remove-Item "$filePath"
 }
+
 $files = New-Object System.Collections.Generic.List[string]
 $allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
@@ -27,18 +31,17 @@ foreach ($file in $allFiles) {
     }
 }
 
-$filePath = "tests.txt"
 $writer = New-Object System.IO.StreamWriter($filePath, $true) # $true for append
 foreach ($file in $files) {
     $writer.WriteLine($file)
 }
 $writer.Dispose()
 
-if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
+if (-not(Test-Path -Path "$filePath" -PathType Leaf)) {
     Write-Host "No test cases provided."
     exit 0
 }
-$size = (Get-Item -Path "tests.txt").Length
+$size = (Get-Item -Path "$filePath").Length
 if ( $size -eq 0 ) {
     Write-Host "No test cases provided."
     exit 0
@@ -47,11 +50,12 @@ if ( $size -eq 0 ) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog pwsh -command "npx tsx Test.js -q -tee -tree $_" *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trwdog pwsh -command "npx tsx Test.js -q -tee -tree $_" *>> parse.txt }
+$status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog pwsh -command "npx tsx Test.js -q -x -tee -tree" *> parse.txt
-$status=$LASTEXITCODE
+get-content "$filePath" | dotnet trwdog pwsh -command "npx tsx Test.js -q -x -tee -tree" *> parse.txt
+$status = $LASTEXITCODE
 <endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
