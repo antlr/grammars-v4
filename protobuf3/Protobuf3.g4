@@ -462,7 +462,7 @@ PROTO3_LIT_SINGLE
     : '"proto3"'
     ;
 
-PROTO3_LIT_DOBULE
+PROTO3_LIT_DOUBLE
     : '\'proto3\''
     ;
 
