@@ -160,6 +160,8 @@ jobs:
         git checkout 4975d4a7b556e34c38c2e53b9815c8c4c802236f
         npm i
         npm run build
+    - name: Test Rust
+      run: rustup --version
     - name: Test
       shell: pwsh
       run: |
@@ -237,6 +239,8 @@ jobs:
       shell: bash
       run: |
         dotnet trgen --help
+    - name: Test Rust
+      run: rustup --version
     - name: Test
       shell: bash
       run: |
