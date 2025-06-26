@@ -4290,8 +4290,12 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
+    : (UNION ALL? by_name? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
     | select_statement_in_parentheses
+    ;
+
+by_name
+    : BY NAME
     ;
 
 select_statement_in_parentheses
