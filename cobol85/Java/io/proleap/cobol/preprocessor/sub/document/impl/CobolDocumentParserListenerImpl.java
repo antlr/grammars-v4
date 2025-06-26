@@ -14,12 +14,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import io.proleap.cobol.Cobol85PreprocessorBaseListener;
 import io.proleap.cobol.Cobol85PreprocessorParser;
@@ -38,7 +36,7 @@ import io.proleap.cobol.preprocessor.sub.util.TokenUtils;
  */
 public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseListener {
 
-	private final static Logger LOG = LogManager.getLogger(CobolDocumentParserListenerImpl.class);
+	private final static Logger LOG = Logger.getLogger(CobolDocumentParserListenerImpl.class.getSimpleName());
 
 	private final Deque<CobolDocumentContext> contexts = new ArrayDeque<>();
 
@@ -85,11 +83,6 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 	}
 
 	@Override
-	public void enterControlSpacingStatement(final Cobol85PreprocessorParser.ControlSpacingStatementContext ctx) {
-		push();
-	}
-
-	@Override
 	public void enterCopyStatement(final Cobol85PreprocessorParser.CopyStatementContext ctx) {
 		// push a new context for COPY terminals
 		push();
@@ -129,12 +122,6 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 	}
 
 	@Override
-	public void exitControlSpacingStatement(final Cobol85PreprocessorParser.ControlSpacingStatementContext ctx) {
-		// throw away control spacing statement
-		pop();
-	};
-
-	@Override
 	public void exitCopyStatement(final Cobol85PreprocessorParser.CopyStatementContext ctx) {
 		// throw away COPY terminals
 		pop();
@@ -145,10 +132,10 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 		/*
 		 * replacement phrase
 		 */
-		final ReplacingPhraseContext replacingPhrase = ctx.replacingPhrase();
+		final List<ReplacingPhraseContext> replacingPhrases = ctx.replacingPhrase();
 
-		if (replacingPhrase != null) {
-			context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
+		if (!replacingPhrases.isEmpty()) {
+			context().storeReplaceablesAndReplacements(replacingPhrases.get(0).replaceClause());
 		}
 
 		/*
@@ -157,7 +144,7 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 		final String copyFileIdentifier = ctx.copySource().getText();
 
 		if (copyFiles == null || copyFiles.isEmpty()) {
-			LOG.warn("Could not identify copy file {} due to missing copy files.", copyFileIdentifier);
+			LOG.warning(String.format("Could not identify copy file %s due to missing copy files.", copyFileIdentifier));
 		} else {
 			final String fileContent = getCopyFileContent(copyFileIdentifier, copyFiles, dialect, format);
 
@@ -275,14 +262,14 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 		String result;
 
 		if (copyFile == null) {
-			LOG.warn("Copy file {} not found in copy files {}.", filename, copyFiles);
+			LOG.warning(String.format("Copy file %s not found in copy files %s.", filename, copyFiles));
 			result = null;
 		} else {
 			try {
 				result = new CobolPreprocessorImpl().process(copyFile, copyFiles, format, dialect);
 			} catch (final IOException e) {
 				result = null;
-				LOG.warn(e.getMessage());
+				LOG.warning(e.getMessage());
 			}
 		}
 
@@ -296,7 +283,7 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 		File copyFile = null;
 
 		for (final File file : copyFiles) {
-			final String baseName = FilenameUtils.getBaseName(file.getName());
+			final String baseName = file.getName().substring(0, file.getName().lastIndexOf('.'));
 			final boolean matchingBaseName = filename.toLowerCase().equals(baseName.toLowerCase());
 
 			if (matchingBaseName) {
@@ -319,8 +306,10 @@ public class CobolDocumentParserListenerImpl extends Cobol85PreprocessorBaseList
 	 * Pushes a new preprocessing context onto the stack.
 	 */
 	protected CobolDocumentContext push() {
-		return contexts.push(new CobolDocumentContext());
-	}
+        CobolDocumentContext ctx = new CobolDocumentContext();
+        contexts.push(ctx);
+        return ctx;
+    }
 
 	@Override
 	public void visitTerminal(final TerminalNode node) {
