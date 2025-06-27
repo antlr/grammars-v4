@@ -9,7 +9,7 @@ import (
     "strconv"
     "bufio"
     "github.com/antlr4-go/antlr/v4"
-    "example.com/myparser/<package_name>"
+    "example.com/Test/<package_name>"
 )
 type CustomErrorListener struct {
     errors int
@@ -144,8 +144,13 @@ func ParseString(input string, row_number int) {
 }
 
 func ParseFilename(input string, row_number int) {
+    encoding := "<file_encoding>"
     var str antlr.CharStream = nil
-    str, _ = antlr.NewFileStream(input)        
+    if encoding != "" {
+        str, _ = NewEncodingFileStream(input, encoding)
+    } else {
+        str, _ = antlr.NewFileStream(input)
+    }
     DoParse(str, input, row_number)
 }
 
