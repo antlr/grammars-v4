@@ -66,6 +66,7 @@ var string_instance = 0
 var prefix = ""
 var quiet = false
 var tee = false
+var binary = <binary>
 
 func main() {
     for i := 1; i \< len(os.Args); i = i + 1 {
@@ -155,6 +156,9 @@ func ParseFilename(input string, row_number int) {
 }
 
 func DoParse(str antlr.CharStream, input_name string, row_number int) {
+    if binary {
+        str = NewBinaryCharStream(str)
+    }
     var lexer = <go_lexer_name>(str);
     if show_tokens {
         j := 0
