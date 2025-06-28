@@ -35,49 +35,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
-grammar d2;
+parser grammar D2Parser;
 
+
+options { tokenVocab = D2Lexer; }
 file_
    : decllist* EOF
    ;
 
 decllist
-   : decl (';' decl)*
+   : decl (SEMICOLON decl)*
    ;
 
 decl
-   : node (CONNECT node)*
+   : node (connect node)*
    ;
 
 node
-   : nodename (':' (map | IDENTIFIER)*)?
-   ;
-
-label
-   : IDENTIFIER
+   : nodename (COLON (map | identifier)*)?
    ;
 
 nodename
-   : IDENTIFIER ('.' IDENTIFIER)?
+   : identifier (DOT identifier)?
    ;
 
 map
-   : '{' node* '}'
+   : LCURL node* RCURL
    ;
 
-CONNECT
-   : '->'
+identifier
+   : IDENTIFIER
    ;
 
-IDENTIFIER
-   : [a-zA-Z] [ a-zA-Z0-9_']* [a-zA-Z0-9_']
-   ;
-
-COMMENT
-   : '#' (~ [\n\r])* -> skip
-   ;
-
-WS
-   : [ \r\n\t]+ -> skip
+connect
+   : CONNECT
+   | CONNECT2
    ;
 

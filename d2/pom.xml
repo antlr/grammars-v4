@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>d2.g4</include>
+                        <include>D2Lexer.g4</include>
+                        <include>D2Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>file_</entryPoint>
-					<grammarName>d2</grammarName>
+					<grammarName>D2</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
