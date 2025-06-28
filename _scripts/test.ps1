@@ -245,7 +245,7 @@ function Get-GitChangedDirectories {
 	foreach ($dir in $newdirs) {
 		# Check either exact match or if $gdir + '\' is the start of $dir
 		Write-Host "dir = $dir gdir $gdir"
-		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\")) {
+		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\") -or $dir.StartsWith($gdir + "/") {
 			$results += $gdir
 			break  # No need to check more once we find a match
 		}
