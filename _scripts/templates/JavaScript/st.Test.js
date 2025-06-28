@@ -3,6 +3,7 @@
 import antlr4 from 'antlr4';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
+import BinaryCharStream from './BinaryCharStream.js';
 import strops from 'typescript-string-operations';
 import fs from 'fs-extra';
 import pkg from 'timer-node';
@@ -52,7 +53,8 @@ var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var encoding = 'utf8';
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
 var inputs = [];
@@ -81,7 +83,7 @@ function main() {
                 tee = true;
                 break;
             case '-encoding':
-                encoding = process.argv[++i];
+                enc = process.argv[++i];
                 break;
             case '-x':
                 var sb = new strops.StringBuilder();
@@ -146,11 +148,13 @@ function ParseString(input, row_number) {
 }
 
 function ParseFilename(input, row_number) {
-    var str = antlr4.CharStreams.fromPathSync(input, encoding);
+    if (enc === '') enc = 'utf8';
+    var str = antlr4.CharStreams.fromPathSync(input, enc);
     DoParse(str, input, row_number);
 }
 
 function DoParse(str, input_name, row_number) {
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
