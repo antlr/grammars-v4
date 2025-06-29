@@ -15,6 +15,7 @@ import { readSync } from 'fs';
 import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
+import { BinaryCharStream } from './BinaryCharStream.js';
 
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GrammarAutomName>.js';
 } >
@@ -68,7 +69,8 @@ var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var encoding = 'utf8';
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
 var inputs: string[] = [];
@@ -97,7 +99,7 @@ function main() {
                 tee = true;
                 break;
             case '-encoding':
-                encoding = process.argv[++i];
+                enc = process.argv[++i];
                 break;
             case '-x':
                 var sb = new StringBuilder();
@@ -162,11 +164,13 @@ function ParseString(input: string, row_number: number) {
 }
 
 function ParseFilename(input: string, row_number: number) {
-    var str = CharStreams.fromPathSync(input, encoding);
+    if (enc === '') enc = 'utf8';
+    var str = CharStreams.fromPathSync(input, enc);
     DoParse(str, input, row_number);
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);

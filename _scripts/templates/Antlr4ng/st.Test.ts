@@ -24,6 +24,7 @@ import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
 import { isToken } from 'antlr4ng';
+import { BinaryCharStream } from './BinaryCharStream.js';
 
 <tool_grammar_tuples: {x | import { <x.GrammarAutomName> \} from './<x.GrammarAutomName>.js';
 } >
@@ -77,7 +78,8 @@ var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var enc = 'utf8';
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
 var inputs: string[] = [];
@@ -171,12 +173,14 @@ function ParseString(input: string, row_number: number) {
 }
 
 function ParseFilename(input: string, row_number: number) {
+    if (enc === '') enc = 'utf8';
     var buffer = readFileSync(input, { encoding: enc as BufferEncoding });
     var str = CharStream.fromString(buffer);
     DoParse(str, input, row_number);
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
