@@ -48,23 +48,63 @@ decllist
    ;
 
 decl
-   : node (connect node)*
+   : node value?
+   ;
+
+value
+   : /*mapvalue |*/
+   
+   connectvalue
+   | labelvalue
+   | mapvalue
+   ;
+
+connectvalue
+   : (connect node)+ label?
+   ;
+
+labelvalue
+   : label
+   ;
+
+label
+   : colon node
+   ;
+
+mapvalue
+   : colon map
    ;
 
 node
-   : nodename (COLON (map | identifier)*)?
-   ;
-
-nodename
-   : identifier (DOT identifier)?
+   : identifier (dot identifier)?
    ;
 
 map
-   : LCURL node* RCURL
+   : lcurl decl* rcurl
    ;
 
 identifier
    : IDENTIFIER
+   ;
+
+lcurl
+   : LCURL
+   | LCURL2
+   ;
+
+rcurl
+   : RCURL
+   | RCURL2
+   ;
+
+dot
+   : DOT
+   | DOT2
+   ;
+
+colon
+   : COLON
+   | COLON2
    ;
 
 connect

@@ -72,15 +72,31 @@ IDENTIFIER
    : [a-zA-Z0-2]? [ a-zA-Z0-9_']* [a-zA-Z0-9_']?
    ;
 
-IDEND
-   : ~ [a-zA-Z0-9_'] -> popMode , skip
+LCURL2
+   : '{' -> popMode
+   ;
+
+RCURL2
+   : '}' -> popMode
+   ;
+
+COLON2
+   : ':' -> popMode
+   ;
+
+DOT2
+   : '.' -> popMode
+   ;
+
+WS2
+   : [\r\n\t]+ -> skip
    ;
 
 CONNECT2
    : '->' -> popMode
    ;
 
-WS2
-   : [\r\n\t]+ -> skip
+IDEND
+   : ~ [a-zA-Z0-9_'] -> popMode
    ;
 
