@@ -179,6 +179,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
+                <module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
