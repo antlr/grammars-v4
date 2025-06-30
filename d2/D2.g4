@@ -43,11 +43,11 @@ statement
    ;
 
 nodeDeclaration
-   : name label? attributeBlock? (COLON block)?
+   : name (COLON label? attributeBlock? block?)?
    ;
 
 edgeDeclaration
-   : name (edgeOp name)+ label? attributeBlock?
+   : name (edgeOp name)+ (COLON label)? attributeBlock?
    ;
 
 block
@@ -55,7 +55,7 @@ block
    ;
 
 label
-   : COLON name
+   : name
    ;
 
 attributeBlock
@@ -63,7 +63,7 @@ attributeBlock
    ;
 
 attributeEntry
-   : name COLON expression
+   : COLON expression
    ;
 
 expression
