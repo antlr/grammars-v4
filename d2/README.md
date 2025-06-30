@@ -1,7 +1,3 @@
-# Arithmetic Grammar
+# D2 Grammar
 
-A simple ANTLR4 grammar for arithmetic.  
-
-This grammar supports the basic addition, subtraction, multiplication, division
-and exponent operations. Floating point numbers using scientific notation 
-are supported as well as variable names consisting of letters.
+An ANTLR4 grammar for [D2](https://d2lang.com/)
