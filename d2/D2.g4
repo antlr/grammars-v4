@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2025, Tom Everett
+Copyright (c) 2025, Tom Everett and Ian MacDonald
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,74 +29,129 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-lexer grammar D2Lexer;
+grammar D2;
 
-SEMICOLON
-   : ';'
+diagram
+   : statement* EOF
+   ;
+
+statement
+   : nodeDeclaration
+   | edgeDeclaration
+   | attributeBlock
+   | COMMENT
+   ;
+
+nodeDeclaration
+   : name label? attributeBlock? (COLON block)?
+   ;
+
+edgeDeclaration
+   : name (edgeOp name)+ label? attributeBlock?
+   ;
+
+block
+   : LBRACE statement* RBRACE
+   ;
+
+label
+   : COLON name
+   ;
+
+attributeBlock
+   : LBRACK attributeEntry (COMMA attributeEntry)* COMMA? RBRACK
+   ;
+
+attributeEntry
+   : name COLON expression
+   ;
+
+expression
+   : STRING
+   | NUMBER
+   | BOOLEAN
+   ;
+
+edgeOp
+   : ARROW
+   | DASH
+   | LARROW
+   ;
+
+name
+   : IDENTIFIER (DOT IDENTIFIER)*
+   ;
+
+BOOLEAN
+   : 'true'
+   | 'false'
+   ;
+
+NUMBER
+   : '-'? DIGIT+ ('.' DIGIT+)?
+   ;
+
+STRING
+   : '"' (~ ["\\\r\n] | ESC)* '"'
+   ;
+
+fragment ESC
+   : '\\' ["\\/bfnrt]
+   ;
+
+IDENTIFIER
+   : [a-zA-Z_] [a-zA-Z0-9_'-]*
+   ;
+
+COMMENT
+   : '#' ~ [\r\n]* -> skip
+   ;
+
+LBRACK
+   : '['
+   ;
+
+RBRACK
+   : ']'
+   ;
+
+LBRACE
+   : '{'
+   ;
+
+RBRACE
+   : '}'
    ;
 
 COLON
    : ':'
    ;
 
+COMMA
+   : ','
+   ;
+
 DOT
    : '.'
    ;
 
-LCURL
-   : '{'
-   ;
-
-RCURL
-   : '}'
-   ;
-
-CONNECT
+ARROW
    : '->'
    ;
 
-IDSTART
-   : [a-zA-Z] -> more , pushMode (ID)
+LARROW
+   : '<-'
    ;
 
-COMMENT
-   : '#' (~ [\n\r])* -> skip
+DASH
+   : '--'
    ;
 
 WS
-   : [ \r\n\t]+ -> skip
+   : [ \t\r\n]+ -> skip
    ;
 
-mode ID;
-IDENTIFIER
-   : [a-zA-Z0-2]? [ a-zA-Z0-9_']* [a-zA-Z0-9_']?
-   ;
-
-LCURL2
-   : '{' -> popMode
-   ;
-
-RCURL2
-   : '}' -> popMode
-   ;
-
-COLON2
-   : ':' -> popMode
-   ;
-
-DOT2
-   : '.' -> popMode
-   ;
-
-WS2
-   : [\r\n\t]+ -> skip
-   ;
-
-CONNECT2
-   : '->' -> popMode
-   ;
-
-IDEND
-   : ~ [a-zA-Z0-9_'] -> popMode
+fragment DIGIT
+   : [0-9]
    ;
 
