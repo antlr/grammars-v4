@@ -22,7 +22,6 @@
 // Add IP V6 lever rule. Currently only copes with IP V4.
 //--------------------------------------------------------------------
 
-
 //--------------------------------------------------------------------
 // The MIT License (MIT) 
 // 
@@ -53,7 +52,9 @@
 // Developed by : Norman Dunbar, norman@dunbar-it.co.uk
 //--------------------------------------------------------------------
 
-
+// $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine true, allowShortBlocksOnASingleLine true, minEmptyLines 0, alignSemicolons ownLine
+// $antlr-format alignColons trailing, singleLineOverrulesHangingColon true, alignLexerCommands true, alignLabels true, alignTrailers true
 
 lexer grammar tnsnamesLexer;
 
@@ -62,43 +63,43 @@ lexer grammar tnsnamesLexer;
 // around here.
 // ---------------------------------------------------------------
 
-L_PAREN          : '(' ;
-                 
-R_PAREN          : ')' ;
-                 
-L_SQUARE         : '[' ;
-                 
-R_SQUARE         : ']' ;
-                 
-EQUAL            : '=' ;
-                 
-DOT              : '.' ;   
-                 
-COMMA            : ',' ;
+L_PAREN: '(';
 
-D_QUOTE          : '"' ;
+R_PAREN: ')';
 
-S_QUOTE          : '\'' ;
-                 
-CONNECT_DATA     : C O N N E C T '_' D A T A ;
+L_SQUARE: '[';
 
-DESCRIPTION_LIST : DESCRIPTION '_' LIST ;
-                 
-DESCRIPTION      : D E S C R I P T I O N ;
-                 
-ADDRESS_LIST     : ADDRESS '_' LIST ;
-                 
-ADDRESS          : A D D R E S S ;
-                 
-PROTOCOL         : P R O T O C O L ;
-                 
-TCP              : T C P ;
-                 
-HOST             : H O S T ;
-                 
-PORT             : P O R T ;
+R_SQUARE: ']';
 
-LOCAL            : L O C A L ;
+EQUAL: '=';
+
+DOT: '.';
+
+COMMA: ',';
+
+D_QUOTE: '"';
+
+S_QUOTE: '\'';
+
+CONNECT_DATA: C O N N E C T '_' D A T A;
+
+DESCRIPTION_LIST: DESCRIPTION '_' LIST;
+
+DESCRIPTION: D E S C R I P T I O N;
+
+ADDRESS_LIST: ADDRESS '_' LIST;
+
+ADDRESS: A D D R E S S;
+
+PROTOCOL: P R O T O C O L;
+
+TCP: T C P;
+
+HOST: H O S T;
+
+PORT: P O R T;
+
+LOCAL: L O C A L;
 
 // ---------------------------------------------------------------
 // Ok, I know this defines an IP version 4 address, but I haven't
@@ -106,255 +107,212 @@ LOCAL            : L O C A L ;
 // It seems that an IPv4 address that begins with a zero is octal.
 // With leading "0x" or "0X" it's hexadecimal. Sigh.
 // ---------------------------------------------------------------
-IP               : QUAD DOT QUAD DOT QUAD DOT QUAD+ ;
-                 
-YES_NO           : Y E S | N O ;
-                 
-ON_OFF           : O N | O F F ;
-                 
-TRUE_FALSE       : T R U E | F A L S E ;  
-                 
-COMMENT          : '#' (.)*? '\n' -> skip ;
-                 
-INT              : DIGIT+ ;
+IP: QUAD DOT QUAD DOT QUAD DOT QUAD+;
 
-OK               : O K ;
-                 
-DEDICATED        : D E D I C A T E D ;
-                 
-SHARED           : S H A R E D ;
-                 
-POOLED           : P O O L E D ;    
-                 
-LOAD_BALANCE     : L O A D '_' B A L A N C E ;   
-                 
-FAILOVER         : F A I L O V E R ;     
-                 
-UR               : U R ;
-                 
-UR_A             : A ;      
-                 
-ENABLE           : E N A B L E ;
-                 
-BROKEN           : B R O K E N ;
-                 
-SDU              : S D U ;
-                 
-RECV_BUF         : R E C V '_' BUF_SIZE ;
-                 
-SEND_BUF         : S E N D '_' BUF_SIZE ;
-                 
-SOURCE_ROUTE     : S O U R C E '_' R O U T E ;
-                 
-SERVICE          : S E R V I C E ;
-                 
-SERVICE_TYPE     : T Y P E '_' O F '_' SERVICE ;
-                 
-KEY              : K E Y ;
-                 
-IPC              : I P C ;
+YES_NO: Y E S | N O;
 
-SPX              : S P X ;
+ON_OFF: O N | O F F;
 
-NMP              : N M P ;
+TRUE_FALSE: T R U E | F A L S E;
 
-BEQ              : B E Q ;
+COMMENT: '#' (.)*? '\n' -> skip;
 
-PIPE             : P I P E ;
+INT: DIGIT+;
 
-PROGRAM          : P R O G R A M ;
+OK: O K;
 
-ARGV0            : A R G V '0' ;
+DEDICATED: D E D I C A T E D;
 
-ARGS             : A R G S ;
-                 
-SECURITY         : S E C U R I T Y ;
-                 
-SSL_CERT         : S S L '_' SERVER '_' C E R T '_' D N ;
-                 
-CONN_TIMEOUT     : C O N N E C T '_' T I M E O U T ;
-                 
-RETRY_COUNT      : R E T R Y '_' C O U N T ;
-                 
-TCT              : T R A N S P O R T '_' CONN_TIMEOUT ; 
+SHARED: S H A R E D;
+
+POOLED: P O O L E D;
+
+LOAD_BALANCE: L O A D '_' B A L A N C E;
+
+FAILOVER: F A I L O V E R;
+
+UR: U R;
+
+UR_A: A;
+
+ENABLE: E N A B L E;
+
+BROKEN: B R O K E N;
+
+SDU: S D U;
+
+RECV_BUF: R E C V '_' BUF_SIZE;
+
+SEND_BUF: S E N D '_' BUF_SIZE;
+
+SOURCE_ROUTE: S O U R C E '_' R O U T E;
+
+SERVICE: S E R V I C E;
+
+SERVICE_TYPE: T Y P E '_' O F '_' SERVICE;
+
+KEY: K E Y;
+
+IPC: I P C;
+
+SPX: S P X;
+
+NMP: N M P;
+
+BEQ: B E Q;
+
+PIPE: P I P E;
+
+PROGRAM: P R O G R A M;
+
+ARGV0: A R G V '0';
+
+ARGS: A R G S;
+
+SECURITY: S E C U R I T Y;
+
+SSL_CERT: S S L '_' SERVER '_' C E R T '_' D N;
+
+CONN_TIMEOUT: C O N N E C T '_' T I M E O U T;
+
+RETRY_COUNT: R E T R Y '_' C O U N T;
+
+TCT: T R A N S P O R T '_' CONN_TIMEOUT;
 
 //----------------------------------------------------------------------------
 // Because IFILEs accept double, single or unquoted strings, we need
 // special processing or there is carnage. When we find an IFILE, change
 // to an IFILE processing mode - see the end of this file for the tokens etc.
 //----------------------------------------------------------------------------
-IFILE            : I F I L E -> pushMode(IFILE_MODE);
+IFILE: I F I L E -> pushMode(IFILE_MODE);
 
-                 
 // ---------------------------------------------------------------
 // It seems I can't use D_QUOTE in the middle of the following 
 // lexer rule. Compiling the grammar gives "rule reference D_QUOTE 
 // is not currently supported in a set".
 // ---------------------------------------------------------------
-DQ_STRING        : D_QUOTE (~'"')* D_QUOTE ;
+DQ_STRING: D_QUOTE (~'"')* D_QUOTE;
 
-
-                 
 //-------------------------------------------------
 // CONNECT_DATA parameters.
 //-------------------------------------------------
-SERVICE_NAME     : SERVICE '_' NAME ;
-                 
-SID              : S I D ;
-                 
-INSTANCE_NAME    : I N S T A N C E '_' NAME ;       
-                 
-FAILOVER_MODE    : FAILOVER '_' M O D E ;
-                 
-GLOBAL_NAME      : G L O B A L '_' NAME ;
-                 
-HS               : H S ;
-                 
-RDB_DATABASE     : R D B '_' D A T A B A S E ;
-                 
-SERVER           : S E R V E R ;
-                 
+SERVICE_NAME: SERVICE '_' NAME;
+
+SID: S I D;
+
+INSTANCE_NAME: I N S T A N C E '_' NAME;
+
+FAILOVER_MODE: FAILOVER '_' M O D E;
+
+GLOBAL_NAME: G L O B A L '_' NAME;
+
+HS: H S;
+
+RDB_DATABASE: R D B '_' D A T A B A S E;
+
+SERVER: S E R V E R;
+
 //-------------------------------------------------
 // FAILOVER_MODE parameters.
 //-------------------------------------------------
-BACKUP           : B A C K U P ;
-                 
-TYPE             : T Y P E ;
-                 
-SESSION          : S E S S I O N ;
-                 
-SELECT           : S E L E C T ;
-                 
-NONE             : N O N E ;
-                 
-METHOD           : M E T H O D ;
-                 
-BASIC            : B A S I C ;
-                 
-PRECONNECT       : P R E C O N N E C T ;
-                 
-RETRIES          : R E T R I E S ;
-                 
-DELAY            : D E L A Y ;                 
+BACKUP: B A C K U P;
 
+TYPE: T Y P E;
 
+SESSION: S E S S I O N;
+
+SELECT: S E L E C T;
+
+NONE: N O N E;
+
+METHOD: M E T H O D;
+
+BASIC: B A S I C;
+
+PRECONNECT: P R E C O N N E C T;
+
+RETRIES: R E T R I E S;
+
+DELAY: D E L A Y;
 
 //-------------------------------------------------
 // IPv4 dotted Quads. For host IP addresses.
 //-------------------------------------------------
-QUAD             : '0'[xX] HEX_DIGIT+
-                 | '0' OCT_DIGIT+
-                 | INT 
-                 ;
-
+QUAD: '0' [xX] HEX_DIGIT+ | '0' OCT_DIGIT+ | INT;
 
 //-------------------------------------------------
 // Other lexer rules, and fragments.
 //-------------------------------------------------
-ID               : [A-Za-z0-9][A-Za-z0-9_\-.]* ;
-WS               : [ \t\r\n]+ -> skip ;
-
-
+ID : [A-Za-z0-9][A-Za-z0-9_\-.]*;
+WS : [ \t\r\n]+ -> skip;
 
 // ----------
 // Fragments.
 // ----------
 
-fragment
-A                : [Aa] ;
-                 
-fragment
-B                : [Bb] ;
-                 
-fragment
-C                : [Cc] ;
-                 
-fragment
-D                : [Dd] ;
-                 
-fragment
-E                : [Ee] ;
-                 
-fragment
-F                : [Ff] ;
-                 
-fragment
-G                : [Gg] ;
-                 
-fragment
-H                : [Hh] ;
-                 
-fragment
-I                : [Ii] ;
-                 
-fragment
-J                : [Jj] ;
-                 
-fragment
-K                : [Kk] ;
-                 
-fragment
-L                : [Ll] ;
-                 
-fragment
-M                : [Mm] ;
-                 
-fragment
-N                : [Nn] ;
-                 
-fragment
-O                : [Oo] ;
-                 
-fragment
-P                : [Pp] ;
-                 
-fragment
-Q                : [Qq] ;
-                 
-fragment
-R                : [Rr] ;
-                 
-fragment
-S                : [Ss] ;
-                 
-fragment
-T                : [Tt] ;
-                 
-fragment
-U                : [Uu] ;
-                 
-fragment
-V                : [Vv] ;
-                 
-fragment
-W                : [Ww] ;
-                 
-fragment
-X                : [Xx] ;
-                 
-fragment
-Y                : [Yy] ;
-                 
-fragment
-Z                : [Zz] ;
+fragment A: [Aa];
 
-fragment
-DIGIT            : [0-9] ;
+fragment B: [Bb];
 
-fragment
-OCT_DIGIT        : [0-8] ;
+fragment C: [Cc];
 
-fragment
-HEX_DIGIT        : [0-9A-Fa-f] ;
-                 
-fragment
-LIST             : L I S T ;
-                 
-fragment
-NAME             : N A M E ;
-                 
-fragment
-BUF_SIZE         :B U F '_' S I Z E ;                 
+fragment D: [Dd];
+
+fragment E: [Ee];
+
+fragment F: [Ff];
+
+fragment G: [Gg];
+
+fragment H: [Hh];
+
+fragment I: [Ii];
+
+fragment J: [Jj];
+
+fragment K: [Kk];
+
+fragment L: [Ll];
+
+fragment M: [Mm];
+
+fragment N: [Nn];
+
+fragment O: [Oo];
+
+fragment P: [Pp];
+
+fragment Q: [Qq];
+
+fragment R: [Rr];
+
+fragment S: [Ss];
+
+fragment T: [Tt];
+
+fragment U: [Uu];
+
+fragment V: [Vv];
+
+fragment W: [Ww];
+
+fragment X: [Xx];
+
+fragment Y: [Yy];
+
+fragment Z: [Zz];
+
+fragment DIGIT: [0-9];
+
+fragment OCT_DIGIT: [0-8];
+
+fragment HEX_DIGIT: [0-9A-Fa-f];
+
+fragment LIST: L I S T;
+
+fragment NAME: N A M E;
+
+fragment BUF_SIZE: B U F '_' S I Z E;
 
 //----------------------------------------------------------------------------
 // Everything from here on (unless we hit another 'mode' command, is related
@@ -366,15 +324,14 @@ BUF_SIZE         :B U F '_' S I Z E ;
 // We need I_WS and I_COMMENT rules here as there is/can be whitespace and
 // comments in the tnsnames.ora's IFILE parameters. (I think!)
 //----------------------------------------------------------------------------
-mode IFILE_MODE ;
+mode IFILE_MODE;
 
-I_EQUAL         : '=' ;
-I_STRING        : (DQ_STRING | ISQ_STRING | IUQ_STRING) -> popMode ;
-ISQ_STRING      : S_QUOTE (~'\'')* S_QUOTE ;
+I_EQUAL    : '=';
+I_STRING   : (DQ_STRING | ISQ_STRING | IUQ_STRING) -> popMode;
+ISQ_STRING : S_QUOTE (~'\'')* S_QUOTE;
 //IUQ_STRING      :  ~["'=\n\r]*? NL ;
-IUQ_STRING      :  (~["'=])*? NL ;
-I_WS            : [ \t\r\n]+ -> skip  ;
-I_COMMENT       : '#' (.)*? NL  -> skip  ;
+IUQ_STRING : (~["'=])*? NL;
+I_WS       : [ \t\r\n]+   -> skip;
+I_COMMENT  : '#' (.)*? NL -> skip;
 
-fragment NL     : '\n' ;
-
+fragment NL: '\n';

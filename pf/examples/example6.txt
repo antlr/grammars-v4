@@ -1,0 +1,4 @@
+
+tcp_pass = "{ 80 22 25 110 123 }"
+block all
+pass out on fxp0 proto t

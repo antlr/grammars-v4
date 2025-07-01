@@ -1,46 +1,33 @@
-# Oracle's MySQL grammar
+# Oracle's MySQL Grammar
 
 ## General
 
-Since more than a decade the MySQL GUI dev tools team at Oracle offers the open source
-[MySQL Workbench](https://github.com/mysql/mysql-workbench) product, which uses ANTLR4 for all MySQL code parsing tasks.
-This requires to translate all changes from the
-[MySQL server grammar](https://github.com/mysql/mysql-server/blob/8.0/sql/sql_yacc.yy) to ANTLR4, which is an ongoing
-effort to always stay up-to-date with the lastest and greatest server features.
-The current grammar supports the server versions 5.6, 5.7 and 8.0.
+This parser grammar is derived from the official Oracle grammar posted here in original/,
+which is derived from sources in the MySQL Shell for VS Code extension.
+https://github.com/mysql/mysql-shell-plugins/tree/8928ada7d9e37a4075291880738983752b315fee/gui/frontend/src/parsing/mysql
 
-## Correct and Flexible Parsing
+This grammar is set to recognize version "8.0.200".
 
-To enable applications like MySQL Workbench to correctly parse MySQL code, some conditions must be respected, namely
-the currently used MySQL **server version** and the active **SQL modes** (for example, to distinguish between
-identifiers and double quoted strings, depending on the ANSI mode setting). Furthermore some specialities must be considered:
-[**string literal concatenation** and **character set introducer**s (aka. underscore charsets or string repertoires)](https://dev.mysql.com/doc/refman/8.0/en/string-literals.html).
+Includes updates to commit https://github.com/mysql/mysql-shell-plugins/commit/d0271b1244d9686c30ce95bae92f4cf4c135d36d.
 
-The server version and the SQL mode can be switched at runtime, enabling the use of a single parser with different
-version/mode settings and to provide better error messages (like for [a feature that is only valid for a specific version](https://github.com/mysql/mysql-workbench/blob/8.0/modules/db.mysql.parser/src/mysql_parser_module.cpp#L391)).
+## License
 
-## Using the Grammar
+* [BSD3](https://opensource.org/license/bsd-3-clause)
+* Copyright © 2025, Oracle and/or its affiliates
 
-The [MySQL ANTLR4 grammar](https://github.com/mysql/mysql-workbench/tree/8.0/library/parsers/grammars) in
-MySQL Workbench considers these conditions to deliver exact parsing results. Unfortunately, this is not possible
-without using action code (and predicates) in the grammar, which are written in the target language of the host
-application (C++). Additionally, the generated parser + lexer classes use a common base class to provide support
-code and which contain fields for the current server version and active SQL modes (which are then used in the
-predicates to guide the parsing process). You can find the few extra files in [another subfolder of the parser library](https://github.com/mysql/mysql-workbench/tree/8.0/library/parsers/mysql).
+## Target Agnostic
 
-This code is well commented and easily translatable to other languages. Additionally, there are a number of pretty
-useful helper functions that might be interesting for you when working with a MySQL parser, for example:
+This grammar is "target agnostic." Unaltered, the .g4 files will not work for
+Antlr4ng, Cpp, Go, and Python3. You will need to first run `python transformGrammar.py`
+provided in the target-specific directory. The script modifies the .g4 files
+for the port.
 
-- Getting the original source text for a given rule context or between two tokens.
-- Getting the text of a token with automatic string concatenation, as used for single and double quoted strings in MySQL.
-- Dumping a (sub) parse tree from a rule context.
-- Navigating back and forward, from a given parse tree reference.
-- Finding a parse tree (rule context or terminal node) for a specific column/row position.
-- Quickly finding the type of a query without doing a full parse run.
-- Type checkers for a given token (identifier, relation, number, operator).
+## Modifying this grammar
+This grammar is current hand-written. The plan is to generate the ports directly
+from the sources at https://github.com/mysql/mysql-shell-plugins.
 
-## Contributing
+## Issues
+* The grammar is ambiguous, but generally performs well, except for bitrix_queries_cut.sql, which contains ~3000 ambiguities.
 
-If you want to contribute bug fixes or enhancements open a pull request in the
-[MySQL Workbench Github repository](https://github.com/mysql/mysql-workbench/pulls) or provide a patch
-in the MySQL bug system. For questions join us in the [#workbench Slack channel](https://mysqlcommunity.slack.com/messages/C8THWN6PL).
+## Performance
+<img src="./times.svg">

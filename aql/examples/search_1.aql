@@ -1,0 +1,3 @@
+FOR doc IN viewName
+  SEARCH ANALYZER(doc.text == "quick" OR doc.text == "brown", "text_en")
+  RETURN doc

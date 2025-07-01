@@ -53,6 +53,8 @@ class Square: NamedShape {
     func area() -> Double {
         return sideLength * sideLength
     }
+    
+    var diameter: Double { sideLength * sqrt(2) }
 
     override func simpleDescription() -> String {
         return "A square with sides of length \(sideLength)."
@@ -113,7 +115,7 @@ class TriangleAndSquare {
         }
     }
     var square: Square {
-        willSet {
+        didSet {
             triangle.sideLength = newValue.sideLength
         }
     }

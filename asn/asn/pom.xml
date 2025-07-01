@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>moduleDefinition</entryPoint>
+					<entryPoint>modules</entryPoint>
 					<grammarName>ASN</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

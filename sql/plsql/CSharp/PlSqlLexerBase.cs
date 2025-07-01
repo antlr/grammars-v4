@@ -3,12 +3,10 @@ using System.IO;
 using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime;
 
 public class PlSqlLexerBase : Lexer
 {
     ICharStream myinput;
-    public PlSqlLexerBase self;
 
     public override string[] RuleNames => throw new NotImplementedException();
 
@@ -20,14 +18,12 @@ public class PlSqlLexerBase : Lexer
         : base(input, output, errorOutput)
     {
         myinput = input;
-        self = this;
     }
 
     public PlSqlLexerBase(ICharStream input)
         : base(input)
     {
         myinput = input;
-        self = this;
     }
 
     public bool IsNewlineAtPos(int pos)
