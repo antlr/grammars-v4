@@ -15,6 +15,8 @@ d = 'abc'
 d = 'abc'+'def'
 d = 'abc'*3
 
+mas = [1, 2, 3, 4, 5]
+
 mas = []
 mas[1] = 5
 mas[2] = "String"
