@@ -23,7 +23,7 @@ body
    ;
 
 bar
-   : NUMBER? TRIPLE+ COLON?
+   : NOTE? (TRIPLE|TRIPLET)+ COLON?
    ;
 
 

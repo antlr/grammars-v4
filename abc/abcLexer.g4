@@ -5,18 +5,13 @@ fragment LETDIG
    ;
 
 TRIPLE
-   : LETDIG LETDIG LETDIG
+   : LETDIG LETDIG LETDIG -> mode(BODY)
    ;
 
 STRING
    : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
-COLON: ':';
-
-BAR
-   : '|'
-   ;
 
 NUMBER
    : [0-9]+
@@ -34,4 +29,19 @@ WS
    : [ \t\r\n]+ -> skip
    ;
 
+mode BODY;
 
+BAR
+   : '|'
+   ;
+
+   COLON: ':';
+
+
+NOTE: [a-gA-G0-9];
+
+TRIPLET: NOTE NOTE NOTE;
+
+WS2
+   : [ \t\r\n]+ -> skip
+   ;
