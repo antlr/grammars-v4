@@ -1,0 +1,5 @@
+PrEfIx : <http://example.com>
+
+SELECT ?x where {
+	?x :name "Test"@ca-ES .
+}

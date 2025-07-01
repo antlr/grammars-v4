@@ -37,135 +37,195 @@
  * Parser Rules
  */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar MuParser;
 
 prog
- : expr+ EOF  # progExpr
- ;
+    : expr+ EOF # progExpr
+    ;
 
 expr
- : <assoc=right> expr POW expr                  # powExpr
- | SUB expr                                     # unaryMinusExpr
- | expr op=(MUL | DIV) expr                     # mulDivExpr
- | expr op=(ADD | SUB) expr                     # addSubExpr
- | expr op=(LTEQ | GTEQ | LT | GT) expr         # relationalExpr
- | expr op=(EQ | NEQ) expr                      # equalityExpr
- | expr AND expr                                # andExpr
- | expr OR expr                                 # orExpr
- | expr QUESTION expr COLON expr                # iteExpr
- | op=FUNCTION OPAR expr CPAR                   # functionExpr
- | op=FUNCTIONMULTI OPAR expr (',' expr)* CPAR  # functionMultiExpr
- | atom                                         # atomExpr
- | ID op=( ASSIGN
-         | ASSIGNADD
-         | ASSIGNSUB
-         | ASSIGNMUL
-         | ASSIGNDIV) expr                      # assignExpr
- ;
+    : <assoc = right> expr POW expr                                         # powExpr
+    | SUB expr                                                              # unaryMinusExpr
+    | expr op = (MUL | DIV) expr                                            # mulDivExpr
+    | expr op = (ADD | SUB) expr                                            # addSubExpr
+    | expr op = (LTEQ | GTEQ | LT | GT) expr                                # relationalExpr
+    | expr op = (EQ | NEQ) expr                                             # equalityExpr
+    | expr AND expr                                                         # andExpr
+    | expr OR expr                                                          # orExpr
+    | expr QUESTION expr COLON expr                                         # iteExpr
+    | op = FUNCTION OPAR expr CPAR                                          # functionExpr
+    | op = FUNCTIONMULTI OPAR expr (',' expr)* CPAR                         # functionMultiExpr
+    | atom                                                                  # atomExpr
+    | ID op = (ASSIGN | ASSIGNADD | ASSIGNSUB | ASSIGNMUL | ASSIGNDIV) expr # assignExpr
+    ;
 
 atom
- : OPAR expr CPAR     # parExpr
- | (INT | FLOAT)      # numberAtom
- | (TRUE | FALSE)     # booleanAtom
- | (E | PI)           # predefinedConstantAtom
- | ID                 # idAtom
- ;
+    : OPAR expr CPAR # parExpr
+    | (INT | FLOAT)  # numberAtom
+    | (TRUE | FALSE) # booleanAtom
+    | (E | PI)       # predefinedConstantAtom
+    | ID             # idAtom
+    ;
 
 /*
  * Lexer Rules
  */
 
 FUNCTION
- : 'sin'
- | 'cos'
- | 'tan'
- | 'asin'
- | 'acos'
- | 'atan'
- | 'sinh'
- | 'cosh'
- | 'tanh'
- | 'asinh'
- | 'acosh'
- | 'atanh'
- | 'log2'
- | 'log10'
- | 'log'
- | 'ln'
- | 'exp'
- | 'sqrt'
- | 'sign'
- | 'rint'
- | 'abs'
- ;
+    : 'sin'
+    | 'cos'
+    | 'tan'
+    | 'asin'
+    | 'acos'
+    | 'atan'
+    | 'sinh'
+    | 'cosh'
+    | 'tanh'
+    | 'asinh'
+    | 'acosh'
+    | 'atanh'
+    | 'log2'
+    | 'log10'
+    | 'log'
+    | 'ln'
+    | 'exp'
+    | 'sqrt'
+    | 'sign'
+    | 'rint'
+    | 'abs'
+    ;
 
 FUNCTIONMULTI
- : 'min'
- | 'max'
- | 'sum'
- | 'avg'
- ;
+    : 'min'
+    | 'max'
+    | 'sum'
+    | 'avg'
+    ;
 
-ASSIGN    : '=' ;
-ASSIGNADD : '+=' ;
-ASSIGNSUB : '-=' ;
-ASSIGNMUL : '*=' ;
-ASSIGNDIV : '/=' ;
-AND       : '&&' ;
-OR        : '||' ;
-LTEQ      : '<=' ;
-GTEQ      : '>=' ;
-NEQ       : '!=' ;
-EQ        : '==' ;
-LT        : '<' ;
-GT        : '>' ;
-ADD       : '+' ;
-SUB       : '-' ;
-MUL       : '*' ;
-DIV       : '/' ;
-POW       : '^' ;
-NOT       : '!' ;
+ASSIGN
+    : '='
+    ;
 
-QUESTION  : '?' ;
-COLON     : ':' ;
+ASSIGNADD
+    : '+='
+    ;
+
+ASSIGNSUB
+    : '-='
+    ;
+
+ASSIGNMUL
+    : '*='
+    ;
+
+ASSIGNDIV
+    : '/='
+    ;
+
+AND
+    : '&&'
+    ;
+
+OR
+    : '||'
+    ;
+
+LTEQ
+    : '<='
+    ;
+
+GTEQ
+    : '>='
+    ;
+
+NEQ
+    : '!='
+    ;
+
+EQ
+    : '=='
+    ;
+
+LT
+    : '<'
+    ;
+
+GT
+    : '>'
+    ;
+
+ADD
+    : '+'
+    ;
+
+SUB
+    : '-'
+    ;
+
+MUL
+    : '*'
+    ;
+
+DIV
+    : '/'
+    ;
+
+POW
+    : '^'
+    ;
+
+NOT
+    : '!'
+    ;
+
+QUESTION
+    : '?'
+    ;
+
+COLON
+    : ':'
+    ;
 
 OPAR
- : '('
- ;
+    : '('
+    ;
 
 CPAR
- : ')'
- ;
+    : ')'
+    ;
 
 INT
- : [0-9]+
- ;
+    : [0-9]+
+    ;
 
 FLOAT
- : [0-9]+ '.' [0-9]* 
- | '.' [0-9]+
- ;
+    : [0-9]+ '.' [0-9]*
+    | '.' [0-9]+
+    ;
 
 TRUE
- : 'true'
- ;
+    : 'true'
+    ;
 
 FALSE
- : 'false'
- ;
+    : 'false'
+    ;
 
 E
- : '_e'
- ;
+    : '_e'
+    ;
 
 PI
- : '_pi'
- ;
+    : '_pi'
+    ;
 
 ID
- : [a-zA-Z_] [a-zA-Z_0-9]*
- ;
+    : [a-zA-Z_] [a-zA-Z_0-9]*
+    ;
 
 SPACE
- : [ \t\r\n] -> skip
- ;
+    : [ \t\r\n] -> skip
+    ;

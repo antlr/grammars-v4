@@ -1,2 +1,0 @@
-php
-	antlr4 issue #2677(https://github.com/antlr/antlr4/issues/2677) descibes a null-pointer exception that occurs when trying to parse any of the examples for this parser.  When that bug is fixed, this parser can be removed from skip-java.txt.
