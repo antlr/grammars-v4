@@ -166,6 +166,7 @@
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
+				<module>cobol85</module>
 				<module>codeql</module>
 				<module>cookie</module>
 				<module>cpp</module>
@@ -178,6 +179,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
+                <module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
@@ -327,6 +329,7 @@
 				<module>rpn</module>
 				<module>ruby</module>
 				<module>rust</module>
+                <module>sapf</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
