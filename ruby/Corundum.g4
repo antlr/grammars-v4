@@ -286,6 +286,7 @@ string_assignment
 
 initial_array_assignment
     : var_id = lvalue op = ASSIGN LEFT_SBRACKET RIGHT_SBRACKET
+    | var_id = lvalue op = ASSIGN array_definition
     ;
 
 array_assignment
