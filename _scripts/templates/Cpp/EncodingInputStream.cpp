@@ -68,20 +68,35 @@ void EncodingInputStream::load(std::ifstream &stream, std::string file_encoding)
 	  return;
     }
     _data.clear();
-    std::vector<uint32_t> vec;
+    std::vector<int32_t> vec;
     if (file_encoding == "latin1")
     {
 	    char c;
 	    while (stream.get(c)) {
-		    vec.push_back(static_cast<uint32_t>(static_cast<unsigned char>(c)));
+		    vec.push_back(static_cast<int32_t>(static_cast<unsigned char>(c)));
 	    }
+	    _data = vec;
     } else {
-	    while (stream.peek() != EOF) {
-		    uint32_t codepoint = decode_utf8_char(stream);
-		    vec.push_back(codepoint);
+	    stream.seekg(0, std::ios::end);
+	    std::streampos length = stream.tellg();
+	    stream.seekg(0, std::ios::beg);
+	    char c;
+	    std::string v2;
+	    while (stream.get(c)) {
+		    v2.push_back(c);
 	    }
+	    auto v = antlrcpp::Utf8::lenientDecode(std::string_view(v2.data(), length));
+	    for (int i = 0; i < v.size(); ++i)
+	    {
+		    vec.push_back(static_cast<uint32_t>(v[i]));
+	    }
+	    _data = vec;
+	    
+//	    while (stream.peek() != EOF) {
+//		    uint32_t codepoint = decode_utf8_char(stream);
+//		    vec.push_back(codepoint);
+//	    }
     }
-    _data = vec;
     p = 0;
 }
 
@@ -112,7 +127,7 @@ void EncodingInputStream::consume()
   }
 }
 
-size_t EncodingInputStream::LA(ssize_t i) {
+size_t EncodingInputStream::LT(ssize_t i) {
   if (i == 0) {
     return 0; // undefined
   }
@@ -129,8 +144,10 @@ size_t EncodingInputStream::LA(ssize_t i) {
   return _data[static_cast<size_t>((position + i - 1))];
 }
 
-size_t EncodingInputStream::LT(ssize_t i) {
-  return LA(i);
+size_t EncodingInputStream::LA(ssize_t i) {
+	auto xxx = LT(i);
+//	std::cout << "LA " << (int32_t)xxx << std::endl;
+	return xxx;
 }
 
 size_t EncodingInputStream::index() {
@@ -160,7 +177,7 @@ void EncodingInputStream::seek(size_t index) {
   }
 }
 
-std::string encode_utf8(const std::vector<uint32_t>& vec, size_t start, size_t end) {
+std::string encode_utf8(const std::vector<int32_t>& vec, size_t start, size_t end) {
 	std::string result;
 
 	if (start >= vec.size() || end > vec.size() || start >= end) {

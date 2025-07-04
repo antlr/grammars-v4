@@ -10,7 +10,7 @@
 
 class EncodingInputStream : public antlr4::CharStream {
   protected:
-    std::vector<uint32_t> _data;
+    std::vector<int32_t> _data;
     size_t p;
 
   public:
