@@ -6,6 +6,7 @@ import 'package:antlr4/antlr4.dart';
 import 'MyErrorListener.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'BinaryCharStream.dart';
 
 var tee = false;
 var show_tree = false;
@@ -13,6 +14,8 @@ var show_tokens = false;
 var show_trace = false;
 var inputs = List\<String>.empty(growable: true);
 var is_fns = List\<bool>.empty(growable: true);
+var file_encoding = "<file_encoding>";
+var binary = <binary>;
 var error_code = 0;
 var string_instance = 0;
 var prefix = "";
@@ -114,12 +117,19 @@ Future\<void> ParseString(String input, int row_number) async
 
 Future\<void> ParseFilename(String input, int row_number) async
 {
-    var str = await InputStream.fromPath(input);
-    await DoParse(str, input, row_number);
+    if (file_encoding == "") {
+        var str = await InputStream.fromPath(input);
+        await DoParse(str, input, row_number);
+    } else {
+        var enc = Encoding.getByName(file_encoding);
+        var str = await InputStream.fromPath(input, encoding: enc!);
+        await DoParse(str, input, row_number);
+    }
 }
 
 Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
+    if (binary) str = new BinaryCharStream(str);
     <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
     }>
     var lexer = <lexer_name>(str);
