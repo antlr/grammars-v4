@@ -246,7 +246,7 @@ offset
     ;
 
 elem
-    : LPAR ELEM var_? offset var_* RPAR
+    : LPAR ELEM var_? offset (FUNC var_)* RPAR
     ;
 
 table
