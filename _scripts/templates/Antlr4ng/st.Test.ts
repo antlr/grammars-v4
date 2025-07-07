@@ -235,52 +235,52 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
 
 function toStringTree(tree: ParseTree, recog?: Parser | null): string {
     var sb = new StringBuilder();
-	let ruleNames = recog.ruleNames;
-	toStringTree2(sb, tree, 0, ruleNames);
-	return sb.toString();
+    let ruleNames = recog.ruleNames;
+    toStringTree2(sb, tree, 0, ruleNames);
+    return sb.toString();
 }
 
 function toStringTree2(sb: StringBuilder, tree: ParseTree, indent: number, ruleNames: string[] | null): void {
-	let s = getNodeText(tree, ruleNames);
-	s = escapeWhitespace(s!, false);
-	const c = tree.getChildCount();
-	if (c === 0) {
-	    for (let i = 0; i \< indent; ++i) sb.Append(" ");
-		sb.Append(s); sb.AppendLine("");
-		return;
-	}
+    let s = getNodeText(tree, ruleNames);
+    s = escapeWhitespace(s!, false);
+    const c = tree.getChildCount();
+    if (c === 0) {
+        for (let i = 0; i \< indent; ++i) sb.Append(" ");
+        sb.Append(s); sb.AppendLine("");
+        return;
+    }
     for (let i = 0; i \< indent; ++i) sb.Append(" ");
-	sb.Append(s); sb.AppendLine("");
-	for (let i = 0; i \< c; i++) {
-		toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
-	}
+    sb.Append(s); sb.AppendLine("");
+    for (let i = 0; i \< c; i++) {
+        toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
+    }
 }
 
 function getNodeText(t: ParseTree, ruleNames: string[] | null, recog?: Parser | null): string | undefined {
-	if (ruleNames !== null) {
-		if (t instanceof ParserRuleContext) {
-			const context = t.ruleContext;
-			const altNumber = context.getAltNumber();
-			// use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
-			if (altNumber !== 0) {
-				return ruleNames[t.ruleIndex] + ":" + altNumber;
-			}
+    if (ruleNames !== null) {
+        if (t instanceof ParserRuleContext) {
+            const context = t.ruleContext;
+            const altNumber = context.getAltNumber();
+            // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+            if (altNumber !== 0) {
+                return ruleNames[t.ruleIndex] + ":" + altNumber;
+            }
 
-			return ruleNames[t.ruleIndex];
-		} else if (t instanceof ErrorNode) {
-			return t.toString();
-		} else if (t instanceof TerminalNode) {
-			if (t.symbol !== null) {
-				return t.symbol.text;
-			}
-		}
-	}
-	const payload = t.getPayload();
-	if (isToken(payload)) {
-		return payload.text;
-	}
+            return ruleNames[t.ruleIndex];
+        } else if (t instanceof ErrorNode) {
+            return t.toString();
+        } else if (t instanceof TerminalNode) {
+            if (t.symbol !== null) {
+                return t.symbol.text;
+            }
+        }
+    }
+    const payload = t.getPayload();
+    if (isToken(payload)) {
+        return payload.text;
+    }
 
-	return String(t.getPayload());
+    return String(t.getPayload());
 }
 
 

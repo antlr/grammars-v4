@@ -43,61 +43,61 @@ public class BinaryCharStream implements CharStream {
     final CharStream stream;
 
     public BinaryCharStream(CharStream stream) {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     @Override
     public void consume() {
-	stream.consume();
+        stream.consume();
     }
 
     @Override
     public String getSourceName() {
-	return stream.getSourceName();
+        return stream.getSourceName();
     }
 
     @Override
     public String getText(Interval interval) {
-	final StringBuilder buf = new StringBuilder();
-	final int start = interval.a;
-	final int stop = interval.b;
-	final int index = stream.index();
-	stream.seek(0);
-	for (int i = start; i \< (stop + 1); i++) {
-	    final int t = stream.LA(i + 1);
-	    buf.append(t);
-	}
-	stream.seek(index);
-	return buf.toString();
+        final StringBuilder buf = new StringBuilder();
+        final int start = interval.a;
+        final int stop = interval.b;
+        final int index = stream.index();
+        stream.seek(0);
+        for (int i = start; i \< (stop + 1); i++) {
+            final int t = stream.LA(i + 1);
+            buf.append(t);
+        }
+        stream.seek(index);
+        return buf.toString();
     }
 
     @Override
     public int index() {
-	return stream.index();
+        return stream.index();
     }
 
     @Override
     public int LA(int i) {
-	return stream.LA(i);
+        return stream.LA(i);
     }
 
     @Override
     public int mark() {
-	return stream.mark();
+        return stream.mark();
     }
 
     @Override
     public void release(int marker) {
-	stream.release(marker);
+        stream.release(marker);
     }
 
     @Override
     public void seek(int index) {
-	stream.seek(index);
+        stream.seek(index);
     }
 
     @Override
     public int size() {
-	return stream.size();
+        return stream.size();
     }
 }
