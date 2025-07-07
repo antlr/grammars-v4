@@ -1,4 +1,4 @@
-# Ruby-like language grammar
+# Corundum: A Ruby-like language grammar
 
 ## Source
 
@@ -12,3 +12,9 @@ representation)
 
 It has some specific stuff like inline pir and for loop :) And won't ever have
 OOP features, sorry.
+
+## License
+BSD
+
+## Copyright
+Copyright (c) 2014 Alexander Belov
