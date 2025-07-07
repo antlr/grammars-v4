@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-   <targets>Cpp;CSharp;Dart;Go;Java;JavaScript;TypeScript;Antlr4ng</targets>
+   <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
    <entry-point>segmentheader</entry-point>
    <binary/>
    <test>
@@ -8,7 +8,7 @@
       <file-encoding>ISO-8859-1</file-encoding>
    </test>
    <test>
-      <targets>Antlr4ng;Cpp;Dart;Go;JavaScript;TypeScript</targets>
+      <targets>Antlr4ng;Cpp;Dart;Go;JavaScript;Python3;TypeScript</targets>
       <file-encoding>latin1</file-encoding>
    </test>
 </desc>
