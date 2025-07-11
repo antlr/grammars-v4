@@ -7,7 +7,8 @@ public abstract class Protobuf3ParserBase : Parser
     private readonly ITokenStream _input;
     private bool debug = false;
     private const string prefix = "   ";
-    SymbolTable symbolTable = new SymbolTable();
+    private SymbolTable symbolTable = new SymbolTable();
+    private TypeClassification default_type = TypeClassification.Message_;
 
     public Protobuf3ParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
@@ -70,19 +71,22 @@ public abstract class Protobuf3ParserBase : Parser
 //        System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.MessageTypeContext);
 //        var tctx = ctx as Protobuf3Parser.MessageTypeContext;
 
-	var la = tokenStream.LT(1);
-	var id = la.Text;
+        var la = tokenStream.LT(1);
+        var id = la.Text;
 
 //        var mn = tctx.messageName();
 //        var id = mn.GetText();
-//	System.Console.WriteLine("IsMessageType " + id);
+//      System.Console.WriteLine("IsMessageType " + id);
         var symbol = symbolTable.Resolve(id);
         if (symbol != null)
         {
-            if (symbol.Classification == TypeClassification.Message_)
+            if (symbol.Classification == TypeClassification.Message_) {
+                if (debug) System.Console.WriteLine("IsMessageType_ " + id + " " + true);
                 return true;
+            }
         }
-        return false;
+        if (debug) System.Console.WriteLine("IsMessageType_ " + id + " " + (this.default_type == TypeClassification.Message_));
+        return this.default_type == TypeClassification.Message_;
     }
 
     public bool IsEnumType_()
@@ -91,26 +95,30 @@ public abstract class Protobuf3ParserBase : Parser
 //        System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.EnumTypeContext);
 //        var tctx = ctx as Protobuf3Parser.EnumTypeContext;
 
-	var la = tokenStream.LT(1);
-	var id = la.Text;
+        var la = tokenStream.LT(1);
+        var id = la.Text;
 
 //        var mn = tctx.enumName();
 //        var id = mn.GetText();
-//	System.Console.WriteLine("IsEnumType " + id);
+//      System.Console.WriteLine("IsEnumType " + id);
         var symbol = symbolTable.Resolve(id);
         if (symbol != null)
         {
             if (symbol.Classification == TypeClassification.Enum_)
+            {
+                if (debug) System.Console.WriteLine("IsEnumType " + id + " " + true);
                 return true;
+            }
         }
-        return false;
+        if (debug) System.Console.WriteLine("IsEnumType " + id + " " + (this.default_type == TypeClassification.Enum_));
+        return this.default_type == TypeClassification.Enum_;
     }
 
     private ITokenStream tokenStream
     {
-	    get
-	    {
-		    return TokenStream;
-	    }
+        get
+        {
+            return TokenStream;
+        }
     }
 }
