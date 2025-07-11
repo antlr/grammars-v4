@@ -80,13 +80,19 @@ public abstract class Protobuf3ParserBase : Parser
         var symbol = symbolTable.Resolve(id);
         if (symbol != null)
         {
-            if (symbol.Classification == TypeClassification.Message_) {
-                if (debug) System.Console.WriteLine("IsMessageType_ " + id + " " + true);
+            if (symbol.Classification == TypeClassification.Message_)
+            {
+                if (debug) System.Console.WriteLine("IsMessageType_ found " + id + " " + true);
                 return true;
             }
+            else
+            {
+                if (debug) System.Console.WriteLine("IsMessageType_ found " + id + " " + false);
+                return false;
+            }
         }
-        if (debug) System.Console.WriteLine("IsMessageType_ " + id + " " + (this.default_type == TypeClassification.Message_));
-        return this.default_type == TypeClassification.Message_;
+        if (debug) System.Console.WriteLine("IsMessageType_ not found " + id + " " + (this.default_type == TypeClassification.Message_));
+            return this.default_type == TypeClassification.Message_;
     }
 
     public bool IsEnumType_()
@@ -106,12 +112,17 @@ public abstract class Protobuf3ParserBase : Parser
         {
             if (symbol.Classification == TypeClassification.Enum_)
             {
-                if (debug) System.Console.WriteLine("IsEnumType " + id + " " + true);
+                if (debug) System.Console.WriteLine("IsEnumType found " + id + " " + true);
                 return true;
             }
+            else
+            {
+                if (debug) System.Console.WriteLine("IsEnumType found " + id + " " + false);
+                return false;
+            }
         }
-        if (debug) System.Console.WriteLine("IsEnumType " + id + " " + (this.default_type == TypeClassification.Enum_));
-        return this.default_type == TypeClassification.Enum_;
+        if (debug) System.Console.WriteLine("IsEnumType not found " + id + " " + (this.default_type == TypeClassification.Enum_));
+            return this.default_type == TypeClassification.Enum_;
     }
 
     private ITokenStream tokenStream
