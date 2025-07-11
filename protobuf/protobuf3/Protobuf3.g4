@@ -162,8 +162,6 @@ enumDef
     : ENUM enumName doEnumNameDef enumBody
     ;
 
-doEnumNameDef : { this.DoEnumNameDef_(); } ;
-
 enumBody
     : LC doEnterBlock enumElement* RC doExitBlock
     ;
@@ -191,8 +189,6 @@ enumValueOption
 messageDef
     : MESSAGE messageName doMessageNameDef messageBody
     ;
-
-doMessageNameDef : { this.DoMessageNameDef_(); } ;
 
 messageBody
     : LC doEnterBlock messageElement* RC doExitBlock
@@ -227,8 +223,6 @@ extendDef
 serviceDef
     : SERVICE serviceName doServiceNameDef LC doEnterBlock serviceElement* RC doExitBlock
     ;
-
-doServiceNameDef : { this.DoServiceNameDef_(); } ;
 
 serviceElement
     : optionStatement
@@ -672,11 +666,12 @@ keywords
     | BOOL_LIT
     ;
 
-doEnterBlock
-	: { this.DoEnterBlock_(); }
-    ;
+doEnterBlock : { this.DoEnterBlock_(); } ;
 
-doExitBlock
-	: { this.DoExitBlock_(); }
-    ;
+doEnumNameDef : { this.DoEnumNameDef_(); } ;
 
+doExitBlock : { this.DoExitBlock_(); } ;
+
+doMessageNameDef : { this.DoMessageNameDef_(); } ;
+
+doServiceNameDef : { this.DoServiceNameDef_(); } ;
