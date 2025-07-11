@@ -779,7 +779,7 @@
  {
   "name": "BibTeX",
   "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/bibtex/BibTeXLexer.g4",
-  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/bibtex/BibTeXLexer.g4",
+  "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/bibtex/BibTeXParser.g4",
   "start": "bibTex",
   "example": [
    "references.bib"
