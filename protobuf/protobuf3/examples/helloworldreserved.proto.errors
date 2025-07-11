@@ -1,0 +1,4 @@
+line 12:16 no viable alternative at input 'HelloRequest'
+line 12:39 no viable alternative at input 'HelloReply'
+line 28:13 no viable alternative at input 'Status'
+line 28:20 extraneous input 'status' expecting '='

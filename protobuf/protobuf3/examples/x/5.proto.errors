@@ -1,0 +1,7 @@
+line 1:0 mismatched input 'package' expecting 'syntax'
+line 5:13 no viable alternative at input 'requiredstring'
+line 5:13 mismatched input 'string' expecting '='
+line 10:11 no viable alternative at input 'requiredmy'
+line 10:11 mismatched input 'my' expecting '='
+line 10:24 no viable alternative at input 'Inner'
+line 10:30 extraneous input 'ref' expecting '='
