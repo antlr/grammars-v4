@@ -243,7 +243,7 @@
  },
  {
   "name": "ARDEN",
-  "lexer": "",
+  "lexer": "https://raw.githubusercontent.com/antlr/grammars-v4/master/arden/ArdenLexer.g4",
   "parser": "https://raw.githubusercontent.com/antlr/grammars-v4/master/arden/ArdenParser.g4",
   "start": "mlms",
   "example": [
