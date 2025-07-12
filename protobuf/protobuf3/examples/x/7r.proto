@@ -1,6 +1,6 @@
 syntax = "proto3";
 message TestMessage {
-        repeated string value = 1;
+        repeated TestMess value = 1;
 }
 message TestMess {
     repeated TestMessage value = 1;
