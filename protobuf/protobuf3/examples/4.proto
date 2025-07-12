@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Another {
+  Outer.Inner ref_to_inner = 1; // Reference Outer.Inner from outside
+}
+
+message Outer {
+  message Inner {
+    string value = 1;
+  }
+
+  Inner inner_field = 1; // Using Inner directly inside Outer
+}

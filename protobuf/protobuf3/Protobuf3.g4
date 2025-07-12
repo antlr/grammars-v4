@@ -17,6 +17,14 @@
 
 grammar Protobuf3;
 
+options {
+    superClass = Protobuf3ParserBase;
+}
+
+twoPassParse
+    : proto { this.DoRewind(); } proto
+    ;
+
 proto
     : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
     ;
@@ -30,7 +38,7 @@ syntax
 // Import Statement
 
 importStatement
-    : IMPORT (WEAK | PUBLIC)? strLit SEMI
+    : IMPORT (WEAK | PUBLIC)? strLit SEMI { this.DoImportStatement_(); }
     ;
 
 // Package
@@ -155,11 +163,11 @@ topLevelDef
 // enum
 
 enumDef
-    : ENUM enumName enumBody
+    : ENUM enumName doEnumNameDef enumBody
     ;
 
 enumBody
-    : LC enumElement* RC
+    : LC doEnterBlock enumElement* RC doExitBlock
     ;
 
 enumElement
@@ -183,12 +191,13 @@ enumValueOption
 // message
 
 messageDef
-    : MESSAGE messageName messageBody
+    : MESSAGE messageName doMessageNameDef messageBody
     ;
 
 messageBody
-    : LC messageElement* RC
+    : LC doEnterBlock messageElement* RC doExitBlock
     ;
+
 
 messageElement
     : field
@@ -216,7 +225,7 @@ extendDef
 // service
 
 serviceDef
-    : SERVICE serviceName LC serviceElement* RC
+    : SERVICE serviceName doServiceNameDef LC doEnterBlock serviceElement* RC doExitBlock
     ;
 
 serviceElement
@@ -292,11 +301,11 @@ rpcName
     ;
 
 messageType
-    : (DOT)? (ident DOT)* messageName
+    : (DOT)? (ident DOT)* { this.IsMessageType_() }? messageName
     ;
 
 enumType
-    : (DOT)? (ident DOT)* enumName
+    : (DOT)? (ident DOT)* { this.IsEnumType_() }? enumName
     ;
 
 intLit
@@ -660,3 +669,13 @@ keywords
     | RETURNS
     | BOOL_LIT
     ;
+
+doEnterBlock : { this.DoEnterBlock_(); } ;
+
+doEnumNameDef : { this.DoEnumNameDef_(); } ;
+
+doExitBlock : { this.DoExitBlock_(); } ;
+
+doMessageNameDef : { this.DoMessageNameDef_(); } ;
+
+doServiceNameDef : { this.DoServiceNameDef_(); } ;

@@ -1,0 +1,3 @@
+(: Check whether field with TestMess is parsed as message type. :)
+
+assert count(//type_/messageType/messageName/ident/IDENTIFIER[text() = "TestMess"]) = 1, "Field TestMess is not being parsed correctly.";

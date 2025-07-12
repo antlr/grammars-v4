@@ -1,0 +1,3 @@
+(: Check whether field with TestEnum is parsed as enum type. :)
+
+assert count(//type_/enumType/enumName/ident/IDENTIFIER[text() = "TestEnum"]) = 1, "Field TestEnum is not being parsed correctly.";

@@ -304,8 +304,7 @@
 				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
-				<module>protobuf2</module>
-				<module>protobuf3</module>
+				<module>protobuf</module>
 				<module>prov-n</module>
 				<module>python</module>
 				<module>qif</module>
