@@ -139,7 +139,7 @@ public abstract class Protobuf3ParserBase : Parser
         var parser = this as Protobuf3Parser;
         var _ctx = parser.Context;
         parser.Reset();
-        _ctx.children.RemoveAt(0);
+        _ctx.RemoveLastChild();
         parser.Context = _ctx;
     }
 }

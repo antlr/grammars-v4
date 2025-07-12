@@ -14,6 +14,10 @@ public abstract class Protobuf3ParserBase extends Parser {
         this.input = input;
     }
 
+    private TokenStream tokenStream() {
+        return getTokenStream();
+    }
+
     public void DoMessageNameDef_() {
         var ctx = this.getContext();
         var tctx = (Protobuf3Parser.DoMessageNameDefContext) ctx;
@@ -92,7 +96,13 @@ public abstract class Protobuf3ParserBase extends Parser {
         return this.default_type == TypeClassification.Enum_;
     }
 
-    private TokenStream tokenStream() {
-        return getTokenStream();
+    public void DoRewind()
+    {
+        // Rewind for symbol table use.
+        var parser = (Protobuf3Parser)this;
+        var _ctx = parser.getContext();
+        parser.reset();
+        _ctx.removeLastChild();
+        parser.setContext(_ctx);
     }
 }

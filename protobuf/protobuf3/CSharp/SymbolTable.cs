@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 
 public class SymbolTable {
-	private Stack<Symbol> scopeStack = new Stack<Symbol>();
+    private Stack<Symbol> scopeStack = new Stack<Symbol>();
 
     // Note: predeclared identifiers here.
 

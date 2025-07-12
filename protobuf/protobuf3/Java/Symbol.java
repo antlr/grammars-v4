@@ -14,9 +14,9 @@ public class Symbol {
     
     public Symbol(String name, Symbol type, TypeClassification classification)
     {
-	this.name = name;
-	this.type = type;
-	this.classification = classification;
+        this.name = name;
+        this.type = type;
+        this.classification = classification;
     }
     
     public String getName() {
