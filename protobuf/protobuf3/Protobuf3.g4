@@ -21,7 +21,9 @@ options {
     superClass = Protobuf3ParserBase;
 }
 
-doTwoPassParse: proto { this.DoTwoPassParse_(); } proto ;
+twoPassParse
+    : proto { this.DoRewind(); } proto
+    ;
 
 proto
     : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF

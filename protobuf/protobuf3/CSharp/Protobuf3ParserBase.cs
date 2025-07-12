@@ -133,7 +133,7 @@ public abstract class Protobuf3ParserBase : Parser
         }
     }
 
-    public void DoTwoPassParse_()
+    public void DoRewind()
     {
         // Rewind for symbol table use.
         var parser = this as Protobuf3Parser;
