@@ -132,4 +132,14 @@ public abstract class Protobuf3ParserBase : Parser
             return TokenStream;
         }
     }
+
+    public void DoTwoPassParse_()
+    {
+        // Rewind for symbol table use.
+        var parser = this as Protobuf3Parser;
+        var _ctx = parser.Context;
+        parser.Reset();
+        _ctx.children.RemoveAt(0);
+        parser.Context = _ctx;
+    }
 }

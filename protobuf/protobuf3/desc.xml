@@ -5,4 +5,5 @@
    -->
    <targets>CSharp;Java</targets>
    <inputs>examples/**/*.proto</inputs>
+   <entry-point>doTwoPassParse</entry-point>
 </desc>
