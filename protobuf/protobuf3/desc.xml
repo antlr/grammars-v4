@@ -4,6 +4,6 @@
    <targets>CSharp;Cpp;Dart;Go;Java;JavaScript;PHP;Python3;TypeScript;Antlr4ng</targets>
    -->
    <targets>CSharp;Java</targets>
-   <inputs>examples/**/*.proto</inputs>
    <entry-point>twoPassParse</entry-point>
+   <inputs>examples/*.proto</inputs>
 </desc>
