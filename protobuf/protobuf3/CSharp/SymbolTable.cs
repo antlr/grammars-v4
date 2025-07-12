@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Text;
 
 public class SymbolTable {
-    private Stack<Symbol> scopeStack = new Stack<Symbol>();
+	private Stack<Symbol> scopeStack = new Stack<Symbol>();
 
     // Note: predeclared identifiers here.
 
@@ -51,5 +52,18 @@ public class SymbolTable {
             }
         }
         return null; // Symbol not found
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (var scope in scopeStack)
+        {
+            foreach (var member in scope.Members)
+            {
+                sb.AppendLine(member.ToString());
+            }
+        }
+        return sb.ToString();
     }
 }
