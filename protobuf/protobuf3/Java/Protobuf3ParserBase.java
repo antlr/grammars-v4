@@ -1,6 +1,14 @@
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.ArrayList;
 
 public abstract class Protobuf3ParserBase extends Parser {
     private final TokenStream input;
@@ -8,6 +16,7 @@ public abstract class Protobuf3ParserBase extends Parser {
     private static final String prefix = "   ";
     private SymbolTable symbolTable = new SymbolTable();
     private TypeClassification default_type = TypeClassification.Message_;
+    private List<String> importedFiles = new ArrayList<>();
 
     public Protobuf3ParserBase(TokenStream input) {
         super(input);
@@ -104,5 +113,37 @@ public abstract class Protobuf3ParserBase extends Parser {
         parser.reset();
         _ctx.removeLastChild();
         parser.setContext(_ctx);
+    }
+
+    public void DoImportStatement_() {
+        String save = null;
+        try {
+            var ctx = this.getContext();
+            assert ctx instanceof Protobuf3Parser.ImportStatementContext;
+            var tctx = (Protobuf3Parser.ImportStatementContext) ctx;
+            String importFileName = trimQuotes(tctx.strLit().getText());
+            String currentFile = this.getTokenStream().getTokenSource().getSourceName();
+            save = System.getProperty("user.dir").replace("\\", "/");
+            Path current = Paths.get(currentFile).getParent();
+            String fpDir = current.toAbsolutePath().toString();
+            System.setProperty("user.dir", fpDir);
+            String fp = Paths.get(importFileName).toAbsolutePath().toString();
+            if (importedFiles.contains(fp)) return;
+            importedFiles.add(fp);
+            CharStream str = CharStreams.fromPath(Paths.get(fp));
+            var lexer = new Protobuf3Lexer(str);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new Protobuf3Parser(tokens);
+            parser.twoPassParse();
+        } catch (Exception e)
+        {
+        }
+        finally {
+            if (save != null) System.setProperty("user.dir", save);
+        }
+    }
+
+    private String trimQuotes(String s) {
+        return (s == null || s.isEmpty()) ? s : s.substring(1, s.length() - 1);
     }
 }

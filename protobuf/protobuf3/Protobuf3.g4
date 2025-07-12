@@ -38,7 +38,7 @@ syntax
 // Import Statement
 
 importStatement
-    : IMPORT (WEAK | PUBLIC)? strLit SEMI
+    : IMPORT (WEAK | PUBLIC)? strLit SEMI { this.DoImportStatement_(); }
     ;
 
 // Package
