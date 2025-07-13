@@ -11,6 +11,7 @@ public abstract class Protobuf3ParserBase : Parser
     private SymbolTable symbolTable = new SymbolTable();
     private TypeClassification default_type = TypeClassification.Message_;
     private static List<string> imported_files = new List<string>();
+
     public Protobuf3ParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
     {
@@ -149,29 +150,34 @@ public abstract class Protobuf3ParserBase : Parser
         // Open input file and parse. Note, parse tree
         // will not be inserted here, but the symbol table
         // is reused.
-        var ctx = this.Context;
-        System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.ImportStatementContext);
-        var tctx = ctx as Protobuf3Parser.ImportStatementContext;
-        var import_file_name = TrimQuotes(tctx.strLit().GetText());
-        var current_file = this.tokenStream.TokenSource.SourceName;
-        var save = Environment.CurrentDirectory.Replace("\\", "/");
-        var current = Path.GetDirectoryName(current_file);
-        var fp_dir = Path.GetFullPath(current);
-        Environment.CurrentDirectory = fp_dir;
-        // Make sure we haven't done this before.
-        var fp = Path.GetFullPath(import_file_name);
-        if (imported_files.Contains(fp)) return;
-        imported_files.Add(fp);
-        ICharStream str = CharStreams.fromPath(fp);
-        var lexer = new Protobuf3Lexer(str);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        var parser = new Protobuf3Parser(tokens);
-        parser.twoPassParse();
-        Environment.CurrentDirectory = save;
+        try {
+            var ctx = this.Context;
+            System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.ImportStatementContext);
+            var tctx = ctx as Protobuf3Parser.ImportStatementContext;
+            var import_file_name = TrimQuotes(tctx.strLit().GetText());
+            var current_file = this.tokenStream.TokenSource.SourceName;
+            var save = Environment.CurrentDirectory.Replace("\\", "/");
+            var current = Path.GetDirectoryName(current_file);
+            var fp_dir = Path.GetFullPath(current);
+            Environment.CurrentDirectory = fp_dir;
+            // Make sure we haven't done this before.
+            var fp = Path.GetFullPath(import_file_name);
+            if (imported_files.Contains(fp)) return;
+            imported_files.Add(fp);
+            ICharStream str = CharStreams.fromPath(fp);
+            var lexer = new Protobuf3Lexer(str);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new Protobuf3Parser(tokens);
+            parser.twoPassParse();
+            Environment.CurrentDirectory = save;
+        }
+        catch
+        {
+        }
     }
 
-	private string TrimQuotes(string s)
-	{
-		return string.IsNullOrEmpty(s) ? s : s.Substring(1, s.Length - 2);
-	}
+    private string TrimQuotes(string s)
+    {
+        return string.IsNullOrEmpty(s) ? s : s.Substring(1, s.Length - 2);
+    }
 }
