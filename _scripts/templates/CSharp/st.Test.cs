@@ -140,7 +140,8 @@ public class Program
     static bool old = false;
     static bool two_byte = false;
     static int exit_code = 0;
-    static Encoding encoding = null;
+    static string file_encoding = "<file_encoding>";
+    static bool binary = <binary>;
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
@@ -195,12 +196,7 @@ public class Program
             else if (args[i] == "-encoding")
             {
                 ++i;
-                encoding = Encoding.GetEncoding(
-                    args[i],
-                    new EncoderReplacementFallback("(unknown)"),
-                    new DecoderReplacementFallback("(error)"));
-                if (encoding == null)
-                    throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
+                file_encoding = args[i];
             }
             else if (args[i] == "-x")
             {
@@ -274,15 +270,23 @@ public class Program
             FileStream fs = new FileStream(input, FileMode.Open);
             str = new Antlr4.Runtime.AntlrInputStream(fs);
         }
-        else if (encoding == null)
+        else if (file_encoding == null || file_encoding == "")
             str = CharStreams.fromPath(input);
-        else
+        else {
+            var encoding = Encoding.GetEncoding(
+                file_encoding,
+                new EncoderReplacementFallback("(unknown)"),
+                new DecoderReplacementFallback("(error)"));
+            if (encoding == null)
+                throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
             str = CharStreams.fromPath(input, encoding);
+        }
         DoParse(str, input, row_number);
     }
 
     static void DoParse(ICharStream str, string input_name, int row_number)
     {
+        if (binary) str = new BinaryCharStream(str);
         var lexer = new <lexer_name>(str);
         if (show_tokens)
         {

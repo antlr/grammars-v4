@@ -18,7 +18,7 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>BibTeX.g4</include>
+					   <include>BibTeXParser.g4</include>
 					   <include>BibTeXLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>

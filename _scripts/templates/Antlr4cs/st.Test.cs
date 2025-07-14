@@ -24,13 +24,14 @@ public class Program
 
     static bool tee = false;
     static bool show_profile = false;
-    static bool show_tree = false;
     static bool show_tokens = false;
     static bool show_trace = false;
+    static bool show_tree = false;
     static bool old = false;
     static bool two_byte = false;
     static int exit_code = 0;
-    static Encoding encoding = null;
+    static string file_encoding = "<file_encoding>";
+    static bool binary = <binary>;
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
@@ -77,12 +78,7 @@ public class Program
             else if (args[i].Equals("-encoding"))
             {
                 ++i;
-                encoding = Encoding.GetEncoding(
-                    args[i],
-                    new EncoderReplacementFallback("(unknown)"),
-                    new DecoderReplacementFallback("(error)"));
-                if (encoding == null)
-                    throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
+                file_encoding = args[i];
             }
             else if (args[i] == "-x")
             {
@@ -167,6 +163,7 @@ public class Program
 
     static void DoParse(ICharStream str, string input_name, int row_number)
     {
+        if (binary) str = new BinaryCharStream(str);
 <if (case_insensitive_type)>
         str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
 <endif>
