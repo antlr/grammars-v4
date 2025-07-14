@@ -356,10 +356,6 @@ diskgroup_attributes
     : SET ATTRIBUTE CHAR_STRING '=' CHAR_STRING
     ;
 
-disk_region_clause
-    :
-    ;
-
 drop_diskgroup_file_clause
     : DROP FILE filename (',' filename)*
     ;
@@ -971,10 +967,6 @@ alter_method_spec
 
 alter_method_element
     : (ADD | DROP) (map_order_function_spec | subprogram_spec)
-    ;
-
-attribute_definition
-    : attribute_name type_spec?
     ;
 
 alter_collection_clauses
@@ -5279,10 +5271,6 @@ check_constraint
     : CHECK '(' condition ')' DISABLE?
     ;
 
-enable_constraint
-    : ENABLE CONSTRAINT constraint_name
-    ;
-
 foreign_key_clause
     : FOREIGN KEY paren_column_list references_clause on_delete_clause?
     ;
@@ -5293,14 +5281,6 @@ references_clause
 
 on_delete_clause
     : ON DELETE (CASCADE | SET NULL_)
-    ;
-
-unique_key_clause
-    : UNIQUE paren_column_list using_index_clause?
-    ;
-
-primary_key_clause
-    : PRIMARY KEY paren_column_list using_index_clause?
     ;
 
 // Anonymous PL/SQL code block
