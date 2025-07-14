@@ -5798,7 +5798,10 @@ commit_statement
     ;
 
 write_clause
-    : WRITE (IMMEDIATE | BATCH)? (WAIT | NOWAIT)?
+    : WRITE (
+        (IMMEDIATE | BATCH)
+        | (WAIT | NOWAIT)
+        )*
     ;
 
 rollback_statement
