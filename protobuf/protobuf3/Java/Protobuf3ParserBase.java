@@ -146,4 +146,29 @@ public abstract class Protobuf3ParserBase extends Parser {
     private String trimQuotes(String s) {
         return (s == null || s.isEmpty()) ? s : s.substring(1, s.length() - 1);
     }
+
+    public boolean IsNotKeyword() {
+        Token la = tokenStream().LT(1);
+        switch (la.getType()) {
+            case Protobuf3Parser.DOUBLE:
+            case Protobuf3Parser.FLOAT:
+            case Protobuf3Parser.INT32:
+            case Protobuf3Parser.INT64:
+            case Protobuf3Parser.UINT32:
+            case Protobuf3Parser.UINT64:
+            case Protobuf3Parser.SINT32:
+            case Protobuf3Parser.SINT64:
+            case Protobuf3Parser.FIXED32:
+            case Protobuf3Parser.FIXED64:
+            case Protobuf3Parser.SFIXED32:
+            case Protobuf3Parser.SFIXED64:
+            case Protobuf3Parser.BOOL:
+            case Protobuf3Parser.STRING:
+            case Protobuf3Parser.BYTES:
+                return false;
+            default:
+                break;
+        }
+        return true;
+    }
 }
