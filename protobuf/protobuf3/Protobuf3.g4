@@ -22,7 +22,7 @@ options {
 }
 
 twoPassParse
-    : proto { this.DoRewind(); } proto
+    : { this.DoRewind(); } proto
     ;
 
 proto
@@ -129,8 +129,8 @@ type_
     | BOOL
     | STRING
     | BYTES
-    | messageType
-    | enumType
+    | { this.IsNotKeyword() }? messageType
+    | { this.IsNotKeyword() }? enumType
     ;
 
 // Reserved

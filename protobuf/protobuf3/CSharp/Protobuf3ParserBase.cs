@@ -11,7 +11,7 @@ public abstract class Protobuf3ParserBase : Parser
     private SymbolTable symbolTable = new SymbolTable();
     private TypeClassification default_type = TypeClassification.Message_;
     private static List<string> imported_files = new List<string>();
-
+    
     public Protobuf3ParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
     {
@@ -137,9 +137,12 @@ public abstract class Protobuf3ParserBase : Parser
 
     public void DoRewind()
     {
-        // Rewind for symbol table use.
+        // Parse proto as a dry run to construct symbol table,
+        // the rewind to do follow up parse in grammar.
         var parser = this as Protobuf3Parser;
         var _ctx = parser.Context;
+        parser.Reset();
+        parser.proto();
         parser.Reset();
         _ctx.RemoveLastChild();
         parser.Context = _ctx;
@@ -156,10 +159,12 @@ public abstract class Protobuf3ParserBase : Parser
             var tctx = ctx as Protobuf3Parser.ImportStatementContext;
             var import_file_name = TrimQuotes(tctx.strLit().GetText());
             var current_file = this.tokenStream.TokenSource.SourceName;
+            if (debug) System.Console.Error.WriteLine("current file = " + current_file);
+            if (debug) System.Console.Error.WriteLine("imported file = " + import_file_name);
             var save = Environment.CurrentDirectory.Replace("\\", "/");
             var current = Path.GetDirectoryName(current_file);
             var fp_dir = Path.GetFullPath(current);
-            Environment.CurrentDirectory = fp_dir;
+            //Environment.CurrentDirectory = fp_dir;
             // Make sure we haven't done this before.
             var fp = Path.GetFullPath(import_file_name);
             if (imported_files.Contains(fp)) return;
@@ -179,5 +184,30 @@ public abstract class Protobuf3ParserBase : Parser
     private string TrimQuotes(string s)
     {
         return string.IsNullOrEmpty(s) ? s : s.Substring(1, s.Length - 2);
+    }
+
+    public bool IsNotKeyword()
+    {
+        // Make sure next word is not a keyword.
+        var la = tokenStream.LT(1);
+        switch (la.Type) {
+            case Protobuf3Parser.DOUBLE:
+            case Protobuf3Parser.FLOAT:
+            case Protobuf3Parser.INT32:
+            case Protobuf3Parser.INT64:
+            case Protobuf3Parser.UINT32:
+            case Protobuf3Parser.UINT64:
+            case Protobuf3Parser.SINT32:
+            case Protobuf3Parser.SINT64:
+            case Protobuf3Parser.FIXED32:
+            case Protobuf3Parser.FIXED64:
+            case Protobuf3Parser.SFIXED32:
+            case Protobuf3Parser.SFIXED64:
+            case Protobuf3Parser.BOOL:
+            case Protobuf3Parser.STRING:
+            case Protobuf3Parser.BYTES:
+                return false;
+        }
+        return true;
     }
 }

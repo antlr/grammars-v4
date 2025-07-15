@@ -24,7 +24,7 @@ public class Program
     public static string StartSymbol { get; set; } = "<start_symbol>";
     public static string Input { get; set; }
     public static bool HeatMap { get; set; } = false;
-    public static void SetupParse2(string input, bool quiet = false)
+    public static void SetupParse2(string input, string fn, bool quiet = false)
     {
         ICharStream str = new AntlrInputStream(input);
         CharStream = str;
@@ -38,6 +38,7 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         TokenStream = tokens;
+        ((AntlrInputStream)(lexer.InputStream)).name = fn;
         var parser = new MyParser(tokens);
         Parser = parser;
         var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
