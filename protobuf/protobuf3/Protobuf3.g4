@@ -244,9 +244,9 @@ rpc
 // lexical
 
 constant
-    : fullIdent
+    : { this.IsNotKeyword() }? fullIdent
     | (MINUS | PLUS)? intLit
-    | ( MINUS | PLUS)? floatLit
+    | (MINUS | PLUS)? floatLit
     | strLit
     | boolLit
     | blockLit
@@ -327,6 +327,7 @@ floatLit
     ;
 
 // keywords
+
 SYNTAX
     : 'syntax'
     ;

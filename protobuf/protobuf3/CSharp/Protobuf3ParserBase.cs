@@ -240,6 +240,7 @@ public abstract class Protobuf3ParserBase : Parser
             case Protobuf3Parser.BOOL:
             case Protobuf3Parser.STRING:
             case Protobuf3Parser.BYTES:
+            case Protobuf3Parser.BOOL_LIT:
                 return false;
         }
         return true;

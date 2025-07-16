@@ -20,3 +20,4 @@ symbol table. The predicates in the grammmar select alts to remove ambiguity.
 
 https://protobuf.dev/reference/protobuf/proto3-spec/
 
+https://protobuf.dev/programming-guides/proto3/

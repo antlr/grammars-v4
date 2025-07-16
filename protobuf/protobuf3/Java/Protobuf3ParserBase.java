@@ -61,83 +61,83 @@ public abstract class Protobuf3ParserBase extends Parser {
     }
 
     public void DoEnterBlock_() {
-	var current_scope = symbolTable.currentScope();
-	// Go up parse tree.
-	String ctx1 = null;
-	String ctx2 = null;
-	String ctx3 = null;
-	String ctx = null;
-	if (this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent().getParent() instanceof Protobuf3Parser.MessageDefContext) {
-	    Protobuf3Parser.MessageDefContext mctx = (Protobuf3Parser.MessageDefContext) this.getContext().getParent().getParent();
-	    if (mctx.messageName() != null) {
-		ctx1 = mctx.messageName().getText();
-	    }
-	}
+        var current_scope = symbolTable.currentScope();
+        // Go up parse tree.
+        String ctx1 = null;
+        String ctx2 = null;
+        String ctx3 = null;
+        String ctx = null;
+        if (this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent().getParent() instanceof Protobuf3Parser.MessageDefContext) {
+            Protobuf3Parser.MessageDefContext mctx = (Protobuf3Parser.MessageDefContext) this.getContext().getParent().getParent();
+            if (mctx.messageName() != null) {
+                ctx1 = mctx.messageName().getText();
+            }
+        }
 
-	if (ctx1 == null && this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent().getParent() instanceof Protobuf3Parser.EnumDefContext) {
-	    Protobuf3Parser.EnumDefContext ectx = (Protobuf3Parser.EnumDefContext) this.getContext().getParent().getParent();
-	    if (ectx.enumName() != null) {
-		ctx2 = ectx.enumName().getText();
-	    }
-	}
+        if (ctx1 == null && this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent().getParent() instanceof Protobuf3Parser.EnumDefContext) {
+            Protobuf3Parser.EnumDefContext ectx = (Protobuf3Parser.EnumDefContext) this.getContext().getParent().getParent();
+            if (ectx.enumName() != null) {
+                ctx2 = ectx.enumName().getText();
+            }
+        }
 
-	if (ctx1 == null && ctx2 == null && this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent() instanceof Protobuf3Parser.ServiceDefContext) {
-	    Protobuf3Parser.ServiceDefContext ectx = (Protobuf3Parser.ServiceDefContext) this.getContext().getParent();
-	    if (ectx.serviceName() != null) {
-		ctx3 = ectx.serviceName().getText();
-	    }
-	}
+        if (ctx1 == null && ctx2 == null && this.getContext() != null && this.getContext().getParent() != null && this.getContext().getParent() instanceof Protobuf3Parser.ServiceDefContext) {
+            Protobuf3Parser.ServiceDefContext ectx = (Protobuf3Parser.ServiceDefContext) this.getContext().getParent();
+            if (ectx.serviceName() != null) {
+                ctx3 = ectx.serviceName().getText();
+            }
+        }
 
-	ctx = ctx1;
-	if (ctx == null) ctx = ctx2;
-	if (ctx == null) ctx = ctx3;
+        ctx = ctx1;
+        if (ctx == null) ctx = ctx2;
+        if (ctx == null) ctx = ctx3;
 
-	if (ctx == null) {
-	    return;
-	}
+        if (ctx == null) {
+            return;
+        }
 
-	Symbol newScope = symbolTable.resolve(ctx, null);
-	if (debug) {
-	    System.out.println(prefix + "EnterBlock " + newScope);
-	}
-	symbolTable.enterScope(newScope);
+        Symbol newScope = symbolTable.resolve(ctx, null);
+        if (debug) {
+            System.out.println(prefix + "EnterBlock " + newScope);
+        }
+        symbolTable.enterScope(newScope);
     }
 
     public void DoExitBlock_() {
         if (debug) System.out.println(prefix + "ExitBlock " + symbolTable.currentScope());
-	var current = symbolTable.currentScope();
-	var parent = current.getParent();
+        var current = symbolTable.currentScope();
+        var parent = current.getParent();
         symbolTable.exitScope();
     }
 
     public boolean IsMessageType_() {
-	int i = 1;
-	Symbol scope = null;
-	Symbol symbol = null;
-	boolean first = true;
-	boolean global = false;
-	for (; ; ++i, first = false)
-	{
-	    var la = this.tokenStream().LT(i);
-	    var id = la.getText();
-	    if (debug) System.err.print(id);
-	    if (la.getType() == Protobuf3Parser.DOT)
-	    {
-		if (first) global = true;
-		if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.IDENTIFIER) break;
-	    }
-	    else if (la.getType() == Protobuf3Parser.IDENTIFIER)
-	    {
-		symbol = symbolTable.resolve(id, scope);
-		if (symbol != null)
-		{
-		    scope = symbol;
-		}
-		else break;
-		if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.DOT) break;
-	    }
-	    else break;
-	}
+        int i = 1;
+        Symbol scope = null;
+        Symbol symbol = null;
+        boolean first = true;
+        boolean global = false;
+        for (; ; ++i, first = false)
+        {
+            var la = this.tokenStream().LT(i);
+            var id = la.getText();
+            if (debug) System.err.print(id);
+            if (la.getType() == Protobuf3Parser.DOT)
+            {
+                if (first) global = true;
+                if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.IDENTIFIER) break;
+            }
+            else if (la.getType() == Protobuf3Parser.IDENTIFIER)
+            {
+                symbol = symbolTable.resolve(id, scope);
+                if (symbol != null)
+                {
+                    scope = symbol;
+                }
+                else break;
+                if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.DOT) break;
+            }
+            else break;
+        }
         if (symbol != null) {
             if (symbol.getClassification() == TypeClassification.Message_) {
                 if (debug) System.out.println("IsMessageType_ found " + " true");
@@ -152,33 +152,33 @@ public abstract class Protobuf3ParserBase extends Parser {
     }
 
     public boolean IsEnumType_() {
-	int i = 1;
-	Symbol scope = null;
-	Symbol symbol = null;
-	boolean first = true;
-	boolean global = false;
-	for (; ; ++i, first = false)
-	{
-	    var la = this.tokenStream().LT(i);
-	    var id = la.getText();
-	    if (debug) System.err.print(id);
-	    if (la.getType() == Protobuf3Parser.DOT)
-	    {
-		if (first) global = true;
-		if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.IDENTIFIER) break;
-	    }
-	    else if (la.getType() == Protobuf3Parser.IDENTIFIER)
-	    {
-		symbol = symbolTable.resolve(id, scope);
-		if (symbol != null)
-		{
-		    scope = symbol;
-		}
-		else break;
-		if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.DOT) break;
-	    }
-	    else break;
-	}
+        int i = 1;
+        Symbol scope = null;
+        Symbol symbol = null;
+        boolean first = true;
+        boolean global = false;
+        for (; ; ++i, first = false)
+        {
+            var la = this.tokenStream().LT(i);
+            var id = la.getText();
+            if (debug) System.err.print(id);
+            if (la.getType() == Protobuf3Parser.DOT)
+            {
+                if (first) global = true;
+                if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.IDENTIFIER) break;
+            }
+            else if (la.getType() == Protobuf3Parser.IDENTIFIER)
+            {
+                symbol = symbolTable.resolve(id, scope);
+                if (symbol != null)
+                {
+                    scope = symbol;
+                }
+                else break;
+                if (this.tokenStream().LT(i + 1).getType() != Protobuf3Parser.DOT) break;
+            }
+            else break;
+        }
         if (symbol != null) {
             if (symbol.getClassification() == TypeClassification.Enum_) {
                 if (debug) System.out.println("IsEnumType found " + " true");
@@ -197,10 +197,10 @@ public abstract class Protobuf3ParserBase extends Parser {
         // Rewind for symbol table use.
         var parser = (Protobuf3Parser)this;
         var _ctx = parser.getContext();
-	parser.reset();
-	parser.proto();
-	parser.reset();
-	_ctx.removeLastChild();
+        parser.reset();
+        parser.proto();
+        parser.reset();
+        _ctx.removeLastChild();
         parser.setContext(_ctx);
     }
 
@@ -254,6 +254,7 @@ public abstract class Protobuf3ParserBase extends Parser {
             case Protobuf3Parser.BOOL:
             case Protobuf3Parser.STRING:
             case Protobuf3Parser.BYTES:
+            case Protobuf3Parser.BOOL_LIT:
                 return false;
             default:
                 break;
