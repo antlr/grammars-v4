@@ -169,6 +169,7 @@
 				<module>cobol85</module>
 				<module>codeql</module>
 				<module>cookie</module>
+				<module>corundum</module>
 				<module>cpp</module>
 				<module>cql</module>
 				<module>cql3</module>
@@ -327,7 +328,6 @@
 				<module>romannumerals</module>
 				<module>ron</module>
 				<module>rpn</module>
-				<module>ruby</module>
 				<module>rust</module>
                 <module>sapf</module>
 				<module>scala</module>
