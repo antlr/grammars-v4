@@ -17,20 +17,19 @@ public class SymbolTable {
     }
 
     public void enterScope(Symbol newScope) {
-        Symbol parent = scopeStack.peek();
-        parent.getMembers().put(newScope.getName(), newScope);
-        newScope.setParent(parent);
+        var current = scopeStack.peek();
+        if (newScope == current) return;
         scopeStack.push(newScope);
     }
 
     public void exitScope() {
         Symbol current = scopeStack.peek();
-        current.setParent(null);
         scopeStack.pop();
     }
 
     public Symbol currentScope() {
-        return scopeStack.peek();
+        var current_scope = scopeStack.peek();
+        return current_scope;
     }
 
     public boolean define(Symbol symbol) {
@@ -48,13 +47,24 @@ public class SymbolTable {
         return true;
     }
 
-    public Symbol resolve(String name) {
-        for (Symbol scope : scopeStack) {
-            Map<String, Symbol> members = scope.getMembers();
+    public Symbol resolve(String name, Symbol start_scope) {
+        if (start_scope == null)
+        {
+            for (Symbol scope : scopeStack) {
+                Map<String, Symbol> members = scope.getMembers();
+                if (members.containsKey(name)) {
+                    return members.get(name);
+                }
+            }
+            return null; // Symbol not found
+        }
+        else
+        {
+            Map<String, Symbol> members = start_scope.getMembers();
             if (members.containsKey(name)) {
                 return members.get(name);
             }
+            return null; // Symbol not found
         }
-        return null; // Symbol not found
     }
 }

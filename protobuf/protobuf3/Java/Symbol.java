@@ -3,7 +3,6 @@ import java.util.Map;
 
 public class Symbol {
     private String name;
-    private Symbol type;
     private TypeClassification classification;
     private final Map<String, Symbol> members = new HashMap<>();
     private Symbol parent;
@@ -12,10 +11,9 @@ public class Symbol {
     {
     }
     
-    public Symbol(String name, Symbol type, TypeClassification classification)
+    public Symbol(String name, TypeClassification classification)
     {
         this.name = name;
-        this.type = type;
         this.classification = classification;
     }
     
@@ -25,14 +23,6 @@ public class Symbol {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Symbol getType() {
-        return type;
-    }
-
-    public void setType(Symbol type) {
-        this.type = type;
     }
 
     public TypeClassification getClassification() {
@@ -61,9 +51,6 @@ public class Symbol {
         result.append(name);
         String classificationStr = classification != null ? classification.toString() : "null";
         result.append(" (with classification ").append(classificationStr);
-        if (type != null) {
-            result.append(", type ").append(type.toString());
-        }
         result.append(")");
         if (parent != null) {
             result.append(" of ").append(parent.toString());

@@ -2,6 +2,7 @@ using Antlr4.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Antlr4.Runtime.Tree.Pattern;
 
 public abstract class Protobuf3ParserBase : Parser
 {
@@ -25,7 +26,7 @@ public abstract class Protobuf3ParserBase : Parser
         var identifier = ((Protobuf3Parser.MessageDefContext)(tctx.Parent)).messageName().ident();
         var name = identifier.GetText();
         var current = symbolTable.CurrentScope();
-        var sym = new Symbol() { Name = name, Type = current, Classification = TypeClassification.Message_ };
+        var sym = new Symbol() { Name = name, Classification = TypeClassification.Message_ };
         symbolTable.Define(sym);
         if (debug) System.Console.WriteLine(prefix + "defined Message " + sym);
     }
@@ -36,8 +37,7 @@ public abstract class Protobuf3ParserBase : Parser
         var tctx = (Protobuf3Parser.DoEnumNameDefContext)ctx;
         var identifier = ((Protobuf3Parser.EnumDefContext)(tctx.Parent)).enumName().ident();
         var name = identifier.GetText();
-        var current = symbolTable.CurrentScope();
-        var sym = new Symbol() { Name = name, Type = current, Classification = TypeClassification.Enum_ };
+        var sym = new Symbol() { Name = name, Classification = TypeClassification.Enum_ };
         symbolTable.Define(sym);
         if (debug) System.Console.WriteLine(prefix + "defined Enum " + sym);
     }
@@ -48,15 +48,21 @@ public abstract class Protobuf3ParserBase : Parser
         var tctx = (Protobuf3Parser.DoServiceNameDefContext)ctx;
         var identifier = ((Protobuf3Parser.ServiceDefContext)(tctx.Parent)).serviceName().ident();
         var name = identifier.GetText();
-        var current = symbolTable.CurrentScope();
-        var sym = new Symbol() { Name = name, Type = current, Classification = TypeClassification.Service_ };
+        var sym = new Symbol() { Name = name, Classification = TypeClassification.Service_ };
         symbolTable.Define(sym);
         if (debug) System.Console.WriteLine(prefix + "defined Service " + sym);
     }
 
     public void DoEnterBlock_()
     {
-        var newScope = new Symbol() { Name = "<block>", Classification = TypeClassification.Block_ };
+        var current_scope = symbolTable.CurrentScope();
+        // Go up parse tree.
+        var ctx1 = (this.Context?.Parent?.Parent as Protobuf3Parser.MessageDefContext)?.messageName()?.GetText();
+        var ctx2 = (this.Context?.Parent?.Parent as Protobuf3Parser.EnumDefContext)?.enumName()?.GetText();
+        var ctx3 = (this.Context?.Parent as Protobuf3Parser.ServiceDefContext)?.serviceName()?.GetText();
+        var ctx = ctx1 != null ? ctx1 : (ctx2 != null ? ctx2 : ctx3);
+        if (ctx == null) throw new Exception();
+        var newScope = symbolTable.Resolve(ctx);
         if (debug) System.Console.WriteLine(prefix + "EnterBlock " + newScope);
         symbolTable.EnterScope(newScope);
     }
@@ -64,67 +70,95 @@ public abstract class Protobuf3ParserBase : Parser
     public void DoExitBlock_()
     {
         if (debug) System.Console.WriteLine(prefix + "ExitBlock " + symbolTable.CurrentScope());
+        var current = symbolTable.CurrentScope();
+        var parent = current.Parent;
         symbolTable.ExitScope();
     }
 
     public bool IsMessageType_()
     {
-//        var ctx = this.Context;
-//        System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.MessageTypeContext);
-//        var tctx = ctx as Protobuf3Parser.MessageTypeContext;
-
-        var la = tokenStream.LT(1);
-        var id = la.Text;
-
-//        var mn = tctx.messageName();
-//        var id = mn.GetText();
-//      System.Console.WriteLine("IsMessageType " + id);
-        var symbol = symbolTable.Resolve(id);
-        if (symbol != null)
+        int i = 1;
+        Symbol scope = null;
+        Symbol symbol = null;
+        bool first = true;
+        bool global = false;
+        for (; ; ++i, first = false)
         {
-            if (symbol.Classification == TypeClassification.Message_)
+            var la = this.TokenStream.LT(i);
+            var id = la.Text;
+            if (debug) System.Console.Error.Write(id);
+            if (la.Type == Protobuf3Parser.DOT)
             {
-                if (debug) System.Console.WriteLine("IsMessageType_ found " + id + " " + true);
-                return true;
+                if (first) global = true;
+                if (this.TokenStream.LT(i + 1).Type != Protobuf3Parser.IDENTIFIER) break;
             }
-            else
+            else if (la.Type == Protobuf3Parser.IDENTIFIER)
             {
-                if (debug) System.Console.WriteLine("IsMessageType_ found " + id + " " + false);
-                return false;
+                symbol = symbolTable.Resolve(id, scope);
+                if (symbol != null)
+                {
+                    scope = symbol;
+                }
+                else break;
+                if (this.TokenStream.LT(i + 1).Type != Protobuf3Parser.DOT) break;
             }
+            else break;
         }
-        if (debug) System.Console.WriteLine("IsMessageType_ not found " + id + " " + (this.default_type == TypeClassification.Message_));
-            return this.default_type == TypeClassification.Message_;
+        if (symbol != null && symbol.Classification == TypeClassification.Message_)
+        {
+            if (debug) System.Console.WriteLine("IsMessageType_ found " + true);
+            return true;
+        }
+        else if (symbol != null && symbol.Classification != TypeClassification.Message_)
+        {
+            if (debug) System.Console.WriteLine("IsMessageType_ found " + false);
+            return false;
+        }
+        if (debug) System.Console.WriteLine("IsMessageType_ not found " + (this.default_type == TypeClassification.Message_));
+        return this.default_type == TypeClassification.Message_;
     }
 
     public bool IsEnumType_()
     {
-//        var ctx = this.Context;
-//        System.Diagnostics.Debug.Assert(ctx is Protobuf3Parser.EnumTypeContext);
-//        var tctx = ctx as Protobuf3Parser.EnumTypeContext;
-
-        var la = tokenStream.LT(1);
-        var id = la.Text;
-
-//        var mn = tctx.enumName();
-//        var id = mn.GetText();
-//      System.Console.WriteLine("IsEnumType " + id);
-        var symbol = symbolTable.Resolve(id);
-        if (symbol != null)
+        int i = 1;
+        Symbol scope = null;
+        Symbol symbol = null;
+        bool first = true;
+        bool global = false;
+        for (; ; ++i, first = false)
         {
-            if (symbol.Classification == TypeClassification.Enum_)
+            var la = this.TokenStream.LT(i);
+            var id = la.Text;
+            if (debug) System.Console.Error.Write(id);
+            if (la.Type == Protobuf3Parser.DOT)
             {
-                if (debug) System.Console.WriteLine("IsEnumType found " + id + " " + true);
-                return true;
+                if (first) global = true;
+                if (this.TokenStream.LT(i + 1).Type != Protobuf3Parser.IDENTIFIER) break;
             }
-            else
+            else if (la.Type == Protobuf3Parser.IDENTIFIER)
             {
-                if (debug) System.Console.WriteLine("IsEnumType found " + id + " " + false);
-                return false;
+                symbol = symbolTable.Resolve(id, scope);
+                if (symbol != null)
+                {
+                    scope = symbol;
+                }
+                else break;
+                if (this.TokenStream.LT(i + 1).Type != Protobuf3Parser.DOT) break;
             }
+            else break;
         }
-        if (debug) System.Console.WriteLine("IsEnumType not found " + id + " " + (this.default_type == TypeClassification.Enum_));
-            return this.default_type == TypeClassification.Enum_;
+        if (symbol != null && symbol.Classification == TypeClassification.Enum_)
+        {
+            if (debug) System.Console.WriteLine("IsEnumType found " + true);
+            return true;
+        }
+        else if (symbol != null && symbol.Classification != TypeClassification.Enum_)
+        {
+            if (debug) System.Console.WriteLine("IsEnumType found " + false);
+            return false;
+        }
+        if (debug) System.Console.WriteLine("IsEnumType not found " + (this.default_type == TypeClassification.Message_));
+        return this.default_type == TypeClassification.Enum_;
     }
 
     private ITokenStream tokenStream

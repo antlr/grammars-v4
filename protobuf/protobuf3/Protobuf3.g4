@@ -301,11 +301,11 @@ rpcName
     ;
 
 messageType
-    : (DOT)? (ident DOT)* { this.IsMessageType_() }? messageName
+    : { this.IsMessageType_() }? (DOT)? (ident DOT)* messageName
     ;
 
 enumType
-    : (DOT)? (ident DOT)* { this.IsEnumType_() }? enumName
+    : { this.IsEnumType_() }? (DOT)? (ident DOT)* enumName
     ;
 
 intLit

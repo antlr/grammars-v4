@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using System.Text;
 
 public class SymbolTable {
@@ -13,26 +13,27 @@ public class SymbolTable {
     }
 
     public void EnterScope(Symbol newScope) {
-        var parent = scopeStack.Peek();
-        parent.Members[newScope.Name] = newScope;
-        newScope.Parent = parent;
+        var current = scopeStack.Peek();
+        if (newScope == current) return;
         scopeStack.Push(newScope);
     }
 
     public void ExitScope() {
         var current = scopeStack.Peek();
-        current.Parent = null;
         scopeStack.Pop();
+        if (scopeStack.Count == 0)
+            throw new Exception();
     }
 
     public Symbol CurrentScope()
     {
+        if (scopeStack.Count == 0) return null;
         var current_scope = scopeStack.Peek();
         return current_scope;
     }
     
     public bool Define(Symbol symbol) {
-        var currentScope = scopeStack.Peek();
+        var currentScope = CurrentScope();
         return this.DefineInScope(currentScope, symbol);
     }
 
@@ -45,13 +46,29 @@ public class SymbolTable {
         return true;
     }
 
-    public Symbol Resolve(string name) {
-        foreach (var scope in scopeStack) {
-            if (scope.Members.TryGetValue(name, out var symbol)) {
+    public Symbol Resolve(string name, Symbol start_scope = null)
+    {
+        if (start_scope == null)
+        {
+            foreach (Symbol scope in scopeStack)
+            {
+                if (scope.Members.TryGetValue(name, out Symbol symbol))
+                {
+                    return symbol;
+                }
+            }
+
+            return null; // Symbol not found
+        }
+        else
+        {
+            if (start_scope.Members.TryGetValue(name, out Symbol symbol))
+            {
                 return symbol;
             }
+
+            return null; // Symbol not found
         }
-        return null; // Symbol not found
     }
 
     public override string ToString()
