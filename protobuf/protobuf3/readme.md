@@ -2,19 +2,17 @@
 
 This is an Antlr4 grammar for protobuf. This grammar
 contains contains a symbol table to remove ambiguity
-within the grammar.
+within the grammar. There is no disambiguation in protobuf2.
 
-The parser works in two passes through rule `twoPassParse`, which looks admittedly
-a little weird.
+The parser works in two passes through rule `twoPassParse`.
 ```
-twoPassParse : proto { this.DoRewind(); } proto ;
+twoPassParse : { this.DoRewind(); } proto ;
 ```
-1) In the first pass, `proto()` parses the full input (it is a proper EOF-terminated
-start rule). It creates a symbol table for the input using actions sprinkled in the grammar.
-Great care is taken to make sure actions don't "hide" semantic predicates from firing.
-1) `DoRewind()` is called to rewind the input and reset the parser for a second parse.
-1) In the second pass, `proto()` is called again, this time using the full
-symbol table. The predicates in the grammmar select alts to remove ambiguity.
+1) In `DoRewind()`, a parse via `proto` is performed to build a symbol table.
+The input is rewound to the beginning.
+1) In the second pass, `proto()` is called within method `twoPassParse`.
+With this parse, the symbol table is utilized to perform correct resolution
+of the applied occurrences of identifiers.
 
 ## Specification
 

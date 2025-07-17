@@ -21,6 +21,8 @@ options {
     superClass = Protobuf3ParserBase;
 }
 
+// Insert here @header for parser.
+
 twoPassParse
     : { this.DoRewind(); } proto
     ;
