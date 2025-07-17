@@ -50,17 +50,21 @@ export abstract class Protobuf3ParserBase extends Parser {
     }
 
     DoEnterBlock_(): void {
-	var ctx = null;
-	const mdc = this.context?.parent?.parent as MessageDefContext;
-	const edc = this.context?.parent?.parent as EnumDefContext;
-	const sdc = this.context?.parent as ServiceDefContext;
-	if (mdc !== null) {
-		ctx = mdc?.messageName()?.getText();
-	} else if (edc !== null) {
-		ctx = edc?.enumName()?.getText();
-	} else if (sdc !== null) {
-		ctx = sdc?.serviceName()?.getText();
-	}
+        var ctx = null;
+        const vvv = this.context?.parent?.parent;
+        const vvvt = vvv?.constructor.name;
+        const vvvsdc = this.context?.parent;
+        const vvvsdct = vvvsdc?.constructor.name;
+        if (vvvt === "MessageDefContext") {
+            const v = vvv as MessageDefContext;
+            ctx = v.messageName().getText();
+        } else if (vvvt === "EnumDefContext") {
+            const v = vvv as EnumDefContext;
+            ctx = v.enumName().getText();
+        } else if (vvvsdct === "ServiceDefContext") {
+            const v = vvvsdc as ServiceDefContext;
+            ctx = v.serviceName().getText();
+        }
         if (!ctx) throw new Error();
         const newScope = this.symbolTable.resolve(ctx);
         if (this.debug) console.log(this.prefix + "EnterBlock " + newScope?.toString());
@@ -159,9 +163,9 @@ export abstract class Protobuf3ParserBase extends Parser {
             if (Protobuf3ParserBase.imported_files.has(fp)) return;
 
             Protobuf3ParserBase.imported_files.add(fp);
-	    var enc = 'utf8';
-	    var buffer = readFileSync(fp, { encoding: enc as BufferEncoding });
-	    var str = CharStream.fromString(buffer);
+            var enc = 'utf8';
+            var buffer = readFileSync(fp, { encoding: enc as BufferEncoding });
+            var str = CharStream.fromString(buffer);
             const lexer = new Protobuf3Lexer(str);
             const tokens = new CommonTokenStream(lexer);
             const parser = new Protobuf3Parser(tokens);
