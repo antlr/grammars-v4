@@ -356,16 +356,6 @@ diskgroup_attributes
     : SET ATTRIBUTE CHAR_STRING '=' CHAR_STRING
     ;
 
-modify_diskgroup_file
-    : MODIFY FILE CHAR_STRING ATTRIBUTE '(' disk_region_clause ')' (
-        ',' CHAR_STRING ATTRIBUTE '(' disk_region_clause ')'
-    )*
-    ;
-
-disk_region_clause
-    :
-    ;
-
 drop_diskgroup_file_clause
     : DROP FILE filename (',' filename)*
     ;
@@ -886,10 +876,6 @@ trigger_body
     | trigger_block
     ;
 
-routine_clause
-    : routine_name function_argument?
-    ;
-
 compound_trigger_block
     : COMPOUND TRIGGER seq_of_declare_specs? timing_point_section+ END trigger_name?
     ;
@@ -958,7 +944,6 @@ alter_type
     : ALTER TYPE type_name (
         compile_type_clause
         | replace_type_clause
-        //TODO | {input.LT(2).getText().equalsIgnoreCase("attribute")}? alter_attribute_definition
         | alter_method_spec
         | alter_collection_clauses
         | modifier_clause
@@ -982,17 +967,6 @@ alter_method_spec
 
 alter_method_element
     : (ADD | DROP) (map_order_function_spec | subprogram_spec)
-    ;
-
-alter_attribute_definition
-    : (ADD | MODIFY | DROP) ATTRIBUTE (
-        attribute_definition
-        | '(' attribute_definition (',' attribute_definition)* ')'
-    )
-    ;
-
-attribute_definition
-    : attribute_name type_spec?
     ;
 
 alter_collection_clauses
@@ -3093,26 +3067,6 @@ mv_log_augmentation
     ) new_values_clause?
     ;
 
-// Should bound this to just date/time expr
-datetime_expr
-    : expression
-    ;
-
-// Should bound this to just interval expr
-interval_expr
-    : expression
-    ;
-
-synchronous_or_asynchronous
-    : SYNCHRONOUS
-    | ASYNCHRONOUS
-    ;
-
-including_or_excluding
-    : INCLUDING
-    | EXCLUDING
-    ;
-
 create_materialized_view_log
     : CREATE MATERIALIZED VIEW LOG ON tableview_name (
         (
@@ -3770,12 +3724,6 @@ lob_partitioning_storage
         lob_segname ('(' TABLESPACE tablespace ')')?
         | '(' TABLESPACE tablespace ')'
     )
-    ;
-
-datatype_null_enable
-    : column_name datatype SORT? (DEFAULT expression)? (
-        ENCRYPT (USING CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
-    )? (NOT NULL_)? (ENABLE | DISABLE)?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/size_clause.html
@@ -5057,11 +5005,6 @@ add_column_clause
         )* ')'
         | ( column_definition | virtual_column_definition)
     ) column_properties?
-    //TODO       (','? out_of_line_part_storage )
-    ;
-
-alter_varray_col_properties
-    : MODIFY VARRAY varray_item '(' modify_lob_parameters ')'
     ;
 
 varray_col_properties
@@ -5268,10 +5211,6 @@ evaluation_edition_clause
     : EVALUATE USING ((CURRENT | NULL_) EDITION | EDITION edition_name)
     ;
 
-out_of_line_part_storage
-    : PARTITION partition_name
-    ;
-
 nested_table_col_properties
     : NESTED TABLE (nested_item | COLUMN_VALUE) substitutable_column_clause? (LOCAL | GLOBAL)? STORE AS tableview_name (
         '(' ('(' object_properties ')' | physical_properties | column_properties)+ ')'
@@ -5294,10 +5233,6 @@ partition_name
 
 supplemental_logging_props
     : SUPPLEMENTAL LOG (supplemental_log_grp_clause | supplemental_id_key_clause)
-    ;
-
-column_or_attribute
-    : regular_id
     ;
 
 object_type_col_properties
@@ -5332,33 +5267,8 @@ drop_constraint_clause
     ) CASCADE? ((KEY | DROP) INDEX)? ONLINE?
     ;
 
-add_constraint
-    : ADD (CONSTRAINT constraint_name)? add_constraint_clause (
-        ',' (CONSTRAINT constraint_name)? add_constraint_clause
-    )+
-    ;
-
-add_constraint_clause
-    : primary_key_clause
-    | foreign_key_clause
-    | unique_key_clause
-    | check_constraint
-    ;
-
 check_constraint
     : CHECK '(' condition ')' DISABLE?
-    ;
-
-drop_constraint
-    : DROP CONSTRAINT constraint_name
-    ;
-
-enable_constraint
-    : ENABLE CONSTRAINT constraint_name
-    ;
-
-disable_constraint
-    : DISABLE CONSTRAINT constraint_name
     ;
 
 foreign_key_clause
@@ -5371,14 +5281,6 @@ references_clause
 
 on_delete_clause
     : ON DELETE (CASCADE | SET NULL_)
-    ;
-
-unique_key_clause
-    : UNIQUE paren_column_list using_index_clause?
-    ;
-
-primary_key_clause
-    : PRIMARY KEY paren_column_list using_index_clause?
     ;
 
 // Anonymous PL/SQL code block
@@ -5560,10 +5462,6 @@ statement
     | call_statement
     | pipe_row_statement
     | grant_statement
-    ;
-
-swallow_to_semi
-    : ~';'+
     ;
 
 assignment_statement
@@ -6990,10 +6888,6 @@ rollback_segment_name
     : identifier
     ;
 
-table_var_name
-    : identifier
-    ;
-
 schema_name
     : identifier
     ;
@@ -7092,10 +6986,6 @@ cursor_name
 record_name
     : identifier
     | bind_variable
-    ;
-
-collection_name
-    : identifier ('.' id_expression)?
     ;
 
 link_name
@@ -9735,20 +9625,4 @@ non_reserved_keywords_pre12c
     | YEAR
     | YES
     | ZONE
-    ;
-
-string_function_name
-    : CHR
-    | DECODE
-    | SUBSTR
-    | TO_CHAR
-    | TRIM
-    ;
-
-numeric_function_name
-    : AVG
-    | COUNT
-    | NVL
-    | ROUND
-    | SUM
     ;
