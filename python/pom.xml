@@ -16,6 +16,6 @@
         <module>python2</module>
         <module>python3</module>
         <module>python2_7_18</module>
-        <module>python3_12</module>
+        <module>python3_13</module>
     </modules>
 </project>
