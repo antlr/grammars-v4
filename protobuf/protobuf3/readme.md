@@ -19,3 +19,7 @@ of the applied occurrences of identifiers.
 https://protobuf.dev/reference/protobuf/proto3-spec/
 
 https://protobuf.dev/programming-guides/proto3/
+
+## Notes
+Apparently, the Dart port for this grammar cannot be done. This is because the parser
+calls for file reading synchronously, whcih cannot be done.
