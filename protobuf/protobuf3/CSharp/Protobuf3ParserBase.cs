@@ -195,7 +195,6 @@ public abstract class Protobuf3ParserBase : Parser
             var current_file = this.tokenStream.TokenSource.SourceName;
             if (debug) System.Console.Error.WriteLine("current file = " + current_file);
             if (debug) System.Console.Error.WriteLine("imported file = " + import_file_name);
-            var save = Environment.CurrentDirectory.Replace("\\", "/");
             var current = Path.GetDirectoryName(current_file);
             var fp_dir = Path.GetFullPath(current);
             //Environment.CurrentDirectory = fp_dir;
@@ -208,7 +207,6 @@ public abstract class Protobuf3ParserBase : Parser
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             var parser = new Protobuf3Parser(tokens);
             parser.twoPassParse();
-            Environment.CurrentDirectory = save;
         }
         catch
         {
