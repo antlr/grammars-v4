@@ -17,6 +17,16 @@
 
 grammar Protobuf3;
 
+options {
+    superClass = Protobuf3ParserBase;
+}
+
+// Insert here @header for parser.
+
+twoPassParse
+    : { this.DoRewind(); } proto
+    ;
+
 proto
     : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
     ;
@@ -30,7 +40,7 @@ syntax
 // Import Statement
 
 importStatement
-    : IMPORT (WEAK | PUBLIC)? strLit SEMI
+    : IMPORT (WEAK | PUBLIC)? strLit SEMI { this.DoImportStatement_(); }
     ;
 
 // Package
@@ -121,8 +131,8 @@ type_
     | BOOL
     | STRING
     | BYTES
-    | messageType
-    | enumType
+    | { this.IsNotKeyword() }? messageType
+    | { this.IsNotKeyword() }? enumType
     ;
 
 // Reserved
@@ -155,11 +165,11 @@ topLevelDef
 // enum
 
 enumDef
-    : ENUM enumName enumBody
+    : ENUM enumName doEnumNameDef enumBody
     ;
 
 enumBody
-    : LC enumElement* RC
+    : LC doEnterBlock enumElement* RC doExitBlock
     ;
 
 enumElement
@@ -183,12 +193,13 @@ enumValueOption
 // message
 
 messageDef
-    : MESSAGE messageName messageBody
+    : MESSAGE messageName doMessageNameDef messageBody
     ;
 
 messageBody
-    : LC messageElement* RC
+    : LC doEnterBlock messageElement* RC doExitBlock
     ;
+
 
 messageElement
     : field
@@ -216,7 +227,7 @@ extendDef
 // service
 
 serviceDef
-    : SERVICE serviceName LC serviceElement* RC
+    : SERVICE serviceName doServiceNameDef LC doEnterBlock serviceElement* RC doExitBlock
     ;
 
 serviceElement
@@ -235,9 +246,9 @@ rpc
 // lexical
 
 constant
-    : fullIdent
+    : { this.IsNotKeyword() }? fullIdent
     | (MINUS | PLUS)? intLit
-    | ( MINUS | PLUS)? floatLit
+    | (MINUS | PLUS)? floatLit
     | strLit
     | boolLit
     | blockLit
@@ -292,11 +303,11 @@ rpcName
     ;
 
 messageType
-    : (DOT)? (ident DOT)* messageName
+    : { this.IsMessageType_() }? (DOT)? (ident DOT)* messageName
     ;
 
 enumType
-    : (DOT)? (ident DOT)* enumName
+    : { this.IsEnumType_() }? (DOT)? (ident DOT)* enumName
     ;
 
 intLit
@@ -318,6 +329,7 @@ floatLit
     ;
 
 // keywords
+
 SYNTAX
     : 'syntax'
     ;
@@ -660,3 +672,13 @@ keywords
     | RETURNS
     | BOOL_LIT
     ;
+
+doEnterBlock : { this.DoEnterBlock_(); } ;
+
+doEnumNameDef : { this.DoEnumNameDef_(); } ;
+
+doExitBlock : { this.DoExitBlock_(); } ;
+
+doMessageNameDef : { this.DoMessageNameDef_(); } ;
+
+doServiceNameDef : { this.DoServiceNameDef_(); } ;

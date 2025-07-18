@@ -1,0 +1,11 @@
+package my.pkg;
+
+message Outer {
+  message Inner {
+    required string value = 1;
+  }
+}
+
+message Another {
+  required my.pkg.Outer.Inner ref = 1;
+}
