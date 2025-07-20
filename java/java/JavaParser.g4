@@ -36,6 +36,7 @@ parser grammar JavaParser;
 
 options {
     tokenVocab = JavaLexer;
+    superClass = JavaParserBase;
 }
 
 compilationUnit
@@ -438,11 +439,11 @@ recordHeader
     ;
 
 recordComponentList
-    : recordComponent (',' recordComponent)*
+    : recordComponent (',' recordComponent)* { this.DoLastRecordComponent() }?
     ;
 
 recordComponent
-    : annotation* typeType (annotation* '...')? identifier
+    : annotation* typeType (annotation* ELLIPSIS)? identifier
     ;
 
 recordBody
