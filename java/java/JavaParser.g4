@@ -442,7 +442,7 @@ recordComponentList
     ;
 
 recordComponent
-    : typeType identifier
+    : annotation* typeType (annotation* '...')? identifier
     ;
 
 recordBody
