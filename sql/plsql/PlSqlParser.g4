@@ -4760,7 +4760,7 @@ split_table_partition
             range_partition_desc (',' range_partition_desc)*
             | list_partition_desc (',' list_partition_desc)*
         ) ')'
-    ) (update_global_index_clause | update_index_clauses)?
+    ) (update_global_index_clause | update_index_clauses | ONLINE)?
     ;
 
 truncate_table_partition
