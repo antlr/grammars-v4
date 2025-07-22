@@ -332,11 +332,7 @@ assignmentValue
 // DELETE statement
 
 deleteStmt
-    : DELETE FROM nestedIdentifier onClusterClause? inPartitionClause? WHERE columnExpr
-    ;
-
-onClusterClause
-    : ON CLUSTER identifier
+    : DELETE FROM nestedIdentifier clusterClause? inPartitionClause? whereClause
     ;
 
 inPartitionClause
@@ -346,7 +342,7 @@ inPartitionClause
 // UPDATE statement
 
 updateStmt
-    : UPDATE nestedIdentifier SET assignmentExprList onClusterClause? inPartitionClause? WHERE columnExpr
+    : UPDATE nestedIdentifier SET assignmentExprList clusterClause? inPartitionClause? whereClause
     ;
 
 // KILL statement
