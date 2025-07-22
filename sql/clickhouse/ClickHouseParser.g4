@@ -13,6 +13,8 @@ options {
 queryStmt
     : query (INTO OUTFILE STRING_LITERAL)? (FORMAT identifierOrNull)? (SEMICOLON)?
     | insertStmt
+    | deleteStmt
+    | updateStmt
     ;
 
 query
@@ -325,6 +327,26 @@ assignmentValues
 
 assignmentValue
     : literal
+    ;
+
+// DELETE statement
+
+deleteStmt
+    : DELETE FROM nestedIdentifier onClusterClause? inPartitionClause? WHERE columnExpr
+    ;
+
+onClusterClause
+    : ON CLUSTER identifier
+    ;
+
+inPartitionClause
+    : IN PARTITION columnExpr
+    ;
+
+// UPDATE statement
+
+updateStmt
+    : UPDATE nestedIdentifier SET assignmentExprList onClusterClause? inPartitionClause? WHERE columnExpr
     ;
 
 // KILL statement
