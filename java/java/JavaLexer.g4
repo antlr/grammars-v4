@@ -213,7 +213,7 @@ IDENTIFIER: Letter LetterOrDigit*;
 fragment ExponentPart: [eE] [+-]? Digits;
 
 fragment EscapeSequence:
-    '\\' 'u005c'? [btnfr"'\\]
+    '\\' 'u005c'? [bstnfr"'\\]
     | '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
 ;
