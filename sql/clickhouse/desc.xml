@@ -4,6 +4,6 @@
     <antlr-version>^4.10</antlr-version>
     <entry-point>queryStmt</entry-point>
 
+    <targets>CSharp;Java</targets>
     <!-- Works only with Java because of symbol conflicts. -->
-    <targets>Java</targets>
 </desc>
