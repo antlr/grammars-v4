@@ -4,6 +4,9 @@
     <antlr-version>^4.10</antlr-version>
     <entry-point>queryStmt</entry-point>
 
-    <targets>CSharp;Java</targets>
-    <!-- Works only with Java because of symbol conflicts. -->
+    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+
+    <!-- Does not work due to symbol conflict.
+    <targets>PHP</targets>
+    -->
 </desc>
