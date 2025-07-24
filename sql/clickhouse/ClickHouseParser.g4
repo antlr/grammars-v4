@@ -342,7 +342,12 @@ optimizeStmt
 // RENAME statement
 
 renameStmt
-    : RENAME TABLE tableIdentifier TO tableIdentifier (COMMA tableIdentifier TO tableIdentifier)* clusterClause?
+    : RENAME renameEntityClause clusterClause?;
+
+renameEntityClause
+    : TABLE? tableIdentifier TO tableIdentifier (COMMA tableIdentifier TO tableIdentifier)*
+    | DATABASE databaseIdentifier TO databaseIdentifier (COMMA databaseIdentifier TO databaseIdentifier)*
+    | DICTIONARY dictionaryIdentifier TO dictionaryIdentifier (COMMA dictionaryIdentifier TO dictionaryIdentifier)*
     ;
 
 // PROJECTION SELECT statement
@@ -688,6 +693,10 @@ tableArgExpr
 databaseIdentifier
     : identifier
     ;
+
+// Dictionaries
+
+dictionaryIdentifier: (databaseIdentifier DOT)? identifier;
 
 // Basics
 
