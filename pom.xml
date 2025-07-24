@@ -180,7 +180,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
-                <module>d2</module>
+				<module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
@@ -207,6 +207,7 @@
 				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
+				<module>gherkin</module>
 				<module>glsl</module>
 				<module>gml</module>
 				<module>golang</module>
