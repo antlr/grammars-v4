@@ -41,7 +41,11 @@ options {
 
 compilationUnit
     : packageDeclaration? (importDeclaration | ';')* (typeDeclaration | ';')* EOF
-    | moduleDeclaration EOF
+    | modularCompulationUnit EOF
+    ;
+
+modularCompulationUnit
+    : importDeclaration* moduleDeclaration
     ;
 
 packageDeclaration
@@ -408,19 +412,15 @@ defaultValue
 // MODULES - Java9
 
 moduleDeclaration
-    : OPEN? MODULE qualifiedName moduleBody
-    ;
-
-moduleBody
-    : '{' moduleDirective* '}'
+    : annotation* OPEN? MODULE qualifiedName '{' moduleDirective* '}'
     ;
 
 moduleDirective
     : REQUIRES requiresModifier* qualifiedName ';'
-    | EXPORTS qualifiedName (TO qualifiedName)? ';'
-    | OPENS qualifiedName (TO qualifiedName)? ';'
+    | EXPORTS qualifiedName (TO qualifiedName (',' qualifiedName)* )? ';'
+    | OPENS qualifiedName (TO qualifiedName (',' qualifiedName)* )? ';'
     | USES qualifiedName ';'
-    | PROVIDES qualifiedName WITH qualifiedName ';'
+    | PROVIDES qualifiedName WITH qualifiedName (',' qualifiedName)* ';'
     ;
 
 requiresModifier
