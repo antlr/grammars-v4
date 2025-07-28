@@ -110,6 +110,7 @@ mckeeman-form/examples/*.txt eol=lf
 objc/examples/* eol=lf
 properties/examples/* eol=lf
 r/examples/*.txt eol=lf
+srt/examples/*.srt eol=lf
 # vb6/examples/**/*.vb eol=lf
 vba/examples/*.bas eol=lf
 z/examples/*.utf8 eol=lf
