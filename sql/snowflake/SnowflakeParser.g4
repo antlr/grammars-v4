@@ -4053,6 +4053,7 @@ expr
     | function_call
     | subquery
     | expr IS null_not_null
+    | expr IS NOT? DISTINCT FROM expr
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr

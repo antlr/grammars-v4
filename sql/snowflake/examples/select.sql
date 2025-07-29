@@ -140,3 +140,11 @@ select * from t2;
 select * from t1
 union by name
 select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;
