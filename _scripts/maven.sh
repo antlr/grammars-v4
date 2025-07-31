@@ -51,6 +51,6 @@ done
 for grammar in ${grammars[@]}
 do
     pushd $grammar
-    mvn clean test --file pom.xml
+    mvn -B package --file pom.xml
     popd
 done
