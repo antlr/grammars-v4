@@ -273,4 +273,4 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/maven.sh $Before $After >> $GITHUB_OUTPUT
+        bash _scripts/maven.sh $Before $After

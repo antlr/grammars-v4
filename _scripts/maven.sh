@@ -1,7 +1,6 @@
 #!/bin/sh
 
-echo YO. I AM HERE.
-exit 1
+echo "YO. I AM HERE."
 
 grammars=()
 # Test grammars for the enclosing directories.
@@ -31,9 +30,13 @@ do
     echo Adding diff $g
     grammars+=( $g )
 done
+echo "YO. Here 2."
+
 for grammar in ${grammars[@]}
 do
     pushd $grammar
     mvn -B package --file pom.xml
     popd
 done
+
+echo "YO. Done."
