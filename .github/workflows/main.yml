@@ -264,6 +264,7 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
     - name: Build with Maven
+      shell: bash
       run: |
         if [ "${{github.event_name}}" == "pull_request" ]; then
             Before="${{github.event.pull_request.base.sha}}"
