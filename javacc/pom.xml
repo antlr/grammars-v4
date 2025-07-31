@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>javacc</artifactId>
 	<packaging>jar</packaging>
-	<name>Javacc grammar</name>
+	<name>JavaCC grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
