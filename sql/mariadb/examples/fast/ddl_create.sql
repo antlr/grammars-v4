@@ -180,6 +180,9 @@ CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = IN
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
+-- Create Table with vector column
+CREATE TABLE VECTOR_TABLE (id INT AUTO_INCREMENT PRIMARY KEY, embedding1 VECTOR(3) DEFAULT NULL, embedding VECTOR(3));
+
 #end
 #begin
 -- Rename table
