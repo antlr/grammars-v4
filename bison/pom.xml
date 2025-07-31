@@ -5,7 +5,7 @@
 	<name>Bison grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
-		<artifactId>antlrparent</artifactId>
+		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
@@ -57,7 +57,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>input</entryPoint>
+					<entryPoint>input_</entryPoint>
 					<grammarName>Bison</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

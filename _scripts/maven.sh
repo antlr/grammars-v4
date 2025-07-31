@@ -1,28 +1,34 @@
 #!/bin/sh
-
-echo "YO. I AM HERE."
+#set -x
+#set -e
+#echo "YO. I AM HERE."
 
 grammars=()
+
 # Test grammars for the enclosing directories.
-echo "Files."
-git diff --name-only $1 $2 -- .
-echo "f1."
-git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#'
-echo "f2."
-git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u
-echo "f3."
-git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts
-echo "ENd Files."
+#echo "Files."
+#git diff --name-only $1 $2 -- .
+#echo "f1."
+#git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#'
+#echo "f2."
+#git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u
+#echo "f3."
+#git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts
+#echo "ENd Files."
 
-directories=`git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
+directories=`git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | grep -v .github`
 echo "Yo. Directories is $directories"
-
+prefix=`pwd`
 for g in $directories
 do
-    pushd $g > /dev/null
+    pushd $g
+    pwd
     while true
     do
-	if [ -f `pwd`/desc.xml ]
+	if [ `pwd` == '/' ]
+	then
+	    break
+	elif [ -f pom.xml ]
 	then
 	    break
 	elif [ `pwd` == "$prefix" ]
@@ -39,16 +45,12 @@ do
 	g="."
     fi
     popd > /dev/null
-    echo Adding diff $g
     grammars+=( $g )
 done
-echo "YO. Here 2."
 
 for grammar in ${grammars[@]}
 do
     pushd $grammar
-    mvn -B package --file pom.xml
+    mvn clean test --file pom.xml
     popd
 done
-
-echo "YO. Done."

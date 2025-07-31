@@ -6,7 +6,7 @@
 	<name>ocl</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
-		<artifactId>javaparent</artifactId>
+		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
@@ -18,7 +18,7 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>OCL.g4</include>
+						<include>UMLRSDS.g4</include>
 					</includes>
 				</configuration>
 				<executions>
@@ -37,9 +37,10 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>specification</entryPoint>
-					<grammarName>OCL</grammarName>
+					<grammarName>UMLRSDS</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples/specification/</exampleFiles>
+					<testFileExtension>.km3</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>
