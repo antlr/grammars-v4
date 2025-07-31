@@ -4,7 +4,9 @@ echo "YO. I AM HERE."
 
 grammars=()
 # Test grammars for the enclosing directories.
-directories=`git diff --name-only $1 $2 . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
+directories=`git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
+echo "Yo. Directories is $directories"
+
 for g in $directories
 do
     pushd $g > /dev/null
