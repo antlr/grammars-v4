@@ -250,14 +250,15 @@ jobs:
         bash _scripts/test-static-checks.sh -t ${{matrix.test}} -f diff $Before $After
 
   maven:
-    needs: setup
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
@@ -267,10 +268,10 @@ jobs:
       shell: bash
       run: |
         if [ "${{github.event_name}}" == "pull_request" ]; then
-            Before="${{github.event.pull_request.base.sha}}"
-            After="${{github.event.pull_request.head.sha}}"
+           Before="${{github.event.pull_request.base.sha}}"
+           After="${{github.event.pull_request.head.sha}}"
         else
-            Before="${{github.event.before}}"
-            After="${{github.event.after}}"
+           Before="${{github.event.before}}"
+           After="${{github.event.after}}"
         fi
         bash _scripts/maven.sh $Before $After
