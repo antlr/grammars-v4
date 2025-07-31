@@ -1,4 +1,8 @@
 #!/bin/sh
+
+echo YO. I AM HERE.
+exit 1
+
 grammars=()
 # Test grammars for the enclosing directories.
 directories=`git diff --name-only $1 $2 . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
