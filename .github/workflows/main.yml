@@ -266,6 +266,6 @@ jobs:
     - name: Build with Maven
       shell: bash
       run: |
-            Before="${{github.event.before}}"
-            After="${{github.event.after}}"
+        Before="${{github.event.before}}"
+        After="${{github.event.after}}"
         bash _scripts/maven.sh $Before $After
