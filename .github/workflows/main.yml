@@ -256,7 +256,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        language: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK
@@ -273,4 +272,4 @@ jobs:
             Before="${{github.event.before}}"
             After="${{github.event.after}}"
         fi
-        bash _scripts/maven.sh $Before $After
+        bash _scripts/maven.sh $Before $After >> $GITHUB_OUTPUT
