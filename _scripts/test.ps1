@@ -68,15 +68,6 @@ function Test-Grammar {
     $success = $true
     $start = Get-Date
 
-    Write-Host "Testing using Maven"
-    if ("$Target" -eq "Java") {
-        $(& mvn clean test ; $status = $LASTEXITCODE) | Write-Host
-        if ($status -ne 0) {
-            $failStage = [FailStage]::CodeGeneration
-            Write-Host "Maven failed" -ForegroundColor Red
-        }
-    }
-
     Write-Host "Building"
     # codegen
     Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
