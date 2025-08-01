@@ -1,0 +1,30 @@
+^ Application
+name         = "MyApp"
+version      = "2.4.1"
+
+# A list of enabled features
+features     = ["login", "search", "notifications"]
+
+# Database connection settings as an inline object.
+database     = {
+    host         : "db.example.com",
+    port         : 5432,
+    username     : "dbuser",
+    password     : "s3cr3t",
+    # Nested “options” object inside "database".
+    options      : {
+        ssl            : true,
+        max_retries    : 5,
+        timeout_secs   : 30,
+    },
+}
+
+# Supported locales as a simple list.
+supportedLocales = [
+    "en",
+    "fr",
+    "de",
+    "es",
+    "sv",
+    "fi",
+]

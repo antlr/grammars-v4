@@ -1,0 +1,18 @@
+^ `Triple-Quoted String Examples`
+
+test1 = """This is a multiline
+string that spans
+three lines."""
+
+test2 = """He said, "hello" and left."""
+
+test3 = """You can use "" double quotes inside."""
+
+test4 = C"""\t He said,
+\t "hello" and left.
+"""
+
+test5 = C"""\t He said,\n
+\t "hello" and\n
+\t left.\n
+"""

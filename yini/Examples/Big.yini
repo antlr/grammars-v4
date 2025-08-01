@@ -1,0 +1,61 @@
+@yini
+
+^ sites
+
+^^ entry0
+
+	^^^ general
+	protocol = "ftp"
+	host = "mysite.com"
+	port = 21
+
+	^^^ advanced
+	serverType = "default"
+	bypassProxy = false
+	localDir = "C:\Users\John Smith\mysite\"
+	remoteDir = "/public_html"
+
+	^^^ transfer
+	maxNumConnections = 1
+
+^^ entry1
+
+	^^^ general
+	protocol = "ftp"
+	host = "mysecondsite.com"
+	port = 21
+
+		^^^^ login
+		type = "normal"
+		username = "usern"
+		password = "0000"
+
+	^^^ advanced
+	serverType = "default"
+	bypassProxy = false
+	localDir = "C:\Users\John Smith\mysecondsite\"
+	remoteDir = "/public_html"
+
+	^^^ transfer
+	maxNumConnections = 1
+
+^^ entry2
+
+	^^^ general
+	protocol = "ftp"
+	host = "mywork.com"
+	port = 21
+
+		^^^^ login
+		type = "ask"
+		username = ""
+		password = ""
+
+	^^^ advanced
+	serverType = "default"
+	bypassProxy = true
+	localDir = ""
+	remoteDir = ""
+
+	^^^ transfer
+	maxNumConnections = 3
