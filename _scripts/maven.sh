@@ -54,3 +54,8 @@ do
     mvn -B package --file pom.xml
     popd
 done
+
+# Perform basic global integrity check.
+root=`git rev-parse --show-toplevel`
+pushd $root
+mvn clean
