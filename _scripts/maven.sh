@@ -3,7 +3,11 @@
 #set -e
 
 grammars=()
-directories=`git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | grep -v .github | grep -v '^[.]$' | grep -v target | grep -v Generated`
+if [ $# -eq 0 ]; then
+    directories=`find . -name pom.xml | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | grep -v .github | grep -v '^[.]$' | grep -v target | grep -v Generated`
+else
+    directories=`git diff --name-only $1 $2 -- . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | grep -v .github | grep -v '^[.]$' | grep -v target | grep -v Generated`
+fi
 prefix=`pwd`
 for g in $directories
 do
