@@ -1,0 +1,100 @@
+Example 1: 
+
+@startuml
+Class11 <|.. Class12
+Class13 --> Class14
+Class15 ..> Class16
+Class17 ..|> Class18
+Class19 <--* Class20
+@enduml
+
+(classDiagram @startuml (cdelement (inheritance (identifier Class11) (leftAncestorSymbol <|..) (identifier Class12))) (cdelement (association (identifier Class13) (associationSymbol -->) (identifier Class14))) (cdelement (dependency (identifier Class15) (dependencySymbol ..>) (identifier Class16))) (cdelement (inheritance (identifier Class17) (rightAncestorSymbol ..|>) (identifier Class18))) (cdelement (composition (identifier Class19) (compositionSymbol <--*) (identifier Class20))) @enduml <EOF>)
+
+
+
+Example 2: 
+
+@startuml
+Class01 "1" *-- "many" Class02 : contains
+Class03 o-- Class04 : aggregation
+Class05 --> "1" Class06
+@enduml
+
+(classDiagram @startuml (cdelement (composition (identifier Class01) (stringExpression "1") (compositionSymbol *--) (stringExpression "many") (identifier Class02) (lineAnnotation : (identifier contains)))) (cdelement (aggregation (identifier Class03) (aggregationSymbol o--) (identifier Class04) (lineAnnotation : (identifier aggregation)))) (cdelement (association (identifier Class05) (associationSymbol -->) (stringExpression "1") (identifier Class06))) @enduml <EOF>)
+
+
+Example 3: 
+@startuml
+Object <|-- ArrayList
+Object : equals()
+ArrayList : Object[] elementData
+ArrayList : size()
+@enduml
+
+(classDiagram @startuml (cdelement (inheritance (identifier Object) (leftAncestorSymbol <|--) (identifier ArrayList))) (cdelement (method (identifier Object) : (identifier equals) ( ))) (cdelement (attribute (identifier ArrayList) : (type (type (identifier Object)) [ ]) (identifier elementData))) (cdelement (method (identifier ArrayList) : (identifier size) ( ))) @enduml <EOF>)
+
+
+Example 4: 
+
+@startuml
+class Dummy {
+String data
+void methods()
+}
+class Flight {
+flightNumber : Integer
+departureTime : Date
+}
+@enduml
+
+
+(classDiagram @startuml (cdelement class (identifier Dummy) (classDefinition { (classElement (internalAttribute (type (identifier String)) (identifier data))) (classElement (internalMethod (type (identifier void)) (identifier methods) ( ))) })) (cdelement class (identifier Flight) (classDefinition { (classElement (internalAttribute (identifier flightNumber) : (type (identifier Integer)))) (classElement (internalAttribute (identifier departureTime) : (type (identifier Date)))) })) @enduml <EOF>)
+
+
+Example 5: 
+
+@startuml
+class Dummy {
+-field1
+#field2
+~method1()
++method2()
+}
+@enduml
+
+
+(classDiagram @startuml (cdelement class (identifier Dummy) (classDefinition { (classElement (internalAttribute (visibility -) (identifier field1))) (classElement (internalAttribute (visibility #) (identifier field2))) (classElement (internalMethod (visibility ~) (identifier method1) ( ))) (classElement (internalMethod (visibility +) (identifier method2) ( ))) })) @enduml <EOF>)
+
+
+Example 6: 
+
+@startuml
+class Dummy {
+{static} String id
+{abstract} void methods()
+}
+@enduml
+
+(classDiagram @startuml (cdelement class (identifier Dummy) (classDefinition { (classElement (internalAttribute { (modifier static) } (type (identifier String)) (identifier id))) (classElement (internalMethod { (modifier abstract) } (type (identifier void)) (identifier methods) ( ))) })) @enduml <EOF>)
+
+
+Example 7: 
+
+@startuml
+abstract class Person {
+name : String
+age : Real
+isAdult()  : Boolean
+}
+
+Person <|-- Employee
+
+class Employee {
+salary : Real
+}
+
+@enduml
+
+(classDiagram @startuml (cdelement abstract class (identifier Person) (classDefinition { (classElement (internalAttribute (identifier name) : (type (identifier String)))) (classElement (internalAttribute (identifier age) : (type (identifier Real)))) (classElement (internalMethod (identifier isAdult) ( ) : (type (identifier Boolean)))) })) (cdelement (inheritance (identifier Person) (leftAncestorSymbol <|--) (identifier Employee))) (cdelement class (identifier Employee) (classDefinition { (classElement (internalAttribute (identifier salary) : (type (identifier Real)))) })) @enduml <EOF>)
+
+              
