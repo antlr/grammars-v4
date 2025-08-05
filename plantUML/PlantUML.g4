@@ -61,7 +61,7 @@ method
 
 internalMethod 
     : ('{' modifier '}')? type? visibility? identifier '(' parameters? ')'
-    | ('{' modifier '}')? visibility? identifier '(' parameters? ')' (':' type)? 
+    | ('{' modifier '}')? visibility? identifier '(' parameters? ')' ':' type 
     ; 
 
 parameters
@@ -85,17 +85,13 @@ modifier
       | 'abstract'
       ; 
 
-idList
-     : (identifier ',')* identifier
-     ; 
-
 type
     : 'Sequence' '(' type ')'  
     | 'Set' '(' type ')'  
     | 'Bag' '(' type ')' 
     | 'OrderedSet' '(' type ')' 
     | 'SortedSet' '(' type ')' 
-    | type '[' integerLiteral? ']'  
+    | identifier '[' integerLiteral? ']'  
     | 'Map' '(' type ',' type ')' 
     | 'SortedMap' '(' type ',' type ')' 
     | 'Function' '(' type ',' type ')' 
@@ -131,7 +127,9 @@ associationSymbol
     | '--'
     | '---' 
     | '-->' 
+    | '->' 
     | '<--'
+    | '<-'
     ; 
 
 aggregation
@@ -153,8 +151,11 @@ compositionSymbol
     : '*--' 
     | '*-' 
     | '--*'
+    | '-*'
     | '*-->'
+    | '*->'
     | '<--*'
+    | '<-*'
     ; 
 
 dependency
@@ -165,6 +166,9 @@ dependencySymbol
     : '..'
     | '..>'
     | '<..'
+    | '...'
+    | '...>'
+    | '<...'
     ; 
 
 lineAnnotation
