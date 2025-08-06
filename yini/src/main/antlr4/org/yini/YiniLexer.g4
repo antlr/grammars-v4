@@ -10,7 +10,7 @@
 /* 
  This grammar aims to follow, as closely as possible,
  the YINI format specification version:
- 1.0.0-rc.2 - 2025 Aug.
+ 1.0.0-rc.3 - 2025 Aug.
  
  Feedback, bug reports and improvements are welcomed here
  https://github.com/YINI-lang/YINI-spec
@@ -102,7 +102,7 @@ SHEBANG: '#!' ~[\n\r\b\f\t]* NL;
 
 // NOTE: NUMBER must come before KEY, IDENT, etc.
 NUMBER:
-	INTEGER ('.' INTEGER?)? EXPONENT?
+	SIGN? INTEGER ('.' DIGIT+)? EXPONENT?
 	| SIGN? '.' DIGIT+ EXPONENT?
 	| SIGN? (
 		BIN_INTEGER
