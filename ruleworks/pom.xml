@@ -17,6 +17,9 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
+					<includes>
+					   <include>ruleworks.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -36,7 +39,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>program</entryPoint>
-					<grammarName>vaxscan</grammarName>
+					<grammarName>ruleworks</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
