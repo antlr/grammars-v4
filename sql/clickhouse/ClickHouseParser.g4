@@ -13,6 +13,8 @@ options {
 queryStmt
     : query (INTO OUTFILE STRING_LITERAL)? (FORMAT identifierOrNull)? (SEMICOLON)?
     | insertStmt
+    | deleteStmt
+    | updateStmt
     ;
 
 query
@@ -327,6 +329,22 @@ assignmentValue
     : literal
     ;
 
+// DELETE statement
+
+deleteStmt
+    : DELETE FROM nestedIdentifier clusterClause? inPartitionClause? whereClause
+    ;
+
+inPartitionClause
+    : IN PARTITION columnExpr
+    ;
+
+// UPDATE statement
+
+updateStmt
+    : UPDATE nestedIdentifier SET assignmentExprList clusterClause? inPartitionClause? whereClause
+    ;
+
 // KILL statement
 
 killStmt
@@ -342,7 +360,12 @@ optimizeStmt
 // RENAME statement
 
 renameStmt
-    : RENAME TABLE tableIdentifier TO tableIdentifier (COMMA tableIdentifier TO tableIdentifier)* clusterClause?
+    : RENAME renameEntityClause clusterClause?;
+
+renameEntityClause
+    : TABLE? tableIdentifier TO tableIdentifier (COMMA tableIdentifier TO tableIdentifier)*
+    | DATABASE databaseIdentifier TO databaseIdentifier (COMMA databaseIdentifier TO databaseIdentifier)*
+    | DICTIONARY dictionaryIdentifier TO dictionaryIdentifier (COMMA dictionaryIdentifier TO dictionaryIdentifier)*
     ;
 
 // PROJECTION SELECT statement
@@ -688,6 +711,10 @@ tableArgExpr
 databaseIdentifier
     : identifier
     ;
+
+// Dictionaries
+
+dictionaryIdentifier: (databaseIdentifier DOT)? identifier;
 
 // Basics
 
