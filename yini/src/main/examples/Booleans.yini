@@ -1,0 +1,14 @@
+/*
+    Boolean values can be any of these 3 forms/styles.
+*/
+
+^ title
+
+bool1 = FALSE
+bool2 = TRUE
+
+question1 = NO
+question2 = YES
+
+switch1 = OFF
+switch2 = ON

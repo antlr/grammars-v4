@@ -1,0 +1,31 @@
+^ Lists
+
+	^^ ListWithBrackets
+
+	// A list with four strings.
+	list1 = [ "Orange", "Banana", "Pear", "Peach" ]
+	list2 = []  // Empty list.
+
+	// Note: var1 and var2 are not lists, both values will be null.
+	var1 = null
+	var2 = 
+
+	listOfLists = [
+		["stylesheet", "https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"],
+		["stylesheet", "css/general.css"],
+		["stylesheet", "css/themes.css"]
+	]
+
+
+	^^ ListWithoutBrackets
+
+	// Alternative notation for a list without brackets,
+	// note the colon : instead of the equals character =.
+	list1: "Orange", "Banana", "Pear", "Peach"
+	list2: null
+	list3:
+
+	listOfLists:
+		["stylesheet", "https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"],
+		["stylesheet", "css/general.css"],
+		["stylesheet", "css/themes.css"]

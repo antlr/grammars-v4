@@ -1,0 +1,23 @@
+/*
+  Nesting level respected, no missing intermediary levels.
+
+  - database is treated as a single "object value."
+  - Inside it, host, port, username, password, and options are all keys with their own values.
+*/
+
+^ Application
+
+name     = "MyApp"
+version  = "1.2.3"
+database = {
+    host     : "db.example.com",
+    port     : 5432,
+    username : "dbuser",
+    password : "s3cr3t",
+    options  : {
+        ssl        : true,
+        maxRetries : 5,
+    },
+}
+
+features = ["login", "search", "notifications"]

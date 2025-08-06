@@ -1,0 +1,7 @@
+/*
+    Example of a simple YINI document.
+*/
+
+^ conf
+
+name = "My Program Name"

@@ -1,0 +1,18 @@
+/*
+  Application Settings with Sections
+*/
+
+^ Database
+host = "localhost"
+port = 5432
+username = "appuser"
+password = "s3cret"
+
+^ Logging
+level = "debug"
+file = "/var/log/myapp.log"
+rotate = true
+
+^ Features
+enable_experimental = false
+api_version = "v2.1"
