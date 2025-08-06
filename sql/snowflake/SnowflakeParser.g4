@@ -4052,7 +4052,7 @@ expr
     | trim_expression
     | function_call
     | subquery
-    | expr IS null_not_null
+    | expr IS (null_not_null | not_distinct_from expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
@@ -4590,6 +4590,10 @@ comparison_operator
 
 null_not_null
     : NOT? NULL_
+    ;
+
+not_distinct_from
+    : NOT? DISTINCT FROM
     ;
 
 subquery
