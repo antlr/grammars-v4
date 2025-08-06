@@ -14,10 +14,8 @@ fi
 popd
 
 zips=(
-https://github.com/openjdk/jdk/archive/refs/tags/jdk8-b120.zip
+https://github.com/openjdk/jdk/archive/refs/tags/jdk-21-ga.zip
 )
-#Current version of grammar cannot parse jdk 17.
-#https://github.com/openjdk/jdk/archive/refs/tags/jdk-17-ga.zip
 
 for url in ${zips[@]}
 do
