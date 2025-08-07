@@ -17,5 +17,11 @@ EPL-2.0
 
 * https://plantuml.com/
 * https://pdf.plantuml.net/PlantUML_Language_Reference_Guide_en.pdf
+* https://github.com/plantuml
 
+## Notes
+
+* There is an EBNF at https://github.com/plantuml/language-grammar/blob/main/puml.ebnf,
+but the grammar here is not derived from it.
+* The source code for PlantUML is at https://github.com/plantuml/plantuml.
 
