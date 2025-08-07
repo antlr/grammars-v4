@@ -714,9 +714,11 @@ switchExpression
 
 // Java17
 switchLabeledRule
-    : CASE (expressionList | NULL_LITERAL | (guardedPattern guard?) ) (ARROW | COLON) switchRuleOutcome
+    : CASE (expressionList | NULL_LITERAL | (guardedPatternList guard?) ) (ARROW | COLON) switchRuleOutcome
     | DEFAULT (ARROW | COLON) switchRuleOutcome
     ;
+
+guardedPatternList : guardedPattern (',' guardedPattern)* ;
 
 guard : 'when' expression ;
 
