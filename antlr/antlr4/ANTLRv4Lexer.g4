@@ -72,7 +72,6 @@ tokens {
     SEMPRED,
     STRING_LITERAL,
     TOKEN_REF,
-    TOKEN_REF,
     UNICODE_ESC,
     UNICODE_EXTENDED_ESC,
     WS,
