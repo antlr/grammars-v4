@@ -397,6 +397,7 @@
 				<module>xsd-regex</module>
 				<module>xyz</module>
 				<module>yara</module>
+				<module>yini</module>
 				<module>z</module>
 			</modules>
 		</profile>

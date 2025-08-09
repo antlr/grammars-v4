@@ -28,7 +28,7 @@ options {
 yini:
 	SHEBANG? INLINE_COMMENT* NL* 
 	YINI_MARKER? INLINE_COMMENT* NL* 
-	section+ NL* terminal_line? EOF?;
+	section+ NL* terminal_line? EOF;
 
 section: SECTION_HEAD? section_members;
 
