@@ -515,7 +515,7 @@ statement
     | DO statement WHILE parExpression ';'
     | TRY block (catchClause+ finallyBlock? | finallyBlock)
     | TRY resourceSpecification block catchClause* finallyBlock?
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
+    | SWITCH parExpression '{' switchBlockStatementGroup* (switchLabel ':')* '}'
     | SYNCHRONIZED parExpression block
     | RETURN expression? ';'
     | THROW expression ';'
@@ -557,7 +557,7 @@ resource
  *  To handle empty cases at the end, we add switchLabel* to statement.
  */
 switchBlockStatementGroup
-    : switchLabel+ blockStatement+
+    : (switchLabel ':')+ blockStatement+
     ;
 
 switchLabel
@@ -565,8 +565,8 @@ switchLabel
         constantExpression = expression
         | enumConstantName = IDENTIFIER
         | typeType varName = identifier
-    ) ':'
-    | DEFAULT ':'
+    )
+    | DEFAULT
     ;
 
 forControl
@@ -675,7 +675,17 @@ expression
 
 // Java17
 pattern
-    : variableModifier* typeType annotation* identifier
+    : variableModifier* typeType annotation* variableDeclarators
+    | typeType '(' componentPatternList? ')'
+    ;
+
+componentPatternList :
+    componentPattern ( ',' componentPattern )*
+    ;
+
+componentPattern :
+    pattern
+//    | '_' Handled in pattern???????
     ;
 
 // Java8
@@ -714,25 +724,28 @@ switchExpression
 
 // Java17
 switchLabeledRule
-    : CASE (expressionList | NULL_LITERAL | (guardedPatternList guard?) ) (ARROW | COLON) switchRuleOutcome
+    : CASE (
+	expressionList
+	| NULL_LITERAL (',' DEFAULT)?
+	| casePattern (',' casePattern)* guard?
+	) (ARROW | COLON) switchRuleOutcome
     | DEFAULT (ARROW | COLON) switchRuleOutcome
     ;
-
-guardedPatternList : guardedPattern (',' guardedPattern)* ;
 
 guard : 'when' expression ;
 
 // Java17
-guardedPattern
-    : '(' guardedPattern ')'
-    | variableModifier* typeType annotation* identifier ('&&' expression)*
-    | guardedPattern '&&' expression
-    ;
+casePattern
+ : pattern;
+//    : '(' casePattern ')'
+//    | variableModifier* typeType annotation* identifier ('&&' expression)*
+//    | casePattern '&&' expression
+//    ;
 
 // Java17
 switchRuleOutcome
     : block
-    | blockStatement*
+    | blockStatement* // is *-operator correct??? I don't think so. https://docs.oracle.com/javase/specs/jls/se24/html/jls-14.html#jls-BlockStatements
     ;
 
 classType
