@@ -270,7 +270,6 @@
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
-				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
@@ -289,18 +288,20 @@
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
-                <module>pf</module>
+				<module>pf</module>
 				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
+				<module>plantUML</module>
 				<module>pl0</module>
 				<module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
+				<module>powerquery</module>
 				<module>prolog</module>
 				<module>promql</module>
 				<module>propcalc</module>
@@ -396,6 +397,7 @@
 				<module>xsd-regex</module>
 				<module>xyz</module>
 				<module>yara</module>
+				<module>yini</module>
 				<module>z</module>
 			</modules>
 		</profile>
