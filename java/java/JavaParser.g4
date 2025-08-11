@@ -476,6 +476,7 @@ identifier
     | TO
     | USES
     | PROVIDES
+    | WHEN
     | WITH
     | TRANSITIVE
     | YIELD
@@ -515,7 +516,7 @@ statement
     | DO statement WHILE parExpression ';'
     | TRY block (catchClause+ finallyBlock? | finallyBlock)
     | TRY resourceSpecification block catchClause* finallyBlock?
-    | SWITCH parExpression '{' switchBlockStatementGroup* (switchLabel ':')* '}'
+    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     | SYNCHRONIZED parExpression block
     | RETURN expression? ';'
     | THROW expression ';'
