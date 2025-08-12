@@ -510,14 +510,14 @@ localTypeDeclaration
 statement
     : blockLabel = block
     | ASSERT expression (':' expression)? ';'
-    | IF parExpression statement (ELSE statement)?
+    | IF '(' expression ')' statement (ELSE statement)?
     | FOR '(' forControl ')' statement
-    | WHILE parExpression statement
-    | DO statement WHILE parExpression ';'
+    | WHILE '(' expression ')' statement
+    | DO statement WHILE '(' expression ')' ';'
     | TRY block (catchClause+ finallyBlock? | finallyBlock)
     | TRY resourceSpecification block catchClause* finallyBlock?
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-    | SYNCHRONIZED parExpression block
+    | SWITCH '(' expression ')' '{' switchBlockStatementGroup* switchLabel* '}'
+    | SYNCHRONIZED '(' expression ')' block
     | RETURN expression? ';'
     | THROW expression ';'
     | BREAK identifier? ';'
@@ -585,10 +585,6 @@ enhancedForControl
     ;
 
 // EXPRESSIONS
-
-parExpression
-    : '(' expression ')'
-    ;
 
 expressionList
     : expression (',' expression)*
@@ -720,7 +716,7 @@ primary
 
 // Java17
 switchExpression
-    : SWITCH parExpression '{' switchLabeledRule* '}'
+    : SWITCH '(' expression ')' '{' switchLabeledRule* '}'
     ;
 
 // Java17
