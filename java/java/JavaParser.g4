@@ -83,8 +83,8 @@ classOrInterfaceModifier
     | ABSTRACT
     | FINAL // FINAL for class only -- does not apply to interfaces
     | STRICTFP
-    | SEALED     // Java17
-    | NON_SEALED // Java17
+    | SEALED
+    | NON_SEALED
     ;
 
 variableModifier
@@ -95,7 +95,7 @@ variableModifier
 classDeclaration
     : CLASS identifier typeParameters? (EXTENDS typeType)? (IMPLEMENTS typeList)? (
         PERMITS typeList
-    )? // Java17
+    )?
     classBody
     ;
 
@@ -146,7 +146,7 @@ classBodyDeclaration
     ;
 
 memberDeclaration
-    : recordDeclaration //Java17
+    : recordDeclaration
     | methodDeclaration
     | genericMethodDeclaration
     | fieldDeclaration
@@ -203,7 +203,7 @@ interfaceBodyDeclaration
     ;
 
 interfaceMemberDeclaration
-    : recordDeclaration // Java17
+    : recordDeclaration
     | constDeclaration
     | interfaceMethodDeclaration
     | genericInterfaceMethodDeclaration
@@ -229,7 +229,6 @@ interfaceMethodDeclaration
     : interfaceMethodModifier* interfaceCommonBodyDeclaration
     ;
 
-// Java8
 interfaceMethodModifier
     : annotation
     | PUBLIC
@@ -326,7 +325,7 @@ literal
     | STRING_LITERAL
     | BOOL_LITERAL
     | NULL_LITERAL
-    | TEXT_BLOCK // Java17
+    | TEXT_BLOCK
     ;
 
 integerLiteral
@@ -389,7 +388,7 @@ annotationTypeElementRest
     | interfaceDeclaration ';'?
     | enumDeclaration ';'?
     | annotationTypeDeclaration ';'?
-    | recordDeclaration ';'? // Java17
+    | recordDeclaration ';'?
     ;
 
 annotationMethodOrConstantRest
@@ -409,8 +408,6 @@ defaultValue
     : DEFAULT elementValue
     ;
 
-// MODULES - Java9
-
 moduleDeclaration
     : annotation* OPEN? MODULE qualifiedName '{' moduleDirective* '}'
     ;
@@ -427,8 +424,6 @@ requiresModifier
     : TRANSITIVE
     | STATIC
     ;
-
-// RECORDS - Java 17
 
 recordDeclaration
     : RECORD identifier typeParameters? recordHeader (IMPLEMENTS typeList)? recordBody
@@ -522,10 +517,10 @@ statement
     | THROW expression ';'
     | BREAK identifier? ';'
     | CONTINUE identifier? ';'
-    | YIELD expression ';' // Java17
+    | YIELD expression ';'
     | SEMI
     | statementExpression = expression ';'
-    | switchExpression ';'? // Java17
+    | switchExpression ';'?
     | identifierLabel = identifier ':' statement
     ;
 
@@ -613,7 +608,6 @@ expression
     | typeType '::' (typeArguments? identifier | NEW)               #MethodReferenceExpression
     | classType '::' typeArguments? NEW                             #MethodReferenceExpression
     
-    // Java17
     | switchExpression                                              #ExpressionSwitch
 
     // Level 15 Post-increment/decrement operators
@@ -666,11 +660,10 @@ expression
         | '%='
     ) expression                                              #BinaryOperatorExpression
 
-    // Level 0, Lambda Expression // Java8
+    // Level 0, Lambda Expression
     | lambdaExpression                                        #ExpressionLambda
     ;
 
-// Java17
 pattern
     : variableModifier* typeType annotation* variableDeclarators
     | typeType '(' componentPatternList? ')'
@@ -682,15 +675,12 @@ componentPatternList :
 
 componentPattern :
     pattern
-//    | '_' Handled in pattern???????
     ;
 
-// Java8
 lambdaExpression
     : lambdaParameters '->' lambdaBody
     ;
 
-// Java8
 lambdaParameters
     : identifier
     | '(' formalParameterList? ')'
@@ -698,7 +688,6 @@ lambdaParameters
     | '(' lambdaLVTIList? ')'
     ;
 
-// Java8
 lambdaBody
     : expression
     | block
@@ -714,12 +703,10 @@ primary
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     ;
 
-// Java17
 switchExpression
     : SWITCH '(' expression ')' '{' switchLabeledRule* '}'
     ;
 
-// Java17
 switchLabeledRule
     : CASE (
 	expressionList
@@ -729,17 +716,14 @@ switchLabeledRule
     | DEFAULT (ARROW | COLON) switchRuleOutcome
     ;
 
-guard : 'when' expression ;
+guard 
+    : 'when' expression
+    ;
 
-// Java17
 casePattern
- : pattern;
-//    : '(' casePattern ')'
-//    | variableModifier* typeType annotation* identifier ('&&' expression)*
-//    | casePattern '&&' expression
-//    ;
+    : pattern
+    ;
 
-// Java17
 switchRuleOutcome
     : block
     | blockStatement* // is *-operator correct??? I don't think so. https://docs.oracle.com/javase/specs/jls/se24/html/jls-14.html#jls-BlockStatements
