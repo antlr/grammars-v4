@@ -6148,7 +6148,7 @@ merge_insert_clause
     ;
 
 selected_tableview
-    : (tableview_name | '(' select_statement ')') table_alias?
+    : ( tableview_name | '(' select_statement ')' | table_collection_expression | '(' table_collection_expression ')') table_alias?
     ;
 
 lock_table_statement
