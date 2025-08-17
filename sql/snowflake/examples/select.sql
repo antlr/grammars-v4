@@ -132,3 +132,19 @@ select count(t.*) as ca from t9 as t;
 SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
 FROM t1 as a
 JOIN t2 as b USING (col5, col6);
+
+select * from t1
+union all by name
+select * from t2;
+
+select * from t1
+union by name
+select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;

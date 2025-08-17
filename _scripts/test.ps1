@@ -67,11 +67,12 @@ function Test-Grammar {
     
     $success = $true
     $start = Get-Date
+
     Write-Host "Building"
     # codegen
     Write-Host "dotnet trgen -t $Target --template-sources-directory $templates"
-    dotnet trgen -t $Target --template-sources-directory $templates | Write-Host
-    if ($LASTEXITCODE -ne 0) {
+    $(& dotnet trgen -t $Target --template-sources-directory $templates; $status = $LASTEXITCODE) | Write-Host
+    if ($status -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
     }
@@ -229,26 +230,26 @@ function Get-GitChangedDirectories {
     # by considering all changes.
     
     $gdirs = Get-ChildItem -Path . -Filter desc.xml -Recurse | 
-	ForEach-Object {
-		# Get the relative path
-		$relativePath = Resolve-Path -LiteralPath $_.FullName -Relative
+        ForEach-Object {
+            # Get the relative path
+            $relativePath = Resolve-Path -LiteralPath $_.FullName -Relative
 
-		# Strip off "desc.xml" by getting just the parent directory
-		[System.IO.Path]::GetDirectoryName($relativePath)
-	}
+            # Strip off "desc.xml" by getting just the parent directory
+            [System.IO.Path]::GetDirectoryName($relativePath)
+        }
     Write-Host "gdirs $gdirs"
 
     # Find all grammar directories that are on each path in the list of
     # git dirs changed.
     $results = @()
     foreach ($gdir in $gdirs) {
-	foreach ($dir in $newdirs) {
-		# Check either exact match or if $gdir + '\' is the start of $dir
-		if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\")) {
-			$results += $gdir
-			break  # No need to check more once we find a match
-		}
-	}
+        foreach ($dir in $newdirs) {
+            # Check either exact match or if $gdir + '\' is the start of $dir
+            if ($dir -eq $gdir -or $dir.StartsWith($gdir + "\") -or $dir.StartsWith($gdir + "/")) {
+                $results += $gdir
+                break  # No need to check more once we find a match
+            }
+        }
     }
     Write-Host "results $results"
 
