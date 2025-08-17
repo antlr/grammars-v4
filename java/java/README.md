@@ -1,10 +1,11 @@
-# Java Antlr Grammar
+# Java grammar
 
-Based on the previous optimized [Java7](../java) grammar by Terence Parr and Sam Harwell
-with the same BSD license. This grammar does not exactly corresponds to the formal
-Java specification unlike usual [Java8](../java8) grammar, but passes tests such as
-[AllInOne7.Java](examples/AllInOne7.java) and [AllInOne8.java](examples/AllInOne8.java).
-Performance, practical usage and clarity in priority.
+This grammar is based on the optimized Java7 grammar
+by Terence Parr and Sam Harwell. This grammar does not exactly corresponds to the
+[Java Language Specification](https://docs.oracle.com/javase/specs/), and
+differ from that for [java8](../java8), [java9](../java9), and [java20](../java20),
+which follow the JLS more closely. Performance, practical usage, and clarity are
+a priority for this grammar.
 
 This grammar parses the file [ManyStringsConcat.java](examples/ManyStringsConcat.java)
 faster than the original grammar without left recursion for expressions.
@@ -20,7 +21,7 @@ faster than the original grammar without left recursion for expressions.
 
 ## Tests
 * See examples/
-* OpenJDK 24, `src/**/*.java` (using [Trash trgen to create app](https://github.com/kaby76/Trash/tree/main/src/trgen), then `find ~/jdk-jdk-23-ga/src/ -name '*.java' | cygpath -w -f - | ./bin/Debug/net8.0/Test.exe -x`)
+* OpenJDK 24, `src/**/*.java` (using [Trash trgen to create app](https://github.com/kaby76/Trash/tree/main/src/trgen), then `find ~/jdk-jdk-23-ga/src/ -name '*.java' | cygpath -w -f - | ./Test -x`)
 
 ## Benchmarks
 Grammar performance has been tested on the following Java projects:
