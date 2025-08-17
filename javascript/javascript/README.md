@@ -4,9 +4,16 @@ This JavaScript grammar does not exactly corresponds to ECMAScript standard.
 The main goal during developing was practical usage, performance and clarity
 (getting rid of duplicates).
 
+# Status
+
+This grammar works the following targets: C# (CSharp = Antlr4.Runtime.Standard)
+and Java.
+It works for the JavaScript target, but requires a fix in Antlr
+post version 4.9.1.
+
 ## Universal Actions & Semantic Predicates
 
-Some modern JavaScript syntax can not be handled with standard context-free
+Some modern JavaScript syntax cannot be handled with standard context-free
 grammars, for example detection of `get` keyword in getters and `get` identifiers
 in other cases. Moreover, some parser options can be defined externally (`use strict`)
 and should be considered during parsing process.
@@ -14,49 +21,7 @@ and should be considered during parsing process.
 For such complex syntax [actions](https://github.com/antlr/antlr4/blob/master/doc/actions.md)
 and [predicates](https://github.com/antlr/antlr4/blob/master/doc/predicates.md)
 are used. This is a first grammar in repository with attempt to use an **universal**
-actions and predicates. It works at least for **C#** and **Java** runtimes.
-
-Consider the `getter` rule in grammar:
-
-```g4
-getter
-    : Identifier{p("get")}? propertyName
-    ;
-```
-
-Instruction `p("get")` stands for *get the previous token value and return a boolean
-value as a result of comparison to "get" string*.
-
-For **Java** runtime it described by the following code in [Java/JavaScriptLexerBase.java](Java/JavaScriptParserBase.java)
-
-```java
-protected boolean prev(String str) {
-    return _input.LT(-1).getText().equals(str);
-}
-```
-
-For **C#** runtime by Sam Harwell it described by 
-[CSharp/JavaScriptParserBase.cs](CSharp/JavaScriptParserBase.cs)
-
-```cs
-protected bool prev(string str)
-{
-    return _input.Lt(-1).Text.Equals(str);
-}
-```
-
-Furthermore the [`superClass`](https://github.com/antlr/antlr4/blob/master/doc/options.md)
-option should be defined lexer and parser grammar files by the following manner:
-
-```g4
-options {
-    tokenVocab=JavaScriptLexer;
-    superClass=JavaScriptParserBase;
-}
-```
-
-Runtimes super class names (`JavaScriptLexer`, `JavaScriptParser`) should be
-the same for correct parser generation.
+actions and predicates.
 
 ## Syntax support
 

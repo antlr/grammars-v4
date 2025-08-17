@@ -3,12 +3,12 @@ package parser
 import (
 	"strings"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/antlr4-go/antlr/v4"
 )
 
 // JavaScriptParserBase implementation.
 type JavaScriptParserBase struct {
-	*antlr.ParserBase
+	*antlr.BaseParser
 }
 
 // Short for p.prev(str string)
@@ -32,29 +32,16 @@ func (p *JavaScriptParserBase) next(str string) bool {
 }
 
 func (p *JavaScriptParserBase) notLineTerminator() bool {
-	return !p.here(JavaScriptParserLineTerminator)
+	return !p.lineTerminatorAhead()
 }
 
 func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
 	nextTokenType := p.GetTokenStream().LT(1).GetTokenType()
-	return nextTokenType != JavaScriptParserOpenBrace && nextTokenType != JavaScriptParserFunction
+	return nextTokenType != JavaScriptParserOpenBrace && nextTokenType != JavaScriptParserFunction_
 }
 
 func (p *JavaScriptParserBase) closeBrace() bool {
 	return p.GetTokenStream().LT(1).GetTokenType() == JavaScriptParserCloseBrace
-}
-
-// Returns true if on the current index of the parser's
-// token stream a token of the given type exists on the
-// Hidden channel.
-func (p *JavaScriptParserBase) here(_type int) bool {
-	// Get the token ahead of the current index.
-	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
-	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
-
-	// Check if the token resides on the HIDDEN channel and if it's of the
-	// provided type.
-	return ahead.GetChannel() == antlr.LexerHidden && ahead.GetTokenType() == _type
 }
 
 // Returns true if on the current index of the parser's
@@ -64,11 +51,14 @@ func (p *JavaScriptParserBase) here(_type int) bool {
 func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 	// Get the token ahead of the current index.
 	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
+        if possibleIndexEosToken < 0 {
+            return false
+        }
 	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
 
 	if ahead.GetChannel() != antlr.LexerHidden {
 		// We're only interested in tokens on the HIDDEN channel.
-		return true
+		return false
 	}
 
 	if ahead.GetTokenType() == JavaScriptParserLineTerminator {

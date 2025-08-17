@@ -32,261 +32,163 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://www.loc.gov/standards/sru/cql/spec.html
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar cql;
 
+options {
+    caseInsensitive = true;
+}
+
 cql
-   : sortedQuery EOF
-   ;
+    : sortedQuery EOF
+    ;
 
 sortedQuery
-   : prefixAssignment sortedQuery
-   | scopedClause (SORTBY sortSpec)?
-   ;
+    : prefixAssignment sortedQuery
+    | scopedClause (SORTBY sortSpec)?
+    ;
 
 sortSpec
-   : sortSpec singleSpec
-   | singleSpec
-   ;
+    : sortSpec singleSpec
+    | singleSpec
+    ;
 
 singleSpec
-   : index modifierList?
-   ;
+    : index modifierList?
+    ;
 
 cqlQuery
-   : prefixAssignment cqlQuery
-   | scopedClause
-   ;
+    : prefixAssignment cqlQuery
+    | scopedClause
+    ;
 
 prefixAssignment
-   : '>' prefix '=' uri
-   | '>' uri
-   ;
+    : '>' prefix_ '=' uri
+    | '>' uri
+    ;
 
 scopedClause
-   : scopedClause booleanGroup searchClause
-   | searchClause
-   ;
+    : scopedClause booleanGroup searchClause
+    | searchClause
+    ;
 
 booleanGroup
-   : boolean_ modifierList?
-   ;
+    : boolean_ modifierList?
+    ;
 
 boolean_
-   : AND
-   | OR
-   | NOT
-   | PROX
-   ;
+    : AND
+    | OR
+    | NOT
+    | PROX
+    ;
 
 searchClause
-   : '(' cqlQuery ')'
-   | index relation searchTerm
-   | searchTerm
-   ;
+    : '(' cqlQuery ')'
+    | index relation searchTerm
+    | searchTerm
+    ;
 
 relation
-   : comparitor modifierList?
-   ;
+    : comparitor modifierList?
+    ;
 
 comparitor
-   : comparitorSymbol
-   | namedComparitor
-   ;
+    : comparitorSymbol
+    | namedComparitor
+    ;
 
 comparitorSymbol
-   : '='
-   | '>'
-   | '<'
-   | '>='
-   | '<='
-   | '<>'
-   | '=='
-   ;
+    : '='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    | '<>'
+    | '=='
+    ;
 
 namedComparitor
-   : identifier
-   ;
+    : identifier
+    ;
 
 modifierList
-   : modifierList modifier
-   | modifier
-   ;
+    : modifierList modifier
+    | modifier
+    ;
 
 modifier
-   : '/' modifierName (comparitorSymbol modifierValue)?
-   ;
+    : '/' modifierName (comparitorSymbol modifierValue)?
+    ;
 
-prefix
-   : term
-   ;
+prefix_
+    : term
+    ;
 
 uri
-   : term
-   ;
+    : term
+    ;
 
 modifierName
-   : term
-   ;
+    : term
+    ;
 
 modifierValue
-   : term
-   ;
+    : term
+    ;
 
 searchTerm
-   : term
-   ;
+    : term
+    ;
 
 index
-   : term
-   ;
+    : term
+    ;
 
 term
-   : identifier
-   | AND
-   | OR
-   | NOT
-   | PROX
-   | SORTBY
-   ;
+    : identifier
+    | AND
+    | OR
+    | NOT
+    | PROX
+    | SORTBY
+    ;
 
 identifier
-   : CHARSTRING1
-   | CHARSTRING2
-   ;
+    : CHARSTRING1
+    | CHARSTRING2
+    ;
 
 AND
-   : A N D
-   ;
+    : 'AND'
+    ;
 
 OR
-   : O R
-   ;
+    : 'OR'
+    ;
 
 NOT
-   : N O T
-   ;
+    : 'NOT'
+    ;
 
 PROX
-   : P R O X
-   ;
+    : 'PROX'
+    ;
 
 SORTBY
-   : S O R T B Y
-   ;
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-fragment Z
-   : ('z' | 'Z')
-   ;
+    : 'SORTBY'
+    ;
 
 CHARSTRING1
-   : [a-zA-Z.]+
-   ;
+    : [A-Z.]+
+    ;
 
 CHARSTRING2
-   : '"' .*? '"'
-   ;
+    : '"' .*? '"'
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

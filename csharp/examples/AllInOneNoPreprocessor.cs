@@ -69,7 +69,7 @@ namespace My
 
             var привет = local;
             var мир = local;
-            var local3 = 0, local4 = 1;
+            int local3 = 0, local4 = 1;
             local3 = local4 = 1;
             var local5 = null as Action ?? null;
             var local6 = local5 is Action;

@@ -1,6 +1,8 @@
-import { Lexer } from "antlr4ts";
+import { CommonToken, Lexer, CharStream, Token } from "antlr4";
+import PlSqlParser from './PlSqlParser';
 
-export abstract class PlSqlLexerBase extends Lexer {
+export default abstract class PlSqlLexerBase extends Lexer {
+  self : PlSqlLexerBase;
   
   IsNewlineAtPos(pos: number): boolean {
     const la = this._input.LA(pos);

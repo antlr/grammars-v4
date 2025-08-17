@@ -34,3 +34,8 @@ $a = array(
 $a = array(
     array(1,2)
 );
+
+class C
+{
+    public static $ar = array ('key' => 'a' . 'b');
+}

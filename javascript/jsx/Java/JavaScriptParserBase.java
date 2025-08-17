@@ -1,7 +1,7 @@
-
-import java.util.Stack;
-
 import org.antlr.v4.runtime.*;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.*;
 public abstract class JavaScriptParserBase extends Parser
 {
 	// 2020/10/27 for jsx
-	private Stack<String> _tagNames = new Stack<String>();
+	private final Deque<String> _tagNames = new ArrayDeque<>();
 	
     public JavaScriptParserBase(TokenStream input) {
         super(input);
@@ -50,7 +50,7 @@ public abstract class JavaScriptParserBase extends Parser
 
     protected boolean notOpenBraceAndNotFunction() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function;
+        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function_;
     }
 
     protected boolean closeBrace() {

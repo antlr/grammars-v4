@@ -1,0 +1,13 @@
+  integers ( p1 p2 )
+    booleans ( Y_found )
+
+    routines (
+       shortv
+       R1 R2
+       Step_1a Step_1b Step_1c Step_2 Step_3 Step_4 Step_5a Step_5b
+    )
+
+    externals ( stem )
+
+    groupings ( v v_WXY v_LSZ )
+

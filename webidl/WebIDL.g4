@@ -2,6 +2,7 @@
 BSD License
 
 Copyright (c) 2013,2015 Rainer Schuster
+Copyright (c) 2021 ethanmdavidson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,357 +35,572 @@ Web IDL grammar derived from:
     http://heycam.github.io/webidl/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 17 November 2015
+    Editor’s Draft, 3 May 2021
  */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar WebIDL;
 
-// Note: Replaced keywords: const, default, enum, interface, null.
+/* Note: appended underscore to keywords for CPP compat:
+    const, default, enum, namespace, null
+    see github.com/antlr/grammars-v4/issues/2099 for more info
+*/
 // Note: Added "wrapper" rule webIDL with EOF token.
 
 webIDL
-	: definitions EOF
-;
-
+    : definitions EOF
+    ;
 
 definitions
-	: extendedAttributeList definition definitions
-	| /* empty */
-;
+    : extendedAttributeList definition definitions
+    | /* empty */
+    ;
 
 definition
-	: callbackOrInterface
-	| partial
-	| dictionary
-	| enum_
-	| typedef
-	| implementsStatement
-;
+    : callbackOrInterfaceOrMixin
+    | namespace_
+    | partial
+    | dictionary
+    | enum_
+    | typedef_
+    | includesStatement
+    ;
 
-callbackOrInterface
-	: 'callback' callbackRestOrInterface
-	| interface_
-	| class_
-;
+argumentNameKeyword
+    : 'async'
+    | 'attribute'
+    | 'callback'
+    | 'const'
+    | 'constructor'
+    | 'deleter'
+    | 'dictionary'
+    | 'enum'
+    | 'getter'
+    | 'includes'
+    | 'inherit'
+    | 'interface'
+    | 'iterable'
+    | 'maplike'
+    | 'mixin'
+    | 'namespace'
+    | 'partial'
+    | 'readonly'
+    | 'required'
+    | 'setlike'
+    | 'setter'
+    | 'static'
+    | 'stringifier'
+    | 'typedef'
+    | 'unrestricted'
+    ;
 
-callbackRestOrInterface
-	: callbackRest
-	| interface_
-;
+callbackOrInterfaceOrMixin
+    : 'callback' callbackRestOrInterface
+    | 'interface' interfaceOrMixin
+    ;
 
-interface_
-	: 'interface' IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
-;
+interfaceOrMixin
+    : interfaceRest
+    | mixinRest
+    ;
 
-class_
-    : 'class' IDENTIFIER_WEBIDL extension '{' interfaceMembers '}' ';'
-;
+interfaceRest
+    : IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
+    ;
 
 partial
-	: 'partial' partialDefinition
-;
+    : 'partial' partialDefinition
+    ;
 
 partialDefinition
-	: partialInterface
-	| partialDictionary
-;
+    : 'interface' partialInterfaceOrPartialMixin
+    | partialDictionary
+    | namespace_
+    ;
 
-partialInterface
-	: 'interface' IDENTIFIER_WEBIDL '{' interfaceMembers '}' ';'
-;
+partialInterfaceOrPartialMixin
+    : partialInterfaceRest
+    | mixinRest
+    ;
+
+partialInterfaceRest
+    : IDENTIFIER_WEBIDL '{' partialInterfaceMembers '}' ';'
+    ;
 
 interfaceMembers
-	: extendedAttributeList interfaceMember interfaceMembers
-	| /* empty */
-;
+    : extendedAttributeList interfaceMember interfaceMembers
+    | /* empty */
+    ;
 
 interfaceMember
-	: const_
-	| operation
-	| serializer
-	| stringifier
-	| staticMember
-	| iterable
-	| readonlyMember
-	| readWriteAttribute
-	| readWriteMaplike
-	| readWriteSetlike
-;
+    : partialInterfaceMember
+    | constructor
+    ;
 
-dictionary
-	: 'dictionary' IDENTIFIER_WEBIDL inheritance '{' dictionaryMembers '}' ';'
-;
+partialInterfaceMembers
+    : extendedAttributeList partialInterfaceMember partialInterfaceMembers
+    | /* empty */
+    ;
 
-dictionaryMembers
-	: extendedAttributeList dictionaryMember dictionaryMembers
-	| /* empty */
-;
-
-dictionaryMember
-	: required type IDENTIFIER_WEBIDL default_ ';'
-;
-
-required
-	: 'required'
-	| /* empty */
-;
-
-partialDictionary
-	: 'dictionary' IDENTIFIER_WEBIDL '{' dictionaryMembers '}' ';'
-;
-
-default_
-	: '=' defaultValue
-	| /* empty */
-;
-
-defaultValue
-	: constValue
-	| STRING_WEBIDL
-	| '[' ']'
-;
+partialInterfaceMember
+    : const_
+    | operation
+    | stringifier
+    | staticMember
+    | iterable
+    | asyncIterable
+    | readonlyMember
+    | readWriteAttribute
+    | readWriteMaplike
+    | readWriteSetlike
+    | inheritAttribute
+    ;
 
 inheritance
-	: ':' IDENTIFIER_WEBIDL
-	| /* empty */
-;
-
-extension
-    : 'extends' IDENTIFIER_WEBIDL
+    : ':' IDENTIFIER_WEBIDL
     | /* empty */
-;
+    ;
 
-enum_
-	: 'enum' IDENTIFIER_WEBIDL '{' enumValueList '}' ';'
-;
+mixinRest
+    : 'mixin' IDENTIFIER_WEBIDL '{' mixinMembers '}' ';'
+    ;
 
-enumValueList
-	: STRING_WEBIDL enumValueListComma
-;
+mixinMembers
+    : extendedAttributeList mixinMember mixinMembers
+    | /* empty */
+    ;
 
-enumValueListComma
-	: ',' enumValueListString
-	| /* empty */
-;
+mixinMember
+    : const_
+    | regularOperation
+    | stringifier
+    | optionalReadOnly attributeRest
+    ;
 
-enumValueListString
-	: STRING_WEBIDL enumValueListComma
-	| /* empty */
-;
+includesStatement
+    : IDENTIFIER_WEBIDL 'includes' IDENTIFIER_WEBIDL ';'
+    ;
 
-callbackRest
-	: IDENTIFIER_WEBIDL '=' returnType '(' argumentList ')' ';'
-;
+callbackRestOrInterface
+    : callbackRest
+    | 'interface' IDENTIFIER_WEBIDL '{' callbackInterfaceMembers '}' ';'
+    ;
 
-typedef
-	: 'typedef' type IDENTIFIER_WEBIDL ';'
-;
+callbackInterfaceMembers
+    : extendedAttributeList callbackInterfaceMember callbackInterfaceMembers
+    | /* empty */
+    ;
 
-implementsStatement
-	: IDENTIFIER_WEBIDL 'implements' IDENTIFIER_WEBIDL ';'
-;
+callbackInterfaceMember
+    : const_
+    | regularOperation
+    ;
 
 const_
-	: 'const' constType IDENTIFIER_WEBIDL '=' constValue ';'
-;
+    : 'const' constType IDENTIFIER_WEBIDL '=' constValue ';'
+    ;
 
 constValue
-	: booleanLiteral
-	| floatLiteral
-	| INTEGER_WEBIDL
-	| 'null'
-;
+    : booleanLiteral
+    | floatLiteral
+    | INTEGER_WEBIDL
+    ;
 
 booleanLiteral
-	: 'true'
-	| 'false'
-;
+    : 'true'
+    | 'false'
+    ;
 
 floatLiteral
-	: FLOAT_WEBIDL
-	| '-Infinity'
-	| 'Infinity'
-	| 'NaN'
-;
+    : DECIMAL_WEBIDL
+    | '-Infinity'
+    | 'Infinity'
+    | 'NaN'
+    ;
 
-serializer
-	: 'serializer' serializerRest
-;
-
-serializerRest
-	: operationRest
-	| '=' serializationPattern ';'
-	| ';'
-;
-
-serializationPattern
-	: '{' serializationPatternMap '}'
-	| '[' serializationPatternList ']'
-	| IDENTIFIER_WEBIDL
-;
-
-serializationPatternMap
-	: 'getter'
-	| 'inherit' identifiers
-	| IDENTIFIER_WEBIDL identifiers
-	| /* empty */
-;
-
-serializationPatternList
-	: 'getter'
-	| IDENTIFIER_WEBIDL identifiers
-	| /* empty */
-;
-
-stringifier
-	: 'stringifier' stringifierRest
-;
-
-stringifierRest
-	: readOnly attributeRest
-	| returnType operationRest
-	| ';'
-;
-
-staticMember
-	: 'static' staticMemberRest
-;
-
-staticMemberRest
-	: readOnly attributeRest
-	| returnType operationRest
-;
+constType
+    : primitiveType
+    | IDENTIFIER_WEBIDL
+    ;
 
 readonlyMember
-	: 'readonly' readonlyMemberRest
-;
+    : 'readonly' readonlyMemberRest
+    ;
 
 readonlyMemberRest
-	: attributeRest
-	| readWriteMaplike
-	| readWriteSetlike
-;
+    : attributeRest
+    | maplikeRest
+    | setlikeRest
+    ;
 
 readWriteAttribute
-	: 'inherit' readOnly attributeRest
-	| attributeRest
-;
+    : attributeRest
+    ;
+
+inheritAttribute
+    : 'inherit' attributeRest
+    ;
 
 attributeRest
-	: 'attribute' type attributeName ';'
-;
+    : 'attribute' typeWithExtendedAttributes attributeName ';'
+    ;
 
 attributeName
-	: attributeNameKeyword
-	| IDENTIFIER_WEBIDL
-;
+    : attributeNameKeyword
+    | IDENTIFIER_WEBIDL
+    ;
 
 attributeNameKeyword
-	: 'required'
-;
+    : 'async'
+    | 'required'
+    ;
 
-inherit
-	: 'inherit'
-	| /* empty */
-;
+optionalReadOnly
+    : 'readonly'
+    | /* empty */
+    ;
 
-readOnly
-	: 'readonly'
-	| /* empty */
-;
+defaultValue
+    : constValue
+    | STRING_WEBIDL
+    | '[' ']'
+    | '{' '}'
+    | 'null'
+    ;
 
 operation
-	: returnType operationRest
-	| specialOperation
-;
+    : regularOperation
+    | specialOperation
+    ;
+
+regularOperation
+    : type_ operationRest
+    ;
 
 specialOperation
-	: special specials returnType operationRest
-;
-
-specials
-	: special specials
-	| /* empty */
-;
+    : special regularOperation
+    ;
 
 special
-	: 'getter'
-	| 'setter'
-	| 'deleter'
-	| 'legacycaller'
-;
+    : 'getter'
+    | 'setter'
+    | 'deleter'
+    ;
 
 operationRest
-	: optionalIdentifier '(' argumentList ')' ';'
-;
+    : optionalOperationName '(' argumentList ')' ';'
+    ;
 
-optionalIdentifier
-	: IDENTIFIER_WEBIDL
-	| /* empty */
-;
+optionalOperationName
+    : operationName
+    | /* empty */
+    ;
+
+operationName
+    : operationNameKeyword
+    | IDENTIFIER_WEBIDL
+    ;
+
+operationNameKeyword
+    : 'includes'
+    ;
 
 argumentList
-	: argument arguments
-	| /* empty */
-;
+    : argument arguments
+    | /* empty */
+    ;
 
 arguments
-	: ',' argument arguments
-	| /* empty */
-;
+    : ',' argument arguments
+    | /* empty */
+    ;
 
 argument
-	: extendedAttributeList optionalOrRequiredArgument
-;
+    : extendedAttributeList argumentRest
+    ;
 
-optionalOrRequiredArgument
-	: 'optional' type argumentName default_
-	| type ellipsis argumentName
-;
+argumentRest
+    : 'optional' typeWithExtendedAttributes argumentName default_
+    | type_ ellipsis argumentName
+    ;
 
 argumentName
-	: argumentNameKeyword
-	| IDENTIFIER_WEBIDL
-;
+    : argumentNameKeyword
+    | IDENTIFIER_WEBIDL
+    ;
 
 ellipsis
-	: '...'
-	| /* empty */
-;
+    : '...'
+    | /* empty */
+    ;
+
+constructor
+    : 'constructor' '(' argumentList ')' ';'
+    ;
+
+stringifier
+    : 'stringifier' stringifierRest
+    ;
+
+stringifierRest
+    : optionalReadOnly attributeRest
+    | regularOperation
+    | ';'
+    ;
+
+staticMember
+    : 'static' staticMemberRest
+    ;
+
+staticMemberRest
+    : optionalReadOnly attributeRest
+    | regularOperation
+    ;
 
 iterable
-	: 'iterable' '<' type optionalType '>' ';'
-;
+    : 'iterable' '<' typeWithExtendedAttributes optionalType '>' ';'
+    ;
 
 optionalType
-	: ',' type
-	| /* empty */
-;
+    : ',' typeWithExtendedAttributes
+    | /* empty */
+    ;
+
+asyncIterable
+    : 'async' 'iterable' '<' typeWithExtendedAttributes optionalType '>' optionalArgumentList ';'
+    ;
+
+optionalArgumentList
+    : '(' argumentList ')'
+    | /* empty */
+    ;
 
 readWriteMaplike
-	: maplikeRest
-;
-
-readWriteSetlike
-	: setlikeRest
-;
+    : maplikeRest
+    ;
 
 maplikeRest
-	: 'maplike' '<' type ',' type '>' ';'
-;
+    : 'maplike' '<' typeWithExtendedAttributes ',' typeWithExtendedAttributes '>' ';'
+    ;
+
+readWriteSetlike
+    : setlikeRest
+    ;
 
 setlikeRest
-	: 'setlike' '<' type '>' ';'
-;
+    : 'setlike' '<' typeWithExtendedAttributes '>' ';'
+    ;
+
+namespace_
+    : 'namespace' IDENTIFIER_WEBIDL '{' namespaceMembers '}' ';'
+    ;
+
+namespaceMembers
+    : extendedAttributeList namespaceMember namespaceMembers
+    | /* empty */
+    ;
+
+namespaceMember
+    : regularOperation
+    | 'readonly' attributeRest
+    | const_
+    ;
+
+dictionary
+    : 'dictionary' IDENTIFIER_WEBIDL inheritance '{' dictionaryMembers '}' ';'
+    ;
+
+dictionaryMembers
+    : dictionaryMember dictionaryMembers
+    | /* empty */
+    ;
+
+dictionaryMember
+    : extendedAttributeList dictionaryMemberRest
+    ;
+
+dictionaryMemberRest
+    : 'required' typeWithExtendedAttributes IDENTIFIER_WEBIDL ';'
+    | type_ IDENTIFIER_WEBIDL default_ ';'
+    ;
+
+partialDictionary
+    : 'dictionary' IDENTIFIER_WEBIDL '{' dictionaryMembers '}' ';'
+    ;
+
+default_
+    : '=' defaultValue
+    | /* empty */
+    ;
+
+enum_
+    : 'enum' IDENTIFIER_WEBIDL '{' enumValueList '}' ';'
+    ;
+
+enumValueList
+    : STRING_WEBIDL enumValueListComma
+    ;
+
+enumValueListComma
+    : ',' enumValueListString
+    | /* empty */
+    ;
+
+enumValueListString
+    : STRING_WEBIDL enumValueListComma
+    | /* empty */
+    ;
+
+callbackRest
+    : IDENTIFIER_WEBIDL '=' type_ '(' argumentList ')' ';'
+    ;
+
+typedef_
+    : 'typedef' typeWithExtendedAttributes IDENTIFIER_WEBIDL ';'
+    ;
+
+type_
+    : singleType
+    | unionType null_
+    ;
+
+typeWithExtendedAttributes
+    : extendedAttributeList type_
+    ;
+
+singleType
+    : distinguishableType
+    | 'any'
+    | promiseType
+    ;
+
+unionType
+    : '(' unionMemberType 'or' unionMemberType unionMemberTypes ')'
+    ;
+
+unionMemberType
+    : extendedAttributeList distinguishableType
+    | unionType null_
+    ;
+
+unionMemberTypes
+    : 'or' unionMemberType unionMemberTypes
+    | /* empty */
+    ;
+
+distinguishableType
+    : primitiveType null_
+    | stringType null_
+    | IDENTIFIER_WEBIDL null_
+    | 'sequence' '<' typeWithExtendedAttributes '>' null_
+    | 'object' null_
+    | 'symbol' null_
+    | bufferRelatedType null_
+    | 'FrozenArray' '<' typeWithExtendedAttributes '>' null_
+    | 'ObservableArray' '<' typeWithExtendedAttributes '>' null_
+    | recordType null_
+    ;
+
+primitiveType
+    : unsignedIntegerType
+    | unrestrictedFloatType
+    | 'undefined'
+    | 'boolean'
+    | 'byte'
+    | 'octet'
+    | 'bigint'
+    ;
+
+unrestrictedFloatType
+    : 'unrestricted' floatType
+    | floatType
+    ;
+
+floatType
+    : 'float'
+    | 'double'
+    ;
+
+unsignedIntegerType
+    : 'unsigned' integerType
+    | integerType
+    ;
+
+integerType
+    : 'short'
+    | 'long' optionalLong
+    ;
+
+optionalLong
+    : 'long'
+    | /* empty */
+    ;
+
+stringType
+    : 'ByteString'
+    | 'DOMString'
+    | 'USVString'
+    ;
+
+promiseType
+    : 'Promise' '<' type_ '>'
+    ;
+
+recordType
+    : 'record' '<' stringType ',' typeWithExtendedAttributes '>'
+    ;
+
+null_
+    : '?'
+    | /* empty */
+    ;
+
+bufferRelatedType
+    : 'ArrayBuffer'
+    | 'DataView'
+    | 'Int8Array'
+    | 'Int16Array'
+    | 'Int32Array'
+    | 'Uint8Array'
+    | 'Uint16Array'
+    | 'Uint32Array'
+    | 'Uint8ClampedArray'
+    | 'Float32Array'
+    | 'Float64Array'
+    ;
 
 extendedAttributeList
-	: '[' extendedAttribute extendedAttributes ']'
-	| /* empty */
-;
+    : '[' extendedAttribute extendedAttributes ']'
+    | /* empty */
+    ;
 
 extendedAttributes
-	: ',' extendedAttribute extendedAttributes
-	| /* empty */
-;
+    : ',' extendedAttribute extendedAttributes
+    | /* empty */
+    ;
+
+/* https://heycam.github.io/webidl/#idl-extended-attributes
+   "The ExtendedAttribute grammar symbol matches nearly any sequence of tokens,
+   however the extended attributes defined in this document only accept a more
+   restricted syntax."
+   I use the more restrictive syntax here because it will be more useful for
+   parsing things in the real world.
+*/
+extendedAttribute
+    : extendedAttributeNoArgs
+    | extendedAttributeArgList
+    | extendedAttributeNamedArgList
+    | extendedAttributeIdent
+    | extendedAttributeIdentList
+    | extendedAttributeString
+    | extendedAttributeStringList
+    ;
+
+/*
+Here is the extendedAttribute grammar as defined in the spec
+(https://heycam.github.io/webidl/#prod-ExtendedAttribute):
 
 extendedAttribute
 	: '(' extendedAttributeInner ')' extendedAttributeRest
@@ -395,7 +611,7 @@ extendedAttribute
 
 extendedAttributeRest
 	: extendedAttribute
-	| /* empty */
+	| // empty
 ;
 
 extendedAttributeInner
@@ -403,242 +619,138 @@ extendedAttributeInner
 	| '[' extendedAttributeInner ']' extendedAttributeInner
 	| '{' extendedAttributeInner '}' extendedAttributeInner
 	| otherOrComma extendedAttributeInner
-	| /* empty */
-;
+	| // empty
+*/
 
 other
-	: INTEGER_WEBIDL
-	| FLOAT_WEBIDL
-	| IDENTIFIER_WEBIDL
-	| STRING_WEBIDL
-	| OTHER_WEBIDL
-	| '-'
-	| '-Infinity'
-	| '.'
-	| '...'
-	| ':'
-	| ';'
-	| '<'
-	| '='
-	| '>'
-	| '?'
-	| 'ByteString'
-	| 'DOMString'
-	| 'FrozenArray'
-	| 'Infinity'
-	| 'NaN'
-	| 'RegExp'
-	| 'USVString'
-	| 'any'
-	| 'boolean'
-	| 'byte'
-	| 'double'
-	| 'false'
-	| 'float'
-	| 'long'
-	| 'null'
-	| 'object'
-	| 'octet'
-	| 'or'
-	| 'optional'
-	| 'sequence'
-	| 'short'
-	| 'true'
-	| 'unsigned'
-	| 'void'
-	| argumentNameKeyword
-	| bufferRelatedType
-;
-
-argumentNameKeyword
-	: 'attribute'
-	| 'callback'
-	| 'const'
-	| 'deleter'
-	| 'dictionary'
-	| 'enum'
-	| 'getter'
-	| 'implements'
-	| 'inherit'
-	| 'interface'
-	| 'iterable'
-	| 'legacycaller'
-	| 'maplike'
-	| 'partial'
-	| 'required'
-	| 'serializer'
-	| 'setlike'
-	| 'setter'
-	| 'static'
-	| 'stringifier'
-	| 'typedef'
-	| 'unrestricted'
-;
+    : INTEGER_WEBIDL
+    | DECIMAL_WEBIDL
+    | IDENTIFIER_WEBIDL
+    | STRING_WEBIDL
+    | OTHER_WEBIDL
+    | '-'
+    | '-Infinity'
+    | '.'
+    | '...'
+    | ':'
+    | ';'
+    | '<'
+    | '='
+    | '>'
+    | '?'
+    | 'ByteString'
+    | 'DOMString'
+    | 'FrozenArray'
+    | 'Infinity'
+    | 'NaN'
+    | 'ObservableArray'
+    | 'Promise'
+    | 'USVString'
+    | 'any'
+    | 'bigint'
+    | 'boolean'
+    | 'byte'
+    | 'double'
+    | 'false'
+    | 'float'
+    | 'long'
+    | 'null'
+    | 'object'
+    | 'octet'
+    | 'or'
+    | 'optional'
+    | 'record'
+    | 'sequence'
+    | 'short'
+    | 'symbol'
+    | 'true'
+    | 'unsigned'
+    | 'undefined'
+    | argumentNameKeyword
+    | bufferRelatedType
+    ;
 
 otherOrComma
-	: other
-	| ','
-;
-
-type
-	: singleType
-	| unionType null_
-;
-
-singleType
-	: nonAnyType
-	| 'any'
-;
-
-unionType
-	: '(' unionMemberType 'or' unionMemberType unionMemberTypes ')'
-;
-
-unionMemberType
-	: nonAnyType
-	| unionType null_
-;
-
-unionMemberTypes
-	: 'or' unionMemberType unionMemberTypes
-	| /* empty */
-;
-
-nonAnyType
-	: primitiveType  null_
-	| promiseType null_
-	| 'ByteString'  null_
-	| 'DOMString'  null_
-	| 'USVString'  null_
-	| IDENTIFIER_WEBIDL  null_
-	| 'sequence' '<' type '>' null_
-	| 'object'  null_
-	| 'RegExp'  null_
-	| 'DOMException'  null_
-	| bufferRelatedType  null_
-	| 'FrozenArray' '<' type '>' null_
-;
-
-bufferRelatedType
-	: 'ArrayBuffer'
-	| 'DataView'
-	| 'Int8Array'
-	| 'Int16Array'
-	| 'Int32Array'
-	| 'Uint8Array'
-	| 'Uint16Array'
-	| 'Uint32Array'
-	| 'Uint8ClampedArray'
-	| 'Float32Array'
-	| 'Float64Array'
-;
-
-constType
-	: primitiveType null_
-	| IDENTIFIER_WEBIDL null_
-;
-
-primitiveType
-	: unsignedIntegerType
-	| unrestrictedFloatType
-	| 'boolean'
-	| 'byte'
-	| 'octet'
-;
-
-unrestrictedFloatType
-	: 'unrestricted' floatType
-	| floatType
-;
-
-floatType
-	: 'float'
-	| 'double'
-;
-
-unsignedIntegerType
-	: 'unsigned' integerType
-	| integerType
-;
-
-integerType
-	: 'short'
-	| 'long' optionalLong
-;
-
-optionalLong
-	: 'long'
-	| /* empty */
-;
-
-promiseType
-	: 'Promise' '<' returnType '>'
-;
-
-null_
-	: '?'
-	| /* empty */
-;
-
-returnType
-	: type
-	| 'void'
-;
+    : other
+    | ','
+    ;
 
 identifierList
-	: IDENTIFIER_WEBIDL identifiers
-;
+    : IDENTIFIER_WEBIDL identifiers
+    ;
 
 identifiers
-	: ',' IDENTIFIER_WEBIDL identifiers
-	| /* empty */
-;
+    : ',' IDENTIFIER_WEBIDL identifiers
+    | /* empty */
+    ;
 
 extendedAttributeNoArgs
-	: IDENTIFIER_WEBIDL
-;
+    : IDENTIFIER_WEBIDL
+    ;
 
 extendedAttributeArgList
-	: IDENTIFIER_WEBIDL '(' argumentList ')'
-;
+    : IDENTIFIER_WEBIDL '(' argumentList ')'
+    ;
 
 extendedAttributeIdent
-	: IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL
-;
+    : IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL
+    ;
 
 extendedAttributeIdentList
-	: IDENTIFIER_WEBIDL '=' '(' identifierList ')'
-;
+    : IDENTIFIER_WEBIDL '=' '(' identifierList ')'
+    ;
 
 extendedAttributeNamedArgList
-	: IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL '(' argumentList ')'
-;
+    : IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL '(' argumentList ')'
+    ;
 
+/* Chromium IDL also allows string literals in extendedAttributes
+https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/blink/renderer/bindings/IDLExtendedAttributes.md
+*/
+extendedAttributeString
+    : IDENTIFIER_WEBIDL '=' STRING_WEBIDL
+    ;
+
+extendedAttributeStringList
+    : IDENTIFIER_WEBIDL '=' '(' stringList ')'
+    ;
+
+stringList
+    : STRING_WEBIDL strings
+    ;
+
+strings
+    : ',' STRING_WEBIDL strings
+    | /* empty */
+    ;
 
 INTEGER_WEBIDL
-	: '-'?('0'([Xx][0-9A-Fa-f]+|[0-7]*)|[1-9][0-9]*)
-;
+    : '-'? ('0' ([Xx][0-9A-Fa-f]+ | [0-7]*) | [1-9][0-9]*)
+    ;
 
-FLOAT_WEBIDL
-	: '-'?(([0-9]+'.'[0-9]*|[0-9]*'.'[0-9]+)([Ee][+\-]?[0-9]+)?|[0-9]+[Ee][+\-]?[0-9]+)
-;
+DECIMAL_WEBIDL
+    : '-'? (
+        ([0-9]+ '.' [0-9]* | [0-9]* '.' [0-9]+) ([Ee][+\-]? [0-9]+)?
+        | [0-9]+ [Ee][+\-]? [0-9]+
+    )
+    ;
 
 IDENTIFIER_WEBIDL
-	: [A-Z_a-z][0-9A-Z_a-z]*
-;
+    : [_-]? [A-Z_a-z][0-9A-Z_a-z]*
+    ;
 
 STRING_WEBIDL
-	: '"' ~["]* '"'
-;
+    : '"' ~["]* '"'
+    ;
 
 WHITESPACE_WEBIDL
-	: [\t\n\r ]+ -> channel(HIDDEN)
-;
+    : [\t\n\r ]+ -> channel(HIDDEN)
+    ;
 
 COMMENT_WEBIDL
-	: ('//'~[\n\r]*|'/*'(.|'\n')*?'*/')+ -> channel(HIDDEN)
-; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
+    : ('//' ~[\n\r]* | '/*' (. | '\n')*? '*/')+ -> channel(HIDDEN)
+    ; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
 
 OTHER_WEBIDL
-	: ~[\t\n\r 0-9A-Z_a-z]
-;
+    : ~[\t\n\r 0-9A-Z_a-z]
+    ;

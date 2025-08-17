@@ -1,10 +1,12 @@
+///{packageLine}
+
 import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlLexerBase extends Lexer
 {
     public PlSqlLexerBase(CharStream input)
-	{
-		super(input);
+    {
+        super(input);
     }
 
     protected boolean IsNewlineAtPos(int pos)

@@ -1,10 +1,92 @@
 version: 2
 updates:
+  # dotnet tools
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+    ignore:
+      - dependency-name: "tr*"
+        update-types: ["version-update:semver-patch"]
+  # Java
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:java"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  - package-ecosystem: "nuget"
+    directory: "/_scripts/templates/CSharp"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:csharp-standard"
+  # Dart
+  - package-ecosystem: "pub"
+    directory: "/_scripts/templates/Dart"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:dart"
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/_scripts/templates/Go"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "all"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # JavaScript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/JavaScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:javascript"
+  # PHP
+  - package-ecosystem: "composer"
+    directory: "/_scripts/templates/PHP"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:php"
+  # Python3
+  - package-ecosystem: "pip"
+    directory: "/_scripts/templates/Python3"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:python3"
+  # TypeScript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/TypeScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:typescript"

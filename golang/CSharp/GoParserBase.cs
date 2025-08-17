@@ -1,159 +1,130 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Antlr4.Runtime;
-using static GoParseTree.GoLexer;
 
-namespace GoParseTree
+public abstract class GoParserBase : Parser
 {
-    public abstract class GoParserBase : Parser
+    const bool debug = false;
+    HashSet<string> table = new HashSet<string>();
+
+    protected GoParserBase(ITokenStream input)
+        : base(input)
     {
-        protected GoParserBase(ITokenStream input)
-            : base(input)
+    }
+
+    protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
+        : base(input, output, errorOutput)
+    {
+    }
+
+    private ITokenStream tokenStream
+    {
+        get
         {
+            return TokenStream;
         }
+    }
 
-    #if ANTLR_STANDARD
-        protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
-            : base(input, output, errorOutput)
+    protected void myreset()
+    {
+        table = new HashSet<string>();
+    }
+
+    protected bool closingBracket()
+    {
+        var la = tokenStream.LT(1);
+        return la.Type == GoParser.R_PAREN || la.Type == GoParser.R_CURLY || la.Type == Eof;
+    }
+
+    public bool isNotReceive()
+    {
+        var la = tokenStream.LT(2);
+        return la.Type != GoParser.RECEIVE;
+    }
+
+    public void addImportSpec()
+    {
+        var ctx = this.Context;
+        var count = ctx.ChildCount;
+        var importSpec = ctx as GoParser.ImportSpecContext;
+        if (importSpec == null) return;
+        var packageName = importSpec.packageName();
+        if (packageName != null)
         {
+            var name = packageName.GetText();
+            if (debug) System.Console.WriteLine("Entering " + name);
+            table.Add(name);
         }
-    #endif
-
-        /// <summary>
-        /// Returns `true` if on the current index of the parser's
-        /// token stream a token exists on the `HIDDEN` channel which
-        /// either is a line terminator, or is a multi line comment that
-        /// contains a line terminator.
-        /// </summary>
-        protected bool lineTerminatorAhead()
+        else
         {
-            // Get the token ahead of the current index.
-            int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
-
-            if (possibleIndexEosToken == -1)
-            {
-                return true;
-            }
-
-            IToken ahead = tokenStream.Get(possibleIndexEosToken);
-            if (ahead.Channel != Lexer.Hidden)
-            {
-                // We're only interested in tokens on the HIDDEN channel.
-                return false;
-            }
-
-            if (ahead.Type == TERMINATOR)
-            {
-                // There is definitely a line terminator ahead.
-                return true;
-            }
-
-            if (ahead.Type == WS)
-            {
-                // Get the token ahead of the current whitespaces.
-                possibleIndexEosToken = CurrentToken.TokenIndex - 2;
-
-                if (possibleIndexEosToken == -1)
-                {
-                    return true;
-                }
-
-                ahead = tokenStream.Get(possibleIndexEosToken);
-            }
-
-            // Get the token's text and type.
-            String text = ahead.Text;
-            int type = ahead.Type;
-
-            // Check if the token is, or contains a line terminator.
-            return type == COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
-                   type == TERMINATOR;
+            var name = importSpec.importPath().GetText();
+            name = name.Replace("\"", "");
+            name = name.Replace("\\", "/");
+            string[] pathArr = name.Split('/');
+            string[] fileArr = pathArr.Last().Split('.');
+            string fileName = fileArr.Last().ToString();
+            if (debug) System.Console.WriteLine("Entering " + fileName);
+            table.Add(fileName);
         }
+    }
 
-        /// <summary>
-        /// Returns `true` if no line terminator exists between the specified
-        /// token offset and the prior one on the `HIDDEN` channel.
-        /// </summary>
-        protected bool noTerminatorBetween(int tokenOffset)
+    public bool isOperand()
+    {
+        var la = tokenStream.LT(1);
+        if (la.Text == "err") return true;
+        bool result = true;
+        if (la.Type != GoParser.IDENTIFIER) {
+            if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        result = table.Contains(la.Text);
+        var la2 = tokenStream.LT(2);
+        // If it's not followed by a '.', then it really should be
+        // considered as operand.
+        if (la2.Type != GoParser.DOT) {
+            result = true;
+            if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+            return result;
+        }
+        // If it's followed by '.', and then followed by '(', then
+        // it is a typeAssertion, and so la must be an operand.
+        var la3 = tokenStream.LT(3);
+        if (la3.Type == GoParser.L_PAREN)
         {
-            BufferedTokenStream stream = (BufferedTokenStream)tokenStream;
-            IList<IToken> tokens = stream.GetHiddenTokensToLeft(LT(stream, tokenOffset).TokenIndex);
-
-            if (tokens == null)
-            {
-                return true;
-            }
-
-            foreach (IToken token in tokens)
-            {
-                if (token.Text.Contains("\n"))
-                    return false;
-            }
-
-            return true;
+            result = true;
+            if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+            return result;
         }
+        if (debug) System.Console.WriteLine("isOperand Returning " + result + " for " + la);
+        return result;
+    }
 
-        /// <summary>
-        /// Returns `true` if no line terminator exists after any encountered
-        /// parameters beyond the specified token offset and the next on the
-        /// `HIDDEN` channel.
-        /// </summary>
-        protected bool noTerminatorAfterParams(int tokenOffset)
-        {
-            BufferedTokenStream stream = (BufferedTokenStream) tokenStream;
-            int leftParams = 1;
-            int rightParams = 0;
+    public bool isConversion()
+    {
+        var la = tokenStream.LT(1);
+        var result = la.Type != GoParser.IDENTIFIER;
+        if (debug) System.Console.WriteLine("isConversion Returning " + result + " for " + la);
+        return result;
+    }
 
-            if (LT(stream, tokenOffset).Type == L_PAREN)
-            {
-                // Scan past parameters
-                while (leftParams != rightParams)
-                {
-                    tokenOffset++;
-                    int tokenType = LT(stream, tokenOffset).Type;
-
-                    if (tokenType == L_PAREN)
-                    {
-                        leftParams++;
-                    }
-                    else if (tokenType == R_PAREN)
-                    {
-                        rightParams++;
-                    }
-                }
-
-                tokenOffset++;
-                return noTerminatorBetween(tokenOffset);
-            }
-
-            return true;
+    public bool isMethodExpr()
+    {
+        var la = tokenStream.LT(1);
+        bool result = true;
+        // See if it looks like a method expr.
+        if (la.Type == GoParser.STAR) {
+            if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+            return result;
         }
-
-        protected bool checkPreviousTokenText(string text)
-        {
-            return LT(tokenStream, 1).Text?.Equals(text) ?? false;
+        if (la.Type != GoParser.IDENTIFIER) {
+            result = false;
+            if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+            return result;
         }
-
-        private IToken LT(ITokenStream stream, int k)
-        {
-        #if ANTLR_STANDARD
-            return stream.LT(k);
-        #else
-            return stream.Lt(k);
-        #endif
-        }
-
-        private ITokenStream tokenStream
-        {
-            get
-            {
-            #if ANTLR_STANDARD
-                return TokenStream;
-            #else
-                return _input;
-            #endif
-            }
-        }
+        result = ! table.Contains(la.Text);
+        if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+        return result;
     }
 }

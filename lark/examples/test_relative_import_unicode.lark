@@ -1,0 +1,3 @@
+start: UNICODE
+
+%import .grammars.test_unicode.UNICODE

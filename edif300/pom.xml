@@ -5,7 +5,6 @@
     <groupId>org.antlr.grammars</groupId>
     <artifactId>grammarsv4</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>edif300</artifactId>
   <name>EDIF 3 0 0 grammar</name>

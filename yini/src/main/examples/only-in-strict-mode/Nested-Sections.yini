@@ -1,0 +1,17 @@
+^ DatabaseConfig
+Host = "db.example.com"
+Port = 3306
+User = "root"
+Password = "secret"
+
+    ^^ Logging
+    LogFilePath = "/var/log/db.log"
+    LogLevel = "info"
+    EnableRotation = YES
+    MaxLogSize = 1e6  // 1 MB
+
+        ^^^ RotationSettings
+        MaxLogCount = 5
+        RotationInterval = "daily"
+
+/END
