@@ -5,211 +5,214 @@ Copyright Arroyo Networks 2019
 Authors: Josh Marshall
 */
 
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 parser grammar RegoParser;
 
-options { tokenVocab=RegoLexer; }
-
-
+options {
+    tokenVocab = RegoLexer;
+}
 
 /*****************************************************************************/
 /* Rules */
 
-root  
-  : stmt* EOF
-  ;
+root
+    : stmt* EOF
+    ;
 
 stmt
-  : regoPackage
-  | importDirective
-  | regoRules
-  | regoBody
-  ;
+    : regoPackage
+    | importDirective
+    | regoRules
+    | regoBody
+    ;
 
 /*****************************************************************************/
 
 regoPackage
-  : Package ref 
-  ;
+    : Package ref
+    ;
 
 /*****************************************************************************/
 
 importDirective
-  : Import import_target=ref ( As import_target_rename_as=ref )?
-  ;
+    : Import import_target = ref (As import_target_rename_as = ref)?
+    ;
 
 /*****************************************************************************/
 
-regoRules 
-  : Default Name EqOper term
-  | ruleHead ruleBody*
-  ;
+regoRules
+    : Default Name EqOper term
+    | ruleHead ruleBody*
+    ;
 
-ruleHead 
-  : Name ( LParan exprTermList? RParan )? ( LSBrace exprTerm RSBrace )? ( EqOper exprTerm )? 
-  ;
+ruleHead
+    : Name (LParan exprTermList? RParan)? (LSBrace exprTerm RSBrace)? (EqOper exprTerm)?
+    ;
 
 ruleBody
-  : ( Else (EqOper exprTerm)? )? nonEmptyBraceEnclosedBody
-  ;
+    : (Else (EqOper exprTerm)?)? nonEmptyBraceEnclosedBody
+    ;
 
-ruleExt 
-  : regoElse
-  | nonEmptyBraceEnclosedBody
-  ;
+ruleExt
+    : regoElse
+    | nonEmptyBraceEnclosedBody
+    ;
 
-regoElse 
-  : Else EqOper term nonEmptyBraceEnclosedBody
-  | Else nonEmptyBraceEnclosedBody
-  ;
+regoElse
+    : Else EqOper term nonEmptyBraceEnclosedBody
+    | Else nonEmptyBraceEnclosedBody
+    ;
 
 /*****************************************************************************/
 
-regoBody 
-  : query 
-  | nonEmptyBraceEnclosedBody
-  ;
+regoBody
+    : query
+    | nonEmptyBraceEnclosedBody
+    ;
 
-nonEmptyBraceEnclosedBody 
-  : LCBrace query RCBrace
-  ;
+nonEmptyBraceEnclosedBody
+    : LCBrace query RCBrace
+    ;
 
 query
-  : literal ( Semicolon? literal )*
-  ;
+    : literal (Semicolon? literal)*
+    ;
 
-literal 
-  : Not? literalExpr withKeyword*
-  ;
+literal
+    : Not? literalExpr withKeyword*
+    ;
 
-literalExpr 
-  : exprTerm (EqOper exprTerm)*
-  ;
+literalExpr
+    : exprTerm (EqOper exprTerm)*
+    ;
 
-withKeyword 
-  : With exprTerm As exprTerm
-  ;
+withKeyword
+    : With exprTerm As exprTerm
+    ;
 
 functionCall
-  : ref LParan exprTermList? RParan
-  ;
+    : ref LParan exprTermList? RParan
+    ;
 
 /*****************************************************************************/
 
-exprTermPair 
-  : exprTerm Colon exprTerm
-  ;
+exprTermPair
+    : exprTerm Colon exprTerm
+    ;
 
-termPair 
-  : term Colon term
-  ;
+termPair
+    : term Colon term
+    ;
 
-exprTermPairList 
-  : exprTermPair ( Comma exprTermPair )*
-  ;
-
-/*****************************************************************************/
-
-exprTerm 
-  : relationExpr ( RelationOperator relationExpr )*
-  ;
-
-exprTermList 
-  : exprTerm ( Comma exprTerm )*
-  ;
-
-relationExpr 
-  : bitwiseOrExpr ( Mid bitwiseOrExpr )*
-  ;
-
-bitwiseOrExpr 
-  : bitwiseAndExpr ( Ampersand bitwiseAndExpr )*
-  ;
-
-bitwiseAndExpr 
-  : arithExpr ( ArithOperator arithExpr )*
-  ;
-
-arithExpr 
-  : factorExpr ( FactorOperator factorExpr )*
-  ;
-
-factorExpr 
-  : LParan exprTerm RParan
-  | term 
-  ;
-
-term 
-  : arrayComprehension 
-  | objectComprehension 
-  | setComprehension 
-  | object_ 
-  | array_ 
-  | set_ 
-  | ArithOperator? scalar 
-  | functionCall
-  | Not? ref
-  ;
+exprTermPairList
+    : exprTermPair (Comma exprTermPair)*
+    ;
 
 /*****************************************************************************/
 
-arrayComprehension 
-  : LSBrace term Mid query RSBrace
-  ;
+exprTerm
+    : relationExpr (RelationOperator relationExpr)*
+    ;
 
-setComprehension 
-  : LCBrace term Mid query RCBrace
-  ;
+exprTermList
+    : exprTerm (Comma exprTerm)*
+    ;
 
-objectComprehension 
-  : LCBrace termPair Mid query RCBrace
-  ;
+relationExpr
+    : bitwiseOrExpr (Mid bitwiseOrExpr)*
+    ;
 
-object_ 
-  : LCBrace ( objectItem ( Comma objectItem )* Comma? )? RCBrace
-  ;
+bitwiseOrExpr
+    : bitwiseAndExpr (Ampersand bitwiseAndExpr)*
+    ;
+
+bitwiseAndExpr
+    : arithExpr (ArithOperator arithExpr)*
+    ;
+
+arithExpr
+    : factorExpr (FactorOperator factorExpr)*
+    ;
+
+factorExpr
+    : LParan exprTerm RParan
+    | term
+    ;
+
+term
+    : arrayComprehension
+    | objectComprehension
+    | setComprehension
+    | object_
+    | array_
+    | set_
+    | ArithOperator? scalar
+    | functionCall
+    | Not? ref
+    ;
+
+/*****************************************************************************/
+
+arrayComprehension
+    : LSBrace term Mid query RSBrace
+    ;
+
+setComprehension
+    : LCBrace term Mid query RCBrace
+    ;
+
+objectComprehension
+    : LCBrace termPair Mid query RCBrace
+    ;
+
+object_
+    : LCBrace (objectItem ( Comma objectItem)* Comma?)? RCBrace
+    ;
 
 objectItem
-  : ( scalar | ref ) Colon term
-  ;
+    : (scalar | ref) Colon term
+    ;
 
-array_ 
-  : LSBrace exprTermList? RSBrace
-  ;
+array_
+    : LSBrace exprTermList? RSBrace
+    ;
 
-set_ 
-  : emptySet 
-  | nonEmptySet
-  ;
+set_
+    : emptySet
+    | nonEmptySet
+    ;
 
 emptySet
-  : Set RParan
-  ;
+    : Set RParan
+    ;
 
 nonEmptySet
-  : LCBrace exprTermList RCBrace
-  ;
+    : LCBrace exprTermList RCBrace
+    ;
 
-ref 
-  : Name refOperand*
-  ;
+ref
+    : Name refOperand*
+    ;
 
-refOperand 
-  : refOperandDot 
-  | refOperandCanonical
-  ;
+refOperand
+    : refOperandDot
+    | refOperandCanonical
+    ;
 
 /*Allow an exprTerm here for more dynamic lookups?*/
-refOperandDot 
-  : Dot Name 
-  ;
+refOperandDot
+    : Dot Name
+    ;
 
-refOperandCanonical 
-  : LSBrace exprTerm RSBrace
-  ;
+refOperandCanonical
+    : LSBrace exprTerm RSBrace
+    ;
 
-scalar 
-  : UnsignedNumber 
-  | String 
-  | Bool 
-  | Null
-  ;
+scalar
+    : UnsignedNumber
+    | String
+    | Bool
+    | Null
+    ;

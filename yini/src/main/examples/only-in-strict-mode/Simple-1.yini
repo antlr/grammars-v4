@@ -1,0 +1,5 @@
+^ conf
+
+name = "My Program Name"
+
+/END // End of YINI doc in strict mode.

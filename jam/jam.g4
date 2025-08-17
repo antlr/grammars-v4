@@ -29,85 +29,88 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar jam;
 
 jam
-   : section* EOF
-   ;
+    : section* EOF
+    ;
 
 section
-   : measure ('|' measure)*
-   ;
+    : measure ('|' measure)*
+    ;
 
 measure
-   : meter? (chord | repeatchord | rest | extendchord | repeatmeasure)+
-   ;
+    : meter? (chord | repeatchord | rest | extendchord | repeatmeasure)+
+    ;
 
 chord
-   : note (chordquality bass?)
-   ;
+    : note (chordquality bass?)
+    ;
 
 chordquality
-   : ('m' | 'M' | 'P' | 'd' | 'maj' | 'min' | 'dim' | 'aug')? NUM? (('-' | '+') NUM)?
-   ;
+    : ('m' | 'M' | 'P' | 'd' | 'maj' | 'min' | 'dim' | 'aug')? NUM? (('-' | '+') NUM)?
+    ;
 
 repeatchord
-   : SLASH
-   ;
+    : SLASH
+    ;
 
 extendchord
-   : EQ
-   ;
+    : EQ
+    ;
 
 repeatmeasure
-   : PCT
-   ;
+    : PCT
+    ;
 
 rest
-   : REST
-   ;
+    : REST
+    ;
 
 bass
-   : SLASH KEY
-   ;
+    : SLASH KEY
+    ;
 
 note
-   : KEY ('b' | '#')?
-   ;
+    : KEY ('b' | '#')?
+    ;
 
 meter
-   : '[' NUM '/' NUM ']'
-   ;
+    : '[' NUM '/' NUM ']'
+    ;
 
 KEY
-   : [A-G]
-   ;
+    : [A-G]
+    ;
 
 REST
-   : '-'
-   ;
+    : '-'
+    ;
 
 SLASH
-   : '/'
-   ;
+    : '/'
+    ;
 
 EQ
-   : '='
-   ;
+    : '='
+    ;
 
 PCT
-   : '%'
-   ;
+    : '%'
+    ;
 
 NUM
-   : [0-9]+
-   ;
+    : [0-9]+
+    ;
 
 COMMENT
-   : '#' ~ [\n\r]+ -> skip
-   ;
+    : '#' ~ [\n\r]+ -> skip
+    ;
 
 WS
-   : [ \r\n\t]+ -> skip
-   ;
-
+    : [ \r\n\t]+ -> skip
+    ;

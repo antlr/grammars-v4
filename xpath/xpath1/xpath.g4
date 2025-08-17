@@ -1,3 +1,6 @@
+// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
 grammar xpath;
 
 /*
@@ -51,254 +54,316 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+main
+    : expr EOF
+    ;
 
-main  :  expr EOF
-  ;
-
-locationPath 
-  :  relativeLocationPath
-  |  absoluteLocationPathNoroot
-  ;
+locationPath
+    : relativeLocationPath
+    | absoluteLocationPathNoroot
+    ;
 
 absoluteLocationPathNoroot
-  :  '/' relativeLocationPath
-  |  '//' relativeLocationPath
-  ;
+    : '/' relativeLocationPath
+    | '//' relativeLocationPath
+    ;
 
 relativeLocationPath
-  :  step (('/'|'//') step)*
-  ;
+    : step (('/' | '//') step)*
+    ;
 
-step  :  axisSpecifier nodeTest predicate*
-  |  abbreviatedStep
-  ;
+step
+    : axisSpecifier nodeTest predicate*
+    | abbreviatedStep
+    ;
 
 axisSpecifier
-  :  AxisName '::'
-  |  AT?
-  ;
+    : AxisName '::'
+    | AT?
+    ;
 
-nodeTest:  nameTest
-  |  NodeType '(' ')'
-  |  'processing-instruction' '(' Literal ')'
-  ;
+nodeTest
+    : nameTest
+    | NodeType '(' ')'
+    | 'processing-instruction' '(' Literal ')'
+    ;
 
 predicate
-  :  '[' expr ']'
-  ;
+    : '[' expr ']'
+    ;
 
 abbreviatedStep
-  :  '.'
-  |  '..'
-  ;
+    : '.'
+    | '..'
+    ;
 
-expr  :  orExpr
-  ;
+expr
+    : orExpr
+    ;
 
 primaryExpr
-  :  variableReference
-  |  '(' expr ')'
-  |  Literal
-  |  Number  
-  |  functionCall
-  ;
+    : variableReference
+    | '(' expr ')'
+    | Literal
+    | Number
+    | functionCall
+    ;
 
 functionCall
-  :  functionName '(' ( expr ( ',' expr )* )? ')'
-  ;
+    : functionName '(' (expr ( ',' expr)*)? ')'
+    ;
 
 unionExprNoRoot
-  :  pathExprNoRoot ('|' unionExprNoRoot)?
-  |  '/' '|' unionExprNoRoot
-  ;
+    : pathExprNoRoot ('|' unionExprNoRoot)?
+    | '/' '|' unionExprNoRoot
+    ;
 
 pathExprNoRoot
-  :  locationPath
-  |  filterExpr (('/'|'//') relativeLocationPath)?
-  ;
+    : locationPath
+    | filterExpr (('/' | '//') relativeLocationPath)?
+    ;
 
 filterExpr
-  :  primaryExpr predicate*
-  ;
+    : primaryExpr predicate*
+    ;
 
-orExpr  :  andExpr (OR andExpr)*
-  ;
+orExpr
+    : andExpr (OR andExpr)*
+    ;
 
-andExpr  :  equalityExpr (AND equalityExpr)*
-  ;
+andExpr
+    : equalityExpr (AND equalityExpr)*
+    ;
 
 equalityExpr
-  :  relationalExpr (('='|'!=') relationalExpr)*
-  ;
+    : relationalExpr (('=' | '!=') relationalExpr)*
+    ;
 
 relationalExpr
-  :  additiveExpr (('<'|'>'|'<='|'>=') additiveExpr)*
-  ;
+    : additiveExpr (('<' | '>' | '<=' | '>=') additiveExpr)*
+    ;
 
 additiveExpr
-  :  multiplicativeExpr (('+'|'-') multiplicativeExpr)*
-  ;
+    : multiplicativeExpr (('+' | '-') multiplicativeExpr)*
+    ;
 
 multiplicativeExpr
-  :  unaryExprNoRoot (('*'|DIV|MOD) multiplicativeExpr)?
-  |  '/' ((DIV|MOD) multiplicativeExpr)?
-  ;
+    : unaryExprNoRoot (('*' | DIV | MOD) multiplicativeExpr)?
+    | '/' ((DIV | MOD) multiplicativeExpr)?
+    ;
 
 unaryExprNoRoot
-  :  '-'* unionExprNoRoot
-  ;
+    : '-'* unionExprNoRoot
+    ;
 
-qName  :  nCName (':' nCName)?
-  ;
+qName
+    : nCName (':' nCName)?
+    ;
 
 // Does not match NodeType, as per spec.
 functionName
-  :  nCName ':' nCName
-  |  NCName
-  |  AxisName
-  |  AND
-  |  OR
-  |  DIV
-  |  MOD
-  ;
+    : nCName ':' nCName
+    | NCName
+    | AxisName
+    | AND
+    | OR
+    | DIV
+    | MOD
+    ;
 
 variableReference
-  :  '$' qName
-  ;
+    : '$' qName
+    ;
 
-nameTest:  '*'
-  |  nCName ':' '*'
-  |  qName
-  ;
+nameTest
+    : '*'
+    | nCName ':' '*'
+    | qName
+    ;
 
-nCName  :  NCName
-  |  AxisName
-  |  NodeType
-  |  AND
-  |  OR
-  |  DIV
-  |  MOD
-  ;
+nCName
+    : NCName
+    | AxisName
+    | NodeType
+    | AND
+    | OR
+    | DIV
+    | MOD
+    ;
 
-NodeType:  'comment'
-  |  'text'
-  |  'processing-instruction'
-  |  'node'
-  ;
-  
-Number  :  Digits ('.' Digits?)?
-  |  '.' Digits
-  ;
+NodeType
+    : 'comment'
+    | 'text'
+    | 'processing-instruction'
+    | 'node'
+    ;
 
-fragment
-Digits  :  ('0'..'9')+
-  ;
+Number
+    : Digits ('.' Digits?)?
+    | '.' Digits
+    ;
 
-AxisName:  'ancestor'
-  |  'ancestor-or-self'
-  |  'attribute'
-  |  'child'
-  |  'descendant'
-  |  'descendant-or-self'
-  |  'following'
-  |  'following-sibling'
-  |  'namespace'
-  |  'parent'
-  |  'preceding'
-  |  'preceding-sibling'
-  |  'self'
-  ;
+fragment Digits
+    : ('0' ..'9')+
+    ;
 
+AxisName
+    : 'ancestor'
+    | 'ancestor-or-self'
+    | 'attribute'
+    | 'child'
+    | 'descendant'
+    | 'descendant-or-self'
+    | 'following'
+    | 'following-sibling'
+    | 'namespace'
+    | 'parent'
+    | 'preceding'
+    | 'preceding-sibling'
+    | 'self'
+    ;
 
-  PATHSEP 
-       :'/';
-  ABRPATH   
-       : '//';
-  LPAR   
-       : '(';
-  RPAR   
-       : ')';
-  LBRAC   
-       :  '[';
-  RBRAC   
-       :  ']';
-  MINUS   
-       :  '-';
-  PLUS   
-       :  '+';
-  DOT   
-       :  '.';
-  MUL   
-       : '*';
-  DOTDOT   
-       :  '..';
-  AT   
-       : '@';
-  COMMA  
-       : ',';
-  PIPE   
-       :  '|';
-  LESS   
-       :  '<';
-  MORE_ 
-       :  '>';
-  LE   
-       :  '<=';
-  GE   
-       :  '>=';
-  COLON   
-       :  ':';
-  CC   
-       :  '::';
-  APOS   
-       :  '\'';
-  QUOT   
-       :  '"';
-  AND
-       :  'and';
-  OR
-       :  'or';
-  DIV
-       :  'div';
-  MOD
-       :  'mod';
+PATHSEP
+    : '/'
+    ;
 
-  
-Literal  :  '"' ~'"'* '"'
-  |  '\'' ~'\''* '\''
-  ;
+ABRPATH
+    : '//'
+    ;
+
+LPAR
+    : '('
+    ;
+
+RPAR
+    : ')'
+    ;
+
+LBRAC
+    : '['
+    ;
+
+RBRAC
+    : ']'
+    ;
+
+MINUS
+    : '-'
+    ;
+
+PLUS
+    : '+'
+    ;
+
+DOT
+    : '.'
+    ;
+
+MUL
+    : '*'
+    ;
+
+DOTDOT
+    : '..'
+    ;
+
+AT
+    : '@'
+    ;
+
+COMMA
+    : ','
+    ;
+
+PIPE
+    : '|'
+    ;
+
+LESS
+    : '<'
+    ;
+
+MORE_
+    : '>'
+    ;
+
+LE
+    : '<='
+    ;
+
+GE
+    : '>='
+    ;
+
+COLON
+    : ':'
+    ;
+
+CC
+    : '::'
+    ;
+
+APOS
+    : '\''
+    ;
+
+QUOT
+    : '"'
+    ;
+
+AND
+    : 'and'
+    ;
+
+OR
+    : 'or'
+    ;
+
+DIV
+    : 'div'
+    ;
+
+MOD
+    : 'mod'
+    ;
+
+Literal
+    : '"' ~'"'* '"'
+    | '\'' ~'\''* '\''
+    ;
 
 Whitespace
-  :  (' '|'\t'|'\n'|'\r')+ ->skip
-  ;
+    : (' ' | '\t' | '\n' | '\r')+ -> skip
+    ;
 
-NCName  :  NCNameStartChar NCNameChar*
-  ;
+NCName
+    : NCNameStartChar NCNameChar*
+    ;
 
-fragment
-NCNameStartChar
-  :  'A'..'Z'
-  |   '_'
-  |  'a'..'z'
-  |  '\u00C0'..'\u00D6'
-  |  '\u00D8'..'\u00F6'
-  |  '\u00F8'..'\u02FF'
-  |  '\u0370'..'\u037D'
-  |  '\u037F'..'\u1FFF'
-  |  '\u200C'..'\u200D'
-  |  '\u2070'..'\u218F'
-  |  '\u2C00'..'\u2FEF'
-  |  '\u3001'..'\uD7FF'
-  |  '\uF900'..'\uFDCF'
-  |  '\uFDF0'..'\uFFFD'
-  |  '\u{10000}'..'\u{EFFFF}'
-  ;
+fragment NCNameStartChar
+    : 'A' ..'Z'
+    | '_'
+    | 'a' ..'z'
+    | '\u00C0' ..'\u00D6'
+    | '\u00D8' ..'\u00F6'
+    | '\u00F8' ..'\u02FF'
+    | '\u0370' ..'\u037D'
+    | '\u037F' ..'\u1FFF'
+    | '\u200C' ..'\u200D'
+    | '\u2070' ..'\u218F'
+    | '\u2C00' ..'\u2FEF'
+    | '\u3001' ..'\uD7FF'
+    | '\uF900' ..'\uFDCF'
+    | '\uFDF0' ..'\uFFFD'
+    | '\u{10000}' ..'\u{EFFFF}'
+    ;
 
-fragment
-NCNameChar
-  :  NCNameStartChar | '-' | '.' | '0'..'9'
-  |  '\u00B7' | '\u0300'..'\u036F'
-  |  '\u203F'..'\u2040'
-  ;
-
-
+fragment NCNameChar
+    : NCNameStartChar
+    | '-'
+    | '.'
+    | '0' ..'9'
+    | '\u00B7'
+    | '\u0300' ..'\u036F'
+    | '\u203F' ..'\u2040'
+    ;

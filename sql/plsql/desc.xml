@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+   <antlr-version>^4.12.0</antlr-version>
+   <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+   <test>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+      <inputs>examples/**/*.sql</inputs>
+   </test>
+   <test>
+      <name>more</name>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
+      <inputs>more/**/*.sql</inputs>
+   </test>
+</desc>

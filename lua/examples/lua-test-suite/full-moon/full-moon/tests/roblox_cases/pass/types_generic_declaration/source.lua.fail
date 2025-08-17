@@ -1,0 +1,6 @@
+--!strict
+type Foo<T..., U...> = (U...) -> T...
+type Bar<U, T...> = nil
+type Function<Args... = ...any, Return... = ()> = (Args...) -> Return...
+type Baz<U = string, T... = (string, number)> = nil
+type Indexed<T...> = module.Indexed<T...>
