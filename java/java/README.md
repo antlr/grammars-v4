@@ -1,11 +1,11 @@
 # The optimized Java grammar
 
-This grammar is based on the optimized Java7 grammar
-by Terence Parr and Sam Harwell. This grammar does not exactly corresponds to the
-[Java Language Specification](https://docs.oracle.com/javase/specs/). It differs
-from the [java8](../java8), [java9](../java9), and [java20](../java20),
-which follow the JLS more closely. This grammar is optimized for performance,
-practical usage, and clarity.
+This grammar, based on the optimized Java7 grammar by Terence Parr and Sam Harwell,
+is optimized for performance, practical usage, and clarity. It does not correspond
+exactly to the [Java Language Specification](https://docs.oracle.com/javase/specs/).
+The [java8](../java8), [java9](../java9), and [java20](../java20) grammars
+follow the JLS, but are slower that this grammar due to ambiguity and max-k problems
+in the published JLS EBNF.
 
 This grammar parses the file [ManyStringsConcat.java](examples/ManyStringsConcat.java)
 faster than the original grammar without left recursion for expressions.
