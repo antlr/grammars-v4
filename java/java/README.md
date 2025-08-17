@@ -1,7 +1,10 @@
 # The optimized Java grammar
 
 This grammar, based on the optimized Java7 grammar by Terence Parr and Sam Harwell,
-is optimized for performance, practical usage, and clarity. It does not correspond
+is meant to parse the latest for the Java language, and is optimized for
+performance, practical usage, and clarity.
+
+It does not correspond
 exactly to the [Java Language Specification](https://docs.oracle.com/javase/specs/).
 The [java8](../java8), [java9](../java9), and [java20](../java20) grammars
 follow the JLS, but are slower that this grammar due to ambiguity and max-k problems
@@ -15,7 +18,10 @@ creating parse trees with long, single-child chains for each string literal cons
 because it avoids the large ATN-config set construction in the
 `AdaptivePredict()` parsing engine.
 
-## Supported Java version
+[Java Enhancement Proposals (JEP)](https://openjdk.org/jeps/0)
+are not implemented in this grammar.
+
+## Currently supported Java version
 * Java 24 (latest)
 
 ## Main contributors
