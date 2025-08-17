@@ -63,10 +63,6 @@ jobs:
       uses: actions/checkout@v5
       with:
         fetch-depth: 0
-    - name: Print PHP version
-      run: |
-        echo ${{ steps.setup-php.outputs.php-version }}
-        php --version
     - name: Test Dotnet
       run: |
         dotnet --version
