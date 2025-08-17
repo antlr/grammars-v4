@@ -137,6 +137,7 @@
 				<module>apex</module>
 				<module>apt</module>
 				<module>aql</module>
+                <module>arden</module>
 				<module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
@@ -168,6 +169,7 @@
 				<module>cobol85</module>
 				<module>codeql</module>
 				<module>cookie</module>
+				<module>corundum</module>
 				<module>cpp</module>
 				<module>cql</module>
 				<module>cql3</module>
@@ -178,6 +180,7 @@
 				<module>ctl</module>
 				<module>cto</module>
 				<module>cypher</module>
+                <module>d2</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>datalog</module>
@@ -214,6 +217,7 @@
 				<module>guido</module>
 				<module>guitartab</module>
 				<module>haskell</module>
+				<module>hexpat</module>
 				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
@@ -230,6 +234,7 @@
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
+				<module>javacc</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>joss</module>
@@ -266,7 +271,6 @@
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
-				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
@@ -285,23 +289,25 @@
 				<module>pddl</module>
 				<module>pdn</module>
 				<module>peoplecode</module>
+				<module>pf</module>
 				<module>pegen</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
+				<module>plantUML</module>
 				<module>pl0</module>
 				<module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
+				<module>powerquery</module>
 				<module>prolog</module>
 				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
-				<module>protobuf2</module>
-				<module>protobuf3</module>
+				<module>protobuf</module>
 				<module>prov-n</module>
 				<module>python</module>
 				<module>qif</module>
@@ -321,14 +327,14 @@
 				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
-                <module>ron</module>
+				<module>ron</module>
 				<module>rpn</module>
-				<module>ruby</module>
 				<module>rust</module>
+                <module>sapf</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
-                <module>semver</module>
+				<module>semver</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
@@ -392,6 +398,7 @@
 				<module>xsd-regex</module>
 				<module>xyz</module>
 				<module>yara</module>
+				<module>yini</module>
 				<module>z</module>
 			</modules>
 		</profile>

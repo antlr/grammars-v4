@@ -573,6 +573,7 @@ tableOption
     | tablespaceStorage                                           # tableOptionTablespace
     | TRANSACTIONAL '='? ('0' | '1')                              # tableOptionTransactional
     | UNION '='? '(' tables ')'                                   # tableOptionUnion
+    | WITH SYSTEM VERSIONING                                      # tableOptionWithSystemVersioning // MariaDB-specific only
     ;
 
 tableType
@@ -595,6 +596,19 @@ partitionFunctionDefinition
     | LINEAR? KEY (ALGORITHM '=' algType = ('1' | '2'))? '(' uidList ')' # partitionFunctionKey
     | RANGE ('(' expression ')' | COLUMNS '(' uidList ')')               # partitionFunctionRange
     | LIST ('(' expression ')' | COLUMNS '(' uidList ')')                # partitionFunctionList
+    | SYSTEM_TIME (expression | LIMIT expression) (
+        STARTS (TIMESTAMP timestampValue | timestampValue)
+    )? AUTO? partitionSystemVersionDefinitions? # partitionSystemVersion // MariaDB-specific
+    ;
+
+// MariaDB-specific
+partitionSystemVersionDefinitions
+    : '(' partitionSystemVersionDefinition (',' partitionSystemVersionDefinition)* ')'
+    ;
+
+// MariaDB-specific
+partitionSystemVersionDefinition
+    : PARTITION uid (HISTORY | CURRENT)
     ;
 
 subpartitionFunctionDefinition
@@ -709,7 +723,7 @@ alterSpecification
     | ADD indexFormat = (INDEX | KEY) ifNotExists? uid? indexType? // here ifNotExists is MariaDB-specific only
     indexColumnNames indexOption*                                                                                                              # alterByAddIndex
     | ADD (CONSTRAINT name = uid?)? PRIMARY KEY index = uid? indexType? indexColumnNames indexOption*                                          # alterByAddPrimaryKey
-    | ADD (CONSTRAINT name = uid?)? UNIQUE ifNotExists? indexFormat = (INDEX | KEY)? indexName = uid? indexType? indexColumnNames indexOption* #
+    | ADD (CONSTRAINT name = uid?)? UNIQUE indexFormat = (INDEX | KEY)? ifNotExists? indexName = uid? indexType? indexColumnNames indexOption* #
         alterByAddUniqueKey
     | ADD keyType = (FULLTEXT | SPATIAL) indexFormat = (INDEX | KEY)? uid? indexColumnNames indexOption* # alterByAddSpecialIndex
     | ADD (CONSTRAINT name = uid?)? FOREIGN KEY ifNotExists? // here ifNotExists is MariaDB-specific only
@@ -729,6 +743,7 @@ alterSpecification
     | DROP indexFormat = (INDEX | KEY) ifExists? uid                      # alterByDropIndex // here ifExists is MariaDB-specific only
     | RENAME indexFormat = (INDEX | KEY) uid TO uid                       # alterByRenameIndex
     | ALTER INDEX uid (VISIBLE | INVISIBLE)                               # alterByAlterIndexVisibility
+    | ALTER (KEY | INDEX) ifExists? uid NOT? IGNORED                      # alterByAlterIndexIgnore
     | DROP FOREIGN KEY ifExists? uid dottedId?                            # alterByDropForeignKey // here ifExists is MariaDB-specific only
     | DISABLE KEYS                                                        # alterByDisableKeys
     | ENABLE KEYS                                                         # alterByEnableKeys
@@ -832,7 +847,7 @@ dropSequence // sequence is MariaDB-specific only
 //    Other DDL statements
 
 renameTable
-    : RENAME TABLE renameTableClause (',' renameTableClause)*
+    : RENAME TABLE ifExists? renameTableClause (',' renameTableClause)*
     ;
 
 renameTableClause
@@ -1663,7 +1678,7 @@ privilege
     : ALL PRIVILEGES?
     | ALTER ROUTINE?
     | CREATE (TEMPORARY TABLES | ROUTINE | VIEW | USER | TABLESPACE | ROLE)?
-    | DELETE
+    | DELETE (HISTORY)? // HISTORY is MariaDB-specific
     | DROP (ROLE)?
     | EVENT
     | EXECUTE
@@ -2283,6 +2298,7 @@ dataType
     ) lengthOneDimension? (SIGNED | UNSIGNED | ZEROFILL)*                              # dimensionDataType
     | typeName = REAL lengthTwoDimension? (SIGNED | UNSIGNED | ZEROFILL)*              # dimensionDataType
     | typeName = DOUBLE PRECISION? lengthTwoDimension? (SIGNED | UNSIGNED | ZEROFILL)* # dimensionDataType
+    | typeName = VECTOR ( lengthOneDimension )                                         # dimensionDataType
     | typeName = (DECIMAL | DEC | FIXED | NUMERIC | FLOAT | FLOAT4 | FLOAT8) lengthTwoOptionalDimension? (
         SIGNED
         | UNSIGNED
@@ -2305,10 +2321,15 @@ dataType
     )                                                                                  # spatialDataType
     | typeName = LONG VARCHAR? BINARY? (charSet charsetName)? (COLLATE collationName)? # longVarcharDataType // LONG VARCHAR is the same as LONG
     | LONG VARBINARY                                                                   # longVarbinaryDataType
+    | UUID                                                                             # uuidDataType // MariaDB-specific only
     ;
 
 collectionOptions
-    : '(' STRING_LITERAL (',' STRING_LITERAL)* ')'
+    : '(' collectionOption (',' collectionOption)* ')'
+    ;
+
+collectionOption
+    : STRING_LITERAL
     ;
 
 convertedDataType
@@ -3199,6 +3220,7 @@ keywordsCanBeId
     | XA
     | XA_RECOVER_ADMIN
     | XML
+    | YES
     // MariaDB-specific only
     | BINLOG_MONITOR
     | BINLOG_REPLAY
@@ -3227,6 +3249,7 @@ keywordsCanBeId
     | SETVAL
     | SKIP_
     | STATEMENT
+    | UUID
     | VIA
     | MONITOR
     | READ_ONLY

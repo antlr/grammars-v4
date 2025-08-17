@@ -9,7 +9,7 @@ import (
     "strconv"
     "bufio"
     "github.com/antlr4-go/antlr/v4"
-    "example.com/myparser/<package_name>"
+    "example.com/Test/<package_name>"
 )
 type CustomErrorListener struct {
     errors int
@@ -66,6 +66,7 @@ var string_instance = 0
 var prefix = ""
 var quiet = false
 var tee = false
+var binary = <binary>
 
 func main() {
     for i := 1; i \< len(os.Args); i = i + 1 {
@@ -111,7 +112,7 @@ func main() {
         }
         elapsed := time.Since(start)
         if ! quiet {
-            fmt.Fprintf(os.Stderr, "Total Time: %.3f s", elapsed.Seconds())
+            fmt.Fprintf(os.Stderr, "%sTotal Time: %.3f", prefix, elapsed.Seconds())
             fmt.Fprintln(os.Stderr)
         }
     }
@@ -144,27 +145,33 @@ func ParseString(input string, row_number int) {
 }
 
 func ParseFilename(input string, row_number int) {
+    encoding := "<file_encoding>"
     var str antlr.CharStream = nil
-    str, _ = antlr.NewFileStream(input)        
+    if encoding != "" {
+        str, _ = NewEncodingFileStream(input, encoding)
+    } else {
+        str, _ = antlr.NewFileStream(input)
+    }
     DoParse(str, input, row_number)
 }
 
 func DoParse(str antlr.CharStream, input_name string, row_number int) {
+    if binary {
+        str = NewBinaryCharStream(str)
+    }
     var lexer = <go_lexer_name>(str);
     if show_tokens {
         j := 0
         for {
             t := lexer.NextToken()
-            fmt.Fprintf(os.Stderr, "%d ", j)
-            fmt.Fprintf(os.Stderr, " ")
-            // missing fmt.Println(t.String())
-            fmt.Fprintf(os.Stderr, "%d ", t.GetText())
+            t.SetTokenIndex(j)
+            fmt.Fprintf(os.Stderr, "%s\n", t.String())
             if t.GetTokenType() == antlr.TokenEOF {
                 break
             }
             j = j + 1
         }
-        // missing lexer.Reset()
+        lexer.Reset()
     }
     // Requires additional 0??
     var tokens = antlr.NewCommonTokenStream(lexer, 0)

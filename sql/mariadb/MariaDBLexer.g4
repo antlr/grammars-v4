@@ -215,6 +215,8 @@ STACKED                       : 'STACKED';
 STARTING                      : 'STARTING';
 STATEMENT                     : 'STATEMENT';
 STRAIGHT_JOIN                 : 'STRAIGHT_JOIN';
+SYSTEM                        : 'SYSTEM';
+SYSTEM_TIME                   : 'SYSTEM_TIME';
 TABLE                         : 'TABLE';
 TERMINATED                    : 'TERMINATED';
 THEN                          : 'THEN';
@@ -232,6 +234,7 @@ USAGE                         : 'USAGE';
 USE                           : 'USE';
 USING                         : 'USING';
 VALUES                        : 'VALUES';
+VERSIONING                    : 'VERSIONING';
 WHEN                          : 'WHEN';
 WHERE                         : 'WHERE';
 WHILE                         : 'WHILE';
@@ -286,6 +289,7 @@ LONGTEXT   : 'LONGTEXT';
 ENUM       : 'ENUM';
 VARYING    : 'VARYING';
 SERIAL     : 'SERIAL';
+VECTOR     : 'VECTOR';
 
 // Interval type Keywords
 
@@ -403,6 +407,7 @@ AT                          : 'AT';
 AUTHORS                     : 'AUTHORS';
 AUTOCOMMIT                  : 'AUTOCOMMIT';
 AUTOEXTEND_SIZE             : 'AUTOEXTEND_SIZE';
+AUTO                        : 'AUTO';
 AUTO_INCREMENT              : 'AUTO_INCREMENT';
 AVG_ROW_LENGTH              : 'AVG_ROW_LENGTH';
 BEGIN                       : 'BEGIN';

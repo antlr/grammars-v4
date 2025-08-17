@@ -1,0 +1,3 @@
+0ox; 0ox; 0ox; 0ox; 0ox;
+0ix{ 1ox; 0oy; 0oy; 0oy; 0oy; 0oy; };
+1iy;

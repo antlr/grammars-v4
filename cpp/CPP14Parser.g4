@@ -699,18 +699,14 @@ abstractDeclarator
     ;
 
 pointerAbstractDeclarator
-    : noPointerAbstractDeclarator
-    | pointerOperator+ noPointerAbstractDeclarator?
+    : pointerOperator* (noPointerAbstractDeclarator | pointerOperator)
     ;
 
 noPointerAbstractDeclarator
-    : noPointerAbstractDeclarator (
+    : (parametersAndQualifiers | LeftParen pointerAbstractDeclarator RightParen) (
         parametersAndQualifiers
-        | noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-    )
-    | parametersAndQualifiers
-    | LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-    | LeftParen pointerAbstractDeclarator RightParen
+        | LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
+    )*
     ;
 
 abstractPackDeclarator
@@ -718,11 +714,10 @@ abstractPackDeclarator
     ;
 
 noPointerAbstractPackDeclarator
-    : noPointerAbstractPackDeclarator (
+    : Ellipsis (
         parametersAndQualifiers
         | LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-    )
-    | Ellipsis
+    )*
     ;
 
 parameterDeclarationClause

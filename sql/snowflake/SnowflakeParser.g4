@@ -536,16 +536,19 @@ alter_command
     | alter_api_integration
     | alter_connection
     | alter_database
+    | alter_dataset
     | alter_dynamic_table
     //| alter_event_table // uses ALTER TABLE stmt
     | alter_external_table
     | alter_failover_group
     | alter_file_format
     | alter_function
+    | alter_git_repository
     | alter_masking_policy
     | alter_materialized_view
     | alter_network_policy
     | alter_notification_integration
+    | alter_password_policy
     | alter_pipe
     | alter_procedure
     | alter_replication_group
@@ -553,6 +556,7 @@ alter_command
     | alter_role
     | alter_row_access_policy
     | alter_schema
+    | alter_secret
     | alter_security_integration_external_oauth
     | alter_security_integration_snowflake_oauth
     | alter_security_integration_saml2
@@ -750,8 +754,34 @@ account_id_list
     : account_identifier (COMMA account_identifier)*
     ;
 
+alter_dataset
+    : ALTER DATASET ds=object_name
+        ADD VERSION v=string
+        FROM query_statement
+        (PARTITION BY id_list)?
+        comment_clause?
+        (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds=object_name
+        DROP VERSION v=string
+    ;
+
 alter_dynamic_table
-    : ALTER DYNAMIC TABLE id_ (resume_suspend | REFRESH | SET WAREHOUSE EQ id_)
+    : ALTER DYNAMIC TABLE if_exists? object_name (
+        resume_suspend
+        | REFRESH
+        | SET dynamic_table_settable_params+
+    )
+    | ALTER DYNAMIC TABLE if_exists? object_name (SWAP WITH | RENAME TO) object_name
+    | ALTER DYNAMIC TABLE if_exists? object_name (set_tags | unset_tags)
+    | ALTER DYNAMIC TABLE if_exists? object_name search_optimization_action
+    | ALTER DYNAMIC TABLE if_exists? object_name UNSET dynamic_table_unsettable_params (
+        COMMA dynamic_table_unsettable_params
+    )*
+    | ALTER DYNAMIC TABLE if_exists? object_name rls_operations
+    ;
+
+id_list
+    : id_ (COMMA id_)*
     ;
 
 alter_external_table
@@ -841,6 +871,24 @@ alter_function_signature
 
 data_type_list
     : data_type (COMMA data_type)*
+    ;
+
+alter_git_repository
+    : ALTER GIT REPOSITORY r=object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY r=object_name FETCH
+    ;
+
+alter_git_set_opts
+    : GIT_CREDENTIALS EQ sn=object_name
+    | API_INTEGRATION EQ ai=id_
+    | comment_clause
+    | tag_decl_list
+    ;
+
+alter_git_unset_opts
+    : GIT_CREDENTIALS
+    | COMMENT
+    | tag_list
     ;
 
 alter_masking_policy
@@ -977,6 +1025,50 @@ alter_sequence
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
     ;
 
+alter_secret
+    : ALTER SECRET if_exists? object_name secret_opts
+    ;
+
+secret_opts
+    : UNSET COMMENT
+    | SET secret_set_opts
+    ;
+
+secret_set_opts
+    : secret_oauth_client_creds_opts+
+    | secret_oauth_auth_code_opts+
+    | secret_basic_auth_opts+
+    | secret_generic_string_opts+
+    | secret_api_auth_opts+
+    ;
+
+secret_oauth_client_creds_opts
+    : OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET
+    | comment_clause
+    ;
+
+secret_oauth_auth_code_opts
+    : OAUTH_REFRESH_TOKEN EQ t=string
+    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet=string
+    | comment_clause
+    ;
+
+secret_api_auth_opts
+    : API_AUTHENTICATION EQ aa=string
+    | comment_clause
+    ;
+
+secret_basic_auth_opts
+    : USERNAME EQ u=string
+    | PASSWORD EQ p=string
+    | comment_clause
+    ;
+
+secret_generic_string_opts
+    : SECRET_STRING EQ ss=string
+    | comment_clause
+    ;
+
 alter_security_integration_external_oauth
     : ALTER SECURITY? INTEGRATION if_exists id_ SET (TYPE EQ EXTERNAL_OAUTH)? (
         ENABLED EQ true_false
@@ -1075,10 +1167,17 @@ alter_session
     ;
 
 alter_session_policy
-    : ALTER SESSION POLICY if_exists? id_ (UNSET | SET) (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
-    | ALTER SESSION POLICY if_exists? id_ RENAME TO id_
+    : ALTER SESSION POLICY if_exists? object_name SET session_policy_params*
+    | ALTER SESSION POLICY if_exists? object_name UNSET (session_policy_param_name | COMMENT)
+    | ALTER SESSION POLICY if_exists? object_name RENAME TO object_name
+    | ALTER SESSION POLICY if_exists? object_name (set_tags | unset_tags)
+    ;
+
+alter_password_policy
+    : ALTER PASSWORD POLICY if_exists? object_name SET password_policy_params*
+    | ALTER PASSWORD POLICY if_exists? object_name UNSET (password_policy_param_name | COMMENT)
+    | ALTER PASSWORD POLICY if_exists? object_name RENAME TO object_name
+    | ALTER PASSWORD POLICY if_exists? object_name (set_tags | unset_tags)
     ;
 
 alter_share
@@ -1141,10 +1240,15 @@ alter_table
         |
     )
     //[ , ... ]
-    | ALTER TABLE if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_
-    | ALTER TABLE if_exists? object_name DROP ROW ACCESS POLICY id_ COMMA ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER TABLE if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER TABLE if_exists? object_name rls_operations
+    ;
+
+rls_operations
+    : ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    | DROP ROW ACCESS POLICY object_name (
+        COMMA ADD ROW ACCESS POLICY object_name ON column_list_in_parentheses
+    )?
+    | DROP ALL ROW ACCESS POLICIES
     ;
 
 clustering_action
@@ -1422,7 +1526,11 @@ tag_decl_list
     ;
 
 unset_tags
-    : UNSET TAG object_name (COMMA object_name)*
+    : UNSET tag_list
+    ;
+
+tag_list
+    : TAG object_name (COMMA object_name)*
     ;
 
 // create commands
@@ -1433,6 +1541,7 @@ create_command
     | create_object_clone
     | create_connection
     | create_database
+    | create_dataset
     | create_dynamic_table
     | create_event_table
     | create_external_function
@@ -1440,12 +1549,14 @@ create_command
     | create_failover_group
     | create_file_format
     | create_function
+    | create_git_repository
     //| create_integration
     | create_managed_account
     | create_masking_policy
     | create_materialized_view
     | create_network_policy
     | create_notification_integration
+    | create_password_policy
     | create_pipe
     | create_procedure
     | create_replication_group
@@ -1453,6 +1564,7 @@ create_command
     | create_role
     | create_row_access_policy
     | create_schema
+    | create_secret
     | create_security_integration_external_oauth
     | create_security_integration_snowflake_oauth
     | create_security_integration_saml2
@@ -1558,14 +1670,54 @@ compression
     : COMPRESSION EQ compression_type
     ;
 
+create_dataset
+    : CREATE or_replace? DATASET if_not_exists? ds=object_name
+    ;
+
 create_dynamic_table
-    : CREATE or_replace? DYNAMIC TABLE id_ TARGET_LAG EQ (string | DOWNSTREAM) WAREHOUSE EQ wh = id_ AS query_statement
+    : CREATE or_replace? TRANSIENT? DYNAMIC TABLE if_not_exists? object_name (
+        LR_BRACKET materialized_col_decl_list RR_BRACKET
+    )? dynamic_table_params+ AS query_statement
+    ;
+
+dynamic_table_params
+    : dynamic_table_settable_params
+    | REFRESH_MODE EQ (AUTO | FULL | INCREMENTAL)
+    | INITIALIZE EQ (ON_CREATE | ON_SCHEDULE)
+    | cluster_by
+    | with_row_access_policy
+    | with_tags
+    ;
+
+dynamic_table_settable_params
+    : TARGET_LAG EQ (string | DOWNSTREAM)
+    | LAG EQ (
+        string
+        | DOWNSTREAM
+    ) // LAG is same as TARGET_LAG but not in documentation. BTW GET_DLL return LAG keyword and not TARGET_LAG
+    | WAREHOUSE EQ wh = id_
+    | set_data_retention_params
+    | DEFAULT_DDL_COLLATION_ EQ STRING
+    | comment_clause
+    ;
+
+dynamic_table_unsettable_params
+    : data_retention_params
+    | DEFAULT_DDL_COLLATION_
+    | COMMENT
+    ;
+
+data_retention_params
+    : DATA_RETENTION_TIME_IN_DAYS
+    | MAX_DATA_EXTENSION_TIME_IN_DAYS
+    ;
+
+set_data_retention_params
+    : data_retention_params EQ num
     ;
 
 create_event_table
-    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? (
+    : CREATE or_replace? EVENT TABLE if_not_exists? id_ cluster_by? data_retention_params* change_tracking? (
         DEFAULT_DDL_COLLATION_ EQ string
     )? copy_grants? with_row_access_policy? with_tags? (WITH? comment_clause)?
     ;
@@ -1660,7 +1812,8 @@ col_decl
     ;
 
 virtual_column_decl
-    : AS '(' function_call ')'
+    : AS LR_BRACKET function_call RR_BRACKET
+    | AS function_call
     ;
 
 function_definition
@@ -1685,6 +1838,19 @@ create_function
         VOLATILE
         | IMMUTABLE
     )? MEMOIZABLE? comment_clause? AS function_definition
+    ;
+
+create_git_repository
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? r=object_name
+        create_git_opts+
+    ;
+
+create_git_opts
+    : ORIGIN EQ string
+    | API_INTEGRATION EQ ai=id_
+    | GIT_CREDENTIALS EQ sn=object_name
+    | comment_clause
+    | with_tags
     ;
 
 create_managed_account
@@ -1824,6 +1990,18 @@ create_schema
     )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? with_tags? comment_clause?
     ;
 
+create_secret
+    : CREATE or_replace? SECRET if_not_exists? s=object_name (
+        TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
+        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt=string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et=string API_AUTHENTICATION EQ aa=id_ |
+        TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
+        TYPE EQ PASSWORD USERNAME EQ u=string PASSWORD EQ p=string |
+        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss=string |
+        TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
+    )
+    comment_clause?
+    ;
+
 create_security_integration_external_oauth
     : CREATE or_replace? SECURITY INTEGRATION if_not_exists? id_ TYPE EQ EXTERNAL_OAUTH ENABLED EQ true_false EXTERNAL_OAUTH_TYPE EQ (
         OKTA
@@ -1915,9 +2093,40 @@ create_sequence
     ;
 
 create_session_policy
-    : CREATE or_replace? SESSION POLICY if_exists? id_ (SESSION_IDLE_TIMEOUT_MINS EQ num)? (
-        SESSION_UI_IDLE_TIMEOUT_MINS EQ num
-    )? comment_clause?
+    : CREATE or_replace? SESSION POLICY if_not_exists? object_name session_policy_params*
+    ;
+
+session_policy_params
+    : session_policy_param_name EQ num
+    | comment_clause
+    ;
+
+session_policy_param_name
+    : SESSION_IDLE_TIMEOUT_MINS
+    | SESSION_UI_IDLE_TIMEOUT_MINS
+    ;
+
+create_password_policy
+    : CREATE or_replace? PASSWORD POLICY if_not_exists? object_name password_policy_params*
+    ;
+
+password_policy_params
+    : password_policy_param_name EQ num
+    | comment_clause
+    ;
+
+password_policy_param_name
+    : PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
     ;
 
 create_share
@@ -1965,7 +2174,7 @@ format_type_options
     | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q)
     | TRIM_SPACE EQ true_false
     | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE)
-    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
+    | NULL_IF EQ LR_BRACKET string_list* RR_BRACKET
     | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
     | REPLACE_INVALID_CHARACTERS EQ true_false
     | EMPTY_FIELD_AS_NULL EQ true_false
@@ -2251,16 +2460,16 @@ stream_time
     ;
 
 create_stream
-    //-- table
-    : CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON TABLE object_name stream_time? append_only? show_initial_rows?
-        comment_clause?
+    //-- table or view
+    : CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON (
+        TABLE
+        | VIEW
+    ) object_name stream_time? append_only? show_initial_rows? comment_clause?
     //-- External table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only? comment_clause?
-    //-- Directory table
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON STAGE object_name comment_clause?
-    //-- View
-    | CREATE or_replace? STREAM if_not_exists? object_name copy_grants? ON VIEW object_name stream_time? append_only? show_initial_rows?
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON EXTERNAL TABLE object_name stream_time? insert_only?
         comment_clause?
+    //-- Directory table
+    | CREATE or_replace? STREAM if_not_exists? object_name with_tags? copy_grants? ON STAGE object_name comment_clause?
     ;
 
 temporary
@@ -2269,7 +2478,8 @@ temporary
     ;
 
 table_type
-    : (( LOCAL | GLOBAL)? temporary | VOLATILE)
+    : (LOCAL | GLOBAL)? temporary
+    | VOLATILE
     | TRANSIENT
     ;
 
@@ -2324,13 +2534,21 @@ out_of_line_constraint
     : (CONSTRAINT id_)? (
         (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
         | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
-    )
+    ) inline_comment_clause?
     ;
 
+//For classic table
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | (default_value | NULL_))* with_masking_policy? with_tags? (
-        COMMENT string
-    )?
+    : col_decl (collate | inline_constraint | null_not_null | default_value)* with_masking_policy? with_tags? inline_comment_clause?
+    ;
+
+//Column declaration for materialized table
+materialized_col_decl
+    : column_name data_type? with_masking_policy? with_tags? (COMMENT string)?
+    ;
+
+materialized_col_decl_list
+    : materialized_col_decl (COMMA materialized_col_decl)*
     ;
 
 column_decl_item
@@ -2343,24 +2561,22 @@ column_decl_item_list
     ;
 
 create_table
-    : CREATE or_replace? table_type? TABLE (
+    : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) ((comment_clause? create_table_clause) | (create_table_clause comment_clause?))
+    ) (comment_clause? create_table_clause | create_table_clause comment_clause?)
     ;
 
 column_decl_item_list_paren
-    : '(' column_decl_item_list ')'
+    : LR_BRACKET column_decl_item_list RR_BRACKET
     ;
 
 create_table_clause
     : (
         column_decl_item_list_paren cluster_by?
         | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? change_tracking? default_ddl_collation? copy_grants? comment_clause? with_row_access_policy?
-        with_tags?
+    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking? default_ddl_collation
+        ? copy_grants? comment_clause? with_row_access_policy? with_tags?
     ;
 
 create_table_as_select
@@ -2610,18 +2826,20 @@ object_type_name
     ;
 
 object_type_plural
-    : ROLES
-    | USERS
-    | WAREHOUSES
-    | INTEGRATIONS
+    : ALERTS
     | DATABASES
+    | INTEGRATIONS
+    | POLICIES
+    | ROLES
     | SCHEMAS
-    | TABLES
-    | VIEWS
     | STAGES
     | STREAMS
+    | TABLES
+    | TAGS
     | TASKS
-    | ALERTS
+    | USERS
+    | VIEWS
+    | WAREHOUSES
     ;
 
 // drop commands
@@ -2636,11 +2854,13 @@ drop_command
     | drop_failover_group
     | drop_file_format
     | drop_function
+    | drop_git_repository
     | drop_integration
     | drop_managed_account
     | drop_masking_policy
     | drop_materialized_view
     | drop_network_policy
+    | drop_password_policy
     | drop_pipe
     | drop_procedure
     | drop_replication_group
@@ -2648,6 +2868,7 @@ drop_command
     | drop_role
     | drop_row_access_policy
     | drop_schema
+    | drop_secret
     | drop_sequence
     | drop_session_policy
     | drop_share
@@ -2695,6 +2916,10 @@ drop_file_format
 
 drop_function
     : DROP FUNCTION if_exists? object_name arg_types
+    ;
+
+drop_git_repository
+    : DROP GIT REPOSITORY if_exists? r=object_name
     ;
 
 drop_integration
@@ -2745,12 +2970,20 @@ drop_schema
     : DROP SCHEMA if_exists? schema_name cascade_restrict?
     ;
 
+drop_secret
+    : DROP SECRET if_exists? object_name
+    ;
+
 drop_sequence
     : DROP SEQUENCE if_exists? object_name cascade_restrict?
     ;
 
 drop_session_policy
-    : DROP SESSION POLICY if_exists? id_
+    : DROP SESSION POLICY if_exists? object_name
+    ;
+
+drop_password_policy
+    : DROP PASSWORD POLICY if_exists? object_name
     ;
 
 drop_share
@@ -2853,6 +3086,10 @@ comment_clause
     : COMMENT EQ string
     ;
 
+inline_comment_clause
+    : COMMENT string
+    ;
+
 if_suspended
     : IF SUSPENDED
     ;
@@ -2869,6 +3106,10 @@ or_replace
     : OR REPLACE
     ;
 
+or_alter
+    : OR ALTER
+    ;
+
 describe
     : DESC
     | DESCRIBE
@@ -2883,10 +3124,12 @@ describe_command
     | describe_external_table
     | describe_file_format
     | describe_function
+    | describe_git_repository
     | describe_integration
     | describe_masking_policy
     | describe_materialized_view
     | describe_network_policy
+    | describe_password_policy
     | describe_pipe
     | describe_procedure
     | describe_result
@@ -2934,6 +3177,10 @@ describe_function
     : describe FUNCTION object_name arg_types
     ;
 
+describe_git_repository
+    : describe GIT REPOSITORY r=object_name
+    ;
+
 describe_integration
     : describe (API | NOTIFICATION | SECURITY | STORAGE)? INTEGRATION id_
     ;
@@ -2979,7 +3226,11 @@ describe_sequence
     ;
 
 describe_session_policy
-    : describe SESSION POLICY id_
+    : describe SESSION POLICY object_name
+    ;
+
+describe_password_policy
+    : describe PASSWORD POLICY object_name
     ;
 
 describe_share
@@ -3023,6 +3274,7 @@ show_command
     | show_databases
     | show_databases_in_failover_group
     | show_databases_in_replication_group
+    | show_datasets
     | show_delegated_authorizations
     | show_dynamic_tables
     | show_event_tables
@@ -3031,6 +3283,9 @@ show_command
     | show_failover_groups
     | show_file_formats
     | show_functions
+    | show_git_branches
+    | show_git_repositories
+    | show_git_tags
     | show_global_accounts
     | show_grants
     | show_integrations
@@ -3042,6 +3297,7 @@ show_command
     | show_objects
     | show_organization_accounts
     | show_parameters
+    | show_password_policies
     | show_pipes
     | show_primary_keys
     | show_procedures
@@ -3053,6 +3309,7 @@ show_command
     | show_roles
     | show_row_access_policies
     | show_schemas
+    | show_secrets
     | show_sequences
     | show_session_policies
     | show_shares
@@ -3067,6 +3324,7 @@ show_command
     | show_user_functions
     | show_users
     | show_variables
+    | show_versions_in_dataset
     | show_views
     | show_warehouses
     ;
@@ -3119,6 +3377,14 @@ show_databases_in_replication_group
     : SHOW DATABASES IN REPLICATION GROUP id_
     ;
 
+show_datasets
+    : SHOW DATASETS
+        like_pattern?
+        (IN (SCHEMA s=schema_name | DATABASE d=id_ | ACCOUNT))?
+        (STARTS WITH sw=string)?
+        (LIMIT num (FROM f=string)? )?
+    ;
+
 show_delegated_authorizations
     : SHOW DELEGATED AUTHORIZATIONS
     | SHOW DELEGATED AUTHORIZATIONS BY USER id_
@@ -3157,6 +3423,24 @@ show_functions
     : SHOW FUNCTIONS like_pattern? (
         IN ( ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA id_ | id_)
     )?
+    ;
+
+show_git_branches
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r=object_name
+    ;
+
+show_git_repositories
+    : SHOW GIT REPOSITORIES like_pattern?
+        (IN (ACCOUNT
+            | DATABASE d=id_?
+            | SCHEMA s=schema_name?
+            | schema_name
+            )
+        )?
+    ;
+
+show_git_tags
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r=object_name
     ;
 
 show_global_accounts
@@ -3278,12 +3562,20 @@ show_schemas
     : SHOW TERSE? SCHEMAS HISTORY? like_pattern? (IN ( ACCOUNT | DATABASE id_?))? starts_with? limit_rows?
     ;
 
+show_secrets
+    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
+    ;
+
 show_sequences
     : SHOW SEQUENCES like_pattern? in_obj?
     ;
 
 show_session_policies
     : SHOW SESSION POLICIES
+    ;
+
+show_password_policies
+    : SHOW PASSWORD POLICIES
     ;
 
 show_shares
@@ -3335,6 +3627,10 @@ show_users
 
 show_variables
     : SHOW VARIABLES like_pattern?
+    ;
+
+show_versions_in_dataset
+    : SHOW VERSIONS like_pattern? IN DATASET ds=object_name (LIMIT num)?
     ;
 
 show_views
@@ -3433,135 +3729,177 @@ id_
 keyword
     //List here keyword (SnowSQL meaning) allowed as object name
     // Name of builtin function should be included in specifique section (ie builtin_function)
-    : STAGE
-    | USER
-    | TYPE
-    | CLUSTER
-    | TEMP
-    | FUNCTION
-    | REGION
-    | ROLLUP
-    | AT_KEYWORD
-    | TIMESTAMP
-    | IF
-    | COPY_OPTIONS_
-    | COMMENT
-    | ORDER
-    | NOORDER
-    | DIRECTION
-    | LENGTH
-    | LANGUAGE
-    | KEY
-    | ALERT
-    | CONDITION
-    | ROLE
-    | ROW_NUMBER
-    | VALUE
-    | FIRST_VALUE
-    | VALUES
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
-    | WAREHOUSE_TYPE
-    | TAG
-    | WAREHOUSE
-    | MODE
+    // please add in alphabetic order for easy reading
+    // https://docs.snowflake.com/en/sql-reference/reserved-keywords
+    : ACCOUNT
     | ACTION
-    | ACCOUNT
+    | ALERT
+    | AT_KEYWORD
+    | CLUSTER
+    | COMMENT
+    | CONDITION
+    | COPY_OPTIONS_
+    | DIRECTION
+    | EMAIL
+    | FIRST_VALUE
+    | FLATTEN
+    | FUNCTION
+    | IF
+    | JOIN
+    | KEY
+    | LAG
+    | LANGUAGE
+    | LENGTH
+    | MAX_CONCURRENCY_LEVEL
+    | MODE
+    | NOORDER
+    | ORDER
+    | OUTER
+    | POLICY
+    | RECURSIVE
+    | REGION
+    | ROLE
+    | ROLLUP
+    | ROW_NUMBER
     | SEQUENCE
+    | SESSION
+    | STAGE
+    | TAG
+    | TARGET_LAG
+    | TEMP
+    | TIMESTAMP
+    | TYPE
+    | USER
+    | VALUE
+    | VALUES
+    | WAREHOUSE
+    | WAREHOUSE_TYPE
     // etc
     ;
 
 non_reserved_words
     //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
-    : ORGADMIN
-    | ACCOUNTADMIN
-    | SECURITYADMIN
-    | USERADMIN
-    | SYSADMIN
-    | PUBLIC
-    | ACTION
+    // please add in alphabetic order for easy reading
+    : ACCOUNTADMIN
     | AES
+    | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
     | COMMENT
     | CONFIGURATION
     | DATA
+    | DAYS
     | DEFINITION
     | DELTA
+    | DISPLAY_NAME
+    | DOWNSTREAM
+    | DYNAMIC
     | EDITION
+    | EMAIL
+    | EMPTY_
+    | ENABLED
+    | ERROR_INTEGRATION
     | EVENT
+    | EXCHANGE
     | EXPIRY_DATE
+    | EXPR
+    | FILE
+    | FILES
     | FIRST_NAME
     | FIRST_VALUE
-    | FLATTEN
+    | FREQUENCY
     | GLOBAL
+    | HIGH
+    | HOURS
     | IDENTIFIER
     | IDENTITY
-    | INTERVAL
+    | INCREMENTAL
+    | IMPORTED
     | INDEX
+    | INITIALIZE
+    | INPUT
+    | INTERVAL
     | JAVASCRIPT
     | LAST_NAME
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
+    | LOW
     | MAX_CONCURRENCY_LEVEL
+    | MEDIUM
+    | MODE
     | NAME
+    | NETWORK
+    | NULLIF
+    | NVL
     | OFFSET
+    | OLD
+    | ON_CREATE
+    | ON_ERROR
+    | ON_SCHEDULE
     | OPTION
+    | ORGADMIN
+    | OUTBOUND
+    | OUTER
+    | OWNER
     | PARTITION
+    | PASSWORD
+    | PASSWORD_HISTORY
+    | PASSWORD_LOCKOUT_TIME_MINS
+    | PASSWORD_MAX_AGE_DAYS
+    | PASSWORD_MAX_LENGTH
+    | PASSWORD_MAX_RETRIES
+    | PASSWORD_MIN_AGE_DAYS
+    | PASSWORD_MIN_LENGTH
+    | PASSWORD_MIN_LOWER_CASE_CHARS
+    | PASSWORD_MIN_NUMERIC_CHARS
+    | PASSWORD_MIN_SPECIAL_CHARS
+    | PASSWORD_MIN_UPPER_CASE_CHARS
+    | PATH_
     | PATTERN
     | PORT
+    | PRIORITY
     | PROCEDURE_NAME
     | PROPERTY
     | PROVIDER
+    | PUBLIC
+    | QUARTER
+    | QUERY
+    | QUERY_TAG
     | RANK
-    | RESPECT
+    | RECURSIVE
+    | REFERENCES
+    | REFRESH_MODE
     | RESOURCE
     | RESOURCES
+    | RESPECT
     | RESTRICT
     | RESULT
     | ROLE
+    | ROUNDING_MODE
     | ROW_NUMBER
-    | INDEX
+    | SCALE
+    | SCHEDULE
+    | SECURITYADMIN
     | SOURCE
-    | PROCEDURE_NAME
+    | START_DATE
     | STATE
     | STATS
+    | STATUS
+    | SYSADMIN
     | TAG
     | TAGS
-    | ROLE
-    | DEFINITION
+    | TARGET_LAG
     | TIMEZONE
     | URL
-    | LOCAL
-    | ROW_NUMBER
+    | USERADMIN
     | VALUE
     | VALUES
     | VERSION
-    | NAME
-    | VERSION
-    | OPTION
-    | RESPECT
-    | RESTRICT
-    | EVENT
-    | DOWNSTREAM
-    | DYNAMIC
-    | TARGET_LAG
-    | EMAIL
-    | MAX_CONCURRENCY_LEVEL
+    | VISIBILITY
     | WAREHOUSE_TYPE
-    | NETWORK
-    | OUTBOUND
-    | INPUT
-    | PATH_
-    | OUTER
-    | RECURSIVE
-    | MODE
-    | EXPR
-    | SCALE
-    | ROUNDING_MODE
+    | YEAR
     ;
 
 builtin_function
@@ -3572,6 +3910,7 @@ builtin_function
     | MIN
     | COUNT
     | CURRENT_TIMESTAMP
+    | CURRENT_TIME
     | CURRENT_DATE
     | UPPER
     | LOWER
@@ -3699,7 +4038,7 @@ expr
     | op = ( PLUS | MINUS) expr
     | expr op = (STAR | DIVIDE | MODULE) expr
     | expr op = (PLUS | MINUS | PIPE_PIPE) expr
-    | expr comparison_operator expr
+    | l = expr comparison_operator r = expr
     | op = NOT+ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
@@ -3713,7 +4052,7 @@ expr
     | trim_expression
     | function_call
     | subquery
-    | expr IS null_not_null
+    | expr IS (null_not_null | not_distinct_from expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
@@ -3794,10 +4133,14 @@ primitive_expression
     : DEFAULT //?
     | NULL_
     | id_ ('.' id_)* // json field access
+    | id_ '.' STAR
     | full_column_name
     | literal
-    | BOTH_Q
     | ARRAY_Q
+    | AUTO_Q
+    | AZURE_Q
+    | BOTH_Q
+    | NONE_Q
     | OBJECT_Q
     //| json_literal
     //| arr_literal
@@ -3823,6 +4166,7 @@ asc_desc
 over_clause
     : OVER '(' partition_by order_by_expr? ')'
     | OVER '(' order_by_expr ')'
+    | OVER '(' ')'
     ;
 
 function_call
@@ -3929,15 +4273,15 @@ switch_section
 
 // select
 query_statement
-    : with_expression? select_statement set_operators*
+    : with_expression? select_statement_in_parentheses set_operators*
     ;
 
 with_expression
-    : WITH common_table_expression (COMMA common_table_expression)*
+    : WITH RECURSIVE? common_table_expression (COMMA common_table_expression)*
     ;
 
 common_table_expression
-    : id_ ('(' columns = column_list ')')? AS '(' select_statement set_operators* ')'
+    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS select_statement_in_parentheses
     ;
 
 select_statement
@@ -3946,12 +4290,23 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement //EXCEPT and MINUS have same SQL meaning
-    | LR_BRACKET select_statement RR_BRACKET
+    : (UNION ALL? by_name? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
+    | select_statement_in_parentheses
+    ;
+
+by_name
+    : BY NAME
+    ;
+
+select_statement_in_parentheses
+    : LR_BRACKET select_statement_in_parentheses RR_BRACKET
+    | select_statement_in_parentheses set_operators
+    | select_statement
+    | with_expression
     ;
 
 select_optional_clauses
-    : into_clause? from_clause? where_clause? (group_by_clause | having_clause)? qualify_clause? order_by_clause?
+    : into_clause? from_clause? where_clause? (group_by_clause having_clause? | having_clause)? qualify_clause? order_by_clause?
     ;
 
 select_clause
@@ -3971,12 +4326,12 @@ select_list_top
     ;
 
 select_list
-    : select_list_elem (COMMA select_list_elem)*
+    : select_list_elem (COMMA select_list_elem)* COMMA?
     ;
 
 select_list_elem
     : column_elem as_alias?
-    | column_elem_star
+    | column_elem_star exclude_clause?
     //    | udt_elem
     | expression_elem as_alias?
     ;
@@ -3993,6 +4348,10 @@ column_elem
 object_name_or_alias
     : object_name
     | alias DOT
+    ;
+
+exclude_clause
+    : EXCLUDE (column_name | column_list_in_parentheses)
     ;
 
 as_alias
@@ -4233,6 +4592,10 @@ null_not_null
     : NOT? NULL_
     ;
 
+not_distinct_from
+    : NOT? DISTINCT FROM
+    ;
+
 subquery
     : query_statement
     ;
@@ -4306,6 +4669,8 @@ round_mode
     ;
 
 round_expr
-    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (COMMA ROUNDING_MODE ASSOC round_mode)* RR_BRACKET
+    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (
+        COMMA ROUNDING_MODE ASSOC round_mode
+    )* RR_BRACKET
     | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;

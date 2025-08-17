@@ -725,14 +725,14 @@ iana_prop
     : iana_token (SCOL icalparameter)* COL value CRLF
     ;
 
-// 3.8.8.2 - Non-Standard Propertie
+// 3.8.8.2 - Non-Standard Properties
 x_prop
     : x_name (SCOL icalparameter)* COL value CRLF
     ;
 
 // 3.8.8.3 - Request Status
 rstatus
-    : k_request_status rstatparam* COL statcode SCOL text (SCOL text)?
+    : k_request_status rstatparam* COL statcode SCOL text (SCOL text)? CRLF
     ;
 
 rstatparam

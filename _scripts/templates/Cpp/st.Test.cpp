@@ -10,6 +10,7 @@
 #include "ErrorListener.h"
 <tool_grammar_tuples:{x | #include "<x.GeneratedIncludeFileName>"
 } >
+#include "EncodingInputStream.h"
 
 std::string formatDuration(uint64_t duration) {
     std::stringstream oss;
@@ -51,6 +52,7 @@ int error_code = 0;
 int string_instance = 0;
 std::string prefix;
 bool quiet = false;
+std::string file_encoding = "<file_encoding>";
 
 void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
 {
@@ -60,6 +62,8 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         for (int i = 0; ; ++i)
         {
             auto token = lexer->nextToken();
+            auto ctoken = (antlr4::CommonToken*)(token.get());
+            ctoken->setTokenIndex(i);
             std::cerr \<\< token->toString() \<\< std::endl;
             if (token->getType() == antlr4::IntStream::EOF)
                 break;
@@ -142,8 +146,8 @@ void ParseString(std::string input, int row_number)
 void ParseFilename(std::string input, int row_number)
 {
     antlr4::CharStream* str = nullptr;
-    std::fstream fs(input);
-    str = new antlr4::ANTLRInputStream(fs);
+    std::ifstream ifs(input, std::ios::binary);
+    str = new EncodingInputStream(ifs, file_encoding);
     DoParse(str, input, row_number);
 }
 
@@ -212,14 +216,27 @@ int TryParse(std::vector\<std::string>& args)
         auto before = std::chrono::steady_clock::now();
         for (int f = 0; f \< inputs.size(); ++f)
         {
-            if (is_fns[f])
-                ParseFilename(inputs[f], f);
-            else
-                ParseString(inputs[f], f);
+            try
+            {
+                if (is_fns[f])
+                    ParseFilename(inputs[f], f);
+                else
+                    ParseString(inputs[f], f);
+            }
+            catch (const std::runtime_error& e)
+            {
+                std::cerr \<\< e.what() \<\< std::endl;
+                error_code = 1;
+            }
+            catch (...)
+            {
+                std::cerr \<\< "unknown exception" \<\< std::endl;
+                error_code = 1;
+            }
         }
         auto after = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
-        if (! quiet) std::cerr \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+        if (! quiet) std::cerr \<\< prefix \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
     }
     return error_code;
 }

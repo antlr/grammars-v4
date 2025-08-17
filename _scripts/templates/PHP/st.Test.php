@@ -127,7 +127,7 @@ function main($argv) : void {
         }
         $duration = $timer->stop();
         if (! $quiet) {
-            fwrite(STDERR, "Total Time: " . $duration->asSeconds() . "\n");
+            fwrite(STDERR, $prefix . "Total Time: " . $duration->asSeconds() . "\n");
         }
     }
     exit($error_code);

@@ -1,10 +1,19 @@
 # Generated from trgen <version>
 
-$version = Select-String -Path "go.mod" -Pattern "github.com/antlr4-go/antlr/v4" | ForEach-Object { $_.Line.Split(" ")[1] } | ForEach-Object { $_ -replace 'v' }
-
+$version="4.13.1"
 $env:GO111MODULE = "on"
 For ($i=0; $i -le 5; $i++) {
 	$(& go get github.com/antlr4-go/antlr/v4@v$version ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+	if($compile_exit_code -eq 0){
+		Break
+	}
+	Write-Host "go get failed. Trying again."
+}
+if($compile_exit_code -ne 0){
+    exit $compile_exit_code
+}
+For ($i=0; $i -le 5; $i++) {
+	$(& go get golang.org/x/text@v0.26.0 ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 	if($compile_exit_code -eq 0){
 		Break
 	}
@@ -18,12 +27,21 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
     $(& python3 transformGrammar.py ) 2>&1 | Write-Host
 }
 
+<if(antlrng_tool)>
+npm init -y
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
-$(& antlr4 -v $version <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<if(antlrng_tool)>
+$(& tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Go --lib parser --package parser <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget> ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<else>
+$(& antlr4 -v $version <x.GrammarFileNameTarget> -encoding <antlr_encoding> -Dlanguage=Go <if(os_win)>-o parser<endif> -lib parser -package parser  <x.AntlrArgs>  <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+<endif>
 if($compile_exit_code -ne 0){
     exit $compile_exit_code
 \}
 }>
 
-$(& go build Test.go; $compile_exit_code = $LASTEXITCODE) | Write-Host
+$(& go build ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 exit $compile_exit_code

@@ -1,11 +1,11 @@
-import {Lexer, Token, CharStream} from "antlr4ts";
-import {TypeScriptLexer} from './TypeScriptLexer';
+import {Lexer, Token, CharStream} from "antlr4";
+import TypeScriptLexer from './TypeScriptLexer';
 
 /**
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-export abstract class TypeScriptLexerBase extends Lexer {
+export default abstract class TypeScriptLexerBase extends Lexer {
     /**
      * Stores values of nested modes. By default mode is strict or
      * defined externally (useStrictDefault)

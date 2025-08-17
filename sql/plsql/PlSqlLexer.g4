@@ -29,9 +29,7 @@ options {
     caseInsensitive = true;
 }
 
-@lexer::postinclude {
-#include <PlSqlLexerBase.h>
-}
+// Insert here @header for C++ lexer.
 
 ABORT                          : 'ABORT';
 ABS                            : 'ABS';
@@ -977,7 +975,7 @@ MV_MERGE                       : 'MV_MERGE';
 NAMED                          : 'NAMED';
 NAME                           : 'NAME';
 NAMESPACE                      : 'NAMESPACE';
-NAN                            : 'NAN';
+NAN_                            : 'NAN';
 NANVL                          : 'NANVL';
 NATIONAL                       : 'NATIONAL';
 NATIVE_FULL_OUTER_JOIN         : 'NATIVE_FULL_OUTER_JOIN';
@@ -1281,7 +1279,7 @@ OUTLINE                        : 'OUTLINE';
 OUT_OF_LINE                    : 'OUT_OF_LINE';
 OUT                            : 'OUT';
 OVERFLOW_NOMOVE                : 'OVERFLOW_NOMOVE';
-OVERFLOW                       : 'OVERFLOW';
+OVERFLOW_                      : 'OVERFLOW';
 OVERLAPS                       : 'OVERLAPS';
 OVER                           : 'OVER';
 OVERRIDING                     : 'OVERRIDING';
@@ -1377,6 +1375,7 @@ POOL_2K                        : 'POOL_2K';
 POOL_32K                       : 'POOL_32K';
 POOL_4K                        : 'POOL_4K';
 POOL_8K                        : 'POOL_8K';
+POSITION                       : 'POSITION';
 POSITIVEN                      : 'POSITIVEN';
 POSITIVE                       : 'POSITIVE';
 POST_TRANSACTION               : 'POST_TRANSACTION';
@@ -2113,6 +2112,7 @@ TZ_OFFSET                      : 'TZ_OFFSET';
 UB2                            : 'UB2';
 UBA                            : 'UBA';
 UCS2                           : 'UCS2';
+UDF                            : 'UDF';
 UID                            : 'UID';
 UNARCHIVED                     : 'UNARCHIVED';
 UNBOUNDED                      : 'UNBOUNDED';
