@@ -1,9 +1,9 @@
 # Generated from trgen <version>
 
-version=`grep 'github.com/antlr4-go/antlr/v4' go.mod | awk '{print $2}' | sed 's/v//'`
-
+version="4.13.1"
 export GO111MODULE=on
 for i in {1..5}; do go get github.com/antlr4-go/antlr/v4@v$version; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
+for i in {1..5}; do go get golang.org/x/text@v0.26.0; if [ "$?" = "0" ]; then break; fi; done; if [ "$?" != "0" ]; then exit 1; fi
 
 set -e
 
@@ -15,8 +15,17 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 # Go has no version, just the latest version.
 
+<if(antlrng_tool)>
+npm init -y
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
-antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<if(antlrng_tool)>
+tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Go --lib parser --package parser <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
+<else>
+antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Go <if(os_win)>-o parser<endif> -lib parser -package parser  <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
+<endif>
 } >
 
-go build Test.go
+go build

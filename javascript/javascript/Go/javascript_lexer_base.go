@@ -10,10 +10,11 @@ type JavaScriptLexerBase struct {
 	stackLength      int
 	stackIx          int
 
-	lastToken        antlr.Token
-	useStrictDefault bool
-	useStrictCurrent bool
-	templateDepth    int
+	lastToken          antlr.Token
+	useStrictDefault   bool
+	useStrictCurrent   bool
+	currentDepth       int
+	templateDepthStack []int
 }
 
 func (l *JavaScriptLexerBase) IsStartOfFile() bool {
@@ -55,6 +56,7 @@ func (l *JavaScriptLexerBase) NextToken() antlr.Token {
 // ProcessOpenBrace is called when a { is encountered during
 // lexing, we push a new scope everytime.
 func (l *JavaScriptLexerBase) ProcessOpenBrace() {
+	l.currentDepth++
 	l.useStrictCurrent = l.useStrictDefault
 	if l.stackIx > 0 && l.scopeStrictModes[l.stackIx-1] {
 		l.useStrictCurrent = true
@@ -69,6 +71,7 @@ func (l *JavaScriptLexerBase) ProcessCloseBrace() {
 	if l.stackIx > 0 {
 		l.useStrictCurrent = l.popStrictModeScope()
 	}
+	l.currentDepth--
 }
 
 // ProcessStringLiteral is called when lexing a string literal.
@@ -82,6 +85,16 @@ func (l *JavaScriptLexerBase) ProcessStringLiteral() {
 			l.pushStrictModeScope(l.useStrictCurrent)
 		}
 	}
+}
+
+func (l *JavaScriptLexerBase) ProcessTemplateOpenBrace() {
+	l.currentDepth++
+	l.templateDepthStack = append(l.templateDepthStack, l.currentDepth)
+}
+
+func (l *JavaScriptLexerBase) ProcessTemplateCloseBrace() {
+	l.templateDepthStack = l.templateDepthStack[:len(l.templateDepthStack)-1]
+	l.currentDepth--
 }
 
 // IsRegexPossible returns true if the lexer can match a
@@ -103,25 +116,18 @@ func (l *JavaScriptLexerBase) IsRegexPossible() bool {
 	}
 }
 
-func (l *JavaScriptLexerBase) IncreaseTemplateDepth() {
-	l.templateDepth++
-}
-
-func (l *JavaScriptLexerBase) DecreaseTemplateDepth() {
-	l.templateDepth--
-}
-
 func (l *JavaScriptLexerBase) IsInTemplateString() bool {
-	return l.templateDepth > 0
+	return len(l.templateDepthStack) > 0 && l.templateDepthStack[len(l.templateDepthStack)-1] == l.currentDepth
 }
 
 func (l *JavaScriptLexerBase) Reset() {
-    l.scopeStrictModes = nil
-    l.stackLength = 0
-    l.stackIx = 0
-    l.lastToken = nil
-    l.useStrictDefault = false
-    l.useStrictCurrent = false
-    l.templateDepth = 0
+	l.scopeStrictModes = nil
+	l.stackLength = 0
+	l.stackIx = 0
+	l.lastToken = nil
+	l.useStrictDefault = false
+	l.useStrictCurrent = false
+	l.currentDepth = 0
+	l.templateDepthStack = make([]int, 0)
 	l.BaseLexer.Reset()
 }

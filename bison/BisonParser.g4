@@ -21,8 +21,9 @@
 | Grammar.  |
 \==========*/
 
-// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+
+// $antlr-format alignColons hanging, alignSemicolons hanging, alignTrailingComments true, allowShortBlocksOnASingleLine true
+// $antlr-format allowShortRulesOnASingleLine false, columnLimit 150, maxEmptyLinesToKeep 1, minEmptyLines 1, reflowComments false, useTab false
 
 parser grammar BisonParser;
 
@@ -74,8 +75,7 @@ prologue_declaration
     ;
 
 params
-    : params actionBlock
-    | actionBlock
+    : actionBlock+
     ;
 
 /*----------------------.
@@ -118,6 +118,7 @@ precedence_declarator
     : PERCENT_LEFT
     | PERCENT_RIGHT
     | PERCENT_NONASSOC
+    | PERCENT_BINARY
     | PRECEDENCE
     ;
 
@@ -193,9 +194,7 @@ alias
 // FOO and 'foo' as two different symbols instead of aliasing them.
 
 token_decls_for_prec
-    : token_decl_for_prec+
-    | TAG token_decl_for_prec+
-    | token_decls_for_prec TAG token_decl_for_prec+
+    : (token_decl_for_prec+ | TAG token_decl_for_prec+) (TAG token_decl_for_prec+)*
     ;
 
 // One token declaration for precedence declaration.
@@ -212,9 +211,7 @@ token_decl_for_prec
 // A non empty list of typed symbols (for %type).
 
 symbol_decls
-    : symbol+
-    | TAG symbol+
-    | symbol_decls TAG symbol+
+    : (symbol+ | TAG symbol+) (TAG symbol+)*
     ;
 
 /*------------------------------------------.
@@ -222,8 +219,7 @@ symbol_decls
 `------------------------------------------*/
 
 bison_grammar
-    : rules_or_grammar_declaration
-    | bison_grammar rules_or_grammar_declaration
+    : rules_or_grammar_declaration+
     ;
 
 /* As a Bison extension, one can use the grammar declarations in the

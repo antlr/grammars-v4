@@ -180,6 +180,9 @@ CREATE TABLE `test_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = IN
 CREATE TABLE `\\test_table`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 CREATE TABLE `\\test\\_table\\`(id INT(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE = INNODB;
 
+-- Create Table with vector column
+CREATE TABLE VECTOR_TABLE (id INT AUTO_INCREMENT PRIMARY KEY, embedding1 VECTOR(3) DEFAULT NULL, embedding VECTOR(3));
+
 #end
 #begin
 -- Rename table
@@ -188,6 +191,7 @@ RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_ta
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
 rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
+RENAME TABLE IF EXISTS EMPLOYEE TO employee;
 #end
 #begin
 -- Truncate table

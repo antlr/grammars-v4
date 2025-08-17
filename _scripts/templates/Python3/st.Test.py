@@ -34,7 +34,7 @@ tee = False
 show_tokens = False
 show_tree = False
 show_trace = False
-encoding = "utf-8"
+encoding = "<file_encoding>"
 error_code = 0
 string_instance = 0
 prefix = ""
@@ -56,30 +56,30 @@ def main(argv):
     i = 1
     while i \< len(argv):
         arg = argv[i]
-        if arg in ("-tokens"):
+        if arg == "-tokens":
             show_tokens = True
-        elif arg in ("-tree"):
+        elif arg == "-tree":
             show_tree = True
-        elif arg in ("-prefix"):
+        elif arg == "-prefix":
             i = i + 1
             prefix = argv[i] + " "
-        elif arg in ("-input"):
+        elif arg == "-input":
             i = i + 1
             inputs.append(argv[i])
             is_fns.append(False)
-        elif arg in ("-encoding"):
+        elif arg == "-encoding":
             i = i + 1
             encoding = argv[i]
-        elif arg in ("-tee"):
+        elif arg == "-tee":
             tee = True
-        elif arg in ("-x"):
+        elif arg == "-x":
             while f := sys.stdin.readline():
                 f = f.strip()
                 inputs.append(f)
                 is_fns.append(True)
-        elif arg in ("-q"):
+        elif arg == "-q":
             quiet = True
-        elif arg in ("-trace"):
+        elif arg == "-trace":
             show_trace = True
         else:
             inputs.append(argv[i])
@@ -98,7 +98,7 @@ def main(argv):
         diff = end_time - start_time
         diff_time = diff.total_seconds()
         if (not quiet):
-            print(f'Total Time: {diff_time}', file=sys.stderr);
+            print(f'{prefix}Total Time: {diff_time}', file=sys.stderr);
     sys.exit(error_code)
 
 def ParseStdin():
@@ -119,6 +119,8 @@ def ParseString(input, row_number):
 
 def ParseFilename(input, row_number):
     global encoding
+    if (encoding == ""):
+        encoding = "utf-8"
     str = FileStream(input, encoding)
     DoParse(str, input, row_number)
 
@@ -151,7 +153,7 @@ def DoParse(str, input_name, row_number):
         while True:
             ro_token = lexer.nextToken()
             token = ro_token
-            # token.TokenIndex = i
+            token.tokenIndex = i
             i = i + 1
             print(token, file=sys.stderr)
             if (token.type == -1):

@@ -1,0 +1,2 @@
+(([.4 [8 7.23]] 0 lfsaw) [24 3] * +/ 81 + nnhz) 0 sinosc 4c * .2 0 4 combn play
+

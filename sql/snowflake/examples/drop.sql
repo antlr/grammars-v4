@@ -21,7 +21,6 @@ drop row access policy obj;
 drop schema obj;
 drop schema obj restrict;
 drop sequence obj;
-drop session policy obj;
 drop share obj;
 drop stage obj;
 drop stream obj;

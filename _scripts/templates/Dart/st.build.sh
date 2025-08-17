@@ -9,8 +9,17 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 version=`grep antlr4 pubspec.yaml | awk '{print $2}' | tr -d '\r' | tr -d '\n'`
 
+<if(antlrng_tool)>
+npm init -y
+npm i antlr-ng
+<endif>
+
 <tool_grammar_tuples:{x |
-antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Dart <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileName>
+<if(antlrng_tool)>
+tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Dart <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
+<else>
+antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Dart <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
+<endif>
 } >
 
 dart pub get

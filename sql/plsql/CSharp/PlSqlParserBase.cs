@@ -8,12 +8,10 @@ public abstract class PlSqlParserBase : Parser
 {
     private bool _isVersion10 = false;
     private bool _isVersion12 = true;
-    public PlSqlParserBase self;
 
     protected PlSqlParserBase(ITokenStream input)
         : base(input)
     {
-        self = this;
     }
 
     public PlSqlParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : this(input)

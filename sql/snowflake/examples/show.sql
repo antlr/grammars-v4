@@ -56,3 +56,4 @@ show users like 'na%';
 show variables like 'na%';
 show views like 'na%';
 show warehouses like 'na%';
+show password policies;

@@ -23,7 +23,6 @@ alter security integration si set enabled = true;
 -- alter security integration scim ;
 alter sequence seq rename to seq2;
 alter session set autocommit = true;
-alter session policy sp rename to sp2;
 alter share sh unset comment;
 alter stage stg rename to stg2;
 alter storage integration si set enabled = true;

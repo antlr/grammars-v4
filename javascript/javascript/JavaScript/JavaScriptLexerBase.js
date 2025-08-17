@@ -9,7 +9,8 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         this.lastToken = null;
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
-        this.templateDepth = 0;
+        this.currentDepth = 0;
+        this.templateDepthStack = new Array();
     }
 
     getStrictDefault() {
@@ -26,7 +27,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     IsInTemplateString() {
-        return this.templateDepth > 0;
+        return this.templateDepthStack.length > 0 && this.templateDepthStack[this.templateDepthStack.length - 1] === this.currentDepth;
     }
 
     getCurrentToken() {
@@ -43,6 +44,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     ProcessOpenBrace() {
+        this.currentDepth++;
         this.useStrictCurrent =
             this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]
                 ? true
@@ -55,6 +57,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
             this.scopeStrictModes.length > 0
                 ? this.scopeStrictModes.pop()
                 : this.useStrictDefault;
+        this.currentDepth--;
     }
 
     ProcessStringLiteral() {
@@ -70,12 +73,14 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         }
     }
 
-    IncreaseTemplateDepth() {
-        this.templateDepth++;
+    ProcessTemplateOpenBrace() {
+        this.currentDepth++;
+        this.templateDepthStack.push(this.currentDepth);
     }
 
-    DecreaseTemplateDepth() {
-        this.templateDepth--;
+    ProcessTemplateCloseBrace() {
+        this.templateDepthStack.pop();
+        this.currentDepth--;
     }
 
     IsRegexPossible() {
@@ -111,7 +116,8 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         this.lastToken = null;
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
-        this.templateDepth = 0;
+        this.currentDepth = 0;
+        this.templateDepthStack = new Array();
         super.reset();
     }
 }

@@ -86,3 +86,65 @@ SELECT n, scale, ROUND(n, scale) FROM t;
 SELECT ROUND(2.5, 0), ROUND(2.5, 0, 'HALF_TO_EVEN'), CEIL(2.5, 0), FLOOR(2.5, 0), TRUNC(3.14,-1), TRUNCATE(3.14116,2);
 SELECT ROUND( EXPR => -2.5, SCALE => 0, ROUNDING_MODE => 'HALF_AWAY_FROM_ZERO_Q');
 SELECT EXPR, SCALE, ROUNDING_MODE, SEQUENCE FROM t;
+
+select 'a', 'b',;
+with t as (select 'a', 'b',) select * from t;
+
+with a as((
+    ((
+        select 10 as c
+    ))
+    union
+    ((
+        select 11 as d
+    ))
+))
+   , b as (((
+    ((select 2 as e))
+)))
+select *
+from a
+union
+((select 1 as c));
+
+(((select 10 as c)))
+union
+((select 11 as d));
+
+SELECT SUM(cs) OVER() AS ta FROM t;
+
+SELECT old, start_date from t;
+
+
+with a as (
+    with b as (
+        select 't' as c
+    )
+    (select * from b)
+    union
+    (select * from b)
+)
+select *
+from a;
+
+select count(t.*) as ca from t9 as t;
+
+SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
+FROM t1 as a
+JOIN t2 as b USING (col5, col6);
+
+select * from t1
+union all by name
+select * from t2;
+
+select * from t1
+union by name
+select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;

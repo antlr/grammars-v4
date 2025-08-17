@@ -1,16 +1,20 @@
 # Generated from trgen <version>
 
+$workingDirectory = Get-Location
+$filePath = "$workingDirectory/tests.txt"
+
 $Tests = "<if(os_win)>../<example_files_win><else>../<example_files_unix><endif>"
 Write-Host "Test cases here: $Tests"
 
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-if (Test-Path -Path "tests.txt" -PathType Leaf) {
-    Remove-Item "tests.txt"
+if (Test-Path -Path "$filePath" -PathType Leaf) {
+    Remove-Item "$filePath"
 }
+
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob -- "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -19,20 +23,26 @@ foreach ($file in $allFiles) {
         continue
     } elseif ($ext -eq ".tree") {
         continue
+    } elseif ($ext -eq ".trq") {
+        continue
     } else {
-        $(& dotnet triconv -- -f utf-8 $file ; $last = $LASTEXITCODE ) | Out-Null
-        if ($last -ne 0)
-        {
-            continue
-        }
         $files.Add($file)
         Write-Host "Test case: $file"
     }
 }
+
+$writer = New-Object System.IO.StreamWriter($filePath, $true) # $true for append
 foreach ($file in $files) {
-    Add-Content "tests.txt" $file
+    $writer.WriteLine($file)
 }
-if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
+$writer.Dispose()
+
+if (-not(Test-Path -Path "$filePath" -PathType Leaf)) {
+    Write-Host "No test cases provided."
+    exit 0
+}
+$size = (Get-Item -Path "$filePath").Length
+if ( $size -eq 0 ) {
     Write-Host "No test cases provided."
     exit 0
 }
@@ -40,10 +50,11 @@ if (-not(Test-Path -Path "tests.txt" -PathType Leaf)) {
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "tests.txt" | ForEach-Object { dotnet trwdog -- python3 Test.py -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trwdog python3 Test.py -q -tee -tree $_ *>> parse.txt }
+$status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "tests.txt" | dotnet trwdog -- python3 Test.py -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trwdog python3 Test.py -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -67,7 +78,7 @@ if ( $size -eq 0 ) {
 }
 
 $old = Get-Location
-Set-Location ..
+Set-Location "<if(os_win)>../<example_dir_win><else>../<example_dir_unix><endif>"
 
 # Check if any .errors/.tree files have changed. That's not good.
 git config --global pager.diff false
@@ -78,7 +89,7 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $ext = $item.Extension
     if ($ext -eq ".errors") {
         git diff --exit-code $file *>> $old/updated.txt
-	$st = $LASTEXITCODE
+        $st = $LASTEXITCODE
         if ($st -ne 0) {
             $updated = $st
         }
@@ -88,8 +99,9 @@ foreach ($item in Get-ChildItem . -Recurse) {
     $file = $item.fullname
     $ext = $item.Extension
     if ($ext -eq ".tree") {
+        [IO.File]::WriteAllText($file, $([IO.File]::ReadAllText($file) -replace "`r`n", "`n"))
         git diff --exit-code $file *>> $old/updated.txt
-	$st = $LASTEXITCODE
+        $st = $LASTEXITCODE
         if ($st -ne 0) {
             $updated = $st
         }

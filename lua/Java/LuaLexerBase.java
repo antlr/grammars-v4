@@ -27,14 +27,14 @@ public abstract class LuaLexerBase extends Lexer {
         }
         while (cs.LA(1) != '\n' && cs.LA(1) != -1)
         {
-            cs.consume();
+            this.getInterpreter().consume(cs);
         }
     }
 
     private void read_long_string(CharStream cs, int sep)
     {
         boolean done = false;
-        cs.consume();
+        this.getInterpreter().consume(cs);
         for (; ; )
         {
             var c = cs.LA(1);
@@ -49,7 +49,7 @@ public abstract class LuaLexerBase extends Lexer {
                 case ']':
                     if (skip_sep(cs) == sep)
                     {
-                        cs.consume();
+                        this.getInterpreter().consume(cs);
                         done = true;
                     }
                     break;
@@ -59,7 +59,7 @@ public abstract class LuaLexerBase extends Lexer {
                         done = true;
                         break;
                     }
-                    cs.consume();
+                    this.getInterpreter().consume(cs);
                     break;
             }
             if (done) break;
@@ -71,10 +71,10 @@ public abstract class LuaLexerBase extends Lexer {
         int count = 0;
         int s = cs.LA(1);
         char ss = (char)s;
-        cs.consume();
+        this.getInterpreter().consume(cs);
         while (cs.LA(1) == '=')
         {
-            cs.consume();
+            this.getInterpreter().consume(cs);
             count++;
         }
         if (cs.LA(1) == s) count += 2;
