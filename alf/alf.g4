@@ -94,11 +94,11 @@ predopType
    ;
 
 moduleBody
-   : (functionRule | predicateRule)
+   : (functionRule | predicateRule)+
    ;
 
 functionRule
-   : functionterm '=' term (':-' literalList)? ('onlyrewrite' | 'onlynarrow')? '.'
+   : functionterm ('=' term)? (':-' literalList)? ('onlyrewrite' | 'onlynarrow')? '.'
    ;
 
 predicateRule
@@ -200,6 +200,7 @@ atom
    : IDENT
    | SPECIALCHARACTERS
    | SINGLE_QUOTE_STRING
+   | NUMBER
    ;
 
 VARIABLE
@@ -208,18 +209,6 @@ VARIABLE
 
 IDENT
    : LOWERCASE (UPPERCASE | LOWERCASE | DIGIT | '_')*
-   ;
-
-fragment UPPERCASE
-   : [A-Z]
-   ;
-
-fragment LOWERCASE
-   : [a-z]
-   ;
-
-fragment DIGIT
-   : [0-9]
    ;
 
 DOUBLE_QUOTE_STRING
@@ -234,7 +223,7 @@ NUMBER
    : DIGIT+
    ;
 
-CHARACTER
+fragment CHARACTER
    : LOWERCASE
    | UPPERCASE
    | DIGIT
@@ -263,6 +252,18 @@ fragment SPECIALCHARACTER
    | '&'
    | '^'
    | '~'
+   ;
+
+fragment UPPERCASE
+   : [A-Z]
+   ;
+
+fragment LOWERCASE
+   : [a-z]
+   ;
+
+fragment DIGIT
+   : [0-9]
    ;
 
 WS
