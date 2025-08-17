@@ -8,8 +8,12 @@ follow the JLS, but are slower that this grammar due to ambiguity and max-k prob
 in the published JLS EBNF.
 
 This grammar parses the file [ManyStringsConcat.java](examples/ManyStringsConcat.java)
-faster than the original grammar. The optimized grammar implements operator precedence
-using Antlr4-style alt ordering instead of operator-precedence rules.
+faster than the unoptimized java grammars. It implements operator precedence
+using Antlr4-style alt ordering instead of operator-precedence rules. Thus, it avoids
+creating parse trees with long, single-child chains for each string literal constant in
+[ManyStringsConcat.java](examples/ManyStringsConcat.java). In addition, it is faster
+because it avoids the large ATN-config set construction in the
+`AdaptivePredict()` parsing engine.
 
 ## Supported Java version
 * Java 24 (latest)
