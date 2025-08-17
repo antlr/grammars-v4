@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
+<!--
    <targets>Antlr4ng;CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+   Removed targets to bring grammar up to date, since that is high
+   priority.
+-->
+   <targets>CSharp;Java</targets>
+   <inputs>examples/**/*.java</inputs>
 </desc>

@@ -17,7 +17,7 @@ jobs:
       mymatrix: ${{ steps.step1.outputs.myoutput }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -60,19 +60,9 @@ jobs:
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
         export
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
-    - name: Setup PHP
-      id: setup-php
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        ini-values: xdebug.max_nesting_level=1000
-    - name: Print PHP version
-      run: |
-        echo ${{ steps.setup-php.outputs.php-version }}
-        php --version
     - name: Test Dotnet
       run: |
         dotnet --version
@@ -107,7 +97,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.5.0
+      uses: actions/setup-python@v5.6.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -123,7 +113,7 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v4.3.0
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: '22.12.0'
     - name: Test JavaScript
@@ -194,7 +184,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -214,7 +204,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.5.0
+      uses: actions/setup-python@v5.6.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -249,4 +239,29 @@ jobs:
         fi
         bash _scripts/test-static-checks.sh -t ${{matrix.test}} -f diff $Before $After
 
-
+  maven:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+    - name: Build with Maven
+      shell: bash
+      run: |
+        if [ "${{github.event_name}}" == "pull_request" ]; then
+           Before="${{github.event.pull_request.base.sha}}"
+           After="${{github.event.pull_request.head.sha}}"
+        else
+           Before="${{github.event.before}}"
+           After="${{github.event.after}}"
+        fi
+        bash _scripts/maven.sh $Before $After

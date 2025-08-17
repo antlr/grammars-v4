@@ -1,0 +1,15 @@
+/*
+  User Preferences Configuration
+*/
+
+^ Preferences
+
+theme = "dark"
+language = "en"
+notifications = true
+volume = 85
+recent_files = [
+    "report.yini",
+    "draft_0423.yini",
+    "budget2025.yini"
+]

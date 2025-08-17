@@ -28,11 +28,19 @@
 /** Derived from http://www.graphviz.org/doc/info/lang.html.
     Comments pulled from spec.
  */
+ /*
+  Modified by: Andrzej Borucki (2025) : character set
+ */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
+// Andrzej Borucki: characters
 
 grammar DOT;
+
+options {
+    caseInsensitive = true;
+}
 
 graph
     : STRICT? (GRAPH | DIGRAPH) id_? '{' stmt_list '}' EOF
@@ -101,27 +109,27 @@ id_
 // "The keywords node, edge, graph, digraph, subgraph, and strict are
 // case-independent"
 STRICT
-    : [Ss] [Tt] [Rr] [Ii] [Cc] [Tt]
+    : 'strict'
     ;
 
 GRAPH
-    : [Gg] [Rr] [Aa] [Pp] [Hh]
+    : 'graph'
     ;
 
 DIGRAPH
-    : [Dd] [Ii] [Gg] [Rr] [Aa] [Pp] [Hh]
+    : 'digraph'
     ;
 
 NODE
-    : [Nn] [Oo] [Dd] [Ee]
+    : 'node'
     ;
 
 EDGE
-    : [Ee] [Dd] [Gg] [Ee]
+    : 'edge'
     ;
 
 SUBGRAPH
-    : [Ss] [Uu] [Bb] [Gg] [Rr] [Aa] [Pp] [Hh]
+    : 'subgraph'
     ;
 
 /** "a numeral [-]?(.[0-9]+ | [0-9]+(.[0-9]*)? )" */
@@ -135,7 +143,16 @@ fragment DIGIT
 
 /** "any double-quoted string ("...") possibly containing escaped quotes" */
 STRING
-    : '"' ('\\"' | .)*? '"'
+    : '"' Char* '"'
+    ;
+
+fragment Char
+    : ~["\\]
+    | ESC
+    ;
+
+fragment ESC
+    : '\\' .
     ;
 
 /** "Any string of alphabetic ([a-zA-Z\200-\377]) characters, underscores
@@ -146,7 +163,7 @@ ID
     ;
 
 fragment LETTER
-    : [a-zA-Z\u0080-\u00FF_]
+    : [a-z_]  // caseInsensitive = true
     ;
 
 /** "HTML strings, angle brackets must occur in matched pairs, and
