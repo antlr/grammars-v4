@@ -44,9 +44,11 @@ to reformat in the [coding standard format for the repo](https://github.com/antl
 Generally, you can use either a string literal or the corresponding lexer rule name
 (`TOKEN_REF`) directly in a parser rule for a token. It makes no difference because the
 [java/java/ grammar](https://github.com/antlr/grammars-v4/tree/master/java/java)
-is a split Antlr4 grammar, and the Antlr Tool warns you from defining a string literal
-in a parser rule. Use the corresponding lexer rule name for the string literal
-in an Antlr listener or visitor.
+is a split Antlr4 grammar, and the Antlr Tool prevents you from defining a token using
+a string literal in a parser rule (it outputs
+`cannot create implicit token for string literal in non-combined grammar`).
+When writing an Antlr listener or visitor, use the corresponding lexer rule name for the
+string literal in the parser rule.
 
 Currently, the grammar contains a mixture of string literals
 and lexer rule names in parser rules. If you want a parser grammar that removes all string literals
