@@ -46,9 +46,9 @@ Generally, you can use either a string literal or the corresponding lexer rule n
 [java/java/ grammar](https://github.com/antlr/grammars-v4/tree/master/java/java)
 is a split Antlr4 grammar, and the Antlr Tool prevents you from defining a token using
 a string literal in a parser rule (it outputs
-`cannot create implicit token for string literal in non-combined grammar`).
+`cannot create implicit token for string literal in non-combined grammar` if you try).
 When writing an Antlr listener or visitor, use the corresponding lexer rule name for the
-string literal in the parser rule.
+string literal used in the parser rule.
 
 Currently, the grammar contains a mixture of string literals
 and lexer rule names in parser rules. If you want a parser grammar that removes all string literals
