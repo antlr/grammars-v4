@@ -282,10 +282,8 @@ qualifiedNameList
 
 formalParameters
     : '(' (
-        receiverParameter?
-        | receiverParameter (',' formalParameterList)?
-        | formalParameterList?
-    ) ')'
+       ( receiverParameter | formalParameter ) (',' formalParameterList)*
+    )? ')'
     ;
 
 receiverParameter
