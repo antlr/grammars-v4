@@ -1185,7 +1185,7 @@ DOUBLE_QUOTE_BLANK : '""';
 SINGLE_QUOTE       : '\'';
 
 ID  : [A-Z_] [A-Z0-9_@$]*;
-ID2 : DOLLAR [A-Z_] [A-Z0-9_]*;
+ID2 : '$' [A-Z0-9_]*;
 
 S3_PATH    : SINGLE_QUOTE 's3://' Uri SINGLE_QUOTE;
 S3GOV_PATH : SINGLE_QUOTE 's3gov://' Uri SINGLE_QUOTE;
@@ -1219,6 +1219,7 @@ fragment WindowsPath: [A-Z] COLON '\\' HexString ('\\' HexString)* '\\'?;
 
 ARROW : '->';
 ASSOC : '=>';
+FLOW : '->>';
 
 NE   : '!=';
 LTGT : '<>';

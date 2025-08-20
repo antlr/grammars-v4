@@ -44,6 +44,7 @@ sql_command
     | show_command
     | use_command
     | describe_command
+    | sql_command (FLOW sql_command)+
     | other_command
     ;
 
