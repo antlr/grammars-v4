@@ -269,8 +269,12 @@ arrayInitializer
 
 classType:
     (
-      ( identifier '.' )? annotation* identifier typeArguments?
-    )+ ( '.' annotation* identifier typeArguments? )*
+      ( packageName '.' annotation* )? typeIdentifier typeArguments?
+    )+ ( '.' annotation* typeIdentifier typeArguments? )*
+    ;
+
+packageName:
+    identifier ('.' identifier)*
     ;
 
 typeArgument
