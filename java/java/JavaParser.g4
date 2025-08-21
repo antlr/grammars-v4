@@ -267,8 +267,10 @@ arrayInitializer
     : '{' (variableInitializer (',' variableInitializer)* ','?)? '}'
     ;
 
-classOrInterfaceType
-    : (identifier typeArguments? '.')* typeIdentifier typeArguments?
+classType:
+    (
+      ( identifier '.' )? annotation* identifier typeArguments?
+    )+ ( '.' annotation* identifier typeArguments? )*
     ;
 
 typeArgument
@@ -487,8 +489,6 @@ typeIdentifier // Identifiers that are not restricted for type declarations
     | WITH
     | TRANSITIVE
     | SEALED
-    | PERMITS
-    | RECORD
     ;
 
 localTypeDeclaration
@@ -722,8 +722,8 @@ switchRuleOutcome
     | blockStatement* // is *-operator correct??? I don't think so. https://docs.oracle.com/javase/specs/jls/se24/html/jls-14.html#jls-BlockStatements
     ;
 
-classType
-    : (classOrInterfaceType '.')? annotation* identifier typeArguments?
+classOrInterfaceType
+    : classType // classType, interfaceType are all essentially identical to classOrInterfaceType because of no symbol table.
     ;
 
 creator
