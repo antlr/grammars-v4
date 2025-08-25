@@ -6807,13 +6807,19 @@ sql_plus_command_no_semicolon
 
 sql_plus_command
     : EXIT
-    | PROMPT_MESSAGE
+    | prompt_message
     | SHOW (ERR | ERRORS)
     | whenever_command
     | timing_command
     | start_command
-    | set_command
-    | clear_command
+    ;
+
+prompt_message
+    : id=ID {
+          String t = $id.text.toUpperCase();
+          if (!t.equals("PRO") && !t.equals("PROMPT")) {
+          }
+    }
     ;
 
 start_command
