@@ -274,6 +274,7 @@ DELTA                  : 'DELTA';
 DENSE_RANK             : 'DENSE_RANK';
 DESC                   : 'DESC';
 DESCRIBE               : 'DESCRIBE';
+DIRECTED               : 'DIRECTED';
 DIRECTION              : 'DIRECTION';
 DIRECTORY              : 'DIRECTORY';
 DISABLE                : 'DISABLE';
