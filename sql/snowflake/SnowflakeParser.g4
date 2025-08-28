@@ -4447,15 +4447,19 @@ outer_join
     ;
 
 join_type
-    : INNER DIRECTED?
-    | outer_join DIRECTED?
+    : INNER
+    | outer_join
     ;
 
 join_clause
-    : join_type? JOIN object_ref ((ON search_condition)? | (USING '(' column_list ')')?)
-    //| join_type? JOIN object_ref (USING '(' column_list ')')?
-    | NATURAL join_type? JOIN object_ref USING column_list_in_parentheses
+    : join_type? DIRECTED? JOIN object_ref on_using_clause?
+    | NATURAL join_type? DIRECTED? JOIN object_ref
     | CROSS DIRECTED? JOIN object_ref
+    | ASOF JOIN object_ref MATCH_CONDITION '(' expr ')' on_using_clause?
+    ;
+
+on_using_clause
+    : ON search_condition | USING column_list_in_parentheses
     ;
 
 at_before
