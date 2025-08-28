@@ -344,19 +344,36 @@ altAnnotationQualifiedName
     : (identifier DOT)* '@' identifier
     ;
 
-annotation
-    : ('@' qualifiedName | altAnnotationQualifiedName) (
-        '(' ( elementValuePairs | elementValue)? ')'
-    )?
+//annotation
+//    : ('@' qualifiedName /* | altAnnotationQualifiedName */) ( '(' ( elementValuePairs | elementValue)? ')')?
+//    ;
+
+annotation :
+    ('@' qualifiedName /* | altAnnotationQualifiedName */) annotationFieldValues?
     ;
 
-elementValuePairs
-    : elementValuePair (',' elementValuePair)*
-    ;
+annotationFieldValues:
+	'(' ( annotationFieldValue ( ',' annotationFieldValue )* )? ')'
+	;
 
-elementValuePair
-    : identifier '=' elementValue
-    ;
+annotationFieldValue:
+	{ this.IsNotIdentifierAssign() }? annotationValue
+	| identifier '=' annotationValue
+	;
+
+annotationValue:
+	expression //conditionalExpression
+	| annotation
+	| '{' ( annotationValue ( ',' annotationValue )* )? ','? '}'
+	;
+
+//elementValuePairs
+//    : elementValuePair (',' elementValuePair)*
+//    ;
+
+//elementValuePair
+//    : identifier '=' elementValue
+//    ;
 
 elementValue
     : expression
