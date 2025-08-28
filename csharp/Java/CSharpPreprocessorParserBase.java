@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.*;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 
 abstract class CSharpPreprocessorParserBase extends Parser
@@ -11,7 +12,7 @@ abstract class CSharpPreprocessorParserBase extends Parser
         ConditionalSymbols.add("DEBUG");
     }
 
-    Stack<Boolean> conditions = new Stack<Boolean>();
+    private final Deque<Boolean> conditions = new ArrayDeque<>();
     public HashSet<String> ConditionalSymbols = new HashSet<String>();
 
     protected Boolean AllConditions()

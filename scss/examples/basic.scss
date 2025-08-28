@@ -216,6 +216,7 @@ div.container {
 }
 
 @keyframes spin {
+    -moz-transform: rotate(0deg);
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
 }

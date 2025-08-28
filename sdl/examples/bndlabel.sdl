@@ -1,0 +1,27 @@
+	module $defbndlab;
+/*
+/*  Copyright © 1996, Digital Equipment Corporation.
+/*
+/* Modifications:
+/*
+/*	001	Tom Benson	13-Feb-1984	(003 VCG)
+/*
+/*		Added modification history.
+/*
+/*
+
+/*
+/* define bound label list node
+/*
+AGGREGATE vcg_bound_label	STRUCTURE;
+	bndlab_a_next		ADDRESS;	{ Pointer to the next bound label
+	bndlab_a_symbol		ADDRESS;	{ Pointer to the symbol node
+#bndlab_length = .;
+	END;
+/*
+/* Define the length of a bound label node
+/*
+CONSTANT bndlab_k_length EQUALS (#bndlab_length);
+/*
+/*
+END_MODULE;
