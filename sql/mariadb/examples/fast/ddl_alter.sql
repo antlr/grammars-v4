@@ -53,6 +53,7 @@ alter table default.task add column xxxx varchar(200) comment 'cdc test';
 alter table `some_table` add unique if not exists `id_unique` (`id`)
 alter table if exists `add_test` add column if not exists `new_col` text default 'my_default';
 alter table user_details add index if not exists `country_id_index` (country_id), algorithm=NOCOPY;
+alter table if exists T1 modify column if exists status ENUM ('PENDING', 'SENDING', 'SENT', 'SUCCESS', 'FAILED', 'FATAL') NOT NULL, rename column if exists col to new_col;
 #end
 #begin
 -- Alter database
