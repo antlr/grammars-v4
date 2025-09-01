@@ -1,0 +1,113 @@
+
+a->60
+b->60
+c->10
+
+
+10)p=1(1)9			// Read contour heights and print them
+read(cp)
+newline
+620,27
+620,3
+620,0
+print(p)1,0
+620,10
+print(cp)0,4
+repeat
+newline
+newline
+jump11
+
+1)i=1(1)50			// Test function value against contour heights
+j=0		                // and store number of highest contour exceeded
+2)jump4,ai>=c(j+1)
+3)bi=j+0.1
+repeat
+b51=0.1
+jump5
+4)j=j+1
+jump3,j=9
+jump2
+
+5)620,28
+newline
+620,28
+s=0
+t=Xintpt(b1)
+i=1(1)50
+r=s
+s=t
+t=Xintpt(b(i+1))
+jump7,s>r
+jump7,s>t			// Test to find if contour number has just
+620,14				// increased or is about to decrease
+6)repeat
+jump12
+7)200(s)
+105,543
+8)125,177			// If contour number satisfies above condition, print it
+330,1
+290(8)
+9)125,464
+090(9)
+625,0
+jump6
+
+11)newline			// Print top border
+p=0(1)51
+620,28
+repeat
+k=1(1)50
+i=1(1)50
+
+a=0.02i				// Subroutine to calculate required function.
+b=0.02k				// Must be in the form AI=L(I,K)
+c=1-a
+d=1-b
+x=1
+l=1(1)3
+x=ax
+repeat
+y=1
+l=1(1)7
+y=cy
+repeat
+z=xy
+x=1
+l=1(1)11
+x=dx
+repeat
+ai=zxb
+
+repeat
+jump1
+12)repeat
+
+620,28				// Print bottom border
+newline
+p=0(1)51
+620,28
+repeat
+newline
+newline
+jump10
+close
+
+
+chapter0
+across10/1
+close
+->
+
+
+
+1.0,-18				// data: Nine contour heights
+1.0,-14
+1.0,-10
+1.0,-8
+1.0,-6
+1.0,-5
+2.5,-5
+5.0,-5
+7.5,-5
+->
