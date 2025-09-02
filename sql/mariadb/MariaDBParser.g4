@@ -733,7 +733,7 @@ alterSpecification
     | ALTER COLUMN? uid (SET DEFAULT defaultValue | DROP DEFAULT)            # alterByChangeDefault
     | CHANGE COLUMN? ifExists? oldColumn = uid // here ifExists is MariaDB-specific only
     newColumn = uid columnDefinition (FIRST | AFTER afterColumn = uid)? # alterByChangeColumn
-    | RENAME COLUMN oldColumn = uid TO newColumn = uid                  # alterByRenameColumn
+    | RENAME COLUMN ifExists? oldColumn = uid TO newColumn = uid        # alterByRenameColumn
     | LOCK '='? lockType = (DEFAULT | NONE | SHARED | EXCLUSIVE)        # alterByLock
     | MODIFY COLUMN? ifExists? // here ifExists is MariaDB-specific only
     uid columnDefinition (FIRST | AFTER uid)?                             # alterByModifyColumn
@@ -2298,6 +2298,7 @@ dataType
     ) lengthOneDimension? (SIGNED | UNSIGNED | ZEROFILL)*                              # dimensionDataType
     | typeName = REAL lengthTwoDimension? (SIGNED | UNSIGNED | ZEROFILL)*              # dimensionDataType
     | typeName = DOUBLE PRECISION? lengthTwoDimension? (SIGNED | UNSIGNED | ZEROFILL)* # dimensionDataType
+    | typeName = VECTOR ( lengthOneDimension )                                         # dimensionDataType
     | typeName = (DECIMAL | DEC | FIXED | NUMERIC | FLOAT | FLOAT4 | FLOAT8) lengthTwoOptionalDimension? (
         SIGNED
         | UNSIGNED

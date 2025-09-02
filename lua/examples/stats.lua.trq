@@ -1,11 +1,3 @@
-(: Check whether there are a correct number of "stat".
+(: Check whether there are a correct number of "stat". :)
 
-    NB!!! This is a placeholder to implement a requirement on
-    the number of stat-nodes. This is known to be incorrect for
-    the current version of the lua grammar. When tree structure
-    is corrected, this file must be fixed.
-
-    For now, the count is 2.
-:)
-
-assert count(//stat) = 2, "Invalid number of 'stat' nodes.";
+assert count(//stat) = 1, "Invalid number of 'stat' nodes.";

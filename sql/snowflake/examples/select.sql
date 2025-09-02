@@ -140,3 +140,19 @@ select * from t2;
 select * from t1
 union by name
 select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;
+
+show warehouses
+->> select * from $1;
+
+SELECT 0 as c
+->> SELECT c FROM $1
+->> SELECT c FROM $2
+->> SELECT c FROM $3;

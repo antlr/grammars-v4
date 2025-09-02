@@ -44,6 +44,7 @@ sql_command
     | show_command
     | use_command
     | describe_command
+    | sql_command (FLOW sql_command)+
     | other_command
     ;
 
@@ -4052,7 +4053,7 @@ expr
     | trim_expression
     | function_call
     | subquery
-    | expr IS null_not_null
+    | expr IS (null_not_null | not_distinct_from expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
@@ -4451,10 +4452,14 @@ join_type
     ;
 
 join_clause
-    : join_type? JOIN object_ref ((ON search_condition)? | (USING '(' column_list ')')?)
-    //| join_type? JOIN object_ref (USING '(' column_list ')')?
-    | NATURAL outer_join? JOIN object_ref
-    | CROSS JOIN object_ref
+    : join_type? DIRECTED? JOIN object_ref on_using_clause?
+    | NATURAL join_type? DIRECTED? JOIN object_ref
+    | CROSS DIRECTED? JOIN object_ref
+    | ASOF JOIN object_ref MATCH_CONDITION '(' expr ')' on_using_clause?
+    ;
+
+on_using_clause
+    : ON search_condition | USING column_list_in_parentheses
     ;
 
 at_before
@@ -4590,6 +4595,10 @@ comparison_operator
 
 null_not_null
     : NOT? NULL_
+    ;
+
+not_distinct_from
+    : NOT? DISTINCT FROM
     ;
 
 subquery
