@@ -30,25 +30,33 @@ grammar HyperTalk;
 // Start symbol accepting only well-formed HyperTalk scripts that consist of handlers, functions, whitespace and
 // comments (representing scripts that are assignable to objects like buttons, fields and cards). Disallows statements or
 // expressions that are not inside of a handler or function block.
+start_script
+    : script EOF
+    ;
+
+start_scriptlet
+    : scriptlet EOF
+    ;
+
 script
     : handler script
     | function_ script
     | NEWLINE script
-    | EOF
+    |
     ;
 
 // Start symbol accepting any sequence of HyperTalk statements, expressions, whitespace and comments. Suitable when
 // evaluating the message box or HyperTalk strings via the 'do' command and 'value of' function.
 scriptlet
-    : statement EOF
+    : statement
     | multilineScriptlet
     ;
 
 multilineScriptlet
     : statement NEWLINE multilineScriptlet
-    | statement EOF
+    | statement
     | NEWLINE multilineScriptlet
-    | EOF
+    |
     ;
 
 handler
