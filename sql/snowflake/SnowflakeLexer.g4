@@ -1101,6 +1101,7 @@ VALUES : 'VALUES';
 VARIABLES: 'VARIABLES';
 // VARP:                                                  'VARP';
 // VARYING:                                               'VARYING';
+VECTOR   : 'VECTOR';
 VERSION  : 'VERSION';
 VERSIONS : 'VERSIONS';
 VIEW     : 'VIEW';

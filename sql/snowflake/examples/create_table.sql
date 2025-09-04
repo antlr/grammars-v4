@@ -113,3 +113,6 @@ CREATE TABLE T (C1 int,C2 int,C3 int as hash(C1,C2));
 
 --Create or alter
 create or alter table T (C1 INT);
+
+create table tv1(v vector(int, 1));
+create table tv2(v vector(float, 2), v2 vector(float4, 2), v3 vector(float8, 2));
