@@ -10,7 +10,15 @@ options {
 
 // Top-level statements
 
-queryStmt
+clickhouseFile
+    : batch? EOF
+    ;
+
+batch
+    : command (SEMICOLON command)* SEMICOLON?
+    ;
+
+command
     : query (INTO OUTFILE STRING_LITERAL)? (FORMAT identifierOrNull)? (SEMICOLON)?
     | insertStmt
     | deleteStmt
@@ -154,7 +162,7 @@ dictionaryAttrDfnt
     ;
 
 dictionaryEngineClause
-    : dictionaryPrimaryKeyClause?
+    : dictionaryPrimaryKeyClause sourceClause layoutClause lifetimeClause dictionarySettingsClause?
     ;
 
 dictionaryPrimaryKeyClause
