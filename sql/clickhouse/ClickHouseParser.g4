@@ -148,7 +148,7 @@ createStmt
         | engineClause POPULATE?
     ) subqueryClause # CreateMaterializedViewStmt
     | (ATTACH | CREATE (OR REPLACE)? | REPLACE) TEMPORARY? TABLE (IF NOT EXISTS)? tableIdentifier uuidClause? clusterClause? tableSchemaClause?
-        engineClause? subqueryClause?                                                                                                    # CreateTableStmt
+        engineClause? subqueryClause? orderByClause?                                                                                                   # CreateTableStmt
     | (ATTACH | CREATE) (OR REPLACE)? VIEW (IF NOT EXISTS)? tableIdentifier uuidClause? clusterClause? tableSchemaClause? subqueryClause #
         CreateViewStmt
     ;
