@@ -3897,6 +3897,7 @@ non_reserved_words
     | USERADMIN
     | VALUE
     | VALUES
+    | VECTOR
     | VERSION
     | VISIBILITY
     | WAREHOUSE_TYPE
@@ -4128,6 +4129,15 @@ data_type
     | ARRAY
     | GEOGRAPHY
     | GEOMETRY
+    | VECTOR '(' vector_element_type COMMA num ')'
+    ;
+
+vector_element_type
+    : INT
+    | INTEGER
+    | FLOAT_
+    | FLOAT4
+    | FLOAT8
     ;
 
 primitive_expression
