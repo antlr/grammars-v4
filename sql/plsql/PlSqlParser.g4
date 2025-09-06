@@ -6617,7 +6617,8 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
-    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' string_delimiter)? listagg_overflow_clause? ')' (
+    // Modified to allow expressions as delimiter to LISTAGG
+    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' expression)? listagg_overflow_clause? ')' (
         WITHIN GROUP '(' order_by_clause ')'
     )? over_clause?
     | cursor_name (PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT)
@@ -6775,7 +6776,10 @@ xml_general_default_part
     ;
 
 xml_multiuse_expression_element
-    : expression (AS (id_expression | EVALNAME concatenation))?
+    : expression
+        ( (AS? id_expression)           
+        | (AS EVALNAME expression)      
+        )?
     ;
 
 xmlroot_param_version_part
