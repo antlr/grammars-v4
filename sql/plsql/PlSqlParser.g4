@@ -6776,7 +6776,10 @@ xml_general_default_part
     ;
 
 xml_multiuse_expression_element
-    : expression (AS (id_expression | EVALNAME concatenation))?
+    : expression
+        ( (AS? id_expression)           
+        | (AS EVALNAME expression)      
+        )?
     ;
 
 xmlroot_param_version_part
