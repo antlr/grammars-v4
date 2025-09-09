@@ -181,8 +181,8 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                                     # DoStatement
     | While '(' expressionSequence ')' statement                                                                            # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement # ForStatement
-    | For '(' (singleExpression | singleVariableDeclaration) In expressionSequence ')' statement                              # ForInStatement
-    | For Await? '(' (singleExpression | singleVariableDeclaration) Of expressionSequence ')' statement                       # ForOfStatement
+    | For '(' (singleExpression | singleVariableDeclaration) In expressionSequence ')' statement                            # ForInStatement
+    | For Await? '(' (singleExpression | singleVariableDeclaration) Of expressionSequence ')' statement                     # ForOfStatement
     ;
 
 varModifier // let, const - ECMAScript 6
