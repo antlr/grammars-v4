@@ -157,6 +157,10 @@ variableDeclarationList
     : varModifier variableDeclaration (',' variableDeclaration)*
     ;
 
+singleVariableDeclaration
+    : varModifier variableDeclaration
+    ;
+
 variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
@@ -177,8 +181,8 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                                     # DoStatement
     | While '(' expressionSequence ')' statement                                                                            # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement # ForStatement
-    | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                              # ForInStatement
-    | For Await? '(' (singleExpression | variableDeclarationList) Of expressionSequence ')' statement                       # ForOfStatement
+    | For '(' (singleExpression | singleVariableDeclaration) In expressionSequence ')' statement                            # ForInStatement
+    | For Await? '(' (singleExpression | singleVariableDeclaration) Of expressionSequence ')' statement                     # ForOfStatement
     ;
 
 varModifier // let, const - ECMAScript 6
@@ -559,7 +563,7 @@ keyword
     | Protected
     | Static
     | Yield
-    | YieldStar    
+    | YieldStar
     | Async
     | Await
     | From
