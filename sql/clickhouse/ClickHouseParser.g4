@@ -614,6 +614,7 @@ columnsExpr
 columnExpr
     : CASE columnExpr? (WHEN columnExpr THEN columnExpr)+ (ELSE columnExpr)? END         # ColumnExprCase
     | CAST LPAREN columnExpr AS columnTypeExpr RPAREN                                    # ColumnExprCast
+    | columnExpr DOUBLE_COLON columnTypeExpr                                             # ColumnExprCastSymbol
     | DATE STRING_LITERAL                                                                # ColumnExprDate
     | EXTRACT LPAREN interval FROM columnExpr RPAREN                                     # ColumnExprExtract
     | INTERVAL columnExpr interval                                                       # ColumnExprInterval
@@ -624,11 +625,11 @@ columnExpr
     | identifier (LPAREN columnExprList? RPAREN) OVER identifier                         # ColumnExprWinFunctionTarget
     | identifier (LPAREN columnExprList? RPAREN)? LPAREN DISTINCT? columnArgList? RPAREN # ColumnExprFunction
     | literal                                                                            # ColumnExprLiteral
-
     // FIXME(ilezhankin): this part looks very ugly, maybe there is another way to express it
-    | columnExpr LBRACKET columnExpr RBRACKET # ColumnExprArrayAccess
-    | columnExpr DOT DECIMAL_LITERAL          # ColumnExprTupleAccess
-    | DASH columnExpr                         # ColumnExprNegate
+    | columnExpr LBRACKET columnExpr RBRACKET                                            # ColumnExprArrayAccess
+    | columnExpr DOT (DECIMAL_LITERAL | STRING_LITERAL | identifier)                     # ColumnExprTupleAccess
+    | columnExpr LBRACE STRING_LITERAL RBRACE                                            # ColumnExprMapAccess
+    | DASH columnExpr                                                                    # ColumnExprNegate
     | columnExpr (
         ASTERISK  // multiply
         | SLASH   // divide
@@ -737,7 +738,7 @@ numberLiteral
         floatingLiteral
         | OCTAL_LITERAL
         | DECIMAL_LITERAL
-        | HEXADECIMAL_LITERAL
+        | HEXADECIMAL_NUMERIC_LITERAL
         | INF
         | NAN_SQL
     )
@@ -762,7 +763,9 @@ interval
 
 keyword
     // except NULL_SQL, INF, NAN_SQL
-    : AFTER
+    : ACCESS
+    | ADD
+    | AFTER
     | ALIAS
     | ALL
     | ALTER
@@ -779,30 +782,36 @@ keyword
     | BETWEEN
     | BOTH
     | BY
+    | CACHES
     | CASE
     | CAST
     | CHECK
     | CLEAR
     | CLUSTER
+    | CLUSTERS
     | CODEC
     | COLLATE
     | COLUMN
+    | COLUMNS
     | COMMENT
     | CONSTRAINT
     | CREATE
     | CROSS
     | CUBE
     | CURRENT
+    | CURRENT_USER
+    | CHANGED
     | DATABASE
     | DATABASES
     | DATE
+    | DAY
     | DEDUPLICATE
     | DEFAULT
     | DELAY
     | DELETE
-    | DESCRIBE
     | DESC
     | DESCENDING
+    | DESCRIBE
     | DETACH
     | DICTIONARIES
     | DICTIONARY
@@ -811,18 +820,25 @@ keyword
     | DISTRIBUTED
     | DROP
     | ELSE
+    | ENABLED
     | END
     | ENGINE
+    | ENGINES
+    | ESTIMATE
     | EVENTS
+    | EXCEPT
     | EXISTS
     | EXPLAIN
     | EXPRESSION
+    | EXTENDED
     | EXTRACT
     | FETCHES
+    | FIELDS
+    | FILESYSTEM
+    | FILL
     | FINAL
     | FIRST
     | FLUSH
-    | FOR
     | FOLLOWING
     | FOR
     | FORMAT
@@ -830,19 +846,27 @@ keyword
     | FROM
     | FULL
     | FUNCTION
+    | FUNCTIONS
     | GLOBAL
     | GRANULARITY
+    | GRANTS
     | GROUP
+    | GROUPING
     | HAVING
     | HIERARCHICAL
+    | HOUR
     | ID
     | IF
     | ILIKE
+    | IMPLICIT
     | IN
     | INDEX
+    | INDEXES
+    | INDICES
     | INJECTIVE
     | INNER
     | INSERT
+    | INTERPOLATE
     | INTERVAL
     | INTO
     | IS
@@ -851,6 +875,7 @@ keyword
     | JSON_FALSE
     | JSON_TRUE
     | KEY
+    | KEYS
     | KILL
     | LAST
     | LAYOUT
@@ -866,7 +891,10 @@ keyword
     | MATERIALIZED
     | MAX
     | MERGES
+    | MICROSECOND
+    | MILLISECOND
     | MIN
+    | MINUTE
     | MODIFY
     | MOVE
     | MUTATION
@@ -881,12 +909,26 @@ keyword
     | OUTER
     | OUTFILE
     | OVER
+    | OVERRIDE
     | PARTITION
+    | PIPELINE
+    | PLAN
+    | POLICY
+    | POLICIES
     | POPULATE
     | PRECEDING
     | PREWHERE
     | PRIMARY
+    | PRIVILEGES
+    | PROCESSLIST
+    | PROFILE
+    | PROFILES
+    | PROJECTION
+    | QUARTER
+    | QUOTA
+    | QUOTAS
     | RANGE
+    | RECURSIVE
     | RELOAD
     | REMOVE
     | RENAME
@@ -894,14 +936,18 @@ keyword
     | REPLICA
     | REPLICATED
     | RIGHT
+    | ROLE
+    | ROLES
     | ROLLUP
     | ROW
     | ROWS
     | SAMPLE
+    | SECOND
     | SELECT
     | SEMI
     | SENDS
     | SET
+    | SETTING
     | SETTINGS
     | SHOW
     | SOURCE
@@ -911,7 +957,9 @@ keyword
     | SYNC
     | SYNTAX
     | SYSTEM
+    | STEP
     | TABLE
+   
     | TABLES
     | TEMPORARY
     | TEST
@@ -919,28 +967,33 @@ keyword
     | TIES
     | TIMEOUT
     | TIMESTAMP
-    | TOTALS
-    | TRAILING
-    | TRIM
-    | TRUNCATE
     | TO
     | TOP
+    | TOTALS
+    | TRAILING
+    | TREE
+    | TRIM
+    | TRUNCATE
     | TTL
     | TYPE
     | UNBOUNDED
     | UNION
     | UPDATE
     | USE
+    | USER
+    | USERS
     | USING
     | UUID
     | VALUES
     | VIEW
     | VOLUME
     | WATCH
+    | WEEK
     | WHEN
     | WHERE
     | WINDOW
     | WITH
+    | YEAR
     ;
 
 keywordForAlias
