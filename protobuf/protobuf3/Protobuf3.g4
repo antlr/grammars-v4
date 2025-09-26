@@ -175,6 +175,7 @@ enumBody
 enumElement
     : optionStatement
     | enumField
+    | reserved
     | emptyStatement_
     ;
 
