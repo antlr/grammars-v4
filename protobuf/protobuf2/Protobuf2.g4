@@ -14,7 +14,7 @@
 grammar Protobuf2;
 
 proto
-    : syntax (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
+    : syntax? (importStatement | packageStatement | optionStatement | topLevelDef | emptyStatement_)* EOF
     ;
 
 // Syntax
