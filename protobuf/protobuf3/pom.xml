@@ -38,10 +38,11 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>twoPassParse</entryPoint>
+					<entryPoint>proto</entryPoint>
 					<grammarName>Protobuf3</grammarName>
 					<packageName></packageName>
-					<exampleFiles></exampleFiles>
+					<testFileExtension>.proto</testFileExtension>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
