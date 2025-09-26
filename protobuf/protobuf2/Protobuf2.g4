@@ -266,7 +266,7 @@ constant
 
 // not specified in specification but used in tests
 blockLit
-    : LC (ident COLON constant)* RC
+    : LC (ident COLON constant (COMMA)?)* RC
     ;
 
 emptyStatement_
