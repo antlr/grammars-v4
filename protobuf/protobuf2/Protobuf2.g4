@@ -132,7 +132,7 @@ type_
 // Extensions
 
 extensions
-    : EXTENSIONS ranges (LB (verificationDef | declarationsDef) RB)? SEMI
+    : EXTENSIONS ranges (LB (verificationDef | declarations) RB)? SEMI
     ;
 
 verificationDef
@@ -144,16 +144,12 @@ verification
     | UNVERIFIED_LIT
     ;
 
-declarationsDef
-    : declarationDef (COMMA declarationDef)*
-    ;
-
-declarationDef
-    : DECLARATION EQ LC (declaration (declaration)*)? RC
+declarations
+    : declaration (COMMA declaration)*
     ;
 
 declaration
-    : fieldName COLON constant (COMMA)?
+    : DECLARATION EQ blockLit
     ;
 
 // Reserved
