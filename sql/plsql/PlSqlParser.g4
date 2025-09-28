@@ -3884,7 +3884,7 @@ heap_org_table_clause
     ;
 
 external_table_clause
-    : '(' (TYPE access_driver_type)? external_table_data_props ')' (
+    : '(' (TYPE access_driver_type)? external_table_data_props ')' parallel_clause? (
         REJECT LIMIT (numeric | UNLIMITED)
     )? inmemory_table_clause?
     ;
@@ -3897,17 +3897,219 @@ access_driver_type
     ;
 
 external_table_data_props
-    : (DEFAULT DIRECTORY directory_name)? (
+    : (DEFAULT DIRECTORY external_table_directory)? (
         ACCESS PARAMETERS (
             '(' CHAR_STRING ')'
-            | '(' opaque_format_spec ')'
+            | '(' external_table_data_format+ ')'
             | USING CLOB select_only_statement
         )
-    )? (LOCATION '(' directory_name COLON CHAR_STRING (',' directory_name COLON CHAR_STRING)* ')')?
+    )? (LOCATION '(' external_table_directory (',' external_table_directory)* ')')?
     ;
 
-opaque_format_spec
-    : //TODO https://docs.oracle.com/en/database/oracle/oracle-database/21/sutil/oracle-external-tables.html
+external_table_data_format
+    : RECORDS DELIMITED BY NEWLINE_
+    | COLUMN TRANSFORMS '(' external_table_transform (',' external_table_transform)* ')'
+    | external_table_records
+    | external_table_fields
+    | external_table_datapump
+    | external_table_hive
+    ;
+
+external_table_transform
+    : column_name FROM (
+        NULL_
+        | CONSTANT quoted_string
+        | (CONCAT | LOBFILE) (external_table_field | CONSTANT quoted_string)
+        | (
+            FROM '(' external_table_directory (',' external_table_directory)* ')'
+            | CLOB
+            | BLOB
+            | CHARACTERSET '=' char_set_name
+        )
+        | STARTOF external_table_field_list '(' UNSIGNED_INTEGER ')'
+    )
+    ;
+
+external_table_field
+    : column_name type_name? (NOT NULL_)? default_value_part?
+    ;
+
+external_table_field_list
+    : external_table_fields_clause (',' external_table_fields_clause)*
+    ;
+
+external_table_fields_clause
+    : external_table_field (
+        external_table_position_clause
+        | external_table_datatype_clause
+        | external_table_init_clause
+        | external_table_lls_clause
+    )*
+    ;
+
+external_table_position_clause
+    : POSITION? '(' ('*'? ('+' | '-')? UNSIGNED_INTEGER?) (BINDVAR | (':' ('+' | '-')? UNSIGNED_INTEGER)) ')'
+    ;
+
+external_table_datatype_clause
+    : UNSIGNED? INTEGER EXTERNAL? UNSIGNED_INTEGER? external_table_delimit_clause?
+    | (DECIMAL | ZONED) (
+        '(' UNSIGNED_INTEGER (',' UNSIGNED_INTEGER)? ')'
+        | EXTERNAL ('(' UNSIGNED_INTEGER ')')? external_table_delimit_clause?
+    )
+    | ORACLE_DATE
+    | ORACLE_NUMBER COUNTED?
+    | FLOAT EXTERNAL? UNSIGNED_INTEGER? external_table_delimit_clause?
+    | DOUBLE
+    | BINARY_FLOAT EXTERNAL? UNSIGNED_INTEGER? external_table_delimit_clause?
+    | BINARY_DOUBLE
+    | RAW UNSIGNED_INTEGER?
+    | CHAR EXTERNAL? ('(' UNSIGNED_INTEGER ')' )? external_table_delimit_clause? external_table_trim_clause? external_table_date_format_clause?
+    | (VARCHAR | VARRAW | VARCHARC | VARRAWC) '(' (UNSIGNED_INTEGER ',')? UNSIGNED_INTEGER ')'
+    ;
+
+external_table_delimit_clause
+    : ENCLOSED BY quoted_string (AND quoted_string)?
+    | TERMINATED BY (quoted_string | WHITESPACE) (OPTIONALLY? ENCLOSED BY quoted_string (AND quoted_string)?)?
+    ;
+
+external_table_trim_clause
+    : LRTRIM
+    | NOTRIM
+    | LTRIM
+    | RTRIM
+    | LDRTRIM
+    ;
+
+external_table_date_format_clause
+    : DATE_FORMAT? (
+        DATE
+        | TIMESTAMP (WITH LOCAL? TIME ZONE)? MASK quoted_string
+        | INTERVAL (YEAR_TO_MONTH | DAY_TO_SECOND)
+    )
+    ;
+
+external_table_init_clause
+    : (DEFAULTIF | NULLIF) external_table_condition_clause
+    ;
+
+external_table_condition_clause
+    : (field_spec | '(' UNSIGNED_INTEGER BINDVAR ')') relational_operator (quoted_string | HEX_STRING_LIT | BLANKS)
+    | external_table_condition_clause (AND | OR) external_table_condition_clause
+    ;
+
+external_table_lls_clause
+    : LLS external_table_directory
+    ;
+
+external_table_records
+    : RECORDS (
+        FIXED UNSIGNED_INTEGER
+        | VARIABLE UNSIGNED_INTEGER
+        | DELIMITED BY (DETECTED? NEWLINE_ | quoted_string)
+        | XMLTAG '('? id_expression (',' id_expression)* ')'?
+    ) external_table_record_options_clause*
+    | external_table_record_options_clause+
+    ;
+
+external_table_record_options_clause
+    : CHARACTERSET char_set_name
+    | EXTERNAL VARIABLE DATA
+    | PREPROCESSOR external_table_directory
+    | DATA IS (LITTLE | BIG) ENDIAN
+    | BYTEORDERMARK (CHECK | NOCHECK)
+    | STRING SIZES ARE IN (BYTES | CHARACTERS)
+    | LOAD WHEN external_table_condition_clause
+    | external_table_output_files
+    | READSIZE '='? UNSIGNED_INTEGER
+    | DISABLE_DIRECTORY_LINK_CHECK
+    | DATE_CACHE UNSIGNED_INTEGER
+    | SKIP_ UNSIGNED_INTEGER
+    | IO_OPTIONS (DIRECTIO | NODIRECTIO)
+    | (DNFS_ENABLE | DNFS_DISABLE)
+    | DNFS_READBUFFERS UNSIGNED_INTEGER
+    ;
+
+external_table_output_files
+    : (
+        (NOBADFILE | NODISCARDFILE | NOLOGFILE)
+        | (BADFILE | DISCARDFILE | LOGFILE) external_table_directory? filename
+    )
+    ;
+
+external_table_fields
+    : FIELDS
+        IGNORE_CHARS_AFTER_EOR?
+        (CSV (WITH | WITHOUT) EMBEDDED)?
+        external_table_delimit_clause?
+        external_table_trim_clause?
+        (ALL FIELDS OVERRIDE THESE FIELDS)?
+        (MISSING FIELD VALUES ARE NULL_)?
+        (REJECT ROWS WITH ALL NULL_ FIELDS)?
+        (DATE_FORMAT (DATE | TIMESTAMP) MASK quoted_string)?
+        (NULLIF (EQUALS_OP | NOT_EQUAL_OP) (quoted_string | HEX_STRING_LIT | BLANKS) | NONULLIF)?
+        '('? external_table_field_list? ')'?
+    ;
+
+external_table_datapump
+    : ENCRYPTION (ENABLE | DISABLED)
+    | NOLOGFILE
+    | LOGFILE external_table_directory? filename
+    | COMPRESSION (ENABLED (BASIC | LOW | MEDIUM | HIGH)? | DISABLED)?
+    | HADOOP_TRAILERS (ENABLED | DISABLED) VERSION (COMPATIBLE | LATEST | quoted_string)
+    | NOLOG
+    | DEBUG '=' '(' UNSIGNED_INTEGER ',' UNSIGNED_INTEGER ')'
+    | DATAPUMP INTERNAL TABLE tableview_name
+    | TEMPLATE_TABLE tableview_name
+    | JOB '(' schema_name ',' tableview_name ',' UNSIGNED_INTEGER ')'
+    | WORKERID UNSIGNED_INTEGER
+    | PARALLEL UNSIGNED_INTEGER
+    | VERSION quoted_string
+    | ENCRYPTPASSWORDISNULL
+    | DBLINK quoted_string
+    ;
+
+external_table_hive
+    : id_expression ('.' id_expression)* ('=' | ':') (
+        tableview_name
+        | external_table_hive_parameter_map
+        | '[' external_table_hive_parameter_map (',' external_table_hive_parameter_map)* ']'
+        | external_table_field datatype (COMMENT quoted_string)? (',' COMMENT quoted_string)*
+        | SEQUENCEFILE
+        | TEXTFILE
+        | RCFILE
+        | ORC
+        | PARQUET
+        | INPUTFORMAT quoted_string OUTPUTFORMAT quoted_string
+        | external_table_directory
+        | DELIMITED? (
+            FIELDS TERMINATED BY CHARACTER (ESCAPED BY CHARACTER)
+            | (COLLECTION ITEMS | MAP KEYS | LINES ) TERMINATED BY CHARACTER
+            | NULL_ DEFINED AS CHARACTER
+        )
+        | SERDE quoted_string (
+            WITH SERDEPROPERTIES (
+                quoted_string '=' quoted_string (',' quoted_string '=' quoted_string)*
+            )
+        )?
+    ) external_table_hive?
+    ;
+
+external_table_hive_parameter_map
+    : LEFT_CURLY_PAREN (external_table_hive_parameter_map_entry (',' external_table_hive_parameter_map_entry)*) RIGHT_CURLY_PAREN
+    ;
+
+external_table_hive_parameter_map_entry
+    : id_expression BINDVAR
+    | id_expression ':' '[' id_expression (',' id_expression)* ']'
+    | '[' id_expression (',' id_expression)* ']'
+    ;
+
+external_table_directory
+    : directory_name COLON CHAR_STRING
+    | (directory_name object_name? COLON)? CHAR_STRING
+    | quoted_string
+    | variable_name
     ;
 
 row_movement_clause
@@ -6777,8 +6979,8 @@ xml_general_default_part
 
 xml_multiuse_expression_element
     : expression
-        ( (AS? id_expression)           
-        | (AS EVALNAME expression)      
+        ( (AS? id_expression)
+        | (AS EVALNAME expression)
         )?
     ;
 
@@ -8124,6 +8326,7 @@ non_reserved_keywords_pre12c
     | DAY
     | DBA
     | DBA_RECYCLEBIN
+    | DBLINK
     | DBMS_STATS
     | DB_ROLE_CHANGE
     | DBTIMEZONE
