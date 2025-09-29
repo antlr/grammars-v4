@@ -140,6 +140,7 @@ unit_statement
     | drop_library
     | drop_lockdown_profile
     | drop_materialized_view
+    | drop_materialized_view_log
     | drop_materialized_zonemap
     | drop_operator
     | drop_outline
@@ -3242,6 +3243,10 @@ create_mv_refresh
 
 drop_materialized_view
     : DROP MATERIALIZED VIEW tableview_name (PRESERVE TABLE)?
+    ;
+
+drop_materialized_view_log
+    : DROP MATERIALIZED VIEW LOG (IF EXISTS)? ON tableview_name
     ;
 
 create_context
