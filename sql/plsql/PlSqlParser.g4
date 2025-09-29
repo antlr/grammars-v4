@@ -9732,6 +9732,7 @@ non_reserved_keywords_pre12c
     | TBLORIDXPARTNUM
     | TEMPFILE
     | TEMPLATE
+    | TEMPLATE_TABLE
     | TEMPORARY
     | TEMP_TABLE
     | TEST
@@ -9745,6 +9746,7 @@ non_reserved_keywords_pre12c
     | TIMEOUT
     | TIMES
     | TIMESTAMP
+    | TIMEZONE
     | TIMEZONE_ABBR
     | TIMEZONE_HOUR
     | TIMEZONE_MINUTE
