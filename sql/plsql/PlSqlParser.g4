@@ -1682,7 +1682,7 @@ on_comp_partitioned_table
     ;
 
 on_comp_partitioned_clause
-    : PARTITION partition_name? (segment_attributes_clause | key_compression)* UNUSABLE index_subpartition_clause?
+    : PARTITION partition_name? (segment_attributes_clause | key_compression)* UNUSABLE? index_subpartition_clause?
     ;
 
 index_subpartition_clause
