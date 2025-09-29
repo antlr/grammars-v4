@@ -239,3 +239,13 @@ CREATE TABLE "ZZZ"."TASKVOLUME" (
         SUBPARTITION "VOL_0_02"  VALUES (02),
         SUBPARTITION "VOL_0_03"  VALUES (03),
         SUBPARTITION "VOL_0_04"  VALUES (04)));
+
+CREATE TABLE character_varying_table (
+    data0 character,
+    data1 character(5),
+    data2 character varying(5));
+
+CREATE TABLE "SCHEMA"."TYPE_GEOMETRY" (
+    "ID" NUMBER(9,0) NOT NULL ENABLE,
+    "LOCATION" SDO_GEOMETRY,
+    PRIMARY KEY ("ID") USING INDEX ENABLE);

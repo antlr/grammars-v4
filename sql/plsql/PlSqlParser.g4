@@ -7434,7 +7434,7 @@ native_datatype_element
     | NCHAR
     | LONG RAW?
     | CHAR
-    | CHARACTER
+    | CHARACTER VARYING?
     | VARCHAR2
     | VARCHAR
     | STRING
@@ -7449,6 +7449,7 @@ native_datatype_element
     | HOUR
     | MINUTE
     | SECOND
+    | SDO_GEOMETRY
     | TIMEZONE_HOUR
     | TIMEZONE_MINUTE
     | TIMEZONE_REGION
