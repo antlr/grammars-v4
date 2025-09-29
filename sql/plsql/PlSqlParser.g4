@@ -3760,7 +3760,10 @@ list_values_clause
     ;
 
 table_partition_description
-    : deferred_segment_creation? segment_attributes_clause? (table_compression | key_compression)? (
+    : (INTERNAL | EXTERNAL)? deferred_segment_creation? read_only_clause? indexing_clause? segment_attributes_clause? (
+        table_compression
+        | key_compression
+    )? inmemory_table_clause? ilm_clause? (
         OVERFLOW_ segment_attributes_clause?
     )? (lob_storage_clause | varray_col_properties | nested_table_col_properties)*
     ;
