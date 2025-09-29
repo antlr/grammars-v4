@@ -3854,7 +3854,6 @@ physical_attributes_clause
         | PCTUSED pctused = UNSIGNED_INTEGER
         | INITRANS inittrans = UNSIGNED_INTEGER
         | MAXTRANS maxtrans = UNSIGNED_INTEGER
-        | COMPUTE STATISTICS
         | storage_clause
         | compute_clauses
     )+
