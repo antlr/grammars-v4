@@ -2158,7 +2158,12 @@ analyze
     : (
         ANALYZE (TABLE tableview_name | INDEX index_name) partition_extention_clause?
         | ANALYZE CLUSTER cluster_name
-    ) (validation_clauses | LIST CHAINED ROWS into_clause1? | DELETE SYSTEM? STATISTICS)
+    ) (
+        validation_clauses
+        | compute_clauses
+        | ESTIMATE SYSTEM? STATISTICS for_clause? (SAMPLE UNSIGNED_INTEGER (ROWS | PERCENT_KEYWORD))?
+        | LIST CHAINED ROWS into_clause1?
+        | DELETE SYSTEM? STATISTICS)
     ;
 
 partition_extention_clause
