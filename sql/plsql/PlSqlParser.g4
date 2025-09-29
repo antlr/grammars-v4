@@ -6883,6 +6883,7 @@ literal
     : CHAR_STRING
     | string_function
     | numeric
+    | numeric_negative
     | MAXVALUE
     ;
 
