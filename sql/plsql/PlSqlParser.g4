@@ -7702,7 +7702,6 @@ regular_id
     | E_LETTER
     | ERROR_INDEX
     | ERROR_CODE
-    | E_LETTER
     | ERR
     | EXCEPTION
     | EXCEPTION_INIT
