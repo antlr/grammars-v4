@@ -3774,6 +3774,7 @@ partitioning_storage_clause
         | OVERFLOW_ (TABLESPACE tablespace)?
         | table_compression
         | key_compression
+        | inmemory_table_clause
         | lob_partitioning_storage
         | VARRAY varray_item STORE AS (BASICFILE | SECUREFILE)? LOB lob_segname
     )+
@@ -3806,12 +3807,13 @@ inmemory_table_clause
     | (INMEMORY inmemory_attributes? | NO INMEMORY) inmemory_column_clause*
     ;
 
-// avoid to match an empty string in
 inmemory_attributes
-    : inmemory_memcompress inmemory_priority? inmemory_distribute? inmemory_duplicate?
-    | inmemory_priority inmemory_distribute? inmemory_duplicate?
-    | inmemory_distribute inmemory_duplicate?
-    | inmemory_duplicate
+    : (
+        inmemory_memcompress
+        | inmemory_priority
+        | inmemory_distribute
+        | inmemory_duplicate
+    )+
     ;
 
 inmemory_memcompress
