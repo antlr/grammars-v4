@@ -3003,7 +3003,19 @@ build_clause
 
 parallel_clause
     : NOPARALLEL
-    | PARALLEL parallel_count = UNSIGNED_INTEGER?
+    | PARALLEL (
+        parallel_count = UNSIGNED_INTEGER parallel_instances_clause?
+        // Deprecated, legacy format from Oracle 8 and prior, and while this is no longer documented,
+        // the DEGREE syntax continues to be accepted by the database engine.
+        | '(' DEGREE parallel_count = UNSIGNED_INTEGER parallel_instances_clause? ')'
+    )?
+    ;
+
+// This is Oracle RAC specific.
+// In modern Oracle, parallelism is controlled by the database initialization parameter PARALLEL_DEGREE_POLICY,
+// however, the database continues to accept and record this SQL syntax if its used.
+parallel_instances_clause
+    : INSTANCES (UNSIGNED_INTEGER | DEFAULT)
     ;
 
 alter_materialized_view
