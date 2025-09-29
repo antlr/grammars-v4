@@ -5432,7 +5432,7 @@ end_time_column
     ;
 
 column_definition
-    : column_name ((datatype | regular_id) (COLLATE column_collation_name)?)? SORT? (
+    : column_name ((datatype | type_name) (COLLATE column_collation_name)?)? SORT? (
         VISIBLE
         | INVISIBLE
     )? (DEFAULT (ON NULL_)? expression | identity_clause)? (ENCRYPT encryption_spec)? (
