@@ -3379,7 +3379,7 @@ create_table
 xmltype_table
     : OF XMLTYPE ('(' object_properties ')')? (XMLTYPE xmltype_storage)? xmlschema_spec? xmltype_virtual_columns? (
         ON COMMIT (DELETE | PRESERVE) ROWS
-    )? oid_clause? oid_index_clause? physical_properties? table_properties
+    )? oid_clause? oid_index_clause? physical_properties? table_properties?
     ;
 
 xmltype_virtual_columns
@@ -3410,7 +3410,7 @@ xmlschema_spec
 object_table
     : OF (schema_name '.')? object_type object_table_substitution? (
         '(' object_properties (',' object_properties)* ')'
-    )? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? table_properties
+    )? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? table_properties?
     ;
 
 object_type
@@ -3440,13 +3440,25 @@ object_table_substitution
     ;
 
 relational_table
-    : ('(' relational_property (',' relational_property)* ')')? immutable_table_clauses blockchain_table_clauses? (
-        DEFAULT COLLATION collation_name
-    )? (ON COMMIT (DROP | PRESERVE) DEFINITION)? (ON COMMIT (DELETE | PRESERVE) ROWS)? physical_properties? table_properties
+    : ('(' relational_property (',' relational_property)* ')')? relational_table_properties?
+    ;
+
+relational_table_properties
+    : relational_table_property+
+    ;
+
+relational_table_property
+    : immutable_table_clauses
+    | blockchain_table_clauses
+    | DEFAULT COLLATION collation_name
+    | ON COMMIT ((DROP | PRESERVE) DEFINITION | (DELETE | PRESERVE) ROWS)
+    | physical_properties
+    | table_properties
     ;
 
 immutable_table_clauses
-    : immutable_table_no_drop_clause? immutable_table_no_delete_clause?
+    : immutable_table_no_drop_clause
+    | immutable_table_no_delete_clause
     ;
 
 immutable_table_no_drop_clause
@@ -3477,15 +3489,28 @@ collation_name
     : identifier
     ;
 
+// While Oracle's documented grammar defines an explicit order of clauses, in practice these clauses can
+// be specified in any order. This rule is designed to follow the grammar intent, and so semantic checks
+// should exist in the listeners to deal with concepts such as duplicates.
 table_properties
-    : column_properties? read_only_clause? indexing_clause? table_partitioning_clauses? attribute_clustering_clause? (
-        CACHE
-        | NOCACHE
-    )? result_cache_clause? parallel_clause? monitoring_nomonitoring? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? enable_disable_clause* row_movement_clause?
-        logical_replication_clause? flashback_archive_clause? physical_properties? (ROW ARCHIVAL)? (
-        AS select_only_statement
-        | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name
-    )?
+    : column_properties
+    | read_only_clause
+    | indexing_clause
+    | table_partitioning_clauses
+    | attribute_clustering_clause
+    | (CACHE | NOCACHE)
+    | result_cache_clause
+    | parallel_clause
+    | monitoring_nomonitoring
+    | (ROWDEPENDENCIES | NOROWDEPENDENCIES)
+    | enable_disable_clause
+    | row_movement_clause
+    | logical_replication_clause
+    | flashback_archive_clause
+    | physical_properties
+    | ROW ARCHIVAL
+    | AS select_only_statement
+    | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name
     ;
 
 read_only_clause
