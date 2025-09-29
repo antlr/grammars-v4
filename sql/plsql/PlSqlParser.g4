@@ -4243,7 +4243,7 @@ upgrade_table_clause
     ;
 
 truncate_table
-    : TRUNCATE TABLE tableview_name PURGE?
+    : TRUNCATE TABLE tableview_name ((PRESERVE | PURGE) (MATERIALIZED VIEW LOG)?)? ((DROP ALL? | REUSE) STORAGE)? CASCADE?
     ;
 
 drop_table
