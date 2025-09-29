@@ -6497,6 +6497,8 @@ dml_table_expression_clause
     | tableview_name hierarchies_clause? sample_clause?
     | json_table_clause (AS identifier)?
     | LATERAL '(' subquery subquery_restriction_clause? ')'
+    // Deprecated Oracle 10/11 RELATIONAL alias for casting object-types to relational tables
+    | {this.isVersion11()}? (RELATIONAL '(' tableview_name NOT XMLTYPE ')')
     ;
 
 table_collection_expression
