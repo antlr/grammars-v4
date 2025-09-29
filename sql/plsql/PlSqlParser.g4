@@ -5472,6 +5472,10 @@ identity_options
     | NOCACHE
     | ORDER
     | NOORDER
+    | SCALE (EXTEND | NOEXTEND)
+    | NOSCALE
+    | KEEP
+    | NOKEEP
     ;
 
 virtual_column_definition
