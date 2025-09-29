@@ -7781,8 +7781,6 @@ regular_id
     | VAR_
     | VALUE
     | COVAR_
-    | ERROR_INDEX
-    | ERROR_CODE
     ;
 
 non_reserved_keywords_in_18c
