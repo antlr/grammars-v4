@@ -1163,13 +1163,14 @@ alter_session_set_clause
     ;
 
 create_sequence
-    : CREATE SEQUENCE sequence_name (sequence_start_clause | sequence_spec)*
+    : CREATE SEQUENCE (IF NOT EXISTS)? sequence_name sequence_spec* (SHARING '=' (METADATA | DATA | NONE))?
     ;
 
 // Common Sequence
 
 sequence_spec
     : INCREMENT BY UNSIGNED_INTEGER
+    | sequence_start_clause
     | MAXVALUE UNSIGNED_INTEGER
     | NOMAXVALUE
     | MINVALUE UNSIGNED_INTEGER
@@ -1180,6 +1181,14 @@ sequence_spec
     | NOCACHE
     | ORDER
     | NOORDER
+    | KEEP
+    | NOKEEP
+    | SCALE (EXTEND | NOEXTEND)?
+    | NOSCALE
+    | SHARD (EXTEND | NOEXTEND)?
+    | NOSHARD
+    | SESSION
+    | GLOBAL
     ;
 
 sequence_start_clause
