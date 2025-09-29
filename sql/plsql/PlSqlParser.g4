@@ -4247,7 +4247,7 @@ truncate_table
     ;
 
 drop_table
-    : DROP TABLE tableview_name (IF EXISTS)? PURGE?
+    : DROP TABLE tableview_name (IF EXISTS)? (AS tableview_name)? (CASCADE (CONSTRAINT | CONSTRAINTS))? PURGE? (AS table_alias)? FORCE?
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/DROP-TABLESPACE.html
