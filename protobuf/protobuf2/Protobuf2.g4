@@ -20,7 +20,7 @@ proto
 // Syntax
 
 syntax
-    : SYNTAX EQ (PROTO2_LIT_SINGLE | PROTO2_LIT_DOBULE) SEMI
+    : SYNTAX EQ (PROTO2_LIT_SINGLE | PROTO2_LIT_DOUBLE) SEMI
     ;
 
 // Import Statement
@@ -335,7 +335,7 @@ intLit
 strLit
     : STR_LIT
     | PROTO2_LIT_SINGLE
-    | PROTO2_LIT_DOBULE
+    | PROTO2_LIT_DOUBLE
     ;
 
 boolLit
@@ -503,7 +503,7 @@ PROTO2_LIT_SINGLE
     : '"proto2"'
     ;
 
-PROTO2_LIT_DOBULE
+PROTO2_LIT_DOUBLE
     : '\'proto2\''
     ;
 
