@@ -5,6 +5,7 @@ import 'dart:convert';
 abstract class PlSqlParserBase extends Parser
 {
     bool _isVersion12 = true;
+    bool _isVersion11 = true;
     bool _isVersion10 = true;
 
     PlSqlParserBase(TokenStream input) : super(input)
@@ -17,6 +18,14 @@ abstract class PlSqlParserBase extends Parser
 
     void setVersion12(bool value) {
         _isVersion12 = value;
+    }
+
+    bool isVersion11() {
+        return _isVersion11;
+    }
+
+    void setVersion11(bool value) {
+        _isVersion11 = value;
     }
 
     bool isVersion10() {
