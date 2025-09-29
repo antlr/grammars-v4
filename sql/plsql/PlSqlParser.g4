@@ -1798,6 +1798,7 @@ modify_index_partitions_ops
     | physical_attributes_clause
     | logging_clause
     | key_compression
+    | shrink_clause
     ;
 
 rename_index_partition
@@ -4170,8 +4171,10 @@ deallocate_unused_clause
     : DEALLOCATE UNUSED (KEEP size_clause)?
     ;
 
+// CHECK is an internal, undocumented Oracle option that is allowed and sometimes specified, used to check for proper
+// segment type and segment attributes allowed to shrink.
 shrink_clause
-    : SHRINK SPACE_KEYWORD COMPACT? CASCADE?
+    : SHRINK SPACE_KEYWORD COMPACT? CASCADE? CHECK?
     ;
 
 records_per_block_clause
