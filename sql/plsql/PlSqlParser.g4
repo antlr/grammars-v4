@@ -7700,6 +7700,7 @@ regular_id
     | DSINTERVAL_UNCONSTRAINED
     | DURATION
     | E_LETTER
+    | ENABLED
     | ERROR_INDEX
     | ERROR_CODE
     | ERR
