@@ -3795,7 +3795,15 @@ size_clause
     ;
 
 table_compression
-    : COMPRESS
+    : COMPRESS (
+        BASIC
+        | FOR (
+            OLTP
+            | (QUERY | ARCHIVE) (LOW | HIGH)?
+            | ALL OPERATIONS
+            | DIRECT_LOAD OPERATIONS
+        )
+    )?
     | ROW STORE COMPRESS (BASIC | ADVANCED)?
     | COLUMN STORE COMPRESS (FOR (QUERY | ARCHIVE) (LOW | HIGH)?)? (NO? ROW LEVEL LOCKING)?
     | NOCOMPRESS
