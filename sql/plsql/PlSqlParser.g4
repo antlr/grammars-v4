@@ -5298,7 +5298,7 @@ varray_storage_clause
     : STORE AS (SECUREFILE | BASICFILE)? LOB (
         lob_segname? '(' lob_storage_parameters ')'
         | lob_segname
-    )
+    )?
     ;
 
 lob_segname
