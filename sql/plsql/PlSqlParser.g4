@@ -3562,7 +3562,10 @@ zonemap_clause
 
 logical_replication_clause
     : DISABLE LOGICAL REPLICATION
-    | ENABLE LOGICAL REPLICATION ((ALL | ALLOW NOVALIDATE) KEYS)?
+    | ENABLE LOGICAL REPLICATION (
+        (ALL | ALLOW NOVALIDATE) KEYS
+        | NO? PARTIAL JSON
+    )?
     ;
 
 table_name
@@ -5090,6 +5093,7 @@ alter_table_properties_1
         | records_per_block_clause
         | parallel_clause
         | row_movement_clause
+        | logical_replication_clause
         | flashback_archive_clause
     )+ alter_iot_clauses?
     ;
