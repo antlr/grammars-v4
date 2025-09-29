@@ -4211,7 +4211,7 @@ supplemental_log_grp_clause
     ;
 
 supplemental_id_key_clause
-    : DATA '(' (','? ( ALL | PRIMARY KEY | UNIQUE | FOREIGN KEY))+ ')' COLUMNS
+    : DATA '(' (','? ( ALL | PRIMARY KEY | UNIQUE INDEX? | FOREIGN KEY))+ ')' COLUMNS
     ;
 
 allocate_extent_clause
