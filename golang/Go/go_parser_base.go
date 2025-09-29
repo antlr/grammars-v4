@@ -41,8 +41,8 @@ func (p *GoParserBase) addImportSpec() {
         name := packageName.GetText()
         if p.debug {
             fmt.Println("Entering " + name)
-            p.table[name] = true
         }
+        p.table[name] = true
     } else {
         name := importSpec.ImportPath().GetText()
         name = strings.ReplaceAll(name, "\"", "")
