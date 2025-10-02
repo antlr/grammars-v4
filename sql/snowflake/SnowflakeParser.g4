@@ -248,7 +248,11 @@ execute_immediate
     ;
 
 execute_task
-    : EXECUTE TASK object_name
+    : EXECUTE TASK object_name retry_last?
+    ;
+
+retry_last
+    : RETRY LAST
     ;
 
 explain
