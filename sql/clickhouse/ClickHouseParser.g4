@@ -10,7 +10,15 @@ options {
 
 // Top-level statements
 
-queryStmt
+clickhouseFile
+    : batch? EOF
+    ;
+
+batch
+    : command (SEMICOLON command)* SEMICOLON?
+    ;
+
+command
     : query (INTO OUTFILE STRING_LITERAL)? (FORMAT identifierOrNull)? (SEMICOLON)?
     | insertStmt
     | deleteStmt
@@ -140,7 +148,7 @@ createStmt
         | engineClause POPULATE?
     ) subqueryClause # CreateMaterializedViewStmt
     | (ATTACH | CREATE (OR REPLACE)? | REPLACE) TEMPORARY? TABLE (IF NOT EXISTS)? tableIdentifier uuidClause? clusterClause? tableSchemaClause?
-        engineClause? subqueryClause?                                                                                                    # CreateTableStmt
+        engineClause? subqueryClause?                                                                                               # CreateTableStmt
     | (ATTACH | CREATE) (OR REPLACE)? VIEW (IF NOT EXISTS)? tableIdentifier uuidClause? clusterClause? tableSchemaClause? subqueryClause #
         CreateViewStmt
     ;
@@ -154,7 +162,7 @@ dictionaryAttrDfnt
     ;
 
 dictionaryEngineClause
-    : dictionaryPrimaryKeyClause?
+    : dictionaryPrimaryKeyClause sourceClause layoutClause lifetimeClause dictionarySettingsClause?
     ;
 
 dictionaryPrimaryKeyClause
@@ -211,8 +219,15 @@ tableSchemaClause
     | AS tableFunctionExpr                                     # SchemaAsFunctionClause
     ;
 
+// TODO: not check once for each clause
 engineClause
     : engineExpr
+    ( orderByClause
+    | partitionByClause
+    | primaryKeyClause
+    | sampleByClause
+    | ttlClause
+    | settingsClause)*
     ;
 
 partitionByClause
@@ -606,6 +621,7 @@ columnsExpr
 columnExpr
     : CASE columnExpr? (WHEN columnExpr THEN columnExpr)+ (ELSE columnExpr)? END         # ColumnExprCase
     | CAST LPAREN columnExpr AS columnTypeExpr RPAREN                                    # ColumnExprCast
+    | columnExpr DOUBLE_COLON columnTypeExpr                                             # ColumnExprCastSymbol
     | DATE STRING_LITERAL                                                                # ColumnExprDate
     | EXTRACT LPAREN interval FROM columnExpr RPAREN                                     # ColumnExprExtract
     | INTERVAL columnExpr interval                                                       # ColumnExprInterval
@@ -616,11 +632,11 @@ columnExpr
     | identifier (LPAREN columnExprList? RPAREN) OVER identifier                         # ColumnExprWinFunctionTarget
     | identifier (LPAREN columnExprList? RPAREN)? LPAREN DISTINCT? columnArgList? RPAREN # ColumnExprFunction
     | literal                                                                            # ColumnExprLiteral
-
     // FIXME(ilezhankin): this part looks very ugly, maybe there is another way to express it
-    | columnExpr LBRACKET columnExpr RBRACKET # ColumnExprArrayAccess
-    | columnExpr DOT DECIMAL_LITERAL          # ColumnExprTupleAccess
-    | DASH columnExpr                         # ColumnExprNegate
+    | columnExpr LBRACKET columnExpr RBRACKET                                            # ColumnExprArrayAccess
+    | columnExpr DOT (DECIMAL_LITERAL | STRING_LITERAL | identifier)                     # ColumnExprTupleAccess
+    | columnExpr LBRACE STRING_LITERAL RBRACE                                            # ColumnExprMapAccess
+    | DASH columnExpr                                                                    # ColumnExprNegate
     | columnExpr (
         ASTERISK  // multiply
         | SLASH   // divide
@@ -729,7 +745,7 @@ numberLiteral
         floatingLiteral
         | OCTAL_LITERAL
         | DECIMAL_LITERAL
-        | HEXADECIMAL_LITERAL
+        | HEXADECIMAL_NUMERIC_LITERAL
         | INF
         | NAN_SQL
     )
@@ -754,187 +770,237 @@ interval
 
 keyword
     // except NULL_SQL, INF, NAN_SQL
-    : AFTER
-    | ALIAS
-    | ALL
-    | ALTER
-    | AND
-    | ANTI
-    | ANY
-    | ARRAY
-    | AS
-    | ASCENDING
-    | ASOF
-    | AST
-    | ASYNC
-    | ATTACH
-    | BETWEEN
-    | BOTH
-    | BY
+    : ACCESS 
+    | ADD 
+    | AFTER 
+    | ALIAS 
+    | ALL 
+    | ALTER 
+    | AND 
+    | ANTI 
+    | ANY 
+    | ARRAY 
+    | AS 
+    | ASCENDING 
+    | ASOF 
+    | AST 
+    | ASYNC 
+    | ATTACH 
+    | BETWEEN 
+    | BOTH 
+    | BY 
+    | CACHES 
     | CASE
-    | CAST
-    | CHECK
-    | CLEAR
-    | CLUSTER
-    | CODEC
-    | COLLATE
-    | COLUMN
-    | COMMENT
-    | CONSTRAINT
-    | CREATE
-    | CROSS
-    | CUBE
-    | CURRENT
+    | CAST 
+    | CHECK 
+    | CLEAR 
+    | CLUSTER 
+    | CLUSTERS 
+    | CODEC 
+    | COLLATE 
+    | COLUMN 
+    | COLUMNS 
+    | COMMENT 
+    | CONSTRAINT 
+    | CREATE 
+    | CROSS 
+    | CUBE 
+    | CURRENT 
+    | CURRENT_USER 
+    | CHANGED 
     | DATABASE
-    | DATABASES
-    | DATE
-    | DEDUPLICATE
-    | DEFAULT
-    | DELAY
-    | DELETE
-    | DESCRIBE
-    | DESC
-    | DESCENDING
-    | DETACH
-    | DICTIONARIES
-    | DICTIONARY
+    | DATABASES 
+    | DATE 
+    | DAY 
+    | DEDUPLICATE 
+    | DEFAULT 
+    | DELAY 
+    | DELETE 
+    | DESC 
+    | DESCENDING 
+    | DESCRIBE 
+    | DETACH 
+    | DICTIONARIES 
+    | DICTIONARY 
     | DISK
-    | DISTINCT
-    | DISTRIBUTED
-    | DROP
-    | ELSE
-    | END
-    | ENGINE
-    | EVENTS
-    | EXISTS
-    | EXPLAIN
-    | EXPRESSION
-    | EXTRACT
-    | FETCHES
-    | FINAL
+    | DISTINCT 
+    | DISTRIBUTED 
+    | DROP 
+    | ELSE 
+    | ENABLED 
+    | END 
+    | ENGINE 
+    | ENGINES 
+    | ESTIMATE 
+    | EVENTS 
+    | EXCEPT 
+    | EXISTS 
+    | EXPLAIN 
+    | EXPRESSION 
+    | EXTENDED 
+    | EXTRACT 
+    | FETCHES 
+    | FIELDS 
+    | FILESYSTEM 
+    | FILL 
+    | FINAL 
     | FIRST
-    | FLUSH
-    | FOR
-    | FOLLOWING
-    | FOR
-    | FORMAT
-    | FREEZE
-    | FROM
-    | FULL
-    | FUNCTION
-    | GLOBAL
-    | GRANULARITY
-    | GROUP
-    | HAVING
-    | HIERARCHICAL
+    | FLUSH 
+    | FOLLOWING 
+    | FOR 
+    | FORMAT 
+    | FREEZE 
+    | FROM 
+    | FULL 
+    | FUNCTION 
+    | FUNCTIONS 
+    | GLOBAL 
+    | GRANULARITY 
+    | GRANTS 
+    | GROUP 
+    | GROUPING 
+    | HAVING 
+    | HIERARCHICAL 
+    | HOUR 
     | ID
-    | IF
-    | ILIKE
-    | IN
-    | INDEX
-    | INJECTIVE
-    | INNER
-    | INSERT
-    | INTERVAL
-    | INTO
-    | IS
-    | IS_OBJECT_ID
-    | JOIN
-    | JSON_FALSE
-    | JSON_TRUE
-    | KEY
-    | KILL
-    | LAST
-    | LAYOUT
-    | LEADING
-    | LEFT
-    | LIFETIME
-    | LIKE
-    | LIMIT
-    | LIVE
-    | LOCAL
-    | LOGS
-    | MATERIALIZE
-    | MATERIALIZED
-    | MAX
+    | IF 
+    | ILIKE 
+    | IMPLICIT 
+    | IN 
+    | INDEX 
+    | INDEXES 
+    | INDICES 
+    | INJECTIVE 
+    | INNER 
+    | INSERT 
+    | INTERPOLATE 
+    | INTERVAL 
+    | INTO 
+    | IS 
+    | IS_OBJECT_ID 
+    | JOIN 
+    | JSON_FALSE 
+    | JSON_TRUE 
+    | KEY 
+    | KEYS
+    | KILL 
+    | LAST 
+    | LAYOUT 
+    | LEADING 
+    | LEFT 
+    | LIFETIME 
+    | LIKE 
+    | LIMIT 
+    | LIVE 
+    | LOCAL 
+    | LOGS 
+    | MATERIALIZE 
+    | MATERIALIZED 
+    | MAX 
     | MERGES
-    | MIN
-    | MODIFY
-    | MOVE
-    | MUTATION
-    | NO
-    | NOT
-    | NULLS
-    | OFFSET
-    | ON
-    | OPTIMIZE
-    | OR
-    | ORDER
-    | OUTER
-    | OUTFILE
-    | OVER
-    | PARTITION
-    | POPULATE
-    | PRECEDING
-    | PREWHERE
-    | PRIMARY
-    | RANGE
-    | RELOAD
-    | REMOVE
-    | RENAME
-    | REPLACE
-    | REPLICA
-    | REPLICATED
-    | RIGHT
-    | ROLLUP
+    | MICROSECOND 
+    | MILLISECOND 
+    | MIN 
+    | MINUTE 
+    | MODIFY 
+    | MOVE 
+    | MUTATION 
+    | NO 
+    | NOT 
+    | NULLS 
+    | OFFSET 
+    | ON 
+    | OPTIMIZE 
+    | OR 
+    | ORDER 
+    | OUTER 
+    | OUTFILE 
+    | OVER 
+    | OVERRIDE 
+    | PARTITION 
+    | PIPELINE 
+    | PLAN
+    | POLICY 
+    | POLICIES 
+    | POPULATE 
+    | PRECEDING 
+    | PREWHERE 
+    | PRIMARY 
+    | PRIVILEGES 
+    | PROCESSLIST 
+    | PROFILE 
+    | PROFILES 
+    | PROJECTION 
+    | QUARTER 
+    | QUOTA 
+    | QUOTAS 
+    | RANGE 
+    | RECURSIVE 
+    | RELOAD 
+    | REMOVE 
+    | RENAME 
+    | REPLACE 
+    | REPLICA 
+    | REPLICATED 
+    | RIGHT 
+    | ROLE 
+    | ROLES 
+    | ROLLUP 
     | ROW
-    | ROWS
-    | SAMPLE
-    | SELECT
-    | SEMI
-    | SENDS
-    | SET
-    | SETTINGS
-    | SHOW
-    | SOURCE
-    | START
-    | STOP
-    | SUBSTRING
-    | SYNC
-    | SYNTAX
-    | SYSTEM
+    | ROWS 
+    | SAMPLE 
+    | SECOND 
+    | SELECT 
+    | SEMI 
+    | SENDS 
+    | SET 
+    | SETTING 
+    | SETTINGS 
+    | SHOW 
+    | SOURCE 
+    | START 
+    | STOP 
+    | SUBSTRING 
+    | SYNC 
+    | SYNTAX 
+    | SYSTEM 
+    | STEP 
     | TABLE
-    | TABLES
-    | TEMPORARY
-    | TEST
-    | THEN
-    | TIES
-    | TIMEOUT
-    | TIMESTAMP
-    | TOTALS
-    | TRAILING
-    | TRIM
-    | TRUNCATE
-    | TO
-    | TOP
-    | TTL
+    | TABLES 
+    | TEMPORARY 
+    | TEST 
+    | THEN 
+    | TIES 
+    | TIMEOUT 
+    | TIMESTAMP 
+    | TO 
+    | TOP 
+    | TOTALS 
+    | TRAILING 
+    | TREE 
+    | TRIM 
+    | TRUNCATE 
+    | TTL 
     | TYPE
-    | UNBOUNDED
-    | UNION
-    | UPDATE
-    | USE
-    | USING
-    | UUID
-    | VALUES
-    | VIEW
-    | VOLUME
-    | WATCH
-    | WHEN
-    | WHERE
-    | WINDOW
-    | WITH
+    | UNBOUNDED 
+    | UNION 
+    | UPDATE 
+    | USE 
+    | USER 
+    | USERS 
+    | USING 
+    | UUID 
+    | VALUES 
+    | VIEW 
+    | VOLUME 
+    | WATCH 
+    | WEEK 
+    | WHEN 
+    | WHERE 
+    | WINDOW 
+    | WITH 
+    | YEAR
     ;
-
 keywordForAlias
     : DATE
     | FIRST

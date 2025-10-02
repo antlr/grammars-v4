@@ -88,7 +88,7 @@ jobs:
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: '^1.21.0'
         cache: false
@@ -97,7 +97,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v5.6.0
+      uses: actions/setup-python@v6.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -113,7 +113,7 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v5.0.0
       with:
         node-version: '22.12.0'
     - name: Test JavaScript
@@ -204,7 +204,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v5.6.0
+      uses: actions/setup-python@v6.0.0
       with:
         python-version: '3.10'
     - name: Test Python

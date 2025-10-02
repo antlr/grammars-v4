@@ -34,7 +34,7 @@ proto
 // Syntax
 
 syntax
-    : SYNTAX EQ (PROTO3_LIT_SINGLE | PROTO3_LIT_DOBULE) SEMI
+    : SYNTAX EQ (PROTO3_LIT_SINGLE | PROTO3_LIT_DOUBLE) SEMI
     ;
 
 // Import Statement
@@ -175,6 +175,7 @@ enumBody
 enumElement
     : optionStatement
     | enumField
+    | reserved
     | emptyStatement_
     ;
 
@@ -317,7 +318,7 @@ intLit
 strLit
     : STR_LIT
     | PROTO3_LIT_SINGLE
-    | PROTO3_LIT_DOBULE
+    | PROTO3_LIT_DOUBLE
     ;
 
 boolLit
@@ -474,7 +475,7 @@ PROTO3_LIT_SINGLE
     : '"proto3"'
     ;
 
-PROTO3_LIT_DOBULE
+PROTO3_LIT_DOUBLE
     : '\'proto3\''
     ;
 

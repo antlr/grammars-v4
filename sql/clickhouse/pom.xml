@@ -39,7 +39,7 @@
                 <configuration>
                     <verbose>true</verbose>
                     <showTree>true</showTree>
-                    <entryPoint>queryStmt</entryPoint>
+                    <entryPoint>clickhouseFile</entryPoint>
                     <grammarName>ClickHouse</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples</exampleFiles>
