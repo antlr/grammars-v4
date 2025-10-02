@@ -31,6 +31,9 @@ public:
     bool next(char expect){
         return _input->LA(1) == expect;
     }
+    bool nexti(int expect){
+        return _input->LA(1) == expect;
+    }
 
     bool floatDotPossible(){
         size_t next = _input->LA(1);
