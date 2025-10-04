@@ -14,6 +14,7 @@
 
     <modules>
         <module>athena</module>
+        <module>databricks</module>
         <module>derby</module>
         <module>drill</module>
         <module>hive</module>
