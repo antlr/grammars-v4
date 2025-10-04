@@ -44,7 +44,6 @@ statement
     | data_retrieval_statement
     | show_statement
     | describe_command
-    | other_command
     | misc_statement
     | resource_management_statement
     | security_statement
@@ -107,15 +106,6 @@ merge_into_statement
     :
     ;
 
-insert_multi_table_statement
-    : INSERT OVERWRITE? ALL into_clause2
-    | INSERT OVERWRITE? (FIRST | ALL) (WHEN predicate THEN into_clause2+)+ (ELSE into_clause2)? subquery
-    ;
-
-into_clause2
-    : INTO object_name ('(' column_list ')')? values_list?
-    ;
-
 values_list
     : VALUES '(' value_item (COMMA value_item)* ')'
     ;
@@ -173,18 +163,6 @@ values_builder
     : VALUES '(' expr_list ')' (COMMA '(' expr_list ')')?
     ;
 
-other_command
-    : commit
-    | execute_immediate
-    | explain
-    | rollback
-    | set
-    | truncate_materialized_view
-    | unset
-    | call
-    | begin_txn
-    ;
-
 misc_statement
     : call
     | execute_immediate
@@ -225,17 +203,6 @@ security_statement
     | show_grants_to_recipient
     ;
 
-begin_txn
-    : BEGIN (WORK | TRANSACTION)? (NAME id_)?
-    | START TRANSACTION ( NAME id_)?
-    ;
-
-
-stage_file_format
-    : STAGE_FILE_FORMAT EQ LR_BRACKET FORMAT_NAME EQ string
-    | TYPE EQ type_fileformat format_type_options+ RR_BRACKET
-    ;
-
 
 comment_on
     : COMMENT ON (
@@ -264,7 +231,12 @@ msck_repair_table
     ;
 
 refresh_statement
-    :
+    : REFRESH FOREIGN (
+        CATALOG catalog_name |
+        SCHEMA schema_name (RESOLVE DBFS LOCATION)? |
+        TABLE table_name (RESOLVE DBFS LOCATION)?
+    )
+    | REFRESH (MATERIALIZED VIEW | STREAMING? TABLE) table_name (FULL | SYNC | ASYNC)?
     ;
 
 set_tag
@@ -280,8 +252,8 @@ set_tag
 
 sync
     : SYNC (
-    SCHEMA ts=schema_name (AS EXTERNAL)? FROM ss=schema_name |
-    TABLE tt=table_name (AS EXTERNAL)? FROM st=table_name
+        SCHEMA ts=schema_name (AS EXTERNAL)? FROM ss=schema_name |
+        TABLE tt=table_name (AS EXTERNAL)? FROM st=table_name
     )
     (SET OWNER principal)?
     (DRY RUN)?
@@ -302,163 +274,38 @@ unset_tag
     ) k=id_
     ;
 
-
-commit
-    : COMMIT WORK?
+execute_immediate
+    : EXECUTE IMMEDIATE string (INTO variable_name_list)? (USING )? //TODO
     ;
 
-execute_immediate
-    : EXECUTE IMMEDIATE (string | id_ | ID2) (USING '(' id_ (COMMA id_)* ')')?
-    | EXECUTE IMMEDIATE DBL_DOLLAR
+variable_name_list
+    : variable_name (COMMA variable_name)*
     ;
 
 reset
-    :
+    : RESET id_?
     ;
 
 set_recipient
-    :
+    : SET RECIPIENT recipient_name
     ;
 
 set_timezone
-    :
+    : SET TIME ZONE (LOCAL ) //TODO
     ;
 
 set_variable
-    :
+    : SET (VAR | VARIABLE) variable_name EQ (expr | DEFAULT) //TODO
+    | SET (VAR | VARIABLE) '(' variable_name_list ')' EQ '(' query_statement ')'
     ;
 
 use_catalog
-    :
-    ;
-
-
-execute_task
-    : EXECUTE TASK object_name
-    ;
-
-explain
-    : EXPLAIN (USING (TABULAR | JSON | TEXT))? statement
-    ;
-
-parallel
-    : PARALLEL EQ num
-    ;
-
-
-
-
-global_privileges
-    : global_privilege (COMMA global_privilege)*
-    ;
-
-global_privilege
-    : CREATE (
-        ACCOUNT
-        | DATA EXCHANGE LISTING
-        | DATABASE
-        | INTEGRATION
-        | NETWORK POLICY
-        | ROLE
-        | SHARE
-        | USER
-        | WAREHOUSE
-    )
-    | (
-        APPLY MASKING POLICY
-        | APPLY ROW ACCESS POLICY
-        | APPLY SESSION POLICY
-        | APPLY TAG
-        | ATTACH POLICY
-    )
-    | (
-        EXECUTE TASK
-        | IMPORT SHARE
-        | MANAGE GRANTS
-        | MONITOR ( EXECUTION | USAGE)
-        | OVERRIDE SHARE RESTRICTIONS
-    )
-    ;
-
-account_object_privileges
-    : account_object_privilege (COMMA account_object_privilege)*
-    ;
-
-account_object_privilege
-    : MONITOR
-    | MODIFY
-    | USAGE
-    | OPERATE
-    | CREATE SCHEMA
-    | IMPORTED PRIVILEGES
-    | USE_ANY_ROLE
-    ;
-
-schema_privileges
-    : schema_privilege (COMMA schema_privilege)*
-    ;
-
-schema_privilege
-    : MODIFY
-    | MONITOR
-    | USAGE
-    | CREATE (
-        TABLE
-        | EXTERNAL TABLE
-        | VIEW
-        | MATERIALIZED VIEW
-        | MASKING POLICY
-        | ROW ACCESS POLICY
-        | SESSION POLICY
-        | TAG
-        | SEQUENCE
-        | FUNCTION
-        | PROCEDURE
-        | FILE FORMAT
-        | STAGE
-        | PIPE
-        | STREAM
-        | TASK
-    )
-    | ADD SEARCH OPTIMIZATION
-    ;
-
-schema_object_privileges
-    : schema_object_privilege (COMMA schema_object_privilege)*
-    ;
-
-schema_object_privilege
-    : SELECT
-    | INSERT
-    | UPDATE
-    | DELETE
-    | TRUNCATE
-    | REFERENCES
-    | USAGE
-    | READ (COMMA WRITE)?
-    | MONITOR
-    | OPERATE
-    | APPLY
-    ;
-
-object_privilege
-    : USAGE
-    | SELECT
-    | REFERENCE_USAGE
-    ;
-
-
-rollback
-    : ROLLBACK WORK?
+    : (USE | SET) CATALOG (catalog_name | string)?
     ;
 
 set
     : SET id_ EQ expr
     | SET LR_BRACKET id_ (COMMA id_)* RR_BRACKET EQ LR_BRACKET expr (COMMA expr)* RR_BRACKET
-    ;
-
-truncate_materialized_view
-    : TRUNCATE MATERIALIZED VIEW object_name
     ;
 
 truncate_table
@@ -478,10 +325,6 @@ partition_value
     | num
     ;
 
-unset
-    : UNSET id_
-    | UNSET '(' id_ (COMMA id_)* ')'
-    ;
 
 alter_statement
     : alter_catalog
@@ -523,7 +366,7 @@ location_name
     ;
 
 principal
-    :
+    : id_
     ;
 
 connection_name
@@ -650,9 +493,6 @@ account_id_list
     : account_identifier (COMMA account_identifier)*
     ;
 
-id_list
-    : id_ (COMMA id_)*
-    ;
 
 
 data_type_list
@@ -717,7 +557,7 @@ alter_schema
     | ALTER SCHEMA if_exists? schema_name set_tags
     | ALTER SCHEMA if_exists? schema_name unset_tags
     | ALTER SCHEMA if_exists? schema_name UNSET schema_property (COMMA schema_property)*
-    | ALTER SCHEMA if_exists? schema_name ( ENABLE | DISABLE) MANAGED ACCESS
+    | ALTER SCHEMA if_exists? schema_name ( ENABLE | DISABLE) MANAGED
     ;
 
 schema_property
@@ -755,7 +595,7 @@ alter_table
     )
     | ALTER TABLE if_exists? object_name ext_table_column_action
     | ALTER TABLE if_exists? object_name search_optimization_action
-    | ALTER TABLE if_exists? object_name SET stage_file_format? (
+    | ALTER TABLE if_exists? object_name? (
         STAGE_COPY_OPTIONS EQ '(' copy_options ')'
     )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? (
         CHANGE_TRACKING EQ true_false
@@ -770,9 +610,7 @@ alter_table
         | COMMENT
         |
     )
-    //[ , ... ]
     ;
-
 
 
 clustering_action
@@ -909,10 +747,10 @@ alter_view
     | ALTER VIEW object_name UNSET SECURE
     | ALTER VIEW if_exists? object_name set_tags
     | ALTER VIEW if_exists? object_name unset_tags
-    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses
-    | ALTER VIEW if_exists? object_name DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? object_name ADD ROW ACCESS POLICY id_ ON column_list_in_parentheses COMMA DROP ROW ACCESS POLICY id_
-    | ALTER VIEW if_exists? object_name DROP ALL ROW ACCESS POLICIES
+    | ALTER VIEW if_exists? object_name ADD ROW  POLICY id_ ON column_list_in_parentheses
+    | ALTER VIEW if_exists? object_name DROP ROW  POLICY id_
+    | ALTER VIEW if_exists? object_name ADD ROW  POLICY id_ ON column_list_in_parentheses COMMA DROP ROW  POLICY id_
+    | ALTER VIEW if_exists? object_name DROP ALL ROW  POLICIES
     | ALTER VIEW object_name alter_modify COLUMN? id_ SET MASKING POLICY id_ (
         USING '(' column_name COMMA column_list ')'
     )? FORCE?
@@ -997,7 +835,7 @@ comment
     ;
 
 create_connection
-    : CREATE CONNECTION if_not_exists? id_ (
+    : CREATE (CONNECTION | SERVER) if_not_exists? id_ (
         comment_clause?
         | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?)
     )
@@ -1018,18 +856,6 @@ clone_at_before
 at_before1
     : AT_KEYWORD
     | BEFORE
-    ;
-
-
-
-
-data_retention_params
-    : DATA_RETENTION_TIME_IN_DAYS
-    | MAX_DATA_EXTENSION_TIME_IN_DAYS
-    ;
-
-set_data_retention_params
-    : data_retention_params EQ num
     ;
 
 
@@ -1164,9 +990,7 @@ create_recipient
     ;
 
 create_schema
-    : CREATE or_replace? TRANSIENT? SCHEMA if_not_exists? schema_name clone_at_before? (
-        WITH MANAGED ACCESS
-    )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? with_tags? comment_clause?
+    : CREATE SCHEMA if_not_exists? schema_name //TODO
     ;
 
 
@@ -1192,7 +1016,6 @@ create_share
 character
     : CHAR_LITERAL
     | AAD_PROVISIONER_Q
-    | ARRAY_Q
     | AUTO_Q
     | AVRO_Q
     | AZURE_CSE_Q
@@ -1214,76 +1037,6 @@ character
     | XML_Q
     ;
 
-format_type_options
-    //-- If TYPE EQ CSV
-    : COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE | AUTO_Q)
-    | RECORD_DELIMITER EQ ( string | NONE)
-    | FIELD_DELIMITER EQ ( string | NONE)
-    | FILE_EXTENSION EQ string
-    | SKIP_HEADER EQ num
-    | SKIP_BLANK_LINES EQ true_false
-    | DATE_FORMAT EQ (string | AUTO)
-    | TIME_FORMAT EQ (string | AUTO)
-    | TIMESTAMP_FORMAT EQ (string | AUTO)
-    | BINARY_FORMAT EQ (HEX | BASE64 | UTF8)
-    | ESCAPE EQ (character | NONE | NONE_Q)
-    | ESCAPE_UNENCLOSED_FIELD EQ (string | NONE | NONE_Q)
-    | TRIM_SPACE EQ true_false
-    | FIELD_OPTIONALLY_ENCLOSED_BY EQ (string | NONE | NONE_Q | SINGLE_QUOTE)
-    | NULL_IF EQ LR_BRACKET string_list* RR_BRACKET
-    | ERROR_ON_COLUMN_COUNT_MISMATCH EQ true_false
-    | REPLACE_INVALID_CHARACTERS EQ true_false
-    | EMPTY_FIELD_AS_NULL EQ true_false
-    | SKIP_BYTE_ORDER_MARK EQ true_false
-    | ENCODING EQ (string | UTF8) //by the way other encoding keyword are valid ie WINDOWS1252
-    //-- If TYPE EQ JSON
-    //| COMPRESSION EQ (AUTO | GZIP | BZ2 | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE)
-    //    | DATE_FORMAT EQ string | AUTO
-    //    | TIME_FORMAT EQ string | AUTO
-    //    | TIMESTAMP_FORMAT EQ string | AUTO
-    //    | BINARY_FORMAT EQ HEX | BASE64 | UTF8
-    //    | TRIM_SPACE EQ true_false
-    //    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
-    //    | FILE_EXTENSION EQ string
-    | ENABLE_OCTAL EQ true_false
-    | ALLOW_DUPLICATE EQ true_false
-    | STRIP_OUTER_ARRAY EQ true_false
-    | STRIP_NULL_VALUES EQ true_false
-    //    | REPLACE_INVALID_CHARACTERS EQ true_false
-    | IGNORE_UTF8_ERRORS EQ true_false
-    //    | SKIP_BYTE_ORDER_MARK EQ true_false
-    //-- If TYPE EQ AVRO
-    //    | COMPRESSION EQ AUTO | GZIP | BROTLI | ZSTD | DEFLATE | RAW_DEFLATE | NONE
-    //    | TRIM_SPACE EQ true_false
-    //    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
-    //-- If TYPE EQ ORC
-    //    | TRIM_SPACE EQ true_false
-    //    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
-    //-- If TYPE EQ PARQUET
-    | COMPRESSION EQ AUTO
-    | LZO
-    | SNAPPY
-    | NONE
-    | SNAPPY_COMPRESSION EQ true_false
-    | BINARY_AS_TEXT EQ true_false
-    //    | TRIM_SPACE EQ true_false
-    //    | NULL_IF EQ LR_BRACKET string_list RR_BRACKET
-    //-- If TYPE EQ XML
-    | COMPRESSION EQ AUTO
-    | GZIP
-    | BZ2
-    | BROTLI
-    | ZSTD
-    | DEFLATE
-    | RAW_DEFLATE
-    | NONE
-    //    | IGNORE_UTF8_ERRORS EQ true_false
-    | PRESERVE_SPACE EQ true_false
-    | STRIP_OUTER_ELEMENT EQ true_false
-    | DISABLE_SNOWFLAKE_DATA EQ true_false
-    | DISABLE_AUTO_CONVERT EQ true_false
-    //    | SKIP_BYTE_ORDER_MARK EQ true_false
-    ;
 
 copy_options
     : ON_ERROR EQ (CONTINUE | SKIP_FILE | SKIP_FILE_N | SKIP_FILE_N ABORT_STATEMENT)
@@ -1315,31 +1068,17 @@ copy_grants
     ;
 
 
-temporary
-    : TEMP
-    | TEMPORARY
-    ;
-
-table_type
-    : (LOCAL | GLOBAL)? temporary
-    | VOLATILE
-    | TRANSIENT
-    ;
 
 with_tags
     : WITH? TAG LR_BRACKET tag_decl (COMMA tag_decl)* RR_BRACKET
     ;
 
 with_row_access_policy
-    : WITH? ROW ACCESS POLICY id_ ON LR_BRACKET column_name (COMMA column_name)* RR_BRACKET
+    : WITH? ROW  POLICY id_ ON LR_BRACKET column_name (COMMA column_name)* RR_BRACKET
     ;
 
 cluster_by
     : CLUSTER BY LINEAR? expr_list_in_parentheses
-    ;
-
-change_tracking
-    : CHANGE_TRACKING EQ true_false
     ;
 
 with_masking_policy
@@ -1385,16 +1124,6 @@ full_col_decl
     : col_decl (collate | inline_constraint | null_not_null | default_value)* with_masking_policy? with_tags? inline_comment_clause?
     ;
 
-//Column declaration for materialized table
-
-column_decl_item
-    : full_col_decl
-    | out_of_line_constraint
-    ;
-
-column_decl_item_list
-    : column_decl_item (COMMA column_decl_item)*
-    ;
 
 create_streaming_table
     :
@@ -1431,7 +1160,7 @@ sql
     ;
 
 call
-    : CALL procedure_name '(' (argument_list | named_argument_list)?  ')'
+    : CALL procedure_name '(' (argument_list | named_argument_list)? ')'
     ;
 
 argument_list
@@ -1472,7 +1201,6 @@ object_type_plural
     | TASKS
     | USERS
     | VIEWS
-    | WAREHOUSES
     ;
 
 // drop commands
@@ -1573,11 +1301,11 @@ arg_types
 
 
 use_database
-    : USE DATABASE id_
+    : USE DATABASE schema_name
     ;
 
 use_schema
-    : USE SCHEMA? (id_ DOT)? id_
+    : USE SCHEMA schema_name
     ;
 
 add_archive
@@ -1645,7 +1373,58 @@ drop_group
     ;
 
 grant
-    : GRANT ON TO principal
+    : GRANT privilege_types ON securable_object TO principal
+    ;
+
+privilege_types
+    : ALL PRIVILEGES
+    | privilege_type_list
+    ;
+
+privilege_type_list
+    : privilege_type (COMMA privilege_type)*
+    ;
+
+privilege_type
+    : ACCESS
+    | APPLY TAG
+    | BROWSE
+    | CREATE (
+        CATALOG
+        | CLEAN ROOM
+        | CONNECTION
+        | EXTERNAL (LOCATION | METADATA | TABLE | VOLUME)
+        | FOREIGN (CATALOG | SECURABLE)
+        | FUNCTION
+        | MODEL VERSION?
+        | MANAGED STORAGE
+        | PROVIDER
+        | RECIPIENT
+        | SCHEMA
+        | SHARE
+        | storage_service CREDENTIAL
+        | TABLE
+        | MATERIALIZED VIEW
+        | VOLUME
+    )
+    | EXECUTE (CLEAN ROOM TASK)?
+    | EXTERNAL USE (LOCATION | SCHEMA)
+    | MANAGE ALLOWLIST?
+    | MODIFY (CLEAN ROOM)?
+    | READ (FILES | VOLUME)
+    | REFRESH
+    | SELECT
+    | SET SHARE PERMISSION
+    | USE (
+        CATALOG
+        | CONNECTION
+        | SCHEMA
+        | MARKETPLACE ASSETS
+        | PROVIDER
+        | RECIPIENT
+        | SHARE
+    )
+    | WRITE (FILES | VOLUME)
     ;
 
 grant_share
@@ -1671,7 +1450,7 @@ object
     ;
 
 revoke
-    : REVOKE ON FROM principal
+    : REVOKE privilege_types ON securable_object FROM principal
     ;
 
 revoke_share
@@ -1733,10 +1512,6 @@ if_not_exists
 
 or_replace
     : OR REPLACE
-    ;
-
-or_alter
-    : OR ALTER
     ;
 
 describe
@@ -1978,19 +1753,6 @@ id_clause
     : IDENTIFIER '(' string ')' // TODO
     ;
 
-object_type
-    : ACCOUNT PARAMETERS
-    | DATABASES
-    | INTEGRATIONS
-    | NETWORK POLICIES
-    | RESOURCE MONITORS
-    | ROLES
-    | SHARES
-    | USERS
-    | WAREHOUSES
-    ;
-
-
 tag_value
     : string
     ;
@@ -2012,16 +1774,11 @@ string_list
     : string (COMMA string)*
     ;
 
-id_fn
-    : id_
-    | IDENTIFIER '(' id_ ')'
-    ;
 
 id_
     //id_ is used for object name. Snowflake is very permissive
     //so we could use nearly all keyword as object name (table, column etc..)
     : ID
-    | ID2
     | DOUBLE_QUOTE_BLANK
     | keyword
     | non_reserved_words
@@ -2075,8 +1832,6 @@ keyword
     | USER
     | VALUE
     | VALUES
-    | WAREHOUSE
-    | WAREHOUSE_TYPE
     // etc
     ;
 
@@ -2085,7 +1840,6 @@ non_reserved_words
     // please add in alphabetic order for easy reading
     : ACCOUNTADMIN
     | AES
-    | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
     | CHECKSUM
     | COLLECTION
@@ -2191,7 +1945,6 @@ non_reserved_words
     | VECTOR
     | VERSION
     | VISIBILITY
-    | WAREHOUSE_TYPE
     | YEAR
     ;
 
@@ -2353,12 +2106,6 @@ primitive_expression
     | id_ '.' STAR
     | full_column_name
     | literal
-    | ARRAY_Q
-    | AUTO_Q
-    | AZURE_Q
-    | BOTH_Q
-    | NONE_Q
-    | OBJECT_Q
     //| json_literal
     //| arr_literal
     ;
@@ -2510,7 +2257,7 @@ sql_pipeline
     ;
 
 explain_statement
-    :
+    : EXPLAIN (EXTENDED | CODEGEN | COST | FORMATTED)? statement
     ;
 
 set_operators
@@ -2646,7 +2393,6 @@ flatten_table_option
     : PATH_ ASSOC string
     | OUTER ASSOC true_false
     | RECURSIVE ASSOC true_false
-    | MODE ASSOC (ARRAY_Q | OBJECT_Q | BOTH_Q)
     ;
 
 flatten_table
