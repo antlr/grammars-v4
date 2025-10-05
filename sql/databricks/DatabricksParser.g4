@@ -83,62 +83,49 @@ data_retrieval_statement
     | explain_statement
     ;
 
-insert_statement
-    : INSERT OVERWRITE? INTO object_name column_list_in_parentheses? (
-        values_builder
-        | query_statement
-    )
+show_statement
+    : list
+    | show_all_in_share
+    | show_catalogs
+    | show_columns
+    | show_connections
+    | show_create_table
+    | show_credentials
+    | show_databases
+    | show_functions
+    | show_groups
+    | show_locations
+    | show_partitions
+    | show_procedures
+    | show_providers
+    | show_recipients
+    | show_schemas
+    | show_shares
+    | show_shares_in_provider
+    | show_table
+    | show_tables
+    | show_tables_dropped
+    | show_tblproperties
+    | show_users
+    | show_views
+    | show_volumes
     ;
 
-insert_overwrite_directory_statement
-    :
-    ;
-
-insert_overwrite_directory_hive_format_statement
-    :
-    ;
-
-load_data_statement
-    :
-    ;
-
-merge_into_statement
-    :
-    ;
-
-values_list
-    : VALUES '(' value_item (COMMA value_item)* ')'
-    ;
-
-value_item
-    : column_name
-    | DEFAULT
-    | NULL_
-    ;
-
-update_statement
-    : UPDATE object_name as_alias? SET column_name EQ expr (COMMA column_name EQ expr)* (
-        FROM TODO
-    )? (WHERE expr)?
-    ;
-
-table_or_query
-    : object_name as_alias?
-    | '(' subquery ')' as_alias?
-    ;
-
-copy_into_statement
-    :
-    ;
-
-delete_statement
-    : DELETE FROM object_name as_alias? (USING table_or_query (COMMA table_or_query)?)? (
-        WHERE expr
-    )?
-    ;
-
-values_builder
-    : VALUES '(' expr_list ')' (COMMA '(' expr_list ')')?
+describe_statement
+    : describe_catalog
+    | describe_connection
+    | describe_credential
+    | describe_database
+    | describe_function
+    | describe_location
+    | describe_procedure
+    | describe_provider
+    | describe_query
+    | describe_recipient
+    | describe_schema
+    | describe_share
+    | describe_table
+    | describe_volume
     ;
 
 misc_statement
@@ -180,6 +167,44 @@ security_statement
     | show_grants_to_recipient
     ;
 
+insert_statement
+    : INSERT (OVERWRITE | INTO) table_name TODO
+    ;
+
+insert_overwrite_directory_statement
+    : TODO
+    ;
+
+insert_overwrite_directory_hive_format_statement
+    : TODO
+    ;
+
+load_data_statement
+    : TODO
+    ;
+
+merge_into_statement
+    : TODO
+    ;
+
+update_statement
+    : UPDATE table_name as_alias? SET column_name EQ expr (COMMA column_name EQ expr)* (
+        FROM TODO
+    )? (WHERE expr)?
+    ;
+
+table_or_query
+    : object_name as_alias?
+    | '(' subquery ')' as_alias?
+    ;
+
+copy_into_statement
+    : TODO
+    ;
+
+delete_statement
+    : DELETE FROM object_name as_alias? (WHERE expr)?
+    ;
 
 comment_on_statement
     : COMMENT ON (
@@ -328,11 +353,11 @@ catalog_name
     ;
 
 default_collation_name
-    :
+    : id_
     ;
 
 location_name
-    :
+    : id_
     ;
 
 principal
@@ -340,15 +365,15 @@ principal
     ;
 
 connection_name
-    :
+    : id_
     ;
 
 clean_room_name
-    :
+    : id_
     ;
 
 credential_name
-    :
+    : id_
     ;
 
 file_name
@@ -364,23 +389,23 @@ resource_name
     ;
 
 function_name
-    :
+    : id_
     ;
 
 metadata_name
-    :
+    : id_
     ;
 
 procedure_name
-    :
+    : id_
     ;
 
 provider_name
-    :
+    : id_
     ;
 
 recipient_name
-    :
+    : id_
     ;
 
 relation_id
@@ -388,27 +413,27 @@ relation_id
     ;
 
 relation_name
-    :
+    : id_
     ;
 
 share_name
-    :
+    : id_
     ;
 
 table_name
-    :
+    : id_
     ;
 
 variable_name
-    :
+    : id_
     ;
 
 view_name
-    :
+    : id_
     ;
 
 volume_name
-    :
+    : id_
     ;
 
 alter_catalog
@@ -538,8 +563,8 @@ create_statement
 
 create_bloomfilter_index
     : CREATE BLOOMFILTER INDEX ON TABLE? table_name
-        FOR COLUMNS '(' ')'
-        (OPTIONS)?
+        FOR COLUMNS '(' TODO ')'
+        (OPTIONS TODO)?
     ;
 
 create_catalog
@@ -961,8 +986,6 @@ show_grants_to_recipient
     : SHOW GRANTS TO RECIPIENT recipient_name
     ;
 
-
-/* */
 comment_clause
     : COMMENT EQ string
     ;
@@ -986,23 +1009,6 @@ or_replace
 describe
     : DESC
     | DESCRIBE
-    ;
-
-describe_statement
-    : describe_catalog
-    | describe_connection
-    | describe_credential
-    | describe_database
-    | describe_function
-    | describe_location
-    | describe_procedure
-    | describe_provider
-    | describe_query
-    | describe_recipient
-    | describe_schema
-    | describe_share
-    | describe_table
-    | describe_volume
     ;
 
 describe_catalog
@@ -1059,34 +1065,6 @@ describe_table
 
 describe_volume
     : DESCRIBE VOLUME volume_name
-    ;
-
-show_statement
-    : list
-    | show_all_in_share
-    | show_catalogs
-    | show_columns
-    | show_connections
-    | show_create_table
-    | show_credentials
-    | show_databases
-    | show_functions
-    | show_groups
-    | show_locations
-    | show_partitions
-    | show_procedures
-    | show_providers
-    | show_recipients
-    | show_schemas
-    | show_shares
-    | show_shares_in_provider
-    | show_table
-    | show_tables
-    | show_tables_dropped
-    | show_tblproperties
-    | show_users
-    | show_views
-    | show_volumes
     ;
 
 list
@@ -1181,7 +1159,7 @@ show_table
     ;
 
 show_tables
-    : SHOW TABLES like_pattern? in_obj?
+    : SHOW TABLES (in_from schema_name)? like_pattern?
     ;
 
 show_tables_dropped
@@ -1292,7 +1270,6 @@ expr
     | expr DOT (VALUE | expr)
     | COLLATE string
     | case_expression
-    | iff_expr
     | bracket_expression
     | op = ( PLUS | MINUS) expr
     | expr op = (STAR | DIVIDE | MODULE) expr
@@ -1302,8 +1279,7 @@ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
     | cast_expr
-    | expr COLON_COLON data_type // Cast also
-    | try_cast_expr
+    | expr COLON_COLON data_type // Cast operator
     | function_call
     | subquery
     | expr IS (NOT NULL_ expr)
@@ -1314,17 +1290,8 @@ expr
     | primitive_expression
     ;
 
-iff_expr
-    : IFF '(' expr ',' expr ',' expr ')'
-    ;
-
-try_cast_expr
-    : TRY_CAST LR_BRACKET expr AS data_type RR_BRACKET
-    ;
-
 cast_expr
     : CAST LR_BRACKET expr AS data_type RR_BRACKET
-    | (TIMESTAMP | DATE | TIME | INTERVAL) expr
     ;
 
 data_type_size
@@ -1332,7 +1299,7 @@ data_type_size
     ;
 
 data_type
-    : int_alias = (INT | INTEGER | SMALLINT | TINYINT | BIGINT)
+    : int_alias = (INT | SMALLINT | TINYINT | BIGINT)
     | number_alias = (NUMERIC | DECIMAL_ | DEC) (LR_BRACKET num (COMMA num)? RR_BRACKET)?
     | float_alias = (FLOAT_ | DOUBLE | REAL_)
     | BOOLEAN
@@ -1349,6 +1316,7 @@ data_type
     | GEOMETRY
     | VOID
     | STRUCT TODO
+    | MAP TODO
     ;
 
 primitive_expression
