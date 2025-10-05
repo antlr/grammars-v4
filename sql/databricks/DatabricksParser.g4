@@ -1226,8 +1226,6 @@ string_list
     ;
 
 id_
-    //id_ is used for object name. Snowflake is very permissive
-    //so we could use nearly all keyword as object name (table, column etc..)
     : ID
     | DOUBLE_QUOTE_BLANK
     | keyword
@@ -1334,33 +1332,23 @@ data_type_size
     ;
 
 data_type
-    : int_alias = (INT | INTEGER | SMALLINT | TINYINT | BYTEINT | BIGINT)
-    | number_alias = (NUMBER | NUMERIC | DECIMAL_) (LR_BRACKET num (COMMA num)? RR_BRACKET)?
-    | float_alias = (FLOAT_ | FLOAT4 | FLOAT8 | DOUBLE | DOUBLE_PRECISION | REAL_)
+    : int_alias = (INT | INTEGER | SMALLINT | TINYINT | BIGINT)
+    | number_alias = (NUMERIC | DECIMAL_ | DEC) (LR_BRACKET num (COMMA num)? RR_BRACKET)?
+    | float_alias = (FLOAT_ | DOUBLE | REAL_)
     | BOOLEAN
     | DATE
-    | DATETIME data_type_size?
-    | TIME data_type_size?
+    | INTERVAL TODO
     | TIMESTAMP data_type_size?
-    | TIMESTAMP_LTZ data_type_size?
     | TIMESTAMP_NTZ data_type_size?
-    | TIMESTAMP_TZ data_type_size?
-    | char_alias = ( CHAR | NCHAR | CHARACTER) data_type_size?
-    | varchar_alias = (
-        CHAR_VARYING
-        | NCHAR_VARYING
-        | NVARCHAR2
-        | NVARCHAR
-        | STRING_
-        | TEXT
-        | VARCHAR
-    ) data_type_size?
-    | binary_alias = ( BINARY | VARBINARY) data_type_size?
+    | STRING_
+    | BINARY data_type_size?
     | VARIANT
     | OBJECT
     | ARRAY
     | GEOGRAPHY
     | GEOMETRY
+    | VOID
+    | STRUCT TODO
     ;
 
 primitive_expression
@@ -1394,7 +1382,6 @@ literal
     | sign? (REAL | FLOAT)
     | true_false
     | NULL_
-    | AT_Q
     ;
 
 sign
