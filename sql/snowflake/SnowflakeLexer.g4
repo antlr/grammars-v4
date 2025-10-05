@@ -796,6 +796,7 @@ RESULT       : 'RESULT';
 RESUME       : 'RESUME';
 // RETAINDAYS:                                            'RETAINDAYS';
 // RETURN:                                                'RETURN';
+RETRY              : 'RETRY';
 RETURNS            : 'RETURNS';
 RETURN_ALL_ERRORS  : 'RETURN_ALL_ERRORS';
 RETURN_ERRORS      : 'RETURN_ERRORS';
