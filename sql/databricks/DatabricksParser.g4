@@ -131,7 +131,7 @@ describe_statement
 misc_statement
     : call
     | execute_immediate
-    | reset
+    | reset_statement
     | set
     | set_recipient
     | set_timezone
@@ -279,8 +279,8 @@ variable_name_list
     : variable_name (COMMA variable_name)*
     ;
 
-reset
-    : RESET id_?
+reset_statement
+    : RESET_ id_?
     ;
 
 set_recipient
@@ -1273,7 +1273,7 @@ data_type
     | ARRAY
     | GEOGRAPHY
     | GEOMETRY
-    | VOID
+    | VOID_
     | STRUCT TODO
     | MAP TODO
     ;
