@@ -870,8 +870,16 @@ YEAR : 'YEAR';
 YEARLY : 'YEARLY';
 ZSTD : 'ZSTD' ;
 ZONE : 'ZONE';
+DATABRICKS : 'DATABRICKS';
+HTTP : 'HTTP';
+MYSQL : 'MYSQL';
+POSTGRESQL : 'POSTGRESQL';
+REDSHIFT : 'REDSHIFT';
+SNOWFLAKE : 'SNOWFLAKE';
+SQLDW : 'SQLDW';
+SQLSERVER : 'SQLSERVER';
 
-DUMMY: 'DUMMY'; //Dummy is not a keyword but rules reference it. As to be cleaned.
+TODO: 'TODO'; //WIP token
 
 SPACE: [ \t\r\n]+ -> channel(HIDDEN) ;
 SQL_COMMENT : '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);

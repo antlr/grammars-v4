@@ -118,7 +118,7 @@ value_item
 
 update_statement
     : UPDATE object_name as_alias? SET column_name EQ expr (COMMA column_name EQ expr)* (
-        FROM //TODO
+        FROM TODO
     )? (WHERE expr)?
     ;
 
@@ -150,7 +150,6 @@ misc_statement
     | set_timezone
     | set_variable
     | use_catalog
-    | use_database
     | use_schema
     ;
 
@@ -253,7 +252,7 @@ unset_tag
     ;
 
 execute_immediate
-    : EXECUTE IMMEDIATE string (INTO variable_name_list)? (USING )? //TODO
+    : EXECUTE IMMEDIATE string (INTO variable_name_list)? (USING )? TODO
     ;
 
 variable_name_list
@@ -269,11 +268,11 @@ set_recipient
     ;
 
 set_timezone
-    : SET TIME ZONE (LOCAL ) //TODO
+    : SET TIME ZONE (LOCAL ) TODO
     ;
 
 set_variable
-    : SET (VAR | VARIABLE) variable_name EQ (expr | DEFAULT) //TODO
+    : SET (VAR | VARIABLE) variable_name EQ (expr | DEFAULT) TODO
     | SET (VAR | VARIABLE) '(' variable_name_list ')' EQ '(' query_statement ')'
     ;
 
@@ -303,12 +302,10 @@ partition_value
     | num
     ;
 
-
 alter_statement
     : alter_catalog
     | alter_connection
     | alter_credential
-    | alter_database
     | alter_location
     | alter_materialized_view
     | alter_provider
@@ -319,11 +316,6 @@ alter_statement
     | alter_table
     | alter_view
     | alter_volume
-    ;
-
-
-default_ddl_collation
-    : DEFAULT_DDL_COLLATION_ EQ string
     ;
 
 resume_suspend
@@ -434,44 +426,13 @@ alter_connection
     ;
 
 option_list
-    :
+    : TODO
     ;
 
 alter_credential
     : ALTER storage_service CREDENTIAL credential_name
     (RENAME TO n=credential_name | SET? OWNER TO principal)
     ;
-
-alter_database
-    : ALTER DATABASE if_exists? id_ RENAME TO id_
-    | ALTER DATABASE if_exists? id_ SWAP WITH id_
-    | ALTER DATABASE if_exists? id_ SET (DATA_RETENTION_TIME_IN_DAYS EQ num)? (
-        MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num
-    )? default_ddl_collation? comment_clause?
-    | ALTER DATABASE id_ set_tags
-    | ALTER DATABASE id_ unset_tags
-    | ALTER DATABASE if_exists? id_ UNSET database_property (COMMA database_property)*
-    | ALTER DATABASE id_ ENABLE REPLICATION TO ACCOUNTS account_id_list (IGNORE EDITION CHECK)?
-    | ALTER DATABASE id_ DISABLE REPLICATION ( TO ACCOUNTS account_id_list)?
-    | ALTER DATABASE id_ REFRESH
-    // Database Failover
-    | ALTER DATABASE id_ ENABLE FAILOVER TO ACCOUNTS account_id_list
-    | ALTER DATABASE id_ DISABLE FAILOVER ( TO ACCOUNTS account_id_list)?
-    | ALTER DATABASE id_ PRIMARY
-    ;
-
-database_property
-    : DATA_RETENTION_TIME_IN_DAYS
-    | MAX_DATA_EXTENSION_TIME_IN_DAYS
-    | DEFAULT_DDL_COLLATION_
-    | COMMENT
-    ;
-
-account_id_list
-    : account_identifier (COMMA account_identifier)*
-    ;
-
-
 
 data_type_list
     : data_type (COMMA data_type)*
@@ -527,221 +488,24 @@ property_value
     ;
 
 alter_schema
-    : ALTER SCHEMA if_exists? schema_name RENAME TO schema_name
-    | ALTER SCHEMA if_exists? schema_name SWAP WITH schema_name
-    | ALTER SCHEMA if_exists? schema_name SET (
-        (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? comment_clause?
-    )
-    | ALTER SCHEMA if_exists? schema_name set_tags
-    | ALTER SCHEMA if_exists? schema_name unset_tags
-    | ALTER SCHEMA if_exists? schema_name UNSET schema_property (COMMA schema_property)*
-    | ALTER SCHEMA if_exists? schema_name ( ENABLE | DISABLE) MANAGED
+    : ALTER (DATABASE | SCHEMA) schema_name TODO
     ;
-
-schema_property
-    : DATA_RETENTION_TIME_IN_DAYS
-    | MAX_DATA_EXTENSION_TIME_IN_DAYS
-    | DEFAULT_DDL_COLLATION_
-    | COMMENT
-    ;
-
 
 alter_share
-    : ALTER SHARE if_exists? id_ (ADD | REMOVE) ACCOUNTS EQ id_ (COMMA id_)* (
-        SHARE_RESTRICTIONS EQ true_false
-    )?
-    | ALTER SHARE if_exists? id_ ADD ACCOUNTS EQ id_ (COMMA id_)* (
-        SHARE_RESTRICTIONS EQ true_false
-    )?
-    | ALTER SHARE if_exists? id_ SET (ACCOUNTS EQ id_ (COMMA id_)*)? comment_clause?
-    | ALTER SHARE if_exists? id_ set_tags
-    | ALTER SHARE id_ unset_tags
-    | ALTER SHARE if_exists? id_ UNSET COMMENT
+    : ALTER SHARE share_name TODO
     ;
 
 alter_streaming_table
-    :
+    : ALTER STREAMING TABLE table_name TODO
     ;
 
 alter_table
-    : ALTER TABLE if_exists? object_name RENAME TO object_name
-    | ALTER TABLE if_exists? object_name SWAP WITH object_name
-    | ALTER TABLE if_exists? object_name (
-        clustering_action
-        | table_column_action
-        | constraint_action
-    )
-    | ALTER TABLE if_exists? object_name ext_table_column_action
-    | ALTER TABLE if_exists? object_name search_optimization_action
-    | ALTER TABLE if_exists? object_name? (
-        STAGE_COPY_OPTIONS EQ '(' copy_options ')'
-    )? (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? (
-        CHANGE_TRACKING EQ true_false
-    )? default_ddl_collation? comment_clause?
-    | ALTER TABLE if_exists? object_name set_tags
-    | ALTER TABLE if_exists? object_name unset_tags
-    | ALTER TABLE if_exists? object_name UNSET (
-        DATA_RETENTION_TIME_IN_DAYS
-        | MAX_DATA_EXTENSION_TIME_IN_DAYS
-        | CHANGE_TRACKING
-        | DEFAULT_DDL_COLLATION_
-        | COMMENT
-        |
-    )
+    : ALTER TABLE TODO
     ;
-
-
-clustering_action
-    : CLUSTER BY '(' expr_list ')'
-    | RECLUSTER ( MAX_SIZE EQ num)? ( WHERE expr)?
-    | resume_suspend RECLUSTER
-    | DROP CLUSTERING KEY
-    ;
-
-table_column_action
-    : ADD COLUMN? if_not_exists? full_col_decl (COMMA full_col_decl)*
-    | RENAME COLUMN column_name TO column_name
-    | alter_modify (
-        '(' alter_column_clause (',' alter_column_clause)* ')'
-        | alter_column_clause (',' alter_column_clause)*
-    )
-    | alter_modify COLUMN column_name SET MASKING POLICY id_ (
-        USING '(' column_name COMMA column_list ')'
-    )? FORCE?
-    | alter_modify COLUMN column_name UNSET MASKING POLICY
-    | alter_modify column_set_tags (COMMA column_set_tags)*
-    | alter_modify column_unset_tags (COMMA column_unset_tags)*
-    | DROP COLUMN? if_exists? column_list
-    //| DROP DEFAULT
-    ;
-
-alter_column_clause
-    : COLUMN? column_name (
-        DROP DEFAULT
-        | SET DEFAULT object_name DOT NEXTVAL
-        | ( SET? NOT NULL_ | DROP NOT NULL_)
-        | ( (SET DATA)? TYPE)? data_type
-        | COMMENT string
-        | UNSET COMMENT
-    )
-    ;
-
-inline_constraint
-    : (CONSTRAINT id_)? (
-        (UNIQUE | primary_key) common_constraint_properties*
-        | foreign_key REFERENCES object_name (LR_BRACKET column_name RR_BRACKET)? constraint_properties
-    )
-    ;
-
-enforced_not_enforced
-    : NOT? ENFORCED
-    ;
-
-deferrable_not_deferrable
-    : NOT? DEFERRABLE
-    ;
-
-initially_deferred_or_immediate
-    : INITIALLY (DEFERRED | IMMEDIATE)
-    ;
-
-//TODO : Some properties are mutualy exclusive ie INITIALLY DEFERRED is not compatible with NOT DEFERRABLE
-// also VALIDATE | NOVALIDATE need to be after ENABLE or ENFORCED. Lot of case to handle :)
-common_constraint_properties
-    : enforced_not_enforced (VALIDATE | NOVALIDATE)?
-    | deferrable_not_deferrable
-    | initially_deferred_or_immediate
-    | ( ENABLE | DISABLE) ( VALIDATE | NOVALIDATE)?
-    | RELY
-    | NORELY
-    ;
-
-on_update
-    : ON UPDATE on_action
-    ;
-
-on_delete
-    : ON DELETE on_action
-    ;
-
-foreign_key_match
-    : MATCH match_type = (FULL | PARTIAL | SIMPLE)
-    ;
-
-on_action
-    : CASCADE
-    | SET ( NULL_ | DEFAULT)
-    | RESTRICT
-    | NO ACTION
-    ;
-
-constraint_properties
-    : common_constraint_properties*
-    | foreign_key_match
-    | foreign_key_match? ( on_update on_delete? | on_delete on_update?)
-    ;
-
-ext_table_column_action
-    : ADD COLUMN? column_name data_type AS '(' expr ')'
-    | RENAME COLUMN column_name TO column_name
-    | DROP COLUMN? column_list
-    ;
-
-constraint_action
-    : ADD out_of_line_constraint
-    | RENAME CONSTRAINT id_ TO id_
-    | alter_modify (CONSTRAINT id_ | primary_key | UNIQUE | foreign_key) column_list_in_parentheses enforced_not_enforced? (
-        VALIDATE
-        | NOVALIDATE
-    ) (RELY | NORELY)
-    | DROP (CONSTRAINT id_ | primary_key | UNIQUE | foreign_key) column_list_in_parentheses? cascade_restrict?
-    | DROP PRIMARY KEY
-    ;
-
-search_optimization_action
-    : ADD SEARCH OPTIMIZATION (ON search_method_with_target (COMMA search_method_with_target)*)?
-    | DROP SEARCH OPTIMIZATION (ON search_method_with_target (COMMA search_method_with_target)*)?
-    ;
-
-search_method_with_target
-    : (EQUALITY | SUBSTRING | GEO) '(' (STAR | expr) ')'
-    ;
-
-
-column_set_tags
-    : COLUMN? column_name set_tags
-    ;
-
-column_unset_tags
-    : COLUMN column_name unset_tags
-    ;
-
 
 alter_view
-    : ALTER VIEW if_exists? object_name RENAME TO object_name
-    | ALTER VIEW if_exists? object_name SET comment_clause
-    | ALTER VIEW if_exists? object_name UNSET COMMENT
-    | ALTER VIEW object_name SET SECURE
-    | ALTER VIEW object_name UNSET SECURE
-    | ALTER VIEW if_exists? object_name set_tags
-    | ALTER VIEW if_exists? object_name unset_tags
-    | ALTER VIEW if_exists? object_name ADD ROW  POLICY id_ ON column_list_in_parentheses
-    | ALTER VIEW if_exists? object_name DROP ROW  POLICY id_
-    | ALTER VIEW if_exists? object_name ADD ROW  POLICY id_ ON column_list_in_parentheses COMMA DROP ROW  POLICY id_
-    | ALTER VIEW if_exists? object_name DROP ALL ROW  POLICIES
-    | ALTER VIEW object_name alter_modify COLUMN? id_ SET MASKING POLICY id_ (
-        USING '(' column_name COMMA column_list ')'
-    )? FORCE?
-    | ALTER VIEW object_name alter_modify COLUMN? id_ UNSET MASKING POLICY
-    | ALTER VIEW object_name alter_modify COLUMN? id_ set_tags
-    | ALTER VIEW object_name alter_modify COLUMN id_ unset_tags
+    : ALTER VIEW TODO
     ;
-
-alter_modify
-    : ALTER
-    | MODIFY
-    ;
-
 
 alter_volume
     : ALTER VOLUME volume_name (
@@ -751,36 +515,20 @@ alter_volume
     )
     ;
 
-set_tags
-    : SET tag_decl_list
-    ;
-
-tag_decl_list
-    : TAG object_name EQ tag_value (COMMA object_name EQ tag_value)*
-    ;
-
-unset_tags
-    : UNSET tag_list
-    ;
-
 tag_list
     : TAG object_name (COMMA object_name)*
     ;
 
-
-// create commands
 create_statement
     : create_bloomfilter_index
     | create_catalog
     | create_connection
-    | create_database
     | create_function
     | create_location
     | create_materialized_view
     | create_procedure
     | create_recipient
     | create_schema
-    | create_server
     | create_share
     | create_streaming_table
     | create_table
@@ -796,11 +544,11 @@ create_bloomfilter_index
 
 create_catalog
     : CREATE CATALOG if_not_exists? catalog_name
-    (USING SHARE  provider_name DOT share_name |
+    (USING SHARE provider_name DOT share_name |
     MANAGED LOCATION location_path |
     COMMENT comment |
     DEFAULT COLLATION default_collation_name |
-    OPTIONS '(' ')'
+    OPTIONS '(' TODO ')'
     )?
     ;
 
@@ -813,68 +561,15 @@ comment
     ;
 
 create_connection
-    : CREATE (CONNECTION | SERVER) if_not_exists? id_ (
-        comment_clause?
-        | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?)
+    : CREATE (SERVER | CONNECTION) if_not_exists? connection_name (
+        TYPE (DATABRICKS | HTTP | MYSQL | POSTGRESQL | REDSHIFT | SNOWFLAKE | SQLDW | SQLSERVER)
+        OPTIONS '(' TODO ')'
+        inline_comment_clause?
     )
     ;
 
-create_database
-    : CREATE or_replace? TRANSIENT? DATABASE if_not_exists? id_ clone_at_before? (
-        DATA_RETENTION_TIME_IN_DAYS EQ num
-    )? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? with_tags? comment_clause?
-    ;
-
-clone_at_before
-    : CLONE id_ (
-        at_before1 LR_BRACKET (TIMESTAMP ASSOC string | OFFSET ASSOC string | STATEMENT ASSOC id_) RR_BRACKET
-    )?
-    ;
-
-at_before1
-    : AT_KEYWORD
-    | BEFORE
-    ;
-
-arg_decl
-    : arg_name arg_data_type arg_default_value_clause?
-    ;
-
-arg_default_value_clause
-    : DEFAULT expr
-    ;
-
-col_decl
-    : column_name data_type virtual_column_decl?
-    ;
-
-virtual_column_decl
-    : AS LR_BRACKET function_call RR_BRACKET
-    | AS function_call
-    ;
-
-function_definition
-    : string
-    | DBL_DOLLAR
-    ;
-
 create_function
-    : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
-        arg_decl (COMMA arg_decl)*
-    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET)  (
-        LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
-    )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
-        PACKAGES EQ '(' string_list ')'
-    )? (RUNTIME_VERSION EQ (string | FLOAT))? (IMPORTS EQ '(' string_list ')')? (
-        PACKAGES EQ '(' string_list ')'
-    )? (HANDLER EQ string)? comment_clause? AS function_definition
-    | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
-        data_type
-        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
-    )  (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
-        VOLATILE
-        | IMMUTABLE
-    )? MEMOIZABLE? comment_clause? AS function_definition
+    : CREATE or_replace? TEMPORARY? FUNCTION if_not_exists? function_name TODO
     ;
 
 create_location
@@ -884,107 +579,28 @@ create_location
         inline_comment_clause?
     ;
 
-tag_decl
-    : object_name EQ string
-    ;
-
 column_list_in_parentheses
     : LR_BRACKET column_list RR_BRACKET
     ;
 
 create_materialized_view
-    : CREATE or_replace? SECURE? MATERIALIZED VIEW if_not_exists? object_name (
-        LR_BRACKET column_list_with_comment RR_BRACKET
-    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? cluster_by? AS select_statement
-    //NOTA MATERIALIZED VIEW accept only simple select statement at this time
-    ;
-
-
-
-
-caller_owner
-    : CALLER
-    | OWNER
-    ;
-
-executa_as
-    : EXECUTE AS caller_owner
-    ;
-
-procedure_definition
-    : string
-    | DBL_DOLLAR
-    ;
-
-not_null
-    : NOT NULL_
+    : CREATE or_replace? MATERIALIZED VIEW if_not_exists? view_name TODO
     ;
 
 create_procedure
-    : CREATE or_replace? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
-        data_type
-        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
-    ) not_null? LANGUAGE SQL (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
-        VOLATILE
-        | IMMUTABLE
-    )? // Note: VOLATILE and IMMUTABLE are deprecated.
-    comment_clause? executa_as? AS procedure_definition
-    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS data_type not_null? LANGUAGE
-        JAVASCRIPT (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
-        VOLATILE
-        | IMMUTABLE
-    )? // Note: VOLATILE and IMMUTABLE are deprecated.
-    comment_clause? executa_as? AS procedure_definition
-    | CREATE or_replace? SECURE? PROCEDURE object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
-        data_type not_null?
-        | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
-    ) LANGUAGE PYTHON RUNTIME_VERSION EQ string (IMPORTS EQ '(' string_list ')')? PACKAGES EQ '(' string_list ')' HANDLER EQ string
-    //            ( CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT )?
-    //            ( VOLATILE | IMMUTABLE )? // Note: VOLATILE and IMMUTABLE are deprecated.
-    comment_clause? executa_as? AS procedure_definition
+    : CREATE or_replace? PROCEDURE if_not_exists procedure_name TODO
     ;
 
 create_recipient
-    :
+    : TODO
     ;
 
 create_schema
-    : CREATE SCHEMA if_not_exists? schema_name //TODO
-    ;
-
-
-create_server
-    :
-    ;
-
-
-start_with
-    : START WITH? EQ? num
-    ;
-
-increment_by
-    : INCREMENT BY? EQ? num
+    : CREATE (DATABASE | SCHEMA) if_not_exists? schema_name TODO
     ;
 
 create_share
     : CREATE or_replace? SHARE id_ comment_clause?
-    ;
-
-character
-    : CHAR_LITERAL
-    ;
-
-copy_options
-    : ON_ERROR EQ (CONTINUE ABORT_STATEMENT)
-    | SIZE_LIMIT EQ num
-    | PURGE EQ true_false
-    | RETURN_FAILED_ONLY EQ true_false
-    | MATCH_BY_COLUMN_NAME EQ CASE_SENSITIVE
-    | CASE_INSENSITIVE
-    | NONE
-    | ENFORCE_LENGTH EQ true_false
-    | TRUNCATECOLUMNS EQ true_false
-    | FORCE EQ true_false
     ;
 
 true_false
@@ -992,70 +608,8 @@ true_false
     | FALSE
     ;
 
-copy_grants
-    : COPY GRANTS
-    ;
-
-
-
-with_tags
-    : WITH? TAG LR_BRACKET tag_decl (COMMA tag_decl)* RR_BRACKET
-    ;
-
-with_row_access_policy
-    : WITH? ROW  POLICY id_ ON LR_BRACKET column_name (COMMA column_name)* RR_BRACKET
-    ;
-
-cluster_by
-    : CLUSTER BY LINEAR? expr_list_in_parentheses
-    ;
-
-with_masking_policy
-    : WITH? MASKING POLICY id_ (USING column_list_in_parentheses)?
-    ;
-
-collate
-    : COLLATE string
-    ;
-
-order_noorder
-    : ORDER
-    | NOORDER
-    ;
-
-default_value
-    : DEFAULT expr
-    | (AUTOINCREMENT | IDENTITY) (
-        LR_BRACKET num COMMA num RR_BRACKET
-        | start_with
-        | increment_by
-        | start_with increment_by
-    )? order_noorder?
-    ;
-
-foreign_key
-    : FOREIGN KEY
-    ;
-
-primary_key
-    : PRIMARY KEY
-    ;
-
-out_of_line_constraint
-    : (CONSTRAINT id_)? (
-        (UNIQUE | primary_key) column_list_in_parentheses common_constraint_properties*
-        | foreign_key column_list_in_parentheses REFERENCES object_name column_list_in_parentheses constraint_properties
-    ) inline_comment_clause?
-    ;
-
-//For classic table
-full_col_decl
-    : col_decl (collate | inline_constraint | default_value)* with_masking_policy? with_tags? inline_comment_clause?
-    ;
-
-
 create_streaming_table
-    :
+    : TODO
     ;
 
 create_table
@@ -1066,21 +620,20 @@ create_table
     ;
 
 create_table_using
-    :
+    : TODO
     ;
 
 create_table_like
-    :
+    : TODO
     ;
 
 create_table_clone
-    :
+    : TODO
     ;
 
 create_table_hive_format
-    :
+    : TODO
     ;
-
 
 sql
     : EXECUTE IMMEDIATE DBL_DOLLAR
@@ -1100,14 +653,8 @@ named_argument_list
     : id_ '=>' expr (COMMA id_ '=>' expr)*
     ;
 
-view_col
-    : column_name with_masking_policy with_tags
-    ;
-
 create_view
-    : CREATE or_replace? SECURE? RECURSIVE? VIEW if_not_exists? object_name (
-        LR_BRACKET column_list_with_comment RR_BRACKET
-    )? view_col* with_row_access_policy? with_tags? copy_grants? comment_clause? AS query_statement
+    : CREATE or_replace? TEMPORARY? VIEW if_not_exists? view_name TODO
     ;
 
 create_volume
@@ -1153,11 +700,11 @@ drop_statement
     ;
 
 drop_bloomfilter_index
-    :
+    : DROP BLOOMFILTER INDEX ON TABLE? table_name (FOR COLUMNS column_list_in_parentheses)?
     ;
 
 drop_catalog
-    :
+    : DROP CATALOG if_exists? catalog_name cascade_restrict?
     ;
 
 drop_connection
@@ -1165,7 +712,7 @@ drop_connection
     ;
 
 drop_credential
-    :
+    : DROP storage_service? CREDENTIAL if_exists? credential_name
     ;
 
 drop_database
@@ -1177,7 +724,7 @@ drop_function
     ;
 
 drop_location
-    :
+    : DROP EXTERNAL LOCATION if_exists? location_name
     ;
 
 drop_procedure
@@ -1185,11 +732,11 @@ drop_procedure
     ;
 
 drop_provider
-    :
+    : DROP PROVIDER if_exists? provider_name
     ;
 
 drop_recipient
-    :
+    : DROP RECIPIENT if_exists? recipient_name
     ;
 
 drop_schema
@@ -1198,25 +745,23 @@ drop_schema
 
 
 drop_share
-    : DROP SHARE id_
+    : DROP SHARE if_exists? share_name
     ;
-
-
 
 drop_table
     : DROP TABLE if_exists? object_name cascade_restrict?
     ;
 
 drop_variable
-    :
+    : DROP TEMPORARY VARIABLE if_exists? variable_name
     ;
 
 drop_view
-    : DROP VIEW if_exists? object_name
+    : DROP MATERIALIZED? VIEW if_exists? view_name
     ;
 
 drop_volume
-    :
+    : DROP VOLUME if_exists? volume_name
     ;
 
 cascade_restrict
@@ -1228,13 +773,8 @@ arg_types
     : LR_BRACKET data_type_list? RR_BRACKET
     ;
 
-
-use_database
-    : USE DATABASE schema_name
-    ;
-
 use_schema
-    : USE SCHEMA schema_name
+    : USE (DATABASE | SCHEMA) schema_name
     ;
 
 add_archive
@@ -1587,7 +1127,7 @@ show_databases
     ;
 
 show_functions
-    : SHOW function_kind? FUNCTIONS (in_from schema_name)? like_pattern? //TODO
+    : SHOW function_kind? FUNCTIONS (in_from schema_name)? like_pattern? TODO
     ;
 
 function_kind
@@ -1649,7 +1189,7 @@ show_tables_dropped
     ;
 
 show_tblproperties
-    : SHOW TBLPROPERTIES table_name //TODO
+    : SHOW TBLPROPERTIES table_name TODO
     ;
 
 show_users
@@ -1668,32 +1208,14 @@ like_pattern
     : LIKE? string
     ;
 
-//names
-account_identifier
-    : id_
-    ;
-
 schema_name
     : (catalog_name DOT)? s = id_
     | id_clause
     ;
 
 id_clause
-    : IDENTIFIER '(' string ')' // TODO
+    : IDENTIFIER '(' string ')' TODO
     ;
-
-tag_value
-    : string
-    ;
-
-arg_data_type
-    : id_
-    ;
-
-arg_name
-    : id_
-    ;
-
 
 string
     : STRING
@@ -1702,7 +1224,6 @@ string
 string_list
     : string (COMMA string)*
     ;
-
 
 id_
     //id_ is used for object name. Snowflake is very permissive
@@ -1716,45 +1237,21 @@ id_
     ;
 
 keyword
-    //List here keyword (SnowSQL meaning) allowed as object name
-    // Name of builtin function should be included in specifique section (ie builtin_function)
-    // please add in alphabetic order for easy reading
-    // https://docs.snowflake.com/en/sql-reference/reserved-keywords
     : ACCOUNT
     | ACTION
-    | ALERT
-    | AT_KEYWORD
     | CLUSTER
     | COMMENT
     | CONDITION
-    | COPY_OPTIONS_
-    | DIRECTION
-    | EMAIL
-    | FIRST_VALUE
-    | FLATTEN
     | FUNCTION
     | IF
     | JOIN
     | KEY
-    | LAG
     | LANGUAGE
-    | LENGTH
-    | MAX_CONCURRENCY_LEVEL
-    | MODE
-    | NOORDER
     | ORDER
     | OUTER
-    | POLICY
     | RECURSIVE
-    | REGION
     | ROLE
-    | ROLLUP
-    | ROW_NUMBER
-    | SEQUENCE
-    | SESSION
-    | STAGE
     | TAG
-    | TARGET_LAG
     | TEMP
     | TIMESTAMP
     | TYPE
@@ -1765,116 +1262,8 @@ keyword
     ;
 
 non_reserved_words
-    //List here lexer token referenced by rules which is not a keyword (SnowSQL Meaning) and allowed has object name
-    // please add in alphabetic order for easy reading
-    : ACCOUNTADMIN
-    | AES
-    | ARRAY_AGG
-    | CHECKSUM
-    | COLLECTION
-    | COMMENT
-    | CONFIGURATION
-    | DATA
-    | DAYS
-    | DEFINITION
-    | DELTA
-    | DISPLAY_NAME
-    | DOWNSTREAM
-    | DYNAMIC
-    | EDITION
-    | EMAIL
-    | EMPTY_
-    | ENABLED
-    | ERROR_INTEGRATION
-    | EVENT
-    | EXCHANGE
-    | EXPIRY_DATE
-    | EXPR
-    | FILE
-    | FILES
-    | FIRST_NAME
-    | FIRST_VALUE
-    | FREQUENCY
-    | GLOBAL
-    | HIGH
-    | HOURS
-    | IDENTIFIER
-    | IDENTITY
-    | INCREMENTAL
-    | IMPORTED
-    | INDEX
-    | INITIALIZE
-    | INPUT
-    | INTERVAL
-    | JAVASCRIPT
-    | LAST_NAME
-    | LAST_QUERY_ID
-    | LEAD
-    | LOCAL
-    | LOW
-    | MAX_CONCURRENCY_LEVEL
-    | MEDIUM
-    | MODE
-    | NAME
-    | NETWORK
-    | NULLIF
-    | NVL
-    | OFFSET
-    | OLD
-    | ON_CREATE
-    | ON_ERROR
-    | ON_SCHEDULE
-    | OPTION
-    | ORGADMIN
-    | OUTBOUND
-    | OUTER
-    | OWNER
-    | PARTITION
-    | PASSWORD
-    | PATH_
-    | PATTERN
-    | PORT
-    | PRIORITY
-    | PROCEDURE_NAME
-    | PROPERTY
-    | PROVIDER
-    | PUBLIC
-    | QUARTER
-    | QUERY
-    | QUERY_TAG
-    | RANK
-    | RECURSIVE
-    | REFERENCES
-    | REFRESH_MODE
-    | RESOURCE
-    | RESOURCES
-    | RESPECT
-    | RESTRICT
-    | RESULT
-    | ROLE
-    | ROUNDING_MODE
-    | ROW_NUMBER
-    | SCALE
-    | SCHEDULE
-    | SECURITYADMIN
-    | SOURCE
-    | START_DATE
-    | STATE
-    | STATS
-    | STATUS
-    | SYSADMIN
-    | TAG
-    | TAGS
-    | TARGET_LAG
+    : COMMENT
     | TIMEZONE
-    | URL
-    | USERADMIN
-    | VALUE
-    | VALUES
-    | VECTOR
-    | VERSION
-    | VISIBILITY
-    | YEAR
     ;
 
 column_name
@@ -1883,10 +1272,6 @@ column_name
 
 column_list
     : column_name (COMMA column_name)*
-    ;
-
-column_list_with_comment
-    : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
     ;
 
 object_name
@@ -1904,10 +1289,10 @@ expr_list
     ;
 
 expr
-    : expr LSB expr RSB //array access
-    | expr COLON expr   //json access
+    : expr '[' expr ']'
+    | expr COLON expr
     | expr DOT (VALUE | expr)
-    | expr COLLATE string
+    | COLLATE string
     | case_expression
     | iff_expr
     | bracket_expression
@@ -1918,8 +1303,6 @@ expr
     | op = NOT+ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
-    //| arr_literal
-//    | expr over_clause
     | cast_expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
@@ -1983,17 +1366,10 @@ data_type
 primitive_expression
     : DEFAULT //?
     | NULL_
-    | id_ ('.' id_)* // json field access
+    | id_ ('.' id_)*
     | id_ '.' STAR
     | full_column_name
     | literal
-    //| json_literal
-    //| arr_literal
-    ;
-
-asc_desc
-    : ASC
-    | DESC
     ;
 
 function_call
@@ -2053,7 +1429,7 @@ switch_section
 
 // select
 query_statement
-    : with_expression? SELECT //TODO
+    : with_expression? SELECT TODO
     ;
 
 with_expression
@@ -2061,19 +1437,19 @@ with_expression
     ;
 
 common_table_expression
-    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS //TODO
+    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS TODO
     ;
 
 select_statement
-    : SELECT //TODO
+    : SELECT TODO
     ;
 
 values_statement
-    :
+    : TODO
     ;
 
 sql_pipeline
-    :
+    : TODO
     ;
 
 explain_statement
