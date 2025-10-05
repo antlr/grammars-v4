@@ -508,18 +508,18 @@ alter_streaming_table
     ;
 
 alter_table
-    : ALTER TABLE TODO
+    : ALTER TABLE table_name TODO
     ;
 
 alter_view
-    : ALTER VIEW TODO
+    : ALTER VIEW view_name TODO
     ;
 
 alter_volume
     : ALTER VOLUME volume_name (
         SET? OWNER TO principal |
-        SET TAGS |
-        UNSET TAGS
+        SET TAGS TODO |
+        UNSET TAGS TODO
     )
     ;
 
@@ -588,7 +588,7 @@ create_location
     ;
 
 column_list_in_parentheses
-    : LR_BRACKET column_list RR_BRACKET
+    : '(' column_list ')'
     ;
 
 create_materialized_view
@@ -1347,7 +1347,7 @@ with_expression
     ;
 
 common_table_expression
-    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS TODO
+    : id_ column_list_in_parentheses? AS TODO
     ;
 
 select_statement

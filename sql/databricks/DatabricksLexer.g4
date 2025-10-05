@@ -340,11 +340,12 @@ DECIMAL : DEC_DIGIT+;
 FLOAT : DEC_DOT_DEC;
 REAL : (DECIMAL | DEC_DOT_DEC) 'E' [+-]? DEC_DIGIT+ ;
 CHAR_LITERAL: '\'' (~['\\\r\n] | EscapeSequence) '\'' ;
+
 fragment EscapeSequence:
     '\\' [btnfr"'\\]
     | '\\' ([0-3]? [0-7])? [0-7]
     | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
- ;
+;
 fragment HexDigit: [0-9a-f] ;
 fragment HexString: [A-Z0-9|.] [A-Z0-9+\-|.]* ;
 fragment Uri: HexString (DIVIDE HexString)* DIVIDE? ;
@@ -352,7 +353,6 @@ fragment WindowsPath: [A-Z] COLON '\\' HexString ('\\' HexString)* '\\'? ;
 fragment DEC_DOT_DEC : DEC_DIGIT+ DOT DEC_DIGIT+ | DEC_DIGIT+ DOT | DOT DEC_DIGIT+;
 fragment DEC_DIGIT : [0-9];
 
-ARROW : '->';
 ASSOC : '=>';
 NE : '!=';
 LTGT : '<>';
@@ -364,8 +364,6 @@ LE : '<=';
 PIPE_PIPE : '||';
 DOT : '.' ;
 AT : '@';
-AT_Q : '\'@\'' ;
-DOLLAR : '$';
 LR_BRACKET : '(';
 RR_BRACKET : ')';
 LSB : '[';
@@ -381,4 +379,4 @@ DIVIDE : '/';
 MODULE : '%';
 PLUS : '+';
 MINUS : '-';
-TILDA : '~' ;
+//TILDA : '~' ;
