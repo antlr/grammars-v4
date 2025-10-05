@@ -193,11 +193,6 @@ update_statement
     )? (WHERE expr)?
     ;
 
-table_or_query
-    : object_name as_alias?
-    | '(' subquery ')' as_alias?
-    ;
-
 copy_into_statement
     : TODO
     ;
@@ -468,14 +463,7 @@ alter_location
     ;
 
 alter_materialized_view
-    : ALTER MATERIALIZED VIEW id_ (
-        RENAME TO id_
-        | CLUSTER BY '(' expr_list ')'
-        | DROP CLUSTERING KEY
-        | resume_suspend RECLUSTER?
-        | SET ( SECURE? comment_clause?)
-        | UNSET ( SECURE | COMMENT)
-    )
+    : ALTER MATERIALIZED VIEW view_name TODO
     ;
 
 alter_provider
@@ -660,12 +648,6 @@ create_table_hive_format
     : TODO
     ;
 
-sql
-    : EXECUTE IMMEDIATE DBL_DOLLAR
-    | statement
-    | call
-    ;
-
 call
     : CALL procedure_name '(' (argument_list | named_argument_list)? ')'
     ;
@@ -689,17 +671,12 @@ create_volume
     ;
 
 object_type_plural
-    : ALERTS
-    | DATABASES
-    | INTEGRATIONS
-    | POLICIES
+    : DATABASES
     | ROLES
     | SCHEMAS
-    | STAGES
     | STREAMS
     | TABLES
     | TAGS
-    | TASKS
     | USERS
     | VIEWS
     ;
@@ -1114,10 +1091,6 @@ function_kind
     | ALL
     ;
 
-in_obj
-    : IN (ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA schema_name | schema_name)
-    ;
-
 show_groups
     : SHOW GROUPS (WITH user_group principal)? like_pattern?
     ;
@@ -1199,10 +1172,6 @@ string
     : STRING
     ;
 
-string_list
-    : string (COMMA string)*
-    ;
-
 id_
     : ID
     | DOUBLE_QUOTE_BLANK
@@ -1213,11 +1182,7 @@ id_
     ;
 
 keyword
-    : ACCOUNT
-    | ACTION
-    | CLUSTER
-    | COMMENT
-    | CONDITION
+    : COMMENT
     | FUNCTION
     | IF
     | JOIN
@@ -1416,10 +1381,6 @@ as_alias
 
 alias
     : id_
-    ;
-
-expr_list_in_parentheses
-    : LR_BRACKET expr_list RR_BRACKET
     ;
 
 comparison_operator
