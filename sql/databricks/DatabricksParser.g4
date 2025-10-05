@@ -43,7 +43,7 @@ statement
     | dml_statement
     | data_retrieval_statement
     | show_statement
-    | describe_command
+    | describe_statement
     | misc_statement
     | resource_management_statement
     | security_statement
@@ -116,32 +116,10 @@ value_item
     | NULL_
     ;
 
-merge_statement
-    : MERGE INTO object_name as_alias? USING table_source ON search_condition merge_matches
-    ;
-
-merge_matches
-    : merge_cond+
-    ;
-
-merge_cond
-    : (WHEN MATCHED (AND search_condition)? THEN merge_update_delete)+
-    | WHEN NOT MATCHED (AND search_condition)? THEN merge_insert
-    ;
-
-merge_update_delete
-    : UPDATE SET column_name EQ expr (',' column_name EQ expr)*
-    | DELETE
-    ;
-
-merge_insert
-    : INSERT ('(' column_list ')')? VALUES '(' expr_list ')'
-    ;
-
 update_statement
     : UPDATE object_name as_alias? SET column_name EQ expr (COMMA column_name EQ expr)* (
-        FROM table_sources
-    )? (WHERE search_condition)?
+        FROM //TODO
+    )? (WHERE expr)?
     ;
 
 table_or_query
@@ -155,7 +133,7 @@ copy_into_statement
 
 delete_statement
     : DELETE FROM object_name as_alias? (USING table_or_query (COMMA table_or_query)?)? (
-        WHERE search_condition
+        WHERE expr
     )?
     ;
 
@@ -858,25 +836,6 @@ at_before1
     | BEFORE
     ;
 
-
-
-
-type_fileformat
-    : CSV
-    | JSON
-    | AVRO
-    | ORC
-    | PARQUET
-    | XML
-    | CSV_Q
-    | JSON_Q
-    | AVRO_Q
-    | ORC_Q
-    | PARQUET_Q
-    | XML_Q
-    ;
-
-
 arg_decl
     : arg_name arg_data_type arg_default_value_clause?
     ;
@@ -902,7 +861,7 @@ function_definition
 create_function
     : CREATE or_replace? SECURE? FUNCTION if_not_exists? object_name LR_BRACKET (
         arg_decl (COMMA arg_decl)*
-    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET) null_not_null? (
+    )? RR_BRACKET RETURNS (data_type | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET)  (
         LANGUAGE (JAVA | PYTHON | JAVASCRIPT | SQL)
     )? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (VOLATILE | IMMUTABLE)? (
         PACKAGES EQ '(' string_list ')'
@@ -912,7 +871,7 @@ create_function
     | CREATE or_replace? SECURE? FUNCTION object_name LR_BRACKET (arg_decl (COMMA arg_decl)*)? RR_BRACKET RETURNS (
         data_type
         | TABLE LR_BRACKET (col_decl (COMMA col_decl)*)? RR_BRACKET
-    ) null_not_null? (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
+    )  (CALLED ON NULL_ INPUT | RETURNS NULL_ ON NULL_ INPUT | STRICT)? (
         VOLATILE
         | IMMUTABLE
     )? MEMOIZABLE? comment_clause? AS function_definition
@@ -1007,39 +966,16 @@ increment_by
     : INCREMENT BY? EQ? num
     ;
 
-
-
 create_share
     : CREATE or_replace? SHARE id_ comment_clause?
     ;
 
 character
     : CHAR_LITERAL
-    | AAD_PROVISIONER_Q
-    | AUTO_Q
-    | AVRO_Q
-    | AZURE_CSE_Q
-    | AZURE_Q
-    | BOTH_Q
-    | CSV_Q
-    | GCS_SSE_KMS_Q
-    | GENERIC_Q
-    | GENERIC_SCIM_PROVISIONER_Q
-    | JSON_Q
-    | NONE_Q
-    | OBJECT_Q
-    | OKTA_PROVISIONER_Q
-    | OKTA_Q
-    | ORC_Q
-    | PARQUET_Q
-    | S3
-    | SNOWPARK_OPTIMIZED
-    | XML_Q
     ;
 
-
 copy_options
-    : ON_ERROR EQ (CONTINUE | SKIP_FILE | SKIP_FILE_N | SKIP_FILE_N ABORT_STATEMENT)
+    : ON_ERROR EQ (CONTINUE ABORT_STATEMENT)
     | SIZE_LIMIT EQ num
     | PURGE EQ true_false
     | RETURN_FAILED_ONLY EQ true_false
@@ -1051,17 +987,10 @@ copy_options
     | FORCE EQ true_false
     ;
 
-
-
 true_false
     : TRUE
     | FALSE
     ;
-
-enable
-    : ENABLE EQ true_false
-    ;
-
 
 copy_grants
     : COPY GRANTS
@@ -1121,7 +1050,7 @@ out_of_line_constraint
 
 //For classic table
 full_col_decl
-    : col_decl (collate | inline_constraint | null_not_null | default_value)* with_masking_policy? with_tags? inline_comment_clause?
+    : col_decl (collate | inline_constraint | default_value)* with_masking_policy? with_tags? inline_comment_clause?
     ;
 
 
@@ -1519,7 +1448,7 @@ describe
     | DESCRIBE
     ;
 
-describe_command
+describe_statement
     : describe_catalog
     | describe_connection
     | describe_credential
@@ -1948,15 +1877,6 @@ non_reserved_words
     | YEAR
     ;
 
-
-pattern
-    : PATTERN EQ string
-    ;
-
-//pattern_assoc
-//    : PATTERN ASSOC string
-//    ;
-
 column_name
     : (id_ '.')? id_
     ;
@@ -1983,13 +1903,8 @@ expr_list
     : expr (COMMA expr)*
     ;
 
-expr_list_sorted
-    : expr asc_desc? (COMMA expr asc_desc?)*
-    ;
-
 expr
-    : object_name DOT NEXTVAL
-    | expr LSB expr RSB //array access
+    : expr LSB expr RSB //array access
     | expr COLON expr   //json access
     | expr DOT (VALUE | expr)
     | expr COLLATE string
@@ -2003,30 +1918,23 @@ expr
     | op = NOT+ expr
     | expr AND expr //bool operation
     | expr OR expr  //bool operation
-    | arr_literal
-    //    | expr time_zone
-    | expr over_clause
+    //| arr_literal
+//    | expr over_clause
     | cast_expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
-    | json_literal
-    | trim_expression
     | function_call
     | subquery
-    | expr IS (null_not_null | not_distinct_from expr)
+    | expr IS (NOT NULL_ expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
-    | primitive_expression //Should be latest rule as it's nearly a catch all
+    | primitive_expression
     ;
 
 iff_expr
-    : IFF '(' search_condition ',' expr ',' expr ')'
-    ;
-
-trim_expression
-    : (TRIM | LTRIM | RTRIM) LR_BRACKET expr (COMMA string)* RR_BRACKET
+    : IFF '(' expr ',' expr ',' expr ')'
     ;
 
 try_cast_expr
@@ -2036,24 +1944,6 @@ try_cast_expr
 cast_expr
     : CAST LR_BRACKET expr AS data_type RR_BRACKET
     | (TIMESTAMP | DATE | TIME | INTERVAL) expr
-    ;
-
-json_literal
-    : LCB kv_pair (COMMA kv_pair)* RCB
-    | LCB RCB
-    ;
-
-kv_pair
-    : key = STRING COLON value
-    ;
-
-value
-    : expr
-    ;
-
-arr_literal
-    : LSB value (',' value)* RSB
-    | LSB RSB
     ;
 
 data_type_size
@@ -2088,15 +1978,6 @@ data_type
     | ARRAY
     | GEOGRAPHY
     | GEOMETRY
-    | VECTOR '(' vector_element_type COMMA num ')'
-    ;
-
-vector_element_type
-    : INT
-    | INTEGER
-    | FLOAT_
-    | FLOAT4
-    | FLOAT8
     ;
 
 primitive_expression
@@ -2110,38 +1991,16 @@ primitive_expression
     //| arr_literal
     ;
 
-order_by_expr
-    : ORDER BY expr_list_sorted
-    ;
-
-//order_by_expr_list
-//    : ORDER BY expr_list
-//    ;
-
-//over_clause_window
-//    : OVER '(' partition_by? order_by_expr (cumulative_frame | sliding_frame)? ')'
-//    ;
-
 asc_desc
     : ASC
     | DESC
     ;
 
-over_clause
-    : OVER '(' partition_by order_by_expr? ')'
-    | OVER '(' order_by_expr ')'
-    | OVER '(' ')'
-    ;
-
 function_call
-    : round_expr
-    | ranking_windowed_function
-    | aggregate_function
-    //    | aggregate_windowed_function
-    | object_name '(' expr_list? ')'
+    : object_name '(' expr_list? ')'
     | object_name '(' param_assoc_list ')'
-    | to_date = ( TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
-    | length = ( LENGTH | LEN) LR_BRACKET expr RR_BRACKET
+    | to_date = (TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
+    | length = (LENGTH | LEN) LR_BRACKET expr RR_BRACKET
     | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
     ;
 
@@ -2152,44 +2011,6 @@ param_assoc_list
 param_assoc
     : id_ ASSOC expr
     ;
-
-ignore_or_repect_nulls
-    : (IGNORE | RESPECT) NULLS
-    ;
-
-ranking_windowed_function
-    : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
-    | NTILE '(' expr ')' over_clause
-    | (LEAD | LAG) LR_BRACKET expr (COMMA expr COMMA expr)? RR_BRACKET ignore_or_repect_nulls? over_clause
-    | (FIRST_VALUE | LAST_VALUE) LR_BRACKET expr RR_BRACKET ignore_or_repect_nulls? over_clause
-    ;
-
-aggregate_function
-    : id_ '(' DISTINCT? expr_list ')'
-    | id_ '(' STAR ')'
-    | (LISTAGG | ARRAY_AGG) '(' DISTINCT? expr (COMMA string)? ')' (
-        WITHIN GROUP '(' order_by_clause ')'
-    )?
-    ;
-
-//rows_range
-//    : ROWS | RANGE
-//    ;
-
-//cumulative_frame
-//    : rows_range BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-//    | rows_range BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
-//    ;
-
-//preceding_following
-//    : PRECEDING | FOLLOWING
-//    ;
-
-//sliding_frame
-//    : ROWS BETWEEN num preceding_following AND num preceding_following
-//    | ROWS BETWEEN UNBOUNDED PRECEDING AND num preceding_following
-//    | ROWS BETWEEN num preceding_following AND UNBOUNDED FOLLOWING
-//    ;
 
 literal
     : STRING // string, date, time, timestamp
@@ -2223,7 +2044,7 @@ case_expression
     ;
 
 switch_search_condition_section
-    : WHEN search_condition THEN expr
+    : WHEN expr THEN expr
     ;
 
 switch_section
@@ -2232,7 +2053,7 @@ switch_section
 
 // select
 query_statement
-    : with_expression? select_statement_in_parentheses set_operators*
+    : with_expression? SELECT //TODO
     ;
 
 with_expression
@@ -2240,12 +2061,11 @@ with_expression
     ;
 
 common_table_expression
-    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS select_statement_in_parentheses
+    : id_ (LR_BRACKET columns = column_list RR_BRACKET)? AS //TODO
     ;
 
 select_statement
-    : select_clause select_optional_clauses limit_clause?
-    | select_top_clause select_optional_clauses //TOP and LIMIT are not allowed together
+    : SELECT //TODO
     ;
 
 values_statement
@@ -2260,296 +2080,16 @@ explain_statement
     : EXPLAIN (EXTENDED | CODEGEN | COST | FORMATTED)? statement
     ;
 
-set_operators
-    : (UNION ALL? by_name? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
-    | select_statement_in_parentheses
-    ;
-
-by_name
-    : BY NAME
-    ;
-
-select_statement_in_parentheses
-    : LR_BRACKET select_statement_in_parentheses RR_BRACKET
-    | select_statement_in_parentheses set_operators
-    | select_statement
-    | with_expression
-    ;
-
-select_optional_clauses
-    : into_clause? from_clause? where_clause? (group_by_clause having_clause? | having_clause)? qualify_clause? order_by_clause?
-    ;
-
-select_clause
-    : SELECT select_list_no_top
-    ;
-
-select_top_clause
-    : SELECT select_list_top
-    ;
-
-select_list_no_top
-    : all_distinct? select_list
-    ;
-
-select_list_top
-    : all_distinct? top_clause? select_list
-    ;
-
-select_list
-    : select_list_elem (COMMA select_list_elem)* COMMA?
-    ;
-
-select_list_elem
-    : column_elem as_alias?
-    | column_elem_star exclude_clause?
-    //    | udt_elem
-    | expression_elem as_alias?
-    ;
-
-column_elem_star
-    : object_name_or_alias? STAR
-    ;
-
-column_elem
-    : object_name_or_alias? column_name
-    | object_name_or_alias? DOLLAR column_position
-    ;
-
-object_name_or_alias
-    : object_name
-    | alias DOT
-    ;
-
-exclude_clause
-    : EXCLUDE (column_name | column_list_in_parentheses)
-    ;
-
 as_alias
     : AS? alias
-    ;
-
-expression_elem
-    : expr
-    | predicate
-    ;
-
-column_position
-    : num
-    ;
-
-all_distinct
-    : ALL
-    | DISTINCT
-    ;
-
-top_clause
-    : TOP num
-    ;
-
-into_clause
-    : INTO var_list
-    ;
-
-var_list
-    : var (COMMA var)*
-    ;
-
-var
-    : COLON id_
-    ;
-
-from_clause
-    : FROM table_sources // object_ref join_clause*
-    ;
-
-table_sources
-    : table_source (',' table_source)*
-    ;
-
-table_source
-    : table_source_item_joined
-    //| '(' table_source ')'
-    ;
-
-table_source_item_joined
-    : object_ref join_clause*
-    | '(' table_source_item_joined ')' join_clause*
-    ;
-
-object_ref
-    : object_name at_before? changes? match_recognize? pivot_unpivot? as_alias? column_list_in_parentheses? sample?
-    | object_name START WITH predicate CONNECT BY prior_list?
-    | TABLE '(' function_call ')' pivot_unpivot? as_alias? sample?
-    | values_table sample?
-    | LATERAL? '(' subquery ')' pivot_unpivot? as_alias? column_list_in_parentheses?
-    | LATERAL (flatten_table | splited_table) as_alias?
-    //| AT id_ PATH?
-    //    ('(' FILE_FORMAT ASSOC id_ COMMA pattern_assoc ')')?
-    //    as_alias?
-    ;
-
-flatten_table_option
-    : PATH_ ASSOC string
-    | OUTER ASSOC true_false
-    | RECURSIVE ASSOC true_false
-    ;
-
-flatten_table
-    : FLATTEN LR_BRACKET (INPUT ASSOC)? expr (COMMA flatten_table_option)* RR_BRACKET
-    ;
-
-splited_table
-    : SPLIT_TO_TABLE LR_BRACKET expr COMMA expr RR_BRACKET
-    ;
-
-prior_list
-    : prior_item (COMMA prior_item)*
-    ;
-
-prior_item
-    : PRIOR? id_ EQ PRIOR? id_
-    ;
-
-outer_join
-    : (LEFT | RIGHT | FULL) OUTER?
-    ;
-
-join_type
-    : INNER
-    | outer_join
-    ;
-
-join_clause
-    : join_type? DIRECTED? JOIN object_ref on_using_clause?
-    | NATURAL join_type? DIRECTED? JOIN object_ref
-    | CROSS DIRECTED? JOIN object_ref
-    | ASOF JOIN object_ref MATCH_CONDITION '(' expr ')' on_using_clause?
-    ;
-
-on_using_clause
-    : ON search_condition | USING column_list_in_parentheses
-    ;
-
-at_before
-    : AT_KEYWORD LR_BRACKET (
-        TIMESTAMP ASSOC expr
-        | OFFSET ASSOC expr
-        | STATEMENT ASSOC string
-        | STREAM ASSOC string
-    ) RR_BRACKET
-    | BEFORE LR_BRACKET STATEMENT ASSOC string RR_BRACKET
-    ;
-
-end
-    : END LR_BRACKET (TIMESTAMP ASSOC expr | OFFSET ASSOC expr | STATEMENT ASSOC string) RR_BRACKET
-    ;
-
-changes
-    : CHANGES LR_BRACKET INFORMATION ASSOC default_append_only RR_BRACKET at_before end?
-    ;
-
-default_append_only
-    : DEFAULT
-    | APPEND_ONLY
-    ;
-
-partition_by
-    : PARTITION BY expr_list
     ;
 
 alias
     : id_
     ;
 
-expr_alias_list
-    : expr AS? alias (COMMA expr AS? alias)*
-    ;
-
-measures
-    : MEASURES expr_alias_list
-    ;
-
-match_opts
-    : SHOW EMPTY_ MATCHES
-    | OMIT EMPTY_ MATCHES
-    | WITH UNMATCHED ROWS
-    ;
-
-row_match
-    : (ONE ROW PER MATCH | ALL ROWS PER MATCH) match_opts?
-    ;
-
-first_last
-    : FIRST
-    | LAST
-    ;
-
-symbol
-    : DUMMY
-    ;
-
-after_match
-    : AFTER MATCH SKIP_ (PAST LAST ROW | TO NEXT ROW | TO first_last? symbol)
-    ;
-
-symbol_list
-    : symbol AS expr (COMMA symbol AS expr)*
-    ;
-
-define
-    : DEFINE symbol_list
-    ;
-
-match_recognize
-    : MATCH_RECOGNIZE LR_BRACKET partition_by? order_by_clause? measures? row_match? after_match? pattern? define? RR_BRACKET
-    ;
-
-pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET (
-        as_alias column_alias_list_in_brackets?
-    )?
-    | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
-    ;
-
-column_alias_list_in_brackets
-    : LR_BRACKET id_ (COMMA id_)* RR_BRACKET
-    ;
-
 expr_list_in_parentheses
     : LR_BRACKET expr_list RR_BRACKET
-    ;
-
-values_table
-    : LR_BRACKET values_table_body RR_BRACKET (as_alias column_alias_list_in_brackets?)?
-    | values_table_body (as_alias column_alias_list_in_brackets?)?
-    ;
-
-values_table_body
-    : VALUES expr_list_in_parentheses (COMMA expr_list_in_parentheses)*
-    ;
-
-sample_method
-    : row_sampling = (BERNOULLI | ROW)
-    | block_sampling = ( SYSTEM | BLOCK)
-    ;
-
-repeatable_seed
-    : (REPEATABLE | SEED) LR_BRACKET num RR_BRACKET
-    ;
-
-sample_opts
-    : LR_BRACKET num ROWS? RR_BRACKET repeatable_seed?
-    ;
-
-sample
-    : (SAMPLE | TABLESAMPLE) sample_method? sample_opts
-    ;
-
-search_condition
-    : NOT* (predicate | '(' search_condition ')')
-    | search_condition AND search_condition
-    | search_condition OR search_condition
     ;
 
 comparison_operator
@@ -2562,89 +2102,6 @@ comparison_operator
     | NE
     ;
 
-null_not_null
-    : NOT? NULL_
-    ;
-
-not_distinct_from
-    : NOT? DISTINCT FROM
-    ;
-
 subquery
     : query_statement
-    ;
-
-predicate
-    : EXISTS LR_BRACKET subquery RR_BRACKET
-    | expr comparison_operator (ALL | SOME | ANY) '(' subquery ')'
-    | expr NOT? BETWEEN expr AND expr
-    | expr NOT? IN '(' (subquery | expr_list) ')'
-    | expr NOT? (LIKE | ILIKE) expr (ESCAPE expr)?
-    | expr NOT? RLIKE expr
-    | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
-    | expr IS null_not_null
-    | expr
-    ;
-
-where_clause
-    : WHERE search_condition
-    ;
-
-group_by_elem
-    : column_elem
-    | num
-    | expression_elem
-    ;
-
-group_by_list
-    : group_by_elem (COMMA group_by_elem)*
-    ;
-
-group_by_clause
-    : GROUP BY group_by_list having_clause?
-    | GROUP BY (CUBE | GROUPING SETS | ROLLUP) LR_BRACKET group_by_list RR_BRACKET
-    | GROUP BY ALL
-    ;
-
-having_clause
-    : HAVING search_condition
-    ;
-
-qualify_clause
-    : QUALIFY expr
-    ;
-
-order_item
-    : (id_ | num | expr) (ASC | DESC)? (NULLS ( FIRST | LAST))?
-    ;
-
-order_by_clause
-    : ORDER BY order_item (COMMA order_item)*
-    ;
-
-row_rows
-    : ROW
-    | ROWS
-    ;
-
-first_next
-    : FIRST
-    | NEXT
-    ;
-
-limit_clause
-    : LIMIT num (OFFSET num)?
-    | (OFFSET num)? row_rows? FETCH first_next? num row_rows? ONLY?
-    ;
-
-round_mode
-    : HALF_AWAY_FROM_ZERO_Q
-    | HALF_TO_EVEN_Q
-    ;
-
-round_expr
-    : ROUND LR_BRACKET EXPR ASSOC expr COMMA SCALE ASSOC expr (
-        COMMA ROUNDING_MODE ASSOC round_mode
-    )* RR_BRACKET
-    | ROUND LR_BRACKET expr COMMA expr (COMMA round_mode)* RR_BRACKET
     ;
