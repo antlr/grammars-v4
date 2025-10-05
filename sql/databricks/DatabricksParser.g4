@@ -1358,8 +1358,7 @@ sign
     ;
 
 full_column_name
-    : db_name = id_? DOT schema = id_? DOT tab_name = id_? DOT col_name = id_
-    | schema = id_? DOT tab_name = id_? DOT col_name = id_
+    : schema = id_? DOT tab_name = id_? DOT col_name = id_
     | tab_name = id_? DOT col_name = id_
     | col_name = id_
     ;
