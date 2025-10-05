@@ -53,15 +53,15 @@ ddl_statement
     : alter_statement
     | create_statement
     | drop_statement
-    | comment_on
+    | comment_on_statement
     | declare_variable
-    | msck_repair_table
+    | msck_repair_table_statement
     | refresh_statement
-    | set_tag
-    | sync
-    | truncate_table
-    | undrop_table
-    | unset_tag
+    | set_tag_statement
+    | sync_statement
+    | truncate_table_statement
+    | undrop_table_statement
+    | unset_tag_statement
     ;
 
 dml_statement
@@ -181,7 +181,7 @@ security_statement
     ;
 
 
-comment_on
+comment_on_statement
     : COMMENT ON (
         CATALOG catalog_name |
         COLUMN relation_name DOT column_name |
@@ -199,7 +199,7 @@ declare_variable
         ((DEFAULT | EQ) expr)?
     ;
 
-msck_repair_table
+msck_repair_table_statement
     : MSCK? REPAIR TABLE table_name
         (
         ( (ADD | DROP | SYNC) PARTITIONS)?
@@ -216,7 +216,7 @@ refresh_statement
     | REFRESH (MATERIALIZED VIEW | STREAMING? TABLE) table_name (FULL | SYNC | ASYNC)?
     ;
 
-set_tag
+set_tag_statement
     : SET TAG ON (
         CATALOG catalog_name |
         COLUMN relation_name DOT column_name |
@@ -227,7 +227,7 @@ set_tag
     ) k=id_ (EQ v=id_)?
     ;
 
-sync
+sync_statement
     : SYNC (
         SCHEMA ts=schema_name (AS EXTERNAL)? FROM ss=schema_name |
         TABLE tt=table_name (AS EXTERNAL)? FROM st=table_name
@@ -236,11 +236,11 @@ sync
     (DRY RUN)?
     ;
 
-undrop_table
+undrop_table_statement
     : UNDROP (MATERIALIZED VIEW | TABLE) (relation_name | WITH ID relation_id)
     ;
 
-unset_tag
+unset_tag_statement
     : UNSET TAG ON (
         CATALOG catalog_name |
         COLUMN relation_name DOT column_name |
@@ -285,7 +285,7 @@ set
     | SET LR_BRACKET id_ (COMMA id_)* RR_BRACKET EQ LR_BRACKET expr (COMMA expr)* RR_BRACKET
     ;
 
-truncate_table
+truncate_table_statement
     : TRUNCATE TABLE table_name partition_clause?
     ;
 
