@@ -194,7 +194,7 @@ update_statement
     ;
 
 copy_into_statement
-    : TODO
+    : COPY INTO TODO
     ;
 
 delete_statement
@@ -336,11 +336,6 @@ alter_statement
     | alter_table
     | alter_view
     | alter_volume
-    ;
-
-resume_suspend
-    : RESUME
-    | SUSPEND
     ;
 
 catalog_name
@@ -1249,9 +1244,8 @@ expr
     | subquery
     | expr IS (NOT NULL_ expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
-    | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
-    | expr NOT? RLIKE expr
-    | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
+    | expr NOT? LIKE expr (ESCAPE expr)?
+    | expr NOT? LIKE ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | primitive_expression
     ;
 
@@ -1296,9 +1290,6 @@ primitive_expression
 function_call
     : object_name '(' expr_list? ')'
     | object_name '(' param_assoc_list ')'
-    | to_date = (TO_DATE | DATE) LR_BRACKET expr RR_BRACKET
-    | length = (LENGTH | LEN) LR_BRACKET expr RR_BRACKET
-    | TO_BOOLEAN LR_BRACKET expr RR_BRACKET
     ;
 
 param_assoc_list
