@@ -6,6 +6,7 @@
 class PlSqlParserBase : public antlr4::Parser
 {
     bool _isVersion12 = true;
+    bool _isVersion11 = true;
     bool _isVersion10 = true;
 
   public:
@@ -19,6 +20,16 @@ class PlSqlParserBase : public antlr4::Parser
     void setVersion12(bool value)
     {
         _isVersion12 = value;
+    }
+
+    bool isVersion11()
+    {
+        return _isVersion11;
+    }
+
+    void setVersion11(bool value)
+    {
+        _isVersion11 = value;
     }
 
     bool isVersion10()
