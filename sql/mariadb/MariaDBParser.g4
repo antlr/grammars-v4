@@ -56,7 +56,7 @@ sqlStatement
     ;
 
 setStatementFor // setStatementFor is MariaDB-specific only
-    : SET STATEMENT ID EQUAL_SYMBOL constant (COMMA ID EQUAL_SYMBOL constant)* FOR
+    : SET STATEMENT simpleId EQUAL_SYMBOL constant (COMMA ID EQUAL_SYMBOL constant)* FOR
     ;
 
 emptyStatement_
@@ -476,6 +476,7 @@ createDefinition
     : uid columnDefinition  # columnDeclaration
     | tableConstraint       # constraintDeclaration
     | indexColumnDefinition # indexDeclaration
+    | periodDefinition      # periodDeclaration
     ;
 
 columnDefinition
@@ -495,7 +496,10 @@ columnConstraint
     | STORAGE storageval = (DISK | MEMORY | DEFAULT)                             # storageColumnConstraint
     | referenceDefinition                                                        # referenceColumnConstraint
     | COLLATE collationName                                                      # collateColumnConstraint
-    | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED | PERSISTENT)? # generatedColumnConstraint
+    | (GENERATED ALWAYS)? AS (
+        '(' expression ')' (VIRTUAL | STORED | PERSISTENT)?
+        | ROW (START | END)
+        )                                                                        # generatedColumnConstraint
     | SERIAL DEFAULT VALUE                                                       # serialDefaultColumnConstraint
     | (CONSTRAINT name = uid?)? CHECK '(' expression ')'                         # checkColumnConstraint
     ;
@@ -528,6 +532,10 @@ indexColumnDefinition
     | (FULLTEXT | SPATIAL) indexFormat = (INDEX | KEY)? uid? indexColumnNames indexOption* # specialIndexDeclaration
     ;
 
+periodDefinition
+    : PERIOD FOR (uid | SYSTEM_TIME) '(' uid ',' uid ')'
+    ;
+
 tableOption
     : ENGINE '='? engineName?                                       # tableOptionEngine
     | ENGINE_ATTRIBUTE '='? STRING_LITERAL                          # tableOptionEngineAttribute
@@ -535,16 +543,16 @@ tableOption
     | AUTO_INCREMENT '='? decimalLiteral                            # tableOptionAutoIncrement
     | AVG_ROW_LENGTH '='? decimalLiteral                            # tableOptionAverage
     | DEFAULT? charSet '='? (charsetName | DEFAULT)                 # tableOptionCharset
-    | (CHECKSUM | PAGE_CHECKSUM) '='? boolValue = ('0' | '1')       # tableOptionChecksum
+    | (CHECKSUM | PAGE_CHECKSUM) '='? booleanValue                  # tableOptionChecksum
     | DEFAULT? COLLATE '='? collationName                           # tableOptionCollate
     | COMMENT '='? STRING_LITERAL                                   # tableOptionComment
     | COMPRESSION '='? (STRING_LITERAL | ID)                        # tableOptionCompression
     | CONNECTION '='? STRING_LITERAL                                # tableOptionConnection
     | (DATA | INDEX) DIRECTORY '='? STRING_LITERAL                  # tableOptionDataDirectory
-    | DELAY_KEY_WRITE '='? boolValue = ('0' | '1')                  # tableOptionDelay
+    | DELAY_KEY_WRITE '='? booleanValue                             # tableOptionDelay
     | ENCRYPTION '='? STRING_LITERAL                                # tableOptionEncryption
     | encryptedLiteral '='? (YES | NO)                              # tableOptionEncrypted
-    | (PAGE_COMPRESSED | STRING_LITERAL) '='? ('0' | '1')           # tableOptionPageCompressed
+    | (PAGE_COMPRESSED | STRING_LITERAL) '='? booleanValue          # tableOptionPageCompressed
     | (PAGE_COMPRESSION_LEVEL | STRING_LITERAL) '='? decimalLiteral # tableOptionPageCompressionLevel
     | ENCRYPTION_KEY_ID '='? decimalLiteral                         # tableOptionEncryptionKeyId
     | INDEX DIRECTORY '='? STRING_LITERAL                           # tableOptionIndexDirectory
@@ -565,8 +573,8 @@ tableOption
     )                                                             # tableOptionRowFormat
     | START TRANSACTION                                           # tableOptionStartTransaction
     | SECONDARY_ENGINE_ATTRIBUTE '='? STRING_LITERAL              # tableOptionSecondaryEngineAttribute
-    | STATS_AUTO_RECALC '='? extBoolValue = (DEFAULT | '0' | '1') # tableOptionRecalculation
-    | STATS_PERSISTENT '='? extBoolValue = (DEFAULT | '0' | '1')  # tableOptionPersistent
+    | STATS_AUTO_RECALC '='? (DEFAULT | booleanValue)             # tableOptionRecalculation
+    | STATS_PERSISTENT '='? (DEFAULT | booleanValue)              # tableOptionPersistent
     | STATS_SAMPLE_PAGES '='? (DEFAULT | decimalLiteral)          # tableOptionSamplePage
     | TABLESPACE uid tablespaceStorage?                           # tableOptionTablespace
     | TABLE_TYPE '=' tableType                                    # tableOptionTableType
@@ -740,10 +748,11 @@ alterSpecification
     | DROP COLUMN? ifExists? uid RESTRICT?                                # alterByDropColumn          // here ifExists is MariaDB-specific only
     | DROP (CONSTRAINT | CHECK) ifExists? uid                             # alterByDropConstraintCheck // here ifExists is MariaDB-specific only
     | DROP PRIMARY KEY                                                    # alterByDropPrimaryKey
+    | ADD PRIMARY KEY ifNotExists? '(' uid ')'                            # alterByNotExistingPrimaryKey // MariaDB-specific only
     | DROP indexFormat = (INDEX | KEY) ifExists? uid                      # alterByDropIndex // here ifExists is MariaDB-specific only
     | RENAME indexFormat = (INDEX | KEY) uid TO uid                       # alterByRenameIndex
     | ALTER INDEX uid (VISIBLE | INVISIBLE)                               # alterByAlterIndexVisibility
-    | ALTER (KEY | INDEX) ifExists? uid NOT? IGNORED                      # alterByAlterIndexIgnore
+    | ALTER (KEY | INDEX) ifExists? uid NOT? IGNORED                      # alterByAlterIndexIgnore // MariaDB-specific only
     | DROP FOREIGN KEY ifExists? uid dottedId?                            # alterByDropForeignKey // here ifExists is MariaDB-specific only
     | DISABLE KEYS                                                        # alterByDisableKeys
     | ENABLE KEYS                                                         # alterByEnableKeys
@@ -1651,6 +1660,7 @@ userResourceOption
     | MAX_UPDATES_PER_HOUR decimalLiteral
     | MAX_CONNECTIONS_PER_HOUR decimalLiteral
     | MAX_USER_CONNECTIONS decimalLiteral
+    | MAX_STATEMENT_TIME decimalLiteral
     ;
 
 userPasswordOption
@@ -2244,6 +2254,15 @@ booleanLiteral
     : TRUE
     | FALSE
     ;
+
+booleanValue
+    : '0'
+    | '1'
+    | ON
+    | OFF
+    | STRING_LITERAL
+    ;
+
 
 hexadecimalLiteral
     : STRING_CHARSET_NAME? HEXADECIMAL_LITERAL
@@ -3007,6 +3026,7 @@ keywordsCanBeId
     | MAX
     | MAX_ROWS
     | MAX_SIZE
+    | MAX_STATEMENT_TIME
     | MAX_UPDATES_PER_HOUR
     | MAX_USER_CONNECTIONS
     | MEDIUM
@@ -3040,6 +3060,7 @@ keywordsCanBeId
     | OFFLINE
     | OFFSET
     | OF
+    | OFF
     | OJ
     | OLD_PASSWORD
     | ONE
@@ -3063,6 +3084,7 @@ keywordsCanBeId
     | PASSWORDLESS_USER_ADMIN
     | PASSWORD_LOCK_TIME
     | PATH
+    | PERIOD
     | PERSIST_RO_VARIABLES_ADMIN
     | PHASE
     | PLUGINS
