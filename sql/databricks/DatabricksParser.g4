@@ -1341,12 +1341,11 @@ switch_section
     : WHEN expr THEN expr
     ;
 
-// select
 query_statement
     : with_expression?
     subquery
     set_operator*
-    (order_by_clause | distribute_by_clause? sort_by_clause? | cluster_by_clause)?
+    (order_by_clause | distribute_by_clause sort_by_clause? | cluster_by_clause)?
     window_clause?
     limit_clause?
     offset_clause?
@@ -1357,7 +1356,15 @@ with_expression
     ;
 
 common_table_expression
-    : id_ column_list_in_parentheses? AS TODO
+    : id_ column_list_in_parentheses? recursion_limit? AS? '(' (query_statement | recursive_query) ')'
+    ;
+
+recursion_limit
+    : MAX RECURSION LEVEL
+    ;
+
+recursive_query
+    : bcq=query_statement UNION ALL scq=query_statement
     ;
 
 subquery
@@ -1437,11 +1444,28 @@ select_statement
     ;
 
 select_clause
-    : SELECT hints? (ALL | DISTINCT)
+    : SELECT hints? (ALL | DISTINCT)? select_item (COMMA select_item)*
     ;
 
 hints
-    : TODO
+    : TODO //partition_hint | join_hint | skew_hint
+    ;
+
+select_item
+    : named_expression
+    | star_clause
+    ;
+
+named_expression
+    : expr as_alias?
+    ;
+
+star_clause
+    : n=id_? STAR except_clause?
+    ;
+
+except_clause
+    : EXCEPT column_list_in_parentheses
     ;
 
 table_reference
@@ -1569,12 +1593,8 @@ qualify_clause
     : QUALIFY expr
     ;
 
-except_clause
-    : EXCEPT column_list_in_parentheses
-    ;
-
 values_statement
-    : VALUES values_item (COMMA values_item) table_alias?
+    : VALUES values_item (COMMA values_item)* table_alias?
     | SELECT expr_list table_alias?
     ;
 
