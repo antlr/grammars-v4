@@ -1343,7 +1343,13 @@ switch_section
 
 // select
 query_statement
-    : with_expression? SELECT TODO
+    : with_expression?
+    subquery
+    set_operator*
+    (order_by_clause | distribute_by_clause? sort_by_clause? | cluster_by_clause)?
+    window_clause?
+    limit_clause?
+    offset_clause?
     ;
 
 with_expression
@@ -1352,6 +1358,72 @@ with_expression
 
 common_table_expression
     : id_ column_list_in_parentheses? AS TODO
+    ;
+
+subquery
+    : select_statement
+    | values_statement
+    | '(' query_statement ')'
+    | TABLE (table_name | view_name)?
+    | FROM table_reference (COMMA table_reference)*
+    ;
+
+set_operator
+    : (UNION | INTERCEPT | EXCEPT) (ALL | DISTINCT) subquery
+    ;
+
+order_by_clause
+    : ORDER BY order_by_item (COMMA order_by_item)*
+    ;
+
+order_by_item
+    : ALL sort_direction? nulls_sort_order?
+    | expr sort_direction? nulls_sort_order?
+    ;
+
+sort_direction
+    : ASC
+    | DESC
+    ;
+
+nulls_sort_order
+    : NULLS (FIRST | LAST)
+    ;
+
+distribute_by_clause
+    : DISTRIBUTE BY expr_list
+    ;
+
+sort_by_clause
+    : SORT BY sort_by_item (COMMA sort_by_item)*
+    ;
+
+sort_by_item
+    : expr sort_direction? nulls_sort_order?
+    ;
+
+cluster_by_clause
+    : CLUSTER BY expr_list
+    ;
+
+window_clause
+    : WINDOW window_name AS window_spec (COMMA window_name AS window_spec)*
+    ;
+
+window_name
+    : id_
+    ;
+
+window_spec
+    : TODO
+    ;
+
+limit_clause
+    : LIMIT (ALL | ie=expr)
+    ;
+
+offset_clause
+    : OFFSET ie=expr
     ;
 
 select_statement
@@ -1502,7 +1574,13 @@ except_clause
     ;
 
 values_statement
-    : TODO
+    : VALUES values_item (COMMA values_item) table_alias?
+    | SELECT expr_list table_alias?
+    ;
+
+values_item
+    : expr
+    | expr_list_in_parentheses
     ;
 
 sql_pipeline
@@ -1529,8 +1607,4 @@ comparison_operator
     | GE
     | LTGT
     | NE
-    ;
-
-subquery
-    : query_statement
     ;
