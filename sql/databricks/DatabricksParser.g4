@@ -1224,6 +1224,10 @@ expr_list
     : expr (COMMA expr)*
     ;
 
+expr_list_in_parentheses
+    : '(' expr_list ')'
+    ;
+
 expr
     : expr '[' expr ']'
     | expr COLON expr
@@ -1242,7 +1246,7 @@ expr
     | expr COLON_COLON data_type // Cast operator
     | function_call
     | subquery
-    | expr IS (NOT NULL_ expr)
+    | expr IS NOT? NULL_
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? LIKE expr (ESCAPE expr)?
     | expr NOT? LIKE ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
@@ -1337,9 +1341,14 @@ switch_section
     : WHEN expr THEN expr
     ;
 
-// select
 query_statement
-    : with_expression? SELECT TODO
+    : with_expression?
+    subquery
+    set_operator*
+    (order_by_clause | distribute_by_clause sort_by_clause? | cluster_by_clause)?
+    window_clause?
+    limit_clause?
+    offset_clause?
     ;
 
 with_expression
@@ -1347,15 +1356,251 @@ with_expression
     ;
 
 common_table_expression
-    : id_ column_list_in_parentheses? AS TODO
+    : id_ column_list_in_parentheses? recursion_limit? AS? '(' (query_statement | recursive_query) ')'
+    ;
+
+recursion_limit
+    : MAX RECURSION LEVEL
+    ;
+
+recursive_query
+    : bcq=query_statement UNION ALL scq=query_statement
+    ;
+
+subquery
+    : select_statement
+    | values_statement
+    | '(' query_statement ')'
+    | TABLE (table_name | view_name)?
+    | FROM table_reference (COMMA table_reference)*
+    ;
+
+set_operator
+    : (UNION | INTERCEPT | EXCEPT) (ALL | DISTINCT) subquery
+    ;
+
+order_by_clause
+    : ORDER BY order_by_item (COMMA order_by_item)*
+    ;
+
+order_by_item
+    : ALL sort_direction? nulls_sort_order?
+    | expr sort_direction? nulls_sort_order?
+    ;
+
+sort_direction
+    : ASC
+    | DESC
+    ;
+
+nulls_sort_order
+    : NULLS (FIRST | LAST)
+    ;
+
+distribute_by_clause
+    : DISTRIBUTE BY expr_list
+    ;
+
+sort_by_clause
+    : SORT BY sort_by_item (COMMA sort_by_item)*
+    ;
+
+sort_by_item
+    : expr sort_direction? nulls_sort_order?
+    ;
+
+cluster_by_clause
+    : CLUSTER BY expr_list
+    ;
+
+window_clause
+    : WINDOW window_name AS window_spec (COMMA window_name AS window_spec)*
+    ;
+
+window_name
+    : id_
+    ;
+
+window_spec
+    : TODO
+    ;
+
+limit_clause
+    : LIMIT (ALL | ie=expr)
+    ;
+
+offset_clause
+    : OFFSET ie=expr
     ;
 
 select_statement
-    : SELECT TODO
+    : select_clause
+    FROM table_reference
+    lateral_view_clause?
+    where_clause?
+    group_by_clause?
+    having_clause?
+    qualify_clause?
+    ;
+
+select_clause
+    : SELECT hints? (ALL | DISTINCT)? select_item (COMMA select_item)*
+    ;
+
+hints
+    : TODO //partition_hint | join_hint | skew_hint
+    ;
+
+select_item
+    : named_expression
+    | star_clause
+    ;
+
+named_expression
+    : expr as_alias?
+    ;
+
+star_clause
+    : n=id_? STAR except_clause?
+    ;
+
+except_clause
+    : EXCEPT column_list_in_parentheses
+    ;
+
+table_reference
+    : table_name tablesample_clause? table_alias?
+    | STREAM table_name_with_optional_parentheses table_alias?
+    | view_name table_alias?
+    | table_reference join_clause
+    | table_reference pivot_clause
+    | table_reference unpivot_clause
+    | (STREAM | LATERAL)? table_valued_function table_alias?
+    | values_statement
+    | LATERAL? '(' query_statement ')' tablesample_clause? table_alias?
+    ;
+
+join_clause
+    : join_type? JOIN r=table_reference ON expr
+    | NATURAL join_type JOIN r=table_reference USING column_list_in_parentheses
+    | CROSS JOIN r=table_reference
+    ;
+
+join_type
+    : INNER
+    | (LEFT | RIGHT | FULL) OUTER?
+    | LEFT? (SEMI | ANTI)
+    ;
+
+pivot_clause
+    : PIVOT '(' expr as_alias? (COMMA expr as_alias?)* ')'
+        FOR (column_name | column_list)
+        IN '(' expr_list_with_alias ')'
+    ;
+
+expr_list_with_alias
+    : expr as_alias?
+    | expr_list_in_parentheses as_alias? (COMMA expr_list_in_parentheses as_alias?)*
+    ;
+
+unpivot_clause
+    : UNPIVOT (include_exclude NULLS)?
+    (single_value | multi_value)
+    '(' vc=column_name FOR upc=column_name IN '(' column_list_with_aliases ')' ')'
+    ;
+
+single_value
+    : '(' vc=column_name FOR upc=column_name IN '(' column_list_with_aliases ')' ')'
+    ;
+
+multi_value
+    : '('
+        vcl=column_list_in_parentheses
+        FOR upc=column_name
+        IN '(' column_list_in_parentheses alias? (column_list_in_parentheses alias?)* ')'
+    ')'
+    ;
+
+column_list_with_aliases
+    : column_name alias? (COMMA column_name alias?)
+    ;
+
+include_exclude
+    : INCLUDE
+    | EXCLUDE
+    ;
+
+table_valued_function
+    : function_name '(' expr_list ')'
+    ;
+
+table_name_with_optional_parentheses
+    : table_name
+    | '(' table_name ')'
+    ;
+
+tablesample_clause
+    : TABLESAMPLE '(' (
+        percentage=num PERCENT
+        | num_rows=num ROWS
+        | BUCKET fraction=num OUT OF total=num
+    ) ')'
+    (REPEATABLE '(' seed=num ')')?
+    ;
+
+table_alias
+    : AS? id_ column_list_in_parentheses?
+    ;
+
+lateral_view_clause
+    : LATERAL VIEW OUTER? function_name '(' expr_list ')' table_identifier? AS column_list
+    ;
+
+table_identifier
+    : alias
+    ;
+
+where_clause
+    : WHERE expr
+    ;
+
+group_by_clause
+    : GROUP BY (
+        ALL
+        | expr_list (WITH (ROLLUP | CUBE))?
+        | group_by_item_list
+    )
+    ;
+
+group_by_item_list
+    : group_by_item (COMMA group_by_item)*
+    ;
+
+group_by_item
+    : (expr | ROLLUP | CUBE | GROUPING SETS) '(' grouping_set (COMMA grouping_set)* ')'
+    ;
+
+grouping_set
+    : expr
+    | '(' expr_list? ')'
+    ;
+
+having_clause
+    : HAVING expr
+    ;
+
+qualify_clause
+    : QUALIFY expr
     ;
 
 values_statement
-    : TODO
+    : VALUES values_item (COMMA values_item)* table_alias?
+    | SELECT expr_list table_alias?
+    ;
+
+values_item
+    : expr
+    | expr_list_in_parentheses
     ;
 
 sql_pipeline
@@ -1382,8 +1627,4 @@ comparison_operator
     | GE
     | LTGT
     | NE
-    ;
-
-subquery
-    : query_statement
     ;
