@@ -53,7 +53,6 @@ alter table default.task add column xxxx varchar(200) comment 'cdc test';
 alter table `some_table` add unique if not exists `id_unique` (`id`)
 alter table if exists `add_test` add column if not exists `new_col` text default 'my_default';
 alter table user_details add index if not exists `country_id_index` (country_id), algorithm=NOCOPY;
-alter table if exists T1 modify column if exists status ENUM ('PENDING', 'SENDING', 'SENT', 'SUCCESS', 'FAILED', 'FATAL') NOT NULL, rename column if exists col to new_col;
 #end
 #begin
 -- Alter database
@@ -131,6 +130,7 @@ alter user if exists 'user'@'%' identified with 'mysql_native_password' as '*247
     require none password expire default account unlock password history default;
 rename user user1@100.200.1.1 to user2@100.200.1.2;
 rename user user1@100.200.1.1 to user2@2001:0db8:85a3:0000:0000:8a2e:0370:7334;
+ALTER USER 'user'@'localhost' WITH MAX_USER_CONNECTIONS 100 MAX_STATEMENT_TIME 30
 #end
 ALTER TABLE t1 ADD PARTITION (PARTITION p3 VALUES LESS THAN (2002));
 ALTER TABLE t1 ADD PARTITION IF NOT EXISTS (PARTITION p3 VALUES LESS THAN (2002));
@@ -143,3 +143,9 @@ ALTER TABLE my_table
 ALTER SEQUENCE IF EXISTS s2 start=100;
 ALTER SEQUENCE s1 CACHE=1000 NOCYCLE RESTART WITH 1;
 ALTER TABLE `TABLE_NAME` DROP FOREIGN KEY `TABLE_NAME`.`FK_COLUMN`;
+
+ALTER TABLE test_table ADD PRIMARY KEY IF NOT EXISTS (id);
+
+ALTER TABLE IF EXISTS T1
+    MODIFY COLUMN IF EXISTS status ENUM ('PENDING', 'SENDING', 'SENT', 'SUCCESS', 'FAILED', 'FATAL') NOT NULL,
+    RENAME COLUMN IF EXISTS col TO new_col;
