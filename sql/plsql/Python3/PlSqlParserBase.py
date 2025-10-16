@@ -3,7 +3,7 @@ from antlr4 import *
 class PlSqlParserBase(Parser):
 
     _isVersion10 = False
-    _isVersion11 = False
+    _isVersion11 = True
     _isVersion12 = True
 
     def isVersion10(self):
