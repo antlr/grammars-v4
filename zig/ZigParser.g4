@@ -43,7 +43,7 @@ container_declaration
     ;
 //TestDecl <- KEYWORD_test (STRINGLITERALSINGLE / IDENTIFIER)? Block
 test_decl
-    : TEST (STRINGLITERALSINGLE | IDENTIFIER) block
+    : TEST (STRINGLITERAL | IDENTIFIER) block
     ;
 //ComptimeDecl <- KEYWORD_comptime Block
 comptime_decl
@@ -53,12 +53,12 @@ comptime_decl
 //    <- (KEYWORD_export / KEYWORD_extern STRINGLITERALSINGLE? / KEYWORD_inline / KEYWORD_noinline)? FnProto (SEMICOLON / Block)
 //     / (KEYWORD_export / KEYWORD_extern STRINGLITERALSINGLE?)? KEYWORD_threadlocal? GlobalVarDecl
 decl
-    : (EXPORT | EXTERN STRINGLITERALSINGLE? | INLINE | NOINLINE)? fn_proto (';' | block)
-    | (EXPORT | EXTERN STRINGLITERALSINGLE)? THREADLOCAL? global_var_decl
+    : (EXPORT | EXTERN STRINGLITERAL? | INLINE | NOINLINE)? fn_proto (';' | block)
+    | (EXPORT | EXTERN STRINGLITERAL)? THREADLOCAL? global_var_decl
     ;
 //FnProto <- KEYWORD_fn IDENTIFIER? LPAREN ParamDeclList RPAREN ByteAlign? AddrSpace? LinkSection? CallConv? EXCLAMATIONMARK? TypeExpr
 fn_proto
-    : FN IDENTIFIER? '(' param_decl_list ')' byte_align? addr_space? link_section? call_conv? '!' type_expr
+    : FN IDENTIFIER? '(' param_decl_list ')' byte_align? addr_space? link_section? call_conv? '!'? type_expr
     ;
 //VarDeclProto <- (KEYWORD_const / KEYWORD_var) IDENTIFIER (COLON TypeExpr)? ByteAlign? AddrSpace? LinkSection?
 var_decl_proto
@@ -70,7 +70,7 @@ global_var_decl
     ;
 //ContainerField <- doc_comment? KEYWORD_comptime? !KEYWORD_fn (IDENTIFIER COLON)? TypeExpr ByteAlign? (EQUAL Expr)?
 container_field
-    : Doc_comment? COMPTIME?
+    : Doc_comment? COMPTIME? (IDENTIFIER ':')? type_expr byte_align? ('=' expr)?
     ;
 //Statement
 //    <- KEYWORD_comptime ComptimeStatement
@@ -330,7 +330,7 @@ labeled_type_expr
     ;
 // LoopTypeExpr <- KEYWORD_inline? (ForTypeExpr / WhileTypeExpr)
 loop_type_expr
-    : for_prefix type_expr (ELSE type_expr)?
+    : INLINE? (for_type_expr | while_type_expr)
     ;
 // ForTypeExpr <- ForPrefix TypeExpr (KEYWORD_else TypeExpr)?
 for_type_expr
