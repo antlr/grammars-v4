@@ -256,3 +256,11 @@ CREATE TABLE "ETUDES"."IMPORT_EXMETI" (
     template_table VARCHAR2(128),
     timezone VARCHAR2(64))
     SEGMENT CREATION IMMEDIATE NO INMEMORY INITRANS 100;
+
+CREATE TABLE fruit (
+    id NUMERIC(9,0) PRIMARY KEY ANNOTATIONS (Visibility 'Everyone'));
+
+CREATE TABLE fruit (
+    id NUMERIC(9,0) PRIMARY KEY,
+    data varchar2(50))
+    ANNOTATIONS (Visibility 'Everyone');

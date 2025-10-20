@@ -3511,6 +3511,7 @@ table_properties
     | ROW ARCHIVAL
     | AS select_only_statement
     | FOR EXCHANGE WITH TABLE (schema_name '.')? table_name
+    | annotations_clause
     ;
 
 read_only_clause
@@ -4991,6 +4992,7 @@ alter_table_properties
     | READ ONLY
     | READ WRITE
     | REKEY CHAR_STRING
+    | annotations_clause
     ;
 
 alter_table_partitioning
@@ -5284,7 +5286,7 @@ modify_column_clauses
     ;
 
 modify_col_properties
-    : column_name datatype? (DEFAULT (ON NULL_)? expression)? (ENCRYPT encryption_spec | DECRYPT)? inline_constraint* lob_storage_clause?
+    : column_name datatype? (DEFAULT (ON NULL_)? expression)? (ENCRYPT encryption_spec | DECRYPT)? inline_constraint* lob_storage_clause? annotations_clause?
     //TODO alter_xmlschema_clause
     ;
 
@@ -5456,7 +5458,7 @@ column_definition
     )? (DEFAULT (ON NULL_)? expression | identity_clause)? (ENCRYPT encryption_spec)? (
         inline_constraint+
         | inline_ref_constraint
-    )?
+    )? annotations_clause?
     ;
 
 column_collation_name
@@ -7117,6 +7119,24 @@ xmlserialize_param_version_part
 xmlserialize_param_ident_part
     : NO INDENT
     | INDENT (SIZE '=' concatenation)?
+    ;
+
+// Annotations
+
+annotations_clause
+    : ANNOTATIONS '(' annotations_list ')'
+    ;
+
+annotations_list
+    : (
+        ADD (IF NOT EXISTS | OR REPLACE)?
+        | DROP (IF EXISTS)?
+        | REPLACE
+    )? annotation (',' annotations_list)*
+    ;
+
+annotation
+    : identifier CHAR_STRING?
     ;
 
 // SqlPlus
