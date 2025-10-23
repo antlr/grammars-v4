@@ -4477,6 +4477,8 @@ built_in_functions
     )? # STRINGAGG
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/string-escape-transact-sql?view=sql-server-ver16
     | STRING_ESCAPE '(' text_ = expression ',' type_ = expression ')' # STRING_ESCAPE
+    // https://learn.microsoft.com/en-us/sql/t-sql/functions/string-split-transact-sql?view=sql-server-ver16
+    | STRING_SPLIT '(' string = expression ',' separator = expression (',' enable_ordinal = expression)? ')' # STRING_SPLIT
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
     | STUFF '(' str = expression ',' from = expression ',' to = expression ',' str_with = expression ')' # STUFF
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver16
