@@ -984,6 +984,7 @@ STOP_ON_ERROR                               : 'STOP_ON_ERROR';
 STR                                         : 'STR';
 STRING_AGG                                  : 'STRING_AGG';
 STRING_ESCAPE                               : 'STRING_ESCAPE';
+STRING_SPLIT                                : 'STRING_SPLIT';
 STUFF                                       : 'STUFF';
 SUBJECT                                     : 'SUBJECT';
 SUBSCRIBE                                   : 'SUBSCRIBE';
