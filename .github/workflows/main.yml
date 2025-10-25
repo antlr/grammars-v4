@@ -111,7 +111,7 @@ jobs:
         pip --version
     - name: Install Antlr tool
       run: |
-         pip install antlr4-tools
+         pip install antlr4-tools-ken.domino
     - name: Install JavaScript
       uses: actions/setup-node@v5.0.0
       with:
