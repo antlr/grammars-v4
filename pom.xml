@@ -399,6 +399,7 @@
 				<module>yara</module>
 				<module>yini</module>
 				<module>z</module>
+				<module>zig</module>
 			</modules>
 		</profile>
 		<profile>
