@@ -4551,9 +4551,8 @@ match_recognize
     ;
 
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET RR_BRACKET (
-        as_alias column_alias_list_in_brackets?
-    )?
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
+        as_alias column_alias_list_in_brackets?  )?
     | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
     ;
 
@@ -4562,7 +4561,11 @@ pivot_in_clause
     | ANY order_by_clause?
     | subquery
     ;
-    
+
+default_on_null
+    : DEFAULT ON NULL_ (expr)
+    ;
+
 column_alias_list_in_brackets
     : LR_BRACKET id_ (COMMA id_)* RR_BRACKET
     ;

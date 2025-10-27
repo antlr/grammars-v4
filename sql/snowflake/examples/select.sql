@@ -165,3 +165,4 @@ SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
         WHERE television = TRUE
         ORDER BY quarter))
   ORDER BY empid;
+  SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));
