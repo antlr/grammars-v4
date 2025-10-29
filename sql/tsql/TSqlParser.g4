@@ -4014,7 +4014,7 @@ query_specification
     // https://msdn.microsoft.com/en-us/library/ms177673.aspx
     (
         GROUP BY (
-            (groupByAll = ALL? groupBys += group_by_item (',' groupBys += group_by_item)*)
+            (groupByAll = ALL? groupBys += group_by_item (',' groupBys += group_by_item)* (WITH (ROLLUP | CUBE))?)
             | GROUPING SETS '(' groupSets += grouping_sets_item (
                 ',' groupSets += grouping_sets_item
             )* ')'
@@ -4080,10 +4080,18 @@ grouping_sets_item
 
 group_by_item
     : expression
-    /*| rollup_spec
+    | rollup_spec
     | cube_spec
-    | grouping_sets_spec
-    | grand_total*/
+    ;
+
+// ROLLUP specification - can be used in modern syntax
+rollup_spec
+    : ROLLUP '(' expression_list_? ')'
+    ;
+
+// CUBE specification
+cube_spec
+    : CUBE '(' expression_list_? ')'
     ;
 
 option_clause
