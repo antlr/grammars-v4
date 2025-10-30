@@ -302,6 +302,7 @@
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>powerquery</module>
+                <module>proguard-mapping</module>
 				<module>prolog</module>
 				<module>promql</module>
 				<module>propcalc</module>
