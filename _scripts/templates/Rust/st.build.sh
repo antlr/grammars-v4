@@ -14,6 +14,11 @@ fi
 java -jar $JAR -encoding <antlr_encoding> -Dlanguage=Rust -o src/gen  <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 } >
 
+<if(os_win)>
 export RUSTFLAGS="-C link-arg=/STACK:16777216"
+<else>
+ulimit -s
+ulimit -s 16384
+<endif>
 
 cargo b --release
