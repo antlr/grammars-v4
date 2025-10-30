@@ -1,0 +1,19 @@
+; a sound as a form. a longer way to write the same example, but now parameterizable.
+{
+    :rate1      .4           ; Hz
+    :rate2      [8 7.23]     ; Hz
+    :depth1     24           ; semitones
+    :depth2     3            ; semitones
+    :center     80           ; semitones
+    :db         -28          ; dB
+    :delay      .2           ; seconds
+    :maxdelay   0            ; seconds
+    :decay      4            ; seconds
+    :out        \o[
+                    o.center
+                    o.rate1 0 lfsaw o.depth1 * +
+                    o.rate2 0 lfsaw o.depth2 * +
+                    nnhz 0 sinosc o.db dbamp *
+                    o.delay o.maxdelay o.decay combn
+                ]
+} = analog_bubbles

@@ -1,0 +1,1 @@
+((.027 0 .05 .2 xlfo) 0 40 4k xlfo) [-.2 .2] + 0 saw    (.17 0 1h 6k xlfo) .1 rlpf   (.041 0 2 20 xlfo) [0 .25] sinosc biuni *    .2 *  .3 0 3 combn  play

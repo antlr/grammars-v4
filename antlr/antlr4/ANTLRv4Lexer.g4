@@ -51,16 +51,44 @@ options {
     // Using a predefined list of tokens here to ensure the same order of the tokens as they were defined
     // in the old ANTLR3 tree parsers (to avoid having to change the tree parsers code).
     // The actual values of the tokens doesn't matter, but the order does.
-    tokenVocab = predefined;
+    // tokenVocab = predefined;
+    //
+    // Instead of declaring predefined.tokens, which messes up the Maven tester for grammars-v4,
+    // we define the total order of token type values. This should work because it was stated
+    // that the "actual values of the tokens doesn't matter, but the order does." Declaring them
+    // in the tokensSpec section preserves the total order.
 }
 
 // Insert here @header for lexer.
 
 // Standard set of fragments
 tokens {
-    TOKEN_REF,
+    ACTION,
+    ARG_ACTION,
+    ARG_OR_CHARSET,
+    ASSIGN,
+    LEXER_CHAR_SET,
     RULE_REF,
-    LEXER_CHAR_SET
+    SEMPRED,
+    STRING_LITERAL,
+    TOKEN_REF,
+    UNICODE_ESC,
+    UNICODE_EXTENDED_ESC,
+    WS,
+    ALT,
+    BLOCK,
+    CLOSURE,
+    ELEMENT_OPTIONS,
+    EPSILON,
+    LEXER_ACTION_CALL,
+    LEXER_ALT_ACTION,
+    OPTIONAL,
+    POSITIVE_CLOSURE,
+    RULE,
+    RULEMODIFIERS,
+    RULES,
+    SET,
+    WILDCARD
 }
 
 channels {

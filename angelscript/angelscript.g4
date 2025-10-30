@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar angelscript;
 
+start_
+    : script EOF
+    ;
+
 script
     : (
         import_
@@ -49,7 +53,7 @@ script
         | func_
         | namespace
         | ';'
-    )+ EOF
+    )+
     ;
 
 class_

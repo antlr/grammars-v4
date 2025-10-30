@@ -1,0 +1,15 @@
+
+@startuml
+abstract class Person {
+name : String
+age : Real
+isAdult()  : Boolean
+}
+
+Person <|-- Employee
+
+class Employee {
+salary : Real
+}
+
+@enduml

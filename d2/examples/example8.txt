@@ -1,0 +1,7 @@
+diagram: {
+
+shape: sql_table
+id: int { constraint: primary_key}
+}
+
+board.diagram -> diagrams.id

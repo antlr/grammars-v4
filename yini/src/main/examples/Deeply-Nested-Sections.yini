@@ -1,0 +1,29 @@
+/*
+  Nesting level respected, no missing intermediary levels.
+
+  Using caret shorthand for deeper nesting.
+*/
+
+^ Root                             # level 1
+rootKey = "rootValue"
+
+^^ Level2                          # level 2
+level2Key = 42
+
+^^^ Level3                         # level 3
+level3Key = true
+
+^^^^ Level4                        # level 4
+level4Key = null
+
+^^^^^ Level5                       # level 5
+level5Key = "hello"
+
+^^^^^^ Level6                      # level 6
+level6Key = [1, 2, 3]
+
+^7 Level7Shorthand                 # level 7 (shorthand)
+level7Key = "deepValue"
+
+^8 Level8Shorthand                 # level 8 (shorthand)
+level8Key = 3.14159

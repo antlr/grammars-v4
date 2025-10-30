@@ -1,0 +1,22 @@
+syntax = 'proto2';
+
+// Extracted from google/protobuf/descriptor.proto
+message FeatureSet {
+  enum FieldPresence {
+    FIELD_PRESENCE_UNKNOWN = 0;
+    EXPLICIT = 1;
+    IMPLICIT = 2;
+    LEGACY_REQUIRED = 3;
+  }
+  optional FieldPresence field_presence = 1 [
+    retention = RETENTION_RUNTIME,
+    targets = TARGET_TYPE_FIELD,
+    targets = TARGET_TYPE_FILE,
+    feature_support = {
+      edition_introduced: EDITION_2023,
+    },
+    edition_defaults = { edition: EDITION_LEGACY, value: "EXPLICIT" },
+    edition_defaults = { edition: EDITION_PROTO3, value: "IMPLICIT" },
+    edition_defaults = { edition: EDITION_2023, value: "EXPLICIT" }
+  ];
+}

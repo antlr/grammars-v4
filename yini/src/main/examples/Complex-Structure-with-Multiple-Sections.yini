@@ -1,0 +1,19 @@
+^ UserProfile
+
+Name = "Jane Doe"
+Email = "jane.doe@example.com"
+Age = 32
+Preferences: 
+  ["Theme", "light"],
+  ["FontSize", 14],
+  ["NotificationsEnabled", YES],
+
+^ SystemSettings
+SystemName = "MySystem"
+Version = "1.0.0"
+IsActive = YES
+
+^^ Paths
+LogFilePath = "/var/log/myapp.log"
+DatabasePath = "/mnt/db/"
+BackupPaths: "/mnt/backup1", "/mnt/backup2"
