@@ -28,8 +28,6 @@ if($compile_exit_code -ne 0){
 <if(os_win)>
 $env:RUSTFLAGS = "-C link-arg=/STACK:16777216"
 <else>
-$(& ulimit -s )
-$(& ulimit -s 16384 )
 <endif>
 
 $(& cargo b --release ; $compile_exit_code = $LASTEXITCODE) | Write-Host
