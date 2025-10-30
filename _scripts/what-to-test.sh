@@ -2,7 +2,7 @@
 #set -x
 declare -A targets
 # remove temporarily TODO add back: "PHP"
-for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "TypeScript" "Antlr4ng"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
 do
     targets[$t]=0
 done
@@ -46,7 +46,7 @@ done
 
 ttargets=""
 # remove temporarily TODO add back: "PHP"
-for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "TypeScript" "Antlr4ng"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
 do
     if [ ${targets[$t]} -ne 0 ]
     then
