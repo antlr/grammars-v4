@@ -268,7 +268,7 @@ fi
 
 if [ "$targets" == "" ]
 then
-    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 TypeScript )
+    targets=( Antlr4ng CSharp Cpp Dart Go Java JavaScript Python3 Rust TypeScript )
 fi
 
 echo grammars = ${grammars[@]}
