@@ -156,3 +156,13 @@ SELECT 0 as c
 ->> SELECT c FROM $1
 ->> SELECT c FROM $2
 ->> SELECT c FROM $3;
+
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY ORDER BY c1 desc)) ORDER BY empid;
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY));
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
+      SELECT DISTINCT quarter
+        FROM t2
+        WHERE television = TRUE
+        ORDER BY quarter))
+  ORDER BY empid;
+  SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));

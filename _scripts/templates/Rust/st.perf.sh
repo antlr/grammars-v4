@@ -5,7 +5,7 @@ IFS=$(echo -en "\n\b")
 
 rm -f parse.txt
 
-echo "Testing for Python3" >> parse.txt
+echo "Testing for Rust" >> parse.txt
 echo "<parser_name>" >> parse.txt
 date >> parse.txt
 echo "" >> parse.txt
@@ -87,7 +87,7 @@ then
         # Loop from 1 to n and execute the body of the loop each time
         for ((i=1; i\<=n; i++))
         do
-            dotnet trwdog python3 Test.py -prefix individual $f >> parse.txt 2>&1
+            dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -prefix individual $f >> parse.txt 2>&1
             xxx="$?"
             if [ "$xxx" -ne 0 ]
             then
@@ -101,10 +101,10 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
-    echo "${files[1]}" | dotnet trwdog python3 Test.py -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -x -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trwdog python3 Test.py -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trwdog ./target/release/<if(os_win)>test.exe<else>test<endif> -x -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

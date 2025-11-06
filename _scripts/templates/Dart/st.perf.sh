@@ -61,11 +61,7 @@ files=()
 for f in $files2
 do
     if [ -d "$f" ]; then continue; fi
-    dotnet triconv -f utf-8 $f > /dev/null 2>&1
-    if [ "$?" = "0" ]
-    then
-        files+=( $f )
-    fi
+    files+=( $f )
 done
 
 # People often specify a test file directory, but sometimes no
@@ -105,6 +101,7 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
+    echo "${files[1]}" | dotnet trwdog ./Test.exe -x -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
         echo "${files[*]}" | dotnet trwdog ./Test.exe -x -prefix group >> parse.txt 2>&1
