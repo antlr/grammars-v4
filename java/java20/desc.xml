@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-    <targets>;Antlr4ng;Cpp;;CSharp;Dart;Go;Java;JavaScript;Python3;Rust;TypeScript</targets>
-    <inputs>**/*.java</inputs>
+    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;Rust;TypeScript</targets>
+    <inputs>examples/**/*.java</inputs>
 </desc>
