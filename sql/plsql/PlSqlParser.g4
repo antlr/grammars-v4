@@ -5006,6 +5006,7 @@ alter_table_partitioning
     | coalesce_table_partition
     | alter_interval_partition
     | move_table_partition
+    | rename_table_partition
     ;
 
 add_table_partition
@@ -5080,6 +5081,10 @@ move_table_partition
 
 filter_condition
     : INCLUDING ROWS where_clause
+    ;
+
+rename_table_partition
+    : RENAME (partition_extended_names | subpartition_extended_names) TO partition_name
     ;
 
 partition_extended_names
