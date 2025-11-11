@@ -883,7 +883,7 @@ OR
     : O R
     ;
 
-PATHSEPARATOR
+pathseparator
     : '.'
     | ':'
     | '-'
