@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar acme;
 
+options { caseInsensitive=true; }
+
 acmeCompUnit
     : acmeImportDeclaration* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+ EOF
     ;
@@ -311,7 +313,7 @@ acmePropertyDeclaration
 
 acmePropertyValueDeclaration
     : INTEGER_LITERAL
-    | FLOATING_POINT_LITERAL
+    | (MINUS | PLUS)* FLOATING_POINT_LITERAL
     | STRING_LITERAL
     | FALSE
     | TRUE
@@ -437,7 +439,7 @@ acmePropertyTypeString
     ;
 
 acmePropertyTypeBoolean
-    : BOOLEAN
+    : boolean
     ;
 
 acmeViewDeclaration
@@ -569,7 +571,7 @@ literalConstant
     | FLOAT
     | DOUBLE
     | STRING
-    | BOOLEAN
+    | boolean
     | ENUM
     | SET
     | SEQUENCE
@@ -647,19 +649,19 @@ acmeTypeRef
     ;
 
 ABSTRACT
-    : A B S T R A C T
+    : 'abstract'
     ;
 
 ANALYSIS
-    : A N A L Y S I S
+    : 'analysis'
     ;
 
 AND
-    : A N D
+    : 'and'
     ;
 
 ANY
-    : A N Y
+    : 'any'
     ;
 
 ASSIGN
@@ -667,19 +669,19 @@ ASSIGN
     ;
 
 ATTACHMENT
-    : A T T A C H M E N T
+    : 'attachment'
     ;
 
 ATTACHMENTS
-    : A T T A C H M E N T S
+    : 'attachments'
     ;
 
 ATTACHEDPORTS
-    : A T T A C H E D P O R T S
+    : 'attachedports'
     ;
 
 ATTACHEDROLES
-    : A T T A C H E D R O L E S
+    : 'attachedroles'
     ;
 
 BANG
@@ -687,7 +689,7 @@ BANG
     ;
 
 BINDINGS
-    : B I N D I N G S
+    : 'bindings'
     ;
 
 COLON
@@ -699,35 +701,35 @@ COMMA
     ;
 
 COLLECT
-    : C O L L E C T
+    : 'collect'
     ;
 
 COMPONENT
-    : C O M P O N E N T
+    : 'component'
     ;
 
 COMPONENTS
-    : C O M P O N E N T S
+    : 'components'
     ;
 
 CONNECTOR
-    : C O N N E C T O R
+    : 'connector'
     ;
 
 CONTAINASSIGN
-    : C O N T A I N A S S I G N
+    : 'containassign'
     ;
 
 CONNECTORS
-    : C O N N E C T O R S
+    : 'connectors'
     ;
 
 DESIGN
-    : D E S I G N
+    : 'design'
     ;
 
 DISTINCT
-    : D I S T I N C T
+    : 'distinct'
     ;
 
 DOT
@@ -735,31 +737,31 @@ DOT
     ;
 
 DOUBLE
-    : D O U B L E
+    : 'double'
     ;
 
 ELEMENT
-    : E L E M E N T
+    : 'element'
     ;
 
 ENUM
-    : E N U M
+    : 'enum'
     ;
 
 EXTENDED
-    : E X T E N D E D
+    : 'extended'
     ;
 
 EXTENDS
-    : E X T E N D S
+    : 'extends'
     ;
 
 EXTERNAL
-    : E X T E R N A L
+    : 'external'
     ;
 
 EXISTS
-    : E X I S T S
+    : 'exists'
     ;
 
 ELLIPSIS
@@ -771,27 +773,27 @@ EQ
     ;
 
 FAMILY
-    : F A M I L Y
+    : 'family'
     ;
 
 FINAL
-    : F I N A L
+    : 'final'
     ;
 
 FORALL
-    : F O R A L L
+    : 'forall'
     ;
 
 FLOAT
-    : F L O A T
+    : 'float'
     ;
 
 GROUP
-    : G R O U P
+    : 'group'
     ;
 
 GROUPS
-    : G R O U P S
+    : 'groups'
     ;
 
 GE
@@ -799,7 +801,7 @@ GE
     ;
 
 HEURISTIC
-    : H E U R I S T I C
+    : 'heuristic'
     ;
 
 IFF
@@ -807,20 +809,20 @@ IFF
     ;
 
 IMPORT
-    : I M P O R T
+    : 'import'
     ;
 
 IN
-    : I N
+    : 'in'
     ;
 
 INT
-    : I N T
-    | I N T E G E R
+    : 'int'
+    | 'integer'
     ;
 
 INVARIANT
-    : I N V A R I A N T
+    : 'invariant'
     ;
 
 IMPLIES
@@ -868,11 +870,11 @@ NE
     ;
 
 NEW
-    : N E W
+    : 'new'
     ;
 
 MEMBERS
-    : M E M B E R S
+    : 'members'
     ;
 
 MINUS
@@ -880,7 +882,7 @@ MINUS
     ;
 
 OR
-    : O R
+    : 'or'
     ;
 
 PATHSEPARATOR
@@ -896,15 +898,15 @@ PATHSEPARATOR
     ;
 
 PUBLIC
-    : P U B L I C
+    : 'public'
     ;
 
 PRIVATE
-    : P R I V A T E
+    : 'private'
     ;
 
 POWER
-    : P O W E R
+    : 'power'
     ;
 
 PLUS
@@ -912,19 +914,19 @@ PLUS
     ;
 
 PORT
-    : P O R T
+    : 'port'
     ;
 
 PORTS
-    : P O R T S
+    : 'ports'
     ;
 
 PROPERTY
-    : P R O P E R T Y
+    : 'property'
     ;
 
 PROPERTIES
-    : P R O P E R T I E S
+    : 'properties'
     ;
 
 PROPBEGIN
@@ -936,11 +938,11 @@ PROPEND
     ;
 
 RECORD
-    : R E C O R D
+    : 'record'
     ;
 
 REPRESENTATION
-    : R E P R E S E N T A T I O N
+    : 'representation'
     ;
 
 REM
@@ -948,28 +950,28 @@ REM
     ;
 
 REPRESENTATIONS
-    : R E P R E S E N T A T I O N S
+    : 'representations'
     ;
 
 ROLE
-    : R O L E
+    : 'role'
     ;
 
 RULE
-    : R U L E
+    : 'rule'
     ;
 
 ROLES
-    : R O L E S
+    : 'roles'
     ;
 
 SEQUENCE
-    : S E Q U E N C E
-    | S E Q
+    : 'sequence'
+    | 'seq'
     ;
 
 SELECT
-    : S E L E C T
+    : 'select'
     ;
 
 SEMICOLON
@@ -977,7 +979,7 @@ SEMICOLON
     ;
 
 SET
-    : S E T
+    : 'set'
     ;
 
 SET_DECLARE
@@ -993,35 +995,35 @@ STAR
     ;
 
 STRING
-    : S T R I N G
+    : 'string'
     ;
 
 STYLE
-    : S T Y L E
+    : 'style'
     ;
 
 SYSTEM
-    : S Y S T E M
+    : 'system'
     ;
 
 TO
-    : T O
+    : 'to'
     ;
 
 TYPE
-    : T Y P E
+    : 'type'
     ;
 
 UNIQUE
-    : U N I Q U E
+    : 'unique'
     ;
 
 WITH
-    : W I T H
+    : 'with'
     ;
 
 VIEW
-    : V I E W
+    : 'view'
     ;
 
 BIT_OR
@@ -1029,150 +1031,20 @@ BIT_OR
     ;
 
 TRUE
-    : T R U E
+    : 'true'
     ;
 
 FALSE
-    : F A L S E
+    : 'false'
     ;
 
-fragment A
-    : 'a'
-    | 'A'
-    ;
-
-fragment B
-    : 'b'
-    | 'B'
-    ;
-
-fragment C
-    : 'c'
-    | 'C'
-    ;
-
-fragment D
-    : 'd'
-    | 'D'
-    ;
-
-fragment E
-    : 'e'
-    | 'E'
-    ;
-
-fragment F
-    : 'f'
-    | 'F'
-    ;
-
-fragment G
-    : 'g'
-    | 'G'
-    ;
-
-fragment H
-    : 'h'
-    | 'H'
-    ;
-
-fragment I
-    : 'i'
-    | 'I'
-    ;
-
-fragment J
-    : 'j'
-    | 'J'
-    ;
-
-fragment K
-    : 'k'
-    | 'K'
-    ;
-
-fragment L
-    : 'l'
-    | 'L'
-    ;
-
-fragment M
-    : 'm'
-    | 'M'
-    ;
-
-fragment N
-    : 'n'
-    | 'N'
-    ;
-
-fragment O
-    : 'o'
-    | 'O'
-    ;
-
-fragment P
-    : 'p'
-    | 'P'
-    ;
-
-fragment Q
-    : 'q'
-    | 'Q'
-    ;
-
-fragment R
-    : 'r'
-    | 'R'
-    ;
-
-fragment S
-    : 's'
-    | 'S'
-    ;
-
-fragment T
-    : 't'
-    | 'T'
-    ;
-
-fragment U
-    : 'u'
-    | 'U'
-    ;
-
-fragment V
-    : 'v'
-    | 'V'
-    ;
-
-fragment W
-    : 'w'
-    | 'W'
-    ;
-
-fragment X
-    : 'x'
-    | 'X'
-    ;
-
-fragment Y
-    : 'y'
-    | 'Y'
-    ;
-
-fragment Z
-    : 'z'
-    | 'Z'
-    ;
-
-BOOLEAN
+boolean
     : TRUE
     | FALSE
     ;
 
 FLOATING_POINT_LITERAL
-    : ('-' | '+')? [0-9]+ '.' [0-9]+
+    : [0-9]+ '.' [0-9]+
     ;
 
 INTEGER_LITERAL
@@ -1184,7 +1056,7 @@ STRING_LITERAL
     ;
 
 IDENTIFIER
-    : [a-zA-Z] [a-zA-Z0-9_-]*
+    : [a-z] [a-z0-9_-]*
     ;
 
 LINE_COMMENT
