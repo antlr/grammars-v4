@@ -1193,9 +1193,9 @@ macroPunctuationToken
 // some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
 
 shl
-    : LT {this.next('<')}? LT
+    : LT {this.NextLT()}? LT
     ;
 
 shr
-    : GT {this.next('>')}? GT
+    : GT {this.NextGT()}? GT
     ;

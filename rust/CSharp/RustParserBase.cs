@@ -9,7 +9,11 @@ public abstract class RustParserBase : Parser {
         _input = input;
     }
 
-    public bool next(char expect) {
-        return _input.LA(1) == expect;
+    public bool NextGT() {
+        return _input.LA(1) == '>';
+    }
+
+    public bool NextLT() {
+        return _input.LA(1) == '<';
     }
 }
