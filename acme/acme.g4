@@ -885,7 +885,7 @@ OR
     : 'or'
     ;
 
-PATHSEPARATOR
+pathseparator
     : '.'
     | ':'
     | '-'
