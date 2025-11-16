@@ -3,7 +3,7 @@
    <antlr-version>^4.7</antlr-version>
    <targets>Cpp;CSharp;Java;Python3;TypeScript</targets>
    <test>
-      <targets>Cpp;CSharp;Java</targets>
+      <targets>Cpp;CSharp;Go;Java</targets>
       <inputs>examples/**/*.rs</inputs>
    </test>
    <test>
