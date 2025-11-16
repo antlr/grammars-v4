@@ -26,9 +26,6 @@ def transform_grammar(file_path):
                 line = re.sub(r"(\/\/ Insert here @header for C\+\+ lexer\.)",\
                     '@header {#include "RustLexerBase.h"}', line)
                 line = re.sub(r"(this\.)", 'this->', line)
-                line = re.sub(r"(_input\.)", '_input->', line)
-                line = re.sub(r"(\.getType\(\))", '->getType()', line)
-                line = re.sub(r"(\.next)", '->next', line)
                 output_file.write(line)
 
     print("Writing ...")
