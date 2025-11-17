@@ -1,4 +1,5 @@
 import { Parser, TokenStream } from 'antlr4';
+import RustParser from './RustParser.js';
 
 export default abstract class RustParserBase extends Parser {
     constructor(input: TokenStream) {
@@ -6,10 +7,10 @@ export default abstract class RustParserBase extends Parser {
     }
 
     NextGT(): boolean {
-        return this._input.LA(1) === '>'.charCodeAt(0);
+        return this._input.LA(1) === RustParser.GT;
     }
 
     NextLT(): boolean {
-        return this._input.LA(1) === '<'.charCodeAt(0);
+        return this._input.LA(1) === RustParser.LT;
     }
 }

@@ -1,4 +1,5 @@
 import { Parser, TokenStream } from 'antlr4ng';
+import { RustParser } from './RustParser.js';
 
 export default abstract class RustParserBase extends Parser {
     constructor(input: TokenStream) {

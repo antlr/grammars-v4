@@ -9,9 +9,9 @@ type RustParserBase struct {
 }
 
 func (p *RustParserBase) NextGT() bool {
-	return p.GetInputStream().LA(1) == '>'
+	return p.GetInputStream().LA(1) == RustParserGT
 }
 
 func (p *RustParserBase) NextLT() bool {
-	return p.GetInputStream().LA(1) == '<'
+	return p.GetInputStream().LA(1) == RustParserLT
 }
