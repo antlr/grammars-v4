@@ -508,7 +508,7 @@ aggregate_function_invocation
 ;
 
 window_function_invocation
-    : window_function OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
+    : window_func OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
         window_defn
         | window_name
     )
@@ -554,43 +554,6 @@ frame_single
     : expr PRECEDING_
     | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
-;
-
-// unknown
-
-window_function
-    : (FIRST_VALUE_ | LAST_VALUE_) OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc frame_clause?
-        CLOSE_PAR
-    | (CUME_DIST_ | PERCENT_RANK_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr? CLOSE_PAR
-    | (DENSE_RANK_ | RANK_ | ROW_NUMBER_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
-    | (LAG_ | LEAD_) OPEN_PAR expr offset? default_value? CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
-    | NTH_VALUE_ OPEN_PAR expr COMMA signed_number CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc frame_clause?
-        CLOSE_PAR
-    | NTILE_ OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
-;
-
-offset
-    : COMMA signed_number
-;
-
-default_value
-    : COMMA signed_number
-;
-
-partition_by
-    : PARTITION_ BY_ expr+
-;
-
-order_by_expr
-    : ORDER_ BY_ expr+
-;
-
-order_by_expr_asc_desc
-    : ORDER_ BY_ expr_asc_desc
-;
-
-expr_asc_desc
-    : expr asc_desc? (COMMA expr asc_desc?)*
 ;
 
 //TODO BOTH OF THESE HAVE TO BE REWORKED TO FOLLOW THE SPEC
@@ -750,7 +713,6 @@ keyword
     | WHERE_
     | WITH_
     | WITHOUT_
-    | FIRST_VALUE_
     | OVER_
     | PARTITION_
     | RANGE_
@@ -758,16 +720,7 @@ keyword
     | UNBOUNDED_
     | CURRENT_
     | FOLLOWING_
-    | CUME_DIST_
-    | DENSE_RANK_
-    | LAG_
-    | LAST_VALUE_
-    | LEAD_
-    | NTH_VALUE_
-    | NTILE_
-    | PERCENT_RANK_
     | RANK_
-    | ROW_NUMBER_
     | GENERATED_
     | ALWAYS_
     | STORED_
@@ -869,6 +822,10 @@ simple_func
 ;
 
 aggregate_func
+    : any_name
+;
+
+window_func
     : any_name
 ;
 
