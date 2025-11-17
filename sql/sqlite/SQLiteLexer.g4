@@ -55,6 +55,8 @@ GT_EQ     : '>=';
 EQ        : '==';
 NOT_EQ1   : '!=';
 NOT_EQ2   : '<>';
+JPTR      : '->';
+JPTR2     : '->>';
 
 // http://www.sqlite.org/lang_keywords.html
 ABORT_             : 'ABORT';

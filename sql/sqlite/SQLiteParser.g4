@@ -244,7 +244,7 @@ drop_stmt
 
 /*
  SQLite understands the following binary operators, in order from highest to lowest precedence:
-    ||
+    || -> ->>
     * / %
     + -
     << >> & |
@@ -258,7 +258,7 @@ expr
     | BIND_PARAMETER
     | ((schema_name DOT)? table_name DOT)? column_name
     | unary_operator expr
-    | expr PIPE2 expr
+    | expr (PIPE2 | JPTR | JPTR2) expr
     | expr ( STAR | DIV | MOD) expr
     | expr ( PLUS | MINUS) expr
     | expr ( LT2 | GT2 | AMP | PIPE) expr
