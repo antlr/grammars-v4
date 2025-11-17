@@ -10,10 +10,10 @@ public abstract class RustParserBase : Parser {
     }
 
     public bool NextGT() {
-        return _input.LA(1) == '>';
+        return _input.LA(1) == RustParser.GT;
     }
 
     public bool NextLT() {
-        return _input.LA(1) == '<';
+        return _input.LA(1) == RustParser.LT;
     }
 }

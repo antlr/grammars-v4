@@ -1189,9 +1189,6 @@ macroPunctuationToken
     //| DOLLAR | QUESTION
     ;
 
-// LA can be removed, legal rust code still pass but the cost is `let c = a < < b` will pass... i hope antlr5 can add
-// some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
-
 shl
     : LT {this.NextLT()}? LT
     ;

@@ -9,11 +9,6 @@ public:
 
     virtual ~RustParserBase() {}
 
-    bool NextGT() {
-        return _input->LA(1) == '>';
-    }
-
-    bool NextLT() {
-	    return _input->LA(1) == '<';
-    }
+    bool NextGT();
+    bool NextLT();
 };

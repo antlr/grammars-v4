@@ -6,10 +6,10 @@ export default abstract class RustParserBase extends Parser {
     }
 
     NextGT(): boolean {
-        return this.inputStream.LA(1) === '>'.charCodeAt(0);
+        return this.inputStream.LA(1) === RustParser.GT;
     }
 
     NextLT(): boolean {
-        return this.inputStream.LA(1) === '<'.charCodeAt(0);
+        return this.inputStream.LA(1) === RustParser.LT;
     }
 }
