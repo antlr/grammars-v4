@@ -31,14 +31,6 @@ public abstract class RustLexerBase : Lexer {
         return _input.LA(-1) <=0;
     }
 
-    public bool NextGT() {
-        return _input.LA(1) == '>';
-    }
-
-    public bool NextLT() {
-       return _input.LA(1) == '<';
-    }
-
     public bool FloatDotPossible(){
         int next = _input.LA(1);
 	// only block . _ identifier after float

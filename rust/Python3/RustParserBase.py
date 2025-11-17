@@ -6,5 +6,9 @@ except ImportError:
 
 
 class RustParserBase(Parser):
-    def next(self, expect: str) -> bool:
-        return self._input.LA(1) == RustLexer.literalNames.index(f"'{expect}'")
+
+    def NextGT(self) -> bool:
+        return self._input.LA(1) == RustLexer.literalNames.index(f"'>'")
+
+    def NextLT(self) -> bool:
+        return self._input.LA(1) == RustLexer.literalNames.index(f"'<'")
