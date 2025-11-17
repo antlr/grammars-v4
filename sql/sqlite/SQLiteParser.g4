@@ -517,9 +517,7 @@ error_message
 ;
 
 module_argument
-    : // TODO check what exactly is permitted here
-    expr
-    | column_def
+    : (~(OPEN_PAR | CLOSE_PAR | COMMA) | OPEN_PAR module_argument* CLOSE_PAR)+
 ;
 
 column_alias

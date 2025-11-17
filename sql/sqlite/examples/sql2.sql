@@ -24,3 +24,5 @@ CREATE TABLE f
     k  CHAR(50),
     m  REAL
 ) STRICT;
+
+CREATE VIRTUAL TABLE f USING module_name(abc()d(te(s)t)f,gh!j%$m@p);
