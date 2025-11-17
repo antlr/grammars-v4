@@ -122,11 +122,13 @@ indexed_column
 
 create_table_stmt
     : CREATE_ (TEMP_ | TEMPORARY_)? TABLE_ (IF_ NOT_ EXISTS_)? (schema_name DOT)? table_name (
-        OPEN_PAR column_def (COMMA column_def)*? (COMMA table_constraint)* CLOSE_PAR (
-            WITHOUT_ row_ROW_ID = IDENTIFIER
-        )?
+        OPEN_PAR column_def (COMMA column_def)*? (COMMA table_constraint)* CLOSE_PAR table_options?
         | AS_ select_stmt
     )
+;
+
+table_options
+    : (WITHOUT_ ROWID_ | STRICT_) (COMMA (WITHOUT_ ROWID_ | STRICT_))*
 ;
 
 column_def
@@ -654,6 +656,7 @@ keyword
     | LIKE_
     | LIMIT_
     | MATCH_
+    | MATERIALIZED_
     | NATURAL_
     | NO_
     | NOT_
@@ -682,9 +685,11 @@ keyword
     | ROLLBACK_
     | ROW_
     | ROWS_
+    | ROWID_
     | SAVEPOINT_
     | SELECT_
     | SET_
+    | STRICT_
     | TABLE_
     | TEMP_
     | TEMPORARY_
