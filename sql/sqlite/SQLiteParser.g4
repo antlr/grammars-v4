@@ -259,24 +259,11 @@ expr
     | ((schema_name DOT)? table_name DOT)? column_name
     | unary_operator expr
     | expr (PIPE2 | JPTR | JPTR2) expr
-    | expr ( STAR | DIV | MOD) expr
-    | expr ( PLUS | MINUS) expr
-    | expr ( LT2 | GT2 | AMP | PIPE) expr
-    | expr ( LT | LT_EQ | GT | GT_EQ) expr
-    | expr (
-        ASSIGN
-        | EQ
-        | NOT_EQ1
-        | NOT_EQ2
-        | IS_
-        | IS_ NOT_
-        | IS_ NOT_? DISTINCT_ FROM_
-        | IN_
-        | LIKE_
-        | GLOB_
-        | MATCH_
-        | REGEXP_
-    ) expr
+    | expr (STAR | DIV | MOD) expr
+    | expr (PLUS | MINUS) expr
+    | expr (LT2 | GT2 | AMP | PIPE) expr
+    | expr (LT | LT_EQ | GT | GT_EQ) expr
+    | expr (ASSIGN | EQ | NOT_EQ1 | NOT_EQ2) expr
     | expr AND_ expr
     | expr OR_ expr
     | function_name OPEN_PAR ((DISTINCT_? expr ( COMMA expr)*) | STAR)? CLOSE_PAR filter_clause? over_clause?
@@ -285,7 +272,7 @@ expr
     | expr COLLATE_ collation_name
     | expr NOT_? (LIKE_ | GLOB_ | REGEXP_ | MATCH_) expr (ESCAPE_ expr)?
     | expr ( ISNULL_ | NOTNULL_ | NOT_ NULL_)
-    | expr IS_ NOT_? expr
+    | expr IS_ NOT_? (DISTINCT_ FROM_)? expr
     | expr NOT_? BETWEEN_ expr AND_ expr
     | expr NOT_? IN_ (
         OPEN_PAR (select_stmt | expr ( COMMA expr)*)? CLOSE_PAR
