@@ -568,7 +568,7 @@ unary_operator
 ;
 
 error_message
-    : STRING_LITERAL
+    : expr
 ;
 
 module_argument
