@@ -628,6 +628,7 @@ keyword
     | RENAME_
     | REPLACE_
     | RESTRICT_
+    | RETURNING_
     | RIGHT_
     | ROLLBACK_
     | ROW_
@@ -676,6 +677,10 @@ keyword
     | FILTER_
     | GROUPS_
     | EXCLUDE_
+    | TIES_
+    | OTHERS_
+    | DO_
+    | NOTHING_
 ;
 
 name
