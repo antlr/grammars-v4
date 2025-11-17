@@ -315,7 +315,7 @@ insert_stmt
         | INSERT_ OR_ ( REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
     ) INTO_ (schema_name DOT)? table_name (AS_ table_alias)? (
         OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
-    )? (( ( values_clause | select_stmt) upsert_clause?) | DEFAULT_ VALUES_) returning_clause?
+    )? (( ( values_clause | select_stmt) upsert_clause*) | DEFAULT_ VALUES_) returning_clause?
 ;
 
 returning_clause
