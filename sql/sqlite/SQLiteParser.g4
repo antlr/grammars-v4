@@ -91,7 +91,7 @@ attach_stmt
 ;
 
 begin_stmt
-    : BEGIN_ (DEFERRED_ | IMMEDIATE_ | EXCLUSIVE_)? (TRANSACTION_ transaction_name?)?
+    : BEGIN_ (DEFERRED_ | IMMEDIATE_ | EXCLUSIVE_)? TRANSACTION_?
 ;
 
 commit_stmt
