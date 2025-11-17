@@ -220,7 +220,12 @@ IDENTIFIER:
     | [A-Z_\u007F-\uFFFF] [A-Z_0-9\u007F-\uFFFF]*
 ;
 
-NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | '0x' HEX_DIGIT+;
+NUMERIC_LITERAL: (
+        (DIGIT+ ('_' DIGIT+)* ('.' (DIGIT+ ('_' DIGIT+)*)?)?)
+        | ('.' DIGIT+ ('_' DIGIT+)*)
+    ) ('E' [-+]? DIGIT+ ('_' DIGIT+)*)?
+    | '0x' HEX_DIGIT+ ('_' HEX_DIGIT+)*
+;
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
