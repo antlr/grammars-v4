@@ -780,10 +780,6 @@ table_alias
     : any_name
 ;
 
-transaction_name
-    : any_name
-;
-
 window_name
     : any_name
 ;
