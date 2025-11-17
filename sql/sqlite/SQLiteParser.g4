@@ -377,9 +377,9 @@ select_core
     : (
         SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
             FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-        )? (WHERE_ whereExpr = expr)? (
+        )? (WHERE_ where_expr = expr)? (
             GROUP_ BY_ groupByExpr += expr (COMMA groupByExpr += expr)* (
-                HAVING_ havingExpr = expr
+                HAVING_ having_expr = expr
             )?
         )? (WINDOW_ window_name AS_ window_defn ( COMMA window_name AS_ window_defn)*)?
     )
