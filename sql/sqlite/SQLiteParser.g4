@@ -332,7 +332,9 @@ insert_stmt
 ;
 
 returning_clause
-    : RETURNING_ result_column (COMMA result_column)*
+    : RETURNING_ (STAR | expr (AS_? column_alias)?) (
+        COMMA (STAR | expr (AS_? column_alias)?)
+    )*
 ;
 
 upsert_clause
