@@ -210,10 +210,6 @@ with_clause
     : WITH_ RECURSIVE_? common_table_expression (COMMA common_table_expression)*
 ;
 
-recursive_cte
-    : cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
-;
-
 common_table_expression
     : cte_table_name AS_ (NOT_? MATERIALIZED_)? OPEN_PAR select_stmt CLOSE_PAR
 ;
@@ -375,18 +371,6 @@ select_core
     | values_clause
 ;
 
-factored_select_stmt
-    : select_stmt
-;
-
-simple_select_stmt
-    : with_clause? select_core order_clause? limit_clause?
-;
-
-compound_select_stmt
-    : with_clause? select_core ((UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core)+ order_clause? limit_clause?
-;
-
 table_or_subquery
     : (
         (schema_name DOT)? table_name (AS_? table_alias)? (
@@ -484,21 +468,6 @@ frame_clause
     )
 ;
 
-simple_function_invocation
-    : simple_func OPEN_PAR (expr (COMMA expr)* | STAR) CLOSE_PAR
-;
-
-aggregate_function_invocation
-    : aggregate_func OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR filter_clause?
-;
-
-window_function_invocation
-    : window_func OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
-        window_defn
-        | window_name
-    )
-;
-
 order_clause
     : ORDER_ BY_ ordering_term (COMMA ordering_term)*
 ;
@@ -534,15 +503,6 @@ frame_single
     : expr PRECEDING_
     | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
-;
-
-//TODO BOTH OF THESE HAVE TO BE REWORKED TO FOLLOW THE SPEC
-initial_select
-    : select_stmt
-;
-
-recursive_select
-    : select_stmt
 ;
 
 unary_operator
@@ -718,8 +678,6 @@ keyword
     | EXCLUDE_
 ;
 
-// TODO: check all names below
-
 name
     : any_name
 ;
@@ -796,6 +754,51 @@ base_window_name
     : any_name
 ;
 
+table_function_name
+    : any_name
+;
+
+// Orphans (Not ever parsed, merely provided by https://sqlite.org/syntaxdiagrams.html as partial descriptions of other rules)
+
+factored_select_stmt
+    : select_stmt
+;
+
+simple_select_stmt
+    : with_clause? select_core order_clause? limit_clause?
+;
+
+compound_select_stmt
+    : with_clause? select_core ((UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core)+ order_clause? limit_clause?
+;
+
+recursive_cte
+    : cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
+;
+
+initial_select
+    : select_stmt
+;
+
+recursive_select
+    : select_stmt
+;
+
+simple_function_invocation
+    : simple_func OPEN_PAR (expr (COMMA expr)* | STAR) CLOSE_PAR
+;
+
+aggregate_function_invocation
+    : aggregate_func OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR filter_clause?
+;
+
+window_function_invocation
+    : window_func OPEN_PAR (expr (COMMA expr)* | STAR)? CLOSE_PAR filter_clause? OVER_ (
+        window_defn
+        | window_name
+    )
+;
+
 simple_func
     : any_name
 ;
@@ -805,10 +808,6 @@ aggregate_func
 ;
 
 window_func
-    : any_name
-;
-
-table_function_name
     : any_name
 ;
 
