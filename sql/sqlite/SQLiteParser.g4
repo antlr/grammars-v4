@@ -461,9 +461,7 @@ filter_clause
 ;
 
 window_defn
-    : OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? (
-        ORDER_ BY_ ordering_term (COMMA ordering_term)*
-    ) frame_spec? CLOSE_PAR
+    : OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? order_clause? frame_spec? CLOSE_PAR
 ;
 
 over_clause
