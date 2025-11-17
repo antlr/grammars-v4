@@ -205,13 +205,7 @@ create_virtual_table_stmt
 ;
 
 with_clause
-    : WITH_ RECURSIVE_? cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR (
-        COMMA cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR
-    )*
-;
-
-cte_table_name
-    : table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)?
+    : WITH_ RECURSIVE_? common_table_expression (COMMA common_table_expression)*
 ;
 
 recursive_cte
@@ -219,7 +213,11 @@ recursive_cte
 ;
 
 common_table_expression
-    : table_name (OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR)? AS_ OPEN_PAR select_stmt CLOSE_PAR
+    : cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR
+;
+
+cte_table_name
+    : table_name (OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR)?
 ;
 
 delete_stmt
@@ -366,7 +364,7 @@ reindex_stmt
 ;
 
 select_stmt
-    : common_table_stmt? select_core (compound_operator select_core)* order_by_stmt? limit_stmt?
+    : with_clause? select_core (compound_operator select_core)* order_by_stmt? limit_stmt?
 ;
 
 join_clause
@@ -391,13 +389,11 @@ factored_select_stmt
 ;
 
 simple_select_stmt
-    : common_table_stmt? select_core order_by_stmt? limit_stmt?
+    : with_clause? select_core order_by_stmt? limit_stmt?
 ;
 
 compound_select_stmt
-    : common_table_stmt? select_core (
-        (UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core
-    )+ order_by_stmt? limit_stmt?
+    : with_clause? select_core ((UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core)+ order_by_stmt? limit_stmt?
 ;
 
 table_or_subquery
@@ -512,11 +508,6 @@ window_function_invocation
         window_defn
         | window_name
     )
-;
-
-common_table_stmt
-    : //additional structures
-    WITH_ RECURSIVE_? common_table_expression (COMMA common_table_expression)*
 ;
 
 order_by_stmt
