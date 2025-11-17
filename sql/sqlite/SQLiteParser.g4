@@ -228,7 +228,7 @@ delete_stmt
 
 delete_stmt_limited
     : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? (
-        order_by_stmt? limit_stmt
+        order_clause? limit_clause
     )?
 ;
 
@@ -355,7 +355,7 @@ reindex_stmt
 ;
 
 select_stmt
-    : with_clause? select_core (compound_operator select_core)* order_by_stmt? limit_stmt?
+    : with_clause? select_core (compound_operator select_core)* order_clause? limit_clause?
 ;
 
 join_clause
@@ -380,11 +380,11 @@ factored_select_stmt
 ;
 
 simple_select_stmt
-    : with_clause? select_core order_by_stmt? limit_stmt?
+    : with_clause? select_core order_clause? limit_clause?
 ;
 
 compound_select_stmt
-    : with_clause? select_core ((UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core)+ order_by_stmt? limit_stmt?
+    : with_clause? select_core ((UNION_ ALL_? | INTERSECT_ | EXCEPT_) select_core)+ order_clause? limit_clause?
 ;
 
 table_or_subquery
@@ -441,7 +441,7 @@ update_stmt_limited
         column_name
         | column_name_list
     ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (WHERE_ expr)? returning_clause? (
-        order_by_stmt? limit_stmt
+        order_clause? limit_clause
     )?
 ;
 
@@ -501,11 +501,11 @@ window_function_invocation
     )
 ;
 
-order_by_stmt
+order_clause
     : ORDER_ BY_ ordering_term (COMMA ordering_term)*
 ;
 
-limit_stmt
+limit_clause
     : LIMIT_ expr ((OFFSET_ | COMMA) expr)?
 ;
 
