@@ -270,7 +270,7 @@ expr
     | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
     | expr COLLATE_ collation_name
-    | expr NOT_? (LIKE_ | GLOB_ | REGEXP_ | MATCH_) expr (ESCAPE_ expr)?
+    | expr NOT_? (LIKE_ (expr ESCAPE_)? | GLOB_ | REGEXP_ | MATCH_) expr
     | expr ( ISNULL_ | NOTNULL_ | NOT_ NULL_)
     | expr IS_ NOT_? (DISTINCT_ FROM_)? expr
     | expr NOT_? BETWEEN_ expr AND_ expr
