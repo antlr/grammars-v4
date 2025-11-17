@@ -132,6 +132,7 @@ LEFT_              : 'LEFT';
 LIKE_              : 'LIKE';
 LIMIT_             : 'LIMIT';
 MATCH_             : 'MATCH';
+MATERIALIZED_      : 'MATERIALIZED';
 NATURAL_           : 'NATURAL';
 NO_                : 'NO';
 NOT_               : 'NOT';

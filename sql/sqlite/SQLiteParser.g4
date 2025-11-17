@@ -213,7 +213,7 @@ recursive_cte
 ;
 
 common_table_expression
-    : cte_table_name AS_ OPEN_PAR select_stmt CLOSE_PAR
+    : cte_table_name AS_ (NOT_? MATERIALIZED_)? OPEN_PAR select_stmt CLOSE_PAR
 ;
 
 cte_table_name
