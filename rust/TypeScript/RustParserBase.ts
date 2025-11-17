@@ -5,7 +5,11 @@ export default abstract class RustParserBase extends Parser {
         super(input);
     }
 
-    next(expect: string): boolean {
-        return this._input.LA(1) === expect.charCodeAt(0);
+    NextGT(): boolean {
+        return this._input.LA(1) === '>'.charCodeAt(0);
+    }
+
+    NextLT(): boolean {
+        return this._input.LA(1) === '<'.charCodeAt(0);
     }
 }

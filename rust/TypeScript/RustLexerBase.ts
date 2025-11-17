@@ -3,8 +3,8 @@ import RustLexer from './RustLexer';
 
 // Abstract class equivalent to RustLexerBase in Java
 export default abstract class RustLexerBase extends Lexer {
-    current: Token | null = null;
-    previous: Token | null = null;
+    lt1: Token | null = null;
+    lt2: Token | null = null;
 
     constructor(input: CharStream) {
         super(input);
@@ -15,8 +15,8 @@ export default abstract class RustLexerBase extends Lexer {
         const next = super.nextToken();
 
         if (next.channel === Token.DEFAULT_CHANNEL) {
-            this.previous = this.current;
-            this.current = next;
+            this.lt2 = this.lt1;
+            this.lt1 = next;
         }
 
         return next;
@@ -26,13 +26,8 @@ export default abstract class RustLexerBase extends Lexer {
         return this._input.LA(-1) <= 0;
     }
 
-    // Check if the next character matches the expected character
-    next(expect: string): boolean {
-        return this._input.LA(1) === expect.charCodeAt(0);
-    }
-
     // Determine if a float dot is possible based on the next character
-    floatDotPossible(): boolean {
+    FloatDotPossible(): boolean {
         const next = this._input.LA(1);
 
         // only block . _ identifier after float
@@ -54,11 +49,17 @@ export default abstract class RustLexerBase extends Lexer {
     }
 
     // Determine if a float literal is possible based on the previous tokens
-    floatLiteralPossible(): boolean {
-        if (this.current === null || this.previous === null) return true;
-        if (this.current.type !== RustLexer.DOT) return true;
+    FloatLiteralPossible(): boolean {
+        if (this.lt1 === null || this.lt2 === null)
+	{
+		return true;
+	}
+        if (this.lt1.type !== RustLexer.DOT)
+	{
+		return true;
+	}
 
-        switch (this.previous.type) {
+        switch (this.lt2.type) {
             case RustLexer.CHAR_LITERAL:
             case RustLexer.STRING_LITERAL:
             case RustLexer.RAW_STRING_LITERAL:
