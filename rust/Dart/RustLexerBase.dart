@@ -27,50 +27,51 @@ abstract class RustLexerBase extends Lexer {
     }
 
     bool SOF(){
-	var input = this.inputStream.LA(-1) ?? 0;
+        var input = this.inputStream.LA(-1) ?? 0;
         return input <= 0;
     }
 
     bool FloatDotPossible(){
         int next = inputStream.LA(1) ?? 0;
-	// only block . _ identifier after float
-	if (next == '.'.codeUnitAt(0) || next == '_'.codeUnitAt(0)) {
-		return false;
-	}
-        if (next == 'f'.codeUnitAt(0)) {
-            // 1.f32
-	    var v2 = inputStream.LA(2) ?? 0;
-	    var v3 = inputStream.LA(3) ?? 0;
-	    if (v2 == '3'.codeUnitAt(0) && v3 == '2'.codeUnitAt(0))
-	    {
-		return true;
-	    }
-            //1.f64
-	    if (v2 == '6'.codeUnitAt(0) && v3 == '4'.codeUnitAt(0))
-	    {
-		return true;
-	    }
+        // only block . _ identifier after float
+        if (next == '.'.codeUnitAt(0) || next == '_'.codeUnitAt(0)) {
             return false;
         }
-	if (next >= 'a'.codeUnitAt(0) && next <= 'z'.codeUnitAt(0)) {
-	    return false;
-	}
-	if (next >= 'A'.codeUnitAt(0) && next <= 'Z'.codeUnitAt(0))
-	{
-	    return false;
-	}
+        if (next == 'f'.codeUnitAt(0)) {
+            // 1.f32
+            var v2 = inputStream.LA(2) ?? 0;
+            var v3 = inputStream.LA(3) ?? 0;
+            if (v2 == '3'.codeUnitAt(0) && v3 == '2'.codeUnitAt(0))
+            {
+                return true;
+            }
+            //1.f64
+            if (v2 == '6'.codeUnitAt(0) && v3 == '4'.codeUnitAt(0))
+            {
+                return true;
+            }
+            return false;
+        }
+        if (next >= 'a'.codeUnitAt(0) && next <= 'z'.codeUnitAt(0)) {
+            return false;
+        }
+        if (next >= 'A'.codeUnitAt(0) && next <= 'Z'.codeUnitAt(0))
+        {
+            return false;
+        }
         return true;
     }
 
     bool FloatLiteralPossible()
     {
-	if (lt1 == null || lt2 == null)
-	{
-	    return true;
-	}
-	if (lt1?.type != RustLexer.TOKEN_DOT) {
-	    return true;
-	}
+        if (lt1 == null || lt2 == null)
+        {
+            return true;
+        }
+        if (lt1?.type != RustLexer.TOKEN_DOT)
+        {
+            return true;
+        }
         switch (lt2?.type) {
             case RustLexer.TOKEN_CHAR_LITERAL:
             case RustLexer.TOKEN_STRING_LITERAL:

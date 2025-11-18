@@ -51,13 +51,13 @@ export default abstract class RustLexerBase extends Lexer {
     // Determine if a float literal is possible based on the previous tokens
     FloatLiteralPossible(): boolean {
         if (this.lt1 === null || this.lt2 === null)
-	{
-		return true;
-	}
+        {
+            return true;
+        }
         if (this.lt1.type !== RustLexer.DOT)
-	{
-		return true;
-	}
+        {
+            return true;
+        }
 
         switch (this.lt2.type) {
             case RustLexer.CHAR_LITERAL:

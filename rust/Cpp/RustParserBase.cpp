@@ -4,10 +4,10 @@
 
 bool RustParserBase::NextGT()
 {
-	return _input->LA(1) == RustParser::GT;
+    return _input->LA(1) == RustParser::GT;
 }
 
 bool RustParserBase::NextLT()
 {
-	return _input->LA(1) == RustParser::LT;
+    return _input->LA(1) == RustParser::LT;
 }

@@ -1,42 +1,50 @@
 #include "RustLexerBase.h"
 #include "RustLexer.h"
 
-
-
 std::unique_ptr<antlr4::Token> RustLexerBase::nextToken()
 {
-	std::unique_ptr<antlr4::Token> next = antlr4::Lexer::nextToken();
+    std::unique_ptr<antlr4::Token> next = antlr4::Lexer::nextToken();
 
-	if (next->getChannel() == antlr4::Token::DEFAULT_CHANNEL) {
-	    // Keep track of the last token on the default channel.
-		this->lt2 = this->lt1;
-		this->lt1 = next->getType();
-	}
+    if (next->getChannel() == antlr4::Token::DEFAULT_CHANNEL) {
+        // Keep track of the last token on the default channel.
+        this->lt2 = this->lt1;
+        this->lt1 = next->getType();
+    }
 
-	return next;
+    return next;
 }
 
 bool RustLexerBase::SOF()
 {
-	size_t next = _input->LA(-1);
-	return next == 0 || next == antlr4::Token::EOF;
+    size_t next = _input->LA(-1);
+    return next == 0 || next == antlr4::Token::EOF;
 }
 
 bool RustLexerBase::FloatDotPossible()
 {
-	size_t next = _input->LA(1);
-	// only block . _ identifier after float
-	if(next == '.' || next =='_') return false;
-	if(next == 'f') {
-	    // 1.f32
-		if (_input->LA(2)=='3'&&_input->LA(3)=='2')return true;
-	    //1.f64
-		if (_input->LA(2)=='6'&&_input->LA(3)=='4')return true;
-		return false;
-	}
-	if(next>='a'&&next<='z') return false;
-	if(next>='A'&&next<='Z') return false;
-	return true;
+    size_t next = _input->LA(1);
+    // only block . _ identifier after float
+    if(next == '.' || next =='_') {
+        return false;
+    }
+    if(next == 'f') {
+        // 1.f32
+        if (_input->LA(2)=='3'&&_input->LA(3)=='2') {
+            return true;
+        }
+        //1.f64
+        if (_input->LA(2)=='6'&&_input->LA(3)=='4') {
+            return true;
+        }
+        return false;
+    }
+    if(next>='a'&&next<='z') {
+        return false;
+    }
+    if(next>='A'&&next<='Z') {
+        return false;
+    }
+    return true;
 }
 
 bool RustLexerBase::FloatLiteralPossible(){

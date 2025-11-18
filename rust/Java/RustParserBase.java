@@ -6,10 +6,10 @@ public abstract class RustParserBase extends Parser {
     }
 
     public boolean NextGT() {
-	return _input.LA(1) == RustParser.GT;
+        return _input.LA(1) == RustParser.GT;
     }
 
     public boolean NextLT() {
-	return _input.LA(1) == RustParser.LT;
+        return _input.LA(1) == RustParser.LT;
     }
 }
