@@ -187,7 +187,7 @@ create_trigger_stmt
         BEFORE_
         | AFTER_
         | INSTEAD_ OF_
-    )? (DELETE_ | INSERT_ | UPDATE_ (OF_ column_name ( COMMA column_name)*)?) ON_ table_name (
+    )? (DELETE_ | INSERT_ | UPDATE_ (OF_ column_name (COMMA column_name)*)?) ON_ table_name (
         FOR_ EACH_ ROW_
     )? (WHEN_ expr)? BEGIN_ (
         (update_stmt | insert_stmt | delete_stmt | select_stmt) SCOL
@@ -271,7 +271,7 @@ expr
     | expr IS_ NOT_? (DISTINCT_ FROM_)? expr
     | expr NOT_? BETWEEN_ expr AND_ expr
     | expr NOT_? IN_ (
-        OPEN_PAR (select_stmt | expr ( COMMA expr)*)? CLOSE_PAR
+        OPEN_PAR (select_stmt | expr (COMMA expr)*)? CLOSE_PAR
         | (schema_name DOT)? table_name
         | (schema_name DOT)? table_function_name OPEN_PAR (expr (COMMA expr)*)? CLOSE_PAR
     )
@@ -308,10 +308,10 @@ insert_stmt
     : with_clause? (
         INSERT_
         | REPLACE_
-        | INSERT_ OR_ ( REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
+        | INSERT_ OR_ (REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
     ) INTO_ (schema_name DOT)? table_name (AS_ table_alias)? (
-        OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
-    )? (( ( values_clause | select_stmt) upsert_clause*) | DEFAULT_ VALUES_) returning_clause?
+        OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
+    )? (((values_clause | select_stmt) upsert_clause*) | DEFAULT_ VALUES_) returning_clause?
 ;
 
 returning_clause
@@ -366,7 +366,7 @@ select_core
             GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
                 HAVING_ having_expr = expr
             )?
-        )? (WINDOW_ window_name AS_ window_defn ( COMMA window_name AS_ window_defn)*)?
+        )? (WINDOW_ window_name AS_ window_defn (COMMA window_name AS_ window_defn)*)?
     )
     | values_clause
 ;
@@ -388,7 +388,7 @@ table_or_subquery
 result_column
     : STAR
     | table_name DOT STAR
-    | expr ( AS_? column_alias)?
+    | expr (AS_? column_alias)?
 ;
 
 join_operator
@@ -398,7 +398,7 @@ join_operator
 
 join_constraint
     : ON_ expr
-    | USING_ OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
+    | USING_ OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
 ;
 
 compound_operator
@@ -458,7 +458,7 @@ over_clause
 ;
 
 frame_spec
-    : frame_clause (EXCLUDE_ ( NO_ OTHERS_ | CURRENT_ ROW_ | GROUP_ | TIES_))?
+    : frame_clause (EXCLUDE_ (NO_ OTHERS_ | CURRENT_ ROW_ | GROUP_ | TIES_))?
 ;
 
 frame_clause
