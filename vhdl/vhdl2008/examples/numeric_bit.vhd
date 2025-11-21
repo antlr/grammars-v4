@@ -1,0 +1,1 @@
+../../vhdl/examples/numeric_bit.vhd

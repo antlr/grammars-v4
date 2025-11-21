@@ -384,7 +384,8 @@
 				<module>vba</module>
 				<module>velocity</module>
 				<module>verilog</module>
-				<module>vhdl</module>
+				<module>vhdl/vhdl</module>
+				<module>vhdl/vhdl2008</module>
 				<module>vmf</module>
 				<module>wat</module>
 				<module>wavefront</module>
