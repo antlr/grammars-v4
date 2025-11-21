@@ -55,6 +55,8 @@ GT_EQ     : '>=';
 EQ        : '==';
 NOT_EQ1   : '!=';
 NOT_EQ2   : '<>';
+JPTR      : '->';
+JPTR2     : '->>';
 
 // http://www.sqlite.org/lang_keywords.html
 ABORT_             : 'ABORT';
@@ -132,6 +134,7 @@ LEFT_              : 'LEFT';
 LIKE_              : 'LIKE';
 LIMIT_             : 'LIMIT';
 MATCH_             : 'MATCH';
+MATERIALIZED_      : 'MATERIALIZED';
 NATURAL_           : 'NATURAL';
 NO_                : 'NO';
 NOT_               : 'NOT';
@@ -161,9 +164,11 @@ RIGHT_             : 'RIGHT';
 ROLLBACK_          : 'ROLLBACK';
 ROW_               : 'ROW';
 ROWS_              : 'ROWS';
+ROWID_             : 'ROWID';
 SAVEPOINT_         : 'SAVEPOINT';
 SELECT_            : 'SELECT';
 SET_               : 'SET';
+STRICT_            : 'STRICT';
 TABLE_             : 'TABLE';
 TEMP_              : 'TEMP';
 TEMPORARY_         : 'TEMPORARY';
@@ -183,7 +188,6 @@ WHEN_              : 'WHEN';
 WHERE_             : 'WHERE';
 WITH_              : 'WITH';
 WITHOUT_           : 'WITHOUT';
-FIRST_VALUE_       : 'FIRST_VALUE';
 OVER_              : 'OVER';
 PARTITION_         : 'PARTITION';
 RANGE_             : 'RANGE';
@@ -191,16 +195,7 @@ PRECEDING_         : 'PRECEDING';
 UNBOUNDED_         : 'UNBOUNDED';
 CURRENT_           : 'CURRENT';
 FOLLOWING_         : 'FOLLOWING';
-CUME_DIST_         : 'CUME_DIST';
-DENSE_RANK_        : 'DENSE_RANK';
-LAG_               : 'LAG';
-LAST_VALUE_        : 'LAST_VALUE';
-LEAD_              : 'LEAD';
-NTH_VALUE_         : 'NTH_VALUE';
-NTILE_             : 'NTILE';
-PERCENT_RANK_      : 'PERCENT_RANK';
 RANK_              : 'RANK';
-ROW_NUMBER_        : 'ROW_NUMBER';
 GENERATED_         : 'GENERATED';
 ALWAYS_            : 'ALWAYS';
 STORED_            : 'STORED';
@@ -225,7 +220,12 @@ IDENTIFIER:
     | [A-Z_\u007F-\uFFFF] [A-Z_0-9\u007F-\uFFFF]*
 ;
 
-NUMERIC_LITERAL: ((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) ('E' [-+]? DIGIT+)? | '0x' HEX_DIGIT+;
+NUMERIC_LITERAL: (
+        (DIGIT+ ('_' DIGIT+)* ('.' (DIGIT+ ('_' DIGIT+)*)?)?)
+        | ('.' DIGIT+ ('_' DIGIT+)*)
+    ) ('E' [-+]? DIGIT+ ('_' DIGIT+)*)?
+    | '0x' HEX_DIGIT+ ('_' HEX_DIGIT+)*
+;
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
