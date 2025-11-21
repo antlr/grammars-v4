@@ -19,6 +19,11 @@ public class SymbolTable {
         Define(new Symbol() { Name = "struct", Classification = TypeClassification.StorageClassSpecifier_ });
         Define(new Symbol() { Name = "union", Classification = TypeClassification.StorageClassSpecifier_ });
 
+		Define(new Symbol() { Name = "const", Classification = TypeClassification.TypeQualifier_ });
+		Define(new Symbol() { Name = "restrict", Classification = TypeClassification.TypeQualifier_ });
+		Define(new Symbol() { Name = "volatile", Classification = TypeClassification.TypeQualifier_ });
+		Define(new Symbol() { Name = "_Atomic", Classification = TypeClassification.TypeQualifier_ });
+
         // Init basic types.
         Define(new Symbol() { Name = "void", Classification = TypeClassification.Type_ });
 		Define(new Symbol() { Name = "char", Classification = TypeClassification.Type_ });

@@ -15,12 +15,17 @@ public abstract class CParserBase : Parser
     public bool IsType()
     {
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
+        //System.Console.Write(text);
         var resolved = _st.Resolve(text);
+        bool result = false;
         if (resolved == null)
-            return false;
+            result = true;
         else if (resolved.Classification != TypeClassification.Variable_)
-            return true;
-        return false;
+            result = true;
+        else
+            result = false;
+        //System.Console.WriteLine(result);
+        return result;
     }
 
     public void EnterDeclaration()

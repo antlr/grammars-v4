@@ -6,4 +6,5 @@ public enum TypeClassification {
 	Variable_,
 	Type_,
 	StorageClassSpecifier_,
+	TypeQualifier_,
 }
