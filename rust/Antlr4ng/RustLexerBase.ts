@@ -1,5 +1,5 @@
-import { CharStream, Token, Lexer } from 'antlr4';
-import RustLexer from './RustLexer';
+import { CharStream, Token, Lexer } from 'antlr4ng';
+import { RustLexer } from './RustLexer.js';
 
 // Abstract class equivalent to RustLexerBase in Java
 export default abstract class RustLexerBase extends Lexer {
@@ -23,12 +23,12 @@ export default abstract class RustLexerBase extends Lexer {
     }
 
     SOF(): boolean {
-        return this._input.LA(-1) <= 0;
+        return this.inputStream.LA(-1) <= 0;
     }
 
     // Determine if a float dot is possible based on the next character
     FloatDotPossible(): boolean {
-        const next = this._input.LA(1);
+        const next = this.inputStream.LA(1);
 
         // only block . _ identifier after float
         if (next === '.'.charCodeAt(0) || next === '_'.charCodeAt(0)) {
@@ -36,9 +36,9 @@ export default abstract class RustLexerBase extends Lexer {
         }
         if (next === 'f'.charCodeAt(0)) {
             // 1.f32
-            if (this._input.LA(2) === '3'.charCodeAt(0) && this._input.LA(3) === '2'.charCodeAt(0)) return true;
+            if (this.inputStream.LA(2) === '3'.charCodeAt(0) && this.inputStream.LA(3) === '2'.charCodeAt(0)) return true;
             // 1.f64
-            if (this._input.LA(2) === '6'.charCodeAt(0) && this._input.LA(3) === '4'.charCodeAt(0)) return true;
+            if (this.inputStream.LA(2) === '6'.charCodeAt(0) && this.inputStream.LA(3) === '4'.charCodeAt(0)) return true;
             return false;
         }
         if ((next >= 'a'.charCodeAt(0) && next <= 'z'.charCodeAt(0)) ||
