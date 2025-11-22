@@ -239,7 +239,7 @@ typeSpecifier
     ;
 
 structOrUnionSpecifier
-    : structOrUnion Identifier? '{' structDeclarationList '}'
+    : structOrUnion Identifier? '{' ( {this.NullStructDeclarationListExtension()}? | structDeclarationList) '}'
     | structOrUnion Identifier
     ;
 

@@ -64,6 +64,13 @@ public abstract class CParserBase : Parser
                 }
             }
         }
-    }
+	}
+
+	// Define to return "true" because "gcc -c -std=c2x" accepts an empty
+	// struct-declaration-list.
+	public bool NullStructDeclarationListExtension()
+	{
+		return true;
+	}
 }
 
