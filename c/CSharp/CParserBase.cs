@@ -5,7 +5,7 @@ using System.Linq;
 public abstract class CParserBase : Parser
 {
     SymbolTable _st;
-    
+    private bool debug = false;
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
     {
@@ -15,16 +15,24 @@ public abstract class CParserBase : Parser
     public bool IsType()
     {
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        //System.Console.Write(text);
+        if (this.debug) System.Console.Write(text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
-            result = true;
+        {
+            // C can reference unresolved types if it's a
+            // pointer.
+            var la2 = (this.InputStream as CommonTokenStream).LT(2).Text;
+            if (la2 != null && la2 == "*")
+                result = true;
+            else
+                result = false;
+        }
         else if (resolved.Classification != TypeClassification.Variable_)
             result = true;
         else
             result = false;
-        //System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(result);
         return result;
     }
 
