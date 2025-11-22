@@ -1,3 +1,6 @@
+typedef int UINTN;
+typedef struct {} MyStruct;
+
 //function returns pointer
 void *
 __cdecl
@@ -13,7 +16,7 @@ f2 (
   );
 
 
-int MyStruct *
+MyStruct *
 f3 (
    int             param1,
    char            param2
