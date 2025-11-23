@@ -80,7 +80,11 @@ ATOM
    ;
 
 STRING
-   : '"' .*? '"'
+   : '"' (~ '"' | ESCAPED_QUOTES)* '"'
+   ;
+
+fragment ESCAPED_QUOTES
+   : '\\"'
    ;
 
 FIX10
