@@ -239,8 +239,11 @@ typeSpecifier
     ;
 
 structOrUnionSpecifier
-    : structOrUnion Identifier? '{' ( {this.NullStructDeclarationListExtension()}? | structDeclarationList) '}'
-    | structOrUnion Identifier
+    : structOrUnion
+	( Identifier? '{' ( {this.NullStructDeclarationListExtension()}? | structDeclarationList) '}'
+	| Identifier
+	)
+//	{this.EnterDeclaration();}
     ;
 
 structOrUnion
@@ -461,8 +464,8 @@ blockItemList
     ;
 
 blockItem
-    : statement
-    | declaration
+    : {this.IsNotType()}? statement
+    | {this.IsType()}? declaration
     ;
 
 expressionStatement
