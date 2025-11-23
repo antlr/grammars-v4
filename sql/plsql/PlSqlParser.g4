@@ -6435,7 +6435,7 @@ conditional_insert_else_part
     ;
 
 insert_into_clause
-    : INTO general_table_ref paren_column_list?
+    : INTO general_table_ref (FIELDS)? paren_column_list?
     ;
 
 values_clause
@@ -7721,6 +7721,7 @@ regular_id
     | non_reserved_keywords_in_12c
     | non_reserved_keywords_in_18c
     | REGULAR_ID
+    | AUDIT
     | ABSENT
     | A_LETTER
     | AGENT
