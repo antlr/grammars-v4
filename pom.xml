@@ -402,6 +402,7 @@
 				<module>yini</module>
 				<module>z</module>
 				<module>zig</module>
+                <module>zil</module>
 			</modules>
 		</profile>
 		<profile>
