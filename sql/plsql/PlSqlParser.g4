@@ -5827,7 +5827,7 @@ cursor_loop_param
 
 //https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/FORALL-statement.html#GUID-C45B8241-F9DF-4C93-8577-C840A25963DB
 forall_statement
-    : FORALL index_name IN bounds_clause (SAVE EXCEPTIONS)? data_manipulation_language_statements
+    : FORALL index_name IN bounds_clause (SAVE EXCEPTIONS)? (data_manipulation_language_statements | execute_immediate)
     ;
 
 bounds_clause
