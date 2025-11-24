@@ -7722,6 +7722,13 @@ regular_id
     | non_reserved_keywords_in_18c
     | REGULAR_ID
     | AUDIT
+    | ITEMS
+    | BYTES
+    | LINES
+    | RECORDS
+    | NEWLINE_
+    | FIELD
+    | MASK
     | ABSENT
     | A_LETTER
     | AGENT
