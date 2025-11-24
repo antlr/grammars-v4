@@ -1051,9 +1051,11 @@ func_decl_in_type
     ;
 
 constructor_declaration
-    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec (
-        '(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)* ')'
-    )? RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
+    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION function_name
+        (
+            '(' (SELF IN OUT type_spec ',')? (type_elements_parameter (',' type_elements_parameter)*)? ')'
+        )?
+      RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 // Common Type Clauses
