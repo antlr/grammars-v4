@@ -1036,10 +1036,11 @@ subprog_decl_in_type
     ;
 
 proc_decl_in_type
-    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')' (
-        IS
-        | AS
-    ) (call_spec | DECLARE? seq_of_declare_specs? body ';')
+    : PROCEDURE procedure_name
+        (
+            '(' type_elements_parameter (',' type_elements_parameter)* ')'
+        )?
+        (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 func_decl_in_type
@@ -1097,7 +1098,7 @@ overriding_function_spec
     ;
 
 type_procedure_spec
-    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')' (
+    : PROCEDURE procedure_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')? (
         (IS | AS) call_spec
     )?
     ;
@@ -1111,7 +1112,7 @@ type_function_spec
 
 constructor_spec
     : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec (
-        '(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)* ')'
+        '(' (SELF IN OUT type_spec ',')? (type_elements_parameter (',' type_elements_parameter)*)? ')'
     )? RETURN SELF AS RESULT ((IS | AS) call_spec)?
     ;
 
