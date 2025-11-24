@@ -7053,7 +7053,16 @@ using_clause
     ;
 
 using_element
-    : (IN OUT? | OUT)? select_list_elements
+    : IN expression
+    | IN OUT assignable_element
+    | OUT assignable_element
+    | expression
+    ;
+
+// Elemento assegnabile: usato per OUT/IN OUT
+assignable_element
+    : general_element
+    | bind_variable
     ;
 
 collect_order_by_part
