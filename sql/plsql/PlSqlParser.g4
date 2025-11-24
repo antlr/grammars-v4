@@ -682,7 +682,7 @@ procedure_spec
     : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? (
         accessible_by_clause
         | PARALLEL_ENABLE
-    )* ';'
+    )* (AS call_spec)? ';'
     ;
 
 function_spec
@@ -692,7 +692,7 @@ function_spec
         | parallel_enable_clause
         | RESULT_CACHE
         | streaming_clause
-    )* ';'
+    )* (AS call_spec)? ';'
     ;
 
 package_obj_body
