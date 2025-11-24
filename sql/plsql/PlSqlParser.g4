@@ -682,6 +682,7 @@ procedure_spec
     : PROCEDURE identifier ('(' parameter ( ',' parameter)* ')')? (
         accessible_by_clause
         | PARALLEL_ENABLE
+        | DETERMINISTIC
     )* (AS call_spec)? ';'
     ;
 
@@ -753,6 +754,7 @@ procedure_body
     : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (
         accessible_by_clause
         | PARALLEL_ENABLE
+        | DETERMINISTIC
     )* (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
     ;
 
