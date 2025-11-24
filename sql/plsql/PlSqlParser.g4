@@ -1139,7 +1139,7 @@ pragma_elements
     ;
 
 type_elements_parameter
-    : parameter_name type_spec
+    : parameter_name (IN OUT NOCOPY | IN OUT | OUT NOCOPY | OUT | IN)? type_spec (ASSIGN_OP constant)?
     ;
 
 // Sequence DDLs
