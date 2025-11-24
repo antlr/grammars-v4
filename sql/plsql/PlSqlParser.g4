@@ -1088,6 +1088,7 @@ subprogram_spec
 // TODO: should be refactored such as Procedure body and Function body, maybe Type_Function_Body and overriding_function_body
 overriding_subprogram_spec
     : OVERRIDING MEMBER overriding_function_spec
+    | OVERRIDING MEMBER overriding_procedure_spec
     ;
 
 overriding_function_spec
@@ -1095,6 +1096,14 @@ overriding_function_spec
         type_spec
         | SELF AS RESULT
     ) (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body))? ';'?
+    ;
+
+overriding_procedure_spec
+    : PROCEDURE procedure_name
+        (
+            '(' type_elements_parameter (',' type_elements_parameter)* ')'
+        )?
+        (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 type_procedure_spec
