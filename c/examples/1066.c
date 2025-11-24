@@ -1,5 +1,5 @@
 typedef int UINTN;
-typedef GUID long;
+typedef long GUID;
 
 typedef
    void
