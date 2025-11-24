@@ -1032,7 +1032,7 @@ map_order_func_declaration
     ;
 
 subprog_decl_in_type
-    : (MEMBER | STATIC) (proc_decl_in_type | func_decl_in_type | constructor_declaration)
+    : (MEMBER | STATIC)? (proc_decl_in_type | func_decl_in_type | constructor_declaration)
     ;
 
 proc_decl_in_type
