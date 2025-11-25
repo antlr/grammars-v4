@@ -89,7 +89,7 @@ unaryExpression
     : ('++' | '--' | 'sizeof')* (
         postfixExpression
         | unaryOperator castExpression
-        | ('sizeof' | '_Alignof') '(' typeName ')'
+        | ('sizeof' | Alignof) '(' typeName ')'
         | '&&' Identifier // GCC extension address of label
     )
     ;
@@ -225,7 +225,7 @@ typeSpecifier
     | 'double'
     | 'signed'
     | 'unsigned'
-    | '_Bool'
+    | Bool
     | '_Complex'
     | '__m128'
     | '__m128d'
@@ -312,7 +312,7 @@ functionSpecifier
     ;
 
 alignmentSpecifier
-    : '_Alignas' '(' (typeName | constantExpression) ')'
+    : Alignas '(' (typeName | constantExpression) ')'
     ;
 
 declarator
@@ -320,15 +320,14 @@ declarator
     ;
 
 directDeclarator
-    : Identifier
+    : Identifier attributeSpecifierSequence?
     | '(' declarator ')'
-    | directDeclarator '[' typeQualifierList? assignmentExpression? ']'
-    | directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-    | directDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
-    | directDeclarator '[' typeQualifierList? '*' ']'
-    | directDeclarator '(' parameterTypeList ')'
-    | directDeclarator '(' identifierList? ')'
-    | Identifier ':' DigitSequence         // bit field
+    | directDeclarator '[' typeQualifierList? assignmentExpression? ']' attributeSpecifierSequence?
+    | directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']' attributeSpecifierSequence?
+    | directDeclarator '[' typeQualifierList 'static' assignmentExpression ']' attributeSpecifierSequence?
+    | directDeclarator '[' typeQualifierList? '*' ']' attributeSpecifierSequence?
+    | directDeclarator '(' parameterTypeList? ')' attributeSpecifierSequence?
+//    | Identifier ':' DigitSequence         // bit field
     | vcSpecificModifer Identifier         // Visual C Extension
     | '(' vcSpecificModifer declarator ')' // Visual C Extension
     ;
@@ -434,7 +433,43 @@ designator
     ;
 
 staticAssertDeclaration
-    : '_Static_assert' '(' constantExpression ',' StringLiteral+ ')' ';'
+    : '_Static_assert' '(' constantExpression (',' StringLiteral)? ')' ';'
+    ;
+
+attributeSpecifierSequence
+    : attributeSpecifier+
+    ;
+
+attributeSpecifier
+    : '[' '[' attributeList ']' ']'
+    ;
+
+attributeList
+    : attribute (',' attribute)* // May not be correct.
+    ;
+
+attribute
+    : attributeToken attributeArgumentClause?
+    ;
+
+attributeToken
+    : Identifier
+    | Identifier '::' Identifier
+    ;
+
+attributeArgumentClause
+    : '(' balancedTokenSequence? ')'
+    ;
+
+balancedTokenSequence
+    : balancedToken+
+    ;
+
+balancedToken
+    : '(' balancedTokenSequence? ')'
+    | '[' balancedTokenSequence? ']'
+    | '{' balancedTokenSequence? '}'
+    // any token other than a parenthesis, bracket, or brace
     ;
 
 statement

@@ -75,6 +75,8 @@ public abstract class CParserBase : Parser
                 var identifier = y.directDeclarator()?.Identifier();
                 if (identifier != null)
                 {
+                    // If a typedef is used in the declaration, the declarator
+                    // itself is a type, not a variable.
                     var text = identifier.GetText();
                     if (is_typedef)
                         _st.Define(new Symbol() { Name = text, Classification = TypeClassification.Type_ });

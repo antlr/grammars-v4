@@ -53,8 +53,23 @@ KW__typeof__: '__typeof__';
 KW__vectorcall: '__vectorcall';
 KW__volatile__: '__volatile__';
 
+Alignas
+    : 'alignas'
+    | '_Alignas'
+    ;
+
+Alignof
+    : 'alignof'
+    | '_Alignof'
+    ;
+
 Auto
     : 'auto'
+    ;
+
+Bool
+    : 'bool'
+    | '_Bool'
     ;
 
 Break
@@ -71,6 +86,10 @@ Char
 
 Const
     : 'const'
+    ;
+
+Constexpr
+    : 'constexpr'
     ;
 
 Continue
@@ -101,6 +120,10 @@ Extern
     : 'extern'
     ;
 
+False
+    : 'false'
+    ;
+
 Float
     : 'float'
     ;
@@ -127,6 +150,10 @@ Int
 
 Long
     : 'long'
+    ;
+
+Nulptr
+    : 'nullptr'
     ;
 
 Register
@@ -157,6 +184,10 @@ Static
     : 'static'
     ;
 
+Static_assert
+    : 'static_assert'
+    ;
+
 Struct
     : 'struct'
     ;
@@ -165,8 +196,20 @@ Switch
     : 'switch'
     ;
 
+Thread_local
+    : 'thread_local'
+    ;
+
 Typedef
     : 'typedef'
+    ;
+
+Typeof
+    : 'typeof'
+    ;
+
+Typeof_unequal
+    : 'typeof_unequal'
     ;
 
 Union
@@ -189,24 +232,28 @@ While
     : 'while'
     ;
 
-Alignas
-    : '_Alignas'
-    ;
-
-Alignof
-    : '_Alignof'
-    ;
-
 Atomic
     : '_Atomic'
     ;
 
-Bool
-    : '_Bool'
+BitInt
+    : '_BitInt'
     ;
 
 Complex
     : '_Complex'
+    ;
+
+Decimal128
+    : '_Decimal128'
+    ;
+
+Decimal32
+    : '_Decimal32'
+    ;
+
+Decimal64
+    : '_Decimal64'
     ;
 
 Generic
@@ -339,6 +386,10 @@ Question
 
 Colon
     : ':'
+    ;
+
+ColonColon
+    : '::'
     ;
 
 Semi
