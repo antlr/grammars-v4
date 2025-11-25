@@ -41,8 +41,13 @@ file_
    : (STR | form)* EOF
    ;
 
+formprefix
+   : '\''
+   | '%'
+   ;
+
 form
-   : LT operation? expression* GT
+   : formprefix? LT operation? expression* GT
    ;
 
 expression
