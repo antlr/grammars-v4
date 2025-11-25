@@ -31,12 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
+
+
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar zil;
 
 file_
-   : (STRING | form)* EOF
+   : (STR | form)* EOF
    ;
 
 form
@@ -45,7 +47,7 @@ form
 
 expression
    : fix
-   | STRING
+   | STR
    | list
    | ATOM
    | form
@@ -73,11 +75,15 @@ operation
    | '=?'
    ;
 
+STR
+   : STRING ([ \t]* ';' STRING)*
+   ;
+
 ATOM
    : (LOCAL | GLOBAL)? [A-Z#=+-]+ QUES?
    ;
 
-STRING
+fragment STRING
    : '"' (~ '"' | ESCAPED_QUOTES)* '"'
    ;
 
@@ -133,8 +139,12 @@ QUES
    : '?'
    ;
 
-COMMENT
+COMMENT1
    : ';' ~ [\r\n]* -> skip
+   ;
+
+COMMENT2
+   : ';' STRING -> skip
    ;
 
 WS
