@@ -253,21 +253,14 @@ expr
     : literal_value
     | BIND_PARAMETER
     | ((schema_name DOT)? table_name DOT)? column_name
-    | unary_operator expr
+    | (MINUS | PLUS | TILDE) expr
+    | expr COLLATE_ collation_name
     | expr (PIPE2 | JPTR | JPTR2) expr
     | expr (STAR | DIV | MOD) expr
     | expr (PLUS | MINUS) expr
     | expr (LT2 | GT2 | AMP | PIPE) expr
     | expr (LT | LT_EQ | GT | GT_EQ) expr
     | expr (ASSIGN | EQ | NOT_EQ1 | NOT_EQ2) expr
-    | expr AND_ expr
-    | expr OR_ expr
-    | function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR filter_clause? over_clause?
-    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
-    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
-    | expr COLLATE_ collation_name
-    | expr NOT_? ((LIKE_ expr (ESCAPE_ expr)?) | (GLOB_ | REGEXP_ | MATCH_) expr)
-    | expr (ISNULL_ | NOTNULL_ | NOT_ NULL_)
     | expr IS_ NOT_? (DISTINCT_ FROM_)? expr
     | expr NOT_? BETWEEN_ expr AND_ expr
     | expr NOT_? IN_ (
@@ -275,6 +268,14 @@ expr
         | (schema_name DOT)? table_name
         | (schema_name DOT)? table_function_name OPEN_PAR (expr (COMMA expr)*)? CLOSE_PAR
     )
+    | expr NOT_? ((LIKE_ expr (ESCAPE_ expr)?) | (GLOB_ | REGEXP_ | MATCH_) expr)
+    | expr (ISNULL_ | NOTNULL_ | NOT_ NULL_)
+    | NOT_ expr
+    | expr AND_ expr
+    | expr OR_ expr
+    | function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR filter_clause? over_clause?
+    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
     | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
     | raise_function
@@ -503,13 +504,6 @@ frame_single
     : expr PRECEDING_
     | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
-;
-
-unary_operator
-    : MINUS
-    | PLUS
-    | TILDE
-    | NOT_
 ;
 
 error_message
