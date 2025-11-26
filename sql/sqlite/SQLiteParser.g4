@@ -520,11 +520,6 @@ module_argument
     : (~(OPEN_PAR | CLOSE_PAR | COMMA) | OPEN_PAR module_argument* CLOSE_PAR)+
 ;
 
-column_alias
-    : IDENTIFIER
-    | STRING_LITERAL
-;
-
 keyword
     : ABORT_
     | ACTION_
@@ -702,6 +697,10 @@ table_or_index_name
 ;
 
 column_name
+    : any_name
+;
+
+column_alias
     : any_name
 ;
 
