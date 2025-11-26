@@ -452,9 +452,7 @@ window_defn
 over_clause
     : OVER_ (
         window_name
-        | OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? (
-            ORDER_ BY_ ordering_term (COMMA ordering_term)*
-        )? frame_spec? CLOSE_PAR
+        | OPEN_PAR base_window_name? (PARTITION_ BY_ expr (COMMA expr)*)? order_clause? frame_spec? CLOSE_PAR
     )
 ;
 
