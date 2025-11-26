@@ -35,11 +35,11 @@ options {
 }
 
 parse
-    : (sql_stmt_list)* EOF
+    : sql_stmt_list EOF
 ;
 
 sql_stmt_list
-    : SCOL* sql_stmt (SCOL+ sql_stmt)* SCOL*
+    : sql_stmt? (SCOL sql_stmt?)*
 ;
 
 sql_stmt
