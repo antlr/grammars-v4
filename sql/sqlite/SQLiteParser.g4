@@ -516,6 +516,10 @@ error_message
     : expr
 ;
 
+filename
+    : expr
+;
+
 module_argument
     : (~(OPEN_PAR | CLOSE_PAR | COMMA) | OPEN_PAR module_argument* CLOSE_PAR)+
 ;
@@ -745,10 +749,6 @@ window_name
 ;
 
 alias
-    : any_name
-;
-
-filename
     : any_name
 ;
 
