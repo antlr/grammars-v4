@@ -43,6 +43,7 @@ sql_statement
     | sql_session_statement
     | sql_embedded_host_language_statement
     | sql_constrol_statement
+    | select_statement
     ;
 
 sql_schema_statement
@@ -4249,7 +4250,7 @@ encryption_value
     ;
 
 create_type_statement
-    :
+    : todo
     ;
 
 create_type_array_statement
@@ -4570,7 +4571,7 @@ cte
 fullselect
     : (subselect | '(' fullselect ')' values_clause)
         (
-            (UNION ALL? | EXCEPT ALL? | INTERSECT ALL?)
+            (UNION | EXCEPT | INTERSECT) ALL?
             (subselect | '(' fullselect ')' | values_clause)
         )*
         order_by_clause?
