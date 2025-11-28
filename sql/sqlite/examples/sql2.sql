@@ -25,7 +25,9 @@ CREATE TABLE f
     m  REAL
 ) STRICT;
 
+-- Module arguments 
 CREATE VIRTUAL TABLE f USING module_name(abc()d(te(s)t)f,gh!j%$m@p);
+CREATE VIRTUAL TABLE f USING module_name(column VARCHAR(1,2), secondarg);
 
 -- All identifiers are keywords (https://sqlite.org/c3ref/keyword_check.html)
 CREATE TABLE BEGIN(REPLACE,PRAGMA,END);

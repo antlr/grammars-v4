@@ -511,7 +511,7 @@ filename
 ;
 
 module_argument
-    : (~(OPEN_PAR | CLOSE_PAR | COMMA) | OPEN_PAR module_argument* CLOSE_PAR)+
+    : (~(OPEN_PAR | CLOSE_PAR) | OPEN_PAR module_argument* CLOSE_PAR)+?
 ;
 
 keyword
