@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar zil;
 
 file_
-   : (STR | form)* EOF
+   : (STRING | form)* EOF
    ;
 
 formprefix
@@ -52,7 +52,7 @@ form
 
 expression
    : fix
-   | STR
+   | STRING
    | list
    | ATOM
    | form
@@ -80,15 +80,11 @@ operation
    | '=?'
    ;
 
-STR
-   : STRING ([ \t]* ';' STRING)*
-   ;
-
 ATOM
    : (LOCAL | GLOBAL)? [A-Z#=+-]+ QUES?
    ;
 
-fragment STRING
+STRING
    : '"' (~ '"' | ESCAPED_QUOTES)* '"'
    ;
 
@@ -144,13 +140,15 @@ QUES
    : '?'
    ;
 
-COMMENT1
-   : ';' ~ [\r\n]* -> skip
-   ;
-
 COMMENT2
    : ';' STRING -> skip
    ;
+
+
+//COMMENT1
+//   : ';' ~ [\r\n]*
+//   ;
+
 
 WS
    : [ \r\n\t]+ -> skip
