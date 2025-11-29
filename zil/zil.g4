@@ -44,6 +44,7 @@ file_
 formprefix
    : '\''
    | '%'
+   | '!'
    ;
 
 form
@@ -144,12 +145,19 @@ COMMENT2
    : ';' STRING -> skip
    ;
 
+ESC1
+   : '\\' '\u0000' .. '\u0255' -> skip
+   ;
 
-//COMMENT1
-//   : ';' ~ [\r\n]*
-//   ;
-
-
+ESC2
+   : '/^' '\u0000' .. '\u0255' -> skip
+   ;
+   //COMMENT1
+   
+   //   : ';' ~ [\r\n]*
+   
+   //   ;
+   
 WS
    : [ \r\n\t]+ -> skip
    ;
