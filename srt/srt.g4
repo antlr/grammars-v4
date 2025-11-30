@@ -46,7 +46,7 @@ subtitles
 subtitle
     : NUMBER NEWLINE
       TIMESTAMP NEWLINE
-      TEXT NEWLINE? 
+      (TEXT NEWLINE?)+ 
     ;
 
 
