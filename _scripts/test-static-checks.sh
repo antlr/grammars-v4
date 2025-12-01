@@ -395,10 +395,10 @@ do
     if [ "$target" == "no-symbolic-links" ]
     then
         # Find if repo contains symbolic file links.
-	for f in `find . -type f | fgrep -v '.git'`
+	for f in `find . -type l | fgrep -v '.git'`
 	do
 		v=`git ls-files --stage $f | awk '{print $1}'`
-		if [ "$v" == 120000 ]
+		if [ "$v" == "120000" ]
 		then
 			echo $f is a symbolic link file, repo cannot have any.
 		fi
