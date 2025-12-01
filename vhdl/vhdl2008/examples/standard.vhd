@@ -1,1 +1,0 @@
-../../vhdl/examples/standard.vhd
