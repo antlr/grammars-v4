@@ -296,7 +296,7 @@ fi
 
 if [ ${#targets[@]} -eq 0 ]
 then
-    targets=( useless-parens format ambiguity )
+    targets=( useless-parens format ambiguity no-symbolic-links )
 fi
 
 echo grammars = ${grammars[@]}
@@ -390,6 +390,24 @@ do
 	    bash build.sh
 	    bash test-ambiguity.sh
 	fi
+    fi
+
+    if [ "$target" == "no-symbolic-links" ]
+    then
+        # Find if repo contains symbolic file links.
+	for f in `find . -type f | fgrep -v '.git'`
+	do
+		v=`git ls-files --stage $f | awk '{print $1}'`
+		if [ "$v" == 120000 ]
+		then
+			echo $f is a symbolic link file, repo cannot have any.
+		fi
+	done
+	
+        if [ $? -ne 0 ]
+        then
+		failed=1
+        fi
     fi
 
     popd > /dev/null
