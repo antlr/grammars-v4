@@ -73,19 +73,12 @@ class_header: header_mark* CLASS class_name; // MOS: header_mark must accept pos
 
 class_name: Identifier;
 
-header_mark
-   locals[
-      boolean deferred_exists=false,
-      boolean expanded_exists=false,
-      boolean frozen_exists=false,
-      boolean external_exists=false,
-      boolean once_exists=false
-   ] :
-     {!$deferred_exists}? DEFERRED {$deferred_exists=true;} #HeaderMarkDeferred
-   | {!$expanded_exists}? EXPANDED {$expanded_exists=true;} #HeaderMarkExpanded
-   | {!$frozen_exists}?   FROZEN   {$frozen_exists=true;}   #HeaderMarkFrozen
-   | {!$external_exists}? EXTERNAL {$external_exists=true;} #HeaderMarkExternal
-   | {!$once_exists}?     once     {$once_exists=true;}     #HeaderMarkOnce
+header_mark:
+     DEFERRED
+   | EXPANDED
+   | FROZEN
+   | EXTERNAL
+   | once
    ;
 
 obsolete: OBSOLETE manifest_string;
@@ -134,20 +127,13 @@ parent_list: parent (';'* parent)* ';'*;
 
 parent: class_type feature_adaptation?;
 
-feature_adaptation // MOS: incorrect publicised grammar (different order in working examples)!
-   locals[
-      boolean undefine_exists=false,
-      boolean redefine_exists=false,
-      boolean rename_exists=false,
-      boolean new_exports_exists=false,
-      boolean select_exists=false
-   ] : // MOS: semantic predicates ensure, at parse time, only one occurrence of each alternative!
+feature_adaptation:
    (
-     {!$undefine_exists}?    undefine    {$undefine_exists=true;}
-   | {!$redefine_exists}?    redefine    {$redefine_exists=true;}
-   | {!$rename_exists}?      rename      {$rename_exists=true;}
-   | {!$new_exports_exists}? new_exports {$new_exports_exists=true;}
-   | {!$select_exists}?      select      {$select_exists=true;}
+     undefine
+   | redefine
+   | rename
+   | new_exports
+   | select
    )* END;
 
 rename: RENAME rename_list;
@@ -194,8 +180,7 @@ compound: ';'* (instruction (';'* instruction)*)? ';'*;
 
 instruction:
      creation_instruction
-   | prec_call=expression // MOS: call -> expression. Semantic verification to ensure a procedure call.
-                          //      (might_be_proc_call necessary but not sufficient).
+   | prec_call=expression
    | assignment
    | assigner_call
    | conditional
@@ -343,14 +328,14 @@ type_interval: manifest_type '..' manifest_type;
 
 non_object_call_interval: non_object_call '..' non_object_call;
 
-loop locals[boolean variant_exists=false]: // MOS: Different from ECMA 367!
+loop: // MOS: Different from ECMA 367!
    iteration?
    initialization?
    invariant?
-   (variant {$variant_exists=true;})? // MOS: variant repeated here (as happens in some examples)
+   variant?
    exit_condition?
    loop_body
-   ({!$variant_exists}? variant)?
+   variant?
    END
    ;
 
@@ -468,11 +453,8 @@ agent_actual: expression | placeholder;
 
 placeholder: manifest_type? '?';
 
-expression returns [boolean might_be_proc_call=false]: // MOS: expression (profoundly) rebuild to ensure an unambiguous free-context grammar
-            //      with proper operator precedence.
-            // Was: basic_expression | special_expression
-            // Precedence extracted from ETL3, pg. 768; Undocumented precedence inferred (revision required)
-     e1=expression '.' e2=expression {$might_be_proc_call=true;}            #ExprQualifiedCall
+expression:
+     e1=expression '.' e2=expression             #ExprQualifiedCall
    | op=(OLD|NOT|'+'|'-'|FreeOperator) expression                           #ExprUnary
    | e1=expression FreeOperator e2=expression                               #ExprFreeBinaryOperator
    | <assoc=right> e1=expression '^' e2=expression                          #ExprPower
@@ -488,8 +470,8 @@ expression returns [boolean might_be_proc_call=false]: // MOS: expression (profo
    | '(' expression ')'                                                     #ExprParenthesized
    | '(|' expression '|)'                                                   #ExprParenthesizedTarget
    | op=(FOR_ALL|FOR_SOME) Identifier ':' expression BAR expression         #ExprFirstOrderLogic
-   | Identifier {$might_be_proc_call=true;}                                 #ExprIdentifier // formal|constant_attribute |local|argumentless call
-   | unqualified_call {$might_be_proc_call=true;}                           #ExprUnqualifiedCall
+   | Identifier                                  #ExprIdentifier // formal|constant_attribute |local|argumentless call
+   | unqualified_call                            #ExprUnqualifiedCall
    | CURRENT                                                                #ExprCurrent
    | RESULT                                                                 #ExprResult
    | VOID                                                                   #ExprVoid
@@ -499,7 +481,7 @@ expression returns [boolean might_be_proc_call=false]: // MOS: expression (profo
    | precursor                                                              #ExprPrecursor
    | creation_expression                                                    #ExprCreation
    | conditional_expression                                                 #ExprConditional
-   | non_object_call {$might_be_proc_call=true;}                            #ExprNonObjectCall
+   | non_object_call                             #ExprNonObjectCall
    | special_expression                                                     #ExprSpecial
    ;
 
