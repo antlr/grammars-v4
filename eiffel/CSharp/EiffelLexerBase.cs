@@ -5,7 +5,7 @@ using Antlr4.Runtime;
 
 public abstract class EiffelLexerBase : Lexer {
 
-    private static String[] invalidFreeOps = {
+    private static string[] invalidFreeOps = {
 	":=.", ":=+", ":=-", "<<-", "<<+", "<<>", "<<>>"
     };
 
@@ -18,9 +18,9 @@ public abstract class EiffelLexerBase : Lexer {
 
     public bool IsFreeOperator() {
 	bool res = true;
-	String tk = getText();
-	for(int i = 0; res && i < invalidFreeOps.length; i++)
-	    res = !invalidFreeOps[i].equals(tk);
+	var tk = this.Text;
+	for(int i = 0; res && i < invalidFreeOps.Length; i++)
+	    res = invalidFreeOps[i] != tk;
 	return res;
     }
 }

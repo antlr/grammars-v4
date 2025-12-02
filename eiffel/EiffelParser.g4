@@ -43,6 +43,7 @@ parser grammar EiffelParser;
 
 options {
     tokenVocab = EiffelLexer;
+    superClass = EiffelParserBase;
 }
 
 class_declaration: notes? class_header formal_generics?
@@ -121,7 +122,7 @@ inheritance: inherit_clause+;
 
 inherit_clause: INHERIT non_conformance? parent_list;
 
-non_conformance: {"none".equalsIgnoreCase(_input.LT(2).getText())}? '{' Identifier '}'; // MOS: NONE -> Identifier
+non_conformance: {this.IsNone()}? '{' Identifier '}'; // MOS: NONE -> Identifier
 
 parent_list: parent (';'* parent)* ';'*;
 
@@ -278,7 +279,7 @@ manifest_array_type: '{' type '}';
 expression_list: (expression (',' expression)*)?;
 
 //tuple_type: TUPLE tuple_parameter_list?; // MOS: tuple is used also as an Identifier!
-tuple_type: {"tuple".equalsIgnoreCase(_input.LT(1).getText())}? Identifier tuple_parameter_list; // MOS: semantic predicate to ensure Identifier equals TUPLE
+tuple_type: {this.IsTuple()}? Identifier tuple_parameter_list; // MOS: semantic predicate to ensure Identifier equals TUPLE
 
 tuple_parameter_list: '[' entity_declaration_list ']'; // MOS: tuple_parameters replaced by entity_declaration_list (type_list already in class_type)
 
@@ -383,7 +384,7 @@ creation_procedure: feature_name;
 
 creation_instruction: CREATE create_passive_region? explicit_creation_type? creation_call;
 
-create_passive_region: {"none".equalsIgnoreCase(_input.LT(2).getText())}? '<' Identifier '>'; // MOS: EiffelStudio 15.08 Releases
+create_passive_region: {this.IsNone()}? '<' Identifier '>'; // MOS: EiffelStudio 15.08 Releases
 
 explicit_creation_type: '{' type '}';
 
