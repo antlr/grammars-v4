@@ -1,5 +1,6 @@
 using Antlr4.Runtime;
 using System.IO;
+using System;
 
 public abstract class EiffelParserBase : Parser {
 
