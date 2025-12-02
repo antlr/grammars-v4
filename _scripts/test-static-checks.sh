@@ -401,13 +401,9 @@ do
 		if [ "$v" == "120000" ]
 		then
 			echo $f is a symbolic link file, repo cannot have any.
+			failed=1
 		fi
 	done
-	
-        if [ $? -ne 0 ]
-        then
-		failed=1
-        fi
     fi
 
     popd > /dev/null
