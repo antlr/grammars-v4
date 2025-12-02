@@ -212,6 +212,10 @@ then
         directories=`git diff --name-only ${additional[0]} ${additional[1]} . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts`
         for g in $directories
         do
+            if [ ! -d $g ]
+            then
+                continue
+            fi
             pushd $g > /dev/null
             while true
             do
@@ -373,31 +377,31 @@ do
     if [ "$target" == "ambiguity" ]
     then
         dotnet trgen -t CSharp --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
-	if [ $? -ne 0 ]
-	then
+        if [ $? -ne 0 ]
+        then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, non-zero return from trgen."
-	elif [ ! -d Generated-CSharp ]
-	then
+        elif [ ! -d Generated-CSharp ]
+        then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, no Generated-CSharp directory."
-	else
-	    cd Generated-CSharp
-	    bash build.sh
-	    bash test-ambiguity.sh
-	fi
+        else
+            cd Generated-CSharp
+            bash build.sh
+            bash test-ambiguity.sh
+        fi
     fi
 
     if [ "$target" == "no-symbolic-links" ]
     then
         # Find if repo contains symbolic file links.
-	for f in `find . -type l | fgrep -v '.git'`
-	do
-		v=`git ls-files --stage $f | awk '{print $1}'`
-		if [ "$v" == "120000" ]
-		then
-			echo $f is a symbolic link file, repo cannot have any.
-			failed=1
-		fi
-	done
+        for f in `find . -type l | fgrep -v '.git'`
+        do
+            v=`git ls-files --stage $f | awk '{print $1}'`
+            if [ "$v" == "120000" ]
+            then
+                echo $f is a symbolic link file, repo cannot have any.
+                failed=1
+            fi
+        done
     fi
 
     popd > /dev/null
