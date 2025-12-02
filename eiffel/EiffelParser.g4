@@ -39,21 +39,10 @@
  *  https://sweet.ua.pt/mos/antlr4
  */
 
-grammar Eiffel;
+parser grammar EiffelParser;
 
-options { caseInsensitive = true; }
-
-@lexer::members {
-   private static String[] invalidFreeOps = {
-      ":=.", ":=+", ":=-", "<<-", "<<+", "<<>", "<<>>"
-   };
-
-   private boolean isFreeOperator(String tk) {
-      boolean res = true;
-      for(int i = 0; res && i < invalidFreeOps.length; i++)
-         res = !invalidFreeOps[i].equals(tk);
-      return res;
-   }
+options {
+    tokenVocab = EiffelLexer;
 }
 
 class_declaration: notes? class_header formal_generics?
@@ -545,101 +534,3 @@ external: EXTERNAL external_language external_name?;
 external_language: manifest_string; // MOS: registered_language handled semantically (it is easy and avoids lexer ambiguities).
 
 external_name: ALIAS manifest_string;
-
-// Explicit TOKENS:
-
-ACROSS: 'across';
-AGENT: 'agent';
-ALIAS: 'alias';
-ALL: 'all';
-AND: 'and' | '∧';
-AND_THEN: 'and' [ \t\r\n]+ 'then';
-AS: 'as';
-ASSIGN: 'assign';
-ATTACHED: 'attached';
-ATTRIBUTE: 'attribute';
-CHECK: 'check';
-CLASS: 'class';
-CONVERT: 'convert';
-CREATE: 'create';
-CURRENT: 'current';
-DEBUG: 'debug';
-DEFERRED: 'deferred';
-DETACHABLE: 'detachable';
-DO: 'do';
-ELSE: 'else';
-ELSEIF: 'elseif';
-END: 'end';
-ENSURE: 'ensure';
-EXPANDED: 'expanded';
-EXPORT: 'export';
-EXTERNAL: 'external';
-FALSE: 'false';
-FEATURE: 'feature';
-FROM: 'from';
-FROZEN: 'frozen';
-IF: 'if';
-IMPLIES: 'implies' | '⇒';
-INHERIT: 'inherit';
-INSPECT: 'inspect';
-INVARIANT: 'invariant';
-LIKE: 'like';
-LOCAL: 'local';
-LOOP: 'loop';
-NOT: 'not' | '¬';
-NOTE: 'note';
-OBSOLETE: 'obsolete';
-OLD: 'old';
-ONCE: 'once';
-ONLY: 'only';
-OR: 'or' | '∨';
-OR_ELSE: 'or' [ \t\r\n]+ 'else';
-PRECURSOR: 'precursor';
-REDEFINE: 'redefine';
-REFERENCE: 'reference';
-RENAME: 'rename';
-REQUIRE: 'require';
-RESCUE: 'rescue';
-RESULT: 'result';
-RETRY: 'retry';
-SELECT: 'select';
-SEPARATE: 'separate';
-SOME: 'some'; // MOS: added!
-THEN: 'then';
-TRUE: 'true';
-//TUPLE: 'tuple';
-UNDEFINE: 'undefine';
-UNIQUE: 'unique';
-UNTIL: 'until';
-VARIANT: 'variant';
-VOID: 'void';
-WHEN: 'when';
-XOR: 'xor' | '⊻';
-FOR_ALL: [∀]; // 0xE2 0x88 0x80
-FOR_SOME: [∃]; // 0xE2 0x88 0x83
-BAR: [¦];
-OPEN_REPEAT: [⟳];
-CLOSE_REPEAT: [⟲];
-
-Identifier: Letter (Letter | [0-9_])*;
-fragment Letter: [a-zA-Z\u00C0-\u00FF];
-Verbatim_string: // MOS: based on example code usage (difficult to make it work correctly)
-     '"[' [ \t]* '\n' (.*? '\n')? [ \t]* ']"'
-   | '"{' [ \t]* '\n' (.*? '\n')? [ \t]* '}"'
-   ;
-Basic_manifest_string: '"' ('%"' | '%%' | StringLineBreak | ~[\n] )*? '"';
-fragment StringLineBreak: '%' [ \t]* '\n' [ \t]* '%';
-Character_constant: ['] (~[%'] | [%]. | [%][/]Integer[/] ) ['];
-Integer: Integer_base? Digit+;
-Integer_interval: Integer [ \t]* '..' [ \t]* Integer;
-fragment Integer_base: '0'[bcxBCX];
-fragment Digit: [0-9a-fA-F_];
-Real: [0-9]* [.] [0-9]+ ([eE][+-]?[0-9]+)? | [0-9]+ [.] [0-9]* ([eE][+-]?[0-9]+)?;
-FreeOperator: [!#$%&*+\-\\/:.<=>?@^|~\u0085-\u0089\u008B\u0095-\u0099\u009B\u00A1-\u00AC\u00B0-\u00B6\u00B9-\u00BF\u00D7\u00F7\u2200-\u22FF\u2A00-\u2AFF\u27C0-\u27EF\u2980-\u29FF\u2300-\u23FF\u25A0-\u25FF\u2190-\u21FF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF]+
-   {isFreeOperator(getText())}?; // MOS: "a:=.33", <<-1>>, <<+1>>, :=+, ... recognized as FreeOperator!
-
-WhiteSpace: [ \t\n\r\uFEFF]+ -> skip; // MOS: gobo eiffel files with <feff> (BOM) character! treated as whitespace
-Comment: '--' .*? '\n' -> skip;
-
-Error: .; // MOS: ensure no lexical errors
-
