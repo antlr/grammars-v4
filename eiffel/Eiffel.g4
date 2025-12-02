@@ -41,6 +41,8 @@
 
 grammar Eiffel;
 
+options { caseInsensitive = true; }
+
 @lexer::members {
    private static String[] invalidFreeOps = {
       ":=.", ":=+", ":=-", "<<-", "<<+", "<<>", "<<>>"
@@ -546,73 +548,73 @@ external_name: ALIAS manifest_string;
 
 // Explicit TOKENS:
 
-ACROSS: [aA][cC][rR][oO][sS][sS];
-AGENT: [aA][gG][eE][nN][tT];
-ALIAS: [aA][lL][iI][aA][sS];
-ALL: [aA][lL][lL];
-AND: [aA][nN][dD] | '∧';
-AND_THEN: [aA][nN][dD][ \t\r\n]+[tT][hH][eE][nN];
-AS: [aA][sS];
-ASSIGN: [aA][sS][sS][iI][gG][nN];
-ATTACHED: [aA][tT][tT][aA][cC][hH][eE][dD];
-ATTRIBUTE: [aA][tT][tT][rR][iI][bB][uU][tT][eE];
-CHECK: [cC][hH][eE][cC][kK];
-CLASS: [cC][lL][aA][sS][sS];
-CONVERT: [cC][oO][nN][vV][eE][rR][tT];
-CREATE: [cC][rR][eE][aA][tT][eE];
-CURRENT: [cC][uU][rR][rR][eE][nN][tT];
-DEBUG: [dD][eE][bB][uU][gG];
-DEFERRED: [dD][eE][fF][eE][rR][rR][eE][dD];
-DETACHABLE: [dD][eE][tT][aA][cC][hH][aA][bB][lL][eE];
-DO: [dD][oO];
-ELSE: [eE][lL][sS][eE];
-ELSEIF: [eE][lL][sS][eE][iI][fF];
-END: [eE][nN][dD];
-ENSURE: [eE][nN][sS][uU][rR][eE];
-EXPANDED: [eE][xX][pP][aA][nN][dD][eE][dD];
-EXPORT: [eE][xX][pP][oO][rR][tT];
-EXTERNAL: [eE][xX][tT][eE][rR][nN][aA][lL];
-FALSE: [fF][aA][lL][sS][eE];
-FEATURE: [fF][eE][aA][tT][uU][rR][eE];
-FROM: [fF][rR][oO][mM];
-FROZEN: [fF][rR][oO][zZ][eE][nN];
-IF: [iI][fF];
-IMPLIES: [iI][mM][pP][lL][iI][eE][sS] | '⇒';
-INHERIT: [iI][nN][hH][eE][rR][iI][tT];
-INSPECT: [iI][nN][sS][pP][eE][cC][tT];
-INVARIANT: [iI][nN][vV][aA][rR][iI][aA][nN][tT];
-LIKE: [lL][iI][kK][eE];
-LOCAL: [lL][oO][cC][aA][lL];
-LOOP: [lL][oO][oO][pP];
-NOT: [nN][oO][tT] | '¬';
-NOTE: [nN][oO][tT][eE];
-OBSOLETE: [oO][bB][sS][oO][lL][eE][tT][eE];
-OLD: [oO][lL][dD];
-ONCE: [oO][nN][cC][eE];
-ONLY: [oO][nN][lL][yY];
-OR: [oO][rR] | '∨';
-OR_ELSE: [oO][rR][ \t\r\n]+[eE][lL][sS][eE];
-PRECURSOR: [pP][rR][eE][cC][uU][rR][sS][oO][rR];
-REDEFINE: [rR][eE][dD][eE][fF][iI][nN][eE];
-REFERENCE: [rR][eE][fF][eE][rR][eE][nN][cC][eE];
-RENAME: [rR][eE][nN][aA][mM][eE];
-REQUIRE: [rR][eE][qQ][uU][iI][rR][eE];
-RESCUE: [rR][eE][sS][cC][uU][eE];
-RESULT: [rR][eE][sS][uU][lL][tT];
-RETRY: [rR][eE][tT][rR][yY];
-SELECT: [sS][eE][lL][eE][cC][tT];
-SEPARATE: [sS][eE][pP][aA][rR][aA][tT][eE];
-SOME: [sS][oO][mM][eE]; // MOS: added!
-THEN: [tT][hH][eE][nN];
-TRUE: [tT][rR][uU][eE];
-//TUPLE: [tT][uU][pP][lL][eE];
-UNDEFINE: [uU][nN][dD][eE][fF][iI][nN][eE];
-UNIQUE: [uU][nN][iI][qQ][uU][eE];
-UNTIL: [uU][nN][tT][iI][lL];
-VARIANT: [vV][aA][rR][iI][aA][nN][tT];
-VOID: [vV][oO][iI][dD];
-WHEN: [wW][hH][eE][nN];
-XOR: [xX][oO][rR] | '⊻';
+ACROSS: 'across';
+AGENT: 'agent';
+ALIAS: 'alias';
+ALL: 'all';
+AND: 'and' | '∧';
+AND_THEN: 'and' [ \t\r\n]+ 'then';
+AS: 'as';
+ASSIGN: 'assign';
+ATTACHED: 'attached';
+ATTRIBUTE: 'attribute';
+CHECK: 'check';
+CLASS: 'class';
+CONVERT: 'convert';
+CREATE: 'create';
+CURRENT: 'current';
+DEBUG: 'debug';
+DEFERRED: 'deferred';
+DETACHABLE: 'detachable';
+DO: 'do';
+ELSE: 'else';
+ELSEIF: 'elseif';
+END: 'end';
+ENSURE: 'ensure';
+EXPANDED: 'expanded';
+EXPORT: 'export';
+EXTERNAL: 'external';
+FALSE: 'false';
+FEATURE: 'feature';
+FROM: 'from';
+FROZEN: 'frozen';
+IF: 'if';
+IMPLIES: 'implies' | '⇒';
+INHERIT: 'inherit';
+INSPECT: 'inspect';
+INVARIANT: 'invariant';
+LIKE: 'like';
+LOCAL: 'local';
+LOOP: 'loop';
+NOT: 'not' | '¬';
+NOTE: 'note';
+OBSOLETE: 'obsolete';
+OLD: 'old';
+ONCE: 'once';
+ONLY: 'only';
+OR: 'or' | '∨';
+OR_ELSE: 'or' [ \t\r\n]+ 'else';
+PRECURSOR: 'precursor';
+REDEFINE: 'redefine';
+REFERENCE: 'reference';
+RENAME: 'rename';
+REQUIRE: 'require';
+RESCUE: 'rescue';
+RESULT: 'result';
+RETRY: 'retry';
+SELECT: 'select';
+SEPARATE: 'separate';
+SOME: 'some'; // MOS: added!
+THEN: 'then';
+TRUE: 'true';
+//TUPLE: 'tuple';
+UNDEFINE: 'undefine';
+UNIQUE: 'unique';
+UNTIL: 'until';
+VARIANT: 'variant';
+VOID: 'void';
+WHEN: 'when';
+XOR: 'xor' | '⊻';
 FOR_ALL: [∀]; // 0xE2 0x88 0x80
 FOR_SOME: [∃]; // 0xE2 0x88 0x83
 BAR: [¦];
