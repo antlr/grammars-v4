@@ -3,4 +3,10 @@
    <antlr-version>^4.10</antlr-version>
    <targets>CSharp;Java</targets>
    <inputs>examples/**/*.e</inputs>
+   <test>
+      <grammar-name>Eiffel</grammar-name>
+   </test>
+   <test>
+      <grammar-name>EiffelNoSkip</grammar-name>
+   </test>
 </desc>
