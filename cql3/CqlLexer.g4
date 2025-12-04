@@ -7,6 +7,17 @@ lexer grammar CqlLexer;
 options {
     caseInsensitive = true;
 }
+@members {
+  public enum Standard { CASS20, CASS21, CASS22, CASS30, CASS311, CASS40 }
+  private Standard standard = Standard.CASS311;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isCass21OrLater() { return atLeast(Standard.CASS21); }
+  public boolean isCass22OrLater() { return atLeast(Standard.CASS22); }
+  public boolean isCass30OrLater() { return atLeast(Standard.CASS30); }
+  public boolean isCass311OrLater() { return atLeast(Standard.CASS311); }
+  public boolean isCass40OrLater() { return atLeast(Standard.CASS40); }
+}
 
 // Operators and Punctuators
 
@@ -37,7 +48,7 @@ OPERATOR_GTE : '>=';
 // Keywords
 
 K_ADD            : 'ADD';
-K_AGGREGATE      : 'AGGREGATE';
+K_AGGREGATE      : 'AGGREGATE' {isCass22OrLater()}?;
 K_ALL            : 'ALL';
 K_ALLOW          : 'ALLOW';
 K_ALTER          : 'ALTER';
@@ -73,8 +84,8 @@ K_FILTERING      : 'FILTERING';
 K_FINALFUNC      : 'FINALFUNC';
 K_FROM           : 'FROM';
 K_FULL           : 'FULL';
-K_FUNCTION       : 'FUNCTION';
-K_FUNCTIONS      : 'FUNCTIONS';
+K_FUNCTION       : 'FUNCTION' {isCass22OrLater()}?;
+K_FUNCTIONS      : 'FUNCTIONS' {isCass22OrLater()}?;
 K_GRANT          : 'GRANT';
 K_IF             : 'IF';
 K_IN             : 'IN';
@@ -85,7 +96,7 @@ K_INPUT          : 'INPUT';
 K_INSERT         : 'INSERT';
 K_INTO           : 'INTO';
 K_IS             : 'IS';
-K_JSON           : 'JSON';
+K_JSON           : 'JSON' {isCass22OrLater()}?;
 K_KEY            : 'KEY';
 K_KEYS           : 'KEYS';
 K_KEYSPACE       : 'KEYSPACE';
@@ -97,7 +108,7 @@ K_LOCAL_ONE      : 'LOCAL_ONE';
 K_LOCAL_QUORUM   : 'LOCAL_QUORUM';
 K_LOGGED         : 'LOGGED';
 K_LOGIN          : 'LOGIN';
-K_MATERIALIZED   : 'MATERIALIZED';
+K_MATERIALIZED   : 'MATERIALIZED' {isCass30OrLater()}?;
 K_MODIFY         : 'MODIFY';
 K_NAN            : 'NAN';
 K_NORECURSIVE    : 'NORECURSIVE';
@@ -122,13 +133,13 @@ K_REPLACE        : 'REPLACE';
 K_REPLICATION    : 'REPLICATION';
 K_RETURNS        : 'RETURNS';
 K_REVOKE         : 'REVOKE';
-K_ROLE           : 'ROLE';
-K_ROLES          : 'ROLES';
+K_ROLE           : 'ROLE' {isCass22OrLater()}?;
+K_ROLES          : 'ROLES' {isCass22OrLater()}?;
 K_SCHEMA         : 'SCHEMA';
 K_SELECT         : 'SELECT';
 K_SET            : 'SET';
 K_SFUNC          : 'SFUNC';
-K_STATIC         : 'STATIC';
+K_STATIC         : 'STATIC' {isCass21OrLater()}?;
 K_STORAGE        : 'STORAGE';
 K_STYPE          : 'STYPE';
 K_SUPERUSER      : 'SUPERUSER';
@@ -150,7 +161,7 @@ K_USER           : 'USER';
 K_USING          : 'USING';
 K_UUID           : 'UUID';
 K_VALUES         : 'VALUES';
-K_VIEW           : 'VIEW';
+K_VIEW           : 'VIEW' {isCass30OrLater()}?;
 K_WHERE          : 'WHERE';
 K_WITH           : 'WITH';
 K_WRITETIME      : 'WRITETIME';
@@ -159,11 +170,11 @@ K_BIGINT         : 'BIGINT';
 K_BLOB           : 'BLOB';
 K_BOOLEAN        : 'BOOLEAN';
 K_COUNTER        : 'COUNTER';
-K_DATE           : 'DATE';
+K_DATE           : 'DATE' {isCass22OrLater()}?;
 K_DECIMAL        : 'DECIMAL';
 K_DOUBLE         : 'DOUBLE';
 K_FLOAT          : 'FLOAT';
-K_FROZEN         : 'FROZEN';
+K_FROZEN         : 'FROZEN' {isCass21OrLater()}?;
 K_INET           : 'INET';
 K_INT            : 'INT';
 K_LIST           : 'LIST';
@@ -171,9 +182,9 @@ K_MAP            : 'MAP';
 K_SMALLINT       : 'SMALLINT';
 K_TEXT           : 'TEXT';
 K_TIMEUUID       : 'TIMEUUID';
-K_TIME           : 'TIME';
+K_TIME           : 'TIME' {isCass22OrLater()}?;
 K_TINYINT        : 'TINYINT';
-K_TUPLE          : 'TUPLE';
+K_TUPLE          : 'TUPLE' {isCass21OrLater()}?;
 K_VARCHAR        : 'VARCHAR';
 K_VARINT         : 'VARINT';
 

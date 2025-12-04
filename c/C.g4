@@ -32,6 +32,24 @@
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar C;
+@parser::members {
+  public enum Standard { KANDR, C90, C99, C11, C17, C23 }
+  private Standard standard = Standard.C11;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isC99OrLater() { return atLeast(Standard.C99); }
+  public boolean isC11OrLater() { return atLeast(Standard.C11); }
+  public boolean isC23OrLater() { return atLeast(Standard.C23); }
+}
+@lexer::members {
+  public enum Standard { KANDR, C90, C99, C11, C17, C23 }
+  private Standard standard = Standard.C11;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isC99OrLater() { return atLeast(Standard.C99); }
+  public boolean isC11OrLater() { return atLeast(Standard.C11); }
+  public boolean isC23OrLater() { return atLeast(Standard.C23); }
+}
 
 primaryExpression
     : Identifier
@@ -224,7 +242,8 @@ typeSpecifier
     | structOrUnionSpecifier
     | enumSpecifier
     | typedefName
-    | '__typeof__' '(' constantExpression ')' // GCC extension
+    | '__typeof__' '(' constantExpression ')'
+    | 'typeof' '(' constantExpression ')'
     ;
 
 structOrUnionSpecifier
@@ -524,11 +543,11 @@ Float: 'float';
 For: 'for';
 Goto: 'goto';
 If: 'if';
-Inline: 'inline';
+Inline: 'inline' {isC99OrLater()}?;
 Int: 'int';
 Long: 'long';
 Register: 'register';
-Restrict: 'restrict';
+Restrict: 'restrict' {isC99OrLater()}?;
 Return: 'return';
 Short: 'short';
 Signed: 'signed';
@@ -542,16 +561,18 @@ Unsigned: 'unsigned';
 Void: 'void';
 Volatile: 'volatile';
 While: 'while';
-Alignas: '_Alignas';
-Alignof: '_Alignof';
-Atomic: '_Atomic';
-Bool: '_Bool';
-Complex: '_Complex';
-Generic: '_Generic';
-Imaginary: '_Imaginary';
-Noreturn: '_Noreturn';
-StaticAssert: '_Static_assert';
-ThreadLocal: '_Thread_local';
+Alignas: '_Alignas' {isC11OrLater()}?;
+Alignof: '_Alignof' {isC11OrLater()}?;
+Atomic: '_Atomic' {isC11OrLater()}?;
+Bool: '_Bool' {isC99OrLater()}?;
+Complex: '_Complex' {isC99OrLater()}?;
+Generic: '_Generic' {isC11OrLater()}?;
+Imaginary: '_Imaginary' {isC99OrLater()}?;
+Noreturn: '_Noreturn' {isC11OrLater()}?;
+StaticAssert: '_Static_assert' {isC11OrLater()}?;
+ThreadLocal: '_Thread_local' {isC11OrLater()}?;
+Typeof: 'typeof' {isC23OrLater()}?;
+TypeofUnqual: 'typeof_unqual' {isC23OrLater()}?;
 
 LeftParen: '(';
 RightParen: ')';
@@ -778,7 +799,7 @@ fragment HexadecimalEscapeSequence
     ;
 
 StringLiteral
-    : EncodingPrefix? '"' SCharSequence? '"'
+    : (('u8' {isC23OrLater()}?) | 'u' | 'U' | 'L')? '"' SCharSequence? '"'
     ;
 
 fragment EncodingPrefix

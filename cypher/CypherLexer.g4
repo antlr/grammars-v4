@@ -38,6 +38,14 @@ options {
     caseInsensitive = true;
 }
 
+@members {
+  public enum Standard { CYPHER3, CYPHER4, CYPHER5 }
+  private Standard standard = Standard.CYPHER5;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isCypher4OrLater() { return atLeast(Standard.CYPHER4); }
+  public boolean isCypher5OrLater() { return atLeast(Standard.CYPHER5); }
+}
 ASSIGN     : '=';
 ADD_ASSIGN : '+=';
 LE         : '<=';
@@ -83,7 +91,7 @@ DELETE     : 'DELETE';
 DESC       : 'DESC';
 DESCENDING : 'DESCENDING';
 DETACH     : 'DETACH';
-EXISTS     : 'EXISTS';
+EXISTS     : 'EXISTS' {isCypher4OrLater()}?;
 LIMIT      : 'LIMIT';
 MATCH      : 'MATCH';
 MERGE      : 'MERGE';
@@ -113,20 +121,20 @@ FALSE      : 'FALSE';
 TRUE       : 'TRUE';
 NULL_W     : 'NULL';
 CONSTRAINT : 'CONSTRAINT';
-DO         : 'DO';
-FOR        : 'FOR';
-REQUIRE    : 'REQUIRE';
-UNIQUE     : 'UNIQUE';
+DO         : 'DO' {isCypher5OrLater()}?;
+FOR        : 'FOR' {isCypher5OrLater()}?;
+REQUIRE    : 'REQUIRE' {isCypher5OrLater()}?;
+UNIQUE     : 'UNIQUE' {isCypher5OrLater()}?;
 CASE       : 'CASE';
 WHEN       : 'WHEN';
 THEN       : 'THEN';
 ELSE       : 'ELSE';
 END        : 'END';
-MANDATORY  : 'MANDATORY';
-SCALAR     : 'SCALAR';
-OF         : 'OF';
-ADD        : 'ADD';
-DROP       : 'DROP';
+MANDATORY  : 'MANDATORY' {isCypher5OrLater()}?;
+SCALAR     : 'SCALAR' {isCypher5OrLater()}?;
+OF         : 'OF' {isCypher5OrLater()}?;
+ADD        : 'ADD' {isCypher5OrLater()}?;
+DROP       : 'DROP' {isCypher5OrLater()}?;
 
 ID: LetterOrDigit+;
 
@@ -134,7 +142,7 @@ ESC_LITERAL    : '`' .*? '`';
 CHAR_LITERAL   : '\'' (~['\\\r\n] | EscapeSequence)? '\'';
 STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
 
-DIGIT : SUB? (HexDigit | OctalDigit | Digits | FLOAT);
+DIGIT : (HexDigits | OctalDigit | Digits | FLOAT);
 FLOAT : (Digits '.' Digits | '.' Digits) ExponentPart? [fd]? | Digits (ExponentPart [fd]? | [fd]);
 
 WS           : [ \t\r\n\u000C]+ -> channel(HIDDEN);

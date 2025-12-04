@@ -30,6 +30,17 @@ options
    {
     tokenVocab = CqlLexer;
 }
+@members {
+  public enum Standard { CASS20, CASS21, CASS22, CASS30, CASS311, CASS40 }
+  private Standard standard = Standard.CASS311;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isCass21OrLater() { return atLeast(Standard.CASS21); }
+  public boolean isCass22OrLater() { return atLeast(Standard.CASS22); }
+  public boolean isCass30OrLater() { return atLeast(Standard.CASS30); }
+  public boolean isCass311OrLater() { return atLeast(Standard.CASS311); }
+  public boolean isCass40OrLater() { return atLeast(Standard.CASS40); }
+}
 
 root
     : cqls? MINUSMINUS? EOF

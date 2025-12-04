@@ -35,8 +35,17 @@ options {
     tokenVocab = CypherLexer;
 }
 
+@members {
+  public enum Standard { CYPHER3, CYPHER4, CYPHER5 }
+  private Standard standard = Standard.CYPHER5;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isCypher4OrLater() { return atLeast(Standard.CYPHER4); }
+  public boolean isCypher5OrLater() { return atLeast(Standard.CYPHER5); }
+}
+
 script
-    : query SEMI? EOF
+    : query (SEMI query)* SEMI? EOF
     ;
 
 // statements

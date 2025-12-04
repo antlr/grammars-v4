@@ -13,6 +13,15 @@ options {
     superClass = BisonLexerBase;
 }
 
+@members {
+  public enum Standard { YACC, BISON2, BISON3 }
+  private Standard standard = Standard.BISON3;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isBison2OrLater() { return atLeast(Standard.BISON2); }
+  public boolean isBison3OrLater() { return atLeast(Standard.BISON3); }
+}
+
 // Insert here @header for C++ lexer.
 
 tokens {
@@ -144,13 +153,13 @@ PercentPercent: '%%' { this.NextMode(); };
 
 PERCENT_BINARY: '%binary';
 
-CODE: '%code';
+CODE: '%code' {isBison2OrLater()}?;
 
 PERCENT_DEBUG: '%debug';
 
 DEFAULT_PREC: '%default-prec';
 
-DEFINE: '%define';
+DEFINE: '%define' {isBison2OrLater()}?;
 
 DEFINES: '%defines';
 
@@ -166,19 +175,19 @@ EXPECT_RR: '%expect-rr';
 
 PERCENT_FILE_PREFIX: '%file-prefix';
 
-INITIAL_ACTION: '%initial-action';
+INITIAL_ACTION: '%initial-action' {isBison2OrLater()}?;
 
-GLR_PARSER: '%glr-parser';
+GLR_PARSER: '%glr-parser' {isBison2OrLater()}?;
 
 LANGUAGE: '%language';
 
 PERCENT_LEFT: '%left';
 
-LEX: '%lex-param';
+LEX: '%lex-param' {isBison2OrLater()}?;
 
 LOCATIONS: '%locations';
 
-MERGE: '%merge';
+MERGE: '%merge' {isBison2OrLater()}?;
 
 NO_DEFAULT_PREC: '%no-default-prec';
 
@@ -186,13 +195,13 @@ NO_LINES: '%no-lines';
 
 PERCENT_NONASSOC: '%nonassoc';
 
-NONDETERMINISTIC_PARSER: '%nondeterministic-parser';
+NONDETERMINISTIC_PARSER: '%nondeterministic-parser' {isBison3OrLater()}?;
 
 NTERM: '%nterm';
 
-PARAM: '%param';
+PARAM: '%param' {isBison2OrLater()}?;
 
-PARSE: '%parse-param';
+PARSE: '%parse-param' {isBison2OrLater()}?;
 
 PERCENT_PREC: '%prec';
 
@@ -200,7 +209,7 @@ PRECEDENCE: '%precedence';
 
 PRINTER: '%printer';
 
-REQUIRE: '%require';
+REQUIRE: '%require' {isBison2OrLater()}?;
 
 PERCENT_RIGHT: '%right';
 

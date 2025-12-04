@@ -31,6 +31,16 @@ options {
     caseInsensitive = true;
 }
 
+@members {
+  public enum Standard { AQL34, AQL37, AQL311 }
+  private Standard standard = Standard.AQL311;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isAql34OrLater() { return atLeast(Standard.AQL34); }
+  public boolean isAql37OrLater() { return atLeast(Standard.AQL37); }
+  public boolean isAql311OrLater() { return atLeast(Standard.AQL311); }
+}
+
 //keywrods
 COLLECT : 'COLLECT';
 FILTER  : 'FILTER';
@@ -41,11 +51,11 @@ LIMIT   : 'LIMIT';
 REMOVE  : 'REMOVE';
 REPLACE : 'REPLACE';
 RETURN  : 'RETURN';
-SEARCH  : 'SEARCH';
+SEARCH  : 'SEARCH' {isAql34OrLater()}?;
 SORT    : 'SORT';
 UPDATE  : 'UPDATE';
 UPSERT  : 'UPSERT';
-WINDOW  : 'WINDOW';
+WINDOW  : 'WINDOW' {isAql311OrLater()}?;
 WITH    : 'WITH';
 
 AGGREGATE        : 'AGGREGATE';
@@ -74,7 +84,7 @@ TRUE             : 'TRUE';
 KEEP    : 'KEEP';
 COUNT   : 'COUNT';
 OPTIONS : 'OPTIONS';
-PRUNE   : 'PRUNE';
+PRUNE   : 'PRUNE' {isAql34OrLater()}?;
 TO      : 'TO';
 
 //case-sensitive:

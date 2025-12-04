@@ -31,6 +31,15 @@ options {
     tokenVocab = BisonLexer;
 }
 
+@members {
+  public enum Standard { YACC, BISON2, BISON3 }
+  private Standard standard = Standard.BISON3;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isBison2OrLater() { return atLeast(Standard.BISON2); }
+  public boolean isBison3OrLater() { return atLeast(Standard.BISON3); }
+}
+
 input_
     : prologue_declarations '%%' bison_grammar epilogue_opt EOF
     ;

@@ -1,4 +1,4 @@
-## Summary
+# Summary
 
 C# grammar with full support of
 [C# 6 features](https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6) and below.
@@ -11,11 +11,13 @@ This ANTLR 4 C# grammar is based on the C# ANTLR 3 grammar from
 ## Using
 
 Due to uncompiled code can be placed after such preprocessor directives:
+
 ```CSharp
 #if SILVERLIGHT && WINDOWS_PHONE || DEBUG || foo == true
 // Some code
 #endif
 ```
+
 at first stage it's necessary to calculate whether condition satisfied in directive.
 This step performed by runtime code in gist:
 [CSharpAntlrParser](https://gist.github.com/KvanTTT/d95579de257531a3cc15).
@@ -24,6 +26,7 @@ This step performed by runtime code in gist:
 
 I put into repository **AllInOne.cs** file (from Roslyn) with most common syntax and also
 I tested this grammar on the following most popular .NET projects:
+
 * [Roslyn-1.1.1](https://github.com/dotnet/roslyn).
 * [Corefx-1.0.0-rc2](https://github.com/dotnet/corefx).
 * [EntityFramework-7.0.0-rc1](https://github.com/aspnet/EntityFramework).

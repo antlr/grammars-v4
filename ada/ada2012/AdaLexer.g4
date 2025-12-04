@@ -31,6 +31,16 @@ options {
     caseInsensitive = true;
 }
 
+@members {
+  public enum Standard { ADA83, ADA95, ADA2005, ADA2012, ADA2022 }
+  private Standard standard = Standard.ADA2012;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isAda2005OrLater() { return atLeast(Standard.ADA2005); }
+  public boolean isAda2012OrLater() { return atLeast(Standard.ADA2012); }
+  public boolean isAda2022OrLater() { return atLeast(Standard.ADA2022); }
+}
+
 ABORT    : 'abort';
 ABS      : 'abs';
 ABSTRACT : 'abstract';
@@ -69,7 +79,7 @@ GOTO    : 'goto';
 
 IF        : 'if';
 IN        : 'in';
-INTERFACE : 'interface';
+INTERFACE : 'interface' {isAda2005OrLater()}?;
 IS        : 'is';
 
 LIMITED : 'limited';
@@ -85,7 +95,7 @@ OF         : 'of';
 OR         : 'or';
 OTHERS     : 'others';
 OUT        : 'out';
-OVERRIDING : 'overriding';
+OVERRIDING : 'overriding' {isAda2005OrLater()}?;
 PACKAGE    : 'package';
 PRAGMA     : 'pragma';
 PRIVATE    : 'private';
@@ -103,9 +113,9 @@ REVERSE : 'reverse';
 
 SELECT       : 'select';
 SEPARATE     : 'separate';
-SOME         : 'some';
+SOME         : 'some' {isAda2022OrLater()}?;
 SUBTYPE      : 'subtype';
-SYNCHRONIZED : 'synchronized';
+SYNCHRONIZED : 'synchronized' {isAda2005OrLater()}?;
 
 TAGGED    : 'tagged';
 TASK      : 'task';

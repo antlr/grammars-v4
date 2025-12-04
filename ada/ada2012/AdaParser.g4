@@ -26,6 +26,16 @@ THE SOFTWARE.
 
 parser grammar AdaParser;
 
+@members {
+  public enum Standard { ADA83, ADA95, ADA2005, ADA2012, ADA2022 }
+  private Standard standard = Standard.ADA2012;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isAda2005OrLater() { return atLeast(Standard.ADA2005); }
+  public boolean isAda2012OrLater() { return atLeast(Standard.ADA2012); }
+  public boolean isAda2022OrLater() { return atLeast(Standard.ADA2022); }
+}
+
 options {
     tokenVocab = AdaLexer;
 }

@@ -30,8 +30,18 @@ options {
     tokenVocab = ArangoDbLexer;
 }
 
+@members {
+  public enum Standard { AQL34, AQL37, AQL311 }
+  private Standard standard = Standard.AQL311;
+  public void setStandard(Standard s) { standard = s; }
+  private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+  public boolean isAql34OrLater() { return atLeast(Standard.AQL34); }
+  public boolean isAql37OrLater() { return atLeast(Standard.AQL37); }
+  public boolean isAql311OrLater() { return atLeast(Standard.AQL311); }
+}
+
 arangodb_query
-    : data_query EOF
+    : data_query (SEMI data_query)* SEMI? EOF
     ;
 
 data_query
