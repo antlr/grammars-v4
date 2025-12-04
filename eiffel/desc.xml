@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
    <antlr-version>^4.10</antlr-version>
-   <targets>Java</targets>
+   <targets>CSharp;Java</targets>
    <inputs>examples/**/*.e</inputs>
+   <test>
+      <grammar-name>Eiffel</grammar-name>
+   </test>
+   <test>
+      <grammar-name>EiffelNoSkip</grammar-name>
+   </test>
 </desc>

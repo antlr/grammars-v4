@@ -191,6 +191,7 @@
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>
+                                <module>eiffel</module>
 				<module>elixir</module>
 				<module>erlang</module>
 				<module>esolang</module>
