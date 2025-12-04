@@ -25,6 +25,22 @@ command
     | setCommand
     | sortedSetCommand
     | hashCommand
+    | streamCommand
+    | pubSubCommand
+    | timeSeriesCommand
+    | graphCommand
+    | searchCommand
+    | hyperLogLogCommand
+    | bitmapCommand
+    | geoCommand
+    | transactionCommand
+    | scriptingCommand
+    | adminCommand
+    | clusterCommand
+    | clientCommand
+    | configCommand
+    | connectionCommand
+    | replicationCommand
     ;
 
 commonCommand
@@ -117,7 +133,7 @@ setCommand
     | spopCommand
     | srandmemberCommand
     | sremCommand
-    | sscanComman
+    | sscanCommand
     | sunionCommand
     | sunionstoreCommand
     ;
@@ -185,6 +201,406 @@ hashCommand
     | hscanCommand
     | hstrlenCommand
     | hvalsCommand
+    ;
+
+streamCommand
+    : xaddCommand
+    | xdelCommand
+    | xackCommand
+    | xgroupCommand
+    | xinfoCommand
+    | xreadCommand
+    | xrangeCommand
+    | xrevrangeCommand
+    | xpendingCommand
+    | xtrimCommand
+    | xclaimCommand
+    | xsetidCommand
+    ;
+
+xaddCommand
+    : XADD identifier identifier (identifier identifier)+
+    ;
+
+xdelCommand
+    : XDEL identifier identifier+
+    ;
+
+xackCommand
+    : XACK identifier identifier identifier+
+    ;
+
+xgroupCommand
+    : XGROUP CREATE identifier identifier ID identifier MKSTREAM?
+    | XGROUP SETID identifier ID identifier
+    | XGROUP DESTROY identifier identifier
+    | XGROUP DELCONSUMER identifier identifier
+    ;
+
+xinfoCommand
+    : XINFO identifier+
+    ;
+
+xreadCommand
+    : XREAD (BLOCK POSITIVE_DECIMAL_LITERAL)? (GROUP identifier identifier NOACK?)? STREAMS identifier+ identifier+
+    ;
+
+xrangeCommand
+    : XRANGE identifier identifier identifier (COUNT POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+xrevrangeCommand
+    : XREVRANGE identifier identifier identifier (COUNT POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+xpendingCommand
+    : XPENDING identifier identifier?
+    ;
+
+xtrimCommand
+    : XTRIM identifier identifier?
+    ;
+
+xclaimCommand
+    : XCLAIM identifier identifier POSITIVE_DECIMAL_LITERAL identifier+ JUSTID?
+    ;
+
+xsetidCommand
+    : XSETID identifier identifier
+    ;
+
+pubSubCommand
+    : subscribeCommand
+    | psubscribeCommand
+    | unsubscribeCommand
+    | punsubscribeCommand
+    | publishCommand
+    | spublishCommand
+    | ssubscribeCommand
+    | sunsubscribeCommand
+    | pubsubCommand
+    ;
+
+subscribeCommand
+    : SUBSCRIBE identifier+
+    ;
+
+psubscribeCommand
+    : PSUBSCRIBE identifier+
+    ;
+
+unsubscribeCommand
+    : UNSUBSCRIBE identifier*
+    ;
+
+punsubscribeCommand
+    : PUNSUBSCRIBE identifier*
+    ;
+
+publishCommand
+    : PUBLISH identifier identifier
+    ;
+
+spublishCommand
+    : SPUBLISH identifier identifier
+    ;
+
+ssubscribeCommand
+    : SSUBSCRIBE identifier+
+    ;
+
+sunsubscribeCommand
+    : SUNSUBSCRIBE identifier*
+    ;
+
+pubsubCommand
+    : PUBSUB identifier+
+    ;
+
+timeSeriesCommand
+    : tsAddCommand
+    | tsMaddCommand
+    | tsCreateCommand
+    | tsAlterCommand
+    | tsIncrbyCommand
+    | tsDecrbyCommand
+    | tsDelCommand
+    | tsInfoCommand
+    | tsMgetCommand
+    | tsRangeCommand
+    | tsRevrangeCommand
+    | tsMrangeCommand
+    | tsQueryIndexCommand
+    ;
+
+tsAddCommand
+    : TS_ADD identifier decimal (identifier identifier)*
+    ;
+
+tsMaddCommand
+    : TS_MADD (identifier decimal (identifier identifier)*)+
+    ;
+
+tsCreateCommand
+    : TS_CREATE identifier (RETENTION POSITIVE_DECIMAL_LITERAL)? (DUPLICATE_POLICY identifier)? (LABELS (identifier identifier)+)?
+    ;
+
+tsAlterCommand
+    : TS_ALTER identifier (RETENTION POSITIVE_DECIMAL_LITERAL | CHUNK_SIZE POSITIVE_DECIMAL_LITERAL | DUPLICATE_POLICY identifier | LABELS (identifier identifier)+)+
+    ;
+
+tsIncrbyCommand
+    : TS_INCRBY identifier decimal (TIMESTAMP POSITIVE_DECIMAL_LITERAL)? (LABELS (identifier identifier)+)?
+    ;
+
+tsDecrbyCommand
+    : TS_DECRBY identifier decimal (TIMESTAMP POSITIVE_DECIMAL_LITERAL)? (LABELS (identifier identifier)+)?
+    ;
+
+tsDelCommand
+    : TS_DEL identifier identifier identifier
+    ;
+
+tsInfoCommand
+    : TS_INFO identifier
+    ;
+
+tsMgetCommand
+    : TS_MGET (identifier identifier)*
+    ;
+
+tsRangeCommand
+    : TS_RANGE identifier FROM POSITIVE_DECIMAL_LITERAL TO POSITIVE_DECIMAL_LITERAL (FILTER (identifier identifier)+)? (COUNT POSITIVE_DECIMAL_LITERAL)? (ALIGN POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+tsRevrangeCommand
+    : TS_REVRANGE identifier FROM POSITIVE_DECIMAL_LITERAL TO POSITIVE_DECIMAL_LITERAL (FILTER (identifier identifier)+)? (COUNT POSITIVE_DECIMAL_LITERAL)? (ALIGN POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+tsMrangeCommand
+    : TS_MRANGE FROM POSITIVE_DECIMAL_LITERAL TO POSITIVE_DECIMAL_LITERAL FILTER (identifier identifier)+ (GROUPBY identifier REDUCE identifier)? (COUNT POSITIVE_DECIMAL_LITERAL)? (ALIGN POSITIVE_DECIMAL_LITERAL)? (WITHLABELS)?
+    ;
+
+tsQueryIndexCommand
+    : TS_QUERYINDEX identifier+
+    ;
+
+graphCommand
+    : graphQueryCommand
+    | graphExplainCommand
+    | graphProfileCommand
+    | graphDeleteCommand
+    | graphRoQueryCommand
+    ;
+
+graphQueryCommand
+    : GRAPH_QUERY identifier identifier
+    ;
+
+graphExplainCommand
+    : GRAPH_EXPLAIN identifier identifier
+    ;
+
+graphProfileCommand
+    : GRAPH_PROFILE identifier identifier
+    ;
+
+graphDeleteCommand
+    : GRAPH_DELETE identifier
+    ;
+
+graphRoQueryCommand
+    : GRAPH_RO_QUERY identifier identifier
+    ;
+
+searchCommand
+    : ftCreateCommand
+    | ftSearchCommand
+    | ftAlterCommand
+    | ftDropIndexCommand
+    ;
+
+hyperLogLogCommand
+    : pfaddCommand
+    | pfcountCommand
+    | pfmergeCommand
+    ;
+
+pfaddCommand
+    : PFADD identifier identifier+
+    ;
+
+pfcountCommand
+    : PFCOUNT identifier+
+    ;
+
+pfmergeCommand
+    : PFMERGE identifier identifier+
+    ;
+
+bitmapCommand
+    : bitcountCommand
+    | bitfieldCommand
+    | bitopCommand
+    | bitposCommand
+    | getbitCommand
+    | setbitCommand
+    ;
+
+bitcountCommand
+    : BITCOUNT identifier (identifier identifier)?
+    ;
+
+bitfieldCommand
+    : BITFIELD identifier identifier+
+    ;
+
+bitopCommand
+    : BITOP identifier identifier+
+    ;
+
+bitposCommand
+    : BITPOS identifier identifier (identifier identifier)?
+    ;
+
+getbitCommand
+    : GETBIT identifier POSITIVE_DECIMAL_LITERAL
+    ;
+
+setbitCommand
+    : SETBIT identifier POSITIVE_DECIMAL_LITERAL POSITIVE_DECIMAL_LITERAL
+    ;
+
+geoCommand
+    : geoaddCommand
+    | geodistCommand
+    | geohashCommand
+    | georadiusCommand
+    | georadiusByMemberCommand
+    | geosearchCommand
+    | geosearchstoreCommand
+    ;
+
+geoaddCommand
+    : GEOADD identifier (decimal decimal identifier)+
+    ;
+
+geodistCommand
+    : GEODIST identifier identifier identifier (identifier)?
+    ;
+
+geohashCommand
+    : GEOHASH identifier identifier+
+    ;
+
+georadiusCommand
+    : GEORADIUS identifier decimal decimal decimal identifier (WITHSCORE)? (COUNT POSITIVE_DECIMAL_LITERAL)? (ASC | DESC)?
+    ;
+
+georadiusByMemberCommand
+    : GEORADIUSBYMEMBER identifier identifier decimal identifier (WITHSCORE)? (COUNT POSITIVE_DECIMAL_LITERAL)? (ASC | DESC)?
+    ;
+
+geosearchCommand
+    : GEOSEARCH identifier BY identifier decimal identifier (ASC | DESC)? (COUNT POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+geosearchstoreCommand
+    : GEOSEARCHSTORE identifier identifier BY identifier decimal identifier (ASC | DESC)? (COUNT POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+transactionCommand
+    : MULTI
+    | EXEC
+    | DISCARD
+    | UNWATCH
+    | WATCH identifier+
+    ;
+
+scriptingCommand
+    : evalCommand
+    | evalShaCommand
+    | scriptCommand
+    | functionCommand
+    | fcallCommand
+    ;
+
+evalCommand
+    : EVAL identifier POSITIVE_DECIMAL_LITERAL identifier+
+    ;
+
+evalShaCommand
+    : EVALSHA identifier POSITIVE_DECIMAL_LITERAL identifier+
+    ;
+
+scriptCommand
+    : SCRIPT (LOAD identifier | EXISTS identifier+ | FLUSH | KILL)
+    ;
+
+functionCommand
+    : FUNCTION (LOAD identifier | LIST | DELETE identifier | FLUSH)
+    ;
+
+fcallCommand
+    : FCALL identifier POSITIVE_DECIMAL_LITERAL identifier*
+    | FCALL_RO identifier POSITIVE_DECIMAL_LITERAL identifier*
+    ;
+
+adminCommand
+    : INFO identifier*
+    | MONITOR
+    | SLOWLOG identifier*
+    | TIME
+    | ROLE
+    | MEMORY identifier*
+    | COMMAND identifier*
+    | MODULE identifier+
+    | PING identifier?
+    | AUTH identifier identifier?
+    | HELLO POSITIVE_DECIMAL_LITERAL (AUTH identifier identifier)? (SETNAME identifier)?
+    | QUIT
+    | SELECT POSITIVE_DECIMAL_LITERAL
+    | BGREWRITEAOF
+    | BGSAVE
+    | SAVE
+    | SHUTDOWN
+    ;
+
+clusterCommand
+    : CLUSTER identifier+
+    ;
+
+clientCommand
+    : CLIENT identifier+
+    ;
+
+configCommand
+    : CONFIG identifier+
+    ;
+
+connectionCommand
+    : PING identifier?
+    | AUTH identifier identifier?
+    ;
+
+replicationCommand
+    : REPLICAOF identifier identifier
+    ;
+
+ftCreateCommand
+    : FT_CREATE identifier (ON (HASH | JSON))? SCHEMA (identifier (TEXT | TAG | NUMERIC)? (AS identifier)? | VECTOR identifier (HNSW | FLAT) DIM POSITIVE_DECIMAL_LITERAL DISTANCE_METRIC (COSINE | L2 | IP) (identifier identifier)*)+
+    ;
+
+ftSearchCommand
+    : FT_SEARCH identifier identifier (INFIELDS POSITIVE_DECIMAL_LITERAL identifier+)? (KNN POSITIVE_DECIMAL_LITERAL identifier (AS identifier)?)? (SORTBY identifier (ASC | DESC)?)? (LIMIT POSITIVE_DECIMAL_LITERAL POSITIVE_DECIMAL_LITERAL)? (RETURN POSITIVE_DECIMAL_LITERAL identifier+)? (WITHSCORES)? (NOCONTENT)? (HIGHLIGHT (identifier identifier)*)? (SUMMARIZE (identifier identifier)*)? (DIALECT POSITIVE_DECIMAL_LITERAL)?
+    ;
+
+ftAlterCommand
+    : FT_ALTER identifier (identifier | VECTOR identifier (identifier identifier)*)+
+    ;
+
+ftDropIndexCommand
+    : FT_DROPINDEX identifier
     ;
 
 hdelCommand
@@ -518,7 +934,7 @@ sremCommand
     : SREM setKeyName identifier+
     ;
 
-sscanComman
+sscanCommand
     : SSCAN setKeyName decimal matchClause? countClause?
     ;
 
