@@ -30,6 +30,19 @@ options {
     superClass = MySQLLexerBase;
 }
 
+@members {
+    public enum Standard { V1, V2, V3 }
+    private Standard standard = Standard.V2;
+    public void setStandard(Standard s) { standard = s; }
+    private boolean atLeast(Standard s) { return standard.ordinal() >= s.ordinal(); }
+    public boolean isV1OrLater() { return atLeast(Standard.V1); }
+    public boolean isV2OrLater() { return atLeast(Standard.V2); }
+    public boolean isV3OrLater() { return atLeast(Standard.V3); }
+    public int protocolVersion = 80000;
+    public void setProtocolVersion(int v) { protocolVersion = v; }
+    public boolean isProtocolGe90500() { return protocolVersion >= 90500; }
+}
+
 tokens {
     NOT2_SYMBOL,
     CONCAT_PIPES_SYMBOL,
@@ -3715,4 +3728,31 @@ fragment DOLLAR_QUOTE_TAG_CHAR
 // Any letter but without e/E and digits (which are used to match a decimal number).
 fragment LETTER_WITHOUT_FLOAT_PART
     : [a-df-zA-DF-Z_$\u0080-\uffff]
+    ;
+VECTOR_SYMBOL
+    : V E C T O R                                                                         {this.isProtocolGe90500()}?
+    ;
+
+EMBEDDING_SYMBOL
+    : E M B E D D I N G                                                                   {this.isProtocolGe90500()}?
+    ;
+
+DOT_PRODUCT_SYMBOL
+    : D O T '_' P R O D U C T                                                             {this.isProtocolGe90500()}?
+    ;
+
+COSINE_DISTANCE_SYMBOL
+    : C O S I N E '_' D I S T A N C E                                                     {this.isProtocolGe90500()}?
+    ;
+
+EUCLIDEAN_DISTANCE_SYMBOL
+    : E U C L I D E A N '_' D I S T A N C E                                               {this.isProtocolGe90500()}?
+    ;
+
+TOPK_SYMBOL
+    : T O P K                                                                             {this.isProtocolGe90500()}?
+    ;
+
+HNSW_SYMBOL
+    : H N S W                                                                             {this.isProtocolGe90500()}?
     ;

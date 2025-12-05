@@ -48,6 +48,16 @@ tokens {
 import { MySQLBaseLexer, SqlMode } from "../MySQLBaseLexer.js";
 }
 
+@members {
+    enum Standard { V1, V2, V3 }
+    private standard: Standard = Standard.V2;
+    public setStandard(s: Standard) { this.standard = s; }
+    private atLeast(s: Standard): boolean { return this.standard >= s; }
+    public isV1OrLater(): boolean { return this.atLeast(Standard.V1); }
+    public isV2OrLater(): boolean { return this.atLeast(Standard.V2); }
+    public isV3OrLater(): boolean { return this.atLeast(Standard.V3); }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 // Operators
