@@ -116,8 +116,9 @@ create_index_stmt
     )* CLOSE_PAR (WHERE_ expr)?
 ;
 
+// Differs from syntax diagram because column_name is already a subset of expr
 indexed_column
-    : (column_name | expr) (COLLATE_ collation_name)? asc_desc?
+    : expr (COLLATE_ collation_name)? asc_desc?
 ;
 
 create_table_stmt
