@@ -23,7 +23,7 @@
  */
 
 // $antlr-format alignTrailingComments on, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments off, useTab off
-// $antlr-format allowShortRulesOnASingleLine on, alignSemicolons ownLine
+// $antlr-format allowShortRulesOnASingleLine on, alignSemicolons ownLine, alignColons trailing
 
 lexer grammar SQLiteLexer;
 

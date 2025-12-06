@@ -27,6 +27,7 @@
 
 // $antlr-format alignTrailingComments on, columnLimit 130, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments off
 // $antlr-format useTab off, allowShortRulesOnASingleLine off, allowShortBlocksOnASingleLine on, alignSemicolons ownLine
+// $antlr-format alignColons hanging
 
 parser grammar SQLiteParser;
 
