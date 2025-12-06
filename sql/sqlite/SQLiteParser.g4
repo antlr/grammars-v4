@@ -382,6 +382,7 @@ values_clause
     : VALUES_ value_row (COMMA value_row)*
 ;
 
+// Differs from syntax diagram because values_clause is already a subset of select_stmt
 insert_stmt
     : with_clause? (
         INSERT_
@@ -389,7 +390,7 @@ insert_stmt
         | INSERT_ OR_ (REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
     ) INTO_ (schema_name DOT)? table_name (AS_ table_alias)? (
         OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
-    )? (((values_clause | select_stmt) upsert_clause*) | DEFAULT_ VALUES_) returning_clause?
+    )? (select_stmt upsert_clause* | DEFAULT_ VALUES_) returning_clause?
 ;
 
 returning_clause
