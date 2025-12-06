@@ -579,7 +579,10 @@ filename
 ;
 
 module_argument
-    : (~(OPEN_PAR | CLOSE_PAR) | OPEN_PAR module_argument* CLOSE_PAR)+?
+    : (
+        ~(OPEN_PAR | CLOSE_PAR | UNEXPECTED_CHAR)
+        | OPEN_PAR module_argument CLOSE_PAR
+    )*?
 ;
 
 // Only some keywords are allowed as identifiers.
