@@ -236,17 +236,8 @@ drop_stmt
     )? any_name
 ;
 
+// expr has been split into multiple levels to ensure precedence
 /*
- SQLite understands the following binary operators, in order from highest to lowest precedence:
-    || -> ->>
-    * / %
-    + -
-    << >> & |
-    < <= > >=
-    = == != <> IS IS NOT IS DISTINCT FROM IS NOT DISTINCT FROM IN LIKE GLOB MATCH REGEXP
-    AND
-    OR
- */
 expr
     : literal_value
     | BIND_PARAMETER
@@ -276,6 +267,87 @@ expr
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
     | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
+    | raise_function
+;
+*/
+
+expr
+    : expr_recursive
+;
+
+expr_recursive
+    : function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR filter_clause? over_clause?
+    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
+    | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
+    | expr_or
+;
+
+expr_or
+    : expr_and (OR_ expr_and)*
+;
+
+expr_and
+    : expr_not (AND_ expr_not)*
+;
+
+expr_not
+    : NOT_* expr_binary
+;
+
+expr_binary
+    : expr_comparison (
+        (ASSIGN | EQ | NOT_EQ1 | NOT_EQ2) expr_comparison
+        | IS_ NOT_? (DISTINCT_ FROM_)? expr_comparison
+        | NOT_? BETWEEN_ expr_comparison AND_ expr_comparison
+        | NOT_? IN_ (
+            OPEN_PAR (select_stmt | expr_comparison (COMMA expr_comparison)*)? CLOSE_PAR
+            | (schema_name DOT)? table_name
+            | (schema_name DOT)? table_function_name OPEN_PAR (
+                expr_comparison (COMMA expr_comparison)*
+            )? CLOSE_PAR
+        )
+        | NOT_? (
+            (LIKE_ expr_comparison (ESCAPE_ expr_comparison)?)
+            | (GLOB_ | REGEXP_ | MATCH_) expr_comparison
+        )
+        | (ISNULL_ | NOTNULL_ | NOT_ NULL_)
+    )*
+;
+
+expr_comparison
+    : expr_bitwise ((LT | LT_EQ | GT | GT_EQ) expr_bitwise)*
+;
+
+expr_bitwise
+    : expr_addition ((LT2 | GT2 | AMP | PIPE) expr_addition)*
+;
+
+expr_addition
+    : expr_multipliction ((PLUS | MINUS) expr_multipliction)*
+;
+
+expr_multipliction
+    : expr_string ((STAR | DIV | MOD) expr_string)*
+;
+
+expr_string
+    : expr_collate ((PIPE2 | JPTR | JPTR2) expr_collate)*
+;
+
+expr_collate
+    : expr_unary (COLLATE_ collation_name)*
+;
+
+expr_unary
+    : (MINUS | PLUS | TILDE)* expr_base
+;
+
+expr_base
+    : literal_value
+    | BIND_PARAMETER
+    | ((schema_name DOT)? table_name DOT)? column_name
+    | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | raise_function
 ;
 
