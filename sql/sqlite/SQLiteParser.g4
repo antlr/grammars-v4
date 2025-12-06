@@ -453,12 +453,10 @@ select_core
 
 // Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 table_or_subquery
-    : (
-        (schema_name DOT)? table_name (AS_? table_alias)? (
-            INDEXED_ BY_ index_name
-            | NOT_ INDEXED_
-        )?
-    )
+    : (schema_name DOT)? table_name (AS_ table_alias | table_alias_excluding_joins)? (
+        INDEXED_ BY_ index_name
+        | NOT_ INDEXED_
+    )?
     | (schema_name DOT)? table_function_name OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
         AS_? table_alias
     )?
@@ -627,7 +625,7 @@ fallback_excluding_conflicts
     | CONFLICT_
     // | CONSTRAINT_
     // | CREATE_
-    | CROSS_
+    // | CROSS_
     | CURRENT_
     | CURRENT_DATE_
     | CURRENT_TIME_
@@ -659,7 +657,7 @@ fallback_excluding_conflicts
     | FOR_
     // | FOREIGN_
     // | FROM_
-    | FULL_
+    // | FULL_
     | GENERATED_
     | GLOB_
     // | GROUP_
@@ -670,9 +668,9 @@ fallback_excluding_conflicts
     | IMMEDIATE_
     // | IN_
     // | INDEX_
-    | INDEXED_
+    // | INDEXED_
     | INITIALLY_
-    | INNER_
+    // | INNER_
     // | INSERT_
     | INSTEAD_
     | INTERSECT_
@@ -682,12 +680,12 @@ fallback_excluding_conflicts
     // | JOIN_
     | KEY_
     | LAST_
-    | LEFT_
+    // | LEFT_
     | LIKE_
     // | LIMIT_
     | MATCH_
     | MATERIALIZED_
-    | NATURAL_
+    // | NATURAL_
     | NO_
     // | NOT_
     // | NOTHING_
@@ -700,7 +698,7 @@ fallback_excluding_conflicts
     // | OR_
     // | ORDER_
     | OTHERS_
-    | OUTER_
+    // | OUTER_
     // | OVER_
     | PARTITION_
     | PLAN_
@@ -719,7 +717,7 @@ fallback_excluding_conflicts
     | REPLACE_
     | RESTRICT_
     // | RETURNING_
-    | RIGHT_
+    // | RIGHT_
     | ROLLBACK_
     | ROW_
     | ROWID_ // ROWID is handled as a special-case indentifier
@@ -755,8 +753,20 @@ fallback_excluding_conflicts
     | WITHOUT_
 ;
 
+join_keyword
+    : CROSS_
+    | FULL_
+    | INDEXED_
+    | INNER_
+    | LEFT_
+    | NATURAL_
+    | OUTER_
+    | RIGHT_
+;
+
 fallback
     : fallback_excluding_conflicts
+    | join_keyword
     | RAISE_
 ;
 
@@ -826,6 +836,10 @@ savepoint_name
 
 table_alias
     : any_name
+;
+
+table_alias_excluding_joins
+    : any_name_excluding_joins
 ;
 
 window_name
@@ -900,6 +914,14 @@ window_func
 any_name_excluding_raise
     : IDENTIFIER
     | fallback_excluding_conflicts
+    | join_keyword
+    | STRING_LITERAL
+;
+
+any_name_excluding_joins
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | RAISE_
     | STRING_LITERAL
 ;
 
