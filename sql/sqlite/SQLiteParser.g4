@@ -514,158 +514,159 @@ module_argument
     : (~(OPEN_PAR | CLOSE_PAR) | OPEN_PAR module_argument* CLOSE_PAR)+?
 ;
 
-keyword
+// Only some keywords are allowed as identifiers.
+fallback
     : ABORT_
     | ACTION_
-    | ADD_
+    // | ADD_
     | AFTER_
-    | ALL_
-    | ALTER_
+    // | ALL_
+    // | ALTER_
     | ALWAYS_
     | ANALYZE_
-    | AND_
-    | AS_
+    // | AND_
+    // | AS_
     | ASC_
     | ATTACH_
-    | AUTOINCREMENT_
+    // | AUTOINCREMENT_
     | BEFORE_
     | BEGIN_
-    | BETWEEN_
+    // | BETWEEN_
     | BY_
     | CASCADE_
-    | CASE_
+    // | CASE_
     | CAST_
-    | CHECK_
-    | COLLATE_
+    // | CHECK_
+    // | COLLATE_
     | COLUMN_
-    | COMMIT_
+    // | COMMIT_
     | CONFLICT_
-    | CONSTRAINT_
-    | CREATE_
+    // | CONSTRAINT_
+    // | CREATE_
     | CROSS_
     | CURRENT_
     | CURRENT_DATE_
     | CURRENT_TIME_
     | CURRENT_TIMESTAMP_
     | DATABASE_
-    | DEFAULT_
-    | DEFERRABLE_
+    // | DEFAULT_
+    // | DEFERRABLE_
     | DEFERRED_
-    | DELETE_
+    // | DELETE_
     | DESC_
     | DETACH_
-    | DISTINCT_
+    // | DISTINCT_
     | DO_
-    | DROP_
+    // | DROP_
     | EACH_
-    | ELSE_
+    // | ELSE_
     | END_
-    | ESCAPE_
+    // | ESCAPE_
     | EXCEPT_
     | EXCLUDE_
     | EXCLUSIVE_
-    | EXISTS_
+    // | EXISTS_
     | EXPLAIN_
     | FAIL_
-    | FALSE_
-    | FILTER_
+    | FALSE_ // FALSE is handled as a special-case indentifier
+    // | FILTER_
     | FIRST_
     | FOLLOWING_
     | FOR_
-    | FOREIGN_
-    | FROM_
+    // | FOREIGN_
+    // | FROM_
     | FULL_
     | GENERATED_
     | GLOB_
-    | GROUP_
+    // | GROUP_
     | GROUPS_
-    | HAVING_
+    // | HAVING_
     | IF_
     | IGNORE_
     | IMMEDIATE_
-    | IN_
-    | INDEX_
+    // | IN_
+    // | INDEX_
     | INDEXED_
     | INITIALLY_
     | INNER_
-    | INSERT_
+    // | INSERT_
     | INSTEAD_
     | INTERSECT_
-    | INTO_
-    | IS_
-    | ISNULL_
-    | JOIN_
+    // | INTO_
+    // | IS_
+    // | ISNULL_
+    // | JOIN_
     | KEY_
     | LAST_
     | LEFT_
     | LIKE_
-    | LIMIT_
+    // | LIMIT_
     | MATCH_
     | MATERIALIZED_
     | NATURAL_
     | NO_
-    | NOT_
-    | NOTHING_
-    | NOTNULL_
-    | NULL_
+    // | NOT_
+    // | NOTHING_
+    // | NOTNULL_
+    // | NULL_
     | NULLS_
     | OF_
     | OFFSET_
-    | ON_
-    | OR_
-    | ORDER_
+    // | ON_
+    // | OR_
+    // | ORDER_
     | OTHERS_
     | OUTER_
-    | OVER_
+    // | OVER_
     | PARTITION_
     | PLAN_
     | PRAGMA_
     | PRECEDING_
-    | PRIMARY_
+    // | PRIMARY_
     | QUERY_
     | RAISE_
     | RANGE_
     | RANK_
     | RECURSIVE_
-    | REFERENCES_
+    // | REFERENCES_
     | REGEXP_
     | REINDEX_
     | RELEASE_
     | RENAME_
     | REPLACE_
     | RESTRICT_
-    | RETURNING_
+    // | RETURNING_
     | RIGHT_
     | ROLLBACK_
     | ROW_
-    | ROWID_
+    | ROWID_ // ROWID is handled as a special-case indentifier
     | ROWS_
     | SAVEPOINT_
-    | SELECT_
-    | SET_
-    | STORED_
-    | STRICT_
-    | TABLE_
+    // | SELECT_
+    // | SET_
+    | STORED_ // STORED is handled as a special-case indentifier
+    | STRICT_ // STRICT is handled as a special-case indentifier
+    // | TABLE_
     | TEMP_
     | TEMPORARY_
-    | THEN_
+    // | THEN_
     | TIES_
-    | TO_
-    | TRANSACTION_
+    // | TO_
+    // | TRANSACTION_
     | TRIGGER_
-    | TRUE_
+    | TRUE_ // TRUE is handled as a special-case indentifier
     | UNBOUNDED_
     | UNION_
-    | UNIQUE_
-    | UPDATE_
-    | USING_
+    // | UNIQUE_
+    // | UPDATE_
+    // | USING_
     | VACUUM_
-    | VALUES_
+    // | VALUES_
     | VIEW_
     | VIRTUAL_
-    | WHEN_
-    | WHERE_
-    | WINDOW_
+    // | WHEN_
+    // | WHERE_
+    // | WINDOW_
     | WITH_
     | WITHOUT_
 ;
@@ -805,6 +806,6 @@ window_func
 
 any_name
     : IDENTIFIER
-    | keyword
+    | fallback
     | STRING_LITERAL
 ;
