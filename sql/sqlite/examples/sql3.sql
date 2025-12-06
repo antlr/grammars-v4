@@ -13,3 +13,5 @@ SELECT row_number() OVER window_name FROM table_name WINDOW window_name AS ();
 
 -- Allow ORDER BY in aggregate functions
 SELECT group_concat(field_name_1, ',' ORDER BY field_name_2) FROM table_name;
+
+SELECT UNBOUNDED FROM table_name;

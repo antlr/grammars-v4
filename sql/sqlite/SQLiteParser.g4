@@ -564,20 +564,20 @@ frame_left
     : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
-    | UNBOUNDED_ PRECEDING_
+    // | UNBOUNDED_ PRECEDING_ // Special case of expr PRECEDING_
 ;
 
 frame_right
     : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
-    | UNBOUNDED_ FOLLOWING_
+    // | UNBOUNDED_ FOLLOWING_ // Special case of expr FOLLOWING_
 ;
 
 frame_single
     : expr PRECEDING_
-    | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
+    // | UNBOUNDED_ PRECEDING_ // Special case of expr PRECEDING_
 ;
 
 error_message
