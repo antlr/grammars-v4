@@ -847,8 +847,34 @@ table_function_name
     : any_name
 ;
 
+any_name_excluding_raise
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | join_keyword
+    | STRING_LITERAL
+;
+
+any_name_excluding_joins
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | RAISE_
+    | STRING_LITERAL
+;
+
+any_name_excluding_string
+    : IDENTIFIER
+    | fallback
+;
+
+any_name
+    : IDENTIFIER
+    | fallback
+    | STRING_LITERAL
+;
+
 // Orphans (Not ever parsed, merely provided by https://sqlite.org/syntaxdiagrams.html as partial descriptions of other rules)
 
+/*
 factored_select_stmt
     : select_stmt
 ;
@@ -899,28 +925,4 @@ aggregate_func
 window_func
     : any_name
 ;
-
-any_name_excluding_raise
-    : IDENTIFIER
-    | fallback_excluding_conflicts
-    | join_keyword
-    | STRING_LITERAL
-;
-
-any_name_excluding_joins
-    : IDENTIFIER
-    | fallback_excluding_conflicts
-    | RAISE_
-    | STRING_LITERAL
-;
-
-any_name_excluding_string
-    : IDENTIFIER
-    | fallback
-;
-
-any_name
-    : IDENTIFIER
-    | fallback
-    | STRING_LITERAL
-;
+*/
