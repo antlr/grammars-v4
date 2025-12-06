@@ -521,6 +521,7 @@ keyword
     | AFTER_
     | ALL_
     | ALTER_
+    | ALWAYS_
     | ANALYZE_
     | AND_
     | AS_
@@ -542,6 +543,7 @@ keyword
     | CONSTRAINT_
     | CREATE_
     | CROSS_
+    | CURRENT_
     | CURRENT_DATE_
     | CURRENT_TIME_
     | CURRENT_TIMESTAMP_
@@ -553,22 +555,30 @@ keyword
     | DESC_
     | DETACH_
     | DISTINCT_
+    | DO_
     | DROP_
     | EACH_
     | ELSE_
     | END_
     | ESCAPE_
     | EXCEPT_
+    | EXCLUDE_
     | EXCLUSIVE_
     | EXISTS_
     | EXPLAIN_
     | FAIL_
+    | FALSE_
+    | FILTER_
+    | FIRST_
+    | FOLLOWING_
     | FOR_
     | FOREIGN_
     | FROM_
     | FULL_
+    | GENERATED_
     | GLOB_
     | GROUP_
+    | GROUPS_
     | HAVING_
     | IF_
     | IGNORE_
@@ -586,6 +596,7 @@ keyword
     | ISNULL_
     | JOIN_
     | KEY_
+    | LAST_
     | LEFT_
     | LIKE_
     | LIMIT_
@@ -594,19 +605,27 @@ keyword
     | NATURAL_
     | NO_
     | NOT_
+    | NOTHING_
     | NOTNULL_
     | NULL_
+    | NULLS_
     | OF_
     | OFFSET_
     | ON_
     | OR_
     | ORDER_
+    | OTHERS_
     | OUTER_
+    | OVER_
+    | PARTITION_
     | PLAN_
     | PRAGMA_
+    | PRECEDING_
     | PRIMARY_
     | QUERY_
     | RAISE_
+    | RANGE_
+    | RANK_
     | RECURSIVE_
     | REFERENCES_
     | REGEXP_
@@ -619,19 +638,23 @@ keyword
     | RIGHT_
     | ROLLBACK_
     | ROW_
-    | ROWS_
     | ROWID_
+    | ROWS_
     | SAVEPOINT_
     | SELECT_
     | SET_
+    | STORED_
     | STRICT_
     | TABLE_
     | TEMP_
     | TEMPORARY_
     | THEN_
+    | TIES_
     | TO_
     | TRANSACTION_
     | TRIGGER_
+    | TRUE_
+    | UNBOUNDED_
     | UNION_
     | UNIQUE_
     | UPDATE_
@@ -642,32 +665,9 @@ keyword
     | VIRTUAL_
     | WHEN_
     | WHERE_
+    | WINDOW_
     | WITH_
     | WITHOUT_
-    | OVER_
-    | PARTITION_
-    | RANGE_
-    | PRECEDING_
-    | UNBOUNDED_
-    | CURRENT_
-    | FOLLOWING_
-    | RANK_
-    | GENERATED_
-    | ALWAYS_
-    | STORED_
-    | TRUE_
-    | FALSE_
-    | WINDOW_
-    | NULLS_
-    | FIRST_
-    | LAST_
-    | FILTER_
-    | GROUPS_
-    | EXCLUDE_
-    | TIES_
-    | OTHERS_
-    | DO_
-    | NOTHING_
 ;
 
 name
