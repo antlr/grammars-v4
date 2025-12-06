@@ -276,7 +276,8 @@ expr
 ;
 
 expr_recursive
-    : function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR filter_clause? over_clause?
+    : function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR percentile_clause? filter_clause?
+        over_clause?
     | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
     | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
@@ -366,6 +367,10 @@ literal_value
     | CURRENT_TIME_
     | CURRENT_DATE_
     | CURRENT_TIMESTAMP_
+;
+
+percentile_clause
+    : WITHIN_ GROUP_ OPEN_PAR ORDER_ BY_ expr CLOSE_PAR
 ;
 
 value_row
@@ -741,6 +746,7 @@ fallback_excluding_conflicts
     // | WHERE_
     // | WINDOW_
     | WITH_
+    | WITHIN_
     | WITHOUT_
 ;
 

@@ -211,6 +211,7 @@ WHEN_              : 'WHEN';
 WHERE_             : 'WHERE';
 WINDOW_            : 'WINDOW';
 WITH_              : 'WITH';
+WITHIN_            : 'WITHIN';
 WITHOUT_           : 'WITHOUT';
 
 IDENTIFIER:
