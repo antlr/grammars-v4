@@ -346,7 +346,8 @@ expr_unary
 expr_base
     : literal_value
     | BIND_PARAMETER
-    | ((schema_name DOT)? table_name DOT)? column_name
+    | (schema_name DOT)? table_name DOT column_name
+    | column_name_excluding_string
     | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | raise_function
 ;
@@ -772,6 +773,10 @@ column_name
     : any_name
 ;
 
+column_name_excluding_string
+    : any_name_excluding_string
+;
+
 column_alias
     : any_name
 ;
@@ -885,6 +890,11 @@ any_name_excluding_raise
     : IDENTIFIER
     | fallback_excluding_conflicts
     | STRING_LITERAL
+;
+
+any_name_excluding_string
+    : IDENTIFIER
+    | fallback
 ;
 
 any_name
