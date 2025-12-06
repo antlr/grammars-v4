@@ -220,10 +220,10 @@ IDENTIFIER:
     | [A-Z_\u007F-\uFFFF] [A-Z_0-9\u007F-\uFFFF]*
 ;
 
-NUMERIC_LITERAL: (
-        (DIGIT+ ('_' DIGIT+)* ('.' (DIGIT+ ('_' DIGIT+)*)?)?)
-        | ('.' DIGIT+ ('_' DIGIT+)*)
-    ) ('E' [-+]? DIGIT+ ('_' DIGIT+)*)?
+NUMERIC_LITERAL:
+    (DIGIT+ ('_' DIGIT+)* ('.' (DIGIT+ ('_' DIGIT+)*)?)? | '.' DIGIT+ ('_' DIGIT+)*) (
+        'E' [-+]? DIGIT+ ('_' DIGIT+)*
+    )?
     | '0x' HEX_DIGIT+ ('_' HEX_DIGIT+)*
 ;
 
@@ -233,7 +233,7 @@ STRING_LITERAL: '\'' ( ~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: 'X' STRING_LITERAL;
 
-SINGLE_LINE_COMMENT: '--' ~[\r\n]* (('\r'? '\n') | EOF) -> channel(HIDDEN);
+SINGLE_LINE_COMMENT: '--' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
 
 MULTILINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 

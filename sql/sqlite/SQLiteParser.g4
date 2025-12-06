@@ -143,7 +143,7 @@ type_name
 
 column_constraint
     : (CONSTRAINT_ name)? (
-        (PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?)
+        PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?
         | (NOT_? NULL_ | UNIQUE_) conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | DEFAULT_ (signed_number | literal_value | OPEN_PAR expr CLOSE_PAR)
@@ -272,7 +272,7 @@ expr
 ;
 
 expr_recursive
-    : function_name OPEN_PAR ((DISTINCT_? expr (COMMA expr)* order_clause?) | STAR)? CLOSE_PAR percentile_clause? filter_clause?
+    : function_name OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR percentile_clause? filter_clause?
         over_clause?
     | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
     | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
@@ -305,10 +305,12 @@ expr_binary
             )? CLOSE_PAR
         )
         | NOT_? (
-            (LIKE_ expr_comparison (ESCAPE_ expr_comparison)?)
+            LIKE_ expr_comparison (ESCAPE_ expr_comparison)?
             | (GLOB_ | REGEXP_ | MATCH_) expr_comparison
         )
-        | (ISNULL_ | NOTNULL_ | NOT_ NULL_)
+        | ISNULL_
+        | NOTNULL_
+        | NOT_ NULL_
     )*
 ;
 
@@ -345,7 +347,7 @@ expr_base
     | BIND_PARAMETER
     | (schema_name DOT)? table_name DOT column_name
     | column_name_excluding_string
-    | ((NOT_)? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
+    | (NOT_? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
     | raise_function
 ;
 
@@ -399,11 +401,9 @@ upsert_clause
         OPEN_PAR indexed_column (COMMA indexed_column)* CLOSE_PAR (WHERE_ expr)?
     )? DO_ (
         NOTHING_
-        | UPDATE_ SET_ (
-            (column_name | column_name_list) ASSIGN expr (
-                COMMA (column_name | column_name_list) ASSIGN expr
-            )* (WHERE_ expr)?
-        )
+        | UPDATE_ SET_ (column_name | column_name_list) ASSIGN expr (
+            COMMA (column_name | column_name_list) ASSIGN expr
+        )* (WHERE_ expr)?
     )
 ;
 
@@ -434,15 +434,13 @@ join_clause
 
 // Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 select_core
-    : (
-        SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
-            FROM_ join_clause
-        )? (WHERE_ where_expr = expr)? (
-            GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
-                HAVING_ having_expr = expr
-            )?
-        )? (WINDOW_ window_name AS_ window_defn (COMMA window_name AS_ window_defn)*)?
-    )
+    : SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
+        FROM_ join_clause
+    )? (WHERE_ where_expr = expr)? (
+        GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
+            HAVING_ having_expr = expr
+        )?
+    )? (WINDOW_ window_name AS_ window_defn (COMMA window_name AS_ window_defn)*)?
     | values_clause
 ;
 
