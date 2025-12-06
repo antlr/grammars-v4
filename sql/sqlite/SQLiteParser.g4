@@ -437,10 +437,11 @@ join_clause
     : table_or_subquery (join_operator table_or_subquery join_constraint?)*
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 select_core
     : (
         SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
-            FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
+            FROM_ join_clause
         )? (WHERE_ where_expr = expr)? (
             GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
                 HAVING_ having_expr = expr
@@ -450,6 +451,7 @@ select_core
     | values_clause
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 table_or_subquery
     : (
         (schema_name DOT)? table_name (AS_? table_alias)? (
@@ -460,7 +462,7 @@ table_or_subquery
     | (schema_name DOT)? table_function_name OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
         AS_? table_alias
     )?
-    | OPEN_PAR (table_or_subquery (COMMA table_or_subquery)* | join_clause) CLOSE_PAR
+    | OPEN_PAR join_clause CLOSE_PAR
     | OPEN_PAR select_stmt CLOSE_PAR (AS_? table_alias)?
 ;
 
@@ -486,12 +488,13 @@ compound_operator
     | EXCEPT_
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 update_stmt
     : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
         column_name
         | column_name_list
     ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
-        FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
+        FROM_ join_clause
     )? (WHERE_ expr)? returning_clause?
 ;
 
@@ -499,12 +502,13 @@ column_name_list
     : OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 update_stmt_limited
     : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
         column_name
         | column_name_list
     ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
-        FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
+        FROM_ join_clause
     )? (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
