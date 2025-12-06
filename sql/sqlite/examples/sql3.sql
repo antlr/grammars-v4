@@ -15,3 +15,6 @@ SELECT row_number() OVER window_name FROM table_name WINDOW window_name AS ();
 SELECT group_concat(field_name_1, ',' ORDER BY field_name_2) FROM table_name;
 
 SELECT UNBOUNDED FROM table_name;
+
+-- NATURAL and other join operator keywords can only work as aliases if preceeded by AS
+SELECT 1 FROM table_name AS NATURAL;
