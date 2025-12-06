@@ -587,7 +587,7 @@ module_argument
 ;
 
 // Only some keywords are allowed as identifiers.
-fallback
+fallback_excluding_conflicts
     : ABORT_
     | ACTION_
     // | ADD_
@@ -696,7 +696,7 @@ fallback
     | PRECEDING_
     // | PRIMARY_
     | QUERY_
-    | RAISE_
+    // | RAISE_
     | RANGE_
     | RANK_
     | RECURSIVE_
@@ -743,12 +743,17 @@ fallback
     | WITHOUT_
 ;
 
+fallback
+    : fallback_excluding_conflicts
+    | RAISE_
+;
+
 name
     : any_name
 ;
 
 function_name
-    : any_name
+    : any_name_excluding_raise
 ;
 
 schema_name
@@ -874,6 +879,12 @@ aggregate_func
 
 window_func
     : any_name
+;
+
+any_name_excluding_raise
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | STRING_LITERAL
 ;
 
 any_name
