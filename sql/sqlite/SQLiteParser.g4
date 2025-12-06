@@ -55,7 +55,6 @@ sql_stmt
         | create_view_stmt
         | create_virtual_table_stmt
         | delete_stmt
-        | delete_stmt_limited
         | detach_stmt
         | drop_stmt
         | insert_stmt
@@ -66,7 +65,6 @@ sql_stmt
         | savepoint_stmt
         | select_stmt
         | update_stmt
-        | update_stmt_limited
         | vacuum_stmt
     )
 ;
@@ -219,11 +217,8 @@ cte_table_name
     : table_name (OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR)?
 ;
 
+// Merged with delete_stmt_limited, which is an optional extension of delete_stmt
 delete_stmt
-    : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause?
-;
-
-delete_stmt_limited
     : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
@@ -487,27 +482,18 @@ compound_operator
 ;
 
 // Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
+// Merged with update_stmt_limited, which is an optional extension of update_stmt
 update_stmt
     : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
         column_name
         | column_name_list
     ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
         FROM_ join_clause
-    )? (WHERE_ expr)? returning_clause?
+    )? (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
 column_name_list
     : OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
-;
-
-// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
-update_stmt_limited
-    : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
-        column_name
-        | column_name_list
-    ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
-        FROM_ join_clause
-    )? (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
 qualified_table_name
