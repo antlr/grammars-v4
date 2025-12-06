@@ -704,7 +704,6 @@ fallback_excluding_conflicts
     | QUERY_
     // | RAISE_
     | RANGE_
-    | RANK_
     | RECURSIVE_
     // | REFERENCES_
     | REGEXP_

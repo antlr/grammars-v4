@@ -169,7 +169,6 @@ PRIMARY_           : 'PRIMARY';
 QUERY_             : 'QUERY';
 RAISE_             : 'RAISE';
 RANGE_             : 'RANGE';
-RANK_              : 'RANK';
 RECURSIVE_         : 'RECURSIVE';
 REFERENCES_        : 'REFERENCES';
 REGEXP_            : 'REGEXP';
