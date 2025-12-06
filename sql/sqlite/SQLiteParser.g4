@@ -321,10 +321,10 @@ expr_bitwise
 ;
 
 expr_addition
-    : expr_multipliction ((PLUS | MINUS) expr_multipliction)*
+    : expr_multiplication ((PLUS | MINUS) expr_multiplication)*
 ;
 
-expr_multipliction
+expr_multiplication
     : expr_string ((STAR | DIV | MOD) expr_string)*
 ;
 
