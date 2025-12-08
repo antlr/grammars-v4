@@ -1,1 +1,0 @@
-../../vhdl/examples/textio.vhd

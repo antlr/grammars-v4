@@ -27,6 +27,7 @@
 
 // $antlr-format alignTrailingComments on, columnLimit 130, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments off
 // $antlr-format useTab off, allowShortRulesOnASingleLine off, allowShortBlocksOnASingleLine on, alignSemicolons ownLine
+// $antlr-format alignColons hanging
 
 parser grammar SQLiteParser;
 
@@ -55,7 +56,6 @@ sql_stmt
         | create_view_stmt
         | create_virtual_table_stmt
         | delete_stmt
-        | delete_stmt_limited
         | detach_stmt
         | drop_stmt
         | insert_stmt
@@ -66,7 +66,6 @@ sql_stmt
         | savepoint_stmt
         | select_stmt
         | update_stmt
-        | update_stmt_limited
         | vacuum_stmt
     )
 ;
@@ -116,8 +115,9 @@ create_index_stmt
     )* CLOSE_PAR (WHERE_ expr)?
 ;
 
+// Differs from syntax diagram because column_name is already a subset of expr
 indexed_column
-    : (column_name | expr) (COLLATE_ collation_name)? asc_desc?
+    : expr (COLLATE_ collation_name)? asc_desc?
 ;
 
 create_table_stmt
@@ -132,7 +132,7 @@ table_options
 ;
 
 column_def
-    : column_name type_name?? column_constraint*
+    : column_name type_name? column_constraint*
 ;
 
 type_name
@@ -144,7 +144,7 @@ type_name
 
 column_constraint
     : (CONSTRAINT_ name)? (
-        (PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?)
+        PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?
         | (NOT_? NULL_ | UNIQUE_) conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | DEFAULT_ (signed_number | literal_value | OPEN_PAR expr CLOSE_PAR)
@@ -218,11 +218,8 @@ cte_table_name
     : table_name (OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR)?
 ;
 
+// Merged with delete_stmt_limited, which is an optional extension of delete_stmt
 delete_stmt
-    : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause?
-;
-
-delete_stmt_limited
     : with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
@@ -236,17 +233,8 @@ drop_stmt
     )? any_name
 ;
 
+// expr has been split into multiple levels to ensure precedence
 /*
- SQLite understands the following binary operators, in order from highest to lowest precedence:
-    || -> ->>
-    * / %
-    + -
-    << >> & |
-    < <= > >=
-    = == != <> IS IS NOT IS DISTINCT FROM IS NOT DISTINCT FROM IN LIKE GLOB MATCH REGEXP
-    AND
-    OR
- */
 expr
     : literal_value
     | BIND_PARAMETER
@@ -278,6 +266,91 @@ expr
     | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
     | raise_function
 ;
+*/
+
+expr
+    : expr_recursive
+;
+
+expr_recursive
+    : function_name OPEN_PAR (DISTINCT_? expr (COMMA expr)* order_clause? | STAR)? CLOSE_PAR percentile_clause? filter_clause?
+        over_clause?
+    | OPEN_PAR expr (COMMA expr)* CLOSE_PAR
+    | CAST_ OPEN_PAR expr AS_ type_name CLOSE_PAR
+    | CASE_ expr? (WHEN_ expr THEN_ expr)+ (ELSE_ expr)? END_
+    | expr_or
+;
+
+expr_or
+    : expr_and (OR_ expr_and)*
+;
+
+expr_and
+    : expr_not (AND_ expr_not)*
+;
+
+expr_not
+    : NOT_* expr_binary
+;
+
+expr_binary
+    : expr_comparison (
+        (ASSIGN | EQ | NOT_EQ1 | NOT_EQ2) expr_comparison
+        | IS_ NOT_? (DISTINCT_ FROM_)? expr_comparison
+        | NOT_? BETWEEN_ expr_comparison AND_ expr_comparison
+        | NOT_? IN_ (
+            OPEN_PAR (select_stmt | expr_comparison (COMMA expr_comparison)*)? CLOSE_PAR
+            | (schema_name DOT)? table_name
+            | (schema_name DOT)? table_function_name OPEN_PAR (
+                expr_comparison (COMMA expr_comparison)*
+            )? CLOSE_PAR
+        )
+        | NOT_? (
+            LIKE_ expr_comparison (ESCAPE_ expr_comparison)?
+            | (GLOB_ | REGEXP_ | MATCH_) expr_comparison
+        )
+        | ISNULL_
+        | NOTNULL_
+        | NOT_ NULL_
+    )*
+;
+
+expr_comparison
+    : expr_bitwise ((LT | LT_EQ | GT | GT_EQ) expr_bitwise)*
+;
+
+expr_bitwise
+    : expr_addition ((LT2 | GT2 | AMP | PIPE) expr_addition)*
+;
+
+expr_addition
+    : expr_multiplication ((PLUS | MINUS) expr_multiplication)*
+;
+
+expr_multiplication
+    : expr_string ((STAR | DIV | MOD) expr_string)*
+;
+
+expr_string
+    : expr_collate ((PIPE2 | JPTR | JPTR2) expr_collate)*
+;
+
+expr_collate
+    : expr_unary (COLLATE_ collation_name)*
+;
+
+expr_unary
+    : (MINUS | PLUS | TILDE)* expr_base
+;
+
+expr_base
+    : literal_value
+    | BIND_PARAMETER
+    | (schema_name DOT)? table_name DOT column_name
+    | column_name_excluding_string
+    | (NOT_? EXISTS_)? OPEN_PAR select_stmt CLOSE_PAR
+    | raise_function
+;
 
 raise_function
     : RAISE_ OPEN_PAR (IGNORE_ | (ROLLBACK_ | ABORT_ | FAIL_) COMMA error_message) CLOSE_PAR
@@ -295,6 +368,10 @@ literal_value
     | CURRENT_TIMESTAMP_
 ;
 
+percentile_clause
+    : WITHIN_ GROUP_ OPEN_PAR ORDER_ BY_ expr CLOSE_PAR
+;
+
 value_row
     : OPEN_PAR expr (COMMA expr)* CLOSE_PAR
 ;
@@ -303,6 +380,7 @@ values_clause
     : VALUES_ value_row (COMMA value_row)*
 ;
 
+// Differs from syntax diagram because values_clause is already a subset of select_stmt
 insert_stmt
     : with_clause? (
         INSERT_
@@ -310,7 +388,7 @@ insert_stmt
         | INSERT_ OR_ (REPLACE_ | ROLLBACK_ | ABORT_ | FAIL_ | IGNORE_)
     ) INTO_ (schema_name DOT)? table_name (AS_ table_alias)? (
         OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
-    )? (((values_clause | select_stmt) upsert_clause*) | DEFAULT_ VALUES_) returning_clause?
+    )? (select_stmt upsert_clause* | DEFAULT_ VALUES_) returning_clause?
 ;
 
 returning_clause
@@ -324,11 +402,9 @@ upsert_clause
         OPEN_PAR indexed_column (COMMA indexed_column)* CLOSE_PAR (WHERE_ expr)?
     )? DO_ (
         NOTHING_
-        | UPDATE_ SET_ (
-            (column_name | column_name_list) ASSIGN expr (
-                COMMA (column_name | column_name_list) ASSIGN expr
-            )* (WHERE_ expr)?
-        )
+        | UPDATE_ SET_ (column_name | column_name_list) ASSIGN expr (
+            COMMA (column_name | column_name_list) ASSIGN expr
+        )* (WHERE_ expr)?
     )
 ;
 
@@ -357,30 +433,28 @@ join_clause
     : table_or_subquery (join_operator table_or_subquery join_constraint?)*
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 select_core
-    : (
-        SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
-            FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-        )? (WHERE_ where_expr = expr)? (
-            GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
-                HAVING_ having_expr = expr
-            )?
-        )? (WINDOW_ window_name AS_ window_defn (COMMA window_name AS_ window_defn)*)?
-    )
+    : SELECT_ (DISTINCT_ | ALL_)? result_column (COMMA result_column)* (
+        FROM_ join_clause
+    )? (WHERE_ where_expr = expr)? (
+        GROUP_ BY_ group_by_expr += expr (COMMA group_by_expr += expr)* (
+            HAVING_ having_expr = expr
+        )?
+    )? (WINDOW_ window_name AS_ window_defn (COMMA window_name AS_ window_defn)*)?
     | values_clause
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
 table_or_subquery
-    : (
-        (schema_name DOT)? table_name (AS_? table_alias)? (
-            INDEXED_ BY_ index_name
-            | NOT_ INDEXED_
-        )?
-    )
+    : (schema_name DOT)? table_name (AS_ table_alias | table_alias_excluding_joins)? (
+        INDEXED_ BY_ index_name
+        | NOT_ INDEXED_
+    )?
     | (schema_name DOT)? table_function_name OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
         AS_? table_alias
     )?
-    | OPEN_PAR (table_or_subquery (COMMA table_or_subquery)* | join_clause) CLOSE_PAR
+    | OPEN_PAR join_clause CLOSE_PAR
     | OPEN_PAR select_stmt CLOSE_PAR (AS_? table_alias)?
 ;
 
@@ -406,26 +480,19 @@ compound_operator
     | EXCEPT_
 ;
 
+// Differs from syntax diagram because comma-separated table_or_subquery is already a subset of join_clause
+// Merged with update_stmt_limited, which is an optional extension of update_stmt
 update_stmt
     : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
         column_name
         | column_name_list
     ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
-        FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-    )? (WHERE_ expr)? returning_clause?
+        FROM_ join_clause
+    )? (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
 column_name_list
     : OPEN_PAR column_name (COMMA column_name)* CLOSE_PAR
-;
-
-update_stmt_limited
-    : with_clause? UPDATE_ (OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_))? qualified_table_name SET_ (
-        column_name
-        | column_name_list
-    ) ASSIGN expr (COMMA (column_name | column_name_list) ASSIGN expr)* (
-        FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
-    )? (WHERE_ expr)? returning_clause? order_clause? limit_clause?
 ;
 
 qualified_table_name
@@ -486,20 +553,20 @@ frame_left
     : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
-    | UNBOUNDED_ PRECEDING_
+    // | UNBOUNDED_ PRECEDING_ // Special case of expr PRECEDING_
 ;
 
 frame_right
     : expr PRECEDING_
     | expr FOLLOWING_
     | CURRENT_ ROW_
-    | UNBOUNDED_ FOLLOWING_
+    // | UNBOUNDED_ FOLLOWING_ // Special case of expr FOLLOWING_
 ;
 
 frame_single
     : expr PRECEDING_
-    | UNBOUNDED_ PRECEDING_
     | CURRENT_ ROW_
+    // | UNBOUNDED_ PRECEDING_ // Special case of expr PRECEDING_
 ;
 
 error_message
@@ -511,163 +578,191 @@ filename
 ;
 
 module_argument
-    : (~(OPEN_PAR | CLOSE_PAR) | OPEN_PAR module_argument* CLOSE_PAR)+?
+    : module_argument_outer*
 ;
 
-keyword
+module_argument_outer
+    : ~(OPEN_PAR | CLOSE_PAR | UNEXPECTED_CHAR | COMMA)
+    | OPEN_PAR module_argument_inner* CLOSE_PAR
+;
+
+module_argument_inner
+    : ~(OPEN_PAR | CLOSE_PAR | UNEXPECTED_CHAR)
+    | OPEN_PAR module_argument_inner* CLOSE_PAR
+;
+
+// Only some keywords are allowed as identifiers.
+fallback_excluding_conflicts
     : ABORT_
     | ACTION_
-    | ADD_
+    // | ADD_
     | AFTER_
-    | ALL_
-    | ALTER_
+    // | ALL_
+    // | ALTER_
+    | ALWAYS_
     | ANALYZE_
-    | AND_
-    | AS_
+    // | AND_
+    // | AS_
     | ASC_
     | ATTACH_
-    | AUTOINCREMENT_
+    // | AUTOINCREMENT_
     | BEFORE_
     | BEGIN_
-    | BETWEEN_
+    // | BETWEEN_
     | BY_
     | CASCADE_
-    | CASE_
+    // | CASE_
     | CAST_
-    | CHECK_
-    | COLLATE_
+    // | CHECK_
+    // | COLLATE_
     | COLUMN_
-    | COMMIT_
+    // | COMMIT_
     | CONFLICT_
-    | CONSTRAINT_
-    | CREATE_
-    | CROSS_
+    // | CONSTRAINT_
+    // | CREATE_
+    // | CROSS_
+    | CURRENT_
     | CURRENT_DATE_
     | CURRENT_TIME_
     | CURRENT_TIMESTAMP_
     | DATABASE_
-    | DEFAULT_
-    | DEFERRABLE_
+    // | DEFAULT_
+    // | DEFERRABLE_
     | DEFERRED_
-    | DELETE_
+    // | DELETE_
     | DESC_
     | DETACH_
-    | DISTINCT_
-    | DROP_
+    // | DISTINCT_
+    | DO_
+    // | DROP_
     | EACH_
-    | ELSE_
+    // | ELSE_
     | END_
-    | ESCAPE_
+    // | ESCAPE_
     | EXCEPT_
+    | EXCLUDE_
     | EXCLUSIVE_
-    | EXISTS_
+    // | EXISTS_
     | EXPLAIN_
     | FAIL_
+    | FALSE_ // FALSE is handled as a special-case indentifier
+    // | FILTER_
+    | FIRST_
+    | FOLLOWING_
     | FOR_
-    | FOREIGN_
-    | FROM_
-    | FULL_
+    // | FOREIGN_
+    // | FROM_
+    // | FULL_
+    | GENERATED_
     | GLOB_
-    | GROUP_
-    | HAVING_
+    // | GROUP_
+    | GROUPS_
+    // | HAVING_
     | IF_
     | IGNORE_
     | IMMEDIATE_
-    | IN_
-    | INDEX_
-    | INDEXED_
+    // | IN_
+    // | INDEX_
+    // | INDEXED_
     | INITIALLY_
-    | INNER_
-    | INSERT_
+    // | INNER_
+    // | INSERT_
     | INSTEAD_
     | INTERSECT_
-    | INTO_
-    | IS_
-    | ISNULL_
-    | JOIN_
+    // | INTO_
+    // | IS_
+    // | ISNULL_
+    // | JOIN_
     | KEY_
-    | LEFT_
+    | LAST_
+    // | LEFT_
     | LIKE_
-    | LIMIT_
+    // | LIMIT_
     | MATCH_
     | MATERIALIZED_
-    | NATURAL_
+    // | NATURAL_
     | NO_
-    | NOT_
-    | NOTNULL_
-    | NULL_
+    // | NOT_
+    // | NOTHING_
+    // | NOTNULL_
+    // | NULL_
+    | NULLS_
     | OF_
     | OFFSET_
-    | ON_
-    | OR_
-    | ORDER_
-    | OUTER_
+    // | ON_
+    // | OR_
+    // | ORDER_
+    | OTHERS_
+    // | OUTER_
+    // | OVER_
+    | PARTITION_
     | PLAN_
     | PRAGMA_
-    | PRIMARY_
+    | PRECEDING_
+    // | PRIMARY_
     | QUERY_
-    | RAISE_
+    // | RAISE_
+    | RANGE_
     | RECURSIVE_
-    | REFERENCES_
+    // | REFERENCES_
     | REGEXP_
     | REINDEX_
     | RELEASE_
     | RENAME_
     | REPLACE_
     | RESTRICT_
-    | RETURNING_
-    | RIGHT_
+    // | RETURNING_
+    // | RIGHT_
     | ROLLBACK_
     | ROW_
+    | ROWID_ // ROWID is handled as a special-case indentifier
     | ROWS_
-    | ROWID_
     | SAVEPOINT_
-    | SELECT_
-    | SET_
-    | STRICT_
-    | TABLE_
+    // | SELECT_
+    // | SET_
+    | STORED_ // STORED is handled as a special-case indentifier
+    | STRICT_ // STRICT is handled as a special-case indentifier
+    // | TABLE_
     | TEMP_
     | TEMPORARY_
-    | THEN_
-    | TO_
-    | TRANSACTION_
+    // | THEN_
+    | TIES_
+    // | TO_
+    // | TRANSACTION_
     | TRIGGER_
+    | TRUE_ // TRUE is handled as a special-case indentifier
+    | UNBOUNDED_
     | UNION_
-    | UNIQUE_
-    | UPDATE_
-    | USING_
+    // | UNIQUE_
+    // | UPDATE_
+    // | USING_
     | VACUUM_
-    | VALUES_
+    // | VALUES_
     | VIEW_
     | VIRTUAL_
-    | WHEN_
-    | WHERE_
+    // | WHEN_
+    // | WHERE_
+    // | WINDOW_
     | WITH_
+    | WITHIN_
     | WITHOUT_
-    | OVER_
-    | PARTITION_
-    | RANGE_
-    | PRECEDING_
-    | UNBOUNDED_
-    | CURRENT_
-    | FOLLOWING_
-    | RANK_
-    | GENERATED_
-    | ALWAYS_
-    | STORED_
-    | TRUE_
-    | FALSE_
-    | WINDOW_
-    | NULLS_
-    | FIRST_
-    | LAST_
-    | FILTER_
-    | GROUPS_
-    | EXCLUDE_
-    | TIES_
-    | OTHERS_
-    | DO_
-    | NOTHING_
+;
+
+join_keyword
+    : CROSS_
+    | FULL_
+    | INDEXED_
+    | INNER_
+    | LEFT_
+    | NATURAL_
+    | OUTER_
+    | RIGHT_
+;
+
+fallback
+    : fallback_excluding_conflicts
+    | join_keyword
+    | RAISE_
 ;
 
 name
@@ -675,7 +770,7 @@ name
 ;
 
 function_name
-    : any_name
+    : any_name_excluding_raise
 ;
 
 schema_name
@@ -692,6 +787,10 @@ table_or_index_name
 
 column_name
     : any_name
+;
+
+column_name_excluding_string
+    : any_name_excluding_string
 ;
 
 column_alias
@@ -734,6 +833,10 @@ table_alias
     : any_name
 ;
 
+table_alias_excluding_joins
+    : any_name_excluding_joins
+;
+
 window_name
     : any_name
 ;
@@ -750,8 +853,34 @@ table_function_name
     : any_name
 ;
 
+any_name_excluding_raise
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | join_keyword
+    | STRING_LITERAL
+;
+
+any_name_excluding_joins
+    : IDENTIFIER
+    | fallback_excluding_conflicts
+    | RAISE_
+    | STRING_LITERAL
+;
+
+any_name_excluding_string
+    : IDENTIFIER
+    | fallback
+;
+
+any_name
+    : IDENTIFIER
+    | fallback
+    | STRING_LITERAL
+;
+
 // Orphans (Not ever parsed, merely provided by https://sqlite.org/syntaxdiagrams.html as partial descriptions of other rules)
 
+/*
 factored_select_stmt
     : select_stmt
 ;
@@ -802,9 +931,4 @@ aggregate_func
 window_func
     : any_name
 ;
-
-any_name
-    : IDENTIFIER
-    | keyword
-    | STRING_LITERAL
-;
+*/

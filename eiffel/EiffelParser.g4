@@ -39,19 +39,11 @@
  *  https://sweet.ua.pt/mos/antlr4
  */
 
-grammar Eiffel;
+parser grammar EiffelParser;
 
-@lexer::members {
-   private static String[] invalidFreeOps = {
-      ":=.", ":=+", ":=-", "<<-", "<<+", "<<>", "<<>>"
-   };
-
-   private boolean isFreeOperator(String tk) {
-      boolean res = true;
-      for(int i = 0; res && i < invalidFreeOps.length; i++)
-         res = !invalidFreeOps[i].equals(tk);
-      return res;
-   }
+options {
+    tokenVocab = EiffelLexer;
+    superClass = EiffelParserBase;
 }
 
 class_declaration: notes? class_header formal_generics?
@@ -82,19 +74,12 @@ class_header: header_mark* CLASS class_name; // MOS: header_mark must accept pos
 
 class_name: Identifier;
 
-header_mark
-   locals[
-      boolean deferred_exists=false,
-      boolean expanded_exists=false,
-      boolean frozen_exists=false,
-      boolean external_exists=false,
-      boolean once_exists=false
-   ] :
-     {!$deferred_exists}? DEFERRED {$deferred_exists=true;} #HeaderMarkDeferred
-   | {!$expanded_exists}? EXPANDED {$expanded_exists=true;} #HeaderMarkExpanded
-   | {!$frozen_exists}?   FROZEN   {$frozen_exists=true;}   #HeaderMarkFrozen
-   | {!$external_exists}? EXTERNAL {$external_exists=true;} #HeaderMarkExternal
-   | {!$once_exists}?     once     {$once_exists=true;}     #HeaderMarkOnce
+header_mark:
+     DEFERRED
+   | EXPANDED
+   | FROZEN
+   | EXTERNAL
+   | once
    ;
 
 obsolete: OBSOLETE manifest_string;
@@ -137,26 +122,19 @@ inheritance: inherit_clause+;
 
 inherit_clause: INHERIT non_conformance? parent_list;
 
-non_conformance: {"none".equalsIgnoreCase(_input.LT(2).getText())}? '{' Identifier '}'; // MOS: NONE -> Identifier
+non_conformance: {this.IsNone()}? '{' Identifier '}'; // MOS: NONE -> Identifier
 
 parent_list: parent (';'* parent)* ';'*;
 
 parent: class_type feature_adaptation?;
 
-feature_adaptation // MOS: incorrect publicised grammar (different order in working examples)!
-   locals[
-      boolean undefine_exists=false,
-      boolean redefine_exists=false,
-      boolean rename_exists=false,
-      boolean new_exports_exists=false,
-      boolean select_exists=false
-   ] : // MOS: semantic predicates ensure, at parse time, only one occurrence of each alternative!
+feature_adaptation:
    (
-     {!$undefine_exists}?    undefine    {$undefine_exists=true;}
-   | {!$redefine_exists}?    redefine    {$redefine_exists=true;}
-   | {!$rename_exists}?      rename      {$rename_exists=true;}
-   | {!$new_exports_exists}? new_exports {$new_exports_exists=true;}
-   | {!$select_exists}?      select      {$select_exists=true;}
+     undefine
+   | redefine
+   | rename
+   | new_exports
+   | select
    )* END;
 
 rename: RENAME rename_list;
@@ -203,8 +181,7 @@ compound: ';'* (instruction (';'* instruction)*)? ';'*;
 
 instruction:
      creation_instruction
-   | prec_call=expression // MOS: call -> expression. Semantic verification to ensure a procedure call.
-                          //      (might_be_proc_call necessary but not sufficient).
+   | prec_call=expression
    | assignment
    | assigner_call
    | conditional
@@ -302,7 +279,7 @@ manifest_array_type: '{' type '}';
 expression_list: (expression (',' expression)*)?;
 
 //tuple_type: TUPLE tuple_parameter_list?; // MOS: tuple is used also as an Identifier!
-tuple_type: {"tuple".equalsIgnoreCase(_input.LT(1).getText())}? Identifier tuple_parameter_list; // MOS: semantic predicate to ensure Identifier equals TUPLE
+tuple_type: {this.IsTuple()}? Identifier tuple_parameter_list; // MOS: semantic predicate to ensure Identifier equals TUPLE
 
 tuple_parameter_list: '[' entity_declaration_list ']'; // MOS: tuple_parameters replaced by entity_declaration_list (type_list already in class_type)
 
@@ -352,14 +329,14 @@ type_interval: manifest_type '..' manifest_type;
 
 non_object_call_interval: non_object_call '..' non_object_call;
 
-loop locals[boolean variant_exists=false]: // MOS: Different from ECMA 367!
+loop: // MOS: Different from ECMA 367!
    iteration?
    initialization?
    invariant?
-   (variant {$variant_exists=true;})? // MOS: variant repeated here (as happens in some examples)
+   variant?
    exit_condition?
    loop_body
-   ({!$variant_exists}? variant)?
+   variant?
    END
    ;
 
@@ -407,7 +384,7 @@ creation_procedure: feature_name;
 
 creation_instruction: CREATE create_passive_region? explicit_creation_type? creation_call;
 
-create_passive_region: {"none".equalsIgnoreCase(_input.LT(2).getText())}? '<' Identifier '>'; // MOS: EiffelStudio 15.08 Releases
+create_passive_region: {this.IsNone()}? '<' Identifier '>'; // MOS: EiffelStudio 15.08 Releases
 
 explicit_creation_type: '{' type '}';
 
@@ -477,11 +454,8 @@ agent_actual: expression | placeholder;
 
 placeholder: manifest_type? '?';
 
-expression returns [boolean might_be_proc_call=false]: // MOS: expression (profoundly) rebuild to ensure an unambiguous free-context grammar
-            //      with proper operator precedence.
-            // Was: basic_expression | special_expression
-            // Precedence extracted from ETL3, pg. 768; Undocumented precedence inferred (revision required)
-     e1=expression '.' e2=expression {$might_be_proc_call=true;}            #ExprQualifiedCall
+expression:
+     e1=expression '.' e2=expression             #ExprQualifiedCall
    | op=(OLD|NOT|'+'|'-'|FreeOperator) expression                           #ExprUnary
    | e1=expression FreeOperator e2=expression                               #ExprFreeBinaryOperator
    | <assoc=right> e1=expression '^' e2=expression                          #ExprPower
@@ -497,8 +471,8 @@ expression returns [boolean might_be_proc_call=false]: // MOS: expression (profo
    | '(' expression ')'                                                     #ExprParenthesized
    | '(|' expression '|)'                                                   #ExprParenthesizedTarget
    | op=(FOR_ALL|FOR_SOME) Identifier ':' expression BAR expression         #ExprFirstOrderLogic
-   | Identifier {$might_be_proc_call=true;}                                 #ExprIdentifier // formal|constant_attribute |local|argumentless call
-   | unqualified_call {$might_be_proc_call=true;}                           #ExprUnqualifiedCall
+   | Identifier                                  #ExprIdentifier // formal|constant_attribute |local|argumentless call
+   | unqualified_call                            #ExprUnqualifiedCall
    | CURRENT                                                                #ExprCurrent
    | RESULT                                                                 #ExprResult
    | VOID                                                                   #ExprVoid
@@ -508,7 +482,7 @@ expression returns [boolean might_be_proc_call=false]: // MOS: expression (profo
    | precursor                                                              #ExprPrecursor
    | creation_expression                                                    #ExprCreation
    | conditional_expression                                                 #ExprConditional
-   | non_object_call {$might_be_proc_call=true;}                            #ExprNonObjectCall
+   | non_object_call                             #ExprNonObjectCall
    | special_expression                                                     #ExprSpecial
    ;
 
@@ -543,101 +517,3 @@ external: EXTERNAL external_language external_name?;
 external_language: manifest_string; // MOS: registered_language handled semantically (it is easy and avoids lexer ambiguities).
 
 external_name: ALIAS manifest_string;
-
-// Explicit TOKENS:
-
-ACROSS: [aA][cC][rR][oO][sS][sS];
-AGENT: [aA][gG][eE][nN][tT];
-ALIAS: [aA][lL][iI][aA][sS];
-ALL: [aA][lL][lL];
-AND: [aA][nN][dD] | '∧';
-AND_THEN: [aA][nN][dD][ \t\r\n]+[tT][hH][eE][nN];
-AS: [aA][sS];
-ASSIGN: [aA][sS][sS][iI][gG][nN];
-ATTACHED: [aA][tT][tT][aA][cC][hH][eE][dD];
-ATTRIBUTE: [aA][tT][tT][rR][iI][bB][uU][tT][eE];
-CHECK: [cC][hH][eE][cC][kK];
-CLASS: [cC][lL][aA][sS][sS];
-CONVERT: [cC][oO][nN][vV][eE][rR][tT];
-CREATE: [cC][rR][eE][aA][tT][eE];
-CURRENT: [cC][uU][rR][rR][eE][nN][tT];
-DEBUG: [dD][eE][bB][uU][gG];
-DEFERRED: [dD][eE][fF][eE][rR][rR][eE][dD];
-DETACHABLE: [dD][eE][tT][aA][cC][hH][aA][bB][lL][eE];
-DO: [dD][oO];
-ELSE: [eE][lL][sS][eE];
-ELSEIF: [eE][lL][sS][eE][iI][fF];
-END: [eE][nN][dD];
-ENSURE: [eE][nN][sS][uU][rR][eE];
-EXPANDED: [eE][xX][pP][aA][nN][dD][eE][dD];
-EXPORT: [eE][xX][pP][oO][rR][tT];
-EXTERNAL: [eE][xX][tT][eE][rR][nN][aA][lL];
-FALSE: [fF][aA][lL][sS][eE];
-FEATURE: [fF][eE][aA][tT][uU][rR][eE];
-FROM: [fF][rR][oO][mM];
-FROZEN: [fF][rR][oO][zZ][eE][nN];
-IF: [iI][fF];
-IMPLIES: [iI][mM][pP][lL][iI][eE][sS] | '⇒';
-INHERIT: [iI][nN][hH][eE][rR][iI][tT];
-INSPECT: [iI][nN][sS][pP][eE][cC][tT];
-INVARIANT: [iI][nN][vV][aA][rR][iI][aA][nN][tT];
-LIKE: [lL][iI][kK][eE];
-LOCAL: [lL][oO][cC][aA][lL];
-LOOP: [lL][oO][oO][pP];
-NOT: [nN][oO][tT] | '¬';
-NOTE: [nN][oO][tT][eE];
-OBSOLETE: [oO][bB][sS][oO][lL][eE][tT][eE];
-OLD: [oO][lL][dD];
-ONCE: [oO][nN][cC][eE];
-ONLY: [oO][nN][lL][yY];
-OR: [oO][rR] | '∨';
-OR_ELSE: [oO][rR][ \t\r\n]+[eE][lL][sS][eE];
-PRECURSOR: [pP][rR][eE][cC][uU][rR][sS][oO][rR];
-REDEFINE: [rR][eE][dD][eE][fF][iI][nN][eE];
-REFERENCE: [rR][eE][fF][eE][rR][eE][nN][cC][eE];
-RENAME: [rR][eE][nN][aA][mM][eE];
-REQUIRE: [rR][eE][qQ][uU][iI][rR][eE];
-RESCUE: [rR][eE][sS][cC][uU][eE];
-RESULT: [rR][eE][sS][uU][lL][tT];
-RETRY: [rR][eE][tT][rR][yY];
-SELECT: [sS][eE][lL][eE][cC][tT];
-SEPARATE: [sS][eE][pP][aA][rR][aA][tT][eE];
-SOME: [sS][oO][mM][eE]; // MOS: added!
-THEN: [tT][hH][eE][nN];
-TRUE: [tT][rR][uU][eE];
-//TUPLE: [tT][uU][pP][lL][eE];
-UNDEFINE: [uU][nN][dD][eE][fF][iI][nN][eE];
-UNIQUE: [uU][nN][iI][qQ][uU][eE];
-UNTIL: [uU][nN][tT][iI][lL];
-VARIANT: [vV][aA][rR][iI][aA][nN][tT];
-VOID: [vV][oO][iI][dD];
-WHEN: [wW][hH][eE][nN];
-XOR: [xX][oO][rR] | '⊻';
-FOR_ALL: [∀]; // 0xE2 0x88 0x80
-FOR_SOME: [∃]; // 0xE2 0x88 0x83
-BAR: [¦];
-OPEN_REPEAT: [⟳];
-CLOSE_REPEAT: [⟲];
-
-Identifier: Letter (Letter | [0-9_])*;
-fragment Letter: [a-zA-Z\u00C0-\u00FF];
-Verbatim_string: // MOS: based on example code usage (difficult to make it work correctly)
-     '"[' [ \t]* '\n' (.*? '\n')? [ \t]* ']"'
-   | '"{' [ \t]* '\n' (.*? '\n')? [ \t]* '}"'
-   ;
-Basic_manifest_string: '"' ('%"' | '%%' | StringLineBreak | ~[\n] )*? '"';
-fragment StringLineBreak: '%' [ \t]* '\n' [ \t]* '%';
-Character_constant: ['] (~[%'] | [%]. | [%][/]Integer[/] ) ['];
-Integer: Integer_base? Digit+;
-Integer_interval: Integer [ \t]* '..' [ \t]* Integer;
-fragment Integer_base: '0'[bcxBCX];
-fragment Digit: [0-9a-fA-F_];
-Real: [0-9]* [.] [0-9]+ ([eE][+-]?[0-9]+)? | [0-9]+ [.] [0-9]* ([eE][+-]?[0-9]+)?;
-FreeOperator: [!#$%&*+\-\\/:.<=>?@^|~\u0085-\u0089\u008B\u0095-\u0099\u009B\u00A1-\u00AC\u00B0-\u00B6\u00B9-\u00BF\u00D7\u00F7\u2200-\u22FF\u2A00-\u2AFF\u27C0-\u27EF\u2980-\u29FF\u2300-\u23FF\u25A0-\u25FF\u2190-\u21FF\u27F0-\u27FF\u2900-\u297F\u2B00-\u2BFF]+
-   {isFreeOperator(getText())}?; // MOS: "a:=.33", <<-1>>, <<+1>>, :=+, ... recognized as FreeOperator!
-
-WhiteSpace: [ \t\n\r\uFEFF]+ -> skip; // MOS: gobo eiffel files with <feff> (BOM) character! treated as whitespace
-Comment: '--' .*? '\n' -> skip;
-
-Error: .; // MOS: ensure no lexical errors
-
