@@ -1,1 +1,0 @@
-../../vhdl/examples/numeric_bit-body.vhd

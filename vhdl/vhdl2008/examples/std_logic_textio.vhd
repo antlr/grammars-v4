@@ -1,1 +1,0 @@
-../../vhdl/examples/std_logic_textio.vhd
