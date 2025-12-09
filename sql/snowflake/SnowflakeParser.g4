@@ -3909,6 +3909,7 @@ non_reserved_words
     | ERROR_INTEGRATION
     | EVENT
     | EXCHANGE
+    | EXCLUDE
     | EXPIRY_DATE
     | EXPR
     | EXTENSION
@@ -3925,6 +3926,7 @@ non_reserved_words
     | IDENTITY
     | INCREMENTAL
     | IMPORTED
+    | INCLUDE
     | INDEX
     | INITIALIZE
     | INPUT
@@ -3943,6 +3945,7 @@ non_reserved_words
     | NAME
     | NETWORK
     | NULLIF
+    | NULLS
     | NVL
     | OFFSET
     | OLD
@@ -4110,6 +4113,10 @@ column_name
 
 column_list
     : column_name (COMMA column_name)*
+    ;
+
+aliased_column_list
+    : column_name as_alias? (',' column_name as_alias?)*
     ;
 
 column_list_with_comment
@@ -4661,7 +4668,12 @@ match_recognize
 pivot_unpivot
     : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
         as_alias column_alias_list_in_brackets?  )?
-    | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
+    | UNPIVOT (include_exclude NULLS)? LR_BRACKET id_ FOR column_name IN LR_BRACKET aliased_column_list RR_BRACKET RR_BRACKET
+    ;
+
+include_exclude
+    : INCLUDE
+    | EXCLUDE
     ;
 
 pivot_in_clause
