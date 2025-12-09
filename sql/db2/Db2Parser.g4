@@ -26,11 +26,11 @@ parser grammar Db2Parser;
 options { tokenVocab=Db2Lexer; }
 
 db2_file
-    : batch* EOF
+    : batch? EOF
     ;
 
 batch
-    : sql_statement SEMI?
+    : sql_statement (SEMI sql_statement)* SEMI?
     ;
 
 sql_statement
@@ -65,7 +65,7 @@ sql_schema_statement
     | alter_procedure_external_statement
     | alter_procedure_sourced_statement
     | alter_procedure_sql_statement
-    | alter_schema_statement_statement
+    | alter_schema_statement
     | alter_security_label_component_statement
     | alter_security_policy_statement
     | alter_sequence_statement
@@ -840,33 +840,32 @@ allocate_cursor_statement
 
 alter_audit_policy_statement
     : ALTER AUDIT POLICY policy_name
-        ( CATEGORIES ( ALL
-                     | AUDIT
-                     | CHECKING
-                     | CONTEXT
-                     | EXECUTE (WITH DATA)?
-                     | OBJMAINT
-                     | SECMAINT
-                     | SYSADMIN
-                     | VALIDATE
-                     )
-                     STATUS ( BOTH
-                            | FAILURE
-                            | NONE
-                            | SUCCESS
-                            )
-
+        ( CATEGORIES audit_policy_categories_opts (',' audit_policy_categories_opts)*
+        | ERROR TYPE normal_audit
         )
-        | ERROR TYPE (NORMAL | AUDIT)
+    ;
+
+status_spec
+    : STATUS (BOTH | FAILURE | NONE | SUCCESS)
+    ;
+
+normal_audit
+    : NORMAL
+    | AUDIT
     ;
 
 alter_bufferpool_statement
     : ALTER BUFFERPOOL bufferpool_name
-       ( (IMMEDIATE | DEFERRED)? (MEMBER member_number)? SIZE (number_of_pages | number_of_pages? AUTOMATIC)
+       ( immediate_deferred? (MEMBER member_number)? SIZE (number_of_pages | number_of_pages? AUTOMATIC)
        | ADD DATABASE PARTITION GROUP db_partition_group_name
        | NUMBLOCKPAGES number_of_pages (BLOCKSIZE number_of_pages)?
        | BLOCKSIZE number_of_pages
        )
+    ;
+
+immediate_deferred
+    : IMMEDIATE
+    | DEFERRED
     ;
 
 alter_database_partition_group_statement
@@ -875,7 +874,7 @@ alter_database_partition_group_statement
 
 db_partition_group_list_item
     : ADD db_partition_num_nums db_partitions_clause db_partition_options?
-    | DROP db_partitions_clause
+    | DROP db_partition_num_nums db_partitions_clause
     ;
 
 db_partition_num_nums
@@ -898,7 +897,7 @@ alter_database_statement
     ;
 
 alter_database_opts
-    : (ADD | DROP) STORAGE ON string_list
+    : (ADD | DROP) STORAGE ON sp=string_list
     ;
 
 alter_event_monitor_statement
@@ -963,7 +962,7 @@ method_designator
     ;
 
 alter_model_statement
-    : CREATE MODEL
+    : ALTER MODEL (model_name | ON table_name) (enable_disable | REVERT)
     ;
 
 alter_module_statement
@@ -983,11 +982,13 @@ alter_module_opts
     ;
 
 module_function_definition
-    : todo
+    : FUNCTION function_name data_type_list_paren?
+    | SPECIFIC FUNCTION function_name
     ;
 
 module_procedure_definition
-    : todo
+    : PROCEDURE procedure_name data_type_list_paren?
+    | SPECIFIC PROCEDURE procedure_name
     ;
 
 module_type_definition
@@ -1098,8 +1099,13 @@ alter_procedure_sql_statement
     : ALTER procedure_designator (NO? EXTERNAL ACTION | NEW SAVEPOINT LEVEL)+
     ;
 
-alter_schema_statement_statement
-    : ALTER SCHEMA schema_name DATA CAPTURE (NONE | CHANGES) (ENABLE ROW MODIFICATION TRACKING)?
+alter_schema_statement
+    : ALTER SCHEMA schema_name DATA CAPTURE none_changes (enable_disable ROW MODIFICATION TRACKING)?
+    ;
+
+none_changes
+    : NONE
+    | CHANGES
     ;
 
 alter_security_label_component_statement
@@ -1725,7 +1731,9 @@ string_constant
     ;
 
 numeric_constant
-    : todo
+    : DECIMAL_LITERAL
+    | FLOAT_LITERAL
+    | REAL_LITERAL
     ;
 
 data_type
@@ -1774,26 +1782,11 @@ data_type_2
     ;
 
 built_in_type
-    : ( SMALLINT
-      | INT
-      | INTEGER
-      | BIGINT
-      )
-    | ( DEC
-      | DECIMAL
-      | NUMERIC
-      | NUM
-      ) '(' integer_value (',' integer_value)? ')'
-    | ( FLOAT ('(' integer_value ')')?
-      | REAL
-      | DOUBLE PRECISION?
-      )
-    | ( char_character VARYING?
-      | VARCHAR
-      ) ('(' integer_value octets_codeunits? ')')? (FOR BIT DATA)?
-    | ( CLOB
-      | char_character LARGE OBJECT
-      ) ('(' integer_value kmg? octets_codeunits? ')')?
+    : (SMALLINT | INT | INTEGER | BIGINT)
+    | (DEC | DECIMAL | NUMERIC | NUM) ('(' integer_value (',' integer_value)? ')')?
+    | (FLOAT ('(' integer_value ')')? | REAL | DOUBLE PRECISION?)
+    | (char_character VARYING? | VARCHAR) ('(' integer_value octets_codeunits? ')')? (FOR BIT DATA)?
+    | (CLOB | char_character LARGE OBJECT) ('(' integer_value kmg? octets_codeunits? ')')?
     | (GRAPHIC | VARGRAPHIC) ('(' integer_value codeunits? ')')?
     | DBCLOB ('(' integer_value kmg? codeunits? ')')?
     | (NCHAR | NATIONAL char_character) integer_paren?
@@ -1854,7 +1847,7 @@ integer_value
     ;
 
 positive_integer
-    : todo
+    : DECIMAL_LITERAL
     ;
 
 bigint_value
@@ -2445,11 +2438,71 @@ field_reference
     ;
 
 search_condition
-    : todo
+    : NOT? predicate (SELECTIVITY numeric_constant)?
+    | search_condition AND search_condition
+    | search_condition OR search_condition
+    ;
+
+predicate
+    : expression comparison_operator expression
+    | row_value_expression comparison_operator row_value_expression
+    | expression comparison_operator some_any_all fullselect_in_parentheses
+    | row_value_expression '=' some_any_all fullselect_in_parentheses
+    | expression IS NOT? (TRUE | FALSE)
+    | ARRAY_EXISTS '(' expression ',' array_index ')'
+    | expression NOT? BETWEEN expression AND expression
+    | cursor_variable_name IN NOT? (FOUND | OPEN)
+    | e1=expression IN NOT? DISTINCT FROM e1=expression
+    | EXISTS fullselect_in_parentheses
+    | e=expression NOT? IN (fullselect_in_parentheses | expression_list_in_parentheses | expression)
+    | row_value_expression NOT? IN fullselect_in_parentheses
+    | JSON_EXISTS '(' je=string (FORMAT (JSON | BSON))? jp=string (AS string)? (FALSE ON ERROR | (TRUE | UNKNOWN | ERROR) ON ERROR) ')'
+    | me=expression NOT? LIKE pe=expression (ESCAPE ee=expression)?
+    | expression IS NOT? NULL_
+    | '(' s1=expression ',' e1=expression ')' OVERLAPS '(' s2=expression ',' e2=expression ')'
+    | REGEXP_LIKE '(' string ',' pe=expression (',' s=expression)? (',' f=expression)? (',' CODEUNITS32 | CODEUNITS16 | OCTETS)?
+    | expression (IN NOT? OF | IS? NOT? OF DYNAMIC TYPE) '(' ONLY? type_name (',' ONLY? type_name)*  ')'
+    | xe=expression IS NOT? VALIDATED according_to_clause?
+    ;
+
+according_to_clause
+    : ACCORDING TO XMLSCHEMA (xml_schema_identification | IN '(' xml_schema_identification_list ')')
+    ;
+
+xml_schema_identification_list
+    : xml_schema_identification (',' xml_schema_identification)*
+    ;
+
+xml_schema_identification
+    : ID xml_schema_name
+    | (URI u=string | NO NAMESPACE) (LOCATION u2=string)?
+    ;
+
+fullselect_in_parentheses
+    : '(' fullselect ')'
+    ;
+
+some_any_all
+    : SOME
+    | ANY
+    | ALL
+    ;
+
+row_value_expression
+    : expression_list_in_parentheses
+    ;
+
+comparison_operator
+    : '='
+    | '<>'
+    | '<'
+    | '>'
+    | '<='
+    | '>='
     ;
 
 row_expression
-    : todo
+    : expression
     ;
 
 path_opt_list
@@ -2497,11 +2550,11 @@ maintain_opt
     ;
 
 variable
-    : todo
+    : id_
     ;
 
 host_variable
-    : todo // :hv1
+    : ':' id_
     ;
 
 set_integrity_statement
@@ -2682,7 +2735,7 @@ sql_routine_statement
     ;
 
 common_table_expression
-    : todo
+    : table_name column_name_list_paren? AS '(' (WITH common_table_expression)? ')'
     ;
 
 create_alias_statement
@@ -2711,7 +2764,7 @@ create_audit_policy_statement
 
 audit_policy_opts
     : CATEGORIES audit_policy_categories_opts (',' audit_policy_categories_opts)*
-    | ERROR TYPE (NORMAL | AUDIT)
+    | ERROR TYPE normal_audit
     ;
 
 audit_policy_categories_opts
@@ -2724,7 +2777,7 @@ audit_policy_categories_opts
       | SECMAINT
       | SYSADMIN
       | VALIDATE
-      ) STATUS (BOTH | FAILURE | NONE | SUCCESS)
+      ) status_spec
     ;
 
 create_bufferpool_statement
@@ -2761,7 +2814,7 @@ create_database_partition_group_statement
     ;
 
 create_event_monitor_statement
-    : todo
+    : CREATE EVENT MONITOR event_monitor_name FOR todo
     ;
 
 create_event_monitor_activities_statement
@@ -2923,7 +2976,11 @@ ext_table_option_value
     ;
 
 create_function_statement
-    : todo
+    : create_function_external_scalar_statement
+    | create_function_external_table_statement
+    | create_function_old_db_external_function_statement
+    | create_function_sourced_or_template_statement
+    | create_function_sql_scalar_table_or_row_statement
     ;
 
 create_function_aggregate_interface_statement
@@ -2944,7 +3001,7 @@ agg_fn_option_list
     ;
 
 state_variable_declaration
-    : todo
+    : variable_name data_type
     ;
 
 create_function_external_scalar_statement
@@ -2996,10 +3053,6 @@ predicate_specification
 
 data_filter
     : FILTER USING (function_invocation | case_expression)
-    ;
-
-function_invocation
-    : todo
     ;
 
 index_exploitation
@@ -3156,9 +3209,9 @@ function_option_name
 
 create_global_temporary_table_statement
     : CREATE GLOBAL TEMPORARY TABLE table_name
-          ( '(' column_definition (',' todo)* ')'
+          ( '(' column_definition (',' column_definition)* ')'
           | LIKE table_or_view_name copy_options?
-          | AS '(' fullselect ')' WITH NO DATA copy_options? todo
+          | AS '(' fullselect ')' WITH NO DATA copy_options?
           )
           create_global_temporary_table_opts?
     ;
@@ -3231,7 +3284,7 @@ create_mask_statement
     ;
 
 case_expression
-    : todo
+    : CASE
     ;
 
 range_producing_funciton_invocation
@@ -3290,7 +3343,7 @@ todo
 sql_statement_inlined
     : call_statement
     | for_statement
-    | (WITH cte (',' cte)*)? fullselect
+    | (WITH common_table_expression_list)? fullselect
     | get_diagnostics_statement
     | if_statement
     | insert_statement
@@ -3338,7 +3391,7 @@ nick_name_option_name
     ;
 
 remote_object_name
-    : todo
+    : id_
     ;
 
 non_relational_data_definition
@@ -3383,7 +3436,9 @@ create_permission_statement
     ;
 
 create_procedure_statement
-    : todo
+    : create_procedure_external_statement
+    | create_procedure_sourced_statement
+    | create_procedure_sql_statement
     ;
 
 create_procedure_external_statement
@@ -3507,7 +3562,7 @@ create_role_statement
 
 create_schema_statement
     : CREATE SCHEMA (schema_name | AUTHORIZATION authorization_name | schema_name AUTHORIZATION authorization_name)
-            (DATA CAPTURE (NONE | CHANGES))?
+            (DATA CAPTURE none_changes)?
             schema_sql_statement*
     ;
 
@@ -3645,7 +3700,7 @@ create_table_statement
     ;
 
 create_table_opts
-    : DATA CAPTURE (NONE | CHANGES)
+    : DATA CAPTURE none_changes
     | tablespace_clauses
     | distribution_clause
     | partitioning_clause
@@ -3683,7 +3738,7 @@ element_list_item
     ;
 
 column_definition
-    : column_name data_type? column_options? //todo dt
+    : column_name data_type? column_options?
     ;
 
 period_definition
@@ -3703,7 +3758,7 @@ check_constraint
     ;
 
 column_options
-    : column_options_item //todo ?
+    : column_options_item
     ;
 
 column_options_item
@@ -3895,7 +3950,7 @@ typed_element_list_item
     ;
 
 as_result_table
-    : column_name_list_paren? AS '(' fullselect ')' WITH NO? DATA
+    : column_name_list_paren? AS fullselect_in_parentheses WITH NO? DATA
     ;
 
 copy_options
@@ -3903,7 +3958,7 @@ copy_options
     ;
 
 materialized_query_options
-    : column_name_list_paren? AS '(' fullselect ')' WITH NO? DATA
+    : column_name_list_paren? AS fullselect_in_parentheses WITH NO? DATA
     ;
 
 staging_table_definition
@@ -4171,11 +4226,11 @@ old_new
     ;
 
 correlation_name
-    : todo
+    : id_
     ;
 
 identifier
-    : todo
+    : id_
     ;
 
 trigger_event
@@ -4250,11 +4305,15 @@ encryption_value
     ;
 
 create_type_statement
-    : todo
+    : create_type_array_statement
+    | create_type_cursor_statement
+    | create_type_distinct_statement
+    | create_type_row_statement
+    | create_type_structured_statement
     ;
 
 create_type_array_statement
-    : CREATE or_replace? TYPE type_name AS data_type ARRAY '[' (MAX_INT | integer_constant | data_type_2) ']'
+    : CREATE or_replace? TYPE type_name AS data_type ARRAY '[' (integer_constant | data_type_2) ']'
     ;
 
 create_type_cursor_statement
@@ -4444,6 +4503,7 @@ data_source_data_type
 
 local_data_type
     : built_in_type
+    | type_name
     ;
 
 remote_server
@@ -4506,7 +4566,12 @@ create_variable_statement
 constant_
     : integer_constant
     | bigint_constant
-    | todo
+    | FLOAT_LITERAL
+    | REAL_LITERAL
+    | string
+    | NULL_
+    | L_ONE
+    | L_ZERO
     ;
 
 special_register
@@ -4551,7 +4616,7 @@ create_view_statement
     : CREATE or_replace? VIEW view_name ( column_name_list_paren
                                         | OF type_name (root_view_definition | subview_definition)
                                         )?
-            (WITH cte_list)? fullselect
+            (WITH common_table_expression_list)? fullselect
             create_view_seq*
     ;
 
@@ -4560,19 +4625,11 @@ create_view_seq
     | WITH NO? ROW MOVEMENT
     ;
 
-cte_list
-    : cte (',' cte)*
-    ;
-
-cte
-    : todo
-    ;
-
 fullselect
-    : (subselect | '(' fullselect ')' values_clause)
+    : (subselect | fullselect_in_parentheses values_clause)
         (
             (UNION | EXCEPT | INTERSECT) ALL?
-            (subselect | '(' fullselect ')' | values_clause)
+            (subselect | fullselect_in_parentheses | values_clause)
         )*
         order_by_clause?
         offset_clause?
@@ -4640,7 +4697,7 @@ tablesample_clause
     ;
 
 numeric_expression
-    : todo
+    : expression
     ;
 
 single_view_reference
@@ -4668,7 +4725,7 @@ implementation_clause
     ;
 
 nested_table_reference
-    : (LATERAL (continue_handler WITHIN)?)? '(' (WITH cte_list)? fullselect ')' correlation_clause?
+    : (LATERAL (continue_handler WITHIN)?)? '(' (WITH common_table_expression_list)? fullselect ')' correlation_clause?
     ;
 
 continue_handler
@@ -4746,7 +4803,7 @@ joined_table
     ;
 
 join_condition
-    : todo
+    : search_condition
     ;
 
 outer
@@ -4783,7 +4840,7 @@ group_by_clause_opts
     ;
 
 grouping_expression
-    : todo
+    : expression
     ;
 
 grouping_sets
@@ -4794,10 +4851,6 @@ super_groups
     : ROLLUP
     | CUBE
     | grant_total
-    ;
-
-grouping_expression_list
-    : todo
     ;
 
 grant_total
@@ -4839,15 +4892,15 @@ sort_key
     ;
 
 simple_column_name
-    : todo
+    : id_
     ;
 
 simple_integer
-    : todo
+    : DECIMAL_LITERAL
     ;
 
 sork_key_expression
-    : todo
+    : expression
     ;
 
 offset_clause
@@ -4855,7 +4908,7 @@ offset_clause
     ;
 
 offset_row_count
-    : todo
+    : DECIMAL_LITERAL
     ;
 
 fetch_clause
@@ -4863,7 +4916,7 @@ fetch_clause
     ;
 
 fetch_row_count
-    : todo
+    : DECIMAL_LITERAL
     ;
 
 row_rows
@@ -5032,11 +5085,11 @@ for_from_to_clause
     ;
 
 from_value
-    : todo
+    : FLOAT_LITERAL
     ;
 
 to_value
-    : todo
+    : FLOAT_LITERAL
     ;
 
 data_tag_clause
@@ -5096,7 +5149,7 @@ workload_attributes
     ;
 
 degree
-    : todo
+    : DECIMAL_LITERAL
     ;
 
 allow_disallow
@@ -5137,19 +5190,197 @@ wrapper_option
 
 // EXPRESSION
 expression
-    : todo
+    : function_invocation
+    | '(' expression_list ')'
+    | constant_
+    | expression '**' expression
+    | expression ('*' | '/') expression
+    | expression  '%' expression
+    | expression (CONCAT | '||') expression
+    | expression ('+' | '-') expression
+    | expression '->' id_ expression_list_in_parentheses?
+    | column_name
+    | variable
+    | special_register
+    | scalar_fullselect
+    | expression (YEAR | YEARS | MONTH | MONTHS | day_to_seconds | MICROSECOND | MICROSECONDS)
+    | case_expression
+    | cast_specification
+    | field_reference
+    | xmlcast_specification
+    | array_element_specification
+    | array_constructor
+    | method_invocation
+    | olap_specification
+    | row_change_expression
+    | sequence_reference
+    | subtype_treatment
+    ;
+
+function_invocation
+    : function_name '(' all_distinct? arg_list ')'
+    ;
+
+all_distinct
+    : ALL
+    | DISTINCT
+    ;
+
+scalar_fullselect
+    : fullselect_in_parentheses
+    ;
+
+cast_specification
+    : CAST '(' (
+        (expression | NULL_ | parameter_marker) AS data_type (SCOPE (typed_table_name | typed_view_name))?
+        | cursor_cast_specification
+        | row_cast_specification
+        | interval_cast_specification
+        )
+        ')'
+    ;
+
+cursor_cast_specification
+    : parameter_marker AS (CURSOR | cursor_type_name)
+    ;
+
+row_cast_specification
+    : (row_expression | NULL_ | parameter_marker) AS row_type_name
+    ;
+
+interval_cast_specification
+    : string_constant AS INTERVAL
+    ;
+
+xmlcast_specification
+    : XMLCAST '(' (expression | NULL_ | parameter_marker) ')' AS data_type
+    ;
+
+array_element_specification
+    : av=id_ '[' expression ']'
+    | CAST '(' parameter_marker AS array_type_name ')'
+    ;
+
+array_constructor
+    : ARRAY '[' ((WITH common_table_expression_list)? fullselect | expression_list)? ']'
+    ;
+
+method_invocation
+    : id_ '..' id_ expression_list_in_parentheses?
+    ;
+
+olap_specification
+    : ordered_olap_specification
+    | numbering_specification
+    | aggregation_specification
+    ;
+
+ordered_olap_specification
+    : f=id_ OVER '(' window_partition_clause? window_order_clause ')'
+    ;
+
+window_partition_clause
+    : PARTITION BY expression_list
+    ;
+
+window_order_clause
+    : ORDER BY order_by_clause_opts
+    ;
+
+numbering_specification
+    : ROW_NUMBER '(' ')' OVER window_partition_clause? window_order_clause?
+    ;
+
+aggregation_specification
+    : (af=id_ | olap_aggregate_function) OVER '(' window_partition_clause?
+        ( RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        | window_order_clause (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW | window_aggregation_group_clause)
+        )
+        ')'
+    ;
+
+olap_aggregate_function
+    : first_value_function
+    | last_value_function
+    | nth_value_function
+    | ratio_to_report_function
+    ;
+
+first_value_function
+    : FIRST_VALUE '(' expression (',' ignore_respect_nulls)?  ')'
+    ;
+
+last_value_function
+    : LAST_VALUE '(' expression (',' ignore_respect_nulls)? ')'
+    ;
+
+nth_value_function
+    : NTH_VALUE '(' expression ',' nth_row = expression ')' ignore_respect_nulls? from_first_last?
+    ;
+
+ratio_to_report_function
+    : RATION_TO_REPORT expression_list_in_parentheses
+    ;
+
+ignore_respect_nulls
+    : (IGNORE | RESPECT) NULLS
+    ;
+
+from_first_last
+    : FROM first_last
+    ;
+
+window_aggregation_group_clause
+    : (ROWS | RANGE) (group_start | group_between | group_end)
+    ;
+
+group_start
+    : UNBOUNDED PRECEDING
+    | constant_ PRECEDING
+    ;
+
+group_between
+    : BETWEEN group_bound1 AND group_bound2
+    ;
+
+group_bound1
+    : UNBOUNDED PRECEDING
+    | constant_ PRECEDING
+    | constant_ FOLLOWING
+    ;
+
+group_bound2
+    : UNBOUNDED FOLLOWING
+    | constant_ PRECEDING
+    | constant_ FOLLOWING
+    ;
+
+group_end
+    : UNBOUNDED FOLLOWING
+    | constant_ FOLLOWING
+    ;
+
+row_change_expression
+    : ROW CHANGE (TOKEN | TIMESTAMP) FOR table_designator
+    ;
+
+sequence_reference
+    : (NEXT | PREVIOUS) VALUE FOR sequence_name
+    ;
+
+subtype_treatment
+    : TREAT '(' AS data_type ')'
     ;
 
 expression_list
     : expression (',' expression)*
     ;
 
-todo
-    : id_
+expression_list_in_parentheses
+    : '(' expression_list ')'
     ;
 
 // ID
-
 id_
     : ID
     ;
@@ -5314,6 +5545,10 @@ mask_name
     ;
 
 method_name
+    : id_
+    ;
+
+model_name
     : id_
     ;
 
@@ -5634,5 +5869,14 @@ period_name
     ;
 
 history_table_name
+    : id_
+    ;
+
+xml_schema_name
+    : id_
+    ;
+
+// TODOS
+todo
     : id_
     ;
