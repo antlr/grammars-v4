@@ -17,6 +17,7 @@
         <module>databricks</module>
         <module>derby</module>
         <module>drill</module>
+        <module>h2</module>
         <module>hive</module>
         <module>mariadb</module>
         <module>mysql/Positive-Technologies</module>
