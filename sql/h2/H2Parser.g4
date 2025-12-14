@@ -329,7 +329,7 @@ alter_view_rename
     ;
 
 analyze
-    : ANALYZE (TABLE schema_name_dot? table_name)? (SAMPLE_SIZE int)?
+    : ANALYZE (TABLE schema_name_dot? table_name)? (SAMPLE_SIZE int_)?
     ;
 
 comment_on
@@ -345,7 +345,7 @@ create_alias
     ;
 
 create_constant
-    : CREATE CONSTANT if_not_exists? schema_name_dot? constant_name VALUE expression
+    : CREATE CONSTANT_ if_not_exists? schema_name_dot? constant_name VALUE expression
     ;
 
 create_domain
@@ -421,7 +421,7 @@ drop_all_objects
     ;
 
 drop_constant
-    : DROP CONSTANT if_exists? schema_name_dot? constant_name
+    : DROP CONSTANT_ if_exists? schema_name_dot? constant_name
     ;
 
 drop_domain
@@ -551,7 +551,7 @@ set_autocommit
     ;
 
 set_cache_size
-    : SET CACHE_SIZE int
+    : SET CACHE_SIZE int_
     ;
 
 set_cluster
@@ -575,11 +575,11 @@ set_database_event_listener
     ;
 
 set_db_close_delay
-    : SET DB_CLOSE_DELAY int
+    : SET DB_CLOSE_DELAY int_
     ;
 
 set_default_lock_timeout
-    : SET DEFAULT_LOCK_TIMEOUT int
+    : SET DEFAULT_LOCK_TIMEOUT int_
     ;
 
 set_default_null_ordering
@@ -607,35 +607,35 @@ set_java_object_serializer
     ;
 
 set_lazy_query_execution
-    : SET LAZE_QUERY_EXECUTION int
+    : SET LAZE_QUERY_EXECUTION int_
     ;
 
 set_lock_mode
-    : SET LOCK_MODE int
+    : SET LOCK_MODE int_
     ;
 
 set_lock_timeout
-    : SET LOCK_TIMEOUT int
+    : SET LOCK_TIMEOUT int_
     ;
 
 set_max_length_inplace_lob
-    : SET_MAX_LENGTH_INPLACE_LOB int
+    : SET_MAX_LENGTH_INPLACE_LOB int_
     ;
 
 set_max_log_size
-    : SET MAX_LOG_SIZE int
+    : SET MAX_LOG_SIZE int_
     ;
 
 set_max_memory_rows
-    : SET MAX_MEMORY_ROWS int
+    : SET MAX_MEMORY_ROWS int_
     ;
 
 set_max_memory_undo
-    : SET MAX_MEMORY_UNDO int
+    : SET MAX_MEMORY_UNDO int_
     ;
 
 set_max_operation_memory
-    : SET MAX_OPERATION_MEMORY int
+    : SET MAX_OPERATION_MEMORY int_
     ;
 
 set_mode
@@ -670,11 +670,11 @@ set_query_statistics
     ;
 
 set_query_statistics_max_entries
-    : SET QUERY_STATISTICS_MAX_ENTRIES int
+    : SET QUERY_STATISTICS_MAX_ENTRIES int_
     ;
 
 set_query_timeout
-    : SET QUERY_TIMEOUT int
+    : SET QUERY_TIMEOUT int_
     ;
 
 set_referential_integrity
@@ -682,7 +682,7 @@ set_referential_integrity
     ;
 
 set_retention_time
-    : SET RETENTION_TIME int
+    : SET RETENTION_TIME int_
     ;
 
 set_salt_hash
@@ -703,7 +703,7 @@ set_session_characteristics
     ;
 
 set_throttle
-    : SET THROTTLE int
+    : SET THROTTLE int_
     ;
 
 set_time_zone
@@ -711,11 +711,11 @@ set_time_zone
     ;
 
 set_trace_level
-    : SET (TRACE_LEVEL_FILE | TRACE_LEVEL_SYSTEM_OUT) int
+    : SET (TRACE_LEVEL_FILE | TRACE_LEVEL_SYSTEM_OUT) int_
     ;
 
 set_trace_max_file_size
-    : SET TRACE_MAX_FILE_SIZE int
+    : SET TRACE_MAX_FILE_SIZE int_
     ;
 
 set_truncate_large_length
@@ -727,7 +727,7 @@ set_variable_binary
     ;
 
 set_write_delay
-    : SET WRITE_DELAY int
+    : SET WRITE_DELAY int_
     ;
 
 shutdown
@@ -740,7 +740,7 @@ true_false
     | FALSE
     ;
 
-int
+int_
     : ('+' | '-' NUMBER)
     ;
 
