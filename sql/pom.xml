@@ -23,6 +23,7 @@
         <module>phoenix</module>
         <module>plsql</module>
         <module>postgresql</module>
+        <module>redshift</module>
         <module>snowflake</module>
         <module>sqlite</module>
         <module>teradata</module>
