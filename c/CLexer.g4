@@ -33,6 +33,11 @@
 
 lexer grammar CLexer;
 
+options {
+    superClass = CLexerBase;
+}
+
+
 KW__asm: '__asm';
 KW__asm__: '__asm__';
 KW__attribute__: '__attribute__';

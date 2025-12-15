@@ -88,19 +88,10 @@ argumentExpressionList
 unaryExpression
     : ('++' | '--' | 'sizeof')* (
         postfixExpression
-        | unaryOperator castExpression
+        | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!') castExpression
         | ('sizeof' | Alignof) '(' typeName ')'
         | '&&' Identifier // GCC extension address of label
     )
-    ;
-
-unaryOperator
-    : '&'
-    | '*'
-    | '+'
-    | '-'
-    | '~'
-    | '!'
     ;
 
 castExpression
@@ -155,22 +146,8 @@ conditionalExpression
 
 assignmentExpression
     : conditionalExpression
-    | unaryExpression assignmentOperator assignmentExpression
+    | unaryExpression assignementOperator=('=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=') assignmentExpression
     | DigitSequence // for
-    ;
-
-assignmentOperator
-    : '='
-    | '*='
-    | '/='
-    | '%='
-    | '+='
-    | '-='
-    | '<<='
-    | '>>='
-    | '&='
-    | '^='
-    | '|='
     ;
 
 expression
@@ -184,10 +161,11 @@ constantExpression
 declaration
     : declarationSpecifiers initDeclaratorList? ';' {this.EnterDeclaration();}
     | staticAssertDeclaration
+    | attributeDeclaration
     ;
 
 declarationSpecifiers
-    : ({ this.IsType()}? declarationSpecifier )+
+    : ({ this.IsDeclarationSpecifier()}? declarationSpecifier )+
     ;
 
 declarationSpecifier
@@ -204,6 +182,10 @@ initDeclaratorList
 
 initDeclarator
     : declarator ('=' initializer)?
+    ;
+
+attributeDeclaration
+    : attributeSpecifierSequence ';'
     ;
 
 storageClassSpecifier
@@ -234,13 +216,13 @@ typeSpecifier
     | atomicTypeSpecifier
     | structOrUnionSpecifier
     | enumSpecifier
-    | typedefName
+    | '__extension__'? typedefName
     | '__typeof__' '(' constantExpression ')' // GCC extension
     ;
 
 structOrUnionSpecifier
-    : structOrUnion
-	( Identifier? '{' ( {this.NullStructDeclarationListExtension()}? | structDeclarationList) '}'
+    : structOrUnion attributeSpecifierSequence? gnuAttributes?
+	( Identifier? '{' ( {this.IsNullStructDeclarationListExtension()}? | memberDeclarationList) '}'
 	| Identifier
 	)
 //	{this.EnterDeclaration();}
@@ -251,32 +233,39 @@ structOrUnion
     | 'union'
     ;
 
-structDeclarationList
-    : structDeclaration+
+memberDeclarationList
+    : memberDeclaration+
     ;
 
-structDeclaration // The first two rules have priority order and cannot be simplified to one expression.
-    : specifierQualifierList structDeclaratorList ';'
-    | specifierQualifierList ';'
+// struct-declaration is the GNU equivalent.
+memberDeclaration
+    : attributeSpecifierSequence? specifierQualifierList memberDeclaratorList? ';'
     | staticAssertDeclaration
+    | '__extension__' memberDeclaration // GNU extension.
     ;
 
 specifierQualifierList
-    : (typeSpecifier | typeQualifier) specifierQualifierList?
+    : typeSpecifierQualifier+ attributeSpecifierSequence?
     ;
 
-structDeclaratorList
-    : structDeclarator (',' structDeclarator)*
+typeSpecifierQualifier
+    : typeSpecifier
+    | typeQualifier
+    | alignmentSpecifier
+    ;
+
+memberDeclaratorList
+    : structDeclarator (',' gnuAttributes? structDeclarator)*
     ;
 
 structDeclarator
-    : declarator
-    | declarator? ':' constantExpression
+    : declarator gnuAttributes?
+    | declarator? ':' constantExpression gnuAttributes?
     ;
 
 enumSpecifier
-    : 'enum' Identifier? '{' enumeratorList ','? '}'
-    | 'enum' Identifier
+    : 'enum' attributeSpecifierSequence? Identifier? enumTypeSpecifier '{' enumeratorList ','? '}'
+    | 'enum' Identifier enumTypeSpecifier?
     ;
 
 enumeratorList
@@ -284,11 +273,15 @@ enumeratorList
     ;
 
 enumerator
-    : enumerationConstant ('=' constantExpression)?
+    : enumerationConstant attributeSpecifierSequence? ('=' constantExpression)?
     ;
 
 enumerationConstant
     : Identifier
+    ;
+
+enumTypeSpecifier
+    : specifierQualifierList
     ;
 
 atomicTypeSpecifier
@@ -307,7 +300,7 @@ functionSpecifier
     | '_Noreturn'
     | '__inline__' // GCC extension
     | '__stdcall'
-    | gccAttributeSpecifier
+    | gnuAttribute
     | '__declspec' '(' Identifier ')'
     ;
 
@@ -316,7 +309,8 @@ alignmentSpecifier
     ;
 
 declarator
-    : pointer? directDeclarator gccDeclaratorExtension*
+    : gnuAttribute? pointer declarationSpecifiers? declarator
+    | directDeclarator gccDeclaratorExtension*
     ;
 
 directDeclarator
@@ -327,9 +321,10 @@ directDeclarator
     | directDeclarator '[' typeQualifierList 'static' assignmentExpression ']' attributeSpecifierSequence?
     | directDeclarator '[' typeQualifierList? '*' ']' attributeSpecifierSequence?
     | directDeclarator '(' parameterTypeList? ')' attributeSpecifierSequence?
-//    | Identifier ':' DigitSequence         // bit field
+    | Identifier ':' DigitSequence         // bit field
     | vcSpecificModifer Identifier         // Visual C Extension
     | '(' vcSpecificModifer declarator ')' // Visual C Extension
+    | gnuAttribute
     ;
 
 vcSpecificModifer
@@ -342,19 +337,23 @@ vcSpecificModifer
     ;
 
 gccDeclaratorExtension
-    : '__asm' '(' StringLiteral+ ')'
-    | gccAttributeSpecifier
+    : asmDefinition
+    | gnuAttribute
     ;
 
-gccAttributeSpecifier
-    : '__attribute__' '(' '(' gccAttributeList ')' ')'
+gnuAttributes
+    : gnuAttribute+
     ;
 
-gccAttributeList
-    : gccAttribute? (',' gccAttribute?)*
+gnuAttribute
+    : '__attribute__' '(' '(' gnuAttributeList ')' ')'
     ;
 
-gccAttribute
+gnuAttributeList
+    : gnuSingleAttribute? (',' gnuSingleAttribute?)*
+    ;
+
+gnuSingleAttribute
     : ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
     ('(' argumentExpressionList? ')')?
     ;
@@ -479,9 +478,7 @@ statement
     | selectionStatement
     | iterationStatement
     | jumpStatement
-    | ('__asm' | '__asm__') ('volatile' | '__volatile__') '(' (
-        logicalOrExpression (',' logicalOrExpression)*
-    )? (':' (logicalOrExpression (',' logicalOrExpression)*)?)* ')' ';'
+    | asmStatement
     ;
 
 labeledStatement
@@ -499,8 +496,8 @@ blockItemList
     ;
 
 blockItem
-    : {this.IsNotType()}? statement
-    | {this.IsType()}? declaration
+    : {this.IsStatement()}? statement
+    | {this.IsDeclaration()}? declaration
     ;
 
 expressionStatement
@@ -544,9 +541,77 @@ jumpStatement
     ;
 
 externalDeclaration
-    : functionDefinition
-    | declaration
-    | ';' // stray ;
+    : '__extension__'? (
+	functionDefinition
+	| declaration
+	| ';' // stray ;
+	| asmDefinition // GCC
+	)
+    ;
+
+asmDefinition
+    : simpleAsmExpr
+    | ('__asm' | '__asm__') '(' toplevelAsmArgument ')'
+    ;
+
+simpleAsmExpr
+    : ('__asm' | '__asm__') '(' asmStringLiteral ')'
+    ;
+
+toplevelAsmArgument
+    : asmStringLiteral
+    | asmStringLiteral ':' asmOperands?
+    | asmStringLiteral ':' asmOperands? ':' asmOperands?
+    | asmStringLiteral '::' asmOperands?
+    ;
+
+asmStringLiteral
+    : StringLiteral
+    ;
+
+asmOperands
+    : asmOperand (',' asmOperand)*
+    ;
+
+asmOperand
+    : asmStringLiteral '(' expression ')'
+    | '[' Identifier ']' asmStringLiteral '(' expression ')'
+    ;
+
+asmStatement
+    : ('__asm' | '__asm__') asmQualifierList? '(' asmArgument ')' ';'
+    ;
+
+asmQualifier
+    : 'volatile'
+    | '__volatile__'
+    | 'inline'
+    | 'goto'
+    ;
+
+asmQualifierList
+    : asmQualifier+
+    ;
+
+asmClobbers
+    : asmStringLiteral ( ',' asmStringLiteral )*
+    ;
+
+asmGotoOperands
+    : Identifier ( ',' Identifier )*
+    ;
+
+asmArgument
+    : asmStringLiteral
+    | asmStringLiteral ':' asmOperand?
+    | asmStringLiteral ':' asmOperand ':' asmOperand?
+    | asmStringLiteral (':' ':' | '::') asmOperand?
+    | asmStringLiteral ':' asmOperand ':' asmOperand ':' asmClobbers?
+    | asmStringLiteral (':' ':' | '::') asmOperand ':' asmClobbers?
+    | asmStringLiteral (':' ':' | '::') ':' asmClobbers?
+    | asmStringLiteral (':' ':' | '::') asmOperand ':' asmClobbers ':' asmGotoOperands
+    | asmStringLiteral (':' ':' | '::') ':' asmClobbers ':' asmGotoOperands
+    | asmStringLiteral (':' ':' | '::') (':' ':' | '::') asmGotoOperands
     ;
 
 functionDefinition

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class Symbol {
     public string Name { get; set; }
-    public TypeClassification Classification { get; set; }
+    public HashSet<TypeClassification> Classification { get; set; }
     public Dictionary<string, Symbol> Members { get; } = new();
     public Symbol Parent { get; set; }
 
