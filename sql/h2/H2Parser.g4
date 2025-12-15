@@ -222,7 +222,7 @@ with
     ;
 
 alter_domain
-    : ALTER DOMAIN if_exists?
+    : ALTER DOMAIN_ if_exists?
     ;
 
 if_exists
@@ -234,21 +234,21 @@ if_not_exists
     ;
 
 alter_domain_add_constraint
-    : ALTER DOMAIN if_exists? schema_name_dot? domain_name
+    : ALTER DOMAIN_ if_exists? schema_name_dot? domain_name
         ADD
     ;
 
 alter_domain_drop_constraint
-    : ALTER DOMAIN if_exists? schema_name_dot? domain_name
+    : ALTER DOMAIN_ if_exists? schema_name_dot? domain_name
         DROP CONSTRAINT if_exists? schema_name_dot? constraint_name
     ;
 
 alter_domain_rename
-    : ALTER DOMAIN if_exists? schema_name_dot? o=domain_name RENAME TO n=domain_name
+    : ALTER DOMAIN_ if_exists? schema_name_dot? o=domain_name RENAME TO n=domain_name
     ;
 
 alter_domain_rename_constraint
-    : ALTER DOMAIN if_exists? schema_name_dot? domain_name
+    : ALTER DOMAIN_ if_exists? schema_name_dot? domain_name
         RENAME CONSTRAINT schema_name_dot? o=constraint_name? TO n=constraint_name
     ;
 
@@ -349,7 +349,7 @@ create_constant
     ;
 
 create_domain
-    : CREATE DOMAIN if_not_exists? schema_name_dot? domain_name AS?
+    : CREATE DOMAIN_ if_not_exists? schema_name_dot? domain_name AS?
     ;
 
 create_index
@@ -425,7 +425,7 @@ drop_constant
     ;
 
 drop_domain
-    : DROP DOMAIN if_exists? schema_name_dot? domain_name restrict_cascade?
+    : DROP DOMAIN_ if_exists? schema_name_dot? domain_name restrict_cascade?
     ;
 
 restrict_cascade
