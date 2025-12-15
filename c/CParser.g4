@@ -264,7 +264,7 @@ structDeclarator
     ;
 
 enumSpecifier
-    : 'enum' attributeSpecifierSequence? Identifier? enumTypeSpecifier '{' enumeratorList ','? '}'
+    : 'enum' attributeSpecifierSequence? Identifier? enumTypeSpecifier? '{' enumeratorList ','? '}'
     | 'enum' Identifier enumTypeSpecifier?
     ;
 
