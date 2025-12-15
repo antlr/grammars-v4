@@ -164,9 +164,72 @@ command
     | shutdown
     ;
 
-
 select
-    : SELECT
+    : SELECT (ALL | DISTINCT (ON '(' expression_list ')')?)? select_expression (',' select_expression)*
+        (FROM table_expression (',' table_expression)*)?
+        (WHERE expression)?
+    ;
+
+select_expression
+    : wildcard_expression
+    | expression (AS? alias)?
+    ;
+
+wildcard_expression
+    : (schema_name_dot? t=alias '.')? '*'
+        (EXCEPT '(' column (',' column)* ')' )?
+    ;
+
+table_expression
+    : (schema_name_dot? table_name
+    | '(' query ')'
+    | unnest
+    | table
+    | data_change_delta_table)
+        (AS alias column_name_list_in_parentheses? )?
+        (USE INDEX '(' index_name_list? ')')?
+        (join_type? JOIN table_expression join_specification?)?
+    ;
+
+join_type
+    : (LEFT | RIGHT) OUTER?
+    | INNER
+    | CROSS
+    | NATURAL
+    ;
+
+join_specification
+    : ON expression
+    | USING '(' column_name_list ')'
+    ;
+
+index_name_list
+    : index_name (',' index_name)*
+    ;
+
+column_name_list_in_parentheses
+    : '(' column_name_list ')'
+    ;
+
+column_name_list
+    : column_name (',' column_name)*
+    ;
+
+table
+    : (TABLE | TABLE DISTINCT) '(' table_item (',' table_item)* ')'
+    ;
+
+table_item
+    : id_ data_type_or_domain '=' (array_ | row_value_expression)
+    ;
+
+unnest
+    : UNNEST '(' expression (',' expression)* ')' (WITH ORDINALITY)?
+    ;
+
+data_change_delta_table
+    : (OLD | NEW | FINAL) TABLE
+        '(' (insert | update | delete | merge_into | merge_using) ')'
     ;
 
 insert
@@ -741,7 +804,7 @@ true_false
     ;
 
 int_
-    : ('+' | '-' NUMBER)
+    : ('+' | '-')? NUMBER
     ;
 
 bytes
@@ -812,6 +875,10 @@ domain_name
     : id_
     ;
 
+field_name
+    : id_
+    ;
+
 index_name
     : id_
     ;
@@ -842,13 +909,386 @@ view_name
 
 //
 expression
-    : todo
+    : and_condition (OR and_condition)*
     ;
 
-literal
+and_condition
+    : condition (AND condition)*
+    ;
+
+condition
+    : operand condition_rhs?
+    | NOT condition
+    | EXISTS '(' query ')'
+    | UNIQUE nulls_distinct? '(' query ')'
+    | INTERSECTS '(' operand ',' operand ')'
+    ;
+
+condition_rhs
+    : comparison_rhs
+    | quantified_comparison_rhs
+    | null_predicate_rhs
+    | distinct_predicate_rhs
+    | quantified_distinct_predicate_rhs
+    | boolean_test_rhs
+    | type_predicate_rhs
+    | json_predicate_rhs
+    | between_predicate_rhs
+    | in_predicate_rhs
+    | like_predicate_rhs
+    | regexp_predicate_rhs
+    ;
+
+compare
+    : '<>'
+    | '<='
+    | '>='
+    | '='
+    | '<'
+    | '>'
+    | '!='
+    | '&&'
+    ;
+
+operand
+    : summand ('||' summand)*
+    ;
+
+summand
+    : factor (plus_minus factor)*
+    ;
+
+plus_minus
+    : '+'
+    | '-'
+    ;
+
+factor
+    : term (mul_div_mod term)*
+    ;
+
+mul_div_mod
+    : '*'
+    | '/'
+    | '%'
+    ;
+
+term
+    : (value
+    | column
+    | '?' int_?
+    | sequence_value_expression
+    | function
+    | plus_minus term
+    | '(' expression ')'
+    | array_element_reference
+    | field_reference
+    | '(' query ')'
+    | case_expression
+    | cast_specification
+    | user_defined_function_name) (time_zone | interval_qualifier)?
+    ;
+
+user_defined_function_name
+    : id_
+    ;
+
+interval_qualifier
+    : YEAR
+    | MONTH
+    | DAY
+    | HOUR
+    | MINUTE
+    | SECONDS
+    ;
+
+precision_int
+    : int_
+    ;
+
+scale_int
+    : int_
+    ;
+
+query
+    : select
+    | explicit_table
+    | table_value
+    ;
+
+explicit_table
+    : TABLE schema_name_dot? table_name
+        order_by_clause?
+        offset_clause?
+        fetch_clause?
+    ;
+
+table_value
+    : VALUES row_value_expression (',' row_value_expression)*
+        order_by_clause?
+        offset_clause?
+        fetch_clause?
+    ;
+
+order_by_clause
+    : ORDER BY select_order (',' select_order)*
+    ;
+
+offset_clause
+    : OFFSET expression row_rows
+    ;
+
+fetch_clause
+    : FETCH first_next (expression PERCENT?)? row_rows only_with_ties
+    ;
+
+row_value_expression
+    : ROW? '(' expression_list? ')'
+    | expression
+    ;
+
+select_order
+    : (expression | int_) asc_desc? nulls_first_last?
+    ;
+
+asc_desc
+    : ASC
+    | DESC
+    ;
+
+nulls_first_last
+    : NULLS (FIRST | LAST)
+    ;
+
+first_next
+    : FIRST
+    | NEXT
+    ;
+
+row_rows
+    : ROW
+    | ROWS
+    ;
+
+only_with_ties
+    : ONLY
+    | WITH TIES
+    ;
+
+case_expression
+    : simple_case
+    | searched_case
+    ;
+
+simple_case
+    : CASE expression
+        (WHEN (expression | condition_rhs) (',' (expression | condition_rhs))* THEN expression)+
+        (ELSE expression)?
+        END
+    ;
+
+searched_case
+    : (CASE WHEN expression THEN expression)+
+        (ELSE expression)?
+        END
+    ;
+
+cast_specification
+    : CAST '(' value AS data_type_or_domain (FORMAT string)? ')'
+    ;
+
+data_type_or_domain
+    : data_type
+    | schema_name_dot? domain_name
+    ;
+
+data_type
+    : predefined_type
+    | array_type
+    | row_type
+    ;
+
+predefined_type
+    : CHAR
+    ;
+
+array_type
+    : predefined_type ARRAY ('[' int_ ']')?
+    ;
+
+row_type
+    : ROW '(' field_name data_type (',' field_name data_type)* ')'
+    ;
+
+function
+    : id_ '(' expression_list ')'
+    ;
+
+sequence_value_expression
+    : (NEXT | CURRENT) VALUE FOR schema_name_dot? sequence_name
+    ;
+
+time_zone
+    : AT (TIME ZONE (interval_hour_to_minute | interval_hour_to_second | string) | LOCAL)
+    ;
+
+interval_hour_to_minute
+    : INTERVAL plus_minus? string HOUR precision_in_parentheses? TO MINUTE
+    ;
+
+precision_in_parentheses
+    : '(' precision_int ')'
+    ;
+
+interval_hour_to_second
+    : INTERVAL plus_minus? string HOUR precision_in_parentheses? TO SECOND fp=precision_in_parentheses?
+    ;
+
+column
+    : (schema_name_dot? t=alias '.')? (column_name | ROW_ID)
+    ;
+
+alias
+    : id_
+    ;
+
+array_element_reference
+    : (array_ | json) '[' int_ ']'
+    ;
+
+array_
+    : ARRAY '[' expression_list? ']'
+    ;
+
+expression_list
+    : expression (',' expression)*
+    ;
+
+json
+    : JSON (bytes | string)
+    ;
+
+field_reference
+    : '(' expression ')' '.' field_name
+    ;
+
+comparison_rhs
+    : compare operand
+    ;
+
+quantified_comparison_rhs
+    : compare all_any_some '(' (query | array_) ')'
+    ;
+
+null_predicate_rhs
+    : IS NOT? NULL_
+    ;
+
+distinct_predicate_rhs
+    : IS NOT? distinct_from? operand
+    ;
+
+quantified_distinct_predicate_rhs
+    : IS NOT? distinct_from? all_any_some '(' (query | array_) ')'
+    ;
+
+distinct_from
+    : DISTINCT FROM
+    ;
+
+all_any_some
+    : ALL
+    | ANY
+    | SOME
+    ;
+
+boolean_test_rhs
+    : IS NOT? (true_false | UNKNOWN)
+    ;
+
+type_predicate_rhs
+    : IS NOT? OF '(' data_type (',' data_type)* ')'
+    ;
+
+json_predicate_rhs
+    : IS NOT? JSON (VALUE | ARRAY | OBJECT | SCALAR)
+        (with_without? UNIQUE KEYS?)?
+    ;
+
+with_without
+    : WITH
+    | WITHOUT
+    ;
+
+between_predicate_rhs
+    : NOT? BETWEEN (ASYMETRIC | SYMETRIC)? operand AND operand
+    ;
+
+in_predicate_rhs
+    : NOT? IN '(' (query | expression_list) ')'
+    ;
+
+like_predicate_rhs
+    : NOT? (LIKE | ILIKE) operand (ESCAPE string)?
+    ;
+
+regexp_predicate_rhs
+    : NOT? REGEXP operand
+    ;
+
+
+value
     : string
+    | DOLLAR_QUOTED_STRING
+    | numeric
+    | date_and_time
+    | boolean
     | bytes
+    | interval
+    | array_
+    | geometry
+    | json
+    | uuid
     | NULL_
+    ;
+
+numeric
+    : int_
+    ;
+
+date_and_time
+    : DATE string
+    | TIME without_timezone? string
+    | TIME with_timezone string
+    | TIMESTAMP without_timezone? string
+    | TIMESTAMP with_timezone string
+    ;
+
+boolean
+    : true_false
+    | UNKNOWN
+    ;
+
+interval
+    : INTERVAL plus_minus string
+        (YEAR | MONTH | DAY | HOUR | MINUTE)
+        precision_in_parentheses?
+    ;
+
+geometry
+    : GEOMETRU (bytes | string)
+    ;
+
+uuid
+    : UUID string
+    ;
+
+without_timezone
+    : WITHOUT TIME ZONE
+    ;
+
+with_timezone
+    : WITH TIME ZONE
     ;
 
 todo
