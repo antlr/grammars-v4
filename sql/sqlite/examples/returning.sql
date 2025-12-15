@@ -21,6 +21,8 @@ INSERT INTO t4(a,b,c) VALUES(2,3,4),(4,5,6),(5,6,7)
 
 UPDATE t1 SET c='bellum' WHERE c='pax';
 
+UPDATE t1 SET c='bellum' WHERE c='pax' ORDER BY c LIMIT 10;
+
 UPDATE t1 SET c='bellum' WHERE c='pax' RETURNING rowid, b, '|';
 
 UPDATE t2 SET b='123' WHERE b='abc' RETURNING (SELECT b FROM t1);
@@ -32,6 +34,8 @@ UPDATE t2 SET b='123' WHERE b='abc' RETURNING b;
 UPDATE t1 SET id=id+y FROM t2 WHERE t1.id=t2.x RETURNING *, '|';
 
 UPDATE t1 SET b=b+y FROM t2 WHERE t2.x=t1.a RETURNING t1.b;
+
+UPDATE t1 SET b=b+y FROM t2 WHERE t2.x=t1.a RETURNING t1.b ORDER BY c LIMIT 10;
 
 UPDATE t1 AS alias SET b=alias.b+1000 RETURNING t1.b;
 

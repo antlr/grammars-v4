@@ -3,9 +3,9 @@ from glob import glob
 from pathlib import Path
 
 def main(argv):
-    for file in glob("./*Lexer.g4"):
+    for file in glob("./parser/*Lexer.g4"):
         fix_lexer(file)
-    for file in glob("./*Parser.g4"):
+    for file in glob("./parser/*Parser.g4"):
         fix_parser(file)
 
 def fix_lexer(file_path):

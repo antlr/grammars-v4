@@ -1,14 +1,17 @@
 package parser
 
 import (
-	"github.com/antlr4-go/antlr/v4"
+    "github.com/antlr4-go/antlr/v4"
 )
 
-// RustParserBase implementation.
 type RustParserBase struct {
-	*antlr.BaseParser
+    *antlr.BaseParser
 }
 
-func (p *RustParserBase) next(expect int) bool {
-	return p.GetInputStream().LA(1) == expect
+func (p *RustParserBase) NextGT() bool {
+    return p.GetInputStream().LA(1) == RustParserGT
+}
+
+func (p *RustParserBase) NextLT() bool {
+    return p.GetInputStream().LA(1) == RustParserLT
 }

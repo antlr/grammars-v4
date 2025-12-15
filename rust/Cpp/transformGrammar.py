@@ -13,7 +13,7 @@ def main():
 def transform_grammar(file_path):
     """Transforms the grammar to fit for the c++ target"""
     print("Altering " + file_path)
-    if not Path(file_path).is_file:
+    if not Path(file_path).is_file():
         print(f"Could not find file: {file_path}")
         sys.exit(1)
 
@@ -26,9 +26,6 @@ def transform_grammar(file_path):
                 line = re.sub(r"(\/\/ Insert here @header for C\+\+ lexer\.)",\
                     '@header {#include "RustLexerBase.h"}', line)
                 line = re.sub(r"(this\.)", 'this->', line)
-                line = re.sub(r"(_input\.)", '_input->', line)
-                line = re.sub(r"(\.getType\(\))", '->getType()', line)
-                line = re.sub(r"(\.next)", '->next', line)
                 output_file.write(line)
 
     print("Writing ...")

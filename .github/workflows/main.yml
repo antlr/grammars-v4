@@ -17,7 +17,7 @@ jobs:
       mymatrix: ${{ steps.step1.outputs.myoutput }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -60,7 +60,7 @@ jobs:
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
         export
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -97,7 +97,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v6.0.0
+      uses: actions/setup-python@v6.1.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -113,7 +113,7 @@ jobs:
       run: |
          pip install antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v6.0.0
+      uses: actions/setup-node@v6.1.0
       with:
         node-version: '22.12.0'
     - name: Test JavaScript
@@ -177,7 +177,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest]
-        test: [ useless-parens, format, ambiguity ]
+        test: [ useless-parens, format, ambiguity, no-symbolic-links ]
     steps:
     - name: Info
       shell: bash
@@ -186,7 +186,7 @@ jobs:
         uname -a
         if [ -f /proc/cpuinfo ]; then cat /proc/cpuinfo; fi
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Test Dotnet
@@ -206,7 +206,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v6.0.0
+      uses: actions/setup-python@v6.1.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -250,7 +250,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest]
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Set up JDK
