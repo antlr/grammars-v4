@@ -54,7 +54,7 @@ primaryExpression
     | StringLiteral+
     | '(' expression ')'
     | genericSelection
-    | '__extension__'? '(' compoundStatement ')' // Blocks (GCC extension)
+    | '__extension__'? '(' compoundStatement ')' //GNU
     | '__builtin_va_arg' '(' unaryExpression ',' typeName ')'
     | '__builtin_offsetof' '(' typeName ',' unaryExpression ')'
     ;
@@ -88,14 +88,18 @@ argumentExpressionList
 unaryExpression
     : ('++' | '--' | 'sizeof')* (
         postfixExpression
-        | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!') castExpression
+        | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!'
+		| '__extension__' // GNU
+		| '__real__' // GNU
+		| '__imag__' // GNU
+		) castExpression
         | ('sizeof' | Alignof) '(' typeName ')'
         | '&&' Identifier // GCC extension address of label
     )
     ;
 
 castExpression
-    : '__extension__'? '(' typeName ')' castExpression
+    : '(' typeName ')' castExpression
     | unaryExpression
     | DigitSequence // for
     ;
@@ -245,7 +249,7 @@ memberDeclaration
     ;
 
 specifierQualifierList
-    : typeSpecifierQualifier+ attributeSpecifierSequence?
+    : gnuAttributes? typeSpecifierQualifier+ attributeSpecifierSequence?
     ;
 
 typeSpecifierQualifier
@@ -350,12 +354,12 @@ gnuAttribute
     ;
 
 gnuAttributeList
-    : gnuSingleAttribute? (',' gnuSingleAttribute?)*
+    : gnuSingleAttribute* (',' gnuSingleAttribute?)*
     ;
 
 gnuSingleAttribute
     : ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
-    ('(' argumentExpressionList? ')')?
+    ('(' gnuAttributeList ')')?
     ;
 
 pointer
@@ -603,13 +607,13 @@ asmGotoOperands
 
 asmArgument
     : asmStringLiteral
-    | asmStringLiteral ':' asmOperand?
-    | asmStringLiteral ':' asmOperand ':' asmOperand?
-    | asmStringLiteral (':' ':' | '::') asmOperand?
-    | asmStringLiteral ':' asmOperand ':' asmOperand ':' asmClobbers?
-    | asmStringLiteral (':' ':' | '::') asmOperand ':' asmClobbers?
+    | asmStringLiteral ':' asmOperands?
+    | asmStringLiteral ':' asmOperands ':' asmOperands?
+    | asmStringLiteral (':' ':' | '::') asmOperands?
+    | asmStringLiteral ':' asmOperands ':' asmOperands ':' asmClobbers?
+    | asmStringLiteral (':' ':' | '::') asmOperands ':' asmClobbers?
     | asmStringLiteral (':' ':' | '::') ':' asmClobbers?
-    | asmStringLiteral (':' ':' | '::') asmOperand ':' asmClobbers ':' asmGotoOperands
+    | asmStringLiteral (':' ':' | '::') asmOperands ':' asmClobbers ':' asmGotoOperands
     | asmStringLiteral (':' ':' | '::') ':' asmClobbers ':' asmGotoOperands
     | asmStringLiteral (':' ':' | '::') (':' ':' | '::') asmGotoOperands
     ;

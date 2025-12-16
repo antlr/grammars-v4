@@ -57,6 +57,8 @@ KW__thiscall: '__thiscall';
 KW__typeof__: '__typeof__';
 KW__vectorcall: '__vectorcall';
 KW__volatile__: '__volatile__';
+KW__real__: '__real__';
+KW__imag__: '__imag__';
 
 Alignas
     : 'alignas'
@@ -66,6 +68,7 @@ Alignas
 Alignof
     : 'alignof'
     | '_Alignof'
+    | '__alignof__' // GNU
     ;
 
 Auto
@@ -647,7 +650,7 @@ fragment HexadecimalEscapeSequence
     ;
 
 StringLiteral
-    : EncodingPrefix? '"' SCharSequence? '"'
+    : EncodingPrefix? '"' SCharSequence? '"' ([ \n\r\t]+ EncodingPrefix? '"' SCharSequence? '"')*
     ;
 
 fragment EncodingPrefix
