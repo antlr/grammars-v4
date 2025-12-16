@@ -48,31 +48,49 @@ translationUnit
     ;
 
 
+// 6.5.1
 primaryExpression
     : Identifier
     | Constant
     | StringLiteral+
     | '(' expression ')'
     | genericSelection
+
+    // ALL GNU
+    | '__func__' //GNU
+    | '__FUNCTION__' //GNU
     | '__extension__'? '(' compoundStatement ')' //GNU
-    | '__builtin_va_arg' '(' unaryExpression ',' typeName ')'
-    | '__builtin_offsetof' '(' typeName ',' unaryExpression ')'
+    | '__builtin_va_arg' '(' unaryExpression ',' typeName ')' //GNU
+    | '__builtin_offsetof' '(' typeName ',' unaryExpression ')' //GNU
+    | '__builtin_choose_expr' '(' unaryExpression ',' unaryExpression ',' unaryExpression ')' //GNU
+    | '__builtin_types_compatible_p' '(' typeName ',' typeName ')' //GNU
+    | '__builtin_tgmath' '(' exprList ')'
+    | '__builtin_complex' '(' assignmentExpression ',' assignmentExpression ')'
     ;
 
+exprList
+    : assignmentExpression (',' assignmentExpression)*
+    ;
+
+// 6.5.1.1
 genericSelection
     : '_Generic' '(' assignmentExpression ',' genericAssocList ')'
     ;
 
+// 6.5.1.1
 genericAssocList
     : genericAssociation (',' genericAssociation)*
     ;
 
+// 6.5.1.1
 genericAssociation
     : (typeName | 'default') ':' assignmentExpression
     ;
 
+// 6.5.2
 postfixExpression
-    : (primaryExpression | '__extension__'? '(' typeName ')' '{' initializerList ','? '}') (
+    : (primaryExpression | '__extension__'? '(' typeName ')' '{' initializerList ','? '}')
+      (
         '[' expression ']'
         | '(' argumentExpressionList? ')'
         | ('.' | '->') Identifier
@@ -221,7 +239,16 @@ typeSpecifier
     | structOrUnionSpecifier
     | enumSpecifier
     | '__extension__'? typedefName
-    | '__typeof__' '(' constantExpression ')' // GCC extension
+    | typeofSpecifier
+    ;
+
+typeofSpecifier
+    : (Typeof | Typeof_unqual) '(' typeofSpecifierArgument ')'
+    ;
+
+typeofSpecifierArgument
+    : expression
+    | typeName
     ;
 
 structOrUnionSpecifier

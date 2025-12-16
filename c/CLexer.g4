@@ -43,6 +43,10 @@ KW__asm__: '__asm__';
 KW__attribute__: '__attribute__';
 KW__builtin_offsetof: '__builtin_offsetof';
 KW__builtin_va_arg: '__builtin_va_arg';
+KW__builtin_choose_expr: '__builtin_choose_expr';
+KW__builtin_types_compatible_p: '__builtin_types_compatible_p';
+KW__builtin_tgmath: '__builtin_tgmath';
+KW__builtin_complex: '__builtin_complex';
 KW__cdecl: '__cdecl';
 KW__clrcall: '__clrcall';
 KW__declspec: '__declspec';
@@ -54,11 +58,14 @@ KW__m128d: '__m128d';
 KW__m128i: '__m128i';
 KW__stdcall: '__stdcall';
 KW__thiscall: '__thiscall';
-KW__typeof__: '__typeof__';
 KW__vectorcall: '__vectorcall';
 KW__volatile__: '__volatile__';
 KW__real__: '__real__';
 KW__imag__: '__imag__';
+KW__func__: '__func__';
+KW__FUNCTION__: '__FUNCTION__';
+KW__PRETTY_FUNCTION__: '__PRETTY_FUNCTION__';
+
 
 Alignas
     : 'alignas'
@@ -214,10 +221,12 @@ Typedef
 
 Typeof
     : 'typeof'
+    | '__typeof__' //GNU
     ;
 
-Typeof_unequal
+Typeof_unqual
     : 'typeof_unequal'
+    | '__typeof_unequal__' //GNU
     ;
 
 Union
