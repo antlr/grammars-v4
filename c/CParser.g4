@@ -92,7 +92,7 @@ genericAssociation
 
 // 6.5.2
 postfixExpression
-    : (primaryExpression | '__extension__'? '(' typeName ')' '{' initializerList ','? '}')
+    : (primaryExpression | '__extension__'? '(' typeName ')' '{' initializerList? ','? '}')
       (
         '[' expression ']'
         | '(' argumentExpressionList? ')'
@@ -449,7 +449,7 @@ typedefName
 
 initializer
     : assignmentExpression
-    | '{' initializerList ','? '}'
+    | '{' initializerList? ','? '}'
     ;
 
 initializerList
