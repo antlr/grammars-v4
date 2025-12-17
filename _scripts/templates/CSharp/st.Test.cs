@@ -26,7 +26,7 @@ public class Program
     public static bool HeatMap { get; set; } = false;
     public static void SetupParse2(string input, string fn, bool quiet = false)
     {
-        ICharStream str = new AntlrInputStream(input);
+        ICharStream str = new CodePointCharStream(input);
         CharStream = str;
         var lexer = new <lexer_name>(str);
         Lexer = lexer;
@@ -38,7 +38,7 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         TokenStream = tokens;
-        ((AntlrInputStream)(lexer.InputStream)).name = fn;
+        ((CodePointCharStream)(lexer.InputStream)).name = fn;
         var parser = new MyParser(tokens);
         Parser = parser;
         var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);

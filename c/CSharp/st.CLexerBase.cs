@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Antlr4.Runtime.Misc;
 
 public abstract class CLexerBase : Lexer
 {
@@ -44,18 +45,7 @@ public abstract class CLexerBase : Lexer
                 UseShellExecute = false
             };
 
-            // Prepend the MSYS2/mingw64 bin directory to PATH for this child process.
-//            string msysBin = @"C:\msys64\mingw64\bin";
-//            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
-
-//            if (string.IsNullOrEmpty(oldPath))
-//            {
-//                psi.EnvironmentVariables["PATH"] = msysBin;
-//            }
-//            else
-//            {
-//                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
-//            }
+            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
 
             using (var process = new Process { StartInfo = psi })
             {
@@ -72,15 +62,18 @@ public abstract class CLexerBase : Lexer
                 // Set up preprocessor output file and open new charstream
                 // for Antlr.
                 File.WriteAllText(i.SourceName + ".p", output);
-                
+
                 //Console.WriteLine("OUTPUT:\n" + output);
                 //Console.WriteLine("ERROR:\n" + error);
                 return CharStreams.fromString(output);
             }
-            
         }
         else
         {
+			// Write to file "stdin.c".
+			var x1 = i.ToString();
+			File.WriteAllText("stdin.c", x1);
+
             var psi = new ProcessStartInfo
             {
 				FileName = "<if(os_win)>cl.exe<else>gcc<endif>",
@@ -88,12 +81,12 @@ public abstract class CLexerBase : Lexer
                 {
 					<if(os_win)>
 					"/E",
-					i.SourceName
+					"stdin.c"
 					<else>
 					"-std=c2x",
 					"-E",
 					"-C",
-					i.SourceName
+					"stdin.c"
 					<endif>
                 },
                 RedirectStandardInput = true,
@@ -104,7 +97,7 @@ public abstract class CLexerBase : Lexer
 
             // Prepend the MSYS2/mingw64 bin directory to PATH for this child process.
 //            string msysBin = @"C:\msys64\mingw64\bin";
-//            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
+            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
 
 //            if (string.IsNullOrEmpty(oldPath))
 ///            {
@@ -129,7 +122,7 @@ public abstract class CLexerBase : Lexer
 
                 // Set up preprocessor output file and open new charstream
                 // for Antlr.
-                File.WriteAllText("stdin.p", output);
+                File.WriteAllText("stdin.c.p", output);
 
                 //Console.WriteLine("OUTPUT:\n" + output);
                 //Console.WriteLine("ERROR:\n" + error);
