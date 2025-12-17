@@ -216,7 +216,7 @@ public abstract class CParserBase : Parser
         var token = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write(token);
         var result = token.Type == CLexer.Typeof ||
-                     token.Type == CLexer.Typeof_unequal;
+                     token.Type == CLexer.Typeof_unqual;
         if (this.debug) System.Console.WriteLine(result);
         return result;
     }
