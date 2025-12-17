@@ -56,7 +56,8 @@ primaryExpression
     | '(' expression ')'
     | genericSelection
 
-    // ALL GNU
+    // GNU
+    // https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L11715-L11734
     | '__func__' //GNU
     | '__FUNCTION__' //GNU
     | '__extension__'? '(' compoundStatement ')' //GNU
@@ -68,6 +69,8 @@ primaryExpression
     | '__builtin_complex' '(' assignmentExpression ',' assignmentExpression ')'
     ;
 
+// GNU
+// https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L14312-L14314
 exprList
     : assignmentExpression (',' assignmentExpression)*
     ;
@@ -99,10 +102,14 @@ postfixExpression
     )*
     ;
 
+// 6.5.2
 argumentExpressionList
     : assignmentExpression (',' assignmentExpression)*
     ;
 
+// 6.5.3
+// GNU
+// https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L10625-L10658
 unaryExpression
     : ('++' | '--' | 'sizeof')* (
         postfixExpression

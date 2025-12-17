@@ -25,13 +25,18 @@ public abstract class CLexerBase : Lexer
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "C:\\msys64\\mingw64\\bin\\gcc.exe",
+                FileName = "<if(os_win)>cl.exe<else>gcc<endif>",
                 ArgumentList =
                 {
-                    "-std=c2x",
-					"-E",
-					"-C",
+                    <if(os_win)>
+                    "/E",
                     i.SourceName
+                    <else>
+                    "-std=c2x",
+                    "-E",
+                    "-C",
+                    i.SourceName
+                    <endif>
                 },
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
@@ -40,17 +45,17 @@ public abstract class CLexerBase : Lexer
             };
 
             // Prepend the MSYS2/mingw64 bin directory to PATH for this child process.
-            string msysBin = @"C:\msys64\mingw64\bin";
-            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
+//            string msysBin = @"C:\msys64\mingw64\bin";
+//            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
 
-            if (string.IsNullOrEmpty(oldPath))
-            {
-                psi.EnvironmentVariables["PATH"] = msysBin;
-            }
-            else
-            {
-                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
-            }
+//            if (string.IsNullOrEmpty(oldPath))
+//            {
+//                psi.EnvironmentVariables["PATH"] = msysBin;
+//            }
+//            else
+//            {
+//                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
+//            }
 
             using (var process = new Process { StartInfo = psi })
             {
@@ -78,12 +83,18 @@ public abstract class CLexerBase : Lexer
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "C:\\msys64\\mingw64\\bin\\gcc.exe",
+				FileName = "<if(os_win)>cl.exe<else>gcc<endif>",
                 ArgumentList =
                 {
-                    "-std=c2x",
-                    "-E",
-                    i.SourceName
+					<if(os_win)>
+					"/E",
+					i.SourceName
+					<else>
+					"-std=c2x",
+					"-E",
+					"-C",
+					i.SourceName
+					<endif>
                 },
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
@@ -92,17 +103,17 @@ public abstract class CLexerBase : Lexer
             };
 
             // Prepend the MSYS2/mingw64 bin directory to PATH for this child process.
-            string msysBin = @"C:\msys64\mingw64\bin";
-            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
+//            string msysBin = @"C:\msys64\mingw64\bin";
+//            string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
 
-            if (string.IsNullOrEmpty(oldPath))
-            {
-                psi.EnvironmentVariables["PATH"] = msysBin;
-            }
-            else
-            {
-                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
-            }
+//            if (string.IsNullOrEmpty(oldPath))
+///            {
+//                psi.EnvironmentVariables["PATH"] = msysBin;
+//            }
+//            else
+//            {
+//                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
+//            }
 
             using (var process = new Process { StartInfo = psi })
             {
