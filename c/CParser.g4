@@ -396,18 +396,23 @@ gnuSingleAttribute
     ('(' gnuAttributeList ')')?
     ;
 
+// 6.7.6
 pointer
     : (('*' | '^') typeQualifierList?)+ // ^ - Blocks language extension
     ;
 
+// 6.7.6
 typeQualifierList
     : typeQualifier+
     ;
 
+// 6.7.6
 parameterTypeList
     : parameterList (',' '...')?
+    | '...'
     ;
 
+// 6.7.6
 parameterList
     : parameterDeclaration (',' parameterDeclaration)*
     ;
@@ -447,26 +452,39 @@ typedefName
     : Identifier
     ;
 
+// 6.7.10
 initializer
     : assignmentExpression
-    | '{' initializerList? ','? '}'
+    | '{' initializerList ','? '}'
+    | '{' '}' //GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6542
     ;
 
+// 6.7.10
 initializerList
     : designation? initializer (',' designation? initializer)*
     ;
 
+// 6.7.10
 designation
     : designatorList '='
+    | arrayDesignator //GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6545-L6546
+    | Identifier ':' //GNU
     ;
 
+// 6.7.10
 designatorList
     : designator+
     ;
 
+// 6.7.10
 designator
-    : '[' constantExpression ']'
+    : arrayDesignator //GNU
     | '.' Identifier
+    ;
+
+// GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6548-L6549
+arrayDesignator
+    : '[' constantExpression ('...' constantExpression)? ']'
     ;
 
 staticAssertDeclaration
