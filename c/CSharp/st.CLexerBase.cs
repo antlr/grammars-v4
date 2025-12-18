@@ -21,32 +21,29 @@ public abstract class CLexerBase : Lexer
     {
         // Replace input with preprocessed input.
 
-        // Detect which type of input.
-        if (i.SourceName.EndsWith(".c"))
+        var source_name = (i.SourceName.EndsWith(".c")) ? i.SourceName : "stdin.c";
+        var output_name = source_name + ".p";
+        var x1 = i.ToString();
+        File.WriteAllText("stdin.c", x1);
+
+    <if(os_win)>
+        var clPath = VsWhereJson.FindLatestClExe().ToString();
+        if (File.Exists(clPath))
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "<if(os_win)>cl.exe<else>gcc<endif>",
+                FileName = clPath,
                 ArgumentList =
                 {
-                    <if(os_win)>
                     "/E",
-                    i.SourceName
-                    <else>
-                    "-std=c2x",
-                    "-E",
-                    "-C",
-                    i.SourceName
-                    <endif>
+                    source_name,
                 },
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
             };
-
             string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
-
             using (var process = new Process { StartInfo = psi })
             {
                 process.Start();
@@ -61,58 +58,35 @@ public abstract class CLexerBase : Lexer
 
                 // Set up preprocessor output file and open new charstream
                 // for Antlr.
-                File.WriteAllText(i.SourceName + ".p", output);
+                File.WriteAllText(output_name, output);
 
                 //Console.WriteLine("OUTPUT:\n" + output);
                 //Console.WriteLine("ERROR:\n" + error);
                 return CharStreams.fromString(output);
             }
         }
-        else
+    <endif>
         {
-			// Write to file "stdin.c".
-			var x1 = i.ToString();
-			File.WriteAllText("stdin.c", x1);
-
             var psi = new ProcessStartInfo
             {
-				FileName = "<if(os_win)>cl.exe<else>gcc<endif>",
+                FileName = "<if(os_win)>gcc.exe<else>gcc<endif>",
                 ArgumentList =
                 {
-					<if(os_win)>
-					"/E",
-					"stdin.c"
-					<else>
-					"-std=c2x",
-					"-E",
-					"-C",
-					"stdin.c"
-					<endif>
+                    "-std=c2x",
+                    "-E",
+                    "-C",
+                    source_name,
                 },
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
             };
-
-            // Prepend the MSYS2/mingw64 bin directory to PATH for this child process.
-//            string msysBin = @"C:\msys64\mingw64\bin";
             string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
-
-//            if (string.IsNullOrEmpty(oldPath))
-///            {
-//                psi.EnvironmentVariables["PATH"] = msysBin;
-//            }
-//            else
-//            {
-//                psi.EnvironmentVariables["PATH"] = msysBin + ";" + oldPath;
-//            }
-
             using (var process = new Process { StartInfo = psi })
             {
                 process.Start();
 
-                // If you want to feed GCC input from a file:
                 process.StandardInput.Close(); // signal EOF
 
                 string output = process.StandardOutput.ReadToEnd();
@@ -120,12 +94,7 @@ public abstract class CLexerBase : Lexer
 
                 process.WaitForExit();
 
-                // Set up preprocessor output file and open new charstream
-                // for Antlr.
-                File.WriteAllText("stdin.c.p", output);
-
-                //Console.WriteLine("OUTPUT:\n" + output);
-                //Console.WriteLine("ERROR:\n" + error);
+                File.WriteAllText(output_name, output);
                 return CharStreams.fromString(output);
             }
         }
