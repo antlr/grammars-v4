@@ -2,7 +2,6 @@
 // ANTLR v4 Lexer Grammar for the Kumir language.
 // Source: Refined based on official documentation and extensive testing
 //         against K.Y. Polyakov's examples. Developed collaboratively.
-// Author: [Your Name/GitHub Handle]
 // License: MIT License
 
 lexer grammar KumirLexer;
@@ -110,8 +109,6 @@ COLON               : ':';
 SEMICOLON           : ';';
 ATAT                : '@@';
 AT                  : '@';
-// DIV_OP              : 'div';
-// MOD_OP              : 'mod';
 
 // --- Literals ---
 CHAR_LITERAL        : '\'' ( EscapeSequence | ~['\\\r\n] ) '\'' ;

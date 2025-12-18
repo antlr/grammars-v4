@@ -4,7 +4,6 @@
 // by using a specific rule `algorithmNameTokens` in the header.
 // Source: Refined based on official documentation and extensive testing
 //         against K.Y. Polyakov's examples. Developed collaboratively.
-// Author: [Your Name/GitHub Handle]
 // License: MIT License
 
 parser grammar KumirParser;
