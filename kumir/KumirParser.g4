@@ -18,7 +18,7 @@ options { tokenVocab=KumirLexer; } // Use tokens from KumirLexer.g4
  * =============================================================================
  */
 qualifiedIdentifier
-    : ID // Currently simple ID, can be extended for module.member later
+    : ATAT? ID // Allow Kumir2-style @@debug identifiers (e.g., @@размер_поля_x)
     ;
 
 literal
@@ -50,9 +50,8 @@ argumentList // e.g., (a, b+c, 5)
     : expression (COMMA expression)*
     ;
 
-indexList // e.g., [i], [i, j], [k:m]
-    : expression (COLON expression)? // Single index or slice
-    | expression COMMA expression    // 2D index
+indexList
+    : expression (COMMA expression)* // Allows one or more expressions separated by commas
     ;
 
 postfixExpression // Handles array/string access and function calls after a primary expression
@@ -63,12 +62,12 @@ unaryExpression // Handles unary plus, minus, not
     : (PLUS | MINUS | NOT) unaryExpression | postfixExpression
     ;
 
-powerExpression // Handles exponentiation (**)
+powerExpression
     : unaryExpression (POWER powerExpression)?
     ;
 
-multiplicativeExpression // Handles *, /, div, mod
-    : powerExpression ((MUL | DIV | DIV_OP | MOD_OP) powerExpression)*
+multiplicativeExpression
+    : powerExpression ((MUL | DIV) powerExpression)*
     ;
 
 additiveExpression // Handles +, -
