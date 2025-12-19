@@ -346,11 +346,17 @@ alignmentSpecifier
     : Alignas '(' (typeName | constantExpression) ')'
     ;
 
+// 6.7.6
+// This rule is basically what was implemented in the GCC compiler.
+// https://github.com/gcc-mirror/gcc/blob/f5cda36f16d447198c1e00b191d720b6f4a02876/gcc/c/c-parser.cc#L4975-L4995
 declarator
     : gnuAttribute? pointer declarationSpecifiers? declarator
     | directDeclarator gccDeclaratorExtension*
     ;
 
+// 6.7.6
+// The rules from the spec were refactored. array-declarator and function-declarator
+// were unfolded into direct-declarator. Those rules were deleted.
 directDeclarator
     : Identifier attributeSpecifierSequence?
     | '(' declarator ')'

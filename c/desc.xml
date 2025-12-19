@@ -10,4 +10,7 @@
     <test>
        <inputs>examples/c-testsuite/**/*.c</inputs>
     </test>
+    <test>
+       <inputs>examples/writing-a-c-compiler-tests/**/valid/**/*.c</inputs>
+    </test>
 </desc>
