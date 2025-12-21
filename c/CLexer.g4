@@ -37,6 +37,9 @@ options {
     superClass = CLexerBase;
 }
 
+channels {
+    LINEDIRECTIVECHANNEL
+}
 
 KW__asm: '__asm';
 KW__asm__: '__asm__';
@@ -682,6 +685,10 @@ fragment SChar
 
 MultiLineMacro
     : '#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN)
+    ;
+
+LineDirective
+    : '#' [ \t]* 'line' .*? ( '\n' | '\r\n' | '\r' ) -> channel (LINEDIRECTIVECHANNEL)
     ;
 
 Directive
