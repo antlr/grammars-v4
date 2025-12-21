@@ -37,6 +37,12 @@ package test_pkg is
     );
   end component component_with_trailing_label;
 
+  function signature_test(data : unsigned) return integer;
+
+  function signature_test(data : signed) return integer;
+
+  function signature_test(data : integer) return integer;
+
 end package;
 
 
@@ -74,6 +80,20 @@ package body test_pkg is
     end function;
   begin
     return nested_inner_func;
+  end function;
+
+  function signature_test(data : unsigned) return integer is begin
+    return 0;
+  end function;
+
+  function signature_test(data : signed) return integer is begin
+    return 1;
+  end function;
+
+  function signature_test(data : integer) return integer is 
+    variable test : unsigned(0 downto 0);
+  begin
+    return signature_test(unsigned)(test);
   end function;
 
 end test_pkg;

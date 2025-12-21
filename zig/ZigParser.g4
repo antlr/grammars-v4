@@ -86,7 +86,7 @@ statement
     | NOSUSPEND block_expr_statement
     | SUSPEND block_expr_statement
     | DEFER block_expr_statement
-    | ERRDEFER payload? block_expr_statement
+    | ERRDEFER payload_? block_expr_statement
     | if_statement
     | labeled_statement
     | var_decl_expr_statement
@@ -103,8 +103,8 @@ comptime_statement
 //     / IfPrefix AssignExpr ( SEMICOLON / KEYWORD_else Payload? Statement )
 //
 if_statement
-    : if_prefix block_expr (ELSE payload? statement)?
-    | if_prefix assign_expr (';' | ELSE payload? statement)
+    : if_prefix block_expr (ELSE payload_? statement)?
+    | if_prefix assign_expr (';' | ELSE payload_? statement)
     ;
 //LabeledStatement <- BlockLabel? (Block / LoopStatement / SwitchExpr)
 labeled_statement
@@ -125,8 +125,8 @@ for_statement
 //    <- WhilePrefix BlockExpr ( KEYWORD_else Payload? Statement )?
 //     / WhilePrefix AssignExpr ( SEMICOLON / KEYWORD_else Payload? Statement )
 while_statement
-    : while_prefix block_expr (ELSE payload? statement)?
-    | while_prefix assign_expr (';' | ELSE payload? statement)
+    : while_prefix block_expr (ELSE payload_? statement)?
+    | while_prefix assign_expr (';' | ELSE payload_? statement)
     ;
 //BlockExprStatement
 //    <- BlockExpr
@@ -220,7 +220,7 @@ primary_expr
     ;
 //IfExpr <- IfPrefix Expr (KEYWORD_else Payload? Expr)?
 if_expr
-    : if_prefix expr (ELSE payload? expr)?
+    : if_prefix expr (ELSE payload_? expr)?
     ;
 //Block <- LBRACE Statement* RBRACE
 block
@@ -236,7 +236,7 @@ for_expr
     ;
 //WhileExpr <- WhilePrefix Expr (KEYWORD_else Payload? Expr)?
 while_expr
-    : while_prefix expr (ELSE payload? expr)?
+    : while_prefix expr (ELSE payload_? expr)?
     ;
 //CurlySuffixExpr <- TypeExpr InitList?
 curly_suffix_expr
@@ -317,7 +317,7 @@ grouped_expr
     ;
 // IfTypeExpr <- IfPrefix TypeExpr (KEYWORD_else Payload? TypeExpr)?
 if_type_expr
-    : if_prefix type_expr (ELSE payload? type_expr)?
+    : if_prefix type_expr (ELSE payload_? type_expr)?
     ;
 // LabeledTypeExpr
 //     <- BlockLabel Block
@@ -338,7 +338,7 @@ for_type_expr
     ;
 // WhileTypeExpr <- WhilePrefix TypeExpr (KEYWORD_else Payload? TypeExpr)?
 while_type_expr
-    : while_prefix type_expr (ELSE payload? type_expr)?
+    : while_prefix type_expr (ELSE payload_? type_expr)?
     ;
 // SwitchExpr <- KEYWORD_switch LPAREN Expr RPAREN LBRACE SwitchProngList RBRACE
 switch_expr
@@ -428,7 +428,7 @@ for_prefix
     ;
 //# Payloads
 //Payload <- PIPE IDENTIFIER PIPE
-payload
+payload_
     : '|' IDENTIFIER '|'
     ;
 //PtrPayload <- PIPE ASTERISK? IDENTIFIER PIPE
@@ -534,7 +534,7 @@ bitwise_op
     | '^'
     | '|'
     | ORELSE
-    | CATCH payload?
+    | CATCH payload_?
     ;
 //BitShiftOp
 //    <- LARROW2

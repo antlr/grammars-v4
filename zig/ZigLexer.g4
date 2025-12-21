@@ -469,11 +469,11 @@ TILDE
 Container_doc_comment
    : '//!' ~ [\n\r]*
    ; //-> channel(HIDDEN);
-   
+
 Doc_comment
    : '///' ~ [\n\r]*
    ; //-> channel(HIDDEN);
-   
+
 Line_comment
    : '//' ~ [/!] ~ [\n\r]* -> channel (HIDDEN)
    ;
@@ -511,6 +511,6 @@ FLOAT
    ;
 
 BUILTINIDENTIFIER
-   : '@'
+   : '@' IDENTIFIER
    ;
 
