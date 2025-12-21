@@ -60,6 +60,7 @@ primaryExpression
     // https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L11715-L11734
     | '__func__' //GNU
     | '__FUNCTION__' //GNU
+    | '__PRETTY_FUNCTION__' //GNU
     | '__extension__'? '(' compoundStatement ')' //GNU
     | '__builtin_va_arg' '(' unaryExpression ',' typeName ')' //GNU
     | '__builtin_offsetof' '(' typeName ',' unaryExpression ')' //GNU
