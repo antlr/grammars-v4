@@ -17,6 +17,6 @@
     </test>
     -->
     <test>
-       <inputs>teststuff</inputs>
+       <inputs>teststuff/*.c</inputs>
     </test>
 </desc>
