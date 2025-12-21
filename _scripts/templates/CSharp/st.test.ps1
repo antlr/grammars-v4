@@ -52,12 +52,14 @@ if ( $size -eq 0 ) {
 # Individual parsing.
 Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ 
 $status = $LASTEXITCODE
-Get-Content "../teststuff/test_delete.c.p | Write-Host
+Write-Host "" > parse.txt
+Get-Content "../teststuff/test_delete.c.p" | Write-Host
 <else>
 # Group parsing.
 get-content "$filePath" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree
 $status = $LASTEXITCODE
-Get-Content "../teststuff/test_delete.c.p | Write-Host
+Write-Host "" > parse.txt
+Get-Content "../teststuff/test_delete.c.p" | Write-Host
 <endif>
 
 # trwdog returns 255 if it cannot spawn the process. This could happen
