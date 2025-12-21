@@ -133,4 +133,15 @@ begin
     end loop;
   end process;
 
+  mux : entity work.generic_mux
+    generic map (
+      DATA_TYPE => GEN_CONDITION'subtype
+    )
+    port map (
+      sel => '0',
+      a_i   => False,
+      b_i   => True
+    );
+
+
 end architecture;
