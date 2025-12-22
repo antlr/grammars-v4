@@ -47,6 +47,10 @@ if ( $size -eq 0 ) {
     exit 0
 }
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ..\\<example_dir_unix>
+
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
