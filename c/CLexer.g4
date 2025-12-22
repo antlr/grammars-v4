@@ -43,6 +43,7 @@ channels {
 
 KW__asm: '__asm';
 KW__asm__: '__asm__';
+KWasm: 'asm';
 KW__attribute__: '__attribute__';
 KW__builtin_offsetof: '__builtin_offsetof';
 KW__builtin_va_arg: '__builtin_va_arg';
@@ -408,10 +409,6 @@ Colon
     : ':'
     ;
 
-ColonColon
-    : '::'
-    ;
-
 Semi
     : ';'
     ;
@@ -693,17 +690,6 @@ LineDirective
 
 Directive
     : '#' ~ [\n]* -> channel (HIDDEN)
-    ;
-
-// ignore the following asm blocks:
-/*
-    asm
-    {
-        mfspr x, 286;
-    }
- */
-AsmBlock
-    : 'asm' ~'{'* '{' ~'}'* '}' -> channel(HIDDEN)
     ;
 
 Whitespace

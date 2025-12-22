@@ -516,7 +516,7 @@ attribute
 
 attributeToken
     : Identifier
-    | Identifier '::' Identifier
+    | Identifier ':' ':' Identifier
     ;
 
 attributeArgumentClause
@@ -614,18 +614,17 @@ externalDeclaration
 
 asmDefinition
     : simpleAsmExpr
-    | ('__asm' | '__asm__') '(' toplevelAsmArgument ')'
+    | ('__asm' | '__asm__' | 'asm') '(' toplevelAsmArgument ')'
     ;
 
 simpleAsmExpr
-    : ('__asm' | '__asm__') '(' asmStringLiteral ')'
+    : ('__asm' | '__asm__' | 'asm') '(' asmStringLiteral ')'
     ;
 
 toplevelAsmArgument
     : asmStringLiteral
     | asmStringLiteral ':' asmOperands?
     | asmStringLiteral ':' asmOperands? ':' asmOperands?
-    | asmStringLiteral '::' asmOperands?
     ;
 
 asmStringLiteral
@@ -642,7 +641,7 @@ asmOperand
     ;
 
 asmStatement
-    : ('__asm' | '__asm__') asmQualifierList? '(' asmArgument ')' ';'
+    : ('__asm' | '__asm__' | 'asm') asmQualifierList? '(' asmArgument ')' ';'
     ;
 
 asmQualifier
@@ -657,24 +656,12 @@ asmQualifierList
     ;
 
 asmClobbers
-    : asmStringLiteral ( ',' asmStringLiteral )*
-    ;
-
-asmGotoOperands
-    : Identifier ( ',' Identifier )*
+    : (asmStringLiteral | Identifier) ( ',' (asmStringLiteral | Identifier) )*
     ;
 
 asmArgument
     : asmStringLiteral
-    | asmStringLiteral ':' asmOperands?
-    | asmStringLiteral ':' asmOperands ':' asmOperands?
-    | asmStringLiteral (':' ':' | '::') asmOperands?
-    | asmStringLiteral ':' asmOperands ':' asmOperands ':' asmClobbers?
-    | asmStringLiteral (':' ':' | '::') asmOperands ':' asmClobbers?
-    | asmStringLiteral (':' ':' | '::') ':' asmClobbers?
-    | asmStringLiteral (':' ':' | '::') asmOperands ':' asmClobbers ':' asmGotoOperands
-    | asmStringLiteral (':' ':' | '::') ':' asmClobbers ':' asmGotoOperands
-    | asmStringLiteral (':' ':' | '::') (':' ':' | '::') asmGotoOperands
+    | asmStringLiteral ':' asmOperands? ( ':' asmOperands? (':' asmClobbers? )* )?
     ;
 
 functionDefinition
