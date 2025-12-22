@@ -19,4 +19,10 @@
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/torture/builtin-*.c</inputs>
     </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/asm*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/auto*.c</inputs>
+    </test>
 </desc>
