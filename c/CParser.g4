@@ -395,12 +395,12 @@ gnuAttribute
     ;
 
 gnuAttributeList
-    : gnuSingleAttribute* (',' gnuSingleAttribute?)*
+    : gnuSingleAttribute*
     ;
 
 gnuSingleAttribute
-    : ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
-    ('(' gnuAttributeList ')')?
+    : ~('(' | ')')
+    | '(' gnuAttributeList ')'
     ;
 
 // 6.7.6

@@ -16,4 +16,7 @@
     <test>
        <inputs>examples/sqlite/**/*.c</inputs>
     </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/torture/builtin-*.c</inputs>
+    </test>
 </desc>
