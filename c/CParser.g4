@@ -119,7 +119,9 @@ unaryExpression
 		| '__real__' // GNU
 		| '__imag__' // GNU
 		) castExpression
-        | ('sizeof' | Alignof) '(' typeName ')'
+        | ('sizeof' | Alignof) ( '(' typeName ')'
+		| unaryExpression //GNU
+		)
         | '&&' Identifier // GCC extension address of label
     )
     ;

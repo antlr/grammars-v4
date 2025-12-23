@@ -80,6 +80,7 @@ Alignof
     : 'alignof'
     | '_Alignof'
     | '__alignof__' // GNU
+    | '__alignof'
     ;
 
 Auto
