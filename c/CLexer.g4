@@ -44,7 +44,7 @@ channels {
 KW__asm: '__asm';
 KW__asm__: '__asm__';
 KWasm: 'asm';
-KW__attribute__: '__attribute__';
+Attribute: '__attribute__' | '__attribute' ;
 KW__builtin_offsetof: '__builtin_offsetof';
 KW__builtin_va_arg: '__builtin_va_arg';
 KW__builtin_choose_expr: '__builtin_choose_expr';
@@ -226,6 +226,7 @@ Typedef
 Typeof
     : 'typeof'
     | '__typeof__' //GNU
+    | '__typeof' // GNU
     ;
 
 Typeof_unqual

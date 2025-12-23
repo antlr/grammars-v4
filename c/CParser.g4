@@ -303,7 +303,7 @@ structDeclarator
     ;
 
 enumSpecifier
-    : 'enum' attributeSpecifierSequence? Identifier? enumTypeSpecifier? '{' enumeratorList ','? '}'
+    : 'enum' attributeSpecifierSequence? gnuAttributes? Identifier? enumTypeSpecifier? '{' enumeratorList ','? '}'
     | 'enum' Identifier enumTypeSpecifier?
     ;
 
@@ -391,7 +391,7 @@ gnuAttributes
     ;
 
 gnuAttribute
-    : '__attribute__' '(' '(' gnuAttributeList ')' ')'
+    : Attribute '(' '(' gnuAttributeList ')' ')'
     ;
 
 gnuAttributeList
