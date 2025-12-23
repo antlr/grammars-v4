@@ -312,7 +312,7 @@ enumeratorList
     ;
 
 enumerator
-    : enumerationConstant attributeSpecifierSequence? ('=' constantExpression)?
+    : enumerationConstant attributeSpecifierSequence? gnuAttributes? ('=' constantExpression)?
     ;
 
 enumerationConstant
