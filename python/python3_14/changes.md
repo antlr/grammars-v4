@@ -1,3 +1,9 @@
+# Dec. 24, 2025
+- parser grammar update for Python 3.14.2
+- tokenizing t-string literals
+- tokenizing BOM Unicode character at the start of the file so it is skipped in the token stream
+- moved encoding detection from PythonLexerBase to a separate component
+
 # Jan. 07, 2025
 - parser grammar update for Python 3.13.1<br/><br/>
 - added ENCODING token<br/><br/>
