@@ -27,6 +27,10 @@ THE SOFTWARE.
  */
 
 using Antlr4.Runtime;
+using System;
+using System.Collections.Generic;
+using System.IO;
+
 
 [assembly: CLSCompliant(true)]
 
