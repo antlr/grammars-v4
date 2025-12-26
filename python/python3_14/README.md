@@ -17,7 +17,5 @@
 - tokenizing BOM Unicode character at the start of the file so it is skipped in the token stream
 - moved encoding detection from PythonLexerBase to a separate component
 
-#### [Previous changes](https://github.com/antlr/grammars-v4/blob/master/python/python3_14/changes.md)<br/><br/>
-
 ### Related link:
 [ANTLR4-parser-for-Python-3.14](https://github.com/RobEin/ANTLR4-parser-for-Python-3.14)
