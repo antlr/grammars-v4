@@ -106,7 +106,7 @@ export default class PythonLexerBase extends Lexer {
      * @param {string} encodingName - The encoding name (e.g., "utf-8"), or empty string to disable ENCODING token.
      */
     setEncodingName(encodingName) {
-        this.encodingName = encodingName;
+        this.#encodingName = encodingName;
     }
 
     nextToken() { // Reading the input stream until EOF is reached

@@ -83,7 +83,7 @@ class PythonLexerBase(Lexer):
 
         :param encoding_name: The encoding name (e.g., "utf-8"), or empty string to disable ENCODING token.
         """
-        self.encoding_name = encoding_name
+        self._encodingName = encoding_name
 
     def nextToken(self) -> CommonToken: # Reading the input stream until EOF is reached
         self._check_next_token()
