@@ -43,15 +43,28 @@ compilationUnit
     : translationUnit? EOF
     ;
 
-translationUnit
-    : externalDeclaration+
+// A.1.5
+// 6.4.4
+constant
+    : IntegerConstant
+    | FloatingConstant
+    //|   EnumerationConstant
+    | CharacterConstant
+    | predefinedConstant
     ;
 
+// 6.4.4.5
+predefinedConstant
+    : 'false'
+    | 'true'
+    | 'nullptr'
+    ;
 
+// A.2.1 Expressions
 // 6.5.1
 primaryExpression
     : Identifier
-    | Constant
+    | constant
     | StringLiteral+
     | '(' expression ')'
     | genericSelection
@@ -331,7 +344,7 @@ atomicTypeSpecifier
 
 typeQualifier
     : 'const'
-    | 'restrict'
+    | Restrict
     | 'volatile'
     | '_Atomic'
     ;
@@ -342,7 +355,10 @@ functionSpecifier
     | '__inline__' // GCC extension
     | '__stdcall'
     | gnuAttribute
-    | '__declspec' '(' Identifier ')'
+    | '__declspec' '(' (Identifier 
+		| Restrict // CLANG
+		| 'deprecated' '(' StringLiteral? ')'
+		) ')'
     ;
 
 alignmentSpecifier
@@ -439,8 +455,8 @@ typeName
     ;
 
 abstractDeclarator
-    : pointer
-    | pointer? directAbstractDeclarator gccDeclaratorExtension*
+    : vcSpecificModifer? pointer
+    | vcSpecificModifer? pointer? directAbstractDeclarator gccDeclaratorExtension*
     ;
 
 directAbstractDeclarator
@@ -605,6 +621,13 @@ jumpStatement
     ) ';'
     ;
 
+// A.2.4 External definitions
+// 6.9
+translationUnit
+    : externalDeclaration+
+    ;
+
+// 6.9
 externalDeclaration
     : '__extension__'? (
 	functionDefinition
@@ -612,6 +635,16 @@ externalDeclaration
 	| ';' // stray ;
 	| asmDefinition // GCC
 	)
+    ;
+
+// 6.9.1
+functionDefinition
+    : attributeSpecifierSequence? declarationSpecifiers? declarator declarationList? functionBody
+    ;
+
+// 6.9.1
+functionBody
+    : compoundStatement
     ;
 
 asmDefinition
@@ -664,10 +697,6 @@ asmClobbers
 asmArgument
     : asmStringLiteral
     | asmStringLiteral ':' asmOperands? ( ':' asmOperands? (':' asmClobbers? )* )?
-    ;
-
-functionDefinition
-    : declarationSpecifiers? declarator declarationList? compoundStatement
     ;
 
 declarationList

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using Antlr4.Runtime;
 using System.IO;
 using System.Linq;
@@ -8,19 +9,24 @@ public abstract class CParserBase : Parser
 {
     SymbolTable _st;
     private bool debug = false;
-    private bool enable_all = true;
+    private bool no_semantics = true;
+    public List<string> _args;
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
     {
+        // Get options from process args.
+        var args = Environment.GetCommandLineArgs().ToList();
+        no_semantics = !(args?.Where(a => a.IndexOf("-semantics", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false);
+        debug = args?.Where(a => a.IndexOf("-debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         _st = new SymbolTable();
     }
 
     public bool IsAlignmentSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsAlignmentSpecifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -31,15 +37,15 @@ public abstract class CParserBase : Parser
             result = true;
         else
             result = false;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsAtomicTypeSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsAtomicTypeSpecifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -50,45 +56,45 @@ public abstract class CParserBase : Parser
             result = true;
         else
             result = false;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsAttributeDeclaration()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         return IsAttributeSpecifierSequence();
     }
 
     public bool IsAttributeSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
-        if (this.debug) System.Console.Write(token);
+        if (this.debug) System.Console.Write("IsAttributeSpecifier " + token);
         var result = token.Type == CLexer.LeftBracket;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsAttributeSpecifierSequence()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         return IsAttributeSpecifier();
     }
 
-	public bool IsDeclaration()
-	{
-        if (enable_all) return true;
-		var result = IsDeclarationSpecifiers()
+    public bool IsDeclaration()
+    {
+        if (no_semantics) return true;
+        var result = IsDeclarationSpecifiers()
                      || IsAttributeSpecifierSequence()
                      || IsStaticAssertDeclaration()
                      || IsAttributeDeclaration();
-		return result;
-	}
+        return result;
+    }
 
     public bool IsDeclarationSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         return
             IsStorageClassSpecifier()
             || IsTypeSpecifier()
@@ -104,19 +110,19 @@ public abstract class CParserBase : Parser
 
     public bool IsEnumSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
-        if (this.debug) System.Console.Write(token);
+        if (this.debug) System.Console.Write("IsEnumSpecifier " + token);
         var result = token.Type == CLexer.Enum;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsFunctionSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsFunctionSpecifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -133,31 +139,31 @@ public abstract class CParserBase : Parser
             result = true;
         else
             result = false;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsStatement()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         return !IsDeclaration();
     }
 
     public bool IsStaticAssertDeclaration()
-	{
-        if (enable_all) return true;
-		var token = (this.InputStream as CommonTokenStream).LT(1);
-		if (this.debug) System.Console.Write(token);
-		var result = token.Type == CLexer.Static_assert;
-		if (this.debug) System.Console.WriteLine(result);
-		return result;
-	}
+    {
+        if (no_semantics) return true;
+        var token = (this.InputStream as CommonTokenStream).LT(1);
+        if (this.debug) System.Console.Write("IsStaticAssertDeclaration " + token);
+        var result = token.Type == CLexer.Static_assert;
+        if (this.debug) System.Console.WriteLine(" " + result);
+        return result;
+    }
 
     public bool IsStorageClassSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsStorageClassSpecifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -168,27 +174,27 @@ public abstract class CParserBase : Parser
             result = true;
         else
             result = false;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
-	public bool IsStructOrUnionSpecifier()
-	{
-        if (enable_all) return true;
-		var token = (this.InputStream as CommonTokenStream).LT(1);
-		if (this.debug) System.Console.Write(token);
-		var result = token.Type == CLexer.Struct ||
-					 token.Type == CLexer.Union;
-		if (this.debug) System.Console.WriteLine(result);
-		return result;
-	}
+    public bool IsStructOrUnionSpecifier()
+    {
+        if (no_semantics) return true;
+        var token = (this.InputStream as CommonTokenStream).LT(1);
+        if (this.debug) System.Console.Write("IsStructOrUnionSpecifier " + token);
+        var result = token.Type == CLexer.Struct ||
+                     token.Type == CLexer.Union;
+        if (this.debug) System.Console.WriteLine(" " + result);
+        return result;
+    }
 
 
     public bool IsTypedefName()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsTypedefName " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -206,26 +212,26 @@ public abstract class CParserBase : Parser
         else
             result = false;
 
-        if (result) return result;
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsTypeofSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
-        if (this.debug) System.Console.Write(token);
+        if (this.debug) System.Console.Write("IsTypeofSpecifier " + token);
         var result = token.Type == CLexer.Typeof ||
                      token.Type == CLexer.Typeof_unqual;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
     public bool IsTypeQualifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsTypeQualifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -236,16 +242,16 @@ public abstract class CParserBase : Parser
             result = true;
         else
             result = false;
-        if (this.debug) System.Console.WriteLine(result);
+        if (this.debug) System.Console.WriteLine(" " + result);
         return result;
     }
 
 
     public bool IsTypeSpecifier()
     {
-        if (enable_all) return true;
+        if (no_semantics) return true;
         var text = (this.InputStream as CommonTokenStream).LT(1).Text;
-        if (this.debug) System.Console.Write(text);
+        if (this.debug) System.Console.Write("IsTypeSpecifier " + text);
         var resolved = _st.Resolve(text);
         bool result = false;
         if (resolved == null)
@@ -263,10 +269,13 @@ public abstract class CParserBase : Parser
         else
             result = false;
 
-        if (result) return result;
-        //if (this.debug) System.Console.WriteLine(result);
+        if (result) {
+            if (this.debug) System.Console.WriteLine(" " +result);
+            return result;
+        }
         result = IsAtomicTypeSpecifier() || IsStructOrUnionSpecifier() || IsEnumSpecifier()
             || IsTypedefName() || IsTypeofSpecifier();
+        if (this.debug) System.Console.WriteLine(" " +result);
         return result;
     }
 

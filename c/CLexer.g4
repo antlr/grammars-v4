@@ -120,6 +120,10 @@ Default
     : 'default'
     ;
 
+Deprecated
+    : 'deprecated' // CLANG
+    ;
+
 Do
     : 'do'
     ;
@@ -182,6 +186,7 @@ Register
 
 Restrict
     : 'restrict'
+    | '__restrict__'
     ;
 
 Return
@@ -218,6 +223,10 @@ Switch
 
 Thread_local
     : 'thread_local'
+    ;
+
+True
+    : 'true'
     ;
 
 Typedef
@@ -511,14 +520,7 @@ fragment HexQuad
     : HexadecimalDigit HexadecimalDigit HexadecimalDigit HexadecimalDigit
     ;
 
-Constant
-    : IntegerConstant
-    | FloatingConstant
-    //|   EnumerationConstant
-    | CharacterConstant
-    ;
-
-fragment IntegerConstant
+IntegerConstant
     : DecimalConstant IntegerSuffix?
     | OctalConstant IntegerSuffix?
     | HexadecimalConstant IntegerSuffix?
@@ -577,7 +579,7 @@ fragment LongLongSuffix
     | 'LL'
     ;
 
-fragment FloatingConstant
+FloatingConstant
     : DecimalFloatingConstant
     | HexadecimalFloatingConstant
     ;
@@ -625,7 +627,7 @@ fragment FloatingSuffix
     : [flFL]
     ;
 
-fragment CharacterConstant
+CharacterConstant
     : '\'' CCharSequence '\''
     | 'L\'' CCharSequence '\''
     | 'u\'' CCharSequence '\''
@@ -687,7 +689,8 @@ MultiLineMacro
     ;
 
 LineDirective
-    : '#' [ \t]* 'line' .*? ( '\n' | '\r\n' | '\r' ) -> channel (LINEDIRECTIVECHANNEL)
+    : ('#' [ \t]* 'line' | '#' [ \t]* [0-9]+)
+		.*? ( '\n' | '\r\n' | '\r' ) -> channel (LINEDIRECTIVECHANNEL)
     ;
 
 Directive

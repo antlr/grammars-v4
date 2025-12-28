@@ -9,14 +9,14 @@ public class SymbolTable {
         var globalScope = new Symbol() { Name = "global", Classification = new HashSet<TypeClassification>() {TypeClassification.Global_} };
         scopeStack.Push(globalScope);
 
-		Define(new Symbol() { Name = "auto", Classification = new HashSet<TypeClassification>(){TypeClassification.StorageClassSpecifier_} });
-		Define(new Symbol() { Name = "constexpr", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "extern", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "register", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "static", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "thread_local", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "_Thread_local", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
-		Define(new Symbol() { Name = "typedef", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "auto", Classification = new HashSet<TypeClassification>(){TypeClassification.StorageClassSpecifier_} });
+        Define(new Symbol() { Name = "constexpr", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "extern", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "register", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "static", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "thread_local", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "_Thread_local", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
+        Define(new Symbol() { Name = "typedef", Classification = new HashSet<TypeClassification>() { TypeClassification.StorageClassSpecifier_ } });
 
         Define(new Symbol() { Name = "enum", Classification = new HashSet<TypeClassification>() { TypeClassification.EnumSpecifier_ } });
 
@@ -36,7 +36,7 @@ public class SymbolTable {
         Define(new Symbol() { Name = "float", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "double", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "signed", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-		Define(new Symbol() { Name = "unsigned", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+        Define(new Symbol() { Name = "unsigned", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "_BitInt", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "bool", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "_Bool", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
@@ -46,8 +46,8 @@ public class SymbolTable {
         Define(new Symbol() { Name = "_Decimal128", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__m128", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__m128d", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-		Define(new Symbol() { Name = "__m128i", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-		Define(new Symbol() { Name = "__extension__", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+        Define(new Symbol() { Name = "__m128i", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+        Define(new Symbol() { Name = "__extension__", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
 
         Define(new Symbol() { Name = "__builtin_va_list", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_has_attribute", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
@@ -76,20 +76,20 @@ public class SymbolTable {
 
         Define(new Symbol() { Name = "inline", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } });
         Define(new Symbol() { Name = "_Noreturn", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } });
-		Define(new Symbol() { Name = "__inline__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } });
-		
-		Define(new Symbol() { Name = "__cdecl", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__clrcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__stdcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__fastcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__thiscall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__vectorcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__inline__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } });
+        
+        Define(new Symbol() { Name = "__cdecl", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__clrcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__stdcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__fastcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__thiscall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+        Define(new Symbol() { Name = "__vectorcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
 
         Define(new Symbol() { Name = "__declspec", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
-		Define(new Symbol() { Name = "__attribute__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // GCC
+        Define(new Symbol() { Name = "__attribute__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // GCC
 
-		Define(new Symbol() { Name = "alignas", Classification = new HashSet<TypeClassification>() { TypeClassification.AlignmentSpecifier_ } });
-		Define(new Symbol() { Name = "align", Classification = new HashSet<TypeClassification>() { TypeClassification.AlignmentSpecifier_ } });
+        Define(new Symbol() { Name = "alignas", Classification = new HashSet<TypeClassification>() { TypeClassification.AlignmentSpecifier_ } });
+        Define(new Symbol() { Name = "align", Classification = new HashSet<TypeClassification>() { TypeClassification.AlignmentSpecifier_ } });
     }
 
     public void EnterScope(Symbol newScope) {

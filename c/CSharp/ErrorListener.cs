@@ -1,15 +1,12 @@
 // Generated from trgen 0.23.32
 
 using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
+using System;
+using System.IO;
 
 public class ErrorListener<S> : IAntlrErrorListener< S>
 {
@@ -29,6 +26,8 @@ public class ErrorListener<S> : IAntlrErrorListener< S>
         int col, string msg, RecognitionException e)
     {
         string file_name = "<unknown>";
+        int line_adjusted = line;
+        
         //Get token stream.
         if (recognizer is Parser)
         {
@@ -44,6 +43,7 @@ public class ErrorListener<S> : IAntlrErrorListener< S>
             var ind = q.TokenIndex;
             for (int j = ind; ; j--)
             {
+                if (j < 0) break;
                 var t = ts2.Get(j);
                 if (t == null) break;
                 if (t.Type == CLexer.LineDirective)
@@ -56,8 +56,12 @@ public class ErrorListener<S> : IAntlrErrorListener< S>
                         // Get line number from directive.
                         if (int.TryParse(parts[1], out int dir_line))
                         {
+                            // Get line number of directive.
+                            var line_directive = t.Line;
+                            // Get line difference from line directive.
+                            var line_diff = line - line_directive;
                             // Adjust line number.
-                            line = line - dir_line;
+                            line_adjusted = line_diff + dir_line - 1;
                             file_name = parts[2].Trim();
                         }
                     }
@@ -67,13 +71,13 @@ public class ErrorListener<S> : IAntlrErrorListener< S>
         }
         had_error = true;
         if (_tee)
-	    {
-            _out.WriteLine(file_name + " line " + line + ":" + col + " " + msg);
+        {
+            _out.WriteLine(file_name + " line " + line_adjusted + ", .p " + line + ":" + col + " " + msg);
 
         }
         if (!_quiet)
         {
-            System.Console.Error.WriteLine(file_name + " line " + line + ":" + col + " " + msg);
+            System.Console.Error.WriteLine(file_name + " line " + line_adjusted + ", .p " + line + ":" + col + " " + msg);
         }
     }
 }
