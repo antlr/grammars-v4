@@ -1,3 +1,3 @@
 storage = { }
 storage.continue = true
-storage['continue']
+print(storage['continue'])
