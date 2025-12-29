@@ -20,6 +20,13 @@ public abstract class CLexerBase : Lexer
 
     public static ICharStream RunGccAndMakeStream(ICharStream i)
     {
+        var is_windows = false;
+        var os = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform;
+        if (os(System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            is_windows = true;
+        }
+
         // Get options to lexer from process args.
         var args = Environment.GetCommandLineArgs().ToList();
 
@@ -46,7 +53,7 @@ public abstract class CLexerBase : Lexer
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "gcc.exe",
+                FileName = (is_windows ? "gcc.exe":"gcc"),
                 ArgumentList =
                 {
                     "-std=c2x",

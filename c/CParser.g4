@@ -431,34 +431,40 @@ typeQualifierList
     : typeQualifier+
     ;
 
-// 6.7.6
+// 6.7.7.1
 parameterTypeList
     : parameterList (',' '...')?
     | '...'
     ;
 
-// 6.7.6
+// 6.7.7.1
 parameterList
     : parameterDeclaration (',' parameterDeclaration)*
     ;
 
+// 6.7.7.1
 parameterDeclaration
-    : declarationSpecifiers ( declarator | abstractDeclarator? )
+    : attributeSpecifierSequence? declarationSpecifiers? declarator
+    | attributeSpecifierSequence? declarationSpecifiers abstractDeclarator?
     ;
 
+// 6.10.1
 identifierList
     : Identifier (',' Identifier)*
     ;
 
+// 6.7.8
 typeName
     : specifierQualifierList abstractDeclarator?
     ;
 
+// 6.7.8
 abstractDeclarator
     : vcSpecificModifer? pointer
     | vcSpecificModifer? pointer? directAbstractDeclarator gccDeclaratorExtension*
     ;
 
+// 6.7.8
 directAbstractDeclarator
     : '(' abstractDeclarator ')' gccDeclaratorExtension*
     | '[' typeQualifierList? assignmentExpression? ']'
@@ -473,6 +479,7 @@ directAbstractDeclarator
     | directAbstractDeclarator '(' parameterTypeList? ')' gccDeclaratorExtension*
     ;
 
+// 6.7.9
 typedefName
     : Identifier
     ;
