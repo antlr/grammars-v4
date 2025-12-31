@@ -61,7 +61,7 @@ public class SymbolTable {
         Define(new Symbol() { Name = "__builtin_expect", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_expect_with_probability", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_trap", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-        Define(new Symbol() { Name = "__builtin_unreachable", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+//        Define(new Symbol() { Name = "__builtin_unreachable", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_assoc_barrier", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_assume_aligned", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_LINE", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
@@ -89,7 +89,6 @@ public class SymbolTable {
 	Define(new Symbol() { Name = "_purecall_handler", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "_onexit_t", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "_locale_t", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
-	Define(new Symbol() { Name = "__builtin_unreachable", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "_invalid_parameter_handler", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "__inline", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	
