@@ -41,9 +41,6 @@ channels {
     LINEDIRECTIVECHANNEL
 }
 
-KW__asm: '__asm';
-KW__asm__: '__asm__';
-KWasm: 'asm';
 Attribute: '__attribute__' | '__attribute' ;
 KW__builtin_offsetof: '__builtin_offsetof';
 KW__builtin_va_arg: '__builtin_va_arg';
@@ -56,14 +53,12 @@ KW__clrcall: '__clrcall';
 KW__declspec: '__declspec';
 KW__extension__: '__extension__';
 KW__fastcall: '__fastcall';
-KW__inline__: '__inline__';
 KW__m128: '__m128';
 KW__m128d: '__m128d';
 KW__m128i: '__m128i';
 KW__stdcall: '__stdcall';
 KW__thiscall: '__thiscall';
 KW__vectorcall: '__vectorcall';
-KW__volatile__: '__volatile__';
 KW__real__: '__real__';
 KW__imag__: '__imag__';
 KW__func__: '__func__';
@@ -81,6 +76,12 @@ Alignof
     | '_Alignof'
     | '__alignof__' // GNU
     | '__alignof'
+    ;
+
+Asm
+    : 'asm'
+    | '__asm'
+    | '__asm__'
     ;
 
 Auto
@@ -166,6 +167,8 @@ If
 
 Inline
     : 'inline'
+    | '__inline__'
+    | '__inline'
     ;
 
 Int
@@ -258,6 +261,7 @@ Void
 
 Volatile
     : 'volatile'
+    | '__volatile__'
     ;
 
 While

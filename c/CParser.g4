@@ -345,14 +345,13 @@ atomicTypeSpecifier
 typeQualifier
     : 'const'
     | Restrict
-    | 'volatile'
+    | Volatile
     | '_Atomic'
     ;
 
 functionSpecifier
-    : 'inline'
+    : Inline
     | '_Noreturn'
-    | '__inline__' // GCC extension
     | '__stdcall'
     | gnuAttribute
     | '__declspec' '(' (Identifier 
@@ -656,11 +655,11 @@ functionBody
 
 asmDefinition
     : simpleAsmExpr
-    | ('__asm' | '__asm__' | 'asm') '(' toplevelAsmArgument ')'
+    | Asm '(' toplevelAsmArgument ')'
     ;
 
 simpleAsmExpr
-    : ('__asm' | '__asm__' | 'asm') '(' asmStringLiteral ')'
+    : Asm '(' asmStringLiteral ')'
     ;
 
 toplevelAsmArgument
@@ -683,13 +682,12 @@ asmOperand
     ;
 
 asmStatement
-    : ('__asm' | '__asm__' | 'asm') asmQualifierList? '(' asmArgument ')' ';'
+    : Asm asmQualifierList? '(' asmArgument ')' ';'
     ;
 
 asmQualifier
-    : 'volatile'
-    | '__volatile__'
-    | 'inline'
+    : Volatile
+    | Inline
     | 'goto'
     ;
 

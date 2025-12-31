@@ -85,6 +85,14 @@ public class SymbolTable {
         Define(new Symbol() { Name = "__thiscall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
         Define(new Symbol() { Name = "__vectorcall", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
 
+	Define(new Symbol() { Name = "_purecall", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_purecall_handler", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_onexit_t", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_locale_t", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__builtin_unreachable", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_invalid_parameter_handler", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__inline", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	
         Define(new Symbol() { Name = "__declspec", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
         Define(new Symbol() { Name = "__attribute__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // GCC
 

@@ -47,7 +47,7 @@ public abstract class CLexerBase : Lexer
             File.WriteAllText(output_name, x1);
             return CharStreams.fromString(x1);
         }
-        File.WriteAllText("stdin.c", x1);
+        File.WriteAllText(output_name, x1);
 
         if (gcc)
         {
