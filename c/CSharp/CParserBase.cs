@@ -146,6 +146,15 @@ public abstract class CParserBase : Parser
     public bool IsStatement()
     {
         if (no_semantics) return true;
+        var t1 = (this.InputStream as CommonTokenStream).LT(1);
+        var t2 = (this.InputStream as CommonTokenStream).LT(2);
+        if (this.debug) System.Console.Write("IsStatement1 " + t1);
+        if (this.debug) System.Console.Write("IsStatement2 " + t2);
+        if (t1.Type == CLexer.Identifier && t2.Type == CLexer.Colon)
+        {
+            if (this.debug) System.Console.Write("IsStatement3 true");
+            return true;
+        }
         return !IsDeclaration();
     }
 
