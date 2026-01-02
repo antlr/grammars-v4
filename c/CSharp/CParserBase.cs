@@ -290,12 +290,12 @@ public abstract class CParserBase : Parser
 
     public void EnterDeclaration()
     {
-		if (debug) System.Console.WriteLine("EnterDeclaration");
+        if (debug) System.Console.WriteLine("EnterDeclaration");
         ParserRuleContext context = this.Context;
         CParser.DeclarationContext declaration_context = context as CParser.DeclarationContext;
         CParser.DeclarationSpecifiersContext declaration_specifiers = declaration_context?.declarationSpecifiers();
-		CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers?.declarationSpecifier();
-		CParser.DirectDeclaratorContext direct_declarator = context as CParser.DirectDeclaratorContext;
+        CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers?.declarationSpecifier();
+        CParser.DirectDeclaratorContext direct_declarator = context as CParser.DirectDeclaratorContext;
 
         // Declare any typeSpecifiers that declare something.
         if (declaration_specifier != null)
@@ -337,13 +337,13 @@ public abstract class CParserBase : Parser
                     // itself is a type, not a variable.
                     var text = identifier.GetText();
                     if (is_typedef) {
-						if (debug) System.Console.WriteLine("Declaration2 Declarator " + text);
-						_st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-					}
+                        if (debug) System.Console.WriteLine("Declaration2 Declarator " + text);
+                        _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+                    }
                     else {
-						if (debug) System.Console.WriteLine("Declaration3 Declarator " + text);
-						_st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } });
-					}
+                        if (debug) System.Console.WriteLine("Declaration3 Declarator " + text);
+                        _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } });
+                    }
                 }
             }
         }
