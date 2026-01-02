@@ -290,32 +290,44 @@ public abstract class CParserBase : Parser
 
     public void EnterDeclaration()
     {
+		if (debug) System.Console.WriteLine("EnterDeclaration");
         ParserRuleContext context = this.Context;
-        CParser.DeclarationContext declaration_context = (CParser.DeclarationContext)context;
-        CParser.DeclarationSpecifiersContext declaration_specifiers = declaration_context.declarationSpecifiers();
-        CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers?.declarationSpecifier();
-        bool is_typedef = declaration_specifier.Where(ds =>
-        {
-            return ds.storageClassSpecifier()?.Typedef() != null;
-        }).Any();
+        CParser.DeclarationContext declaration_context = context as CParser.DeclarationContext;
+        CParser.DeclarationSpecifiersContext declaration_specifiers = declaration_context?.declarationSpecifiers();
+		CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers?.declarationSpecifier();
+		CParser.DirectDeclaratorContext direct_declarator = context as CParser.DirectDeclaratorContext;
 
         // Declare any typeSpecifiers that declare something.
-        foreach (var ds in declaration_specifier)
+        if (declaration_specifier != null)
         {
-            var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
-            if (sous != null)
+            bool is_typedef = declaration_specifier?.Where(ds =>
             {
-                var id = sous.Identifier()?.GetText();
-                if (id != null)
-                    _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() {TypeClassification.TypeSpecifier_} });
+                return ds.storageClassSpecifier()?.Typedef() != null;
+            }).Any() ?? false;
+            foreach (var ds in declaration_specifier)
+            {
+                var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
+                if (sous != null)
+                {
+                    var id = sous.Identifier()?.GetText();
+                    if (id != null)
+                    {
+                        if (debug) System.Console.WriteLine("Declaration1 Declaration " + id);
+                        _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+                    }
+                }
             }
         }
 
-        CParser.InitDeclaratorListContext init_declaration_list = declaration_context.initDeclaratorList();
-        CParser.InitDeclaratorContext[] x = init_declaration_list?.initDeclarator();
-        if (x != null)
+        CParser.InitDeclaratorListContext init_declaration_list = declaration_context?.initDeclaratorList();
+        CParser.InitDeclaratorContext[] init_declarators = init_declaration_list?.initDeclarator();
+        if (init_declarators != null)
         {
-            foreach (var id in x)
+            bool is_typedef = declaration_specifier?.Where(ds =>
+            {
+                return ds.storageClassSpecifier()?.Typedef() != null;
+            }).Any() ?? false;
+            foreach (var id in init_declarators)
             {
                 CParser.DeclaratorContext y = id?.declarator();
                 var identifier = y.directDeclarator()?.Identifier();
@@ -324,10 +336,45 @@ public abstract class CParserBase : Parser
                     // If a typedef is used in the declaration, the declarator
                     // itself is a type, not a variable.
                     var text = identifier.GetText();
-                    if (is_typedef)
-                        _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-                    else 
-                        _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } });
+                    if (is_typedef) {
+						if (debug) System.Console.WriteLine("Declaration2 Declarator " + text);
+						_st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+					}
+                    else {
+						if (debug) System.Console.WriteLine("Declaration3 Declarator " + text);
+						_st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } });
+					}
+                }
+            }
+        }
+
+        if (direct_declarator != null)
+        {
+            RuleContext parent = direct_declarator;
+            while (parent != null && parent as CParser.DeclarationContext == null)
+            {
+                parent = parent.Parent;
+            }
+            if (parent == null) return;
+            var dss = (parent as CParser.DeclarationContext)?.declarationSpecifiers().declarationSpecifier();
+            bool is_typedef = dss?.Where(ds =>
+            {
+                return ds.storageClassSpecifier()?.Typedef() != null;
+            }).Any() ?? false;
+            var identifier = direct_declarator.Identifier();
+            if (identifier != null)
+            {
+                var text = identifier.GetText();
+                if (debug) System.Console.WriteLine("Declaration4 direct_declarator " + text);
+                if (is_typedef)
+                {
+                    if (debug) System.Console.WriteLine("Declaration2 Declarator " + text);
+                    _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+                }
+                else
+                {
+                    if (debug) System.Console.WriteLine("Declaration3 Declarator " + text);
+                    _st.Define(new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } });
                 }
             }
         }

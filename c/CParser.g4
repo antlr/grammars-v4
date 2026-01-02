@@ -204,7 +204,7 @@ constantExpression
     ;
 
 declaration
-    : declarationSpecifiers initDeclaratorList? ';' {this.EnterDeclaration();}
+    : declarationSpecifiers initDeclaratorList? ';'
     | staticAssertDeclaration
     | attributeDeclaration
     ;
@@ -376,7 +376,7 @@ declarator
 // The rules from the spec were refactored. array-declarator and function-declarator
 // were unfolded into direct-declarator. Those rules were deleted.
 directDeclarator
-    : Identifier attributeSpecifierSequence?
+    : Identifier attributeSpecifierSequence? {this.EnterDeclaration();}
     | '(' declarator ')'
     | directDeclarator '[' typeQualifierList? assignmentExpression? ']' attributeSpecifierSequence?
     | directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']' attributeSpecifierSequence?
