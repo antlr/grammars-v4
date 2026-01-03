@@ -31,7 +31,7 @@ public class ErrorListener<S> : IAntlrErrorListener< S>
         //Get token stream.
         if (recognizer is Parser)
         {
-            var p = recognizer as CParser;
+            var p = recognizer as Parser;
             var ts = p.InputStream;
             var i = ts.Index;
             var z = offendingSymbol;
