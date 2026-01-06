@@ -26,7 +26,9 @@ public class Program
     public static bool HeatMap { get; set; } = false;
     public static void SetupParse2(string input, string fn, bool quiet = false)
     {
-        ICharStream str = new CodePointCharStream(input);
+        var code_point_stream = new CodePointCharStream(input);
+        code_point_stream.name = fn;
+        ICharStream str = code_point_stream;
         CharStream = str;
         var lexer = new <lexer_name>(str);
         Lexer = lexer;
@@ -226,6 +228,10 @@ public class Program
             {
                 earley = true;
                 show_tree = false;
+            }
+            else if (args[i][0] == '-')
+            {
+                // Ignore unknown option.
             }
             else
             {
