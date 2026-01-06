@@ -628,7 +628,16 @@ fragment HexadecimalDigitSequence
     ;
 
 fragment FloatingSuffix
-    : [flFL]
+    : [Ff]
+    | [Ll]
+    | [Dd][Ff]
+    | [Dd][Dd]
+    | [Dd][Ll]
+    | [Ff] '16'
+    | [Ff] '32'
+    | [Ff] '64'
+    | [Ff] '128'
+    | [Bb][Ff] '16'
     ;
 
 CharacterConstant
