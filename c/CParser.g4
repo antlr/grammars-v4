@@ -369,7 +369,7 @@ alignmentSpecifier
 // https://github.com/gcc-mirror/gcc/blob/f5cda36f16d447198c1e00b191d720b6f4a02876/gcc/c/c-parser.cc#L4975-L4995
 declarator
     : gnuAttribute? pointer declarationSpecifiers? declarator
-    | directDeclarator gccDeclaratorExtension*
+    | gnuAttribute* directDeclarator gccDeclaratorExtension*
     ;
 
 // 6.7.6
