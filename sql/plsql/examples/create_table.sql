@@ -264,3 +264,7 @@ CREATE TABLE fruit (
     id NUMERIC(9,0) PRIMARY KEY,
     data varchar2(50))
     ANNOTATIONS (Visibility 'Everyone');
+
+CREATE TABLE "SCHEMA"."TAB" (
+    ID NUMBER(9,0) NOT NULL PRIMARY KEY,
+    OVERRIDE VARCHAR2(50));
