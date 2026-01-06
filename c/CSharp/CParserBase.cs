@@ -9,7 +9,7 @@ public abstract class CParserBase : Parser
 {
     SymbolTable _st;
     private bool debug = false;
-    private bool no_semantics = true;
+    private bool no_semantics = false;
     public List<string> _args;
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
