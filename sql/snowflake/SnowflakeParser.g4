@@ -4170,6 +4170,7 @@ expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
     | json_literal
+    | expr '->' expr
     | trim_expression
     | function_call
     | subquery
