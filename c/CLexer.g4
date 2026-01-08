@@ -194,6 +194,7 @@ Register
 Restrict
     : 'restrict'
     | '__restrict__'
+    | '__restrict'
     ;
 
 Return
