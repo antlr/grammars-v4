@@ -368,25 +368,27 @@ alignmentSpecifier
 // This rule is basically what was implemented in the GCC compiler.
 // https://github.com/gcc-mirror/gcc/blob/f5cda36f16d447198c1e00b191d720b6f4a02876/gcc/c/c-parser.cc#L4975-L4995
 declarator
-    : gnuAttribute? pointer declarationSpecifiers? declarator
-    | gnuAttribute* directDeclarator gccDeclaratorExtension*
+    : (gnuAttribute? pointer declarationSpecifiers?)* (gnuAttribute* directDeclarator gccDeclaratorExtension*) {this.EnterDeclaration();}
     ;
 
 // 6.7.6
 // The rules from the spec were refactored. array-declarator and function-declarator
 // were unfolded into direct-declarator. Those rules were deleted.
 directDeclarator
-    : Identifier attributeSpecifierSequence? {this.EnterDeclaration();}
-    | '(' declarator ')'
-    | directDeclarator '[' typeQualifierList? assignmentExpression? ']' attributeSpecifierSequence?
-    | directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']' attributeSpecifierSequence?
-    | directDeclarator '[' typeQualifierList 'static' assignmentExpression ']' attributeSpecifierSequence?
-    | directDeclarator '[' typeQualifierList? '*' ']' attributeSpecifierSequence?
-    | directDeclarator '(' parameterTypeList? ')' attributeSpecifierSequence?
-    | Identifier ':' DigitSequence         // bit field
-    | vcSpecificModifer Identifier         // Visual C Extension
-    | '(' vcSpecificModifer declarator ')' // Visual C Extension
-    | gnuAttribute
+    : (
+	Identifier attributeSpecifierSequence?
+	| '(' declarator ')'
+	| Identifier ':' DigitSequence         // bit field
+	| vcSpecificModifer Identifier         // Visual C Extension
+	| '(' vcSpecificModifer declarator ')' // Visual C Extension
+	| gnuAttribute
+    )
+    ( '[' typeQualifierList? assignmentExpression? ']' attributeSpecifierSequence?
+      | '[' 'static' typeQualifierList? assignmentExpression ']' attributeSpecifierSequence?
+      | '[' typeQualifierList 'static' assignmentExpression ']' attributeSpecifierSequence?
+      | '[' typeQualifierList? '*' ']' attributeSpecifierSequence?
+      | '(' parameterTypeList? ')' attributeSpecifierSequence?
+    )*
     ;
 
 vcSpecificModifer
@@ -443,8 +445,8 @@ parameterList
 
 // 6.7.7.1
 parameterDeclaration
-    : attributeSpecifierSequence? declarationSpecifiers? declarator
-    | attributeSpecifierSequence? declarationSpecifiers abstractDeclarator?
+    : (attributeSpecifierSequence? ({this.IsDeclarationSpecifier()}? declarationSpecifiers | ) )
+	(declarator | abstractDeclarator | )
     ;
 
 // 6.10.1
@@ -570,6 +572,7 @@ statement
 
 labeledStatement
     : Identifier ':' statement?
+    | Label Identifier ';'
     | 'case' constantExpression ':' statement
     | 'default' ':' statement
     ;

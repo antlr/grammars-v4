@@ -68,7 +68,7 @@ public class SymbolTable {
         Define(new Symbol() { Name = "__builtin_FUNCTION", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_FILE", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin___clear_cache", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-        Define(new Symbol() { Name = "__builtin_prefetch", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+        Define(new Symbol() { Name = "__builtin_prefetch", Classification = new HashSet<TypeClassification>() { TypeClassification.Function_ } });
         Define(new Symbol() { Name = "__builtin_classify_type", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_extend_pointer", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
         Define(new Symbol() { Name = "__builtin_goacc_parlevel_id", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
@@ -92,7 +92,18 @@ public class SymbolTable {
         Define(new Symbol() { Name = "_invalid_parameter_handler", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
         Define(new Symbol() { Name = "__inline", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
         
-        Define(new Symbol() { Name = "__declspec", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
+
+	Define(new Symbol() { Name = "__int8", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__int16", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__int32", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__int64", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__int128", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_Float16", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__v8hf", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__bf16", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "__v16bf", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	
+	Define(new Symbol() { Name = "__declspec", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // MS
         Define(new Symbol() { Name = "__attribute__", Classification = new HashSet<TypeClassification>() { TypeClassification.FunctionSpecifier_ } }); // GCC
 
         Define(new Symbol() { Name = "alignas", Classification = new HashSet<TypeClassification>() { TypeClassification.AlignmentSpecifier_ } });

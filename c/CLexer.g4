@@ -175,6 +175,10 @@ Int
     : 'int'
     ;
 
+Label
+    : '__label__' // gnu
+    ;
+
 Long
     : 'long'
     ;

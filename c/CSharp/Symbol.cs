@@ -10,9 +10,8 @@ public class Symbol {
     {
         var result = Name;
         var classification = Classification.ToString();
-        result += " (with classification " + classification;
-        result += ")";
-        if (Parent != null) result += " of " + Parent.ToString();
+        result += " (with classification " + string.Join(", ", Classification) + ")";
+        //if (Parent != null) result += " of " + Parent.ToString();
         return result;
     }
 }
