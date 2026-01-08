@@ -99,6 +99,9 @@ public class SymbolTable {
 	Define(new Symbol() { Name = "__int64", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "__int128", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "_Float16", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_Float32", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_Float64", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
+	Define(new Symbol() { Name = "_Float128", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "__v8hf", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "__bf16", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
 	Define(new Symbol() { Name = "__v16bf", Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } }); // gcc
