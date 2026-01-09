@@ -4170,7 +4170,7 @@ expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
     | json_literal
-    | expr '->' expr
+    | lambda_params '->' expr
     | trim_expression
     | function_call
     | subquery
@@ -4180,6 +4180,11 @@ expr
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | primitive_expression //Should be latest rule as it's nearly a catch all
+    ;
+
+lambda_params
+    : id_ data_type?
+    | '(' id_ data_type? (',' id_ data_type?)* ')'
     ;
 
 iff_expr
@@ -4246,7 +4251,7 @@ data_type
     | binary_alias = ( BINARY | VARBINARY) data_type_size?
     | VARIANT
     | OBJECT
-    | ARRAY
+    | ARRAY ('(' data_type ')')?
     | GEOGRAPHY
     | GEOMETRY
     | VECTOR '(' vector_element_type COMMA num ')'
