@@ -108,6 +108,18 @@ public abstract class CParserBase : Parser
         return result;
     }
 
+    public bool IsTypeSpecifierQualifier()
+    {
+        if (no_semantics) return true;
+        if (debug) System.Console.WriteLine("IsDeclarationSpecifier");
+        var result = 
+            IsTypeSpecifier()
+            || IsTypeQualifier()
+            || IsAlignmentSpecifier();
+        if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + result);
+        return result;
+    }
+
     public bool IsDeclarationSpecifiers()
     {
         return IsDeclarationSpecifier();
@@ -402,6 +414,40 @@ public abstract class CParserBase : Parser
     public bool IsNullStructDeclarationListExtension()
     {
         return true;
+    }
+
+    public bool IsCast()
+    {
+        var result = false;
+        // Look for a cast.
+        if (no_semantics) return true;
+        var t1 = (this.InputStream as CommonTokenStream).LT(1);
+        var t2 = (this.InputStream as CommonTokenStream).LT(2);
+        if (this.debug) System.Console.WriteLine("IsCast1 " + t1);
+        if (this.debug) System.Console.WriteLine("IsCast2 " + t2);
+        if (t1.Type != CLexer.LeftParen)
+        {
+            if (this.debug) System.Console.Write("IsCast " + result);
+        } else if (t2.Type != CLexer.Identifier)
+        {
+            // Assume typecast until otherwise.
+            result = true;
+        } else
+        {
+            // Check id.
+            var text = t2.Text;
+            var resolved = _st.Resolve(text);
+            if (resolved == null)
+            {
+                // It's not in symbol table.
+                result = false;
+            } else if (resolved.Classification.Contains(TypeClassification.TypeSpecifier_))
+                result = true;
+            else
+                result = false;
+        }
+        if (this.debug) System.Console.Write("IsStatement " + result);
+        return result;
     }
 }
 

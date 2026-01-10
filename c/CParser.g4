@@ -140,7 +140,7 @@ unaryExpression
     ;
 
 castExpression
-    : '(' typeName ')' castExpression
+    : {this.IsCast()}? '(' typeName ')' castExpression
     | unaryExpression
     | DigitSequence // for
     ;
@@ -299,7 +299,7 @@ memberDeclaration
     ;
 
 specifierQualifierList
-    : gnuAttributes? typeSpecifierQualifier+ attributeSpecifierSequence?
+    : gnuAttributes? ({this.IsTypeSpecifierQualifier()}?  typeSpecifierQualifier)+ attributeSpecifierSequence?
     ;
 
 typeSpecifierQualifier
