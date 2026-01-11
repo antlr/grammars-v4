@@ -387,7 +387,7 @@ directDeclarator
       | '[' 'static' typeQualifierList? assignmentExpression ']' attributeSpecifierSequence?
       | '[' typeQualifierList 'static' assignmentExpression ']' attributeSpecifierSequence?
       | '[' typeQualifierList? '*' ']' attributeSpecifierSequence?
-      | '(' parameterTypeList? ')' attributeSpecifierSequence?
+      | '(' parameterTypeList ')' attributeSpecifierSequence?
     )*
     ;
 
@@ -444,6 +444,14 @@ parameterList
     ;
 
 // 6.7.7.1
+// Slightly refactored from spec.
+// parameter-declaration:
+//   attribute-specifier-sequenceopt declaration-specifiers declarator
+//   attribute-specifier-sequenceopt declaration-specifiers abstract-declaratoropt
+//
+// Includes disambiguating predicate.
+// Note the spec states parameter-declataion cannot be empty. But, we
+// found situations where it must be allowed.
 parameterDeclaration
     : (attributeSpecifierSequence? ({this.IsDeclarationSpecifier()}? declarationSpecifiers | ) )
 	(declarator | abstractDeclarator | )
@@ -472,12 +480,12 @@ directAbstractDeclarator
     | '[' 'static' typeQualifierList? assignmentExpression ']'
     | '[' typeQualifierList 'static' assignmentExpression ']'
     | '[' '*' ']'
-    | '(' parameterTypeList? ')' gccDeclaratorExtension*
+    | '(' parameterTypeList ')' gccDeclaratorExtension*
     | directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
     | directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
     | directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
     | directAbstractDeclarator '[' '*' ']'
-    | directAbstractDeclarator '(' parameterTypeList? ')' gccDeclaratorExtension*
+    | directAbstractDeclarator '(' parameterTypeList ')' gccDeclaratorExtension*
     ;
 
 // 6.7.9
