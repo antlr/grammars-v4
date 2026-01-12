@@ -21,17 +21,13 @@ THE SOFTWARE.
  */
 
  /*
-  * Project      : an ANTLR4 parser grammar by the official PEG grammar
-  *                https://github.com/RobEin/ANTLR4-parser-for-Python-3.13
+  * Project      : an ANTLR4 parser grammar for Python 3 programming language based on the official PEG grammar
+  *                https://github.com/RobEin/ANTLR4-parser-for-Python-3.14
   * Developed by : Robert Einhorn
   *
   */
 
- /*
-  * Contributors : [Willie Shen](https://github.com/Willie169)
-  */
-
-// Python 3.13.2  https://docs.python.org/3.13/reference/grammar.html#full-grammar-specification
+// Python 3.14.2  https://docs.python.org/3.14/reference/grammar.html#full-grammar-specification
 
 parser grammar PythonParser;
 
@@ -50,10 +46,15 @@ func_type: '(' type_expressions? ')' '->' expression NEWLINE* EOF;
 
 statements: statement+;
 
-statement: compound_stmt  | simple_stmts;
+statement
+    : compound_stmt
+    | simple_stmts;
+
+single_compound_stmt
+    : compound_stmt;
 
 statement_newline
-    : compound_stmt NEWLINE
+    : single_compound_stmt NEWLINE
     | simple_stmts
     | NEWLINE
     | EOF;
@@ -71,12 +72,12 @@ simple_stmt
     | return_stmt
     | import_stmt
     | raise_stmt
-    | 'pass'
+    | pass_stmt
     | del_stmt
     | yield_stmt
     | assert_stmt
-    | 'break'
-    | 'continue'
+    | break_stmt
+    | continue_stmt
     | global_stmt
     | nonlocal_stmt;
 
@@ -98,8 +99,8 @@ assignment
     : name ':' expression ('=' annotated_rhs )?
     | ('(' single_target ')'
          | single_subscript_attribute_target) ':' expression ('=' annotated_rhs )?
-    | (star_targets '=' )+ (yield_expr | star_expressions) TYPE_COMMENT?
-    | single_target augassign (yield_expr | star_expressions);
+    | (star_targets '=' )+ annotated_rhs TYPE_COMMENT?
+    | single_target augassign annotated_rhs;
 
 annotated_rhs: yield_expr | star_expressions;
 
@@ -124,6 +125,15 @@ return_stmt
 raise_stmt
     : 'raise' (expression ('from' expression )?)?
     ;
+
+pass_stmt
+    : 'pass';
+
+break_stmt
+    : 'break';
+
+continue_stmt
+    : 'continue';
 
 global_stmt: 'global' name (',' name)*;
 
@@ -156,10 +166,12 @@ import_from_as_names
     : import_from_as_name (',' import_from_as_name)*;
 import_from_as_name
     : name ('as' name )?;
+
 dotted_as_names
     : dotted_as_name (',' dotted_as_name)*;
 dotted_as_name
     : dotted_name ('as' name )?;
+
 dotted_name
     : dotted_name '.' name
     | name;
@@ -311,10 +323,14 @@ try_stmt
 // ----------------
 
 except_block
-    : 'except' (expression ('as' name )?)? ':' block
+    : 'except' (expression ('as' name )? | expressions)? ':' block
     ;
+
+
 except_star_block
-    : 'except' '*' expression ('as' name )? ':' block;
+    : 'except' '*' (expression ('as' name )? | expressions) ':' block
+    ;
+
 finally_block
     : 'finally' ':' block;
 
@@ -472,7 +488,8 @@ type_alias
 // Type parameter declaration
 // --------------------------
 
-type_params: '[' type_param_seq  ']';
+type_params
+    : '[' type_param_seq  ']';
 
 type_param_seq: type_param (',' type_param)* ','?;
 
@@ -481,8 +498,6 @@ type_param
     | '*'  name type_param_starred_default?
     | '**' name type_param_default?
     ;
-
-
 type_param_bound: ':' expression;
 type_param_default: '=' expression;
 type_param_starred_default: '=' star_expression;
@@ -719,8 +734,25 @@ fstring_format_spec
 fstring
     : FSTRING_START fstring_middle* FSTRING_END;
 
+
+
+tstring_format_spec
+    : TSTRING_MIDDLE
+    | tstring_replacement_field;
+tstring_full_format_spec
+    : ':' tstring_format_spec*;
+tstring_replacement_field
+    : LBRACE annotated_rhs '='? fstring_conversion? tstring_full_format_spec? RBRACE;
+tstring_middle
+    : tstring_replacement_field
+    | TSTRING_MIDDLE;
+tstring
+    : TSTRING_START tstring_middle* TSTRING_END;
+
 string: STRING;
-strings: (fstring|string)+;
+strings
+    : (fstring|string)+
+    |tstring+;
 
 list
     : '[' star_named_expressions? ']';
@@ -875,7 +907,7 @@ func_type_comment
     : NEWLINE TYPE_COMMENT   // Must be followed by indented block
     | TYPE_COMMENT;
 
-// *** related to soft keywords: https://docs.python.org/3.13/reference/lexical_analysis.html#soft-keywords
+// *** related to soft keywords: https://docs.python.org/3.14/reference/lexical_analysis.html#soft-keywords
 name_except_underscore
     : NAME // ***** The NAME token can be used only in this rule *****
     | NAME_OR_TYPE
