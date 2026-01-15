@@ -96,7 +96,7 @@ then
         # Loop from 1 to n and execute the body of the loop each time
         for ((i=1; i\<=n; i++))
         do
-            dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
+            dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
             xxx="$?"
             if [ "$xxx" -ne 0 ]
             then
@@ -110,10 +110,10 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
-    echo "${files[1]}" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

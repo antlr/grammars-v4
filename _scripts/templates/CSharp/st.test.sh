@@ -9,6 +9,16 @@ shopt -s globstar
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
+# Get environment.
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
@@ -29,13 +39,17 @@ then
     exit 0
 fi
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ../<example_dir_unix>
+
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
+    dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -44,7 +58,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 
@@ -69,14 +83,6 @@ fi
 
 # For Unix environments, convert the newline in the .errors and .trees
 # to Unix style.
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Cygwin;;
-    MINGW*)     machine=MinGw;;
-    *)          machine="UNKNOWN:${unameOut}"
-esac
 if [[ "$machine" == "MinGw" || "$machine" == "Msys" || "$machine" == "Cygwin" || "#machine" == "Linux" ]]
 then
     gen=`find ../<example_dir_unix> -type f -name '*.errors' -o -name '*.tree'`

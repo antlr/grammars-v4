@@ -43,9 +43,13 @@ if (-not(Test-Path -Path "$filePath" -PathType Leaf)) {
 }
 $size = (Get-Item -Path "$filePath").Length
 if ( $size -eq 0 ) {
-    Write-Host "No test cases provided."
+    Write-Host "Test cases file empty."
     exit 0
 }
+
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ..\\<example_dir_unix>
 
 # Parse all input files.
 <if(individual_parsing)>
