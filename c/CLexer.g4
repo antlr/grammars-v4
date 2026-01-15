@@ -37,6 +37,8 @@ options {
     superClass = CLexerBase;
 }
 
+// Insert here @header for lexer.
+
 channels {
     LINEDIRECTIVECHANNEL
 }

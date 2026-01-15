@@ -38,6 +38,7 @@ options {
     tokenVocab=CLexer;
 }
 
+// Insert here @header for parser.
 
 compilationUnit
     : translationUnit? EOF
