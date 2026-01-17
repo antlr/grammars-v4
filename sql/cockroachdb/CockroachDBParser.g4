@@ -888,6 +888,26 @@ alter_stmt
     | alter_virtual_cluster_stmt
     ;
 
+alter_ddl_stmt
+    : alter_table_stmt
+    | alter_index_stmt
+    | alter_view_stmt
+    | alter_sequence_stmt
+    | alter_database_stmt
+    | alter_range_stmt
+    | alter_partition_stmt
+    | alter_schema_stmt
+    | alter_type_stmt
+    | alter_default_privileges_stmt
+    | alter_changefeed_stmt
+    | alter_backup_stmt
+    | alter_func_stmt
+    | alter_proc_stmt
+    | alter_backup_schedule
+    | alter_policy_stmt
+    | alter_job_stmt
+    ;
+
 backup_stmt
     : BACKUP opt_backup_targets INTO ( (sconst_or_placeholder | LATEST) IN)?
         string_or_placeholder_opt_list
@@ -958,6 +978,23 @@ create_stmt
 
 check_stmt
     : check_external_connection_stmt
+    ;
+
+check_external_connection_stmt
+    : CHECK EXTERNAL CONNECTION string_or_placeholder opt_with_check_external_connection_options_list?
+    ;
+
+opt_with_check_external_connection_options_list
+    : WITH (check_external_connection_options_list | OPTIONS '(' check_external_connection_options_list ')')
+    ;
+
+check_external_connection_options_list
+    : check_external_connection_options (',' check_external_connection_options)*
+    ;
+
+check_external_connection_options
+    : (TRANSFER | TIME) '=' string_or_placeholder
+    | CONCURRENTLY '=' a_expr
     ;
 
 delete_stmt
@@ -1914,6 +1951,27 @@ scrub_stmt
     |  scrub_database_stmt
     ;
 
+scrub_table_stmt
+    : EXPERIMENTAL SCRUB TABLE table_name opt_as_of_clause? opt_scrub_options_clause?
+    ;
+
+opt_scrub_options_clause
+    : WITH OPTIONS scrub_option_list
+    ;
+
+scrub_option_list
+    : scrub_option (',' scrub_option)*
+    ;
+
+scrub_option
+    : (INDEX | CONSTRAINT) (ALL | '(' name_list ')')
+    | PHYSICAL
+    ;
+
+scrub_database_stmt
+    : EXPERIMENTAL SCRUB DATABASE database_name opt_as_of_clause?
+    ;
+
 drop_ddl_stmt
     : drop_database_stmt
     | drop_index_stmt
@@ -2232,6 +2290,451 @@ opt_locked_rels
 opt_nowait_or_skip
     : SKIP LOCKED
     | NOWAIT
+    ;
+
+preparable_set_stmt
+    : set_session_stmt
+    | set_local_stmt
+    | set_csetting_stmt
+    | use_stmt
+    ;
+
+set_session_stmt
+    : SET (SESSION (set_rest_more | CHARACTERISTICS AS TRANSACTION transaction_mode_list) | set_rest_more)
+    ;
+
+set_rest_more
+    : set_rest
+    ;
+
+set_rest
+    : generic_set
+    ;
+
+generic_set
+    : var_name to_or_eq var_list
+    ;
+
+var_list
+    : var_value (',' var_value)*
+    ;
+
+var_value
+    : a_expr
+    | extra_var_value
+    ;
+
+extra_var_value
+    : ON
+    | NONE
+    | cockroachdb_extra_reserved_keyword
+    ;
+
+to_or_eq
+    : '='
+    | TO
+    ;
+
+set_local_stmt
+    : SET LOCAL set_rest
+    ;
+
+set_csetting_stmt
+    : SET CLUSTER SETTING var_name to_or_eq var_value
+    ;
+
+use_stmt
+    : USE var_name
+    ;
+
+show_stmt
+    : show_backup_stmt
+    | show_columns_stmt
+    | show_constraints_stmt
+    | show_triggers_stmt
+    | show_create_stmt
+    | show_create_schedules_stmt
+    | show_create_external_connections_stmt
+    | show_databases_stmt
+    | show_enums_stmt
+    | show_external_connections_stmt
+    | show_types_stmt
+    | show_functions_stmt
+    | show_procedures_stmt
+    | show_grants_stmt
+    | show_indexes_stmt
+    | show_partitions_stmt
+    | show_jobs_stmt
+    | show_locality_stmt
+    | show_schedules_stmt
+    | show_statements_stmt
+    | show_ranges_stmt
+    | show_range_for_row_stmt
+    | show_regions_stmt
+    | show_survival_goal_stmt
+    | show_roles_stmt
+    | show_savepoint_stmt
+    | show_schemas_stmt
+    | show_sequences_stmt
+    | show_session_stmt
+    | show_sessions_stmt
+    | show_stats_stmt
+    | show_tables_stmt
+    | show_trace_stmt
+    | show_transactions_stmt
+    | show_transfer_stmt
+    | show_users_stmt
+    | show_default_session_variables_for_role_stmt
+    | show_zone_stmt
+    | show_full_scans_stmt
+    | show_default_privileges_stmt
+    | show_inspect_errors_stmt
+    ;
+
+show_backup_stmt
+    : SHOW (
+        BACKUPS IN string_or_placeholder opt_with_show_backup_options?
+        | BACKUP (SCHEMAS FROM)? string_or_placeholder IN string_or_placeholder_opt_list opt_with_show_backup_options?
+        )
+    ;
+
+opt_with_show_backup_options
+    : WITH (
+        show_backup_options_list
+        | OPTIONS '(' show_backup_options_list ')'
+    )
+    ;
+
+show_backup_options_list
+    : show_backup_options (',' show_backup_options)*
+    ;
+
+show_backup_options
+    : AS JSON
+    | CHECK_FILES
+    | SKIP SIZE
+    | DEBUG_IDS
+    | (INCREMENT_LOCATION | KMS) '=' string_or_placeholder_opt_list
+    | (ENCRYPTION_PASSPHRASE | ENCRYPTION_INFO_DIR) '=' string_or_placeholder
+    | PRIVILEGES
+    ;
+
+show_columns_stmt
+    : SHOW COLUMNS FROM table_name with_comment?
+    ;
+
+with_comment
+    : WITH COMMENT
+    ;
+
+show_constraints_stmt
+    : SHOW (CONSTRAINT | CONSTRAINTS) FROM table_name with_comment?
+    ;
+
+show_triggers_stmt
+    : SHOW TRIGGER FROM table_name
+    ;
+
+show_create_stmt
+    : SHOW CREATE
+        ( table_name opt_show_create_format_options
+        | ALL (SCHEMAS | TABLES | TRIGGERS | TYPES | ROUTINES)
+        )
+    ;
+
+opt_show_create_format_options
+    : WITH (REDACT | IGNORE_FOREIGN_KEYS)
+    ;
+
+show_create_schedules_stmt
+    : SHOW CREATE (ALL SCHEDULES | SCHEDULE a_expr)
+    ;
+
+show_create_external_connections_stmt
+    : SHOW CREATE (ALL EXTERNAL CONNECTIONS | EXTERNAL CONNECTION string_or_placeholder)
+    ;
+
+show_databases_stmt
+    : SHOW DATABASES with_comment?
+    ;
+
+show_enums_stmt
+    : SHOW ENUMS (FROM name ('.' name)?)?
+    ;
+
+show_external_connections_stmt
+    : SHOW EXTERNAL (CONNECTIONS | CONNECTION string_or_placeholder)
+    ;
+
+show_types_stmt
+    : SHOW TYPES with_comment?
+    ;
+
+show_functions_stmt
+    : SHOW FUNCTIONS (FROM name ('.' name)?)?
+    ;
+
+show_procedures_stmt
+    : SHOW PROCEDURES (FROM name ('.' name)?)?
+    ;
+
+show_grants_stmt
+    : SHOW (GRANTS opt_target_roles? | SYSTEM GRANTS) for_grantee_clause?
+    ;
+
+opt_target_roles
+    : ON target_roles
+    ;
+
+target_roles
+    : ROLE role_spec_list
+    | SCHEMA (schema_name_list | schema_wildcard)
+    | TYPE type_name_list
+    | grant_targets
+    ;
+
+schema_wildcard
+    : wildcard_pattern
+    ;
+
+wildcard_pattern
+    : name '.' '*'
+    ;
+
+for_grantee_clause
+    : FOR role_spec_list
+    ;
+
+show_indexes_stmt
+    : SHOW (INDEX | INDEXES | KEYS) FROM (table_name | DATABASE database_name) with_comment?
+    ;
+
+show_partitions_stmt
+    : SHOW PARTITIONS FROM (TABLE table_name | DATABASE database_name | INDEX (table_index_name | table_name '@' '*'))
+    ;
+
+show_jobs_stmt
+    : SHOW (
+        AUTOMATIC JOBS
+        | JOBS (select_stmt? (WITH show_job_options_list)? | WHEN COMPLETE select_stmt | for_schedules_clause)
+        | CHANGEFEED (JOBS select_stmt? | JOB a_expr)
+        | JOB (a_expr (WITH show_job_options_list)? | WHEN COMPLETE a_expr)
+    )
+    ;
+
+show_job_options_list
+    : show_job_options (',' show_job_options)*
+    ;
+
+show_job_options
+    : EXECUTION DETAILS
+    ;
+
+show_locality_stmt
+    : SHOW LOCALITY
+    ;
+
+show_schedules_stmt
+    : SHOW (schedule_state? SCHEDULE opt_schedule_executor_type | SCHEDULE a_expr)
+    ;
+
+schedule_state
+    : RUNNING
+    | PAUSED
+    ;
+
+opt_schedule_executor_type
+    : FOR (BACKUP | SQL STATISTICS | CHANGEFEED)
+    ;
+
+show_statements_stmt
+    : SHOW ALL? opt_cluster statements_or_queries
+    ;
+
+opt_cluster
+    : CLUSTER
+    | LOCAL
+    ;
+
+statements_or_queries
+    : STATEMENTS
+    | QUERIES
+    ;
+
+show_ranges_stmt
+    : SHOW (
+        RANGES (
+                FROM (
+                INDEX table_index_name
+                | TABLE table_name
+                | DATABASE database_name
+                | CURRENT_CATALOG
+                )
+              )?
+        | CLUSTER RANGES
+        )
+        opt_show_ranges_options
+    ;
+
+opt_show_ranges_options
+    : WITH show_ranges_options
+    ;
+
+show_ranges_options
+    : show_ranges_option (',' show_ranges_option)*
+    ;
+
+show_ranges_option
+    : TABLES
+    | INDEXES
+    | DETAILS
+    | KEYS
+    | EXPLAIN
+    ;
+
+show_range_for_row_stmt
+    : SHOW RANGE FROM (TABLE table_name | INDEX table_index_name) FOR ROW expr_list_in_parens
+    ;
+
+show_regions_stmt
+    : SHOW (
+        REGIONS (FROM (CLUSTER | DATABASE database_name? | ALL DATABASES))?
+        | SUPER REGIONS FROM DATABASE database_name
+        )
+    ;
+
+show_survival_goal_stmt
+    : SHOW SURVIVAL GOAL FROM DATABASE database_name?
+    ;
+
+show_roles_stmt
+    : SHOW ROLES
+    ;
+
+show_savepoint_stmt
+    : SHOW SAVEPOINT STATUS
+    ;
+
+show_schemas_stmt
+    : SHOW SCHEMAS (FROM name)? with_comment?
+    ;
+
+show_sequences_stmt
+    : SHOW SEQUENCES (FROM name)?
+    ;
+
+show_session_stmt
+    : SHOW SESSION? session_var
+    ;
+
+show_sessions_stmt
+    : SHOW ALL opt_cluster SESSIONS
+    ;
+
+show_stats_stmt
+    : SHOW STATISTICS FOR_TABLE TABLE table_name opt_with_options?
+    ;
+
+show_tables_stmt
+    : SHOW TABLE (FROM name ('.' name)?)? with_comment?
+    ;
+
+show_trace_stmt
+    : SHOW opt_compact? KV? TRACE FOR SESSION
+    ;
+
+opt_compact
+    : COMPACT
+    ;
+
+show_transactions_stmt
+    : SHOW ALL? opt_cluster TRANSACTIONS
+    ;
+
+show_transfer_stmt
+    : SHOW TRANSFER STATE (WITH sconst)?
+    ;
+
+show_users_stmt
+    : SHOW USERS
+    ;
+
+show_default_session_variables_for_role_stmt
+    : SHOW DEFAULT SESSION VARIABLES FOR
+        (role_or_group_or_user role_spec | (ROLE_ALL | USER_ALL) ALL)
+    ;
+
+show_zone_stmt
+    : SHOW (
+        ZONE (
+            CONFIGURATION FROM (
+                RANGE zone_name
+                | DATABASE database_name
+                | table_or_index opt_partition?
+                | PARTITION partition_name OF table_or_index
+                )
+            | CONFIGURATIONS
+        )
+        | ALL ZONE CONFIGURATIONS
+        )
+    ;
+
+zone_name
+    : unrestricted_name
+    ;
+
+opt_partition
+    : partition
+    ;
+
+partition
+    : PARTITION partition_name
+    ;
+
+partition_name
+    : unrestricted_name
+    ;
+
+table_or_index
+    : TABLE table_name
+    | INDEX table_index_name
+    ;
+
+show_full_scans_stmt
+    : SHOW FULL TABLE SCANS
+    ;
+
+show_default_privileges_stmt
+    : SHOW DEFAULT PRIVILEGES (opt_for_roles? | FOR (GRANTEE role_spec_list | ALL ROLES))
+        opt_in_schema?
+    ;
+
+opt_for_roles
+    : FOR role_or_group_or_user role_spec_list
+    ;
+
+opt_in_schema
+    : IN SCHEMA schema_name
+    ;
+
+schema_name
+    : name
+    ;
+
+show_inspect_errors_stmt
+    : SHOW INSPECT ERRORS opt_for_table_clause? opt_for_job_clause? opt_with_details?
+    ;
+
+opt_for_table_clause
+    : FOR_TABLE TABLE table_name
+    ;
+
+opt_for_job_clause
+    : FOR_JOB JOB iconst
+    ;
+
+opt_with_details
+    : WITH DETAILS
     ;
 
 truncate_stmt
