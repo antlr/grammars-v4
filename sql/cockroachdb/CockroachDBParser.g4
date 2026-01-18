@@ -888,6 +888,55 @@ alter_stmt
     | alter_virtual_cluster_stmt
     ;
 
+alter_external_connection_stmt
+    : ALTER EXTERNAL CONNECTION if_exists? label_spec AS string_or_placeholder
+    ;
+
+label_spec
+    : if_not_exists? string_or_placeholder
+    ;
+
+alter_role_stmt
+    : ALTER (
+        role_or_group_or_user if_exists? role_spec (opt_role_options | opt_in_database? set_or_reset_clause)
+        | (ROLE_ALL | USER_ALL) ALL opt_in_database? set_or_reset_clause
+    )
+    ;
+
+opt_in_database
+    : IN DATABASE database_name
+    ;
+
+set_or_reset_clause
+    : SET set_rest
+    | RESET_ALL ALL
+    | RESET session_var
+    ;
+
+alter_virtual_cluster_stmt
+    : alter_virtual_cluster_replication_stmt
+    | alter_virtual_cluster_capability_stmt
+    | alter_virtual_cluster_rename_stmt
+    | alter_virtual_cluster_service_stmt
+    ;
+
+alter_virtual_cluster_replication_stmt
+    : todo
+    ;
+
+alter_virtual_cluster_capability_stmt
+    : todo
+    ;
+
+alter_virtual_cluster_rename_stmt
+    : todo
+    ;
+
+alter_virtual_cluster_service_stmt
+    : todo
+    ;
+
+
 alter_ddl_stmt
     : alter_table_stmt
     | alter_index_stmt
@@ -907,6 +956,75 @@ alter_ddl_stmt
     | alter_policy_stmt
     | alter_job_stmt
     ;
+
+alter_table_stmt
+    : todo
+    ;
+
+alter_index_stmt
+    : todo
+    ;
+
+alter_view_stmt
+    : todo
+    ;
+
+alter_sequence_stmt
+    : todo
+    ;
+
+alter_database_stmt
+    : todo
+    ;
+
+alter_range_stmt
+    : todo
+    ;
+
+alter_partition_stmt
+    : todo
+    ;
+
+alter_schema_stmt
+    : todo
+    ;
+
+alter_type_stmt
+    : todo
+    ;
+
+alter_default_privileges_stmt
+    : todo
+    ;
+
+alter_changefeed_stmt
+    : todo
+    ;
+
+alter_backup_stmt
+    : todo
+    ;
+
+alter_func_stmt
+    : todo
+    ;
+
+alter_proc_stmt
+    : todo
+    ;
+
+alter_backup_schedule
+    : todo
+    ;
+
+alter_policy_stmt
+    : todo
+    ;
+
+alter_job_stmt
+    : todo
+    ;
+
 
 backup_stmt
     : BACKUP opt_backup_targets INTO ( (sconst_or_placeholder | LATEST) IN)?
@@ -965,6 +1083,22 @@ cancel_stmt
     | cancel_all_jobs_stmt
     ;
 
+cancel_jobs_stmt
+    : CANCEL (JOB a_expr | JOBS (select_stmt | for_schedules_clause))
+    ;
+
+cancel_queries_stmt
+    : CANCEL (QUERY if_exists? a_expr | QUERIES if_exists? select_stmt)
+    ;
+
+cancel_sessions_stmt
+    : CANCEL (SESSION if_exists a_expr | SESSIONS if_exists? select_stmt)
+    ;
+
+cancel_all_jobs_stmt
+    : CANCEL ALL name JOBS
+    ;
+
 create_stmt
     : create_role_stmt
     | create_ddl_stmt
@@ -974,6 +1108,155 @@ create_stmt
     | create_external_connection_stmt
     | create_logical_replication_stream_stmt
     | create_schedule_stmt
+    ;
+
+create_stats_stmt
+    : todo
+    ;
+
+create_changefeed_stmt
+    : todo
+    ;
+
+create_extension_stmt
+    : todo
+    ;
+
+create_external_connection_stmt
+    : todo
+    ;
+
+create_logical_replication_stream_stmt
+    : todo
+    ;
+
+create_schedule_stmt
+    : todo
+    ;
+
+create_ddl_stmt
+    : create_database_stmt
+    | create_index_stmt
+    | create_schema_stmt
+    | create_table_stmt
+    | create_table_as_stmt
+    | create_type_stmt
+    | create_view_stmt
+    | create_sequence_stmt
+    | create_func_stmt
+    | create_proc_stmt
+    | create_trigger_stmt
+    | create_policy_stmt
+    ;
+
+create_database_stmt
+    : todo
+    ;
+
+create_index_stmt
+    : todo
+    ;
+
+create_schema_stmt
+    : todo
+    ;
+
+create_table_stmt
+    : todo
+    ;
+
+create_table_as_stmt
+    : todo
+    ;
+
+create_type_stmt
+    : todo
+    ;
+
+create_view_stmt
+    : todo
+    ;
+
+create_sequence_stmt
+    : todo
+    ;
+
+create_func_stmt
+    : todo
+    ;
+
+create_proc_stmt
+    : todo
+    ;
+
+create_trigger_stmt
+    : todo
+    ;
+
+create_policy_stmt
+    : todo
+    ;
+
+create_role_stmt
+    : CREATE role_or_group_or_user if_not_exists? role_spec opt_role_options?
+    ;
+
+if_not_exists
+    : IF NOT EXISTS
+    ;
+
+opt_role_options
+    : opt_with? role_options
+    ;
+
+role_options
+    : role_option+
+    ;
+
+role_option
+    : CREATEROLE
+    | NOCREATEROLE
+    | LOGIN
+    | NOLOGIN
+    | CONTROLJOB
+    | NOCONTROLJOB
+    | CONTROLCHANGEFEED
+    | NOCONTROLCHANGEFEED
+    | CREATEDB
+    | NOCREATEDB
+    | CREATELOGIN
+    | NOCREATELOGIN
+    | VIEWACTIVITY
+    | NOVIEWACTIVITY
+    | VIEWACTIVITYREDACTED
+    | NOVIEWACTIVITYREDACTED
+    | CANCELQUERY
+    | NOCANCELQUERY
+    | MODIFYCLUSTERSETTING
+    | NOMODIFYCLUSTERSETTING
+    | SQLLOGIN
+    | NOSQLLOGIN
+    | VIEWCLUSTERSETTING
+    | NOVIEWCLUSTERSETTING
+    | password_clause
+    | valid_until_clause
+    | provisionsrc_clause
+    | REPLICATION
+    | NOREPLICATION
+    | BYPASSRLS
+    | NOBYPASSRLS
+    ;
+
+password_clause
+    : PASSWORD (sconst_or_placeholder | NULL_)
+    ;
+
+valid_until_clause
+    : VALID UNTIL (string_or_placeholder | NULL_)
+    ;
+
+provisionsrc_clause
+    : PROVISIONSRC (string_or_placeholder | NULL_)
     ;
 
 check_stmt
@@ -2206,8 +2489,184 @@ table_clause
     ;
 
 table_ref
-    : relation_expr opt_index_flags? todo
-    | todo
+    : ( relation_expr opt_index_flags?
+      | select_with_parens
+      | '[' row_source_extension_stmt ']'
+      | LATERAL (select_with_parens | func_table)
+    ) opt_ordinality? opt_alias_clause?
+    | joined_table
+    | '(' joined_table ')' opt_ordinality? alias_clause
+    | func_table opt_ordinality opt_func_alias_clause
+    ;
+
+row_source_extension_stmt
+    : delete_stmt
+    | explain_stmt
+    | insert_rest
+    | select_stmt
+    | show_stmt
+    | update_stmt
+    | upsert_stmt
+    ;
+
+func_table
+    : (func_expr_windowless | ROWS FROM '(' rowsfrom_list ')')
+    ;
+
+func_expr_windowless
+    : func_application
+    | fun_expr_common_subexpr
+    ;
+
+fun_expr_common_subexpr
+    : COLLATION FOR '(' a_expr ')'
+    | IF '(' a_expr ',' a_expr ',' a_expr ')'
+    | (NULLIF | IFNULL) '(' a_expr ',' a_expr ')'
+    | IFERROR '(' a_expr ',' a_expr ',' a_expr ')'
+    | ISERROR '(' a_expr ',' a_expr ')'
+    | CAST '(' a_expr AS cast_target ')'
+    | ANNOTATE_TYPE '(' a_expr ',' typename ')'
+    | COALESCE '(' expr_list ')'
+    | CURRENT_DATE
+    | CURRENT_SCHEMA
+    | CURRENT_CATALOG
+    | CURRENT_TIMESTAMP
+    | CURRENT_TIME
+    | LOCALTIMESTAMP
+    | LOCALTIME
+    | CURRENT_USER
+    | CURRENT_ROLE
+    | SESSION_USER
+    | USER
+    | special_function
+    ;
+
+cast_target
+    : typename
+    ;
+
+special_function
+    : (CURRENT_DATE | CURRENT_SCHEMA | CURRENT_USER | SESSION_USER) '(' ')'
+    | (EXTRACT | EXTRACT_DURATION) '(' extract_list ')'
+    | OVERLAY '(' overlay_list ')'
+    | POSITION '(' position_list? ')'
+    | SUBSTRING '(' substr_list ')'
+    | (GREATEST | LEAST) expr_list_in_parens
+    | (CURRENT_TIMESTAMP | CURRENT_TIME | LOCALTIMESTAMP | LOCALTIME) '(' a_expr ')'
+    | TRIM '(' (BOTH | LEADING | TRAILING)? trim_list ')'
+    ;
+
+extract_list
+    : extract_arg FROM a_expr
+    | expr_list
+    ;
+
+extract_arg
+    : identifier_
+    | YEAR
+    | MONTH
+    | DAY
+    | HOUR
+    | MINUTE
+    | SECOND
+    | sconst
+    ;
+
+overlay_list
+    : a_expr overlay_placing substr_from substr_for?
+    | expr_list
+    ;
+
+position_list
+    : b_expr IN b_expr
+    ;
+
+substr_list
+    : a_expr (substr_from substr_for? | substr_for substr_from?)
+    | expr_list
+    ;
+
+trim_list
+    : (a_expr? FROM)? expr_list
+    ;
+
+overlay_placing
+    : PLACING a_expr
+    ;
+
+substr_from
+    : FROM a_expr
+    ;
+
+substr_for
+    : FOR a_expr
+    ;
+
+rowsfrom_list
+    : rowsfrom_item (',' rowsfrom_item)*
+    ;
+
+rowsfrom_item
+    : func_expr_windowless opt_func_alias_clause?
+    ;
+
+joined_table
+    : '(' joined_table ')'
+    | table_ref (
+        (CROSS opt_join_hint? |  NATURAL (join_type opt_join_hint?)?) JOIN table_ref
+        | (join_type opt_join_hint?)? JOIN table_ref join_equal
+        )
+    ;
+
+join_type
+    : (FULL | LEFT | RIGHT) join_outer?
+    | INNER
+    ;
+
+join_outer
+    : OUTER
+    ;
+
+opt_join_hint
+    : HASH
+    | MERGE
+    | LOOKUP
+    | INVERTED
+    | STRAIGHT
+    ;
+
+join_equal
+    : USING '(' name_list ')'
+    | ON a_expr
+    ;
+
+opt_ordinality
+    : WITH ORDINALITY
+    ;
+
+opt_alias_clause
+    : alias_clause
+    ;
+
+alias_clause
+    : AS? table_alias_name opt_col_def_list_no_types?
+    ;
+
+opt_func_alias_clause
+    : func_alias_clause
+    ;
+
+func_alias_clause
+    : alias_clause
+    | (AS table_alias_name? | table_alias_name) '(' col_def_list ')'
+    ;
+
+col_def_list
+    : col_def (',' col_def)*
+    ;
+
+col_def
+    : name typename
     ;
 
 set_operation
@@ -2788,17 +3247,41 @@ expr_list_in_parens
     ;
 
 expr_list
-    :
+    : todo
     ;
 
 a_expr
-    :
+    : todo
+    ;
+
+b_expr
+    : (c_expr | ('+' | '-' | '~' | qual_op) b_expr) todo
+    ;
+
+qual_op
+    : OPERATOR '(' operator_op ')'
+    ;
+
+operator_op
+    : all_op
+    ;
+
+all_op
+    : todo
     ;
 
 c_expr
     : d_expr array_subscripts?
     | case_expr
     | EXISTS select_with_parens
+    ;
+
+d_expr
+    : todo
+    ;
+
+case_expr
+    : todo
     ;
 
 array_subscripts
