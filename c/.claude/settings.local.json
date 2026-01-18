@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet trgen:*)",
+      "Bash(make)",
+      "Bash(bash:*)"
+    ]
+  }
+}
