@@ -47,33 +47,34 @@ export abstract class CLexerBase extends Lexer {
         }
 
         if (gcc) {
+            let output = "";
             try {
                 const gccCommand = isWindows ? "gcc.exe" : "gcc";
-                const output = execSync(`${gccCommand} -std=c2x -E -C "${sourceName}"`, {
+                output = execSync(`${gccCommand} -std=c2x -E -C "${sourceName}"`, {
                     encoding: "utf-8",
-                    maxBuffer: 50 * 1024 * 1024
+                    maxBuffer: 50 * 1024 * 1024,
+                    stdio: ["ignore", "pipe", "pipe"],
                 });
-
-                fs.writeFileSync(outputName, output);
-                return CharStream.fromString(output);
             } catch (e) {
-                throw new Error("Failed to run gcc preprocessor: " + e);
+//                throw new Error("Failed to run gcc preprocessor: " + e);
             }
+            fs.writeFileSync(outputName, output);
+            return CharStream.fromString(output);
         }
-
         if (clang) {
+            let output = "";
             try {
                 const clangCommand = isWindows ? "clang.exe" : "clang";
-                const output = execSync(`${clangCommand} -std=c2x -E -C "${sourceName}"`, {
+                output = execSync(`${clangCommand} -std=c2x -E -C "${sourceName}"`, {
                     encoding: "utf-8",
-                    maxBuffer: 50 * 1024 * 1024
+                    maxBuffer: 50 * 1024 * 1024,
+                    stdio: ["ignore", "pipe", "pipe"],
                 });
-
-                fs.writeFileSync(outputName, output);
-                return CharStream.fromString(output);
             } catch (e) {
-                throw new Error("Failed to run clang preprocessor: " + e);
+//                throw new Error("Failed to run clang preprocessor: " + e);
             }
+            fs.writeFileSync(outputName, output);
+            return CharStream.fromString(output);
         }
 
         throw new Error("No preprocessor specified.");

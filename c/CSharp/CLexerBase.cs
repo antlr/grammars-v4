@@ -36,7 +36,7 @@ public abstract class CLexerBase : Lexer
         var clang = args?.Where(a => a.IndexOf("-clang", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         var nopp = args?.Where(a => a.IndexOf("-nopp", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         if (!(vsc || gcc || clang))
-        gcc = true;
+	    gcc = true;
 
         // Replace input with preprocessed input.
         var source_name = (i.SourceName.EndsWith(".c")) ? i.SourceName : "stdin.c";
