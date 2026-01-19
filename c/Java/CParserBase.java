@@ -276,26 +276,59 @@ public abstract class CParserBase extends Parser {
         ParserRuleContext context = this.getContext();
         while (context != null) {
             if (context instanceof CParser.DeclarationContext) {
-                CParser.DeclarationContext declarationContext = (CParser.DeclarationContext) context;
-                CParser.DeclarationSpecifiersContext declarationSpecifiers = declarationContext.declarationSpecifiers();
-                CParser.DeclarationSpecifierContext[] declarationSpecifier = declarationSpecifiers != null ?
-                        declarationSpecifiers.declarationSpecifier().toArray(new CParser.DeclarationSpecifierContext[0]) : null;
+                CParser.DeclarationContext declaration_context = (CParser.DeclarationContext) context;
+                CParser.DeclarationSpecifiersContext declaration_specifiers = declaration_context.declarationSpecifiers();
+                CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers != null ?
+                        declaration_specifiers.declarationSpecifier().toArray(new CParser.DeclarationSpecifierContext[0]) : null;
 
-                CParser.InitDeclaratorListContext initDeclarationList = declarationContext.initDeclaratorList();
-                List<CParser.InitDeclaratorContext> initDeclarators = initDeclarationList != null ?
-                        initDeclarationList.initDeclarator() : null;
-
-                if (initDeclarators != null) {
+                // Declare any typeSpecifiers that declare something.
+                if (declaration_specifier != null)
+                {
                     boolean isTypedef = false;
-                    if (declarationSpecifier != null) {
-                        for (CParser.DeclarationSpecifierContext ds : declarationSpecifier) {
+                    if (declaration_specifier != null) {
+                        for (CParser.DeclarationSpecifierContext ds : declaration_specifier) {
                             if (ds.storageClassSpecifier() != null && ds.storageClassSpecifier().Typedef() != null) {
                                 isTypedef = true;
                                 break;
                             }
                         }
                     }
-                    for (CParser.InitDeclaratorContext id : initDeclarators) {
+                    for (CParser.DeclarationSpecifierContext ds : declaration_specifier) {
+                        if (ds != null && ds.typeSpecifier() != null) {
+                            var sous = ds.typeSpecifier().structOrUnionSpecifier();
+                            if (sous != null && sous.Identifier() != null)
+                            {
+                                var id = sous.Identifier().getText();
+                                if (id != null)
+                                {
+                                    if (debug) System.out.println("New symbol Declaration1 Declarator " + id);
+                                    Symbol symbol = new Symbol();
+                                    symbol.setName(id);
+                                    HashSet<TypeClassification> classSet = new HashSet<>();
+                                    classSet.add(TypeClassification.TypeSpecifier_);
+                                    symbol.setClassification(classSet);
+                                    _st.define(symbol);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                CParser.InitDeclaratorListContext init_declarator_list = declaration_context.initDeclaratorList();
+                List<CParser.InitDeclaratorContext> init_declarators = init_declarator_list != null ?
+                        init_declarator_list.initDeclarator() : null;
+
+                if (init_declarators != null) {
+                    boolean isTypedef = false;
+                    if (declaration_specifier != null) {
+                        for (CParser.DeclarationSpecifierContext ds : declaration_specifier) {
+                            if (ds.storageClassSpecifier() != null && ds.storageClassSpecifier().Typedef() != null) {
+                                isTypedef = true;
+                                break;
+                            }
+                        }
+                    }
+                    for (CParser.InitDeclaratorContext id : init_declarators) {
                         CParser.DeclaratorContext y = id != null ? id.declarator() : null;
                         String identifier = getDeclarationId(y);
                         if (identifier != null) {

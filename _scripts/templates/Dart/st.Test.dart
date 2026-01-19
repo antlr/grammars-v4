@@ -67,6 +67,10 @@ void main(List\<String> args) async {
         {
             show_trace = true;
         }
+        else if (args[i][0] == '-')
+        {
+            // Ignore unknown option.
+        }
         else
         {
             inputs.add(args[i]);

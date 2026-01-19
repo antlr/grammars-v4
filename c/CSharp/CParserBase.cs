@@ -322,36 +322,35 @@ public abstract class CParserBase : Parser
     {
         if (debug) System.Console.WriteLine("EnterDeclaration");
         ParserRuleContext context = this.Context;
-        for (; context != null; )
+        for (; context != null; context = (ParserRuleContext)((ParserRuleContext)context).Parent)
         {
-            CParser.DeclarationContext declaration_context = context as CParser.DeclarationContext;
-            CParser.DeclarationSpecifiersContext declaration_specifiers = declaration_context?.declarationSpecifiers();
-            CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers?.declarationSpecifier();
-            CParser.DeclaratorContext declarator = context as CParser.DeclaratorContext;
+            var declaration_context = context as CParser.DeclarationContext;
+            var declaration_specifiers = declaration_context?.declarationSpecifiers();
+            var declaration_specifier = declaration_specifiers?.declarationSpecifier();
+            var declarator = context as CParser.DeclaratorContext;
             // Declare any typeSpecifiers that declare something.
-            //if (declaration_specifier != null)
-            //{
-            //    bool is_typedef = declaration_specifier?.Where(ds =>
-            //    {
-            //        return ds.storageClassSpecifier()?.Typedef() != null;
-            //    }).Any() ?? false;
-            //    foreach (var ds in declaration_specifier)
-            //    {
-            //        var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
-            //        if (sous != null)
-            //        {
-            //            var id = sous.Identifier()?.GetText();
-            //            if (id != null)
-            //            {
-            //                if (debug) System.Console.WriteLine("New symbol Declaration1 Declaration " + id);
-            //                _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
-            //                return;
-            //            }
-            //        }
-            //    }
-            //}
-            CParser.InitDeclaratorListContext init_declaration_list = declaration_context?.initDeclaratorList();
-            CParser.InitDeclaratorContext[] init_declarators = init_declaration_list?.initDeclarator();
+            if (declaration_specifier != null)
+            {
+                bool is_typedef = declaration_specifier?.Where(ds =>
+                {
+                    return ds.storageClassSpecifier()?.Typedef() != null;
+                }).Any() ?? false;
+                foreach (var ds in declaration_specifier)
+                {
+                    var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
+                    if (sous != null)
+                    {
+                        var id = sous.Identifier()?.GetText();
+                        if (id != null)
+                        {
+                            if (debug) System.Console.WriteLine("New symbol Declaration1 Declaration " + id);
+                            _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+                        }
+                    }
+                }
+            }
+            CParser.InitDeclaratorListContext init_declarator_list = declaration_context?.initDeclaratorList();
+            CParser.InitDeclaratorContext[] init_declarators = init_declarator_list?.initDeclarator();
             if (init_declarators != null)
             {
                 bool is_typedef = declaration_specifier?.Where(ds =>
@@ -393,7 +392,6 @@ public abstract class CParserBase : Parser
                     return;
                 }
             }
-            context = (ParserRuleContext)((ParserRuleContext)context).Parent;
         }
     }
 

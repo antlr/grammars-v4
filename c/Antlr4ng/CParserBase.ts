@@ -288,28 +288,58 @@ export abstract class CParserBase extends Parser {
 		if ( ! isDeclarationContext(context)) {
 		    continue;
 		}
-                const declarationContext = context as DeclarationContext;
-                const declarationSpecifiers = declarationContext.declarationSpecifiers();
-                const declarationSpecifier = declarationSpecifiers?.declarationSpecifier() ?? null;
-                const initDeclarationList = declarationContext.initDeclaratorList();
-                const initDeclarators = initDeclarationList?.initDeclarator() ?? null;
+                const declaration_context = context as DeclarationContext;
+                const declaration_specifiers = declaration_context.declarationSpecifiers();
+                const declaration_specifier = declaration_specifiers?.declarationSpecifier() ?? null;
 
-                if (initDeclarators !== null) {
-                    let isTypedef = false;
-                    if (declarationSpecifier !== null) {
-                        for (const ds of declarationSpecifier) {
-                            if (ds.storageClassSpecifier()?.Typedef() !== null && ds.storageClassSpecifier()?.Typedef() !== undefined) {
-                                isTypedef = true;
-                                break;
-                            }
+                let is_typedef = false;
+                if (declaration_specifier !== null) {
+                    for (const ds of declaration_specifier) {
+                        if (ds.storageClassSpecifier()?.Typedef() !== null && ds.storageClassSpecifier()?.Typedef() !== undefined) {
+                            is_typedef = true;
+                            break;
                         }
                     }
-                    for (const id of initDeclarators) {
+                    for (const ds of declaration_specifier) {
+                        if (ds.storageClassSpecifier()?.Typedef() !== null && ds.storageClassSpecifier()?.Typedef() !== undefined) {
+                            is_typedef = true;
+                            break;
+                        }
+                    }
+                    for (const ds of declaration_specifier) {
+                        if (ds.storageClassSpecifier()?.Typedef() !== null && ds.storageClassSpecifier()?.Typedef() !== undefined) {
+                            is_typedef = true;
+                            break;
+                        }
+                    }
+                    for (const ds of declaration_specifier) {
+                        if (ds.typeSpecifier() !== null && ds.typeSpecifier() != undefined) {
+			    const sous = ds.typeSpecifier().structOrUnionSpecifier();
+			    if (sous !== null && sous !== undefined) {
+				const id = sous.Identifier();
+				if (id !== null && id !== undefined) {
+				    const text = id.getText();
+				    const symbol = new Symbol();
+				    symbol.name = text;
+				    symbol.classification = new Set([TypeClassification.TypeSpecifier_]);
+				    this._st.define(symbol);
+				    if (this.debug) console.log("New symbol Declaration1 Declarator " + symbol);
+				}
+			    }
+                        }
+                    }
+                }
+
+                const init_declaration_list = declaration_context.initDeclaratorList();
+                const init_declarators = init_declaration_list?.initDeclarator() ?? null;
+
+                if (init_declarators !== null) {
+                    for (const id of init_declarators) {
                         const y = id?.declarator() ?? null;
                         const identifier = this.getDeclarationId(y);
                         if (identifier !== null && identifier != undefined) {
                             const text = identifier;
-                            if (isTypedef) {
+                            if (is_typedef) {
                                 const symbol = new Symbol();
                                 symbol.name = text;
                                 symbol.classification = new Set([TypeClassification.TypeSpecifier_]);

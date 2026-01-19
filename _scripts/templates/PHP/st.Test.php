@@ -107,6 +107,7 @@ function main($argv) : void {
             $quiet = true;
         } else if ($argv[$i] == "-trace") {
             $show_trace = true;
+        } else if ($argv[$i][0] == "-") {
         } else {
             array_push($inputs, $argv[$i]);
             array_push($is_fns, true);

@@ -205,9 +205,11 @@ constantExpression
     ;
 
 declaration
-    : declarationSpecifiers initDeclaratorList? ';'
-    | staticAssertDeclaration
-    | attributeDeclaration
+    : (
+	declarationSpecifiers initDeclaratorList? ';'
+	| staticAssertDeclaration
+	| attributeDeclaration
+      ) {this.EnterDeclaration();}
     ;
 
 declarationSpecifiers
