@@ -342,8 +342,7 @@ func_params_list
     ;
 
 routine_param
-    : ()? routine_param_type
-    | param_name routine_param_class?
+    : ((routine_param_class param_name?)? | param_name routine_param_class?) routine_param_type
     ;
 
 routine_param_class
@@ -415,7 +414,7 @@ const_typename
     ;
 
 numeric
-    : INT
+    : INT_
     | INTEGER
     | SMALLINT
     | BIGINT
@@ -1909,27 +1908,120 @@ create_stmt
     ;
 
 create_stats_stmt
-    : todo
+    : CREATE STATISTICS statistics_name opt_stats_columns?
+        FROM create_stats_target opt_create_stats_options?
+    ;
+
+opt_stats_columns
+    : ON name_list
+    ;
+
+create_stats_target
+    : table_name
+    ;
+
+opt_create_stats_options
+    : (WITH OPTIONS)? create_stats_option_list
+    ;
+
+create_stats_option_list
+    : create_stats_option+
+    ;
+
+create_stats_option
+    : as_of_clause
+    | USING EXTREMES
+    | where_clause
     ;
 
 create_changefeed_stmt
-    : todo
+    : CREATE CHANGEFEED
+        ( for_with_lookahead_variants changefeed_table_targets opt_changefeed_sink opt_with_options?
+        | opt_changefeed_sink opt_with_options? AS SELECT target_list FROM changefeed_target_expr opt_where_clause?
+        )
+    ;
+
+opt_changefeed_sink
+    : INTO string_or_placeholder
+    ;
+
+changefeed_target_expr
+    : insert_target
     ;
 
 create_extension_stmt
-    : todo
+    : CREATE EXTENSION if_not_exists? name
     ;
 
 create_external_connection_stmt
-    : todo
+    : CREATE EXTERNAL CONNECTION label_spec AS string_or_placeholder
     ;
 
 create_logical_replication_stream_stmt
-    : todo
+    : CREATE LOGICALLY REPLICATED logical_replication_resources FROM logical_replication_resources
+        ON string_or_placeholder opt_logical_replication_create_table_options?
+    ;
+
+logical_replication_resources
+    : TABLE db_object_name
+    | TABLES '(' logical_replication_resources_list ')'
+    | DATABASE database_name
+    ;
+
+logical_replication_resources_list
+    : db_object_name (',' db_object_name)*
+    ;
+
+opt_logical_replication_create_table_options
+    : WITH ( logical_replication_create_table_options_list
+           | OPTIONS '(' logical_replication_create_table_options_list ')'
+           )
+    ;
+
+logical_replication_create_table_options_list
+    : logical_replication_create_table_options (',' logical_replication_create_table_options)*
+    ;
+
+logical_replication_create_table_options
+    : ( (MODE | DISCARD | LABEL) '='
+        | BIDIRECTIONAL ON
+      ) string_or_placeholder
+    | UNIDIRECTIONAL
     ;
 
 create_schedule_stmt
-    : todo
+    : create_schedule_for_changefeed_stmt
+    | create_schedule_for_backup_stm
+    ;
+
+create_schedule_for_changefeed_stmt
+    : CREATE SCHEDULE schedule_label_spec FOR CHANGEFEED
+        ( changefeed_table_targets changefeed_sink opt_with_options?
+        | changefeed_sink opt_with_options? AS SELECT target_list
+            FROM changefeed_target_expr opt_where_clause? cron_expr opt_with_schedule_options?
+        )
+    ;
+
+schedule_label_spec
+    : label_spec
+    ;
+
+changefeed_sink
+    : INTO string_or_placeholder
+    ;
+
+opt_with_schedule_options
+    : WITH SCHEDULE OPTIONS (kv_option_list | '(' kv_option_list ')')
+    ;
+
+create_schedule_for_backup_stm
+    : CREATE SCHEDULE schedule_label_spec FOR BACKUP opt_backup_targets
+        INTO string_or_placeholder_opt_list opt_with_backup_options? cron_expr
+            opt_full_backup_clause? opt_with_schedule_options?
+    ;
+
+opt_full_backup_clause
+    : FULL BACKUP (sconst_or_placeholder | ALWAYS)
     ;
 
 create_ddl_stmt
@@ -1948,51 +2040,393 @@ create_ddl_stmt
     ;
 
 create_database_stmt
-    : todo
+    : CREATE DATABASE if_not_exists? database_name opt_with?
+        opt_template_clause? opt_encoding_clause? opt_lc_collate_clause? opt_lc_ctype_clause?
+        opt_connection_limit? opt_primary_region_clause? opt_regions_list? opt_survival_goal_clause?
+        opt_placement_clause? opt_owner_clause? opt_super_region_clause? opt_secondary_region_clause?
+    ;
+
+opt_template_clause
+    : TEMPLATE opt_equal? non_reserved_word_or_sconst
+    ;
+
+opt_encoding_clause
+    : ENCODING opt_equal? non_reserved_word_or_sconst
+    ;
+
+opt_lc_collate_clause
+    : LC_COLLATE opt_equal? non_reserved_word_or_sconst
+    ;
+
+opt_lc_ctype_clause
+    : LC_CTYPE opt_equal? non_reserved_word_or_sconst
+    ;
+
+opt_connection_limit
+    : CONNECTION LIMIT opt_equal? signed_iconst
+    ;
+
+opt_primary_region_clause
+    : primary_region_clause
+    ;
+
+opt_regions_list
+    : REGIONS opt_equal? region_name_list
+    ;
+
+opt_survival_goal_clause
+    : survival_goal_clause
+    ;
+
+opt_placement_clause
+    : placement_clause
+    ;
+
+opt_owner_clause
+    : OWNER opt_equal? role_spec
+    ;
+
+opt_super_region_clause
+    : super_region_clause
+    ;
+
+super_region_clause
+    : SUPER REGION region_name VALUES region_name_list
+    ;
+
+opt_secondary_region_clause
+    : secondary_region_clause
     ;
 
 create_index_stmt
-    : todo
+    : CREATE UNIQUE?
+        ( INDEX opt_concurrently? (index_name | if_not_exists? index_name)? ON table_name opt_index_access_method? '(' index_params ')' opt_hash_sharded
+        | (INVERTED | VECTOR) INDEX opt_concurrently? (index_name | if_not_exists? index_name)? ON table_name '(' index_params ')'
+        ) opt_storing? opt_partition_by_index? opt_with_storage_parameter_list? opt_where_clause? opt_index_visible?
+    ;
+
+opt_index_access_method
+    : USING name
     ;
 
 create_schema_stmt
-    : todo
+    : CREATE SCHEMA if_not_exists? (qualifiable_schema_name | opt_schema_name? AUTHORIZATION role_spec)
+    ;
+
+opt_schema_name
+    : qualifiable_schema_name
     ;
 
 create_table_stmt
-    : todo
+    : CREATE opt_persistence_temp_table? TABLE if_not_exists? table_name
+        '(' opt_table_elem_list? ')' partition_by_table? opt_table_with?
+        opt_create_table_on_commit locality?
+    ;
+
+opt_table_with
+    : opt_with_storage_parameter_list
+    ;
+
+opt_create_table_on_commit
+    : ON COMMIT PRESERVE ROWS
+    ;
+
+opt_persistence_temp_table
+    : (LOCAL | GLOBAL)? (TEMPORARY | TEMP)
+    | UNLOGGED
+    ;
+
+opt_table_elem_list
+    : table_elem_list
+    ;
+
+table_elem_list
+    : table_elem (',' table_elem)*
+    ;
+
+table_elem
+    : column_table_def
+    | index_def
+    | family_def
+    | table_constraint opt_validate_behavior
+    | LIKE table_name like_table_option_list
+    ;
+
+index_def
+    : ( INDEX name '(' index_params ')' opt_hash_sharded opt_storing
+      | UNIQUE INDEX index_name?
+      | (INVERTED | VECTOR) INDEX name? '(' index_params ')'
+      ) opt_partition_by_index? opt_with_storage_parameter_list? opt_where_clause? opt_index_visible?
+    ;
+
+opt_index_visible
+    : NOT? VISIBLE
+    | INVISIBLE
+    | VISIBILTY fconst
+    ;
+
+family_def
+    : FAMILY family_name? '(' name_list ')'
+    ;
+
+like_table_option_list
+    : ( (INCLUDING | EXCLUDING) like_table_option)+
+    ;
+
+like_table_option
+    : CONSTRAINTS
+    | DEFAULTS
+    | GENERATED
+    | INDEXES
+    | ALL
     ;
 
 create_table_as_stmt
-    : todo
+    : CREATE opt_persistence_temp_table? TABLE if_not_exists?
+        table_name create_as_opt_col_list? opt_table_with? AS select_stmt
+            opt_create_table_on_commit
     ;
 
+create_as_opt_col_list
+    : '(' create_as_table_defs ')'
+    ;
+
+create_as_table_defs
+    : column_name create_as_col_qual_list? (',' (column_name create_as_col_qual_list? | family_def | create_as_constraint_def) )*
+    ;
+
+create_as_col_qual_list
+    : create_as_col_qualification
+    ;
+
+create_as_col_qualification
+    : create_as_col_qualification_elem
+    | FAMILY family_name
+    ;
+
+create_as_col_qualification_elem
+    : PRIMARY KEY opt_with_storage_parameter_list
+    ;
+
+create_as_constraint_def
+    : create_as_constraint_elem
+    ;
+
+create_as_constraint_elem
+    : PRIMARY KEY '(' create_as_params ')' opt_with_storage_parameter_list
+    ;
+
+create_as_params
+    : create_as_param (',' create_as_param)*
+    ;
+
+create_as_param
+    : column_name
+    ;
+
+
 create_type_stmt
-    : todo
+    : CREATE TYPE if_not_exists? type_name AS
+        ( ENUM '(' opt_enum_val_list? ')'
+        | '(' opt_composite_type_list? ')'
+        )
+    ;
+
+opt_enum_val_list
+    : enum_val_list
+    ;
+
+enum_val_list
+    : sconst (',' sconst)*
+    ;
+
+opt_composite_type_list
+    : composite_type_list
+    ;
+
+composite_type_list
+    : name simple_typename (',' name simple_typename)*
     ;
 
 create_view_stmt
-    : todo
+    : CREATE
+        ( (opt_temp? VIEW if_not_exists? | or_replace opt_temp? VIEW) view_name opt_column_list? AS select_stmt
+        | MATERIALIZED VIEW if_not_exists? view_name opt_column_list? AS select_stmt opt_with_data?
+        )
+    ;
+
+opt_with_data
+    : WITH DATA
     ;
 
 create_sequence_stmt
-    : todo
+    : CREATE opt_temp? SEQUENCE if_not_exists? sequence_name opt_sequence_option_list?
+    ;
+
+opt_temp
+    : TEMPORARY
+    | TEMP
     ;
 
 create_func_stmt
-    : todo
+    : CREATE or_replace? FUNCTION routine_create_name '(' opt_routine_param_with_defaults_list? ')'
+        ( RETURNS ( opt_return_set? routine_return_type
+                  | TABLE '(' table_func_column_list ')'
+                  )
+        )?
+        opt_create_routine_opt_list? opt_routine_body?
+    ;
+
+opt_return_set
+    : SETOF
+    ;
+
+routine_return_type
+    : routine_param_type
+    ;
+
+table_func_column_list
+    : table_func_column (',' table_func_column)*
+    ;
+
+table_func_column
+    : param_name routine_param_type
     ;
 
 create_proc_stmt
-    : todo
+    : CREATE or_replace? PROCEDURE routine_create_name '(' opt_routine_param_with_defaults_list? ')'
+        opt_create_routine_opt_list? opt_routine_body?
+    ;
+
+opt_routine_param_with_defaults_list
+    : routine_param_with_defaults_list
+    ;
+
+routine_param_with_defaults_list
+    : routine_param_with_default (',' routine_param_with_default)*
+    ;
+
+routine_param_with_default
+    : routine_param ( (DEFAULT | '=') a_expr)?
+    ;
+
+opt_create_routine_opt_list
+    : routine_return_stmt
+    | BEGIN ATOMIC routine_body_stmt_list? END
+    ;
+
+routine_return_stmt
+    : RETURN a_expr
+    ;
+
+routine_body_stmt_list
+    : (routine_body_stmt ';')+
+    ;
+
+routine_body_stmt
+    : stmt_without_legacy_transaction
+    | routine_return_stmt
+    ;
+
+opt_routine_body
+    : routine_return_stmt
+    | BEGIN ATOMIC routine_body_stmt_list END
+    ;
+
+or_replace
+    : OR REPLACE
+    ;
+
+routine_create_name
+    : db_object_name
     ;
 
 create_trigger_stmt
-    : todo
+    : CREATE or_replace? TRIGGER name trigger_action_time trigger_event_list
+        ON table_name opt_trigger_transition_list trigger_for_each? trigger_when?
+        EXECUTE function_or_procedure func_name '(' trigger_func_args? ')'
+    ;
+
+trigger_action_time
+    : BEFORE
+    | AFTER
+    | INSTEAD OF
+    ;
+
+trigger_event_list
+    : OR
+    | trigger_event
+    ;
+
+trigger_event
+    : INSERT
+    | DELETE
+    | UPDATE (OF name_list)?
+    | TRUNCATE
+    ;
+
+opt_trigger_transition_list
+    : trigger_transition_list
+    ;
+
+trigger_transition_list
+    : trigger_transition+
+    ;
+
+trigger_transition
+    : transition_is_new transition_is_row AS? table_alias_name
+    ;
+
+transition_is_new
+    : NEW
+    | OLD
+    ;
+
+transition_is_row
+    : ROW
+    | TABLE
+    ;
+
+trigger_for_each
+    : FOR EACH? trigger_for_type
+    ;
+
+trigger_for_type
+    : ROW
+    | STATEMENT
+    ;
+
+trigger_when
+    : WHEN a_expr
+    ;
+
+function_or_procedure
+    : FUNCTION
+    | PROCEDURE
+    ;
+
+trigger_func_args
+    : trigger_func_arg (',' trigger_func_arg)*
+    ;
+
+trigger_func_arg
+    : iconst
+    | fconst
+    | sconst
+    | unrestricted_name
     ;
 
 create_policy_stmt
-    : todo
+    : CREATE POLICY if_not_exists? name ON table_name
+        opt_policy_type? opt_policy_command? opt_policy_roles opt_policy_exprs
+    ;
+
+opt_policy_type
+    : AS (PERMISSIVE | RESTRICTIVE)
+    ;
+
+opt_policy_command
+    : FOR (ALL | SELECT | INSERT | UPDATE | DELETE)
     ;
 
 create_role_stmt
@@ -2085,7 +2519,7 @@ delete_stmt
     ;
 
 opt_with_clause
-    : with_clause?
+    : with_clause
     ;
 
 with_clause
@@ -2511,7 +2945,7 @@ bare_label_keywords
     | INSERT
     | INSPECT
     | INSTEAD
-    | INT
+    | INT_
     | INTEGER
     | INTERVAL
     | INTO_DB
@@ -2762,7 +3196,7 @@ bare_label_keywords
     | SIMILAR
     | SIMPLE
     | SIZE
-    | SKIP
+    | SKIP_
     | SKIP_LOCALITIES_CHECK
     | SKIP_MISSING_FOREIGN_KEYS
     | SKIP_MISSING_SEQUENCES
@@ -3313,10 +3747,10 @@ func_table
 
 func_expr_windowless
     : func_application
-    | fun_expr_common_subexpr
+    | func_expr_common_subexpr
     ;
 
-fun_expr_common_subexpr
+func_expr_common_subexpr
     : COLLATION FOR '(' a_expr ')'
     | IF '(' a_expr ',' a_expr ',' a_expr ')'
     | (NULLIF | IFNULL) '(' a_expr ',' a_expr ')'
@@ -3545,7 +3979,7 @@ opt_locked_rels
     ;
 
 opt_nowait_or_skip
-    : SKIP LOCKED
+    : SKIP_ LOCKED
     | NOWAIT
     ;
 
@@ -3669,7 +4103,7 @@ show_backup_options_list
 show_backup_options
     : AS JSON
     | CHECK_FILES
-    | SKIP SIZE
+    | SKIP_ SIZE
     | DEBUG_IDS
     | (INCREMENT_LOCATION | KMS) '=' string_or_placeholder_opt_list
     | (ENCRYPTION_PASSPHRASE | ENCRYPTION_INFO_DIR) '=' string_or_placeholder
@@ -4038,6 +4472,14 @@ sconst
     : STRING_LITERAL
     ;
 
+bconst
+    : 'b' STRING_LITERAL
+    ;
+
+
+bitconst
+    : BINARY_LITERAL
+    ;
 //
 
 expr_list_in_parens
@@ -4045,15 +4487,28 @@ expr_list_in_parens
     ;
 
 expr_list
-    : todo
+    : a_expr (',' a_expr)*
     ;
 
 a_expr
-    : todo
+    : (c_expr
+    | ('+' | '-' | '~' | SQRT | CBRT | qual_op | NOPT) a_expr
+    | row OVERLAPS row
+    | DEFAULT)
+        ( TYPECAST cast_target
+        | TYPEANNOTATE typename
+        | COLLATE collation_name
+        | AT TIME ZONE a_expr
+        //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#a_expr
+        )+
     ;
 
 b_expr
-    : (c_expr | ('+' | '-' | '~' | qual_op) b_expr) todo
+    : (c_expr | ('+' | '-' | '~' | qual_op) b_expr)
+        ( TYPECAST cast_target
+        | TYPEANNOTATE typename
+        //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#b_expr
+        ) +
     ;
 
 qual_op
@@ -4065,7 +4520,23 @@ operator_op
     ;
 
 all_op
-    : todo
+    : '+'
+    | '-'
+    | '*'
+    | '/'
+    | '%'
+    | '^'
+    | '<'
+    | '>'
+    | '='
+    | '<='
+    | '>='
+    | '<>'
+    | '?'
+    | '&'
+    | '|'
+    | '#'
+    //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#all_op
     ;
 
 c_expr
@@ -4075,11 +4546,108 @@ c_expr
     ;
 
 d_expr
-    : todo
+    : '@' iconst
+    | fconst
+    | sconst
+    | bconst
+    | bitconst
+    | typed_literal
+    | interval_value
+    | TRUE
+    | FALSE
+    | NULL_
+    | column_path_with_star
+    | PLACEHOLDER
+    | '(' a_expr ')' ('.' ('*' | unrestricted_name | '@' iconst) )?
+    | func_expr
+    | select_with_parens
+    | labeled_row
+    | ARRAY (select_with_parens | row | array_expr)
+    ;
+
+typed_literal
+    : (func_name_no_crdb_extra | const_typename) sconst
+    ;
+
+func_name_no_crdb_extra
+    : type_function_name_no_crdb_extra
+    | prefixed_column_path
+    ;
+
+interval_value
+    : INTERVAL (sconst interval_qualifier? | '(' iconst ')' sconst )
+    ;
+
+column_path_with_star
+    : column_path
+    | db_object_name_component '.' (unrestricted_name '.' (unrestricted_name '.')?)? '*'
+    ;
+
+func_expr
+    : func_application within_group_clause? filter_clause? over_clause?
+    | func_expr_common_subexpr
+    ;
+
+array_expr
+    : '[' (expr_list? | array_expr_list) ']'
+    ;
+
+array_expr_list
+    : array_expr (',' array_expr)*
+    ;
+
+within_group_clause
+    : WITHIN GROUP '(' single_sort_clause ')'
+    ;
+
+over_clause
+    : OVER (window_specification | window_name)
+    ;
+
+filter_clause
+    : FILTER '(' WHERE a_expr ')'
+    ;
+
+single_sort_clause
+    : ORDER BY (sortby (',' sortby_list)? | sortby_index ',' sortby_list)
+    ;
+
+labeled_row
+    : row
+    | '(' row AS name_list ')'
+    ;
+
+row
+    : ROW '(' expr_list? ')'
+    | expr_tuple_unambiguous
+    ;
+
+expr_tuple_unambiguous
+    : '(' tuple1_unambiguous_values ')'
+    ;
+
+tuple1_unambiguous_values
+    : a_expr ',' expr_list?
     ;
 
 case_expr
-    : todo
+    : CASE case_arg? when_clause_list case_default? END
+    ;
+
+case_arg
+    : a_expr
+    ;
+
+when_clause_list
+    : when_clause+
+    ;
+
+when_clause
+    : WHEN a_expr THEN a_expr
+    ;
+
+case_default
+    : ELSE a_expr
     ;
 
 array_subscripts
@@ -4521,7 +5089,7 @@ unreserved_keyword
     | SHOW
     | SIMPLE
     | SIZE
-    | SKIP
+    | SKIP_
     | SKIP_LOCALITIES_CHECK
     | SKIP_MISSING_FOREIGN_KEYS
     | SKIP_MISSING_SEQUENCES
@@ -4644,7 +5212,7 @@ col_name_keyword
     | IFERROR
     | IFNULL
     | INOUT
-    | INT
+    | INT_
     | INTEGER
     | INTERVAL
     | ISERROR
@@ -4718,6 +5286,10 @@ view_name
 
 savepoint_name
     : SAVEPOINT? name
+    ;
+
+statistics_name
+    : name
     ;
 
 qualifiable_schema_name
