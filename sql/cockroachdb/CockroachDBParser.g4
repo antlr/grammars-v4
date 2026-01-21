@@ -921,21 +921,55 @@ alter_virtual_cluster_stmt
     ;
 
 alter_virtual_cluster_replication_stmt
-    : todo
+    : ALTER virtual_cluster virtual_cluster_spec
+        ( (PAUSE | RESUME) REPLICATION
+        | COMPLETE REPLICATION TO (SYSTEM TIME a_expr | LATEST)
+        | SET REPLICATION (replication_options_list | SOUCE source_replication_options_list)
+        | START REPLICATION OF d_expr ON d_expr opt_with_replication_options?
+        )
+    ;
+
+virtual_cluster
+    : VIRTUAL CLUSTER
+    ;
+
+virtual_cluster_spec
+    : d_expr
+    | '[' a_expr ']'
+    ;
+
+replication_options_list
+    : replication_options (',' replication_options)*
+    ;
+
+replication_options
+    : RETENTION '=' d_expr
+    | READ VIRTUAL CLUSTER
+    ;
+
+source_replication_options_list
+    : source_replication_options (',' source_replication_options)*
+    ;
+
+source_replication_options
+    : EXPIRATION WINDOW '=' d_expr
+    ;
+
+opt_with_replication_options
+    : WITH (replication_options_list | OPTIONS '(' replication_options_list ')')
     ;
 
 alter_virtual_cluster_capability_stmt
-    : todo
+    : ALTER virtual_cluster virtual_cluster_spec (GRANT | REVOKE) ALL CAPABILITIES
     ;
 
 alter_virtual_cluster_rename_stmt
-    : todo
+    : ALTER virtual_cluster virtual_cluster_spec RENAME TO d_expr
     ;
 
 alter_virtual_cluster_service_stmt
-    : todo
+    : ALTER virtual_cluster virtual_cluster_spec (START SERVICE SHARED | STOP SERVICE)
     ;
-
 
 alter_ddl_stmt
     : alter_table_stmt
@@ -958,73 +992,837 @@ alter_ddl_stmt
     ;
 
 alter_table_stmt
-    : todo
+    : alter_onetable_stmt
+    | alter_split_stmt
+    | alter_unsplit_stmt
+    | alter_scatter_stmt
+    | alter_zone_table_stmt
+    | alter_rename_table_stmt
+    | alter_table_set_schema_stmt
+    | alter_table_locality_stmt
+    | alter_table_logged_stmt
+    | alter_table_owner_stmt
+    ;
+
+alter_onetable_stmt
+    : ALTER TABLE if_exists? relation_expr alter_table_cmds
+    ;
+
+alter_table_cmds
+    : alter_table_cmd (',' alter_table_cmd)*
+    ;
+
+alter_table_cmd
+    : RENAME (opt_column? | CONSTRAINT) column_name TO column_name
+    | ADD
+        ( COLUMN? if_not_exists? column_table_def
+        | (table_constraint | CONSTRAINT if_not_exists? constraint_name constraint_elem) opt_validate_behavior?
+        )
+    | ALTER
+        ( opt_column? column_name
+            ( alter_column_default
+            | alter_column_on_update
+            | alter_column_visible
+            | DROP (NOT NULL_ | IDENTITY if_exists? | STORED)
+            | ADD (generated_always_as | generated_by_default_as) IDENTITY ('(' opt_sequence_option_list ')')?
+            | set_generated_always
+            | set_generated_default
+            | identity_option_list
+            | SET NOT NULL_
+            | opt_set_data? TYPE typename opt_collate? opt_alter_column_using?
+            )
+        | PRIMARY KEY USING COLUMNS '(' index_params ')' opt_hash_sharded? opt_with_storage_parameter_list
+        )
+    | DROP ( opt_column? if_exists? column_name
+           | CONSTRAINT if_exists? constraint_name
+           ) opt_drop_behavior?
+    | VALIDATE CONSTRAINT constraint_name
+    | EXPERIMENTAL_AUDIT SET audit_mode
+    | partition_by_table
+    | SET '(' storage_parameter_list ')'
+    | RESET '(' storage_parameter_key_list ')'
+    | table_rls_mode ROW LEVEL SECURITY
+    ;
+
+opt_column
+    : COLUMN
+    ;
+
+column_table_def
+    : column_name typename col_qual_list
+    ;
+
+table_constraint
+    : (CONSTRAINT constraint_name)? constraint_elem
+    ;
+
+constraint_elem
+    : CHECK '(' a_expr ')'
+    | UNIQUE '(' index_params ')' opt_storing? opt_partition_by_index? opt_where_clause?
+    | PRIMARY
+    | FOREIGN
+    ;
+
+opt_storing
+    : storing '(' name_list ')'
+    ;
+
+storing
+    : COVERING
+    | STORING
+    | INCLUDE
+    ;
+
+opt_partition_by_index
+    : partition_by
+    ;
+
+opt_validate_behavior
+    : NOT VALID
+    ;
+
+alter_column_default
+    : SET DEFAULT a_expr
+    | DROP DEFAULT
+    ;
+
+alter_column_on_update
+    : SET ON UPDATE a_expr
+    | DROP ON UPDATE
+    ;
+
+alter_column_visible
+    : SET NOT? VISIBLE
+    ;
+
+identity_option_list
+    : identity_option_elem+
+    ;
+
+identity_option_elem
+    : SET ( NO (CYCLE | MINVALUE | MAXVALUE)
+          | ( (PER (NODE | SESSION)) CACHE
+            | MINVALUE
+            | MAXVALUE
+            | INCREMENT BY?
+            | START WITH?
+            ) signed_iconst64
+          )
+    | RESTART (WITH? signed_iconst64)?
+    ;
+
+opt_set_data
+    : SET DATA
+    ;
+
+opt_collate
+    : COLLATE collation_name
+    ;
+
+opt_alter_column_using
+    : USING a_expr
+    ;
+
+col_qual_list
+    : col_qualification*
+    ;
+
+col_qualification
+    : (CONSTRAINT constraint_name)? col_qualification_elem
+    | COLLATE collation_name
+    | FAMILTY family_name
+    | CREATE (FAMILTY family_name? | if_not_exists? FAMILY family_name)
+    ;
+
+col_qualification_elem
+    : NOT (NULL_ | VISIBLE)
+    | NULL_
+    | UNIQUE
+    | PRIMARY KEY (USING HASH opt_hash_sharded_bucket_count)? opt_with_storage_parameter_list
+    | CHECK '(' a_expr ')'
+    | (DEFAULT | ON UPDATE) b_expr
+    | REFERENCES table_name opt_name_parens? key_match? reference_actions
+    | generated_as '(' a_expr ')' (STORED | VIRTUAL)
+    | (generated_always_as | generated_by_default_as) IDENTITY ('(' opt_sequence_option_list? ')')?
+    ;
+
+opt_name_parens
+    : '(' name ')'
+    ;
+
+key_match
+    : MATCH (SIMPLE | FULL)
+    ;
+
+reference_actions
+    : reference_on_update reference_on_delete?
+    | reference_on_delete reference_on_update?
+    ;
+
+reference_on_update
+    : ON UPDATE reference_action
+    ;
+
+reference_on_delete
+    : ON DELETE reference_action
+    ;
+
+reference_action
+    : NO ACTION
+    | RESTRICT
+    | CASCADE
+    | SET (NULL_ | DEFAULT)
+    ;
+
+generated_as
+    : AS
+    | generated_always_as
+    ;
+
+generated_always_as
+    : GENERATED_ALWAYS ALWAYS AS
+    ;
+
+generated_by_default_as
+    : GENERATED_BY_DEFAULT BY DEFAULT AS
+    ;
+
+opt_sequence_option_list
+    : sequence_option_list
+    ;
+
+sequence_option_list
+    : sequence_option_elem+
+    ;
+
+sequence_option_elem
+    : AS typename
+    | NO (CYCLE | MINVALUE | MAXVALUE)
+    | OWNED BY (NONE | column_path)
+    | ( (PER (NODE | SESSION))? CACHE
+      | MINVALUE
+      | MAXVALUE
+      | INCREMENT BY?
+      | START WITH?
+      )  signed_iconst64
+    | RESTART (WITH? signed_iconst64)?
+    | VIRTUAL
+    ;
+
+set_generated_always
+    : SET GENERATED_ALWAYS ALWAYS
+    ;
+
+set_generated_default
+    : SET GENERATED_BY_DEFAULT BY DEFAULT
+    ;
+
+index_params
+    : index_elem (',' index_elem)*
+    ;
+
+index_elem
+    : (func_expr_windowless | '(' a_expr ')' | name) index_elem_options
+    ;
+
+index_elem_options
+    : opt_class? opt_asc_desc? opt_nulls_order?
+    ;
+
+opt_class
+    : name
+    ;
+
+opt_hash_sharded
+    : USING HASH opt_hash_sharded_bucket_count?
+    ;
+
+opt_hash_sharded_bucket_count
+    : WITH BUCKET_COUNT '=' a_expr
+    ;
+
+opt_with_storage_parameter_list
+    : WITH '(' storage_parameter_list ')'
+    ;
+
+audit_mode
+    : READ WRITE
+    | OFF
+    ;
+
+partition_by_table
+    : partition_by
+    | PARTITION ALL BY partition_by_inner
+    ;
+
+partition_by
+    : PARTITION BY partition_by_inner
+    ;
+
+partition_by_inner
+    : LIST '(' name_list ')' '(' list_partitions ')'
+    | RANGE '(' name_list ')' '(' range_partitions ')'
+    | NOTHING
+    ;
+
+list_partitions
+    : list_partition (',' list_partition)*
+    ;
+
+list_partition
+    : partition VALUES IN '(' expr_list ')' opt_partition_by?
+    ;
+
+opt_partition_by
+    : partition_by
+    ;
+
+range_partitions
+    : range_partition (',' range_partition)*
+    ;
+
+range_partition
+    : partition VALUES FROM '(' expr_list ')' TO '(' expr_list ')' opt_partition_by?
+    ;
+
+storage_parameter_list
+    : storage_parameter (',' storage_parameter)*
+    ;
+
+storage_parameter
+    : storage_parameter_key '=' var_value
+    ;
+
+storage_parameter_key_list
+    : storage_parameter_key (',' storage_parameter_key)*
+    ;
+
+storage_parameter_key
+    : name
+    | sconst
+    ;
+
+table_rls_mode
+    : ENABLE
+    | DISABLE
+    | NO? FORCE
+    ;
+
+alter_split_stmt
+    : ALTER TABLE table_name SPLIT AT select_stmt (WITH EXPIRATION a_expr)?
+    ;
+
+alter_unsplit_stmt
+    : ALTER TABLE table_name UNSPLIT (AT select_stmt | ALL)
+    ;
+
+alter_scatter_stmt
+    : ALTER TABLE table_name SCATTER (FROM expr_list_in_parens TO expr_list_in_parens)?
+    ;
+
+alter_zone_table_stmt
+    : ALTER TABLE table_name set_zone_config
+    ;
+
+alter_rename_table_stmt
+    : ALTER TABLE if_exists? relation_expr RENAME TO table_name
+    ;
+
+alter_table_set_schema_stmt
+    : ALTER TABLE if_exists relation_expr SET SCHEMA schema_name
+    ;
+
+alter_table_locality_stmt
+    : ALTER TABLE if_exists? relation_expr SET locality
+    ;
+
+locality
+    : LOCALITY
+        ( GLOBAL
+        | REGIONAL ( BY ( TABLE (IN (region_name | PRIMARY REGION))?
+                        | ROW (AS name)?
+                        )
+                   | IN (region_name | PRIMARY REGION)
+                   )?
+        )
+    ;
+
+region_name
+    : name
+    | sconst
+    ;
+
+alter_table_logged_stmt
+    : ALTER TABLE if_exists? relation_expr SET (LOGGED | UNLOGGED)
+    ;
+
+alter_table_owner_stmt
+    : ALTER TABLE if_exists? relation_expr OWNER TO role_spec
     ;
 
 alter_index_stmt
-    : todo
+    : alter_oneindex_stmt
+    | alter_split_index_stmt
+    | alter_unsplit_index_stmt
+    | alter_scatter_index_stmt
+    | alter_rename_index_stmt
+    | alter_zone_index_stmt
+    | alter_index_visible_stmt
+    ;
+
+alter_oneindex_stmt
+    : ALTER INDEX if_exists? table_index_name alter_index_cmds
+    ;
+
+alter_index_cmds
+    : alter_index_cmd (',' alter_index_cmd)*
+    ;
+
+alter_index_cmd
+    : partition_by_index
+    ;
+
+partition_by_index
+    : partition_by
+    ;
+
+alter_split_index_stmt
+    : ALTER INDEX table_index_name SPLIT AT select_stmt (WITH EXPIRATION a_expr)?
+    ;
+
+alter_unsplit_index_stmt
+    : ALTER INDEX table_index_name UNSPLIT (AT select_stmt | ALL)
+    ;
+
+alter_scatter_index_stmt
+    : ALTER INDEX table_index_name SCATTER (FROM expr_list_in_parens TO expr_list_in_parens)?
+    ;
+
+alter_rename_index_stmt
+    : ALTER INDEX if_exists? table_index_name RENAME TO index_name
+    ;
+
+alter_zone_index_stmt
+    : ALTER INDEX table_index_name set_zone_config
+    ;
+
+alter_index_visible_stmt
+    : ALTER INDEX if_exists? table_index_name alter_index_visible
+    ;
+
+alter_index_visible
+    : NOT? VISIBLE
+    | INVISIBLE
+    | VISIBILITY fconst
     ;
 
 alter_view_stmt
-    : todo
+    : alter_rename_view_stmt
+    | alter_view_set_schema_stmt
+    | alter_view_owner_stmt
+    ;
+
+alter_rename_view_stmt
+    : ALTER MATERIALIZED? VIEW if_exists? relation_expr RENAME TO view_name
+    ;
+
+alter_view_set_schema_stmt
+    : ALTER MATERIALIZED? VIEW if_exists? relation_expr SET SCHEMA schema_name
+    ;
+
+alter_view_owner_stmt
+    : ALTER MATERIALIZED? VIEW if_exists? relation_expr OWNER TO role_spec
     ;
 
 alter_sequence_stmt
-    : todo
+    : alter_rename_sequence_stmt
+    | alter_sequence_options_stmt
+    | alter_sequence_set_schema_stmt
+    | alter_sequence_owner_stmt
+    ;
+
+alter_rename_sequence_stmt
+    : ALTER SEQUENCE if_exists? relation_expr RENAME TO sequence_name
+    ;
+
+alter_sequence_options_stmt
+    : ALTER SEQUENCE if_exists? sequence_name sequence_option_list
+    ;
+
+alter_sequence_set_schema_stmt
+    : ALTER SEQUENCE if_exists? relation_expr SET SCHEMA schema_name
+    ;
+
+alter_sequence_owner_stmt
+    : ALTER SEQUENCE if_exists relation_expr OWNER TO role_spec
     ;
 
 alter_database_stmt
-    : todo
+    : alter_rename_database_stmt
+    | alter_zone_database_stmt
+    | alter_database_owner
+    | alter_database_to_schema_stmt
+    | alter_database_add_region_stmt
+    | alter_database_drop_region_stmt
+    | alter_database_survival_goal_stmt
+    | alter_database_primary_region_stmt
+    | alter_database_placement_stmt
+    | alter_database_set_stmt
+    | alter_database_add_super_region
+    | alter_database_alter_super_region
+    | alter_database_drop_super_region
+    | alter_database_set_secondary_region_stmt
+    | alter_database_drop_secondary_region
+    | alter_database_set_zone_config_extension_stmt
+    ;
+
+alter_rename_database_stmt
+    : ALTER DATABASE database_name RENAME TO database_name
+    ;
+
+alter_zone_database_stmt
+    : ALTER DATABASE database_name set_zone_config
+    ;
+
+alter_database_owner
+    : ALTER DATABASE database_name OWNER TO role_spec
+    ;
+
+alter_database_to_schema_stmt
+    : ALTER DATABASE database_name CONVERT TO SCHEMA WITH PARENT database_name
+    ;
+
+alter_database_add_region_stmt
+    : ALTER DATABASE database_name ADD REGION if_not_exists? region_name
+    ;
+
+alter_database_drop_region_stmt
+    : ALTER DATABASE database_name DROP REGION if_exists? region_name
+    ;
+
+alter_database_survival_goal_stmt
+    : ALTER DATABASE database_name survival_goal_clause
+    ;
+
+survival_goal_clause
+    : SURVIVE opt_equal? (REGION | ZONE) FAILURE
+    ;
+
+opt_equal
+    : '='
+    ;
+
+alter_database_primary_region_stmt
+    : ALTER DATABASE database_name SET? primary_region_clause
+    ;
+
+primary_region_clause
+    : PRIMARY REGION opt_equal? region_name
+    ;
+
+alter_database_placement_stmt
+    : ALTER DATABASE database_name placement_clause
+    ;
+
+placement_clause
+    : PLACEMENT (RESTRICTED | DEFAULT)
+    ;
+
+alter_database_set_stmt
+    : ALTER DATABASE database_name set_or_reset_clause
+    ;
+
+alter_database_add_super_region
+    : ALTER DATABASE database_name ADD SUPER REGION region_name VALUES region_name_list
+    ;
+
+region_name_list
+    : region_name (',' region_name)*
+    ;
+
+alter_database_alter_super_region
+    : ALTER DATABASE database_name ALTER SUPER REGION region_name VALUES region_name_list
+    ;
+
+alter_database_drop_super_region
+    : ALTER DATABASE database_name DROP SUPER REGION region_name
+    ;
+
+alter_database_set_secondary_region_stmt
+    : ALTER DATABASE database_name SET secondary_region_clause
+    ;
+
+secondary_region_clause
+    : SECONDARY REGION opt_equal? region_name
+    ;
+
+alter_database_drop_secondary_region
+    : ALTER DATABASE database_name DROP SECONDARY REGION if_exists?
+    ;
+
+alter_database_set_zone_config_extension_stmt
+    : ALTER DATABASE database_name ALTER LOCALITY
+        (GLOBAL | REGIONAL (IN region_name)?)? set_zone_config
     ;
 
 alter_range_stmt
-    : todo
+    : alter_zone_range_stmt
+    | alter_range_relocate_stmt
+    ;
+
+alter_zone_range_stmt
+    : ALTER RANGE a_expr set_zone_config
+    ;
+
+alter_range_relocate_stmt
+    : ALTER RANGE
+        ( relocate_kw lease_or_relocate_subject_nonlease TO a_expr FOR select_stmt
+        | a_expr relocate_kw lease_or_relocate_subject_nonlease TO a_expr
+        )
+    ;
+
+relocate_kw
+    : TESTING_RELOCATE
+    | EXPERIMENTAL_RELOCATE
+    | RELOCATE
+    ;
+
+lease_or_relocate_subject_nonlease
+    : LEASE
+    | relocate_subject_nonlease? FROM a_expr
+    ;
+
+relocate_subject_nonlease
+    : VOTERS
+    | NONVOTERS
     ;
 
 alter_partition_stmt
-    : todo
+    : alter_zone_partition_stmt
+    ;
+
+alter_zone_partition_stmt
+    : ALTER PARTITION partition_name OF
+        ( TABLE table_name
+        | INDEX (table_index_name | table_name '@' '*')
+        ) set_zone_config
+    ;
+
+set_zone_config
+    : CONFIGURE ZONE (USING var_set_list | DISCARD)
+    ;
+
+var_set_list
+    : var_set_item (',' var_set_item)*
+    ;
+
+var_set_item
+    : var_name '=' (COPY FROM PARENT | var_value)
     ;
 
 alter_schema_stmt
-    : todo
+    : ALTER SCHEMA qualifiable_schema_name (RENAME TO schema_name | OWNER TO role_spec)
     ;
 
 alter_type_stmt
-    : todo
+    : ALTER TYPE type_name (
+        | ADD VALUE if_not_exists? sconst opt_add_val_placement?
+        | DROP VALUE sconst
+        | RENAME (VALUE sconst TO sconst | TO name)
+        | SET SCHEMA schema_name
+        | OWNER TO role_spec
+        )
+    ;
+
+opt_add_val_placement
+    : (BEFORE | AFTER) sconst
     ;
 
 alter_default_privileges_stmt
-    : todo
+    : ALTER DEFAULT PRIVILEGES (opt_for_roles | FOR ALL ROLES) opt_in_schemas?
+        (abbreviated_grant_stmt | abbreviated_revoke_stmt)
+    ;
+
+abbreviated_grant_stmt
+    : GRANT privileges ON target_object_type TO role_spec_list opt_with_grant_option?
+    ;
+
+target_object_type
+    : TABLES
+    | SEQUENCES
+    | TYPES
+    | SCHEMAS
+    | FUNCTIONS
+    | ROUTINES
+    ;
+
+abbreviated_revoke_stmt
+    : REVOKE (GRANT OPTION FOR)? privileges ON target_object_type FROM role_spec_list opt_drop_behavior?
+    ;
+
+opt_in_schemas
+    : IN SCHEMA schema_name_list
     ;
 
 alter_changefeed_stmt
-    : todo
+    : ALTER CHANGEFEED a_expr alter_changefeed_cmds
+    ;
+
+alter_changefeed_cmds
+    : alter_changefeed_cmd+
+    ;
+
+alter_changefeed_cmd
+    : ADD changefeed_table_targets opt_with_options?
+    | DROP changefeed_table_targets
+    | SET kv_option_list
+    | UNSET name_list
+    ;
+
+changefeed_table_targets
+    : changefeed_table_target (',' changefeed_table_target)*
+    ;
+
+changefeed_table_target
+    : opt_table_prefix? table_name opt_chagefeed_family?
+    ;
+
+opt_table_prefix
+    : TABLE
+    ;
+
+opt_chagefeed_family
+    : FAMILY family_name
     ;
 
 alter_backup_stmt
-    : todo
+    : ALTER BACKUP string_or_placeholder (IN string_or_placeholder)? alter_backup_cmds
+    ;
+
+alter_backup_cmds
+    : alter_backup_cmd+
+    ;
+
+alter_backup_cmd
+    : ADD backup_kms
+    ;
+
+backup_kms
+    : NEW_KMS '=' string_or_placeholder_opt_list WITH OLD_KMS '=' string_or_placeholder_opt_list
     ;
 
 alter_func_stmt
-    : todo
+    : alter_func_options_stmt
+    | alter_func_rename_stmt
+    | alter_func_owner_stmt
+    | alter_func_set_schema_stmt
+    | alter_func_dep_extension_stmt
+    ;
+
+alter_func_options_stmt
+    : ALTER FUNCTION function_with_paramtypes alter_func_opt_list ops_restrict?
+    ;
+
+alter_func_opt_list
+    : common_routine_opt_item+
+    ;
+
+common_routine_opt_item
+    : (CALLED | RETURNS NULL_) ON NULL_ INPUT
+    | STRICT
+    | IMMUTABLE
+    | STABLE
+    | VOLATILE
+    | EXTERNAL? SECURITY (DEFINER | INVOKER)
+    | NOT? LEAKPROOF
+    ;
+
+ops_restrict
+    : RESTRICT
+    ;
+
+alter_func_rename_stmt
+    : ALTER FUNCTION function_with_paramtypes RENAME TO name
+    ;
+
+alter_func_owner_stmt
+    : ALTER FUNCTION function_with_paramtypes OWNER TO role_spec
+    ;
+
+alter_func_set_schema_stmt
+    : ALTER FUNCTION function_with_paramtypes SET SCHEMA schema_name
+    ;
+
+alter_func_dep_extension_stmt
+    : ALTER FUNCTION function_with_paramtypes opt_no? DEPENDS ON EXTENSION name
+    ;
+
+opt_no
+    : NO
     ;
 
 alter_proc_stmt
-    : todo
+    : alter_proc_rename_stmt
+    | alter_proc_owner_stmt
+    | alter_proc_set_schema_stmt
+    ;
+
+alter_proc_rename_stmt
+    : ALTER PROCEDURE function_with_paramtypes RENAME TO name
+    ;
+
+alter_proc_owner_stmt
+    : ALTER PROCEDURE function_with_paramtypes OWNER TO role_spec
+    ;
+
+alter_proc_set_schema_stmt
+    : ALTER PROCEDURE function_with_paramtypes SET SCHEMA schema_name
     ;
 
 alter_backup_schedule
-    : todo
+    : ALTER BACKUP SCHEDULE iconst alter_backup_schedule_cmds
+    ;
+
+alter_backup_schedule_cmds
+    : alter_backup_schedule_cmd (',' alter_backup_schedule_cmd)*
+    ;
+
+alter_backup_schedule_cmd
+    : SET
+        ( LABEL sconst_or_placeholder
+        | INTO string_or_placeholder_opt_list
+        | WITH backup_options
+        | cron_expr
+        | FULL BACKUP (ALWAYS | sconst_or_placeholder)
+        | SCHEDULE OPTION kv_option
+        )
+    | EXECUTE FULL? IMMEDIATELY
+    ;
+
+cron_expr
+    : (name | sconst) ('=' string_or_placeholder)?
     ;
 
 alter_policy_stmt
-    : todo
+    : ALTER POLICY name ON table_name
+        ( RENAME TO name
+        | opt_policy_roles? opt_policy_exprs?
+        )
+    ;
+
+opt_policy_roles
+    : TO role_spec_list
+    ;
+
+opt_policy_exprs
+    : ( USING ('(' a_expr ')' WITH CHECK)?
+      | WITH CHECK ('(' a_expr ')' USING)?
+      ) '(' a_expr ')'
     ;
 
 alter_job_stmt
-    : todo
+    : ALTER JOB a_expr OWNER TO role_spec
     ;
-
 
 backup_stmt
     : BACKUP opt_backup_targets INTO ( (sconst_or_placeholder | LATEST) IN)?
@@ -3883,6 +4681,10 @@ column_name
     : name
     ;
 
+collation_name
+    : unrestricted_name
+    ;
+
 constraint_name
     : name
     ;
@@ -3952,6 +4754,10 @@ complex_db_object_name
 
 db_name
     : db_object_name
+    ;
+
+family_name
+    : name
     ;
 
 sequence_name
