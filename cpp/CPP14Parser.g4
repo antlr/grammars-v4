@@ -797,10 +797,10 @@ classKey
     ;
 
 memberSpecification
-    : (memberdeclaration | accessSpecifier Colon)+
+    : (memberDeclaration | accessSpecifier Colon)+
     ;
 
-memberdeclaration
+memberDeclaration
     : attributeSpecifierSeq? declSpecifierSeq? memberDeclaratorList? Semi
     | functionDefinition
     | usingDeclaration
