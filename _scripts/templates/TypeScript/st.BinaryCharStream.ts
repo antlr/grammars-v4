@@ -35,7 +35,7 @@ export class BinaryCharStream {
     }
 
     get name(): string {
-        return "<unknown>";
+        return "\<unknown>";
     }
 
     get index(): number {

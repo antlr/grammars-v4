@@ -1,4 +1,4 @@
-import { ErrorListener } from "antlr4";
+import { ErrorListener as BaseErrorListener } from "antlr4";
 import { Recognizer } from "antlr4";
 import { RecognitionException } from "antlr4";
 import { Token } from "antlr4";
@@ -6,7 +6,7 @@ import { Parser } from "antlr4";
 import { CommonTokenStream } from "antlr4";
 import CLexer from "./CLexer.js";
 
-export class MyErrorListener<T> extends ErrorListener<T> {
+export class ErrorListener<T> extends BaseErrorListener<T> {
     public had_error: boolean = false;
     private _quiet: boolean;
     private _tee: boolean;
