@@ -1,10 +1,10 @@
-import { Lexer, CharStream } from "antlr4ng";
+import { Lexer, CharStream, CharStreams } from "antlr4";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 
-export abstract class CLexerBase extends Lexer {
+export default abstract class CLexerBase extends Lexer {
     constructor(input: CharStream) {
         super(CLexerBase.runGccAndMakeStream(input));
     }
@@ -25,8 +25,8 @@ export abstract class CLexerBase extends Lexer {
         }
 
         // Get the source name from the CharStream
-        let sourceName = input.getSourceName();
-        const inputText = input.getTextFromRange(0, input.size - 1);
+        let sourceName = "<unknown>"; // (API does not exist) input.getSourceName();
+        const inputText = input.getText(0, input.size - 1);
 
         // If source name is empty or not a .c file, we need to write to a temp file
         if (!sourceName || sourceName === "" || !sourceName.endsWith(".c")) {
@@ -43,7 +43,7 @@ export abstract class CLexerBase extends Lexer {
             } catch (e) {
                 // Ignore
             }
-            return CharStream.fromString(inputText);
+            return CharStreams.fromString(inputText);
         }
 
         if (gcc) {
@@ -59,7 +59,7 @@ export abstract class CLexerBase extends Lexer {
 //                throw new Error("Failed to run gcc preprocessor: " + e);
             }
             fs.writeFileSync(outputName, output);
-            return CharStream.fromString(output);
+            return CharStreams.fromString(output);
         }
         if (clang) {
             let output = "";
@@ -74,7 +74,7 @@ export abstract class CLexerBase extends Lexer {
 //                throw new Error("Failed to run clang preprocessor: " + e);
             }
             fs.writeFileSync(outputName, output);
-            return CharStream.fromString(output);
+            return CharStreams.fromString(output);
         }
 
         throw new Error("No preprocessor specified.");

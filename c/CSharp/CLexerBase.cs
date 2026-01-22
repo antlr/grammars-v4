@@ -31,10 +31,10 @@ public abstract class CLexerBase : Lexer
         var args = Environment.GetCommandLineArgs().ToList();
 
         // Determine which preprocessor to run: gcc or cl.exe or clang.
-        var vsc = args?.Where(a => a.IndexOf("-vsc", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
-        var gcc = args?.Where(a => a.IndexOf("-gcc", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
-        var clang = args?.Where(a => a.IndexOf("-clang", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
-        var nopp = args?.Where(a => a.IndexOf("-nopp", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        var vsc = args?.Where(a => a.IndexOf("--vsc", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        var gcc = args?.Where(a => a.IndexOf("--gcc", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        var clang = args?.Where(a => a.IndexOf("--clang", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        var nopp = args?.Where(a => a.IndexOf("--nopp", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         if (!(vsc || gcc || clang))
 	    gcc = true;
 

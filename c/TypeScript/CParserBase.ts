@@ -1,15 +1,9 @@
-import { Parser, TokenStream, CommonTokenStream, ParserRuleContext } from "antlr4ng";
+import { Parser, TokenStream, CommonTokenStream, ParserRuleContext } from "antlr4";
 import { SymbolTable } from "./SymbolTable.js";
 import { Symbol } from "./Symbol.js";
 import { TypeClassification } from "./TypeClassification.js";
-import { CLexer } from "./CLexer.js";
-import {
-    CParser,
-    DeclarationContext,
-    FunctionDefinitionContext,
-    DeclaratorContext
-} from "./CParser.js";
-
+import CLexer from "./CLexer.js";
+import CParser, { DeclarationContext, FunctionDefinitionContext, DeclaratorContext } from "./CParser.js";
 
 function isDeclarationContext(x: any): x is DeclarationContext {
   return x?.ruleIndex === CParser.RULE_declaration;
@@ -20,7 +14,7 @@ function isFunctionDefinitionContext(x: any): x is FunctionDefinitionContext {
   return x?.ruleIndex === CParser.RULE_functionDefinition;
 }
 
-export abstract class CParserBase extends Parser {
+export default abstract class CParserBase extends Parser {
     private _st: SymbolTable;
     private debug: boolean = false;
     private noSemantics: boolean = false;
@@ -36,7 +30,7 @@ export abstract class CParserBase extends Parser {
 
     public IsAlignmentSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAlignmentSpecifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -54,7 +48,7 @@ export abstract class CParserBase extends Parser {
 
     public IsAtomicTypeSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAtomicTypeSpecifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -77,7 +71,7 @@ export abstract class CParserBase extends Parser {
 
     public IsAttributeSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         if (this.debug) process.stdout.write("IsAttributeSpecifier " + lt1);
         const result = lt1!.type === CLexer.LeftBracket;
         if (this.debug) console.log(" " + result);
@@ -102,7 +96,7 @@ export abstract class CParserBase extends Parser {
 
     public IsDeclarationSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) console.log("IsDeclarationSpecifier " + lt1);
         const result = this.IsStorageClassSpecifier()
@@ -130,7 +124,7 @@ export abstract class CParserBase extends Parser {
 
     public IsEnumSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         if (this.debug) process.stdout.write("IsEnumSpecifier " + lt1);
         const result = lt1!.type === CLexer.Enum;
         if (this.debug) console.log(" " + result);
@@ -139,7 +133,7 @@ export abstract class CParserBase extends Parser {
 
     public IsFunctionSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsFunctionSpecifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -157,8 +151,8 @@ export abstract class CParserBase extends Parser {
 
     public IsStatement(): boolean {
         if (this.noSemantics) return true;
-        const t1 = (this.inputStream as CommonTokenStream).LT(1);
-        const t2 = (this.inputStream as CommonTokenStream).LT(2);
+        const t1 = (this._input as CommonTokenStream).LT(1);
+        const t2 = (this._input as CommonTokenStream).LT(2);
         if (this.debug) console.log("IsStatement1 " + t1);
         if (this.debug) console.log("IsStatement2 " + t2);
         if (t1!.type === CLexer.Identifier && t2!.type === CLexer.Colon) {
@@ -172,7 +166,7 @@ export abstract class CParserBase extends Parser {
 
     public IsStaticAssertDeclaration(): boolean {
         if (this.noSemantics) return true;
-        const token = (this.inputStream as CommonTokenStream).LT(1);
+        const token = (this._input as CommonTokenStream).LT(1);
         if (this.debug) process.stdout.write("IsStaticAssertDeclaration " + token);
         const result = token!.type === CLexer.Static_assert;
         if (this.debug) console.log(" " + result);
@@ -181,7 +175,7 @@ export abstract class CParserBase extends Parser {
 
     public IsStorageClassSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsStorageClassSpecifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -199,7 +193,7 @@ export abstract class CParserBase extends Parser {
 
     public IsStructOrUnionSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const token = (this.inputStream as CommonTokenStream).LT(1);
+        const token = (this._input as CommonTokenStream).LT(1);
         if (this.debug) process.stdout.write("IsStructOrUnionSpecifier " + token);
         const result = token!.type === CLexer.Struct ||
             token!.type === CLexer.Union;
@@ -209,7 +203,7 @@ export abstract class CParserBase extends Parser {
 
     public IsTypedefName(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypedefName " + lt1);
         const resolved = this._st.resolve(text);
@@ -229,7 +223,7 @@ export abstract class CParserBase extends Parser {
 
     public IsTypeofSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const token = (this.inputStream as CommonTokenStream).LT(1);
+        const token = (this._input as CommonTokenStream).LT(1);
         if (this.debug) process.stdout.write("IsTypeofSpecifier " + token);
         const result = token!.type === CLexer.Typeof ||
             token!.type === CLexer.Typeof_unqual;
@@ -239,7 +233,7 @@ export abstract class CParserBase extends Parser {
 
     public IsTypeQualifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeQualifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -257,7 +251,7 @@ export abstract class CParserBase extends Parser {
 
     public IsTypeSpecifier(): boolean {
         if (this.noSemantics) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this._input as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeSpecifier " + lt1);
         const resolved = this._st.resolve(text);
@@ -280,17 +274,36 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
+    private myGetDeclarationId(y: DeclaratorContext | null): string | null {
+        // Go down the tree and find a declarator with Identifier.
+        if (y === null) return null;
+
+        // Check if this declarator has a direct declarator with an identifier
+        const directDeclarator = y.directDeclarator();
+        if (directDeclarator !== null) {
+            const more = directDeclarator.declarator();
+            const xxx = this.myGetDeclarationId(more);
+            if (xxx !== null) return xxx;
+            if (directDeclarator.Identifier() !== null) {
+                return directDeclarator.Identifier()!.getText();
+            }
+        }
+
+        return null;
+    }
+
+
     public EnterDeclaration(): void {
         if (this.debug) console.log("EnterDeclaration");
-        let context: ParserRuleContext | null = this.context;
-        for (; context !== null; context = context.parent) {
+        let context: ParserRuleContext | null = this._ctx;
+        for (; context !== null; context = context.parentCtx) {
             if (context instanceof DeclarationContext) {
 		if ( ! isDeclarationContext(context)) {
 		    continue;
 		}
                 const declaration_context = context as DeclarationContext;
                 const declaration_specifiers = declaration_context.declarationSpecifiers();
-                const declaration_specifier = declaration_specifiers?.declarationSpecifier() ?? null;
+                const declaration_specifier = declaration_specifiers?.declarationSpecifier_list() ?? null;
 
                 let is_typedef = false;
                 if (declaration_specifier !== null) {
@@ -331,14 +344,14 @@ export abstract class CParserBase extends Parser {
                 }
 
                 const init_declaration_list = declaration_context.initDeclaratorList();
-                const init_declarators = init_declaration_list?.initDeclarator() ?? null;
+                const init_declarators = init_declaration_list?.initDeclarator_list() ?? null;
 
                 if (init_declarators !== null) {
                     for (const id of init_declarators) {
                         const y = id?.declarator() ?? null;
-                        const identifier = this.getDeclarationId(y);
-                        if (identifier !== null && identifier != undefined) {
-                            const text = identifier;
+                        const mid = this.myGetDeclarationId(y);
+                        if (mid !== null && mid != undefined) {
+                            const text = mid;
                             if (is_typedef) {
                                 const symbol = new Symbol();
                                 symbol.name = text;
@@ -378,24 +391,6 @@ export abstract class CParserBase extends Parser {
         }
     }
 
-    private getDeclarationId(y: DeclaratorContext | null): string | null {
-        // Go down the tree and find a declarator with Identifier.
-        if (y === null) return null;
-
-        // Check if this declarator has a direct declarator with an identifier
-        const directDeclarator = y.directDeclarator();
-        if (directDeclarator !== null) {
-            const more = directDeclarator.declarator();
-            const xxx = this.getDeclarationId(more);
-            if (xxx !== null) return xxx;
-            if (directDeclarator.Identifier() !== null) {
-                return directDeclarator.Identifier()!.getText();
-            }
-        }
-
-        return null;
-    }
-
     // Define to return "true" because "gcc -c -std=c2x" accepts an empty
     // struct-declaration-list.
     public IsNullStructDeclarationListExtension(): boolean {
@@ -406,8 +401,8 @@ export abstract class CParserBase extends Parser {
         let result = false;
         // Look for a cast.
         if (this.noSemantics) return true;
-        const t1 = (this.inputStream as CommonTokenStream).LT(1);
-        const t2 = (this.inputStream as CommonTokenStream).LT(2);
+        const t1 = (this._input as CommonTokenStream).LT(1);
+        const t2 = (this._input as CommonTokenStream).LT(2);
         if (this.debug) console.log("IsCast1 " + t1);
         if (this.debug) console.log("IsCast2 " + t2);
         if (t1!.type !== CLexer.LeftParen) {

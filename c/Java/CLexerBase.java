@@ -16,10 +16,10 @@ public abstract class CLexerBase extends Lexer {
         // Get options from system property or environment
         String[] args = getCommandLineArgs();
 
-        boolean vsc = hasArg(args, "-vsc");
-        boolean gcc = hasArg(args, "-gcc");
-        boolean clang = hasArg(args, "-clang");
-        boolean nopp = hasArg(args, "-nopp");
+        boolean vsc = hasArg(args, "--vsc");
+        boolean gcc = hasArg(args, "--gcc");
+        boolean clang = hasArg(args, "--clang");
+        boolean nopp = hasArg(args, "--nopp");
 
         if (!(vsc || gcc || clang)) {
             gcc = true;

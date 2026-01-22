@@ -17,8 +17,8 @@ public abstract class CParserBase : Parser
     {
         // Get options from process args.
         var args = Environment.GetCommandLineArgs().ToList();
-        no_semantics = (args?.Where(a => a.IndexOf("-no-semantics", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false);
-        debug = args?.Where(a => a.IndexOf("-debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        no_semantics = (args?.Where(a => a.IndexOf("--no-symbol-table", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false);
+        debug = args?.Where(a => a.IndexOf("--debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         _st = new SymbolTable();
     }
 

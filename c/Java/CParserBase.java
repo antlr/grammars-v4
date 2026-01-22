@@ -11,8 +11,8 @@ public abstract class CParserBase extends Parser {
         // Get options from system property
         String cmdLine = System.getProperty("sun.java.command");
         String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
-        noSemantics = hasArg(args, "-no-semantics");
-        debug = hasArg(args, "-debug");
+        noSemantics = hasArg(args, "--no-symbol-table");
+        debug = hasArg(args, "--debug");
         _st = new SymbolTable();
     }
 
