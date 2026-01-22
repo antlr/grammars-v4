@@ -356,7 +356,7 @@ routine_param_type
     ;
 
 typename
-    : simple_typename (opt_array_bounds | ARRAY)
+    : simple_typename (opt_array_bounds | ARRAY)?
     ;
 
 simple_typename
@@ -2055,11 +2055,11 @@ opt_encoding_clause
     ;
 
 opt_lc_collate_clause
-    : LC_COLLATE opt_equal? non_reserved_word_or_sconst
+    : LC_COLLATE_ opt_equal? non_reserved_word_or_sconst
     ;
 
 opt_lc_ctype_clause
-    : LC_CTYPE opt_equal? non_reserved_word_or_sconst
+    : LC_CTYPE_ opt_equal? non_reserved_word_or_sconst
     ;
 
 opt_connection_limit
@@ -2120,7 +2120,7 @@ opt_schema_name
 create_table_stmt
     : CREATE opt_persistence_temp_table? TABLE if_not_exists? table_name
         '(' opt_table_elem_list? ')' partition_by_table? opt_table_with?
-        opt_create_table_on_commit locality?
+        opt_create_table_on_commit? locality?
     ;
 
 opt_table_with
@@ -2836,7 +2836,7 @@ bare_label_keywords
     | DISCARD
     | DISTINCT
     | DO
-    | DOMAIN
+    | DOMAIN_
     | DOUBLE
     | DROP
     | EACH
@@ -2968,8 +2968,8 @@ bare_label_keywords
     | LAST
     | LATERAL
     | LATEST
-    | LC_COLLATE
-    | LC_CTYPE
+    | LC_COLLATE_
+    | LC_CTYPE_
     | LEADING
     | LEAKPROOF
     | LEASE
@@ -3384,7 +3384,7 @@ session_var
     | NAMES
     | ROLE
     | SESSION_USER
-    | LC_COLLATE
+    | LC_COLLATE_
     | TIME ZONE
     | VIRTUAL_CLUSTER_NAME
     ;
@@ -3632,7 +3632,7 @@ distinct_on_clause
     ;
 
 from_clause
-    : FROM from_list opt_as_of_clause?
+    : FROM from_list as_of_clause?
     ;
 
 from_list
@@ -3717,7 +3717,7 @@ table_ref
     | func_table opt_ordinality opt_func_alias_clause
     | '(' table_ref ')' opt_ordinality? alias_clause?
     | table_ref (
-              (CROSS opt_join_hint? |  NATURAL (join_type opt_join_hint?)?) JOIN table_ref
+              (CROSS opt_join_hint? | NATURAL (join_type opt_join_hint?)?) JOIN table_ref
               | (join_type opt_join_hint?)? JOIN table_ref join_equal
               )
     ;
@@ -4768,7 +4768,7 @@ unreserved_keyword
     | DETAILS
     | DISABLE
     | DISCARD
-    | DOMAIN
+    | DOMAIN_
     | DOUBLE
     | DROP
     | EACH
@@ -4868,8 +4868,8 @@ unreserved_keyword
     | LANGUAGE
     | LAST
     | LATEST
-    | LC_COLLATE
-    | LC_CTYPE
+    | LC_COLLATE_
+    | LC_CTYPE_
     | LEAKPROOF
     | LEASE
     | LESS
