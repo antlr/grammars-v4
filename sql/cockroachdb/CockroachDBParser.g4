@@ -3586,21 +3586,6 @@ drop_policy_stmt
     : DROP POLICY if_exists? name ON table_name opt_drop_behavior?
     ;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 select_stmt
     : select_no_parens
     | select_with_parens
@@ -3608,11 +3593,11 @@ select_stmt
 
 select_no_parens
     : simple_select
-    | select_clause (
+    | simple_select (
         sort_clause
         | sort_clause? (for_locking_clause select_limit? | select_limit for_locking_clause?)
       )
-    | with_clause select_clause (
+    | with_clause simple_select (
             sort_clause
             | sort_clause? (for_locking_clause select_limit? | select_limit for_locking_clause?)
         )?
@@ -3622,21 +3607,24 @@ simple_select
     : simple_select_clause
     | values_clause
     | table_clause
-    | set_operation
+    | select_with_parens
+    | simple_select (UNION | INTERSECT | EXCEPT) all_or_distinct? simple_select
     ;
 
 simple_select_clause
-    : SELECT (opt_all_clause? opt_target_list? | (DISTINCT | distinct_on_clause) target_list)
-        from_clause? opt_where_clause?
-        group_clause? having_clause? window_clause?
+    : SELECT
+        ( opt_all_clause? target_list?
+        | (DISTINCT | distinct_on_clause) target_list
+        )
+        from_clause?
+        where_clause?
+        group_clause?
+        having_clause?
+        window_clause?
     ;
 
 opt_all_clause
     : ALL
-    ;
-
-opt_target_list
-    : target_list
     ;
 
 distinct_on_clause
@@ -3726,9 +3714,12 @@ table_ref
       | '[' row_source_extension_stmt ']'
       | LATERAL (select_with_parens | func_table)
     ) opt_ordinality? opt_alias_clause?
-    | joined_table
-    | '(' joined_table ')' opt_ordinality? alias_clause
     | func_table opt_ordinality opt_func_alias_clause
+    | '(' table_ref ')' opt_ordinality? alias_clause?
+    | table_ref (
+              (CROSS opt_join_hint? |  NATURAL (join_type opt_join_hint?)?) JOIN table_ref
+              | (join_type opt_join_hint?)? JOIN table_ref join_equal
+              )
     ;
 
 row_source_extension_stmt
@@ -3842,14 +3833,6 @@ rowsfrom_item
     : func_expr_windowless opt_func_alias_clause?
     ;
 
-joined_table
-    : '(' joined_table ')'
-    | table_ref (
-        (CROSS opt_join_hint? |  NATURAL (join_type opt_join_hint?)?) JOIN table_ref
-        | (join_type opt_join_hint?)? JOIN table_ref join_equal
-        )
-    ;
-
 join_type
     : (FULL | LEFT | RIGHT) join_outer?
     | INNER
@@ -3901,19 +3884,19 @@ col_def
     : name typename
     ;
 
-set_operation
-    : select_clause (UNION | INTERSECT | EXCEPT) all_or_distinct? select_clause
-    ;
+//set_operation
+//    : select_clause (UNION | INTERSECT | EXCEPT) all_or_distinct? select_clause
+//    ;
 
 all_or_distinct
     : ALL
     | DISTINCT
     ;
 
-select_clause
-    : simple_select
-    | select_with_parens
-    ;
+//select_clause
+//    : simple_select
+//    | select_with_parens
+//    ;
 
 select_limit
     : limit_clause offset_clause?
