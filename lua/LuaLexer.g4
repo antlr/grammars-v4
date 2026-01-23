@@ -32,7 +32,6 @@ LOCAL    : 'local';
 LT       : '<';
 GT       : '>';
 RETURN   : 'return';
-CONTINUE : 'continue';
 CC       : '::';
 NIL      : 'nil';
 FALSE    : 'false';

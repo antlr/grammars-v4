@@ -445,6 +445,7 @@ IMPORT             : 'IMPORT';
 IMPORTS            : 'IMPORTS';
 IMPORTED           : 'IMPORTED';
 IN                 : 'IN';
+INCLUDE            : 'INCLUDE';
 INCREMENT          : 'INCREMENT';
 INCREMENTAL        : 'INCREMENTAL';
 INDEX              : 'INDEX';

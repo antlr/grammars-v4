@@ -3909,6 +3909,7 @@ non_reserved_words
     | ERROR_INTEGRATION
     | EVENT
     | EXCHANGE
+    | EXCLUDE
     | EXPIRY_DATE
     | EXPR
     | EXTENSION
@@ -3925,6 +3926,7 @@ non_reserved_words
     | IDENTITY
     | INCREMENTAL
     | IMPORTED
+    | INCLUDE
     | INDEX
     | INITIALIZE
     | INPUT
@@ -3943,6 +3945,7 @@ non_reserved_words
     | NAME
     | NETWORK
     | NULLIF
+    | NULLS
     | NVL
     | OFFSET
     | OLD
@@ -4112,6 +4115,10 @@ column_list
     : column_name (COMMA column_name)*
     ;
 
+aliased_column_list
+    : column_name as_alias? (',' column_name as_alias?)*
+    ;
+
 column_list_with_comment
     : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
     ;
@@ -4163,6 +4170,7 @@ expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
     | json_literal
+    | lambda_params '->' expr
     | trim_expression
     | function_call
     | subquery
@@ -4172,6 +4180,11 @@ expr
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | primitive_expression //Should be latest rule as it's nearly a catch all
+    ;
+
+lambda_params
+    : id_ data_type?
+    | '(' id_ data_type? (',' id_ data_type?)* ')'
     ;
 
 iff_expr
@@ -4238,7 +4251,7 @@ data_type
     | binary_alias = ( BINARY | VARBINARY) data_type_size?
     | VARIANT
     | OBJECT
-    | ARRAY
+    | ARRAY ('(' data_type ')')?
     | GEOGRAPHY
     | GEOMETRY
     | VECTOR '(' vector_element_type COMMA num ')'
@@ -4661,7 +4674,12 @@ match_recognize
 pivot_unpivot
     : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
         as_alias column_alias_list_in_brackets?  )?
-    | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
+    | UNPIVOT (include_exclude NULLS)? LR_BRACKET id_ FOR column_name IN LR_BRACKET aliased_column_list RR_BRACKET RR_BRACKET
+    ;
+
+include_exclude
+    : INCLUDE
+    | EXCLUDE
     ;
 
 pivot_in_clause
