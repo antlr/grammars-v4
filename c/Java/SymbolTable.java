@@ -3,6 +3,7 @@ import java.util.Stack;
 
 public class SymbolTable {
     private Stack<Symbol> scopeStack = new Stack<>();
+    private int blockCounter = 0;
 
     public SymbolTable() {
         Symbol globalScope = createSymbol("global", TypeClassification.Global_);
@@ -160,7 +161,9 @@ public class SymbolTable {
 
     public Symbol resolve(String name, Symbol startScope) {
         if (startScope == null) {
-            for (Symbol scope : scopeStack) {
+            // Iterate from innermost (top of stack) to outermost (bottom of stack)
+            for (int i = scopeStack.size() - 1; i >= 0; i--) {
+                Symbol scope = scopeStack.get(i);
                 Symbol symbol = scope.getMembers().get(name);
                 if (symbol != null) {
                     return symbol;
@@ -172,16 +175,40 @@ public class SymbolTable {
         }
     }
 
+    public Symbol pushBlockScope() {
+        Symbol blockScope = new Symbol();
+        blockScope.setName("block" + (++blockCounter));
+        HashSet<TypeClassification> classSet = new HashSet<>();
+        classSet.add(TypeClassification.Block_);
+        blockScope.setClassification(classSet);
+        blockScope.setPredefined(true);
+        enterScope(blockScope);
+        return blockScope;
+    }
+
+    public void popBlockScope() {
+        exitScope();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Symbol scope : scopeStack) {
-            for (var entry : scope.getMembers().entrySet()) {
-                if (!entry.getValue().isPredefined()) {
-                    sb.append(entry.getValue().toString()).append("\n");
-                }
+        toStringHelper(sb, scopeStack.get(0), 0);
+        return sb.toString();
+    }
+
+    private void toStringHelper(StringBuilder sb, Symbol scope, int depth) {
+        String indent = "  ".repeat(depth);
+        for (var entry : scope.getMembers().entrySet()) {
+            Symbol sym = entry.getValue();
+            if (!sym.isPredefined()) {
+                sb.append(indent).append(sym.toString()).append("\n");
+            }
+            // Recursively print nested scopes
+            if (sym.getClassification().contains(TypeClassification.Block_) ||
+                sym.getClassification().contains(TypeClassification.Function_)) {
+                toStringHelper(sb, sym, depth + 1);
             }
         }
-        return sb.toString();
     }
 }

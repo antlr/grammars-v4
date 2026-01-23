@@ -4,6 +4,7 @@ using System.Text;
 
 public class SymbolTable {
     private Stack<Symbol> scopeStack = new Stack<Symbol>();
+    private int blockCounter = 0;
 
     public SymbolTable() {
         var globalScope = new Symbol() { Name = "global", Classification = new HashSet<TypeClassification>() {TypeClassification.Global_} };
@@ -151,6 +152,7 @@ public class SymbolTable {
     {
         if (start_scope == null)
         {
+            // Stack iteration in C# is already from top (innermost) to bottom (outermost)
             foreach (Symbol scope in scopeStack)
             {
                 if (scope.Members.TryGetValue(name, out Symbol symbol))
@@ -172,19 +174,51 @@ public class SymbolTable {
         }
     }
 
+    public Symbol PushBlockScope()
+    {
+        var blockScope = new Symbol()
+        {
+            Name = "block" + (++blockCounter),
+            Classification = new HashSet<TypeClassification>() { TypeClassification.Block_ },
+            Predefined = true
+        };
+        EnterScope(blockScope);
+        return blockScope;
+    }
+
+    public void PopBlockScope()
+    {
+        ExitScope();
+    }
+
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        foreach (var scope in scopeStack)
+        // Get the global scope (bottom of stack)
+        var scopes = scopeStack.ToArray();
+        if (scopes.Length > 0)
         {
-            foreach (var member in scope.Members)
-            {
-                if (!member.Value.Predefined)
-                {
-                    sb.AppendLine(member.Value.ToString());
-                }
-            }
+            ToStringHelper(sb, scopes[scopes.Length - 1], 0);
         }
         return sb.ToString();
+    }
+
+    private void ToStringHelper(StringBuilder sb, Symbol scope, int depth)
+    {
+        string indent = new string(' ', depth * 2);
+        foreach (var entry in scope.Members)
+        {
+            var sym = entry.Value;
+            if (!sym.Predefined)
+            {
+                sb.AppendLine(indent + sym.ToString());
+            }
+            // Recursively print nested scopes
+            if (sym.Classification.Contains(TypeClassification.Block_) ||
+                sym.Classification.Contains(TypeClassification.Function_))
+            {
+                ToStringHelper(sb, sym, depth + 1);
+            }
+        }
     }
 }

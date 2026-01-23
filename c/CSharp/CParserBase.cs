@@ -10,6 +10,7 @@ public abstract class CParserBase : Parser
     SymbolTable _st;
     private bool debug = false;
     private bool output_symbol_table = false;
+    private bool output_applied_occurrences = false;
     private HashSet<string> no_semantics = new HashSet<string>();
     public List<string> _args;
 
@@ -32,6 +33,7 @@ public abstract class CParserBase : Parser
         no_semantics = ParseNoSemantics(args);
         debug = args?.Where(a => a.IndexOf("--debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         output_symbol_table = args?.Where(a => a.IndexOf("--output-symbol-table", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        output_applied_occurrences = args?.Where(a => a.IndexOf("--output-applied-occurrences", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         _st = new SymbolTable();
     }
 
@@ -73,7 +75,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAlignmentSpecifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -93,7 +95,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAtomicTypeSpecifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -190,7 +192,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsFunctionSpecifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -243,7 +245,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsStorageClassSpecifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -275,7 +277,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypedefName " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -315,7 +317,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeQualifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -336,7 +338,7 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeSpecifier " + lt1);
-        var resolved = _st.Resolve(text);
+        var resolved = ResolveWithOutput(lt1);
         bool result = false;
         if (resolved == null)
         {
@@ -480,12 +482,37 @@ public abstract class CParserBase : Parser
         return true;
     }
 
+    public void EnterScope()
+    {
+        if (debug) System.Console.WriteLine("EnterScope");
+        _st.PushBlockScope();
+    }
+
+    public void ExitScope()
+    {
+        if (debug) System.Console.WriteLine("ExitScope");
+        _st.PopBlockScope();
+    }
+
     public void OutputSymbolTable()
     {
         if (output_symbol_table)
         {
             System.Console.Error.WriteLine(_st.ToString());
         }
+    }
+
+    private Symbol ResolveWithOutput(IToken token)
+    {
+        if (token == null) return null;
+        var text = token.Text;
+        var resolved = _st.Resolve(text);
+        if (output_applied_occurrences && resolved != null)
+        {
+            var appliedLoc = GetSourceLocation(token);
+            System.Console.Error.WriteLine($"Applied occurrence: {text} at {appliedLoc.File}:{appliedLoc.Line}:{appliedLoc.Column} -> Defined at {resolved.DefinedFile}:{resolved.DefinedLine}:{resolved.DefinedColumn}");
+        }
+        return resolved;
     }
 
     // Helper class to hold source location information
@@ -570,8 +597,7 @@ public abstract class CParserBase : Parser
         } else
         {
             // Check id.
-            var text = t2.Text;
-            var resolved = _st.Resolve(text);
+            var resolved = ResolveWithOutput(t2);
             if (resolved == null)
             {
                 // It's not in symbol table.

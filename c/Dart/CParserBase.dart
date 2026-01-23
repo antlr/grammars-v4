@@ -45,6 +45,7 @@ abstract class CParserBase extends Parser {
   late SymbolTable _st;
   bool _debug = false;
   bool _outputSymbolTable = false;
+  bool _outputAppliedOccurrences = false;
   Set<String> _noSemantics = <String>{};
 
   CParserBase(TokenStream input) : super(input) {
@@ -53,6 +54,7 @@ abstract class CParserBase extends Parser {
     _noSemantics = parseNoSemantics(args);
     _debug = args.any((a) => a.toLowerCase().contains("--debug"));
     _outputSymbolTable = args.any((a) => a.toLowerCase().contains("--output-symbol-table"));
+    _outputAppliedOccurrences = args.any((a) => a.toLowerCase().contains("--output-applied-occurrences"));
     _st = SymbolTable();
   }
 
@@ -61,7 +63,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAlignmentSpecifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -79,7 +81,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAtomicTypeSpecifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -161,7 +163,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsFunctionSpecifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -203,7 +205,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsStorageClassSpecifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -230,7 +232,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypedefName $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -259,7 +261,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeQualifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -277,7 +279,7 @@ abstract class CParserBase extends Parser {
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeSpecifier $lt1");
-    var resolved = _st.resolve(text);
+    var resolved = _resolveWithOutput(lt1);
     bool result = false;
     if (resolved == null) {
       result = false;
@@ -428,10 +430,31 @@ abstract class CParserBase extends Parser {
     return true;
   }
 
+  void EnterScope() {
+    if (_debug) print("EnterScope");
+    _st.pushBlockScope();
+  }
+
+  void ExitScope() {
+    if (_debug) print("ExitScope");
+    _st.popBlockScope();
+  }
+
   void OutputSymbolTable() {
     if (_outputSymbolTable) {
       stderr.writeln(_st.toString());
     }
+  }
+
+  Symbol? _resolveWithOutput(Token? token) {
+    if (token == null) return null;
+    var text = token.text ?? "";
+    var resolved = _st.resolve(text);
+    if (_outputAppliedOccurrences && resolved != null) {
+      var appliedLoc = _getSourceLocation(token);
+      stderr.writeln("Applied occurrence: $text at ${appliedLoc["file"]}:${appliedLoc["line"]}:${appliedLoc["column"]} -> Defined at ${resolved.definedFile}:${resolved.definedLine}:${resolved.definedColumn}");
+    }
+    return resolved;
   }
 
   // Helper class to hold source location
@@ -490,8 +513,7 @@ abstract class CParserBase extends Parser {
       result = true;
     } else {
       // Check id.
-      var text = t2?.text ?? "";
-      var resolved = _st.resolve(text);
+      var resolved = _resolveWithOutput(t2);
       if (resolved == null) {
         // It's not in symbol table.
         result = false;

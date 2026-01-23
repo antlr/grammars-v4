@@ -5,6 +5,7 @@ public abstract class CParserBase extends Parser {
     private SymbolTable _st;
     private boolean debug = false;
     private boolean outputSymbolTable = false;
+    private boolean outputAppliedOccurrences = false;
     private Set<String> noSemantics = new HashSet<>();
 
     // List of all semantic function names
@@ -26,6 +27,7 @@ public abstract class CParserBase extends Parser {
         noSemantics = parseNoSemantics(args);
         debug = hasArg(args, "--debug");
         outputSymbolTable = hasArg(args, "--output-symbol-table");
+        outputAppliedOccurrences = hasArg(args, "--output-applied-occurrences");
         _st = new SymbolTable();
     }
 
@@ -67,7 +69,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAlignmentSpecifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -85,7 +87,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAtomicTypeSpecifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -170,7 +172,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsFunctionSpecifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -212,7 +214,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsStorageClassSpecifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -240,7 +242,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypedefName " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -270,7 +272,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeQualifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -288,7 +290,7 @@ public abstract class CParserBase extends Parser {
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeSpecifier " + lt1);
-        Symbol resolved = _st.resolve(text);
+        Symbol resolved = resolveWithOutput(lt1);
         boolean result = false;
         if (resolved == null) {
             result = false;
@@ -458,10 +460,32 @@ public abstract class CParserBase extends Parser {
         return true;
     }
 
+    public void EnterScope() {
+        if (debug) System.out.println("EnterScope");
+        _st.pushBlockScope();
+    }
+
+    public void ExitScope() {
+        if (debug) System.out.println("ExitScope");
+        _st.popBlockScope();
+    }
+
     public void OutputSymbolTable() {
         if (outputSymbolTable) {
             System.err.println(_st.toString());
         }
+    }
+
+    private Symbol resolveWithOutput(Token token) {
+        if (token == null) return null;
+        String text = token.getText();
+        Symbol resolved = _st.resolve(text);
+        if (outputAppliedOccurrences && resolved != null) {
+            SourceLocation appliedLoc = getSourceLocation(token);
+            System.err.println("Applied occurrence: " + text + " at " + appliedLoc.file + ":" + appliedLoc.line + ":" + appliedLoc.column +
+                " -> Defined at " + resolved.getDefinedFile() + ":" + resolved.getDefinedLine() + ":" + resolved.getDefinedColumn());
+        }
+        return resolved;
     }
 
     // Helper class to hold source location information
@@ -536,8 +560,7 @@ public abstract class CParserBase extends Parser {
             result = true;
         } else {
             // Check id.
-            String text = t2.getText();
-            Symbol resolved = _st.resolve(text);
+            Symbol resolved = resolveWithOutput(t2);
             if (resolved == null) {
                 // It's not in symbol table.
                 result = false;

@@ -598,7 +598,7 @@ labeledStatement
     ;
 
 compoundStatement
-    : '{' blockItemList? '}'
+    : '{' {this.EnterScope();} blockItemList? '}' {this.ExitScope();}
     ;
 
 blockItemList

@@ -1,5 +1,6 @@
 enum TypeClassification {
   global,
+  block,
   function_,
   variable,
   typeSpecifier,

@@ -3,6 +3,7 @@ import 'TypeClassification.dart';
 
 class SymbolTable {
   final List<Symbol> _scopeStack = [];
+  int _blockCounter = 0;
 
   SymbolTable() {
     var globalScope = _createSymbol("global", TypeClassification.global);
@@ -160,6 +161,7 @@ class SymbolTable {
 
   Symbol? resolve(String name, [Symbol? startScope]) {
     if (startScope == null) {
+      // Iterate from innermost (top of stack) to outermost (bottom of stack)
       for (var i = _scopeStack.length - 1; i >= 0; i--) {
         var scope = _scopeStack[i];
         var symbol = scope.members[name];
@@ -173,16 +175,40 @@ class SymbolTable {
     }
   }
 
+  Symbol pushBlockScope() {
+    var blockScope = Symbol();
+    blockScope.name = "block${++_blockCounter}";
+    blockScope.classification = {TypeClassification.block};
+    blockScope.predefined = true;
+    enterScope(blockScope);
+    return blockScope;
+  }
+
+  void popBlockScope() {
+    exitScope();
+  }
+
   @override
   String toString() {
     var result = StringBuffer();
-    for (var scope in _scopeStack) {
-      for (var entry in scope.members.entries) {
-        if (!entry.value.predefined) {
-          result.writeln(entry.value.toString());
-        }
-      }
+    if (_scopeStack.isNotEmpty) {
+      _toStringHelper(result, _scopeStack[0], 0);
     }
     return result.toString();
+  }
+
+  void _toStringHelper(StringBuffer sb, Symbol scope, int depth) {
+    var indent = '  ' * depth;
+    for (var entry in scope.members.entries) {
+      var sym = entry.value;
+      if (!sym.predefined) {
+        sb.writeln('$indent${sym.toString()}');
+      }
+      // Recursively print nested scopes
+      if (sym.classification.contains(TypeClassification.block) ||
+          sym.classification.contains(TypeClassification.function_)) {
+        _toStringHelper(sb, sym, depth + 1);
+      }
+    }
   }
 }

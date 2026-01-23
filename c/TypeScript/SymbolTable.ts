@@ -3,6 +3,7 @@ import { TypeClassification } from "./TypeClassification.js";
 
 export class SymbolTable {
     private scopeStack: Symbol[] = [];
+    private blockCounter: number = 0;
 
     constructor() {
         const globalScope = this.createSymbol("global", TypeClassification.Global_);
@@ -161,6 +162,7 @@ export class SymbolTable {
 
     public resolve(name: string, startScope: Symbol | null = null): Symbol | null {
         if (startScope === null) {
+            // Iterate from innermost (top of stack) to outermost (bottom of stack)
             for (let i = this.scopeStack.length - 1; i >= 0; i--) {
                 const scope = this.scopeStack[i];
                 const symbol = scope.members.get(name);
@@ -174,13 +176,38 @@ export class SymbolTable {
         }
     }
 
+    public pushBlockScope(): Symbol {
+        const blockScope = new Symbol();
+        blockScope.name = "block" + (++this.blockCounter);
+        blockScope.classification = new Set([TypeClassification.Block_]);
+        blockScope.predefined = true;
+        this.enterScope(blockScope);
+        return blockScope;
+    }
+
+    public popBlockScope(): void {
+        this.exitScope();
+    }
+
     public toString(): string {
         let result = "";
-        for (const scope of this.scopeStack) {
-            for (const [key, value] of scope.members) {
-                if (!value.predefined) {
-                    result += value.toString() + "\n";
-                }
+        if (this.scopeStack.length > 0) {
+            result = this.toStringHelper(this.scopeStack[0], 0);
+        }
+        return result;
+    }
+
+    private toStringHelper(scope: Symbol, depth: number): string {
+        let result = "";
+        const indent = "  ".repeat(depth);
+        for (const [key, sym] of scope.members) {
+            if (!sym.predefined) {
+                result += indent + sym.toString() + "\n";
+            }
+            // Recursively print nested scopes
+            if (sym.classification.has(TypeClassification.Block_) ||
+                sym.classification.has(TypeClassification.Function_)) {
+                result += this.toStringHelper(sym, depth + 1);
             }
         }
         return result;

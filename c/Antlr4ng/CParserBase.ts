@@ -59,6 +59,7 @@ export abstract class CParserBase extends Parser {
     private _st: SymbolTable;
     private debug: boolean = false;
     private outputSymbolTable: boolean = false;
+    private outputAppliedOccurrences: boolean = false;
     private noSemantics: Set<string> = new Set<string>();
 
     constructor(input: TokenStream) {
@@ -68,6 +69,7 @@ export abstract class CParserBase extends Parser {
         this.noSemantics = parseNoSemantics(args);
         this.debug = args.some(a => a.toLowerCase().includes("--debug"));
         this.outputSymbolTable = args.some(a => a.toLowerCase().includes("--output-symbol-table"));
+        this.outputAppliedOccurrences = args.some(a => a.toLowerCase().includes("--output-applied-occurrences"));
         this._st = new SymbolTable();
     }
 
@@ -76,7 +78,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAlignmentSpecifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -94,7 +96,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAtomicTypeSpecifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -179,7 +181,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsFunctionSpecifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -221,7 +223,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsStorageClassSpecifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -249,7 +251,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypedefName " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -279,7 +281,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeQualifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -297,7 +299,7 @@ export abstract class CParserBase extends Parser {
         const lt1 = (this.inputStream as CommonTokenStream).LT(1);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeSpecifier " + lt1);
-        const resolved = this._st.resolve(text);
+        const resolved = this.resolveWithOutput(lt1);
         let result = false;
         if (resolved === null) {
             result = false;
@@ -462,10 +464,31 @@ export abstract class CParserBase extends Parser {
         return true;
     }
 
+    public EnterScope(): void {
+        if (this.debug) console.log("EnterScope");
+        this._st.pushBlockScope();
+    }
+
+    public ExitScope(): void {
+        if (this.debug) console.log("ExitScope");
+        this._st.popBlockScope();
+    }
+
     public OutputSymbolTable(): void {
         if (this.outputSymbolTable) {
             process.stderr.write(this._st.toString() + "\n");
         }
+    }
+
+    private resolveWithOutput(token: any): Symbol | null {
+        if (token === null || token === undefined) return null;
+        const text = token.text;
+        const resolved = this._st.resolve(text);
+        if (this.outputAppliedOccurrences && resolved !== null) {
+            const appliedLoc = this.getSourceLocation(token);
+            process.stderr.write(`Applied occurrence: ${text} at ${appliedLoc.file}:${appliedLoc.line}:${appliedLoc.column} -> Defined at ${resolved.definedFile}:${resolved.definedLine}:${resolved.definedColumn}\n`);
+        }
+        return resolved;
     }
 
     // Helper method to get source location from a token, accounting for #line directives
@@ -525,8 +548,7 @@ export abstract class CParserBase extends Parser {
             result = true;
         } else {
             // Check id.
-            const text = t2!.text!;
-            const resolved = this._st.resolve(text);
+            const resolved = this.resolveWithOutput(t2);
             if (resolved === null) {
                 // It's not in symbol table.
                 result = false;

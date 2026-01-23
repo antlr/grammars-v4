@@ -1,5 +1,6 @@
 export enum TypeClassification {
     Global_,
+    Block_,
     Function_,
     Variable_,
     TypeSpecifier_,
