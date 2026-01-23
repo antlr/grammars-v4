@@ -114,6 +114,7 @@ class SymbolTable {
     var symbol = Symbol();
     symbol.name = name;
     symbol.classification = {classification};
+    symbol.predefined = true;
     return symbol;
   }
 
@@ -121,6 +122,7 @@ class SymbolTable {
     var symbol = Symbol();
     symbol.name = name;
     symbol.classification = Set.from(classifications);
+    symbol.predefined = true;
     return symbol;
   }
 
@@ -176,7 +178,9 @@ class SymbolTable {
     var result = StringBuffer();
     for (var scope in _scopeStack) {
       for (var entry in scope.members.entries) {
-        result.writeln(entry.value.toString());
+        if (!entry.value.predefined) {
+          result.writeln(entry.value.toString());
+        }
       }
     }
     return result.toString();

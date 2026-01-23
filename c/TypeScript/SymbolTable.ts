@@ -114,6 +114,7 @@ export class SymbolTable {
         const symbol = new Symbol();
         symbol.name = name;
         symbol.classification = new Set([classification]);
+        symbol.predefined = true;
         return symbol;
     }
 
@@ -121,6 +122,7 @@ export class SymbolTable {
         const symbol = new Symbol();
         symbol.name = name;
         symbol.classification = new Set(classifications);
+        symbol.predefined = true;
         return symbol;
     }
 
@@ -176,7 +178,9 @@ export class SymbolTable {
         let result = "";
         for (const scope of this.scopeStack) {
             for (const [key, value] of scope.members) {
-                result += value.toString() + "\n";
+                if (!value.predefined) {
+                    result += value.toString() + "\n";
+                }
             }
         }
         return result;

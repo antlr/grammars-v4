@@ -5,6 +5,7 @@ export class Symbol {
     public classification: Set<TypeClassification> = new Set();
     public members: Map<string, Symbol> = new Map();
     public parent: Symbol | null = null;
+    public predefined: boolean = false;
 
     public toString(): string {
         let result = this.name;

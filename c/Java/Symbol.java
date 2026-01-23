@@ -8,6 +8,15 @@ public class Symbol {
     private HashSet<TypeClassification> classification;
     private Map<String, Symbol> members = new HashMap<>();
     private Symbol parent;
+    private boolean predefined = false;
+
+    public boolean isPredefined() {
+        return predefined;
+    }
+
+    public void setPredefined(boolean predefined) {
+        this.predefined = predefined;
+    }
 
     public String getName() {
         return name;

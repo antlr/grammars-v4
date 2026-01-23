@@ -5,6 +5,7 @@ public class Symbol {
     public HashSet<TypeClassification> Classification { get; set; }
     public Dictionary<string, Symbol> Members { get; } = new();
     public Symbol Parent { get; set; }
+    public bool Predefined { get; set; } = false;
 
     public override string ToString()
     {

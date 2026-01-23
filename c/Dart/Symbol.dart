@@ -5,6 +5,7 @@ class Symbol {
   Set<TypeClassification> classification = {};
   Map<String, Symbol> members = {};
   Symbol? parent;
+  bool predefined = false;
 
   @override
   String toString() {

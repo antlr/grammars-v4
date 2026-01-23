@@ -118,6 +118,7 @@ public class SymbolTable {
             classSet.add(c);
         }
         symbol.setClassification(classSet);
+        symbol.setPredefined(true);
         return symbol;
     }
 
@@ -176,7 +177,9 @@ public class SymbolTable {
         StringBuilder sb = new StringBuilder();
         for (Symbol scope : scopeStack) {
             for (var entry : scope.getMembers().entrySet()) {
-                sb.append(entry.toString()).append("\n");
+                if (!entry.getValue().isPredefined()) {
+                    sb.append(entry.getValue().toString()).append("\n");
+                }
             }
         }
         return sb.toString();
