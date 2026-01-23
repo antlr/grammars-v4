@@ -3016,7 +3016,7 @@ bare_label_keywords
     | MULTIPOLYGONZ
     | MULTIPOLYGONZM
     | NAMES
-    | NAN
+    | NAN_
     | NATURAL
     | NEVER
     | NEW
@@ -3049,7 +3049,7 @@ bare_label_keywords
     | NO_FULL_SCAN
     | NO_INDEX_JOIN
     | NO_ZIGZAG_JOIN
-    | NULL
+    | NULL_
     | NULLIF
     | NULLS
     | NUMERIC
@@ -4912,7 +4912,7 @@ unreserved_keyword
     | MONTH
     | MOVE
     | NAMES
-    | NAN
+    | NAN_
     | NEVER
     | NEW
     | NEW_DB_NAME
@@ -5392,7 +5392,7 @@ reserved_keyword
     | LOCALTIME
     | LOCALTIMESTAMP
     | NOT
-    | NULL
+    | NULL_
     | OFFSET
     | ON
     | ONLY
