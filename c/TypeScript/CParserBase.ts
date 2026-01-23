@@ -312,6 +312,11 @@ export default abstract class CParserBase extends Parser {
     }
 
     private myGetDeclarationId(y: DeclaratorContext | null): string | null {
+        const token = this.myGetDeclarationToken(y);
+        return token !== null ? token.text : null;
+    }
+
+    private myGetDeclarationToken(y: DeclaratorContext | null): any | null {
         // Go down the tree and find a declarator with Identifier.
         if (y === null) return null;
 
@@ -319,10 +324,10 @@ export default abstract class CParserBase extends Parser {
         const directDeclarator = y.directDeclarator();
         if (directDeclarator !== null) {
             const more = directDeclarator.declarator();
-            const xxx = this.myGetDeclarationId(more);
-            if (xxx !== null) return xxx;
+            const token = this.myGetDeclarationToken(more);
+            if (token !== null) return token;
             if (directDeclarator.Identifier() !== null) {
-                return directDeclarator.Identifier()!.getText();
+                return directDeclarator.Identifier()!.symbol;
             }
         }
 
@@ -368,10 +373,15 @@ export default abstract class CParserBase extends Parser {
 			    if (sous !== null && sous !== undefined) {
 				const id = sous.Identifier();
 				if (id !== null && id !== undefined) {
-				    const text = id.getText();
+				    const idToken = id.symbol;
+				    const text = idToken.text;
+				    const loc = this.getSourceLocation(idToken);
 				    const symbol = new Symbol();
 				    symbol.name = text;
 				    symbol.classification = new Set([TypeClassification.TypeSpecifier_]);
+				    symbol.definedFile = loc.file;
+				    symbol.definedLine = loc.line;
+				    symbol.definedColumn = loc.column;
 				    this._st.define(symbol);
 				    if (this.debug) console.log("New symbol Declaration1 Declarator " + symbol);
 				}
@@ -386,19 +396,26 @@ export default abstract class CParserBase extends Parser {
                 if (init_declarators !== null) {
                     for (const id of init_declarators) {
                         const y = id?.declarator() ?? null;
-                        const mid = this.myGetDeclarationId(y);
-                        if (mid !== null && mid != undefined) {
-                            const text = mid;
+                        const idToken = this.myGetDeclarationToken(y);
+                        if (idToken !== null && idToken != undefined) {
+                            const text = idToken.text;
+                            const loc = this.getSourceLocation(idToken);
                             if (is_typedef) {
                                 const symbol = new Symbol();
                                 symbol.name = text;
                                 symbol.classification = new Set([TypeClassification.TypeSpecifier_]);
+                                symbol.definedFile = loc.file;
+                                symbol.definedLine = loc.line;
+                                symbol.definedColumn = loc.column;
                                 this._st.define(symbol);
                                 if (this.debug) console.log("New symbol Declaration2 Declarator " + symbol);
                             } else {
                                 const symbol = new Symbol();
                                 symbol.name = text;
                                 symbol.classification = new Set([TypeClassification.Variable_]);
+                                symbol.definedFile = loc.file;
+                                symbol.definedLine = loc.line;
+                                symbol.definedColumn = loc.column;
                                 this._st.define(symbol);
                                 if (this.debug) console.log("New symbol Declaration3 Declarator " + symbol);
                             }
@@ -416,10 +433,15 @@ export default abstract class CParserBase extends Parser {
                 const dd = de?.directDeclarator();
 		if (dd === null || dd === undefined) continue;
                 if (dd !== null && dd.Identifier() !== null && dd.Identifier() !== undefined) {
-                    const text = dd.Identifier()!.getText();
+                    const idToken = dd.Identifier()!.symbol;
+                    const text = idToken.text;
+                    const loc = this.getSourceLocation(idToken);
                     const symbol = new Symbol();
                     symbol.name = text;
                     symbol.classification = new Set([TypeClassification.Function_]);
+                    symbol.definedFile = loc.file;
+                    symbol.definedLine = loc.line;
+                    symbol.definedColumn = loc.column;
                     this._st.define(symbol);
                     if (this.debug) console.log("New symbol Declarationf Declarator " + symbol);
                     return;
@@ -439,6 +461,48 @@ export default abstract class CParserBase extends Parser {
         if (this.outputSymbolTable) {
             process.stderr.write(this._st.toString() + "\n");
         }
+    }
+
+    // Helper interface to hold source location information
+    private getSourceLocation(token: any): { file: string; line: number; column: number } {
+        if (token === null || token === undefined) {
+            return { file: "", line: 0, column: 0 };
+        }
+
+        let fileName = "<unknown>";
+        const line = token.line;
+        const column = token.column;
+        let lineAdjusted = line;
+
+        const ts = this._input as CommonTokenStream;
+        const ind = token.tokenIndex;
+
+        // Search back from token index to find last LineDirective
+        for (let j = ind; j >= 0; j--) {
+            const t = ts.get(j);
+            if (t === null) break;
+            if (t.type === CLexer.LineDirective) {
+                // Found it
+                const txt = t.text!;
+                const parts = txt.split(/\s+/);
+                if (parts.length >= 3) {
+                    const dirLine = parseInt(parts[1], 10);
+                    if (!isNaN(dirLine)) {
+                        const lineDirective = t.line;
+                        const lineDiff = line - lineDirective;
+                        lineAdjusted = lineDiff + dirLine - 1;
+                        fileName = parts[2].trim();
+                        // Remove quotes if present
+                        if (fileName.startsWith("\"") && fileName.endsWith("\"")) {
+                            fileName = fileName.substring(1, fileName.length - 1);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        return { file: fileName, line: lineAdjusted, column: column };
     }
 
     public IsCast(): boolean {

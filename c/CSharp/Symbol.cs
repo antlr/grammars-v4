@@ -6,13 +6,19 @@ public class Symbol {
     public Dictionary<string, Symbol> Members { get; } = new();
     public Symbol Parent { get; set; }
     public bool Predefined { get; set; } = false;
+    public string DefinedFile { get; set; } = "";
+    public int DefinedLine { get; set; } = 0;
+    public int DefinedColumn { get; set; } = 0;
 
     public override string ToString()
     {
         var result = Name;
         var classification = Classification.ToString();
         result += " (with classification " + string.Join(", ", Classification) + ")";
-        //if (Parent != null) result += " of " + Parent.ToString();
+        if (!string.IsNullOrEmpty(DefinedFile))
+        {
+            result += " defined at " + DefinedFile + ":" + DefinedLine + ":" + DefinedColumn;
+        }
         return result;
     }
 }

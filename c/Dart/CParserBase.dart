@@ -301,6 +301,11 @@ abstract class CParserBase extends Parser {
   }
 
   String? _myGetDeclarationId(DeclaratorContext? y) {
+    var token = _myGetDeclarationToken(y);
+    return token?.text;
+  }
+
+  Token? _myGetDeclarationToken(DeclaratorContext? y) {
     // Go down the tree and find a declarator with Identifier.
     if (y == null) return null;
 
@@ -308,10 +313,10 @@ abstract class CParserBase extends Parser {
     var directDeclarator = y.directDeclarator();
     if (directDeclarator != null) {
       var more = directDeclarator.declarator();
-      var xxx = _myGetDeclarationId(more);
-      if (xxx != null) return xxx;
+      var token = _myGetDeclarationToken(more);
+      if (token != null) return token;
       if (directDeclarator.Identifier() != null) {
-        return directDeclarator.Identifier()!.text;
+        return directDeclarator.Identifier()!.symbol;
       }
     }
 
@@ -342,10 +347,15 @@ abstract class CParserBase extends Parser {
               if (sous != null) {
                 var id = sous.Identifier();
                 if (id != null) {
-                  var text = id.text;
+                  var idToken = id.symbol;
+                  var text = idToken?.text ?? "";
+                  var loc = _getSourceLocation(idToken);
                   var symbol = Symbol();
-                  symbol.name = text ?? "";
+                  symbol.name = text;
                   symbol.classification = {TypeClassification.typeSpecifier};
+                  symbol.definedFile = loc["file"];
+                  symbol.definedLine = loc["line"];
+                  symbol.definedColumn = loc["column"];
                   _st.define(symbol);
                   if (_debug) print("New symbol Declaration1 Declarator $symbol");
                 }
@@ -360,19 +370,26 @@ abstract class CParserBase extends Parser {
         if (initDeclarators != null) {
           for (var id in initDeclarators) {
             var y = id.declarator();
-            var mid = _myGetDeclarationId(y);
-            if (mid != null) {
-              var text = mid;
+            var idToken = _myGetDeclarationToken(y);
+            if (idToken != null) {
+              var text = idToken.text ?? "";
+              var loc = _getSourceLocation(idToken);
               if (isTypedef) {
                 var symbol = Symbol();
                 symbol.name = text;
                 symbol.classification = {TypeClassification.typeSpecifier};
+                symbol.definedFile = loc["file"];
+                symbol.definedLine = loc["line"];
+                symbol.definedColumn = loc["column"];
                 _st.define(symbol);
                 if (_debug) print("New symbol Declaration2 Declarator $symbol");
               } else {
                 var symbol = Symbol();
                 symbol.name = text;
                 symbol.classification = {TypeClassification.variable};
+                symbol.definedFile = loc["file"];
+                symbol.definedLine = loc["line"];
+                symbol.definedColumn = loc["column"];
                 _st.define(symbol);
                 if (_debug) print("New symbol Declaration3 Declarator $symbol");
               }
@@ -387,10 +404,15 @@ abstract class CParserBase extends Parser {
         var dd = de.directDeclarator();
         if (dd == null) continue;
         if (dd.Identifier() != null) {
-          var text = dd.Identifier()!.text;
+          var idToken = dd.Identifier()!.symbol;
+          var text = idToken?.text ?? "";
+          var loc = _getSourceLocation(idToken);
           var symbol = Symbol();
-          symbol.name = text ?? "";
+          symbol.name = text;
           symbol.classification = {TypeClassification.function_};
+          symbol.definedFile = loc["file"];
+          symbol.definedLine = loc["line"];
+          symbol.definedColumn = loc["column"];
           _st.define(symbol);
           if (_debug) print("New symbol Declarationf Declarator $symbol");
           return;
@@ -410,6 +432,47 @@ abstract class CParserBase extends Parser {
     if (_outputSymbolTable) {
       stderr.writeln(_st.toString());
     }
+  }
+
+  // Helper class to hold source location
+  Map<String, dynamic> _getSourceLocation(Token? token) {
+    if (token == null) {
+      return {"file": "", "line": 0, "column": 0};
+    }
+
+    var fileName = "<unknown>";
+    var line = token.line ?? 0;
+    var column = token.charPositionInLine;
+    var lineAdjusted = line;
+
+    var ts = inputStream as CommonTokenStream;
+    var ind = token.tokenIndex;
+
+    // Search back from token index to find last LineDirective
+    for (var j = ind; j >= 0; j--) {
+      var t = ts.get(j);
+      if (t.type == CLexer.TOKEN_LineDirective) {
+        // Found it
+        var txt = t.text ?? "";
+        var parts = txt.split(RegExp(r'\s+'));
+        if (parts.length >= 3) {
+          var dirLine = int.tryParse(parts[1]);
+          if (dirLine != null) {
+            var lineDirective = t.line ?? 0;
+            var lineDiff = line - lineDirective;
+            lineAdjusted = lineDiff + dirLine - 1;
+            fileName = parts[2].trim();
+            // Remove quotes if present
+            if (fileName.startsWith("\"") && fileName.endsWith("\"")) {
+              fileName = fileName.substring(1, fileName.length - 1);
+            }
+          }
+        }
+        break;
+      }
+    }
+
+    return {"file": fileName, "line": lineAdjusted, "column": column};
   }
 
   bool IsCast() {

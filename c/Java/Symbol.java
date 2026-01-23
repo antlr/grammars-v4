@@ -9,6 +9,33 @@ public class Symbol {
     private Map<String, Symbol> members = new HashMap<>();
     private Symbol parent;
     private boolean predefined = false;
+    private String definedFile = "";
+    private int definedLine = 0;
+    private int definedColumn = 0;
+
+    public String getDefinedFile() {
+        return definedFile;
+    }
+
+    public void setDefinedFile(String definedFile) {
+        this.definedFile = definedFile;
+    }
+
+    public int getDefinedLine() {
+        return definedLine;
+    }
+
+    public void setDefinedLine(int definedLine) {
+        this.definedLine = definedLine;
+    }
+
+    public int getDefinedColumn() {
+        return definedColumn;
+    }
+
+    public void setDefinedColumn(int definedColumn) {
+        this.definedColumn = definedColumn;
+    }
 
     public boolean isPredefined() {
         return predefined;
@@ -53,6 +80,9 @@ public class Symbol {
             .map(TypeClassification::name)
             .collect(Collectors.joining(", "));
         result += " (with classification " + classificationStr + ")";
+        if (definedFile != null && !definedFile.isEmpty()) {
+            result += " defined at " + definedFile + ":" + definedLine + ":" + definedColumn;
+        }
         return result;
     }
 }

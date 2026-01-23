@@ -335,7 +335,8 @@ public abstract class CParserBase extends Parser {
                             var sous = ds.typeSpecifier().structOrUnionSpecifier();
                             if (sous != null && sous.Identifier() != null)
                             {
-                                var id = sous.Identifier().getText();
+                                var idToken = sous.Identifier().getSymbol();
+                                var id = idToken.getText();
                                 if (id != null)
                                 {
                                     if (debug) System.out.println("New symbol Declaration1 Declarator " + id);
@@ -344,6 +345,10 @@ public abstract class CParserBase extends Parser {
                                     HashSet<TypeClassification> classSet = new HashSet<>();
                                     classSet.add(TypeClassification.TypeSpecifier_);
                                     symbol.setClassification(classSet);
+                                    SourceLocation loc = getSourceLocation(idToken);
+                                    symbol.setDefinedFile(loc.file);
+                                    symbol.setDefinedLine(loc.line);
+                                    symbol.setDefinedColumn(loc.column);
                                     _st.define(symbol);
                                 }
                             }
@@ -367,15 +372,19 @@ public abstract class CParserBase extends Parser {
                     }
                     for (CParser.InitDeclaratorContext id : init_declarators) {
                         CParser.DeclaratorContext y = id != null ? id.declarator() : null;
-                        String identifier = getDeclarationId(y);
-                        if (identifier != null) {
-                            String text = identifier;
+                        Token idToken = getDeclarationToken(y);
+                        if (idToken != null) {
+                            String text = idToken.getText();
+                            SourceLocation loc = getSourceLocation(idToken);
                             if (isTypedef) {
                                 Symbol symbol = new Symbol();
                                 symbol.setName(text);
                                 HashSet<TypeClassification> classSet = new HashSet<>();
                                 classSet.add(TypeClassification.TypeSpecifier_);
                                 symbol.setClassification(classSet);
+                                symbol.setDefinedFile(loc.file);
+                                symbol.setDefinedLine(loc.line);
+                                symbol.setDefinedColumn(loc.column);
                                 _st.define(symbol);
                                 if (debug) System.out.println("New symbol Declaration2 Declarator " + symbol);
                             } else {
@@ -384,6 +393,9 @@ public abstract class CParserBase extends Parser {
                                 HashSet<TypeClassification> classSet = new HashSet<>();
                                 classSet.add(TypeClassification.Variable_);
                                 symbol.setClassification(classSet);
+                                symbol.setDefinedFile(loc.file);
+                                symbol.setDefinedLine(loc.line);
+                                symbol.setDefinedColumn(loc.column);
                                 _st.define(symbol);
                                 if (debug) System.out.println("New symbol Declaration3 Declarator " + symbol);
                             }
@@ -396,12 +408,17 @@ public abstract class CParserBase extends Parser {
                 CParser.DeclaratorContext de = fd.declarator();
                 CParser.DirectDeclaratorContext dd = de != null ? de.directDeclarator() : null;
                 if (dd != null && dd.Identifier() != null) {
-                    String text = dd.Identifier().getText();
+                    Token idToken = dd.Identifier().getSymbol();
+                    String text = idToken.getText();
+                    SourceLocation loc = getSourceLocation(idToken);
                     Symbol symbol = new Symbol();
                     symbol.setName(text);
                     HashSet<TypeClassification> classSet = new HashSet<>();
                     classSet.add(TypeClassification.Function_);
                     symbol.setClassification(classSet);
+                    symbol.setDefinedFile(loc.file);
+                    symbol.setDefinedLine(loc.line);
+                    symbol.setDefinedColumn(loc.column);
                     _st.define(symbol);
                     if (debug) System.out.println("New symbol Declarationf Declarator " + symbol);
                     return;
@@ -412,6 +429,11 @@ public abstract class CParserBase extends Parser {
     }
 
     private String getDeclarationId(CParser.DeclaratorContext y) {
+        Token token = getDeclarationToken(y);
+        return token != null ? token.getText() : null;
+    }
+
+    private Token getDeclarationToken(CParser.DeclaratorContext y) {
         // Go down the tree and find a declarator with Identifier.
         if (y == null) return null;
 
@@ -419,10 +441,10 @@ public abstract class CParserBase extends Parser {
         CParser.DirectDeclaratorContext directDeclarator = y.directDeclarator();
         if (directDeclarator != null) {
             CParser.DeclaratorContext more = directDeclarator.declarator();
-            String xxx = getDeclarationId(more);
-            if (xxx != null) return xxx;
+            Token token = getDeclarationToken(more);
+            if (token != null) return token;
             if (directDeclarator.Identifier() != null) {
-                return directDeclarator.Identifier().getText();
+                return directDeclarator.Identifier().getSymbol();
             }
         }
 
@@ -440,6 +462,63 @@ public abstract class CParserBase extends Parser {
         if (outputSymbolTable) {
             System.err.println(_st.toString());
         }
+    }
+
+    // Helper class to hold source location information
+    private static class SourceLocation {
+        String file;
+        int line;
+        int column;
+
+        SourceLocation(String file, int line, int column) {
+            this.file = file;
+            this.line = line;
+            this.column = column;
+        }
+    }
+
+    // Compute source file, line, and column from a token, accounting for #line directives
+    private SourceLocation getSourceLocation(Token token) {
+        if (token == null) {
+            return new SourceLocation("", 0, 0);
+        }
+
+        String fileName = "<unknown>";
+        int line = token.getLine();
+        int column = token.getCharPositionInLine();
+        int lineAdjusted = line;
+
+        CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
+        int ind = token.getTokenIndex();
+
+        // Search back from token index to find last LineDirective
+        for (int j = ind; j >= 0; j--) {
+            Token t = ts.get(j);
+            if (t == null) break;
+            if (t.getType() == CLexer.LineDirective) {
+                // Found it
+                String txt = t.getText();
+                String[] parts = txt.split("\\s+");
+                if (parts.length >= 3) {
+                    try {
+                        int dirLine = Integer.parseInt(parts[1]);
+                        int lineDirective = t.getLine();
+                        int lineDiff = line - lineDirective;
+                        lineAdjusted = lineDiff + dirLine - 1;
+                        fileName = parts[2].trim();
+                        // Remove quotes if present
+                        if (fileName.startsWith("\"") && fileName.endsWith("\"")) {
+                            fileName = fileName.substring(1, fileName.length() - 1);
+                        }
+                    } catch (NumberFormatException ex) {
+                        // Ignore parse errors
+                    }
+                }
+                break;
+            }
+        }
+
+        return new SourceLocation(fileName, lineAdjusted, column);
     }
 
     public boolean IsCast() {

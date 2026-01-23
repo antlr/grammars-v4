@@ -385,11 +385,13 @@ public abstract class CParserBase : Parser
                     var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
                     if (sous != null)
                     {
-                        var id = sous.Identifier()?.GetText();
-                        if (id != null)
+                        var idToken = sous.Identifier()?.Symbol;
+                        if (idToken != null)
                         {
+                            var id = idToken.Text;
+                            var loc = GetSourceLocation(idToken);
                             if (debug) System.Console.WriteLine("New symbol Declaration1 Declaration " + id);
-                            _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } });
+                            _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column });
                         }
                     }
                 }
@@ -405,18 +407,19 @@ public abstract class CParserBase : Parser
                 foreach (var id in init_declarators)
                 {
                     CParser.DeclaratorContext y = id?.declarator();
-                    string identifier = GetDeclarationId(y);
-                    if (identifier != null)
+                    var idToken = GetDeclarationToken(y);
+                    if (idToken != null)
                     {
                         // If a typedef is used in the declaration, the declarator
                         // itself is a type, not a variable.
-                        var text = identifier;
+                        var text = idToken.Text;
+                        var loc = GetSourceLocation(idToken);
                         if (is_typedef) {
-                            var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ } };
+                            var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
                             _st.Define(symbol);
                             if (debug) System.Console.WriteLine("New symbol Declaration2 Declarator " + symbol);
                         } else {
-                            var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ } };
+                            var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Variable_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
                             _st.Define(symbol);
                             if (debug) System.Console.WriteLine("New symbol Declaration3 Declarator " + symbol);
                         }
@@ -430,8 +433,10 @@ public abstract class CParserBase : Parser
                 var dd = de.directDeclarator();
                 var identifier = dd?.Identifier();
                 if (identifier != null) {
-                    var text = identifier.GetText();
-                    var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Function_ } };
+                    var idToken = identifier.Symbol;
+                    var text = idToken.Text;
+                    var loc = GetSourceLocation(idToken);
+                    var symbol = new Symbol() { Name = text, Classification = new HashSet<TypeClassification>() { TypeClassification.Function_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column };
                     _st.Define(symbol);
                     if (debug) System.Console.WriteLine("New symbol Declarationf Declarator " + symbol);
                     return;
@@ -442,19 +447,25 @@ public abstract class CParserBase : Parser
 
     private string GetDeclarationId(CParser.DeclaratorContext y)
     {
+        var token = GetDeclarationToken(y);
+        return token?.Text;
+    }
+
+    private IToken GetDeclarationToken(CParser.DeclaratorContext y)
+    {
         // Go down the tree and find a declarator with Identifier.
         if (y == null) return null;
-        
+
         // Check if this declarator has a direct declarator with an identifier
         var directDeclarator = y.directDeclarator();
         if (directDeclarator != null)
         {
             var more = directDeclarator.declarator();
-            var xxx = GetDeclarationId(more);
-            if (xxx != null) return xxx;
+            var token = GetDeclarationToken(more);
+            if (token != null) return token;
             if (directDeclarator.Identifier() != null)
             {
-                return directDeclarator.Identifier().GetText();
+                return directDeclarator.Identifier().Symbol;
             }
         }
 
@@ -475,6 +486,69 @@ public abstract class CParserBase : Parser
         {
             System.Console.Error.WriteLine(_st.ToString());
         }
+    }
+
+    // Helper class to hold source location information
+    private class SourceLocation
+    {
+        public string File { get; set; }
+        public int Line { get; set; }
+        public int Column { get; set; }
+
+        public SourceLocation(string file, int line, int column)
+        {
+            File = file;
+            Line = line;
+            Column = column;
+        }
+    }
+
+    // Compute source file, line, and column from a token, accounting for #line directives
+    private SourceLocation GetSourceLocation(IToken token)
+    {
+        if (token == null)
+        {
+            return new SourceLocation("", 0, 0);
+        }
+
+        string fileName = "<unknown>";
+        int line = token.Line;
+        int column = token.Column;
+        int lineAdjusted = line;
+
+        var ts = this.InputStream as CommonTokenStream;
+        int ind = token.TokenIndex;
+
+        // Search back from token index to find last LineDirective
+        for (int j = ind; j >= 0; j--)
+        {
+            var t = ts.Get(j);
+            if (t == null) break;
+            if (t.Type == CLexer.LineDirective)
+            {
+                // Found it
+                var txt = t.Text;
+                var parts = txt.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 3)
+                {
+                    if (int.TryParse(parts[1], out int dirLine))
+                    {
+                        int lineDirective = t.Line;
+                        int lineDiff = line - lineDirective;
+                        lineAdjusted = lineDiff + dirLine - 1;
+                        fileName = parts[2].Trim();
+                        // Remove quotes if present
+                        if (fileName.StartsWith("\"") && fileName.EndsWith("\""))
+                        {
+                            fileName = fileName.Substring(1, fileName.Length - 2);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        return new SourceLocation(fileName, lineAdjusted, column);
     }
 
     public bool IsCast()
