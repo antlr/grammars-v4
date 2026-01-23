@@ -3,7 +3,9 @@
     "allow": [
       "Bash(dotnet trgen:*)",
       "Bash(make)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
