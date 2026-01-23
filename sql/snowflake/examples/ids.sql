@@ -10,3 +10,5 @@ CREATE or replace TEMP TABLE ACTION (MODE int);
 
 select 0 as interval;
 create table interval(internal int);
+
+select 0 as include, 0 as exclude, 0 as nulls;

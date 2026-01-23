@@ -15,11 +15,18 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+// Author : Lucas Moss <48305572+LucasMoss@users.noreply.github.com>
+// 
 // This grammar is based on the VHDL grammar by Denis Gavrish in the
 // ANTLR Grammars v4 repository : <https://github.com/antlr/grammars-v4>
 //
-// This grammar has been updated to support parts of the VHDL-2008 specification,
-// but is incomplete and has not been formally tested.
+// In addition to the minimal test files in the `examples` folder, this
+// grammar has been tested on all VHDL in:
+//     surf       <https://github.com/slaclab/surf>
+//     open-logic <https://github.com/open-logic/open-logic>
+//
+// This grammar has been updated to support parts of the VHDL-2008 specification.
+// It does not support PSL or VUnit features.
 //
 // Supports the following VHDL-2008 features:
 //  block comments
@@ -27,6 +34,7 @@
 //  else generate, elsif generate, for generate
 //  'subtype in signal declaration
 //  AND, OR, XOR, NAND, XNOR unary reduction functions
+//  generic types in package instances, subprograms and entities
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
@@ -121,6 +129,14 @@ CONSTANT
     : 'CONSTANT'
     ;
 
+CONTEXT
+    : 'CONTEXT'
+    ;
+
+DEFAULT
+    : 'DEFAULT'
+    ;
+
 DISCONNECT
     : 'DISCONNECT'
     ;
@@ -155,6 +171,10 @@ FILE
 
 FOR
     : 'FOR'
+    ;
+
+FORCE
+    : 'FORCE'
     ;
 
 FUNCTION
@@ -293,6 +313,10 @@ PACKAGE
     : 'PACKAGE'
     ;
 
+PARAMETER
+    : 'PARAMETER'
+    ;
+
 PORT
     : 'PORT'
     ;
@@ -327,6 +351,10 @@ QUANTITY
 
 RANGE
     : 'RANGE'
+    ;
+
+RELEASE
+    : 'RELEASE'
     ;
 
 REVERSE_RANGE
@@ -488,21 +516,18 @@ XOR
 //------------------------------------------Parser----------------------------------------
 
 abstract_literal
-    : INTEGER
-    | REAL_LITERAL
-    | BASE_LITERAL
+    : DECIMAL_LITERAL
+    | BASED_LITERAL
     ;
 
 access_type_definition
     : ACCESS subtype_indication
     ;
 
-across_aspect
-    : identifier_list (tolerance_aspect)? (VARASGN expression)? ACROSS
-    ;
-
 actual_designator
-    : expression
+    : (INERTIAL)? expression
+    | name
+    | subtype_indication
     | OPEN
     ;
 
@@ -511,8 +536,9 @@ actual_parameter_part
     ;
 
 actual_part
-    : name LPAREN actual_designator RPAREN
-    | actual_designator
+    : actual_designator
+    | name LPAREN actual_designator RPAREN
+    //| type_mark LPAREN actual_designator RPAREN // Equivalent to name
     ;
 
 adding_operator
@@ -526,26 +552,24 @@ aggregate
     ;
 
 alias_declaration
-    : ALIAS alias_designator (COLON alias_indication)? IS name (signature)? SEMI
+    // : ALIAS alias_designator (COLON subtype_indication)? IS name (signature)? SEMI
+    : ALIAS alias_designator (COLON subtype_indication)? IS name SEMI
     ;
 
 alias_designator
     : identifier
     | CHARACTER_LITERAL
-    | STRING_LITERAL
-    ;
-
-alias_indication
-    : subnature_indication
-    | subtype_indication
+    //| operator_symbol
+    | STRING_LITERAL // Equivalent to operator_symbol
     ;
 
 allocator
-    : NEW (qualified_expression | subtype_indication)
+    : NEW subtype_indication
+    | NEW qualified_expression
     ;
 
 architecture_body
-    : ARCHITECTURE identifier OF identifier IS architecture_declarative_part BEGIN architecture_statement_part END (
+    : ARCHITECTURE identifier OF name IS architecture_declarative_part BEGIN architecture_statement_part END (
         ARCHITECTURE
     )? (identifier)? SEMI
     ;
@@ -554,29 +578,25 @@ architecture_declarative_part
     : (block_declarative_item)*
     ;
 
-architecture_statement
-    : block_statement
-    | process_statement
-    | ( label_colon)? concurrent_procedure_call_statement
-    | ( label_colon)? concurrent_assertion_statement
-    | ( label_colon)? ( POSTPONED)? concurrent_signal_assignment_statement
-    | component_instantiation_statement
-    | generate_statement
-    | concurrent_break_statement
-    | simultaneous_statement
-    ;
-
 architecture_statement_part
-    : (architecture_statement)*
+    : (concurrent_statement)*
     ;
 
-array_nature_definition
-    : unconstrained_nature_definition
-    | constrained_nature_definition
+array_constraint
+    : index_constraint (array_element_constraint)?
+    | OPEN (array_element_constraint)
+    ;
+
+array_element_constraint
+    : element_constraint
+    ;
+
+array_element_resolution
+    : resolution_indication
     ;
 
 array_type_definition
-    : unconstrained_array_definition
+    : unbounded_array_definition
     | constrained_array_definition
     ;
 
@@ -600,9 +620,7 @@ attribute_declaration
     : ATTRIBUTE label_colon name SEMI
     ;
 
-// Need to add several tokens here, for they are both, VHDLAMS reserved words
-// and attribute names.
-// (25.2.2004, e.f.)
+// Need to add tokens here since they will be consumed by the Lexer
 attribute_designator
     : identifier
     | RANGE
@@ -614,17 +632,28 @@ attribute_designator
     | SUBTYPE
     ;
 
+attribute_name
+    // : prefix (signature)? APOSTROPHE attribute_designator (LPAREN expression RPAREN)?
+    : prefix APOSTROPHE attribute_designator (LPAREN expression RPAREN)?
+    ;
+
 attribute_specification
     : ATTRIBUTE attribute_designator OF entity_specification IS expression SEMI
     ;
 
-base_unit_declaration
-    : identifier SEMI
+base
+    : INTEGER
     ;
+
+// Lexer : basic_identifier
 
 binding_indication
     : (USE entity_aspect)? (generic_map_aspect)? (port_map_aspect)?
     ;
+
+// Lexer : bit_string_literal
+
+// bit_value
 
 block_configuration
     : FOR block_specification (use_clause)* (configuration_item)* END FOR SEMI
@@ -633,6 +662,10 @@ block_configuration
 block_declarative_item
     : subprogram_declaration
     | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
@@ -645,14 +678,9 @@ block_declarative_item
     | attribute_specification
     | configuration_specification
     | disconnection_specification
-    | step_limit_specification
     | use_clause
     | group_template_declaration
     | group_declaration
-    | nature_declaration
-    | subnature_declaration
-    | quantity_declaration
-    | terminal_declaration
     ;
 
 block_declarative_part
@@ -664,8 +692,9 @@ block_header
     ;
 
 block_specification
-    : identifier (LPAREN index_specification RPAREN)?
-    | name
+    : name
+    //| label (LPAREN generate_specification RPAREN)?
+    identifier (LPAREN generate_specification RPAREN)?
     ;
 
 block_statement
@@ -675,31 +704,21 @@ block_statement
     ;
 
 block_statement_part
-    : (architecture_statement)*
+    : (concurrent_statement)*
     ;
 
-branch_quantity_declaration
-    : QUANTITY (across_aspect)? (through_aspect)? terminal_aspect SEMI
+case_generate_alternative
+    : WHEN (label_colon)? choices ARROW generate_statement_body
     ;
 
-break_element
-    : (break_selector_clause)? name ARROW expression
-    ;
-
-break_list
-    : break_element (COMMA break_element)*
-    ;
-
-break_selector_clause
-    : FOR name USE
-    ;
-
-break_statement
-    : (label_colon)? BREAK (break_list)? (WHEN condition)? SEMI
+case_generate_statement
+    : CASE expression GENERATE case_generate_alternative (case_generate_alternative)*
     ;
 
 case_statement
-    : (label_colon)? CASE expression IS (case_statement_alternative)+ END CASE (identifier)? SEMI
+    : (label_colon)? CASE (QUESTION)? expression IS (case_statement_alternative)+ END CASE (
+        QUESTION
+    )? (identifier)? SEMI
     ;
 
 case_statement_alternative
@@ -707,9 +726,9 @@ case_statement_alternative
     ;
 
 choice
-    : identifier
+    : simple_expression
     | discrete_range
-    | simple_expression
+    | identifier
     | OTHERS
     ;
 
@@ -733,11 +752,6 @@ component_specification
     : instantiation_list COLON name
     ;
 
-composite_nature_definition
-    : array_nature_definition
-    | record_nature_definition
-    ;
-
 composite_type_definition
     : array_type_definition
     | record_type_definition
@@ -747,16 +761,38 @@ concurrent_assertion_statement
     : (label_colon)? (POSTPONED)? assertion SEMI
     ;
 
-concurrent_break_statement
-    : (label_colon)? BREAK (break_list)? (sensitivity_clause)? (WHEN condition)? SEMI
+concurrent_conditional_signal_assignment
+    : target LEQ (GUARDED)? (delay_mechanism)? conditional_waveforms SEMI
     ;
 
 concurrent_procedure_call_statement
     : (label_colon)? (POSTPONED)? procedure_call SEMI
     ;
 
+concurrent_selected_signal_assignment
+    : WITH expression SELECT (QUESTION)? target LEQ (GUARDED)? (delay_mechanism)? selected_waveforms SEMI
+    ;
+
 concurrent_signal_assignment_statement
-    : (label_colon)? (POSTPONED)? (conditional_signal_assignment | selected_signal_assignment)
+    : (label_colon)? (POSTPONED)? (
+        conditional_signal_assignment
+        | selected_signal_assignment
+        | concurrent_selected_signal_assignment
+    )
+    ;
+
+concurrent_simple_signal_assignment
+    : target LEQ (GUARDED)? (delay_mechanism)? waveform SEMI
+    ;
+
+concurrent_statement
+    : block_statement
+    | process_statement
+    | concurrent_procedure_call_statement
+    | concurrent_assertion_statement
+    | concurrent_signal_assignment_statement
+    | component_instantiation_statement
+    | generate_statement
     ;
 
 condition
@@ -767,11 +803,31 @@ condition_clause
     : UNTIL condition
     ;
 
+// Lexer : condition_operator
+
+conditional_expression
+    : expression WHEN condition (ELSE expression WHEN condition)* (ELSE expression)?
+    ;
+
+conditional_force_assignment
+    : target LEQ FORCE (force_mode)? conditional_expression SEMI
+    ;
+
 conditional_signal_assignment
-    : target LE opts conditional_waveforms SEMI
+    : conditional_waveform_assignment
+    | conditional_force_assignment
+    ;
+
+conditional_variable_assignment
+    : target WALRUS conditional_expression
+    ;
+
+conditional_waveform_assignment
+    : target LEQ (delay_mechanism)? conditional_waveforms SEMI
     ;
 
 conditional_waveforms
+    //: waveform WHEN condition (ELSE waveform WHEN condition)* (ELSE waveform)
     : waveform (WHEN condition (ELSE conditional_waveforms)?)?
     ;
 
@@ -797,33 +853,45 @@ configuration_item
     ;
 
 configuration_specification
-    : FOR component_specification binding_indication SEMI
+    : FOR component_specification binding_indication SEMI // Equivalent to simple_configuration_specification
+    // | compound_configuration_specification // Only used for vunit
     ;
 
 constant_declaration
-    : CONSTANT identifier_list COLON subtype_indication (VARASGN expression)? SEMI
+    : CONSTANT identifier_list COLON subtype_indication (WALRUS expression)? SEMI
     ;
 
 constrained_array_definition
     : ARRAY index_constraint OF subtype_indication
     ;
 
-constrained_nature_definition
-    : ARRAY index_constraint OF subnature_indication
-    ;
-
 constraint
     : range_constraint
     | index_constraint
+    | record_constraint
     ;
 
 context_clause
     : (context_item)*
     ;
 
+context_declaration
+    // : CONTEXT identifier IS context_clause END (CONTEXT)? (simple_name)? SEMI
+    : CONTEXT identifier IS context_clause END (CONTEXT)? (identifier)? SEMI
+    ;
+
 context_item
     : library_clause
     | use_clause
+    | context_reference
+    ;
+
+context_reference
+    : CONTEXT selected_name (COMMA selected_name)* SEMI
+    ;
+
+DECIMAL_LITERAL
+    : INTEGER (DOT INTEGER)? (EXPONENT)?
     ;
 
 delay_mechanism
@@ -832,7 +900,7 @@ delay_mechanism
     ;
 
 design_file
-    : (design_unit)* EOF
+    : (design_unit)+ EOF
     ;
 
 design_unit
@@ -841,8 +909,8 @@ design_unit
 
 designator
     : identifier
-    | STRING_LITERAL
-    | 'RESOLVED'
+    // | operator_symbol
+    | STRING_LITERAL // Equivalent to operator_symbol
     ;
 
 direction
@@ -855,20 +923,26 @@ disconnection_specification
     ;
 
 discrete_range
-    : range_decl
-    | subtype_indication
+    : subtype_indication
+    | range_decl
     ;
 
 element_association
     : (choices ARROW)? expression
     ;
 
+element_constraint
+    : array_constraint
+    | record_constraint
+    ;
+
 element_declaration
     : identifier_list COLON element_subtype_definition SEMI
     ;
 
-element_subnature_definition
-    : subnature_indication
+element_resolution
+    : array_element_resolution
+    | record_resolution
     ;
 
 element_subtype_definition
@@ -899,10 +973,8 @@ entity_class
     | UNITS
     | GROUP
     | FILE
-    | NATURE
-    | SUBNATURE
-    | QUANTITY
-    | TERMINAL
+    // | PROPERTY
+    // | SEQUENCE
     ;
 
 entity_class_entry
@@ -922,6 +994,10 @@ entity_declaration
 entity_declarative_item
     : subprogram_declaration
     | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
@@ -932,14 +1008,9 @@ entity_declarative_item
     | attribute_declaration
     | attribute_specification
     | disconnection_specification
-    | step_limit_specification
     | use_clause
     | group_template_declaration
     | group_declaration
-    | nature_declaration
-    | subnature_declaration
-    | quantity_declaration
-    | terminal_declaration
     ;
 
 entity_declarative_part
@@ -947,7 +1018,8 @@ entity_declarative_part
     ;
 
 entity_designator
-    : entity_tag (signature)?
+    // : entity_tag (signature)?
+    : entity_tag
     ;
 
 entity_header
@@ -990,20 +1062,51 @@ enumeration_type_definition
     ;
 
 exit_statement
+    // : (label_colon)? EXIT (label)? (WHEN condition)? SEMI
     : (label_colon)? EXIT (identifier)? (WHEN condition)? SEMI
     ;
 
-// NOTE that NAND/NOR are in (...)* now (used to be in (...)?).
-// (21.1.2004, e.f.)
+// Lexer : exponent
+
 expression
-    : relation (: logical_operator relation)*
-    | aggregate
+    : (CONDITION_OPERATOR primary)
+    // | logical_expression
+    | (relation (logical_operator relation)*) // Optimised logical_expression
     ;
 
+// Lexer : extended_digit
+
+// Lexer : extended_identifier
+
+// external_name
+//     : external_constant_name
+//     | external_signal_name
+//     | external_variable_name
+//     ;
+
+// external_constant_name
+//     : LSHIFT external_pathname COLON subtype_indication RSHIFT
+//     ;
+
+// external_signal_name
+//     : LSHIFT external_pathname COLON subtype_indication RSHIFT
+//     ;
+
+// external_variable_name
+//     : LSHIFT external_pathname COLON subtype_indication RSHIFT
+//     ;
+
+// external_pathname
+//     : package_pathname
+//     | absolute_pathname
+//     | relative_pathname
+//     ;
+
 factor
-    : primary (: DOUBLESTAR primary)?
+    : primary (DOUBLESTAR primary)?
     | ABS primary
     | NOT primary
+    | logical_operator primary
     ;
 
 file_declaration
@@ -1022,41 +1125,65 @@ file_type_definition
     : FILE OF subtype_indication
     ;
 
+floating_type_definition
+    : range_constraint
+    ;
+
+for_generate_statement
+    : FOR parameter_specification GENERATE generate_statement_body
+    ;
+
+force_mode
+    : IN
+    | OUT
+    ;
+
+// formal_designator
+//     : name
+//     ;
+
 formal_parameter_list
     : interface_list
     ;
 
 formal_part
-    : identifier
-    | identifier LPAREN explicit_range RPAREN
+    // : formal_designator
+    // | name LPAREN formal_designator RPAREN
+    // | type_mark LPAREN formal_designator RPAREN
+    : name (LPAREN name RPAREN)? // Equivalent to all above statements
     ;
 
-free_quantity_declaration
-    : QUANTITY identifier_list COLON subtype_indication (VARASGN expression)? SEMI
+full_type_declaration
+    : TYPE identifier IS type_definition SEMI
+    ;
+
+function_call
+    : name (LPAREN actual_parameter_part RPAREN)?
+    ;
+
+function_specification
+    : (PURE | IMPURE)? FUNCTION designator subprogram_header (
+        LPAREN (PARAMETER)? formal_parameter_list RPAREN
+    )?
+    // RETURN type_mark
+    RETURN name
+    ;
+
+generate_specification
+    : discrete_range
+    | expression
+    // | label
+    | identifier
     ;
 
 generate_statement
-    : label_colon? (for_generate_statement | if_generate_statement | case_generate_statement)
-    ;
-
-generate_statement_body
-    : (block_declarative_item* BEGIN)? architecture_statement*
-    ;
-
-case_generate_statement
-    : CASE expression GENERATE (WHEN choices ARROW generate_statement_body)+ END GENERATE (
+    : label_colon? (for_generate_statement | if_generate_statement | case_generate_statement) END GENERATE (
         identifier
     )? SEMI
     ;
 
-for_generate_statement
-    : FOR parameter_specification GENERATE generate_statement_body END GENERATE (identifier)? SEMI
-    ;
-
-if_generate_statement
-    : IF condition GENERATE generate_statement_body (
-        ELSIF condition GENERATE generate_statement_body
-    )* (ELSE GENERATE generate_statement_body)? END GENERATE (identifier)? SEMI
+generate_statement_body
+    : (block_declarative_part BEGIN)? concurrent_statement*
     ;
 
 generic_clause
@@ -1064,11 +1191,15 @@ generic_clause
     ;
 
 generic_list
-    : interface_constant_declaration (SEMI interface_constant_declaration)*
+    : interface_list
     ;
 
 generic_map_aspect
     : GENERIC MAP LPAREN association_list RPAREN
+    ;
+
+graphic_character
+    : (EXTENDED_IDENTIFIER)
     ;
 
 group_constituent
@@ -1089,6 +1220,7 @@ group_template_declaration
     ;
 
 guarded_signal_specification
+    //: signal_list COLON type_mark
     : signal_list COLON name
     ;
 
@@ -1101,28 +1233,40 @@ identifier_list
     : identifier (COMMA identifier)*
     ;
 
+if_generate_statement
+    : IF condition GENERATE generate_statement_body (
+        ELSIF condition GENERATE generate_statement_body
+    )* (ELSE GENERATE generate_statement_body)?
+    ;
+
 if_statement
     : (label_colon)? IF condition THEN sequence_of_statements (
         ELSIF condition THEN sequence_of_statements
-    )* (ELSE sequence_of_statements)? END IF (identifier)? SEMI
+    )* (ELSE sequence_of_statements)? END IF
+    // (label)? 
+    (identifier)? SEMI
+    ;
+
+incomplete_type_declaration
+    : TYPE identifier
     ;
 
 index_constraint
     : LPAREN discrete_range (COMMA discrete_range)* RPAREN
     ;
 
-index_specification
-    : discrete_range
-    | expression
+index_subtype_definition
+    //: type_mark RANGE BOX
+    : name RANGE BOX
     ;
 
-index_subtype_definition
-    : name RANGE BOX
+indexed_name
+    : prefix LPAREN expression (COMMA expression)* RPAREN
     ;
 
 instantiated_unit
     : (COMPONENT)? name
-    | ENTITY name ( LPAREN identifier RPAREN)?
+    | ENTITY name (LPAREN identifier RPAREN)?
     | CONFIGURATION name
     ;
 
@@ -1132,59 +1276,90 @@ instantiation_list
     | ALL
     ;
 
-interface_constant_declaration
-    : (CONSTANT)? identifier_list COLON (IN)? subtype_indication (VARASGN expression)?
-    ;
+// Lexer : integer
 
-// TODO: Add interface type declaration
+// integer_type_definition
+//     : range_constraint
+//     ;
+
+interface_constant_declaration
+    : (CONSTANT)? identifier_list COLON (IN)? subtype_indication (WALRUS expression)?
+    ;
 
 interface_declaration
-    : interface_constant_declaration
-    | interface_signal_declaration
-    | interface_variable_declaration
-    | interface_file_declaration
-    | interface_terminal_declaration
-    | interface_quantity_declaration
+    : interface_object_declaration
+    | interface_type_declaration
+    | interface_subprogram_declaration
+    | interface_package_declaration
     ;
 
-interface_element
-    : interface_declaration
-    ;
+// interface_element
+//     : interface_declaration
+//     ;
 
 interface_file_declaration
     : FILE identifier_list COLON subtype_indication
     ;
 
-interface_signal_list
-    : interface_signal_declaration (SEMI interface_signal_declaration)*
+interface_function_specification
+    : (PURE | IMPURE)? FUNCTION designator ((PARAMETER)? LPAREN formal_parameter_list RPAREN)?
+    // RETURN type_mark
+    RETURN name
     ;
 
-interface_port_list
-    : interface_port_declaration (SEMI interface_port_declaration)*
+interface_incomplete_type_declaration
+    : TYPE identifier
     ;
 
 interface_list
-    : interface_element (SEMI interface_element)*
+    // : interface_element (SEMI interface_element)*
+    : interface_declaration (SEMI interface_declaration)*
     ;
 
-interface_quantity_declaration
-    : QUANTITY identifier_list COLON (IN | OUT)? subtype_indication (VARASGN expression)?
+interface_object_declaration
+    : interface_constant_declaration
+    | interface_signal_declaration
+    | interface_variable_declaration
+    | interface_file_declaration
     ;
 
-interface_port_declaration
-    : identifier_list COLON (signal_mode)? subtype_indication (BUS)? (VARASGN expression)?
+interface_package_declaration
+    : PACKAGE identifier IS NEW name interface_package_generic_map_aspect
+    ;
+
+interface_package_generic_map_aspect
+    : generic_map_aspect
+    | GENERIC MAP LPAREN (BOX | DEFAULT) RPAREN
+    ;
+
+interface_procedure_specification
+    : PROCEDURE designator (((PARAMETER)? LPAREN formal_parameter_list RPAREN))?
     ;
 
 interface_signal_declaration
-    : SIGNAL identifier_list COLON (signal_mode)? subtype_indication (BUS)? (VARASGN expression)?
+    : (SIGNAL)? identifier_list COLON (mode_rule)? subtype_indication (BUS)? (WALRUS expression)?
     ;
 
-interface_terminal_declaration
-    : TERMINAL identifier_list COLON subnature_indication
+interface_subprogram_declaration
+    : interface_subprogram_specification (IS interface_subprogram_default)
+    ;
+
+interface_subprogram_default
+    : name
+    | BOX
+    ;
+
+interface_subprogram_specification
+    : interface_procedure_specification
+    | interface_function_specification
+    ;
+
+interface_type_declaration
+    : interface_incomplete_type_declaration
     ;
 
 interface_variable_declaration
-    : (VARIABLE)? identifier_list COLON (signal_mode)? subtype_indication (VARASGN expression)?
+    : (VARIABLE)? identifier_list COLON (mode_rule)? subtype_indication (WALRUS expression)?
     ;
 
 iteration_scheme
@@ -1192,34 +1367,52 @@ iteration_scheme
     | FOR parameter_specification
     ;
 
+// label
+//     : identifier
+//     ;
+// ANTLR optimisation : combine label and COLON rules
 label_colon
     : identifier COLON
     ;
 
+// Lexer : letter
+
+// Lexer : letter_or_digit
+
 library_clause
-    : LIBRARY logical_name_list SEMI
+    // : LIBRARY logical_name_list SEMI
+    : LIBRARY identifier_list SEMI // Equivalent to logical_name_list
     ;
 
 library_unit
-    : secondary_unit
-    | primary_unit
+    : primary_unit
+    | secondary_unit
     ;
 
 literal
-    : NULL_
-    | BIT_STRING_LITERAL
-    | STRING_LITERAL
+    : numeric_literal
     | enumeration_literal
-    | numeric_literal
+    | STRING_LITERAL
+    | BIT_STRING_LITERAL
+    | NULL_
     ;
 
-logical_name
-    : identifier
-    ;
+// logical_expression
+//     : relation (AND relation)*
+//     | relation (OR relation)*
+//     | relation (XOR relation)*
+//     | relation (NAND relation)*
+//     | relation (NOR relation)*
+//     | relation (XNOR relation)*
+//     ;
 
-logical_name_list
-    : logical_name (COMMA logical_name)*
-    ;
+// logical_name
+//     : identifier
+//     ;
+
+// logical_name_list // Equivalent to identifier_list
+//     : logical_name (COMMA logical_name)*
+//     ;
 
 logical_operator
     : AND
@@ -1231,10 +1424,18 @@ logical_operator
     ;
 
 loop_statement
-    : (label_colon)? (iteration_scheme)? LOOP sequence_of_statements END LOOP (identifier)? SEMI
+    : (label_colon)? (iteration_scheme)? LOOP sequence_of_statements END LOOP
+    // (label)?
+    (identifier)? SEMI
     ;
 
-signal_mode
+// miscellaneous_operator // Rule not used for anything
+//     : DOUBLESTAR
+//     | ABS
+//     | NOT
+//     ;
+
+mode_rule
     : IN
     | OUT
     | INOUT
@@ -1249,65 +1450,29 @@ multiplying_operator
     | REM
     ;
 
-// was
-//   name
-//     : simple_name
-//     | operator_symbol
-//     | selected_name
-//     | indexed_name
-//     | slice_name
-//     | attribute_name
-//     ;
-// changed to avoid left-recursion to name (from selected_name, indexed_name,
-// slice_name, and attribute_name, respectively)
-// (2.2.2004, e.f.) + (12.07.2017, o.p.)
-
 name
-    : (identifier | STRING_LITERAL | logical_operator) (name_part)*
+    : (
+        identifier       // simple_name
+        | STRING_LITERAL // operator_symbol
+        | CHARACTER_LITERAL
+    ) (name_part)*
     ;
 
 name_part
-    : selected_name_part
-    | function_call_or_indexed_name_part
-    | slice_name_part
-    | attribute_name_part
-    ;
-
-selected_name
-    : identifier (DOT suffix)*
-    ;
-
-selected_name_part
-    : (DOT suffix)+
-    ;
-
-function_call_or_indexed_name_part
-    : LPAREN actual_parameter_part RPAREN
-    ;
-
-slice_name_part
-    : LPAREN discrete_range RPAREN
-    ;
-
-attribute_name_part
-    : (signature)? APOSTROPHE attribute_designator (LPAREN expression RPAREN)?
-    ;
-
-nature_declaration
-    : NATURE identifier IS nature_definition SEMI
-    ;
-
-nature_definition
-    : scalar_nature_definition
-    | composite_nature_definition
-    ;
-
-nature_element_declaration
-    : identifier_list COLON element_subnature_definition
+    : (DOT suffix)+                                               // selected_name
+    | LPAREN actual_parameter_part RPAREN                         // indexed_name
+    | LPAREN discrete_range RPAREN                                // slice_name
+    | APOSTROPHE attribute_designator (LPAREN expression RPAREN)? // attribute_name
     ;
 
 next_statement
+    // : (label COLON)? NEXT (label)? (WHEN condition)? SEMI
     : (label_colon)? NEXT (identifier)? (WHEN condition)? SEMI
+    ;
+
+null_statement
+    // (label COLON)> NULL_ SEMI
+    : (label_colon)? NULL_ SEMI
     ;
 
 numeric_literal
@@ -1320,27 +1485,32 @@ object_declaration
     | signal_declaration
     | variable_declaration
     | file_declaration
-    | terminal_declaration
-    | quantity_declaration
     ;
 
-opts
-    : (GUARDED)? (delay_mechanism)?
-    ;
+// operator_symbol
+//     : STRING_LITERAL
+//     ;
 
 package_body
+    //: PACKAGE BODY identifier IS package_body_declarative_part END (PACKAGE BODY)? (simple_name)? SEMI
     : PACKAGE BODY identifier IS package_body_declarative_part END (PACKAGE BODY)? (identifier)? SEMI
     ;
 
 package_body_declarative_item
     : subprogram_declaration
     | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
     | variable_declaration
     | file_declaration
     | alias_declaration
+    | attribute_declaration
+    | attribute_specification
     | use_clause
     | group_template_declaration
     | group_declaration
@@ -1351,12 +1521,15 @@ package_body_declarative_part
     ;
 
 package_declaration
-    : PACKAGE identifier IS package_declarative_part END (PACKAGE)? (identifier)? SEMI
+    // : PACKAGE identifier IS package_header package_declarative_part END (PACKAGE)? (simple_name)? SEMI
+    : PACKAGE identifier IS package_header package_declarative_part END (PACKAGE)? (identifier)? SEMI
     ;
 
 package_declarative_item
     : subprogram_declaration
-    | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
@@ -1371,25 +1544,43 @@ package_declarative_item
     | use_clause
     | group_template_declaration
     | group_declaration
-    | nature_declaration
-    | subnature_declaration
-    | terminal_declaration
     ;
 
 package_declarative_part
     : (package_declarative_item)*
     ;
 
+package_header
+    : (generic_clause (generic_map_aspect SEMI)?)?
+    ;
+
+package_instantiation_declaration
+    : PACKAGE identifier IS NEW name (LPAREN generic_map_aspect RPAREN) SEMI
+    ;
+
+// package_pathname
+//     : AT name DOT (identifier DOT)* identifier
+//     ;
+
 parameter_specification
     : identifier IN discrete_range
     ;
+
+// partial_pathname
+//     : (pathname_element DOT)* identifier
+//     ;
+
+// pathname_element
+//     : identifier (LPAREN expression RPAREN)?
+//     ;
 
 physical_literal
     : abstract_literal (: identifier)
     ;
 
 physical_type_definition
-    : range_constraint UNITS base_unit_declaration (secondary_unit_declaration)* END UNITS (
+    : range_constraint UNITS primary_unit_declaration (secondary_unit_declaration)* END UNITS (
+        // simple_name
         identifier
     )?
     ;
@@ -1399,35 +1590,66 @@ port_clause
     ;
 
 port_list
-    : interface_port_list
+    : interface_list
     ;
 
 port_map_aspect
     : PORT MAP LPAREN association_list RPAREN
     ;
 
+prefix
+    : name
+    | function_call
+    ;
+
 primary
-    : literal
-    | qualified_expression
-    | LPAREN expression RPAREN
-    | allocator
+    : name
+    | literal
     | aggregate
-    | name
+    | function_call
+    | qualified_expression
+    | type_conversion
+    | allocator
+    | LPAREN expression RPAREN
     ;
 
 primary_unit
     : entity_declaration
     | configuration_declaration
     | package_declaration
+    | package_instantiation_declaration
+    | context_declaration
+    ;
+
+primary_unit_declaration
+    : identifier SEMI
+    ;
+
+procedure_call
+    : name (LPAREN actual_parameter_part RPAREN)?
+    ;
+
+procedure_call_statement
+    //: (label COLON)? procedure_call SEMI
+    : (label_colon)? procedure_call SEMI
+    ;
+
+procedure_specification
+    : PROCEDURE designator subprogram_header ((PARAMETER)? LPAREN formal_parameter_list RPAREN)?
     ;
 
 procedural_declarative_item
     : subprogram_declaration
     | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
     | variable_declaration
+    | file_declaration
     | alias_declaration
     | attribute_declaration
     | attribute_specification
@@ -1436,20 +1658,8 @@ procedural_declarative_item
     | group_declaration
     ;
 
-procedural_declarative_part
-    : (procedural_declarative_item)*
-    ;
-
 procedural_statement_part
     : (sequential_statement)*
-    ;
-
-procedure_call
-    : selected_name (LPAREN actual_parameter_part RPAREN)?
-    ;
-
-procedure_call_statement
-    : (label_colon)? procedure_call SEMI
     ;
 
 process_declarative_item
@@ -1487,41 +1697,85 @@ process_statement_part
     : (sequential_statement)*
     ;
 
+protected_type_body
+    // : PROTECTED BODY protected_type_body_declarative_part END PROTECTED BODY (simple_name)?
+    : PROTECTED BODY protected_type_body_declarative_part END PROTECTED BODY (identifier)?
+    ;
+
+protected_type_body_declarative_item
+    : subprogram_declaration
+    | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
+    | type_declaration
+    | subtype_declaration
+    | constant_declaration
+    | variable_declaration
+    | file_declaration
+    | alias_declaration
+    | attribute_declaration
+    | attribute_specification
+    | use_clause
+    | group_template_declaration
+    | group_declaration
+    ;
+
+protected_type_body_declarative_part
+    : (protected_type_body_declarative_item)?
+    ;
+
+protected_type_declaration
+    //: PROTECTED protected_type_declarative_part END PROTECTED (simple_name)?
+    : PROTECTED protected_type_declarative_part END PROTECTED (identifier)?
+    ;
+
+protected_type_declarative_item
+    : subprogram_declaration
+    | subprogram_instantiation_declaration
+    | attribute_specification
+    | use_clause
+    ;
+
+protected_type_declarative_part
+    : (protected_type_declarative_item)?
+    ;
+
+protected_type_definition
+    : protected_type_declaration
+    | protected_type_body
+    ;
+
 qualified_expression
-    : subtype_indication APOSTROPHE (aggregate | LPAREN expression RPAREN)
-    ;
-
-quantity_declaration
-    : free_quantity_declaration
-    | branch_quantity_declaration
-    | source_quantity_declaration
-    ;
-
-quantity_list
-    : name (COMMA name)*
-    | OTHERS
-    | ALL
-    ;
-
-quantity_specification
-    : quantity_list COLON name
+    : name APOSTROPHE (aggregate | LPAREN expression RPAREN)
     ;
 
 range_decl
-    : explicit_range
-    | name
-    ;
-
-explicit_range
-    : simple_expression (direction simple_expression)?
+    : attribute_name
+    | (simple_expression direction simple_expression)
     ;
 
 range_constraint
     : RANGE range_decl
     ;
 
-record_nature_definition
-    : RECORD (nature_element_declaration)+ END RECORD (identifier)?
+record_constraint
+    : LPAREN record_element_constraint (COMMA record_element_constraint)* RPAREN
+    ;
+
+record_element_constraint
+    //: simple_name element_constraint
+    : identifier element_constraint
+    ;
+
+record_element_resolution
+    //: simple_name resolution_indication
+    : identifier resolution_indication
+    ;
+
+record_resolution
+    : record_element_resolution (COMMA record_element_resolution)*
     ;
 
 record_type_definition
@@ -1529,34 +1783,43 @@ record_type_definition
     ;
 
 relation
-    : shift_expression (: relational_operator shift_expression)?
+    : shift_expression (relational_operator shift_expression)?
     ;
 
 relational_operator
     : EQ
     | NEQ
-    | LOWERTHAN
-    | LE
+    | LESSTHAN
+    | LEQ
     | GREATERTHAN
-    | GE
+    | GEQ
+    | CONDITION_EQ
+    | CONDITION_NEQ
+    | CONDITION_LESSTHAN
+    | CONDITION_LEQ
+    | CONDITION_GREATERTHAN
+    | CONDITION_GEQ
     ;
 
 report_statement
     : (label_colon)? REPORT expression (SEVERITY expression)? SEMI
     ;
 
+resolution_indication
+    : name
+    | (LPAREN element_resolution RPAREN)
+    ;
+
 return_statement
     : (label_colon)? RETURN (expression)? SEMI
     ;
 
-scalar_nature_definition
-    : name ACROSS name THROUGH name REFERENCE
-    ;
-
 scalar_type_definition
-    : physical_type_definition
-    | enumeration_type_definition
-    | range_constraint
+    : enumeration_type_definition
+    // | integer_type_definition
+    // | floating_type_definition
+    | range_constraint // Equivalent to both integer_type_definition and floating_type_definition
+    | physical_type_definition
     ;
 
 secondary_unit
@@ -1568,11 +1831,33 @@ secondary_unit_declaration
     : identifier EQ physical_literal SEMI
     ;
 
+selected_expressions
+    : (expression WHEN choices COMMA)* expression WHEN choices
+    ;
+
+selected_force_assignment
+    : WITH expression SELECT (QUESTION)? target LEQ FORCE (force_mode)? selected_expressions SEMI
+    ;
+
+selected_name
+    : prefix DOT suffix
+    ;
+
 selected_signal_assignment
-    : WITH expression SELECT target LE opts selected_waveforms SEMI
+    : selected_waveform_assignment
+    | selected_force_assignment
+    ;
+
+selected_variable_assignment
+    : WITH expression SELECT (QUESTION)? target WALRUS selected_expressions SEMI
+    ;
+
+selected_waveform_assignment
+    : WITH expression SELECT (QUESTION)? target LEQ (delay_mechanism)? selected_waveforms SEMI
     ;
 
 selected_waveforms
+    //: (waveform WHEN choices COMMA)* waveform WHEN choices
     : waveform WHEN choices (COMMA waveform WHEN choices)*
     ;
 
@@ -1594,15 +1879,14 @@ sequential_statement
     | report_statement
     | signal_assignment_statement
     | variable_assignment_statement
+    | procedure_call_statement
     | if_statement
     | case_statement
     | loop_statement
     | next_statement
     | exit_statement
     | return_statement
-    | ( label_colon)? NULL_ SEMI
-    | break_statement
-    | procedure_call_statement
+    | null_statement
     ;
 
 shift_expression
@@ -1618,12 +1902,20 @@ shift_operator
     | ROR
     ;
 
+// sign // Only used in one other rule
+//     : PLUS | MINUS
+//     ;
+
 signal_assignment_statement
-    : (label_colon)? target LE (delay_mechanism)? waveform SEMI
+    : (label_colon)? (
+        simple_signal_assignment
+        | conditional_signal_assignment
+        | selected_signal_assignment
+    )
     ;
 
 signal_declaration
-    : SIGNAL identifier_list COLON (subtype_indication) (signal_kind)? (VARASGN expression)? SEMI
+    : SIGNAL identifier_list COLON (subtype_indication) (signal_kind)? (WALRUS expression)? SEMI
     ;
 
 signal_kind
@@ -1637,73 +1929,53 @@ signal_list
     | ALL
     ;
 
-signature
-    : LBRACKET (name ( COMMA name)*)? (RETURN name)? RBRACKET
-    ;
+// Signatures never get matched before other rules,
+// and no-one uses them in most HDL designs
+// signature
+//     : ( (type_mark (COMMA type_mark)?) (RETURN type_mark)? )?
+//     ;
 
-// NOTE that sign is applied to first operand only (LRM does not permit
-// `a op -b' - use `a op (-b)' instead).
-// (3.2.2004, e.f.)
+// simple_configuration_specification // Only used in one other rule
+//     : FOR component_specification binding_indication SEMI (END FOR SEMI)?
+//     ;
 
 simple_expression
-    : (PLUS | MINUS)? term (: adding_operator term)*
+    // : (sign)? term (adding_operator term)*
+    : (PLUS | MINUS)? term (adding_operator term)*
     ;
 
-simple_simultaneous_statement
-    : (label_colon)? simple_expression ASSIGN simple_expression (tolerance_aspect)? SEMI
+simple_force_assignment
+    // : target LEQ FORCE (force_mode)? expression SEMI
+    : (force_mode)? expression
     ;
 
-simultaneous_alternative
-    : WHEN choices ARROW simultaneous_statement_part
+// simple_name
+//     : identifier
+//     ;
+
+simple_release_assignment
+    // : target LEQ RELEASE (force_mode)? SEMI
+    : (force_mode)?
     ;
 
-simultaneous_case_statement
-    : (label_colon)? CASE expression USE (simultaneous_alternative)+ END CASE (identifier)? SEMI
+simple_signal_assignment
+    // : simple_waveform_assignment
+    // | simple_force_assignment
+    // | simple_release_assignment
+    : target LEQ (simple_waveform_assignment | simple_force_assignment | simple_release_assignment) SEMI
     ;
 
-simultaneous_if_statement
-    : (label_colon)? IF condition USE simultaneous_statement_part (
-        ELSIF condition USE simultaneous_statement_part
-    )* (ELSE simultaneous_statement_part)? END USE (identifier)? SEMI
+simple_waveform_assignment
+    // : target LEQ (delay_mechanism)? waveform SEMI
+    : (delay_mechanism)? waveform
     ;
 
-simultaneous_procedural_statement
-    : (label_colon)? PROCEDURAL (IS)? procedural_declarative_part BEGIN procedural_statement_part END PROCEDURAL (
-        identifier
-    )? SEMI
+simple_variable_assignment
+    : target WALRUS expression SEMI
     ;
 
-simultaneous_statement
-    : simple_simultaneous_statement
-    | simultaneous_if_statement
-    | simultaneous_case_statement
-    | simultaneous_procedural_statement
-    | ( label_colon)? NULL_ SEMI
-    ;
-
-simultaneous_statement_part
-    : (simultaneous_statement)*
-    ;
-
-source_aspect
-    : SPECTRUM simple_expression COMMA simple_expression
-    | NOISE simple_expression
-    ;
-
-source_quantity_declaration
-    : QUANTITY identifier_list COLON subtype_indication source_aspect SEMI
-    ;
-
-step_limit_specification
-    : LIMIT quantity_specification WITH expression SEMI
-    ;
-
-subnature_declaration
-    : SUBNATURE identifier IS subnature_indication SEMI
-    ;
-
-subnature_indication
-    : name (index_constraint)? (TOLERANCE expression ACROSS expression THROUGH)?
+slice_name
+    : prefix LPAREN discrete_range RPAREN
     ;
 
 subprogram_body
@@ -1719,6 +1991,10 @@ subprogram_declaration
 subprogram_declarative_item
     : subprogram_declaration
     | subprogram_body
+    | subprogram_instantiation_declaration
+    | package_declaration
+    | package_body
+    | package_instantiation_declaration
     | type_declaration
     | subtype_declaration
     | constant_declaration
@@ -1736,6 +2012,15 @@ subprogram_declarative_part
     : (subprogram_declarative_item)*
     ;
 
+subprogram_header
+    : (GENERIC LPAREN generic_list RPAREN (generic_map_aspect))?
+    ;
+
+subprogram_instantiation_declaration
+    // : subprogram_kind identifier IS NEW name (signature)? (generic_map_aspect) SEMI
+    : subprogram_kind identifier IS NEW name (generic_map_aspect) SEMI
+    ;
+
 subprogram_kind
     : PROCEDURE
     | FUNCTION
@@ -1746,14 +2031,6 @@ subprogram_specification
     | function_specification
     ;
 
-procedure_specification
-    : PROCEDURE designator (LPAREN formal_parameter_list RPAREN)?
-    ;
-
-function_specification
-    : (PURE | IMPURE)? FUNCTION ( designator ) (LPAREN formal_parameter_list RPAREN)? RETURN subtype_indication
-    ;
-
 subprogram_statement_part
     : (sequential_statement)*
     ;
@@ -1762,20 +2039,16 @@ subtype_declaration
     : SUBTYPE identifier IS subtype_indication SEMI
     ;
 
-// VHDLAMS 1076.1-1999 declares first name as optional. Here, second name
-// is made optional to prevent antlr nondeterminism.
-// (9.2.2004, e.f.)
-
 subtype_indication
-    : ('RESOLVED')? selected_name (APOSTROPHE SUBTYPE)? (LPAREN expression (TO | DOWNTO) expression RPAREN)* (
-        constraint
-    )? (tolerance_aspect)?
+    // : (resolution_indication)? type_mark (constraint)?
+    : (resolution_indication)? name (constraint)?
     ;
 
 suffix
     : identifier
     | CHARACTER_LITERAL
-    | STRING_LITERAL
+    // | operator_symbol
+    | STRING_LITERAL // Equivalent to operator_symbol
     | ALL
     ;
 
@@ -1785,31 +2058,25 @@ target
     ;
 
 term
-    : factor (: multiplying_operator factor)*
-    ;
-
-terminal_aspect
-    : name (TO name)?
-    ;
-
-terminal_declaration
-    : TERMINAL identifier_list COLON subnature_indication SEMI
-    ;
-
-through_aspect
-    : identifier_list (tolerance_aspect)? (VARASGN expression)? THROUGH
+    : factor (multiplying_operator factor)*
     ;
 
 timeout_clause
     : FOR expression
     ;
 
-tolerance_aspect
-    : TOLERANCE expression
+tool_directive
+    : BACKTICK identifier (graphic_character)*
+    ;
+
+type_conversion
+    // : type_mark LPAREN expression RPAREN
+    : name LPAREN expression RPAREN
     ;
 
 type_declaration
-    : TYPE identifier (IS type_definition)? SEMI
+    : full_type_declaration
+    | incomplete_type_declaration
     ;
 
 type_definition
@@ -1817,14 +2084,15 @@ type_definition
     | composite_type_definition
     | access_type_definition
     | file_type_definition
+    | protected_type_definition
     ;
 
-unconstrained_array_definition
+// type_mark
+//     : name
+//     ;
+
+unbounded_array_definition
     : ARRAY LPAREN index_subtype_definition (COMMA index_subtype_definition)* RPAREN OF subtype_indication
-    ;
-
-unconstrained_nature_definition
-    : ARRAY LPAREN index_subtype_definition (COMMA index_subtype_definition)* RPAREN OF subnature_indication
     ;
 
 use_clause
@@ -1832,11 +2100,15 @@ use_clause
     ;
 
 variable_assignment_statement
-    : (label_colon)? target VARASGN expression SEMI
+    : (label_colon)? (
+        simple_variable_assignment
+        | conditional_variable_assignment
+        | selected_variable_assignment
+    )
     ;
 
 variable_declaration
-    : (SHARED)? VARIABLE identifier_list COLON subtype_indication (VARASGN expression)? SEMI
+    : (SHARED)? VARIABLE identifier_list COLON subtype_indication (WALRUS expression)? SEMI
     ;
 
 wait_statement
@@ -1850,18 +2122,17 @@ waveform
 
 waveform_element
     : expression (AFTER expression)?
+    | NULL_ (AFTER expression)?
     ;
 
 //------------------------------------------Lexer-----------------------------------------
 
-BASE_LITERAL
-    // INTEGER must be checked to be between and including 2 and 16 (included) i.e.
-    // INTEGER >=2 and INTEGER <=16
-    // A Based integer (a number without a . such as 3) should not have a negative exponent
-    // A Based fractional number with a . i.e. 3.0 may have a negative exponent
-    // These should be checked in the Visitor/Listener whereby an appropriate error message
-    // should be given
-    : INTEGER '#' BASED_INTEGER ('.' BASED_INTEGER)? '#' (EXPONENT)?
+STRING_LITERAL
+    : '"' (~('"' | '\n' | '\r') | '\'' | '""')* '"'
+    ;
+
+BASED_LITERAL
+    : INTEGER HASH BASED_INTEGER (DOT BASED_INTEGER)? HASH (EXPONENT)?
     ;
 
 BIT_STRING_LITERAL
@@ -1898,10 +2169,6 @@ BIT_STRING_LITERAL_HEX
         | '0'
         | '_'
     )+ '"'
-    ;
-
-REAL_LITERAL
-    : INTEGER '.' INTEGER (EXPONENT)?
     ;
 
 BASIC_IDENTIFIER
@@ -1968,10 +2235,6 @@ CHARACTER_LITERAL
     : APOSTROPHE . APOSTROPHE
     ;
 
-STRING_LITERAL
-    : '"' (~('"' | '\n' | '\r') | '""')* '"'
-    ;
-
 OTHER_SPECIAL_CHARACTER
     : '!'
     | '$'
@@ -2006,15 +2269,47 @@ DOUBLESTAR
     : '**'
     ;
 
+CONDITION_OPERATOR
+    : '??'
+    ;
+
+CONDITION_EQ
+    : '?='
+    ;
+
+CONDITION_NEQ
+    : '?/E'
+    ;
+
+CONDITION_LEQ
+    : '?<='
+    ;
+
+CONDITION_LESSTHAN
+    : '?<'
+    ;
+
+CONDITION_GEQ
+    : '?>='
+    ;
+
+CONDITION_GREATERTHAN
+    : '?>'
+    ;
+
 ASSIGN
     : '=='
     ;
 
-LE
+AT
+    : '@'
+    ;
+
+LEQ
     : '<='
     ;
 
-GE
+GEQ
     : '>='
     ;
 
@@ -2022,11 +2317,15 @@ ARROW
     : '=>'
     ;
 
+HASH
+    : '#'
+    ;
+
 NEQ
     : '/='
     ;
 
-VARASGN
+WALRUS
     : ':='
     ;
 
@@ -2086,9 +2385,17 @@ MINUS
     : '-'
     ;
 
-LOWERTHAN
+// LSHIFT
+//     : '<<'
+//     ;
+
+LESSTHAN
     : '<'
     ;
+
+// RSHIFT
+//     : '>>'
+//     ;
 
 GREATERTHAN
     : '>'
@@ -2110,8 +2417,12 @@ BACKSLASH
     : '\\'
     ;
 
+BACKTICK
+    : '`'
+    ;
+
 EXPONENT
-    : 'E' ('+' | '-')? INTEGER
+    : 'E' ('+' | '-')? INTEGER (DOT INTEGER)?
     ;
 
 HEXDIGIT
@@ -2136,4 +2447,8 @@ EXTENDED_DIGIT
 
 APOSTROPHE
     : '\''
+    ;
+
+QUESTION
+    : '?'
     ;

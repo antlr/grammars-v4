@@ -181,7 +181,7 @@ createrolestmt
 with_
     : WITH
     //| WITH_LA
-    
+
     ;
 
 optrolelist
@@ -250,7 +250,7 @@ createschemastmt
 
 optschemaname
     : colid
-    
+
     ;
 
 optschemaeltlist
@@ -332,7 +332,7 @@ zone_value
 encoding_
     : sconst
     | DEFAULT
-    
+
     ;
 
 nonreservedword_or_sconst
@@ -486,17 +486,17 @@ alter_column_default
 drop_behavior_
     : CASCADE
     | RESTRICT
-    
+
     ;
 
 collate_clause_
     : COLLATE any_name
-    
+
     ;
 
 alter_using
     : USING a_expr
-    
+
     ;
 
 replica_identity
@@ -512,7 +512,7 @@ reloptions
 
 reloptions_
     : WITH reloptions
-    
+
     ;
 
 reloption_list
@@ -577,7 +577,7 @@ copy_from
 
 program_
     : PROGRAM
-    
+
     ;
 
 copy_file_name
@@ -613,17 +613,17 @@ copy_opt_item
 
 binary_
     : BINARY
-    
+
     ;
 
 copy_delimiter
     : using_? DELIMITERS sconst
-    
+
     ;
 
 using_
     : USING
-    
+
     ;
 
 copy_generic_opt_list
@@ -639,7 +639,7 @@ copy_generic_opt_arg
     | numericonly
     | STAR
     | OPEN_PAREN copy_generic_opt_arg_list CLOSE_PAREN
-    
+
     ;
 
 copy_generic_opt_arg_list
@@ -665,17 +665,17 @@ opttemp
     | LOCAL (TEMPORARY | TEMP)
     | GLOBAL (TEMPORARY | TEMP)
     | UNLOGGED
-    
+
     ;
 
 opttableelementlist
     : tableelementlist
-    
+
     ;
 
 opttypedtableelementlist
     : OPEN_PAREN typedtableelementlist CLOSE_PAREN
-    
+
     ;
 
 tableelementlist
@@ -783,12 +783,12 @@ constraintelem
 
 no_inherit_
     : NO INHERIT
-    
+
     ;
 
 column_list_
     : OPEN_PAREN columnlist CLOSE_PAREN
-    
+
     ;
 
 columnlist
@@ -801,12 +801,12 @@ columnElem
 
 c_include_
     : INCLUDE OPEN_PAREN columnlist CLOSE_PAREN
-    
+
     ;
 
 key_match
     : MATCH (FULL | PARTIAL | SIMPLE)
-    
+
     ;
 
 exclusionconstraintlist
@@ -819,7 +819,7 @@ exclusionconstraintelem
 
 exclusionwhereclause
     : WHERE OPEN_PAREN a_expr CLOSE_PAREN
-    
+
     ;
 
 key_actions
@@ -827,7 +827,7 @@ key_actions
     | key_delete
     | key_update key_delete
     | key_delete key_update
-    
+
     ;
 
 key_update
@@ -847,12 +847,12 @@ key_action
 
 optinherit
     : INHERITS OPEN_PAREN qualified_name_list CLOSE_PAREN
-    
+
     ;
 
 optpartitionspec
     : partitionspec
-    
+
     ;
 
 partitionspec
@@ -871,28 +871,28 @@ part_elem
 
 table_access_method_clause
     : USING name
-    
+
     ;
 
 optwith
     : WITH reloptions
     | WITHOUT OIDS
-    
+
     ;
 
 oncommitoption
     : ON COMMIT (DROP | DELETE_P ROWS | PRESERVE ROWS)
-    
+
     ;
 
 opttablespace
     : TABLESPACE name
-    
+
     ;
 
 optconstablespace
     : USING INDEX TABLESPACE name
-    
+
     ;
 
 existingindex
@@ -917,7 +917,7 @@ create_as_target
 
 with_data_
     : WITH (DATA_P | NO DATA_P)
-    
+
     ;
 
 creatematviewstmt
@@ -930,7 +930,7 @@ create_mv_target
 
 optnolog
     : UNLOGGED
-    
+
     ;
 
 refreshmatviewstmt
@@ -947,12 +947,12 @@ alterseqstmt
 
 optseqoptlist
     : seqoptlist
-    
+
     ;
 
 optparenthesizedseqoptlist
     : OPEN_PAREN seqoptlist CLOSE_PAREN
-    
+
     ;
 
 seqoptlist
@@ -975,7 +975,7 @@ seqoptelem
 
 by_
     : BY
-    
+
     ;
 
 numericonly
@@ -997,7 +997,7 @@ createplangstmt
 
 trusted_
     : TRUSTED
-    
+
     ;
 
 handler_name
@@ -1006,7 +1006,7 @@ handler_name
 
 inline_handler_
     : INLINE_P handler_name
-    
+
     ;
 
 validator_clause
@@ -1016,12 +1016,12 @@ validator_clause
 
 validator_
     : validator_clause
-    
+
     ;
 
 procedural_
     : PROCEDURAL
-    
+
     ;
 
 createtablespacestmt
@@ -1030,7 +1030,7 @@ createtablespacestmt
 
 opttablespaceowner
     : OWNER rolespec
-    
+
     ;
 
 droptablespacestmt
@@ -1097,7 +1097,7 @@ fdw_options
 
 fdw_options_
     : fdw_options
-    
+
     ;
 
 alterfdwstmt
@@ -1107,7 +1107,7 @@ alterfdwstmt
 
 create_generic_options
     : OPTIONS OPEN_PAREN generic_option_list CLOSE_PAREN
-    
+
     ;
 
 generic_option_list
@@ -1148,7 +1148,7 @@ createforeignserverstmt
 
 type_
     : TYPE_P sconst
-    
+
     ;
 
 foreign_server_version
@@ -1157,7 +1157,7 @@ foreign_server_version
 
 foreign_server_version_
     : foreign_server_version
-    
+
     ;
 
 alterforeignserverstmt
@@ -1183,7 +1183,7 @@ import_qualification_type
 
 import_qualification
     : import_qualification_type OPEN_PAREN relation_expr_list CLOSE_PAREN
-    
+
     ;
 
 createusermappingstmt
@@ -1216,32 +1216,32 @@ alterpolicystmt
 
 rowsecurityoptionalexpr
     : USING OPEN_PAREN a_expr CLOSE_PAREN
-    
+
     ;
 
 rowsecurityoptionalwithcheck
     : WITH CHECK OPEN_PAREN a_expr CLOSE_PAREN
-    
+
     ;
 
 rowsecuritydefaulttorole
     : TO role_list
-    
+
     ;
 
 rowsecurityoptionaltorole
     : TO role_list
-    
+
     ;
 
 rowsecuritydefaultpermissive
     : AS identifier
-    
+
     ;
 
 rowsecuritydefaultforcmd
     : FOR row_security_cmd
-    
+
     ;
 
 row_security_cmd
@@ -1288,7 +1288,7 @@ triggeroneevent
 
 triggerreferencing
     : REFERENCING triggertransitions
-    
+
     ;
 
 triggertransitions
@@ -1315,12 +1315,12 @@ transitionrelname
 
 triggerforspec
     : FOR triggerforopteach? triggerfortype
-    
+
     ;
 
 triggerforopteach
     : EACH
-    
+
     ;
 
 triggerfortype
@@ -1330,7 +1330,7 @@ triggerfortype
 
 triggerwhen
     : WHEN OPEN_PAREN a_expr CLOSE_PAREN
-    
+
     ;
 
 function_or_procedure
@@ -1351,7 +1351,7 @@ triggerfuncarg
 
 optconstrfromtable
     : FROM qualified_name
-    
+
     ;
 
 constraintattributespec
@@ -1453,7 +1453,7 @@ old_aggr_elem
 
 enum_val_list_
     : enum_val_list
-    
+
     ;
 
 enum_val_list
@@ -1469,7 +1469,7 @@ alterenumstmt
 
 if_not_exists_
     : IF_P NOT EXISTS
-    
+
     ;
 
 createopclassstmt
@@ -1490,23 +1490,23 @@ opclass_item
 
 default_
     : DEFAULT
-    
+
     ;
 
 opfamily_
     : FAMILY any_name
-    
+
     ;
 
 opclass_purpose
     : FOR SEARCH
     | FOR ORDER BY any_name
-    
+
     ;
 
 recheck_
     : RECHECK
-    
+
     ;
 
 createopfamilystmt
@@ -1624,7 +1624,7 @@ truncatestmt
 restart_seqs_
     : CONTINUE_P IDENTITY_P
     | RESTART IDENTITY_P
-    
+
     ;
 
 commentstmt
@@ -1668,7 +1668,7 @@ seclabelstmt
 
 provider_
     : FOR nonreservedword_or_sconst
-    
+
     ;
 
 security_label
@@ -1707,7 +1707,7 @@ from_in
 
 from_in_
     : from_in
-    
+
     ;
 
 grantstmt
@@ -1772,7 +1772,7 @@ grantee
 
 grant_grant_option_
     : WITH GRANT OPTION
-    
+
     ;
 
 grantrolestmt
@@ -1786,12 +1786,12 @@ revokerolestmt
 
 grant_admin_option_
     : WITH ADMIN OPTION
-    
+
     ;
 
 granted_by_
     : GRANTED BY rolespec
-    
+
     ;
 
 alterdefaultprivilegesstmt
@@ -1826,15 +1826,19 @@ defacl_privilege_target
 //create index
 
 indexstmt
-    : CREATE unique_? INDEX concurrently_? index_name_? ON relation_expr access_method_clause? OPEN_PAREN index_params CLOSE_PAREN include_?
+    : CREATE unique_? INDEX concurrently_? (if_not_exists_? index_name_)?
+        ON relation_expr access_method_clause? OPEN_PAREN index_params CLOSE_PAREN include_? nulls_distinct?
         reloptions_? opttablespace? where_clause?
-    | CREATE unique_? INDEX concurrently_? IF_P NOT EXISTS name ON relation_expr access_method_clause? OPEN_PAREN index_params CLOSE_PAREN
-        include_? reloptions_? opttablespace? where_clause?
+    | CREATE unique_? INDEX concurrently_? if_not_exists_? name ON relation_expr access_method_clause? OPEN_PAREN index_params CLOSE_PAREN
+        include_? nulls_distinct? reloptions_? opttablespace? where_clause?
     ;
 
 unique_
     : UNIQUE
-    
+    ;
+
+nulls_distinct
+    : NULLS_P NOT? DISTINCT
     ;
 
 single_name_
@@ -1843,17 +1847,17 @@ single_name_
 
 concurrently_
     : CONCURRENTLY
-    
+
     ;
 
 index_name_
     : name
-    
+
     ;
 
 access_method_clause
     : USING name
-    
+
     ;
 
 index_params
@@ -1873,7 +1877,7 @@ index_elem
 
 include_
     : INCLUDE OPEN_PAREN index_including_params CLOSE_PAREN
-    
+
     ;
 
 index_including_params
@@ -1882,18 +1886,18 @@ index_including_params
 
 collate_
     : COLLATE any_name
-    
+
     ;
 
 class_
     : any_name
-    
+
     ;
 
 asc_desc_
     : ASC
     | DESC
-    
+
     ;
 
 //TOD NULLS_LA was used
@@ -1901,7 +1905,7 @@ asc_desc_
 nulls_order_
     : NULLS_P FIRST_P
     | NULLS_P LAST_P
-    
+
     ;
 
 createfunctionstmt
@@ -1912,7 +1916,7 @@ createfunctionstmt
 
 or_replace_
     : OR REPLACE
-    
+
     ;
 
 func_args
@@ -2048,7 +2052,7 @@ transform_type_list
 
 definition_
     : WITH definition
-    
+
     ;
 
 table_func_column
@@ -2069,7 +2073,7 @@ alterfunc_opt_list
 
 restrict_
     : RESTRICT
-    
+
     ;
 
 removefuncstmt
@@ -2132,7 +2136,7 @@ createcaststmt
 cast_context
     : AS IMPLICIT_P
     | AS ASSIGNMENT
-    
+
     ;
 
 dropcaststmt
@@ -2141,7 +2145,7 @@ dropcaststmt
 
 if_exists_
     : IF_P EXISTS
-    
+
     ;
 
 createtransformstmt
@@ -2244,12 +2248,12 @@ renamestmt
 
 column_
     : COLUMN
-    
+
     ;
 
 set_data_
     : SET DATA_P
-    
+
     ;
 
 alterobjectdependsstmt
@@ -2263,7 +2267,7 @@ alterobjectdependsstmt
 
 no_
     : NO
-    
+
     ;
 
 alterobjectschemastmt
@@ -2354,7 +2358,7 @@ createpublicationstmt
 
 publication_for_tables_
     : publication_for_tables
-    
+
     ;
 
 publication_for_tables
@@ -2419,7 +2423,7 @@ ruleactionstmt
 
 ruleactionstmtOrEmpty
     : ruleactionstmt
-    
+
     ;
 
 event
@@ -2432,7 +2436,7 @@ event
 instead_
     : INSTEAD
     | ALSO
-    
+
     ;
 
 notifystmt
@@ -2441,7 +2445,7 @@ notifystmt
 
 notify_payload
     : COMMA sconst
-    
+
     ;
 
 listenstmt
@@ -2473,7 +2477,7 @@ transactionstmt
 transaction_
     : WORK
     | TRANSACTION
-    
+
     ;
 
 transaction_mode_item
@@ -2490,12 +2494,12 @@ transaction_mode_list
 
 transaction_mode_list_or_empty
     : transaction_mode_list
-    
+
     ;
 
 transaction_chain_
     : AND NO? CHAIN
-    
+
     ;
 
 viewstmt
@@ -2507,7 +2511,7 @@ viewstmt
 
 check_option_
     : WITH (CASCADED | LOCAL)? CHECK OPTION
-    
+
     ;
 
 loadstmt
@@ -2520,7 +2524,7 @@ createdbstmt
 
 createdb_opt_list
     : createdb_opt_items
-    
+
     ;
 
 createdb_opt_items
@@ -2543,7 +2547,7 @@ createdb_opt_name
 
 equal_
     : EQUAL
-    
+
     ;
 
 alterdatabasestmt
@@ -2591,7 +2595,7 @@ alterdomainstmt
 
 as_
     : AS
-    
+
     ;
 
 altertsdictionarystmt
@@ -2626,7 +2630,7 @@ clusterstmt
 
 cluster_index_specification
     : USING name
-    
+
     ;
 
 vacuumstmt
@@ -2679,32 +2683,32 @@ vac_analyze_option_name
 vac_analyze_option_arg
     : boolean_or_string_
     | numericonly
-    
+
     ;
 
 analyze_
     : analyze_keyword
-    
+
     ;
 
 verbose_
     : VERBOSE
-    
+
     ;
 
 full_
     : FULL
-    
+
     ;
 
 freeze_
     : FREEZE
-    
+
     ;
 
 name_list_
     : OPEN_PAREN name_list CLOSE_PAREN
-    
+
     ;
 
 vacuum_relation
@@ -2717,7 +2721,7 @@ vacuum_relation_list
 
 vacuum_relation_list_
     : vacuum_relation_list
-    
+
     ;
 
 explainstmt
@@ -2755,7 +2759,7 @@ explain_option_name
 explain_option_arg
     : boolean_or_string_
     | numericonly
-    
+
     ;
 
 preparestmt
@@ -2764,7 +2768,7 @@ preparestmt
 
 prep_type_clause
     : OPEN_PAREN type_list CLOSE_PAREN
-    
+
     ;
 
 preparablestmt
@@ -2782,7 +2786,7 @@ executestmt
 
 execute_param_clause
     : OPEN_PAREN expr_list CLOSE_PAREN
-    
+
     ;
 
 deallocatestmt
@@ -2822,18 +2826,18 @@ insert_column_item
 
 on_conflict_
     : ON CONFLICT conf_expr_? DO (UPDATE SET set_clause_list where_clause? | NOTHING)
-    
+
     ;
 
 conf_expr_
     : OPEN_PAREN index_params CLOSE_PAREN where_clause?
     | ON CONSTRAINT name
-    
+
     ;
 
 returning_clause
     : RETURNING target_list
-    
+
     ;
 
 // https://www.postgresql.org/docs/current/sql-merge.html
@@ -2862,7 +2866,7 @@ deletestmt
 
 using_clause
     : USING from_list
-    
+
     ;
 
 lockstmt
@@ -2871,7 +2875,7 @@ lockstmt
 
 lock_
     : IN_P lock_type MODE
-    
+
     ;
 
 lock_type
@@ -2883,13 +2887,13 @@ lock_type
 
 nowait_
     : NOWAIT
-    
+
     ;
 
 nowait_or_skip_
     : NOWAIT
     | SKIP_P LOCKED
-    
+
     ;
 
 updatestmt
@@ -3000,12 +3004,12 @@ common_table_expr
 materialized_
     : MATERIALIZED
     | NOT MATERIALIZED
-    
+
     ;
 
 with_clause_
     : with_clause
-    
+
     ;
 
 into_clause
@@ -3026,13 +3030,13 @@ opttempTableName
 
 table_
     : TABLE
-    
+
     ;
 
 all_or_distinct
     : ALL
     | DISTINCT
-    
+
     ;
 
 distinct_clause
@@ -3041,12 +3045,12 @@ distinct_clause
 
 all_clause_
     : ALL
-    
+
     ;
 
 sort_clause_
     : sort_clause
-    
+
     ;
 
 sort_clause
@@ -3068,7 +3072,7 @@ select_limit
 
 select_limit_
     : select_limit
-    
+
     ;
 
 limit_clause
@@ -3115,7 +3119,7 @@ first_or_next
 
 group_clause
     : GROUP_P BY group_by_list
-    
+
     ;
 
 group_by_list
@@ -3148,7 +3152,7 @@ grouping_sets_clause
 
 having_clause
     : HAVING a_expr
-    
+
     ;
 
 for_locking_clause
@@ -3158,7 +3162,7 @@ for_locking_clause
 
 for_locking_clause_
     : for_locking_clause
-    
+
     ;
 
 for_locking_items
@@ -3175,7 +3179,7 @@ for_locking_strength
 
 locked_rels_list
     : OF qualified_name_list
-    
+
     ;
 
 values_clause
@@ -3184,7 +3188,7 @@ values_clause
 
 from_clause
     : FROM from_list
-    
+
     ;
 
 from_list
@@ -3221,7 +3225,7 @@ alias_clause
 func_alias_clause
     : alias_clause
     | (AS colid? | colid) OPEN_PAREN tablefuncelementlist CLOSE_PAREN
-    
+
     ;
 
 join_type
@@ -3252,7 +3256,7 @@ tablesample_clause
 
 repeatable_clause_
     : REPEATABLE OPEN_PAREN a_expr CLOSE_PAREN
-    
+
     ;
 
 func_table
@@ -3270,29 +3274,29 @@ rowsfrom_list
 
 col_def_list_
     : AS OPEN_PAREN tablefuncelementlist CLOSE_PAREN
-    
+
     ;
 
 //TODO WITH_LA was used
 
 ordinality_
     : WITH ORDINALITY
-    
+
     ;
 
 where_clause
     : WHERE a_expr
-    
+
     ;
 
 where_or_current_clause
     : WHERE (CURRENT_P OF cursor_name | a_expr)
-    
+
     ;
 
 opttablefuncelementlist
     : tablefuncelementlist
-    
+
     ;
 
 tablefuncelementlist
@@ -3373,7 +3377,7 @@ generictype
 
 type_modifiers_
     : OPEN_PAREN expr_list CLOSE_PAREN
-    
+
     ;
 
 numeric
@@ -3392,7 +3396,7 @@ numeric
 
 float_
     : OPEN_PAREN iconst CLOSE_PAREN
-    
+
     ;
 
 //todo: merge alts
@@ -3431,7 +3435,7 @@ character_c
 
 varying_
     : VARYING
-    
+
     ;
 
 constdatetime
@@ -3447,7 +3451,7 @@ constinterval
 timezone_
     : WITH TIME ZONE
     | WITHOUT TIME ZONE
-    
+
     ;
 
 interval_
@@ -3461,7 +3465,7 @@ interval_
     | DAY_P TO (HOUR_P | MINUTE_P | interval_second)
     | HOUR_P TO (MINUTE_P | interval_second)
     | MINUTE_P TO interval_second
-    
+
     ;
 
 interval_second
@@ -3474,7 +3478,7 @@ jsonType
 
 escape_
     : ESCAPE a_expr
-    
+
     ;
 
 //precendence accroding to Table 4.2. Operator Precedence (highest to lowest)
@@ -3850,7 +3854,7 @@ document_or_content
 xml_whitespace_option
     : PRESERVE WHITESPACE_P
     | STRIP_P WHITESPACE_P
-    
+
     ;
 
 xmlexists_argument
@@ -3866,17 +3870,17 @@ xml_passing_mech
 
 within_group_clause
     : WITHIN GROUP_P OPEN_PAREN sort_clause CLOSE_PAREN
-    
+
     ;
 
 filter_clause
     : FILTER OPEN_PAREN WHERE a_expr CLOSE_PAREN
-    
+
     ;
 
 window_clause
     : WINDOW window_definition_list
-    
+
     ;
 
 window_definition_list
@@ -3889,7 +3893,7 @@ window_definition
 
 over_clause
     : OVER (window_specification | colid)
-    
+
     ;
 
 window_specification
@@ -3898,19 +3902,19 @@ window_specification
 
 existing_window_name_
     : colid
-    
+
     ;
 
 partition_clause_
     : PARTITION BY expr_list
-    
+
     ;
 
 frame_clause_
     : RANGE frame_extent window_exclusion_clause_?
     | ROWS frame_extent window_exclusion_clause_?
     | GROUPS frame_extent window_exclusion_clause_?
-    
+
     ;
 
 frame_extent
@@ -3926,7 +3930,7 @@ frame_bound
 
 window_exclusion_clause_
     : EXCLUDE (CURRENT_P ROW | GROUP_P | TIES | NO OTHERS)
-    
+
     ;
 
 row
@@ -4024,7 +4028,7 @@ array_expr_list
 
 extract_list
     : extract_arg FROM a_expr
-    
+
     ;
 
 extract_arg
@@ -4051,7 +4055,7 @@ overlay_list
 
 position_list
     : b_expr IN_P b_expr
-    
+
     ;
 
 substr_list
@@ -4087,12 +4091,12 @@ when_clause
 
 case_default
     : ELSE a_expr
-    
+
     ;
 
 case_arg
     : a_expr
-    
+
     ;
 
 columnref
@@ -4106,7 +4110,7 @@ indirection_el
 
 slice_bound_
     : a_expr
-    
+
     ;
 
 indirection
@@ -4276,7 +4280,7 @@ json_array_aggregate_order_by_clause:
 
 target_list_
     : target_list
-    
+
     ;
 
 target_list
@@ -4363,7 +4367,7 @@ anysconst
 
 uescape_
     : UESCAPE anysconst
-    
+
     ;
 
 signediconst

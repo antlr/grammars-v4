@@ -1122,3 +1122,5 @@ EXPLAIN (COSTS OFF)
 SELECT count(*) FROM point_tbl p WHERE p.f1 >> '(0.0, 0.0)';
 SELECT count(*) FROM point_tbl p WHERE p.f1 >> '(0.0, 0.0)';
 
+CREATE UNIQUE INDEX unique_idx1nd ON unique_tbl (i) NULLS DISTINCT;
+CREATE UNIQUE INDEX unique_idx1nnd ON unique_tbl (i) NULLS NOT DISTINCT;
