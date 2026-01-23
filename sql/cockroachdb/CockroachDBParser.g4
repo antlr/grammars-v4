@@ -4474,24 +4474,120 @@ expr_list
     ;
 
 a_expr
-    : (c_expr
-    | ('+' | '-' | '~' | SQRT | CBRT | qual_op | NOPT) a_expr
-    | row OVERLAPS row
-    | DEFAULT)
+    : ( c_expr
+      | ('+' | '-' | '~' | SQRT | CBRT | qual_op | NOT) a_expr
+      | row OVERLAPS row
+      | DEFAULT
+      )
         ( TYPECAST cast_target
         | TYPEANNOTATE typename
         | COLLATE collation_name
         | AT TIME ZONE a_expr
-        //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#a_expr
-        )+
+        | '+' a_expr
+        | '-' a_expr
+        | '*' a_expr
+        | '/' a_expr
+        | FLOORDIV a_expr
+        | '%' a_expr
+        | '^' a_expr
+        | '#' a_expr
+        | '&' a_expr
+        | '|' a_expr
+        | '<' a_expr
+        | '>' a_expr
+        | '?' a_expr
+        | JSON_SOME_EXISTS a_expr
+        | JSON_ALL_EXISTS a_expr
+        | CONTAINS a_expr
+//        | FIRST_CONTAINS a_expr
+        | CONTAINED_BY a_expr
+//        | FIRST_CONTAINED_BY a_expr
+        | '=' a_expr
+        | CONCAT a_expr
+        | LSHIFT a_expr
+        | RSHIFT a_expr
+        | FETCHVAL a_expr
+        | FETCHTEXT a_expr
+        | FETCHVAL_PATH a_expr
+        | FETCHTEXT_PATH a_expr
+        | REMOVE_PATH a_expr
+        | INET_CONTAINED_BY_OR_EQUALS  a_expr
+        | AND_AND a_expr
+        | AT_AT a_expr
+        | DISTANCE a_expr
+        | COS_DISTANCE a_expr
+        | NEG_INNER_PRODUCT a_expr
+        | INET_CONTAINS_OR_EQUALS a_expr
+        | LESS_EQUALS a_expr
+        | GREATER_EQUALS a_expr
+        | NOT_EQUALS a_expr
+        qual_op a_expr
+        | AND a_expr
+        | OR a_expr
+        | NOT? LIKE a_expr (ESCAPE a_expr)?
+        | NOT? ILIKE a_expr (ESCAPE a_expr)?
+        | NOT? SIMILAR TO a_expr (ESCAPE a_expr)?
+        | '~' a_expr
+        | NOT_REGMATCH a_expr
+        | REGIMATCH a_expr
+        | NOT_REGIMATCH a_expr
+        | IS NOT? NAN_
+        | IS NOT? NULL_
+        | ISNULL
+        | NOTNULL
+        | IS NOT? TRUE
+        | IS NOT? FALSE
+        | IS NOT? UNKNOWN
+        | IS NOT? DISTINCT FROM a_expr
+        | IS NOT? OF '(' type_list ')'
+        | NOT? BETWEEN ASYMMETRIC? b_expr AND a_expr
+        | NOT? BETWEEN SYMMETRIC b_expr AND a_expr
+        | NOT? IN in_expr
+        | subquery_op sub_type a_expr
+        // https://www.cockroachlabs.com/docs/stable/sql-grammar#a_expr
+        )*
+    ;
+
+subquery_op
+    : all_op
+    | qual_op
+    | NOT? (LIKE | ILIKE)
+    ;
+
+sub_type
+    : ANY
+    | SOME
+    | ALL
     ;
 
 b_expr
     : (c_expr | ('+' | '-' | '~' | qual_op) b_expr)
         ( TYPECAST cast_target
         | TYPEANNOTATE typename
-        //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#b_expr
-        ) +
+        | ( '+'
+          | '-'
+          | '*'
+          | '/'
+          | FLOORDIV
+          | '%'
+          | '^'
+          | '#'
+          | '&'
+          | '|'
+          | '<'
+          | '>'
+          | '='
+          | CONCAT
+          | LSHIFT
+          | RSHIFT
+          | LESS_EQUALS
+          | GREATER_EQUALS
+          | NOT_EQUALS
+          | qual_op
+          ) b_expr
+        | IS NOT? (DISTINCT FROM b_expr | OF '(' type_list ')')
+        // https://www.cockroachlabs.com/docs/stable/sql-grammar#b_expr
+        )*
     ;
 
 qual_op
@@ -4512,14 +4608,39 @@ all_op
     | '<'
     | '>'
     | '='
-    | '<='
-    | '>='
-    | '<>'
+    | LESS_EQUALS
+    | GREATER_EQUALS
+    | NOT_EQUALS
     | '?'
     | '&'
     | '|'
     | '#'
-    //TODO https://www.cockroachlabs.com/docs/stable/sql-grammar#all_op
+    | FLOORDIV
+    | CONTAINS
+//    | FIRST_CONTAINS
+    | CONTAINED_BY
+//    | FIRST_CONTAINED_BY
+    | LSHIFT
+    | RSHIFT
+    | CONCAT
+    | FETCHVAL
+    | FETCHTEXT
+    | FETCHVAL_PATH
+    | FETCHTEXT_PATH
+    | JSON_SOME_EXISTS
+    | JSON_ALL_EXISTS
+    | NOT_REGMATCH
+    | REGIMATCH
+    | NOT_REGIMATCH
+    | AND_AND
+    | AT_AT
+    | DISTANCE
+    | COS_DISTANCE
+    | NEG_INNER_PRODUCT
+    | '~'
+    | SQRT
+    | CBRT
+    // https://www.cockroachlabs.com/docs/stable/sql-grammar#all_op
     ;
 
 c_expr
