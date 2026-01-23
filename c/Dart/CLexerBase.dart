@@ -1,0 +1,71 @@
+import 'dart:io';
+import 'package:antlr4/antlr4.dart';
+
+abstract class CLexerBase extends Lexer {
+  CLexerBase(CharStream input) : super(runGccAndMakeStream(input));
+
+  static CharStream runGccAndMakeStream(CharStream input) {
+    var isWindows = Platform.isWindows;
+
+    // Get options from command line args
+    var args = Platform.executableArguments + Platform.script.pathSegments;
+
+    var vsc = args.any((a) => a.toLowerCase().contains("--vsc"));
+    var gcc = args.any((a) => a.toLowerCase().contains("--gcc"));
+    var clang = args.any((a) => a.toLowerCase().contains("--clang"));
+    var nopp = args.any((a) => a.toLowerCase().contains("--nopp"));
+
+    if (!(vsc || gcc || clang)) {
+      gcc = true;
+    }
+
+    // Get the source name from the CharStream
+    var sourceName = input.sourceName;
+    var inputText = input.getText(Interval(0, input.size - 1));
+
+    // If source name is empty or not a .c file, we need to write to a temp file
+    if (sourceName.isEmpty || !sourceName.endsWith(".c")) {
+      // Create a temp file for preprocessing
+      sourceName = "${Directory.systemTemp.path}/antlr4_temp_${DateTime.now().millisecondsSinceEpoch}.c";
+      File(sourceName).writeAsStringSync(inputText);
+    }
+
+    var outputName = "$sourceName.p";
+
+    if (nopp) {
+      try {
+        File(outputName).writeAsStringSync(inputText);
+      } catch (e) {
+        // Ignore
+      }
+      return InputStream.fromString(inputText);
+    }
+
+    if (gcc) {
+      var output = "";
+      try {
+        var gccCommand = isWindows ? "gcc.exe" : "gcc";
+        var result = Process.runSync(gccCommand, ["-std=c2x", "-E", "-C", sourceName]);
+        output = result.stdout as String;
+      } catch (e) {
+        // Failed to run gcc preprocessor
+      }
+      File(outputName).writeAsStringSync(output);
+      return InputStream.fromString(output);
+    }
+    if (clang) {
+      var output = "";
+      try {
+        var clangCommand = isWindows ? "clang.exe" : "clang";
+        var result = Process.runSync(clangCommand, ["-std=c2x", "-E", "-C", sourceName]);
+        output = result.stdout as String;
+      } catch (e) {
+        // Failed to run clang preprocessor
+      }
+      File(outputName).writeAsStringSync(output);
+      return InputStream.fromString(output);
+    }
+
+    throw Exception("No preprocessor specified.");
+  }
+}
