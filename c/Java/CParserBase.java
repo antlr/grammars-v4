@@ -4,14 +4,25 @@ import java.util.*;
 public abstract class CParserBase extends Parser {
     private SymbolTable _st;
     private boolean debug = false;
-    private boolean noSemantics = false;
+    private Set<String> noSemantics = new HashSet<>();
+
+    // List of all semantic function names
+    private static final String[] ALL_SEMANTIC_FUNCTIONS = {
+        "IsAlignmentSpecifier", "IsAtomicTypeSpecifier", "IsAttributeDeclaration",
+        "IsAttributeSpecifier", "IsAttributeSpecifierSequence", "IsDeclaration",
+        "IsDeclarationSpecifier", "IsTypeSpecifierQualifier", "IsEnumSpecifier",
+        "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
+        "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
+        "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
+        "IsNullStructDeclarationListExtension"
+    };
 
     protected CParserBase(TokenStream input) {
         super(input);
         // Get options from system property
         String cmdLine = System.getProperty("sun.java.command");
         String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
-        noSemantics = hasArg(args, "--no-symbol-table");
+        noSemantics = parseNoSemantics(args);
         debug = hasArg(args, "--debug");
         _st = new SymbolTable();
     }
@@ -25,8 +36,32 @@ public abstract class CParserBase extends Parser {
         return false;
     }
 
+    private static Set<String> parseNoSemantics(String[] args) {
+        Set<String> result = new HashSet<>();
+        for (String a : args) {
+            String lower = a.toLowerCase();
+            if (lower.startsWith("--no-semantics")) {
+                int eqIndex = a.indexOf('=');
+                if (eqIndex == -1) {
+                    // --no-semantics without value: disable all semantic functions
+                    for (String func : ALL_SEMANTIC_FUNCTIONS) {
+                        result.add(func);
+                    }
+                } else {
+                    // --no-semantics=Func1,Func2,...
+                    String value = a.substring(eqIndex + 1);
+                    String[] funcs = value.split(",");
+                    for (String func : funcs) {
+                        result.add(func.trim());
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     public boolean IsAlignmentSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsAlignmentSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAlignmentSpecifier " + lt1);
@@ -44,7 +79,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsAtomicTypeSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsAtomicTypeSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAtomicTypeSpecifier " + lt1);
@@ -62,12 +97,12 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsAttributeDeclaration() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsAttributeDeclaration")) return true;
         return IsAttributeSpecifierSequence();
     }
 
     public boolean IsAttributeSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsAttributeSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         if (this.debug) System.out.print("IsAttributeSpecifier " + lt1);
         boolean result = lt1.getType() == CLexer.LeftBracket;
@@ -76,12 +111,12 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsAttributeSpecifierSequence() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsAttributeSpecifierSequence")) return true;
         return IsAttributeSpecifier();
     }
 
     public boolean IsDeclaration() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsDeclaration")) return true;
         if (debug) System.out.println("IsDeclaration");
         boolean result = IsDeclarationSpecifiers()
                 || IsAttributeSpecifierSequence()
@@ -92,7 +127,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsDeclarationSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsDeclarationSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (debug) System.out.println("IsDeclarationSpecifier " + lt1);
@@ -106,7 +141,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsTypeSpecifierQualifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsTypeSpecifierQualifier")) return true;
         if (debug) System.out.println("IsDeclarationSpecifier");
         boolean result = IsTypeSpecifier()
                 || IsTypeQualifier()
@@ -120,7 +155,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsEnumSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsEnumSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         if (this.debug) System.out.print("IsEnumSpecifier " + lt1);
         boolean result = lt1.getType() == CLexer.Enum;
@@ -129,7 +164,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsFunctionSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsFunctionSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsFunctionSpecifier " + lt1);
@@ -147,7 +182,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsStatement() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsStatement")) return true;
         Token t1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         Token t2 = ((CommonTokenStream) this.getInputStream()).LT(2);
         if (this.debug) System.out.println("IsStatement1 " + t1);
@@ -162,7 +197,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsStaticAssertDeclaration() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsStaticAssertDeclaration")) return true;
         Token token = ((CommonTokenStream) this.getInputStream()).LT(1);
         if (this.debug) System.out.print("IsStaticAssertDeclaration " + token);
         boolean result = token.getType() == CLexer.Static_assert;
@@ -171,7 +206,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsStorageClassSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsStorageClassSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsStorageClassSpecifier " + lt1);
@@ -189,7 +224,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsStructOrUnionSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsStructOrUnionSpecifier")) return true;
         Token token = ((CommonTokenStream) this.getInputStream()).LT(1);
         if (this.debug) System.out.print("IsStructOrUnionSpecifier " + token);
         boolean result = token.getType() == CLexer.Struct ||
@@ -199,7 +234,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsTypedefName() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsTypedefName")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypedefName " + lt1);
@@ -219,7 +254,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsTypeofSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsTypeofSpecifier")) return true;
         Token token = ((CommonTokenStream) this.getInputStream()).LT(1);
         if (this.debug) System.out.print("IsTypeofSpecifier " + token);
         boolean result = token.getType() == CLexer.Typeof ||
@@ -229,7 +264,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsTypeQualifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsTypeQualifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeQualifier " + lt1);
@@ -247,7 +282,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsTypeSpecifier() {
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsTypeSpecifier")) return true;
         Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeSpecifier " + lt1);
@@ -395,13 +430,14 @@ public abstract class CParserBase extends Parser {
     // Define to return "true" because "gcc -c -std=c2x" accepts an empty
     // struct-declaration-list.
     public boolean IsNullStructDeclarationListExtension() {
+        if (noSemantics.contains("IsNullStructDeclarationListExtension")) return true;
         return true;
     }
 
     public boolean IsCast() {
         boolean result = false;
         // Look for a cast.
-        if (noSemantics) return true;
+        if (noSemantics.contains("IsCast")) return true;
         Token t1 = ((CommonTokenStream) this.getInputStream()).LT(1);
         Token t2 = ((CommonTokenStream) this.getInputStream()).LT(2);
         if (this.debug) System.out.println("IsCast1 " + t1);

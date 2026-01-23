@@ -6,21 +6,56 @@ import 'TypeClassification.dart';
 import 'CLexer.dart';
 import 'CParser.dart';
 
+// List of all semantic function names
+const List<String> ALL_SEMANTIC_FUNCTIONS = [
+  "IsAlignmentSpecifier", "IsAtomicTypeSpecifier", "IsAttributeDeclaration",
+  "IsAttributeSpecifier", "IsAttributeSpecifierSequence", "IsDeclaration",
+  "IsDeclarationSpecifier", "IsTypeSpecifierQualifier", "IsEnumSpecifier",
+  "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
+  "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
+  "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
+  "IsNullStructDeclarationListExtension"
+];
+
+Set<String> parseNoSemantics(List<String> args) {
+  var result = <String>{};
+  for (var a in args) {
+    var lower = a.toLowerCase();
+    if (lower.startsWith("--no-semantics")) {
+      var eqIndex = a.indexOf('=');
+      if (eqIndex == -1) {
+        // --no-semantics without value: disable all semantic functions
+        for (var func in ALL_SEMANTIC_FUNCTIONS) {
+          result.add(func);
+        }
+      } else {
+        // --no-semantics=Func1,Func2,...
+        var value = a.substring(eqIndex + 1);
+        var funcs = value.split(',');
+        for (var func in funcs) {
+          result.add(func.trim());
+        }
+      }
+    }
+  }
+  return result;
+}
+
 abstract class CParserBase extends Parser {
   late SymbolTable _st;
   bool _debug = false;
-  bool _noSemantics = false;
+  Set<String> _noSemantics = <String>{};
 
   CParserBase(TokenStream input) : super(input) {
     // Get options from command line args
     var args = Platform.executableArguments;
-    _noSemantics = args.any((a) => a.toLowerCase().contains("--no-symbol-table"));
+    _noSemantics = parseNoSemantics(args);
     _debug = args.any((a) => a.toLowerCase().contains("--debug"));
     _st = SymbolTable();
   }
 
   bool IsAlignmentSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsAlignmentSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAlignmentSpecifier $lt1");
@@ -38,7 +73,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsAtomicTypeSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsAtomicTypeSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAtomicTypeSpecifier $lt1");
@@ -56,12 +91,12 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsAttributeDeclaration() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsAttributeDeclaration")) return true;
     return IsAttributeSpecifierSequence();
   }
 
   bool IsAttributeSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsAttributeSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     if (_debug) stdout.write("IsAttributeSpecifier $lt1");
     var result = lt1?.type == CLexer.TOKEN_LeftBracket;
@@ -70,12 +105,12 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsAttributeSpecifierSequence() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsAttributeSpecifierSequence")) return true;
     return IsAttributeSpecifier();
   }
 
   bool IsDeclaration() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsDeclaration")) return true;
     if (_debug) print("IsDeclaration");
     var result = IsDeclarationSpecifiers() ||
         IsAttributeSpecifierSequence() ||
@@ -86,7 +121,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsDeclarationSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsDeclarationSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     if (_debug) print("IsDeclarationSpecifier $lt1");
     var result = IsStorageClassSpecifier() ||
@@ -99,7 +134,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypeSpecifierQualifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsTypeSpecifierQualifier")) return true;
     if (_debug) print("IsTypeSpecifierQualifier");
     var result = IsTypeSpecifier() || IsTypeQualifier() || IsAlignmentSpecifier();
     if (_debug) print("IsTypeSpecifierQualifier $result");
@@ -111,7 +146,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsEnumSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsEnumSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     if (_debug) stdout.write("IsEnumSpecifier $lt1");
     var result = lt1?.type == CLexer.TOKEN_Enum;
@@ -120,7 +155,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsFunctionSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsFunctionSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsFunctionSpecifier $lt1");
@@ -138,7 +173,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsStatement() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsStatement")) return true;
     var t1 = (inputStream as CommonTokenStream).LT(1);
     var t2 = (inputStream as CommonTokenStream).LT(2);
     if (_debug) print("IsStatement1 $t1");
@@ -153,7 +188,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsStaticAssertDeclaration() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsStaticAssertDeclaration")) return true;
     var token = (inputStream as CommonTokenStream).LT(1);
     if (_debug) stdout.write("IsStaticAssertDeclaration $token");
     var result = token?.type == CLexer.TOKEN_Static_assert;
@@ -162,7 +197,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsStorageClassSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsStorageClassSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsStorageClassSpecifier $lt1");
@@ -180,7 +215,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsStructOrUnionSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsStructOrUnionSpecifier")) return true;
     var token = (inputStream as CommonTokenStream).LT(1);
     if (_debug) stdout.write("IsStructOrUnionSpecifier $token");
     var result = token?.type == CLexer.TOKEN_Struct || token?.type == CLexer.TOKEN_Union;
@@ -189,7 +224,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypedefName() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsTypedefName")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypedefName $lt1");
@@ -209,7 +244,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypeofSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsTypeofSpecifier")) return true;
     var token = (inputStream as CommonTokenStream).LT(1);
     if (_debug) stdout.write("IsTypeofSpecifier $token");
     var result = token?.type == CLexer.TOKEN_Typeof || token?.type == CLexer.TOKEN_Typeof_unqual;
@@ -218,7 +253,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypeQualifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsTypeQualifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeQualifier $lt1");
@@ -236,7 +271,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypeSpecifier() {
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsTypeSpecifier")) return true;
     var lt1 = (inputStream as CommonTokenStream).LT(1);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeSpecifier $lt1");
@@ -365,13 +400,14 @@ abstract class CParserBase extends Parser {
   // Define to return "true" because "gcc -c -std=c2x" accepts an empty
   // struct-declaration-list.
   bool IsNullStructDeclarationListExtension() {
+    if (_noSemantics.contains("IsNullStructDeclarationListExtension")) return true;
     return true;
   }
 
   bool IsCast() {
     var result = false;
     // Look for a cast.
-    if (_noSemantics) return true;
+    if (_noSemantics.contains("IsCast")) return true;
     var t1 = (inputStream as CommonTokenStream).LT(1);
     var t2 = (inputStream as CommonTokenStream).LT(2);
     if (_debug) print("IsCast1 $t1");

@@ -9,22 +9,65 @@ public abstract class CParserBase : Parser
 {
     SymbolTable _st;
     private bool debug = false;
-    private bool no_semantics = false;
+    private HashSet<string> no_semantics = new HashSet<string>();
     public List<string> _args;
+
+    // List of all semantic function names
+    private static readonly string[] ALL_SEMANTIC_FUNCTIONS = {
+        "IsAlignmentSpecifier", "IsAtomicTypeSpecifier", "IsAttributeDeclaration",
+        "IsAttributeSpecifier", "IsAttributeSpecifierSequence", "IsDeclaration",
+        "IsDeclarationSpecifier", "IsTypeSpecifierQualifier", "IsEnumSpecifier",
+        "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
+        "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
+        "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
+        "IsNullStructDeclarationListExtension"
+    };
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
         : base(input, output, errorOutput)
     {
         // Get options from process args.
         var args = Environment.GetCommandLineArgs().ToList();
-        no_semantics = (args?.Where(a => a.IndexOf("--no-symbol-table", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false);
+        no_semantics = ParseNoSemantics(args);
         debug = args?.Where(a => a.IndexOf("--debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         _st = new SymbolTable();
     }
 
+    private static HashSet<string> ParseNoSemantics(List<string> args)
+    {
+        var result = new HashSet<string>();
+        if (args == null) return result;
+        foreach (var a in args)
+        {
+            if (a.StartsWith("--no-semantics", StringComparison.OrdinalIgnoreCase))
+            {
+                int eqIndex = a.IndexOf('=');
+                if (eqIndex == -1)
+                {
+                    // --no-semantics without value: disable all semantic functions
+                    foreach (var func in ALL_SEMANTIC_FUNCTIONS)
+                    {
+                        result.Add(func);
+                    }
+                }
+                else
+                {
+                    // --no-semantics=Func1,Func2,...
+                    var value = a.Substring(eqIndex + 1);
+                    var funcs = value.Split(',');
+                    foreach (var func in funcs)
+                    {
+                        result.Add(func.Trim());
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     public bool IsAlignmentSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsAlignmentSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAlignmentSpecifier " + lt1);
@@ -44,7 +87,7 @@ public abstract class CParserBase : Parser
 
     public bool IsAtomicTypeSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsAtomicTypeSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAtomicTypeSpecifier " + lt1);
@@ -64,13 +107,13 @@ public abstract class CParserBase : Parser
 
     public bool IsAttributeDeclaration()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsAttributeDeclaration")) return true;
         return IsAttributeSpecifierSequence();
     }
 
     public bool IsAttributeSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsAttributeSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write("IsAttributeSpecifier " + lt1);
         var result = lt1.Type == CLexer.LeftBracket;
@@ -80,13 +123,13 @@ public abstract class CParserBase : Parser
 
     public bool IsAttributeSpecifierSequence()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsAttributeSpecifierSequence")) return true;
         return IsAttributeSpecifier();
     }
 
     public bool IsDeclaration()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsDeclaration")) return true;
         if (debug) System.Console.WriteLine("IsDeclaration");
         var result = IsDeclarationSpecifiers()
                      || IsAttributeSpecifierSequence()
@@ -98,7 +141,7 @@ public abstract class CParserBase : Parser
 
     public bool IsDeclarationSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsDeclarationSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + lt1);
@@ -114,7 +157,7 @@ public abstract class CParserBase : Parser
 
     public bool IsTypeSpecifierQualifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsTypeSpecifierQualifier")) return true;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier");
         var result = 
             IsTypeSpecifier()
@@ -131,7 +174,7 @@ public abstract class CParserBase : Parser
 
     public bool IsEnumSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsEnumSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write("IsEnumSpecifier " + lt1);
         var result = lt1.Type == CLexer.Enum;
@@ -141,7 +184,7 @@ public abstract class CParserBase : Parser
 
     public bool IsFunctionSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsFunctionSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsFunctionSpecifier " + lt1);
@@ -167,7 +210,7 @@ public abstract class CParserBase : Parser
 
     public bool IsStatement()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsStatement")) return true;
         var t1 = (this.InputStream as CommonTokenStream).LT(1);
         var t2 = (this.InputStream as CommonTokenStream).LT(2);
         if (this.debug) System.Console.WriteLine("IsStatement1 " + t1);
@@ -184,7 +227,7 @@ public abstract class CParserBase : Parser
 
     public bool IsStaticAssertDeclaration()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsStaticAssertDeclaration")) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write("IsStaticAssertDeclaration " + token);
         var result = token.Type == CLexer.Static_assert;
@@ -194,7 +237,7 @@ public abstract class CParserBase : Parser
 
     public bool IsStorageClassSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsStorageClassSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsStorageClassSpecifier " + lt1);
@@ -214,7 +257,7 @@ public abstract class CParserBase : Parser
 
     public bool IsStructOrUnionSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsStructOrUnionSpecifier")) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write("IsStructOrUnionSpecifier " + token);
         var result = token.Type == CLexer.Struct ||
@@ -226,7 +269,7 @@ public abstract class CParserBase : Parser
 
     public bool IsTypedefName()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsTypedefName")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypedefName " + lt1);
@@ -255,7 +298,7 @@ public abstract class CParserBase : Parser
 
     public bool IsTypeofSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsTypeofSpecifier")) return true;
         var token = (this.InputStream as CommonTokenStream).LT(1);
         if (this.debug) System.Console.Write("IsTypeofSpecifier " + token);
         var result = token.Type == CLexer.Typeof ||
@@ -266,7 +309,7 @@ public abstract class CParserBase : Parser
 
     public bool IsTypeQualifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsTypeQualifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeQualifier " + lt1);
@@ -287,7 +330,7 @@ public abstract class CParserBase : Parser
 
     public bool IsTypeSpecifier()
     {
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsTypeSpecifier")) return true;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeSpecifier " + lt1);
@@ -420,6 +463,7 @@ public abstract class CParserBase : Parser
     // struct-declaration-list.
     public bool IsNullStructDeclarationListExtension()
     {
+        if (no_semantics.Contains("IsNullStructDeclarationListExtension")) return true;
         return true;
     }
 
@@ -427,7 +471,7 @@ public abstract class CParserBase : Parser
     {
         var result = false;
         // Look for a cast.
-        if (no_semantics) return true;
+        if (no_semantics.Contains("IsCast")) return true;
         var t1 = (this.InputStream as CommonTokenStream).LT(1);
         var t2 = (this.InputStream as CommonTokenStream).LT(2);
         if (this.debug) System.Console.WriteLine("IsCast1 " + t1);
