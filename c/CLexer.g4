@@ -231,10 +231,6 @@ Switch
     : 'switch'
     ;
 
-Thread_local
-    : 'thread_local'
-    ;
-
 True
     : 'true'
     ;
@@ -317,6 +313,7 @@ StaticAssert
 
 ThreadLocal
     : '_Thread_local'
+    | 'thread_local'
     ;
 
 LeftParen

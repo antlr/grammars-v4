@@ -204,6 +204,8 @@ constantExpression
     : conditionalExpression
     ;
 
+// A.3.2 Declarations
+// 6.7.1
 declaration
     : (
 	declarationSpecifiers initDeclaratorList? ';'
@@ -212,10 +214,12 @@ declaration
       ) {this.EnterDeclaration();}
     ;
 
+// 6.7.1
 declarationSpecifiers
     : ({ this.IsDeclarationSpecifier()}? declarationSpecifier )+
     ;
 
+// 6.7.1
 declarationSpecifier
     : storageClassSpecifier
     | typeSpecifier
@@ -224,25 +228,30 @@ declarationSpecifier
     | alignmentSpecifier
     ;
 
+// 6.7.1
 initDeclaratorList
     : initDeclarator (',' initDeclarator)*
     ;
 
+// 6.7.1
 initDeclarator
     : declarator ('=' initializer)?
     ;
 
+// 6.7.2
 attributeDeclaration
     : attributeSpecifierSequence ';'
     ;
 
+// 6.7.2
 storageClassSpecifier
-    : 'typedef'
+    : 'auto'
+    | 'constexpr'
     | 'extern'
-    | 'static'
-    | '_Thread_local'
-    | 'auto'
     | 'register'
+    | 'static'
+    | ThreadLocal
+    | 'typedef'
     ;
 
 typeSpecifier
