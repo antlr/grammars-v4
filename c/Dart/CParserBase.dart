@@ -44,6 +44,7 @@ Set<String> parseNoSemantics(List<String> args) {
 abstract class CParserBase extends Parser {
   late SymbolTable _st;
   bool _debug = false;
+  bool _outputSymbolTable = false;
   Set<String> _noSemantics = <String>{};
 
   CParserBase(TokenStream input) : super(input) {
@@ -51,6 +52,7 @@ abstract class CParserBase extends Parser {
     var args = Platform.executableArguments;
     _noSemantics = parseNoSemantics(args);
     _debug = args.any((a) => a.toLowerCase().contains("--debug"));
+    _outputSymbolTable = args.any((a) => a.toLowerCase().contains("--output-symbol-table"));
     _st = SymbolTable();
   }
 
@@ -402,6 +404,12 @@ abstract class CParserBase extends Parser {
   bool IsNullStructDeclarationListExtension() {
     if (_noSemantics.contains("IsNullStructDeclarationListExtension")) return true;
     return true;
+  }
+
+  void OutputSymbolTable() {
+    if (_outputSymbolTable) {
+      stderr.writeln(_st.toString());
+    }
   }
 
   bool IsCast() {

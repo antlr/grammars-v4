@@ -4,6 +4,7 @@ import java.util.*;
 public abstract class CParserBase extends Parser {
     private SymbolTable _st;
     private boolean debug = false;
+    private boolean outputSymbolTable = false;
     private Set<String> noSemantics = new HashSet<>();
 
     // List of all semantic function names
@@ -24,6 +25,7 @@ public abstract class CParserBase extends Parser {
         String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
         noSemantics = parseNoSemantics(args);
         debug = hasArg(args, "--debug");
+        outputSymbolTable = hasArg(args, "--output-symbol-table");
         _st = new SymbolTable();
     }
 
@@ -432,6 +434,12 @@ public abstract class CParserBase extends Parser {
     public boolean IsNullStructDeclarationListExtension() {
         if (noSemantics.contains("IsNullStructDeclarationListExtension")) return true;
         return true;
+    }
+
+    public void OutputSymbolTable() {
+        if (outputSymbolTable) {
+            System.err.println(_st.toString());
+        }
     }
 
     public boolean IsCast() {

@@ -41,7 +41,7 @@ options {
 // Insert here @header for parser.
 
 compilationUnit
-    : translationUnit? EOF
+    : translationUnit? {this.OutputSymbolTable();} EOF
     ;
 
 // A.1.5

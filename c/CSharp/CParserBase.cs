@@ -9,6 +9,7 @@ public abstract class CParserBase : Parser
 {
     SymbolTable _st;
     private bool debug = false;
+    private bool output_symbol_table = false;
     private HashSet<string> no_semantics = new HashSet<string>();
     public List<string> _args;
 
@@ -30,6 +31,7 @@ public abstract class CParserBase : Parser
         var args = Environment.GetCommandLineArgs().ToList();
         no_semantics = ParseNoSemantics(args);
         debug = args?.Where(a => a.IndexOf("--debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        output_symbol_table = args?.Where(a => a.IndexOf("--output-symbol-table", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         _st = new SymbolTable();
     }
 
@@ -465,6 +467,14 @@ public abstract class CParserBase : Parser
     {
         if (no_semantics.Contains("IsNullStructDeclarationListExtension")) return true;
         return true;
+    }
+
+    public void OutputSymbolTable()
+    {
+        if (output_symbol_table)
+        {
+            System.Console.Error.WriteLine(_st.ToString());
+        }
     }
 
     public bool IsCast()
