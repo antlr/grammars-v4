@@ -494,6 +494,20 @@ public abstract class CParserBase : Parser
         _st.PopBlockScope();
     }
 
+    public void LookupSymbol()
+    {
+        // Get the token that was just parsed (the Identifier)
+        var token = (this.InputStream as CommonTokenStream).LT(-1);
+        if (token == null) return;
+        var text = token.Text;
+        var resolved = _st.Resolve(text);
+        if (output_applied_occurrences && resolved != null)
+        {
+            var appliedLoc = GetSourceLocation(token);
+            System.Console.Error.WriteLine($"Applied occurrence: {text} at {appliedLoc.File}:{appliedLoc.Line}:{appliedLoc.Column} -> Defined at {resolved.DefinedFile}:{resolved.DefinedLine}:{resolved.DefinedColumn}");
+        }
+    }
+
     public void OutputSymbolTable()
     {
         if (output_symbol_table)

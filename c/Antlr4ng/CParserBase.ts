@@ -474,6 +474,18 @@ export abstract class CParserBase extends Parser {
         this._st.popBlockScope();
     }
 
+    public LookupSymbol(): void {
+        // Get the token that was just parsed (the Identifier)
+        const token = (this.inputStream as CommonTokenStream).LT(-1);
+        if (token === null) return;
+        const text = token.text!;
+        const resolved = this._st.resolve(text);
+        if (this.outputAppliedOccurrences && resolved !== null) {
+            const appliedLoc = this.getSourceLocation(token);
+            process.stderr.write(`Applied occurrence: ${text} at ${appliedLoc.file}:${appliedLoc.line}:${appliedLoc.column} -> Defined at ${resolved.definedFile}:${resolved.definedLine}:${resolved.definedColumn}\n`);
+        }
+    }
+
     public OutputSymbolTable(): void {
         if (this.outputSymbolTable) {
             process.stderr.write(this._st.toString() + "\n");

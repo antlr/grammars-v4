@@ -64,7 +64,7 @@ predefinedConstant
 // A.2.1 Expressions
 // 6.5.1
 primaryExpression
-    : Identifier
+    : Identifier {this.LookupSymbol();}
     | constant
     | StringLiteral+
     | '(' expression ')'

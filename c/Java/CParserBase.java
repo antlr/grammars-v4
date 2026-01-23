@@ -470,6 +470,19 @@ public abstract class CParserBase extends Parser {
         _st.popBlockScope();
     }
 
+    public void LookupSymbol() {
+        // Get the token that was just parsed (the Identifier)
+        Token token = ((CommonTokenStream) this.getInputStream()).LT(-1);
+        if (token == null) return;
+        String text = token.getText();
+        Symbol resolved = _st.resolve(text);
+        if (outputAppliedOccurrences && resolved != null) {
+            SourceLocation appliedLoc = getSourceLocation(token);
+            System.err.println("Applied occurrence: " + text + " at " + appliedLoc.file + ":" + appliedLoc.line + ":" + appliedLoc.column +
+                " -> Defined at " + resolved.getDefinedFile() + ":" + resolved.getDefinedLine() + ":" + resolved.getDefinedColumn());
+        }
+    }
+
     public void OutputSymbolTable() {
         if (outputSymbolTable) {
             System.err.println(_st.toString());
