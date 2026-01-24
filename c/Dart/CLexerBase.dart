@@ -19,6 +19,9 @@ abstract class CLexerBase extends Lexer {
       gcc = true;
     }
 
+    // Extract preprocessor options (-D and -I)
+    var ppOptions = extractPreprocessorOptions(args);
+
     // Get the source name from the CharStream
     var sourceName = input.sourceName;
     var inputText = input.getText(Interval(0, input.size - 1));
@@ -45,7 +48,10 @@ abstract class CLexerBase extends Lexer {
       var output = "";
       try {
         var gccCommand = isWindows ? "gcc.exe" : "gcc";
-        var result = Process.runSync(gccCommand, ["-std=c2x", "-E", "-C", sourceName]);
+        var gccArgs = ["-std=c2x", "-E", "-C"];
+        gccArgs.addAll(ppOptions);
+        gccArgs.add(sourceName);
+        var result = Process.runSync(gccCommand, gccArgs);
         output = result.stdout as String;
       } catch (e) {
         // Failed to run gcc preprocessor
@@ -57,7 +63,10 @@ abstract class CLexerBase extends Lexer {
       var output = "";
       try {
         var clangCommand = isWindows ? "clang.exe" : "clang";
-        var result = Process.runSync(clangCommand, ["-std=c2x", "-E", "-C", sourceName]);
+        var clangArgs = ["-std=c2x", "-E", "-C"];
+        clangArgs.addAll(ppOptions);
+        clangArgs.add(sourceName);
+        var result = Process.runSync(clangCommand, clangArgs);
         output = result.stdout as String;
       } catch (e) {
         // Failed to run clang preprocessor
@@ -67,5 +76,19 @@ abstract class CLexerBase extends Lexer {
     }
 
     throw Exception("No preprocessor specified.");
+  }
+
+  static List<String> extractPreprocessorOptions(List<String> args) {
+    var options = <String>[];
+    for (var arg in args) {
+      // Match --D and --I options
+      if (arg.startsWith("--D")) {
+        options.add("-D${arg.substring(3)}");
+      }
+      else if (arg.startsWith("--I")) {
+        options.add("-I${arg.substring(3)}");
+      }
+    }
+    return options;
   }
 }

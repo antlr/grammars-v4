@@ -24,6 +24,9 @@ export default abstract class CLexerBase extends Lexer {
             gcc = true;
         }
 
+        // Extract preprocessor options (-D and -I)
+        const ppOptions = CLexerBase.extractPreprocessorOptions(args);
+
         // Get the source name from the CharStream
         let sourceName = "<unknown>"; // (API does not exist) input.getSourceName();
         const inputText = input.getText(0, input.size - 1);
@@ -50,7 +53,8 @@ export default abstract class CLexerBase extends Lexer {
             let output = "";
             try {
                 const gccCommand = isWindows ? "gcc.exe" : "gcc";
-                output = execSync(`${gccCommand} -std=c2x -E -C "${sourceName}"`, {
+                const ppOptsStr = ppOptions.map(o => `"${o}"`).join(" ");
+                output = execSync(`${gccCommand} -std=c2x -E -C ${ppOptsStr} "${sourceName}"`, {
                     encoding: "utf-8",
                     maxBuffer: 50 * 1024 * 1024,
                     stdio: ["ignore", "pipe", "pipe"],
@@ -65,7 +69,8 @@ export default abstract class CLexerBase extends Lexer {
             let output = "";
             try {
                 const clangCommand = isWindows ? "clang.exe" : "clang";
-                output = execSync(`${clangCommand} -std=c2x -E -C "${sourceName}"`, {
+                const ppOptsStr = ppOptions.map(o => `"${o}"`).join(" ");
+                output = execSync(`${clangCommand} -std=c2x -E -C ${ppOptsStr} "${sourceName}"`, {
                     encoding: "utf-8",
                     maxBuffer: 50 * 1024 * 1024,
                     stdio: ["ignore", "pipe", "pipe"],
@@ -78,5 +83,19 @@ export default abstract class CLexerBase extends Lexer {
         }
 
         throw new Error("No preprocessor specified.");
+    }
+
+    private static extractPreprocessorOptions(args: string[]): string[] {
+        const options: string[] = [];
+        for (const arg of args) {
+            // Match --D and --I options
+            if (arg.startsWith("--D")) {
+                options.push("-D" + arg.substring(3));
+            }
+            else if (arg.startsWith("--I")) {
+                options.push("-I" + arg.substring(3));
+            }
+        }
+        return options;
     }
 }

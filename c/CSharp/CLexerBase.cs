@@ -38,6 +38,9 @@ public abstract class CLexerBase : Lexer
         if (!(vsc || gcc || clang))
 	    gcc = true;
 
+        // Extract preprocessor options (-D and -I)
+        var ppOptions = ExtractPreprocessorOptions(args);
+
         // Replace input with preprocessed input.
         var source_name = (i.SourceName.EndsWith(".c")) ? i.SourceName : "stdin.c";
         var output_name = source_name + ".p";
@@ -54,18 +57,20 @@ public abstract class CLexerBase : Lexer
             var psi = new ProcessStartInfo
             {
                 FileName = (is_windows ? "gcc.exe":"gcc"),
-                ArgumentList =
-                {
-                    "-std=c2x",
-                    "-E",
-                    "-C",
-                    source_name,
-                },
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
             };
+            psi.ArgumentList.Add("-std=c2x");
+            psi.ArgumentList.Add("-E");
+            psi.ArgumentList.Add("-C");
+            // Add preprocessor options (-D and -I)
+            foreach (var opt in ppOptions)
+            {
+                psi.ArgumentList.Add(opt);
+	    }
+	    psi.ArgumentList.Add(source_name);
             string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
             using (var process = new Process { StartInfo = psi })
             {
@@ -89,16 +94,23 @@ public abstract class CLexerBase : Lexer
                 var psi = new ProcessStartInfo
                 {
                     FileName = clPath,
-                    ArgumentList =
-                {
-                    "/E",
-                    source_name,
-                },
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false
                 };
+                psi.ArgumentList.Add("/E");
+                // Add preprocessor options (-D and -I, converted to /D and /I for cl.exe)
+                foreach (var opt in ppOptions)
+                {
+                    if (opt.StartsWith("-D"))
+                        psi.ArgumentList.Add("/D" + opt.Substring(2));
+                    else if (opt.StartsWith("-I"))
+                        psi.ArgumentList.Add("/I" + opt.Substring(2));
+                    else
+                        psi.ArgumentList.Add(opt);
+                }
+                psi.ArgumentList.Add(source_name);
                 string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
                 using (var process = new Process { StartInfo = psi })
                 {
@@ -126,19 +138,21 @@ public abstract class CLexerBase : Lexer
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "clang.exe",
-                ArgumentList =
-                {
-                    "-std=c2x",
-                    "-E",
-                    "-C",
-                    source_name,
-                },
+                FileName = (is_windows ? "clang.exe" : "clang"),
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
             };
+            psi.ArgumentList.Add("-std=c2x");
+            psi.ArgumentList.Add("-E");
+            psi.ArgumentList.Add("-C");
+            // Add preprocessor options (-D and -I)
+            foreach (var opt in ppOptions)
+            {
+                psi.ArgumentList.Add(opt);
+            }
+            psi.ArgumentList.Add(source_name);
             string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
             using (var process = new Process { StartInfo = psi })
             {
@@ -156,5 +170,21 @@ public abstract class CLexerBase : Lexer
             }
         }
         throw new Exception("No preprocessor specified.");
+    }
+
+    private static List<string> ExtractPreprocessorOptions(List<string> args)
+    {
+        var options = new List<string>();
+        if (args == null) return options;
+
+        foreach (var arg in args)
+        {
+            // Match --D and --I options (with or without space before value)
+            if (arg.StartsWith("--D"))
+                options.Add("-D" + arg.Substring(3));
+            else if (arg.StartsWith("--I"))
+                options.Add("-I" + arg.Substring(3));
+        }
+        return options;
     }
 }

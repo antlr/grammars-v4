@@ -25,6 +25,9 @@ public abstract class CLexerBase extends Lexer {
             gcc = true;
         }
 
+        // Extract preprocessor options (-D and -I)
+        List<String> ppOptions = extractPreprocessorOptions(args);
+
         // Replace input with preprocessed input.
         String sourceName = input.getSourceName();
         if (sourceName == null || !sourceName.endsWith(".c")) {
@@ -51,13 +54,15 @@ public abstract class CLexerBase extends Lexer {
         if (gcc) {
             try {
                 String gccCommand = isWindows ? "gcc.exe" : "gcc";
-                ProcessBuilder pb = new ProcessBuilder(
-                    gccCommand,
-                    "-std=c2x",
-                    "-E",
-                    "-C",
-                    sourceName
-                );
+                List<String> command = new ArrayList<>();
+                command.add(gccCommand);
+                command.add("-std=c2x");
+                command.add("-E");
+                command.add("-C");
+                // Add preprocessor options (-D and -I)
+                command.addAll(ppOptions);
+                command.add(sourceName);
+                ProcessBuilder pb = new ProcessBuilder(command);
                 pb.redirectErrorStream(false);
                 Process process = pb.start();
 
@@ -78,13 +83,15 @@ public abstract class CLexerBase extends Lexer {
         if (clang) {
             try {
                 String clangCommand = isWindows ? "clang.exe" : "clang";
-                ProcessBuilder pb = new ProcessBuilder(
-                    clangCommand,
-                    "-std=c2x",
-                    "-E",
-                    "-C",
-                    sourceName
-                );
+                List<String> command = new ArrayList<>();
+                command.add(clangCommand);
+                command.add("-std=c2x");
+                command.add("-E");
+                command.add("-C");
+                // Add preprocessor options (-D and -I)
+                command.addAll(ppOptions);
+                command.add(sourceName);
+                ProcessBuilder pb = new ProcessBuilder(command);
                 pb.redirectErrorStream(false);
                 Process process = pb.start();
 
@@ -124,5 +131,21 @@ public abstract class CLexerBase extends Lexer {
             }
         }
         return false;
+    }
+
+    private static List<String> extractPreprocessorOptions(String[] args) {
+        List<String> options = new ArrayList<>();
+        if (args == null) return options;
+
+        for (String arg : args) {
+            // Match --D and --I options
+            if (arg.startsWith("--D")) {
+                options.add("-D" + arg.substring(3));
+            }
+            else if (arg.startsWith("--I")) {
+                options.add("-I" + arg.substring(3));
+            }
+        }
+        return options;
     }
 }
