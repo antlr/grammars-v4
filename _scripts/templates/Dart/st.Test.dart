@@ -9,6 +9,45 @@ import 'dart:io';
 import 'dart:convert';
 import 'BinaryCharStream.dart';
 
+// Wrapper to fix InputStream.sourceName always returning '\<unknown>'
+class NamedCharStream extends CharStream {
+  final CharStream _inner;
+  final String _name;
+
+  NamedCharStream(this._inner, this._name);
+
+  @override
+  String get sourceName => _name;
+
+  @override
+  int get index => _inner.index;
+
+  @override
+  int get size => _inner.size;
+
+  @override
+  void consume() => _inner.consume();
+
+  @override
+  int? LA(int offset) => _inner.LA(offset);
+
+  @override
+  int mark() => _inner.mark();
+
+  @override
+  void release(int marker) => _inner.release(marker);
+
+  @override
+  void seek(int _index) => _inner.seek(_index);
+
+  @override
+  String getText(Interval interval) => _inner.getText(interval);
+
+  @override
+  String toString() => _inner.toString();
+}
+
+
 var tee = false;
 var show_tree = false;
 var show_tokens = false;
@@ -126,11 +165,13 @@ Future\<void> ParseFilename(String input, int row_number) async
 {
     if (file_encoding == "") {
         var str = await InputStream.fromPath(input);
-        await DoParse(str, input, row_number);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
     } else {
         var enc = Encoding.getByName(file_encoding);
         var str = await InputStream.fromPath(input, encoding: enc!);
-        await DoParse(str, input, row_number);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
     }
 }
 

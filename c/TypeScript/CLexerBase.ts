@@ -28,7 +28,7 @@ export default abstract class CLexerBase extends Lexer {
         const ppOptions = CLexerBase.extractPreprocessorOptions(args);
 
         // Get the source name from the CharStream
-        let sourceName = "<unknown>"; // (API does not exist) input.getSourceName();
+        let sourceName = (input as any).name;  // (API does not exist) input.getSourceName(); HACK!!!
         const inputText = input.getText(0, input.size - 1);
 
         // If source name is empty or not a .c file, we need to write to a temp file
