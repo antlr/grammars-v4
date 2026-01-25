@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:antlr4/antlr4.dart';
+import 'Args.dart' as args_holder;
 
 abstract class CLexerBase extends Lexer {
   CLexerBase(CharStream input) : super(runGccAndMakeStream(input));
@@ -8,7 +9,7 @@ abstract class CLexerBase extends Lexer {
     var isWindows = Platform.isWindows;
 
     // Get options from command line args
-    var args = Platform.executableArguments + Platform.script.pathSegments;
+    var args = args_holder.commandLineArgs;
 
     var vsc = args.any((a) => a.toLowerCase().contains("--vsc"));
     var gcc = args.any((a) => a.toLowerCase().contains("--gcc"));
