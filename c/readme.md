@@ -25,6 +25,8 @@ These options control which C preprocessor is used before parsing:
 | `--clang` | Use the Clang preprocessor (`clang -E`). |
 | `--vsc` | Use the Visual Studio C preprocessor (`cl.exe /E`). Windows only. |
 | `--nopp` | Skip preprocessing entirely. Use this if the input is already preprocessed. |
+| `--D<macro>[=<value>]` | Define a preprocessor macro. Passed to the preprocessor as `-D<macro>[=<value>]`. Can be specified multiple times. Example: `--DDEBUG=1` |
+| `--I<path>` | Add a directory to the include search path. Passed to the preprocessor as `-I<path>`. Can be specified multiple times. Example: `--I/usr/local/include` |
 
 ### Parser Options (CParserBase)
 
