@@ -3,6 +3,7 @@
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';
 } >
+import 'Args.dart' as args_holder;
 import 'MyErrorListener.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -22,6 +23,8 @@ var prefix = "";
 var quiet = false;
 
 void main(List\<String> args) async {
+    // Set command-line args before anything else.
+    args_holder.commandLineArgs = args;
     for (int i = 0; i \< args.length; ++i)
     {
         if (args[i] == "-tokens")
