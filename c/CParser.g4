@@ -321,10 +321,10 @@ typeSpecifierQualifier
     ;
 
 memberDeclaratorList
-    : structDeclarator (',' gnuAttributes? structDeclarator)*
+    : memberDeclarator (',' gnuAttributes? memberDeclarator)*
     ;
 
-structDeclarator
+memberDeclarator
     : declarator gnuAttributes?
     | declarator? ':' constantExpression gnuAttributes?
     ;
