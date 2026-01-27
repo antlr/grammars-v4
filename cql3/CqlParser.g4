@@ -288,11 +288,12 @@ alterTypeAlterType
     ;
 
 alterTable
-    : kwAlter kwTable (keyspace DOT)? table alterTableOperation
+    : kwAlter kwTable ifExist? (keyspace DOT)? table alterTableOperation
     ;
 
 alterTableOperation
     : alterTableAdd
+    | alterTableAlter
     | alterTableDropColumns
     | alterTableDropCompactStorage
     | alterTableRename
@@ -304,7 +305,7 @@ alterTableWith
     ;
 
 alterTableRename
-    : kwRename column kwTo column
+    : kwRename ifExist? column kwTo column (K_AND column kwTo column)*
     ;
 
 alterTableDropCompactStorage
@@ -312,7 +313,7 @@ alterTableDropCompactStorage
     ;
 
 alterTableDropColumns
-    : kwDrop alterTableDropColumnList
+    : kwDrop ifExist? alterTableDropColumnList
     ;
 
 alterTableDropColumnList
@@ -320,11 +321,19 @@ alterTableDropColumnList
     ;
 
 alterTableAdd
-    : kwAdd alterTableColumnDefinition
+    : kwAdd ifNotExist? alterTableColumnDefinition
     ;
 
 alterTableColumnDefinition
-    : column dataType (syntaxComma column dataType)*
+    : alterColumnDefinition (syntaxComma alterColumnDefinition)*
+    ;
+
+alterTableAlter
+    : kwAlter ifExist? column (column_mask | K_DROP K_MASKED)
+    ;
+
+alterColumnDefinition
+    : column dataType column_mask?
     ;
 
 alterRole
@@ -441,7 +450,15 @@ columnDefinitionList
 
 //
 columnDefinition
-    : column dataType primaryKeyColumn?
+    : column dataType K_STATIC? column_mask? primaryKeyColumn?
+    ;
+
+column_mask
+    : K_MASKED K_WITH (K_DEFAULT | function_name '(' functionArgs? ')' )
+    ;
+
+function_name
+    : (keyspace '.')? function_
     ;
 
 //
@@ -854,6 +871,7 @@ dataTypeName
     | K_VARINT
     | K_TIMESTAMP
     | K_UUID
+    | K_VECTOR
     ;
 
 dataTypeDefinition
