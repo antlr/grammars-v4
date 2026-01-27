@@ -520,8 +520,8 @@ initializerList
 // 6.7.10
 designation
     : designatorList '='
-    | arrayDesignator //GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6545-L6546
-    | Identifier ':' //GNU
+    | gnuArrayDesignator //GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6545-L6546
+    | gnuIdentifier ':' //GNU
     ;
 
 // 6.7.10
@@ -531,12 +531,12 @@ designatorList
 
 // 6.7.10
 designator
-    : arrayDesignator //GNU
+    : gnuArrayDesignator //GNU
     | '.' Identifier
     ;
 
 // GNU https://github.com/gcc-mirror/gcc/blob/77ab3b07385f23b39a2445011068c04e0872b481/gcc/c/c-parser.cc#L6548-L6549
-arrayDesignator
+gnuArrayDesignator
     : '[' constantExpression ('...' constantExpression)? ']'
     ;
 
@@ -671,6 +671,10 @@ functionDefinition
     : attributeSpecifierSequence? declarationSpecifiers? declarator declarationList? functionBody
     ;
 
+declarationList
+    : declaration+
+    ;
+
 // 6.9.1
 functionBody
     : compoundStatement
@@ -725,9 +729,5 @@ asmClobbers
 asmArgument
     : asmStringLiteral
     | asmStringLiteral ':' asmOperands? ( ':' asmOperands? (':' asmClobbers? )* )?
-    ;
-
-declarationList
-    : declaration+
     ;
 
