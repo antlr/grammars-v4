@@ -301,5 +301,7 @@ The following table maps the EBNF nonterminal names from the ISO C specification
 |  | vcSpecificModifer |  |
 
 ## Reference
-* ISO Specification: https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
-* JTC1/SC22/WG14 - C: https://www.open-std.org/jtc1/sc22/wg14/
+* ISO Specification: https://www.iso.org/standard/82075.html
+* ISO/ IEC C - Project status and milestones: https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
+* ISO/ IEC JTC1/SC22/WG14 - C, Official home of the working group: https://www.open-std.org/jtc1/sc22/wg14/
+* Wikipedia page for C: https://en.wikipedia.org/wiki/C_(programming_language)
