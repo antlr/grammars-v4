@@ -1,5 +1,5 @@
-PDF_EBNF_Nonterminal	ANTLR4_Rule
---------------------	-----------
+PDF_EBNF_Nonterminal	ANTLR4_Rule	ISO C Rule
+--------------------	-----------	----------
 	compilationUnit	
 token		6.4.1
 preprocessing-token		6.4.1
