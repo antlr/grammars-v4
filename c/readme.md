@@ -1,15 +1,46 @@
 # C Language Grammar
 
-This grammar is a refactoring of the EBNF in the ISO/IEC 0900:2024 Specification for the
-C language, which contains ambiguity. This grammar tries to correct the ambiguity
-with the addition of a symbol table. Since many symbols are declared in include files,
-the grammar includes code to call the native C preprocessor to produce a post-processed
-file containing all definitions. The grammar implements options to control preprocessor
-and semantic predicate functionality, which can be used to explore the ambiguity.
+## Introduction
+
+This is an ANTLR4 grammar for the C programming language, based on the ISO/IEC 9899:2024 specification (C23). The grammar is organized into two files: `CLexer.g4` for lexical analysis and `CParser.g4` for parsing. Parser rules are ordered to correspond with the sections in the ISO C specification.
+
+### Preprocessor Integration
+
+Unlike many C grammars that assume pre-processed input, this grammar integrates directly with native C preprocessors (GCC, Clang, or Visual Studio). This integration is essential because C programs typically rely on header files (`#include`) that define types, macros, and declarations. Without preprocessing, the parser would lack the type information necessary to correctly parse the source code.
+
+The lexer base class (`CLexerBase`) automatically invokes the selected preprocessor before tokenization begins. By default, the grammar uses `gcc -E` for preprocessing, but this can be configured via command-line options (see Options below). The `--nopp` option allows parsing of already-preprocessed files.
+
+### Symbol Table for Disambiguation
+
+The C language grammar contains inherent ambiguities that cannot be resolved through syntax alone. The most significant is the "typedef problem": when the parser encounters an identifier, it cannot determine from context alone whether it represents a type name (from a `typedef`) or a variable/function name. For example:
+
+```c
+foo * bar;
+```
+
+This could be parsed as either:
+- A declaration of `bar` as a pointer to type `foo` (if `foo` is a typedef)
+- A multiplication expression of `foo` times `bar` (if `foo` is a variable)
+
+To resolve such ambiguities, this grammar implements a symbol table that tracks type definitions as they are parsed. Semantic predicates in the parser (such as `IsTypedefName`, `IsTypeSpecifier`, and `IsCast`) query the symbol table to make context-sensitive parsing decisions. The symbol table maintains proper scoping, pushing and popping block scopes as compound statements are entered and exited.
+
+### Multi-Target Support
+
+The grammar includes target-specific implementations for multiple languages: Java, TypeScript, C#, Dart, and Antlr4ng. Each target provides its own implementation of `CLexerBase` and `CParserBase` with the preprocessor integration and symbol table logic.
+
+### GNU/GCC Extensions
+
+In addition to standard C23, this grammar supports common GNU/GCC extensions including:
+- GNU-style attributes (`__attribute__`)
+- Inline assembly (`asm`, `__asm__`)
+- Additional type specifiers (`__int128`, `_Float128`, etc.)
+- Statement expressions (`({ ... })`)
+- Label addresses (`&&label`)
+- Various built-in functions (`__builtin_va_arg`, `__builtin_offsetof`, etc.)
+
+Visual C extensions such as calling conventions (`__cdecl`, `__stdcall`, etc.) and `__declspec` are also supported.
 
 ## Ambiguities
-
-
 
 ## Options
 
