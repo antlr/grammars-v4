@@ -205,7 +205,7 @@ dec-direction		6.10.8
 n-char-sequence		7.24.2.6
 n-wchar-sequence		7.31.4.2.2
 d-char-sequence		7.24.2.7
-d-wchar-sequence	7.31.4.2.3
+d-wchar-sequence		7.31.4.2.3
 	gnuArrayDesignator	
 	asmArgument	
 	asmClobbers	
