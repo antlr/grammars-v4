@@ -31,3 +31,6 @@ antlr4-*-complete.jar
 
 node_modules
 package-lock.json
+
+# Ignore C parser preprocessed output files in examples
+c/examples/**/*.p

@@ -94,6 +94,8 @@ func main() {
             quiet = true
         } else if os.Args[i] == "-trace" {
             show_trace = true
+        } else if os.Args[i][0] == '-' {
+            // Ignore unknown option.
         } else {
             inputs = append(inputs, os.Args[i])
             is_fns = append(is_fns, true)

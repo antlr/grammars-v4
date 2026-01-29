@@ -28,13 +28,13 @@ fn parse_input(
     idx: i32,
     flags: &Flags,
 ) -> usize {
-	let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
-		if flags.tee {
-			Box::new(File::create(format!("{}.errors", input_name)).unwrap()) as Box\<dyn Write>
-		} else {
-			Box::new(io::sink()) as Box\<dyn Write>
-		}
-	));
+        let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
+                if flags.tee {
+                        Box::new(File::create(format!("{}.errors", input_name)).unwrap()) as Box\<dyn Write>
+                } else {
+                        Box::new(io::sink()) as Box\<dyn Write>
+                }
+        ));
 
     let my_string_result = fs::read_to_string(input_name);
     let input = my_string_result.unwrap(); // Panics if Err
@@ -44,25 +44,25 @@ fn parse_input(
     let lec = Rc::new(RefCell::new(0));
     let lel = Box::new(ParserErrorListener {
         quiet: flags.quiet,
-		tee: flags.tee,
+                tee: flags.tee,
         error_count: Rc::clone(&lec),
-		output: Rc::clone(&writer),
-	});
+                output: Rc::clone(&writer),
+        });
     lexer.add_error_listener(lel);
 
     if flags.show_tokens {
-	let mut i: isize = 0;
-	loop {
-		let token = lexer.next_token();
-		let token_type = token.get_token_type();
-		token.set_token_index(i);
-		i = i + 1;
-		eprintln!("{}", token.to_string());
-		if token_type == -1 {
-			break;
-		}
-	}
-	// no lexer.reset();
+        let mut i: isize = 0;
+        loop {
+                let token = lexer.next_token();
+                let token_type = token.get_token_type();
+                token.set_token_index(i);
+                i = i + 1;
+                eprintln!("{}", token.to_string());
+                if token_type == -1 {
+                        break;
+                }
+        }
+        // no lexer.reset();
     }
 
     let token_stream = CommonTokenStream::new(lexer);
@@ -71,10 +71,10 @@ fn parse_input(
     let pec = Rc::new(RefCell::new(0));
     let pel = Box::new(ParserErrorListener {
         quiet: flags.quiet,
-		tee: flags.tee,
+        tee: flags.tee,
         error_count: Rc::clone(&pec),
-		output: Rc::clone(&writer),
-	});
+        output: Rc::clone(&writer),
+        });
     parser.add_error_listener(pel);
 
     let start = Instant::now();
@@ -84,12 +84,12 @@ fn parse_input(
     let error_cnt = *lec.borrow() + *pec.borrow();
 
     if flags.show_tree {
-	let tree_str = tree.to_string_tree(&*parser);
+        let tree_str = tree.to_string_tree(&*parser);
         if flags.tee {
             let mut f = File::create(format!("{}.tree", input_name)).unwrap();
             write!(f, "{}", tree_str).ok();
         } else {
-	    eprintln!("{}", tree_str);
+            eprintln!("{}", tree_str);
         }
     }
 
@@ -154,8 +154,10 @@ fn main() {
                 }
             }
             other => {
-                flags.inputs.push(other.to_string());
-                flags.is_fns.push(true);
+                if other.to_string().as_bytes()[0] != b'-' {
+                    flags.inputs.push(other.to_string());
+                    flags.is_fns.push(true);
+                }
             }
         }
         i += 1;
@@ -167,15 +169,15 @@ fn main() {
         let mut exit_code = 0;
         let start_all = Instant::now();
         for (idx, input) in flags.inputs.iter().enumerate() {
-	    let rc = parse_input(input, idx as i32, &flags);
-	    if rc > 0 {
-		exit_code = 1;
-	    }
+            let rc = parse_input(input, idx as i32, &flags);
+            if rc > 0 {
+                exit_code = 1;
+            }
         }
         let elapsed = start_all.elapsed();
-	if !flags.quiet {
-	    eprintln!("{}Total Time: {:.3}", flags.prefix, elapsed.as_secs_f64());
-	}
+        if !flags.quiet {
+            eprintln!("{}Total Time: {:.3}", flags.prefix, elapsed.as_secs_f64());
+        }
         process::exit(exit_code as i32);
     }
 }
@@ -197,7 +199,7 @@ impl\<'a, T: Recognizer\<'a>> ErrorListener\<'a, T> for ParserErrorListener {
         msg: &str,
         _error: Option\<&ANTLRError>,
     ) {
-	    *self.error_count.borrow_mut() += 1;
+        *self.error_count.borrow_mut() += 1;
         if self.tee {
             writeln!(self.output.borrow_mut().as_mut(), "line {}:{} {}", line, column, msg).ok();
         }

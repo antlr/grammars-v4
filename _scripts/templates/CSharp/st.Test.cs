@@ -26,7 +26,9 @@ public class Program
     public static bool HeatMap { get; set; } = false;
     public static void SetupParse2(string input, string fn, bool quiet = false)
     {
-        ICharStream str = new AntlrInputStream(input);
+        var code_point_stream = new CodePointCharStream(input);
+        code_point_stream.name = fn;
+        ICharStream str = code_point_stream;
         CharStream = str;
         var lexer = new <lexer_name>(str);
         Lexer = lexer;
@@ -38,7 +40,7 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         TokenStream = tokens;
-        ((AntlrInputStream)(lexer.InputStream)).name = fn;
+        ((CodePointCharStream)(lexer.InputStream)).name = fn;
         var parser = new MyParser(tokens);
         Parser = parser;
         var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
@@ -146,6 +148,7 @@ public class Program
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
+    static bool earley = false;
 
     static void Main(string[] args)
     {
@@ -220,6 +223,15 @@ public class Program
             else if (args[i] == "-trace")
             {
                 show_trace = true;
+            }
+            else if (args[i] == "-earley")
+            {
+                earley = true;
+                show_tree = false;
+            }
+            else if (args[i][0] == '-')
+            {
+                // Ignore unknown option.
             }
             else
             {
@@ -397,6 +409,25 @@ public class Program
         {
             System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
         }
+
+        if (earley) {
+            var epsilon_remover = new EpsilonRemover(parser);
+            var new_atn = epsilon_remover.Convert_ENFA_to_NFA();
+
+            lexer.Reset();
+            parser.Reset();
+
+            int start = parser.RuleNames.Select((value, index) => new { value, index })
+                .Where(pair => (pair.value == StartSymbol))
+                .Select(pair => pair.index).First();
+
+            MyATN atn = new_atn;
+            DateTime ebefore = DateTime.Now;
+            var accepted = EarleyATN.EarleyAtnRecognizer.ParseToTree(parser, new_atn, parser.TokenStream, start);
+            DateTime eafter = DateTime.Now;
+            Console.Error.WriteLine((accepted ? "ACCEPT" : "REJECT") + " " + (eafter - ebefore).TotalSeconds);
+        }
+
         if (tee) output.Close();
     }
 

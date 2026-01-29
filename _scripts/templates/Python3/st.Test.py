@@ -39,6 +39,7 @@ error_code = 0
 string_instance = 0
 prefix = ""
 quiet = False
+noop = False
 
 def main(argv):
     global tee
@@ -81,6 +82,9 @@ def main(argv):
             quiet = True
         elif arg == "-trace":
             show_trace = True
+        elif arg[0] == "-":
+            # Ignore
+            noop = True
         else:
             inputs.append(argv[i])
             is_fns.append(True)
