@@ -310,6 +310,11 @@ The following table maps the EBNF nonterminal names from the ISO C specification
 
 <img src="./times.svg">
 
+Runtime of `examples/*.c` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Samsung SSD 990 EVO Plus 2TB;
+Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
+.NET SDK: 10.0.102. Sample size 20.
+
 ## Reference
 * ISO Specification: https://www.iso.org/standard/82075.html
 * ISO/ IEC C - Project status and milestones: https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
