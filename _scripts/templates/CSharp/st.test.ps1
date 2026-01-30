@@ -47,14 +47,18 @@ if ( $size -eq 0 ) {
     exit 0
 }
 
+# Before anything, clean out the testsuite directory of any previous
+# run.
+git clean -f ..\\<example_dir_unix>
+
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog ./bin/Debug/net8.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 

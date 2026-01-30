@@ -201,6 +201,10 @@ int TryParse(std::vector\<std::string>& args)
         {
             show_trace = true;
         }
+        else if (args[i][0] == '-')
+        {
+            // Ignore unknown option.
+        }
         else
         {
             inputs.push_back(args[i]);

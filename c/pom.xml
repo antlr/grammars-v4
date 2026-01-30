@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>C.g4</include>
+					   <include>CLexer.g4</include>
+					   <include>CParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -41,7 +42,7 @@
 					<entryPoint>compilationUnit</entryPoint>
 					<grammarName>C</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples/maven</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

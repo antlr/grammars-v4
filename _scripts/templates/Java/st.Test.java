@@ -96,6 +96,10 @@ public class Test {
                 show_trace = true;
                 continue;
             }
+            else if (args[i].charAt(0) == '-')
+            {
+                // Ignore unknown option.
+            }
             else {
                 inputs.add(args[i]);
                 is_fns.add(true);
