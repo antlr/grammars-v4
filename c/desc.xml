@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-    <targets>;Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;PHP;Python3;Rust;TypeScript</targets>
+    <targets>Antlr4ng;CSharp;Dart;Java;TypeScript</targets>
+<!--
+    <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;PHP;Python3;Rust;TypeScript</targets>
+    -->
+    <test>
+       <inputs>examples/*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/c-testsuite/**/*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/writing-a-c-compiler-tests/**/valid/**/*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/sqlite/**/*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/torture/builtin-*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/asm*.c</inputs>
+    </test>
+    <test>
+       <inputs>examples/gcc/testsuite/c-c++-common/auto*.c</inputs>
+    </test>
 </desc>

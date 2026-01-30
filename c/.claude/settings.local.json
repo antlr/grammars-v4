@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet trgen:*)",
+      "Bash(make)",
+      "Bash(bash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(wmic:*)",
+      "Bash(cmd //c ver)",
+      "Bash(dotnet --version:*)"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+org=www.simple-cc.org
+repository=git://git.simple-cc.org/scc
+version=355356a9836e487939cf5e98b5332a63e5264e27
+path=tests/scc/execute/0030-bxor.c
