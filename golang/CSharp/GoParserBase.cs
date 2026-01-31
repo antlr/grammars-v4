@@ -6,8 +6,30 @@ using Antlr4.Runtime;
 
 public abstract class GoParserBase : Parser
 {
-    const bool debug = false;
+    private static bool debug = false;
     HashSet<string> table = new HashSet<string>();
+
+    static GoParserBase()
+    {
+        string[] args = Environment.GetCommandLineArgs();
+        debug = HasArg(args, "--debug");
+        if (debug)
+        {
+            Console.WriteLine("debug = " + debug);
+        }
+    }
+
+    private static bool HasArg(string[] args, string arg)
+    {
+        foreach (string a in args)
+        {
+            if (a.ToLower().Contains(arg.ToLower()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     protected GoParserBase(ITokenStream input)
         : base(input)
@@ -47,7 +69,6 @@ public abstract class GoParserBase : Parser
     public void addImportSpec()
     {
         var ctx = this.Context;
-        var count = ctx.ChildCount;
         var importSpec = ctx as GoParser.ImportSpecContext;
         if (importSpec == null) return;
         var packageName = importSpec.packageName();
@@ -56,18 +77,37 @@ public abstract class GoParserBase : Parser
             var name = packageName.GetText();
             if (debug) System.Console.WriteLine("Entering " + name);
             table.Add(name);
+            return;
         }
-        else
+        var importPath = importSpec.importPath();
+        if (importPath == null) return;
+        var name2 = importPath.GetText();
+        if (debug) System.Console.WriteLine("import path " + name2);
+        name2 = name2.Replace("\"", "");
+        if (string.IsNullOrEmpty(name2)) return;
+        name2 = name2.Replace("\\", "/");
+        string[] pathArr = name2.Split('/');
+        if (pathArr.Length == 0) return;
+        string lastComponent = pathArr.Last();
+        if (string.IsNullOrEmpty(lastComponent)) return;
+        // Handle special cases like "." and ".."
+        if (lastComponent == "." || lastComponent == "..") return;
+        string[] fileArr = lastComponent.Split('.');
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.Length == 0)
         {
-            var name = importSpec.importPath().GetText();
-            name = name.Replace("\"", "");
-            name = name.Replace("\\", "/");
-            string[] pathArr = name.Split('/');
-            string[] fileArr = pathArr.Last().Split('.');
-            string fileName = fileArr.Last().ToString();
-            if (debug) System.Console.WriteLine("Entering " + fileName);
-            table.Add(fileName);
+            table.Add(lastComponent);
+            if (debug) System.Console.WriteLine("Entering " + lastComponent);
+            return;
         }
+        string fileName = fileArr.Last();
+        if (string.IsNullOrEmpty(fileName))
+        {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (debug) System.Console.WriteLine("Entering " + fileName);
+        table.Add(fileName);
     }
 
     public bool isOperand()

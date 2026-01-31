@@ -9,10 +9,17 @@ export default abstract class GoParserBase extends Parser {
 
     constructor(input: TokenStream) {
         super(input);
+        this.table = new Set<string>();
+        // Check for --debug flag in command line arguments (Node.js environment)
+        this.debug = typeof process !== 'undefined' &&
+                     process.argv &&
+                     process.argv.some(arg => arg.toLowerCase().includes('--debug'));
+        if (this.debug) {
+            console.log("debug = " + this.debug);
+        }
     }
 
     protected myreset(): void {
-        this.debug = false;
         this.table = new Set<string>();
     }
 
@@ -32,7 +39,6 @@ export default abstract class GoParserBase extends Parser {
     public addImportSpec(): void
     {
         const ctx = this.context;
-        const count = ctx.getChildCount();
         if (!(ctx instanceof ImportSpecContext)) {
             return;
         }
@@ -43,18 +49,45 @@ export default abstract class GoParserBase extends Parser {
             var name = packageName.getText();
             if (this.debug) console.log("Entering " + name);
             this.table.add(name);
+            return;
         }
-        else
-        {
-            var name = importSpec.importPath().getText();
-            name = name.replaceAll("\"", "");
-            name = name.replaceAll("\\", "/");
-            const pathArr = name.split('/');
-            const fileArr = pathArr.at(-1).split('.');
-            const fileName = fileArr.at(-1).toString();
-            if (this.debug) console.log("Entering " + fileName);
-            this.table.add(fileName);
+        const importPath = importSpec.importPath();
+        if (importPath == null) {
+            return;
         }
+        var name = importPath.getText();
+        if (this.debug) console.log("import path " + name);
+        name = name.replaceAll("\"", "");
+        if (name.length === 0) {
+            return;
+        }
+        name = name.replaceAll("\\", "/");
+        const pathArr = name.split('/');
+        if (pathArr.length === 0) {
+            return;
+        }
+        const lastComponent = pathArr[pathArr.length - 1];
+        if (lastComponent.length === 0) {
+            return;
+        }
+        // Handle special cases like "." and ".."
+        if (lastComponent === "." || lastComponent === "..") {
+            return;
+        }
+        const fileArr = lastComponent.split('.');
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.length === 0) {
+            this.table.add(lastComponent);
+            if (this.debug) console.log("Entering " + lastComponent);
+            return;
+        }
+        var fileName = fileArr[fileArr.length - 1];
+        if (fileName.length === 0) {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (this.debug) console.log("Entering " + fileName);
+        this.table.add(fileName);
     }
 
     protected isType(): boolean {

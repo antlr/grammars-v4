@@ -3,6 +3,7 @@ package parser
 import (
         "github.com/antlr4-go/antlr/v4"
         "fmt"
+        "os"
         "strings"
 )
 
@@ -13,8 +14,28 @@ type GoParserBase struct {
         table   map[string]bool
 }
 
+func hasArg(args []string, arg string) bool {
+    argLower := strings.ToLower(arg)
+    for _, a := range args {
+        if strings.Contains(strings.ToLower(a), argLower) {
+            return true
+        }
+    }
+    return false
+}
+
+func NewGoParserBase(input antlr.TokenStream) *GoParserBase {
+    p := &GoParserBase{
+        table: make(map[string]bool),
+    }
+    p.debug = hasArg(os.Args, "--debug")
+    if p.debug {
+        fmt.Println("debug =", p.debug)
+    }
+    return p
+}
+
 func (p *GoParserBase) myreset() {
-    p.debug = false
     p.table = make(map[string]bool)
 }
 
@@ -31,10 +52,14 @@ func (p *GoParserBase) isNotReceive() bool {
 }
 
 func (p *GoParserBase) addImportSpec() {
+    // Initialize table if nil (can happen if myreset() wasn't called)
+    if p.table == nil {
+        p.table = make(map[string]bool)
+    }
     ctx := p.GetParserRuleContext()
-    importSpec := ctx.(IImportSpecContext)
-    if importSpec == nil {
-        return;
+    importSpec, ok := ctx.(IImportSpecContext)
+    if !ok || importSpec == nil {
+        return
     }
     packageName := importSpec.PackageName()
     if packageName != nil {
@@ -43,17 +68,51 @@ func (p *GoParserBase) addImportSpec() {
             fmt.Println("Entering " + name)
         }
         p.table[name] = true
-    } else {
-        name := importSpec.ImportPath().GetText()
-        name = strings.ReplaceAll(name, "\"", "")
-        name = strings.ReplaceAll(name, "\\", "/")
-        pathArr := strings.Split(name, "/")
-        fileName := pathArr[len(pathArr)-1]
-        if p.debug {
-            fmt.Println("Entering " + fileName)
-        }
-        p.table[fileName] = true
+        return
     }
+    importPath := importSpec.ImportPath()
+    if importPath == nil {
+        return
+    }
+    name := importPath.GetText()
+    if p.debug {
+        fmt.Println("import path " + name)
+    }
+    name = strings.ReplaceAll(name, "\"", "")
+    if len(name) == 0 {
+        return
+    }
+    name = strings.ReplaceAll(name, "\\", "/")
+    pathArr := strings.Split(name, "/")
+    if len(pathArr) == 0 {
+        return
+    }
+    lastComponent := pathArr[len(pathArr)-1]
+    if len(lastComponent) == 0 {
+        return
+    }
+    // Handle special cases like "." and ".."
+    if lastComponent == "." || lastComponent == ".." {
+        return
+    }
+    fileArr := strings.Split(lastComponent, ".")
+    // Guard against empty array (can happen if lastComponent is all dots)
+    if len(fileArr) == 0 {
+        p.table[lastComponent] = true
+        if p.debug {
+            fmt.Println("Entering " + lastComponent)
+        }
+        return
+    }
+    fileName := fileArr[len(fileArr)-1]
+    if len(fileName) == 0 {
+        // Fall back to lastComponent if split resulted in empty string
+        fileName = lastComponent
+    }
+    if p.debug {
+        fmt.Println("Entering " + fileName)
+    }
+    p.table[fileName] = true
 }
 
 func (p *GoParserBase) isOperand() bool {

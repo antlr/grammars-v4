@@ -10,11 +10,23 @@ import java.util.Set;
  */
 public abstract class GoParserBase extends Parser
 {
-    private static final boolean debug = false;
+    private static boolean debug = false;
     private Set<String> table = new HashSet<>();
 
     protected GoParserBase(TokenStream input) {
         super(input);
+	String cmdLine = System.getProperty("sun.java.command");
+	String[] args = cmdLine != null ? cmdLine.split("\\s+") : new String[0];
+	debug = hasArg(args, "--debug");
+    }
+
+    private static boolean hasArg(String[] args, String arg) {
+	for (String a : args) {
+	    if (a.toLowerCase().contains(arg.toLowerCase())) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     protected void myreset()
@@ -53,16 +65,45 @@ public abstract class GoParserBase extends Parser
             String name = packageName.getText();
             if (debug) System.out.println("Entering " + name);
             table.add(name);
-        } else {
-            String name = importSpec.importPath().getText();
-            name = name.replace("\"", "");
-            name = name.replace("\\", "/");
-            String[] pathArr = name.split("/");
-            String[] fileArr = pathArr[pathArr.length - 1].split("\\.");
-            String fileName = fileArr[fileArr.length - 1];
-            if (debug) System.out.println("Entering " + fileName);
-            table.add(fileName);
+            return;
         }
+        GoParser.ImportPathContext importPath = importSpec.importPath();
+        if (importPath == null) {
+            return;
+        }
+        String name = importPath.getText();
+        if (debug) System.out.println("import path " + name);
+        name = name.replace("\"", "");
+        if (name.isEmpty()) {
+            return;
+        }
+        name = name.replace("\\", "/");
+        String[] pathArr = name.split("/");
+        if (pathArr.length == 0) {
+            return;
+        }
+        String lastComponent = pathArr[pathArr.length - 1];
+        if (lastComponent.isEmpty()) {
+            return;
+        }
+        // Handle special cases like "." and ".."
+        if (lastComponent.equals(".") || lastComponent.equals("..")) {
+            return;
+        }
+        String[] fileArr = lastComponent.split("\\.");
+        // Guard against empty array (can happen if lastComponent is all dots)
+        if (fileArr.length == 0) {
+            table.add(lastComponent);
+            if (debug) System.out.println("Entering " + lastComponent);
+            return;
+        }
+        String fileName = fileArr[fileArr.length - 1];
+        if (fileName.isEmpty()) {
+            // Fall back to lastComponent if split resulted in empty string
+            fileName = lastComponent;
+        }
+        if (debug) System.out.println("Entering " + fileName);
+        table.add(fileName);
     }
 
     public boolean isOperand() {

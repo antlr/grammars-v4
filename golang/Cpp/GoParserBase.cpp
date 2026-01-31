@@ -1,5 +1,32 @@
 #include "GoParserBase.h"
 #include "GoParser.h"
+#include <algorithm>
+#include <cctype>
+
+bool GoParserBase::hasArg(int argc, char* argv[], const std::string& arg)
+{
+    std::string argLower = arg;
+    std::transform(argLower.begin(), argLower.end(), argLower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    for (int i = 0; i < argc; i++) {
+        std::string a = argv[i];
+        std::transform(a.begin(), a.end(), a.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+        if (a.find(argLower) != std::string::npos) {
+            return true;
+        }
+    }
+    return false;
+}
+
+GoParserBase::GoParserBase(antlr4::TokenStream* input, int argc, char* argv[])
+    : Parser(input)
+{
+    debug = hasArg(argc, argv, "--debug");
+    if (debug) {
+        std::cout << "debug = " << debug << std::endl;
+    }
+}
 
 void GoParserBase::myreset()
 {
@@ -37,27 +64,43 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 void GoParserBase::addImportSpec()
 {
     antlr4::ParserRuleContext* ctx = this->_ctx;
-    auto count = ctx->children.size();
     auto importSpec = dynamic_cast<GoParser::ImportSpecContext*>(ctx);
     if (importSpec == nullptr) return;
     auto packageName = importSpec->packageName();
     if (packageName != nullptr)
     {
         auto name = packageName->getText();
-        if (debug) std::cout << "Entering " << name;
+        if (debug) std::cout << "Entering " << name << std::endl;
         table.insert(name);
+        return;
     }
-    else
-    {
-        auto name = importSpec->importPath()->getText();
-        name.erase(std::remove(name.begin(), name.end(), '\"'), name.end());
-        std::replace(name.begin(), name.end(), '\\', '/');
-        auto pathArr = split(name, '/');
-        auto fileArr = split(pathArr[pathArr.size()-1], '.');
-        auto fileName = fileArr[fileArr.size()-1];
-        if (this->debug) std::cout << "Entering " << fileName << std::endl;
-        table.insert(fileName);
+    auto importPath = importSpec->importPath();
+    if (importPath == nullptr) return;
+    auto name = importPath->getText();
+    if (debug) std::cout << "import path " << name << std::endl;
+    name.erase(std::remove(name.begin(), name.end(), '\"'), name.end());
+    if (name.empty()) return;
+    std::replace(name.begin(), name.end(), '\\', '/');
+    auto pathArr = split(name, '/');
+    if (pathArr.empty()) return;
+    auto lastComponent = pathArr[pathArr.size()-1];
+    if (lastComponent.empty()) return;
+    // Handle special cases like "." and ".."
+    if (lastComponent == "." || lastComponent == "..") return;
+    auto fileArr = split(lastComponent, '.');
+    // Guard against empty array (can happen if lastComponent is all dots)
+    if (fileArr.empty()) {
+        table.insert(lastComponent);
+        if (debug) std::cout << "Entering " << lastComponent << std::endl;
+        return;
     }
+    auto fileName = fileArr[fileArr.size()-1];
+    if (fileName.empty()) {
+        // Fall back to lastComponent if split resulted in empty string
+        fileName = lastComponent;
+    }
+    if (debug) std::cout << "Entering " << fileName << std::endl;
+    table.insert(fileName);
 }
 
 bool GoParserBase::isOperand()

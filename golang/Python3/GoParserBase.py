@@ -9,12 +9,23 @@ class GoParserBase(Parser):
 
     debug = False
 
+    @staticmethod
+    def _has_arg(args, arg):
+        arg_lower = arg.lower()
+        for a in args:
+            if arg_lower in a.lower():
+                return True
+        return False
+
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
         self.table = set()
+        GoParserBase.debug = GoParserBase._has_arg(sys.argv, '--debug')
+        if GoParserBase.debug:
+            print("debug =", GoParserBase.debug)
 
     def myreset(self):
-        la = 1
+        self.table = set()
     
     def closingBracket(self) -> bool:
         la = self._input.LT(1)
@@ -34,16 +45,40 @@ class GoParserBase(Parser):
             if self.debug:
                 print("Entering", name)
             self.table.add(name)
-        else:
-            name = importSpec.importPath().getText()
-            name = name.replace("\"", "")
-            name = name.replace("\\", "/")
-            path_arr = name.split('/')
-            file_arr = path_arr[-1].split('.')
-            file_name = file_arr[-1]
+            return
+        import_path = importSpec.importPath()
+        if import_path is None:
+            return
+        name = import_path.getText()
+        if self.debug:
+            print("import path", name)
+        name = name.replace("\"", "")
+        if len(name) == 0:
+            return
+        name = name.replace("\\", "/")
+        path_arr = name.split('/')
+        if len(path_arr) == 0:
+            return
+        last_component = path_arr[-1]
+        if len(last_component) == 0:
+            return
+        # Handle special cases like "." and ".."
+        if last_component == "." or last_component == "..":
+            return
+        file_arr = last_component.split('.')
+        # Guard against empty array (can happen if last_component is all dots)
+        if len(file_arr) == 0:
+            self.table.add(last_component)
             if self.debug:
-                print("Entering", file_name)
-            self.table.add(file_name)
+                print("Entering", last_component)
+            return
+        file_name = file_arr[-1]
+        if len(file_name) == 0:
+            # Fall back to last_component if split resulted in empty string
+            file_name = last_component
+        if self.debug:
+            print("Entering", file_name)
+        self.table.add(file_name)
 
     def isOperand(self) -> bool:
         la = self._input.LT(1)
