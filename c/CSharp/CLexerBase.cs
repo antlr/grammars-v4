@@ -36,7 +36,7 @@ public abstract class CLexerBase : Lexer
         var clang = args?.Where(a => a.IndexOf("--clang", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         var nopp = args?.Where(a => a.IndexOf("--nopp", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         if (!(vsc || gcc || clang))
-	    gcc = true;
+            gcc = true;
 
         // Extract preprocessor options (-D and -I)
         var ppOptions = ExtractPreprocessorOptions(args);
@@ -50,7 +50,7 @@ public abstract class CLexerBase : Lexer
             File.WriteAllText(output_name, x1);
             return CharStreams.fromString(x1);
         }
-        File.WriteAllText(output_name, x1);
+        if (source_name == "stdin.c") File.WriteAllText(source_name, x1);
 
         if (gcc)
         {
@@ -69,8 +69,8 @@ public abstract class CLexerBase : Lexer
             foreach (var opt in ppOptions)
             {
                 psi.ArgumentList.Add(opt);
-	    }
-	    psi.ArgumentList.Add(source_name);
+            }
+            psi.ArgumentList.Add(source_name);
             string? oldPath = psi.EnvironmentVariables["PATH"]; // inherits from parent
             using (var process = new Process { StartInfo = psi })
             {

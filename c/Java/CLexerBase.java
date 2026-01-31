@@ -45,10 +45,12 @@ public abstract class CLexerBase extends Lexer {
             return CharStreams.fromString(inputText);
         }
 
-        try {
-            Files.writeString(Path.of(outputName), inputText);
-        } catch (IOException e) {
-            // Ignore
+        if ("stdin.c".equals(sourceName)) {
+            try {
+                Files.writeString(Path.of(sourceName), inputText);
+            } catch (IOException e) {
+                // Ignore
+            }
         }
 
         if (gcc) {

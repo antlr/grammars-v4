@@ -27,11 +27,9 @@ abstract class CLexerBase extends Lexer {
     var sourceName = input.sourceName;
     var inputText = input.getText(Interval(0, input.size - 1));
 
-    // If source name is empty or not a .c file, we need to write to a temp file
+    // If source name is empty or not a .c file, use stdin.c
     if (sourceName.isEmpty || !sourceName.endsWith(".c")) {
-      // Create a temp file for preprocessing
-      sourceName = "${Directory.systemTemp.path}/antlr4_temp_${DateTime.now().millisecondsSinceEpoch}.c";
-      File(sourceName).writeAsStringSync(inputText);
+      sourceName = "stdin.c";
     }
 
     var outputName = "$sourceName.p";
@@ -43,6 +41,10 @@ abstract class CLexerBase extends Lexer {
         // Ignore
       }
       return InputStream.fromString(inputText);
+    }
+
+    if (sourceName == "stdin.c") {
+      File(sourceName).writeAsStringSync(inputText);
     }
 
     if (gcc) {

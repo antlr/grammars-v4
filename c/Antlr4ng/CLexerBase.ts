@@ -1,8 +1,6 @@
 import { Lexer, CharStream } from "antlr4ng";
 import { execSync } from "child_process";
 import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
 
 export abstract class CLexerBase extends Lexer {
     constructor(input: CharStream) {
@@ -31,11 +29,9 @@ export abstract class CLexerBase extends Lexer {
         let sourceName = input.getSourceName();
         const inputText = input.getTextFromRange(0, input.size - 1);
 
-        // If source name is empty or not a .c file, we need to write to a temp file
+        // If source name is empty or not a .c file, use stdin.c
         if (!sourceName || sourceName === "" || !sourceName.endsWith(".c")) {
-            // Create a temp file for preprocessing
-            sourceName = path.join(os.tmpdir(), "antlr4ng_temp_" + Date.now() + ".c");
-            fs.writeFileSync(sourceName, inputText);
+            sourceName = "stdin.c";
         }
 
         const outputName = sourceName + ".p";
@@ -47,6 +43,10 @@ export abstract class CLexerBase extends Lexer {
                 // Ignore
             }
             return CharStream.fromString(inputText);
+        }
+
+        if (sourceName === "stdin.c") {
+            fs.writeFileSync(sourceName, inputText);
         }
 
         if (gcc) {
