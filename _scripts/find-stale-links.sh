@@ -244,7 +244,8 @@ process_file() {
         url="${match_line#*:}"
 
         # Clean up the URL (remove trailing punctuation that might not be part of the URL)
-        url=$(echo "$url" | sed 's/[,;.!?>]*$//' | sed "s/'$//" | sed 's/\]$//')
+        # Also remove trailing curly braces (common in BibTeX files)
+        url=$(echo "$url" | sed 's/[,;.!?>}]*$//' | sed "s/'$//" | sed 's/\]$//')
 
         # Balance parentheses - for markdown links like [text](url), trim excess trailing )
         # Count open and close parens; remove trailing ) until balanced
