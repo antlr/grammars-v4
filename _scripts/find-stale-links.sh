@@ -228,8 +228,9 @@ process_file() {
     fi
 
     # Extract HTTP/HTTPS URLs from the file with line numbers
+    # Include ) in URLs to handle Wikipedia-style URLs with parentheses
     local url_matches
-    url_matches=$(grep -noP 'https?://[^\s<>")\]`'\'']+' "$file" 2>/dev/null || true)
+    url_matches=$(grep -noP 'https?://[^\s<>"\]`'\'']+' "$file" 2>/dev/null || true)
 
     if [[ -z "$url_matches" ]]; then
         return
@@ -243,7 +244,20 @@ process_file() {
         url="${match_line#*:}"
 
         # Clean up the URL (remove trailing punctuation that might not be part of the URL)
-        url=$(echo "$url" | sed 's/[,;.!?)>]*$//' | sed "s/'$//" | sed 's/\]$//')
+        url=$(echo "$url" | sed 's/[,;.!?>]*$//' | sed "s/'$//" | sed 's/\]$//')
+
+        # Balance parentheses - for markdown links like [text](url), trim excess trailing )
+        # Count open and close parens; remove trailing ) until balanced
+        while [[ "$url" == *")" ]]; do
+            local open_count close_count
+            open_count=$(echo "$url" | tr -cd '(' | wc -c)
+            close_count=$(echo "$url" | tr -cd ')' | wc -c)
+            if [[ "$close_count" -gt "$open_count" ]]; then
+                url="${url%)}"
+            else
+                break
+            fi
+        done
 
         # Skip empty URLs
         [[ -z "$url" ]] && continue
