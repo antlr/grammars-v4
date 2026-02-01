@@ -124,8 +124,9 @@ check_url() {
     log_verbose "URL: $url returned HTTP code: $http_code"
 
     # Consider various status codes
+    # 401/403 mean the URL exists but requires authentication - not stale
     case "$http_code" in
-        200|201|202|203|204|301|302|303|307|308)
+        200|201|202|203|204|301|302|303|307|308|401|403)
             URL_CACHE["$url"]=0
             return 0
             ;;
@@ -256,6 +257,12 @@ process_file() {
         # Skip already-archived URLs
         if echo "$url" | grep -qE 'web\.archive\.org|archive\.org/web'; then
             log_verbose "Skipping already-archived URL: $url"
+            continue
+        fi
+
+        # Skip XML namespace URIs (not meant to be accessible URLs)
+        if echo "$url" | grep -qE '(maven\.apache\.org/POM|maven\.apache\.org/xsd|w3\.org/[0-9]{4}/XMLSchema|w3\.org/XML/|xml\.org/sax|purl\.org/dc|schemas\.microsoft\.com|schemas\.openxmlformats\.org)'; then
+            log_verbose "Skipping XML namespace URI: $url"
             continue
         fi
 
