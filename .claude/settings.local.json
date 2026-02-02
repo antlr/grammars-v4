@@ -8,7 +8,9 @@
       "Bash(echo:*)",
       "Bash(curl:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:productionresultssa18.blob.core.windows.net)",
+      "Bash(./_scripts/find-stale-links.sh:*)"
     ]
   }
 }
