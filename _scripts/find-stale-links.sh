@@ -18,7 +18,7 @@ set -euo pipefail
 # Default values
 REPLACE=false
 VERBOSE=false
-TIMEOUT=10
+TIMEOUT=30
 PATHS=()
 
 # Color output (if terminal)

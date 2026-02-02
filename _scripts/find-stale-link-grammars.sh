@@ -110,7 +110,7 @@ for grammar in "${grammars[@]}"; do
     echo "=== Checking $grammar ==="
     grammar_path="$PREFIX/$grammar"
 
-    if "$STALE_LINKS_SCRIPT" --timeout 15 "$grammar_path"; then
+    if "$STALE_LINKS_SCRIPT" "$grammar_path"; then
         echo "OK: No stale links in $grammar"
     else
         echo "::warning file=$grammar,line=0,col=0,endColumn=0::Stale links detected in $grammar"
