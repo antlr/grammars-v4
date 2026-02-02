@@ -227,15 +227,16 @@ process_file() {
         return
     fi
 
-    # Skip most files in examples/ directories (they're parse examples, not documentation)
+    # Skip most files in example directories (they're parse examples, not documentation)
+    # Match: examples/, example/, examples-to-fix/, examples.errors/, etc.
     # Exception: .md files may contain documentation with links worth checking
-    if echo "$file" | grep -qE '/examples/'; then
+    if echo "$file" | grep -qE '/examples?[^/]*/' ; then
         case "$file" in
             *.md)
-                # Allow .md files in examples/
+                # Allow .md files in example directories
                 ;;
             *.tree|*.errors)
-                log_verbose "Skipping test output file in examples/: $file"
+                log_verbose "Skipping test output file in example dir: $file"
                 return
                 ;;
             *)
@@ -263,7 +264,8 @@ process_file() {
 
         # Clean up the URL (remove trailing punctuation that might not be part of the URL)
         # Also remove trailing curly braces (common in BibTeX files)
-        url=$(echo "$url" | sed 's/[,;.!?>}]*$//' | sed "s/'$//" | sed 's/\]$//')
+        # Include : to handle markdown like [text](url): where : follows the link
+        url=$(echo "$url" | sed 's/[,;.!?>}:]*$//' | sed "s/'$//" | sed 's/\]$//')
 
         # Balance parentheses - for markdown links like [text](url), trim excess trailing )
         # Count open and close parens; remove trailing ) until balanced
