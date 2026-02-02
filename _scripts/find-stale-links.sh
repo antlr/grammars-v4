@@ -2,12 +2,13 @@
 #
 # find-stale-links.sh - Find and optionally replace stale HTTP links with web.archive.org links
 #
-# Usage: find-stale-links.sh [--replace] [--verbose] [--timeout SECONDS] [PATH...]
+# Usage: find-stale-links.sh [--replace] [--verbose] [--timeout SECONDS] [--parallel N] [PATH...]
 #
 # Options:
 #   --replace      Replace stale links with web.archive.org archived versions
 #   --verbose      Print verbose output
-#   --timeout N    Timeout for HTTP requests in seconds (default: 10)
+#   --timeout N    Timeout for HTTP requests in seconds (default: 60)
+#   --parallel N   Number of parallel URL checks (default: 10, use 1 to disable)
 #   --help         Show this help message
 #
 # If no PATH is provided, searches the current directory.
@@ -18,7 +19,8 @@ set -euo pipefail
 # Default values
 REPLACE=false
 VERBOSE=false
-TIMEOUT=30
+TIMEOUT=60
+PARALLEL=10
 PATHS=()
 
 # Color output (if terminal)
@@ -74,6 +76,10 @@ while [[ $# -gt 0 ]]; do
             TIMEOUT="$2"
             shift 2
             ;;
+        --parallel)
+            PARALLEL="$2"
+            shift 2
+            ;;
         --help|-h)
             usage
             ;;
@@ -96,9 +102,12 @@ fi
 # Temporary files for tracking results
 STALE_LINKS_FILE=$(mktemp)
 CHECKED_URLS_FILE=$(mktemp)
-trap 'rm -f "$STALE_LINKS_FILE" "$CHECKED_URLS_FILE"' EXIT
+URLS_TO_CHECK_FILE=$(mktemp)
+URL_RESULTS_FILE=$(mktemp)
+URL_OCCURRENCES_FILE=$(mktemp)
+trap 'rm -f "$STALE_LINKS_FILE" "$CHECKED_URLS_FILE" "$URLS_TO_CHECK_FILE" "$URL_RESULTS_FILE" "$URL_OCCURRENCES_FILE"' EXIT
 
-# URL cache to avoid checking the same URL multiple times
+# URL cache to avoid checking the same URL multiple times (used after parallel check)
 declare -A URL_CACHE
 
 # Check if a URL is accessible (returns 0 if accessible, 1 if stale)
@@ -136,6 +145,33 @@ check_url() {
             ;;
     esac
 }
+
+# Check a single URL and output result (for parallel execution)
+# Output format: OK|STALE<tab>URL
+check_url_standalone() {
+    local url="$1"
+    local timeout="$2"
+
+    # Use curl to check the URL
+    local http_code
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        --connect-timeout "$timeout" \
+        --max-time "$((timeout * 3))" \
+        -L \
+        -A "Mozilla/5.0 (compatible; StaleLinksChecker/1.0)" \
+        "$url" 2>/dev/null || echo "000")
+
+    # Consider various status codes
+    case "$http_code" in
+        200|201|202|203|204|301|302|303|307|308|401|403)
+            echo -e "OK\t$url"
+            ;;
+        *)
+            echo -e "STALE\t$url"
+            ;;
+    esac
+}
+export -f check_url_standalone
 
 # Get the date when a line was added to a file using git blame
 get_line_date() {
@@ -215,11 +251,13 @@ get_archive_url() {
     return 1
 }
 
-# Extract URLs from a file and check them
-process_file() {
+# Extract URLs from a file (collection phase - no checking)
+# Outputs: file<tab>line_num<tab>url to URL_OCCURRENCES_FILE
+# Also outputs unique URLs to stdout for collection
+collect_urls_from_file() {
     local file="$1"
 
-    log_verbose "Processing file: $file"
+    log_verbose "Collecting URLs from: $file"
 
     # Skip binary files
     if file "$file" | grep -qE 'binary|executable|data'; then
@@ -228,12 +266,9 @@ process_file() {
     fi
 
     # Skip most files in example directories (they're parse examples, not documentation)
-    # Match: examples/, example/, examples-to-fix/, examples.errors/, etc.
-    # Exception: .md files may contain documentation with links worth checking
     if echo "$file" | grep -qE '/examples?[^/]*/' ; then
         case "$file" in
             *.md)
-                # Allow .md files in example directories
                 ;;
             *.tree|*.errors)
                 log_verbose "Skipping test output file in example dir: $file"
@@ -247,7 +282,6 @@ process_file() {
     fi
 
     # Extract HTTP/HTTPS URLs from the file with line numbers
-    # Include ) in URLs to handle Wikipedia-style URLs with parentheses
     local url_matches
     url_matches=$(grep -noP 'https?://[^\s<>"\]`'\'']+' "$file" 2>/dev/null || true)
 
@@ -255,20 +289,14 @@ process_file() {
         return
     fi
 
-    # Process each URL found
     while IFS= read -r match_line; do
-        # Extract line number and URL (format: "linenum:url")
-        # Only split on first colon to preserve colons in URLs
         line_num="${match_line%%:*}"
         url="${match_line#*:}"
 
-        # Clean up the URL (remove trailing punctuation that might not be part of the URL)
-        # Also remove trailing curly braces (common in BibTeX files)
-        # Include : to handle markdown like [text](url): where : follows the link
+        # Clean up the URL
         url=$(echo "$url" | sed 's/[,;.!?>}:]*$//' | sed "s/'$//" | sed 's/\]$//')
 
-        # Balance parentheses - for markdown links like [text](url), trim excess trailing )
-        # Count open and close parens; remove trailing ) until balanced
+        # Balance parentheses
         while [[ "$url" == *")" ]]; do
             local open_count close_count
             open_count=$(echo "$url" | tr -cd '(' | wc -c)
@@ -280,46 +308,59 @@ process_file() {
             fi
         done
 
-        # Skip empty URLs
         [[ -z "$url" ]] && continue
 
         # Skip localhost and example URLs
         if echo "$url" | grep -qE '(localhost|127\.0\.0\.1|example\.com|example\.org)'; then
-            log_verbose "Skipping local/example URL: $url"
             continue
         fi
 
         # Skip already-archived URLs
         if echo "$url" | grep -qE 'web\.archive\.org|archive\.org/web'; then
-            log_verbose "Skipping already-archived URL: $url"
             continue
         fi
 
-        # Skip XML namespace URIs (not meant to be accessible URLs)
+        # Skip XML namespace URIs
         if echo "$url" | grep -qE '(maven\.apache\.org/POM|maven\.apache\.org/xsd|w3\.org/[0-9]{4}/XMLSchema|w3\.org/XML/|xml\.org/sax|purl\.org/dc|schemas\.microsoft\.com|schemas\.openxmlformats\.org)'; then
-            log_verbose "Skipping XML namespace URI: $url"
             continue
         fi
 
-        # Check if URL is accessible
-        if ! check_url "$url"; then
+        # Record this occurrence
+        printf '%s\t%s\t%s\n' "$file" "$line_num" "$url" >> "$URL_OCCURRENCES_FILE"
+        # Output URL for unique collection
+        echo "$url"
+    done <<< "$url_matches"
+}
+
+# Process URL check results and handle stale links
+process_results() {
+    log_verbose "Processing URL check results..."
+
+    # Load URL results into cache
+    while IFS=$'\t' read -r status url; do
+        if [[ "$status" == "OK" ]]; then
+            URL_CACHE["$url"]=0
+        else
+            URL_CACHE["$url"]=1
+        fi
+    done < "$URL_RESULTS_FILE"
+
+    # Process each URL occurrence using cached results
+    while IFS=$'\t' read -r file line_num url; do
+        echo "$url" >> "$CHECKED_URLS_FILE"
+
+        if [[ "${URL_CACHE[$url]:-1}" == "1" ]]; then
             log_warn "Stale link found: $file:$line_num - $url"
-            # Use tab as delimiter to avoid issues with colons in Windows paths and URLs
             printf '%s\t%s\t%s\n' "$file" "$line_num" "$url" >> "$STALE_LINKS_FILE"
 
             if [[ "$REPLACE" == "true" ]]; then
-                # Get the date when this line was added
                 local line_date
                 line_date=$(get_line_date "$file" "$line_num")
                 log_verbose "Line was added on: $line_date"
 
-                # Try to get an archived version
                 local archive_url
                 if archive_url=$(get_archive_url "$url" "$line_date"); then
                     log_info "Found archive: $archive_url"
-
-                    # Replace the URL in the file
-                    # Use | as delimiter to avoid issues with URLs containing /
                     sed -i "s|$url|$archive_url|g" "$file"
                     log_info "Replaced in $file: $url -> $archive_url"
                 else
@@ -329,9 +370,7 @@ process_file() {
         else
             log_verbose "URL is accessible: $url"
         fi
-
-        echo "$url" >> "$CHECKED_URLS_FILE"
-    done <<< "$url_matches"
+    done < "$URL_OCCURRENCES_FILE"
 }
 
 # Main execution
@@ -339,6 +378,7 @@ main() {
     log_info "Starting stale link check..."
     log_info "Replace mode: $REPLACE"
     log_info "Timeout: ${TIMEOUT}s"
+    log_info "Parallel jobs: $PARALLEL"
     log_info "Paths: ${PATHS[*]}"
 
     # Find all text files, excluding .git directory
@@ -369,23 +409,52 @@ main() {
     find_args+=(-not -name '*.gz')
     find_args+=(-not -name '*.lock')
 
+    # Phase 1: Collect all URLs from all files
+    log_info "Phase 1: Collecting URLs from files..."
     local file_count=0
     while IFS= read -r file; do
-        process_file "$file"
+        collect_urls_from_file "$file" >> "$URLS_TO_CHECK_FILE"
         file_count=$((file_count + 1))
     done < <(find "${find_args[@]}" 2>/dev/null || true)
 
     log_info "Processed $file_count files"
+
+    # Get unique URLs to check
+    local unique_urls_file
+    unique_urls_file=$(mktemp)
+    sort -u "$URLS_TO_CHECK_FILE" > "$unique_urls_file"
+    local unique_count
+    unique_count=$(wc -l < "$unique_urls_file" | tr -d ' ')
+
+    if [[ "$unique_count" -eq 0 ]]; then
+        log_info "No URLs found to check"
+        rm -f "$unique_urls_file"
+        exit 0
+    fi
+
+    log_info "Found $unique_count unique URLs to check"
+
+    # Phase 2: Check URLs in parallel
+    log_info "Phase 2: Checking URLs (parallel=$PARALLEL)..."
+
+    # Use xargs for parallel execution
+    cat "$unique_urls_file" | xargs -P "$PARALLEL" -I {} bash -c 'check_url_standalone "$@"' _ {} "$TIMEOUT" >> "$URL_RESULTS_FILE"
+
+    rm -f "$unique_urls_file"
+
+    # Phase 3: Process results
+    log_info "Phase 3: Processing results..."
+    process_results
 
     # Report results
     local stale_count
     stale_count=$(wc -l < "$STALE_LINKS_FILE" | tr -d ' ')
     local checked_count
     checked_count=$(wc -l < "$CHECKED_URLS_FILE" | tr -d ' ')
-    local unique_count
-    unique_count=$(sort -u "$CHECKED_URLS_FILE" | wc -l | tr -d ' ')
+    local final_unique_count
+    final_unique_count=$(sort -u "$CHECKED_URLS_FILE" | wc -l | tr -d ' ')
 
-    log_info "Checked $unique_count unique URLs ($checked_count total occurrences)"
+    log_info "Checked $final_unique_count unique URLs ($checked_count total occurrences)"
 
     if [[ "$stale_count" -gt 0 ]]; then
         log_warn "Found $stale_count stale link(s):"
