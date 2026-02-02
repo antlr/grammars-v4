@@ -227,6 +227,24 @@ process_file() {
         return
     fi
 
+    # Skip most files in examples/ directories (they're parse examples, not documentation)
+    # Exception: .md files may contain documentation with links worth checking
+    if echo "$file" | grep -qE '/examples/'; then
+        case "$file" in
+            *.md)
+                # Allow .md files in examples/
+                ;;
+            *.tree|*.errors)
+                log_verbose "Skipping test output file in examples/: $file"
+                return
+                ;;
+            *)
+                log_verbose "Skipping example file: $file"
+                return
+                ;;
+        esac
+    fi
+
     # Extract HTTP/HTTPS URLs from the file with line numbers
     # Include ) in URLs to handle Wikipedia-style URLs with parentheses
     local url_matches
