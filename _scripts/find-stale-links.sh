@@ -13,6 +13,9 @@
 #
 # If no PATH is provided, searches the current directory.
 # Always excludes .git/ directory.
+#
+# Timeouts (HTTP 000) are reported separately and do not cause failure.
+# Only actual HTTP errors (404, 500, etc.) are counted as stale links.
 
 set -euo pipefail
 
@@ -101,13 +104,15 @@ fi
 
 # Temporary files for tracking results
 STALE_LINKS_FILE=$(mktemp)
+TIMEOUT_LINKS_FILE=$(mktemp)
 CHECKED_URLS_FILE=$(mktemp)
 URLS_TO_CHECK_FILE=$(mktemp)
 URL_RESULTS_FILE=$(mktemp)
 URL_OCCURRENCES_FILE=$(mktemp)
-trap 'rm -f "$STALE_LINKS_FILE" "$CHECKED_URLS_FILE" "$URLS_TO_CHECK_FILE" "$URL_RESULTS_FILE" "$URL_OCCURRENCES_FILE"' EXIT
+trap 'rm -f "$STALE_LINKS_FILE" "$TIMEOUT_LINKS_FILE" "$CHECKED_URLS_FILE" "$URLS_TO_CHECK_FILE" "$URL_RESULTS_FILE" "$URL_OCCURRENCES_FILE"' EXIT
 
 # URL cache to avoid checking the same URL multiple times (used after parallel check)
+# Format: URL_CACHE[url]="status:http_code" where status is OK, TIMEOUT, or STALE
 declare -A URL_CACHE
 
 # Check if a URL is accessible (returns 0 if accessible, 1 if stale)
@@ -147,7 +152,7 @@ check_url() {
 }
 
 # Check a single URL and output result (for parallel execution)
-# Output format: OK|STALE<tab>URL
+# Output format: OK|TIMEOUT|STALE<tab>HTTP_CODE<tab>URL
 check_url_standalone() {
     local url="$1"
     local timeout="$2"
@@ -164,10 +169,15 @@ check_url_standalone() {
     # Consider various status codes
     case "$http_code" in
         200|201|202|203|204|301|302|303|307|308|401|403)
-            echo -e "OK\t$url"
+            echo -e "OK\t$http_code\t$url"
+            ;;
+        000)
+            # 000 means timeout or connection failure
+            echo -e "TIMEOUT\t$http_code\t$url"
             ;;
         *)
-            echo -e "STALE\t$url"
+            # Actual HTTP error (404, 500, etc.)
+            echo -e "STALE\t$http_code\t$url"
             ;;
     esac
 }
@@ -337,39 +347,47 @@ process_results() {
     log_verbose "Processing URL check results..."
 
     # Load URL results into cache
-    while IFS=$'\t' read -r status url; do
-        if [[ "$status" == "OK" ]]; then
-            URL_CACHE["$url"]=0
-        else
-            URL_CACHE["$url"]=1
-        fi
+    # Format: status<tab>http_code<tab>url
+    while IFS=$'\t' read -r status http_code url; do
+        URL_CACHE["$url"]="$status:$http_code"
     done < "$URL_RESULTS_FILE"
 
     # Process each URL occurrence using cached results
     while IFS=$'\t' read -r file line_num url; do
         echo "$url" >> "$CHECKED_URLS_FILE"
 
-        if [[ "${URL_CACHE[$url]:-1}" == "1" ]]; then
-            log_warn "Stale link found: $file:$line_num - $url"
-            printf '%s\t%s\t%s\n' "$file" "$line_num" "$url" >> "$STALE_LINKS_FILE"
+        local cached="${URL_CACHE[$url]:-STALE:000}"
+        local status="${cached%%:*}"
+        local http_code="${cached#*:}"
 
-            if [[ "$REPLACE" == "true" ]]; then
-                local line_date
-                line_date=$(get_line_date "$file" "$line_num")
-                log_verbose "Line was added on: $line_date"
+        case "$status" in
+            OK)
+                log_verbose "URL is accessible: $url"
+                ;;
+            TIMEOUT)
+                log_warn "Timeout (HTTP $http_code): $file:$line_num - $url"
+                printf '%s\t%s\t%s\t%s\n' "$file" "$line_num" "$url" "$http_code" >> "$TIMEOUT_LINKS_FILE"
+                ;;
+            STALE)
+                log_warn "Stale link (HTTP $http_code): $file:$line_num - $url"
+                printf '%s\t%s\t%s\t%s\n' "$file" "$line_num" "$url" "$http_code" >> "$STALE_LINKS_FILE"
 
-                local archive_url
-                if archive_url=$(get_archive_url "$url" "$line_date"); then
-                    log_info "Found archive: $archive_url"
-                    sed -i "s|$url|$archive_url|g" "$file"
-                    log_info "Replaced in $file: $url -> $archive_url"
-                else
-                    log_warn "No archive available for: $url"
+                if [[ "$REPLACE" == "true" ]]; then
+                    local line_date
+                    line_date=$(get_line_date "$file" "$line_num")
+                    log_verbose "Line was added on: $line_date"
+
+                    local archive_url
+                    if archive_url=$(get_archive_url "$url" "$line_date"); then
+                        log_info "Found archive: $archive_url"
+                        sed -i "s|$url|$archive_url|g" "$file"
+                        log_info "Replaced in $file: $url -> $archive_url"
+                    else
+                        log_warn "No archive available for: $url"
+                    fi
                 fi
-            fi
-        else
-            log_verbose "URL is accessible: $url"
-        fi
+                ;;
+        esac
     done < "$URL_OCCURRENCES_FILE"
 }
 
@@ -449,6 +467,8 @@ main() {
     # Report results
     local stale_count
     stale_count=$(wc -l < "$STALE_LINKS_FILE" | tr -d ' ')
+    local timeout_count
+    timeout_count=$(wc -l < "$TIMEOUT_LINKS_FILE" | tr -d ' ')
     local checked_count
     checked_count=$(wc -l < "$CHECKED_URLS_FILE" | tr -d ' ')
     local final_unique_count
@@ -456,12 +476,26 @@ main() {
 
     log_info "Checked $final_unique_count unique URLs ($checked_count total occurrences)"
 
+    # Report timeouts (warnings only, don't fail)
+    if [[ "$timeout_count" -gt 0 ]]; then
+        log_warn "Found $timeout_count URL(s) that timed out (not counted as stale):"
+        echo ""
+        echo "=== TIMEOUT REPORT ==="
+        while IFS=$'\t' read -r report_file report_line_num report_url report_code; do
+            echo "  $report_file:$report_line_num (HTTP $report_code)"
+            echo "    $report_url"
+        done < "$TIMEOUT_LINKS_FILE"
+        echo "======================"
+        echo ""
+    fi
+
+    # Report stale links (actual errors)
     if [[ "$stale_count" -gt 0 ]]; then
-        log_warn "Found $stale_count stale link(s):"
+        log_error "Found $stale_count stale link(s):"
         echo ""
         echo "=== STALE LINKS REPORT ==="
-        while IFS=$'\t' read -r report_file report_line_num report_url; do
-            echo "  $report_file:$report_line_num"
+        while IFS=$'\t' read -r report_file report_line_num report_url report_code; do
+            echo "  $report_file:$report_line_num (HTTP $report_code)"
             echo "    $report_url"
         done < "$STALE_LINKS_FILE"
         echo "=========================="
