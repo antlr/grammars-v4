@@ -11,7 +11,7 @@ public abstract class GoParserBase : Parser
     private HashSet<string> no_semantics = new HashSet<string>();
     private static readonly string[] ALL_SEMANTIC_FUNCTIONS = {
         "isNotReceive", "isOperand", "isConversion",
-        "isMethodExpr"
+        "isMethodExpr", "isTypeArgument", "isExpressionArgument"
     };
 
     static GoParserBase()
@@ -210,6 +210,38 @@ public abstract class GoParserBase : Parser
         }
         result = ! table.Contains(la.Text);
         if (debug) System.Console.WriteLine("isMethodExpr Returning " + result + " for " + la);
+        return result;
+    }
+
+    // Built-in functions that take a type as first argument
+    private static readonly HashSet<string> BUILTIN_TYPE_FUNCTIONS = new HashSet<string> {
+        "make", "new"
+    };
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    public bool isTypeArgument()
+    {
+        if (no_semantics.Contains("isTypeArgument")) return true;
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        var funcToken = tokenStream.LT(-2);
+        if (funcToken == null || funcToken.Type != GoParser.IDENTIFIER)
+        {
+            if (debug) System.Console.WriteLine("isTypeArgument Returning false - no identifier before (");
+            return false;
+        }
+        var result = BUILTIN_TYPE_FUNCTIONS.Contains(funcToken.Text);
+        if (debug) System.Console.WriteLine("isTypeArgument Returning " + result + " for " + funcToken.Text);
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    public bool isExpressionArgument()
+    {
+        if (no_semantics.Contains("isExpressionArgument")) return true;
+        var result = !isTypeArgument() || no_semantics.Contains("isTypeArgument");
+        if (debug) System.Console.WriteLine("isExpressionArgument Returning " + result);
         return result;
     }
 }
