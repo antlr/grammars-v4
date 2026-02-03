@@ -164,3 +164,31 @@ bool GoParserBase::isMethodExpr()
     return result;
 }
 
+// Built-in functions that take a type as first argument
+const std::set<std::string> GoParserBase::BUILTIN_TYPE_FUNCTIONS = {"make", "new"};
+
+// Check if we're in a call to a built-in function that takes a type as first argument.
+// Called after L_PAREN has been matched in the arguments rule.
+bool GoParserBase::isTypeArgument()
+{
+    antlr4::BufferedTokenStream* stream = static_cast<antlr4::BufferedTokenStream*>(_input);
+    // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+    auto funcToken = stream->LT(-2);
+    if (funcToken == nullptr || funcToken->getType() != GoParser::IDENTIFIER) {
+        if (debug) std::cout << "isTypeArgument Returning false - no identifier before (" << std::endl;
+        return false;
+    }
+    bool result = BUILTIN_TYPE_FUNCTIONS.find(funcToken->getText()) != BUILTIN_TYPE_FUNCTIONS.end();
+    if (debug) std::cout << "isTypeArgument Returning " << result << " for " << funcToken->getText() << std::endl;
+    return result;
+}
+
+// Check if we're NOT in a call to a built-in function that takes a type.
+// This is the inverse of isTypeArgument for the expressionList alternative.
+bool GoParserBase::isExpressionArgument()
+{
+    bool result = !isTypeArgument();
+    if (debug) std::cout << "isExpressionArgument Returning " << result << std::endl;
+    return result;
+}
+

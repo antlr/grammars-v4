@@ -10,6 +10,7 @@ class GoParserBase : public antlr4::Parser {
 private:
     bool debug = false;
     std::set<std::string> table;
+    static const std::set<std::string> BUILTIN_TYPE_FUNCTIONS;
 
     static bool hasArg(int argc, char* argv[], const std::string& arg);
 
@@ -26,4 +27,6 @@ protected:
     bool isOperand();
     bool isConversion();
     bool isMethodExpr();
+    bool isTypeArgument();
+    bool isExpressionArgument();
 };
