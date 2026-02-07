@@ -13,7 +13,7 @@ based on a set of ABB Rapid sys-files and the existing kuka-krl antlr file
 
 ## Links
 
-https://pldb.io/concepts/rapid.html
+http://web.archive.org/web/20250323184017/https://pldb.io/concepts/rapid.html
 
 ## License
 
@@ -22,3 +22,4 @@ https://pldb.io/concepts/rapid.html
 ## Issues
 
 Known ambiguity in dataList.
+
