@@ -116,4 +116,30 @@ export default abstract class GoParserBase extends Parser {
         if (this.debug) console.log("isMethodExpr Returning " + result + " for " + la);
         return result;
     }
+
+    // Built-in functions that take a type as first argument
+    private static readonly BUILTIN_TYPE_FUNCTIONS: Set<string> = new Set(["make", "new"]);
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    public isTypeArgument(): boolean {
+        const stream = this._input as BufferedTokenStream;
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        const funcToken = stream.LT(-2);
+        if (funcToken === null || funcToken.type !== GoParser.IDENTIFIER) {
+            if (this.debug) console.log("isTypeArgument Returning false - no identifier before (");
+            return false;
+        }
+        const result = GoParserBase.BUILTIN_TYPE_FUNCTIONS.has(funcToken.text);
+        if (this.debug) console.log("isTypeArgument Returning " + result + " for " + funcToken.text);
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    public isExpressionArgument(): boolean {
+        const result = !this.isTypeArgument();
+        if (this.debug) console.log("isExpressionArgument Returning " + result);
+        return result;
+    }
 }

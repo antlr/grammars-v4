@@ -187,3 +187,38 @@ func (p *GoParserBase) isMethodExpr() bool {
     }
     return result
 }
+
+// Built-in functions that take a type as first argument
+var builtinTypeFunctions = map[string]bool{
+    "make": true,
+    "new":  true,
+}
+
+// Check if we're in a call to a built-in function that takes a type as first argument.
+// Called after L_PAREN has been matched in the arguments rule.
+func (p *GoParserBase) isTypeArgument() bool {
+    stream := p.GetTokenStream()
+    // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+    funcToken := stream.LT(-2)
+    if funcToken == nil || funcToken.GetTokenType() != GoParserIDENTIFIER {
+        if p.debug {
+            fmt.Println("isTypeArgument Returning false - no identifier before (")
+        }
+        return false
+    }
+    _, result := builtinTypeFunctions[funcToken.GetText()]
+    if p.debug {
+        fmt.Println("isTypeArgument Returning ", result, " for ", funcToken.GetText())
+    }
+    return result
+}
+
+// Check if we're NOT in a call to a built-in function that takes a type.
+// This is the inverse of isTypeArgument for the expressionList alternative.
+func (p *GoParserBase) isExpressionArgument() bool {
+    result := !p.isTypeArgument()
+    if p.debug {
+        fmt.Println("isExpressionArgument Returning ", result)
+    }
+    return result
+}

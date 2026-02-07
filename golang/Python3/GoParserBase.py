@@ -129,3 +129,28 @@ class GoParserBase(Parser):
         if self.debug:
             print(f"isMethodExpr Returning {result} for {la.text}")
         return result
+
+    # Built-in functions that take a type as first argument
+    BUILTIN_TYPE_FUNCTIONS = {"make", "new"}
+
+    # Check if we're in a call to a built-in function that takes a type as first argument.
+    # Called after L_PAREN has been matched in the arguments rule.
+    def isTypeArgument(self) -> bool:
+        # After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        func_token = self._input.LT(-2)
+        if func_token is None or func_token.type != self.IDENTIFIER:
+            if self.debug:
+                print("isTypeArgument Returning False - no identifier before (")
+            return False
+        result = func_token.text in self.BUILTIN_TYPE_FUNCTIONS
+        if self.debug:
+            print(f"isTypeArgument Returning {result} for {func_token.text}")
+        return result
+
+    # Check if we're NOT in a call to a built-in function that takes a type.
+    # This is the inverse of isTypeArgument for the expressionList alternative.
+    def isExpressionArgument(self) -> bool:
+        result = not self.isTypeArgument()
+        if self.debug:
+            print(f"isExpressionArgument Returning {result}")
+        return result
