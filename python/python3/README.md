@@ -14,3 +14,6 @@ the insertion of `INDENT` and `DEDENT` tokens. The embedded code,
 located inside the `NEWLINE` lexer rule as well as the `@lexer::members`
 section is well documented, so people trying to port this grammar to
 another target should not have much difficulty.
+
+## Reference
+

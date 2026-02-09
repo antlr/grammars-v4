@@ -7,3 +7,7 @@
 Entry rule is `program`.
 
 Last updated at 2021-12-15, Godot 3.3.4
+
+## Reference
+* [pldb](http://pldb.info/concepts/gdscript)
+

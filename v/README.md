@@ -9,3 +9,7 @@ Examples are all from [V language's official website](https://vlang.io)
 - Because of the V is under early stage, its grammar is not so stable for now.
 
 - some golang features are not completely removed in the `V.g4` file.
+
+## Reference
+* [pldb](http://pldb.info/concepts/v)
+

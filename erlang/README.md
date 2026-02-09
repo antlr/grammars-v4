@@ -50,3 +50,7 @@ Check Erlang.g4 against the whole Erlang/OTP's `.erl` sources:
 :::bash
 make check
 ```
+
+## Reference
+* [pldb](http://pldb.info/concepts/erlang)
+

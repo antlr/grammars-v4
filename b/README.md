@@ -8,5 +8,6 @@ A first attempt at a grammar for the programming language [B](https://en.wikiped
 
 Examples are from [https://www.bell-labs.com/usr/dmr/www/btut.html](https://www.bell-labs.com/usr/dmr/www/btut.html)
 
-
+## Reference
+* [pldb](http://pldb.info/concepts/b)
 

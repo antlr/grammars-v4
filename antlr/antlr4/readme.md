@@ -6,7 +6,7 @@ This is the Antlr4 grammar in Antlr4.
 ## License
 [BSD](https://opensource.org/license/bsd-3-clause)
 
-## Links
-* [PLDB](https://pldb.io/concepts/antlr.html)
+## Reference
+* [pldb](http://pldb.info/concepts/antlr)
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
 

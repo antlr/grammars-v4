@@ -2,7 +2,7 @@
 
 ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
 
-## Links
+## Reference
 * [EBNF Kotlin grammar](http://kotlinlang.org/docs/reference/grammar.html)
 * [Kotlin specification](https://github.com/Kotlin/kotlin-spec)
 
