@@ -10,7 +10,22 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "WebFetch(domain:productionresultssa18.blob.core.windows.net)",
-      "Bash(./_scripts/find-stale-links.sh:*)"
+      "Bash(./_scripts/find-stale-links.sh:*)",
+      "Bash(grep:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"=== {} ===\"\" && cat \"\"{}\"\"')",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(while read dir)",
+      "Bash(do if [ ! -f \"$dir/README.md\" ])",
+      "Bash([ ! -f \"$dir/readme.md\" ])",
+      "Bash(then basename \"$dir\")",
+      "Bash(fi:*)",
+      "Bash(done)",
+      "Bash(for dir in */)",
+      "Bash(do)",
+      "Bash(if [ ! -f \"$dir/README.md\" ])",
+      "Bash(then)",
+      "Bash(python sync_pldb.py:*)"
     ]
   }
 }
