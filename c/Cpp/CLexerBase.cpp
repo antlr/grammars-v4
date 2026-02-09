@@ -8,6 +8,11 @@
 #include <sstream>
 #include <stdexcept>
 
+#ifdef _MSC_VER
+#define popen  _popen
+#define pclose _pclose
+#endif
+
 CLexerBase::CLexerBase(antlr4::CharStream *input)
     : CLexerBase(input, runGccAndMakeStream(input)) {}
 
@@ -47,6 +52,7 @@ CLexerBase::runGccAndMakeStream(antlr4::CharStream *input)
         sourceName = "stdin.c";
     }
     std::string outputName = sourceName + ".p";
+
     std::string inputText;
     auto inputSize = input->size();
     if (inputSize > 0) {
@@ -70,14 +76,22 @@ CLexerBase::runGccAndMakeStream(antlr4::CharStream *input)
 
     // ---- gcc / clang (external) -------------------------------------------
     if (gcc || clang) {
+#ifdef _WIN32
+        std::string cmd = gcc ? "gcc.exe" : "clang.exe";
+#else
         std::string cmd = gcc ? "gcc" : "clang";
+#endif
 
         std::ostringstream cmdline;
         cmdline << cmd << " -std=c2x -E -C";
         for (auto& opt : ppOptions) {
             cmdline << " " << opt;
         }
+#ifdef _WIN32
+        cmdline << " " << sourceName << " 2>NUL";
+#else
         cmdline << " " << sourceName << " 2>/dev/null";
+#endif
 
         FILE *pipe = popen(cmdline.str().c_str(), "r");
         if (!pipe) {
@@ -126,9 +140,9 @@ bool CLexerBase::hasArg(const std::string& arg) {
 std::vector<std::string> CLexerBase::extractPreprocessorOptions() {
     std::vector<std::string> options;
     for (auto& arg : args_) {
-        if (arg.starts_with("--D")) {
+        if (arg.find("--D") == 0) {
             options.push_back("-D" + arg.substr(3));
-        } else if (arg.starts_with("--I")) {
+        } else if (arg.find("--I") == 0) {
             options.push_back("-I" + arg.substr(3));
         }
     }
