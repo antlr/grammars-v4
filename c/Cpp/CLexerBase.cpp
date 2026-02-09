@@ -47,8 +47,12 @@ CLexerBase::runGccAndMakeStream(antlr4::CharStream *input)
         sourceName = "stdin.c";
     }
     std::string outputName = sourceName + ".p";
-    std::string inputText  = input->getText(
-        antlr4::misc::Interval(0, static_cast<ssize_t>(input->size()) - 1));
+    std::string inputText;
+    auto inputSize = input->size();
+    if (inputSize > 0) {
+        inputText = input->getText(
+            antlr4::misc::Interval(0, static_cast<ssize_t>(inputSize) - 1));
+    }
 
     // ---- --nopp -----------------------------------------------------------
     if (nopp) {

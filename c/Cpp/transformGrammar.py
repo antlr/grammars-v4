@@ -9,24 +9,21 @@ to work with the C++ (Cpp) target by:
 """
 
 import re
-import sys
-import os
-import shutil
+import glob
 
-def transform_file(input_path, output_path):
-    with open(input_path, 'r') as f:
+
+def transform_file(file_path):
+    with open(file_path, 'r') as f:
         content = f.read()
 
-    filename = os.path.basename(input_path)
-
-    if filename == 'CLexer.g4':
+    if 'CLexer' in file_path:
         # Replace: // Insert here @header for lexer.
         content = content.replace(
             '// Insert here @header for lexer.',
             '@header {#include "CLexerBase.h"}'
         )
 
-    elif filename == 'CParser.g4':
+    elif 'CParser' in file_path:
         # Replace: // Insert here @header for parser.
         content = content.replace(
             '// Insert here @header for parser.',
@@ -36,35 +33,17 @@ def transform_file(input_path, output_path):
     # Convert this.MethodName() -> this->MethodName() for C++ syntax
     content = re.sub(r'\bthis\.', 'this->', content)
 
-    with open(output_path, 'w') as f:
+    with open(file_path, 'w') as f:
         f.write(content)
 
-    print(f"Transformed {input_path} -> {output_path}")
+    print(f"Transformed {file_path}")
+
 
 def main():
-    # Determine paths
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    grammar_dir = os.path.dirname(script_dir)  # grammar/
-
-    clexer_src = os.path.join(grammar_dir, 'CLexer.g4')
-    cparser_src = os.path.join(grammar_dir, 'CParser.g4')
-
-    # Output to the same grammar directory (overwrite in-place or to a target)
-    # By default, transform in-place for ANTLR generation
-    if len(sys.argv) > 1:
-        output_dir = sys.argv[1]
-    else:
-        output_dir = grammar_dir
-
-    os.makedirs(output_dir, exist_ok=True)
-
-    clexer_dst = os.path.join(output_dir, 'CLexer.g4')
-    cparser_dst = os.path.join(output_dir, 'CParser.g4')
-
-    transform_file(clexer_src, clexer_dst)
-    transform_file(cparser_src, cparser_dst)
-
+    for file in glob.glob("./*.g4"):
+        transform_file(file)
     print("Grammar transformation for Cpp target complete.")
+
 
 if __name__ == '__main__':
     main()

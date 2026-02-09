@@ -43,17 +43,24 @@ endif()
 
 # ──────────────────────────────────────────────────────────
 #  Step 1: transformGrammar.py  →  生成 Cpp 版 .g4
+#  脚本使用 glob("./*.g4") 就地转换当前目录下的 .g4 文件，
+#  所以先拷贝原始 .g4 到 GENERATED_DIR，再在该目录下运行脚本。
 # ──────────────────────────────────────────────────────────
 add_custom_command(
   OUTPUT
     ${GENERATED_DIR}/CLexer.g4
     ${GENERATED_DIR}/CParser.g4
-  COMMAND ${PYTHON3} ${GRAMMAR_DIR}/transformGrammar.py ${GENERATED_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy
+    ${GRAMMAR_ROOT}/CLexer.g4
+    ${GRAMMAR_ROOT}/CParser.g4
+    ${GENERATED_DIR}/
+  COMMAND ${PYTHON3} ${GRAMMAR_DIR}/transformGrammar.py
+  WORKING_DIRECTORY ${GENERATED_DIR}
   DEPENDS
     ${GRAMMAR_DIR}/transformGrammar.py
     ${GRAMMAR_ROOT}/CLexer.g4
     ${GRAMMAR_ROOT}/CParser.g4
-  COMMENT "Transforming grammar for Cpp target"
+  COMMENT "Copying and transforming grammar for Cpp target"
 )
 
 # ──────────────────────────────────────────────────────────
