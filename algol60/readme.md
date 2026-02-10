@@ -13,6 +13,7 @@ page.
 The examples included were gathered from various free
 sources on the Internet.
 
+## Reference
 * https://github.com/erwan-kessler/ALGOL-60/tree/master/examples
     The samples in this repo are of unknown origin, but they appear
     valid with only a few simple departures from the Standard in
@@ -28,12 +29,11 @@ sources on the Internet.
     The samples in this Algol-60 compiler source, written by Jan van Katwijk,
     are described in the [User Manual](https://github.com/JvanKatwijk/algol-60-compiler/blob/master/doc/jff-manual.pdf).
     It is a derivative of the [”Modified Report
-    on the algorithmic language ALGOL 60”](https://doi.org/10.1093/comjnl/19.4.364)
-    (downloadable from [here](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.1483&rep=rep1&type=pdf)).
+    on the algorithmic language ALGOL 60”](https://doi.org/10.1093/comjnl/19.4.364).
     Some of the samples are included in the tests here, but others
     are not because they deviate from the spec, e.g.,
     a semi-colon after an "end".
-
-## Reference
+* Report on the Algorithmic Language ALGOL 60. https://dl.acm.org/doi/pdf/10.1145/367236.367262
+* Revised Report on the Algorithmic Language ALGOL 60. https://dl.acm.org/doi/pdf/10.1145/366193.366201
 * [pldb](http://pldb.info/concepts/algol-60)
 
