@@ -9,4 +9,5 @@ ISO 8601 grammar with date, time, duration, recurring support.
 This grammar is licensed under 0BSD.
 
 ## Reference
+* [pldb](http://pldb.info/concepts/iso-8601)
 

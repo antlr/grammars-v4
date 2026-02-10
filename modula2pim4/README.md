@@ -8,4 +8,5 @@ in the fourth edition of "Programming in Modula-2"
 by N. Wirth, refactored to satisfy LL(1) constraints.
 
 ## Reference
+* [pldb](http://pldb.info/concepts/modula-2)
 

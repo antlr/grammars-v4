@@ -7,4 +7,5 @@ http://web.archive.org/web/20240704154247/https://msopenspecs.azureedge.net/file
 The vba_cc grammar can be used against vba files to analyze that portion of the code.
 
 ## Reference
+* [pldb](http://pldb.info/concepts/vba)
 

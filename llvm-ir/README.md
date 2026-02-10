@@ -8,4 +8,5 @@ This grammar refers to the following two implementations and rewrites using `ant
   - [https://lists.llvm.org/pipermail/llvm-dev/2018-June/123851.html](https://lists.llvm.org/pipermail/llvm-dev/2018-June/123851.html )
 
 ## Reference
+* [pldb](http://pldb.info/concepts/llvmir)
 

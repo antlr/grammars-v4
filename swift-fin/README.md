@@ -6,6 +6,7 @@ It is sufficient for current needs and therefor should be improved.
 See links for structure description.
 
 ## Reference
+* [pldb](http://pldb.info/concepts/swift)
 * [SWIFT](http://www.swift.com)
 * [Sepa for Corporates](http://www.sepaforcorporates.com/swift-for-corporates/read-swift-message-structure)
 * [Anatomy of a SWIFT message](http://coding.pstodulka.com/2015/01/10/anatomy-of-a-swift-message)

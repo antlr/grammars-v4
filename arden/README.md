@@ -5,4 +5,5 @@ An ANTLR4 grammar for [Arden Syntax](http://www.hl7.org/special/Committees/arden
 The examples are from the arden syntax document v3.0 found [here](http://www.hl7.org/implement/standards/product_brief.cfm?product_id=372).
 
 ## Reference
+* [pldb](http://pldb.info/concepts/arden-syntax)
 

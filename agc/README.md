@@ -5,4 +5,5 @@ The grammar was tested on Apollo4 [Solarium055](http://www.ibiblio.org/apollo/li
 pulled from [https://github.com/avtobiff/virtualagc](https://github.com/avtobiff/virtualagc).
 
 ## Reference
+* [pldb](http://pldb.info/concepts/apollo-guidance-computer)
 

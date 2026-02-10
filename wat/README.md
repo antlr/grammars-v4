@@ -5,4 +5,5 @@ An ANTLRv4 grammar for the [Wat](http://webassembly.github.io/spec/core/text/ind
 Inspired by the reference interpreter of the official WebAssembly GitHub [repository](https://github.com/WebAssembly/spec).
 
 ## Reference
+* [pldb](http://pldb.info/concepts/wast)
 
