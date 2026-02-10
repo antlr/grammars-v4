@@ -1,6 +1,6 @@
 # Godot GDScript ANTLR 4 grammar
 
-[Official EBNF grammar](https://docs.godotengine.org/en/stable/development/file_formats/gdscript_grammar.html)
+[Official EBNF grammar](https://docs.godotengine.org/en/stable/engine_details/file_formats/gdscript_grammar.html#doc-gdscript-grammar)
 
 [Parser source code](https://github.com/godotengine/godot/tree/master/modules/gdscript)
 

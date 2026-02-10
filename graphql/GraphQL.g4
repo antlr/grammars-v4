@@ -22,7 +22,7 @@
 
  GraphQL Draft Specification - Oct 2021 upgraded from June 2018
 
- http://facebook.github.io/graphql/ https://github.com/facebook/graphql
+ https://spec.graphql.org/ https://github.com/facebook/graphql
 
  AB:10-sep19: replaced type with type_ to resolve conflict for golang generator
 

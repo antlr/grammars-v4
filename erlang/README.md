@@ -16,7 +16,6 @@ It is meant for students and people who work on Erlang's syntax.
 
 ## Requierements
 
-* [antlr4](http://www.antlr.org/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4)
 * Erlang's **erlc** for preprocessing purposes.
 
 ## Usage
