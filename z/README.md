@@ -4,7 +4,7 @@ Z Notation grammar based on the [ISO standard](http://standards.iso.org/ittf/Pub
 
 ## Examples
 
-I created standard\_toolkit\_operator\_templates.utf8 based upon "Annex B" in the ISO standard. All other examples were created from [CZT's test cases](https://git.code.sf.net/p/czt/code)
+I created standard\_toolkit\_operator\_templates.utf8 based upon "Annex B" in the ISO standard. All other examples were created from the [CZT](https://czt.sourceforge.net/) test cases.
 
 ## Using
 
