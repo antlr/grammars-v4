@@ -1,6 +1,4 @@
 #
-# https://github.com/antlr/grammars-v4/blob/master/javascript/Cpp/README.md
-#
 # Run the command in the .g4 file directory:
 # sed -f Cpp/pitch.sed JavaScriptParser.g4 > target/JavaScriptParser.g4
 # sed -f Cpp/pitch.sed JavaScriptLexer.g4  > target/JavaScriptLexer.g4

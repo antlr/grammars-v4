@@ -5,7 +5,7 @@ Grammar for parsing Well Known Text Coordinate Reference System, version 1.
 References:
 
 - [WKT](https://en.wikipedia.org/wiki/Well-known_text_representation_of_coordinate_reference_systems)
-- [WKT v1](https://github.com/geotools/geotools/blob/main/modules/library/opengis/src/main/java/org/opengis/referencing/doc-files/WKT.html)
+- WKT v1 github.com/geotools/geotools/blob/main/modules/library/opengis/src/main/java/org/opengis/referencing/doc-files/WKT.html
 
 The grammar tries to adhere to the spec but have not made extensive tests.
 

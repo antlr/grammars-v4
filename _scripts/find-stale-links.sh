@@ -168,7 +168,7 @@ check_url_standalone() {
 
     # Consider various status codes
     case "$http_code" in
-        200|201|202|203|204|301|302|303|307|308|401|403|418)
+        200|201|202|203|204|301|302|303|307|308|401|403|418|429)
             echo -e "OK\t$http_code\t$url"
             ;;
         000|000000)
