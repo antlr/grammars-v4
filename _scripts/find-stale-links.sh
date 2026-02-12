@@ -171,7 +171,7 @@ check_url_standalone() {
         200|201|202|203|204|301|302|303|307|308|401|403|418)
             echo -e "OK\t$http_code\t$url"
             ;;
-        000)
+        000|000000)
             # 000 means timeout or connection failure
             echo -e "TIMEOUT\t$http_code\t$url"
             ;;
