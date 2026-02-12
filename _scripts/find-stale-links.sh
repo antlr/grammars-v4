@@ -276,7 +276,7 @@ collect_urls_from_file() {
     fi
 
     # Skip most files in example directories (they're parse examples, not documentation)
-    if echo "$file" | grep -qE '/examples?[^/]*/' ; then
+    if echo "$file" | grep -qE '/(([^/]*-)?examples?[^/]*)/' ; then
         case "$file" in
             *.md)
                 ;;
