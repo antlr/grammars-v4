@@ -8,10 +8,9 @@ npm init -y
 npm i antlr-ng
 <endif>
 
-$version = dotnet trxml2 Other.csproj | Where-Object { $_ -match 'PackageReference/@Version' } | ForEach-Object {
-        ($_ -split '=')[1].Trim()
-    }
-
+$version = dotnet trxml2 Other.csproj | Select-String 'PackageReference/@Version' | ForEach-Object { ($_ -split '=')[1].Trim() }
+dotnet trxml2 Other.csproj
+dotnet trxml2 Other.csproj | Select-String 'PackageReference/@Version'
 Write-Host "version = '$version'"
 
 <tool_grammar_files:{x |
