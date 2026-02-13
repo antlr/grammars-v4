@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
-* http://www.mit.edu/afs.new/sipb/project/pike/tutorial/tutorial_onepage.html#D
+* https://web.archive.org/web/20220124144721/http://www.mit.edu/afs.new/sipb/project/pike/tutorial/tutorial_onepage.html#D
 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false

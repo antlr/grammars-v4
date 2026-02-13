@@ -26,7 +26,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
-* examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
+* examples here: http://web.archive.org/web/20141011223900/http://svn.ez.no:80/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false

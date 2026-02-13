@@ -12,11 +12,11 @@ Dmitry Litovchenko [i@dlitovchenko.ru](mailto:i@dlitovchenko.ru)
 
 https://docs.soliditylang.org/en/latest/grammar.html
 
-## Links
+## Reference
 
 [Docs](https://docs.soliditylang.org/en/v0.8.27/)
 
-[pldb](https://pldb.io/concepts/solidity.html)
+* [pldb](http://pldb.info/concepts/solidity)
 
 [Original grammar](https://github.com/ethereum/solidity/tree/develop/docs/grammar)
 

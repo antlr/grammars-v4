@@ -170,7 +170,7 @@ token_decls
 
 token_decl
     : id int_opt alias
-    | id id LPAREN id RPAREN alias // Not in Bison, but used in https://github.com/ruby/ruby/parse.y
+    | id id LPAREN id RPAREN alias // Not in Bison, but used in Ruby parse.y
     ;
 
 int_opt

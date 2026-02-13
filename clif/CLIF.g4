@@ -31,10 +31,10 @@
    http://standards.iso.org/ittf/PubliclyAvailableStandards/c039175_ISO_IEC_24707_2007%28E%29.zip
    
    with bug fixes from
-   http://metadata-standards.org/Document-library/Documents-by-number/WG2-N1701-N1750/WG2N1703_24707-defect-report.pdf
+   metadata-standards.org/Document-library/Documents-by-number/WG2-N1701-N1750/WG2N1703_24707-defect-report.pdf
     
    example clif ontologies available from COLORE
-   http://stl.mie.utoronto.ca/colore/
+   http://web.archive.org/web/20150422010624/http://stl.mie.utoronto.ca:80/colore/
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false

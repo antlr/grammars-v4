@@ -24,3 +24,7 @@ BibTeX grammar for ANTLR v4.
 # References
 
 - https://www.bibtex.com/e/entry-types/
+
+## Reference
+* [pldb](http://pldb.info/concepts/bibtex)
+

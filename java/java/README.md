@@ -66,3 +66,7 @@ and lexer rule names in parser rules. If you want a parser grammar that removes 
 from parser rules, use [Trash trfoldlit](https://github.com/kaby76/Trash/tree/main/src/trfoldlit).
 If you want a parser grammar that uses string literals where a lexer rule exists for the string
 literal, use [Trash trunfoldlit](https://github.com/kaby76/Trash/tree/main/src/trunfoldlit).
+
+## Reference
+* [pldb](http://pldb.info/concepts/java)
+

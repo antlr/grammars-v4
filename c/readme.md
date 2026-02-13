@@ -316,6 +316,7 @@ Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build);
 .NET SDK: 10.0.102. Sample size 20.
 
 ## Reference
+* [pldb](http://pldb.info/concepts/c)
 * ISO Specification: https://www.iso.org/standard/82075.html
 * ISO/ IEC C - Project status and milestones: https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
 * ISO/ IEC JTC1/SC22/WG14 - C, Official home of the working group: https://www.open-std.org/jtc1/sc22/wg14/

@@ -10,7 +10,7 @@ Robert Hovsepyan
 
 Licensed under the Apache 2.0
 
-## Links
+## Reference
 
 * [wikipedia](https://en.wikipedia.org/wiki/Redis)
-* [pldb](https://pldb.io/concepts/redis.html)
+* [pldb](http://pldb.info/concepts/redis)

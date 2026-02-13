@@ -21,6 +21,10 @@ An ANTLR4 grammar for Golang based on [The Go Programming Language Specification
     * Samples set
     * Fixes and refactoring
 
+## Reference
+* [pldb](http://pldb.info/concepts/go)
+
+
 ## License
 
 [BSD-3](https://opensource.org/licenses/BSD-3-Clause)
