@@ -28,3 +28,7 @@ MIT — Copyright (c) 2026 J Dalton
 The SysML v2 specification grammar is owned by the Object Management Group
 (OMG).  This project provides a derived ANTLR4 translation of the official
 KEBNF grammar.
+
+## Reference
+
+- <http://pldb.info/concepts/sysml>

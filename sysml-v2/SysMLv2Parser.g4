@@ -491,7 +491,7 @@ basicFeaturePrefix
     ;
 
 featurePrefix
-    : (endFeaturePrefix ( ownedCrossFeatureMember)? | basicFeaturePrefix) (prefixMetadataMember)*
+    : (endFeaturePrefix ownedCrossFeatureMember | basicFeaturePrefix) (prefixMetadataMember)*
     ;
 
 ownedCrossFeatureMember
@@ -560,13 +560,11 @@ featureSpecialization
     ;
 
 typings
-    : typedBy (COMMA ownedFeatureTyping)*
-    | typedBy ( COMMA featureTyping)*
+    : typedBy (COMMA featureTyping)*
     ;
 
 typedBy
-    : (COLON | TYPED BY) ownedFeatureTyping
-    | ( COLON | DEFINED BY) featureTyping
+    : (COLON | TYPED BY | DEFINED BY) featureTyping
     ;
 
 subsettings
@@ -757,7 +755,7 @@ returnFeatureMember
     ;
 
 resultExpressionMember
-    : memberPrefix? ownedExpression
+    : memberPrefix ownedExpression
     ;
 
 expression
@@ -797,7 +795,7 @@ referenceTyping
     ;
 
 emptyResultMember
-    : emptyFeature
+    : emptyFeature_
     ;
 
 sequenceOperatorExpression
@@ -984,12 +982,10 @@ multiplicitySubset
 
 multiplicityRange
     : MULTIPLICITY identification? multiplicityBounds typeBody
-    | LBRACK (multiplicityExpressionMember DOT_DOT)? multiplicityExpressionMember RBRACK
     ;
 
 ownedMultiplicity
     : ownedMultiplicityRange
-    | multiplicityRange
     ;
 
 ownedMultiplicityRange
@@ -1208,7 +1204,7 @@ basicUsagePrefix
     ;
 
 endUsagePrefix
-    : END (ownedCrossFeatureMember)?
+    : END ownedCrossFeatureMember
     ;
 
 usageExtensionKeyword
@@ -1383,7 +1379,7 @@ individualDefinition
     ;
 
 emptyMultiplicityMember
-    : emptyMultiplicity
+    : emptyMultiplicity_
     ;
 
 occurrenceUsagePrefix
@@ -1776,10 +1772,10 @@ triggerExpression
     ;
 
 sendNode
-    : occurrenceUsagePrefix (actionNodeUsageDeclaration | actionUsageDeclaration)? SEND (
+    : occurrenceUsagePrefix (actionNodeUsageDeclaration | actionUsageDeclaration) SEND (
         nodeParameterMember senderReceiverPart?
         | emptyParameterMember senderReceiverPart
-    )? actionBody
+    ) actionBody
     ;
 
 sendNodeDeclaration
@@ -1804,7 +1800,7 @@ featureBinding
     ;
 
 emptyParameterMember
-    : emptyUsage
+    : emptyUsage_
     ;
 
 assignmentNode
@@ -1926,7 +1922,7 @@ entryTransitionMember
     ;
 
 stateActionUsage
-    : emptyActionUsage SEMI
+    : emptyActionUsage_ SEMI
     | statePerformActionUsage
     | stateAcceptActionUsage
     | stateSendActionUsage
@@ -2006,7 +2002,7 @@ effectBehaviorMember
     ;
 
 effectBehaviorUsage
-    : emptyActionUsage
+    : emptyActionUsage_
     | transitionPerformActionUsage
     | transitionAcceptActionUsage
     | transitionSendActionUsage
@@ -2038,7 +2034,7 @@ transitionSuccession
     ;
 
 emptyEndMember
-    : emptyFeature
+    : emptyFeature_
     ;
 
 calculationDefinition
@@ -2064,7 +2060,7 @@ calculationBodyItem
     ;
 
 returnParameterMember
-    : memberPrefix? RETURN usageElement
+    : memberPrefix RETURN usageElement
     ;
 
 constraintDefinition
@@ -2114,7 +2110,7 @@ subjectUsage
     ;
 
 requirementConstraintMember
-    : memberPrefix? requirementKind requirementConstraintUsage
+    : memberPrefix requirementKind requirementConstraintUsage
     ;
 
 requirementKind
@@ -2128,7 +2124,7 @@ requirementConstraintUsage
     ;
 
 framedConcernMember
-    : memberPrefix? FRAME framedConcernUsage
+    : memberPrefix FRAME framedConcernUsage
     ;
 
 framedConcernUsage
@@ -2375,19 +2371,19 @@ calculationUsageDeclaration
     : usageDeclaration? valuePart?
     ;
 
-emptyActionUsage
+emptyActionUsage_
     : /* epsilon */
     ;
 
-emptyFeature
+emptyFeature_
     : /* epsilon */
     ;
 
-emptyMultiplicity
+emptyMultiplicity_
     : /* epsilon */
     ;
 
-emptyUsage
+emptyUsage_
     : /* epsilon */
     ;
 
