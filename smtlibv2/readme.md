@@ -6,7 +6,8 @@ Julian Thome <julian.thome.de@gmail.com>
 ## Description
 Grammar is baesd on the following specification: http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf.
 
-## Links
+## Reference
+* [pldb](http://pldb.info/concepts/smt)
 * https://smt-lib.org/
 * https://en.wikipedia.org/wiki/Satisfiability_modulo_theories
 

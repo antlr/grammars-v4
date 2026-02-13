@@ -208,7 +208,7 @@ fExp
     ;
 
 // This is purely a workaround for an ANTLR bug in tree construction
-// http://www.antlr.org/wiki/display/ANTLR3/multiple+occurences+of+a+token+mix+up+the+list+management+in+tree+rewrites
+// www.antlr.org/wiki/display/ANTLR3/multiple+occurences+of+a+token+mix+up+the+list+management+in+tree+rewrites
 fExp2
     : fExp
     ;

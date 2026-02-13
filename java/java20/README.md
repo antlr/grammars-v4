@@ -13,8 +13,8 @@ Alex Buckley
 Daniel Smith
 Gavin Bierman; mailto:jls-jvms-spec-comments@openjdk.java.net.
 
-## Links
+## Reference
 
 [wikipedia](https://en.wikipedia.org/wiki/Java_(programming_language))
-[pldb](https://pldb.pub/concepts/java.html)
+* [pldb](http://pldb.info/concepts/java)
 

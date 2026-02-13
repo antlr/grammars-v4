@@ -11,3 +11,7 @@ The resources:
 This implementation is case insensitive.
 
 Also, the starting rule parses multiple statements.
+
+## Reference
+* [pldb](http://pldb.info/concepts/hiveql)
+

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 
-// http://www.eecs.qmul.ac.uk/~pm/SaR/2004ltl.pdf
+// https://web.archive.org/web/20250321022944/http://www.eecs.qmul.ac.uk/~pm/SaR/2004ltl.pdf
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging

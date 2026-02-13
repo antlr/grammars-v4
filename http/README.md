@@ -7,3 +7,7 @@ the [ABNF](https://www.rfc-editor.org/rfc/rfc7230#appendix-B) format.
 
 Currently, the grammar is incomplete and only supports the request line and
 headers.
+
+## Reference
+* [pldb](http://pldb.info/concepts/http)
+

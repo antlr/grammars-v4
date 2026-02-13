@@ -93,3 +93,7 @@ fails due to unicode width limitations in the java used in ANTLR4.
 
 * classify16.g4 works with the existing 16 bit java ANTLR4
 * classify21.g4 works with a theoretically complete 21 bit java ANTLR4
+
+## Reference
+* [pldb](http://pldb.info/concepts/unicode)
+

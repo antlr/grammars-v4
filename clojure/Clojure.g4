@@ -6,13 +6,13 @@
    it commited by matthias.koester for clojure-eclipse project on
    Oct 5, 2009:
 
-   https://code.google.com/p/clojure-eclipse/
+   code.google.com/p/clojure-eclipse/
 
    Seems to me Laurent Petit had a version of this. I also see
    Jingguo Yao submitting a link to a now-dead github project on
    Jan 1, 2011.
 
-   https://github.com/laurentpetit/ccw/tree/master/clojure-antlr-grammar
+   github.com/laurentpetit/ccw/tree/master/clojure-antlr-grammar
 
    Regardless, there are some issues perhaps related to "sugar";
    I've tried to fix them.

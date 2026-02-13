@@ -23,7 +23,7 @@
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=F54E0B46B27FC0AEF07271B358CE34E3?doi=10.1.1.47.155&rep=rep1&type=pdf
+// https://dl.acm.org/doi/10.1145/289423.289451
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging

@@ -6,3 +6,7 @@ Therefore, it should be easier to implement comparison between semvers.
 ```
 "1.2.3-rc2" > "1.2.3-beta23" > "1.2.3-beta8" > "1.2.3-alpha8"
 ```
+
+## Reference
+* [pldb](http://pldb.info/concepts/semver)
+

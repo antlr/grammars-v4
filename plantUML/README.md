@@ -13,8 +13,9 @@ This is an ANTLR4 grammar for the textual UML class diagram notation of PlantUML
 
 EPL-2.0
 
-## Links
+## Reference
 
+* [pldb](http://pldb.info/concepts/plantuml)
 * https://plantuml.com/
 * https://pdf.plantuml.net/PlantUML_Language_Reference_Guide_en.pdf
 * https://github.com/plantuml

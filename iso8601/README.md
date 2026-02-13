@@ -7,3 +7,7 @@ ISO 8601 grammar with date, time, duration, recurring support.
 - If you don't know which rule to use, try rule `iso`.
 
 This grammar is licensed under 0BSD.
+
+## Reference
+* [pldb](http://pldb.info/concepts/iso-8601)
+

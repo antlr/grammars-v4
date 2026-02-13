@@ -31,6 +31,10 @@ PHP parser has been successfully tested (parsing without errors) on the followin
 Also this parser has been tested on plenty number of PHP files from different CMS (~70000 files).
 It took approximately 1 hour and 15 minutes with 70% on lexer part and 30% on parser part.
 
+## Reference
+* [pldb](http://pldb.info/concepts/php)
+
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)
