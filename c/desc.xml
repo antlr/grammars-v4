@@ -9,6 +9,8 @@
     </test>
     <test>
        <inputs>examples/c-testsuite/**/*.c</inputs>
+       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/writing-a-c-compiler-tests/**/valid/**/*.c</inputs>
