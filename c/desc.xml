@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
-    <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
+    <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;Python3;TypeScript</targets>
 <!--
     <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;PHP;Python3;Rust;TypeScript</targets>
     -->
@@ -9,32 +9,32 @@
     </test>
     <test>
        <inputs>examples/c-testsuite/**/*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/writing-a-c-compiler-tests/**/valid/**/*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/sqlite/**/*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/torture/builtin-*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/asm*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/auto*.c</inputs>
-       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Java;JavaScript;TypeScript</targets>
        <!-- Python3 too slow -->
     </test>
 </desc>
