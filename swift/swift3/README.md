@@ -84,8 +84,9 @@ Beware of adding too much tests, swift parser is slow.
 It can fail on Travis after you make a pull request due to current 
 10min timeout per grammar and travis works very slow in comparison to your computer.
 
-## Links
+## Reference
 
+* [pldb](http://pldb.info/concepts/swift)
 Permanent links for language reference:
 [Swift 2.2](http://web.archive.org/web/20160423125921/https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/zzSummaryOfTheGrammar.html)
 [Swift 3.0.1](http://web.archive.org/web/20170221054114/https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/zzSummaryOfTheGrammar.html).

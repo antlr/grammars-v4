@@ -7,3 +7,7 @@ An ANTLR4 grammar for [Eiffel](https://en.wikipedia.org/wiki/Eiffel_(programming
     * https://www.eiffel.org/codeboard
 * https://apt.liberty-eiffel.org/
 * https://rosettacode.org/wiki/Category:Eiffel
+
+## Reference
+* [pldb](http://pldb.info/concepts/eiffel)
+

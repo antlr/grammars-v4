@@ -10,6 +10,6 @@ https://github.com/yeahCaesar -- useful for migrating CaQL to Grafana(Prometheus
 
 BSD License
 
-## Links
+## Reference
 
 https://docs.circonus.com/caql/reference

@@ -174,4 +174,37 @@ abstract class GoParserBase extends Parser
         }
         return result;
     }
+
+    // Built-in functions that take a type as first argument
+    static final Set<String> BUILTIN_TYPE_FUNCTIONS = {'make', 'new'};
+
+    // Check if we're in a call to a built-in function that takes a type as first argument.
+    // Called after L_PAREN has been matched in the arguments rule.
+    bool isTypeArgument()
+    {
+        // After matching L_PAREN, LT(-1) is '(' and LT(-2) is the token before it
+        final funcToken = this.tokenStream.LT(-2);
+        if (funcToken == null || funcToken.type != GoParser.TOKEN_IDENTIFIER) {
+            if (debug) {
+                print('isTypeArgument Returning false - no identifier before (');
+            }
+            return false;
+        }
+        final result = BUILTIN_TYPE_FUNCTIONS.contains(funcToken.text);
+        if (debug) {
+            print('isTypeArgument Returning $result for ${funcToken.text}');
+        }
+        return result;
+    }
+
+    // Check if we're NOT in a call to a built-in function that takes a type.
+    // This is the inverse of isTypeArgument for the expressionList alternative.
+    bool isExpressionArgument()
+    {
+        final result = !isTypeArgument();
+        if (debug) {
+            print('isExpressionArgument Returning $result');
+        }
+        return result;
+    }
 }

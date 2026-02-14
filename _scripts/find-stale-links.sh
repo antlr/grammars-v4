@@ -168,10 +168,10 @@ check_url_standalone() {
 
     # Consider various status codes
     case "$http_code" in
-        200|201|202|203|204|301|302|303|307|308|401|403)
+        200|201|202|203|204|301|302|303|307|308|401|403|418|429)
             echo -e "OK\t$http_code\t$url"
             ;;
-        000)
+        000|000000|504)
             # 000 means timeout or connection failure
             echo -e "TIMEOUT\t$http_code\t$url"
             ;;
@@ -276,7 +276,7 @@ collect_urls_from_file() {
     fi
 
     # Skip most files in example directories (they're parse examples, not documentation)
-    if echo "$file" | grep -qE '/examples?[^/]*/' ; then
+    if echo "$file" | grep -qE '/(([^/]*-)?examples?[^/]*)/' ; then
         case "$file" in
             *.md)
                 ;;

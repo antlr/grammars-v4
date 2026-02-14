@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(dotnet trgen:*)",
+      "Bash(bash:*)",
+      "Bash(./bin/Debug/net10.0/Test.exe:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(dotnet trparse:*)",
+      "Bash(dotnet trtree:*)",
+      "Bash(for f in ../examples/*.go)",
+      "Bash(do ./bin/Debug/net10.0/Test.exe \"$f\")",
+      "Bash(done)",
+      "Bash(ls:*)"
     ]
   }
 }

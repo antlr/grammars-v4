@@ -13,7 +13,7 @@ This grammar was a scrape of three files in Graphviz source.
 * lib/cgraph/scal.l
 * lib/gvpr/parse.c
 
-## Links
+## Reference
 
 Source code: https://gitlab.com/graphviz/graphviz
 

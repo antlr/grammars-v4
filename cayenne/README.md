@@ -1,4 +1,8 @@
 # Cayenne Grammar
 
-A simple ANTLR4 grammar for [cayenne](http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=F54E0B46B27FC0AEF07271B358CE34E3?doi=10.1.1.47.155&rep=rep1&type=pdf).  
+A simple ANTLR4 grammar for
+[cayenne](https://dl.acm.org/doi/10.1145/289423.289451).
+
+## Reference
+* [pldb](http://pldb.info/concepts/cayenne)
 

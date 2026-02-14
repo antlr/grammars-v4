@@ -243,3 +243,7 @@ one parameter, and `p2` taking two parameters:
    |                             '- 20
    '- <EOF>
 ```
+
+## Reference
+* [pldb](http://pldb.info/concepts/logo)
+

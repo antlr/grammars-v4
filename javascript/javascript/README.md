@@ -97,6 +97,10 @@ Also this grammar supports outdated syntax such as
 
 Error will show in terminal, correspond code located in `gen/temp.js`
 
+## Reference
+* [pldb](http://pldb.info/concepts/javascript)
+
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

@@ -297,3 +297,6 @@ tagged elements must define their own equality semantics. #uuid elements are equ
 representations are equal. #inst elements are equal if their representation strings designate the
 same timestamp per [RFC-3339](http://www.ietf.org/rfc/rfc3339.txt).
 
+## Reference
+* [pldb](http://pldb.info/concepts/edn)
+

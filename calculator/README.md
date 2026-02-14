@@ -11,3 +11,6 @@ Currently supported are:
 * Scientific numbers with "e" notation
 * A small number of trigonometric and logarithmic functions including exponentiation, cos, ln, etc.
 * The constants "e", "pi" and "i"
+
+## Reference
+

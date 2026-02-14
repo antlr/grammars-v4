@@ -12,6 +12,10 @@ ANSI standard.
 * Include both generated and base classes to project from corresponding
   directory (_e.g._, Java or Python)
 
+## Reference
+* [pldb](http://pldb.info/concepts/rexx)
+
+
 ## License
 
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
