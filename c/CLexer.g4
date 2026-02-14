@@ -147,7 +147,7 @@ Extern
     : 'extern'
     ;
 
-False
+False_
     : 'false'
     ;
 
@@ -231,7 +231,7 @@ Switch
     : 'switch'
     ;
 
-True
+True_
     : 'true'
     ;
 

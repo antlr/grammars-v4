@@ -126,6 +126,7 @@ def ParseFilename(input, row_number):
     if (encoding == ""):
         encoding = "utf-8"
     str = FileStream(input, encoding)
+    str.name = input
     DoParse(str, input, row_number)
 
 def DoParse(str, input_name, row_number):
