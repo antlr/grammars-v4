@@ -148,6 +148,7 @@ void ParseFilename(std::string input, int row_number)
     antlr4::CharStream* str = nullptr;
     std::ifstream ifs(input, std::ios::binary);
     str = new EncodingInputStream(ifs, file_encoding);
+    static_cast\<EncodingInputStream*>(str)->name = input;
     DoParse(str, input, row_number);
 }
 
