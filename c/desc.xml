@@ -12,18 +12,27 @@
     </test>
     <test>
        <inputs>examples/writing-a-c-compiler-tests/**/valid/**/*.c</inputs>
+       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/sqlite/**/*.c</inputs>
        <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/torture/builtin-*.c</inputs>
+       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/asm*.c</inputs>
+       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
     <test>
        <inputs>examples/gcc/testsuite/c-c++-common/auto*.c</inputs>
+       <targets>Antlr4ng;CSharp;Dart;Java;JavaScript;TypeScript</targets>
+       <!-- Python3 too slow -->
     </test>
 </desc>
