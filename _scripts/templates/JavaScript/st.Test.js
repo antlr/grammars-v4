@@ -151,7 +151,9 @@ function ParseString(input, row_number) {
 
 function ParseFilename(input, row_number) {
     if (enc === '') enc = 'utf8';
-    var str = antlr4.CharStreams.fromPathSync(input, enc);
+    var buffer = fs.readFileSync(input, { encoding: enc });
+    var str = antlr4.CharStreams.fromString(buffer);
+    str.name = input;
     DoParse(str, input, row_number);
 }
 
