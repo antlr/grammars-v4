@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>General Standards</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-44.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-46.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.5 General Standards</H1>
+<div class="Normal">ACATS tests were developed to a general set of standards. 
+To promote a variety of code styles and usage idioms in the tests, standards 
+were not necessarily rigorously enforced but were used as guidelines 
+for test writers. A maximum line length of 79 characters was used to 
+enhance electronic distribution of tests (except when specific testing 
+requirements dictated otherwise, usually in .dep and .tst files). Tests 
+tend to be about 120 executable lines long, though many tests deviate 
+from this norm (either longer or shorter) to achieve a design that focuses 
+on the objective and a readable, maintainable test. Sometimes complex 
+objectives have been divided into sub-objectives to achieve complete 
+coverage in comprehensible, maintainable tests. Some tests check multiple 
+objectives; in other cases, sub-objectives are checked in separate tests.</div>
+<div class="Normal">Legacy tests use only the basic 55-character set 
+(26 capital letters, 10 digits, and 19 punctuation marks). Unless there 
+is a specific test requirement, numeric values are in the range (-2048..2047), 
+which can be represented in 12 bits. Numeric values are generally in 
+the range (-128..127). Modern tests use both upper and lower case letters 
+and may use larger numeric values (but within the range (-65536..65535) 
+except in rare cases).</div>
+<div class="Normal">Legacy tests tend to use as few Ada features as necessary 
+to write a self-checking executable test that can be read and maintained. 
+Modern tests tend to exhibit a usage-oriented style, employing a rich 
+assortment and interaction of features and exemplifying the kind of code 
+styles and idioms that compilers may encounter in practice.</div>
+<div class="Normal">In modern tests, Ada reserved words are entirely 
+in lower case. Identifiers normally have their initial letter capitalized. 
+Every attempt has been made to choose meaningful identifiers. In B class 
+tests, identifier names often provide a clue to the specific case or 
+situation under test. In C class tests, identifiers are normally chosen 
+to help document the test design or the intent of the code.</div>
+<div class="Normal">Modern executable tests generally provide some visual 
+separation of those test elements that focus on conformance issues from 
+those that govern the flow of a test. For example, there is frequently 
+a need to establish preconditions for a test and examine post-conditions 
+after a section of test code has executed. To distinguish between constructs 
+(types, objects, etc.) that are part of the test code and those that 
+are artifacts of the testing process (e.g., pre-, post-conditions), the 
+latter have <TT>TC_</TT> prefixed to the identifier name. This prefix 
+is shorthand for <TT>Test_Control</TT>.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-44.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-46.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

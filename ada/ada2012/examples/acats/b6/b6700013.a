@@ -1,0 +1,87 @@
+-- B6700013.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    See B6700010.A.
+--
+-- TEST DESCRIPTION:
+--    See B6700010.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B6700010.A
+--         B6700011.AM
+--         B6700012.A
+--      -> B6700013.A
+--
+-- CHANGE HISTORY:
+--    19 Aug 2004   PHL   Initial version.
+--    03 May 2007   RLB   Added test cases for additional kinds of completion.
+--!
+
+package body B670001_0 is
+
+    package body Pak is
+
+        procedure Not_Null1 (T : access Float) is                 -- OK.
+	begin
+	    T.all := 42.0;
+	end Not_Null1;
+
+	procedure Null3 (T : access Float)
+            renames Not_Null1;                                   -- ERROR:
+
+	procedure Null2 (X, Y : Boolean; Z : in out Duration) is -- ERROR:
+	begin
+	    if X and Y then
+		Z := 1.0;
+	    else
+		Z := 4.0;
+	    end if;
+	end Null2;
+
+    end Pak;
+
+    procedure Null1 (X : out Integer) is separate;               -- ERROR:
+
+end B670001_0;
+
+
+separate (B670001_0)
+procedure Null1 (X : out Integer) is   -- OPTIONAL ERROR: Stub may not exist
+begin
+    X := 42;
+end Null1;
+

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Decompressing Zipped Files</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-512.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5122.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.1.2.1 Decompressing Zipped Files</H1>
+<div class="Normal">All ACATS files have been compressed (zipped) into 
+compressed archives (zip-files) that have the MS-DOS file extension &quot;.zip&quot;. 
+A Windows command-line utility was used to compress them. They must be 
+decompressed before they can be further processed. A decompression utility 
+is available from the source of the ACATS distribution. All ACATS 4.2 
+files may be decompressed using the following steps. Approximately 48 
+MB of free space on a Windows machine hard drive will be required to 
+accomplish the decompression using this technique.</div>
+<div class="Normal">Create a directory on the hard disk to contain ACATS. 
+In these examples, we assume the name is <TT>acats4_2</TT>, but any name 
+can be used. Copy the archive (file with .zip extension) to the hard 
+disk in the new directory. Decompress it insuring that directories are 
+used. For the <TT>unzip</TT> program, this is the default setting. For 
+the <TT>pkunzip</TT> program, this is the -d option. For the <TT>winzip</TT> 
+program, ensure that &quot;Use Directory Names&quot; is checked. Also, 
+ensure that the files are decompressed into the proper directory. For 
+command line decompressors, this means ensuring that the current subdirectory 
+is acats4_2. For <TT>winzip</TT>, this simply means selecting acats4_2 
+as the extract path.</div>
+<div class="Normal" style="margin-bottom: 0.4em">For example, using 
+unzip, and assuming that the archive name is ACATS42.zip, type&nbsp;</div>
+<div class="Examples">cd&nbsp;acats4_2</div>
+<div class="Normal" style="margin-bottom: 0.4em">to set the proper directory, 
+and&nbsp;</div>
+<div class="Examples">unzip&nbsp;ACATS42</div>
+<div class="Normal">to extract the files.</div>
+<div class="Normal">The files were compressed on a Windows system, where 
+&lt;CR&gt;&lt;LF&gt; is used as a line terminator. Decompressors for 
+other systems using other line terminators should be able convert the 
+line terminators. The ACAA has a short Ada program which converts a file 
+from Windows to Unix format; please send the ACAA mail at <A HREF="mailto:agent@ada-auth.org">agent@ada-auth.org</A> 
+to request it if needed.</div>
+<div class="Normal">After all files have been extracted from the archive, 
+delete the archive file from the hard disk if you wish to conserve space.</div>
+<div class="Normal">As it decompresses files, <TT>unzip</TT> will restore 
+the directory structure of the files, creating all needed subdirectories.</div>
+<div class="Normal">Some users may prefer to work with ACATS files in 
+an alternate directory structure or none at all. If the <TT>unzip</TT> 
+utility is invoked with the &quot;-j&quot; option, all files in the archive 
+will be decompressed and placed in the local working directory. In other 
+words, none of the above subdirectories will be created. Since there 
+are too many ACATS files to fit into a root DOS directory, if you wish 
+to put all files in a single directory, you must first create a subdirectory 
+(e.g., mkdir \ACATS) and unzip all archives there.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-512.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5122.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

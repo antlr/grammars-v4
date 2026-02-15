@@ -29,7 +29,10 @@ lexer grammar AdaLexer;
 
 options {
     caseInsensitive = true;
+    superClass = AdaLexerBase;
 }
+
+// Insert here @header for lexer.
 
 ABORT    : 'abort';
 ABS      : 'abs';
@@ -138,7 +141,7 @@ MOD__ options {
     caseInsensitive = false;
 }: 'Mod';
 
-WHITESPACE   : [ \t\r\n]+    -> channel(HIDDEN);
+WHITESPACE   : [\u0009\u000A\u000B\u000C\u000D\u0020]+ -> channel(HIDDEN);
 LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 
 IDENTIFIER_      : LETTER+ [A-Z_0-9]*;
@@ -151,7 +154,7 @@ BASED_NUMERAL    : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
 EXTENDED_DIGIT   : DIGIT | [A-F];
 BASE             : NUMERAL;
 
-CHARACTER_LITERAL_ : '\'' ~['\\\r\n] '\'';
+CHARACTER_LITERAL_ : {this.IsCharLiteralAllowed()}? '\'' ~['\\\r\n] '\'';
 STRING_LITERAL_    : '"' ('""' | ~'"')* '"';
 
 fragment LETTER : [A-Z];
@@ -172,9 +175,8 @@ LT        : '<';
 EQ        : '=';
 GT        : '>';
 US        : '_';
-VL        : '|';
+VL        : '|' | '!';
 DIV       : '/';
-EP        : '!';
 PS        : '%';
 ARROW     : '=>';
 DOTDOT    : '..';

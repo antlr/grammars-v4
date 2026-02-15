@@ -1,0 +1,306 @@
+-- B611016.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that Pre'Class and Post'Class cannot be specified for an entry of
+--    a tagged task or protected type.
+--
+--    Check that Pre'Class and Post'Class cannot be specified for a protected
+--    subprogram of a tagged protected type.
+--
+--    Check that Pre'Class and Post'Class cannot be specified for a subprogram
+--    that is not a primitive subprogram of some tagged type. (Tagged task type
+--    and tagged protected type cases.)
+--
+--    Check that Pre'Class and Post'Class cannot be specified for task
+--    types, protected types, single tasks, and single protected objects.
+--
+-- TEST DESCRIPTION:
+--    We declare a synchronized interface, and then declare various
+--    task and protected types that implement it (thus giving us tagged
+--    task and protected types).
+--
+--    The first two objectives were discussed in AI12-0182-1, and the
+--    language was confirmed.
+--
+-- CHANGE HISTORY:
+--     16 Nov 2016   RLB   Created test.
+--     18 Nov 2016   Rlb   Removed some cases redundant with those in B611003.
+--
+--!
+package B611016A is
+
+   type Syn is synchronized interface;
+
+   function Is_Green (A_Syn : Syn) return Boolean is abstract;
+
+   function Is_Round (A_Syn : Syn) return Boolean is abstract;
+
+   function Is_Hard (A_Syn : Syn; N : in Natural) return Boolean is abstract
+      with Pre'Class => Is_Round (A_Syn);
+
+   procedure Do_It (A_Syn : in out Syn; N : in Natural) is abstract
+      with
+         Pre'Class => Is_Green (A_Syn),
+         Post'Class => Is_Round (A_Syn);
+
+
+   type Syn2 is synchronized interface;
+
+   procedure Do_It (A_Syn : in out Syn2; N : in out Natural) is abstract
+      with
+         Pre'Class => N > 0,
+         Post'Class => N in 1 .. 99;
+
+
+end B611016A;
+
+with B611016A;
+package B611016 is
+
+   -- First objective: (Tagged task, Pre'Class)
+
+   task type Task1 is new B611016A.Syn with
+      entry Do_It (N : in Natural)
+         with Pre'Class => N >= 1;                             -- ERROR: {15;1}
+   end Task1;
+
+   function Is_Green (Tsk : Task1) return Boolean;
+
+   function Is_Round (Tsk : Task1) return Boolean;
+
+   function Is_Hard (Tsk : Task1; N : in Natural) return Boolean
+      with Pre'Class => Is_Green (Tsk);                        -- OK. {12;1}
+      -- This is a primitive of a tagged type.
+
+   -- First objective: (Tagged task, Post'Class)
+
+   task type Task2 is new B611016A.Syn with
+      entry Do_It (N : in Natural)
+         with Post'Class => Is_Hard (Task1);                   -- ERROR: {15;1}
+   end Task2;
+
+   function Is_Green (Tsk : Task2) return Boolean;
+
+   function Is_Round (Tsk : Task2) return Boolean;
+
+   function Is_Hard (Tsk : Task2; N : in Natural) return Boolean
+      with Post'Class => Is_Hard'Result = Is_Green (Tsk);      -- OK. {12;1}
+      -- This is a primitive of a tagged type.
+
+
+   -- First objective (Tagged protected type, Pre'Class):
+
+   protected type Prot1 is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      entry Do_It (N : in Natural)
+         with Pre'Class => N > 0;                              -- ERROR: {15;1}
+   private
+      Locked : Boolean := False;
+   end Prot1;
+
+   function Is_Hard (Prot : Prot1; N : in Natural) return Boolean
+      with Pre'Class => Prot.Is_Green;                         -- OK. {12;1}
+      -- This is a primitive of a tagged type.
+
+
+   -- First objective (Tagged protected type, Post'Class):
+
+   protected type Prot2 is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      entry Do_It (N : in Natural)
+         with Post'Class => Is_Green;                          -- ERROR: {15;1}
+   private
+      Locked : Boolean := False;
+   end Prot2;
+
+   function Is_Hard (Prot : Prot2; N : in Natural) return Boolean
+      with Post'Class => Is_Hard'Result = Prot.Is_Green;       -- OK. {12;1}
+      -- This is a primitive of a tagged type.
+
+
+   -- Second objective (Tagged protected type, Pre'Class):
+
+   protected type Prot3 is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean
+         with Pre'Class => N in 4 | 12 | 15;                   -- ERROR: {15;1}
+      procedure Do_It (N : in Natural)
+         with Pre'Class => N in 1..10;                         -- ERROR: {15;1}
+   private
+      Locked : Boolean := False;
+   end Prot3;
+
+   -- Second objective (Tagged protected type, Post'Class):
+
+   protected type Prot4 is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean
+         with Post'Class => Is_Hard'Result = (N > 100);        -- ERROR: {15;1}
+      procedure Do_It (N : in Natural)
+         with Post'Class => Is_Green;                          -- ERROR: {15;1}
+   private
+      Locked : Boolean := False;
+   end Prot4;
+
+
+   -- Third objective:
+
+   task type Task5 is new B611016A.Syn with
+      entry Do_It (N : in Natural);
+   end Task5;
+
+   function Is_Green (Tsk : Task5) return Boolean;
+
+   function Is_Round (Tsk : Task5) return Boolean;
+
+   function Is_Hard (Tsk : Task5; N : in Natural) return Boolean;
+
+   protected type Prot5 is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean;
+      procedure Do_It (N : in Natural);
+   private
+      Locked : Boolean := False;
+   end Prot5;
+
+   package Nested is
+      -- Nested subprograms are never primitive:
+      procedure Nope1 (Tsk : Task5)
+         with Pre'Class => Is_Hard (Tsk, 4);                   -- ERROR: {15;1}
+
+      procedure Nope2 (Tsk : in out Task5)
+         with Post'Class => Is_Round (Tsk);                    -- ERROR: {15;1}
+
+      procedure Nope3 (Prot : Prot5)
+         with Pre'Class => Prot.Is_Green;                      -- ERROR: {15;1}
+
+      procedure Nope4 (Prot : in out Prot5)
+         with Post'Class => Prot.Is_Hard (12);                 -- ERROR: {15;1}
+
+   end Nested;
+
+
+   -- Fourth objective:
+
+   task type Task6
+      with Pre'Class => Is_Green (Task6)                       -- ERROR: {12;0}
+      is new B611016A.Syn with
+      entry Do_It (N : in Natural);
+   end Task6;
+
+   function Is_Green (Tsk : Task6) return Boolean;
+
+   function Is_Round (Tsk : Task6) return Boolean;
+
+   function Is_Hard (Tsk : Task6; N : in Natural) return Boolean;
+
+   protected type Prot6
+      with Pre'Class => Prot6.Is_Green                         -- ERROR: {12;0}
+      is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean;
+      procedure Do_It (N : in Natural);
+   private
+      Locked : Boolean := False;
+   end Prot6;
+
+   task type Task7
+      with Post'Class => Is_Hard (Task7, 28)                   -- ERROR: {12;0}
+      is new B611016A.Syn with
+      entry Do_It (N : in Natural);
+   end Task7;
+
+   function Is_Green (Tsk : Task7) return Boolean;
+
+   function Is_Round (Tsk : Task7) return Boolean;
+
+   function Is_Hard (Tsk : Task7; N : in Natural) return Boolean;
+
+   protected type Prot7
+      with Post'Class => Prot7.Is_Round                        -- ERROR: {12;0}
+      is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean;
+      procedure Do_It (N : in Natural);
+   private
+      Locked : Boolean := False;
+   end Prot7;
+
+   Glob : Natural;
+
+   task Task8
+      with Pre'Class => Glob > 10                              -- ERROR: {12;0}
+      is new B611016A.Syn2 with
+      entry Do_It (N : in out Natural);
+   end Task8;
+
+   task Task9
+      with Post'Class => Glob in 1 .. 9                        -- ERROR: {12;0}
+      is new B611016A.Syn2 with
+      entry Do_It (N : in out Natural);
+   end Task9;
+
+   protected Prot8
+      with Pre'Class => Prot8.Is_Green                         -- ERROR: {12;0}
+      is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean;
+      procedure Do_It (N : in Natural);
+   private
+      Locked : Boolean := False;
+   end Prot8;
+
+   protected Prot9
+      with Post'Class => Is_Hard (59)                          -- ERROR: {12;0}
+      is new B611016A.Syn with
+      function Is_Green return Boolean;
+      function Is_Round return Boolean;
+      function Is_Hard (N : in Natural) return Boolean;
+      procedure Do_It (N : in Natural);
+   private
+      Locked : Boolean := False;
+   end Prot9;
+
+end B611016;
+

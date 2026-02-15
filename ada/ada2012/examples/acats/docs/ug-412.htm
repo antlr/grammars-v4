@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Logical Organization</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-411.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-413.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.1.2 Logical Organization</H1>
+<div class="Normal">The table summarizes the number of tests that check 
+the conformance of an Ada implementation to the core language and conformance 
+to the Specialized Needs Annexes of Ada.</div>
+<div class="Normal">Core tests apply to all implementations. Specialized 
+Needs Annex tests are not required for any implementation. Tests for 
+a given Specialized Needs Annex may be processed by implementations that 
+claim implementation of that annex.</div>
+<div class="Normal">In general, no test result depends on the processing 
+or the result of any other test. Exceptions are noted in Section <A HREF="UG-542.HTM">5.4.2</A>. 
+No annex test depends on the implementation of any other annex, except 
+possibly in cases where one annex specifically depends on another in 
+Ada (e.g., no test for the Information Processing Annex uses features 
+from any other annex, however Real Time Annex and Distributed Processing 
+tests may depend on Systems Programming Annex features). (There is a 
+single exception to this rule: see Section <A HREF="UG-5553.HTM">5.5.5.3</A>.) 
+Annex tests may use any core feature.</div>
+<div class="Normal">Tests may be created from one or more compilation 
+units. If a test consists of a single compilation unit (a main subprogram 
+only), the test code will be contained in a single file. Tests built 
+from more than one compilation unit may require multiple files. Moreover, 
+some compilation units, called foundation code, may be used by more than 
+one test. Even in these cases, the resulting tests are strictly independent: 
+if test A and test B use the same foundation code, the results of processing 
+(and running, if appropriate) A have no effect on the results of processing 
+(and running, if appropriate) B. Foundation code is more fully explained 
+in Section <A HREF="UG-414.HTM">4.1.4</A>.</div>
+<div class="Normal">Tests are named using conventions that provide (limited) 
+information about the test. The test naming conventions are explained 
+in Section <A HREF="UG-43.HTM">4.3</A>. Each test belongs to a single 
+test class that indicates whether it is or is not an executable test. 
+Test classes are explained in Section <A HREF="UG-42.HTM">4.2</A>.</div>
+<div class="Normal">In addition to test code and foundation code, there 
+is code on which many or all of the executable tests in the suite depend 
+(e.g., package Report, package ImpDef, package TCTouch). Some of this 
+code must be customized to each implementation. There is also code that 
+must be used to build support tools used to customize the suite of tests 
+to an implementation. The customization process is described in Section 
+<A HREF="UG-52.HTM">5.2</A>.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-411.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-413.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,167 @@
+-- BA16001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that library subprograms, generic units, and library renames
+--    of them cannot be mentioned in a limited_with_clause. (10.1.6(2/2);
+--    this is repeated in 10.1.2(17/2)).
+--
+--    Check that a package nested in a library package cannot be mentioned
+--    in a limited_with_clause. (10.1.6(2/2)).
+--
+--    Check that a child unit cannot be named in a limited_with_clause by its
+--    simple name or any abbreviated form of its full name. (10.1.6(2/2)).
+--
+-- TEST DESCRIPTION:
+--    Declare an example of every kind of library unit, and try to use
+--    them in a limited with. Use some children and some root units.
+--    Also use a few limited private withs to check that the rules are
+--    checked for them, too.
+
+-- CHANGE HISTORY:
+--    29 Nov 2004   PHL    Initial version.
+--    26 Mar 2006   RLB    Created test from submitted test.
+--
+--!
+
+package BA16001 is
+    type Gollywog is null record;
+end BA16001;
+
+package BA16001.Pak2 is
+    package Nested is
+        type Glab is array (Natural range <>) of Gollywog;
+    end Nested;
+    procedure Inner_Proc;
+    package Math is
+        PI : constant := 3.14159;
+    end Math;
+end BA16001.Pak2;
+
+package body BA16001.Pak2 is
+    procedure Inner_Proc is
+    begin
+        null;
+    end Inner_Proc;
+end BA16001.Pak2;
+
+package BA16001.Pak3 is
+    type Foobar is range 0 .. 10;
+end BA16001.Pak3;
+
+package BA16001.Pak3.Pak31 is
+    type Flubber is access all Foobar;
+end BA16001.Pak3.Pak31;
+
+
+function BA16001_Func (X : Float) return Integer;
+
+
+procedure BA16001.Proc (X : access Integer);
+
+
+generic
+    type T is range <>;
+package BA16001_GenPak is
+end BA16001_GenPak;
+
+
+generic
+    type T is (<>);
+    C : T;
+procedure BA16001.Gensub (X : T := C);
+
+
+with BA16001_GenPak;
+package BA16001.Instpak is new BA16001_GenPak (Integer);
+
+
+with BA16001.Gensub;
+procedure BA16001.Instsub is new BA16001.Gensub (Boolean, True);
+
+
+with BA16001_Func;
+function BA16001.Renfunc (Y : Float := -1.0) return Natural
+   renames BA16001_Func;
+
+
+with BA16001.Proc;
+procedure BA16001_Renproc (X : access Integer := new Integer'(0))
+   renames BA16001.Proc;
+
+
+with BA16001.Pak3;
+package BA16001_Renpak3 renames BA16001.Pak3;
+
+
+with BA16001_GenPak;
+generic package BA16001.Rengenpak renames BA16001_GenPak;
+
+
+with BA16001.Gensub;
+generic procedure BA16001.Rengensub renames BA16001.Gensub;
+
+
+with BA16001.Instpak;
+package BA16001.Reninstpak renames BA16001.Instpak;
+
+
+with BA16001.Instsub;
+procedure BA16001.Reninstsub (Z : Boolean := True) renames BA16001.Instsub;
+
+
+limited with BA16001.Pak3;            -- OK.
+limited with BA16001_Func;            -- ERROR: Not package
+limited with BA16001_Genpak;          -- ERROR: Not package
+limited with BA16001.Gensub;          -- ERROR: Not package
+limited with BA16001.Instpak;         -- ERROR: Not package
+limited private with BA16001.Instsub; -- ERROR: Not package
+limited private with BA16001.Proc;    -- ERROR: Not package
+limited private with BA16001.Renfunc; -- ERROR: Not package
+limited with BA16001.Rengenpak;       -- ERROR: Not package
+limited with BA16001.Rengensub;       -- ERROR: Not package
+limited with BA16001.Reninstpak;      -- ERROR: Not package
+limited with BA16001.Reninstsub;      -- ERROR: Not package
+limited with BA16001_Renpak3;         -- ERROR: Not package
+limited with BA16001_Renproc;         -- ERROR: Not package
+limited with BA16001.Pak2.Nested;     -- ERROR: Nested package
+limited with BA16001.Pak2.Inner_Proc; -- ERROR: Nested and not package
+limited private with BA16001.Pak2.Math;--ERROR: Nested package
+limited with Pak3;                    -- ERROR: Not root package
+limited private with Pak31;           -- ERROR: Not root package
+limited with Pak3.Pak31;              -- ERROR: Not root package
+package BA16001.Pak4 is
+   type Wowser is (Red, Blue, Green);
+end BA16001.Pak4;

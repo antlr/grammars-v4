@@ -1,0 +1,243 @@
+-- B393004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the actual subprogram corresponding to a generic formal
+--      subprogram must not be abstract.
+--
+-- TEST DESCRIPTION:
+--      This test verifies the objective for formal subprograms (both functions
+--      and procedures) with profiles containing parameters of formal derived
+--      types, formal private types, abstract and non-abstract, tagged and
+--      non-tagged types (note that non-tagged types may have abstract
+--      primitive subprograms).
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      13 Nov 95   SAIC    ACVC 2.0.1 fixes: Swapped parameter and result
+--                          types for functions. Corrected commentary.
+--
+--!
+
+package B393004_0 is
+
+   type Field is range 0 .. 100;                         -- Non-tagged type.
+
+
+
+   type Ancestor is abstract tagged record               -- Abstract tagged
+      C : Field;                                         -- type.
+   end record;
+
+   procedure Process (A: in out Ancestor; B: in Field) is abstract;
+   function  Fetch   (A: Ancestor) return Field is abstract;
+
+
+   type Child is new Ancestor with record                -- Non-abstract
+      M : String (1 .. 10);                              -- derivative.
+   end record;
+
+   procedure Process (A: in out Child; B: in Field);
+   function  Fetch   (A: Child) return Field;
+
+
+   type Grandchild is abstract new Child with             -- Abstract
+     null record;                                         -- derivative.
+
+   -- procedure Process (A: in out Grandchild; B: in Field);
+   function Fetch (A: Grandchild) return Field is abstract;
+
+
+
+   type New_Field is new Field;                           -- Non-tagged
+                                                          -- derivative.
+   -- procedure Process (A: in out Ancestor; B: in New_Field) is abstract;
+   -- function  Fetch   (A: Ancestor) return New_Field is abstract;
+   -- procedure Process (A: in out Child; B: in New_Field);
+   -- function  Fetch   (A: Child) return New_Field;
+   -- function  Fetch   (A: Grandchild) return New_Field is abstract;
+
+
+
+end B393004_0;
+
+
+     --===================================================================--
+
+
+package body B393004_0 is
+
+   procedure Process (A: in out Child; B: in Field) is
+   begin
+      A.C := B;
+   end Process;
+
+
+   function Fetch (A: Child) return Field is
+   begin
+      return A.C;
+   end Fetch;
+
+end B393004_0;
+
+
+     --===================================================================--
+
+
+with B393004_0;
+package B393004_1 is
+
+--
+-- Generics for actuals which are primitive subprograms of tagged type:
+--
+
+   generic
+      type FD_Nontagged is          new B393004_0.Field;
+      type FD_Abstract  is abstract new B393004_0.Ancestor with private;
+
+      with procedure Proc (P1: in out FD_Abstract; P2: in FD_Nontagged);
+   package Tag_Formal_Derived_Proc is end;
+
+
+   generic
+      type FP_Nontagged is                 private;
+      type FP_Abstract  is abstract tagged private;
+
+      with function Func (P1: FP_Abstract) return FP_Nontagged;
+   package Tag_Formal_Private_Func is end;
+
+
+   generic
+      type FD_Nontagged is new B393004_0.Field;
+
+      with function Func (P1: B393004_0.Ancestor) return FD_Nontagged;
+   package Tag_Ancestor_Func is end;
+      
+
+   generic
+      type FP_Nontagged is private;
+
+      with procedure Proc (P1: in out B393004_0.Ancestor;
+                           P2: in     FP_Nontagged);
+   package Tag_Ancestor_Proc is end;
+      
+
+   generic
+      type FD_Nontagged is new B393004_0.Field;
+
+      with function Func (P1: B393004_0.Grandchild) return FD_Nontagged;
+   package Tag_Grandchild_Func is end;
+      
+
+end B393004_1;
+
+
+     --===================================================================--
+
+
+with B393004_0;
+with B393004_1;
+package B393004 is
+
+   package Instance01 is new B393004_1.Tag_Formal_Derived_Proc
+      (B393004_0.Field, B393004_0.Ancestor, B393004_0.Process);       -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance02 is new B393004_1.Tag_Formal_Derived_Proc
+      (B393004_0.Field, B393004_0.Child, B393004_0.Process);          -- OK.
+
+
+   package Instance03 is new B393004_1.Tag_Formal_Derived_Proc
+      (B393004_0.Field, B393004_0.Grandchild, B393004_0.Process);     -- OK.
+
+
+   package Instance04 is new B393004_1.Tag_Formal_Derived_Proc
+      (B393004_0.New_Field, B393004_0.Ancestor, B393004_0.Process);   -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance05 is new B393004_1.Tag_Formal_Derived_Proc
+      (B393004_0.New_Field, B393004_0.Child, B393004_0.Process);      -- OK.
+
+
+
+
+   package Instance06 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.Field, B393004_0.Ancestor, B393004_0.Fetch);        -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance07 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.Field, B393004_0.Child, B393004_0.Fetch);           -- OK.
+
+
+   package Instance08 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.Field, B393004_0.Grandchild, B393004_0.Fetch);      -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance09 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.New_Field, B393004_0.Ancestor, B393004_0.Fetch);    -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance10 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.New_Field, B393004_0.Child, B393004_0.Fetch);       -- OK.
+
+
+   package Instance11 is new B393004_1.Tag_Formal_Private_Func
+      (B393004_0.New_Field, B393004_0.Grandchild, B393004_0.Fetch);  -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+
+
+   package Instance12 is new B393004_1.Tag_Ancestor_Func
+      (B393004_0.Field, B393004_0.Fetch);                            -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance13 is new B393004_1.Tag_Ancestor_Func
+      (B393004_0.New_Field, B393004_0.Fetch);                        -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+
+
+   package Instance14 is new B393004_1.Tag_Ancestor_Proc
+      (B393004_0.Field, B393004_0.Process);                           -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance15 is new B393004_1.Tag_Ancestor_Proc
+      (B393004_0.New_Field, B393004_0.Process);                       -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+
+
+
+   package Instance16 is new B393004_1.Tag_Grandchild_Func
+      (B393004_0.Field, B393004_0.Fetch);                            -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+   package Instance17 is new B393004_1.Tag_Grandchild_Func
+      (B393004_0.New_Field, B393004_0.Fetch);                        -- ERROR:
+                                              -- Actual subprogram is abstract.
+
+
+end B393004;

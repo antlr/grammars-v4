@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Legacy Naming</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    DIV.WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 6.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-43.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-432.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.3.1 Legacy Naming</H1>
+<div class="Normal" style="margin-bottom: 0.4em">The name of a legacy 
+test is composed of seven or eight characters. Each character position 
+serves a specific purpose as described in the table below. The first 
+column identifies the character position(s) starting from the left, the 
+second column gives the kind of character allowed, and the third gives 
+the corresponding meaning:</div>
+<div class="Indented1"><TABLE frame="void" rules="none" border="0" cellpadding="2"><TR><TH align="left"><B>Position</B><TH align="left"><B>Kind</B><TH align="left"><B>Meaning</B>
+<TR><TD align="left">1<TD align="left">Letter<TD align="left">Test 
+class (see Section <A HREF="UG-42.HTM">4.2</A>)
+<TR><TD align="left">2<TD align="left">Hexadecimal<TD align="left">AIG 
+chapter containing the test objective
+<TR><TD align="left">3<TD align="left">Hexadecimal<TD align="left">Section 
+within the above AIG chapter
+<TR><TD align="left">4<TD align="left">Alphanumeric<TD align="left">Sub-section 
+of the above AIG section
+<TR><TD align="left">5-6<TD align="left">Decimal<TD align="left">Number 
+of the test objective within the above sub-section
+<TR><TD align="left">7<TD align="left">Letter<TD align="left">Letter 
+identifier of the sub-objective of the above objective.
+<TR><TD align="left">8<TD align="left">Alphanumeric<TD align="left"><I>optional</I> 
+&ndash; Compilation sequence identifier &mdash; indicates the compilation 
+order of multiple files that make up a single test. This position is 
+used only if the test comprises multiple files.
+</table></div>
+<div class="Normal">The convention is illustrated below.</div>
+<DIV Style="text-align: center; margin-bottom: 0.4em"><IMG src="LEG-NAME.PNG" height="180" width="345" alt="Legacy File Name Convention" border="0"></DIV>
+<div class="Normal" style="text-align: center"><SPAN STYLE="font-size: 80%">Legacy 
+File Name Convention</SPAN></div>
+<div class="Normal">In multiple file tests, the intended order of compilation 
+is indicated by a numeral at position 8. The first file to be compiled 
+has '0', the second has '1', and so forth.</div>
+<div class="Normal">The chapter and section numbers of the AIG (ACVC 
+Implementer's Guide) correspond to those in <A HREF="UG-01.HTM#Ada83">[Ada83]</A>. 
+<A NAME="I1024"></A></div>
+<div class="Normal">Note: The use of a ninth character ('m') to indicate 
+the file containing the main subprogram has been discontinued. The following 
+table lists the files containing the main subprograms of the legacy multiple 
+file tests.</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">AD7001C0.ADA<TD align="left">BA1010K0.ADA<TD align="left">C38108C1.ADA<TD align="left">CA2008A0.ADA<TD align="left">
+<TR><TD align="left">AD7001D0.ADA<TD align="left">BA1010L0.ADA<TD align="left">C38108D0.ADA<TD align="left">CA2009C0.ADA<TD align="left">
+<TR><TD align="left">B38103C3.ADA<TD align="left">BA1010M0.ADA<TD align="left">C39006C0.ADA<TD align="left">CA2009F0.ADA<TD align="left">
+<TR><TD align="left">B38103E0.ADA<TD align="left">BA1010N0.ADA<TD align="left">C39006F3.ADA<TD align="left">CA3011A4.ADA<TD align="left">
+<TR><TD align="left">B63009C3.ADA<TD align="left">BA1010P0.ADA<TD align="left">C64005D0.ADA<TD align="left">CA5003A6.ADA<TD align="left">
+<TR><TD align="left">B73004B0.ADA<TD align="left">BA1010Q0.ADA<TD align="left">C83022G0.ADA<TD align="left">CA5003B5.ADA<TD align="left">
+<TR><TD align="left">B83003B0.ADA<TD align="left">BA1011B0.ADA<TD align="left">C83024E1.ADA<TD align="left">CA5004B2.ADA<TD align="left">
+<TR><TD align="left">B83004B0.ADA<TD align="left">BA1011C0.ADA<TD align="left">C83F01C2.ADA<TD align="left">CC3019B2.ADA<TD align="left">
+<TR><TD align="left">B83004C2.ADA<TD align="left">BA1020A0.ADA<TD align="left">C83F01D0.ADA<TD align="left">CC3019C2.ADA<TD align="left">
+<TR><TD align="left">B83004D0.ADA<TD align="left">BA1020B6.ADA<TD align="left">C83F03C2.ADA<TD align="left">LA5001A7.ADA<TD align="left">
+<TR><TD align="left">B83024F0.ADA<TD align="left">BA1020C0.ADA<TD align="left">C83F03D0.ADA<TD align="left">LA5007A1.ADA<TD align="left">
+<TR><TD align="left">B83E01E0.ADA<TD align="left">BA1020F2.ADA<TD align="left">C86004B2.ADA<TD align="left">LA5007B1.ADA<TD align="left">
+<TR><TD align="left">B83E01F0.ADA<TD align="left">BA1101B0.ADA<TD align="left">C86004C2.ADA<TD align="left">LA5007C1.ADA<TD align="left">
+<TR><TD align="left">B86001A1.ADA<TD align="left">BA1101C2.ADA<TD align="left">CA1011A6.ADA<TD align="left">LA5007D1.ADA<TD align="left">
+<TR><TD align="left">B95020B2.ADA<TD align="left">BA1109A2.ADA<TD align="left">CA1012A4.ADA<TD align="left">LA5007E1.ADA<TD align="left">
+<TR><TD align="left">BA1001A0.ADA<TD align="left">BA1110A1.ADA<TD align="left">CA1012B4.ADA<TD align="left">LA5007F1.ADA<TD align="left">
+<TR><TD align="left">BA1010A0.ADA<TD align="left">BA2001F0.ADA<TD align="left">CA1013A6.ADA<TD align="left">LA5007G1.ADA<TD align="left">
+<TR><TD align="left">BA1010B0.ADA<TD align="left">BA2003B0.ADA<TD align="left">CA1014A0.ADA<TD align="left">LA5008A1.ADA<TD align="left">
+<TR><TD align="left">BA1010C0.ADA<TD align="left">BA2011A1.ADA<TD align="left">CA1020E3.ADA<TD align="left">LA5008B1.ADA<TD align="left">
+<TR><TD align="left">BA1010D0.ADA<TD align="left">BA3001A0.ADA<TD align="left">CA1022A6.ADA<TD align="left">LA5008C1.ADA<TD align="left">
+<TR><TD align="left">BA1010E0.ADA<TD align="left">BA3001B0.ADA<TD align="left">CA1102A2.ADA<TD align="left">LA5008D1.ADA<TD align="left">
+<TR><TD align="left">BA1010F0.ADA<TD align="left">BA3001C0.ADA<TD align="left">CA2001H3.ADA<TD align="left">LA5008E1.ADA<TD align="left">
+<TR><TD align="left">BA1010G0.ADA<TD align="left">BA3001E0.ADA<TD align="left">CA2002A0.ADA<TD align="left">LA5008F1.ADA<TD align="left">
+<TR><TD align="left">BA1010H0.ADA<TD align="left">BA3001F0.ADA<TD align="left">CA2003A0.ADA<TD align="left">LA5008G1.ADA <TD align="left">
+<TR><TD align="left">BA1010I0.ADA<TD align="left">BA3006A6.ADA<TD align="left">CA2004A0.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">BA1010J0.ADA<TD align="left">BA3006B4.ADA<TD align="left">CA2007A0.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">The file name extension 
+is three characters long. There are four extensions:&nbsp;</div>
+<div class="WideHanging-Term">.ada</div><div class="WideHanging-Body">
+A file that contains only Ada code. It does not require any pre-processing 
+to create a compilable test. It will be submitted directly to the implementation 
+for determination of test results. All implementations must correctly 
+process these tests.</div>
+<div class="WideHanging-Term">.dep</div><div class="WideHanging-Body">
+A file that has a test involving implementation-dependent features of 
+the language. These tests may not apply to all implementations.</div>
+<div class="WideHanging-Term">.tst</div><div class="WideHanging-Body">
+A file that has &quot;code&quot; that is not quite Ada; it contains &quot;macro&quot; 
+symbols to be replaced by implementation-dependent values, and it must 
+be customized (macro expanded) to prepare it for compilation (see Section 
+<A HREF="UG-522.HTM">5.2.2</A>). Once customized, the resulting test 
+must be processed as indicated by its class.</div>
+<div class="WideHanging-Term">.adt</div><div class="WideHanging-Body">
+A file that has been modified by the macro processor. It contains only 
+Ada code and may be submitted to the implementation for results. All 
+implementations must correctly process these tests. There are no files 
+in the ACATS distribution with this extension; they are only produced 
+as the output of the macro processor.&nbsp;</div>
+<div class="Normal">Modern tests use different file name extensions (see 
+<A HREF="UG-432.HTM">4.3.2</A>).</div>
+<div class="Bulleted-NoPrefix"><SPAN STYLE="color: rgb(153,0,0)"><I>Note 
+that legacy tests have not been renamed for ACATS 4.2. Since <A HREF="UG-01.HTM#Ada2012">[Ada2012]</A> 
+includes some organizational differences from <A HREF="UG-01.HTM#Ada83">[Ada83]</A>, 
+this means that the name of a legacy test sometimes will not correspond 
+to the clause of <A HREF="UG-01.HTM#Ada2012">[Ada2012]</A> in which the 
+tested feature is described.</I></SPAN>&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-43.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-432.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,176 @@
+-- B3A1A04.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--
+--     Check that the name of a tagged incomplete view cannot be used as
+--     the prefix of the Class attribute used in a context that does not
+--     allow the use of a tagged incomplete view.
+--
+-- TEST DESCRIPTION:
+--
+--     We declare a number of subprograms, protected types, and task types
+--     in a package specification with types imported from a limited view.
+--     We then give the body of the package with the appropriate completions
+--     without WITHing the full view.
+--
+--     Note that the specification of this package is made legal by Ada 2012
+--     (AI05-0151-1).
+--
+--     We don't attempt to test cases involving incomplete types (as opposed
+--     to views), as any such case will have at least one other error
+--     associated (either freezing or indefinite types), and as such
+--     it is not particularly interesting to test. We did put one such case
+--     into the somewhat related test B3A1006 so that it is at least tried once.
+--
+--     The test cases that the former version of this test had involving
+--     access-to-subprogram types are now all legal. Other rules (mostly
+--     freezing rules) are supposed to prevent trouble and thus there is
+--     nothing to test here. These cases all have been removed.
+
+-- CHANGE HISTORY:
+--     01 Oct 2008  RLB  Created test basing it on B3A1A01.
+--     13 Mar 2014  RLB  Updated test to allow parameters allowed by
+--                       Ada 2012 (AI05-0151-1). This requires testing
+--                       in a body.
+--     14 Apr 2014  RLB  Added missing word in test description.
+limited with F3A1A00;
+package B3A1A04 is
+
+    procedure Proc2 (A : F3A1A00.A_Tagged_Type'Class);         -- OK.
+
+    procedure Proc4 (Cnt : in Natural;
+                     Obj : out F3A1A00.Tagged_Private'Class);  -- OK.
+
+    procedure Proc6 (
+               Wobble : access F3A1A00.A_Tagged_Type'Class);   -- OK.
+
+    function Func2 (Rash : Character)
+                   return F3A1A00.A_Tagged_Type'Class;         -- OK.
+
+    function Func4 (Cnt : Natural)
+                   return access F3A1A00.Tagged_Private'Class; -- OK.
+
+    protected type PT1 is
+       function F (Num : Float)
+          return F3A1A00.A_Tagged_Type'Class;                  -- OK.
+       entry E (B : in out F3A1A00.A_Tagged_Type'Class);       -- OK.
+    private
+       C : Character := 'R';
+    end PT1;
+
+    task type Tsk1 is
+       entry E1 (B : in out F3A1A00.A_Tagged_Type'Class);      -- OK.
+       entry E2 (B : out F3A1A00.Tagged_Private'Class);        -- OK.
+    end Tsk1;
+
+
+end B3A1A04;
+
+package body B3A1A04 is
+
+    -- Note: No WITH of the full view here, the imported types remain
+    -- incomplete. 3.10.1(8.4/3) allows tagged incomplete views to be
+    -- used as parameters (only); thus most of these cases are legal.
+
+    procedure Proc2 (A : F3A1A00.A_Tagged_Type'Class) is       -- OK.
+    begin
+       null;
+    end Proc2;
+
+    procedure Proc4 (Cnt : in Natural;
+                     Obj : out F3A1A00.Tagged_Private'Class) is-- OK.
+    begin
+       null;
+    end Proc4;
+
+    procedure Proc6 (
+               Wobble : access F3A1A00.A_Tagged_Type'Class) is -- OK.
+    begin
+       null;
+    end Proc6;
+
+    function Func2 (Rash : Character)
+                   return F3A1A00.A_Tagged_Type'Class is       -- ERROR:
+    begin
+       return (raise Program_Error); -- So we have the required return stmt.
+    end Func2;
+
+    function Func4 (Cnt : Natural)
+                   return access F3A1A00.Tagged_Private'Class is -- OK.
+    begin
+       return null;
+    end Func4;
+
+    -- Note: The following are also illegal because indefinite objects
+    -- are not allowed without initialization (and there is no legal
+    -- initialization that can be written), as well as being illegal
+    -- uses of an incomplete type.
+
+    Obj6 : F3A1A00.A_Tagged_Type'Class;                        -- ERROR:
+
+    type Rec2 is
+       record
+          Comp : F3A1A00.Tagged_Private'Class;                 -- ERROR:
+       end record;
+
+    protected body PT1 is
+       function F (Num : Float)
+          return F3A1A00.A_Tagged_Type'Class is                -- ERROR:
+       begin
+          return (raise Program_Error);
+       end F;
+
+       entry E (B : in out F3A1A00.A_Tagged_Type'Class)        -- OK.
+          when True is
+       begin
+          C := 'H';
+       end E;
+    end PT1;
+
+    task body Tsk1 is
+    begin
+       select
+          accept E1 (B : in out F3A1A00.A_Tagged_Type'Class) do-- OK.
+             null;
+          end E1;
+       or
+          accept E2 (B : out F3A1A00.Tagged_Private'Class) do  -- OK.
+             null;
+          end E2;
+       end select;
+    end Tsk1;
+
+end B3A1A04;
+

@@ -1,0 +1,196 @@
+-- B413005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+-- OBJECTIVE:
+--
+--     (1) Check that a call of a prefixed view cannot repeat the first
+--     parameter in the parameter list.
+--
+--     (2) Check that for the reference L.R, if L represents an object of a 
+--     tagged type T or an access type designating a tagged type T, and R 
+--     represents a subprogram with a first parameter of the type T or a 
+--     class-wide type that is covered by T that is not declared immediately
+--     in the declarative region of an ancestor of T, the reference is
+--     illegal.
+--
+--     (3) Check that for the reference L.R, if L represents an object of a
+--     tagged type T or an access type designating a tagged type T, and R
+--     represents a subprogram with some parameter other than the first
+--     parameter of the type T and a first parameter of a non-access
+--     untagged type that is declared immediately in the declarative region
+--     of an ancestor of T, the reference is illegal.
+--
+-- CHANGE HISTORY:
+--     30 Dec 2022  RLB  Created test. Used layout of C413001 as a template.
+--
+--!
+package B413005P is
+   type TP is tagged record
+      Data  : Integer := 999;
+   end record;
+
+   type TP_Ptr is access all TP;
+
+   procedure Prim_Proc1  (X : in out TP);
+   procedure Prim_Proc2  (X : access TP; Value : in Integer);
+   function  Prim_Func1  (X : TP) return Integer;
+   function  Prim_Func2  (X : access constant TP; Value : in Integer)
+                                  return Integer;
+   -- These subprograms are primitive for TP, and thus can be used with
+   -- prefix notation. They are used to check OK cases as well as objective
+   -- (1).
+
+   procedure Prim_Proc3  (Value : in Integer; X : in out TP);
+   procedure Prim_Proc4  (A, B : in Integer; X : access TP);
+   function Prim_Func3   (A, B : in Integer; X : in TP) return Boolean;
+   function Prim_Func4   (Value : in Integer; X : access constant TP)
+                                                        return Boolean;
+   -- These subprograms are primitive for TP, but the first parameter is not
+   -- of a tagged type so they cannot be used with prefix notation.
+   -- They are used to check objective (3).
+
+
+   procedure Class_Wide_Proc1 (X : access TP'Class);
+   procedure Class_Wide_Proc2 (X : in out TP'Class; Value : in Integer);
+   function  Class_Wide_Func1 (X : access constant TP'Class) return Integer;
+   function  Class_Wide_Func2 (X : in TP'Class; Value : in Integer)
+                                                return Integer;
+   --  These subprograms are in the declarative region for TP, and thus
+   --  can be used with prefix notation. They are used to check OK cases as
+   --  well as objective (1).
+
+   procedure Class_Wide_Proc3 (First, Second : in Integer;
+                               X : in out TP'Class);
+   function Class_Wide_Func3 (Val : in Integer; X : in TP'Class)
+                                 return Boolean;
+   procedure Class_Wide_Proc4 (Value : in Integer;
+                               X : access TP'Class);
+   function Class_Wide_Func4 (A, B : in Integer;
+                              X : access constant TP'Class)
+                                 return Boolean;
+
+   package Local is
+      -- These routines are not primitive for T, nor declared in the 
+      -- declarative region of an ancestor of T. Used to check objective (2).
+
+      procedure Local_Proc1  (X : access TP);
+      procedure Local_Proc2  (X : in out TP; Value : in Integer);
+      function  Local_Func1  (X : access constant TP) return Integer;
+      function  Local_Func2  (X : in TP; Value : in Integer) return Integer;
+
+      procedure Local_Class_Wide_Proc1 (X : in out TP'Class);
+      procedure Local_Class_Wide_Proc2 (X : TP'Class; Value : Integer);
+      function  Local_Class_Wide_Func1 (X : TP'Class) return Integer;
+      function  Local_Class_Wide_Func2 (X : TP'Class; Value : Integer)
+                                                      return Integer;
+
+   end Local;
+
+end B413005P;
+
+with B413005P;
+procedure B413005 is
+begin
+
+   declare
+      P1_Obj    : aliased B413005P.TP;
+      P1_Acc    : B413005P.TP_Ptr := P1_Obj'Unchecked_Access;
+      Int_Sink  : Integer;
+      Bool_Sink : Boolean;
+   begin
+      P1_Obj.Prim_Proc1;                                       -- OK. {7}
+      P1_Acc.Prim_Proc2 (1);                                   -- OK. {7}
+      Int_Sink := P1_Obj.Prim_Func1;                           -- OK. {7}
+      Int_Sink := P1_Acc.Prim_Func2 (12);                      -- OK. {7}
+      P1_Obj.Class_Wide_Proc1;                                 -- OK. {7}
+      P1_Acc.Class_Wide_Proc2 (92);                            -- OK. {7}
+      Int_Sink := P1_Obj.Class_Wide_Func1;                     -- OK. {7}
+      Int_Sink := P1_Acc.Class_Wide_Func2 (12);                -- OK. {7}
+      
+      -- Objective (1): Do not repeat the parameter!
+      P1_Obj.Prim_Proc1 (P1_Obj);                              -- ERROR: {7}
+      P1_Acc.Prim_Proc2 (P1_Acc, 1);                           -- ERROR: {7}
+      Int_Sink := P1_Obj.Prim_Func1 (P1_Obj);                  -- ERROR: {7}
+      Int_Sink := P1_Acc.Prim_Func2 (P1_Acc, 12);              -- ERROR: {7}
+      P1_Acc.Class_Wide_Proc1 (P1_Acc);                        -- ERROR: {7}
+      P1_Obj.Class_Wide_Proc2 (P1_Obj, 92);                    -- ERROR: {7}
+      Int_Sink := P1_Acc.Class_Wide_Func1 (P1_Acc);            -- ERROR: {7}
+      Int_Sink := P1_Obj.Class_Wide_Func2 (P1_Obj, 12);        -- ERROR: {7}
+      
+      -- An expanded name is OK, of course.
+      B413005P.Prim_Proc1 (P1_Obj);                            -- OK. {7}
+      B413005P.Prim_Proc2 (P1_Acc, 1);                         -- OK. {7}
+      Int_Sink := B413005P.Prim_Func1 (P1_Obj);                -- OK. {7}
+      Int_Sink := B413005P.Prim_Func2 (P1_Acc, 12);            -- OK. {7}
+      B413005P.Class_Wide_Proc1 (P1_Acc);                      -- OK. {7}
+      B413005P.Class_Wide_Proc2 (P1_Obj, 92);                  -- OK. {7}
+      Int_Sink := B413005P.Class_Wide_Func1 (P1_Acc);          -- OK. {7}
+      Int_Sink := B413005P.Class_Wide_Func2 (P1_Obj, 12);      -- OK. {7}
+
+      -- Objective (2): Prefix notation not allowed on non-primitive routines.
+      P1_Obj.Local_Proc1;                                      -- ERROR: {7}
+      P1_Acc.Local_Proc2 (1);                                  -- ERROR: {7}
+      Int_Sink := P1_Obj.Local_Func1;                          -- ERROR: {7}
+      Int_Sink := P1_Acc.Local_Func2 (12);                     -- ERROR: {7}
+      P1_Obj.Local_Class_Wide_Proc1;                           -- ERROR: {7}
+      P1_Acc.Local_Class_Wide_Proc2 (92);                      -- ERROR: {7}
+      Int_Sink := P1_Obj.Local_Class_Wide_Func1;               -- ERROR: {7}
+      Int_Sink := P1_Acc.Local_Class_Wide_Func2 (12);          -- ERROR: {7}
+
+      -- Objective (3): Prefix notation not allowed if the first parameter
+      -- is not tagged.
+      P1_Obj.Prim_Proc3 (4);                                   -- ERROR: {7}
+      P1_Acc.Prim_Proc4 (1, 2);                                -- ERROR: {7}
+      Bool_Sink := P1_Obj.Prim_Func3 (10, 20);                 -- ERROR: {7}
+      Bool_Sink := P1_Acc.Prim_Func4 (66);                     -- ERROR: {7}
+      P1_Acc.Class_Wide_Proc3 (22, 44);                        -- ERROR: {7}
+      P1_Obj.Class_Wide_Proc4 (15);                            -- ERROR: {7}
+      Bool_Sink := P1_Acc.Class_Wide_Func3 (13);               -- ERROR: {7}
+      Bool_Sink := P1_Obj.Class_Wide_Func4 (80, 88);           -- ERROR: {7}
+
+      -- A regular expanded call is OK.
+      B413005P.Prim_Proc3 (4, P1_Obj);                         -- OK. {7}
+      B413005P.Prim_Proc4 (1, 2, P1_Acc);                      -- OK. {7}
+      Bool_Sink := B413005P.Prim_Func3 (10, 20, P1_Obj);       -- OK. {7}
+      Bool_Sink := B413005P.Prim_Func4 (66, P1_Acc);           -- OK. {7}
+      B413005P.Class_Wide_Proc3 (22, 44, P1_Obj);              -- OK. {7}
+      B413005P.Class_Wide_Proc4 (15, P1_Acc);                  -- OK. {7}
+      Bool_Sink := B413005P.Class_Wide_Func3 (13, P1_Obj);     -- OK. {7}
+      Bool_Sink := B413005P.Class_Wide_Func4 (80, 88, P1_Acc); -- OK. {7}
+
+
+   end;
+
+
+end B413005;

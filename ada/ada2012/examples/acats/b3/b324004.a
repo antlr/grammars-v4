@@ -1,0 +1,135 @@
+-- B324004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that a Predicate_Failure aspect cannot be given on an entity other
+--     than a type or subtype.
+--    
+--     Check that the Predicate_Failure aspect cannot be specified on a type or
+--     subtype that does not also have a Static_Predicate or Dynamic_Predicate 
+--     aspect specified.
+--
+--     Check that the expression of a Predicate_Failure aspect must have type
+--     String.
+--
+-- TEST DESCRIPTION:
+--     The aspect Predicate_Failure was added by the 2016 Corrigendum. This
+--     test checks that the basic rules for that aspect are respected.
+
+-- CHANGE HISTORY:
+--      29 Jun 21   RLB     Created test.
+--!
+
+package B324004 is
+
+   -- Entities other than types or subtypes:
+   
+   procedure Fooey (A : Natural)
+      with Pre => A mod 2 = 1, 
+           Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- ERROR: {3:4;1}
+
+   subtype Is_Odd is Natural
+      with Dynamic_Predicate => Is_Odd mod 2 = 1;            -- OK. {1:4;1}
+      
+   Obj : Is_Odd := 15
+      with Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- ERROR: {2:4;1}
+
+   function Bleech (A : Natural) return Is_Odd is (A * 2 + 1)
+      with Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- ERROR: {2:4;1}
+    
+   -- A type or subtype that does not have a predicate specified:
+
+   subtype A_Rename is Natural
+      with Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- ERROR: {1:12;1}
+
+   subtype Also_Odd is Natural
+      with Dynamic_Predicate => Also_Odd mod 2 = 1,            
+           Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- OK. {3:4;1}
+
+   subtype Small is Natural
+      with Static_Predicate => Small in 1 .. 99,           
+           Predicate_Failure => 
+              (raise Constraint_Error with "Not small");     -- OK. {3:4;1}
+
+   subtype Very_Odd is Is_Odd
+      with Predicate_Failure => 
+              (raise Constraint_Error with "Is_Even");       -- ERROR: {1:12;1}
+      -- Note: Predicate_Failure is only allowed on subtypes that directly
+      -- specify a predicate, not those that inherit one.
+
+   type Small_Type is range 0 .. 99
+      with Predicate_Failure => 
+              (raise Constraint_Error with "Not small");     -- ERROR: {1:12;1}
+               
+   type Priv is private
+      with Type_Invariant => Is_OK (Priv),
+           Predicate_Failure => 
+              (raise Constraint_Error with "Not OK");        -- ERROR: {1:12;1}
+
+   function Is_OK (Obj : in Priv) return Boolean;
+   
+   -- The Predicate_Failure expression must be a String:   
+   
+   Str  : constant String := "A string";
+   WStr : constant Wide_String := "A wide string";
+
+   subtype Odd_One is Natural
+      with Dynamic_Predicate => Odd_One mod 2 = 1,            
+           Predicate_Failure => 10;                          -- ERROR: {12;1}
+      
+   subtype Odd_Two is Natural
+      with Dynamic_Predicate => Odd_Two mod 2 = 1,            
+           Predicate_Failure => WStr;                        -- ERROR: {12;1}
+
+   subtype Odd_Three is Natural
+      with Dynamic_Predicate => Odd_Three mod 2 = 1,
+           Predicate_Failure => Str;                         -- OK. {12;1}
+      
+private
+
+   -- Completions for declarations above:
+   procedure Fooey (A : Natural) is null;              -- OPTIONAL ERROR: {4;1}
+
+   type Priv is new Natural;                           -- OPTIONAL ERROR: {4;1}
+
+   function Is_OK (Obj : in Priv) return Boolean is
+      (Obj mod 2 = 1);
+
+end B324004;
+

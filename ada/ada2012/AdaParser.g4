@@ -99,7 +99,7 @@ type_definition
     ;
 
 subtype_declaration
-    : SUBTYPE defining_identifier IS subtype_indication aspect_specification?
+    : SUBTYPE defining_identifier IS subtype_indication aspect_specification? SEMI
     ;
 
 subtype_indication
@@ -107,7 +107,7 @@ subtype_indication
     ;
 
 subtype_mark
-    : identifier
+    : identifier (DOT identifier)*
     ;
 
 constraint
@@ -139,7 +139,7 @@ defining_identifier_list
     ;
 
 number_declaration
-    : defining_identifier_list COLON CONSTANT ASSIGN expression
+    : defining_identifier_list COLON CONSTANT ASSIGN expression SEMI
     ;
 
 derived_type_definition
@@ -321,7 +321,7 @@ record_extension_part
     ;
 
 abstract_subprogram_declaration
-    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification?
+    : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification? SEMI
     ;
 
 interface_type_definition
@@ -636,7 +636,7 @@ type_conversion
 
 qualified_expression
     : subtype_mark SQ '(' expression ')'
-    | subtype_mark SQ '(' aggregate ')'
+    | subtype_mark SQ aggregate
     ;
 
 allocator
@@ -740,7 +740,7 @@ exit_statement
     ;
 
 goto_statement
-    : GOTO name
+    : GOTO name SEMI
     ;
 
 /*
@@ -812,7 +812,7 @@ subprogram_body
     ;
 
 procedure_call_statement
-    : name
+    : name SEMI
     | name actual_parameter_part SEMI
     ;
 
@@ -1055,11 +1055,11 @@ delay_statement
     ;
 
 delay_until_statement
-    : DELAY UNTIL delay_expression
+    : DELAY UNTIL delay_expression SEMI
     ;
 
 delay_relative_statement
-    : DELAY delay_expression
+    : DELAY delay_expression SEMI
     ;
 
 delay_expression
@@ -1136,7 +1136,7 @@ abortable_part
     ;
 
 abort_statement
-    : ABORT name (',' name)*
+    : ABORT name (',' name)* SEMI
     ;
 
 /*
@@ -1279,9 +1279,9 @@ generic_formal_parameter_declaration
     ;
 
 generic_instantiation
-    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification?
+    : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI
+    | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification? SEMI
+    | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification? SEMI
     ;
 
 generic_actual_part
@@ -1300,7 +1300,7 @@ explicit_generic_actual_parameter
 
 formal_object_declaration
     : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI
-    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification?
+    | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification? SEMI
     ;
 
 formal_type_declaration
@@ -1343,7 +1343,7 @@ formal_discrete_type_definition
     ;
 
 formal_signed_integer_type_definition
-    : range BOX
+    : RANGE_ BOX
     ;
 
 formal_modular_type_definition
@@ -1457,7 +1457,7 @@ enumeration_aggregate
     ;
 
 record_representation_clause
-    : FOR local_name USE RECORD mod_clause? component_clause* END RECORD?
+    : FOR local_name USE RECORD mod_clause? component_clause* END RECORD SEMI
     ;
 
 component_clause

@@ -1,0 +1,114 @@
+-- B3A20170.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--      Check that, for P'Access of an access-to-subprogram type S, if the
+--      subprogram denoted by P is declared within a generic unit, P'Access
+--      occurs within the body of that generic unit or within the body
+--      of a generic unit declared within the declarative region of the
+--      generic unit, S must be a nonformal type declared within the generic
+--      unit.
+--
+-- TEST DESCRIPTION:
+--      This test is based on a test program designed during the discussion
+--      of AI95-00229-1 to show that the Ada 95 rule allowed the creation of
+--      accesses that did not live as long as the access type, and thus calls
+--      to nonexistent subprograms. Compilers of the time happily compiled the
+--      program and the programs executed until they crashed in various ways
+--      when executing the nonexistent subprograms.
+--
+--      The test uses a global library-level access type, a formal access type,
+--      and a series of library-level generics that use 'Access on a subprogram
+--      declared in a generic specification, a generic parent unit's
+--      specification, and in a formal package.
+--
+--      The test also tries a few legal cases (using an access-to-subprogram
+--      declared inside the generic unit) to ensure that too much is not
+--      rejected. Note that this test is a companion to the original test
+--      B3A2009, which also serves to ensure that too much is not rejected.
+--
+--      If none of the errors are detected, this test can be executed, which
+--      typically will quickly show why detecting the errors is necessary. :-)
+
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B3A20170.A
+--         B3A20171.A
+--         B3A20172.A
+--         B3A20173.A
+--         B3A20174.A
+--
+-- PASS/FAIL CRITERIA:
+--     Test files B3A20171, B3A20172, and B3A20173 contains errors. All errors
+--     in these files must be detected.
+--
+-- CHANGE HISTORY:
+--      31 May 01   RLB     Created initial test from an ARG discussion.
+--      18 Dec 14   RLB     Turned into an ACATS B-Test, added some
+--                          legal cases.
+--      13 Mar 15   RLB     Eliminated overlong lines.
+--!
+
+package B3A2017_Global is
+  type Ref is access procedure;
+  P, Q, R : Ref;
+end B3A2017_Global;
+
+generic
+  type FRef is access procedure;
+package B3A2017_G is
+  procedure Foo;
+end B3A2017_G;
+
+generic
+package B3A2017_G.C is
+  procedure Dummy; -- just to make body non-optional
+
+  type Inner_Ref is access procedure;
+  Y : Inner_Ref;
+
+end;
+
+with B3A2017_G;
+generic
+  with package Pack is new B3A2017_G(<>);
+package B3A2017_FP is
+  procedure Dummy; -- just to make body non-optional
+
+  type Gen_Ref is access procedure;
+  Z : Gen_Ref;
+
+end;
+

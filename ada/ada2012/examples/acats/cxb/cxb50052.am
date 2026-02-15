@@ -1,0 +1,275 @@
+-- CXB50052.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that using Pragmas Import and Convention allow modification
+--      of an array in Fortran's column-major order.
+--      
+-- TEST DESCRIPTION:
+--      This test defines a two-dimensional integer array type, and using
+--      Pragma Convention, specifies that the array elements of objects of
+--      the array type are stored in Fortran's column-major order.  The test
+--      also defines an array type, identical in definition to the above
+--      described type, except without the use of Pragma Convention.
+--      This test checks that user-defined Fortran language procedures 
+--      can be imported and referenced from an Ada program.  Two Fortran
+--      subprograms are specified in files CXB50050.FTN and CXB50051.FTN. 
+--      These subprograms are imported to this test program, using calls to 
+--      Pragma Import with convention identifier "Fortran".  These subprograms
+--      are used as completions to Ada subprogram specifications.  Each 
+--      subprogram is then called in this test to modify array objects,
+--      and the results of the calls are verified.  The differences between
+--      the modified array objects of the two types are then verified.
+--
+--      The two subprograms used in this test are as follows:
+--      1) A Fortran procedure Align_Matrix that modifies the contents of
+--         the Fortran_Integer array.  All of the cells in each column of
+--         the matrix are filled with the index of the particular column.
+--      2) A Fortran procedure Modify_Matrix that places 1's on the array
+--         diagonal, 2's below the diagonal, and 3's above the diagonal.
+--      
+-- SPECIAL REQUIREMENTS:
+--      The files CXB50050.FTN and CXB50051.FTN must be compiled with a 
+--      Fortran compiler.  Implementation dialects of Fortran may require 
+--      alteration of the Fortran program syntax.  An implementation must 
+--      provide the necessary modifications to satisfy the subprogram
+--      requirements.
+--     
+--      Note that the compiled Fortran code must be bound with the compiled
+--      Ada code to create an executable image.  An implementation must
+--      provide the necessary commands to accomplish this.
+--     
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         CXB50050.FTN
+--         CXB50051.FTN
+--      => CXB50052.AM
+--
+-- APPLICABILITY CRITERIA: 
+--      This test is applicable to all implementations that provide 
+--      package Interfaces.Fortran.  If an implementation provides
+--      package Interfaces.Fortran, this test must compile, execute, and 
+--      report "PASSED".
+--
+--       
+-- CHANGE HISTORY:
+--      28 Mar 96   SAIC    Initial release for 2.1.
+--      10 Jun 96   SAIC    Incorporated reviewer comments for ACVC 2.1.
+--      27 Oct 96   SAIC    Incorporated reviewer comments.
+--
+--!
+
+with Report;
+with Impdef;
+with Ada.Exceptions;
+with Interfaces.Fortran;                                     -- N/A => ERROR
+
+procedure CXB50052 is
+begin
+
+   Report.Test ("CXB5005", "Check that using Pragmas Import and Convention " &
+                           "allow modification of an array in Fortran's "    &
+                           "column-major order");
+
+   Test_Block:
+   declare
+
+      use Interfaces.Fortran;
+      use Ada.Exceptions;
+
+      type A_Fortran_Matrix_Type is 
+        array (Fortran_Integer range <>, Fortran_Integer range <>) of 
+        Fortran_Integer;
+
+      type An_Ada_Matrix_Type is 
+        array (Fortran_Integer range <>, Fortran_Integer range <>) of 
+        Fortran_Integer;
+
+
+
+      -- Store objects of A_Fortran_Matrix_Type in Fortran's column-major 
+      -- order.
+
+      pragma Convention (Fortran, A_Fortran_Matrix_Type);
+
+
+      -- The Align_Fortran_Matrix procedure takes two parameter values: 
+      --   Rank   - size of the array to be modified.
+      --   Matrix - an array of Fortran_Integers. 
+
+      procedure Align_Fortran_Matrix(Rank   : in     Fortran_Integer;
+                                     Matrix : in out A_Fortran_Matrix_Type);
+
+
+      -- The Modify_Fortran_Matrix procedure takes two parameter values:
+      --   Rank   - size of the array to be modified.
+      --   Matrix - a Fortran_Integer array.
+
+      procedure Modify_Fortran_Matrix(Rank   : in     Fortran_Integer;
+                                      Matrix : in out A_Fortran_Matrix_Type);
+
+      -- The following two procedures are identical to those defined above
+      -- with the difference being that the matrix is of type 
+      -- An_Ada_Matrix_Type, one that has not been converted to a 
+      -- Fortran compatible type.
+
+      procedure Align_Ada_Matrix(Rank   : in     Fortran_Integer;
+                                 Matrix : in out An_Ada_Matrix_Type);
+
+      procedure Modify_Ada_Matrix(Rank   : in     Fortran_Integer;
+                                  Matrix : in out An_Ada_Matrix_Type);
+
+
+      -- Use Fortran subprograms as completions to the Ada subprogram 
+      -- specifications above.
+
+      pragma Import(Fortran, 
+                    Align_Fortran_Matrix, 
+                    Impdef.CXB50050_External_Name);
+
+      pragma Import(Fortran, 
+                    Modify_Fortran_Matrix, 
+                    Impdef.CXB50051_External_Name);
+
+      pragma Import(Fortran, 
+                    Align_Ada_Matrix, 
+                    Impdef.CXB50050_External_Name);
+
+      pragma Import(Fortran, 
+                    Modify_Ada_Matrix, 
+                    Impdef.CXB50051_External_Name);
+
+
+      Arr_Size : constant Fortran_Integer := 6;
+
+      Fortran_Matrix : A_Fortran_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     (( 1,  2,  3,  4,  5,  6),
+                      ( 7,  8,  9, 10, 11, 12),
+                      (13, 14, 15, 16, 17, 18),
+                      (19, 20, 21, 22, 23, 24),
+                      (25, 26, 27, 28, 29, 30),
+                      (31, 32, 33, 34, 35, 36));
+
+      Ada_Matrix : An_Ada_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     (( 1,  2,  3,  4,  5,  6),
+                      ( 7,  8,  9, 10, 11, 12),
+                      (13, 14, 15, 16, 17, 18),
+                      (19, 20, 21, 22, 23, 24),
+                      (25, 26, 27, 28, 29, 30),
+                      (31, 32, 33, 34, 35, 36));
+
+      -- The following two "aligned" matrices are identical in content.
+
+      TC_Aligned_Fortran_Matrix : 
+        A_Fortran_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     (( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6));
+
+      TC_Aligned_Ada_Matrix : 
+        An_Ada_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     (( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6),
+                      ( 1, 2, 3, 4, 5, 6));
+
+      -- The following two "modified" matrices are identical in content.
+
+      TC_Modified_Fortran_Matrix : 
+        A_Fortran_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     ((1, 3, 3, 3, 3, 3),
+                      (2, 1, 3, 3, 3, 3),   -- 3's above/right of diagonal
+                      (2, 2, 1, 3, 3, 3),
+                      (2, 2, 2, 1, 3, 3),   -- 1's on diagonal
+                      (2, 2, 2, 2, 1, 3),
+                      (2, 2, 2, 2, 2, 1));  -- 2's below/left of diagonal
+
+      TC_Modified_Ada_Matrix : 
+        An_Ada_Matrix_Type(1..Arr_Size, 1..Arr_Size) :=
+                     ((1, 3, 3, 3, 3, 3),
+                      (2, 1, 3, 3, 3, 3),   -- 3's above/right of diagonal
+                      (2, 2, 1, 3, 3, 3),
+                      (2, 2, 2, 1, 3, 3),   -- 1's on diagonal
+                      (2, 2, 2, 2, 1, 3),
+                      (2, 2, 2, 2, 2, 1));  -- 2's below/left of diagonal
+
+   begin
+
+      -- Call the Fortran procedures to align the matrices.
+
+      Align_Fortran_Matrix(Arr_Size, Fortran_Matrix);
+      Align_Ada_Matrix(Arr_Size, Ada_Matrix);
+
+      -- Check that the Fortran matrix is properly aligned.
+
+      if Fortran_Matrix /= TC_Aligned_Fortran_Matrix then
+         Report.Failed
+           ("Incorrect result from procedure Align_Fortran_Matrix");
+      end if;
+
+      -- Check that the Ada matrix is not aligned in the manner that
+      -- a Fortran compatible matrix would be.
+
+      if Ada_Matrix = TC_Aligned_Ada_Matrix then
+         Report.Failed("Incorrect result from procedure Align_Ada_Matrix");
+      end if;
+
+
+      -- Call the Fortran procedures to modify the matrices.
+
+      Modify_Fortran_Matrix(Rank => Arr_Size, Matrix => Fortran_Matrix);
+      Modify_Ada_Matrix(Rank => Arr_Size, Matrix => Ada_Matrix);
+
+      -- Check that the Fortran matrix is properly modified.
+
+      if Fortran_Matrix /= TC_Modified_Fortran_Matrix then
+         Report.Failed
+           ("Incorrect result from procedure Modify_Fortran_Matrix");
+      end if;
+
+      -- Check that the Ada matrix is not modified in the manner that
+      -- a Fortran compatible matrix would be.
+
+      if Ada_Matrix = TC_Modified_Ada_Matrix then
+         Report.Failed
+           ("Incorrect result from procedure Modify_Ada_Matrix");
+      end if;
+
+
+   exception
+      when The_Error : others => 
+         Report.Failed("The following exception was raised in the " &
+                       "Test_Block: " & Exception_Name(The_Error));
+   end Test_Block;
+
+   Report.Result;
+
+end CXB50052;

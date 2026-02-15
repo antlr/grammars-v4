@@ -1,0 +1,254 @@
+-- CXE2001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that only one copy of the data in a shared passive library
+--      unit is present in a program.
+--      Check that a protected object declared in a shared passive
+--      library unit can be used from both partitions of a two partition 
+--      program.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE2001_A
+--          CXE2001_B
+--          CXE2001_Part_B
+--          CXE2001_Shared
+--      The testing will be done by configuring a program into two 
+--      partitions, one of which contains the shared passive unit.
+--      Access to the shared data will be coordinated and checked.  
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file. 
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE2001_A  (main procedure)
+--           and all normal and pure packages with'ed by this unit.
+--        Partition B contains:
+--           CXE2001_B  (main procedure)
+--           CXE2001_Part_B  (RCI package)
+--           CXE2001_Shared  (shared data package)
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions.
+--      Run the program by starting both partitions.  
+--      Since partition B acts as a server, an implementation may require
+--      that it be started before partition A is started.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations
+--         supporting the Distribution Annex,
+--         supporting shared memory, 
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     18 APR 95   SAIC    ACVC 2.1
+--     25 OCT 95   SAIC    Fixed bugs for ACVC 2.0.1
+--
+--!
+
+
+-----------------------------------------------------------------------------
+
+package CXE2001_Shared is
+  pragma Shared_Passive;
+
+  Shared_Data : Integer := 35;
+
+  protected Shared_Counter is
+    procedure Increment;
+    function Value return Integer;
+  private
+    Count : Integer := 0;
+  end Shared_Counter;
+end CXE2001_Shared;
+
+-----------------------------------------------------------------------------
+
+package CXE2001_Part_B is
+  pragma Remote_Call_Interface;
+  
+  procedure Test_Finished;
+  procedure Set_Shared_Data (Value : Integer);
+  procedure Increment_Counter;
+end CXE2001_Part_B;
+
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for partition B
+--
+
+with CXE2001_Part_B;
+with CXE2001_Shared;
+with Report;
+procedure CXE2001_B is
+begin
+  -- The body of package CXE2001_Part_B contains a task that is elaborated
+  -- and will prevent the partition from completing until a Test_Finished
+  -- call arrives from partition A.
+  Report.Test ("CXE2001_B", "Access to shared passive data from active" &
+                            " partitions (server)");
+end CXE2001_B;
+
+-----------------------------------------------------------------------------
+--
+-- main procedure for partition A (and the test)
+--
+
+with CXE2001_Part_B;
+with CXE2001_Shared;
+with System.RPC;
+with Report;
+procedure CXE2001_A is
+  use type System.RPC.Partition_ID;
+begin
+  Report.Test ("CXE2001_A", "Access to shared passive data from active" &
+                          " partitions");
+
+  -- make sure partitioning is performed correctly
+  if CXE2001_A'Partition_ID = CXE2001_Part_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE2001_A and CXE2001_Part_B" &
+                   " are in the same partition.");
+  end if;
+
+  -- It doesn't really matter which partition the shared data is placed in
+  -- so we don't check that it is in a particular partition.
+
+  -- check the shared data access
+  CXE2001_Shared.Shared_Data := Report.Ident_Int(42);
+  if CXE2001_Shared.Shared_Data /= 42 then
+    Report.Failed ("direct assignment to shared data failed");
+  end if;
+
+  CXE2001_Part_B.Set_Shared_Data (Report.Ident_Int(45));
+  case CXE2001_Shared.Shared_Data is
+    when 42 => Report.Failed ("remote access to the shared data failed");
+    when 45 => null;  -- expected result
+               -- Report.Comment ("remote access to shared passive data");
+    when others => Report.Failed ("unexpected value in shared data (1)" &
+                             Integer'Image (CXE2001_Shared.Shared_Data));
+  end case;
+
+  -- check the protected object access  
+  declare
+     V : Integer := CXE2001_Shared.Shared_Counter.Value;
+  begin
+     if V /= 0 then
+       Report.Failed ("initial value of shared protected value is" &
+                      Integer'Image (V));
+     end if;
+
+     -- manipulate the protected object directly
+     CXE2001_Shared.Shared_Counter.Increment;
+     if CXE2001_Shared.Shared_Counter.Value /= 1 then
+       Report.Failed ("incorrect shared passive protected object value 1");
+     end if;
+
+     CXE2001_Shared.Shared_Counter.Increment;
+     if CXE2001_Shared.Shared_Counter.Value /= 2 then
+       Report.Failed ("incorrect shared passive protected object value 2");
+     end if;
+
+     CXE2001_Shared.Shared_Counter.Increment;
+     if CXE2001_Shared.Shared_Counter.Value /= 3 then
+       Report.Failed ("incorrect shared passive protected object value 3");
+     end if;
+
+     -- manipulate the protected object from the other partition
+     CXE2001_Part_B.Increment_Counter;
+     V := CXE2001_Shared.Shared_Counter.Value;
+     if V = 3 then
+       Report.Failed ("shared passive protected object appears " &
+                      "to be copied");
+     elsif V = 4 then
+       null;
+       -- Report.Comment ("remote access to shared passive protected" &
+       --                 " object");
+     else
+       Report.Failed ("unexpected value in shared data (2)" &
+           Integer'Image (V));
+     end if;
+     
+  end;
+
+  -- finish up
+  CXE2001_Part_B.Test_Finished;
+  Report.Result;
+end CXE2001_A;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE2001_Shared;
+package body CXE2001_Part_B is
+  task Keep_Partition_Alive is
+    entry Quit;
+  end Keep_Partition_Alive;
+
+  task body Keep_Partition_Alive is
+  begin
+    accept Quit;
+  end Keep_Partition_Alive;
+
+  procedure Test_Finished is
+  begin
+    Keep_Partition_Alive.Quit;
+    Report.Result;
+  end Test_Finished;
+
+
+  procedure Set_Shared_Data (Value : Integer) is
+  begin
+    CXE2001_Shared.Shared_Data := Value;
+  end Set_Shared_Data;
+
+
+  procedure Increment_Counter is
+  begin
+    CXE2001_Shared.Shared_Counter.Increment;
+  end Increment_Counter;
+end CXE2001_Part_B;
+
+-----------------------------------------------------------------------------
+
+package body CXE2001_Shared is
+  protected body Shared_Counter is
+    procedure Increment is
+    begin
+      Count := Count + 1;
+    end Increment;
+
+    function Value return Integer is
+    begin
+      return Count;
+    end Value;
+  end Shared_Counter;
+end CXE2001_Shared;

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Test Summary Tool Reference</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-614.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-62.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.1.5 Test Summary Tool Reference</H1>
+<div class="Normal" style="margin-bottom: 0.4em">The command line for 
+the Test Summary Tool is:</div>
+<div class="Examples">&nbsp;&nbsp;Summary&nbsp;&lt;ACATS_Test_File_Name&gt;&nbsp;&lt;Summary_of_Tests_File_Name&gt;</div>
+<div class="Indented4WideHanging-Term">&lt;ACATS_Test_File_Name&gt;</div><div class="Indented4WideHanging-Body"><br clear="left">
+The name of an ACATS test source file. This can use any file name acceptable 
+to the implementation that compiled the tool (in particular, full paths 
+may be used on most implementations). The Summary tool assumes that the 
+simple file name of the test follows the naming conventions as described 
+in <A HREF="UG-43.HTM">4.3</A>; either the modern or legacy naming conventions 
+are acceptable.</div>
+<div class="Indented4WideHanging-Term"></div><div class="Indented4WideHanging-Body">
+The summary tool can be used on split tests and other Ada code not directly 
+part of the ACATS, so long as the ACATS naming conventions are followed 
+(see above), and the files contain no optional units (as the tool has 
+no way to discover optional units). This allows the Grading Tool to be 
+used on tests being developed for submission to the ACATS (see <A HREF="UG-E.HTM">Annex 
+E</A>). We also expect that the tool could be used on older ACATS versions, 
+allowing the Grading Tool to be used with those versions.</div>
+<div class="Indented4WideHanging-Term">&lt;Summary_of_Tests_File_Name&gt;</div><div class="Indented4WideHanging-Body"><br clear="left">
+The name of the Test Summary File. If this file exists, the new test 
+summary records will be appended to it. Otherwise, the file will be created. 
+</div>
+<div class="Normal" style="margin-bottom: 0.4em">The test summary tool 
+needs to be run on each individual source file. Typically, it makes sense 
+to combine all of the tests of a single ACATS directory into a single 
+test summary file. This can easily be accomplished on Microsoft Windows 
+with a batch file containing the following:</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Rem&nbsp;Chapter&nbsp;5&nbsp;C-Tests<BR>
+&nbsp;&nbsp;&nbsp;Del&nbsp;C5-Sum.csv<BR>
+&nbsp;&nbsp;&nbsp;for&nbsp;%%i&nbsp;in&nbsp;(\My_ACATS\C5\*.A??)&nbsp;do&nbsp;Summary&nbsp;%%i&nbsp;C5-Sum.csv<BR>
+&nbsp;&nbsp;&nbsp;for&nbsp;%%i&nbsp;in&nbsp;(\My_ACATS\C5\*.D??)&nbsp;do&nbsp;Summary&nbsp;%%i&nbsp;C5-Sum.csv</div>
+<div class="Normal">We first delete any existing summary file (so we 
+don't accidentally double the contents), then run the summary tool on 
+all of the ACATS source code found in the directory \My_ACATS\C5. (The 
+second loop is needed in case there are any legacy .DEP files; all of 
+the other extensions start with 'A'.)</div>
+<div class="Normal">A similar technique can be used on other host operating 
+systems.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-614.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-62.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

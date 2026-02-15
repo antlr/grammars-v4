@@ -1,0 +1,164 @@
+-- B7400030.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that the full constant declaration that completes a deferred
+--     constant declaration can only occur in the private part of the same
+--     package.
+--
+--     Check that a deferred constant declaration completed with a full
+--     constant declaration can only be given in the visible part of a
+--     package specification.
+--
+-- TEST DESCRIPTION:
+--     The objective of test B740001 may appear to cover these cases,
+--     but the actual test does not. Nor do any legacy tests cover these
+--     objectives.
+--
+--     This test declares deferred constants of various types
+--     in the visible part of a package specification, and completes the
+--     them with full constant declarations in various places. The test
+--     verifies that the deferred constants lacking a completion in the
+--     private part of the same package are illegal.
+--
+--     The test also tests that is it illegal to declare a deferred constant
+--     which is completed with a full constant declaration in private
+--     parts and in package bodies. Note that the deferred constant itself
+--     is legal (it could be completed with a pragma Import); it is the
+--     presence of the full constant declaration that makes it illegal.
+--
+--     We don't test completions given in a body, as those would look
+--     identical to completions that are missing altogether (tested by
+--     B740001).
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B7400030.A
+--         B7400031.A
+--         B7400032.AM
+--
+-- PASS/FAIL CRITERIA:
+--     Files B7400030.A and B7400031.A contain errors. All errors in
+--     these files must be detected to pass the test.
+--
+--     Files B7400030.A and B7400031.A contain several lines
+--     marked POSSIBLE ERROR: [Setn].
+--     For each value of n, the implementation must detect one or more of
+--     these possible errors. For instance, an error must be detected on
+--     at least one of the lines labeled POSSIBLE ERROR: [Set1] for an
+--     implementation to pass.
+--
+--     Compiling the main subprogram file B7400032.AM is optional.
+--
+-- CHANGE HISTORY:
+--      30 Apr 07  RLB   Created from ACATS 2.6 test.
+--      17 Aug 07  RLB   Moved error indications based on implementer comments.
+--      06 Sep 07  RLB   Added more flexibility in error indications.
+--      29 May 08  RLB   Updated Pass/Fail criteria.
+--      29 Jun 16  RLB   Fixed so tools don't pick up markers in criteria.
+--      13 Jun 18  RLB   Updated Pass/Fail criteria to note that processing
+--                       the last source file is optional (it is unnecessary
+--                       to test the objective). Added error location
+--                       indicators.
+
+--!
+package B7400030 is
+
+   type Priv_Comp is private;
+
+   type List_Of_Priv_Comp is array (Positive range <>) of Priv_Comp;
+
+   Null_List : constant List_Of_Priv_Comp;                 -- OK. {4;1}
+
+   type Rec is record
+      C : Integer;
+   end record;
+
+   CRec : constant Rec;                                    -- OK. {4;1}
+
+   procedure Dummy;
+
+private
+
+   type Priv_Comp is (Anything);      -- Enumeration type.
+
+   Null_List : constant List_Of_Priv_Comp := (1 .. 0 => Anything);
+
+   CRec : constant Rec := (C => 12);
+
+end B7400030;
+
+package body B7400030 is
+
+   Null_List_Body : constant List_Of_Priv_Comp; -- POSSIBLE ERROR: [Set1] {4;1}
+                                           --   Deferred constant in body.
+   CRec_Body : constant Rec;               -- POSSIBLE ERROR: [Set2] {4;1}
+                                           --   Deferred constant in body.
+
+   Null_List_Body : constant List_Of_Priv_Comp :=
+      (1 .. 0 => Anything);                -- POSSIBLE ERROR: [Set1] {1:4;1}
+                                           -- Completion of deferred constant
+                                           -- in body.
+
+   CRec_Body : constant Rec := (C => 12);  -- POSSIBLE ERROR: [Set2] {4;1}
+                                           -- Completion of deferred constant
+                                           -- in body.
+
+
+   procedure Dummy is
+      CRec_Sub : constant Rec;             -- POSSIBLE ERROR: [Set3] {7;1}
+                                           -- Deferred constant in subprogram.
+
+      CRec_Sub : constant Rec := (C => 18);-- POSSIBLE ERROR: [Set3] {7;1}
+                                           -- Completion of deferred constant
+                                           -- in subprogram.
+      package Goofy is
+         CRec_Nest : constant Rec;
+      private
+         CRec_Nest : constant Rec := (C => 18); -- OK. {10;1}
+      end Goofy;
+   begin
+      declare
+         CRec_Sub : constant Rec;          -- POSSIBLE ERROR: [Set4] {10;1}
+                                           -- Deferred constant in block.
+
+         CRec_Sub : constant Rec := (C => 92);-- POSSIBLE ERROR: [Set4] {10;1}
+                                           -- Completion of deferred
+                                           -- constant in block.
+      begin
+         null;
+      end;
+   end Dummy;
+
+end B7400030;

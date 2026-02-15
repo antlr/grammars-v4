@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Expected Results for Class B Tests</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-561.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-563.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.6.2 Expected Results for Class B Tests</H1>
+<div class="Normal">Class B tests are expected to be compiled but are 
+not subject to further processing and are not intended to be executable. 
+An implementation must correctly report each clearly marked error (the 
+notation <TT>-- ERROR:</TT> occurs at the right hand side of the source). 
+A multiple unit B test file generally will have errors only in one compilation 
+unit per source file. Error messages must provide some means of specifying 
+the location of an error, but they are not required to be in direct proximity 
+with the <TT>-- ERROR:</TT> marking of the errors. The actual text of 
+error messages is not used in determining whether an error is properly 
+detected; only the location of the reported error is used. (The ACATS 
+must not prevent innovation in error handling.)</div>
+<div class="Normal">Some B-tests also include the notation <TT>-- OK</TT> 
+to indicate constructs that <I>must not</I> be identified as errors. 
+Such constructs are typically similar to illegal constructs and serve 
+to ensure that implementations do not reject too much. Not identifying 
+<TT>-- OK</TT> constructs as errors is especially important since some 
+constructs that were errors in <A HREF="UG-01.HTM#Ada83">[Ada83]</A> 
+are now legal in later versions of Ada.</div>
+<div class="Normal">Some B-tests exercise constructs whose correctness 
+depends on source code that is textually separated (for example, a deferred 
+constant and its full declaration). In these cases, it may be reasonable 
+to report an error at both locations. Such cases are marked with <TT>-- 
+OPTIONAL ERROR</TT>. These lines may be flagged as errors by some, but 
+not all, implementations. Unless an optional error is marked as an error 
+for the wrong reason, an error report (or lack of it) does not affect 
+the pass/fail status of the test.</div>
+<div class="Normal">Some B-tests contain constructs where it would be 
+reasonable for a compiler to report an error at one of several source 
+locations. When it would not be appropriate for the ACATS to insist on 
+a particular source location, all such source locations are marked with 
+<TT>-- POSSIBLE ERROR:</TT> and an indication of which error set (if 
+the test contains several) the location belongs to. In such cases, an 
+implementation is considered to have properly reported the error if it 
+reports an error at any of the places marked <TT>-- POSSIBLE ERROR:</TT> 
+for a particular set. The implementation may flag more than one such 
+place; this does not affect the pass/fail status of the test. However, 
+the test is graded &quot;failed&quot; if no error is reported at any 
+of the places marked <TT>-- POSSIBLE ERROR:</TT> for an error set.</div>
+<div class="Normal">A test is graded as &quot;passed&quot; if it reports 
+each error in the test. The content of error messages is considered only 
+to determine that they are indeed indications of errors (as opposed to 
+warnings) and that they refer to the expected errors. The Reference Manual 
+does not specify the form or content of error messages. In particular, 
+a test with just one expected error is graded as &quot;passed&quot; if 
+the test is rejected at compile time for any reason.</div>
+<div class="Normal">A test is graded as &quot;failed&quot; if it fails 
+to report on each error in the test or if it marks legal code as incorrect.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-561.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-563.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

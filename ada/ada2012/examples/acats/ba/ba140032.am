@@ -1,0 +1,77 @@
+-- BA140032.AM
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--      See BA140030.A.
+--
+-- TEST DESCRIPTION:
+--      See BA140030.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         BA140030.A
+--         BA140031.A
+--      -> BA140032.AM
+--
+-- PASS/FAIL CRITERIA:
+--      See BA140030.A.
+--
+-- CHANGE HISTORY:
+--    15 Feb 2018  RLB  Created test based on ideas from the legacy test
+--                      BA3006B.
+--
+--!
+
+-- Revised unit test.
+private with BA14003_1, BA14003_2;
+procedure BA140032 is -- ERROR: {1:1} - Depends on two versions of BA14003_1.
+   D : BA14003_2.Data;
+begin
+   for I in 1 .. BA14003_1.Max_Size loop
+      if BA14003_2.Get_Data(D, I) /= BA14003_1.Initial_Value(0) then
+          null; -- Failed message goes here.
+      end if;
+   end loop;
+   BA14003_2.Munge_Data(D, 4);
+   BA14003_2.Munge_Data(D, 4);
+   if BA14003_2.Get_Data(D, 4) /= 3 then
+      null; -- Failed message goes here.
+   end if;
+end BA140032;
+
+-- Note: If the compilation system supports automatic recompilation, that
+-- will fail (as "Unused" is used, but no longer defined) instead of some
+-- compilation failure on this unit. We don't care WHY compilation fails here,
+-- just that some failure is reported when compiling this source file.

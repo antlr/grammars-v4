@@ -1,0 +1,135 @@
+-- BD8004A.TST
+
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+-- OBJECTIVE:
+--     IF A PROCEDURE BODY CONTAINS MACHINE CODE STATEMENTS, THEN NO
+--     DECLARATIVE ITEMS OTHER THAN USE CLAUSES ARE ALLOWED IN THE
+--     PROCEDURE'S DECLARATIVE PART.
+
+-- APPLICABILITY CRITERIA:
+--     THIS TEST IS APPLICABLE ONLY TO IMPLEMENTATIONS THAT SUPPORT
+--     MACHINE CODE INSERTIONS.
+
+--     IF SUCH INSERTIONS ARE NOT SUPPORTED, THE "WITH MACHINE_CODE"
+--     CLAUSE MUST BE REJECTED.
+
+-- MACRO SUBSTITUTION:
+--     IF MACHINE CODE INSERTIONS ARE SUPPORTED THEN THE MACRO
+--     $MACHINE_CODE_STATEMENT MUST BE REPLACED BY A VALID CODE
+--     STATEMENT.
+
+--     IF MACHINE CODE INSERTIONS ARE NOT SUPPORTED, THEN SUBSTITUTE
+--     THE ADA NULL STATEMENT (IE: NULL;) FOR $MACHINE_CODE_STATEMENT.
+
+-- HISTORY:
+--     DHH 08/24/88  CREATED ORIGINAL TEST.
+
+WITH MACHINE_CODE;                                     -- N/A => ERROR.
+USE MACHINE_CODE;
+PROCEDURE BD8004A IS
+BEGIN
+     NULL;
+END BD8004A;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_1 IS
+     TYPE ENUM IS (RED, YELLOW, BLUE);                   -- ERROR:
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_1;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_2 IS
+     TYPE REC IS                                         -- ERROR:
+     RECORD
+          NULL;
+     END RECORD;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_2;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_3 IS
+     TYPE ARR IS ARRAY(1 .. 10) OF BOOLEAN;              -- ERROR:
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_3;
+
+ WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_4 IS
+     A : INTEGER;                                        -- ERROR:
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_4;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_5 IS
+     PACKAGE P IS                                        -- ERROR:
+     END P;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_5;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_6 IS
+     TASK T IS                                           -- ERROR:
+     END T;
+
+     TASK BODY T IS
+     BEGIN
+          NULL;
+     END T;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_6;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_7 IS
+     FUNCTION F RETURN BOOLEAN IS                        -- ERROR:
+     BEGIN
+          RETURN TRUE;
+     END;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_7;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_8 IS
+     PROCEDURE PROC IS                                   -- ERROR:
+     BEGIN
+          NULL;
+     END PROC;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_8;
+
+WITH MACHINE_CODE; USE MACHINE_CODE;
+PROCEDURE BD8004A_9 IS
+     PROCEDURE M_C IS                                    -- ERROR:
+     BEGIN
+         $MACHINE_CODE_STATEMENT
+     END M_C;
+BEGIN
+     $MACHINE_CODE_STATEMENT
+END BD8004A_9;

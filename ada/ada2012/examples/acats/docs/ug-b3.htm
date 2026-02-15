@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Package ImpDef and Its Children</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B2.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>B.3 Package ImpDef and Its Children</H1>
+<div class="Normal">The package ImpDef (for &quot;Implementation Definitions&quot;) 
+provides constants and functions for producing implementation-specific 
+values required by certain test programs. This package resides in the 
+file <TT>ImpDef.a</TT> in the &quot;support&quot; directory. Four child 
+packages are also included in the &quot;support&quot; directory, each 
+providing the means for producing implementation-specific values required 
+by certain test programs for a particular Specialized Needs Annex. These 
+packages have names of the form ImpDef.Annex_X, and reside in files with 
+names of the form <TT>ImpDefX.a</TT>, where 'X' is replaced by the letter 
+designating the relevant Annex.</div>
+<div class="Normal">The ImpDef package and each of its children should 
+be modified for each implementation as described in the source code. 
+The following excerpt from the &quot;ImpDef.a&quot; file illustrates 
+how these modification points are indicated in the packages.</div>
+<div class="Examples"><B>package</B>&nbsp;ImpDef&nbsp;<B>is</B></div>
+<div class="Examples">--=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;--&nbsp;The&nbsp;following&nbsp;boolean&nbsp;constants&nbsp;indicate&nbsp;whether&nbsp;this&nbsp;validation&nbsp;will<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;include&nbsp;any&nbsp;of&nbsp;annexes&nbsp;C-H.&nbsp;The&nbsp;values&nbsp;of&nbsp;these&nbsp;booleans&nbsp;affect&nbsp;the<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;behavior&nbsp;of&nbsp;the&nbsp;test&nbsp;result&nbsp;reporting&nbsp;software.<BR>
+&nbsp;&nbsp;&nbsp;--<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;&nbsp;means&nbsp;the&nbsp;associated&nbsp;annex&nbsp;IS&nbsp;included&nbsp;in&nbsp;the&nbsp;validation.<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;False&nbsp;means&nbsp;the&nbsp;associated&nbsp;annex&nbsp;is&nbsp;NOT&nbsp;included.</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_C&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_D&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_E&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_F&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_G&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Validating_Annex_H&nbsp;:&nbsp;<B>constant</B>&nbsp;Boolean&nbsp;:=&nbsp;False;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples">--=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;--&nbsp;This&nbsp;is&nbsp;the&nbsp;minimum&nbsp;time&nbsp;required&nbsp;to&nbsp;allow&nbsp;another&nbsp;task&nbsp;to&nbsp;get<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;control.&nbsp;&nbsp;It&nbsp;is&nbsp;expected&nbsp;that&nbsp;the&nbsp;task&nbsp;is&nbsp;on&nbsp;the&nbsp;Ready&nbsp;queue.<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;A&nbsp;duration&nbsp;of&nbsp;0.0&nbsp;would&nbsp;normally&nbsp;be&nbsp;sufficient&nbsp;but&nbsp;some&nbsp;number<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;greater&nbsp;than&nbsp;that&nbsp;is&nbsp;expected.</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;Minimum_Task_Switch&nbsp;:&nbsp;<B>constant</B>&nbsp;Duration&nbsp;:=&nbsp;0.1;<BR>
+&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^^&nbsp;---&nbsp;MODIFY&nbsp;HERE&nbsp;AS&nbsp;NEEDED</div>
+<div class="Examples"><SPAN Class="roman"><I>...</I></SPAN></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-B2.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

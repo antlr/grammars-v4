@@ -1,0 +1,231 @@
+-- B730002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that a private extension is limited if its ancestor type is
+--      limited. Check that if a partial view is nonlimited, the full view
+--      must be nonlimited. Check that if a partial view of a tagged type is
+--      limited, the full view must be limited, but that if a partial view of
+--      an untagged type is limited, the full view may be either limited or
+--      nonlimited. Check that the full view of a private extension must be
+--      derived, either directly or indirectly, from the ancestor type.  Check
+--      that the ancestor type of a private extension must be a specific type.
+--
+-- TEST DESCRIPTION:
+--      For private types, this test focuses on cases where the full view
+--      is a derived type. In such cases, the limitedness of the full view
+--      depends on whether or not the parent type is limited, and cannot
+--      be determined syntactically. 
+--
+--      Neither assignment nor predefined equality are defined for limited
+--      types, and so they are not defined for private extensions whose 
+--      ancestor type is limited.
+--
+--      Since tagged derived types are limited if and only if their parent
+--      type is limited, it is impossible to construct a derivation class
+--      which contains both limited and nonlimited types. Thus, if the ancestor
+--      of a private extension is limited, any otherwise legal parent given
+--      for the full view will also be limited.
+--
+--      This test declares tagged limited, tagged nonlimited, untagged limited,
+--      untagged private, tagged private types and their extensions.  Verify 
+--      that compiler generates errors for all cases as described in the 
+--      objective.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+package B730002_0 is
+
+-- Hierarchy of limited types looks like:
+--
+--                        Lim_Root
+--               Lim_Ancestor     Lim_Sibling
+--           Lim_Child    Lim_Pri_Ext
+--       Lim_GrnChild
+
+   type Lim_Root is tagged limited record
+      I : Integer;
+   end record;
+
+   type Lim_Sibling  is new Lim_Root     with null record;
+
+   type Lim_Ancestor is new Lim_Root     with null record;
+   type Lim_Child    is new Lim_Ancestor with null record;
+   type Lim_GrnChild is new Lim_Child    with null record;
+
+
+-- Hierarchy of nonlimited types looks like:
+--
+--                          NonLim_Root
+--               NonLim_Derived
+
+   type NonLim_Root is tagged record
+      Int : Integer;
+   end record;
+
+   type NonLim_Derived is new NonLim_Root with null record;
+
+
+--
+-- Private extension:
+--
+
+   type Lim_Pri_Ext is new Lim_Ancestor with private;     -- Private extension
+                                                          -- is limited.
+
+private
+
+   type Lim_Pri_Ext is new Lim_Ancestor with record
+      Another_Int : Integer := 0;
+   end record;
+
+end B730002_0;
+
+
+     --==================================================================--
+
+
+with B730002_0;
+use  B730002_0;
+package B730002 is
+
+--
+-- Nonlimited cases:
+--
+   -- Untagged private types:
+
+   type NL_Untag_Priv1 is private;
+   type NL_Untag_Priv2 is private;
+
+
+   -- Tagged private types:
+
+   type NL_Tag_Priv1 is tagged private;
+   type NL_Tag_Priv2 is tagged private;
+
+
+--
+-- Limited cases:
+--
+   -- Untagged private types:
+
+   type L_Untag_Priv1 is limited private;
+   type L_Untag_Priv2 is limited private;
+
+
+   -- Tagged private types:
+
+   type L_Tag_Priv1 is tagged limited private;
+   type L_Tag_Priv2 is tagged limited private;
+
+
+--
+-- Private extensions:
+--
+
+   type Pri_Ext1 is new Lim_Ancestor with private;
+   type Pri_Ext2 is new Lim_Ancestor with private;
+   type Pri_Ext3 is new Lim_Ancestor with private;
+   type Pri_Ext4 is new Lim_Ancestor with private;
+   type Pri_Ext5 is new Lim_Ancestor with private;
+   type Pri_Ext6 is new Lim_Ancestor'Class with null record;          -- ERROR:
+                                 -- Ancestor type must be specific tagged type.
+
+   -- Check that private extension is limited if its ancestor is:
+
+   Obj1 : Lim_Pri_Ext;                                                
+   Obj2 : Lim_Pri_Ext;                                                
+   Obj3 : Lim_Pri_Ext := Obj1;                                        -- ERROR:
+                        -- Type of object is limited; assignment not available.
+
+   Obj4 : Boolean := (Obj1 = Obj2);                                   -- ERROR:
+             -- Type of operands is limited; predefined equality not available.
+
+
+private
+
+--
+-- Nonlimited cases (full view must be nonlimited):
+--
+   -- Untagged private types:
+
+   -- Even though partial view is untagged, full view may be tagged.
+
+   type NL_Untag_Priv1 is new NonLim_Root with null record;           -- OK.
+   type NL_Untag_Priv2 is new Lim_Root    with null record;           -- ERROR:
+                                               -- Full view must be nonlimited.
+
+   -- Tagged private types:
+
+   type NL_Tag_Priv1 is new NonLim_Derived with null record;          -- OK.
+   type NL_Tag_Priv2 is new Lim_Ancestor   with null record;          -- ERROR:
+                                               -- Full view must be nonlimited.
+
+
+--
+-- Limited cases:
+--
+   -- Untagged private types (full view may be limited or nonlimited):
+
+   -- Even though partial view is untagged, full view may be tagged.
+
+   type L_Untag_Priv1 is new Lim_Ancestor   with null record;         -- OK.
+   type L_Untag_Priv2 is new NonLim_Derived with null record;         -- OK.
+
+
+   -- Tagged private types (full view must be limited):
+
+   type L_Tag_Priv1 is new Lim_Root    with null record;              -- OK.
+   type L_Tag_Priv2 is new NonLim_Root with null record;              -- ERROR:
+                                                 -- Parent type is not limited.
+
+
+--
+-- Private extensions:
+--
+
+   -- Check that parent must be derived (directly or indirectly) from ancestor:
+
+   type Pri_Ext1 is new Lim_Ancestor with null record;                -- OK.
+   type Pri_Ext2 is new Lim_Child    with null record;                -- OK.
+   type Pri_Ext3 is new Lim_GrnChild with null record;                -- OK.
+   type Pri_Ext4 is new Lim_Root     with null record;                -- ERROR:
+                                           -- Parent not derived from ancestor.
+
+   type Pri_Ext5 is new Lim_Sibling  with null record;                -- ERROR:
+                                           -- Parent not derived from ancestor.
+
+   -- Partial view is limited, full view is nonlimited.
+
+   Obj5 : L_Untag_Priv2;                                                
+   Obj6 : L_Untag_Priv2;                                                
+   Obj7 : L_Untag_Priv2 := Obj5;                                      -- OK.
+   Obj8 : Boolean := (Obj5 = Obj6);                                   -- OK.
+
+end B730002;

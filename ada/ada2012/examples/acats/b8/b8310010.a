@@ -1,0 +1,165 @@
+-- B8310010
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--    Check that an operation that has an overriding indicator is a
+--    primitive operation for some type.
+--
+--    Check that an overriding indicator can be given on an abstract
+--    subprogram declaration, a null procedure declaration, and an ordinary
+--    (non-protected) subprogram declaration.
+--
+--    Check that an overriding indicator can be given on a subprogram body,
+--    subprogram body stub, and a subprogram renaming declaration.
+--
+--    Check that an overriding indicator can be given on a generic
+--    instantiation of a subprogram.
+--
+-- TEST DESCRIPTION
+--    We mainly check "not overriding", because a non-primitive subprogram
+--    cannot override anything. Thus, any check of "overriding" will
+--    necessarily mix two errors and therefore not be as definitive as
+--    "not overriding".
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B8310010.A
+--         B8310011.A
+--         B8310012.A
+--
+-- PASS/FAIL CRITERIA:
+--      Files B8310011.A and B8310012.A contain errors. All
+--      errors in these files must be detected to pass the test.
+--
+-- CHANGE HISTORY:
+--      22 Aug 2007   RLB   Created test from submitted test. Added null
+--                          procedure cases. Added missing body cases.
+--      15 Nov 2007   RLB   Added missing secondary objectives.
+--      28 Apr 2008   RLB   Removed "abstract" from Gft, as this violates
+--                          AI05-0073-1.
+--
+--!
+package B831001_0 is
+
+    generic
+        type T (<>) is abstract tagged private;
+    procedure Gpt (X : T; Y : in out T; Z : out T);
+
+    generic
+        type T (<>) is private;
+    procedure Gpu (X : T; Y : in out T; Z : out T);
+
+    generic
+        type T (<>) is tagged private;
+    function Gft (X : T) return T;
+
+    generic
+        type T (<>) is private;
+    function Gfu (X : T) return T;
+
+
+    package Pu is
+
+        type T is new Integer;
+
+        not overriding
+        procedure P (X : T); -- OK
+
+        not overriding
+        procedure Q (Z : T) renames P; -- OK
+
+        not overriding
+        procedure Q (X : T; Y : in out Boolean); -- OK
+
+        not overriding
+        procedure R (X : T; Y : in out T; Z : out T); -- OK
+
+        not overriding
+        function F return T; -- OK
+
+        not overriding
+        function G return T renames F; -- OK
+
+        not overriding
+        function G (Y : Boolean) return T; -- OK
+
+        overriding
+        function "-" (X : T) return T; -- OK
+
+    end Pu;
+
+    package Pt is
+
+        type T is abstract tagged null record;
+
+        not overriding
+        procedure P (X : T); -- OK
+
+        not overriding
+        procedure Q (X : in T; A : in Integer) is abstract; -- OK
+
+        not overriding
+        procedure R (Z : T) renames P; -- OK
+
+        not overriding
+        procedure R (X : T; Y : in out Boolean); -- OK
+
+        not overriding
+        procedure S (X : in out T) is null; -- OK
+
+        not overriding
+        function F return T is abstract; -- OK
+
+        not overriding
+        function G return T renames F; -- OK
+
+        not overriding
+        function G (Y : Boolean) return T is abstract; -- OK
+
+        not overriding
+        function "-" (Left : T) return T is abstract; -- OK
+
+    end Pt;
+
+end B831001_0;
+
+package B831001_2 is
+    type T is tagged null record;
+
+    not overriding
+    procedure P (X : T); -- OK
+
+    not overriding
+    function F return T; -- OK
+end B831001_2;

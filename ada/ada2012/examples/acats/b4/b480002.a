@@ -1,0 +1,174 @@
+-- B480002
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--
+--     If the designated type of an initialized allocator is class-wide,
+--     check that the accessibility level of the type of the qualified
+--     expression cannot be statically deeper than the level of the type
+--     of the allocator.
+--
+-- TEST DESCRIPTION:
+--
+--     We try allocators initialized with objects of types declared at various
+--     nesting levels. Note that a type declared at an inner or parallel
+--     nesting level is not visible, and thus can only occur at run-time when
+--     returned from a class-wide function.
+--
+-- CHANGE HISTORY:
+--    05 Jan 2015   RLB   Created test, using the similar return statement
+--                        test (B650003) as a basis.
+--    13 Mar 2015   RLB   Eliminated overlong lines and tabs.
+--    26 Apr 2021   RLB   Added error location indicators.
+--!
+package B480002_0 is
+    type Vis_Root is tagged null record;
+    type Prv_Root is tagged private;
+    Prv_Root_Obj : constant Prv_Root;
+    type Intf is limited interface;
+private
+    type Prv_Root is tagged null record;
+    Prv_Root_Obj : constant Prv_Root := (null record);
+end;
+
+
+with B480002_0;
+procedure B480002 is
+    type Der_Vis is new B480002_0.Vis_Root with null record;
+    type Der_Prv is new B480002_0.Prv_Root with null record;
+    type Impl is new B480002_0.Intf with null record;
+
+    type Acc_Vis_Root is access all B480002_0.Vis_Root'Class;
+
+    type Acc_Prv_Root is access all B480002_0.Prv_Root'Class;
+
+    type Acc_Intf  is access all B480002_0.Intf'Class;
+
+    procedure Test_Vis (N : in Natural) is
+        type Nest_Vis is new B480002_0.Vis_Root with null record;
+        Nest_Vis_Obj : Nest_Vis := (null record);
+        P : Acc_Vis_Root;
+    begin
+        declare
+            type Inner_Vis is new B480002_0.Vis_Root with null record;
+        begin
+            case N is
+                when 1 =>
+                    P := new B480002_0.Vis_Root'(null record); -- OK. {21;1}
+                when 2 =>
+                    P := new Der_Vis'(null record);          -- OK. {21;1}
+                when 3 =>
+                    P := new Nest_Vis'(null record);         -- ERROR: {21;1}
+                when 4 =>
+                    P := new Inner_Vis'(null record);        -- ERROR: {21;1}
+                when 5 =>
+                    P := new B480002_0.Vis_Root'Class'(
+                               B480002_0.Vis_Root'Class(
+                                             Nest_Vis_Obj)); -- OK. {2:21;1}
+                        -- But Program_Error would be raised at run-time.
+                when 6 =>
+                    P := new Nest_Vis'Class'(
+                             Nest_Vis'Class(Nest_Vis_Obj));  -- ERROR: {1:21;1}
+                when others => raise Program_Error;
+            end case;
+        end;
+    end Test_Vis;
+
+    procedure Test_Prv (N : in Natural) is
+        type Nest_Prv is new B480002_0.Prv_Root with null record;
+        Nest_Prv_Obj : Nest_Prv :=
+           Nest_Prv'(B480002_0.Prv_Root_Obj with null record);
+        P : Acc_Prv_Root;
+    begin
+        declare
+            type Inner_Prv is new B480002_0.Prv_Root with null record;
+        begin
+            case N is
+                when 1 =>
+                    P := new B480002_0.Prv_Root'(
+                                  B480002_0.Prv_Root_Obj);   -- OK. {1:21;1}
+                when 2 =>
+                    P := new Der_Prv'(B480002_0.Prv_Root_Obj with
+                                    null record);            -- OK. {1:21;1}
+                when 3 =>
+                    P := new Nest_Prv'(Nest_Prv_Obj);        -- ERROR: {21;1}
+                when 4 =>
+                    P := new Inner_Prv'(B480002_0.Prv_Root_Obj with
+                                      null record);          -- ERROR: {1:21;1}
+                when 5 =>
+                    P := new B480002_0.Prv_Root'Class'(
+                                B480002_0.Prv_Root'Class(
+                                   B480002_0.Prv_Root_Obj)); -- OK. {2:21;1}
+                when 6 =>
+                    P := new Nest_Prv'Class'(
+                              Nest_Prv'Class(Nest_Prv_Obj)); -- ERROR: {1:21;1}
+                when 7 =>
+                    P := new Inner_Prv'Class'(
+                               Inner_Prv'Class(
+                                 Inner_Prv'(B480002_0.Prv_Root_Obj with
+                                      null record)));        -- ERROR: {3:21;1}
+                when others => raise Program_Error;
+            end case;
+        end;
+    end Test_Prv;
+
+    procedure Test_Intf (N : in Natural) is
+        type Nest_Impl is new B480002_0.Intf with null record;
+        Nest_Impl_Obj : Nest_Impl := Nest_Impl'(null record);
+        P : Acc_Intf;
+    begin
+        declare
+            type Inner_Impl is new B480002_0.Intf with null record;
+        begin
+            case N is
+                when 2 =>
+                    P := new Impl'(null record);             -- OK. {21;1}
+                when 3 =>
+                    P := new Nest_Impl'(null record);        -- ERROR: {21;1}
+                when 4 =>
+                    P := new Inner_Impl'(null record);       -- ERROR: {21;1}
+                when 6 =>
+                    P := new Nest_Impl'Class'(
+                             Nest_Impl'Class(Nest_Impl_Obj));-- ERROR: {1:21;1}
+                when others => raise Program_Error;
+            end case;
+        end;
+    end Test_Intf;
+
+begin
+    Test_Vis (1);
+    Test_Prv (1);
+    Test_Intf (1);
+end B480002;
+

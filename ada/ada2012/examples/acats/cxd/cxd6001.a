@@ -1,0 +1,352 @@
+-- CXD6001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that an aborted construct is completed immediately
+--      at the first point that is outside the execution of an
+--      abort-deferred operation.
+--
+-- TEST DESCRIPTION:
+--      This test relies upon the ability to unblock an interrupt
+--      priority task that in turn aborts a normal priority task.
+--      This is accomplished by having the interrupt priority task
+--      waiting for a Set_True on a Suspension_Object.
+--      The normal priority tasks that are aborted note their state
+--      in global variables.  These variables are named starting
+--      with Check_Point_.  This state allows us to determine if
+--      the abort occurred at the right time.  In particular, one
+--      of the state variables is set while in an abort-deferred
+--      region that should be executing when the abort occurs and
+--      is used to check that abort deferral is properly performed.
+--      The setting of the final state variable occurs outside
+--      the abort-deferred area and should not occur since aborts
+--      are supposed to be immediate.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Real-Time Systems Annex.
+--      This test is not applicable to multi-processor systems.
+--
+--
+-- CHANGE HISTORY:
+--      25 SEP 95   SAIC    Initial version for 2.1
+--      22 FEB 96   SAIC    Incorporated Reviewer Comments
+--                          New ImpDef
+--      01 DEC 97   EDS     Added "with Impdef;"  Added delay statements to
+--                          block the main subprogram's execution and thus
+--                          free the Victim tasks to complete their execution
+--                          (to the point where they are aborted) before the
+--                          main subprgram continues and calls procedure
+--                          Check_Results to check various state variables.
+--      25 NOV 98   RLB     Added multi-processor Not_Applicable check
+--                          and comments.
+--!
+
+with System;
+with Report;
+with Ada.Task_Identification;
+with Ada.Synchronous_Task_Control;
+package CXD6001_1 is
+  Verbose : constant Boolean := False;
+
+  package TID renames Ada.Task_Identification;
+  package STC renames Ada.Synchronous_Task_Control;
+
+  -- Killer_Task takes a task_id of a task to abort.  Once it receives
+  -- the task_id it will suspend on Kill_Now awaiting notification
+  -- that it is time for it to do its dastardly deed.  Once it has
+  -- aborted its prey it will go back to waiting for another mission.
+  Kill_Now : STC.Suspension_Object;
+  task Killer_Task is
+    -- high enough to preempt any non-interrupt level item
+    pragma Interrupt_Priority (System.Interrupt_Priority'First);
+
+    entry Task_To_Abort (T : in TID.Task_ID);
+  end Killer_Task;
+end CXD6001_1;
+
+----------------------------------------------------------
+
+package body CXD6001_1 is
+
+  task body Killer_Task is
+    Victim : TID.Task_ID;
+  begin
+    loop
+      select
+        accept Task_To_Abort (T : in TID.Task_ID) do
+           Victim := T;
+        end Task_To_Abort;
+      or
+        terminate;
+      end select;
+
+      STC.Suspend_Until_True (Kill_Now);
+      TID.Abort_Task (Victim);
+    end loop;
+  end Killer_Task;
+
+end CXD6001_1;
+
+----------------------------------------------------------
+
+package CXD6001_2 is
+  procedure Simple_Case;
+  procedure In_Rendezvous;
+  procedure In_Protected;
+end CXD6001_2;
+
+----------------------------------------------------------
+with ImpDef;
+with CXD6001_1;
+with System;
+with Report;
+with Ada.Task_Identification;
+with Ada.Synchronous_Task_Control;
+
+package body CXD6001_2 is
+  package TID renames Ada.Task_Identification;
+  package STC renames Ada.Synchronous_Task_Control;
+  Verbose : constant Boolean := CXD6001_1.Verbose;
+
+  type Action_Requests is (Simple, In_Rdzv, In_Prot);
+
+  Check_Point_Start : Boolean := False;
+  pragma Atomic (Check_Point_Start);
+  Check_Point_Resume : Boolean := False;
+  pragma Atomic (Check_Point_Resume);
+  Check_Point_Protected : Boolean := False;
+  pragma Atomic (Check_Point_Protected);
+  Check_Point_Not_Protected : Boolean := False;
+  pragma Atomic (Check_Point_Not_Protected);
+
+
+  procedure Check_Results (Title : String) is
+  begin
+    if Verbose then
+      Report.Comment (Title);
+    end if;
+    if Check_Point_Start then
+      if Verbose then
+        Report.Comment ("  start reached");
+      end if;
+    else
+      Report.Failed ("start never reached");
+    end if;
+
+    if Check_Point_Resume then
+      if Verbose then
+        Report.Comment ("  resume reached");
+      end if;
+    else
+      Report.Failed ("resume never reached");
+    end if;
+
+    if Check_Point_Protected then
+      if Verbose then
+        Report.Comment ("  protected reached");
+      end if;
+    else
+      Report.Failed ("protected operation aborted");
+    end if;
+
+    if Check_Point_Not_Protected then
+      Report.Failed ("abort was not immediate");
+    else
+      if Verbose then
+        Report.Comment ("  immediate abort");
+      end if;
+    end if;
+  end Check_Results;
+
+----------------
+
+  task Server is
+    entry Simple_Service;
+  end Server;
+
+  task body Server is
+  begin
+    select
+      accept Simple_Service do
+        Check_Point_Resume := True;
+        STC.Set_True (CXD6001_1.Kill_Now);
+        Check_Point_Protected := True;
+      end Simple_Service;
+    or
+      terminate;
+    end select;
+  end Server;
+
+----------------
+  protected Protected_Object is
+    procedure Service;
+  end Protected_Object;
+
+  protected body Protected_Object is
+    procedure Service is
+    begin
+        Check_Point_Resume := True;
+        STC.Set_True (CXD6001_1.Kill_Now);
+        Check_Point_Protected := True;
+    end Service;
+  end Protected_Object;
+
+----------------
+
+  task type Victim_Type is
+    entry Get_ID (Id : out TID.Task_ID);
+    entry Do_It (Action : Action_Requests);
+  end Victim_Type;
+
+  task body Victim_Type is
+    This_Action : Action_Requests;
+  begin
+    select
+      accept Get_Id (Id : out TID.Task_ID) do
+        Id := TID.Current_Task;
+      end Get_ID;
+    or
+      -- allows clean termination when the test is
+      -- determined to be not applicable.
+      terminate;
+    end select;
+
+    Check_Point_Start := False;
+    Check_Point_Resume := False;
+    Check_Point_Protected := False;
+    Check_Point_Not_Protected := False;
+
+    accept Do_It (Action : Action_Requests) do
+      This_Action := Action;
+    end Do_It;
+
+    Check_Point_Start := True;
+    case This_Action is
+      when Simple =>
+              Check_Point_Resume := True;
+              Check_Point_Protected := True;  -- n/a in this test
+              STC.Set_True (CXD6001_1.Kill_Now);
+              Check_Point_Not_Protected := True;
+      when In_Rdzv =>
+              Server.Simple_Service;
+              Check_Point_Not_Protected := True;
+      when In_Prot =>
+              Protected_Object.Service;
+              Check_Point_Not_Protected := True;
+    end case;
+
+    -- should not get to this point
+    delay 0.0;
+    Report.Failed ("task was not aborted for this action: " &
+                   Action_Requests'Image (This_Action));
+  end Victim_Type;
+
+------------------------
+
+  Simple_Victim : Victim_Type;
+
+  procedure Simple_Case is
+    -- the task being aborted is not in a abort-deferred region
+    -- when the abort occurs.
+    Victim : TID.Task_ID;
+  begin
+    Simple_Victim.Get_ID (Victim);
+    CXD6001_1.Killer_Task.Task_To_Abort (Victim);
+    Simple_Victim.Do_It (Simple);
+    delay ImpDef.Clear_Ready_Queue;
+    Check_Results ("simple case - no abort deferral");
+  end Simple_Case;
+
+------------------------
+
+  Rendezvous_Victim : Victim_Type;
+
+  procedure In_Rendezvous is
+    -- the task being aborted is in a rendezvous with a server
+    -- when the abort occurs.
+    Victim : TID.Task_ID;
+  begin
+    Rendezvous_Victim.Get_ID (Victim);
+    CXD6001_1.Killer_Task.Task_To_Abort (Victim);
+    Rendezvous_Victim.Do_It (In_Rdzv);
+    delay ImpDef.Clear_Ready_Queue;
+    Check_Results ("in rendezvous when abort occurs");
+  end In_Rendezvous;
+
+------------------------
+
+  Protected_Victim : Victim_Type;
+
+  procedure In_Protected is
+    -- the task being aborted is in a protected operation
+    -- when the abort occurs.
+    Victim : TID.Task_ID;
+  begin
+    Protected_Victim.Get_ID (Victim);
+    CXD6001_1.Killer_Task.Task_To_Abort (Victim);
+    Protected_Victim.Do_It (In_Prot);
+    delay ImpDef.Clear_Ready_Queue;
+    Check_Results ("in protected operation when abort occurs");
+  end In_Protected;
+end CXD6001_2;
+
+----------------------------------------------------------
+
+with System;
+with Report;
+with ImpDef.Annex_D;        use type ImpDef.Annex_D.Processor_Type;
+with Ada.Task_Identification;
+with Ada.Synchronous_Task_Control;
+with CXD6001_1;
+with CXD6001_2;
+procedure CXD6001 is
+begin
+  Report.Test ("CXD6001",
+               "Check that an abort takes place as soon" &
+               " as the aborted task is no longer in an" &
+               " abort-deferred region.");
+
+  if ImpDef.Annex_D.Processor /= ImpDef.Annex_D.Uni_Processor then
+      Report.Not_Applicable ("Multi-Processor configuration");
+      Report.Result;
+      return;
+  end if;
+
+  -- The requirements on the abort being immediate are
+  -- only placed upon uni-processor systems.
+  -- Only the simple case does not have an abort completion point
+  -- prior to the check for being aborted.
+  CXD6001_2.Simple_Case;
+
+  -- A multi-processor could fail the following tests, as the
+  -- victim task may continue to execute, return from the rendezvous
+  -- or protected action, and set the Not_Protected flag for failure,
+  -- before the killer task can abort it.
+  CXD6001_2.In_Rendezvous;
+  CXD6001_2.In_Protected;
+
+  Report.Result;
+end CXD6001;

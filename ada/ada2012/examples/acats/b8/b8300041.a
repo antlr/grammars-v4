@@ -1,0 +1,113 @@
+-- B8300041.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See B8300040.A.
+--
+-- TEST DESCRIPTION:
+--      See B8300040.A.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B8300040.A
+--      -> B8300041.A
+--         B8300042.A
+--         B8300043.A
+--         B8300044.A
+--         B8300045.A
+--         B8300046.A
+--         B8300047.A
+--         B8300048.A
+--
+-- PASS/FAIL CRITERIA:
+--      See B8300040.A.
+--
+-- CHANGE HISTORY:
+--      29 Apr 2021   RLB     Created test from ACVC test B83004B.
+--!
+-- CASE A:
+package body B830004_Pack1A is
+
+   -- Completions for declarations in the specification:
+
+   protected body Prot is                           -- OPTIONAL ERROR: {4}
+                                    -- Body for entity with illegal homograph.
+      procedure Lock (A : Boolean) is
+      begin
+         L := A;
+      end Lock;
+   end Prot;
+
+   procedure Proc1 (X : in Integer; Y : out Boolean) is -- OPTIONAL ERROR: {4}
+   begin                            -- Body for entity with illegal homograph.
+      if X = 1 then
+         Y := True;
+      else
+         Y := False;
+      end if;
+   end Proc1;
+
+   -- Homographs:
+
+   Var1 : constant String := "HELLO";                        -- ERROR: {4;1}
+
+   Con1 : Integer := 1;                                      -- ERROR: {4;1}
+
+   protected Int is                                          -- ERROR: {4}
+      procedure Lock (A : Boolean);      
+   private
+      L : Boolean;
+   end Int;
+
+   type Exc1 is new Integer;                                 -- ERROR: {4;1}
+
+   subtype P is Integer range 1 .. 10;                       -- ERROR: {4;1}
+
+   package Int_Subtype is                                    -- ERROR: {4}
+      X : Integer := 0;
+   end Int_Subtype;
+
+   procedure Prot (A : in Natural; B : out Boolean) is null; -- ERROR: {4;1}
+
+   Proc1 : exception;                                        -- ERROR: {4;1}
+   
+   procedure NP1 (A : in Integer);                           -- ERROR: {4;1}
+
+   -- Completions for declarations here:
+
+   protected body Int is                           -- OPTIONAL ERROR: {4}
+                                               -- Body of illegal homograph.
+      procedure Lock (A : Boolean) is
+      begin
+         null;
+      end Lock;
+   end Int;
+
+   procedure NP1 (X : in Integer) is                -- OPTIONAL ERROR: {4}
+   begin                                       -- Body of illegal homograph.
+      null;
+   end NP1;
+
+end B830004_Pack1A;

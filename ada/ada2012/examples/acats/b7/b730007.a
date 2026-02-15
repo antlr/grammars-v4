@@ -1,0 +1,102 @@
+-- B730007.A
+
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+-- OBJECTIVE:
+--     Check that if the ancestor subtype of a private extension
+--     has constrained discriminants, then the parent subtype of
+--     the full view imposes a statically matching constraint
+--     on those discriminants.
+--
+-- TEST DESCRIPTION:
+--
+--     Declare various type extensions that have constraints and check
+--     that static matching is required.
+--     Note that constraints that depend on the discriminants of a view
+--     are never static. If those are explicitly given on a private extension,
+--     no completion could ever be legal (the constraints given on the
+--     completion are not static and are different, thus they can never
+--     statically match). In this case, we allow rejecting the
+--     private extension declaration (marked as an "Possible Error" in the
+--     test) instead of the completion.
+--
+-- PASS/FAIL CRITERIA:
+--     The test contains several lines marked POSSIBLE ERROR: [Setnn].
+--     For each value of n, the implementation must detect one or more of
+--     these possible errors. For instance, an error must be detected on
+--     at least one of the lines labeled POSSIBLE ERROR: [Set1] for an
+--     implementation to pass.
+--
+-- CHANGE HISTORY:
+--     06 Sep 02   DRE   Created test.
+--     30 May 13   RLB   Changes for issuance: created main subprogram,
+--                       adjusted capitalization, improved objective wording,
+--                       explained errors, added derived test cases.
+--     22 Apr 21   RLB   Fixed overlong lines, header formatting issues.
+--                       Added error location indicators.
+
+procedure B730007 is
+
+    package Pack1 is
+       type R1(B: Boolean) is tagged null record;
+       type D1 is new R1 with null record;
+       subtype S1 is R1(B => False);
+       subtype S2 is R1(B => True);
+       type D2 is new S1 with null record;
+    end Pack1;
+
+    package Pack2 is
+       use Pack1;
+       type T1 is new R1(B => False) with private;
+       type T2 is new R1(B => False) with private;
+       type T3 is new R1(B => False) with private;
+       type T4(B: Boolean) is new R1(B => False) with private;
+       type T5(B: Boolean) is new R1(B => False) with private;
+       type T6(B: Boolean) is new R1(B => B) with null record;  -- OK. {8;1}
+       type T7(B: Boolean) is new R1(B => B) 
+                              with private;  -- POSSIBLE ERROR: [Set1] {1:8;1}
+       type T8 is new R1(B => False) with private;
+       type T9 is new R1(B => False) with private;
+       type T10 is new R1(B => False) with private;
+       type T11 is new R1(B => False) with private;
+       type T12 is new R1(B => True) with private;
+    private
+       type T1 is new R1 with null record;                    -- ERROR: {8;1}
+       type T2 is new R1(B => False) with null record;        -- OK. {8;1}
+       type T3 is new R1(B => True) with null record;         -- ERROR: {8;1}
+       type T4(B: Boolean) is new R1(B => False) 
+                                           with null record;  -- OK. {1:8;1}
+       type T5(B: Boolean) is new R1(B => True) 
+                                           with null record;  -- ERROR: {1:8;1}
+       type T7(B: Boolean) is new R1(B => B) 
+                           with null record;  -- POSSIBLE ERROR: [Set1] {1:8;1}
+       type T8 is new S1 with null record;                    -- OK. {8;1}
+       type T9 is new S2 with null record;                    -- ERROR: {8;1}
+       type T10 is new D1 with null record;                   -- ERROR: {8;1}
+       type T11 is new D2 with null record;                   -- OK. {8;1}
+       type T12 is new D2 with null record;                   -- ERROR: {8;1}
+    end Pack2;
+
+begin
+    null;
+end B730007;

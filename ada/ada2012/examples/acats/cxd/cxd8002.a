@@ -1,0 +1,243 @@
+-- CXD8002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that Ada.Real_Time.Time can be used in a
+--      delay_until_statement.
+--      Check that a delay_statement blocks the task for at least
+--      as long as the requested delay as measured by Real_Time.Clock.
+--
+-- TEST DESCRIPTION:
+--      This test sets up a number of different tasks, each of a
+--      different priority, all doing delays.  The delays are
+--      checked to make sure they are long enough.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable to implementations supporting the
+--      Real-Time Annex.
+--
+--
+-- CHANGE HISTORY:
+--     26 SEP 95   SAIC    Initial version
+--     01 JUN 98   EDS     Provide new initial value for Delay_Amount.
+--     29 JUN 98   EDS     Inserted code to guard the Background_Passive task's
+--                         accept statement.
+--     18 DEC 06   RLB     Corrected test so rounding errors don't cause
+--                         failure.
+--!
+
+-------------------------------------------------------------------------------
+--- The following package does not contain any code to test the features being
+--- tested but instead provides some "background noise" for the test.
+--- Experience has shown that such background noise can have an effect on the
+--- accuracy of the clock.
+-------------------------------------------------------------------------------
+package CXD8002_1 is
+  procedure Stop;
+end CXD8002_1;
+
+with System;
+package body CXD8002_1 is
+      Finished : Boolean := False;
+      pragma Volatile (Finished);
+
+      type Int is range 0 .. System.Max_Int;
+      Rendezvous_Count : Int := 0;
+      Overflow : Boolean := False;
+
+      task Background_Passive is
+         pragma Priority (System.Priority'First + 1);
+         entry Available_Entry;
+      end  Background_Passive;
+
+      task body Background_Passive is
+      begin
+         while not Finished loop
+          if Available_Entry'Count > 0 then
+            accept Available_Entry do
+               Rendezvous_Count := Rendezvous_Count + 1;
+               if Rendezvous_Count = Int'Last then
+                 Overflow := True;
+                 Rendezvous_Count := 0;
+               end if;
+            end Available_Entry;
+          end if;
+         end loop;
+      end Background_Passive;
+
+      task Background_Active is
+        pragma Priority (System.Priority'First + 2);
+      end Background_Active;
+
+      task body Background_Active is
+      begin
+        while not Finished loop
+           Background_Passive.Available_Entry;
+        end loop;
+      end Background_Active;
+
+
+      procedure Stop is
+      begin
+        Finished := True;
+      end Stop;
+end CXD8002_1;
+
+-------------------------------------------------------------------------------
+with Report;
+with ImpDef;
+with System;
+with Ada.Real_Time;
+with CXD8002_1;
+procedure CXD8002 is
+   Verbose     : constant Boolean := False;
+   type Int is range 0 .. System.Max_Int;
+   package RT renames Ada.Real_Time;
+
+   task type Delay_Test (Pri : System.Priority) is
+     pragma Priority (Pri);
+   end Delay_Test;
+
+   procedure Do_Delay_Test (Verbose : Boolean; Pri : Integer) is
+      Delay_Amount : RT.Time_Span := RT.Time_Span_Unit;
+      Start,
+      Finish : RT.Time;
+      Iteration : Int := 1;
+      use type RT.Time_Span, RT.Time;
+      Max_Delay : Duration := ImpDef.Switch_To_New_Task;
+   begin    -- encapsulation
+     -- we want our maximum delay to be at least a second
+     if Max_Delay < 1.0 then
+        Max_Delay := 1.0;
+     end if;
+
+     -- delay until test
+     if Verbose then
+       Report.Comment ("testing delay_until_statement");
+     end if;
+
+     loop
+       Start := RT.Clock;
+       delay until Start + Delay_Amount;
+       Finish := RT.Clock;
+       if Finish - Start < Delay_Amount then
+         Report.Failed (
+                 "delay_until too short at iteration" &
+                 Int'Image (Iteration) &
+                 "  requested delay: " &
+                 Duration'Image (RT.To_Duration (Delay_Amount)) &
+                 "  task priority:" &
+                 Integer'Image (Pri) &
+                 "  actual delay: " &
+                 Duration'Image (RT.To_Duration (Finish - Start)));
+       elsif Verbose then
+         Report.Comment (
+                 "delay_until iteration" &
+                 Int'Image (Iteration) &
+                 "  requested delay: " &
+                 Duration'Image (RT.To_Duration (Delay_Amount)) &
+                 "  task priority:" &
+                 Integer'Image (Pri) &
+                 "  actual delay: " &
+                 Duration'Image (RT.To_Duration (Finish - Start)));
+       end if;
+       exit when RT.To_Duration(Delay_Amount) > Max_Delay;
+       Iteration := Iteration + 1;
+       Delay_Amount := Delay_Amount * 2;
+     end loop;
+
+
+     -- delay relative test
+     if Verbose then
+       Report.Comment ("testing delay_relative_statement");
+     end if;
+
+     Delay_Amount := RT.To_Time_Span(Duration'Small);
+     Iteration := 1;
+     loop
+       Start := RT.Clock;
+       delay RT.To_Duration (Delay_Amount);
+       Finish := RT.Clock;
+       if RT.To_Duration (Finish - Start) < RT.To_Duration (Delay_Amount) then
+           -- We must check this in type Duration, as the conversion to
+           -- Duration can round down if Duration'Small > Time_Unit and
+           -- Duration'Small isn't a multiple of Time_Unit. In that case,
+           -- we could delay less than Delay_Amount.
+         Report.Failed (
+                 "delay too short at iteration" &
+                 Int'Image (Iteration) &
+                 "  requested delay: " &
+                 Duration'Image (RT.To_Duration (Delay_Amount)) &
+                 "  task priority:" &
+                 Integer'Image (Pri) &
+                 "  actual delay: " &
+                 Duration'Image (RT.To_Duration (Finish - Start)));
+       elsif Verbose then
+         Report.Comment (
+                 "delay_relative iteration" &
+                 Int'Image (Iteration) &
+                 "  requested delay: " &
+                 Duration'Image (RT.To_Duration (Delay_Amount)) &
+                 "  task priority:" &
+                 Integer'Image (Pri) &
+                 "  actual delay: " &
+                 Duration'Image (RT.To_Duration (Finish - Start)));
+       end if;
+       exit when RT.To_Duration(Delay_Amount) > Max_Delay;
+       Iteration := Iteration + 1;
+       Delay_Amount := Delay_Amount * 2;
+     end loop;
+   end Do_Delay_Test;
+
+   task body Delay_Test is
+   begin
+     -- Normally only the environment task runs the delay test
+     -- in a verbose mode.  This is to prevent the output from
+     -- multiple tasks getting all jumbled.
+     Do_Delay_Test (False, Pri);
+   end Delay_Test;
+begin
+
+
+   Report.Test ("CXD8002", "Check the use of Real_Time.Clock" &
+                           " in delay statements");
+
+
+   declare
+     -- lots of tests going on in parallel and preempting tests
+     Tm3 : Delay_Test (System.Default_Priority - 3);
+     Tm2 : Delay_Test (System.Default_Priority - 2);
+     Tm1 : Delay_Test (System.Default_Priority - 1);
+     Tp1 : Delay_Test (System.Default_Priority + 1);
+     Tp2 : Delay_Test (System.Default_Priority + 2);
+     Tp3 : Delay_Test (System.Default_Priority + 3);
+   begin
+     -- this is the only one that is potentially verbose
+     Do_Delay_Test (Verbose, System.Default_Priority);
+   end;     -- encapsulation
+
+   CXD8002_1.Stop;
+   Report.Result;
+end CXD8002;

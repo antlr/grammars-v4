@@ -1,0 +1,89 @@
+-- LXH40102.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See file LXH40103.AM for details on this test
+--
+-- TEST DESCRIPTION:
+--      See file LXH40103.AM for details on this test
+--
+-- SPECIAL REQUIREMENTS:
+--      See file LXH40103.AM for details on this test
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--
+--         LXH40100.A
+--         LXH40101.A
+--    =>   LXH40102.A
+--         LXH40103.AM
+--
+-- APPLICABILITY CRITERIA:
+--      See file LXH40103.AM for details on this test
+--
+-- PASS/FAIL CRITERIA:
+--      See file LXH40103.AM for details on this test
+--
+-- CHANGE HISTORY:
+--      22 MAR 96   SAIC   Initial version
+--
+--!
+
+----------------------------------------------------------------- LXH4010_1
+
+package LXH4010_1 is
+
+  type Int_P is access all Integer;
+
+  type Proc_P is access procedure;
+
+  IP : Int_P;
+
+  procedure Proc;
+
+end LXH4010_1;
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+package body LXH4010_1 is
+
+  I : aliased Integer := 4200;
+
+  OKP : Int_P := I'Access;                                        -- OK
+
+ procedure Proc is
+  begin
+    if OKP = null then
+      OKP := new Integer;
+    end if;
+  end Proc;
+
+  OKPP : Proc_P := Proc'Access;                                   -- OK
+
+begin
+
+  IP:= I'Access;                                                  -- OK
+
+end LXH4010_1;

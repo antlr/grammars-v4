@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/msys64/mingw64/bin/gnatmake:*)",
+      "Bash(/c/msys64/mingw64/bin/gcc:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(PATH=\"/c/msys64/mingw64/bin:$PATH\" gnatmake:*)",
+      "Bash(./a29003a.exe:*)"
+    ]
+  }
+}

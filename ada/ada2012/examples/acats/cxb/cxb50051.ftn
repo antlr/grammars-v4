@@ -1,0 +1,86 @@
+C CXB50051.FTN
+C
+C                         Grant of Unlimited Rights
+C
+C Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+C F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+C unlimited rights in the software and documentation contained herein.
+C Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+C this public release, the Government intends to confer upon all 
+C recipients unlimited rights  equal to those held by the Government.  
+C These rights include rights to use, duplicate, release or disclose the 
+C released technical data and computer software in whole or in part, in 
+C any manner and for any purpose whatsoever, and to have or permit others 
+C to do so.
+C
+C                                DISCLAIMER
+C
+C ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+C DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+C WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+C SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+C OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+C PARTICULAR PURPOSE OF SAID MATERIAL.
+C
+C----------------------------------------------------------------------
+C TEST OBJECTIVE
+C      See CXB50052.AM
+C
+C TEST DESCRIPTION
+C      The following Fortran subroutine, CXB50051, has two arguments.
+C      The modified matrix is returned to the calling program.
+C
+C      Inputs:
+C        There are two arguments to this Fortran subroutine:
+C          1) N      - an integer value that indicates the array size.
+C          2) MATRIX - a two-dimensional integer array.
+C
+C      Processing:
+C        The matrix argument is modified in the following manner:
+C          The array diagonal elements are filled with 1's, the elements 
+C          below/left of the diagonal are filled with 2's, and the elements
+C          above/right of the diagonal are filled with 3's.
+C
+C      Outputs:
+C        The modified array argument is returned.
+C
+C SPECIAL REQUIREMENTS:
+C      See CXB50052.AM
+C     
+C TEST FILES:
+C      The following files comprise this test:
+C
+C         CXB50050.FTN
+C      => CXB50051.FTN
+C         CXB50052.AM
+C
+C APPLICABILITY CRITERIA: 
+C      See CXB50052.AM
+C
+C
+C CHANGE HISTORY:
+C       28 Mar 1996     SAIC     Initial release for ACVC 2.1.
+C       14 Feb 1997     PWB.CTA  Corrected Fortran syntax errors
+C 
+C----------------------------------------------------------------------
+C
+      SUBROUTINE MODIFY (N, MATRIX)
+C
+      INTEGER   N, I, J
+      INTEGER   MATRIX(1:N, 1:N)
+C
+C     Modify the contents of the array.
+C
+      DO 100 I = 1, N
+        DO 100 J = 1, N
+          IF (I .EQ. J) THEN
+            MATRIX(I,J) = 1
+          ELSE IF (I .GT. J) THEN
+            MATRIX(I,J) = 2
+          ELSE
+            MATRIX(I,J) = 3
+          ENDIF
+ 100  CONTINUE
+C
+      RETURN
+      END

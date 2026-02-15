@@ -1,0 +1,148 @@
+-- BC51B01.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if a generic formal private subtype is definite, the actual
+--      subtype must not be indefinite, even if the formal subtype appears
+--      only in contexts where an indefinite subtype would be legal.
+--
+-- TEST DESCRIPTION:
+--      A definite subtype is any subtype which is not indefinite. An
+--      indefinite subtype is either:
+--         a) An unconstrained array subtype.
+--         b) A subtype with unknown discriminants (this includes class-wide
+--            types).
+--         c) A subtype with unconstrained discriminants without defaults.
+--
+--      The formal private type may be tagged or untagged.
+--
+--      The formal private type may not have an unknown discriminant
+--      part, nor may it have a known discriminant part, since defaults may
+--      not be specified for the discriminants. 
+--
+--      The following cases are considered:
+--                                                Formal Private
+--            Actual subtype                     Tagged  Untagged
+--            ---------------------------------  ------  --------
+--         1) Unconstrained array                  n/a      Yes
+--         2) Unconstrained record w/o defaults    n/a      Yes
+--         3) Unconstrained tagged w/o defaults    Yes      Yes
+--         4) Class-wide                           Yes      Yes
+--         5) With unknown discriminants           No       Yes
+--
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         FC51B00.A
+--      -> BC51B01.A
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      30 Nov 95   SAIC    ACVC 2.0.1 fixes: Replaced derived type in
+--                          BC51B01_1 with subtype.
+--
+--!
+
+generic
+   type Item_Type is private;            -- Formal (untagged) private type.
+package BC51B01_0 is
+   procedure Push (E : in Item_Type);    -- Does not require definite formal.
+end BC51B01_0;
+
+
+     --==================================================================--
+
+
+package body BC51B01_0 is
+
+   -- Stack implementation below is purely artificial; a fully functional
+   -- implementation would be longer than is needed to test the objective.
+
+   type Item_Ptr is access Item_Type;
+   Top : Item_Ptr;
+
+   procedure Push (E : in Item_Type) is
+   begin
+      Top := new Item_Type'(E);          -- Does not require definite formal.
+   end Push;
+
+end BC51B01_0;
+
+
+     --==================================================================--
+
+
+generic
+   type Item_Type is tagged private;     -- Formal (tagged) private type.
+package BC51B01_1 is
+
+   subtype My_Item is Item_Type;         -- Does not require definite formal.
+
+end BC51B01_1;
+
+
+-- No body for BC51B01_1;
+
+
+     --==================================================================--
+
+
+with FC51B00;    -- Indefinite subtype definitions.
+with BC51B01_0;  -- Generic with formal private type.
+with BC51B01_1;  -- Generic with formal tagged private type.
+
+procedure BC51B01 is
+
+   package ArrStacks is new BC51B01_0 (FC51B00.Matrix);              -- ERROR:
+                                  -- Actual subtype is an unconstrained array.
+
+   generic
+      with package Formal_Pack is new FC51B00.Signature (<>);
+   package Sig_Packs is
+      package UnkTagStacks is new BC51B01_0 (Formal_Pack.Vectors);   -- ERROR:
+                                  -- Actual subtype has unknown discriminants.
+   end Sig_Packs;
+
+   package UnconRecStacks is new BC51B01_0 (FC51B00.Square);         -- ERROR:
+                              -- Actual subtype has undefaulted discriminants.
+
+
+   package UnconTagStacks is new BC51B01_0 (FC51B00.Square_Pair);    -- ERROR:
+                              -- Actual subtype has undefaulted discriminants.
+
+   package UnconTagCnt is new BC51B01_1 (FC51B00.Square_Pair);       -- ERROR:
+                              -- Actual subtype has undefaulted discriminants.
+
+
+   package ClassTagStacks is new BC51B01_0 (FC51B00.Vector'Class);   -- ERROR:
+                                              -- Actual subtype is class-wide.
+
+   package ClassTagCnt is new BC51B01_1 (FC51B00.Vector'Class);      -- ERROR:
+                                              -- Actual subtype is class-wide.
+
+begin
+   null;
+end BC51B01;

@@ -1,0 +1,142 @@
+-- BA15001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that configuration pragmas must appear before the first 
+--      compilation unit of a compilation.
+--
+-- TEST DESCRIPTION:
+--      This test declares a package specification, then attempts to place
+--      one of each form of configuration pragma AFTER the package
+--      specification.  The reason for placing multiple pragmas is to ensure
+--      that each of them is rejected.
+--
+-- SPECIAL REQUIREMENTS:
+--      This test contains the error of placing a configuration pragma after
+--      the first unit in a compilation.  This whole file must be treated as
+--      a single compilation.
+--
+-- APPLICABILITY
+--      If a pragma in this test is not supported by the implementation, the
+--      compiler output (e.g, error message, warning message, no message)
+--      associated with the pragma is ignored for the grading of this test.
+--      In particular, an error message for such a pragma is NOT required.
+--
+--      This test does not apply to an implementation that does not accept
+--      configuration pragmas as part of the same compilation with other
+--      compilation units.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes when all pragmas supported by the implementation are
+--      marked as illegal in the provided context.
+--
+--      If a pragma in this test is not supported by the implementation, the
+--      compiler output (e.g, error message, warning message, no message)
+--      associated with the pragma is ignored for the grading of this test.
+--      In particular, an error message for such a pragma is NOT required.
+--
+--
+-- CHANGE HISTORY:
+--      26 JAN 96   SAIC   Initial version
+--      27 MAR 96   SAIC   Modified error format
+--      11 APR 96   SAIC   Updated documentation for 2.1
+--      16 MAY 96   SAIC   Added 4 checks
+--      03 NOV 96   SAIC   Documentation correction
+--
+--      03 NOV 96   Keith  Documentation correction
+--!
+
+----------------------------------------------------------------- BA15001_0
+
+package BA15001_0 is
+  type Some_Type_To_Make_The_Package_Minimally_Existent is range 1..100;
+  procedure Do_Something;
+end BA15001_0;
+
+---------------------------- CONFIGURATION PRAGMAS -----------------------
+
+-- note that pragma Suppress may be used immediately within a declarative
+-- part or package specification, or may be used as a configuration pragma
+-- (as follows).  This test only uses it in the configuration pragma form.
+
+pragma Suppress(Access_Check);                                    -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Discriminant_Check);                              -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Division_Check);                                  -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Index_Check);                                     -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Length_Check);                                    -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Overflow_Check);                                  -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Range_Check);                                     -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Tag_Check);                                       -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Elaboration_Check);                               -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Accessibility_Check);                             -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(Storage_Check);                                   -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+pragma Suppress(All_Checks);                                      -- ERROR:
+  -- configuration pragmas must occur before the first compilation_unit
+  -- of a compilation
+
+------------------------ END OF CONFIGURATION PRAGMAS --------------------
+
+with Report;
+package body BA15001_0 is
+
+  procedure Do_Something is
+  begin
+    Report.Failed( "This message cannot possibly occur" );
+  end Do_Something;
+
+end BA15001_0;

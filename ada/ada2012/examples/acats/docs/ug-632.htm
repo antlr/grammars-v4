@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Range Indicators</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-631.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-64.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.3.2 Range Indicators</H1>
+<div class="Normal">Optional range indicators (sometimes known as location 
+indicators) can appear after the various markers in an ACATS test source 
+file. These describe the exact range of the reported location of an expected 
+error. Range indicators are usually used to expand the range of an error 
+beyond the same line as the ERROR: or other marker. <A NAME="I1054"></A><A NAME="I1055"></A></div>
+<div class="Normal">The format of a range indicator is:&nbsp;</div>
+<div class="Examples">&nbsp;&nbsp;&nbsp;{[sl:]sp[;[el:]ep]}</div>
+<div class="Normal" style="margin-bottom: 0.4em">In the above, '{' and 
+'}' are literal, while '[' and ']' indicate optionality. Each of the 
+four values is relative, so it is one or two digits, with an optional 
+minus sign for <TT>el</TT>. Omitted values are assumed to be zero. Specifically: 
+</div>
+<div class="Indented4WideHanging-Term"><TT>sl</TT></div><div class="Indented4WideHanging-Body">
+Start Line &ndash; offset <I>before</I> the current line for the start 
+of the error range.</div>
+<div class="Indented4WideHanging-Term"><TT>sp</TT></div><div class="Indented4WideHanging-Body">
+Start Position &ndash; position offset in the line indicated by <TT>sl</TT>, 
+relative to the start of the line.</div>
+<div class="Indented4WideHanging-Term"><TT>el</TT></div><div class="Indented4WideHanging-Body">
+End_Line &ndash; offset <I>before</I> the current line for the end of 
+the error range. Can be negative if the end of the error range follows 
+the error tag. But almost always should be zero.</div>
+<div class="Indented4WideHanging-Term"><TT>ep</TT></div><div class="Indented4WideHanging-Body">
+End Position &ndash; position offset from the last significant character 
+in the line indication by End_Line. (The last significant character is 
+the last non-white-space character not including any comment.)&nbsp;</div>
+<div class="Normal">This compact representation was chosen because of 
+the limited space given the ACATS line length limit (see <A HREF="UG-45.HTM">4.5</A>) 
+and a desire to avoid unnecessarily cluttering tests with extraneous 
+information.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-631.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-64.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

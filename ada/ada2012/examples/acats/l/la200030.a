@@ -1,0 +1,122 @@
+-- LA200030.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--      Check that an inconsistent partition cannot be created.
+--      Case L2: A partition cannot depend on two versions of a unit
+--      referenced through a limited with on a library package
+--      specification and a regular with on the package body.
+--
+-- TEST DESCRIPTION:
+--
+--      This test is intended to emulate the following development steps:
+--
+--      A reusable subsystem LA20003_L is developed, including types
+--      Some_Info and Extra_Info and operations on them. A library package
+--      LA20003_0 is created which declares operations on accesses to
+--      the types in the subsystem LA20003_L, and thus uses a limited with.
+--      The body of the library package uses the complete types, and thus
+--      has a regular with on the subsystem. A unit test program for LA20003_0
+--      is developed (this will be named LA20003).
+--
+--      Later during development, the operations on Extra_Info are deleted
+--      from LA20003_L, and all calls to them are removed from LA20003_0.
+--      The partition is recompiled and is retested. This is the
+--      initial state of this test.
+--
+--      Now, a code review on LA20003_L finds the now unused type Extra_Info;
+--      the type is removed from LA20003_L and the subsystem recompiled.
+--      The body of LA20003_0 and the test program LA200033 is recompiled
+--      and an attempt to recreate the test partition LA200033 is made.
+--      This should fail at some step (either recompilation or linking).
+--
+--      The compilation pattern of this example is intended to emulate
+--      a broken compilation tool that ignores dependence caused by limited
+--      with. Of course, it also tests the case of incorrect compilations
+--      being run by hand.
+--
+-- SPECIAL REQUIREMENTS:
+--      To build this test:
+--         1) Compile the file LA200030 (and include the results in the
+--            environment). This is the initial reusable subsystem.
+--            Any additional steps needed to add the limited view of the
+--            reusable subsystem to the environment also must be
+--            performed at this time.
+--         2) Compile the file LA200031 (and include the results in the
+--            environment). This is the subprogram and test code.
+--         3) Compile the file LA200032 (and include the results in the
+--            environment). This is the revised reusable subsystem.
+--            Any additional steps needed to add the limited view of the
+--            revised reusable subsystem to the environment also must be
+--            performed at this time.
+--         4) Compile the file LA200033 (and include the results in the
+--            environment). This is a recompile of the test code.
+--         5) Attempt to build an executable image.
+--         6) If an executable image results, run it.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> LA200030.A
+--         LA200031.A
+--         LA200032.A
+--         LA200033.AM
+--
+-- PASS/FAIL CRITERIA:
+--      The test passes if either of the compilation units in LA200033
+--      are rejected, or link-time error message reports an inconsistency.
+--
+-- CHANGE HISTORY:
+--     09 Apr 07   RLB     Initial test.
+--!
+
+package LA20003_L is
+   type Some_Info is record
+      A : Character := 'A';
+   end record;
+
+   procedure Do_a_Little (A : in out Some_Info);
+
+   type Extra_Info is null record; -- No info now.
+end LA20003_L;
+
+package body LA20003_L is
+
+   procedure Do_a_Little (A : in out Some_Info) is
+   begin
+      A.A := 'B';
+   end Do_a_Little;
+
+end LA20003_L;
+

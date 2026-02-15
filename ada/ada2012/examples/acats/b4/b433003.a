@@ -1,0 +1,243 @@
+-- B433003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+-- OBJECTIVE
+--     Check that an others choice is not allowed in an array aggregate in the
+--     expression of a return statement if the subtype of the function return
+--     is unconstrained.
+--
+--     Check that an others choice is not allowed in an array aggregate in the
+--     return expression of an expression function if the subtype of the
+--     function return is unconstrained.
+--
+-- TEST DESCRIPTION
+--     In this test, we declare several unconstrained array types. We then
+--     test a variety of cases of using appropriate aggregates.
+--
+--     Legacy test B43202A tests simple examples, but with the large number
+--     of new kinds of return statements and aggregate improvements, we have
+--     constructed a more comprehensive test.
+--
+--     We have a number of cases with extra parentheses, to test 4.3.3(15/3).
+--
+-- CHANGE HISTORY:
+--      16 Apr 2015   RLB   Created from C433006.
+--      23 Apr 2021   RLB   Added error location indicators.
+--!
+
+procedure B433003 is
+
+    type Color_Type is (Red, Orange, Yellow, Green, Blue, Indigo, Violet);
+
+    type Default_to_Zero is range -10000 .. 10000
+       with Default_Value => 0;
+
+    function Ident_Int (Val : in Default_to_Zero) return Default_to_Zero is
+        (Val);
+
+    type Array_1 is array (Positive range <>) of Default_to_Zero;
+
+    type Array_2 is array (Color_Type range <>) of Default_to_Zero;
+    subtype Sub_Arr_2 is Array_2;
+    subtype Sub_Con_Arr_2 is Array_2 (Yellow .. Blue);
+
+    type Array_3 is array (Color_Type range <>, Positive range <>)
+                       of Default_to_Zero;
+    subtype Sub_3_1 is Array_3 (Color_Type'Val(0) ..
+                                Color_Type'Val(2),
+                                3 .. 5);
+
+    -- Simple return statements:
+    function Test_SR1 (A : Natural) return Array_1 is
+    begin
+        case A is
+            when 0 =>
+                return (2, 3, others => <>);                 -- ERROR: {24;1}
+            when 1 =>
+                return (5, 6, 8);                            -- OK. {24;1}
+            when 2 =>
+                return (2 => <>, others => 8);               -- ERROR: {24;1}
+            when 3 =>
+                return (((6 => <>, 8 => <>, others => 1)));  -- ERROR: {24;1}
+                    -- Two sets of extra parentheses.
+            when 4 =>
+                return (5 => Ident_Int(88), 8 => <>,
+                       10 => <>, others => <>);              -- ERROR: {1:24;1}
+            when others => null;
+        end case;
+    end Test_SR1;
+
+    function Test_SR2 (A : Natural) return Sub_Arr_2 is
+    begin
+        case A is
+            when 0 =>
+                return ((1, others => Ident_Int(6)));        -- ERROR: {24;1}
+                    -- Extra parentheses.
+            when 1 =>
+                return (Ident_Int(88), 89, 90, 91, 92);      -- OK. {24;1}
+            when 2 =>
+                return (Red => Ident_Int(88), Blue => <>,
+                       Green => <>, others => <>);           -- ERROR: {1:24;1}
+            when 3 =>
+                return (Yellow => <>, Blue => <>, 
+                       others => 77);                        -- ERROR: {1:24;1}
+            when others => null;
+        end case;
+    end Test_SR2;
+
+    function Test_SR3 (A : Natural) return Array_3 is
+    begin
+        if A /= 10 then
+            return (Yellow => (7 => <>, others => 10),
+                    others => (1, 2, 3));                    -- ERROR: {1:20;1}
+        elsif A = 42 then
+            return ((12, others => 92),
+                    (52, others => 80));                     -- ERROR: {1:20;1}
+        else
+            return ((10, others => <>),
+                    (20, others => <>));                     -- ERROR: {1:20;1}
+        end if;
+    end Test_SR3;
+
+    -- Extended return statements:
+    function Test_ER1 (A : Natural) return Array_1 is
+    begin
+        case A is
+            when 0 =>
+                return Res : Array_1 :=
+                       (2, 3, others => <>);                 -- ERROR: {24;1}
+            when 1 =>
+                return Res : Array_1 :=
+                       (5, 6, 8);                            -- OK. {24;1}
+            when 2 =>
+                return Res : Array_1 :=
+                       (2 => <>, others => 8);               -- ERROR: {24;1}
+            when 3 =>
+                return Res : Array_1 :=
+                       (((6 => <>, 8 => <>, others => 1)));  -- ERROR: {24;1}
+                    -- Two sets of extra parentheses.
+            when 4 =>
+                return Res : Array_1 :=
+                       (5 => Ident_Int(88), 8 => <>,
+                       10 => <>, others => <>);              -- ERROR: {1:24;1}
+            when others => null;
+        end case;
+    end Test_ER1;
+
+    function Test_ER2 (A : Natural) return Sub_Arr_2 is
+    begin
+        case A is
+            when 0 =>
+                return Res : Array_2 :=
+                       ((1, others => Ident_Int(6)));        -- ERROR: {24;1}
+                    -- Extra parentheses.
+            when 1 =>
+                return Res : Array_2 :=
+                       (Ident_Int(88), 89, 90, 91, 92);      -- OK. {24;1}
+            when 2 =>
+                return Res : Sub_Arr_2 :=
+                       (Red => Ident_Int(88), Blue => <>,
+                       Green => <>, others => <>);           -- ERROR: {1:24;1}
+            when 3 =>
+                return Res : Sub_Arr_2 :=
+                       (Yellow => <>, Blue => <>, 
+                       others => 77);                        -- ERROR: {1:24;1}
+            when 4 =>
+                return Res : Sub_Con_Arr_2 :=
+                       (Yellow => <>, Blue => <>, 
+                       others => 55);                        -- OK. {1:24;1}
+            when others => null;
+        end case;
+    end Test_ER2;
+
+    function Test_ER3 (A : Natural) return Array_3 is
+    begin
+        if A <= 10 then
+            return Res : Array_3 :=
+                   (Yellow => (7 => <>, others => 10),
+                    others => (1, 2, 3));                    -- ERROR: {1:20;1}
+        elsif A = 42 then
+            return Res : Array_3 :=
+                   ((12, others => 92),
+                    (52, others => 80));                     -- ERROR: {1:20;1}
+        elsif A = 4 then
+            return Res : Sub_3_1 :=
+                   ((12, others => 92),
+                    (52, others => 80));                     -- OK. {1:20;1}
+        else
+            return Res : Array_3 :=
+                   ((10, others => <>),
+                    (20, others => <>));                     -- ERROR: {1:20;1}
+        end if;
+    end Test_ER3;
+
+    -- Expression functions:
+    function Test_XA return Array_1 is
+        (2, 3, others => <>);                                -- ERROR: {9;1}
+
+    function Test_XB return Array_2 is
+        ((1, others => Ident_Int(6)));                       -- ERROR: {9;1}
+       -- Extra parentheses.
+
+    function Test_XC return Array_1 is (5, 6, 8);            -- OK. {40;1}
+
+    function Test_XD return Array_1 is 
+        (2 => <>, others => 8);                              -- ERROR: {9;1}
+
+    function Test_XE return Array_3 is
+        (Yellow => (7 => <>, others => 10), 
+         others => (1, 2, 3));                               -- ERROR: {1:9;1}
+
+    function Test_XF return Array_1 is
+        (((6 => <>, 8 => <>, others => 1)));                 -- ERROR: {9;1}
+        -- Two sets of extra parentheses.
+
+    function Test_XG return Sub_Arr_2 is
+        (Ident_Int(88), 89, 90, 91, 92);                     -- OK. {9;1}
+
+    function Test_XH return Array_1 is
+        ((5 => Ident_Int(88), 8 => <>,
+          10 => <>, others => <>));                          -- ERROR: {1:9;1}
+       -- Extra parentheses.
+
+    function Test_XJ return Sub_Arr_2 is
+        (Yellow => <>, Blue => <>, others => 77);            -- ERROR: {9;1}
+
+    function Test_XK return Sub_Arr_2 is
+        ((Yellow => 101, Green => 89, Blue => 1));           -- OK. {9;1}
+        -- Extra parentheses.
+
+begin
+    null;
+end B433003;

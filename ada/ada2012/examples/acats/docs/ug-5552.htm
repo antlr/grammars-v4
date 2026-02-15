@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Foreign Language Interface Tests</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5551.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5553.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.5.5.2 Foreign Language Interface Tests</H1>
+<div class="Normal">Annex B, Interface to Other Languages, is part of 
+the Ada core language. However, most of the features contained in it 
+are optional. In particular, if an implementation does not support an 
+optional feature in Annex B, then it must indicate the non-support by 
+rejecting the test at compile time or by raising an appropriate exception 
+at run time. (See Ada <A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-B.html#p2">B(2/3)</A>.)</div>
+<div class="Normal">ACATS tests expect that an implementation that provides 
+one or more of the packages Interfaces.C, Interfaces.COBOL, or Interfaces.Fortran 
+implements the entire interface as defined by <A HREF="http://www.adaic.org/resources/add_content/standards/12rm/html/RM-B.html">Annex 
+B</A>. As such, ACATS testing procedures expect that the implementation 
+will correctly process, and pass, all of the tests for interfaces to 
+C, COBOL, and/or Fortran code respectively, with the possible exception 
+of tests containing actual foreign code. If an implementation provides 
+a partial implementation of one of the foreign language interfaces, special 
+handling of the test results will be needed. In particular, some or all 
+tests may fail by reporting an error on a line other than on marked with 
+N/A =&gt; ERROR or may fail at runtime. Such cases need to be described 
+to the ACAL and ACAA and will be handled on a case-by-case basis.</div>
+<div class="Normal">An implementation that provides one or more of these 
+Interfaces child packages must successfully compile the Ada units of 
+tests with actual foreign language code. If the implementation does not 
+support the actual binding of the foreign language code to Ada, these 
+tests may report binding errors, or may reject the pragma Import, in 
+which case they may be graded as inapplicable. If the implementation 
+supports the binding and an appropriate compiler is available, the tests 
+must execute and report &quot;Passed&quot;. If the implementation supports 
+the binding, but it is not feasible to have an appropriate compiler available, 
+then the tests may be graded as inapplicable by demonstrating that they 
+fail to bind.</div>
+<div class="Normal">If one of the Interfaces child packages is not provided, 
+then the corresponding tests may be graded as inapplicable, provided 
+they reject the corresponding <B>with</B> clause (see <A HREF="UG-D1G.HTM">D.1.16</A> 
+(C), <A HREF="UG-D1J.HTM">D.1.19</A> (COBOL), and <A HREF="UG-D1K.HTM">D.1.20</A> 
+(Fortran) for lists of tests that use the packages). Similarly, if a 
+convention identifier for one of these languages is not supported, then 
+the corresponding tests may be graded as inapplicable, provided they 
+reject the corresponding aspect or <B>pragma</B> (see <A HREF="UG-D1D.HTM">D.1.13</A> 
+(C), <A HREF="UG-D1E.HTM">D.1.14</A> (COBOL), and <A HREF="UG-D1F.HTM">D.1.15</A> 
+(Fortran) for lists of tests containing each convention).</div>
+<div class="Normal">The tests involving interfaces to foreign code are 
+listed below.</div>
+<div class="Normal">The foreign language code included in ACATS tests 
+uses no special or unique features, and should be accepted by any standard 
+(C, COBOL, or Fortran) compiler. However, there may be dialect problems 
+that prevent the code from compiling correctly. Modifications to the 
+foreign language code are allowable; the modifications must follow the 
+code as supplied as closely as possible and the result must satisfy the 
+requirements stated in the file header. Such modifications must be approved 
+in advance by the ACAL (and, if necessary, the ACAA).</div>
+<div class="Normal">The method for compiling foreign code is implementation 
+dependent and not specified as part of the ACATS. Ada code in these tests 
+must be compiled as usual. The Ada code includes Pragma Import that references 
+the foreign language code. The link name of foreign language object code 
+must be provided in ImpDef. When all code has been compiled, the test 
+must be bound (including the foreign language object code) and run. The 
+method for binding Ada and foreign language code is implementation dependent 
+and not specified as part of the ACATS. The test must report &quot;PASSED&quot; 
+when executed.</div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>C 
+Language Interface</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">The following tests check the C language interface; 
+the ACATS expects that all of the tests identified below will be satisfactorily 
+processed as described above if the C language interface is supported.</div>
+<div class="Normal">The starred tests contain C code that must be compiled 
+and linked if possible, as described above. The C code is easily identifiable 
+because the file has the extension <TT>.C</TT>. The C code may be modified 
+to satisfy dialect requirements of the C compiler. The C code files must 
+be compiled through a C compiler, and the resulting object code must 
+be bound with the compiled Ada code. Pragma Import will take the name 
+of the C code from ImpDef.</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cd30005*<TD align="left">cxb3004*<TD align="left">cxb3012<TD align="left">cxb3020<TD align="left">
+<TR><TD align="left">bxb3001<TD align="left">cxb3005<TD align="left">cxb3013*<TD align="left">cxb3021<TD align="left">
+<TR><TD align="left">bxb3002<TD align="left">cxb3006*<TD align="left">cxb3014<TD align="left">cxb3022<TD align="left">
+<TR><TD align="left">bxb3003<TD align="left">cxb3007<TD align="left">cxb3015<TD align="left">cxb3023*<TD align="left">
+<TR><TD align="left">bxb3004<TD align="left">cxb3008<TD align="left">cxb3016<TD align="left">cxb3024* <TD align="left">
+<TR><TD align="left">cxb3001<TD align="left">cxb3009<TD align="left">cxb3017*<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxb3002<TD align="left">cxb3010<TD align="left">cxb3018<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxb3003<TD align="left">cxb3011<TD align="left">cxb3019<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>COBOL 
+Language Interface</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">The following tests check the COBOL language interface; 
+the ACATS expects that all of the tests identified below will be satisfactorily 
+processed as described above if the COBOL language interface is supported.</div>
+<div class="Normal">The starred test contains COBOL code that must be 
+compiled and linked if possible, as described above. The COBOL code is 
+easily identifiable because the file has the extension <TT>.CBL</TT>. 
+The COBOL code may be modified to satisfy dialect requirements of the 
+COBOL compiler. The COBOL code files must be compiled through a COBOL 
+compiler, and the resulting object code must be bound with the compiled 
+Ada code. Pragma Import will take the name of the COBOL code from ImpDef.</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cxb4001<TD align="left">cxb4004<TD align="left">cxb4007<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxb4002<TD align="left">cxb4005<TD align="left">cxb4008<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxb4003<TD align="left">cxb4006<TD align="left">cxb4009* <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove"><SPAN Class="swiss"><SPAN STYLE="font-size: 156%"><B></B></SPAN><SPAN STYLE="font-size: 125%"><B>Fortran 
+Language Interface</B></SPAN><SPAN STYLE="font-size: 156%"><B></B></SPAN></SPAN></div>
+<div class="Normal">The following tests check the Fortran language interface; 
+the ACATS expects that all of the tests identified below will be satisfactorily 
+processed as described above if the Fortran language interface is supported.</div>
+<div class="Normal">The starred tests contain Fortran code that must 
+be compiled and linked if possible, as described above. The Fortran code 
+is easily identifiable because the file has the extension <TT>.FTN</TT>. 
+The Fortran code may be modified to satisfy dialect requirements of the 
+Fortran compiler. The Fortran code files must be compiled through a Fortran 
+compiler, and the resulting object code must be bound with the compiled 
+Ada code. Pragma Import will take the name of the Fortran code from ImpDef.</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">cxb5001<TD align="left">cxb5003<TD align="left">cxb5005* <TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">cxb5002<TD align="left">cxb5004*<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5551.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5553.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

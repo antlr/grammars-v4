@@ -1,0 +1,266 @@
+-- B460001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if the target type of a type conversion is a general access
+--      type, the accessibility level of the operand type must not be
+--      statically deeper than that of the target type.
+--
+--      Check for cases where the operand is:
+--         (a) a stand-alone access object.
+--         (b) a formal parameter.
+--         (c) an access discriminant.
+--
+-- TEST DESCRIPTION:
+--      In order to satisfy accessibility requirements, the operand type must
+--      be at the same or a less deep "nesting level" than the target type --
+--      the operand type must "live" as long as the target type. Nesting levels
+--      are the run-time nestings of masters: block statements; subprogram,
+--      task, and entry bodies; and accept statements. Packages are invisible
+--      to accessibility rules.
+--
+--      The accessibility level of the anonymous access type of an access
+--      discriminant is that of the containing object.
+--
+--      This test declares general and pool-specific access types in various
+--      packages and nested subprogram bodies, and verifies that a type
+--      conversion to a general access type is illegal when the type of the
+--      operand of a type conversion has a deeper accessibility level than
+--      that of the target type, and legal otherwise. Pool-specific types are
+--      used as operand types, since the operand type of a conversion to a
+--      general access type may be pool-specific. Other operand types used are
+--      general access-to-tagged types (including access-to-class-wide types).
+--      Accessibility is checked in two contexts: the target is an actual
+--      parameter; the target is a stand-alone access object.
+--
+--      The nesting structure is as follows:
+--
+--          - Library-level package
+--         |                                (Level = 0)
+--          - end package
+--
+--          - Main subprogram
+--         |                                (Level = 1)
+--         |     - Nested procedure
+--         |    |                           (Level = 2)
+--         |    |     - Nested procedure
+--         |    |    |                      (Level = 3)
+--         |    |    |  begin
+--         |    |    |     *** Testing here
+--         |    |     - end procedure
+--         |    |  begin
+--         |    |     *** Testing here
+--         |     - end procedure
+--         |  begin          
+--         |     *** Testing here
+--          - end Main subprogram
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      21 Nov 95   SAIC    ACVC 2.0.1 fixes: Corrected commentary.
+--
+--!
+
+package B460001_0 is
+
+   --
+   -- Integer type, associated objects and access types:
+   -- 
+
+   type Obj_Type is new Integer range 0..1000;
+
+   type GAccObj_L0 is access all Obj_Type;                      -- Level = 0.
+   type PAccObj_L0 is access     Obj_Type;                      -- Level = 0.
+
+   Obj   : aliased Obj_Type := 355;
+   GSA_0 : GAccObj_L0;
+   PSA_0 : PAccObj_L0;
+
+   --
+   -- Type with access discriminant:
+   -- 
+
+   type Acc_Disc (D : access Obj_Type := Obj'Access) is limited record
+      Limited_Field : String(1..80);
+   end record;
+
+   AD_0 : Acc_Disc;
+
+   --
+   -- Tagged types, associated objects and access types:
+   -- 
+
+   type Tag_Type is tagged record 
+      Field_1 : Obj_Type := 123;
+      Field_2 : String(1..21) := "This is a tagged type";
+   end record;
+
+   type Der_Type is new Tag_Type with record 
+      Field_3 : Natural := 598;
+   end record;
+
+   type GAccCls_L0 is access all Tag_Type'Class;                -- Level = 0.
+
+   GSAC_0 : GAccCls_L0;
+
+
+end B460001_0;
+
+
+     --==================================================================--
+
+
+with B460001_0;
+procedure B460001 is
+
+   AD_1 : B460001_0.Acc_Disc;
+
+   type GAccObj_L1 is access all B460001_0.Obj_Type;            -- Level = 1.
+   type PAccObj_L1 is access     B460001_0.Obj_Type;            -- Level = 1.
+
+   GSA_1 : GAccObj_L1;
+
+   type GAccTag_L1 is access all B460001_0.Tag_Type;            -- Level = 1.
+   type PAccDer_L1 is access     B460001_0.Der_Type;            -- Level = 1.
+
+   PSAD_1 : PAccDer_L1;
+
+
+   procedure TagCall_L1 (X : GAccTag_L1) is     -- Subprogram with parameter
+   begin                                        -- of a general access type:
+      null;                                     -- tagged designated type.
+   end TagCall_L1;
+
+
+   --
+   -- Nested subprogram:
+   --
+
+   procedure Nested (GFP_1 : GAccObj_L1;         -- Parameter type level = 1.
+                     PFP_1 : PAccObj_L1) is      -- Parameter type level = 1.
+
+      AD_2 : B460001_0.Acc_Disc;
+
+      type GAccObj_L2 is access all B460001_0.Obj_Type;         -- Level = 2.
+
+      GSA_2 : GAccObj_L2;
+
+      type GAccDer_L2 is access all B460001_0.Der_Type;         -- Level = 2.
+      type GAccCls_L2 is access all B460001_0.Tag_Type'Class;   -- Level = 2.
+
+      GSAC_2 : GAccCls_L2;
+
+
+      procedure TagCall_L2 (X : GAccDer_L2) is  -- Subprogram with parameter
+      begin                                     -- of a general access type:
+         null;                                  -- tagged designated type.
+      end TagCall_L2;
+
+
+      --
+      -- Doubly-nested subprogram:
+      --
+
+      procedure Doubly_Nested 
+                 (GFPC_0 : B460001_0.GAccCls_L0;    -- Param. type level = 0.
+                  PFPD_1 : PAccDer_L1;              -- Param. type level = 1.
+                  GFPC_2 : GAccCls_L2) is           -- Param. type level = 2.
+
+         type GAccDer_L3 is access all B460001_0.Der_Type;      -- Level = 3.
+         type PAccCls_L3 is access     B460001_0.Der_Type;      -- Level = 3.
+
+         GSAD_3 : GAccDer_L3;
+         PSAC_3 : PAccCls_L3;
+
+      begin -- Doubly_Nested.
+
+         -- Operand is a formal parameter:
+
+         TagCall_L1 (GAccTag_L1(GFPC_0));                           -- OK.
+         TagCall_L1 (GAccTag_L1(PFPD_1));                           -- OK.
+         TagCall_L1 (GAccTag_L1(GFPC_2));                           -- ERROR:
+                                        -- Accessibility level of GAccCls_L2 
+                                        -- is deeper than that of GAccTag_L1.
+
+
+         -- Operand is a stand-alone object:
+
+         TagCall_L1 (GAccTag_L1(GSAD_3));                           -- ERROR:
+                                     -- Accessibility level of GAccDer_L3 is 
+                                     -- deeper than that of GAccTag_L1.
+
+         TagCall_L2 (GAccDer_L2(B460001_0.GSAC_0));                 -- OK.
+         TagCall_L2 (GAccDer_L2(PSAD_1));                           -- OK.
+         TagCall_L2 (GAccDer_L2(GSAC_2));                           -- OK.
+         TagCall_L2 (GAccDer_L2(PSAC_3));                           -- ERROR:
+                                     -- Accessibility level of PAccCls_L3 is 
+                                     -- deeper than that of GAccDer_L2.
+
+      end Doubly_Nested;
+
+
+   begin -- Nested.
+
+      -- Operand is a formal parameter:
+
+      B460001_0.GSA_0 := B460001_0.GAccObj_L0(GFP_1);               -- ERROR:
+                                 -- Accessibility level of GAccObj_L1 is 
+                                 -- deeper than that of B460001_0.GAccObj_L0.
+
+      GSA_1 := GAccObj_L1(PFP_1);                                   -- OK.
+
+
+      -- Operand is an access discriminant:
+
+      B460001_0.GSA_0 := B460001_0.GAccObj_L0(AD_2.D);              -- ERROR:
+                                   -- Accessibility level of AD_2.D is deeper
+                                   --than that of B460001_0.GAccObj_L0.
+
+      GSA_2 := GAccObj_L2(B460001_0.AD_0.D);                        -- OK.
+
+   end Nested;
+
+
+
+begin -- B460001
+
+   -- Operand is a stand-alone object:
+
+   B460001_0.GSA_0 := B460001_0.GAccObj_L0(B460001_0.PSA_0);        -- OK.
+   GSA_1 := GAccObj_L1(B460001_0.GSA_0);                            -- OK.
+
+
+   -- Operand is an access discriminant:
+
+   B460001_0.GSA_0 := B460001_0.GAccObj_L0(B460001_0.AD_0.D);       -- OK.
+   B460001_0.GSA_0 := B460001_0.GAccObj_L0(AD_1.D);                 -- ERROR:
+                                    -- Accessibility level of AD_1 is deeper 
+                                    --than that of B460001_0.GAccObj_L0.
+
+   GSA_1 := GAccObj_L1(B460001_0.AD_0.D);                           -- OK.
+   GSA_1 := GAccObj_L1(AD_1.D);                                     -- OK.
+
+end B460001;

@@ -1,0 +1,520 @@
+-- B433004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+-- OBJECTIVE
+--     Check that an others choice is not allowed in an array aggregate which
+--     is the dependent expression of a conditional expression used as:
+--         * the expression of a return statement if the subtype of the
+--           function return is unconstrained;
+--         * the return expression of an expression function if the subtype of
+--           the function return is unconstrained;
+--         * the expression of an object declaration if the subtype of the
+--           object declaration is unconstrained;
+--         * an actual parameter to a call of a subprogram if the subtype of
+--           the formal parameter is unconstrained;
+--         * the operand of a qualified expression if the subtype of the
+--           qualfied expression is unconstrained.
+--
+-- TEST DESCRIPTION
+--     In this test, we declare several unconstrained array types. We then
+--     test a variety of cases of using appropriate aggregates. We try
+--     both if expressions and case expressions.
+--
+-- CHANGE HISTORY:
+--      24 Sep 2022   RLB   Created from B433003.
+--!
+
+procedure B433004 is
+
+    function Do_It return Boolean is (True);
+        -- To be the condition in our conditional expressions.
+
+    type Tiny is range 1 .. 5;
+    function Copy (Val : in Tiny) return Tiny is (Val);
+
+    type Color_Type is (Red, Orange, Yellow, Green, Blue, Indigo, Violet);
+
+    type Default_to_Zero is range -10000 .. 10000
+       with Default_Value => 0;
+
+    function Ident_Int (Val : in Default_to_Zero) return Default_to_Zero is
+        (Val);
+
+    type Array_1 is array (Positive range <>) of Default_to_Zero;
+
+    type Array_2 is array (Color_Type range <>) of Default_to_Zero;
+    subtype Sub_Arr_2 is Array_2;
+    subtype Sub_Con_Arr_2 is Array_2 (Yellow .. Blue);
+
+    type Array_3 is array (Color_Type range <>, Positive range <>)
+                       of Default_to_Zero;
+    subtype Sub_3_1 is Array_3 (Color_Type'Val(0) ..
+                                Color_Type'Val(1),
+                                3 .. 4);
+
+   procedure P1 (Arg : in Array_1) is null;
+   procedure P2 (Arg : in Array_2) is null;
+   procedure P3 (Arg : in Array_3) is null;
+
+    -- Simple return statements:
+    function Test_SR1 (A : Natural) return Array_1 is
+    begin
+        case A is
+            when 0 =>
+                return (if Do_It then (1, 2, 3)
+                        else (2, 3, others => <>));        -- ERROR: {1:24;1}
+            when 1 =>
+                return (if Do_It then (5, 6)
+                        else (5, 6, 12));                  -- OK. {1:24;1}
+            when 2 =>
+                return (if Do_It then (2, 3, 4)
+                        else (2 => <>, others => 8));      -- ERROR: {1:24;1}
+            when 3 =>
+                return (if Do_It then (2, 3, 4, 8)
+                        else (5 => Ident_Int(88), 8 => <>,
+                        10 => <>, others => <>));          -- ERROR: {2:24;1}
+            when 4 =>
+                return (case Copy(1) is
+                          when 1 => (1, 2),
+                          when 2 .. 4 => (2, 3, 4),
+                          when 5 => (6 => <>, 8 => <>,
+                                     others => 1));        -- ERROR: {4:24;1}
+            when 5 =>
+                return (case Copy(1) is
+                          when 1 => (5, 2),
+                          when 2 .. 4 => (8, 6, 4),
+                          when 5 => (6 => <>, 8 => <>,
+                                     7 | 9 => 1));         -- OK. {4:24;1}
+            when others => null;
+        end case;
+    end Test_SR1;
+
+    function Test_SR2 (A : Natural) return Sub_Arr_2 is
+    begin
+        case A is
+            when 0 =>
+                return (if Do_It then
+                           (1, others => Ident_Int(6))
+                        else (1, 2, 3));                   -- ERROR: {2:24;1}
+            when 1 =>
+                return (if Do_It then
+                           (Ident_Int(88), 89, 90, 91, 92)
+                        else (1, 2, 3));                   -- OK. {2:24;1}
+            when 2 =>
+                return (if Do_It then
+                           (Red => Ident_Int(88), Blue => <>,
+                            Green => <>, others => <>)
+                        else (1, 2, 3));                   -- ERROR: {3:24;1}
+            when 3 =>
+                return (if Do_It then
+                           (Yellow => <>, Blue => <>, 
+                            others => 77)
+                        else (1, 2, 3));                   -- ERROR: {3:24;1}
+            when 4 =>
+                return (case Copy(1) is
+                          when 1 => (1, 2),
+                          when 2 .. 4 => (2, 3, 4),
+                          when 5 => (Red => <>, Blue => <>,
+                                     others => 1));        -- ERROR: {4:24;1}
+            when 5 =>
+                return (case Copy(1) is
+                          when 1 => (5, 2),
+                          when 2 .. 4 => (8, 6, 4),
+                          when 5 => (Red => <>, Yellow => <>,
+                                     Orange => 1));        -- OK. {4:24;1}
+            when others => null;
+        end case;
+    end Test_SR2;
+
+    function Test_SR3 (A : Natural) return Array_3 is
+    begin
+        if A /= 10 then
+            return (if Do_It then ((1, 2), (3, 4))
+                    else (Yellow => (7 => <>, others => 10),
+                         others => (1, 2, 3)));            -- ERROR: {2:20;1}
+        elsif A = 42 then
+            return (if Do_It then ((1, 2), (3, 4))
+                    else ((12, others => 92),
+                          (52, others => 80)));            -- ERROR: {2:20;1}
+        elsif A > 12 then
+            return (if Do_It then ((1, 2), (3, 4))
+                    else ((10, others => <>),
+                          (20, others => <>)));            -- ERROR: {2:20;1}
+        else
+            return (case Copy(1) is
+                      when 3 => ((1, 2), (3, 4)),
+                      when 1 | 2 | 5 => ((1, 2, 3), (2, 3, 4)),
+                      when 4 => (Blue   => (7 => <>, others => 10),
+                                 others => (1, 2, 3)));    -- ERROR: {4:20;1}
+        end if;
+    end Test_SR3;
+
+    -- Extended return statements:
+    function Test_ER1 (A : Natural) return Array_1 is
+    begin
+        case A is
+            when 0 =>
+                return Res : Array_1 :=
+                       (if Do_It then (1, 2, 3)
+                        else (2, 3, others => <>));        -- ERROR: {1:24;1}
+            when 1 =>
+                return Res : Array_1 :=
+                       (if Do_It then (1, 2, 3)
+                        else (5, 6, 8));                   -- OK. {1:24;1}
+            when 2 =>
+                return Res : Array_1 :=
+                       (if Do_It then (1, 2, 3)
+                        else (2 => <>, others => 8));      -- ERROR: {1:24;1}
+            when 3 =>
+                return Res : Array_1 :=
+                       (if Do_It then (1, 2, 3)
+                       else (5 => Ident_Int(88), 8 => <>,
+                            10 => <>, others => <>));      -- ERROR: {2:24;1}
+            when 4 =>
+                return Res : Array_1 :=
+                       (case Copy(1) is
+                          when 1 => (1, 2),
+                          when 2 .. 4 => (2, 3, 4),
+                          when 5 => (7 => <>, 8 => <>,
+                                     others => 1));        -- ERROR: {4:24;1}
+            when others => null;
+        end case;
+    end Test_ER1;
+
+    function Test_ER2 (A : Natural) return Sub_Arr_2 is
+    begin
+        case A is
+            when 0 =>
+                return Res : Array_2 :=
+                       (if Do_It then
+                            (1, others => Ident_Int(6))
+                        else (1, 2, 3));                   -- ERROR: {2:24;1}
+            when 1 =>
+                return Res : Array_2 :=
+                       (if Do_It then
+                            (Ident_Int(88), 89, 90, 91, 92)
+                        else (1, 2, 3));                   -- OK. {2:24;1}
+            when 2 =>
+                return Res : Sub_Arr_2 :=
+                       (if Do_It then
+                            (Red => Ident_Int(88), Blue => <>,
+                             Green => <>, others => <>)
+                        else (1, 2, 3));                   -- ERROR: {3:24;1}
+            when 3 =>
+                return Res : Sub_Con_Arr_2 :=
+                       (if Do_It then
+                            (Yellow => <>, Blue => <>, 
+                             others => 55)                
+                        else (1, 2, 3));                   -- OK. {3:24;1}
+            when 4 =>
+                return Res : Sub_Arr_2 :=
+                       (case Copy(1) is
+                           when 1 | 2 | 5 => (2, 3, 4),
+                           when 4 =>
+                               (Yellow => <>, Blue => <>, 
+                                others => 77),
+                           when 3 => (1, 2));              -- ERROR: {5:24;1}
+            when others => null;
+        end case;
+    end Test_ER2;
+
+    function Test_ER3 (A : Natural) return Array_3 is
+    begin
+        if A <= 10 then
+            return Res : Array_3 :=
+                   (if Do_It then ((1, 2), (3, 4))
+                    else (Yellow => (7 => <>, others => 10),
+                          others => (1, 2, 3)));           -- ERROR: {2:20;1}
+        elsif A = 42 then
+            return Res : Array_3 :=
+                   (if Do_It then ((1, 2), (3, 4))
+                    else ((12, others => 92),
+                          (52, others => 80)));            -- ERROR: {2:20;1}
+        elsif A = 4 then
+            return Res : Sub_3_1 :=
+                   (if Do_It then ((1, 2), (4, 8))
+                    else ((12, others => 92),
+                          (52, others => 80)));            -- OK. {2:20;1}
+        elsif A = 66 then
+            return Res : Array_3 :=
+                   (if Do_It then ((1, 2), (3, 4))
+                    else ((10, others => <>),
+                          (20, others => <>)));            -- ERROR: {2:20;1}
+        else
+            return Res : Array_3 :=
+                   (case Copy(1) is
+                       when 3 => ((1, 2), (3, 4)),
+                       when 1 | 2 | 5 => ((1, 2, 3), (2, 3, 4)),
+                       when 4 => (Blue   => (7 => <>, others => 10),
+                                  others => (1, 2, 3)));   -- ERROR: {4:20;1}
+        end if;
+    end Test_ER3;
+
+    -- Expression functions:
+    function Test_XA return Array_1 is
+        (if Do_It then (1, 2, 3)
+                  else (2, 3, others => <>));              -- ERROR: {1:9;1}
+
+    function Test_XB return Array_2 is
+        (if Do_It then (1, 2, 3)
+                  else (1, others => Ident_Int(6)));       -- ERROR: {1:9;1}
+
+    function Test_XC return Array_1 is
+        (if Do_It then (1, 2, 3)
+                  else (5, 6, 8));                         -- OK. {1:9;1}
+
+    function Test_XD return Array_1 is 
+        (if Do_It then (1, 2, 3)
+                  else (2 => <>, others => 8));            -- ERROR: {1:9;1}
+
+    function Test_XE return Array_1 is 
+        (case Copy(1) is
+             when 3 => (1, 2),
+             when 1 | 2 | 5 => (2, 3, 4),
+             when 4 => (Blue   => (7 => <>, others => 10),
+                        others => (1, 2, 3)));             -- ERROR: {4:9;1}
+
+    function Test_XF return Array_3 is
+        (if Do_It then ((1, 2), (3, 4))
+         else (Yellow => (7 => <>, others => 10), 
+               others => (1, 2, 3)));                      -- ERROR: {2:9;1}
+
+   -- Object declarations:
+   Obj1A : Array_1 :=
+        (if Do_It then (1, 2, 3)
+         else (2, 3, others => <>));                       -- ERROR: {1:9;1}
+   Obj1B : Array_1 :=
+        (if Do_It then (1, 2, 3)
+         else (5, 6, 8));                                  -- OK. {1:9;1}
+   Obj1C : Array_1 :=
+        (if Do_It then (1, 2, 3)
+         else (2 => <>, others => 8));                     -- ERROR: {1:9;1}
+   Obj1D : Array_1 :=
+        (if Do_It then (1, 2, 3)
+         else (5 => Ident_Int(88), 8 => <>,
+               10 => <>, others => <>));                   -- ERROR: {2:9;1}
+   Obj1E : Array_1 :=
+        (case Copy(1) is
+             when 1 => (1, 2),
+             when 2 .. 4 => (2, 3, 4),
+             when 5 => (7 => <>, 8 => <>,
+                        others => 1));                     -- ERROR: {4:9;1}
+
+   Obj2A : Array_2 :=
+        (if Do_It then
+            (1, others => Ident_Int(6))
+         else (1, 2, 3));                                  -- ERROR: {2:9;1}
+   Obj2B : Array_2 :=
+        (if Do_It then
+            (Ident_Int(88), 89, 90, 91, 92)
+         else (1, 2, 3));                                  -- OK. {2:9;1}
+   Obj2C : Sub_Arr_2 :=
+        (if Do_It then
+            (Red => Ident_Int(88), Blue => <>,
+             Green => <>, others => <>)
+         else (1, 2, 3));                                  -- ERROR: {3:9;1}
+   Obj2D : Sub_Con_Arr_2 :=
+        (if Do_It then
+           (Yellow => <>, Blue => <>, 
+            others => 55)                
+         else (1, 2, 3));                                  -- OK. {3:9;1}
+   Obj2E : Sub_Arr_2 :=
+        (case Copy(1) is
+             when 1 | 2 | 5 => (2, 3, 4),
+             when 4 =>
+                 (Yellow => <>, Blue => <>, 
+                  others => 77),
+             when 3 => (1, 2));                            -- ERROR: {5:9;1}
+
+   Obj3A : Array_3 :=
+        (if Do_It then ((1, 2), (3, 4))
+         else (Yellow => (7 => <>, others => 10),
+               others => (1, 2, 3)));                      -- ERROR: {2:9;1}
+   Obj3B : Array_3 :=
+        (if Do_It then ((1, 2), (3, 4))
+         else ((12, others => 92),
+               (52, others => 80)));                       -- ERROR: {2:9;1}
+   Obj3C : Sub_3_1 :=
+        (if Do_It then ((1, 2), (3, 4))
+                    else ((12, others => 92),
+                          (52, others => 80)));            -- OK. {2:9;1}
+   Obj3D : Array_3 :=
+        (if Do_It then ((1, 2), (3, 4))
+         else ((10, others => <>),
+               (20, others => <>)));                       -- ERROR: {2:9;1}
+   Obj3E : Array_3 :=
+        (case Copy(1) is
+             when 3 => ((1, 2), (3, 4)),
+             when 1 | 2 | 5 => ((1, 2, 3), (2, 3, 4)),
+             when 4 => (Blue   => (7 => <>, others => 10),
+                        others => (1, 2, 3)));             -- ERROR: {4:9;1}
+
+
+   -- Qualified expressions:
+   QObj1A : Array_1 :=
+        Array_1'(if Do_It then (1, 2, 3)
+                 else (2, 3, others => <>));               -- ERROR: {1:9;1}
+   QObj1B : Array_1 :=
+        Array_1'(if Do_It then (1, 2, 3)
+                 else (5, 6, 8));                          -- OK. {1:9;1}
+   QObj1C : Array_1 :=
+        Array_1'(case Copy(1) is
+                     when 1 => (1, 2),
+                     when 2 .. 4 => (2, 3, 4),
+                     when 5 => (7 => <>, 8 => <>,
+                               others => 1));              -- ERROR: {4:9;1}
+
+   QObj2A : Array_2 :=
+        Array_2'(if Do_It then
+                    (1, others => Ident_Int(6))
+                 else (1, 2, 3));                          -- ERROR: {2:9;1}
+   QObj2B : Array_2 :=
+        Array_2'(if Do_It then
+                   (Ident_Int(88), 89, 90, 91, 92)
+                 else (1, 2, 3));                          -- OK. {2:9;1}
+   QObj2C : Array_2 :=
+        Sub_Arr_2'(if Do_It then
+                     (Red => Ident_Int(88), Blue => <>,
+                      Green => <>, others => <>)
+                   else (1, 2, 3));                        -- ERROR: {3:9;1}
+   QObj2D : Array_2 :=
+        Sub_Con_Arr_2'(if Do_It then
+                          (Yellow => <>, Blue => <>, 
+                           others => 55)                
+                       else (1, 2, 3));                    -- OK. {3:9;1}
+   QObj2E : Array_2 :=
+        Sub_Arr_2'(case Copy(1) is
+                      when 1 | 2 | 5 => (2, 3, 4),
+                      when 4 =>
+                         (Yellow => <>, Blue => <>, 
+                          others => 77),
+                      when 3 => (1, 2));                   -- ERROR: {5:9;1}
+
+   QObj3A : Array_3 :=
+        Array_3'(if Do_It then ((1, 2), (3, 4))
+         else (Yellow => (7 => <>, others => 10),
+               others => (1, 2, 3)));                      -- ERROR: {2:9;1}
+   QObj3B : Sub_3_1 :=
+        Array_3'(if Do_It then ((1, 2), (3, 4))
+         else ((12, others => 92),
+               (52, others => 80)));                       -- ERROR: {2:9;1}
+   QObj3C : Array_3 :=
+        Sub_3_1'(if Do_It then ((1, 2), (3, 4))
+                 else ((12, others => 92),
+                       (52, others => 80)));               -- OK. {2:9;1}
+   QObj3D : Array_3 :=
+        Array_3'(if Do_It then ((1, 2), (3, 4))
+                 else ((10, others => <>),
+                       (20, others => <>)));               -- ERROR: {2:9;1}
+   QObj3E : Array_3 :=
+        Array_3'(case Copy(1) is
+                    when 3 => ((1, 2), (3, 4)),
+                    when 1 | 2 | 5 => ((1, 2, 3), (2, 3, 4)),
+                    when 4 => (Blue   => (7 => <>, others => 10),
+                              others => (1, 2, 3)));       -- ERROR: {4:9;1}
+
+
+
+begin
+   -- The actual parameter in a call:
+   P1 (if Do_It then (1, 2, 3)
+       else (2, 3, others => <>));                         -- ERROR: {1:4;1}
+   P1 (if Do_It then (1, 2, 3)
+         else (5, 6, 8));                                  -- OK. {1:4;1}
+   P1 (if Do_It then (1, 2, 3)
+       else (2 => <>, others => 8));                       -- ERROR: {1:4;1}
+   P1 (if Do_It then (1, 2, 3)
+       else (5 => Ident_Int(88), 8 => <>,
+             10 => <>, others => <>));                     -- ERROR: {2:4;1}
+   P1 (case Copy(1) is
+           when 1 => (1, 2),
+           when 2 .. 4 => (2, 3, 4),
+           when 5 => (7 => <>, 8 => <>,
+                      others => 1));                       -- ERROR: {4:4;1}
+
+   P2 (if Do_It then
+          (1, others => Ident_Int(6))
+       else (1, 2, 3));                                    -- ERROR: {2:4;1}
+   P2 (if Do_It then
+          (Ident_Int(88), 89, 90, 91, 92)
+       else (1, 2, 3));                                    -- OK. {2:4;1}
+   P2 (if Do_It then
+          (Red => Ident_Int(88), Blue => <>,
+           Green => <>, others => <>)
+       else (1, 2, 3));                                    -- ERROR: {3:4;1}
+   P2 (case Copy(1) is
+           when 1 | 2 | 5 => (2, 3, 4),
+           when 4 =>
+               (Yellow => <>, Blue => <>, 
+                others => 77),
+           when 3 => (1, 2));                              -- ERROR: {5:4;1}
+ 
+   P3 (if Do_It then ((1, 2), (3, 4))
+       else (Yellow => (7 => <>, others => 10),
+             others => (1, 2, 3)));                        -- ERROR: {2:4;1}
+   P3 (if Do_It then ((1, 2), (3, 4))
+       else ((12, others => 92),
+             (52, others => 80)));                         -- ERROR: {2:4;1}
+   P3 (case Copy(1) is
+           when 3 => ((1, 2), (3, 4)),
+           when 1 | 2 | 5 => ((1, 2, 3), (2, 3, 4)),
+           when 4 => (Blue   => (7 => <>, others => 10),
+                      others => (1, 2, 3)));               -- ERROR: {4:4;1}
+
+
+   -- Assignments (always gets the bounds from the Left-hand side variable,
+   -- so others is always allowed):
+   Obj1B := 
+        (if Do_It then (1, 2, 3)
+         else (2, 3, others => <>));                       -- OK. {1:9;1}
+   Obj1B :=
+        (case Copy(1) is
+             when 1 => (1, 2),
+             when 2 .. 4 => (2, 3, 4),
+             when 5 => (7 => <>, 8 => <>,
+                        others => 1));                     -- OK. {4:9;1}
+   Obj2B :=
+        (if Do_It then
+            (Red => Ident_Int(88), Blue => <>,
+             Green => <>, others => <>)
+         else (1, 2, 3));                                  -- OK. {3:9;1}
+   Obj2B :=
+         (case Copy(1) is
+              when 1 | 2 | 5 => (2, 3, 4),
+              when 4 =>
+                  (Yellow => <>, Blue => <>, 
+                   others => 77),
+              when 3 => (1, 2));                           -- OK. {5:9;1}
+
+end B433004;

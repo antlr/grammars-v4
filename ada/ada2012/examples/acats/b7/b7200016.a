@@ -1,0 +1,106 @@
+-- B7200016.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if a library package declaration or library 
+--      generic package declaration does not require a body, that 
+--      a body is not allowed.  Check that pragma Elaborate_Body 
+--      can be used to require a body even if not otherwise required.
+--
+-- TEST DESCRIPTION:
+--      This test declares a number of library packages and then
+--      checks that only those package bodies that are legal are
+--      accepted.  The test cases were derived from instances
+--      in ACVC legacy tests that were not legal under Ada 95 and
+--      required changing.  From these tests, individual cases were
+--      identified and reproduced as part of this test.  Further,
+--      instances were derived from RM 6.0.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--         B7200010.A
+--         B7200011.A
+--         B7200012.A
+--         B7200013.A
+--         B7200014.A
+--         B7200015.A
+--      -> B7200016.A
+--
+--
+-- CHANGE HISTORY:
+--     15 FEB 95   SAIC    Initial version
+--     19 NOV 96   SAIC    Corrected spelling.
+--     08 DEC 96   SAIC    Split test into multiple files. Corrected
+--                         prologue. Corrected placement of pragma in
+--                         B720001_6.
+--
+--!
+ 
+package B720001_6 is
+  pragma Elaborate_Body;
+
+  I : Integer;
+end B720001_6;
+
+     --==================================================================--
+
+package body B720001_6 is                                             -- OK. 
+        -- Package body completion required by use of pragma Elaborate_Body.
+begin      
+  null;   
+end B720001_6;                                           
+
+     --==================================================================--
+
+generic
+package B720001_7 is
+  pragma Elaborate_Body (B720001_7);
+end B720001_7;
+
+     --==================================================================--
+
+package body B720001_7 is                                             -- OK. 
+        -- Package body completion required by use of pragma Elaborate_Body.
+begin                                                  
+  null;                                               
+end B720001_7;                                       
+                                                    
+     --==================================================================--
+
+procedure B720001_8 is                                                -- OK.
+               -- Non library packages may have bodies even if not required.
+  package Non_Library_Sub_Pack8 is                 
+    I : Integer;                                  
+    F : Float;                                   
+  end Non_Library_Sub_Pack8;
+
+  package body Non_Library_Sub_Pack8 is
+  begin
+    I := 3;
+    F := 4.0;
+  end Non_Library_Sub_Pack8;
+begin
+  null;
+end B720001_8;

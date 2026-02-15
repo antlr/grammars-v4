@@ -1,0 +1,288 @@
+-- BA11009.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if the generic being renamed is itself a child of a 
+--      generic package P, the renaming must occur in a place that is within 
+--      the declarative region of P, which includes the body, the children 
+--      (and descendant ...), and the subunits of P.
+--
+-- TEST DESCRIPTION:
+--      Declare the first generic grandparent package.  Declare a generic 
+--      parent package.  Declare a generic grandchild procedure.  Declare a
+--      generic grandchild function.  Declare the second generic grandparent 
+--      package.  Declare a subunit in the grandparent package body.  Declare
+--      a generic parent package.  Declare a generic grandchild procedure.  
+--      Declare a generic grandchild function. 
+--
+--                           BA11009_0                BA11009_4
+--                             /   \                 (BA11009_5)
+--                            /     \                  /    \
+--                           /       \                /      \
+--                      BA11009_1  BA11009_3      BA11009_6  BA11009_8
+--                        /                          /
+--                       /                          /
+--                   BA11009_2                  BA11009_7
+--      
+--      The following cases should cause compile-time errors:
+--         (a) rename generic package BA11009_1 in the subunit, BA11009_5.
+--         (b) rename generic procedure BA11009_7 in the subunit, BA11009_5.
+--         (c) rename generic procedure BA11009_2 in the subunit, BA11009_5.
+--         (d) rename generic function BA11009_3 in the subunit, BA11009_5.
+--         (e) rename generic package BA11009_1 in the body of BA11009_6.
+--         (f) rename generic procedure BA11009_2 in the body of BA11009_6.
+--         (g) rename generic function BA11009_3 in the body of BA11009_6.
+--         (h) rename generic package BA11009_1 in the body of BA11009_8.
+--         (i) rename generic procedure BA11009_7 in the body of BA11009_8.
+--         (j) rename generic procedure BA11009_2 in the body of BA11009_8.
+--         (k) rename generic function BA11009_3 in the body of BA11009_8.
+--         (l) rename generic package BA11009_1 in BA11009.
+--         (m) rename generic procedure BA11009_2 in BA11009.
+--         (n) rename generic function BA11009_3 in BA11009.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      15 Nov 95   SAIC    Update and repair for ACVC 2.0.1
+--
+--!
+
+-- Generic grandparent package
+generic
+package BA11009_0 is
+
+   type Grand_Parent_Type is range 1..100;
+
+end BA11009_0;
+
+-- No bodies required for BA11009_0.
+
+     --=================================================================--
+
+-- Generic public parent package.  
+generic
+package BA11009_0.BA11009_1 is
+
+   Parent_Var : Grand_Parent_Type := 10;
+
+end BA11009_0.BA11009_1;
+
+-- No bodies required for BA11009_0.BA11009_1.
+
+     --=================================================================--
+
+-- Generic public grandchild procedure.
+generic
+procedure BA11009_0.BA11009_1.BA11009_2;
+
+     --=================================================================--
+
+procedure BA11009_0.BA11009_1.BA11009_2 is
+
+begin
+   null;
+end BA11009_0.BA11009_1.BA11009_2;
+
+     --=================================================================--
+
+-- Generic public parent function.  
+generic
+function BA11009_0.BA11009_3 return Grand_Parent_Type;
+
+     --=================================================================--
+
+function BA11009_0.BA11009_3 return Grand_Parent_Type is
+
+begin
+   return 17;
+end BA11009_0.BA11009_3;
+
+     --=================================================================--
+
+-- Generic grandparent package
+generic
+package BA11009_4 is
+
+   type SGrand_Parent_Type is range 500..600;
+   procedure BA11009_5;
+
+end BA11009_4;
+
+     --=================================================================--
+
+-- Generic public parent package.  
+generic
+package BA11009_4.BA11009_6 is
+
+   SParent_Var : SGrand_Parent_Type := 567;
+
+   procedure Do_Something;     -- will require the package body
+
+end BA11009_4.BA11009_6;
+
+     --=================================================================--
+
+-- Generic public grandchild procedure.
+generic
+procedure BA11009_4.BA11009_6.BA11009_7;
+
+     --=================================================================--
+
+-- Generic public parent function.  
+with BA11009_4.BA11009_6.BA11009_7;   -- Generic grandchild procedure.
+with BA11009_0.BA11009_3;             -- Generic grandchild function.
+generic
+function BA11009_4.BA11009_8 return SGrand_Parent_Type;
+
+     --=================================================================--
+
+with BA11009_4.BA11009_6.BA11009_7;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_4.BA11009_6.
+with BA11009_4.BA11009_8;             -- Generic child package.
+
+with BA11009_0.BA11009_1.BA11009_2;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_0.BA11009_1.
+with BA11009_0.BA11009_3;             -- Generic grandchild function.
+
+package body BA11009_4 is
+
+   procedure BA11009_5 is separate;
+
+end BA11009_4;
+
+     --=================================================================--
+
+separate (BA11009_4)
+procedure BA11009_5 is
+   generic package BA11009_10 renames BA11009_4.BA11009_6;           -- OK. 
+   generic package BA11009_11 renames BA11009_0.BA11009_1;           -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic procedure BA11009_12 renames 
+     BA11009_4.BA11009_6.BA11009_7;                                  -- ERROR:
+                                                      -- Outside of BA11009_6.
+   generic procedure BA11009_13 renames
+     BA11009_0.BA11009_1.BA11009_2;                                  -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic function BA11009_14 renames BA11009_4.BA11009_8;          -- OK. 
+   generic function BA11009_15 renames BA11009_0.BA11009_3;          -- ERROR:
+                                                      -- Outside of BA11009_0.
+begin
+   null;
+end BA11009_5;
+
+     --=================================================================--
+
+with BA11009_4.BA11009_6.BA11009_7;   -- Generic grandchild procedure.
+with BA11009_4.BA11009_8;             -- Generic grandchild function.
+
+with BA11009_0.BA11009_1.BA11009_2;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_0.BA11009_1.
+with BA11009_0.BA11009_3;             -- Generic grandchild function.
+
+package body BA11009_4.BA11009_6 is
+
+   generic package BA11009_16 renames BA11009_0.BA11009_1;           -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic procedure BA11009_17 renames 
+     BA11009_4.BA11009_6.BA11009_7;                                  -- OK. 
+   generic procedure BA11009_18 renames 
+     BA11009_0.BA11009_1.BA11009_2;                                  -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic function BA11009_19 renames BA11009_4.BA11009_8;          -- OK. 
+   generic function BA11009_20 renames BA11009_0.BA11009_3;          -- ERROR:
+                                                      -- Outside of BA11009_0.
+
+  procedure Do_Something is               -- here to require the package body 
+   begin
+      SParent_Var := SParent_Var / 7;
+      -- Real body of procedure goes here.
+   end Do_Something;
+
+end BA11009_4.BA11009_6;
+
+     --=================================================================--
+
+with BA11009_4.BA11009_8;             -- Generic grandchild function.
+
+with BA11009_0.BA11009_1.BA11009_2;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_0.BA11009_1.
+with BA11009_0.BA11009_3;             -- Generic grandchild function.
+
+procedure BA11009_4.BA11009_6.BA11009_7 is
+
+   generic package BA11009_21 renames BA11009_0.BA11009_1;           -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic procedure BA11009_22 renames 
+     BA11009_0.BA11009_1.BA11009_2;                                  -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic function BA11009_23 renames BA11009_4.BA11009_8;          -- OK. 
+   generic function BA11009_24 renames BA11009_0.BA11009_3;          -- ERROR:
+                                                      -- Outside of BA11009_0.
+begin
+   null;
+end BA11009_4.BA11009_6.BA11009_7;
+
+     --=================================================================--
+
+
+with BA11009_0.BA11009_1.BA11009_2;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_0.BA11009_1.
+
+function BA11009_4.BA11009_8 return SGrand_Parent_Type is
+
+   generic package BA11009_25 renames BA11009_4.BA11009_6;           -- OK. 
+   generic package BA11009_26 renames BA11009_0.BA11009_1;           -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic procedure BA11009_27 renames 
+     BA11009_4.BA11009_6.BA11009_7;                                  -- ERROR:
+                                                      -- Outside of BA11009_6.
+   generic procedure BA11009_28 renames 
+     BA11009_0.BA11009_1.BA11009_2;                                  -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic function BA11009_29 renames BA11009_0.BA11009_3;          -- ERROR:
+                                                      -- Outside of BA11009_0.
+
+begin
+   return 598;
+end BA11009_4.BA11009_8;
+
+     --=================================================================--
+
+with BA11009_0.BA11009_1.BA11009_2;   -- Generic grandchild procedure,
+                                      -- implicitly with BA11009_0.BA11009_1.
+with BA11009_0.BA11009_3;             -- Generic grandchild function.
+
+procedure BA11009 is
+
+   generic package BA11009_30 renames BA11009_0.BA11009_1;           -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic procedure BA11009_31 renames 
+     BA11009_0.BA11009_1.BA11009_2;                                  -- ERROR:
+                                                      -- Outside of BA11009_0.
+   generic function BA11009_32 renames BA11009_0.BA11009_3;          -- ERROR:
+                                                      -- Outside of BA11009_0.
+begin
+   null;
+end BA11009;

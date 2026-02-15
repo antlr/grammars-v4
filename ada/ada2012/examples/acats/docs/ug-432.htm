@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Modern Naming</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented1 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-bottom: 0.6em}
+    DIV.WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 6.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-431.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-433.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.3.2 Modern Naming</H1>
+<div class="Normal" style="margin-bottom: 0.4em">The name of a modern 
+ACATS test is composed of seven or eight characters. Foundation code 
+has a name composed of seven characters. The use of each character position 
+is described below. The first column indicates the character position(s) 
+starting from the left, and the second column indicates the kind of character 
+allowed, and the third column gives the corresponding meaning:</div>
+<div class="Indented1"><TABLE frame="void" rules="none" border="0" cellpadding="2"><TR><TH align="left"><B>Position</B><TH align="left"><B>Kind</B><TH align="left"><B>Meaning</B>
+<TR><TD align="left">1<TD align="left">Letter<TD align="left">Test 
+class; foundations are marked 'F'.
+<TR><TD align="left">2<TD align="left">Alphanumeric<TD align="left">If 
+other than an 'x', the clause of the Ada Standard describing the feature 
+under test. An 'x' indicates that the test includes one or more features 
+from an annex of the Ada Standard.
+<TR><TD align="left">3<TD align="left">Alphanumeric<TD align="left">Core 
+subclause or annex letter identifier (either core or Specialized Needs 
+Annex); clauses are a hexadecimal value.
+<TR><TD align="left">4<TD align="left">Alphanumeric<TD align="left">Sub-subclause 
+(if a core test), or subclause (if an annex test); a number if less than 
+10, otherwise a letter with 10='A', 11='B', and so on.
+<TR><TD align="left">5<TD align="left">Alphanumeric<TD align="left">Foundation 
+identifier (alphabetic, unless no foundation is required, in which case 
+a '0').
+<TR><TD align="left">6-7<TD align="left">Decimal<TD align="left">Sequence 
+number of this test in a series of tests for the same clause; foundation 
+code will have &quot;00&quot;.
+<TR><TD align="left">8<TD align="left">Alphanumeric<TD align="left"><I>optional</I> 
+&ndash; Compilation sequence identifier &mdash; indicates the suggested 
+or required compilation order of multiple files that make up a single 
+test (0 is compiled first). This position is used only if the test comprises 
+multiple files.
+</table></div>
+<div class="Normal">(Note: Formally groupings for all levels below the 
+top-level grouping are known as subclauses; here we use subclause to 
+specifically refer to the second level and sub-subclause to refer to 
+the third level.)</div>
+<div class="Normal">The convention is illustrated below.</div>
+<DIV Style="text-align: center; margin-bottom: 0.4em"><IMG src="MOD-NAME.PNG" height="192" width="342" alt="Modern File Name Convention" border="0"></DIV>
+<div class="Normal" style="text-align: center"><SPAN STYLE="font-size: 80%">Modern 
+File Name Convention</SPAN></div>
+<div class="Normal" style="margin-bottom: 0.4em">The file name extension 
+is a one or two character file name extension. There are six extensions:</div>
+<div class="WideHanging-Term">.a</div><div class="WideHanging-Body">
+A file that contains only Ada code (except for configuration pragmas 
+in the case of some Specialized Needs Annex tests). It does not require 
+any processing to prepare it for compilation (unless configuration pragmas 
+must be handled separately). It is normally submitted directly to the 
+implementation for determination of test results.</div>
+<div class="WideHanging-Term">.am</div><div class="WideHanging-Body">
+A file that contains the main subprogram for a multi-file test. Generally, 
+this extension is used for only one file of a test. In rare cases (some 
+Annex E tests), a multi-file test may have more than one file containing 
+a &quot;main&quot; subprogram; in such cases, the correct testing procedure 
+is described in the Special Requirements section of the test prologue.</div>
+<div class="WideHanging-Term">.au</div><div class="WideHanging-Body">
+A file that contains only Ada code that contains characters outside of 
+the 7-bit ASCII character set. These files are provided in UTF-8 format 
+with a starting byte-order mark. For ACATS 4.2, these tests must be compiled 
+and run as all other tests of its test class, although usage of a different 
+workflow (which must be documented if it is necessary) is allowed. (Note 
+that <A HREF="UG-01.HTM#Ada2012">[Ada2012]</A> requires compilers to 
+be able to process UTF-8 source files, although the details [such as 
+compiler options] might be different than ASCII source files.)</div>
+<div class="WideHanging-Term">.ftn</div><div class="WideHanging-Body">
+A file that contains Fortran language code and must be compiled by a 
+Fortran compiler. These files are used by tests that check a foreign 
+language interface to Fortran.</div>
+<div class="WideHanging-Term">.c</div><div class="WideHanging-Body">
+A file that contains C language code and must be compiled by a C compiler. 
+These files are used by tests that check a foreign language interface 
+to C.</div>
+<div class="WideHanging-Term">.cbl</div><div class="WideHanging-Body">
+A file that contains Cobol language code and must be compiled by a Cobol 
+compiler. These files are used by tests that check a foreign language 
+interface to Cobol.&nbsp;</div>
+<div class="Normal">A test that depends on foundation code has an alphabetic 
+character in the fifth position of its name. The required foundation 
+will have the same characters in the second through fifth positions of 
+its name. For example, C<B>123A</B>xx depends on F<B>123A</B>00.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-431.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-433.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

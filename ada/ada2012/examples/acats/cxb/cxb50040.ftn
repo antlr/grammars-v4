@@ -1,0 +1,121 @@
+C CXB50040.FTNTDT 552-5600
+ 
+
+C
+C                         Grant of Unlimited Rights
+C
+C Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+C F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+C unlimited rights in the software and documentation contained herein.
+C Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+C this public release, the Government intends to confer upon all 
+C recipients unlimited rights  equal to those held by the Government.  
+C These rights include rights to use, duplicate, release or disclose the 
+C released technical data and computer software in whole or in part, in 
+C any manner and for any purpose whatsoever, and to have or permit others 
+C to do so.
+C
+C                                DISCLAIMER
+C
+C ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+C DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+C WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+C SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+C OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+C PARTICULAR PURPOSE OF SAID MATERIAL.
+C
+C----------------------------------------------------------------------
+C TEST OBJECTIVE
+C      See CXB50042.AM
+C
+C TEST DESCRIPTION
+C      The following Fortran subroutine, CXB50040, has six arguments, each 
+C      of a different type, and each of which is modified in a different 
+C      manner.  The modified arguments are returned to the calling program.
+C
+C      Inputs:
+C        There are six arguments to this Fortran subroutine:
+C          1) INTARR - an integer array of size three.
+C          2) RVALUE - a real variable.
+C          3) CHAR   - a character variable.
+C          4) STR    - a seven character string variable.
+C          5) BOOL   - a logical variable.
+C          6) DBL    - a double precision variable.
+C                      Note: Since the SQRT function is used to calculate
+C                            the square root, the argument provided to 
+C                            this subroutine must be positive.
+C      Processing:
+C        The six arguments are modified as follows:
+C          1) INTARR - each element of the integer array is doubled in 
+C                      value.
+C          2) RVALUE - the real value is squared.
+C          3) CHAR   - the character variable is set to 'Z'.
+C          4) STR    - the string variable is set to 'FORTRAN'.
+C          5) BOOL   - the logical variable is set to True.
+C          6) DBL    - the square root of the double precision value is
+C                    - calculated using the Fortran intrinsic function
+C                    - SQRT, with the result placed into the argument.
+C      Outputs:
+C        The six modified arguments (see Inputs) are returned.
+C
+C SPECIAL REQUIREMENTS:
+C      See CXB50042.AM
+C     
+C TEST FILES:
+C      The following files comprise this test:
+C
+C      => CXB50040.FTN
+C         CXB50041.FTN
+C         CXB50042.AM
+C
+C APPLICABILITY CRITERIA: 
+C      See CXB50042.AM
+C
+C CHANGE HISTORY:
+C    21 Mar 1996     SAIC     Initial release for ACVC 2.1.
+C    27 Oct 1996     SAIC     Revised argument type.
+C    01 DEC 1997     EDS      Correct bad Fortran
+C                               INTARR(3) => INTARR in formal parameter list
+C                               STR(7) => STR*7  in character definition
+C----------------------------------------------------------------------
+C
+      SUBROUTINE ARGS (INTARR, RVALUE, CHAR, STR, BOOL, DBL)
+C
+      INTEGER            INTARR(3)
+      REAL               RVALUE
+      CHARACTER          CHAR, STR*7
+      LOGICAL            BOOL
+      DOUBLE PRECISION   DBL
+C
+C     Double the value of each array item.
+C
+      INTARR(1) = INTARR(1) + INTARR(1)
+      INTARR(2) = INTARR(2) + INTARR(2)
+      INTARR(3) = INTARR(3) + INTARR(3)
+C
+C     Square the value of the real variable.
+C
+      RVALUE = RVALUE * RVALUE
+C
+C     Change the value of the character variable to 'Z'.
+C
+      CHAR = 'Z'
+C
+C     Set the value of the string to 'FORTRAN'.
+C
+      STR = 'FORTRAN'
+C
+C     Set the value of the logical variable to True.
+C     Use the string value set above in a logical operation.
+C
+      BOOL = STR .EQ. 'FORTRAN'
+C
+C     Set the value of the double precision variable equal to the 
+C     square root of its original value.
+C     Note: Argument must be positive double precision (or real) value
+C           for the intrinsic Fortran SQRT function.
+C
+      DBL = SQRT(DBL)
+C
+      RETURN
+      END

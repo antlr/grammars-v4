@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Compiling the Grading Tool and the Test Summary Tool</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    DIV.Indented3MediumHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 6.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented3MediumHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-612.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-614.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.1.3 Compiling the Grading Tool and the Test Summary Tool</H1>
+<div class="Normal" style="margin-bottom: 0.4em">The Grading Tool and 
+the Test Summary Tool are provided in six Ada source files. Some of the 
+files are shared by both tools, so we present them as a single group. 
+The six files are:</div>
+<div class="Indented3MediumHanging-Term">GRADE.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+The main subprogram for the grading tool; contains option processing 
+and test grading.</div>
+<div class="Indented3MediumHanging-Term">GRD_DATA.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+A package to store grading data; contains the code to read and display 
+all of the file information (events, test summaries, and manual grading 
+requests).</div>
+<div class="Indented3MediumHanging-Term">SPECIAL.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+A package containing the special handling for the test summary program. 
+This package contains the data needed to handle optional units and tests 
+with severe syntax errors that cannot be processed by normal means.</div>
+<div class="Indented3MediumHanging-Term">SUMMARY.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+The main subprogram for the test summary tool; contains lexical and syntactic 
+analysis for ACATS test files.</div>
+<div class="Indented3MediumHanging-Term">TRACE.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+A package containing the data types that define an event trace.</div>
+<div class="Indented3MediumHanging-Term">TST_SUM.A</div><div class="Indented3MediumHanging-Body"><br clear="left">
+A package containing the data types that define a test summary; it also 
+contains a routine to write an individual test summary record.&nbsp;</div>
+<div class="Normal">The source of the grading tools is written in Ada, 
+and only uses Ada 95 features other than the following:&nbsp;</div>
+<div class="Bulleted">Raise statements with messages;</div>
+<div class="Bulleted">Ada.Containers.Generic_Array_Sort;</div>
+<div class="Bulleted">Ada.Calendar.Formatting.&nbsp;</div>
+<div class="Normal">Uses of the first could be replaced by calls to Ada.Exceptions.Raise_Exception; 
+and the latter could be replaced by similar routines. We did not do this 
+for readability and to avoid re-inventing the wheel.</div>
+<div class="Normal">The source code should be compilable by any Ada 95 
+or later compiler that supports the above three features; it certainly 
+should be compilable by any Ada 2012 compiler.</div>
+<div class="Normal">As each Ada implementation uses different commands 
+for compiling, we can only give the general direction that the six source 
+files need to be compiled and then bound into two execuable programs: 
+Grade (the Grading Tool) and Summary (the Test Summary Tool). Elsewhere 
+in this documentation we assume that this has been done.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-612.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-614.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

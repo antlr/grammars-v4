@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Event Trace Files</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-615.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-621.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.2 Event Trace Files</H1>
+<div class="Normal">An event trace file includes each (interesting) event 
+that occurs during the compilation, binding/linking, and execution of 
+one or more ACATS tests. <A NAME="I1050"></A><A NAME="I1051"></A></div>
+<div class="Normal">An event trace file provides a way to present the 
+implementation-specific format of events to the Grading Tool in a common 
+format. In order for an ACATS user to use the Grading Tool, they will 
+need to provide a method to get an event trace file from the implementation's 
+processing of ACATS tests. There are a number of ways to accomplish that; 
+several are outlined in following subclauses. No matter what method is 
+selected, it should be possible to use the same options/tools for future 
+ACATS tests. (Developing a method to create event trace files should 
+be a one-time cost).</div>
+<div class="Normal">The events of an event trace file are intended to 
+be abstract representations of the processes of an implementation. It 
+should be possible to map the processes of any Ada implementation into 
+an event trace file.</div>
+<div class="Normal">The event trace file was selected as the method of 
+abstracting implementation processing in order to avoid the ACATS Grading 
+Tool from providing an disincentive to innovation in error handling by 
+Ada implementations. The files are not intended to be useful (directly) 
+to a human user, so their details should have little effect on the human 
+error handling interface for an implementation. Moreover, while the event 
+trace files provide values for error messages and positioning, neither 
+of these is required for formal grading (they're provided to making easier 
+for an ACATS user to figure out why a test is reported as failing). As 
+noted in <A HREF="UG-562.HTM">5.6.2</A>, the actual text of an error 
+message is not used to determine pass or fail for grading purposing; 
+only the specified location of the error is used.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-615.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-621.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

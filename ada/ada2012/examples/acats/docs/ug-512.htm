@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Guide to Decompressing Files</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-511.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5121.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>5.1.2 Guide to Decompressing Files</H1>
+<div class="Normal">The ACATS files are provided in two forms: compressed 
+in zip format and compressed in Unix compress format. Zipped files are 
+included in a zip archive (files) with the file extension .zip. A Unix 
+compressed files, with extension .Z, contains a Unix tar file. This section 
+provides generic instructions for uncompressing them. These instructions 
+are not the only ways to uncompress the files; sophisticated users may 
+wish to use their own procedures.</div>
+<div class="Normal" style="margin-bottom: 0.4em">If the instructions 
+below are used, the following subdirectories will have been created and 
+populated with test files after all decompression:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/a</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/be</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cd</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxc</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b2</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxa</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/ce</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxd</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b3</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c2</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxa</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxe</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b4</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c3</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxb</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxf</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b5</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c4</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cz</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxg</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b6</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c5</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/d</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cxh</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b7</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c6</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/e</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/lxd</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b8</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c7</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/l</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/lxe</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/b9</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c8</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxc</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/lxh</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/ba</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/c9</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxd</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/docs</SPAN></TT><TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bb</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/ca</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxe</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/support</SPAN></TT> <TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bc</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cb</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxf</SPAN></TT><TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bd</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/cc</SPAN></TT><TD align="left"><TT><SPAN STYLE="font-size: 80%">./acats4_2/bxh</SPAN></TT><TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove">Note that the names are given here in all lowercase; 
+some systems may create uppercase names. The path separator, shown here 
+as '/', may also differ.&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-511.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-5121.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

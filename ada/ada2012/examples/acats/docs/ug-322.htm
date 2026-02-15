@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>General Coverage Guidelines</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-321.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-323.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>3.2.2 General Coverage Guidelines</H1>
+<div class="Normal">As noted in Section <A HREF="UG-12.HTM">1.2</A>, 
+the ACATS strives for complete coverage of the Ada standard. However, 
+complete coverage does not mean that every sentence in the standard has 
+an associated test objective and test. Not all rules are testable; one 
+important way to determine testability of a rule is to check its category. 
+The next clause (<A HREF="UG-323.HTM">3.2.3</A>) will discuss how the 
+category of a rule affects its mapping to test objectives.</div>
+<div class="Normal">There are also additional considerations that don't 
+apply to specific rule categories.</div>
+<div class="Normal">Text sometimes contains definitions (especially in 
+Static Semantics rules). Definitions are hard to handle, because they 
+usually are not testable by themselves. The definition has to be used 
+in another rule to make them visible. For instance, a categorization 
+rule such as &quot;something is either this, that, or fuzzy&quot; cannot 
+be tested by itself. &quot;Something&quot; has to be used in some other 
+rule in order for the categorization to matter. That being the case, 
+it usually makes sense to test the definition as part of the other rule(s). 
+Such rules are marked as having a kind of &quot;Widely Used&quot; or 
+&quot;Subpart&quot; in the coverage documentation. &quot;Subpart&quot; 
+rules are tested as part of specific other objectives, while &quot;Widely 
+Used&quot; rules are thought to be tested by many tests indirectly (and 
+no attempt is made to verify that). In some cases, especially those that 
+otherwise would have a combinatorial explosion, it may make more sense 
+to test the definition as directly as possible (in which case objectives 
+will be assigned to the definition).</div>
+<div class="Normal">Text sometimes includes sentences marked as redundant 
+by the AARM. Such sentences should be given normatively elsewhere, and 
+the testing should be done in the place where they are normatively given. 
+The AARM often will indicate this place.</div>
+<div class="Normal">Combinational explosion is always a problem for visibility 
+rules. Rules that define the scope or visibility of something should 
+always be tested in place (even though other rules will need to be used 
+to accomplish that).</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-321.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-323.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,654 @@
+-- B851006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVES:
+--     Check that an object renaming declaration is illegal if it
+--     renames a discriminant-dependent component or subcomponent
+--     if the enclosing record type has an unconstrained nominal
+--     subtype and the object is not known to be constrained.
+--     Part B: Access types and dereferences.
+--
+-- TEST DESCRIPTION:
+--     This test follows the same outline as test B851005.
+--
+--     Discriminant dependent components can be:
+--     (1) A component with a discriminant constraint using a discriminant.
+--     (2) A component with an index constraint using a discriminant.
+--     (3) A component declared in a variant.
+--     We indicate components that are none of these by "Not DDC".
+--
+--     No enclosing object cannot have an unconstrained-but-definite
+--         nominal subtype that's not immutably limited and be:
+--     (A) A component of a containing composite type (of any other of these
+--         choices) [try both array and record cases];
+--     (B) A variable stand-alone object;
+--     (C) A formal "in out" or "out" parameter of a subprogram or entry;
+--     (D) A generic formal in out parameter (note: the subtype is
+--         unconstrained by 12.4(9/2) even if the named subtype is
+--         constrained);
+--     (E) A nonconstant return object in an extended return statement;
+--     (F) A dereference of a general access-to-object type (try an
+--         access-to-constant case);
+--     (G) A dereference of a pool-specific access-to-object type if the
+--         designated type has a constrained partial view;
+--     (H) A qualified expression of any of these cases (by AI12-0228-1).
+--     Additionally, in a generic body, we assume that a type descended from
+--     an untagged generic formal private or derived type is not indefinite
+--     and has a constrained partial view. (Thus, if the type is unconstrained,
+--     all of the cases noted above are illegal.) Also, formal access types
+--     are not pool-specific. We also check that rechecking of the
+--     above is done in generic instances.
+--
+--     All of the following can be the enclosing object, regardless of the
+--     subtype:
+--     (S) Any object of a immutably limited type;
+--     (T) Any object of an indefinite type;
+--     (U) A dereference of a pool-specific access-to-object type if the
+--         designated type does not have a constrained partial view;
+--     (V) A formal "in" parameter of a subprogram or entry;
+--     (W) A constant return object in an extended return statement;
+--     (X) A qualified aggregate;
+--     (Y) A function call;
+--     (Z) A stand-alone constant.
+--     (Recall that the rules need to pass for *all* enclosing objects of the
+--     renamed component; these cases don't automatically make the rename legal
+--     if there are other enclosing objects as well). We only try a few of
+--     these cases; C-Tests ought to be used to test these legal cases.
+--
+--     This test includes tests for all three kinds of components,
+--     and cases F, G, and U combined with modifiers A and H. Since the access
+--     object itself isn't relevant to these rules, we primarily try
+--     stand-alone access objects. We try a handful of other cases just to
+--     check that the source of the dereference isn't considered when
+--     enforcing these rules.
+--
+--     Note that there are five kinds of access types to check:
+--     (a) A named pool specific access type;
+--     (b) A named general access-to-object type; ("all")
+--     (c) A named general access-to-constant type; ("constant")
+--     (d) An anonymous access-to-object type;
+--     (e) An anonymous access-to-constant type.
+--     For the later two, the context could matter (the semantics of
+--     anonymous access type vary by context), so we try some cases
+--     of stand-alone objects, components, and of parameters.
+--
+-- CHANGE HISTORY:
+--     08 Jun 2018  RLB  Created test, patterning on B851005.
+
+package B851006 is
+
+   type R0 (D : Integer) is record
+      F : Integer := D;
+   end record;
+
+   type A0 is array (Integer range <>) of Integer;
+
+   type Rec (D : Integer := 1) is
+      record
+         F1 : Integer;
+         F2 : R0(D);
+         F3 : A0(1 .. D);
+         case D is
+            when 1 =>
+               F4 : Integer range -10 .. 0;
+               F5 : A0(1..5);
+            when others =>
+               F6 : Float;
+               F7 : R0(5);
+           end case;
+      end record;
+
+   type PCRec is private; -- Constrained partial view.
+
+   type PDRec (D : Integer := 1) is private;
+      -- Unconstrained definite partial view.
+
+   type PIRec (D : Integer) is private;
+      -- Unconstrained indefinite partial view.
+
+   type Outer_Rec is record
+      F : Rec;
+   end record;
+
+   procedure Fooey (A : in Rec); -- Force a body.
+
+private
+
+   type PCRec (D : Integer := 1) is
+      record
+         F1 : Integer;
+         F2 : R0(D);
+         F3 : A0(1 .. D);
+         case D is
+            when 1 =>
+               F4 : Integer range -10 .. 0;
+               F5 : A0(1..5);
+            when others =>
+               F6 : Float;
+               F7 : R0(5);
+           end case;
+      end record;
+
+   type PDRec (D : Integer := 1) is
+      record
+         F1 : Integer;
+         F2 : R0(D);
+         F3 : A0(1 .. D);
+         case D is
+            when 1 =>
+               F4 : Integer range -10 .. 0;
+               F5 : A0(1..5);
+            when others =>
+               F6 : Float;
+               F7 : R0(5);
+           end case;
+      end record;
+
+   type PIRec (D : Integer) is
+      record
+         F1 : Integer;
+         F2 : R0(D);
+         F3 : A0(1 .. D);
+         case D is
+            when 1 =>
+               F4 : Integer range -10 .. 0;
+               F5 : A0(1..5);
+            when others =>
+               F6 : Float;
+               F7 : R0(5);
+           end case;
+      end record;
+
+end B851006;
+
+package body B851006 is
+
+   procedure Fooey (A : in Rec) is
+   begin
+      null;
+   end Fooey;
+
+   type Acc1_Rec is access Rec;                -- Kind (a)
+   type Acc2_Rec is access all Rec;            -- Kind (b)
+   type Acc3_Rec is access constant Rec;       -- Kind (c)
+
+   V1 : Acc1_Rec;
+   V2 : Acc2_Rec;
+   V3 : Acc3_Rec;
+   V4 : access Rec;                            -- Kind (d)
+   V5 : access constant Rec;                   -- Kind (e)
+
+   A1X01 : Integer renames V1.F1;              -- OK. {4;1} (aU, not DDC)
+   A1X02 : R0 renames V1.F2;                   -- OK. {4;1} (aU1)
+   A1X03 : A0 renames V1.F3;                   -- OK. {4;1} (aU2)
+   A1X04 : Integer renames V1.F4;              -- OK. {4;1} (aU3)
+   A1X05 : A0 renames V1.F5;                   -- OK. {4;1} (aU3)
+   A1X06 : R0 renames V1.all.F2;               -- OK. {4;1} (aU1)
+   A1X07 : A0 renames V1.all.F3;               -- OK. {4;1} (aU2)
+   A1X08 : Float renames V1.all.F6;            -- OK. {4;1} (aU3)
+   A1X09 : R0 renames V1.F7;                   -- OK. {4;1} (aU3)
+   A1X10 : Integer renames V1.F2.F;            -- OK. {4;1} (aAU1)
+   A1X11 : Integer renames V1.F3(1);           -- OK. {4;1} (aAU2)
+   A1X12 : Integer renames V1.F7.F;            -- OK. {4;1} (aAU3)
+   A1X13 : R0 renames Acc1_Rec'(V1).F2;        -- OK. {4;1} (aHU1)
+   A1X14 : A0 renames Acc1_Rec'(V1).F3;        -- OK. {4;1} (aHU2)
+   A1X15 : Integer renames Acc1_Rec'(V1).F4;   -- OK. {4;1} (aHU3)
+   A1X16 : Integer renames Rec'(V1.all).F1;    -- OK. {4;1} (aUH, not DDC)
+   A1X17 : R0 renames Rec'(V1.all).F2;         -- OK. {4;1} (aUH1)
+   A1X18 : A0 renames Rec'(V1.all).F3;         -- OK. {4;1} (aUH2)
+   A1X19 : Integer renames Rec'(V1.all).F4;    -- OK. {4;1} (aUH3)
+
+   A2X01 : Integer renames V2.F1;              -- OK. {4;1} (bF, not DDC)
+   A2X02 : R0 renames V2.F2;                   -- ERROR: {4;1} (bF1)
+   A2X03 : A0 renames V2.F3;                   -- ERROR: {4;1} (bF2)
+   A2X04 : Integer renames V2.F4;              -- ERROR: {4;1} (bF3)
+   A2X05 : A0 renames V2.F5;                   -- ERROR: {4;1} (bF3)
+   A2X06 : R0 renames V2.all.F2;               -- ERROR: {4;1} (bF1)
+   A2X07 : A0 renames V2.all.F3;               -- ERROR: {4;1} (bF2)
+   A2X08 : Float renames V2.all.F6;            -- ERROR: {4;1} (bF3)
+   A2X09 : R0 renames V2.F7;                   -- ERROR: {4;1} (bF3)
+   A2X10 : Integer renames V2.F2.F;            -- ERROR: {4;1} (bAF1)
+   A2X11 : Integer renames V2.F3(1);           -- ERROR: {4;1} (bAF2)
+   A2X12 : Integer renames V2.F7.F;            -- ERROR: {4;1} (bAF3)
+   A2X13 : R0 renames Acc2_Rec'(V2).F2;        -- ERROR: {4;1} (bHF1)
+   A2X14 : A0 renames Acc2_Rec'(V2).F3;        -- ERROR: {4;1} (bHF2)
+   A2X15 : Integer renames Acc2_Rec'(V2).F4;   -- ERROR: {4;1} (bHF3)
+   A2X16 : Integer renames Rec'(V2.all).F1;    -- OK. {4;1} (bFH, not DDC)
+   A2X17 : R0 renames Rec'(V2.all).F2;         -- ERROR: {4;1} (bFH1)
+   A2X18 : A0 renames Rec'(V2.all).F3;         -- ERROR: {4;1} (bFH2)
+   A2X19 : Integer renames Rec'(V2.all).F4;    -- ERROR: {4;1} (bFH3)
+
+   A3X01 : Integer renames V3.F1;              -- OK. {4;1} (cF, not DDC)
+   A3X02 : R0 renames V3.F2;                   -- ERROR: {4;1} (cF1)
+   A3X03 : A0 renames V3.F3;                   -- ERROR: {4;1} (cF2)
+   A3X04 : Integer renames V3.F4;              -- ERROR: {4;1} (cF3)
+   A3X05 : A0 renames V3.F5;                   -- ERROR: {4;1} (cF3)
+   A3X06 : R0 renames V3.all.F2;               -- ERROR: {4;1} (cF1)
+   A3X07 : A0 renames V3.all.F3;               -- ERROR: {4;1} (cF2)
+   A3X08 : Float renames V3.all.F6;            -- ERROR: {4;1} (cF3)
+   A3X09 : R0 renames V3.F7;                   -- ERROR: {4;1} (cF3)
+   A3X10 : Integer renames V3.F2.F;            -- ERROR: {4;1} (cAF1)
+   A3X11 : Integer renames V3.F3(1);           -- ERROR: {4;1} (cAF2)
+   A3X12 : Integer renames V3.F7.F;            -- ERROR: {4;1} (cAF3)
+   A3X13 : R0 renames Acc3_Rec'(V3).F2;        -- ERROR: {4;1} (cHF1)
+   A3X14 : A0 renames Acc3_Rec'(V3).F3;        -- ERROR: {4;1} (cHF3)
+   A3X15 : Integer renames Acc3_Rec'(V3).F4;   -- ERROR: {4;1} (cHF3)
+   A3X16 : Integer renames Rec'(V3.all).F1;    -- OK. {4;1} (cFH, not DDC)
+   A3X17 : R0 renames Rec'(V3.all).F2;         -- ERROR: {4;1} (cFH1)
+   A3X18 : A0 renames Rec'(V3.all).F3;         -- ERROR: {4;1} (cFH2)
+   A3X19 : Integer renames Rec'(V3.all).F4;    -- ERROR: {4;1} (cFH3)
+
+   A4X01 : Integer renames V4.F1;              -- OK. {4;1} (dF, not DDC)
+   A4X02 : R0 renames V4.F2;                   -- ERROR: {4;1} (dF1)
+   A4X03 : A0 renames V4.F3;                   -- ERROR: {4;1} (dF2)
+   A4X04 : Integer renames V4.F4;              -- ERROR: {4;1} (dF3)
+   A4X05 : A0 renames V4.F5;                   -- ERROR: {4;1} (dF3)
+   A4X06 : R0 renames V4.all.F2;               -- ERROR: {4;1} (dF1)
+   A4X07 : A0 renames V4.all.F3;               -- ERROR: {4;1} (dF2)
+   A4X08 : Float renames V4.all.F6;            -- ERROR: {4;1} (dF3)
+   A4X09 : R0 renames V4.F7;                   -- ERROR: {4;1} (dF3)
+   A4X10 : Integer renames V4.F2.F;            -- ERROR: {4;1} (dAF1)
+   A4X11 : Integer renames V4.F3(1);           -- ERROR: {4;1} (dAF2)
+   A4X12 : Integer renames V4.F7.F;            -- ERROR: {4;1} (dAF3)
+   A4X16 : Integer renames Rec'(V4.all).F1;    -- OK. {4;1} (dFH, not DDC)
+   A4X17 : R0 renames Rec'(V4.all).F2;         -- ERROR: {4;1} (dFH1)
+   A4X18 : A0 renames Rec'(V4.all).F3;         -- ERROR: {4;1} (dFH2)
+   A4X19 : Integer renames Rec'(V4.all).F4;    -- ERROR: {4;1} (dFH3)
+
+   A5X01 : Integer renames V5.F1;              -- OK. {4;1} (eF, not DDC)
+   A5X02 : R0 renames V5.F2;                   -- ERROR: {4;1} (eF1)
+   A5X03 : A0 renames V5.F3;                   -- ERROR: {4;1} (eF2)
+   A5X04 : Integer renames V5.F4;              -- ERROR: {4;1} (eF3)
+   A5X05 : A0 renames V5.F5;                   -- ERROR: {4;1} (eF3)
+   A5X06 : R0 renames V5.all.F2;               -- ERROR: {4;1} (eF1)
+   A5X07 : A0 renames V5.all.F3;               -- ERROR: {4;1} (eF2)
+   A5X08 : Float renames V5.all.F6;            -- ERROR: {4;1} (eF3)
+   A5X09 : R0 renames V5.F7;                   -- ERROR: {4;1} (eF3)
+   A5X10 : Integer renames V5.F2.F;            -- ERROR: {4;1} (eAF1)
+   A5X11 : Integer renames V5.F3(1);           -- ERROR: {4;1} (eAF2)
+   A5X12 : Integer renames V5.F7.F;            -- ERROR: {4;1} (eAF3)
+   A5X16 : Integer renames Rec'(V5.all).F1;    -- OK. {4;1} (eFH, not DDC)
+   A5X17 : R0 renames Rec'(V5.all).F2;         -- ERROR: {4;1} (eFH1)
+   A5X18 : A0 renames Rec'(V5.all).F3;         -- ERROR: {4;1} (eFH2)
+   A5X19 : Integer renames Rec'(V5.all).F4;    -- ERROR: {4;1} (eFH3)
+
+   type Acc6_Rec is access PCRec;              -- Kind (a)
+   type Acc7_Rec is access all PCRec;          -- Kind (b)
+
+   V6 : Acc6_Rec;
+   V7 : Acc7_Rec;
+
+   A6X01 : Integer renames V6.F1;              -- OK. {4;1} (aG, not DDC)
+   A6X02 : R0 renames V6.F2;                   -- ERROR: {4;1} (aG1)
+   A6X03 : A0 renames V6.F3;                   -- ERROR: {4;1} (aG2)
+   A6X04 : Integer renames V6.F4;              -- ERROR: {4;1} (aG3)
+   A6X05 : A0 renames V6.F5;                   -- ERROR: {4;1} (aG3)
+   A6X06 : R0 renames V6.all.F2;               -- ERROR: {4;1} (aG1)
+   A6X07 : A0 renames V6.all.F3;               -- ERROR: {4;1} (aG2)
+   A6X08 : Float renames V6.all.F6;            -- ERROR: {4;1} (aG3)
+   A6X09 : R0 renames V6.F7;                   -- ERROR: {4;1} (aG3)
+   A6X10 : Integer renames V6.F2.F;            -- ERROR: {4;1} (aAG1)
+   A6X11 : Integer renames V6.F3(1);           -- ERROR: {4;1} (aAG2)
+   A6X12 : Integer renames V6.F7.F;            -- ERROR: {4;1} (aAG3)
+   A6X13 : R0 renames Acc6_Rec'(V6).F2;        -- ERROR: {4;1} (aHG1)
+   A6X14 : A0 renames Acc6_Rec'(V6).F3;        -- ERROR: {4;1} (aHG2)
+   A6X15 : Integer renames Acc6_Rec'(V6).F4;   -- ERROR: {4;1} (aHG3)
+   A6X16 : Integer renames PCRec'(V6.all).F1;  -- OK. {4;1} (aGH, not DDC)
+   A6X17 : R0 renames PCRec'(V6.all).F2;       -- ERROR: {4;1} (aGH1)
+   A6X18 : A0 renames PCRec'(V6.all).F3;       -- ERROR: {4;1} (aGH2)
+   A6X19 : Integer renames PCRec'(V6.all).F4;  -- ERROR: {4;1} (aGH3)
+
+   A7X01 : Integer renames V7.F1;              -- OK. {4;1} (bF, not DDC)
+   A7X02 : R0 renames V7.F2;                   -- ERROR: {4;1} (bF1)
+   A7X03 : A0 renames V7.F3;                   -- ERROR: {4;1} (bF2)
+   A7X04 : Integer renames V7.F4;              -- ERROR: {4;1} (bF3)
+   A7X05 : A0 renames V7.F5;                   -- ERROR: {4;1} (bF3)
+   A7X06 : R0 renames V7.all.F2;               -- ERROR: {4;1} (bF1)
+   A7X07 : A0 renames V7.all.F3;               -- ERROR: {4;1} (bF2)
+   A7X08 : Float renames V7.all.F6;            -- ERROR: {4;1} (bF3)
+   A7X09 : R0 renames V7.F7;                   -- ERROR: {4;1} (bF3)
+   A7X10 : Integer renames V7.F2.F;            -- ERROR: {4;1} (bAF1)
+   A7X11 : Integer renames V7.F3(1);           -- ERROR: {4;1} (bAF2)
+   A7X12 : Integer renames V7.F7.F;            -- ERROR: {4;1} (bAF3)
+   A7X13 : R0 renames Acc7_Rec'(V7).F2;        -- ERROR: {4;1} (bHF1)
+   A7X14 : A0 renames Acc7_Rec'(V7).F3;        -- ERROR: {4;1} (bHF2)
+   A7X15 : Integer renames Acc7_Rec'(V7).F4;   -- ERROR: {4;1} (bHF3)
+   A7X16 : Integer renames PCRec'(V7.all).F1;  -- OK. {4;1} (bFH, not DDC)
+   A7X17 : R0 renames PCRec'(V7.all).F2;       -- ERROR: {4;1} (bFH1)
+   A7X18 : A0 renames PCRec'(V7.all).F3;       -- ERROR: {4;1} (bFH2)
+   A7X19 : Integer renames PCRec'(V7.all).F4;  -- ERROR: {4;1} (bFH3)
+
+   type Acc8_Rec is access PDRec;              -- Kind (a)
+   type Acc9_Rec is access constant PDRec;     -- Kind (c)
+
+   V8 : Acc8_Rec;
+   V9 : Acc9_Rec;
+
+   A8X01 : Integer renames V8.F1;              -- OK. {4;1} (aU, not DDC)
+   A8X02 : R0 renames V8.F2;                   -- OK. {4;1} (aU1)
+   A8X03 : A0 renames V8.F3;                   -- OK. {4;1} (aU2)
+   A8X04 : Integer renames V8.F4;              -- OK. {4;1} (aU3)
+   A8X05 : A0 renames V8.F5;                   -- OK. {4;1} (aU3)
+   A8X06 : R0 renames V8.all.F2;               -- OK. {4;1} (aU1)
+   A8X07 : A0 renames V8.all.F3;               -- OK. {4;1} (aU2)
+   A8X08 : Float renames V8.all.F6;            -- OK. {4;1} (aU3)
+   A8X09 : R0 renames V8.F7;                   -- OK. {4;1} (aU3)
+   A8X10 : Integer renames V8.F2.F;            -- OK. {4;1} (aAU1)
+   A8X11 : Integer renames V8.F3(1);           -- OK. {4;1} (aAU2)
+   A8X12 : Integer renames V8.F7.F;            -- OK. {4;1} (aAU3)
+   A8X13 : R0 renames Acc8_Rec'(V8).F2;        -- OK. {4;1} (aHU1)
+   A8X14 : A0 renames Acc8_Rec'(V8).F3;        -- OK. {4;1} (aHU2)
+   A8X15 : Integer renames Acc8_Rec'(V8).F4;   -- OK. {4;1} (aHU3)
+   A8X16 : Integer renames PDRec'(V8.all).F1;  -- OK. {4;1} (aUH, not DDC)
+   A8X17 : R0 renames PDRec'(V8.all).F2;       -- OK. {4;1} (aUH1)
+   A8X18 : A0 renames PDRec'(V8.all).F3;       -- OK. {4;1} (aUH2)
+   A8X19 : Integer renames PDRec'(V8.all).F4;  -- OK. {4;1} (aUH3)
+
+   A9X01 : Integer renames V9.F1;              -- OK. {4;1} (cF, not DDC)
+   A9X02 : R0 renames V9.F2;                   -- ERROR: {4;1} (cF1)
+   A9X03 : A0 renames V9.F3;                   -- ERROR: {4;1} (cF2)
+   A9X04 : Integer renames V9.F4;              -- ERROR: {4;1} (cF3)
+   A9X05 : A0 renames V9.F5;                   -- ERROR: {4;1} (cF3)
+   A9X06 : R0 renames V9.all.F2;               -- ERROR: {4;1} (cF1)
+   A9X07 : A0 renames V9.all.F3;               -- ERROR: {4;1} (cF2)
+   A9X08 : Float renames V9.all.F6;            -- ERROR: {4;1} (cF3)
+   A9X09 : R0 renames V9.F7;                   -- ERROR: {4;1} (cF3)
+   A9X10 : Integer renames V9.F2.F;            -- ERROR: {4;1} (cAF1)
+   A9X11 : Integer renames V9.F3(1);           -- ERROR: {4;1} (cAF2)
+   A9X12 : Integer renames V9.F7.F;            -- ERROR: {4;1} (cAF3)
+   A9X13 : R0 renames Acc9_Rec'(V9).F2;        -- ERROR: {4;1} (cHF1)
+   A9X14 : A0 renames Acc9_Rec'(V9).F3;        -- ERROR: {4;1} (cHF2)
+   A9X15 : Integer renames Acc9_Rec'(V9).F4;   -- ERROR: {4;1} (cHF3)
+   A9X16 : Integer renames PDRec'(V9.all).F1;  -- OK. {4;1} (cFH, not DDC)
+   A9X17 : R0 renames PDRec'(V9.all).F2;       -- ERROR: {4;1} (cFH1)
+   A9X18 : A0 renames PDRec'(V9.all).F3;       -- ERROR: {4;1} (cFH2)
+   A9X19 : Integer renames PDRec'(V9.all).F4;  -- ERROR: {4;1} (cFH3)
+
+   type AccA_Rec is access PIRec;              -- Kind (a)
+   type AccB_Rec is access all PIRec;          -- Kind (b)
+
+   VA : AccA_Rec;
+   VB : AccB_Rec;
+
+   AAX01 : Integer renames VA.F1;              -- OK. {4;1} (aU, not DDC)
+   AAX02 : R0 renames VA.F2;                   -- OK. {4;1} (aU1)
+   AAX03 : A0 renames VA.F3;                   -- OK. {4;1} (aU2)
+   AAX04 : Integer renames VA.F4;              -- OK. {4;1} (aU3)
+   AAX05 : A0 renames VA.F5;                   -- OK. {4;1} (aU3)
+   AAX06 : R0 renames VA.all.F2;               -- OK. {4;1} (aU1)
+   AAX07 : A0 renames VA.all.F3;               -- OK. {4;1} (aU2)
+   AAX08 : Float renames VA.all.F6;            -- OK. {4;1} (aU3)
+   AAX09 : R0 renames VA.F7;                   -- OK. {4;1} (aU3)
+   AAX10 : Integer renames VA.F2.F;            -- OK. {4;1} (aAU1)
+   AAX11 : Integer renames VA.F3(1);           -- OK. {4;1} (aAU2)
+   AAX12 : Integer renames VA.F7.F;            -- OK. {4;1} (aAU3)
+   AAX13 : R0 renames AccA_Rec'(VA).F2;        -- OK. {4;1} (aHU1)
+   AAX14 : A0 renames AccA_Rec'(VA).F3;        -- OK. {4;1} (aHU2)
+   AAX15 : Integer renames AccA_Rec'(VA).F4;   -- OK. {4;1} (aHU3)
+   AAX16 : Integer renames PIRec'(VA.all).F1;  -- OK. {4;1} (aUH, not DDC)
+   AAX17 : R0 renames PIRec'(VA.all).F2;       -- OK. {4;1} (aUH1)
+   AAX18 : A0 renames PIRec'(VA.all).F3;       -- OK. {4;1} (aUH2)
+   AAX19 : Integer renames PIRec'(VA.all).F4;  -- OK. {4;1} (aUH3)
+
+   ABX01 : Integer renames VB.F1;              -- OK. {4;1} (bS, not DDC)
+   ABX02 : R0 renames VB.F2;                   -- OK. {4;1} (bS1)
+   ABX03 : A0 renames VB.F3;                   -- OK. {4;1} (bS2)
+   ABX04 : Integer renames VB.F4;              -- OK. {4;1} (bS3)
+   ABX05 : A0 renames VB.F5;                   -- OK. {4;1} (bS3)
+   ABX06 : R0 renames VB.all.F2;               -- OK. {4;1} (bS1)
+   ABX07 : A0 renames VB.all.F3;               -- OK. {4;1} (bS2)
+   ABX08 : Float renames VB.all.F6;            -- OK. {4;1} (bS3)
+   ABX09 : R0 renames VB.F7;                   -- OK. {4;1} (bS3)
+   ABX10 : Integer renames VB.F2.F;            -- OK. {4;1} (bAS1)
+   ABX11 : Integer renames VB.F3(1);           -- OK. {4;1} (bAS2)
+   ABX12 : Integer renames VB.F7.F;            -- OK. {4;1} (bAS3)
+   ABX13 : R0 renames AccB_Rec'(VB).F2;        -- OK. {4;1} (bHS1)
+   ABX14 : A0 renames AccB_Rec'(VB).F3;        -- OK. {4;1} (bHS2)
+   ABX15 : Integer renames AccB_Rec'(VB).F4;   -- OK. {4;1} (bHS3)
+   ABX16 : Integer renames PIRec'(VB.all).F1;  -- OK. {4;1} (bSH, not DDC)
+   ABX17 : R0 renames PIRec'(VB.all).F2;       -- OK. {4;1} (bSH1)
+   ABX18 : A0 renames PIRec'(VB.all).F3;       -- OK. {4;1} (bSH2)
+   ABX19 : Integer renames PIRec'(VB.all).F4;  -- OK. {4;1} (bSH3)
+
+
+   type AccC_Rec is access Outer_Rec;          -- Kind (a)
+   type AccD_Rec is access all Outer_Rec;      -- Kind (b)
+
+   VC : AccC_Rec;
+   VD : AccD_Rec;
+
+   ACX01 : Integer renames VC.F.F1;            -- OK. {4;1} (aUA, not DDC)
+   ACX02 : R0 renames VC.F.F2;                 -- ERROR: {4;1} (aUA1)
+   ACX03 : A0 renames VC.F.F3;                 -- ERROR: {4;1} (aUA2)
+   ACX04 : Integer renames VC.F.F4;            -- ERROR: {4;1} (aUA3)
+   ACX05 : A0 renames VC.F.F5;                 -- ERROR: {4;1} (aUA3)
+   ACX06 : R0 renames VC.F.all.F2;             -- ERROR: {4;1} (aUA1)
+   ACX07 : A0 renames VC.F.all.F3;             -- ERROR: {4;1} (aUA2)
+   ACX08 : Float renames VC.F.all.F6;          -- ERROR: {4;1} (aUA3)
+   ACX09 : R0 renames VC.F.F7;                 -- ERROR: {4;1} (aUA3)
+   ACX10 : Integer renames VC.F.F2.F;          -- ERROR: {4;1} (AAUA1)
+   ACX11 : Integer renames VC.F.F3(1);         -- ERROR: {4;1} (AAUA2)
+   ACX12 : Integer renames VC.F.F7.F;          -- ERROR: {4;1} (AAUA3)
+   ACX13 : R0 renames AccC_Rec'(VC).F.F2;      -- ERROR: {4;1} (aHUA1)
+   ACX14 : A0 renames AccC_Rec'(VC).F.F3;      -- ERROR: {4;1} (aHUA2)
+   ACX15 : Integer renames AccC_Rec'(VC).F.F4; -- ERROR: {4;1} (aHUA3)
+   ACX16 : Integer renames Rec'(VC.all.F).F1;  -- OK. {4;1} (aUAH, not DDC)
+   ACX17 : R0 renames Rec'(VC.all.F).F2;       -- ERROR: {4;1} (aUAH1)
+   ACX18 : A0 renames Rec'(VC.all.F).F3;       -- ERROR: {4;1} (aUAH2)
+   ACX19 : Integer renames Rec'(VC.F.all).F4;  -- ERROR: {4;1} (aUAH3)
+
+   ADX01 : Integer renames VD.F.F1;            -- OK. {4;1} (bS, not DDC)
+   ADX02 : R0 renames VD.F.F2;                 -- ERROR: {4;1} (bS1)
+   ADX03 : A0 renames VD.F.F3;                 -- ERROR: {4;1} (bS2)
+   ADX04 : Integer renames VD.F.F4;            -- ERROR: {4;1} (bS3)
+   ADX05 : A0 renames VD.F.F5;                 -- ERROR: {4;1} (bS3)
+   ADX06 : R0 renames VD.F.all.F2;             -- ERROR: {4;1} (bS1)
+   ADX07 : A0 renames VD.F.all.F3;             -- ERROR: {4;1} (bS2)
+   ADX08 : Float renames VD.F.all.F6;          -- ERROR: {4;1} (bS3)
+   ADX09 : R0 renames VD.F.F7;                 -- ERROR: {4;1} (bS3)
+   ADX10 : Integer renames VD.F.F2.F;          -- ERROR: {4;1} (bAS1)
+   ADX11 : Integer renames VD.F.F3(1);         -- ERROR: {4;1} (bAS2)
+   ADX12 : Integer renames VD.F.F7.F;          -- ERROR: {4;1} (bAS3)
+   ADX13 : R0 renames AccD_Rec'(VD).F.F2;      -- ERROR: {4;1} (bHS1)
+   ADX14 : A0 renames AccD_Rec'(VD).F.F3;      -- ERROR: {4;1} (bHS2)
+   ADX15 : Integer renames AccD_Rec'(VD).F.F4; -- ERROR: {4;1} (bHS3)
+   ADX16 : Integer renames Rec'(VD.all.F).F1;  -- OK. {4;1} (bSH, not DDC)
+   ADX17 : R0 renames Rec'(VD.all.F).F2;       -- ERROR: {4;1} (bSH1)
+   ADX18 : A0 renames Rec'(VD.all.F).F3;       -- ERROR: {4;1} (bSH2)
+   ADX19 : Integer renames Rec'(VD.all.F).F4;  -- ERROR: {4;1} (bSH3)
+
+   procedure Params
+     (P1 : access Rec;                         -- Kind (d)
+      P2 : access constant Rec;                -- Kind (e)
+      P3 : access PDRec) is                    -- Kind (d)
+
+      P1X01 : Integer renames P1.F1;           -- OK. {7;1} (dF, not DDC)
+      P1X02 : R0 renames P1.F2;                -- ERROR: {7;1} (dF1)
+      P1X03 : A0 renames P1.F3;                -- ERROR: {7;1} (dF2)
+      P1X04 : Integer renames P1.F4;           -- ERROR: {7;1} (dF3)
+      P1X05 : A0 renames P1.F5;                -- ERROR: {7;1} (dF3)
+      P1X06 : R0 renames P1.all.F2;            -- ERROR: {7;1} (dF1)
+      P1X07 : A0 renames P1.all.F3;            -- ERROR: {7;1} (dF2)
+      P1X08 : Float renames P1.all.F6;         -- ERROR: {7;1} (dF3)
+      P1X09 : R0 renames P1.F7;                -- ERROR: {7;1} (dF3)
+      P1X10 : Integer renames P1.F2.F;         -- ERROR: {7;1} (dAF1)
+      P1X11 : Integer renames P1.F3(1);        -- ERROR: {7;1} (dAF2)
+      P1X12 : Integer renames P1.F7.F;         -- ERROR: {7;1} (dAF3)
+      P1X16 : Integer renames Rec'(P1.all).F1; -- OK. {7;1} (dFH, not DDC)
+      P1X17 : R0 renames Rec'(P1.all).F2;      -- ERROR: {7;1} (dFH1)
+      P1X18 : A0 renames Rec'(P1.all).F3;      -- ERROR: {7;1} (dFH2)
+      P1X19 : Integer renames Rec'(P1.all).F4; -- ERROR: {7;1} (dFH3)
+
+      P2X01 : Integer renames P2.F1;           -- OK. {7;1} (eF, not DDC)
+      P2X02 : R0 renames P2.F2;                -- ERROR: {7;1} (eF1)
+      P2X03 : A0 renames P2.F3;                -- ERROR: {7;1} (eF2)
+      P2X04 : Integer renames P2.F4;           -- ERROR: {7;1} (eF3)
+      P2X05 : A0 renames P2.F5;                -- ERROR: {7;1} (eF3)
+      P2X06 : R0 renames P2.all.F2;            -- ERROR: {7;1} (eF1)
+      P2X07 : A0 renames P2.all.F3;            -- ERROR: {7;1} (eF2)
+      P2X08 : Float renames P2.all.F6;         -- ERROR: {7;1} (eF3)
+      P2X09 : R0 renames P2.F7;                -- ERROR: {7;1} (eF3)
+      P2X10 : Integer renames P2.F2.F;         -- ERROR: {7;1} (eAF1)
+      P2X11 : Integer renames P2.F3(1);        -- ERROR: {7;1} (eAF2)
+      P2X12 : Integer renames P2.F7.F;         -- ERROR: {7;1} (eAF3)
+      P2X16 : Integer renames Rec'(P2.all).F1; -- OK. {7;1} (eFH, not DDC)
+      P2X17 : R0 renames Rec'(P2.all).F2;      -- ERROR: {7;1} (eFH1)
+      P2X18 : A0 renames Rec'(P2.all).F3;      -- ERROR: {7;1} (eFH2)
+      P2X19 : Integer renames Rec'(P2.all).F4; -- ERROR: {7;1} (eFH3)
+
+      P3X01 : Integer renames P3.F1;           -- OK. {7;1} (dF, not DDC)
+      P3X02 : R0 renames P3.F2;                -- ERROR: {7;1} (dF1)
+      P3X03 : A0 renames P3.F3;                -- ERROR: {7;1} (dF2)
+      P3X04 : Integer renames P3.F4;           -- ERROR: {7;1} (dF3)
+      P3X05 : A0 renames P3.F5;                -- ERROR: {7;1} (dF3)
+      P3X06 : R0 renames P3.all.F2;            -- ERROR: {7;1} (dF1)
+      P3X07 : A0 renames P3.all.F3;            -- ERROR: {7;1} (dF2)
+      P3X08 : Float renames P3.all.F6;         -- ERROR: {7;1} (dF3)
+      P3X09 : R0 renames P3.F7;                -- ERROR: {7;1} (dF3)
+      P3X10 : Integer renames P3.F2.F;         -- ERROR: {7;1} (dAF1)
+      P3X11 : Integer renames P3.F3(1);        -- ERROR: {7;1} (dAF2)
+      P3X12 : Integer renames P3.F7.F;         -- ERROR: {7;1} (dAF3)
+      P3X16 : Integer renames PDRec'(P3.all).F1;-- OK. {7;1} (dFH, not DDC)
+      P3X17 : R0 renames PDRec'(P3.all).F2;    -- ERROR: {7;1} (dFH1)
+      P3X18 : A0 renames PDRec'(P3.all).F3;    -- ERROR: {7;1} (dFH2)
+      P3X19 : Integer renames PDRec'(P3.all).F4;-- ERROR: {7;1} (dFH3)
+   begin
+      null;
+   end Params;
+
+   type Holder_Rec is record
+      C1 : Acc1_Rec;                           -- Kind (a)
+      C2 : Acc2_Rec;                           -- Kind (b)
+      C3 : Acc3_Rec;                           -- Kind (c)
+      C4 : access Rec;                         -- Kind (d)
+      C5 : access constant Rec;                -- Kind (e)
+   end record;
+
+   VH : Holder_Rec;
+
+   AC1X01 : Integer renames VH.C1.F1;          -- OK. {4;1} (aU, not DDC)
+   AC1X02 : R0 renames VH.C1.F2;               -- OK. {4;1} (aU1)
+   AC1X03 : A0 renames VH.C1.F3;               -- OK. {4;1} (aU2)
+   AC1X04 : Integer renames VH.C1.F4;          -- OK. {4;1} (aU3)
+   AC1X05 : A0 renames VH.C1.F5;               -- OK. {4;1} (aU3)
+   AC1X06 : R0 renames VH.C1.all.F2;           -- OK. {4;1} (aU1)
+   AC1X07 : A0 renames VH.C1.all.F3;           -- OK. {4;1} (aU2)
+   AC1X08 : Float renames VH.C1.all.F6;        -- OK. {4;1} (aU3)
+   AC1X09 : R0 renames VH.C1.F7;               -- OK. {4;1} (aU3)
+   AC1X10 : Integer renames VH.C1.F2.F;        -- OK. {4;1} (aAU1)
+   AC1X11 : Integer renames VH.C1.F3(1);       -- OK. {4;1} (aAU2)
+   AC1X12 : Integer renames VH.C1.F7.F;        -- OK. {4;1} (aAU3)
+   AC1X13 : R0 renames Acc1_Rec'(VH.C1).F2;    -- OK. {4;1} (aHU1)
+   AC1X14 : A0 renames Acc1_Rec'(VH.C1).F3;    -- OK. {4;1} (aHU2)
+   AC1X15 : Integer renames Acc1_Rec'(VH.C1).F4;-- OK. {4;1} (aHU3)
+   AC1X16 : Integer renames Rec'(VH.C1.all).F1;-- OK. {4;1} (aUH, not DDC)
+   AC1X17 : R0 renames Rec'(VH.C1.all).F2;     -- OK. {4;1} (aUH1)
+   AC1X18 : A0 renames Rec'(VH.C1.all).F3;     -- OK. {4;1} (aUH2)
+   AC1X19 : Integer renames Rec'(VH.C1.all).F4;-- OK. {4;1} (aUH3)
+
+   AC2X01 : Integer renames VH.C2.F1;          -- OK. {4;1} (bF, not DDC)
+   AC2X02 : R0 renames VH.C2.F2;               -- ERROR: {4;1} (bF1)
+   AC2X03 : A0 renames VH.C2.F3;               -- ERROR: {4;1} (bF2)
+   AC2X04 : Integer renames VH.C2.F4;          -- ERROR: {4;1} (bF3)
+   AC2X05 : A0 renames VH.C2.F5;               -- ERROR: {4;1} (bF3)
+   AC2X06 : R0 renames VH.C2.all.F2;           -- ERROR: {4;1} (bF1)
+   AC2X07 : A0 renames VH.C2.all.F3;           -- ERROR: {4;1} (bF2)
+   AC2X08 : Float renames VH.C2.all.F6;        -- ERROR: {4;1} (bF3)
+   AC2X09 : R0 renames VH.C2.F7;               -- ERROR: {4;1} (bF3)
+   AC2X10 : Integer renames VH.C2.F2.F;        -- ERROR: {4;1} (bAF1)
+   AC2X11 : Integer renames VH.C2.F3(1);       -- ERROR: {4;1} (bAF2)
+   AC2X12 : Integer renames VH.C2.F7.F;        -- ERROR: {4;1} (bAF3)
+   AC2X13 : R0 renames Acc2_Rec'(VH.C2).F2;    -- ERROR: {4;1} (bHF1)
+   AC2X14 : A0 renames Acc2_Rec'(VH.C2).F3;    -- ERROR: {4;1} (bHF2)
+   AC2X15 : Integer renames Acc2_Rec'(VH.C2).F4;-- ERROR: {4;1} (bHF3)
+   AC2X16 : Integer renames Rec'(VH.C2.all).F1;-- OK. {4;1} (bFH, not DDC)
+   AC2X17 : R0 renames Rec'(VH.C2.all).F2;     -- ERROR: {4;1} (bFH1)
+   AC2X18 : A0 renames Rec'(VH.C2.all).F3;     -- ERROR: {4;1} (bFH2)
+   AC2X19 : Integer renames Rec'(VH.C2.all).F4;-- ERROR: {4;1} (bFH3)
+
+   AC3X01 : Integer renames VH.C3.F1;          -- OK. {4;1} (cF, not DDC)
+   AC3X02 : R0 renames VH.C3.F2;               -- ERROR: {4;1} (cF1)
+   AC3X03 : A0 renames VH.C3.F3;               -- ERROR: {4;1} (cF2)
+   AC3X04 : Integer renames VH.C3.F4;          -- ERROR: {4;1} (cF3)
+   AC3X05 : A0 renames VH.C3.F5;               -- ERROR: {4;1} (cF3)
+   AC3X06 : R0 renames VH.C3.all.F2;           -- ERROR: {4;1} (cF1)
+   AC3X07 : A0 renames VH.C3.all.F3;           -- ERROR: {4;1} (cF2)
+   AC3X08 : Float renames VH.C3.all.F6;        -- ERROR: {4;1} (cF3)
+   AC3X09 : R0 renames VH.C3.F7;               -- ERROR: {4;1} (cF3)
+   AC3X10 : Integer renames VH.C3.F2.F;        -- ERROR: {4;1} (cAF1)
+   AC3X11 : Integer renames VH.C3.F3(1);       -- ERROR: {4;1} (cAF2)
+   AC3X12 : Integer renames VH.C3.F7.F;        -- ERROR: {4;1} (cAF3)
+   AC3X13 : R0 renames Acc3_Rec'(VH.C3).F2;    -- ERROR: {4;1} (cHF1)
+   AC3X14 : A0 renames Acc3_Rec'(VH.C3).F3;    -- ERROR: {4;1} (cHF3)
+   AC3X15 : Integer renames Acc3_Rec'(VH.C3).F4;-- ERROR: {4;1} (cHF3)
+   AC3X16 : Integer renames Rec'(VH.C3.all).F1;-- OK. {4;1} (cFH, not DDC)
+   AC3X17 : R0 renames Rec'(VH.C3.all).F2;     -- ERROR: {4;1} (cFH1)
+   AC3X18 : A0 renames Rec'(VH.C3.all).F3;     -- ERROR: {4;1} (cFH2)
+   AC3X19 : Integer renames Rec'(VH.C3.all).F4;-- ERROR: {4;1} (cFH3)
+
+   AC4X01 : Integer renames VH.C4.F1;          -- OK. {4;1} (dF, not DDC)
+   AC4X02 : R0 renames VH.C4.F2;               -- ERROR: {4;1} (dF1)
+   AC4X03 : A0 renames VH.C4.F3;               -- ERROR: {4;1} (dF2)
+   AC4X04 : Integer renames VH.C4.F4;          -- ERROR: {4;1} (dF3)
+   AC4X05 : A0 renames VH.C4.F5;               -- ERROR: {4;1} (dF3)
+   AC4X06 : R0 renames VH.C4.all.F2;           -- ERROR: {4;1} (dF1)
+   AC4X07 : A0 renames VH.C4.all.F3;           -- ERROR: {4;1} (dF2)
+   AC4X08 : Float renames VH.C4.all.F6;        -- ERROR: {4;1} (dF3)
+   AC4X09 : R0 renames VH.C4.F7;               -- ERROR: {4;1} (dF3)
+   AC4X10 : Integer renames VH.C4.F2.F;        -- ERROR: {4;1} (dAF1)
+   AC4X11 : Integer renames VH.C4.F3(1);       -- ERROR: {4;1} (dAF2)
+   AC4X12 : Integer renames VH.C4.F7.F;        -- ERROR: {4;1} (dAF3)
+   AC4X16 : Integer renames Rec'(VH.C4.all).F1;-- OK. {4;1} (dFH, not DDC)
+   AC4X17 : R0 renames Rec'(VH.C4.all).F2;     -- ERROR: {4;1} (dFH1)
+   AC4X18 : A0 renames Rec'(VH.C4.all).F3;     -- ERROR: {4;1} (dFH2)
+   AC4X19 : Integer renames Rec'(VH.C4.all).F4;-- ERROR: {4;1} (dFH3)
+
+   AC5X01 : Integer renames VH.C5.F1;          -- OK. {4;1} (eF, not DDC)
+   AC5X02 : R0 renames VH.C5.F2;               -- ERROR: {4;1} (eF1)
+   AC5X03 : A0 renames VH.C5.F3;               -- ERROR: {4;1} (eF2)
+   AC5X04 : Integer renames VH.C5.F4;          -- ERROR: {4;1} (eF3)
+   AC5X05 : A0 renames VH.C5.F5;               -- ERROR: {4;1} (eF3)
+   AC5X06 : R0 renames VH.C5.all.F2;           -- ERROR: {4;1} (eF1)
+   AC5X07 : A0 renames VH.C5.all.F3;           -- ERROR: {4;1} (eF2)
+   AC5X08 : Float renames VH.C5.all.F6;        -- ERROR: {4;1} (eF3)
+   AC5X09 : R0 renames VH.C5.F7;               -- ERROR: {4;1} (eF3)
+   AC5X10 : Integer renames VH.C5.F2.F;        -- ERROR: {4;1} (eAF1)
+   AC5X11 : Integer renames VH.C5.F3(1);       -- ERROR: {4;1} (eAF2)
+   AC5X12 : Integer renames VH.C5.F7.F;        -- ERROR: {4;1} (eAF3)
+   AC5X16 : Integer renames Rec'(VH.C5.all).F1;-- OK. {4;1} (eFH, not DDC)
+   AC5X17 : R0 renames Rec'(VH.C5.all).F2;     -- ERROR: {4;1} (eFH1)
+   AC5X18 : A0 renames Rec'(VH.C5.all).F3;     -- ERROR: {4;1} (eFH2)
+   AC5X19 : Integer renames Rec'(VH.C5.all).F4;-- ERROR: {4;1} (eFH3)
+
+end B851006;
+

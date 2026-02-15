@@ -1,0 +1,649 @@
+-- CXE4003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the task executing a remote subprogram call blocks
+--      until the subprogram in the called partition returns.
+--      Check that a remote procedure call can be aborted.
+--      Check that remote subprogram calls are executed at most once.
+--      Check that potentially concurrent calls from multiple tasks
+--      can be handled by the PCS.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--        CXE4003_A             - partition A main procedure
+--        CXE4003_B             - partition B main procedure
+--        CXE4003_Part_B1       - RCI package
+--        CXE4003_Generic_RCI   - generic package
+--        CXE4003_Part_B2       - instantiation of generic RCI pkg
+--        CXE4003_Part_B3       - instantiation of generic RCI pkg
+--        CXE4003_Part_B4       - instantiation of generic RCI pkg
+--        CXE4003_Part_B5       - instantiation of generic RCI pkg
+--        CXE4003_Blocking_Test - normal package
+--        CXE4003_Cancellation_Test - normal package
+--        CXE4003_Call_Test     - normal package
+--      The test is divided into 3 sections.  The packages
+--      CXE4003_Blocking_Test, CXE4003_Cancellation_Test, and
+--      CXE4003_Call_Test each implement a section of the test.  The
+--      main procedure for partition A sequences through these three
+--      sections.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file. 
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4003_A  (main procedure)
+--           CXE4003_Blocking_Test
+--           CXE4003_Cancellation_Test
+--           CXE4003_Call_Test
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4003_B  (main procedure)
+--           CXE4003_Part_B1  (RCI package)
+--           CXE4003_Part_B2  (RCI package)
+--           CXE4003_Part_B3  (RCI package)
+--           CXE4003_Part_B4  (RCI package)
+--           CXE4003_Part_B5  (RCI package)
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions.
+--      Run the program by starting both partitions.  Partition B
+--      acts as a server and should be started first.  
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations that
+--         support the Distribution Annex,
+--         support the Remote_Call_Interface pragma, and
+--         provide an implementation of System.RPC.
+--      This test contains task priorities that should be used if
+--      the implementation supports the Real-Time Annex.
+--      The priority related code is marked with a "--RT" at the end
+--      of a source line.  These lines can be removed from the test
+--      if the implementation does not support the Real-Time annex.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     09 MAY 95   SAIC    Initial version
+--     23 JUN 95   SAIC    Fixed problem noted by reviewer where 
+--                         preemptive abort was being incorrectly
+--                         determined.
+--     19 DEC 95   SAIC    Lack of preemptive abort when the Real-Time
+--                         Annex is supported results in failure.
+--     22 FEB 96   SAIC    Incorporated Reviewer comments.
+--                         New ImpDef.
+--     01 DEC 97   EDS     Add pragma Remote_Call_Interface for each of the four
+--                         instances of the package CXE4003_Generic_RCI.
+--!
+
+-----------------------------------------------------------------------------
+
+package CXE4003_Part_B1 is
+  pragma Remote_Call_Interface;
+
+  procedure Test_Complete;
+
+    
+    -- a call to Block_2 will not return until Release_1 and Release_2
+    -- have been called.
+  procedure Block_2;
+    -- a call to Release_1 is not accepted until Block_2 has been called
+  procedure Release_1;
+  procedure Release_2;
+
+
+    -- support for cancellation test
+  procedure Start_Cancellation_Test;
+  procedure May_Be_Cancelled (Delay_Time : Duration);
+  procedure End_Cancellation_Test (Name : String);
+end CXE4003_Part_B1;
+
+-----------------------------------------------------------------------------
+
+generic
+  Low : Integer;
+  High : Integer;
+package CXE4003_Generic_RCI is
+  pragma Remote_Call_Interface;
+  pragma Elaborate_Body (CXE4003_Generic_RCI);
+
+  subtype Serial_Numbers is Integer range Low .. High;
+  procedure Take_Call (X : Serial_Numbers);
+  procedure Done;
+end CXE4003_Generic_RCI;
+
+with Report;
+package body CXE4003_Generic_RCI is
+
+  -- This package expects calls to come into Take_Call with the 
+  -- Serial_Number parameter starting at Low and progressing to 
+  -- High.  If any value is missed or repeated then the test fails.
+  -- Done is called after all the calls to Take_Call have completed.
+
+  Last_Call : Integer := Low - 1;
+  
+  procedure Take_Call (X : Serial_Numbers) is
+  begin
+    if X /= Last_Call + 1 then
+      Report.Failed ("call out of sequence.  Expected " &
+                     Integer'Image (Last_Call + 1) &
+                     "  Received: " &
+                     Integer'Image (X));
+    end if;
+    Last_Call := X;
+    delay 0.0;  -- just to add some shuffling to the scheduling
+  end Take_Call;
+
+  procedure Done is
+  begin
+    if Last_Call /= High then
+      Report.Failed ("not all the remote calls completed, only" &
+                     Integer'Image (Last_Call) & " of" &
+                     Integer'Image (High));
+    end if;
+  end Done;
+end CXE4003_Generic_RCI;
+
+-----------------------------------------------------------------------------
+
+with CXE4003_Generic_RCI;
+package CXE4003_Part_B2 is new CXE4003_Generic_RCI (200, 299);
+pragma Remote_Call_Interface (CXE4003_Part_B2);
+
+with CXE4003_Generic_RCI;
+package CXE4003_Part_B3 is new CXE4003_Generic_RCI (300, 399);
+pragma Remote_Call_Interface (CXE4003_Part_B3);
+
+with CXE4003_Generic_RCI;
+package CXE4003_Part_B4 is new CXE4003_Generic_RCI (400, 499);
+pragma Remote_Call_Interface (CXE4003_Part_B4);
+
+with CXE4003_Generic_RCI;
+package CXE4003_Part_B5 is new CXE4003_Generic_RCI (500, 699);
+pragma Remote_Call_Interface (CXE4003_Part_B5);
+
+-----------------------------------------------------------------------------
+
+package CXE4003_Blocking_Test is
+
+  -- Check that the task executing a remote subprogram call blocks
+  -- until the subprogram in the called partition returns.
+  --
+  -- This is done by having a task make a call to partition B where
+  -- the call is blocked until calls to Release_1 and Release_2 have 
+  -- been received.  The sequence of events is as follows:
+  --                                             
+  --       main                        task      
+  --       ----                        ----       
+  --                                    
+  --       start task                 wait for start
+  --                                  set flag        
+  --                                  call Block_2  
+  --       call Release_1      
+  --       check that flag is set                 
+  --       call Release_2                       
+  --                                  reset flag  
+  --
+  procedure Do_Test;
+end CXE4003_Blocking_Test;
+
+
+with Report;
+with CXE4003_Part_B1;
+with ImpDef;
+package body CXE4003_Blocking_Test is
+  RPC_In_Progress : Boolean := False;
+
+  task Gets_Blocked is
+    entry Go;
+  end Gets_Blocked;
+  
+  task body Gets_Blocked is
+  begin
+    accept Go;
+    RPC_In_Progress := True;
+    CXE4003_Part_B1.Block_2;
+    RPC_In_Progress := False;
+    -- Report.Comment ("Call to Block_2 is now complete");    
+  end Gets_Blocked;
+
+  procedure Do_Test is
+  begin
+    Gets_Blocked.Go;
+    -- Gets_Blocked is now free to make the RPC
+    -- The following delay gives Gets_Blocked plenty of 
+    -- opportunity to run but isn't really necessary since
+    -- we explicitly block when we call Release_1 
+    delay ImpDef.Minimum_Task_Switch;
+    -- At this point the call should be in progress
+    CXE4003_Part_B1.Release_1;
+    -- at this point we know that task Gets_Blocked should be
+    -- blocked in the call to Block_2.
+    if not RPC_In_Progress then
+      Report.Failed ("task did not block during RPC");
+    end if;
+    
+    -- allow the task to complete
+    CXE4003_Part_B1.Release_2;
+  end Do_Test;
+end CXE4003_Blocking_Test;
+
+-----------------------------------------------------------------------------
+
+package CXE4003_Cancellation_Test is
+  procedure Do_Test;
+end CXE4003_Cancellation_Test;
+
+
+with Report;
+with ImpDef.Annex_E;
+with CXE4003_Part_B1;
+package body CXE4003_Cancellation_Test is
+  -- Check that a remote procedure call can be aborted.
+  --
+  -- This is first done using asynchronous transfer of control where the 
+  -- triggering_statement is a delay of a period that is shorter
+  -- than the time required for the RPC to complete.  The remote procedure
+  -- contains a delay to insure that it takes longer than the timeout.
+  -- The test is repeated several times to insure that once an RPC is
+  -- aborted it is still possible to try again.  Finally, the same remote
+  -- procedure is called without a timeout to make sure it is possible to
+  -- really call the procedure.
+
+  procedure ATC_Test is
+    Was_Aborted : Boolean;
+  begin
+    CXE4003_Part_B1.Start_Cancellation_Test;
+    for Several in 1 .. 10 loop
+      Was_Aborted := False;
+
+      select
+        -- delay enough time to insure the remote procedure is executing
+        delay ImpDef.Annex_E.Max_RPC_Call_Time;
+        Was_Aborted := True;
+      then abort
+        -- make sure the remote procedure takes longer than the timeout
+        CXE4003_Part_B1.May_Be_Cancelled (ImpDef.Annex_E.Max_RPC_Call_Time + 
+                                          ImpDef.Annex_E.Max_RPC_Call_Time);
+      end select;
+
+      if not Was_Aborted then
+        Report.Failed ("RPC was not aborted - iteration" &
+                       Integer'Image (Several));
+      end if;
+    end loop;
+
+      -- this one shouldn't be cancelled
+    CXE4003_Part_B1.May_Be_Cancelled (0.0);
+
+      -- tell the other partition that it can report its results for 
+      -- this test now.
+    CXE4003_Part_B1.End_Cancellation_Test("atc");
+  end ATC_Test;
+
+  --
+  -- This is done again using an abort statement.  The remote procedure
+  -- contains a delay to insure that it takes longer than the delay used
+  -- here before the abort is performed.
+  -- The test is repeated several times to insure that once an RPC is
+  -- aborted it is still possible to try again.  Finally, the same remote
+  -- procedure is called without an abort to make sure it is possible to
+  -- really call the procedure.
+
+  procedure Abort_Test is
+    Preemptive_Abort : Boolean := True;
+
+    -- indication to the Agent_Task as to whether or not it will be
+    -- aborted.
+    Abort_Expected : Boolean := True;
+    
+    task type Agent_Task;
+    task body Agent_Task is
+    begin
+        -- make sure the remote procedure takes longer than the timeout
+        CXE4003_Part_B1.May_Be_Cancelled (ImpDef.Annex_E.Max_RPC_Call_Time + 
+                                          ImpDef.Annex_E.Max_RPC_Call_Time);
+        -- if preemptive aborts are supported then we should never get to
+        -- the next statement
+        Preemptive_Abort := False;
+
+        -- in the absence of preemptive aborts, give the runtime a 
+        -- chance to do the abort
+        delay 0.0;  -- abort completion point
+
+        if Abort_Expected then
+          -- if we get here then the task was not aborted.  
+          -- Could be because the RPC returned prematurely (an error).  
+          -- Alternatively, the value of ImpDef.Annex_E.Max_RPC_Call_Time may
+          -- not be large enough.  If this is the case, a new value should
+          -- be picked.
+          Report.Failed ("abort did not take place");
+        end if;
+    end Agent_Task;
+
+  begin
+    CXE4003_Part_B1.Start_Cancellation_Test;
+    for Several in 1 .. 10 loop
+
+      declare
+        The_Agent : Agent_Task;
+      begin
+        -- delay enough time to insure the remote procedure is executing
+        -- but not so long that the call will complete.
+        delay ImpDef.Annex_E.Max_RPC_Call_Time;
+        abort The_Agent;
+      end;
+
+    end loop;
+
+      -- state our findings about preemptive abort.  Note that
+      -- preemptive abort is only required if the Real-Time Annex
+      -- is supported.
+    if not Preemptive_Abort then
+      if ImpDef.Validating_Annex_D then
+         Report.Failed ("preemptive abort is not supported");
+      else
+         Report.Comment ("preemptive abort is not supported");
+      end if;
+    end if;
+
+      -- this one shouldn't be cancelled
+     Abort_Expected := False;
+    declare
+      The_Agent : Agent_Task; 
+    begin
+      null;  -- wait for the agent to finish
+    end;
+
+      -- tell the other partition that it can report its results for 
+      -- this test now.
+    CXE4003_Part_B1.End_Cancellation_Test("abort");
+
+  end Abort_Test;
+
+  procedure Do_Test is
+  begin
+    ATC_Test;
+    Abort_Test;
+  end Do_Test;
+end CXE4003_Cancellation_Test;
+
+-----------------------------------------------------------------------------
+
+package CXE4003_Call_Test is
+  procedure Do_Test;
+end CXE4003_Call_Test;
+
+
+with System;                                                            --RT
+with Report;
+with ImpDef;
+with CXE4003_Part_B2;
+with CXE4003_Part_B3;
+with CXE4003_Part_B4;
+with CXE4003_Part_B5;
+package body CXE4003_Call_Test is
+
+  -- Check that remote subprogram calls are executed at most once.
+  -- Check that potentially concurrent calls from multiple tasks
+  -- can be handled by the PCS.
+  --
+  -- This is done by having several tasks each calling different
+  -- RCI packages in the partition B and passing in a sequence
+  -- number. The sequence number is checked to insure that each
+  -- call arrives and that they come in order.
+  -- The tasks are all of different priorities (if the Real-Time        --RT
+  -- annex is supported.  This should result in preemption occurring    --RT
+  -- which will exercise the PCS better.                                --RT
+  -- The Id is a unique value used to identify each task, tell it
+  -- what RCI package it is to be using, and initialize the Cycle so
+  -- that each task starts out on a slightly different schedule.
+
+  task type Client (Low   : Integer;
+                    High  : Integer;
+                    Prior : System.Priority;                            --RT
+                    Id    : Integer) is
+    entry Go;
+    pragma Priority (Prior);                                            --RT
+  end Client;
+  
+  task body Client is
+    This_Cycle : Integer := Id;
+  begin
+    for I in Low .. High loop
+      case Id is
+        when 2 => 
+          CXE4003_Part_B2.Take_Call (I);
+        when 3 =>
+          CXE4003_Part_B3.Take_Call (I);
+        when 4 =>
+          CXE4003_Part_B4.Take_Call (I);
+        when 5 =>
+          CXE4003_Part_B5.Take_Call (I);
+        when others =>
+          Report.Failed ("internal error in Client");
+      end case;
+      delay Duration (ImpDef.Minimum_Task_Switch * This_Cycle);
+      This_Cycle := This_Cycle mod 5 + 1;
+    end loop;
+  exception
+    when others =>
+      Report.Failed ("unexpected exception in Call_Test Client");
+  end Client;
+  
+  procedure Do_Test is
+  begin
+    -- Report.Comment ("starting call test");
+    declare
+      C2 : Client (200, 299,
+                   System.Priority'Last - 5,                            --RT
+                   2);
+      C3 : Client (300, 399,
+                   System.Priority'Last - 4,                            --RT
+                   3);
+      C4 : Client (400, 499,
+                   System.Priority'Last - 3,                            --RT
+                   4);
+        -- give the highest priority task the most to do
+      C5 : Client (500, 699,
+                   System.Priority'Last - 2,                            --RT
+                   5);
+    begin
+      null;  -- wait for the clients to finish
+    end;
+    -- Report.Comment ("client tasks have completed");
+    CXE4003_Part_B2.Done;
+    CXE4003_Part_B3.Done;
+    CXE4003_Part_B4.Done;
+    CXE4003_Part_B5.Done;
+  end Do_Test;
+end CXE4003_Call_Test;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4003_Part_B1;
+with CXE4003_Blocking_Test;
+with CXE4003_Cancellation_Test;
+with CXE4003_Call_Test;
+procedure CXE4003_A is
+begin
+  Report.Test ("CXE4003_A", "Check the blocking properties of " &
+                            "remote calls");
+  -- Check that the task executing a remote subprogram call blocks
+  -- until the subprogram in the called partition returns.
+  CXE4003_Blocking_Test.Do_Test;
+
+  -- Check that a remote procedure call can be aborted.
+  CXE4003_Cancellation_Test.Do_Test;
+
+  -- Check that remote subprogram calls are executed at most once.
+  -- Check that potentially concurrent calls from multiple tasks
+  -- can be handled by the PCS.
+  CXE4003_Call_Test.Do_Test;
+
+   -- All done.
+  CXE4003_Part_B1.Test_Complete;
+  Report.Result;
+exception
+  when others =>
+     Report.Failed ("Unexpected exception in test");
+     Report.Result;
+end CXE4003_A;
+
+-----------------------------------------------------------------------------
+
+with CXE4003_Part_B1;
+with CXE4003_Part_B2;
+with CXE4003_Part_B3;
+with CXE4003_Part_B4;
+with CXE4003_Part_B5;
+with Report;
+procedure CXE4003_B is
+begin
+  Report.Test ("CXE4003_B", "Check the blocking properties of " &
+                            "remote calls");
+
+  -- the call to Report.Result is made by the task in
+  -- CXE4003_Part_B1 when partition A is finished.
+end CXE4003_B;
+
+-----------------------------------------------------------------------------
+
+with Report;
+package body CXE4003_Part_B1 is
+  Cancellation_Test_Start_Count  : Integer;
+  Cancellation_Test_Finish_Count : Integer;
+
+  task Sequence is
+    -- blocking test support
+    entry Block_2;
+    entry Release_1;
+    entry Release_2;
+
+    -- last thing to call
+    entry Finished;
+  end Sequence;
+
+  task body Sequence is
+  begin
+  
+        -- the protocol needed by the blocking test
+      accept Block_2 do
+        accept Release_1;
+        accept Release_2;
+      end Block_2;
+  
+      -- allow the task to complete which will then allow the partition
+      -- to complete but only when told to do so.
+      accept Finished;
+      Report.Result;
+ 
+  end Sequence;
+
+  ------
+
+  procedure Test_Complete is
+  begin
+    Sequence.Finished;
+  end Test_Complete;
+
+  ------
+    
+  procedure Block_2 is
+  begin
+    Sequence.Block_2;
+  end Block_2;
+
+  procedure Release_1 is
+  begin
+    Sequence.Release_1;
+  end Release_1;
+
+  procedure Release_2 is
+  begin
+    Sequence.Release_2;
+  end Release_2;
+
+  ------
+  procedure Start_Cancellation_Test is
+  begin
+    Cancellation_Test_Start_Count  := 0;
+    Cancellation_Test_Finish_Count := 0;
+  end Start_Cancellation_Test;
+
+
+  procedure May_Be_Cancelled (Delay_Time : Duration) is
+  begin
+    -- this first statement should always be executed
+    Cancellation_Test_Start_Count  := Cancellation_Test_Start_Count + 1;
+
+    -- the cancellation should come in during this delay
+    delay Delay_Time;
+
+    -- this statement should only be executed if the remote call is
+    -- not really cancelled.  This is legal but not especially desirable.
+    Cancellation_Test_Finish_Count := Cancellation_Test_Finish_Count + 1;
+  end May_Be_Cancelled;
+
+  procedure End_Cancellation_Test (Name : String) is
+  begin
+    if Cancellation_Test_Start_Count /= 11 then
+      Report.Failed ("Remote procedure in cancellation test " &
+                     "was called" & 
+                     Integer'Image(Cancellation_Test_Start_Count) &
+                     " times instead of 11 times");
+    else
+      null;
+      -- Report.Comment ("cancellation test calls ok");
+    end if;
+
+    case Cancellation_Test_Finish_Count is
+      when 0 =>
+          -- the call that wasn't aborted should have finished
+          Report.Failed ("last RPC for cancellation test did not complete");
+      when 1 =>
+          -- this is the desired result
+          null;
+          -- Report.Comment ("all aborted remote calls were cancelled for " &
+          --                 Name & " test");
+      when 11 =>
+          -- undesirable but not illegal.  
+          Report.Comment ("none of the aborted remote calls were " &
+                          "actually cancelled for " & Name & " test");
+      when others =>
+          -- some, but not all, of the calls were cancelled.  
+          -- this is undesirable but not illegal.
+          Report.Comment (Integer'Image (11-Cancellation_Test_Finish_Count) &
+                          " remote calls out of 10 were cancelled for " &
+                          Name & " test");
+    end case;
+
+  end End_Cancellation_Test;
+end CXE4003_Part_B1;

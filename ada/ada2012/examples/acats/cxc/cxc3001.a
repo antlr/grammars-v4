@@ -1,0 +1,411 @@
+-- CXC3001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that Is_Attached returns False for all non-reserved interrupts
+--     to which no user-defined handler has been attached.
+--
+--     Check that a user-defined handler can be attached to every interrupt
+--     for which Is_Reserved returns False. Check that Is_Attached returns
+--     True for all non-reserved interrupts to which a user-defined handler
+--     has been attached. Check that if Detach_Handler is subsequently called
+--     for such an interrupt, Is_Attached returns False.
+--
+--     Check that, for procedures Attach_Handler and Exchange_Handler, if
+--     the parameter New_Handler designates a protected procedure to which
+--     the pragma Interrupt_Handler does not apply, Program_Error is raised
+--     and the existing interrupt treatment is not modified.
+--
+-- TEST DESCRIPTION:
+--     At program start-up, the test checks that Is_Attached returns False
+--     for each value of the subtype Ada.Interrupt.Interrupt_ID for which
+--     Is_Reserved returns False. Then Attach_Handler is called to attach
+--     a handler to each non-reserved interrupt. The test checks that
+--     Is_Attached is True for each non-reserved interrupt.
+--
+--     Next, Detach_Handler is called for each non-reserved interrupt, and
+--     the test checks that Is_Attached is False for each of them.
+--
+--     Finally, Attach_Handler is used to attach a handler to the interrupt
+--     ImpDef.Annex_C.Interrupt_To_Generate. The interrupt is generated to
+--     verify that the handler is attached. Attach_Handler is then called
+--     to attempt to attach a protected procedure, to which a pragma
+--     Interrupt_Handler does not apply, to the same interrupt. The test
+--     verifies that Program_Error is raised, then generates the interrupt
+--     to verify that the existing treatment is still in effect. This
+--     process is repeated with the procedure Exchange_Handler.
+--
+-- SPECIAL REQUIREMENTS:
+--      This test requires that interrupts be enabled, and that an
+--      interrupt (identified by ImpDef.Annex_C.Interrupt_To_Generate)
+--      be generated multiple times, at points designated by calls to
+--      ImpDef.Annex_C.Generate_Interrupt.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      20 Dec 94   SAIC    Delete array indexed by Interrupt_ID
+--      14 Oct 95   SAIC    Fixed bugs for ACVC 2.0.1
+--      23 Feb 96   SAIC    Updated ImpDef references to ImpDef.Annex_C.
+--      29 Feb 96   SAIC    ACVC 2.0.1 fixes: Removed equality check of two
+--                          access-to-subprogram values. Adjusted commentary.
+--      09 May 96   SAIC    ACVC 2.1: Substantially modified objective and
+--                          test. Removed documentation-only cases and cases
+--                          redundant with other tests. Enhanced testing of
+--                          Is_Attached. Added case to check that P_E raised
+--                          if Attach_Handler or Exchange_Handler used to
+--                          attach and invalid handler.
+--
+--!
+
+with Ada.Interrupts;
+package CXC3001_0 is
+
+   protected Good is
+      procedure Handler;
+      pragma Interrupt_Handler( Handler );
+
+      function  Count return Natural;
+      procedure Reset;
+   private
+      Counter : Natural := 0;
+   end Good;
+
+
+   protected Bad is
+      procedure Handler;     -- No pragma Interrupt_Handler!
+
+      function Count return Natural;
+   private
+      Counter : Natural := 0;
+   end Bad;
+
+end CXC3001_0;
+
+
+     --==================================================================--
+
+
+package body CXC3001_0 is
+
+   protected body Good is
+
+      procedure Handler is
+      begin
+         Counter := Counter + 1;
+      end Handler;
+
+      function Count return Natural is
+      begin
+         return Counter;
+      end Count;
+
+      procedure Reset is
+      begin
+         Counter := 0;
+      end Reset;
+
+   end Good;
+
+
+   protected body Bad is
+
+      procedure Handler is
+      begin
+         Counter := Counter + 1;
+      end Handler;
+
+      function Count return Natural is
+      begin
+         return Counter;
+      end Count;
+
+   end Bad;
+
+end CXC3001_0;
+
+
+     --==================================================================--
+
+
+with Ada.Interrupts;
+with CXC3001_0;
+
+with ImpDef.Annex_C;
+with Report;
+
+procedure CXC3001 is
+
+   package AI renames Ada.Interrupts;
+
+   type Interrupt_Array is array (AI.Interrupt_ID) of Boolean;
+
+   Reserved_Interrupt : Interrupt_Array := (others => False);
+   Verbose            : Boolean         := True;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Map_Reserved_Interrupts (IsReserved: in out Interrupt_Array) is
+   begin
+      for Interrupt in IsReserved'Range loop
+         if AI.Is_Reserved(Interrupt) then
+            IsReserved(Interrupt) := True;
+         else
+            IsReserved(Interrupt) := False;
+         end if;
+      end loop;
+   end Map_Reserved_Interrupts;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Check_Attachments (IsReserved    : in Interrupt_Array;
+                                Expected_Value: in Boolean) is
+      Fail_Count : Natural := 0;
+   begin
+      for Interrupt in IsReserved'Range loop
+         if not IsReserved(Interrupt) and then
+            AI.Is_Attached(Interrupt) /= Expected_Value
+         then
+            Fail_Count := Fail_Count + 1;
+         end if;
+      end loop;
+
+      if Fail_Count /= 0 then
+         Report.Failed ("Wrong result from Is_Attached for" &
+                         Natural'Image(Fail_Count)          &
+                         " of"                              &
+                         Natural'Image(IsReserved'Length)   &
+                         " interrupt IDs");
+      end if;
+   end Check_Attachments;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Attach_Handlers (IsReserved: in Interrupt_Array) is
+   begin
+      for Interrupt in IsReserved'Range loop
+         if not IsReserved(Interrupt) then
+            AI.Attach_Handler (CXC3001_0.Good.Handler'Access, Interrupt);
+         end if;
+      end loop;
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error in Attach_Handlers");
+      when others        =>
+         Report.Failed ("Unexpected exception in Attach_Handlers");
+   end Attach_Handlers;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Detach_Handlers (IsReserved: in Interrupt_Array) is
+   begin
+      for Interrupt in IsReserved'Range loop
+         if not IsReserved(Interrupt) then
+            AI.Detach_Handler (Interrupt);
+         end if;
+      end loop;
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error in Detach_Handlers");
+      when others        =>
+         Report.Failed ("Unexpected exception in Detach_Handlers");
+   end Detach_Handlers;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Test_Attach_Handler is
+   begin
+      if CXC3001_0.Good.Count /= 0 then
+         Report.Failed ("Bad handle count before Attach_Handler");
+      else
+         AI.Attach_Handler (CXC3001_0.Good.Handler'Access,
+                            ImpDef.Annex_C.Interrupt_To_Generate);
+
+         ImpDef.Annex_C.Generate_Interrupt;
+         delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+         if CXC3001_0.Good.Count /= 1 then 
+            Report.Failed ("Handler not attached by Attach_Handler");
+         else
+            begin
+               AI.Attach_Handler (CXC3001_0.Bad.Handler'Access,
+                                  ImpDef.Annex_C.Interrupt_To_Generate);
+               Report.Failed ("Program_Error not raised by Attach_Handler");
+            exception
+               when Program_Error => -- Expected result.
+                  null;
+               when others        =>
+                  Report.Failed ("Unexpected exception from Attach_Handler");
+            end;
+
+            -- Don't generate interrupt if no user-handler attached at
+            -- this point (could cause unpredictable results):
+            if AI.Is_Attached(ImpDef.Annex_C.Interrupt_To_Generate) then
+               ImpDef.Annex_C.Generate_Interrupt;
+               delay ImpDef.Annex_C.Wait_For_Interrupt;
+  
+               if CXC3001_0.Good.Count /= 2 then 
+                  Report.Failed ("Treatment not retained by Attach_Handler");
+               end if;
+            else
+               Report.Failed ("Attach_Handler: no handler attached");
+            end if;
+
+            CXC3001_0.Good.Reset;  -- Reset CXC3001_0.Good.Count to 0.
+
+         end if;
+
+      end if;
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error in Test_Attach_Handler");
+      when others        =>
+         Report.Failed ("Unexpected exception in Test_Attach_Handler");
+   end Test_Attach_Handler;
+
+                 --===--===--===--===--===--===--===--===--===--
+
+   procedure Test_Exchange_Handler is
+      Old : AI.Parameterless_Handler;
+   begin
+      if CXC3001_0.Good.Count /= 0 then
+         Report.Failed ("Bad handle count before Exchange_Handler");
+      else
+         AI.Exchange_Handler(Old,
+                             CXC3001_0.Good.Handler'Access,
+                             ImpDef.Annex_C.Interrupt_To_Generate);
+
+         ImpDef.Annex_C.Generate_Interrupt;
+         delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+         if CXC3001_0.Good.Count /= 1 then 
+            Report.Failed ("Handler not attached by Exchange_Handler");
+         else
+            begin
+               AI.Exchange_Handler (Old,
+                                    CXC3001_0.Bad.Handler'Access,
+                                    ImpDef.Annex_C.Interrupt_To_Generate);
+               Report.Failed ("Program_Error not raised by Exchange_Handler");
+            exception
+               when Program_Error => -- Expected result.
+                  null;
+               when others        =>
+                  Report.Failed ("Unexpected exception from Exchange_Handler");
+            end;
+
+            -- Don't generate interrupt if no user-handler attached at
+            -- this point (could cause unpredictable results):
+            if AI.Is_Attached(ImpDef.Annex_C.Interrupt_To_Generate) then
+               ImpDef.Annex_C.Generate_Interrupt;
+               delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+               if CXC3001_0.Good.Count /= 2 then 
+                  Report.Failed ("Treatment not retained by Exchange_Handler");
+               end if;
+            else
+               Report.Failed ("Exchange_Handler: no handler attached");
+            end if;
+
+         end if;
+
+      end if;
+   exception
+      when Program_Error =>
+         Report.Failed ("Unexpected Program_Error in Test_Exchange_Handler");
+      when others        =>
+         Report.Failed ("Unexpected exception in Test_Exchange_Handler");
+   end Test_Exchange_Handler;
+
+                 --===--===--===--===--===--===--===--===--===--
+   
+begin
+
+   Report.Test ("CXC3001","Check operation of Is_Attached. Check that "     &
+                          "Program_Error is raised if the handler used by " &
+                          "Attach_Handler or Exchange_Handler does not "    &
+                          "have an associated pragma Interrupt_Handler" );
+
+
+-- Enable interrupts, if necessary:
+   ImpDef.Annex_C.Enable_Interrupts;
+
+
+-- Identify all reserved interrupts:
+   Map_Reserved_Interrupts (Reserved_Interrupt);
+
+
+-- Verify that Is_Attached is False for all non-reserved interrupts:
+
+   if Verbose then
+      Report.Comment ("Before attachments..");
+   end if;
+
+   Check_Attachments (IsReserved     => Reserved_Interrupt,
+                      Expected_Value => False);
+
+
+-- Attach a user-defined handler to each non-reserved interrupt:
+   Attach_Handlers (Reserved_Interrupt);
+
+
+-- Verify that Is_Attached is True for all non-reserved interrupts:
+
+   if Verbose then
+      Report.Comment ("After attachments..");
+   end if;
+
+   Check_Attachments (IsReserved     => Reserved_Interrupt,
+                      Expected_Value => True);
+
+
+-- Detach user-defined handlers from each non-reserved interrupt:
+   Detach_Handlers (Reserved_Interrupt);
+
+
+-- Verify that Is_Attached is False for all non-reserved interrupts:
+
+   if Verbose then
+      Report.Comment ("After detachments..");
+   end if;
+
+   Check_Attachments (IsReserved     => Reserved_Interrupt,
+                      Expected_Value => False);
+
+
+-- Verify that P_E is raised if Attach_Handler uses an invalid handler:
+   Test_Attach_Handler;
+
+
+-- Verify that P_E is raised if Exchange_Handler uses an invalid handler:
+   Test_Exchange_Handler;
+
+
+   Report.Result;
+
+end CXC3001;
