@@ -19,7 +19,8 @@
       "Bash(bash test.sh:*)",
       "Bash(go env:*)",
       "Bash(node:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(antlr4:*)"
     ]
   }
 }
