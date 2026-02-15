@@ -564,7 +564,7 @@ logical_operator
 relational_operator
     : EQ
     | NE
-    | LE
+    | LT
     | GT
     | LE
     | GE
@@ -691,7 +691,7 @@ null_statement
     ;
 
 label
-    : direct_name
+    : LLB direct_name RLB
     ;
 
 assignment_statement

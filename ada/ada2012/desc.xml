@@ -2,5 +2,10 @@
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
    <antlr-version>^4.10</antlr-version>
    <targets>Antlr4ng;CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
-   <inputs>examples/*.adb</inputs>
+   <test>
+      <inputs>examples/*.adb</inputs>
+   </test>
+   <test>
+      <inputs>examples/acats/a/**/*.adb</inputs>
+   </test>
 </desc>
