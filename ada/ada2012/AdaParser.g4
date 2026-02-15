@@ -432,6 +432,10 @@ attribute_designator
     | DELTA__
     | DIGITS__
     | MOD__
+    | ACCESS
+    | DELTA
+    | DIGITS
+    | MOD
     ;
 
 range_attribute_reference
