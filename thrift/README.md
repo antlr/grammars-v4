@@ -4,5 +4,9 @@ ANTLR v4 grammar for Apache Thrift interface description language (IDL): http://
 
 Thrift's Bison grammar source code https://github.com/apache/thrift/blob/master/compiler/cpp/src/thrift/thrifty.yy
 
+## Reference
+* [pldb](http://pldb.info/concepts/thrift)
+
+
 ## License
 Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt

@@ -44,6 +44,7 @@ sql_command
     | show_command
     | use_command
     | describe_command
+    | sql_command (FLOW sql_command)+
     | other_command
     ;
 
@@ -247,7 +248,11 @@ execute_immediate
     ;
 
 execute_task
-    : EXECUTE TASK object_name
+    : EXECUTE TASK object_name retry_last?
+    ;
+
+retry_last
+    : RETRY LAST
     ;
 
 explain
@@ -565,6 +570,7 @@ alter_command
     | alter_session
     | alter_session_policy
     | alter_share
+    | alter_semantic_view
     | alter_stage
     | alter_storage_integration
     | alter_stream
@@ -1569,6 +1575,7 @@ create_command
     | create_security_integration_snowflake_oauth
     | create_security_integration_saml2
     | create_security_integration_scim
+    | create_semantic_view
     | create_sequence
     | create_session_policy
     | create_share
@@ -2088,6 +2095,52 @@ increment_by
     : INCREMENT BY? EQ? num
     ;
 
+create_semantic_view
+    : CREATE or_replace? SEMANTIC VIEW if_not_exists? object_name
+        TABLES '(' logical_table (',' logical_table)* ')'
+        (RELATIONSHIPS '(' relationship_def (',' relationship_def)* ')')?
+        (FACTS '(' semantic_expression_list ')')?
+        (DIMENSIONS '(' semantic_expression_list ')')?
+        (METRICS '(' semantic_expression_list ')')?
+        with_extension_clause?
+        comment_clause?
+        copy_grants?
+    ;
+
+logical_table
+    : (alias AS)? object_name
+        (PRIMARY KEY '(' column_list ')')?
+        ( (UNIQUE column_list_in_parentheses)+)?
+        with_synonyms_clause?
+        comment_clause?
+    ;
+
+relationship_def
+    : (r=id_ AS)? t=alias column_list_in_parentheses REFERENCES rft=alias ('(' ASOF? column_list ')')?
+    ;
+
+with_synonyms_clause
+    : WITH SYNONYMS '='? '(' string_list ')'
+    ;
+
+semantic_expression_list
+    : semantic_expression (',' semantic_expression)*
+    ;
+
+semantic_expression
+    : PUBLIC? t=alias '.' dim=id_ AS expr
+        (WITH CORTEX SEARCH SERVICE sn=id_ (USING col=id_)?)?
+        with_synonyms_clause?
+        comment_clause?
+    | (PRIVATE | PUBLIC)? t=alias '.' fom=id_ AS expr
+        with_synonyms_clause?
+        comment_clause?
+    ;
+
+with_extension_clause
+    : WITH EXTENSION '(' CA '=' string ')'
+    ;
+
 create_sequence
     : CREATE or_replace? SEQUENCE if_not_exists? object_name WITH? start_with? increment_by? order_noorder? comment_clause?
     ;
@@ -2382,6 +2435,14 @@ create_stage
             | TYPE EQ type_fileformat format_type_options*
         ) RR_BRACKET
     )? (COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET)? with_tags? comment_clause?
+    ;
+
+alter_semantic_view
+    : ALTER SEMANTIC VIEW if_exists? sv=object_name
+        ( RENAME TO n=object_name
+        | SET comment_clause
+        | UNSET COMMENT
+        )
     ;
 
 alter_stage
@@ -2869,6 +2930,7 @@ drop_command
     | drop_row_access_policy
     | drop_schema
     | drop_secret
+    | drop_semantic_view
     | drop_sequence
     | drop_session_policy
     | drop_share
@@ -2972,6 +3034,10 @@ drop_schema
 
 drop_secret
     : DROP SECRET if_exists? object_name
+    ;
+
+drop_semantic_view
+    : DROP SEMANTIC VIEW if_exists? object_name
     ;
 
 drop_sequence
@@ -3136,6 +3202,7 @@ describe_command
     | describe_row_access_policy
     | describe_schema
     | describe_search_optimization
+    | describe_semantic_view
     | describe_sequence
     | describe_session_policy
     | describe_share
@@ -3219,6 +3286,10 @@ describe_schema
 
 describe_search_optimization
     : describe SEARCH OPTIMIZATION ON object_name
+    ;
+
+describe_semantic_view
+    : describe SEMANTIC VIEW object_name
     ;
 
 describe_sequence
@@ -3310,6 +3381,11 @@ show_command
     | show_row_access_policies
     | show_schemas
     | show_secrets
+    | show_semantic_views
+    | show_semantic_dimensions
+    | show_semantic_dimensions_for_metric
+    | show_semantic_facts
+    | show_semantic_metrics
     | show_sequences
     | show_session_policies
     | show_shares
@@ -3363,6 +3439,10 @@ starts_with
 
 limit_rows
     : LIMIT num (FROM string)?
+    ;
+
+limit_rows_2
+    : LIMIT num
     ;
 
 show_databases
@@ -3485,6 +3565,10 @@ in_obj_2
     : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE | TABLE object_name)
     ;
 
+in_obj_3
+    : IN (object_name | ACCOUNT | DATABASE id_? | SCHEMA schema_name?)
+    ;
+
 show_materialized_views
     : SHOW MATERIALIZED VIEWS like_pattern? in_obj?
     ;
@@ -3564,6 +3648,26 @@ show_schemas
 
 show_secrets
     : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
+    ;
+
+show_semantic_views
+    : SHOW TERSE? SEMANTIC VIEWS like_pattern? in_obj? starts_with? limit_rows?
+    ;
+
+show_semantic_dimensions
+    : SHOW SEMANTIC DIMENSIONS like_pattern? in_obj_3? starts_with? limit_rows_2?
+    ;
+
+show_semantic_dimensions_for_metric
+    : SHOW SEMANTIC DIMENSIONS like_pattern? IN sv=object_name FOR METRIC mn=id_ starts_with? limit_rows_2?
+    ;
+
+show_semantic_facts
+    : SHOW SEMANTIC FACTS like_pattern? in_obj_3? starts_with? limit_rows_2?
+    ;
+
+show_semantic_metrics
+    : SHOW SEMANTIC METRICS like_pattern? in_obj_3? starts_with? limit_rows_2?
     ;
 
 show_sequences
@@ -3784,14 +3888,17 @@ non_reserved_words
     | AES
     | ALLOW_OVERLAPPING_EXECUTION
     | ARRAY_AGG
+    | CA
     | CHECKSUM
     | COLLECTION
     | COMMENT
     | CONFIGURATION
+    | CORTEX
     | DATA
     | DAYS
     | DEFINITION
     | DELTA
+    | DIMENSIONS
     | DISPLAY_NAME
     | DOWNSTREAM
     | DYNAMIC
@@ -3802,8 +3909,11 @@ non_reserved_words
     | ERROR_INTEGRATION
     | EVENT
     | EXCHANGE
+    | EXCLUDE
     | EXPIRY_DATE
     | EXPR
+    | EXTENSION
+    | FACTS
     | FILE
     | FILES
     | FIRST_NAME
@@ -3816,6 +3926,7 @@ non_reserved_words
     | IDENTITY
     | INCREMENTAL
     | IMPORTED
+    | INCLUDE
     | INDEX
     | INITIALIZE
     | INPUT
@@ -3828,10 +3939,13 @@ non_reserved_words
     | LOW
     | MAX_CONCURRENCY_LEVEL
     | MEDIUM
+    | METRIC
+    | METRICS
     | MODE
     | NAME
     | NETWORK
     | NULLIF
+    | NULLS
     | NVL
     | OFFSET
     | OLD
@@ -3871,6 +3985,7 @@ non_reserved_words
     | RECURSIVE
     | REFERENCES
     | REFRESH_MODE
+    | RELATIONSHIPS
     | RESOURCE
     | RESOURCES
     | RESPECT
@@ -3882,6 +3997,7 @@ non_reserved_words
     | SCALE
     | SCHEDULE
     | SECURITYADMIN
+    | SEMANTIC
     | SOURCE
     | START_DATE
     | STATE
@@ -3896,6 +4012,7 @@ non_reserved_words
     | USERADMIN
     | VALUE
     | VALUES
+    | VECTOR
     | VERSION
     | VISIBILITY
     | WAREHOUSE_TYPE
@@ -3998,6 +4115,10 @@ column_list
     : column_name (COMMA column_name)*
     ;
 
+aliased_column_list
+    : column_name as_alias? (',' column_name as_alias?)*
+    ;
+
 column_list_with_comment
     : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
     ;
@@ -4049,15 +4170,21 @@ expr
     | expr COLON_COLON data_type // Cast also
     | try_cast_expr
     | json_literal
+    | lambda_params '->' expr
     | trim_expression
     | function_call
     | subquery
-    | expr IS null_not_null
+    | expr IS (null_not_null | not_distinct_from expr)
     | expr NOT? IN LR_BRACKET (subquery | expr_list) RR_BRACKET
     | expr NOT? ( LIKE | ILIKE) expr (ESCAPE expr)?
     | expr NOT? RLIKE expr
     | expr NOT? (LIKE | ILIKE) ANY LR_BRACKET expr (COMMA expr)* RR_BRACKET (ESCAPE expr)?
     | primitive_expression //Should be latest rule as it's nearly a catch all
+    ;
+
+lambda_params
+    : id_ data_type?
+    | '(' id_ data_type? (',' id_ data_type?)* ')'
     ;
 
 iff_expr
@@ -4124,9 +4251,18 @@ data_type
     | binary_alias = ( BINARY | VARBINARY) data_type_size?
     | VARIANT
     | OBJECT
-    | ARRAY
+    | ARRAY ('(' data_type ')')?
     | GEOGRAPHY
     | GEOMETRY
+    | VECTOR '(' vector_element_type COMMA num ')'
+    ;
+
+vector_element_type
+    : INT
+    | INTEGER
+    | FLOAT_
+    | FLOAT4
+    | FLOAT8
     ;
 
 primitive_expression
@@ -4290,8 +4426,12 @@ select_statement
     ;
 
 set_operators
-    : (UNION ALL? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
+    : (UNION ALL? by_name? | EXCEPT | MINUS_ | INTERSECT) select_statement_in_parentheses //EXCEPT and MINUS have same SQL meaning
     | select_statement_in_parentheses
+    ;
+
+by_name
+    : BY NAME
     ;
 
 select_statement_in_parentheses
@@ -4447,10 +4587,14 @@ join_type
     ;
 
 join_clause
-    : join_type? JOIN object_ref ((ON search_condition)? | (USING '(' column_list ')')?)
-    //| join_type? JOIN object_ref (USING '(' column_list ')')?
-    | NATURAL outer_join? JOIN object_ref
-    | CROSS JOIN object_ref
+    : join_type? DIRECTED? JOIN object_ref on_using_clause?
+    | NATURAL join_type? DIRECTED? JOIN object_ref
+    | CROSS DIRECTED? JOIN object_ref
+    | ASOF JOIN object_ref MATCH_CONDITION '(' expr ')' on_using_clause?
+    ;
+
+on_using_clause
+    : ON search_condition | USING column_list_in_parentheses
     ;
 
 at_before
@@ -4528,10 +4672,24 @@ match_recognize
     ;
 
 pivot_unpivot
-    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET literal (COMMA literal)* RR_BRACKET RR_BRACKET (
-        as_alias column_alias_list_in_brackets?
-    )?
-    | UNPIVOT LR_BRACKET id_ FOR column_name IN LR_BRACKET column_list RR_BRACKET RR_BRACKET
+    : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
+        as_alias column_alias_list_in_brackets?  )?
+    | UNPIVOT (include_exclude NULLS)? LR_BRACKET id_ FOR column_name IN LR_BRACKET aliased_column_list RR_BRACKET RR_BRACKET
+    ;
+
+include_exclude
+    : INCLUDE
+    | EXCLUDE
+    ;
+
+pivot_in_clause
+    : literal (COMMA literal)*
+    | ANY order_by_clause?
+    | subquery
+    ;
+
+default_on_null
+    : DEFAULT ON NULL_ (expr)
     ;
 
 column_alias_list_in_brackets
@@ -4586,6 +4744,10 @@ comparison_operator
 
 null_not_null
     : NOT? NULL_
+    ;
+
+not_distinct_from
+    : NOT? DISTINCT FROM
     ;
 
 subquery

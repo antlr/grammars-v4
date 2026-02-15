@@ -43,3 +43,6 @@ path=c:\\docs\\doc1
 **Note**: It is not necessary to escape backslashes in property values when you use the ATG Control Center Components window; the ATG Control Center handles the escape characters automatically.
 
 + UNICODE characters can be entered as they are in a Java program, using the \u prefix. For example, `\u002c`.
+
+## Reference
+

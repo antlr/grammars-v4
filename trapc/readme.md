@@ -4,7 +4,10 @@
 Ken Domino
 
 ## Copyright
-Copyright © 2025 Ken Domino. All rights reserved.
+Copyright ï¿½ 2025 Ken Domino. All rights reserved.
+
+## Reference
+
 
 ## License
 [MIT](https://opensource.org/license/mit)

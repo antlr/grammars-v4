@@ -4,7 +4,7 @@ Z Notation grammar based on the [ISO standard](http://standards.iso.org/ittf/Pub
 
 ## Examples
 
-I created standard\_toolkit\_operator\_templates.utf8 based upon "Annex B" in the ISO standard. All other examples were created from [CZT's test cases](https://git.code.sf.net/p/czt/code)
+I created standard\_toolkit\_operator\_templates.utf8 based upon "Annex B" in the ISO standard. All other examples were created from the [CZT](https://czt.sourceforge.net/) test cases.
 
 ## Using
 
@@ -25,4 +25,6 @@ Associativity values specified in Z operator templates are taken into considerat
 
 that is, the semantic predicate is not on the left side of the rule, so my understanding from this [SO post](http://stackoverflow.com/a/23677069/7711235) is that the predicate will be ignored and not used in prediction...maybe it's consuming the first expression and falling through to the next rule?
 
+## Reference
+* [pldb](http://pldb.info/concepts/z)
 

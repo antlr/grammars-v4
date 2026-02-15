@@ -24,9 +24,11 @@ public class Program
     public static string StartSymbol { get; set; } = "<start_symbol>";
     public static string Input { get; set; }
     public static bool HeatMap { get; set; } = false;
-    public static void SetupParse2(string input, bool quiet = false)
+    public static void SetupParse2(string input, string fn, bool quiet = false)
     {
-        ICharStream str = new AntlrInputStream(input);
+        var code_point_stream = new CodePointCharStream(input);
+        code_point_stream.name = fn;
+        ICharStream str = code_point_stream;
         CharStream = str;
         var lexer = new <lexer_name>(str);
         Lexer = lexer;
@@ -38,6 +40,7 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         TokenStream = tokens;
+        ((CodePointCharStream)(lexer.InputStream)).name = fn;
         var parser = new MyParser(tokens);
         Parser = parser;
         var listener_lexer = new ErrorListener\<int>(false, false, System.Console.Error);
@@ -140,10 +143,12 @@ public class Program
     static bool old = false;
     static bool two_byte = false;
     static int exit_code = 0;
-    static Encoding encoding = null;
+    static string file_encoding = "<file_encoding>";
+    static bool binary = <binary>;
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
+    static bool earley = false;
 
     static void Main(string[] args)
     {
@@ -195,12 +200,7 @@ public class Program
             else if (args[i] == "-encoding")
             {
                 ++i;
-                encoding = Encoding.GetEncoding(
-                    args[i],
-                    new EncoderReplacementFallback("(unknown)"),
-                    new DecoderReplacementFallback("(error)"));
-                if (encoding == null)
-                    throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
+                file_encoding = args[i];
             }
             else if (args[i] == "-x")
             {
@@ -223,6 +223,15 @@ public class Program
             else if (args[i] == "-trace")
             {
                 show_trace = true;
+            }
+            else if (args[i] == "-earley")
+            {
+                earley = true;
+                show_tree = false;
+            }
+            else if (args[i][0] == '-')
+            {
+                // Ignore unknown option.
             }
             else
             {
@@ -274,15 +283,23 @@ public class Program
             FileStream fs = new FileStream(input, FileMode.Open);
             str = new Antlr4.Runtime.AntlrInputStream(fs);
         }
-        else if (encoding == null)
+        else if (file_encoding == null || file_encoding == "")
             str = CharStreams.fromPath(input);
-        else
+        else {
+            var encoding = Encoding.GetEncoding(
+                file_encoding,
+                new EncoderReplacementFallback("(unknown)"),
+                new DecoderReplacementFallback("(error)"));
+            if (encoding == null)
+                throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
             str = CharStreams.fromPath(input, encoding);
+        }
         DoParse(str, input, row_number);
     }
 
     static void DoParse(ICharStream str, string input_name, int row_number)
     {
+        if (binary) str = new BinaryCharStream(str);
         var lexer = new <lexer_name>(str);
         if (show_tokens)
         {
@@ -392,6 +409,25 @@ public class Program
         {
             System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
         }
+
+        if (earley) {
+            var epsilon_remover = new EpsilonRemover(parser);
+            var new_atn = epsilon_remover.Convert_ENFA_to_NFA();
+
+            lexer.Reset();
+            parser.Reset();
+
+            int start = parser.RuleNames.Select((value, index) => new { value, index })
+                .Where(pair => (pair.value == StartSymbol))
+                .Select(pair => pair.index).First();
+
+            MyATN atn = new_atn;
+            DateTime ebefore = DateTime.Now;
+            var accepted = EarleyATN.EarleyAtnRecognizer.ParseToTree(parser, new_atn, parser.TokenStream, start);
+            DateTime eafter = DateTime.Now;
+            Console.Error.WriteLine((accepted ? "ACCEPT" : "REJECT") + " " + (eafter - ebefore).TotalSeconds);
+        }
+
         if (tee) output.Close();
     }
 

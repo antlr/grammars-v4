@@ -14,3 +14,6 @@ Known issue:
 - Now consider `¥`(`\u00a5`,japanese yen) as UnexpectedCharacter insteadof Backslash(`\`,`\u005c`).
 - TJS2 bytecode also use *.tjs extension, this script can't parse them.
 - Need an preprocessor (`preprocessor.js`) to handle preprocess command.
+
+## Reference
+

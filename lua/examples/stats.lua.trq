@@ -1,0 +1,3 @@
+(: Check whether there are a correct number of "stat". :)
+
+assert count(//stat) = 1, "Invalid number of 'stat' nodes.";

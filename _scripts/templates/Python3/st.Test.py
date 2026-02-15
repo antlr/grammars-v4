@@ -34,11 +34,12 @@ tee = False
 show_tokens = False
 show_tree = False
 show_trace = False
-encoding = "utf-8"
+encoding = "<file_encoding>"
 error_code = 0
 string_instance = 0
 prefix = ""
 quiet = False
+noop = False
 
 def main(argv):
     global tee
@@ -81,6 +82,9 @@ def main(argv):
             quiet = True
         elif arg == "-trace":
             show_trace = True
+        elif arg[0] == "-":
+            # Ignore
+            noop = True
         else:
             inputs.append(argv[i])
             is_fns.append(True)
@@ -119,6 +123,8 @@ def ParseString(input, row_number):
 
 def ParseFilename(input, row_number):
     global encoding
+    if (encoding == ""):
+        encoding = "utf-8"
     str = FileStream(input, encoding)
     DoParse(str, input, row_number)
 

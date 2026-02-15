@@ -5,8 +5,8 @@ public abstract class RustLexerBase extends Lexer{
         super(input);
     }
 
-    Token current;
-    Token previous;
+    Token lt1;
+    Token lt2;
 
     @Override
     public Token nextToken() {
@@ -14,8 +14,8 @@ public abstract class RustLexerBase extends Lexer{
 
         if (next.getChannel() == Token.DEFAULT_CHANNEL) {
             // Keep track of the last token on the default channel.
-            this.previous = this.current;
-            this.current = next;
+            this.lt2 = this.lt1;
+            this.lt1 = next;
         }
 
         return next;
@@ -25,30 +25,45 @@ public abstract class RustLexerBase extends Lexer{
         return _input.LA(-1) <=0;
     }
     
-    public boolean next(char expect){
-        return _input.LA(1) == expect;
-    }
-
-    public boolean floatDotPossible(){
+    public boolean FloatDotPossible(){
         int next = _input.LA(1);
         // only block . _ identifier after float
-        if(next == '.' || next =='_') return false;
-        if(next == 'f') {
-            // 1.f32
-            if (_input.LA(2)=='3'&&_input.LA(3)=='2')return true;
-            //1.f64
-            if (_input.LA(2)=='6'&&_input.LA(3)=='4')return true;
+        if(next == '.' || next =='_')
+        {
             return false;
         }
-        if(next>='a'&&next<='z') return false;
-        if(next>='A'&&next<='Z') return false;
+        if(next == 'f') {
+            // 1.f32
+            if (_input.LA(2)=='3'&&_input.LA(3)=='2')
+            {
+                return true;
+            }
+            //1.f64
+            if (_input.LA(2)=='6'&&_input.LA(3)=='4')
+            {
+                return true;
+            }
+            return false;
+        }
+        if(next>='a'&&next<='z') {
+            return false;
+        }
+        if(next>='A'&&next<='Z') {
+            return false;
+        }
         return true;
     }
 
-    public boolean floatLiteralPossible(){
-        if(this.current == null || this.previous == null) return true;
-        if(this.current.getType() != RustLexer.DOT) return true;
-        switch (this.previous.getType()){
+    public boolean FloatLiteralPossible(){
+        if(this.lt1 == null || this.lt2 == null)
+        {
+            return true;
+        }
+        if(this.lt1.getType() != RustLexer.DOT)
+        {
+            return true;
+        }
+        switch (this.lt2.getType()){
             case RustLexer.CHAR_LITERAL:
             case RustLexer.STRING_LITERAL:
             case RustLexer.RAW_STRING_LITERAL:

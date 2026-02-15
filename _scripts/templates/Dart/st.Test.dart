@@ -3,9 +3,50 @@
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';
 } >
+import 'Args.dart' as args_holder;
 import 'MyErrorListener.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'BinaryCharStream.dart';
+
+// Wrapper to fix InputStream.sourceName always returning '\<unknown>'
+class NamedCharStream extends CharStream {
+  final CharStream _inner;
+  final String _name;
+
+  NamedCharStream(this._inner, this._name);
+
+  @override
+  String get sourceName => _name;
+
+  @override
+  int get index => _inner.index;
+
+  @override
+  int get size => _inner.size;
+
+  @override
+  void consume() => _inner.consume();
+
+  @override
+  int? LA(int offset) => _inner.LA(offset);
+
+  @override
+  int mark() => _inner.mark();
+
+  @override
+  void release(int marker) => _inner.release(marker);
+
+  @override
+  void seek(int _index) => _inner.seek(_index);
+
+  @override
+  String getText(Interval interval) => _inner.getText(interval);
+
+  @override
+  String toString() => _inner.toString();
+}
+
 
 var tee = false;
 var show_tree = false;
@@ -13,12 +54,16 @@ var show_tokens = false;
 var show_trace = false;
 var inputs = List\<String>.empty(growable: true);
 var is_fns = List\<bool>.empty(growable: true);
+var file_encoding = "<file_encoding>";
+var binary = <binary>;
 var error_code = 0;
 var string_instance = 0;
 var prefix = "";
 var quiet = false;
 
 void main(List\<String> args) async {
+    // Set command-line args before anything else.
+    args_holder.commandLineArgs = args;
     for (int i = 0; i \< args.length; ++i)
     {
         if (args[i] == "-tokens")
@@ -63,6 +108,10 @@ void main(List\<String> args) async {
         else if (args[i] == "-trace")
         {
             show_trace = true;
+        }
+        else if (args[i][0] == '-')
+        {
+            // Ignore unknown option.
         }
         else
         {
@@ -114,12 +163,21 @@ Future\<void> ParseString(String input, int row_number) async
 
 Future\<void> ParseFilename(String input, int row_number) async
 {
-    var str = await InputStream.fromPath(input);
-    await DoParse(str, input, row_number);
+    if (file_encoding == "") {
+        var str = await InputStream.fromPath(input);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
+    } else {
+        var enc = Encoding.getByName(file_encoding);
+        var str = await InputStream.fromPath(input, encoding: enc!);
+        var namedStr = NamedCharStream(str, input);
+        await DoParse(namedStr, input, row_number);
+    }
 }
 
 Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
+    if (binary) str = new BinaryCharStream(str);
     <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
     }>
     var lexer = <lexer_name>(str);

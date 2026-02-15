@@ -53,3 +53,7 @@ This repository currently focuses on the OCL core and UML-RSDS grammars. In the 
 ---
 
 Feel free to contribute to this repository or suggest additional grammars and tools that could enhance its capabilities.
+
+## Reference
+* [pldb](http://pldb.info/concepts/ocl)
+

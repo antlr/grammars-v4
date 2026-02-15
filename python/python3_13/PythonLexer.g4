@@ -417,7 +417,7 @@ fragment EXPONENT       : ('e' | 'E') ('+' | '-')? DIGIT_PART;
 // https://docs.python.org/3.13/reference/lexical_analysis.html#imaginary-literals
 fragment IMAG_NUMBER : (FLOAT_NUMBER | DIGIT_PART) ('j' | 'J');
 
-// https://github.com/RobEin/ANTLR4-parser-for-Python-3.13/tree/main/valid_chars_in_py_identifiers
+// github.com/RobEin/ANTLR4-parser-for-Python-3.13/tree/main/valid_chars_in_py_identifiers
 fragment ID_CONTINUE
     : ID_START
     | '\u{0030}' .. '\u{0039}'

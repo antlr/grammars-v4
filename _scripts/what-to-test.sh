@@ -2,11 +2,11 @@
 #set -x
 declare -A targets
 # remove temporarily TODO add back: "PHP"
-for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "TypeScript" "Antlr4ng"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
 do
     targets[$t]=0
 done
-directories=( `git diff --name-only $1 $2 . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | fgrep -v .github | tr -d '\r'` )
+directories=( `git diff --name-only $1 $2 . 2> /dev/null | sed 's#\(.*\)[/][^/]*$#\1#' | sort -u | grep -v _scripts | fgrep -v .github | grep -v 'examples/' | tr -d '\r'` )
 prefix=`pwd`
 for g in ${directories[@]}
 do
@@ -46,7 +46,7 @@ done
 
 ttargets=""
 # remove temporarily TODO add back: "PHP"
-for t in "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "TypeScript" "Antlr4ng"
+for t in  "Antlr4ng" "Cpp" "CSharp" "Dart" "Go" "Java" "JavaScript" "Python3" "Rust" "TypeScript"
 do
     if [ ${targets[$t]} -ne 0 ]
     then

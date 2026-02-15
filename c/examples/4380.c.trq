@@ -1,0 +1,2 @@
+assert count(//declaration/declarationSpecifiers/declarationSpecifier/typeSpecifier/typedefName/Identifier[text() = "nginx"]) = 1, "Declaration 'nginx *d;' is not being parsed correctly.";
+assert count(//declaration/initDeclaratorList/initDeclarator/declarator[./pointer][./directDeclarator/Identifier[text() = "d"]]) = 1, "Declaration 'nginx *d;' is not being parsed correctly.";

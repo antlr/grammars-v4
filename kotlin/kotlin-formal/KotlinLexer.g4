@@ -2,9 +2,9 @@
  * Kotlin Grammar for ANTLR v4
  *
  * Based on:
- * http://jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
+ * jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
  * and
- * http://kotlinlang.org/docs/reference/grammar.html
+ * kotlinlang.org/docs/reference/grammar.html
  *
  * Tested on
  * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi

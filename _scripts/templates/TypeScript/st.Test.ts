@@ -3,7 +3,6 @@
 import { CharStream } from 'antlr4';
 import { CharStreams } from 'antlr4';
 import { CommonTokenStream } from 'antlr4';
-import { ErrorListener } from 'antlr4';
 import { InputStream } from 'antlr4';
 import { Recognizer } from 'antlr4';
 import { RecognitionException } from 'antlr4';
@@ -15,6 +14,8 @@ import { readSync } from 'fs';
 import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
+import { BinaryCharStream } from './BinaryCharStream.js';
+import { ErrorListener } from './ErrorListener.js';
 
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GrammarAutomName>.js';
 } >
@@ -35,32 +36,6 @@ function getChar() {
     return buffer.toString('utf8');
 }
 
-
-class MyErrorListener\<T> extends ErrorListener\<T> {
-    _quiet: boolean;
-    _tee: boolean;
-    _output: any;
-    had_error: boolean;
-
-    constructor(quiet: boolean, tee: boolean, output: any) {
-        super();
-        this._quiet = quiet;
-        this._tee = tee;
-        this._output = output;
-        this.had_error = false;
-    }
-
-    syntaxError(recognizer: Recognizer\<T>, offendingSymbol: T, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
-        this.had_error = true;
-        if (this._tee) {
-            writeSync(this._output, `line ${line}:${column} ${msg}\n`);
-        }
-        if (!this._quiet) {
-            console.error(`line ${line}:${column} ${msg}`);
-        }
-    }
-}
-
 var tee = false;
 var show_profile = false;
 var show_tree = false;
@@ -68,7 +43,8 @@ var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var encoding = 'utf8';
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
 var inputs: string[] = [];
@@ -97,7 +73,7 @@ function main() {
                 tee = true;
                 break;
             case '-encoding':
-                encoding = process.argv[++i];
+                enc = process.argv[++i];
                 break;
             case '-x':
                 var sb = new StringBuilder();
@@ -120,8 +96,10 @@ function main() {
                 show_trace = true;
                 break;
             default:
-                inputs.push(process.argv[i]);
-                is_fns.push(true);
+                if (process.argv[i][0] !== '-') {
+                    inputs.push(process.argv[i]);
+                    is_fns.push(true);
+                }
                 break;
         }
     }
@@ -162,19 +140,23 @@ function ParseString(input: string, row_number: number) {
 }
 
 function ParseFilename(input: string, row_number: number) {
-    var str = CharStreams.fromPathSync(input, encoding);
+    if (enc === '') enc = 'utf8';
+    var buffer = readFileSync(input, { encoding: enc as BufferEncoding });
+    var str = CharStreams.fromString(buffer);
+    (str as any).name = input;
     DoParse(str, input, row_number);
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
     var output = tee ? openSync(input_name + ".errors", 'w') : 1;
-    var listener_parser = new MyErrorListener(quiet, tee, output);
-    var listener_lexer = new MyErrorListener(quiet, tee, output);
+    var listener_parser = new ErrorListener(quiet, tee, output);
+    var listener_lexer = new ErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
     lexer.addErrorListener(listener_lexer);
     if (show_tokens) {

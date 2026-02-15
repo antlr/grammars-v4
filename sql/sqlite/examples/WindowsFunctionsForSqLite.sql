@@ -299,3 +299,6 @@ FROM (
         Sales )
 WHERE
     RowNum = 1;
+
+-- Only valid with SQLITE_ENABLE_ORDERED_SET_AGGREGATES compile time option (https://sqlite.org/percentile.html)
+SELECT percentile_cont(P) WITHIN GROUP (ORDER BY Y) FROM tab;

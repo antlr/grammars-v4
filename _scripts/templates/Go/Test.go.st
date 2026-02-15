@@ -9,7 +9,7 @@ import (
     "strconv"
     "bufio"
     "github.com/antlr4-go/antlr/v4"
-    "example.com/myparser/<package_name>"
+    "example.com/Test/<package_name>"
 )
 type CustomErrorListener struct {
     errors int
@@ -66,6 +66,7 @@ var string_instance = 0
 var prefix = ""
 var quiet = false
 var tee = false
+var binary = <binary>
 
 func main() {
     for i := 1; i \< len(os.Args); i = i + 1 {
@@ -93,6 +94,8 @@ func main() {
             quiet = true
         } else if os.Args[i] == "-trace" {
             show_trace = true
+        } else if os.Args[i][0] == '-' {
+            // Ignore unknown option.
         } else {
             inputs = append(inputs, os.Args[i])
             is_fns = append(is_fns, true)
@@ -144,12 +147,20 @@ func ParseString(input string, row_number int) {
 }
 
 func ParseFilename(input string, row_number int) {
+    encoding := "<file_encoding>"
     var str antlr.CharStream = nil
-    str, _ = antlr.NewFileStream(input)        
+    if encoding != "" {
+        str, _ = NewEncodingFileStream(input, encoding)
+    } else {
+        str, _ = antlr.NewFileStream(input)
+    }
     DoParse(str, input, row_number)
 }
 
 func DoParse(str antlr.CharStream, input_name string, row_number int) {
+    if binary {
+        str = NewBinaryCharStream(str)
+    }
     var lexer = <go_lexer_name>(str);
     if show_tokens {
         j := 0

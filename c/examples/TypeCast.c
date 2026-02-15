@@ -1,3 +1,5 @@
+typedef struct foo {} CustomType;
+
 f()
 {
 	a1 = (int)(b1);

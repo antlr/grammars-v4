@@ -7,7 +7,7 @@
       <inputs>examples/**/*.sql</inputs>
    </test>
    <test>
-      <name>more</name>
+      <name>more-examples</name>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
       <inputs>more/**/*.sql</inputs>
    </test>

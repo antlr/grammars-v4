@@ -132,3 +132,37 @@ select count(t.*) as ca from t9 as t;
 SELECT a.* EXCLUDE (col1, col2), b.* EXCLUDE col3
 FROM t1 as a
 JOIN t2 as b USING (col5, col6);
+
+select * from t1
+union all by name
+select * from t2;
+
+select * from t1
+union by name
+select * from t2;
+
+select *
+from t
+where c1 is distinct from c2;
+
+select *
+from t
+where c1 is not distinct from c2;
+
+show warehouses
+->> select * from $1;
+
+SELECT 0 as c
+->> SELECT c FROM $1
+->> SELECT c FROM $2
+->> SELECT c FROM $3;
+
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY ORDER BY c1 desc)) ORDER BY empid;
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY));
+SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
+      SELECT DISTINCT quarter
+        FROM t2
+        WHERE television = TRUE
+        ORDER BY quarter))
+  ORDER BY empid;
+  SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (ANY) DEFAULT ON NULL (IFF(c3 % 2 = 0 ,1,-1)));

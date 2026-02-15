@@ -41,6 +41,7 @@
 					<grammarName>Java</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.java</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

@@ -24,6 +24,8 @@ import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
 import { isToken } from 'antlr4ng';
+import { BinaryCharStream } from './BinaryCharStream.js';
+import { ErrorListener } from './ErrorListener.js';
 
 <tool_grammar_tuples: {x | import { <x.GrammarAutomName> \} from './<x.GrammarAutomName>.js';
 } >
@@ -44,32 +46,6 @@ function getChar() {
     return buffer.toString('utf8');
 }
 
-
-class MyErrorListener\<T  extends ATNSimulator> extends ConsoleErrorListener {
-    _quiet: boolean;
-    _tee: boolean;
-    _output: any;
-    had_error: boolean;
-
-    constructor(quiet: boolean, tee: boolean, output: any) {
-        super();
-        this._quiet = quiet;
-        this._tee = tee;
-        this._output = output;
-        this.had_error = false;
-    }
-
-    syntaxError\<T extends ATNSimulator>(recognizer: Recognizer\<T> | null, offendingSymbol: unknown, line: number, column: number, msg: string | null, e: RecognitionException | null): void {
-        this.had_error = true;
-        if (this._tee) {
-            writeSync(this._output, `line ${line}:${column} ${msg}\n`);
-        }
-        if (!this._quiet) {
-            console.error(`line ${line}:${column} ${msg}`);
-        }
-    }
-}
-
 var tee = false;
 var show_profile = false;
 var show_tree = false;
@@ -77,7 +53,8 @@ var show_tokens = false;
 var show_trace = false;
 var error_code = 0;
 var quiet = false;
-var enc = 'utf8';
+var enc = '<file_encoding>';
+var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
 var inputs: string[] = [];
@@ -129,8 +106,10 @@ function main() {
                 show_trace = true;
                 break;
             default:
-                inputs.push(process.argv[i]);
-                is_fns.push(true);
+                if (process.argv[i][0] !== '-') {
+                    inputs.push(process.argv[i]);
+                    is_fns.push(true);
+                }
                 break;
         }
     }
@@ -162,29 +141,34 @@ function ParseStdin() {
     }
     var input = sb.ToString();
     var str = CharStream.fromString(input);
+    str.name = "stdin";
     DoParse(str, "stdin", 0);
 }
 
 function ParseString(input: string, row_number: number) {
     var str = CharStream.fromString(input);
+    str.name = "string";
     DoParse(str, "string" + string_instance++, row_number);
 }
 
 function ParseFilename(input: string, row_number: number) {
+    if (enc === '') enc = 'utf8';
     var buffer = readFileSync(input, { encoding: enc as BufferEncoding });
     var str = CharStream.fromString(buffer);
+    str.name = input;
     DoParse(str, input, row_number);
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
     var output = tee ? openSync(input_name + ".errors", 'w') : 1;
-    var listener_parser = new MyErrorListener(quiet, tee, output);
-    var listener_lexer = new MyErrorListener(quiet, tee, output);
+    var listener_parser = new ErrorListener(quiet, tee, output);
+    var listener_lexer = new ErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
     lexer.addErrorListener(listener_lexer);
     if (show_tokens) {
@@ -231,52 +215,52 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
 
 function toStringTree(tree: ParseTree, recog?: Parser | null): string {
     var sb = new StringBuilder();
-	let ruleNames = recog.ruleNames;
-	toStringTree2(sb, tree, 0, ruleNames);
-	return sb.toString();
+    let ruleNames = recog.ruleNames;
+    toStringTree2(sb, tree, 0, ruleNames);
+    return sb.toString();
 }
 
 function toStringTree2(sb: StringBuilder, tree: ParseTree, indent: number, ruleNames: string[] | null): void {
-	let s = getNodeText(tree, ruleNames);
-	s = escapeWhitespace(s!, false);
-	const c = tree.getChildCount();
-	if (c === 0) {
-	    for (let i = 0; i \< indent; ++i) sb.Append(" ");
-		sb.Append(s); sb.AppendLine("");
-		return;
-	}
+    let s = getNodeText(tree, ruleNames);
+    s = escapeWhitespace(s!, false);
+    const c = tree.getChildCount();
+    if (c === 0) {
+        for (let i = 0; i \< indent; ++i) sb.Append(" ");
+        sb.Append(s); sb.AppendLine("");
+        return;
+    }
     for (let i = 0; i \< indent; ++i) sb.Append(" ");
-	sb.Append(s); sb.AppendLine("");
-	for (let i = 0; i \< c; i++) {
-		toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
-	}
+    sb.Append(s); sb.AppendLine("");
+    for (let i = 0; i \< c; i++) {
+        toStringTree2(sb, tree.getChild(i)!, indent+1, ruleNames);
+    }
 }
 
 function getNodeText(t: ParseTree, ruleNames: string[] | null, recog?: Parser | null): string | undefined {
-	if (ruleNames !== null) {
-		if (t instanceof ParserRuleContext) {
-			const context = t.ruleContext;
-			const altNumber = context.getAltNumber();
-			// use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
-			if (altNumber !== 0) {
-				return ruleNames[t.ruleIndex] + ":" + altNumber;
-			}
+    if (ruleNames !== null) {
+        if (t instanceof ParserRuleContext) {
+            const context = t.ruleContext;
+            const altNumber = context.getAltNumber();
+            // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+            if (altNumber !== 0) {
+                return ruleNames[t.ruleIndex] + ":" + altNumber;
+            }
 
-			return ruleNames[t.ruleIndex];
-		} else if (t instanceof ErrorNode) {
-			return t.toString();
-		} else if (t instanceof TerminalNode) {
-			if (t.symbol !== null) {
-				return t.symbol.text;
-			}
-		}
-	}
-	const payload = t.getPayload();
-	if (isToken(payload)) {
-		return payload.text;
-	}
+            return ruleNames[t.ruleIndex];
+        } else if (t instanceof ErrorNode) {
+            return t.toString();
+        } else if (t instanceof TerminalNode) {
+            if (t.symbol !== null) {
+                return t.symbol.text;
+            }
+        }
+    }
+    const payload = t.getPayload();
+    if (isToken(payload)) {
+        return payload.text;
+    }
 
-	return String(t.getPayload());
+    return String(t.getPayload());
 }
 
 

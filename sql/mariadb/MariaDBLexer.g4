@@ -175,6 +175,7 @@ OVER                          : 'OVER';
 PARTITION                     : 'PARTITION';
 PRIMARY                       : 'PRIMARY';
 PACKAGE                       : 'PACKAGE';
+PERIOD                        : 'PERIOD';
 PROCEDURE                     : 'PROCEDURE';
 PURGE                         : 'PURGE';
 RANGE                         : 'RANGE';
@@ -289,6 +290,7 @@ LONGTEXT   : 'LONGTEXT';
 ENUM       : 'ENUM';
 VARYING    : 'VARYING';
 SERIAL     : 'SERIAL';
+VECTOR     : 'VECTOR';
 
 // Interval type Keywords
 
@@ -568,6 +570,7 @@ MAX_CONNECTIONS_PER_HOUR    : 'MAX_CONNECTIONS_PER_HOUR';
 MAX_QUERIES_PER_HOUR        : 'MAX_QUERIES_PER_HOUR';
 MAX_ROWS                    : 'MAX_ROWS';
 MAX_SIZE                    : 'MAX_SIZE';
+MAX_STATEMENT_TIME          : 'MAX_STATEMENT_TIME';
 MAX_UPDATES_PER_HOUR        : 'MAX_UPDATES_PER_HOUR';
 MAX_USER_CONNECTIONS        : 'MAX_USER_CONNECTIONS';
 MEDIUM                      : 'MEDIUM';
@@ -600,6 +603,7 @@ ODBC                        : 'ODBC';
 OFFLINE                     : 'OFFLINE';
 OFFSET                      : 'OFFSET';
 OF                          : 'OF';
+OFF                         : 'OFF';
 OJ                          : 'OJ';
 OLD_PASSWORD                : 'OLD_PASSWORD';
 ONE                         : 'ONE';

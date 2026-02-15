@@ -24,7 +24,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-## Links
+## Reference
 
 * [LocalStack](https://github.com/localstack/localstack) - LocalStack, the project 
 that developed the grammar and an Amazon States Language interpreter.
