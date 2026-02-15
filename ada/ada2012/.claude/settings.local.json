@@ -6,7 +6,20 @@
       "Bash(echo:*)",
       "Bash(ls:*)",
       "Bash(PATH=\"/c/msys64/mingw64/bin:$PATH\" gnatmake:*)",
-      "Bash(./a29003a.exe:*)"
+      "Bash(./a29003a.exe:*)",
+      "Bash(./bin/Debug/net10.0/Test.exe:*)",
+      "Bash(grep:*)",
+      "Bash(./Generated-CSharp/bin/Debug/net10.0/Test.exe:*)",
+      "Bash(dotnet build:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:pub.dev)",
+      "Bash(bash build.sh)",
+      "Bash(dart compile exe:*)",
+      "Bash(bash test.sh:*)",
+      "Bash(go env:*)",
+      "Bash(node:*)",
+      "Bash(python3:*)"
     ]
   }
 }

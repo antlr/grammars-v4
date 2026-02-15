@@ -8,6 +8,30 @@ type AdaParserBase struct {
 	*antlr.BaseParser
 }
 
+// pragmaTokenSource wraps a list of tokens as a Lexer for CommonTokenStream.
+type pragmaTokenSource struct {
+	*antlr.BaseLexer
+	toks []antlr.Token
+	pos  int
+}
+
+func (s *pragmaTokenSource) NextToken() antlr.Token {
+	if s.pos >= len(s.toks) {
+		return s.toks[len(s.toks)-1] // EOF
+	}
+	t := s.toks[s.pos]
+	s.pos++
+	return t
+}
+
+func (s *pragmaTokenSource) GetATN() *antlr.ATN {
+	return nil
+}
+
+func (s *pragmaTokenSource) GetSourceName() string {
+	return "pragma"
+}
+
 func (p *AdaParserBase) ParsePragmas() {
 	stream, ok := p.GetTokenStream().(*antlr.CommonTokenStream)
 	if !ok {
@@ -33,24 +57,23 @@ func (p *AdaParserBase) ParsePragmas() {
 		}
 	}
 	for _, pragmaTokens := range pragmas {
-		var defaultChannelTokens []antlr.Token
+		source := pragmaTokens[0].GetSource()
+		var tokens []antlr.Token
 		for _, t := range pragmaTokens {
-			ct := antlr.NewCommonToken(nil, t.GetTokenType(), antlr.TokenDefaultChannel, t.GetStart(), t.GetStop())
+			ct := antlr.NewCommonToken(source, t.GetTokenType(), antlr.TokenDefaultChannel, t.GetStart(), t.GetStop())
 			ct.SetText(t.GetText())
-			ct.SetLine(t.GetLine())
-			ct.SetColumn(t.GetColumn())
-			ct.SetTokenIndex(t.GetTokenIndex())
-			defaultChannelTokens = append(defaultChannelTokens, ct)
+			tokens = append(tokens, ct)
 		}
-		eof := antlr.NewCommonToken(nil, antlr.TokenEOF, antlr.TokenDefaultChannel, -1, -1)
-		defaultChannelTokens = append(defaultChannelTokens, eof)
-		tokenSource := antlr.NewListTokenSource(defaultChannelTokens)
-		tokenStream := antlr.NewCommonTokenStream(tokenSource, antlr.TokenDefaultChannel)
+		eof := antlr.NewCommonToken(source, antlr.TokenEOF, antlr.TokenDefaultChannel, -1, -1)
+		tokens = append(tokens, eof)
+		src := &pragmaTokenSource{
+			BaseLexer: &antlr.BaseLexer{BaseRecognizer: antlr.NewBaseRecognizer()},
+			toks:      tokens,
+		}
+		tokenStream := antlr.NewCommonTokenStream(src, antlr.TokenDefaultChannel)
 		parser := NewAdaParser(tokenStream)
 		parser.RemoveErrorListeners()
-		for _, listener := range p.GetErrorListenerDispatch().GetChildren() {
-			parser.AddErrorListener(listener)
-		}
+		parser.AddErrorListener(p.GetErrorListenerDispatch())
 		parser.PragmaRule()
 	}
 }

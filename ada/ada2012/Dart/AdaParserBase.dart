@@ -8,7 +8,7 @@ abstract class AdaParserBase extends Parser {
     void ParsePragmas() {
         var stream = tokenStream as BufferedTokenStream;
         stream.fill();
-        var allTokens = stream.getTokens();
+        var allTokens = stream.getTokens() ?? [];
         const int PRAGMA_CHANNEL = 2;
         List<Token>? currentPragma;
         var pragmas = <List<Token>>[];

@@ -54,9 +54,7 @@ void AdaParserBase::ParsePragmas()
         auto tokenStream = std::make_unique<antlr4::CommonTokenStream>(tokenSource.get());
         AdaParser parser(tokenStream.get());
         parser.removeErrorListeners();
-        for (auto listener : getErrorListeners()) {
-            parser.addErrorListener(listener);
-        }
+        parser.addErrorListener(&getErrorListenerDispatch());
         parser.pragmaRule();
     }
 }
