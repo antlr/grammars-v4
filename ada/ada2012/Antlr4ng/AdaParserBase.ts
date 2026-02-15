@@ -40,7 +40,7 @@ export abstract class AdaParserBase extends Parser {
             const tokenStream = new CommonTokenStream(tokenSource);
             const parser = new AdaParser(tokenStream);
             parser.removeErrorListeners();
-            for (const listener of this.errorListeners) {
+            for (const listener of this.getErrorListeners()) {
                 parser.addErrorListener(listener);
             }
             parser.pragmaRule();
