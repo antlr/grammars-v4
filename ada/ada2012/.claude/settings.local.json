@@ -20,7 +20,8 @@
       "Bash(go env:*)",
       "Bash(node:*)",
       "Bash(python3:*)",
-      "Bash(antlr4:*)"
+      "Bash(antlr4:*)",
+      "Bash(bash run.sh ../examples/acats/c2/c25001a.ada -tokens)"
     ]
   }
 }

@@ -151,13 +151,16 @@ NUMERIC_LITERAL_ : DECIMAL_LITERAL_ | BASED_LITERAL;
 DECIMAL_LITERAL_ : NUMERAL ('.' NUMERAL)? EXPONENT?;
 NUMERAL          : DIGIT+ ('_'? DIGIT)*;
 EXPONENT         : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
-BASED_LITERAL    : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
+// Ada 83 (RM Annex J.2) allows ':' in place of '#' as the based literal delimiter.
+BASED_LITERAL    : BASE ('#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' | ':' BASED_NUMERAL ('.' BASED_NUMERAL)? ':') EXPONENT?;
 BASED_NUMERAL    : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
 EXTENDED_DIGIT   : DIGIT | [A-F];
 BASE             : NUMERAL;
 
-CHARACTER_LITERAL_ : {this.IsCharLiteralAllowed()}? '\'' ~['\\\r\n] '\'';
-STRING_LITERAL_    : '"' ('""' | ~'"')* '"';
+// Ada RM 2.6: character_literal ::= 'graphic_character' (includes apostrophe and backslash)
+CHARACTER_LITERAL_ : {this.IsCharLiteralAllowed()}? '\'' ~[\r\n] '\'';
+// Ada 83 (RM Annex J.2) allows '%' as an alternative string delimiter.
+STRING_LITERAL_    : '"' ('""' | ~'"')* '"' | '%' ('%%' | ~[%\r\n])* '%';
 
 fragment LETTER : [A-Z];
 fragment DIGIT  : [0-9];
@@ -197,7 +200,7 @@ PRAGMA_WHITESPACE      : [\u0009\u000A\u000B\u000C\u000D\u0020]+ -> channel(HIDD
 PRAGMA_LINE_COMMENT    : '--' ~[\r\n]*                            -> channel(HIDDEN);
 PRAGMA_IDENTIFIER      : [A-Z]+ [A-Z_0-9]*         -> channel(PRAGMA_CHANNEL), type(IDENTIFIER_);
 PRAGMA_STRING_LITERAL  : '"' ('""' | ~'"')* '"'     -> channel(PRAGMA_CHANNEL), type(STRING_LITERAL_);
-PRAGMA_CHAR_LITERAL    : '\'' ~['\\\r\n] '\''       -> channel(PRAGMA_CHANNEL), type(CHARACTER_LITERAL_);
+PRAGMA_CHAR_LITERAL    : '\'' ~[\r\n] '\''           -> channel(PRAGMA_CHANNEL), type(CHARACTER_LITERAL_);
 PRAGMA_NUMERIC_LITERAL : [0-9]+ ('_'? [0-9])* (('.' [0-9]+ ('_'? [0-9])*)? ([E] [+-]? [0-9]+ ('_'? [0-9])*)? | '#' [0-9A-F]+ ('_'? [0-9A-F])* ('.' [0-9A-F]+ ('_'? [0-9A-F])*)? '#' ([E] [+-]? [0-9]+ ('_'? [0-9])*)?) -> channel(PRAGMA_CHANNEL), type(NUMERIC_LITERAL_);
 PRAGMA_ARROW           : '=>' -> channel(PRAGMA_CHANNEL), type(ARROW);
 PRAGMA_DOTDOT          : '..' -> channel(PRAGMA_CHANNEL), type(DOTDOT);
