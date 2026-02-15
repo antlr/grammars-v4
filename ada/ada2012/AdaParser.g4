@@ -28,7 +28,10 @@ parser grammar AdaParser;
 
 options {
     tokenVocab = AdaLexer;
+    superClass = AdaParserBase;
 }
+
+// Insert here @header for parser.
 
 /*
 2 - Lexical Elements
@@ -1144,7 +1147,7 @@ abort_statement
 */
 
 compilation
-    : compilation_unit* EOF
+    : compilation_unit* {this.ParsePragmas();} EOF
     ;
 
 compilation_unit
@@ -1494,4 +1497,17 @@ at_clause
 
 mod_clause
     : AT MOD expression SEMI
+    ;
+
+/*
+2.8 - Pragmas
+*/
+
+pragmaRule
+    : PRAGMA identifier (LP pragma_argument_association (COMMA pragma_argument_association)* RP)? SEMI EOF
+    ;
+
+pragma_argument_association
+    : (identifier ARROW)? expression
+    | name
     ;

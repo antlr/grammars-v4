@@ -23,6 +23,8 @@ def transform_grammar(file_path):
             for line in input_file:
                 line = re.sub(r"(\/\/ Insert here @header for lexer\.)",
                     '@header {import { AdaLexerBase } from "./AdaLexerBase.js"}', line)
+                line = re.sub(r"(\/\/ Insert here @header for parser\.)",
+                    '@header {import { AdaParserBase } from "./AdaParserBase.js"}', line)
                 output_file.write(line)
 
     print("Writing ...")

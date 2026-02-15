@@ -22,6 +22,8 @@ def fix(file_path):
     for x in input_file:
         if '// Insert here @header for lexer.' in x:
             x = x.replace('// Insert here @header for lexer.', '@header {#include "AdaLexerBase.h"}')
+        if '// Insert here @header for parser.' in x:
+            x = x.replace('// Insert here @header for parser.', '@header {#include "AdaParserBase.h"}')
         if 'this.' in x:
             x = x.replace('this.', 'this->')
         output_file.write(x)
