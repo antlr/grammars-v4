@@ -24,7 +24,7 @@
       "Bash(bash run.sh ../examples/acats/c2/c25001a.ada -tokens)",
       "Bash(for f in ../examples/acats/c3/c34003a.ada ../examples/acats/c3/c34003c.ada ../examples/acats/c3/c34004a.ada ../examples/acats/c3/c34004c.ada ../examples/acats/c3/c35a02a.ada)",
       "Bash(do echo \"=== $f ===\")",
-      "Bash(done)",
+      "Bash(done)",<<<<<<< HEAD
       "Bash(do echo \"$f\")",
       "Bash(dotnet trgen:*)"
     ]
