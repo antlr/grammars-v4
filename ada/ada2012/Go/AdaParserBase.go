@@ -283,9 +283,9 @@ func (p *AdaParserBase) EnterDeclaration() {
 			}
 			return
 		case *Generic_instantiationContext:
-			dpuns := c.AllDefining_program_unit_name()
-			if len(dpuns) > 0 {
-				defId := dpuns[0].Defining_identifier()
+			dpun := c.Defining_program_unit_name()
+			if dpun != nil {
+				defId := dpun.Defining_identifier()
 				if defId != nil {
 					tc := PackageName_
 					if c.PROCEDURE() != nil || c.FUNCTION() != nil {
@@ -294,11 +294,11 @@ func (p *AdaParserBase) EnterDeclaration() {
 					p.defineSymbol(defId.GetText(), tc, defId.GetStart(), false)
 				}
 			}
-			dds := c.AllDefining_designator()
-			if len(dds) > 0 {
-				dpun := dds[0].Defining_program_unit_name()
-				if dpun != nil {
-					defId := dpun.Defining_identifier()
+			dd := c.Defining_designator()
+			if dd != nil {
+				ddDpun := dd.Defining_program_unit_name()
+				if ddDpun != nil {
+					defId := ddDpun.Defining_identifier()
 					if defId != nil {
 						p.defineSymbol(defId.GetText(), SubprogramName_, defId.GetStart(), false)
 					}

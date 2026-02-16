@@ -195,20 +195,20 @@ abstract class AdaParserBase extends Parser {
                 return;
             }
             if (ctx is Generic_instantiationContext) {
-                var dpuns = ctx.defining_program_unit_names();
-                if (dpuns.isNotEmpty) {
-                    var defId = dpuns[0].defining_identifier();
+                var dpun = ctx.defining_program_unit_name();
+                if (dpun != null) {
+                    var defId = dpun.defining_identifier();
                     if (defId != null) {
                         var tc = TypeClassification.packageName_;
                         if (ctx.PROCEDURE() != null || ctx.FUNCTION() != null) tc = TypeClassification.subprogramName_;
                         _defineSymbol(defId.text, tc, defId.start);
                     }
                 }
-                var dds = ctx.defining_designators();
-                if (dds.isNotEmpty) {
-                    var dpun = dds[0].defining_program_unit_name();
-                    if (dpun != null) {
-                        var defId = dpun.defining_identifier();
+                var dd = ctx.defining_designator();
+                if (dd != null) {
+                    var ddDpun = dd.defining_program_unit_name();
+                    if (ddDpun != null) {
+                        var defId = ddDpun.defining_identifier();
                         if (defId != null) _defineSymbol(defId.text, TypeClassification.subprogramName_, defId.start);
                     }
                 }

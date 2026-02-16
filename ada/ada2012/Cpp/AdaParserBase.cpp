@@ -151,20 +151,20 @@ void AdaParserBase::EnterDeclaration()
             return;
         }
         if (auto gi = dynamic_cast<AdaParser::Generic_instantiationContext*>(context)) {
-            auto dpuns = gi->defining_program_unit_name();
-            if (!dpuns.empty()) {
-                auto defId = dpuns[0]->defining_identifier();
+            auto dpun = gi->defining_program_unit_name();
+            if (dpun) {
+                auto defId = dpun->defining_identifier();
                 if (defId) {
                     auto tc = TypeClassification::PackageName_;
                     if (gi->PROCEDURE() || gi->FUNCTION()) tc = TypeClassification::SubprogramName_;
                     defineSymbol(defId->getText(), tc, defId->getStart());
                 }
             }
-            auto dds = gi->defining_designator();
-            if (!dds.empty()) {
-                auto dpun = dds[0]->defining_program_unit_name();
-                if (dpun && dpun->defining_identifier())
-                    defineSymbol(dpun->defining_identifier()->getText(), TypeClassification::SubprogramName_, dpun->defining_identifier()->getStart());
+            auto dd = gi->defining_designator();
+            if (dd) {
+                auto ddDpun = dd->defining_program_unit_name();
+                if (ddDpun && ddDpun->defining_identifier())
+                    defineSymbol(ddDpun->defining_identifier()->getText(), TypeClassification::SubprogramName_, ddDpun->defining_identifier()->getStart());
             }
             return;
         }

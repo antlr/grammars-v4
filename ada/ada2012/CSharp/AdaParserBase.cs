@@ -359,10 +359,9 @@ public abstract class AdaParserBase : Parser
             }
             if (context is AdaParser.Generic_instantiationContext gi)
             {
-                var dpuns = gi.defining_program_unit_name();
-                if (dpuns != null && dpuns.Length > 0)
+                var dpun = gi.defining_program_unit_name();
+                if (dpun != null)
                 {
-                    var dpun = dpuns[0];
                     var defId = dpun.defining_identifier();
                     if (defId != null)
                     {
@@ -373,14 +372,13 @@ public abstract class AdaParserBase : Parser
                         DefineSymbol(defId.GetText(), tc, defId.Start);
                     }
                 }
-                var dds = gi.defining_designator();
-                if (dds != null && dds.Length > 0)
+                var dd = gi.defining_designator();
+                if (dd != null)
                 {
-                    var dd = dds[0];
-                    var dpun = dd.defining_program_unit_name();
-                    if (dpun != null)
+                    var ddDpun = dd.defining_program_unit_name();
+                    if (ddDpun != null)
                     {
-                        var defId = dpun.defining_identifier();
+                        var defId = ddDpun.defining_identifier();
                         if (defId != null)
                             DefineSymbol(defId.GetText(), TypeClassification.SubprogramName_, defId.Start);
                     }

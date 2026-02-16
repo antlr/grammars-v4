@@ -226,20 +226,20 @@ public abstract class AdaParserBase extends Parser {
             }
             if (context instanceof AdaParser.Generic_instantiationContext) {
                 AdaParser.Generic_instantiationContext gi = (AdaParser.Generic_instantiationContext) context;
-                List<AdaParser.Defining_program_unit_nameContext> dpuns = gi.defining_program_unit_name();
-                if (dpuns != null && !dpuns.isEmpty()) {
-                    AdaParser.Defining_identifierContext defId = dpuns.get(0).defining_identifier();
+                AdaParser.Defining_program_unit_nameContext dpun = gi.defining_program_unit_name();
+                if (dpun != null) {
+                    AdaParser.Defining_identifierContext defId = dpun.defining_identifier();
                     if (defId != null) {
                         TypeClassification tc = TypeClassification.PackageName_;
                         if (gi.PROCEDURE() != null || gi.FUNCTION() != null) tc = TypeClassification.SubprogramName_;
                         defineSymbol(defId.getText(), tc, defId.getStart());
                     }
                 }
-                List<AdaParser.Defining_designatorContext> dds = gi.defining_designator();
-                if (dds != null && !dds.isEmpty()) {
-                    AdaParser.Defining_program_unit_nameContext dpun = dds.get(0).defining_program_unit_name();
-                    if (dpun != null && dpun.defining_identifier() != null)
-                        defineSymbol(dpun.defining_identifier().getText(), TypeClassification.SubprogramName_, dpun.defining_identifier().getStart());
+                AdaParser.Defining_designatorContext dd = gi.defining_designator();
+                if (dd != null) {
+                    AdaParser.Defining_program_unit_nameContext ddDpun = dd.defining_program_unit_name();
+                    if (ddDpun != null && ddDpun.defining_identifier() != null)
+                        defineSymbol(ddDpun.defining_identifier().getText(), TypeClassification.SubprogramName_, ddDpun.defining_identifier().getStart());
                 }
                 return;
             }
