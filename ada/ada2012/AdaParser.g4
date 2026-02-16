@@ -739,7 +739,7 @@ iterator_specification
     ;
 
 block_statement
-    : (direct_name COLON)? (DECLARE {this.EnterScope();} declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
+    : (direct_name COLON)? {this.EnterScope();} (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END identifier? SEMI {this.ExitScope();}
     ;
 
 exit_statement
