@@ -1,0 +1,151 @@
+-- B740002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that the full constant declaration completing a deferred constant
+--     declaration is illegal if it has an anonymous access type that does not
+--     statically match that of the deferred constant declaration.
+--
+--     Check that the full constant declaration must exclude null if the
+--     deferred constant declaration excludes null.
+--
+-- TEST DESCRIPTION:
+--     This test declares deferred constants of accesses to a private type
+--     in the visible part of a package specification, and completes them
+--     with full constant declarations in the private part of the same
+--     package. The test verifies that completions that don't statically
+--     match or don't exclude null are illegal.
+--
+-- CHANGE HISTORY:
+--      30 Apr 07   RLB   Created from ACATS 2.6 test.
+--      21 Aug 07   RLB   Removed Cnst_Priv_22 pending resolution of
+--                        AI05-0062.
+--      05 Dec 07   RLB   Replaced Cnst_Priv_22.
+--      22 Apr 21   RLB   Added error location indicators.
+--!
+
+package B740002 is
+
+   type Priv_Comp is private;
+
+   type Acc_to_Priv is access all Priv_Comp;
+
+   Cnst_Priv_1 : constant access Priv_Comp;
+
+   Cnst_Priv_2 : constant access Priv_Comp;
+
+   Cnst_Priv_3 : constant access constant Priv_Comp;
+
+   Cnst_Priv_4 : constant access constant Priv_Comp;
+
+   Cnst_Priv_5 : constant not null access Priv_Comp;
+
+   Cnst_Priv_6 : constant not null access Priv_Comp;
+
+   Cnst_Priv_7 : constant not null access constant Priv_Comp;
+
+   Cnst_Priv_8 : constant not null access constant Priv_Comp;
+
+   Cnst_Priv_9 : constant access Priv_Comp;
+
+   Cnst_Priv_10: constant access constant Priv_Comp;
+
+   Cnst_Priv_11 : constant access Priv_Comp;
+
+   Cnst_Priv_12 : constant Acc_to_Priv;
+
+   Cnst_Priv_13 : constant Acc_to_Priv;
+
+   Cnst_Priv_14 : constant access Priv_Comp;
+
+   Cnst_Priv_21 : constant not null Acc_to_Priv;
+
+   Cnst_Priv_22 : constant Acc_to_Priv;
+
+   Cnst_Priv_23 : constant not null Acc_to_Priv;
+
+private
+
+   type Small_Int is range 0 .. 5;
+   type Priv_Comp is new Small_Int;
+
+   Priv_Obj : aliased Priv_Comp := 5;
+
+   -- Check static matching:
+
+   Cnst_Priv_1 : constant access Priv_Comp := null;           -- OK. {4;1}
+
+   Cnst_Priv_2 : constant access constant Priv_Comp := null;  -- ERROR: {4;1}
+
+   Cnst_Priv_3 : constant access Priv_Comp := null;           -- ERROR: {4;1}
+
+   Cnst_Priv_4 : constant access constant Priv_Comp := null;  -- OK. {4;1}
+
+   Cnst_Priv_5 : constant access Priv_Comp := Priv_Obj'Access;-- ERROR: {4;1}
+
+   Cnst_Priv_6 : constant not null access Priv_Comp :=
+                    Priv_Obj'Access;                          -- OK. {1:4;1}
+
+   Cnst_Priv_7 : constant access constant Priv_Comp :=
+                    Priv_Obj'Access;                          -- ERROR: {1:4;1}
+
+   Cnst_Priv_8 : constant not null access constant Priv_Comp :=
+                    Priv_Obj'Access;                          -- OK. {1:4;1}
+
+   Cnst_Priv_9 : constant not null access Priv_Comp :=
+                    Priv_Obj'Access;                          -- ERROR: {1:4;1}
+
+   Cnst_Priv_10: constant not null access constant Priv_Comp :=
+                    Priv_Obj'Access;                          -- ERROR: {1:4;1}
+
+   Cnst_Priv_11 : constant Acc_to_Priv := null;               -- ERROR: {4;1}
+
+   Cnst_Priv_12 : constant Acc_to_Priv := null;               -- OK. {4;1}
+
+   Cnst_Priv_13 : constant access Priv_Comp := null;          -- ERROR: {4;1}
+
+   Cnst_Priv_14 : constant access Small_Int := null;          -- ERROR: {4;1}
+
+   -- Check null exclusions:
+
+   Cnst_Priv_21 : constant not null Acc_to_Priv :=
+                    Priv_Obj'Access;                          -- OK. {1:4;1}
+
+   Cnst_Priv_22 : constant not null Acc_to_Priv :=
+                    Priv_Obj'Access;                          -- OK. {1:4;1}
+
+   Cnst_Priv_23 : constant Acc_to_Priv :=
+                    Priv_Obj'Access;                          -- ERROR: {1:4;1}
+
+end B740002;

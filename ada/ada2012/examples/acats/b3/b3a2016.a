@@ -1,0 +1,393 @@
+-- B3A2016.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the type or profile of the prefix of X'Access is used
+--      to resolve the expected type (both for X as an object and as a
+--      subprogram).
+--
+--      Check that the kind (pool-specific, access-to-constant, and so
+--      on) of access types that have the appropriate
+--      designated type is not used to resolve the expected type.
+--
+--      Check that different access-to-subprogram types with the same accessed
+--      profile do not match.
+--
+-- TEST DESCRIPTION:
+--      3.10.2(2-2.3/2) was changed by AI-235 (which was included in the
+--      Amendment) to allow the type or profile of the prefix of an
+--      'Access or 'Unchecked_Access attribute to participate in the
+--      resolution of the attribute.
+--
+--      However, the rule still requires a "single access type", so
+--      all access type with the appropriate designated type or profile
+--      participate in the resolution. This means that the type of the
+--      prefix cannot be used to help determine the expected type. It also
+--      means that pool-specific access types (which can never match the
+--      attribute) participate in the resolution. Similarly, access to variable
+--      types participate even if the object is a constant.
+--
+--      Therefore, a series of subprograms overloaded on several access types
+--      are declared. Various calls to the subprograms with Access and
+--      Unchecked_Access attributes which should and should not be legal.
+--
+--      We also check the common error of using a type conversion instead of
+--      a qualified expression to disambiguate the calls. (This is illegal by
+--      8.6(27)).
+--
+--      We additionally check that overloading in the prefix of an access
+--      attribute can be resolved.
+--
+--      Several calls with similar access types with the same structure but
+--      different names are also attempted.
+--
+-- CHANGE HISTORY:
+--      17 Dec 99   RLB     Created initial test from an Ada user problem
+--                          report.
+--      27 Apr 00   RLB     Added type conversion and pool-specific access
+--                          type cases, corrected description based on user
+--                          comments.
+--      12 May 00   RLB     Added weird test cases to see what happens if
+--                          Tucker's rewording is adopted. Marked errors that
+--                          are OK if the change (AI-235) is adopted.
+--      31 May 00   RLB     Created a version that does not include any cases
+--                          that depend on AI-235's resolution (for current
+--                          use) - such cases are commented out, to be replaced
+--                          either as errors or OKs, depending on the AI.
+--      01 Jun 00   RLB     Added an access to constant test as suggested
+--                          by Tucker.
+--      15 Mar 07   RLB     Replaced test cases based on Amendment wording
+--                          (from AI-235).
+--      09 Feb 18   RLB     Added error location indicators to reflect common
+--                          error reporting strategies.
+--
+--!
+
+package B3A2016 is
+
+   type Int_Ptr is access all Integer;
+   type Char_Ptr is access all Character;
+   type Float_Ptr is access all Float;
+   type Pool_Float_Ptr is access Float;
+   type Constant_Float_Ptr is access constant Float;
+
+   function Zap (Val : Int_Ptr) return Float;
+   function Zap (Val : Float_Ptr) return Float;
+
+   function Zup (Val : Float_Ptr) return Float;
+   function Zup (Val : Pool_Float_Ptr) return Float;
+
+   function Zwp (Val : Float_Ptr) return Float;
+   function Zwp (Val : Constant_Float_Ptr) return Float;
+
+   function Zop (Val : Int_Ptr) return Float;
+
+   type Access_Proc is access procedure (Flag : Boolean);
+   type Access_Func is access function (Val : Integer) return Boolean;
+
+   procedure Zip (Val : Access_Proc);
+   procedure Zip (Val : Access_Func);
+
+   function Zep (Val : Float_Ptr) return Float;
+   function Zep (Val : Access_Func) return Float;
+
+   function Zyp return Int_Ptr;
+   function Zyp return Char_Ptr;
+
+   package Pkg is
+      type Access_Proc is access procedure (Flag : Boolean);
+      procedure Call (Action : Access_Proc);
+      function Zop (Val : Float_Ptr) return Float;
+
+      type My_Tagged is tagged null record;
+
+      procedure My_Op (Val : access My_Tagged);
+   end Pkg;
+
+   package Pkg2 is
+      type New_Tagged is new Pkg.My_Tagged with null record;
+
+      -- Inherits My_Op (Val : access New_Tagged);
+   end Pkg2;
+
+   procedure Set_Flag (Flag : Boolean);
+   procedure Set_Flag (Value : Integer);
+
+
+end B3A2016;
+
+
+     --==================================================================--
+
+
+package body B3A2016 is
+
+   function Zap (Val : Int_Ptr) return Float is
+   begin
+      return Float(Val.all);
+   end Zap;
+
+   function Zap (Val : Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zap;
+
+   function Zop (Val : Int_Ptr) return Float is
+   begin
+      return Float(Val.all);
+   end Zop;
+
+   procedure Zip (Val : Access_Proc) is
+   begin
+      Val (True);
+   end Zip;
+
+   procedure Zip (Val : Access_Func) is
+   begin
+      if Val (10) then
+         null;
+      end if;
+   end Zip;
+
+   function Zup (Val : Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zup;
+
+   function Zup (Val : Pool_Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zup;
+
+   function Zwp (Val : Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zwp;
+
+   function Zwp (Val : Constant_Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zwp;
+
+   function Zep (Val : Float_Ptr) return Float is
+   begin
+      return Val.all;
+   end Zep;
+
+   function Zep (Val : Access_Func) return Float is
+   begin
+      if Val (10) then
+         return 2.0;
+      else
+         return 0.0;
+      end if;
+   end Zep;
+
+   function Zyp return Int_Ptr is
+   begin
+      return null;
+   end Zyp;
+
+   function Zyp return Char_Ptr is
+   begin
+      return null;
+   end Zyp;
+
+   procedure Set_Flag (Flag : Boolean) is
+   begin
+      null;
+   end Set_Flag;
+
+   procedure Set_Flag (Value : Integer) is
+   begin
+      null;
+   end Set_Flag;
+
+
+   -- Test that the prefix of 'Access for objects is used in resolution:
+
+   Value : aliased Integer := 4;
+
+   Result1 : Float := Zap (Value'access);                    -- OK. {23;1}
+   Result2 : Float := Zap (Int_Ptr'(Value'access));          -- OK. {23;1}
+
+   Temperature : aliased Float := 98.6;
+
+   Result3 : Float := Zap (Temperature'access);              -- OK. {23;1}
+   Result4 : Float := Zap (Float_Ptr(Temperature'access));   -- ERROR: {23;1}
+                                                             -- Type conversion
+   Result5 : Float := Zap (Float_Ptr'(Temperature'access));  -- OK. {23;1}
+
+   package body Pkg is
+      procedure Call (Action : Access_Proc) is
+      begin
+         Action (TRUE);
+      end Call;
+      function Zop (Val : Float_Ptr) return Float is
+      begin
+         return Val.all;
+      end Zop;
+
+      Humidity : aliased Float := 0.57;
+
+      Result6 : Float := Zop (Humidity'access);              -- OK. {26;1}
+      Result7 : Float := Zop (Float_Ptr(Humidity'access));   -- ERROR: {26;1}
+                                                             -- Type conversion
+      Result8 : Float := Zop (Float_Ptr'(Humidity'access));  -- OK. {26;1}
+      Result9 : Float := Pkg.Zop (Humidity'access);          -- OK. {26;1}
+
+      procedure My_Op (Val : access My_Tagged) is
+      begin
+         null;
+      end My_Op;
+
+   end Pkg;
+
+   -- Test that the prefix of 'Unchecked_Access for objects is used
+   -- in resolution:
+
+   Result11 : Float := Zap (Value'Unchecked_Access);         -- OK. {24;1}
+   Result12 : Float := Zap (Int_Ptr(
+                            Value'Unchecked_Access));        -- ERROR: {1:24;1}
+                                                             -- Type conversion
+   Result13 : Float := Zap (Int_Ptr'(Value'Unchecked_Access)); -- OK. {24;1}
+
+   Result14 : Float := Zap (Temperature'Unchecked_Access);   -- OK. {24;1}
+   Result15 : Float := Zap (Float_Ptr(
+                            Temperature'Unchecked_Access));  -- ERROR: {1:24;1}
+                                                             -- Type conversion
+   Result16 : Float := Zap (Float_Ptr'(
+                            Temperature'Unchecked_Access));  -- OK. {1:24;1}
+
+   Subprogram : Access_Proc := Set_Flag'access;
+
+   -- Check that pool-specific access types participate in resolution of
+   -- access attributes:
+
+   Result20 : Float := Zup (Temperature'access);             -- ERROR: {24;1}
+                                                             -- Ambigious
+   Result21 : Float := Zup (Float_Ptr'(Temperature'access)); -- OK. {24;1}
+
+   Result22 : Float := Zup (Temperature'Unchecked_Access);   -- ERROR: {24;1}
+                                                             -- Ambigious
+   Result23 : Float := Zup (Float_Ptr'(
+                            Temperature'Unchecked_Access));  -- OK. {1:24;1}
+
+   -- Check that access-to-variable access types participate in resolution of
+   -- access attributes, even when the prefix is a constant:
+
+   Human_Temperature : aliased constant Float := 98.6;
+
+   Result24 : Float := Zwp (Human_Temperature'access);       -- ERROR: {24;1}
+                                                             -- Ambigious
+   Result25 : Float := Zwp (Constant_Float_Ptr'(
+                            Human_Temperature'access));      -- OK. {1:24;1}
+
+   Result26 : Float := Zwp (
+                         Human_Temperature'Unchecked_Access);-- ERROR: {1:24;1}
+                                                             -- Ambigious
+   Result27 : Float := Zwp (Constant_Float_Ptr'(
+                         Human_Temperature'Unchecked_Access));-- OK. {1:24;1}
+
+   -- Check that subprogram access types do not participate in resolution of
+   -- object access attributes:
+
+   Result30 : Float := Zep (Temperature'access);             -- OK. {24;1}
+   Result31 : Float := Zep (Float_Ptr'(Temperature'access)); -- OK. {24;1}
+
+   Result32 : Float := Zep (Temperature'Unchecked_Access);   -- OK. {24;1}
+   Result33 : Float := Zep (Float_Ptr'(
+                            Temperature'Unchecked_Access));  -- OK. {1:24;1}
+
+   -- Check that overloaded prefixes can be resolved:
+
+   Result40 : Float := Zap (Zyp.all'access);                 -- OK. {24;1}
+   Result41 : Float := Zap (Zyp.all'Unchecked_Access);       -- OK. {24;1}
+   Result42 : Float := Zap (Int_Ptr'(Zyp.all'access));       -- OK. {24;1}
+   Result43 : Float := Zap (Int_Ptr'(Zyp.all'Unchecked_Access)); -- OK. {24;1}
+
+begin
+   -- Test that the prefix of 'Access for subprograms is used in
+   -- resolution:
+
+   Zip (Set_Flag'access);                                    -- OK. {4;1}
+   Zip (Access_Proc(Set_Flag'access));                       -- ERROR: {4;1}
+                                                             -- Type conversion
+   Zip (Access_Proc'(Set_Flag'access));                      -- OK. {4;1}
+   Zip (Subprogram);                                         -- OK. {4;1}
+
+
+   -- Check that two types with the same structure do not accidentally
+   -- match in a subprogram call:
+
+   Pkg.Call (Subprogram);                                    -- ERROR: {4;1}
+                                                             -- Type mismatch
+   Pkg.Call (Set_Flag'access);                               -- OK. {4;1}
+
+   -- Check that overloading caused by use clauses is handled the same
+   -- as direct overloading:
+
+   declare
+      use Pkg, Pkg2;
+      My_Obj : aliased Pkg.My_Tagged;
+      New_Obj : aliased Pkg2.New_Tagged;
+   begin
+      My_Op (New_Obj'access);                                -- OK. {7;1}
+      Pkg2.My_Op (New_Obj'access);                           -- OK. {7;1}
+      My_Op (My_Obj'Unchecked_Access);                       -- OK. {7;1}
+      Pkg.My_Op (My_Obj'Unchecked_Access);                   -- OK. {7;1}
+   end;
+
+   -- Check Tucker Taft's overloading example:
+   declare
+      procedure Proc (X : Access_Proc; Y : Integer) is
+      begin
+         null;
+      end Proc;
+
+      procedure Proc (X : Int_Ptr; Y : Float) is
+      begin
+         null;
+      end Proc;
+
+      function Func return Access_Proc is
+      begin
+         return null;
+      end Func;
+
+      function Func return Int_Ptr is
+      begin
+         return null;
+      end Func;
+   begin
+      Proc (Func.all'access, 2);                             -- OK. {7;1}
+            -- Resolves to Access_Proc.
+      Proc (Func.all'Unchecked_Access, 2.0);                 -- OK. {7;1}
+            -- Resolves to Int_Ptr.
+      Proc (Access_Proc'(Func.all'access), 2);               -- OK. {7;1}
+      Proc (Int_Ptr'(Func.all'Unchecked_Access), 2.0);       -- OK. {7;1}
+   end;
+
+end B3A2016;

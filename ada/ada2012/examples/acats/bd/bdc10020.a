@@ -1,0 +1,114 @@
+-- BDC10020.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--     Check that the restriction_parameter_argument of restriction
+--     No_Specification_of_Aspect can be any identifier.
+--
+--     Check that specification of an aspect (by any means) mentioned in a
+--     restriction No_Specification_of_Aspect is detected.
+--
+--     Check that the restriction No_Specification_of_Aspect only applies to
+--     the current compilation.
+--
+-- TEST DESCRIPTION:
+--     We follow the great tradition of the ACATS (see tests B28001A-B28001W),
+--     and use the names of ARG chairmen as implementation-defined aspect
+--     names. We don't even want names that exist anyway, so the more
+--     unlikely the name, the better.
+--
+--     We try a second compilation in which we use the prohibited aspects,
+--     in order to check that the restriction doesn't last too long.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BDC10020.A
+--         BDC10021.A
+--
+-- PASS/FAIL CRITERIA:
+--      File BDC10020.A contains errors. All errors in this file must be 
+--      detected to pass the test. Additionally, no errors may be detected in
+--      file BDC10021.A.
+
+-- CHANGE HISTORY:
+--      29 Sep 21   RLB     Created test.
+--
+--!
+pragma Restrictions (No_Specification_of_Aspect => Default_Value); -- OK. {0}
+
+pragma Restrictions (No_Specification_of_Aspect => Alignment);    -- OK. {0}
+
+pragma Restrictions (No_Specification_of_Aspect => Pack);         -- OK. {0}
+
+pragma Restrictions (No_Specification_of_Aspect => Steve_Baird);  -- OK. {0}
+
+pragma Restrictions (No_Specification_of_Aspect => Pascal_Leroy); -- OK. {0}
+   -- Note: We allow any legal identifier here, not just aspects defined
+   -- by the current implementation, as we want to be able to
+   -- specify implementation-defined aspects for some other
+   -- implementation; these may be totally unknown to the implementation
+   -- that is processing the restriction pragma.
+
+   -- Note: Pragma Restrictions is a configuration pragma, and thus applies to
+   -- all of the units in a compilation, and has to be placed before any units
+   -- of a compilation (see 10.1.5(8)). This particular restriction only
+   -- applies to this compilation, not the entire partition.
+   -- Therefore, the permission 10.1.5(9/2) does not apply and a compiler
+   -- must accept the above and apply the restrictions to the following
+   -- compilation units (and no others).
+
+package BDC10020 is
+
+   type Colors is (White, Red, Green, Blue, Black)
+      with Default_Value => White;                            -- ERROR: {1:4}
+
+   Obj : Integer with Alignment => 1;                         -- ERROR: {4}
+
+   type Int is range 0 .. 99 with Size => Integer'Size;       -- OK. {4}
+   for Int'Alignment use 1;                                   -- ERROR: {4}
+
+   type Chars1 is array (1..10) of Character with Pack;       -- ERROR: {4}
+
+   type Chars2 is array (1..10) of Character;
+   pragma Pack (Chars2);                                      -- ERROR: {4}
+
+   type Sml is range 0 .. 99;
+
+   Alg : constant := Sml'Alignment;                           -- OK. {4}
+       -- One can read an attribute covered by this restriction, but not
+       -- specify it.
+   
+end BDC10020;
+

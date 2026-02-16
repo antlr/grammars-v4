@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Sequential Files (Non-supported Features)</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D26.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D28.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>D.2.7 Sequential Files (Non-supported Features)</H1>
+<div class="Normal" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+sequential file (this is appropriate behavior for an implementation which 
+does not support sequential files), then the tests contained in the following 
+files should report NOT_APPLICABLE:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102A.ADA<TD align="left">CE2106A.ADA<TD align="left">CE2201D.DEP<TD align="left">CE2204A.ADA<TD align="left">
+<TR><TD align="left">CE2102C.TST<TD align="left">CE2108E.ADA<TD align="left">CE2201E.DEP<TD align="left">CE2204B.ADA<TD align="left">
+<TR><TD align="left">CE2102G.ADA<TD align="left">CE2108F.ADA<TD align="left">CE2201F.ADA<TD align="left">CE2204C.ADA<TD align="left">
+<TR><TD align="left">CE2102N.ADA<TD align="left">CE2109A.ADA<TD align="left">CE2201G.ADA<TD align="left">CE2204D.ADA<TD align="left">
+<TR><TD align="left">CE2102O.ADA<TD align="left">CE2110A.ADA<TD align="left">CE2201H.ADA<TD align="left">CE2205A.ADA<TD align="left">
+<TR><TD align="left">CE2102P.ADA<TD align="left">CE2111A.ADA<TD align="left">CE2201I.ADA<TD align="left">CE2206A.ADA<TD align="left">
+<TR><TD align="left">CE2102Q.ADA<TD align="left">CE2111C.ADA<TD align="left">CE2201J.ADA<TD align="left">CE2208B.ADA<TD align="left">
+<TR><TD align="left">CE2102X.ADA<TD align="left">CE2111F.ADA<TD align="left">CE2201K.ADA<TD align="left">CXA8001.A<TD align="left">
+<TR><TD align="left">CE2103A.TST<TD align="left">CE2111I.ADA<TD align="left">CE2201L.ADA<TD align="left">CXA8002.A <TD align="left">
+<TR><TD align="left">CE2103C.ADA<TD align="left">CE2201A.ADA<TD align="left">CE2201M.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2104A.ADA<TD align="left">CE2201B.ADA<TD align="left">CE2201N.ADA<TD align="left">&nbsp;<TD align="left">
+<TR><TD align="left">CE2104B.ADA<TD align="left">CE2201C.ADA<TD align="left">CE2203A.TST<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+sequential file with mode <TT>In_File</TT>, then the tests contained 
+in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102G.ADA<TD align="left">CE2111C.ADA<TD align="left">CE2201G.ADA<TD align="left">CE2201M.ADA<TD align="left">
+<TR><TD align="left">CE2102O.ADA<TD align="left">CE2111F.ADA<TD align="left">CE2201H.ADA<TD align="left">CE2201N.ADA<TD align="left">
+<TR><TD align="left">CE2104A.ADA<TD align="left">CE2201A.ADA<TD align="left">CE2201I.ADA<TD align="left">CE2204A.ADA<TD align="left">
+<TR><TD align="left">CE2104B.ADA<TD align="left">CE2201B.ADA<TD align="left">CE2201J.ADA<TD align="left">CE2205A.ADA<TD align="left">
+<TR><TD align="left">CE2108F.ADA<TD align="left">CE2201C.ADA<TD align="left">CE2201K.ADA<TD align="left">CE2206A.ADA<TD align="left">
+<TR><TD align="left">CE2111A.ADA<TD align="left">CE2201F.ADA<TD align="left">CE2201L.ADA<TD align="left">CE2208B.ADA <TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+sequential file with mode <TT>Out_File</TT>, then the tests contained 
+in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2102A.ADA<TD align="left">CE2104B.ADA<TD align="left">CE2201B.ADA<TD align="left">CE2201M.ADA<TD align="left">
+<TR><TD align="left">CE2102C.TST<TD align="left">CE2106A.ADA<TD align="left">CE2201C.ADA<TD align="left">CE2201N.ADA<TD align="left">
+<TR><TD align="left">CE2102G.ADA<TD align="left">CE2108E.ADA<TD align="left">CE2201D.DEP<TD align="left">CE2203A.TST<TD align="left">
+<TR><TD align="left">CE2102N.ADA<TD align="left">CE2108F.ADA<TD align="left">CE2201E.DEP<TD align="left">CE2204A.ADA<TD align="left">
+<TR><TD align="left">CE2102O.ADA<TD align="left">CE2109A.ADA<TD align="left">CE2201F.ADA<TD align="left">CE2204B.ADA<TD align="left">
+<TR><TD align="left">CE2102P.ADA<TD align="left">CE2110A.ADA<TD align="left">CE2201G.ADA<TD align="left">CE2204C.ADA<TD align="left">
+<TR><TD align="left">CE2102Q.ADA<TD align="left">CE2111A.ADA<TD align="left">CE2201H.ADA<TD align="left">CE2204D.ADA<TD align="left">
+<TR><TD align="left">CE2102X.ADA<TD align="left">CE2111C.ADA<TD align="left">CE2201I.ADA<TD align="left">CE2205A.ADA<TD align="left">
+<TR><TD align="left">CE2103A.TST<TD align="left">CE2111F.ADA<TD align="left">CE2201J.ADA<TD align="left">CE2206A.ADA<TD align="left">
+<TR><TD align="left">CE2103C.ADA<TD align="left">CE2111I.ADA<TD align="left">CE2201K.ADA<TD align="left">CE2208B.ADA<TD align="left">
+<TR><TD align="left">CE2104A.ADA<TD align="left">CE2201A.ADA<TD align="left">CE2201L.ADA<TD align="left">CXA8001.A <TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+sequential file with mode APPEND_FILE, then the tests contained in the 
+following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CXA8001.A <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If reset to mode 
+<TT>Out_File</TT> is not supported for sequential files, then the tests 
+contained in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2111C.ADA<TD align="left">CE2111F.ADA<TD align="left">CE2111I.ADA <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If reset to mode 
+<TT>In_File</TT> is not supported for sequential files, then the tests 
+contained in the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2111F.ADA<TD align="left">CE2111I.ADA<TD align="left">CE2204C.ADA <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Delete</TT> 
+for sequential files is not supported, then the tests contained in the 
+following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2106A.ADA<TD align="left">CE2110A.ADA <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If the implementation 
+cannot restrict the file capacity for a sequential file, then the test 
+contained in the following file should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2203A.TST <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D26.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D28.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,79 @@
+-- B3A1A062.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     See B3A1A060.A.
+--
+-- TEST DESCRIPTION
+--     See B3A1A060.A.
+--
+-- TEST FILES:
+--     This test consists of the following files:
+--         B3A1A060.A
+--         B3A1A061.A
+--      -> B3A1A062.A
+--         B3A1A063.A
+--         B3A1A064.A
+--         B3A1A065.A
+--
+-- PASS/FAIL CRITERIA:
+--     See B3A1A060.A.
+--
+--
+-- CHANGE HISTORY:
+--     29 Mar 2023  RLB  Created test.
+--
+
+package body B3A1A062 is
+
+   procedure Do_Stuff is
+      Tote : B3A1A06L.Tote_Type;
+   begin
+      B3A1A06L.AddU (Tote, PU.all);                            -- ERROR: {7}
+      B3A1A06L.AddT (Tote, PT.all);                            -- OK. {7}
+      B3A1A06L.AddU (Tote, B3A1A06L.GetU (Tote));              -- ERROR: {7}
+      B3A1A06L.AddT (Tote, B3A1A06L.GetT (Tote));              -- ERROR: {7}
+      if B3A1A06L.HasU (Tote, PU.all) then                     -- ERROR: {10;5}
+         null;    
+      elsif B3A1A06L.HasT (Tote, PT.all) then                  -- OK. {13;5}
+         null;
+      elsif B3A1A06L.HasU (Tote, B3A1A06L.GetU (Tote)) then    -- ERROR: {13;5}
+         null;
+      elsif B3A1A06L.HasT (Tote, B3A1A06L.GetT (Tote)) then    -- ERROR: {13;5}
+         null;
+      end if;      
+   end Do_Stuff;
+
+end B3A1A062;
+

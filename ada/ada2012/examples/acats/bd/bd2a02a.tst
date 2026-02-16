@@ -1,0 +1,83 @@
+-- BD2A02A.TST
+
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+-- OBJECTIVE:
+--     CHECK THAT TWO SIZE SPECIFICATIONS, EVEN IF THE SAME, CANNOT BE
+--     GIVEN FOR THE SAME ENUMERATION, INTEGER, FIXED-POINT, FLOATING-
+--     POINT, ARRAY, RECORD, AND ACCESS TYPE.
+
+-- MACRO SUBSTITUTION:
+--     THE MACRO "ACC_SIZE" IS AN INTEGER LITERAL WHOSE VALUE IS THE
+--     MINIMUM NUMBER OF BITS SUFFICIENT TO HOLD ANY VALUE OF AN ACCESS
+--     TYPE.
+
+-- HISTORY:
+--     JKC 03/16/88  CREATED ORIGINAL TEST.
+--     BCB 04/18/90  CHANGED SIZES ON INTEGER, FLOAT, ARRAY, RECORD, 
+--                   AND ACCESS CHECKS.  CHANGED EXTENSION FROM '.ADA' 
+--                   TO '.TST'.
+
+PROCEDURE BD2A02A IS
+
+     TYPE BASIC_ENUM IS (A, B, C);
+     FOR BASIC_ENUM'SIZE USE 4;
+     FOR BASIC_ENUM'SIZE USE 4;                    -- ERROR:  DUPLICATE.
+
+     SIZE1 : CONSTANT := INTEGER'SIZE;
+     TYPE INTEGER_TYPE IS RANGE 1..10;
+     FOR INTEGER_TYPE'SIZE USE 4;
+     FOR INTEGER_TYPE'SIZE USE SIZE1;              -- ERROR:  DUPLICATE.
+
+     TYPE FSIZE IS DELTA 0.25 RANGE 0.0..1.0;
+     TYPE FIXED_TYPE IS DELTA 0.25 RANGE 0.0..1.0;
+     FOR FIXED_TYPE'SIZE USE 3;
+     FOR FIXED_TYPE'SIZE USE FSIZE'SIZE;           -- ERROR:  DUPLICATE.
+
+     TYPE FLOAT_TYPE2 IS DIGITS 5;
+     SIZE2 : CONSTANT := FLOAT_TYPE2'SIZE;
+     TYPE FLOAT_TYPE IS DIGITS 5;
+     FOR FLOAT_TYPE'SIZE USE FLOAT_TYPE2'SIZE;
+     FOR FLOAT_TYPE'SIZE USE SIZE2;                -- ERROR:  DUPLICATE.
+
+     TYPE ARRAY_TYPE IS ARRAY (1..4) OF BOOLEAN;
+     PRAGMA PACK(ARRAY_TYPE);
+     FOR ARRAY_TYPE'SIZE USE 4;
+     FOR ARRAY_TYPE'SIZE USE 4;                    -- ERROR:  DUPLICATE.
+
+     TYPE RECORD_TYPE IS
+          RECORD
+               UNIT1 : BOOLEAN := TRUE;
+          END RECORD;
+     PRAGMA PACK(RECORD_TYPE);
+     FOR RECORD_TYPE'SIZE USE BOOLEAN'SIZE;
+     FOR RECORD_TYPE'SIZE USE BOOLEAN'SIZE;        -- ERROR:  DUPLICATE.
+
+     TYPE ACCESS_TYPE IS ACCESS INTEGER;
+     TYPE ACCESS_TYPE2 IS ACCESS INTEGER;
+     FOR ACCESS_TYPE'SIZE USE $ACC_SIZE;
+     FOR ACCESS_TYPE'SIZE USE $ACC_SIZE;           -- ERROR:  DUPLICATE.
+
+BEGIN
+     NULL;
+END BD2A02A;

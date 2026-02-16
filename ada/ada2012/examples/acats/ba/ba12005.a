@@ -1,0 +1,222 @@
+-- BA12005.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the with-clause in the body of a (public or private)
+--      descendant of a library unit cannot include a private child of a
+--      different library unit.
+--
+-- TEST DESCRIPTION:
+--      Declare a parent package.  Declare the first public child
+--      package.  Declare a private grandchild package.  Declare a public 
+--      great grandchild function. Declare a public grandchild package.
+--      Declare the second public child package.  Declare the third private
+--      child package.
+--
+--                               BA12005_0                
+--                             /      |     \
+--                            /       |      \
+--                       BA12005_1 BA12005_5 BA12005_6
+--                        /     \            (private)  
+--                       /       \              
+--                  BA12005_2   BA12005_4                
+--                  (private)  
+--                     /
+--                    /
+--                BA12005_3
+--
+--      
+--      The following cases are ok:
+--      (a) In the body of the public grandchild, BA12005_4, "with"s  
+--          the public great grandchild package, BA12005_3.
+--      (b) In the body of the public grandchild, BA12005_4, "with"s  
+--          the private grandchild package, BA12005_2.
+--
+--      The following cases generate compile-time errors:
+--      (c) In the body of the second public parent, BA12005_5, "with"s 
+--          the public grandchild package, BA12005_2.
+--      (d) In the body of the third private parent, BA12005_6, "with"s 
+--          the public grandchild package, BA12005_2.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      05 Apr 95   SAIC    Test description modification.  Changed BA12005_4 
+--                          to be a package.  Deleted with BA12005_3 cases
+--                          in BA12005_5 and BA12005_6.
+--
+--!
+
+-- Parent
+
+package BA12005_0 is
+
+   type Parent_Type is range 101 .. 500;
+
+end BA12005_0;
+
+-- No body for BA12005_0.
+
+
+     --=================================================================--
+
+-- Public child
+
+package BA12005_0.BA12005_1 is
+
+   type First_Child_Type is range 1 .. 100;
+
+   First_Child_Var : Parent_Type := 125;
+
+end BA12005_0.BA12005_1;
+
+
+-- No body for BA12005_0.BA12005_1.
+
+
+     --=================================================================--
+
+-- Private grandchild
+
+private package BA12005_0.BA12005_1.BA12005_2 is
+  
+   type Grandchild_Type is range 101 .. 200;
+
+   Grandchild_Var : Parent_Type := 234;
+
+end BA12005_0.BA12005_1.BA12005_2;
+
+
+-- No body for BA12005_0.BA12005_1.BA12005_2.
+
+                       
+     --=================================================================--
+
+-- Public great grandchild
+
+function BA12005_0.BA12005_1.BA12005_2.BA12005_3 
+  (X, Y : Grandchild_Type) return Parent_Type is                
+   
+begin
+
+   -- Real body of function goes here.
+
+   return Parent_Type (X + Y);
+
+end BA12005_0.BA12005_1.BA12005_2.BA12005_3;
+
+     --=================================================================--
+
+-- Public grandchild, child of BA12005_0.BA12005_1
+
+package BA12005_0.BA12005_1.BA12005_4 is
+
+   procedure First_Proc (Grandchild : out Parent_Type);
+
+end BA12005_0.BA12005_1.BA12005_4;
+
+     --=================================================================--
+
+with BA12005_0.BA12005_1.BA12005_2;             -- OK
+
+with BA12005_0.BA12005_1.BA12005_2.BA12005_3;   -- OK
+
+package body BA12005_0.BA12005_1.BA12005_4 is
+
+   procedure First_Proc (Grandchild : out Parent_Type) is
+                        -- reference to parent
+
+      A, B : BA12005_0.BA12005_1.BA12005_2.Grandchild_Type;
+                        -- reference to private sibling
+   begin
+
+      Grandchild := BA12005_0.BA12005_1.BA12005_2.BA12005_3 (A, B);
+                       -- reference to public niece
+
+       -- Real body of procedure goes here.
+
+   end First_Proc;
+
+end BA12005_0.BA12005_1.BA12005_4;
+
+                       
+     --=================================================================--
+
+-- Public child
+
+package BA12005_0.BA12005_5 is
+
+   procedure Second_Proc
+     (Second_Child : in out Parent_Type);
+                     -- reference to parent
+
+end BA12005_0.BA12005_5;
+
+     --=================================================================--
+
+with BA12005_0.BA12005_1.BA12005_2;                                  -- ERROR:
+                                                   -- not a child of BA12005_0
+
+package body BA12005_0.BA12005_5 is
+
+   procedure Second_Proc   
+     (Second_Child : in out Parent_Type) is
+   begin
+      Second_Child := Second_Child * Second_Child;
+
+       -- Real body of procedure goes here.
+
+   end Second_Proc;
+
+end BA12005_0.BA12005_5;
+
+     --=================================================================--
+
+-- Private child
+
+private package BA12005_0.BA12005_6 is
+
+   procedure Third_Proc;
+
+end BA12005_0.BA12005_6;
+
+     --=================================================================--
+
+with BA12005_0.BA12005_1.BA12005_2;                                  -- ERROR:
+                                                   -- not a child of BA12005_0
+
+package body BA12005_0.BA12005_6 is
+
+   procedure Third_Proc is
+      Private_Child_Var : Parent_Type := 136;
+   begin
+
+      Private_Child_Var := Private_Child_Var + Private_Child_Var;
+
+       -- Real body of procedure goes here.
+
+   end Third_Proc;
+
+end BA12005_0.BA12005_6;

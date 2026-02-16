@@ -1,0 +1,218 @@
+-- LXE30010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      This test checks that an inconsistent distributed program
+--      is properly detected.
+--
+-- TEST DESCRIPTION:
+--      In this test the inconsistency is
+--      introduced by attempting to produce two partitions, each
+--      containing a different version of the specification of the
+--      Remote_Call_Interface package than that contained in the
+--      other partition.
+--
+--      This test is constructed such that a consistent program
+--      cannot be produced and execution of the inconsistent
+--      program will produce a failed message if the inconsistency
+--      is not detected by the implementation.
+--
+--      The first file of this test (LXE30010.A) contains all the
+--      compilation units required for constructing partition A.
+--      The second file of this test (LXE30011.A) contains all the
+--      compilation units required for constructing partition B.
+--      Both files contain the specifications for both the RCI
+--      units in the program.  The specifications are different
+--      in each of the two files.
+--
+--      The compilation units contained in LXE30010.A are as
+--      follows:
+--          LXE3001_A       -- partition main procedure
+--          LXE3001_Part_A  -- specification and body of RCI unit
+--          LXE3001_Part_B  -- specification of RCI unit
+--
+--      The compilation units contained in LXE30011.A are as
+--      follows:
+--          LXE3001_B       -- partition main procedure
+--          LXE3001_Part_B  -- specification and body of RCI unit
+--          LXE3001_Part_A  -- specification of RCI unit
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file (LXE30010.A)
+--      If the implementation allows one partition of a program to
+--      be created before the other partition is compiled then
+--      partition A is to be created once the units in this file have
+--      been compiled.  Partition A is to contain the following units:
+--           LXE3001_A       (main procedure)
+--           LXE3001_Part_A  (RCI package)
+--           Report
+--         and any other non-RCI units required by those compilation
+--             units.
+--      Compile all the compilation units in LXE30011.A.
+--      If the implementation requires that all partitions of the
+--      program be created at the same time then attempt to create
+--      both partitions at this time. This should result in an error
+--      since the program library will not contain a complete set of
+--      up-to-date units.  If such an error is reported then the test
+--      passes.
+--      If the implementation does not require that all partitions
+--      be created at one time then partition A has already been
+--      created so create partition B at this time.
+--      Partition B is to contain the following units:
+--           LXE3001_B       (main procedure)
+--           LXE3001_Part_B  (RCI package)
+--           Report
+--         and any other non-RCI units required by those compilation
+--             units.
+--      If the two partitions were successfully created then
+--      run the program by starting both partitions.  The partitions may be
+--      started in either order.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if:
+--        1.  The tool that creates the partitions reports that the
+--            program is inconsistent (a unit is obsolete), or
+--        2.  Both partitions report Passed (which can only happen
+--            if Communication_Error is raised by the first attempt
+--            to make an RPC), or
+--        3.  Program_Error is raised in either or both partitions
+--            during elaboration. If an exception is raised in only
+--            one partition the other partition must report Passed.
+--
+-- ACAA REPAIR NOTES:
+--      The original test assumed that the bounded error described in
+--      E.3(6) must raise Program_Error, but that is incorrect.
+--      Raising Program_Error is optional; the requirement is that
+--      "the partitions become inaccessible to each other".
+--      Therefore, the partitions were revised to allow the RPC calls
+--      to raise Communication_Error.
+--      The original test also had tasks which did not terminate if an
+--      exception is raised, so the tests typcially hung.
+--
+-- CHANGE HISTORY:
+--     22 JUN 95   SAIC    Initial version
+--     29 APR 96   SAIC    Revised Pass/Fail criteria.
+--      2 OCT 96   SAIC    Incorporated reviewer comments.
+--     26 SEP 98   RLB     Repaired to allow Communication_Error; to eliminate
+--                         hanging; and to update the description.
+--     02 OCT 98   RLB     Corrected spelling of Communication_Error.
+--
+--!
+
+-----------------------------------------------------------------------------
+
+package LXE3001_Part_A is
+  pragma Remote_Call_Interface;
+  procedure Quit;
+
+  -- the following declarations are different in the other file
+  procedure Unstable_Profile (X : Integer);
+  File_0_Version : constant Boolean := True;
+end LXE3001_Part_A;
+
+-----------------------------------------------------------------------------
+
+package LXE3001_Part_B is
+  pragma Remote_Call_Interface;
+  procedure Quit;
+
+  -- the following declarations are different in the other file
+  procedure Unstable_Profile (X : Integer);
+  File_0_Version : constant Boolean := True;
+end LXE3001_Part_B;
+
+-----------------------------------------------------------------------------
+
+with LXE3001_Part_A;
+with LXE3001_Part_B;
+with System.RPC;
+with Report;
+procedure LXE3001_A is
+begin
+  -- this partition attempts to communicate with partition B.
+  Report.Test ("LXE3001_A",
+               "Checking that a program is consistent across partitions");
+
+  LXE3001_Part_B.Unstable_Profile (99);
+  Report.Failed ("inconsistency not detected");
+  LXE3001_Part_B.Quit;
+
+  -- Report.Result is called in the body of LXE3001_Part_A.
+
+exception
+  when System.RPC.Communication_Error =>
+    Report.Comment ("Communication_Error raised");
+       -- This ought to happen if the Program_Error is not raised.
+  when Program_Error =>
+    Report.Failed ("Program_Error raised after elaboration");
+  when others =>
+    Report.Failed ("Unexpected exception");
+end LXE3001_A;
+
+-----------------------------------------------------------------------------
+
+
+with Report;
+package body LXE3001_Part_A is
+
+  Make_Sure_Correct_Spec_is_Used : Boolean := File_0_Version;
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit.
+
+
+  task Wait_For_Quit is
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    select
+      accept Quit;
+    or
+      terminate;
+    end select;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Quit is
+  begin
+    Report.Failed ("received a call for Part_A.Quit");
+    Wait_For_Quit.Quit;
+  end Quit;
+
+  procedure Unstable_Profile (X : Integer) is
+  begin
+    Report.Failed ("received a call for Part_A.Unstable_Profile");
+  end Unstable_Profile;
+
+end LXE3001_Part_A;

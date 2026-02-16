@@ -1,0 +1,150 @@
+-- B354001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the expression of a modular_type_definition must be
+--      static and that the expected type of the expression can be of any
+--      integer type.  Check that the modulus must be positive.
+--      Check that moduli that are powers of two are allowed up to and
+--      including, but not exceeding, System.Max_Binary_Modulus.
+--      Check that non-power-of-two moduli are allowed as long as they do
+--      not exceed System.Max_Nonbinary_Modulus.
+--      Check that the value of a potentially static expression of a
+--      modular type that appears in a nonstatic context must be within
+--      the base range of its expected type.
+--      Check that the predefined logical operators and membership tests
+--      are available.
+--
+-- TEST DESCRIPTION:
+--      Declarations using expressions of the form:
+--      (System.Max_Binary_Modulus/2 and System.Max_Binary_Modulus*2)
+--      test for bounding conditions.
+--      This test declares modular types in contexts where Ada'83
+--      would consider the "potentially static expression"s not-static,
+--      where an Ada'9X compiler should consider the value static.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      13 Dec 94   SAIC    Fix range misconception
+--
+--!
+
+package B354001_0 is
+
+  type Cents is mod 100;                                              -- OK
+  Pennies     : Cents := 50;
+  Half_Dollar : constant Cents := Pennies;  
+
+  type Bight is mod 256;                                              -- OK
+
+  Number : constant := 1.54321;
+
+end B354001_0;
+
+with B354001_0;
+with System;
+procedure B354001 is
+
+  type Largest_Possible_Integer is range System.Min_Int..System.Max_Int;
+
+  type Max_Binary    is mod System.Max_Binary_Modulus;
+  type Over_Binary   is mod System.Max_Binary_Modulus*2;          -- ERROR:
+                                                         -- value too large
+
+  Half_Max    : constant := System.Max_Binary_Modulus / 2;
+  Valid_Value : constant := Half_Max / 2;
+
+  type Mod_Half_Max     is mod Half_Max;
+
+  type Four_Bits is mod B354001_0.Half_Dollar;                    -- ERROR:
+                        -- nonstatic expression used for modular type bound
+  type Bit_Counter is mod Integer'Size;                           -- OK
+  type Arithmetic is mod ( ( 3 + Integer( B354001_0.Number )));   -- OK
+
+  type Sour_Bits is mod B354001_0.Number;                         -- ERROR:
+                                          -- modular type bound not integer
+
+  type Mod_0 is mod 0;                                            -- ERROR:
+                     -- zero used for modulus, value must be greater than 0
+
+  type Mod_2                  is mod 2;                           -- OK
+  type Mod_3                  is mod 3;                           -- OK
+  type Mod_128                is mod 128;                         -- OK
+  type Mod_15                 is mod 15;                          -- OK
+  type Sixteen_Bits           is mod 2**16;                       -- OK
+
+  type Max_NonBinary          is mod System.Max_Nonbinary_Modulus;-- OK
+  type LessThan_Max_NonBinary is
+                             mod System.Max_Nonbinary_Modulus -1; -- OK
+  type MoreThan_Max_NonBinary is
+                 mod (System.Max_Nonbinary_Modulus +2)/2 * 2 + 1; -- ERROR:
+                                                         -- value too large
+
+  procedure UserLike(Param: Natural) is
+    type Mod_By_Param is mod Param;                               -- ERROR:
+                        -- nonstatic expression used for modular type bound
+
+    Negative_Value : constant := 100 - 200;
+    type Mod_Negative_Value is mod Negative_Value;                -- ERROR:
+                                        -- negative number used for modulus
+
+    JPR_Constant : constant Sixteen_Bits := Negative_Value;       -- ERROR:
+                                     -- value outside of base range of type
+    Sweet : Sixteen_Bits;
+  begin
+    Sweet := Negative_Value;                                      -- ERROR:
+                                     -- value outside of base range of type
+  end UserLike;
+
+  AMB, BMB, CMB   : Max_Binary := 16#F00D#;
+  H1,H2           : Mod_Half_Max := 1;
+  LMBA,LMBB       : LessThan_Max_NonBinary := 1;
+
+begin  -- Main test procedure.
+
+  AMB := AMB or CMB;                                              -- OK
+  AMB := AMB and 16#BEEF#;                                        -- OK
+  AMB := AMB xor BMB;                                             -- OK
+
+  AMB := AMB or else CMB;                                         -- ERROR:
+                -- short circuit control form not defined for modular types
+
+  AMB := AMB and then 16#F1D0#;                                   -- ERROR:
+                -- short circuit control form not defined for modular types
+
+  LMBA := LMBA or else 16#00DD#;                                  -- ERROR:
+                -- short circuit control form not defined for modular types
+
+  LMBA := LMBA and then LMBB;                                     -- ERROR:
+                -- short circuit control form not defined for modular types
+
+  if Valid_Value in Mod_Half_Max then                             -- OK
+    H1 := H1 + Valid_Value;
+  elsif Valid_Value not in Mod_Half_Max then                      -- OK
+    H1 := H1 - Valid_Value;
+  end if;
+
+end B354001;

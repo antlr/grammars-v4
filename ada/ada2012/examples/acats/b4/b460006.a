@@ -1,0 +1,106 @@
+-- B460006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--    Check that a type conversion where one type is tagged and the other
+--    is not tagged is not treated as a view conversion.
+--    (Defect Report 8652/0017, as reflected in Technical Corrigendum 1,
+--    RM95 4.6(5/1)).
+--
+-- TEST DESCRIPTION:
+--    Declares a private type completed by a tagged type, then derives
+--    a new type from the private type in a separate scope. This second
+--    type is always untagged. Since it is derived from the original private
+--    type, a conversion from it to the private type is legal. Where the
+--    full view of the private type is visible, this is a conversion between
+--    an untagged type and a tagged type.
+--
+--    The conversion from an untagged operand to a tagged type is clearly
+--    legal if it is not a view conversion, as it is converting toward the
+--    root of a tagged type. Converting from a tagged operand to an untagged
+--    type appears illegal even if it is not a view conversion (since it it
+--    is converting away from the root), but actually 4.6(21-23) does not
+--    apply (the target type is untagged), so the conversion is legal.
+--    Moreover, there cannot be a problem with the conversion, as 7.3(7)
+--    prevents any extension components existing for the untagged type.
+--    And the conversion clearly is legal if both types are untagged (as they
+--    are when outside of the visibility of the original full type).
+--
+-- CHANGE HISTORY:
+--    25 Jan 2001   PHL   Initial version.
+--    30 Apr 2002   RLB   Readied for release, added untagged => tagged
+--                        test and comments.
+--
+--!
+package B460006 is
+    pragma Elaborate_Body;
+
+    package P is
+        subtype Index is Positive range 1 .. 10;
+        type T (D : Index) is private;
+    private
+        type T (D : Index) is tagged
+            record
+                C : String (1 .. D) := (others => 'a');
+            end record;
+        Obj : T (4);
+    end P;
+
+    package Q is
+        type Nt (Nd : P.Index := 3) is new P.T (Nd);
+        X : Nt;
+        Y : Nt (1);
+    end Q;
+
+end B460006;
+
+package body B460006 is
+
+    package body P is
+        Obj_Copy : Q.NT (4) := Q.NT (Obj); -- OK: A view conversion is not
+                                           -- required here, and 4.6(21-23)
+                                           -- does not apply.
+
+        C_Copy : Character := T (Q.X).C (2); -- OK: A view conversion is not
+                                             -- required here.
+
+        C_Ren : Character renames T (Q.X).C (2); -- ERROR: Q.NT is not tagged.
+
+        Obj_Ren : Q.NT renames Q.NT (Obj); -- ERROR: Q.NT is not tagged.
+    begin
+        Q.X := Q.Y;
+        --Obj_Ren := Q.Y;
+    end P;
+
+begin
+    declare
+        P_Obj1, P_Obj2 : P.T(5);
+        Q_Obj : Q.Nt(5);
+    begin
+        Q_Obj  := Q.Nt(P_Obj1); -- OK: Both types are untagged.
+        P_Obj2 := P.T (Q_Obj);  -- OK: Both types are untagged.
+    end;
+end B460006;
+

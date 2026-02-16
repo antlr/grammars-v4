@@ -1,0 +1,153 @@
+-- B3A1A060.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--
+--     Check that the actual parameter to a call cannot be of an untagged
+--     incomplete view.
+--
+--     Check that the result object of a function call cannot be of an
+--     incomplete view.
+--
+-- TEST DESCRIPTION:
+--
+--     We are checking 3.10.1(10/3). This rules prevents passing parameters
+--     when the parameter passing mechanism is unknown, and prevents returning
+--     values whose size and layout is unknown.
+--
+--     We try cases for limited with, and for uncomplete types deferred to a
+--     body (but we don't give the bodies in either case).
+--
+--     For the function case, we have to pass the function result as a
+--     parameter, since other uses like assignment are not allowed. That means
+--     that we can't separate the two errors for untagged views.
+--
+--     We do not try cases within a single declaration list, as such calls
+--     necessarily must raise Program_Error, and thus are not useful.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B3A1A060.A
+--         B3A1A061.A
+--         B3A1A062.A
+--         B3A1A063.A
+--         B3A1A064.A
+--         B3A1A065.A
+--
+-- PASS/FAIL CRITERIA:
+--     All of the test files except B3A1A060 contain errors. All errors in
+--     each of these files must be detected.
+--
+-- CHANGE HISTORY:
+--     29 Mar 2023  RLB  Created test.
+--
+limited with F3A1A00;
+package B3A1A06L is
+
+   type Tote_Type is private;
+
+   procedure AddU (Tote : in out Tote_Type; Obj : F3A1A00.An_Untagged_Type);
+
+   procedure AddT (Tote : in out Tote_Type; Obj : F3A1A00.A_Tagged_Type);
+
+   function HasU (Tote : in Tote_Type; Obj : F3A1A00.An_Untagged_Type)
+      return Boolean;
+
+   function HasT (Tote : in Tote_Type; Obj : F3A1A00.A_Tagged_Type)
+      return Boolean;
+
+   function GetU (Tote : in Tote_Type) return F3A1A00.An_Untagged_Type;
+
+   function GetT (Tote : in Tote_Type) return F3A1A00.A_Tagged_Type;
+
+   function EmptyU return access F3A1A00.An_Untagged_Type;
+
+   function EmptyT return access F3A1A00.A_Tagged_Type;
+  
+private
+
+   type Tote_Type is record
+      CU : access F3A1A00.An_Untagged_Type;
+      CT : access F3A1A00.A_Tagged_Type;
+   end record;
+   
+end B3A1A06L;
+
+limited with F3A1A00;
+with B3A1A06L;
+package B3A1A062 is
+
+   PU : access F3A1A00.An_Untagged_Type := B3A1A06L.EmptyU;
+   PT : access F3A1A00.A_Tagged_Type := B3A1A06L.EmptyT;
+
+   procedure Do_Stuff;
+
+end B3A1A062;
+
+package B3A1A06D is
+
+   procedure Do_Much;
+   
+private
+
+   type Deferred_Untagged_Type;
+   type Deferred_Tagged_Type is tagged;
+   type Tote_Type is record
+      CU : access Deferred_Untagged_Type;
+      CT : access Deferred_Tagged_Type;
+   end record;
+   
+   package NP is
+      -- Make these subprograms not primitive to avoid 3.10.1(9.3/2).
+      procedure AddU (Tote : in out Tote_Type; Obj : Deferred_Untagged_Type);
+      procedure AddT (Tote : in out Tote_Type; Obj : Deferred_Tagged_Type);
+      function HasU (Tote : in Tote_Type; Obj : in Deferred_Untagged_Type)
+         return Boolean;
+      function HasT (Tote : in Tote_Type; Obj : in Deferred_Tagged_Type)
+         return Boolean;
+      function GetU (Tote : in Tote_Type) return Deferred_Untagged_Type;
+      function GetT (Tote : in Tote_Type) return Deferred_Tagged_Type;
+      function EmptyU return access Deferred_Untagged_Type;
+      function EmptyT return access Deferred_Tagged_Type;
+   end NP;
+   
+end B3A1A06D;
+
+package B3A1A06D.Good_Child is
+
+   procedure Do_More_Stuff;
+
+end B3A1A06D.Good_Child;
+
+   

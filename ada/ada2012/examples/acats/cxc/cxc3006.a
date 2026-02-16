@@ -1,0 +1,272 @@
+-- CXC3006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--     Check that Program_Error is raised if, by using the Ada.Interrupts
+--     procedure Attach_Handler, Detach_Handler, or Exchange_Handler, an
+--     attempt is made to detach an interrupt handler that was attached
+--     using the pragma Attach_Handler. Check that, in each case, the
+--     handler attached by the pragma is not detached.
+--    
+-- TEST DESCRIPTION:
+--     An anonymous protected object A is declared, and one of its procedures
+--     is attached to the interrupt designated by the constant
+--     ImpDef.Annex_C.Interrupt_To_Generate, using a pragma Attach_Handler.
+--
+--     A second anonymous protected object B is declared, and one of its
+--     procedures is designated as an interrupt handler using a pragma
+--     Interrupt_Handler.
+--
+--     The procedure Ada.Interrupts.Attach_Handler is used to attempt to
+--     attach the procedure of B to (and hence, to detach the procedure of
+--     A from) ImpDef.Annex_C.Interrupt_To_Generate. The test verifies that
+--     Program_Error is raised, and that a subsequent interrupt is handled
+--     by the procedure of A.
+--
+--     This process is repeated for procedures Ada.Interrupts.Detach_Handler
+--     and Ada.Interrupts.Exchange_Handler.
+--
+-- SPECIAL REQUIREMENTS:
+--      This test requires that interrupts be enabled, and that an
+--      interrupt (identified by ImpDef.Annex_C.Interrupt_To_Generate)
+--      be generated multiple times, at points designated by calls to
+--      ImpDef.Annex_C.Generate_Interrupt.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for implementations validating the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      18 Jan 96   SAIC    Initial prerelease version.
+--      23 Feb 96   SAIC    Updated ImpDef references to ImpDef.Annex_C.
+--      12 Apr 96   SAIC    Fixed typo in Report.Test string.
+--
+--!
+
+package CXC3006_0 is
+
+   protected Dynamic is
+      procedure Handler;
+      pragma Interrupt_Handler ( Handler );
+
+      procedure Reset;
+      function  Handled return Boolean;
+   private
+      Was_Handled: Boolean := False;
+   end Dynamic;
+
+end CXC3006_0;
+
+
+     --==================================================================--
+
+
+package body CXC3006_0 is
+
+   protected body Dynamic is
+      procedure Handler is
+      begin
+         Was_Handled := True;
+      end Handler;
+
+      procedure Reset is
+      begin
+         Was_Handled := False;
+      end Reset;
+
+      function Handled return Boolean is
+      begin
+         return Was_Handled;
+      end Handled;
+   end Dynamic;
+
+end CXC3006_0;
+
+
+     --==================================================================--
+
+
+with ImpDef.Annex_C;
+package CXC3006_1 is
+
+   protected Static is
+      procedure Handler;
+      pragma Attach_Handler ( Handler, ImpDef.Annex_C.Interrupt_To_Generate );
+
+      procedure Reset;
+      function  Handled return Boolean;
+   private
+      Was_Handled: Boolean := False;
+   end Static;
+
+end CXC3006_1;
+
+
+     --==================================================================--
+
+
+package body CXC3006_1 is
+
+   protected body Static is
+      procedure Handler is
+      begin
+         Was_Handled := True;
+      end Handler;
+
+      procedure Reset is
+      begin
+         Was_Handled := False;
+      end Reset;
+
+      function Handled return Boolean is
+      begin
+         return Was_Handled;
+      end Handled;
+   end Static;
+
+
+end CXC3006_1;
+
+
+     --==================================================================--
+
+
+with CXC3006_0;
+with CXC3006_1;
+
+with Ada.Interrupts;
+
+with ImpDef.Annex_C;
+with Report;
+procedure CXC3006 is
+begin
+
+   Report.Test ("CXC3006", "Check that Program_Error is raised if "    &
+                "Attach_Handler, Detach_Handler, or Exchange_Handler " &
+                "is used to attempt to detach a handler that was "     &
+                "attached with a pragma Attach_Handler");
+
+
+   ImpDef.Annex_C.Enable_Interrupts;     -- Enable interrupts, if necessary.
+
+
+-- ==============
+-- Attach_Handler:
+-- ==============
+
+   begin
+      Ada.Interrupts.Attach_Handler (CXC3006_0.Dynamic.Handler'Access,
+                                     ImpDef.Annex_C.Interrupt_To_Generate);
+      Report.Failed ("Attach_Handler: Program_Error was not raised");
+   exception
+      when Program_Error => -- Expected result.
+         null;
+      when others        =>
+         Report.Failed ("Attach_Handler: Unexpected exception raised");
+   end;
+
+   ImpDef.Annex_C.Generate_Interrupt;
+   delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+   if CXC3006_0.Dynamic.Handled then
+      Report.Failed ("1st interrupt: Dynamic.Handler was called");
+   end if;
+
+   if not CXC3006_1.Static.Handled then
+      Report.Failed ("1st interrupt: Static.Handler not called");
+   end if;
+
+   CXC3006_0.Dynamic.Reset;
+   CXC3006_1.Static.Reset;
+   Report.Comment ("Done with 1st interrupt");
+
+
+-- ==============
+-- Detach_Handler:
+-- ==============
+
+   begin
+      Ada.Interrupts.Detach_Handler (ImpDef.Annex_C.Interrupt_To_Generate);
+      Report.Failed ("Detach_Handler: Program_Error was not raised");
+   exception
+      when Program_Error => -- Expected result.
+         null;
+      when others        =>
+         Report.Failed ("Detach_Handler: Unexpected exception raised");
+   end;
+
+   ImpDef.Annex_C.Generate_Interrupt;
+   delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+   if CXC3006_0.Dynamic.Handled then
+      Report.Failed ("2nd interrupt: Dynamic.Handler was called");
+   end if;
+
+   if not CXC3006_1.Static.Handled then
+      Report.Failed ("2nd interrupt: Static.Handler not called");
+   end if;
+
+   CXC3006_0.Dynamic.Reset;
+   CXC3006_1.Static.Reset;
+   Report.Comment ("Done with 2nd interrupt");
+
+
+-- ================
+-- Exchange_Handler:
+-- ================
+
+   declare
+      Old_Handler : Ada.Interrupts.Parameterless_Handler;
+   begin
+      Ada.Interrupts.Exchange_Handler (Old_Handler,
+                                       CXC3006_0.Dynamic.Handler'Access,
+                                       ImpDef.Annex_C.Interrupt_To_Generate);
+      Report.Failed ("Exchange_Handler: Program_Error was not raised");
+   exception
+      when Program_Error => -- Expected result.
+         null;
+      when others        =>
+         Report.Failed ("Exchange_Handler: Unexpected exception raised");
+   end;
+
+   ImpDef.Annex_C.Generate_Interrupt;
+   delay ImpDef.Annex_C.Wait_For_Interrupt;
+
+   if CXC3006_0.Dynamic.Handled then
+      Report.Failed ("3rd interrupt: Dynamic.Handler was called");
+   end if;
+
+   if not CXC3006_1.Static.Handled then
+      Report.Failed ("3rd interrupt: Static.Handler not called");
+   end if;
+
+   Report.Comment ("Done with 3rd interrupt");
+
+
+
+   Report.Result;
+
+end CXC3006;

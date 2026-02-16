@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Test Applicability Criteria</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Bulleted-NoPrefix {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em}
+    DIV.Bulleted {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-right: 2.0em; margin-top: 0em; margin-bottom: 0.5em; display: list-item; list-style-type: disc}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C42.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D1.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>Annex D<BR>
+Test Applicability Criteria</H1>
+<div class="Normal">Certain tests in the suite may be considered inapplicable 
+to an implementation depending on the way the implementation treats the 
+implementation-dependent features of the language. A brief summary of 
+these implementation-dependent features and the tests they affect are 
+listed in this appendix.</div>
+<div class="Normal" style="margin-bottom: 0.4em">Note that the applicability 
+of each one of these tests is based on the criteria listed in the test 
+file. During conformity assessment, all the implementation-dependent 
+tests are submitted for compilation and (if compiled successfully) are 
+executed, with the following exceptions:</div>
+<div class="Bulleted">Tests which require a floating point <B>digits</B> 
+value that exceeds <TT>System.Max_Digits</TT> need not be submitted to 
+the compiler. (The testing laboratory may require pre-validation evidence 
+that the tests are properly rejected.)</div>
+<div class="Bulleted">If file I/O is not supported, then the tests listed 
+in Section <A HREF="UG-D2F.HTM">D.2.15</A> will not be part of the customized 
+test suite for bare target validations and will not be run during witness 
+testing.&nbsp;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-C42.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D1.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,377 @@
+-- BA110140.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--    The ACAA has created and maintains the Ada Conformity Assessment Test
+--    Suite for the purpose of conformity assessments conducted in accordance
+--    with the International Standard ISO/IEC 18009 - Ada: Conformity
+--    assessment of a language processor. This test suite should not be used
+--    to make claims of conformance unless used in accordance with
+--    ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE:
+--    Check that entities other than types and nested packages are not
+--    present in the limited view. 10.1.1(12.1-3/2)
+--
+--    Check that nested packages are present in the limited view of a package.
+--    10.1.1(12.2/2).
+--
+--    Check that all types are present in the limited view of a package, and
+--    all types are incomplete, and that tagged types are tagged incomplete.
+--    10.1.1(12.3/2).
+--
+-- TEST DESCRIPTION
+--     A package containing a number of types, packages, subprograms,
+--     instances, exceptions, and objects is declared. This package is then
+--     used in a limited with on other packages, which then attempt to
+--     use all of the contents of the limited view package in various
+--     ways; in the visible part of one of the packages, and in the private
+--     part of the other package.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BA110140.A
+--         BA110141.A
+--         BA110142.A
+--
+-- PASS/FAIL CRITERIA:
+--      Files BA110141.A, and BA110142.A contain errors. All
+--      errors in these files must be detected to pass the test.
+--
+-- CHANGE HISTORY:
+--    30 NOV 2004   PHL   Initial version.
+--    23 Mar 2007   RLB   Created ACATS version from submitted test.
+--    17 Aug 2007   RLB   Corrected missing "body" keywords.
+--
+--!
+
+with Ada.Numerics.Float_Random;
+with Ada.Numerics.Discrete_Random;
+package BA11014 is
+
+    type T1 is range 1 .. 10;
+    type T2 is access constant T1;
+    type T3 is tagged
+        record
+            C1 : T1;
+        end record;
+
+    X2 : aliased T2 := null;
+    X3 : T3;
+
+
+    package P is
+
+        type T1 is range 1 .. 10;
+        type T2 is access constant T1;
+        type T3 is tagged
+            record
+                C1 : T1;
+            end record;
+
+        X2 : aliased T2 := null;
+        X3 : T3;
+
+        package Q is
+
+            type T1 is range 1 .. 10;
+            type T2 is access constant T1;
+            type T3 is tagged
+                record
+                    C1 : T1;
+                end record;
+
+            X2 : aliased T2 := null;
+            X3 : T3;
+
+            type T4 is private;
+            type T5 is tagged private;
+            type T6;
+            type T7 is tagged;
+
+            X4 : constant T4;
+            procedure P1 (X1 : access T1);
+            function F7 (X7 : T7) return Boolean;
+
+            X5 : exception;
+            X6 : constant := 10;
+
+            type T6 is new Boolean;
+            type T7 is new T3 with null record;
+
+            package Anfr renames Ada.Numerics.Float_Random;
+            package Andr is new Ada.Numerics.Discrete_Random (Boolean);
+
+            task type TA1;
+
+            task TA2;
+
+            protected type PT1 is
+                procedure Bump (A : out Natural);
+            private
+                Cnt : Natural := 0;
+            end PT1;
+
+            protected PT2 is
+                function Count return Natural;
+                procedure Bump (A : out Natural);
+            private
+                Cnt : Natural := 0;
+            end PT2;
+
+            type IT1 is interface;
+
+        private
+            type T8 is new Boolean;
+            type T9 is tagged null record;
+            type T4 is new T9 with null record;
+            type T5 is new T3 with null record;
+            X4 : constant T4 := (null record);
+        end Q;
+
+        type T4 is private;
+        type T5 is tagged private;
+        type T6;
+        type T7 is tagged;
+
+        X4 : constant T4;
+        procedure P1 (X1 : access T1);
+        function F7 (X7 : T7) return Boolean;
+
+        X5 : exception;
+        X6 : constant := 10;
+
+        type T6 is new Boolean;
+        type T7 is new T3 with null record;
+
+        package Anfr renames Ada.Numerics.Float_Random;
+        package Andr is new Ada.Numerics.Discrete_Random (Boolean);
+
+        task type TA1;
+
+        task TA2;
+
+        protected type PT1 is
+            procedure Bump (A : out Natural);
+        private
+            Cnt : Natural := 0;
+        end PT1;
+
+        protected PT2 is
+            function Count return Natural;
+            procedure Bump (A : out Natural);
+        private
+            Cnt : Natural := 0;
+        end PT2;
+
+        type IT1 is interface;
+
+    private
+        type T8 is new Boolean;
+        type T9 is tagged null record;
+        type T4 is new T9 with null record;
+        type T5 is new T3 with null record;
+        X4 : constant T4 := (null record);
+    end P;
+
+    type T4 is private;
+    type T5 is tagged private;
+    type T6;
+    type T7 is tagged;
+
+    X4 : constant T4;
+    procedure P1 (X1 : access T1);
+    function F7 (X7 : T7) return Boolean;
+
+    X5 : exception;
+    X6 : constant := 10;
+
+    type T6 is new Boolean;
+    type T7 is new T3 with null record;
+
+    package Anfr renames Ada.Numerics.Float_Random;
+    package Andr is new Ada.Numerics.Discrete_Random (Boolean);
+
+    task type TA1;
+
+    task TA2;
+
+    protected type PT1 is
+        procedure Bump (A : out Natural);
+    private
+        Cnt : Natural := 0;
+    end PT1;
+
+    protected PT2 is
+        function Count return Natural;
+        procedure Bump (A : out Natural);
+    private
+        Cnt : Natural := 0;
+    end PT2;
+
+    type IT1 is interface;
+
+private
+    type T8 is new Boolean;
+    type T9 is tagged null record;
+    type T4 is new T9 with null record;
+    type T5 is new T3 with null record;
+    X4 : constant T4 := (null record);
+end BA11014;
+
+package body BA11014 is
+
+    package body P is
+
+        package body Q is
+
+            procedure P1 (X1 : access T1) is
+            begin
+                null;
+            end P1;
+
+            function F7 (X7 : T7) return Boolean is
+            begin
+                return True;
+            end F7;
+
+            task body TA1 is
+            begin
+                null;
+            end TA1;
+
+            task body TA2 is
+            begin
+                null;
+            end TA2;
+
+            protected body PT1 is
+                procedure Bump (A : out Natural) is
+                begin
+                    Cnt := Cnt + 1;
+                    A := Cnt;
+                end Bump;
+            end PT1;
+
+            protected body PT2 is
+                function Count return Natural is
+                begin
+                    return Cnt;
+                end Count;
+                procedure Bump (A : out Natural) is
+                begin
+                    Cnt := Cnt + 1;
+                    A := Cnt;
+                end Bump;
+            end PT2;
+
+        end Q;
+
+        procedure P1 (X1 : access T1) is
+        begin
+            null;
+        end P1;
+
+        function F7 (X7 : T7) return Boolean is
+        begin
+            return True;
+        end F7;
+
+        task body TA1 is
+        begin
+            null;
+        end TA1;
+
+        task body TA2 is
+        begin
+            null;
+        end TA2;
+
+        protected body PT1 is
+            procedure Bump (A : out Natural) is
+            begin
+                Cnt := Cnt + 1;
+                A := Cnt;
+            end Bump;
+        end PT1;
+
+        protected body PT2 is
+            function Count return Natural is
+            begin
+                return Cnt;
+            end Count;
+            procedure Bump (A : out Natural) is
+            begin
+                Cnt := Cnt + 1;
+                A := Cnt;
+            end Bump;
+        end PT2;
+
+    end P;
+
+    procedure P1 (X1 : access T1) is
+    begin
+        null;
+    end P1;
+
+    function F7 (X7 : T7) return Boolean is
+    begin
+        return True;
+    end F7;
+
+    task body TA1 is
+    begin
+        null;
+    end TA1;
+
+    task body TA2 is
+    begin
+        null;
+    end TA2;
+
+    protected body PT1 is
+        procedure Bump (A : out Natural) is
+        begin
+            Cnt := Cnt + 1;
+            A := Cnt;
+        end Bump;
+    end PT1;
+
+    protected body PT2 is
+        function Count return Natural is
+        begin
+            return Cnt;
+        end Count;
+        procedure Bump (A : out Natural) is
+        begin
+            Cnt := Cnt + 1;
+            A := Cnt;
+        end Bump;
+    end PT2;
+
+end BA11014;
+

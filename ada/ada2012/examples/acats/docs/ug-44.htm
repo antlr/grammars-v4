@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Test Program Format</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-433.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-45.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.4 Test Program Format</H1>
+<div class="Normal">Each test file is composed of a test prologue, documenting 
+the test, and the test code proper. All prologue lines are marked as 
+comments. (The prologue in files containing non-Ada code is marked according 
+to the comment conventions of the foreign language.)</div>
+<div class="Normal">The prologue for all tests is based on that of legacy 
+tests. Legacy tests are generally, but not entirely, consistent in their 
+use of the prologue. The format of the prologue between test files and 
+foundation files is slightly different.</div>
+<div class="Normal" style="margin-bottom: 0.4em">The general format 
+of the prologue is as follows:&nbsp;</div>
+<div class="Indented4WideHanging-Term">&lt;file name&gt;</div><div class="Indented4WideHanging-Body">
+The distribution name of the file containing this prologue.</div>
+<div class="Indented4WideHanging-Term"><TT>DISCLAIMER</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+Use restrictions for ACATS tests; included in all tests.</div>
+<div class="Indented4WideHanging-Term"><TT>OBJECTIVE</TT></div><div class="Indented4WideHanging-Body">
+A statement of the test objective; included in all tests.</div>
+<div class="Indented4WideHanging-Term"><TT>TEST DESCRIPTION</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+A short description of the design or strategy of the test or other pertinent 
+information. Included in most newer tests but not generally included 
+in legacy tests.</div>
+<div class="Indented4WideHanging-Term"><TT>SPECIAL REQUIREMENTS</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+<I>optional</I> &ndash; Included if the test has any special requirements 
+for processing. Normally, this section will be found only in Specialized 
+Needs Annex tests. For example, an Annex E test may check for the correct 
+implementation of partitions; the requirements for test partitioning 
+and what to use as a main subprogram in each partition would be documented 
+in this section.</div>
+<div class="Indented4WideHanging-Term"><TT>TEST FILES</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+<I>optional</I> &ndash; Included if the test depends on multiple files; 
+identifies the component files of a multi-file test.</div>
+<div class="Indented4WideHanging-Term"><TT>APPLICABILITY CRITERIA</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+<I>optional</I> &ndash; Specifies the conditions under which the test 
+can be ruled inapplicable.</div>
+<div class="Indented4WideHanging-Term"><TT>PASS/FAIL CRITERIA</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+<I>optional</I> &ndash; Explains how to interpret compilation, binding, 
+and/or run-time results for grading the test.</div>
+<div class="Indented4WideHanging-Term"><TT>MACRO SUBSTITUTIONS</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+<I>optional</I> &ndash; Identifies the macro symbol(s) in the file that 
+must be replaced and provides a brief description of what the replacement(s) 
+represent. Appears only in legacy tests.</div>
+<div class="Indented4WideHanging-Term"><TT>CHANGE HISTORY</TT></div><div class="Indented4WideHanging-Body"><br clear="left">
+History of the test file. Included in all tests.</div>
+<div class="Normal">All tests have the line immediately after the disclaimer 
+marked <TT>--*</TT>. Modern tests have the line after the last prologue 
+line (before the first line of executable code) marked <TT>--!</TT>  
+No other comment lines are marked with those conventions, so the start 
+of the objective (which is the next line after the disclaimer) and the 
+first line of code may be found quickly with an editor search.</div>
+<div class="Normal">Some tests are composed of multiple files (other 
+than foundation code). Rather than repeating the complete prologue in 
+each file, an alternate approach has been used. One file (usually the 
+one containing the main subprogram or the first file in the set) has 
+the complete prologue; the other, related files have those sections that 
+apply to files (TEST FILES, CHANGE HISTORY) and refer to the file with 
+the complete prologue for the other sections.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-433.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-45.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

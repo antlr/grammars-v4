@@ -1,0 +1,107 @@
+-- BC510210.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--      Check that the actual types associated with a formal incomplete type
+--      can be of any category, including incomplete and private types prior
+--      to their completion. Check that, if the word tagged appears in an
+--      formal incomplete type declaration, the actual type must be tagged.
+--
+-- TEST DESCRIPTION:
+--      Verify that various categories of types are legal as actuals in
+--      instantiations of generics declaring formal incomplete types.
+--      In particular, verify that a private type can be associated with
+--      such a formal type prior to the full type declaration, that
+--      incomplete type views can be associated with such formal types,
+--      and that an incomplete view of a type coming from a limited view
+--      of a package can be associated with an incomplete formal type.
+--      Verify that if a formal incomplete type is declared as tagged,
+--      then the actual type must be tagged. Verify that components of
+--      of a formal abstract type are illegal for both record and array
+--      types.
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> BC510210.A
+--         BC510211.A
+--         BC510212.A
+--         BC510213.AM
+--
+-- PASS/FAIL CRITERIA:
+--      Files BC510211.A and BC510212.A contain errors. All
+--      errors in these files must be detected to pass the test.
+--
+--
+-- CHANGE HISTORY:
+--      15 Jan 2012   GJD     Initial version.
+--      25 Apr 2014   RLB     Split into two tests, this one for matching
+--                            rules. Put units with errors into separate
+--                            files.
+--
+--!
+
+generic
+   type Untagged_Incomplete_Formal;
+package BC51021_0 is
+
+end BC51021_0;
+
+
+     --==================================================================--
+
+
+generic
+   type Tagged_Incomplete_Formal is tagged;
+package BC51021_1 is
+
+end BC51021_1;
+
+
+     --==================================================================--
+
+
+package BC51021_2 is
+
+   type Unsigned_10 is mod 2 ** 10;
+
+   type Fixed is delta 0.1 range -10.0 .. +10.0;
+
+   type Untagged_Record is null record;
+
+   type Tagged_Record is tagged null record;
+
+   type Arr_Integer is array (1 .. 10) of Integer;
+
+end BC51021_2;
+

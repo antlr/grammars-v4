@@ -1,0 +1,279 @@
+-- BXH4003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE
+--     Check pragma Restrictions.
+--     Check that the application of the configuration pragma Restrictions
+--     with the specific restriction:
+--       No_Local_Allocators
+--     disallows allocators in subprograms, generic subprograms, tasks, and
+--     entry bodies. Check that generic units are expanded at the point of
+--     instantiation for the purposes of this check (13.12(8.1-4)).
+--     Check that allocators and generic instantiations are still
+--     allowed at the library package level.
+--
+-- TEST DESCRIPTION
+--     The test requires that the configuration pragma
+--     Restrictions(No_Local_Allocators) be processed.  Allocators
+--     and generic instantiations used in this test within an enclosed scope
+--     should cause compilation errors.  Library level allocators and generic
+--     instantiations should still be allowed.
+--
+-- APPLICABILITY CRITERIA:
+--      This test is only applicable for a compiler attempting validation
+--      for the Safety and Security Annex.
+--
+-- SPECIAL REQUIREMENTS
+--      The implementation must process a configuration pragma which is not
+--      part of any Compilation Unit; the method employed is implementation
+--      defined.
+--
+--
+-- CHANGE HISTORY:
+--      26 OCT 95   SAIC   Initial version
+--      11 APR 96   SAIC   Removed unintentional error case for 2.1
+--      21 NOV 96   SAIC   Corrected for 2.1 release
+--      14 MAR 03   RLB    Corrected so that instantiations are really
+--                         illegal. (The Technical Corrigendum made it legal
+--                         to have instantiations with No_Local_Allocators).
+--                         Added missing entry body check.
+--      14 APR 03   RLB    Corrected parameter name in new generic.
+--      23 MAY 03   RLB    Corrected additional test errors.
+--
+--!
+
+---------------------------- CONFIGURATION PRAGMAS -----------------------
+
+pragma Restrictions(No_Local_Allocators);                         -- OK
+                                                -- configuration pragma
+
+------------------------ END OF CONFIGURATION PRAGMAS --------------------
+
+
+----------------------------------------------------------------- BXH4003_0
+
+with Unchecked_Deallocation;
+generic
+  type Stuff is private;
+  type Reference is access Stuff;
+package BXH4003_0 is
+  procedure Operation( R: in out Reference; S: Stuff );
+  Default_Item : constant Reference;
+private
+  procedure Dump is new Unchecked_Deallocation( Stuff, Reference ); -- OK
+                                                                    -- H.4(8)
+  Default_Item : constant Reference := new Stuff; -- OK
+end BXH4003_0;
+
+package body BXH4003_0 is
+  procedure Operation( R: in out Reference; S: Stuff ) is
+  begin
+    if R /= null then
+      Dump( R );
+    end if;
+  end Operation;
+end BXH4003_0;
+
+----------------------------------------------------------------- BXH4003_1
+
+with BXH4003_0;
+package BXH4003_1 is
+
+  type Objects is tagged record
+    Name : String(1..20);
+    Location : Natural;
+  end record;
+
+  type Pointers is access Objects;
+
+end BXH4003_1;
+
+package BXH4003_1.Instance is new BXH4003_0( Objects, Pointers );
+
+------------------------------------------------------------------- BXH4003_2
+
+generic
+  type Item is private;
+package BXH4003_2 is
+  function Is_Default (The_Item : in Item) return Boolean;
+end BXH4003_2;
+
+package body BXH4003_2 is
+  type Reference is access Item;
+  Default_Item : constant Reference := new Item; -- OK
+                                                 -- (in library level instance)
+  function Is_Default (The_Item : in Item) return Boolean is
+  begin
+    return The_Item = Default_Item.all;
+  end Is_Default;
+end BXH4003_2;
+
+------------------------------------------------------------------- BXH4003
+
+with BXH4003_2;
+package BXH4003 is
+
+  type Item;
+
+  type List_P is access all Item;
+
+  type Item is record
+    Data : Natural;
+    Next : List_P;
+  end record;
+
+  Global_List : List_P := new Item'(0,new Item'(1,null));         -- OK
+                                                 -- non-local allocator
+
+  package Tester is new BXH4003_2 (Item);     -- OK
+                                              -- library level instance of
+                                              -- package containing a library
+                                              -- level allocator.
+
+  task type T is
+    entry E;
+  end T;
+
+  protected type Lock is
+    entry Seize;
+    procedure Free;
+  private
+   Locked : Boolean;
+  end Lock;
+
+end BXH4003;
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+with BXH4003_0;
+with Unchecked_Conversion;
+with BXH4003_2;
+package body BXH4003 is
+
+  Item_A, Item_B : aliased Item;
+
+  List_C, List_D : List_P;
+
+  procedure Build_OK_List is
+  begin
+    List_C := Item_A'Access;                                       -- OK
+    List_C.Next := Item_B'Access;                                  -- OK
+
+    List_D := Item_A'Unchecked_Access;                             -- OK
+    List_D.Next := Item_B'Unchecked_Access;                        -- OK
+  end Build_OK_List;
+
+  package Instance is new BXH4003_0 (Item, List_P);                -- OK
+
+  package Another_Checker is new BXH4003_2 (Item);                 -- OK
+
+  procedure Build_Error_List is
+
+    package Inst2 is new BXH4003_0 (Item, List_P);                 -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+                        -- generic instance of package with an allocator
+                        -- enclosed in subprogram scope
+
+    generic
+       type Item is (<>);
+    procedure subprog;
+
+    procedure Subprog is
+      A : Item := Item'First;
+      package Test_It is new BXH4003_2 (Item);                     -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+                        -- generic instance of package with an allocator
+                        -- enclosed in subprogram scope
+    begin
+      A := Item'Last;
+    end Subprog;
+
+  begin
+
+    List_C := new Item;                                            -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+
+    List_D := new Item'(42,List_C);                                -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+
+  end Build_Error_List;
+
+  task body T is
+    Task_List : List_P;
+
+    package Inst3 is new BXH4003_0 (Item, List_P);                 -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+                        -- generic instance of package with an allocator
+                        -- enclosed in task scope
+
+  begin
+    Task_List := new Item;                                         -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+    loop
+      accept E do
+        Entry_Body: declare
+          package YATest is new BXH4003_2 (Item);                  -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+                        -- generic instance of package with an allocator
+                        -- enclosed in task scope
+        begin
+          Task_List := new Item'(24,List_C);                       -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+        end Entry_Body;
+      end E;
+    end loop;
+  end T;
+
+  protected body Lock is
+    entry Seize when not Locked is
+       package EBTest is new BXH4003_2 (Item);                     -- ERROR:
+                      -- pragma Restrictions(No_Local_Allocators) in force
+                      -- generic instance of package with an allocator
+                      -- enclosed in entry body
+    begin
+      Locked := True;
+      List_D := new Item;                                          -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+    end Seize;
+
+    procedure Free is
+      package Inst4 is new BXH4003_0 (Item, List_P);               -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+                        -- generic instance of package with an allocator
+                        -- enclosed in protected subprogram
+    begin
+      Locked := False;
+      List_C := new Item;                                          -- ERROR:
+                        -- pragma Restrictions(No_Local_Allocators) in force
+    end Free;
+  end Lock;
+
+begin
+
+  List_D := Item_A'Unchecked_Access;                               -- OK
+
+  List_D.Next := new Item'(42,List_C);                             -- OK
+                                                  -- non-local allocator
+end BXH4003;

@@ -1,0 +1,318 @@
+-- B854003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+-- OBJECTIVE:
+--     Check that a renames-as-body is illegal if:
+--       A) it does not fully conform to the declaration that it completes;
+--       B) the renamed entity is not subtype conformant with the declaration
+--          that it completes if that declaration is frozen;
+--       C) the renamed entity has convention Intrinsic;
+--       D) the renamed entity is abstract;
+--
+-- CHANGE HISTORY:
+--     06 Sep 2018 RLB Created test.
+--
+package B854003A is
+   -- Entities to rename:
+
+   -- For case B:
+   ONE : Integer := 1;
+   subtype Dyn_Positive is Integer range One .. Integer'Last;
+   type New_Positive is range 1 .. Integer'Last;
+
+   procedure Munge_1 (Val : in out Integer);
+
+   procedure Munge_2 (Val : in out Natural);
+
+   procedure Munge_3 (Val : in out Dyn_Positive);
+
+   procedure Munge_4 (Val : in Integer);
+
+   procedure Munge_5 (Val : in out New_Positive);
+
+   procedure Munge_6 (Val : in out Positive; Foo : in Boolean := True);
+
+   function Double_1 (Val : in Integer) return Integer;
+
+   function Double_2 (Val : in Integer) return Natural;
+
+   function Double_3 (Val : in Integer) return Dyn_Positive;
+
+
+   -- For case D:
+
+   type T is abstract tagged null record;
+
+   procedure Proc (Obj : in out T) is abstract;
+
+   function Func (Obj : in T) return Boolean is abstract;
+
+   function Count (Obj : in T) return Natural;
+
+   procedure Sink (Obj : in T);
+
+end B854003A;
+
+package body B854003A is
+   procedure Munge_1 (Val : in out Integer) is
+   begin
+      null;
+   end Munge_1;
+
+   procedure Munge_2 (Val : in out Natural) is
+   begin
+      null;
+   end Munge_2;
+
+   procedure Munge_3 (Val : in out Dyn_Positive) is
+   begin
+      null;
+   end Munge_3;
+
+   procedure Munge_4 (Val : in Integer) is
+   begin
+      null;
+   end Munge_4;
+
+   procedure Munge_5 (Val : in out New_Positive) is
+   begin
+      null;
+   end Munge_5;
+
+   procedure Munge_6 (Val : in out Positive; Foo : in Boolean := True) is
+   begin
+      null;
+   end Munge_6;
+
+   function Double_1 (Val : in Integer) return Integer is
+   begin
+      return Val * 2;
+   end Double_1;
+
+   function Double_2 (Val : in Integer) return Natural is
+   begin
+      return Val * 2;
+   end Double_2;
+
+   function Double_3 (Val : in Integer) return Dyn_Positive is
+   begin
+      return Val * 2;
+   end Double_3;
+
+   function Count (Obj : in T) return Natural is
+   begin
+      return 0;
+   end Count;
+
+   procedure Sink (Obj : in T) is
+   begin
+      null;
+   end Sink;
+
+end B854003A;
+
+with B854003A;
+package B854003B is
+
+   procedure ReConf_1 (Val : in Integer);
+
+   procedure ReConf_2 (Val : in out Positive);
+
+   procedure ReConf_3 (Pos : in out Integer);
+
+   procedure ReConf_4 (Val : in out Integer);
+
+   function ReConf_F1 (Val : in Integer) return Integer;
+
+   function ReConf_F2 (Val : in Integer) return Positive;
+
+   function ReConf_F3 (Val : in Integer := 1) return Integer;
+
+   function ReConf_F4 (Pos : in Integer) return Integer;
+
+
+   procedure ReMunge_1 (Val : in out Natural);
+
+   procedure ReMunge_2 (Val : in out Natural);
+
+   procedure ReMunge_3 (Val : in out Natural);
+
+   procedure ReMunge_4 (Val : in out Natural);
+
+   procedure ReMunge_5 (Val : in out Positive);
+
+   procedure ReMunge_6 (Val : in out Positive);
+
+   subtype Dyn_Positive is Integer range B854003A.One .. Integer'Last;
+
+   procedure ReMunge_11 (Val : in out Dyn_Positive);
+
+   procedure ReMunge_12 (Val : in out B854003A.Dyn_Positive);
+
+   generic
+      with procedure Munge_G (Val : in out Natural);
+   package Gen1 is
+      procedure ReMunge_G (Val : in out Natural);
+   end Gen1;
+
+   function ReDouble_1 (Val : in Integer) return Integer;
+
+   function ReDouble_2 (Val : in Integer) return Integer;
+
+   function ReDouble_3 (Val : in Integer) return Integer;
+
+   function ReDouble_11 (Val : in Integer) return Dyn_Positive;
+
+   function ReDouble_12 (Val : in Integer) return B854003A.Dyn_Positive;
+
+
+   function Ren_1 (Left, Right : Integer'Base) return Integer'Base;
+
+   function Ren_2 (Left, Right : Integer'Base) return Boolean;
+
+
+   procedure ReProc (Obj : in out B854003A.T);
+
+   function ReFunc (Obj : in B854003A.T) return Boolean;
+
+   function ReCount (Obj : in B854003A.T) return Natural;
+
+   procedure ReSink (Obj : in B854003A.T);
+
+end B854003B;
+
+package body B854003B is
+
+   -- Objective A tests:
+
+   procedure ReConf_1 (Val : in out Integer)
+                    renames B854003A.Munge_1;                 -- ERROR: {1:4;1}
+
+   procedure ReConf_2 (Val : in out Integer)
+                    renames B854003A.Munge_1;                 -- ERROR: {1:4;1}
+
+   procedure ReConf_3 (Val : in out Integer)
+                    renames B854003A.Munge_1;                 -- ERROR: {1:4;1}
+
+   procedure ReConf_4 (Val : in out Integer)
+                    renames B854003A.Munge_1;                 -- OK. {1:4;1}
+
+   function ReConf_F1 (Val : in Integer) return Integer
+                    renames B854003A.Double_1;                -- OK. {1:4;1}
+
+   function ReConf_F2 (Val : in Integer) return Integer
+                    renames B854003A.Double_1;                -- ERROR: {1:4;1}
+
+   function ReConf_F3 (Val : in Integer) return Integer
+                    renames B854003A.Double_1;                -- ERROR: {1:4;1}
+
+   function ReConf_F4 (Val : in Integer) return Integer
+                    renames B854003A.Double_1;                -- ERROR: {1:4;1}
+
+   -- Objective B tests:
+
+   procedure ReMunge_1 (Val : in out Natural)
+                    renames B854003A.Munge_1;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_2 (Val : in out Natural)
+                    renames B854003A.Munge_2;                 -- OK. {1:4;1}
+
+   procedure ReMunge_3 (Val : in out Natural)
+                    renames B854003A.Munge_3;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_4 (Val : in out Natural)
+                    renames B854003A.Munge_4;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_5 (Val : in out Positive)
+                    renames B854003A.Munge_5;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_6 (Val : in out Positive)
+                    renames B854003A.Munge_6;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_11 (Val : in out Dyn_Positive)
+                    renames B854003A.Munge_3;                 -- ERROR: {1:4;1}
+
+   procedure ReMunge_12 (Val : in out B854003A.Dyn_Positive)
+                    renames B854003A.Munge_3;                 -- OK. {1:4;1}
+
+   package body Gen1 is
+      procedure ReMunge_G (Val : in out Natural)
+                    renames Munge_G;                          -- ERROR: {1:7;1}
+      -- Note: See the second sentence of 6.3.1(17/3)!
+   end Gen1;
+
+   function ReDouble_1 (Val : in Integer) return Integer
+                    renames B854003A.Double_1;                -- OK. {1:4;1}
+
+   function ReDouble_2 (Val : in Integer) return Integer
+                    renames B854003A.Double_2;                -- ERROR: {1:4;1}
+
+   function ReDouble_3 (Val : in Integer) return Integer
+                    renames B854003A.Double_3;                -- ERROR: {1:4;1}
+
+   function ReDouble_11 (Val : in Integer) return Dyn_Positive
+                    renames B854003A.Double_3;                -- ERROR: {1:4;1}
+
+   function ReDouble_12 (Val : in Integer) return B854003A.Dyn_Positive
+                    renames B854003A.Double_3;                -- OK. {1:4;1}
+
+   -- Objective C tests:
+
+   function Ren_1 (Left, Right : Integer'Base) return Integer'Base
+                    renames Standard."+";                     -- ERROR: {1:4;1}
+
+   function Ren_2 (Left, Right : Integer'Base) return Boolean
+                    renames Standard."/=";                    -- ERROR: {1:4;1}
+
+   -- Objective D tests:
+
+   procedure ReProc (Obj : in out B854003A.T)
+                    renames B854003A.Proc;                    -- ERROR: {1:4;1}
+
+   function ReFunc (Obj : in B854003A.T) return Boolean
+                    renames B854003A.Func;                    -- ERROR: {1:4;1}
+
+   function ReCount (Obj : in B854003A.T) return Natural
+                    renames B854003A.Count;                   -- OK. {1:4;1}
+
+   procedure ReSink (Obj : in B854003A.T)
+                    renames B854003A.Sink;                    -- OK. {1:4;1}
+
+end B854003B;
+
+with B854003A, B854003B;
+procedure B854003 is -- Optional main subprogram. This does not need to be
+                     -- processed.
+begin
+    null;
+end B854003;

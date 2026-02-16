@@ -1,0 +1,111 @@
+-- B3A1010.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that the name of a parameter that has a tagged formal incomplete
+--     type cannot be used as a prefix.
+--
+--     Check that a dereference of an access-to-formal incomplete type cannot
+--     be used as a prefix.
+--
+-- CHANGE HISTORY:
+--     13 Jan 2015  RLB  Created test.
+--
+generic
+   type An_Inc;
+   type A_Tagged_Inc is tagged;
+package B3A1010 is
+   type An_Acc_Inc is access constant An_Inc;
+   type An_Acc_Tagged_Inc is access constant A_Tagged_Inc;
+
+   procedure Test1 (P : access An_Inc);
+
+   procedure Test2 (P : access A_Tagged_Inc);
+
+   procedure Test3 (Obj : A_Tagged_Inc);
+
+end B3A1010;
+
+
+with System;
+package body B3A1010 is
+
+   procedure Test1 (P : access An_Inc) is
+      Q : An_Acc_Inc;
+      A : System.Address;
+   begin
+      if P /= null then                                      -- OK.
+         null;
+      elsif P.all'Size /= 10 then                            -- ERROR:
+         null;
+      elsif P.all'Alignment /= 1 then                        -- ERROR:
+         null;
+      end if;
+      Q := An_Acc_Inc(P);                                    -- OK.
+      Q := P.all'Access;                                     -- ERROR:
+      A := P.all'Address;                                    -- ERROR:
+   end Test1;
+
+   procedure Test2 (P : access A_Tagged_Inc) is
+      Q : An_Acc_Tagged_Inc;
+      A : System.Address;
+   begin
+      if P /= null then                                      -- OK.
+         null;
+      elsif P.all'Size /= 20 then                            -- ERROR:
+         null;
+      elsif P.all'Alignment /= 1 then                        -- ERROR:
+         null;
+      elsif Q.all'Alignment = 4 then                         -- ERROR:
+         null;
+      end if;
+      Q := An_Acc_Tagged_Inc(P);                             -- OK.
+      Q := P.all'Access;                                     -- ERROR:
+      A := Q.all'Address;                                    -- ERROR:
+   end Test2;
+
+   procedure Test3 (Obj : A_Tagged_Inc) is
+      Q : An_Acc_Tagged_Inc;
+      A : System.Address;
+   begin
+      if Obj'Size /= 12 then                                 -- ERROR:
+         null;
+      elsif Obj'Alignment /= 2 then                          -- ERROR:
+         null;
+      end if;
+      Q := Obj'Unchecked_Access;                             -- ERROR:
+      A := Q.all'Address;                                    -- ERROR:
+   end Test3;
+
+end B3A1010;

@@ -1,0 +1,439 @@
+-- B460002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that if the target type of a type conversion is a general
+--      access type, the accessibility level of the operand type must not
+--      be statically deeper than that of the target type. Check for cases
+--      where the type conversion occurs in the visible or private part of
+--      an instance.
+--
+-- TEST DESCRIPTION:
+--      In order to satisfy accessibility requirements, the operand type must
+--      be at the same or a less deep nesting level than the target type -- the
+--      operand type must "live" as long as the target type. Nesting levels
+--      are the run-time nestings of masters: block statements; subprogram,
+--      task, and entry bodies; and accept statements. Packages are invisible
+--      to accessibility rules.
+--
+--      Check access type conversions, using various combinations of operand
+--      and target types, in both the visible and private parts of instances:
+--
+--      Target type        Operand type                Coverage           Part
+--      ----------------------------------------------------------------------
+--      Global to generic  Local to generic            Not covered
+--              "          Global to generic           Not covered
+--              "          Formal of generic           Not covered
+--              "          Local derivative of formal  B460002_4.Target   Priv
+--              "          Access discriminant         B460002_3.Target   Visi
+--      Formal of generic  Local to generic            B460002_2.Target   Visi
+--              "          Global to generic           Not covered
+--              "          Formal of generic           B460002_5.Target   Visi
+--              "          Local derivative of formal  Not covered
+--              "          Access discriminant         B460002_6.Target   Priv
+--      Local to generic   Local to generic            B460002_1.Target3  Priv
+--              "          Global to generic           B460002_1.Target1  Visi
+--              "          Formal of generic           B460002_1.Target4  Priv
+--              "          Local derivative of formal  Not covered
+--              "          Access discriminant         B460002_1.Target2  Visi
+--
+--      Include cases where the operand is a stand-alone access object, an
+--      access discriminant, and a function call. Verify that an access
+--      type conversion is illegal in an instance if the operand type has
+--      a deeper accessibility level than the target type, and legal otherwise.
+--
+--
+-- CHANGE HISTORY:
+--      26 May 95   SAIC    Initial prerelease version.
+--      01 May 96   Dianne  Added an instantiation using a derived access type.
+--      28 Apr 21   RLB     Added error location indicators.
+--!
+
+package B460002_0 is
+
+   type Tagged_Type is tagged record
+     I : Integer;
+   end record;
+
+   type External_Operand_Type_L0  is access all Tagged_Type;
+   type External_Operand_Class_L0 is access all Tagged_Type'Class;
+
+   type External_Target_Type_L0   is access all Tagged_Type;
+
+   function Oper_Func return External_Operand_Class_L0;
+
+   type Disc_Record_Type (D : access Tagged_Type'Class) is limited record
+      B : Boolean;
+   end record;
+
+   Tag_Object : aliased Tagged_Type;
+   Operand_L0 : External_Operand_Type_L0 := new Tagged_Type;
+   AccDisc_L0 : Disc_Record_Type(Tag_Object'Access);
+
+end B460002_0;
+
+
+     --==================================================================--
+
+
+package body B460002_0 is
+
+   function Oper_Func return External_Operand_Class_L0 is
+   begin
+      return new Tagged_Type'(I => 7);
+   end Oper_Func;
+
+end B460002_0;
+
+
+     --==================================================================--
+
+
+with B460002_0;
+generic
+   type Designated_Type is new B460002_0.Tagged_Type with private;
+
+   type Formal_Operand_Type is access Designated_Type;
+   Formal_Operand : in out Formal_Operand_Type;
+
+   type Formal_Disc_Record_Type is new B460002_0.Disc_Record_Type;
+   Formal_AccDisc : in out Formal_Disc_Record_Type;
+package B460002_1 is
+
+   type Internal_Target_Type  is access all Designated_Type;
+
+   type Internal_Operand_Type is access all Designated_Type;
+   Internal_Operand : Internal_Operand_Type := new Designated_Type;
+
+
+   -- The following conversions are always legal. In each case, the conversion
+   -- is to a target type declared within the instance, and the level of each
+   -- operand type will never be deeper than that of the target type (because
+   -- it is either already at library level, already at the same level as the
+   -- target type, or must be passed as an actual to the instance):
+
+   Target1 : Internal_Target_Type := Internal_Target_Type(B460002_0.Oper_Func);
+   Target2 : Internal_Target_Type := Internal_Target_Type(Formal_AccDisc.D);
+   
+private
+
+   Target3 : Internal_Target_Type := Internal_Target_Type(Internal_Operand);
+   Target4 : Internal_Target_Type := Internal_Target_Type(Formal_Operand);
+
+end B460002_1;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_1;
+package B460002_1_InstanceL0 is new B460002_1
+  (Designated_Type         => B460002_0.Tagged_Type,
+   Formal_Operand_Type     => B460002_0.External_Operand_Type_L0,
+   Formal_Operand          => B460002_0.Operand_L0,
+   Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+   Formal_AccDisc          => B460002_0.AccDisc_L0);         -- OK. {5:1;1}
+
+
+     --==================================================================--
+
+
+generic
+   type Designated_Type is tagged private;
+   type Formal_Target_Type is access all Designated_Type;
+package B460002_2 is
+
+   type Internal_Operand_Type is access all Designated_Type;
+   Internal_Operand : Internal_Operand_Type := new Designated_Type;
+
+
+   -- The following conversion is illegal in an instance if the package is
+   -- instantiated at a level deeper than that of the actual corresponding
+   -- to Formal_Target_Type:
+
+   Target : Formal_Target_Type := Formal_Target_Type(Internal_Operand);
+
+end B460002_2;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_2;
+package B460002_2_InstanceL0 is new B460002_2
+  (Designated_Type    => B460002_0.Tagged_Type,
+   Formal_Target_Type => B460002_0.External_Target_Type_L0); -- OK. {2:1;1}
+
+
+     --==================================================================--
+
+
+with B460002_0;
+generic
+   type Formal_Disc_Record_Type is new B460002_0.Disc_Record_Type;
+   Formal_AccDisc : in out Formal_Disc_Record_Type;
+package B460002_3 is
+
+   -- The following conversion is illegal in an instance if the level of the
+   -- actual object corresponding to Formal_AccDisc is deeper than that of
+   -- B460002_0.External_Target_Type_L0 (because the operand type is the
+   -- anonymous type of an access discriminant, the level of which is
+   -- that of the containing object): 
+
+   Target : B460002_0.External_Target_Type_L0 :=
+            B460002_0.External_Target_Type_L0(Formal_AccDisc.D);
+
+end B460002_3;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_3;
+package B460002_3_InstanceL0 is new B460002_3
+  (Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+   Formal_AccDisc          => B460002_0.AccDisc_L0);         -- OK. {2:1;1}
+
+
+     --==================================================================--
+
+
+with B460002_0;
+generic
+   type Designated_Type is new B460002_0.Tagged_Type with private;
+   type Formal_Operand_Type is access all Designated_Type;
+package B460002_4 is
+
+   -- Derived access type (level is that of ultimate ancestor):
+   type Derived_Operand_Type is new Formal_Operand_Type;
+   Derived_Operand : Derived_Operand_Type;
+
+private
+
+   -- The following conversion is illegal in an instance if the level of the
+   -- ultimate ancestor of the actual corresponding to Formal_Operand_Type is
+   -- deeper than that of B460002_0.External_Target_Type_L0:
+
+   Target : B460002_0.External_Target_Type_L0 :=
+            B460002_0.External_Target_Type_L0(Derived_Operand);
+
+end B460002_4;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_4;
+package B460002_4_InstanceL0 is new B460002_4
+  (Designated_Type     => B460002_0.Tagged_Type,
+   Formal_Operand_Type => B460002_0.External_Operand_Type_L0); -- OK. {2:1;1}
+
+
+     --==================================================================--
+
+
+generic
+   type Designated_Type is tagged private;
+
+   type Formal_Operand_Type is access all Designated_Type;
+   Formal_Operand: in out Formal_Operand_Type;
+
+   type Formal_Target_Type is access all Designated_Type;
+package B460002_5 is
+
+   -- The following conversion is illegal in an instance if the actual
+   -- corresponding to Formal_Operand_Type has a deeper level than that
+   -- of the actual corresponding to Formal_Target_Type:
+
+   Target : Formal_Target_Type := Formal_Target_Type(Formal_Operand);
+
+end B460002_5;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_5;
+package B460002_5_InstanceL0 is new B460002_5
+  (Designated_Type     => B460002_0.Tagged_Type,
+   Formal_Operand_Type => B460002_0.External_Operand_Type_L0,
+   Formal_Operand      => B460002_0.Operand_L0,
+   Formal_Target_Type  => B460002_0.External_Target_Type_L0); -- OK. {4:1;1}
+
+
+     --==================================================================--
+
+
+with B460002_0;
+generic
+   type Designated_Type is new B460002_0.Tagged_Type with private;
+
+   type Formal_Target_Type is access all Designated_Type;
+
+   type Formal_Disc_Record_Type is new B460002_0.Disc_Record_Type;
+   Formal_AccDisc: in out Formal_Disc_Record_Type;
+package B460002_6 is
+
+   -- The following conversion is illegal in an instance if the level of the
+   -- actual object corresponding to Formal_AccDisc is deeper than that of
+   -- the actual corresponding to Formal_Target_Type (because the operand type
+   -- is the anonymous type of an access discriminant, the level of which is
+   -- that of the containing object): 
+
+private
+
+   Target : Formal_Target_Type := Formal_Target_Type(Formal_AccDisc.D);
+
+end B460002_6;
+
+               --==============================================--
+
+                                                             -- [ Level = 0 ]
+with B460002_0;
+with B460002_6;
+package B460002_6_InstanceL0 is new B460002_6
+  (Designated_Type         => B460002_0.Tagged_Type,
+   Formal_Target_Type      => B460002_0.External_Target_Type_L0,
+   Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+   Formal_AccDisc          => B460002_0.AccDisc_L0);         -- OK. {4:1;1}
+
+
+     --==================================================================--
+
+
+with B460002_0;
+with B460002_1;
+with B460002_2;
+with B460002_3;
+with B460002_4;
+with B460002_5;
+with B460002_6;
+
+procedure B460002 is                                         -- [ Level = 1 ]
+
+
+   type External_Operand_Type_L1 is access all B460002_0.Tagged_Type;
+   type External_Target_Type_L1  is access all B460002_0.Tagged_Type;
+
+   Operand_L1 : External_Operand_Type_L1 := new B460002_0.Tagged_Type;
+
+   -- Level of derived access type is that of its ultimate ancestor, so
+   -- the level of this type is 0, even though it is derived at level 1:
+   type Derived_Operand_Type_L0 is new B460002_0.External_Operand_Type_L0;
+
+
+   -- The following instantiation is illegal because the level of the operand
+   -- type (which is that of the instance = 1) is deeper than that of the
+   -- target type (0):
+
+   package B460002_2_InstanceL1 is new B460002_2
+     (Designated_Type       => B460002_0.Tagged_Type,
+      Formal_Target_Type    => 
+                         B460002_0.External_Target_Type_L0);  -- ERROR: {3:4;1}
+               -- Accessibility level of operand type in access type conversion
+               -- deeper than that of target type.
+begin -- B460002.                                            -- [ Level = 1 ]
+
+   declare                                                   -- [ Level = 2 ]
+
+      type External_Operand_Type_L2  is access all B460002_0.Tagged_Type;
+      Operand_L2 :  External_Operand_Type_L2;
+
+      AccDisc_L2 :  B460002_0.Disc_Record_Type(B460002_0.Tag_Object'Access);
+
+
+      -- The following instantiation is illegal because the level of the
+      -- operand type (which is that of AccDisc_L2 = 2) is deeper than
+      -- that of the target type (0):
+
+      package B460002_3_InstanceL2 is new B460002_3
+        (Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+         Formal_AccDisc          => AccDisc_L2);             -- ERROR: {2:7;1}
+               -- Accessibility level of operand type in access type conversion
+               -- deeper than that of target type.
+
+
+      -- The following instantiation is illegal because the level of the
+      -- operand type (1) is deeper than that of the target type (0):
+
+      package B460002_4_InstanceL2 is new B460002_4
+        (Designated_Type         => B460002_0.Tagged_Type,
+         Formal_Operand_Type     => External_Operand_Type_L1);-- ERROR: {2:7;1}
+               -- Accessibility level of operand type in access type conversion
+               -- deeper than that of target type.
+
+      -- The following instantiation is legal because the level of the 
+      -- operand type is no deeper than that of the target type (0):
+
+      package B460002_4_Instance is new B460002_4
+        (Designated_Type         => B460002_0.Tagged_Type,
+         Formal_Operand_Type     => Derived_Operand_Type_L0);-- OK. {2:7;1}
+
+   begin
+      declare                                                -- [ Level = 3 ]
+
+         -- The following instantiation is legal because in all cases the
+         -- level of the operand type is no deeper than that of the target
+         -- type (which is that of the instance = 3):
+
+         package B460002_1_InstanceL3 is new B460002_1
+           (Designated_Type         => B460002_0.Tagged_Type,
+            Formal_Operand_Type     => External_Operand_Type_L1,
+            Formal_Operand          => Operand_L1,
+            Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+            Formal_AccDisc          => AccDisc_L2);          -- OK. {5:10;1}
+
+
+         -- The following instantiation is illegal because the level of the
+         -- operand type (2) is deeper than that of the target type (1):
+
+         package B460002_5_InstanceL3 is new B460002_5
+           (Designated_Type     => B460002_0.Tagged_Type,
+            Formal_Operand_Type => External_Operand_Type_L2,
+            Formal_Operand      => Operand_L2,
+            Formal_Target_Type  => External_Target_Type_L1); -- ERROR: {4:10;1}
+               -- Accessibility level of operand type in access type conversion
+               -- deeper than that of target type.
+
+
+         -- The following instantiation is illegal because the level of the
+         -- operand type (which is that of AccDisc_L2 = 2) is deeper than that
+         -- of the target type (1):
+
+         package B460002_6_InstanceL3 is new B460002_6
+           (Designated_Type         => B460002_0.Tagged_Type,
+            Formal_Target_Type      => External_Target_Type_L1,
+            Formal_Disc_Record_Type => B460002_0.Disc_Record_Type,
+            Formal_AccDisc          => AccDisc_L2);          -- ERROR: {4:10;1}
+               -- Accessibility level of operand type in access type conversion
+               -- deeper than that of target type.
+
+      begin
+         null;
+      end;
+
+   end;
+
+end B460002;

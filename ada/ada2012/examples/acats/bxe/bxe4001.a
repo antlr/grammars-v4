@@ -1,0 +1,166 @@
+-- BXE4001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that pragma Asynchronous can only be applied to one of
+--      the following three categories of items:
+--      Remote procedures where the formal parameters of the procedures
+--      are all of mode in;
+--      The first subtype of a remote access-to-procedure type where 
+--      the formal parameters of the designated profile of the type 
+--      are all of mode in;
+--      Remote access-to-class-wide types.
+--
+-- TEST DESCRIPTION:  
+--      This test consists of 4 package specifications.  
+--      The first package is a pure package providing declarations
+--      that are used by the other packages.  This is the only package
+--      that is expected to compile without error.
+--      The remaining packages consist of a normal package, a remote types
+--      package, and a remote call interface package.  These packages 
+--      contain a selection of legal and illegal declarations.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Distribution Annex and the Remote_Call_Interface pragma.
+--
+--
+-- CHANGE HISTORY:
+--     20 JUN 95   SAIC    Initial version for 2.1
+--     01 MAY 96   SAIC    Added additional test suggested by reviewers 
+--     26 JUN 98   EDS     Created private part for last few lines of
+--                         package BXE4001_Types so access type is legal.
+--!
+
+----------------------------------------------------------------------------
+
+package BXE4001_Pure is
+  -- this package should compile without error
+  pragma Pure;
+
+  type Tagged_Type_1 is tagged limited private;
+  procedure Primitive_1a (T : access Tagged_Type_1);
+
+  type Tagged_Type_2 is tagged limited private;
+  procedure Primitive_2a (T : access Tagged_Type_2;  X : out Integer);
+  function  Primitive_2b (T : access Tagged_Type_2) return Boolean;
+
+private
+  type Tagged_Type_1 is tagged limited record
+      Component : Character;
+    end record;
+  type Tagged_Type_2 is tagged limited record
+      Component : Character;
+    end record;
+end BXE4001_Pure;
+
+----------------------------------------------------------------------------
+
+with BXE4001_Pure;
+package BXE4001_Types is
+  pragma Remote_Types;
+
+  type Ptr_1 is access all BXE4001_Pure.Tagged_Type_1'Class;
+  pragma Asynchronous (Ptr_1);                                     -- OK.
+
+  type Ptr_2 is access all BXE4001_Pure.Tagged_Type_2'Class;
+  pragma Asynchronous (Ptr_2);                                     -- OK.
+     -- A warning would be appropriate here since none of the primitive
+     -- operations can be called asynchronously.
+
+private
+
+  type Ptr_X is access all Integer;
+  pragma Asynchronous (Ptr_X);                                     -- ERROR:
+                                   -- not a remote access-to-class-wide type
+
+  subtype Second_Subtype is Ptr_1;
+  pragma Asynchronous (Second_Subtype);                            -- ERROR:
+                        -- pragma Asynchronous only allowed on first subtype
+end BXE4001_Types;
+
+----------------------------------------------------------------------------
+
+with BXE4001_Pure;
+package BXE4001_Normal is
+  
+  procedure No_Parameters; 
+  pragma Asynchronous(No_Parameters);                              -- ERROR:
+                                                   -- not a remote procedure
+
+  type Ptr_1 is access all BXE4001_Pure.Tagged_Type_1'Class;
+  pragma Asynchronous (Ptr_1);                                     -- ERROR:
+                                   -- not a remote access-to-class-wide type
+end BXE4001_Normal;
+
+----------------------------------------------------------------------------
+
+with BXE4001_Pure;
+package BXE4001_RCI is
+  pragma Remote_Call_Interface;
+   
+  procedure No_Parameters; 
+  pragma Asynchronous(No_Parameters);                              -- OK.
+
+  type No_Parm_Ptr is access procedure;
+  pragma Asynchronous (No_Parm_Ptr);                               -- OK.
+
+  type In_Parm_Ptr is access procedure (X : in Integer);          
+  pragma Asynchronous (In_Parm_Ptr);                               -- OK. 
+
+  procedure Has_Out_Parameters (P : out Integer); 
+  pragma Asynchronous(Has_Out_Parameters);                         -- ERROR:
+              -- The parameters for a procedure named in pragma Asynchronous
+              -- must be of mode in.
+  
+  type Out_Parm_Ptr is access procedure (P : out Integer); 
+  pragma Asynchronous(Out_Parm_Ptr);                               -- ERROR:
+              -- The parameters for a procedure named in pragma Asynchronous
+              -- must be of mode in.
+  
+  procedure Has_In_Out_Parameter  (N : in     Integer;
+                                   P : in out Integer;               
+                                   Q : in     Integer);
+  pragma Asynchronous (Has_In_Out_Parameter);                      -- ERROR:
+              -- The parameters for a procedure named in pragma Asynchronous
+              -- must be of mode in.
+
+  type InOut_Parm_Ptr is access
+     procedure (N : in     Integer;
+                P : in out Integer;               
+                Q : in     Integer);
+  pragma Asynchronous (InOut_Parm_Ptr);                            -- ERROR:
+              -- The parameters for a procedure named in pragma Asynchronous
+              -- must be of mode in.
+
+  function Simple_Function (X : Integer) return Integer;
+  pragma Asynchronous (Simple_Function);                           -- ERROR:
+                         -- functions cannot be named in pragma Asynchronous
+         
+  type Func_Ptr is access function (X : Integer) return Integer;
+  pragma Asynchronous (Func_Ptr);                                  -- ERROR:
+                         -- functions cannot be named in pragma Asynchronous
+         
+end BXE4001_RCI;

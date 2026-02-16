@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Creating an Event Trace from Listings</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-622.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-63.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.2.3 Creating an Event Trace from Listings</H1>
+<div class="Normal">If it is not possible or desirable to modify the 
+implementation to create an event trace, an event trace can be created 
+from a listing of test processing. Such a listing would capture all of 
+the compile, bind, and run steps for a set of tests. The Generate_Event_Trace_File 
+constant in Report.A would remain False.</div>
+<div class="Normal">A tool then would have to be constructed to read 
+those listings and convert them to an event trace. This would be specific 
+to a particular implementation, and the tool would potentially break 
+due to future changes in an implementation.</div>
+<div class="Normal">The tool would probably have to gather information 
+from several parts of a listing. For instance, most programs don't display 
+a time stamp when they run, so it would be necessary to use a system 
+tool or tiny Ada program to add those to strategic points in a listing. 
+(Using a single timestamp for an entire compilation of a compilation 
+unit, including any reported errors, is sufficient to meet the requirements 
+of the Grading Tool.) Note that the initial message from Report includes 
+a timestamp, so there is no need to add one for the execution of tests.</div>
+<div class="Normal">The listing converter tool would have to be able 
+to extract events from the compiler, the binder, and running of ACATS 
+tests. Each of these likely has a different format, so the tool would 
+need many rules to extract all of the events.</div>
+<div class="Normal">While a listing converted tool is potentially more 
+fragile (due to more dependence on the exact layout of messages for an 
+implementation), it would have the possibility of detecting test failures 
+after the reporting of Passed (due to a finalization or tasking failure) 
+- such &quot;aberrant behavior&quot; (as defined in <A HREF="UG-561.HTM">5.6.1</A>) 
+cannot be detected when Report.A itself writes the event trace (as the 
+failure happens outside of the control of Report).</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-622.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-63.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

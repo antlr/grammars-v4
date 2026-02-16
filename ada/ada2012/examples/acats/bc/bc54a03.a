@@ -1,0 +1,315 @@
+-- BC54A03.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that, for a formal access-to-subprogram subtype whose profile
+--      contains access parameters, the designated subtypes of the
+--      corresponding access parameters in the formal and actual profiles must
+--      statically match. Check cases where the designated subtype is a
+--      generic formal subtype.
+--
+-- TEST DESCRIPTION:
+--      Two subtypes of the same type statically match if their constraints
+--      statically match. Two constraints statically match if they are both
+--      null constraints, both are static and have equal corresponding bounds
+--      or discriminant values, or both are nonstatic and result from the same
+--      elaboration of a constraint of a subtype indication or the same
+--      evaluation of a range of a discrete subtype definition.
+--
+--      The test declares generics with formal access-to-subprogram types
+--      (access-to-procedure and access-to-function) with designated profiles
+--      containing access parameters of generic formal types (formal derived,
+--      formal private, formal discrete) declared either in the same formal
+--      part, or in the formal part of a formal package. For each of these
+--      designated types (as appropriate), various actual access-to-subprogram
+--      types are declared whose access parameters designate unconstrained,
+--      constrained, class-wide, and derived subtypes with null, static, and
+--      nonstatic constraints.
+--
+--      The use of formal packages provides checks of static matching through
+--      one and two levels of indirection.
+--
+--
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         FC54A00.A
+--      -> BC54A03.A
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+generic                                              -- Template for generic
+   type Formal_Discrete is (<>);                     -- formal package.
+package BC54A03_0 is end;
+
+
+     --===================================================================--
+
+
+with BC54A03_0;
+generic                                              -- Template for generic
+   with package Outer_FP is new BC54A03_0 (<>);      -- formal package (also
+   type Formal_Private (<>) is tagged private;       -- declares a generic
+package BC54A03_1 is end;                            -- formal package).
+
+
+     --===================================================================--
+
+
+with FC54A00;
+with BC54A03_1;
+package BC54A03_2 is
+
+--
+-- Generics declaring access-to-subprogram formals:
+--
+
+   -- Designated type is a formal derived type declared in the same formal
+   -- part:
+
+   generic
+      type Formal_Derived (<>) is abstract new FC54A00.Parent with private;
+      type Access_To_Proc is access procedure (P: access Formal_Derived);
+   package Formal_Derived_Parameter is end;
+
+
+   -- Designated type is a formal tagged private type declared in the
+   -- formal part of a formal package:
+
+   generic
+      with package Formal_Package is new BC54A03_1 (<>);
+      type Access_To_Proc is access procedure
+        (P: access Formal_Package.Formal_Private);
+   package Formal_Tagged_Private_Parameter is end;
+
+
+   -- Designated type is a formal discrete type declared in the formal part of
+   -- a formal package, which is itself declared in the formal part of a
+   -- formal package:
+
+   generic
+      with package Formal_Package is new BC54A03_1 (<>);
+      type Access_To_Func is access function
+        (P, Q: access Formal_Package.Outer_FP.Formal_Discrete)
+          return Integer;
+   package Formal_Discrete_Parameter is end;
+
+
+end BC54A03_2;
+
+
+     --===================================================================--
+
+
+with FC54A00;
+with BC54A03_0;
+with BC54A03_1;
+package BC54A03_3 is
+
+--
+-- Support declarations for indirection cases:
+--
+
+   -- Tagged private case (one level of indirection):
+
+   package Len_Inst  is new BC54A03_0 (FC54A00.Lengths);
+
+   package Tag_Indef is new BC54A03_1 (Len_Inst, FC54A00.Tag);
+   package Tag_Class is new BC54A03_1 (Len_Inst, FC54A00.Tag'Class);
+   package Tag_Def   is new BC54A03_1 (Len_Inst, FC54A00.Tag20);
+   package Tag_Nonst is new BC54A03_1 (Len_Inst, FC54A00.Tag20_Nonstatic);
+
+
+   -- Tagged discrete case (two levels of indirection):
+
+   type Tag_Rec is tagged null record;
+
+   package Dis_Numerals      is new BC54A03_0 (FC54A00.Numerals);
+   package Dis_Static        is new BC54A03_1 (Dis_Numerals, Tag_Rec);
+
+   package Dis_Pos_Nonstatic is new BC54A03_0 (FC54A00.Positive_Nonstatic);
+   package Dis_Nonstatic     is new BC54A03_1 (Dis_Pos_Nonstatic, Tag_Rec);
+
+
+end BC54A03_3;
+
+
+     --===================================================================--
+
+
+with FC54A00;
+package BC54A03_4 is
+
+--
+-- Access-to-subprogram actuals:
+--
+
+   -- Tagged types:
+
+   type Tagged_Same_Type is access procedure
+     (A : access FC54A00.Tag);
+
+   type Tagged_Diff_Type is access procedure
+     (A : access FC54A00.New_Tag);
+
+   type Tagged_Class_Actual is access procedure
+     (A : access FC54A00.Tag'Class);
+
+   type Tagged_Nonconstrained_Subtype is access procedure
+     (A : access FC54A00.Same_Tag);
+
+   type Tagged_Diff_Constraint is access procedure
+     (A : access FC54A00.Tag25);
+
+   type Tagged_Same_Constraint is access procedure
+     (A : access FC54A00.Tag_Twenty);
+
+   type Tagged_Nonstatic_Equiv_Constraint is access procedure
+     (A : access FC54A00.Tag20_Var_Nonstatic);
+
+
+   -- Discrete types:
+
+   type Discrete_Same_Type is access function
+     (A, B : access FC54A00.Numerals) return Integer;
+
+   type Discrete_Diff_Range is access function
+     (A, B : access FC54A00.Positives) return Integer;
+
+   type Discrete_Same_Range is access function
+     (A, B : access FC54A00.Numerals_Static) return Integer;
+
+end BC54A03_4;
+
+
+     --===================================================================--
+
+
+with FC54A00;
+with BC54A03_2;
+with BC54A03_3;
+with BC54A03_4;
+package BC54A03 is
+
+--
+-- Instantiations:
+--
+
+   -- Formal derived types:
+
+   package Instance01 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag, BC54A03_4.Tagged_Same_Type);                       -- OK.
+
+
+   package Instance02 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag, BC54A03_4.Tagged_Diff_Type);                       -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance03 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag, BC54A03_4.Tagged_Class_Actual);                    -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance04 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag, BC54A03_4.Tagged_Nonconstrained_Subtype);          -- OK.
+
+
+   package Instance05 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag'Class, BC54A03_4.Tagged_Class_Actual);              -- OK.
+
+
+   package Instance06 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag'Class, BC54A03_4.Tagged_Same_Type);                 -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance07 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag20, BC54A03_4.Tagged_Same_Type);                     -- ERROR:
+             -- Access parameters in profiles do not both have null constraint.
+
+   package Instance08 is new BC54A03_2.Formal_Derived_Parameter
+     (FC54A00.Tag20, BC54A03_4.Tagged_Diff_Constraint);               -- ERROR:
+                        -- Designated types of access parameters have different
+                        -- discriminant constraints.
+
+
+
+   -- Formal tagged private types
+   -- (one level of indirection through formal package):
+
+   package Instance10 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Indef, BC54A03_4.Tagged_Diff_Type);               -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance11 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Indef, BC54A03_4.Tagged_Class_Actual);            -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance12 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Indef, BC54A03_4.Tagged_Nonconstrained_Subtype);  -- OK.
+
+
+   package Instance13 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Class, BC54A03_4.Tagged_Same_Type);               -- ERROR:
+             -- Access parameters in profiles do not have same designated type.
+
+   package Instance14 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Def, BC54A03_4.Tagged_Same_Type);                 -- ERROR:
+             -- Access parameters in profiles do not both have null constraint.
+
+   package Instance15 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Nonst,
+      BC54A03_4.Tagged_Same_Constraint);                              -- ERROR:
+                -- Designated type in formal is nonstatic; in actual is static.
+
+   package Instance16 is new BC54A03_2.Formal_Tagged_Private_Parameter
+     (BC54A03_3.Tag_Nonst,
+      BC54A03_4.Tagged_Nonstatic_Equiv_Constraint);                   -- ERROR:
+                     -- Constraints of designated types do not result from same
+                     -- evaluation/elaboration of a range/constraint.
+
+
+
+   -- Formal discrete types
+   -- (two levels of indirection through formal packages):
+
+   package Instance17 is new BC54A03_2.Formal_Discrete_Parameter
+     (BC54A03_3.Dis_Static,
+      BC54A03_4.Discrete_Diff_Range);                                 -- ERROR:
+                -- Designated types of access parameters have different bounds.
+
+   package Instance18 is new BC54A03_2.Formal_Discrete_Parameter
+     (BC54A03_3.Dis_Static,
+      BC54A03_4.Discrete_Same_Range);                                 -- OK.
+
+
+   package Instance19 is new BC54A03_2.Formal_Discrete_Parameter
+     (BC54A03_3.Dis_Nonstatic,
+      BC54A03_4.Discrete_Same_Type);                                  -- ERROR:
+                -- Designated type in formal is nonstatic; in actual is static.
+
+end BC54A03;

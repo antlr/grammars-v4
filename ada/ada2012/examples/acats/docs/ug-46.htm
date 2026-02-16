@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Test Structure</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-45.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-47.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>4.6 Test Structure</H1>
+<div class="Normal" style="margin-bottom: 0.4em">Executable tests (class 
+A, C, D, and E) generally use the following format:&nbsp;</div>
+<div class="Examples"><B>with</B>&nbsp;Report;<BR>
+<B>procedure</B>&nbsp;Testname&nbsp;<B>is</B><BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>&lt;declarations&gt;</I></SPAN><BR>
+<B>begin</B><BR>
+&nbsp;&nbsp;&nbsp;Report.Test&nbsp;(&quot;Testname&quot;,&nbsp;&quot;Description&nbsp;...&quot;);<BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>...</I></SPAN><BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>&lt;test&nbsp;situation&nbsp;yielding&nbsp;result&gt;</I></SPAN><BR>
+&nbsp;&nbsp;&nbsp;<B>if</B>&nbsp;Post_Condition&nbsp;/=&nbsp;Correct_Value&nbsp;<B>then</B><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report.Failed&nbsp;(&quot;Reason&quot;);<BR>
+&nbsp;&nbsp;&nbsp;<B>end&nbsp;if</B>;<BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>...</I></SPAN><BR>
+&nbsp;&nbsp;&nbsp;Report.Result;<BR>
+<B>end</B>&nbsp;Testname;</div>
+<div class="Normal">The initial call to Report.Test prints the test objective 
+using Text_IO output (unless the body of Report has been modified to 
+do something else). After each section of test code, there is normally 
+a check of post conditions. The if statement in this skeleton is such 
+a check; unexpected results produce a call to Report.Failed. The sequence 
+of test code / check of results may be repeated several times in a single 
+test. Finally, there is a call to Report.Result that will print the test 
+result to Text_IO output. Often, but not always, this structure is enclosed 
+in a declare block.</div>
+<div class="Normal">One or more calls to Report.Failed will report a 
+result of &quot;FAILED&quot; and a brief suggestion of the likely reason 
+for that result.</div>
+<div class="Normal" style="margin-bottom: 0.4em">More complex tests 
+may include calls to Report.Failed in the code other than in the main 
+program, and therefore exhibit the following format for the main procedure: 
+</div>
+<div class="Examples"><B>with</B>&nbsp;Report;<BR>
+<B>procedure</B>&nbsp;Testname&nbsp;<B>is</B><BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>&lt;declarations&gt;</I></SPAN><BR>
+begin<BR>
+&nbsp;&nbsp;&nbsp;Report.Test&nbsp;(&quot;Testname&quot;,&nbsp;&quot;Description&nbsp;...&quot;);<BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>...</I></SPAN><BR>
+&nbsp;&nbsp;&nbsp;Subtest_Call;<BR>
+&nbsp;&nbsp;&nbsp;<SPAN Class="roman"><I>...</I></SPAN><BR>
+&nbsp;&nbsp;&nbsp;Report.Result;<BR>
+<B>end</B>&nbsp;Testname;</div>
+<div class="Normal">Fail conditions are detected in subprograms (or tasks) 
+and Report.Failed is called within them.</div>
+<div class="Normal">Occasionally, as a test is running, it will determine 
+that it is not applicable. In such a case, it will call Report.Not_Applicable 
+that will report a result of &quot;NOT_APPLICABLE&quot; (unless there 
+is also a call to Report.Failed).</div>
+<div class="Normal">Often, a test calls one of the functions Report.Ident_Int 
+or Report.Ident_Bool to obtain a value that could be provided as a literal. 
+These functions are intended to prevent optimizers from eliminating certain 
+sections of test code. The ACATS suite has no intention of trying to 
+discourage the application of optimizer technology, however satisfactory 
+testing of language features often requires the presence and execution 
+of specific lines of test code. Report.Ident_Int and Report.Ident_Bool 
+are structured so that they can be modified when needed to defeat optimizer 
+advances.</div>
+<div class="Normal">Class B tests may be structured differently. Since 
+they are not executable, they normally do not include calls to Report.Test 
+or Report.Result (since those lines of code would have no output effect). 
+Instead, intentional errors are coded that invoke specific legality rules. 
+The source code includes comments that document expected compiler results. 
+Legal constructs may also be included in B class tests. Constructs that 
+are allowed by the legality rules are marked <TT>-- OK</TT>; constructs 
+that are disallowed are marked <TT>-- ERROR:</TT>. (Some additional markings 
+can also be used, see <A HREF="UG-422.HTM">4.2.2</A>.) There is usually 
+a brief indication of the nature of an intentional error on the same 
+line or the line following a comment. The indications of expected results 
+are approximately right justified to the code file margin, about column 
+79, for quick visual identification.</div>
+<div class="Normal">Class L tests are multifile tests with illegalities 
+that should be detected at bind time. They are generally structured like 
+class C tests, often with calls to Report.Test and Report.Result, but 
+they are not expected to execute.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-45.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-47.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,104 @@
+-- BC60001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--
+--*
+--
+-- OBJECTIVE
+--    Check that a subprogram default of null shall not be specified for a
+--    formal function.
+--
+--    Check that a subprogram default of null shall not be specified for a
+--    formal abstract subprogram.
+--
+--    Check that a null procedure as a formal subprogram default has convention
+--    Intrinsic.
+--
+-- TEST DESCRIPTION
+--    This test checks the effect of rules introduced by AI95-00348-1, and
+--    combined with AI95-0260-2.
+--
+-- HISTORY:
+--      19 Aug 2004   PHL   Initial version.
+--      18 Dec 2014   RLB   Created test from two submitted tests and some
+--                          additional cases (for the second objective).
+--      22 Apr 2021   RLB   Added error location indicators.
+
+package BC60001 is
+
+   generic
+      with function Null1 (X : String) return String 
+                                                 is null; -- ERROR: (1) {1:7;1}
+   package Gen1 is
+      Dummy : Natural;
+   end Gen1;
+
+   generic
+      with function Null2 (X : access Character) return String
+         is null;                                         -- ERROR: (1) {1:7;1}
+   package Gen2 is
+   end Gen2;
+
+   generic
+      with procedure Null3 (X : Float) is null;           -- OK.  {9;1}
+   package Gen3 is
+   end Gen3;
+
+   generic
+      type T is tagged private;
+      with function Null4 (X : T) return Boolean is
+          abstract null;                                  -- ERROR: (2) {1:7;1}
+   package Gen4 is
+      Dummy : Natural;
+   end Gen4;
+
+   generic
+      type T is tagged private;
+      with procedure Null5 (X : in out T) is abstract null; -- ERROR: (2) {7;1}
+   package Gen5 is
+      Dummy : Natural;
+   end Gen5;
+
+   generic
+      type T is private;
+      C : T;
+      with procedure Proc (X : T) is null;                -- OK.  {7;1}
+   package Gen6 is
+      procedure Ren (X : T) renames Proc;
+   end Gen6;
+
+   package Inst is new Gen6 (Integer, 42);                -- OK.  {4;1}
+
+   type Acc is access procedure (X : Integer);
+   A : Acc := Inst.Ren'Access;                            -- ERROR: (3)  {4;1}
+
+end BC60001;

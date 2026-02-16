@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Event Trace File Reference</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Examples {font-family: "Courier New", monospace; font-size: 90%; line-height: 122%; margin-left: 2.2em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Body {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 8.0em; margin-top: 0em; margin-bottom: 0.6em}
+    DIV.Indented4WideHanging-Term {float: left; font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 2.0em; margin-top: 0em; margin-bottom: 0em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-62.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-622.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>6.2.1 Event Trace File Reference</H1>
+<div class="Normal">An event trace file is a CSV (Comma Separated Value) 
+file of event records. See <A HREF="UG-65.HTM">6.5</A>, &ldquo;<A HREF="UG-65.HTM">CSV 
+File Reference</A>&rdquo; for the general rules for constructing a CSV 
+file.</div>
+<div class="Normal" style="margin-bottom: 0.4em">An event trace file 
+record contains the following comma-separated fields on a single line:</div>
+<div class="Indented4WideHanging-Term">Event</div><div class="Indented4WideHanging-Body">
+One of UNKN (Unknown), CSTART (Compilation_Start), CEND (Compilation_End), 
+CERR (Compile_Error), CWARN (Compile_Warning), BSTART (Binder_Start), 
+BEND (Binder_End), BERR (Binder_Error), BWARN (Binder_Warning), EXSTART 
+(Execution_Start), EXEND (Execution_End), EXFAIL (Execution_Failure), 
+EXNA (Execution_Not_Applicable), EXSACT (Execution_Special_Action), EVENT 
+(see below). These values are case-insensitive. &quot;EVENT&quot; is 
+treated as specifying a comment; it usually appears in column headers.</div>
+<div class="Indented4WideHanging-Term">Timestamp</div><div class="Indented4WideHanging-Body">
+The timestamp, double quoted, in the format specified by Ada.Calendar.Formatting.Image.</div>
+<div class="Indented4WideHanging-Term">Name</div><div class="Indented4WideHanging-Body">
+The double quoted name of the source file, main subprogram, or test. 
+For Compilation events, this is the simple name of the source file. For 
+Binder events, this is the name of the main subprogram. For Execution 
+events, this is the name of the test as passed to Report.Test.</div>
+<div class="Indented4WideHanging-Term">Line</div><div class="Indented4WideHanging-Body">
+For Compilation_Start, the first line of the current compilation unit. 
+(Usually 1, unless there are multiple compilation units in a single file.) 
+For Compile_Error or Compile_Warning, the line number where that error 
+or warning is reported. (This is critical to the correct operation of 
+the grading tool.) Otherwise, it is not used and can be omitted other 
+than the comma separator.</div>
+<div class="Indented4WideHanging-Term">Position</div><div class="Indented4WideHanging-Body">
+For Compile_Error or Compile_Warning, the position within the line that 
+on which the error is reported. An implementation does not have to provide 
+a meaningful Position for errors (use the -No_Position option on the 
+Grading Tool - see <A HREF="UG-614.HTM">6.1.4</A> if this is true for 
+your implementation). Otherwise, it is not used and can be omitted other 
+than the comma separator.</div>
+<div class="Indented4WideHanging-Term">Message</div><div class="Indented4WideHanging-Body">
+The double quoted message (make sure to replace any double quotes, as 
+they are not allowed in double quoted strings). For Compile and Binder 
+Errors and Warnings, this is the message emitted by the appropriate tool. 
+For Execution events, this is the message passed to Report. For End events, 
+this is an implementation-defined result of the operation (OK, with Errors, 
+Passed, Failed, and so on). If there is no appropriate message, nothing 
+need be written for this field (as it is last, there is no trailing comma). 
+</div>
+<div class="Normal">The order of the event records in the event trace 
+file is unimportant to the Grading Tool; it will sort the records appropiately 
+before grading. (The order of the timestamps in the records does matter; 
+running before compiling and the like indicate a test processing problem.)</div>
+<div class="Normal">The record types used by the Ada implementation of 
+this file can be found in Trace.A.</div>
+<div class="Normal">There is an example of writing an event trace file 
+in the file Report.A, in procedure Put_Event_Trace. Most of the code 
+involves limiting the length of, and removing any double quotes from, 
+the (quoted) message string. Note that Put_Event_Trace writes column 
+headers into a new file, so that headers exist if the file is loaded 
+into a spreadsheet or database. This is recommended for any tool that 
+creates an event trace.</div>
+<div class="Normal">The Grading Tool treats any record that starts with 
+EVENT as a comment; this skips any headers and allows event trace files 
+to be concatenated together for combined processing.</div>
+
+<HR SIZE=1>
+
+<div class="Normal">For the purposes of an event trace, a &quot;compile&quot; 
+is the part of an Ada implementation that processes Ada source code and 
+provides diagnostics to diagnose Ada errors (specifically syntax errors, 
+resolution errors, and violations of Legality Rules). This does not need 
+to be a single phase or program; it could be several cooperating programs. 
+Moreover, the &quot;compile&quot; events only need to include parts of 
+the implementation that are involved in diagnosing errors. Code generation 
+and optimization are part of a conventional compiler that can be omitted 
+from the &quot;compile&quot; as defined for an event trace. (A failure 
+in one of these phases not included in &quot;compile&quot; would probably 
+cause a test to be graded as crashed or with a failed bind.)</div>
+<div class="Normal">Similarly, a &quot;bind&quot; is the part of an Ada 
+implementation that creates an Ada partition and enforces post-compilation 
+rules not enforced by the compile stage. (The compiler is allowed to 
+enforce post-compilation rules by the Ada Standard.) This also does need 
+not be a single program, and it only needs to include phases that enforce 
+Ada errors. For instance, a system linker need not be included in the 
+event trace for the &quot;bind&quot; operation.</div>
+
+<HR SIZE=1>
+
+<div class="Normal">Not all of the information in an event trace is currently 
+used by the Grading Tool. We included additional information (like warnings) 
+in part because future versions of the ACATS tools might need them and 
+changing the format in the future could be very disruptive. In addition, 
+it's possible that this compiler-independent event format could be useful 
+to other future ACATS tools or even third-party tools having nothing 
+to do with the ACATS. As such, we included all of the information that 
+seemed potentially useful.</div>
+<div class="Normal">Here is part of an event trace for Chapter 5 C-Tests:</div>
+<div class="Examples">Event,&quot;Timestamp&quot;,&quot;Name&quot;,&quot;Line&quot;,&quot;Position&quot;,&quot;Message&quot;<BR>
+CSTART,&quot;2016-05-16&nbsp;23:16:41.05&quot;,&quot;C51004A.ADA&quot;,&nbsp;1,&nbsp;1,&quot;&quot;<BR>
+CEND,&quot;2016-05-16&nbsp;23:16:41.13&quot;,&quot;C51004A.ADA&quot;,,,&quot;OK&quot;<BR>
+BSTART,&quot;2016-05-16&nbsp;23:16:41.14&quot;,&quot;C51004A&quot;,,,&quot;&quot;<BR>
+BEND,&quot;2016-05-16&nbsp;23:16:41.27&quot;,&quot;C51004A&quot;,,,&quot;OK&quot;<BR>
+EXSTART,&quot;2016-05-16&nbsp;23:16:41.33&quot;,&quot;C51004A&quot;,,,&quot;CHECK&nbsp;THAT&nbsp;LABELS,&nbsp;LOOP&nbsp;IDENTIFIERS,&nbsp;AND&nbsp;BLOCK&quot;<BR>
+EXEND,&quot;2016-05-16&nbsp;23:16:41.33&quot;,&quot;C51004A&quot;,,,&quot;Passed&quot;<BR>
+CSTART,&quot;2016-05-16&nbsp;23:16:41.38&quot;,&quot;C52005A.ADA&quot;,&nbsp;1,&nbsp;1,&quot;&quot;<BR>
+CEND,&quot;2016-05-16&nbsp;23:16:41.44&quot;,&quot;C52005A.ADA&quot;,,,&quot;OK&quot;<BR>
+BSTART,&quot;2016-05-16&nbsp;23:16:41.45&quot;,&quot;C52005A&quot;,,,&quot;&quot;<BR>
+BEND,&quot;2016-05-16&nbsp;23:16:41.56&quot;,&quot;C52005A&quot;,,,&quot;OK&quot;<BR>
+EXSTART,&quot;2016-05-16&nbsp;23:16:41.64&quot;,&quot;C52005A&quot;,,,&quot;CHECK&nbsp;THAT&nbsp;CONSTRAINT_ERROR&nbsp;EXCEPTION&nbsp;IS&nbsp;RAISED&quot;<BR>
+EXEND,&quot;2016-05-16&nbsp;23:16:41.64&quot;,&quot;C52005A&quot;,,,&quot;Passed&quot;<BR>
+CSTART,&quot;2016-05-16&nbsp;23:16:41.70&quot;,&quot;C52005B.ADA&quot;,&nbsp;1,&nbsp;1,&quot;&quot;<BR>
+CEND,&quot;2016-05-16&nbsp;23:16:41.77&quot;,&quot;C52005B.ADA&quot;,,,&quot;OK&quot;<BR>
+BSTART,&quot;2016-05-16&nbsp;23:16:41.78&quot;,&quot;C52005B&quot;,,,&quot;&quot;<BR>
+BEND,&quot;2016-05-16&nbsp;23:16:41.89&quot;,&quot;C52005B&quot;,,,&quot;OK&quot;<BR>
+EXSTART,&quot;2016-05-16&nbsp;23:16:41.95&quot;,&quot;C52005B&quot;,,,&quot;CHECK&nbsp;THAT&nbsp;CONSTRAINT_ERROR&nbsp;EXCEPTION&nbsp;IS&nbsp;RAISED&quot;<BR>
+EXEND,&quot;2016-05-16&nbsp;23:16:41.95&quot;,&quot;C52005B&quot;,,,&quot;Passed&quot;<BR>
+CSTART,&quot;2016-05-16&nbsp;23:17:06.36&quot;,&quot;C55B07B.DEP&quot;,&nbsp;1,&nbsp;1,&quot;&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;45,&nbsp;14,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;47,&nbsp;39,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;51,&nbsp;27,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;52,&nbsp;27,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;57,&nbsp;32,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;58,&nbsp;32,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;58,&nbsp;52,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;83,&nbsp;21,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;83,&nbsp;21,&quot;Only&nbsp;discrete&nbsp;types&nbsp;may&nbsp;be&nbsp;used&nbsp;here&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;99,&nbsp;18,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.41&quot;,&quot;C55B07B.DEP&quot;,&nbsp;107,&nbsp;18,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CERR,&quot;2016-05-16&nbsp;23:17:06.42&quot;,&quot;C55B07B.DEP&quot;,&nbsp;109,&nbsp;26,&quot;Identifier&nbsp;is&nbsp;not&nbsp;defined&quot;<BR>
+CEND,&quot;2016-05-16&nbsp;23:17:06.42&quot;,&quot;C55B07B.DEP&quot;,,,&quot;Aborted&nbsp;by&nbsp;semantic&nbsp;errors&quot;<BR>
+BSTART,&quot;2016-05-16&nbsp;23:17:06.44&quot;,&quot;C55B07B&quot;,,,&quot;&quot;<BR>
+BERR,&quot;2016-05-16&nbsp;23:17:06.44&quot;,&quot;C55B07B&quot;,,,&quot;Main&nbsp;program&nbsp;file&nbsp;not&nbsp;found&quot;<BR>
+BEND,&quot;2016-05-16&nbsp;23:17:06.44&quot;,&quot;C55B07B&quot;,,,&quot;Aborted&nbsp;by&nbsp;errors&quot;</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-62.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-622.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

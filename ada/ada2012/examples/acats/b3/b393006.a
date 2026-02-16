@@ -1,0 +1,225 @@
+-- B393006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that, if a non-abstract type is derived from an abstract formal
+--      private type within the generic declaration, an instantiation is
+--      rejected if primitive subprograms that require overriding are
+--      inherited by the derived type from the actual (parent) type
+--      and they are not overridden.
+--
+-- TEST DESCRIPTION:
+--      Check cases where the primitive subprogram is declared abstract,
+--      cases where the primitive subprogram is a function with a controlling
+--      result, and cases where the primitive subprogram is a function with
+--      a controlling access result. Include a case where the parent of the
+--      derived type is the formal type of a formal package, and a case
+--      where a null extension is checked.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      13 Nov 95   SAIC    ACVC 2.0.1 fixes: added context clause. Renamed
+--                          from BC51014.
+--      28 Feb 96   SAIC    ACVC 2.0.1 fixes: moved declaration of Proc in
+--                          B393006_0 to visible part. Relabeled Instance6
+--                          case from OK to ERROR. Corrected commentary.
+--      01 Jun 98   EDS     Delete the private part of generic package B393006_1
+--                          and delete the body of generic package B393006_1.
+--      23 Oct 07   RLB     Updated terminology of objective.
+--
+--!
+
+generic
+   type Formal_Type is abstract tagged private;     -- Abstract formal private
+package B393006_0 is                                -- type.
+
+   type Derived_Type is new Formal_Type with record -- Non-abstract derivative.
+      Field : Natural := 0;
+   end record;
+   -- In the instance, inherits primitive subprograms of the actual.
+
+
+   function Func (E : Derived_Type)                 -- Primitive function:
+     return Derived_Type;                           -- overrides Func of actual
+                                                    -- (if any).
+
+   procedure Proc (Parm : Derived_Type);            -- Primitive procedure:
+                                                    -- overrides Proc of actual
+end B393006_0;                                      -- (if any).
+
+
+     --===================================================================--
+
+
+package body B393006_0 is
+
+   function Func (E : Derived_Type) return Derived_Type is
+   begin
+      return E;
+   end Func;
+
+   procedure Proc (Parm : Derived_Type) is
+   begin
+      null;
+   end Proc;
+
+end B393006_0;
+
+
+     --===================================================================--
+
+
+with B393006_0;
+generic
+   with package Formal_Package is new B393006_0 (<>);
+package B393006_1 is
+
+   type Derived_Type is new Formal_Package.Formal_Type with record
+      Field : Boolean;                              -- Non-abstract derivative.
+   end record;
+   -- In the instance, inherits primitive subprograms of the actual.
+
+end B393006_1;
+
+     --===================================================================--
+
+generic
+   type Formal_Type is abstract tagged private;     -- Abstract formal private
+package B393006_2 is                                -- type.
+
+   type Derived_Type2 is new Formal_Type
+      with null record;                             -- Non-abstract derivative.
+   -- In the instance, inherits primitive subprograms of the actual.
+
+end B393006_2;
+
+     --===================================================================--
+
+
+with B393006_0;
+with B393006_1;
+with B393006_2;
+package B393006 is
+
+   type Nonabstract_Type is tagged record               -- Non-abstract type.
+      Line : String (1 .. 80);
+   end record;
+
+   function Func return Nonabstract_Type;               -- Function with
+                                                        -- controlling result
+                                                        -- (no parameters).
+
+   type Abstract_With_Proc is abstract tagged record    -- Abstract type with
+      Msg : Nonabstract_Type;                           -- primitive subprog.
+   end record;
+
+   procedure Proc (Elem : Abstract_With_Proc)           -- Abstract primitive
+     is abstract;                                       -- procedure (one
+                                                        -- parameter).
+
+
+   type Abstract_Diff_Proc is abstract tagged record    -- Abstract type with
+      Msg : Nonabstract_Type;                           -- primitive subprog.
+   end record;
+
+   procedure Proc (P1, P2 : Abstract_Diff_Proc)         -- Abstract primitive
+     is abstract;                                       -- procedure (two
+                                                        -- parameters).
+
+   type Abstract_With_Func is abstract tagged record    -- Abstract type with
+      ID : Character;                                   -- prim. function with
+   end record;                                          -- controlling result.
+
+   function Func (Parm : Abstract_With_Func)            -- Abstract primitive
+     return Abstract_With_Func is abstract;             -- function (one
+                                                        -- parameter).
+
+   type Nonabstract_With_Acc_Func is tagged record      -- Non-abstract type
+      ID : Character;                                   -- with prim. function
+   end record;                                          -- with controlling
+                                                        -- access result.
+
+   function Func (Parm : Nonabstract_With_Acc_Func)     -- Primitive function
+     return access Nonabstract_With_Acc_Func;           -- (one parameter) with
+                                                        -- controlling result.
+
+   --
+   -- Instantiations:
+   --
+
+   package Instance1 is new B393006_0 (Abstract_Diff_Proc);          -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits procedure that requires
+                                      -- overriding.
+
+   package Instance2 is new B393006_0 (Abstract_With_Proc);          -- OK.
+                                      -- Non-abstract derived type in instance
+                                      -- overrides procedure that requires
+                                      -- overriding.
+
+   package Instance3 is new B393006_0 (Abstract_With_Func);          -- OK.
+                                      -- Non-abstract derived type in instance
+                                      -- overrides function that requires
+                                      -- overriding.
+
+   package Instance4 is new B393006_0 (Nonabstract_Type);            -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that requires
+                                      -- overriding.
+
+   package Instance5 is new B393006_0 (Nonabstract_With_Acc_Func);   -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that requires
+                                      -- overriding.
+
+
+   package Instance6 is new B393006_1 (Instance2);                   -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits procedure that requires
+                                      -- overriding.
+
+   package Instance7 is new B393006_1 (Instance3);                   -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that requires
+                                      -- overriding.
+
+   package Instance8 is new B393006_2 (Abstract_With_Func);          -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that requires
+                                      -- overriding.
+
+   package Instance9 is new B393006_2 (Nonabstract_Type);            -- OK.
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that does not
+                                      -- require overriding.
+
+   package InstanceA is new B393006_2 (Nonabstract_With_Acc_Func);   -- ERROR:
+                                      -- Non-abstract derived type in instance
+                                      -- inherits function that requires
+                                      -- overriding.
+
+
+end B393006;

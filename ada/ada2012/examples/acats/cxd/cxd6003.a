@@ -1,0 +1,330 @@
+-- CXD6003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- TEST OBJECTIVE:
+--      Check that in an asynchronous transfer of control an aborted
+--      construct is completed immediately at the first point that
+--      is outside the execution of an abort-deferred operation where
+--      the abort-deferred operation is the default initialization
+--      and finalization of a controlled object, or an assignment
+--      to a controlled type object.
+--
+-- TEST DESCRIPTION:
+--      A controlled type is created with Initialize, Adjust, and 
+--      Finalize operations.  These operations note in a protected
+--      object when the operation starts and completes.  This change
+--      in state of the protected object will open the barrier for
+--      the entry in the protected object.
+--      The test contains declarations of objects of the controlled
+--      type.  An asynchronous select is used to attempt to abort
+--      the operations on the controlled type.  The asynchronous select
+--      makes use of the state change to the protected object to 
+--      trigger the abort.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Real-Time Systems Annex.
+--      This test is not applicable to multi-processor systems.
+--
+--
+-- CHANGE HISTORY:
+--      17 Jan 96   SAIC    Initial Release for 2.1
+--      29 Feb 96   SAIC    New ImpDef structure.
+--       5 May 96   SAIC    Added Allocation/Deallocation checks
+--      11 Oct 96   SAIC    Allows assignment statement to consist of
+--                          two assignment operations.
+--
+--!
+
+with Ada.Finalization;
+package CXD6003_0 is
+    Verbose : constant Boolean := False;
+
+    type Is_Controlled is new Ada.Finalization.Controlled with
+         record
+             Id : Integer;
+         end record;
+
+     -- set to true at end of Initialize
+     Completed_Init : Boolean;
+
+     procedure Initialize (Object : in out Is_Controlled);
+     procedure Finalize   (Object : in out Is_Controlled);
+     procedure Adjust     (Object : in out Is_Controlled);
+
+     type States is (Unknown,
+                     Start_Init,   Finished_Init, 
+                     Start_Adjust, Finished_Adjust,
+                     Start_Final,  Finished_Final);
+
+     protected State_Manager is
+        procedure Reset;
+        procedure Set (New_State : States);
+        function Current return States;
+        entry Wait_For_Change;
+     private
+        Current_State : States := Unknown;
+        Changed : Boolean := False;
+     end State_Manager;
+
+end CXD6003_0;
+
+
+with Report;
+with ImpDef;  
+package body CXD6003_0 is
+     protected body State_Manager is
+         procedure Reset is
+         begin
+             Current_State := Unknown;
+             Changed := False;
+         end Reset;
+
+         procedure Set (New_State : States) is
+         begin
+             Changed := True;
+             Current_State := New_State;
+         end Set;
+
+         function Current return States is
+         begin
+             return Current_State;
+         end Current;
+
+         entry Wait_For_Change when Changed is
+         begin
+             Changed := False;
+         end Wait_For_Change;
+     end State_Manager;
+
+     procedure Initialize (Object : in out Is_Controlled) is
+     begin
+        Completed_Init := False;
+        if Verbose then
+            Report.Comment ("starting initialize");
+        end if;
+        State_Manager.Set (Start_Init);
+        if Verbose then
+            Report.Comment ("in initialize");
+        end if;
+        delay ImpDef.Switch_To_New_Task;  -- tempting place for abort
+        State_Manager.Set (Finished_Init);
+        if Verbose then
+            Report.Comment ("finished initialize");
+        end if;
+        Completed_Init := True;
+     end Initialize;
+
+     procedure Finalize   (Object : in out Is_Controlled) is
+     begin
+        if Verbose then
+            Report.Comment ("starting finalize");
+        end if;
+        State_Manager.Set (Start_Final);
+        if Verbose then
+            Report.Comment ("in finalize");
+        end if;
+        delay ImpDef.Switch_To_New_Task; -- tempting place for abort
+        State_Manager.Set (Finished_Final);
+        if Verbose then
+            Report.Comment ("finished finalize");
+        end if;
+     end Finalize;
+
+     procedure Adjust     (Object : in out Is_Controlled) is
+     begin
+        if Verbose then
+            Report.Comment ("starting adjust");
+        end if;
+        State_Manager.Set (Start_Adjust);
+        if Verbose then
+            Report.Comment ("in adjust");
+        end if;
+        delay ImpDef.Switch_To_New_Task; -- tempting place for abort
+        State_Manager.Set (Finished_Adjust);
+        if Verbose then
+            Report.Comment ("finished adjust");
+        end if;
+     end Adjust;
+end CXD6003_0;
+
+
+with Report;
+with ImpDef.Annex_D; use ImpDef.Annex_D;
+with CXD6003_0;  use CXD6003_0;
+with Ada.Unchecked_Deallocation;
+procedure CXD6003 is
+
+    procedure Check_State (Should_Be : States;
+                           Msg       : String) is
+        Cur : States := State_Manager.Current;
+    begin
+        if Cur /= Should_Be then
+            Report.Failed (Msg);
+            Report.Comment ("expected: " & States'Image (Should_Be) &
+                            "  found: " & States'Image (Cur));
+        elsif Verbose then
+            Report.Comment ("passed: " & Msg);
+        end if;
+    end Check_State;
+
+begin
+ 
+    Report.Test ("CXD6003", "Check that aborts are deferred during" &
+                            " initialization, finalization, and assignment" &
+                            " operations on controlled objects but" &
+                            " restored immediately afterward");
+
+    -- the requirements on the abort being immediate are
+    -- only placed upon uni-processor systems.
+    if ImpDef.Annex_D.Processor /= ImpDef.Annex_D.Uni_Processor then
+        Report.Not_Applicable ("Multi-Processor configuration");
+        Report.Result;
+        return;
+    end if;
+
+    Check_State (Unknown, "initial condition");
+
+    -- check that initialization and finalization both take place 
+    -- and are abort deferred 
+    Completed_Init := False;
+    select
+        State_Manager.Wait_For_Change;
+    then abort
+        declare
+            My_Controlled_Obj : Is_Controlled;
+        begin
+            Report.Failed ("abort not immediate - init/final");
+        end; 
+    end select;
+    if not Completed_Init then
+        Report.Failed ("initialization was aborted");
+    end if;
+    Check_State (Finished_Final, "init/final for declared item");
+
+    -- check adjust
+    State_Manager.Reset;
+    declare
+        Source, Dest : Is_Controlled;
+    begin
+        Check_State (Finished_Init, "adjust initial state");
+        Source.Id := 3;
+        Dest.Id := 4;
+        State_Manager.Reset;  -- so we will wait for change
+        select
+            State_Manager.Wait_For_Change;
+        then abort
+            Dest := Source;
+            Report.Failed ("abort not immediate - adjust");
+        end select;
+
+        -- note that assignment operation is not the same as an
+        -- assignment statement.  The state could be either Finished_Adjust
+        -- or Finished_Final depending upon the use of temporaries.
+        case State_Manager.Current is
+        when Finished_Adjust =>
+            if Verbose then
+                Report.Comment ("assignment aborted after adjust");
+            end if;
+        when Finished_Final =>
+            if Verbose then
+                Report.Comment ("assignment aborted after finalize");
+            end if;
+        when Start_Adjust =>
+            Report.Failed ("assignment aborted in adjust");
+        when Start_Final =>
+            Report.Failed ("assignment aborted in finalize");
+        when Start_Init =>
+            Report.Failed ("assignment aborted in initialize");
+        when Finished_Init =>
+            Report.Failed ("assignment aborted after initialize");
+        when Unknown =>
+            Report.Failed ("assignment aborted in unknown state");
+        end case;
+
+        if Dest.Id /= 3 then
+            -- depending upon the implementation, the copy into the
+            -- resulting object may not have occurred yet.
+            -- Just note it.
+            Report.Comment("assignment not performed");
+        end if;
+    end;
+    Check_State (Finished_Final, "finalization for check adjust block");
+
+     -- check dynamically allocated objects
+    State_Manager.Reset;
+    declare
+        type Pointer_Type is access Is_Controlled;
+        procedure Free is new Ada.Unchecked_Deallocation (
+              Is_Controlled, Pointer_Type);
+        Ptr : Pointer_Type;
+    begin
+      -- make sure initialize is done when object is allocated
+      Ptr := new Is_Controlled;
+      Check_State (Finished_Init, "init when item allocated");
+      -- now try aborting the finalize
+      State_Manager.Reset;
+      select
+             State_Manager.Wait_For_Change;
+      then abort
+             Free (Ptr);
+             Report.Failed ("abort not immediate - finalize in dealloc");
+      end select;
+      Check_State (Finished_Final, "finalization in dealloc");
+    end;
+
+    -- explicitly calling Initialize, Finalize, or Adjust is not
+    -- abort deferred.
+    declare
+        Obj : Is_Controlled;
+    begin
+        State_Manager.Reset;   -- so we will wait for change
+        select
+            State_Manager.Wait_For_Change;
+        then abort
+            CXD6003_0.Initialize (Obj);
+        end select;
+        Check_State (Start_Init, "abort erroneously deferred - initialize");
+            
+        State_Manager.Reset;   -- so we will wait for change
+        select
+            State_Manager.Wait_For_Change;
+        then abort
+            CXD6003_0.Adjust (Obj);
+        end select;
+        Check_State (Start_Adjust, "abort erroneously deferred - adjust");
+            
+        State_Manager.Reset;   -- so we will wait for change
+        select
+            State_Manager.Wait_For_Change;
+        then abort
+            CXD6003_0.Finalize (Obj);
+        end select;
+        Check_State (Start_Final, "abort erroneously deferred - finalize");
+    end;
+    Check_State (Finished_Final, "finalization for explicit call block");
+    Report.Result;
+ 
+end CXD6003;

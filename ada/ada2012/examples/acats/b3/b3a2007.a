@@ -1,0 +1,327 @@
+-- B3A2007.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that, for X'Access of a general access type A, the accessibility
+--      level of the view denoted by X must not be statically deeper than that
+--      of A.  Check for cases where X'Access occurs in the visible part of
+--      an instance and X is declared in the instance itself.
+--
+--      Check for cases where X is:
+--         (a) a view defined by an object declaration.
+--         (b) a renaming of an aliased view.
+--         (c) a view conversion of an aliased view.
+--
+--
+-- TEST DESCRIPTION:
+--      In order to satisfy accessibility requirements, the designated
+--      object X must be at the same or a less deep nesting level than the
+--      general access type A -- X must "live" as long as A. Nesting
+--      levels are the run-time nestings of masters: block statements;
+--      subprogram, task, and entry bodies; and accept statements. Packages
+--      are invisible to accessibility rules.
+--
+--      If X is an object declared by an object declaration, its accessibility
+--      level is that of the innermost enclosing master execution.
+--
+--      If X is a view of an object defined by a renaming declaration, its
+--      accessibility level is that of the renamed view.
+--
+--      If X is a view conversion, its accessibility level is the same as that
+--      of its operand.
+--
+--      This test declares a generic package which utilizes X'Access in its
+--      visible part, where X is declared in the instance itself and the type
+--      A of X'Access is a generic formal type.  The accessibility level of
+--      X depends on the nesting depth of the instance.  The tests covers
+--      cases where the actual corresponding to X is a view defined by an
+--      object declaration, a renaming of an aliased view, and a view
+--      conversion of an aliased view.
+--
+--      The test declares general access types and aliased objects in
+--      packages, subprograms and nested blocks.  These types and objects are
+--      passed as actuals to instantiations, which are attempted at various
+--      nesting levels. The test verifies that X'Access is illegal when X is
+--      declared at a nesting level deeper than that of the type of X'Access,
+--      and legal otherwise.
+--
+--      The nesting structure is as follows:
+--
+--          - Library-level package
+--         |                                                 (Level = 0)
+--          - end package
+--
+--          - Main subprogram
+--         |      *** testing here                           (Level = 1)
+--         |
+--         |     - Nested block statement
+--         |    |     *** testing here                       (Level = 2)
+--         |    |
+--         |    |     - Doubly-nested block statement
+--         |    |    |     *** testing here                  (Level = 3)
+--         |    |    |
+--         |    |    |  begin
+--         |    |     - end doubly-nested block statement
+--         |    |  begin
+--         |     - end nested block statement
+--         |
+--          - end main subprogram
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      19 Apr 95   SAIC    Modified header commentary.
+--      16 Nov 95   SAIC    ACVC 2.0.1. Fixed problem where declarations in the
+--                          generic declaration violated the accessibility
+--                          rule of 3.9.1(3).
+--      09 Feb 18   RLB     Added error location indicators to reflect common
+--                          error reporting strategies.
+--
+--!
+
+package B3A2007_0 is
+
+   type Tag_Desig is tagged record
+      I : Integer;
+   end record;
+
+   type AT1_L0 is access all Tag_Desig;                           -- Level = 0.
+   type AT2_L0 is access all Tag_Desig;                           -- Level = 0.
+   type AT3_L0 is access all Tag_Desig;                           -- Level = 0.
+
+end B3A2007_0;
+
+
+     --==================================================================--
+
+
+-- For the generic below, the aliased view X used in X'Access will be declared
+-- within the instance itself. The accessibility of X is therefore tied to the
+-- nesting level of the instance. The access type A of X'Access is passed as
+-- an actual. The nesting level of X must be at least as high as that of A.
+
+generic
+
+   type Gen_Tag is tagged private;
+
+   type ObjFA is access all Gen_Tag;
+   type RenFA is access all Gen_Tag;
+   type ConvFA is access all Gen_Tag;
+
+package B3A2007_1 is
+
+   type New_Tag is new Gen_Tag with record
+      B : Boolean;
+   end record;
+
+   FObj : aliased Gen_Tag;
+   RObj : aliased Gen_Tag;
+   VObj : aliased New_Tag;
+   Ren  : Gen_Tag renames RObj;
+
+   GAcc  : ObjFA  := FObj'Access;
+   ARen  : RenFA  := Ren'Access;
+   AConv : ConvFA := Gen_Tag(VObj)'Access;
+
+   -- These declarations are OK in the generic, but won't necessarily be OK
+   -- in an instance.
+
+end B3A2007_1;
+
+
+     --==================================================================--
+
+
+with B3A2007_0;
+with B3A2007_1;
+package B3A2007_2 is
+  new B3A2007_1 (B3A2007_0.Tag_Desig,
+                 B3A2007_0.AT1_L0,
+                 B3A2007_0.AT2_L0,
+                 B3A2007_0.AT3_L0);                          -- OK. {4:1;1}
+
+
+     --==================================================================--
+
+
+-- For the generic below, the aliased view X used in X'Access will be declared
+-- within the instance itself. The accessibility of X is therefore tied to the
+-- nesting level of the instance. The access type A of X'Access is passed as
+-- an actual. The nesting level of X must be at least as high as that of A.
+
+generic
+
+   type Gen_Tag is tagged private;
+
+   type ObjFA is access all Gen_Tag;
+   type RenFA is access all Gen_Tag;
+   type ConvFA is access all Gen_Tag;
+
+package B3A2007_3 is
+
+   FObj : aliased Gen_Tag;
+   RObj : aliased Gen_Tag;
+   Ren  : Gen_Tag renames RObj;
+
+   GAcc  : ObjFA  := FObj'Access;
+   ARen  : RenFA  := Ren'Access;
+
+   -- These declarations are OK in the generic, but won't necessarily be OK
+   -- in an instance.
+
+end B3A2007_3;
+
+     --==================================================================--
+
+
+with B3A2007_0;
+with B3A2007_3;
+procedure B3A2007 is
+
+   type AT1_L1 is access all B3A2007_0.Tag_Desig;                 -- Level = 1.
+   type AT2_L1 is access all B3A2007_0.Tag_Desig;                 -- Level = 1.
+   type AT3_L1 is access all B3A2007_0.Tag_Desig;                 -- Level = 1.
+
+   package Inst_L1_OK is
+     new B3A2007_3 (B3A2007_0.Tag_Desig,
+                    AT1_L1,
+                    AT2_L1,
+                    AT3_L1);                                 -- OK. {4:4;1}
+       -- After the above instantiation of Inst_L1_OK:
+       -- GAcc  : AT1_L1 := FObj'Access          (FObj level = 1)
+       -- ARen  : AT2_L1 := Ren'Access           (Ren  level = 1)
+
+   package Inst_L1_Obj is
+     new B3A2007_3 (B3A2007_0.Tag_Desig,
+                    B3A2007_0.AT1_L0,
+                    AT2_L1,
+                    AT3_L1);                                 -- ERROR: {4:4;1}
+                          -- Accessibility level of FObj is deeper than that of
+                          -- B3A2007_0.AT1_L0.
+       -- After the above instantiation of Inst_L1_Obj:
+       -- GAcc  : AT1_L0 := FObj'Access          (FObj level = 1)   <= Illegal
+       -- ARen  : AT2_L1 := Ren'Access           (Ren  level = 1)
+
+
+   package Inst_L1_Ren is
+     new B3A2007_3 (B3A2007_0.Tag_Desig,
+                    AT1_L1,
+                    B3A2007_0.AT1_L0,
+                    AT2_L1);                                 -- ERROR: {4:4;1}
+                           -- Accessibility level of Ren is deeper than that of
+                           -- B3A2007_0.AT1_L0.
+       -- After the above instantiation of Inst_L1_Ren:
+       -- GAcc  : AT1_L1 := FObj'Access          (FObj level = 1)
+       -- ARen  : AT1_L0 := Ren'Access;          (Ren  level = 1)   <= Illegal
+
+
+begin -- B3A2007
+
+   First_Nested_Block:
+   declare
+
+      type AT1_L2 is access all B3A2007_0.Tag_Desig;              -- Level = 2.
+      type AT2_L2 is access all B3A2007_0.Tag_Desig;              -- Level = 2.
+      type AT3_L2 is access all B3A2007_0.Tag_Desig;              -- Level = 2.
+
+
+      package Inst_L2_OK is
+        new B3A2007_3 (B3A2007_0.Tag_Desig,
+                       AT1_L2,
+                       AT2_L2,
+                       AT3_L2);                              -- OK. {4:7;1}
+       -- After the above instantiation of Inst_L2_OK:
+       -- GAcc  : AT1_L2 := FObj'Access          (FObj level = 2)
+       -- ARen  : AT2_L2 := Ren'Access           (Ren  level = 2)
+
+      package Inst_L2_Obj is
+        new B3A2007_3 (B3A2007_0.Tag_Desig,
+                       AT1_L1,
+                       AT2_L2,
+                       AT3_L2);                              -- ERROR: {4:7;1}
+                  -- Accessibility level of FObj is deeper than that of AT1_L1.
+       -- After the above instantiation of Inst_L2_Obj:
+       -- GAcc  : AT1_L1 := FObj'Access          (FObj level = 2)   <= Illegal
+       -- ARen  : AT2_L2 := Ren'Access           (Ren  level = 2)
+
+      package Inst_L2_Ren is
+        new B3A2007_3 (B3A2007_0.Tag_Desig,
+                       AT1_L2,
+                       B3A2007_0.AT1_L0,
+                       AT3_L2);                              -- ERROR: {4:7;1}
+                           -- Accessibility level of Ren is deeper than that of
+                           -- B3A2007_0.AT1_L0.
+       -- After the above instantiation of Inst_L2_Ren:
+       -- GAcc  : AT1_L2 := FObj'Access          (FObj level = 2)
+       -- ARen  : AT1_L0 := Ren'Access           (Ren  level = 2)   <= Illegal
+
+
+   begin -- First_Nested.
+
+      Doubly_Nested_Block:
+      declare
+
+         type AT1_L3 is access all B3A2007_0.Tag_Desig;           -- Level = 3.
+         type AT2_L3 is access all B3A2007_0.Tag_Desig;           -- Level = 3.
+         type AT3_L3 is access all B3A2007_0.Tag_Desig;           -- Level = 3.
+
+         package Inst_L3_OK is
+           new B3A2007_3 (B3A2007_0.Tag_Desig,
+                          AT1_L3,
+                          AT2_L3,
+                          AT3_L3);                           -- OK. {4:10;1}
+         -- After the above instantiation of Inst_L3_OK:
+         -- GAcc  : AT1_L3 := FObj'Access          (FObj level = 3)
+         -- ARen  : AT2_L3 := Ren'Access           (Ren  level = 3)
+
+         package Inst_L3_Obj is
+           new B3A2007_3 (B3A2007_0.Tag_Desig,
+                          B3A2007_0.AT1_L0,
+                          AT2_L3,
+                          AT3_L3);                           -- ERROR: {4:10;1}
+                         -- Accessibility level of TObj1 is deeper than that of
+                         -- B3A2007_0.AT1_L0.
+         -- After the above instantiation of Inst_L3_Obj:
+         -- GAcc  : AT1_L0 := FObj'Access          (FObj level = 3) <= Illegal
+         -- ARen  : AT2_L3 := Ren'Access           (Ren  level = 3)
+
+         package Inst_L3_Ren is
+           new B3A2007_3 (B3A2007_0.Tag_Desig,
+                          AT1_L3,
+                          AT2_L1,
+                          AT3_L3);                           -- ERROR: {4:10;1}
+                    -- Accessibility level of Ren is deeper than that of AT_L1.
+         -- After the above instantiation of Inst_L3_Ren:
+         -- GAcc  : AT1_L3 := FObj'Access          (FObj level = 3)
+         -- ARen  : AT2_L1 := Ren'Access           (Ren  level = 3) <= Illegal
+
+
+      begin -- Doubly_Nested_Block.
+        null;
+      end Doubly_Nested_Block;
+
+   end First_Nested_Block;
+
+end B3A2007;

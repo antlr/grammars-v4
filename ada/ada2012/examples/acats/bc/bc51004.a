@@ -1,0 +1,366 @@
+-- BC51004.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that, for a generic formal derived type with no discriminant
+--      part, if the ancestor subtype is constrained, the actual subtype
+--      must be constrained and must be statically compatible with the
+--      ancestor. Check for the case where both constraints are static and the
+--      actual subtype is defined by a derived type declaration.
+--
+-- TEST DESCRIPTION:
+--      The ancestor type must be a type for which range, index, or
+--      discriminant constraints are possible. The types of most interest are
+--      scalar, array, record, access, and tagged types.
+--
+--      For each type category considered, an unconstrained "root" type is
+--      declared, followed by a constrained subtype which will serve as the
+--      ancestor subtype in a formal derived type declaration. (The
+--      unconstrained "root" type is needed in order to allow constrained
+--      derivatives to be declared with the same type as the ancestor subtype.)
+--      Next, two derived types are declared, one which is statically
+--      compatible with the ancestor subtype and one which is not.
+--
+--      Static compatibility between the actual subtype and the ancestor
+--      subtype is defined as follows when both are static and the ancestor
+--      subtype is constrained:
+--
+--         For an access or composite ancestor subtype, the ancestor's
+--         constraint and the actual's constraint must have equal corresponding
+--         bounds or discriminant values.
+--
+--         For a scalar ancestor subtype, the bounds of the actual's constraint
+--         must both belong to the range of the ancestor subtype.
+--
+--      In the main program, a generic with a formal derived type of the
+--      appropriate ancestor subtype is instantiated with the following
+--      actuals:
+--
+--         (a) A derived type with statically compatible constraints.
+--         (b) A derived type with statically incompatible constraints.
+--
+--      Since any constraint on the ancestor subtype is considered part of the
+--      generic "contract," case (b) should result in a compile-time error.
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--
+--!
+
+package BC51004_0 is  -- Type definitions.
+
+--
+-- Integer Types :
+--
+
+   -- For the integer case, Natural is the statically constrained integer
+   -- (ancestor) subtype. There is no unconstrained "root" type, since
+   -- Integer is considered to be constrained. 
+
+   type Sizes is new Integer range 1 .. 5;        -- Statically compatible
+                                                  -- integer derived type
+                                                  -- (derived from root type).
+
+   type Size is new Integer range -1 .. 4;        -- Statically incompatible
+                                                  -- integer derived type
+                                                  -- (derived from root type).
+
+--
+-- Floating Point Types :
+--
+
+   -- For the floating point case, Float is the unconstrained floating point
+   -- "root" type.
+
+   subtype My_Float is Float range 1.0 .. 100.0;  -- Statically constrained
+                                                  -- floating point (ancestor)
+                                                  -- subtype.
+
+   Last_Float : constant Float := 100.0;
+
+   type Up_To_100 is new My_Float                 -- Statically compatible
+     range 1.0 .. Last_Float;                     -- floating pt. derived type
+                                                  -- (derived from subtype).
+
+   type Top_125 is new Float range 0.0 .. 125.0;  -- Statically incompatible
+                                                  -- floating pt. derived type
+                                                  -- (derived from root type).
+
+--
+-- Array Types :
+--
+
+   subtype Size2 is Sizes range 1 .. 2;
+
+   type Matrix is array                           -- Unconstrained array
+     (Sizes range <>, Sizes range <>) of Integer; -- "root" type.
+
+   subtype Matrix_2x2 is Matrix (1 .. 2, 1 .. 2); -- Statically constrained
+                                                  -- array (ancestor) subtype.
+
+   type Two_By_Two is new Matrix (Size2, Size2);  -- Statically compatible
+                                                  -- array derived type
+                                                  -- (derived from root type).
+
+   type Shifted_2x2 is new Matrix                 -- Statically incompatible
+     (2 .. 3, 2 .. 3);                            -- array derived type
+                                                  -- (derived from root type).
+
+--
+-- Record Types :
+--
+
+   type Square (Side : Sizes) is record           -- Unconstrained record
+      Mat : Matrix (1 .. Side, 1 .. Side);        -- "root" type.
+   end record;
+
+   subtype Square2 is Square (Side => 2);         -- Statically constrained
+                                                  -- record (ancestor) subtype.
+
+   type Another_Sq2 is new Square2;               -- Statically compatible
+                                                  -- record derived type
+                                                  -- (derived from subtype).
+
+   type Square3 is new Square(3);                 -- Statically incompatible
+                                                  -- record derived type
+                                                  -- (derived from root type).
+
+--
+-- Access Types :
+--
+
+   type Square_Ptr is access Square;              -- Unconstrained access
+                                                  -- "root" type.
+
+   subtype Sq2_Ptr is Square_Ptr(2);              -- Statically constrained
+                                                  -- access (ancestor) subtype.
+
+   type Sq2_Point is new Square_Ptr(Size2'Last);  -- Statically compatible
+                                                  -- access derived type
+                                                  -- (derived from root type).
+
+   type Sq4_Point is new Square_Ptr(Sizes'Last);  -- Statically incompatible
+                                                  -- access derived type
+                                                  -- (derived from root type).
+--
+-- Tagged Types :
+--
+
+   type Double_Square (Num : Sizes) is tagged     -- Unconstrained tagged
+     record                                       -- "root" type.
+       Left  : Square (Num);                       
+       Right : Square (Num);
+     end record;
+
+   subtype Dbl_Sq4 is Double_Square(4);           -- Statically constrained
+                                                  -- tagged (ancestor) subtype.
+
+   type Annot_Dbl_Sq4 is new Dbl_Sq4 with         -- Statically compatible
+     record                                       -- tagged derived type
+       Msg : String (1 .. 20);                    -- (derived from subtype).
+     end record;
+
+   type Dbl_Two is new Double_Square(Size2'Last)  -- Statically incompatible
+     with null record;                            -- tagged derived type
+                                                  -- (derived from root type).
+
+end BC51004_0;
+
+-- No body for BC51004_0.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Integer_Constrained_Subtype is new Natural;            -- Valid ranges
+package BC51004_1 is                                           -- are in
+   Rows : Integer_Constrained_Subtype;                         -- 0..
+end BC51004_1;                                                 -- Integer'Last.
+
+-- No body for BC51004_1.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Float_Constrained_Subtype is new BC51004_0.My_Float;   -- Valid ranges
+package BC51004_2 is                                           -- are in
+   Val : Float_Constrained_Subtype;                            -- 1.0..100.0.
+end BC51004_2;
+
+-- No body for BC51004_2.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Array_Constrained_Subtype is new BC51004_0.Matrix_2x2; -- Valid index
+package BC51004_3 is                                           -- constraints
+   Det : Array_Constrained_Subtype;                            -- are 1..2.
+end BC51004_3;
+
+-- No body for BC51004_3.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Record_Constrained_Subtype is new BC51004_0.Square2;   -- Valid
+package BC51004_4 is                                           -- discriminant
+   State : Record_Constrained_Subtype;                         -- constraint is
+end BC51004_4;                                                 -- 2.
+
+-- No body for BC51004_4.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Access_Constrained_Subtype is new BC51004_0.Sq2_Ptr;   -- Valid
+package BC51004_5 is                                           -- discriminant
+   State_Ptr : Access_Constrained_Subtype;                     -- constraint is
+end BC51004_5;                                                 -- 2.
+
+-- No body for BC51004_5.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+generic
+   type Tagged_Constrained_Subtype is new BC51004_0.Dbl_Sq4    -- Valid
+     with private;                                             -- discriminant
+package BC51004_6 is                                           -- constraint is
+   State_Pair : Tagged_Constrained_Subtype;                    -- 4.
+end BC51004_6;
+
+-- No body for BC51004_6.
+
+
+     --==================================================================--
+
+
+with BC51004_0;  -- Type definitions.
+with BC51004_1;  -- Integer formal types.
+with BC51004_2;  -- Floating point formal types.
+with BC51004_3;  -- Array  formal types.
+with BC51004_4;  -- Record formal types.
+with BC51004_5;  -- Access formal types.
+with BC51004_6;  -- Tagged formal types.
+procedure BC51004 is
+
+--
+-- Integer Types :
+--
+
+   package Integer_Compatible_Constraints is new
+     BC51004_1 (BC51004_0.Sizes);                                     -- OK.
+
+
+   package Integer_Incompatible_Constraints is new
+     BC51004_1 (BC51004_0.Size);                                      -- ERROR:
+                                                                -- Lower bound.
+
+
+--
+-- Floating Point Types :
+--
+
+   package Float_Compatible_Constraints is new
+     BC51004_2 (BC51004_0.Up_To_100);                                 -- OK.
+
+
+   package Float_Incompatible_Constraints is new
+     BC51004_2 (BC51004_0.Top_125);                                   -- ERROR:
+                                                                -- Both bounds.
+
+
+--
+-- Array Types :
+--
+
+   package Array_Compatible_Constraints is new
+     BC51004_3 (BC51004_0.Two_By_Two);                                -- OK.
+
+
+   package Array_Incompatible_Constraints is new
+     BC51004_3 (BC51004_0.Shifted_2x2);                               -- ERROR:
+                                                               -- Index bounds.
+
+
+--
+-- Record Types :
+--
+
+   package Record_Compatible_Constraints is new
+     BC51004_4 (BC51004_0.Another_Sq2);                               -- OK.
+
+
+   package Record_Incompatible_Constraints is new
+     BC51004_4 (BC51004_0.Square3);                                   -- ERROR:
+                                                    -- Discriminant constraint.
+
+
+--
+-- Access Types :
+--
+
+   package Access_Compatible_Constraints is new
+     BC51004_5 (BC51004_0.Sq2_Point);                                 -- OK.
+
+
+   package Access_Incompatible_Constraints is new
+     BC51004_5 (BC51004_0.Sq4_Point);                                 -- ERROR:
+                                                    -- Discriminant constraint.
+
+
+--
+-- Tagged Types :
+--
+
+   package Tagged_Compatible_Constraints is new
+     BC51004_6 (BC51004_0.Annot_Dbl_Sq4);                             -- OK.
+
+
+   package Tagged_Incompatible_Constraints is new
+     BC51004_6 (BC51004_0.Dbl_Two);                                   -- ERROR:
+                                                    -- Discriminant constraint.
+
+
+begin
+   null;
+end BC51004;

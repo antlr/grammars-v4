@@ -1,0 +1,76 @@
+-- B9400042.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See B9400040.A.
+--
+-- TEST DESCRIPTION:
+--      See B9400040.A.
+--
+-- TEST FILES:
+--      The following files comprise this test:
+--
+--         B9400040.A
+--         B9400041.A
+--      -> B9400042.A
+--         B9400043.A
+--         B9400044.A
+--         B9400045.A
+--         B9400046.A
+--         B9400047.A
+--
+--
+-- PASS/FAIL CRITERIA:
+--      See B9400040.A.
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0.
+--      02 Feb 17   RLB     Added location indicators to allow the errors
+--                          to be reported anywhere in the appropriate body.
+--                          Split test into separate units with errors.
+--
+--!
+
+   package body B940004_2 is
+
+      protected body Object_No_Internal_Specs is
+         -- an entry body must have a specification
+         entry Entry_No_Spec when true is                  -- ERROR: {10}
+                                                      -- Missing Specification
+         begin
+            null;
+         end Entry_No_Spec;
+         -- Note: there are no corresponding subprograms with missing
+         --       specifications - they are just treated as local
+         --       subprograms.
+         --=======
+         function Good_One return boolean is     -- OK.
+         begin
+            return true;
+         end Good_One;
+      end Object_No_Internal_Specs;
+
+   end B940004_2;
+

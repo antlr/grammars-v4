@@ -1,0 +1,803 @@
+-- CXE4006.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that calls can be made to remote procedures when a
+--      dispatching call is made where the controlling operand
+--      designates a type declared in a remote call interface package.
+--      Check that tagged types can be passed between partitions
+--      when passed as a class-wide type.
+--      In a remote subprogram call with a formal parameter of a
+--      class-wide type, check that Program_Error is raised if the
+--      actual parameter identifies a tagged type declared in a
+--      normal package.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          CXE4006_Common  - pure package containing declarations
+--              shared between partitions A & B
+--          CXE4006_Part_A1 - rci package interface for partition A
+--          CXE4006_Part_A2 - rci package interface for partition A
+--          CXE4006_Part_B  - rci package interface for partition B
+--          CXE4006_Normal  - normal package
+--          CXE4006_A  - main procedure for partition A
+--          CXE4006_B  - main procedure for partition B - main driver
+--              for the test.
+--      Tagged types are declared in all of the above packages.  The
+--      first set of tests involve declaring and initializing objects
+--      of each of the tagged types.  A dispatching call is made with
+--      each of the objects.  One of the parameters returned from the
+--      call is an indication of which routine actually handled the
+--      call.  A check is made that the correct routine was called.
+--      The second set of tests consist of passing an object of
+--      each of the tagged types across partitions twice and then
+--      a dispatching call is made.  The tag of each object is checked
+--      to make sure it made it across the partition boundary ok.
+--      The final test uses the structure set up for the second set
+--      of tests.  In this case, however, an object of the tagged
+--      type declared in the normal package is used.  This should
+--      result in a program_error.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE4006_A  (main procedure)
+--           CXE4006_Part_A1  (RCI package body)
+--           CXE4006_Part_A2  (RCI package body)
+--           CXE4006_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE4006_B  (main procedure)
+--           CXE4006_Part_B  (RCI package body)
+--           CXE4006_Normal
+--           CXE4006_Common
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Note that package Report is included in both partitions and
+--        prints messages from both partitions.
+--      Run the program by starting partition A and then partition B.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         providing an implementation of System.RPC.
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if both partition A and
+--      partition B print a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     30 MAY 95   SAIC    Initial version
+--     29 APR 96   SAIC    Fixed operator visibility problem
+--     05 AUG 98   EDS     Fix call of procedure
+--     13 AUG 99   RLB     Repaired startup race condition
+--!
+
+package CXE4006_Common is
+  pragma Pure;
+
+  -- controls progress output from the tests.  The value of this
+  -- flag does not affect whether or not the test passes.
+  Verbose : constant Boolean := False;
+
+  -- exception to signify that the test number or object
+  -- was not a one of the expected values
+  Failed_Check : exception;
+
+  -- instances of types derived from Root_Tagged_Type.
+  -- Used to identify the routine that received the dispatching call.
+
+  type Type_Decl_Location is (
+        Common_Spec,
+        Part_A1_1_Spec,
+        Part_A1_2_Spec,
+        Part_A2_Spec,
+        Part_B_Spec,
+        Part_B_Body,
+        Normal_Spec);
+
+  -- root tagged type for remote access to class wide type test
+  type Root_Tagged_Type is tagged
+    record
+      Common_Record_Field : Integer := 1234;
+    end record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+
+end CXE4006_Common;
+
+---
+-- This package is pure so it cannot depend upon Report
+---
+package body CXE4006_Common is
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out Root_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Expected : Integer;
+  begin
+    case Test_Number is
+      when 1001 => Expected := 100;
+      when 2001 => Expected := 200;
+      when others => raise Failed_Check;
+    end case;
+
+    if RTT.Common_Record_Field /= Expected then
+      raise Failed_Check;
+    end if;
+
+    RTT.Common_Record_Field := Expected + 5;
+    Callee := Common_Spec;
+  end Single_Controlling_Operand;
+
+end CXE4006_Common;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;  use CXE4006_Common;
+package CXE4006_Normal is
+  type Normal_Spec_Tagged_Type is new CXE4006_Common.Root_Tagged_Type
+       with null record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out Normal_Spec_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+end CXE4006_Normal;
+
+
+package body CXE4006_Normal is
+  procedure Single_Controlling_Operand (
+      RTT         : in out Normal_Spec_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+  begin
+    Callee := Normal_Spec;
+  end Single_Controlling_Operand;
+
+end CXE4006_Normal;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;  use CXE4006_Common;
+package CXE4006_Part_A1 is
+  pragma Remote_Call_Interface;
+
+  -- coordination of test termination across partitions
+  procedure Can_Quit;
+  procedure Quit;
+
+  -- tagged types that can be passed between partitions
+  type A1_Tagged_Type_1 is new Root_Tagged_Type with
+    record
+      A1_1_Component : Character := ' ';
+    end record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A1_Tagged_Type_1;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+
+  type A1_Tagged_Type_2 is new A1_Tagged_Type_1 with
+    record
+       A1_2_Component : Float;
+    end record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A1_Tagged_Type_2;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+
+  ----------
+
+  procedure Make_Dispatching_Call_With (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+end CXE4006_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;  use CXE4006_Common;
+with CXE4006_Part_A1;
+package CXE4006_Part_A2 is
+  pragma Remote_Call_Interface;
+
+  subtype String_20 is String (1..20);
+
+  -- tagged types that can be passed between partitions
+  type A2_Tagged_Type is new Root_Tagged_Type with
+      record
+        A2_Component : String_20;
+      end record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A2_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+
+  -- pass thru procedure
+  procedure Call_B (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+end CXE4006_Part_A2;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;  use CXE4006_Common;
+with CXE4006_Part_A1;
+package CXE4006_Part_B is
+  pragma Remote_Call_Interface;
+
+  -- tagged types that can be passed between partitions
+  type B_Tagged_Type is new Root_Tagged_Type
+       with null record;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out B_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+
+
+  procedure Wrapped_Around (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location);
+end CXE4006_Part_B;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;
+with CXE4006_Part_A1;
+with CXE4006_Part_A2;
+with Report;
+procedure CXE4006_A is
+begin
+  -- this partition is a server that deals with calls
+  -- from CXE4006_B.
+  Report.Test ("CXE4006_A", "Remote dispatching calls (server)");
+  CXE4006_Part_A1.Can_Quit; -- OK to quit now.
+
+  -- Report.Result is called in the body of CXE4006_Part_A1.
+end CXE4006_A;
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Common;  use CXE4006_Common;
+with CXE4006_Normal;
+with CXE4006_Part_A1;
+with CXE4006_Part_A2;
+with CXE4006_Part_B;
+with Report;
+procedure CXE4006_B is
+
+-----------------------
+--
+--      Service Routine
+
+procedure Start_Test (Test_Number : Integer) is
+begin
+  if Verbose then
+    Report.Comment ("starting test" & Integer'Image (Test_Number));
+  end if;
+end Start_Test;
+
+-----------------------
+--
+--      Check that calls can be made to remote procedures when a
+--      dispatching call is made where the controlling operand
+--      designates a type declared in a remote call interface package.
+
+procedure Dispatching_Test is
+
+  Root_Obj   : CXE4006_Common.Root_Tagged_Type;
+  A1_1_Obj   : CXE4006_Part_A1.A1_Tagged_Type_1;
+  A1_2_Obj   : CXE4006_Part_A1.A1_Tagged_Type_2;
+  A2_Obj     : CXE4006_Part_A2.A2_Tagged_Type;
+  B_Obj      : CXE4006_Part_B.B_Tagged_Type;
+
+  Callee     : Type_Decl_Location;
+begin
+  if Verbose then
+    Report.Comment ("starting dispatching test");
+  end if;
+
+  Start_Test (1001);  -- not remote
+  Root_Obj.Common_Record_Field := 100;
+  Single_Controlling_Operand (
+       Root_Tagged_Type'Class(Root_Obj),
+       1001, Callee);
+  if Root_Obj.Common_Record_Field /= 105 then
+    Report.Failed ("test 1001 expected 105 received" &
+                   Integer'Image (Root_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Common_Spec then
+    Report.Failed ("test 1001 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (1002);  -- remote
+  A1_1_Obj.Common_Record_Field := 110;
+  Single_Controlling_Operand (
+       Root_Tagged_Type'Class(A1_1_Obj),
+       1002, Callee);
+  if A1_1_Obj.Common_Record_Field /= 116 then
+    Report.Failed ("test 1002 expected 116 received" &
+                   Integer'Image (A1_1_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A1_1_Spec then
+    Report.Failed ("test 1002 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (1003);  -- remote
+  A1_2_Obj.Common_Record_Field := 120;
+  Single_Controlling_Operand (
+       Root_Tagged_Type'Class(A1_2_Obj),
+       1003, Callee);
+  if A1_2_Obj.Common_Record_Field /= 127 then
+    Report.Failed ("test 1003 expected 127 received" &
+                   Integer'Image (A1_2_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A1_2_Spec then
+    Report.Failed ("test 1003 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (1004);  -- remote
+  A2_Obj.Common_Record_Field := 130;
+  A2_Obj.A2_Component := "12345678901234567890";
+  Single_Controlling_Operand (
+       Root_Tagged_Type'Class(A2_Obj),
+       1004, Callee);
+  if A2_Obj.Common_Record_Field /= 138 then
+    Report.Failed ("test 1004 expected 138 received" &
+                   Integer'Image (A2_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A2_Spec then
+    Report.Failed ("test 1004 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (1005);
+  B_Obj.Common_Record_Field := 140;
+  Single_Controlling_Operand (
+       Root_Tagged_Type'Class(B_Obj),
+       1005, Callee);
+  if B_Obj.Common_Record_Field /= 149 then
+    Report.Failed ("test 1005 expected 149 received" &
+                   Integer'Image (B_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_B_Spec then
+    Report.Failed ("test 1005 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+exception
+  when others =>
+     Report.Failed ("unexpected exception in Dispatching_Test");
+end Dispatching_Test;
+
+-----------------------
+--
+--      Check that tagged types can be passed between partitions
+--      when passed as a class-wide type.
+
+procedure Class_Wide_Test is
+  Root_Obj   : CXE4006_Common.Root_Tagged_Type;
+  A1_1_Obj   : CXE4006_Part_A1.A1_Tagged_Type_1;
+  A1_2_Obj   : CXE4006_Part_A1.A1_Tagged_Type_2;
+  A2_Obj     : CXE4006_Part_A2.A2_Tagged_Type;
+  B_Obj      : CXE4006_Part_B.B_Tagged_Type;
+
+  Callee     : Type_Decl_Location;
+begin
+  if Verbose then
+    Report.Comment ("starting class wide test");
+  end if;
+
+  Start_Test (2001);
+  Root_Obj.Common_Record_Field := 200;
+  CXE4006_Part_A2.Call_B (Root_Obj, 2001, Callee);
+  if Root_Obj.Common_Record_Field /= 205 then
+    Report.Failed ("test 2001 expected 205 received" &
+                   Integer'Image (Root_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Common_Spec then
+    Report.Failed ("test 2001 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (2002);
+  A1_1_Obj.Common_Record_Field := 210;
+  CXE4006_Part_A2.Call_B (A1_1_Obj, 2002, Callee);
+  if A1_1_Obj.Common_Record_Field /= 216 then
+    Report.Failed ("test 2002 expected 216 received" &
+                   Integer'Image (A1_1_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A1_1_Spec then
+    Report.Failed ("test 2002 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (2003);  -- remote
+  A1_2_Obj.Common_Record_Field := 220;
+  CXE4006_Part_A2.Call_B (A1_2_Obj, 2003, Callee);
+  if A1_2_Obj.Common_Record_Field /= 227 then
+    Report.Failed ("test 2003 expected 227 received" &
+                   Integer'Image (A1_2_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A1_2_Spec then
+    Report.Failed ("test 2003 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (2004);  -- remote
+  A2_Obj.Common_Record_Field := 230;
+  A2_Obj.A2_Component := "24680135790987654321";
+  CXE4006_Part_A2.Call_B (A2_Obj, 2004, Callee);
+  if A2_Obj.Common_Record_Field /= 238 then
+    Report.Failed ("test 2004 expected 238 received" &
+                   Integer'Image (A2_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_A2_Spec then
+    Report.Failed ("test 2004 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+
+  Start_Test (2005);
+  B_Obj.Common_Record_Field := 240;
+  CXE4006_Part_A2.Call_B (B_Obj, 2005, Callee);
+  if B_Obj.Common_Record_Field /= 249 then
+    Report.Failed ("test 2005 expected 249 received" &
+                   Integer'Image (B_Obj.Common_Record_Field));
+  end if;
+  if Callee /= Part_B_Spec then
+    Report.Failed ("test 2005 callee was " &
+                   Type_Decl_Location'Image (Callee));
+  end if;
+
+end Class_Wide_Test;
+
+-----------------------
+--
+--      In a remote subprogram call with a formal parameter of a
+--      class-wide type, check that Program_Error is raised if the
+--      actual parameter identifies a tagged type not declared in a
+--      pure, shared passive, or the visible part of a remote types or
+--      remote call interface package.
+
+procedure Class_Wide_Exception_Test is
+  Normal_Obj : CXE4006_Normal.Normal_Spec_Tagged_Type;
+  Callee     : Type_Decl_Location;
+begin
+  if Verbose then
+    Report.Comment ("starting class wide exception test");
+  end if;
+  CXE4006_Part_A2.Call_B (Normal_Obj, 3001, Callee);
+  Report.Failed ("Program_Error expected but did not occur - test 3001");
+exception
+  when Program_Error =>  -- expected exception
+    if Verbose then
+      Report.Comment ("Program_Error raised as expected - test 3001");
+    end if;
+  when others =>
+    Report.Failed ("Program_Error expected but some other exception" &
+                   " was raised instead - test 3001");
+end Class_Wide_Exception_Test;
+
+-----------------------
+
+begin  -- CXE4006_B
+  Report.Test ("CXE4006_B", "Remote dispatching calls");
+
+  -- make sure partitioning was performed correctly
+
+  if CXE4006_Part_A1'Partition_ID = CXE4006_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4006_Part_A1 and CXE4006_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4006_Part_A2'Partition_ID = CXE4006_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4006_Part_A2 and CXE4006_B" &
+                   " are in the same partition.");
+  end if;
+  if CXE4006_Part_B'Partition_ID /= CXE4006_B'Partition_ID then
+    Report.Failed ("Partitioning Error - CXE4006_Part_B and CXE4006_B" &
+                   " are not in the same partition.");
+  end if;
+
+  -- do the tests
+  Dispatching_Test;
+  Class_Wide_Test;
+  Class_Wide_Exception_Test;
+
+  -- finish up
+  CXE4006_Part_A1.Quit;
+  Report.Result;
+end CXE4006_B;
+
+-----------------------------------------------------------------------------
+
+
+with Report;
+with CXE4006_Part_A2;
+with CXE4006_Part_B;
+with CXE4006_Normal;
+package body CXE4006_Part_A1 is
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit, and to insure
+  -- that Report.Result is not called until after the partition is started.
+
+  task Wait_For_Quit is
+    entry Can_Quit;
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    accept Can_Quit;
+    accept Quit;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Can_Quit is
+  begin
+    Wait_For_Quit.Can_Quit;
+  end Can_Quit;
+
+  procedure Quit is
+  begin
+    Wait_For_Quit.Quit;
+  end Quit;
+
+  ----------
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A1_Tagged_Type_1;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Expected : Integer := 0;
+  begin
+    case Test_Number is
+      when 1002   => Expected := 110;
+      when 2002   => Expected := 210;
+      when others => Report.Failed ("CXE4006_Part_A1(1) bad test number" &
+                                    Integer'Image (Test_Number));
+    end case;
+
+    if RTT.Common_Record_Field /= Expected then
+      Report.Failed ("CXE4006_Part_A1(1) expected" &
+                     Integer'Image (Expected) &
+                     " but received" &
+                     Integer'Image (RTT.Common_Record_Field) &
+                     " in test" &
+                     Integer'Image (Test_Number));
+    end if;
+
+    RTT.Common_Record_Field := Expected + 6;
+    Callee := Part_A1_1_Spec;
+  end Single_Controlling_Operand;
+
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A1_Tagged_Type_2;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Expected : Integer := 0;
+  begin
+    case Test_Number is
+      when 1003   => Expected := 120;
+      when 2003   => Expected := 220;
+      when others => Report.Failed ("CXE4006_Part_A1(2) bad test number" &
+                                    Integer'Image (Test_Number));
+    end case;
+
+    if RTT.Common_Record_Field /= Expected then
+      Report.Failed ("CXE4006_Part_A1(2) expected" &
+                     Integer'Image (Expected) &
+                     " but received" &
+                     Integer'Image (RTT.Common_Record_Field) &
+                     " in test" &
+                     Integer'Image (Test_Number));
+    end if;
+
+    RTT.Common_Record_Field := Expected + 7;
+    Callee := Part_A1_2_Spec;
+  end Single_Controlling_Operand;
+
+  ----------
+
+  procedure Make_Dispatching_Call_With (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+  begin
+    Single_Controlling_Operand (X, Test_Number, Callee);
+  end Make_Dispatching_Call_With;
+
+end CXE4006_Part_A1;
+
+-----------------------------------------------------------------------------
+
+with Report;
+with CXE4006_Part_B;
+with CXE4006_Normal;
+package body CXE4006_Part_A2 is
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out A2_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Expected : Integer := 0;
+    Expected_String : String_20;
+  begin
+    case Test_Number is
+      when 1004   => Expected := 130;
+                     Expected_String := "12345678901234567890";
+      when 2004   => Expected := 230;
+                     Expected_String := "24680135790987654321";
+      when others => Report.Failed ("CXE4006_Part_A2 bad test number" &
+                                    Integer'Image (Test_Number));
+    end case;
+
+    if RTT.Common_Record_Field /= Expected then
+      Report.Failed ("CXE4006_Part_A2 expected" &
+                     Integer'Image (Expected) &
+                     " but received" &
+                     Integer'Image (RTT.Common_Record_Field) &
+                     " in test" &
+                     Integer'Image (Test_Number));
+    end if;
+    if RTT.A2_Component /= Expected_String then
+      Report.Failed ("CXE4006_Part_A2 expected '" &
+                     Expected_String &
+                     "' but received '" &
+                     RTT.A2_Component &
+                     "' in test" &
+                     Integer'Image (Test_Number));
+    end if;
+
+    RTT.Common_Record_Field := Expected + 8;
+    Callee := Part_A2_Spec;
+  end Single_Controlling_Operand;
+
+
+  -- pass thru procedure
+  procedure Call_B (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+  begin
+    CXE4006_Part_B.Wrapped_Around (X, Test_Number, Callee);
+  end Call_B;
+
+end CXE4006_Part_A2;
+
+
+-----------------------------------------------------------------------------
+
+with CXE4006_Part_A1;
+with CXE4006_Part_A2;
+with CXE4006_Normal;
+with Report;
+with Ada.Tags;   use type Ada.Tags.Tag;
+package body CXE4006_Part_B is
+
+  type B_Body_Tagged_Type is new CXE4006_Common.Root_Tagged_Type
+       with null record;
+
+  Root_Obj   : CXE4006_Common.Root_Tagged_Type;
+  A1_1_Obj   : CXE4006_Part_A1.A1_Tagged_Type_1;
+  A1_2_Obj   : CXE4006_Part_A1.A1_Tagged_Type_2;
+  A2_Obj     : CXE4006_Part_A2.A2_Tagged_Type;
+  B_Obj      : CXE4006_Part_B.B_Tagged_Type;
+  B_Body_Obj : CXE4006_Part_B.B_Body_Tagged_Type;
+  Normal_Obj : CXE4006_Normal.Normal_Spec_Tagged_Type;
+
+  procedure Single_Controlling_Operand (
+      RTT         : in out B_Tagged_Type;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Expected : Integer := 0;
+  begin
+    case Test_Number is
+      when 1005   => Expected := 140;
+      when 2005   => Expected := 240;
+      when others => Report.Failed ("CXE4006_Part_A2 bad test number" &
+                                    Integer'Image (Test_Number));
+    end case;
+
+    if RTT.Common_Record_Field /= Expected then
+      Report.Failed ("CXE4006_Part_B expected" &
+                     Integer'Image (Expected) &
+                     " but received" &
+                     Integer'Image (RTT.Common_Record_Field) &
+                     " in test" &
+                     Integer'Image (Test_Number));
+    end if;
+
+    RTT.Common_Record_Field := Expected + 9;
+    Callee := Part_B_Spec;
+
+  end Single_Controlling_Operand;
+
+
+  -- this procedure will pass all the parameters along to
+  -- partition A CXE4006_Part_A1.Make_Dispatching_Call_With.
+  -- Prior to making the call, the tag of X is checked to make
+  -- sure it is correct.
+  procedure Wrapped_Around (
+      X           : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer;
+      Callee      :    out Type_Decl_Location) is
+    Good_Tag : Boolean := False;
+  begin
+    if Verbose then
+      Report.Comment ("wrap around test number" &
+                      Integer'Image (Test_Number));
+    end if;
+
+    case Test_Number is
+      when 2001 => Good_Tag := X'Tag = CXE4006_Common.Root_Tagged_Type'Tag;
+      when 2002 => Good_Tag := X'Tag = CXE4006_Part_A1.A1_Tagged_Type_1'Tag;
+      when 2003 => Good_Tag := X'Tag = CXE4006_Part_A1.A1_Tagged_Type_2'Tag;
+      when 2004 => Good_Tag := X'Tag = CXE4006_Part_A2.A2_Tagged_Type'Tag;
+      when 2005 => Good_Tag := X'Tag = CXE4006_Part_B.B_Tagged_Type'Tag;
+      when 3001 =>
+         Report.Failed ("test 3001 call should not have been made");
+         return;  -- just to avoid extra error messages
+      when others =>
+         Report.Failed ("bad test number in wrap around" &
+                        Integer'Image (Test_Number));
+    end case;
+
+    if not Good_Tag then
+      Report.Failed ("unexpected tag value in wrap around test" &
+                     Integer'Image (Test_Number));
+    end if;
+
+    CXE4006_Part_A1.Make_Dispatching_Call_With (X, Test_Number, Callee);
+  end Wrapped_Around;
+
+end CXE4006_Part_B;

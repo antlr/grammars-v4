@@ -1,0 +1,173 @@
+-- B8300040.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18010 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that homographs are forbidden in any of these combinations
+--     of parts of a generic package: Visible-Body; Private-Body; Body-Body.
+--
+-- TEST DESCRIPTION:
+--     This test was created from the ACVC test B83004B (there also were
+--     the sibling tests with related objectives). The original test
+--     caused many spurious errors by not having completions for many
+--     declarations that require completions. It also did not test newer
+--     constructs like protected types and null procedures. The original test
+--     set also treated separate compilation as a special case rather than the
+--     normal state of programs, thus trying many cases multiple times.
+--
+--     This rewrite of the test includes completions for all declarations
+--     that need them. When more than one declaration of a set needs a
+--     completion, we test that case in a separate file. Such a case will
+--     inevitably geneate many extra error messages regardless of the test
+--     organization. (This takes advantage of the rule that a file 
+--     with a single error is considered passing if it is rejected, 
+--     regardless of the number, location, or contents of any error messages.)
+--
+-- TEST FILES:
+--      This test consists of the following files:
+--      -> B8300040.A
+--         B8300041.A
+--         B8300042.A
+--         B8300043.A
+--         B8300044.A
+--         B8300045.A
+--         B8300046.A
+--         B8300047.A
+--         B8300048.A
+--
+-- PASS/FAIL CRITERIA:
+--      Files B8300041.A, B8300042.A, B8300043.A, B8300044.A, and B8300045.A,
+--      B8300046.A, B8300047.A, and B8300048.A, contain errors. All errors
+--      in these files must be detected to pass the test.
+--
+
+-- CHANGE HISTORY:
+--      29 Apr 2021   RLB     Created test from ACVC test B83004B.
+--!
+generic
+package B830004_Pack1A is
+   Var1 : Integer := 1;
+   Con1 : constant String := "HELLO";
+   Exc1 : exception;
+
+   type Int is new Integer;
+   subtype Int_Subtype is Integer range 1 .. 10;
+
+   package P is
+      X : Integer := 0;
+   end P;
+
+   protected Prot is
+      procedure Lock (A : Boolean);
+   private
+      L : Boolean;
+   end Prot;
+
+   procedure Proc1 (X : in Integer; Y : out Boolean);
+   
+   procedure NP1 (X : in Natural) is null;
+   
+end B830004_Pack1A;
+
+generic
+package B830004_Pack1B is
+   task T;
+end B830004_Pack1B;
+
+generic
+package B830004_Pack1C is
+   generic
+   function Fun return Integer;
+end B830004_Pack1C;
+
+-- CASE B:
+generic
+package B830004_Pack2A is
+   type Int2 is private;
+private
+   Var2 : Integer := 2;
+   Con2 : constant String := "HELLO";
+   Exc2 : exception;
+
+   type Int2 is new Integer;
+   subtype Int_Subtype2 is Integer range 2 .. 20;
+
+   package P2 is
+      X : Integer := 0;
+   end P2;
+
+   task T2;
+
+   generic
+   function Fun2 return Integer;
+
+   procedure NP2 (X : in Natural) is null;
+end B830004_Pack2A;
+
+generic
+package B830004_Pack2B is
+   protected Prot2 is
+      procedure Lock (A : Boolean);
+   private
+      L : Boolean;
+   end Prot2;
+end B830004_Pack2B;
+
+generic
+package B830004_Pack2C is
+   procedure Proc2 (X : in Integer; Y : out Boolean);
+end B830004_Pack2C;
+
+-- CASE C:
+generic
+   type Funny_Type is private;
+package B830004_Pack3A is
+   New_Var : Boolean;
+   type Arr1 is array (1 .. 2) of Character;
+   type Arr2 is array (1 .. 2) of Arr1;
+   type Arr3 is array (1 .. 2) of Arr2;
+   type Arr4 is array (1 .. 2) of Arr3;
+   type Arr5 is array (1 .. 2) of Arr4;
+   type Arr6 is array (1 .. 2) of Arr5;
+   Array_Object : Arr6;
+
+   function Funny (A : Funny_Type) return Funny_Type;
+
+end B830004_Pack3A;
+
+
+generic
+   type Yuppy is range <>;
+package B830004_Pack3B is
+   function Natty (A : Yuppy) return Yuppy;
+end B830004_Pack3B;

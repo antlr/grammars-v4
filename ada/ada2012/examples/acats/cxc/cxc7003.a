@@ -1,0 +1,212 @@
+-- CXC7003.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the Task_Attributes operations Set_Value and
+--      Reinitialize performs finalization on the old value
+--      of the attribute of the specified task.
+--
+-- TEST DESCRIPTION:
+--      A type is created from Controlled with a Finalize procedure
+--      that records the Id of the object being finalized.
+--      This type is used to create a task attribute.
+--      A task is created so that attributes can be set for both
+--      that task and the environment task.
+--      Both the environment task and the created task are given 
+--      unique attribute values.
+--      Set_Value and Reinitialize are called and the value of the
+--      last finalized Id is checked to make sure the proper attribute
+--      values were finalized.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations supporting the
+--      Systems Programming Annex.
+--
+--
+-- CHANGE HISTORY:
+--      25 JAN 96   SAIC    Initial version
+--       7 MAY 96   SAIC    Incorporated Reviewer comments.
+--      20 JAN 99   RLB     Restructured to support implementations which
+--                          take advantage of the permissions of C.7.2(29).
+--
+--!
+
+
+with Ada.Finalization;
+package CXC7003_0 is
+   type Notes_Finalization is new Ada.Finalization.Controlled with
+      record
+         Id : Integer := 0;
+      end record;
+
+   procedure Finalize (Object : in out Notes_Finalization);
+
+   Last_Finalized : Integer := -1;  -- holds Id of last item finalized;
+
+   ------ a few objects with known ids  -------
+   Object_1 : Notes_Finalization;
+   Object_2 : Notes_Finalization;
+   Object_3 : Notes_Finalization;
+   Object_4 : Notes_Finalization;
+end CXC7003_0;
+
+
+package body CXC7003_0 is
+   procedure Finalize (Object : in out Notes_Finalization) is
+   begin
+      Last_Finalized := Object.Id;
+      Object.Id := 0;
+   end Finalize;
+
+begin
+   Object_1.Id := 1;
+   Object_2.Id := 2;
+   Object_3.Id := 3;
+   Object_4.Id := 4;
+end CXC7003_0;
+
+
+------------------------------------------------------------------
+
+with CXC7003_0;
+with ImpDef;
+with Report;
+with Ada.Task_Identification;
+with Ada.Task_Attributes;
+with Ada.Exceptions;
+procedure CXC7003 is
+   Verbose : constant Boolean := False;
+   Not_Supported_Error : exception;
+begin
+   Report.Test ("CXC7003",
+                "Check that Set_Value and Reinitialize" &
+                " finalize the previous attribute value");
+
+   begin
+      declare
+         package TID renames Ada.Task_Identification;
+         generic package TA  renames Ada.Task_Attributes;
+         package FTA is new TA (CXC7003_0.Notes_Finalization,
+                                CXC7003_0.Object_4);
+      begin
+         declare
+
+            -- The following task doesn't really do anything.  It is just around
+            -- so we can set its attribute.
+
+            task Check_It is
+               entry Get_Id (Id : out TID.Task_Id);
+               entry Ok_To_Terminate;
+            end Check_It;
+
+            task body Check_It is
+            begin
+               accept Get_Id (Id : out TID.Task_Id) do
+                  Id := TID.Current_Task;
+               end Get_Id;
+               accept Ok_To_Terminate;
+            end Check_It;
+      
+            Check_It_TID : TID.Task_ID;
+         begin
+            Check_It.Get_Id (Check_It_TID);
+
+            begin
+               -- set Check_It's attribute to 1 and the environment task's to 2
+               FTA.Set_Value (CXC7003_0.Object_1, Check_It_TID);
+               FTA.Set_Value (CXC7003_0.Object_2);
+            exception
+               when Info:others => 
+                  Report.Not_Applicable("System not capable of supporting a " &
+                               "task attribute of a controlled type -- " &
+                               "exception during Set_Value");
+                  if Verbose then
+                     Report.Comment ("Exception raised was" &
+                                     Ada.Exceptions.Exception_Name(Info));
+                  end if;
+                  raise Not_Supported_Error;
+            end;
+
+            -- set a new value for Check_It's attribute and make sure that 
+            -- the object with Id 1 was finalized.
+            CXC7003_0.Last_Finalized := 9; -- state known not to be 
+                                           -- produced by finalize
+            FTA.Set_Value (CXC7003_0.Object_3, Check_It_TID);
+            case CXC7003_0.Last_Finalized is
+               when 1 => if Verbose then
+                             Report.Comment ("Set_value finalization ok");
+                         end if;
+               when 2 => Report.Failed ("Wrong task's attribute finalized");
+               when 9 =>Report.Failed("No finalization occurred for set_value");
+               when others => Report.Failed ("Unexpected result for set_value:"
+                                  & Integer'Image (CXC7003_0.Last_Finalized));
+            end case;
+
+            -- restore the default value for the environment task.  This should 
+            -- finalize the object with Id 2
+            CXC7003_0.Last_Finalized := 9; -- state known not to be 
+                                           -- produced by finalize
+            FTA.Reinitialize; 
+            case CXC7003_0.Last_Finalized is
+               when 2 => if Verbose then
+                              Report.Comment ("Reinitialize finalization ok");
+                         end if;
+               when 3 => Report.Failed ("Wrong task's attribute finalized" &
+                                        " in reinitialize");
+               when 9 => Report.Failed ("No finalization occurred" &
+                                        " for reinitialize");
+               when others => Report.Failed ("Unexpected result for" &
+                                  " reinitialize:" &
+                                  Integer'Image (CXC7003_0.Last_Finalized));
+            end case;
+
+            -- let the task terminate
+            Check_It.Ok_To_Terminate;
+   
+        exception
+            when Not_Supported_Error => raise;
+            when others => Report.Failed ("Unexpected exception (1)");
+        end;
+      exception
+         when Not_Supported_Error => raise;
+         when others => Report.Failed ("Unexpected exception (2)");
+      end;
+   exception
+      when Not_Supported_Error => 
+         null; -- Not Supported already reported.
+      when Info:others => 
+         -- This handler should be reachable only for exceptions raised
+         -- during the instantiation of task attributes.
+         Report.Not_Applicable("System not capable of supporting a task " &
+                               "attribute of a controlled type -- exception " &
+                               "during instantiation");
+         if Verbose then
+               Report.Comment ("Exception raised was" &
+                               Ada.Exceptions.Exception_Name(Info));
+         end if;
+   end;
+
+   Report.Result;
+end CXC7003;

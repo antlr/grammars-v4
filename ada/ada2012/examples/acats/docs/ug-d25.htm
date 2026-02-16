@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>Text Files (Non-supported Features)</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    DIV.Indented2 {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-left: 4.0em; margin-bottom: 0.6em}
+    DIV.WideAbove {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-top: 0.6em; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D24.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D26.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>D.2.5 Text Files (Non-supported Features)</H1>
+<div class="Normal" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+text file (this is the appropriate behavior for an implementation which 
+does not support text files other than standard input and output), then 
+the tests contained in the following files should report NOT_APPLICABLE:</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2109C.ADA<TD align="left">CE3405C.ADA<TD align="left">CE3704A.ADA<TD align="left">CE3905A.ADA<TD align="left">
+<TR><TD align="left">CE3102A.ADA<TD align="left">CE3405D.ADA<TD align="left">CE3704B.ADA<TD align="left">CE3905B.ADA<TD align="left">
+<TR><TD align="left">CE3102B.TST<TD align="left">CE3406A.ADA<TD align="left">CE3704C.ADA<TD align="left">CE3905C.ADA<TD align="left">
+<TR><TD align="left">CE3102F.ADA<TD align="left">CE3406B.ADA<TD align="left">CE3704D.ADA<TD align="left">CE3905L.ADA<TD align="left">
+<TR><TD align="left">CE3102G.ADA<TD align="left">CE3406C.ADA<TD align="left">CE3704E.ADA<TD align="left">CE3906A.ADA<TD align="left">
+<TR><TD align="left">CE3102H.ADA<TD align="left">CE3406D.ADA<TD align="left">CE3704F.ADA<TD align="left">CE3906B.ADA<TD align="left">
+<TR><TD align="left">CE3102J.ADA<TD align="left">CE3407A.ADA<TD align="left">CE3704M.ADA<TD align="left">CE3906C.ADA<TD align="left">
+<TR><TD align="left">CE3102K.ADA<TD align="left">CE3407B.ADA<TD align="left">CE3704N.ADA<TD align="left">CE3906E.ADA<TD align="left">
+<TR><TD align="left">CE3103A.ADA<TD align="left">CE3407C.ADA<TD align="left">CE3704O.ADA<TD align="left">CE3906F.ADA<TD align="left">
+<TR><TD align="left">CE3104A.ADA<TD align="left">CE3408A.ADA<TD align="left">CE3705A.ADA<TD align="left">CXAA001.A<TD align="left">
+<TR><TD align="left">CE3104B.ADA<TD align="left">CE3408B.ADA<TD align="left">CE3705B.ADA<TD align="left">CXAA002.A<TD align="left">
+<TR><TD align="left">CE3104C.ADA<TD align="left">CE3408C.ADA<TD align="left">CE3705C.ADA<TD align="left">CXAA003.A<TD align="left">
+<TR><TD align="left">CE3106A.ADA<TD align="left">CE3409A.ADA<TD align="left">CE3705D.ADA<TD align="left">CXAA004.A<TD align="left">
+<TR><TD align="left">CE3106B.ADA<TD align="left">CE3409C.ADA<TD align="left">CE3705E.ADA<TD align="left">CXAA005.A<TD align="left">
+<TR><TD align="left">CE3107A.TST<TD align="left">CE3409D.ADA<TD align="left">CE3706D.ADA<TD align="left">CXAA006.A<TD align="left">
+<TR><TD align="left">CE3107B.ADA<TD align="left">CE3409E.ADA<TD align="left">CE3706F.ADA<TD align="left">CXAA007.A<TD align="left">
+<TR><TD align="left">CE3108A.ADA<TD align="left">CE3410A.ADA<TD align="left">CE3706G.ADA<TD align="left">CXAA008.A<TD align="left">
+<TR><TD align="left">CE3108B.ADA<TD align="left">CE3410C.ADA<TD align="left">CE3804A.ADA<TD align="left">CXAA009.A<TD align="left">
+<TR><TD align="left">CE3110A.ADA<TD align="left">CE3410D.ADA<TD align="left">CE3804B.ADA<TD align="left">CXAA010.A<TD align="left">
+<TR><TD align="left">CE3112C.ADA<TD align="left">CE3410E.ADA<TD align="left">CE3804C.ADA<TD align="left">CXAA011.A<TD align="left">
+<TR><TD align="left">CE3112D.ADA<TD align="left">CE3411A.ADA<TD align="left">CE3804D.ADA<TD align="left">CXAA012.A<TD align="left">
+<TR><TD align="left">CE3114A.ADA<TD align="left">CE3411C.ADA<TD align="left">CE3804E.ADA<TD align="left">CXAA013.A<TD align="left">
+<TR><TD align="left">CE3115A.ADA<TD align="left">CE3412A.ADA<TD align="left">CE3804F.ADA<TD align="left">CXAA014.A<TD align="left">
+<TR><TD align="left">CE3207A.ADA<TD align="left">CE3413A.ADA<TD align="left">CE3804G.ADA<TD align="left">CXAA015.A<TD align="left">
+<TR><TD align="left">CE3301A.ADA<TD align="left">CE3413B.ADA<TD align="left">CE3804H.ADA<TD align="left">CXAA016.A<TD align="left">
+<TR><TD align="left">CE3302A.ADA<TD align="left">CE3413C.ADA<TD align="left">CE3804I.ADA<TD align="left">CXAA017.A<TD align="left">
+<TR><TD align="left">CE3304A.TST<TD align="left">CE3414A.ADA<TD align="left">CE3804J.ADA<TD align="left">CXAA018.A<TD align="left">
+<TR><TD align="left">CE3305A.ADA<TD align="left">CE3602A.ADA<TD align="left">CE3804M.ADA<TD align="left">CXAA019.A<TD align="left">
+<TR><TD align="left">CE3401A.ADA<TD align="left">CE3602B.ADA<TD align="left">CE3804O.ADA<TD align="left">CXAA020.A<TD align="left">
+<TR><TD align="left">CE3402A.ADA<TD align="left">CE3602C.ADA<TD align="left">CE3804P.ADA<TD align="left">CXAA021.A<TD align="left">
+<TR><TD align="left">CE3402C.ADA<TD align="left">CE3602D.ADA<TD align="left">CE3805A.ADA<TD align="left">CXAA022.A<TD align="left">
+<TR><TD align="left">CE3402D.ADA<TD align="left">CE3603A.ADA<TD align="left">CE3805B.ADA<TD align="left">CXAG001.A<TD align="left">
+<TR><TD align="left">CE3403A.ADA<TD align="left">CE3604A.ADA<TD align="left">CE3806A.ADA<TD align="left">CXAG003.A<TD align="left">
+<TR><TD align="left">CE3403B.ADA<TD align="left">CE3604B.ADA<TD align="left">CE3806B.ADA<TD align="left">CXF3A06.A<TD align="left">
+<TR><TD align="left">CE3403C.ADA<TD align="left">CE3605A.ADA<TD align="left">CE3806D.ADA<TD align="left">CXG1003.A<TD align="left">
+<TR><TD align="left">CE3403E.ADA<TD align="left">CE3605B.ADA<TD align="left">CE3806E.ADA<TD align="left">EE3203A.ADA<TD align="left">
+<TR><TD align="left">CE3403F.ADA<TD align="left">CE3605C.ADA<TD align="left">CE3806G.ADA<TD align="left">EE3204A.ADA<TD align="left">
+<TR><TD align="left">CE3404B.ADA<TD align="left">CE3605D.ADA<TD align="left">CE3806H.ADA<TD align="left">EE3402B.ADA<TD align="left">
+<TR><TD align="left">CE3404C.ADA<TD align="left">CE3605E.ADA<TD align="left">CE3902B.ADA<TD align="left">EE3409F.ADA<TD align="left">
+<TR><TD align="left">CE3404D.ADA<TD align="left">CE3606A.ADA<TD align="left">CE3904A.ADA<TD align="left">EE3412C.ADA <TD align="left">
+<TR><TD align="left">CE3405A.ADA<TD align="left">CE3606B.ADA<TD align="left">CE3904B.ADA<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+text file with mode <TT>In_File</TT>, then the tests contained in the 
+following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3102F.ADA<TD align="left">CE3407C.ADA<TD align="left">CE3605C.ADA<TD align="left">CE3804H.ADA<TD align="left">
+<TR><TD align="left">CE3102H.ADA<TD align="left">CE3408A.ADA<TD align="left">CE3704A.ADA<TD align="left">CE3804I.ADA<TD align="left">
+<TR><TD align="left">CE3104B.ADA<TD align="left">CE3408C.ADA<TD align="left">CE3704C.ADA<TD align="left">CE3804J.ADA<TD align="left">
+<TR><TD align="left">CE3106A.ADA<TD align="left">CE3409C.ADA<TD align="left">CE3704D.ADA<TD align="left">CE3804M.ADA<TD align="left">
+<TR><TD align="left">CE3108A.ADA<TD align="left">CE3409D.ADA<TD align="left">CE3704E.ADA<TD align="left">CE3804P.ADA<TD align="left">
+<TR><TD align="left">CE3108B.ADA<TD align="left">CE3409E.ADA<TD align="left">CE3704F.ADA<TD align="left">CE3805A.ADA<TD align="left">
+<TR><TD align="left">CE3112D.ADA<TD align="left">CE3410C.ADA<TD align="left">CE3704M.ADA<TD align="left">CE3805B.ADA<TD align="left">
+<TR><TD align="left">CE3301A.ADA<TD align="left">CE3410D.ADA<TD align="left">CE3704N.ADA<TD align="left">CE3806A.ADA<TD align="left">
+<TR><TD align="left">CE3302A.ADA<TD align="left">CE3410E.ADA<TD align="left">CE3704O.ADA<TD align="left">CE3806B.ADA<TD align="left">
+<TR><TD align="left">CE3402A.ADA<TD align="left">CE3411A.ADA<TD align="left">CE3705B.ADA<TD align="left">CE3806D.ADA<TD align="left">
+<TR><TD align="left">CE3403B.ADA<TD align="left">CE3411C.ADA<TD align="left">CE3705C.ADA<TD align="left">CE3806G.ADA<TD align="left">
+<TR><TD align="left">CE3403C.ADA<TD align="left">CE3412A.ADA<TD align="left">CE3705D.ADA<TD align="left">CE3902B.ADA<TD align="left">
+<TR><TD align="left">CE3403E.ADA<TD align="left">CE3413A.ADA<TD align="left">CE3705E.ADA<TD align="left">CE3904B.ADA<TD align="left">
+<TR><TD align="left">CE3403F.ADA<TD align="left">CE3413B.ADA<TD align="left">CE3706D.ADA<TD align="left">CE3905A.ADA<TD align="left">
+<TR><TD align="left">CE3404B.ADA<TD align="left">CE3413C.ADA<TD align="left">CE3706G.ADA<TD align="left">CE3905C.ADA<TD align="left">
+<TR><TD align="left">CE3404C.ADA<TD align="left">CE3602A.ADA<TD align="left">CE3804A.ADA<TD align="left">CE3905L.ADA<TD align="left">
+<TR><TD align="left">CE3404D.ADA<TD align="left">CE3602B.ADA<TD align="left">CE3804B.ADA<TD align="left">CE3906B.ADA<TD align="left">
+<TR><TD align="left">CE3406A.ADA<TD align="left">CE3602D.ADA<TD align="left">CE3804D.ADA<TD align="left">CE3906C.ADA<TD align="left">
+<TR><TD align="left">CE3406C.ADA<TD align="left">CE3603A.ADA<TD align="left">CE3804E.ADA<TD align="left">EE3203A.ADA<TD align="left">
+<TR><TD align="left">CE3406D.ADA<TD align="left">CE3604A.ADA<TD align="left">CE3804F.ADA<TD align="left">EE3204A.ADA<TD align="left">
+<TR><TD align="left">CE3407A.ADA<TD align="left">CE3604B.ADA<TD align="left">CE3804G.ADA<TD align="left">EE3412C.ADA <TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+text file with mode <TT>Out_File</TT>, then the tests contained in the 
+following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE2109C.ADA<TD align="left">CE3404D.ADA<TD align="left">CE3605D.ADA<TD align="left">CE3806E.ADA<TD align="left">
+<TR><TD align="left">CE3102A.ADA<TD align="left">CE3405A.ADA<TD align="left">CE3605E.ADA<TD align="left">CE3806G.ADA<TD align="left">
+<TR><TD align="left">CE3102B.TST<TD align="left">CE3405C.ADA<TD align="left">CE3606A.ADA<TD align="left">CE3806H.ADA<TD align="left">
+<TR><TD align="left">CE3102F.ADA<TD align="left">CE3405D.ADA<TD align="left">CE3606B.ADA<TD align="left">CE3902B.ADA<TD align="left">
+<TR><TD align="left">CE3102G.ADA<TD align="left">CE3406A.ADA<TD align="left">CE3704A.ADA<TD align="left">CE3904A.ADA<TD align="left">
+<TR><TD align="left">CE3102H.ADA<TD align="left">CE3406B.ADA<TD align="left">CE3704B.ADA<TD align="left">CE3904B.ADA<TD align="left">
+<TR><TD align="left">CE3102J.ADA<TD align="left">CE3406C.ADA<TD align="left">CE3704C.ADA<TD align="left">CE3905A.ADA<TD align="left">
+<TR><TD align="left">CE3102K.ADA<TD align="left">CE3406D.ADA<TD align="left">CE3704D.ADA<TD align="left">CE3905B.ADA<TD align="left">
+<TR><TD align="left">CE3103A.ADA<TD align="left">CE3407A.ADA<TD align="left">CE3704E.ADA<TD align="left">CE3905C.ADA<TD align="left">
+<TR><TD align="left">CE3104A.ADA<TD align="left">CE3407B.ADA<TD align="left">CE3704F.ADA<TD align="left">CE3905L.ADA<TD align="left">
+<TR><TD align="left">CE3104B.ADA<TD align="left">CE3407C.ADA<TD align="left">CE3704M.ADA<TD align="left">CE3906A.ADA<TD align="left">
+<TR><TD align="left">CE3104C.ADA<TD align="left">CE3408A.ADA<TD align="left">CE3704N.ADA<TD align="left">CE3906B.ADA<TD align="left">
+<TR><TD align="left">CE3106A.ADA<TD align="left">CE3408B.ADA<TD align="left">CE3704O.ADA<TD align="left">CE3906C.ADA<TD align="left">
+<TR><TD align="left">CE3106B.ADA<TD align="left">CE3408C.ADA<TD align="left">CE3705A.ADA<TD align="left">CE3906E.ADA<TD align="left">
+<TR><TD align="left">CE3107A.TST<TD align="left">CE3409A.ADA<TD align="left">CE3705B.ADA<TD align="left">CE3906F.ADA<TD align="left">
+<TR><TD align="left">CE3107B.ADA<TD align="left">CE3409C.ADA<TD align="left">CE3705C.ADA<TD align="left">CXAA003.A<TD align="left">
+<TR><TD align="left">CE3108A.ADA<TD align="left">CE3409D.ADA<TD align="left">CE3705D.ADA<TD align="left">CXAA004.A<TD align="left">
+<TR><TD align="left">CE3108B.ADA<TD align="left">CE3409E.ADA<TD align="left">CE3705E.ADA<TD align="left">CXAA005.A<TD align="left">
+<TR><TD align="left">CE3110A.ADA<TD align="left">CE3410A.ADA<TD align="left">CE3706D.ADA<TD align="left">CXAA009.A<TD align="left">
+<TR><TD align="left">CE3112C.ADA<TD align="left">CE3410C.ADA<TD align="left">CE3706F.ADA<TD align="left">CXAA010.A<TD align="left">
+<TR><TD align="left">CE3112D.ADA<TD align="left">CE3410D.ADA<TD align="left">CE3706G.ADA<TD align="left">CXAA011.A<TD align="left">
+<TR><TD align="left">CE3114A.ADA<TD align="left">CE3410E.ADA<TD align="left">CE3804A.ADA<TD align="left">CXAA012.A<TD align="left">
+<TR><TD align="left">CE3115A.ADA<TD align="left">CE3411A.ADA<TD align="left">CE3804B.ADA<TD align="left">CXAA014.A<TD align="left">
+<TR><TD align="left">CE3207A.ADA<TD align="left">CE3411C.ADA<TD align="left">CE3804C.ADA<TD align="left">CXAA016.A<TD align="left">
+<TR><TD align="left">CE3301A.ADA<TD align="left">CE3412A.ADA<TD align="left">CE3804D.ADA<TD align="left">CXAA017.A<TD align="left">
+<TR><TD align="left">CE3302A.ADA<TD align="left">CE3413A.ADA<TD align="left">CE3804E.ADA<TD align="left">CXAA018.A<TD align="left">
+<TR><TD align="left">CE3304A.TST<TD align="left">CE3413B.ADA<TD align="left">CE3804F.ADA<TD align="left">CXAA019.A<TD align="left">
+<TR><TD align="left">CE3305A.ADA<TD align="left">CE3413C.ADA<TD align="left">CE3804G.ADA<TD align="left">CXAA020.A<TD align="left">
+<TR><TD align="left">CE3401A.ADA<TD align="left">CE3414A.ADA<TD align="left">CE3804H.ADA<TD align="left">CXAA021.A<TD align="left">
+<TR><TD align="left">CE3402A.ADA<TD align="left">CE3602A.ADA<TD align="left">CE3804I.ADA<TD align="left">CXAA022.A<TD align="left">
+<TR><TD align="left">CE3402C.ADA<TD align="left">CE3602B.ADA<TD align="left">CE3804J.ADA<TD align="left">CXAG001.A<TD align="left">
+<TR><TD align="left">CE3402D.ADA<TD align="left">CE3602C.ADA<TD align="left">CE3804M.ADA<TD align="left">CXAG003.A<TD align="left">
+<TR><TD align="left">CE3403A.ADA<TD align="left">CE3602D.ADA<TD align="left">CE3804O.ADA<TD align="left">CXF3A06.A<TD align="left">
+<TR><TD align="left">CE3403B.ADA<TD align="left">CE3603A.ADA<TD align="left">CE3804P.ADA<TD align="left">CXG1003.A<TD align="left">
+<TR><TD align="left">CE3403C.ADA<TD align="left">CE3604A.ADA<TD align="left">CE3805A.ADA<TD align="left">EE3203A.ADA<TD align="left">
+<TR><TD align="left">CE3403E.ADA<TD align="left">CE3604B.ADA<TD align="left">CE3805B.ADA<TD align="left">EE3204A.ADA<TD align="left">
+<TR><TD align="left">CE3403F.ADA<TD align="left">CE3605A.ADA<TD align="left">CE3806A.ADA<TD align="left">EE3402B.ADA<TD align="left">
+<TR><TD align="left">CE3404B.ADA<TD align="left">CE3605B.ADA<TD align="left">CE3806B.ADA<TD align="left">EE3409F.ADA<TD align="left">
+<TR><TD align="left">CE3404C.ADA<TD align="left">CE3605C.ADA<TD align="left">CE3806D.ADA<TD align="left">EE3412C.ADA <TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Use_Error</TT> 
+or <TT>Name_Error</TT> is raised by every attempt to create or open a 
+text file with mode <TT>Append_File</TT>, then the tests contained in 
+the following files should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CXAA001.A<TD align="left">CXAA006.A<TD align="left">CXAA008.A<TD align="left">CXAA015.A <TD align="left">
+<TR><TD align="left">CXAA002.A<TD align="left">CXAA007.A<TD align="left">CXAA013.A<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Reset</TT> 
+is not supported for text files, then the following tests should report 
+NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3104C.ADA<TD align="left">CE3115A.ADA<TD align="left">CXAA020.A <TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If <TT>Delete</TT> 
+is not supported for text files, then the following tests should report 
+NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3110A.ADA<TD align="left">CE3114A.ADA <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If association of 
+multiple internal text files (opened for reading and writing) to a single 
+external file is not supported, then the test contained in the following 
+file should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3115A.ADA <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If there are no 
+inappropriate values for either line length or page length, then the 
+test contained in the following file should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3304A.TST <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+<div class="WideAbove" style="margin-bottom: 0.4em">If the value of 
+<TT>Count'Last</TT> is greater than 150_000, then the following test 
+should report NOT_APPLICABLE:&nbsp;</div>
+<div class="Indented2"><table width="70%">
+<TR><TD align="left">CE3413B.ADA <TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">&nbsp;<TD align="left">
+</table></div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D24.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-D26.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+    <TITLE>ACATS Coverage of Ada</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <META NAME="Author" CONTENT="JTC1/SC22/WG9/ARG, by Randall Brukardt, ARG Editor">
+    <META NAME="GENERATOR" CONTENT="Arm_Form.Exe, Ada Reference Manual generator">
+    <STYLE type="text/css">
+    H4.centered {text-align: center}
+    SPAN.swiss {font-family: Arial, Helvetica, sans-serif; font-size: 92%}
+    SPAN.roman {font-family: "Times New Roman", Times, serif}
+    TT {font-family: "Courier New", monospace}
+    DT {display: compact}
+    A.Bar:link {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    A.Bar:visited {font-family: Arial, Helvetica, sans-serif; font-style: normal; text-decoration: none; color: rgb(204,204,51)}
+    DIV.Normal {font-family: "Times New Roman", Times, serif; line-height: 122%; margin-bottom: 0.6em}
+    </STYLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFE8" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+<DIV><SPAN Style="font-size:200%; color: rgb(0,0,153)"><B>ACATS 4.2 User's Guide</B></SPAN></DIV>
+<DIV Class="Normal"><I><B><A HREF="UG-TTL.HTM">Title Page</A></B></I></DIV>
+<div style="margin-top: 0.6em; margin-bottom: 0.0em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-11.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-2.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+<HR>
+<H1>1.2 ACATS Coverage of Ada</H1>
+<div class="Normal">The ACATS needs to test as many Ada language rules 
+as possible in order to meet the goal of enhancing Ada software portability. 
+After all, a rule that is not tested is far more likely to be incorrectly 
+implemented than one that is tested.</div>
+<div class="Normal">Therefore the ACATS strives for complete coverage 
+of the standard. <I>Complete coverage</I><A NAME="I1015"></A> means that 
+every rule in the Ada standard has one or more associated tests that 
+ensure that the rule is implemented properly.</div>
+<div class="Normal">Complete coverage is especially important for legality 
+rules and runtime checks. It is easy for implementers to miss these rules, 
+as their compiler may do something useful in the absence of the checks. 
+But allowing such incorrect code can be a major portability problem when 
+a program is moved to a compiler (including a later version of the same 
+compiler) that properly implements the rules and checks.</div>
+<div class="Normal">Of course, complete coverage does not mean that every 
+sentence in the Ada standard has an associated test. There are many lines 
+in the standard that are not rules at all, such as notes and examples. 
+There are also many lines in the standard that are not testable; documentation 
+requirements are but one example. There are also rules in the standard 
+which could be tested, but such tests would be outside of the purpose 
+of the ACATS. Rules which express options for Ada implementations (such 
+as permissions or advice) are in this category (as the ACATS does not 
+test implementation quality).</div>
+<div class="Normal">It should be obvious that the importance of testing 
+particular rules in the Ada standard vary widely. In part, that's because 
+the various Ada features themselves have widely varying importance. (For 
+example, looking at three features that ACATS 4.1 could have tested, 
+proper operation of if expressions is more important than correct functioning 
+of record equality, which in turn is more important than run-time accessibility 
+checks for coextensions.) But it's also because of the differing nature 
+of the rules. For instance, testing of syntax rules is not very important 
+in most cases, as correct syntax will be checked by tests for other rules, 
+and tests for incorrect syntax require guessing what error a compiler 
+might make in interpreting syntax. Unless an error seems particularly 
+likely (as might happen from some irregularity in the syntax), such guessing 
+is unlikely to find actual errors. This makes it impossible for there 
+to be a definitive set of rules that need to be tested to accomplish 
+complete coverage, as the decision as to whether a particular rule is 
+usefully testable can be a judgement call.</div>
+<div class="Normal">In any case, complete coverage is a goal for the 
+ACATS. However, it is not expected to be ever be achieved. As the ACATS 
+gets nearer to the goal, the value of additional tests will drop (since 
+higher value tests get created earlier), and at some point, the cost 
+of creating and processing new tests would outweigh their value.</div>
+<div class="Normal">Since exactly which rules need to be tested to accomplish 
+complete coverage will always be a judgement call, the test coverage 
+analysis of the ACATS is a set of living documents, which will be updated 
+with new information and tests with each new ACATS version.</div>
+<div class="Normal">Coverage testing will generally not test combinations 
+of features, so problems that only manifest themselves in such combinations 
+will not be detected. Tests designed primarily to cover language rules 
+are most useful to prevent gross errors in implementations (such as forgetting 
+to implement checks or features). As such, the ACATS also supplements 
+those tests with tests written to emulate the patterns of use of Ada 
+features. Such tests provide tests of common combinations of features, 
+and ensure that common idioms are implemented properly.</div>
+<div class="Normal">A detailed description of how coverage is determined 
+for the Ada standard can be found in Section <A HREF="UG-32.HTM">3.2</A>.</div>
+
+<HR>
+<div style="margin-top: 0.0em; margin-bottom: 0.6em"><A HREF="UG-TOC.HTM"><IMG SRC="CONT.GIF" ALT="Contents" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-02.HTM"><IMG SRC="INDEX.GIF" ALT="Index" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-01.HTM"><IMG SRC="LIB.GIF" ALT="References" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-11.HTM"><IMG SRC="PREV.GIF" ALT="Previous" BORDER=0></A>&nbsp;
+&nbsp;<A HREF="UG-2.HTM"><IMG SRC="NEXT.GIF" ALT="Next" BORDER=0></A>&nbsp;
+</div>
+</BODY>
+</HTML>

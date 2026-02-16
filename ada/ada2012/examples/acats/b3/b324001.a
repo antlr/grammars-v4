@@ -1,0 +1,261 @@
+-- B324001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     The Ada Conformity Assessment Authority (ACAA) holds unlimited
+--     rights in the software and documentation contained herein. Unlimited
+--     rights are the same as those granted by the U.S. Government for older
+--     parts of the Ada Conformity Assessment Test Suite, and are defined
+--     in DFAR 252.227-7013(a)(19). By making this public release, the ACAA
+--     intends to confer upon all recipients unlimited rights equal to those
+--     held by the ACAA. These rights include rights to use, duplicate,
+--     release or disclose the released technical data and computer software
+--     in whole or in part, in any manner and for any purpose whatsoever, and
+--     to have or permit others to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS. THE ACAA MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--
+--                                     Notice
+--
+--     The ACAA has created and maintains the Ada Conformity Assessment Test
+--     Suite for the purpose of conformity assessments conducted in accordance
+--     with the International Standard ISO/IEC 18009 - Ada: Conformity
+--     assessment of a language processor. This test suite should not be used
+--     to make claims of conformance unless used in accordance with
+--     ISO/IEC 18009 and any applicable ACAA procedures.
+--*
+--
+-- OBJECTIVE:
+--     Check that a predicate aspect must be of boolean type. Check that a
+--     predicate may be given only on type and subtype declarations. Check
+--     that a predicate may not be given on an incomplete subtype. Check
+--     that a Static_Predicate must be predicate-static.
+--
+-- TEST DESCRIPTION:
+--     Try various declarations that violate the rules. Detailed checks are
+--     as follows:
+--
+--     (A) Non-boolean predicate expressions.
+--     (B) Predicate aspect given on something other than a type or subtype
+--         declaration.
+--     (C) Predicate aspect given on a subtype of an incomplete type.
+--     (D) Expression of a Static_Predicate containing a non-static function
+--         call.
+--     (E) Expression of a Static_Predicate containing a non-static call to
+--         a arithmetic operator, including predefined operators operating
+--         on the current instance.
+--     (F) Expression of a Static_Predicate is a non-static membership whose
+--         tested expression is not the current instance.
+--     (G) Expression of a Static_Predicate is a membership where one or more
+--         choices is non-static even when the tested expression is the current
+--         instance.
+--     (H) Expression of a Static_Predicate is a non-static case expression
+--         whose tested expression is not the current instance.
+--     (I) Expression of a Static_Predicate is a case expression where one or
+--         more dependent_expressions is non-static even when the selecting
+--         expression is the current instance.
+--     (J) Expression of a Static_Predicate is a non-static call to a
+--         predefined ordering or equality operator if neither operand is
+--         the current instance.
+--     (K) Expression of a Static_Predicate is a call to a predefined ordering
+--         or equality operator where one operand is non-static even when the
+--         other operand is the current instance.
+--     (L) Expression of a Static_Predicate is a call to a predefined logical
+--         operator if either operand is not predicate static.
+--     (M) Expression of a Static_Predicate is a short circuit control form if
+--         either operand is not predicate static.
+--     (N) Expression of a Static_Predicate is a parenthesized expression if
+--         the operand is not predicate static.
+--     (Q) Expression of a Static_Predicate is non-static object.
+--
+--
+-- CHANGE HISTORY:
+--      14 Jan 12   RAD     Initial version.
+--      26 May 14   RLB     Split test into two parts, added test cases.
+--      21 Apr 21   RLB     Added error location indicators.
+--!
+
+package B324001 is
+
+   Named_Number: constant := 1;
+
+   function Int_Func (X: Integer) return Integer;
+
+   function Is_Good (X: String) return Boolean;
+   function Is_Good (X: String) return Integer;
+
+end B324001;
+
+package body B324001 is
+
+   type T1 is range 1..10
+      with Static_Predicate => Named_Number;           -- ERROR: (A)  {12;1}
+
+   subtype T2 is Integer
+      with Dynamic_Predicate => Int_Func(T2);          -- ERROR: (A)  {12;1}  
+
+   subtype T3 is String
+      with Dynamic_Predicate => Is_Good(T3);           -- OK.         {12;1}
+
+   function Int_Func (X: Integer) return Integer is
+   begin
+      return 1;
+   end Int_Func;
+
+   function Is_Good (X: String) return Boolean is
+   begin
+      return True;
+   end Is_Good;
+
+   function Is_Good (X: String) return Integer is
+   begin
+      return 1;
+   end Is_Good;
+
+   function Is_OK (X: String) return Boolean is
+   begin
+      return True;
+   end Is_OK;
+
+   ----------------
+
+   An_Exception: exception
+      with Static_Predicate => True;                   -- ERROR: (B)  {12;1}
+   Another_Exception: exception
+      with Dynamic_Predicate => True;                  -- ERROR: (B)  {12;1}
+   A_Variable: Natural := 0
+      with Dynamic_Predicate => A_Variable mod 2 = 0;  -- ERROR: (B)  {12;1}
+
+   function Fooey (X: String) return Natural is
+      (X'Length)
+      with Dynamic_Predicate => X < 80;                -- ERROR: (B)  {12;1}
+   procedure Bar (X: String) is null
+      with Static_Predicate => True;                   -- ERROR: (B)  {12;1}
+
+   package Inner
+      with Dynamic_Predicate => True is                -- ERROR: (B)  {12;3}
+      Blah : Natural;
+   end Inner;
+
+   protected type Prot (A : Natural)
+      with Dynamic_Predicate => Prot.A mod 2 = 0 is    -- OK.         {12;3}
+      procedure Do_It (B: Natural);
+   private
+      Local : Natural;
+   end Prot;
+
+   protected body Prot is
+      procedure Do_It (B: Natural) is
+      begin
+         Local := (if B < A then B else A);
+      end Do_It;
+   end Prot;
+
+   task type Tsk (C : Natural)
+      with Dynamic_Predicate => Tsk.C mod 2 = 1 is     -- OK.         {12;3}
+      entry Do_It (D: Natural);
+   end Tsk;
+
+   task body Tsk is
+      Local : Natural;
+   begin
+      accept Do_It (D: Natural) do
+         Local := (if D < C then D else C);
+      end Do_It;
+   end Tsk;
+
+   ----------------
+
+   type Rec;
+   subtype SRec is Rec
+      with Dynamic_Predicate => True;                  -- ERROR: (C)  {12;1}
+   type Ptr is access Rec;
+   type Rec is record
+      Next : Ptr;
+   end record;
+
+   ----------------
+
+   Global_Var : Natural := 0;
+   subtype Dyn is Integer range 0 .. Global_Var;
+   subtype Dyn_Bool is Boolean range False .. (Dyn'Last > 0);
+   Global_Bool_Var : Boolean := Dyn'Last >= 0;
+
+   type Static_Predicate is null record
+     with Static_Predicate => Is_OK("Hello");          -- ERROR: (D)  {11;1}
+
+   type Even is new Integer
+     with Static_Predicate => (Even mod 2) = 0;        -- ERROR: (E)  {11;1}
+
+   subtype Nonstatic_1 is Integer
+     with Static_Predicate => (Nonstatic_1 * 2) >= 10; -- ERROR: (E)  {11;1}
+
+   subtype Nonstatic_2 is Integer
+     with Static_Predicate => (4096 / Nonstatic_2) > 2;-- ERROR: (E)  {11;1}
+
+   subtype Nonstatic_3 is Integer
+     with Static_Predicate =>
+        (Dyn'(10) - 2) > Nonstatic_3;                  -- ERROR: (E)(K){1:11;1}
+
+   subtype Nonstatic_4 is Integer
+     with Static_Predicate => 10 in Dyn;               -- ERROR: (F)  {11;1}
+
+   subtype Nonstatic_5 is Integer
+     with Static_Predicate =>
+        Nonstatic_5 in 1 | 2 | Dyn'(8);                -- ERROR: (G)  {1:11;1}
+
+   subtype Nonstatic_6 is Integer
+     with Static_Predicate => Nonstatic_6 in Dyn;      -- ERROR: (G)  {11;1}
+
+   subtype Nonstatic_7 is Integer
+     with Static_Predicate =>
+        (case 10 is
+           when 1 => True,
+           when 2 => True,
+           when others => Dyn_Bool'(False));           -- ERROR: (H)  {4:11;1}
+
+   subtype Nonstatic_8 is Integer
+     with Static_Predicate =>
+        (case Nonstatic_8 is
+           when 1 => True,
+           when 2 => True,
+           when others => Dyn_Bool'(False));           -- ERROR: (I)  {4:11;1}
+
+   subtype Nonstatic_9 is Integer
+     with Static_Predicate => Dyn'(8) > 2;             -- ERROR: (J)  {11;1}
+
+   subtype Nonstatic_10 is Integer
+     with Static_Predicate => Nonstatic_10 > Dyn'(0);  -- ERROR: (K)  {11;1}
+
+   subtype Nonstatic_11 is Integer
+     with Static_Predicate =>
+        Nonstatic_11 > 0 and Nonstatic_11 in Dyn;      -- ERROR: (L)(G){1:11;1}
+
+   subtype Nonstatic_12 is Integer
+     with Static_Predicate =>
+        Nonstatic_12 > 0 or Is_OK ("Ugh");             -- ERROR: (L)(A){1:11;1}
+
+   subtype Nonstatic_13 is Integer
+     with Static_Predicate =>
+        Nonstatic_13 >= 0 and then
+        Nonstatic_13 / 2 < 1000;                       -- ERROR: (M)(E){2:11;1}
+
+   subtype Nonstatic_14 is Integer
+     with Static_Predicate =>
+        (Nonstatic_14 > Dyn'(0));                      -- ERROR: (N)(J){1:11;1}
+
+   subtype Nonstatic_15 is Integer
+     with Static_Predicate =>
+        (Nonstatic_15 >= Global_Var);                  -- ERROR: (N)(Q){1:11;1}
+
+   subtype Nonstatic_16 is Integer
+     with Static_Predicate => Global_Bool_Var;         -- ERROR: (Q)  {11;1}
+
+end B324001;

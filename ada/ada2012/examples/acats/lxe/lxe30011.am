@@ -1,0 +1,137 @@
+-- LXE30011.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      See LXE30010.AM
+--
+-- TEST DESCRIPTION:
+--      See LXE30010.AM
+--
+-- SPECIAL REQUIREMENTS:
+--      See LXE30010.AM
+--
+-- APPLICABILITY CRITERIA:
+--      See LXE30010.AM
+--
+-- PASS/FAIL CRITERIA:
+--      See LXE30010.AM
+--
+-- CHANGE HISTORY:
+--     22 JUN 95   SAIC    Initial version
+--      2 OCT 96   SAIC    Incorporated reviewer comments.
+--     26 SEP 98   RLB     Repaired to allow Communication_Error; to eliminate
+--                         hanging; and to update the description.
+--     02 OCT 98   RLB     Corrected spelling of Communication_Error.
+--
+--!
+
+-----------------------------------------------------------------------------
+
+package LXE3001_Part_A is
+  pragma Remote_Call_Interface;
+  procedure Quit;
+  procedure Unstable_Profile (Y : Integer);
+    -- note that formal parameter name is different than that found
+    -- in LXE30010.AM
+  File_1_Version : constant Boolean := True;
+    -- this declaration is different than that found in LXE30010.AM
+end LXE3001_Part_A;
+
+-----------------------------------------------------------------------------
+
+package LXE3001_Part_B is
+  pragma Remote_Call_Interface;
+  File_1_Version : constant Boolean := True;
+  procedure Quit;
+  procedure Unstable_Profile (Y : Integer);
+    -- note that formal parameter name is different than that found
+    -- in LXE30010.AM
+end LXE3001_Part_B;
+
+-----------------------------------------------------------------------------
+
+with LXE3001_Part_A;
+with LXE3001_Part_B;
+with System.RPC;
+with Report;
+procedure LXE3001_B is
+begin
+  -- this partition attempts to communicate with partition A.
+  Report.Test ("LXE3001_B",
+               "Checking that a program is consistent across partitions");
+
+  LXE3001_Part_A.Unstable_Profile (99);
+  Report.Failed ("inconsistency not detected");
+  LXE3001_Part_A.Quit;
+
+  -- Report.Result is called in the body of LXE3001_Part_B.
+exception
+  when System.RPC.Communication_Error =>
+    Report.Comment ("Communication_Error raised");
+       -- This ought to happen if the Program_Error is not raised.
+  when Program_Error =>
+    Report.Failed ("Program_Error raised after elaboration");
+  when others =>
+    Report.Failed ("Unexpected exception");
+end LXE3001_B;
+
+-----------------------------------------------------------------------------
+
+
+with Report;
+package body LXE3001_Part_B is
+
+  Make_Sure_Correct_Spec_is_Used : Boolean := File_1_Version;
+
+  ---------  partition termination coordination ----------
+  -- use a task to prevent the partition from completing its execution
+  -- until the main procedure in partition B tells it to quit.
+
+  task Wait_For_Quit is
+    entry Quit;
+  end Wait_For_Quit;
+
+  task body Wait_For_Quit is
+  begin
+    select
+      accept Quit;
+    or
+      terminate;
+    end select;
+    Report.Result;
+  end Wait_For_Quit;
+
+  procedure Quit is
+  begin
+    Report.Failed ("received a call for Part_B.Quit");
+    Wait_For_Quit.Quit;
+  end Quit;
+
+  procedure Unstable_Profile (Y : Integer) is
+  begin
+    Report.Failed ("received a call for Part_B.Unstable_Profile");
+  end Unstable_Profile;
+
+end LXE3001_Part_B;

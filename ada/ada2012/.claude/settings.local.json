@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/msys64/mingw64/bin/gnatmake:*)",
+      "Bash(/c/msys64/mingw64/bin/gcc:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(PATH=\"/c/msys64/mingw64/bin:$PATH\" gnatmake:*)",
+      "Bash(./a29003a.exe:*)",
+      "Bash(./bin/Debug/net10.0/Test.exe:*)",
+      "Bash(grep:*)",
+      "Bash(./Generated-CSharp/bin/Debug/net10.0/Test.exe:*)",
+      "Bash(dotnet build:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:pub.dev)",
+      "Bash(bash build.sh)",
+      "Bash(dart compile exe:*)",
+      "Bash(bash test.sh:*)",
+      "Bash(go env:*)",
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(antlr4:*)",
+      "Bash(bash run.sh ../examples/acats/c2/c25001a.ada -tokens)",
+      "Bash(for f in ../examples/acats/c3/c34003a.ada ../examples/acats/c3/c34003c.ada ../examples/acats/c3/c34004a.ada ../examples/acats/c3/c34004c.ada ../examples/acats/c3/c35a02a.ada)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(done)",
+      "Bash(do echo \"$f\")"
+    ]
+  }
+}
