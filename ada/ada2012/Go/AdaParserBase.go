@@ -470,9 +470,10 @@ func (p *AdaParserBase) defineSymbol(name string, classification TypeClassificat
 	sym.Name = name
 	sym.Classification[classification] = true
 	sym.IsComposite = isComposite
-	if token != nil && token.GetSource() != nil {
-		if token.GetSource().GetTokenSource() != nil {
-			sym.DefinedFile = token.GetSource().GetTokenSource().GetSourceName()
+	if token != nil {
+		ts := token.GetTokenSource()
+		if ts != nil {
+			sym.DefinedFile = ts.GetSourceName()
 		}
 		sym.DefinedLine = token.GetLine()
 		sym.DefinedColumn = token.GetColumn()
