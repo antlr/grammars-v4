@@ -870,9 +870,9 @@ package_declaration
     ;
 
 package_specification
-    : PACKAGE defining_program_unit_name aspect_specification? IS {this.EnterScope();} basic_declarative_item* (
+    : PACKAGE defining_program_unit_name aspect_specification? IS basic_declarative_item* (
         PRIVATE basic_declarative_item*
-    )? {this.ExitScope();} END ((name DOT)? identifier)?
+    )? END ((name DOT)? identifier)?
     ;
 
 package_body
