@@ -348,7 +348,10 @@ class AdaParserBase(Parser):
         sym.classification = {classification}
         sym.is_composite = is_composite
         if token and hasattr(token, 'source') and token.source[0]:
-            sym.defined_file = token.source[0].sourceName or ""
+            try:
+                sym.defined_file = token.source[0].sourceName or ""
+            except AttributeError:
+                sym.defined_file = ""
         sym.defined_line = token.line if token else 0
         sym.defined_column = token.column if token else 0
         self._st.define(sym)
