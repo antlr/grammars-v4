@@ -405,9 +405,9 @@ abstract class AdaParserBase extends Parser {
         var ctx = context;
         List<dynamic>? names;
         if (ctx is Nonlimited_with_clauseContext) {
-            names = ctx.name();
+            names = ctx.names();
         } else if (ctx is Limited_with_clauseContext) {
-            names = ctx.name();
+            names = ctx.names();
         }
         if (names == null || names.isEmpty) return;
 
