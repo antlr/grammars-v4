@@ -1,6 +1,10 @@
 # Ada 2012 ANTLR Grammar
 
-http://www.ada-auth.org/standards/12rm/html/RM-TOC.html
+This is an ANTLR4 grammar for the Ada 2012 programming language,
+based on the [Ada Reference Manual](http://www.ada-auth.org/standards/12rm/html/RM-TOC.html).
+The grammar is organized into two files:
+AdaLexer.g4 for lexical analysis and AdaParser.g4 for parsing.
+Parser rules are ordered to correspond with the sections in the [Syntax Summary](http://www.ada-auth.org/standards/12rm/html/RM-P.html).
 
 ## Symbol Table for Disambiguation
 
