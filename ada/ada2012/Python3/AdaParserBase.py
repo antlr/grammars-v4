@@ -389,8 +389,9 @@ class AdaParserBase(Parser):
         if not self._current_file:
             stream = self._input
             if hasattr(stream, 'tokenSource') and stream.tokenSource:
-                source_name = getattr(stream.tokenSource, 'sourceName', None)
-                if source_name and source_name != "unknown" and os.path.isfile(source_name):
+                ts = stream.tokenSource
+                source_name = getattr(getattr(ts, 'inputStream', None), 'name', None)
+                if source_name and source_name != "unknown" and source_name != "<empty>" and os.path.isfile(source_name):
                     self._current_file = os.path.abspath(source_name)
 
         if "." in __name__:
