@@ -1,6 +1,7 @@
 import antlr4 from 'antlr4';
 import AdaLexer from './AdaLexer.js';
 import AdaParser from './AdaParser.js';
+import Symbol from './Symbol.js';
 import SymbolTable from './SymbolTable.js';
 import TypeClassification from './TypeClassification.js';
 
@@ -465,9 +466,6 @@ export default class AdaParserBase extends antlr4.Parser {
     }
 
     _defineSymbol(name, classification, token, isComposite) {
-        var sym = new (await_import_Symbol())(name, classification, token, isComposite);
-        // Inline symbol creation to avoid circular dependency
-        var Symbol = (await import('./Symbol.js')).default;
         var s = new Symbol();
         s.name = name;
         s.classification = new Set([classification]);

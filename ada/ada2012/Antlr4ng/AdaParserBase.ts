@@ -68,6 +68,125 @@ function parseNoSemantics(args: string[]): Set<string> {
     return result;
 }
 
+// Type-narrowing helpers using ruleIndex, avoiding instanceof issues with tsx module resolution.
+function isFull_type_declarationContext(x: any): x is Full_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_full_type_declaration;
+}
+function isSubtype_declarationContext(x: any): x is Subtype_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_subtype_declaration;
+}
+function isObject_declarationContext(x: any): x is Object_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_object_declaration;
+}
+function isNumber_declarationContext(x: any): x is Number_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_number_declaration;
+}
+function isSubprogram_declarationContext(x: any): x is Subprogram_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_subprogram_declaration;
+}
+function isSubprogram_bodyContext(x: any): x is Subprogram_bodyContext {
+    return x?.ruleIndex === AdaParser.RULE_subprogram_body;
+}
+function isPackage_declarationContext(x: any): x is Package_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_package_declaration;
+}
+function isPackage_bodyContext(x: any): x is Package_bodyContext {
+    return x?.ruleIndex === AdaParser.RULE_package_body;
+}
+function isException_declarationContext(x: any): x is Exception_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_exception_declaration;
+}
+function isTask_type_declarationContext(x: any): x is Task_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_task_type_declaration;
+}
+function isSingle_task_declarationContext(x: any): x is Single_task_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_single_task_declaration;
+}
+function isProtected_type_declarationContext(x: any): x is Protected_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_protected_type_declaration;
+}
+function isSingle_protected_declarationContext(x: any): x is Single_protected_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_single_protected_declaration;
+}
+function isEntry_declarationContext(x: any): x is Entry_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_entry_declaration;
+}
+function isComponent_declarationContext(x: any): x is Component_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_component_declaration;
+}
+function isIncomplete_type_declarationContext(x: any): x is Incomplete_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_incomplete_type_declaration;
+}
+function isPrivate_type_declarationContext(x: any): x is Private_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_private_type_declaration;
+}
+function isPrivate_extension_declarationContext(x: any): x is Private_extension_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_private_extension_declaration;
+}
+function isGeneric_instantiationContext(x: any): x is Generic_instantiationContext {
+    return x?.ruleIndex === AdaParser.RULE_generic_instantiation;
+}
+function isObject_renaming_declarationContext(x: any): x is Object_renaming_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_object_renaming_declaration;
+}
+function isException_renaming_declarationContext(x: any): x is Exception_renaming_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_exception_renaming_declaration;
+}
+function isPackage_renaming_declarationContext(x: any): x is Package_renaming_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_package_renaming_declaration;
+}
+function isFormal_complete_type_declarationContext(x: any): x is Formal_complete_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_formal_complete_type_declaration;
+}
+function isFormal_incomplete_type_declarationContext(x: any): x is Formal_incomplete_type_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_formal_incomplete_type_declaration;
+}
+function isFormal_object_declarationContext(x: any): x is Formal_object_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_formal_object_declaration;
+}
+function isFormal_package_declarationContext(x: any): x is Formal_package_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_formal_package_declaration;
+}
+function isParameter_specificationContext(x: any): x is Parameter_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_parameter_specification;
+}
+function isLoop_parameter_specificationContext(x: any): x is Loop_parameter_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_loop_parameter_specification;
+}
+function isIterator_specificationContext(x: any): x is Iterator_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_iterator_specification;
+}
+function isEnumeration_literal_specificationContext(x: any): x is Enumeration_literal_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_enumeration_literal_specification;
+}
+function isChoice_parameter_specificationContext(x: any): x is Choice_parameter_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_choice_parameter_specification;
+}
+function isEntry_index_specificationContext(x: any): x is Entry_index_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_entry_index_specification;
+}
+function isExtended_return_object_declarationContext(x: any): x is Extended_return_object_declarationContext {
+    return x?.ruleIndex === AdaParser.RULE_extended_return_object_declaration;
+}
+function isEntry_bodyContext(x: any): x is Entry_bodyContext {
+    return x?.ruleIndex === AdaParser.RULE_entry_body;
+}
+function isTask_bodyContext(x: any): x is Task_bodyContext {
+    return x?.ruleIndex === AdaParser.RULE_task_body;
+}
+function isProtected_bodyContext(x: any): x is Protected_bodyContext {
+    return x?.ruleIndex === AdaParser.RULE_protected_body;
+}
+function isDiscriminant_specificationContext(x: any): x is Discriminant_specificationContext {
+    return x?.ruleIndex === AdaParser.RULE_discriminant_specification;
+}
+function isAssignment_statementContext(x: any): x is Assignment_statementContext {
+    return x?.ruleIndex === AdaParser.RULE_assignment_statement;
+}
+function isSimple_return_statementContext(x: any): x is Simple_return_statementContext {
+    return x?.ruleIndex === AdaParser.RULE_simple_return_statement;
+}
+
 export abstract class AdaParserBase extends Parser {
     private _st: SymbolTable;
     private _expectedTypeStack: (Symbol | null)[] = [];
@@ -98,7 +217,6 @@ export abstract class AdaParserBase extends Parser {
             if (this._debug) process.stderr.write("IsAggregate: LT(1) is not LP, returning false\n");
             return false;
         }
-        // Structural scan from LT(2), tracking paren depth
         let depth = 0;
         for (let i = 2; ; i++) {
             const t = stream.LT(i);
@@ -130,7 +248,6 @@ export abstract class AdaParserBase extends Parser {
                 }
             }
         }
-        // Type-context check
         if (this._expectedTypeStack.length > 0) {
             const expected = this._expectedTypeStack[this._expectedTypeStack.length - 1];
             if (expected !== null && expected.isComposite) {
@@ -162,14 +279,14 @@ export abstract class AdaParserBase extends Parser {
 
     EnterDeclaration(): void {
         if (this._debug) process.stderr.write("EnterDeclaration\n");
-        let context: ParserRuleContext | null = this.context;
-        for (; context !== null; context = context.parent as ParserRuleContext | null) {
-            if (context instanceof Full_type_declarationContext) {
-                const defId = context.defining_identifier();
+        let ctx: ParserRuleContext | null = this.context;
+        for (; ctx !== null; ctx = ctx.parent as ParserRuleContext | null) {
+            if (isFull_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null) {
                     const name = defId.getText();
                     let isComposite = false;
-                    const typeDef = context.type_definition();
+                    const typeDef = ctx.type_definition();
                     if (typeDef !== null) {
                         isComposite = typeDef.record_type_definition() !== null
                                    || typeDef.array_type_definition() !== null;
@@ -178,12 +295,12 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Subtype_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isSubtype_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null) {
                     const name = defId.getText();
                     let isComposite = false;
-                    const si = context.subtype_indication();
+                    const si = ctx.subtype_indication();
                     if (si !== null) {
                         const sm = si.subtype_mark();
                         if (sm !== null) {
@@ -195,8 +312,8 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Object_declarationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isObject_declarationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ObjectName_, di.start);
@@ -204,8 +321,8 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Number_declarationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isNumber_declarationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ObjectName_, di.start);
@@ -213,16 +330,16 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Subprogram_declarationContext) {
-                this._defineSubprogramFromSpec(context.subprogram_specification());
+            if (isSubprogram_declarationContext(ctx)) {
+                this._defineSubprogramFromSpec(ctx.subprogram_specification());
                 return;
             }
-            if (context instanceof Subprogram_bodyContext) {
-                this._defineSubprogramFromSpec(context.subprogram_specification());
+            if (isSubprogram_bodyContext(ctx)) {
+                this._defineSubprogramFromSpec(ctx.subprogram_specification());
                 return;
             }
-            if (context instanceof Package_declarationContext) {
-                const pkgSpec = context.package_specification();
+            if (isPackage_declarationContext(ctx)) {
+                const pkgSpec = ctx.package_specification();
                 if (pkgSpec !== null) {
                     const dpun = pkgSpec.defining_program_unit_name();
                     if (dpun !== null) {
@@ -233,8 +350,8 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Package_bodyContext) {
-                const dpun = context.defining_program_unit_name();
+            if (isPackage_bodyContext(ctx)) {
+                const dpun = ctx.defining_program_unit_name();
                 if (dpun !== null) {
                     const defId = dpun.defining_identifier();
                     if (defId !== null)
@@ -242,8 +359,8 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Exception_declarationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isException_declarationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ExceptionName_, di.start);
@@ -251,38 +368,38 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Task_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isTask_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Single_task_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isSingle_task_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Protected_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isProtected_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Single_protected_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isSingle_protected_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Entry_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isEntry_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.SubprogramName_, defId.start);
                 return;
             }
-            if (context instanceof Component_declarationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isComponent_declarationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ComponentName_, di.start);
@@ -290,36 +407,36 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Incomplete_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isIncomplete_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Private_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isPrivate_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Private_extension_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isPrivate_extension_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start, true);
                 return;
             }
-            if (context instanceof Generic_instantiationContext) {
-                const dpun = context.defining_program_unit_name();
+            if (isGeneric_instantiationContext(ctx)) {
+                const dpun = ctx.defining_program_unit_name();
                 if (dpun !== null) {
                     const defId = dpun.defining_identifier();
                     if (defId !== null) {
                         let tc = TypeClassification.PackageName_;
-                        if (context.PROCEDURE() !== null) tc = TypeClassification.SubprogramName_;
-                        else if (context.FUNCTION() !== null) tc = TypeClassification.SubprogramName_;
+                        if (ctx.PROCEDURE() !== null) tc = TypeClassification.SubprogramName_;
+                        else if (ctx.FUNCTION() !== null) tc = TypeClassification.SubprogramName_;
                         this._defineSymbol(defId.getText(), tc, defId.start);
                     }
                 }
-                const dd = context.defining_designator();
+                const dd = ctx.defining_designator();
                 if (dd !== null) {
                     const ddDpun = dd.defining_program_unit_name();
                     if (ddDpun !== null) {
@@ -330,20 +447,20 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Object_renaming_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isObject_renaming_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Exception_renaming_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isException_renaming_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ExceptionName_, defId.start);
                 return;
             }
-            if (context instanceof Package_renaming_declarationContext) {
-                const dpun = context.defining_program_unit_name();
+            if (isPackage_renaming_declarationContext(ctx)) {
+                const dpun = ctx.defining_program_unit_name();
                 if (dpun !== null) {
                     const defId = dpun.defining_identifier();
                     if (defId !== null)
@@ -351,20 +468,20 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Formal_complete_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isFormal_complete_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Formal_incomplete_type_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isFormal_incomplete_type_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.TypeName_, defId.start);
                 return;
             }
-            if (context instanceof Formal_object_declarationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isFormal_object_declarationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ObjectName_, di.start);
@@ -372,14 +489,14 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Formal_package_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isFormal_package_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.PackageName_, defId.start);
                 return;
             }
-            if (context instanceof Parameter_specificationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isParameter_specificationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ObjectName_, di.start);
@@ -387,62 +504,62 @@ export abstract class AdaParserBase extends Parser {
                 }
                 return;
             }
-            if (context instanceof Loop_parameter_specificationContext) {
-                const defId = context.defining_identifier();
+            if (isLoop_parameter_specificationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Iterator_specificationContext) {
-                const defId = context.defining_identifier();
+            if (isIterator_specificationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Enumeration_literal_specificationContext) {
-                const defId = context.defining_identifier();
+            if (isEnumeration_literal_specificationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.EnumerationLiteral_, defId.start);
                 return;
             }
-            if (context instanceof Choice_parameter_specificationContext) {
-                const defId = context.defining_identifier();
+            if (isChoice_parameter_specificationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Entry_index_specificationContext) {
-                const defId = context.defining_identifier();
+            if (isEntry_index_specificationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Extended_return_object_declarationContext) {
-                const defId = context.defining_identifier();
+            if (isExtended_return_object_declarationContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Entry_bodyContext) {
-                const defId = context.defining_identifier();
+            if (isEntry_bodyContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.SubprogramName_, defId.start);
                 return;
             }
-            if (context instanceof Task_bodyContext) {
-                const defId = context.defining_identifier();
+            if (isTask_bodyContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Protected_bodyContext) {
-                const defId = context.defining_identifier();
+            if (isProtected_bodyContext(ctx)) {
+                const defId = ctx.defining_identifier();
                 if (defId !== null)
                     this._defineSymbol(defId.getText(), TypeClassification.ObjectName_, defId.start);
                 return;
             }
-            if (context instanceof Discriminant_specificationContext) {
-                const defIdList = context.defining_identifier_list();
+            if (isDiscriminant_specificationContext(ctx)) {
+                const defIdList = ctx.defining_identifier_list();
                 if (defIdList !== null) {
                     for (const di of defIdList.defining_identifier()) {
                         this._defineSymbol(di.getText(), TypeClassification.ObjectName_, di.start);
@@ -500,10 +617,10 @@ export abstract class AdaParserBase extends Parser {
     }
 
     PushExpectedType(): void {
-        let context: ParserRuleContext | null = this.context;
-        for (; context !== null; context = context.parent as ParserRuleContext | null) {
-            if (context instanceof Object_declarationContext) {
-                const si = context.subtype_indication();
+        let ctx: ParserRuleContext | null = this.context;
+        for (; ctx !== null; ctx = ctx.parent as ParserRuleContext | null) {
+            if (isObject_declarationContext(ctx)) {
+                const si = ctx.subtype_indication();
                 if (si !== null) {
                     const sm = si.subtype_mark();
                     if (sm !== null) {
@@ -516,8 +633,8 @@ export abstract class AdaParserBase extends Parser {
                 this._expectedTypeStack.push(null);
                 return;
             }
-            if (context instanceof Assignment_statementContext) {
-                const n = context.name();
+            if (isAssignment_statementContext(ctx)) {
+                const n = ctx.name();
                 if (n !== null) {
                     const nameText = n.getText();
                     const resolved = this._st.resolve(nameText);
@@ -528,8 +645,8 @@ export abstract class AdaParserBase extends Parser {
                 this._expectedTypeStack.push(null);
                 return;
             }
-            if (context instanceof Component_declarationContext) {
-                const compDef = context.component_definition();
+            if (isComponent_declarationContext(ctx)) {
+                const compDef = ctx.component_definition();
                 if (compDef !== null) {
                     const si = compDef.subtype_indication();
                     if (si !== null) {
@@ -545,13 +662,13 @@ export abstract class AdaParserBase extends Parser {
                 this._expectedTypeStack.push(null);
                 return;
             }
-            if (context instanceof Number_declarationContext) {
+            if (isNumber_declarationContext(ctx)) {
                 this._expectedTypeStack.push(null);
                 if (this._debug) process.stderr.write("PushExpectedType: null (scalar) from number_declaration\n");
                 return;
             }
-            if (context instanceof Parameter_specificationContext) {
-                const sm = context.subtype_mark();
+            if (isParameter_specificationContext(ctx)) {
+                const sm = ctx.subtype_mark();
                 if (sm !== null) {
                     const resolved = this._st.resolve(sm.getText());
                     this._expectedTypeStack.push(resolved);
@@ -561,7 +678,7 @@ export abstract class AdaParserBase extends Parser {
                 this._expectedTypeStack.push(null);
                 return;
             }
-            if (context instanceof Simple_return_statementContext) {
+            if (isSimple_return_statementContext(ctx)) {
                 this._expectedTypeStack.push(null);
                 if (this._debug) process.stderr.write("PushExpectedType: null from simple_return_statement\n");
                 return;
