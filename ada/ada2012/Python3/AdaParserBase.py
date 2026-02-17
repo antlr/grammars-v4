@@ -1,10 +1,13 @@
 from antlr4 import *
 from antlr4.Token import CommonToken
 import sys
+import os
 from typing import TextIO
 
 
 class AdaParserBase(Parser):
+    _package_cache = {}  # class-level: package name -> exported symbols
+    _parsing_in_progress = set()  # class-level: paths being parsed
 
     def __init__(self, input: TokenStream, output: TextIO = sys.stdout):
         super().__init__(input, output)
@@ -18,6 +21,11 @@ class AdaParserBase(Parser):
         self._output_symbol_table = "--output-symbol-table" in sys.argv
         self._output_applied_occurrences = "--output-applied-occurrences" in sys.argv
         self._no_semantics = self._parse_no_semantics()
+        self._search_paths = []
+        self._current_file = ""
+        for arg in sys.argv:
+            if arg.lower().startswith("--i") and len(arg) > 3:
+                self._search_paths.append(arg[3:])
 
     @staticmethod
     def _parse_no_semantics():
@@ -372,6 +380,133 @@ class AdaParserBase(Parser):
     def OutputSymbolTable(self):
         if self._output_symbol_table:
             print(str(self._st), file=sys.stderr)
+
+    def ImportWithClause(self):
+        if "IsTypeName" in self._no_semantics and "IsAggregate" in self._no_semantics:
+            return
+
+        # Auto-detect current file from token stream
+        if not self._current_file:
+            stream = self._input
+            if hasattr(stream, 'tokenSource') and stream.tokenSource:
+                source_name = getattr(stream.tokenSource, 'sourceName', None)
+                if source_name and source_name != "unknown" and os.path.isfile(source_name):
+                    self._current_file = os.path.abspath(source_name)
+
+        if "." in __name__:
+            from .AdaParser import AdaParser
+            from .AdaLexer import AdaLexer
+            from .TypeClassification import TypeClassification
+            from .Symbol import Symbol
+        else:
+            from AdaParser import AdaParser
+            from AdaLexer import AdaLexer
+            from TypeClassification import TypeClassification
+            from Symbol import Symbol
+
+        context = self._ctx
+        names = None
+        if isinstance(context, AdaParser.Nonlimited_with_clauseContext):
+            names = context.name()
+        elif isinstance(context, AdaParser.Limited_with_clauseContext):
+            names = context.name()
+        if not names:
+            return
+
+        for name_ctx in names:
+            package_name = name_ctx.getText()
+            if self._debug:
+                print(f"ImportWithClause: processing 'with {package_name}'", file=sys.stderr)
+
+            file_name = self._package_name_to_file_name(package_name)
+            cache_key = package_name.lower()
+
+            if cache_key in AdaParserBase._package_cache:
+                if self._debug:
+                    print(f"ImportWithClause: using cached symbols for {package_name}", file=sys.stderr)
+                for sym in AdaParserBase._package_cache[cache_key]:
+                    copy = Symbol()
+                    copy.name = sym.name
+                    copy.classification = set(sym.classification)
+                    copy.is_composite = sym.is_composite
+                    copy.defined_file = sym.defined_file
+                    copy.defined_line = sym.defined_line
+                    copy.defined_column = sym.defined_column
+                    self._st.define(copy)
+                continue
+
+            ads_path = self._find_ads_file(file_name)
+            if ads_path is None:
+                if self._debug:
+                    print(f"ImportWithClause: could not find {file_name}", file=sys.stderr)
+                continue
+
+            full_path = os.path.abspath(ads_path).lower()
+            if full_path in AdaParserBase._parsing_in_progress:
+                if self._debug:
+                    print(f"ImportWithClause: skipping {file_name} (cycle detected)", file=sys.stderr)
+                continue
+
+            symbols = self._parse_ads_file(ads_path)
+            if symbols is not None:
+                AdaParserBase._package_cache[cache_key] = symbols
+                for sym in symbols:
+                    copy = Symbol()
+                    copy.name = sym.name
+                    copy.classification = set(sym.classification)
+                    copy.is_composite = sym.is_composite
+                    copy.defined_file = sym.defined_file
+                    copy.defined_line = sym.defined_line
+                    copy.defined_column = sym.defined_column
+                    self._st.define(copy)
+                    if self._debug:
+                        print(f"ImportWithClause: imported symbol {sym.name} from {package_name}", file=sys.stderr)
+
+    def _package_name_to_file_name(self, package_name):
+        return package_name.lower().replace('.', '-') + ".ads"
+
+    def _find_ads_file(self, file_name):
+        if self._current_file:
+            dir_path = os.path.dirname(self._current_file)
+            if dir_path:
+                candidate = os.path.join(dir_path, file_name)
+                if os.path.isfile(candidate):
+                    return candidate
+        for search_path in self._search_paths:
+            candidate = os.path.join(search_path, file_name)
+            if os.path.isfile(candidate):
+                return candidate
+        return None
+
+    def _parse_ads_file(self, ads_path):
+        if "." in __name__:
+            from .AdaParser import AdaParser
+            from .AdaLexer import AdaLexer
+        else:
+            from AdaParser import AdaParser
+            from AdaLexer import AdaLexer
+        full_path = os.path.abspath(ads_path).lower()
+        AdaParserBase._parsing_in_progress.add(full_path)
+        try:
+            if self._debug:
+                print(f"ImportWithClause: parsing {ads_path}", file=sys.stderr)
+            from antlr4 import CommonTokenStream, InputStream
+            with open(ads_path, 'r') as f:
+                input_stream = InputStream(f.read())
+            lexer = AdaLexer(input_stream)
+            lexer.removeErrorListeners()
+            token_stream = CommonTokenStream(lexer)
+            parser = AdaParser(token_stream)
+            parser.removeErrorListeners()
+            parser._current_file = os.path.abspath(ads_path)
+            parser.compilation()
+            return parser._st.get_exported_symbols()
+        except Exception as ex:
+            if self._debug:
+                print(f"ImportWithClause: error parsing {ads_path}: {ex}", file=sys.stderr)
+            return None
+        finally:
+            AdaParserBase._parsing_in_progress.discard(full_path)
 
     def ParsePragmas(self):
         if "." in __name__:

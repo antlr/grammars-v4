@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -17,7 +18,12 @@ type AdaParserBase struct {
 	outputAppliedOccurrences bool
 	noSemantics             map[string]bool
 	initialized             bool
+	searchPaths             []string
+	currentFile             string
 }
+
+var packageCache = make(map[string][]*Symbol)
+var parsingInProgress = make(map[string]bool)
 
 func (p *AdaParserBase) initSemantics() {
 	if p.initialized {
@@ -37,6 +43,9 @@ func (p *AdaParserBase) initSemantics() {
 		}
 		if strings.Contains(lower, "--output-applied-occurrences") {
 			p.outputAppliedOccurrences = true
+		}
+		if strings.HasPrefix(lower, "--i") && len(arg) > 3 {
+			p.searchPaths = append(p.searchPaths, arg[3:])
 		}
 		if strings.HasPrefix(lower, "--no-semantics") {
 			eq := strings.Index(arg, "=")
@@ -508,6 +517,160 @@ func (p *AdaParserBase) OutputSymbolTable() {
 	if p.outputSymbolTableFlag {
 		fmt.Fprintln(os.Stderr, p.st.String())
 	}
+}
+
+func (p *AdaParserBase) ImportWithClause() {
+	p.initSemantics()
+	if p.noSemantics["IsTypeName"] && p.noSemantics["IsAggregate"] {
+		return
+	}
+
+	// Auto-detect current file from token stream
+	if p.currentFile == "" {
+		stream, ok := p.GetTokenStream().(*antlr.CommonTokenStream)
+		if ok {
+			sourceName := stream.GetTokenSource().GetSourceName()
+			if sourceName != "" && sourceName != "unknown" {
+				if _, err := os.Stat(sourceName); err == nil {
+					abs, err := filepath.Abs(sourceName)
+					if err == nil {
+						p.currentFile = abs
+					}
+				}
+			}
+		}
+	}
+
+	ctx := p.GetParserRuleContext()
+	var names []INameContext
+	switch c := ctx.(type) {
+	case *Nonlimited_with_clauseContext:
+		names = c.AllName()
+	case *Limited_with_clauseContext:
+		names = c.AllName()
+	default:
+		return
+	}
+	if len(names) == 0 {
+		return
+	}
+
+	for _, nameCtx := range names {
+		packageName := nameCtx.GetText()
+		if p.debug {
+			fmt.Fprintf(os.Stderr, "ImportWithClause: processing 'with %s'\n", packageName)
+		}
+
+		fileName := packageNameToFileName(packageName)
+		cacheKey := strings.ToLower(packageName)
+
+		if cached, ok := packageCache[cacheKey]; ok {
+			if p.debug {
+				fmt.Fprintf(os.Stderr, "ImportWithClause: using cached symbols for %s\n", packageName)
+			}
+			for _, sym := range cached {
+				copy := NewSymbol()
+				copy.Name = sym.Name
+				for k, v := range sym.Classification {
+					copy.Classification[k] = v
+				}
+				copy.IsComposite = sym.IsComposite
+				copy.DefinedFile = sym.DefinedFile
+				copy.DefinedLine = sym.DefinedLine
+				copy.DefinedColumn = sym.DefinedColumn
+				p.st.Define(copy)
+			}
+			continue
+		}
+
+		adsPath := p.findAdsFile(fileName)
+		if adsPath == "" {
+			if p.debug {
+				fmt.Fprintf(os.Stderr, "ImportWithClause: could not find %s\n", fileName)
+			}
+			continue
+		}
+
+		fullPath, _ := filepath.Abs(adsPath)
+		fullPathLower := strings.ToLower(fullPath)
+		if parsingInProgress[fullPathLower] {
+			if p.debug {
+				fmt.Fprintf(os.Stderr, "ImportWithClause: skipping %s (cycle detected)\n", fileName)
+			}
+			continue
+		}
+
+		symbols := p.parseAdsFile(adsPath)
+		if symbols != nil {
+			packageCache[cacheKey] = symbols
+			for _, sym := range symbols {
+				copy := NewSymbol()
+				copy.Name = sym.Name
+				for k, v := range sym.Classification {
+					copy.Classification[k] = v
+				}
+				copy.IsComposite = sym.IsComposite
+				copy.DefinedFile = sym.DefinedFile
+				copy.DefinedLine = sym.DefinedLine
+				copy.DefinedColumn = sym.DefinedColumn
+				p.st.Define(copy)
+				if p.debug {
+					fmt.Fprintf(os.Stderr, "ImportWithClause: imported symbol %s from %s\n", sym.Name, packageName)
+				}
+			}
+		}
+	}
+}
+
+func packageNameToFileName(packageName string) string {
+	return strings.ToLower(strings.ReplaceAll(packageName, ".", "-")) + ".ads"
+}
+
+func (p *AdaParserBase) findAdsFile(fileName string) string {
+	if p.currentFile != "" {
+		dir := filepath.Dir(p.currentFile)
+		candidate := filepath.Join(dir, fileName)
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+	for _, searchPath := range p.searchPaths {
+		candidate := filepath.Join(searchPath, fileName)
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+	return ""
+}
+
+func (p *AdaParserBase) parseAdsFile(adsPath string) []*Symbol {
+	fullPath, _ := filepath.Abs(adsPath)
+	fullPathLower := strings.ToLower(fullPath)
+	parsingInProgress[fullPathLower] = true
+	defer delete(parsingInProgress, fullPathLower)
+
+	if p.debug {
+		fmt.Fprintf(os.Stderr, "ImportWithClause: parsing %s\n", adsPath)
+	}
+
+	data, err := os.ReadFile(adsPath)
+	if err != nil {
+		if p.debug {
+			fmt.Fprintf(os.Stderr, "ImportWithClause: error reading %s: %v\n", adsPath, err)
+		}
+		return nil
+	}
+
+	input := antlr.NewInputStream(string(data))
+	lexer := NewAdaLexer(input)
+	lexer.RemoveErrorListeners()
+	tokenStream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+	parser := NewAdaParser(tokenStream)
+	parser.RemoveErrorListeners()
+	parser.currentFile = fullPath
+	parser.Compilation()
+
+	return parser.st.GetExportedSymbols()
 }
 
 func (p *AdaParserBase) ParsePragmas() {

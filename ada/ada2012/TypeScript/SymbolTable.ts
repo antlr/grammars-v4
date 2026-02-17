@@ -122,6 +122,18 @@ export class SymbolTable {
         this.exitScope();
     }
 
+    getExportedSymbols(): Symbol[] {
+        const result: Symbol[] = [];
+        if (this.scopeStack.length === 0) return result;
+        const global = this.scopeStack[0]; // bottom of stack = global scope
+        for (const [, sym] of global.members) {
+            if (!sym.predefined) {
+                result.push(sym);
+            }
+        }
+        return result;
+    }
+
     toString(): string {
         let sb = "";
         if (this.scopeStack.length > 0) {

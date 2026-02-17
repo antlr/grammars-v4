@@ -87,6 +87,18 @@ class SymbolTable {
     exitScope();
   }
 
+  List<Symbol> getExportedSymbols() {
+    List<Symbol> result = [];
+    if (_scopeStack.isEmpty) return result;
+    var global = _scopeStack.first;
+    for (var sym in global.members.values) {
+      if (!sym.predefined) {
+        result.add(sym);
+      }
+    }
+    return result;
+  }
+
   @override
   String toString() {
     var sb = StringBuffer();

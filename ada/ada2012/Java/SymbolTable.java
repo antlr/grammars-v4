@@ -114,6 +114,17 @@ public class SymbolTable {
         exitScope();
     }
 
+    public List<Symbol> getExportedSymbols() {
+        List<Symbol> result = new ArrayList<>();
+        Symbol[] scopes = scopeStack.toArray(new Symbol[0]);
+        Symbol global = scopes[scopes.length - 1]; // bottom of stack = global scope
+        for (Map.Entry<String, Symbol> entry : global.getMembers().entrySet()) {
+            if (!entry.getValue().isPredefined())
+                result.add(entry.getValue());
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

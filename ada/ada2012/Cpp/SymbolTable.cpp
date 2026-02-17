@@ -91,6 +91,18 @@ void SymbolTable::popBlockScope() {
     scopeStack.pop_back();
 }
 
+std::vector<Symbol*> SymbolTable::getExportedSymbols() {
+    std::vector<Symbol*> result;
+    if (scopeStack.empty()) return result;
+    Symbol* global = scopeStack.front();
+    for (auto& entry : global->members) {
+        if (!entry.second->predefined) {
+            result.push_back(entry.second);
+        }
+    }
+    return result;
+}
+
 std::string SymbolTable::toString() const {
     std::string sb;
     if (!scopeStack.empty()) {

@@ -4,6 +4,12 @@
 #include "AdaParser.h"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <sys/stat.h>
+
+std::map<std::string, std::vector<Symbol>> AdaParserBase::_packageCache;
+std::set<std::string> AdaParserBase::_parsingInProgress;
 
 AdaParserBase::AdaParserBase(antlr4::TokenStream * input) : antlr4::Parser(input)
 {
@@ -406,5 +412,184 @@ void AdaParserBase::ParsePragmas()
         parser.removeErrorListeners();
         parser.addErrorListener(&getErrorListenerDispatch());
         parser.pragmaRule();
+    }
+}
+
+std::string AdaParserBase::toLowerStr(const std::string& s) {
+    std::string result = s;
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+bool AdaParserBase::fileExists(const std::string& p) {
+    struct stat st;
+    return stat(p.c_str(), &st) == 0;
+}
+
+std::string AdaParserBase::getFullPath(const std::string& p) {
+#ifdef _WIN32
+    char buf[_MAX_PATH];
+    if (_fullpath(buf, p.c_str(), _MAX_PATH) != nullptr) return std::string(buf);
+#else
+    char* resolved = realpath(p.c_str(), nullptr);
+    if (resolved) {
+        std::string result(resolved);
+        free(resolved);
+        return result;
+    }
+#endif
+    return p;
+}
+
+std::string AdaParserBase::getDirName(const std::string& p) {
+    auto pos = p.find_last_of("/\\");
+    if (pos == std::string::npos) return ".";
+    return p.substr(0, pos);
+}
+
+std::string AdaParserBase::packageNameToFileName(const std::string& packageName) {
+    std::string lower = toLowerStr(packageName);
+    std::replace(lower.begin(), lower.end(), '.', '-');
+    return lower + ".ads";
+}
+
+std::string AdaParserBase::findAdsFile(const std::string& fileName) {
+    if (!currentFile.empty()) {
+        std::string dir = getDirName(currentFile);
+        std::string candidate = dir + "/" + fileName;
+        if (fileExists(candidate)) return candidate;
+    }
+    for (const auto& searchPath : _searchPaths) {
+        std::string candidate = searchPath + "/" + fileName;
+        if (fileExists(candidate)) return candidate;
+    }
+    return "";
+}
+
+std::vector<Symbol> AdaParserBase::parseAdsFile(const std::string& adsPath) {
+    std::string fullPath = getFullPath(adsPath);
+    std::string fullPathLower = toLowerStr(fullPath);
+    _parsingInProgress.insert(fullPathLower);
+    std::vector<Symbol> result;
+    try {
+        if (debug) std::cerr << "ImportWithClause: parsing " << adsPath << std::endl;
+        std::ifstream file(adsPath);
+        if (!file.is_open()) {
+            _parsingInProgress.erase(fullPathLower);
+            return result;
+        }
+        std::stringstream ss;
+        ss << file.rdbuf();
+        std::string content = ss.str();
+        file.close();
+
+        antlr4::ANTLRInputStream input(content);
+        input.name = adsPath;
+        AdaLexer lexer(&input);
+        lexer.removeErrorListeners();
+        antlr4::CommonTokenStream tokenStream(&lexer);
+        AdaParser parser(&tokenStream);
+        parser.removeErrorListeners();
+        parser.currentFile = fullPath;
+        parser.compilation();
+
+        auto exported = parser._st.getExportedSymbols();
+        for (auto* sym : exported) {
+            Symbol copy;
+            copy.name = sym->name;
+            copy.classification = sym->classification;
+            copy.isComposite = sym->isComposite;
+            copy.definedFile = sym->definedFile;
+            copy.definedLine = sym->definedLine;
+            copy.definedColumn = sym->definedColumn;
+            result.push_back(copy);
+        }
+    } catch (const std::exception& ex) {
+        if (debug) std::cerr << "ImportWithClause: error parsing " << adsPath << ": " << ex.what() << std::endl;
+    } catch (...) {
+        if (debug) std::cerr << "ImportWithClause: error parsing " << adsPath << std::endl;
+    }
+    _parsingInProgress.erase(fullPathLower);
+    return result;
+}
+
+void AdaParserBase::ImportWithClause() {
+    if (noSemantics.count("IsTypeName") && noSemantics.count("IsAggregate")) return;
+
+    // Auto-detect current file from token stream
+    if (currentFile.empty()) {
+        auto stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+        if (stream) {
+            std::string sourceName = stream->getTokenSource()->getSourceName();
+            if (!sourceName.empty() && sourceName != "unknown" && fileExists(sourceName)) {
+                currentFile = getFullPath(sourceName);
+            }
+        }
+    }
+
+    auto context = dynamic_cast<antlr4::ParserRuleContext*>(getContext());
+    std::vector<AdaParser::NameContext*> names;
+    if (auto nwc = dynamic_cast<AdaParser::Nonlimited_with_clauseContext*>(context)) {
+        names = nwc->name();
+    } else if (auto lwc = dynamic_cast<AdaParser::Limited_with_clauseContext*>(context)) {
+        names = lwc->name();
+    }
+    if (names.empty()) return;
+
+    for (auto nameCtx : names) {
+        std::string packageName = nameCtx->getText();
+        if (debug) std::cerr << "ImportWithClause: processing 'with " << packageName << "'" << std::endl;
+
+        std::string fileName = packageNameToFileName(packageName);
+        std::string packageKey = toLowerStr(packageName);
+
+        // Check cache first
+        auto cacheIt = _packageCache.find(packageKey);
+        if (cacheIt != _packageCache.end()) {
+            if (debug) std::cerr << "ImportWithClause: using cached symbols for " << packageName << std::endl;
+            for (const auto& sym : cacheIt->second) {
+                auto* copy = new Symbol();
+                copy->name = sym.name;
+                copy->classification = sym.classification;
+                copy->isComposite = sym.isComposite;
+                copy->definedFile = sym.definedFile;
+                copy->definedLine = sym.definedLine;
+                copy->definedColumn = sym.definedColumn;
+                _st.define(copy);
+            }
+            continue;
+        }
+
+        // Search for the .ads file
+        std::string adsPath = findAdsFile(fileName);
+        if (adsPath.empty()) {
+            if (debug) std::cerr << "ImportWithClause: could not find " << fileName << std::endl;
+            continue;
+        }
+
+        // Cycle detection
+        std::string fullPath = getFullPath(adsPath);
+        std::string fullPathLower = toLowerStr(fullPath);
+        if (_parsingInProgress.count(fullPathLower)) {
+            if (debug) std::cerr << "ImportWithClause: skipping " << fileName << " (cycle detected)" << std::endl;
+            continue;
+        }
+
+        // Parse the .ads file
+        std::vector<Symbol> symbols = parseAdsFile(adsPath);
+        if (!symbols.empty()) {
+            _packageCache[packageKey] = symbols;
+            for (const auto& sym : symbols) {
+                auto* copy = new Symbol();
+                copy->name = sym.name;
+                copy->classification = sym.classification;
+                copy->isComposite = sym.isComposite;
+                copy->definedFile = sym.definedFile;
+                copy->definedLine = sym.definedLine;
+                copy->definedColumn = sym.definedColumn;
+                _st.define(copy);
+                if (debug) std::cerr << "ImportWithClause: imported symbol " << sym.name << " from " << packageName << std::endl;
+            }
+        }
     }
 }

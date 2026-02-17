@@ -1,4 +1,6 @@
 import antlr4 from 'antlr4';
+import fs from 'fs';
+import pathModule from 'path';
 import AdaLexer from './AdaLexer.js';
 import AdaParser from './AdaParser.js';
 import Symbol from './Symbol.js';
@@ -52,6 +54,8 @@ export default class AdaParserBase extends antlr4.Parser {
         this._outputSymbolTable = false;
         this._outputAppliedOccurrences = false;
         this._noSemantics = new Set();
+        this._searchPaths = [];
+        this._currentFile = "";
         this._initOptions();
     }
 
@@ -61,6 +65,11 @@ export default class AdaParserBase extends antlr4.Parser {
         this._debug = args.some(a => a.toLowerCase().indexOf("--debug") >= 0);
         this._outputSymbolTable = args.some(a => a.toLowerCase().indexOf("--output-symbol-table") >= 0);
         this._outputAppliedOccurrences = args.some(a => a.toLowerCase().indexOf("--output-applied-occurrences") >= 0);
+        for (var a of args) {
+            if (a.toLowerCase().startsWith("--i") && a.length > 3) {
+                this._searchPaths.push(a.substring(3));
+            }
+        }
     }
 
     IsAggregate() {
@@ -504,6 +513,122 @@ export default class AdaParserBase extends antlr4.Parser {
         }
     }
 
+    ImportWithClause() {
+        if (this._noSemantics.has("IsTypeName") && this._noSemantics.has("IsAggregate")) return;
+
+        // Auto-detect current file from the token stream if not already set
+        if (!this._currentFile) {
+            var stream = this._input;
+            var sourceName = stream && stream.tokenSource ? stream.tokenSource.sourceName : null;
+            if (sourceName && sourceName !== "unknown" && fs.existsSync(sourceName)) {
+                this._currentFile = pathModule.resolve(sourceName);
+            }
+        }
+
+        var context = this._ctx;
+        var names = null;
+        if (context instanceof AdaParser.Nonlimited_with_clauseContext) {
+            names = context.name();
+        } else if (context instanceof AdaParser.Limited_with_clauseContext) {
+            names = context.name();
+        }
+        if (!names || names.length === 0) return;
+
+        for (var ni = 0; ni < names.length; ni++) {
+            var nameCtx = names[ni];
+            var packageName = nameCtx.getText();
+            if (this._debug) process.stderr.write("ImportWithClause: processing 'with " + packageName + "'\n");
+
+            var fileName = this._packageNameToFileName(packageName);
+            var cacheKey = packageName.toLowerCase();
+
+            if (AdaParserBase._packageCache.has(cacheKey)) {
+                if (this._debug) process.stderr.write("ImportWithClause: using cached symbols for " + packageName + "\n");
+                var cachedSymbols = AdaParserBase._packageCache.get(cacheKey);
+                for (var ci = 0; ci < cachedSymbols.length; ci++) {
+                    var sym = cachedSymbols[ci];
+                    var copy = new Symbol();
+                    copy.name = sym.name;
+                    copy.classification = new Set(sym.classification);
+                    copy.isComposite = sym.isComposite;
+                    copy.definedFile = sym.definedFile;
+                    copy.definedLine = sym.definedLine;
+                    copy.definedColumn = sym.definedColumn;
+                    this._st.define(copy);
+                }
+                continue;
+            }
+
+            var adsPath = this._findAdsFile(fileName);
+            if (adsPath === null) {
+                if (this._debug) process.stderr.write("ImportWithClause: could not find " + fileName + "\n");
+                continue;
+            }
+
+            var fullPath = pathModule.resolve(adsPath).toLowerCase();
+            if (AdaParserBase._parsingInProgress.has(fullPath)) {
+                if (this._debug) process.stderr.write("ImportWithClause: skipping " + fileName + " (cycle detected)\n");
+                continue;
+            }
+
+            var symbols = this._parseAdsFile(adsPath);
+            if (symbols !== null) {
+                AdaParserBase._packageCache.set(cacheKey, symbols);
+                for (var si = 0; si < symbols.length; si++) {
+                    var sym = symbols[si];
+                    var copy = new Symbol();
+                    copy.name = sym.name;
+                    copy.classification = new Set(sym.classification);
+                    copy.isComposite = sym.isComposite;
+                    copy.definedFile = sym.definedFile;
+                    copy.definedLine = sym.definedLine;
+                    copy.definedColumn = sym.definedColumn;
+                    this._st.define(copy);
+                    if (this._debug) process.stderr.write("ImportWithClause: imported symbol " + sym.name + " from " + packageName + "\n");
+                }
+            }
+        }
+    }
+
+    _packageNameToFileName(packageName) {
+        return packageName.toLowerCase().replace(/\./g, '-') + ".ads";
+    }
+
+    _findAdsFile(fileName) {
+        if (this._currentFile) {
+            var dir = pathModule.dirname(this._currentFile);
+            var candidate = pathModule.join(dir, fileName);
+            if (fs.existsSync(candidate)) return candidate;
+        }
+        for (var i = 0; i < this._searchPaths.length; i++) {
+            var candidate = pathModule.join(this._searchPaths[i], fileName);
+            if (fs.existsSync(candidate)) return candidate;
+        }
+        return null;
+    }
+
+    _parseAdsFile(adsPath) {
+        var fullPath = pathModule.resolve(adsPath).toLowerCase();
+        AdaParserBase._parsingInProgress.add(fullPath);
+        try {
+            if (this._debug) process.stderr.write("ImportWithClause: parsing " + adsPath + "\n");
+            var input = new antlr4.CharStream(fs.readFileSync(adsPath, 'utf-8'));
+            var lexer = new AdaLexer(input);
+            lexer.removeErrorListeners();
+            var tokenStream = new antlr4.CommonTokenStream(lexer);
+            var parser = new AdaParser(tokenStream);
+            parser.removeErrorListeners();
+            parser._currentFile = pathModule.resolve(adsPath);
+            parser.compilation();
+            return parser._st.getExportedSymbols();
+        } catch (ex) {
+            if (this._debug) process.stderr.write("ImportWithClause: error parsing " + adsPath + ": " + ex.message + "\n");
+            return null;
+        } finally {
+            AdaParserBase._parsingInProgress.delete(fullPath);
+        }
+    }
+
     ParsePragmas() {
         var stream = this._input;
         stream.fill();
@@ -552,3 +677,6 @@ export default class AdaParserBase extends antlr4.Parser {
         }
     }
 }
+
+AdaParserBase._packageCache = new Map();
+AdaParserBase._parsingInProgress = new Set();

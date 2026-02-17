@@ -95,6 +95,14 @@ class SymbolTable:
     def pop_block_scope(self):
         self.exit_scope()
 
+    def get_exported_symbols(self):
+        result = []
+        global_scope = self._scope_stack[0]  # bottom of stack = global scope
+        for sym in global_scope.members.values():
+            if not sym.predefined:
+                result.append(sym)
+        return result
+
     def __str__(self):
         if self._scope_stack:
             return self._to_string_helper(self._scope_stack[0], 0)

@@ -77,6 +77,18 @@ export class SymbolTable {
         this.scopeStack.pop();
     }
 
+    getExportedSymbols(): Symbol[] {
+        const result: Symbol[] = [];
+        if (this.scopeStack.length === 0) return result;
+        const global = this.scopeStack[0];
+        for (const [, sym] of global.members) {
+            if (!sym.predefined) {
+                result.push(sym);
+            }
+        }
+        return result;
+    }
+
     toString(): string {
         let sb = "";
         if (this.scopeStack.length > 0) {

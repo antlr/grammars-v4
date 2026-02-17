@@ -106,6 +106,18 @@ export default class SymbolTable {
         this.scopeStack.pop();
     }
 
+    getExportedSymbols() {
+        var result = [];
+        if (this.scopeStack.length === 0) return result;
+        var global = this.scopeStack[0]; // bottom of stack = global scope
+        for (var [key, sym] of global.members) {
+            if (!sym.predefined) {
+                result.push(sym);
+            }
+        }
+        return result;
+    }
+
     toString() {
         var result = "";
         if (this.scopeStack.length > 0) {

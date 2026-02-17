@@ -8,4 +8,7 @@
    <test>
       <inputs>examples/acats/a/**/*.adb</inputs>
    </test>
+   <test>
+      <inputs>examples/semtest/main.adb</inputs>
+   </test>
 </desc>

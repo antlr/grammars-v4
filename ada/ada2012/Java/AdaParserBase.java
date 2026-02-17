@@ -1,14 +1,20 @@
 import org.antlr.v4.runtime.*;
 import java.util.*;
+import java.io.*;
+import java.nio.file.*;
 
 public abstract class AdaParserBase extends Parser {
 
-    private SymbolTable _st;
+    SymbolTable _st;
     private Deque<Symbol> _expectedTypeStack = new ArrayDeque<>();
     private boolean debug = false;
     private boolean outputSymbolTable = false;
     private boolean outputAppliedOccurrences = false;
     private Set<String> noSemantics = new HashSet<>();
+    private List<String> _searchPaths = new ArrayList<>();
+    private static Map<String, List<Symbol>> _packageCache = new HashMap<>();
+    private static Set<String> _parsingInProgress = new HashSet<>();
+    String _currentFile = "";
 
     private static final String[] ALL_SEMANTIC_FUNCTIONS = {
         "IsAggregate", "IsTypeName"
@@ -30,6 +36,11 @@ public abstract class AdaParserBase extends Parser {
         debug = args.stream().anyMatch(a -> a.toLowerCase().contains("--debug"));
         outputSymbolTable = args.stream().anyMatch(a -> a.toLowerCase().contains("--output-symbol-table"));
         outputAppliedOccurrences = args.stream().anyMatch(a -> a.toLowerCase().contains("--output-applied-occurrences"));
+        for (String arg : args) {
+            if (arg.toLowerCase().startsWith("--i") && arg.length() > 3) {
+                _searchPaths.add(arg.substring(3));
+            }
+        }
         _st = new SymbolTable();
     }
 
@@ -405,6 +416,126 @@ public abstract class AdaParserBase extends Parser {
     public void OutputSymbolTable() {
         if (outputSymbolTable) {
             System.err.println(_st.toString());
+        }
+    }
+
+    public void ImportWithClause() {
+        if (noSemantics.contains("IsTypeName") && noSemantics.contains("IsAggregate")) return;
+
+        // Auto-detect current file from token stream
+        if (_currentFile.isEmpty()) {
+            CommonTokenStream stream = (CommonTokenStream) getTokenStream();
+            String sourceName = stream.getTokenSource().getSourceName();
+            if (sourceName != null && !sourceName.isEmpty() && !sourceName.equals("unknown")) {
+                File f = new File(sourceName);
+                if (f.exists()) {
+                    try { _currentFile = f.getCanonicalPath(); } catch (IOException e) { _currentFile = f.getAbsolutePath(); }
+                }
+            }
+        }
+
+        ParserRuleContext context = getContext();
+        List<AdaParser.NameContext> names = null;
+        if (context instanceof AdaParser.Nonlimited_with_clauseContext) {
+            names = ((AdaParser.Nonlimited_with_clauseContext) context).name();
+        } else if (context instanceof AdaParser.Limited_with_clauseContext) {
+            names = ((AdaParser.Limited_with_clauseContext) context).name();
+        }
+        if (names == null || names.isEmpty()) return;
+
+        for (AdaParser.NameContext nameCtx : names) {
+            String packageName = nameCtx.getText();
+            if (debug) System.err.println("ImportWithClause: processing 'with " + packageName + "'");
+
+            String fileName = packageNameToFileName(packageName);
+
+            if (_packageCache.containsKey(packageName.toLowerCase())) {
+                List<Symbol> cachedSymbols = _packageCache.get(packageName.toLowerCase());
+                if (debug) System.err.println("ImportWithClause: using cached symbols for " + packageName);
+                for (Symbol sym : cachedSymbols) {
+                    Symbol copy = new Symbol();
+                    copy.setName(sym.getName());
+                    copy.setClassification(new HashSet<>(sym.getClassification()));
+                    copy.setComposite(sym.isComposite());
+                    copy.setDefinedFile(sym.getDefinedFile());
+                    copy.setDefinedLine(sym.getDefinedLine());
+                    copy.setDefinedColumn(sym.getDefinedColumn());
+                    _st.define(copy);
+                }
+                continue;
+            }
+
+            String adsPath = findAdsFile(fileName);
+            if (adsPath == null) {
+                if (debug) System.err.println("ImportWithClause: could not find " + fileName);
+                continue;
+            }
+
+            String fullPath;
+            try { fullPath = new File(adsPath).getCanonicalPath(); } catch (IOException e) { fullPath = new File(adsPath).getAbsolutePath(); }
+
+            if (_parsingInProgress.contains(fullPath.toLowerCase())) {
+                if (debug) System.err.println("ImportWithClause: skipping " + fileName + " (cycle detected)");
+                continue;
+            }
+
+            List<Symbol> symbols = parseAdsFile(adsPath);
+            if (symbols != null) {
+                _packageCache.put(packageName.toLowerCase(), symbols);
+                for (Symbol sym : symbols) {
+                    Symbol copy = new Symbol();
+                    copy.setName(sym.getName());
+                    copy.setClassification(new HashSet<>(sym.getClassification()));
+                    copy.setComposite(sym.isComposite());
+                    copy.setDefinedFile(sym.getDefinedFile());
+                    copy.setDefinedLine(sym.getDefinedLine());
+                    copy.setDefinedColumn(sym.getDefinedColumn());
+                    _st.define(copy);
+                    if (debug) System.err.println("ImportWithClause: imported symbol " + sym.getName() + " from " + packageName);
+                }
+            }
+        }
+    }
+
+    private String packageNameToFileName(String packageName) {
+        return packageName.toLowerCase().replace('.', '-') + ".ads";
+    }
+
+    private String findAdsFile(String fileName) {
+        if (!_currentFile.isEmpty()) {
+            File dir = new File(_currentFile).getParentFile();
+            if (dir != null) {
+                File candidate = new File(dir, fileName);
+                if (candidate.exists()) return candidate.getPath();
+            }
+        }
+        for (String searchPath : _searchPaths) {
+            File candidate = new File(searchPath, fileName);
+            if (candidate.exists()) return candidate.getPath();
+        }
+        return null;
+    }
+
+    private List<Symbol> parseAdsFile(String adsPath) {
+        String fullPath;
+        try { fullPath = new File(adsPath).getCanonicalPath(); } catch (IOException e) { fullPath = new File(adsPath).getAbsolutePath(); }
+        _parsingInProgress.add(fullPath.toLowerCase());
+        try {
+            if (debug) System.err.println("ImportWithClause: parsing " + adsPath);
+            CharStream input = CharStreams.fromPath(Paths.get(adsPath));
+            AdaLexer lexer = new AdaLexer(input);
+            lexer.removeErrorListeners();
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            AdaParser parser = new AdaParser(tokenStream);
+            parser.removeErrorListeners();
+            parser._currentFile = fullPath;
+            parser.compilation();
+            return parser._st.getExportedSymbols();
+        } catch (Exception ex) {
+            if (debug) System.err.println("ImportWithClause: error parsing " + adsPath + ": " + ex.getMessage());
+            return null;
+        } finally {
+            _parsingInProgress.remove(fullPath.toLowerCase());
         }
     }
 

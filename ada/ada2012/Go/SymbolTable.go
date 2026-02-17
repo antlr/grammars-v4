@@ -103,6 +103,20 @@ func (st *SymbolTable) PopBlockScope() {
 	st.scopeStack = st.scopeStack[:len(st.scopeStack)-1]
 }
 
+func (st *SymbolTable) GetExportedSymbols() []*Symbol {
+	var result []*Symbol
+	if len(st.scopeStack) == 0 {
+		return result
+	}
+	global := st.scopeStack[0] // bottom of stack = global scope
+	for _, sym := range global.Members {
+		if !sym.Predefined {
+			result = append(result, sym)
+		}
+	}
+	return result
+}
+
 func (st *SymbolTable) String() string {
 	var sb strings.Builder
 	if len(st.scopeStack) > 0 {

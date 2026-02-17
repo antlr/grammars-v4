@@ -13,6 +13,10 @@ abstract class AdaParserBase extends Parser {
     bool _outputSymbolTable = false;
     bool _outputAppliedOccurrences = false;
     final Set<String> _noSemantics = {};
+    final List<String> _searchPaths = [];
+    static final Map<String, List<ada.Symbol>> _packageCache = {};
+    static final Set<String> _parsingInProgress = {};
+    String _currentFile = "";
 
     static const List<String> _allSemanticFunctions = ["IsAggregate", "IsTypeName"];
 
@@ -378,6 +382,124 @@ abstract class AdaParserBase extends Parser {
     void OutputSymbolTable() {
         if (_outputSymbolTable) {
             stderr.writeln(_st.toString());
+        }
+    }
+
+    void ImportWithClause() {
+        if (_noSemantics.contains("IsTypeName") && _noSemantics.contains("IsAggregate")) return;
+
+        // Auto-detect current file from token stream
+        if (_currentFile.isEmpty) {
+            var stream = tokenStream;
+            if (stream is CommonTokenStream) {
+                var sourceName = stream.tokenSource.sourceName;
+                if (sourceName != null && sourceName.isNotEmpty && sourceName != "unknown") {
+                    var f = File(sourceName);
+                    if (f.existsSync()) {
+                        _currentFile = f.absolute.path;
+                    }
+                }
+            }
+        }
+
+        var ctx = context;
+        List<dynamic>? names;
+        if (ctx is Nonlimited_with_clauseContext) {
+            names = ctx.name();
+        } else if (ctx is Limited_with_clauseContext) {
+            names = ctx.name();
+        }
+        if (names == null || names.isEmpty) return;
+
+        for (var nameCtx in names) {
+            var packageName = nameCtx.text;
+            if (_debug) stderr.writeln("ImportWithClause: processing 'with $packageName'");
+
+            var fileName = _packageNameToFileName(packageName);
+            var cacheKey = packageName.toLowerCase();
+
+            if (_packageCache.containsKey(cacheKey)) {
+                if (_debug) stderr.writeln("ImportWithClause: using cached symbols for $packageName");
+                for (var sym in _packageCache[cacheKey]!) {
+                    var copy = ada.Symbol()
+                      ..name = sym.name
+                      ..classification = Set.from(sym.classification)
+                      ..isComposite = sym.isComposite
+                      ..definedFile = sym.definedFile
+                      ..definedLine = sym.definedLine
+                      ..definedColumn = sym.definedColumn;
+                    _st.define(copy);
+                }
+                continue;
+            }
+
+            var adsPath = _findAdsFile(fileName);
+            if (adsPath == null) {
+                if (_debug) stderr.writeln("ImportWithClause: could not find $fileName");
+                continue;
+            }
+
+            var fullPath = File(adsPath).absolute.path.toLowerCase();
+            if (_parsingInProgress.contains(fullPath)) {
+                if (_debug) stderr.writeln("ImportWithClause: skipping $fileName (cycle detected)");
+                continue;
+            }
+
+            var symbols = _parseAdsFile(adsPath);
+            if (symbols != null) {
+                _packageCache[cacheKey] = symbols;
+                for (var sym in symbols) {
+                    var copy = ada.Symbol()
+                      ..name = sym.name
+                      ..classification = Set.from(sym.classification)
+                      ..isComposite = sym.isComposite
+                      ..definedFile = sym.definedFile
+                      ..definedLine = sym.definedLine
+                      ..definedColumn = sym.definedColumn;
+                    _st.define(copy);
+                    if (_debug) stderr.writeln("ImportWithClause: imported symbol ${sym.name} from $packageName");
+                }
+            }
+        }
+    }
+
+    String _packageNameToFileName(String packageName) {
+        return packageName.toLowerCase().replaceAll('.', '-') + ".ads";
+    }
+
+    String? _findAdsFile(String fileName) {
+        if (_currentFile.isNotEmpty) {
+            var dir = File(_currentFile).parent.path;
+            var candidate = '$dir/$fileName';
+            if (File(candidate).existsSync()) return candidate;
+        }
+        for (var searchPath in _searchPaths) {
+            var candidate = '$searchPath/$fileName';
+            if (File(candidate).existsSync()) return candidate;
+        }
+        return null;
+    }
+
+    List<ada.Symbol>? _parseAdsFile(String adsPath) {
+        var fullPath = File(adsPath).absolute.path.toLowerCase();
+        _parsingInProgress.add(fullPath);
+        try {
+            if (_debug) stderr.writeln("ImportWithClause: parsing $adsPath");
+            var content = File(adsPath).readAsStringSync();
+            var input = InputStream.fromString(content);
+            var lexer = AdaLexer(input);
+            lexer.removeErrorListeners();
+            var stream = CommonTokenStream(lexer);
+            var parser = AdaParser(stream);
+            parser.removeErrorListeners();
+            parser._currentFile = File(adsPath).absolute.path;
+            parser.compilation();
+            return parser._st.getExportedSymbols();
+        } catch (ex) {
+            if (_debug) stderr.writeln("ImportWithClause: error parsing $adsPath: $ex");
+            return null;
+        } finally {
+            _parsingInProgress.remove(fullPath);
         }
     }
 

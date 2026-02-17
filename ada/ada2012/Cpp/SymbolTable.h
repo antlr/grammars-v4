@@ -13,6 +13,7 @@ public:
     Symbol* pushBlockScope();
     void popBlockScope();
     Symbol* currentScope();
+    std::vector<Symbol*> getExportedSymbols();
     std::string toString() const;
 
 private:
