@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Parser, TokenStream, Token, CommonToken, CommonTokenStream, ParserRuleContext } from "antlr4";
+import { Parser, TokenStream, Token, CommonToken, CommonTokenStream, CharStream, ParserRuleContext } from "antlr4";
 import AdaLexer from './AdaLexer';
 import AdaParser, {
     Full_type_declarationContext,
@@ -747,7 +747,7 @@ export default abstract class AdaParserBase extends Parser {
         // Auto-detect current file from token stream
         if (!this._currentFile) {
             const stream = this._input as CommonTokenStream;
-            const sourceName = (stream as any)?.tokenSource?.sourceName;
+            const sourceName = (stream as any)?.tokenSource?.inputStream?.name;
             if (sourceName && sourceName !== "unknown" && fs.existsSync(sourceName)) {
                 this._currentFile = path.resolve(sourceName);
             }
@@ -832,11 +832,10 @@ export default abstract class AdaParserBase extends Parser {
         AdaParserBase._parsingInProgress.add(fullPath);
         try {
             if (this._debug) process.stderr.write(`ImportWithClause: parsing ${adsPath}\n`);
-            const { CharStream, CommonTokenStream: CTS } = require("antlr4");
             const input = new CharStream(fs.readFileSync(adsPath, 'utf-8'));
             const lexer = new AdaLexer(input);
             lexer.removeErrorListeners();
-            const tokenStream = new CTS(lexer);
+            const tokenStream = new CommonTokenStream(lexer);
             const parser = new AdaParser(tokenStream);
             parser.removeErrorListeners();
             (parser as any)._currentFile = path.resolve(adsPath);
