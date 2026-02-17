@@ -1193,11 +1193,11 @@ with_clause
     ;
 
 limited_with_clause
-    : LIMITED PRIVATE? WITH name (',' name)* SEMI
+    : LIMITED PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
     ;
 
 nonlimited_with_clause
-    : PRIVATE? WITH name (',' name)* SEMI
+    : PRIVATE? WITH name (',' name)* SEMI {this.ImportWithClause();}
     ;
 
 body_stub

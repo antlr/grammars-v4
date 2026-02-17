@@ -119,6 +119,18 @@ public class SymbolTable {
         ExitScope();
     }
 
+    public List<Symbol> GetExportedSymbols()
+    {
+        var result = new List<Symbol>();
+        var global = scopeStack.ToArray()[scopeStack.Count - 1]; // bottom of stack = global scope
+        foreach (var entry in global.Members)
+        {
+            if (!entry.Value.Predefined)
+                result.Add(entry.Value);
+        }
+        return result;
+    }
+
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();

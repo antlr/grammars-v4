@@ -12,6 +12,14 @@ public abstract class AdaParserBase : Parser
     private bool outputSymbolTable = false;
     private bool outputAppliedOccurrences = false;
     private HashSet<string> noSemantics = new HashSet<string>();
+    private List<string> _searchPaths = new List<string>();
+    private static Dictionary<string, List<Symbol>> _packageCache
+        = new Dictionary<string, List<Symbol>>(StringComparer.OrdinalIgnoreCase);
+    private static HashSet<string> _parsingInProgress
+        = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    private string _currentFile = "";
+
+    public string CurrentFile { get { return _currentFile; } set { _currentFile = value; } }
 
     private static readonly string[] ALL_SEMANTIC_FUNCTIONS = {
         "IsAggregate", "IsTypeName"
@@ -35,6 +43,16 @@ public abstract class AdaParserBase : Parser
         debug = args?.Where(a => a.IndexOf("--debug", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         outputSymbolTable = args?.Where(a => a.IndexOf("--output-symbol-table", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
         outputAppliedOccurrences = args?.Where(a => a.IndexOf("--output-applied-occurrences", StringComparison.OrdinalIgnoreCase) >= 0).Any() ?? false;
+        if (args != null)
+        {
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("--I", StringComparison.OrdinalIgnoreCase) && arg.Length > 3)
+                {
+                    _searchPaths.Add(arg.Substring(3));
+                }
+            }
+        }
         _st = new SymbolTable();
     }
 
@@ -697,6 +715,162 @@ public abstract class AdaParserBase : Parser
         if (outputSymbolTable)
         {
             System.Console.Error.WriteLine(_st.ToString());
+        }
+    }
+
+    public void ImportWithClause()
+    {
+        if (noSemantics.Contains("IsTypeName") && noSemantics.Contains("IsAggregate")) return;
+
+        // Auto-detect current file from the token stream if not already set
+        if (string.IsNullOrEmpty(_currentFile))
+        {
+            var stream = this.InputStream as CommonTokenStream;
+            if (stream != null)
+            {
+                var sourceName = stream.TokenSource?.SourceName;
+                if (!string.IsNullOrEmpty(sourceName) && sourceName != "unknown" && File.Exists(sourceName))
+                {
+                    _currentFile = Path.GetFullPath(sourceName);
+                }
+            }
+        }
+
+        ParserRuleContext context = this.Context;
+        // Extract name nodes from the with_clause context
+        List<AdaParser.NameContext> names = null;
+        if (context is AdaParser.Nonlimited_with_clauseContext nwc)
+        {
+            names = new List<AdaParser.NameContext>(nwc.name());
+        }
+        else if (context is AdaParser.Limited_with_clauseContext lwc)
+        {
+            names = new List<AdaParser.NameContext>(lwc.name());
+        }
+
+        if (names == null || names.Count == 0) return;
+
+        foreach (var nameCtx in names)
+        {
+            var packageName = nameCtx.GetText();
+            if (debug) System.Console.Error.WriteLine("ImportWithClause: processing 'with " + packageName + "'");
+
+            var fileName = PackageNameToFileName(packageName);
+
+            // Check cache first
+            if (_packageCache.TryGetValue(packageName, out var cachedSymbols))
+            {
+                if (debug) System.Console.Error.WriteLine("ImportWithClause: using cached symbols for " + packageName);
+                foreach (var sym in cachedSymbols)
+                {
+                    _st.Define(new Symbol()
+                    {
+                        Name = sym.Name,
+                        Classification = new HashSet<TypeClassification>(sym.Classification),
+                        IsComposite = sym.IsComposite,
+                        DefinedFile = sym.DefinedFile,
+                        DefinedLine = sym.DefinedLine,
+                        DefinedColumn = sym.DefinedColumn
+                    });
+                }
+                continue;
+            }
+
+            // Search for the .ads file
+            var adsPath = FindAdsFile(fileName);
+            if (adsPath == null)
+            {
+                if (debug) System.Console.Error.WriteLine("ImportWithClause: could not find " + fileName);
+                continue;
+            }
+
+            // Cycle detection
+            var fullPath = Path.GetFullPath(adsPath);
+            if (_parsingInProgress.Contains(fullPath))
+            {
+                if (debug) System.Console.Error.WriteLine("ImportWithClause: skipping " + fileName + " (cycle detected)");
+                continue;
+            }
+
+            // Parse the .ads file
+            var symbols = ParseAdsFile(adsPath);
+            if (symbols != null)
+            {
+                _packageCache[packageName] = symbols;
+                foreach (var sym in symbols)
+                {
+                    _st.Define(new Symbol()
+                    {
+                        Name = sym.Name,
+                        Classification = new HashSet<TypeClassification>(sym.Classification),
+                        IsComposite = sym.IsComposite,
+                        DefinedFile = sym.DefinedFile,
+                        DefinedLine = sym.DefinedLine,
+                        DefinedColumn = sym.DefinedColumn
+                    });
+                    if (debug) System.Console.Error.WriteLine("ImportWithClause: imported symbol " + sym.Name + " from " + packageName);
+                }
+            }
+        }
+    }
+
+    private string PackageNameToFileName(string packageName)
+    {
+        return packageName.ToLowerInvariant().Replace('.', '-') + ".ads";
+    }
+
+    private string FindAdsFile(string fileName)
+    {
+        // 1. Directory of the current file being parsed
+        if (!string.IsNullOrEmpty(_currentFile))
+        {
+            var dir = Path.GetDirectoryName(_currentFile);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                var candidate = Path.Combine(dir, fileName);
+                if (File.Exists(candidate)) return candidate;
+            }
+        }
+
+        // 2. Directories specified by --I options
+        foreach (var searchPath in _searchPaths)
+        {
+            var candidate = Path.Combine(searchPath, fileName);
+            if (File.Exists(candidate)) return candidate;
+        }
+
+        return null;
+    }
+
+    private List<Symbol> ParseAdsFile(string adsPath)
+    {
+        var fullPath = Path.GetFullPath(adsPath);
+        _parsingInProgress.Add(fullPath);
+        try
+        {
+            if (debug) System.Console.Error.WriteLine("ImportWithClause: parsing " + adsPath);
+            var input = new Antlr4.Runtime.AntlrInputStream(File.ReadAllText(adsPath));
+            var lexer = new AdaLexer(input);
+            lexer.RemoveErrorListeners();
+            var tokenStream = new CommonTokenStream(lexer);
+            var parser = new AdaParser(tokenStream);
+            parser.RemoveErrorListeners();
+
+            // Copy settings to sub-parser
+            parser.CurrentFile = fullPath;
+
+            parser.compilation();
+
+            return parser._st.GetExportedSymbols();
+        }
+        catch (Exception ex)
+        {
+            if (debug) System.Console.Error.WriteLine("ImportWithClause: error parsing " + adsPath + ": " + ex.Message);
+            return null;
+        }
+        finally
+        {
+            _parsingInProgress.Remove(fullPath);
         }
     }
 
