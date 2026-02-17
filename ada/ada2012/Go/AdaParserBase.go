@@ -529,7 +529,7 @@ func (p *AdaParserBase) ImportWithClause() {
 	if p.currentFile == "" {
 		stream, ok := p.GetTokenStream().(*antlr.CommonTokenStream)
 		if ok {
-			sourceName := stream.GetTokenSource().GetSourceName()
+			sourceName := stream.GetTokenSource().GetInputStream().GetSourceName()
 			if sourceName != "" && sourceName != "unknown" {
 				if _, err := os.Stat(sourceName); err == nil {
 					abs, err := filepath.Abs(sourceName)
