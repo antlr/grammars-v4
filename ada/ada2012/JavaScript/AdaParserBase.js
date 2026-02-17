@@ -519,7 +519,7 @@ export default class AdaParserBase extends antlr4.Parser {
         // Auto-detect current file from the token stream if not already set
         if (!this._currentFile) {
             var stream = this._input;
-            var sourceName = stream && stream.tokenSource ? stream.tokenSource.sourceName : null;
+            var sourceName = stream && stream.tokenSource && stream.tokenSource.inputStream ? stream.tokenSource.inputStream.name : null;
             if (sourceName && sourceName !== "unknown" && fs.existsSync(sourceName)) {
                 this._currentFile = pathModule.resolve(sourceName);
             }
