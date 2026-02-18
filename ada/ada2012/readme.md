@@ -51,6 +51,15 @@ The parser base class implements the following command-line options:
 | `--output-symbol-table` | Output the symbol table to stderr after parsing completes. Shows all non-predefined symbols with their classification and source location. |
 | `--output-applied-occurrences` | Output applied occurrences (identifier references) to stderr as they are resolved. |
 
+## Peformance
+
+<img src="./times.svg">
+
+Runtime of `examples/*.c` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Samsung SSD 990 EVO Plus 2TB;
+Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
+.NET SDK: 10.0.102. Sample size 20.
+
 ## Reference
 * [pldb](http://pldb.info/concepts/ada)
 * http://www.ada-auth.org/acats.html
