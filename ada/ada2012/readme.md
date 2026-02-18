@@ -55,7 +55,7 @@ The parser base class implements the following command-line options:
 
 <img src="./times.svg">
 
-Runtime of `examples/*.c` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Runtime of `examples/acats/a/*.ada` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
 Samsung SSD 990 EVO Plus 2TB;
 Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
 .NET SDK: 10.0.102. Sample size 20.
