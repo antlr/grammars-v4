@@ -1,0 +1,6 @@
+SELECT * FROM t1;
+SELECT * FROM test.t1;
+SELECT ts, c1 FROM t1;
+SELECT ts, t.c1 FROM (SELECT * FROM t1) t;
+SELECT * FROM t1 tt1, t1 tt2 WHERE tt1.c1 = tt2.c1;
+SELECT * FROM st1;
