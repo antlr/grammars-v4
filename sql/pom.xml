@@ -20,6 +20,7 @@
         <module>derby</module>
         <module>drill</module>
         <module>hive</module>
+        <module>impala</module>
         <module>mariadb</module>
         <module>mysql/Positive-Technologies</module>
         <module>phoenix</module>
