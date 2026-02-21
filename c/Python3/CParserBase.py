@@ -12,7 +12,8 @@ ALL_SEMANTIC_FUNCTIONS = [
     "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
     "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-    "IsNullStructDeclarationListExtension"
+    "IsNullStructDeclarationListExtension",
+    "IsGnuAttributeBeforeDeclarator"
 ]
 
 def parseNoSemantics(args):
@@ -138,7 +139,7 @@ class CParserBase(Parser):
         result = (self.IsStorageClassSpecifier()
             or self.IsTypeSpecifier()
             or self.IsTypeQualifier()
-            or self.IsFunctionSpecifier()
+            or (self.IsFunctionSpecifier() and not self.IsGnuAttributeBeforeDeclarator())
             or self.IsAlignmentSpecifier())
         if self._debug:
             print("IsDeclarationSpecifier " + str(result) + " for " + str(lt1))
@@ -189,6 +190,31 @@ class CParserBase(Parser):
         if self._debug:
             print("IsFunctionSpecifier " + str(result))
         return result
+
+    def IsGnuAttributeBeforeDeclarator(self):
+        if "IsGnuAttributeBeforeDeclarator" in self.noSemantics:
+            return False
+        CLexer = self._getLexerModule()
+        i = 1
+        if self._input.LT(i).type != CLexer.Attribute:
+            return False
+        i += 1
+        depth = 0
+        while True:
+            t = self._input.LT(i)
+            i += 1
+            if t.type < 0:  # EOF
+                return False
+            if t.type == CLexer.LeftParen:
+                depth += 1
+            elif t.type == CLexer.RightParen:
+                depth -= 1
+                if depth == 0:
+                    break
+        next_type = self._input.LT(i).type
+        return (next_type == CLexer.Identifier
+                or next_type == CLexer.Star
+                or next_type == CLexer.LeftParen)
 
     def IsStatement(self):
         if "IsStatement" in self.noSemantics:

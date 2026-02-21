@@ -175,7 +175,7 @@ bool CParserBase::IsDeclarationSpecifier() {
     bool result = IsStorageClassSpecifier()
                   || IsTypeSpecifier()
                   || IsTypeQualifier()
-                  || IsFunctionSpecifier()
+                  || (IsFunctionSpecifier() && !IsGnuAttributeBeforeDeclarator())
                   || IsAlignmentSpecifier();
     if (debug_) std::cerr << "IsDeclarationSpecifier " << result << std::endl;
     return result;
@@ -215,6 +215,24 @@ bool CParserBase::IsFunctionSpecifier() {
     }
     if (debug_) std::cerr << " " << result << std::endl;
     return result;
+}
+
+bool CParserBase::IsGnuAttributeBeforeDeclarator() {
+    if (noSemantics_.count("IsGnuAttributeBeforeDeclarator")) return false;
+    auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    if (!ts) return false;
+    int i = 1;
+    if (ts->LT(i)->getType() != CLexer::Attribute) return false;
+    i++;
+    int depth = 0;
+    while (true) {
+        auto *t = ts->LT(i++);
+        if (t->getType() == antlr4::Token::EOF) return false;
+        if (t->getType() == CLexer::LeftParen) depth++;
+        else if (t->getType() == CLexer::RightParen) { depth--; if (depth == 0) break; }
+    }
+    int next = ts->LT(i)->getType();
+    return next == CLexer::Identifier || next == CLexer::Star || next == CLexer::LeftParen;
 }
 
 bool CParserBase::IsStatement() {

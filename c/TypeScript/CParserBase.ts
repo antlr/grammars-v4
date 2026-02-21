@@ -22,7 +22,8 @@ const ALL_SEMANTIC_FUNCTIONS = [
     "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
     "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-    "IsNullStructDeclarationListExtension"
+    "IsNullStructDeclarationListExtension",
+    "IsGnuAttributeBeforeDeclarator"
 ];
 
 function parseNoSemantics(args: string[]): Set<string> {
@@ -141,7 +142,7 @@ export default abstract class CParserBase extends Parser {
         const result = this.IsStorageClassSpecifier()
             || this.IsTypeSpecifier()
             || this.IsTypeQualifier()
-            || this.IsFunctionSpecifier()
+            || (this.IsFunctionSpecifier() && !this.IsGnuAttributeBeforeDeclarator())
             || this.IsAlignmentSpecifier();
         if (this.debug) console.log("IsDeclarationSpecifier " + result + " for " + lt1);
         return result;
@@ -186,6 +187,23 @@ export default abstract class CParserBase extends Parser {
         }
         if (this.debug) console.log("IsFunctionSpecifier " + result);
         return result;
+    }
+
+    public IsGnuAttributeBeforeDeclarator(): boolean {
+        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return false;
+        const ts = this._input as CommonTokenStream;
+        let i = 1;
+        if (ts.LT(i)!.type !== CLexer.Attribute) return false;
+        i++;
+        let depth = 0;
+        while (true) {
+            const t = ts.LT(i++)!;
+            if (t.type < 0) return false; // EOF
+            if (t.type === CLexer.LeftParen) depth++;
+            else if (t.type === CLexer.RightParen) { depth--; if (depth === 0) break; }
+        }
+        const next = ts.LT(i)!.type;
+        return next === CLexer.Identifier || next === CLexer.Star || next === CLexer.LeftParen;
     }
 
     public IsStatement(): boolean {

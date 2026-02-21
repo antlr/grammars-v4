@@ -30,6 +30,7 @@ public:
     bool IsDeclarationSpecifiers();
     bool IsEnumSpecifier();
     bool IsFunctionSpecifier();
+    bool IsGnuAttributeBeforeDeclarator();
     bool IsStatement();
     bool IsStaticAssertDeclaration();
     bool IsStorageClassSpecifier();

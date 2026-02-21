@@ -22,7 +22,8 @@ public abstract class CParserBase : Parser
         "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
         "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-        "IsNullStructDeclarationListExtension"
+        "IsNullStructDeclarationListExtension",
+        "IsGnuAttributeBeforeDeclarator"
     };
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
@@ -149,11 +150,11 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + lt1);
-        var result = 
+        var result =
             IsStorageClassSpecifier()
             || IsTypeSpecifier()
             || IsTypeQualifier()
-            || IsFunctionSpecifier()
+            || (IsFunctionSpecifier() && !IsGnuAttributeBeforeDeclarator())
             || IsAlignmentSpecifier();
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + result + " for " + lt1);
         return result;
@@ -210,6 +211,27 @@ public abstract class CParserBase : Parser
             result = false;
         if (this.debug) System.Console.WriteLine("IsFunctionSpecifier " + result);
         return result;
+    }
+
+    public bool IsGnuAttributeBeforeDeclarator()
+    {
+        if (no_semantics.Contains("IsGnuAttributeBeforeDeclarator")) return false;
+        var ts = this.InputStream as CommonTokenStream;
+        int i = 1;
+        if (ts.LT(i).Type != CLexer.Attribute) return false;
+        i++;
+        int depth = 0;
+        while (true)
+        {
+            var t = ts.LT(i++);
+            if (t.Type == TokenConstants.EOF) return false;
+            if (t.Type == CLexer.LeftParen) depth++;
+            else if (t.Type == CLexer.RightParen) { depth--; if (depth == 0) break; }
+        }
+        var next = ts.LT(i).Type;
+        return next == CLexer.Identifier
+            || next == CLexer.Star
+            || next == CLexer.LeftParen;
     }
 
     public bool IsStatement()

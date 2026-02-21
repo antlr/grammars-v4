@@ -14,7 +14,8 @@ const List<String> ALL_SEMANTIC_FUNCTIONS = [
   "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
   "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
   "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-  "IsNullStructDeclarationListExtension"
+  "IsNullStructDeclarationListExtension",
+  "IsGnuAttributeBeforeDeclarator"
 ];
 
 Set<String> parseNoSemantics(List<String> args) {
@@ -131,7 +132,7 @@ abstract class CParserBase extends Parser {
     var result = IsStorageClassSpecifier() ||
         IsTypeSpecifier() ||
         IsTypeQualifier() ||
-        IsFunctionSpecifier() ||
+        (IsFunctionSpecifier() && !IsGnuAttributeBeforeDeclarator()) ||
         IsAlignmentSpecifier();
     if (_debug) print("IsDeclarationSpecifier $result for $lt1");
     return result;
@@ -174,6 +175,23 @@ abstract class CParserBase extends Parser {
     }
     if (_debug) print("IsFunctionSpecifier $result");
     return result;
+  }
+
+  bool IsGnuAttributeBeforeDeclarator() {
+    if (_noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
+    final ts = inputStream as CommonTokenStream;
+    int i = 1;
+    if (ts.LT(i)?.type != CLexer.TOKEN_Attribute) return false;
+    i++;
+    int depth = 0;
+    while (true) {
+      final t = ts.LT(i++);
+      if ((t?.type ?? -1) < 0) return false; // EOF
+      if (t?.type == CLexer.TOKEN_LeftParen) depth++;
+      else if (t?.type == CLexer.TOKEN_RightParen) { depth--; if (depth == 0) break; }
+    }
+    final next = ts.LT(i)?.type;
+    return next == CLexer.TOKEN_Identifier || next == CLexer.TOKEN_Star || next == CLexer.TOKEN_LeftParen;
   }
 
   bool IsStatement() {

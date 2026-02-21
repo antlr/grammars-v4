@@ -20,7 +20,8 @@ const ALL_SEMANTIC_FUNCTIONS = [
     "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
     "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-    "IsNullStructDeclarationListExtension"
+    "IsNullStructDeclarationListExtension",
+    "IsGnuAttributeBeforeDeclarator"
 ];
 
 function parseNoSemantics(args) {
@@ -130,7 +131,7 @@ export default class CParserBase extends antlr4.Parser {
         const result = this.IsStorageClassSpecifier()
             || this.IsTypeSpecifier()
             || this.IsTypeQualifier()
-            || this.IsFunctionSpecifier()
+            || (this.IsFunctionSpecifier() && !this.IsGnuAttributeBeforeDeclarator())
             || this.IsAlignmentSpecifier();
         if (this._debug) console.log("IsDeclarationSpecifier " + result + " for " + lt1);
         return result;
@@ -175,6 +176,23 @@ export default class CParserBase extends antlr4.Parser {
         }
         if (this._debug) console.log("IsFunctionSpecifier " + result);
         return result;
+    }
+
+    IsGnuAttributeBeforeDeclarator() {
+        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return false;
+        const ts = this._input;
+        let i = 1;
+        if (ts.LT(i).type !== CLexer.Attribute) return false;
+        i++;
+        let depth = 0;
+        while (true) {
+            const t = ts.LT(i++);
+            if (t.type < 0) return false; // EOF
+            if (t.type === CLexer.LeftParen) depth++;
+            else if (t.type === CLexer.RightParen) { depth--; if (depth === 0) break; }
+        }
+        const next = ts.LT(i).type;
+        return next === CLexer.Identifier || next === CLexer.Star || next === CLexer.LeftParen;
     }
 
     IsStatement() {

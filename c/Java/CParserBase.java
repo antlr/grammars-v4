@@ -16,7 +16,8 @@ public abstract class CParserBase extends Parser {
         "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
         "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-        "IsNullStructDeclarationListExtension"
+        "IsNullStructDeclarationListExtension",
+        "IsGnuAttributeBeforeDeclarator"
     };
 
     protected CParserBase(TokenStream input) {
@@ -138,7 +139,7 @@ public abstract class CParserBase extends Parser {
         boolean result = IsStorageClassSpecifier()
                 || IsTypeSpecifier()
                 || IsTypeQualifier()
-                || IsFunctionSpecifier()
+                || (IsFunctionSpecifier() && !IsGnuAttributeBeforeDeclarator())
                 || IsAlignmentSpecifier();
         if (debug) System.out.println("IsDeclarationSpecifier " + result + " for " + lt1);
         return result;
@@ -183,6 +184,25 @@ public abstract class CParserBase extends Parser {
         }
         if (this.debug) System.out.println("IsFunctionSpecifier " + result);
         return result;
+    }
+
+    public boolean IsGnuAttributeBeforeDeclarator() {
+        if (noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
+        CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
+        int i = 1;
+        if (ts.LT(i).getType() != CLexer.Attribute) return false;
+        i++;
+        int depth = 0;
+        while (true) {
+            Token t = ts.LT(i++);
+            if (t.getType() == Token.EOF) return false;
+            if (t.getType() == CLexer.LeftParen) depth++;
+            else if (t.getType() == CLexer.RightParen) { depth--; if (depth == 0) break; }
+        }
+        int next = ts.LT(i).getType();
+        return next == CLexer.Identifier
+            || next == CLexer.Star
+            || next == CLexer.LeftParen;
     }
 
     public boolean IsStatement() {
