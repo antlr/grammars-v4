@@ -212,19 +212,21 @@ COMPLEX
 STRING
     : '"' (ESC | ~[\\"])*? '"'
     | '\'' ( ESC | ~[\\'])*? '\''
-    | '`' ( ESC | ~[\\'])*? '`'
+    | '`' ( ESC | ~[\\`])*? '`'
     ;
 
 fragment ESC
-    : '\\' [abtnfrv"'\\]
+    : '\\' [abtnfrv"'\\`]
     | UNICODE_ESCAPE
-    | HEX_ESCAPE
     | OCTAL_ESCAPE
+    | HEX_XHH
+    | '\\' .
     ;
 
 fragment UNICODE_ESCAPE
     : '\\' 'u' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT
-    | '\\' 'u' '{' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT '}'
+    | '\\' 'u' '{' HEXDIGIT+ '}'
+    | '\\' 'U' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT
     ;
 
 fragment OCTAL_ESCAPE
@@ -233,8 +235,8 @@ fragment OCTAL_ESCAPE
     | '\\' [0-7]
     ;
 
-fragment HEX_ESCAPE
-    : '\\' HEXDIGIT HEXDIGIT?
+fragment HEX_XHH
+    : '\\' 'x' HEXDIGIT HEXDIGIT
     ;
 
 ID
@@ -251,7 +253,7 @@ USER_OP
     ;
 
 COMMENT
-    : '#' .*? '\r'? '\n' -> type(NL)
+    : '#' ~[\r\n]* '\r'? '\n'? -> type(NL)
     ;
 
 // Match both UNIX and Windows newlines
