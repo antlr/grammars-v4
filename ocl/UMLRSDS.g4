@@ -39,6 +39,14 @@ interfaceDefinition
     : 'interface' identifier ('extends' identifier)? '{' classBody? '}'
     ;
 
+enumeration
+    : 'enumeration' identifier '{' enumerationLiteral+ '}'
+    ;
+
+enumerationLiteral
+    : 'literal' identifier
+    ;
+
 classDefinition
     : 'class' identifier ('extends' identifier)? ('implements' idList)? '{' classBody? '}'
     ;
