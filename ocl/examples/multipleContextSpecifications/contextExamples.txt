@@ -12,7 +12,7 @@ context MyContext inv:
     history->last().bindings->any(p | name = n).value
 
 context Company inv:
-    self.employee->select(p : Person | p.age > 50 ).notEmpty()
+    self.employee->select(p : Person | p.age > 50 )->notEmpty()
 
 context MyClass::derivedAttribute: Integer  
     derive: attribute1 + attribute2
