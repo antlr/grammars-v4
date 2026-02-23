@@ -6,6 +6,9 @@
       <inputs>examples/*.adb</inputs>
    </test>
    <test>
-      <inputs>examples/acats/a/**/*.adb</inputs>
+      <inputs>examples/acats/a/**/*.ada</inputs>
+   </test>
+   <test>
+      <inputs>examples/semtest/main.adb</inputs>
    </test>
 </desc>
