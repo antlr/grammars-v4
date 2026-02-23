@@ -24,7 +24,16 @@ specification
     ;
 
 expressions
-    : expression (';' expression)* ';'? EOF
+    : expressionOrLambda (';' expressionOrLambda)* ';'? EOF
+    ;
+
+expressionOrLambda
+    : lambdaExpression
+    | expression
+    ;
+
+lambdaExpression
+    : 'lambda' identifier ':' type 'in' expression
     ;
 
 classifier
