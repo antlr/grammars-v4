@@ -3,7 +3,7 @@ inv:
     self.processes->exists(p : ProductionOrder | 
         (p.type = 'Sublimation' or p.type = 'Tailoring') and 
         p.order < self.processes->select(proc | proc.type = 'Preparation')->first().order
-    )
+    ) 
 
 context Person inv: 
     statistics->sortedBy(totalSalary)->last().wellpaidEmployees->includes(self)
@@ -12,10 +12,47 @@ context MyContext inv:
     history->last().bindings->any(p | name = n).value
 
 context Company inv:
-    self.employee->select(p : Person | p.age > 50 ).notEmpty()
+    self.employee->select(p : Person | p.age > 50 )->notEmpty()
 
 context MyClass::derivedAttribute: Integer  
     derive: attribute1 + attribute2
 
 context Product::lowestPrice: Price 
     derive: sellingPrice->sortedBy(valueInEUR)->first()
+
+
+context Company inv: self.employee->forAll( e1, e2 : Person | e1 <> e2 implies e1.forename <> e2.forename)
+
+context Company inv: self.employee->exists( e1, e2 : Person | e1 <> e2)
+
+
+context SET inv: let variableReference : VariableReference = self.referenceOwner.oclAsType(VariableReference), queryResult : EObjectReference = variableReference.referencedVariable.oclAsType(QueryVariable).queryResult.oclAsType(EObjectReference) in if self.referenceOwner.oclIsKindOf(EObjectReference) then self.referenceOwner.oclAsType(EObjectReference).elements->size() = 1 else if self.referenceOwner.oclIsKindOf(VariableReference) then if variableReference.referencedVariable.oclIsKindOf(QueryVariable) then if variableReference.referencedVariable.oclAsType(QueryVariable).queryResult.oclIsKindOf(EObjectReference) then queryResult.elements->size() = 1 else false endif else true endif else true endif endif
+
+context Birthday inv: self.date <> null
+
+context Birthday inv: self.levels->first().name = 'Silver'
+
+context Birthday inv: self.cards->select(c | c.valid)->first().id
+
+context Birthday inv: self.customers->any(c | c.age > 18).id
+
+context Birthday inv: bodyEvals->at(1).environment = self.environment->addAll( bindings )
+
+context Prova inv: parts->select(valid)
+context Body inv: parts->select(x | x.valid)
+context Body inv: parts->collect(element)
+context Body inv: parts->collect(element | element.weight)
+context Body inv: c.Job->select(salary > 10000).employee->asSet()
+context EvalEnvironment inv: bindings->collect(name)->forAll( name: String | bindings->collect(name)->isUnique(name))
+context EvalEnvironment inv: self->iterate( elem; acc : Integer = 0 | if elem = object then acc + 1 else acc endif)
+context CollectionLiteralExp inv: type.oclAsType (CollectionType).elementType = part->iterate (p; c : Classifier = OclVoid | c.commonSuperType (p.type))
+context Schedule inv: days->forAll( hours >=10 )
+context LoopExp inv: self.iterator->forAll(initExpression->isEmpty())
+context IteratorExp inv: self.iterator->forAll(type = source.type.oclAsType (CollectionType).elementType)
+context Test inv: days->forAll(d: Day | d.hours >= 10)
+context Department inv: self.controls->forAll( p:Project | self.manages.employee.worksOn->select(hours >= 5)->includes(p) )
+
+context Test inv: aSet.name
+context Test inv: aSet->collect(name)
+context Tree
+inv: Tree.allInstances()->forAll(example | example.fruit->size() <= self.capacity)
