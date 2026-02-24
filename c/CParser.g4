@@ -296,7 +296,7 @@ constantExpression
 // ISO C: declaration (6.7.1)
 declaration
     : (
-	declarationSpecifiers initDeclaratorList? ';'
+	declarationSpecifiers ( {this.IsInitDeclaratorList()}? initDeclaratorList | ) ';'
 	| staticAssertDeclaration
 	| attributeDeclaration
       ) {this.EnterDeclaration();}

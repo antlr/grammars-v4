@@ -216,7 +216,7 @@ public abstract class CParserBase : Parser
 
     public bool IsGnuAttributeBeforeDeclarator(int k = 1)
     {
-        if (no_semantics.Contains("IsGnuAttributeBeforeDeclarator")) return false;
+        if (no_semantics.Contains("IsGnuAttributeBeforeDeclarator")) return true;
         var ts = this.InputStream as CommonTokenStream;
         int i = k;
         if (ts.LT(i).Type != CLexer.Attribute) return false;
@@ -615,19 +615,42 @@ public abstract class CParserBase : Parser
         return new SourceLocation(fileName, lineAdjusted, column);
     }
 
+    public bool IsInitDeclaratorList()
+    {
+        // Cannot be initDeclaratorList if the first thing is a type.
+        // Types need to go to preceeding declarationSpecifiers.
+        if (no_semantics.Contains("IsInitDeclaratorList")) return true;
+        var ts = this.InputStream as CommonTokenStream;
+        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var text = lt1.Text;
+        if (this.debug) System.Console.Write("IsInitDeclaratorList " + lt1);
+        var resolved = ResolveWithOutput(lt1);
+        bool result = false;
+        if (resolved == null)
+        {
+            result = true;
+        }
+        else if (resolved.Classification.Contains(TypeClassification.TypeQualifier_) || resolved.Classification.Contains(TypeClassification.TypeSpecifier_))
+            result = false;
+        else
+            result = true;
+        if (this.debug) System.Console.WriteLine(" " + result);
+        return result;
+    }
+    
     public bool IsSomethingOfTypeName()
     {
         // Returns true if current position looks like "sizeof ( typedefName )"
         // Used to prevent sizeof from entering the ('++' | '--' | 'sizeof')* loop
         // when it is actually a sizeof(type) expression, avoiding ambiguity.
-        if (no_semantics.Contains("IsSizeofTypeName")) return false;
+        if (no_semantics.Contains("IsSizeofTypeName")) return true;
         var ts = this.InputStream as CommonTokenStream;
-	if (!(ts.LT(1).Type == CLexer.Sizeof ||
-	      ts.LT(1).Type == CLexer.Countof ||
-	      ts.LT(1).Type == CLexer.Alignof ||
-	      ts.LT(1).Type == CLexer.Maxof ||
-	      ts.LT(1).Type == CLexer.Minof)
-	     ) return false;
+        if (!(ts.LT(1).Type == CLexer.Sizeof ||
+            ts.LT(1).Type == CLexer.Countof ||
+            ts.LT(1).Type == CLexer.Alignof ||
+            ts.LT(1).Type == CLexer.Maxof ||
+            ts.LT(1).Type == CLexer.Minof)
+            ) return false;
         if (ts.LT(2).Type != CLexer.LeftParen) return false;
         if (IsTypeName(3)) return true;
         return false;
