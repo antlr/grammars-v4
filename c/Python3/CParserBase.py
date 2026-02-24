@@ -13,7 +13,8 @@ ALL_SEMANTIC_FUNCTIONS = [
     "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
     "IsNullStructDeclarationListExtension",
-    "IsGnuAttributeBeforeDeclarator"
+    "IsGnuAttributeBeforeDeclarator",
+    "IsSizeofTypeName"
 ]
 
 def parseNoSemantics(args):
@@ -56,10 +57,10 @@ class CParserBase(Parser):
             self._CParser = CParser
         return self._CParser
 
-    def IsAlignmentSpecifier(self):
+    def IsAlignmentSpecifier(self, k=1):
         if "IsAlignmentSpecifier" in self.noSemantics:
             return True
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         text = lt1.text
         if self._debug:
             sys.stdout.write("IsAlignmentSpecifier " + str(lt1))
@@ -75,10 +76,10 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsAtomicTypeSpecifier(self):
+    def IsAtomicTypeSpecifier(self, k=1):
         if "IsAtomicTypeSpecifier" in self.noSemantics:
             return True
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         text = lt1.text
         if self._debug:
             sys.stdout.write("IsAtomicTypeSpecifier " + str(lt1))
@@ -145,14 +146,14 @@ class CParserBase(Parser):
             print("IsDeclarationSpecifier " + str(result) + " for " + str(lt1))
         return result
 
-    def IsTypeSpecifierQualifier(self):
+    def IsTypeSpecifierQualifier(self, k=1):
         if "IsTypeSpecifierQualifier" in self.noSemantics:
             return True
         if self._debug:
             print("IsDeclarationSpecifier")
-        result = (self.IsTypeSpecifier()
-            or self.IsTypeQualifier()
-            or self.IsAlignmentSpecifier())
+        result = (self.IsTypeSpecifier(k)
+            or self.IsTypeQualifier(k)
+            or self.IsAlignmentSpecifier(k))
         if self._debug:
             print("IsDeclarationSpecifier " + str(result))
         return result
@@ -160,11 +161,11 @@ class CParserBase(Parser):
     def IsDeclarationSpecifiers(self):
         return self.IsDeclarationSpecifier()
 
-    def IsEnumSpecifier(self):
+    def IsEnumSpecifier(self, k=1):
         if "IsEnumSpecifier" in self.noSemantics:
             return True
         CLexer = self._getLexerModule()
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         if self._debug:
             sys.stdout.write("IsEnumSpecifier " + str(lt1))
         result = lt1.type == CLexer.Enum
@@ -191,11 +192,11 @@ class CParserBase(Parser):
             print("IsFunctionSpecifier " + str(result))
         return result
 
-    def IsGnuAttributeBeforeDeclarator(self):
+    def IsGnuAttributeBeforeDeclarator(self, k=1):
         if "IsGnuAttributeBeforeDeclarator" in self.noSemantics:
             return False
         CLexer = self._getLexerModule()
-        i = 1
+        i = k
         if self._input.LT(i).type != CLexer.Attribute:
             return False
         i += 1
@@ -266,11 +267,11 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsStructOrUnionSpecifier(self):
+    def IsStructOrUnionSpecifier(self, k=1):
         if "IsStructOrUnionSpecifier" in self.noSemantics:
             return True
         CLexer = self._getLexerModule()
-        token = self._input.LT(1)
+        token = self._input.LT(k)
         if self._debug:
             sys.stdout.write("IsStructOrUnionSpecifier " + str(token))
         result = token.type == CLexer.Struct or token.type == CLexer.Union
@@ -278,10 +279,10 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsTypedefName(self):
+    def IsTypedefName(self, k=1):
         if "IsTypedefName" in self.noSemantics:
             return True
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         text = lt1.text
         if self._debug:
             sys.stdout.write("IsTypedefName " + str(lt1))
@@ -299,11 +300,11 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsTypeofSpecifier(self):
+    def IsTypeofSpecifier(self, k=1):
         if "IsTypeofSpecifier" in self.noSemantics:
             return True
         CLexer = self._getLexerModule()
-        token = self._input.LT(1)
+        token = self._input.LT(k)
         if self._debug:
             sys.stdout.write("IsTypeofSpecifier " + str(token))
         result = token.type == CLexer.Typeof or token.type == CLexer.Typeof_unqual
@@ -311,10 +312,10 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsTypeQualifier(self):
+    def IsTypeQualifier(self, k=1):
         if "IsTypeQualifier" in self.noSemantics:
             return True
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         text = lt1.text
         if self._debug:
             sys.stdout.write("IsTypeQualifier " + str(lt1))
@@ -330,10 +331,10 @@ class CParserBase(Parser):
             print(" " + str(result))
         return result
 
-    def IsTypeSpecifier(self):
+    def IsTypeSpecifier(self, k=1):
         if "IsTypeSpecifier" in self.noSemantics:
             return True
-        lt1 = self._input.LT(1)
+        lt1 = self._input.LT(k)
         text = lt1.text
         if self._debug:
             sys.stdout.write("IsTypeSpecifier " + str(lt1))
@@ -350,8 +351,8 @@ class CParserBase(Parser):
             if self._debug:
                 print(" " + str(result))
             return result
-        result = (self.IsAtomicTypeSpecifier() or self.IsStructOrUnionSpecifier() or self.IsEnumSpecifier()
-            or self.IsTypedefName() or self.IsTypeofSpecifier())
+        result = (self.IsAtomicTypeSpecifier(k) or self.IsStructOrUnionSpecifier(k) or self.IsEnumSpecifier(k)
+            or self.IsTypedefName(k) or self.IsTypeofSpecifier(k))
         if self._debug:
             print(" " + str(result))
         return result
@@ -571,6 +572,32 @@ class CParserBase(Parser):
             j -= 1
 
         return {"file": fileName, "line": lineAdjusted, "column": column}
+
+    def IsSomethingOfTypeName(self):
+        if "IsSizeofTypeName" in self.noSemantics:
+            return False
+        CLexer = self._getLexerModule()
+        if not (self._input.LT(1).type == CLexer.Sizeof or
+                self._input.LT(1).type == CLexer.Countof or
+                self._input.LT(1).type == CLexer.Alignof or
+                self._input.LT(1).type == CLexer.Maxof or
+                self._input.LT(1).type == CLexer.Minof):
+            return False
+        if self._input.LT(2).type != CLexer.LeftParen:
+            return False
+        if self.IsTypeName(3):
+            return True
+        return False
+
+    def IsTypeName(self, k=1):
+        return self.IsSpecifierQualifierList(k)
+
+    def IsSpecifierQualifierList(self, k=1):
+        if self.IsGnuAttributeBeforeDeclarator(k):
+            return True
+        if self.IsTypeSpecifierQualifier(k):
+            return True
+        return False
 
     def IsCast(self):
         result = False

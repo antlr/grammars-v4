@@ -15,7 +15,8 @@ const List<String> ALL_SEMANTIC_FUNCTIONS = [
   "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
   "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
   "IsNullStructDeclarationListExtension",
-  "IsGnuAttributeBeforeDeclarator"
+  "IsGnuAttributeBeforeDeclarator",
+  "IsSizeofTypeName"
 ];
 
 Set<String> parseNoSemantics(List<String> args) {
@@ -59,9 +60,9 @@ abstract class CParserBase extends Parser {
     _st = SymbolTable();
   }
 
-  bool IsAlignmentSpecifier() {
+  bool IsAlignmentSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsAlignmentSpecifier")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAlignmentSpecifier $lt1");
     var resolved = _resolveWithOutput(lt1);
@@ -77,9 +78,9 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsAtomicTypeSpecifier() {
+  bool IsAtomicTypeSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsAtomicTypeSpecifier")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsAtomicTypeSpecifier $lt1");
     var resolved = _resolveWithOutput(lt1);
@@ -138,10 +139,10 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsTypeSpecifierQualifier() {
+  bool IsTypeSpecifierQualifier([int k = 1]) {
     if (_noSemantics.contains("IsTypeSpecifierQualifier")) return true;
     if (_debug) print("IsTypeSpecifierQualifier");
-    var result = IsTypeSpecifier() || IsTypeQualifier() || IsAlignmentSpecifier();
+    var result = IsTypeSpecifier(k) || IsTypeQualifier(k) || IsAlignmentSpecifier(k);
     if (_debug) print("IsTypeSpecifierQualifier $result");
     return result;
   }
@@ -150,9 +151,9 @@ abstract class CParserBase extends Parser {
     return IsDeclarationSpecifier();
   }
 
-  bool IsEnumSpecifier() {
+  bool IsEnumSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsEnumSpecifier")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     if (_debug) stdout.write("IsEnumSpecifier $lt1");
     var result = lt1?.type == CLexer.TOKEN_Enum;
     if (_debug) print(" $result");
@@ -177,10 +178,10 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsGnuAttributeBeforeDeclarator() {
+  bool IsGnuAttributeBeforeDeclarator([int k = 1]) {
     if (_noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
     final ts = inputStream as CommonTokenStream;
-    int i = 1;
+    int i = k;
     if (ts.LT(i)?.type != CLexer.TOKEN_Attribute) return false;
     i++;
     int depth = 0;
@@ -236,18 +237,18 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsStructOrUnionSpecifier() {
+  bool IsStructOrUnionSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsStructOrUnionSpecifier")) return true;
-    var token = (inputStream as CommonTokenStream).LT(1);
+    var token = (inputStream as CommonTokenStream).LT(k);
     if (_debug) stdout.write("IsStructOrUnionSpecifier $token");
     var result = token?.type == CLexer.TOKEN_Struct || token?.type == CLexer.TOKEN_Union;
     if (_debug) print(" $result");
     return result;
   }
 
-  bool IsTypedefName() {
+  bool IsTypedefName([int k = 1]) {
     if (_noSemantics.contains("IsTypedefName")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypedefName $lt1");
     var resolved = _resolveWithOutput(lt1);
@@ -265,18 +266,18 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsTypeofSpecifier() {
+  bool IsTypeofSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsTypeofSpecifier")) return true;
-    var token = (inputStream as CommonTokenStream).LT(1);
+    var token = (inputStream as CommonTokenStream).LT(k);
     if (_debug) stdout.write("IsTypeofSpecifier $token");
     var result = token?.type == CLexer.TOKEN_Typeof || token?.type == CLexer.TOKEN_Typeof_unqual;
     if (_debug) print(" $result");
     return result;
   }
 
-  bool IsTypeQualifier() {
+  bool IsTypeQualifier([int k = 1]) {
     if (_noSemantics.contains("IsTypeQualifier")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeQualifier $lt1");
     var resolved = _resolveWithOutput(lt1);
@@ -292,9 +293,9 @@ abstract class CParserBase extends Parser {
     return result;
   }
 
-  bool IsTypeSpecifier() {
+  bool IsTypeSpecifier([int k = 1]) {
     if (_noSemantics.contains("IsTypeSpecifier")) return true;
-    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var lt1 = (inputStream as CommonTokenStream).LT(k);
     var text = lt1?.text ?? "";
     if (_debug) stdout.write("IsTypeSpecifier $lt1");
     var resolved = _resolveWithOutput(lt1);
@@ -311,11 +312,11 @@ abstract class CParserBase extends Parser {
       if (_debug) print(" $result");
       return result;
     }
-    result = IsAtomicTypeSpecifier() ||
-        IsStructOrUnionSpecifier() ||
-        IsEnumSpecifier() ||
-        IsTypedefName() ||
-        IsTypeofSpecifier();
+    result = IsAtomicTypeSpecifier(k) ||
+        IsStructOrUnionSpecifier(k) ||
+        IsEnumSpecifier(k) ||
+        IsTypedefName(k) ||
+        IsTypeofSpecifier(k);
     if (_debug) print(" $result");
     return result;
   }
@@ -526,6 +527,29 @@ abstract class CParserBase extends Parser {
     }
 
     return {"file": fileName, "line": lineAdjusted, "column": column};
+  }
+
+  bool IsSomethingOfTypeName() {
+    if (_noSemantics.contains("IsSizeofTypeName")) return false;
+    final ts = inputStream as CommonTokenStream;
+    if (!(ts.LT(1)?.type == CLexer.TOKEN_Sizeof ||
+          ts.LT(1)?.type == CLexer.TOKEN_Countof ||
+          ts.LT(1)?.type == CLexer.TOKEN_Alignof ||
+          ts.LT(1)?.type == CLexer.TOKEN_Maxof ||
+          ts.LT(1)?.type == CLexer.TOKEN_Minof)) return false;
+    if (ts.LT(2)?.type != CLexer.TOKEN_LeftParen) return false;
+    if (IsTypeName(3)) return true;
+    return false;
+  }
+
+  bool IsTypeName([int k = 1]) {
+    return IsSpecifierQualifierList(k);
+  }
+
+  bool IsSpecifierQualifierList([int k = 1]) {
+    if (IsGnuAttributeBeforeDeclarator(k)) return true;
+    if (IsTypeSpecifierQualifier(k)) return true;
+    return false;
   }
 
   bool IsCast() {

@@ -110,10 +110,10 @@ std::string CParserBase::getDeclarationId(antlr4::ParserRuleContext *ctx) {
 
 // ---------- Semantic Predicates ----------
 
-bool CParserBase::IsAlignmentSpecifier() {
+bool CParserBase::IsAlignmentSpecifier(int k) {
     if (noSemantics_.count("IsAlignmentSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsAlignmentSpecifier " << lt1->toString() << std::flush;
     auto resolved = resolveWithOutput(lt1);
     bool result = false;
@@ -124,10 +124,10 @@ bool CParserBase::IsAlignmentSpecifier() {
     return result;
 }
 
-bool CParserBase::IsAtomicTypeSpecifier() {
+bool CParserBase::IsAtomicTypeSpecifier(int k) {
     if (noSemantics_.count("IsAtomicTypeSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsAtomicTypeSpecifier " << lt1->toString() << std::flush;
     auto resolved = resolveWithOutput(lt1);
     bool result = false;
@@ -181,11 +181,11 @@ bool CParserBase::IsDeclarationSpecifier() {
     return result;
 }
 
-bool CParserBase::IsTypeSpecifierQualifier() {
+bool CParserBase::IsTypeSpecifierQualifier(int k) {
     if (noSemantics_.count("IsTypeSpecifierQualifier")) return true;
-    bool result = IsTypeSpecifier()
-                  || IsTypeQualifier()
-                  || IsAlignmentSpecifier();
+    bool result = IsTypeSpecifier(k)
+                  || IsTypeQualifier(k)
+                  || IsAlignmentSpecifier(k);
     return result;
 }
 
@@ -193,10 +193,10 @@ bool CParserBase::IsDeclarationSpecifiers() {
     return IsDeclarationSpecifier();
 }
 
-bool CParserBase::IsEnumSpecifier() {
+bool CParserBase::IsEnumSpecifier(int k) {
     if (noSemantics_.count("IsEnumSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsEnumSpecifier " << lt1->toString() << std::flush;
     bool result = lt1->getType() == CLexer::Enum;
     if (debug_) std::cerr << " " << result << std::endl;
@@ -217,11 +217,11 @@ bool CParserBase::IsFunctionSpecifier() {
     return result;
 }
 
-bool CParserBase::IsGnuAttributeBeforeDeclarator() {
+bool CParserBase::IsGnuAttributeBeforeDeclarator(int k) {
     if (noSemantics_.count("IsGnuAttributeBeforeDeclarator")) return false;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     if (!ts) return false;
-    int i = 1;
+    int i = k;
     if (ts->LT(i)->getType() != CLexer::Attribute) return false;
     i++;
     int depth = 0;
@@ -275,10 +275,10 @@ bool CParserBase::IsStorageClassSpecifier() {
     return result;
 }
 
-bool CParserBase::IsStructOrUnionSpecifier() {
+bool CParserBase::IsStructOrUnionSpecifier(int k) {
     if (noSemantics_.count("IsStructOrUnionSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *token = ts->LT(1);
+    auto *token = ts->LT(k);
     if (debug_) std::cerr << "IsStructOrUnionSpecifier " << token->toString() << std::flush;
     bool result = token->getType() == CLexer::Struct ||
                   token->getType() == CLexer::Union;
@@ -286,10 +286,10 @@ bool CParserBase::IsStructOrUnionSpecifier() {
     return result;
 }
 
-bool CParserBase::IsTypedefName() {
+bool CParserBase::IsTypedefName(int k) {
     if (noSemantics_.count("IsTypedefName")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsTypedefName " << lt1->toString() << std::flush;
     auto resolved = resolveWithOutput(lt1);
     bool result = false;
@@ -306,10 +306,10 @@ bool CParserBase::IsTypedefName() {
     return result;
 }
 
-bool CParserBase::IsTypeofSpecifier() {
+bool CParserBase::IsTypeofSpecifier(int k) {
     if (noSemantics_.count("IsTypeofSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *token = ts->LT(1);
+    auto *token = ts->LT(k);
     if (debug_) std::cerr << "IsTypeofSpecifier " << token->toString() << std::flush;
     bool result = token->getType() == CLexer::Typeof ||
                   token->getType() == CLexer::Typeof_unqual;
@@ -317,10 +317,10 @@ bool CParserBase::IsTypeofSpecifier() {
     return result;
 }
 
-bool CParserBase::IsTypeQualifier() {
+bool CParserBase::IsTypeQualifier(int k) {
     if (noSemantics_.count("IsTypeQualifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsTypeQualifier " << lt1->toString() << std::flush;
     auto resolved = resolveWithOutput(lt1);
     bool result = false;
@@ -331,10 +331,10 @@ bool CParserBase::IsTypeQualifier() {
     return result;
 }
 
-bool CParserBase::IsTypeSpecifier() {
+bool CParserBase::IsTypeSpecifier(int k) {
     if (noSemantics_.count("IsTypeSpecifier")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
-    auto *lt1 = ts->LT(1);
+    auto *lt1 = ts->LT(k);
     if (debug_) std::cerr << "IsTypeSpecifier " << lt1->toString() << std::flush;
     auto resolved = resolveWithOutput(lt1);
     bool result = false;
@@ -347,10 +347,35 @@ bool CParserBase::IsTypeSpecifier() {
         return result;
     }
 
-    result = IsAtomicTypeSpecifier() || IsStructOrUnionSpecifier() || IsEnumSpecifier()
-             || IsTypedefName() || IsTypeofSpecifier();
+    result = IsAtomicTypeSpecifier(k) || IsStructOrUnionSpecifier(k) || IsEnumSpecifier(k)
+             || IsTypedefName(k) || IsTypeofSpecifier(k);
     if (debug_) std::cerr << " " << result << std::endl;
     return result;
+}
+
+bool CParserBase::IsSomethingOfTypeName() {
+    if (noSemantics_.count("IsSizeofTypeName")) return false;
+    auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    if (!ts) return false;
+    int lt1Type = ts->LT(1)->getType();
+    if (!(lt1Type == CLexer::Sizeof ||
+          lt1Type == CLexer::Countof ||
+          lt1Type == CLexer::Alignof ||
+          lt1Type == CLexer::Maxof ||
+          lt1Type == CLexer::Minof)) return false;
+    if (ts->LT(2)->getType() != CLexer::LeftParen) return false;
+    if (IsTypeName(3)) return true;
+    return false;
+}
+
+bool CParserBase::IsTypeName(int k) {
+    return IsSpecifierQualifierList(k);
+}
+
+bool CParserBase::IsSpecifierQualifierList(int k) {
+    if (IsGnuAttributeBeforeDeclarator(k)) return true;
+    if (IsTypeSpecifierQualifier(k)) return true;
+    return false;
 }
 
 bool CParserBase::IsCast() {

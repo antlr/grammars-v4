@@ -17,7 +17,8 @@ public abstract class CParserBase extends Parser {
         "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
         "IsNullStructDeclarationListExtension",
-        "IsGnuAttributeBeforeDeclarator"
+        "IsGnuAttributeBeforeDeclarator",
+        "IsSizeofTypeName"
     };
 
     protected CParserBase(TokenStream input) {
@@ -65,9 +66,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsAlignmentSpecifier() {
+    public boolean IsAlignmentSpecifier() { return IsAlignmentSpecifier(1); }
+    public boolean IsAlignmentSpecifier(int k) {
         if (noSemantics.contains("IsAlignmentSpecifier")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAlignmentSpecifier " + lt1);
         Symbol resolved = resolveWithOutput(lt1);
@@ -83,9 +85,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsAtomicTypeSpecifier() {
+    public boolean IsAtomicTypeSpecifier() { return IsAtomicTypeSpecifier(1); }
+    public boolean IsAtomicTypeSpecifier(int k) {
         if (noSemantics.contains("IsAtomicTypeSpecifier")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsAtomicTypeSpecifier " + lt1);
         Symbol resolved = resolveWithOutput(lt1);
@@ -145,12 +148,13 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsTypeSpecifierQualifier() {
+    public boolean IsTypeSpecifierQualifier() { return IsTypeSpecifierQualifier(1); }
+    public boolean IsTypeSpecifierQualifier(int k) {
         if (noSemantics.contains("IsTypeSpecifierQualifier")) return true;
         if (debug) System.out.println("IsDeclarationSpecifier");
-        boolean result = IsTypeSpecifier()
-                || IsTypeQualifier()
-                || IsAlignmentSpecifier();
+        boolean result = IsTypeSpecifier(k)
+                || IsTypeQualifier(k)
+                || IsAlignmentSpecifier(k);
         if (debug) System.out.println("IsDeclarationSpecifier " + result);
         return result;
     }
@@ -159,9 +163,10 @@ public abstract class CParserBase extends Parser {
         return IsDeclarationSpecifier();
     }
 
-    public boolean IsEnumSpecifier() {
+    public boolean IsEnumSpecifier() { return IsEnumSpecifier(1); }
+    public boolean IsEnumSpecifier(int k) {
         if (noSemantics.contains("IsEnumSpecifier")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         if (this.debug) System.out.print("IsEnumSpecifier " + lt1);
         boolean result = lt1.getType() == CLexer.Enum;
         if (this.debug) System.out.println(" " + result);
@@ -186,10 +191,11 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsGnuAttributeBeforeDeclarator() {
+    public boolean IsGnuAttributeBeforeDeclarator() { return IsGnuAttributeBeforeDeclarator(1); }
+    public boolean IsGnuAttributeBeforeDeclarator(int k) {
         if (noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
         CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
-        int i = 1;
+        int i = k;
         if (ts.LT(i).getType() != CLexer.Attribute) return false;
         i++;
         int depth = 0;
@@ -247,9 +253,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsStructOrUnionSpecifier() {
+    public boolean IsStructOrUnionSpecifier() { return IsStructOrUnionSpecifier(1); }
+    public boolean IsStructOrUnionSpecifier(int k) {
         if (noSemantics.contains("IsStructOrUnionSpecifier")) return true;
-        Token token = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token token = ((CommonTokenStream) this.getInputStream()).LT(k);
         if (this.debug) System.out.print("IsStructOrUnionSpecifier " + token);
         boolean result = token.getType() == CLexer.Struct ||
                 token.getType() == CLexer.Union;
@@ -257,9 +264,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsTypedefName() {
+    public boolean IsTypedefName() { return IsTypedefName(1); }
+    public boolean IsTypedefName(int k) {
         if (noSemantics.contains("IsTypedefName")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypedefName " + lt1);
         Symbol resolved = resolveWithOutput(lt1);
@@ -277,9 +285,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsTypeofSpecifier() {
+    public boolean IsTypeofSpecifier() { return IsTypeofSpecifier(1); }
+    public boolean IsTypeofSpecifier(int k) {
         if (noSemantics.contains("IsTypeofSpecifier")) return true;
-        Token token = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token token = ((CommonTokenStream) this.getInputStream()).LT(k);
         if (this.debug) System.out.print("IsTypeofSpecifier " + token);
         boolean result = token.getType() == CLexer.Typeof ||
                 token.getType() == CLexer.Typeof_unqual;
@@ -287,9 +296,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsTypeQualifier() {
+    public boolean IsTypeQualifier() { return IsTypeQualifier(1); }
+    public boolean IsTypeQualifier(int k) {
         if (noSemantics.contains("IsTypeQualifier")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeQualifier " + lt1);
         Symbol resolved = resolveWithOutput(lt1);
@@ -305,9 +315,10 @@ public abstract class CParserBase extends Parser {
         return result;
     }
 
-    public boolean IsTypeSpecifier() {
+    public boolean IsTypeSpecifier() { return IsTypeSpecifier(1); }
+    public boolean IsTypeSpecifier(int k) {
         if (noSemantics.contains("IsTypeSpecifier")) return true;
-        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(k);
         String text = lt1.getText();
         if (this.debug) System.out.print("IsTypeSpecifier " + lt1);
         Symbol resolved = resolveWithOutput(lt1);
@@ -324,8 +335,8 @@ public abstract class CParserBase extends Parser {
             if (this.debug) System.out.println(" " + result);
             return result;
         }
-        result = IsAtomicTypeSpecifier() || IsStructOrUnionSpecifier() || IsEnumSpecifier()
-                || IsTypedefName() || IsTypeofSpecifier();
+        result = IsAtomicTypeSpecifier(k) || IsStructOrUnionSpecifier(k) || IsEnumSpecifier(k)
+                || IsTypedefName(k) || IsTypeofSpecifier(k);
         if (this.debug) System.out.println(" " + result);
         return result;
     }
@@ -576,6 +587,32 @@ public abstract class CParserBase extends Parser {
         }
 
         return new SourceLocation(fileName, lineAdjusted, column);
+    }
+
+    public boolean IsSomethingOfTypeName() {
+        if (noSemantics.contains("IsSizeofTypeName")) return false;
+        CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
+        int lt1Type = ts.LT(1).getType();
+        if (!(lt1Type == CLexer.Sizeof ||
+              lt1Type == CLexer.Countof ||
+              lt1Type == CLexer.Alignof ||
+              lt1Type == CLexer.Maxof ||
+              lt1Type == CLexer.Minof)) return false;
+        if (ts.LT(2).getType() != CLexer.LeftParen) return false;
+        if (IsTypeName(3)) return true;
+        return false;
+    }
+
+    public boolean IsTypeName() { return IsTypeName(1); }
+    public boolean IsTypeName(int k) {
+        return IsSpecifierQualifierList(k);
+    }
+
+    public boolean IsSpecifierQualifierList() { return IsSpecifierQualifierList(1); }
+    public boolean IsSpecifierQualifierList(int k) {
+        if (IsGnuAttributeBeforeDeclarator(k)) return true;
+        if (IsTypeSpecifierQualifier(k)) return true;
+        return false;
     }
 
     public boolean IsCast() {

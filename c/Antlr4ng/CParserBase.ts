@@ -29,7 +29,8 @@ const ALL_SEMANTIC_FUNCTIONS = [
     "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
     "IsNullStructDeclarationListExtension",
-    "IsGnuAttributeBeforeDeclarator"
+    "IsGnuAttributeBeforeDeclarator",
+    "IsSizeofTypeName"
 ];
 
 function parseNoSemantics(args: string[]): Set<string> {
@@ -74,9 +75,9 @@ export abstract class CParserBase extends Parser {
         this._st = new SymbolTable();
     }
 
-    public IsAlignmentSpecifier(): boolean {
+    public IsAlignmentSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsAlignmentSpecifier")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAlignmentSpecifier " + lt1);
         const resolved = this.resolveWithOutput(lt1);
@@ -92,9 +93,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsAtomicTypeSpecifier(): boolean {
+    public IsAtomicTypeSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsAtomicTypeSpecifier")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsAtomicTypeSpecifier " + lt1);
         const resolved = this.resolveWithOutput(lt1);
@@ -154,12 +155,12 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsTypeSpecifierQualifier(): boolean {
+    public IsTypeSpecifierQualifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsTypeSpecifierQualifier")) return true;
         if (this.debug) console.log("IsDeclarationSpecifier");
-        const result = this.IsTypeSpecifier()
-            || this.IsTypeQualifier()
-            || this.IsAlignmentSpecifier();
+        const result = this.IsTypeSpecifier(k)
+            || this.IsTypeQualifier(k)
+            || this.IsAlignmentSpecifier(k);
         if (this.debug) console.log("IsDeclarationSpecifier " + result);
         return result;
     }
@@ -168,9 +169,9 @@ export abstract class CParserBase extends Parser {
         return this.IsDeclarationSpecifier();
     }
 
-    public IsEnumSpecifier(): boolean {
+    public IsEnumSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsEnumSpecifier")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         if (this.debug) process.stdout.write("IsEnumSpecifier " + lt1);
         const result = lt1!.type === CLexer.Enum;
         if (this.debug) console.log(" " + result);
@@ -195,10 +196,10 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsGnuAttributeBeforeDeclarator(): boolean {
+    public IsGnuAttributeBeforeDeclarator(k: number = 1): boolean {
         if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return false;
         const ts = this.inputStream as CommonTokenStream;
-        let i = 1;
+        let i = k;
         if (ts.LT(i)!.type !== CLexer.Attribute) return false;
         i++;
         let depth = 0;
@@ -254,9 +255,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsStructOrUnionSpecifier(): boolean {
+    public IsStructOrUnionSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsStructOrUnionSpecifier")) return true;
-        const token = (this.inputStream as CommonTokenStream).LT(1);
+        const token = (this.inputStream as CommonTokenStream).LT(k);
         if (this.debug) process.stdout.write("IsStructOrUnionSpecifier " + token);
         const result = token!.type === CLexer.Struct ||
             token!.type === CLexer.Union;
@@ -264,9 +265,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsTypedefName(): boolean {
+    public IsTypedefName(k: number = 1): boolean {
         if (this.noSemantics.has("IsTypedefName")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypedefName " + lt1);
         const resolved = this.resolveWithOutput(lt1);
@@ -284,9 +285,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsTypeofSpecifier(): boolean {
+    public IsTypeofSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsTypeofSpecifier")) return true;
-        const token = (this.inputStream as CommonTokenStream).LT(1);
+        const token = (this.inputStream as CommonTokenStream).LT(k);
         if (this.debug) process.stdout.write("IsTypeofSpecifier " + token);
         const result = token!.type === CLexer.Typeof ||
             token!.type === CLexer.Typeof_unqual;
@@ -294,9 +295,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsTypeQualifier(): boolean {
+    public IsTypeQualifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsTypeQualifier")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeQualifier " + lt1);
         const resolved = this.resolveWithOutput(lt1);
@@ -312,9 +313,9 @@ export abstract class CParserBase extends Parser {
         return result;
     }
 
-    public IsTypeSpecifier(): boolean {
+    public IsTypeSpecifier(k: number = 1): boolean {
         if (this.noSemantics.has("IsTypeSpecifier")) return true;
-        const lt1 = (this.inputStream as CommonTokenStream).LT(1);
+        const lt1 = (this.inputStream as CommonTokenStream).LT(k);
         const text = lt1!.text!;
         if (this.debug) process.stdout.write("IsTypeSpecifier " + lt1);
         const resolved = this.resolveWithOutput(lt1);
@@ -331,8 +332,8 @@ export abstract class CParserBase extends Parser {
             if (this.debug) console.log(" " + result);
             return result;
         }
-        result = this.IsAtomicTypeSpecifier() || this.IsStructOrUnionSpecifier() || this.IsEnumSpecifier()
-            || this.IsTypedefName() || this.IsTypeofSpecifier();
+        result = this.IsAtomicTypeSpecifier(k) || this.IsStructOrUnionSpecifier(k) || this.IsEnumSpecifier(k)
+            || this.IsTypedefName(k) || this.IsTypeofSpecifier(k);
         if (this.debug) console.log(" " + result);
         return result;
     }
@@ -561,6 +562,29 @@ export abstract class CParserBase extends Parser {
         }
 
         return { file: fileName, line: lineAdjusted, column: column };
+    }
+
+    public IsSomethingOfTypeName(): boolean {
+        if (this.noSemantics.has("IsSizeofTypeName")) return false;
+        const ts = this.inputStream as CommonTokenStream;
+        if (!(ts.LT(1)!.type === CLexer.Sizeof ||
+              ts.LT(1)!.type === CLexer.Countof ||
+              ts.LT(1)!.type === CLexer.Alignof ||
+              ts.LT(1)!.type === CLexer.Maxof ||
+              ts.LT(1)!.type === CLexer.Minof)) return false;
+        if (ts.LT(2)!.type !== CLexer.LeftParen) return false;
+        if (this.IsTypeName(3)) return true;
+        return false;
+    }
+
+    public IsTypeName(k: number = 1): boolean {
+        return this.IsSpecifierQualifierList(k);
+    }
+
+    public IsSpecifierQualifierList(k: number = 1): boolean {
+        if (this.IsGnuAttributeBeforeDeclarator(k)) return true;
+        if (this.IsTypeSpecifierQualifier(k)) return true;
+        return false;
     }
 
     public IsCast(): boolean {
