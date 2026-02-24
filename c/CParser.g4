@@ -191,18 +191,23 @@ argumentExpressionList
 // ISO C: unary-expression (6.5.4.1)
 // GNU: https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L10625-L10658
 unaryExpression
-    : ('++' | '--' | 'sizeof')* (
-        postfixExpression
-        | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!'
-		| '__extension__' // GNU
-		| '__real__' // GNU
-		| '__imag__' // GNU
-		) castExpression
-        | ('sizeof' | Alignof) ( '(' typeName ')'
-		| unaryExpression //GNU
-		)
-        | '&&' Identifier // GCC extension address of label
-    )
+    : postfixExpression
+    | '++' unaryExpression
+    | '--' unaryExpression
+    | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!'
+	| '__extension__' // GNU
+	| '__real__' // GNU
+	| '__imag__' // GNU
+	) castExpression
+    | {!this.IsSomethingOfTypeName()}? 'sizeof' unaryExpression
+    | {this.IsSomethingOfTypeName()}? 'sizeof' '(' typeName ')'
+    | {this.IsSomethingOfTypeName()}? Alignof '(' typeName ')'
+    | {!this.IsSomethingOfTypeName()}? Countof unaryExpression // GCC
+    | {this.IsSomethingOfTypeName()}? Countof '(' typeName ')' // GCC
+    | {!this.IsSomethingOfTypeName()}? Alignof unaryExpression // GCC
+    | {this.IsSomethingOfTypeName()}? Maxof '(' typeName ')' // GCC
+    | {this.IsSomethingOfTypeName()}? Minof '(' typeName ')' // GCC
+    | '&&' Identifier // GCC extension address of label
     ;
 
 // ISO C: unary-operator (6.5.4.1) - No ANTLR4 rule
@@ -569,7 +574,7 @@ directAbstractDeclarator
 
 // ISO C: typedef-name (6.7.9)
 typedefName
-    : Identifier
+    : {this.IsTypedefName()}? Identifier
     ;
 
 // ISO C: braced-initializer (6.7.11) - No ANTLR4 rule
