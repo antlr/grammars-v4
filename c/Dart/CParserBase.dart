@@ -179,7 +179,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsGnuAttributeBeforeDeclarator([int k = 1]) {
-    if (_noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
+    if (_noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return true;
     final ts = inputStream as CommonTokenStream;
     int i = k;
     if (ts.LT(i)?.type != CLexer.TOKEN_Attribute) return false;
@@ -529,8 +529,28 @@ abstract class CParserBase extends Parser {
     return {"file": fileName, "line": lineAdjusted, "column": column};
   }
 
+  bool IsInitDeclaratorList() {
+    // Cannot be initDeclaratorList if the first thing is a type.
+    // Types need to go to preceding declarationSpecifiers.
+    if (_noSemantics.contains("IsInitDeclaratorList")) return true;
+    var lt1 = (inputStream as CommonTokenStream).LT(1);
+    var text = lt1?.text ?? "";
+    if (_debug) stdout.write("IsInitDeclaratorList $lt1");
+    var resolved = _resolveWithOutput(lt1);
+    bool result = false;
+    if (resolved == null) {
+      result = true;
+    } else if (resolved.classification.contains(TypeClassification.typeQualifier) || resolved.classification.contains(TypeClassification.typeSpecifier)) {
+      result = false;
+    } else {
+      result = true;
+    }
+    if (_debug) print(" $result");
+    return result;
+  }
+
   bool IsSomethingOfTypeName() {
-    if (_noSemantics.contains("IsSizeofTypeName")) return false;
+    if (_noSemantics.contains("IsSizeofTypeName")) return true;
     final ts = inputStream as CommonTokenStream;
     if (!(ts.LT(1)?.type == CLexer.TOKEN_Sizeof ||
           ts.LT(1)?.type == CLexer.TOKEN_Countof ||

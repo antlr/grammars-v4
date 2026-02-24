@@ -39,6 +39,7 @@ public:
     bool IsTypeofSpecifier(int k = 1);
     bool IsTypeQualifier(int k = 1);
     bool IsTypeSpecifier(int k = 1);
+    bool IsInitDeclaratorList();
     bool IsSomethingOfTypeName();
     bool IsTypeName(int k = 1);
     bool IsSpecifierQualifierList(int k = 1);

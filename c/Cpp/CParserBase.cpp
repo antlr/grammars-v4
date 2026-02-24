@@ -218,7 +218,7 @@ bool CParserBase::IsFunctionSpecifier() {
 }
 
 bool CParserBase::IsGnuAttributeBeforeDeclarator(int k) {
-    if (noSemantics_.count("IsGnuAttributeBeforeDeclarator")) return false;
+    if (noSemantics_.count("IsGnuAttributeBeforeDeclarator")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     if (!ts) return false;
     int i = k;
@@ -353,8 +353,28 @@ bool CParserBase::IsTypeSpecifier(int k) {
     return result;
 }
 
+bool CParserBase::IsInitDeclaratorList() {
+    // Cannot be initDeclaratorList if the first thing is a type.
+    // Types need to go to preceding declarationSpecifiers.
+    if (noSemantics_.count("IsInitDeclaratorList")) return true;
+    auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto *lt1 = ts->LT(1);
+    if (debug_) std::cerr << "IsInitDeclaratorList " << lt1->toString() << std::flush;
+    auto resolved = resolveWithOutput(lt1);
+    bool result = false;
+    if (!resolved) {
+        result = true;
+    } else if (resolved->getClassification().count(TypeClassification::TypeQualifier_) || resolved->getClassification().count(TypeClassification::TypeSpecifier_)) {
+        result = false;
+    } else {
+        result = true;
+    }
+    if (debug_) std::cerr << " " << result << std::endl;
+    return result;
+}
+
 bool CParserBase::IsSomethingOfTypeName() {
-    if (noSemantics_.count("IsSizeofTypeName")) return false;
+    if (noSemantics_.count("IsSizeofTypeName")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     if (!ts) return false;
     int lt1Type = ts->LT(1)->getType();

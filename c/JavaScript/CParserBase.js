@@ -180,7 +180,7 @@ export default class CParserBase extends antlr4.Parser {
     }
 
     IsGnuAttributeBeforeDeclarator(k = 1) {
-        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return false;
+        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return true;
         const ts = this._input;
         let i = k;
         if (ts.LT(i).type !== CLexer.Attribute) return false;
@@ -538,8 +538,28 @@ export default class CParserBase extends antlr4.Parser {
         return { file: fileName, line: lineAdjusted, column: column };
     }
 
+    IsInitDeclaratorList() {
+        // Cannot be initDeclaratorList if the first thing is a type.
+        // Types need to go to preceding declarationSpecifiers.
+        if (this.noSemantics.has("IsInitDeclaratorList")) return true;
+        const lt1 = this._input.LT(1);
+        const text = lt1.text;
+        if (this._debug) process.stdout.write("IsInitDeclaratorList " + lt1);
+        const resolved = this._resolveWithOutput(lt1);
+        let result = false;
+        if (resolved === null) {
+            result = true;
+        } else if (resolved.classification.has(TypeClassification.TypeQualifier_) || resolved.classification.has(TypeClassification.TypeSpecifier_)) {
+            result = false;
+        } else {
+            result = true;
+        }
+        if (this._debug) console.log(" " + result);
+        return result;
+    }
+
     IsSomethingOfTypeName() {
-        if (this.noSemantics.has("IsSizeofTypeName")) return false;
+        if (this.noSemantics.has("IsSizeofTypeName")) return true;
         const ts = this._input;
         if (!(ts.LT(1).type === CLexer.Sizeof ||
               ts.LT(1).type === CLexer.Countof ||

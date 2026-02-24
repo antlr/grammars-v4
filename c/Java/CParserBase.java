@@ -193,7 +193,7 @@ public abstract class CParserBase extends Parser {
 
     public boolean IsGnuAttributeBeforeDeclarator() { return IsGnuAttributeBeforeDeclarator(1); }
     public boolean IsGnuAttributeBeforeDeclarator(int k) {
-        if (noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return false;
+        if (noSemantics.contains("IsGnuAttributeBeforeDeclarator")) return true;
         CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
         int i = k;
         if (ts.LT(i).getType() != CLexer.Attribute) return false;
@@ -589,8 +589,28 @@ public abstract class CParserBase extends Parser {
         return new SourceLocation(fileName, lineAdjusted, column);
     }
 
+    public boolean IsInitDeclaratorList() {
+        // Cannot be initDeclaratorList if the first thing is a type.
+        // Types need to go to preceding declarationSpecifiers.
+        if (noSemantics.contains("IsInitDeclaratorList")) return true;
+        Token lt1 = ((CommonTokenStream) this.getInputStream()).LT(1);
+        String text = lt1.getText();
+        if (this.debug) System.out.print("IsInitDeclaratorList " + lt1);
+        Symbol resolved = resolveWithOutput(lt1);
+        boolean result = false;
+        if (resolved == null) {
+            result = true;
+        } else if (resolved.getClassification().contains(TypeClassification.TypeQualifier_) || resolved.getClassification().contains(TypeClassification.TypeSpecifier_)) {
+            result = false;
+        } else {
+            result = true;
+        }
+        if (this.debug) System.out.println(" " + result);
+        return result;
+    }
+
     public boolean IsSomethingOfTypeName() {
-        if (noSemantics.contains("IsSizeofTypeName")) return false;
+        if (noSemantics.contains("IsSizeofTypeName")) return true;
         CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
         int lt1Type = ts.LT(1).getType();
         if (!(lt1Type == CLexer.Sizeof ||

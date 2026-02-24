@@ -194,7 +194,7 @@ class CParserBase(Parser):
 
     def IsGnuAttributeBeforeDeclarator(self, k=1):
         if "IsGnuAttributeBeforeDeclarator" in self.noSemantics:
-            return False
+            return True
         CLexer = self._getLexerModule()
         i = k
         if self._input.LT(i).type != CLexer.Attribute:
@@ -573,9 +573,30 @@ class CParserBase(Parser):
 
         return {"file": fileName, "line": lineAdjusted, "column": column}
 
+    def IsInitDeclaratorList(self):
+        # Cannot be initDeclaratorList if the first thing is a type.
+        # Types need to go to preceding declarationSpecifiers.
+        if "IsInitDeclaratorList" in self.noSemantics:
+            return True
+        lt1 = self._input.LT(1)
+        text = lt1.text
+        if self._debug:
+            sys.stdout.write("IsInitDeclaratorList " + str(lt1))
+        resolved = self._resolveWithOutput(lt1)
+        result = False
+        if resolved is None:
+            result = True
+        elif TypeClassification.TypeQualifier_ in resolved.classification or TypeClassification.TypeSpecifier_ in resolved.classification:
+            result = False
+        else:
+            result = True
+        if self._debug:
+            print(" " + str(result))
+        return result
+
     def IsSomethingOfTypeName(self):
         if "IsSizeofTypeName" in self.noSemantics:
-            return False
+            return True
         CLexer = self._getLexerModule()
         if not (self._input.LT(1).type == CLexer.Sizeof or
                 self._input.LT(1).type == CLexer.Countof or

@@ -191,7 +191,7 @@ export default abstract class CParserBase extends Parser {
     }
 
     public IsGnuAttributeBeforeDeclarator(k: number = 1): boolean {
-        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return false;
+        if (this.noSemantics.has("IsGnuAttributeBeforeDeclarator")) return true;
         const ts = this._input as CommonTokenStream;
         let i = k;
         if (ts.LT(i)!.type !== CLexer.Attribute) return false;
@@ -559,8 +559,28 @@ export default abstract class CParserBase extends Parser {
         return { file: fileName, line: lineAdjusted, column: column };
     }
 
+    public IsInitDeclaratorList(): boolean {
+        // Cannot be initDeclaratorList if the first thing is a type.
+        // Types need to go to preceding declarationSpecifiers.
+        if (this.noSemantics.has("IsInitDeclaratorList")) return true;
+        const lt1 = (this._input as CommonTokenStream).LT(1);
+        const text = lt1!.text!;
+        if (this.debug) process.stdout.write("IsInitDeclaratorList " + lt1);
+        const resolved = this.resolveWithOutput(lt1);
+        let result = false;
+        if (resolved === null) {
+            result = true;
+        } else if (resolved.classification.has(TypeClassification.TypeQualifier_) || resolved.classification.has(TypeClassification.TypeSpecifier_)) {
+            result = false;
+        } else {
+            result = true;
+        }
+        if (this.debug) console.log(" " + result);
+        return result;
+    }
+
     public IsSomethingOfTypeName(): boolean {
-        if (this.noSemantics.has("IsSizeofTypeName")) return false;
+        if (this.noSemantics.has("IsSizeofTypeName")) return true;
         const ts = this._input as CommonTokenStream;
         if (!(ts.LT(1)!.type === CLexer.Sizeof ||
               ts.LT(1)!.type === CLexer.Countof ||
