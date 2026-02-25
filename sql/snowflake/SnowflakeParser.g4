@@ -2948,6 +2948,7 @@ drop_command
     | drop_file_format
     | drop_function
     | drop_git_repository
+    | drop_index
     | drop_integration
     | drop_managed_account
     | drop_masking_policy
@@ -3014,6 +3015,10 @@ drop_function
 
 drop_git_repository
     : DROP GIT REPOSITORY if_exists? r=object_name
+    ;
+
+drop_index
+    : DROP INDEX if_exists? object_name DOT id_
     ;
 
 drop_integration
