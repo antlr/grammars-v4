@@ -1557,6 +1557,7 @@ create_command
     | create_function
     | create_git_repository
     //| create_integration
+    | create_index
     | create_managed_account
     | create_masking_policy
     | create_materialized_view
@@ -1858,6 +1859,11 @@ create_git_opts
     | GIT_CREDENTIALS EQ sn=object_name
     | comment_clause
     | with_tags
+    ;
+
+create_index
+    : CREATE or_replace? INDEX if_not_exists id_ ON object_name  column_list_in_parentheses
+        (INCLUDE column_list_in_parentheses)?
     ;
 
 create_managed_account
@@ -2630,19 +2636,18 @@ create_table
     : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) create_table_clause*
+    ) create_table_optionnal_clause* column_decl_item_list_paren create_table_optionnal_clause*
     ;
 
 column_decl_item_list_paren
     : LR_BRACKET column_decl_item_list RR_BRACKET
     ;
 
-create_table_clause
+create_table_optionnal_clause
     : settable_table_options
     | addable_table_options
-    | column_decl_item_list_paren 
     | deprecated_table_options
-    | copy_grants 
+    | copy_grants
     | copy_tags
     ;
 

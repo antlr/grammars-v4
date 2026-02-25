@@ -38,3 +38,4 @@ create database public;
 create schema raw;
 create tag public.t ALLOWED_VALUES 'V1' comment ='1';
 create sequence s1 NOORDER;
+CREATE OR REPLACE INDEX vidx ON mytable (val);
