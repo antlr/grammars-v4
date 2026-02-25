@@ -24,7 +24,8 @@ public abstract class CParserBase : Parser
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
         "IsNullStructDeclarationListExtension",
         "IsGnuAttributeBeforeDeclarator",
-        "IsSizeofTypeName"
+        "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+        "IsInitDeclaratorList"
     };
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
@@ -175,6 +176,7 @@ public abstract class CParserBase : Parser
 
     public bool IsDeclarationSpecifiers()
     {
+        if (no_semantics.Contains("IsDeclarationSpecifiers")) return true;
         return IsDeclarationSpecifier();
     }
 
@@ -643,7 +645,7 @@ public abstract class CParserBase : Parser
         // Returns true if current position looks like "sizeof ( typedefName )"
         // Used to prevent sizeof from entering the ('++' | '--' | 'sizeof')* loop
         // when it is actually a sizeof(type) expression, avoiding ambiguity.
-        if (no_semantics.Contains("IsSizeofTypeName")) return true;
+        if (no_semantics.Contains("IsSomethingOfTypeName")) return true;
         var ts = this.InputStream as CommonTokenStream;
         if (!(ts.LT(1).Type == CLexer.Sizeof ||
             ts.LT(1).Type == CLexer.Countof ||
@@ -658,11 +660,13 @@ public abstract class CParserBase : Parser
 
     public bool IsTypeName(int k = 1)
     {
+        if (no_semantics.Contains("IsTypeName")) return true;
         return IsSpecifierQualifierList(k);
     }
 
     public bool IsSpecifierQualifierList(int k = 1)
     {
+        if (no_semantics.Contains("IsSpecifierQualifierList")) return true;
         if (IsGnuAttributeBeforeDeclarator(k)) return true;
         if (IsTypeSpecifierQualifier(k)) return true;
         return false;
