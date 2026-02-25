@@ -189,9 +189,14 @@ propertyDeclaration
     : modifierList? (VAL | VAR) (NL* typeParameters)? (NL* type NL* DOT)? (
         NL* (multiVariableDeclaration | variableDeclaration)
     ) (NL* typeConstraints)? (NL* (BY | ASSIGNMENT) NL* expression)? (
-        NL* getter (semi setter)?
-        | NL* setter (semi getter)?
+        (NL* getter (semi setter)?
+        | NL* setter (semi getter)?)
+        | NL* explicitBackingField
     )?
+    ;
+
+explicitBackingField
+    : FIELD COLON type ASSIGNMENT NL* expression
     ;
 
 multiVariableDeclaration
