@@ -36,7 +36,7 @@ fileAnnotations
     ;
 
 fileAnnotation
-    : (FILE COLON (LSQUARE unescapedAnnotation+ RSQUARE | unescapedAnnotation) semi?)+
+    : (FILE_SITE COLON (LSQUARE unescapedAnnotation+ RSQUARE | unescapedAnnotation) semi?)+
     ;
 
 packageHeader
