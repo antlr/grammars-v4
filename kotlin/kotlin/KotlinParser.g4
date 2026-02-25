@@ -147,7 +147,7 @@ enumEntry
     ;
 
 functionDeclaration
-    : modifierList? FUN (NL* type NL* DOT)? (NL* typeParameters)? (NL* receiverType NL* DOT)? (
+    : functionModifierList? FUN (NL* type NL* DOT)? (NL* typeParameters)? (NL* receiverType NL* DOT)? (
         NL* identifier
     )? NL* functionValueParameters (NL* COLON NL* type)? (NL* typeConstraints)? (NL* functionBody)?
     ;
@@ -657,6 +657,19 @@ memberAccessOperator
 
 modifierList
     : (annotations | modifier)+
+    ;
+
+functionModifierList
+    : (annotations | modifier | contextModifier)+
+    ;
+
+contextParameters
+    : LPAREN (parameter (COMMA parameter)* COMMA?)? RPAREN
+    ;
+
+contextModifier
+    : CONTEXT
+    contextParameters
     ;
 
 modifier
