@@ -400,29 +400,6 @@ public abstract class CParserBase : Parser
             var declaration_specifiers = declaration_context?.declarationSpecifiers();
             var declaration_specifier = declaration_specifiers?.declarationSpecifier();
             var declarator = context as CParser.DeclaratorContext;
-            // Declare any typeSpecifiers that declare something.
-            if (declaration_specifier != null)
-            {
-                bool is_typedef = declaration_specifier?.Where(ds =>
-                {
-                    return ds.storageClassSpecifier()?.Typedef() != null;
-                }).Any() ?? false;
-                foreach (var ds in declaration_specifier)
-                {
-                    var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
-                    if (sous != null)
-                    {
-                        var idToken = sous.Identifier()?.Symbol;
-                        if (idToken != null)
-                        {
-                            var id = idToken.Text;
-                            var loc = GetSourceLocation(idToken);
-                            if (debug) System.Console.WriteLine("New symbol Declaration1 Declaration " + id);
-                            _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column });
-                        }
-                    }
-                }
-            }
             CParser.InitDeclaratorListContext init_declarator_list = declaration_context?.initDeclaratorList();
             CParser.InitDeclaratorContext[] init_declarators = init_declarator_list?.initDeclarator();
             if (init_declarators != null)

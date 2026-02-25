@@ -345,9 +345,9 @@ export abstract class CParserBase extends Parser {
         let context: ParserRuleContext | null = this.context;
         for (; context !== null; context = context.parent) {
             if (context instanceof DeclarationContext) {
-		if ( ! isDeclarationContext(context)) {
-		    continue;
-		}
+                if ( ! isDeclarationContext(context)) {
+                    continue;
+                }
                 const declaration_context = context as DeclarationContext;
                 const declaration_specifiers = declaration_context.declarationSpecifiers();
                 const declaration_specifier = declaration_specifiers?.declarationSpecifier() ?? null;
@@ -370,27 +370,6 @@ export abstract class CParserBase extends Parser {
                         if (ds.storageClassSpecifier()?.Typedef() !== null && ds.storageClassSpecifier()?.Typedef() !== undefined) {
                             is_typedef = true;
                             break;
-                        }
-                    }
-                    for (const ds of declaration_specifier) {
-                        if (ds.typeSpecifier() !== null && ds.typeSpecifier() != undefined) {
-			    const sous = ds.typeSpecifier().structOrUnionSpecifier();
-			    if (sous !== null && sous !== undefined) {
-				const id = sous.Identifier();
-				if (id !== null && id !== undefined) {
-				    const idToken = id.symbol;
-				    const text = idToken.text;
-				    const loc = this.getSourceLocation(idToken);
-				    const symbol = new Symbol();
-				    symbol.name = text;
-				    symbol.classification = new Set([TypeClassification.TypeSpecifier_]);
-				    symbol.definedFile = loc.file;
-				    symbol.definedLine = loc.line;
-				    symbol.definedColumn = loc.column;
-				    this._st.define(symbol);
-				    if (this.debug) console.log("New symbol Declaration1 Declarator " + symbol);
-				}
-			    }
                         }
                     }
                 }
@@ -430,13 +409,13 @@ export abstract class CParserBase extends Parser {
             }
             if (context instanceof FunctionDefinitionContext) {
                 const fd = context as FunctionDefinitionContext;
-		if ( ! isFunctionDefinitionContext(context)) {
-		    continue;
-		}
+                if ( ! isFunctionDefinitionContext(context)) {
+                    continue;
+                }
                 const de = fd.declarator();
-		if (de === null || de === undefined) continue;
+                if (de === null || de === undefined) continue;
                 const dd = de?.directDeclarator();
-		if (dd === null || dd === undefined) continue;
+                if (dd === null || dd === undefined) continue;
                 if (dd !== null && dd.Identifier() !== null && dd.Identifier() !== undefined) {
                     const idToken = dd.Identifier()!.symbol;
                     const text = idToken.text;

@@ -353,44 +353,6 @@ public abstract class CParserBase extends Parser {
                 CParser.DeclarationSpecifierContext[] declaration_specifier = declaration_specifiers != null ?
                         declaration_specifiers.declarationSpecifier().toArray(new CParser.DeclarationSpecifierContext[0]) : null;
 
-                // Declare any typeSpecifiers that declare something.
-                if (declaration_specifier != null)
-                {
-                    boolean isTypedef = false;
-                    if (declaration_specifier != null) {
-                        for (CParser.DeclarationSpecifierContext ds : declaration_specifier) {
-                            if (ds.storageClassSpecifier() != null && ds.storageClassSpecifier().Typedef() != null) {
-                                isTypedef = true;
-                                break;
-                            }
-                        }
-                    }
-                    for (CParser.DeclarationSpecifierContext ds : declaration_specifier) {
-                        if (ds != null && ds.typeSpecifier() != null) {
-                            var sous = ds.typeSpecifier().structOrUnionSpecifier();
-                            if (sous != null && sous.Identifier() != null)
-                            {
-                                var idToken = sous.Identifier().getSymbol();
-                                var id = idToken.getText();
-                                if (id != null)
-                                {
-                                    if (debug) System.out.println("New symbol Declaration1 Declarator " + id);
-                                    Symbol symbol = new Symbol();
-                                    symbol.setName(id);
-                                    HashSet<TypeClassification> classSet = new HashSet<>();
-                                    classSet.add(TypeClassification.TypeSpecifier_);
-                                    symbol.setClassification(classSet);
-                                    SourceLocation loc = getSourceLocation(idToken);
-                                    symbol.setDefinedFile(loc.file);
-                                    symbol.setDefinedLine(loc.line);
-                                    symbol.setDefinedColumn(loc.column);
-                                    _st.define(symbol);
-                                }
-                            }
-                        }
-                    }
-                }
-
                 CParser.InitDeclaratorListContext init_declarator_list = declaration_context.initDeclaratorList();
                 List<CParser.InitDeclaratorContext> init_declarators = init_declarator_list != null ?
                         init_declarator_list.initDeclarator() : null;

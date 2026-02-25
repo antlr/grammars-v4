@@ -447,39 +447,6 @@ void CParserBase::EnterDeclaration() {
                 declSpecList = declSpecs->declarationSpecifier();
             }
 
-            // Declare any typeSpecifiers that declare something (struct/union names)
-            if (!declSpecList.empty()) {
-                bool isTypedef = false;
-                for (auto *ds : declSpecList) {
-                    if (ds->storageClassSpecifier() && ds->storageClassSpecifier()->Typedef()) {
-                        isTypedef = true;
-                        break;
-                    }
-                }
-                for (auto *ds : declSpecList) {
-                    if (ds && ds->typeSpecifier()) {
-                        auto *sous = ds->typeSpecifier()->structOrUnionSpecifier();
-                        if (sous && sous->Identifier()) {
-                            auto *idToken = sous->Identifier()->getSymbol();
-                            std::string id = idToken->getText();
-                            if (!id.empty()) {
-                                if (debug_) std::cerr << "New symbol Declaration1 Declarator " << id << std::endl;
-                                auto symbol = std::make_shared<Symbol>();
-                                symbol->setName(id);
-                                std::unordered_set<TypeClassification> classSet;
-                                classSet.insert(TypeClassification::TypeSpecifier_);
-                                symbol->setClassification(classSet);
-                                auto loc = getSourceLocation(idToken);
-                                symbol->setDefinedFile(loc.file);
-                                symbol->setDefinedLine(loc.line);
-                                symbol->setDefinedColumn(loc.column);
-                                _st.define(symbol);
-                            }
-                        }
-                    }
-                }
-            }
-
             // Process init-declarator-list
             auto *initDeclList = declarationCtx->initDeclaratorList();
             if (initDeclList) {

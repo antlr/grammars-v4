@@ -376,27 +376,6 @@ export default class CParserBase extends antlr4.Parser {
                             break;
                         }
                     }
-                    for (const ds of declaration_specifier) {
-                        if (ds.typeSpecifier() !== null && ds.typeSpecifier() !== undefined) {
-                            const sous = ds.typeSpecifier().structOrUnionSpecifier();
-                            if (sous !== null && sous !== undefined) {
-                                const id = sous.Identifier();
-                                if (id !== null && id !== undefined) {
-                                    const idToken = id.symbol;
-                                    const text = idToken.text;
-                                    const loc = this._getSourceLocation(idToken);
-                                    const symbol = new Symbol();
-                                    symbol.name = text;
-                                    symbol.classification = new Set([TypeClassification.TypeSpecifier_]);
-                                    symbol.definedFile = loc.file;
-                                    symbol.definedLine = loc.line;
-                                    symbol.definedColumn = loc.column;
-                                    this._st.define(symbol);
-                                    if (this._debug) console.log("New symbol Declaration1 Declarator " + symbol);
-                                }
-                            }
-                        }
-                    }
                 }
 
                 const init_declaration_list = declaration_context.initDeclaratorList();

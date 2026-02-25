@@ -363,28 +363,6 @@ abstract class CParserBase extends Parser {
               break;
             }
           }
-          for (var ds in declarationSpecifierList) {
-            var typeSpec = ds.typeSpecifier();
-            if (typeSpec != null) {
-              var sous = typeSpec.structOrUnionSpecifier();
-              if (sous != null) {
-                var id = sous.Identifier();
-                if (id != null) {
-                  var idToken = id.symbol;
-                  var text = idToken?.text ?? "";
-                  var loc = _getSourceLocation(idToken);
-                  var symbol = Symbol();
-                  symbol.name = text;
-                  symbol.classification = {TypeClassification.typeSpecifier};
-                  symbol.definedFile = loc["file"];
-                  symbol.definedLine = loc["line"];
-                  symbol.definedColumn = loc["column"];
-                  _st.define(symbol);
-                  if (_debug) print("New symbol Declaration1 Declarator $symbol");
-                }
-              }
-            }
-          }
         }
 
         var initDeclarationList = declarationContext.initDeclaratorList();

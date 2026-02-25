@@ -415,25 +415,6 @@ class CParserBase(Parser):
                         if scs is not None and scs.Typedef() is not None:
                             is_typedef = True
                             break
-                    for ds in declaration_specifier:
-                        ts = ds.typeSpecifier()
-                        if ts is not None:
-                            sous = ts.structOrUnionSpecifier()
-                            if sous is not None:
-                                id_ = sous.Identifier()
-                                if id_ is not None:
-                                    idToken = id_.symbol
-                                    text = idToken.text
-                                    loc = self._getSourceLocation(idToken)
-                                    symbol = Symbol()
-                                    symbol.name = text
-                                    symbol.classification = {TypeClassification.TypeSpecifier_}
-                                    symbol.definedFile = loc["file"]
-                                    symbol.definedLine = loc["line"]
-                                    symbol.definedColumn = loc["column"]
-                                    self._st.define(symbol)
-                                    if self._debug:
-                                        print("New symbol Declaration1 Declarator " + str(symbol))
 
                 init_declaration_list = declaration_context.initDeclaratorList()
                 init_declarators = None
