@@ -790,6 +790,7 @@ simpleIdentifier
     | ANNOTATION
     | BY
     | CATCH
+    | CONTEXT
     | COMPANION
     | CONSTRUCTOR
     | CROSSINLINE
@@ -797,6 +798,7 @@ simpleIdentifier
     | DYNAMIC
     | ENUM
     | EXTERNAL
+    | FIELD
     | FINAL
     | FINALLY
     | GETTER
