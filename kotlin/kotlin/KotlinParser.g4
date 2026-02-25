@@ -759,15 +759,15 @@ annotationList
     ;
 
 annotationUseSiteTarget
-    : FIELD
-    | FILE
-    | PROPERTY
-    | GET
-    | SET
-    | RECEIVER
-    | PARAM
-    | SETPARAM
-    | DELEGATE
+    : FIELD_SITE
+    | FILE_SITE
+    | PROPERTY_SITE
+    | GET_SITE
+    | SET_SITE
+    | RECEIVER_SITE
+    | PARAM_SITE
+    | SETPARAM_SITE
+    | DELEGATE_SITE
     ;
 
 unescapedAnnotation
