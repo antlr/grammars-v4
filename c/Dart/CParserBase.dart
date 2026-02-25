@@ -16,7 +16,8 @@ const List<String> ALL_SEMANTIC_FUNCTIONS = [
   "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
   "IsNullStructDeclarationListExtension",
   "IsGnuAttributeBeforeDeclarator",
-  "IsSizeofTypeName"
+  "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+  "IsInitDeclaratorList"
 ];
 
 Set<String> parseNoSemantics(List<String> args) {
@@ -148,6 +149,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsDeclarationSpecifiers() {
+    if (_noSemantics.contains("IsDeclarationSpecifiers")) return true;
     return IsDeclarationSpecifier();
   }
 
@@ -550,7 +552,7 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsSomethingOfTypeName() {
-    if (_noSemantics.contains("IsSizeofTypeName")) return true;
+    if (_noSemantics.contains("IsSomethingOfTypeName")) return true;
     final ts = inputStream as CommonTokenStream;
     if (!(ts.LT(1)?.type == CLexer.TOKEN_Sizeof ||
           ts.LT(1)?.type == CLexer.TOKEN_Countof ||
@@ -563,10 +565,12 @@ abstract class CParserBase extends Parser {
   }
 
   bool IsTypeName([int k = 1]) {
+    if (_noSemantics.contains("IsTypeName")) return true;
     return IsSpecifierQualifierList(k);
   }
 
   bool IsSpecifierQualifierList([int k = 1]) {
+    if (_noSemantics.contains("IsSpecifierQualifierList")) return true;
     if (IsGnuAttributeBeforeDeclarator(k)) return true;
     if (IsTypeSpecifierQualifier(k)) return true;
     return false;

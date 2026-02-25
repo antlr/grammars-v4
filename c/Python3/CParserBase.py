@@ -14,7 +14,8 @@ ALL_SEMANTIC_FUNCTIONS = [
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
     "IsNullStructDeclarationListExtension",
     "IsGnuAttributeBeforeDeclarator",
-    "IsSizeofTypeName"
+    "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+    "IsInitDeclaratorList"
 ]
 
 def parseNoSemantics(args):
@@ -159,6 +160,8 @@ class CParserBase(Parser):
         return result
 
     def IsDeclarationSpecifiers(self):
+        if "IsDeclarationSpecifiers" in self.noSemantics:
+            return True
         return self.IsDeclarationSpecifier()
 
     def IsEnumSpecifier(self, k=1):
@@ -595,7 +598,7 @@ class CParserBase(Parser):
         return result
 
     def IsSomethingOfTypeName(self):
-        if "IsSizeofTypeName" in self.noSemantics:
+        if "IsSomethingOfTypeName" in self.noSemantics:
             return True
         CLexer = self._getLexerModule()
         if not (self._input.LT(1).type == CLexer.Sizeof or
@@ -611,9 +614,13 @@ class CParserBase(Parser):
         return False
 
     def IsTypeName(self, k=1):
+        if "IsTypeName" in self.noSemantics:
+            return True
         return self.IsSpecifierQualifierList(k)
 
     def IsSpecifierQualifierList(self, k=1):
+        if "IsSpecifierQualifierList" in self.noSemantics:
+            return True
         if self.IsGnuAttributeBeforeDeclarator(k):
             return True
         if self.IsTypeSpecifierQualifier(k):

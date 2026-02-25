@@ -190,6 +190,7 @@ bool CParserBase::IsTypeSpecifierQualifier(int k) {
 }
 
 bool CParserBase::IsDeclarationSpecifiers() {
+    if (noSemantics_.count("IsDeclarationSpecifiers")) return true;
     return IsDeclarationSpecifier();
 }
 
@@ -374,7 +375,7 @@ bool CParserBase::IsInitDeclaratorList() {
 }
 
 bool CParserBase::IsSomethingOfTypeName() {
-    if (noSemantics_.count("IsSizeofTypeName")) return true;
+    if (noSemantics_.count("IsSomethingOfTypeName")) return true;
     auto *ts = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     if (!ts) return false;
     int lt1Type = ts->LT(1)->getType();
@@ -389,10 +390,12 @@ bool CParserBase::IsSomethingOfTypeName() {
 }
 
 bool CParserBase::IsTypeName(int k) {
+    if (noSemantics_.count("IsTypeName")) return true;
     return IsSpecifierQualifierList(k);
 }
 
 bool CParserBase::IsSpecifierQualifierList(int k) {
+    if (noSemantics_.count("IsSpecifierQualifierList")) return true;
     if (IsGnuAttributeBeforeDeclarator(k)) return true;
     if (IsTypeSpecifierQualifier(k)) return true;
     return false;

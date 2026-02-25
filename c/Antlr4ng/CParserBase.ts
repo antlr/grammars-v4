@@ -30,7 +30,8 @@ const ALL_SEMANTIC_FUNCTIONS = [
     "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
     "IsNullStructDeclarationListExtension",
     "IsGnuAttributeBeforeDeclarator",
-    "IsSizeofTypeName"
+    "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+    "IsInitDeclaratorList"
 ];
 
 function parseNoSemantics(args: string[]): Set<string> {
@@ -166,6 +167,7 @@ export abstract class CParserBase extends Parser {
     }
 
     public IsDeclarationSpecifiers(): boolean {
+        if (this.noSemantics.has("IsDeclarationSpecifiers")) return true;
         return this.IsDeclarationSpecifier();
     }
 
@@ -585,7 +587,7 @@ export abstract class CParserBase extends Parser {
     }
 
     public IsSomethingOfTypeName(): boolean {
-        if (this.noSemantics.has("IsSizeofTypeName")) return true;
+        if (this.noSemantics.has("IsSomethingOfTypeName")) return true;
         const ts = this.inputStream as CommonTokenStream;
         if (!(ts.LT(1)!.type === CLexer.Sizeof ||
               ts.LT(1)!.type === CLexer.Countof ||
@@ -598,10 +600,12 @@ export abstract class CParserBase extends Parser {
     }
 
     public IsTypeName(k: number = 1): boolean {
+        if (this.noSemantics.has("IsTypeName")) return true;
         return this.IsSpecifierQualifierList(k);
     }
 
     public IsSpecifierQualifierList(k: number = 1): boolean {
+        if (this.noSemantics.has("IsSpecifierQualifierList")) return true;
         if (this.IsGnuAttributeBeforeDeclarator(k)) return true;
         if (this.IsTypeSpecifierQualifier(k)) return true;
         return false;

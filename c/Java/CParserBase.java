@@ -18,7 +18,8 @@ public abstract class CParserBase extends Parser {
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
         "IsNullStructDeclarationListExtension",
         "IsGnuAttributeBeforeDeclarator",
-        "IsSizeofTypeName"
+        "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+        "IsInitDeclaratorList"
     };
 
     protected CParserBase(TokenStream input) {
@@ -160,6 +161,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsDeclarationSpecifiers() {
+        if (noSemantics.contains("IsDeclarationSpecifiers")) return true;
         return IsDeclarationSpecifier();
     }
 
@@ -610,7 +612,7 @@ public abstract class CParserBase extends Parser {
     }
 
     public boolean IsSomethingOfTypeName() {
-        if (noSemantics.contains("IsSizeofTypeName")) return true;
+        if (noSemantics.contains("IsSomethingOfTypeName")) return true;
         CommonTokenStream ts = (CommonTokenStream) this.getInputStream();
         int lt1Type = ts.LT(1).getType();
         if (!(lt1Type == CLexer.Sizeof ||
@@ -625,11 +627,13 @@ public abstract class CParserBase extends Parser {
 
     public boolean IsTypeName() { return IsTypeName(1); }
     public boolean IsTypeName(int k) {
+        if (noSemantics.contains("IsTypeName")) return true;
         return IsSpecifierQualifierList(k);
     }
 
     public boolean IsSpecifierQualifierList() { return IsSpecifierQualifierList(1); }
     public boolean IsSpecifierQualifierList(int k) {
+        if (noSemantics.contains("IsSpecifierQualifierList")) return true;
         if (IsGnuAttributeBeforeDeclarator(k)) return true;
         if (IsTypeSpecifierQualifier(k)) return true;
         return false;
