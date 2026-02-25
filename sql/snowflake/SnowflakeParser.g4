@@ -1862,7 +1862,7 @@ create_git_opts
     ;
 
 create_index
-    : CREATE or_replace? INDEX if_not_exists id_ ON object_name  column_list_in_parentheses
+    : CREATE or_replace? INDEX if_not_exists? id_ ON object_name  column_list_in_parentheses
         (INCLUDE column_list_in_parentheses)?
     ;
 
@@ -3396,6 +3396,7 @@ show_command
     | show_git_tags
     | show_global_accounts
     | show_grants
+    | show_indexes
     | show_integrations
     | show_locks
     | show_managed_accounts
@@ -3578,6 +3579,10 @@ show_grants_opts
     | OF SHARE id_
     ;
 
+show_indexes
+    : SHOW TERSE? INDEXES like_pattern? in_obj_2? starts_with? limit_rows?
+    ;
+
 show_integrations
     : SHOW (API | NOTIFICATION | SECURITY | STORAGE)? INTEGRATIONS like_pattern?
     ;
@@ -3595,11 +3600,11 @@ show_masking_policies
     ;
 
 in_obj
-    : IN (ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA schema_name | schema_name)
+    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | schema_name)
     ;
 
 in_obj_2
-    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE | TABLE object_name)
+    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE object_name?)
     ;
 
 in_obj_3
@@ -3736,7 +3741,7 @@ show_streams
     ;
 
 show_tables
-    : SHOW TABLES like_pattern? in_obj?
+    : SHOW TERSE? HYBRID? TABLES like_pattern? in_obj? starts_with? limit_rows?
     ;
 
 show_tags
@@ -3962,10 +3967,11 @@ non_reserved_words
     | HYBRID
     | IDENTIFIER
     | IDENTITY
-    | INCREMENTAL
     | IMPORTED
+    | INCREMENTAL
     | INCLUDE
     | INDEX
+    | INDEXES
     | INITIALIZE
     | INPUT
     | INTERVAL
@@ -4048,6 +4054,7 @@ non_reserved_words
     | TIMEZONE
     | URL
     | USERADMIN
+    | USERNAME
     | VALUE
     | VALUES
     | VECTOR

@@ -450,6 +450,7 @@ INCLUDE            : 'INCLUDE';
 INCREMENT          : 'INCREMENT';
 INCREMENTAL        : 'INCREMENTAL';
 INDEX              : 'INDEX';
+INDEXES            : 'INDEXES';
 INFORMATION        : 'INFORMATION';
 // INIT:                                                  'INIT';
 INITIALIZE                           : 'INITIALIZE';
