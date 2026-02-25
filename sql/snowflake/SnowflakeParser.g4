@@ -2499,6 +2499,10 @@ copy_grants
     : COPY GRANTS
     ;
 
+copy_tags
+    : COPY TAGS
+    ;
+
 append_only
     : APPEND_ONLY EQ true_false
     ;
@@ -2542,6 +2546,7 @@ table_type
     : (LOCAL | GLOBAL)? temporary
     | VOLATILE
     | TRANSIENT
+    | HYBRID
     ;
 
 with_tags
@@ -2625,7 +2630,7 @@ create_table
     : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) (comment_clause? create_table_clause | create_table_clause comment_clause?)
+    ) create_table_clause*
     ;
 
 column_decl_item_list_paren
@@ -2633,12 +2638,34 @@ column_decl_item_list_paren
     ;
 
 create_table_clause
-    : (
-        column_decl_item_list_paren cluster_by?
-        | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking? default_ddl_collation
-        ? copy_grants? comment_clause? with_row_access_policy? with_tags?
+    : settable_table_options
+    | addable_table_options
+    | column_decl_item_list_paren 
+    | deprecated_table_options
+    | copy_grants 
+    | copy_tags
     ;
+
+addable_table_options
+    : with_row_access_policy
+    | with_tags
+    ;
+
+settable_table_options
+    : cluster_by
+    | set_data_retention_params
+    | default_ddl_collation
+    | comment_clause
+    | change_tracking
+    ;
+
+//on 02/2026, stage related options with CREATE TABLE do not appear anymore in doc but still supported
+//Snowflake recommend to use COPY INTO statement
+deprecated_table_options
+    : stage_file_format
+    | STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET
+    ;
+
 
 create_table_as_select
     : CREATE or_replace? table_type? TABLE (
@@ -2648,7 +2675,7 @@ create_table_as_select
     ;
 
 create_table_like
-    : CREATE or_replace? TRANSIENT? TABLE if_not_exists? object_name LIKE object_name cluster_by? copy_grants?
+    : CREATE or_replace? table_type? TABLE if_not_exists? object_name LIKE object_name cluster_by? copy_grants?
     ;
 
 create_tag
@@ -3922,6 +3949,7 @@ non_reserved_words
     | GLOBAL
     | HIGH
     | HOURS
+    | HYBRID
     | IDENTIFIER
     | IDENTITY
     | INCREMENTAL

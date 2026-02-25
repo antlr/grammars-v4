@@ -425,6 +425,7 @@ HEX                   : 'HEX';
 HIGH       : 'HIGH';
 HISTORY    : 'HISTORY';
 HOURS      : 'HOURS';
+HYBRID     : 'HYBRID';
 IDENTIFIER : 'IDENTIFIER';
 IDENTITY   : 'IDENTITY';
 IF         : 'IF';
