@@ -761,14 +761,10 @@ account_id_list
     ;
 
 alter_dataset
-    : ALTER DATASET ds=object_name
-        ADD VERSION v=string
-        FROM query_statement
-        (PARTITION BY id_list)?
-        comment_clause?
-        (METADATA EQ string)?
-    | ALTER DATASET if_exists? ds=object_name
-        DROP VERSION v=string
+    : ALTER DATASET ds=object_name ADD VERSION v=string FROM query_statement (
+        PARTITION BY id_list
+        )? comment_clause? (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds=object_name DROP VERSION v=string
     ;
 
 alter_dynamic_table
@@ -880,13 +876,13 @@ data_type_list
     ;
 
 alter_git_repository
-    : ALTER GIT REPOSITORY r=object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
-    | ALTER GIT REPOSITORY r=object_name FETCH
+    : ALTER GIT REPOSITORY r = object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY r = object_name FETCH
     ;
 
 alter_git_set_opts
-    : GIT_CREDENTIALS EQ sn=object_name
-    | API_INTEGRATION EQ ai=id_
+    : GIT_CREDENTIALS EQ sn = object_name
+    | API_INTEGRATION EQ ai = id_
     | comment_clause
     | tag_decl_list
     ;
@@ -1052,24 +1048,24 @@ secret_oauth_client_creds_opts
     ;
 
 secret_oauth_auth_code_opts
-    : OAUTH_REFRESH_TOKEN EQ t=string
-    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet=string
+    : OAUTH_REFRESH_TOKEN EQ t = string
+    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet = string
     | comment_clause
     ;
 
 secret_api_auth_opts
-    : API_AUTHENTICATION EQ aa=string
+    : API_AUTHENTICATION EQ aa = string
     | comment_clause
     ;
 
 secret_basic_auth_opts
-    : USERNAME EQ u=string
-    | PASSWORD EQ p=string
+    : USERNAME EQ u = string
+    | PASSWORD EQ p = string
     | comment_clause
     ;
 
 secret_generic_string_opts
-    : SECRET_STRING EQ ss=string
+    : SECRET_STRING EQ ss = string
     | comment_clause
     ;
 
@@ -1617,15 +1613,15 @@ alert_action
     ;
 
 create_api_integration
-    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider=id_ API_AWS_ROLE_ARN EQ string (
+    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider = id_ API_AWS_ROLE_ARN EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ LR_BRACKET string RR_BRACKET (
         API_BLOCKED_PREFIXES EQ LR_BRACKET string RR_BRACKET
     )? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider=id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
+    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider = id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ '(' string ')' (API_BLOCKED_PREFIXES EQ '(' string ')')? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ provider=id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
+    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ provider = id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
         API_BLOCKED_PREFIXES EQ '(' string ')'
     )? ENABLED EQ true_false comment_clause?
     ;
@@ -1677,7 +1673,7 @@ compression
     ;
 
 create_dataset
-    : CREATE or_replace? DATASET if_not_exists? ds=object_name
+    : CREATE or_replace? DATASET if_not_exists? ds = object_name
     ;
 
 create_dynamic_table
@@ -1848,14 +1844,14 @@ create_function
     ;
 
 create_git_repository
-    : CREATE or_replace? GIT REPOSITORY if_not_exists? r=object_name
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? r = object_name
         create_git_opts+
     ;
 
 create_git_opts
     : ORIGIN EQ string
-    | API_INTEGRATION EQ ai=id_
-    | GIT_CREDENTIALS EQ sn=object_name
+    | API_INTEGRATION EQ ai = id_
+    | GIT_CREDENTIALS EQ sn = object_name
     | comment_clause
     | with_tags
     ;
@@ -2003,12 +1999,12 @@ create_schema
     ;
 
 create_secret
-    : CREATE or_replace? SECRET if_not_exists? s=object_name (
+    : CREATE or_replace? SECRET if_not_exists? s = object_name (
         TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
-        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt=string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et=string API_AUTHENTICATION EQ aa=id_ |
+        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt = string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et = string API_AUTHENTICATION EQ aa = id_ |
         TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
-        TYPE EQ PASSWORD USERNAME EQ u=string PASSWORD EQ p=string |
-        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss=string |
+        TYPE EQ PASSWORD USERNAME EQ u = string PASSWORD EQ p = string |
+        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss = string |
         TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
     )
     comment_clause?
@@ -2121,7 +2117,7 @@ logical_table
     ;
 
 relationship_def
-    : (r=id_ AS)? t=alias column_list_in_parentheses REFERENCES rft=alias ('(' ASOF? column_list ')')?
+    : (r = id_ AS)? t = alias column_list_in_parentheses REFERENCES rft = alias ('(' ASOF? column_list ')')?
     ;
 
 with_synonyms_clause
@@ -2133,11 +2129,11 @@ semantic_expression_list
     ;
 
 semantic_expression
-    : PUBLIC? t=alias '.' dim=id_ AS expr
-        (WITH CORTEX SEARCH SERVICE sn=id_ (USING col=id_)?)?
+    : PUBLIC? t = alias '.' dim = id_ AS expr
+        (WITH CORTEX SEARCH SERVICE sn = id_ (USING col = id_)?)?
         with_synonyms_clause?
         comment_clause?
-    | (PRIVATE | PUBLIC)? t=alias '.' fom=id_ AS expr
+    | (PRIVATE | PUBLIC)? t = alias '.' fom = id_ AS expr
         with_synonyms_clause?
         comment_clause?
     ;
@@ -2443,8 +2439,8 @@ create_stage
     ;
 
 alter_semantic_view
-    : ALTER SEMANTIC VIEW if_exists? sv=object_name
-        ( RENAME TO n=object_name
+    : ALTER SEMANTIC VIEW if_exists? sv = object_name
+        ( RENAME TO n = object_name
         | SET comment_clause
         | UNSET COMMENT
         )
@@ -3013,7 +3009,7 @@ drop_function
     ;
 
 drop_git_repository
-    : DROP GIT REPOSITORY if_exists? r=object_name
+    : DROP GIT REPOSITORY if_exists? r = object_name
     ;
 
 drop_index
@@ -3281,7 +3277,7 @@ describe_function
     ;
 
 describe_git_repository
-    : describe GIT REPOSITORY r=object_name
+    : describe GIT REPOSITORY r = object_name
     ;
 
 describe_integration
@@ -3497,9 +3493,9 @@ show_databases_in_replication_group
 show_datasets
     : SHOW DATASETS
         like_pattern?
-        (IN (SCHEMA s=schema_name | DATABASE d=id_ | ACCOUNT))?
-        (STARTS WITH sw=string)?
-        (LIMIT num (FROM f=string)? )?
+        (IN (SCHEMA s = schema_name | DATABASE d = id_ | ACCOUNT))?
+        (STARTS WITH sw = string)?
+        (LIMIT num (FROM f = string)? )?
     ;
 
 show_delegated_authorizations
@@ -3543,21 +3539,21 @@ show_functions
     ;
 
 show_git_branches
-    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r=object_name
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r = object_name
     ;
 
 show_git_repositories
     : SHOW GIT REPOSITORIES like_pattern?
         (IN (ACCOUNT
-            | DATABASE d=id_?
-            | SCHEMA s=schema_name?
+            | DATABASE d = id_?
+            | SCHEMA s = schema_name?
             | schema_name
             )
         )?
     ;
 
 show_git_tags
-    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r=object_name
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r = object_name
     ;
 
 show_global_accounts
@@ -3688,7 +3684,7 @@ show_schemas
     ;
 
 show_secrets
-    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
+    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d = id_ | SCHEMA? s = schema_name | APPLICATION a = id_ | APPLICATION PACKAGE p = id_))?
     ;
 
 show_semantic_views
@@ -3700,7 +3696,7 @@ show_semantic_dimensions
     ;
 
 show_semantic_dimensions_for_metric
-    : SHOW SEMANTIC DIMENSIONS like_pattern? IN sv=object_name FOR METRIC mn=id_ starts_with? limit_rows_2?
+    : SHOW SEMANTIC DIMENSIONS like_pattern? IN sv = object_name FOR METRIC mn = id_ starts_with? limit_rows_2?
     ;
 
 show_semantic_facts
@@ -3775,7 +3771,7 @@ show_variables
     ;
 
 show_versions_in_dataset
-    : SHOW VERSIONS like_pattern? IN DATASET ds=object_name (LIMIT num)?
+    : SHOW VERSIONS like_pattern? IN DATASET ds = object_name (LIMIT num)?
     ;
 
 show_views
@@ -4638,7 +4634,8 @@ join_clause
     ;
 
 on_using_clause
-    : ON search_condition | USING column_list_in_parentheses
+    : ON search_condition 
+    | USING column_list_in_parentheses
     ;
 
 at_before
@@ -4717,7 +4714,8 @@ match_recognize
 
 pivot_unpivot
     : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
-        as_alias column_alias_list_in_brackets?  )?
+        as_alias column_alias_list_in_brackets?  
+    )?
     | UNPIVOT (include_exclude NULLS)? LR_BRACKET id_ FOR column_name IN LR_BRACKET aliased_column_list RR_BRACKET RR_BRACKET
     ;
 
