@@ -909,8 +909,8 @@ alter_materialized_view
         | CLUSTER BY '(' expr_list ')'
         | DROP CLUSTERING KEY
         | resume_suspend RECLUSTER?
-        | SET ( SECURE? comment_clause?)
-        | UNSET ( SECURE | COMMENT)
+        | SET (SECURE | comment_clause)
+        | UNSET (SECURE | COMMENT)
     )
     ;
 
@@ -928,11 +928,10 @@ alter_notification_integration
     ;
 
 alter_pipe
-    : ALTER PIPE if_exists? id_ SET (object_properties? comment_clause?)
+    : ALTER PIPE if_exists? id_ SET (PIPE_EXECUTION_PAUSED EQ true_false | comment_clause | ERROR_INTEGRATION EQ string)
     | ALTER PIPE id_ set_tags
     | ALTER PIPE id_ unset_tags
-    | ALTER PIPE if_exists? id_ UNSET PIPE_EXECUTION_PAUSED EQ true_false
-    | ALTER PIPE if_exists? id_ UNSET COMMENT
+    | ALTER PIPE if_exists? id_ UNSET (PIPE_EXECUTION_PAUSED | ERROR_INTEGRATION | COMMENT)
     | ALTER PIPE if_exists? id_ REFRESH (PREFIX EQ string)? (MODIFIED_AFTER EQ string)?
     ;
 
@@ -1008,9 +1007,8 @@ alter_row_access_policy
 alter_schema
     : ALTER SCHEMA if_exists? schema_name RENAME TO schema_name
     | ALTER SCHEMA if_exists? schema_name SWAP WITH schema_name
-    | ALTER SCHEMA if_exists? schema_name SET (
+    | ALTER SCHEMA if_exists? schema_name SET
         (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? comment_clause?
-    )
     | ALTER SCHEMA if_exists? schema_name set_tags
     | ALTER SCHEMA if_exists? schema_name unset_tags
     | ALTER SCHEMA if_exists? schema_name UNSET schema_property (COMMA schema_property)*
@@ -1122,7 +1120,7 @@ alter_security_integration_snowflake_oauth
         EXTERNAL_OAUTH_AUDIENCE_LIST EQ '(' string ')'
     )? (EXTERNAL_OAUTH_ANY_ROLE_MODE EQ DISABLE | ENABLE | ENABLE_FOR_PRIVILEGE)? (
         EXTERNAL_OAUTH_SCOPE_DELIMITER EQ string
-    ) // Only for EXTERNAL_OAUTH_TYPE EQ CUSTOM
+    )? // Only for EXTERNAL_OAUTH_TYPE EQ CUSTOM
     | ALTER SECURITY? INTEGRATION if_exists? id_ UNSET security_integration_snowflake_oauth_property (
         COMMA security_integration_snowflake_oauth_property
     )*
@@ -1285,7 +1283,7 @@ alter_column_clause
     : COLUMN? column_name (
         DROP DEFAULT
         | SET DEFAULT object_name DOT NEXTVAL
-        | ( SET? NOT NULL_ | DROP NOT NULL_)
+        | ( SET | DROP)? NOT NULL_
         | ( (SET DATA)? TYPE)? data_type
         | COMMENT string
         | UNSET COMMENT
@@ -1397,7 +1395,7 @@ alter_column_decl
 alter_column_opts
     : DROP DEFAULT
     | SET DEFAULT object_name DOT NEXTVAL
-    | ( SET? NOT NULL_ | DROP NOT NULL_)
+    | ( SET | DROP )? NOT NULL_
     | ( (SET DATA)? TYPE)? data_type
     | comment_clause
     | UNSET COMMENT
@@ -1466,7 +1464,7 @@ alter_warehouse
 
 alter_connection_opts
     : id_ ENABLE FAILOVER TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_)* ignore_edition_check?
-    | id_ DISABLE FAILOVER ( TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_))?
+    | id_ DISABLE FAILOVER ( TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_)*)?
     | id_ PRIMARY
     | if_exists? id_ SET comment_clause
     | if_exists? id_ UNSET COMMENT
@@ -1619,15 +1617,15 @@ alert_action
     ;
 
 create_api_integration
-    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ (id_) API_AWS_ROLE_ARN EQ string (
+    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider=id_ API_AWS_ROLE_ARN EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ LR_BRACKET string RR_BRACKET (
         API_BLOCKED_PREFIXES EQ LR_BRACKET string RR_BRACKET
     )? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
+    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider=id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ '(' string ')' (API_BLOCKED_PREFIXES EQ '(' string ')')? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
+    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ provider=id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
         API_BLOCKED_PREFIXES EQ '(' string ')'
     )? ENABLED EQ true_false comment_clause?
     ;
@@ -1734,8 +1732,9 @@ create_external_function
     : CREATE or_replace? SECURE? EXTERNAL FUNCTION object_name LR_BRACKET (
         arg_name arg_data_type (COMMA arg_name arg_data_type)*
     )? RR_BRACKET RETURNS data_type null_not_null? (
-        ( CALLED ON NULL_ INPUT)
-        | ((RETURNS NULL_ ON NULL_ INPUT) | STRICT)
+        CALLED ON NULL_ INPUT 
+        | RETURNS NULL_ ON NULL_ INPUT 
+        | STRICT
     )? (VOLATILE | IMMUTABLE)? comment_clause? API_INTEGRATION EQ id_ (
         HEADERS EQ LR_BRACKET header_decl (COMMA header_decl)* RR_BRACKET
     )? (CONTEXT_HEADERS EQ LR_BRACKET id_ (COMMA id_)* RR_BRACKET)? (MAX_BATCH_ROWS EQ num)? compression? (
@@ -4734,7 +4733,7 @@ pivot_in_clause
     ;
 
 default_on_null
-    : DEFAULT ON NULL_ (expr)
+    : DEFAULT ON NULL_ LR_BRACKET expr RR_BRACKET
     ;
 
 column_alias_list_in_brackets
