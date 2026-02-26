@@ -761,14 +761,10 @@ account_id_list
     ;
 
 alter_dataset
-    : ALTER DATASET ds=object_name
-        ADD VERSION v=string
-        FROM query_statement
-        (PARTITION BY id_list)?
-        comment_clause?
-        (METADATA EQ string)?
-    | ALTER DATASET if_exists? ds=object_name
-        DROP VERSION v=string
+    : ALTER DATASET ds=object_name ADD VERSION v=string FROM query_statement (
+        PARTITION BY id_list
+        )? comment_clause? (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds=object_name DROP VERSION v=string
     ;
 
 alter_dynamic_table
@@ -880,13 +876,13 @@ data_type_list
     ;
 
 alter_git_repository
-    : ALTER GIT REPOSITORY r=object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
-    | ALTER GIT REPOSITORY r=object_name FETCH
+    : ALTER GIT REPOSITORY r = object_name (SET alter_git_set_opts+ | UNSET alter_git_unset_opts+)
+    | ALTER GIT REPOSITORY r = object_name FETCH
     ;
 
 alter_git_set_opts
-    : GIT_CREDENTIALS EQ sn=object_name
-    | API_INTEGRATION EQ ai=id_
+    : GIT_CREDENTIALS EQ sn = object_name
+    | API_INTEGRATION EQ ai = id_
     | comment_clause
     | tag_decl_list
     ;
@@ -909,8 +905,8 @@ alter_materialized_view
         | CLUSTER BY '(' expr_list ')'
         | DROP CLUSTERING KEY
         | resume_suspend RECLUSTER?
-        | SET ( SECURE? comment_clause?)
-        | UNSET ( SECURE | COMMENT)
+        | SET (SECURE | comment_clause)
+        | UNSET (SECURE | COMMENT)
     )
     ;
 
@@ -928,11 +924,10 @@ alter_notification_integration
     ;
 
 alter_pipe
-    : ALTER PIPE if_exists? id_ SET (object_properties? comment_clause?)
+    : ALTER PIPE if_exists? id_ SET (PIPE_EXECUTION_PAUSED EQ true_false | comment_clause | ERROR_INTEGRATION EQ string)
     | ALTER PIPE id_ set_tags
     | ALTER PIPE id_ unset_tags
-    | ALTER PIPE if_exists? id_ UNSET PIPE_EXECUTION_PAUSED EQ true_false
-    | ALTER PIPE if_exists? id_ UNSET COMMENT
+    | ALTER PIPE if_exists? id_ UNSET (PIPE_EXECUTION_PAUSED | ERROR_INTEGRATION | COMMENT)
     | ALTER PIPE if_exists? id_ REFRESH (PREFIX EQ string)? (MODIFIED_AFTER EQ string)?
     ;
 
@@ -1008,9 +1003,8 @@ alter_row_access_policy
 alter_schema
     : ALTER SCHEMA if_exists? schema_name RENAME TO schema_name
     | ALTER SCHEMA if_exists? schema_name SWAP WITH schema_name
-    | ALTER SCHEMA if_exists? schema_name SET (
+    | ALTER SCHEMA if_exists? schema_name SET
         (DATA_RETENTION_TIME_IN_DAYS EQ num)? (MAX_DATA_EXTENSION_TIME_IN_DAYS EQ num)? default_ddl_collation? comment_clause?
-    )
     | ALTER SCHEMA if_exists? schema_name set_tags
     | ALTER SCHEMA if_exists? schema_name unset_tags
     | ALTER SCHEMA if_exists? schema_name UNSET schema_property (COMMA schema_property)*
@@ -1054,24 +1048,24 @@ secret_oauth_client_creds_opts
     ;
 
 secret_oauth_auth_code_opts
-    : OAUTH_REFRESH_TOKEN EQ t=string
-    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet=string
+    : OAUTH_REFRESH_TOKEN EQ t = string
+    | OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ tet = string
     | comment_clause
     ;
 
 secret_api_auth_opts
-    : API_AUTHENTICATION EQ aa=string
+    : API_AUTHENTICATION EQ aa = string
     | comment_clause
     ;
 
 secret_basic_auth_opts
-    : USERNAME EQ u=string
-    | PASSWORD EQ p=string
+    : USERNAME EQ u = string
+    | PASSWORD EQ p = string
     | comment_clause
     ;
 
 secret_generic_string_opts
-    : SECRET_STRING EQ ss=string
+    : SECRET_STRING EQ ss = string
     | comment_clause
     ;
 
@@ -1122,7 +1116,7 @@ alter_security_integration_snowflake_oauth
         EXTERNAL_OAUTH_AUDIENCE_LIST EQ '(' string ')'
     )? (EXTERNAL_OAUTH_ANY_ROLE_MODE EQ DISABLE | ENABLE | ENABLE_FOR_PRIVILEGE)? (
         EXTERNAL_OAUTH_SCOPE_DELIMITER EQ string
-    ) // Only for EXTERNAL_OAUTH_TYPE EQ CUSTOM
+    )? // Only for EXTERNAL_OAUTH_TYPE EQ CUSTOM
     | ALTER SECURITY? INTEGRATION if_exists? id_ UNSET security_integration_snowflake_oauth_property (
         COMMA security_integration_snowflake_oauth_property
     )*
@@ -1285,7 +1279,7 @@ alter_column_clause
     : COLUMN? column_name (
         DROP DEFAULT
         | SET DEFAULT object_name DOT NEXTVAL
-        | ( SET? NOT NULL_ | DROP NOT NULL_)
+        | ( SET | DROP)? NOT NULL_
         | ( (SET DATA)? TYPE)? data_type
         | COMMENT string
         | UNSET COMMENT
@@ -1397,7 +1391,7 @@ alter_column_decl
 alter_column_opts
     : DROP DEFAULT
     | SET DEFAULT object_name DOT NEXTVAL
-    | ( SET? NOT NULL_ | DROP NOT NULL_)
+    | ( SET | DROP )? NOT NULL_
     | ( (SET DATA)? TYPE)? data_type
     | comment_clause
     | UNSET COMMENT
@@ -1466,7 +1460,7 @@ alter_warehouse
 
 alter_connection_opts
     : id_ ENABLE FAILOVER TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_)* ignore_edition_check?
-    | id_ DISABLE FAILOVER ( TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_))?
+    | id_ DISABLE FAILOVER ( TO ACCOUNTS id_ DOT id_ (COMMA id_ DOT id_)*)?
     | id_ PRIMARY
     | if_exists? id_ SET comment_clause
     | if_exists? id_ UNSET COMMENT
@@ -1557,6 +1551,7 @@ create_command
     | create_function
     | create_git_repository
     //| create_integration
+    | create_index
     | create_managed_account
     | create_masking_policy
     | create_materialized_view
@@ -1618,15 +1613,15 @@ alert_action
     ;
 
 create_api_integration
-    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ (id_) API_AWS_ROLE_ARN EQ string (
+    : CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider = id_ API_AWS_ROLE_ARN EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ LR_BRACKET string RR_BRACKET (
         API_BLOCKED_PREFIXES EQ LR_BRACKET string RR_BRACKET
     )? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
+    | CREATE or_replace? API INTEGRATION if_not_exists? id_ API_PROVIDER EQ provider = id_ AZURE_TENANT_ID EQ string AZURE_AD_APPLICATION_ID EQ string (
         API_KEY EQ string
     )? API_ALLOWED_PREFIXES EQ '(' string ')' (API_BLOCKED_PREFIXES EQ '(' string ')')? ENABLED EQ true_false comment_clause?
-    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
+    | CREATE or_replace API INTEGRATION if_not_exists id_ API_PROVIDER EQ provider = id_ GOOGLE_AUDIENCE EQ string API_ALLOWED_PREFIXES EQ '(' string ')' (
         API_BLOCKED_PREFIXES EQ '(' string ')'
     )? ENABLED EQ true_false comment_clause?
     ;
@@ -1678,7 +1673,7 @@ compression
     ;
 
 create_dataset
-    : CREATE or_replace? DATASET if_not_exists? ds=object_name
+    : CREATE or_replace? DATASET if_not_exists? ds = object_name
     ;
 
 create_dynamic_table
@@ -1733,8 +1728,9 @@ create_external_function
     : CREATE or_replace? SECURE? EXTERNAL FUNCTION object_name LR_BRACKET (
         arg_name arg_data_type (COMMA arg_name arg_data_type)*
     )? RR_BRACKET RETURNS data_type null_not_null? (
-        ( CALLED ON NULL_ INPUT)
-        | ((RETURNS NULL_ ON NULL_ INPUT) | STRICT)
+        CALLED ON NULL_ INPUT 
+        | RETURNS NULL_ ON NULL_ INPUT 
+        | STRICT
     )? (VOLATILE | IMMUTABLE)? comment_clause? API_INTEGRATION EQ id_ (
         HEADERS EQ LR_BRACKET header_decl (COMMA header_decl)* RR_BRACKET
     )? (CONTEXT_HEADERS EQ LR_BRACKET id_ (COMMA id_)* RR_BRACKET)? (MAX_BATCH_ROWS EQ num)? compression? (
@@ -1848,16 +1844,21 @@ create_function
     ;
 
 create_git_repository
-    : CREATE or_replace? GIT REPOSITORY if_not_exists? r=object_name
+    : CREATE or_replace? GIT REPOSITORY if_not_exists? r = object_name
         create_git_opts+
     ;
 
 create_git_opts
     : ORIGIN EQ string
-    | API_INTEGRATION EQ ai=id_
-    | GIT_CREDENTIALS EQ sn=object_name
+    | API_INTEGRATION EQ ai = id_
+    | GIT_CREDENTIALS EQ sn = object_name
     | comment_clause
     | with_tags
+    ;
+
+create_index
+    : CREATE or_replace? INDEX if_not_exists? id_ ON object_name  column_list_in_parentheses
+        (INCLUDE column_list_in_parentheses)?
     ;
 
 create_managed_account
@@ -1998,12 +1999,12 @@ create_schema
     ;
 
 create_secret
-    : CREATE or_replace? SECRET if_not_exists? s=object_name (
+    : CREATE or_replace? SECRET if_not_exists? s = object_name (
         TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
-        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt=string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et=string API_AUTHENTICATION EQ aa=id_ |
+        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt = string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et = string API_AUTHENTICATION EQ aa = id_ |
         TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
-        TYPE EQ PASSWORD USERNAME EQ u=string PASSWORD EQ p=string |
-        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss=string |
+        TYPE EQ PASSWORD USERNAME EQ u = string PASSWORD EQ p = string |
+        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss = string |
         TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
     )
     comment_clause?
@@ -2116,7 +2117,7 @@ logical_table
     ;
 
 relationship_def
-    : (r=id_ AS)? t=alias column_list_in_parentheses REFERENCES rft=alias ('(' ASOF? column_list ')')?
+    : (r = id_ AS)? t = alias column_list_in_parentheses REFERENCES rft = alias ('(' ASOF? column_list ')')?
     ;
 
 with_synonyms_clause
@@ -2128,11 +2129,11 @@ semantic_expression_list
     ;
 
 semantic_expression
-    : PUBLIC? t=alias '.' dim=id_ AS expr
-        (WITH CORTEX SEARCH SERVICE sn=id_ (USING col=id_)?)?
+    : PUBLIC? t = alias '.' dim = id_ AS expr
+        (WITH CORTEX SEARCH SERVICE sn = id_ (USING col = id_)?)?
         with_synonyms_clause?
         comment_clause?
-    | (PRIVATE | PUBLIC)? t=alias '.' fom=id_ AS expr
+    | (PRIVATE | PUBLIC)? t = alias '.' fom = id_ AS expr
         with_synonyms_clause?
         comment_clause?
     ;
@@ -2438,8 +2439,8 @@ create_stage
     ;
 
 alter_semantic_view
-    : ALTER SEMANTIC VIEW if_exists? sv=object_name
-        ( RENAME TO n=object_name
+    : ALTER SEMANTIC VIEW if_exists? sv = object_name
+        ( RENAME TO n = object_name
         | SET comment_clause
         | UNSET COMMENT
         )
@@ -2499,6 +2500,10 @@ copy_grants
     : COPY GRANTS
     ;
 
+copy_tags
+    : COPY TAGS
+    ;
+
 append_only
     : APPEND_ONLY EQ true_false
     ;
@@ -2542,6 +2547,7 @@ table_type
     : (LOCAL | GLOBAL)? temporary
     | VOLATILE
     | TRANSIENT
+    | HYBRID
     ;
 
 with_tags
@@ -2625,20 +2631,41 @@ create_table
     : CREATE (or_replace | or_alter)? table_type? TABLE (
         if_not_exists? object_name
         | object_name if_not_exists?
-    ) (comment_clause? create_table_clause | create_table_clause comment_clause?)
+    ) create_table_optionnal_clause* column_decl_item_list_paren create_table_optionnal_clause*
     ;
 
 column_decl_item_list_paren
     : LR_BRACKET column_decl_item_list RR_BRACKET
     ;
 
-create_table_clause
-    : (
-        column_decl_item_list_paren cluster_by?
-        | cluster_by? comment_clause? column_decl_item_list_paren
-    ) stage_file_format? (STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET)? set_data_retention_params? change_tracking? default_ddl_collation
-        ? copy_grants? comment_clause? with_row_access_policy? with_tags?
+create_table_optionnal_clause
+    : settable_table_options
+    | addable_table_options
+    | deprecated_table_options
+    | copy_grants
+    | copy_tags
     ;
+
+addable_table_options
+    : with_row_access_policy
+    | with_tags
+    ;
+
+settable_table_options
+    : cluster_by
+    | set_data_retention_params
+    | default_ddl_collation
+    | comment_clause
+    | change_tracking
+    ;
+
+//on 02/2026, stage related options with CREATE TABLE do not appear anymore in doc but still supported
+//Snowflake recommend to use COPY INTO statement
+deprecated_table_options
+    : stage_file_format
+    | STAGE_COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET
+    ;
+
 
 create_table_as_select
     : CREATE or_replace? table_type? TABLE (
@@ -2648,7 +2675,7 @@ create_table_as_select
     ;
 
 create_table_like
-    : CREATE or_replace? TRANSIENT? TABLE if_not_exists? object_name LIKE object_name cluster_by? copy_grants?
+    : CREATE or_replace? table_type? TABLE if_not_exists? object_name LIKE object_name cluster_by? copy_grants?
     ;
 
 create_tag
@@ -2916,6 +2943,7 @@ drop_command
     | drop_file_format
     | drop_function
     | drop_git_repository
+    | drop_index
     | drop_integration
     | drop_managed_account
     | drop_masking_policy
@@ -2981,7 +3009,11 @@ drop_function
     ;
 
 drop_git_repository
-    : DROP GIT REPOSITORY if_exists? r=object_name
+    : DROP GIT REPOSITORY if_exists? r = object_name
+    ;
+
+drop_index
+    : DROP INDEX if_exists? object_name DOT id_
     ;
 
 drop_integration
@@ -3245,7 +3277,7 @@ describe_function
     ;
 
 describe_git_repository
-    : describe GIT REPOSITORY r=object_name
+    : describe GIT REPOSITORY r = object_name
     ;
 
 describe_integration
@@ -3359,6 +3391,7 @@ show_command
     | show_git_tags
     | show_global_accounts
     | show_grants
+    | show_indexes
     | show_integrations
     | show_locks
     | show_managed_accounts
@@ -3460,9 +3493,9 @@ show_databases_in_replication_group
 show_datasets
     : SHOW DATASETS
         like_pattern?
-        (IN (SCHEMA s=schema_name | DATABASE d=id_ | ACCOUNT))?
-        (STARTS WITH sw=string)?
-        (LIMIT num (FROM f=string)? )?
+        (IN (SCHEMA s = schema_name | DATABASE d = id_ | ACCOUNT))?
+        (STARTS WITH sw = string)?
+        (LIMIT num (FROM f = string)? )?
     ;
 
 show_delegated_authorizations
@@ -3506,21 +3539,21 @@ show_functions
     ;
 
 show_git_branches
-    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r=object_name
+    : SHOW GIT BRANCHES like_pattern? IN (GIT REPOSITORY)? r = object_name
     ;
 
 show_git_repositories
     : SHOW GIT REPOSITORIES like_pattern?
         (IN (ACCOUNT
-            | DATABASE d=id_?
-            | SCHEMA s=schema_name?
+            | DATABASE d = id_?
+            | SCHEMA s = schema_name?
             | schema_name
             )
         )?
     ;
 
 show_git_tags
-    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r=object_name
+    : SHOW GIT TAGS like_pattern? IN (GIT REPOSITORY)? r = object_name
     ;
 
 show_global_accounts
@@ -3541,6 +3574,10 @@ show_grants_opts
     | OF SHARE id_
     ;
 
+show_indexes
+    : SHOW TERSE? INDEXES like_pattern? in_obj_2? starts_with? limit_rows?
+    ;
+
 show_integrations
     : SHOW (API | NOTIFICATION | SECURITY | STORAGE)? INTEGRATIONS like_pattern?
     ;
@@ -3558,11 +3595,11 @@ show_masking_policies
     ;
 
 in_obj
-    : IN (ACCOUNT | DATABASE | DATABASE id_ | SCHEMA | SCHEMA schema_name | schema_name)
+    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | schema_name)
     ;
 
 in_obj_2
-    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE | TABLE object_name)
+    : IN (ACCOUNT | DATABASE id_? | SCHEMA schema_name? | TABLE object_name?)
     ;
 
 in_obj_3
@@ -3647,7 +3684,7 @@ show_schemas
     ;
 
 show_secrets
-    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d=id_ | SCHEMA? s=schema_name | APPLICATION a=id_ | APPLICATION PACKAGE p=id_))?
+    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d = id_ | SCHEMA? s = schema_name | APPLICATION a = id_ | APPLICATION PACKAGE p = id_))?
     ;
 
 show_semantic_views
@@ -3659,7 +3696,7 @@ show_semantic_dimensions
     ;
 
 show_semantic_dimensions_for_metric
-    : SHOW SEMANTIC DIMENSIONS like_pattern? IN sv=object_name FOR METRIC mn=id_ starts_with? limit_rows_2?
+    : SHOW SEMANTIC DIMENSIONS like_pattern? IN sv = object_name FOR METRIC mn = id_ starts_with? limit_rows_2?
     ;
 
 show_semantic_facts
@@ -3699,7 +3736,7 @@ show_streams
     ;
 
 show_tables
-    : SHOW TABLES like_pattern? in_obj?
+    : SHOW TERSE? HYBRID? TABLES like_pattern? in_obj? starts_with? limit_rows?
     ;
 
 show_tags
@@ -3734,7 +3771,7 @@ show_variables
     ;
 
 show_versions_in_dataset
-    : SHOW VERSIONS like_pattern? IN DATASET ds=object_name (LIMIT num)?
+    : SHOW VERSIONS like_pattern? IN DATASET ds = object_name (LIMIT num)?
     ;
 
 show_views
@@ -3922,12 +3959,14 @@ non_reserved_words
     | GLOBAL
     | HIGH
     | HOURS
+    | HYBRID
     | IDENTIFIER
     | IDENTITY
-    | INCREMENTAL
     | IMPORTED
+    | INCREMENTAL
     | INCLUDE
     | INDEX
+    | INDEXES
     | INITIALIZE
     | INPUT
     | INTERVAL
@@ -4010,6 +4049,7 @@ non_reserved_words
     | TIMEZONE
     | URL
     | USERADMIN
+    | USERNAME
     | VALUE
     | VALUES
     | VECTOR
@@ -4594,7 +4634,8 @@ join_clause
     ;
 
 on_using_clause
-    : ON search_condition | USING column_list_in_parentheses
+    : ON search_condition 
+    | USING column_list_in_parentheses
     ;
 
 at_before
@@ -4673,7 +4714,8 @@ match_recognize
 
 pivot_unpivot
     : PIVOT LR_BRACKET id_ LR_BRACKET id_ RR_BRACKET FOR id_ IN LR_BRACKET pivot_in_clause RR_BRACKET default_on_null? RR_BRACKET (
-        as_alias column_alias_list_in_brackets?  )?
+        as_alias column_alias_list_in_brackets?  
+    )?
     | UNPIVOT (include_exclude NULLS)? LR_BRACKET id_ FOR column_name IN LR_BRACKET aliased_column_list RR_BRACKET RR_BRACKET
     ;
 
@@ -4689,7 +4731,7 @@ pivot_in_clause
     ;
 
 default_on_null
-    : DEFAULT ON NULL_ (expr)
+    : DEFAULT ON NULL_ LR_BRACKET expr RR_BRACKET
     ;
 
 column_alias_list_in_brackets

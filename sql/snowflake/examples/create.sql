@@ -38,3 +38,6 @@ create database public;
 create schema raw;
 create tag public.t ALLOWED_VALUES 'V1' comment ='1';
 create sequence s1 NOORDER;
+CREATE OR REPLACE INDEX vidx ON mytable (val);
+CREATE INDEX vidx ON myschem.mytable (val);
+CREATE INDEX IF NOT EXISTS vidx ON mydb.myschem.mytable (val,val2) INCLUDE (val3);
