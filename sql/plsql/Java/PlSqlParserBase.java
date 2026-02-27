@@ -35,4 +35,20 @@ public abstract class PlSqlParserBase extends Parser
     public void setVersion10(boolean value) {
         _isVersion10 = value;
     }
+
+    public boolean IsNotNumericFunction() {
+        Token lt1 = _input.LT(1);
+        Token lt2 = _input.LT(2);
+        if ((lt1.getType() == PlSqlParser.SUM ||
+             lt1.getType() == PlSqlParser.COUNT ||
+             lt1.getType() == PlSqlParser.AVG ||
+             lt1.getType() == PlSqlParser.MIN ||
+             lt1.getType() == PlSqlParser.MAX ||
+             lt1.getType() == PlSqlParser.ROUND ||
+             lt1.getType() == PlSqlParser.LEAST ||
+             lt1.getType() == PlSqlParser.GREATEST) &&
+             lt2.getType() == PlSqlParser.LEFT_PAREN)
+            return false;
+        return true;
+    }
 }
