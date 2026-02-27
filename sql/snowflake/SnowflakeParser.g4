@@ -1427,7 +1427,7 @@ alter_task
     //[ , ... ]
     | ALTER TASK if_exists? object_name set_tags
     | ALTER TASK if_exists? object_name unset_tags
-    | ALTER TASK if_exists? object_name MODIFY AS sql
+    | ALTER TASK if_exists? object_name MODIFY AS task_sql
     | ALTER TASK if_exists? object_name MODIFY WHEN expr
     ;
 
@@ -2751,7 +2751,7 @@ session_params_list
 create_task
     : CREATE or_replace? TASK if_not_exists? object_name task_parameters* comment_clause? copy_grants? (
         AFTER object_name (COMMA object_name)*
-    )? (WHEN search_condition)? AS sql
+    )? (WHEN search_condition)? AS task_sql
     ;
 
 task_parameters
@@ -2796,6 +2796,43 @@ sql
     : EXECUTE IMMEDIATE DBL_DOLLAR
     | sql_command
     | call
+    ;
+
+task_sql
+    : sql
+    | task_scripting_block
+    ;
+
+task_scripting_block
+    : BEGIN task_scripting_statement_list END
+    | DECLARE task_scripting_declaration_list BEGIN task_scripting_statement_list END
+    ;
+
+task_scripting_declaration_list
+    : task_scripting_declaration (SEMI task_scripting_declaration)* SEMI
+    ;
+
+task_scripting_declaration
+    : id_ data_type
+    ;
+
+task_scripting_statement_list
+    : task_scripting_statement (SEMI task_scripting_statement)* SEMI?
+    ;
+
+task_scripting_statement
+    : sql_command
+    | call
+    | task_scripting_assignment
+    | task_scripting_return
+    ;
+
+task_scripting_assignment
+    : id_ COLON EQ expr
+    ;
+
+task_scripting_return
+    : RETURN expr
     ;
 
 call
