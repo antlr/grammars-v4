@@ -524,6 +524,7 @@ choice_relation
 relation
     : simple_expression (relational_operator simple_expression)?
     | simple_expression NOT? IN membership_choice_list
+    | raise_expression
     ;
 
 membership_choice_list
@@ -531,12 +532,16 @@ membership_choice_list
     ;
 
 membership_choice
-    : choice_expression
+    : choice_simple_expression
     | range
     | subtype_mark
     ;
 
 simple_expression
+    : unary_adding_operator? term (binary_adding_operator term)*
+    ;
+
+choice_simple_expression
     : unary_adding_operator? term (binary_adding_operator term)*
     ;
 
@@ -604,6 +609,10 @@ highest_precedence_operator
 conditional_expression
     : if_expression
     | case_expression
+    ;
+
+raise_expression
+    : RAISE name (WITH simple_expression)?
     ;
 
 if_expression
@@ -1492,7 +1501,7 @@ J.*
 */
 
 delta_constraint
-    : DELTA expression range_constraint?
+    : DELTA simple_expression range_constraint?
     ;
 
 at_clause
