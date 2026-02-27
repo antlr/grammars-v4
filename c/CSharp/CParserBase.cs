@@ -597,7 +597,13 @@ public abstract class CParserBase : Parser
     public bool IsInitDeclaratorList()
     {
         // Cannot be initDeclaratorList if the first thing is a type.
-        // Types need to go to preceeding declarationSpecifiers.
+	// Types need to go to preceeding declarationSpecifiers.
+	// A declarator must start with:
+	//  identifier
+	//  *
+	//  (
+	// It cannot start with __attribute__.
+	
         if (no_semantics.Contains("IsInitDeclaratorList")) return true;
         var ts = this.InputStream as CommonTokenStream;
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
@@ -609,7 +615,9 @@ public abstract class CParserBase : Parser
         {
             result = true;
         }
-        else if (resolved.Classification.Contains(TypeClassification.TypeQualifier_) || resolved.Classification.Contains(TypeClassification.TypeSpecifier_))
+        else if (resolved.Classification.Contains(TypeClassification.TypeQualifier_)
+            || resolved.Classification.Contains(TypeClassification.TypeSpecifier_)
+            || text == "__attribute__")
             result = false;
         else
             result = true;
