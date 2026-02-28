@@ -23,3 +23,14 @@ class PlSqlParserBase(Parser):
 
     def setVersion12(self, value):
         self._isVersion12 = value
+
+    def IsNotNumericFunction(self):
+        from PlSqlLexer import PlSqlLexer as _Lexer
+        lt1 = self._input.LT(1)
+        lt2 = self._input.LT(2)
+        if (lt1.type in (_Lexer.SUM, _Lexer.COUNT, _Lexer.AVG,
+                         _Lexer.MIN, _Lexer.MAX, _Lexer.ROUND,
+                         _Lexer.LEAST, _Lexer.GREATEST) and
+                lt2.type == _Lexer.LEFT_PAREN):
+            return False
+        return True

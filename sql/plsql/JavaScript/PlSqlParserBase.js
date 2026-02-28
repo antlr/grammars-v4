@@ -1,5 +1,6 @@
 import antlr4 from 'antlr4';
 import JavaScriptLexer from './PlSqlParser.js';
+import PlSqlLexer from './PlSqlLexer.js';
 
 export default class PlSqlParserBase extends antlr4.Parser {
   _isVersion10;
@@ -35,5 +36,20 @@ export default class PlSqlParserBase extends antlr4.Parser {
 
   setVersion12(value) {
     this._isVersion12 = value;
+  }
+
+  IsNotNumericFunction() {
+    const lt1 = this.getTokenStream().LT(1);
+    const lt2 = this.getTokenStream().LT(2);
+    if ((lt1.type === PlSqlLexer.SUM ||
+      lt1.type === PlSqlLexer.COUNT ||
+      lt1.type === PlSqlLexer.AVG ||
+      lt1.type === PlSqlLexer.MIN ||
+      lt1.type === PlSqlLexer.MAX ||
+      lt1.type === PlSqlLexer.ROUND ||
+      lt1.type === PlSqlLexer.LEAST ||
+      lt1.type === PlSqlLexer.GREATEST) && lt2.type === PlSqlLexer.LEFT_PAREN)
+      return false;
+    return true;
   }
 }

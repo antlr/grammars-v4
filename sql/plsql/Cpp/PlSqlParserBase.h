@@ -41,6 +41,8 @@ class PlSqlParserBase : public antlr4::Parser
     {
         _isVersion10 = value;
     }
+
+    bool IsNotNumericFunction();
 };
 
 #endif
