@@ -22,7 +22,10 @@ public abstract class CParserBase : Parser
         "IsFunctionSpecifier", "IsStatement", "IsStaticAssertDeclaration",
         "IsStorageClassSpecifier", "IsStructOrUnionSpecifier", "IsTypedefName",
         "IsTypeofSpecifier", "IsTypeQualifier", "IsTypeSpecifier", "IsCast",
-        "IsNullStructDeclarationListExtension"
+        "IsNullStructDeclarationListExtension",
+        "IsGnuAttributeBeforeDeclarator",
+        "IsSomethingOfTypeName", "IsSpecifierQualifierList", "IsTypeName",
+        "IsInitDeclaratorList"
     };
 
     protected CParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
@@ -69,10 +72,10 @@ public abstract class CParserBase : Parser
         return result;
     }
 
-    public bool IsAlignmentSpecifier()
+    public bool IsAlignmentSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsAlignmentSpecifier")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAlignmentSpecifier " + lt1);
         var resolved = ResolveWithOutput(lt1);
@@ -89,10 +92,10 @@ public abstract class CParserBase : Parser
         return result;
     }
 
-    public bool IsAtomicTypeSpecifier()
+    public bool IsAtomicTypeSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsAtomicTypeSpecifier")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsAtomicTypeSpecifier " + lt1);
         var resolved = ResolveWithOutput(lt1);
@@ -149,37 +152,38 @@ public abstract class CParserBase : Parser
         var lt1 = (this.InputStream as CommonTokenStream).LT(1);
         var text = lt1.Text;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + lt1);
-        var result = 
+        var result =
             IsStorageClassSpecifier()
             || IsTypeSpecifier()
             || IsTypeQualifier()
-            || IsFunctionSpecifier()
+            || (IsFunctionSpecifier() && !IsGnuAttributeBeforeDeclarator())
             || IsAlignmentSpecifier();
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + result + " for " + lt1);
         return result;
     }
 
-    public bool IsTypeSpecifierQualifier()
+    public bool IsTypeSpecifierQualifier(int k = 1)
     {
         if (no_semantics.Contains("IsTypeSpecifierQualifier")) return true;
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier");
-        var result = 
-            IsTypeSpecifier()
-            || IsTypeQualifier()
-            || IsAlignmentSpecifier();
+        var result =
+            IsTypeSpecifier(k)
+            || IsTypeQualifier(k)
+            || IsAlignmentSpecifier(k);
         if (debug) System.Console.WriteLine("IsDeclarationSpecifier " + result);
         return result;
     }
 
     public bool IsDeclarationSpecifiers()
     {
+        if (no_semantics.Contains("IsDeclarationSpecifiers")) return true;
         return IsDeclarationSpecifier();
     }
 
-    public bool IsEnumSpecifier()
+    public bool IsEnumSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsEnumSpecifier")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         if (this.debug) System.Console.Write("IsEnumSpecifier " + lt1);
         var result = lt1.Type == CLexer.Enum;
         if (this.debug) System.Console.WriteLine(" " + result);
@@ -210,6 +214,27 @@ public abstract class CParserBase : Parser
             result = false;
         if (this.debug) System.Console.WriteLine("IsFunctionSpecifier " + result);
         return result;
+    }
+
+    public bool IsGnuAttributeBeforeDeclarator(int k = 1)
+    {
+        if (no_semantics.Contains("IsGnuAttributeBeforeDeclarator")) return true;
+        var ts = this.InputStream as CommonTokenStream;
+        int i = k;
+        if (ts.LT(i).Type != CLexer.Attribute) return false;
+        i++;
+        int depth = 0;
+        while (true)
+        {
+            var t = ts.LT(i++);
+            if (t.Type == TokenConstants.EOF) return false;
+            if (t.Type == CLexer.LeftParen) depth++;
+            else if (t.Type == CLexer.RightParen) { depth--; if (depth == 0) break; }
+        }
+        var next = ts.LT(i).Type;
+        return next == CLexer.Identifier
+            || next == CLexer.Star
+            || next == CLexer.LeftParen;
     }
 
     public bool IsStatement()
@@ -259,10 +284,10 @@ public abstract class CParserBase : Parser
         return result;
     }
 
-    public bool IsStructOrUnionSpecifier()
+    public bool IsStructOrUnionSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsStructOrUnionSpecifier")) return true;
-        var token = (this.InputStream as CommonTokenStream).LT(1);
+        var token = (this.InputStream as CommonTokenStream).LT(k);
         if (this.debug) System.Console.Write("IsStructOrUnionSpecifier " + token);
         var result = token.Type == CLexer.Struct ||
                      token.Type == CLexer.Union;
@@ -271,10 +296,10 @@ public abstract class CParserBase : Parser
     }
 
 
-    public bool IsTypedefName()
+    public bool IsTypedefName(int k = 1)
     {
         if (no_semantics.Contains("IsTypedefName")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypedefName " + lt1);
         var resolved = ResolveWithOutput(lt1);
@@ -300,10 +325,10 @@ public abstract class CParserBase : Parser
         return result;
     }
 
-    public bool IsTypeofSpecifier()
+    public bool IsTypeofSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsTypeofSpecifier")) return true;
-        var token = (this.InputStream as CommonTokenStream).LT(1);
+        var token = (this.InputStream as CommonTokenStream).LT(k);
         if (this.debug) System.Console.Write("IsTypeofSpecifier " + token);
         var result = token.Type == CLexer.Typeof ||
                      token.Type == CLexer.Typeof_unqual;
@@ -311,10 +336,10 @@ public abstract class CParserBase : Parser
         return result;
     }
 
-    public bool IsTypeQualifier()
+    public bool IsTypeQualifier(int k = 1)
     {
         if (no_semantics.Contains("IsTypeQualifier")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeQualifier " + lt1);
         var resolved = ResolveWithOutput(lt1);
@@ -332,10 +357,10 @@ public abstract class CParserBase : Parser
     }
 
 
-    public bool IsTypeSpecifier()
+    public bool IsTypeSpecifier(int k = 1)
     {
         if (no_semantics.Contains("IsTypeSpecifier")) return true;
-        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var lt1 = (this.InputStream as CommonTokenStream).LT(k);
         var text = lt1.Text;
         if (this.debug) System.Console.Write("IsTypeSpecifier " + lt1);
         var resolved = ResolveWithOutput(lt1);
@@ -359,8 +384,8 @@ public abstract class CParserBase : Parser
             if (this.debug) System.Console.WriteLine(" " +result);
             return result;
         }
-        result = IsAtomicTypeSpecifier() || IsStructOrUnionSpecifier() || IsEnumSpecifier()
-            || IsTypedefName() || IsTypeofSpecifier();
+        result = IsAtomicTypeSpecifier(k) || IsStructOrUnionSpecifier(k) || IsEnumSpecifier(k)
+            || IsTypedefName(k) || IsTypeofSpecifier(k);
         if (this.debug) System.Console.WriteLine(" " +result);
         return result;
     }
@@ -375,29 +400,6 @@ public abstract class CParserBase : Parser
             var declaration_specifiers = declaration_context?.declarationSpecifiers();
             var declaration_specifier = declaration_specifiers?.declarationSpecifier();
             var declarator = context as CParser.DeclaratorContext;
-            // Declare any typeSpecifiers that declare something.
-            if (declaration_specifier != null)
-            {
-                bool is_typedef = declaration_specifier?.Where(ds =>
-                {
-                    return ds.storageClassSpecifier()?.Typedef() != null;
-                }).Any() ?? false;
-                foreach (var ds in declaration_specifier)
-                {
-                    var sous = ds.typeSpecifier()?.structOrUnionSpecifier();
-                    if (sous != null)
-                    {
-                        var idToken = sous.Identifier()?.Symbol;
-                        if (idToken != null)
-                        {
-                            var id = idToken.Text;
-                            var loc = GetSourceLocation(idToken);
-                            if (debug) System.Console.WriteLine("New symbol Declaration1 Declaration " + id);
-                            _st.Define(new Symbol() { Name = id, Classification = new HashSet<TypeClassification>() { TypeClassification.TypeSpecifier_ }, DefinedFile = loc.File, DefinedLine = loc.Line, DefinedColumn = loc.Column });
-                        }
-                    }
-                }
-            }
             CParser.InitDeclaratorListContext init_declarator_list = declaration_context?.initDeclaratorList();
             CParser.InitDeclaratorContext[] init_declarators = init_declarator_list?.initDeclarator();
             if (init_declarators != null)
@@ -592,6 +594,69 @@ public abstract class CParserBase : Parser
         return new SourceLocation(fileName, lineAdjusted, column);
     }
 
+    public bool IsInitDeclaratorList()
+    {
+        // Cannot be initDeclaratorList if the first thing is a type.
+	// Types need to go to preceeding declarationSpecifiers.
+	// A declarator must start with:
+	//  identifier
+	//  *
+	//  (
+	// It cannot start with __attribute__.
+	
+        if (no_semantics.Contains("IsInitDeclaratorList")) return true;
+        var ts = this.InputStream as CommonTokenStream;
+        var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+        var text = lt1.Text;
+        if (this.debug) System.Console.Write("IsInitDeclaratorList " + lt1);
+        var resolved = ResolveWithOutput(lt1);
+        bool result = false;
+        if (resolved == null)
+        {
+            result = true;
+        }
+        else if (resolved.Classification.Contains(TypeClassification.TypeQualifier_)
+            || resolved.Classification.Contains(TypeClassification.TypeSpecifier_)
+            || text == "__attribute__")
+            result = false;
+        else
+            result = true;
+        if (this.debug) System.Console.WriteLine(" " + result);
+        return result;
+    }
+    
+    public bool IsSomethingOfTypeName()
+    {
+        // Returns true if current position looks like "sizeof ( typedefName )"
+        // Used to prevent sizeof from entering the ('++' | '--' | 'sizeof')* loop
+        // when it is actually a sizeof(type) expression, avoiding ambiguity.
+        if (no_semantics.Contains("IsSomethingOfTypeName")) return true;
+        var ts = this.InputStream as CommonTokenStream;
+        if (!(ts.LT(1).Type == CLexer.Sizeof ||
+            ts.LT(1).Type == CLexer.Countof ||
+            ts.LT(1).Type == CLexer.Alignof ||
+            ts.LT(1).Type == CLexer.Maxof ||
+            ts.LT(1).Type == CLexer.Minof)
+            ) return false;
+        if (ts.LT(2).Type != CLexer.LeftParen) return false;
+        if (IsTypeName(3)) return true;
+        return false;
+    }
+
+    public bool IsTypeName(int k = 1)
+    {
+        if (no_semantics.Contains("IsTypeName")) return true;
+        return IsSpecifierQualifierList(k);
+    }
+
+    public bool IsSpecifierQualifierList(int k = 1)
+    {
+        if (no_semantics.Contains("IsSpecifierQualifierList")) return true;
+        if (IsGnuAttributeBeforeDeclarator(k)) return true;
+        if (IsTypeSpecifierQualifier(k)) return true;
+        return false;
+    }
+    
     public bool IsCast()
     {
         var result = false;

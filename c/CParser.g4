@@ -191,18 +191,23 @@ argumentExpressionList
 // ISO C: unary-expression (6.5.4.1)
 // GNU: https://github.com/gcc-mirror/gcc/blob/5d69161a7c36a2da8565967eb0cc2df1322a05a3/gcc/c/c-parser.cc#L10625-L10658
 unaryExpression
-    : ('++' | '--' | 'sizeof')* (
-        postfixExpression
-        | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!'
-		| '__extension__' // GNU
-		| '__real__' // GNU
-		| '__imag__' // GNU
-		) castExpression
-        | ('sizeof' | Alignof) ( '(' typeName ')'
-		| unaryExpression //GNU
-		)
-        | '&&' Identifier // GCC extension address of label
-    )
+    : postfixExpression
+    | '++' unaryExpression
+    | '--' unaryExpression
+    | unaryOperator=('&' | '*' | '+' | '-' | '~' | '!'
+	| '__extension__' // GNU
+	| '__real__' // GNU
+	| '__imag__' // GNU
+	) castExpression
+    | {!this.IsSomethingOfTypeName()}? 'sizeof' unaryExpression
+    | {this.IsSomethingOfTypeName()}? 'sizeof' '(' typeName ')'
+    | {this.IsSomethingOfTypeName()}? Alignof '(' typeName ')'
+    | {!this.IsSomethingOfTypeName()}? Countof unaryExpression // GCC
+    | {this.IsSomethingOfTypeName()}? Countof '(' typeName ')' // GCC
+    | {!this.IsSomethingOfTypeName()}? Alignof unaryExpression // GCC
+    | {this.IsSomethingOfTypeName()}? Maxof '(' typeName ')' // GCC
+    | {this.IsSomethingOfTypeName()}? Minof '(' typeName ')' // GCC
+    | '&&' Identifier // GCC extension address of label
     ;
 
 // ISO C: unary-operator (6.5.4.1) - No ANTLR4 rule
@@ -291,7 +296,7 @@ constantExpression
 // ISO C: declaration (6.7.1)
 declaration
     : (
-	declarationSpecifiers initDeclaratorList? ';'
+	declarationSpecifiers ( {this.IsInitDeclaratorList()}? initDeclaratorList | ) ';'
 	| staticAssertDeclaration
 	| attributeDeclaration
       ) {this.EnterDeclaration();}
@@ -477,7 +482,7 @@ alignmentSpecifier
 // This rule is basically what was implemented in the GCC compiler.
 // https://github.com/gcc-mirror/gcc/blob/f5cda36f16d447198c1e00b191d720b6f4a02876/gcc/c/c-parser.cc#L4975-L4995
 declarator
-    : (gnuAttribute? pointer declarationSpecifiers?)* (gnuAttribute* directDeclarator gccDeclaratorExtension*) {this.EnterDeclaration();}
+    : (gnuAttribute? pointer /* declarationSpecifiers? */)* (gnuAttribute* directDeclarator gccDeclaratorExtension*) {this.EnterDeclaration();}
     ;
 
 // ISO C: direct-declarator (6.7.7.1)
@@ -569,7 +574,7 @@ directAbstractDeclarator
 
 // ISO C: typedef-name (6.7.9)
 typedefName
-    : Identifier
+    : {this.IsTypedefName()}? Identifier
     ;
 
 // ISO C: braced-initializer (6.7.11) - No ANTLR4 rule
