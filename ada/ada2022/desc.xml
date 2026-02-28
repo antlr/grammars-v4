@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
+   <antlr-version>^4.10</antlr-version>
+   <targets>Antlr4ng;CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+   <test>
+      <inputs>../ada2012/examples/*.adb</inputs>
+   </test>
+   <test>
+      <inputs>../ada2012/examples/acats/a/**/*.ada</inputs>
+   </test>
+   <test>
+      <inputs>../ada2012/examples/semtest/main.adb</inputs>
+   </test>
+   <test>
+      <inputs>examples/*.adb</inputs>
+   </test>
+</desc>
