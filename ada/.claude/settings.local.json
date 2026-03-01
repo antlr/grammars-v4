@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.ada-auth.org)",
+      "Bash(wget:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}
