@@ -45,3 +45,21 @@ func (p *PlSqlParserBase) isVersion10() bool {
 func (p *PlSqlParserBase) setVersion10(value bool) {
     StaticConfig._isVersion10 = value;
 }
+
+func (p *PlSqlParserBase) IsNotNumericFunction() bool {
+    stream := p.GetTokenStream().(*antlr.CommonTokenStream)
+    lt1 := stream.LT(1)
+    lt2 := stream.LT(2)
+    if (lt1.GetTokenType() == PlSqlParserSUM ||
+        lt1.GetTokenType() == PlSqlParserCOUNT ||
+        lt1.GetTokenType() == PlSqlParserAVG ||
+        lt1.GetTokenType() == PlSqlParserMIN ||
+        lt1.GetTokenType() == PlSqlParserMAX ||
+        lt1.GetTokenType() == PlSqlParserROUND ||
+        lt1.GetTokenType() == PlSqlParserLEAST ||
+        lt1.GetTokenType() == PlSqlParserGREATEST) &&
+        lt2.GetTokenType() == PlSqlParserLEFT_PAREN {
+        return false
+    }
+    return true
+}

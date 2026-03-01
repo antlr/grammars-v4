@@ -30,4 +30,19 @@ public abstract class PlSqlParserBase : Parser
     public bool setVersion11(bool value) => _isVersion11 = value;
 
     public bool setVersion12(bool value) => _isVersion12 = value;
+
+    public bool IsNotNumericFunction() {
+	    var lt1 = (this.InputStream as CommonTokenStream).LT(1);
+	    var lt2 = (this.InputStream as CommonTokenStream).LT(2);
+	    if ( (lt1.Type == PlSqlParser.SUM ||
+		lt1.Type == PlSqlParser.COUNT ||
+		lt1.Type == PlSqlParser.AVG ||
+		lt1.Type == PlSqlParser.MIN ||
+		lt1.Type == PlSqlParser.MAX ||
+		lt1.Type == PlSqlParser.ROUND ||
+		lt1.Type == PlSqlParser.LEAST ||
+		  lt1.Type == PlSqlParser.GREATEST) && lt2.Type == PlSqlParser.LEFT_PAREN)
+		    return false;
+	    return true;
+    }
 }

@@ -80,6 +80,18 @@ Alignof
     | '__alignof'
     ;
 
+Maxof
+    : '_Maxof' //GNU
+    ;
+
+Minof
+    : '_Minof' //GNU
+    ;
+
+Countof
+    : '_Countof' //GNU
+    ;
+
 Asm
     : 'asm'
     | '__asm'

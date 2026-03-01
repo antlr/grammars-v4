@@ -6659,7 +6659,6 @@ concatenation
 interval_expression
     : DAY ('(' concatenation ')')? TO SECOND ('(' concatenation ')')?
     | YEAR ('(' concatenation ')')? TO MONTH
-    | concatenation (SECOND | DAY | MONTH | YEAR)
     ;
 
 model_expression
@@ -6700,7 +6699,7 @@ unary_expression
     )
     | quantified_expression
     | standard_function
-    | atom
+    | {this.IsNotNumericFunction()}? atom
     | implicit_cursor_expression
     ;
 
@@ -6795,7 +6794,7 @@ standard_function
     : string_function
     | numeric_function_wrapper
     | json_function
-    | other_function
+    | {this.IsNotNumericFunction()}? other_function
     ;
 
 //see as https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/JSON_ARRAY.html#GUID-46CDB3AF-5795-455B-85A8-764528CEC43B

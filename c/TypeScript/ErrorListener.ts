@@ -4,13 +4,14 @@ import { RecognitionException } from "antlr4";
 import { Token } from "antlr4";
 import { Parser } from "antlr4";
 import { CommonTokenStream } from "antlr4";
+import { writeSync } from 'fs';
 import CLexer from "./CLexer.js";
 
 export class ErrorListener<T> extends BaseErrorListener<T> {
     public had_error: boolean = false;
     private _quiet: boolean;
     private _tee: boolean;
-    private _out: NodeJS.WriteStream | null;
+    private _out: any;
 
     constructor(quiet: boolean, tee: boolean, out: any) {
         super();
@@ -63,7 +64,7 @@ export class ErrorListener<T> extends BaseErrorListener<T> {
         }
         this.had_error = true;
         if (this._tee && this._out !== null) {
-            this._out.write(fileName + " line " + lineAdjusted + ", .p " + line + ":" + column + " " + msg + "\n");
+            writeSync(this._out, fileName + " line " + lineAdjusted + ", .p " + line + ":" + column + " " + msg + "\n");
         }
         if (!this._quiet) {
             console.error(fileName + " line " + lineAdjusted + ", .p " + line + ":" + column + " " + msg);
