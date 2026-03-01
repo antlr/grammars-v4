@@ -41,3 +41,6 @@ ALTER TABLE fruit MODIFY (id ANNOTATIONS (Visibility 'Hidden'));
 ALTER TABLE fruit MODIFY (id ANNOTATIONS (drop Visibility));
 
 ALTER TABLE fruit MODIFY (id ANNOTATIONS (add Visibility 'Hidden'));
+
+ALTER TABLE MY_SCHEMA.MY_TABLE
+    ROW ARCHIVAL;
