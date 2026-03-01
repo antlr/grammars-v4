@@ -534,6 +534,7 @@ abstract class AdaParserBase extends Parser {
             eof.channel = Token.DEFAULT_CHANNEL;
             defaultChannelTokens.add(eof);
             var tokenSource = ListTokenSource(defaultChannelTokens);
+            tokenSource.i = 0; // workaround: antlr4 dart ListTokenSource leaves 'late int i' uninitialized
             var tokenStream = CommonTokenStream(tokenSource);
             var parser = AdaParser(tokenStream);
             parser.removeErrorListeners();
