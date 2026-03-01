@@ -12,6 +12,7 @@ procedure Iterated_Components is
    -- Bracket form of iterated component
    Doubled : Int_Array := [for I in 1 .. 5 => Src (I) * 2];
 begin
+   null;
    pragma Assert (Squares (1) = 1);
    pragma Assert (Squares (3) = 9);
    pragma Assert (Squares (5) = 25);

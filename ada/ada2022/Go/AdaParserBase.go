@@ -93,6 +93,9 @@ func (p *AdaParserBase) IsAggregate() bool {
 	}
 	stream := p.GetTokenStream().(*antlr.CommonTokenStream)
 	lt1 := stream.LT(1)
+	if lt1.GetTokenType() == AdaLexerLSB {
+		return true
+	}
 	if lt1.GetTokenType() != AdaLexerLP {
 		return false
 	}

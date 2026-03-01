@@ -414,7 +414,8 @@ name
     //| name                       //generalized_reference
     | name actual_parameter_part //generalized_indexing
     | target_name
-    | reduction_attribute_reference
+    | value_sequence SQ reduction_attribute_designator  //reduction_attribute_reference
+    | name SQ reduction_attribute_designator            //reduction_attribute_reference
     ;
 
 direct_name
@@ -722,11 +723,6 @@ quantifier
 
 predicate
     : expression
-    ;
-
-reduction_attribute_reference
-    : value_sequence SQ reduction_attribute_designator
-    | name SQ reduction_attribute_designator
     ;
 
 value_sequence

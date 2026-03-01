@@ -67,6 +67,7 @@ public abstract class AdaParserBase extends Parser {
         if (noSemantics.contains("IsAggregate")) return true;
         CommonTokenStream stream = (CommonTokenStream) getTokenStream();
         Token lt1 = stream.LT(1);
+        if (lt1.getType() == AdaLexer.LSB) return true;
         if (lt1.getType() != AdaLexer.LP) return false;
         int depth = 0;
         for (int i = 2; ; i++) {

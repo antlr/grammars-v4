@@ -19,6 +19,7 @@ begin
                       begin
                          A * B);
    begin
+      null;
       pragma Assert (Z = 15);
    end;
 end Declare_Expressions;

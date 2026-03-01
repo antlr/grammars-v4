@@ -7,12 +7,12 @@ procedure Parallel_Loops is
    Sum2 : Integer := 0;
 begin
    -- Parallel for loop over a range
-   for I in parallel A'Range loop
+   parallel for I in A'Range loop
       A (I) := I;
    end loop;
 
    -- Parallel for loop with chunk specification
-   for I in parallel (4) A'Range loop
+   parallel (4) for I in A'Range loop
       B (I) := A (I) * 2;
    end loop;
 

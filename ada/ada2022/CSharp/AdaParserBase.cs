@@ -91,6 +91,11 @@ public abstract class AdaParserBase : Parser
         if (noSemantics.Contains("IsAggregate")) return true;
         var stream = this.InputStream as CommonTokenStream;
         var lt1 = stream.LT(1);
+        if (lt1.Type == AdaLexer.LSB)
+        {
+            if (debug) System.Console.Error.WriteLine("IsAggregate: LT(1) is LSB, returning true");
+            return true;
+        }
         if (lt1.Type != AdaLexer.LP)
         {
             if (debug) System.Console.Error.WriteLine("IsAggregate: LT(1) is not LP, returning false");

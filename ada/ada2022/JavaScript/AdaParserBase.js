@@ -76,6 +76,10 @@ export default class AdaParserBase extends antlr4.Parser {
         if (this._noSemantics.has("IsAggregate")) return true;
         var stream = this._input;
         var lt1 = stream.LT(1);
+        if (lt1.type === AdaLexer.LSB) {
+            if (this._debug) process.stderr.write("IsAggregate: LT(1) is LSB, returning true\n");
+            return true;
+        }
         if (lt1.type !== AdaLexer.LP) {
             if (this._debug) process.stderr.write("IsAggregate: LT(1) is not LP, returning false\n");
             return false;

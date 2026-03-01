@@ -18,8 +18,12 @@ procedure Bracket_Aggregates is
    type Fixed_Array is array (1 .. 3) of Integer;
    D : Fixed_Array := [1 | 2 => 5, others => 0];
 begin
-   pragma Assert (A (1) = 1 and A (2) = 2 and A (3) = 3);
-   pragma Assert (B (1) = 1 and B (3) = 0);
+   null;
+   pragma Assert (A (1) = 1);
+   pragma Assert (A (2) = 2);
+   pragma Assert (A (3) = 3);
+   pragma Assert (B (1) = 1);
+   pragma Assert (B (3) = 0);
    pragma Assert (C (2) = 20);
    pragma Assert (D (3) = 0);
 end Bracket_Aggregates;

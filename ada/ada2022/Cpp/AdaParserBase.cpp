@@ -21,6 +21,7 @@ bool AdaParserBase::IsAggregate()
     auto stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     if (!stream) return false;
     auto lt1 = stream->LT(1);
+    if (lt1 && lt1->getType() == AdaLexer::LSB) return true;
     if (!lt1 || lt1->getType() != AdaLexer::LP) return false;
     int depth = 0;
     for (int i = 2; ; i++) {

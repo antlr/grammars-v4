@@ -232,6 +232,10 @@ export abstract class AdaParserBase extends Parser {
         if (this._noSemantics.has("IsAggregate")) return true;
         const stream = this.inputStream as BufferedTokenStream;
         const lt1 = stream.LT(1);
+        if (lt1 !== null && lt1.type === AdaLexer.LSB) {
+            if (this._debug) process.stderr.write("IsAggregate: LT(1) is LSB, returning true\n");
+            return true;
+        }
         if (lt1 === null || lt1.type !== AdaLexer.LP) {
             if (this._debug) process.stderr.write("IsAggregate: LT(1) is not LP, returning false\n");
             return false;

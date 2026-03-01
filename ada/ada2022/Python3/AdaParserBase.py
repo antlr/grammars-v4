@@ -50,6 +50,8 @@ class AdaParserBase(Parser):
             from AdaLexer import AdaLexer
         stream = self._input
         lt1 = stream.LT(1)
+        if lt1.type == AdaLexer.LSB:
+            return True
         if lt1.type != AdaLexer.LP:
             return False
         depth = 0

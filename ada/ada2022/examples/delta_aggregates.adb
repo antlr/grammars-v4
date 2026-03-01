@@ -18,7 +18,9 @@ procedure Delta_Aggregates is
    -- Array delta aggregate (bracket form): copy A but override index 1
    A3 : Int_Array := [A with delta 1 => 10];
 begin
-   pragma Assert (P2.X = 1 and P2.Y = 99);
+   null;
+   pragma Assert (P2.X = 1);
+   pragma Assert (P2.Y = 99);
    pragma Assert (A2 (3) = 30);
    pragma Assert (A3 (1) = 10);
 end Delta_Aggregates;

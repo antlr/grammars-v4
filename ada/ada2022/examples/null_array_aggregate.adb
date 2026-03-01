@@ -13,6 +13,7 @@ procedure Null_Array_Aggregate is
 
    Result : Int_Array := Make_Empty;
 begin
+   null;
    pragma Assert (Empty'Length = 0);
    pragma Assert (Result'Length = 0);
 end Null_Array_Aggregate;
