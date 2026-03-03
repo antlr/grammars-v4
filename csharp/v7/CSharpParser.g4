@@ -172,24 +172,7 @@ additive_expression
     ;
 
 multiplicative_expression
-    : switch_expression (('*' | '/' | '%') switch_expression)*
-    ;
-
-switch_expression
-    : range_expression ('switch' '{' (switch_expression_arms ','?)? '}')?
-    ;
-
-switch_expression_arms
-    : switch_expression_arm (',' switch_expression_arm)*
-    ;
-
-switch_expression_arm
-    : expression case_guard? right_arrow throwable_expression
-    ;
-
-range_expression
-    : unary_expression
-    | unary_expression? OP_RANGE unary_expression?
+    : unary_expression (('*' | '/' | '%') unary_expression)*
     ;
 
 // https://msdn.microsoft.com/library/6a71f45d(v=vs.110).aspx
@@ -478,7 +461,7 @@ simple_embedded_statement
     | WHILE OPEN_PARENS expression CLOSE_PARENS embedded_statement                                            # whileStatement
     | DO embedded_statement WHILE OPEN_PARENS expression CLOSE_PARENS ';'                                     # doStatement
     | FOR OPEN_PARENS for_initializer? ';' expression? ';' for_iterator? CLOSE_PARENS embedded_statement      # forStatement
-    | AWAIT? FOREACH OPEN_PARENS (REF READONLY? | READONLY REF)? local_variable_type identifier IN expression CLOSE_PARENS embedded_statement # foreachStatement
+    | FOREACH OPEN_PARENS (REF READONLY? | READONLY REF)? local_variable_type identifier IN expression CLOSE_PARENS embedded_statement # foreachStatement
 
     // jump statements
     | BREAK ';'                                                              # breakStatement

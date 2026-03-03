@@ -971,6 +971,8 @@ class CSharp73
     }
 }
 
+// C# 8+ content removed — this grammar strictly targets ECMA-334 7th edition (C# 7.x).
+/*
 namespace CSharp80
 {
 	class CSharp80ExceptInterfaceDefaultImplement
@@ -1070,3 +1072,4 @@ namespace CSharp80
 		override void M() { WriteLine("IC.M"); } // implicitly named
 	}
 }
+*/
