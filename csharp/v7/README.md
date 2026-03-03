@@ -42,7 +42,7 @@ ANTLR parser from this grammar approximately ~5-7 slowly than Roslyn parser.
 
 ## Reference
 * [pldb](http://pldb.info/concepts/csharp)
-
+* [ECMA 334](https://ecma-international.org/publications-and-standards/standards/ecma-334/)
 
 ## License
 
