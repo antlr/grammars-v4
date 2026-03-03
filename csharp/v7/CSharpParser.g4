@@ -1029,7 +1029,7 @@ fixed_size_buffer_declarator
 
 stackalloc_initializer
     : STACKALLOC type_ '[' expression ']'
-    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE expression (',' expression)* ','? CLOSE_BRACE
+    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE (expression (',' expression)* ','?)? CLOSE_BRACE
     ;
 
 right_arrow

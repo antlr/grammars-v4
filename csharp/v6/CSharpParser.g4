@@ -1056,7 +1056,7 @@ fixed_size_buffer_declarator
 
 stackalloc_initializer
     : STACKALLOC type_ '[' expression ']'
-    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE expression (',' expression)* ','? CLOSE_BRACE // C# 7.3: stackalloc array initializer
+    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE (expression (',' expression)* ','?)? CLOSE_BRACE // C# 7.3: stackalloc array initializer (empty list allowed)
     ;
 
 right_arrow

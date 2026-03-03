@@ -35,9 +35,15 @@ fi
 # ── 2. ensure ripgrep ─────────────────────────────────────────────────────────
 echo
 echo "[2/5] ripgrep"
+# The UCRT64 package installs to /c/msys64/ucrt64/bin which may not be in PATH
+UCRT64_BIN="/c/msys64/ucrt64/bin"
+if [ -f "$UCRT64_BIN/rg.exe" ] && ! command -v rg &>/dev/null; then
+    export PATH="$UCRT64_BIN:$PATH"
+fi
 if ! command -v rg &>/dev/null; then
     echo "  Not found — installing mingw-w64-ucrt-x86_64-ripgrep via pacman..."
     pacman -S --noconfirm mingw-w64-ucrt-x86_64-ripgrep
+    export PATH="$UCRT64_BIN:$PATH"
 fi
 echo "  $(rg --version | head -1)"
 
@@ -108,6 +114,10 @@ CS_SRC = re.compile(
     r'|\busing\s+\w'
     r'|\b(?:public|private|internal|protected|static)\s+\w'
 )
+# Reject IL disassembly (CompileAndVerify checks expected IL output)
+IL_ASM = re.compile(r'\bIL_[0-9a-f]{4}:|\.maxstack\b|\.locals\b')
+# Reject compiler diagnostic output strings (not source)
+DIAG_OUT = re.compile(r'\(\d+,\d+\): (error|warning) CS\d+')
 
 count = 0
 for path in files:
@@ -116,12 +126,21 @@ for path in files:
     except OSError:
         continue
     for m in VERBATIM.finditer(text):
-        snippet = m.group(1).replace('""', '"').strip()
-        if len(snippet) >= 15 and CS_SRC.search(snippet):
-            out_path = os.path.join(work_dir, f'snippet_{count:05d}.cs')
-            with open(out_path, 'w', encoding='utf-8') as fh:
-                fh.write(snippet + '\n')
-            count += 1
+        raw = m.group(1)
+        # Decode verbatim-string escapes: "" -> " and {{ -> { / }} -> }
+        snippet = raw.replace('""', '"').replace('{{', '{').replace('}}', '}').strip()
+        if len(snippet) < 15:
+            continue
+        if not CS_SRC.search(snippet):
+            continue
+        if IL_ASM.search(snippet):
+            continue
+        if DIAG_OUT.search(snippet):
+            continue
+        out_path = os.path.join(work_dir, f'snippet_{count:05d}.cs')
+        with open(out_path, 'w', encoding='utf-8') as fh:
+            fh.write(snippet + '\n')
+        count += 1
 
 print(count)
 PYEOF
