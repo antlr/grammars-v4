@@ -160,7 +160,7 @@ equality_expression
     ;
 
 relational_expression
-    : shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS isType | AS type_)*
+    : shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS pattern | AS type_)*
     ;
 
 shift_expression
@@ -345,18 +345,6 @@ unbound_type_name
 
 generic_dimension_specifier
     : '<' ','* '>'
-    ;
-
-isType
-    : base_type (rank_specifier | '*')* '?'? isTypePatternArms? identifier?
-    ;
-
-isTypePatternArms
-    : '{' isTypePatternArm (',' isTypePatternArm)* '}'
-    ;
-
-isTypePatternArm
-    : identifier ':' expression
     ;
 
 lambda_expression
@@ -550,12 +538,23 @@ switch_section
     ;
 
 switch_label
-    : CASE expression case_guard? ':'
+    : CASE pattern case_guard? ':'
     | DEFAULT ':'
     ;
 
 case_guard
     : WHEN expression
+    ;
+
+// C# 7.0: pattern matching (ECMA-334 §11.20.4)
+pattern
+    : VAR simple_designation        // var_pattern
+    | type_ simple_designation      // declaration_pattern
+    | expression                    // constant_pattern
+    ;
+
+simple_designation
+    : identifier
     ;
 
 statement_list
