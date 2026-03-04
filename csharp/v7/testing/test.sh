@@ -118,6 +118,12 @@ CS_SRC = re.compile(
 IL_ASM = re.compile(r'\bIL_[0-9a-f]{4}:|\.maxstack\b|\.locals\b')
 # Reject compiler diagnostic output strings (not source)
 DIAG_OUT = re.compile(r'\(\d+,\d+\): (error|warning) CS\d+')
+# Reject format-string placeholders like {pointerType} that appear after
+# '=' or ':' — positions where '{identifier}' is never valid C# syntax.
+# (Avoids false positives from '{name}' inside C# string literals.)
+FMT_PLACEHOLDER = re.compile(r'(?:=|:)\s*\{[A-Za-z_]\w*\}')
+# Reject intentionally-invalid 'using Foo*' (wildcard namespace — not C#)
+USING_STAR = re.compile(r'\busing\s+\w[\w.]*\s*\*')
 
 count = 0
 for path in files:
@@ -136,6 +142,13 @@ for path in files:
         if IL_ASM.search(snippet):
             continue
         if DIAG_OUT.search(snippet):
+            continue
+        # Reject code fragments: compilation_unit never starts with '{' or '}'
+        if snippet[0] in ('{', '}'):
+            continue
+        if FMT_PLACEHOLDER.search(snippet):
+            continue
+        if USING_STAR.search(snippet):
             continue
         out_path = os.path.join(work_dir, f'snippet_{count:05d}.cs')
         with open(out_path, 'w', encoding='utf-8') as fh:
