@@ -9,7 +9,7 @@ and `ref` returns in anonymous functions.
 
 Mapping between ANTLR4 grammar rule names and their corresponding symbols in the ECMA-334 7th edition (December 2023) specification. The **Section** column gives the `Source` entry from the spec EBNF.
 
-Rules marked *(ANTLR-specific)* have no direct single spec equivalent—they are modularisation helpers, combined alternatives, or syntactic predicates introduced in the grammar.
+Rules marked *(ANTLR-specific)* have no direct single spec equivalent.
 
 ### CSharpParser rules
 

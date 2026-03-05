@@ -209,7 +209,7 @@ OP_COALESCING_ASSIGNMENT : '??=';
 OP_RANGE                 : '..';
 
 // Emitted programmatically by CSharpLexerBase for false #if blocks; never matched from input.
-SKIPPED_SECTION : '\u0000' -> channel(HIDDEN), skip;
+SKIPPED_SECTION : '\u0000' -> channel(HIDDEN);
 
 // https://msdn.microsoft.com/en-us/library/dn961160.aspx
 mode INTERPOLATION_STRING;
