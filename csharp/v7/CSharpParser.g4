@@ -462,6 +462,7 @@ simple_embedded_statement
     | DO embedded_statement WHILE OPEN_PARENS expression CLOSE_PARENS ';'                                     # doStatement
     | FOR OPEN_PARENS for_initializer? ';' expression? ';' for_iterator? CLOSE_PARENS embedded_statement      # forStatement
     | FOREACH OPEN_PARENS (REF READONLY? | READONLY REF)? local_variable_type identifier IN expression CLOSE_PARENS embedded_statement # foreachStatement
+    | FOREACH OPEN_PARENS VAR parenthesized_variable_designation IN expression CLOSE_PARENS embedded_statement # foreachDeconstructStatement
 
     // jump statements
     | BREAK ';'                                                              # breakStatement
@@ -531,9 +532,18 @@ case_guard
 
 // C# 7.0: pattern matching (ECMA-334 §11.20.4)
 pattern
-    : VAR simple_designation        // var_pattern
+    : VAR variable_designation      // var_pattern
     | type_ simple_designation      // declaration_pattern
     | expression                    // constant_pattern
+    ;
+
+variable_designation
+    : simple_designation
+    | parenthesized_variable_designation
+    ;
+
+parenthesized_variable_designation
+    : OPEN_PARENS variable_designation (',' variable_designation)+ CLOSE_PARENS
     ;
 
 simple_designation
