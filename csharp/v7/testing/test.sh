@@ -214,3 +214,6 @@ if [ "${#FAILED_LIST[@]}" -gt 0 ]; then
     done
     exit 1
 fi
+
+find "$ROSLYN_DIR/src/" -name '*.cs' | "$TEST_EXE" -x
+
