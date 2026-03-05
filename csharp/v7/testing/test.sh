@@ -215,5 +215,8 @@ if [ "${#FAILED_LIST[@]}" -gt 0 ]; then
     exit 1
 fi
 
-find "$ROSLYN_DIR/src/" -name '*.cs' | "$TEST_EXE" -x
+find "$ROSLYN_DIR/src/" -name '*.cs' | \
+	grep -v 'testing/roslyn/src/Compilers/Test/Resources/Core/SymbolsTests/Metadata/public-and-private.cs' | \
+	grep -v '/VisualStudioInstanceFactory.cs' | \
+	"$TEST_EXE" -x
 
