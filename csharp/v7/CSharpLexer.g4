@@ -208,6 +208,9 @@ OP_LEFT_SHIFT_ASSIGNMENT : '<<=';
 OP_COALESCING_ASSIGNMENT : '??=';
 OP_RANGE                 : '..';
 
+// Emitted programmatically by CSharpLexerBase for false #if blocks; never matched from input.
+SKIPPED_SECTION : '\u0000' -> channel(HIDDEN), skip;
+
 // https://msdn.microsoft.com/en-us/library/dn961160.aspx
 mode INTERPOLATION_STRING;
 
