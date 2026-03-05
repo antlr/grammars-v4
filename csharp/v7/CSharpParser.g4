@@ -534,6 +534,7 @@ case_guard
 pattern
     : VAR variable_designation      // var_pattern
     | type_ simple_designation      // declaration_pattern
+    | type_                         // type_pattern (old-style 'is Type' without name, e.g. 'is byte[]')
     | expression                    // constant_pattern
     ;
 
