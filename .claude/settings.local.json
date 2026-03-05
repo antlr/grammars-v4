@@ -25,7 +25,11 @@
       "Bash(do)",
       "Bash(if [ ! -f \"$dir/README.md\" ])",
       "Bash(then)",
-      "Bash(python sync_pldb.py:*)"
+      "Bash(python sync_pldb.py:*)",
+      "Bash(pdftotext:*)",
+      "Bash(awk NR>=450 && NR<=800:*)",
+      "Bash(dotnet:*)",
+      "Bash(./bin/Debug/net10.0/Test.exe:*)"
     ]
   }
 }
