@@ -374,6 +374,7 @@ schema_privilege
         | PIPE
         | STREAM
         | TASK
+        | IMAGE REPOSITORY
     )
     | ADD SEARCH OPTIMIZATION
     ;
@@ -549,6 +550,7 @@ alter_command
     | alter_file_format
     | alter_function
     | alter_git_repository
+    | alter_image_repository
     | alter_masking_policy
     | alter_materialized_view
     | alter_network_policy
@@ -893,6 +895,14 @@ alter_git_unset_opts
     | tag_list
     ;
 
+alter_image_repository
+    : ALTER IMAGE REPOSITORY if_exists? object_name RENAME TO object_name
+    | ALTER IMAGE REPOSITORY if_exists? object_name SET comment_clause
+    | ALTER IMAGE REPOSITORY if_exists? object_name UNSET COMMENT
+    | ALTER IMAGE REPOSITORY if_exists? object_name set_tags
+    | ALTER IMAGE REPOSITORY if_exists? object_name unset_tags
+    ;
+
 alter_masking_policy
     : ALTER MASKING POLICY if_exists? id_ SET BODY ARROW expr
     | ALTER MASKING POLICY if_exists? id_ RENAME TO id_
@@ -900,7 +910,7 @@ alter_masking_policy
     ;
 
 alter_materialized_view
-    : ALTER MATERIALIZED VIEW id_ (
+    : ALTER MATERIALIZED VIEW if_exists? object_name (
         RENAME TO id_
         | CLUSTER BY '(' expr_list ')'
         | DROP CLUSTERING KEY
@@ -1551,6 +1561,7 @@ create_command
     | create_function
     | create_git_repository
     //| create_integration
+    | create_image_repository
     | create_index
     | create_managed_account
     | create_masking_policy
@@ -1854,6 +1865,11 @@ create_git_opts
     | GIT_CREDENTIALS EQ sn = object_name
     | comment_clause
     | with_tags
+    ;
+
+create_image_repository
+    // comment and tag clause are not in documentation but supported by UI
+    : CREATE or_replace? IMAGE REPOSITORY if_not_exists? r = object_name encryption_opts_internal? comment_clause? with_tags?
     ;
 
 create_index
@@ -2296,8 +2312,8 @@ copy_options
     | FORCE EQ true_false
     ;
 
-stage_encryption_opts_internal
-    : ENCRYPTION EQ LR_BRACKET TYPE EQ (SNOWFLAKE_FULL | SNOWFLAKE_SSE) RR_BRACKET
+encryption_opts_internal
+    : ENCRYPTION EQ LR_BRACKET TYPE EQ (SNOWFLAKE_FULL_Q | SNOWFLAKE_SSE_Q) RR_BRACKET
     ;
 
 stage_type
@@ -2424,7 +2440,7 @@ directory_table_external_params
 
 /* ===========  Stage DDL section =========== */
 create_stage
-    : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier stage_encryption_opts_internal? directory_table_internal_params? (
+    : CREATE or_replace? temporary? STAGE if_not_exists? object_name_or_identifier encryption_opts_internal? directory_table_internal_params? (
         FILE_FORMAT EQ LR_BRACKET (
             FORMAT_NAME EQ string
             | TYPE EQ type_fileformat format_type_options*
@@ -2980,6 +2996,7 @@ drop_command
     | drop_file_format
     | drop_function
     | drop_git_repository
+    | drop_image_repository
     | drop_index
     | drop_integration
     | drop_managed_account
@@ -3047,6 +3064,10 @@ drop_function
 
 drop_git_repository
     : DROP GIT REPOSITORY if_exists? r = object_name
+    ;
+
+drop_image_repository
+    : DROP IMAGE REPOSITORY if_exists? r = object_name
     ;
 
 drop_index
@@ -3428,6 +3449,8 @@ show_command
     | show_git_tags
     | show_global_accounts
     | show_grants
+    | show_image_repositories
+    | show_images
     | show_indexes
     | show_integrations
     | show_locks
@@ -3609,6 +3632,14 @@ show_grants_opts
     | TO (ROLE id_ | USER id_ | SHARE id_)
     | OF ROLE id_
     | OF SHARE id_
+    ;
+
+show_image_repositories
+    : SHOW IMAGE REPOSITORIES like_pattern? in_obj? starts_with? limit_rows?
+    ;
+
+show_images
+    : SHOW IMAGES IN IMAGE REPOSITORY r = object_name
     ;
 
 show_indexes
@@ -3999,6 +4030,8 @@ non_reserved_words
     | HYBRID
     | IDENTIFIER
     | IDENTITY
+    | IMAGE
+    | IMAGES
     | IMPORTED
     | INCREMENTAL
     | INCLUDE

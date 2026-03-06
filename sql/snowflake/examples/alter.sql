@@ -42,3 +42,5 @@ ALTER TABLE t ADD COLUMN c2 INTEGER NULL DEFAULT NULL COMMENT 'text';
 ALTER TABLE t ADD COLUMN c2 INTEGER NULL NULL COMMENT 'text';
 ALTER TABLE t ADD COLUMN c2 INTEGER NULL NOT NULL COMMENT 'text'; --Seems to not make sense but Snowflake accept it but do nothing
 --ALTER TABLE t ADD COLUMN c2 INTEGER NULL 1 COMMENT 'text'; This fail in Snowflake
+ALTER IMAGE REPOSITORY tutorial_repository SET TAG  T1 = 'v2';
+ALTER IMAGE REPOSITORY if exists tutorial_repository RENAME TO tutorial_repository2;
