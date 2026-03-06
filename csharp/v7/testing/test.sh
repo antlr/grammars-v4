@@ -241,9 +241,20 @@ if [ "${#FAILED_LIST[@]}" -gt 0 ]; then
     done
     exit 1
 fi
-exit 0
-find `cygpath -u "$ROSLYN_DIR/src/"` -name '*.cs' | \
-	grep -v 'Metadata/public-and-private.cs' | \
-	grep -v 'VisualStudioInstanceFactory.cs' | \
-	"$TEST_EXE" -x 2>&1 | \
-	grep ' fail '
+
+p=`cygpath -u "$ROSLYN_DIR/src/"`
+failures=$(
+    find "$p" -name '*.cs' | \
+        grep -v 'Metadata/public-and-private.cs' | \
+        grep -v 'VisualStudioInstanceFactory.cs' | \
+        while IFS= read -r f; do cygpath -w "$f"; done | \
+        "$TEST_EXE" -x 2>&1 | \
+        grep ' fail ' || true
+)
+if [ -n "$failures" ]; then
+    echo "$failures"
+    echo "error: parse failures detected" >&2
+    exit 1
+else
+    echo 'Parse of roslyn/src/**/*.cs passed.'
+fi
