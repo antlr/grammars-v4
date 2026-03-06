@@ -38,6 +38,18 @@ public abstract class CSharpParserBase extends Parser
         return result;
     }
 
+    protected boolean IsRightArrow() { return areAdjacent(); }
+    protected boolean IsRightShift() { return areAdjacent(); }
+    protected boolean IsRightShiftAssignment() { return areAdjacent(); }
+
+    private boolean areAdjacent()
+    {
+        Token first  = _input.LT(-2);
+        Token second = _input.LT(-1);
+        return first != null && second != null &&
+               first.getTokenIndex() + 1 == second.getTokenIndex();
+    }
+
     protected boolean IsLocalVariableDeclaration()
     {
         if (noSemantics.contains("IsLocalVariableDeclaration")) return true;

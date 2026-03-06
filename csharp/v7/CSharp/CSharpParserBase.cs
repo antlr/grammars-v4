@@ -46,6 +46,18 @@ public abstract class CSharpParserBase : Parser
         return result;
     }
 
+    protected bool IsRightArrow() => AreAdjacent();
+    protected bool IsRightShift() => AreAdjacent();
+    protected bool IsRightShiftAssignment() => AreAdjacent();
+
+    private bool AreAdjacent()
+    {
+        var first  = this.TokenStream.LT(-2);
+        var second = this.TokenStream.LT(-1);
+        return first != null && second != null &&
+               first.TokenIndex + 1 == second.TokenIndex;
+    }
+
     protected bool IsLocalVariableDeclaration()
     {
         if (_noSemantics.Contains("IsLocalVariableDeclaration")) return true;

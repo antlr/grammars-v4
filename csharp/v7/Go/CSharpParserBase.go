@@ -38,6 +38,18 @@ func (p *CSharpParserBase) initSemantics() {
 	}
 }
 
+func (p *CSharpParserBase) IsRightArrow() bool            { return p.areAdjacent() }
+func (p *CSharpParserBase) IsRightShift() bool            { return p.areAdjacent() }
+func (p *CSharpParserBase) IsRightShiftAssignment() bool  { return p.areAdjacent() }
+
+func (p *CSharpParserBase) areAdjacent() bool {
+	stream := p.GetTokenStream()
+	first  := stream.LT(-2)
+	second := stream.LT(-1)
+	return first != nil && second != nil &&
+		first.GetTokenIndex()+1 == second.GetTokenIndex()
+}
+
 func (p *CSharpParserBase) IsLocalVariableDeclaration() bool {
 	p.initSemantics()
 	if p.noSemantics["IsLocalVariableDeclaration"] {

@@ -24,6 +24,17 @@ export default class CSharpParserBase extends antlr4.Parser {
         this._noSemantics = parseNoSemantics(process.argv);
     }
 
+    IsRightArrow() { return this._areAdjacent(); }
+    IsRightShift() { return this._areAdjacent(); }
+    IsRightShiftAssignment() { return this._areAdjacent(); }
+
+    _areAdjacent() {
+        const first  = this._input.LT(-2);
+        const second = this._input.LT(-1);
+        return first !== null && second !== null &&
+               first.tokenIndex + 1 === second.tokenIndex;
+    }
+
     IsLocalVariableDeclaration() {
         if (this._noSemantics.has("IsLocalVariableDeclaration")) return true;
         const local_var_decl = this._ctx;

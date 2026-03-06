@@ -11,6 +11,9 @@ class CSharpParserBase : public antlr4::Parser
 public:
     CSharpParserBase(antlr4::TokenStream *input);
 
+    bool IsRightArrow();
+    bool IsRightShift();
+    bool IsRightShiftAssignment();
     bool IsLocalVariableDeclaration();
 
 protected:
@@ -19,6 +22,7 @@ protected:
 private:
     bool initialized_ = false;
     void initSemantics();
+    bool areAdjacent();
 
     static const std::vector<std::string> &allSemanticFunctions();
 };

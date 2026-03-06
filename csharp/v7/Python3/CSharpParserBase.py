@@ -24,6 +24,16 @@ class CSharpParserBase(Parser):
         super().__init__(input, output)
         self._noSemantics = parseNoSemantics(sys.argv)
 
+    def IsRightArrow(self): return self._areAdjacent()
+    def IsRightShift(self): return self._areAdjacent()
+    def IsRightShiftAssignment(self): return self._areAdjacent()
+
+    def _areAdjacent(self):
+        first  = self._input.LT(-2)
+        second = self._input.LT(-1)
+        return (first is not None and second is not None and
+                first.tokenIndex + 1 == second.tokenIndex)
+
     def IsLocalVariableDeclaration(self):
         if "IsLocalVariableDeclaration" in self._noSemantics:
             return True

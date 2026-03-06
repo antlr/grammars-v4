@@ -25,6 +25,18 @@ void CSharpParserBase::initSemantics()
     // construction if --no-semantics was passed on the command line.
 }
 
+bool CSharpParserBase::areAdjacent()
+{
+    auto *first  = _input->LT(-2);
+    auto *second = _input->LT(-1);
+    return first != nullptr && second != nullptr &&
+           first->getTokenIndex() + 1 == second->getTokenIndex();
+}
+
+bool CSharpParserBase::IsRightArrow()           { return areAdjacent(); }
+bool CSharpParserBase::IsRightShift()           { return areAdjacent(); }
+bool CSharpParserBase::IsRightShiftAssignment() { return areAdjacent(); }
+
 bool CSharpParserBase::IsLocalVariableDeclaration()
 {
     initSemantics();

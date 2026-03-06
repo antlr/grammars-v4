@@ -26,6 +26,17 @@ export abstract class CSharpParserBase extends Parser {
         this._noSemantics = parseNoSemantics(process.argv);
     }
 
+    protected IsRightArrow(): boolean { return this.areAdjacent(); }
+    protected IsRightShift(): boolean { return this.areAdjacent(); }
+    protected IsRightShiftAssignment(): boolean { return this.areAdjacent(); }
+
+    private areAdjacent(): boolean {
+        const first  = this.tokenStream.LT(-2);
+        const second = this.tokenStream.LT(-1);
+        return first !== null && second !== null &&
+               first.tokenIndex + 1 === second.tokenIndex;
+    }
+
     protected IsLocalVariableDeclaration(): boolean {
         if (this._noSemantics.has("IsLocalVariableDeclaration")) return true;
         const local_var_decl = this.context as Local_variable_declarationContext | null;

@@ -491,7 +491,7 @@ block
 
 local_variable_declaration
     : (USING | REF | REF READONLY)? local_variable_type local_variable_declarator (
-        ',' local_variable_declarator { this.IsLocalVariableDeclaration() }?
+        ',' local_variable_declarator {this.IsLocalVariableDeclaration()}?
     )*
     | FIXED pointer_type fixed_pointer_declarators
     ;
@@ -1047,15 +1047,15 @@ stackalloc_initializer
     ;
 
 right_arrow
-    : first = '=' second = '>' {$first.index + 1 == $second.index}? // Nothing between the tokens?
+    : '=' '>' {this.IsRightArrow()}? // Nothing between the tokens?
     ;
 
 right_shift
-    : first = '>' second = '>' {$first.index + 1 == $second.index}? // Nothing between the tokens?
+    : '>' '>' {this.IsRightShift()}? // Nothing between the tokens?
     ;
 
 right_shift_assignment
-    : first = '>' second = '>=' {$first.index + 1 == $second.index}? // Nothing between the tokens?
+    : '>' '>=' {this.IsRightShiftAssignment()}? // Nothing between the tokens?
     ;
 
 literal

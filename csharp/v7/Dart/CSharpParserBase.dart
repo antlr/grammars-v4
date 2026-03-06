@@ -26,9 +26,17 @@ abstract class CSharpParserBase extends Parser {
         _noSemantics = parseNoSemantics(Platform.executableArguments);
     }
 
-    bool adjacentTokens(Token? first, Token? second) =>
-        first != null && second != null &&
-        first.tokenIndex + 1 == second.tokenIndex;
+    bool IsRightArrow()           => _areAdjacent();
+    bool IsRightShift()           => _areAdjacent();
+    bool IsRightShiftAssignment() => _areAdjacent();
+
+    bool _areAdjacent() {
+        final stream = inputStream as TokenStream;
+        final first  = stream.LT(-2);
+        final second = stream.LT(-1);
+        return first != null && second != null &&
+               first.tokenIndex + 1 == second.tokenIndex;
+    }
 
     bool IsLocalVariableDeclaration() {
         if (_noSemantics.contains("IsLocalVariableDeclaration")) return true;
