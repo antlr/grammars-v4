@@ -41,3 +41,5 @@ create sequence s1 NOORDER;
 CREATE OR REPLACE INDEX vidx ON mytable (val);
 CREATE INDEX vidx ON myschem.mytable (val);
 CREATE INDEX IF NOT EXISTS vidx ON mydb.myschem.mytable (val,val2) INCLUDE (val3);
+CREATE OR REPLACE IMAGE REPOSITORY tutorial_repository ENCRYPTION = (type = 'SNOWFLAKE_SSE') COMMENT ='COM TEST' WITH TAG (t1 = 'v1');
+CREATE IMAGE REPOSITORY IF NOT EXISTS tutorial_repository;
