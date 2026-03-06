@@ -52,6 +52,27 @@ Test.exe --DCOMPILERCORE myfile.cs
 Test.exe --DDEBUG;TRACE myfile.cs
 ```
 
+### `--no-semantics`
+
+The parser uses one semantic predicate, `IsLocalVariableDeclaration()`, to disambiguate
+`var x = ...` (implicitly-typed local) from a type named `var`. Passing `--no-semantics`
+disables this predicate (it returns `true` unconditionally), which lets the parser run
+without any context-sensitive logic — useful for quick batch testing or fuzzing.
+
+```
+--no-semantics                           Disable all semantic predicates
+--no-semantics=IsLocalVariableDeclaration  Disable a specific predicate by name
+```
+
+**Java**: pass as a JVM system property: `-Dno-semantics` is not used here; instead pass
+`--no-semantics` in `sun.java.command` (i.e. as a normal program argument to the test harness).
+
+**C#**: pass on the command line to the test harness:
+
+```
+Test.exe --no-semantics myfile.cs
+```
+
 ## Grammar Symbol Mapping
 
 See [grammar-symbol-mapping.md](grammar-symbol-mapping.md) for the full mapping between ANTLR4 rule names

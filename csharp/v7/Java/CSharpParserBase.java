@@ -1,14 +1,46 @@
 import org.antlr.v4.runtime.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class CSharpParserBase extends Parser
 {
+    private static final String[] ALL_SEMANTIC_FUNCTIONS = {
+        "IsLocalVariableDeclaration"
+    };
+
+    private final Set<String> noSemantics;
+
     protected CSharpParserBase(TokenStream input)
     {
         super(input);
+        noSemantics = parseNoSemantics(System.getProperty("sun.java.command", "").split("\\s+"));
+    }
+
+    private static Set<String> parseNoSemantics(String[] args)
+    {
+        Set<String> result = new HashSet<>();
+        for (String a : args)
+        {
+            if (a.toLowerCase().startsWith("--no-semantics"))
+            {
+                int eq = a.indexOf('=');
+                if (eq == -1)
+                {
+                    for (String f : ALL_SEMANTIC_FUNCTIONS) result.add(f);
+                }
+                else
+                {
+                    for (String f : a.substring(eq + 1).split(","))
+                        result.add(f.trim());
+                }
+            }
+        }
+        return result;
     }
 
     protected boolean IsLocalVariableDeclaration()
     {
+        if (noSemantics.contains("IsLocalVariableDeclaration")) return true;
         if (!(this._ctx instanceof CSharpParser.Local_variable_declarationContext)) {
             return false;
         }
