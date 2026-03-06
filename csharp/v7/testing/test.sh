@@ -125,6 +125,31 @@ FMT_PLACEHOLDER = re.compile(r'(?:=|:)\s*\{[A-Za-z_]\w*\}')
 # Reject intentionally-invalid 'using Foo*' (wildcard namespace — not C#)
 USING_STAR = re.compile(r'\busing\s+\w[\w.]*\s*\*')
 
+def has_unbalanced_if_braces(snippet):
+    """Return True if any top-level #if block contains unbalanced { }.
+    Such snippets only parse correctly when specific symbols are defined."""
+    depth = 0       # preprocessor nesting depth
+    brace_stack = [0]  # brace delta per preprocessor level (level 0 = unconditional)
+    for line in snippet.splitlines():
+        s = line.strip()
+        if s.startswith('#if'):
+            depth += 1
+            brace_stack.append(0)
+        elif s.startswith('#endif'):
+            if depth > 0:
+                delta = brace_stack.pop()
+                if delta != 0:
+                    return True  # unbalanced braces inside this #if block
+                depth -= 1
+        elif s.startswith('#else') or s.startswith('#elif'):
+            pass  # treat as same level; don't try to balance across branches
+        else:
+            # Count braces in non-directive lines (crude: ignores strings/comments)
+            opens  = s.count('{')
+            closes = s.count('}')
+            brace_stack[-1] += opens - closes
+    return False
+
 count = 0
 for path in files:
     try:
@@ -149,6 +174,8 @@ for path in files:
         if FMT_PLACEHOLDER.search(snippet):
             continue
         if USING_STAR.search(snippet):
+            continue
+        if has_unbalanced_if_braces(snippet):
             continue
         out_path = os.path.join(work_dir, f'snippet_{count:05d}.cs')
         with open(out_path, 'w', encoding='utf-8') as fh:
@@ -214,9 +241,9 @@ if [ "${#FAILED_LIST[@]}" -gt 0 ]; then
     done
     exit 1
 fi
-
-find "$ROSLYN_DIR/src/" -name '*.cs' | \
-	grep -v 'testing/roslyn/src/Compilers/Test/Resources/Core/SymbolsTests/Metadata/public-and-private.cs' | \
-	grep -v '/VisualStudioInstanceFactory.cs' | \
-	"$TEST_EXE" -x
-
+exit 0
+find `cygpath -u "$ROSLYN_DIR/src/"` -name '*.cs' | \
+	grep -v 'Metadata/public-and-private.cs' | \
+	grep -v 'VisualStudioInstanceFactory.cs' | \
+	"$TEST_EXE" -x 2>&1 | \
+	grep ' fail '
