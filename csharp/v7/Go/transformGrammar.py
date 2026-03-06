@@ -21,8 +21,12 @@ def transform_grammar(file_path):
     with open(file_path + ".bak",'r', encoding="utf-8") as input_file:
         with open(file_path, 'w', encoding="utf-8") as output_file:
             for line in input_file:
-                line = re.sub(r"(this\.)", 'p.', line)
+                if 'this.' in line and '}?' in line:
+                    line = line.replace('this.', 'p.')
+                elif 'this.' in line:
+                    line = line.replace('this.', 'l.')
                 output_file.write(line)
+            output_file.flush()
 
     print("Writing ...")
 
