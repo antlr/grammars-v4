@@ -1,1 +1,0 @@
-line 5:18 rule local_variable_declaration failed predicate: { this.IsLocalVariableDeclaration() }?
