@@ -82,6 +82,15 @@ and their corresponding symbols in the ECMA-334 7th edition specification.
 * [pldb](http://pldb.info/concepts/csharp)
 * [ECMA 334](https://ecma-international.org/publications-and-standards/standards/ecma-334/)
 
+## Performance
+
+<img src="./times.svg">
+
+Runtime of `examples/*.cs` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Samsung SSD 990 EVO Plus 2TB;
+Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
+.NET SDK: 10.0.102. Sample size 20.
+
 ## License
 
 MIT
