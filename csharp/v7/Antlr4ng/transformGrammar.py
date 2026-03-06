@@ -4,25 +4,27 @@ import shutil
 from glob import glob
 from pathlib import Path
 
-HEADERS = {
-    "CSharpLexer.g4":
-        '@header { import { CSharpLexerBase } from "./CSharpLexerBase.js"; }\n',
-    "CSharpParser.g4":
-        '@header { import { CSharpParserBase } from "./CSharpParserBase.js"; }\n',
-}
+def main():
+    """Executes the script."""
+    for file in glob("./*.g4"):
+        transform_grammar(file)
 
 def transform(file_path: str) -> None:
-    header = HEADERS.get(Path(file_path).name)
-    if header is None:
-        return
     print(f"Transforming {file_path}")
-    shutil.move(file_path, file_path + ".bak")
-    with open(file_path + ".bak", "r", encoding="utf-8") as f:
-        text = f.read()
-    # Insert @header before the first 'options {' block
-    text = re.sub(r"(options\s*\{)", header + r"\1", text, count=1)
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(text)
+    print("Altering " + file_path)
+    if not Path(file_path).is_file:
+        print(f"Could not find file: {file_path}")
+        sys.exit(1)
 
-for g4 in glob("./*.g4"):
-    transform(g4)
+    shutil.move(file_path, file_path + ".bak")
+    with open(file_path + ".bak",'r', encoding="utf-8") as input_file:
+        with open(file_path, 'w', encoding="utf-8") as output_file:
+            for line in input_file:
+                line = re.sub(r"(\/\/ Insert here @header for lexer\.)",\
+                    '@header {import { CLexerBase } from "./CSharpLexerBase.js"}', line)
+                line = re.sub(r"(\/\/ Insert here @header for parser\.)",\
+                    '@header {import { CParserBase } from "./CSharpParserBase.js"}', line)
+                output_file.write(line)
+
+if __name__ == '__main__':
+    main()

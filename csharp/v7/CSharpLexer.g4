@@ -17,6 +17,8 @@ options {
     superClass = CSharpLexerBase;
 }
 
+// Insert here @header for lexer.
+
 BYTE_ORDER_MARK: '\u00EF\u00BB\u00BF';
 
 SINGLE_LINE_DOC_COMMENT     : '///' InputCharacter*   -> channel(COMMENTS_CHANNEL);

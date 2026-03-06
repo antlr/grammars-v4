@@ -12,6 +12,9 @@ options {
     superClass = CSharpParserBase;
 }
 
+// Insert here @header for parser.
+
+
 // entry point
 compilation_unit
     : BYTE_ORDER_MARK? extern_alias_directives? using_directives? global_attribute_section* namespace_member_declarations? EOF
