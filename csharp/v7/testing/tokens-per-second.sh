@@ -9,6 +9,10 @@ ROSLYN_DIR="$SCRIPT_DIR/roslyn"
 GENERATED_DIR="$SCRIPT_DIR/../Generated-CSharp"
 TEST_SUBDIR="src/Compilers/CSharp/Test"
 TEST_EXE="$(find "$GENERATED_DIR/bin" -name "Test.exe" 2>/dev/null | sort | tail -1 || true)"
+if [[ -z "$TEST_EXE" ]]; then
+    echo "Error: Test.exe not found under $GENERATED_DIR/bin" >&2
+    exit 1
+fi
 p=`cygpath -u "$ROSLYN_DIR/src/"`
 
 tokens=`find "$p" -name '*.cs' | \
