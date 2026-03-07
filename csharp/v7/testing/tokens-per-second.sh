@@ -48,5 +48,5 @@ read mean_tps std_tps < <("$OCTAVE" --no-gui --norc --eval "
   printf('%d %d\n', round(m/1000)*1000, round(s/1000)*1000);
 " 2>/dev/null | tail -1)
 
-echo "Parse of \`testing/roslyn/src/**/*.cs\` is $mean_tps +/- $std_tps tokens per second. Sample size ${#times[@]}, port CSharp."
+echo "Parse of \`testing/roslyn/src/**/*.cs\` is $mean_tps +/- $std_tps tokens per second (SD). Sample size ${#times[@]}, port CSharp."
 
