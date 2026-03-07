@@ -174,7 +174,8 @@
 				<module>cql</module>
 				<module>cql3</module>
 				<module>creole</module>
-				<module>csharp</module>
+				<module>csharp/v6</module>
+				<module>csharp/v7</module>
 				<module>css3</module>
 				<module>csv</module>
 				<module>ctl</module>

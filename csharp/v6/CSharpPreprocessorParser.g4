@@ -26,7 +26,7 @@ preprocessor_directive
     | REGION TEXT? directive_new_line_or_sharp { this.OnPreprocessorDirectiveRegion(); }                                     # preprocessorRegion
     | ENDREGION TEXT? directive_new_line_or_sharp { this.OnPreprocessorDirectiveEndregion(); }                               # preprocessorRegion
     | PRAGMA TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectivePragma(); }                                      # preprocessorPragma
-    | NULLABLE TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectiveNullable(); }                                  # preprocessorNullable
+    | NULLABLE TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectiveNullable(); }                                  # preprocessorNullable // C# 8.0
     ;
 
 directive_new_line_or_sharp

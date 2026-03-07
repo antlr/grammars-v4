@@ -34,3 +34,6 @@ package-lock.json
 
 # Ignore C parser preprocessed output files in examples
 c/examples/**/*.p
+
+# Ignore Roslyn clone used for C# v7 grammar testing
+csharp/v7/testing/roslyn/

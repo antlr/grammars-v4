@@ -1,0 +1,8 @@
+class A{
+  void a() {
+    int[] nums = {1, 3, 5, 7};
+    for (int num : nums){
+        b(num);
+    }
+  }
+}

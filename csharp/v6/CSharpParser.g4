@@ -36,9 +36,10 @@ base_type
     : simple_type
     | class_type // represents types: enum, class, interface, delegate, type_parameter
     | VOID '*'
-    | tuple_type
+    | tuple_type // C# 7.0
     ;
 
+// C# 7.0 tuple types
 tuple_type
     : '(' tuple_element (',' tuple_element)+ ')'
     ;
@@ -93,13 +94,13 @@ argument_list
     ;
 
 argument
-    : (identifier ':')? refout = (REF | OUT | IN)? (expression | (VAR | type_) expression)
+    : (identifier ':')? refout = (REF | OUT | IN)? (expression | (VAR | type_) expression) // C# 7.2: IN
     ;
 
 expression
     : assignment
     | non_assignment_expression
-    | REF non_assignment_expression
+    | REF non_assignment_expression // C# 7.0: ref expression (ref locals, ref return)
     ;
 
 non_assignment_expression
@@ -110,7 +111,7 @@ non_assignment_expression
 
 assignment
     : unary_expression assignment_operator expression
-    | unary_expression '??=' throwable_expression
+    | unary_expression '??=' throwable_expression // C# 8.0: null-coalescing assignment
     ;
 
 assignment_operator
@@ -132,7 +133,7 @@ conditional_expression
     ;
 
 null_coalescing_expression
-    : conditional_or_expression ('??' (null_coalescing_expression | throw_expression))?
+    : conditional_or_expression ('??' (null_coalescing_expression | throw_expression))? // C# 7.0: throw_expression in ??
     ;
 
 conditional_or_expression
@@ -160,7 +161,8 @@ equality_expression
     ;
 
 relational_expression
-    : shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS isType | AS type_)*
+    : shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS isType // C# 7.0: type pattern matching
+    | AS type_)*
     ;
 
 shift_expression
@@ -175,21 +177,25 @@ multiplicative_expression
     : switch_expression (('*' | '/' | '%') switch_expression)*
     ;
 
+// C# 8.0 switch expression
 switch_expression
     : range_expression ('switch' '{' (switch_expression_arms ','?)? '}')?
     ;
 
+// C# 8.0
 switch_expression_arms
     : switch_expression_arm (',' switch_expression_arm)*
     ;
 
+// C# 8.0
 switch_expression_arm
     : expression case_guard? right_arrow throwable_expression
     ;
 
+// C# 8.0 range expression
 range_expression
     : unary_expression
-    | unary_expression? OP_RANGE unary_expression?
+    | unary_expression? OP_RANGE unary_expression? // C# 8.0
     ;
 
 // https://msdn.microsoft.com/library/6a71f45d(v=vs.110).aspx
@@ -237,22 +243,24 @@ primary_expression_start
         | anonymous_object_initializer
         | rank_specifier array_initializer
     )                                                                                               # objectCreationExpression
-    | OPEN_PARENS argument ( ',' argument)+ CLOSE_PARENS                                            # tupleExpression
+    | OPEN_PARENS argument ( ',' argument)+ CLOSE_PARENS                                            # tupleExpression // C# 7.0
     | TYPEOF OPEN_PARENS (unbound_type_name | type_ | VOID) CLOSE_PARENS                            # typeofExpression
     | CHECKED OPEN_PARENS expression CLOSE_PARENS                                                   # checkedExpression
     | UNCHECKED OPEN_PARENS expression CLOSE_PARENS                                                 # uncheckedExpression
-    | DEFAULT (OPEN_PARENS type_ CLOSE_PARENS)?                                                     # defaultValueExpression
+    | DEFAULT (OPEN_PARENS type_ CLOSE_PARENS)?                                                     # defaultValueExpression // C# 7.1: default literal (parens optional)
     | ASYNC? DELEGATE (OPEN_PARENS explicit_anonymous_function_parameter_list? CLOSE_PARENS)? block # anonymousMethodExpression
     | SIZEOF OPEN_PARENS type_ CLOSE_PARENS                                                         # sizeofExpression
     // C# 6: https://msdn.microsoft.com/en-us/library/dn986596.aspx
     | NAMEOF OPEN_PARENS (identifier '.')* identifier CLOSE_PARENS # nameofExpression
     ;
 
+// C# 7.0 throw expression
 throwable_expression
     : expression
     | throw_expression
     ;
 
+// C# 7.0
 throw_expression
     : THROW expression
     ;
@@ -345,14 +353,17 @@ generic_dimension_specifier
     : '<' ','* '>'
     ;
 
+// C# 7.0: IS type pattern (identifier? = optional binding variable)
 isType
     : base_type (rank_specifier | '*')* '?'? isTypePatternArms? identifier?
     ;
 
+// C# 8.0: property pattern arms (extended from isType)
 isTypePatternArms
     : '{' isTypePatternArm (',' isTypePatternArm)* '}'
     ;
 
+// C# 8.0
 isTypePatternArm
     : identifier ':' expression
     ;
@@ -373,7 +384,7 @@ explicit_anonymous_function_parameter_list
     ;
 
 explicit_anonymous_function_parameter
-    : refout = (REF | OUT | IN)? type_ identifier
+    : refout = (REF | OUT | IN)? type_ identifier // C# 7.2: IN
     ;
 
 implicit_anonymous_function_parameter_list
@@ -444,23 +455,27 @@ statement
 declarationStatement
     : local_variable_declaration ';'
     | local_constant_declaration ';'
-    | local_function_declaration
+    | local_function_declaration // C# 7.0
     ;
 
+// C# 7.0 local functions
 local_function_declaration
     : local_function_header local_function_body
     ;
 
+// C# 7.0
 local_function_header
     : local_function_modifiers? return_type identifier type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS
         type_parameter_constraints_clauses?
     ;
 
+// C# 7.0; STATIC modifier: C# 8.0 (static local functions)
 local_function_modifiers
-    : (ASYNC | UNSAFE) STATIC?
-    | STATIC (ASYNC | UNSAFE)
+    : (ASYNC | UNSAFE) STATIC? // C# 8.0: STATIC
+    | STATIC (ASYNC | UNSAFE)  // C# 8.0: STATIC
     ;
 
+// C# 7.0
 local_function_body
     : block
     | right_arrow throwable_expression ';'
@@ -487,7 +502,7 @@ simple_embedded_statement
     | WHILE OPEN_PARENS expression CLOSE_PARENS embedded_statement                                            # whileStatement
     | DO embedded_statement WHILE OPEN_PARENS expression CLOSE_PARENS ';'                                     # doStatement
     | FOR OPEN_PARENS for_initializer? ';' expression? ';' for_iterator? CLOSE_PARENS embedded_statement      # forStatement
-    | AWAIT? FOREACH OPEN_PARENS local_variable_type identifier IN expression CLOSE_PARENS embedded_statement # foreachStatement
+    | AWAIT? FOREACH OPEN_PARENS local_variable_type identifier IN expression CLOSE_PARENS embedded_statement # foreachStatement // C# 8.0: AWAIT?
 
     // jump statements
     | BREAK ';'                                                              # breakStatement
@@ -512,7 +527,7 @@ block
     ;
 
 local_variable_declaration
-    : (USING | REF | REF READONLY)? local_variable_type local_variable_declarator (
+    : (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( // C# 8.0: USING; C# 7.0: REF, REF READONLY
         ',' local_variable_declarator { this.IsLocalVariableDeclaration() }?
     )*
     | FIXED pointer_type fixed_pointer_declarators
@@ -524,13 +539,13 @@ local_variable_type
     ;
 
 local_variable_declarator
-    : identifier ('=' REF? local_variable_initializer)?
+    : identifier ('=' REF? local_variable_initializer)? // C# 7.0: REF? (ref local assignment)
     ;
 
 local_variable_initializer
     : expression
     | array_initializer
-    | stackalloc_initializer
+    | stackalloc_initializer // C# 7.0
     ;
 
 local_constant_declaration
@@ -547,10 +562,11 @@ switch_section
     ;
 
 switch_label
-    : CASE expression case_guard? ':'
+    : CASE expression case_guard? ':' // C# 7.0: arbitrary expression (not just constant) + case_guard
     | DEFAULT ':'
     ;
 
+// C# 7.0 case guard (when clause in switch)
 case_guard
     : WHEN expression
     ;
@@ -683,7 +699,7 @@ primary_constraint
     : class_type
     | CLASS '?'?
     | STRUCT
-    | UNMANAGED
+    | UNMANAGED // C# 7.2: unmanaged type constraint
     ;
 
 // namespace_or_type_name includes identifier
@@ -746,7 +762,7 @@ common_member_declaration
     ;
 
 typed_member_declaration
-    : (REF | READONLY REF | REF READONLY)? type_ (
+    : (REF | READONLY REF | REF READONLY)? type_ ( // C# 7.0: REF/READONLY REF/REF READONLY (ref return types)
         namespace_or_type_name '.' indexer_declaration
         | method_declaration
         | property_declaration
@@ -808,9 +824,9 @@ fixed_parameter
 parameter_modifier
     : REF
     | OUT
-    | IN
-    | REF THIS
-    | IN THIS
+    | IN       // C# 7.2: in parameter modifier
+    | REF THIS // C# 7.2: ref extension method receiver
+    | IN THIS  // C# 7.2: in extension method receiver
     | THIS
     ;
 
@@ -949,7 +965,7 @@ interface_body // ignored in csharp 8
 
 interface_member_declaration
     : attributes? NEW? (
-        UNSAFE? (REF | REF READONLY | READONLY REF)? type_ (
+        UNSAFE? (REF | REF READONLY | READONLY REF)? type_ ( // C# 7.0: ref return types in interface
             identifier type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS type_parameter_constraints_clauses? ';'
             | identifier OPEN_BRACE interface_accessors CLOSE_BRACE
             | THIS '[' formal_parameter_list ']' OPEN_BRACE interface_accessors CLOSE_BRACE
@@ -1040,7 +1056,7 @@ fixed_size_buffer_declarator
 
 stackalloc_initializer
     : STACKALLOC type_ '[' expression ']'
-    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE expression (',' expression)* ','? CLOSE_BRACE
+    | STACKALLOC type_? '[' expression? ']' OPEN_BRACE (expression (',' expression)* ','?)? CLOSE_BRACE // C# 7.3: stackalloc array initializer (empty list allowed)
     ;
 
 right_arrow
@@ -1060,7 +1076,7 @@ literal
     | string_literal
     | INTEGER_LITERAL
     | HEX_INTEGER_LITERAL
-    | BIN_INTEGER_LITERAL
+    | BIN_INTEGER_LITERAL // C# 7.0
     | REAL_LITERAL
     | CHARACTER_LITERAL
     | NULL_

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(pdftotext:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(bash:*)",
+      "Bash(head:*)",
+      "Bash(csc:*)",
+      "Bash(cat:*)",
+      "Bash(./bin/Debug/net10.0/Test.exe:*)"
+    ]
+  }
+}
