@@ -91,6 +91,8 @@ Samsung SSD 990 EVO Plus 2TB;
 Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
 .NET SDK: 10.0.102. Sample size 20.
 
+Parse of `testing/roslyn/src/**/*.cs` is approximately 74,000 tokens per second.
+
 ## License
 
 MIT
