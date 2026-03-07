@@ -14,21 +14,18 @@ def fix(file_path):
     parts = os.path.split(file_path)
     file_name = parts[-1]
     shutil.move(file_path, file_path + ".bak")
-    input_file = open(file_path + ".bak",'r')
-    output_file = open(file_path, 'w')
-    for x in input_file:
-        if '// Insert here @header for lexer.' in x:
-            x = x.replace('// Insert here @header for lexer.', '@header {#include "CSharpLexerBase.h"}')
-        if '// Insert here @header for parser.' in x:
-            x = x.replace('// Insert here @header for parser.', '@header {#include "CSharpParserBase.h"}')
-        if 'this.' in x:
-            x = x.replace('this.', 'this->')
-        output_file.write(x)
-        output_file.flush()
+    with open(file_path + ".bak", 'r') as input_file:
+        with open(file_path, 'w') as output_file:
+            for x in input_file:
+                if '// Insert here @header for lexer.' in x:
+                    x = x.replace('// Insert here @header for lexer.', '@header {#include "CSharpLexerBase.h"}')
+                if '// Insert here @header for parser.' in x:
+                    x = x.replace('// Insert here @header for parser.', '@header {#include "CSharpParserBase.h"}')
+                if 'this.' in x:
+                    x = x.replace('this.', 'this->')
+                output_file.write(x)
 
     print("Writing ...")
-    input_file.close()
-    output_file.close()
 
 if __name__ == '__main__':
     main(sys.argv)

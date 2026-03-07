@@ -10,9 +10,8 @@ def main():
         transform_grammar(file)
 
 def transform_grammar(file_path: str) -> None:
-    print(f"Transforming {file_path}")
     print("Altering " + file_path)
-    if not Path(file_path).is_file:
+    if not Path(file_path).is_file():
         print(f"Could not find file: {file_path}")
         sys.exit(1)
 
