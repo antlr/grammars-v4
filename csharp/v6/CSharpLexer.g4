@@ -140,10 +140,11 @@ IDENTIFIER: '@'? IdentifierOrKeyword;
 
 //B.1.8 Literals
 // 0.Equals() would be parsed as an invalid real (1. branch) causing a lexer error
+// Note: '_'* digit separators in numeric literals: C# 7.0
 LITERAL_ACCESS      : [0-9] ('_'* [0-9])* IntegerTypeSuffix? '.' '@'? IdentifierOrKeyword;
 INTEGER_LITERAL     : [0-9] ('_'* [0-9])* IntegerTypeSuffix?;
 HEX_INTEGER_LITERAL : '0' [xX] ('_'* HexDigit)+ IntegerTypeSuffix?;
-BIN_INTEGER_LITERAL : '0' [bB] ('_'* [01])+ IntegerTypeSuffix?;
+BIN_INTEGER_LITERAL : '0' [bB] ('_'* [01])+ IntegerTypeSuffix?; // C# 7.0
 REAL_LITERAL:
     ([0-9] ('_'* [0-9])*)? '.' [0-9] ('_'* [0-9])* ExponentPart? [FfDdMm]?
     | [0-9] ('_'* [0-9])* ([FfDdMm] | ExponentPart [FfDdMm]?)
@@ -205,8 +206,8 @@ OP_OR_ASSIGNMENT         : '|=';
 OP_XOR_ASSIGNMENT        : '^=';
 OP_LEFT_SHIFT            : '<<';
 OP_LEFT_SHIFT_ASSIGNMENT : '<<=';
-OP_COALESCING_ASSIGNMENT : '??=';
-OP_RANGE                 : '..';
+OP_COALESCING_ASSIGNMENT : '??='; // C# 8.0
+OP_RANGE                 : '..';  // C# 8.0
 
 // https://msdn.microsoft.com/en-us/library/dn961160.aspx
 mode INTERPOLATION_STRING;
@@ -243,7 +244,7 @@ WARNING                : 'warning' Whitespace+   -> channel(DIRECTIVE), mode(DIR
 REGION                 : 'region' Whitespace*    -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 ENDREGION              : 'endregion' Whitespace* -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 PRAGMA                 : 'pragma' Whitespace+    -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
-NULLABLE               : 'nullable' Whitespace+  -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
+NULLABLE               : 'nullable' Whitespace+  -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT); // C# 8.0
 DIRECTIVE_DEFAULT      : 'default'               -> channel(DIRECTIVE), type(DEFAULT);
 DIRECTIVE_HIDDEN       : 'hidden'                -> channel(DIRECTIVE);
 DIRECTIVE_OPEN_PARENS  : '('                     -> channel(DIRECTIVE), type(OPEN_PARENS);

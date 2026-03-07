@@ -9,6 +9,9 @@
 <tool_grammar_files:{x |    \<Antlr4 Include="<x>">
 <if(name_space)>\<Package><name_space>\</Package><endif>\</Antlr4>
 } >  \</ItemGroup>
+  \<ItemGroup>
+    \<PackageReference Include="UTF.Unknown" Version="2.6.0" />
+  \</ItemGroup>
   \<Import Project="Other.csproj">\</Import>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
