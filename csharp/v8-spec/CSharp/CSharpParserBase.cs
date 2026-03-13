@@ -103,7 +103,7 @@ public abstract class CSharpParserBase : Parser
 
     private void InsertNode(ParserRuleContext currentctx, string contextTypeName)
     {
-        Type parserType  = GetType();
+        Type parserType  = typeof(CSharpParser);
         Type contextType = parserType.GetNestedType(contextTypeName)
             ?? throw new InvalidOperationException(
                 $"Nested type '{contextTypeName}' not found on {parserType.Name}.");
