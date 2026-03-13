@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 class Program
 {
 	static void Main()
