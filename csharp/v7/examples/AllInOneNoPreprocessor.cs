@@ -222,11 +222,11 @@ namespace My
             }
             checked
             {
-                checked(++i);
+                @checked(++i);
             }
             unchecked
             {
-                unchecked(++i);
+                @unchecked(++i);
             }
             lock (sync)
                 process();
