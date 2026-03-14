@@ -772,9 +772,10 @@ class CSharp71
 class CSharp72
 {
     readonly struct ReadonlyRef1
-    {    
+    {
         Func<int, int> s = (in int x) => x;
-        ref TValue this[in TKey index] => null;
+        TValue _value;
+        ref TValue this[in TKey index] => ref _value;
         public static Vector3 operator+(in Vector3 x, in Vector3 y) => null;
 
         static readonly ref Vector3 M1_Trace()
