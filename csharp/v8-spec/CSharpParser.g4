@@ -799,7 +799,7 @@ stackalloc_expression
     ;
 
 stackalloc_initializer
-     : '{' stackalloc_initializer_element_list '}'
+     : '{' stackalloc_initializer_element_list? '}'
      ;
 
 stackalloc_initializer_element_list

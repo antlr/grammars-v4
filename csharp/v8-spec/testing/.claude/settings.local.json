@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/msys64/ucrt64/bin/**)",
+      "Bash(command -v rg)",
+      "Bash(export:*)"
+    ]
+  }
+}
