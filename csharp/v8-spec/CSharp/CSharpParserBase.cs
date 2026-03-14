@@ -220,3 +220,4 @@ public abstract class CSharpParserBase : Parser
             $"LHS of {childPrefix} {childRuleName} cannot be {lhsPrefix} {lhsRuleName} unless it has an initializer");
     }
 }
+

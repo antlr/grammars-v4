@@ -331,3 +331,4 @@ public abstract class CSharpLexerBase : Lexer
         return false; // malformed expression
     }
 }
+
