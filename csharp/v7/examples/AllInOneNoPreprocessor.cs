@@ -775,7 +775,7 @@ class CSharp72
     {
         Func<int, int> s = (in int x) => x;
         TValue _value;
-        ref TValue this[in TKey index] => ref _value;
+        ref readonly TValue this[in TKey index] => ref _value;
         public static Vector3 operator+(in Vector3 x, in Vector3 y) => null;
 
         static readonly ref Vector3 M1_Trace()
