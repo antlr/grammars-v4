@@ -63,3 +63,17 @@ func (p *PlSqlParserBase) IsNotNumericFunction() bool {
     }
     return true
 }
+
+func (p *PlSqlParserBase) isStartOfJoin() bool {
+    stream := p.GetTokenStream().(*antlr.CommonTokenStream)
+    lt1 := stream.LT(1)
+    return lt1.GetTokenType() == PlSqlParserINNER ||
+           lt1.GetTokenType() == PlSqlParserCROSS ||
+           lt1.GetTokenType() == PlSqlParserNATURAL ||
+           lt1.GetTokenType() == PlSqlParserPARTITION ||
+           lt1.GetTokenType() == PlSqlParserFULL ||
+           lt1.GetTokenType() == PlSqlParserLEFT ||
+           lt1.GetTokenType() == PlSqlParserRIGHT ||
+           lt1.GetTokenType() == PlSqlParserOUTER ||
+           lt1.GetTokenType() == PlSqlParserAPPLY
+}

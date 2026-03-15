@@ -17,3 +17,19 @@ bool PlSqlParserBase::IsNotNumericFunction() {
         return false;
     return true;
 }
+
+bool PlSqlParserBase::isStartOfJoin() {
+    auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto* lt1 = stream->LT(1);
+    if (lt1->getType() == PlSqlParser::INNER ||
+        lt1->getType() == PlSqlParser::CROSS ||
+        lt1->getType() == PlSqlParser::NATURAL ||
+        lt1->getType() == PlSqlParser::PARTITION ||
+        lt1->getType() == PlSqlParser::FULL ||
+        lt1->getType() == PlSqlParser::LEFT ||
+        lt1->getType() == PlSqlParser::RIGHT ||
+        lt1->getType() == PlSqlParser::OUTER ||
+        lt1->getType() == PlSqlParser::APPLY)
+        return true;
+    return false;
+}

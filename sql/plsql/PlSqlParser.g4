@@ -6188,12 +6188,13 @@ table_ref_list
 // according to he reality it is. Here we probably apply pivot/unpivot onto whole join clause
 // eventhough it is not enclosed in parenthesis. See pivot examples 09,10,11
 
+// TODO: RLH
 table_ref
     : table_ref_aux join_clause* (pivot_clause | unpivot_clause)?
     ;
 
 table_ref_aux
-    : table_ref_aux_internal flashback_query_clause* (/*{isTableAlias()}?*/ table_alias)?
+    : table_ref_aux_internal flashback_query_clause* ({!isStartOfJoin()}? table_alias)?
     ;
 
 table_ref_aux_internal

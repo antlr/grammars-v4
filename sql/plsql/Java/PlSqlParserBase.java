@@ -51,4 +51,17 @@ public abstract class PlSqlParserBase extends Parser
             return false;
         return true;
     }
+
+    public boolean isStartOfJoin() {
+        Token lt1 = _input.LT(1);
+        return lt1.getType() == PlSqlParser.INNER ||
+               lt1.getType() == PlSqlParser.CROSS ||
+               lt1.getType() == PlSqlParser.NATURAL ||
+               lt1.getType() == PlSqlParser.PARTITION ||
+               lt1.getType() == PlSqlParser.FULL ||
+               lt1.getType() == PlSqlParser.LEFT ||
+               lt1.getType() == PlSqlParser.RIGHT ||
+               lt1.getType() == PlSqlParser.OUTER ||
+               lt1.getType() == PlSqlParser.APPLY;
+    }
 }
