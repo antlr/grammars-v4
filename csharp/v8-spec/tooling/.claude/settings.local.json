@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/tmp/**)",
+      "Bash(tar -tzf /c/msys64/home/Kenne/issues/g4-4783-v8/csharp/v8-spec/tooling/csharpstandard/.github/workflows/dependencies/GrammarTestingEnv.tgz)",
+      "Bash(tar:*)",
+      "Bash(unzip:*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}
