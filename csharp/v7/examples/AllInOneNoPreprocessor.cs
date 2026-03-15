@@ -49,6 +49,9 @@ namespace My
         { 
         }
 
+	void @checked(int x) {}
+	void @unchecked(int x) {}
+	
         [method: Obsolete]
         public A([param: Obsolete] int foo) :
             base(1)
