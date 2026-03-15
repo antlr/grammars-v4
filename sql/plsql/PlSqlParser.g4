@@ -6193,7 +6193,7 @@ table_ref
     ;
 
 table_ref_aux
-    : table_ref_aux_internal flashback_query_clause* ({isNotStartOfJoin()}? table_alias)?
+    : table_ref_aux_internal flashback_query_clause* ({this.isNotStartOfJoin()}? table_alias)?
     ;
 
 table_ref_aux_internal
