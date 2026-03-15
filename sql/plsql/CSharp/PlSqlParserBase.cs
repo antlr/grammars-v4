@@ -55,7 +55,6 @@ public abstract class PlSqlParserBase : Parser
                lt1.Type == PlSqlParser.FULL ||
                lt1.Type == PlSqlParser.LEFT ||
                lt1.Type == PlSqlParser.RIGHT ||
-               lt1.Type == PlSqlParser.OUTER ||
-               lt1.Type == PlSqlParser.APPLY;
+               lt1.Type == PlSqlParser.OUTER;
     }
 }

@@ -74,6 +74,5 @@ func (p *PlSqlParserBase) isStartOfJoin() bool {
            lt1.GetTokenType() == PlSqlParserFULL ||
            lt1.GetTokenType() == PlSqlParserLEFT ||
            lt1.GetTokenType() == PlSqlParserRIGHT ||
-           lt1.GetTokenType() == PlSqlParserOUTER ||
-           lt1.GetTokenType() == PlSqlParserAPPLY
+           lt1.GetTokenType() == PlSqlParserOUTER
 }

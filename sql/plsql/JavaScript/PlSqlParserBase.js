@@ -62,7 +62,6 @@ export default class PlSqlParserBase extends antlr4.Parser {
            lt1.type == PlSqlLexer.FULL ||
            lt1.type == PlSqlLexer.LEFT ||
            lt1.type == PlSqlLexer.RIGHT ||
-           lt1.type == PlSqlLexer.OUTER ||
-           lt1.type == PlSqlLexer.APPLY;
+           lt1.type == PlSqlLexer.OUTER;
   }
 }

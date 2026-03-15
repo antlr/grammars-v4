@@ -28,8 +28,7 @@ bool PlSqlParserBase::isStartOfJoin() {
         lt1->getType() == PlSqlParser::FULL ||
         lt1->getType() == PlSqlParser::LEFT ||
         lt1->getType() == PlSqlParser::RIGHT ||
-        lt1->getType() == PlSqlParser::OUTER ||
-        lt1->getType() == PlSqlParser::APPLY)
+        lt1->getType() == PlSqlParser::OUTER)
         return true;
     return false;
 }

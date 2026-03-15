@@ -63,7 +63,6 @@ abstract class PlSqlParserBase extends Parser
                lt1.type == PlSqlLexer.TOKEN_FULL ||
                lt1.type == PlSqlLexer.TOKEN_LEFT ||
                lt1.type == PlSqlLexer.TOKEN_RIGHT ||
-               lt1.type == PlSqlLexer.TOKEN_OUTER ||
-               lt1.type == PlSqlLexer.TOKEN_APPLY;
+               lt1.type == PlSqlLexer.TOKEN_OUTER;
     }
 }
