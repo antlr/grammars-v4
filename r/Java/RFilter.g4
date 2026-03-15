@@ -37,10 +37,7 @@ parser grammar RFilter;
 
 options {
     tokenVocab = R;
-}
-
-@members {
-protected int curlies = 0;
+    superClass = RFilterBase;
 }
 
 // TODO: MAKE THIS GET ONE COMMAND ONLY
@@ -49,13 +46,13 @@ stream
     ;
 
 eat
-    : (NL {((WritableToken)$NL).setChannel(Token.HIDDEN_CHANNEL);})+
+    : (NL {this.hideToken($NL)})+
     ;
 
 elem
     : op eat?
     | atom
-    | CURLY_L eat? {curlies++;} (elem | NL | SEMICOLON)* {curlies--;} CURLY_R
+    | CURLY_L eat? {this.curlies++;} (elem | NL | SEMICOLON)* {this.curlies--;} CURLY_R
     | PAREN_L (elem | eat)* PAREN_R
     | ARRAY_ACCESS_START (elem | eat)* ARRAY_ACCESS_END
     | LIST_ACCESS_START (elem | eat)* LIST_ACCESS_END
@@ -64,27 +61,10 @@ elem
     | WHILE eat? PAREN_L (elem | eat)* PAREN_R eat?
     | IF eat? PAREN_L (elem | eat)* PAREN_R eat?
     | ELSE {
-        // ``inside a compound expression, a newline before else is discarded,
-        // whereas at the outermost level, the newline terminates the if
-        // construction and a subsequent else causes a syntax error.''
-        /*
-        Works here
-            if (1==0) { print(1) } else { print(2) }
-
-        and correctly gets error here:
-
-            if (1==0) { print(1) }
-            else { print(2) }
-
-        this works too:
-
-            if (1==0) {
-              if (2==0) print(1)
-              else print(2)
-            }
-        */
-        WritableToken tok = (WritableToken)_input.LT(-2);
-        if (curlies>0&&tok.getType()==NL) tok.setChannel(Token.HIDDEN_CHANNEL);
+        Token tok = this._input.LT(-2);
+        if (this.curlies > 0 && tok.getType() == NL) {
+            this.hideToken(tok);
+        }
         }
     ;
 
