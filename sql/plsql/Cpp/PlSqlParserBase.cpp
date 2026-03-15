@@ -18,7 +18,7 @@ bool PlSqlParserBase::IsNotNumericFunction() {
     return true;
 }
 
-bool PlSqlParserBase::isStartOfJoin() {
+bool PlSqlParserBase::isNotStartOfJoin() {
     auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     auto* lt1 = stream->LT(1);
     if (lt1->getType() == PlSqlParser::INNER ||
@@ -29,6 +29,6 @@ bool PlSqlParserBase::isStartOfJoin() {
         lt1->getType() == PlSqlParser::LEFT ||
         lt1->getType() == PlSqlParser::RIGHT ||
         lt1->getType() == PlSqlParser::OUTER)
-        return true;
-    return false;
+        return false;
+    return true;
 }

@@ -53,16 +53,18 @@ abstract class PlSqlParserBase extends Parser
         return true;
     }
 
-    bool isStartOfJoin() {
+    bool isNotStartOfJoin() {
         var stream = tokenStream as CommonTokenStream;
         var lt1 = stream.LT(1);
-        return lt1!.type == PlSqlLexer.TOKEN_INNER ||
-               lt1.type == PlSqlLexer.TOKEN_CROSS ||
-               lt1.type == PlSqlLexer.TOKEN_NATURAL ||
-               lt1.type == PlSqlLexer.TOKEN_PARTITION ||
-               lt1.type == PlSqlLexer.TOKEN_FULL ||
-               lt1.type == PlSqlLexer.TOKEN_LEFT ||
-               lt1.type == PlSqlLexer.TOKEN_RIGHT ||
-               lt1.type == PlSqlLexer.TOKEN_OUTER;
+        if (lt1!.type == PlSqlLexer.TOKEN_INNER ||
+            lt1.type == PlSqlLexer.TOKEN_CROSS ||
+            lt1.type == PlSqlLexer.TOKEN_NATURAL ||
+            lt1.type == PlSqlLexer.TOKEN_PARTITION ||
+            lt1.type == PlSqlLexer.TOKEN_FULL ||
+            lt1.type == PlSqlLexer.TOKEN_LEFT ||
+            lt1.type == PlSqlLexer.TOKEN_RIGHT ||
+            lt1.type == PlSqlLexer.TOKEN_OUTER)
+            return false;
+        return true;
     }
 }

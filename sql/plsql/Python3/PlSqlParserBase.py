@@ -35,9 +35,11 @@ class PlSqlParserBase(Parser):
             return False
         return True
 
-    def isStartOfJoin(self):
+    def isNotStartOfJoin(self):
         from PlSqlLexer import PlSqlLexer as _Lexer
         lt1 = self._input.LT(1)
-        return lt1.type in (_Lexer.INNER, _Lexer.CROSS, _Lexer.NATURAL,
-                            _Lexer.PARTITION, _Lexer.FULL, _Lexer.LEFT,
-                            _Lexer.RIGHT, _Lexer.OUTER)
+        if (lt1.type in (_Lexer.INNER, _Lexer.CROSS, _Lexer.NATURAL,
+                         _Lexer.PARTITION, _Lexer.FULL, _Lexer.LEFT,
+                         _Lexer.RIGHT, _Lexer.OUTER)):
+            return False
+        return True

@@ -44,7 +44,7 @@ class PlSqlParserBase : public antlr4::Parser
 
     bool IsNotNumericFunction();
 
-    bool isStartOfJoin();
+    bool isNotStartOfJoin();
 };
 
 #endif
