@@ -245,8 +245,6 @@ if [ "${#FAILED_LIST[@]}" -gt 0 ]; then
     exit 1
 fi
 
-exit 0
-
 p=`cygpath -u "$ROSLYN_DIR/src/"`
 failures=$(
     find "$p" -name '*.cs' | \

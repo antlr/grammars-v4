@@ -107,17 +107,11 @@ and their corresponding symbols in the ECMA-334 7th edition specification.
 ## Reference
 * [pldb](http://pldb.info/concepts/csharp)
 * [ECMA 334](https://ecma-international.org/publications-and-standards/standards/ecma-334/)
+* [csharpstandard, Working space for ECMA-TC49-TG2, the C# standard committee](https://github.com/dotnet/csharpstandard).
 
 ## Performance
 
-<img src="./times.svg">
-
-Runtime of `examples/*.cs` on AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
-Samsung SSD 990 EVO Plus 2TB;
-Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build);
-.NET SDK: 10.0.102. Sample size 20.
-
-Parse of `testing/roslyn/src/**/*.cs` is 76000 +/- 1000 tokens per second (SD). Sample size 5, port CSharp. 13287206 tokens.
+Parse of first 1000 files of `find testing/roslyn/src -name '*.cs'` is 871 +/- 8 tokens per second (SD). Sample size 5, port CSharp. 915535 tokens.
 
 ## License
 
