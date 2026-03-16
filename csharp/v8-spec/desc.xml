@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../_scripts/desc.xsd">
-   <targets>CSharp</targets>
-   <inputs>examples/**/*.cs</inputs>
+   <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
+   <grammar-name>CSharp</grammar-name>
+   <test>
+      <inputs>examples/**/*.cs</inputs>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;TypeScript</targets>
+   </test>
+   <test>
+      <inputs>examples/CSharp8*.cs</inputs>
+      <targets>Python3</targets>
+   </test>
 </desc>

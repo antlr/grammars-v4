@@ -2,6 +2,8 @@ parser grammar CSharpParser;
 
 options { tokenVocab=CSharpLexer; superClass=CSharpParserBase; }
 
+// Insert here @header for parser.
+
 // Source: §0.0.0 Top Level Rule
 // [ADDED] Rule added as the start point
 // ║ Added ║

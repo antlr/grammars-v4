@@ -4,6 +4,8 @@ options { superClass=CSharpLexerBase; }
 
 channels { DIRECTIVE }
 
+// Insert here @header for lexer.
+
 // Source: §6.3.0 Extracted literal tokens
 TK : '_' ;
 TK_MINUS : '-' ;
