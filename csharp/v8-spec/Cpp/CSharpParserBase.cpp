@@ -48,6 +48,23 @@ int CSharpParserBase::ruleIdx(const std::string &name) const
 }
 
 // -------------------------------------------------------------------------
+// Rule-index cache — computed once, reused across all action calls
+// -------------------------------------------------------------------------
+
+void CSharpParserBase::cacheRuleIndices()
+{
+    if (ruleIndicesCached_) return;
+    rulePrimaryExpression_       = ruleIdx("primary_expression");
+    ruleTypeArgumentList_        = ruleIdx("type_argument_list");
+    ruleElementAccess_           = ruleIdx("element_access");
+    rulePointerElementAccess_    = ruleIdx("pointer_element_access");
+    ruleNullCondElementAccess_   = ruleIdx("null_conditional_element_access");
+    ruleArrayCreationExpression_ = ruleIdx("array_creation_expression");
+    ruleStackallocExpression_    = ruleIdx("stackalloc_expression");
+    ruleIndicesCached_ = true;
+}
+
+// -------------------------------------------------------------------------
 // ReduceTree — post-parse cleanup
 // -------------------------------------------------------------------------
 
@@ -88,8 +105,8 @@ static void reducer(antlr4::ParserRuleContext *node, bool reduceAllChildren)
 
 void CSharpParserBase::ReduceTree(antlr4::ParserRuleContext *currentctx)
 {
-    int ruleTypeArgumentList = ruleIdx("type_argument_list");
-    takeOutEmpties(currentctx, ruleTypeArgumentList);
+    cacheRuleIndices();
+    takeOutEmpties(currentctx, ruleTypeArgumentList_);
 
     const char *env = std::getenv("ANTLR_REDUCE_TREE");
     if (!env || std::string(env) != "yes") return;
@@ -159,14 +176,9 @@ void CSharpParserBase::AsPointerMemberAccess(antlr4::ParserRuleContext *currentc
 
 void CSharpParserBase::ElementAccessSemanticCheck(antlr4::ParserRuleContext *currentctx)
 {
-    int rulePrimaryExpression            = ruleIdx("primary_expression");
-    int ruleElementAccess                = ruleIdx("element_access");
-    int rulePointerElementAccess         = ruleIdx("pointer_element_access");
-    int ruleNullConditionalElementAccess = ruleIdx("null_conditional_element_access");
-    int ruleArrayCreationExpression      = ruleIdx("array_creation_expression");
-    int ruleStackallocExpression         = ruleIdx("stackalloc_expression");
+    cacheRuleIndices();
 
-    if (currentctx->getRuleIndex() != rulePrimaryExpression
+    if (currentctx->getRuleIndex() != rulePrimaryExpression_
         || static_cast<int>(currentctx->children.size()) != 1)
         return;
 
@@ -176,11 +188,11 @@ void CSharpParserBase::ElementAccessSemanticCheck(antlr4::ParserRuleContext *cur
     int childRuleIndex  = childTree->getRuleIndex();
     int childChildCount = static_cast<int>(childTree->children.size());
 
-    if (childRuleIndex == ruleElementAccess || childRuleIndex == rulePointerElementAccess)
+    if (childRuleIndex == ruleElementAccess_ || childRuleIndex == rulePointerElementAccess_)
     {
         if (childChildCount != 4) return;
     }
-    else if (childRuleIndex == ruleNullConditionalElementAccess)
+    else if (childRuleIndex == ruleNullCondElementAccess_)
     {
         if (childChildCount != 5) return;
     }
@@ -188,15 +200,15 @@ void CSharpParserBase::ElementAccessSemanticCheck(antlr4::ParserRuleContext *cur
 
     auto *accessTarget = dynamic_cast<antlr4::ParserRuleContext *>(childTree->children[0]);
     if (!accessTarget) return;
-    if (accessTarget->getRuleIndex() != rulePrimaryExpression
+    if (accessTarget->getRuleIndex() != rulePrimaryExpression_
         || accessTarget->children.size() == 0)
         return;
 
     auto *lhsTarget = dynamic_cast<antlr4::ParserRuleContext *>(accessTarget->children[0]);
     if (!lhsTarget) return;
 
-    if (lhsTarget->getRuleIndex() != ruleArrayCreationExpression
-        && lhsTarget->getRuleIndex() != ruleStackallocExpression)
+    if (lhsTarget->getRuleIndex() != ruleArrayCreationExpression_
+        && lhsTarget->getRuleIndex() != ruleStackallocExpression_)
         return;
 
     antlr4::Token *lhsLast = lhsTarget->stop;

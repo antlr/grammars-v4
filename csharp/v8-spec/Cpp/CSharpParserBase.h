@@ -28,4 +28,14 @@ private:
     void notifySemanticError(int line, int charPositionInLine, const std::string &msg);
     void insertNode(antlr4::ParserRuleContext *currentctx, const std::string &contextTypeName);
     int  ruleIdx(const std::string &name) const;
+
+    void cacheRuleIndices();
+    bool ruleIndicesCached_              = false;
+    int  rulePrimaryExpression_          = -1;
+    int  ruleTypeArgumentList_           = -1;
+    int  ruleElementAccess_              = -1;
+    int  rulePointerElementAccess_       = -1;
+    int  ruleNullCondElementAccess_      = -1;
+    int  ruleArrayCreationExpression_    = -1;
+    int  ruleStackallocExpression_       = -1;
 };

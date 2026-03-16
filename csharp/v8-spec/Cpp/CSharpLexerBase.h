@@ -26,6 +26,7 @@ public:
 
 private:
     // Preprocessor state
+    antlr4::CharStream *charStream_;
     std::deque<std::unique_ptr<antlr4::Token>> pending_;
     std::unordered_set<std::string> symbols_;
     std::vector<bool> condition_;

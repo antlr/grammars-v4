@@ -6,7 +6,7 @@
 #include <iostream>
 
 CSharpLexerBase::CSharpLexerBase(antlr4::CharStream *input)
-    : antlr4::Lexer(input)
+    : antlr4::Lexer(input), charStream_(input)
 {
 }
 
@@ -36,12 +36,12 @@ bool CSharpLexerBase::PeekModeIs(int mode) const
 
 bool CSharpLexerBase::LookAheadIs(int pos, int value)
 {
-    return dynamic_cast<antlr4::CharStream *>(getInputStream())->LA(pos) == value;
+    return charStream_->LA(pos) == value;
 }
 
 bool CSharpLexerBase::LookAheadIsNot(int pos, int value)
 {
-    return dynamic_cast<antlr4::CharStream *>(getInputStream())->LA(pos) != value;
+    return charStream_->LA(pos) != value;
 }
 
 void CSharpLexerBase::WrapToken()
@@ -205,7 +205,7 @@ std::string CSharpLexerBase::symbolFromLine(const std::vector<antlr4::Token *> &
 std::unique_ptr<antlr4::Token> CSharpLexerBase::skipFalseBlock()
 {
     std::string text;
-    auto *stream = dynamic_cast<antlr4::CharStream *>(getInputStream());
+    auto *stream = charStream_;
     int depth = 1;
     bool atLineStart = true;
     size_t startLine = getLine();
@@ -265,7 +265,7 @@ std::unique_ptr<antlr4::Token> CSharpLexerBase::skipFalseBlock()
 
 std::string CSharpLexerBase::peekKeyword()
 {
-    auto *stream = dynamic_cast<antlr4::CharStream *>(getInputStream());
+    auto *stream = charStream_;
     int i = 2; // LA(1) is '#'
     while (stream->LA(i) == ' ' || stream->LA(i) == '\t') i++;
     std::string kw;
