@@ -55,4 +55,18 @@ export default abstract class PlSqlParserBase extends Parser {
     return true;
   }
 
+  isNotStartOfJoin(): boolean {
+    const lt1 = this.getTokenStream().LT(1);
+    if (lt1!.type == PlSqlLexer.INNER ||
+        lt1!.type == PlSqlLexer.CROSS ||
+        lt1!.type == PlSqlLexer.NATURAL ||
+        lt1!.type == PlSqlLexer.PARTITION ||
+        lt1!.type == PlSqlLexer.FULL ||
+        lt1!.type == PlSqlLexer.LEFT ||
+        lt1!.type == PlSqlLexer.RIGHT ||
+        lt1!.type == PlSqlLexer.OUTER)
+      return false;
+    return true
+  }
+
 }
