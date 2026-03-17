@@ -125,11 +125,6 @@ never been inlined, so external tooling that walks the tree expecting `member_ac
 `array_creation_expression[…]` and `stackalloc_expression[…]` must have an initializer on
 the left-hand side of an element access — a constraint the grammar alone cannot express.
 
-## Grammar Symbol Mapping
-
-See [grammar-symbol-mapping.md](grammar-symbol-mapping.md) for the full mapping between ANTLR4 rule names
-and their corresponding symbols in the ECMA-334 7th edition specification.
-
 ## Reference
 * [csharpstandard, Working space for ECMA-TC49-TG2, the C# standard committee](https://github.com/dotnet/csharpstandard).
 * [pldb](http://pldb.info/concepts/csharp)
