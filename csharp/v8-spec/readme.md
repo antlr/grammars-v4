@@ -2,7 +2,12 @@
 
 C# grammar targeting ECMA-334 8th edition (draft), with full support of C# 8 features in the
 Roslyn compiler.
-This grammar is based on the v7 grammar and adds the new features and enhancements for C#:
+This grammar is derived directly from the ECMA-334 specification using a tool provided in
+the [csharpstandard repo](https://github.com/dotnet/csharpstandard) and patched with a [Bash
+script provided in this grammar directory](tooling/generate-csharp-parser.sh).
+
+Below is a table of the new features and enhancements for C# and where they are tested
+by this grammar.
 
 | Feature | Example |
 |---|---|
