@@ -1,3 +1,5 @@
+# Antlr4 grammar for C# version 8
+
 ## Summary
 
 C# grammar targeting ECMA-334 8th edition (draft), with full support of C# 8 features in the
@@ -129,13 +131,18 @@ See [grammar-symbol-mapping.md](grammar-symbol-mapping.md) for the full mapping 
 and their corresponding symbols in the ECMA-334 7th edition specification.
 
 ## Reference
+* [csharpstandard, Working space for ECMA-TC49-TG2, the C# standard committee](https://github.com/dotnet/csharpstandard).
 * [pldb](http://pldb.info/concepts/csharp)
 * [ECMA 334](https://ecma-international.org/publications-and-standards/standards/ecma-334/)
-* [csharpstandard, Working space for ECMA-TC49-TG2, the C# standard committee](https://github.com/dotnet/csharpstandard).
 
 ## Performance
 
-Parse of first 1000 files of `find testing/roslyn/src -name '*.cs'` is 871 +/- 8 tokens per second (SD). Sample size 5, port CSharp. 915535 tokens.
+Hardware and Platform: AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Samsung SSD 990 EVO Plus 2TB;
+Windows: Version 10.0.26200.7623 (this is a Windows 11 Insider Preview build); 
+.NET SDK: 10.0.102.
+
+Tokens parsed per second: First 1000 files of `find testing/roslyn/src -name '*.cs'` is 871 +/- 8 tokens per second (SD). Sample size 5, port CSharp. 915535 tokens.
 
 ## License
 
