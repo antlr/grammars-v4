@@ -3,23 +3,26 @@
 C# grammar targeting ECMA-334 8th edition (draft), with full support of C# 8 features in the
 Roslyn compiler.
 This grammar is based on the v7 grammar and adds the new features and enhancements for C#:
-- [Readonly members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#readonly-instance-members)
-- [Default interface members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface#default-interface-members)
-- [Pattern matching enhancements](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns):
-    - [Switch expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression)
-    - [Property patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#property-pattern)
-    - [Tuple patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#tuple-pattern)
-    - [Positional patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#positional-pattern)
-- [Using declarations](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/using)
-- [Static local functions](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/local-functions)
-- [Disposable ref structs](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/ref-struct)
-- [Nullable reference types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-reference-types)
-- [Asynchronous streams](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#await-foreach)
-- [Indices and ranges](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#range-operator-)
-- [Null-coalescing assignment](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/assignment-operator#null-coalescing-assignment)
-- [Unmanaged constructed types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/where-generic-type-constraint)
-- [Stackalloc in nested expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc)
-- [Enhancement of interpolated verbatim strings](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)
+
+| Feature | Example |
+|---|---|
+| [Readonly members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#readonly-instance-members) | `CSharp8ReadonlyMembers.cs` |
+| [Default interface members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface#default-interface-members) | `CSharp8DefaultInterfaceMembers.cs` |
+| [Pattern matching enhancements](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns) | |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Switch expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression) | `CSharp8SwitchExpressions.cs` |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Property patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#property-pattern) | `CSharp8SwitchExpressions.cs` |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Tuple patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#tuple-pattern) | `CSharp8TuplePositionalPatterns.cs` |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Positional patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#positional-pattern) | `CSharp8TuplePositionalPatterns.cs` |
+| [Using declarations](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/using) | `CSharp8UsingDeclarations.cs` |
+| [Static local functions](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/local-functions) | `CSharp8StaticLocalFunctions.cs` |
+| [Disposable ref structs](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/ref-struct) | `CSharp8DisposableRefStructs.cs` |
+| [Nullable reference types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-reference-types) | `CSharp8NullableReferenceTypes.cs` |
+| [Asynchronous streams](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#await-foreach) | `CSharp8AsyncStreams.cs` |
+| [Indices and ranges](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#range-operator-) | `CSharp8IndicesAndRanges.cs` |
+| [Null-coalescing assignment](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/assignment-operator#null-coalescing-assignment) | `CSharp8NullCoalescingAssignment.cs` |
+| [Unmanaged constructed types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/where-generic-type-constraint) | `CSharp8MiscFeatures.cs` |
+| [Stackalloc in nested expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc) | `CSharp8MiscFeatures.cs` |
+| [Enhancement of interpolated verbatim strings](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated) | `CSharp8MiscFeatures.cs` |
 
 ## Preprocessing
 
