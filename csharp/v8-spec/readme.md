@@ -6,23 +6,23 @@ This grammar is based on the v7 grammar and adds the new features and enhancemen
 
 | Feature | Example |
 |---|---|
-| [Readonly members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#readonly-instance-members) | `CSharp8ReadonlyMembers.cs` |
-| [Default interface members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface#default-interface-members) | `CSharp8DefaultInterfaceMembers.cs` |
+| [Readonly members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#readonly-instance-members) | [`CSharp8ReadonlyMembers.cs`](examples/CSharp8ReadonlyMembers.cs) |
+| [Default interface members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface#default-interface-members) | [`CSharp8DefaultInterfaceMembers.cs`](examples/CSharp8DefaultInterfaceMembers.cs) |
 | [Pattern matching enhancements](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns) | |
-| &nbsp;&nbsp;&nbsp;&nbsp;[Switch expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression) | `CSharp8SwitchExpressions.cs` |
-| &nbsp;&nbsp;&nbsp;&nbsp;[Property patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#property-pattern) | `CSharp8SwitchExpressions.cs` |
-| &nbsp;&nbsp;&nbsp;&nbsp;[Tuple patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#tuple-pattern) | `CSharp8TuplePositionalPatterns.cs` |
-| &nbsp;&nbsp;&nbsp;&nbsp;[Positional patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#positional-pattern) | `CSharp8TuplePositionalPatterns.cs` |
-| [Using declarations](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/using) | `CSharp8UsingDeclarations.cs` |
-| [Static local functions](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/local-functions) | `CSharp8StaticLocalFunctions.cs` |
-| [Disposable ref structs](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/ref-struct) | `CSharp8DisposableRefStructs.cs` |
-| [Nullable reference types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-reference-types) | `CSharp8NullableReferenceTypes.cs` |
-| [Asynchronous streams](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#await-foreach) | `CSharp8AsyncStreams.cs` |
-| [Indices and ranges](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#range-operator-) | `CSharp8IndicesAndRanges.cs` |
-| [Null-coalescing assignment](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/assignment-operator#null-coalescing-assignment) | `CSharp8NullCoalescingAssignment.cs` |
-| [Unmanaged constructed types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/where-generic-type-constraint) | `CSharp8MiscFeatures.cs` |
-| [Stackalloc in nested expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc) | `CSharp8MiscFeatures.cs` |
-| [Enhancement of interpolated verbatim strings](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated) | `CSharp8MiscFeatures.cs` |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Switch expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression) | [`CSharp8SwitchExpressions.cs#L13`](examples/CSharp8SwitchExpressions.cs#L13) |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Property patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#property-pattern) | [`CSharp8SwitchExpressions.cs#L44`](examples/CSharp8SwitchExpressions.cs#L44) |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Tuple patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#tuple-pattern) | [`CSharp8TuplePositionalPatterns.cs#L9`](examples/CSharp8TuplePositionalPatterns.cs#L9) |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Positional patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns#positional-pattern) | [`CSharp8TuplePositionalPatterns.cs#L19`](examples/CSharp8TuplePositionalPatterns.cs#L19) |
+| [Using declarations](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/using) | [`CSharp8UsingDeclarations.cs`](examples/CSharp8UsingDeclarations.cs) |
+| [Static local functions](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/local-functions) | [`CSharp8StaticLocalFunctions.cs`](examples/CSharp8StaticLocalFunctions.cs) |
+| [Disposable ref structs](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/ref-struct) | [`CSharp8DisposableRefStructs.cs`](examples/CSharp8DisposableRefStructs.cs) |
+| [Nullable reference types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-reference-types) | [`CSharp8NullableReferenceTypes.cs`](examples/CSharp8NullableReferenceTypes.cs) |
+| [Asynchronous streams](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/iteration-statements#await-foreach) | [`CSharp8AsyncStreams.cs`](examples/CSharp8AsyncStreams.cs) |
+| [Indices and ranges](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#range-operator-) | [`CSharp8IndicesAndRanges.cs`](examples/CSharp8IndicesAndRanges.cs) |
+| [Null-coalescing assignment](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/assignment-operator#null-coalescing-assignment) | [`CSharp8NullCoalescingAssignment.cs`](examples/CSharp8NullCoalescingAssignment.cs) |
+| [Unmanaged constructed types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/where-generic-type-constraint) | [`CSharp8MiscFeatures.cs#L58`](examples/CSharp8MiscFeatures.cs#L58) |
+| [Stackalloc in nested expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc) | [`CSharp8MiscFeatures.cs#L12`](examples/CSharp8MiscFeatures.cs#L12) |
+| [Enhancement of interpolated verbatim strings](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated) | [`CSharp8MiscFeatures.cs#L30`](examples/CSharp8MiscFeatures.cs#L30) |
 
 ## Preprocessing
 
