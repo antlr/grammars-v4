@@ -15,6 +15,93 @@ public abstract class CSharpParserBase : Parser
     private int RuleIdx(string ruleName) => Array.IndexOf(RuleNames, ruleName);
 
     //======================================================================================
+    // Symbol table for parse disambiguation (cast vs. parenthesised, etc.)
+
+    public CSharpSymbolTable SymTable { get; } = new CSharpSymbolTable();
+
+    //--------------------------------------------------------------------------------------
+    // Semantic predicate — cast_expression
+    //
+    // Fires at the start of the cast_expression alternative inside unary_expression.
+    // At that moment LT(1) = '(' so LT(2) is the first token inside the parens.
+    //
+    // Strategy: only BLOCK the cast alternative when the first token inside the
+    // parens is definitively a variable (not a type).  For unknown names and
+    // qualified names (e.g. System.String) we return true and let ANTLR's LL(*)
+    // lookahead continue to resolve the ambiguity.  This avoids false negatives
+    // on forward-declared or externally-defined types.
+    public bool IsCastExpressionAhead()
+    {
+        IToken tok = ((ITokenStream)InputStream).LT(2);
+        if (tok == null) return true;
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(tok.Text);
+        // Return false only when the name is explicitly declared as a variable.
+        return sym == null || sym.Kind != CSharpSymbolKind.Variable;
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Scope management — called from grammar actions; no parameters required.
+
+    public void EnterNamespaceScope() => SymTable.EnterScope(CSharpScopeKind.Namespace);
+    public void EnterTypeScope()      => SymTable.EnterScope(CSharpScopeKind.Type);
+    public void EnterBlockScope()     => SymTable.EnterScope(CSharpScopeKind.Block);
+    public void ExitCurrentScope()    => SymTable.ExitScope();
+
+    //--------------------------------------------------------------------------------------
+    // Type-parameter declaration — fires after the identifier token is consumed.
+    //
+    // Context is the type_parameter rule context whose single child is the
+    // identifier that was just matched.
+    public void OnTypeParameter()
+    {
+        string name = Context.GetChild(Context.ChildCount - 1).GetText();
+        SymTable.DeclareTypeParam(name);
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Using-directive handlers — fire at the end of the respective rules.
+
+    // using_alias_directive : 'using' identifier '=' namespace_or_type_name ';'
+    //   child[0]='using'  child[1]=identifier  child[2]='='
+    //   child[3]=namespace_or_type_name  child[4]=';'
+    public void OnUsingAliasDirective()
+    {
+        string alias  = Context.GetChild(1).GetText();
+        string target = Context.GetChild(3).GetText();
+        SymTable.DeclareAlias(alias, target);
+    }
+
+    // using_namespace_directive : 'using' namespace_name ';'
+    //   child[0]='using'  child[1]=namespace_name  child[2]=';'
+    public void OnUsingNamespaceDirective()
+    {
+        string ns = Context.GetChild(1).GetText();
+        SymTable.ImportNamespace(ns);
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Variable declaration helpers — called in two steps:
+    //   1. BeginVariableDeclaration() fires after 'type' is consumed; the type rule
+    //      context is the last child added to the enclosing declaration context so far.
+    //   2. OnVariableDeclarator() fires after each 'identifier' declarator is consumed.
+
+    private string _pendingVarType = "?";
+
+    public void BeginVariableDeclaration()
+    {
+        // The 'type' rule is the last child matched in the current rule context so far.
+        _pendingVarType = Context.GetChild(Context.ChildCount - 1).GetText();
+    }
+
+    // Shared by variable_declarator (fields) and explicitly_typed_local_variable_declarator.
+    // Fires after 'identifier' is consumed; it is the only child present at that point.
+    public void OnVariableDeclarator()
+    {
+        string id = Context.GetChild(Context.ChildCount - 1).GetText();
+        SymTable.DeclareVariable(id, _pendingVarType);
+    }
+
+    //======================================================================================
 
     private void NotifySemanticError(int line, int charPositionInLine, string msg)
     {
@@ -218,6 +305,36 @@ public abstract class CSharpParserBase : Parser
 
         NotifySemanticError(reportAt.Line, reportAt.Column,
             $"LHS of {childPrefix} {childRuleName} cannot be {lhsPrefix} {lhsRuleName} unless it has an initializer");
+    }
+
+    public bool IsExplicitlyTypedLocalVariable()
+    {
+        var t = ((CommonTokenStream)this.InputStream).LT(1);
+        if (t == null) return true;
+        var n = t.Text;
+        if (t.Type != CSharpLexer.KW_VAR)
+            return true;
+        if (this.SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
+            && sym.Kind == CSharpSymbolKind.Type)
+		return true;
+	var p = ((CommonTokenStream)this.InputStream).LT(1);
+	if (p == null) return true;
+	if (p.Type == CSharpLexer.KW_VAR)
+		return true;
+        return false;
+    }
+
+    public bool IsImplicitlyTypedLocalVariable()
+    {
+        var t = ((CommonTokenStream)this.InputStream).LT(1);
+        if (t == null) return true;
+        var n = t.Text;
+        if (t.Type != CSharpLexer.KW_VAR)
+            return false;
+        if (this.SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
+            && sym.Kind == CSharpSymbolKind.Type)
+            return false;
+        return true;
     }
 }
 

@@ -288,7 +288,7 @@ type_argument
 
 // Source: §8.5 Type parameters
 type_parameter
-    : identifier
+    : identifier { this.OnTypeParameter(); }
     ;
 
 // Source: §8.8 Unmanaged types
@@ -855,8 +855,11 @@ pre_decrement_expression
     ;
 
 // Source: §12.9.8 Cast expressions
+// The semantic predicate checks the first token inside '(' against the symbol
+// table.  If it is a known type name we prefer cast_expression over the
+// parenthesised_expression alternative of primary_expression.
 cast_expression
-    : '(' type ')' unary_expression
+    : {this.IsCastExpressionAhead()}? '(' type ')' unary_expression
     ;
 
 // Source: §12.9.9.1 General
@@ -1172,7 +1175,9 @@ embedded_statement
 
 // Source: §13.3.1 General
 block
-    : '{' statement_list? '}'
+    : '{' { this.EnterBlockScope(); }
+        statement_list?
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §13.3.2 Statement lists
@@ -1200,8 +1205,8 @@ declaration_statement
 
 // Source: §13.6.2.1 General
 local_variable_declaration
-    : implicitly_typed_local_variable_declaration
-    | explicitly_typed_local_variable_declaration
+    : {this.IsImplicitlyTypedLocalVariable()}? implicitly_typed_local_variable_declaration
+    | {this.IsExplicitlyTypedLocalVariable()}? explicitly_typed_local_variable_declaration
     | explicitly_typed_ref_local_variable_declaration
     ;
 
@@ -1217,7 +1222,8 @@ implicitly_typed_local_variable_declarator
 
 // Source: §13.6.2.3 Explicitly typed local variable declarations
 explicitly_typed_local_variable_declaration
-    : type explicitly_typed_local_variable_declarators
+    : type { this.BeginVariableDeclaration(); }
+      explicitly_typed_local_variable_declarators
     ;
 
 explicitly_typed_local_variable_declarators
@@ -1226,7 +1232,8 @@ explicitly_typed_local_variable_declarators
     ;
 
 explicitly_typed_local_variable_declarator
-    : identifier ('=' local_variable_initializer)?
+    : identifier { this.OnVariableDeclarator(); }
+      ('=' local_variable_initializer)?
     ;
 
 local_variable_initializer
@@ -1527,8 +1534,10 @@ qualified_identifier
     ;
 
 namespace_body
-    : '{' extern_alias_directive* using_directive*
-      namespace_member_declaration* '}'
+    : '{' { this.EnterNamespaceScope(); }
+        extern_alias_directive* using_directive*
+        namespace_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §14.4 Extern alias directives
@@ -1546,11 +1555,13 @@ using_directive
 // Source: §14.5.2 Using alias directives
 using_alias_directive
     : 'using' identifier '=' namespace_or_type_name ';'
+      { this.OnUsingAliasDirective(); }
     ;
 
 // Source: §14.5.3 Using namespace directives
 using_namespace_directive
     : 'using' namespace_name ';'
+      { this.OnUsingNamespaceDirective(); }
     ;
 
 // Source: §14.5.4 Using static directives
@@ -1652,7 +1663,9 @@ constructor_constraint
 
 // Source: §15.2.6 Class body
 class_body
-    : '{' class_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        class_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §15.3.1 General
@@ -1685,7 +1698,8 @@ constant_modifier
 
 // Source: §15.5.1 General
 field_declaration
-    : attributes? field_modifier* type variable_declarators ';'
+    : attributes? field_modifier* type { this.BeginVariableDeclaration(); }
+      variable_declarators ';'
     ;
 
 field_modifier
@@ -1705,7 +1719,8 @@ variable_declarators
     ;
 
 variable_declarator
-    : identifier ('=' variable_initializer)?
+    : identifier { this.OnVariableDeclarator(); }
+      ('=' variable_initializer)?
     ;
 
 // Source: §15.6.1 General
@@ -2109,7 +2124,9 @@ struct_interfaces
 
 // Source: §16.2.6 Struct body
 struct_body
-    : '{' struct_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        struct_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §16.3.1 General
@@ -2180,7 +2197,9 @@ interface_base
 
 // Source: §19.3 Interface body
 interface_body
-    : '{' interface_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        interface_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §19.4.1 General
