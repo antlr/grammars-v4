@@ -569,6 +569,7 @@ alter_command
     | alter_security_integration_saml2
     | alter_security_integration_scim
     | alter_sequence
+    | alter_service
     | alter_session
     | alter_session_policy
     | alter_share
@@ -1033,6 +1034,14 @@ alter_sequence
     | ALTER SEQUENCE if_exists? object_name SET? ( INCREMENT BY? EQ? num)?
     | ALTER SEQUENCE if_exists? object_name SET (order_noorder? comment_clause | order_noorder)
     | ALTER SEQUENCE if_exists? object_name UNSET COMMENT
+    ;
+
+alter_service
+    : ALTER SERVICE if_exists? object_name (SUSPEND | RESUME)
+    | ALTER SERVICE if_exists? object_name SET service_params+
+    | ALTER SERVICE if_exists? object_name UNSET service_param_name
+    | ALTER SERVICE if_exists? object_name FROM service_specification
+    | ALTER SERVICE if_exists? object_name RESTORE VOLUME id_ INSTANCES num (COMMA num)* FROM SNAPSHOT id_
     ;
 
 alter_secret
@@ -1583,6 +1592,7 @@ create_command
     | create_security_integration_scim
     | create_semantic_view
     | create_sequence
+    | create_service
     | create_session_policy
     | create_share
     | create_stage
@@ -2160,6 +2170,47 @@ with_extension_clause
 
 create_sequence
     : CREATE or_replace? SEQUENCE if_not_exists? object_name WITH? start_with? increment_by? order_noorder? comment_clause?
+    ;
+
+create_service
+    : CREATE or_replace? SERVICE if_not_exists? object_name IN COMPUTE POOL id_ FROM service_specification service_params*
+    ;
+
+service_specification
+    : (table_stage | user_stage | named_stage | external_location)? SPECIFICATION_FILE  EQ string
+    | SPECIFICATION service_specification_text
+    | (table_stage | user_stage | named_stage | external_location)? SPECIFICATION_TEMPLATE_FILE EQ string USING key_value_assoc_list
+    | SPECIFICATION_TEMPLATE service_specification_text USING key_value_assoc_list
+    ;
+
+service_specification_text
+    : string
+    | DBL_DOLLAR
+    ;
+
+key_value_assoc_list
+    : LR_BRACKET key_value_assoc (COMMA key_value_assoc)* RR_BRACKET
+    ;
+
+key_value_assoc
+    : string ASSOC string
+    ;
+
+service_params
+    : service_param_name EQ (string | num | true_false | id_)
+    | comment_clause
+    | with_tags
+    ;
+
+service_param_name
+    : MIN_INSTANCES
+    | AUTO_SUSPEND_SECS
+    | MAX_INSTANCES
+    | AUTO_RESUME
+    | LOG_LEVEL
+    | MIN_READY_INSTANCES
+    | QUERY_WAREHOUSE
+    | EXTERNAL_ACCESS_INTEGRATIONS
     ;
 
 create_session_policy
@@ -3014,6 +3065,7 @@ drop_command
     | drop_secret
     | drop_semantic_view
     | drop_sequence
+    | drop_service
     | drop_session_policy
     | drop_share
     | drop_stage
@@ -3132,6 +3184,10 @@ drop_semantic_view
 
 drop_sequence
     : DROP SEQUENCE if_exists? object_name cascade_restrict?
+    ;
+
+drop_service
+    : DROP SERVICE if_exists? object_name FORCE?
     ;
 
 drop_session_policy
@@ -3480,6 +3536,7 @@ show_command
     | show_semantic_facts
     | show_semantic_metrics
     | show_sequences
+    | show_services
     | show_session_policies
     | show_shares
     | show_shares_in_failover_group
@@ -3779,6 +3836,10 @@ show_sequences
     : SHOW SEQUENCES like_pattern? in_obj?
     ;
 
+show_services
+    : SHOW JOB? SERVICES (EXCLUDE JOBS)? like_pattern? (in_obj | IN COMPUTE POOL id_)? starts_with? limit_rows?
+    ;
+
 show_session_policies
     : SHOW SESSION POLICIES
     ;
@@ -3946,6 +4007,7 @@ keyword
     | AT_KEYWORD
     | CLUSTER
     | COMMENT
+    | COMPUTE
     | CONDITION
     | COPY_OPTIONS_
     | DIRECTION
@@ -3954,6 +4016,8 @@ keyword
     | FLATTEN
     | FUNCTION
     | IF
+    | JOB
+    | JOBS
     | JOIN
     | KEY
     | LAG
@@ -3965,13 +4029,19 @@ keyword
     | ORDER
     | OUTER
     | POLICY
+    | POOL
     | RECURSIVE
     | REGION
+    | RESTORE
     | ROLE
     | ROLLUP
     | ROW_NUMBER
     | SEQUENCE
+    | SERVICE
+    | SERVICES
     | SESSION
+    | SNAPSHOT
+    | SPECIFICATION
     | STAGE
     | TAG
     | TARGET_LAG
@@ -4025,6 +4095,7 @@ non_reserved_words
     | FIRST_NAME
     | FIRST_VALUE
     | FREQUENCY
+    | FROM
     | GLOBAL
     | HIGH
     | HOURS
@@ -4127,6 +4198,7 @@ non_reserved_words
     | VERSION
     | VERSIONS
     | VISIBILITY
+    | VOLUME
     | WAREHOUSE_TYPE
     | YEAR
     ;

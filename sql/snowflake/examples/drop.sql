@@ -33,3 +33,5 @@ drop warehouse obj;
 DROP INDEX t0.c_idx;
 DROP INDEX if exists mydb.t0.c_idx;
 DROP IMAGE REPOSITORY tutorial_repository;
+DROP SERVICE IF EXISTS SRV FORCE;
+DROP SERVICE SRV;

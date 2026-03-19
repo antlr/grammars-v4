@@ -43,3 +43,5 @@ CREATE INDEX vidx ON myschem.mytable (val);
 CREATE INDEX IF NOT EXISTS vidx ON mydb.myschem.mytable (val,val2) INCLUDE (val3);
 CREATE OR REPLACE IMAGE REPOSITORY tutorial_repository ENCRYPTION = (type = 'SNOWFLAKE_SSE') COMMENT ='COM TEST' WITH TAG (t1 = 'v1');
 CREATE IMAGE REPOSITORY IF NOT EXISTS tutorial_repository;
+CREATE SERVICE echo_service IN COMPUTE POOL cp FROM @tutorial_stage SPECIFICATION_FILE='echo_spec.yaml' MIN_INSTANCES=2 MAX_INSTANCES=2;
+CREATE SERVICE echo_service IN COMPUTE POOL cp FROM SPECIFICATION $$a yaml string $$;
