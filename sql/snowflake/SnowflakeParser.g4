@@ -4015,6 +4015,7 @@ non_reserved_words
     | EVENT
     | EXCHANGE
     | EXCLUDE
+    | EXECUTION
     | EXPIRY_DATE
     | EXPR
     | EXTENSION
@@ -4124,6 +4125,7 @@ non_reserved_words
     | VALUES
     | VECTOR
     | VERSION
+    | VERSIONS
     | VISIBILITY
     | WAREHOUSE_TYPE
     | YEAR
