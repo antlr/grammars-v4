@@ -310,24 +310,27 @@ public abstract class CSharpParserBase : Parser
     public bool IsExplicitlyTypedLocalVariable()
     {
         var t = ((CommonTokenStream)this.InputStream).LT(1);
-        if (t == null) return true;
+        if (t == null)
+            return true;
         var n = t.Text;
         if (t.Type != CSharpLexer.KW_VAR)
             return true;
         if (this.SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
             && sym.Kind == CSharpSymbolKind.Type)
-		return true;
-	var p = ((CommonTokenStream)this.InputStream).LT(1);
-	if (p == null) return true;
-	if (p.Type == CSharpLexer.KW_VAR)
-		return true;
+            return true;
+        var p = ((CommonTokenStream)this.InputStream).LT(-1);
+        if (p == null)
+            return true;
+        if (p.Type == CSharpLexer.KW_VAR)
+            return true;
         return false;
     }
 
     public bool IsImplicitlyTypedLocalVariable()
     {
         var t = ((CommonTokenStream)this.InputStream).LT(1);
-        if (t == null) return true;
+        if (t == null)
+            return true;
         var n = t.Text;
         if (t.Type != CSharpLexer.KW_VAR)
             return false;
