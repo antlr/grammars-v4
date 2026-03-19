@@ -4110,7 +4110,6 @@ non_reserved_words
     | FIRST_NAME
     | FIRST_VALUE
     | FREQUENCY
-    | FROM
     | GLOBAL
     | HIGH
     | HOURS
