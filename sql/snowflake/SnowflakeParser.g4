@@ -402,7 +402,8 @@ grant_to_share
         DATABASE id_
         | SCHEMA id_
         | FUNCTION id_
-        | ( TABLE object_name | ALL TABLES IN SCHEMA schema_name)
+        | TABLE object_name 
+        | ALL TABLES IN SCHEMA schema_name
         | VIEW id_
     ) TO SHARE id_
     ;
@@ -488,7 +489,7 @@ revoke_from_role
             SCHEMA schema_name
             | ALL SCHEMAS IN DATABASE id_
         )
-        | (schema_privileges | ALL PRIVILEGES?) ON (FUTURE SCHEMAS IN DATABASE <db_name>)
+        | (schema_privileges | ALL PRIVILEGES?) ON FUTURE SCHEMAS IN DATABASE <db_name>
         | (schema_object_privileges | ALL PRIVILEGES?) ON (
             object_type object_name
             | ALL object_type_plural IN SCHEMA schema_name
@@ -504,8 +505,10 @@ revoke_from_share
     : REVOKE object_privilege ON (
         DATABASE id_
         | SCHEMA schema_name
-        | ( TABLE object_name | ALL TABLES IN SCHEMA schema_name)
-        | ( VIEW object_name | ALL VIEWS IN SCHEMA schema_name)
+        | TABLE object_name 
+        | ALL TABLES IN SCHEMA schema_name
+        | VIEW object_name
+        | ALL VIEWS IN SCHEMA schema_name
     ) FROM SHARE id_
     ;
 
@@ -764,10 +767,10 @@ account_id_list
     ;
 
 alter_dataset
-    : ALTER DATASET ds=object_name ADD VERSION v=string FROM query_statement (
+    : ALTER DATASET ds = object_name ADD VERSION v = string FROM query_statement (
         PARTITION BY id_list
-        )? comment_clause? (METADATA EQ string)?
-    | ALTER DATASET if_exists? ds=object_name DROP VERSION v=string
+    )? comment_clause? (METADATA EQ string)?
+    | ALTER DATASET if_exists? ds = object_name DROP VERSION v = string
     ;
 
 alter_dynamic_table
@@ -843,7 +846,7 @@ alter_failover_group
 
 alter_file_format
     : ALTER FILE FORMAT if_exists? id_ RENAME TO id_
-    | ALTER FILE FORMAT if_exists? id_ SET (format_type_options* comment_clause?)
+    | ALTER FILE FORMAT if_exists? id_ SET format_type_options* comment_clause?
     ;
 
 alter_function
@@ -935,7 +938,11 @@ alter_notification_integration
     ;
 
 alter_pipe
-    : ALTER PIPE if_exists? id_ SET (PIPE_EXECUTION_PAUSED EQ true_false | comment_clause | ERROR_INTEGRATION EQ string)
+    : ALTER PIPE if_exists? id_ SET (
+        PIPE_EXECUTION_PAUSED EQ true_false 
+        | comment_clause 
+        | ERROR_INTEGRATION EQ string
+    )
     | ALTER PIPE id_ set_tags
     | ALTER PIPE id_ unset_tags
     | ALTER PIPE if_exists? id_ UNSET (PIPE_EXECUTION_PAUSED | ERROR_INTEGRATION | COMMENT)
@@ -1657,7 +1664,7 @@ create_object_clone
 create_connection
     : CREATE CONNECTION if_not_exists? id_ (
         comment_clause?
-        | (AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?)
+        | AS REPLICA OF id_ DOT id_ DOT id_ comment_clause?
     )
     ;
 
@@ -1883,8 +1890,9 @@ create_image_repository
     ;
 
 create_index
-    : CREATE or_replace? INDEX if_not_exists? id_ ON object_name  column_list_in_parentheses
-        (INCLUDE column_list_in_parentheses)?
+    : CREATE or_replace? INDEX if_not_exists? id_ ON object_name  column_list_in_parentheses (
+        INCLUDE column_list_in_parentheses
+    )?
     ;
 
 create_managed_account
@@ -2026,14 +2034,13 @@ create_schema
 
 create_secret
     : CREATE or_replace? SECRET if_not_exists? s = object_name (
-        TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET |
-        TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt = string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et = string API_AUTHENTICATION EQ aa = id_ |
-        TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false |
-        TYPE EQ PASSWORD USERNAME EQ u = string PASSWORD EQ p = string |
-        TYPE EQ GENERIC_STRING SECRET_STRING EQ ss = string |
-        TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
-    )
-    comment_clause?
+        TYPE EQ OAUTH2 API_AUTHENTICATION EQ id_ OAUTH_SCOPES EQ LR_BRACKET string_list RR_BRACKET
+        | TYPE EQ OAUTH2 OAUTH_REFRESH_TOKEN EQ rt = string OAUTH_REFRESH_TOKEN_EXPIRY_TIME EQ et = string API_AUTHENTICATION EQ aa = id_
+        | TYPE EQ CLOUD_PROVIDER_TOKEN API_AUTHENTICATION EQ string ENABLED EQ true_false
+        | TYPE EQ PASSWORD USERNAME EQ u = string PASSWORD EQ p = string
+        | TYPE EQ GENERIC_STRING SECRET_STRING EQ ss = string
+        | TYPE EQ SYMMETRIC_KEY ALGORITHM = GENERIC
+    ) comment_clause?
     ;
 
 create_security_integration_external_oauth
@@ -2177,7 +2184,7 @@ create_service
     ;
 
 service_specification
-    : (table_stage | user_stage | named_stage | external_location)? SPECIFICATION_FILE  EQ string
+    : (table_stage | user_stage | named_stage | external_location)? SPECIFICATION_FILE EQ string
     | SPECIFICATION service_specification_text
     | (table_stage | user_stage | named_stage | external_location)? SPECIFICATION_TEMPLATE_FILE EQ string USING key_value_assoc_list
     | SPECIFICATION_TEMPLATE service_specification_text USING key_value_assoc_list
@@ -3809,7 +3816,15 @@ show_schemas
     ;
 
 show_secrets
-    : SHOW SECRETS like_pattern? (IN (ACCOUNT | DATABASE? d = id_ | SCHEMA? s = schema_name | APPLICATION a = id_ | APPLICATION PACKAGE p = id_))?
+    : SHOW SECRETS like_pattern? (
+        IN (
+            ACCOUNT
+            | DATABASE? d = id_
+            | SCHEMA? s = schema_name
+            | APPLICATION a = id_
+            | APPLICATION PACKAGE p = id_
+        )
+    )?
     ;
 
 show_semantic_views
@@ -4778,7 +4793,7 @@ join_clause
     ;
 
 on_using_clause
-    : ON search_condition 
+    : ON search_condition
     | USING column_list_in_parentheses
     ;
 
