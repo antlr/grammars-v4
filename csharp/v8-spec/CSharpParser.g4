@@ -168,10 +168,10 @@ reference_type
     ;
 
 non_nullable_reference_type
-    : class_type
-    | interface_type
+    : {this.IsDelegateTypeName()}?  delegate_type
+    | {this.IsInterfaceTypeName()}? interface_type
+    | {this.IsClassTypeName()}?     class_type
     | array_type
-    | delegate_type
     | 'dynamic'
     ;
 

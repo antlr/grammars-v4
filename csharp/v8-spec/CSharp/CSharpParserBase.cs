@@ -383,6 +383,53 @@ public abstract class CSharpParserBase : Parser
         return ts != null && (ts.TypeKind == CSharpTypeKind.Struct || ts.TypeKind == CSharpTypeKind.Enum);
     }
 
+    //--------------------------------------------------------------------------------------
+    // non_nullable_reference_type disambiguation — decision 15
+    //
+    // class_type, interface_type, and delegate_type all reduce through type_name
+    // for a bare identifier, so ANTLR cannot distinguish them by lookahead alone.
+    // IsDelegateTypeName and IsInterfaceTypeName fire only on positively-known symbols;
+    // IsClassTypeName is the complement/default.
+
+    public bool IsDelegateTypeName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return false;
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null || sym.Kind != CSharpSymbolKind.Type) return false;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        return ts != null && ts.TypeKind == CSharpTypeKind.Delegate;
+    }
+
+    public bool IsInterfaceTypeName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return false;
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null || sym.Kind != CSharpSymbolKind.Type) return false;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        return ts != null && ts.TypeKind == CSharpTypeKind.Interface;
+    }
+
+    public bool IsClassTypeName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return true;
+        switch (t.Type)
+        {
+            case CSharpLexer.KW_OBJECT:
+            case CSharpLexer.KW_STRING:
+                return true;  // always class types
+        }
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null) return true;  // unknown name — default to class_type
+        if (sym.Kind != CSharpSymbolKind.Type) return true;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        if (ts == null) return true;
+        return ts.TypeKind != CSharpTypeKind.Interface
+            && ts.TypeKind != CSharpTypeKind.Delegate;
+    }
+
     // True when LT(1) is NOT a known type parameter and NOT a known value type.
     // Unambiguous reference-type openers (dynamic, object, string, '[') always return true.
     // Unknown identifiers default to true (open-world assumption).
