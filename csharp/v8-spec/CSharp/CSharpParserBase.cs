@@ -384,6 +384,50 @@ public abstract class CSharpParserBase : Parser
     }
 
     //--------------------------------------------------------------------------------------
+    // pattern rule disambiguation — decision 31
+    //
+    // declaration_pattern (type simple_designation) and constant_pattern share the same
+    // token prefix for inputs like "double d" or "Shape x".  We disambiguate by
+    // speculatively parsing a type() — analogous to an ANTLR3 syntactic predicate —
+    // then checking whether a simple designation follows.
+    //
+    // BailErrorStrategy causes the speculative parse to throw on any error rather than
+    // attempting recovery, so the token stream remains clean for the rewind.
+
+    public bool IsDeclarationPatternAhead()
+    {
+        var savedListeners = new List<IAntlrErrorListener<IToken>>(ErrorListeners);
+        var savedStrategy  = ErrorHandler;
+        RemoveErrorListeners();
+        ErrorHandler = new BailErrorStrategy();
+        int mark       = InputStream.Mark();
+        int savedIndex = InputStream.Index;
+        try
+        {
+            typeof(CSharpParser)
+                .GetMethod("type", BindingFlags.Instance | BindingFlags.Public)
+                .Invoke(this, null);
+            IToken next = CurrentToken;
+            return next != null
+                && (next.Type == CSharpLexer.Simple_Identifier || next.Text == "_");
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            InputStream.Seek(savedIndex);
+            InputStream.Release(mark);
+            RemoveErrorListeners();
+            foreach (var l in savedListeners) AddErrorListener(l);
+            ErrorHandler = savedStrategy;
+        }
+    }
+
+    public bool IsConstantPatternAhead() => !IsDeclarationPatternAhead();
+
+    //--------------------------------------------------------------------------------------
     // non_nullable_reference_type disambiguation — decision 15
     //
     // class_type, interface_type, and delegate_type all reduce through type_name
@@ -429,6 +473,35 @@ public abstract class CSharpParserBase : Parser
         return ts.TypeKind != CSharpTypeKind.Interface
             && ts.TypeKind != CSharpTypeKind.Delegate;
     }
+
+    //--------------------------------------------------------------------------------------
+    // class_base disambiguation
+    //
+    // class_base starts with ':' in all alternatives, so the decision point is at LT(1)=':'.
+    // Predicates must be at the START of alternatives (before ':') so ANTLR4 evaluates them
+    // during prediction — they check LT(2), which is the base type name after the colon.
+
+    private bool ClassBaseTypeCheck(bool wantInterface)
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(2);  // LT(1)=':' LT(2)=type name
+        if (t == null) return !wantInterface;
+        switch (t.Type)
+        {
+            case CSharpLexer.KW_OBJECT:
+            case CSharpLexer.KW_STRING:
+                return !wantInterface;  // always class types
+        }
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null) return !wantInterface;  // unknown → default to class
+        if (sym.Kind != CSharpSymbolKind.Type) return !wantInterface;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        if (ts == null) return !wantInterface;
+        bool isInterface = ts.TypeKind == CSharpTypeKind.Interface;
+        return wantInterface ? isInterface : !isInterface;
+    }
+
+    public bool IsClassBaseInterfaceList() => ClassBaseTypeCheck(true);
+    public bool IsClassBaseClassType()     => ClassBaseTypeCheck(false);
 
     // True when LT(1) is NOT a known type parameter and NOT a known value type.
     // Unambiguous reference-type openers (dynamic, object, string, '[') always return true.

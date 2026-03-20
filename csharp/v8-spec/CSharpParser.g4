@@ -304,8 +304,8 @@ variable_reference
 
 // Source: §11.2.1 General
 pattern
-    : declaration_pattern
-    | constant_pattern
+    : {this.IsDeclarationPatternAhead()}? declaration_pattern
+    | {this.IsConstantPatternAhead()}?    constant_pattern
     | var_pattern
     | positional_pattern
     | property_pattern
@@ -1620,8 +1620,8 @@ decorated_type_parameter
 
 // Source: §15.2.4.1 General
 class_base
-    : ':' class_type
-    | ':' interface_type_list
+    : {this.IsClassBaseInterfaceList()}? ':' interface_type_list
+    | {this.IsClassBaseClassType()}?     ':' class_type
     | ':' class_type ',' interface_type_list
     ;
 
