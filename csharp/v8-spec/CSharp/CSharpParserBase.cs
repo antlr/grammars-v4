@@ -335,5 +335,79 @@ public abstract class CSharpParserBase : Parser
         if (lt4 != null && lt4.Text == "{") return false;  // array_initializer → not implicitly typed
         return true;
     }
+
+    //--------------------------------------------------------------------------------------
+    // type rule disambiguation — decisions 13 / 15
+    //
+    // The type rule has four alternatives:
+    //   reference_type | value_type | type_parameter | pointer_type
+    // For a bare identifier all three non-pointer alts are viable, so we add
+    // mutually-exclusive predicates to the first three alternatives.
+
+    // True only when LT(1) is declared as a type parameter in the current scope chain.
+    public bool IsTypeParameterName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return false;
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        return sym != null && sym.Kind == CSharpSymbolKind.TypeParameter;
+    }
+
+    // True when LT(1) is unambiguously a value type: a simple-type keyword,
+    // a tuple opener '(', or an identifier declared as a struct/enum.
+    public bool IsValueTypeName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return false;
+        switch (t.Type)
+        {
+            case CSharpLexer.KW_BOOL:
+            case CSharpLexer.KW_BYTE:
+            case CSharpLexer.KW_CHAR:
+            case CSharpLexer.KW_DECIMAL:
+            case CSharpLexer.KW_DOUBLE:
+            case CSharpLexer.KW_FLOAT:
+            case CSharpLexer.KW_INT:
+            case CSharpLexer.KW_LONG:
+            case CSharpLexer.KW_SBYTE:
+            case CSharpLexer.KW_SHORT:
+            case CSharpLexer.KW_UINT:
+            case CSharpLexer.KW_ULONG:
+            case CSharpLexer.KW_USHORT:
+            case CSharpLexer.TK_LPAREN:   // tuple_type
+                return true;
+        }
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null || sym.Kind != CSharpSymbolKind.Type) return false;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        return ts != null && (ts.TypeKind == CSharpTypeKind.Struct || ts.TypeKind == CSharpTypeKind.Enum);
+    }
+
+    // True when LT(1) is NOT a known type parameter and NOT a known value type.
+    // Unambiguous reference-type openers (dynamic, object, string, '[') always return true.
+    // Unknown identifiers default to true (open-world assumption).
+    public bool IsReferenceTypeName()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return true;
+        switch (t.Type)
+        {
+            case CSharpLexer.KW_DYNAMIC:
+            case CSharpLexer.KW_OBJECT:
+            case CSharpLexer.KW_STRING:
+            case CSharpLexer.TK_LBRACK:   // array_type
+                return true;
+        }
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null) return true;  // unknown name — default to reference_type
+        if (sym.Kind == CSharpSymbolKind.TypeParameter) return false;
+        if (sym.Kind == CSharpSymbolKind.Type)
+        {
+            CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+            if (ts != null && (ts.TypeKind == CSharpTypeKind.Struct || ts.TypeKind == CSharpTypeKind.Enum))
+                return false;
+        }
+        return true;
+    }
 }
 

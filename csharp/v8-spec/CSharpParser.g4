@@ -155,9 +155,9 @@ namespace_or_type_name
 
 // Source: §8.1 General
 type
-    : reference_type
-    | value_type
-    | type_parameter
+    : {this.IsTypeParameterName()}? type_parameter
+    | {this.IsValueTypeName()}?     value_type
+    | {this.IsReferenceTypeName()}? reference_type
     | pointer_type     // unsafe code support
     ;
 
