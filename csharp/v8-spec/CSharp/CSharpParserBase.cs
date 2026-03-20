@@ -309,34 +309,30 @@ public abstract class CSharpParserBase : Parser
 
     public bool IsExplicitlyTypedLocalVariable()
     {
-        var t = ((CommonTokenStream)this.InputStream).LT(1);
-        if (t == null)
-            return true;
-        var n = t.Text;
-        if (t.Type != CSharpLexer.KW_VAR)
-            return true;
-        if (this.SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
-            && sym.Kind == CSharpSymbolKind.Type)
-            return true;
-        var p = ((CommonTokenStream)this.InputStream).LT(-1);
-        if (p == null)
-            return true;
-        if (p.Type == CSharpLexer.KW_VAR)
-            return true;
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return true;
+        if (t.Type != CSharpLexer.KW_VAR) return true;  // not 'var' → always explicit
+        if (SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
+            && sym.Kind == CSharpSymbolKind.Type) return true;  // 'var' is a type name
+        // LT(1)='var' LT(2)=identifier LT(3)='=' or something else
+        IToken lt3 = ((CommonTokenStream)InputStream).LT(3);
+        if (lt3 == null || lt3.Text != "=") return true;   // no '=' → explicit
+        IToken lt4 = ((CommonTokenStream)InputStream).LT(4);
+        if (lt4 != null && lt4.Text == "{") return true;   // array_initializer → explicit
         return false;
     }
 
     public bool IsImplicitlyTypedLocalVariable()
     {
-        var t = ((CommonTokenStream)this.InputStream).LT(1);
-        if (t == null)
-            return true;
-        var n = t.Text;
-        if (t.Type != CSharpLexer.KW_VAR)
-            return false;
-        if (this.SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
-            && sym.Kind == CSharpSymbolKind.Type)
-            return false;
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return true;
+        if (t.Type != CSharpLexer.KW_VAR) return false;
+        if (SymTable.CurrentScope.LookupChain("var") is CSharpSymbol sym
+            && sym.Kind == CSharpSymbolKind.Type) return false;
+        IToken lt3 = ((CommonTokenStream)InputStream).LT(3);
+        if (lt3 == null || lt3.Text != "=") return false;  // no '=' → not implicitly typed
+        IToken lt4 = ((CommonTokenStream)InputStream).LT(4);
+        if (lt4 != null && lt4.Text == "{") return false;  // array_initializer → not implicitly typed
         return true;
     }
 }
