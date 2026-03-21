@@ -2204,7 +2204,7 @@ key_value_assoc
     ;
 
 service_params
-    : service_param_name EQ (string | num | true_false | id_)
+    : service_param_name EQ (string | num | true_false | id_ | LR_BRACKET object_name (COMMA object_name)* RR_BRACKET)
     | comment_clause
     | with_tags
     ;
