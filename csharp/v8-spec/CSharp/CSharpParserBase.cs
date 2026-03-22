@@ -396,18 +396,14 @@ public abstract class CSharpParserBase : Parser
 
     public bool IsDeclarationPatternAhead()
     {
-        var savedListeners = new List<IAntlrErrorListener<IToken>>(ErrorListeners);
-        var savedStrategy  = ErrorHandler;
-        RemoveErrorListeners();
-        ErrorHandler = new BailErrorStrategy();
-        int mark       = InputStream.Mark();
+        var par = new CSharpParser((ITokenStream)InputStream);
+        par.RemoveErrorListeners();
+        par.ErrorHandler = new BailErrorStrategy();
         int savedIndex = InputStream.Index;
         try
         {
-            typeof(CSharpParser)
-                .GetMethod("type", BindingFlags.Instance | BindingFlags.Public)
-                .Invoke(this, null);
-            IToken next = CurrentToken;
+            var type = par.type();
+            IToken next = ((CommonTokenStream)InputStream).LT(1);
             return next != null
                 && (next.Type == CSharpLexer.Simple_Identifier || next.Text == "_");
         }
@@ -418,10 +414,6 @@ public abstract class CSharpParserBase : Parser
         finally
         {
             InputStream.Seek(savedIndex);
-            InputStream.Release(mark);
-            RemoveErrorListeners();
-            foreach (var l in savedListeners) AddErrorListener(l);
-            ErrorHandler = savedStrategy;
         }
     }
 
