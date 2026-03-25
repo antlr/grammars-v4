@@ -190,6 +190,7 @@ public abstract class CSharpParserBase : Parser
 
     private void InsertNode(ParserRuleContext currentctx, string contextTypeName)
     {
+return;
         Type parserType  = typeof(CSharpParser);
         Type contextType = parserType.GetNestedType(contextTypeName)
             ?? throw new InvalidOperationException(
