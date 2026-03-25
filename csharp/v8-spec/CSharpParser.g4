@@ -586,18 +586,18 @@ null_conditional_projection_initializer
     ;
 
 // Source: §12.8.9.1 General
-null_forgiving_expression
-    : primary_expression null_forgiving_operator
-    ;
+//null_forgiving_expression
+//    : primary_expression null_forgiving_operator
+//    ;
 
 null_forgiving_operator
     : '!'
     ;
 
 // Source: §12.8.10.1 General
-invocation_expression
-    : primary_expression '(' argument_list? ')'
-    ;
+//invocation_expression
+//    : primary_expression '(' argument_list? ')'
+//    ;
 
 // Source: §12.8.11 Null Conditional Invocation Expression
 null_conditional_invocation_expression
@@ -606,9 +606,9 @@ null_conditional_invocation_expression
     ;
 
 // Source: §12.8.12.1 General
-element_access
-    : primary_expression '[' argument_list ']'
-    ;
+//element_access
+//    : primary_expression '[' argument_list ']'
+//    ;
 
 // Source: §12.8.13 Null Conditional Element Access
 null_conditional_element_access
@@ -1309,7 +1309,8 @@ expression_statement
 
 statement_expression
     : null_conditional_invocation_expression
-    | invocation_expression
+// BUGBUG BUG    | invocation_expression
+ | primary_expression
     | object_creation_expression
     | assignment
     | post_increment_expression
@@ -2367,14 +2368,14 @@ pointer_indirection_expression
     ;
 
 // Source: §24.6.3 Pointer member access
-pointer_member_access
-    : primary_expression '->' identifier type_argument_list?
-    ;
+//pointer_member_access
+//    : primary_expression '->' identifier type_argument_list?
+//    ;
 
 // Source: §24.6.4 Pointer element access
-pointer_element_access
-    : primary_expression '[' expression ']'
-    ;
+//pointer_element_access
+//    : primary_expression '[' expression ']'
+//    ;
 
 // Source: §24.6.5 The address-of operator
 addressof_expression
