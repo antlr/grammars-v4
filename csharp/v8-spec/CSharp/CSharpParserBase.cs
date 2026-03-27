@@ -320,7 +320,14 @@ return;
         if (lt3 == null || lt3.Text != "=") return true;   // no '=' → explicit
         IToken lt4 = ((CommonTokenStream)InputStream).LT(4);
         if (lt4 != null && lt4.Text == "{") return true;   // array_initializer → explicit
+//	System.Console.WriteLine("t1f = " + t);
         return false;
+    }
+
+    public bool IsExplicitlyTypedRefLocalVariable()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        return t != null && t.Type == CSharpLexer.KW_REF;
     }
 
     public bool IsImplicitlyTypedLocalVariable()
@@ -334,6 +341,7 @@ return;
         if (lt3 == null || lt3.Text != "=") return false;  // no '=' → not implicitly typed
         IToken lt4 = ((CommonTokenStream)InputStream).LT(4);
         if (lt4 != null && lt4.Text == "{") return false;  // array_initializer → not implicitly typed
+//	System.Console.WriteLine("t2t = " + t);
         return true;
     }
 

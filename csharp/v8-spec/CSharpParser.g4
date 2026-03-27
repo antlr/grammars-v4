@@ -1207,7 +1207,7 @@ declaration_statement
 local_variable_declaration
     : {this.IsImplicitlyTypedLocalVariable()}? implicitly_typed_local_variable_declaration
     | {this.IsExplicitlyTypedLocalVariable()}? explicitly_typed_local_variable_declaration
-    | explicitly_typed_ref_local_variable_declaration
+    | {this.IsExplicitlyTypedRefLocalVariable()}? explicitly_typed_ref_local_variable_declaration
     ;
 
 // Source: §13.6.2.2 Implicitly typed local variable declarations
