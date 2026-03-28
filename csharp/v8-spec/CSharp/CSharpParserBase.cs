@@ -411,7 +411,7 @@ return;
         int savedIndex = InputStream.Index;
         try
         {
-            var type = par.type();
+            var type = par.type_();
             IToken next = ((CommonTokenStream)InputStream).LT(1);
             return next != null
                 && (next.Type == CSharpLexer.Simple_Identifier || next.Text == "_");

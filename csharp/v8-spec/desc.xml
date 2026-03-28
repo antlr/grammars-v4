@@ -4,7 +4,7 @@
    <grammar-name>CSharp</grammar-name>
    <test>
       <inputs>examples/**/*.cs</inputs>
-      <targets>Antlr4ng;CSharp;Dart;Go;Java;JavaScript;TypeScript</targets>
+      <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;TypeScript</targets>
    </test>
    <!-- Cpp target not working. -->
    <test>

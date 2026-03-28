@@ -154,7 +154,7 @@ namespace_or_type_name
     ;
 
 // Source: §8.1 General
-type
+type_
     : {this.IsTypeParameterName()}? type_parameter
     | {this.IsValueTypeName()}?     value_type
     | {this.IsReferenceTypeName()}? reference_type
@@ -265,7 +265,7 @@ tuple_type
     ;
 
 tuple_type_element
-    : type identifier?
+    : type_ identifier?
     ;
 
 enum_type
@@ -282,7 +282,7 @@ type_argument_list
     ;
 
 type_argument
-    : type
+    : type_
     | type_parameter nullable_type_annotation?
     ;
 
@@ -314,7 +314,7 @@ pattern
 
 // Source: §11.2.2 Declaration pattern
 declaration_pattern
-    : type simple_designation
+    : type_ simple_designation
     ;
 
 simple_designation
@@ -355,7 +355,7 @@ designations
 
 // Source: §11.2.5 Positional pattern
 positional_pattern
-    : type? '(' subpatterns? ')' property_subpattern? simple_designation?
+    : type_? '(' subpatterns? ')' property_subpattern? simple_designation?
     ;
 
 subpatterns
@@ -369,7 +369,7 @@ subpattern
 
 // Source: §11.2.6 Property pattern
 property_pattern
-    : type? property_subpattern simple_designation?
+    : type_? property_subpattern simple_designation?
     ;
 
 property_subpattern
@@ -638,8 +638,8 @@ post_decrement_expression
 
 // Source: §12.8.17.2.1 General
 object_creation_expression
-    : 'new' type '(' argument_list? ')' object_or_collection_initializer?
-    | 'new' type object_or_collection_initializer
+    : 'new' type_ '(' argument_list? ')' object_or_collection_initializer?
+    | 'new' type_ object_or_collection_initializer
     ;
 
 object_or_collection_initializer
@@ -727,7 +727,7 @@ delegate_creation_expression
 
 // Source: §12.8.18 The typeof operator
 typeof_expression
-    : 'typeof' '(' type ')'
+    : 'typeof' '(' type_ ')'
     | 'typeof' '(' unbound_type_name ')'
     | 'typeof' '(' 'void' ')'
     ;
@@ -768,7 +768,7 @@ reftype_expression
 
 // MS extension: typed reference operators (__makeref, __reftype, __refvalue)
 refvalue_expression
-    : '__refvalue' '(' expression ',' type ')'
+    : '__refvalue' '(' expression ',' type_ ')'
     ;
 
 // Source: §12.8.20 The checked and unchecked operators
@@ -787,7 +787,7 @@ default_value_expression
     ;
 
 explicitly_typed_default
-    : 'default' '(' type ')'
+    : 'default' '(' type_ ')'
     ;
 
 default_literal
@@ -859,7 +859,7 @@ pre_decrement_expression
 // table.  If it is a known type name we prefer cast_expression over the
 // parenthesised_expression alternative of primary_expression.
 cast_expression
-    : {this.IsCastExpressionAhead()}? '(' type ')' unary_expression
+    : {this.IsCastExpressionAhead()}? '(' type_ ')' unary_expression
     ;
 
 // Source: §12.9.9.1 General
@@ -919,9 +919,9 @@ relational_expression
     | relational_expression '>' shift_expression
     | relational_expression '<=' shift_expression
     | relational_expression '>=' shift_expression
-    | relational_expression 'is' type
+    | relational_expression 'is' type_
     | relational_expression 'is' pattern
-    | relational_expression 'as' type
+    | relational_expression 'as' type_
     ;
 
 equality_expression
@@ -975,7 +975,7 @@ declaration_expression
     ;
 
 local_variable_type
-    : type
+    : type_
     | 'var'
     ;
 
@@ -1011,7 +1011,7 @@ explicit_anonymous_function_parameter_list
     ;
 
 explicit_anonymous_function_parameter
-    : anonymous_function_parameter_modifier? type identifier
+    : anonymous_function_parameter_modifier? type_ identifier
     ;
 
 anonymous_function_parameter_modifier
@@ -1047,7 +1047,7 @@ query_expression
     ;
 
 from_clause
-    : 'from' type? identifier 'in' expression
+    : 'from' type_? identifier 'in' expression
     ;
 
 query_body
@@ -1072,12 +1072,12 @@ where_clause
     ;
 
 join_clause
-    : 'join' type? identifier 'in' expression 'on' expression
+    : 'join' type_? identifier 'in' expression 'on' expression
       'equals' expression
     ;
 
 join_into_clause
-    : 'join' type? identifier 'in' expression 'on' expression
+    : 'join' type_? identifier 'in' expression 'on' expression
       'equals' expression 'into' identifier
     ;
 
@@ -1222,7 +1222,7 @@ implicitly_typed_local_variable_declarator
 
 // Source: §13.6.2.3 Explicitly typed local variable declarations
 explicitly_typed_local_variable_declaration
-    : type { this.BeginVariableDeclaration(); }
+    : type_ { this.BeginVariableDeclaration(); }
       explicitly_typed_local_variable_declarators
     ;
 
@@ -1243,7 +1243,7 @@ local_variable_initializer
 
 // Source: §13.6.2.4 Explicitly typed ref local variable declarations
 explicitly_typed_ref_local_variable_declaration
-    : ref_kind type ref_local_variable_declarators
+    : ref_kind type_ ref_local_variable_declarators
     ;
 
 ref_local_variable_declarators
@@ -1256,7 +1256,7 @@ ref_local_variable_declarator
 
 // Source: §13.6.3 Local constant declarations
 local_constant_declaration
-    : 'const' type constant_declarators
+    : 'const' type_ constant_declarators
     ;
 
 constant_declarators
@@ -1464,7 +1464,7 @@ specific_catch_clause
     ;
 
 exception_specifier
-    : '(' type identifier? ')'
+    : '(' type_ identifier? ')'
     ;
 
 exception_filter
@@ -1686,7 +1686,7 @@ class_member_declaration
 
 // Source: §15.4 Constants
 constant_declaration
-    : attributes? constant_modifier* 'const' type constant_declarators ';'
+    : attributes? constant_modifier* 'const' type_ constant_declarators ';'
     ;
 
 constant_modifier
@@ -1699,7 +1699,7 @@ constant_modifier
 
 // Source: §15.5.1 General
 field_declaration
-    : attributes? field_modifier* type { this.BeginVariableDeclaration(); }
+    : attributes? field_modifier* type_ { this.BeginVariableDeclaration(); }
       variable_declarators ';'
     ;
 
@@ -1777,7 +1777,7 @@ return_type
     ;
 
 ref_return_type
-    : type
+    : type_
     ;
 
 member_name
@@ -1810,7 +1810,7 @@ fixed_parameters
     ;
 
 fixed_parameter
-    : attributes? parameter_modifier? type identifier default_argument?
+    : attributes? parameter_modifier? type_ identifier default_argument?
     | '__arglist'                                                          // MS extension
     ;
 
@@ -1836,8 +1836,8 @@ parameter_array
 
 // Source: §15.7.1 General
 property_declaration
-    : attributes? property_modifier* type member_name property_body
-    | attributes? property_modifier* ref_kind type member_name ref_property_body
+    : attributes? property_modifier* type_ member_name property_body
+    | attributes? property_modifier* ref_kind type_ member_name ref_property_body
     ;    
 
 property_modifier
@@ -1913,8 +1913,8 @@ ref_accessor_body
 
 // Source: §15.8.1 General
 event_declaration
-    : attributes? event_modifier* 'event' type variable_declarators ';'
-    | attributes? event_modifier* 'event' type member_name
+    : attributes? event_modifier* 'event' type_ variable_declarators ';'
+    | attributes? event_modifier* 'event' type_ member_name
         '{' event_accessor_declarations '}'
     ;
 
@@ -1969,8 +1969,8 @@ indexer_modifier
     ;
 
 indexer_declarator
-    : type 'this' '[' parameter_list ']'
-    | type interface_type '.' 'this' '[' parameter_list ']'
+    : type_ 'this' '[' parameter_list ']'
+    | type_ interface_type '.' 'this' '[' parameter_list ']'
     ;
 
 indexer_body
@@ -2002,7 +2002,7 @@ operator_declarator
     ;
 
 unary_operator_declarator
-    : type 'operator' overloadable_unary_operator '(' fixed_parameter ')'
+    : type_ 'operator' overloadable_unary_operator '(' fixed_parameter ')'
     ;
 
 logical_negation_operator
@@ -2014,7 +2014,7 @@ overloadable_unary_operator
     ;
 
 binary_operator_declarator
-    : type 'operator' overloadable_binary_operator
+    : type_ 'operator' overloadable_binary_operator
         '(' fixed_parameter ',' fixed_parameter ')'
     ;
 
@@ -2024,8 +2024,8 @@ overloadable_binary_operator
     ;
 
 conversion_operator_declarator
-    : 'implicit' 'operator' type '(' fixed_parameter ')'
-    | 'explicit' 'operator' type '(' fixed_parameter ')'
+    : 'implicit' 'operator' type_ '(' fixed_parameter ')'
+    | 'explicit' 'operator' type_ '(' fixed_parameter ')'
     ;
 
 operator_body
@@ -2415,7 +2415,7 @@ fixed_size_buffer_modifier
     ;
 
 buffer_element_type
-    : type
+    : type_
     ;
 
 fixed_size_buffer_declarators

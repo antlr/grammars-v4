@@ -160,7 +160,7 @@ export abstract class CSharpLexerBase extends Lexer {
 
     private _symbolFromLine(line: Token[]): string | null {
         for (const t of line)
-            if (t.type === CSharpLexer.CONDITIONAL_SYMBOL) return t.text;
+            if (t.type === CSharpLexer.CONDITIONAL_SYMBOL) return t.text ?? null;
         return null;
     }
 
