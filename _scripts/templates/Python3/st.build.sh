@@ -22,6 +22,7 @@ antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Python3 <x.AntlrArgs> <
 <endif>
 }>
 
-pip install -r requirements.txt
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 
 exit 0
