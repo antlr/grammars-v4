@@ -77,11 +77,11 @@ export default abstract class CSharpParserBase extends Parser {
 
     private _insertNode(currentctx: ParserRuleContext, contextTypeName: string): void {
         return;
-        const CtxCls = (this.constructor as any)[contextTypeName] as (new (parent: ParserRuleContext, invokingState: number) => ParserRuleContext) | undefined;
-        if (!CtxCls) return;
-        const inserted = new CtxCls(currentctx, (currentctx as any).invokingState ?? -1);
-        (inserted as any).children = (currentctx as any).children ? [...(currentctx as any).children] : [];
-        (currentctx as any).children = [inserted];
+        // const CtxCls = (this.constructor as any)[contextTypeName] as (new (parent: ParserRuleContext, invokingState: number) => ParserRuleContext) | undefined;
+        // if (!CtxCls) return;
+        // const inserted = new CtxCls(currentctx, (currentctx as any).invokingState ?? -1);
+        // (inserted as any).children = (currentctx as any).children ? [...(currentctx as any).children] : [];
+        // (currentctx as any).children = [inserted];
     }
 
     AsInvocationExpression(currentctx: ParserRuleContext): void         { this._insertNode(currentctx, "Invocation_expressionContext"); }
