@@ -113,36 +113,35 @@ public abstract class CSharpParserBase extends Parser
 
     private void insertNode(ParserRuleContext currentctx, String contextTypeName)
     {
-	return;
-        try
-        {
-            Class<?> contextType = null;
-            for (Class<?> inner : getClass().getDeclaredClasses())
-            {
-                if (inner.getSimpleName().equals(contextTypeName))
-                {
-                    contextType = inner;
-                    break;
-                }
-            }
-            if (contextType == null) return;
-
-            Constructor<?> ctor = contextType.getConstructor(ParserRuleContext.class, int.class);
-            ParserRuleContext insertedctx = (ParserRuleContext) ctor.newInstance(
-                currentctx, currentctx.invokingState);
-
-            insertedctx.children = (currentctx.children != null)
-                ? new ArrayList<>(currentctx.children)
-                : new ArrayList<>();
-            if (currentctx.children == null)
-                currentctx.children = new ArrayList<>();
-            currentctx.children.clear();
-            currentctx.children.add(insertedctx);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("insertNode failed: " + e.getMessage(), e);
-        }
+        // try
+        // {
+        //     Class<?> contextType = null;
+        //     for (Class<?> inner : getClass().getDeclaredClasses())
+        //     {
+        //         if (inner.getSimpleName().equals(contextTypeName))
+        //         {
+        //             contextType = inner;
+        //             break;
+        //         }
+        //     }
+        //     if (contextType == null) return;
+        //
+        //     Constructor<?> ctor = contextType.getConstructor(ParserRuleContext.class, int.class);
+        //     ParserRuleContext insertedctx = (ParserRuleContext) ctor.newInstance(
+        //         currentctx, currentctx.invokingState);
+        // 
+        //     insertedctx.children = (currentctx.children != null)
+        //         ? new ArrayList<>(currentctx.children)
+        //         : new ArrayList<>();
+        //     if (currentctx.children == null)
+        //         currentctx.children = new ArrayList<>();
+        //     currentctx.children.clear();
+        //     currentctx.children.add(insertedctx);
+        // }
+        // catch (Exception e)
+        // {
+        //     throw new RuntimeException("insertNode failed: " + e.getMessage(), e);
+        // }
     }
 
     public void AsInvocationExpression(ParserRuleContext currentctx)         { insertNode(currentctx, "Invocation_expressionContext"); }

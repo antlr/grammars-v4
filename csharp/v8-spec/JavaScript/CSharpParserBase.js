@@ -296,25 +296,29 @@ export default class CSharpParserBase extends antlr4.Parser {
     IsClassBaseClassType()     { return this._classBaseTypeCheck(false); }
 
     IsDeclarationPatternAhead() {
-        // Speculative parse: create a new parser on the same stream, try to parse
-        // a type(), then check if LT(1) is a simple designation.
-        // Note: use this.constructor (the CSharpParser subclass) to avoid a
-        // hard import dependency that would be circular.
-        const savedIndex = this._input.index;
-        const ParserClass = this.constructor;
-        const par = new ParserClass(this._input);
-        par.removeErrorListeners();
-        par.buildParseTrees = false;
-        try {
-            par.type_();
-            const next = this._input.LT(1);
-            return next !== null &&
-                (next.type === CSharpLexer.Simple_Identifier || next.text === '_');
-        } catch (e) {
-            return false;
-        } finally {
-            this._input.seek(savedIndex);
+        // Heuristic lookahead (avoids stream corruption from Parser constructor
+        // reset() and BailErrorStrategy.sync() silently consuming mismatched tokens):
+        // A declaration_pattern is "type simple_designation".
+        // If LT(1) is a value-type keyword, check LT(2) is a designator.
+        // If LT(1) is an identifier known to be a type, check LT(2) likewise.
+        // Otherwise (string/number literals, unknown names) it is a constant_pattern.
+        const tok1 = this._input.LT(1);
+        if (!tok1) return false;
+        const vt = new Set([CSharpLexer.KW_BOOL, CSharpLexer.KW_BYTE, CSharpLexer.KW_CHAR,
+            CSharpLexer.KW_DECIMAL, CSharpLexer.KW_DOUBLE, CSharpLexer.KW_FLOAT,
+            CSharpLexer.KW_INT, CSharpLexer.KW_LONG, CSharpLexer.KW_SBYTE,
+            CSharpLexer.KW_SHORT, CSharpLexer.KW_UINT, CSharpLexer.KW_ULONG,
+            CSharpLexer.KW_USHORT]);
+        if (vt.has(tok1.type)) {
+            const tok2 = this._input.LT(2);
+            return tok2 !== null && (tok2.type === CSharpLexer.Simple_Identifier || tok2.text === '_');
         }
+        if (tok1.type !== CSharpLexer.Simple_Identifier) return false;
+        const sym = this.symTable.currentScope.lookupChain(tok1.text);
+        const isKnownType = sym !== null && sym.kind === CSharpSymbolKind.Type;
+        if (!isKnownType) return false;
+        const tok2 = this._input.LT(2);
+        return tok2 !== null && (tok2.type === CSharpLexer.Simple_Identifier || tok2.text === '_');
     }
 
     IsConstantPatternAhead() { return !this.IsDeclarationPatternAhead(); }
