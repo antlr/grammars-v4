@@ -215,7 +215,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
 
 function toStringTree(tree: ParseTree, recog?: Parser | null): string {
     var sb = new StringBuilder();
-    let ruleNames = recog.ruleNames;
+    let ruleNames = recog?.ruleNames ?? null;
     toStringTree2(sb, tree, 0, ruleNames);
     return sb.toString();
 }

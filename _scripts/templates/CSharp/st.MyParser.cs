@@ -26,7 +26,8 @@ public class MyParser : <parser_name> {
         BitSet alts,
         int startIndex,
         int stopIndex,
-        int startRuleIndex)
+        int startRuleIndex,
+        int limit = 0)
     {
         _ParserInterpreter.Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;
         var trees = new List\<Tuple\<string,ParserRuleContext>>();
@@ -47,6 +48,7 @@ public class MyParser : <parser_name> {
             _ParserInterpreter.AddDecisionOverride(decision, startIndex, alt);
             ParserRuleContext t = _ParserInterpreter.Parse(startRuleIndex);
             trees.Add(new Tuple\<string, ParserRuleContext>("d=" + decision + ".a=" + alt, t));
+            if (limit > 0 && trees.Count >= limit) break;
             alt = alts.NextSetBit(alt+1);
         }
         return trees;

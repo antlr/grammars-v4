@@ -15,12 +15,12 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 runtime_version=`grep antlr4 composer.json | awk '{print $2}' | tr -d '\r' | tr -d '\n' | tr -d ',' | tr -d '"'`
 
 # Get from online sources the commit version number that corresponds to the runtime version.
-rm -rf antlr4-php-runtime
+rm -rf antlr4-php-runtime antlr-php-runtime
 wget "https://packagist.org/packages/antlr/antlr4-php-runtime#$runtime_version"
 commit_version=`grep BSD-3-Clause antlr4-php-runtime | awk '{print $NF}' | sed 's/\<.*//'`
 
 # Checkout the sources from the php runtime repo.
-rm -rf antlr4-php-runtime
+rm -rf antlr4-php-runtime antlr-php-runtime
 git clone https://github.com/antlr/antlr-php-runtime
 cd antlr-php-runtime
 git checkout $commit_version
