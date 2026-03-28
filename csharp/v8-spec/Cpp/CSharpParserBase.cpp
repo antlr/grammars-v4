@@ -12,9 +12,16 @@ CSharpParserBase::CSharpParserBase(antlr4::TokenStream *input)
 {
 }
 
-// -------------------------------------------------------------------------
-// Look-ahead helpers
-// -------------------------------------------------------------------------
+// ─── Symbol table ─────────────────────────────────────────────────────────────
+
+CSharpSymbolTable *CSharpParserBase::symTable()
+{
+    if (!symTable_)
+        symTable_ = std::make_unique<CSharpSymbolTable>();
+    return symTable_.get();
+}
+
+// ─── Look-ahead helpers ───────────────────────────────────────────────────────
 
 bool CSharpParserBase::LookAheadIs(int pos, int value)
 {
@@ -26,18 +33,14 @@ bool CSharpParserBase::LookAheadIsNot(int pos, int value)
     return _input->LA(pos) != value;
 }
 
-// -------------------------------------------------------------------------
-// Error reporting
-// -------------------------------------------------------------------------
+// ─── Error reporting ─────────────────────────────────────────────────────────
 
 void CSharpParserBase::notifySemanticError(int /*line*/, int /*charPositionInLine*/, const std::string &msg)
 {
     notifyErrorListeners(msg);
 }
 
-// -------------------------------------------------------------------------
-// Rule-index helper
-// -------------------------------------------------------------------------
+// ─── Rule-index helper ────────────────────────────────────────────────────────
 
 int CSharpParserBase::ruleIdx(const std::string &name) const
 {
@@ -47,9 +50,7 @@ int CSharpParserBase::ruleIdx(const std::string &name) const
     return -1;
 }
 
-// -------------------------------------------------------------------------
-// Rule-index cache — computed once, reused across all action calls
-// -------------------------------------------------------------------------
+// ─── Rule-index cache ─────────────────────────────────────────────────────────
 
 void CSharpParserBase::cacheRuleIndices()
 {
@@ -64,9 +65,235 @@ void CSharpParserBase::cacheRuleIndices()
     ruleIndicesCached_ = true;
 }
 
-// -------------------------------------------------------------------------
-// ReduceTree — post-parse cleanup
-// -------------------------------------------------------------------------
+// ─── Semantic predicates ──────────────────────────────────────────────────────
+
+bool CSharpParserBase::IsCastExpressionAhead()
+{
+    antlr4::Token *tok = _input->LT(2);
+    if (!tok) return true;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(tok->getText());
+    return sym == nullptr || sym->kind != CSharpSymbolKind::Variable;
+}
+
+bool CSharpParserBase::IsDeclarationPatternAhead()
+{
+    auto *par = new CSharpParser(_input);
+    par->removeErrorListeners();
+    par->setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
+    size_t savedIndex = _input->index();
+    bool result = false;
+    try
+    {
+        par->type_();
+        antlr4::Token *next = _input->LT(1);
+        if (next)
+        {
+            int tt = static_cast<int>(next->getType());
+            result = (tt == CSharpLexer::Simple_Identifier || next->getText() == "_");
+        }
+    }
+    catch (...) { }
+    _input->seek(savedIndex);
+    delete par;
+    return result;
+}
+
+bool CSharpParserBase::IsConstantPatternAhead()
+{
+    return !IsDeclarationPatternAhead();
+}
+
+bool CSharpParserBase::IsTypeParameterName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return false;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    return sym != nullptr && sym->kind == CSharpSymbolKind::TypeParameter;
+}
+
+bool CSharpParserBase::IsValueTypeName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return false;
+    int tt = static_cast<int>(t->getType());
+    switch (tt)
+    {
+        case CSharpLexer::KW_BOOL:
+        case CSharpLexer::KW_BYTE:
+        case CSharpLexer::KW_CHAR:
+        case CSharpLexer::KW_DECIMAL:
+        case CSharpLexer::KW_DOUBLE:
+        case CSharpLexer::KW_FLOAT:
+        case CSharpLexer::KW_INT:
+        case CSharpLexer::KW_LONG:
+        case CSharpLexer::KW_SBYTE:
+        case CSharpLexer::KW_SHORT:
+        case CSharpLexer::KW_UINT:
+        case CSharpLexer::KW_ULONG:
+        case CSharpLexer::KW_USHORT:
+        case CSharpLexer::TK_LPAREN:
+            return true;
+        default: break;
+    }
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym || sym->kind != CSharpSymbolKind::Type) return false;
+    return sym->typeKind == CSharpTypeKind::Struct || sym->typeKind == CSharpTypeKind::Enum;
+}
+
+bool CSharpParserBase::IsReferenceTypeName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return true;
+    int tt = static_cast<int>(t->getType());
+    switch (tt)
+    {
+        case CSharpLexer::KW_DYNAMIC:
+        case CSharpLexer::KW_OBJECT:
+        case CSharpLexer::KW_STRING:
+        case CSharpLexer::TK_LBRACK:
+            return true;
+        default: break;
+    }
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym) return true;
+    if (sym->kind == CSharpSymbolKind::TypeParameter) return false;
+    if (sym->kind == CSharpSymbolKind::Type)
+    {
+        if (sym->typeKind == CSharpTypeKind::Struct || sym->typeKind == CSharpTypeKind::Enum)
+            return false;
+    }
+    return true;
+}
+
+bool CSharpParserBase::IsDelegateTypeName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return false;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym || sym->kind != CSharpSymbolKind::Type) return false;
+    return sym->typeKind == CSharpTypeKind::Delegate;
+}
+
+bool CSharpParserBase::IsInterfaceTypeName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return false;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym || sym->kind != CSharpSymbolKind::Type) return false;
+    return sym->typeKind == CSharpTypeKind::Interface;
+}
+
+bool CSharpParserBase::IsClassTypeName()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return true;
+    int tt = static_cast<int>(t->getType());
+    if (tt == CSharpLexer::KW_OBJECT || tt == CSharpLexer::KW_STRING) return true;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym) return true;
+    if (sym->kind != CSharpSymbolKind::Type) return true;
+    return sym->typeKind != CSharpTypeKind::Interface && sym->typeKind != CSharpTypeKind::Delegate;
+}
+
+bool CSharpParserBase::classBaseTypeCheck(bool wantInterface)
+{
+    antlr4::Token *t = _input->LT(2);  // LT(1)=':' LT(2)=type name
+    if (!t) return !wantInterface;
+    int tt = static_cast<int>(t->getType());
+    if (tt == CSharpLexer::KW_OBJECT || tt == CSharpLexer::KW_STRING)
+        return !wantInterface;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain(t->getText());
+    if (!sym) return !wantInterface;
+    if (sym->kind != CSharpSymbolKind::Type) return !wantInterface;
+    bool isInterface = (sym->typeKind == CSharpTypeKind::Interface);
+    return wantInterface ? isInterface : !isInterface;
+}
+
+bool CSharpParserBase::IsClassBaseInterfaceList() { return classBaseTypeCheck(true); }
+bool CSharpParserBase::IsClassBaseClassType()     { return classBaseTypeCheck(false); }
+
+bool CSharpParserBase::IsExplicitlyTypedLocalVariable()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return true;
+    if (static_cast<int>(t->getType()) != CSharpLexer::KW_VAR) return true;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain("var");
+    if (sym && sym->kind == CSharpSymbolKind::Type) return true;
+    antlr4::Token *lt3 = _input->LT(3);
+    if (!lt3 || lt3->getText() != "=") return true;
+    antlr4::Token *lt4 = _input->LT(4);
+    if (lt4 && lt4->getText() == "{") return true;
+    return false;
+}
+
+bool CSharpParserBase::IsExplicitlyTypedRefLocalVariable()
+{
+    antlr4::Token *t = _input->LT(1);
+    return t != nullptr && static_cast<int>(t->getType()) == CSharpLexer::KW_REF;
+}
+
+bool CSharpParserBase::IsImplicitlyTypedLocalVariable()
+{
+    antlr4::Token *t = _input->LT(1);
+    if (!t) return true;
+    if (static_cast<int>(t->getType()) != CSharpLexer::KW_VAR) return false;
+    CSharpSymbol *sym = symTable()->currentScope()->lookupChain("var");
+    if (sym && sym->kind == CSharpSymbolKind::Type) return false;
+    antlr4::Token *lt3 = _input->LT(3);
+    if (!lt3 || lt3->getText() != "=") return false;
+    antlr4::Token *lt4 = _input->LT(4);
+    if (lt4 && lt4->getText() == "{") return false;
+    return true;
+}
+
+// ─── Grammar actions ──────────────────────────────────────────────────────────
+
+void CSharpParserBase::EnterNamespaceScope() { symTable()->enterScope(CSharpScopeKind::Namespace); }
+void CSharpParserBase::EnterTypeScope()      { symTable()->enterScope(CSharpScopeKind::Type); }
+void CSharpParserBase::EnterBlockScope()     { symTable()->enterScope(CSharpScopeKind::Block); }
+void CSharpParserBase::ExitCurrentScope()    { symTable()->exitScope(); }
+
+void CSharpParserBase::OnTypeParameter()
+{
+    antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx) return;
+    std::string name = ctx->children.back()->getText();
+    symTable()->declareTypeParam(name);
+}
+
+void CSharpParserBase::OnUsingAliasDirective()
+{
+    antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx || ctx->children.size() < 4) return;
+    std::string alias  = ctx->children[1]->getText();
+    std::string target = ctx->children[3]->getText();
+    symTable()->declareAlias(alias, target);
+}
+
+void CSharpParserBase::OnUsingNamespaceDirective()
+{
+    antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx || ctx->children.size() < 2) return;
+    std::string ns = ctx->children[1]->getText();
+    symTable()->importNamespace(ns);
+}
+
+void CSharpParserBase::BeginVariableDeclaration()
+{
+    antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx || ctx->children.empty()) return;
+    pendingVarType_ = ctx->children.back()->getText();
+}
+
+void CSharpParserBase::OnVariableDeclarator()
+{
+    antlr4::ParserRuleContext *ctx = getContext();
+    if (!ctx || ctx->children.empty()) return;
+    std::string id = ctx->children.back()->getText();
+    symTable()->declareVariable(id, pendingVarType_);
+}
+
+// ─── ReduceTree — post-parse cleanup ─────────────────────────────────────────
 
 static void takeOutEmpties(antlr4::ParserRuleContext *node, int ruleTypeArgumentList)
 {
@@ -116,15 +343,15 @@ void CSharpParserBase::ReduceTree(antlr4::ParserRuleContext *currentctx)
     reducer(currentctx, reduceAllChildren);
 }
 
-// -------------------------------------------------------------------------
-// insertNode — rewire parse tree (MLR un-inlining)
-// -------------------------------------------------------------------------
+// ─── insertNode — rewire parse tree ──────────────────────────────────────────
 
 void CSharpParserBase::insertNode(antlr4::ParserRuleContext *currentctx, const std::string &contextTypeName)
 {
+    return;
     antlr4::ParserRuleContext *inserted = nullptr;
     int invokingState = currentctx->invokingState;
 
+/*
     if      (contextTypeName == "Invocation_expressionContext")
         inserted = new CSharpParser::Invocation_expressionContext(currentctx, invokingState);
     else if (contextTypeName == "Element_accessContext")
@@ -149,6 +376,7 @@ void CSharpParserBase::insertNode(antlr4::ParserRuleContext *currentctx, const s
     inserted->children = currentctx->children;
     currentctx->children.clear();
     currentctx->children.push_back(inserted);
+*/
 }
 
 void CSharpParserBase::AsInvocationExpression(antlr4::ParserRuleContext *currentctx)
@@ -170,9 +398,7 @@ void CSharpParserBase::AsNullForgivingExpression(antlr4::ParserRuleContext *curr
 void CSharpParserBase::AsPointerMemberAccess(antlr4::ParserRuleContext *currentctx)
     { insertNode(currentctx, "Pointer_member_accessContext"); }
 
-// -------------------------------------------------------------------------
-// ElementAccessSemanticCheck
-// -------------------------------------------------------------------------
+// ─── ElementAccessSemanticCheck ───────────────────────────────────────────────
 
 void CSharpParserBase::ElementAccessSemanticCheck(antlr4::ParserRuleContext *currentctx)
 {
@@ -215,7 +441,7 @@ void CSharpParserBase::ElementAccessSemanticCheck(antlr4::ParserRuleContext *cur
     if (!lhsLast) return;
     int lhsLastType = static_cast<int>(lhsLast->getType());
 
-    if (lhsLastType == CSharpLexer::TK_RBRACE) return; // initializer present
+    if (lhsLastType == CSharpLexer::TK_RBRACE) return;
 
     if (lhsLastType != CSharpLexer::TK_RBRACK)
     {

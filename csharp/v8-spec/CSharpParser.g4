@@ -154,10 +154,10 @@ namespace_or_type_name
     ;
 
 // Source: §8.1 General
-type
-    : reference_type
-    | value_type
-    | type_parameter
+type_
+    : {this.IsTypeParameterName()}? type_parameter
+    | {this.IsValueTypeName()}?     value_type
+    | {this.IsReferenceTypeName()}? reference_type
     | pointer_type     // unsafe code support
     ;
 
@@ -168,10 +168,10 @@ reference_type
     ;
 
 non_nullable_reference_type
-    : class_type
-    | interface_type
+    : {this.IsDelegateTypeName()}?  delegate_type
+    | {this.IsInterfaceTypeName()}? interface_type
+    | {this.IsClassTypeName()}?     class_type
     | array_type
-    | delegate_type
     | 'dynamic'
     ;
 
@@ -265,7 +265,7 @@ tuple_type
     ;
 
 tuple_type_element
-    : type identifier?
+    : type_ identifier?
     ;
 
 enum_type
@@ -282,13 +282,13 @@ type_argument_list
     ;
 
 type_argument
-    : type
+    : type_
     | type_parameter nullable_type_annotation?
     ;
 
 // Source: §8.5 Type parameters
 type_parameter
-    : identifier
+    : identifier { this.OnTypeParameter(); }
     ;
 
 // Source: §8.8 Unmanaged types
@@ -304,8 +304,8 @@ variable_reference
 
 // Source: §11.2.1 General
 pattern
-    : declaration_pattern
-    | constant_pattern
+    : {this.IsDeclarationPatternAhead()}? declaration_pattern
+    | {this.IsConstantPatternAhead()}?    constant_pattern
     | var_pattern
     | positional_pattern
     | property_pattern
@@ -314,7 +314,7 @@ pattern
 
 // Source: §11.2.2 Declaration pattern
 declaration_pattern
-    : type simple_designation
+    : type_ simple_designation
     ;
 
 simple_designation
@@ -355,7 +355,7 @@ designations
 
 // Source: §11.2.5 Positional pattern
 positional_pattern
-    : type? '(' subpatterns? ')' property_subpattern? simple_designation?
+    : type_? '(' subpatterns? ')' property_subpattern? simple_designation?
     ;
 
 subpatterns
@@ -369,7 +369,7 @@ subpattern
 
 // Source: §11.2.6 Property pattern
 property_pattern
-    : type? property_subpattern simple_designation?
+    : type_? property_subpattern simple_designation?
     ;
 
 property_subpattern
@@ -586,18 +586,18 @@ null_conditional_projection_initializer
     ;
 
 // Source: §12.8.9.1 General
-null_forgiving_expression
-    : primary_expression null_forgiving_operator
-    ;
+//null_forgiving_expression
+//    : primary_expression null_forgiving_operator
+//    ;
 
 null_forgiving_operator
     : '!'
     ;
 
 // Source: §12.8.10.1 General
-invocation_expression
-    : primary_expression '(' argument_list? ')'
-    ;
+//invocation_expression
+//    : primary_expression '(' argument_list? ')'
+//    ;
 
 // Source: §12.8.11 Null Conditional Invocation Expression
 null_conditional_invocation_expression
@@ -606,9 +606,9 @@ null_conditional_invocation_expression
     ;
 
 // Source: §12.8.12.1 General
-element_access
-    : primary_expression '[' argument_list ']'
-    ;
+//element_access
+//    : primary_expression '[' argument_list ']'
+//    ;
 
 // Source: §12.8.13 Null Conditional Element Access
 null_conditional_element_access
@@ -638,8 +638,8 @@ post_decrement_expression
 
 // Source: §12.8.17.2.1 General
 object_creation_expression
-    : 'new' type '(' argument_list? ')' object_or_collection_initializer?
-    | 'new' type object_or_collection_initializer
+    : 'new' type_ '(' argument_list? ')' object_or_collection_initializer?
+    | 'new' type_ object_or_collection_initializer
     ;
 
 object_or_collection_initializer
@@ -727,7 +727,7 @@ delegate_creation_expression
 
 // Source: §12.8.18 The typeof operator
 typeof_expression
-    : 'typeof' '(' type ')'
+    : 'typeof' '(' type_ ')'
     | 'typeof' '(' unbound_type_name ')'
     | 'typeof' '(' 'void' ')'
     ;
@@ -768,7 +768,7 @@ reftype_expression
 
 // MS extension: typed reference operators (__makeref, __reftype, __refvalue)
 refvalue_expression
-    : '__refvalue' '(' expression ',' type ')'
+    : '__refvalue' '(' expression ',' type_ ')'
     ;
 
 // Source: §12.8.20 The checked and unchecked operators
@@ -787,7 +787,7 @@ default_value_expression
     ;
 
 explicitly_typed_default
-    : 'default' '(' type ')'
+    : 'default' '(' type_ ')'
     ;
 
 default_literal
@@ -855,8 +855,11 @@ pre_decrement_expression
     ;
 
 // Source: §12.9.8 Cast expressions
+// The semantic predicate checks the first token inside '(' against the symbol
+// table.  If it is a known type name we prefer cast_expression over the
+// parenthesised_expression alternative of primary_expression.
 cast_expression
-    : '(' type ')' unary_expression
+    : {this.IsCastExpressionAhead()}? '(' type_ ')' unary_expression
     ;
 
 // Source: §12.9.9.1 General
@@ -916,9 +919,9 @@ relational_expression
     | relational_expression '>' shift_expression
     | relational_expression '<=' shift_expression
     | relational_expression '>=' shift_expression
-    | relational_expression 'is' type
+    | relational_expression 'is' type_
     | relational_expression 'is' pattern
-    | relational_expression 'as' type
+    | relational_expression 'as' type_
     ;
 
 equality_expression
@@ -972,7 +975,7 @@ declaration_expression
     ;
 
 local_variable_type
-    : type
+    : type_
     | 'var'
     ;
 
@@ -1008,7 +1011,7 @@ explicit_anonymous_function_parameter_list
     ;
 
 explicit_anonymous_function_parameter
-    : anonymous_function_parameter_modifier? type identifier
+    : anonymous_function_parameter_modifier? type_ identifier
     ;
 
 anonymous_function_parameter_modifier
@@ -1044,7 +1047,7 @@ query_expression
     ;
 
 from_clause
-    : 'from' type? identifier 'in' expression
+    : 'from' type_? identifier 'in' expression
     ;
 
 query_body
@@ -1069,12 +1072,12 @@ where_clause
     ;
 
 join_clause
-    : 'join' type? identifier 'in' expression 'on' expression
+    : 'join' type_? identifier 'in' expression 'on' expression
       'equals' expression
     ;
 
 join_into_clause
-    : 'join' type? identifier 'in' expression 'on' expression
+    : 'join' type_? identifier 'in' expression 'on' expression
       'equals' expression 'into' identifier
     ;
 
@@ -1172,7 +1175,9 @@ embedded_statement
 
 // Source: §13.3.1 General
 block
-    : '{' statement_list? '}'
+    : '{' { this.EnterBlockScope(); }
+        statement_list?
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §13.3.2 Statement lists
@@ -1200,9 +1205,9 @@ declaration_statement
 
 // Source: §13.6.2.1 General
 local_variable_declaration
-    : implicitly_typed_local_variable_declaration
-    | explicitly_typed_local_variable_declaration
-    | explicitly_typed_ref_local_variable_declaration
+    : {this.IsImplicitlyTypedLocalVariable()}? implicitly_typed_local_variable_declaration
+    | {this.IsExplicitlyTypedLocalVariable()}? explicitly_typed_local_variable_declaration
+    | {this.IsExplicitlyTypedRefLocalVariable()}? explicitly_typed_ref_local_variable_declaration
     ;
 
 // Source: §13.6.2.2 Implicitly typed local variable declarations
@@ -1217,7 +1222,8 @@ implicitly_typed_local_variable_declarator
 
 // Source: §13.6.2.3 Explicitly typed local variable declarations
 explicitly_typed_local_variable_declaration
-    : type explicitly_typed_local_variable_declarators
+    : type_ { this.BeginVariableDeclaration(); }
+      explicitly_typed_local_variable_declarators
     ;
 
 explicitly_typed_local_variable_declarators
@@ -1226,7 +1232,8 @@ explicitly_typed_local_variable_declarators
     ;
 
 explicitly_typed_local_variable_declarator
-    : identifier ('=' local_variable_initializer)?
+    : identifier { this.OnVariableDeclarator(); }
+      ('=' local_variable_initializer)?
     ;
 
 local_variable_initializer
@@ -1236,7 +1243,7 @@ local_variable_initializer
 
 // Source: §13.6.2.4 Explicitly typed ref local variable declarations
 explicitly_typed_ref_local_variable_declaration
-    : ref_kind type ref_local_variable_declarators
+    : ref_kind type_ ref_local_variable_declarators
     ;
 
 ref_local_variable_declarators
@@ -1249,7 +1256,7 @@ ref_local_variable_declarator
 
 // Source: §13.6.3 Local constant declarations
 local_constant_declaration
-    : 'const' type constant_declarators
+    : 'const' type_ constant_declarators
     ;
 
 constant_declarators
@@ -1302,7 +1309,8 @@ expression_statement
 
 statement_expression
     : null_conditional_invocation_expression
-    | invocation_expression
+// BUGBUG BUG    | invocation_expression
+ | primary_expression
     | object_creation_expression
     | assignment
     | post_increment_expression
@@ -1456,7 +1464,7 @@ specific_catch_clause
     ;
 
 exception_specifier
-    : '(' type identifier? ')'
+    : '(' type_ identifier? ')'
     ;
 
 exception_filter
@@ -1527,8 +1535,10 @@ qualified_identifier
     ;
 
 namespace_body
-    : '{' extern_alias_directive* using_directive*
-      namespace_member_declaration* '}'
+    : '{' { this.EnterNamespaceScope(); }
+        extern_alias_directive* using_directive*
+        namespace_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §14.4 Extern alias directives
@@ -1546,11 +1556,13 @@ using_directive
 // Source: §14.5.2 Using alias directives
 using_alias_directive
     : 'using' identifier '=' namespace_or_type_name ';'
+      { this.OnUsingAliasDirective(); }
     ;
 
 // Source: §14.5.3 Using namespace directives
 using_namespace_directive
     : 'using' namespace_name ';'
+      { this.OnUsingNamespaceDirective(); }
     ;
 
 // Source: §14.5.4 Using static directives
@@ -1609,8 +1621,8 @@ decorated_type_parameter
 
 // Source: §15.2.4.1 General
 class_base
-    : ':' class_type
-    | ':' interface_type_list
+    : {this.IsClassBaseInterfaceList()}? ':' interface_type_list
+    | {this.IsClassBaseClassType()}?     ':' class_type
     | ':' class_type ',' interface_type_list
     ;
 
@@ -1652,7 +1664,9 @@ constructor_constraint
 
 // Source: §15.2.6 Class body
 class_body
-    : '{' class_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        class_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §15.3.1 General
@@ -1672,7 +1686,7 @@ class_member_declaration
 
 // Source: §15.4 Constants
 constant_declaration
-    : attributes? constant_modifier* 'const' type constant_declarators ';'
+    : attributes? constant_modifier* 'const' type_ constant_declarators ';'
     ;
 
 constant_modifier
@@ -1685,7 +1699,8 @@ constant_modifier
 
 // Source: §15.5.1 General
 field_declaration
-    : attributes? field_modifier* type variable_declarators ';'
+    : attributes? field_modifier* type_ { this.BeginVariableDeclaration(); }
+      variable_declarators ';'
     ;
 
 field_modifier
@@ -1705,7 +1720,8 @@ variable_declarators
     ;
 
 variable_declarator
-    : identifier ('=' variable_initializer)?
+    : identifier { this.OnVariableDeclarator(); }
+      ('=' variable_initializer)?
     ;
 
 // Source: §15.6.1 General
@@ -1761,7 +1777,7 @@ return_type
     ;
 
 ref_return_type
-    : type
+    : type_
     ;
 
 member_name
@@ -1794,7 +1810,7 @@ fixed_parameters
     ;
 
 fixed_parameter
-    : attributes? parameter_modifier? type identifier default_argument?
+    : attributes? parameter_modifier? type_ identifier default_argument?
     | '__arglist'                                                          // MS extension
     ;
 
@@ -1820,8 +1836,8 @@ parameter_array
 
 // Source: §15.7.1 General
 property_declaration
-    : attributes? property_modifier* type member_name property_body
-    | attributes? property_modifier* ref_kind type member_name ref_property_body
+    : attributes? property_modifier* type_ member_name property_body
+    | attributes? property_modifier* ref_kind type_ member_name ref_property_body
     ;    
 
 property_modifier
@@ -1897,8 +1913,8 @@ ref_accessor_body
 
 // Source: §15.8.1 General
 event_declaration
-    : attributes? event_modifier* 'event' type variable_declarators ';'
-    | attributes? event_modifier* 'event' type member_name
+    : attributes? event_modifier* 'event' type_ variable_declarators ';'
+    | attributes? event_modifier* 'event' type_ member_name
         '{' event_accessor_declarations '}'
     ;
 
@@ -1953,8 +1969,8 @@ indexer_modifier
     ;
 
 indexer_declarator
-    : type 'this' '[' parameter_list ']'
-    | type interface_type '.' 'this' '[' parameter_list ']'
+    : type_ 'this' '[' parameter_list ']'
+    | type_ interface_type '.' 'this' '[' parameter_list ']'
     ;
 
 indexer_body
@@ -1986,7 +2002,7 @@ operator_declarator
     ;
 
 unary_operator_declarator
-    : type 'operator' overloadable_unary_operator '(' fixed_parameter ')'
+    : type_ 'operator' overloadable_unary_operator '(' fixed_parameter ')'
     ;
 
 logical_negation_operator
@@ -1998,7 +2014,7 @@ overloadable_unary_operator
     ;
 
 binary_operator_declarator
-    : type 'operator' overloadable_binary_operator
+    : type_ 'operator' overloadable_binary_operator
         '(' fixed_parameter ',' fixed_parameter ')'
     ;
 
@@ -2008,8 +2024,8 @@ overloadable_binary_operator
     ;
 
 conversion_operator_declarator
-    : 'implicit' 'operator' type '(' fixed_parameter ')'
-    | 'explicit' 'operator' type '(' fixed_parameter ')'
+    : 'implicit' 'operator' type_ '(' fixed_parameter ')'
+    | 'explicit' 'operator' type_ '(' fixed_parameter ')'
     ;
 
 operator_body
@@ -2109,7 +2125,9 @@ struct_interfaces
 
 // Source: §16.2.6 Struct body
 struct_body
-    : '{' struct_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        struct_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §16.3.1 General
@@ -2180,7 +2198,9 @@ interface_base
 
 // Source: §19.3 Interface body
 interface_body
-    : '{' interface_member_declaration* '}'
+    : '{' { this.EnterTypeScope(); }
+        interface_member_declaration*
+      '}' { this.ExitCurrentScope(); }
     ;
 
 // Source: §19.4.1 General
@@ -2348,14 +2368,14 @@ pointer_indirection_expression
     ;
 
 // Source: §24.6.3 Pointer member access
-pointer_member_access
-    : primary_expression '->' identifier type_argument_list?
-    ;
+//pointer_member_access
+//    : primary_expression '->' identifier type_argument_list?
+//    ;
 
 // Source: §24.6.4 Pointer element access
-pointer_element_access
-    : primary_expression '[' expression ']'
-    ;
+//pointer_element_access
+//    : primary_expression '[' expression ']'
+//    ;
 
 // Source: §24.6.5 The address-of operator
 addressof_expression
@@ -2395,7 +2415,7 @@ fixed_size_buffer_modifier
     ;
 
 buffer_element_type
-    : type
+    : type_
     ;
 
 fixed_size_buffer_declarators
