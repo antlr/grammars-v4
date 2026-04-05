@@ -208,6 +208,7 @@
 				<module>fusion-tables</module>
 				<module>gdscript</module>
 				<module>gedcom</module>
+                <module>geekcode</module>
 				<module>gff3</module>
 				<module>glsl</module>
 				<module>gml</module>
