@@ -1,3 +1,18 @@
+# Using the Grammar
+
+To correctly parse the language, you **must run the `RFilter` before using the main parser**.
+
+## Why `RFilter` is required
+
+The language uses **newline tokens (`NL`) whose meaning depends on the syntactic context**.
+In some cases a newline should behave like a statement separator, while in other contexts it must be ignored.
+
+`RFilter` is implemented as a secondary grammar (`RFilter.g4`) that processes the token stream produced by the lexer and adjusts the visibility of newline tokens. Specifically, it hides newline tokens that should not be treated as statement separators.
+
+## Example
+
+```java
+
 import org.antlr.v4.runtime.*;
 
 import java.io.FileInputStream;
@@ -33,3 +48,5 @@ public class TestR {
 		System.out.println(tree.toStringTree(parser));
 	}
 }
+
+```

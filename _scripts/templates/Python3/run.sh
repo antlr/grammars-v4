@@ -1,1 +1,2 @@
-python3 Test.py "$@"
+if [ -f .venv/bin/activate ]; then source .venv/bin/activate; fi
+python Test.py "$@"

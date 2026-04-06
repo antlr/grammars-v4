@@ -52,4 +52,18 @@ export default class PlSqlParserBase extends antlr4.Parser {
       return false;
     return true;
   }
+
+  isNotStartOfJoin() {
+    const lt1 = this.getTokenStream().LT(1);
+    if (lt1.type == PlSqlLexer.INNER ||
+        lt1.type == PlSqlLexer.CROSS ||
+        lt1.type == PlSqlLexer.NATURAL ||
+        lt1.type == PlSqlLexer.PARTITION ||
+        lt1.type == PlSqlLexer.FULL ||
+        lt1.type == PlSqlLexer.LEFT ||
+        lt1.type == PlSqlLexer.RIGHT ||
+        lt1.type == PlSqlLexer.OUTER)
+        return false;
+    return true;
+  }
 }

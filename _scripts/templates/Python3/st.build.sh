@@ -9,10 +9,17 @@ if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 # parser and lexer.
 version=`grep antlr4-python3-runtime requirements.txt | awk -F= '{print $3}' | tr -d '\r' | tr -d '\n'`
 
+python3 -m venv .venv
+source .venv/bin/activate
+
 <if(antlrng_tool)>
 npm init -y
 npm i antlr-ng
+<else>
+.venv/bin/pip install antlr4-tools
 <endif>
+
+.venv/bin/pip install -r requirements.txt
 
 <tool_grammar_tuples:{x |
 <if(antlrng_tool)>
@@ -21,7 +28,5 @@ tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Python3 
 antlr4 -v $version -encoding <antlr_encoding> -Dlanguage=Python3 <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 <endif>
 }>
-
-pip install -r requirements.txt
 
 exit 0

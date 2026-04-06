@@ -1,4 +1,6 @@
 # Generated from trgen <version>
+# Get-Content build.ps1 | Write-Host
+
 if (Test-Path -Path transformGrammar.py -PathType Leaf) {
     $(& python3 transformGrammar.py ) 2>&1 | Write-Host
 }
@@ -9,9 +11,15 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 # parser and lexer.
 $version = (Select-String -Path "requirements.txt" -Pattern "antlr4" | ForEach-Object {$_.Line.Split("=")[2]}) -replace '"|,|\r|\n'
 
+python3 -m venv .venv
+<if(test.IsWindows)>.venv\Scripts\Activate.ps1<else>.venv/bin/Activate.ps1<endif>
+<if(test.IsWindows)>.venv\Scripts\pip<else>.venv/bin/pip<endif> install -r requirements.txt
+
 <if(antlrng_tool)>
 npm init -y
 npm i antlr-ng
+<else>
+<if(test.IsWindows)>.venv\Scripts\pip<else>.venv/bin/pip<endif> install antlr4-tools
 <endif>
 
 <tool_grammar_tuples:{x |
@@ -20,10 +28,6 @@ $(& tsx $HOME/antlr-ng/cli/runner.ts --encoding <antlr_encoding> -Dlanguage=Pyth
 <else>
 $(& antlr4 -v $version <x.GrammarFileNameTarget> -encoding <antlr_encoding> -Dlanguage=Python3 <x.AntlrArgs> <antlr_tool_args:{y | <y> } > ; $compile_exit_code = $LASTEXITCODE) | Write-Host
 <endif>
-if($compile_exit_code -ne 0){
-    exit $compile_exit_code
-\}
 }>
 
-$(& pip install -r requirements.txt ; $compile_exit_code = $LASTEXITCODE ) | Write-Host
 exit $compile_exit_code

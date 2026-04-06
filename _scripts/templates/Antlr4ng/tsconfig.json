@@ -3,6 +3,7 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "target": "ESNext",
+    "types": ["node"],
   },
   "ts-node": {
     "esm": true,

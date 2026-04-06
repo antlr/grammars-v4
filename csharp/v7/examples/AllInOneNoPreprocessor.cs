@@ -49,6 +49,9 @@ namespace My
         { 
         }
 
+        void @checked(int x) {}
+        void @unchecked(int x) {}
+    
         [method: Obsolete]
         public A([param: Obsolete] int foo) :
             base(1)
@@ -129,7 +132,7 @@ namespace My
             var remove = 0;
             var select = 0;
             var set = 0;
-			var var = 0;
+            var var = 0;
             var when = 0;
             var where = 0;
             var yield = 0;
@@ -222,11 +225,11 @@ namespace My
             }
             checked
             {
-                checked(++i);
+                @checked(++i);
             }
             unchecked
             {
-                unchecked(++i);
+                @unchecked(++i);
             }
             lock (sync)
                 process();
@@ -617,71 +620,6 @@ namespace Comments.XmlComments.UndocumentedKeywords
 
     class TestClassXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX22/*Scen9*/{ }
 
-    class yield
-    {
-        void Foo<U>(__arglist)
-        {
-            C<U> c = null;
-            c.M<int>(5, default(U));
-            TypedReference tr = __makeref(c);
-            Type t = __reftype(tr);
-            int j = __refvalue(tr, int);
-            Params(a: t, b: t);
-            Params(ref c, out c);
-        }
-        void Params(ref dynamic a, out dynamic b, params dynamic[] c) {}
-        void Params(out dynamic a = 2, ref dynamic c = default(dynamic), params dynamic[][] c) {}
-
-        public override string ToString() { return base.ToString(); } 
-
-        public partial void OnError();
-
-        public partial void method()
-        {
-            int?[] a = new int?[5];/*[] bug*/ // YES []
-            int[] var = { 1, 2, 3, 4, 5 };/*,;*/
-            int i = a[i];/*[]*/
-            Foo<T> f = new Foo<int>();/*<> ()*/
-            f.method();/*().*/
-            i = i + i - i * i / i % i & i | i ^ i;/*+ - * / % & | ^*/
-            bool b = true & false | true ^ false;/*& | ^*/
-            b = !b;/*!*/
-            i = ~i;/*~i*/
-            b = i < i && i > i;/*< && >*/
-            int? ii = 5;/*? bug*/ // NO ?
-            int f = true ? 1 : 0;/*? :*/   // YES :
-            i++;/*++*/
-            i--;/*--*/
-            b = true && false || true;/*&& ||*/
-            i << 5;/*<<*/
-            i >> 5;/*>>*/
-            b = i == i && i != i && i <= i && i >= i;/*= == && != <= >=*/
-            i += 5.0;/*+=*/
-            i -= i;/*-=*/
-            i *= i;/**=*/
-            i /= i;/*/=*/
-            i %= i;/*%=*/
-            i &= i;/*&=*/
-            i |= i;/*|=*/
-            i ^= i;/*^=*/
-            i <<= i;/*<<=*/
-            i >>= i;/*>>=*/
-            object s = x => x + 1;/*=>*/
-            double d = .3;
-            Point point;
-            unsafe
-            {
-                Point* p = &point;/** &*/
-                p->x = 10;/*->*/
-            }
-            IO::BinaryReader br = null;
-            x[i: 1] = 3;
-            x[i: 1, j: 5] = "str";
-        }
-
-        struct Point { public int X; public int Y; public void ThisAccess() { this = this; } }
-    }
-    
     // From here:https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6
     class CSharp6Features
     {
@@ -784,22 +722,22 @@ class CSharp70
         if (expr is Type v) { Hello(); }
     }
 
-	public static async Task LocalFunctions(string[] args)
-	{
-		string Hello2(int i)
+    public static async Task LocalFunctions(string[] args)
+    {
+            string Hello2(int i)
         {
             return args[i];
         }
 
-		async Task<string> Hello<T>(T i) => await Task.FromResult(args[i]);
-		await Hello(1);
-	}
+        async Task<string> Hello<T>(T i) => await Task.FromResult(args[i]);
+        await Hello(1);
+    }
 
-	public static void OutVar(string[] args)
-	{
-		int.TryParse(Hello(1), out var item);
-		int.TryParse(Hello(1), out int item);
-	}
+    public static void OutVar(string[] args)
+    {
+        int.TryParse(Hello(1), out var item);
+        int.TryParse(Hello(1), out int item);
+    }
 
     public void ThrowExpression()
     {
@@ -837,9 +775,10 @@ class CSharp71
 class CSharp72
 {
     readonly struct ReadonlyRef1
-    {    
+    {
         Func<int, int> s = (in int x) => x;
-        ref TValue this[in TKey index] => null;
+        TValue _value;
+        ref readonly TValue this[in TKey index] => ref _value;
         public static Vector3 operator+(in Vector3 x, in Vector3 y) => null;
 
         static readonly ref Vector3 M1_Trace()
@@ -975,101 +914,101 @@ class CSharp73
 /*
 namespace CSharp80
 {
-	class CSharp80ExceptInterfaceDefaultImplement
-	{
-		void ReferenceNullable()
-		{
-			var? x = E;
-			x!.ToString();
-			string? wtf = null;
-			int?[]? hello;
-		}
+    class CSharp80ExceptInterfaceDefaultImplement
+    {
+        void ReferenceNullable()
+        {
+            var? x = E;
+            x!.ToString();
+            string? wtf = null;
+            int?[]? hello;
+        }
 
-		void Patterns()
-		{
-			if (o is string { Length: 5 } s) Do();
-			
-			return lang.CountOfTokens switch
-			{
-				1 => 100,
-				2 => 200,
-				_ => throw new global::System.Exception()
-			};
+        void Patterns()
+        {
+            if (o is string { Length: 5 } s) Do();
+            
+            return lang.CountOfTokens switch
+            {
+                1 => 100,
+                2 => 200,
+                _ => throw new global::System.Exception()
+            };
 
-			var newState = (GetState(), action, hasKey) switch
-			{
-				(DoorState.Closed, Action.Open, _) => DoorState.Opened,
-				(DoorState.Opened, Action.Close, _) => DoorState.Closed,
-				(DoorState.Closed, Action.Lock, true) => DoorState.Locked,
-				(DoorState.Locked, Action.Unlock, true) => DoorState.Closed,
-				(var state, _, _) => state
-			};
-		}
+            var newState = (GetState(), action, hasKey) switch
+            {
+                (DoorState.Closed, Action.Open, _) => DoorState.Opened,
+                (DoorState.Opened, Action.Close, _) => DoorState.Closed,
+                (DoorState.Closed, Action.Lock, true) => DoorState.Locked,
+                (DoorState.Locked, Action.Unlock, true) => DoorState.Closed,
+                (var state, _, _) => state
+            };
+        }
 
-		async Task AsyncStreams()
-		{
-			await foreach (var item in asyncEnumerables)
-			{
-			}
-		}
+        async Task AsyncStreams()
+        {
+            await foreach (var item in asyncEnumerables)
+            {
+            }
+        }
 
-		void Ranges()
-		{
-			var thirdItem = list[2];                // list[2]
-			var lastItem = list[^1];                // list[Index.CreateFromEnd(1)]
-			var multiDimensional = list[3, ^2];     // list[3, Index.CreateFromEnd(2)]
+        void Ranges()
+        {
+            var thirdItem = list[2];                // list[2]
+            var lastItem = list[^1];                // list[Index.CreateFromEnd(1)]
+            var multiDimensional = list[3, ^2];     // list[3, Index.CreateFromEnd(2)]
 
-			var slice1 = list[2..^3];               // list[Range.Create(2, Index.CreateFromEnd(3))]
-			var slice2 = list[..^3];                // list[Range.ToEnd(Index.CreateFromEnd(3))]
-			var slice3 = list[2..];                 // list[Range.FromStart(2)]
-			var slice4 = list[..];                  // list[Range.All]
-			var multiDimensional = list[1..2, ..];  // list[Range.Create(1, 2), Range.All]
-		}
+            var slice1 = list[2..^3];               // list[Range.Create(2, Index.CreateFromEnd(3))]
+            var slice2 = list[..^3];                // list[Range.ToEnd(Index.CreateFromEnd(3))]
+            var slice3 = list[2..];                 // list[Range.FromStart(2)]
+            var slice4 = list[..];                  // list[Range.All]
+            var multiDimensional = list[1..2, ..];  // list[Range.Create(1, 2), Range.All]
+        }
 
-		void UsingDeclarators()
-		{
-			using var item = new FileStream("./.f");
-			fixed char* ch = "hell";
-			item.Dispose(); // no!
-		}
+        void UsingDeclarators()
+        {
+            using var item = new FileStream("./.f");
+            fixed char* ch = "hell";
+            item.Dispose(); // no!
+        }
 
-		void StaticLocalFunction()
-		{
-			static unsafe void Func1() {}
-			static unsafe void Func1() {}
-			async static void Func2() {}
-			static async void Func2() {}
-		}
+        void StaticLocalFunction()
+        {
+            static unsafe void Func1() {}
+            static unsafe void Func1() {}
+            async static void Func2() {}
+            static async void Func2() {}
+        }
 
-		void NullCoalescingAssignment()
-		{
-			var item = a ??= b ??= c ??= d ??= throw new Exception();
-		}
+        void NullCoalescingAssignment()
+        {
+            var item = a ??= b ??= c ??= d ??= throw new Exception();
+        }
 
-		public readonly float Hello()
-		{
-			return 0.1f;
-		}
-	}
+        public readonly float Hello()
+        {
+            return 0.1f;
+        }
+    }
 
-	interface IA
-	{
-		void M() { WriteLine("IA.M"); }
-	}
+    interface IA
+    {
+        void M() { WriteLine("IA.M"); }
+    }
 
-	interface IA
-	{
-		void M() { WriteLine("IA.M"); }
-	}
+    interface IA
+    {
+        void M() { WriteLine("IA.M"); }
+    }
 
-	interface IB : IA
-	{
-		override void IA.M() { WriteLine("IB.M"); } // explicitly named
-	}
+    interface IB : IA
+    {
+        override void IA.M() { WriteLine("IB.M"); } // explicitly named
+    }
 
-	interface IC : IA
-	{
-		override void M() { WriteLine("IC.M"); } // implicitly named
-	}
+    interface IC : IA
+    {
+        override void M() { WriteLine("IC.M"); } // implicitly named
+    }
 }
 */

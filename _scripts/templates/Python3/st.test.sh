@@ -3,6 +3,9 @@
 # Uncomment for debugging.
 #set -x
 
+# Activate venv if present so that 'python3' resolves to the venv interpreter.
+if [ -f .venv/bin/activate ]; then source .venv/bin/activate; fi
+
 # glob patterns
 shopt -s globstar
 
