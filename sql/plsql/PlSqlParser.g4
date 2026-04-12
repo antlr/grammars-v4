@@ -6458,7 +6458,7 @@ values_clause
     ;
 
 merge_statement
-    : MERGE INTO tableview_name table_alias? USING selected_tableview ON '(' condition ')' (
+    : MERGE INTO selected_tableview table_alias? USING selected_tableview ON '(' condition ')' (
         merge_update_clause merge_insert_clause?
         | merge_insert_clause merge_update_clause?
     )? error_logging_clause?
@@ -6932,12 +6932,12 @@ numeric_function_wrapper
     ;
 
 numeric_function
-    : SUM '(' (DISTINCT | ALL)? expression ')' over_clause?
-    | COUNT '(' (ASTERISK | ((DISTINCT | UNIQUE | ALL)? concatenation)?) ')' over_clause?
-    | ROUND '(' expression (',' UNSIGNED_INTEGER)? ')'
-    | AVG '(' (DISTINCT | ALL)? expression ')' over_clause?
-    | MIN '(' (DISTINCT | ALL)? expression ')' over_clause?
-    | MAX '(' (DISTINCT | ALL)? expression ')' over_clause?
+    : SUM '(' (DISTINCT | ALL)? expression ')' (over_clause | keep_clause)?
+    | COUNT '(' (ASTERISK | ((DISTINCT | UNIQUE | ALL)? concatenation)?) ')' (over_clause | keep_clause)?
+    | ROUND '(' expression (',' (UNSIGNED_INTEGER | expression))? ')'
+    | AVG '(' (DISTINCT | ALL)? expression ')' (over_clause | keep_clause)?
+    | MIN '(' (DISTINCT | ALL)? expression ')' (over_clause | keep_clause)?
+    | MAX '(' (DISTINCT | ALL)? expression ')' (over_clause | keep_clause)?
     | LEAST '(' expressions_ ')'
     | GREATEST '(' expressions_ ')'
     ;
