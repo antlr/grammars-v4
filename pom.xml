@@ -16,7 +16,7 @@
 		version of antlr4test-maven-plugin.version. When Antlr
 		is release, the plugin has to be updated. -->
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
-		<antlr.version>4.11.1</antlr.version>
+		<antlr.version>4.13.2</antlr.version>
 
 		<junit.version>4.13.2</junit.version>
 
