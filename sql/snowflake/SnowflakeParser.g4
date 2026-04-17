@@ -4535,7 +4535,7 @@ ignore_or_repect_nulls
 ranking_windowed_function
     : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
     | NTILE '(' expr ')' over_clause
-    | (LEAD | LAG) LR_BRACKET expr (COMMA expr COMMA expr)? RR_BRACKET ignore_or_repect_nulls? over_clause
+    | (LEAD | LAG) LR_BRACKET expr (COMMA expr (COMMA expr)?)? RR_BRACKET ignore_or_repect_nulls? over_clause
     | (FIRST_VALUE | LAST_VALUE) LR_BRACKET expr RR_BRACKET ignore_or_repect_nulls? over_clause
     ;
 
