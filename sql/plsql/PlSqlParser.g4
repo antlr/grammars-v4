@@ -7855,6 +7855,7 @@ regular_id
     | VAR_
     | VALUE
     | COVAR_
+    | DATE_FORMAT
     ;
 
 non_reserved_keywords_in_18c
