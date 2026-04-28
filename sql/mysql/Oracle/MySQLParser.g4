@@ -163,7 +163,7 @@ alterDatabaseOption
 alterEvent
     : definerClause? EVENT_SYMBOL eventRef (ON_SYMBOL SCHEDULE_SYMBOL schedule)? (
         ON_SYMBOL COMPLETION_SYMBOL NOT_SYMBOL? PRESERVE_SYMBOL
-    )? (RENAME_SYMBOL TO_SYMBOL identifier)? (
+    )? (RENAME_SYMBOL TO_SYMBOL qualifiedIdentifier)? (
         ENABLE_SYMBOL
         | DISABLE_SYMBOL (ON_SYMBOL replica)?
     )? (COMMENT_SYMBOL textLiteral)? (DO_SYMBOL compoundStatement)?
@@ -2355,7 +2355,7 @@ optionValueListContinued
 
 optionValueNoOptionType
     : lvalueVariable equal setExprOrDefault
-    | charsetClause
+    | charset (charsetName | DEFAULT_SYMBOL)
     | userVariable equal expr
     | AT_AT_SIGN_SYMBOL setVarIdentType? lvalueVariable equal setExprOrDefault
     | NAMES_SYMBOL (
@@ -3839,12 +3839,10 @@ functionDatetimePrecision
 charsetName
     : textOrIdentifier
     | BINARY_SYMBOL
-    | {this.isServerVersionLt80011()}? DEFAULT_SYMBOL
     ;
 
 collationName
     : textOrIdentifier
-    | {this.isServerVersionLt80011()}? DEFAULT_SYMBOL
     | {this.isServerVersionGe80018()}? BINARY_SYMBOL
     ;
 
