@@ -14,8 +14,9 @@
 <http://example.org/search?q=turtle&lang=en> <http://www.w3.org/2000/01/rdf-schema#comment> "Query IRI" .
 
 # IRI with allowed special characters (!, $, ', (, ), *, +, ,, -, ., _, ~)
-<http://example.org/path/with-dashes_and.dots~here> <http://example.org/predicate> "special chars" .
-<http://example.org/path/(parentheses)/and!exclamation> <http://example.org/predicate> "more special chars" .
+<http://example.org/path/with-dashes_and.dots~here> <http://example.org/predicate> "special chars: - _ . ~" .
+<http://example.org/path/(parentheses)/and!exclamation> <http://example.org/predicate> "special chars: ( ) !" .
+<http://example.org/path/$dollar,'quote,*star,+plus> <http://example.org/predicate> "special chars: $ , ' * +" .
 
 # IRI with percent-encoding (allowed since % is not in the excluded set)
 <http://example.org/caf%C3%A9> <http://www.w3.org/2000/01/rdf-schema#label> "Café" .
