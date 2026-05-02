@@ -6458,10 +6458,10 @@ values_clause
     ;
 
 merge_statement
-    : MERGE INTO selected_tableview table_alias? USING selected_tableview ON '(' condition ')' (
+    : MERGE INTO selected_tableview USING selected_tableview ON '(' condition ')' (
         merge_update_clause merge_insert_clause?
         | merge_insert_clause merge_update_clause?
-    )? error_logging_clause?
+    ) error_logging_clause?
     ;
 
 // Merge Specific Clauses
