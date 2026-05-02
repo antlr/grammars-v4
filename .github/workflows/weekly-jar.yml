@@ -1,0 +1,28 @@
+name: Weekly All-Grammars JAR
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'   # every Monday at 03:00 UTC
+  workflow_dispatch:        # allow manual triggering
+
+jobs:
+  build-all-grammars-jar:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        cache: 'maven'
+    - name: Build all grammars and assemble combined JAR
+      run: bash _scripts/assemble-all-grammars.sh
+    - name: Upload combined JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: all-grammars
+        path: target/all-grammars-1.0-SNAPSHOT.jar
+        retention-days: 90
