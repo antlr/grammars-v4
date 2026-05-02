@@ -111,7 +111,8 @@ jobs:
         pip --version
     - name: Install Antlr tool
       run: |
-         pip install antlr4-tools
+         pip install _scripts/antlr4-tools
+         pip show antlr4-tools
     - name: Install JavaScript
       uses: actions/setup-node@v6.4.0
       with:
@@ -240,7 +241,8 @@ jobs:
         pip --version
     - name: Install Antlr tool
       run: |
-         pip install antlr4-tools
+         pip install _scripts/antlr4-tools
+         pip show antlr4-tools
     - name: Install Trash
       shell: bash
       run: |
