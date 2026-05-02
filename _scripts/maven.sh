@@ -52,7 +52,7 @@ failed_grammars=()
 for grammar in ${grammars[@]}
 do
     pushd $grammar
-    mvn -B package --file pom.xml
+    mvn -B clean test
     if [ $? -ne 0 ]; then
         failed_grammars+=( $grammar )
     fi
