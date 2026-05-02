@@ -6,7 +6,6 @@
       <inputs>examples/**/*.cs</inputs>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;TypeScript</targets>
    </test>
-   <!-- Cpp target not working. -->
    <test>
       <inputs>examples/CSharp8*.cs</inputs>
       <targets>Python3</targets>

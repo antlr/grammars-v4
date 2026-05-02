@@ -68,7 +68,7 @@ public class Program
                 if (int.TryParse(part.Trim(), out int d))
                     ambig_decisions.Add(d);
         }
-        else if (d_ambig_index >= 0 && (args[d_ambig_index].StartsWith("-ambig=")))
+        else if (d_ambig_index >= 0 && (args[d_ambig_index].StartsWith("--ambig=")))
         {
             ambig_decisions = new HashSet\<int>();
             int prefix_len = 8;
@@ -102,7 +102,7 @@ public class Program
                     var parser_startIndex = ai.startIndex;
                     var parser_stopIndex = ai.stopIndex;
                     var p = Parser.RuleNames.Select((value, index) => new { value, index })
-                        .Where(pair => (pair.value == "prog"))
+                        .Where(pair => (pair.value == "<start_symbol>"))
                         .Select(pair => pair.index).First();
                     var parser_startRuleIndex = p;
                     var parse_trees = ((MyParser)Parser).getAllPossibleParseTrees(
@@ -393,7 +393,6 @@ public class Program
                 if (token.Type == Antlr4.Runtime.TokenConstants.EOF)
                     break;
             }
-            if (show_tokens) System.Console.Error.WriteLine(new_s.ToString());
             total_count += i;
             if (show_tokens) System.Console.Error.WriteLine(new_s.ToString());
             lexer.Reset();

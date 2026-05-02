@@ -307,7 +307,7 @@ pattern
     : {this.IsDeclarationPatternAhead()}? declaration_pattern
     | {this.IsConstantPatternAhead()}?    constant_pattern
     | var_pattern
-    | positional_pattern
+    | {this.IsPositionalPatternAhead()}? positional_pattern
     | property_pattern
     | discard_pattern
     ;
@@ -868,9 +868,14 @@ await_expression
     ;
 
 // Source: §12.10 Range operator
+// Original:
+//range_expression
+//    : unary_expression
+//    | unary_expression? '..' unary_expression?
+//    ;
 range_expression
-    : unary_expression
-    | unary_expression? '..' unary_expression?
+    : unary_expression ('..' unary_expression?)?
+    | '..' unary_expression?
     ;
 
 // Source: §12.11 Switch expression
@@ -958,9 +963,14 @@ conditional_or_expression
     ;
 
 // Source: §12.17 The null coalescing operator
+// Original:
+//null_coalescing_expression
+//    : conditional_or_expression
+//    | conditional_or_expression '??' null_coalescing_expression
+//    | throw_expression
+//    ;
 null_coalescing_expression
-    : conditional_or_expression
-    | conditional_or_expression '??' null_coalescing_expression
+    : conditional_or_expression ('??' null_coalescing_expression)?
     | throw_expression
     ;
 
@@ -983,11 +993,19 @@ declaration_expression
 //       ;
 
 // Source: §12.20 Conditional operator
+// Original rule before left-factoring:
+//conditional_expression
+//    : null_coalescing_expression
+//    | null_coalescing_expression '?' expression ':' expression
+//    | null_coalescing_expression '?' 'ref' variable_reference ':' 'ref' variable_reference
+//    ;
 conditional_expression
-    : null_coalescing_expression
-    | null_coalescing_expression '?' expression ':' expression
-    | null_coalescing_expression '?' 'ref' variable_reference ':'
-      'ref' variable_reference
+    : null_coalescing_expression (
+        '?' (
+            expression ':' expression
+            | 'ref' variable_reference ':' 'ref' variable_reference
+        )
+    )?
     ;
 
 // Source: §12.21.1 General
@@ -1130,9 +1148,13 @@ assignment_operator
     ;
 
 // Source: §12.24 Expression
+// Original:
+//expression
+//    : non_assignment_expression
+//    | assignment
+//    ;
 expression
-    : non_assignment_expression
-    | assignment
+    : non_assignment_expression (assignment_operator expression)?
     ;
 
 non_assignment_expression

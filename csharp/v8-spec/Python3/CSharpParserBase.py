@@ -402,7 +402,51 @@ class CSharpParserBase(Parser):
             self._input.seek(saved_index)
 
     def IsConstantPatternAhead(self):
-        return not self.IsDeclarationPatternAhead()
+        if self.IsDeclarationPatternAhead():
+            return False
+        if "." in __name__:
+            from .CSharpLexer import CSharpLexer
+            from .CSharpParser import CSharpParser
+        else:
+            from CSharpLexer import CSharpLexer
+            from CSharpParser import CSharpParser
+        from antlr4 import BailErrorStrategy
+        tok1 = self._input.LT(1)
+        if tok1 is not None and tok1.type == CSharpLexer.TK_LPAREN:
+            depth = 0
+            i = 1
+            while True:
+                tok = self._input.LT(i)
+                i += 1
+                if tok is None or tok.type < 0:
+                    break
+                if tok.type == CSharpLexer.TK_LPAREN:
+                    depth += 1
+                elif tok.type == CSharpLexer.TK_RPAREN:
+                    depth -= 1
+                    if depth == 0:
+                        break
+                elif tok.type == CSharpLexer.TK_COMMA and depth == 1:
+                    return False
+        # Identifier followed by '(' after type_ → type-headed positional pattern.
+        if tok1 is not None and tok1.type == CSharpLexer.Simple_Identifier:
+            saved_index = self._input.index
+            par = CSharpParser(self._input)
+            par.removeErrorListeners()
+            par._errHandler = BailErrorStrategy()
+            try:
+                par.type_()
+                next_tok = self._input.LT(1)
+                if next_tok is not None and next_tok.type == CSharpLexer.TK_LPAREN:
+                    return False
+            except Exception:
+                pass
+            finally:
+                self._input.seek(saved_index)
+        return True
+
+    def IsPositionalPatternAhead(self):
+        return not self.IsConstantPatternAhead()
 
     def IsImplicitlyTypedLocalVariable(self):
         if "." in __name__:

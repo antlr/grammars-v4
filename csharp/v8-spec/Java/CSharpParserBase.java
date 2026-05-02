@@ -389,7 +389,43 @@ public abstract class CSharpParserBase extends Parser
         finally { _input.seek(savedIndex); }
     }
 
-    public boolean IsConstantPatternAhead() { return !IsDeclarationPatternAhead(); }
+    public boolean IsConstantPatternAhead()
+    {
+        if (IsDeclarationPatternAhead()) return false;
+        Token t1 = ((CommonTokenStream)_input).LT(1);
+        if (t1 != null && t1.getType() == CSharpLexer.TK_LPAREN)
+        {
+            int depth = 0, i = 1;
+            while (true)
+            {
+                Token tok = ((CommonTokenStream)_input).LT(i++);
+                if (tok == null || tok.getType() == Token.EOF) break;
+                int tt = tok.getType();
+                if (tt == CSharpLexer.TK_LPAREN) depth++;
+                else if (tt == CSharpLexer.TK_RPAREN) { depth--; if (depth == 0) break; }
+                else if (tt == CSharpLexer.TK_COMMA && depth == 1) return false;
+            }
+        }
+        // Identifier followed by '(' after type_ → type-headed positional pattern.
+        if (t1 != null && t1.getType() == CSharpLexer.Simple_Identifier)
+        {
+            int savedIndex = _input.index();
+            CSharpParser par = new CSharpParser(_input);
+            par.removeErrorListeners();
+            par.setErrorHandler(new BailErrorStrategy());
+            try
+            {
+                par.type_();
+                Token next = ((CommonTokenStream)_input).LT(1);
+                if (next != null && next.getType() == CSharpLexer.TK_LPAREN) return false;
+            }
+            catch (Exception e) { }
+            finally { _input.seek(savedIndex); }
+        }
+        return true;
+    }
+
+    public boolean IsPositionalPatternAhead() { return !IsConstantPatternAhead(); }
 
     public boolean IsImplicitlyTypedLocalVariable()
     {

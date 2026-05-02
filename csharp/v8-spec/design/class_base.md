@@ -38,8 +38,8 @@ clause:
 
 ## The problem
 
-All three alternatives begin with the token `':'`.  After the colon, all three
-continue with a `type_name` — which reduces to an identifier.  ANTLR4 therefore
+All three alternatives begin with the token `':'`. After the colon, all three
+continue with a `type_name`, which reduces to an identifier. ANTLR4 therefore
 sees the same token prefix `':' IDENTIFIER` for alts 1, 2, and 3 and cannot
 choose among them by token lookahead alone.
 
@@ -47,17 +47,17 @@ The specific ambiguities are:
 
 ### Single type after the colon (e.g., `: Foo`)
 
-Both alt 1 and alt 2 match `':' type_name`.  Without the symbol table, ANTLR4
+Both alt 1 and alt 2 match `':' type_name`. Without the symbol table, ANTLR4
 cannot tell whether `Foo` is an interface (→ alt 1) or a class (→ alt 2).
-Without predicates it would always choose alt 1 (`interface_type_list`),
+Without predicates, it would always choose alt 1 (`interface_type_list`),
 misclassifying every single-base-class declaration as an interface list.
 
 ### Multiple types after the colon (e.g., `: Foo, Bar`)
 
 Both alt 1 (`interface_type_list = Foo, Bar`) and alt 3
 (`class_type = Foo ',' interface_type_list = Bar`) match `':' type_name ','
-type_name`.  Without the symbol table, ANTLR4 cannot tell whether the first
-type is a class (→ alt 3) or an interface (→ alt 1).  Without predicates it
+type_name`. Without the symbol table, ANTLR4 cannot tell whether the first
+type is a class (→ alt 3) or an interface (→ alt 1). Without predicates, it
 would always choose alt 1, misclassifying every class-plus-interfaces base
 clause.
 
@@ -144,7 +144,7 @@ selects alt 2.
 ## Open-world limitation
 
 Accurate alt 1 classification requires interface declarations to be registered
-in the symbol table before the class that implements them is parsed.  In the
+in the symbol table before the class that implements them is parsed. In the
 grammar test harness the declarations are **not** pre-registered, so all
 user-defined names default to `IsClassBaseClassType() = true` and parse as
 alt 2 or alt 3.

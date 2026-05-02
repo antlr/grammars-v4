@@ -26,7 +26,7 @@ For example, `Foo` could be:
 always syntactically distinguished by the trailing `*`.
 
 Because the three non-pointer alternatives are token-identical at `LT(1)`,
-ANTLR4 cannot resolve the choice by lookahead alone.  Without help it would
+ANTLR4 cannot resolve the choice by lookahead alone. Without help, it would
 always pick the first alternative (`type_parameter`), misclassifying every
 ordinary type as a generic type variable.
 
@@ -44,7 +44,7 @@ type_
     ;
 ```
 
-ANTLR4 evaluates the predicates in order at prediction time.  The first
+ANTLR4 evaluates the predicates in order at prediction time. The first
 predicate that returns `true` selects the corresponding alternative; execution
 never reaches a later alternative once an earlier one is chosen.
 
@@ -76,7 +76,7 @@ Returns `true` for two disjoint sets of inputs:
 
 ### `IsReferenceTypeName()`
 
-The default / open-world predicate.  Returns `true` for:
+The default, open-world predicate. Returns `true` for:
 
 * The keywords `dynamic`, `object`, `string`.
 * `[` — beginning of an `array_type`.

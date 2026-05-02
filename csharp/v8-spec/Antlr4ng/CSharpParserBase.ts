@@ -292,7 +292,26 @@ export abstract class CSharpParserBase extends Parser {
         return tok2 !== null && (tok2.type === CSharpLexer.Simple_Identifier || tok2.text === "_");
     }
 
-    IsConstantPatternAhead(): boolean { return !this.IsDeclarationPatternAhead(); }
+    IsConstantPatternAhead(): boolean {
+        if (this.IsDeclarationPatternAhead()) return false;
+        const ts = this.tokenStream;
+        if (ts.LT(1)?.type === CSharpLexer.TK_LPAREN) {
+            let depth = 0, i = 1;
+            while (true) {
+                const tok = ts.LT(i++);
+                if (!tok || tok.type < 0) break;
+                if (tok.type === CSharpLexer.TK_LPAREN) depth++;
+                else if (tok.type === CSharpLexer.TK_RPAREN) { depth--; if (depth === 0) break; }
+                else if (tok.type === CSharpLexer.TK_COMMA && depth === 1) return false;
+            }
+        }
+        // Identifier followed immediately by '(' → type-headed positional pattern.
+        if (ts.LT(1)?.type === CSharpLexer.Simple_Identifier
+                && ts.LT(2)?.type === CSharpLexer.TK_LPAREN) return false;
+        return true;
+    }
+
+    IsPositionalPatternAhead(): boolean { return !this.IsConstantPatternAhead(); }
 
     IsImplicitlyTypedLocalVariable(): boolean {
         const tok = this.tokenStream.LT(1);

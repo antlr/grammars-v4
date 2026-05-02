@@ -801,8 +801,46 @@ func (p *CSharpParserBase) IsDeclarationPatternAhead() bool {
 	return tok2 != nil && (tok2.GetTokenType() == CSharpLexerSimple_Identifier || tok2.GetText() == "_")
 }
 
-// IsConstantPatternAhead is the complement of IsDeclarationPatternAhead.
-func (p *CSharpParserBase) IsConstantPatternAhead() bool { return !p.IsDeclarationPatternAhead() }
+// IsConstantPatternAhead returns false for declaration patterns and for paren-with-comma
+// (tuple-positional) patterns, routing the latter exclusively to positional_pattern.
+func (p *CSharpParserBase) IsConstantPatternAhead() bool {
+    if p.IsDeclarationPatternAhead() {
+        return false
+    }
+    ts := p.GetTokenStream()
+    tok1 := ts.LT(1)
+    if tok1 != nil && tok1.GetTokenType() == CSharpLexerTK_LPAREN {
+        depth, i := 0, 1
+        for {
+            tok := ts.LT(i)
+            i++
+            if tok == nil || tok.GetTokenType() == antlr.TokenEOF {
+                break
+            }
+            tt := tok.GetTokenType()
+            if tt == CSharpLexerTK_LPAREN {
+                depth++
+            } else if tt == CSharpLexerTK_RPAREN {
+                depth--
+                if depth == 0 {
+                    break
+                }
+            } else if tt == CSharpLexerTK_COMMA && depth == 1 {
+                return false
+            }
+        }
+    }
+    // Identifier followed immediately by '(' → type-headed positional pattern.
+    tok2 := ts.LT(2)
+    if tok1 != nil && tok1.GetTokenType() == CSharpLexerSimple_Identifier &&
+        tok2 != nil && tok2.GetTokenType() == CSharpLexerTK_LPAREN {
+        return false
+    }
+    return true
+}
+
+// IsPositionalPatternAhead is the complement of IsConstantPatternAhead.
+func (p *CSharpParserBase) IsPositionalPatternAhead() bool { return !p.IsConstantPatternAhead() }
 
 // IsImplicitlyTypedLocalVariable returns true when LT(1)='var' and context implies implicit typing.
 func (p *CSharpParserBase) IsImplicitlyTypedLocalVariable() bool {

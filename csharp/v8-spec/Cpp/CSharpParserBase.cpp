@@ -100,8 +100,51 @@ bool CSharpParserBase::IsDeclarationPatternAhead()
 
 bool CSharpParserBase::IsConstantPatternAhead()
 {
-    return !IsDeclarationPatternAhead();
+    if (IsDeclarationPatternAhead()) return false;
+    antlr4::Token *first = _input->LT(1);
+    if (first && static_cast<int>(first->getType()) == CSharpLexer::TK_LPAREN)
+    {
+        int depth = 0, i = 1;
+        while (true)
+        {
+            antlr4::Token *tok = _input->LT(i++);
+            if (!tok) break;
+            int tt = static_cast<int>(tok->getType());
+            if (tt < 0) break;  // EOF
+            if (tt == CSharpLexer::TK_LPAREN) depth++;
+            else if (tt == CSharpLexer::TK_RPAREN) { depth--; if (depth == 0) break; }
+            else if (tt == CSharpLexer::TK_COMMA && depth == 1) return false;
+        }
+    }
+    // Type-headed positional pattern: speculative parse of type_() followed by '('
+    // e.g. Point(0, 0) — LT(1) is an identifier, not '(', so the tuple scan above
+    // was skipped.  A successful type_() parse whose next token is '(' means this
+    // is a positional_pattern, not a constant_pattern.
+    if (first && static_cast<int>(first->getType()) == CSharpLexer::Simple_Identifier)
+    {
+        size_t savedIndex = _input->index();
+        auto *par = new CSharpParser(_input);
+        par->removeErrorListeners();
+        par->setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
+        try
+        {
+            par->type_();
+            antlr4::Token *next = _input->LT(1);
+            if (next && static_cast<int>(next->getType()) == CSharpLexer::TK_LPAREN)
+            {
+                _input->seek(savedIndex);
+                delete par;
+                return false;
+            }
+        }
+        catch (...) { }
+        _input->seek(savedIndex);
+        delete par;
+    }
+    return true;
 }
+
+bool CSharpParserBase::IsPositionalPatternAhead() { return !IsConstantPatternAhead(); }
 
 bool CSharpParserBase::IsTypeParameterName()
 {

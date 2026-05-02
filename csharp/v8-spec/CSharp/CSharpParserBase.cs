@@ -426,7 +426,54 @@ return;
         }
     }
 
-    public bool IsConstantPatternAhead() => !IsDeclarationPatternAhead();
+    public bool IsConstantPatternAhead()
+    {
+        if (IsDeclarationPatternAhead()) return false;
+
+        // A '(' followed by a comma at depth 1 is a tuple-positional pattern
+        // like ("rock", "scissors") or (0, 0).  Tuple expressions are not C#
+        // compile-time constants, so this can only match positional_pattern
+        // (alt 4), not constant_pattern (alt 2).  Return false to suppress
+        // alt 2 and eliminate the decision-31 ambiguity.
+        var ts = (ITokenStream)InputStream;
+        if (ts.LT(1).Type == CSharpLexer.TK_LPAREN)
+        {
+            int depth = 0, i = 1;
+            while (true)
+            {
+                IToken tok = ts.LT(i++);
+                if (tok.Type == TokenConstants.EOF) break;
+                if (tok.Type == CSharpLexer.TK_LPAREN)       depth++;
+                else if (tok.Type == CSharpLexer.TK_RPAREN) { depth--; if (depth == 0) break; }
+                else if (tok.Type == CSharpLexer.TK_COMMA && depth == 1) return false;
+            }
+        }
+
+        // An identifier followed by '(' after a type_ is a type-headed positional
+        // pattern like Point(0, 0) or Shape.Circle(x, y).  Invocation expressions
+        // cannot be compile-time constants, so this cannot be a constant_pattern.
+        IToken t1 = ts.LT(1);
+        if (t1 != null && t1.Type == CSharpLexer.Simple_Identifier)
+        {
+            var par = new CSharpParser((ITokenStream)InputStream);
+            par.RemoveErrorListeners();
+            par.ErrorHandler = new BailErrorStrategy();
+            int savedIndex = InputStream.Index;
+            try
+            {
+                par.type_();
+                IToken next = ((CommonTokenStream)InputStream).LT(1);
+                if (next != null && next.Type == CSharpLexer.TK_LPAREN)
+                    return false;  // type_ '(' → positional_pattern
+            }
+            catch { }
+            finally { InputStream.Seek(savedIndex); }
+        }
+
+        return true;
+    }
+
+    public bool IsPositionalPatternAhead() => !IsConstantPatternAhead();
 
     //--------------------------------------------------------------------------------------
     // non_nullable_reference_type disambiguation — decision 15

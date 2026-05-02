@@ -309,7 +309,35 @@ abstract class CSharpParserBase extends Parser {
             (tok2.type == CSharpLexer.TOKEN_Simple_Identifier || tok2.text == '_');
     }
 
-    bool IsConstantPatternAhead() => !IsDeclarationPatternAhead();
+    bool IsConstantPatternAhead() {
+        if (IsDeclarationPatternAhead()) return false;
+        final ts = inputStream as TokenStream;
+        final first = ts.LT(1);
+        if (first != null && first.type == CSharpLexer.TOKEN_TK_LPAREN) {
+            int depth = 0, i = 1;
+            while (true) {
+                final tok = ts.LT(i++);
+                if (tok == null || tok.type < 0) break;
+                if (tok.type == CSharpLexer.TOKEN_TK_LPAREN) {
+                    depth++;
+                } else if (tok.type == CSharpLexer.TOKEN_TK_RPAREN) {
+                    depth--;
+                    if (depth == 0) break;
+                } else if (tok.type == CSharpLexer.TOKEN_TK_COMMA && depth == 1) {
+                    return false;
+                }
+            }
+        }
+        // Identifier followed immediately by '(' → type-headed positional pattern.
+        final second = ts.LT(2);
+        if (first != null && first.type == CSharpLexer.TOKEN_Simple_Identifier &&
+                second != null && second.type == CSharpLexer.TOKEN_TK_LPAREN) {
+            return false;
+        }
+        return true;
+    }
+
+    bool IsPositionalPatternAhead() => !IsConstantPatternAhead();
 
     bool IsImplicitlyTypedLocalVariable() {
         final tok = (inputStream as TokenStream).LT(1);

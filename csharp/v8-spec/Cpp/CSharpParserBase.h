@@ -19,6 +19,7 @@ public:
     bool IsCastExpressionAhead();
     bool IsDeclarationPatternAhead();
     bool IsConstantPatternAhead();
+    bool IsPositionalPatternAhead();
     bool IsTypeParameterName();
     bool IsValueTypeName();
     bool IsReferenceTypeName();

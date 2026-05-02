@@ -32,14 +32,14 @@ interface_type : type_name ;
 class_type     : type_name | 'object' | 'string' ;
 ```
 
-and `type_name` starts with an identifier.  So for any input like `Foo bar`,
+and `type_name` starts with an identifier. So for any input like `Foo bar`,
 ANTLR4 cannot distinguish between:
 
 * `Foo` being the name of a delegate (→ `delegate_type`)
 * `Foo` being the name of an interface (→ `interface_type`)
 * `Foo` being the name of a class (→ `class_type`)
 
-by token lookahead alone.  Without predicates it would always choose the first
+by token lookahead alone. Without predicates, it would always choose the first
 alternative (`delegate_type`), misclassifying every class and interface as a
 delegate.
 
@@ -80,7 +80,7 @@ return ts != null && ts.TypeKind == CSharpTypeKind.Interface;
 
 ### `IsClassTypeName()`
 
-The default / open-world predicate.  Returns `true` for:
+The default, open-world predicate. Returns `true` for:
 
 * The keywords `object` and `string` (always class types).
 * Any **unknown identifier** (not in the symbol table) — open-world assumption.
@@ -100,7 +100,7 @@ return ts.TypeKind != CSharpTypeKind.Interface
 ## Decision ordering and mutual exclusivity
 
 ANTLR4 evaluates the predicates in declaration order and stops at the first
-`true` result.  The three predicates are mutually exclusive for any
+`true` result. The three predicates are mutually exclusive for any
 **registered** type name:
 
 | Predicate | Returns `true` |
@@ -116,7 +116,7 @@ both return `false`, and `IsClassTypeName` returns `true` (open-world default).
 
 Accurate classification of user-defined delegate and interface types requires
 those declarations to have been registered in the symbol table before the
-type reference is parsed.  When the symbol table has not been populated —
+type reference is parsed. When the symbol table has not been populated —
 as is the case in the grammar test harness for declarations made in the same
 file — all user-defined type names fall through to the `class_type` default.
 A post-parse binding pass would correct the classification.
