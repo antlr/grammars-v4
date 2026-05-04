@@ -21,7 +21,7 @@ jobs:
     - name: Build all grammars and assemble combined JAR
       run: bash _scripts/assemble-all-grammars.sh
     - name: Upload combined JAR
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: all-grammars
         path: target/all-grammars-1.0-SNAPSHOT.jar
