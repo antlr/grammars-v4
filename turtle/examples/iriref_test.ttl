@@ -1,0 +1,43 @@
+@prefix ex: <http://example.org/> .
+@base <http://example.org/base/> .
+
+# Basic HTTP IRI
+<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .
+
+# IRI with path segments
+<http://example.org/a/b/c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/Type> .
+
+# IRI with fragment identifier (#)
+<http://example.org/resource#section1> <http://www.w3.org/2000/01/rdf-schema#label> "Section 1" .
+
+# IRI with query parameters (?, =, &)
+<http://example.org/search?q=turtle&lang=en> <http://www.w3.org/2000/01/rdf-schema#comment> "Query IRI" .
+
+# IRI with allowed special characters (!, $, ', (, ), *, +, ,, -, ., _, ~)
+<http://example.org/path/with-dashes_and.dots~here> <http://example.org/predicate> "special chars: - _ . ~" .
+<http://example.org/path/(parentheses)/and!exclamation> <http://example.org/predicate> "special chars: ( ) !" .
+<http://example.org/path/$dollar,'quote,*star,+plus> <http://example.org/predicate> "special chars: $ , ' * +" .
+
+# IRI with percent-encoding (allowed since % is not in the excluded set)
+<http://example.org/caf%C3%A9> <http://www.w3.org/2000/01/rdf-schema#label> "Café" .
+
+# IRI with UCHAR (4-digit Unicode escape)
+<http://example.org/\u0041BC> <http://example.org/predicate> "IRI with 4-digit UCHAR, A" .
+
+# IRI with UCHAR (8-digit Unicode escape)
+<http://example.org/\U00000041BC> <http://example.org/predicate> "IRI with 8-digit UCHAR, A" .
+
+# IRI with port number (colon is allowed)
+<http://example.org:8080/resource> <http://example.org/predicate> "IRI with port" .
+
+# IRI with @ sign (allowed)
+<http://user@example.org/resource> <http://example.org/predicate> "IRI with user info" .
+
+# Mailto IRI scheme
+<mailto:user@example.org> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> .
+
+# URN scheme
+<urn:isbn:0451450523> <http://www.w3.org/2000/01/rdf-schema#label> "The First and Last Freedom" .
+
+# IRI with semicolons and slash combinations
+<http://example.org/a;b/c;d> <http://example.org/predicate> "semicolons in IRI" .
