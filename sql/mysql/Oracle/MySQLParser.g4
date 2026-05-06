@@ -2244,7 +2244,7 @@ tableAdministrationStatement
         QUICK_SYMBOL
         | EXTENDED_SYMBOL
     )?
-    | type = OPTIMIZE_SYMBOL noWriteToBinLog? TABLE_SYMBOL tableRefList
+    | type = OPTIMIZE_SYMBOL noWriteToBinLog? (TABLE_SYMBOL | TABLES_SYMBOL) tableRefList
     | type = REPAIR_SYMBOL noWriteToBinLog? TABLE_SYMBOL tableRefList repairType*
     ;
 
