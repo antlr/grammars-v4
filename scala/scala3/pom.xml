@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>scala2</artifactId>
+	<artifactId>scala3</artifactId>
 	<packaging>jar</packaging>
-	<name>Scala 2 grammar</name>
+	<name>Scala 3 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -19,7 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Scala.g4</include>
+					   <include>Scala3Lexer.g4</include>
+					   <include>Scala3Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -40,7 +41,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>compilationUnit</entryPoint>
-					<grammarName>Scala</grammarName>
+					<grammarName>Scala3</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

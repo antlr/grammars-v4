@@ -333,7 +333,8 @@
 				<module>rpn</module>
 				<module>rust</module>
                 <module>sapf</module>
-				<module>scala</module>
+				<module>scala/scala2</module>
+				<module>scala/scala3</module>
 				<module>scotty</module>
 				<module>scss</module>
 				<module>semver</module>
