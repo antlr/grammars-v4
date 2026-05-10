@@ -135,6 +135,8 @@ point
 ordinate
     : DECIMAL
     | NAN_
+    | INF_
+    | NEG_INF_
     ;
 
 DECIMAL
@@ -264,6 +266,14 @@ M_
 
 NAN_
     : N A N
+    ;
+
+NEG_INF_
+    : '-' I N F
+    ;
+
+INF_
+    : I N F
     ;
 
 fragment A
