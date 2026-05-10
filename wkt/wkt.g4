@@ -7,130 +7,138 @@ file_
     : geometry* EOF
     ;
 
-geometryCollection
-    : GEOMETRYCOLLECTION (LPAR geometry (COMMA geometry)* RPAR | EMPTY_)
+geometry
+    : pointGeometry
+    | lineStringGeometry
+    | linearRingGeometry
+    | polygonGeometry
+    | triangleGeometry
+    | multiPointGeometry
+    | multiLineStringGeometry
+    | multiPolygonGeometry
+    | geometryCollection
+    | circularStringGeometry
+    | compoundCurveGeometry
+    | curvePolygonGeometry
+    | multiCurveGeometry
+    | multiSurfaceGeometry
+    | polyhedralSurfaceGeometry
+    | tinGeometry
     ;
 
-geometry
-    : (
-        polygonGeometry
-        | lineStringGeometry
-        | pointGeometry
-        | compoundCurveGeometry
-        | curvePolygonGeometry
-        | multiSurfaceGeometry
-        | multiCurveGeometry
-        | multiPointGeometry
-        | multiLineStringGeometry
-        | multiPolygonGeometry
-        | circularStringGeometry
-        | multiPolyhedralSurfaceGeometry
-        | multiTinGeometry
-        | geometryCollection
-    )
+dim
+    : Z_
+    | M_
+    | ZM_
     ;
 
 pointGeometry
-    : POINT ((name? LPAR point RPAR) | EMPTY_)
+    : POINT dim? (LPAR point RPAR | EMPTY_)
     ;
 
 lineStringGeometry
-    : LINESTRING lineString
+    : LINESTRING dim? lineStringText
+    ;
+
+linearRingGeometry
+    : LINEARRING dim? lineStringText
     ;
 
 polygonGeometry
-    : POLYGON polygon
+    : POLYGON dim? polygonText
     ;
 
-multiCurveGeometry
-    : MULTICURVE (
-        (
-            LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (
-                COMMA (circularStringGeometry | lineString | compoundCurveGeometry)
-            )* RPAR
-        )
-        | EMPTY_
-    )
-    ;
-
-multiSurfaceGeometry
-    : MULTISURFACE (
-        (LPAR (polygon | curvePolygonGeometry) (COMMA (polygon | curvePolygonGeometry))* RPAR)
-        | EMPTY_
-    )
-    ;
-
-curvePolygonGeometry
-    : CURVEPOLYGON (
-        (
-            LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (
-                COMMA (circularStringGeometry | lineString | compoundCurveGeometry)
-            )* RPAR
-        )
-        | EMPTY_
-    )
-    ;
-
-compoundCurveGeometry
-    : COMPOUNDCURVE (
-        (
-            LPAR (lineString | circularStringGeometry) (
-                COMMA (circularStringGeometry | lineString)
-            )* RPAR
-        )
-        | EMPTY_
-    )
+triangleGeometry
+    : TRIANGLE dim? polygonText
     ;
 
 multiPointGeometry
-    : MULTIPOINT ((LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR) | EMPTY_)
+    : MULTIPOINT dim? (LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR | EMPTY_)
     ;
 
 multiLineStringGeometry
-    : MULTILINESTRING ((LPAR lineString (COMMA lineString)* RPAR) | EMPTY_)
+    : MULTILINESTRING dim? (LPAR lineStringText (COMMA lineStringText)* RPAR | EMPTY_)
     ;
 
 multiPolygonGeometry
-    : MULTIPOLYGON ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
+    : MULTIPOLYGON dim? (LPAR polygonText (COMMA polygonText)* RPAR | EMPTY_)
     ;
 
-multiPolyhedralSurfaceGeometry
-    : POLYHEDRALSURFACE ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
-    ;
-
-multiTinGeometry
-    : TIN ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
+geometryCollection
+    : GEOMETRYCOLLECTION dim? (LPAR geometry (COMMA geometry)* RPAR | EMPTY_)
     ;
 
 circularStringGeometry
-    : CIRCULARSTRING LPAR point (COMMA point)* RPAR
+    : CIRCULARSTRING dim? lineStringText
+    ;
+
+compoundCurveGeometry
+    : COMPOUNDCURVE dim? (LPAR compoundCurveMember (COMMA compoundCurveMember)* RPAR | EMPTY_)
+    ;
+
+compoundCurveMember
+    : lineStringText
+    | circularStringGeometry
+    ;
+
+curvePolygonGeometry
+    : CURVEPOLYGON dim? (LPAR curveMember (COMMA curveMember)* RPAR | EMPTY_)
+    ;
+
+multiCurveGeometry
+    : MULTICURVE dim? (LPAR curveMember (COMMA curveMember)* RPAR | EMPTY_)
+    ;
+
+curveMember
+    : lineStringText
+    | circularStringGeometry
+    | compoundCurveGeometry
+    ;
+
+multiSurfaceGeometry
+    : MULTISURFACE dim? (LPAR surfaceMember (COMMA surfaceMember)* RPAR | EMPTY_)
+    ;
+
+surfaceMember
+    : polygonText
+    | curvePolygonGeometry
+    ;
+
+polyhedralSurfaceGeometry
+    : POLYHEDRALSURFACE dim? (LPAR polygonText (COMMA polygonText)* RPAR | EMPTY_)
+    ;
+
+tinGeometry
+    : TIN dim? (LPAR polygonText (COMMA polygonText)* RPAR | EMPTY_)
+    ;
+
+polygonText
+    : LPAR lineStringText (COMMA lineStringText)* RPAR
+    | EMPTY_
+    ;
+
+lineStringText
+    : LPAR point (COMMA point)* RPAR
+    | EMPTY_
     ;
 
 pointOrClosedPoint
     : point
     | LPAR point RPAR
-    ;
-
-polygon
-    : LPAR lineString (COMMA lineString)* RPAR
-    | EMPTY_
-    ;
-
-lineString
-    : LPAR point (COMMA point)* RPAR
     | EMPTY_
     ;
 
 point
-    : DECIMAL+
+    : ordinate ordinate ordinate? ordinate?
     ;
 
-name
-    : STRING
+ordinate
+    : DECIMAL
+    | NAN_
     ;
 
 DECIMAL
-    : '-'? INTEGERPART (DOT DECIMALPART)?
+    : '-'? INTEGERPART (DOT DECIMALPART)? EXPONENT?
     ;
 
 INTEGERPART
@@ -140,6 +148,10 @@ INTEGERPART
 
 DECIMALPART
     : DIGIT+
+    ;
+
+fragment EXPONENT
+    : ('e' | 'E') ('+' | '-')? DIGIT+
     ;
 
 fragment DIGIT
@@ -168,7 +180,7 @@ RPAR
     ;
 
 /**
- * Case-insensitive geometry types
+ * Case-insensitive geometry type keywords
  */
 POINT
     : P O I N T
@@ -178,8 +190,16 @@ LINESTRING
     : L I N E S T R I N G
     ;
 
+LINEARRING
+    : L I N E A R R I N G
+    ;
+
 POLYGON
     : P O L Y G O N
+    ;
+
+TRIANGLE
+    : T R I A N G L E
     ;
 
 MULTIPOINT
@@ -198,20 +218,12 @@ GEOMETRYCOLLECTION
     : G E O M E T R Y C O L L E C T I O N
     ;
 
-EMPTY_
-    : E M P T Y
-    ;
-
 CIRCULARSTRING
     : C I R C U L A R S T R I N G
     ;
 
 COMPOUNDCURVE
     : C O M P O U N D C U R V E
-    ;
-
-MULTISURFACE
-    : M U L T I S U R F A C E
     ;
 
 CURVEPOLYGON
@@ -222,16 +234,36 @@ MULTICURVE
     : M U L T I C U R V E
     ;
 
-TRIANGLE
-    : T R I A N G L E
+MULTISURFACE
+    : M U L T I S U R F A C E
+    ;
+
+POLYHEDRALSURFACE
+    : P O L Y H E D R A L S U R F A C E
     ;
 
 TIN
     : T I N
     ;
 
-POLYHEDRALSURFACE
-    : P O L Y H E D R A L S U R F A C E
+EMPTY_
+    : E M P T Y
+    ;
+
+ZM_
+    : Z M
+    ;
+
+Z_
+    : Z
+    ;
+
+M_
+    : M
+    ;
+
+NAN_
+    : N A N
     ;
 
 fragment A
@@ -336,10 +368,6 @@ fragment Y
 
 fragment Z
     : ('z' | 'Z')
-    ;
-
-STRING
-    : [a-zA-Z]+
     ;
 
 WS
