@@ -10,7 +10,7 @@
 > Assisted-by: Claude (Opus-4.7)
 > ```
 
-**Status:** Draft proposal + minimal grammar landed (lexer token, `clothoidGeometry` parser rule, wired into `compoundCurveMember`). Reference Java implementation (geometry types, `CurvedWKTReader`/`Writer`, renderer, TestBuilder UI for editing/inserting clothoids) lives at <https://github.com/grootstebozewolf/jts/tree/feature/sfa-curve-clothoid-playground>.
+**Status:** Draft proposal + minimal grammar landed (lexer token, `clothoidGeometry` parser rule, wired into `compoundCurveMember`). Upstream PR open at [antlr/grammars-v4#4848](https://github.com/antlr/grammars-v4/pull/4848). Reference Java implementation (geometry types, `CurvedWKTReader`/`Writer`, renderer, TestBuilder UI for editing/inserting clothoids) lives at <https://github.com/grootstebozewolf/jts/tree/feature/sfa-curve-clothoid-playground>.
 **Audience:** the JTS / NetTopologySuite curve-geometry community, and (later) `antlr/grammars-v4` reviewers.
 **Companion:** sister proposal under [locationtech/jts#1195 — SFA Curve Awareness epic](https://github.com/locationtech/jts/issues/1195).
 
@@ -197,17 +197,34 @@ For interop with non-extension consumers, a `WKTWriter.writeWithFallback(Geometr
 
 This is implementation guidance; not part of the grammar proposal itself.
 
-## 7. Implementation outline
+## 7. Implementation status
 
-Three small modules, mirrors how `CircularString` / `CompoundCurve` were structured in the JTS spike:
+The reference Java implementation is **complete** on the JTS playground branch
+[`feature/sfa-curve-clothoid-playground`](https://github.com/grootstebozewolf/jts/tree/feature/sfa-curve-clothoid-playground).
+The structure mirrors how `CircularString` / `CompoundCurve` are laid out:
 
 - **`ClothoidSegment`** (geometry) — extends `LineString`, stores `(startPoint, startTangent, startKappa, endKappa, length)`. Implements `Linearizable.toLinear(tolerance)` via §3.5.
-- **`CompoundCurve` member-list update** — accept `ClothoidSegment` alongside the existing `LineString` / `CircularString` member kinds.
-- **`CurvedWKTReader.readClothoidSegmentText`** — reads the three scalars and constructs a `ClothoidSegment` using the running state from preceding `CompoundCurve` members.
-- **`CurvedWKTWriter.appendClothoidSegmentText`** — emits the three scalars; junction coordinates come from the surrounding members.
-- **`CurvedShapeWriter`** — extend the `CompoundCurve` walker to render `ClothoidSegment` members via `toLinear` then `lineTo`-stream (or, optionally, Bezier-approximate per arc-length step for smoother rendering).
+- **`CompoundCurve` with structural members** — accepts `ClothoidSegment` alongside `LineString` / `CircularString` members; flat coord sequence is the dedup-concatenation of member coords (§3.6).
+- **`CurvedWKTReader.readClothoidSegmentText`** — reads the three scalars and constructs a `ClothoidSegment` using the running state (point + tangent + curvature) from preceding `CompoundCurve` members; emits the junction-drift warning (§3.3) when the next typed coordinate disagrees with the analytical end.
+- **`CurvedWKTWriter.appendClothoidSegmentText`** — emits the three scalars; junction coordinates come from surrounding members.
+- **`CurvedShapeWriter`** — `CompoundCurve` walker dispatches each member to a type-specific renderer: `ClothoidSegment` via `toLinear(0.5)` chord-stream, `CircularString` via cubic-Bezier arc approximation, plain `LineString` straight-through.
+- **TestBuilder integration** — `ClothoidPanel` provides parameter editing of any selected `ClothoidSegment` with a cascade rigid-frame transform on Apply (so downstream members translate + rotate to maintain G2 continuity), an "Insert spiral before next arc" action that fits a spiral easement at any tangent-continuous `LineString → CircularString` junction, and an inspect button that displays κ / θ / L / R for clothoid and arc members.
 
-Estimated surface: ~600–800 LoC across the JTS spike branch, plus tests. Not in this proposal — that's a separate implementation epic.
+Total surface: ~1500 LoC including the editing UI. The grammar half — token + rule + example — landed in [antlr/grammars-v4#4848](https://github.com/antlr/grammars-v4/pull/4848).
+
+### 7.1 Operational characteristics (v1)
+
+These are the things reviewers and downstream users will observe; documented here so the proposal stays the canonical reference and the PR thread doesn't have to be the source of truth.
+
+**Buffering and other spatial ops go through full linearization.** `BufferOp` (and `intersection`, `union`, etc.) call `((Linearizable) g).toLinear(tol)` and operate on the resulting chord polyline. This is intentional for v1: the parallel of a clothoid is *not* itself a clothoid (no closed-form arc-length parameterisation), and the parallel of a circular arc remains a circular arc only if the caller accepts a different radius (and the construction degenerates for inward offsets when distance ≥ R). For v1 we retain the densify-then-buffer approach because it is predictable, the geometric error is bounded by the caller-supplied tolerance, and it avoids the substantially larger problem of a true curve-aware offset algorithm (which belongs in a separate proposal).
+
+**Artifacts to watch in offset / buffer output.**
+
+- *Tangent kinks at user-authored junctions* render as the configured join style (Round / Mitre / Bevel) instead of smoothing across — a feature, not a bug, but worth knowing if a buffer comes back with corners. The TestBuilder edit operations (Apply, Insert spiral) preserve G1 + G2 continuity, but hand-authored WKT can absolutely create kinks.
+- *Very tight clothoids* — the densifier's chord-to-true-curve drift is bounded by `tol`, but the buffer polygon's vertices inherit that drift. Visible as minor faceting / short straight segments on the offset polygon in regions of very high curvature. Tighter `tol` makes it disappear at the cost of more vertices.
+- *Cap orientation at clothoid endpoints* uses the analytical end tangent, not chord direction. A naive "last two coords" implementation would be subtly wrong here — the clothoid's flat coord sequence is just `(start, end)` (per §3.6), so chord direction equals the *secant*, not the tangent.
+
+**Cost vs a plain `LineString` of equivalent densified-point count.** Equivalent within noise. `CompoundCurve` adds a structural member array (a few hundred bytes for typical chains of 5–10 members) but the flat coord sequence concatenates member coords, so spatial ops see the same point count regardless of structural layering. Repeated `toLinear(tol)` calls are not memoized in v1 — that's a future optimisation if a profiler shows it matters; in practice spatial ops dominate.
 
 ## 8. Relationship to the SFA Curve Awareness epic
 
