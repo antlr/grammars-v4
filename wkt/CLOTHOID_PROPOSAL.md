@@ -10,7 +10,7 @@
 > Assisted-by: Claude (Opus-4.7)
 > ```
 
-**Status:** Draft proposal. **No grammar changes in this branch — proposal text only.**
+**Status:** Draft proposal + minimal grammar landed (lexer token, `clothoidGeometry` parser rule, wired into `compoundCurveMember`). Reference Java implementation (geometry types, `CurvedWKTReader`/`Writer`, renderer, TestBuilder UI for editing/inserting clothoids) lives at <https://github.com/grootstebozewolf/jts/tree/feature/sfa-curve-clothoid-playground>.
 **Audience:** the JTS / NetTopologySuite curve-geometry community, and (later) `antlr/grammars-v4` reviewers.
 **Companion:** sister proposal under [locationtech/jts#1195 — SFA Curve Awareness epic](https://github.com/locationtech/jts/issues/1195).
 
@@ -157,7 +157,7 @@ Reads as: a 100-unit straight, an 80-unit entry clothoid taking curvature from 0
 - Parser fails fast if `CLOTHOID` appears as the first member of a `COMPOUNDCURVE`, or at the top level (matching §3.2).
 - `length` and `kappa` parse via the existing numeric ordinate rule, so `INF`/`NAN` are syntactically accepted but semantically rejected at construction (length must be positive finite; kappa must be finite).
 
-## 5. Grammar diff sketch (illustrative — no commit in this branch)
+## 5. Grammar diff (landed in this branch)
 
 Against the post-#4846 `wkt/wkt.g4` (which has `compoundCurveGeometry` and a `compoundCurveMember` production):
 
@@ -165,8 +165,8 @@ Against the post-#4846 `wkt/wkt.g4` (which has `compoundCurveGeometry` and a `co
 // Lexer addition
 CLOTHOID : C L O T H O I D ;
 
-// Parser addition
-clothoidSegment
+// Parser addition (rule name follows the existing "<keyword>Geometry" convention)
+clothoidGeometry
     : CLOTHOID LPAR ordinate COMMA ordinate COMMA ordinate RPAR
     ;
 
@@ -174,12 +174,12 @@ clothoidSegment
 compoundCurveMember
     : lineStringText
     | circularStringGeometry
-    | clothoidSegment              // ← new
+    | clothoidGeometry             // ← new
     ;
 ```
 
 A separate semantic-validation pass (not the grammar) enforces:
-- `clothoidSegment` cannot be the first member of a `compoundCurveGeometry`,
+- `clothoidGeometry` cannot be the first member of a `compoundCurveGeometry`,
 - `length` ordinate is positive finite,
 - `startKappa ≠ endKappa`.
 

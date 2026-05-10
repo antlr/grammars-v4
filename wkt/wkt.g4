@@ -79,6 +79,11 @@ compoundCurveGeometry
 compoundCurveMember
     : lineStringText
     | circularStringGeometry
+    | clothoidGeometry
+    ;
+
+clothoidGeometry
+    : CLOTHOID LPAR ordinate COMMA ordinate COMMA ordinate RPAR
     ;
 
 curvePolygonGeometry
@@ -226,6 +231,10 @@ CIRCULARSTRING
 
 COMPOUNDCURVE
     : C O M P O U N D C U R V E
+    ;
+
+CLOTHOID
+    : C L O T H O I D
     ;
 
 CURVEPOLYGON
