@@ -31,7 +31,7 @@
       "rollForward": false
     },
     "triconv": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "triconv"
       ],
