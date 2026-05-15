@@ -280,6 +280,7 @@
 				<module>muparser</module>
 				<module>newick</module>
 				<module>oberon</module>
+                <module>odin</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>orwell</module>
