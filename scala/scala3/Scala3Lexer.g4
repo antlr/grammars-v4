@@ -2,11 +2,18 @@
  * Scala 3 Lexer Grammar
  * Based on https://docs.scala-lang.org/scala3/reference/syntax.html
  *
- * Handles the brace-delimited form of Scala 3 (always valid).
- * Indentation-sensitive parsing is not supported in this version.
+ * Supports both brace-delimited and indentation-sensitive Scala 3.
+ * INDENT/DEDENT tokens are injected by Scala3LexerBase; NEWLINE tokens
+ * are emitted by the grammar (not skipped) so the base class can count
+ * leading whitespace.  WS is sent to the hidden channel for the same reason.
  */
 
 lexer grammar Scala3Lexer;
+
+options { superClass=Scala3LexerBase; }
+
+// Synthetic tokens injected by Scala3LexerBase (no lexer rule matches them).
+tokens { INDENT, DEDENT }
 
 // -----------------------------------------------------------------------
 // Keywords — must come before identifier rules
@@ -225,12 +232,17 @@ Varid
 // Whitespace and comments (skip)
 // -----------------------------------------------------------------------
 
-Newline
-    : ('\r'? '\n') -> skip
+// Emitted as a real token so Scala3LexerBase can inject INDENT/DEDENT/SEMI.
+// The base class hides every NEWLINE from the parser and replaces it with
+// the appropriate synthetic token(s).
+NEWLINE
+    : '\r'? '\n'
     ;
 
+// Sent to the hidden channel so Scala3LexerBase can read leading whitespace
+// (needed for indentation measurement) while the parser ignores all WS.
 WS
-    : [ \t\u000C]+ -> skip
+    : [ \t\u000C]+ -> channel(HIDDEN)
     ;
 
 BlockComment

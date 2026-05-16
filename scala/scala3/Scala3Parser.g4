@@ -3,8 +3,11 @@
  * Based on https://docs.scala-lang.org/scala3/reference/syntax.html
  *
  * Design notes:
- *   - Handles brace-delimited Scala 3 (always valid; indentation form omitted).
- *   - Newlines/whitespace are skipped by the lexer; 'semi' = SEMI? in most places.
+ *   - Handles both brace-delimited and indentation-sensitive Scala 3.
+ *   - INDENT/DEDENT are injected by Scala3LexerBase; NEWLINE tokens are kept
+ *     on the default channel at statement boundaries (mirroring Dotty's virtual
+ *     NEWLINE token) rather than suppressed to the hidden channel.
+ *   - end_of_stat : NEWLINE+ | SEMI ; handles both surfaced newlines and ';'.
  *   - Contextual keywords (as, open, infix, transparent, inline, opaque,
  *     derives, end, extension, using) are lexer keywords here for simplicity.
  *   - Left-recursive rules (simpleType, simpleExpr, infixType, infixExpr,
@@ -19,12 +22,20 @@ options { tokenVocab = Scala3Lexer; }
 // Top-level
 // =====================================================================
 
+colonTripleOpen: COLON? (INDENT | '{' INDENT?);
+tripleOpen: INDENT | '{' | '{' INDENT;
+tripleClose: DEDENT '}' | DEDENT | '}';
+indent: INDENT;
+outdent: DEDENT;
+// Statement separator: NEWLINE kept on default channel or real ';'.
+end_of_stat : NEWLINE+ | SEMI ;
+
 compilationUnit
-    : (PACKAGE qualId SEMI?)* topStats EOF
+    : (PACKAGE qualId end_of_stat?)* topStats EOF
     ;
 
 topStats
-    : topStat (SEMI? topStat)*
+    : topStat (end_of_stat topStat)*
     ;
 
 topStat
@@ -38,7 +49,7 @@ topStat
     ;
 
 packaging
-    : PACKAGE qualId LBRACE topStats? RBRACE
+    : PACKAGE qualId (COLON | ) colonTripleOpen topStats? tripleClose
     ;
 
 packageObject
@@ -173,7 +184,7 @@ typedFunParam
     ;
 
 matchType_
-    : infixType MATCH LBRACE typeCaseClauses RBRACE
+    : infixType MATCH tripleOpen typeCaseClauses tripleClose
     ;
 
 infixType
@@ -235,7 +246,7 @@ typeArgs
     ;
 
 refinement
-    : LBRACE (refineDcl (SEMI? refineDcl)*)? RBRACE
+    : colonTripleOpen (refineDcl (end_of_stat refineDcl)*)? tripleClose
     ;
 
 typeBounds
@@ -264,7 +275,7 @@ typeCaseClauses
     ;
 
 typeCaseClause
-    : CASE (infixType | USCORE) ARROW type_ SEMI?
+    : CASE (infixType | USCORE) ARROW type_ end_of_stat?
     ;
 
 // =====================================================================
@@ -329,7 +340,7 @@ infixExpr
     ;
 
 matchClause
-    : MATCH LBRACE caseClauses RBRACE
+    : MATCH tripleOpen caseClauses tripleClose
     ;
 
 prefixExpr
@@ -361,7 +372,12 @@ simpleExpr
     ;
 
 colonArgument
-    : COLON LBRACE (caseClauses | block) RBRACE
+    : COLON lambdaStart? indent (caseClauses | block) outdent
+    | COLON lambdaStart? LBRACE (caseClauses | block) RBRACE
+    ;
+
+lambdaStart: funParams ('=>' | '?=>')
+    | typTypeParamClause '=>'
     ;
 
 quoted
@@ -395,12 +411,12 @@ argumentExprs
     ;
 
 blockExpr
-    : LBRACE caseClauses RBRACE
-    | LBRACE block RBRACE
+    : tripleOpen (caseClauses | block) tripleClose 
     ;
 
 block
-    : (blockStat SEMI?)* blockResult?
+    : INDENT (blockStat end_of_stat*)* blockResult? DEDENT
+    | (blockStat end_of_stat*)* blockResult?
     ;
 
 blockStat
@@ -414,6 +430,9 @@ blockStat
 forExpr
     : FOR LPAREN enumerators0 RPAREN (DO | YIELD)? expr
     | FOR LBRACE enumerators0 RBRACE (DO | YIELD)? expr
+    | FOR LBRACE INDENT enumerators0 DEDENT RBRACE (DO | YIELD)? expr
+    | FOR INDENT enumerators0 DEDENT (DO | YIELD) indent (blockStat end_of_stat*)* blockResult? outdent
+    | FOR INDENT enumerators0 DEDENT (DO | YIELD)? expr
     | FOR enumerators0 (DO | YIELD) expr
     ;
 
@@ -422,7 +441,7 @@ enumerators0
     ;
 
 enumerators
-    : generator (SEMI? enumerator)*
+    : generator (end_of_stat enumerator)*
     ;
 
 enumerator
@@ -444,7 +463,7 @@ guard_
 // =====================================================================
 
 caseClauses
-    : caseClause+
+    : caseClause (end_of_stat? caseClause)*
     ;
 
 caseClause
@@ -699,6 +718,7 @@ patDef
 defDef
     : defSig (COLON type_)? ASSIGN expr
     | defSig (COLON type_)? LBRACE block RBRACE
+    | defSig (COLON type_)? LBRACE INDENT block DEDENT RBRACE
     | THIS constrParamClauses defImplicitClause? ASSIGN constrExpr
     | defSig (COLON type_)?                        // abstract declaration (no body)
     ;
@@ -793,8 +813,7 @@ extension_
     ;
 
 extMethods
-    : extMethod
-    | LBRACE (extMethod (SEMI? extMethod)*)? RBRACE
+    : extMethod | colonTripleOpen (extMethod (end_of_stat extMethod)*)? tripleClose
     ;
 
 extMethod
@@ -828,7 +847,7 @@ constrApp
 
 constrExpr
     : selfInvocation
-    | LBRACE selfInvocation (SEMI? blockStat)* RBRACE
+    | tripleOpen selfInvocation (end_of_stat blockStat)* tripleClose
     ;
 
 selfInvocation
@@ -836,11 +855,11 @@ selfInvocation
     ;
 
 withTemplateBody
-    : LBRACE selfType? (templateStat (SEMI? templateStat)*)? RBRACE
+    : tripleOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? tripleClose
     ;
 
 templateBody
-    : LBRACE selfType? (templateStat (SEMI? templateStat)*)? RBRACE
+    : colonTripleOpen end_of_stat? selfType? end_of_stat? (templateStat (end_of_stat templateStat)*)? tripleClose
     ;
 
 templateStat
@@ -862,7 +881,7 @@ selfType
 // =====================================================================
 
 enumBody
-    : LBRACE selfType? (enumStat (SEMI? enumStat)*)? RBRACE
+    : colonTripleOpen end_of_stat? selfType? end_of_stat? (enumStat (end_of_stat enumStat)*)? tripleClose
     ;
 
 enumStat
