@@ -354,7 +354,7 @@ fragment InterpMultiPart
     | '"' ~["]
     | '""' ~["]
     | '$' [a-zA-Z_$] [a-zA-Z0-9_$]*
-    | '$' '{' InterpExprContent* '}'
+    | '$' '{' InterpMultiExprContent* '}'
     | '$$'
     ;
 
@@ -373,6 +373,22 @@ fragment InterpExprContent0
     : ~[{}"\\\r\n]+
     | '\\' .
     | '"' (~["\\\r\n] | '\\' .)* '"'
+    | '{' ~[{}]* '}'
+    ;
+
+// Like InterpExprContent but allows actual newlines — for use inside """..."""
+// where the ${ } expression may span multiple source lines.
+fragment InterpMultiExprContent
+    : ~[{}"\\]+
+    | '\\' .
+    | '"' (~["\\] | '\\' .)* '"'
+    | '{' InterpMultiExprContent0* '}'
+    ;
+
+fragment InterpMultiExprContent0
+    : ~[{}"\\]+
+    | '\\' .
+    | '"' (~["\\] | '\\' .)* '"'
     | '{' ~[{}]* '}'
     ;
 
