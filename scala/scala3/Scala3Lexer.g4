@@ -345,7 +345,7 @@ fragment InterpStringPart
     : ~["$\\\r\n]+
     | '\\' .
     | '$' [a-zA-Z_$] [a-zA-Z0-9_$]*
-    | '$' '{' .*? '}'
+    | '$' '{' InterpExprContent* '}'
     | '$$'
     ;
 
@@ -354,8 +354,26 @@ fragment InterpMultiPart
     | '"' ~["]
     | '""' ~["]
     | '$' [a-zA-Z_$] [a-zA-Z0-9_$]*
-    | '$' '{' .*? '}'
+    | '$' '{' InterpExprContent* '}'
     | '$$'
+    ;
+
+// Content of a ${ } block in an interpolated string.
+// Handles one level of nested { }, double-quoted string literals, and escape
+// sequences — enough to cover cases like ${map(m => s"${m.x}").mkString("\n")}.
+fragment InterpExprContent
+    : ~[{}"\\\r\n]+
+    | '\\' .
+    | '"' (~["\\\r\n] | '\\' .)* '"'
+    | '{' InterpExprContent0* '}'
+    ;
+
+// One additional level of { } nesting inside InterpExprContent.
+fragment InterpExprContent0
+    : ~[{}"\\\r\n]+
+    | '\\' .
+    | '"' (~["\\\r\n] | '\\' .)* '"'
+    | '{' ~[{}]* '}'
     ;
 
 // -----------------------------------------------------------------------
