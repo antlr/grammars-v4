@@ -50,15 +50,6 @@ public abstract class Scala3LexerBase extends Lexer {
     private int previousPendingTokenType = 0;
     // Last token type sent on the default channel — used for canEndStat checks.
     private int lastNonHiddenType = 0;
-    // Set when COLON is emitted inside InParens (colonArgument context), cleared on the
-    // next NEWLINE.  Allows a following ARROW/CTXARROW to still trigger INDENT even
-    // inside InParens (e.g. `flatMap: status =>\n  body`).
-    private boolean colonArgLambda = false;
-    // Region-stack depth at the time colonArgLambda was set.  A COMMA resets the flag
-    // only when the stack is at exactly this depth — not when it is deeper (e.g. inside
-    // the lambda's own parameter list `(code, msg)`).
-    private int colonArgLambdaStackDepth = 0;
-
     // Two-token look-ahead.
     private Token curToken = null;
     private Token ffgToken = null;
@@ -91,8 +82,6 @@ public abstract class Scala3LexerBase extends Lexer {
         pendingTokens      = new LinkedList<>();
         previousPendingTokenType = 0;
         lastNonHiddenType  = 0;
-        colonArgLambda     = false;
-        colonArgLambdaStackDepth = 0;
         curToken           = null;
         ffgToken           = null;
     }
@@ -191,10 +180,6 @@ public abstract class Scala3LexerBase extends Lexer {
             return;
         }
 
-        // Consume the colon-arg-lambda flag for this line transition.
-        boolean isColonArg = colonArgLambda;
-        colonArgLambda = false;
-
         Region top = regionStack.peek();
 
         // Compute next-line indentation from the WS text before enqueuing anything,
@@ -216,22 +201,14 @@ public abstract class Scala3LexerBase extends Lexer {
         // When true, NEWLINE is always suppressed (even in InBraces) because
         // emitting NEWLINE before INDENT would produce an unexpected separator.
         //
-        // Inside InParens, ARROW (=>) and CTXARROW (?=>) are excluded from
-        // triggering INDENT because lambda bodies used as function arguments
-        // often have a trailing comma (`,`) on the same line as the last
-        // expression — e.g. `err => negotiate(...),`.  If INDENT were emitted
-        // for `=>`, that comma would end up inside the INDENT block (before the
-        // DEDENT that is generated at the following newline), which the grammar
-        // cannot handle.  Without INDENT, the lambda body is parsed as a
-        // non-INDENT block, and the comma is correctly seen as an argument
-        // separator outside the block.
-        boolean inParensArrow = (top == Region.InParens)
-            && !isColonArg
-            && (lastNonHiddenType == Scala3Lexer.ARROW || lastNonHiddenType == Scala3Lexer.CTXARROW);
+        // ARROW (=>) and CTXARROW (?=>) inside InParens are NOT excluded:
+        // multi-statement lambda bodies (e.g. `loginData =>\n  val x = …\n  x`)
+        // require INDENT/DEDENT even inside (…).  Trailing-comma cases such as
+        // `err => body,` are handled by the COMMA drain in checkNextToken, which
+        // emits DEDENT before the comma so the grammar sees the separator correctly.
         boolean willIndent = newIndent > curIndent
             && !isDot
-            && canStartIndent(lastNonHiddenType)
-            && !inParensArrow;
+            && canStartIndent(lastNonHiddenType);
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
@@ -505,20 +482,8 @@ public abstract class Scala3LexerBase extends Lexer {
 
     private void addPendingToken(Token token) {
         previousPendingTokenType = token.getType();
-        if (token.getChannel() == Token.DEFAULT_CHANNEL) {
+        if (token.getChannel() == Token.DEFAULT_CHANNEL)
             lastNonHiddenType = token.getType();
-            // Track colonArgument lambda context inside parentheses.
-            if (token.getType() == Scala3Lexer.COLON
-                    && !regionStack.isEmpty() && regionStack.peek() == Region.InParens) {
-                colonArgLambda = true;
-                colonArgLambdaStackDepth = regionStack.size();
-            } else if ((token.getType() == Scala3Lexer.COMMA || token.getType() == Scala3Lexer.SEMI)
-                       && regionStack.size() == colonArgLambdaStackDepth) {
-                // Reset only at the same depth where COLON was seen — not inside
-                // the lambda's own parameter list (e.g. the comma in `(code, msg)`).
-                colonArgLambda = false;
-            }
-        }
         pendingTokens.addLast(token);
     }
 
