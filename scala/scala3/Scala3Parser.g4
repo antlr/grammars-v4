@@ -288,10 +288,18 @@ expr
     | expr1
     ;
 
+// Original @ 757667725:
+//   blockResult
+//       : funParams (ARROW | CTXARROW) block
+//       | typTypeParamClause ARROW block
+//       | expr1
+//       ;
+// Removed '| expr1': it duplicates blockStat's expr1 alternative, causing
+// genuine grammar ambiguity (every plain expression at end-of-block matches
+// both blockStat and blockResult) and O(n) ALL(*) lookahead.
 blockResult
     : funParams (ARROW | CTXARROW) block
     | typTypeParamClause ARROW block
-    | expr1
     ;
 
 funParams
@@ -300,6 +308,30 @@ funParams
     | USCORE
     ;
 
+// Original @ 757667725:
+//   expr1
+//       : INLINE? IF LPAREN expr RPAREN expr (SEMI? ELSE expr)?
+//       | INLINE? IF expr THEN expr (SEMI? ELSE expr)?
+//       | WHILE LPAREN expr RPAREN expr
+//       | WHILE expr DO expr
+//       | TRY expr catches (FINALLY expr)?
+//       | TRY expr (FINALLY expr)?
+//       | THROW expr
+//       | RETURN expr?
+//       | forExpr
+//       | simpleExpr DOT id ASSIGN expr
+//       | prefixOperator simpleExpr ASSIGN expr
+//       | infixExpr id ASSIGN expr
+//       | simpleExpr argumentExprs ASSIGN expr
+//       | id ASSIGN expr
+//       | postfixExpr ascription?
+//       | INLINE infixExpr matchClause
+//       ;
+// Collapsed the five assignment alternatives and 'postfixExpr ascription?' into
+// 'postfixExpr (ASSIGN expr | ascription)?': every assignment LHS is a
+// sub-case of postfixExpr (since postfixExpr = infixExpr id?), so the old
+// alternatives all shared the same prefix, forcing ALL(*) to scan hundreds of
+// tokens before ruling out assignment alternatives.
 expr1
     : INLINE? IF LPAREN expr RPAREN expr (SEMI? ELSE expr)?   // if (cond) t [else f]
     | INLINE? IF expr THEN expr (SEMI? ELSE expr)?             // if cond then t [else f]
@@ -310,13 +342,8 @@ expr1
     | THROW expr
     | RETURN expr?
     | forExpr
-    | simpleExpr DOT id ASSIGN expr                            // x.m = e
-    | prefixOperator simpleExpr ASSIGN expr                    // prefix(e) = e2
-    | infixExpr id ASSIGN expr                                 // x op= e
-    | simpleExpr argumentExprs ASSIGN expr                     // f(args) = e
-    | id ASSIGN expr                                           // x = e (simple var assignment)
-    | postfixExpr ascription?
     | INLINE infixExpr matchClause
+    | postfixExpr (ASSIGN expr | ascription)?
     ;
 
 ascription
@@ -414,6 +441,16 @@ blockExpr
     : tripleOpen (caseClauses | block) tripleClose 
     ;
 
+// Original @ 757667725:
+//   block
+//       : INDENT (blockStat end_of_stat*)* blockResult? DEDENT
+//       | USCORE (ARROW | CTXARROW) block
+//       | id (ARROW | CTXARROW) block
+//       | (blockStat end_of_stat*)* blockResult?
+//       ;
+// Removed '| USCORE ...' and '| id ...': both are fully subsumed by
+// blockResult (funParams covers USCORE and id), so they introduced genuine
+// ambiguity with alt 2 and caused deep ALL(*) lookahead.
 block
     : INDENT (blockStat end_of_stat*)* blockResult? DEDENT
     | (blockStat end_of_stat*)* blockResult?
