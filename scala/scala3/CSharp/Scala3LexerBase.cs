@@ -50,6 +50,10 @@ public abstract class Scala3LexerBase : Lexer
     // next NEWLINE.  Allows a following ARROW/CTXARROW to still trigger INDENT even
     // inside InParens (e.g. `flatMap: status =>\n  body`).
     private bool _colonArgLambda = false;
+    // Region-stack depth at the time _colonArgLambda was set.  A COMMA resets the flag
+    // only when the stack is at exactly this depth — not when it is deeper (e.g. inside
+    // the lambda's own parameter list `(code, msg)`).
+    private int _colonArgLambdaStackDepth = 0;
 
     // Two-token look-ahead.
     private IToken? _curToken = null;
@@ -85,6 +89,7 @@ public abstract class Scala3LexerBase : Lexer
         _previousPendingTokenType = 0;
         _lastNonHiddenType   = 0;
         _colonArgLambda      = false;
+        _colonArgLambdaStackDepth = 0;
         _curToken            = null;
         _ffgToken            = null;
     }
@@ -525,9 +530,17 @@ public abstract class Scala3LexerBase : Lexer
             // Track colonArgument lambda context inside parentheses.
             if (token.Type == Scala3Lexer.COLON
                 && _regionStack.Count > 0 && _regionStack.Peek() == Region.InParens)
+            {
                 _colonArgLambda = true;
-            else if (token.Type == Scala3Lexer.COMMA || token.Type == Scala3Lexer.SEMI)
+                _colonArgLambdaStackDepth = _regionStack.Count;
+            }
+            else if ((token.Type == Scala3Lexer.COMMA || token.Type == Scala3Lexer.SEMI)
+                     && _regionStack.Count == _colonArgLambdaStackDepth)
+            {
+                // Reset only at the same depth where COLON was seen — not inside
+                // the lambda's own parameter list (e.g. the comma in `(code, msg)`).
                 _colonArgLambda = false;
+            }
         }
         _pendingTokens.AddLast(token);
     }
