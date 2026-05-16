@@ -127,6 +127,19 @@ public abstract class Scala3LexerBase : Lexer
                 AddPendingToken(_curToken);
                 break;
 
+            case Scala3Lexer.COMMA:
+                // Drain any Indented regions opened inside InParens (e.g. a same-line
+                // colonArgument body: `f: u => expr,` — the INDENT was emitted but no
+                // NEWLINE-triggered DEDENT ran before the comma).
+                while (_regionStack.Count > 0 && _regionStack.Peek() == Region.Indented)
+                {
+                    _indentLengthStack.Pop();
+                    _regionStack.Pop();
+                    CreateAndAddPendingToken(Scala3Lexer.DEDENT, TokenConstants.DefaultChannel, "<DEDENT>", _curToken);
+                }
+                AddPendingToken(_curToken);
+                break;
+
             case Scala3Lexer.RPAREN:
             case Scala3Lexer.RBRACKET:
                 // Drain any Indented regions opened inside InParens (e.g. a

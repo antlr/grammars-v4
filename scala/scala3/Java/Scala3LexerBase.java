@@ -120,6 +120,16 @@ public abstract class Scala3LexerBase extends Lexer {
         } else if (type == Scala3Lexer.LPAREN || type == Scala3Lexer.LBRACKET) {
             regionStack.push(Region.InParens);
             addPendingToken(curToken);
+        } else if (type == Scala3Lexer.COMMA) {
+            // Drain any Indented regions opened inside InParens (e.g. a same-line
+            // colonArgument body: `f: u => expr,` — the INDENT was emitted but no
+            // NEWLINE-triggered DEDENT ran before the comma).
+            while (!regionStack.isEmpty() && regionStack.peek() == Region.Indented) {
+                indentLengthStack.pop();
+                regionStack.pop();
+                createAndAddPendingToken(Scala3Lexer.DEDENT, Token.DEFAULT_CHANNEL, "<DEDENT>", curToken);
+            }
+            addPendingToken(curToken);
         } else if (type == Scala3Lexer.RPAREN || type == Scala3Lexer.RBRACKET) {
             // Drain any Indented regions opened inside InParens (e.g. a
             // colonArgument body whose closing ')' is on the same source
