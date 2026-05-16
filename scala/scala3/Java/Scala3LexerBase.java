@@ -206,9 +206,17 @@ public abstract class Scala3LexerBase extends Lexer {
         // require INDENT/DEDENT even inside (…).  Trailing-comma cases such as
         // `err => body,` are handled by the COMMA drain in checkNextToken, which
         // emits DEDENT before the comma so the grammar sees the separator correctly.
+        // `extension (params)` ends with RPAREN but has an indented method body.
+        // Allow RPAREN to trigger INDENT only when the outer context is Indented
+        // or TopLevel — not inside a function-call argument list (InParens) or a
+        // brace block (InBraces), where a trailing RPAREN must never open a new
+        // indented region.
+        boolean rparenOpensIndent = lastNonHiddenType == Scala3Lexer.RPAREN
+                                 && regionStack.peek() != Region.InParens
+                                 && regionStack.peek() != Region.InBraces;
         boolean willIndent = newIndent > curIndent
             && !isDot
-            && canStartIndent(lastNonHiddenType);
+            && (canStartIndent(lastNonHiddenType) || rparenOpensIndent);
 
         // ---- Decide whether to surface the NEWLINE as a statement separator ----
         //
