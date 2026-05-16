@@ -460,6 +460,10 @@ public abstract class Scala3LexerBase : Lexer
         Scala3Lexer.INFIX                     => true,
         Scala3Lexer.TRANSPARENT               => true,
         Scala3Lexer.OPAQUE                    => true,
+        // contextual keywords usable as plain identifiers
+        Scala3Lexer.AS                        => true,
+        Scala3Lexer.DERIVES                   => true,
+        Scala3Lexer.USING                     => true,
         _                                     => false
     };
 

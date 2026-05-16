@@ -427,6 +427,10 @@ public abstract class Scala3LexerBase extends Lexer {
             case Scala3Lexer.INFIX:
             case Scala3Lexer.TRANSPARENT:
             case Scala3Lexer.OPAQUE:
+            // contextual keywords usable as plain identifiers
+            case Scala3Lexer.AS:
+            case Scala3Lexer.DERIVES:
+            case Scala3Lexer.USING:
                 return true;
             default:
                 return false;
