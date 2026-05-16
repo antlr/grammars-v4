@@ -80,3 +80,4 @@ rules therefore use `Op` where only one specific character is valid:
 Adding dedicated single-character lexer tokens (e.g. `STAR`, `MINUS`, `PLUS`) would
 require fragmented operator lexing throughout the grammar and is not warranted for a
 reference grammar.  The comment on each rule documents the intended restriction.
+
