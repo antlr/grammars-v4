@@ -350,7 +350,8 @@ fragment InterpStringPart
     ;
 
 fragment InterpMultiPart
-    : ~["$]+
+    : ~["$\\]+
+    | '\\' .
     | '"' ~["]
     | '""' ~["]
     | '$' [a-zA-Z_$] [a-zA-Z0-9_$]*

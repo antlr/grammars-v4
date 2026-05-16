@@ -240,11 +240,14 @@ public abstract class Scala3LexerBase : Lexer
         // `extension (params)` ends with RPAREN but has an indented method body.
         // Allow RPAREN to trigger INDENT only when the outer context is Indented
         // or TopLevel — not inside a function-call argument list (InParens) or a
-        // brace block (InBraces), where a trailing RPAREN must never open a new
-        // indented region.
+        // brace block (InBraces), and not when the following line starts with a
+        // class-template continuation keyword (extends / with / derives), which
+        // is a header-continuation line, not a new indented block.
         bool rparenOpensIndent = _lastNonHiddenType == Scala3Lexer.RPAREN
                               && _regionStack.Peek() != Region.InParens
-                              && _regionStack.Peek() != Region.InBraces;
+                              && _regionStack.Peek() != Region.InBraces
+                              && _ffgToken!.Type != Scala3Lexer.EXTENDS
+                              && _ffgToken!.Type != Scala3Lexer.WITH;
         bool willIndent = newIndent > curIndent
                        && !isDot
                        && (CanStartIndent(_lastNonHiddenType) || rparenOpensIndent);
