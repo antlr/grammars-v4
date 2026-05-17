@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Linq;
 // Scala 3 INDENT/DEDENT injection for ANTLR4
 // Modelled on Dotty (Scala 3 compiler) Scanners.scala handleNewLine logic.
 //
@@ -34,6 +36,12 @@ using System.IO;
 
 public abstract class Scala3LexerBase : Lexer
 {
+    // Set to true when --3.0-migration is passed on the command line.
+    // Enables Scala 2-compatible syntax (._  wildcard imports, [_] type wildcards).
+    public static bool Migration30 { get; } =
+        Environment.GetCommandLineArgs()
+            .Any(a => a.Equals("--3.0-migration", StringComparison.OrdinalIgnoreCase));
+
     private enum Region { TopLevel, Indented, InBraces, InParens }
 
     // Region stack: bottom = TopLevel, top = innermost.
@@ -301,7 +309,7 @@ public abstract class Scala3LexerBase : Lexer
             // copy on the default channel if the outer context needs a separator.
             InsertDedentTokens(newIndent, _ffgToken);
             Region newTop = _regionStack.Peek();
-            if (newTop != Region.InParens && newTop != Region.InBraces && !isDot
+            if (newTop != Region.InParens && !isDot
                 && _ffgToken.Type != TokenConstants.EOF
                 && _ffgToken.Type != Scala3Lexer.RBRACE
                 && CanEndStat(_lastNonHiddenType)

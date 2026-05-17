@@ -38,6 +38,18 @@ import java.util.LinkedList;
 
 public abstract class Scala3LexerBase extends Lexer {
 
+    // Set to true when --3.0-migration is passed on the command line.
+    // Enables Scala 2-compatible syntax (._  wildcard imports, [_] type wildcards).
+    public static final boolean migration30 = checkMigration30();
+
+    private static boolean checkMigration30() {
+        String cmd = System.getProperty("sun.java.command", "");
+        for (String arg : cmd.split("\\s+")) {
+            if (arg.equalsIgnoreCase("--3.0-migration")) return true;
+        }
+        return false;
+    }
+
     private enum Region { TopLevel, Indented, InBraces, InParens }
 
     // Region stack: bottom = TopLevel, top = innermost.
@@ -269,7 +281,7 @@ public abstract class Scala3LexerBase extends Lexer {
             // copy on the default channel if the outer context needs a separator.
             insertDedentTokens(newIndent, ffgToken);
             Region newTop = regionStack.peek();
-            if (newTop != Region.InParens && newTop != Region.InBraces && !isDot
+            if (newTop != Region.InParens && !isDot
                     && ffgToken.getType() != Token.EOF
                     && ffgToken.getType() != Scala3Lexer.RBRACE
                     && canEndStat(lastNonHiddenType)

@@ -16,7 +16,7 @@
 
 parser grammar Scala3Parser;
 
-options { tokenVocab = Scala3Lexer; }
+options { tokenVocab = Scala3Lexer; superClass = Scala3ParserBase; }
 
 // =====================================================================
 // Top-level
@@ -96,9 +96,10 @@ namedSelector
     : id (AS (id | USCORE))?
     ;
 
-// wildcard: '*' or 'given [Type]'
+// wildcard: '*', '_' (--3.0-migration), or 'given [Type]'
 wildCardSelector
-    : Op                   // the '*' operator
+    : Op                               // the '*' operator
+    | {migration30()}? USCORE          // '_' Scala 2-style wildcard (--3.0-migration)
     | GIVEN infixType?
     ;
 
@@ -202,7 +203,8 @@ annotType
 
 simpleType_
     : simpleLiteral                                              // literal type
-    | QUESTION typeBounds                                        // wildcard type
+    | QUESTION typeBounds                                        // wildcard type  ?
+    | {migration30()}? USCORE typeBounds?                        // wildcard type  _ (--3.0-migration)
     | singleton DOT TYPE                                         // singleton type
     | singleton DOT id                                           // type selection on singleton
     | id                                                         // type name

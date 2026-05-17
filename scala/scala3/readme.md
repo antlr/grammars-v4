@@ -7,10 +7,19 @@ So, I decided to not use that, but the "docs" version instead. Note, the "docs" 
 contains several problems with newlines, semicolons, and statements. I tried to mirror what
 the Dotty compiler does rather than assume blind allegience to a human-scraped EBNF.
 
+## Options
+
+The lexer and parser base classes recognise the following command-line option:
+
+| Option | Description |
+|--------|-------------|
+| `--3.0-migration` | Enable Scala 2-compatible syntax accepted by the Scala 3 compiler under `-source:3.0-migration`. Currently enables: `._` wildcard import selectors (e.g. `import scala.jdk.CollectionConverters._`) and `_` as a wildcard type argument (e.g. `Seq[_]`). Without this flag these constructs are rejected; the Scala 3 equivalents are `.*` and `?` respectively. |
+
 ## Reference
 * [pldb](http://pldb.info/concepts/scala)
 * Dotty compiler parser: https://github.com/scala/scala3/blob/main/compiler/src/dotty/tools/dotc/parsing/Parsers.scala
 * Playground: https://onecompiler.com/scala
+* Playground: https://www.tutorialspoint.com/compilers/online-scala-compiler.htm
 
 ## Parser Rule Coverage
 
