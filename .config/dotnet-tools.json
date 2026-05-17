@@ -52,35 +52,35 @@
       "rollForward": false
     },
     "trtext": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trtext"
       ],
       "rollForward": false
     },
     "trwdog": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trwdog"
       ],
       "rollForward": false
     },
     "trxgrep": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trxgrep"
       ],
       "rollForward": false
     },
     "trxml": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trxml"
       ],
       "rollForward": false
     },
     "trxml2": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trxml2"
       ],
@@ -143,49 +143,49 @@
       "rollForward": false
     },
     "trsort": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trsort"
       ],
       "rollForward": false
     },
     "trsplit": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trsplit"
       ],
       "rollForward": false
     },
     "trsponge": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trsponge"
       ],
       "rollForward": false
     },
     "trtokens": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trtokens"
       ],
       "rollForward": false
     },
     "trtree": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trtree"
       ],
       "rollForward": false
     },
     "trunfold": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trunfold"
       ],
       "rollForward": false
     },
     "trunfoldlit": {
-      "version": "0.23.43",
+      "version": "0.23.44",
       "commands": [
         "trunfoldlit"
       ],
