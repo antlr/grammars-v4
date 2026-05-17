@@ -11,7 +11,7 @@ fi
 prefix=`pwd`
 for g in $directories
 do
-    pushd $g
+    pushd $g > /dev/null 2>&1
     while true
     do
         if [ `pwd` == '/' ]
@@ -35,18 +35,23 @@ do
     fi
     if [ ! -f pom.xml ]
     then
-        popd > /dev/null
+        popd > /dev/null 2>&1
         continue
     fi
     grep -q -e '<modules>' pom.xml
     if [ $? -eq 0 ]
     then
-        popd > /dev/null
+        popd > /dev/null 2>&1
         continue
     fi
-    popd > /dev/null
-    grammars+=( $g )
+    popd > /dev/null 2>&1
+    if [[ ! " ${grammars[@]} " =~ " $g " ]]; then
+        grammars+=( $g )
+    fi
 done
+
+echo All grammars:
+echo ${grammars[@]}
 
 failed_grammars=()
 for grammar in ${grammars[@]}

@@ -33,12 +33,18 @@ cloneroot=`pwd`
 
 ```sh
 cd csharp/v8-spec
-dotnet trgen -t CSharp --template-sources-directory $cloneroot
+dotnet trgen -t CSharp
 ```
 
 `trgen` reads `desc.xml` in the current directory for grammar and test configuration,
 discovers all `.g4` files, resolves their dependencies, and writes the complete driver
 application into `Generated-CSharp/`.
+
+> **trgen rules:**
+> - Only ever use `-t <target>` — no other options (no `--template-sources-directory`, etc.).
+> - Always run `dotnet trgen` from the directory that contains `desc.xml` (the grammar dir).
+> - Never run it from the repo root or any other directory.
+> - For Java: `dotnet trgen -t Java` → generates `Generated-Java/`.
 
 **3. Build the driver:**
 
