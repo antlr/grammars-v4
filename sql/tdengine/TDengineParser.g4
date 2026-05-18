@@ -947,7 +947,6 @@ expressionList
 
 columnReference
    : (tableName NK_DOT)? columnName
-   | (tableName NK_DOT)? columnAlias
    ;
 
 pseudoColumn
@@ -1138,7 +1137,7 @@ commonExpression
    ;
 
 searchCondition
-   : commonExpression
+   : booleanValueExpression
    ;
 /*
  * =============================================================================
