@@ -105,7 +105,7 @@ typeDef
     ;
 
 typeParameters
-    : L_BRACKET typeParameterDecl (COMMA typeParameterDecl)* R_BRACKET
+    : L_BRACKET (typeParameterDecl (COMMA typeParameterDecl)* COMMA?) R_BRACKET
     ;
 
 typeParameterDecl
