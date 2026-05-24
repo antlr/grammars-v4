@@ -1,0 +1,64 @@
+name: Weekly Dev Build
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
+  workflow_dispatch:        # allow manual triggering
+
+jobs:
+  test-java-dev:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+        cache: 'maven'
+    - name: Test Java
+      run: |
+        java --version
+        javac --version
+        mvn --version
+    - name: Install Python
+      uses: actions/setup-python@v6.2.0
+      with:
+        python-version: '3.10'
+    - name: Install antlr4-tools
+      run: |
+        python -m ensurepip --upgrade
+        pip install _scripts/antlr4-tools
+        pip show antlr4-tools
+    - name: Install Trash
+      shell: bash
+      run: |
+        dotnet tool restore
+    - name: Test Trash install
+      shell: bash
+      run: |
+        dotnet trgen --help
+    - name: Test all grammars with stable ANTLR4 (Java target)
+      shell: bash
+      run: |
+        bash _scripts/test.sh -t Java
+    - name: Clone and build ANTLR4 dev branch
+      shell: bash
+      run: |
+        ANTLR4_DEV_DIR="$HOME/.antlr4-dev/antlr4"
+        git clone https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
+        cd "$ANTLR4_DEV_DIR"
+        git checkout dev
+        mvn -DskipTests install
+    - name: Test all grammars with dev ANTLR4 (Java target)
+      shell: bash
+      run: |
+        bash _scripts/test.sh -t Java --antlr-version dev
+    - name: Upload dev ANTLR4 JAR
+      uses: actions/upload-artifact@v7
+      with:
+        name: antlr4-dev-complete
+        path: ~/.antlr4-dev/antlr4/tool/target/antlr4-*-complete.jar
+        retention-days: 90

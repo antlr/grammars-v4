@@ -93,6 +93,27 @@ popd > /dev/null 2>&1
 
 rm -rf `find . -name 'Generated*' -type d`
 
+# Pre-process long options not handled by getopts.
+antlr_version=""
+_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --antlr-version)
+            antlr_version="$2"
+            shift 2
+            ;;
+        --antlr-version=*)
+            antlr_version="${1#*=}"
+            shift
+            ;;
+        *)
+            _args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${_args[@]}"
+
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
@@ -348,7 +369,7 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates"${antlr_version:+ --antlr-version "$antlr_version"} 2> /dev/null`
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`
