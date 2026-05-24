@@ -11,8 +11,15 @@
 } >  \</ItemGroup>
   \<ItemGroup>
     \<PackageReference Include="UTF.Unknown" Version="2.6.0" />
+<if(antlr_is_dev)>
+    \<Reference Include="Antlr4.Runtime.Standard">
+      \<HintPath>$(ANTLR4_CS_DLL)\</HintPath>
+    \</Reference>
+<else>
+    \<PackageReference Include="Antlr4.Runtime.Standard" Version="<antlr_version>" />
+<endif>
+	  \<!--PackageReference Include="Antlr4BuildTasks" Version="12.10" PrivateAssets="all" -->
   \</ItemGroup>
-  \<Import Project="Other.csproj">\</Import>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
   \</PropertyGroup>
