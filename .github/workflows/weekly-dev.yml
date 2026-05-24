@@ -1,15 +1,9 @@
 name: Weekly Dev Build
 
-#on:
-#  schedule:
-#    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
-#  workflow_dispatch:        # allow manual triggering
-
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
+  workflow_dispatch:        # allow manual triggering
 
 jobs:
   test-java-dev:
