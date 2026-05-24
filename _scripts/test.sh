@@ -99,6 +99,10 @@ _args=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --antlr-version)
+            if [[ -z "${2:-}" || "$2" == -* ]]; then
+                echo "Error: --antlr-version requires a non-option value." >&2
+                exit 2
+            fi
             antlr_version="$2"
             shift 2
             ;;
