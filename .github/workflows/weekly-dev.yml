@@ -48,10 +48,11 @@ jobs:
       shell: bash
       run: |
         ANTLR4_DEV_DIR="$HOME/.antlr4-dev/antlr4"
-        git clone https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
+        git clone --branch dev --depth 1 https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
         cd "$ANTLR4_DEV_DIR"
-        git checkout dev
         mvn -DskipTests install
+        JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
+        echo "ANTLR4_DEV_JAR=$JAR" >> "$GITHUB_ENV"
     - name: Test all grammars with dev ANTLR4 (Java target)
       shell: bash
       run: |
@@ -60,5 +61,5 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: antlr4-dev-complete
-        path: ~/.antlr4-dev/antlr4/tool/target/antlr4-*-complete.jar
+        path: ${{ env.ANTLR4_DEV_JAR }}
         retention-days: 90

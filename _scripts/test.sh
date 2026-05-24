@@ -181,6 +181,11 @@ OPTIONS
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "Python3".
            All targets are tested by default.
 
+       --antlr-version
+           Specifies the ANTLR4 tool and runtime version to use (e.g. "4.13.1"),
+           or "dev" to clone and build from the ANTLR4 dev branch. Passed
+           directly to trgen. If omitted, trgen's default version is used.
+
 EOF
             exit 0
             ;;
@@ -373,7 +378,9 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trgen -t "$target" --template-sources-directory "$full_path_templates" ${antlr_version:+ --antlr-version "$antlr_version"} 2> /dev/null`
+    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
+    bad=$(dotnet trgen "${trgen_opts[@]}" 2>/dev/null)
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`
