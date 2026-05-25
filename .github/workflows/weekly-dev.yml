@@ -54,8 +54,9 @@ jobs:
       shell: bash
       run: |
         ANTLR4_DEV_DIR="$HOME/.antlr4-dev/antlr4"
-        git clone --branch dev --depth 1 https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
+        git clone --quiet https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
         cd "$ANTLR4_DEV_DIR"
+        git checkout dev
         mvn -DskipTests install
         JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
         echo "ANTLR4_DEV_JAR=$JAR" >> "$GITHUB_ENV"

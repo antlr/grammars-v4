@@ -8,7 +8,7 @@ if (Test-Path -Path transformGrammar.py -PathType Leaf) {
 <if(antlr_is_dev)>
 $ANTLR4_DEV_DIR = "<antlr_dev_dir>/antlr4"
 if (-not (Test-Path "$ANTLR4_DEV_DIR/.git")) {
-    git clone https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
+    git clone --quiet https://github.com/antlr/antlr4.git "$ANTLR4_DEV_DIR"
 }
 Push-Location "$ANTLR4_DEV_DIR"
 git checkout dev
