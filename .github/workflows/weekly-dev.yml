@@ -66,6 +66,7 @@ jobs:
         bash ../_scripts/test.sh -t Java --antlr-version dev
         cat Generated-Java/test.sh
     - name: What happened
+      if: always()
       shell: bash
       run: |
         cd abb
