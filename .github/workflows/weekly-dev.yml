@@ -1,9 +1,15 @@
 name: Weekly Dev Build
 
+#on:
+#  schedule:
+#    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
+#  workflow_dispatch:        # allow manual triggering
+
 on:
-  schedule:
-    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
-  workflow_dispatch:        # allow manual triggering
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   test-java-dev:
@@ -40,10 +46,6 @@ jobs:
       shell: bash
       run: |
         dotnet trgen --help
-    - name: Test all grammars with stable ANTLR4 (Java target)
-      shell: bash
-      run: |
-        bash _scripts/test.sh -t Java
     - name: Clone and build ANTLR4 dev branch
       shell: bash
       run: |
@@ -56,7 +58,9 @@ jobs:
     - name: Test all grammars with dev ANTLR4 (Java target)
       shell: bash
       run: |
-        bash _scripts/test.sh -t Java --antlr-version dev
+        cd abb
+        bash ../_scripts/test.sh -t Java --antlr-version dev
+        cat Generated-Java/test.sh
     - name: Upload dev ANTLR4 JAR
       uses: actions/upload-artifact@v7
       with:
