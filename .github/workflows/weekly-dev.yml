@@ -64,9 +64,7 @@ jobs:
     - name: Test all grammars with dev ANTLR4 (Java target)
       shell: bash
       run: |
-        cd abb
-        bash ../_scripts/test.sh -t Java --antlr-version dev
-        cat Generated-Java/test.sh
+        bash _scripts/test.sh -t Java --antlr-version dev
     - name: Upload dev ANTLR4 JAR
       uses: actions/upload-artifact@v7
       with:
