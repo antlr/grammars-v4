@@ -65,6 +65,11 @@ jobs:
         cd abb
         bash ../_scripts/test.sh -t Java --antlr-version dev
         cat Generated-Java/test.sh
+    - name: What happened
+      shell: bash
+      run: |
+        cd abb
+        cat Generated-Java/test.sh
     - name: Upload dev ANTLR4 JAR
       uses: actions/upload-artifact@v7
       with:
