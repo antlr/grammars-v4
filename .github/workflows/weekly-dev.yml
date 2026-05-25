@@ -61,6 +61,9 @@ jobs:
         mvn -DskipTests install
         JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
         echo "ANTLR4_DEV_JAR=$JAR" >> "$GITHUB_ENV"
+        dotnet build -c Release "$ANTLR4_DEV_DIR/runtime/CSharp/src"
+        CS_BIN=$(ls -d "$ANTLR4_DEV_DIR"/runtime/CSharp/src/bin/Release/*)
+        echo "ANTLR4_CS_BIN=$CS_BIN" >> "$GITHUB_ENV"
     - name: Test all grammars with dev ANTLR4 (Java target)
       shell: bash
       run: |
@@ -70,4 +73,10 @@ jobs:
       with:
         name: antlr4-dev-complete
         path: ${{ env.ANTLR4_DEV_JAR }}
+        retention-days: 90
+    - name: Upload dev ANTLR4 CSharp runtime bin
+      uses: actions/upload-artifact@v7
+      with:
+        name: antlr4-dev-csharp-runtime-bin
+        path: ${{ env.ANTLR4_CS_BIN }}
         retention-days: 90
