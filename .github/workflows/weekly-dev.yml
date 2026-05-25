@@ -1,15 +1,16 @@
 name: Weekly Dev Build
 
-#on:
-#  schedule:
-#    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
-#  workflow_dispatch:        # allow manual triggering
-
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 9 * * 1'   # every Monday at 09:00 UTC (staggered from weekly-jar at 03:00)
+  workflow_dispatch:        # allow manual triggering
+
+# Use for testing.
+#on:
+#  push:
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -65,12 +66,6 @@ jobs:
       run: |
         cd abb
         bash ../_scripts/test.sh -t Java --antlr-version dev
-        cat Generated-Java/test.sh
-    - name: What happened
-      if: always()
-      shell: bash
-      run: |
-        cd abb
         cat Generated-Java/test.sh
     - name: Upload dev ANTLR4 JAR
       uses: actions/upload-artifact@v7
