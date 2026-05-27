@@ -76,8 +76,18 @@ alter_table_stmt
             TO_ new_table_name = table_name
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
         )
-        | ADD_ COLUMN_? column_def
-        | DROP_ COLUMN_? column_name
+        | ADD_ (
+        	COLUMN_? column_def
+       		| (CONSTRAINT_ name)? CHECK_ (expr) conflict_clause?
+        )
+        | DROP_ (
+        	COLUMN_? column_name
+        	| CONSTRAINT_ name
+        )
+        | ALTER_ COLUMN_? column_name (
+        	(SET_ NOT_ NULL_ conflict_clause?)
+        	| (DROP_ NOT_ NULL_)
+       	)
     )
 ;
 
