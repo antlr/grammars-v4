@@ -94,6 +94,31 @@ popd > /dev/null 2>&1
 
 rm -rf `find . -name 'Generated*' -type d`
 
+# Pre-process long options not handled by getopts.
+antlr_version=""
+_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --antlr-version)
+            if [[ -z "${2:-}" || "$2" == -* ]]; then
+                echo "Error: --antlr-version requires a non-option value." >&2
+                exit 2
+            fi
+            antlr_version="$2"
+            shift 2
+            ;;
+        --antlr-version=*)
+            antlr_version="${1#*=}"
+            shift
+            ;;
+        *)
+            _args+=("$1")
+            shift
+            ;;
+    esac
+done
+set -- "${_args[@]}"
+
 # Parse args, and update computation to perform.
 order="grammars"
 additional=()
@@ -156,6 +181,11 @@ OPTIONS
            Specifies the targets to test. Possible targets are
            "CSharp", "Cpp", "Dart", "Go", "Java", "JavaScript", "Python3".
            All targets are tested by default.
+
+       --antlr-version
+           Specifies the ANTLR4 tool and runtime version to use (e.g. "4.13.1"),
+           or "dev" to clone and build from the ANTLR4 dev branch. Passed
+           directly to trgen. If omitted, trgen's default version is used.
 
 EOF
             exit 0
@@ -349,7 +379,9 @@ do
     # Generate driver source code.
 
     if [ $quiet != "true" ]; then echo "Generating driver for $testname."; fi
-    bad=`dotnet trash gen -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar 2> /dev/null`
+    trgen_opts=(-t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path "$antlr4jar")
+    [[ -n "$antlr_version" ]] && trgen_opts+=(--antlr-version "$antlr_version")
+    bad=$(dotnet trash gen "${trgen_opts[@]}" 2>/dev/null)
     for i in $bad; do failed+=( "$testname/$target" ); done
 
     for d in `echo Generated-$target-* Generated-$target`

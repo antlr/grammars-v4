@@ -10,7 +10,6 @@ updates:
       - "dependencies"
     ignore:
       - dependency-name: "tr*"
-        update-types: ["version-update:semver-patch"]
   # Java
   - package-ecosystem: "maven"
     directory: "/"
