@@ -56,7 +56,7 @@ echo "" >> parse.txt
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
@@ -81,7 +81,7 @@ echo "" >> parse.txt
 # Perform trperf to find ambiguities for each file.
 echo Ambiguities per file: >> parse.txt
 echo "${files[*]}" \
-    | dotnet trperf -x -c aF \
+    | dotnet trash perf -x -c aF \
     | grep -v '^0' \
     | awk '{sum[$2] += $1} END {for (key in sum) print sum[key], key}' \
     | sort -k1 -n >> parse.txt
@@ -96,7 +96,7 @@ then
         # Loop from 1 to n and execute the body of the loop each time
         for ((i=1; i\<=n; i++))
         do
-            dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
+            dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -prefix individual $f >> parse.txt 2>&1
             xxx="$?"
             if [ "$xxx" -ne 0 ]
             then
@@ -110,10 +110,10 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
-    echo "${files[1]}" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -x -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

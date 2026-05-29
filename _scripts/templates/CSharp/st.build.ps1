@@ -8,7 +8,7 @@ npm init -y
 npm i antlr-ng
 <endif>
 
-$trxml2_output = dotnet trxml2 Other.csproj
+$trxml2_output = dotnet trash xml2 Other.csproj
 if (-not $trxml2_output -or ($trxml2_output -match '^\s*$')) {
     Write-Host "trxml2 returned no output. Contents of Other.csproj:"
     Get-Content Other.csproj | Write-Host
@@ -19,9 +19,9 @@ if (-not $version -or $version -eq '') {
     $version = "4.13.1"
 }
 Write-Host "trxml2 output"
-dotnet trxml2 Other.csproj | Write-Host
+dotnet trash xml2 Other.csproj | Write-Host
 Write-Host "trxml2 plus select string output"
-dotnet trxml2 Other.csproj | Select-String 'PackageReference/@Version' | Write-Host
+dotnet trash xml2 Other.csproj | Select-String 'PackageReference/@Version' | Write-Host
 Write-Host "version = '$version'"
 
 <tool_grammar_files:{x |
