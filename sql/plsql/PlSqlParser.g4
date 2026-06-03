@@ -91,6 +91,8 @@ unit_statement
     | drop_view
     | drop_index
 
+    | purge_statement
+
     | rename_object
 
     | comment_on_column
@@ -1217,6 +1219,16 @@ sql_statement_shortcut
 
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+purge_statement
+    : PURGE (TABLE tableview_name
+            | INDEX index_name
+            | TABLESPACE tablespace (USER user_object_name)?
+            | TABLESPACE SET tablespace_set (USER user_object_name)?
+            | RECYCLEBIN
+            | DBA_RECYCLEBIN
+            ) ';'
     ;
 
 rename_object
@@ -2753,6 +2765,10 @@ encryption_spec
     : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
     ;
 tablespace
+    : regular_id
+    ;
+
+tablespace_set
     : regular_id
     ;
 
