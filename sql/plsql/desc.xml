@@ -9,7 +9,7 @@
    <test>
       <name>more-examples</name>
       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java</targets>
-      <inputs>more/**/*.sql</inputs>
+      <inputs>more-examples/**/*.sql</inputs>
    </test>
 </desc>
 
