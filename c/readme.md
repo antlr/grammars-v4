@@ -3,6 +3,9 @@
 ## Introduction
 
 This is an ANTLR4 grammar for the C programming language, based on the ISO/IEC 9899:2024 specification (C23). The grammar is organized into two files: `CLexer.g4` for lexical analysis and `CParser.g4` for parsing. Parser rules are ordered to correspond with the sections in the ISO C specification.
+Note, the EBNF of the draft
+[N3320](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf) 2024-02-22, early C2y draft,
+differs only in rule numbering from the C23 Spec.
 
 ### Preprocessor Integration
 
