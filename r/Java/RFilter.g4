@@ -46,7 +46,7 @@ stream
     ;
 
 eat
-    : (NL {this.hideToken($NL)})+
+    : (NL {this.hideToken($NL);})+
     ;
 
 elem
