@@ -306,7 +306,7 @@ The following table maps the EBNF nonterminal names from the ISO C specification
 * [sqlite](https://github.com/sqlite/sqlite)
 * [writing-a-c-compiler-tests](https://github.com/nlsandler/writing-a-c-compiler-tests)
 
-## Peformance
+## Performance
 
 <img src="./times.svg">
 

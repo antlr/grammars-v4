@@ -2,7 +2,7 @@
 
 Grammar parses SWIFT FIN exchange messages between financial institutions.
 It is based on experience gained when working on core banking system.
-It is sufficient for current needs and therefor should be improved.
+It is sufficient for current needs and therefore should be improved.
 See links for structure description.
 
 ## Reference
