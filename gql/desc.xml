@@ -1,0 +1,10 @@
+<grammar>
+    <name>GQL</name>
+    <targets>
+        <target>Java</target>
+        <target>Python3</target>
+        <target>JavaScript</target>
+        <target>Cpp</target>
+    </targets>
+    <inputs>examples/**/*.gql</inputs>
+</grammar>
