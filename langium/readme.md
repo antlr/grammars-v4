@@ -18,7 +18,7 @@ the equivalent of a label is called a "property", which--surprisingly--is requir
 children of the tree node must be explicitly named.
 
 The regular expression
-rules are roughly equivalent to that for JavaScript, but I cannot guarentee that it is
+rules are roughly equivalent to that for JavaScript, but I cannot guarantee that it is
 completely correct. The use of the semantic predicate for RegexLiteral is to make sure
 comments are not lexed as regular expressions.
 
