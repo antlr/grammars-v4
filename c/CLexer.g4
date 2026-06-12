@@ -203,7 +203,7 @@ Long
     : 'long'
     ;
 
-Nulptr
+Nullptr_
     : 'nullptr'
     ;
 
