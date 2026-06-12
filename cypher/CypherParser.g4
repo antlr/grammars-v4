@@ -272,12 +272,31 @@ patternPart
     ;
 
 patternElem
-    : nodePattern patternElemChain*
-    | LPAREN patternElem RPAREN
+    : nodePattern (patternElemChain | qppElemChain)*
+    | LPAREN patternElem RPAREN qppQuantifier?
     ;
 
 patternElemChain
     : relationshipPattern nodePattern
+    ;
+
+qppElemChain
+    : LPAREN patternElem RPAREN qppQuantifier nodePattern
+    ;
+
+qppQuantifier
+    : LBRACE qppInt COMMA qppInt RBRACE
+    | LBRACE qppInt RBRACE
+    | LBRACE qppInt COMMA RBRACE
+    | LBRACE COMMA qppInt RBRACE
+    | LBRACE COMMA RBRACE
+    | PLUS
+    | MULT
+    ;
+
+qppInt
+    : DIGIT
+    | ID
     ;
 
 properties
