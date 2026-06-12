@@ -1,5 +1,5 @@
 --Keyword tester
-CREATE TABLE TESTKEYWORD(IFNULL int, NVL int, GET int, LEFT int,RIGHT int, DATE_PART int,TO_DATE int,DATE int,SPLIT int,NULLIF int,EQUAL_NULL int );
+CREATE TABLE TESTKEYWORD(IFNULL int, NVL int, GET int, LEFT int,RIGHT int, DATE_PART int,TO_DATE int,DATE int,SPLIT int,NULLIF int,EQUAL_NULL int, LOCATION int );
 create table TestK (NVL2 string, FIRST_VALUE string, RESTRICT int, NVL int, RESPECT int);
 
 create temporary table t(i int);
