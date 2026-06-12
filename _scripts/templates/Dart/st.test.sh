@@ -22,7 +22,7 @@ esac
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+files2=`dotnet trash glob '../<example_files_unix>' | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
@@ -49,7 +49,7 @@ git clean -f ../<example_dir_unix>
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog ./Test.exe -q -tee -tree $f >> parse.txt
+    dotnet trash wdog ./Test.exe -q -tee -tree $f >> parse.txt
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -58,7 +58,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog ./Test.exe -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trash wdog ./Test.exe -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 

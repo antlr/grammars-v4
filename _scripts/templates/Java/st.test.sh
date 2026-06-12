@@ -22,7 +22,7 @@ esac
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+files2=`dotnet trash glob '../<example_files_unix>' | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
@@ -44,15 +44,20 @@ fi
 git clean -f ../<example_dir_unix>
 
 # Parse all input files.
-version=`grep "version=" build.sh | awk -F= '{print $2}'`
+<if(antlr_is_dev)>
+ANTLR4_DEV_DIR=<antlr_dev_dir>/antlr4
+JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
+<else>
+version=<antlr_version>
 JAR=`python -c "import os; from pathlib import Path; print(os.path.join(Path.home() , '.m2',  'repository', 'org', 'antlr', 'antlr4', '$version', 'antlr4-$version-complete.jar'))"`
+<endif>
 CLASSPATH="$JAR<if(path_sep_semi)>\;<else>:<endif>."
 <if(individual_parsing)>
 # Individual parsing.
 rm -f parse.txt
 for f in ${files[*]}
 do
-    dotnet trwdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
+    dotnet trash wdog java -classpath "$CLASSPATH" Test -q -tee -tree $f >> parse.txt 2>&1
     xxx="$?"
     if [ "$xxx" -ne 0 ]
     then
@@ -61,7 +66,7 @@ do
 done
 <else>
 # Group parsing.
-echo "${files[*]}" | dotnet trwdog java -classpath "$CLASSPATH" Test -q -x -tee -tree > parse.txt 2>&1
+echo "${files[*]}" | dotnet trash wdog java -classpath "$CLASSPATH" Test -q -x -tee -tree > parse.txt 2>&1
 status=$?
 <endif>
 

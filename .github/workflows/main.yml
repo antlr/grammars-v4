@@ -140,7 +140,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
+        dotnet trash --help
     - name: Install Antlr-ng
       shell: pwsh
       run: |
@@ -250,7 +250,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
+        dotnet trash --help
     - name: Test Rust
       run: rustup --version
     - name: Test

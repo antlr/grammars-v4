@@ -343,7 +343,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trparse -t ANTLRv4 *.g4 2> /dev/null | dotnet trxgrep ' //(actionBlock | argActionBlock)' | dotnet trtext -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -376,7 +376,7 @@ do
 
     if [ "$target" == "ambiguity" ]
     then
-        dotnet trgen -t CSharp --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
+        dotnet trash gen -t CSharp --template-sources-directory "$full_path_templates" --antlr-tool-path $antlr4jar
         if [ $? -ne 0 ]
         then
             echo "::warning file=$testname,line=0,col=0,endColumn=0::Cannot test ambiguity, non-zero return from trgen."
