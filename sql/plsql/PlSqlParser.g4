@@ -7788,6 +7788,7 @@ regular_id
     | EXISTS
     | EXIT
     | EXTEND
+    | FIELDS
     | FILESTORE
     | FLOAT
     | FORALL
@@ -7795,6 +7796,7 @@ regular_id
     | INDICES
     | INOUT
     | INTEGER
+    | INTERNAL
     | JSON_TRANSFORM
     | K_LETTER
     | LANGUAGE
@@ -7807,6 +7809,7 @@ regular_id
     | MISMATCH
     | NUMBER
     | ORADATA
+    | ORC
     | OSERROR
     | OUT
     | OVERRIDING
