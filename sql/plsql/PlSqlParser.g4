@@ -3240,7 +3240,9 @@ drop_binding_clause
     ;
 
 create_materialized_view
-    : CREATE MATERIALIZED VIEW tableview_name (OF type_name)? (
+    : CREATE MATERIALIZED VIEW (
+        IF NOT EXISTS
+    )? tableview_name (OF type_name)? (
         '(' (scoped_table_ref_constraint | mv_column_alias) (
             ',' (scoped_table_ref_constraint | mv_column_alias)
         )* ')'
@@ -3250,7 +3252,11 @@ create_materialized_view
     ) (
         USING INDEX ((physical_attributes_clause | TABLESPACE mv_tablespace = id_expression)+)*
         | USING NO INDEX
-    )? create_mv_refresh? (FOR UPDATE)? ((DISABLE | ENABLE) QUERY REWRITE)? AS select_only_statement
+    )? create_mv_refresh? evaluation_edition_clause? (
+        (ENABLE | DISABLE) ON QUERY COMPUTATION
+    )? query_rewrite_clause? (
+        (ENABLE | DISABLE) CONCURRENT REFRESH
+    )? annotations_clause? AS select_only_statement
     ;
 
 scoped_table_ref_constraint
@@ -3258,7 +3264,7 @@ scoped_table_ref_constraint
     ;
 
 mv_column_alias
-    : (identifier | quoted_string) (ENCRYPT encryption_spec)?
+    : (identifier | quoted_string) (ENCRYPT encryption_spec)? (annotations_clause | scoped_table_ref_constraint)?
     ;
 
 create_mv_refresh
@@ -3266,15 +3272,27 @@ create_mv_refresh
         NEVER REFRESH
         | REFRESH (
             (FAST | COMPLETE | FORCE)
-            | ON (DEMAND | COMMIT)
-            | (START WITH | NEXT) //date goes here TODO
+            | ON (DEMAND | COMMIT | STATEMENT)
+            | (START WITH | NEXT) expression
             | WITH (PRIMARY KEY | ROWID)
             | USING (
                 DEFAULT (MASTER | LOCAL)? ROLLBACK SEGMENT
-                | (MASTER | LOCAL)? ROLLBACK SEGMENT rb_segment = REGULAR_ID
+                | (MASTER | LOCAL)? ROLLBACK SEGMENT rollback_segment_name
             )
             | USING (ENFORCED | TRUSTED) CONSTRAINTS
         )+
+    )
+    ;
+
+query_rewrite_clause
+    : (ENABLE | DISABLE) QUERY REWRITE unusable_editions_clause?
+    ;
+
+unusable_editions_clause
+    : UNUSABLE (
+        (BEFORE | BEGINNING WITH) CURRENT EDITION
+        | (BEFORE | BEGINNING WITH) EDITION edition_name
+        | BEGINNING WITH NULL_ EDITION
     )
     ;
 
