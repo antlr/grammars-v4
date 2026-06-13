@@ -6,7 +6,7 @@ Rainer Schuster, 2013
 
 ## Description
 
-Augmented Backus�Naur Form (ABNF) is a metalanguage based on Backus�Naur form (BNF),
+Augmented Backus-Naur Form (ABNF) is a metalanguage based on Backus-Naur form (BNF),
 but consisting of its own syntax and derivation rules. The motive principle for
 ABNF is to describe a formal system of a language to be used as a
 bidirectional communications protocol.

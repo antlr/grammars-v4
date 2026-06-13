@@ -5,7 +5,7 @@ EBNF adapted from https://docs.scala-lang.org/scala3/reference/syntax.html (read
 NB: https://scala-lang.org/files/archive/spec/3.4/13-syntax-summary.html seems incomplete (e.g., Import).
 So, I decided to not use that, but the "docs" version instead. Note, the "docs" grammar
 contains several problems with newlines, semicolons, and statements. I tried to mirror what
-the Dotty compiler does rather than assume blind allegience to a human-scraped EBNF.
+the Dotty compiler does rather than assume blind allegiance to a human-scraped EBNF.
 
 ## Options
 

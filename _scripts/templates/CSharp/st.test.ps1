@@ -14,7 +14,7 @@ if (Test-Path -Path "$filePath" -PathType Leaf) {
 }
 
 $files = New-Object System.Collections.Generic.List[string]
-$allFiles = $(& dotnet trglob "$Tests" ; $last = $LASTEXITCODE )
+$allFiles = $(& dotnet trash glob "$Tests" ; $last = $LASTEXITCODE )
 foreach ($file in $allFiles) {
     $ext = $file | Split-Path -Extension
     if (Test-Path $file -PathType Container) {
@@ -54,11 +54,11 @@ git clean -f ..\\<example_dir_unix>
 # Parse all input files.
 <if(individual_parsing)>
 # Individual parsing.
-Get-Content "$filePath" | ForEach-Object { dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
+Get-Content "$filePath" | ForEach-Object { dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -tee -tree $_ *>> parse.txt }
 $status = $LASTEXITCODE
 <else>
 # Group parsing.
-get-content "$filePath" | dotnet trwdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
+get-content "$filePath" | dotnet trash wdog ./bin/Debug/net10.0/<if(os_win)>Test.exe<else>Test<endif> -q -x -tee -tree *> parse.txt
 $status = $LASTEXITCODE
 <endif>
 
@@ -89,7 +89,7 @@ foreach ($file in $files) {
     $trq = "$file.trq"
     if (Test-Path $trq -PathType Leaf) {
         Write-Host "Assert test case: $trq"
-        dotnet trparse $file | dotnet trquery -c $trq
+        dotnet trash parse $file | dotnet trash query -c $trq
         $xxx = $LASTEXITCODE
         if ( $xxx -ne 0 ) {
             $assertions_err = $xxx

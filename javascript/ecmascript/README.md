@@ -11,7 +11,7 @@ files.
 
 The parser needs to read certain tokens from the `HIDDEN` channel
 for proper *semi colon insertion*. The following method signatures
-are therefor embedded inside `@parser::members`:
+are therefore embedded inside `@parser::members`:
 
 ```java
 /**

@@ -4131,6 +4131,7 @@ non_reserved_words
     | LAST_QUERY_ID
     | LEAD
     | LOCAL
+    | LOCATION
     | LOW
     | MAX_CONCURRENCY_LEVEL
     | MEDIUM

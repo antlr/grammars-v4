@@ -9,11 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4": "4.13.2",
+    "antlr4": "<if(antlr_is_dev)>*<else><antlr_version><endif>",
     "buffer": "^6.0.3",
     "fs-extra": "^11.1.1",
     "timer-node": "^5.0.6",
-    "typescript-collections": "^1.3.3",
     "typescript-string-operations": "^1.5.0"
   },
   "type": "module",

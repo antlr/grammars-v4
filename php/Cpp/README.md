@@ -18,4 +18,4 @@
     }
     ```
 
-* In both `PhpLexer.g4` and `PhpParser.g4`, replace all `this.` ocurrences with `this->`
+* In both `PhpLexer.g4` and `PhpParser.g4`, replace all `this.` occurrences with `this->`

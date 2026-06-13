@@ -51,7 +51,7 @@ The parser base class implements the following command-line options:
 | `--output-symbol-table` | Output the symbol table to stderr after parsing completes. Shows all non-predefined symbols with their classification and source location. |
 | `--output-applied-occurrences` | Output applied occurrences (identifier references) to stderr as they are resolved. |
 
-## Peformance
+## Performance
 
 <img src="./times.svg">
 
