@@ -1206,7 +1206,7 @@ sequence_spec
     ;
 
 sequence_start_clause
-    : START WITH UNSIGNED_INTEGER
+    : START WITH (UNSIGNED_INTEGER | APPROXIMATE_NUM_LIT)
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-ANALYTIC-VIEW.html
