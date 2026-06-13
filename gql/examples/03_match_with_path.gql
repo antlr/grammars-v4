@@ -1,0 +1,2 @@
+MATCH (n:Perosn)-[f:FIREND_OF]->(m:Person)
+RETURN n.name, f.since, m.name
