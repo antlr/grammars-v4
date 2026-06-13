@@ -1,4 +1,4 @@
-# Protocal Buffers (protobuf) Grammar, Version 3
+# Protocol Buffers (protobuf) Grammar, Version 3
 
 This is an Antlr4 grammar for protobuf. This grammar
 contains contains a symbol table to remove ambiguity
@@ -22,7 +22,7 @@ https://protobuf.dev/programming-guides/proto3/
 
 ## Notes
 Apparently, the Dart port for this grammar cannot be done. This is because the parser
-calls for file reading synchronously, whcih cannot be done.
+calls for file reading synchronously, which cannot be done.
 
 ## Reference
 * [pldb](http://pldb.info/concepts/protobuf)

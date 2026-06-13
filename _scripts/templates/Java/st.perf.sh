@@ -56,7 +56,7 @@ echo "" >> parse.txt
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trglob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+files2=`dotnet trash glob '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 files=()
 for f in $files2
 do
@@ -90,7 +90,7 @@ then
         # Loop from 1 to n and execute the body of the loop each time
         for ((i=1; i\<=n; i++))
         do
-            dotnet trwdog java -classpath "$CLASSPATH" Test -prefix individual $f >> parse.txt 2>&1
+            dotnet trash wdog java -classpath "$CLASSPATH" Test -prefix individual $f >> parse.txt 2>&1
             xxx="$?"
             if [ "$xxx" -ne 0 ]
             then
@@ -104,10 +104,10 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
-    echo "${files[1]}" | dotnet trwdog java -classpath "$CLASSPATH" Test -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trash wdog java -classpath "$CLASSPATH" Test -x -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trwdog java -classpath "$CLASSPATH" Test -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trash wdog java -classpath "$CLASSPATH" Test -x -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

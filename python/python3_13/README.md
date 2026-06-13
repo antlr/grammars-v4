@@ -15,7 +15,7 @@
 - parser grammar update for Python 3.13.2
 - added ENCODING token
 - complete rewrite of fstring tokenizer in lexer grammar and PythonLexerBase class
-    - now correctly tokenizes the followings in fstring:
+    - now correctly tokenizes the following in fstring:
         - escape sequences
         - walrus operator
         - dictionary comprehension

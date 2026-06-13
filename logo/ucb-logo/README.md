@@ -33,7 +33,7 @@ print {1+2}
 ## Parser
 
 There are no strict delimiters that act as the end or procedure calls in Logo.
-The following two snippets are therefor valid Logo sources:
+The following two snippets are therefore valid Logo sources:
 
 ```
 print "a print "b
@@ -75,7 +75,7 @@ initial pass over the input collecting all user defined procedures and macros:
  * parse.
  *
  * @param input
- *         the inout stream containing the UCB Logo source
+ *         the input stream containing the UCB Logo source
  *         to parse.
  */
 public UCBLogoParser(ANTLRInputStream input) {

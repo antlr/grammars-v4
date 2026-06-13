@@ -37,7 +37,7 @@ library should endeavor to map the elements to programming language types with s
 
 # Spec
 
-Currently this specification is casual, as we gather feedback from implementors. A more rigorous
+Currently this specification is casual, as we gather feedback from implementers. A more rigorous
 e.g. BNF will follow.
 
 ## General considerations

@@ -35,7 +35,7 @@ do
     fi
     if [ -f desc.xml ]
     then
-        gtargets=`dotnet trxml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
+        gtargets=`dotnet trash xml2 desc.xml | fgrep -e '/desc/targets' | awk -F = '{print $2}' | sed 's/;/ /g'`
         for t in $gtargets
         do
             targets[$t]=`expr ${targets[$t]} + 1`

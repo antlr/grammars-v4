@@ -552,8 +552,7 @@ aggregate
     ;
 
 alias_declaration
-    // : ALIAS alias_designator (COLON subtype_indication)? IS name (signature)? SEMI
-    : ALIAS alias_designator (COLON subtype_indication)? IS name SEMI
+    : ALIAS alias_designator (COLON subtype_indication)? IS name (signature)? SEMI
     ;
 
 alias_designator
@@ -1929,11 +1928,9 @@ signal_list
     | ALL
     ;
 
-// Signatures never get matched before other rules,
-// and no-one uses them in most HDL designs
-// signature
-//     : ( (type_mark (COMMA type_mark)?) (RETURN type_mark)? )?
-//     ;
+signature
+    : LBRACKET (name (COMMA name)?) (RETURN name)? RBRACKET
+    ;
 
 // simple_configuration_specification // Only used in one other rule
 //     : FOR component_specification binding_indication SEMI (END FOR SEMI)?

@@ -6462,7 +6462,7 @@ merge_statement
     : MERGE INTO selected_tableview USING selected_tableview ON '(' condition ')' (
         merge_update_clause merge_insert_clause?
         | merge_insert_clause merge_update_clause?
-    ) error_logging_clause?
+    ) error_logging_clause? static_returning_clause?
     ;
 
 // Merge Specific Clauses
@@ -6664,7 +6664,7 @@ interval_expression
     ;
 
 model_expression
-    : unary_expression ('[' model_expression_element ']')?
+    : ('-' | '+')? unary_expression ('[' model_expression_element ']')?
     ;
 
 model_expression_element
@@ -6688,17 +6688,20 @@ multi_column_for_loop
     ;
 
 unary_expression
-    : ('-' | '+') unary_expression
-    | PRIOR unary_expression
-    | CONNECT_BY_ROOT unary_expression
-    | /*TODO {input.LT(1).getText().equalsIgnoreCase("new") && !input.LT(2).getText().equals(".")}?*/ NEW unary_expression
-    | DISTINCT unary_expression
-    | ALL unary_expression
-    | /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_expression
-    | unary_expression '.' (
-        (COUNT | FIRST | LAST | LIMIT)
-        | (EXISTS | NEXT | PRIOR) '(' index += expression ')'
-    )
+    : PRIOR unary_expression_core
+    | CONNECT_BY_ROOT unary_expression_core
+    | NEW unary_expression_core
+    | OLD unary_expression_core
+    | unary_expression_core (
+        '.' (
+            (COUNT | FIRST | LAST | LIMIT)
+            | (EXISTS | NEXT | PRIOR) '(' index += expression ')'
+        )
+    )?
+    ;
+
+unary_expression_core
+    : case_expression
     | quantified_expression
     | standard_function
     | {this.IsNotNumericFunction()}? atom
