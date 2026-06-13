@@ -1,0 +1,16 @@
+syntax = 'proto2';
+
+message UserContent {
+  extensions 100 to 199 [verification = DECLARATION];
+}
+
+message OtherContent {
+  extensions 100 to 199 [
+    declaration = {
+      number: 126,
+      full_name: ".kittens.kitten_videos",
+      type: ".kittens.Video",
+      repeated: true
+    }
+  ];
+}

@@ -132,7 +132,24 @@ type_
 // Extensions
 
 extensions
-    : EXTENSIONS ranges SEMI
+    : EXTENSIONS ranges (LB (verificationDef | declarations) RB)? SEMI
+    ;
+
+verificationDef
+    : VERIFICATION EQ verification
+    ;
+
+verification
+    : DECLARATION_LIT
+    | UNVERIFIED_LIT
+    ;
+
+declarations
+    : declaration (COMMA declaration)*
+    ;
+
+declaration
+    : DECLARATION EQ blockLit
     ;
 
 // Reserved
@@ -472,6 +489,22 @@ MAX
     : 'max'
     ;
 
+VERIFICATION
+    : 'verification'
+    ;
+
+DECLARATION
+    : 'declaration'
+    ;
+
+DECLARATION_LIT
+    : 'DECLARATION'
+    ;
+
+UNVERIFIED_LIT
+    : 'UNVERIFIED'
+    ;
+
 ENUM
     : 'enum'
     ;
@@ -707,4 +740,8 @@ keywords
     | STREAM
     | RETURNS
     | BOOL_LIT
+    | DECLARATION
+    | VERIFICATION
+    | DECLARATION_LIT
+    | UNVERIFIED_LIT
     ;
