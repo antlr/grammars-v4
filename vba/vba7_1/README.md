@@ -2,7 +2,7 @@
 
 Derived from the Visual Basic 7.1 language reference
 
-https://msopenspecs.azureedge.net/files/MS-VBAL/%5bMS-VBAL%5d.pdf
+https://officeprotocoldoc.z19.web.core.windows.net/files/MS-VBAL/%5bMS-VBAL%5d.pdf
 
 This grammar ignores conditional-compilation statements. The vba_cc grammar can be used against vba files to analyze that portion of the code.
 
