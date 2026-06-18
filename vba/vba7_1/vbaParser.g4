@@ -496,10 +496,10 @@ blockStatement
     | endOfStatement* endOfLineNoWs attributeStatement
     ;
 statement
-    : controlStatement
+    : endOfStatement+ fileStatement
+    | controlStatement
     | endOfStatement+ dataManipulationStatement
     | endOfStatement+ errorHandlingStatement
-    | endOfStatement+ fileStatement
     ;
     
 // 5.4.1.1  Statement Labels
@@ -899,7 +899,7 @@ widthStatement: WIDTH wsc markedFileNumber wsc? ',' wsc? lineWidth;
 lineWidth: expression;
 
 // 5.4.5.8 Print Statement
-printStatement: ((DEBUG | ME) '.')? PRINT wsc markedFileNumber wsc? ',' wsc? outputList?;
+printStatement: ((DEBUG | ME) '.')? PRINT wsc (markedFileNumber wsc? ',' wsc?)? outputList?;
 
 // 5.4.5.8.1 Output Lists
 outputList: outputItem+;
@@ -907,7 +907,7 @@ outputItem
     : outputClause charPosition?
     | charPosition;
 outputClause: spcClause | tabClause| outputExpression;
-charPosition: ';' | ',';
+charPosition: ';' | ',' | wsc;
 outputExpression: expression;
 spcClause: SPC wsc '(' wsc? spcNumber wsc? ')';
 spcNumber: expression;
