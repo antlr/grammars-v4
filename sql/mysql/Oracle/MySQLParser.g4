@@ -152,7 +152,7 @@ alterStatement
     ;
 
 alterDatabase
-    : DATABASE_SYMBOL schemaRef alterDatabaseOption+
+    : DATABASE_SYMBOL schemaRef? alterDatabaseOption+
     ;
 
 alterDatabaseOption
@@ -399,13 +399,13 @@ viewCheckOption
 
 alterInstanceStatement
     : INSTANCE_SYMBOL ROTATE_SYMBOL textOrIdentifier MASTER_SYMBOL KEY_SYMBOL
-    | {this.isServerVersionGe80024()}? (
+    | {this.isServerVersionGe80024()}? INSTANCE_SYMBOL (
         RELOAD_SYMBOL TLS_SYMBOL (
             NO_SYMBOL ROLLBACK_SYMBOL ON_SYMBOL ERROR_SYMBOL
             | FOR_SYMBOL CHANNEL_SYMBOL identifier (
                 NO_SYMBOL ROLLBACK_SYMBOL ON_SYMBOL ERROR_SYMBOL
             )?
-        )
+        )?
         | (ENABLE_SYMBOL | DISABLE_SYMBOL) identifier identifier
         | RELOAD_SYMBOL KEYRING_SYMBOL
     )
@@ -676,7 +676,7 @@ tsOptionEncryption
     ;
 
 tsOptionEngineAttribute
-    : ENGINE_SYMBOL EQUAL_OPERATOR? jsonAttribute
+    : ENGINE_ATTRIBUTE_SYMBOL EQUAL_OPERATOR? jsonAttribute
     ;
 
 createView
@@ -732,10 +732,10 @@ createSpatialReference
     ;
 
 srsAttribute
-    : NAME_SYMBOL TEXT_SYMBOL textStringNoLinebreak
-    | DEFINITION_SYMBOL TEXT_SYMBOL textStringNoLinebreak
+    : NAME_SYMBOL textStringNoLinebreak
+    | DEFINITION_SYMBOL textStringNoLinebreak
     | ORGANIZATION_SYMBOL textStringNoLinebreak IDENTIFIED_SYMBOL BY_SYMBOL real_ulonglong_number
-    | DESCRIPTION_SYMBOL TEXT_SYMBOL textStringNoLinebreak
+    | DESCRIPTION_SYMBOL textStringNoLinebreak
     ;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -4014,7 +4014,7 @@ ifExists
     ;
 
 ifExistsIdentifier
-    : ifExists persistedVariableIdentifier
+    : ifExists? persistedVariableIdentifier
     ;
 
 persistedVariableIdentifier
