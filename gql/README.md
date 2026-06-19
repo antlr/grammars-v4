@@ -27,3 +27,4 @@ GQL is a database query language that allows users to interact with databases in
 
 ### References
 * [ISO/IEC 39075:2024](https://www.iso.org/standard/76120.html)
+* [Graph Query Language](https:://pldb.info/concepts/graph-query-language)
