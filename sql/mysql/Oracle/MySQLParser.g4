@@ -116,10 +116,10 @@ simpleStatement
     | showCreateProcedureStatement
     | showCreateFunctionStatement
     | showCreateTriggerStatement
-    | showCreateProcedureStatusStatement
-    | showCreateFunctionStatusStatement
-    | showCreateProcedureCodeStatement
-    | showCreateFunctionCodeStatement
+    | showProcedureStatusStatement
+    | showFunctionStatusStatement
+    | showProcedureCodeStatement
+    | showFunctionCodeStatement
     | showCreateEventStatement
     | showCreateUserStatement
     | resourceGroupManagement
@@ -2561,20 +2561,20 @@ showCreateTriggerStatement
     : SHOW_SYMBOL CREATE_SYMBOL TRIGGER_SYMBOL triggerRef
     ;
 
-showCreateProcedureStatusStatement
-    : SHOW_SYMBOL CREATE_SYMBOL PROCEDURE_SYMBOL STATUS_SYMBOL likeOrWhere?
+showProcedureStatusStatement
+    : SHOW_SYMBOL PROCEDURE_SYMBOL STATUS_SYMBOL likeOrWhere?
     ;
 
-showCreateFunctionStatusStatement
-    : SHOW_SYMBOL CREATE_SYMBOL FUNCTION_SYMBOL STATUS_SYMBOL likeOrWhere?
+showFunctionStatusStatement
+    : SHOW_SYMBOL FUNCTION_SYMBOL STATUS_SYMBOL likeOrWhere?
     ;
 
-showCreateProcedureCodeStatement
-    : SHOW_SYMBOL CREATE_SYMBOL PROCEDURE_SYMBOL CODE_SYMBOL procedureRef
+showProcedureCodeStatement
+    : SHOW_SYMBOL PROCEDURE_SYMBOL CODE_SYMBOL procedureRef
     ;
 
-showCreateFunctionCodeStatement
-    : SHOW_SYMBOL CREATE_SYMBOL FUNCTION_SYMBOL CODE_SYMBOL functionRef
+showFunctionCodeStatement
+    : SHOW_SYMBOL FUNCTION_SYMBOL CODE_SYMBOL functionRef
     ;
 
 showCreateEventStatement
