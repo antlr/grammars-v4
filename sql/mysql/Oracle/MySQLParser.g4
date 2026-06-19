@@ -1016,7 +1016,7 @@ loadDataFileTargetList
     ;
 
 fieldOrVariableList
-    : (columnRef | AT_SIGN_SYMBOL textOrIdentifier | AT_AT_SIGN_SYMBOL) (
+    : (columnRef | AT_SIGN_SYMBOL textOrIdentifier | AT_TEXT_SUFFIX | AT_AT_SIGN_SYMBOL) (
         COMMA_SYMBOL (
             columnRef
             | AT_SIGN_SYMBOL textOrIdentifier
@@ -1469,7 +1469,7 @@ transactionOrLockingStatement
     ;
 
 transactionStatement
-    : START_SYMBOL TRANSACTION_SYMBOL startTransactionOptionList*
+    : START_SYMBOL TRANSACTION_SYMBOL (startTransactionOptionList (COMMA_SYMBOL startTransactionOptionList)*)?
     | COMMIT_SYMBOL WORK_SYMBOL? (AND_SYMBOL NO_SYMBOL? CHAIN_SYMBOL)? (
         NO_SYMBOL? RELEASE_SYMBOL
     )?
@@ -1868,7 +1868,8 @@ replicaThreadOption
     ;
 
 groupReplication
-    : (START_SYMBOL groupReplicationStartOptions? | STOP_SYMBOL) GROUP_REPLICATION_SYMBOL
+    : START_SYMBOL GROUP_REPLICATION_SYMBOL groupReplicationStartOptions?
+    | STOP_SYMBOL GROUP_REPLICATION_SYMBOL
     ;
 
 groupReplicationStartOptions
@@ -2124,7 +2125,7 @@ withRoles
     ;
 
 grantAs
-    : AS_SYMBOL USER_SYMBOL withRoles?
+    : AS_SYMBOL user withRoles?
     ;
 
 versionedRequireClause
@@ -2743,7 +2744,7 @@ vcpuNumOrRange
     ;
 
 resourceGroupPriority
-    : THREAD_PRIORITY_SYMBOL equal? INT_NUMBER
+    : THREAD_PRIORITY_SYMBOL equal? MINUS_OPERATOR? INT_NUMBER
     ;
 
 resourceGroupEnableDisable
