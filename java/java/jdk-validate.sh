@@ -24,7 +24,7 @@ do
 	name="jdk-${filename%.*}"
 	unzip "$filename" > /dev/null 2>&1
 	pushd $root
-	dotnet trgen -t CSharp
+	dotnet trash gen -t CSharp
 	cd Generated-*
 	make
 	for times in 1 2 3

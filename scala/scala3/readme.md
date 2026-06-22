@@ -32,7 +32,7 @@ To regenerate coverage after adding or modifying example files:
 
 ```sh
 cd Generated-CSharp
-dotnet trcover ../examples/*.scala
+dotnet trash cover ../examples/*.scala
 ```
 
 This writes `cover.html`, an annotated copy of the grammar where covered call sites are

@@ -28,7 +28,7 @@
     -->
     \<MyTester>\<![CDATA[
 err=0
-for g in `dotnet trglob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
+for g in `dotnet trash glob -- '../<example_files_unix>' | grep -v '.errors$' | grep -v '.tree$'`
 do
   file=$g
   x1="${g##*.}"

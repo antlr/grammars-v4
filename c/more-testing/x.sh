@@ -1,14 +1,14 @@
 
 # set -x
 # set -e
-dirs=`dotnet trxml2 ../desc.xml | grep targets | sed 's/.*[=]//' | tr ';' ' '`
+dirs=`dotnet trash xml2 ../desc.xml | grep targets | sed 's/.*[=]//' | tr ';' ' '`
 p=`pwd`/x.c.p
 cd ..
 for t in $dirs
 do
 	echo $t
 	rm -rf Generated-*
-	dotnet trgen -t $t > /dev/null 2>&1
+	dotnet trash gen -t $t > /dev/null 2>&1
 	cd Generated-$t
 	make > /dev/null 2>&1
 	rm -f $p

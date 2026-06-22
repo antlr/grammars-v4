@@ -50,7 +50,7 @@ jobs:
     - name: Test Trash install
       shell: bash
       run: |
-        dotnet trgen --help
+        dotnet trash gen --help
     - name: Clone and build ANTLR4 dev branch
       shell: bash
       run: |

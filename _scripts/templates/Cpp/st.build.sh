@@ -9,7 +9,7 @@ cd build
 npm init -y
 npm i antlr-ng
 <endif>
-<if(test.IsWindows)>cmake .. -G "Visual Studio 17 2022" -A x64
+<if(test.IsWindows)>cmake .. -G "Visual Studio 18 2026" -A x64
 <else>cmake ..
 <endif>
 <if(test.IsWindows)>cmake --build . --config Release
