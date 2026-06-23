@@ -1753,7 +1753,7 @@ SQLDATA                        : 'SQLDATA';
 SQLERROR                       : 'SQLERROR';
 SQLLDR                         : 'SQLLDR';
 SQL                            : 'SQL';
-FILE_EXT                       : 'PKB' | 'PKS';
+FILE_EXT                       : 'FNC' | 'PKB' | 'PKS' | 'PRC' | 'TRG' | 'VW';
 SQL_MACRO                      : 'SQL_MACRO';
 SQL_TRACE                      : 'SQL_TRACE';
 SQL_TRANSLATION_PROFILE        : 'SQL_TRANSLATION_PROFILE';
@@ -2554,6 +2554,7 @@ PLUS_SIGN       : '+';
 MINUS_SIGN      : '-';
 COMMA           : ',';
 SOLIDUS         : '/';
+RSOLIDUS        : '\\';
 AT_SIGN         : '@';
 ASSIGN_OP       : ':=';
 HASH_OP         : '#';
@@ -2598,11 +2599,6 @@ REMARK_COMMENT:
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
 PROMPT_MESSAGE: 'PRO' {this.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
-
-// TODO: should starts with newline
-START_CMD: // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
-    '@' '@'?
-; // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 

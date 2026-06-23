@@ -7205,7 +7205,13 @@ sql_plus_command
     ;
 
 start_command
-    : START_CMD id_expression PERIOD (SQL | FILE_EXT)
+    : (START | AT_SIGN AT_SIGN?) sql_plus_filepath
+    ;
+
+sql_plus_filepath
+    : (id_expression COLON)? (SOLIDUS | RSOLIDUS)? (
+        id_expression (SOLIDUS | RSOLIDUS)
+    )* id_expression PERIOD (SQL | FILE_EXT)
     ;
 
 whenever_command
