@@ -262,6 +262,7 @@
 				<module>ltl</module>
 				<module>lua</module>
 				<module>lucene</module>
+				<module>maml</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>

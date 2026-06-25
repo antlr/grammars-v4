@@ -1,0 +1,10 @@
+{
+  escaped: "line1\nline2\ttabbed \"quoted\" back\\slash"
+  unicode: "snowman \u{2603} and emoji \u{1F600}"
+  notes: """
+This preserves
+formatting "as-is" and even ""double quotes""
+"""
+  oneline: """raw single line"""
+  inline: "value"  # inline comment after a value
+}
