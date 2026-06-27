@@ -83,7 +83,7 @@ NULL
 // A hash marks the rest of the line as a comment, except inside a string. The
 // terminating newline is left for NL so it can still act as a separator.
 COMMENT
-    : '#' ~[\r\n]* -> skip
+    : '#' ~[\r\n]* -> channel(HIDDEN)
     ;
 
 // Raw strings are bounded by """ and preserve their contents literally. Listed
@@ -137,5 +137,5 @@ NL
 
 // Spaces and tabs are insignificant.
 WS
-    : [ \t]+ -> skip
+    : [ \t]+ -> channel(HIDDEN)
     ;
