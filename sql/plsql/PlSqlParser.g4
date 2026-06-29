@@ -31,12 +31,46 @@ options {
 // Insert here @header for C++ parser.
 
 sql_script
-    : (sql_plus_command  SEMICOLON?)* (
-        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
+    : (sql_plus_command SEMICOLON?)* (
+        script_unit
+        (script_unit)*
     ) EOF
     ;
 
+// A script unit carries its own terminator, which differs by unit kind:
+//   - sql_plus_command: optional semicolon (handled by the leading loop above
+//     and by the command itself when it appears between statements)
+//   - plsql_unit_statement: SEMICOLON required, trailing SOLIDUS optional
+//     (sqlplus convention to run the block)
+//   - sql_unit_statement: SEMICOLON optional, SOLIDUS allowed as alternative
+//     separator (sqlplus-style DDL/DML scripts)
+script_unit
+    : sql_plus_command SEMICOLON?
+    | plsql_unit_statement SEMICOLON '/'?
+    | sql_unit_statement (SEMICOLON '/'? | '/' SEMICOLON? | SEMICOLON)?
+    ;
+
+// Backward-compatible alias: matches either a PL/SQL block or a SQL/DDL statement.
+// Kept for visitors that reference unit_statement directly.
 unit_statement
+    : plsql_unit_statement
+    | sql_unit_statement
+    ;
+
+// PL/SQL blocks: end with END and require a semicolon terminator.
+// A trailing SOLIDUS (/) is optional (sqlplus convention).
+plsql_unit_statement
+    : anonymous_block
+    | create_function_body
+    | create_procedure_body
+    | create_package
+    | create_package_body
+    | create_trigger
+    | create_type_body
+    ;
+
+// SQL/DDL statements: semicolon is optional, SOLIDUS (/) is a valid terminator.
+sql_unit_statement
     : alter_analytic_view
     | alter_attribute_dimension
     | alter_audit_policy
@@ -74,7 +108,6 @@ unit_statement
     | alter_type
     | alter_user
     | alter_view
-    | anonymous_block
     | call_statement
     | create_analytic_view
     | create_attribute_dimension
@@ -90,7 +123,6 @@ unit_statement
     | create_diskgroup
     | create_edition
     | create_flashback_archive
-    | create_function_body
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
@@ -102,10 +134,7 @@ unit_statement
     | create_materialized_zonemap
     | create_operator
     | create_outline
-    | create_package
-    | create_package_body
     | create_pmem_filestore
-    | create_procedure_body
     | create_profile
     | create_restore_point
     | create_role
@@ -116,8 +145,7 @@ unit_statement
     | create_table
     | create_tablespace
     | create_tablespace_set
-    | create_trigger
-    | create_type
+    | create_type_spec
     | create_user
     | create_view
     | drop_analytic_view
@@ -986,7 +1014,17 @@ dependent_exceptions_part
     ;
 
 create_type
-    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE (type_definition | type_body)
+    : create_type_spec | create_type_body
+    ;
+
+// Type spec (SQL, no END) — semicolon optional, solidus valid as terminator
+create_type_spec
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_definition
+    ;
+
+// Type body (PL/SQL, has END) — requires semicolon, solidus optional after
+create_type_body
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_body
     ;
 
 // Create Type Specific Clauses
