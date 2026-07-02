@@ -6,6 +6,7 @@ import re, sys, html as html_mod
 def md_inline(s):
     """Convert basic Markdown inline formatting to HTML."""
     s = html_mod.escape(s)
+    s = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', s)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
     s = re.sub(r'`([^`]+)`', r'<code>\1</code>', s)
     return s
@@ -98,7 +99,7 @@ def render_sortable_table(tbl, table_id):
                    for i, hdr in enumerate(headers))
     out += '</tr></thead>\n<tbody>\n'
     for row in rows:
-        out += '<tr>' + ''.join(f'<td>{h(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in row) + '</tr>\n'
     out += '</tbody>\n</table>\n'
 
     out += f"""<script>
