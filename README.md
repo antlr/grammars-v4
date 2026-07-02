@@ -8,6 +8,10 @@ This repository is a collection of formal grammars written for [ANTLR v4](https:
 
 The root directory name is the all-lowercase name of the language or file format parsed by the grammar. For example, java, cpp, csharp, c, etc...
 
+## Performance
+
+[Grammar performance table](https://htmlpreview.github.io/?https://github.com/kaby76/grammars-v4/blob/g4-fix-tps/performance.html) (sortable by column header)
+
 ## FAQ
 
 Please refer to the [grammars-v4 Wiki](https://github.com/antlr/grammars-v4/wiki)
