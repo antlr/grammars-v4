@@ -24,12 +24,12 @@
 <table>
 <thead><tr><th>Label</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td>`PT`</td><td>**Parse time** — sum of the parse-only time across all input files</td></tr>
-<tr><td>`OT`</td><td>**Overhead time** — `TT − PT`; time spent on file I/O, lexer/parser construction, and post-parse work</td></tr>
-<tr><td>`TT`</td><td>**Total time** — overall wall-clock time for the entire run</td></tr>
-<tr><td>`TPS`</td><td>**Tokens per second** — `total tokens / PT`; pure parse throughput across all files</td></tr>
-<tr><td>`Post-warmup TPS`</td><td>TPS computed from files 2…N only, excluding the first (warm-up) run; `n.a.` if only one file was parsed</td></tr>
-<tr><td>`Post-warmup Speed Up`</td><td>Ratio of Post-warmup TPS to first-file TPS, showing the JIT/runtime warm-up benefit; `n.a.` if only one file was parsed</td></tr>
+<tr><td><code>PT</code></td><td><strong>Parse time</strong> — sum of the parse-only time across all input files</td></tr>
+<tr><td><code>OT</code></td><td><strong>Overhead time</strong> — <code>TT − PT</code>; time spent on file I/O, lexer/parser construction, and post-parse work</td></tr>
+<tr><td><code>TT</code></td><td><strong>Total time</strong> — overall wall-clock time for the entire run</td></tr>
+<tr><td><code>TPS</code></td><td><strong>Tokens per second</strong> — <code>total tokens / PT</code>; pure parse throughput across all files</td></tr>
+<tr><td><code>Post-warmup TPS</code></td><td>TPS computed from files 2…N only, excluding the first (warm-up) run; <code>n.a.</code> if only one file was parsed</td></tr>
+<tr><td><code>Post-warmup Speed Up</code></td><td>Ratio of Post-warmup TPS to first-file TPS, showing the JIT/runtime warm-up benefit; <code>n.a.</code> if only one file was parsed</td></tr>
 </tbody>
 </table>
 <h3>Results</h3>

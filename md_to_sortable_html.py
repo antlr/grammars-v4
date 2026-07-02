@@ -3,6 +3,13 @@
 The last (largest) table is made sortable; earlier tables are static."""
 import re, sys, html as html_mod
 
+def md_inline(s):
+    """Convert basic Markdown inline formatting to HTML."""
+    s = html_mod.escape(s)
+    s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
+    s = re.sub(r'`([^`]+)`', r'<code>\1</code>', s)
+    return s
+
 def parse_num(s):
     s = s.strip()
     if 'n.a.' in s:
@@ -70,10 +77,10 @@ def render_static_table(tbl):
     if tbl['heading']:
         out += f'<h3>{h(tbl["heading"])}</h3>\n'
     out += '<table>\n<thead><tr>'
-    out += ''.join(f'<th>{h(c)}</th>' for c in tbl['headers'])
+    out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
     for row in tbl['rows']:
-        out += '<tr>' + ''.join(f'<td>{h(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in row) + '</tr>\n'
     out += '</tbody>\n</table>\n'
     return out
 
