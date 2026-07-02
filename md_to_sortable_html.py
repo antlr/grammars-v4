@@ -80,7 +80,7 @@ def render_static_table(tbl):
     out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
     for row in tbl['rows']:
-        out += '<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in row) + '</tr>\n'
+        out += '<tr>' + ''.join(f'<td style="text-align:left">{md_inline(c)}</td>' for c in row) + '</tr>\n'
     out += '</tbody>\n</table>\n'
     return out
 
