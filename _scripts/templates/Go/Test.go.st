@@ -67,6 +67,10 @@ var prefix = ""
 var quiet = false
 var tee = false
 var binary = <binary>
+var total_tokens int64 = 0
+var total_parse_seconds float64 = 0
+var first_file_tokens int64 = 0
+var first_file_parse_seconds float64 = 0
 
 func main() {
     for i := 1; i \< len(os.Args); i = i + 1 {
@@ -114,8 +118,27 @@ func main() {
         }
         elapsed := time.Since(start)
         if ! quiet {
-            fmt.Fprintf(os.Stderr, "%sTotal Time: %.3f", prefix, elapsed.Seconds())
-            fmt.Fprintln(os.Stderr)
+            overall_seconds := elapsed.Seconds()
+            warm_tokens := total_tokens - first_file_tokens
+            warm_seconds := total_parse_seconds - first_file_parse_seconds
+            warm_tps := "n.a."
+            if len(inputs) > 1 && warm_seconds > 0 {
+                warm_tps = fmt.Sprintf("%.0f", float64(warm_tokens)/warm_seconds)
+            }
+            first_tps := 0.0
+            if first_file_parse_seconds > 0 {
+                first_tps = float64(first_file_tokens) / first_file_parse_seconds
+            }
+            speedup := "n.a."
+            if len(inputs) > 1 && warm_seconds > 0 && first_tps > 0 {
+                speedup = fmt.Sprintf("%.2f", (float64(warm_tokens)/warm_seconds)/first_tps)
+            }
+            fmt.Fprintf(os.Stderr, "%sPT: %.3f\n", prefix, total_parse_seconds)
+            fmt.Fprintf(os.Stderr, "%sOT: %.3f\n", prefix, overall_seconds - total_parse_seconds)
+            fmt.Fprintf(os.Stderr, "%sTT: %.3f\n", prefix, overall_seconds)
+            fmt.Fprintf(os.Stderr, "%sTPS: %.0f\n", prefix, float64(total_tokens)/total_parse_seconds)
+            fmt.Fprintf(os.Stderr, "%sPost-warmup TPS: %s\n", prefix, warm_tps)
+            fmt.Fprintf(os.Stderr, "%sPost-warmup speed up: %s\n", prefix, speedup)
         }
     }
     if error_code != 0 {
@@ -202,6 +225,14 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
     start := time.Now()
     var tree = parser.<cap_start_symbol>()
     elapsed := time.Since(start)
+    parse_seconds := elapsed.Seconds()
+    total_parse_seconds += parse_seconds
+    token_count := int64(len(tokens.GetAllTokens()))
+    total_tokens += token_count
+    if row_number == 0 {
+        first_file_tokens = token_count
+        first_file_parse_seconds = parse_seconds
+    }
     var result = ""
     if parserErrors.errors > 0 || lexerErrors.errors > 0 {
         result = "fail"
@@ -228,7 +259,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         fmt.Fprintf(os.Stderr, "%d ", row_number)
         fmt.Fprintf(os.Stderr, "%s ", input_name)
         fmt.Fprintf(os.Stderr, "%s ", result)
-        fmt.Fprintf(os.Stderr, "%.3f", elapsed.Seconds())
+        fmt.Fprintf(os.Stderr, "%.3f s %d tokens %.0f tps", parse_seconds, token_count, float64(token_count)/parse_seconds)
         fmt.Fprintln(os.Stderr)
     }
 }
