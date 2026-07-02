@@ -18,6 +18,11 @@ myrealpath ()
 # true or false
 quiet=true
 
+# Number of times to run Test.exe per grammar for statistical averaging
+N=3
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
+
 # Get full path of this script.
 full_path_script=$(myrealpath $0)
 full_path_templates=$(dirname $full_path_script)/templates
@@ -48,6 +53,26 @@ thetime()
     printf "%02d:%02d:%02d" $hh $mm $ss
 }
 
+# Compute mean ± SEM from a list of values (skipping "n.a." entries).
+# Usage: compute_stats val1 val2 val3 ...
+compute_stats() {
+    printf '%s\n' "$@" | awk '
+    {
+        if ($1 != "n.a." && $1 != "") {
+            count++; sum += $1; v[count] = $1
+        }
+    }
+    END {
+        if (count == 0) { print "n.a. ± n.a."; exit }
+        mean = sum / count
+        if (count == 1) { printf "%.4g ± n.a.\n", mean; exit }
+        ss = 0
+        for (i = 1; i <= count; i++) ss += (v[i] - mean)^2
+        sem = sqrt(ss / (count * (count - 1)))
+        printf "%.4g ± %.4g\n", mean, sem
+    }'
+}
+
 function getopts-extra () {
     OPTARG=()
     declare i=0
@@ -68,6 +93,7 @@ skipped=""
 grammars=()
 targets=()
 tests=()
+table_rows=()
 
 # Get "root" of the repo clone.
 cwd=`pwd`
@@ -192,7 +218,10 @@ EOF
     esac
 done
 
-if [ "$filter" == "diff" ]
+if [ "${#grammars[@]}" -gt 0 ]
+then
+    : # grammars explicitly specified via -g; skip discovery
+elif [ "$filter" == "diff" ]
 then
     if [ "${#additional[@]}" -eq 0 ]
     then
@@ -313,10 +342,6 @@ do
     all=( $(echo $test | tr "," "\n") )
     testname=`echo ${all[0]} | tr -d '\n' | tr -d ' '`
     target=${all[1]}
-    if [ ! -d /home/Kenne/issues/g4-current/abnf ]
-    then
-        echo what the f.
-    fi
     if [ ! -d "$prefix/$testname" ]
     then
         echo not there.
@@ -405,12 +430,45 @@ do
         then
             continue
         fi
-        printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x
-        status="$?"
+        # Warmup run (discarded): lets Windows AV pre-scan the executable.
+        printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x > /dev/null 2>&1
+
+        # Run Test.exe N times, tee raw output to stdout, capture for stats.
+        run_pt=(); run_ot=(); run_tt=(); run_tps=(); run_warm_tps=(); run_speedup=()
+        for ((run=1; run<=N; run++)); do
+            echo "=== $testname run $run/$N ==="
+            runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_run${run}.txt"
+            printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x 2>&1 | tee "$runfile"
+            run_pt+=(      "$(awk '/^PT:/{print $NF}'               "$runfile" | tail -1)" )
+            run_ot+=(      "$(awk '/^OT:/{print $NF}'               "$runfile" | tail -1)" )
+            run_tt+=(      "$(awk '/^TT:/{print $NF}'               "$runfile" | tail -1)" )
+            run_tps+=(     "$(awk '/^TPS:/{print $NF}'              "$runfile" | tail -1)" )
+            run_warm_tps+=("$(awk '/^Post-warmup TPS:/{print $NF}'  "$runfile" | tail -1)" )
+            run_speedup+=( "$(awk '/^Post-warmup speed up:/{print $NF}' "$runfile" | tail -1)" )
+        done
+        pt_stat=$(      compute_stats "${run_pt[@]}")
+        ot_stat=$(      compute_stats "${run_ot[@]}")
+        tt_stat=$(      compute_stats "${run_tt[@]}")
+        tps_stat=$(     compute_stats "${run_tps[@]}")
+        warm_tps_stat=$(compute_stats "${run_warm_tps[@]}")
+        speedup_stat=$( compute_stats "${run_speedup[@]}")
+        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} |")
         popd > /dev/null
     done
     popd > /dev/null
 done
+
+# Print markdown performance table
+if [ ${#table_rows[@]} -gt 0 ]; then
+    echo ""
+    echo "## Performance Summary (N=${N} runs, mean ± SEM)"
+    echo ""
+    echo "| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up |"
+    echo "|---------|--------|--------|--------|-----|-----------------|----------------------|"
+    for row in "${table_rows[@]}"; do
+        echo "$row"
+    done
+fi
 
 if [[ "$failed" == "" ]]
 then
