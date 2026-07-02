@@ -10,7 +10,7 @@ The root directory name is the all-lowercase name of the language or file format
 
 ## Performance
 
-[Grammar performance table](https://htmlpreview.github.io/?https://github.com/kaby76/grammars-v4/blob/g4-fix-tps/performance.html) (sortable by column header).
+[Grammar performance table](https://htmlpreview.github.io/?https://github.com/antlr/grammars-v4/blob/performance.html) (sortable by column header).
 
 ## FAQ
 
