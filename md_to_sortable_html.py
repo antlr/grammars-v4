@@ -76,7 +76,7 @@ def render_static_table(tbl):
     out = ''
     if tbl['heading']:
         out += f'<h3>{h(tbl["heading"])}</h3>\n'
-    out += '<table>\n<thead><tr>'
+    out += '<table class="key-table">\n<thead><tr>'
     out += ''.join(f'<th>{md_inline(c)}</th>' for c in tbl['headers'])
     out += '</tr></thead>\n<tbody>\n'
     for row in tbl['rows']:
@@ -157,6 +157,7 @@ out = f"""<!DOCTYPE html>
   tr:nth-child(even) td {{ background: #f7f7f7; }}
   td {{ text-align: right; }}
   td:first-child {{ text-align: left; }}
+  .key-table td {{ text-align: left; }}
 </style>
 </head>
 <body>

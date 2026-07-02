@@ -16,12 +16,13 @@
   tr:nth-child(even) td { background: #f7f7f7; }
   td { text-align: right; }
   td:first-child { text-align: left; }
+  .key-table td { text-align: left; }
 </style>
 </head>
 <body>
 <h2>Performance Summary (N=3 runs, mean ± SEM)</h2>
 <h3>Column key</h3>
-<table>
+<table class="key-table">
 <thead><tr><th>Label</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><code>PT</code></td><td><strong>Parse time</strong> — sum of the parse-only time across all input files</td></tr>
