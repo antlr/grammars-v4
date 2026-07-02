@@ -15,7 +15,7 @@ def parse_num(s):
             pass
     return None
 
-src = open(sys.argv[1], encoding='latin-1').read()
+src = open(sys.argv[1], encoding='utf-8').read()
 lines = src.splitlines()
 
 h = html_mod.escape
