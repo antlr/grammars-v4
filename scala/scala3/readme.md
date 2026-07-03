@@ -1,4 +1,4 @@
-# Scala 3
+# Scala 3 Grammar
 
 ## Source
 EBNF adapted from https://docs.scala-lang.org/scala3/reference/syntax.html (read May 6, 2026).

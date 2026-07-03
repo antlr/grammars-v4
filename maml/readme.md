@@ -1,4 +1,4 @@
-# MAML
+# MAML Grammar
 
 MAML — Minimal Abstract Markup Language. "JSON with comments, unquoted keys,
 optional commas, and multiline strings."

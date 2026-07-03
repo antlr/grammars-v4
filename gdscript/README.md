@@ -1,4 +1,4 @@
-# Godot GDScript ANTLR 4 grammar
+# Godot GDScript Grammar
 
 [Official EBNF grammar](https://docs.godotengine.org/en/stable/engine_details/file_formats/gdscript_grammar.html#doc-gdscript-grammar)
 

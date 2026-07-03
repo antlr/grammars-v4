@@ -1,4 +1,4 @@
-## Summary
+# Zig Grammar
 
 Zig language grammar
 

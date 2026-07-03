@@ -1,4 +1,4 @@
-# Amazon States Language (ASL) ANTLR4 Grammar
+# Amazon States Language Grammar
 
 The ANTLR4 grammar for the Amazon States Language (ASL), initially developed by 
 [LocalStack](github.com/localstack/localstack).

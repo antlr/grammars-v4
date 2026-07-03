@@ -1,4 +1,4 @@
-# An ANTLR4 grammar for T-SQL
+# T-SQL Grammar
 
 This is a community-supported grammar file for t-sql.
 It's not fully complete so far because a grammar reference of T-SQL is hard to clarify.

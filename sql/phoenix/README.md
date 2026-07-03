@@ -1,4 +1,4 @@
-# ANTLR4 grammar for Apache Phoenix
+# Apache Phoenix Grammar
 
 https://phoenix.apache.org/language/index.html
 

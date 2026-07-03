@@ -1,4 +1,4 @@
-# ABNF (BSD License) grammar
+# ABNF Grammar
 
 ## Authors
 

@@ -1,4 +1,4 @@
-# Clickhouse
+# ClickHouse Grammar
 
 ## Reference
 

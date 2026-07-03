@@ -1,4 +1,4 @@
-# Kirikiri TJS2 ANTLR4 grammar
+# Kirikiri TJS2 Grammar
 
 Kirikiri TJS2 is a Javascript-like script language for Kirikiri2 game engine.
 

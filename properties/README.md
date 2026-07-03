@@ -1,4 +1,5 @@
-## [Properties File Format](https://docs.oracle.com/cd/E23095_01/Platform.93/ATGProgGuide/html/s0204propertiesfileformat01.html)
+# Java Properties File Grammar
+
 The properties files read by Nucleus must follow a format that is recognized by the class java.util.Properties. The rules for the format are as follows:
 
 + Entries are generally expected to be a single line of the form, one of the following:
