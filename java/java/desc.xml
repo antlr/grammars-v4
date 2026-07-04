@@ -5,6 +5,6 @@
    Removed targets to bring grammar up to date, since that is high
    priority.
 -->
-   <targets>CSharp;Java</targets>
+   <targets>Cpp;CSharp;Dart;Go;Java;Rust;TypeScript</targets>
    <inputs>examples/**/*.java</inputs>
 </desc>

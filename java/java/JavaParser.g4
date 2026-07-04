@@ -34,6 +34,8 @@
 
 parser grammar JavaParser;
 
+// Insert here @header.
+
 options {
     tokenVocab = JavaLexer;
     superClass = JavaParserBase;

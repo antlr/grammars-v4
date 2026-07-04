@@ -25,6 +25,10 @@ if($compile_exit_code -ne 0){
 \}
 }>
 
+if (Test-Path -Path transformGrammar.py -PathType Leaf) {
+    $(& python3 transformGrammar.py ) 2>&1 | Write-Host
+}
+
 <if(os_win)>
 $env:RUSTFLAGS = "-C link-arg=/STACK:16777216"
 <else>
