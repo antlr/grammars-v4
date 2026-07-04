@@ -1,6 +1,6 @@
 # Godot GDScript Grammar
 
-[Official EBNF grammar](https://docs.godotengine.org/en/stable/engine_details/file_formats/gdscript_grammar.html#doc-gdscript-grammar)
+[Official EBNF grammar](https://web.archive.org/web/20260201112337/https://docs.godotengine.org/en/stable/engine_details/file_formats/gdscript_grammar.html#doc-gdscript-grammar#doc-gdscript-grammar)
 
 [Parser source code](https://github.com/godotengine/godot/tree/master/modules/gdscript)
 

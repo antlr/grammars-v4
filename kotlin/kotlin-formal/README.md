@@ -11,7 +11,9 @@ ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
 Licensed under the Apache 2.0
 
 ## Testing
-Test.kt includes the test data from the [JetBrains's repository](https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi).
+Test.kt includes the test data from the JetBrains's repository
+github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+(stale link).
 
 ## Contacts
 Anastasiya Shadrina a.shadrina5@mail.ru
