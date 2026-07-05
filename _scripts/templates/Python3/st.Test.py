@@ -40,6 +40,10 @@ string_instance = 0
 prefix = ""
 quiet = False
 noop = False
+total_tokens = 0
+total_parse_seconds = 0
+first_file_tokens = 0
+first_file_parse_seconds = 0
 
 def main(argv):
     global tee
@@ -50,7 +54,10 @@ def main(argv):
     global prefix
     global quiet
     global error_code
-    
+    global total_parse_seconds
+    global first_file_tokens
+    global first_file_parse_seconds
+
     inputs = []
     is_fns = []
     prefix = ""
@@ -102,7 +109,17 @@ def main(argv):
         diff = end_time - start_time
         diff_time = diff.total_seconds()
         if (not quiet):
-            print(f'{prefix}Total Time: {diff_time}', file=sys.stderr);
+            warm_tokens = total_tokens - first_file_tokens
+            warm_seconds = total_parse_seconds - first_file_parse_seconds
+            warm_tps = str(int(warm_tokens / warm_seconds)) if (len(inputs) > 1 and warm_seconds > 0) else "n.a."
+            first_tps = first_file_tokens / first_file_parse_seconds if first_file_parse_seconds > 0 else 0
+            speedup = f'{(warm_tokens / warm_seconds) / first_tps:.2f}' if (len(inputs) > 1 and warm_seconds > 0 and first_tps > 0) else "n.a."
+            print(f'{prefix}PT: {total_parse_seconds}', file=sys.stderr)
+            print(f'{prefix}OT: {diff_time - total_parse_seconds}', file=sys.stderr)
+            print(f'{prefix}TT: {diff_time}', file=sys.stderr)
+            print(f'{prefix}TPS: {int(total_tokens / total_parse_seconds) if total_parse_seconds > 0 else 0}', file=sys.stderr)
+            print(f'{prefix}Post-warmup TPS: {warm_tps}', file=sys.stderr)
+            print(f'{prefix}Post-warmup speed up: {speedup}', file=sys.stderr)
     sys.exit(error_code)
 
 def ParseStdin():
@@ -138,6 +155,10 @@ def DoParse(str, input_name, row_number):
     global prefix
     global quiet
     global error_code
+    global total_tokens
+    global total_parse_seconds
+    global first_file_tokens
+    global first_file_parse_seconds
 
     lexer = <lexer_name>(str)
     lexer.removeErrorListeners()
@@ -171,8 +192,14 @@ def DoParse(str, input_name, row_number):
     start_time = datetime.now()
     tree = parser.<start_symbol>()
     end_time = datetime.now()
+    token_count = len(tokens.tokens)
+    total_tokens += token_count
     diff = end_time - start_time
     diff_time = diff.total_seconds()
+    total_parse_seconds += diff_time
+    if row_number == 0:
+        first_file_tokens = token_count
+        first_file_parse_seconds = diff_time
     result = ''
     if listener_parser.had_error or listener_lexer.had_error:
         result = 'fail'
@@ -196,7 +223,11 @@ def DoParse(str, input_name, row_number):
         sys.stderr.write(result)
         sys.stderr.write(' ')
         sys.stderr.write(f'{diff_time}')
-        sys.stderr.write('\n')
+        sys.stderr.write(' s ')
+        sys.stderr.write(f'{token_count}')
+        sys.stderr.write(' tokens ')
+        sys.stderr.write(f'{int(token_count / diff_time) if diff_time > 0 else 0}')
+        sys.stderr.write(' tps\n')
     if (tee):
         output.close()
 

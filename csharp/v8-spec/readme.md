@@ -1,4 +1,4 @@
-# Antlr4 grammar for C# version 8
+# C# Version 8 Grammar
 
 ## Summary
 

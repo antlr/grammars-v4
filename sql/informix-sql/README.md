@@ -1,4 +1,4 @@
-# Informix database sql grammar for ANTLR4
+# Informix SQL Grammar
 
 An ANTLR4 grammar for Informix database.
 

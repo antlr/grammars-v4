@@ -1,4 +1,4 @@
-# Cookie
+# Cookie Grammar
 
 ## Reference
 

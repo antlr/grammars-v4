@@ -1,4 +1,4 @@
-protobuf v2 grammars 
+# Protocol Buffers (protobuf) Grammar, Version 2
 
 author: @Boyce-Lee
 

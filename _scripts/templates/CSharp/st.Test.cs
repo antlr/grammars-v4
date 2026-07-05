@@ -176,6 +176,10 @@ public class Program
     static bool show_tokens = false;
     static bool show_token_count = false;
     static long total_count = 0;
+    static long total_tokens = 0;
+    static double total_parse_seconds = 0;
+    static long first_file_tokens = 0;
+    static double first_file_parse_seconds = 0;
     static bool show_trace = false;
     static bool show_tree = false;
     static bool old = false;
@@ -328,7 +332,25 @@ public class Program
                     ParseString(inputs[f], f);
             }
             DateTime after = DateTime.Now;
-            if (!quiet) System.Console.Error.WriteLine(prefix + "Total Time: " + (after - before).TotalSeconds);
+            if (!quiet)
+            {
+                var overall_seconds = (after - before).TotalSeconds;
+                var warm_tokens = total_tokens - first_file_tokens;
+                var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+                var warm_tps = (inputs.Count() > 1 && warm_seconds > 0)
+                    ? ((long)(warm_tokens / warm_seconds)).ToString()
+                    : "n.a.";
+                var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+                var speedup = (inputs.Count() > 1 && warm_seconds > 0 && first_tps > 0)
+                    ? ((warm_tokens / warm_seconds) / first_tps).ToString("F2")
+                    : "n.a.";
+                System.Console.Error.WriteLine(prefix + "PT: " + total_parse_seconds);
+                System.Console.Error.WriteLine(prefix + "OT: " + (overall_seconds - total_parse_seconds));
+                System.Console.Error.WriteLine(prefix + "TT: " + overall_seconds);
+                System.Console.Error.WriteLine(prefix + "TPS: " + (long)(total_tokens / total_parse_seconds));
+                System.Console.Error.WriteLine(prefix + "Post-warmup TPS: " + warm_tps);
+                System.Console.Error.WriteLine(prefix + "Post-warmup speed up: " + speedup);
+            }
             if (show_token_count) System.Console.Error.WriteLine("TC: " + total_count);
         }
         Environment.ExitCode = exit_code;
@@ -359,6 +381,8 @@ public class Program
             str = new Antlr4.Runtime.AntlrInputStream(fs);
         }
         else if (file_encoding == null || file_encoding == "")
+            str = CharStreams.fromPath(input);
+        else if (file_encoding == "detect")
         {
             var detected = CharsetDetector.DetectFromFile(input);
             var enc = detected.Detected?.Encoding ?? Encoding.UTF8;
@@ -431,6 +455,15 @@ public class Program
         DateTime before = DateTime.Now;
         var tree = parser.<start_symbol>();
         DateTime after = DateTime.Now;
+        var parse_seconds = (after - before).TotalSeconds;
+        total_parse_seconds += parse_seconds;
+        var token_count = tokens.Size;
+        total_tokens += token_count;
+        if (row_number == 0)
+        {
+            first_file_tokens = token_count;
+            first_file_parse_seconds = parse_seconds;
+        }
         var result = "";
         if (listener_lexer.had_error || listener_parser.had_error)
         {
@@ -492,7 +525,7 @@ public class Program
         }
         if (!quiet)
         {
-            System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + (after - before).TotalSeconds);
+            System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps");
         }
 
         if (earley) {

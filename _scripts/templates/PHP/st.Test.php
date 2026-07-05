@@ -73,6 +73,10 @@ $error_code = 0;
 $string_instance = 0;
 $prefix = "";
 $quiet = false;
+$total_tokens = 0;
+$total_parse_seconds = 0;
+$first_file_tokens = 0;
+$first_file_parse_seconds = 0;
 
 function main($argv) : void {
     global $tee;
@@ -85,6 +89,10 @@ function main($argv) : void {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $total_tokens;
+    global $total_parse_seconds;
+    global $first_file_tokens;
+    global $first_file_parse_seconds;
     for ($i = 1; $i \< count($argv); $i++) {
         if ($argv[$i] == "-tokens") {
             $show_tokens = true;
@@ -128,7 +136,22 @@ function main($argv) : void {
         }
         $duration = $timer->stop();
         if (! $quiet) {
-            fwrite(STDERR, $prefix . "Total Time: " . $duration->asSeconds() . "\n");
+            $overall_seconds = $duration->asSeconds();
+            $warm_tokens = $total_tokens - $first_file_tokens;
+            $warm_seconds = $total_parse_seconds - $first_file_parse_seconds;
+            $warm_tps = (count($inputs) > 1 && $warm_seconds > 0)
+                ? strval((int)($warm_tokens / $warm_seconds))
+                : "n.a.";
+            $first_tps = $first_file_parse_seconds > 0 ? ($first_file_tokens / $first_file_parse_seconds) : 0;
+            $speedup = (count($inputs) > 1 && $warm_seconds > 0 && $first_tps > 0)
+                ? number_format(($warm_tokens / $warm_seconds) / $first_tps, 2)
+                : "n.a.";
+            fwrite(STDERR, $prefix . "PT: " . $total_parse_seconds . "\n");
+            fwrite(STDERR, $prefix . "OT: " . ($overall_seconds - $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "TT: " . $overall_seconds . "\n");
+            fwrite(STDERR, $prefix . "TPS: " . (int)($total_tokens / $total_parse_seconds) . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup TPS: " . $warm_tps . "\n");
+            fwrite(STDERR, $prefix . "Post-warmup speed up: " . $speedup . "\n");
         }
     }
     exit($error_code);
@@ -166,6 +189,10 @@ function DoParse($str, $input_name, $row_number) {
     global $error_code;
     global $prefix;
     global $quiet;
+    global $total_tokens;
+    global $total_parse_seconds;
+    global $first_file_tokens;
+    global $first_file_parse_seconds;
     $lexer = new <lexer_name>($str);
     if ($show_tokens) {
         for ($i=0;  ; $i++) {
@@ -200,6 +227,14 @@ function DoParse($str, $input_name, $row_number) {
     $timer2->start();
     $tree = $parser-><start_symbol>();
     $duration = $timer2->stop();
+    $parse_seconds = $duration->asSeconds();
+    $total_parse_seconds += $parse_seconds;
+    $token_count = $tokens->count();
+    $total_tokens += $token_count;
+    if ($row_number == 0) {
+        $first_file_tokens = $token_count;
+        $first_file_parse_seconds = $parse_seconds;
+    }
     $result = "";
     if ($parserErrorListener->had_error || $lexerErrorListener->had_error) {
         $result = "fail";
@@ -218,7 +253,7 @@ function DoParse($str, $input_name, $row_number) {
         }
     }
     if ( ! $quiet ) {
-        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $duration->asSeconds() . "\n");
+        fwrite(STDERR, $prefix . "PHP " . $row_number . " " . $input_name . " " . $result . " " . $parse_seconds . " s " . $token_count . " tokens " . (int)($token_count / $parse_seconds) . " tps\n");
     }
     if ( $tee ) {
         fclose($output);

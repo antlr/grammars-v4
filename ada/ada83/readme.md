@@ -1,4 +1,4 @@
-Ada 83 ANTLR Grammar
+# Ada 83 Grammar
 
 http://archive.adaic.com/standards/83lrm/html/ada_lrm.html#Top
 

@@ -1,5 +1,5 @@
-Sgf.g4
-======
+# Smart Game Format (SGF) Grammar
+
 This is an antlr4-grammar for the `Smart Game Format`
 which is also called `Smart Go Format`.
 
@@ -10,19 +10,15 @@ gives a very good starting point.
 All properties from the list of property: www.red-bean.com/sgf/proplist.html
 are implemented and the official example: www.red-bean.com/sgf/examples/ parses without problems.
 
-Unknown properties are supported and will show up as `privateProp`-nodes. 
+Unknown properties are supported and will show up as `privateProp`-nodes.
 
-Definition
-----------
+## Reference
 
 * www.red-bean.com/sgf/sgf4.htm
 * www.red-bean.com/sgf/properties.htm
 * www.red-bean.com/sgf/proplist.html
 * www.red-bean.com/sgf/go.htm (Go)
 
-License
--------
+## License
 [AGPL-3.0](agpl-3.0.txt)
-
-## Reference
 

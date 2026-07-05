@@ -34,6 +34,10 @@ public class Test {
     static int string_instance = 0;
     static String prefix = "";
     static boolean quiet = false;
+    static long total_tokens = 0;
+    static double total_parse_seconds = 0;
+    static long first_file_tokens = 0;
+    static double first_file_parse_seconds = 0;
 
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
@@ -122,7 +126,24 @@ public class Test {
             }
             Instant finish = Instant.now();
             long timeElapsed = Duration.between(start, finish).toMillis();
-            if (!quiet) System.err.println(prefix + "Total Time: " + (timeElapsed * 1.0) / 1000.0);
+            if (!quiet) {
+                double overall_seconds = (timeElapsed * 1.0) / 1000.0;
+                long warm_tokens = total_tokens - first_file_tokens;
+                double warm_seconds = total_parse_seconds - first_file_parse_seconds;
+                String warm_tps = (inputs.size() > 1 && warm_seconds > 0)
+                    ? Long.toString((long)(warm_tokens / warm_seconds))
+                    : "n.a.";
+                double first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+                String speedup = (inputs.size() > 1 && warm_seconds > 0 && first_tps > 0)
+                    ? String.format("%.2f", (warm_tokens / warm_seconds) / first_tps)
+                    : "n.a.";
+                System.err.println(prefix + "PT: " + total_parse_seconds);
+                System.err.println(prefix + "OT: " + (overall_seconds - total_parse_seconds));
+                System.err.println(prefix + "TT: " + overall_seconds);
+                System.err.println(prefix + "TPS: " + (long)(total_tokens / total_parse_seconds));
+                System.err.println(prefix + "Post-warmup TPS: " + warm_tps);
+                System.err.println(prefix + "Post-warmup speed up: " + speedup);
+            }
         }
         java.lang.System.exit(error_code);
     }
@@ -197,6 +218,14 @@ public class Test {
         ParseTree tree = parser.<start_symbol>();
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();
+        double parse_seconds = (timeElapsed * 1.0) / 1000.0;
+        total_parse_seconds += parse_seconds;
+        long token_count = tokens.size();
+        total_tokens += token_count;
+        if (row_number == 0) {
+            first_file_tokens = token_count;
+            first_file_parse_seconds = parse_seconds;
+        }
         String result = "";
         if (listener_parser.had_error || listener_lexer.had_error)
         {
@@ -227,7 +256,7 @@ public class Test {
         }
         if (!quiet)
         {
-            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + (timeElapsed * 1.0) / 1000.0);
+            System.err.println(prefix + "Java " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps");
         }
         if (tee) output.close();
     }

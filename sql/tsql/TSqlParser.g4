@@ -4152,7 +4152,8 @@ table_sources
     | source += table_source (',' source += table_source)*
     ;
 
-// https://sqlenlight.com/support/help/sa0006/
+// sqlenlight.com/support/help/sa0006/
+// stale link
 non_ansi_join
     : source += table_source (',' source += table_source)+
     ;

@@ -57,6 +57,10 @@ var enc = '<file_encoding>';
 var binary = <binary>;
 var string_instance = 0;
 var prefix = '';
+var total_tokens = 0;
+var total_parse_seconds = 0;
+var first_file_tokens = 0;
+var first_file_parse_seconds = 0;
 var inputs: string[] = [];
 var is_fns: boolean[] = [];
 
@@ -128,7 +132,23 @@ function main() {
         }
         timer.stop();
         var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
-        if (!quiet) console.error(prefix + 'Total Time: ' + t);
+        if (!quiet) {
+            var warm_tokens = total_tokens - first_file_tokens;
+            var warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            var warm_tps = (inputs.length > 1 && warm_seconds > 0)
+                ? Math.round(warm_tokens / warm_seconds).toString()
+                : 'n.a.';
+            var first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+            var speedup = (inputs.length > 1 && warm_seconds > 0 && first_tps > 0)
+                ? ((warm_tokens / warm_seconds) / first_tps).toFixed(2)
+                : 'n.a.';
+            console.error(prefix + 'PT: ' + total_parse_seconds);
+            console.error(prefix + 'OT: ' + (t - total_parse_seconds));
+            console.error(prefix + 'TT: ' + t);
+            console.error(prefix + 'TPS: ' + Math.round(total_tokens / total_parse_seconds));
+            console.error(prefix + 'Post-warmup TPS: ' + warm_tps);
+            console.error(prefix + 'Post-warmup speed up: ' + speedup);
+        }
     }
     process.exitCode = error_code;
 }
@@ -189,6 +209,8 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     timer.start();
     const tree = parser.<start_symbol>();
     timer.stop();
+    var token_count = tokens.size;
+    total_tokens += token_count;
     var result = "";
     if (listener_parser.had_error || listener_lexer.had_error) {
         result = 'fail';
@@ -198,6 +220,11 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
         result = 'success';
     }
     var t = timer.time().m * 60 + timer.time().s + timer.time().ms / 1000;
+    total_parse_seconds += t;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = t;
+    }
     if (show_tree) {
         if (tee) {
             writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
@@ -206,7 +233,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
         }
     }
     if (!quiet) {
-        console.error(prefix + 'TypeScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t);
+        console.error(prefix + 'TypeScript ' + row_number + ' ' + input_name + ' ' + result + ' ' + t + ' s ' + token_count + ' tokens ' + Math.round(token_count / t) + ' tps');
     }
     if (tee) {
         closeSync(output);

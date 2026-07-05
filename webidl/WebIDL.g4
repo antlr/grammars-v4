@@ -705,7 +705,8 @@ extendedAttributeNamedArgList
     ;
 
 /* Chromium IDL also allows string literals in extendedAttributes
-https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/blink/renderer/bindings/IDLExtendedAttributes.md
+chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/blink/renderer/bindings/IDLExtendedAttributes.md
+link no longer valid.
 */
 extendedAttributeString
     : IDENTIFIER_WEBIDL '=' STRING_WEBIDL
