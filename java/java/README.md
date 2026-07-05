@@ -46,6 +46,25 @@ Grammar performance has been tested on the following Java projects:
 
 See the [benchmarks](Benchmarks.md) page for details.
 
+## Performance Summary (N=3 runs, mean ± SEM)
+This is the performance of the target parse against the JDK SDK 21 source.
+
+| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up |
+|---------|--------|--------|--------|-----|-----------------|----------------------|
+| java/java,Cpp | 282 ± 1.755 | 83.2 ± 53.6 | 365.2 ± 55.03 | 7.865e+04 ± 491.5 | 7.866e+04 ± 492.4 | 2.04 ± 0.08021 |
+| java/java,CSharp | 176.6 ± 0.6581 | 4.654 ± 0.09829 | 181.2 ± 0.6459 | 1.256e+05 ± 468.6 | 1.257e+05 ± 467.7 | 9.373 ± 0.07513 |
+| java/java,Dart | 200 ± 0.5003 | 16.52 ± 0.04388 | 216.5 ± 0.4851 | 1.109e+05 ± 277.3 | 1.109e+05 ± 277 | 2.283 ± 0.01764 |
+| java/java,Go | 358.4 ± 0.6414 | 21.72 ± 12.37 | 380.1 ± 11.73 | 6.189e+04 ± 111 | 6.19e+04 ± 111 | 2.047 ± 0.006667 |
+| java/java,Java | 108.7 ± 0.648 | 7.631 ± 0.02434 | 116.3 ± 0.6287 | 2.041e+05 ± 1222 | 2.045e+05 ± 1228 | 16.17 ± 0.4402 |
+| java/java,Rust | 315.9 ± 0.3973 | 15.37 ± 0.00809 | 331.3 ± 0.3907 | 7.02e+04 ± 88.12 | 7.021e+04 ± 87.85 | 2.027 ± 0.05364 |
+| java/java,TypeScript | 916.2 ± 2.695 | 7.621 ± 0.2235 | 923.8 ± 2.491 | 2.421e+04 ± 71.4 | 2.421e+04 ± 71.53 | 2.597 ± 0.02404 |
+
+Methods: AMD Ryzen 7 2700 Eight-Core Processor; 16GB DDR4;
+Samsung SSD 990 EVO Plus 2TB;
+Windows: Version 10.0.26200 (this is a Windows 11 Insider Preview build); 
+.NET SDK: 10.0.301.
+Sample size 3.
+
 ## Grammar style
 Please use [antlr-format](https://github.com/antlr-ng/antlr-format) and
 [formatting style config](https://github.com/antlr/grammars-v4/blob/master/_scripts/repo_coding_style.json)
