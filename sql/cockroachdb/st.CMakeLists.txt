@@ -1,4 +1,4 @@
-# Generated from trgen <version>
+﻿# Generated from trgen <version>
 
 cmake_minimum_required (VERSION 3.14)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -10,7 +10,7 @@ find_package(Threads REQUIRED)
 #SET(GCC_COVERAGE_COMPILE_FLAGS "-g -pg")
 #SET(GCC_COVERAGE_LINK_FLAGS    "-g -pg")
 <if(os_win)>
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MT /bigobj")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MT")
 <endif>
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
@@ -71,7 +71,7 @@ add_executable(Test
 <endif>
 
 <if(os_win)>
-target_compile_options(Test PUBLIC /MT /bigobj)
+target_compile_options(Test PUBLIC /MT)
 <endif>
 
 target_link_libraries(Test antlr4_static Threads::Threads)

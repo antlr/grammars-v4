@@ -1,4 +1,4 @@
-# Summary
+# Objective-C Grammar
 
 Objective-C 2.0 grammars with preprocessor support can be used in 2 different modes:
 

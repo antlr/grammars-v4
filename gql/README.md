@@ -1,4 +1,4 @@
-# Database languages — GQL
+# GQL Grammar
 
 ## Description
 GQL is a database query language that allows users to interact with databases in a structured and efficient manner. It is designed to be intuitive and easy to use, while also providing powerful features for complex queries and data manipulation. GQL supports a wide range of database systems and is compatible with various data formats, making it a versatile tool for developers and data analysts alike.

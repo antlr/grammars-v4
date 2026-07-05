@@ -1,4 +1,4 @@
-# Python 3.13.2 parser
+# Python 3.13.2 Grammar
 
 ### About files:
 - PythonParser.g4 is the ANTLR4 parser grammar that based on the official [Python PEG grammar](https://docs.python.org/3.13/reference/grammar.html)

@@ -14,7 +14,7 @@ JAR=$(ls "$ANTLR4_DEV_DIR"/tool/target/antlr4-*-complete.jar | tail -1)
 version=`grep antlr4-python3-runtime requirements.txt | awk -F= '{print $3}' | tr -d '\r' | tr -d '\n'`
 <endif>
 
-python3 -m venv .venv
+python3 -m venv --copies .venv
 source .venv/bin/activate
 
 <if(antlrng_tool)>

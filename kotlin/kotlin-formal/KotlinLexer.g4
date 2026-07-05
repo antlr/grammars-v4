@@ -7,7 +7,8 @@
  * kotlinlang.org/docs/reference/grammar.html
  *
  * Tested on
- * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ * (stale link)
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, maxEmptyLinesToKeep 1, reflowComments false, useTab false
