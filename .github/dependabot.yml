@@ -1,15 +1,5 @@
 version: 2
 updates:
-  # dotnet tools
-  - package-ecosystem: "nuget"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "infrastructure"
-      - "dependencies"
-    ignore:
-      - dependency-name: "tr*"
   # Java
   - package-ecosystem: "maven"
     directory: "/"

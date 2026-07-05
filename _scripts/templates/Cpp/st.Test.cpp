@@ -53,6 +53,10 @@ int string_instance = 0;
 std::string prefix;
 bool quiet = false;
 std::string file_encoding = "<file_encoding>";
+long total_tokens = 0;
+double total_parse_seconds = 0;
+long first_file_tokens = 0;
+double first_file_parse_seconds = 0;
 
 void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
 {
@@ -89,7 +93,15 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     auto before = std::chrono::steady_clock::now();
     auto* tree = parser-><start_symbol>();
     auto after = std::chrono::steady_clock::now();
+    long token_count = (long)tokens->size();
+    total_tokens += token_count;
     auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
+    double parse_seconds = duration.count() / 1000000.0;
+    total_parse_seconds += parse_seconds;
+    if (row_number == 0) {
+        first_file_tokens = token_count;
+        first_file_parse_seconds = parse_seconds;
+    }
     std::string result;
     if (listener_parser->had_error || listener_lexer->had_error)
     {
@@ -120,7 +132,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     }
     if (!quiet)
     {
-        std::cerr \<\< prefix \<\< "Cpp " \<\< row_number \<\< " " \<\< input_name \<\< " " \<\< result \<\< " " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+        std::cerr \<\< prefix \<\< "Cpp " \<\< row_number \<\< " " \<\< input_name \<\< " " \<\< result \<\< " " \<\< parse_seconds \<\< " s " \<\< token_count \<\< " tokens " \<\< (long)(token_count / parse_seconds) \<\< " tps" \<\< std::endl;
     }
     if (tee)
     {
@@ -241,7 +253,26 @@ int TryParse(std::vector\<std::string>& args)
         }
         auto after = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
-        if (! quiet) std::cerr \<\< prefix \<\< "Total Time: " \<\< formatDurationSeconds(duration.count()) \<\< std::endl;
+        if (!quiet) {
+            double overall_seconds = duration.count() / 1000000.0;
+            long warm_tokens = total_tokens - first_file_tokens;
+            double warm_seconds = total_parse_seconds - first_file_parse_seconds;
+            std::string warm_tps = (inputs.size() > 1 && warm_seconds > 0)
+                ? std::to_string((long)(warm_tokens / warm_seconds))
+                : "n.a.";
+            double first_tps = first_file_parse_seconds > 0 ? (first_file_tokens / first_file_parse_seconds) : 0;
+            std::ostringstream speedup_ss;
+            if (inputs.size() > 1 && warm_seconds > 0 && first_tps > 0)
+                speedup_ss \<\< std::fixed \<\< std::setprecision(2) \<\< ((warm_tokens / warm_seconds) / first_tps);
+            else
+                speedup_ss \<\< "n.a.";
+            std::cerr \<\< prefix \<\< "PT: " \<\< total_parse_seconds \<\< std::endl;
+            std::cerr \<\< prefix \<\< "OT: " \<\< (overall_seconds - total_parse_seconds) \<\< std::endl;
+            std::cerr \<\< prefix \<\< "TT: " \<\< overall_seconds \<\< std::endl;
+            std::cerr \<\< prefix \<\< "TPS: " \<\< (long)(total_tokens / total_parse_seconds) \<\< std::endl;
+            std::cerr \<\< prefix \<\< "Post-warmup TPS: " \<\< warm_tps \<\< std::endl;
+            std::cerr \<\< prefix \<\< "Post-warmup speed up: " \<\< speedup_ss.str() \<\< std::endl;
+        }
     }
     return error_code;
 }
