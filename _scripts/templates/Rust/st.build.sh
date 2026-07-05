@@ -14,6 +14,8 @@ fi
 java -jar $JAR -encoding <antlr_encoding> -Dlanguage=Rust -o src/gen  <x.AntlrArgs> <antlr_tool_args:{y | <y> } > <x.GrammarFileNameTarget>
 } >
 
+if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
+
 <if(os_win)>
 export RUSTFLAGS="-C link-arg=/STACK:16777216"
 <else>
