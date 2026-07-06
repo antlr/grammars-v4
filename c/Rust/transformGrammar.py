@@ -247,7 +247,24 @@ def fix_generated_rust() -> None:
     if main_rs.exists():
         content = main_rs.read_text(encoding="utf-8")
         changed = False
-        # 4a. Replace fs::read_to_string with preprocess_input(name, nopp)
+        # 4a. Add reset_symbol_table() call at the start of parse_input (once).
+        # This ensures each translation unit starts with a fresh symbol table.
+        if "reset_symbol_table" not in content:
+            content = content.replace(
+                "    let input = crate::c_parser_base::preprocess_input(input_name, flags.nopp);\n",
+                "    crate::c_parser_base::reset_symbol_table();\n"
+                "    let input = crate::c_parser_base::preprocess_input(input_name, flags.nopp);\n",
+            )
+            # Also handle the original (un-patched) direct read form in case
+            # this step runs before 4b below.
+            if "reset_symbol_table" not in content:
+                content = content.replace(
+                    "    let my_string_result = fs::read_to_string(input_name);\n",
+                    "    crate::c_parser_base::reset_symbol_table();\n"
+                    "    let my_string_result = fs::read_to_string(input_name);\n",
+                )
+            changed = True
+        # 4b. Replace fs::read_to_string with preprocess_input(name, nopp)
         if "preprocess_input" not in content:
             old_read = (
                 "    let my_string_result = fs::read_to_string(input_name);\n"

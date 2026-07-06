@@ -133,11 +133,12 @@ impl SymbolTable {
             ("__fastcall",   &[FunctionSpecifier]),
             ("__thiscall",   &[FunctionSpecifier]),
             ("__vectorcall", &[FunctionSpecifier]),
-            ("_purecall",              &[TypeSpecifier]),
-            ("_purecall_handler",      &[TypeSpecifier]),
-            ("_onexit_t",              &[TypeSpecifier]),
-            ("_locale_t",              &[TypeSpecifier]),
-            ("_invalid_parameter_handler", &[TypeSpecifier]),
+            // Note: Windows-specific typedef names (_locale_t, _onexit_t, etc.) are
+            // intentionally NOT predefined here. With gcc preprocessing, their typedef
+            // definitions are expanded inline before any use, so they are registered
+            // dynamically by enter_declaration. Predefining them would prevent the
+            // parser from accepting `typedef struct X *_locale_t;` (the name after `*`
+            // would be rejected as a type-specifier keyword rather than a declarator).
             ("__int8",   &[TypeSpecifier]),
             ("__int16",  &[TypeSpecifier]),
             ("__int32",  &[TypeSpecifier]),
@@ -232,6 +233,15 @@ where
 }
 
 // ── Actions ──────────────────────────────────────────────────────────────────
+
+/// Resets the symbol table to its initial state (predefined keywords only).
+/// Must be called before parsing each new translation unit so that typedefs
+/// from one file do not contaminate the next.
+pub fn reset_symbol_table() {
+    SYMBOL_TABLE.with(|st| {
+        *st.borrow_mut() = SymbolTable::new();
+    });
+}
 
 pub fn enter_scope() {
     with_st_mut(|st| st.push_block_scope());
