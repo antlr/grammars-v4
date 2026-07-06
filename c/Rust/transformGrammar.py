@@ -242,23 +242,49 @@ def fix_generated_rust() -> None:
             main_rs.write_text("".join(lines), encoding="utf-8")
             print("Added `mod c_parser_base;` to src/main.rs")
 
-    # 4. Replace direct file read with a gcc preprocessing call.
+    # 4. Replace direct file read with gcc preprocessing; add --nopp flag.
     # Mirrors the default behaviour of CLexerBase.cs (gcc -std=c2x -E -C).
     if main_rs.exists():
         content = main_rs.read_text(encoding="utf-8")
+        changed = False
+        # 4a. Replace fs::read_to_string with preprocess_input(name, nopp)
         if "preprocess_input" not in content:
             old_read = (
                 "    let my_string_result = fs::read_to_string(input_name);\n"
                 "    let input = my_string_result.unwrap(); // Panics if Err\n"
             )
             new_read = (
-                "    let input = crate::c_parser_base::preprocess_input(input_name);\n"
+                "    let input = crate::c_parser_base::preprocess_input(input_name, flags.nopp);\n"
             )
             if old_read in content:
                 content = content.replace("use std::fs;\n", "")
                 content = content.replace(old_read, new_read)
-                main_rs.write_text(content, encoding="utf-8")
-                print("Patched src/main.rs to use preprocess_input")
+                changed = True
+        # 4b. Upgrade existing preprocess_input(input_name) (no nopp arg) to pass flags.nopp
+        if "preprocess_input(input_name)" in content:
+            content = content.replace(
+                "preprocess_input(input_name)",
+                "preprocess_input(input_name, flags.nopp)",
+            )
+            changed = True
+        # 4c. Add nopp field to Flags struct, initializer, and arg parser (once)
+        if "nopp: bool" not in content:
+            content = content.replace(
+                "    tee: bool,\n    quiet: bool,\n}",
+                "    tee: bool,\n    quiet: bool,\n    nopp: bool,\n}",
+            )
+            content = content.replace(
+                "        tee: false,\n        quiet: false,\n    };",
+                "        tee: false,\n        quiet: false,\n        nopp: false,\n    };",
+            )
+            content = content.replace(
+                '"-q" => flags.quiet = true,',
+                '"-q" => flags.quiet = true,\n            "--nopp" => flags.nopp = true,',
+            )
+            changed = True
+        if changed:
+            main_rs.write_text(content, encoding="utf-8")
+            print("Patched src/main.rs to use preprocess_input with --nopp flag")
 
 
 def main() -> None:

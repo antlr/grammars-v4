@@ -606,8 +606,12 @@ pub fn is_cast(t1_text: &str, t2_text: &str) -> bool {
 
 /// Run the C preprocessor on `source_name` and return the preprocessed text.
 /// Mirrors the default `gcc -std=c2x -E -C` behaviour of CLexerBase.cs.
+/// If `nopp` is true, skips preprocessing and reads the file directly.
 /// Falls back to reading the raw file if gcc is unavailable or fails.
-pub fn preprocess_input(source_name: &str) -> String {
+pub fn preprocess_input(source_name: &str, nopp: bool) -> String {
+    if nopp {
+        return std::fs::read_to_string(source_name).unwrap_or_default();
+    }
     // If the source is not a .c file write it to a temp file so gcc accepts it.
     let actual_source = if source_name.ends_with(".c") {
         source_name.to_owned()
