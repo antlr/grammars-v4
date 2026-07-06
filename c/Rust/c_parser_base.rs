@@ -473,10 +473,10 @@ fn prev_tokens_have_type_specifier(prev_tokens: &[(i32, String)]) -> bool {
 /// `prev_tokens`). This prevents a typedef name used as a variable name (e.g.
 /// `i64` in `sqlite3_int64 i64;`) from being consumed as a second type specifier.
 pub fn is_declaration_specifier(text: &str, prev_tokens: &[(i32, String)]) -> bool {
-    if text == "__attribute__" {
-        return false;
-    }
     // Storage class, type qualifiers, function/alignment specifiers: unconditional.
+    // Note: __attribute__ is classified as FunctionSpecifier and must be allowed here
+    // so that `void __attribute__((cdecl)) func(...)` parses correctly after GCC
+    // expands __cdecl → __attribute__((__cdecl__)) during preprocessing.
     if is_storage_class_specifier(text)
         || is_type_qualifier(text)
         || is_function_specifier(text)
