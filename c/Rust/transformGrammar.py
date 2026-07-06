@@ -239,13 +239,35 @@ def fix_generated_rust() -> None:
             main_rs.write_text("".join(lines), encoding="utf-8")
             print("Added `mod c_parser_base;` to src/main.rs")
 
+    # 4. Replace direct file read with a gcc preprocessing call.
+    # Mirrors the default behaviour of CLexerBase.cs (gcc -std=c2x -E -C).
+    if main_rs.exists():
+        content = main_rs.read_text(encoding="utf-8")
+        if "preprocess_input" not in content:
+            old_read = (
+                "    let my_string_result = fs::read_to_string(input_name);\n"
+                "    let input = my_string_result.unwrap(); // Panics if Err\n"
+            )
+            new_read = (
+                "    let input = crate::c_parser_base::preprocess_input(input_name);\n"
+            )
+            if old_read in content:
+                content = content.replace("use std::fs;\n", "")
+                content = content.replace(old_read, new_read)
+                main_rs.write_text(content, encoding="utf-8")
+                print("Patched src/main.rs to use preprocess_input")
+
 
 def main() -> None:
     if needs_transform():
         for f in glob("./*.g4"):
             transform_grammar(f)
-    else:
-        fix_generated_rust()
+    # Always run post-generation fixes: copies c_parser_base.rs into src/,
+    # patches mod declarations and preprocess_input into main.rs.
+    # In Phase 1 the generated cparser.rs does not exist yet so that step is
+    # silently skipped; in Phase 2 the full fixup runs.  When build.sh only
+    # invokes this script once (trash 1.1.1) the Phase-1 call is sufficient.
+    fix_generated_rust()
 
 
 if __name__ == "__main__":
