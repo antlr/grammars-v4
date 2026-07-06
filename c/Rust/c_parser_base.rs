@@ -451,6 +451,12 @@ pub fn is_static_assert_declaration(text: &str) -> bool {
 
 fn prev_tokens_have_type_specifier(prev_tokens: &[(i32, String)]) -> bool {
     for (_, text) in prev_tokens {
+        // __extension__ is a GCC extension marker consumed by externalDeclaration
+        // or structDeclaration at the rule level; it is not an actual type specifier
+        // and must not block a typedef name from being used as a type specifier.
+        if text == "__extension__" {
+            continue;
+        }
         let sym = with_st(|st| st.resolve(text).cloned());
         if let Some(s) = sym {
             if s.classification.contains(&TypeClassification::TypeSpecifier)
