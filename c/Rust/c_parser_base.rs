@@ -302,15 +302,18 @@ pub fn enter_declaration(tokens: Vec<(i32, String)>) {
     } else if first_tt == IDENT {
         // From the `declarator` rule with a direct identifier.
         // tokens[0].1 is the declared name; scan further back for `typedef`.
+        // Tokens are in reverse chronological order; RBRACE/LBRACE track brace depth
+        // so that semicolons inside struct bodies don't stop the scan prematurely.
         let name = tokens[0].1.clone();
         let mut is_typedef = false;
+        let mut depth: i32 = 0;
         for (tt, _) in &tokens[1..] {
-            if *tt == SEMI {
-                break; // hit a previous declaration boundary
-            }
-            if *tt == TYPEDEF {
-                is_typedef = true;
-                break;
+            match *tt {
+                RBRACE => depth += 1,
+                LBRACE => { if depth > 0 { depth -= 1; } }
+                SEMI if depth == 0 => break, // previous declaration boundary
+                TYPEDEF if depth == 0 => { is_typedef = true; break; }
+                _ => {}
             }
         }
         if is_typedef {

@@ -134,13 +134,16 @@ _ACTION_REPLACEMENTS = [
     (r"\{this\.EnterDeclaration\(\);\}",
      "{ let mut __etoks: Vec<(i32,String)> = Vec::new();"
      " let mut __ek: isize = 1;"
+     " let mut __edepth: i32 = 0;"
      " loop {"
      " let (__ett,__etx) = recog.input.lt(-__ek)"
      ".map(|t| (t.get_token_type(), t.get_text().to_owned()))"
      ".unwrap_or((-1,String::new()));"
      " if __ett <= 0 { break; }"
      " __etoks.push((__ett, __etx));"
-     " if __ett == 116 || __ek >= 500 { break; }"  # 116 = CParser_Semi
+     " if __ett == 93 { __edepth += 1; }"        # 93 = RBRACE: entering block going backwards
+     " else if __ett == 92 && __edepth > 0 { __edepth -= 1; }"  # 92 = LBRACE: leaving
+     " if __edepth == 0 && (__ett == 116 || __ek >= 500) { break; }"  # SEMI only at depth 0
      " __ek += 1; }"
      " crate::c_parser_base::enter_declaration(__etoks); }"),
     (r"\{this\.EnterScope\(\);\}",
