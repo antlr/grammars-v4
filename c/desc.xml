@@ -3,7 +3,7 @@
     <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;Rust;TypeScript</targets>
     <test>
        <inputs>examples/*.c</inputs>
-       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Rust;TypeScript</targets>
+       <targets>Antlr4ng;Cpp;CSharp;Dart;Go;Java;JavaScript;Python3;Rust;TypeScript</targets>
     </test>
     <test>
        <inputs>examples/tiny/*.c</inputs>
