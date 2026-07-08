@@ -1,0 +1,5 @@
+semi-comment = ";" *any                 ; semi comment
+cpp-comment  = "//" *any                ; C++ comment
+c-comment    = "/*" *(!"*/" anyLF) "*/" ; C comment
+any          = %d32-126 / %d9
+anyLF        = %d32-126 / %d9 / %d10 / %d13 
