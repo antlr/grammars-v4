@@ -118,7 +118,9 @@ ProseValue
     ;
 
 ID
-    : LETTER (LETTER | DIGIT | '-')*
+    : LETTER (LETTER | DIGIT | '-'
+    | '_' // Extension
+    )*
     ;
 
 INT

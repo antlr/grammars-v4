@@ -1,0 +1,21 @@
+IniFile         = *BlankLine *Section
+Section         = SectionLine *(BlankLine/ValueLine)
+SectionLine     = GoodSectionLine/BadSectionLine
+GoodSectionLine = "[" wsp SectionName wsp "]" wsp [comment] LineEnd
+BadSectionLine  = "[" *any LineEnd;
+ValueLine       = GoodValueLine/BadValueLine
+GoodValueLine   = ValueName wsp "=" wsp ValueArray wsp [comment] LineEnd
+BadValueLine    = (%d33-90/%d92-126) *any LineEnd
+ValueArray      = Value *(wsp "," wsp Value)
+SectionName     = 1*(alpha/digit/%d95)
+ValueName       = 1*(alpha/digit/%d95)
+Value           = (1*(alpha/digit)) /
+                  (%d34 1*(%d32-33/%d35-126) %d34) /
+                  (%d39 1*(%d32-38/%d40-126) %d39)
+BlankLine       = wsp [comment] LineEnd
+LineEnd         = %d13.10/%d10/%d13
+comment         = ";" *any
+wsp             = *(%d32/%d9)
+alpha           = %d65-90/%d97-122
+digit           = %d48-57
+any             = %d32-126/%d9

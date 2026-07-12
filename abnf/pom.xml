@@ -42,6 +42,7 @@
 					<grammarName>Abnf</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.abnf</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>
