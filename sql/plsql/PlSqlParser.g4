@@ -5903,9 +5903,9 @@ pipe_row_statement
     ;
 
 selection_directive
-    : DOLLAR_IF condition DOLLAR_THEN selection_directive_body (
-        DOLLAR_ELSIF selection_directive_body
-    )* (DOLLAR_ELSE selection_directive_body)? DOLLAR_END
+    : DOLLAR_IF condition DOLLAR_THEN selection_directive_body? (
+        DOLLAR_ELSIF condition DOLLAR_THEN selection_directive_body?
+    )* (DOLLAR_ELSE selection_directive_body?)? DOLLAR_END
     ;
 
 error_directive
