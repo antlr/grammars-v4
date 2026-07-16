@@ -247,7 +247,7 @@ check$prl:				;check if .PLR
 	;********************************
 	;* Open File / Password Routine
 	;********************************
-open$fileº				
+open$file				
 	mvi	c,openf			;also check if PASSWORD
 	lxi	d,fcb
 	call	bdos			;open the file
@@ -1064,4 +1064,3 @@ table:		db 1,2,4,8,16,32,64,128	;This table is for bit manipulation
 stack:
 		ds 2
 buff:		ds 128			;Buffer (holds one record;128 bytes)
-
