@@ -418,6 +418,8 @@ do
         echo $testname
     
         # Test generated parser on examples.
+        SAVEIFS=$IFS
+        IFS=$(echo -en "\n\b")
         cmd=`grep '^files2' test.sh`
         eval "$cmd"
         files=()
@@ -426,6 +428,7 @@ do
             if [ -d "$f" ]; then continue; fi
                 files+=( $f )
         done
+        IFS=$SAVEIFS
         if [ ${#files[@]} -eq 0 ]
         then
             continue
