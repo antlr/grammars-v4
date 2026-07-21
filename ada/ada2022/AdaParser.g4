@@ -110,7 +110,8 @@ subtype_indication
     ;
 
 subtype_mark
-    : identifier (DOT identifier)*
+    // : name
+    : identifier (DOT identifier)* (SQ CLASS__)?
     ;
 
 constraint
@@ -435,6 +436,7 @@ attribute_designator
     | DELTA__
     | DIGITS__
     | MOD__
+    | CLASS__
     | ACCESS
     | DELTA
     | DIGITS
