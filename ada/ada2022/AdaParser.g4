@@ -111,7 +111,7 @@ subtype_indication
 
 subtype_mark
     // : name
-    : identifier (DOT identifier)* (SQ CLASS__)?
+    : identifier (DOT identifier)* (SQ attribute_designator)?
     ;
 
 constraint
