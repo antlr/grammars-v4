@@ -12,3 +12,5 @@ select 0 as interval;
 create table interval(internal int);
 
 select 0 as include, 0 as exclude, 0 as nulls;
+select 0 as excluding;
+create table excluding(excluding int);
