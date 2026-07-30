@@ -80,11 +80,13 @@ match. All such references have been replaced with `QName`:
 | `fieldname` | field name in `record(field as T)` |
 | `wildcard` | namespace wildcards `prefix:*` and `*:local` |
 
-### `URIQualifiedName` tokens are not produced by the lexer
+### `URIQualifiedName` with non-empty URI is not tokenised by the lexer
 
-`Q{uri}local` should tokenise as a single `URIQualifiedName` token, but in
-practice ANTLR4's lexer DFA commits to `QName` (matching the single character
-`Q`) rather than continuing to try the longer `URIQualifiedName` pattern. The
-same limitation exists in the XPath 3.1 grammar. `URIQualifiedName` and
-`BracedURILiteral`-star wildcard expressions are therefore not included in the
-test suite.
+`URIQualifiedName` is defined as `'Q' '{' [^{}]* '}' NCName`. The empty-URI
+form `Q{}local` tokenises correctly and is used in the test suite (e.g.
+`17 cast as Q{}apple`). However, the non-empty-URI form `Q{uri}local` does
+not: once the `[^{}]*` fragment matches one or more characters, ANTLR4's
+lexer DFA fails to continue into the trailing `NCName`, committing instead to
+the shorter `QName` match for the single character `Q`. The same limitation
+exists in the XPath 3.1 grammar. Non-empty `Q{uri}local` patterns and
+`Q{uri}*` wildcard expressions are therefore not included in the test suite.
