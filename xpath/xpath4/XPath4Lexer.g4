@@ -51,7 +51,6 @@ QM            : '?';
 SLASH         : '/';
 STAR          : '*';
 SEMI          : ';';
-BACKTICK      : '`';
 TIMES_SIGN    : '\u00D7'; // × (Unicode multiplication sign, alias for *)
 DIV_SIGN      : '\u00F7'; // ÷ (Unicode division sign, alias for div)
 
@@ -152,7 +151,7 @@ BracedURILiteral : 'Q' '{' [^{}]* '}';
 
 // String template (simplified: full embedded-expression support requires lexer modes).
 // A production implementation would push/pop lexer modes on '{' and '}'.
-StringTemplate   : BACKTICK StringTemplateChar* BACKTICK;
+StringTemplate   : '`' StringTemplateChar* '`';
 fragment StringTemplateChar
     : '{{' // escaped open brace
     | '}}' // escaped close brace
