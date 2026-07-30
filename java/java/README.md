@@ -88,4 +88,3 @@ literal, use [Trash trunfoldlit](https://github.com/kaby76/Trash/tree/main/src/t
 
 ## Reference
 * [pldb](http://pldb.info/concepts/java)
-
