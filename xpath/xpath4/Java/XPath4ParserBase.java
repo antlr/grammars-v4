@@ -18,6 +18,8 @@ public abstract class XPath4ParserBase extends Parser
 			|| getInputStream().LA(1) == XPath4Parser.KW_EMPTY_SEQUENCE
 			|| getInputStream().LA(1) == XPath4Parser.KW_FN
 			|| getInputStream().LA(1) == XPath4Parser.KW_FUNCTION
+			|| getInputStream().LA(1) == XPath4Parser.KW_GNODE
+			|| getInputStream().LA(1) == XPath4Parser.KW_JNODE
 			|| getInputStream().LA(1) == XPath4Parser.KW_IF
 			|| getInputStream().LA(1) == XPath4Parser.KW_ITEM
 			|| getInputStream().LA(1) == XPath4Parser.KW_MAP

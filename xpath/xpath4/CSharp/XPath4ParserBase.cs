@@ -26,6 +26,8 @@ public abstract class XPath4ParserBase : Parser
             || InputStream.LA(1) == XPath4Parser.KW_EMPTY_SEQUENCE
             || InputStream.LA(1) == XPath4Parser.KW_FN
             || InputStream.LA(1) == XPath4Parser.KW_FUNCTION
+            || InputStream.LA(1) == XPath4Parser.KW_GNODE
+            || InputStream.LA(1) == XPath4Parser.KW_JNODE
             || InputStream.LA(1) == XPath4Parser.KW_IF
             || InputStream.LA(1) == XPath4Parser.KW_ITEM
             || InputStream.LA(1) == XPath4Parser.KW_MAP

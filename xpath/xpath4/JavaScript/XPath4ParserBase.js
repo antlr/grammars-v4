@@ -18,6 +18,8 @@ export default class XPath4ParserBase extends antlr4.Parser {
 		 || nextTokenType == this.KW_EMPTY_SEQUENCE
 		 || nextTokenType == this.KW_FN
 		 || nextTokenType == this.KW_FUNCTION
+		 || nextTokenType == this.KW_GNODE
+		 || nextTokenType == this.KW_JNODE
 		 || nextTokenType == this.KW_IF
 		 || nextTokenType == this.KW_ITEM
 		 || nextTokenType == this.KW_MAP

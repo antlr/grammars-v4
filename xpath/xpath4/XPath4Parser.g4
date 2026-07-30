@@ -358,7 +358,7 @@ abbreviatedstep
     | simplenodetest
     ;
 
-// Full step: axis ":::" nodetest
+// Full step: axis "::" nodetest
 fullstep
     : axis nodetest
     ;
