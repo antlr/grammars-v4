@@ -145,8 +145,9 @@ IntegerLiteral   : FragDigits;
 DecimalLiteral   : '.' FragDigits | FragDigits '.' [0-9]*;
 DoubleLiteral    : ('.' FragDigits | FragDigits ('.' [0-9]*)?) [eE] [+-]? FragDigits;
 StringLiteral    : '"' (~["] | FragEscapeQuot)* '"' | '\'' (~['] | FragEscapeApos)* '\'';
-// URIQualifiedName now allows optional prefix: Q{uri}ncname or Q{uri}prefix:ncname
-URIQualifiedName : BracedURILiteral FragmentNCName (':' FragmentNCName)?;
+// URIQualifiedName: inline the braced-URI pattern so it is not shadowed by BracedURILiteral.
+// Allows optional prefix: Q{uri}ncname or Q{uri}prefix:ncname
+URIQualifiedName : 'Q' '{' [^{}]* '}' FragmentNCName (':' FragmentNCName)?;
 BracedURILiteral : 'Q' '{' [^{}]* '}';
 
 // String template (simplified: full embedded-expression support requires lexer modes).

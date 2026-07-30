@@ -25,7 +25,7 @@ defaultelementnamespacedecl
     ;
 
 namespacedecl
-    : KW_DECLARE KW_NAMESPACE NCName EQ uriliteral
+    : KW_DECLARE KW_NAMESPACE QName EQ uriliteral
     ;
 
 uriliteral
@@ -423,7 +423,7 @@ dynamicnodetest
 // Postfix expressions: primaryexpr followed by zero or more postfix operations.
 // PostfixExpr covers: FilterExpr, DynamicFunctionCall, LookupExpr, MethodCall
 postfixexpr
-    : primaryexpr (predicate | positionalargumentlist | lookup | (METHOD_ARROW NCName positionalargumentlist))*
+    : primaryexpr (predicate | positionalargumentlist | lookup | (METHOD_ARROW QName positionalargumentlist))*
     ;
 
 positionalargumentlist
@@ -448,7 +448,7 @@ lookup
 
 // KeySpecifier: extended in XPath 4.0 to include ContextValueRef, VarRef, and LookupWildcard
 keyspecifier
-    : NCName
+    : QName
     | literal
     | contextvalueref
     | varref
@@ -602,7 +602,7 @@ compnodencname
 
 // #NCName -- marks an unqualified name for namespace/PI constructors
 markedncname
-    : POUND NCName
+    : POUND QName
     ;
 
 // #EQName -- marks a qualified name for element/attribute constructors
@@ -722,7 +722,7 @@ schemaattributenodetype
     ;
 
 processinginstructionnodetype
-    : KW_PROCESSING_INSTRUCTION OP (NCName | StringLiteral)? CP
+    : KW_PROCESSING_INSTRUCTION OP (QName | StringLiteral)? CP
     ;
 
 commentnodetype
@@ -754,7 +754,7 @@ gnodetype
 
 // JSON node type (new in XPath 4.0): jnode(selector [, SequenceType])
 jnodetype
-    : KW_JNODE OP (STAR | jrootselector | NCName | constant) (COMMA sequencetype)? CP
+    : KW_JNODE OP (STAR | jrootselector | QName | constant) (COMMA sequencetype)? CP
     ;
 
 jrootselector
@@ -818,7 +818,7 @@ fielddeclaration
     ;
 
 fieldname
-    : NCName
+    : QName
     | StringLiteral
     ;
 
@@ -877,8 +877,8 @@ simpletypename
 // Wildcard: extended in XPath 4.0 with URIQualifiedStar (BracedURILiteral "*")
 wildcard
     : STAR
-    | NCName CS
-    | SC NCName
+    | QName CS
+    | SC QName
     | BracedURILiteral STAR
     ;
 

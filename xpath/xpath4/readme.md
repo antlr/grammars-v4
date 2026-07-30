@@ -30,7 +30,7 @@ the XPath 3.1 grammar:
 ```
 postfixexpr
     : primaryexpr (predicate | positionalargumentlist | lookup
-                  | (METHOD_ARROW NCName positionalargumentlist))*
+                  | (METHOD_ARROW QName positionalargumentlist))*
     ;
 ```
 
@@ -57,3 +57,34 @@ choiceitemtype
 
 This covers both the single-item parenthesised form `(T)` and the true choice
 form `(T1 | T2 | ...)`.
+
+### `NCName` tokens are never produced — use `QName` throughout the parser
+
+The lexer defines `QName : FragQName` where `FragQName` expands to both prefixed
+(`prefix:local`) and unprefixed (`local`) name forms. Because `QName` is declared
+before `NCName : FragmentNCName`, and both rules match unprefixed names with the
+same number of characters, ANTLR4's first-rule-wins tie-breaking means the `NCName`
+token is never produced — every unqualified name becomes a `QName` token.
+
+Any parser rule that references the `NCName` token literal will therefore never
+match. All such references have been replaced with `QName`:
+
+| Rule | Context |
+|---|---|
+| `namespacedecl` | namespace prefix in `declare namespace prefix = uri` |
+| `postfixexpr` | method name after `=?>` |
+| `keyspecifier` | unquoted map-lookup key |
+| `markedncname` | name after `#` in namespace/PI constructors |
+| `processinginstructionnodetype` | PI name in `processing-instruction(name)` |
+| `jnodetype` | JSON node kind selector |
+| `fieldname` | field name in `record(field as T)` |
+| `wildcard` | namespace wildcards `prefix:*` and `*:local` |
+
+### `URIQualifiedName` tokens are not produced by the lexer
+
+`Q{uri}local` should tokenise as a single `URIQualifiedName` token, but in
+practice ANTLR4's lexer DFA commits to `QName` (matching the single character
+`Q`) rather than continuing to try the longer `URIQualifiedName` pattern. The
+same limitation exists in the XPath 3.1 grammar. `URIQualifiedName` and
+`BracedURILiteral`-star wildcard expressions are therefore not included in the
+test suite.
