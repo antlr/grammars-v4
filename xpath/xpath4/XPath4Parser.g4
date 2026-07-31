@@ -1,6 +1,6 @@
 // XPath v4.0
 // Author--Ken Domino
-// Based on the XPath 4.0 WG Review Draft at https://qt4cg.org/specifications/xquery-40/xPath-40.html
+// Based on the XPath 4.0 WG Review Draft at https://qt4cg.org/specifications/xquery-40/xpath-40.html#nt-bnf
 //
 // This is an implementation of the XPath version 4.0 grammar.
 
