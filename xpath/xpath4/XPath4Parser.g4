@@ -1,6 +1,6 @@
 // XPath v4.0
 // Author--Ken Domino
-// Based on the XPath 4.0 WG Review Draft at https://qt4cg.org/specifications/xquery-40/xpath-40.html
+// Based on the XPath 4.0 WG Review Draft at https://qt4cg.org/specifications/xquery-40/xPath-40.html
 //
 // This is an implementation of the XPath version 4.0 grammar.
 
@@ -14,92 +14,92 @@ options {
     superClass = XPath4ParserBase;
 }
 
-// Abbreviated steps: "..", "@nodetest", or a simple node test (child axis abbreviation)
-abbreviatedstep
+// Abbreviated steps: "..", "@nodeTest", or a simple node test (child axis abbreviation)
+abbreviatedStep
     : '..'
-    | '@' nodetest
-    | simplenodetest
+    | '@' nodeTest
+    | simpleNodeTest
     ;
 
-absolutepathexpr
-    : '/' relativepathexpr?
-    | '//' relativepathexpr
+absolutePathExpr
+    : '/' relativePathExpr?
+    | '//' relativePathExpr
     ;
 
-additiveexpr
-    : multiplicativeexpr (( '+' | '-') multiplicativeexpr)*
+additiveExpr
+    : multiplicativeExpr (( '+' | '-') multiplicativeExpr)*
     ;
 
-andexpr
-    : comparisonexpr ('and' comparisonexpr)*
+andExpr
+    : comparisonExpr ('and' comparisonExpr)*
     ;
 
-anyarraytype
+anyArrayType
     : 'array' '(' '*' ')'
     ;
 
-anyfunctiontype
+anyFunctionType
     : ('function' | 'fn') '(' '*' ')'
     ;
 
-anyitemtype
+anyItemType
     : 'item' '(' ')'
     ;
 
-anymaptype
+anyMapType
     : 'map' '(' '*' ')'
     ;
 
-anyrecordtype
+anyRecordType
     : 'record' '(' '*' ')'
     ;
 
-anyxnodetype
+anyXNodeType
     : 'node' '(' ')'
     ;
 
 argument
-    : exprsingle
-    | argumentplaceholder
+    : exprSingle
+    | argumentPlaceholder
     ;
 
 // Argument list: now supports keyword arguments (new in XPath 4.0)
-argumentlist
-    : '(' (positionalarguments ( ',' keywordarguments)? | keywordarguments)? ')'
+argumentList
+    : '(' (positionalArguments ( ',' keywordArguments)? | keywordArguments)? ')'
     ;
 
-argumentplaceholder
+argumentPlaceholder
     : '?'
     ;
 
-arrayconstructor
-    : squarearrayconstructor
-    | curlyarrayconstructor
+arrayConstructor
+    : squareArrayConstructor
+    | curlyArrayConstructor
     ;
 
 // Array types
-arraytype
-    : anyarraytype
-    | typedarraytype
+arrayType
+    : anyArrayType
+    | typedArrayType
     ;
 
 // ArrowExpr: supports both "=>" (sequence arrow) and "=!>" (mapping arrow)
-arrowexpr
-    : unaryexpr (sequencearrowtarget | mappingarrowtarget)*
+arrowExpr
+    : unaryExpr (sequenceArrowTarget | mappingArrowTarget)*
     ;
 
 // Arrow target: named function call or restricted dynamic call
-arrowtarget
-    : functioncall
-    | restricteddynamiccall
+arrowTarget
+    : functionCall
+    | restrictedDynamicCall
     ;
 
-attributename
-    : eqname
+attributeName
+    : eqName
     ;
 
-attributenodetype
-    : 'attribute' '(' (nametestunion ( ',' typename_)?)? ')'
+attributeNodeType
+    : 'attribute' '(' (nameTestUnion ( ',' typeName_)?)? ')'
     ;
 
 // XPath 4.0 adds four new or-self axes and four new or-self siblings
@@ -124,153 +124,153 @@ axis
     ;
 
 // Axis step: abbreviated or full, followed by zero or more predicates/lookups
-axisstep
-    : (abbreviatedstep | fullstep) (predicate | lookup)*
+axisStep
+    : (abbreviatedStep | fullStep) (predicate | lookup)*
     ;
 
 // Block form for if: if (cond) { expr }  (new in XPath 4.0)
-bracedaction
-    : enclosedexpr
+bracedAction
+    : enclosedExpr
     ;
 
 // Expression operators in precedence order (lowest to highest)
 
 // CastableExpr: now uses CastTarget + OccurrenceIndicator instead of SingleType
-castableexpr
-    : castexpr ('castable' 'as' casttarget occurrenceindicator?)?
+castableExpr
+    : castExpr ('castable' 'as' castTarget occurrenceIndicator?)?
     ;
 
-castexpr
-    : pipelineexpr ('cast' 'as' casttarget occurrenceindicator?)?
+castExpr
+    : pipelineExpr ('cast' 'as' castTarget occurrenceIndicator?)?
     ;
 
 // CastTarget: richer than XPath 3.1's SingleType -- can target composite types
-casttarget
-    : typename_
-    | choiceitemtype
-    | enumerationtype
-    | typedarraytype
-    | typedmaptype
-    | typedrecordtype
+castTarget
+    : typeName_
+    | choiceItemType
+    | enumerationType
+    | typedArrayType
+    | typedMapType
+    | typedRecordType
     ;
 
 // ChoiceItemType: parenthesized item type or union of item types, e.g. (T) or (T1 | T2)
-choiceitemtype
-    : '(' itemtype ('|' itemtype)* ')'
+choiceItemType
+    : '(' itemType ('|' itemType)* ')'
     ;
 
-commentnodetype
+commentNodeType
     : 'comment' '(' ')'
     ;
 
-comparisonexpr
-    : otherwiseexpr ((valuecomp | generalcomp | nodecomp) otherwiseexpr)?
+comparisonExpr
+    : otherwiseExpr ((valueComp | generalComp | nodeComp) otherwiseExpr)?
     ;
 
-compAttrconstructor
-    : 'attribute' compnodename enclosedexpr
+compAttrConstructor
+    : 'attribute' compNodeName enclosedExpr
     ;
 
-compCommentconstructor
-    : 'comment' enclosedexpr
+compCommentConstructor
+    : 'comment' enclosedExpr
     ;
 
-compdocconstructor
-    : 'document' enclosedexpr
+compDocConstructor
+    : 'document' enclosedExpr
     ;
 
-compElemconstructor
-    : 'element' compnodename enclosedcontentexpr
+compElemConstructor
+    : 'element' compNodeName enclosedContentExpr
     ;
 
-compNSconstructor
-    : 'namespace' compnodencname enclosedexpr
+compNamespaceConstructor
+    : 'namespace' compNodeNCName enclosedExpr
     ;
 
 // Computed node name: a QName literal (#name) or dynamic expression ({expr})
-compnodename
-    : qnameliteral
+compNodeName
+    : qNameLiteral
     | '{' expr '}'
     ;
 
 // Computed NCName: a marked NCName (#ncname) or dynamic expression ({expr})
-compnodencname
-    : markedncname
+compNodeNCName
+    : markedNCName
     | '{' expr '}'
     ;
 
-compPIconstructor
-    : 'processing-instruction' compnodencname enclosedexpr
+compPIConstructor
+    : 'processing-instruction' compNodeNCName enclosedExpr
     ;
 
-comptextconstructor
-    : 'text' enclosedexpr
+compTextConstructor
+    : 'text' enclosedExpr
     ;
 
-computedconstructor
-    : compdocconstructor
-    | compElemconstructor
-    | compAttrconstructor
-    | compNSconstructor
-    | comptextconstructor
-    | compCommentconstructor
-    | compPIconstructor
+computedConstructor
+    : compDocConstructor
+    | compElemConstructor
+    | compAttrConstructor
+    | compNamespaceConstructor
+    | compTextConstructor
+    | compCommentConstructor
+    | compPIConstructor
     ;
 
 // Constant: literal value, QName literal, or boolean function call
 constant
     : StringLiteral
-    | '-' numericliteral
-    | qnameliteral
-    | eqname '(' ')'
+    | '-' numericLiteral
+    | qNameLiteral
+    | eqName '(' ')'
     ;
 
 // ContextValueRef replaces ContextItemExpr from XPath 3.1 (still just ".")
-contextvalueref
+contextValueRef
     : '.'
     ;
 
-curlyarrayconstructor
-    : 'array' enclosedexpr
+curlyArrayConstructor
+    : 'array' enclosedExpr
     ;
 
 // Namespace declarations (new in XPath 4.0)
-defaultelementnamespacedecl
-    : 'declare' 'default' 'element' 'namespace' uriliteral
+defaultElementNamespaceDecl
+    : 'declare' 'default' 'element' 'namespace' uriLiteral
     ;
 
-documentnodetype
-    : 'document-node' '(' (elementnodetype | schemaelementnodetype | nametestunion)? ')'
+documentNodeType
+    : 'document-node' '(' (elementNodeType | schemaElementNodeType | nameTestUnion)? ')'
     ;
 
 // Dynamic node test: { expr } -- node type computed at runtime (new in XPath 4.0)
-dynamicnodetest
-    : enclosedexpr
+dynamicNodeTest
+    : enclosedExpr
     ;
 
-elementname
-    : eqname
+elementName
+    : eqName
     ;
 
-elementnodetype
-    : 'element' '(' (nametestunion ( ',' typename_ '?'?)?)? ')'
+elementNodeType
+    : 'element' '(' (nameTestUnion ( ',' typeName_ '?'?)?)? ')'
     ;
 
-enclosedcontentexpr
-    : enclosedexpr
+enclosedContentExpr
+    : enclosedExpr
     ;
 
-enclosedexpr
+enclosedExpr
     : '{' expr? '}'
     ;
 
 // Enumeration types (new in XPath 4.0): enum("value1", "value2", ...)
-enumerationtype
+enumerationType
     : 'enum' '(' StringLiteral (',' StringLiteral)* ')'
     ;
 
 // EQName: an expanded QName -- keywords are also valid names in XPath
-eqname
+eqName
     : QName
     | URIQualifiedName
     | 'ancestor'
@@ -358,105 +358,105 @@ eqname
 
 // [1]
 expr
-    : exprsingle (',' exprsingle)*
+    : exprSingle (',' exprSingle)*
     ;
 
-exprsingle
-    : forexpr
-    | letexpr
-    | quantifiedexpr
-    | ifexpr
-    | orexpr
+exprSingle
+    : forExpr
+    | letExpr
+    | quantifiedExpr
+    | ifExpr
+    | orExpr
     ;
 
 // FieldDeclaration: "?" marks the field as optional; "as SequenceType" gives its type
-fielddeclaration
-    : fieldname '?'? ('as' sequencetype)?
+fieldDeclaration
+    : fieldName '?'? ('as' sequenceType)?
     ;
 
-fieldname
+fieldName
     : QName
     | StringLiteral
     ;
 
-forbinding
-    : foritembinding
-    | formemberbinding
-    | forentrybinding
+forBinding
+    : forItemBinding
+    | forMemberBinding
+    | forEntryBinding
     ;
 
-forclause
-    : 'for' forbinding
+forClause
+    : 'for' forBinding
     ;
 
 // Entry binding (new in XPath 4.0): iterates over map key-value entries
-forentrybinding
-    : (forentrykeybinding forentryvaluebinding | forentryvaluebinding) positionalvar? 'in' exprsingle
+forEntryBinding
+    : (forEntryKeyBinding forEntryValueBinding | forEntryValueBinding) positionalVar? 'in' exprSingle
     ;
 
-forentrykeybinding
-    : 'key' varnameandtype
+forEntryKeyBinding
+    : 'key' varNameAndType
     ;
 
-forentryvaluebinding
-    : 'value' varnameandtype
+forEntryValueBinding
+    : 'value' varNameAndType
     ;
 
 // For expression: single ForClause followed by chained ForLetReturn body.
 // Multiple bindings are expressed by chaining: for $x in A for $y in B return C
-forexpr
-    : forclause forletreturn
+forExpr
+    : forClause forLetReturn
     ;
 
 // Standard item binding: for $x [as T] [at $p] in expr
-foritembinding
-    : varnameandtype positionalvar? 'in' exprsingle
+forItemBinding
+    : varNameAndType positionalVar? 'in' exprSingle
     ;
 
 // The body of a for/let expression -- can chain another for, let, or terminate with return.
 // This avoids the indirect left-recursion that the spec's ForLetReturn would otherwise create.
-forletreturn
-    : forclause forletreturn
-    | letclause forletreturn
-    | 'return' exprsingle
+forLetReturn
+    : forClause forLetReturn
+    | letClause forLetReturn
+    | 'return' exprSingle
     ;
 
 // Member binding (new in XPath 4.0): iterates over array members
-formemberbinding
-    : 'member' varnameandtype positionalvar? 'in' exprsingle
+forMemberBinding
+    : 'member' varNameAndType positionalVar? 'in' exprSingle
     ;
 
-// Full step: axis "::" nodetest
-fullstep
-    : axis nodetest
+// Full step: axis "::" nodeTest
+fullStep
+    : axis nodeTest
     ;
 
-functionbody
-    : enclosedexpr
+functionBody
+    : enclosedExpr
     ;
 
-functioncall
-    : { this.IsFuncCall() }? eqname argumentlist
+functionCall
+    : { this.IsFuncCall() }? eqName argumentList
     ;
 
 // Function item expressions
-functionitemexpr
-    : namedfunctionref
-    | inlinefunctionexpr
+functionItemExpr
+    : namedFunctionRef
+    | inlineFunctionExpr
     ;
 
 // FunctionSignature separates the parameter list from the return type
-functionsignature
-    : '(' paramlist? ')' typedeclaration?
+functionSignature
+    : '(' paramList? ')' typeDeclaration?
     ;
 
 // Function types: "fn" is now an alias for "function"
-functiontype
-    : anyfunctiontype
-    | typedfunctiontype
+functionType
+    : anyFunctionType
+    | typedFunctionType
     ;
 
-generalcomp
+generalComp
     : '='
     | '!='
     | '<'
@@ -466,258 +466,258 @@ generalcomp
     ;
 
 // Generic node type (new in XPath 4.0): gnode()
-gnodetype
+gNodeType
     : 'gnode' '(' ')'
     ;
 
 // If expression: now allows both traditional "then/else" and block "{...}" forms
-ifexpr
-    : 'if' '(' expr ')' (unbracedactions | bracedaction)
+ifExpr
+    : 'if' '(' expr ')' (unbracedActions | bracedAction)
     ;
 
 // InlineFunctionExpr: "fn" is now an alias for "function" (new in XPath 4.0)
-inlinefunctionexpr
-    : ('function' | 'fn') functionsignature functionbody
+inlineFunctionExpr
+    : ('function' | 'fn') functionSignature functionBody
     ;
 
-instanceofexpr
-    : treatexpr ('instance' 'of' sequencetype)?
+instanceofExpr
+    : treatExpr ('instance' 'of' sequenceType)?
     ;
 
-intersectexceptexpr
-    : recordputexpr (( 'intersect' | 'except') recordputexpr)*
+intersectExceptExpr
+    : recordPutExpr (( 'intersect' | 'except') recordPutExpr)*
     ;
 
 // ItemType: restructured in XPath 4.0
-itemtype
-    : regularitemtype
-    | functiontype
-    | typename_
-    | choiceitemtype
+itemType
+    : regularItemType
+    | functionType
+    | typeName_
+    | choiceItemType
     ;
 
 // JSON node type (new in XPath 4.0): jnode(selector [, SequenceType])
-jnodetype
-    : 'jnode' '(' ('*' | jrootselector | QName | constant) (',' sequencetype)? ')'
+jNodeType
+    : 'jnode' '(' ('*' | jRootSelector | QName | constant) (',' sequenceType)? ')'
     ;
 
-jrootselector
+jRootSelector
     : '(' ')'
     ;
 
 // KeySpecifier: extended in XPath 4.0 to include ContextValueRef, VarRef, and LookupWildcard
-keyspecifier
+keySpecifier
     : QName
     | literal
-    | contextvalueref
-    | varref
-    | parenthesizedexpr
-    | lookupwildcard
+    | contextValueRef
+    | varRef
+    | parenthesizedExpr
+    | lookupWildcard
     ;
 
-keywordargument
-    : eqname ':=' argument
+keywordArgument
+    : eqName ':=' argument
     ;
 
-keywordarguments
-    : keywordargument (',' keywordargument)*
+keywordArguments
+    : keywordArgument (',' keywordArgument)*
     ;
 
 // let $[ $x [as T] ] [as T] := expr  -- destructuring array binding
-letarraybinding
-    : '$' '[' varnameandtype ']' typedeclaration? ':=' exprsingle
+letArrayBinding
+    : '$' '[' varNameAndType ']' typeDeclaration? ':=' exprSingle
     ;
 
-letbinding
-    : letvaluebinding
-    | letsequencebinding
-    | letarraybinding
-    | letmapbinding
+letBinding
+    : letValueBinding
+    | letSequenceBinding
+    | letArrayBinding
+    | letMapBinding
     ;
 
-letclause
-    : 'let' letbinding
+letClause
+    : 'let' letBinding
     ;
 
 // Let expression: single LetClause followed by chained ForLetReturn body.
-letexpr
-    : letclause forletreturn
+letExpr
+    : letClause forLetReturn
     ;
 
 // let ${ $x [as T] } [as T] := expr  -- destructuring map binding
-letmapbinding
-    : '$' '{' varnameandtype '}' typedeclaration? ':=' exprsingle
+letMapBinding
+    : '$' '{' varNameAndType '}' typeDeclaration? ':=' exprSingle
     ;
 
 // let $( $x [as T] ) [as T] := expr  -- destructuring sequence binding
-letsequencebinding
-    : '$' '(' varnameandtype ')' typedeclaration? ':=' exprsingle
+letSequenceBinding
+    : '$' '(' varNameAndType ')' typeDeclaration? ':=' exprSingle
     ;
 
 // let $x [as T] := expr
-letvaluebinding
-    : varnameandtype ':=' exprsingle
+letValueBinding
+    : varNameAndType ':=' exprSingle
     ;
 
 literal
-    : numericliteral
+    : numericLiteral
     | StringLiteral
     ;
 
 lookup
-    : '?' keyspecifier
+    : '?' keySpecifier
     ;
 
-lookupwildcard
+lookupWildcard
     : '*'
     ;
 
-mapconstructor
-    : 'map' '{' (mapconstructorentry ( ',' mapconstructorentry)*)? '}'
+mapConstructor
+    : 'map' '{' (mapConstructorEntry ( ',' mapConstructorEntry)*)? '}'
     ;
 
 // MapConstructorEntry: simplified to ExprSingle ":" ExprSingle (no separate key/value rules)
-mapconstructorentry
-    : exprsingle ':' exprsingle
+mapConstructorEntry
+    : exprSingle ':' exprSingle
     ;
 
 // =!> target(...args)  -- maps arrow operator (new in XPath 4.0)
-mappingarrowtarget
-    : '=!>' arrowtarget
+mappingArrowTarget
+    : '=!>' arrowTarget
     ;
 
 // Map types
-maptype
-    : anymaptype
-    | typedmaptype
+mapType
+    : anyMapType
+    | typedMapType
     ;
 
 // #NCName -- marks an unqualified name for namespace/PI constructors
-markedncname
+markedNCName
     : '#' QName
     ;
 
 // XPath 4.0 adds Unicode × (U+00D7) and ÷ (U+00F7) as aliases for * and div
-multiplicativeexpr
-    : unionexpr (( '*' | '\u00D7' | 'div' | '\u00F7' | 'idiv' | 'mod') unionexpr)*
+multiplicativeExpr
+    : unionExpr (( '*' | '\u00D7' | 'div' | '\u00F7' | 'idiv' | 'mod') unionExpr)*
     ;
 
-namedfunctionref
-    : eqname '#' IntegerLiteral /* xgc: reserved-function-names */
+namedFunctionRef
+    : eqName '#' IntegerLiteral /* xgc: reserved-function-names */
     ;
 
-namespacedecl
-    : 'declare' 'namespace' QName '=' uriliteral
+namespaceDecl
+    : 'declare' 'namespace' QName '=' uriLiteral
     ;
 
-namespacenodetype
+namespaceNodeType
     : 'namespace-node' '(' ')'
     ;
 
-nametest
-    : eqname
+nameTest
+    : eqName
     | wildcard
     ;
 
 // NameTestUnion: used in element/attribute node type tests
-nametestunion
-    : nametest
+nameTestUnion
+    : nameTest
     ;
 
 // NodeComp: extended in XPath 4.0 with is-not, precedes, follows, precedes-or-is, follows-or-is
-nodecomp
+nodeComp
     : 'is'
     | 'is-not'
-    | nodeprecedes
-    | nodefollows
+    | nodePrecedes
+    | nodeFollows
     | 'precedes-or-is'
     | 'follows-or-is'
     ;
 
 // Node constructors (computed constructors -- new in XPath 4.0 for XPath; from XQuery)
 nodeConstructor
-    : computedconstructor
+    : computedConstructor
     ;
 
-nodefollows
+nodeFollows
     : '>>'
     | 'follows'
     ;
 
-nodeprecedes
+nodePrecedes
     : '<<'
     | 'precedes'
     ;
 
 // Node test: union, simple, or dynamic (new in XPath 4.0)
-nodetest
-    : unionnodetest
-    | simplenodetest
-    | dynamicnodetest
+nodeTest
+    : unionNodeTest
+    | simpleNodeTest
+    | dynamicNodeTest
     ;
 
-numericliteral
+numericLiteral
     : IntegerLiteral
     | DecimalLiteral
     | DoubleLiteral
     ;
 
-occurrenceindicator
+occurrenceIndicator
     : '?'
     | '*'
     | '+'
     ;
 
-orexpr
-    : andexpr ('or' andexpr)*
+orExpr
+    : andExpr ('or' andExpr)*
     ;
 
 // OtherwiseExpr: new in XPath 4.0 -- sequence coalescing with "otherwise"
-otherwiseexpr
-    : stringconcatexpr ('otherwise' stringconcatexpr)*
+otherwiseExpr
+    : stringConcatExpr ('otherwise' stringConcatExpr)*
     ;
 
 // Shared sub-parts
-paramlist
-    : varnameandtype (',' varnameandtype)*
+paramList
+    : varNameAndType (',' varNameAndType)*
     ;
 
-parenthesizedexpr
+parenthesizedExpr
     : '(' expr? ')'
     ;
 
 // Path expressions
-pathexpr
-    : absolutepathexpr
-    | relativepathexpr
+pathExpr
+    : absolutePathExpr
+    | relativePathExpr
     ;
 
 // PipelineExpr: thin wrapper around ArrowExpr (placeholder for future pipeline operators)
-pipelineexpr
-    : arrowexpr
+pipelineExpr
+    : arrowExpr
     ;
 
-positionalargumentlist
-    : '(' positionalarguments? ')'
+positionalArgumentList
+    : '(' positionalArguments? ')'
     ;
 
-positionalarguments
+positionalArguments
     : argument (',' argument)*
     ;
 
 // Positional variable binding: at $pos
-positionalvar
-    : 'at' '$' eqname
+positionalVar
+    : 'at' '$' eqName
     ;
 
-// Postfix expressions: primaryexpr followed by zero or more postfix operations.
+// Postfix expressions: primaryExpr followed by zero or more postfix operations.
 // PostfixExpr covers: FilterExpr, DynamicFunctionCall, LookupExpr, MethodCall
-postfixexpr
-    : primaryexpr (
+postfixExpr
+    : primaryExpr (
         predicate
-        | positionalargumentlist
+        | positionalArgumentList
         | lookup
-        | '=?>' QName positionalargumentlist
+        | '=?>' QName positionalArgumentList
     )*
     ;
 
@@ -725,215 +725,215 @@ predicate
     : '[' expr ']'
     ;
 
-predicatelist
+predicateList
     : predicate*
     ;
 
 // Primary expressions: extended in XPath 4.0 with NodeConstructor and StringTemplate
-primaryexpr
+primaryExpr
     : literal
-    | varref
-    | parenthesizedexpr
-    | contextvalueref
-    | functioncall
+    | varRef
+    | parenthesizedExpr
+    | contextValueRef
+    | functionCall
     | nodeConstructor
-    | functionitemexpr
-    | mapconstructor
-    | arrayconstructor
-    | stringtemplate
-    | unarylookup
+    | functionItemExpr
+    | mapConstructor
+    | arrayConstructor
+    | stringTemplate
+    | unaryLookup
     ;
 
-processinginstructionnodetype
+processingInstructionNodeType
     : 'processing-instruction' '(' (QName | StringLiteral)? ')'
     ;
 
 // #EQName -- marks a qualified name for element/attribute constructors
-qnameliteral
-    : '#' eqname
+qNameLiteral
+    : '#' eqName
     ;
 
 // Quantified expression: some/every with one or more bindings
-quantifiedexpr
-    : ('some' | 'every') quantifierbinding (',' quantifierbinding)* 'satisfies' exprsingle
+quantifiedExpr
+    : ('some' | 'every') quantifierBinding (',' quantifierBinding)* 'satisfies' exprSingle
     ;
 
-quantifierbinding
-    : varnameandtype 'in' exprsingle
+quantifierBinding
+    : varNameAndType 'in' exprSingle
     ;
 
-rangeexpr
-    : additiveexpr ('to' additiveexpr)?
+rangeExpr
+    : additiveExpr ('to' additiveExpr)?
     ;
 
 // RecordPutExpr: new in XPath 4.0 -- record field update with "+:="
-recordputexpr
-    : instanceofexpr ('+:=' instanceofexpr)*
+recordPutExpr
+    : instanceofExpr ('+:=' instanceofExpr)*
     ;
 
 // Record types (new in XPath 4.0): structural typing for maps
-recordtype
-    : anyrecordtype
-    | typedrecordtype
+recordType
+    : anyRecordType
+    | typedRecordType
     ;
 
-regularitemtype
-    : anyitemtype
-    | xnodetype
-    | gnodetype
-    | jnodetype
-    | maptype
-    | arraytype
-    | recordtype
-    | enumerationtype
+regularItemType
+    : anyItemType
+    | xNodeType
+    | gNodeType
+    | jNodeType
+    | mapType
+    | arrayType
+    | recordType
+    | enumerationType
     ;
 
-relativepathexpr
-    : stepexpr (( '/' | '//') stepexpr)*
+relativePathExpr
+    : stepExpr (( '/' | '//') stepExpr)*
     ;
 
 // Restricted set of targets allowed for dynamic arrow calls
-restricteddynamiccall
-    : (varref | parenthesizedexpr | functionitemexpr | mapconstructor | arrayconstructor) positionalargumentlist
+restrictedDynamicCall
+    : (varRef | parenthesizedExpr | functionItemExpr | mapConstructor | arrayConstructor) positionalArgumentList
     ;
 
-schemaattributenodetype
-    : 'schema-attribute' '(' attributename ')'
+schemaAttributeNodeType
+    : 'schema-attribute' '(' attributeName ')'
     ;
 
-schemaelementnodetype
-    : 'schema-element' '(' elementname ')'
+schemaElementNodeType
+    : 'schema-element' '(' elementName ')'
     ;
 
 // Name selector: a qualified name or wildcard (for abbreviated child/attribute axis)
 selector
-    : eqname
+    : eqName
     | wildcard
     ;
 
 // => target(...args)
-sequencearrowtarget
-    : '=>' arrowtarget
+sequenceArrowTarget
+    : '=>' arrowTarget
     ;
 
-sequencetype
+sequenceType
     : 'empty-sequence' '(' ')'
-    | itemtype occurrenceindicator?
+    | itemType occurrenceIndicator?
     ;
 
 // Simple map expression
-simplemapexpr
-    : pathexpr ('!' pathexpr)*
+simpleMapExpr
+    : pathExpr ('!' pathExpr)*
     ;
 
 // Simple node test: type test or element/attribute name selector
-simplenodetest
-    : typetest
+simpleNodeTest
+    : typeTest
     | selector
     ;
 
-squarearrayconstructor
-    : '[' (exprsingle ( ',' exprsingle)*)? ']'
+squareArrayConstructor
+    : '[' (exprSingle ( ',' exprSingle)*)? ']'
     ;
 
-stepexpr
-    : postfixexpr
-    | axisstep
+stepExpr
+    : postfixExpr
+    | axisStep
     ;
 
-stringconcatexpr
-    : rangeexpr ('||' rangeexpr)*
+stringConcatExpr
+    : rangeExpr ('||' rangeExpr)*
     ;
 
 // String template: backtick-delimited interpolated string (new in XPath 4.0).
 // The lexer captures the full template as a single token (simplified).
 // A production implementation would parse embedded { expr } with lexer modes.
-stringtemplate
+stringTemplate
     : StringTemplate
     ;
 
-textnodetype
+textNodeType
     : 'text' '(' ')'
     ;
 
-treatexpr
-    : castableexpr ('treat' 'as' sequencetype)?
+treatExpr
+    : castableExpr ('treat' 'as' sequenceType)?
     ;
 
-typedarraytype
-    : 'array' '(' sequencetype ')'
+typedArrayType
+    : 'array' '(' sequenceType ')'
     ;
 
-typedeclaration
-    : 'as' sequencetype
+typeDeclaration
+    : 'as' sequenceType
     ;
 
-typedfunctionparam
-    : ('$' eqname 'as')? sequencetype
+typedFunctionParam
+    : ('$' eqName 'as')? sequenceType
     ;
 
 // TypedFunctionParam: optional named parameter ("$name as") followed by a SequenceType
-typedfunctionparamlist
-    : typedfunctionparam (',' typedfunctionparam)*
+typedFunctionParamList
+    : typedFunctionParam (',' typedFunctionParam)*
     ;
 
-typedfunctiontype
-    : ('function' | 'fn') '(' typedfunctionparamlist? ')' 'as' sequencetype
+typedFunctionType
+    : ('function' | 'fn') '(' typedFunctionParamList? ')' 'as' sequenceType
     ;
 
 // TypedMapType now uses ItemType for key (not just AtomicOrUnionType)
-typedmaptype
-    : 'map' '(' itemtype ',' sequencetype ')'
+typedMapType
+    : 'map' '(' itemType ',' sequenceType ')'
     ;
 
-typedrecordtype
-    : 'record' '(' fielddeclaration (',' fielddeclaration)* ')'
+typedRecordType
+    : 'record' '(' fieldDeclaration (',' fieldDeclaration)* ')'
     ;
 
 // Type name
-typename_
-    : eqname
+typeName_
+    : eqName
     ;
 
-simpletypename
-    : typename_
+simpleTypeName
+    : typeName_
     ;
 
 // Type test: covers gnode, XML node types, and JSON node types
-typetest
-    : gnodetype
-    | xnodetype
-    | jnodetype
+typeTest
+    : gNodeType
+    | xNodeType
+    | jNodeType
     ;
 
-unaryexpr
-    : ('-' | '+')* valueexpr
+unaryExpr
+    : ('-' | '+')* valueExpr
     ;
 
-unarylookup
-    : '?' keyspecifier
+unaryLookup
+    : '?' keySpecifier
     ;
 
 // Type declarations and sequence types
 
-unbracedactions
-    : 'then' exprsingle 'else' exprsingle
+unbracedActions
+    : 'then' exprSingle 'else' exprSingle
     ;
 
-unionexpr
-    : intersectexceptexpr (( 'union' | '|') intersectexceptexpr)*
+unionExpr
+    : intersectExceptExpr (( 'union' | '|') intersectExceptExpr)*
     ;
 
 // Union node test: (T1 | T2 | ...) -- selects nodes matching any of the tests
-unionnodetest
-    : '(' simplenodetest ('|' simplenodetest)+ ')'
+unionNodeTest
+    : '(' simpleNodeTest ('|' simpleNodeTest)+ ')'
     ;
 
-uriliteral
+uriLiteral
     : StringLiteral
     ;
 
-valuecomp
+valueComp
     : 'eq'
     | 'ne'
     | 'lt'
@@ -942,17 +942,17 @@ valuecomp
     | 'ge'
     ;
 
-valueexpr
-    : simplemapexpr
+valueExpr
+    : simpleMapExpr
     ;
 
-// Variable name with optional type (replaces old "$ varname typedeclaration?")
-varnameandtype
-    : '$' eqname typedeclaration?
+// Variable name with optional type (replaces old "$ varname typeDeclaration?")
+varNameAndType
+    : '$' eqName typeDeclaration?
     ;
 
-varref
-    : '$' eqname
+varRef
+    : '$' eqName
     ;
 
 // Wildcard: extended in XPath 4.0 with URIQualifiedStar (BracedURILiteral "*")
@@ -964,22 +964,22 @@ wildcard
     ;
 
 // XML node types (XNodeType) -- replaces and renames the old KindTest rules
-xnodetype
-    : documentnodetype
-    | elementnodetype
-    | attributenodetype
-    | schemaelementnodetype
-    | schemaattributenodetype
-    | processinginstructionnodetype
-    | commentnodetype
-    | textnodetype
-    | namespacenodetype
-    | anyxnodetype
+xNodeType
+    : documentNodeType
+    | elementNodeType
+    | attributeNodeType
+    | schemaElementNodeType
+    | schemaAttributeNodeType
+    | processingInstructionNodeType
+    | commentNodeType
+    | textNodeType
+    | namespaceNodeType
+    | anyXNodeType
     ;
 
 // Top-level XPath expression. XPath 4.0 allows optional namespace declarations at the start.
-xpath
-    : (defaultelementnamespacedecl ';')? (namespacedecl ';')* expr EOF
+xPath
+    : (defaultElementNamespaceDecl ';')? (namespaceDecl ';')* expr EOF
     ;
 
 // Entry point for testing: semicolon-separated expressions
