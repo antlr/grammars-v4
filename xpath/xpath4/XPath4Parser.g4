@@ -574,7 +574,7 @@ letMapBinding
 
 // let $( $x [as T] ) [as T] := expr  -- destructuring sequence binding
 letSequenceBinding
-    : '$' '(' varNameAndType ')' typeDeclaration? ':=' exprSingle
+    : '$' '(' varNameAndType (',' varNameAndType)* ')' typeDeclaration? ':=' exprSingle
     ;
 
 // let $x [as T] := expr
