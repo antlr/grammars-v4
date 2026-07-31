@@ -940,7 +940,7 @@ unaryExpr
     ;
 
 unaryLookup
-    : '?' keySpecifier
+    : lookup
     ;
 
 // Type declarations and sequence types
