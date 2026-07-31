@@ -908,13 +908,8 @@ typedFunctionParam
     : ('$' eqName 'as')? sequenceType
     ;
 
-// TypedFunctionParam: optional named parameter ("$name as") followed by a SequenceType
-typedFunctionParamList
-    : typedFunctionParam (',' typedFunctionParam)*
-    ;
-
 typedFunctionType
-    : ('function' | 'fn') '(' typedFunctionParamList? ')' 'as' sequenceType
+    : ('function' | 'fn') '(' (typedFunctionParam (',' typedFunctionParam)*)? ')' 'as' sequenceType
     ;
 
 // TypedMapType now uses ItemType for key (not just AtomicOrUnionType)
