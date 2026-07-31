@@ -500,7 +500,7 @@ ifExpr
 
 // InlineFunctionExpr: "fn" is now an alias for "function" (new in XPath 4.0)
 inlineFunctionExpr
-    : ('function' | 'fn') functionSignature functionBody
+    : ('function' | 'fn') functionSignature? functionBody
     ;
 
 instanceofExpr

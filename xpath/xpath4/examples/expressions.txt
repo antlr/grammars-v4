@@ -1501,3 +1501,7 @@ for key $k in $map return $k;
 for value $v in $map return $v;
 for key $k value $v at $pos in $map return concat($pos, ": ", $k, "=", $v);
 for key $k at $pos in $map return concat($pos, ": ", $k);
+function { 42 };
+fn { $x + 1 };
+function() { $x };
+fn() as xs:integer { $x + 1 };
