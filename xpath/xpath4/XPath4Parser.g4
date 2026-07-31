@@ -606,9 +606,8 @@ mapConstructor
     : 'map'? '{' (mapConstructorEntry ( ',' mapConstructorEntry)*)? '}'
     ;
 
-// MapConstructorEntry: simplified to ExprSingle ":" ExprSingle (no separate key/value rules)
 mapConstructorEntry
-    : exprSingle ':' exprSingle
+    : exprSingle (':' exprSingle)?
     ;
 
 // =!> target(...args)  -- maps arrow operator (new in XPath 4.0)

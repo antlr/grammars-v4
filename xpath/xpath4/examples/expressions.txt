@@ -1542,3 +1542,6 @@ $x instance of jnode(*, xs:integer);
 {"a": 1};
 {"a": 1, "b": 2};
 {"key": "value", "count": 42};
+map {"a", "b"};
+map {"a": 1, "b"};
+{"x", "y", "z"};
