@@ -17,7 +17,7 @@ MAPPING_ARROW : '=!>'; // mapping arrow operator (new in XPath 4.0)
 METHOD_ARROW  : '=?>'; // method call operator (new in XPath 4.0)
 SS            : '//';
 PP            : '||';
-DDD           : '...'; // ExtensibleFlag in RecordType (must precede DD)
+DDD           : '...'; // ExtensibleFlag in RecordType
 DD            : '..';
 COLONCOLON    : '::';
 CEQ           : ':=';
@@ -41,7 +41,7 @@ DOLLAR        : '$';
 EQ            : '=';
 GT            : '>';
 LT            : '<';
-THIN_ARROW    : '->'; // pipeline operator (new in XPath 4.0); must precede MINUS
+THIN_ARROW    : '->'; // pipeline operator (new in XPath 4.0)
 MINUS         : '-';
 OB            : '[';
 OC            : '{';
