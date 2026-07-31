@@ -219,12 +219,14 @@ computedConstructor
     | compPIConstructor
     ;
 
-// Constant: literal value, QName literal, or boolean function call
+// Constant: literal value, QName literal, or boolean function call.
+// Spec: ("true" "()")  |  ("false" "()")  — "true"/"false" are not reserved words,
+// so they tokenise as QName; QName '(' ')' is the faithful syntactic approximation.
 constant
     : StringLiteral
-    | '-' numericLiteral
+    | '-'? numericLiteral
     | qNameLiteral
-    | eqName '(' ')'
+    | QName '(' ')'
     ;
 
 // ContextValueRef replaces ContextItemExpr from XPath 3.1 (still just ".")
