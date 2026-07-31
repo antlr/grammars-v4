@@ -16,46 +16,46 @@ options {
 
 // Abbreviated steps: "..", "@nodetest", or a simple node test (child axis abbreviation)
 abbreviatedstep
-    : DD
-    | AT nodetest
+    :  '..'
+    |  '@' nodetest
     | simplenodetest
     ;
 
 absolutepathexpr
-    : SLASH relativepathexpr?
-    | SS relativepathexpr
+    :  '/' relativepathexpr?
+    |  '//' relativepathexpr
     ;
 
 additiveexpr
-    : multiplicativeexpr ((PLUS | MINUS) multiplicativeexpr)*
+    : multiplicativeexpr (( '+' |  '-') multiplicativeexpr)*
     ;
 
 andexpr
-    : comparisonexpr (KW_AND comparisonexpr)*
+    : comparisonexpr ( 'and' comparisonexpr)*
     ;
 
 anyarraytype
-    : KW_ARRAY OP STAR CP
+    :  'array'  '('  '*'  ')'
     ;
 
 anyfunctiontype
-    : (KW_FUNCTION | KW_FN) OP STAR CP
+    : ( 'function' |  'fn')  '('  '*'  ')'
     ;
 
 anyitemtype
-    : KW_ITEM OP CP
+    :  'item'  '('  ')'
     ;
 
 anymaptype
-    : KW_MAP OP STAR CP
+    :  'map'  '('  '*'  ')'
     ;
 
 anyrecordtype
-    : KW_RECORD OP STAR CP
+    :  'record'  '('  '*'  ')'
     ;
 
 anyxnodetype
-    : KW_NODE OP CP
+    :  'node'  '('  ')'
     ;
 
 argument
@@ -65,11 +65,11 @@ argument
 
 // Argument list: now supports keyword arguments (new in XPath 4.0)
 argumentlist
-    : OP (positionalarguments (COMMA keywordarguments)? | keywordarguments)? CP
+    :  '(' (positionalarguments ( ',' keywordarguments)? | keywordarguments)?  ')'
     ;
 
 argumentplaceholder
-    : QM
+    :  '?'
     ;
 
 arrayconstructor
@@ -99,28 +99,28 @@ attributename
     ;
 
 attributenodetype
-    : KW_ATTRIBUTE OP (nametestunion (COMMA typename_)?)? CP
+    :  'attribute'  '(' (nametestunion ( ',' typename_)?)?  ')'
     ;
 
 // XPath 4.0 adds four new or-self axes and four new or-self siblings
 axis
-    : KW_ANCESTOR COLONCOLON
-    | KW_ANCESTOR_OR_SELF COLONCOLON
-    | KW_ATTRIBUTE COLONCOLON
-    | KW_CHILD COLONCOLON
-    | KW_DESCENDANT COLONCOLON
-    | KW_DESCENDANT_OR_SELF COLONCOLON
-    | KW_FOLLOWING COLONCOLON
-    | KW_FOLLOWING_OR_SELF COLONCOLON
-    | KW_FOLLOWING_SIBLING COLONCOLON
-    | KW_FOLLOWING_SIBLING_OR_SELF COLONCOLON
-    | KW_NAMESPACE COLONCOLON
-    | KW_PARENT COLONCOLON
-    | KW_PRECEDING COLONCOLON
-    | KW_PRECEDING_OR_SELF COLONCOLON
-    | KW_PRECEDING_SIBLING COLONCOLON
-    | KW_PRECEDING_SIBLING_OR_SELF COLONCOLON
-    | KW_SELF COLONCOLON
+    :  'ancestor'  '::'
+    |  'ancestor-or-self'  '::'
+    |  'attribute'  '::'
+    |  'child'  '::'
+    |  'descendant'  '::'
+    |  'descendant-or-self'  '::'
+    |  'following'  '::'
+    |  'following-or-self'  '::'
+    |  'following-sibling'  '::'
+    |  'following-sibling-or-self'  '::'
+    |  'namespace'  '::'
+    |  'parent'  '::'
+    |  'preceding'  '::'
+    |  'preceding-or-self'  '::'
+    |  'preceding-sibling'  '::'
+    |  'preceding-sibling-or-self'  '::'
+    |  'self'  '::'
     ;
 
 // Axis step: abbreviated or full, followed by zero or more predicates/lookups
@@ -137,11 +137,11 @@ bracedaction
 
 // CastableExpr: now uses CastTarget + OccurrenceIndicator instead of SingleType
 castableexpr
-    : castexpr (KW_CASTABLE KW_AS casttarget occurrenceindicator?)?
+    : castexpr ( 'castable'  'as' casttarget occurrenceindicator?)?
     ;
 
 castexpr
-    : pipelineexpr (KW_CAST KW_AS casttarget occurrenceindicator?)?
+    : pipelineexpr ( 'cast'  'as' casttarget occurrenceindicator?)?
     ;
 
 // CastTarget: richer than XPath 3.1's SingleType -- can target composite types
@@ -156,11 +156,11 @@ casttarget
 
 // ChoiceItemType: parenthesized item type or union of item types, e.g. (T) or (T1 | T2)
 choiceitemtype
-    : OP itemtype (P itemtype)* CP
+    :  '(' itemtype ( '|' itemtype)*  ')'
     ;
 
 commentnodetype
-    : KW_COMMENT OP CP
+    :  'comment'  '('  ')'
     ;
 
 comparisonexpr
@@ -168,43 +168,43 @@ comparisonexpr
     ;
 
 compAttrconstructor
-    : KW_ATTRIBUTE compnodename enclosedexpr
+    :  'attribute' compnodename enclosedexpr
     ;
 
 compCommentconstructor
-    : KW_COMMENT enclosedexpr
+    :  'comment' enclosedexpr
     ;
 
 compdocconstructor
-    : KW_DOCUMENT enclosedexpr
+    :  'document' enclosedexpr
     ;
 
 compElemconstructor
-    : KW_ELEMENT compnodename enclosedcontentexpr
+    :  'element' compnodename enclosedcontentexpr
     ;
 
 compNSconstructor
-    : KW_NAMESPACE compnodencname enclosedexpr
+    :  'namespace' compnodencname enclosedexpr
     ;
 
 // Computed node name: a QName literal (#name) or dynamic expression ({expr})
 compnodename
     : qnameliteral
-    | OC expr CC
+    |  '{' expr  '}'
     ;
 
 // Computed NCName: a marked NCName (#ncname) or dynamic expression ({expr})
 compnodencname
     : markedncname
-    | OC expr CC
+    |  '{' expr  '}'
     ;
 
 compPIconstructor
-    : KW_PROCESSING_INSTRUCTION compnodencname enclosedexpr
+    :  'processing-instruction' compnodencname enclosedexpr
     ;
 
 comptextconstructor
-    : KW_TEXT enclosedexpr
+    :  'text' enclosedexpr
     ;
 
 computedconstructor
@@ -220,27 +220,27 @@ computedconstructor
 // Constant: literal value, QName literal, or boolean function call
 constant
     : StringLiteral
-    | MINUS numericliteral
+    |  '-' numericliteral
     | qnameliteral
-    | eqname OP CP
+    | eqname  '('  ')'
     ;
 
 // ContextValueRef replaces ContextItemExpr from XPath 3.1 (still just ".")
 contextvalueref
-    : D
+    :  '.'
     ;
 
 curlyarrayconstructor
-    : KW_ARRAY enclosedexpr
+    :  'array' enclosedexpr
     ;
 
 // Namespace declarations (new in XPath 4.0)
 defaultelementnamespacedecl
-    : KW_DECLARE KW_DEFAULT KW_ELEMENT KW_NAMESPACE uriliteral
+    :  'declare'  'default'  'element'  'namespace' uriliteral
     ;
 
 documentnodetype
-    : KW_DOCUMENT_NODE OP (elementnodetype | schemaelementnodetype | nametestunion)? CP
+    :  'document-node'  '(' (elementnodetype | schemaelementnodetype | nametestunion)?  ')'
     ;
 
 // Dynamic node test: { expr } -- node type computed at runtime (new in XPath 4.0)
@@ -253,7 +253,7 @@ elementname
     ;
 
 elementnodetype
-    : KW_ELEMENT OP (nametestunion (COMMA typename_ QM?)?)? CP
+    :  'element'  '(' (nametestunion ( ',' typename_  '?'?)?)?  ')'
     ;
 
 enclosedcontentexpr
@@ -261,104 +261,104 @@ enclosedcontentexpr
     ;
 
 enclosedexpr
-    : OC expr? CC
+    :  '{' expr?  '}'
     ;
 
 // Enumeration types (new in XPath 4.0): enum("value1", "value2", ...)
 enumerationtype
-    : KW_ENUM OP StringLiteral (COMMA StringLiteral)* CP
+    :  'enum'  '(' StringLiteral ( ',' StringLiteral)*  ')'
     ;
 
 // EQName: an expanded QName -- keywords are also valid names in XPath
 eqname
     : QName
     | URIQualifiedName
-    | KW_ANCESTOR
-    | KW_ANCESTOR_OR_SELF
-    | KW_AND
-    | KW_ARRAY
-    | KW_AS
-    | KW_AT
-    | KW_ATTRIBUTE
-    | KW_CAST
-    | KW_CASTABLE
-    | KW_CHILD
-    | KW_COMMENT
-    | KW_DECLARE
-    | KW_DEFAULT
-    | KW_DESCENDANT
-    | KW_DESCENDANT_OR_SELF
-    | KW_DIV
-    | KW_DOCUMENT_NODE
-    | KW_DOCUMENT
-    | KW_ELEMENT
-    | KW_ELSE
-    | KW_EMPTY_SEQUENCE
-    | KW_ENUM
-    | KW_EQ
-    | KW_EVERY
-    | KW_EXCEPT
-    | KW_FN
-    | KW_FOLLOWING
-    | KW_FOLLOWING_OR_SELF
-    | KW_FOLLOWING_SIBLING
-    | KW_FOLLOWING_SIBLING_OR_SELF
-    | KW_FOLLOWS
-    | KW_FOLLOWS_OR_IS
-    | KW_FOR
-    | KW_FUNCTION
-    | KW_GE
-    | KW_GNODE
-    | KW_GT
-    | KW_IDIV
-    | KW_IF
-    | KW_IN
-    | KW_INSTANCE
-    | KW_INTERSECT
-    | KW_IS
-    | KW_IS_NOT
-    | KW_ITEM
-    | KW_JNODE
-    | KW_KEY
-    | KW_LE
-    | KW_LET
-    | KW_LT
-    | KW_MAP
-    | KW_MEMBER
-    | KW_MOD
-    | KW_NAMESPACE
-    | KW_NAMESPACE_NODE
-    | KW_NE
-    | KW_NODE
-    | KW_OF
-    | KW_OR
-    | KW_OTHERWISE
-    | KW_PARENT
-    | KW_PRECEDES
-    | KW_PRECEDES_OR_IS
-    | KW_PRECEDING
-    | KW_PRECEDING_OR_SELF
-    | KW_PRECEDING_SIBLING
-    | KW_PRECEDING_SIBLING_OR_SELF
-    | KW_PROCESSING_INSTRUCTION
-    | KW_RECORD
-    | KW_RETURN
-    | KW_SATISFIES
-    | KW_SCHEMA_ATTRIBUTE
-    | KW_SCHEMA_ELEMENT
-    | KW_SELF
-    | KW_SOME
-    | KW_TEXT
-    | KW_THEN
-    | KW_TO
-    | KW_TREAT
-    | KW_UNION
-    | KW_VALUE
+    |  'ancestor'
+    |  'ancestor-or-self'
+    |  'and'
+    |  'array'
+    |  'as'
+    |  'at'
+    |  'attribute'
+    |  'cast'
+    |  'castable'
+    |  'child'
+    |  'comment'
+    |  'declare'
+    |  'default'
+    |  'descendant'
+    |  'descendant-or-self'
+    |  'div'
+    |  'document-node'
+    |  'document'
+    |  'element'
+    |  'else'
+    |  'empty-sequence'
+    |  'enum'
+    |  'eq'
+    |  'every'
+    |  'except'
+    |  'fn'
+    |  'following'
+    |  'following-or-self'
+    |  'following-sibling'
+    |  'following-sibling-or-self'
+    |  'follows'
+    |  'follows-or-is'
+    |  'for'
+    |  'function'
+    |  'ge'
+    |  'gnode'
+    |  'gt'
+    |  'idiv'
+    |  'if'
+    |  'in'
+    |  'instance'
+    |  'intersect'
+    |  'is'
+    |  'is-not'
+    |  'item'
+    |  'jnode'
+    |  'key'
+    |  'le'
+    |  'let'
+    |  'lt'
+    |  'map'
+    |  'member'
+    |  'mod'
+    |  'namespace'
+    |  'namespace-node'
+    |  'ne'
+    |  'node'
+    |  'of'
+    |  'or'
+    |  'otherwise'
+    |  'parent'
+    |  'precedes'
+    |  'precedes-or-is'
+    |  'preceding'
+    |  'preceding-or-self'
+    |  'preceding-sibling'
+    |  'preceding-sibling-or-self'
+    |  'processing-instruction'
+    |  'record'
+    |  'return'
+    |  'satisfies'
+    |  'schema-attribute'
+    |  'schema-element'
+    |  'self'
+    |  'some'
+    |  'text'
+    |  'then'
+    |  'to'
+    |  'treat'
+    |  'union'
+    |  'value'
     ;
 
 // [1]
 expr
-    : exprsingle (COMMA exprsingle)*
+    : exprsingle ( ',' exprsingle)*
     ;
 
 exprsingle
@@ -371,7 +371,7 @@ exprsingle
 
 // FieldDeclaration: "?" marks the field as optional; "as SequenceType" gives its type
 fielddeclaration
-    : fieldname QM? (KW_AS sequencetype)?
+    : fieldname  '?'? ( 'as' sequencetype)?
     ;
 
 fieldname
@@ -386,20 +386,20 @@ forbinding
     ;
 
 forclause
-    : KW_FOR forbinding
+    :  'for' forbinding
     ;
 
 // Entry binding (new in XPath 4.0): iterates over map key-value entries
 forentrybinding
-    : (forentrykeybinding forentryvaluebinding | forentryvaluebinding) positionalvar? KW_IN exprsingle
+    : (forentrykeybinding forentryvaluebinding | forentryvaluebinding) positionalvar?  'in' exprsingle
     ;
 
 forentrykeybinding
-    : KW_KEY varnameandtype
+    :  'key' varnameandtype
     ;
 
 forentryvaluebinding
-    : KW_VALUE varnameandtype
+    :  'value' varnameandtype
     ;
 
 // For expression: single ForClause followed by chained ForLetReturn body.
@@ -410,7 +410,7 @@ forexpr
 
 // Standard item binding: for $x [as T] [at $p] in expr
 foritembinding
-    : varnameandtype positionalvar? KW_IN exprsingle
+    : varnameandtype positionalvar?  'in' exprsingle
     ;
 
 // The body of a for/let expression -- can chain another for, let, or terminate with return.
@@ -418,12 +418,12 @@ foritembinding
 forletreturn
     : forclause forletreturn
     | letclause forletreturn
-    | KW_RETURN exprsingle
+    |  'return' exprsingle
     ;
 
 // Member binding (new in XPath 4.0): iterates over array members
 formemberbinding
-    : KW_MEMBER varnameandtype positionalvar? KW_IN exprsingle
+    :  'member' varnameandtype positionalvar?  'in' exprsingle
     ;
 
 // Full step: axis "::" nodetest
@@ -447,7 +447,7 @@ functionitemexpr
 
 // FunctionSignature separates the parameter list from the return type
 functionsignature
-    : OP paramlist? CP typedeclaration?
+    :  '(' paramlist?  ')' typedeclaration?
     ;
 
 // Function types: "fn" is now an alias for "function"
@@ -457,35 +457,35 @@ functiontype
     ;
 
 generalcomp
-    : EQ
-    | NE
-    | LT
-    | LE
-    | GT
-    | GE
+    :  '='
+    |  '!='
+    |  '<'
+    |  '<='
+    |  '>'
+    |  '>='
     ;
 
 // Generic node type (new in XPath 4.0): gnode()
 gnodetype
-    : KW_GNODE OP CP
+    :  'gnode'  '('  ')'
     ;
 
 // If expression: now allows both traditional "then/else" and block "{...}" forms
 ifexpr
-    : KW_IF OP expr CP (unbracedactions | bracedaction)
+    :  'if'  '(' expr  ')' (unbracedactions | bracedaction)
     ;
 
 // InlineFunctionExpr: "fn" is now an alias for "function" (new in XPath 4.0)
 inlinefunctionexpr
-    : (KW_FUNCTION | KW_FN) functionsignature functionbody
+    : ( 'function' |  'fn') functionsignature functionbody
     ;
 
 instanceofexpr
-    : treatexpr (KW_INSTANCE KW_OF sequencetype)?
+    : treatexpr ( 'instance'  'of' sequencetype)?
     ;
 
 intersectexceptexpr
-    : recordputexpr ((KW_INTERSECT | KW_EXCEPT) recordputexpr)*
+    : recordputexpr (( 'intersect' |  'except') recordputexpr)*
     ;
 
 // ItemType: restructured in XPath 4.0
@@ -498,11 +498,11 @@ itemtype
 
 // JSON node type (new in XPath 4.0): jnode(selector [, SequenceType])
 jnodetype
-    : KW_JNODE OP (STAR | jrootselector | QName | constant) (COMMA sequencetype)? CP
+    :  'jnode'  '(' ( '*' | jrootselector | QName | constant) ( ',' sequencetype)?  ')'
     ;
 
 jrootselector
-    : OP CP
+    :  '('  ')'
     ;
 
 // KeySpecifier: extended in XPath 4.0 to include ContextValueRef, VarRef, and LookupWildcard
@@ -516,16 +516,16 @@ keyspecifier
     ;
 
 keywordargument
-    : eqname CEQ argument
+    : eqname  ':=' argument
     ;
 
 keywordarguments
-    : keywordargument (COMMA keywordargument)*
+    : keywordargument ( ',' keywordargument)*
     ;
 
 // let $[ $x [as T] ] [as T] := expr  -- destructuring array binding
 letarraybinding
-    : DOLLAR OB varnameandtype CB typedeclaration? CEQ exprsingle
+    :  '$'  '[' varnameandtype  ']' typedeclaration?  ':=' exprsingle
     ;
 
 letbinding
@@ -536,7 +536,7 @@ letbinding
     ;
 
 letclause
-    : KW_LET letbinding
+    :  'let' letbinding
     ;
 
 // Let expression: single LetClause followed by chained ForLetReturn body.
@@ -546,17 +546,17 @@ letexpr
 
 // let ${ $x [as T] } [as T] := expr  -- destructuring map binding
 letmapbinding
-    : DOLLAR OC varnameandtype CC typedeclaration? CEQ exprsingle
+    :  '$'  '{' varnameandtype  '}' typedeclaration?  ':=' exprsingle
     ;
 
 // let $( $x [as T] ) [as T] := expr  -- destructuring sequence binding
 letsequencebinding
-    : DOLLAR OP varnameandtype CP typedeclaration? CEQ exprsingle
+    :  '$'  '(' varnameandtype  ')' typedeclaration?  ':=' exprsingle
     ;
 
 // let $x [as T] := expr
 letvaluebinding
-    : varnameandtype CEQ exprsingle
+    : varnameandtype  ':=' exprsingle
     ;
 
 literal
@@ -565,25 +565,25 @@ literal
     ;
 
 lookup
-    : QM keyspecifier
+    :  '?' keyspecifier
     ;
 
 lookupwildcard
-    : STAR
+    :  '*'
     ;
 
 mapconstructor
-    : KW_MAP OC (mapconstructorentry (COMMA mapconstructorentry)*)? CC
+    :  'map'  '{' (mapconstructorentry ( ',' mapconstructorentry)*)?  '}'
     ;
 
 // MapConstructorEntry: simplified to ExprSingle ":" ExprSingle (no separate key/value rules)
 mapconstructorentry
-    : exprsingle COLON exprsingle
+    : exprsingle  ':' exprsingle
     ;
 
 // =!> target(...args)  -- maps arrow operator (new in XPath 4.0)
 mappingarrowtarget
-    : MAPPING_ARROW arrowtarget
+    :  '=!>' arrowtarget
     ;
 
 // Map types
@@ -594,24 +594,24 @@ maptype
 
 // #NCName -- marks an unqualified name for namespace/PI constructors
 markedncname
-    : POUND QName
+    :  '#' QName
     ;
 
 // XPath 4.0 adds Unicode × (U+00D7) and ÷ (U+00F7) as aliases for * and div
 multiplicativeexpr
-    : unionexpr ((STAR | TIMES_SIGN | KW_DIV | DIV_SIGN | KW_IDIV | KW_MOD) unionexpr)*
+    : unionexpr (( '*' |  '\u00D7' |  'div' |  '\u00F7' |  'idiv' |  'mod') unionexpr)*
     ;
 
 namedfunctionref
-    : eqname POUND IntegerLiteral /* xgc: reserved-function-names */
+    : eqname  '#' IntegerLiteral /* xgc: reserved-function-names */
     ;
 
 namespacedecl
-    : KW_DECLARE KW_NAMESPACE QName EQ uriliteral
+    :  'declare'  'namespace' QName  '=' uriliteral
     ;
 
 namespacenodetype
-    : KW_NAMESPACE_NODE OP CP
+    :  'namespace-node'  '('  ')'
     ;
 
 nametest
@@ -626,12 +626,12 @@ nametestunion
 
 // NodeComp: extended in XPath 4.0 with is-not, precedes, follows, precedes-or-is, follows-or-is
 nodecomp
-    : KW_IS
-    | KW_IS_NOT
+    :  'is'
+    |  'is-not'
     | nodeprecedes
     | nodefollows
-    | KW_PRECEDES_OR_IS
-    | KW_FOLLOWS_OR_IS
+    |  'precedes-or-is'
+    |  'follows-or-is'
     ;
 
 // Node constructors (computed constructors -- new in XPath 4.0 for XPath; from XQuery)
@@ -640,13 +640,13 @@ nodeConstructor
     ;
 
 nodefollows
-    : GG
-    | KW_FOLLOWS
+    :  '>>'
+    |  'follows'
     ;
 
 nodeprecedes
-    : LL
-    | KW_PRECEDES
+    :  '<<'
+    |  'precedes'
     ;
 
 // Node test: union, simple, or dynamic (new in XPath 4.0)
@@ -663,27 +663,27 @@ numericliteral
     ;
 
 occurrenceindicator
-    : QM
-    | STAR
-    | PLUS
+    :  '?'
+    |  '*'
+    |  '+'
     ;
 
 orexpr
-    : andexpr (KW_OR andexpr)*
+    : andexpr ( 'or' andexpr)*
     ;
 
 // OtherwiseExpr: new in XPath 4.0 -- sequence coalescing with "otherwise"
 otherwiseexpr
-    : stringconcatexpr (KW_OTHERWISE stringconcatexpr)*
+    : stringconcatexpr ( 'otherwise' stringconcatexpr)*
     ;
 
 // Shared sub-parts
 paramlist
-    : varnameandtype (COMMA varnameandtype)*
+    : varnameandtype ( ',' varnameandtype)*
     ;
 
 parenthesizedexpr
-    : OP expr? CP
+    :  '(' expr?  ')'
     ;
 
 // Path expressions
@@ -698,16 +698,16 @@ pipelineexpr
     ;
 
 positionalargumentlist
-    : OP positionalarguments? CP
+    :  '(' positionalarguments?  ')'
     ;
 
 positionalarguments
-    : argument (COMMA argument)*
+    : argument ( ',' argument)*
     ;
 
 // Positional variable binding: at $pos
 positionalvar
-    : KW_AT DOLLAR eqname
+    :  'at'  '$' eqname
     ;
 
 // Postfix expressions: primaryexpr followed by zero or more postfix operations.
@@ -717,12 +717,12 @@ postfixexpr
         predicate
         | positionalargumentlist
         | lookup
-        | METHOD_ARROW QName positionalargumentlist
+        |  '=?>' QName positionalargumentlist
     )*
     ;
 
 predicate
-    : OB expr CB
+    :  '[' expr  ']'
     ;
 
 predicatelist
@@ -745,30 +745,30 @@ primaryexpr
     ;
 
 processinginstructionnodetype
-    : KW_PROCESSING_INSTRUCTION OP (QName | StringLiteral)? CP
+    :  'processing-instruction'  '(' (QName | StringLiteral)?  ')'
     ;
 
 // #EQName -- marks a qualified name for element/attribute constructors
 qnameliteral
-    : POUND eqname
+    :  '#' eqname
     ;
 
 // Quantified expression: some/every with one or more bindings
 quantifiedexpr
-    : (KW_SOME | KW_EVERY) quantifierbinding (COMMA quantifierbinding)* KW_SATISFIES exprsingle
+    : ( 'some' |  'every') quantifierbinding ( ',' quantifierbinding)*  'satisfies' exprsingle
     ;
 
 quantifierbinding
-    : varnameandtype KW_IN exprsingle
+    : varnameandtype  'in' exprsingle
     ;
 
 rangeexpr
-    : additiveexpr (KW_TO additiveexpr)?
+    : additiveexpr ( 'to' additiveexpr)?
     ;
 
 // RecordPutExpr: new in XPath 4.0 -- record field update with "+:="
 recordputexpr
-    : instanceofexpr (PLUS_CEQ instanceofexpr)*
+    : instanceofexpr ( '+:=' instanceofexpr)*
     ;
 
 // Record types (new in XPath 4.0): structural typing for maps
@@ -789,7 +789,7 @@ regularitemtype
     ;
 
 relativepathexpr
-    : stepexpr ((SLASH | SS) stepexpr)*
+    : stepexpr (( '/' |  '//') stepexpr)*
     ;
 
 // Restricted set of targets allowed for dynamic arrow calls
@@ -798,11 +798,11 @@ restricteddynamiccall
     ;
 
 schemaattributenodetype
-    : KW_SCHEMA_ATTRIBUTE OP attributename CP
+    :  'schema-attribute'  '(' attributename  ')'
     ;
 
 schemaelementnodetype
-    : KW_SCHEMA_ELEMENT OP elementname CP
+    :  'schema-element'  '(' elementname  ')'
     ;
 
 // Name selector: a qualified name or wildcard (for abbreviated child/attribute axis)
@@ -813,17 +813,17 @@ selector
 
 // => target(...args)
 sequencearrowtarget
-    : EG arrowtarget
+    :  '=>' arrowtarget
     ;
 
 sequencetype
-    : KW_EMPTY_SEQUENCE OP CP
+    :  'empty-sequence'  '('  ')'
     | itemtype occurrenceindicator?
     ;
 
 // Simple map expression
 simplemapexpr
-    : pathexpr (BANG pathexpr)*
+    : pathexpr ( '!' pathexpr)*
     ;
 
 // Simple node test: type test or element/attribute name selector
@@ -833,7 +833,7 @@ simplenodetest
     ;
 
 squarearrayconstructor
-    : OB (exprsingle (COMMA exprsingle)*)? CB
+    :  '[' (exprsingle ( ',' exprsingle)*)?  ']'
     ;
 
 stepexpr
@@ -842,7 +842,7 @@ stepexpr
     ;
 
 stringconcatexpr
-    : rangeexpr (PP rangeexpr)*
+    : rangeexpr ( '||' rangeexpr)*
     ;
 
 // String template: backtick-delimited interpolated string (new in XPath 4.0).
@@ -853,41 +853,41 @@ stringtemplate
     ;
 
 textnodetype
-    : KW_TEXT OP CP
+    :  'text'  '('  ')'
     ;
 
 treatexpr
-    : castableexpr (KW_TREAT KW_AS sequencetype)?
+    : castableexpr ( 'treat'  'as' sequencetype)?
     ;
 
 typedarraytype
-    : KW_ARRAY OP sequencetype CP
+    :  'array'  '(' sequencetype  ')'
     ;
 
 typedeclaration
-    : KW_AS sequencetype
+    :  'as' sequencetype
     ;
 
 typedfunctionparam
-    : (DOLLAR eqname KW_AS)? sequencetype
+    : ( '$' eqname  'as')? sequencetype
     ;
 
 // TypedFunctionParam: optional named parameter ("$name as") followed by a SequenceType
 typedfunctionparamlist
-    : typedfunctionparam (COMMA typedfunctionparam)*
+    : typedfunctionparam ( ',' typedfunctionparam)*
     ;
 
 typedfunctiontype
-    : (KW_FUNCTION | KW_FN) OP typedfunctionparamlist? CP KW_AS sequencetype
+    : ( 'function' |  'fn')  '(' typedfunctionparamlist?  ')'  'as' sequencetype
     ;
 
 // TypedMapType now uses ItemType for key (not just AtomicOrUnionType)
 typedmaptype
-    : KW_MAP OP itemtype COMMA sequencetype CP
+    :  'map'  '(' itemtype  ',' sequencetype  ')'
     ;
 
 typedrecordtype
-    : KW_RECORD OP fielddeclaration (COMMA fielddeclaration)* CP
+    :  'record'  '(' fielddeclaration ( ',' fielddeclaration)*  ')'
     ;
 
 // Type name
@@ -907,26 +907,26 @@ typetest
     ;
 
 unaryexpr
-    : (MINUS | PLUS)* valueexpr
+    : ( '-' |  '+')* valueexpr
     ;
 
 unarylookup
-    : QM keyspecifier
+    :  '?' keyspecifier
     ;
 
 // Type declarations and sequence types
 
 unbracedactions
-    : KW_THEN exprsingle KW_ELSE exprsingle
+    :  'then' exprsingle  'else' exprsingle
     ;
 
 unionexpr
-    : intersectexceptexpr ((KW_UNION | P) intersectexceptexpr)*
+    : intersectexceptexpr (( 'union' |  '|') intersectexceptexpr)*
     ;
 
 // Union node test: (T1 | T2 | ...) -- selects nodes matching any of the tests
 unionnodetest
-    : OP simplenodetest (P simplenodetest)+ CP
+    :  '(' simplenodetest ( '|' simplenodetest)+  ')'
     ;
 
 uriliteral
@@ -934,12 +934,12 @@ uriliteral
     ;
 
 valuecomp
-    : KW_EQ
-    | KW_NE
-    | KW_LT
-    | KW_LE
-    | KW_GT
-    | KW_GE
+    :  'eq'
+    |  'ne'
+    |  'lt'
+    |  'le'
+    |  'gt'
+    |  'ge'
     ;
 
 valueexpr
@@ -948,19 +948,19 @@ valueexpr
 
 // Variable name with optional type (replaces old "$ varname typedeclaration?")
 varnameandtype
-    : DOLLAR eqname typedeclaration?
+    :  '$' eqname typedeclaration?
     ;
 
 varref
-    : DOLLAR eqname
+    :  '$' eqname
     ;
 
 // Wildcard: extended in XPath 4.0 with URIQualifiedStar (BracedURILiteral "*")
 wildcard
-    : STAR
-    | QName CS
-    | SC QName
-    | BracedURILiteral STAR
+    :  '*'
+    | QName  ':*'
+    |  '*:' QName
+    | BracedURILiteral  '*'
     ;
 
 // XML node types (XNodeType) -- replaces and renames the old KindTest rules
@@ -979,10 +979,10 @@ xnodetype
 
 // Top-level XPath expression. XPath 4.0 allows optional namespace declarations at the start.
 xpath
-    : (defaultelementnamespacedecl SEMI)? (namespacedecl SEMI)* expr EOF
+    : (defaultelementnamespacedecl  ';')? (namespacedecl  ';')* expr EOF
     ;
 
 // Entry point for testing: semicolon-separated expressions
 auxilary
-    : (expr SEMI)+ EOF
+    : (expr  ';')+ EOF
     ;
