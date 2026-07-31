@@ -1496,3 +1496,8 @@ for member $m in $arr, $x in $m?items return $x;
 let $x := 1, $y := 2 return $x + $y;
 let $a := "hello", $b := "world", $c := concat($a, $b) return $c;
 for $x in /items/item let $label := $x/@label, $val := $x/@value return concat($label, ": ", $val);
+for key $k value $v in $map return concat($k, "=", $v);
+for key $k in $map return $k;
+for value $v in $map return $v;
+for key $k value $v at $pos in $map return concat($pos, ": ", $k, "=", $v);
+for key $k at $pos in $map return concat($pos, ": ", $k);

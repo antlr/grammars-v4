@@ -414,7 +414,7 @@ forClause
 
 // Entry binding (new in XPath 4.0): iterates over map key-value entries
 forEntryBinding
-    : (forEntryKeyBinding forEntryValueBinding | forEntryValueBinding) positionalVar? 'in' exprSingle
+    : (forEntryKeyBinding forEntryValueBinding? | forEntryValueBinding) positionalVar? 'in' exprSingle
     ;
 
 forEntryKeyBinding
