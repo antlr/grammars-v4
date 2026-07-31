@@ -247,6 +247,12 @@ documentNodeType
     : 'document-node' '(' (elementNodeType | schemaElementNodeType | nameTestUnion)? ')'
     ;
 
+// dynamicFunctionCall — intentionally absent as a named rule.
+// The spec defines it as: PostfixExpr PositionalArgumentList, which creates indirect
+// left recursion across PostfixExpr → DynamicFunctionCall → PostfixExpr.
+// ANTLR4 cannot handle cross-rule left recursion, so FilterExpr, DynamicFunctionCall,
+// LookupExpr, and MethodCall are all inlined into postfixExpr as a (…)* suffix loop.
+
 // Dynamic node test: { expr } -- node type computed at runtime (new in XPath 4.0)
 dynamicNodeTest
     : enclosedExpr
