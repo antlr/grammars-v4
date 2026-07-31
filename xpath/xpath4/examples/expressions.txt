@@ -1538,3 +1538,7 @@ $x -> fn:string() -> fn:upper-case();
 $x instance of jnode();
 $x instance of jnode(*);
 $x instance of jnode(*, xs:integer);
+{};
+{"a": 1};
+{"a": 1, "b": 2};
+{"key": "value", "count": 42};

@@ -603,7 +603,7 @@ lookupWildcard
     ;
 
 mapConstructor
-    : 'map' '{' (mapConstructorEntry ( ',' mapConstructorEntry)*)? '}'
+    : 'map'? '{' (mapConstructorEntry ( ',' mapConstructorEntry)*)? '}'
     ;
 
 // MapConstructorEntry: simplified to ExprSingle ":" ExprSingle (no separate key/value rules)
