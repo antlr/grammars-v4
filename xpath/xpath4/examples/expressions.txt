@@ -1535,3 +1535,6 @@ document-node(element(foo | bar));
 $x -> fn:string();
 $x -> fn:string() -> fn:upper-case();
 (1, 2, 3) -> fn:sum() -> fn:string();
+$x instance of jnode();
+$x instance of jnode(*);
+$x instance of jnode(*, xs:integer);

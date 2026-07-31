@@ -522,7 +522,7 @@ itemType
 
 // JSON node type (new in XPath 4.0): jnode(selector [, SequenceType])
 jNodeType
-    : 'jnode' '(' ('*' | jRootSelector | QName | constant) (',' sequenceType)? ')'
+    : 'jnode' '(' (('*' | jRootSelector | QName | constant) (',' sequenceType)?)? ')'
     ;
 
 jRootSelector
