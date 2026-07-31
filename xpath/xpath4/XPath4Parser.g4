@@ -548,7 +548,7 @@ keywordArguments
 
 // let $[ $x [as T] ] [as T] := expr  -- destructuring array binding
 letArrayBinding
-    : '$' '[' varNameAndType ']' typeDeclaration? ':=' exprSingle
+    : '$' '[' varNameAndType (',' varNameAndType)* ']' typeDeclaration? ':=' exprSingle
     ;
 
 letBinding
