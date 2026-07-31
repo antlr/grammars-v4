@@ -389,6 +389,12 @@ fieldName
     | StringLiteral
     ;
 
+// filterExpr — intentionally absent as a named rule.
+// The spec defines it as: PostfixExpr Predicate, which creates indirect
+// left recursion across PostfixExpr → FilterExpr → PostfixExpr.
+// ANTLR4 cannot handle cross-rule left recursion, so FilterExpr, DynamicFunctionCall,
+// LookupExpr, and MethodCall are all inlined into postfixExpr as a (…)* suffix loop.
+
 forBinding
     : forItemBinding
     | forMemberBinding
@@ -578,6 +584,12 @@ lookup
     : '?' keySpecifier
     ;
 
+// lookupExpr — intentionally absent as a named rule.
+// The spec defines it as: PostfixExpr Lookup, which creates indirect
+// left recursion across PostfixExpr → LookupExpr → PostfixExpr.
+// ANTLR4 cannot handle cross-rule left recursion, so FilterExpr, DynamicFunctionCall,
+// LookupExpr, and MethodCall are all inlined into postfixExpr as a (…)* suffix loop.
+
 lookupWildcard
     : '*'
     ;
@@ -606,6 +618,12 @@ mapType
 markedNCName
     : '#' QName
     ;
+
+// methodCall — intentionally absent as a named rule.
+// The spec defines it as: PostfixExpr "=?>" NCName PositionalArgumentList, which creates
+// indirect left recursion across PostfixExpr → MethodCall → PostfixExpr.
+// ANTLR4 cannot handle cross-rule left recursion, so FilterExpr, DynamicFunctionCall,
+// LookupExpr, and MethodCall are all inlined into postfixExpr as a (…)* suffix loop.
 
 // XPath 4.0 adds Unicode × (U+00D7) and ÷ (U+00F7) as aliases for * and div
 multiplicativeExpr
