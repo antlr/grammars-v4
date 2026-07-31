@@ -1532,3 +1532,6 @@ element(foo | bar | baz);
 attribute(foo | bar);
 element(foo:* | *:bar);
 document-node(element(foo | bar));
+$x -> fn:string();
+$x -> fn:string() -> fn:upper-case();
+(1, 2, 3) -> fn:sum() -> fn:string();

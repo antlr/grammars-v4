@@ -41,6 +41,7 @@ DOLLAR        : '$';
 EQ            : '=';
 GT            : '>';
 LT            : '<';
+THIN_ARROW    : '->'; // pipeline operator (new in XPath 4.0); must precede MINUS
 MINUS         : '-';
 OB            : '[';
 OC            : '{';

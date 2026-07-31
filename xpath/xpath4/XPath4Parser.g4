@@ -728,9 +728,8 @@ pathExpr
     | relativePathExpr
     ;
 
-// PipelineExpr: thin wrapper around ArrowExpr (placeholder for future pipeline operators)
 pipelineExpr
-    : arrowExpr
+    : arrowExpr ('->' arrowExpr)*
     ;
 
 positionalArgumentList
