@@ -471,7 +471,7 @@ functionItemExpr
 
 // FunctionSignature separates the parameter list from the return type
 functionSignature
-    : '(' paramList? ')' typeDeclaration?
+    : '(' paramList ')' typeDeclaration?
     ;
 
 // Function types: "fn" is now an alias for "function"
@@ -715,7 +715,7 @@ otherwiseExpr
 
 // Shared sub-parts
 paramList
-    : varNameAndType (',' varNameAndType)*
+    : (varNameAndType (',' varNameAndType)*)?
     ;
 
 parenthesizedExpr
