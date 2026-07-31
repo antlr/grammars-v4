@@ -657,7 +657,7 @@ nameTest
 
 // NameTestUnion: used in element/attribute node type tests
 nameTestUnion
-    : nameTest
+    : nameTest ('|' nameTest)*
     ;
 
 // NodeComp: extended in XPath 4.0 with is-not, precedes, follows, precedes-or-is, follows-or-is

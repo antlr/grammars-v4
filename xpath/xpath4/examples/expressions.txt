@@ -1527,3 +1527,8 @@ $x instance of record(name as xs:string, ...);
 $x instance of record(name as xs:string, age? as xs:integer, ...);
 $x instance of record("field-name" as xs:string);
 $x instance of record(Q{}field as xs:string);
+element(foo | bar);
+element(foo | bar | baz);
+attribute(foo | bar);
+element(foo:* | *:bar);
+document-node(element(foo | bar));
