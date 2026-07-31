@@ -366,7 +366,6 @@ eqName
     | 'value'
     ;
 
-// [1]
 expr
     : exprSingle (',' exprSingle)*
     ;
@@ -379,9 +378,8 @@ exprSingle
     | orExpr
     ;
 
-// FieldDeclaration: "?" marks the field as optional; "as SequenceType" gives its type
 fieldDeclaration
-    : fieldName '?'? ('as' sequenceType)?
+    : fieldName ('as' sequenceType)?
     ;
 
 fieldName
