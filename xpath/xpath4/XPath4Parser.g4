@@ -104,23 +104,25 @@ attributeNodeType
 
 // XPath 4.0 adds four new or-self axes and four new or-self siblings
 axis
-    : 'ancestor' '::'
-    | 'ancestor-or-self' '::'
-    | 'attribute' '::'
-    | 'child' '::'
-    | 'descendant' '::'
-    | 'descendant-or-self' '::'
-    | 'following' '::'
-    | 'following-or-self' '::'
-    | 'following-sibling' '::'
-    | 'following-sibling-or-self' '::'
-    | 'namespace' '::'
-    | 'parent' '::'
-    | 'preceding' '::'
-    | 'preceding-or-self' '::'
-    | 'preceding-sibling' '::'
-    | 'preceding-sibling-or-self' '::'
-    | 'self' '::'
+    : (
+        'ancestor'
+        | 'ancestor-or-self'
+        | 'attribute'
+        | 'child'
+        | 'descendant'
+        | 'descendant-or-self'
+        | 'following'
+        | 'following-or-self'
+        | 'following-sibling'
+        | 'following-sibling-or-self'
+        | 'namespace'
+        | 'parent'
+        | 'preceding'
+        | 'preceding-or-self'
+        | 'preceding-sibling'
+        | 'preceding-sibling-or-self'
+        | 'self'
+    ) '::'
     ;
 
 // Axis step: abbreviated or full, followed by zero or more predicates/lookups
