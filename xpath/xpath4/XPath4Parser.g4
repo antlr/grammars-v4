@@ -440,8 +440,7 @@ forItemBinding
 // The body of a for/let expression -- can chain another for, let, or terminate with return.
 // This avoids the indirect left-recursion that the spec's ForLetReturn would otherwise create.
 forLetReturn
-    : forClause forLetReturn
-    | letClause forLetReturn
+    : (forClause | letClause) forLetReturn
     | 'return' exprSingle
     ;
 
