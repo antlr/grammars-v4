@@ -379,7 +379,7 @@ exprSingle
     ;
 
 fieldDeclaration
-    : fieldName '?'? ('as' sequenceType)?
+    : fieldName ('as' sequenceType)?
     ;
 
 // fieldName uses QName where the spec says NCName.
