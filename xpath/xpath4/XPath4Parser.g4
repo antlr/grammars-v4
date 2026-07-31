@@ -423,7 +423,12 @@ dynamicnodetest
 // Postfix expressions: primaryexpr followed by zero or more postfix operations.
 // PostfixExpr covers: FilterExpr, DynamicFunctionCall, LookupExpr, MethodCall
 postfixexpr
-    : primaryexpr (predicate | positionalargumentlist | lookup | (METHOD_ARROW QName positionalargumentlist))*
+    : primaryexpr (
+        predicate
+        | positionalargumentlist
+        | lookup
+        | METHOD_ARROW QName positionalargumentlist
+    )*
     ;
 
 positionalargumentlist
@@ -505,7 +510,7 @@ functioncall
 
 // Argument list: now supports keyword arguments (new in XPath 4.0)
 argumentlist
-    : OP ((positionalarguments (COMMA keywordarguments)?) | keywordarguments)? CP
+    : OP (positionalarguments (COMMA keywordarguments)? | keywordarguments)? CP
     ;
 
 keywordarguments

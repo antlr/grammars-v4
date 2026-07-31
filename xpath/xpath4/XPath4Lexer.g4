@@ -140,10 +140,10 @@ KW_VALUE                     : 'value';
 
 // A.2.1. TERMINAL SYMBOLS
 
-IntegerLiteral   : FragDigits;
-DecimalLiteral   : '.' FragDigits | FragDigits '.' [0-9]*;
-DoubleLiteral    : ('.' FragDigits | FragDigits ('.' [0-9]*)?) [eE] [+-]? FragDigits;
-StringLiteral    : '"' (~["] | FragEscapeQuot)* '"' | '\'' (~['] | FragEscapeApos)* '\'';
+IntegerLiteral : FragDigits;
+DecimalLiteral : '.' FragDigits | FragDigits '.' [0-9]*;
+DoubleLiteral  : ('.' FragDigits | FragDigits ('.' [0-9]*)?) [eE] [+-]? FragDigits;
+StringLiteral  : '"' (~["] | FragEscapeQuot)* '"' | '\'' (~['] | FragEscapeApos)* '\'';
 // URIQualifiedName: inline the braced-URI pattern so it is not shadowed by BracedURILiteral.
 // Allows optional prefix: Q{uri}ncname or Q{uri}prefix:ncname
 URIQualifiedName : 'Q' '{' [^{}]* '}' FragmentNCName (':' FragmentNCName)?;
@@ -151,19 +151,19 @@ BracedURILiteral : 'Q' '{' [^{}]* '}';
 
 // String template (simplified: full embedded-expression support requires lexer modes).
 // A production implementation would push/pop lexer modes on '{' and '}'.
-StringTemplate   : '`' StringTemplateChar* '`';
-fragment StringTemplateChar
-    : '{{' // escaped open brace
+StringTemplate: '`' StringTemplateChar* '`';
+fragment StringTemplateChar:
+    '{{'   // escaped open brace
     | '}}' // escaped close brace
     | ~[`] // any character except backtick (includes bare { and }, not nested-parsed)
-    ;
+;
 
 // Error in spec: EscapeQuot and EscapeApos are not terminals.
 fragment FragEscapeQuot : '""';
 fragment FragEscapeApos : '\'\'';
 
 // Error in spec: Comment is not really a terminal, but an off-channel object.
-Comment : '(:' (Comment | CommentContents)*? ':)' -> skip;
+Comment: '(:' (Comment | CommentContents)*? ':)' -> skip;
 
 QName  : FragQName;
 NCName : FragmentNCName;
