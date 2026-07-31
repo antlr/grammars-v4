@@ -7,38 +7,38 @@
 
 ## Grammar Notes
 
-### `postfixexpr` — flat form, not left-recursive
+### `postfixExpr` — flat form, not left-recursive
 
 The XPath 4.0 spec describes `PostfixExpr` with left-recursive alternatives
 (filter, dynamic function call, lookup, method call). Although ANTLR4 supports
 direct left recursion, using it here breaks the `IsFuncCall()` semantic
 predicate.
 
-The predicate guards `functioncall` inside `primaryexpr`, which in turn is
-nested inside `postfixexpr`. When `postfixexpr` is written left-recursively,
+The predicate guards `functionCall` inside `primaryExpr`, which in turn is
+nested inside `postfixExpr`. When `postfixExpr` is written left-recursively,
 ANTLR4's internal rewriting of that rule makes the predicate invisible to the
-ALL(\*) prediction for `stepexpr`. As a result, the prediction resolves the
-`stepexpr` ambiguity in favour of `postfixexpr` before the predicate is ever
+ALL(\*) prediction for `stepExpr`. As a result, the prediction resolves the
+`stepExpr` ambiguity in favour of `postfixExpr` before the predicate is ever
 evaluated. When execution then reaches the predicate for tokens like `text`,
 `comment`, `node`, or `processing-instruction`, it fires `false` and the parser
 reports "no viable alternative" — even though the correct parse is through
-`axisstep`.
+`axisStep`.
 
-The fix is to keep `postfixexpr` in the flat, non-left-recursive form used by
+The fix is to keep `postfixExpr` in the flat, non-left-recursive form used by
 the XPath 3.1 grammar:
 
 ```
-postfixexpr
-    : primaryexpr (predicate | positionalargumentlist | lookup
-                  | (METHOD_ARROW QName positionalargumentlist))*
+postfixExpr
+    : primaryExpr (predicate | positionalArgumentList | lookup
+                  | (METHOD_ARROW QName positionalArgumentList))*
     ;
 ```
 
 This keeps the predicate visible during prediction and allows `text()`,
 `comment()`, `node()`, and `processing-instruction()` to be correctly routed
-through `axisstep`.
+through `axisStep`.
 
-### `choiceitemtype` — also covers parenthesized single types
+### `choiceItemType` — also covers parenthesized single types
 
 The spec's `ChoiceItemType` production uses `|` to express a union of two or
 more item types, e.g. `(xs:string | xs:integer)`. However, XPath 4.0 also
@@ -50,8 +50,8 @@ the single-type parenthesised form. The rule is therefore written with `*`
 instead:
 
 ```
-choiceitemtype
-    : OP itemtype (P itemtype)* CP
+choiceItemType
+    : OP itemType (P itemType)* CP
     ;
 ```
 
@@ -71,13 +71,13 @@ match. All such references have been replaced with `QName`:
 
 | Rule | Context |
 |---|---|
-| `namespacedecl` | namespace prefix in `declare namespace prefix = uri` |
-| `postfixexpr` | method name after `=?>` |
-| `keyspecifier` | unquoted map-lookup key |
-| `markedncname` | name after `#` in namespace/PI constructors |
-| `processinginstructionnodetype` | PI name in `processing-instruction(name)` |
-| `jnodetype` | JSON node kind selector |
-| `fieldname` | field name in `record(field as T)` |
+| `namespaceDecl` | namespace prefix in `declare namespace prefix = uri` |
+| `postfixExpr` | method name after `=?>` |
+| `keySpecifier` | unquoted map-lookup key |
+| `markedNCName` | name after `#` in namespace/PI constructors |
+| `processingInstructionNodeType` | PI name in `processing-instruction(name)` |
+| `jNodeType` | JSON node kind selector |
+| `fieldName` | field name in `record(field as T)` |
 | `wildcard` | namespace wildcards `prefix:*` and `*:local` |
 
 ### `URIQualifiedName` with non-empty URI is not tokenised by the lexer
