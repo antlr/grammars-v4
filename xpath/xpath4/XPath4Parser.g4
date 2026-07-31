@@ -409,7 +409,7 @@ forBinding
     ;
 
 forClause
-    : 'for' forBinding
+    : 'for' forBinding (',' forBinding)*
     ;
 
 // Entry binding (new in XPath 4.0): iterates over map key-value entries
@@ -426,7 +426,8 @@ forEntryValueBinding
     ;
 
 // For expression: single ForClause followed by chained ForLetReturn body.
-// Multiple bindings are expressed by chaining: for $x in A for $y in B return C
+// Multiple bindings may appear within a clause (for $x in A, $y in B return C)
+// or by chaining clauses (for $x in A for $y in B return C).
 forExpr
     : forClause forLetReturn
     ;
@@ -559,7 +560,7 @@ letBinding
     ;
 
 letClause
-    : 'let' letBinding
+    : 'let' letBinding (',' letBinding)*
     ;
 
 // Let expression: single LetClause followed by chained ForLetReturn body.
