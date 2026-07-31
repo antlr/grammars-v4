@@ -382,6 +382,15 @@ fieldDeclaration
     : fieldName ('as' sequenceType)?
     ;
 
+// fieldName uses QName where the spec says NCName.
+// Reason: the lexer defines QName before NCName, and QName matches bare unqualified
+// names (via FragUnprefixedName) as well as prefix:local names. ANTLR4's first-match
+// rule means the lexer always produces QName for a bare identifier — NCName is never
+// emitted for unqualified names — so using NCName here would be dead code.
+// The trade-off is that QName is over-general: it also accepts prefix:local names,
+// which the spec disallows for FieldName. Fixing this properly would require
+// restructuring the lexer so bare names tokenise as NCName and the parser composes
+// QName as NCName (':' NCName)?, which would ripple through the entire grammar.
 fieldName
     : QName
     | StringLiteral
