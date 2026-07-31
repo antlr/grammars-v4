@@ -379,7 +379,7 @@ exprSingle
     ;
 
 fieldDeclaration
-    : fieldName ('as' sequenceType)?
+    : fieldName '?'? ('as' sequenceType)?
     ;
 
 // fieldName uses QName where the spec says NCName.
@@ -394,6 +394,7 @@ fieldDeclaration
 fieldName
     : QName
     | StringLiteral
+    | URIQualifiedName
     ;
 
 // filterExpr — intentionally absent as a named rule.
@@ -922,7 +923,7 @@ typedMapType
     ;
 
 typedRecordType
-    : 'record' '(' fieldDeclaration (',' fieldDeclaration)* ')'
+    : 'record' '(' (fieldDeclaration (',' fieldDeclaration)* (',' '...')?)? ')'
     ;
 
 // Type name

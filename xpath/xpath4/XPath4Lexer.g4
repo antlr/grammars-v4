@@ -17,6 +17,7 @@ MAPPING_ARROW : '=!>'; // mapping arrow operator (new in XPath 4.0)
 METHOD_ARROW  : '=?>'; // method call operator (new in XPath 4.0)
 SS            : '//';
 PP            : '||';
+DDD           : '...'; // ExtensibleFlag in RecordType (must precede DD)
 DD            : '..';
 COLONCOLON    : '::';
 CEQ           : ':=';
