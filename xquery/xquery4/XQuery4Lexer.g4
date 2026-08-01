@@ -247,7 +247,7 @@ URIQualifiedName : 'Q' '{' [^{}]* '}' FragmentNCName (':' FragmentNCName)?;
 BracedURILiteral : 'Q' '{' [^{}]* '}';
 
 // String template: backtick-delimited interpolated string (XPath/XQuery 4.0)
-StringTemplate : '`' StringTemplateChar* '`';
+StringTemplate: '`' StringTemplateChar* '`';
 
 fragment StringTemplateChar : '{{' | '}}' | ~[`];
 fragment FragEscapeQuot     : '""';
@@ -255,12 +255,12 @@ fragment FragEscapeApos     : '\'\'';
 
 // Pragma: (# EQName PragmaContents #) -- entire pragma is one token.
 // PragmaContents ::= (Char* - (Char* '#)' Char*))
-Pragma : '(#' S? FragQName (S PragmaContentChar*)? '#)';
+Pragma                     : '(#' S? FragQName (S PragmaContentChar*)? '#)';
 fragment PragmaContentChar : ~[#] | '#' ~[)];
 fragment S                 : [\u0009\u000a\u000d\u0020]+;
 
 // XQuery comments (nested, off-channel)
-Comment : '(:' (Comment | CommentContents)*? ':)' -> skip;
+Comment: '(:' (Comment | CommentContents)*? ':)' -> skip;
 
 // Direct element constructor: '<' when followed by an NCNameStartChar starts an element.
 // IsNCNameStart() checks _input.LA(1) in XQuery4LexerBase.
@@ -269,7 +269,7 @@ LT       : '<';
 
 // Right curly brace: pops mode when inside embedded element/attribute expression.
 // PopModeIfNeeded() in XQuery4LexerBase calls popMode() only when the mode stack is non-empty.
-CC : '}' { PopModeIfNeeded(); } ;
+CC: '}' { PopModeIfNeeded(); };
 
 QName  : FragQName;
 NCName : FragmentNCName;
@@ -283,8 +283,8 @@ fragment FragPrefixedName   : FragPrefix ':' FragLocalPart;
 fragment FragUnprefixedName : FragLocalPart;
 fragment FragPrefix         : FragmentNCName;
 fragment FragLocalPart      : FragmentNCName;
-fragment FragNCNameStartChar
-    : 'A' ..'Z'
+fragment FragNCNameStartChar:
+    'A' ..'Z'
     | '_'
     | 'a' ..'z'
     | '\u00C0' ..'\u00D6'
@@ -299,98 +299,99 @@ fragment FragNCNameStartChar
     | '\uF900' ..'\uFDCF'
     | '\uFDF0' ..'\uFFFD'
     | '\u{10000}' ..'\u{EFFFF}'
-    ;
-fragment FragNCNameChar
-    : FragNCNameStartChar
+;
+fragment FragNCNameChar:
+    FragNCNameStartChar
     | '-'
     | '.'
     | '0' ..'9'
     | '\u00B7'
     | '\u0300' ..'\u036F'
     | '\u203F' ..'\u2040'
-    ;
-fragment FragmentNCName : FragNCNameStartChar FragNCNameChar*;
+;
+fragment FragmentNCName: FragNCNameStartChar FragNCNameChar*;
 
-fragment FragChar
-    : '\u0009'
+fragment FragChar:
+    '\u0009'
     | '\u000a'
     | '\u000d'
     | '\u0020' ..'\ud7ff'
     | '\ue000' ..'\ufffd'
     | '\u{10000}' ..'\u{10ffff}'
-    ;
+;
 
-Whitespace : [\u000d\u000a\u0020\u0009]+ -> skip;
+Whitespace: [\u000d\u000a\u0020\u0009]+ -> skip;
 
 // ============================================================
 // IN_ELEMENT_TAG: Processing <ElemName attr="val" ... (> or />)
 // ============================================================
 mode IN_ELEMENT_TAG;
 
-ET_QName    : FragQName                                         -> type(QName);
-ET_COLON    : ':'                                               -> type(COLON);
-ET_EQ       : '='                                              -> type(EQ);
-ET_SLASH_GT : '/>'                                             -> popMode;
-ET_GT       : '>'                                              -> mode(IN_ELEMENT_CONTENT);
-ET_DQ_OPEN  : '"'                                              -> pushMode(IN_ATTR_VALUE_QUOT);
-ET_SQ_OPEN  : '\''                                             -> pushMode(IN_ATTR_VALUE_APOS);
-ET_WS       : [\u000d\u000a\u0020\u0009]+                      -> skip;
+ET_QName    : FragQName                   -> type(QName);
+ET_COLON    : ':'                         -> type(COLON);
+ET_EQ       : '='                         -> type(EQ);
+ET_SLASH_GT : '/>'                        -> popMode;
+ET_GT       : '>'                         -> mode(IN_ELEMENT_CONTENT);
+ET_DQ_OPEN  : '"'                         -> pushMode(IN_ATTR_VALUE_QUOT);
+ET_SQ_OPEN  : '\''                        -> pushMode(IN_ATTR_VALUE_APOS);
+ET_WS       : [\u000d\u000a\u0020\u0009]+ -> skip;
 
 // ============================================================
 // IN_ATTR_VALUE_QUOT: Inside a double-quoted attribute value
 // ============================================================
 mode IN_ATTR_VALUE_QUOT;
 
-AV_QUOT_ESCAPE : '""'                  -> type(EscapeQuot);
-AV_QUOT_ENTITY : FragPredEntityRef     -> type(PredefinedEntityRef);
-AV_QUOT_CREF   : FragCharRef           -> type(CharRef);
-AV_QUOT_OC     : '{'                   -> type(OC), pushMode(DEFAULT_MODE);
-AV_QUOT_CLOSE  : '"'                   -> popMode;
-AV_QUOT_CHARS  : ~["{&<]+             -> type(QuotAttrContentChar);
+AV_QUOT_ESCAPE : '""'              -> type(EscapeQuot);
+AV_QUOT_ENTITY : FragPredEntityRef -> type(PredefinedEntityRef);
+AV_QUOT_CREF   : FragCharRef       -> type(CharRef);
+AV_QUOT_OC     : '{'               -> type(OC), pushMode(DEFAULT_MODE);
+AV_QUOT_CLOSE  : '"'               -> popMode;
+AV_QUOT_CHARS  : ~["{&<]+          -> type(QuotAttrContentChar);
 
 // ============================================================
 // IN_ATTR_VALUE_APOS: Inside a single-quoted attribute value
 // ============================================================
 mode IN_ATTR_VALUE_APOS;
 
-AV_APOS_ESCAPE : '\'\''                -> type(EscapeApos);
-AV_APOS_ENTITY : FragPredEntityRef     -> type(PredefinedEntityRef);
-AV_APOS_CREF   : FragCharRef           -> type(CharRef);
-AV_APOS_OC     : '{'                   -> type(OC), pushMode(DEFAULT_MODE);
-AV_APOS_CLOSE  : '\''                  -> popMode;
-AV_APOS_CHARS  : ~['&{<]+             -> type(AposAttrContentChar);
+AV_APOS_ESCAPE : '\'\''            -> type(EscapeApos);
+AV_APOS_ENTITY : FragPredEntityRef -> type(PredefinedEntityRef);
+AV_APOS_CREF   : FragCharRef       -> type(CharRef);
+AV_APOS_OC     : '{'               -> type(OC), pushMode(DEFAULT_MODE);
+AV_APOS_CLOSE  : '\''              -> popMode;
+AV_APOS_CHARS  : ~['&{<]+          -> type(AposAttrContentChar);
 
 // ============================================================
 // IN_ELEMENT_CONTENT: Between > and </
 // ============================================================
 mode IN_ELEMENT_CONTENT;
 
-EC_CDATA       : '<![CDATA[' .*? ']]>'                         -> type(CDataSection);
-EC_XMLCMT      : '<!--' .*? '-->'                              -> type(DirCommentContents);
-EC_PI          : '<?' FragmentNCName ([\u0009\u000a\u000d\u0020] (~[?] | '?' ~[>])*)? '?>'
-                                                               -> type(DirPIContents);
-EC_OPEN_TAG    : '<' { IsNCNameStart() }?                      -> type(OPEN_TAG), pushMode(IN_ELEMENT_TAG);
-EC_CLOSE_TAG   : '</'                                          -> pushMode(IN_CLOSE_TAG);
-EC_OC_ESCAPE   : '{{'                                          -> type(LCurlyBraceEscape);
-EC_CC_ESCAPE   : '}}'                                          -> type(RCurlyBraceEscape);
-EC_OC          : '{'                                           -> type(OC), pushMode(DEFAULT_MODE);
-EC_ENTITY      : FragPredEntityRef                             -> type(PredefinedEntityRef);
-EC_CREF        : FragCharRef                                   -> type(CharRef);
-EC_CHAR        : FragElemContentChar+                          -> type(ElementContentChar);
-EC_WS          : [\u0009\u000a\u000d\u0020]+                   -> type(ElementContentChar);
+EC_CDATA  : '<![CDATA[' .*? ']]>' -> type(CDataSection);
+EC_XMLCMT : '<!--' .*? '-->'      -> type(DirCommentContents);
+EC_PI:
+    '<?' FragmentNCName ([\u0009\u000a\u000d\u0020] (~[?] | '?' ~[>])*)? '?>' -> type(DirPIContents)
+;
+EC_OPEN_TAG  : '<'                         { IsNCNameStart() }? -> type(OPEN_TAG), pushMode(IN_ELEMENT_TAG);
+EC_CLOSE_TAG : '</'                        -> pushMode(IN_CLOSE_TAG);
+EC_OC_ESCAPE : '{{'                        -> type(LCurlyBraceEscape);
+EC_CC_ESCAPE : '}}'                        -> type(RCurlyBraceEscape);
+EC_OC        : '{'                         -> type(OC), pushMode(DEFAULT_MODE);
+EC_ENTITY    : FragPredEntityRef           -> type(PredefinedEntityRef);
+EC_CREF      : FragCharRef                 -> type(CharRef);
+EC_CHAR      : FragElemContentChar+        -> type(ElementContentChar);
+EC_WS        : [\u0009\u000a\u000d\u0020]+ -> type(ElementContentChar);
 
 // ============================================================
 // IN_CLOSE_TAG: Processing </ElemName>
 // ============================================================
 mode IN_CLOSE_TAG;
 
-CT_QName : FragQName                                           -> type(QName);
-CT_WS    : [\u0009\u000a\u000d\u0020]+                         -> skip;
-CT_GT    : '>'                                                 -> popMode, popMode;
+CT_QName : FragQName                   -> type(QName);
+CT_WS    : [\u0009\u000a\u000d\u0020]+ -> skip;
+CT_GT    : '>'                         -> popMode, popMode;
 
 // ============================================================
 // Shared fragments across modes
 // ============================================================
-fragment FragPredEntityRef  : '&' ('lt' | 'gt' | 'amp' | 'quot' | 'apos') ';';
+fragment FragPredEntityRef   : '&' ('lt' | 'gt' | 'amp' | 'quot' | 'apos') ';';
 fragment FragCharRef         : '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';';
 fragment FragElemContentChar : ~[&<{}];

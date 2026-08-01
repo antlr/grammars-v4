@@ -410,6 +410,7 @@
 				<module>yini</module>
 				<module>z</module>
 				<module>zig</module>
+				<module>xquery/xquery4</module>
 			</modules>
 		</profile>
 		<profile>
