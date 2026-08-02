@@ -17,22 +17,22 @@ options {
 }
 
 abbreviatedstep
-    : DD
-    | AT nodetest
+    :  '..'
+    |  '@' nodetest
     | simplenodetest
     ;
 
 absolutepathexpr
-    : SLASH relativepathexpr?
-    | SS relativepathexpr
+    :  '/' relativepathexpr?
+    |  '//' relativepathexpr
     ;
 
 additiveexpr
-    : multiplicativeexpr ((PLUS | MINUS) multiplicativeexpr)*
+    : multiplicativeexpr (( '+' |  '-') multiplicativeexpr)*
     ;
 
 andexpr
-    : comparisonexpr (KW_AND comparisonexpr)*
+    : comparisonexpr ( 'and' comparisonexpr)*
     ;
 
 // [26] AnnotatedDecl
@@ -42,31 +42,31 @@ annotateddecl
 
 // [27] Annotation: %EQName or %EQName(Literal, ...)
 annotation
-    : POUND eqname (OP literal (COMMA literal)* CP)?
+    :  '#' eqname ( '(' literal ( ',' literal)*  ')')?
     ;
 
 anyarraytype
-    : KW_ARRAY OP STAR CP
+    :  'array'  '('  '*'  ')'
     ;
 
 anyfunctiontype
-    : (KW_FUNCTION | KW_FN) OP STAR CP
+    : ( 'function' |  'fn')  '('  '*'  ')'
     ;
 
 anyitemtype
-    : KW_ITEM OP CP
+    :  'item'  '('  ')'
     ;
 
 anymaptype
-    : KW_MAP OP STAR CP
+    :  'map'  '('  '*'  ')'
     ;
 
 anyrecordtype
-    : KW_RECORD OP STAR CP
+    :  'record'  '('  '*'  ')'
     ;
 
 anyxnodetype
-    : KW_NODE OP CP
+    :  'node'  '('  ')'
     ;
 
 aposattrcontentchar
@@ -83,11 +83,11 @@ argument
     ;
 
 argumentlist
-    : OP ((positionalarguments (COMMA keywordarguments)?) | keywordarguments)? CP
+    :  '(' ((positionalarguments ( ',' keywordarguments)?) | keywordarguments)?  ')'
     ;
 
 argumentplaceholder
-    : QM
+    :  '?'
     ;
 
 arrayconstructor
@@ -114,32 +114,32 @@ attributename
     ;
 
 attributenodetype
-    : KW_ATTRIBUTE OP (nametestunion (COMMA typename_)?)? CP
+    :  'attribute'  '(' (nametestunion ( ',' typename_)?)?  ')'
     ;
 
 // Entry point for Maven antlr4test-maven-plugin: semicolon-separated queries/modules
 auxilary
-    : (module_ SEMI?)+ EOF
+    : (module_  ';'?)+ EOF
     ;
 
 axis
-    : KW_ANCESTOR COLONCOLON
-    | KW_ANCESTOR_OR_SELF COLONCOLON
-    | KW_ATTRIBUTE COLONCOLON
-    | KW_CHILD COLONCOLON
-    | KW_DESCENDANT COLONCOLON
-    | KW_DESCENDANT_OR_SELF COLONCOLON
-    | KW_FOLLOWING COLONCOLON
-    | KW_FOLLOWING_OR_SELF COLONCOLON
-    | KW_FOLLOWING_SIBLING COLONCOLON
-    | KW_FOLLOWING_SIBLING_OR_SELF COLONCOLON
-    | KW_NAMESPACE COLONCOLON
-    | KW_PARENT COLONCOLON
-    | KW_PRECEDING COLONCOLON
-    | KW_PRECEDING_OR_SELF COLONCOLON
-    | KW_PRECEDING_SIBLING COLONCOLON
-    | KW_PRECEDING_SIBLING_OR_SELF COLONCOLON
-    | KW_SELF COLONCOLON
+    :  'ancestor'  '::'
+    |  'ancestor-or-self'  '::'
+    |  'attribute'  '::'
+    |  'child'  '::'
+    |  'descendant'  '::'
+    |  'descendant-or-self'  '::'
+    |  'following'  '::'
+    |  'following-or-self'  '::'
+    |  'following-sibling'  '::'
+    |  'following-sibling-or-self'  '::'
+    |  'namespace'  '::'
+    |  'parent'  '::'
+    |  'preceding'  '::'
+    |  'preceding-or-self'  '::'
+    |  'preceding-sibling'  '::'
+    |  'preceding-sibling-or-self'  '::'
+    |  'self'  '::'
     ;
 
 axisstep
@@ -148,12 +148,12 @@ axisstep
 
 // [11] BaseURIDecl
 baseuridecl
-    : KW_DECLARE KW_BASE_URI uriliteral
+    :  'declare'  'base-uri' uriliteral
     ;
 
 // [9] BoundarySpaceDecl
 boundaryspacedecl
-    : KW_DECLARE KW_BOUNDARY_SPACE (KW_PRESERVE | KW_STRIP)
+    :  'declare'  'boundary-space' ( 'preserve' |  'strip')
     ;
 
 bracedaction
@@ -162,15 +162,15 @@ bracedaction
 
 // [71] CaseClause
 caseclause
-    : KW_CASE (DOLLAR eqname KW_AS)? sequencetypeunion KW_RETURN exprsingle
+    :  'case' ( '$' eqname  'as')? sequencetypeunion  'return' exprsingle
     ;
 
 castableexpr
-    : castexpr (KW_CASTABLE KW_AS casttarget occurrenceindicator?)?
+    : castexpr ( 'castable'  'as' casttarget occurrenceindicator?)?
     ;
 
 castexpr
-    : pipelineexpr (KW_CAST KW_AS casttarget occurrenceindicator?)?
+    : pipelineexpr ( 'cast'  'as' casttarget occurrenceindicator?)?
     ;
 
 casttarget
@@ -184,16 +184,16 @@ casttarget
 
 // [75] CatchClause
 catchclause
-    : KW_CATCH catcherrlist enclosedexpr
+    :  'catch' catcherrlist enclosedexpr
     ;
 
 catcherrlist
-    : catcherror (P catcherror)*
+    : catcherror ( '|' catcherror)*
     ;
 
 catcherror
     : eqname
-    | STAR
+    |  '*'
     ;
 
 cdsection
@@ -201,31 +201,31 @@ cdsection
     ;
 
 choiceitemtype
-    : OP itemtype (P itemtype)* CP
+    :  '(' itemtype ( '|' itemtype)*  ')'
     ;
 
 commentnodetype
-    : KW_COMMENT OP CP
+    :  'comment'  '('  ')'
     ;
 
 compAttrconstructor
-    : KW_ATTRIBUTE compnodename enclosedexpr
+    :  'attribute' compnodename enclosedexpr
     ;
 
 compCommentconstructor
-    : KW_COMMENT enclosedexpr
+    :  'comment' enclosedexpr
     ;
 
 compElemconstructor
-    : KW_ELEMENT compnodename enclosedcontentexpr
+    :  'element' compnodename enclosedcontentexpr
     ;
 
 compNSconstructor
-    : KW_NAMESPACE compnodencname enclosedexpr
+    :  'namespace' compnodencname enclosedexpr
     ;
 
 compPIconstructor
-    : KW_PROCESSING_INSTRUCTION compnodencname enclosedexpr
+    :  'processing-instruction' compnodencname enclosedexpr
     ;
 
 comparisonexpr
@@ -233,7 +233,7 @@ comparisonexpr
     ;
 
 compdocconstructor
-    : KW_DOCUMENT enclosedexpr
+    :  'document' enclosedexpr
     ;
 
 compnodename
@@ -247,7 +247,7 @@ compnodencname
     ;
 
 comptextconstructor
-    : KW_TEXT enclosedexpr
+    :  'text' enclosedexpr
     ;
 
 // [83] ComputedConstructor (same as XPath 4.0)
@@ -263,21 +263,21 @@ computedconstructor
 
 constant
     : StringLiteral
-    | MINUS numericliteral
+    |  '-' numericliteral
     | qnameliteral
-    | eqname OP CP
+    | eqname  '('  ')'
     ;
 
 // [12] ConstructionDecl
 constructiondecl
-    : KW_DECLARE KW_CONSTRUCTION (KW_STRIP | KW_PRESERVE)
+    :  'declare'  'construction' ( 'strip' |  'preserve')
     ;
 
 // [30] ContextItemDecl
 contextitemdecl
-    : KW_DECLARE KW_CONTEXT KW_ITEM (KW_AS itemtype)? (
-        (CEQ vardefaultvalue)
-        | (KW_EXTERNAL (CEQ vardefaultvalue)?)
+    :  'declare'  'context'  'item' ( 'as' itemtype)? (
+        ( ':=' vardefaultvalue)
+        | ( 'external' ( ':=' vardefaultvalue)?)
     )
     ;
 
@@ -287,35 +287,35 @@ contextvalueref
 
 // [15] CopyNamespacesDecl
 copynamespaces_decl
-    : KW_DECLARE KW_COPY_NAMESPACES preservemode COMMA inheritmode
+    :  'declare'  'copy-namespaces' preservemode  ',' inheritmode
     ;
 
 // [58] CountClause
 countclause
-    : KW_COUNT DOLLAR eqname
+    :  'count'  '$' eqname
     ;
 
 curlyarrayconstructor
-    : KW_ARRAY enclosedexpr
+    :  'array' enclosedexpr
     ;
 
 currentvar
-    : DOLLAR eqname
+    :  '$' eqname
     ;
 
 // [18] DecimalFormatDecl
 decimaldecl
-    : KW_DECLARE (KW_DECIMAL_FORMAT eqname | KW_DEFAULT KW_DECIMAL_FORMAT) dfpropertyname*
+    :  'declare' ( 'decimal-format' eqname |  'default'  'decimal-format') dfpropertyname*
     ;
 
 // [10] DefaultCollationDecl
 defaultcollationdecl
-    : KW_DECLARE KW_DEFAULT KW_COLLATION uriliteral
+    :  'declare'  'default'  'collation' uriliteral
     ;
 
 // [20] DefaultNamespaceDecl
 defaultnamespacedecl
-    : KW_DECLARE KW_DEFAULT (KW_ELEMENT | KW_FUNCTION) KW_NAMESPACE uriliteral
+    :  'declare'  'default' ( 'element' |  'function')  'namespace' uriliteral
     ;
 
 // [19] DFPropertyName: eqname covers all property keywords (decimal-separator, etc.)
@@ -372,7 +372,7 @@ dirpiconstructor
     ;
 
 documentnodetype
-    : KW_DOCUMENT_NODE OP (elementnodetype | schemaelementnodetype | nametestunion)? CP
+    :  'document-node'  '(' (elementnodetype | schemaelementnodetype | nametestunion)?  ')'
     ;
 
 dynamicnodetest
@@ -384,12 +384,12 @@ elementname
     ;
 
 elementnodetype
-    : KW_ELEMENT OP (nametestunion (COMMA typename_ QM?)?)? CP
+    :  'element'  '(' (nametestunion ( ',' typename_  '?'?)?)?  ')'
     ;
 
 // [14] EmptyOrderDecl
 emptyorderdecl
-    : KW_DECLARE KW_DEFAULT KW_ORDER KW_EMPTY (KW_GREATEST | KW_LEAST)
+    :  'declare'  'default'  'order'  'empty' ( 'greatest' |  'least')
     ;
 
 enclosedcontentexpr
@@ -401,7 +401,7 @@ enclosedexpr
     ;
 
 enumerationtype
-    : KW_ENUM OP StringLiteral (COMMA StringLiteral)* CP
+    :  'enum'  '(' StringLiteral ( ',' StringLiteral)*  ')'
     ;
 
 // ============================================================
@@ -411,159 +411,159 @@ enumerationtype
 eqname
     : QName
     | URIQualifiedName
-    | KW_AFTER
-    | KW_ALLOWING
-    | KW_ANCESTOR
-    | KW_ANCESTOR_OR_SELF
-    | KW_AND
-    | KW_ARRAY
-    | KW_AS
-    | KW_ASCENDING
-    | KW_AT
-    | KW_ATTRIBUTE
-    | KW_BASE_URI
-    | KW_BEFORE
-    | KW_BOUNDARY_SPACE
-    | KW_BY
-    | KW_CASE
-    | KW_CAST
-    | KW_CASTABLE
-    | KW_CATCH
-    | KW_CHILD
-    | KW_COLLATION
-    | KW_COMMENT
-    | KW_CONSTRUCTION
-    | KW_CONTEXT
-    | KW_COPY_NAMESPACES
-    | KW_COUNT
-    | KW_DECIMAL_FORMAT
-    | KW_DECIMAL_SEPARATOR
-    | KW_DECLARE
-    | KW_DEFAULT
-    | KW_DESCENDANT
-    | KW_DESCENDANT_OR_SELF
-    | KW_DESCENDING
-    | KW_DIGIT
-    | KW_DIV
-    | KW_DOCUMENT_NODE
-    | KW_DOCUMENT
-    | KW_ELEMENT
-    | KW_ELSE
-    | KW_EMPTY_SEQUENCE
-    | KW_EMPTY
-    | KW_ENCODING
-    | KW_END
-    | KW_ENUM
-    | KW_EQ
-    | KW_EVERY
-    | KW_EXCEPT
-    | KW_EXPONENT_SEPARATOR
-    | KW_EXTERNAL
-    | KW_FINALLY
-    | KW_FIRST
-    | KW_FN
-    | KW_FOLLOWING
-    | KW_FOLLOWING_OR_SELF
-    | KW_FOLLOWING_SIBLING
-    | KW_FOLLOWING_SIBLING_OR_SELF
-    | KW_FOLLOWS
-    | KW_FOLLOWS_OR_IS
-    | KW_FOR
-    | KW_FUNCTION
-    | KW_GE
-    | KW_GNODE
-    | KW_GREATEST
-    | KW_GROUP
-    | KW_GROUPING_SEPARATOR
-    | KW_GT
-    | KW_IDIV
-    | KW_IF
-    | KW_IMPORT
-    | KW_IN
-    | KW_INFINITY
-    | KW_INHERIT
-    | KW_INSTANCE
-    | KW_INTERSECT
-    | KW_IS
-    | KW_IS_NOT
-    | KW_ITEM
-    | KW_JNODE
-    | KW_KEY
-    | KW_LAST
-    | KW_LAX
-    | KW_LE
-    | KW_LEAST
-    | KW_LET
-    | KW_LT
-    | KW_MAP
-    | KW_MEMBER
-    | KW_MINUS_SIGN
-    | KW_MOD
-    | KW_MODULE
-    | KW_NAN
-    | KW_NAMESPACE
-    | KW_NAMESPACE_NODE
-    | KW_NE
-    | KW_NEXT
-    | KW_NO_INHERIT
-    | KW_NO_PRESERVE
-    | KW_NODE
-    | KW_OF
-    | KW_ONLY
-    | KW_OPTION
-    | KW_OR
-    | KW_ORDER
-    | KW_ORDERED
-    | KW_ORDERING
-    | KW_OTHERWISE
-    | KW_PARENT
-    | KW_PATTERN_SEPARATOR
-    | KW_PERCENT
-    | KW_PER_MILLE
-    | KW_PRECEDES
-    | KW_PRECEDES_OR_IS
-    | KW_PRECEDING
-    | KW_PRECEDING_OR_SELF
-    | KW_PRECEDING_SIBLING
-    | KW_PRECEDING_SIBLING_OR_SELF
-    | KW_PRESERVE
-    | KW_PREVIOUS
-    | KW_PROCESSING_INSTRUCTION
-    | KW_RECORD
-    | KW_RETURN
-    | KW_SATISFIES
-    | KW_SCHEMA
-    | KW_SCHEMA_ATTRIBUTE
-    | KW_SCHEMA_ELEMENT
-    | KW_SELF
-    | KW_SLIDING
-    | KW_SOME
-    | KW_STABLE
-    | KW_START
-    | KW_STRICT
-    | KW_STRIP
-    | KW_SWITCH
-    | KW_TEXT
-    | KW_THEN
-    | KW_TO
-    | KW_TRACE
-    | KW_TREAT
-    | KW_TRY
-    | KW_TUMBLING
-    | KW_TYPE
-    | KW_TYPESWITCH
-    | KW_UNION
-    | KW_UNORDERED
-    | KW_VALIDATE
-    | KW_VALUE
-    | KW_VARIABLE
-    | KW_VERSION
-    | KW_WHEN
-    | KW_WHERE
-    | KW_WHILE
-    | KW_WINDOW
-    | KW_XQUERY
-    | KW_ZERO_DIGIT
+    |  'after'
+    |  'allowing'
+    |  'ancestor'
+    |  'ancestor-or-self'
+    |  'and'
+    |  'array'
+    |  'as'
+    |  'ascending'
+    |  'at'
+    |  'attribute'
+    |  'base-uri'
+    |  'before'
+    |  'boundary-space'
+    |  'by'
+    |  'case'
+    |  'cast'
+    |  'castable'
+    |  'catch'
+    |  'child'
+    |  'collation'
+    |  'comment'
+    |  'construction'
+    |  'context'
+    |  'copy-namespaces'
+    |  'count'
+    |  'decimal-format'
+    |  'decimal-separator'
+    |  'declare'
+    |  'default'
+    |  'descendant'
+    |  'descendant-or-self'
+    |  'descending'
+    |  'digit'
+    |  'div'
+    |  'document-node'
+    |  'document'
+    |  'element'
+    |  'else'
+    |  'empty-sequence'
+    |  'empty'
+    |  'encoding'
+    |  'end'
+    |  'enum'
+    |  'eq'
+    |  'every'
+    |  'except'
+    |  'exponent-separator'
+    |  'external'
+    |  'finally'
+    |  'first'
+    |  'fn'
+    |  'following'
+    |  'following-or-self'
+    |  'following-sibling'
+    |  'following-sibling-or-self'
+    |  'follows'
+    |  'follows-or-is'
+    |  'for'
+    |  'function'
+    |  'ge'
+    |  'gnode'
+    |  'greatest'
+    |  'group'
+    |  'grouping-separator'
+    |  'gt'
+    |  'idiv'
+    |  'if'
+    |  'import'
+    |  'in'
+    |  'infinity'
+    |  'inherit'
+    |  'instance'
+    |  'intersect'
+    |  'is'
+    |  'is-not'
+    |  'item'
+    |  'jnode'
+    |  'key'
+    |  'last'
+    |  'lax'
+    |  'le'
+    |  'least'
+    |  'let'
+    |  'lt'
+    |  'map'
+    |  'member'
+    |  'minus-sign'
+    |  'mod'
+    |  'module'
+    |  'NaN'
+    |  'namespace'
+    |  'namespace-node'
+    |  'ne'
+    |  'next'
+    |  'no-inherit'
+    |  'no-preserve'
+    |  'node'
+    |  'of'
+    |  'only'
+    |  'option'
+    |  'or'
+    |  'order'
+    |  'ordered'
+    |  'ordering'
+    |  'otherwise'
+    |  'parent'
+    |  'pattern-separator'
+    |  'percent'
+    |  'per-mille'
+    |  'precedes'
+    |  'precedes-or-is'
+    |  'preceding'
+    |  'preceding-or-self'
+    |  'preceding-sibling'
+    |  'preceding-sibling-or-self'
+    |  'preserve'
+    |  'previous'
+    |  'processing-instruction'
+    |  'record'
+    |  'return'
+    |  'satisfies'
+    |  'schema'
+    |  'schema-attribute'
+    |  'schema-element'
+    |  'self'
+    |  'sliding'
+    |  'some'
+    |  'stable'
+    |  'start'
+    |  'strict'
+    |  'strip'
+    |  'switch'
+    |  'text'
+    |  'then'
+    |  'to'
+    |  'trace'
+    |  'treat'
+    |  'try'
+    |  'tumbling'
+    |  'type'
+    |  'typeswitch'
+    |  'union'
+    |  'unordered'
+    |  'validate'
+    |  'value'
+    |  'variable'
+    |  'version'
+    |  'when'
+    |  'where'
+    |  'while'
+    |  'window'
+    |  'xquery'
+    |  'zero-digit'
     ;
 
 // ============================================================
@@ -572,7 +572,7 @@ eqname
 
 // [39] Expr
 expr
-    : exprsingle (COMMA exprsingle)*
+    : exprsingle ( ',' exprsingle)*
     ;
 
 // [40] ExprSingle -- XQuery extends XPath with FLWOR, switch, typeswitch, try-catch
@@ -588,7 +588,7 @@ exprsingle
 
 // "..." means extensible record (new in XQuery 4.0)
 extendedfielddeclaration
-    : DD
+    :  '..'
     ;
 
 // [ExtensionExpr]
@@ -597,11 +597,11 @@ extensionexpr
     ;
 
 fielddeclaration
-    : fieldname QM? (KW_AS sequencetype)?
+    : fieldname  '?'? ( 'as' sequencetype)?
     ;
 
 fielddeclarationlist
-    : fielddeclaration (COMMA fielddeclaration)* (COMMA extendedfielddeclaration)?
+    : fielddeclaration ( ',' fielddeclaration)* ( ',' extendedfielddeclaration)?
     | extendedfielddeclaration
     ;
 
@@ -612,7 +612,7 @@ fieldname
 
 // [76] FinallyClause (new in XQuery 4.0)
 finallyclause
-    : KW_FINALLY enclosedexpr
+    :  'finally' enclosedexpr
     ;
 
 // ============================================================
@@ -633,30 +633,30 @@ forbinding
 
 // [45] ForClause (multiple bindings per clause)
 forclause
-    : KW_FOR forbinding (COMMA forbinding)*
+    :  'for' forbinding ( ',' forbinding)*
     ;
 
 // [49] ForEntryBinding (XPath/XQuery 4.0: iterates over map entries)
 forentrybinding
-    : (forentrykeybinding forentryvaluebinding | forentryvaluebinding) positionalvar? KW_IN exprsingle
+    : (forentrykeybinding forentryvaluebinding | forentryvaluebinding) positionalvar?  'in' exprsingle
     ;
 
 forentrykeybinding
-    : KW_KEY varnameandtype
+    :  'key' varnameandtype
     ;
 
 forentryvaluebinding
-    : KW_VALUE varnameandtype
+    :  'value' varnameandtype
     ;
 
 // [47] ForItemBinding (AllowingEmpty is XQuery 3.0+)
 foritembinding
-    : varnameandtype (KW_ALLOWING KW_EMPTY)? positionalvar? KW_IN exprsingle
+    : varnameandtype ( 'allowing'  'empty')? positionalvar?  'in' exprsingle
     ;
 
 // [48] ForMemberBinding (XPath/XQuery 4.0: iterates over array members)
 formemberbinding
-    : KW_MEMBER varnameandtype positionalvar? KW_IN exprsingle
+    :  'member' varnameandtype positionalvar?  'in' exprsingle
     ;
 
 fullstep
@@ -673,7 +673,7 @@ functioncall
 
 // [31] FunctionDecl
 functiondecl
-    : KW_DECLARE KW_FUNCTION eqname functionsignature (functionbody | KW_EXTERNAL)
+    :  'declare'  'function' eqname functionsignature (functionbody |  'external')
     ;
 
 // ============================================================
@@ -687,7 +687,7 @@ functionitemexpr
 
 // [32] FunctionSignature
 functionsignature
-    : OP paramlistwithdefaults? CP typedeclaration?
+    :  '(' paramlistwithdefaults?  ')' typedeclaration?
     ;
 
 functiontype
@@ -697,29 +697,29 @@ functiontype
 
 generalcomp
     : EQ
-    | NE
+    |  '!='
     | LT
-    | LE
+    |  '<='
     | GT
-    | GE
+    |  '>='
     ;
 
 gnodetype
-    : KW_GNODE OP CP
+    :  'gnode'  '('  ')'
     ;
 
 // [60] GroupByClause
 groupbyclause
-    : KW_GROUP KW_BY groupingspec (COMMA groupingspec)*
+    :  'group'  'by' groupingspec ( ',' groupingspec)*
     ;
 
 // [61] GroupingSpec
 groupingspec
-    : (varnameandtype (CEQ exprsingle)? | exprsingle) (KW_COLLATION uriliteral)?
+    : (varnameandtype ( ':=' exprsingle)? | exprsingle) ( 'collation' uriliteral)?
     ;
 
 ifexpr
-    : KW_IF OP expr CP (unbracedactions | bracedaction)
+    :  'if'  '(' expr  ')' (unbracedactions | bracedaction)
     ;
 
 // [22] Import
@@ -730,8 +730,8 @@ import_
 
 // [17] InheritMode
 inheritmode
-    : KW_INHERIT
-    | KW_NO_INHERIT
+    :  'inherit'
+    |  'no-inherit'
     ;
 
 // [42] InitialClause
@@ -742,11 +742,11 @@ initialclause
     ;
 
 inlinefunctionexpr
-    : (KW_FUNCTION | KW_FN) functionsignature functionbody
+    : ( 'function' |  'fn') functionsignature functionbody
     ;
 
 instanceofexpr
-    : treatexpr (KW_INSTANCE KW_OF sequencetype)?
+    : treatexpr ( 'instance'  'of' sequencetype)?
     ;
 
 // [43] IntermediateClause
@@ -761,7 +761,7 @@ intermediateclause
     ;
 
 intersectexceptexpr
-    : recordputexpr ((KW_INTERSECT | KW_EXCEPT) recordputexpr)*
+    : recordputexpr (( 'intersect' |  'except') recordputexpr)*
     ;
 
 itemtype
@@ -773,15 +773,15 @@ itemtype
 
 // [35] ItemTypeDecl (new in XQuery 4.0: type aliases)
 itemtypedecl
-    : KW_DECLARE KW_TYPE eqname EQ itemtype
+    :  'declare'  'type' eqname EQ itemtype
     ;
 
 jnodetype
-    : KW_JNODE OP (STAR | jrootselector | QName | constant) (COMMA sequencetype)? CP
+    :  'jnode'  '(' ( '*' | jrootselector | QName | constant) ( ',' sequencetype)?  ')'
     ;
 
 jrootselector
-    : OP CP
+    :  '('  ')'
     ;
 
 keyspecifier
@@ -794,15 +794,15 @@ keyspecifier
     ;
 
 keywordargument
-    : eqname CEQ argument
+    : eqname  ':=' argument
     ;
 
 keywordarguments
-    : keywordargument (COMMA keywordargument)*
+    : keywordargument ( ',' keywordargument)*
     ;
 
 letarraybinding
-    : DOLLAR OB varnameandtype CB typedeclaration? CEQ exprsingle
+    :  '$'  '[' varnameandtype  ']' typedeclaration?  ':=' exprsingle
     ;
 
 // [52] LetBinding variants (XPath/XQuery 4.0 destructuring)
@@ -815,19 +815,19 @@ letbinding
 
 // [51] LetClause (multiple bindings per clause)
 letclause
-    : KW_LET letbinding (COMMA letbinding)*
+    :  'let' letbinding ( ',' letbinding)*
     ;
 
 letmapbinding
-    : DOLLAR OC varnameandtype CC typedeclaration? CEQ exprsingle
+    :  '$' OC varnameandtype CC typedeclaration?  ':=' exprsingle
     ;
 
 letsequencebinding
-    : DOLLAR OP varnameandtype CP typedeclaration? CEQ exprsingle
+    :  '$'  '(' varnameandtype  ')' typedeclaration?  ':=' exprsingle
     ;
 
 letvaluebinding
-    : varnameandtype CEQ exprsingle
+    : varnameandtype  ':=' exprsingle
     ;
 
 // [4] LibraryModule
@@ -841,11 +841,11 @@ literal
     ;
 
 lookup
-    : QM keyspecifier
+    :  '?' keyspecifier
     ;
 
 lookupwildcard
-    : STAR
+    :  '*'
     ;
 
 // [3] MainModule
@@ -858,7 +858,7 @@ mainmodule
 // ============================================================
 
 mapconstructor
-    : KW_MAP OC (mapconstructorentry (COMMA mapconstructorentry)*)? CC
+    :  'map' OC (mapconstructorentry ( ',' mapconstructorentry)*)? CC
     ;
 
 mapconstructorentry
@@ -866,7 +866,7 @@ mapconstructorentry
     ;
 
 mappingarrowtarget
-    : MAPPING_ARROW arrowtarget
+    :  '=!>' arrowtarget
     ;
 
 maptype
@@ -875,7 +875,7 @@ maptype
     ;
 
 markedncname
-    : POUND QName
+    :  '#' QName
     ;
 
 // A single XQuery module (library or main)
@@ -885,36 +885,36 @@ module_
 
 // [5] ModuleDecl
 moduledecl
-    : KW_MODULE KW_NAMESPACE NCName EQ uriliteral SEMI
+    :  'module'  'namespace' NCName EQ uriliteral  ';'
     ;
 
 // [25] ModuleImport
 moduleimport
-    : KW_IMPORT KW_MODULE (KW_NAMESPACE NCName EQ)? uriliteral (
-        KW_AT uriliteral (COMMA uriliteral)*
+    :  'import'  'module' ( 'namespace' NCName EQ)? uriliteral (
+         'at' uriliteral ( ',' uriliteral)*
     )?
     ;
 
 multiplicativeexpr
-    : unionexpr ((STAR | TIMES_SIGN | KW_DIV | DIV_SIGN | KW_IDIV | KW_MOD) unionexpr)*
+    : unionexpr (( '*' |  '\u00D7' |  'div' |  '\u00F7' |  'idiv' |  'mod') unionexpr)*
     ;
 
 namedfunctionref
-    : eqname POUND IntegerLiteral
+    : eqname  '#' IntegerLiteral
     ;
 
 // [36] NamedRecordTypeDecl (new in XQuery 4.0)
 namedrecordtypedecl
-    : KW_DECLARE KW_RECORD eqname EQ typedrecordtype
+    :  'declare'  'record' eqname EQ typedrecordtype
     ;
 
 // [21] NamespaceDecl
 namespacedecl
-    : KW_DECLARE KW_NAMESPACE NCName EQ uriliteral
+    :  'declare'  'namespace' NCName EQ uriliteral
     ;
 
 namespacenodetype
-    : KW_NAMESPACE_NODE OP CP
+    :  'namespace-node'  '('  ')'
     ;
 
 nametest
@@ -940,22 +940,22 @@ nodeConstructor
     ;
 
 nodecomp
-    : KW_IS
-    | KW_IS_NOT
+    :  'is'
+    |  'is-not'
     | nodeprecedes
     | nodefollows
-    | KW_PRECEDES_OR_IS
-    | KW_FOLLOWS_OR_IS
+    |  'precedes-or-is'
+    |  'follows-or-is'
     ;
 
 nodefollows
-    : GG
-    | KW_FOLLOWS
+    :  '>>'
+    |  'follows'
     ;
 
 nodeprecedes
-    : LL
-    | KW_PRECEDES
+    :  '<<'
+    |  'precedes'
     ;
 
 nodetest
@@ -971,34 +971,34 @@ numericliteral
     ;
 
 occurrenceindicator
-    : QM
-    | STAR
-    | PLUS
+    :  '?'
+    |  '*'
+    |  '+'
     ;
 
 // [37] OptionDecl
 optiondecl
-    : KW_DECLARE KW_OPTION eqname StringLiteral
+    :  'declare'  'option' eqname StringLiteral
     ;
 
 // [62] OrderByClause
 orderbyclause
-    : (KW_ORDER KW_BY | KW_STABLE KW_ORDER KW_BY) orderspec (COMMA orderspec)*
+    : ( 'order'  'by' |  'stable'  'order'  'by') orderspec ( ',' orderspec)*
     ;
 
 orderedexpr
-    : KW_ORDERED enclosedexpr
+    :  'ordered' enclosedexpr
     ;
 
 // [13] OrderingModeDecl
 orderingmodedecl
-    : KW_DECLARE KW_ORDERING (KW_ORDERED | KW_UNORDERED)
+    :  'declare'  'ordering' ( 'ordered' |  'unordered')
     ;
 
 // [64] OrderModifier
 ordermodifier
-    : (KW_ASCENDING | KW_DESCENDING)? (KW_EMPTY (KW_GREATEST | KW_LEAST))? (
-        KW_COLLATION uriliteral
+    : ( 'ascending' |  'descending')? ( 'empty' ( 'greatest' |  'least'))? (
+         'collation' uriliteral
     )?
     ;
 
@@ -1008,11 +1008,11 @@ orderspec
     ;
 
 orexpr
-    : andexpr (KW_OR andexpr)*
+    : andexpr ( 'or' andexpr)*
     ;
 
 otherwiseexpr
-    : stringconcatexpr (KW_OTHERWISE stringconcatexpr)*
+    : stringconcatexpr ( 'otherwise' stringconcatexpr)*
     ;
 
 // ============================================================
@@ -1020,21 +1020,21 @@ otherwiseexpr
 // ============================================================
 
 paramlist
-    : varnameandtype (COMMA varnameandtype)*
+    : varnameandtype ( ',' varnameandtype)*
     ;
 
 // [33] ParamListWithDefaults (XQuery 4.0 allows default parameter values)
 paramlistwithdefaults
-    : paramwithdefault (COMMA paramwithdefault)*
+    : paramwithdefault ( ',' paramwithdefault)*
     ;
 
 // [34] ParamWithDefault
 paramwithdefault
-    : DOLLAR eqname typedeclaration? (CEQ exprsingle)?
+    :  '$' eqname typedeclaration? ( ':=' exprsingle)?
     ;
 
 parenthesizedexpr
-    : OP expr? CP
+    :  '(' expr?  ')'
     ;
 
 // ============================================================
@@ -1051,16 +1051,16 @@ pipelineexpr
     ;
 
 positionalargumentlist
-    : OP positionalarguments? CP
+    :  '(' positionalarguments?  ')'
     ;
 
 positionalarguments
-    : argument (COMMA argument)*
+    : argument ( ',' argument)*
     ;
 
 // [50] PositionalVar
 positionalvar
-    : KW_AT DOLLAR eqname
+    :  'at'  '$' eqname
     ;
 
 positionalvarname
@@ -1076,12 +1076,12 @@ postfixexpr
         predicate
         | positionalargumentlist
         | lookup
-        | (METHOD_ARROW QName positionalargumentlist)
+        | ( '=?>' QName positionalargumentlist)
     )*
     ;
 
 predicate
-    : OB expr CB
+    :  '[' expr  ']'
     ;
 
 predicatelist
@@ -1090,8 +1090,8 @@ predicatelist
 
 // [16] PreserveMode
 preservemode
-    : KW_PRESERVE
-    | KW_NO_PRESERVE
+    :  'preserve'
+    |  'no-preserve'
     ;
 
 previousvar
@@ -1116,7 +1116,7 @@ primaryexpr
     ;
 
 processinginstructionnodetype
-    : KW_PROCESSING_INSTRUCTION OP (QName | StringLiteral)? CP
+    :  'processing-instruction'  '(' (QName | StringLiteral)?  ')'
     ;
 
 // ============================================================
@@ -1125,14 +1125,14 @@ processinginstructionnodetype
 
 // [6] Prolog: two phases -- setters/imports first, then annotated decls
 prolog
-    : (setter SEMI | defaultnamespacedecl SEMI | namespacedecl SEMI | import_ SEMI)* (
-        annotateddecl SEMI
-        | optiondecl SEMI
+    : (setter  ';' | defaultnamespacedecl  ';' | namespacedecl  ';' | import_  ';')* (
+        annotateddecl  ';'
+        | optiondecl  ';'
     )*
     ;
 
 qnameliteral
-    : POUND eqname
+    :  '#' eqname
     ;
 
 // ============================================================
@@ -1140,11 +1140,11 @@ qnameliteral
 // ============================================================
 
 quantifiedexpr
-    : (KW_SOME | KW_EVERY) quantifierbinding (COMMA quantifierbinding)* KW_SATISFIES exprsingle
+    : ( 'some' |  'every') quantifierbinding ( ',' quantifierbinding)*  'satisfies' exprsingle
     ;
 
 quantifierbinding
-    : varnameandtype KW_IN exprsingle
+    : varnameandtype  'in' exprsingle
     ;
 
 // ============================================================
@@ -1157,7 +1157,7 @@ querybody
 
 // A file may contain multiple whitespace/semicolon-separated modules
 querylist
-    : module_ (SEMI* module_)* SEMI* EOF
+    : module_ ( ';'* module_)*  ';'* EOF
     ;
 
 quotattrcontentchar
@@ -1169,12 +1169,12 @@ quotattrcontentchar
     ;
 
 rangeexpr
-    : additiveexpr (KW_TO additiveexpr)?
+    : additiveexpr ( 'to' additiveexpr)?
     ;
 
 // RecordPutExpr: new in XPath/XQuery 4.0
 recordputexpr
-    : instanceofexpr (PLUS_CEQ instanceofexpr)*
+    : instanceofexpr ( '+:=' instanceofexpr)*
     ;
 
 recordtype
@@ -1194,7 +1194,7 @@ regularitemtype
     ;
 
 relativepathexpr
-    : stepexpr ((SLASH | SS) stepexpr)*
+    : stepexpr (( '/' |  '//') stepexpr)*
     ;
 
 restricteddynamiccall
@@ -1203,26 +1203,26 @@ restricteddynamiccall
 
 // [44] ReturnClause
 returnclause
-    : KW_RETURN exprsingle
+    :  'return' exprsingle
     ;
 
 schemaattributenodetype
-    : KW_SCHEMA_ATTRIBUTE OP attributename CP
+    :  'schema-attribute'  '(' attributename  ')'
     ;
 
 schemaelementnodetype
-    : KW_SCHEMA_ELEMENT OP elementname CP
+    :  'schema-element'  '(' elementname  ')'
     ;
 
 // [23] SchemaImport
 schemaimport
-    : KW_IMPORT KW_SCHEMA schemaprefix? uriliteral (KW_AT uriliteral (COMMA uriliteral)*)?
+    :  'import'  'schema' schemaprefix? uriliteral ( 'at' uriliteral ( ',' uriliteral)*)?
     ;
 
 // [24] SchemaPrefix
 schemaprefix
-    : KW_NAMESPACE NCName EQ
-    | KW_DEFAULT KW_ELEMENT KW_NAMESPACE
+    :  'namespace' NCName EQ
+    |  'default'  'element'  'namespace'
     ;
 
 selector
@@ -1231,17 +1231,17 @@ selector
     ;
 
 sequencearrowtarget
-    : EG arrowtarget
+    :  '=>' arrowtarget
     ;
 
 sequencetype
-    : KW_EMPTY_SEQUENCE OP CP
+    :  'empty-sequence'  '('  ')'
     | itemtype occurrenceindicator?
     ;
 
 // [72] SequenceTypeUnion
 sequencetypeunion
-    : sequencetype (P sequencetype)*
+    : sequencetype ( '|' sequencetype)*
     ;
 
 // [8] Setter
@@ -1257,7 +1257,7 @@ setter
     ;
 
 simplemapexpr
-    : pathexpr (BANG pathexpr)*
+    : pathexpr ( '!' pathexpr)*
     ;
 
 simplenodetest
@@ -1270,7 +1270,7 @@ simpletypename
     ;
 
 squarearrayconstructor
-    : OB (exprsingle (COMMA exprsingle)*)? CB
+    :  '[' (exprsingle ( ',' exprsingle)*)?  ']'
     ;
 
 stepexpr
@@ -1279,7 +1279,7 @@ stepexpr
     ;
 
 stringconcatexpr
-    : rangeexpr (PP rangeexpr)*
+    : rangeexpr ( '||' rangeexpr)*
     ;
 
 stringtemplate
@@ -1288,7 +1288,7 @@ stringtemplate
 
 // [67] SwitchCaseClause
 switchcaseclause
-    : (KW_CASE switchcaseoperand)+ KW_RETURN exprsingle
+    : ( 'case' switchcaseoperand)+  'return' exprsingle
     ;
 
 // [68] SwitchCaseOperand
@@ -1302,20 +1302,20 @@ switchcaseoperand
 
 // [65] SwitchExpr
 switchexpr
-    : KW_SWITCH OP expr CP switchcaseclause+ KW_DEFAULT KW_RETURN exprsingle
+    :  'switch'  '(' expr  ')' switchcaseclause+  'default'  'return' exprsingle
     ;
 
 textnodetype
-    : KW_TEXT OP CP
+    :  'text'  '('  ')'
     ;
 
 // TraceClause (new in XQuery 4.0): trace($label, $expr) or trace($expr)
 traceclause
-    : KW_TRACE OP exprsingle (COMMA exprsingle)? CP
+    :  'trace'  '(' exprsingle ( ',' exprsingle)?  ')'
     ;
 
 treatexpr
-    : castableexpr (KW_TREAT KW_AS sequencetype)?
+    : castableexpr ( 'treat'  'as' sequencetype)?
     ;
 
 // ============================================================
@@ -1329,11 +1329,11 @@ trycatchexpr
 
 // [74] TryClause
 tryclause
-    : KW_TRY enclosedexpr
+    :  'try' enclosedexpr
     ;
 
 typedarraytype
-    : KW_ARRAY OP sequencetype CP
+    :  'array'  '(' sequencetype  ')'
     ;
 
 // ============================================================
@@ -1341,27 +1341,27 @@ typedarraytype
 // ============================================================
 
 typedeclaration
-    : KW_AS sequencetype
+    :  'as' sequencetype
     ;
 
 typedfunctionparam
-    : (DOLLAR eqname KW_AS)? sequencetype
+    : ( '$' eqname  'as')? sequencetype
     ;
 
 typedfunctionparamlist
-    : typedfunctionparam (COMMA typedfunctionparam)*
+    : typedfunctionparam ( ',' typedfunctionparam)*
     ;
 
 typedfunctiontype
-    : (KW_FUNCTION | KW_FN) OP typedfunctionparamlist? CP KW_AS sequencetype
+    : ( 'function' |  'fn')  '(' typedfunctionparamlist?  ')'  'as' sequencetype
     ;
 
 typedmaptype
-    : KW_MAP OP itemtype COMMA sequencetype CP
+    :  'map'  '(' itemtype  ',' sequencetype  ')'
     ;
 
 typedrecordtype
-    : KW_RECORD OP fielddeclarationlist CP
+    :  'record'  '(' fielddeclarationlist  ')'
     ;
 
 typename_
@@ -1370,7 +1370,7 @@ typename_
 
 // [69] TypeswitchExpr
 typeswitchexpr
-    : KW_TYPESWITCH OP expr CP caseclause+ KW_DEFAULT (DOLLAR eqname)? KW_RETURN exprsingle
+    :  'typeswitch'  '(' expr  ')' caseclause+  'default' ( '$' eqname)?  'return' exprsingle
     ;
 
 typetest
@@ -1380,27 +1380,27 @@ typetest
     ;
 
 unaryexpr
-    : (MINUS | PLUS)* valueexpr
+    : ( '-' |  '+')* valueexpr
     ;
 
 unarylookup
-    : QM keyspecifier
+    :  '?' keyspecifier
     ;
 
 unbracedactions
-    : KW_THEN exprsingle KW_ELSE exprsingle
+    :  'then' exprsingle  'else' exprsingle
     ;
 
 unionexpr
-    : intersectexceptexpr ((KW_UNION | P) intersectexceptexpr)*
+    : intersectexceptexpr (( 'union' |  '|') intersectexceptexpr)*
     ;
 
 unionnodetest
-    : OP simplenodetest (P simplenodetest)+ CP
+    :  '(' simplenodetest ( '|' simplenodetest)+  ')'
     ;
 
 unorderedexpr
-    : KW_UNORDERED enclosedexpr
+    :  'unordered' enclosedexpr
     ;
 
 uriliteral
@@ -1409,22 +1409,22 @@ uriliteral
 
 // [ValidateExpr]
 validateexpr
-    : KW_VALIDATE validationmode? enclosedexpr
+    :  'validate' validationmode? enclosedexpr
     ;
 
 validationmode
-    : KW_LAX
-    | KW_STRICT
-    | KW_TYPE typename_
+    :  'lax'
+    |  'strict'
+    |  'type' typename_
     ;
 
 valuecomp
-    : KW_EQ
-    | KW_NE
-    | KW_LT
-    | KW_LE
-    | KW_GT
-    | KW_GE
+    :  'eq'
+    |  'ne'
+    |  'lt'
+    |  'le'
+    |  'gt'
+    |  'ge'
     ;
 
 // [ValueExpr] XQuery extends XPath with ValidateExpr and ExtensionExpr
@@ -1436,9 +1436,9 @@ valueexpr
 
 // [28] VarDecl
 vardecl
-    : KW_DECLARE KW_VARIABLE DOLLAR eqname typedeclaration? (
-        (CEQ vardefaultvalue)
-        | (KW_EXTERNAL (CEQ vardefaultvalue)?)
+    :  'declare'  'variable'  '$' eqname typedeclaration? (
+        ( ':=' vardefaultvalue)
+        | ( 'external' ( ':=' vardefaultvalue)?)
     )
     ;
 
@@ -1448,57 +1448,57 @@ vardefaultvalue
     ;
 
 varnameandtype
-    : DOLLAR eqname typedeclaration?
+    :  '$' eqname typedeclaration?
     ;
 
 varref
-    : DOLLAR eqname
+    :  '$' eqname
     ;
 
 // [2] VersionDecl
 versiondecl
-    : KW_XQUERY (
-        (KW_ENCODING StringLiteral)
-        | (KW_VERSION StringLiteral (KW_ENCODING StringLiteral)?)
-    ) SEMI
+    :  'xquery' (
+        ( 'encoding' StringLiteral)
+        | ( 'version' StringLiteral ( 'encoding' StringLiteral)?)
+    )  ';'
     ;
 
 // [59] WhereClause
 whereclause
-    : KW_WHERE exprsingle
+    :  'where' exprsingle
     ;
 
 // WhileClause (new in XQuery 4.0)
 whileclause
-    : KW_WHILE OP exprsingle CP
+    :  'while'  '(' exprsingle  ')'
     ;
 
 wildcard
-    : STAR
-    | QName CS
-    | SC QName
-    | BracedURILiteral STAR
+    :  '*'
+    | QName  ':*'
+    |  '*:' QName
+    | BracedURILiteral  '*'
     ;
 
 // [53] WindowClause
 windowclause
-    : KW_FOR (KW_TUMBLING | KW_SLIDING) KW_WINDOW varnameandtype KW_IN exprsingle windowstartcondition windowendcondition?
+    :  'for' ( 'tumbling' |  'sliding')  'window' varnameandtype  'in' exprsingle windowstartcondition windowendcondition?
     ;
 
 // [56] WindowEndCondition
 windowendcondition
-    : KW_ONLY? KW_END windowvars KW_WHEN exprsingle
+    :  'only'?  'end' windowvars  'when' exprsingle
     ;
 
 // [55] WindowStartCondition
 windowstartcondition
-    : KW_START windowvars KW_WHEN exprsingle
+    :  'start' windowvars  'when' exprsingle
     ;
 
 // [57] WindowVars
 windowvars
-    : currentvar? (KW_AT DOLLAR positionalvarname)? (KW_PREVIOUS DOLLAR previousvar)? (
-        KW_NEXT DOLLAR nextvar
+    : currentvar? ( 'at'  '$' positionalvarname)? ( 'previous'  '$' previousvar)? (
+         'next'  '$' nextvar
     )?
     ;
 
