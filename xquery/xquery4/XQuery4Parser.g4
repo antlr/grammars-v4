@@ -117,10 +117,6 @@ attributenodetype
     : KW_ATTRIBUTE OP (nametestunion (COMMA typename_)?)? CP
     ;
 
-// ============================================================
-// Entry points for testing
-// ============================================================
-
 // Entry point for Maven antlr4test-maven-plugin: semicolon-separated queries/modules
 auxilary
     : (module_ SEMI?)+ EOF
@@ -1158,10 +1154,6 @@ quantifierbinding
 querybody
     : expr
     ;
-
-// ============================================================
-// A.1 Top-level entry points
-// ============================================================
 
 // A file may contain multiple whitespace/semicolon-separated modules
 querylist
