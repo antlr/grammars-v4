@@ -31,11 +31,18 @@ additiveexpr
     : multiplicativeexpr (( '+' |  '-') multiplicativeexpr)*
     ;
 
+allowingEmpty
+    : 'allowing' 'empty'
+    ;
+
 andexpr
     : comparisonexpr ( 'and' comparisonexpr)*
     ;
 
-// [26] AnnotatedDecl
+annotation
+    : '%' EQName ('(' constant (',' constant)* ')')?
+    ;
+
 annotateddecl
     : annotation* (vardecl | contextitemdecl | functiondecl | itemtypedecl | namedrecordtypedecl)
     ;
