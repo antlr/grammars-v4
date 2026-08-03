@@ -81,7 +81,7 @@ jobs:
         javac --version
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
+      uses: dart-lang/setup-dart@v1.7.2
     - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
