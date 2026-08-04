@@ -1,0 +1,1334 @@
+$ TITLE('CP/M 3.0 --- DEVICE')
+device:
+do;
+
+/*
+  Copyright (C) 1982
+  Digital Research
+  P.O. Box 579
+  Pacific Grove, CA 93950
+*/
+
+/*
+Written:  09 July 82  by John Knight 
+Revised   02 Dec 82   by Bruce Skidmore
+*/
+
+/********************************************
+*                                           *
+*       LITERALS AND GLOBAL VARIABLES       *
+* 					    *
+********************************************/
+
+declare
+    true    		literally '1',
+    false   		literally '0',
+    forever 		literally 'while true',
+    lit     		literally 'literally',
+    proc    		literally 'procedure',
+    dcl     		literally 'declare',
+    addr    		literally 'address',
+    cr      		literally '13',
+    lf      		literally '10',
+    ctrlc   		literally '3',
+    ctrlx   		literally '18h',
+    bksp    		literally '8',
+    conin$disp 		literally '22h',
+    conout$disp		literally '24h',
+    auxin$disp 		literally '26h',
+    auxout$disp		literally '28h',
+    listout$disp	literally '2ah',
+    mb$input		literally '1',
+    mb$output		literally '2',
+    mb$in$out		literally '3',
+    mb$soft$baud	literally '4',
+    mb$serial		literally '8',
+    mb$xon$xoff		literally '16',
+    dev$table$adr$func	literally '20',
+    dev$init$func	literally '21',
+    cpmversion		literally '30h',
+    console$page$offset literally '1ch',
+    console$width$offset literally '1ah';
+
+  declare begin$buffer address;
+  declare buf$length byte;
+  declare con$width byte;
+  declare con$page byte;
+  declare phys$dev$table$adr address;
+  declare no$chars byte;
+  declare string$adr address;
+  declare i byte;
+  declare device$bit$table (16) byte;
+  declare memory (255) byte;	/* assignment input buffer */
+  /* scanner variables and data */
+  declare
+    options(*) byte data
+        ('NAMES~VALUES~HELP~CON:~CONIN:~CONOUT:~LST:~',
+         'AUX:~AUXIN:~AUXOUT:~CONSOLE~KEYBOARD~',
+         'PRINTER~AUXILIARY~AXI:~AXO:',0ffh),
+		
+    options$offset(*) byte data
+        (0,6,13,18,23,30,38,43,48,55,63,71,80,88,98,103,107),
+                
+    mods(*) byte data
+        ('XON~NOXON~NULL~50   ~75   ~110~134~150~300~',
+         '600~1200~1800~2400~3600~4800~7200~',
+         '9600~19200',0ffh),
+
+    mods$offset(*) byte data
+        (0,4,10,15,21,27,31,35,39,43,47,52,57,62,
+         67,72,77,82,87),
+
+    page$options (*) byte data
+        ('COLUMNS~LINES~PAGESIZE',0ffh),
+
+    page$offsets (*) byte data
+        (0,8,14,22),
+
+    end$list	byte data (0ffh),
+
+    delimiters(*) byte data (0,'[]=, ',0,0ffh),
+
+    SPACE	byte data(5),
+    j		byte initial(0),
+    buf$ptr	address,
+    index	byte,
+    endbuf	byte,
+    delimiter	byte;
+    
+    declare 	end$of$string byte initial ('~');
+  
+  /* tables */
+  declare phys$table (15) structure
+     (name(6)         byte,
+     characteristic   byte,
+     baud	      byte);
+
+  declare biospb structure
+    (func  byte,
+     areg  byte,
+     bcreg address,
+     dereg address,
+     hlreg address);
+
+  declare scbpd structure
+    (offset byte,
+     set    byte,
+     value  address);
+
+  declare baud$rates (*) byte data
+    ('NONE 50   75   110  134  150  300  600  ',
+     '1200 1800 2400 3600 4800 7200 9600 19200');
+  
+  declare baud$table (16) structure
+    (graphic (5) byte) at (.baud$rates(0));
+  
+  declare log$offsets (*) byte data
+    (0,conin$disp,conout$disp,listout$disp,1,auxin$disp,
+     auxout$disp,3,conin$disp,listout$disp,2,auxin$disp,auxout$disp);
+
+  declare characteristics$table (*) byte data
+    ('INPUT    $OUTPUT   $SOFT-BAUD$SERIAL   $XON-XOFF $');
+
+  declare char$table (5) structure
+    (graphic (10) byte) at (.characteristics$table(0));
+  
+ declare plm label public;
+ 
+  /**************************************
+   *                                    *
+   *       B D O S   INTERFACE          *
+   *                                    *
+   **************************************/
+
+
+  mon1:
+    procedure (func,info) external;
+      declare func byte;
+      declare info address;
+    end mon1;
+
+  mon2:
+    procedure (func,info) byte external;
+      declare func byte;
+      declare info address;
+    end mon2;
+
+  mon3:
+    procedure (func,info) address external;
+      declare func byte;
+      declare info address;
+    end mon3;
+
+  declare cmdrv     byte    external;	/* command drive      */
+  declare fcb (1)   byte    external;	/* 1st default fcb    */
+  declare fcb16 (1) byte    external;	/* 2nd default fcb    */
+  declare pass0     address external;	/* 1st password ptr   */
+  declare len0      byte    external;	/* 1st passwd length  */
+  declare pass1     address external;	/* 2nd password ptr   */
+  declare len1      byte    external;	/* 2nd passwd length  */
+  declare tbuff (1) byte    external;	/* default dma buffer */
+
+
+  /**************************************
+   *                                    *
+   *       B D O S   Externals          *
+   *                                    *
+   **************************************/
+
+  printchar: 
+    procedure(char);
+    declare char byte;
+    call mon1(2,char);
+    end printchar;
+
+  print$buf:
+    procedure (buffer$address);
+      declare buffer$address address;
+      call mon1 (9,buffer$address);
+    end print$buf;
+
+  read$console$buf:
+    procedure (buffer$address,max) byte;
+      declare buffer$address address;
+      declare new$max based buffer$address address;
+      declare max byte;
+      new$max = max;
+      call mon1(10,buffer$address);
+      buffer$address = buffer$address + 1;
+      return new$max; 	/* actually number of chars input */
+  end read$console$buf;
+
+  version: procedure address;
+    /* returns current cp/m version # */
+    return mon3(12,0);
+    end version;
+
+  getscbbyte: procedure (offset) byte;
+    declare offset byte;
+    scbpd.offset = offset;
+    scbpd.set = 0;
+    return mon2(49,.scbpd);
+  end getscbbyte;
+
+  getscbword:
+    procedure (offset) address;
+    declare offset byte;
+    scbpd.offset = offset;
+    scbpd.set = 0;
+    return mon3(49,.scbpd);
+  end getscbword;
+
+  setscbbyte:
+    procedure (offset,value);
+    declare offset byte;
+    declare value byte;
+    scbpd.offset = offset;
+    scbpd.set = 0FFH;
+    scbpd.value = double(value);
+    call mon1(49,.scbpd);
+  end setscbbyte;
+    
+  setscbword:
+    procedure (offset,value);
+    declare offset byte;
+    declare value address;
+    scbpd.offset = offset;
+    scbpd.set = 0FEh;
+    scbpd.value = value;
+    call mon1(49,.scbpd);
+  end setscbword;
+
+  direct$bios:
+    procedure (func) address;
+      declare func byte;
+      biospb.func = func;
+      return mon3(50,.biospb);
+  end direct$bios;
+
+  /**************************************
+   *                                    *
+   *       S U B R O U T I N E S        *
+   *                                    *
+   **************************************/
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                    * * *  Option scanner  * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+separator: procedure(character) byte;
+
+					/* determines if character is a 
+					   delimiter and which one */
+	declare	k	byte,
+		character	byte;
+
+	k = 1;
+loop:	if delimiters(k) = end$list then return(0);
+	if delimiters(k) = character then return(k);	/* null = 25 */
+		k = k + 1;
+		go to loop;
+
+end separator;
+
+opt$scanner:	procedure(list$ptr,off$ptr,idx$ptr);
+					/* scans the list pointed at by idxptr
+					   for any strings that are in the 
+					   list pointed at by list$ptr.
+					   Offptr points at an array that 
+					   contains the indices for the known
+					   list. Idxptr points at the index 
+					   into the list. If the input string
+					   is unrecognizable then the index is
+				   	   0, otherwise > 0.
+
+					First, find the string in the known
+					list that starts with the same first 
+					character.  Compare up until the next
+					delimiter on the input. if every input
+					character matches then check for 
+					uniqueness.  Otherwise try to find 
+					another known string that has its first
+					character match, and repeat.  If none
+					can be found then return invalid.
+
+					To test for uniqueness, start at the 
+					next string in the knwon list and try
+					to get another match with the input.
+					If there is a match then return invalid.
+
+					else move pointer past delimiter and 
+					return.
+
+				P.Balma		*/
+
+	declare
+		buff		based buf$ptr (1) byte,
+		idx$ptr		address,
+		off$ptr		address,
+		list$ptr	address;
+
+	declare
+		i		byte,
+		j		byte,
+		list		based list$ptr (1) byte,
+		offsets		based off$ptr (1) byte,
+		wrd$pos  	byte,
+		character	byte,
+		letter$in$word	byte,
+		found$first	byte,
+		start		byte,
+		index		based idx$ptr byte,
+		save$index	byte,
+		(len$new,len$found)	byte,
+		valid		byte;
+
+/*****************************************************************************/
+/*			internal subroutines				     */
+/*****************************************************************************/
+
+check$in$list: procedure;
+				/* find known string that has a match with 
+				   input on the first character.  Set index
+				   = invalid if none found.   */
+			
+	declare	i	byte;
+
+	i = start;
+	wrd$pos = offsets(i);
+	do while list(wrd$pos) <> end$list;
+		i = i + 1;
+		index = i;
+		if list(wrd$pos) = character then return;
+		wrd$pos = offsets(i);
+	end;
+			/* could not find character */
+	index = 0;
+	return;
+end check$in$list;
+
+setup:	procedure;
+	character = buff(0);
+	call check$in$list;
+	letter$in$word = wrd$pos;
+			/* even though no match may have occurred, position
+			   to next input character.  */
+	i = 1;
+	character = buff(1);
+end setup;
+
+test$letter:	procedure;
+			/* test each letter in input and known string */
+
+	letter$in$word = letter$in$word + 1;
+
+					/* too many chars input? 0 means
+					   past end of known string */
+	if list(letter$in$word) = end$of$string then valid = false;
+	else
+	if list(letter$in$word) <> character then valid = false;
+
+	i = i + 1;
+	character = buff(i);
+
+end test$letter;
+
+skip:	procedure;
+					/* scan past the offending string;
+					   position buf$ptr to next string...
+					   skip entire offending string;
+					   ie., falseopt=mod, [note: comma or
+					   space is considered to be group 
+					   delimiter] */
+	character = buff(i);
+	delimiter = separator(character);
+	/* No skip for DEVICE */
+        do while ((delimiter < 1) or (delimiter > 6));
+		i = i + 1;
+		character = buff(i);
+		delimiter = separator(character);
+	end;
+	endbuf = i;
+	buf$ptr = buf$ptr + endbuf + 1;
+	return;
+end skip;
+
+eat$blanks: procedure;
+
+	declare	charac	based buf$ptr byte;
+
+
+	do while ((delimiter := separator(charac)) = SPACE);
+		buf$ptr = buf$ptr + 1;
+	end;
+
+end eat$blanks;
+
+/*****************************************************************************/
+/*			end of internals				     */
+/*****************************************************************************/
+
+
+					/* start of procedure */
+	call eat$blanks;
+	start = 0;
+	call setup;
+
+					/* match each character with the option
+					   for as many chars as input 
+					   Please note that due to the array
+					   indices being relative to 0 and the
+					   use of index both as a validity flag
+					   and as a index into the option/mods
+					   list, index is forced to be +1 as an
+					   index into array and 0 as a flag*/
+
+	do while index <> 0;
+		start = index;
+		delimiter = separator(character);
+
+					/* check up to input delimiter */
+
+		valid = true;		/* test$letter resets this */
+		do while delimiter = 0;
+			call test$letter;
+			if not valid then go to exit1;
+			delimiter = separator(character);
+		end;
+
+		go to good;
+
+					/* input ~= this known string;
+					   get next known string that 
+					   matches */
+exit1:		call setup;
+	end;
+					/* fell through from above, did
+					   not find a good match*/
+	endbuf = i;			/* skip over string & return*/
+	call skip;
+	return;
+
+					/* is it a unique match in options
+					   list? */
+good:	endbuf = i;
+	len$found = endbuf;
+	save$index = index;
+	valid = false;
+next$opt:
+		start = index;
+		call setup;
+		if index = 0 then go to finished;
+
+					/* look at other options and check
+					   uniqueness */
+
+		len$new = offsets(index + 1) - offsets(index) - 1;
+		if len$new = len$found then do;
+			valid = true;
+			do j = 1 to len$found;
+				call test$letter;
+				if not valid then go to next$opt;
+			end;
+		end;
+		else go to nextopt;
+					/* fell through...found another valid
+					   match --> ambiguous reference */
+	index = 0;
+	call skip;		/* skip input field to next delimiter*/
+	return;
+
+finished:			/* unambiguous reference */
+	index = save$index;
+	buf$ptr = buf$ptr + endbuf;
+	call eat$blanks;
+	if delimiter <> 0 then
+          buf$ptr = buf$ptr + 1;
+        else
+          delimiter = 5;
+	return;
+
+end opt$scanner;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+ucase: procedure (char) byte;
+  declare char byte;
+  if char >= 'a' then
+    if char < '{' then
+      return (char-20h);
+  return char;
+end ucase;
+    
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+crlf:   proc;
+    call printchar(cr);
+    call printchar(lf);
+    end crlf;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                  /* fill string @ s for c bytes with f */
+fill:   proc(s,f,c);
+    dcl s addr,
+        (f,c) byte,
+        a based s byte;
+
+        do while (c:=c-1)<>255;
+        a = f;
+        s = s+1;
+        end;
+    end fill;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/*  The error processor.  This routine prints the command line
+    with a carot '^' under the offending delimiter, or sub-string.
+    The code passed to the routine determmines the error message
+    to be printed beneath the command string.			*/
+
+errors: procedure (code);
+  declare (code,i,j,nlines,rem) byte;
+  declare (string$ptr,tstring$ptr) address;
+  declare chr1 based string$ptr byte;
+  declare chr2 based tstring$ptr byte;
+  declare carot$flag byte;
+
+print$command: procedure (size);
+  declare size byte;
+  do j=1 to size;	/* print command string */
+    call printchar(chr1);
+    string$ptr = string$ptr + 1;
+  end;
+  call crlf;
+  do j=1 to size;	/* print carot if applicable */
+    if .chr2 = buf$ptr then do;
+      carot$flag = true;
+      call printchar('^');
+    end;
+    else
+      call printchar(' ');
+    tstring$ptr = tstring$ptr + 1;
+  end;
+  call crlf;
+end print$command;
+
+  carot$flag = false;
+  string$ptr,tstring$ptr = begin$buffer;
+  if con$width < 40 then con$width = 40;	/* minimum size screen assumed */
+  nlines = buf$length / con$width;	/* determine number lines to print */
+  rem = buf$length mod con$width;	/* number of extra characters */
+  if (code = 2) or (code = 1) then	/* adjust carot pointer */
+    buf$ptr = buf$ptr - 1;	/* for delimiter errors */
+  else
+    buf$ptr = buf$ptr - endbuf - 1;	/* for sub-string errors */
+  call crlf;
+  do i=1 to nlines;
+    tstring$ptr = string$ptr;
+    call print$command(con$width);
+  end;
+  call print$command(rem);
+  if carot$flag then
+    call print$buf(.('Error at the ''^''; $'));
+  else
+    call print$buf(.('Error at end of line; $'));
+  if con$width < 63 then
+    call crlf;
+  do case code;		/* error messages */
+    call print$buf(.('Invalid number$'));
+    call print$buf(.('End of line expected$'));
+    call print$buf(.('Invalid delimiter$'));
+    call print$buf(.('Invalid option$'));
+    call print$buf(.('Baud rate can not be set for this device$'));
+    call print$buf(.('Invalid physical device$'));
+    call print$buf(.('Physical device does not have input capability$'));
+    call print$buf(.('Physical device does not have output capability$'));
+    call print$buf(.('Physical device does not have input/output capability$'));
+    call print$buf(.('A NULL device can not be assigned to CONIN$'));
+    call print$buf(.('Ambiguous assignments to a NULL device are not allowed$'));
+  end;
+  call crlf;
+  call mon1(0,0);
+end errors;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+/* Help display.  A simple print of the syntax accepted by this
+   utility.  The display assumes a minimum 40 column screen and
+   does not give an explanation to the commands. For quick ref. only 
+
+ help: procedure;                        COMMENTED OUT -- NEW HELP
+                                         PROGRAM WILL REPLACE THIS
+                                         DISPLAY	
+  call print$buf(.(
+  'COMMAND SYNTAX:',cr,lf,cr,lf,
+  'DEVICE',cr,lf,
+  'DEVICE NAMES',cr,lf,
+  'DEVICE VALUES',cr,lf,
+  'DEVICE pd',cr,lf,
+  'DEVICE ld',cr,lf,
+  'DEVICE ld=pd[opt,opt],pd[opt],...',cr,lf,
+  'DEVICE pd[opt,opt]',cr,lf,
+  'DEVICE ld=NULL',cr,lf,
+  'DEVICE CONSOLE[COLUMNS=nnn,LINES=nnn]',cr,lf,
+  'DEVICE CONSOLE[PAGESIZE]',cr,lf,cr,lf,
+  'pd  = a physical device',cr,lf,
+  'ld  = a logical device',cr,lf,
+  '      CON:,CONIN:,CONOUT:,LST:,AUX:,',cr,lf,
+  '      AUXIN:,AXI:,AUXOUT:,AXO:,CONSOLE,',cr,lf,
+  '      KEYBOARD,PRINTER, or AUXILIARY',cr,lf,
+  'opt = a valid option',cr,lf,
+  '      XON,NOXON, or a baud rate:  50,',cr,lf,
+  '      75,110,134,150,300,600,1200,1800,',cr,lf,
+  '      2400,3600,4800,7200,9600,19200',cr,lf,
+  'nnn = a number; 0-255',cr,lf,'$'));
+end help; */
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+set$bit:
+  procedure (val,bit) address;
+  /* sets a bit in 0-15 in val, returns val */
+  declare bit byte;
+  declare val address;
+  declare temp address;
+  temp = 1;
+  bit = 15 - bit;
+  if bit <> 0 then 
+    temp = shl(temp,bit);
+  val = val or temp;
+  return val;
+end set$bit;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine assigns to a word in the system control block a
+   bit pattern as specified in the device$bit$table.         */
+
+make$assignments: procedure (offset);
+  declare (i,offset) byte;
+  declare val address;
+  val = 0;	/* clear address to be set */
+  do i=0 to 15;
+    if device$bit$table(i) = 1
+      then val= set$bit(val,i);
+  end;
+  call setscbword(offset,val);
+end make$assignments;
+     
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine prints the physical device located in the
+   physical device table at the index passed to the routine */
+
+print$phys$device: procedure (index);
+  declare (i,index) byte;
+  do i=0 to 5;
+    call printchar(phys$table(index).name(i));
+  end;
+end print$phys$device;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine prints the baud rate corresponding to the baud
+   code found in the physical device table.  The index to the
+   physical device table is passed to this routine.          */
+
+print$baud$rate: procedure (index);
+  declare (k,index,baud) byte;
+  baud = phys$table(index).baud;
+  if baud > 15 then baud = 0;
+  do k=0 to 4;
+    call printchar(baud$table(baud).graphic(k));
+  end;
+end print$baud$rate;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine prints the physical characteristics codes for
+   a specific physical device found in the physical device table.
+   This procedure is called by names.                        */
+
+print$phys$characteristics: procedure (index);
+  declare (char,index,ct) byte;
+  ct = 0;
+  char = phys$table(index).characteristic;
+  char = shr(char,1);
+  if carry = 0ffh then do;	/* input bit */
+    call printchar('I');
+    ct = ct + 1;
+  end;
+  char = shr(char,1);
+  if carry = 0ffh then do;	/* output bit */
+    call printchar('O');
+    ct = ct + 1;
+  end;
+  char = shr(char,2);	/* skip soft-baud */
+  if carry = 0ffh then do;	/* serial bit in carry */
+    call printchar('S');
+    ct = ct + 1;
+  end;
+  char = shr(char,1);
+  if carry = 0ffh then do;	/* xon-xoff bit */
+    call printchar('X');
+    ct = ct + 1;
+  end;
+  do while ct <> 4;
+    call printchar(' ');
+    ct = ct + 1;
+  end;
+end print$phys$characteristics;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine prints the names of the physical devices as well
+   as the baud rate and characteristics codes.               */
+
+names: procedure;
+  declare (i,j,cols,char,baud,k) byte;
+  call crlf;
+  call print$buf(.('Physical Devices: ',cr,lf,'$'));
+  call print$buf(.('I=Input,O=Output,S=Serial,X=Xon-Xoff',cr,lf,'$'));
+  i = con$width;
+  if i < 40 then i = 40;
+  cols = i / 20;	/* determine columns per line */
+  j = 0;	/* table index */
+crloop: i=1;	/* columns counter */
+process: if phys$table(j).name(0) = 0 then do;
+           call crlf; 
+           return;
+         end;
+  /* print device name, baud, and attributes */
+  call print$phys$device(j);
+  call printchar(' ');
+  call print$baud$rate(j);
+  call printchar(' ');
+  call print$phys$characteristics(j);
+  call print$buf(.('   $'));
+  j = j + 1;
+  if i >= cols then do;
+    call crlf;
+    goto crloop;
+  end;
+  i = i + 1;
+  goto process;
+end names;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine prints the physical devices that are assigned
+   to the logical device.  The bit pattern of the vector passed
+   to this routine determines the current assignments to the device */
+
+show$physical$devices:
+  procedure (vector);
+    declare vector address;
+    declare device$present byte;
+    declare bit$table (16) byte;
+    declare (i,k,cols,max) byte;
+    i = con$width;
+    if i < 40 then i = 40;
+    cols = (i - 10) / 7;	/* determine phys$devices per line */
+    do i = 0 to 15;
+      vector = shl(vector,1);
+      bit$table(i) = carry;	/* ff = 1, 0 = 0 */
+    end;
+    i = 0;
+    do while phys$table(i).name(0) <> 0;
+      if i = 15 then goto set$max;
+      i = i + 1;
+    end;
+    set$max: max = i;	/* number of entries in table */
+    device$present = false;
+    k = 1;	/* cols printed count */
+    do i = 0 to 14;
+      if bit$table(i) = 0ffh then do;
+        /* obtain match from physical device table */
+        if i > max then do;
+          call print$buf(.(cr,lf,'Bad Logical Device Assignment; $')); 
+          call print$buf(.('Physical Device Does Not Exist$'));
+          call crlf;
+          return;
+        end;
+        device$present = true;
+        call print$phys$device(i);
+        call printchar(' ');
+        k = k + 1;
+        if k > cols then do;
+          k = 1;
+          call crlf;
+          call print$buf(.('          $'));
+        end;
+      end;
+    end;
+    if bit$table(15) = 0ffh then do;	/* File assignment */
+      device$present = true;
+      call print$buf(.('File$'));
+    end;
+    if (device$present = false) then
+      call print$buf(.('Null Device$'));
+    call crlf;
+  end show$physical$devices;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This procedure produces the values display.  It shows all the
+ assignments of physical devices to the logical devices        */
+
+values:  procedure;
+    declare val address;
+    call crlf;
+    call print$buf(.('Current Assignments: ',cr,lf,'$'));
+    val = getscbword(conin$disp);
+    call print$buf(.('CONIN:  = $'));
+    call show$physical$devices(val);
+    val = getscbword(conout$disp);
+    call print$buf(.('CONOUT: = $'));
+    call show$physical$devices(val);
+    val = getscbword(auxin$disp);
+    call print$buf(.('AUXIN:  = $'));
+    call show$physical$devices(val);
+    val = getscbword(auxout$disp);
+    call print$buf(.('AUXOUT: = $'));
+    call show$physical$devices(val);
+    val = getscbword(listout$disp);
+    call print$buf(.('LST:    = $'));
+    call show$physical$devices(val);
+    call crlf;
+  end values;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This procedure searches for the string pointed to by 
+   search$string$adr in the local physical device table.
+   The length of the input string is determined by endbuf. */
+
+search$physical$table:
+  procedure (search$string$adr) byte;
+    declare (i,j) byte;
+    declare search$string$adr address;
+    declare string (6) byte;
+    declare loc based search$string$adr (6) byte;
+    if endbuf > 6 then return 0ffh;
+    call fill(.string(0),' ',6);
+    do i=0 to (endbuf-1);
+      string(i)=loc(i);
+    end;
+    i = 0;
+    do while phys$table(i).name(0) <> 0;
+      do j=0 to 5;
+        if string(j) <> phys$table(i).name(j)
+          then goto search$next;
+      end;
+      return i;	/* found; return index */
+      search$next: i=i+1;
+      if i > 15 then return 0ffh;	/* not found */
+    end;
+    return 0ffh;	/* not found, table empty */
+  end search$physical$table;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine processes the physical device options: 'XON','NOXON' 
+and the baud rates. It calls the scanner and processes on the fly */
+
+process$option: procedure (table$index);
+  declare table$index byte;
+  declare soft$baud byte;
+  declare (char,baud) byte;
+  declare val address;
+  char = phys$table(table$index).characteristic;
+  baud = phys$table(table$index).baud;
+  index = 0;
+  delimiter = 1;
+  do while((delimiter <> 2) and (delimiter <> 6));
+    call opt$scanner(.mods(0),.mods$offset(0),.index);
+    if index = 0 then call errors(3);
+    if index = 3 then call errors(3);
+    if index = 1 then	/* Xon */
+      phys$table(table$index).characteristic = char or mb$xon$xoff;
+    if index = 2 then	/* No Xon */
+      phys$table(table$index).characteristic = char and (not mb$xon$xoff);
+    if index > 2 then do;	/* baud rates to be set */
+      index = index - 3;
+      /* set baud rate only if soft$baud set to 1 */
+      soft$baud = shr(char,3);
+      soft$baud = carry;	/* 0ffh = 1, 0 = 0 */
+      if soft$baud = 0 then
+        call errors(4);
+      /* set baud in table and have bios initialize device */
+      phys$table(table$index).baud = index;
+      /* move local phys$device table to actual table in bios */
+      call move(120,.phys$table(0),phys$dev$table$adr);
+      biospb.bcreg = double(table$index);
+      val = direct$bios(dev$init$func);
+    end;
+    else
+      call move(120,.phys$table(0),phys$dev$table$adr);
+  end;
+end process$option;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine converts an ascii number string into a byte number.
+   ie. 32h 35h 35h ==> FFh in one byte. Numbers allowed are 0-255 */
+
+number: procedure (loc,length) byte;
+  declare (loc,val) address;
+  declare (length,i) byte;
+  declare chr based loc byte;
+  if length > 3 then
+    call errors(0);
+  val = 0;
+  do i=1 to length;
+    if (chr < 30h) or (chr > 39h) then
+      call errors(0);
+    val = val * 10 + (chr - 30h);
+    loc = loc + 1;
+  end;
+  if val > 255 then
+    call errors(0);
+  return low(val);
+end number;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine converts a byte into an ascii string of numbers,
+   printing the number to the screen. ie. FFh ==> 255        */
+
+print$byte: procedure (num);
+  declare (hundreds,tens,ones,num) byte;
+  hundreds = num / 100;
+  num = num - (100 * hundreds);
+  tens = num / 10;
+  ones = num - (10 * tens);
+  if hundreds > 0 then
+    call printchar(hundreds + 30h);
+  if (hundreds > 0) or (tens > 0) then
+    call printchar(tens + 30h);
+  call printchar(ones + 30h);
+end print$byte;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This procedure processes the console page setting options.
+   It parses the command options and sets the scb page accordingly.
+   The result of the process is displayed showing the user the
+   number of lines and columns of the console.               */
+
+process$page$options: procedure;
+  declare num byte;
+  delimiter=1;
+  index=0;
+  do while ((delimiter <> 2) and (delimiter <> 6));
+    call opt$scanner(.page$options(0),.page$offsets(0),.index);
+    if index = 0 then	/* bad option */
+      call errors(3);
+    if index = 1 then do;	/* columns */
+      if delimiter <> 3 then	/* '=' */
+        call errors(2);
+      else do;
+        call opt$scanner(.page$options(0),.page$offsets(0),.index);
+        num = number(buf$ptr-endbuf-1,endbuf)-1;
+        call setscbbyte(console$width$offset,num);
+      end;
+    end;
+    if index = 2 then do;	/* lines */
+      if delimiter <> 3 then
+        call errors(2);
+      else do;
+        call opt$scanner(.page$options(0),.page$offsets(0),.index);
+        num = number(buf$ptr-endbuf-1,endbuf)-1;
+        call setscbbyte(console$page$offset,num);
+      end;
+    end;
+  end;
+  con$width = getscbbyte(console$width$offset);
+  con$page = getscbbyte(console$page$offset);
+  call crlf;
+  call print$buf(.('Console width set to $'));
+  call print$byte(con$width+1);
+  call print$buf(.(' columns',cr,lf,'Console page set to $'));
+  call print$byte(con$page+1);
+  call print$buf(.(' lines',cr,lf,'$'));
+  call crlf;
+  call mon1(0,0);
+end process$page$options;
+ 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine produces the display of the assignments to an
+   individual logical device.  The command that invokes this
+   procedure is 'DEVICE <logical device>'.                   */
+
+show$assignments: procedure (index);
+  declare (index,offset) byte;
+  declare val address;
+  offset = log$offsets(index-4);
+  if (offset = 0) or (offset = 3) then do;	/* CON: */
+    call print$buf(.('CONIN:  = $'));
+    val = getscbword(conin$disp);
+    call show$physical$devices(val);
+    call print$buf(.('CONOUT: = $'));
+    val = getscbword(conout$disp);
+    call show$physical$devices(val);
+  end;
+  if (offset = 1) or (offset = 2) then do;	/* AUX: */
+    call print$buf(.('AUXIN:  = $'));
+    val = getscbword(auxin$disp);
+    call show$physical$devices(val);
+    call print$buf(.('AUXOUT: = $'));
+    val = getscbword(auxout$disp);
+    call show$physical$devices(val);
+  end;
+  if offset > 3 then do;	/* all others */
+    do case (offset - 22h);
+      call print$buf(.('CONIN:  = $'));
+      ;
+      call print$buf(.('CONOUT: = $'));
+      ;
+      call print$buf(.('AUXIN:  = $'));
+      ;
+      call print$buf(.('AUXOUT: = $'));
+      ;
+      call print$buf(.('LST:    = $'));
+    end;
+    val = getscbword(offset);
+    call show$physical$devices(val);
+  end;
+  call crlf;
+  call mon1(0,0);
+end show$assignments;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine is called if the first sub-string in the command
+   line was determined to be a logical device.  If an end-of-line
+   is the delimiter, the routine will display the assignments to
+   the specified logical device.  If a '[' is found as the delimiter
+   and the logical device is console, then the option processor to
+   set the console page parameters is called. If the delimiter was
+   an '=' then an assignment of physical devices to the logical
+   device is done.                                              */
+
+found$logical$device: procedure;
+  declare (save$index,offset,eoln,i,val) byte;
+  declare next$delim based buf$ptr byte;
+  save$index = index;	/* save index to logical device */
+  if (delimiter = 0) or (delimiter = 6)
+    then call show$assignments(index);	/* DEVICE <log. dev> */
+  else do;
+    if delimiter = 1 then do;	/* '[' */
+      if (index=4) or (index=5) or (index=6) or (index=11) then
+        call process$page$options;	/* DEVICE CON:[col=45,lines=21] */
+      else
+        call errors(2);
+    end;
+    else if delimiter <> 3 then
+        call errors(2);
+  end;
+  delimiter = 1;	/* do assignment: DEVICE CON:=CRT,CRT1[XON,1200],... */
+  index = 0; 
+  call opt$scanner(.mods(0),.mods$offset(0),.index);
+  offset = log$offsets(save$index - 4);
+  if index = 3 then do;	/* NULL */
+    if (offset < 4) then do;	/* CON: and AUX:*/
+      call errors(10);
+    end;
+    else do;
+        if (offset=conin$disp) then do;
+          call errors(9);
+        end;
+        else do;
+          call setscbword(offset,0);
+        end;
+    end;
+  end;
+  else do;	/* Process physical name */
+    eoln = false;
+    do i = 0 to 15;  	/* clear bit table */
+      device$bit$table(i) = 0;
+    end;
+    do while not eoln;
+      val =  search$physical$table(buf$ptr-endbuf-1);
+      if val = 0ffh then	/* not found */
+         call errors(5);
+      device$bit$table(val) = 1; /* mark bit to be set in log device vector */
+      if delimiter = 1 then
+        call process$option(val);
+      if (delimiter=0) or (delimiter=6) or ((delimiter=2) and (next$delim=0))
+         then eoln = true;
+      if ((delimiter = 2) and (next$delim = ',')) then
+        buf$ptr = buf$ptr + 1;	/* case where 2 delimiters: '],' */
+      if not eoln then
+        call opt$scanner(.mods(0),.mods$offset(0),.index);
+    end;
+    if (offset = 0) or (offset = 3) then do;	/* CON: */
+      if ((phys$table(val).characteristic and mb$in$out)=mb$in$out) then do;
+        call make$assignments(conin$disp);
+        call make$assignments(conout$disp);
+      end;
+      else call errors(8);
+    end;
+    else do;
+      if ((offset=1) or (offset=2)) then do;	/* AUX: */
+        if ((phys$table(val).characteristic and mb$in$out)=mb$in$out) then do;
+          call make$assignments(auxin$disp);
+          call make$assignments(auxout$disp);
+        end;
+        else call errors(8);
+      end;
+      else do;
+        if ((offset=conin$disp) or (offset=auxin$disp)) then do;
+          if ((phys$table(val).characteristic and mb$input)<> mb$input)
+            then call errors(6);
+          else call make$assignments(offset);	/* CONIN: OR AUXIN: */
+        end;
+        else do;
+          if ((phys$table(val).characteristic and mb$output)<> mb$output)
+            then call errors(7);
+          else call make$assignments(offset);	/* CONOUT: OR AUXOUT: OR LSTOUT: */
+        end;
+      end;
+    end;
+  end;
+end found$logical$device;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
+
+/* This routine produces the display invoked by the command
+   string: 'DEVICE <physical device>'.  It prints the characteristics
+   of the device as found in the physical device table */
+
+show$characteristics: procedure (index);
+  declare (index,char,baud,j,i) byte;
+  char = phys$table(index).characteristic;
+  baud = phys$table(index).baud;
+  call crlf;
+  call print$buf(.('Physical Device:  $'));
+  call print$phys$device(index);
+  call crlf;
+  call print$buf(.('Baud Rate:        $'));
+  call print$baud$rate(index);
+  call crlf;
+  call print$buf(.('Characteristics:  $'));
+  do i=0 to 4;
+    char = shr(char,1);
+    if carry = 0ffh then do;
+      call print$buf(.char$table(i));
+      call crlf;
+      do j=0 to 17;
+        call printchar(' ');
+      end;
+    end;
+    else do;
+      if i = 3 then do;
+        call print$buf(.('PARALLEL$'));
+        call crlf;
+        do j=0 to 17;
+          call printchar(' ');
+        end;
+      end;
+    end;
+  end;
+  call mon1(0,0);
+end show$characteristics;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine is called whenever a presummed physical device
+   is found as the first entry by the parser.  It looks up the
+   string in the physical device table to validate it.  If the
+   device has options, it calls process option to set the baud & protocol */
+
+found$physical$device: procedure (string$adr);
+  declare (eoln,index) byte;
+  declare string$adr address;
+  if (delimiter=0) or (delimiter=6) then 
+    eoln = true;
+  else
+    eoln = false;
+  index = search$physical$table(string$adr);
+  if index = 0ffh then
+    call errors(5);
+  if eoln then		/* DEVICE <phys.dev> */
+    call show$characteristics(index);
+  if delimiter = 1 then
+    call process$option(index);
+  else
+    call errors(2);
+end found$physical$device;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* This routine determines which of the sub-routines should
+   continue with the parsing and eventual execution of the 
+   command string.  In the event that the commands were 'NAMES',
+   'VALUES', no further parsing is needed and the routines
+   are called directly to produce the desired displays.      */
+
+parser: procedure;
+  declare (t,char,i) byte;
+  declare eoln byte;
+  declare phys$dev byte;
+  declare log$dev byte;
+  delimiter = 1;
+  index = 0;
+  if tbuff(0) = 0 then 
+    begin$buffer,buf$ptr = .memory(2);
+  else do;
+    buf$ptr = .tbuff(2);
+    begin$buffer = .tbuff(1);
+    buf$length = tbuff(0);
+  end;
+  call opt$scanner(.options(0),.options$offset(0),.index);
+  if (delimiter=0) or (delimiter=2) or (delimiter=6) then
+    eoln = true;
+  else
+    eoln = false;
+  if (index = 0) or (index = 3) then do; /* HELP is now a valid phys device */
+    call found$physical$device(buf$ptr-endbuf-1);
+    call names;		/* show results */
+    call values;
+  end;
+  else do;
+    if index = 1 then do;	/* names */
+      if eoln then
+        call names;
+      else 
+        call errors(1);
+    end;
+    else do;
+      if index = 2 then do;	/* values */
+        if eoln then
+          call values;
+        else
+          call errors(1);
+      end;
+      else do;
+        call found$logical$device;
+        call names;		/* show results */
+        call values;
+      end;
+    end;
+  end;
+end parser;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+input$found: procedure (buffer$adr) byte;
+  declare buffer$adr address;
+  declare char based buffer$adr byte;
+  do while (char = ' ') or (char = 9); /* tabs & spaces */
+    buffer$adr = buffer$adr + 1;
+  end;
+  if char = 0 then	/* eoln */
+    return false;	/* input not found */
+  else
+    return true;	/* input found */
+end input$found;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ 
+
+    
+/**************************************
+*                                     *
+*       M A I N   P R O G R A M       *
+*                                     *
+**************************************/
+
+plm:
+  do;
+    if (low(version) < cpmversion) or (high(version) = 1) then do;
+      call print$buf(.('Requires CP/M 3.0$'));
+      call mon1(0,0);
+    end;
+    phys$dev$table$adr = direct$bios(dev$table$adr$func); 
+    if (tbuff(0) <> 0) and (phys$dev$table$adr = 0) then do;
+      buf$ptr = .tbuff(1);
+      call opt$scanner(.options(0),.options$offset(0),.index);
+      if ((index = 4) or (index = 11)) and (delimiter = 1) then do;
+        call parser;
+        call mon1(0,0);
+      end;
+    end;
+    if (phys$dev$table$adr = 0) then do;
+      call print$buf(.('Device Reassignment Not Supported$'));
+      call mon1(0,0);
+    end;
+    con$width = getscbbyte(console$width$offset);
+    con$page = getscbbyte(console$page$offset);
+    call move(120,phys$dev$table$adr,.phys$table(0));
+    if not input$found(.tbuff(1)) then do;
+      /* display names & values and prompt for the assignment */
+      call names;
+      call values;
+      call print$buf(.('Enter new assignment or hit RETURN $'));
+      /* can not use default dma; not always enough room for input */
+      call crlf;
+      no$chars = read$console$buf(.memory(0),255);
+      call crlf;
+      memory(1) = ' '; 	/* blank out nc field */
+      memory(no$chars+2) = 0;	/* mark eoln */
+      if not input$found(.memory(1)) then	/* no input, quit */
+        call mon1(0,0);
+      do i=1 to no$chars;	/* convert input to caps */
+        memory(i+1) = ucase(memory(i+1));
+      end;
+      buf$length = no$chars;
+    end;
+  call parser;
+  call mon1(0,0);
+  end;
+end device;
+

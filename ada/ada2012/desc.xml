@@ -3,10 +3,10 @@
    <antlr-version>^4.10</antlr-version>
    <targets>Antlr4ng;CSharp;Cpp;Dart;Go;Java;JavaScript;Python3;TypeScript</targets>
    <test>
-      <inputs>examples/*.adb</inputs>
+      <inputs>examples/acats/a/**/*.ada</inputs>
    </test>
    <test>
-      <inputs>examples/acats/a/**/*.ada</inputs>
+      <inputs>examples/*.adb</inputs>
    </test>
    <test>
       <inputs>examples/semtest/main.adb</inputs>

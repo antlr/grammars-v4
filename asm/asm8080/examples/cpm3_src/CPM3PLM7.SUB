@@ -1,0 +1,62 @@
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax main.plm $$stran
+vax timest.plm $$stran
+vax dpb80.plm $$stran
+vax disp.plm $$stran
+vax main80.plm $$stran
+vax scan.plm $$stran
+vax util.plm $$stran
+vax search.plm $$stran
+vax sort.plm $$stran
+vax mon.plm $$stran
+vax copyrt.lit $$stran
+vax comlit.lit $$stran
+vax finfo.lit $$stran
+vax vers.lit $$stran
+vax format.lit $$stran
+vax xfcb.lit $$stran
+vax dpb.lit $$stran
+vax scan.lit $$stran
+vax fcb.lit $$stran
+vax search.lit $$starn
+stat con:=uc1:
+seteof main.plm
+seteof timest.plm
+seteof dpb80.plm
+seteof disp.plm
+seteof main80.plm
+seteof scan.plm
+seteof util.plm
+seteof search.plm
+seteof sort.plm
+seteof mon.plm
+seteof copyrt.lit
+seteof comlit.lit
+seteof finfo.lit
+seteof vers.lit
+seteof format.lit
+seteof xfcb.lit
+seteof dpb.lit
+seteof scan.lit
+seteof fcb.lit
+seteof search.lit
+is14
+plm80 main80.plm debug pagewidth(130) optimize object(main80) 
+plm80 scan.plm debug pagewidth(130) optimize object(scan)
+plm80 search.plm debug pagewidth(130) optimize object(search)
+plm80 sort.plm debug pagewidth(130) optimize object(sort)
+plm80 disp.plm debug pagewidth(130) optimize object(disp) 
+plm80 dpb80.plm debug pagewidth(130) optimize object(dpb80)
+plm80 util.plm debug pagewidth(130) optimize object(util)
+plm80 timest.plm debug pagewidth(130) optimize object(timest)
+link mcd80a.obj,main80,scan,search,sort,disp,util,dpb80,timest,plm80.lib to dir.lnk
+locate dir.lnk code(0100H) stacksize(50)
+era dir.lnk
+cpm
+zero
+objcpm dir
+;
+; next one
+sub cpm3plm8
+

@@ -1,0 +1,103 @@
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax gencpm.plm $$stran
+vax datmod.asm $$stran
+vax getdef.plm $$stran
+vax setbuf.plm $$stran
+vax crdef.plm $$stran
+vax ldrlwr.asm $$stran
+vax $$as\sd mason.cpm30.listing\ar
+stat con:=uc1:
+seteof gencpm.plm
+seteof datmod.asm
+seteof getdef.plm
+seteof setbuf.plm
+seteof crdef.plm
+seteof ldrlwr.asm
+is14
+plm80 gencpm.plm debug optimize
+plm80 getdef.plm debug optimize
+plm80 setbuf.plm debug optimize
+plm80 crdef.plm debug optimize
+asm80 datmod.asm debug
+asm80 ldrlwr.asm debug
+asm80 mcd80f.asm
+link mcd80f.obj,gencpm.obj,setbuf.obj,getdef.obj,crdef.obj,ldrlwr.obj,datmod.obj,plm80.lib to gencpm.mod
+locate gencpm.mod code(0100H) stacksize(100)
+era gencpm.mod
+cpm
+zero
+objcpm gencpm
+stat con:=tty:
+vax gencpm.lst $$stran
+vax datmod.lst $$stran
+vax getdef.lst $$stran
+vax setbuf.lst $$stran
+vax crdef.lst $$stran
+vax ldrlwr.lst $$stran
+vax gencpm.sym $$stran
+vax gencpm.lin $$stran
+stat con:=uc1:
+era gencpm
+era gencpm.obj
+era setbuf.obj
+era getdef.obj
+era crdef.obj
+era ldrlwr.obj
+era datmod.obj
+era *.lst
+era *.sym
+era *.lin
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax help.plm $$stran
+seteof help.plm
+is14
+plm80 help.plm debug optimize
+link mcd80a.obj,help.obj,plm80.lib to help.mod
+locate help.mod code(0100H) stacksize(100)
+era help.mod
+cpm
+zero
+objcpm help
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax help.lst $$stran
+vax help.sym $$stran
+vax help.lin $$stran
+stat con:=uc1:
+era help
+era help.obj
+era *.lst
+era *.sym
+era *.lin
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax pip.plm $$stran
+vax inpout.asm $$stran
+stat con:=uc1:
+seteof pip.plm
+seteof inpout.asm
+is14
+asm80 inpout.asm debug
+plm80 pip.plm debug optimize
+link mcd80f.obj,inpout.obj,pip.obj,plm80.lib to pip.mod
+locate pip.mod code(0100H) stacksize(100)
+era pip.mod
+cpm
+zero
+objcpm pip
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax pip.lst $$stran
+vax inpout.lst $$stran
+vax pip.sym $$stran
+vax pip.lin $$stran
+stat con:=uc1:
+era pip.obj
+era inpout.obj
+era *.lst
+era *.sym
+era *.lin
+SUB CPM3PLM2
+

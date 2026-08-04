@@ -1,0 +1,677 @@
+$title ('SDIR - Display Files')
+display:
+do;
+                 /*  Display Module for SDIR */
+
+$include(comlit.lit)
+
+$include(mon.plm)
+
+dcl debug boolean external;
+dcl (cur$drv, cur$usr) byte external;
+
+dcl (os,bdos) byte external;
+$include(vers.lit)
+
+dcl used$de address external;        /* number of used directory entries */
+dcl date$opt boolean external;	    /* date option flag */	
+dcl display$attributes boolean external;	/* attributes display flag */
+dcl sorted boolean external;
+dcl filesfound address external;
+dcl no$page$mode byte external;
+dcl sfcbs$present byte external;    /*  sfcb's there/not there indicator  */
+
+$include (search.lit)
+dcl find find$structure external;
+
+dcl format byte external,       /* format is one of the following */
+    page$len address external,  /* page size before printing new headers */
+    message boolean external,   /* print titles and msg when no file found */
+    formfeeds boolean external; /* use form feeds to separate headers */
+
+$include(format.lit)
+
+dcl file$displayed boolean public initial (false);
+              /* true if we ever display a file, from any drive or user */
+              /* used by main.plm for file not found message            */
+
+dcl dir$label byte external;
+
+$include(fcb.lit)
+$include(xfcb.lit)
+
+dcl
+        buf$fcb$adr address external,       /* index into directory buffer  */
+        buf$fcb based buf$fcb$adr (32) byte,
+                                            /* fcb template for dir         */
+
+        (f$i$adr,last$f$i$adr,first$f$i$adr) address external,
+        cur$file address;                   /* number of file currently     */
+                                            /* being displayed              */
+
+$include(finfo.lit)
+                                            /* structure of file info       */ 
+dcl     file$info based f$i$adr f$info$structure;
+
+dcl     x$i$adr address external,
+        xfcb$info based x$i$adr x$info$structure;
+
+dcl     f$i$indices$base address external,  /* if sorted then f$i$indices   */
+        f$i$indices based f$i$indices$base (1) address; /* are here         */
+
+
+/* -------- Routines in util.plm -------- */
+
+printchar: procedure (char) external;
+    dcl char byte;
+end printchar;
+
+print: procedure (string$adr) external;      /* BDOS call # 9               */
+    dcl string$adr address;
+end print;
+
+printb: procedure external;
+end printb;
+
+crlf: procedure external;
+end crlf;
+
+printfn: procedure(fname$adr) external;
+    dcl fname$adr address;
+end printfn;
+
+pdecimal: procedure(v,prec,zerosup) external;
+                       /* print value val, field size = (log10 prec) + 1  */
+                       /* with leading zero suppression if zerosup = true */
+    declare v address,                           /* value to print        */
+            prec address,                        /* precision             */
+            zerosup boolean;                     /* zero suppression flag */
+end pdecimal;
+
+p3byte: procedure(byte3adr,prec)external;
+                                /* print 3 byte value with 0 suppression */
+      dcl (byte3adr,prec) address; /* assume high order bit is < 10         */
+end p3byte;
+
+add3byte: procedure (byte3$adr,word$amt) external;
+    dcl (byte3$adr, word$amt) address;
+end add3byte;            /* add word to 3 byte structure */
+
+add3byte3: procedure (byte3$adr,byte3) external;
+    dcl (byte3$adr, byte3) address;
+end add3byte3;            /* add 3 byte quantity to 3 byte total */
+
+shr3byte: procedure (byte3$adr) external;
+    dcl byte3$adr address;
+end shr3byte;
+
+
+/* -------- Routines in search.plm -------- */
+
+search$first: procedure(fcb$adr) byte external;
+    dcl fcb$adr address;
+end search$first;
+
+search$next: procedure byte external;
+end search$next;
+
+break: procedure external;
+end break;
+
+match: procedure boolean external;
+    dcl fcb$adr address;
+end match;
+
+
+/* -------- Other external routines -------- */
+
+display$time$stamp: procedure (ts$adr) external;     /* in dts.plm */
+    dcl ts$adr address;
+end display$time$stamp;
+
+terminate: procedure external;                       /* in main.plm */
+end terminate;
+
+mult23: procedure(index) address external;           /* in sort.plm */
+    dcl index address;
+end mult23;
+
+
+/* -------- From dpb86.plm or dpb80.plm -------- */
+
+$include(dpb.lit)
+
+dpb$byte: procedure (dpb$index) byte external;
+    dcl dpb$index byte;
+end dpb$byte;
+
+dpb$word: procedure (dpb$index) address external;
+    dcl dpb$index byte;
+end dpb$word;
+
+
+/* -------- routines and data structures local to this module -------- */
+
+direct$console$io: procedure byte;
+  return mon2(6,0ffh);	/* ff to stay downward compatable */
+end direct$console$io;
+
+dcl first$time address initial (0);
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+wait$keypress: procedure;
+  declare char byte;
+/*  if debug then
+call print(.(cr,lf,'In wait*keypress...',cr,lf,'$'));
+*/
+  char = direct$console$io;
+  do while char = 0;
+    char = direct$console$io;
+  end;
+  if char = ctrlc then
+    call terminate;
+end wait$keypress;
+
+declare global$line$count byte initial(1);
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+ 
+crlf$and$check: procedure;
+/*
+     if debug then
+call print(.(cr,lf,'In crlf*and*check...',cr,lf,'$'));
+*/
+     if no$page$mode = 0 then do;
+        if global$line$count > page$len-1 then do;
+           call print(.(cr,lf,'Press RETURN to Continue $'));
+           cur$line = cur$line + 1;
+           call wait$keypress;
+           global$line$count = 0;
+        end; /* global$line$count > page$len */
+     end; /* no$page$mode = 0 */
+  call crlf;
+  global$line$count = global$line$count + 1;
+end crlf$and$check;
+
+dcl     total$kbytes structure (    /* grand total k bytes of files matched */
+          lword address,
+          hbyte byte),
+        total$recs structure (      /* grand total records of files matched */
+          lword address,
+          hbyte byte),
+        total$1k$blocks structure(  /* how many 1k blocks are allocated     */
+          lword address,
+          hbyte byte);
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+ 
+add$totals: procedure;
+
+/*
+    if debug then
+call print(.(cr,lf,'In add*totals...',cr,lf,'$'));
+*/
+    call add3byte(.total$kbytes,file$info.kbytes);
+    call add3byte3(.total$recs,.file$info.recs$lword); /* records in file */
+    call add3byte(.total$1k$blocks,file$info.onekblocks);
+    
+end add$totals;
+
+dcl files$per$line byte;
+dcl cur$line address;
+
+dcl hdr (*) byte data      ('    Name     Bytes   Recs   Attributes $');
+dcl hdr$bars (*) byte data ('------------ ------ ------ ------------$');
+dcl hdr$pu (*) byte data        ('  Prot      Update    $');
+dcl hdr$xfcb$bars (*) byte data (' ------ --------------  --------------$');
+dcl hdr$access (*) byte data                          ('      Access    $');
+dcl hdr$create (*) byte data                          ('      Create    $');
+                                   /* example date        04/02/55 00:34  */
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+display$file$info: procedure;
+                                                    /* print filename.typ   */
+/*
+if debug then
+call print(.(cr,lf,'In display*file*info...',cr,lf,'$'));
+*/
+    call printfn(.file$info.name(0));
+    call printb;
+    call pdecimal(file$info.kbytes,10000,true);
+    call printchar('k');                           /* up to 32 Meg - Bytes  */
+                                                   /* or 32,000k            */
+    call printb;
+    call p3byte(.file$info.recs$lword,1);          /* records               */
+    call printb;
+    if rol(file$info.name(f$dirsys-1),1) then      /* Type                  */
+       call print(.('Sys$'));
+    else call print(.('Dir$'));
+    call printb;
+    if rol(file$info.name(f$rw-1),1) then
+        call print(.('RO$'));
+    else call print(.('RW$'));
+    call printb;
+    if not display$attributes then do;
+      if rol(file$info.name(f$arc-1),1) then
+        call print(.('Arcv $'));
+      else 
+        call print(.('     $'));
+    end;
+    else do;
+      if  rol(file$info.name(f$arc-1),1) then       /* arc bit was on in all */
+          call print$char('A');                     /* dir entries           */
+      else call printb;
+      if rol(file$info.name(0),1) then
+          call print$char('1');
+      else call printb;
+      if rol(file$info.name(1),1) then
+          call print$char('2');
+      else call printb;
+      if rol(file$info.name(2),1) then
+          call print$char('3');
+      else call printb;
+      if rol(file$info.name(3),1) then
+          call print$char('4');
+      else call printb;
+    end;
+end display$file$info;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+display$xfcb$info: procedure;
+/*
+if debug then
+call print(.(cr,lf,'In display*xfcb*info...',cr,lf,'$'));
+*/
+        if file$info.x$i$adr <> 0 then
+        do;
+            call printb;
+            x$i$adr = file$info.x$i$adr;
+            if (xfcb$info.passmode and pm$read) <> 0 then
+                call print(.('Read  $'));
+            else if (xfcb$info.passmode and pm$write) <> 0 then
+                call print(.('Write $'));
+            else if (xfcb$info.passmode and pm$delete) <> 0 then
+                call print(.('Delete$'));
+            else
+                call print(.('None  $'));
+            call printb;
+            if (xfcb$info.update(0) <> 0 or xfcb$info.update(1) <> 0) then
+                call display$timestamp(.xfcb$info.update);
+            else call print(.('              $'));
+                call printb; call printb;
+            if (xfcb$info.create(0) <> 0 or xfcb$info.create(1) <> 0) then
+                 call display$timestamp(.xfcb$info.create(0));
+                                                /* Create/Access */
+        end;
+end display$xfcb$info;
+
+dcl first$title boolean initial (true);
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+display$title: procedure;
+/*
+if debug then
+call print(.(cr,lf,'In display*title...',cr,lf,'$'));
+*/
+    if formfeeds then
+        call print$char(ff);
+    else if not first$title then
+        call crlf$and$check;
+    call print(.('Directory For Drive $'));
+    call printchar('A'+ cur$drv); call printchar(':');
+    if bdos >= bdos20 then 
+    do;
+        call print(.('  User $'));
+        call pdecimal(cur$usr,10,true);
+    end;
+    call crlf$and$check;
+    cur$line = 2;
+    first$title = false;
+end display$title;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+short$display: procedure (fname$adr);
+    dcl fname$adr address;
+/*
+if debug then
+call print(.(cr,lf,'In short*display...',cr,lf,'$'));
+*/
+    if cur$file mod files$per$line = 0 then
+        do;
+            if cur$line mod page$len = 0  and first$time = 0 then
+            do; 
+                call crlf$and$check;
+                call display$title;
+                call crlf$and$check;
+            end;
+            else
+                call crlf$and$check;
+            cur$line = cur$line + 1;
+            call printchar(cur$drv + 'A');
+        end;
+    else call printb;
+    call print(.(': $'));
+    call printfn(fname$adr);
+    call break;
+    cur$file = cur$file + 1;
+    first$time = first$time + 1;
+end short$display;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+test$att: procedure(char,off,on) boolean;
+    dcl (char,off,on) byte;
+/*
+if debug then
+call print(.(cr,lf,'In test*att...',cr,lf,'$'));
+*/
+    if (80h and char) <> 80h and off then
+        return(true);
+    if (80h and char) = 80h and on then
+        return(true);
+    return(false);
+end test$att;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+right$attributes: procedure(name$adr) boolean;
+    dcl name$adr address,
+        name based name$adr (1) byte;
+    return 
+        test$att(name(f$rw-1),find.rw,find.ro) and
+        test$att(name(f$dirsys-1),find.dir,find.sys);
+end right$attributes;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+short$dir: procedure;             /* looks like "DIR" command */
+    dcl dcnt byte;
+/*
+if debug then
+call print(.(cr,lf,'In short*dir...',cr,lf,'$'));
+*/
+    fcb(f$drvusr) = '?';
+    files$per$line = 4;
+    dcnt = search$first(.fcb);
+    do while dcnt <> 0ffh;
+        buf$fcb$adr = shl(dcnt and 11b,5)+.buff;    /* dcnt mod 4 * 32      */
+        if (buf$fcb(f$drvusr) and 0f0h) = 0 and
+            buf$fcb(f$ex) = 0 and
+            buf$fcb(f$ex)<= dpb$byte(extmsk$b) then /* no dir labels, xfcbs */
+            if match then
+                if right$attributes(.buf$fcb(f$name)) then
+                    call short$display(.buf$fcb(f$name));
+        dcnt = search$next;
+    end;
+end short$dir;
+
+dcl (last$plus$one,index) address;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+getnxt$file$info: procedure;     /* set f$i$adr to base file$info on file    */
+dcl right$usr boolean;           /* to be displayed, f$i$adr = 0ffffh if end */
+/*
+if debug then
+call print(.(cr,lf,'In getnxt*file*info...',cr,lf,'$'));
+*/
+    right$usr = false;
+    if sorted then
+    do; index = index + 1;
+        f$i$adr = mult23(f$i$indices(index));
+        do while file$info.usr <> cur$usr and index <> filesfound;
+           index = index + 1;
+           f$i$adr = mult23(f$i$indices(index));
+        end;
+        if index = files$found then
+           f$i$adr = last$plus$one;               /* no more files */
+    end;
+    else /* not sorted display in order found in directory */
+    do;  /* use last$plus$one to avoid wrap around problems */
+        f$i$adr = f$i$adr + size(file$info);
+        do while file$info.usr <> cur$usr and f$i$adr <> last$plus$one;
+            f$i$adr = f$i$adr + size(file$info);
+        end;
+    end;
+end getnxt$file$info;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+size$display: procedure;
+/*
+if debug then
+call print(.(cr,lf,'In size*display...',cr,lf,'$'));
+*/
+    if (format and form$size) <> 0 then
+        files$per$line = 3;
+    else files$per$line = 4;
+    do while f$i$adr <> last$plus$one;
+    if ((file$info.x$i$adr <> 0 and find.xfcb) or
+        file$info.x$i$adr  = 0 and find.nonxfcb) and
+        right$attributes(.file$info.name(0)) then 
+        do;
+            call add$totals;
+            call short$display(.file$info.name(0));
+            call pdecimal(file$info.kbytes,10000,true);
+            call print(.('k$'));
+        end;
+        call getnxt$file$info;
+    end;
+end size$display;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+display$no$dirlabel: procedure;
+/*
+if debug then
+call print(.(cr,lf,'In display*no*dirlabel...',cr,lf,'$'));
+*/
+    files$per$line = 2;
+    first$time = 0;
+    do while (f$i$adr <> last$plus$one);
+
+     if ((file$info.x$i$adr <> 0 and find.xfcb) or
+         (file$info.x$i$adr  = 0 and find.nonxfcb)) and
+         right$attributes(.file$info.name(0)) then
+     do;
+
+      if ((cur$file mod files$per$line) = 0) then  /* need new line */
+      do;
+
+           if ((cur$line mod page$len) = 0) then
+           do; 
+
+             if ((no$page$mode = 0) or (first$time = 0)) then do;
+               call crlf$and$check;
+               call display$title;
+               call crlf$and$check;
+               call print(.hdr);
+               call printb;                    /* two sets of hdrs  */
+               call print(.hdr);
+               call crlf$and$check;
+               call print(.hdr$bars);
+               call printb;
+               call print(.hdr$bars);
+               call crlf$and$check;
+               cur$line = cur$line + 4;
+               first$time = first$time+1;
+             end;  
+             else do;
+               call crlf$and$check;
+               cur$line = cur$line + 1;
+             end;  /* no$page$mode check */
+
+           end;  
+           else
+           do; call crlf$and$check;
+              cur$line = cur$line + 1;
+           end; 
+
+         end;  
+      else
+        call printb;                           /* separate the files        */
+
+      call display$file$info;
+      cur$file = cur$file + 1;
+      call add$totals;
+      call break;
+     end; 
+     call getnxt$file$info;
+    end;
+    
+end display$no$dirlabel;
+
+/*- - - - - - - - - - - - - - - - - - - - - - -*/
+
+display$with$dirlabel: procedure;
+/*
+if debug then
+call print(.(cr,lf,'In display*with*dirlabel...',cr,lf,'$'));
+*/
+    files$per$line = 1;
+    first$time = 0;
+    do while (f$i$adr <> last$plus$one);
+
+      if ((file$info.x$i$adr <> 0 and find.xfcb) or
+         (file$info.x$i$adr  = 0 and find.nonxfcb)) and
+         right$attributes(.file$info.name(0)) then 
+      do;
+
+        if cur$line mod page$len = 0 then
+        do; 
+
+            if ((no$page$mode = 0) or (first$time = 0)) then do;
+
+               call crlf$and$check;
+               call display$title; 
+               call crlf$and$check;
+               call print(.hdr);
+               call print(.hdr$pu);
+               if (dirlabel and dl$access) <> 0 then
+                   call print(.hdr$access);
+               else
+                   call print(.hdr$create);
+               call crlf$and$check;
+               call print(.hdr$bars);
+               call print(.hdr$xfcb$bars);
+               call crlf$and$check;
+               cur$line = cur$line + 4;
+               first$time = first$time + 1;
+            end; /* no$page$mode check */
+
+        end;
+
+        call crlf$and$check;
+        cur$line = cur$line + 1;
+        call display$file$info;        /* display non bdos 3.0 file info    */
+        call display$xfcb$info;
+        cur$file = cur$file + 1;
+        call break;
+        call add$totals;
+      end;
+      call getnxt$file$info;
+    end;
+end display$with$dirlabel;
+
+
+/*- - - - -MAIN ENTRY POINT - - - - - - - - - -*/
+
+
+display$files: procedure public; /* MODULE ENTRY POINT         */
+                                 /* display the collected data */
+/*
+if debug then
+call print(.(cr,lf,'In main display routine...',cr,lf,'$'));
+*/
+    cur$line, cur$file = 0;      /* force titles and new line  */
+    totalkbytes.lword, totalkbytes.hbyte, totalrecs.lword, totalrecs.hbyte =0;
+    total$1k$blocks.lword, total$1k$blocks.hbyte = 0;
+    f$i$adr = first$f$i$adr - size(file$info);        /* initial if no sort */
+    last$plus$one = last$f$i$adr + size(file$info);
+    index = 0ffffh;              /* initial if sorted          */
+    call getnxt$file$info;       /* base file info record      */
+
+    if format > 2 then
+    do;
+        call print(.('ERROR: Illegal Format Value.',cr,lf,'$'));
+        call terminate;          /* default could be patched - watch it */
+    end;
+
+    do case format;              /* format = */   
+        call short$dir;                       /* form$short          */
+        call size$display;                    /* form$size           */
+                                              /* form = full         */
+        if date$opt then do;
+          if ((( dir$label and dl$exists) <> 0 ) and
+          ((( dir$label and dl$access) <> 0 ) or
+          (( dir$label and dl$update) <> 0 ) or
+          (( dir$label and dl$makexfcb) <> 0 )) and (sfcbs$present)) then
+            call display$with$dirlabel;	/* Timestamping is active! */
+          else do;
+            call print(.('ERROR: Date and Time Stamping Inactive.',cr,lf,'$'));
+            call terminate;
+          end;
+        end;
+        else do;	/* No date option; Regular Full display */
+          if (((dir$label and dl$exists) <> 0) and (sfcbs$present)) then 
+          do;
+            call display$with$dirlabel; 
+          end;
+          else 
+          do;
+            call display$no$dirlabel; 
+          end;
+        end;
+    end;  /* end of case */
+    if format <> form$short and cur$file > 0 then    /* print totals */
+    do;
+        if cur$line + 4 > page$len and formfeeds then
+        do;
+            call printchar(cr);
+            call printchar(ff);                 /* need a new page ? */
+        end;
+        else
+        do;
+            call crlf$and$check;
+            call crlf$and$check;
+        end;
+        call print(.(      'Total Bytes     = $'));
+        call p3byte(.total$kbytes,1);         /* 6 digit max */
+        call printchar('k');
+        call print(.('  Total Records = $'));
+        call p3byte(.total$recs,10);      /* 7 digit max */
+        call print(.('  Files Found = $'));
+        call pdecimal(cur$file,1000,true);    /* 4 digit max */
+        call print(.(cr,lf,'Total 1k Blocks = $'));
+        call p3byte(.total$1k$blocks,1);           /* 6 digit max */
+        call print(.('   Used/Max Dir Entries For Drive $'));
+        call print$char('A' + cur$drv);
+        call print$char(':'); call printb;
+        call pdecimal(used$de,1000,true);
+        call print$char('/');
+        call pdecimal(dpb$word(dirmax$w) + 1,1000,true);
+    end;
+
+    if cur$file = 0 then
+    do;
+        if message then
+        do; call crlf$and$check;
+            call display$title;
+            call print(.('No File',cr,lf,'$'));
+        end;
+        call break;
+    end;
+    else do;
+      file$displayed = true;
+      if not formfeeds then
+        call crlf$and$check;
+    end;
+
+end display$files;
+
+end display;
