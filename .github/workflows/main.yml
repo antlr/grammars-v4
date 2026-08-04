@@ -70,7 +70,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v5.6.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -81,14 +81,14 @@ jobs:
         javac --version
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
+      uses: dart-lang/setup-dart@v1.7.2
     - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: '^1.21.0'
         cache: false
@@ -97,7 +97,7 @@ jobs:
       run: |
         go version
     - name: Install Python
-      uses: actions/setup-python@v6.3.0
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -114,7 +114,7 @@ jobs:
          pip install _scripts/antlr4-tools
          pip show antlr4-tools
     - name: Install JavaScript
-      uses: actions/setup-node@v6.4.0
+      uses: actions/setup-node@v7.0.0
       with:
         node-version: '22.12.0'
     - name: Test JavaScript
@@ -217,7 +217,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v5.6.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -227,7 +227,7 @@ jobs:
         java --version
         javac --version
     - name: Install Python
-      uses: actions/setup-python@v6.3.0
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.10'
     - name: Test Python
@@ -276,7 +276,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v5.6.0
       with:
         distribution: 'zulu'
         java-version: '17'

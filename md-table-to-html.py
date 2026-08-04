@@ -47,7 +47,8 @@ STATIC_HEAD = """\
 <tr><td style="text-align:left"><code>TPS</code></td><td style="text-align:left"><strong>Tokens per second</strong> \u2014 <code>total tokens / PT</code>; pure parse throughput across all files</td></tr>
 <tr><td style="text-align:left"><code>Post-warmup TPS</code></td><td style="text-align:left">TPS computed from files 2\u2026N only, excluding the first (warm-up) run; <code>n.a.</code> if only one file was parsed</td></tr>
 <tr><td style="text-align:left"><code>Post-warmup Speed Up</code></td><td style="text-align:left">Ratio of Post-warmup TPS to first-file TPS, showing the JIT/runtime warm-up benefit; <code>n.a.</code> if only one file was parsed</td></tr>
-<tr><td style="text-align:left"><code>Total Ambiguities</code></td><td style="text-align:left">Total number of ANTLR ambiguity reports fired across all input files during parsing</td></tr>
+<tr><td style="text-align:left"><code>Ambiguities</code></td><td style="text-align:left">Total number of ANTLR ambiguity reports fired across all input files during parsing</td></tr>
+<tr><td style="text-align:left"><code>Actions</code></td><td style="text-align:left">Total number of action code blocks across all <code>.g4</code> files in the grammar</td></tr>
 </tbody>
 </table>
 <h3>Results</h3>
@@ -60,7 +61,7 @@ STATIC_HEAD = """\
 STATIC_SCRIPT = """\
 <script>
 (function() {
-  const NUM = [false,true,true,true,true,true,true,true];
+  const NUM = [false,true,true,true,true,true,true,true,true];
   let col = -1, dir = 1;
   function parseVal(s, num) {
     s = s.trim();

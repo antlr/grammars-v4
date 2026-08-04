@@ -63,7 +63,7 @@ compute_stats() {
         }
     }
     END {
-        if (count == 0) { print "n.a. ± n.a."; exit }
+        if (count == 0) { print "n.a."; exit }
         mean = sum / count
         if (count == 1) { printf "%.4g ± n.a.\n", mean; exit }
         ss = 0
@@ -456,8 +456,12 @@ do
         tps_stat=$(     compute_stats "${run_tps[@]}")
         warm_tps_stat=$(compute_stats "${run_warm_tps[@]}")
         speedup_stat=$( compute_stats "${run_speedup[@]}")
-        ambig_stat=$(   compute_stats "${run_ambig[@]}")
-        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambig_stat} |")
+        ambig_stat=$(   compute_stats "${run_ambig[@]}" | sed 's/ ± 0$//')
+
+	action_count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(element | lexerElement)/actionBlock' | dotnet trash text -c | sed 's/^[^:]*://'`
+	action_sum=$(printf '%s\n' $action_count | awk '{s+=$1} END {print s+0}')
+
+        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambig_stat} | ${action_sum} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -468,8 +472,8 @@ if [ ${#table_rows[@]} -gt 0 ]; then
     echo ""
     echo "## Performance Summary (N=${N} runs, mean ± SEM)"
     echo ""
-    echo "| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up | Total Ambiguities |"
-    echo "|---------|--------|--------|--------|-----|-----------------|----------------------|-------------------|"
+    echo "| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up | Ambiguities | Actions |"
+    echo "|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
     for row in "${table_rows[@]}"; do
         echo "$row"
     done
