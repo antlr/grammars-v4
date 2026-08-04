@@ -120,7 +120,7 @@ axis
     ;
 
 axisStep
-    : (abbreviatedStep | fullStep) (predicate | lookup)*
+    : (abbreviatedStep | fullStep) predicate*
     ;
 
 bracedAction
