@@ -1297,7 +1297,7 @@ unionExpr
     ;
 
 unionNodeTest
-    : '(' simpleNodeTest+ ')'
+    : '(' simpleNodeTest ('|' simpleNodeTest)* ')'
     ;
 
 unorderedExpr
