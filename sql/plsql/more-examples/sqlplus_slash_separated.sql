@@ -11,11 +11,3 @@ insert into employee_table values (1)
 / -- ; is optional here
 insert into employee_table values (2)
 /
-
--------------------------------------------
-create or replace package business_pkg is
-    procedure process_employee(
-        p_emp_id number
-    );
-end business_pkg;   -- ; is still required here
-/
