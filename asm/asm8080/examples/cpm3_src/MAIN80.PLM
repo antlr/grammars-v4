@@ -1,0 +1,11 @@
+$title ('SDIR 8080 - Main Module')
+sdir:                               /* SDIR FOR 8080 */
+do;
+
+$include(copyrt.lit)
+
+declare plm label public;
+
+$include(main.plm)
+
+

@@ -43,11 +43,11 @@ options {
 }
 
 prog
-    : EOL* ((line EOL)* line EOL*)? EOF
+    : EOL* ((line EOL+)* line EOL*)? EOF
     ;
 
 line
-    : lbl? (instruction | directive) comment?
+    : lbl? (instruction | directive | macrocall) comment?
     | lbl comment?
     | comment
     ;
@@ -65,11 +65,15 @@ register_
     ;
 
 directive
-    : argument? assemblerdirective expressionlist
+    : argument? assemblerdirective expressionlist?
     ;
 
 assemblerdirective
     : ASSEMBLER_DIRECTIVE
+    ;
+
+macrocall
+    : NAME expressionlist?
     ;
 
 lbl
@@ -85,7 +89,7 @@ label
     ;
 
 expression
-    : multiplyingExpression (('+' | '-') multiplyingExpression)*
+    : '-'? multiplyingExpression (('+' | '-') multiplyingExpression)*
     ;
 
 multiplyingExpression
@@ -107,10 +111,13 @@ dollar
 
 string_
     : STRING
+    | DOUBLE_STRING
     ;
 
 name
     : NAME
+    | OPCODE
+    | ASSEMBLER_DIRECTIVE
     ;
 
 number
@@ -136,6 +143,7 @@ REGISTER
     | 'IXL'
     | 'IYH'
     | 'IYL'
+    | 'AF' '\''
     | 'AF'
     | 'BC'
     | 'DE'
@@ -150,12 +158,16 @@ ASSEMBLER_DIRECTIVE
     : 'ORG'
     | 'END'
     | 'EQU'
+    | 'DB'
     | 'DEFB'
+    | 'DW'
     | 'DEFW'
     | 'DS'
     | 'IF'
     | 'ENDIF'
     | 'SET'
+    | 'MACRO'
+    | 'ENDM'
     ;
 
 OPCODE
@@ -178,6 +190,7 @@ OPCODE
     | 'EI'
     | 'EX'
     | 'EXX'
+    | 'HALT'
     | 'IM'
     | 'IN'
     | 'INC'
@@ -229,19 +242,33 @@ OPCODE
     ;
 
 NAME
-    : [A-Z] [A-Z0-9."]*
+    : '.'? [A-Z] [A-Z0-9._"]*
     ;
 
 NUMBER
     : '$'? [0-9A-F]+ 'H'?
+    | '0x' [0-9A-F]+
     ;
 
 COMMENT
     : ';' ~ [\r\n]*
     ;
 
+// Single-quoted string with backslash escapes (e.g. \'  inside a string).
 STRING
-    : '\u0027' ~'\u0027'* '\u0027'
+    : '\'' ('\\' . | ~['\\\r\n])* '\''
+    ;
+
+// Double-quoted string with backslash escapes.
+DOUBLE_STRING
+    : '"' ('\\' . | ~["\\\r\n])* '"'
+    ;
+
+// Skip unterminated single-quoted content (e.g. Oshonsoft IDE metadata lines).
+// Uses ~['\r\n]* so it stops at any closing quote — STRING (which includes the
+// closing quote) will always be longer and win when a closing quote is present.
+METADATA
+    : '\'' ~['\r\n]* -> skip
     ;
 
 EOL

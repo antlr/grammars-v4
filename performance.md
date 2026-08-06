@@ -13,338 +13,339 @@
 
 ### Results
 
-| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up |
-|---------|--------|--------|--------|-----|-----------------|----------------------|
-| [abb](https://github.com/antlr/grammars-v4/tree/master/abb) | 0.04683 ± 0.001672 | 0.04988 ± 0.002761 | 0.09671 ± 0.004381 | 3232 ± 112.9 | n.a. ± n.a. | n.a. ± n.a. |
-| [abnf](https://github.com/antlr/grammars-v4/tree/master/abnf) | 0.03736 ± 7.044e-06 | 0.04961 ± 0.002437 | 0.08696 ± 0.002431 | 4.029e+04 ± 7.506 | 5.065e+05 ± 1.402e+04 | 27.39 ± 0.7923 |
-| [acme](https://github.com/antlr/grammars-v4/tree/master/acme) | 0.318 ± 0.01096 | 0.06642 ± 0.0002936 | 0.3844 ± 0.01108 | 1.185e+05 ± 3956 | 1.559e+05 ± 6897 | 31.36 ± 1.432 |
-| [action](https://github.com/antlr/grammars-v4/tree/master/action) | 0.075 ± 0.001391 | 0.04917 ± 0.0002442 | 0.1242 ± 0.001203 | 2001 ± 36.67 | 4048 ± 108.3 | 16.33 ± 0.2693 |
-| [ada/ada2005](https://github.com/antlr/grammars-v4/tree/master/ada/ada2005) | 0.2617 ± 0.02145 | 0.07807 ± 0.006667 | 0.3397 ± 0.02811 | 479.3 ± 36.17 | 1947 ± 103.1 | 5.86 ± 0.7983 |
-| [ada/ada2012](https://github.com/antlr/grammars-v4/tree/master/ada/ada2012) | 0.1999 ± 0.003888 | 0.08831 ± 0.001038 | 0.2882 ± 0.004891 | 400.3 ± 7.881 | n.a. ± n.a. | n.a. ± n.a. |
-| [ada/ada2022](https://github.com/antlr/grammars-v4/tree/master/ada/ada2022) | 0.2253 ± 0.004537 | 0.1034 ± 0.002321 | 0.3287 ± 0.006485 | 355 ± 7.371 | n.a. ± n.a. | n.a. ± n.a. |
-| [ada/ada83](https://github.com/antlr/grammars-v4/tree/master/ada/ada83) | 0.1264 ± 0.001276 | 0.07685 ± 0.002636 | 0.2033 ± 0.003196 | 980.7 ± 9.821 | 5151 ± 218.1 | 7.583 ± 0.2739 |
-| [ada/ada95](https://github.com/antlr/grammars-v4/tree/master/ada/ada95) | 0.1999 ± 0.00119 | 0.07745 ± 0.001233 | 0.2773 ± 0.002322 | 620 ± 3.786 | 2711 ± 31.77 | 6.227 ± 0.09821 |
-| [agc](https://github.com/antlr/grammars-v4/tree/master/agc) | 1.75 ± 0.05855 | 0.06236 ± 0.003031 | 1.812 ± 0.05968 | 2.047e+04 ± 708.2 | 2.393e+04 ± 910.7 | 2.97 ± 0.05508 |
-| [alef](https://github.com/antlr/grammars-v4/tree/master/alef) | 0.09148 ± 0.01574 | 0.06387 ± 0.007543 | 0.1553 ± 0.02327 | 588.7 ± 93.69 | n.a. ± n.a. | n.a. ± n.a. |
-| [algol60](https://github.com/antlr/grammars-v4/tree/master/algol60) | 2.192 ± 0.02759 | 0.05506 ± 0.001158 | 2.247 ± 0.02824 | 3533 ± 44.86 | 4643 ± 28 | 2.32 ± 0.07024 |
-| [alloy](https://github.com/antlr/grammars-v4/tree/master/alloy) | 0.07168 ± 0.002262 | 0.05596 ± 0.003646 | 0.1276 ± 0.005874 | 1859 ± 57.25 | 8070 ± 305.9 | 23.21 ± 0.214 |
-| [alpaca](https://github.com/antlr/grammars-v4/tree/master/alpaca) | 0.04449 ± 0.0006127 | 0.04606 ± 0.0008943 | 0.09055 ± 0.001225 | 1191 ± 16.41 | n.a. ± n.a. | n.a. ± n.a. |
-| [amazon-states-language](https://github.com/antlr/grammars-v4/tree/master/amazon-states-language) | 0.09414 ± 0.002319 | 0.06566 ± 0.001518 | 0.1598 ± 0.001935 | 1.014e+04 ± 246.1 | 1.82e+04 ± 140.1 | 6.59 ± 0.305 |
-| [amazon-states-language-intrinsic-functions](https://github.com/antlr/grammars-v4/tree/master/amazon-states-language-intrinsic-functions) | 0.0363 ± 0.001895 | 0.05157 ± 0.002042 | 0.08787 ± 0.003874 | 5261 ± 262.2 | 5.465e+04 ± 6033 | 197.8 ± 13.96 |
-| [angelscript](https://github.com/antlr/grammars-v4/tree/master/angelscript) | 0.04245 ± 0.002288 | 0.05945 ± 0.01113 | 0.1019 ± 0.0134 | 165.3 ± 8.743 | n.a. ± n.a. | n.a. ± n.a. |
-| [antlr/antlr2](https://github.com/antlr/grammars-v4/tree/master/antlr/antlr2) | 0.4432 ± 0.0169 | 0.07679 ± 0.003561 | 0.52 ± 0.01582 | 4.161e+05 ± 1.546e+04 | 4.909e+05 ± 2.587e+04 | 2.627 ± 0.1841 |
-| [antlr/antlr3](https://github.com/antlr/grammars-v4/tree/master/antlr/antlr3) | 0.2724 ± 0.007137 | 0.06989 ± 0.002946 | 0.3423 ± 0.008539 | 2.604e+05 ± 6680 | 3.236e+05 ± 1.203e+04 | 1.923 ± 0.1093 |
-| [antlr/antlr4](https://github.com/antlr/grammars-v4/tree/master/antlr/antlr4) | 2.101 ± 0.05165 | 0.2696 ± 0.007623 | 2.371 ± 0.045 | 7.003e+05 ± 1.764e+04 | 7.177e+05 ± 1.835e+04 | 70.31 ± 1.624 |
-| [aql](https://github.com/antlr/grammars-v4/tree/master/aql) | 0.2495 ± 0.004203 | 0.05886 ± 0.001121 | 0.3084 ± 0.003714 | 6556 ± 112.3 | 8003 ± 99.06 | 61.26 ± 5.415 |
-| [arden](https://github.com/antlr/grammars-v4/tree/master/arden) | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. |
-| [arithmetic](https://github.com/antlr/grammars-v4/tree/master/arithmetic) | 0.03908 ± 0.0005639 | 0.04865 ± 0.001082 | 0.08773 ± 0.001488 | 4377 ± 63.69 | 2.565e+04 ± 332.8 | 208.7 ± 0.6339 |
-| [asl](https://github.com/antlr/grammars-v4/tree/master/asl) | 0.1922 ± 0.008631 | 0.06697 ± 0.001997 | 0.2592 ± 0.01063 | 1.119e+04 ± 487.7 | 1.41e+04 ± 760.5 | 4.937 ± 0.2035 |
-| [asm/asm6502](https://github.com/antlr/grammars-v4/tree/master/asm/asm6502) | 0.05978 ± 0.002005 | 0.05299 ± 0.003333 | 0.1128 ± 0.004285 | 8.846e+04 ± 3042 | 2.129e+05 ± 1.989e+04 | 74.79 ± 8.243 |
-| [asm/asm8080](https://github.com/antlr/grammars-v4/tree/master/asm/asm8080) | 0.1113 ± 0.006973 | 0.04976 ± 0.004074 | 0.1611 ± 0.01104 | 1.231e+05 ± 7260 | n.a. ± n.a. | n.a. ± n.a. |
-| [asm/asm8086](https://github.com/antlr/grammars-v4/tree/master/asm/asm8086) | 0.1511 ± 0.002167 | 0.05504 ± 0.001152 | 0.2061 ± 0.003192 | 9.451e+04 ± 1339 | 1.507e+05 ± 2077 | 5.203 ± 0.2772 |
-| [asm/asmMASM](https://github.com/antlr/grammars-v4/tree/master/asm/asmMASM) | 0.05736 ± 0.00284 | 0.05035 ± 0.001886 | 0.1077 ± 0.004489 | 4835 ± 234.6 | 1.922e+04 ± 1431 | 8.743 ± 0.5427 |
-| [asm/asmRISCV](https://github.com/antlr/grammars-v4/tree/master/asm/asmRISCV) | 0.07679 ± 0.0007256 | 0.07981 ± 0.0008221 | 0.1566 ± 0.0002113 | 5105 ± 48.12 | 3.858e+04 ± 1793 | 19.75 ± 0.8339 |
-| [asm/asmZ80](https://github.com/antlr/grammars-v4/tree/master/asm/asmZ80) | 0.1117 ± 0.001685 | 0.04708 ± 0.0004865 | 0.1587 ± 0.002028 | 1.467e+05 ± 2182 | n.a. ± n.a. | n.a. ± n.a. |
-| [asm/nasm](https://github.com/antlr/grammars-v4/tree/master/asm/nasm) | 0.2283 ± 0.001265 | 0.1845 ± 0.003633 | 0.4129 ± 0.003559 | 2.823e+04 ± 155.9 | 4.957e+04 ± 643.4 | 10.38 ± 0.1633 |
-| [asm/pdp7](https://github.com/antlr/grammars-v4/tree/master/asm/pdp7) | 1.369 ± 0.02223 | 0.06669 ± 0.0004322 | 1.436 ± 0.02266 | 3.556e+04 ± 581.5 | 3.902e+04 ± 726 | 3.09 ± 0.06506 |
-| [asm/ptx/ptx-isa-1.0](https://github.com/antlr/grammars-v4/tree/master/asm/ptx/ptx-isa-1.0) | 0.09245 ± 0.001696 | 0.0608 ± 0.0005208 | 0.1532 ± 0.002056 | 3.078e+04 ± 561.1 | n.a. ± n.a. | n.a. ± n.a. |
-| [asn/asn](https://github.com/antlr/grammars-v4/tree/master/asn/asn) | 0.06519 ± 0.003962 | 0.06129 ± 0.002054 | 0.1265 ± 0.005974 | 1915 ± 110 | 2.104e+04 ± 1806 | 30.37 ± 0.9815 |
-| [asn/asn_3gpp](https://github.com/antlr/grammars-v4/tree/master/asn/asn_3gpp) | 0.1483 ± 0.003482 | 0.06495 ± 0.00446 | 0.2133 ± 0.00599 | 1167 ± 27.06 | n.a. ± n.a. | n.a. ± n.a. |
-| [aterm](https://github.com/antlr/grammars-v4/tree/master/aterm) | 0.03986 ± 0.000251 | 0.04744 ± 0.001252 | 0.08731 ± 0.00143 | 2910 ± 18.22 | 2.12e+04 ± 133.1 | 365.5 ± 4.718 |
-| [awk](https://github.com/antlr/grammars-v4/tree/master/awk) | 0.1744 ± 0.003342 | 0.05008 ± 0.001488 | 0.2245 ± 0.002984 | 1193 ± 22.38 | 1923 ± 86.31 | 2.323 ± 0.09333 |
-| b | 0.05652 ± 0.0008807 | 0.04907 ± 0.001658 | 0.1056 ± 0.002531 | 4673 ± 71.6 | 2.189e+04 ± 328.4 | 30.5 ± 0.8223 |
-| [basic](https://github.com/antlr/grammars-v4/tree/master/basic) | 0.3804 ± 0.00533 | 0.05497 ± 0.000576 | 0.4354 ± 0.005112 | 1.389e+04 ± 196.3 | 1.643e+04 ± 259.1 | 16.81 ± 0.2321 |
-| [bcpl](https://github.com/antlr/grammars-v4/tree/master/bcpl) | 15.93 ± 0.4537 | 0.05859 ± 0.0003406 | 15.99 ± 0.4536 | 0 ± 0 | 0 ± 0 | n.a. ± n.a. |
-| [bdf](https://github.com/antlr/grammars-v4/tree/master/bdf) | 0.181 ± 0.005121 | 0.05167 ± 0.002405 | 0.2327 ± 0.007513 | 3.537e+05 ± 9890 | 4.234e+05 ± 9560 | 222.4 ± 8.338 |
-| [bencoding](https://github.com/antlr/grammars-v4/tree/master/bencoding) | 0.0273 ± 0.0005619 | 0.04509 ± 0.0006727 | 0.07239 ± 0.001234 | 2933 ± 60.33 | 1.472e+05 ± 3942 | 107.5 ± 4.43 |
-| [bibcode](https://github.com/antlr/grammars-v4/tree/master/bibcode) | 0.02312 ± 0.0002645 | 0.04581 ± 0.0008955 | 0.06893 ± 0.001148 | 3460 ± 40.05 | 1.032e+05 ± 768.5 | 116.3 ± 0.9933 |
-| [bibtex](https://github.com/antlr/grammars-v4/tree/master/bibtex) | 0.02498 ± 0.0002582 | 0.04663 ± 0.001784 | 0.07161 ± 0.00193 | 4965 ± 50.86 | n.a. ± n.a. | n.a. ± n.a. |
-| [bicep](https://github.com/antlr/grammars-v4/tree/master/bicep) | 0.09786 ± 0.001131 | 0.0531 ± 0.0002907 | 0.151 ± 0.0009109 | 2.493e+04 ± 285.3 | 2.928e+04 ± 407.6 | 426.2 ± 7.417 |
-| [bison](https://github.com/antlr/grammars-v4/tree/master/bison) | 0.05384 ± 0.0001459 | 0.04895 ± 0.0002119 | 0.1028 ± 0.0002808 | 6816 ± 18.59 | 2.989e+04 ± 210.6 | 9.173 ± 0.04485 |
-| [blueprint](https://github.com/antlr/grammars-v4/tree/master/blueprint) | 0.038 ± 0.0001993 | 0.04503 ± 0.0007024 | 0.08304 ± 0.0008998 | 1947 ± 10.33 | n.a. ± n.a. | n.a. ± n.a. |
-| [bnf](https://github.com/antlr/grammars-v4/tree/master/bnf) | 1.655 ± 0.01547 | 0.0494 ± 0.0004686 | 1.704 ± 0.01588 | 3928 ± 36.44 | 4134 ± 43.64 | 2.687 ± 0.05696 |
-| c | 1.186 ± 0.04024 | 1.613 ± 0.02412 | 2.798 ± 0.01715 | 5.661e+04 ± 1967 | 6.152e+04 ± 2238 | 102.6 ± 2.199 |
-| [calculator](https://github.com/antlr/grammars-v4/tree/master/calculator) | 0.02607 ± 8.856e-05 | 0.04898 ± 0.0009919 | 0.07504 ± 0.00099 | 9361 ± 31.86 | 9.386e+04 ± 907.5 | 276.3 ± 3.729 |
-| [callable](https://github.com/antlr/grammars-v4/tree/master/callable) | 0.02248 ± 0.0006961 | 0.04442 ± 0.001181 | 0.0669 ± 0.001667 | 1827 ± 55.41 | 2.749e+04 ± 136.7 | 116.4 ± 4.061 |
-| [capnproto](https://github.com/antlr/grammars-v4/tree/master/capnproto) | 0.08381 ± 0.002012 | 0.05045 ± 0.0009409 | 0.1343 ± 0.002942 | 9.837e+04 ± 2415 | 1.885e+05 ± 7015 | 60.38 ± 2.156 |
-| [chip8](https://github.com/antlr/grammars-v4/tree/master/chip8) | 0.03351 ± 0.001223 | 0.04735 ± 0.0008188 | 0.08086 ± 0.001356 | 268.7 ± 9.351 | n.a. ± n.a. | n.a. ± n.a. |
-| [clf](https://github.com/antlr/grammars-v4/tree/master/clf) | 0.0875 ± 0.001671 | 0.04702 ± 0.0006804 | 0.1345 ± 0.002081 | 2.304e+05 ± 4352 | 5.266e+04 ± 3973 | 0.2267 ± 0.01453 |
-| [clojure](https://github.com/antlr/grammars-v4/tree/master/clojure) | 0.0391 ± 0.002223 | 0.04687 ± 0.0009102 | 0.08597 ± 0.002971 | 823 ± 44.24 | n.a. ± n.a. | n.a. ± n.a. |
-| [clu](https://github.com/antlr/grammars-v4/tree/master/clu) | 0.17 ± 0.003955 | 0.05095 ± 0.001686 | 0.221 ± 0.005475 | 1118 ± 26.87 | 2.25e+04 ± 1043 | 22.87 ± 1.01 |
-| [cmake](https://github.com/antlr/grammars-v4/tree/master/cmake) | 0.02538 ± 0.0008483 | 0.04364 ± 0.0004244 | 0.06902 ± 0.001126 | 2763 ± 90.02 | n.a. ± n.a. | n.a. ± n.a. |
-| [cobol85](https://github.com/antlr/grammars-v4/tree/master/cobol85) | 0.07736 ± 0.001355 | 0.1735 ± 0.002098 | 0.2509 ± 0.003419 | 633.3 ± 10.84 | n.a. ± n.a. | n.a. ± n.a. |
-| [codeql](https://github.com/antlr/grammars-v4/tree/master/codeql) | 0.4184 ± 0.009652 | 0.0638 ± 0.0002097 | 0.4822 ± 0.009856 | 7080 ± 167.3 | 8270 ± 217.7 | 4.357 ± 0.1601 |
-| [cookie](https://github.com/antlr/grammars-v4/tree/master/cookie) | 0.02133 ± 0.0001143 | 0.04436 ± 0.0002823 | 0.0657 ± 0.0002948 | 1687 ± 9 | 1.428e+05 ± 2624 | 189.2 ± 3.827 |
-| [corundum](https://github.com/antlr/grammars-v4/tree/master/corundum) | 0.5683 ± 0.01463 | 0.04954 ± 0.0007946 | 0.6179 ± 0.01389 | 1330 ± 34.82 | n.a. ± n.a. | n.a. ± n.a. |
-| [cpp](https://github.com/antlr/grammars-v4/tree/master/cpp) | 2.152 ± 0.04327 | 0.0787 ± 0.0006871 | 2.231 ± 0.04262 | 2750 ± 56.22 | 2899 ± 62.35 | 12.4 ± 0.2293 |
-| [cql](https://github.com/antlr/grammars-v4/tree/master/cql) | 0.04757 ± 0.001492 | 0.04916 ± 0.001319 | 0.09673 ± 0.002792 | 1053 ± 33.95 | 4672 ± 152.7 | 44.03 ± 2.103 |
-| [cql3](https://github.com/antlr/grammars-v4/tree/master/cql3) | 0.1762 ± 0.0009389 | 0.09221 ± 0.001623 | 0.2685 ± 0.002559 | 1.159e+04 ± 61.44 | 1.507e+04 ± 52.31 | 16.36 ± 0.1378 |
-| [creole](https://github.com/antlr/grammars-v4/tree/master/creole) | 0.2202 ± 0.001912 | 0.0463 ± 0.0005804 | 0.2665 ± 0.002277 | 3156 ± 27.65 | 3925 ± 19.06 | 34.93 ± 1.992 |
-| [csharp/v6](https://github.com/antlr/grammars-v4/tree/master/csharp/v6) | 1.62 ± 0.07426 | 0.09109 ± 0.002256 | 1.711 ± 0.07639 | 5219 ± 229.3 | 5647 ± 88.55 | 1.087 ± 0.05783 |
-| [csharp/v7](https://github.com/antlr/grammars-v4/tree/master/csharp/v7) | 1.42 ± 0.03253 | 0.1018 ± 0.00197 | 1.522 ± 0.03078 | 7317 ± 165.7 | 1.792e+04 ± 633.2 | 3.217 ± 0.1235 |
-| [csharp/v8-spec](https://github.com/antlr/grammars-v4/tree/master/csharp/v8-spec) | 9.429 ± 0.02413 | 0.1368 ± 0.002572 | 9.566 ± 0.02386 | 1121 ± 2.963 | 1986 ± 24.58 | 2.94 ± 0.06506 |
-| [css3](https://github.com/antlr/grammars-v4/tree/master/css3) | 2.857 ± 0.04994 | 0.07054 ± 0.0007196 | 2.928 ± 0.05035 | 3.733e+04 ± 654.6 | 3.829e+04 ± 686 | 249.9 ± 3.83 |
-| [csv](https://github.com/antlr/grammars-v4/tree/master/csv) | 0.02169 ± 0.001586 | 0.04374 ± 0.0009396 | 0.06543 ± 0.002513 | 4145 ± 285.3 | n.a. ± n.a. | n.a. ± n.a. |
-| [ctl](https://github.com/antlr/grammars-v4/tree/master/ctl) | 0.03418 ± 0.001618 | 0.04741 ± 0.001193 | 0.08159 ± 0.002806 | 352 ± 16.17 | n.a. ± n.a. | n.a. ± n.a. |
-| [cto](https://github.com/antlr/grammars-v4/tree/master/cto) | 0.06323 ± 0.0007214 | 0.04891 ± 0.0003996 | 0.1121 ± 0.0009977 | 4603 ± 52.35 | 1.829e+04 ± 439.2 | 40.32 ± 0.7153 |
-| [cypher](https://github.com/antlr/grammars-v4/tree/master/cypher) | 0.1021 ± 0.0008325 | 0.06378 ± 0.00152 | 0.1659 ± 0.00217 | 1.416e+04 ± 116.1 | 2.63e+04 ± 339.5 | 54.89 ± 0.7748 |
-| [d2](https://github.com/antlr/grammars-v4/tree/master/d2) | 0.04492 ± 0.001281 | 0.04499 ± 0.0002583 | 0.08991 ± 0.001484 | 3188 ± 88.58 | 1.61e+04 ± 466.3 | 145.7 ± 0.3188 |
-| [databank](https://github.com/antlr/grammars-v4/tree/master/databank) | 0.04284 ± 0.0006567 | 0.04869 ± 0.0006629 | 0.09153 ± 0.001189 | 3.113e+04 ± 473.7 | 3.255e+05 ± 4322 | 88 ± 2.214 |
-| [datalog](https://github.com/antlr/grammars-v4/tree/master/datalog) | 0.03966 ± 0.00082 | 0.04719 ± 0.0009255 | 0.08686 ± 0.001725 | 2725 ± 55.43 | 1.155e+05 ± 1946 | 64.05 ± 2.435 |
-| [dice](https://github.com/antlr/grammars-v4/tree/master/dice) | 0.05126 ± 0.001589 | 0.05907 ± 0.003408 | 0.1103 ± 0.004925 | 1700 ± 54.01 | 4778 ± 143.9 | 14.12 ± 0.06888 |
-| [dif](https://github.com/antlr/grammars-v4/tree/master/dif) | 0.03464 ± 0.0003954 | 0.04467 ± 0.0007389 | 0.07931 ± 0.00107 | 3523 ± 40.28 | 3.58e+05 ± 4195 | 202.2 ± 2.084 |
-| [doiurl](https://github.com/antlr/grammars-v4/tree/master/doiurl) | 0.03444 ± 0.0001988 | 0.0457 ± 0.0001005 | 0.08014 ± 0.0001068 | 9990 ± 57.86 | 3.442e+05 ± 5010 | 501.4 ± 9.41 |
-| [dot](https://github.com/antlr/grammars-v4/tree/master/dot) | 0.04477 ± 0.0008666 | 0.04533 ± 0.000357 | 0.0901 ± 0.001098 | 3.009e+04 ± 571.2 | 3.182e+05 ± 8755 | 120.3 ± 1.205 |
-| [ebnf](https://github.com/antlr/grammars-v4/tree/master/ebnf) | 0.03836 ± 0.003449 | 0.04339 ± 0.0008073 | 0.08175 ± 0.004208 | 608.3 ± 50.27 | n.a. ± n.a. | n.a. ± n.a. |
-| [edif300](https://github.com/antlr/grammars-v4/tree/master/edif300) | 0.07254 ± 0.00293 | 0.1284 ± 0.001022 | 0.2009 ± 0.00321 | 1797 ± 70.29 | n.a. ± n.a. | n.a. ± n.a. |
-| [edn](https://github.com/antlr/grammars-v4/tree/master/edn) | 0.2849 ± 0.01149 | 0.07577 ± 0.0004925 | 0.3606 ± 0.011 | 2.935e+05 ± 1.141e+04 | 3.284e+05 ± 1.459e+04 | 12.46 ± 0.6318 |
-| [eiffel](https://github.com/antlr/grammars-v4/tree/master/eiffel) | 0.6035 ± 0.01735 | 0.07143 ± 0.001323 | 0.6749 ± 0.01736 | 1845 ± 52.78 | 2417 ± 82.6 | 2.55 ± 0.05508 |
-| [elixir](https://github.com/antlr/grammars-v4/tree/master/elixir) | 19.1 ± 0.2015 | 0.1242 ± 0.001493 | 19.23 ± 0.2001 | 398.7 ± 3.93 | 523 ± 6.506 | 1.52 ± 0.03055 |
-| [erlang](https://github.com/antlr/grammars-v4/tree/master/erlang) | 0.2546 ± 0.00763 | 0.05391 ± 0.001175 | 0.3085 ± 0.008797 | 2561 ± 74.71 | 3869 ± 113.2 | 5.373 ± 0.01453 |
-| [esolang/barrous](https://github.com/antlr/grammars-v4/tree/master/esolang/barrous) | 0.03429 ± 0.002084 | 0.04693 ± 0.002578 | 0.08122 ± 0.004662 | 1145 ± 65.64 | 3.829e+04 ± 1357 | 56.17 ± 1.628 |
-| [esolang/bio](https://github.com/antlr/grammars-v4/tree/master/esolang/bio) | 0.02511 ± 0.001017 | 0.04666 ± 0.00253 | 0.07177 ± 0.003545 | 3.751e+04 ± 1461 | 4.945e+05 ± 2.616e+04 | 14.41 ± 0.2348 |
-| [esolang/brainflak](https://github.com/antlr/grammars-v4/tree/master/esolang/brainflak) | 0.02135 ± 0.000109 | 0.04359 ± 0.0007671 | 0.06494 ± 0.00077 | 1264 ± 6.333 | 2.413e+05 ± 1.459e+04 | 733.2 ± 45.39 |
-| [esolang/brainfuck](https://github.com/antlr/grammars-v4/tree/master/esolang/brainfuck) | 0.02515 ± 0.001045 | 0.04515 ± 0.001497 | 0.0703 ± 0.002457 | 3.384e+04 ± 1461 | 2.584e+05 ± 5187 | 17.07 ± 0.6238 |
-| [esolang/cool](https://github.com/antlr/grammars-v4/tree/master/esolang/cool) | 0.0757 ± 0.0003823 | 0.05295 ± 0.0005399 | 0.1287 ± 0.0006077 | 1.368e+05 ± 687.2 | 3.429e+05 ± 1429 | 9.397 ± 0.01856 |
-| [esolang/lolcode](https://github.com/antlr/grammars-v4/tree/master/esolang/lolcode) | 0.04286 ± 0.001262 | 0.05123 ± 0.0008836 | 0.09409 ± 0.0004201 | 139.7 ± 4.096 | n.a. ± n.a. | n.a. ± n.a. |
-| [esolang/loop](https://github.com/antlr/grammars-v4/tree/master/esolang/loop) | 0.03372 ± 0.001337 | 0.04517 ± 0.002288 | 0.07889 ± 0.003599 | 743.3 ± 29.17 | 2.006e+04 ± 1501 | 130.9 ± 8.381 |
-| [esolang/nanofuck](https://github.com/antlr/grammars-v4/tree/master/esolang/nanofuck) | 0.03245 ± 0.0005046 | 0.04643 ± 0.002085 | 0.07888 ± 0.002546 | 1356 ± 21.4 | 1.971e+05 ± 2.286e+04 | 159.3 ± 16.44 |
-| [esolang/sickbay](https://github.com/antlr/grammars-v4/tree/master/esolang/sickbay) | 0.03754 ± 0.001154 | 0.04453 ± 0.001122 | 0.08207 ± 0.002231 | 2321 ± 70.41 | n.a. ± n.a. | n.a. ± n.a. |
-| [esolang/skull](https://github.com/antlr/grammars-v4/tree/master/esolang/skull) | 0.0355 ± 0.001615 | 0.04438 ± 0.0008506 | 0.07988 ± 0.001089 | 6138 ± 269.6 | 1.008e+05 ± 2809 | 31.28 ± 1.701 |
-| [esolang/snowball](https://github.com/antlr/grammars-v4/tree/master/esolang/snowball) | 0.0321 ± 0.001119 | 0.05267 ± 0.001618 | 0.08477 ± 0.002533 | 1062 ± 37.88 | n.a. ± n.a. | n.a. ± n.a. |
-| [esolang/wheel](https://github.com/antlr/grammars-v4/tree/master/esolang/wheel) | 0.02102 ± 0.0003796 | 0.04398 ± 0.001024 | 0.065 ± 0.001172 | 3190 ± 56.48 | 8.773e+04 ± 2803 | 78.16 ± 1.448 |
-| [esolang/whenever](https://github.com/antlr/grammars-v4/tree/master/esolang/whenever) | 0.05119 ± 0.001239 | 0.04827 ± 0.0005547 | 0.09946 ± 0.001515 | 5769 ± 137.5 | 1.738e+05 ± 3736 | 51.56 ± 0.7318 |
-| [evm-bytecode](https://github.com/antlr/grammars-v4/tree/master/evm-bytecode) | 0.02795 ± 0.000527 | 0.05495 ± 0.005275 | 0.0829 ± 0.005799 | 6.549e+04 ± 1217 | n.a. ± n.a. | n.a. ± n.a. |
-| [fasta](https://github.com/antlr/grammars-v4/tree/master/fasta) | 2.312 ± 0.01219 | 0.1471 ± 0.001697 | 2.46 ± 0.01387 | 9.322e+04 ± 489.5 | 1.196e+05 ± 4020 | 2.73 ± 0.2352 |
-| [fdo91](https://github.com/antlr/grammars-v4/tree/master/fdo91) | 0.04695 ± 0.001158 | 0.0518 ± 0.006432 | 0.09876 ± 0.007587 | 1.136e+04 ± 273.7 | 6.459e+04 ± 659.4 | 74.48 ± 1.433 |
-| [fen](https://github.com/antlr/grammars-v4/tree/master/fen) | 0.02436 ± 0.001017 | 0.04822 ± 0.002951 | 0.07258 ± 0.003936 | 9967 ± 401.6 | 2.118e+05 ± 1.642e+04 | 86.72 ± 3.692 |
-| [flatbuffers](https://github.com/antlr/grammars-v4/tree/master/flatbuffers) | 0.05287 ± 0.001309 | 0.05614 ± 0.001642 | 0.109 ± 0.001102 | 5.611e+04 ± 1367 | 1.768e+05 ± 3033 | 62.29 ± 0.6845 |
-| [flowmatic](https://github.com/antlr/grammars-v4/tree/master/flowmatic) | 0.041 ± 0.0002479 | 0.04586 ± 0.0007096 | 0.08686 ± 0.0009561 | 4927 ± 29.98 | n.a. ± n.a. | n.a. ± n.a. |
-| [focal](https://github.com/antlr/grammars-v4/tree/master/focal) | 0.04472 ± 0.000202 | 0.04652 ± 0.001913 | 0.09124 ± 0.001744 | 6239 ± 28.31 | n.a. ± n.a. | n.a. ± n.a. |
-| [fol](https://github.com/antlr/grammars-v4/tree/master/fol) | 0.04743 ± 0.0002043 | 0.04431 ± 0.000283 | 0.09174 ± 0.0003777 | 4575 ± 19.66 | 4.359e+04 ± 458.1 | 40.37 ± 0.346 |
-| [fortran/fortran77](https://github.com/antlr/grammars-v4/tree/master/fortran/fortran77) | 0.1507 ± 0.003242 | 0.06604 ± 0.000831 | 0.2167 ± 0.002742 | 1095 ± 24.13 | 1680 ± 49.74 | 5.633 ± 0.2457 |
-| [freedesktop/desktop-entry](https://github.com/antlr/grammars-v4/tree/master/freedesktop/desktop-entry) | 0.04132 ± 0.0004777 | 0.04729 ± 0.001406 | 0.08861 ± 0.001843 | 2e+04 ± 229.6 | 1.97e+05 ± 2062 | 16.43 ± 0.2917 |
-| [gdscript](https://github.com/antlr/grammars-v4/tree/master/gdscript) | 0.2221 ± 0.009376 | 0.05482 ± 0.0009341 | 0.2769 ± 0.01011 | 2258 ± 91.5 | 3347 ± 152.2 | 6.733 ± 0.09207 |
-| [gedcom](https://github.com/antlr/grammars-v4/tree/master/gedcom) | 0.0485 ± 0.002724 | 0.04509 ± 0.0009101 | 0.09359 ± 0.003627 | 7032 ± 374 | n.a. ± n.a. | n.a. ± n.a. |
-| [geekcode](https://github.com/antlr/grammars-v4/tree/master/geekcode) | 0.08288 ± 0.001624 | 0.04987 ± 0.002807 | 0.1327 ± 0.003156 | 4745 ± 91.77 | 1.61e+04 ± 37.47 | 8.533 ± 0.1981 |
-| [gff3](https://github.com/antlr/grammars-v4/tree/master/gff3) | 0.02628 ± 2.462e-05 | 0.04352 ± 0.0007994 | 0.0698 ± 0.0007749 | 2.671e+04 ± 25.01 | 5.405e+05 ± 1.052e+04 | 32.92 ± 0.6863 |
-| [glsl](https://github.com/antlr/grammars-v4/tree/master/glsl) | 0.2742 ± 0.005072 | 0.07462 ± 0.002073 | 0.3488 ± 0.00709 | 7964 ± 145.3 | 1.136e+04 ± 248.5 | 10.12 ± 0.1387 |
-| [gml](https://github.com/antlr/grammars-v4/tree/master/gml) | 0.03737 ± 0.0009452 | 0.04973 ± 0.002685 | 0.08711 ± 0.003602 | 1.015e+05 ± 2527 | 2.712e+05 ± 1.256e+04 | 96.85 ± 3.388 |
-| [golang](https://github.com/antlr/grammars-v4/tree/master/golang) | 2.569 ± 0.03328 | 0.1093 ± 0.003122 | 2.678 ± 0.03129 | 2.036e+04 ± 260.6 | 2.183e+04 ± 295.1 | 33.31 ± 0.3677 |
-| [gql](https://github.com/antlr/grammars-v4/tree/master/gql) | 0.1681 ± 0.003125 | 0.1563 ± 0.003316 | 0.3244 ± 0.005709 | 779.3 ± 14.84 | 1414 ± 33.72 | 11.66 ± 0.1683 |
-| [graphstream-dgs](https://github.com/antlr/grammars-v4/tree/master/graphstream-dgs) | 0.04979 ± 0.00129 | 0.0497 ± 0.001384 | 0.0995 ± 0.002673 | 1.323e+04 ± 337.8 | 7.091e+04 ± 1856 | 111.3 ± 1.771 |
-| [gtin](https://github.com/antlr/grammars-v4/tree/master/gtin) | 0.05275 ± 0.001529 | 0.04754 ± 0.0005107 | 0.1003 ± 0.001049 | 2582 ± 74 | 8295 ± 188.7 | 22.5 ± 0.273 |
-| [guido](https://github.com/antlr/grammars-v4/tree/master/guido) | 0.07227 ± 0.0004654 | 0.04577 ± 0.000132 | 0.118 ± 0.0005709 | 2.123e+04 ± 136.7 | 5.553e+04 ± 1722 | 34.95 ± 1.519 |
-| [guitartab](https://github.com/antlr/grammars-v4/tree/master/guitartab) | 0.0221 ± 0.000229 | 0.04373 ± 0.0005088 | 0.06583 ± 0.0007286 | 2.874e+04 ± 295.4 | 5.934e+05 ± 1.358e+04 | 99.23 ± 1.842 |
-| [gvpr](https://github.com/antlr/grammars-v4/tree/master/gvpr) | 0.8111 ± 0.03368 | 0.07082 ± 0.001551 | 0.8819 ± 0.03237 | 1.676e+04 ± 708.7 | 1.818e+04 ± 845 | 95.87 ± 6.541 |
-| [haskell](https://github.com/antlr/grammars-v4/tree/master/haskell) | 7.957 ± 0.06451 | 0.1104 ± 0.001691 | 8.067 ± 0.06387 | 320 ± 2.517 | 332.3 ± 3.844 | 2.24 ± 0.13 |
-| [hexpat](https://github.com/antlr/grammars-v4/tree/master/hexpat) | 0.207 ± 0.00244 | 0.05421 ± 0.000753 | 0.2612 ± 0.001795 | 5.715e+04 ± 666 | 7.728e+04 ± 1360 | 4.637 ± 0.1267 |
-| [http](https://github.com/antlr/grammars-v4/tree/master/http) | 0.05157 ± 0.003976 | 0.04663 ± 0.0004576 | 0.0982 ± 0.004173 | 2.416e+04 ± 1729 | 8.621e+04 ± 6852 | 113.9 ± 1.365 |
-| [hypertalk](https://github.com/antlr/grammars-v4/tree/master/hypertalk) | 4.642 ± 0.07533 | 0.08024 ± 0.003381 | 4.723 ± 0.07867 | 1641 ± 26.58 | n.a. ± n.a. | n.a. ± n.a. |
-| [icalendar](https://github.com/antlr/grammars-v4/tree/master/icalendar) | 0.118 ± 0.000887 | 0.06831 ± 0.001437 | 0.1864 ± 0.00122 | 4600 ± 34.43 | n.a. ± n.a. | n.a. ± n.a. |
-| [icon](https://github.com/antlr/grammars-v4/tree/master/icon) | 0.07793 ± 0.001858 | 0.05268 ± 0.002019 | 0.1306 ± 0.00312 | 128 ± 3.055 | n.a. ± n.a. | n.a. ± n.a. |
-| [idl](https://github.com/antlr/grammars-v4/tree/master/idl) | 0.09857 ± 0.003933 | 0.06182 ± 0.001587 | 0.1604 ± 0.005304 | 6503 ± 268.1 | 1.201e+04 ± 412.8 | 12.78 ± 0.2291 |
-| [inf](https://github.com/antlr/grammars-v4/tree/master/inf) | 0.02581 ± 0.0007412 | 0.0501 ± 0.003518 | 0.0759 ± 0.004258 | 1513 ± 43.3 | 1.226e+04 ± 603.1 | 31.77 ± 1.459 |
-| [informix](https://github.com/antlr/grammars-v4/tree/master/informix) | 0.1292 ± 0.00456 | 0.1046 ± 0.001305 | 0.2338 ± 0.005201 | 775.3 ± 26.91 | 1155 ± 13.53 | 4.513 ± 0.2843 |
-| [iri](https://github.com/antlr/grammars-v4/tree/master/iri) | 0.04012 ± 0.0006035 | 0.04767 ± 0.0006863 | 0.08779 ± 0.0006949 | 1571 ± 23.67 | 3.253e+04 ± 827.7 | 38.66 ± 1.455 |
-| [iso8601](https://github.com/antlr/grammars-v4/tree/master/iso8601) | 0.1063 ± 0.00337 | 0.05955 ± 0.002438 | 0.1659 ± 0.00571 | 9262 ± 285.9 | 1.585e+04 ± 726.3 | 70.77 ± 2.755 |
-| [istc](https://github.com/antlr/grammars-v4/tree/master/istc) | 0.01765 ± 0.0001597 | 0.04224 ± 0.0006266 | 0.05989 ± 0.0007581 | 1247 ± 11.14 | n.a. ± n.a. | n.a. ± n.a. |
-| [itn](https://github.com/antlr/grammars-v4/tree/master/itn) | 0.02117 ± 0.0001422 | 0.04295 ± 0.001116 | 0.06412 ± 0.001073 | 1559 ± 10.35 | n.a. ± n.a. | n.a. ± n.a. |
-| [jam](https://github.com/antlr/grammars-v4/tree/master/jam) | 0.06474 ± 0.002659 | 0.04845 ± 0.003605 | 0.1132 ± 0.006264 | 4494 ± 177.4 | 9254 ± 492.6 | 2.533 ± 0.04631 |
-| [janus](https://github.com/antlr/grammars-v4/tree/master/janus) | 0.04183 ± 0.001017 | 0.04327 ± 0.0004508 | 0.0851 ± 0.001453 | 502 ± 12.01 | n.a. ± n.a. | n.a. ± n.a. |
-| [java/java](https://github.com/antlr/grammars-v4/tree/master/java/java) | 1.107 ± 0.03988 | 0.07119 ± 0.001512 | 1.178 ± 0.0385 | 1.498e+04 ± 540.9 | 1.715e+04 ± 730.9 | 2.57 ± 0.121 |
-| [java/java20](https://github.com/antlr/grammars-v4/tree/master/java/java20) | 3.089 ± 0.05902 | 0.1056 ± 0.001741 | 3.195 ± 0.0577 | 1053 ± 20.58 | 7846 ± 639.3 | 20.38 ± 1.374 |
-| [java/java8](https://github.com/antlr/grammars-v4/tree/master/java/java8) | 0.7029 ± 0.02358 | 0.0817 ± 0.0007279 | 0.7846 ± 0.02286 | 254.7 ± 8.413 | 202.3 ± 10.17 | 0.49 ± 0.03215 |
-| [java/java9](https://github.com/antlr/grammars-v4/tree/master/java/java9) | 7.326 ± 0.02148 | 0.07863 ± 0.001447 | 7.405 ± 0.02111 | 462 ± 1.528 | 3905 ± 178.4 | 24.33 ± 1.15 |
-| [javacc](https://github.com/antlr/grammars-v4/tree/master/javacc) | 0.7926 ± 0.03091 | 0.07926 ± 0.0001411 | 0.8718 ± 0.03089 | 1.015e+05 ± 4059 | 1.154e+05 ± 5658 | 14.39 ± 1.002 |
-| [javascript/ecmascript](https://github.com/antlr/grammars-v4/tree/master/javascript/ecmascript) | 0.1983 ± 0.005106 | 0.08308 ± 0.001998 | 0.2814 ± 0.00511 | 1762 ± 45.8 | 2575 ± 84.63 | 54.62 ± 1.396 |
-| [javascript/javascript](https://github.com/antlr/grammars-v4/tree/master/javascript/javascript) | 2.766 ± 0.07394 | 0.1085 ± 0.001859 | 2.875 ± 0.07234 | 3560 ± 97.45 | 3676 ± 106.6 | 107.6 ± 5.347 |
-| [javascript/typescript](https://github.com/antlr/grammars-v4/tree/master/javascript/typescript) | 5.277 ± 0.07581 | 0.09921 ± 0.003472 | 5.376 ± 0.07718 | 1020 ± 14.68 | 1294 ± 17.7 | 8.033 ± 0.1345 |
-| [jpa](https://github.com/antlr/grammars-v4/tree/master/jpa) | 0.03702 ± 0.001024 | 0.04709 ± 0.0004298 | 0.08412 ± 0.001192 | 134.7 ± 3.844 | n.a. ± n.a. | n.a. ± n.a. |
-| [json](https://github.com/antlr/grammars-v4/tree/master/json) | 0.0323 ± 0.0005741 | 0.04651 ± 0.001796 | 0.07881 ± 0.002364 | 2974 ± 52.29 | 7.986e+04 ± 1840 | 38.62 ± 1.075 |
-| [json5](https://github.com/antlr/grammars-v4/tree/master/json5) | 0.03771 ± 0.0003746 | 0.06912 ± 0.002228 | 0.1068 ± 0.001856 | 1.26e+04 ± 125.4 | 8.13e+04 ± 1684 | 40.24 ± 0.8635 |
-| [karel](https://github.com/antlr/grammars-v4/tree/master/karel) | 0.0247 ± 0.0008452 | 0.04625 ± 0.002052 | 0.07095 ± 0.002893 | 730 ± 24.38 | n.a. ± n.a. | n.a. ± n.a. |
-| [kotlin/kotlin](https://github.com/antlr/grammars-v4/tree/master/kotlin/kotlin) | 0.8355 ± 0.0424 | 0.1145 ± 0.003997 | 0.95 ± 0.0461 | 1212 ± 59.49 | 1341 ± 69.27 | 5.473 ± 0.1281 |
-| [kotlin/kotlin-formal](https://github.com/antlr/grammars-v4/tree/master/kotlin/kotlin-formal) | 7.459 ± 0.02226 | 0.1613 ± 0.002247 | 7.621 ± 0.02309 | 2142 ± 6.36 | 2224 ± 4.163 | 17.59 ± 0.5152 |
-| [kquery](https://github.com/antlr/grammars-v4/tree/master/kquery) | 0.1577 ± 0.005882 | 0.05717 ± 0.001341 | 0.2148 ± 0.00718 | 2.387e+04 ± 915.1 | 3.625e+04 ± 1724 | 21.88 ± 0.9069 |
-| [kuka](https://github.com/antlr/grammars-v4/tree/master/kuka) | 0.05084 ± 0.001496 | 0.05196 ± 0.0009382 | 0.1028 ± 0.002246 | 2501 ± 71.73 | n.a. ± n.a. | n.a. ± n.a. |
-| [lambda](https://github.com/antlr/grammars-v4/tree/master/lambda) | 0.02201 ± 0.0008425 | 0.04291 ± 0.0004518 | 0.06491 ± 0.001265 | 1959 ± 72.79 | 1.558e+05 ± 1.346e+04 | 421.6 ± 22.58 |
-| [langium](https://github.com/antlr/grammars-v4/tree/master/langium) | 0.08343 ± 0.000925 | 0.05526 ± 0.002399 | 0.1387 ± 0.003299 | 4.882e+04 ± 535.7 | 1.902e+05 ± 6172 | 7.333 ± 0.1992 |
-| [lark](https://github.com/antlr/grammars-v4/tree/master/lark) | 0.0626 ± 0.00225 | 0.05793 ± 0.002071 | 0.1205 ± 0.00392 | 9.385e+04 ± 3259 | 2.687e+05 ± 1.94e+04 | 266.2 ± 16.04 |
-| [lcc](https://github.com/antlr/grammars-v4/tree/master/lcc) | 0.03343 ± 0.0002438 | 0.04429 ± 0.0003245 | 0.07772 ± 0.0005201 | 4517 ± 32.77 | 1.638e+05 ± 7116 | 314.1 ± 12.01 |
-| [less](https://github.com/antlr/grammars-v4/tree/master/less) | 0.04446 ± 0.002483 | 0.0533 ± 0.00374 | 0.09777 ± 0.006222 | 610.3 ± 32.18 | n.a. ± n.a. | n.a. ± n.a. |
-| [limbo](https://github.com/antlr/grammars-v4/tree/master/limbo) | 0.08637 ± 0.002173 | 0.05125 ± 0.002393 | 0.1376 ± 0.004128 | 567.3 ± 14.52 | n.a. ± n.a. | n.a. ± n.a. |
-| [lisa](https://github.com/antlr/grammars-v4/tree/master/lisa) | 0.04734 ± 0.0009843 | 0.04655 ± 0.0006825 | 0.09389 ± 0.001348 | 760.7 ± 15.68 | n.a. ± n.a. | n.a. ± n.a. |
-| [llvm-ir](https://github.com/antlr/grammars-v4/tree/master/llvm-ir) | 0.3317 ± 0.00702 | 0.1328 ± 0.00542 | 0.4645 ± 0.007443 | 7.436e+04 ± 1544 | 8.217e+04 ± 2033 | 90.03 ± 4.221 |
-| [logo/logo](https://github.com/antlr/grammars-v4/tree/master/logo/logo) | 0.07303 ± 0.001603 | 0.05 ± 0.0008829 | 0.123 ± 0.0007626 | 8498 ± 190.8 | 1.727e+04 ± 418 | 46.72 ± 1.034 |
-| [lrc](https://github.com/antlr/grammars-v4/tree/master/lrc) | 0.02315 ± 0.000681 | 0.04411 ± 0.001525 | 0.06726 ± 0.001878 | 562.3 ± 16.9 | n.a. ± n.a. | n.a. ± n.a. |
-| [ltl](https://github.com/antlr/grammars-v4/tree/master/ltl) | 0.03257 ± 0.0002805 | 0.0445 ± 5.783e-05 | 0.07708 ± 0.0002233 | 183.7 ± 1.667 | n.a. ± n.a. | n.a. ± n.a. |
-| [lua](https://github.com/antlr/grammars-v4/tree/master/lua) | 4.659 ± 0.03004 | 0.4569 ± 0.01366 | 5.116 ± 0.02757 | 3.767e+05 ± 2414 | 3.806e+05 ± 2642 | 1827 ± 96.24 |
-| [lucene](https://github.com/antlr/grammars-v4/tree/master/lucene) | 0.05676 ± 0.001369 | 0.06104 ± 0.005178 | 0.1178 ± 0.006475 | 1957 ± 46.98 | 7738 ± 90.61 | 110.5 ± 5.22 |
-| [maml](https://github.com/antlr/grammars-v4/tree/master/maml) | 0.03525 ± 0.0003668 | 0.04687 ± 0.00038 | 0.08212 ± 0.0007435 | 6355 ± 65.38 | 9.401e+04 ± 1532 | 47.11 ± 0.4891 |
-| [matlab](https://github.com/antlr/grammars-v4/tree/master/matlab) | 0.06752 ± 0.001378 | 0.05094 ± 0.002138 | 0.1185 ± 0.001794 | 355.3 ± 7.055 | 2.021e+04 ± 1255 | 104.3 ± 8.109 |
-| [mckeeman-form](https://github.com/antlr/grammars-v4/tree/master/mckeeman-form) | 0.03307 ± 0.0006046 | 0.045 ± 0.0007847 | 0.07807 ± 0.001337 | 1.97e+04 ± 363.3 | 5.157e+05 ± 1.913e+04 | 48.13 ± 1.92 |
-| [mdx](https://github.com/antlr/grammars-v4/tree/master/mdx) | 0.04828 ± 0.004741 | 0.04983 ± 0.001661 | 0.09811 ± 0.005932 | 1750 ± 157.8 | 7.715e+04 ± 4709 | 117 ± 3.905 |
-| [memcached_protocol](https://github.com/antlr/grammars-v4/tree/master/memcached_protocol) | 0.03077 ± 5.428e-05 | 0.04553 ± 0.0003203 | 0.0763 ± 0.0002733 | 259.3 ± 0.3333 | n.a. ± n.a. | n.a. ± n.a. |
-| [metamath](https://github.com/antlr/grammars-v4/tree/master/metamath) | 0.04775 ± 0.001436 | 0.04573 ± 0.0004344 | 0.09348 ± 0.001821 | 1279 ± 37.36 | 1.022e+04 ± 493.6 | 23.39 ± 0.5112 |
-| [metric](https://github.com/antlr/grammars-v4/tree/master/metric) | 0.03357 ± 0.0008727 | 0.04869 ± 0.0003971 | 0.08226 ± 0.001125 | 1282 ± 34.24 | 8458 ± 352 | 81.17 ± 2.555 |
-| [microc](https://github.com/antlr/grammars-v4/tree/master/microc) | 0.04761 ± 0.0005699 | 0.04624 ± 5.713e-05 | 0.09385 ± 0.0005727 | 1722 ± 20.67 | 9771 ± 276.2 | 21.17 ± 0.8383 |
-| [modelica](https://github.com/antlr/grammars-v4/tree/master/modelica) | 0.6487 ± 0.008925 | 0.05899 ± 0.0002822 | 0.7077 ± 0.009181 | 2.324e+05 ± 3240 | 2.573e+05 ± 4229 | 8.337 ± 0.1875 |
-| [modula2pim4](https://github.com/antlr/grammars-v4/tree/master/modula2pim4) | 0.033 ± 0.0009342 | 0.04886 ± 0.001724 | 0.08186 ± 0.002608 | 1275 ± 35.67 | n.a. ± n.a. | n.a. ± n.a. |
-| [molecule](https://github.com/antlr/grammars-v4/tree/master/molecule) | 0.04327 ± 0.0001447 | 0.04519 ± 0.0003926 | 0.08846 ± 0.0005243 | 2819 ± 9.387 | 4.945e+04 ± 1274 | 127.1 ± 3.68 |
-| [moo](https://github.com/antlr/grammars-v4/tree/master/moo) | 0.08532 ± 0.001347 | 0.04796 ± 0.0005502 | 0.1333 ± 0.001831 | 9427 ± 151.1 | 6.934e+04 ± 2743 | 18.86 ± 0.7237 |
-| [morsecode](https://github.com/antlr/grammars-v4/tree/master/morsecode) | 0.03136 ± 0.0003415 | 0.045 ± 0.0003355 | 0.07637 ± 0.0005934 | 733 ± 8.083 | 3.188e+04 ± 671.2 | 89.77 ± 1.642 |
-| [mps](https://github.com/antlr/grammars-v4/tree/master/mps) | 0.03898 ± 0.0002878 | 0.04349 ± 0.000287 | 0.08247 ± 0.0005385 | 5490 ± 40.18 | 6.271e+04 ± 542.7 | 38.17 ± 0.511 |
-| [muddb](https://github.com/antlr/grammars-v4/tree/master/muddb) | 0.0418 ± 0.001218 | 0.0451 ± 0.0008433 | 0.0869 ± 0.002034 | 1.782e+05 ± 5046 | 4.51e+05 ± 2.03e+04 | 193.6 ± 5.505 |
-| [mumath](https://github.com/antlr/grammars-v4/tree/master/mumath) | 0.03529 ± 0.0008097 | 0.04922 ± 0.002207 | 0.08452 ± 0.00275 | 368 ± 8.505 | n.a. ± n.a. | n.a. ± n.a. |
-| [mumps](https://github.com/antlr/grammars-v4/tree/master/mumps) | 0.06022 ± 0.0003782 | 0.0481 ± 0.0006657 | 0.1083 ± 0.0009647 | 5314 ± 33.11 | 1.247e+04 ± 170.7 | 62.54 ± 1.002 |
-| [muparser](https://github.com/antlr/grammars-v4/tree/master/muparser) | 0.04348 ± 0.0001839 | 0.04662 ± 0.0002739 | 0.0901 ± 0.0004018 | 3105 ± 12.99 | n.a. ± n.a. | n.a. ± n.a. |
-| [newick](https://github.com/antlr/grammars-v4/tree/master/newick) | 0.0459 ± 0.001113 | 0.04547 ± 0.0009586 | 0.09137 ± 0.001723 | 3293 ± 78.69 | 2.61e+04 ± 476.3 | 117.4 ± 5.25 |
-| [oberon](https://github.com/antlr/grammars-v4/tree/master/oberon) | 0.05781 ± 0.004036 | 0.04946 ± 0.002616 | 0.1073 ± 0.006576 | 1117 ± 74.46 | n.a. ± n.a. | n.a. ± n.a. |
-| [objc](https://github.com/antlr/grammars-v4/tree/master/objc) | 2.184 ± 0.03957 | 0.09248 ± 0.0008938 | 2.277 ± 0.03893 | 1.371e+04 ± 249.1 | 1.447e+04 ± 268.6 | 8.817 ± 0.1281 |
-| [odin](https://github.com/antlr/grammars-v4/tree/master/odin) | 4.285 ± 0.0257 | 0.06634 ± 0.001902 | 4.351 ± 0.0263 | 3665 ± 22.12 | 1.139e+04 ± 1328 | 3.117 ± 0.3717 |
-| [oncrpc](https://github.com/antlr/grammars-v4/tree/master/oncrpc) | 0.03834 ± 0.0007094 | 0.04798 ± 0.0002951 | 0.08633 ± 0.0006458 | 1330 ± 24.31 | n.a. ± n.a. | n.a. ± n.a. |
-| [orwell](https://github.com/antlr/grammars-v4/tree/master/orwell) | 0.06449 ± 0.0001254 | 0.0482 ± 0.0003491 | 0.1127 ± 0.0004673 | 728.3 ± 1.202 | 1856 ± 15.9 | 13.13 ± 0.2079 |
-| p | 0.02376 ± 0.001176 | 0.04912 ± 0.001186 | 0.07288 ± 0.002315 | 930 ± 47.57 | 1.641e+04 ± 1938 | 122.4 ± 10.14 |
-| [parkingsign](https://github.com/antlr/grammars-v4/tree/master/parkingsign) | 0.06054 ± 0.001254 | 0.04715 ± 0.0007684 | 0.1077 ± 0.002009 | 4563 ± 93.74 | n.a. ± n.a. | n.a. ± n.a. |
-| [pascal](https://github.com/antlr/grammars-v4/tree/master/pascal) | 0.09195 ± 0.0007482 | 0.06299 ± 0.0006715 | 0.1549 ± 0.0004468 | 3.49e+04 ± 281.9 | 6.456e+04 ± 288.6 | 130.9 ± 1.777 |
-| [pbm](https://github.com/antlr/grammars-v4/tree/master/pbm) | 0.02058 ± 0.0001301 | 0.04223 ± 0.0005867 | 0.06281 ± 0.0006612 | 3109 ± 19.55 | n.a. ± n.a. | n.a. ± n.a. |
-| [pcre](https://github.com/antlr/grammars-v4/tree/master/pcre) | 0.2591 ± 0.0104 | 0.05956 ± 0.002641 | 0.3187 ± 0.0128 | 3.102e+04 ± 1296 | 3.665e+04 ± 1609 | 67.04 ± 2.577 |
-| [pdn](https://github.com/antlr/grammars-v4/tree/master/pdn) | 0.04034 ± 0.0005654 | 0.04723 ± 0.001936 | 0.08757 ± 0.002497 | 8233 ± 113.9 | 1.432e+05 ± 1.498e+04 | 75.34 ± 7.272 |
-| [pegen](https://github.com/antlr/grammars-v4/tree/master/pegen) | 1.016 ± 0.05305 | 0.05294 ± 0.001621 | 1.068 ± 0.05181 | 1.287e+04 ± 667.3 | 1.941e+04 ± 1691 | 2.257 ± 0.1335 |
-| [peoplecode](https://github.com/antlr/grammars-v4/tree/master/peoplecode) | 0.4197 ± 0.01263 | 0.05819 ± 0.001205 | 0.4779 ± 0.01384 | 8607 ± 263 | 1.058e+04 ± 351.7 | 1.77 ± 0.02082 |
-| [pest](https://github.com/antlr/grammars-v4/tree/master/pest) | 0.04576 ± 0.0004766 | 0.04805 ± 0.0006017 | 0.09381 ± 0.001077 | 6.245e+04 ± 652.4 | 2.83e+05 ± 3287 | 48.58 ± 0.5415 |
-| [php](https://github.com/antlr/grammars-v4/tree/master/php) | 2.851 ± 0.01878 | 0.09703 ± 0.002448 | 2.948 ± 0.01725 | 2177 ± 14.5 | 2578 ± 17.94 | 6.33 ± 0.04041 |
-| [pii](https://github.com/antlr/grammars-v4/tree/master/pii) | 0.02135 ± 0.0003212 | 0.04465 ± 0.001367 | 0.06601 ± 0.001222 | 843 ± 12.58 | n.a. ± n.a. | n.a. ± n.a. |
-| [pl0](https://github.com/antlr/grammars-v4/tree/master/pl0) | 0.03111 ± 0.0009639 | 0.04778 ± 0.0005491 | 0.07889 ± 0.001432 | 1.304e+04 ± 396.1 | 1.136e+05 ± 3117 | 75.65 ± 4.9 |
-| [plantUML](https://github.com/antlr/grammars-v4/tree/master/plantUML) | 0.04582 ± 0.002211 | 0.04884 ± 0.001229 | 0.09466 ± 0.003363 | 3946 ± 187.4 | 1.881e+04 ± 2723 | 20.75 ± 2.845 |
-| [ply](https://github.com/antlr/grammars-v4/tree/master/ply) | 0.2929 ± 0.001067 | 0.05354 ± 0.002304 | 0.3465 ± 0.002822 | 3.746e+05 ± 1366 | 4.345e+05 ± 1168 | 1.993 ± 0.02848 |
-| [postalcode](https://github.com/antlr/grammars-v4/tree/master/postalcode) | 0.01648 ± 0.0001133 | 0.04151 ± 0.0004975 | 0.05798 ± 0.0005912 | 424.3 ± 2.848 | n.a. ± n.a. | n.a. ± n.a. |
-| [powerbuilder](https://github.com/antlr/grammars-v4/tree/master/powerbuilder) | 19.43 ± 0.1148 | 0.07126 ± 0.001694 | 19.5 ± 0.1136 | 557 ± 3.512 | 619.3 ± 3.756 | 7.767 ± 0.1841 |
-| [prolog](https://github.com/antlr/grammars-v4/tree/master/prolog) | 0.04811 ± 0.003195 | 0.04907 ± 0.0008584 | 0.09717 ± 0.003486 | 670 ± 42.44 | n.a. ± n.a. | n.a. ± n.a. |
-| [promql](https://github.com/antlr/grammars-v4/tree/master/promql) | 0.08144 ± 0.009939 | 0.05892 ± 0.005833 | 0.1404 ± 0.01576 | 5260 ± 573.8 | 1.559e+04 ± 1643 | 55.84 ± 3.049 |
-| [propcalc](https://github.com/antlr/grammars-v4/tree/master/propcalc) | 0.03764 ± 0.0002773 | 0.04408 ± 0.0005628 | 0.08172 ± 0.0008295 | 3906 ± 28.9 | 5.695e+04 ± 1259 | 100.8 ± 1.605 |
-| [properties](https://github.com/antlr/grammars-v4/tree/master/properties) | 0.0286 ± 0.001955 | 0.04352 ± 0.0004163 | 0.07212 ± 0.001846 | 5.47e+04 ± 3526 | 1.359e+05 ± 1.991e+04 | 2260 ± 338.6 |
-| [protobuf/protobuf2](https://github.com/antlr/grammars-v4/tree/master/protobuf/protobuf2) | 0.05717 ± 0.0004994 | 0.05868 ± 0.0005705 | 0.1159 ± 0.0008734 | 3883 ± 33.81 | 2.201e+04 ± 134 | 12.15 ± 0.1992 |
-| [protobuf/protobuf3](https://github.com/antlr/grammars-v4/tree/master/protobuf/protobuf3) | 0.1001 ± 0.003793 | 0.05799 ± 0.002903 | 0.1581 ± 0.006693 | 1.818e+04 ± 666.2 | 4.166e+04 ± 1518 | 67.97 ± 0.13 |
-| [prov-n](https://github.com/antlr/grammars-v4/tree/master/prov-n) | 0.07626 ± 0.001032 | 0.05021 ± 0.0007683 | 0.1265 ± 0.001066 | 8881 ± 121.8 | 2.573e+04 ± 907 | 15.76 ± 0.6808 |
-| [python/python](https://github.com/antlr/grammars-v4/tree/master/python/python) | 0.1662 ± 0.002493 | 0.06631 ± 0.001773 | 0.2325 ± 0.0041 | 1.944e+04 ± 288.3 | 3.225e+04 ± 658.2 | 21.47 ± 0.5567 |
-| [python/python2_7_18](https://github.com/antlr/grammars-v4/tree/master/python/python2_7_18) | 0.7152 ± 0.02577 | 0.06357 ± 0.001556 | 0.7788 ± 0.02482 | 1.212e+05 ± 4217 | 1.328e+05 ± 5090 | 15.2 ± 0.5985 |
-| [python/python3](https://github.com/antlr/grammars-v4/tree/master/python/python3) | 4.596 ± 0.1158 | 0.09647 ± 0.001864 | 4.692 ± 0.1152 | 1.246e+04 ± 306.4 | 1.284e+04 ± 326.7 | 9.527 ± 0.2774 |
-| [python/python3_13](https://github.com/antlr/grammars-v4/tree/master/python/python3_13) | 2.006 ± 0.03872 | 0.1038 ± 0.0007274 | 2.109 ± 0.03892 | 5.764e+04 ± 1117 | 6.072e+04 ± 1305 | 9.31 ± 0.3464 |
-| [qif](https://github.com/antlr/grammars-v4/tree/master/qif) | 0.02489 ± 0.0001017 | 0.04367 ± 0.0004423 | 0.06857 ± 0.000527 | 1606 ± 6.429 | 1.23e+04 ± 242.9 | 12.08 ± 0.2017 |
-| [quakemap](https://github.com/antlr/grammars-v4/tree/master/quakemap) | 0.02438 ± 0.000594 | 0.04366 ± 0.0005408 | 0.06804 ± 0.0009751 | 5953 ± 142.2 | n.a. ± n.a. | n.a. ± n.a. |
-| [racket-bsl](https://github.com/antlr/grammars-v4/tree/master/racket-bsl) | 0.03674 ± 0.00126 | 0.04455 ± 0.0004097 | 0.08129 ± 0.0009016 | 1718 ± 57.18 | n.a. ± n.a. | n.a. ± n.a. |
-| [racket-isl](https://github.com/antlr/grammars-v4/tree/master/racket-isl) | 0.03763 ± 0.0003023 | 0.0453 ± 0.000584 | 0.08293 ± 0.0007321 | 6431 ± 52.06 | n.a. ± n.a. | n.a. ± n.a. |
-| [recfile](https://github.com/antlr/grammars-v4/tree/master/recfile) | 0.02257 ± 0.0002585 | 0.04324 ± 0.000557 | 0.0658 ± 0.0007853 | 6781 ± 76.82 | 2.641e+05 ± 3174 | 91.72 ± 1.36 |
-| [redcode](https://github.com/antlr/grammars-v4/tree/master/redcode) | 0.02383 ± 0.000991 | 0.04421 ± 0.0003352 | 0.06803 ± 0.001326 | 7074 ± 283.4 | 1.3e+05 ± 1.321e+04 | 61.5 ± 4.116 |
-| [redis](https://github.com/antlr/grammars-v4/tree/master/redis) | 0.0822 ± 0.0006387 | 0.07593 ± 0.0005743 | 0.1581 ± 0.001072 | 5316 ± 41.38 | 9397 ± 81.59 | 24.96 ± 0.2473 |
-| [refal](https://github.com/antlr/grammars-v4/tree/master/refal) | 0.0376 ± 0.0003868 | 0.04558 ± 0.0003169 | 0.08318 ± 0.0006949 | 1277 ± 13.04 | n.a. ± n.a. | n.a. ± n.a. |
-| [rfc1035](https://github.com/antlr/grammars-v4/tree/master/rfc1035) | 0.02123 ± 0.0006419 | 0.04329 ± 0.0006795 | 0.06453 ± 0.000846 | 848.7 ± 25.15 | 1.292e+04 ± 111 | 43.75 ± 1.76 |
-| [rfc1960](https://github.com/antlr/grammars-v4/tree/master/rfc1960) | 0.0393 ± 0.0008896 | 0.04389 ± 0.0006217 | 0.08319 ± 0.001459 | 1247 ± 28.14 | 5739 ± 55.14 | 30.41 ± 0.4945 |
-| [rfc822/rfc822-datetime](https://github.com/antlr/grammars-v4/tree/master/rfc822/rfc822-datetime) | 0.02395 ± 0.0009492 | 0.04991 ± 0.002968 | 0.07387 ± 0.003859 | 1591 ± 60.62 | 4.543e+04 ± 2460 | 62.52 ± 1.409 |
-| [rfc822/rfc822-emailaddress](https://github.com/antlr/grammars-v4/tree/master/rfc822/rfc822-emailaddress) | 0.04408 ± 0.001294 | 0.04524 ± 0.0001969 | 0.08932 ± 0.001119 | 5430 ± 155 | 1.137e+05 ± 963.6 | 319.1 ± 7.865 |
-| [robotwars](https://github.com/antlr/grammars-v4/tree/master/robotwars) | 0.1053 ± 0.0003656 | 0.04879 ± 0.0002909 | 0.1541 ± 8.538e-05 | 1.899e+04 ± 66.06 | 3.39e+04 ± 174.1 | 19.7 ± 0.1185 |
-| [romannumerals](https://github.com/antlr/grammars-v4/tree/master/romannumerals) | 0.03721 ± 0.0005623 | 0.04703 ± 0.0004323 | 0.08424 ± 0.0006669 | 268.3 ± 4.256 | 968.7 ± 15.45 | 14.02 ± 0.03383 |
-| [ron](https://github.com/antlr/grammars-v4/tree/master/ron) | 0.05041 ± 0.001493 | 0.04752 ± 0.002229 | 0.09794 ± 0.003694 | 4152 ± 119.8 | 2.875e+04 ± 550.9 | 23.94 ± 0.4452 |
-| [rpn](https://github.com/antlr/grammars-v4/tree/master/rpn) | 0.03362 ± 0.0007813 | 0.04948 ± 0.001676 | 0.08309 ± 0.002456 | 1489 ± 33.89 | 9408 ± 45.94 | 89.74 ± 2.158 |
-| [ruleworks](https://github.com/antlr/grammars-v4/tree/master/ruleworks) | 0.1529 ± 0.004822 | 0.08243 ± 0.0001544 | 0.2354 ± 0.004969 | 5.011e+04 ± 1549 | 1.007e+05 ± 4369 | 2.58 ± 0.04726 |
-| [rust](https://github.com/antlr/grammars-v4/tree/master/rust) | 18.15 ± 0.08979 | 0.1053 ± 0.0009507 | 18.25 ± 0.08963 | 4042 ± 20.07 | 3589 ± 16.13 | 0.72 ± 7.85e-17 |
-| [sapf](https://github.com/antlr/grammars-v4/tree/master/sapf) | 0.4007 ± 0.004803 | 0.05221 ± 0.0004785 | 0.4529 ± 0.005145 | 1590 ± 18.88 | 1770 ± 22.98 | 19.07 ± 0.2411 |
-| [scala/scala2](https://github.com/antlr/grammars-v4/tree/master/scala/scala2) | 2.388 ± 0.07934 | 0.05919 ± 0.002607 | 2.447 ± 0.0787 | 439.3 ± 14.26 | 591.3 ± 9.404 | 2.383 ± 0.1746 |
-| [scala/scala3](https://github.com/antlr/grammars-v4/tree/master/scala/scala3) | 2.465 ± 0.03766 | 0.09445 ± 0.001519 | 2.559 ± 0.03916 | 5525 ± 85.54 | 5821 ± 91.7 | 17.96 ± 0.2021 |
-| [scotty](https://github.com/antlr/grammars-v4/tree/master/scotty) | 0.03951 ± 0.0001387 | 0.04469 ± 0.0002269 | 0.0842 ± 0.0001847 | 100.7 ± 0.3333 | n.a. ± n.a. | n.a. ± n.a. |
-| [scss](https://github.com/antlr/grammars-v4/tree/master/scss) | 50.03 ± 0.6138 | 0.1057 ± 0.005227 | 50.13 ± 0.61 | 711 ± 8.622 | 717 ± 9.713 | 1.36 ± 0.0781 |
-| [sdl](https://github.com/antlr/grammars-v4/tree/master/sdl) | 0.2063 ± 0.00246 | 0.06256 ± 0.0007468 | 0.2688 ± 0.003202 | 9.757e+04 ± 1159 | 1.54e+05 ± 1734 | 4.487 ± 0.01453 |
-| [semver](https://github.com/antlr/grammars-v4/tree/master/semver) | 0.04729 ± 0.0002999 | 0.047 ± 0.0004909 | 0.09428 ± 0.0005473 | 3489 ± 22.23 | 4.624e+04 ± 1359 | 81.84 ± 2.017 |
-| [sexpression](https://github.com/antlr/grammars-v4/tree/master/sexpression) | 0.03546 ± 0.002191 | 0.04296 ± 0.0002572 | 0.07841 ± 0.002438 | 653 ± 38.55 | 5.379e+04 ± 1269 | 157.7 ± 7.645 |
-| [sgf](https://github.com/antlr/grammars-v4/tree/master/sgf) | 0.03233 ± 0.0008355 | 0.05311 ± 0.003948 | 0.08544 ± 0.004769 | 2.555e+04 ± 666.3 | n.a. ± n.a. | n.a. ± n.a. |
-| [sici](https://github.com/antlr/grammars-v4/tree/master/sici) | 0.02445 ± 0.0001824 | 0.04387 ± 0.0001675 | 0.06831 ± 0.0001052 | 3722 ± 28.06 | 3.3e+05 ± 4.567e+04 | 178.6 ± 26.03 |
-| [sieve](https://github.com/antlr/grammars-v4/tree/master/sieve) | 0.02549 ± 0.0008278 | 0.04552 ± 0.0006679 | 0.07101 ± 0.001454 | 2594 ± 81.73 | n.a. ± n.a. | n.a. ± n.a. |
-| [smalltalk](https://github.com/antlr/grammars-v4/tree/master/smalltalk) | 0.06346 ± 0.001864 | 0.04638 ± 0.0008857 | 0.1098 ± 0.002741 | 110 ± 3 | n.a. ± n.a. | n.a. ± n.a. |
-| [smiles](https://github.com/antlr/grammars-v4/tree/master/smiles) | 0.04688 ± 0.0006445 | 0.05071 ± 0.001424 | 0.09758 ± 0.001726 | 2731 ± 38 | 7221 ± 181.3 | 12.69 ± 0.3795 |
-| [smtlibv2](https://github.com/antlr/grammars-v4/tree/master/smtlibv2) | 0.1049 ± 0.001843 | 0.07223 ± 0.001986 | 0.1771 ± 0.003526 | 5.777e+04 ± 1019 | 5.102e+04 ± 1445 | 0.7967 ± 0.02404 |
-| [snobol](https://github.com/antlr/grammars-v4/tree/master/snobol) | 0.03612 ± 0.0002381 | 0.04678 ± 0.0003114 | 0.08291 ± 0.0005482 | 2104 ± 13.78 | 3.104e+04 ± 207.9 | 66.31 ± 0.04055 |
-| [solidity](https://github.com/antlr/grammars-v4/tree/master/solidity) | 0.1252 ± 0.001115 | 0.06944 ± 0.001431 | 0.1947 ± 0.002259 | 1.898e+04 ± 167.7 | 3.944e+04 ± 467 | 60.58 ± 0.9472 |
-| [sparql](https://github.com/antlr/grammars-v4/tree/master/sparql) | 0.03883 ± 0.0002129 | 0.05018 ± 0.0007162 | 0.08901 ± 0.0009236 | 4739 ± 26.3 | 2.19e+04 ± 185 | 27.66 ± 0.1353 |
-| [spass](https://github.com/antlr/grammars-v4/tree/master/spass) | 0.08085 ± 0.003673 | 0.04939 ± 0.000413 | 0.1302 ± 0.003873 | 1.377e+04 ± 601.6 | 2.669e+04 ± 975.2 | 5.847 ± 0.08413 |
-| [spl](https://github.com/antlr/grammars-v4/tree/master/spl) | 0.09997 ± 0.001571 | 0.05346 ± 0.0008987 | 0.1534 ± 0.002449 | 3042 ± 47.15 | 5615 ± 62.61 | 15.29 ± 0.1426 |
-| [sql/athena](https://github.com/antlr/grammars-v4/tree/master/sql/athena) | 0.07984 ± 0.001195 | 0.07718 ± 0.00209 | 0.157 ± 0.003239 | 6854 ± 100.9 | 1.153e+04 ± 199.5 | 20.63 ± 0.1976 |
-| [sql/clickhouse](https://github.com/antlr/grammars-v4/tree/master/sql/clickhouse) | 0.1571 ± 0.009963 | 0.1143 ± 0.009576 | 0.2714 ± 0.01952 | 1167 ± 71.38 | 1735 ± 106 | 3.533 ± 0.04702 |
-| [sql/cockroachdb](https://github.com/antlr/grammars-v4/tree/master/sql/cockroachdb) | 0.173 ± 0.004373 | 0.1776 ± 0.00377 | 0.3506 ± 0.006181 | 277.3 ± 6.936 | n.a. ± n.a. | n.a. ± n.a. |
-| [sql/databricks](https://github.com/antlr/grammars-v4/tree/master/sql/databricks) | 0.2108 ± 0.004727 | 0.1048 ± 0.00209 | 0.3156 ± 0.004176 | 1229 ± 27.72 | 1340 ± 33.72 | 12.65 ± 0.3523 |
-| [sql/derby](https://github.com/antlr/grammars-v4/tree/master/sql/derby) | 0.1476 ± 0.006811 | 0.0932 ± 0.001039 | 0.2408 ± 0.007584 | 1700 ± 75.5 | 2110 ± 125.2 | 2.663 ± 0.1367 |
-| [sql/drill](https://github.com/antlr/grammars-v4/tree/master/sql/drill) | 0.08212 ± 0.002797 | 0.05393 ± 0.000455 | 0.136 ± 0.003189 | 3148 ± 104 | 8173 ± 37.4 | 7.773 ± 0.3589 |
-| [sql/hive/v2](https://github.com/antlr/grammars-v4/tree/master/sql/hive/v2) | 0.1955 ± 0.018 | 0.152 ± 0.03635 | 0.3476 ± 0.02901 | 3430 ± 299.7 | 4871 ± 603.9 | 12.29 ± 1.526 |
-| [sql/hive/v3](https://github.com/antlr/grammars-v4/tree/master/sql/hive/v3) | 0.147 ± 0.001484 | 0.1029 ± 0.001581 | 0.2499 ± 0.002679 | 4082 ± 41.53 | 6296 ± 106.1 | 14.55 ± 0.4495 |
-| [sql/hive/v4](https://github.com/antlr/grammars-v4/tree/master/sql/hive/v4) | 0.1305 ± 0.002797 | 0.1094 ± 0.00242 | 0.2399 ± 0.005175 | 1664 ± 35.31 | 2485 ± 25.51 | 4.35 ± 0.1212 |
-| [sql/informix-sql](https://github.com/antlr/grammars-v4/tree/master/sql/informix-sql) | 0.06166 ± 0.0002885 | 0.06462 ± 0.0001785 | 0.1263 ± 0.0003932 | 1.328e+04 ± 62.23 | 3.466e+04 ± 212.5 | 49.82 ± 0.4804 |
-| [sql/mariadb](https://github.com/antlr/grammars-v4/tree/master/sql/mariadb) | 22.06 ± 0.431 | 0.1675 ± 0.005719 | 22.22 ± 0.4263 | 1434 ± 28.2 | n.a. ± n.a. | n.a. ± n.a. |
-| [sql/mysql/Oracle](https://github.com/antlr/grammars-v4/tree/master/sql/mysql/Oracle) | 3.208 ± 0.05103 | 0.2029 ± 0.001827 | 3.411 ± 0.05263 | 1.701e+04 ± 268.3 | 1.789e+04 ± 303.8 | 48.55 ± 1.337 |
-| [sql/mysql/Positive-Technologies](https://github.com/antlr/grammars-v4/tree/master/sql/mysql/Positive-Technologies) | 28.6 ± 0.4324 | 0.1697 ± 0.003154 | 28.77 ± 0.4294 | 1957 ± 29.63 | 1964 ± 29.9 | 5.39 ± 0.1179 |
-| [sql/phoenix](https://github.com/antlr/grammars-v4/tree/master/sql/phoenix) | 0.1286 ± 0.0004699 | 0.07155 ± 0.0005238 | 0.2002 ± 5.485e-05 | 1.169e+04 ± 42.99 | 1.718e+04 ± 196.5 | 1.947 ± 0.03283 |
-| [sql/plsql](https://github.com/antlr/grammars-v4/tree/master/sql/plsql) | 6.237 ± 0.08565 | 0.521 ± 0.01207 | 6.758 ± 0.0971 | 1810 ± 24.66 | 2029 ± 28.75 | 105.8 ± 0.9492 |
-| [sql/postgresql](https://github.com/antlr/grammars-v4/tree/master/sql/postgresql) | 8.808 ± 0.08638 | 0.3397 ± 0.01878 | 9.147 ± 0.07562 | 8.88e+04 ± 864.8 | 9.043e+04 ± 907.5 | 13.41 ± 0.2199 |
-| [sql/snowflake](https://github.com/antlr/grammars-v4/tree/master/sql/snowflake) | 22.2 ± 0.1911 | 0.2434 ± 0.002089 | 22.44 ± 0.1893 | 740.7 ± 6.333 | 763.7 ± 6.333 | 4.037 ± 0.01856 |
-| [sql/sqlite](https://github.com/antlr/grammars-v4/tree/master/sql/sqlite) | 0.1504 ± 0.002743 | 0.08111 ± 0.0008769 | 0.2315 ± 0.00203 | 3.46e+04 ± 634 | 6.149e+04 ± 1243 | 27.59 ± 0.4354 |
-| [sql/teradata](https://github.com/antlr/grammars-v4/tree/master/sql/teradata) | 6.795 ± 0.1163 | 0.3236 ± 0.006711 | 7.119 ± 0.1198 | 1004 ± 17.5 | 1005 ± 17.84 | 1.15 ± 0.04 |
-| [sql/trino](https://github.com/antlr/grammars-v4/tree/master/sql/trino) | 0.3853 ± 0.01627 | 0.1285 ± 0.002278 | 0.5138 ± 0.0182 | 1.622e+04 ± 668.2 | 2.345e+04 ± 800.6 | 133.5 ± 3.373 |
-| [sql/tsql](https://github.com/antlr/grammars-v4/tree/master/sql/tsql) | 50.14 ± 0.3256 | 0.3507 ± 0.003383 | 50.49 ± 0.3222 | 959.3 ± 6.173 | 979 ± 5.859 | 3.267 ± 0.07333 |
-| [squirrel](https://github.com/antlr/grammars-v4/tree/master/squirrel) | 0.3703 ± 0.001886 | 0.05675 ± 0.001308 | 0.427 ± 0.002567 | 9754 ± 49.75 | 1.328e+04 ± 153.4 | 10.01 ± 0.4117 |
-| [srt](https://github.com/antlr/grammars-v4/tree/master/srt) | 0.03477 ± 0.0006153 | 0.04209 ± 0.000134 | 0.07686 ± 0.0007414 | 632.7 ± 10.9 | n.a. ± n.a. | n.a. ± n.a. |
-| [star](https://github.com/antlr/grammars-v4/tree/master/star) | 0.06871 ± 0.0026 | 0.05202 ± 0.003913 | 0.1207 ± 0.006364 | 1664 ± 64.33 | 4804 ± 60.61 | 6.533 ± 0.2463 |
-| [stellaris](https://github.com/antlr/grammars-v4/tree/master/stellaris) | 0.2019 ± 0.0008324 | 0.04898 ± 0.001009 | 0.2509 ± 0.001641 | 2.154e+05 ± 884.2 | 2.883e+05 ± 2520 | 8.503 ± 0.3033 |
-| [suokif](https://github.com/antlr/grammars-v4/tree/master/suokif) | 0.042 ± 0.0007422 | 0.04535 ± 0.000509 | 0.08735 ± 0.001246 | 500 ± 8.622 | 8025 ± 356.2 | 53.58 ± 1.54 |
-| [swift/swift5](https://github.com/antlr/grammars-v4/tree/master/swift/swift5) | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. |
-| [swift-fin](https://github.com/antlr/grammars-v4/tree/master/swift-fin) | 0.04026 ± 0.0003007 | 0.04384 ± 0.0002705 | 0.0841 ± 0.0004127 | 4.416e+04 ± 328.9 | 7.031e+05 ± 8743 | 88.29 ± 1.549 |
-| [sysml-v2](https://github.com/antlr/grammars-v4/tree/master/sysml-v2) | 2.185 ± 0.06529 | 0.1109 ± 0.004388 | 2.295 ± 0.06723 | 374.3 ± 11.32 | 501.3 ± 8.413 | 7.8 ± 0.3995 |
-| [szf](https://github.com/antlr/grammars-v4/tree/master/szf) | 0.05104 ± 0.00126 | 0.04294 ± 0.0001816 | 0.09397 ± 0.001379 | 4158 ± 101.1 | 3.226e+04 ± 714.7 | 9.54 ± 0.3101 |
-| [tcpheader](https://github.com/antlr/grammars-v4/tree/master/tcpheader) | 0.01917 ± 0.0006222 | 0.04565 ± 0.0006492 | 0.06482 ± 0.001262 | 1098 ± 34.75 | n.a. ± n.a. | n.a. ± n.a. |
-| [teal](https://github.com/antlr/grammars-v4/tree/master/teal) | 0.05852 ± 0.0002107 | 0.05061 ± 0.0009152 | 0.1091 ± 0.001034 | 1127 ± 4.163 | 4559 ± 39.25 | 11.57 ± 0.1311 |
-| [telephone](https://github.com/antlr/grammars-v4/tree/master/telephone) | 0.02588 ± 0.002965 | 0.04732 ± 0.00419 | 0.0732 ± 0.007144 | 2017 ± 208.1 | 7.909e+04 ± 3347 | 167.7 ± 22.21 |
-| [terraform](https://github.com/antlr/grammars-v4/tree/master/terraform) | 0.1083 ± 0.004739 | 0.06517 ± 0.002238 | 0.1735 ± 0.003618 | 1.511e+04 ± 662.7 | 3.298e+04 ± 1572 | 63.27 ± 4.026 |
-| [tiny](https://github.com/antlr/grammars-v4/tree/master/tiny) | 0.03718 ± 0.00165 | 0.04444 ± 0.0008481 | 0.08162 ± 0.002493 | 701.3 ± 29.67 | 6322 ± 482.5 | 42.5 ± 1.672 |
-| [tinybasic](https://github.com/antlr/grammars-v4/tree/master/tinybasic) | 0.04197 ± 0.0021 | 0.04726 ± 0.001384 | 0.08923 ± 0.002123 | 1484 ± 71.36 | n.a. ± n.a. | n.a. ± n.a. |
-| [tinyc](https://github.com/antlr/grammars-v4/tree/master/tinyc) | 0.0465 ± 0.0004181 | 0.04662 ± 0.001507 | 0.09311 ± 0.00192 | 2645 ± 23.78 | 1.427e+04 ± 177.3 | 29.45 ± 0.2666 |
-| [tinymud](https://github.com/antlr/grammars-v4/tree/master/tinymud) | 0.02524 ± 0.0007687 | 0.04619 ± 0.0007173 | 0.07143 ± 0.001431 | 873 ± 27.02 | n.a. ± n.a. | n.a. ± n.a. |
-| [tnsnames](https://github.com/antlr/grammars-v4/tree/master/tnsnames) | 0.06648 ± 0.0003786 | 0.05327 ± 0.001125 | 0.1198 ± 0.001485 | 4061 ± 23.25 | n.a. ± n.a. | n.a. ± n.a. |
-| [tnt](https://github.com/antlr/grammars-v4/tree/master/tnt) | 0.03921 ± 0.0004984 | 0.04612 ± 0.001184 | 0.08533 ± 0.001646 | 4668 ± 59.74 | 4.164e+04 ± 780.7 | 145.9 ± 2.512 |
-| [toml](https://github.com/antlr/grammars-v4/tree/master/toml) | 0.06062 ± 0.0016 | 0.04987 ± 0.001155 | 0.1105 ± 0.001725 | 1.411e+04 ± 362.9 | 3.463e+04 ± 1411 | 24.86 ± 0.6791 |
-| [trac](https://github.com/antlr/grammars-v4/tree/master/trac) | 0.03522 ± 0.001027 | 0.04647 ± 0.0006735 | 0.08169 ± 0.001542 | 1166 ± 33.19 | 4.394e+04 ± 236 | 151.6 ± 3.903 |
-| [tsv](https://github.com/antlr/grammars-v4/tree/master/tsv) | 0.02068 ± 0.0004714 | 0.04268 ± 0.000702 | 0.06337 ± 0.001173 | 628.7 ± 14.4 | n.a. ± n.a. | n.a. ± n.a. |
-| [ttm](https://github.com/antlr/grammars-v4/tree/master/ttm) | 0.03495 ± 0.001181 | 0.04434 ± 0.0003423 | 0.07929 ± 0.001521 | 1835 ± 59.84 | 2.287e+05 ± 9049 | 330.5 ± 3.029 |
-| [turing](https://github.com/antlr/grammars-v4/tree/master/turing) | 0.04722 ± 0.0006198 | 0.04965 ± 0.001774 | 0.09687 ± 0.001865 | 1313 ± 17.06 | 6287 ± 187.4 | 47.94 ± 1.086 |
-| [turtle](https://github.com/antlr/grammars-v4/tree/master/turtle) | 0.1683 ± 0.003 | 0.05065 ± 0.0003827 | 0.219 ± 0.00265 | 1.849e+05 ± 3261 | 2.248e+05 ± 4918 | 83.65 ± 3.685 |
-| [unicode/graphemes](https://github.com/antlr/grammars-v4/tree/master/unicode/graphemes) | 0.0473 ± 0.0003301 | 0.07211 ± 0.0007502 | 0.1194 ± 0.00108 | 1.814e+04 ± 126.4 | 3.043e+04 ± 281.4 | 84.01 ± 1.287 |
-| [unreal_angelscript](https://github.com/antlr/grammars-v4/tree/master/unreal_angelscript) | 0.2464 ± 0.0035 | 0.06046 ± 0.0004131 | 0.3069 ± 0.003127 | 299.7 ± 4.256 | n.a. ± n.a. | n.a. ± n.a. |
-| [upnp](https://github.com/antlr/grammars-v4/tree/master/upnp) | 0.04537 ± 0.0009017 | 0.04885 ± 0.003087 | 0.09422 ± 0.003861 | 6397 ± 127.8 | 5.06e+04 ± 1124 | 35.55 ± 0.2786 |
-| [url](https://github.com/antlr/grammars-v4/tree/master/url) | 0.04388 ± 0.0008964 | 0.04938 ± 0.0006433 | 0.09326 ± 0.001383 | 7276 ± 147.5 | 2.636e+04 ± 831.8 | 168.2 ± 2.835 |
-| [useragent](https://github.com/antlr/grammars-v4/tree/master/useragent) | 0.02393 ± 0.001198 | 0.04577 ± 0.001315 | 0.0697 ± 0.00214 | 3905 ± 191.6 | 1.861e+05 ± 1.622e+04 | 241.4 ± 11.76 |
-| [vaxscan](https://github.com/antlr/grammars-v4/tree/master/vaxscan) | 0.2732 ± 0.003187 | 0.07649 ± 6.987e-05 | 0.3497 ± 0.003149 | 4.082e+04 ± 470.8 | 6.264e+04 ± 673.5 | 18.32 ± 0.04978 |
-| [vb6](https://github.com/antlr/grammars-v4/tree/master/vb6) | 2.254 ± 0.005125 | 0.1116 ± 0.003615 | 2.366 ± 0.008323 | 2164 ± 4.91 | 2627 ± 39.95 | 2.317 ± 0.1132 |
-| [vba/vba_cc](https://github.com/antlr/grammars-v4/tree/master/vba/vba_cc) | 0.06799 ± 0.002108 | 0.04867 ± 0.0008672 | 0.1167 ± 0.002811 | 2313 ± 70.74 | n.a. ± n.a. | n.a. ± n.a. |
-| [vba/vba_like](https://github.com/antlr/grammars-v4/tree/master/vba/vba_like) | 0.04333 ± 0.000612 | 0.04516 ± 0.0005097 | 0.0885 ± 0.001013 | 1039 ± 14.44 | 3903 ± 62.22 | 9.87 ± 0.2401 |
-| [vba/vba6](https://github.com/antlr/grammars-v4/tree/master/vba/vba6) | 1.479 ± 0.06973 | 0.1144 ± 0.002863 | 1.593 ± 0.07259 | 420.7 ± 19.63 | 539 ± 34.59 | 4.927 ± 0.3762 |
-| [vba/vba7_1](https://github.com/antlr/grammars-v4/tree/master/vba/vba7_1) | 1.544 ± 0.05481 | 0.146 ± 0.0002486 | 1.69 ± 0.0547 | 3758 ± 133.4 | 6276 ± 91.6 | 3.43 ± 0.2977 |
-| [verilog/systemverilog](https://github.com/antlr/grammars-v4/tree/master/verilog/systemverilog) | 8.203 ± 0.1345 | 0.2592 ± 0.01001 | 8.462 ± 0.1257 | 1420 ± 23.56 | 1433 ± 23.88 | 3.173 ± 0.04333 |
-| [verilog/verilog](https://github.com/antlr/grammars-v4/tree/master/verilog/verilog) | 0.3544 ± 0.002268 | 0.1033 ± 0.001498 | 0.4577 ± 0.003709 | 3.999e+04 ± 255.8 | 6.323e+04 ± 175.5 | 3.62 ± 0.04509 |
-| [vhdl/vhdl](https://github.com/antlr/grammars-v4/tree/master/vhdl/vhdl) | 1.693 ± 0.04069 | 0.08248 ± 3.189e-05 | 1.775 ± 0.04067 | 3.544e+04 ± 852.6 | 3.769e+04 ± 949.3 | 41.32 ± 0.8121 |
-| [vhdl/vhdl2008](https://github.com/antlr/grammars-v4/tree/master/vhdl/vhdl2008) | 8.098 ± 0.06034 | 0.08824 ± 0.0009118 | 8.186 ± 0.0602 | 7533 ± 55.81 | 7713 ± 56.93 | 16.51 ± 0.03712 |
-| [vmf](https://github.com/antlr/grammars-v4/tree/master/vmf) | 0.1566 ± 0.0008097 | 0.0447 ± 0.0007092 | 0.2013 ± 0.001067 | 2.294e+04 ± 117.8 | n.a. ± n.a. | n.a. ± n.a. |
-| [wat](https://github.com/antlr/grammars-v4/tree/master/wat) | 0.0474 ± 0.0007429 | 0.04963 ± 0.0007565 | 0.09702 ± 0.0008046 | 1203 ± 18.37 | n.a. ± n.a. | n.a. ± n.a. |
-| [wavefront](https://github.com/antlr/grammars-v4/tree/master/wavefront) | 0.05984 ± 0.0001658 | 0.05027 ± 0.0001414 | 0.1101 ± 0.0003015 | 5.45e+04 ± 151.2 | 1.129e+05 ± 376.5 | 70.85 ± 0.3998 |
-| [webidl](https://github.com/antlr/grammars-v4/tree/master/webidl) | 0.06354 ± 0.0001774 | 0.05031 ± 0.0007057 | 0.1138 ± 0.000641 | 4.024e+04 ± 112.1 | 1.693e+05 ± 614.8 | 4.907 ± 0.0318 |
-| [wkt](https://github.com/antlr/grammars-v4/tree/master/wkt) | 0.05442 ± 0.0006034 | 0.04515 ± 0.0003336 | 0.09957 ± 0.0008714 | 1.753e+04 ± 195.1 | 7.977e+04 ± 2790 | 12.96 ± 0.4293 |
-| [wkt-crs-v1](https://github.com/antlr/grammars-v4/tree/master/wkt-crs-v1) | 0.04285 ± 3.881e-05 | 0.04451 ± 0.0001114 | 0.08736 ± 8.34e-05 | 5017 ± 4.583 | n.a. ± n.a. | n.a. ± n.a. |
-| [wln](https://github.com/antlr/grammars-v4/tree/master/wln) | 0.01995 ± 3.051e-05 | 0.04708 ± 0.002716 | 0.06702 ± 0.002686 | 2005 ± 3.215 | 3.119e+04 ± 226.7 | 146.6 ± 1.355 |
-| [wren](https://github.com/antlr/grammars-v4/tree/master/wren) | 0.7949 ± 0.04215 | 0.05318 ± 0.0006476 | 0.8481 ± 0.04183 | 7497 ± 395.5 | 8366 ± 533.5 | 2.633 ± 0.1765 |
-| [xml](https://github.com/antlr/grammars-v4/tree/master/xml) | 0.0366 ± 0.0001928 | 0.04492 ± 0.0001837 | 0.08152 ± 0.0001745 | 2.541e+04 ± 134.1 | 1.319e+05 ± 1827 | 5.823 ± 0.05239 |
-| [xpath/xpath1](https://github.com/antlr/grammars-v4/tree/master/xpath/xpath1) | 0.04384 ± 0.0001542 | 0.0453 ± 8.116e-05 | 0.08914 ± 0.0001454 | 410.3 ± 1.453 | 2010 ± 10.84 | 12.69 ± 0.08988 |
-| [xpath/xpath20](https://github.com/antlr/grammars-v4/tree/master/xpath/xpath20) | 0.1703 ± 0.0004753 | 0.05806 ± 0.0004969 | 0.2283 ± 4.857e-05 | 5.448e+04 ± 152.7 | n.a. ± n.a. | n.a. ± n.a. |
-| [xpath/xpath31](https://github.com/antlr/grammars-v4/tree/master/xpath/xpath31) | 0.2129 ± 0.001043 | 0.05881 ± 0.0007779 | 0.2717 ± 0.0002843 | 4.53e+04 ± 222 | n.a. ± n.a. | n.a. ± n.a. |
-| [xsd-regex](https://github.com/antlr/grammars-v4/tree/master/xsd-regex) | 0.03586 ± 0.0001874 | 0.04548 ± 0.0003138 | 0.08134 ± 0.0003758 | 1366 ± 7.055 | 2765 ± 7.688 | 13.55 ± 0.132 |
-| [xyz](https://github.com/antlr/grammars-v4/tree/master/xyz) | 0.0374 ± 0.0001476 | 0.04279 ± 0.0008047 | 0.08019 ± 0.0008887 | 3582 ± 14.11 | 8.387e+04 ± 805.8 | 46.5 ± 0.4306 |
-| [yara](https://github.com/antlr/grammars-v4/tree/master/yara) | 0.08682 ± 0.001859 | 0.05155 ± 0.0029 | 0.1384 ± 0.002516 | 1.57e+04 ± 329.5 | n.a. ± n.a. | n.a. ± n.a. |
-| [yini](https://github.com/antlr/grammars-v4/tree/master/yini) | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. | n.a. ± n.a. |
-| [zig](https://github.com/antlr/grammars-v4/tree/master/zig) | 0.191 ± 0.003018 | 0.05165 ± 0.001818 | 0.2427 ± 0.004836 | 1314 ± 20.63 | 1598 ± 40.17 | 1.703 ± 0.0441 |
-
+| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up | Ambiguities | Actions |
+|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|
+| abb | 0.05018 ± 0.003113 | 0.04592 ± 0.0002224 | 0.0961 ± 0.002897 | 3033 ± 195.1 | n.a. | n.a. | 1 | 0 |
+| abnf | 0.05022 ± 0.001259 | 0.05136 ± 0.0002332 | 0.1016 ± 0.001444 | 1.682e+05 ± 4278 | 5.625e+05 ± 1.971e+04 | 11.83 ± 0.4137 | 0 | 0 |
+| acme | 0.3393 ± 0.0236 | 0.07402 ± 0.002307 | 0.4133 ± 0.02591 | 1.118e+05 ± 7285 | 1.496e+05 ± 1.123e+04 | 33.49 ± 1.601 | 777 | 0 |
+| action | 0.07911 ± 0.002383 | 0.04913 ± 0.000735 | 0.1282 ± 0.002243 | 1899 ± 56.89 | 3758 ± 264.8 | 15.61 ± 1.313 | 11 | 0 |
+| ada/ada2005 | 0.2542 ± 0.01331 | 0.07175 ± 0.0006673 | 0.3259 ± 0.0129 | 489.7 ± 24.36 | 1997 ± 155.7 | 5.743 ± 0.1915 | 1 | 0 |
+| ada/ada2012 | 11.18 ± 0.002151 | 0.1271 ± 0.0006846 | 11.31 ± 0.001623 | 3216 ± 0.5774 | 3272 ± 0.5774 | 7.473 ± 0.07219 | 2585 | 68 |
+| ada/ada2022 | 13.93 ± 0.0898 | 0.1439 ± 0.008842 | 14.08 ± 0.09038 | 2581 ± 16.64 | 2625 ± 17.1 | 7.35 ± 0.1054 | 2591 | 68 |
+| ada/ada83 | 0.1255 ± 0.0004642 | 0.07241 ± 0.0003181 | 0.1979 ± 0.0004667 | 987.7 ± 3.756 | 5255 ± 131.8 | 7.69 ± 0.1762 | 4 | 0 |
+| ada/ada95 | 0.2062 ± 0.001817 | 0.07373 ± 0.000132 | 0.2799 ± 0.001686 | 601 ± 5.292 | 2597 ± 105.2 | 6.143 ± 0.2521 | 1 | 0 |
+| agc | 1.642 ± 0.03896 | 0.05807 ± 0.000311 | 1.7 ± 0.03873 | 2.179e+04 ± 505.2 | 2.561e+04 ± 791.9 | 3.04 ± 0.1217 | 1.379e+04 | 0 |
+| alef | 0.06627 ± 0.0003303 | 0.04998 ± 0.0004575 | 0.1163 ± 0.0007457 | 769 ± 3.786 | n.a. | n.a. | 4 | 0 |
+| algol60 | 1.998 ± 0.0276 | 0.05435 ± 0.0001035 | 2.053 ± 0.0276 | 3877 ± 54.54 | 5105 ± 21.38 | 2.333 ± 0.09684 | 162 | 0 |
+| alloy | 0.06861 ± 0.0009145 | 0.04866 ± 0.0008794 | 0.1173 ± 0.001725 | 1939 ± 26.09 | 8430 ± 107.1 | 23.27 ± 0.5847 | 9 | 0 |
+| alpaca | 0.0458 ± 0.002378 | 0.04611 ± 0.002648 | 0.09191 ± 0.005026 | 1163 ± 57.36 | n.a. | n.a. | 0 | 0 |
+| amazon-states-language | 0.08736 ± 0.00136 | 0.05993 ± 0.0001729 | 0.1473 ± 0.001234 | 1.091e+04 ± 168.5 | 1.977e+04 ± 220.3 | 6.69 ± 0.05568 | 19 | 0 |
+| amazon-states-language-intrinsic-functions | 0.03452 ± 0.0001252 | 0.04732 ± 6.869e-05 | 0.08185 ± 0.00018 | 5503 ± 20 | 6.21e+04 ± 495.9 | 218.1 ± 2.176 | 0 | 0 |
+| angelscript | 0.03792 ± 0.0001637 | 0.04758 ± 0.0008866 | 0.0855 ± 0.0009975 | 184.3 ± 0.6667 | n.a. | n.a. | 0 | 0 |
+| antlr/antlr2 | 0.3326 ± 0.003832 | 0.06619 ± 0.0005516 | 0.3988 ± 0.003286 | 5.531e+05 ± 6422 | 7.095e+05 ± 1.124e+04 | 3.577 ± 0.05175 | 0 | 4 |
+| antlr/antlr3 | 0.2478 ± 0.001351 | 0.06443 ± 0.001032 | 0.3123 ± 0.002379 | 2.858e+05 ± 1550 | 3.526e+05 ± 2224 | 1.887 ± 0.003333 | 1 | 4 |
+| antlr/antlr4 | 2.141 ± 0.07421 | 0.2414 ± 0.01305 | 2.382 ± 0.0624 | 6.883e+05 ± 2.416e+04 | 7.043e+05 ± 2.536e+04 | 65.9 ± 2.616 | 9 | 2 |
+| aql | 0.2311 ± 0.002513 | 0.05414 ± 0.000284 | 0.2852 ± 0.002377 | 7077 ± 76.38 | 8513 ± 106.1 | 56.26 ± 0.5541 | 75 | 0 |
+| arden | 1.023 ± 0.005803 | 0.08057 ± 0.0008061 | 1.103 ± 0.005775 | 2.135e+04 ± 121.2 | 2.375e+04 ± 169.2 | 14.3 ± 0.1929 | 47 | 0 |
+| arithmetic | 0.03964 ± 0.001442 | 0.04785 ± 0.0007613 | 0.08749 ± 0.002196 | 4325 ± 152.1 | 2.639e+04 ± 409.6 | 219.4 ± 5.313 | 0 | 0 |
+| asl | 0.1805 ± 0.004598 | 0.0632 ± 0.0008374 | 0.2437 ± 0.005251 | 1.188e+04 ± 296.8 | 1.512e+04 ± 462.1 | 5.137 ± 0.1139 | 46 | 0 |
+| asm/asm6502 | 0.05424 ± 0.0001101 | 0.04845 ± 0.0001673 | 0.1027 ± 0.000269 | 9.728e+04 ± 198 | 2.535e+05 ± 833.7 | 85.74 ± 0.4746 | 0 | 0 |
+| asm/asm8080 | 1.109 ± 0.04506 | 0.06576 ± 0.0004214 | 1.175 ± 0.0452 | 1.525e+05 ± 6042 | 1.619e+05 ± 7274 | 1.757 ± 0.07126 | 3265 | 0 |
+| asm/asm8086 | 0.1448 ± 0.0008784 | 0.05397 ± 0.0003034 | 0.1988 ± 0.001136 | 9.855e+04 ± 594.5 | 1.559e+05 ± 1234 | 5.107 ± 0.02333 | 142 | 0 |
+| asm/asmMASM | 0.05314 ± 4.365e-05 | 0.0468 ± 0.0005703 | 0.09994 ± 0.0005846 | 5193 ± 4.041 | 2.164e+04 ± 57.36 | 9.247 ± 0.02186 | 1 | 0 |
+| asm/asmRISCV | 0.07605 ± 0.0002533 | 0.07776 ± 0.0005997 | 0.1538 ± 0.0008124 | 5154 ± 17.48 | 4.129e+04 ± 828.9 | 21.06 ± 0.4385 | 3 | 0 |
+| asm/asmZ80 | 0.2313 ± 0.005133 | 0.04886 ± 0.0006771 | 0.2802 ± 0.005795 | 7.909e+04 ± 1723 | 9.209e+04 ± 924 | 1.183 ± 0.01856 | 674 | 0 |
+| asm/nasm | 0.2213 ± 0.004658 | 0.1706 ± 0.0001091 | 0.3918 ± 0.004613 | 2.916e+04 ± 604.6 | 5.005e+04 ± 1839 | 9.887 ± 0.3597 | 479 | 0 |
+| asm/pdp7 | 1.37 ± 0.0251 | 0.06365 ± 0.0004124 | 1.433 ± 0.02469 | 3.556e+04 ± 648.8 | 3.881e+04 ± 847.7 | 2.967 ± 0.0857 | 8951 | 0 |
+| asm/ptx/ptx-isa-1.0 | 0.08939 ± 0.0009909 | 0.05949 ± 0.001002 | 0.1489 ± 0.001993 | 3.182e+04 ± 350.4 | n.a. | n.a. | 2 | 0 |
+| asn/asn | 0.0635 ± 0.003357 | 0.05895 ± 0.001619 | 0.1225 ± 0.004956 | 1962 ± 98.67 | 2.254e+04 ± 957 | 31.98 ± 0.2837 | 0 | 0 |
+| asn/asn_3gpp | 0.1536 ± 0.008587 | 0.05898 ± 0.0006548 | 0.2125 ± 0.008075 | 1133 ± 61.65 | n.a. | n.a. | 10 | 1 |
+| aterm | 0.04005 ± 0.0001381 | 0.04677 ± 0.001283 | 0.08682 ± 0.001155 | 2896 ± 10.2 | 2.148e+04 ± 394.6 | 373.2 ± 9.32 | 16 | 0 |
+| awk | 0.172 ± 0.00229 | 0.04915 ± 0.0004473 | 0.2212 ± 0.00218 | 1209 ± 16.04 | 2035 ± 32.76 | 2.477 ± 0.01667 | 3 | 0 |
+| b | 0.05552 ± 0.0002511 | 0.0469 ± 0.0005733 | 0.1024 ± 0.0007568 | 4755 ± 21.39 | 2.286e+04 ± 158.1 | 31.46 ± 0.1424 | 0 | 0 |
+| basic | 0.3677 ± 0.002594 | 0.05456 ± 0.0006125 | 0.4223 ± 0.00262 | 1.436e+04 ± 100.8 | 1.7e+04 ± 115.7 | 16.89 ± 0.08969 | 354 | 0 |
+| bcpl | 15.02 ± 0.1574 | 0.05626 ± 0.0002605 | 15.07 ± 0.1575 | 0 ± 0 | 0 ± 0 | n.a. | 878 | 2 |
+| bdf | 0.1762 ± 0.00233 | 0.04859 ± 0.0008896 | 0.2248 ± 0.003132 | 3.628e+05 ± 4743 | 4.371e+05 ± 1669 | 231.2 ± 18.38 | 0 | 0 |
+| bencoding | 0.026 ± 0.000188 | 0.04427 ± 0.001188 | 0.07027 ± 0.001326 | 3076 ± 22.55 | 1.501e+05 ± 3169 | 104.3 ± 2.039 | 0 | 2 |
+| bibcode | 0.02266 ± 0.0002449 | 0.04402 ± 0.0002066 | 0.06668 ± 0.000361 | 3530 ± 37.87 | 1.049e+05 ± 1.186e+04 | 115.9 ± 14 | 0 | 0 |
+| bibtex | 0.02491 ± 0.0001511 | 0.0441 ± 0.000384 | 0.06901 ± 0.000534 | 4977 ± 30.07 | n.a. | n.a. | 0 | 0 |
+| bicep | 0.09669 ± 0.000988 | 0.05205 ± 0.0004653 | 0.1487 ± 0.001157 | 2.523e+04 ± 257.8 | 2.968e+04 ± 323.6 | 431 ± 2.828 | 8 | 0 |
+| bison | 0.055 ± 0.001155 | 0.04902 ± 0.0004902 | 0.104 ± 0.001634 | 6678 ± 139 | 2.828e+04 ± 1347 | 8.813 ± 0.4146 | 0 | 1 |
+| blueprint | 0.03783 ± 0.0001538 | 0.04491 ± 0.0009985 | 0.08274 ± 0.001127 | 1956 ± 8.09 | n.a. | n.a. | 0 | 0 |
+| bnf | 1.494 ± 0.05445 | 0.04786 ± 0.0005993 | 1.542 ± 0.05503 | 4360 ± 153.5 | 4623 ± 176.7 | 2.933 ± 0.1091 | 3097 | 1 |
+| c | 1.138 ± 0.01925 | 1.464 ± 0.003146 | 2.602 ± 0.02129 | 5.888e+04 ± 982.7 | 6.376e+04 ± 1159 | 98.38 ± 1.968 | 311 | 23 |
+| calculator | 0.02531 ± 0.0003196 | 0.04687 ± 0.0002036 | 0.07218 ± 0.0004506 | 9641 ± 120.2 | 9.972e+04 ± 1133 | 286 ± 3.157 | 0 | 0 |
+| callable | 0.02179 ± 0.0002942 | 0.04274 ± 0.000482 | 0.06453 ± 0.000508 | 1882 ± 25.15 | 2.979e+04 ± 782.9 | 122.6 ± 3.649 | 0 | 0 |
+| capnproto | 0.08103 ± 0.000268 | 0.04899 ± 0.0005836 | 0.13 ± 0.0005256 | 1.016e+05 ± 335.5 | 1.966e+05 ± 795.1 | 61.61 ± 0.2179 | 48 | 0 |
+| chip8 | 0.03264 ± 0.0008007 | 0.04473 ± 0.0003262 | 0.07737 ± 0.001126 | 275.3 ± 6.692 | n.a. | n.a. | 0 | 0 |
+| clf | 0.08494 ± 0.000366 | 0.04524 ± 0.000333 | 0.1302 ± 0.0004086 | 2.372e+05 ± 1020 | 5.948e+04 ± 820.4 | 0.2467 ± 0.003333 | 0 | 0 |
+| clojure | 0.03675 ± 0.0001932 | 0.04525 ± 0.0002606 | 0.082 ± 0.0001477 | 870.3 ± 4.485 | n.a. | n.a. | 0 | 0 |
+| clu | 0.1588 ± 0.0004199 | 0.04847 ± 0.0001968 | 0.2073 ± 0.0002822 | 1195 ± 3.18 | 2.488e+04 ± 125.8 | 23.67 ± 0.0857 | 10 | 0 |
+| cmake | 0.02457 ± 0.0001261 | 0.04359 ± 0.0009792 | 0.06816 ± 0.001093 | 2848 ± 14.71 | n.a. | n.a. | 0 | 0 |
+| cobol85 | 0.07203 ± 0.0002508 | 0.1553 ± 4.007e-05 | 0.2274 ± 0.0002202 | 680 ± 2.309 | n.a. | n.a. | 0 | 0 |
+| codeql | 0.3788 ± 0.008447 | 0.06196 ± 0.000217 | 0.4408 ± 0.00861 | 7818 ± 173.3 | 9295 ± 235.3 | 4.773 ± 0.09404 | 44 | 0 |
+| cookie | 0.02123 ± 8.53e-05 | 0.04473 ± 0.0004333 | 0.06597 ± 0.0005171 | 1695 ± 6.741 | 1.408e+05 ± 1034 | 185.6 ± 1.558 | 0 | 0 |
+| corundum | 0.5544 ± 0.02238 | 0.04973 ± 0.0007586 | 0.6041 ± 0.02305 | 1366 ± 55.59 | n.a. | n.a. | 101 | 0 |
+| cpp | 1.952 ± 0.03635 | 0.07478 ± 0.0002319 | 2.027 ± 0.03612 | 3032 ± 57.07 | 3208 ± 63.38 | 13.23 ± 0.2221 | 670 | 2 |
+| cql | 0.04459 ± 0.0003174 | 0.04705 ± 0.0006639 | 0.09164 ± 0.000662 | 1121 ± 8.021 | 4851 ± 29.87 | 42.57 ± 0.2385 | 0 | 0 |
+| cql3 | 0.1749 ± 0.000433 | 0.08852 ± 0.001198 | 0.2635 ± 0.001084 | 1.167e+04 ± 29.01 | 1.517e+04 ± 77.2 | 16.3 ± 0.1934 | 66 | 0 |
+| creole | 0.2158 ± 0.000862 | 0.04464 ± 0.0002161 | 0.2604 ± 0.0009886 | 3221 ± 13.01 | 3932 ± 11.84 | 31.7 ± 0.3646 | 133 | 0 |
+| csharp/v6 | 1.446 ± 0.01791 | 0.08573 ± 0.0004257 | 1.532 ± 0.01829 | 5826 ± 72.48 | 5391 ± 245.3 | 0.92 ± 0.03215 | 133 | 38 |
+| csharp/v7 | 1.296 ± 0.04784 | 0.09526 ± 0.0005601 | 1.391 ± 0.04786 | 8031 ± 286 | 2.21e+04 ± 1184 | 3.677 ± 0.1386 | 161 | 16 |
+| csharp/v8-spec | 8.875 ± 0.07685 | 0.1334 ± 0.004494 | 9.008 ± 0.07934 | 1192 ± 10.2 | 2098 ± 46.62 | 2.913 ± 0.1033 | 238 | 59 |
+| css3 | 2.682 ± 0.02923 | 0.06854 ± 0.0005454 | 2.75 ± 0.02891 | 3.976e+04 ± 438.2 | 4.087e+04 ± 453.9 | 271.7 ± 3.788 | 1.144e+04 | 0 |
+| csv | 0.01984 ± 4.303e-05 | 0.04278 ± 0.0006406 | 0.06262 ± 0.0006819 | 4486 ± 9.597 | n.a. | n.a. | 0 | 0 |
+| ctl | 0.03194 ± 0.0001644 | 0.0444 ± 0.0001692 | 0.07634 ± 0.0001646 | 375.3 ± 2.028 | n.a. | n.a. | 0 | 0 |
+| cto | 0.06113 ± 0.0004354 | 0.04749 ± 0.0003003 | 0.1086 ± 0.0007335 | 4760 ± 33.81 | 1.88e+04 ± 211.5 | 40.01 ± 0.2171 | 0 | 0 |
+| cypher | 0.1022 ± 0.00104 | 0.06099 ± 0.001121 | 0.1632 ± 0.002161 | 1.415e+04 ± 142.4 | 2.618e+04 ± 556.1 | 54.44 ± 1.477 | 0 | 0 |
+| d2 | 0.04386 ± 0.0006061 | 0.0448 ± 0.0006055 | 0.08866 ± 0.00118 | 3261 ± 44.63 | 1.642e+04 ± 216.3 | 145.2 ± 1.232 | 15 | 0 |
+| databank | 0.04093 ± 5.176e-05 | 0.0457 ± 0.000152 | 0.08663 ± 0.0001562 | 3.257e+04 ± 41.16 | 3.246e+05 ± 467.1 | 83.45 ± 0.1919 | 6 | 1 |
+| datalog | 0.03817 ± 0.0001646 | 0.04423 ± 9.513e-05 | 0.0824 ± 0.0002513 | 2829 ± 12.17 | 1.137e+05 ± 2956 | 60.61 ± 1.332 | 0 | 0 |
+| dice | 0.04399 ± 0.0001784 | 0.0447 ± 0.0003645 | 0.08869 ± 0.0005429 | 1977 ± 7.965 | 5948 ± 50.36 | 15.55 ± 0.1106 | 11 | 0 |
+| dif | 0.03307 ± 0.0002093 | 0.04244 ± 0.0003564 | 0.07551 ± 0.0004485 | 3689 ± 23.17 | 4.047e+05 ± 1.165e+04 | 218.3 ± 4.996 | 0 | 0 |
+| doiurl | 0.03364 ± 4.994e-05 | 0.0439 ± 0.0003361 | 0.07754 ± 0.000373 | 1.022e+04 ± 14.99 | 3.498e+05 ± 6929 | 497.7 ± 9.422 | 0 | 0 |
+| dot | 0.04231 ± 0.0002716 | 0.04515 ± 0.001644 | 0.08746 ± 0.001775 | 3.181e+04 ± 205.6 | 3.221e+05 ± 7203 | 114.7 ± 2.035 | 0 | 0 |
+| ebnf | 0.0344 ± 0.0001916 | 0.04221 ± 0.0002878 | 0.07661 ± 0.000469 | 668.3 ± 3.756 | n.a. | n.a. | 0 | 0 |
+| edif300 | 0.06832 ± 0.001638 | 0.1229 ± 0.003704 | 0.1912 ± 0.005152 | 1904 ± 44.68 | n.a. | n.a. | 0 | 0 |
+| edn | 0.2958 ± 0.01579 | 0.07174 ± 5.309e-05 | 0.3675 ± 0.01583 | 2.835e+05 ± 1.536e+04 | 3.144e+05 ± 1.902e+04 | 11.48 ± 0.67 | 0 | 0 |
+| eiffel | 0.5744 ± 0.001297 | 0.06898 ± 0.0009085 | 0.6433 ± 0.00209 | 1936 ± 4.333 | 2547 ± 14.43 | 2.58 ± 0.03215 | 344 | 7 |
+| elixir | 18.49 ± 0.3559 | 0.1219 ± 0.0003105 | 18.62 ± 0.3561 | 412 ± 7.638 | 532 ± 11.36 | 1.487 ± 0.01202 | 1347 | 0 |
+| erlang | 0.2355 ± 0.0004664 | 0.05001 ± 0.0001657 | 0.2855 ± 0.0005846 | 2763 ± 5.457 | 4287 ± 20.66 | 5.723 ± 0.0393 | 9 | 0 |
+| esolang/barrous | 0.03476 ± 0.00201 | 0.04476 ± 7.544e-05 | 0.07952 ± 0.001942 | 1128 ± 61.84 | 3.667e+04 ± 4725 | 55.06 ± 8.854 | 0 | 0 |
+| esolang/bio | 0.02493 ± 0.0007695 | 0.04275 ± 0.0002782 | 0.06768 ± 0.0006617 | 3.773e+04 ± 1130 | 5.061e+05 ± 3309 | 14.72 ± 0.5568 | 0 | 0 |
+| esolang/brainflak | 0.02029 ± 6.321e-05 | 0.04208 ± 0.0005486 | 0.06237 ± 0.0005008 | 1330 ± 4.041 | 2.937e+05 ± 2780 | 848.7 ± 8.468 | 0 | 0 |
+| esolang/brainfuck | 0.02336 ± 0.0001938 | 0.04326 ± 0.001132 | 0.06663 ± 0.001325 | 3.63e+04 ± 298.7 | 2.668e+05 ± 1313 | 16.34 ± 0.07796 | 0 | 0 |
+| esolang/cool | 0.0761 ± 0.000812 | 0.05172 ± 0.000124 | 0.1278 ± 0.00072 | 1.361e+05 ± 1461 | 3.34e+05 ± 8276 | 9.093 ± 0.2293 | 0 | 0 |
+| esolang/lolcode | 0.0386 ± 0.0001099 | 0.04484 ± 0.001121 | 0.08344 ± 0.001221 | 155 ± 0.5774 | n.a. | n.a. | 1 | 0 |
+| esolang/loop | 0.03183 ± 0.0002663 | 0.04212 ± 7.574e-05 | 0.07394 ± 0.0003173 | 785 ± 6.506 | 2.201e+04 ± 226.3 | 136.1 ± 1.684 | 0 | 0 |
+| esolang/nanofuck | 0.03078 ± 0.0001755 | 0.04266 ± 0.0003226 | 0.07344 ± 0.000319 | 1429 ± 8.083 | 2.122e+05 ± 1.86e+04 | 163.1 ± 13.5 | 0 | 0 |
+| esolang/sickbay | 0.03582 ± 9.359e-05 | 0.04313 ± 9.143e-05 | 0.07895 ± 0.000184 | 2428 ± 6.227 | n.a. | n.a. | 3 | 0 |
+| esolang/skull | 0.03297 ± 0.0002499 | 0.04236 ± 8.972e-05 | 0.07533 ± 0.0002944 | 6583 ± 49.64 | 1.109e+05 ± 526.9 | 31.99 ± 0.2525 | 0 | 0 |
+| esolang/snowball | 0.03001 ± 0.0006217 | 0.04711 ± 0.0003546 | 0.07712 ± 0.0009753 | 1133 ± 23.01 | n.a. | n.a. | 0 | 0 |
+| esolang/wheel | 0.02044 ± 0.00011 | 0.04202 ± 0.0003006 | 0.06245 ± 0.0004105 | 3278 ± 17.5 | 9.546e+04 ± 62 | 82.91 ± 0.4305 | 0 | 0 |
+| esolang/whenever | 0.04775 ± 7.37e-05 | 0.04391 ± 0.0001511 | 0.09166 ± 0.000204 | 6178 ± 9.701 | 1.812e+05 ± 5581 | 50.16 ± 1.49 | 8 | 0 |
+| evm-bytecode | 0.02665 ± 0.0001215 | 0.04788 ± 0.0001644 | 0.07454 ± 0.0002214 | 6.862e+04 ± 311.2 | n.a. | n.a. | 0 | 0 |
+| fasta | 2.271 ± 0.07369 | 0.1292 ± 0.0006575 | 2.4 ± 0.07304 | 9.513e+04 ± 3184 | 1.249e+05 ± 2075 | 2.923 ± 0.1372 | 1.905e+05 | 0 |
+| fdo91 | 0.04544 ± 0.0002886 | 0.04445 ± 0.000739 | 0.08989 ± 0.0009692 | 1.173e+04 ± 75.06 | 6.512e+04 ± 539.2 | 72.34 ± 0.3688 | 61 | 0 |
+| fen | 0.02291 ± 3.058e-05 | 0.04351 ± 0.0001351 | 0.06642 ± 0.0001436 | 1.056e+04 ± 13.97 | 2.273e+05 ± 2279 | 88.08 ± 0.8321 | 0 | 0 |
+| flatbuffers | 0.05145 ± 0.0002896 | 0.05025 ± 0.0001223 | 0.1017 ± 0.0003977 | 5.759e+04 ± 323.1 | 1.788e+05 ± 635.2 | 60.93 ± 0.181 | 0 | 0 |
+| flowmatic | 0.03992 ± 1.877e-06 | 0.04257 ± 9.962e-05 | 0.08249 ± 9.972e-05 | 5060 ± 0.3333 | n.a. | n.a. | 0 | 0 |
+| focal | 0.04427 ± 0.0001772 | 0.04436 ± 0.0002649 | 0.08863 ± 0.000436 | 6302 ± 25.1 | n.a. | n.a. | 0 | 0 |
+| fol | 0.04779 ± 0.0008147 | 0.04472 ± 0.001085 | 0.09251 ± 0.001899 | 4543 ± 76.28 | 4.461e+04 ± 436.4 | 41.73 ± 0.5617 | 5 | 0 |
+| fortran/fortran77 | 0.145 ± 0.002358 | 0.06262 ± 0.001128 | 0.2076 ± 0.003469 | 1138 ± 18.19 | 1763 ± 9.871 | 5.77 ± 0.14 | 0 | 1 |
+| freedesktop/desktop-entry | 0.03998 ± 5.306e-05 | 0.04587 ± 0.000786 | 0.08586 ± 0.0007489 | 2.066e+04 ± 27.55 | 2.04e+05 ± 820.5 | 16.47 ± 0.05239 | 0 | 0 |
+| gdscript | 0.2065 ± 0.002513 | 0.05075 ± 0.0004422 | 0.2572 ± 0.002565 | 2421 ± 29.2 | 3559 ± 84.35 | 6.587 ± 0.2111 | 2 | 8 |
+| gedcom | 0.04715 ± 0.0005456 | 0.04321 ± 9.6e-05 | 0.09036 ± 0.00045 | 7191 ± 84.34 | n.a. | n.a. | 163 | 0 |
+| geekcode | 0.07962 ± 0.0001646 | 0.04627 ± 0.001017 | 0.1259 ± 0.0009509 | 4935 ± 10.17 | 1.642e+04 ± 12.55 | 8.317 ± 0.01764 | 96 | 0 |
+| gff3 | 0.02571 ± 0.000239 | 0.04246 ± 0.0006835 | 0.06817 ± 0.0006744 | 2.731e+04 ± 252.8 | 5.176e+05 ± 3.774e+04 | 30.8 ± 2.306 | 0 | 0 |
+| glsl | 0.2736 ± 0.003771 | 0.07196 ± 0.001119 | 0.3456 ± 0.003206 | 7976 ± 108.3 | 1.136e+04 ± 142.9 | 10.07 ± 0.1584 | 22 | 0 |
+| gml | 0.03483 ± 0.0001083 | 0.04572 ± 0.0002347 | 0.08054 ± 0.0001264 | 1.087e+05 ± 337.2 | 2.969e+05 ± 555.9 | 100.3 ± 0.4073 | 0 | 0 |
+| golang | 2.406 ± 0.04035 | 0.1012 ± 0.0008241 | 2.507 ± 0.03953 | 2.174e+04 ± 358.8 | 2.33e+04 ± 400.9 | 33.02 ± 0.3411 | 389 | 9 |
+| gql | 0.1624 ± 0.0007037 | 0.1513 ± 0.0007902 | 0.3136 ± 0.0001545 | 806.7 ± 3.48 | 1486 ± 5.132 | 12.04 ± 0.02667 | 5 | 0 |
+| graphstream-dgs | 0.04655 ± 0.0001582 | 0.04616 ± 0.0002377 | 0.09271 ± 0.0003887 | 1.414e+04 ± 47.98 | 7.536e+04 ± 666.5 | 110.6 ± 1.401 | 84 | 0 |
+| gtin | 0.04973 ± 7.46e-05 | 0.04433 ± 8.446e-05 | 0.09406 ± 4.553e-05 | 2734 ± 4.041 | 8762 ± 30.02 | 22.42 ± 0.09207 | 4 | 0 |
+| guido | 0.07125 ± 0.0006218 | 0.04502 ± 0.0004466 | 0.1163 ± 0.001049 | 2.153e+04 ± 186.7 | 5.718e+04 ± 296 | 35.79 ± 0.2261 | 366 | 0 |
+| guitartab | 0.0217 ± 0.0001077 | 0.04228 ± 0.0003554 | 0.06397 ± 0.0004602 | 2.927e+04 ± 144.7 | 6.425e+05 ± 3995 | 105.8 ± 0.671 | 0 | 0 |
+| gvpr | 0.8155 ± 0.01832 | 0.06388 ± 0.0006854 | 0.8794 ± 0.01788 | 1.663e+04 ± 368.1 | 1.794e+04 ± 428 | 89.7 ± 2.17 | 897 | 3 |
+| haskell | 7.347 ± 0.07082 | 0.1039 ± 0.00479 | 7.451 ± 0.06878 | 346.7 ± 3.333 | 359 ± 4.041 | 2.14 ± 0.06245 | 549 | 6 |
+| hexpat | 0.2031 ± 0.005302 | 0.05262 ± 0.0006864 | 0.2557 ± 0.005495 | 5.83e+04 ± 1496 | 8.008e+04 ± 2181 | 4.853 ± 0.02728 | 126 | 0 |
+| http | 0.04711 ± 3.412e-05 | 0.04466 ± 0.0001854 | 0.09177 ± 0.0002157 | 2.615e+04 ± 18.76 | 9.277e+04 ± 358.5 | 113.1 ± 0.5021 | 5 | 0 |
+| hypertalk | 4.45 ± 0.05247 | 0.07417 ± 0.0002935 | 4.524 ± 0.05272 | 1712 ± 20.22 | n.a. | n.a. | 795 | 0 |
+| icalendar | 0.1123 ± 0.001804 | 0.06726 ± 0.002392 | 0.1796 ± 0.004196 | 4836 ± 76.46 | n.a. | n.a. | 18 | 0 |
+| icon | 0.07342 ± 0.0002602 | 0.04756 ± 0.0002803 | 0.121 ± 0.0001677 | 135.7 ± 0.3333 | n.a. | n.a. | 1 | 0 |
+| idl | 0.08901 ± 0.001037 | 0.06036 ± 0.0008479 | 0.1494 ± 0.001817 | 7181 ± 83.89 | 1.309e+04 ± 166.4 | 12.42 ± 0.02728 | 0 | 0 |
+| inf | 0.02262 ± 0.0002427 | 0.04291 ± 0.0003334 | 0.06553 ± 0.0004909 | 1724 ± 18.33 | 1.465e+04 ± 76.05 | 33.48 ± 0.2084 | 0 | 0 |
+| informix | 0.123 ± 0.000756 | 0.1005 ± 0.001041 | 0.2235 ± 0.001788 | 812.7 ± 4.91 | 1185 ± 3.606 | 4.273 ± 0.03756 | 20 | 0 |
+| iri | 0.03913 ± 0.0001509 | 0.047 ± 0.001049 | 0.08613 ± 0.001174 | 1609 ± 6.438 | 3.424e+04 ± 870.3 | 39.69 ± 0.9914 | 0 | 0 |
+| iso8601 | 0.1012 ± 0.0005586 | 0.0569 ± 9.808e-05 | 0.1581 ± 0.000648 | 9715 ± 54.17 | 1.678e+04 ± 90.81 | 72.49 ± 0.1105 | 33 | 0 |
+| istc | 0.01772 ± 0.000614 | 0.04132 ± 0.0004795 | 0.05904 ± 0.001091 | 1244 ± 41.84 | n.a. | n.a. | 0 | 0 |
+| itn | 0.02105 ± 0.0001092 | 0.04214 ± 0.0007184 | 0.0632 ± 0.0008025 | 1567 ± 8.145 | n.a. | n.a. | 0 | 0 |
+| jam | 0.06175 ± 0.0002781 | 0.04513 ± 0.000768 | 0.1069 ± 0.0009536 | 4696 ± 21.17 | 9559 ± 147.7 | 2.503 ± 0.04333 | 76 | 0 |
+| janus | 0.04079 ± 0.000448 | 0.04528 ± 0.002092 | 0.08607 ± 0.001881 | 514.3 ± 5.783 | n.a. | n.a. | 0 | 0 |
+| java/java | 1.14 ± 0.007746 | 0.06909 ± 0.001957 | 1.209 ± 0.008573 | 1.45e+04 ± 99.02 | 1.629e+04 ± 127.6 | 2.34 ± 0.01155 | 189 | 2 |
+| java/java20 | 2.814 ± 0.008904 | 0.09487 ± 0.0006018 | 2.909 ± 0.009428 | 1156 ± 3.48 | 8272 ± 171.5 | 19.56 ± 0.4479 | 118 | 0 |
+| java/java8 | 0.6358 ± 0.006411 | 0.07895 ± 0.0003126 | 0.7148 ± 0.006302 | 281.3 ± 2.906 | 229.7 ± 1.764 | 0.5433 ± 0.008819 | 32 | 0 |
+| java/java9 | 6.806 ± 0.03795 | 0.07309 ± 0.0004488 | 6.879 ± 0.03832 | 497.3 ± 2.603 | 4029 ± 64.84 | 23.23 ± 0.3082 | 234 | 4 |
+| javacc | 0.7105 ± 0.004068 | 0.07675 ± 0.0003713 | 0.7872 ± 0.004431 | 1.129e+05 ± 644.3 | 1.294e+05 ± 844.9 | 15.41 ± 0.09387 | 639 | 0 |
+| javascript/ecmascript | 0.1885 ± 0.001018 | 0.07732 ± 0.000291 | 0.2658 ± 0.001309 | 1851 ± 9.955 | 2735 ± 2.667 | 56.58 ± 0.97 | 10 | 23 |
+| javascript/javascript | 2.559 ± 0.1123 | 0.1013 ± 0.0004205 | 2.66 ± 0.1124 | 3858 ± 172.7 | 3986 ± 184.7 | 108.6 ± 5.047 | 373 | 34 |
+| javascript/typescript | 4.876 ± 0.04366 | 0.0951 ± 0.0005656 | 4.971 ± 0.04324 | 1103 ± 9.939 | 1397 ± 8.762 | 7.963 ± 0.4524 | 905 | 26 |
+| jpa | 0.03436 ± 9.189e-05 | 0.04599 ± 0.0007984 | 0.08035 ± 0.0008485 | 145.3 ± 0.3333 | n.a. | n.a. | 0 | 0 |
+| json | 0.0308 ± 5.253e-05 | 0.04384 ± 0.000447 | 0.07464 ± 0.0004087 | 3116 ± 5.364 | 8.432e+04 ± 238.1 | 38.89 ± 0.05812 | 0 | 0 |
+| json5 | 0.03595 ± 8.763e-05 | 0.06674 ± 0.002117 | 0.1027 ± 0.002203 | 1.321e+04 ± 31.87 | 8.967e+04 ± 402.7 | 42.65 ± 0.2506 | 0 | 0 |
+| karel | 0.02466 ± 0.0005319 | 0.04539 ± 0.001303 | 0.07005 ± 0.001809 | 730 ± 15.82 | n.a. | n.a. | 0 | 0 |
+| kotlin/kotlin | 0.711 ± 0.0302 | 0.1079 ± 0.0009057 | 0.8188 ± 0.03098 | 1423 ± 62.98 | 1591 ± 80.09 | 5.96 ± 0.285 | 65 | 0 |
+| kotlin/kotlin-formal | 6.873 ± 0.0335 | 0.1707 ± 0.01118 | 7.043 ± 0.04133 | 2325 ± 11.26 | 2415 ± 11.67 | 17.73 ± 0.3153 | 1031 | 0 |
+| kquery | 0.1429 ± 0.001581 | 0.04968 ± 0.0002004 | 0.1926 ± 0.001781 | 2.627e+04 ± 289 | 3.96e+04 ± 734.5 | 21.47 ± 0.4783 | 402 | 0 |
+| kuka | 0.04857 ± 0.0001095 | 0.05022 ± 0.001097 | 0.09879 ± 0.001124 | 2614 ± 6.11 | n.a. | n.a. | 0 | 0 |
+| lambda | 0.02079 ± 3.055e-05 | 0.04266 ± 0.0002004 | 0.06344 ± 0.0002218 | 2068 ± 3.215 | 1.848e+05 ± 1935 | 476 ± 5.62 | 0 | 0 |
+| langium | 0.07785 ± 0.0009414 | 0.05063 ± 0.001343 | 0.1285 ± 0.001208 | 5.232e+04 ± 625.4 | 2.032e+05 ± 259.6 | 7.307 ± 0.09207 | 0 | 1 |
+| lark | 0.05801 ± 0.0005973 | 0.0517 ± 0.0001533 | 0.1097 ± 0.0006541 | 1.01e+05 ± 1030 | 3.017e+05 ± 1376 | 285 ± 2.853 | 0 | 0 |
+| lcc | 0.03277 ± 0.0005537 | 0.04338 ± 0.0002812 | 0.07615 ± 0.0008173 | 4610 ± 76.65 | 1.713e+05 ± 1.295e+04 | 321.5 ± 19.79 | 0 | 0 |
+| less | 0.0418 ± 4.127e-05 | 0.0495 ± 0.0004886 | 0.0913 ± 0.0004747 | 645.7 ± 0.6667 | n.a. | n.a. | 0 | 0 |
+| limbo | 0.08265 ± 0.001958 | 0.04709 ± 0.0001534 | 0.1297 ± 0.001811 | 593 ± 13.53 | n.a. | n.a. | 3 | 0 |
+| lisa | 0.04491 ± 0.0002157 | 0.04436 ± 0.0001669 | 0.08927 ± 0.0003713 | 801 ± 3.786 | n.a. | n.a. | 0 | 0 |
+| llvm-ir | 0.3171 ± 0.001134 | 0.1163 ± 0.0002228 | 0.4334 ± 0.001178 | 7.772e+04 ± 277 | 8.58e+04 ± 338.7 | 89.36 ± 0.3901 | 0 | 0 |
+| logo/logo | 0.06891 ± 0.0001975 | 0.04734 ± 7.99e-05 | 0.1162 ± 0.0002322 | 8997 ± 25.76 | 1.802e+04 ± 119.7 | 45.4 ± 0.374 | 18 | 0 |
+| lrc | 0.02125 ± 0.0001207 | 0.04197 ± 0.0004822 | 0.06322 ± 0.000596 | 611.3 ± 3.283 | n.a. | n.a. | 0 | 0 |
+| ltl | 0.03208 ± 0.0001681 | 0.04361 ± 0.000199 | 0.07569 ± 0.0001924 | 186.7 ± 0.8819 | n.a. | n.a. | 0 | 0 |
+| lua | 4.446 ± 0.09895 | 0.3648 ± 0.01524 | 4.81 ± 0.08676 | 3.952e+05 ± 8612 | 3.991e+05 ± 8785 | 1719 ± 40.74 | 12 | 3 |
+| lucene | 0.04938 ± 0.0001987 | 0.04831 ± 0.0002967 | 0.09769 ± 0.0004774 | 2248 ± 9.262 | 9235 ± 51.27 | 116 ± 0.6284 | 3 | 0 |
+| maml | 0.03496 ± 0.0006153 | 0.04454 ± 0.000545 | 0.0795 ± 0.001125 | 6411 ± 111.9 | 1.035e+05 ± 108.6 | 51.68 ± 0.8958 | 0 | 0 |
+| matlab | 0.06525 ± 0.0006643 | 0.04654 ± 0.000529 | 0.1118 ± 0.001002 | 367.3 ± 3.93 | 1.632e+04 ± 2842 | 80.83 ± 13.54 | 1 | 0 |
+| mckeeman-form | 0.03187 ± 0.0003562 | 0.04345 ± 0.0007232 | 0.07532 ± 0.001079 | 2.043e+04 ± 225.8 | 5.383e+05 ± 3033 | 48.43 ± 0.7979 | 0 | 0 |
+| mdx | 0.04254 ± 3.911e-05 | 0.04643 ± 0.0002921 | 0.08897 ± 0.0003116 | 1951 ± 1.667 | 8.295e+04 ± 2966 | 112.2 ± 4.003 | 0 | 0 |
+| memcached_protocol | 0.03016 ± 9.575e-05 | 0.04455 ± 0.0002745 | 0.0747 ± 0.0003519 | 264.7 ± 0.6667 | n.a. | n.a. | 0 | 0 |
+| metamath | 0.04818 ± 0.002353 | 0.04728 ± 0.003073 | 0.09545 ± 0.005422 | 1272 ± 59.47 | 1.067e+04 ± 226 | 24.78 ± 0.7497 | 20 | 0 |
+| metric | 0.03149 ± 9.605e-05 | 0.04533 ± 0.0002611 | 0.07682 ± 0.0003315 | 1365 ± 4 | 8977 ± 8.647 | 80.91 ± 0.2033 | 0 | 0 |
+| microc | 0.04578 ± 8.502e-05 | 0.04446 ± 3.945e-05 | 0.09023 ± 0.0001151 | 1791 ± 3.333 | 9830 ± 178 | 20.37 ± 0.3853 | 0 | 0 |
+| miniscript | 0.03238 ± 0.0002269 | 0.04693 ± 0.000255 | 0.07931 ± 0.0002505 | 4107 ± 28.67 | 1.052e+04 ± 87.64 | 42.55 ± 1.003 | 0 | 0 |
+| modelica | 0.6232 ± 0.01768 | 0.05763 ± 0.0004466 | 0.6809 ± 0.01738 | 2.422e+05 ± 6736 | 2.688e+05 ± 8337 | 8.493 ± 0.2463 | 0 | 0 |
+| modula2pim4 | 0.03305 ± 0.001495 | 0.04708 ± 0.0003945 | 0.08013 ± 0.001884 | 1276 ± 55.23 | n.a. | n.a. | 0 | 6 |
+| molecule | 0.04255 ± 0.0001534 | 0.04425 ± 0.0003052 | 0.08679 ± 0.0004257 | 2867 ± 10.26 | 5.259e+04 ± 781.6 | 133.2 ± 2.006 | 18 | 0 |
+| moo | 0.08279 ± 9.702e-05 | 0.04774 ± 0.000832 | 0.1305 ± 0.0008884 | 9711 ± 11.35 | 7.292e+04 ± 2630 | 19.3 ± 0.7842 | 65 | 0 |
+| morsecode | 0.03118 ± 0.000494 | 0.04451 ± 0.001303 | 0.07569 ± 0.00176 | 737.3 ± 11.62 | 2.958e+04 ± 3945 | 82.44 ± 10.16 | 0 | 0 |
+| mps | 0.03883 ± 0.0001334 | 0.04283 ± 7.046e-05 | 0.08166 ± 0.0001842 | 5511 ± 19.09 | 6.256e+04 ± 511.3 | 37.91 ± 0.2281 | 0 | 0 |
+| muddb | 0.04119 ± 0.0004982 | 0.04424 ± 0.001032 | 0.08543 ± 0.001529 | 1.806e+05 ± 2167 | 4.673e+05 ± 3619 | 201.2 ± 2.291 | 0 | 0 |
+| mumath | 0.03312 ± 0.0003651 | 0.045 ± 0.0006146 | 0.07811 ± 0.0009735 | 392.3 ± 4.177 | n.a. | n.a. | 0 | 0 |
+| mumps | 0.05904 ± 0.0002329 | 0.04697 ± 0.0003715 | 0.106 ± 0.0006027 | 5420 ± 21.37 | 1.271e+04 ± 80.73 | 62.48 ± 0.361 | 3 | 0 |
+| muparser | 0.04225 ± 8.265e-05 | 0.04569 ± 0.000722 | 0.08794 ± 0.0007121 | 3195 ± 6.386 | n.a. | n.a. | 0 | 0 |
+| newick | 0.04389 ± 0.0001134 | 0.04283 ± 0.0002162 | 0.08672 ± 0.0003253 | 3440 ± 8.876 | 2.648e+04 ± 92.85 | 113.4 ± 0.3383 | 7 | 0 |
+| oberon | 0.05235 ± 0.0002437 | 0.04664 ± 0.000829 | 0.09899 ± 0.001067 | 1222 ± 5.783 | n.a. | n.a. | 8 | 0 |
+| objc | 2.006 ± 0.03703 | 0.08705 ± 0.001628 | 2.093 ± 0.03675 | 1.493e+04 ± 274.8 | 1.578e+04 ± 307.4 | 9.08 ± 0.1637 | 3272 | 0 |
+| odin | 3.976 ± 0.01224 | 0.06286 ± 0.001164 | 4.038 ± 0.01111 | 3950 ± 12.17 | 1.308e+04 ± 1362 | 3.32 ± 0.3556 | 1699 | 0 |
+| oncrpc | 0.03608 ± 0.0003083 | 0.04496 ± 0.0004175 | 0.08104 ± 0.000239 | 1413 ± 12.17 | n.a. | n.a. | 0 | 0 |
+| orwell | 0.06335 ± 0.0001783 | 0.04584 ± 0.0001559 | 0.1092 ± 0.0002349 | 741.3 ± 2.028 | 1872 ± 22.53 | 12.94 ± 0.1822 | 12 | 0 |
+| p | 0.02067 ± 3.09e-05 | 0.04158 ± 6.863e-05 | 0.06225 ± 8.406e-05 | 1064 ± 1.453 | 2.137e+04 ± 459.4 | 140.9 ± 2.964 | 0 | 0 |
+| parkingsign | 0.05759 ± 0.0002464 | 0.04485 ± 7.057e-05 | 0.1024 ± 0.0002664 | 4792 ± 20.61 | n.a. | n.a. | 4 | 0 |
+| pascal | 0.08945 ± 0.0004847 | 0.06062 ± 1.08e-05 | 0.1501 ± 0.000474 | 3.588e+04 ± 193.6 | 6.563e+04 ± 814.1 | 127.7 ± 1.989 | 0 | 0 |
+| pbm | 0.02064 ± 0.000144 | 0.04183 ± 0.0007832 | 0.06248 ± 0.0009185 | 3100 ± 21.57 | n.a. | n.a. | 0 | 0 |
+| pcre | 0.2367 ± 0.001407 | 0.05367 ± 0.0004203 | 0.2904 ± 0.001671 | 3.385e+04 ± 200.3 | 4.017e+04 ± 277 | 69.04 ± 0.4978 | 447 | 0 |
+| pdn | 0.03883 ± 4.045e-05 | 0.04341 ± 8.537e-05 | 0.08223 ± 5.317e-05 | 8551 ± 8.819 | 1.834e+05 ± 5516 | 94.02 ± 3.009 | 1 | 0 |
+| pegen | 0.8115 ± 0.05615 | 0.05018 ± 0.0001115 | 0.8617 ± 0.05622 | 1.616e+04 ± 1047 | 2.475e+04 ± 490.2 | 2.357 ± 0.2106 | 816 | 1 |
+| peoplecode | 0.3832 ± 0.001003 | 0.05331 ± 0.0001511 | 0.4365 ± 0.0008671 | 9410 ± 24.66 | 1.15e+04 ± 12.17 | 1.75 ± 0.01155 | 165 | 0 |
+| pest | 0.04294 ± 0.0001171 | 0.04597 ± 0.0002935 | 0.08891 ± 0.0003976 | 6.653e+04 ± 181 | 2.953e+05 ± 773.8 | 47.33 ± 0.1662 | 0 | 0 |
+| php | 2.755 ± 0.03621 | 0.09052 ± 0.0007452 | 2.846 ± 0.03657 | 2254 ± 29.72 | 2674 ± 43.88 | 6.4 ± 0.1201 | 853 | 13 |
+| pii | 0.02043 ± 3.458e-05 | 0.04143 ± 0.0001224 | 0.06186 ± 0.0001511 | 880.7 ± 1.667 | n.a. | n.a. | 0 | 0 |
+| pl0 | 0.02904 ± 0.0003999 | 0.04509 ± 0.0007912 | 0.07414 ± 0.001189 | 1.395e+04 ± 190.7 | 1.193e+05 ± 2679 | 73.8 ± 0.769 | 0 | 0 |
+| plantUML | 0.04011 ± 0.0005493 | 0.04628 ± 0.0006341 | 0.08639 ± 0.001168 | 4489 ± 60.75 | 2.195e+04 ± 248.4 | 21.59 ± 0.2564 | 0 | 0 |
+| ply | 0.2851 ± 0.001809 | 0.04916 ± 0.0001935 | 0.3343 ± 0.001992 | 3.849e+05 ± 2429 | 4.449e+05 ± 3609 | 1.97 ± 0.01528 | 0 | 0 |
+| postalcode | 0.01586 ± 3.259e-05 | 0.0395 ± 0.000193 | 0.05536 ± 0.0002204 | 441 ± 1 | n.a. | n.a. | 0 | 0 |
+| powerbuilder | 17.77 ± 0.04634 | 0.06685 ± 0.0001465 | 17.83 ± 0.04625 | 609 ± 1.528 | 672 ± 2 | 7.28 ± 0.04163 | 2274 | 0 |
+| prolog | 0.04305 ± 9.122e-05 | 0.04534 ± 8.181e-05 | 0.08839 ± 5.443e-05 | 743 ± 1.528 | n.a. | n.a. | 3 | 0 |
+| promql | 0.0715 ± 0.0008333 | 0.05469 ± 0.0004009 | 0.1262 ± 0.001232 | 5833 ± 68.22 | 1.773e+04 ± 414.4 | 57.66 ± 1.1 | 5 | 0 |
+| propcalc | 0.03749 ± 0.0004855 | 0.04297 ± 0.0002626 | 0.08047 ± 0.000735 | 3922 ± 50.27 | 5.758e+04 ± 3579 | 101.4 ± 5.404 | 0 | 0 |
+| properties | 0.0258 ± 0.0001095 | 0.04313 ± 0.001286 | 0.06893 ± 0.001391 | 6.012e+04 ± 254.6 | 1.657e+05 ± 612 | 2723 ± 3.56 | 0 | 0 |
+| protobuf/protobuf2 | 0.05674 ± 0.0006337 | 0.05459 ± 0.0002952 | 0.1113 ± 0.0009061 | 3913 ± 43 | 2.141e+04 ± 467.1 | 11.67 ± 0.1914 | 16 | 0 |
+| protobuf/protobuf3 | 0.0929 ± 0.0003018 | 0.05241 ± 0.0002616 | 0.1453 ± 0.0005244 | 1.953e+04 ± 63.45 | 4.453e+04 ± 309.3 | 67.37 ± 0.503 | 0 | 12 |
+| prov-n | 0.07248 ± 0.0003305 | 0.0467 ± 0.0001053 | 0.1192 ± 0.0002876 | 9340 ± 42.57 | 2.711e+04 ± 35.86 | 15.8 ± 0.08876 | 0 | 0 |
+| python/python | 0.1567 ± 0.001352 | 0.05997 ± 0.0001431 | 0.2167 ± 0.001409 | 2.061e+04 ± 176.2 | 3.394e+04 ± 408.5 | 21.07 ± 0.1873 | 11 | 20 |
+| python/python2_7_18 | 0.6642 ± 0.007209 | 0.06378 ± 0.003794 | 0.7279 ± 0.005747 | 1.302e+05 ± 1399 | 1.431e+05 ± 1727 | 15.73 ± 0.2201 | 0 | 0 |
+| python/python3 | 4.6 ± 0.1422 | 0.09109 ± 5.225e-05 | 4.691 ± 0.1421 | 1.246e+04 ± 397 | 1.283e+04 ± 422.2 | 9.21 ± 0.2862 | 1 | 12 |
+| python/python3_13 | 1.966 ± 0.01829 | 0.09808 ± 0.0005879 | 2.064 ± 0.01883 | 5.878e+04 ± 544 | 6.18e+04 ± 599.2 | 9.003 ± 0.08293 | 750 | 0 |
+| qif | 0.02439 ± 2.957e-05 | 0.04317 ± 0.001033 | 0.06756 ± 0.001049 | 1639 ± 1.856 | 1.284e+04 ± 30.83 | 12.39 ± 0.02404 | 0 | 0 |
+| quakemap | 0.0237 ± 0.0003183 | 0.04171 ± 0.0001041 | 0.06541 ± 0.0002185 | 6120 ± 82.8 | n.a. | n.a. | 0 | 0 |
+| racket-bsl | 0.03488 ± 0.0007816 | 0.04465 ± 0.001042 | 0.07953 ± 0.001819 | 1807 ± 39.68 | n.a. | n.a. | 0 | 0 |
+| racket-isl | 0.03664 ± 3.691e-05 | 0.04463 ± 0.0006987 | 0.08127 ± 0.0007241 | 6604 ± 6.807 | n.a. | n.a. | 0 | 0 |
+| recfile | 0.02215 ± 0.0001099 | 0.0415 ± 8.293e-05 | 0.06365 ± 0.0001589 | 6909 ± 34.37 | 2.76e+05 ± 6721 | 94.11 ± 2.065 | 0 | 0 |
+| redcode | 0.02241 ± 8.115e-05 | 0.04316 ± 0.0002432 | 0.06557 ± 0.0002371 | 7497 ± 27.06 | 1.489e+05 ± 2608 | 67.01 ± 1.379 | 0 | 0 |
+| redis | 0.08044 ± 0.0006214 | 0.07325 ± 0.0001472 | 0.1537 ± 0.0007577 | 5433 ± 41.55 | 9609 ± 113.7 | 24.99 ± 0.2318 | 0 | 0 |
+| refal | 0.0368 ± 0.0003405 | 0.04441 ± 0.0002395 | 0.08122 ± 0.0003709 | 1304 ± 12.01 | n.a. | n.a. | 0 | 0 |
+| rfc1035 | 0.02108 ± 0.0007317 | 0.0416 ± 3.569e-05 | 0.06268 ± 0.0007189 | 855 ± 28.75 | 1.346e+04 ± 147 | 45.34 ± 2.172 | 0 | 0 |
+| rfc1960 | 0.03749 ± 0.0004184 | 0.04229 ± 0.0004906 | 0.07978 ± 0.000909 | 1307 ± 14.53 | 6059 ± 50.31 | 30.69 ± 0.1405 | 0 | 0 |
+| rfc822/rfc822-datetime | 0.02351 ± 0.0007397 | 0.04793 ± 0.004219 | 0.07144 ± 0.004942 | 1619 ± 49.69 | 4.833e+04 ± 3480 | 65.39 ± 3.476 | 0 | 0 |
+| rfc822/rfc822-emailaddress | 0.04279 ± 0.0006238 | 0.04553 ± 0.001099 | 0.08832 ± 0.001708 | 5587 ± 82.44 | 1.124e+05 ± 2167 | 305.7 ± 8.251 | 0 | 0 |
+| robotwars | 0.1029 ± 0.000301 | 0.04642 ± 0.0002523 | 0.1494 ± 0.0004802 | 1.942e+04 ± 56.96 | 3.444e+04 ± 82.35 | 19.4 ± 0.05457 | 390 | 0 |
+| romannumerals | 0.03716 ± 0.0008539 | 0.04537 ± 0.0003609 | 0.08253 ± 0.001051 | 269 ± 6 | 953.3 ± 46.8 | 13.68 ± 0.4822 | 0 | 0 |
+| ron | 0.04814 ± 3.257e-05 | 0.04419 ± 2.272e-05 | 0.09233 ± 2.743e-05 | 4341 ± 2.906 | 2.877e+04 ± 462.1 | 22.78 ± 0.4283 | 7 | 0 |
+| rpn | 0.03171 ± 0.0005256 | 0.04594 ± 0.0007945 | 0.07765 ± 0.0008586 | 1577 ± 25.51 | 1.006e+04 ± 295.8 | 90.54 ± 1.416 | 0 | 0 |
+| ruleworks | 0.1437 ± 0.002025 | 0.07547 ± 0.0007906 | 0.2192 ± 0.002029 | 5.324e+04 ± 740.3 | 1.067e+05 ± 3232 | 2.573 ± 0.05364 | 0 | 0 |
+| rust | 16.48 ± 0.122 | 0.09962 ± 0.0007196 | 16.58 ± 0.1218 | 4451 ± 32.77 | 3972 ± 26.56 | 0.73 ± 0 | 8702 | 5 |
+| sapf | 0.3917 ± 0.004807 | 0.04918 ± 0.0001007 | 0.4409 ± 0.00485 | 1626 ± 19.68 | 1805 ± 24.67 | 18.5 ± 0.2573 | 140 | 0 |
+| scala/scala2 | 2.023 ± 0.06482 | 0.05439 ± 0.0005443 | 2.077 ± 0.06431 | 518.7 ± 16.19 | 691.3 ± 10.37 | 2.327 ± 0.08988 | 230 | 0 |
+| scala/scala3 | 2.353 ± 0.04097 | 0.08997 ± 0.0002793 | 2.443 ± 0.04072 | 5788 ± 99.68 | 6103 ± 111.8 | 18.23 ± 0.3724 | 530 | 2 |
+| scotty | 0.03832 ± 0.0004496 | 0.0421 ± 0.0002173 | 0.08042 ± 0.0006453 | 103.7 ± 1.333 | n.a. | n.a. | 0 | 0 |
+| scss | 44.87 ± 0.3901 | 0.09398 ± 0.0004769 | 44.96 ± 0.3905 | 793.3 ± 6.984 | 801.3 ± 8.819 | 1.49 ± 0.1079 | 1.616e+04 | 0 |
+| sdl | 0.2029 ± 0.001569 | 0.06039 ± 0.0007026 | 0.2633 ± 0.001605 | 9.918e+04 ± 771.2 | 1.561e+05 ± 1801 | 4.453 ± 0.05696 | 0 | 0 |
+| semver | 0.04622 ± 0.0001834 | 0.04564 ± 0.0003496 | 0.09186 ± 0.0003605 | 3569 ± 14.22 | 4.847e+04 ± 302.3 | 84.02 ± 0.7736 | 29 | 0 |
+| sexpression | 0.03279 ± 8.139e-05 | 0.04268 ± 0.0006534 | 0.07547 ± 0.0006823 | 700.7 ± 1.667 | 5.874e+04 ± 1040 | 159.6 ± 2.542 | 0 | 0 |
+| sgf | 0.03047 ± 0.0005295 | 0.04477 ± 0.0001911 | 0.07523 ± 0.0003678 | 2.71e+04 ± 464.1 | n.a. | n.a. | 0 | 0 |
+| sici | 0.02388 ± 2.507e-05 | 0.04196 ± 0.0004031 | 0.06584 ± 0.0004121 | 3811 ± 4.041 | 4.656e+05 ± 3194 | 246 ± 1.695 | 0 | 0 |
+| sieve | 0.02411 ± 0.0001241 | 0.04342 ± 0.0001362 | 0.06753 ± 9.149e-05 | 2737 ± 14.22 | n.a. | n.a. | 0 | 0 |
+| smalltalk | 0.06062 ± 0.0003217 | 0.04543 ± 0.0006512 | 0.106 ± 0.0008131 | 115 ± 0.5774 | n.a. | n.a. | 4 | 0 |
+| smiles | 0.04562 ± 0.0003721 | 0.04926 ± 0.0006196 | 0.09487 ± 0.0009832 | 2806 ± 22.6 | 7510 ± 41.65 | 12.92 ± 0.05457 | 0 | 0 |
+| smtlibv2 | 0.1009 ± 0.0008785 | 0.06867 ± 0.0008598 | 0.1696 ± 0.001738 | 6.001e+04 ± 526.9 | 5.461e+04 ± 780.8 | 0.8433 ± 0.02028 | 34 | 0 |
+| snobol | 0.03622 ± 0.0002328 | 0.04702 ± 0.0009445 | 0.08324 ± 0.001174 | 2098 ± 13.58 | 3.037e+04 ± 269.4 | 65.01 ± 0.5309 | 0 | 0 |
+| solidity | 0.1242 ± 0.002232 | 0.06769 ± 0.001342 | 0.1919 ± 0.003563 | 1.915e+04 ± 338.9 | 3.993e+04 ± 795 | 60.99 ± 0.351 | 9 | 0 |
+| sparql | 0.03827 ± 7.643e-05 | 0.04859 ± 0.0002393 | 0.08685 ± 0.0002812 | 4808 ± 9.684 | 2.222e+04 ± 120.7 | 27.66 ± 0.1365 | 0 | 0 |
+| spass | 0.07838 ± 0.001468 | 0.04967 ± 0.0007557 | 0.1281 ± 0.002192 | 1.416e+04 ± 266.1 | 2.747e+04 ± 483.4 | 5.85 ± 0.04163 | 15 | 0 |
+| spl | 0.09726 ± 0.002401 | 0.0536 ± 0.002649 | 0.1509 ± 0.005043 | 3129 ± 75.81 | 5876 ± 164.2 | 15.82 ± 0.1222 | 6 | 0 |
+| sql/athena | 0.07954 ± 0.00167 | 0.07611 ± 0.001842 | 0.1556 ± 0.003487 | 6882 ± 142.9 | 1.145e+04 ± 250.5 | 20.12 ± 0.09452 | 0 | 0 |
+| sql/clickhouse | 0.143 ± 0.004234 | 0.09431 ± 0.002252 | 0.2373 ± 0.006465 | 1274 ± 36.67 | 1887 ± 47.02 | 3.507 ± 0.03756 | 1 | 0 |
+| sql/cockroachdb | 0.1584 ± 0.0006551 | 0.1563 ± 0.0003351 | 0.3146 ± 0.0003757 | 302.3 ± 1.202 | n.a. | n.a. | 2 | 0 |
+| sql/databricks | 0.2028 ± 0.00469 | 0.1014 ± 0.002354 | 0.3042 ± 0.006777 | 1278 ± 28.94 | 1401 ± 31.71 | 13.48 ± 0.08212 | 19 | 0 |
+| sql/derby | 0.1383 ± 0.002054 | 0.08804 ± 0.0003501 | 0.2264 ± 0.002013 | 1807 ± 26.31 | 2258 ± 42.67 | 2.727 ± 0.03844 | 16 | 0 |
+| sql/drill | 0.08026 ± 0.001681 | 0.05452 ± 0.00218 | 0.1348 ± 0.00203 | 3217 ± 66.02 | 8020 ± 257.9 | 7.31 ± 0.125 | 1 | 0 |
+| sql/hive/v2 | 0.1481 ± 0.000588 | 0.09761 ± 0.0004416 | 0.2457 ± 0.001022 | 4456 ± 17.82 | 6740 ± 27.24 | 15.09 ± 0.03528 | 1 | 0 |
+| sql/hive/v3 | 0.1416 ± 0.0009277 | 0.09689 ± 0.0002503 | 0.2385 ± 0.001177 | 4237 ± 27.76 | 6564 ± 70.02 | 14.72 ± 0.1674 | 1 | 0 |
+| sql/hive/v4 | 0.1258 ± 0.001608 | 0.1023 ± 0.0003187 | 0.2281 ± 0.001916 | 1725 ± 21.99 | 2563 ± 47.84 | 4.287 ± 0.06984 | 1 | 0 |
+| sql/informix-sql | 0.06219 ± 0.001459 | 0.06566 ± 0.00324 | 0.1279 ± 0.004659 | 1.318e+04 ± 304.6 | 3.515e+04 ± 724.6 | 51.56 ± 0.2226 | 3 | 0 |
+| sql/mariadb | 20.79 ± 0.1321 | 0.1537 ± 0.001386 | 20.94 ± 0.131 | 1521 ± 9.644 | n.a. | n.a. | 7478 | 0 |
+| sql/mysql/Oracle | 2.993 ± 0.04454 | 0.1942 ± 0.001025 | 3.187 ± 0.04505 | 1.823e+04 ± 269.1 | 1.921e+04 ± 307.1 | 50.21 ± 1.201 | 3376 | 287 |
+| sql/mysql/Positive-Technologies | 26.84 ± 0.3659 | 0.1593 ± 0.001344 | 27 ± 0.367 | 2084 ± 28.15 | 2092 ± 28.15 | 5.443 ± 0.01202 | 9983 | 0 |
+| sql/phoenix | 0.127 ± 0.0007195 | 0.07033 ± 4.383e-05 | 0.1973 ± 0.0007595 | 1.184e+04 ± 66.88 | 1.749e+04 ± 155.9 | 1.963 ± 0.008819 | 42 | 0 |
+| sql/plsql | 5.87 ± 0.07412 | 0.4647 ± 0.0138 | 6.335 ± 0.07722 | 1950 ± 24.38 | 2191 ± 21.15 | 110.2 ± 3.189 | 357 | 16 |
+| sql/postgresql | 8.153 ± 0.06737 | 0.3073 ± 0.01469 | 8.461 ± 0.05496 | 9.592e+04 ± 788.3 | 9.779e+04 ± 797.5 | 14.14 ± 0.06766 | 626 | 17 |
+| sql/snowflake | 20.38 ± 0.3169 | 0.2147 ± 0.005631 | 20.6 ± 0.3225 | 807.3 ± 12.6 | 831 ± 13.08 | 3.93 ± 0.1015 | 969 | 0 |
+| sql/sqlite | 0.1426 ± 0.002255 | 0.0702 ± 1.855e-05 | 0.2128 ± 0.002272 | 3.65e+04 ± 576.8 | 6.541e+04 ± 987.2 | 28.11 ± 0.2627 | 1 | 0 |
+| sql/teradata | 6.044 ± 0.04546 | 0.2975 ± 0.003798 | 6.342 ± 0.04608 | 1128 ± 8.413 | 1130 ± 8.686 | 1.147 ± 0.01667 | 266 | 0 |
+| sql/trino | 0.3561 ± 0.00204 | 0.1137 ± 0.0007449 | 0.4698 ± 0.002705 | 1.749e+04 ± 99.56 | 2.522e+04 ± 169.5 | 132.1 ± 0.6994 | 49 | 0 |
+| sql/tsql | 44.6 ± 0.5458 | 0.3262 ± 0.003457 | 44.93 ± 0.5493 | 1079 ± 13 | 1103 ± 13.5 | 3.53 ± 0.03512 | 9173 | 0 |
+| squirrel | 0.3513 ± 0.003901 | 0.05236 ± 0.0002274 | 0.4037 ± 0.004087 | 1.028e+04 ± 114.9 | 1.4e+04 ± 221.2 | 9.997 ± 0.1562 | 192 | 0 |
+| srt | 0.03355 ± 0.0001433 | 0.04124 ± 0.0007551 | 0.07479 ± 0.0008492 | 655.3 ± 2.848 | n.a. | n.a. | 3 | 0 |
+| star | 0.05934 ± 8.951e-05 | 0.04345 ± 0.0001241 | 0.1028 ± 0.0001659 | 1920 ± 2.848 | 5876 ± 40.01 | 7.017 ± 0.05364 | 73 | 0 |
+| stellaris | 0.1935 ± 0.001711 | 0.04736 ± 0.001143 | 0.2409 ± 0.002839 | 2.248e+05 ± 1979 | 2.946e+05 ± 2860 | 7.883 ± 0.03283 | 2396 | 0 |
+| suokif | 0.04024 ± 0.000466 | 0.04453 ± 0.0006471 | 0.08477 ± 0.0008218 | 521.7 ± 5.84 | 8252 ± 337.4 | 52.79 ± 1.649 | 7 | 0 |
+| swift/swift5 | 5.19 ± 0.07157 | 0.09411 ± 0.0003473 | 5.284 ± 0.07124 | 1299 ± 17.93 | 1596 ± 2.333 | 3.723 ± 0.2053 | 1001 | 27 |
+| swift-fin | 0.03966 ± 0.0001721 | 0.04314 ± 0.0002635 | 0.0828 ± 0.0004244 | 4.483e+04 ± 194.4 | 7.309e+05 ± 5556 | 90.51 ± 0.3334 | 0 | 0 |
+| sysml-v2 | 1.769 ± 0.02387 | 0.09758 ± 0.001287 | 1.867 ± 0.02258 | 461.3 ± 6.36 | 619.3 ± 1.764 | 7.83 ± 0.4285 | 0 | 0 |
+| szf | 0.04821 ± 4.44e-05 | 0.04212 ± 0.0003977 | 0.09033 ± 0.0004348 | 4396 ± 4.055 | 3.414e+04 ± 47 | 9.537 ± 0.008819 | 60 | 0 |
+| tcpheader | 0.01833 ± 3.744e-05 | 0.04273 ± 9.639e-05 | 0.06106 ± 0.0001083 | 1145 ± 2.517 | n.a. | n.a. | 0 | 0 |
+| teal | 0.05908 ± 0.00269 | 0.04879 ± 0.001004 | 0.1079 ± 0.003694 | 1121 ± 49 | 4578 ± 90.02 | 11.74 ± 0.3642 | 0 | 0 |
+| telephone | 0.02212 ± 0.0001835 | 0.04273 ± 0.001069 | 0.06485 ± 0.001228 | 2305 ± 19.38 | 8.436e+04 ± 3427 | 152.2 ± 5.097 | 0 | 0 |
+| terraform | 0.08647 ± 0.0004431 | 0.05061 ± 0.0002843 | 0.1371 ± 0.0007231 | 1.885e+04 ± 96.32 | 4.018e+04 ± 279 | 60.49 ± 0.215 | 84 | 0 |
+| tiny | 0.03562 ± 0.0003283 | 0.04424 ± 0.0007983 | 0.07986 ± 0.001125 | 729.7 ± 6.839 | 6865 ± 53.08 | 44.71 ± 0.351 | 0 | 0 |
+| tinybasic | 0.03845 ± 9.149e-05 | 0.04327 ± 9.976e-05 | 0.08171 ± 8.975e-05 | 1612 ± 4.041 | n.a. | n.a. | 4 | 0 |
+| tinyc | 0.04646 ± 0.0006862 | 0.04508 ± 0.0001199 | 0.09154 ± 0.0008046 | 2648 ± 38.74 | 1.444e+04 ± 140.9 | 29.82 ± 0.2115 | 0 | 0 |
+| tinymud | 0.02383 ± 3.749e-05 | 0.04505 ± 0.0001607 | 0.06888 ± 0.000141 | 923 ± 1.528 | n.a. | n.a. | 0 | 0 |
+| tnsnames | 0.0591 ± 0.000449 | 0.04776 ± 0.0001651 | 0.1069 ± 0.0002966 | 4568 ± 34.35 | n.a. | n.a. | 0 | 0 |
+| tnt | 0.03783 ± 0.0001036 | 0.04452 ± 0.000725 | 0.08235 ± 0.0008286 | 4837 ± 13.2 | 4.288e+04 ± 124 | 144.9 ± 0.8612 | 0 | 0 |
+| toml | 0.05709 ± 0.000313 | 0.04641 ± 8.715e-05 | 0.1035 ± 0.0003797 | 1.496e+04 ± 82.03 | 3.66e+04 ± 625.9 | 24.75 ± 0.4934 | 3 | 0 |
+| trac | 0.03335 ± 0.0004116 | 0.04243 ± 0.0002817 | 0.07578 ± 0.0006905 | 1229 ± 15.1 | 4.767e+04 ± 1142 | 155.8 ± 2.205 | 0 | 0 |
+| trapc | 0.08919 ± 0.0003022 | 0.1348 ± 0.006013 | 0.224 ± 0.006106 | 728.3 ± 2.404 | n.a. | n.a. | 0 | 23 |
+| tsv | 0.01965 ± 0.0001186 | 0.04225 ± 0.0007063 | 0.06191 ± 0.0008066 | 661 ± 4.041 | n.a. | n.a. | 0 | 0 |
+| ttm | 0.03433 ± 0.0007522 | 0.0426 ± 0.0003626 | 0.07693 ± 0.001077 | 1865 ± 40 | 2.273e+05 ± 1.515e+04 | 322.5 ± 15.06 | 0 | 0 |
+| turing | 0.04583 ± 0.0003006 | 0.04814 ± 0.0006634 | 0.09397 ± 0.0009123 | 1352 ± 8.819 | 6569 ± 46.06 | 48.81 ± 0.3645 | 0 | 0 |
+| turtle | 0.1613 ± 0.0002896 | 0.04886 ± 0.0001711 | 0.2101 ± 0.0002314 | 1.929e+05 ± 346.2 | 2.329e+05 ± 397.7 | 80.64 ± 0.04842 | 0 | 0 |
+| unicode/graphemes | 0.04646 ± 0.001557 | 0.06573 ± 0.0005841 | 0.1122 ± 0.002139 | 1.851e+04 ± 600.1 | 3.112e+04 ± 993.7 | 84.55 ± 0.1272 | 20 | 0 |
+| unreal_angelscript | 0.2417 ± 0.003917 | 0.06057 ± 0.0005118 | 0.3023 ± 0.004201 | 306 ± 5.033 | n.a. | n.a. | 16 | 0 |
+| upnp | 0.04454 ± 0.0007237 | 0.04401 ± 0.0001447 | 0.08854 ± 0.0008646 | 6514 ± 105.3 | 5.073e+04 ± 310.1 | 34.95 ± 0.41 | 193 | 0 |
+| url | 0.04173 ± 0.0002484 | 0.04734 ± 0.0006718 | 0.08906 ± 0.0007308 | 7645 ± 45.27 | 2.798e+04 ± 64.51 | 170.7 ± 1.705 | 6 | 0 |
+| useragent | 0.02204 ± 0.0005681 | 0.04256 ± 0.0003718 | 0.0646 ± 0.0009395 | 4223 ± 106.2 | 2.173e+05 ± 896.4 | 262 ± 7.09 | 0 | 0 |
+| vaxscan | 0.2477 ± 0.004118 | 0.06866 ± 0.000977 | 0.3163 ± 0.004875 | 4.505e+04 ± 757.5 | 6.84e+04 ± 1580 | 17.79 ± 0.3319 | 0 | 0 |
+| vb6 | 2.093 ± 0.00535 | 0.1036 ± 0.001566 | 2.197 ± 0.004255 | 2330 ± 5.84 | 2794 ± 13.93 | 2.223 ± 0.02728 | 330 | 0 |
+| vba/vba_cc | 0.06287 ± 0.0009302 | 0.04709 ± 0.0005873 | 0.11 ± 0.0007775 | 2498 ± 36.59 | n.a. | n.a. | 1 | 0 |
+| vba/vba_like | 0.04156 ± 0.0002014 | 0.04299 ± 0.0002366 | 0.08455 ± 0.0004309 | 1082 ± 5.132 | 4155 ± 68.88 | 10.12 ± 0.1497 | 0 | 0 |
+| vba/vba6 | 1.119 ± 0.01897 | 0.1078 ± 0.0003231 | 1.227 ± 0.0188 | 553.7 ± 9.207 | 781.7 ± 21.87 | 6.783 ± 0.2199 | 49 | 0 |
+| vba/vba7_1 | 1.599 ± 0.06957 | 0.1439 ± 0.0009542 | 1.743 ± 0.06995 | 3632 ± 152 | 6173 ± 271.9 | 3.513 ± 0.01856 | 422 | 0 |
+| verilog/systemverilog | 7.844 ± 0.02182 | 0.2408 ± 0.01764 | 8.084 ± 0.008199 | 1485 ± 4.177 | 1498 ± 4.372 | 3.303 ± 0.02603 | 152 | 0 |
+| verilog/verilog | 0.3515 ± 0.006261 | 0.1032 ± 0.0004762 | 0.4546 ± 0.006719 | 4.035e+04 ± 706 | 6.326e+04 ± 1782 | 3.557 ± 0.07839 | 9 | 0 |
+| vhdl/vhdl | 1.653 ± 0.01515 | 0.08247 ± 0.002549 | 1.736 ± 0.0134 | 3.627e+04 ± 329.9 | 3.867e+04 ± 426 | 43.24 ± 1.577 | 8433 | 0 |
+| vhdl/vhdl2008 | 8.185 ± 0.0529 | 0.08481 ± 0.0003123 | 8.27 ± 0.05311 | 7452 ± 48.36 | 7626 ± 50.99 | 16.15 ± 0.1361 | 1.684e+04 | 0 |
+| vmf | 0.1587 ± 0.001041 | 0.04363 ± 9.483e-05 | 0.2024 ± 0.000972 | 2.263e+04 ± 148.4 | n.a. | n.a. | 2157 | 0 |
+| wat | 0.04814 ± 0.0004583 | 0.04975 ± 0.0002509 | 0.09789 ± 0.0006931 | 1184 ± 11.26 | n.a. | n.a. | 0 | 0 |
+| wavefront | 0.06063 ± 0.0001719 | 0.05062 ± 0.0003639 | 0.1112 ± 0.0004016 | 5.379e+04 ± 152.7 | 1.113e+05 ± 393.5 | 70.74 ± 0.09597 | 40 | 0 |
+| webidl | 0.06353 ± 0.0004291 | 0.05116 ± 0.0009758 | 0.1147 ± 0.001363 | 4.025e+04 ± 273.6 | 1.744e+05 ± 400.9 | 5.06 ± 0.03606 | 0 | 0 |
+| wkt | 0.0538 ± 0.0004263 | 0.04578 ± 0.0008469 | 0.09958 ± 0.00126 | 1.773e+04 ± 140.6 | 8.228e+04 ± 275.1 | 13.27 ± 0.07219 | 76 | 0 |
+| wkt-crs-v1 | 0.04346 ± 0.0001554 | 0.04597 ± 0.001505 | 0.08943 ± 0.001518 | 4947 ± 17.62 | n.a. | n.a. | 0 | 0 |
+| wln | 0.02032 ± 0.0002122 | 0.04423 ± 0.0007766 | 0.06455 ± 0.0009842 | 1969 ± 20.35 | 2.957e+04 ± 261.7 | 141.2 ± 0.6217 | 0 | 0 |
+| wren | 0.7928 ± 0.04382 | 0.05286 ± 0.0006937 | 0.8457 ± 0.04452 | 7519 ± 396.8 | 8390 ± 521.2 | 2.633 ± 0.155 | 441 | 0 |
+| xml | 0.03617 ± 0.0001584 | 0.0447 ± 0.0001565 | 0.08087 ± 0.0003121 | 2.571e+04 ± 112.1 | 1.392e+05 ± 938.5 | 6.08 ± 0.01732 | 0 | 0 |
+| xpath/xpath1 | 0.04459 ± 0.0005694 | 0.04569 ± 0.0006655 | 0.09028 ± 0.001232 | 403.3 ± 5.239 | 1976 ± 19.47 | 12.68 ± 0.04096 | 0 | 0 |
+| xpath/xpath20 | 0.1699 ± 0.001662 | 0.05795 ± 0.0001211 | 0.2279 ± 0.001624 | 5.46e+04 ± 528.8 | n.a. | n.a. | 1 | 1 |
+| xpath/xpath31 | 0.1924 ± 0.000642 | 0.06378 ± 0.0005245 | 0.2562 ± 0.001146 | 5.025e+04 ± 167.1 | 7.341e+04 ± 600.5 | 34.49 ± 0.519 | 3 | 1 |
+| xsd-regex | 0.03582 ± 0.0001983 | 0.04493 ± 6.374e-05 | 0.08075 ± 0.0002181 | 1367 ± 7.311 | 2735 ± 29.31 | 13.25 ± 0.1281 | 0 | 0 |
+| xyz | 0.0412 ± 0.0005603 | 0.04578 ± 0.0006075 | 0.08698 ± 0.001139 | 3253 ± 43.92 | 8.042e+04 ± 939 | 49.19 ± 1.254 | 2 | 0 |
+| yara | 0.08546 ± 8.328e-05 | 0.04984 ± 0.001501 | 0.1353 ± 0.001419 | 1.594e+04 ± 15.6 | n.a. | n.a. | 14 | 0 |
+| yini | 1.283 ± 0.004309 | 0.05419 ± 0.0005139 | 1.337 ± 0.004098 | 1436 ± 4.933 | 1466 ± 5.196 | 2.21 ± 0.01732 | 392 | 0 |
+| zig | 0.1885 ± 0.0003921 | 0.04973 ± 0.0003329 | 0.2383 ± 0.0005707 | 1331 ± 2.887 | 1634 ± 3.48 | 1.743 ± 0.008819 | 7 | 0 |

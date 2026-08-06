@@ -1,0 +1,120 @@
+$title ('SDIR - Sort Module')
+sort:
+do;
+                /* sort module for extended dir */
+
+$include(comlit.lit)
+
+print: procedure(str$adr) external;  /* in util.plm */
+dcl str$adr address;
+end print;
+
+dcl sorted boolean public;         /* set by this module if successful sort */
+
+$include(finfo.lit)
+
+declare
+        buf$fcb$adr address external,     /* index into directory buffer */
+        buf$fcb based buf$fcb$adr (32) byte,
+                                        /* fcb template for dir        */
+
+        (f$i$adr, first$f$i$adr, last$f$i$adr, x$i$adr, filesfound)
+             address external,
+                                    /* indices into file$info array    */
+        file$info based f$i$adr f$info$structure,
+  
+        mid$adr address,
+        mid$file$info based mid$adr f$info$structure;
+
+
+mult23: procedure(index) address public;
+    dcl index address;   /* return address of file$info numbered by index */
+    return shl(index, 4) + shl(index,2) + shl(index,1) + index + first$f$i$adr;
+        /* index * size(file$info) + base of file$info array */
+end mult23;
+
+lessthan: procedure( str1$adr, str2$adr) boolean;
+    dcl (i,c1,c2) byte,                   /* true if str1 < str2            */
+        (str1$adr, str2$adr) address,     /* sorting on name and type field */
+        str1 based str1$adr (1) byte,     /* only, assumed to be first in   */
+        str2 based str2$adr (1) byte;     /* file$info record */
+    do i = 1 to 11;
+        if (c1:=(str1(i) and 7fh)) <> (c2:=(str2(i) and 7fh)) then
+            return(c1 < c2);
+    end;
+    return(false);
+end lessthan;
+
+dcl f$i$indices$base address public,
+    f$i$indices based f$i$indices$base (1) address;
+
+qsort: procedure(l,r);     /* no recursive quick sort, sorting largest    */
+dcl (l,r,i,j,temp) address,/* partition first                             */
+    stacksiz lit '14',     /* should always be able to sort 2 ** stacksiz */
+    stack (stack$siz) structure (l address, r address),
+    sp byte;
+
+    sp = 0; stack(0).l = l; stack(0).r = r;
+
+    do while sp < stack$siz - 1;
+        l = stack(sp).l; r = stack(sp).r; sp = sp - 1;
+        do while l < r;
+            i = l; j = r;
+            mid$adr = mult23(f$i$indices(shr(l+r,1)));
+            do while i <= j;
+                f$i$adr = mult23(f$i$indices(i));
+                do while lessthan(f$i$adr,mid$adr);
+                    i = i + 1;
+                    f$i$adr = mult23(f$i$indices(i));
+                end;
+                f$i$adr = mult23(f$i$indices(j));
+                do while lessthan(mid$adr,f$i$adr);
+                    j = j - 1;
+                    f$i$adr = mult23(f$i$indices(j));
+                end;
+                if i <= j then
+                do; temp = f$i$indices(i); f$i$indices(i) = f$i$indices(j); 
+                    f$i$indices(j) = temp;
+                    i = i + 1;
+                    if j > 0 then j = j - 1;
+                end;
+            end;  /* while i <= j    */
+            if j - l < r - i then        /* which partition is larger */
+            do; if i < r then
+                do; sp = sp + 1; stack(sp).l = i; stack(sp).r = r;
+                end;
+                r = j;     /* continue sorting left partition */
+            end;
+            else
+            do; if l < j then
+                do; sp = sp + 1; stack(sp).l = l; stack(sp).r = j;
+                end;
+                l = i;     /* continue sorting right partition */
+            end;
+        end;      /* while l < r              */
+    end;          /* while sp < stack$siz - 1 */
+    if sp <> 255 then
+        call print(.(cr,lf,lf,'Sort Stack Overflow',cr,lf,'$'));
+    else sorted = true;
+end qsort;
+
+sort: procedure public;
+    dcl i address;
+    f$i$indices$base = last$f$i$adr + size(file$info);
+    if filesfound < 2 then
+        return;
+    if shr((x$i$adr - f$i$indices$base),1) < filesfound then
+    do;
+        call print(.('Not Enough Memory for Sort',cr,lf,'$'));
+        return;
+    end;
+    do i = 0 to filesfound - 1;
+        f$i$indices(i) = i;                       /* initialize f$i$indices */
+    end;
+    call print(.(cr,lf,'Sorting  Directory...',cr,lf,'$'));
+    call qsort(0,filesfound - 1);
+    sorted = true;
+end sort;
+
+end sort;
+

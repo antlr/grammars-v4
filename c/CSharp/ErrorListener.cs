@@ -1,12 +1,15 @@
 // Generated from trgen 0.23.32
 
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
-using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
-using System;
-using System.IO;
 
 public class ErrorListener<S> : IAntlrErrorListener< S>
 {
@@ -159,6 +162,17 @@ public class MyDiagnosticErrorListener : DiagnosticErrorListener
             return str;
         }
         return "";
+    }
+}
+
+public class AmbigCountListener : Antlr4.Runtime.BaseErrorListener
+{
+    public int ambiguity_count = 0;
+
+    public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
+        bool exact, BitSet ambigAlts, ATNConfigSet configs)
+    {
+        ambiguity_count++;
     }
 }
 
