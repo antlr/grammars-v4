@@ -316,11 +316,11 @@ nodePattern
     ;
 
 atom
-    : literal
+    : listComprehension
+    | literal
     | parameter
     | caseExpression
     | countAll
-    | listComprehension
     | patternComprehension
     | filterWith
     | relationshipsChainPattern
