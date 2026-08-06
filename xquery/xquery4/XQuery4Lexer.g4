@@ -284,12 +284,12 @@ Comment: '(:' (Comment | CommentContents)*? ':)' -> skip;
 
 // Direct element constructor: '<' when followed by an NCNameStartChar starts an element.
 // IsNCNameStart() checks _input.LA(1) in XQuery4LexerBase.
-OPEN_TAG : '<' { IsNCNameStart() }? -> pushMode(IN_ELEMENT_TAG);
+OPEN_TAG : '<' { this.IsNCNameStart() }? -> pushMode(IN_ELEMENT_TAG);
 LT       : '<';
 
 // Right curly brace: pops mode when inside embedded element/attribute expression.
 // PopModeIfNeeded() in XQuery4LexerBase calls popMode() only when the mode stack is non-empty.
-CC: '}' { PopModeIfNeeded(); };
+CC: '}' { this.PopModeIfNeeded(); };
 
 QName  : FragQName;
 NCName : FragmentNCName;
@@ -397,7 +397,7 @@ EC_XMLCMT : '<!--' .*? '-->'      -> type(DirCommentContents);
 EC_PI:
     '<?' FragmentNCName ([\u0009\u000a\u000d\u0020] (~[?] | '?' ~[>])*)? '?>' -> type(DirPIContents)
 ;
-EC_OPEN_TAG  : '<'                         { IsNCNameStart() }? -> type(OPEN_TAG), pushMode(IN_ELEMENT_TAG);
+EC_OPEN_TAG  : '<'                         { this.IsNCNameStart() }? -> type(OPEN_TAG), pushMode(IN_ELEMENT_TAG);
 EC_CLOSE_TAG : '</'                        -> pushMode(IN_CLOSE_TAG);
 EC_OC_ESCAPE : '{{'                        -> type(LCurlyBraceEscape);
 EC_CC_ESCAPE : '}}'                        -> type(RCurlyBraceEscape);
