@@ -1,1 +1,1 @@
-fn($x as xs:integer) { $x * 2 } ;
+fn($x as xs:integer) { $x * 2 }

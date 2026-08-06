@@ -1,1 +1,1 @@
-substring($str, start := 1) ;
+substring($str, start := 1)

@@ -1,1 +1,1 @@
-$string => upper-case() => normalize-space() ;
+$string => upper-case() => normalize-space()

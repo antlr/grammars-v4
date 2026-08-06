@@ -1,1 +1,1 @@
-$items =!> string() ;
+$items =!> string()

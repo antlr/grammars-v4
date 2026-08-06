@@ -1,1 +1,1 @@
-child::(element() | text()) ;
+child::(element() | text())

@@ -1,1 +1,1 @@
-`{$first} {$last}` ;
+`{$first} {$last}`

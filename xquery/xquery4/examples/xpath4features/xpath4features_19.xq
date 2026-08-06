@@ -1,1 +1,1 @@
-upper-case#1 ;
+upper-case#1

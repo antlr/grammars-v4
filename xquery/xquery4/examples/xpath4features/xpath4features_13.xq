@@ -1,1 +1,1 @@
-format-date($date, picture := "[Y]-[M]-[D]") ;
+format-date($date, picture := "[Y]-[M]-[D]")
