@@ -1168,7 +1168,7 @@ slidingWindowClause
     ;
 
 squareArrayConstructor
-    : '[' exprSingle* ']'
+    : '[' (exprSingle (',' exprSingle)*)? ']'
     ;
 
 stepExpr

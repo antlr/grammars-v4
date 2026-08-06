@@ -1,0 +1,1 @@
+namespace {$prefix} {$uri}
