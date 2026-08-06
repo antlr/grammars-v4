@@ -537,6 +537,13 @@ exprSingle
     | typeswitchExpr
     | ifExpr
     | tryCatchExpr
+// XQuery Update
+    | insertExpr
+    | deleteExpr
+    | renameExpr
+    | replaceExpr
+    | transformExpr
+//
     | orExpr
     ;
 
@@ -1403,4 +1410,46 @@ xNodeType
     | textNodeType
     | namespaceNodeType
     | anyXNodeType
+    ;
+
+
+
+// XQuery Update Facility 1.0
+
+insertExprTargetChoice
+    : ('as' ('first' | 'last'))? 'into'
+    | 'after'
+    | 'before'
+    ;
+
+insertExpr
+    : 'insert' ('node' | 'nodes') sourceExpr insertExprTargetChoice targetExpr
+    ;
+
+deleteExpr
+    : 'delete' ('node' | 'nodes') targetExpr
+    ;
+
+replaceExpr
+    : 'replace' ('value' 'of')? 'node' targetExpr 'with' exprSingle
+    ;
+
+renameExpr
+    : 'rename' 'node' targetExpr 'as' newNameExpr
+    ;
+
+transformExpr
+    : 'copy' '$' varName ':=' exprSingle (',' '$' varName ':=' exprSingle)* 'modify' exprSingle 'return' exprSingle
+    ;
+
+sourceExpr
+    : exprSingle
+    ;
+
+targetExpr
+    : exprSingle
+    ;
+
+newNameExpr
+    : exprSingle
     ;

@@ -243,6 +243,18 @@ KW_WINDOW                    : 'window';
 KW_XQUERY                    : 'xquery';
 KW_ZERO_DIGIT                : 'zero-digit';
 
+// XQuery Update Facility 1.0
+
+KW_INTO : 'into';
+KW_INSERT : 'insert';
+KW_NODES : 'nodes';
+KW_DELETE : 'delete';
+KW_REPLACE : 'replace';
+KW_WITH : 'with';
+KW_RENAME : 'rename';
+KW_COPY : 'copy';
+KW_MODIFY : 'modify';
+
 // A.2.1. TERMINAL SYMBOLS
 
 IntegerLiteral   : FragDigits;
