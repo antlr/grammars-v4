@@ -1528,7 +1528,7 @@ declareCursor
 declareHandler
     : DECLARE handlerAction = (CONTINUE | EXIT | UNDO) HANDLER FOR handlerConditionValue (
         ',' handlerConditionValue
-    )* routineBody
+    )* (compoundStatement | sqlStatement)
     ;
 
 handlerConditionValue

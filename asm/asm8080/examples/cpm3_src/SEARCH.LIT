@@ -1,0 +1,23 @@
+
+declare                       /* what kind of file user wants to find       */
+    find$structure lit 'structure (
+    dir byte,
+    sys byte,
+    ro  byte,
+    rw  byte,
+    pass byte,
+    xfcb byte,
+    nonxfcb byte,
+    exclude byte)';
+
+declare
+    max$search$files literally '10';
+
+declare
+    search$structure lit 'structure(
+    drv byte,
+    name(8) byte,
+    type(3) byte,
+    anyfile boolean)';        /* match on any drive if true */
+
+

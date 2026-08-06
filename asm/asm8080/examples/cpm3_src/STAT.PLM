@@ -1,0 +1,894 @@
+stat:
+do;
+declare
+    cpmversion literally '20h'; /* requires 2.0 cp/m */
+ /* c p / m   s t a t u s    c o m m a n d  (s t a t) */
+
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+/* status    status    status    status    status    status */
+
+/*
+            copyright(c) 1975, 1976, 1977, 1978, 1979
+            digital research
+            box 579
+            pacific grove, ca
+            93950
+  */
+
+/* modified 10/30/78 to fix the space computation */
+/* modified 01/28/79 to remove despool dependencies */
+/* modified 07/26/79 to operate under cp/m 2.0 */
+
+declare jump byte data(0c3h),
+    jadr address data (.status);
+    /* jump to status */
+
+/* function call 32 returns the address of the disk parameter
+block for the currently selected disk, which consists of:
+        scptrk      (2 by) number of sectors per track
+        blkshf      (1 by) log2 of blocksize (2**blkshf=blksize)
+        blkmsk      (1 by) 2**blkshf-1
+        extmsk      (1 by) logical/physical extents
+        maxall      (2 by) max alloc number
+        dirmax      (2 by) size of directory-1
+        dirblk      (2 by) reservation bits for directory
+        chksiz      (2 by) size of checksum vector
+        offset      (2 by) offset for operating system
+*/
+
+declare
+    /* fixed locations for cp/m */
+    bdosa literally '0006h',     /* bdos base */
+    buffa literally '0080h',     /* default buffer */
+    fcba  literally '005ch',     /* default file control block */
+    dolla literally '006dh',     /* dollar sign position */
+    parma literally '006eh',     /* parameter, if sent */
+    rreca literally '007dh',     /* random record 7d,7e,7f */
+    rreco literally '007fh',     /* high byte of random overflow */
+    ioba  literally '0003h',     /* iobyte address */
+    sectorlen literally '128',   /* sector length */
+    memsize address at(bdosa),   /* end of memory */
+    rrec address at(rreca),      /* random record address */
+    rovf byte at(rreco),         /* overflow on getfile */
+    doll byte at(dolla),         /* dollar parameter */
+    parm byte at(parma),         /* parameter */
+    sizeset byte,                /* true if displaying size field */
+    dpba address,                /* disk parameter block address */
+    dpb based dpba structure
+    (spt address, bls byte, bms byte, exm byte, mxa address,
+     dmx address, dbl address, cks address, ofs address),
+    scptrk literally 'dpb.spt',
+    blkshf literally 'dpb.bls',
+    blkmsk literally 'dpb.bms',
+    extmsk literally 'dpb.exm',
+    maxall literally 'dpb.mxa',
+    dirmax literally 'dpb.dmx',
+    dirblk literally 'dpb.dbl',
+    chksiz literally 'dpb.cks',
+    offset literally 'dpb.ofs';
+
+
+boot: procedure external;
+    /* reboot */
+    end boot;
+
+mon1: procedure(f,a) external;
+    declare f byte, a address;
+    end mon1;
+
+mon2: procedure(f,a) byte external;
+    declare f byte, a address;
+    end mon2;
+
+mon3: procedure(f,a) address external;
+    declare f byte, a address;
+    end mon3;
+
+
+status: procedure;
+    declare copyright(*) byte data (
+    '   Copyright (c) 1979, Digital Research');
+    /* dummy outer procedure 'status' will start at 100h */
+    /* determine status of currently selected disk */
+
+declare alloca address,
+    /* alloca is the address of the disk allocation vector */
+    alloc based alloca (1024) byte;  /* allocation vector */
+
+declare
+    true literally '1',
+    false literally '0',
+    forever literally 'while true',
+    cr literally '13',
+    lf literally '10';
+
+printchar: procedure(char);
+    declare char byte;
+    call mon1(2,char);
+    end printchar;
+
+crlf: procedure;
+    call printchar(cr);
+    call printchar(lf);
+    end crlf;
+
+printb: procedure;
+    /* print blank character */
+    call printchar(' ');
+    end printb;
+
+printx: procedure(a);
+    declare a address;
+    declare s based a byte;
+        do while s <> 0;
+        call printchar(s);
+        a = a + 1;
+        end;
+    end printx;
+
+print: procedure(a);
+    declare a address;
+    /* print the string starting at address a until the
+    next 0 is encountered */
+    call crlf;
+    call printx(a);
+    end print;
+
+break: procedure byte;
+    return mon2(11,0); /* console ready */
+    end break;
+
+declare dcnt byte;
+
+version: procedure byte;
+    /* returns current cp/m version # */
+    return mon2(12,0);
+    end version;
+
+select: procedure(d);
+    declare d byte;
+    call mon1(14,d);
+    end select;
+
+open: procedure(fcb);
+    declare fcb address;
+    dcnt = mon2(15,fcb);
+    end open;
+
+search: procedure(fcb);
+    declare fcb address;
+    dcnt = mon2(17,fcb);
+    end search;
+
+searchn: procedure;
+    dcnt = mon2(18,0);
+    end searchn;
+
+cselect: procedure byte;
+    /* return current disk number */
+    return mon2(25,0);
+    end cselect;
+
+setdma: procedure(dma);
+    declare dma address;
+    call mon1(26,dma);
+    end setdma;
+
+getalloca: procedure address;
+    /* get base address of alloc vector */
+    return mon3(27,0);
+    end getalloca;
+
+getlogin: procedure address;
+    /* get the login vector */
+    return mon3(24,0);
+    end getlogin;
+
+writeprot: procedure;
+    /* write protect the current disk */
+    call mon1(28,0);
+    end writeprot;
+
+getrodisk: procedure address;
+    /* get the read-only disk vector */
+    return mon3(29,0);
+    end getrodisk;
+
+setind: procedure;
+    /* set file indicators for current fcb */
+    call mon1(30,fcba);
+    end setind;
+
+set$dpb: procedure;
+    /* set disk parameter block values */
+    dpba = mon3(31,0); /* base of dpb */
+    end set$dpb;
+
+getuser: procedure byte;
+    /* return current user number */
+    return mon2(32,0ffh);
+    end getuser;
+
+setuser: procedure(user);
+    declare user byte;
+    call mon1(32,user);
+    end setuser;
+
+getfilesize: procedure(fcb);
+    declare fcb address;
+    call mon1(35,fcb);
+    end getfilesize;
+
+declare oldsp address,   /* sp on entry */
+    stack(16) address;   /* this program's stack */
+
+declare
+    fcbmax literally '512', /* max fcb count */
+    fcbs literally 'memory',/* remainder of memory */
+    fcb(33) byte at (fcba), /* default file control block */
+    buff(128) byte at (buffa),          /* default buffer */
+    ioval byte at (ioba);               /* io byte */
+
+declare bpb address; /* bytes per block */
+
+set$bpb: procedure;
+    call set$dpb; /* disk parameters set */
+    bpb = shl(double(1),blkshf) * sectorlen;
+    end set$bpb;
+
+select$disk: procedure(d);
+    declare d byte;
+    /* select disk and set bpb */
+    call select(d);
+    call set$bpb; /* bytes per block */
+    end select$disk;
+
+getalloc: procedure(i) byte;
+    /* return the ith bit of the alloc vector */
+    declare i address;
+    return
+    rol(alloc(shr(i,3)), (i and 111b) + 1);
+    end getalloc;
+
+declare
+    accum(4) byte,    /* accumulator */
+    ibp byte;         /* input buffer pointer */
+
+compare: procedure(a) byte;
+    /* compare accumulator with four bytes addressed by a */
+    declare a address;
+    declare (s based a) (4) byte;
+    declare i byte;
+        do i = 0 to 3;
+        if s(i) <> accum(i) then return false;
+        end;
+    return true;
+    end compare;
+
+scan: procedure;
+    /* fill accum with next input value */
+    declare (i,b) byte;
+    setacc: procedure(b);
+        declare b byte;
+        accum(i) = b; i = i + 1;
+        end setacc;
+    /* deblank input */
+        do while buff(ibp) = ' '; ibp=ibp+1;
+        end;
+    /* initialize accum length */
+    i = 0;
+        do while i < 4;
+        if (b := buff(ibp)) > 1 then /* valid */
+            call setacc(b); else /* blank fill */
+            call setacc(' ');
+        if b <= 1 or b = ',' or b = ':' or
+          b = '*' or b = '.' or b = '>' or
+          b = '<' or b = '=' then buff(ibp) = 1;
+        else
+            ibp = ibp + 1;
+        end;
+    ibp = ibp + 1;
+    end scan;
+
+pdecimal: procedure(v,prec);
+    /* print value v with precision prec (10,100,1000)
+    with leading zero suppression */
+    declare
+        v address,    /* value to print */
+        prec address, /* precision */
+        zerosup byte, /* zero suppression flag */
+        d byte;       /* current decimal digit */
+    zerosup = true;
+        do while prec <> 0;
+        d = v / prec ; /* get next digit */
+        v = v mod prec;/* get remainder back to v */
+        prec = prec / 10; /* ready for next digit */
+        if prec <> 0 and zerosup and d = 0 then call printb; else
+            do; zerosup = false; call printchar('0'+d);
+            end;
+        end;
+    end pdecimal;
+
+add$block: procedure(ak,ab);
+    declare (ak, ab) address;
+    /* add one block to the kilobyte accumulator */
+    declare kaccum based ak address; /* kilobyte accum */
+    declare baccum based ab address; /* byte accum */
+    baccum = baccum + bpb;
+        do while baccum >= 1024;
+        baccum = baccum - 1024;
+        kaccum = kaccum + 1;
+        end;
+    end add$block;
+
+count: procedure(mode) address;
+    declare mode byte; /* true if counting 0's */
+    /* count kb remaining, kaccum set upon exit */
+    declare
+        ka  address,  /* kb accumulator */
+        ba  address,  /* byte accumulator */
+        i   address,  /* local index */
+        bit byte;     /* always 1 if mode = false */
+    ka, ba = 0;
+    bit = 0;
+        do i = 0 to maxall;
+        if mode then bit = getalloc(i);
+        if not bit then call add$block(.ka,.ba);
+        end;
+    return ka;
+    end count;
+
+abortmsg: procedure;
+    call print(.('** Aborted **',0));
+    end abortmsg;
+
+userstatus: procedure;
+    /* display active user numbers */
+    declare i byte;
+    declare user(32) byte;
+    declare ufcb(*) byte data ('????????????',0,0,0);
+    call print(.('Active User :',0));
+    call pdecimal(getuser,10);
+    call print(.('Active Files:',0));
+        do i = 0 to last(user);
+        user(i) = false;
+        end;
+    call setdma(.fcbs);
+    call search(.ufcb);
+        do while dcnt <> 255;
+        if (i := fcbs(shl(dcnt and 11b,5))) <> 0e5h then
+            user(i and 1fh) = true;
+        call searchn;
+        end;
+        do i = 0 to last(user);
+        if user(i) then call pdecimal(i,10);
+        end;
+    end userstatus;
+
+drivestatus: procedure;
+    declare
+        rpb address,
+        rpd address;
+    pv: procedure(v);
+        declare v address;
+        call crlf;
+        call pdecimal(v,10000);
+        call printchar(':');
+        call printb;
+        end pv;
+    /* print the characteristics of the currently selected drive */
+    call print(.('    ',0));
+    call printchar(cselect+'A');
+    call printchar(':');
+    call printx(.(' Drive Characteristics',0));
+    rpb = shl(double(1),blkshf); /* records/block=2**blkshf */
+    if (rpd := (maxall+1) * rpb) = 0 and (rpb <> 0) then
+        call print(.('65536: ',0)); else
+        call pv(rpd);
+        call printx(.('128 Byte Record Capacity',0));
+    call pv(count(false));
+        call printx(.('Kilobyte Drive  Capacity',0));
+    call pv(dirmax+1);
+        call printx(.('32  Byte Directory Entries',0));
+    call pv(shl(chksiz,2));
+        call printx(.('Checked  Directory Entries',0));
+    call pv((extmsk+1) * 128);
+        call printx(.('Records/ Extent',0));
+    call pv(rpb);
+        call printx(.('Records/ Block',0));
+    call pv(scptrk);
+        call printx(.('Sectors/ Track',0));
+    call pv(offset);
+        call printx(.('Reserved Tracks',0));
+    call crlf;
+    end drivestatus;
+
+diskstatus: procedure;
+    /* display disk status */
+    declare login address, d byte;
+    login = getlogin; /* login vector set */
+    d = 0;
+        do while login <> 0;
+        if low(login) then
+            do; call select$disk(d);
+            call drivestatus;
+            end;
+        login = shr(login,1);
+        d = d + 1;
+        end;
+    end diskstatus;
+
+match: procedure(va,vl) byte;
+    /* return index+1 to vector at va if match */
+    declare va address,
+        v based va (16) byte,
+        vl byte;
+    declare (i,j,match,sync) byte;
+    j,sync = 0;
+        do sync = 1 to vl;
+        match = true;
+            do i = 0 to 3;
+            if v(j) <> accum(i) then match=false;
+            j = j + 1;
+            end;
+        if match then return sync;
+        end;
+    return 0; /* no match */
+    end match;
+
+declare devl(*) byte data
+    ('CON:RDR:PUN:LST:DEV:VAL:USR:DSK:');
+
+devreq: procedure byte;
+    /* process device request, return true if found */
+    /* device tables */
+    declare
+        devr(*) byte data
+        (/* console */ 'TTY:CRT:BAT:UC1:',
+         /* reader  */ 'TTY:PTR:UR1:UR2:',
+         /* punch   */ 'TTY:PTP:UP1:UP2:',
+         /* listing */ 'TTY:CRT:LPT:UL1:');
+
+    declare
+        (i,j,iobyte,items) byte;
+
+
+    prname: procedure(a);
+        declare a address,
+            x based a byte;
+        /* print device name at a */
+            do while x <> ':';
+            call printchar(x); a=a+1;
+            end;
+        call printchar(':');
+        end prname;
+
+    items = 0;
+        do forever;
+        call scan;
+        if (i:=match(.devl,8)) = 0 then return items<>0;
+        items = items+1; /* found first/next item */
+        if i = 5 then /* device status request */
+            do;
+            iobyte = ioval; j = 0;
+                do i = 0 to 3;
+                call prname(.devl(shl(i,2)));
+                call printx(.(' is ',0));
+                call prname(.devr(shl(iobyte and 11b,2)+j));
+                j = j + 16; iobyte = shr(iobyte,2);
+                call crlf;
+                end;
+            end; else /* not dev: */
+        if i = 6 then /* list possible assignment */
+            do;
+            call print(.('Temp R/O Disk: d:=R/O',0));
+            call print(.('Set Indicator: d:filename.typ ',
+                          '$R/O $R/W $SYS $DIR',0));
+            call print(.('Disk Status  : DSK: d:DSK:',0));
+            call print(.('User Status  : USR:',0));
+            call print(.('Iobyte Assign:',0));
+                do i = 0 to 3; /* each line shows one device */
+                call crlf;
+                call prname(.devl(shl(i,2)));
+                call printx(.(' =',0));
+                    do j = 0 to 12 by 4;
+                    call printchar(' ');
+                    call prname(.devr(shl(i,4)+j));
+                    end;
+                end;
+            end; else
+        if i = 7 then /* list user status values */
+            do; call userstatus;
+            return true;
+            end; else
+	if i = 8 then /* show the disk device status */
+            call diskstatus; else
+        /* scan item i-1 in device table */
+            do; /* find base of destination */
+            j = shl(i:=i-1,4);
+            call scan;
+            if accum(0) <> '=' then
+                do; call print(.('Bad Delimiter',0));
+                return true;
+                end;
+            call scan;
+            if (j:=match(.devr(j),4)-1) = 255 then
+                do; call print(.('Invalid Assignment',0));
+                return true;
+                end;
+            iobyte = 1111$1100b; /* construct mask */
+                do while (i:=i-1) <> 255;
+                iobyte = rol(iobyte,2);
+                j = shl(j,2);
+                end;
+            ioval = (ioval and iobyte) or j;
+            end;
+        /* end of current item, look for more */
+        call scan;
+        if accum(0) = ' ' then return true;
+        if accum(0) <> ',' then
+            do; call print(.('Bad Delimiter',0));
+            return true;
+            end;
+        end; /* of do forever */
+    end devreq;
+
+pvalue: procedure(v);
+    declare (d,zero) byte,
+        (k,v) address;
+    k = 10000;
+    zero = false;
+        do while k <> 0;
+        d = low(v/k); v = v mod k;
+        k = k / 10;
+        if zero or k = 0 or d <> 0 then
+             do; zero = true; call printchar('0'+d);
+             end;
+        end;
+    call printchar('k');
+    call crlf;
+    end pvalue;
+
+comp$alloc: procedure;
+    alloca = getalloca;
+    call printchar(cselect+'A');
+    call printx(.(': ',0));
+    end comp$alloc;
+
+prcount: procedure;
+    /* print the actual byte count */
+    call pvalue(count(true));
+    end prcount;
+
+pralloc: procedure;
+    /* print allocation for current disk */
+    call print (.('Bytes Remaining On ',0));
+    call comp$alloc;
+    call prcount;
+    end pralloc;
+
+prstatus: procedure;
+    /* print the status of the disk system */
+    declare (login, rodisk) address;
+    declare d byte;
+    login = getlogin; /* login vector set */
+    rodisk = getrodisk; /* read only disk vector set */
+    d = 0;
+        do while login <> 0;
+        if low(login) then
+            do; call select$disk(d);
+            call comp$alloc;
+            call printx(.('R/',0));
+            if low(rodisk) then
+                call printchar('O'); else
+                call printchar('W');
+            call printx(.(', Space: ',0));
+            call prcount;
+            end;
+        login = shr(login,1); rodisk = shr(rodisk,1);
+        d = d + 1;
+        end;
+    call crlf;
+    end prstatus;
+
+setdisk: procedure;
+    if fcb(0) <> 0 then call select$disk(fcb(0)-1);
+    end setdisk;
+
+getfile: procedure;
+    /* process file request */
+
+    declare
+        fnam literally '11',   fext literally '12',
+        fmod literally '14',
+        frc  literally '15',   fln  literally '15',
+        fdm  literally '16',   fdl  literally '31',
+        ftyp literally '9',
+        rofile literally '9', /* read/only file */
+        infile literally '10';  /* invisible file */
+    declare
+        fcbn address,   /* number of fcb's collected so far */
+        finx(fcbmax) address, /* index vector used during sort */
+        fcbe(fcbmax) address, /* extent counts */
+        fcbb(fcbmax) address, /* byte count (mod kb) */
+        fcbk(fcbmax) address, /* kilobyte count */
+        fcbr(fcbmax) address, /* record count */
+        bfcba address,    /* index into directory buffer */
+        fcbsa address,    /* index into fcbs */
+        bfcb based bfcba (32) byte,   /* template over directory */
+        fcbv based fcbsa (16) byte;   /* template over fcbs entry */
+    declare
+        i address,     /* fcb counter during collection and display */
+        l address,     /* used during sort and display */
+        k address,     /* " */
+        m address,     /* " */
+        kb byte,       /* byte counter */
+        lb byte,       /* byte counter */
+        mb byte,       /* byte counter */
+        (b,f) byte,    /* counters */
+        matched byte;  /* used during fcbs search */
+
+    multi16: procedure;
+        /* utility to compute fcbs address from i */
+        fcbsa = shl(i,4) + .fcbs;
+        end multi16;
+
+    declare
+        scase byte; /* status case # */
+
+    declare
+        fstatlist(*) byte data('R/O',0,'R/W',0,'SYS',0,'DIR',0);
+
+    setfilestatus: procedure byte;
+            /* eventually, scase set r/o=0,r/w=1,dat=2,sys=3 */
+        declare
+            fstat(*) byte data('R/O R/W SYS DIR ');
+        if doll = ' ' then return false;
+        call move(4,.parm,.accum); /* $???? */
+        if accum(0) = 'S' and accum(1) = ' ' then
+            return not (sizeset := true);
+        /* must be a parameter */
+        if (scase := match(.fstat,4)) = 0 then
+            call print(.('Invalid File Indicator',0));
+        return true;
+        end setfilestatus;
+
+    printfn: procedure;
+        declare (k, lb) byte;
+        /* print file name */
+            do k = 1 to fnam;
+            if (lb := fcbv(k) and 7fh) <> ' ' then
+                do; if k = ftyp then call printchar('.');
+                call printchar(lb);
+                end;
+            end;
+        end printfn;
+
+    call set$bpb; /* in case default disk */
+    call setdisk;
+    sizeset = false;
+    scase = 255;
+    if setfilestatus then
+        do; if scase = 0 then return;
+        scase = scase - 1;
+        end; else
+    if fcb(1) = ' ' then /* no file named */
+        do; call pralloc;
+        return;
+        end;
+    /* read the directory, collect all common file names */
+    fcbn,fcb(0) = 0;
+    fcb(fext),fcb(fmod) = '?'; /* question mark matches all */
+    call search(fcba); /* fill directory buffer */
+    collect: /* label for debug */
+        do while dcnt <> 255;
+        /* another item found, compare it for common entry */
+        bfcba = shl(dcnt and 11b,5)+buffa; /* dcnt mod 4 * 32 */
+        matched = false; i = 0;
+            do while not matched and i < fcbn;
+            /* compare current entry */
+            call multi16;
+                do kb = 1 to fnam;
+                if bfcb(kb) <> fcbv(kb) then kb = fnam; else
+                /* complete match if at end */
+                    matched = kb = fnam;
+                end;
+            i = i + 1;
+            end;
+    checkmatched: /* label for debug */
+        if matched then i = i - 1; else
+            do; /* copy to new position in fcbs */
+            fcbn = (i := fcbn) + 1;
+            call multi16;
+            /* fcbsa set to next to fill */
+            if (fcbn > fcbmax) or (fcbsa + 16) >= memsize then
+                do; call print(.('** Too Many Files **',0));
+                i = 0; fcbn = 1;
+                call multi16;
+                end;
+            /* save index to element for later sort */
+            finx(i) = i;
+                do kb = 0 to fnam;
+                fcbv(kb) = bfcb(kb);
+                end;
+            fcbe(i),fcbb(i),fcbk(i),fcbr(i) = 0;
+            end;
+        /* entry is at, or was placed at location i in fcbs */
+        fcbe(i) = fcbe(i) + 1; /* extent incremented */
+        /* record count */
+        fcbr(i) = fcbr(i) + bfcb(frc)
+                + (bfcb(fext) and extmsk) * 128;
+        /* count kilobytes */
+    countbytes: /* label for debug */
+        lb = 1;
+        if maxall > 255 then lb = 2; /* double precision inx */
+            do kb = fdm to fdl by lb;
+                mb = bfcb(kb);
+                if lb = 2 then /* double precision inx */
+                    mb = mb or bfcb(kb+1);
+                if mb <> 0 then /* allocated */
+                call add$block(.fcbk(i),.fcbb(i));
+            end;
+        call searchn; /* to next entry in directory */
+        end; /* of do while dcnt <> 255 */
+
+    display: /* label for debug */
+    /* now display the collected data */
+    if fcbn = 0 then call print(.('File Not Found',0)); else
+    if scase = 255 then /* display collected data */
+        do;
+        /* sort the file names in ascending order */
+        if fcbn > 1 then /* requires at least two to sort */
+            do; l = 1;
+                do while l > 0; /* bubble sort */
+                l = 0;
+                    do m = 0 to fcbn - 2;
+                    i = finx(m+1); call multi16; bfcba = fcbsa; i = finx(m);
+                    call multi16; /* sets fcbsa, basing fcbv */
+                        do kb = 1 to fnam; /* compare for less or equal */
+                        if (b:=bfcb(kb)) < (f:=fcbv(kb)) then /* switch */
+                            do; k = finx(m); finx(m) = finx(m + 1);
+                            finx(m + 1) = k; l = l + 1; kb = fnam;
+                            end;
+                        else if b > f then kb = fnam; /* stop compare */
+                        end;
+                    end;
+                end;
+            end;
+        if sizeset then
+            call print(.(' Size ',0)); else
+            call crlf;
+        call printx(.(' Recs  Bytes  Ext Acc',0));
+        l = 0;
+            do while l < fcbn;
+            i = finx(l); /* i is the index to next in order */
+            call multi16; call crlf;
+            /* print the file length */
+            call move(16,.fcbv(0),fcba);
+            fcb(0) = 0;
+            if sizeset then
+                do; call getfilesize(fcba);
+                if rovf <> 0 then call printx(.('65536',0)); else
+                    call pdecimal(rrec,10000);
+                call printb;
+                end;
+            call pdecimal(fcbr(i),10000); /* rrrrr */
+            call printb; /* blank */
+            call pdecimal(fcbk(i),10000);  /* bbbbbk */
+            call printchar('k'); call printb;
+            call pdecimal(fcbe(i),1000);   /* eeee */
+            call printb;
+            call printchar('R');
+            call printchar('/');
+            if rol(fcbv(rofile),1) then
+                call printchar('O'); else
+                call printchar('W');
+            call printb;
+            call printchar('A'+cselect); call printchar(':');
+            /* print filename.typ */
+            if (mb:=rol(fcbv(infile),1)) then call printchar('(');
+            call printfn;
+            if mb then call printchar(')');
+            l = l + 1;
+            end;
+        call pralloc;
+        end; else
+    setfileatt: /* label for debug */
+    /* set file attributes */
+        do;
+        l = 0;
+            do while l < fcbn;
+            if break then
+                do; call abortmsg; return;
+                end;
+            i = l;
+            call multi16;
+            call crlf;
+            call printfn;
+                do case scase;
+                /* set to r/o */
+                fcbv(rofile) = fcbv(rofile) or 80h;
+                /* set to r/w */
+                fcbv(rofile) = fcbv(rofile) and 7fh;
+                /* set to sys */
+                fcbv(infile) = fcbv(infile) or 80h;
+                /* set to dir */
+                fcbv(infile) = fcbv(infile) and 7fh;
+                end;
+            /* place name into default fcb location */
+            call move(16,fcbsa,fcba);
+            fcb(0) = 0; /* in case matched user# > 0 */
+            call setind; /* indicators set */
+            call printx(.(' set to ',0));
+            call printx(.fstatlist(shl(scase,2)));
+            l = l + 1;
+            end;
+        end;
+    end getfile;
+
+setdrivestatus: procedure;
+    /* handle possible drive status assignment */
+    call scan; /* remove drive name */
+    call scan; /* check for = */
+    if accum(0) = '=' then
+        do; call scan; /* get assignment */
+        if compare(.('R/O ')) then
+            do; call setdisk; /* a: ... */
+            call writeprot;
+            end; else
+        call print(.('Invalid Disk Assignment',0));
+        end;
+    else /* not a disk assignment */
+        do; call setdisk;
+        if match(.devl,8) = 8 then call drive$status; else
+            call getfile;
+        end;
+    end setdrivestatus;
+
+ /* save stack pointer and reset */
+oldsp = stackptr;
+stackptr = .stack(length(stack));
+/* process request */
+if version < cpmversion then
+    call print(.('Wrong CP/M Version (Requires 2.0)',0));
+    else
+        do;
+        /* size display if $S set in command */
+        ibp = 1; /* initialize buffer pointer */
+        if fcb(0) = 0 and fcb(1) = ' ' then /* stat only */
+            call prstatus; else
+            do;
+            if fcb(0) <> 0 then
+                call setdrivestatus; else
+                do;
+                if not devreq then /* must be file name */
+                    call getfile;
+                end;
+            end;
+        end;
+ /* restore old stack before exit */
+    stackptr = oldsp;
+    end status;
+end;
+

@@ -1,0 +1,23 @@
+
+declare                                 /* XFCB                        */
+    xfcb$type          lit '10h',       /* identifier on disk          */
+    xf$passmode        lit '12',        /* pass word protection mode   */
+    xf$pass            lit '16',        /* XFCB password               */
+    passlen            lit '8',         /* password length             */
+    xf$create          lit '24',        /* creation/access time stamp  */
+    xf$update          lit '28';        /* update time stamp           */
+
+declare                       /* directory label: special case of XFCB */
+    dirlabeltype       lit '20h',       /* identifier on disk          */
+    dl$password        lit '128',       /* masks on data byte          */
+    dl$access          lit '64',
+    dl$update          lit '32',
+    dl$makexfcb        lit '16',
+    dl$exists          lit '1';
+
+declare                                 /* password mode of xfcb       */
+    pm$read            lit '80h',
+    pm$write           lit '40h',
+    pm$delete          lit '20h';
+
+

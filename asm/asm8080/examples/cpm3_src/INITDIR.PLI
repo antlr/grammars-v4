@@ -1,0 +1,1163 @@
+initdir: procedure options(main);
+
+declare
+    cpm3                char(2) static initial('30');
+
+/* fixed bug in clearout, buildnew, and reconstruction 11/12/82 */
+
+/*
+            copyright(c) 1982
+            digital research
+            box 579
+            pacific grove, ca
+            93950
+  */
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+                  * * *  DISK INTERFACE * * *
+
+
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        %include 'diomod.dcl';
+
+        %include 'plibios.dcl';
+
+        %replace
+           TRUE           by '1'b,
+           FALSE          by '0'b;
+
+                                        /* directory array 4K */
+        declare
+                1 dir_fcb(0:127),
+                 3 user          bit(8),
+                 3 rest(31)      char(1),
+
+                1 outbuf(0:127),
+                 2 user         fixed(7),
+                 2 rest(31)     char(1),
+
+                1 buffer2(0:127),
+                 2 user         bit(8),
+                 2 rest(31)     bit(8),
+
+                1 outb(0:127)   based(outptr),
+                 2 rest         char(32),
+
+                1 outb2(0:127)  based(outptr),
+                 2 user         bit(8),
+                 2 rest(31)     char(1),
+
+                1 outb3(0:127)  based(outptr),
+                 2 user         fixed(7),
+                 2 rest(31)     bit(8),
+
+                1 outb4(0:127)  based(outptr),
+                 2 sfcbm        char(1),
+                 2 sfcb(3),
+                  3 stamps      char(8),
+                  3 mode        bit(8),
+                  3 rest        char(1),
+                 2 frest        char(1),
+
+                1 infcb(0:127)  based(dirptr),
+                 2 rest         char(32),
+
+                1 infcb2(0:127) based(dirptr),
+                 2 user         char(1),
+                 2 name         char(11),
+                 2 pmode        bit(8),
+                 2 junk1        char(11),
+                 2 stamp        char(8),
+
+               1 clearbuf(0:127) based(clearptr),
+                 2 rest         char(32),
+
+                zeroes(31)      bit(8) static init((31)'00000000'b);
+
+                                        /* directory array mask */
+        declare
+           1 dirm(0:127)      based(dirptr),
+             3 user          fixed(7),
+             3 fname         char(8),
+             3 ftype         char(3),
+             3 fext          bin fixed(7),
+             3 fs1           bit(8),
+             3 fs2           bit(8),
+             3 frc           fixed(7),
+             3 diskpass(8)   char(1),
+             3 rest          char(8);
+
+        declare                         /* disk parameter header mask */
+                dphp            ptr,
+                1 dph_mask      based(dphp),
+                 2 xlt1         ptr,
+                 2 space(9)     bit(8),
+                 2 mediaf       bit(8),
+                 2 dpbptr       ptr,
+                 2 csvptr       ptr,
+                 2 alvptr       ptr,
+                 2 dirbcb       ptr,
+                 2 dtabcb       ptr,
+                 2 hash         ptr,
+                 2 hbank        ptr,
+
+        xlt             ptr;    /* save the xlt ptr because of F10 buffer */
+
+        declare                 /* disk parameter block mask */
+           dpbp        ptr ext,
+           1 dpb_mask  based(dpbp),
+             2 spt     fixed(15),
+             2 blkshft fixed(7),
+             2 blkmsk  fixed(7),
+             2 extmsk  fixed(7),
+             2 dsksiz  fixed(15),
+             2 dirmax  fixed(15),
+             2 diralv  bit(16),
+             2 checked fixed(15),
+             2 offset  fixed(15),
+             2 physhf  fixed(7),
+             2 phymsk  fixed(7),
+
+                dspt    decimal(7,0),
+                dblk    decimal(7,0);
+
+        declare
+           dir_blks(32)   bit(8),
+           errorcode      bit(16);
+
+        declare
+                MAXSAVE         bin fixed(15),
+                enddcnt         bin fixed(15),
+                nxfcb           bin fixed(15),
+                notsaved        bin fixed(15),
+                xptr            pointer,
+
+                1 XFCBs(1)      based(xptr),
+                 2 user         bin fixed(7),
+                 2 name         char(11),
+                 2 pmode        bit(8),
+                 2 stamp        char(8);
+
+
+declare
+                INITMSG         char(54) static initial
+                   ('INITDIR WILL ACTIVATE TIME STAMPS FOR SPECIFIED DRIVE.'),
+                CONFIRM         char(60) varying static initial
+                   ('Do you want to re-format the directory on drive: '),
+
+                ASKCLEAR        char(44) static initial
+                   ('Do you want the existing time stamps cleared'),
+                RECOVER         char(50) varying static init
+                   ('Do you want to recover time/date directory space'),
+                YN              char(10) static initial('  (Y/N)?  '),
+                YES             char(1) static initial('Y'),
+                lyes            char(1) static initial('y'),
+                yesno           char(1),
+
+                UPPERCASE       char(26) static initial
+                                         ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+                LOWERCASE       char(26) static initial
+                                         ('abcdefghijklmnopqrstuvwxyz'),
+
+                pass1           char(20) static initial
+                                         ('End of PASS 1.'),
+                ERRORM          char(7) static initial('ERROR: '),
+                TERM            char(30) static initial('INITDIR TERMINATED.'),
+                errvers         char(30) static initial
+                                ('Requires CP/M 3.0 or higher.'),
+                errnotnew       char(31) static initial
+                                ('Directory already re-formatted.'),
+                errtoobig       char(30) static initial
+                                ('Not enough room in directory.'),
+                errpass         char(15) static initial('Wrong password.'),
+                errSTRIP        char(30) varying static initial
+                                ('No time stamps present.'),
+                errMEM          char(30) varying static initial
+                                ('Not enough available memory.'),
+                errRO           char(20) varying static initial
+                                ('Disk is READ ONLY.'),
+                errWHAT         char(30) varying static initial
+                                ('Cannot find last XFCB.'),
+                errRSX          char(60) varying static initial
+                ('Cannot re-format the directory with RSXs in memory.'),
+                errunrec        char(19) static initial ('Unrecognized drive.'),
+
+                errBIOS         char(20) static initial('Cannot select drive.');
+
+        declare
+                outptr          pointer,
+                bufptr1         pointer,
+                bufptr2         pointer,
+                dirptr          pointer,
+                drivptr         pointer,
+                clearptr        pointer,
+
+                nempty          bin fixed(15),
+                (nfcbs,nfcbs1)  bin fixed(15),
+                lastsfcb        bin fixed(15),
+                lastdcnt        bin fixed(15),
+                (lasti,lastx)   bin fixed(15),
+                lastsect        bin fixed(15),
+                cleardcnt       bin fixed(15),
+                (gsec,gtrk)     bin fixed(15),
+                (dcnt,sect)     bin fixed(15),
+                outdcnt         bin fixed(15),
+                newdcnt         bin fixed(15),
+                outidx          bin fixed(7),
+                curdisk         bin fixed(7),
+                newlasti        bin fixed(7),
+                (sfcbidx,sfcboffs)  bin fixed(15),
+                usernum         fixed(7),
+                SFCBmark        fixed(7) static initial(33),
+                Dlabel          bin fixed(7) static initial (32),
+
+                Redo            bit(1),
+                bad             bit(1),
+                writeflag       bit(1),
+                CLEARSECT       bit(1),
+                CLEARSFCB       bit(1),
+                labdone         bit(1) static initial(false),
+                cversion        bit(16),
+                READonly        bit(16),
+
+                ptreos          pointer,
+                EOS             bit(8) static initial('00'b4),
+                CEOS            char(1) based (ptreos),
+
+                fcb(32)         char(1),
+                fcb0(50)        char(1) based (drivptr),
+                dr0             fixed(7) based(drivptr),
+                disks           char(16) static initial
+                                ('ABCDEFGHIJKLMNOP'),
+                drive           bin fixed(7),
+                cdrive          char(1);
+
+declare
+                1 SCB,
+                 2 soffs        fixed(7),
+                 2 seter        fixed(7),
+                 2 value        char(2),
+
+                ccppage         bit(8);
+
+/*************************************************************************
+
+
+                        ***  MAIN PROGRAM  ***
+
+
+**************************************************************************/
+
+        declare i       bin fixed(7);
+
+        cversion = vers();
+        if substr(cversion,9,8) < '31'b4 then call errprint((errvers));
+
+        soffs = 23;
+        seter = 0;
+        ccppage = sgscb(addr(SCB));             /* if RSX present then stop */
+        if substr(ccppage,7,1) = '1'b then call errprint(errRSX);
+
+        drivptr = dfcb0();                      /* get drive */
+        drive = dr0;
+        if dr0 > 16  then drive = 0;
+
+        do while(drive = 0);                    /* none recognized */
+                call wrongdisk(i,drive);
+                call getdisk(i,drive);
+        end;
+
+        cdrive = substr(disks,drive,1);
+
+        curdisk = curdsk();                     /* restore BIOS to this */
+
+        put edit(INITMSG,confirm,cdrive,YN)(skip(2),a,skip,a,a,a);
+        get list(yesno);
+        if yesno ~= YES & yesno ~= lyes then call reboot;
+
+        READonly = rovec();                     /* is the drive RO ? */
+        if substr(READonly,(17-drive),1) = '1'b then
+           call errprint(errRO);
+
+        call dselect(drive);
+        nfcbs = ((phymsk + 1)*4) - 1;           /* # fcbs/physical rcd - 1 */
+        nfcbs1 = nfcbs + 1;
+
+        dirptr = addr(dir_fcb(0));
+        dcnt = 0;
+        call read_sector(dcnt,dirptr);
+
+        call init;
+
+        call restore;
+
+/********************************************************************/
+
+
+wrongdisk: procedure(i,drive);
+        declare (i,j,drive)     bin fixed(7);
+
+        put list(ERRORM,errunrec);
+        put skip list('DRIVE: ');
+                                                /* print errant string */
+        j = i;
+        ptreos = addr(EOS);
+        do while(fcb0(j) ~= ' ' & fcb0(j) ~= CEOS);
+                put edit(fcb0(j))(a);
+                j = j + 1;
+        end;
+        put skip;
+
+end wrongdisk;
+
+getdisk: procedure(i,drive);
+        declare (i,drive)       bin fixed(7);
+
+        put skip list('Enter Drive: ');
+        get list(fcb0(i));
+        fcb0(i) = translate(fcb0(i),UPPERCASE,LOWERCASE);
+        fcb0(i+1) = ':';
+
+        drive = index(disks,fcb0(i));
+
+end getdisk;
+
+
+/**************************************************************************/
+
+
+init: procedure;
+
+        declare
+                (i,j,k,l)       bin fixed(15);
+
+        call allxfcb;                   /* allocate XFCB data space */
+        call countdir;
+
+        lastx = nxfcb;
+        sect = sect - 1;
+        dcnt = dcnt - 1;                        /* reset to good dcnt */
+
+        if Redo then do;
+                newdcnt = lastdcnt;
+                newlasti = lasti;
+        end;
+        else do;
+                newdcnt = lastdcnt + lastsfcb + (2 - mod(lastdcnt,3));
+                if (newdcnt + 1) > dirmax then do;
+                        lastdcnt = lastdcnt - nempty;
+                        lastsfcb = lastdcnt/3 + 1;
+                        newdcnt = lastdcnt + lastsfcb + (2 - mod(lastdcnt,3));
+
+                        if (newdcnt + 1) > dirmax then 
+                           call errprint(errtoobig);
+
+                        call collapse;           /* remove all empties by
+                                                    collapsing dir from top */
+                        lastsfcb = lastdcnt/3 + 1;
+                        newdcnt = lastdcnt + lastsfcb + (2 - mod(lastdcnt,3));
+                end;
+                newlasti = mod(newdcnt,nfcbs1) - 3 + mod(lastdcnt,3);
+        end;
+
+        outptr = addr(buffer2(0));              /* want to clear last read
+                                                   sector...buffer2 only used
+                                                   in collapse so it is free */
+        call clearout;
+        clearptr = outptr;
+        outptr = addr(outbuf(0));
+        call clearout;                          /* zero output buffer */
+
+
+/***********************************************************************/
+
+
+        do while(lastsect < sect );             /* clear from end of dir */
+                call write_sector(dcnt,outptr);
+                dcnt = dcnt - nfcbs1;
+                sect = sect - 1;
+        end;
+
+        if (nempty - 1) ~= dirmax then do;      /* if there are files on dir */
+
+                                                /* bottom of directory is
+                                                   now all E5 and 21...
+                                                   it is positioned to the
+                                                   last good sector of the old
+                                                   directory.  */
+           dcnt = lastdcnt;
+           enddcnt = newdcnt;
+           call read_sector(dcnt,dirptr);       /* read last good sector */
+
+           outidx = newlasti;                   /* index into out buffer */
+           call buildnew(lasti);                /* fill in outbuff from the
+                                                   bottom up...need this call
+                                                   because lasti may be in 
+                                                   middle of read buffer */
+           do while(dcnt >= 0);
+                                                /* as soon as we are finished
+                                                   with reading old sector,
+                                                   then go clear it.  This
+                                                   should limit possibility
+                                                   that duplicate FCB's occur.
+                                                */
+                call read_sector(dcnt,dirptr);
+                call buildnew(nfcbs);
+           end;
+
+        end;                                    /* virgin dir */
+
+        else call write_sector(0,outptr);       /* write last sector */
+
+        do while(notsaved > 0);
+                call moreXFCB;
+        end;
+
+end init;
+
+/************************************************************************/
+
+
+strip: procedure;
+
+                                /* remove all SFCB from directory by jamming
+                                   E5 into user field.  Also turn off time/date
+                                   stamping in DIR LABEL.  */
+
+        declare (i,j)           bin fixed(7),
+                1 direct(0:127) based(dirptr),
+                 2 junk1        char(12),
+                 2 ext          bit(8),
+                 2 rest         char(19),
+
+                olddcnt         bin fixed(15);
+
+
+        dcnt = 0;
+
+        do while(dcnt <= dirmax);
+
+                call read_sector(dcnt,dirptr);
+
+                olddcnt = dcnt;
+                do i = 0 to nfcbs while(dcnt <= dirmax);
+
+                        if ~labdone then
+                            if dirm(i).user = Dlabel then do;
+                                call getpass(i);
+                                direct(i).ext = direct(i).ext & '10000001'b;
+                                labdone = true;
+                            end;
+
+                        if dirm(i).user = SFCBmark then 
+                            dir_fcb(i).user = 'E5'b4;
+
+                        dcnt = dcnt + 1;
+                end;
+
+                call write_sector(olddcnt,dirptr);
+        end;
+
+end strip;
+
+
+/*****************************************************************************/
+
+
+
+countdir: procedure;
+        declare i       bin fixed(7);
+
+                                        /* there are 5 valid sets of codes in 
+                                           the user field:
+
+                                                E5      - empty
+                                                0-15    - user numbers
+                                                32      - Directory label
+                                                33      - SFCB marker
+                                                16-31   - XFCB marker
+
+                                           This routine counts the # of used
+                                           directory slots ignoring E5.
+                                           NOTE: if SFCB present then last
+                                                 slot = SFCB */
+
+        Redo = false;
+        nempty = 0;
+        sect = 0;
+        nxfcb = 0;
+        notsaved = 0;
+        bad = true;
+                                        /* If dir is already time stamped then 
+                                           SFCBs should appear in every sector,
+                                           notably the first sector. Thus,
+                                           test first sector.  If first sector
+                                           has SFCB then all do.  If none in
+                                           first & they appear later then
+                                           INITDIR was probably interrupted.
+                                           In that case, zap the found SFCB's
+                                           and treat dir as virgin.  */
+
+        if dirm(3).user = SFCBmark then bad = false;
+
+        do while(dcnt <= dirmax);
+                do i = 0 to nfcbs while(dcnt <= dirmax);
+                        if dir_fcb(i).user ~= 'E5'b4 then do;
+                                usernum = dirm(i).user;
+
+                                if ~Redo & usernum = 33 then call query;
+
+                                if usernum > 15 & usernum < 32 then
+                                   call getXFCB(i);
+
+                                        /* if LABEL then check for password...
+                                           may terminate in getpass */
+
+                                else if usernum = Dlabel then call getpass(i);
+
+                                if (usernum < 33) | (~bad & usernum = 33) then
+                                        do;
+
+                                        lasti = i;
+                                        lastsect = sect;
+                                        lastdcnt = dcnt;
+                                end;                 /* bad...*/
+                                else if usernum = 33 then nempty = nempty + 1;
+
+                        end;                    /* E5 ... */
+                        else nempty = nempty + 1;
+                        dcnt = dcnt + 1;
+                end;
+
+                sect = sect + 1;
+                call read_sector(dcnt,dirptr);
+        end;
+
+        if ~Redo then lastsfcb = lastdcnt/3 + 1;
+
+end countdir;
+
+getXFCB: procedure(i);
+        declare i       bin fixed(7);
+
+         if nxfcb <= MAXSAVE then do;
+                nxfcb = nxfcb + 1;
+                XFCBs(nxfcb).user = usernum - 16;
+                XFCBs(nxfcb).name = infcb2(i).name;
+                XFCBs(nxfcb).pmode = infcb2(i).pmode;
+                XFCBs(nxfcb).stamp = infcb2(i).stamp;
+         end;
+         else notsaved = notsaved + 1;
+
+end getXFCB;
+
+
+allxfcb: procedure;
+
+                                /* allocates largest available block of space
+                                   to be used in storing XFCB info.
+                                        maxwds & allwds use word units */
+
+        declare maxwds          entry returns(fixed(15)),
+                allwds          entry(fixed(15)) returns(pointer),
+                size            bin fixed(15);
+
+        size = maxwds();                /* get largest block in free space */
+        if size <= 10 then call errprint(errMEM);
+
+        xptr = allwds(size);            /* reserve it */
+        MAXSAVE = (2*size)/21;          /* # XFCBs that can be saved */
+
+end allxfcb;
+
+
+query: procedure;
+
+        if bad then return;
+
+        put skip(2) list(errnotnew);
+
+                                                /* check to see if user wants
+                                                   to strip SFCB's */
+        if ~asker(RECOVER) then do;
+                Redo = true;
+                CLEARSFCB = false;
+                if asker(ASKCLEAR) then do;
+                        CLEARSFCB = true;
+                        return;
+                end;
+        end;
+        else call strip;                        /* this will end down here
+                                                   after stripping */
+
+        call restore;                           /* dir is already formattted &
+                                                   user does not want to clear
+                                                   old SFCB's....just stop */
+
+end query;              
+
+buildnew: procedure(endidx);
+        declare (i,j,k,endidx)          bin fixed(15);
+
+declare 1 ot(0:127)     based(outptr),
+         2 user         fixed(7),
+         2 fname        char(8),
+         2 ftype        char(3),
+         2 rest         char(20);
+
+                                      /* build output buffer from
+                                           input(end) to input(0).
+                                           k => refers to input */
+        k = endidx;
+        do while(k >= 0);
+                usernum = dirm(k).user;
+
+                outb(outidx).rest = infcb(k).rest;
+
+                if usernum = SFCBmark then do;
+                        if bad then outb2(outidx).user = 'E5'b4;
+                        else if CLEARSFCB then outb3(outidx).rest = zeroes;
+                end;
+
+                if usernum < 16 then do;
+                   if nxfcb > 0 then            /* if fcb is ex=0 and XFCB
+                                                   exists then check for
+                                                   possible SFCB update */
+                        call putXFCB(k);
+                end;
+
+                if ~Redo & mod(outidx,4) = 0 then outidx = outidx - 2;
+                else outidx = outidx - 1;
+
+                k = k - 1;
+                dcnt = dcnt - 1;
+
+                if outidx < 0 then do;
+                        if dcnt > 14 then 
+                           if mod(dcnt + 1,nfcbs1) = 0 then
+                                call write_sector(dcnt + 1,clearptr);
+                        call write_sector(newdcnt,outptr);
+                        newdcnt = newdcnt - nfcbs1;
+                        outidx = nfcbs - 1;
+                        if Redo then outidx = outidx + 1;
+                end;
+        end;
+
+end buildnew;
+
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+
+compare: procedure(k) returns(fixed(7));
+
+        declare (i,j,k)         bin fixed(7),
+                1 direc(0:127)  based(dirptr),
+                 2 user         fixed(7),
+                 2 name(11)     char(1),
+                 2 rest         char(20),
+
+                1 XFCB2(1)      based(xptr),
+                 2 user         char(1),
+                 2 name(11)     char(1),
+                 2 rest         char(9);
+
+                                                /* compare fcb with XFCB list;
+                                                   return position in list if
+                                                   found, 0 otherwise.
+                                                   Nullify usernum field in 
+                                                   XFCB list (=99) if found.
+                                                   Decrement #xfcb as well.*/
+        do i = 1 to nxfcb;
+                if XFCBs(i).user ~= 99 then do;
+                        if XFCBs(i).user = direc(k).user then do;
+
+                                do j = 1 to 11;
+                                   if direc(k).name(j) ~= XFCB2(i).name(j)
+                                      then go to outx;
+                                end;
+
+                                                /* found a match */
+                                XFCBs(i).user = 99;
+                                nxfcb = nxfcb - 1;
+                                return(i);
+
+outx:                   end;
+                end;
+        end;
+
+        return(0);
+
+end compare;
+
+moreXFCB: procedure;
+                                /* we could not store all the xfcb's in memory
+                                   available, so now must make another pass &
+                                   store as many XFCB as possible.
+                                   'notsaved' > 0 ==> we may have to
+                                                      do this again.  */
+        declare (i,k)   bin fixed(7);
+
+        dcnt = enddcnt;                 /* go to end of directory */
+        if ~findXFCB(k) then            /* work backwards trying to find
+                                           last known XFCB...if not found
+                                           then something very strange has
+                                           happened;
+            call errprint(errWHAT);
+
+        notsaved = 0;                   /* now in last sector where last XFCB
+                                           occurs...look for other XFCB that
+                                           we know is there.  */
+        nxfcb = 0;
+
+        dcnt = dcnt + 1;
+        lastdcnt = dcnt;                /* save position of last XFCB + 1 */
+        lasti = k + 1;                  /* index in sector */
+        do while(dcnt <= enddcnt);
+                do i = k+1 to nfcbs while(dcnt <= enddcnt);
+                        usernum = dirm(i).user;
+                        if usernum > 15 & usernum < 32 then call getXFCB(i);
+                        dcnt = dcnt + 1;
+                end;
+                k = 0;
+                call read_sector(dcnt,dirptr);
+        end;
+
+        dcnt = 0;                               /* go to start of dir */
+        do while(dcnt <= enddcnt);
+                call read_sector(dcnt,dirptr);
+                outdcnt = dcnt;
+                writeflag = false;              /* putXFCB sets when it finds a
+                                                   match */
+
+                do k = 0 to nfcbs while(dcnt <= enddcnt);
+                        outidx = k;
+                        if dirm(k).user < 16 then call putXFCB(k);
+                        dcnt = dcnt + 1;
+                end;
+                if writeflag then call write_sector(outdcnt,dirptr);
+        end;
+
+end moreXFCB;
+
+findXFCB: procedure(idx) returns(bit(1));
+
+                                /* find the last known XFCB...starts from the
+                                   last written sector in the dir and goes
+                                   backwards...hopefully that's faster */
+        declare idx     fixed(7);
+
+        do while(dcnt > 0);
+                call read_sector(dcnt,dirptr);
+                do idx = 0 to nfcbs while(dcnt > 0);
+                        usernum = dirm(idx).user;
+                        if usernum > 15 & usernum < 32 then
+                                if XFCBs(lastx).name = infcb2(idx).name then
+                                        return(true);
+                        dcnt = dcnt + 1;
+                end;
+        end;
+
+        return(false);          /* big trouble...*/
+
+end findXFCB;
+
+
+putXFCB: procedure(k);
+                                /* if this is extent 0 fold and names match
+                                   then update SFCB from XFCB */
+        declare (k,j)   fixed(7);
+
+                        if dirm(k).fext <= dpb_mask.extmsk then do;
+                           j = compare(k);
+                           if j ~= 0 then do;
+
+                                                /* fcb matches XFCB...
+                                                   update the SFCB */
+                             sfcboffs = mod(outidx+1,4);
+                             sfcbidx = outidx + (4 - sfcboffs);
+                             outb4(sfcbidx).sfcb(sfcboffs).stamps =
+                                                                XFCBs(j).stamp;
+                             outb4(sfcbidx).sfcb(sfcboffs).mode =
+                                                                XFCBs(j).pmode;
+                             writeflag = true;
+                           end;
+                        end;                    /* extent 0 ? */
+
+end putXFCB;
+
+
+errprint: procedure(msg);
+        declare
+                msg             char(60) varying;
+
+        put edit(ERRORM,msg,TERM)(skip(2),a,a,skip,a);
+        put skip(2);
+
+        call restore;
+
+end errprint;
+
+
+asker: procedure(msg) returns(bit(1));
+
+        declare msg             char(60) varying;
+
+        put skip list(msg,YN);
+        get list(yesno);
+
+        if yesno ~= YES & yesno ~= lyes then return(false);
+
+        return(true);
+
+end asker;
+
+
+clearout: procedure;
+        declare
+                (i,j)   bin fixed(7);
+
+        do i = 0 to nfcbs;
+                if mod(i+1,4) ~= 0 then outb2(i).user = 'E5'b4;
+                else outb3(i).user = SFCBmark;
+
+                do j = 1 to 31;
+                        outb3(i).rest(j) = '00000000'b;
+                end;
+        end;
+
+end clearout;
+
+getpass: procedure(fcbx);
+                                        /* Drive may be password protected...
+                                           Get passw from user and compare
+                                           with Password in label.
+                                           Label password is encoded by first
+                                           reversing each char nibble and then
+                                           XOR'ing with the sum of the pass.
+                                           S2 in label = that sum.  */
+
+        declare
+                passwd(8)       bit(8) based(passptr),
+
+                passptr         pointer,
+                convptr         pointer,
+                pchar(8)        bit(8),
+                cvpass(8)       char(1) based(convptr),
+                inpass          char(8),
+                (i,j,fcbx)      bin fixed(7);
+
+        labdone = true;
+
+        passptr = addr(dirm(fcbx).diskpass);
+        convptr = addr(pchar(1));
+
+        do i = 1 to 8;                  /* XOR each character  */
+                pchar(i) = bool(passwd(i),dirm(fcbx).fs1,'0110'b);
+        end;
+
+        if cvpass(8) <= ' ' then return; /* no password */
+
+        put skip(2) list('Directory is password protected.');
+        put skip list('Password, please.  >');
+        get list(inpass);
+        inpass = translate(inpass,UPPERCASE,LOWERCASE);
+
+        j = 8;
+        do i = 1 to 8;
+                if substr(inpass,i,1) ~= cvpass(j) then call errprint(errpass);
+                j = j - 1;
+        end;
+
+end getpass;
+
+collapse: procedure;
+
+        declare whichbuf        bin fixed(7),
+                enddcnt         bin fixed(15),
+                (i,nout1,nout2) bin fixed(7);
+
+        dcnt = 0;
+        sect = 0;
+        outdcnt = 0;
+        whichbuf = 0;
+        nout1 = 0;
+        nout2 = 0;
+        lastsect = 0;
+        enddcnt = lastdcnt + nempty;
+        lastdcnt = 0;
+        bufptr1 = addr(outbuf(0));
+        bufptr2 = addr(buffer2(0));
+
+        do while(dcnt <= enddcnt);               /* read up to last dcnt */
+
+                call read_sector(dcnt,dirptr);
+
+                do i = 0 to nfcbs while(dcnt <= enddcnt);
+                        if dir_fcb(i).user ~= 'E5'b4 &
+                           dirm(i).user ~= SFCBmark then do;
+
+                               if whichbuf = 0 then 
+                                        call fill(bufptr1,i,nout1,whichbuf);
+                                else call fill(bufptr2,i,nout2,whichbuf);
+                        end;
+                        dcnt = dcnt + 1;
+                end;
+
+                sect = sect + 1;
+                if nout1 = nfcbs1 then call flush_write(nout1,bufptr1);
+                else if nout2 = nfcbs1 then call flush_write(nout2,bufptr2);
+        end;
+
+        dcnt = dcnt - 1;                        /* fill unused slots in buffer
+                                                   with empty...scratch rest of
+                                                   dir */
+        if whichbuf = 0 then call fill2(bufptr1,nout1);
+        else call fill2(bufptr2,nout2);
+
+end collapse;
+
+fill: proc(bufptr,i,nout,whichbuf);
+        declare bufptr          pointer,
+                (i,j,nout)      bin fixed(7),
+                whichbuf        bin fixed(7),
+
+                1 buffer(0:127) based(bufptr),
+                 2 out          char(32);
+
+        buffer(nout).out = infcb(i).rest;
+
+        lastdcnt = lastdcnt + 1;
+        nout = nout + 1;
+        if nout = nfcbs1 then whichbuf = mod((whichbuf + 1),2);
+
+end fill;
+
+flush_write: proc(nout,bufptr);
+        declare nout            bin fixed(7),
+                bufptr          pointer;
+
+                                        /* always behind the read...thus don't
+                                           need to test to see if read sector =
+                                           write sector. */
+        call write_sector(outdcnt,bufptr);
+        outdcnt = outdcnt + nfcbs1;
+        nout = 0;
+        lastsect = lastsect + 1;
+
+end flush_write;
+
+fill2: proc(bufptr,nout);
+
+        declare (i,j,nout)      bin fixed(7),
+                bufptr          pointer,
+                1 buffer(0:127) based(bufptr),
+                 2 user         bit(8),
+                 2 rest(31)     bit(8);
+
+        do i = nout to nfcbs;
+                buffer(i).user = 'E5'b4;
+                do j = 1 to 31;
+                        buffer(i).rest(j) = '00000000'b;
+                end;
+        end;
+
+        lastdcnt = lastdcnt - 1;
+        lasti = nout - 1;
+        call flush_write(nout,bufptr);
+
+        do i = 0 to nfcbs;                      /* prepare empty sector */
+                buffer(i).user = 'E5'b4;
+                do j = 1 to 31;
+                        buffer(i).rest(j) = '00000000'b;
+                end;
+        end;
+
+                                                /* clear rest of directory */
+        do while (outdcnt < dcnt);
+                call write_sector(outdcnt,bufptr);
+                outdcnt = outdcnt + nfcbs1;
+        end;
+
+end fill2;
+
+restore: procedure;
+
+        dphp = seldsk(curdisk);         /* restore drive */
+        call reset();                   /* reset disk system */
+        errorcode = select(curdisk);
+
+        call reboot;
+
+end restore;
+
+                                /* read logical record # to dma address */
+read_sector: procedure(lrcd,dmaaddr);
+        dcl 
+           lrcd      bin fixed(15),
+           prcd      decimal(7,0),
+           dmaaddr   pointer;                   /* dma address */
+
+        prcd = lrcd/nfcbs1;
+        gtrk = track(prcd);
+        call settrk(gtrk);
+        gsec = sector(prcd);
+        call setsec(gsec);
+
+        call bstdma(dmaaddr);
+        if rdsec() ~= 0 then signal error(71);
+
+end read_sector;
+
+
+                                /* write logical record # from dma address */
+write_sector: procedure(lrcd,dmaaddr);
+        dcl 
+           lrcd         bin fixed(15),
+           dmaaddr      pointer,                /* dma address */
+           prcd         decimal(7,0);
+
+        prcd = lrcd/nfcbs1;                     /* #fcbs/phys rec */
+        gtrk = track(prcd);
+        call settrk(gtrk);
+        gsec = sector(prcd);
+        call setsec(gsec);
+
+        call bstdma(dmaaddr);
+        if wrsec(1) ~= 0 then signal error(91);
+
+end write_sector;
+
+
+                                /* select disk drive */
+dselect: procedure((d));
+        dcl
+            p              ptr,
+            wdalv(16)      fixed(15) based(p),
+            btalv(16)      fixed(7)  based(p),
+            all            bit(16),
+            d              fixed(7);
+
+
+        dcl
+                1 dpb based (dpbp),
+                  2 sec bit(16),
+                  2 bsh bit(8),
+                  2 blm bit(8),
+                  2 exm bit(8),
+                  2 dsm bit(16),
+                  2 drm bit(16),
+                  2 al0 bit(8),
+                  2 al1 bit(8),
+                  2 cks bit(16),
+                  2 off bit(8);
+
+        if d = 0 then d = curdsk();
+        else d = d - 1;
+
+        errorcode = select(d);                  /* sync BIOS & BDOS */
+        dphp = seldsk(d);
+        if dphp = null then call errprint(errBIOS);/* can't select disk */
+
+        xlt = xlt1;
+        dpbp = dpbptr;
+
+        dspt = decimal(spt/(phymsk + 1));
+        dblk = decimal(conv(blkmsk) + 1);
+                                        /* get directory blocks */
+        p = addr(dir_blks(1));
+        all = al0;
+        substr(all,9) = al1;
+
+        do d = 1 to 16;
+            wdalv(d) = 0;       /* clears dir_blks to 0s */
+            if substr(all,d,1) then 
+                if dsksiz < 255 then
+                    btalv(d) = d - 1;
+                else
+                    wdalv(d) = d - 1;
+        end;
+
+end dselect;
+
+
+                                /* convert logical rcd # to physical sector */
+sector: procedure(i) returns(fixed(15));
+        dcl 
+            i    decimal(7,0);
+
+        return(sectrn(binary(mod(i,dspt),15),xlt));
+
+end sector;
+
+
+                                /* logical record # to physical track */
+track: procedure(i) returns(fixed(15));
+        dcl 
+            i    decimal(7,0);
+
+        return(offset + binary(i/dspt,15));
+
+end track;
+
+
+                                /* logical record # to physical block */
+block: procedure(i) returns(fixed(15));
+        dcl 
+            i decimal(7,0);
+
+        return(binary(i/dblk,15));
+
+end block;
+
+                                /* block to logical sector */
+bsec: procedure(i) returns(decimal(7,0));
+        dcl 
+            i     fixed(15);
+
+        if i > dsksiz then signal error(83);
+
+        return(decimal(i) * dblk);
+
+end bsec;
+
+                        /* convert fixed(7) to fixed(15) w/o sign extension */
+conv: procedure(i) returns(fixed(15));
+        dcl
+            i       fixed(7),
+            j       fixed(15),
+            p       ptr,
+            n       fixed(7) based(p);
+
+        p = addr(j);
+        j = 0;
+        n = i;
+        return(j);
+end conv;
+
+                                /* test for console break */
+break_test: procedure ext;
+
+        if con_break() then signal error(85);
+
+end break_test;
+
+
+                                /* test for console break */
+con_break: procedure returns(bit(1));
+        dcl
+            c char(1);
+
+        if break() then do;
+            c = rdcon();
+            if c ~= '^S' then return(TRUE);
+        end;
+        return(FALSE);
+
+end con_break;
+
+end initdir;
+

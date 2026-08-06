@@ -1,0 +1,59 @@
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax main.lst $$stran
+vax main.sym $$stran
+vax main.lin $$stran
+vax timest.lst $$stran
+vax timest.sym $$stran
+vax timest.lin $$stran
+vax dpb80.lst $$stran
+vax dpb80.sym $$stran
+vax dpb80.lin $$stran
+vax disp.lst $$stran
+vax disp.sym $$stran
+vax disp.lin $$stran
+vax main80.lst $$stran
+vax main80.sym $$stran
+vax main80.lin $$stran
+vax scan.lst $$stran
+vax scan.sym $$stran
+vax scan.lin $$stran
+vax util.lst $$stran
+vax util.sym $$stran
+vax util.lin $$stran
+vax search.lst $$stran
+vax search.sym $$stran
+vax search.lin $$stran
+vax sort.lst $$stran
+vax sort.sym $$stran
+vax sort.lin $$stran
+vax mon.lst $$stran
+vax mon.sym $$stran
+vax mon.lin $$stran
+stat con:=uc1:
+era *.lst
+era *.sym
+era *.lin
+era *.hex
+era *.prn
+era main.obj
+era main
+era timest.obj
+era timest
+era dpb80.obj
+era dpb80
+era disp.obj
+era disp
+era main80.obj
+era main80
+era scan.obj
+era scan
+era util.obj
+era util
+era search.obj
+era search
+era sort.obj
+era sort
+era mon.obj
+era mon
+

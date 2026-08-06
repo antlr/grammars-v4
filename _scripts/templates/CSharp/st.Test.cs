@@ -192,6 +192,8 @@ public class Program
     static bool quiet = false;
     static bool earley = false;
     static int limit = 0; // 0 = unlimited
+    static bool count_ambig = false;
+    static long total_ambig_count = 0;
 
     static void Main(string[] args)
     {
@@ -307,6 +309,10 @@ public class Program
                     int.TryParse(args[++i], out limit);
                 }
             }
+            else if (args[i] == "-count-ambig")
+            {
+                count_ambig = true;
+            }
             else if (args[i][0] == '-')
             {
                 // Ignore unknown option.
@@ -350,6 +356,7 @@ public class Program
                 System.Console.Error.WriteLine(prefix + "TPS: " + (long)(total_tokens / total_parse_seconds));
                 System.Console.Error.WriteLine(prefix + "Post-warmup TPS: " + warm_tps);
                 System.Console.Error.WriteLine(prefix + "Post-warmup speed up: " + speedup);
+                if (count_ambig) System.Console.Error.WriteLine(prefix + "Total ambiguities: " + total_ambig_count);
             }
             if (show_token_count) System.Console.Error.WriteLine("TC: " + total_count);
         }
@@ -443,6 +450,12 @@ public class Program
         {
             parser.AddErrorListener(new MyDiagnosticErrorListener());
         }
+        AmbigCountListener ambig_count_listener = null;
+        if (count_ambig)
+        {
+            ambig_count_listener = new AmbigCountListener();
+            parser.AddErrorListener(ambig_count_listener);
+        }
         if (show_profile || show_ambig)
         {
             parser.Profile = true;
@@ -523,9 +536,12 @@ public class Program
                 }
             }
         }
+        if (count_ambig && ambig_count_listener != null)
+            total_ambig_count += ambig_count_listener.ambiguity_count;
         if (!quiet)
         {
-            System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps");
+            var ambig_suffix = count_ambig ? " ambig " + (ambig_count_listener?.ambiguity_count ?? 0) : "";
+            System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps" + ambig_suffix);
         }
 
         if (earley) {

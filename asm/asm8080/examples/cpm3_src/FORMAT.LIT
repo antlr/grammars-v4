@@ -1,0 +1,6 @@
+
+dcl form$short lit '0',       /* format values for SDIR */
+    form$size lit '1',
+    form$full lit '2';
+
+

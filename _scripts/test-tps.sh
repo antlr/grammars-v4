@@ -63,7 +63,7 @@ compute_stats() {
         }
     }
     END {
-        if (count == 0) { print "n.a. ± n.a."; exit }
+        if (count == 0) { print "n.a."; exit }
         mean = sum / count
         if (count == 1) { printf "%.4g ± n.a.\n", mean; exit }
         ss = 0
@@ -418,6 +418,8 @@ do
         echo $testname
     
         # Test generated parser on examples.
+        SAVEIFS=$IFS
+        IFS=$(echo -en "\n\b")
         cmd=`grep '^files2' test.sh`
         eval "$cmd"
         files=()
@@ -426,25 +428,27 @@ do
             if [ -d "$f" ]; then continue; fi
                 files+=( $f )
         done
+        IFS=$SAVEIFS
         if [ ${#files[@]} -eq 0 ]
         then
             continue
         fi
         # Warmup run (discarded): lets Windows AV pre-scan the executable.
-        printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x > /dev/null 2>&1
+        printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x -count-ambig > /dev/null 2>&1
 
         # Run Test.exe N times, tee raw output to stdout, capture for stats.
-        run_pt=(); run_ot=(); run_tt=(); run_tps=(); run_warm_tps=(); run_speedup=()
+        run_pt=(); run_ot=(); run_tt=(); run_tps=(); run_warm_tps=(); run_speedup=(); run_ambig=()
         for ((run=1; run<=N; run++)); do
             echo "=== $testname run $run/$N ==="
             runfile="$tmpdir/$(echo "$testname" | tr '/' '_')_run${run}.txt"
-            printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x 2>&1 | tee "$runfile"
-            run_pt+=(      "$(awk '/^PT:/{print $NF}'               "$runfile" | tail -1)" )
-            run_ot+=(      "$(awk '/^OT:/{print $NF}'               "$runfile" | tail -1)" )
-            run_tt+=(      "$(awk '/^TT:/{print $NF}'               "$runfile" | tail -1)" )
-            run_tps+=(     "$(awk '/^TPS:/{print $NF}'              "$runfile" | tail -1)" )
-            run_warm_tps+=("$(awk '/^Post-warmup TPS:/{print $NF}'  "$runfile" | tail -1)" )
-            run_speedup+=( "$(awk '/^Post-warmup speed up:/{print $NF}' "$runfile" | tail -1)" )
+            printf '%s\n' "${files[@]}" | ./bin/Debug/net10.0/Test.exe -x -count-ambig 2>&1 | tee "$runfile"
+            run_pt+=(      "$(awk '/^PT:/{print $NF}'                      "$runfile" | tail -1)" )
+            run_ot+=(      "$(awk '/^OT:/{print $NF}'                      "$runfile" | tail -1)" )
+            run_tt+=(      "$(awk '/^TT:/{print $NF}'                      "$runfile" | tail -1)" )
+            run_tps+=(     "$(awk '/^TPS:/{print $NF}'                     "$runfile" | tail -1)" )
+            run_warm_tps+=("$(awk '/^Post-warmup TPS:/{print $NF}'         "$runfile" | tail -1)" )
+            run_speedup+=( "$(awk '/^Post-warmup speed up:/{print $NF}'    "$runfile" | tail -1)" )
+            run_ambig+=(   "$(awk '/^Total ambiguities:/{print $NF}'       "$runfile" | tail -1)" )
         done
         pt_stat=$(      compute_stats "${run_pt[@]}")
         ot_stat=$(      compute_stats "${run_ot[@]}")
@@ -452,7 +456,12 @@ do
         tps_stat=$(     compute_stats "${run_tps[@]}")
         warm_tps_stat=$(compute_stats "${run_warm_tps[@]}")
         speedup_stat=$( compute_stats "${run_speedup[@]}")
-        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} |")
+        ambig_stat=$(   compute_stats "${run_ambig[@]}" | sed 's/ ± 0$//')
+
+	action_count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(element | lexerElement)/actionBlock' | dotnet trash text -c | sed 's/^[^:]*://'`
+	action_sum=$(printf '%s\n' $action_count | awk '{s+=$1} END {print s+0}')
+
+        table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambig_stat} | ${action_sum} |")
         popd > /dev/null
     done
     popd > /dev/null
@@ -463,8 +472,8 @@ if [ ${#table_rows[@]} -gt 0 ]; then
     echo ""
     echo "## Performance Summary (N=${N} runs, mean ± SEM)"
     echo ""
-    echo "| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up |"
-    echo "|---------|--------|--------|--------|-----|-----------------|----------------------|"
+    echo "| Grammar | PT (s) | OT (s) | TT (s) | TPS | Post-warmup TPS | Post-warmup Speed Up | Ambiguities | Actions |"
+    echo "|---------|--------|--------|--------|-----|-----------------|----------------------|-------------|---------|"
     for row in "${table_rows[@]}"; do
         echo "$row"
     done

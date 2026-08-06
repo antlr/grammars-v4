@@ -1,0 +1,27 @@
+; CPM 3 PLM PROGRAM GENERATION SUBMIT #0
+;
+; MCD MODULE GENERATIONS
+;
+stat con:=tty:
+vax $$as\sd mason.cpm30.sources\ar
+vax mcd80a.asm $$stran
+vax mcd80f.asm $$stran
+stat con:=uc1:
+seteof mcd80a.asm
+seteof mcd80f.asm
+seteof parse.asm
+is14
+asm80 mcd80a.asm debug
+asm80 mcd80f.asm debug
+asm80 parse.asm debug
+cpm
+stat con:=tty:
+vax $$as\sd mason.cpm30.listing\ar
+vax mcd80a.lst $$stran
+vax mcd80f.lst $$stran
+vax parse.lst $$stran
+stat con:=uc1:
+era *.lst
+;
+; CALL CPM3PLM1
+SUB CPM3PLM1
