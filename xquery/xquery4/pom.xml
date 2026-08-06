@@ -40,7 +40,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>auxilary</entryPoint>
+					<entryPoint>queryList</entryPoint>
 					<grammarName>XQuery4</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
