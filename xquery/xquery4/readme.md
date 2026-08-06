@@ -3,7 +3,8 @@
 ANTLR4 grammar for XQuery 4.0.
 
 * Specification: https://qt4cg.org/pr/2796/xquery-40/xquery-40-autodiff.html
-* Grammar Explorer: https://qt4cg.org/specifications/grammar-explorer/xquery40/index.html
+* Grammar Explorer: https://qt4cg.org/specifications/grammar-explorer/xquery40/index.html NB: Differs from Spec; Incorrect syntax.
+* XQuery Update: https://www.w3.org/TR/xquery-update-10/#id-grammar
 
 ## Grammar Files
 
