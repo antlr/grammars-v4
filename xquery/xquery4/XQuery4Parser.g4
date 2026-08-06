@@ -119,7 +119,7 @@ axis
         | 'following-or-self'
         | 'following-sibling'
         | 'following-sibling-or-self'
-        | 'namespace' // missing from XQuery4 Spec but in XPath4 Spec.
+//        | 'namespace' // missing from XQuery4 Spec but in XPath4 Spec.
         | 'parent'
         | 'preceding'
         | 'preceding-or-self'
@@ -993,7 +993,12 @@ positionalVar
     ;
 
 postfixExpr
-    : primaryExpr
+    : primaryExpr (
+        predicate
+        | positionalArgumentList
+        | lookup
+        | '=?>' QName positionalArgumentList
+    )*
 //    | filterExpr
 //    | dynamicFunctionCall
 //    | lookupExpr
