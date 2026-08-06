@@ -41,12 +41,13 @@ tokens {
 
 // Operators -- longer multi-char tokens before shorter prefixes
 
+AT            : '@';
+ARROW         : '->';
 PLUS_CEQ      : '+:=';
 MAPPING_ARROW : '=!>';
 METHOD_ARROW  : '=?>';
 SS            : '//';
 PP            : '||';
-DD            : '..';
 COLONCOLON    : '::';
 CEQ           : ':=';
 CS            : ':*';
@@ -57,13 +58,14 @@ EG            : '=>';
 GE            : '>=';
 LE            : '<=';
 NE            : '!=';
-AT            : '@';
 BANG          : '!';
 CB            : ']';
 COLON         : ':';
 COMMA         : ',';
 CP            : ')';
 D             : '.';
+DD            : '..';
+DIV_ALT       : '÷';
 DOLLAR        : '$';
 EQ            : '=';
 GT            : '>';
@@ -72,12 +74,15 @@ OB            : '[';
 OC            : '{';
 OP            : '(';
 P             : '|';
+PERPERPERCENT : '%%%';
 PLUS          : '+';
 POUND         : '#';
 QM            : '?';
 SLASH         : '/';
 STAR          : '*';
+STAR_ALT      : '×';
 SEMI          : ';';
+PERCENT       : '%';
 TIMES_SIGN    : '\u00D7'; // × multiplication sign (XPath 4.0 alias for *)
 DIV_SIGN      : '\u00F7'; // ÷ division sign (XPath 4.0 alias for div)
 
@@ -133,6 +138,7 @@ KW_EXPONENT_SEPARATOR        : 'exponent-separator';
 KW_EXTERNAL                  : 'external';
 KW_FINALLY                   : 'finally';
 KW_FIRST                     : 'first';
+KW_FIXED                     : 'fixed';
 KW_FN                        : 'fn';
 KW_FOLLOWING_SIBLING_OR_SELF : 'following-sibling-or-self';
 KW_FOLLOWING_SIBLING         : 'following-sibling';
@@ -241,6 +247,8 @@ KW_ZERO_DIGIT                : 'zero-digit';
 
 IntegerLiteral   : FragDigits;
 DecimalLiteral   : '.' FragDigits | FragDigits '.' [0-9]*;
+HexIntegerLiteral : '0x' HexDigits;
+BinaryIntegerLiteral : '0b' BinaryDigits;
 DoubleLiteral    : ('.' FragDigits | FragDigits ('.' [0-9]*)?) [eE] [+-]? FragDigits;
 StringLiteral    : '"' (~["] | FragEscapeQuot)* '"' | '\'' (~['] | FragEscapeApos)* '\'';
 URIQualifiedName : 'Q' '{' [^{}]* '}' FragmentNCName (':' FragmentNCName)?;
@@ -274,8 +282,11 @@ CC: '}' { PopModeIfNeeded(); };
 QName  : FragQName;
 NCName : FragmentNCName;
 
+
 fragment Char            : FragChar;
 fragment FragDigits      : [0-9]+;
+fragment HexDigits       : [a-fA-F0-9]+;
+fragment BinaryDigits    : [01] ([01_]* [01])?;
 fragment CommentContents : Char;
 
 fragment FragQName          : FragPrefixedName | FragUnprefixedName;
@@ -319,6 +330,10 @@ fragment FragChar:
     | '\ue000' ..'\ufffd'
     | '\u{10000}' ..'\u{10ffff}'
 ;
+
+StringConstructor: '``[' .*? ']``';
+
+
 
 Whitespace: [\u000d\u000a\u0020\u0009]+ -> skip;
 

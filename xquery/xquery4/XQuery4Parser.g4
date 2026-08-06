@@ -40,7 +40,7 @@ andExpr
     ;
 
 annotation
-    : '%' EQName ('(' constant (',' constant)+ ')')?
+    : '%' eqName ('(' constant (',' constant)+ ')')?
     ;
 
 anyArrayType
@@ -779,7 +779,7 @@ libraryModule
 literal
     : numericLiteral
     | StringLiteral
-    | QNameLiteral
+    | qNameLiteral
     ;
 
 lookup
@@ -1032,7 +1032,7 @@ processingInstructionNodeType
     ;
 
 prolog
-    : ((defaultNamespaceDecl | setter | namespaceDecl | import_) Separator)* (
+    : ((defaultNamespaceDecl | setter | namespaceDecl | import_) ';')* (
         (
             contextValueDecl
             | varDecl
@@ -1040,7 +1040,7 @@ prolog
             | itemTypeDecl
             | namedRecordTypeDecl
             | optionDecl
-        ) Separator
+        ) ';'
     )*
     ;
 
@@ -1309,10 +1309,6 @@ uriLiteral
     : StringLiteral
     ;
 
-uriQualifiedName
-    : BracedURILiteral (NCNameToken COLON)? NCNameToken
-    ;
-
 validateExpr
     : 'validate' (validationMode | ('type' typeName_))? '{' expr '}'
     ;
@@ -1378,9 +1374,6 @@ whileClause
 
 wildcard
     : '*'
-    | NCNameColonStar
-    | StarColonNCName
-    | URIQualifiedStar
     ;
 
 windowClause
