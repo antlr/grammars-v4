@@ -128,19 +128,18 @@ OF         : 'OF';
 ADD        : 'ADD';
 DROP       : 'DROP';
 
-ID: LetterOrDigit+;
+ID: Letter LetterOrDigit*;
 
 ESC_LITERAL    : '`' .*? '`';
-CHAR_LITERAL   : '\'' (~['\\\r\n] | EscapeSequence)? '\'';
+CHAR_LITERAL   : '\'' (~['\\\r\n] | EscapeSequence)* '\'';
 STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
 
-DIGIT : SUB? (HexDigit | OctalDigit | Digits | FLOAT);
+DIGIT : HexDigits | OctalDigits | Digits | FLOAT;
 FLOAT : (Digits '.' Digits | '.' Digits) ExponentPart? [fd]? | Digits (ExponentPart [fd]? | [fd]);
 
 WS           : [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT      : '/*' .*? '*/'    -> channel(COMMENTS);
 LINE_COMMENT : '//' ~[\r\n]*    -> channel(COMMENTS);
-ERRCHAR      : .                -> channel(HIDDEN);
 
 fragment EscapeSequence:
     '\\' [btnfr"'\\]
@@ -150,10 +149,11 @@ fragment EscapeSequence:
 
 fragment ExponentPart: [e] [+-]? Digits;
 
-fragment HexDigits  : '0x' HexDigit ((HexDigit | '_')* HexDigit)?;
-fragment HexDigit   : [0-9a-f];
-fragment OctalDigit : '0' Digits;
-fragment Digits     : [1-9] ([0-9_]* [0-9])?;
+fragment HexDigits   : '0x' HexDigit ((HexDigit | '_')* HexDigit)?;
+fragment HexDigit    : [0-9a-f];
+fragment OctalDigits : '0o' OctalDigit ((OctalDigit | '_')* OctalDigit)?;
+fragment OctalDigit  : [0-7];
+fragment Digits      : [0-9] ([0-9_]* [0-9])?;
 
 fragment LetterOrDigit: Letter | [0-9];
 

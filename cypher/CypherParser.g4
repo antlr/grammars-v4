@@ -99,7 +99,7 @@ singlePartQ
     ;
 
 multiPartQ
-    : readingStatement* (updatingStatement* withSt)+ singlePartQ
+    : readingStatement* ((readingStatement | updatingStatement)* withSt)+ singlePartQ
     ;
 
 matchSt
@@ -204,7 +204,7 @@ andExpression
     ;
 
 notExpression
-    : NOT? comparisonExpression
+    : NOT* comparisonExpression
     ;
 
 comparisonExpression
