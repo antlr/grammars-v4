@@ -1,0 +1,1 @@
+$record +:= map{"name": "Alice"} ;

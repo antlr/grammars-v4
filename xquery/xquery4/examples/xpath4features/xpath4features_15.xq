@@ -1,0 +1,1 @@
+child::(element() | text()) ;
