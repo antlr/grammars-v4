@@ -16,6 +16,26 @@ options {
     superClass = XQuery4ParserBase;
 }
 
+
+/*
+   "Semi-Official" entry is QueryList.
+   See https://github.com/qt4cg/qtspecs/blob/060ec4f3a70b78326248be58691aca5e7b107e0d/specifications/grammar-40/xpath-grammar.xml#L34-L36
+
+   NB: According to the Spec:
+   "The QueryList production is not in the official grammar,
+   and is not shown in the bnf.  It is here only for the purpose
+   of testing a series of queries."
+   https://github.com/qt4cg/qtspecs/blob/060ec4f3a70b78326248be58691aca5e7b107e0d/specifications/grammar-40/xpath-grammar.xml#L41-L43
+
+   The entry point for XQuery 3.0 EBNF is "Module".
+*/
+
+queryList
+    : module_ ('%%%' module_?)* EOF
+    ;
+
+// Start of official Spec EBNF translation.
+
 abbreviatedStep
     : '..'
     | '@' nodeTest
@@ -1070,10 +1090,6 @@ quantifierBinding
 
 queryBody
     : expr
-    ;
-
-queryList
-    : module_ ('%%%' module_?)* EOF
     ;
 
 quotStringLiteral
