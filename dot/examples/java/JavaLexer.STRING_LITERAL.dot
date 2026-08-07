@@ -1,0 +1,28 @@
+digraph ATN {
+rankdir=LR;
+s152[fontsize=11, label="152", shape=doublecircle, fixedsize=true, width=.6];
+s864[fontsize=11,label="&larr;\n864", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s865[fontsize=11,label="{865*\nd=31|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s866[fontsize=11,label="866", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s867[fontsize=11,label="867*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s868[fontsize=11,label="868", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s869[fontsize=11,label="869", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s151[fontsize=11,label="151", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s860[fontsize=11,label="860", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s861[fontsize=11,label="861", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s862[fontsize=11,label="862", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s863[fontsize=11,label="{&rarr;\n863*\nd=30|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s151 -> s860 [fontname="Times-Italic", label="&epsilon;"];
+s860 -> s865 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'\\\"'", arrowhead = normal];
+s865:p0 -> s863 [fontname="Times-Italic", label="&epsilon;"];
+s865:p1 -> s866 [fontname="Times-Italic", label="&epsilon;"];
+s863:p0 -> s861 [fontname="Times-Italic", label="&epsilon;"];
+s863:p1 -> s862 [fontname="Times-Italic", label="&epsilon;"];
+s866 -> s868 [fontname="Times-Italic", label="&epsilon;"];
+s861 -> s864 [fontsize=11, fontname="Courier", arrowsize=.7, label = "~{'\\n', '', '\"', '\\'}", arrowhead = normal];
+s862 -> s864 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<EscapeSequence>", arrowhead = normal];
+s868 -> s869 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'\\\"'", arrowhead = normal];
+s864 -> s867 [fontname="Times-Italic", label="&epsilon;"];
+s869 -> s152 [fontname="Times-Italic", label="&epsilon;"];
+s867 -> s865 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

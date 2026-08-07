@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s260[fontsize=11, label="260", shape=doublecircle, fixedsize=true, width=.6];
+s1057[fontsize=11,label="1057", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1058[fontsize=11,label="1058", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s259[fontsize=11,label="259", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1059[fontsize=11,label="{&rarr;\n1059\nd=39|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1060[fontsize=11,label="&larr;\n1060", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1061[fontsize=11,label="1061", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1062[fontsize=11,label="1062", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s259 -> s1057 [fontname="Times-Italic", label="&epsilon;"];
+s1057 -> s1059 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'E', 'e'}", arrowhead = normal];
+s1059:p0 -> s1058 [fontname="Times-Italic", label="&epsilon;"];
+s1059:p1 -> s1060 [fontname="Times-Italic", label="&epsilon;"];
+s1058 -> s1060 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'+', '-'}", arrowhead = normal];
+s1060 -> s1061 [fontname="Times-Italic", label="&epsilon;"];
+s1061 -> s1062 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Digits>", arrowhead = normal];
+s1062 -> s260 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s369[fontsize=11, label="369", shape=doublecircle, fixedsize=true, width=.6];
+s368[fontsize=11,label="368", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2256[fontsize=11,label="2256", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2257[fontsize=11,label="2257", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2258[fontsize=11,label="{&rarr;\n2258\nd=190|{<p0>|<p1>|<p2>|<p3>}}", shape=record, fixedsize=false, peripheries=1];
+s2259[fontsize=11,label="&larr;\n2259", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2254[fontsize=11,label="2254", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2255[fontsize=11,label="2255", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s368 -> s2258 [fontname="Times-Italic", label="&epsilon;"];
+s2258:p0 -> s2254 [fontname="Times-Italic", label="&epsilon;"];
+s2258:p1 -> s2255 [fontname="Times-Italic", label="&epsilon;"];
+s2258:p2 -> s2256 [fontname="Times-Italic", label="&epsilon;"];
+s2258:p3 -> s2257 [fontname="Times-Italic", label="&epsilon;"];
+s2254 -> s2259 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<declaration_expression>", arrowhead = normal];
+s2255 -> s2259 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<conditional_expression>", arrowhead = normal];
+s2256 -> s2259 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<lambda_expression>", arrowhead = normal];
+s2257 -> s2259 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<query_expression>", arrowhead = normal];
+s2259 -> s369 [fontname="Times-Italic", label="&epsilon;"];
+}

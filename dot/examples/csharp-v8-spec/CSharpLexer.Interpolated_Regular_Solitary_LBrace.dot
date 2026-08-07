@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s460[fontsize=11, label="460", shape=doublecircle, fixedsize=true, width=.6];
+s1959[fontsize=11,label="1959", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1960[fontsize=11,label="1960", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1961[fontsize=11,label="1961", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1962[fontsize=11,label="1962", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s459[fontsize=11,label="459", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1963[fontsize=11,label="1963", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1964[fontsize=11,label="1964", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s459 -> s1959 [fontname="Times-Italic", label="&epsilon;"];
+s1959 -> s1960 [fontsize=11, fontname="Courier", arrowsize=.7, label = "pred_227:4", arrowhead = normal];
+s1960 -> s1961 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'{'", arrowhead = normal];
+s1961 -> s1962 [fontname="Times-Italic", label="&epsilon;"];
+s1962 -> s1963 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_227:15", arrowhead = normal];
+s1963 -> s1964 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_227:0", arrowhead = normal];
+s1964 -> s460 [fontname="Times-Italic", label="&epsilon;"];
+}

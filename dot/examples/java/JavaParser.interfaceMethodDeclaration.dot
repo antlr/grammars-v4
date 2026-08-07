@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s67[fontsize=11, label="67", shape=doublecircle, fixedsize=true, width=.6];
+s66[fontsize=11,label="66", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s599[fontsize=11,label="599", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s600[fontsize=11,label="&rarr;\n600*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s601[fontsize=11,label="&larr;\n601", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s602[fontsize=11,label="{602*\nd=53|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s603[fontsize=11,label="603", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s604[fontsize=11,label="604*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s605[fontsize=11,label="605", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s606[fontsize=11,label="606", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s66 -> s602 [fontname="Times-Italic", label="&epsilon;"];
+s602:p0 -> s600 [fontname="Times-Italic", label="&epsilon;"];
+s602:p1 -> s603 [fontname="Times-Italic", label="&epsilon;"];
+s600 -> s599 [fontname="Times-Italic", label="&epsilon;"];
+s603 -> s605 [fontname="Times-Italic", label="&epsilon;"];
+s599 -> s601 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceMethodModifier>", arrowhead = normal];
+s605 -> s606 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<interfaceCommonBodyDeclaration>", arrowhead = normal];
+s601 -> s604 [fontname="Times-Italic", label="&epsilon;"];
+s606 -> s67 [fontname="Times-Italic", label="&epsilon;"];
+s604 -> s602 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}
