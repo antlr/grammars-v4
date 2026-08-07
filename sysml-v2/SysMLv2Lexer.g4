@@ -908,12 +908,21 @@ REAL
     ;
 
 // Comments
+// REGULAR_COMMENT also matches //* ... */ (OMG block-comment-out convention).
 REGULAR_COMMENT
     : '/*' .*? '*/'
+    | '//*' .*? '*/'
     ;
 
+// SINGLE_LINE_NOTE: '//' followed by non-'*' content (to avoid consuming
+// //* ... */ block comments which are handled by REGULAR_COMMENT).
+// A bare '//' at end of line is handled by the second rule.
 SINGLE_LINE_NOTE
-    : '//' ~[\r\n]* -> skip
+    : '//' ~[*\r\n] ~[\r\n]* -> skip
+    ;
+
+BARE_LINE_COMMENT
+    : '//' -> skip
     ;
 
 // Whitespace
