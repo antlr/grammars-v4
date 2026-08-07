@@ -14,6 +14,17 @@ options {
     superClass = XPath4ParserBase;
 }
 
+
+// Not in official Spec EBNF, but provided for testing and Trash toolkit.
+// Official entry is xPath.
+// See https://github.com/qt4cg/qtspecs/blob/060ec4f3a70b78326248be58691aca5e7b107e0d/specifications/grammar-40/xpath-grammar.xml#L34-L36
+
+auxilary
+    : (expr ';')+ EOF
+    ;
+
+// Start of official Spec EBNF translation.
+
 abbreviatedStep
     : '..'
     | '@' nodeTest
@@ -938,8 +949,4 @@ xNodeType
 
 xPath
     : (defaultElementNamespaceDecl ';')? (namespaceDecl ';')* expr EOF
-    ;
-
-auxilary
-    : (expr ';')+ EOF
     ;
