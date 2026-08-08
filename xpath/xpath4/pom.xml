@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>XPath20</artifactId>
+	<artifactId>XPath4</artifactId>
 	<packaging>jar</packaging>
-	<name>XPath20 grammar</name>
+	<name>XPath4 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -19,8 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>XPath20Lexer.g4</include>
-					   <include>XPath20Parser.g4</include>
+					   <include>XPath4Lexer.g4</include>
+					   <include>XPath4Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -41,7 +41,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>auxilary</entryPoint>
-					<grammarName>XPath20</grammarName>
+					<grammarName>XPath4</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
