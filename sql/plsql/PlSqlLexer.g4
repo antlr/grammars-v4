@@ -2553,6 +2553,7 @@ ASTERISK        : '*';
 PLUS_SIGN       : '+';
 MINUS_SIGN      : '-';
 COMMA           : ',';
+SQLPLUS_EXECUTE : {isOnlySymbolOnLine()}? '/' ;
 SOLIDUS         : '/';
 RSOLIDUS        : '\\';
 AT_SIGN         : '@';

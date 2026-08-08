@@ -8,9 +8,22 @@ public abstract class PlSqlParserBase extends Parser
     private boolean _isVersion11 = true;
     private boolean _isVersion10 = true;
 
+    /** True if the last script_unit was PL/SQL (bare '/' requires preceding ';'). */
+    private boolean _lastUnitWasPlsql = false;
+
     public PlSqlParserBase(TokenStream input) {
         super(input);
     }
+
+    @Override
+    public void reset() {
+        _lastUnitWasPlsql = false;
+        super.reset();
+    }
+
+    public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    public boolean isLastUnitSql() { return !_lastUnitWasPlsql; }
 
     public boolean isVersion12() {
         return _isVersion12;
@@ -66,3 +79,4 @@ public abstract class PlSqlParserBase extends Parser
         return true;
     }
 }
+

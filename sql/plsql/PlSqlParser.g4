@@ -31,35 +31,28 @@ options {
 // Insert here @header for C++ parser.
 
 sql_script
-    : (sql_plus_command SEMICOLON?)* (
-        script_unit
-        (script_unit)*
-    ) EOF
+    : (sql_plus_command SEMICOLON?)*
+      (script_unit (terminator script_unit)* terminator?)?
+      EOF
     ;
 
-// A script unit carries its own terminator, which differs by unit kind:
-//   - sql_plus_command: optional semicolon (handled by the leading loop above
-//     and by the command itself when it appears between statements)
-//   - plsql_unit_statement: SEMICOLON required, trailing SOLIDUS optional
-//     (sqlplus convention to run the block)
-//   - sql_unit_statement: SEMICOLON optional, SOLIDUS allowed as alternative
-//     separator (sqlplus-style DDL/DML scripts)
+// Actions set a flag for the `terminator` predicate: bare '/' is accepted only
+// after a SQL unit; a PL/SQL unit requires a preceding SEMICOLON.
 script_unit
-    : sql_plus_command SEMICOLON?
-    | plsql_unit_statement SEMICOLON '/'?
-    | sql_unit_statement (SEMICOLON '/'? | '/' SEMICOLON? | SEMICOLON)?
+    : plsql_unit {setLastUnitPlsql();}
+    | sql_unit {setLastUnitSql();}
+    | sql_plus_command {setLastUnitSql();}
     ;
 
-// Backward-compatible alias: matches either a PL/SQL block or a SQL/DDL statement.
-// Kept for visitors that reference unit_statement directly.
-unit_statement
-    : plsql_unit_statement
-    | sql_unit_statement
+// Separator between units (and optional terminator after the last one).
+// SEMICOLON is always valid; bare '/' only after a SQL unit — the predicate
+// rejects '/' after a PL/SQL block, yielding useful diagnostic.
+terminator
+    : SEMICOLON SQLPLUS_EXECUTE?
+    | {isLastUnitSql()}? SQLPLUS_EXECUTE
     ;
 
-// PL/SQL blocks: end with END and require a semicolon terminator.
-// A trailing SOLIDUS (/) is optional (sqlplus convention).
-plsql_unit_statement
+plsql_unit
     : anonymous_block
     | create_function_body
     | create_procedure_body
@@ -69,8 +62,10 @@ plsql_unit_statement
     | create_type_body
     ;
 
-// SQL/DDL statements: semicolon is optional, SOLIDUS (/) is a valid terminator.
-sql_unit_statement
+// SQL/DDL statements. A trailing terminator is optional (the last unit in a
+// script may omit it); when present it is matched by the `terminator` rule,
+// which accepts SEMICOLON, SQLPLUS_EXECUTE, or both.
+sql_unit
     : alter_analytic_view
     | alter_attribute_dimension
     | alter_audit_policy
