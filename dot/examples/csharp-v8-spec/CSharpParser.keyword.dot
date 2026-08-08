@@ -1,0 +1,10 @@
+digraph ATN {
+rankdir=LR;
+s17[fontsize=11, label="17", shape=doublecircle, fixedsize=true, width=.6];
+s16[fontsize=11,label="16", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s843[fontsize=11,label="843", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s844[fontsize=11,label="844", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s16 -> s843 [fontname="Times-Italic", label="&epsilon;"];
+s843 -> s844 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'abstract', 'as', 'base', 'bool', 'break', 'byte', 'case', 'catch', 'char', 'checked', 'class', 'const', 'continue', 'decimal', 'delegate', 'do', 'double', 'else', 'enum', 'event', 'explicit', 'extern', 'finally', 'fixed', 'float', 'for', 'foreach', 'goto', 'if', 'implicit', 'in', 'int', 'interface', 'internal', 'is', 'lock', 'long', 'namespace', 'new', 'object', 'operator', 'out', 'override', 'params', 'private', 'protected', 'public', 'readonly', 'ref', 'return', 'sbyte', 'sealed', 'short', 'sizeof', 'stackalloc', 'static', 'string', 'struct', 'switch', 'this', 'throw', 'try', 'typeof', 'uint', 'ulong', 'unchecked', 'unsafe', 'ushort', 'using', 'virtual', 'void', 'volatile', 'while', 'default', 'null', 'true', 'false'}", arrowhead = normal];
+s844 -> s17 [fontname="Times-Italic", label="&epsilon;"];
+}

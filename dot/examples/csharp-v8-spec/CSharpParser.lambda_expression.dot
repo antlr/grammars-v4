@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s309[fontsize=11, label="309", shape=doublecircle, fixedsize=true, width=.6];
+s2064[fontsize=11,label="2064", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2065[fontsize=11,label="{&rarr;\n2065\nd=167|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2066[fontsize=11,label="&larr;\n2066", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2067[fontsize=11,label="2067", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s308[fontsize=11,label="308", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2068[fontsize=11,label="2068", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2069[fontsize=11,label="2069", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2070[fontsize=11,label="2070", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s308 -> s2065 [fontname="Times-Italic", label="&epsilon;"];
+s2065:p0 -> s2064 [fontname="Times-Italic", label="&epsilon;"];
+s2065:p1 -> s2066 [fontname="Times-Italic", label="&epsilon;"];
+s2064 -> s2066 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'async'", arrowhead = normal];
+s2066 -> s2067 [fontname="Times-Italic", label="&epsilon;"];
+s2067 -> s2068 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<anonymous_function_signature>", arrowhead = normal];
+s2068 -> s2069 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'=>'", arrowhead = normal];
+s2069 -> s2070 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<anonymous_function_body>", arrowhead = normal];
+s2070 -> s309 [fontname="Times-Italic", label="&epsilon;"];
+}

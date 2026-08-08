@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s425[fontsize=11, label="425", shape=doublecircle, fixedsize=true, width=.6];
+s424[fontsize=11,label="424", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2472[fontsize=11,label="2472", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2473[fontsize=11,label="2473", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2474[fontsize=11,label="2474", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2475[fontsize=11,label="2475", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2476[fontsize=11,label="2476", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2477[fontsize=11,label="{&rarr;\n2477\nd=217|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2478[fontsize=11,label="&larr;\n2478", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s424 -> s2477 [fontname="Times-Italic", label="&epsilon;"];
+s2477:p0 -> s2472 [fontname="Times-Italic", label="&epsilon;"];
+s2477:p1 -> s2476 [fontname="Times-Italic", label="&epsilon;"];
+s2472 -> s2473 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s2476 -> s2478 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<tuple_expression>", arrowhead = normal];
+s2473 -> s2474 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2478 -> s425 [fontname="Times-Italic", label="&epsilon;"];
+s2474 -> s2475 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s2475 -> s2478 [fontname="Times-Italic", label="&epsilon;"];
+}

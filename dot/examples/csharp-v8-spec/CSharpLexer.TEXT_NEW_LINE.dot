@@ -1,0 +1,25 @@
+digraph ATN {
+rankdir=LR;
+s528[fontsize=11, label="528", shape=doublecircle, fixedsize=true, width=.6];
+s2320[fontsize=11,label="2320", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2321[fontsize=11,label="2321", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2322[fontsize=11,label="2322", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2323[fontsize=11,label="{&rarr;\n2323\nd=80|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2324[fontsize=11,label="&larr;\n2324", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2325[fontsize=11,label="2325", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2326[fontsize=11,label="2326", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2327[fontsize=11,label="2327", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2328[fontsize=11,label="2328", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s527[fontsize=11,label="527", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s527 -> s2323 [fontname="Times-Italic", label="&epsilon;"];
+s2323:p0 -> s2320 [fontname="Times-Italic", label="&epsilon;"];
+s2323:p1 -> s2321 [fontname="Times-Italic", label="&epsilon;"];
+s2320 -> s2324 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<New_Line_Character>", arrowhead = normal];
+s2321 -> s2322 [fontsize=11, fontname="Courier", arrowsize=.7, label = "''", arrowhead = normal];
+s2324 -> s2325 [fontname="Times-Italic", label="&epsilon;"];
+s2322 -> s2324 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'\\\\n'", arrowhead = normal];
+s2325 -> s2326 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_261:16", arrowhead = normal];
+s2326 -> s2327 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_261:31", arrowhead = normal];
+s2327 -> s2328 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_261:30", arrowhead = normal];
+s2328 -> s528 [fontname="Times-Italic", label="&epsilon;"];
+}

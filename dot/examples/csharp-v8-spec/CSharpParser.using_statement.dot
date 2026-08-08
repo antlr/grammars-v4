@@ -1,0 +1,25 @@
+digraph ATN {
+rankdir=LR;
+s485[fontsize=11, label="485", shape=doublecircle, fixedsize=true, width=.6];
+s2705[fontsize=11,label="2705", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2706[fontsize=11,label="{&rarr;\n2706\nd=244|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2707[fontsize=11,label="&larr;\n2707", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s484[fontsize=11,label="484", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2708[fontsize=11,label="2708", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2709[fontsize=11,label="2709", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2710[fontsize=11,label="2710", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2711[fontsize=11,label="2711", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2712[fontsize=11,label="2712", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2713[fontsize=11,label="2713", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s484 -> s2706 [fontname="Times-Italic", label="&epsilon;"];
+s2706:p0 -> s2705 [fontname="Times-Italic", label="&epsilon;"];
+s2706:p1 -> s2707 [fontname="Times-Italic", label="&epsilon;"];
+s2705 -> s2707 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'await'", arrowhead = normal];
+s2707 -> s2708 [fontname="Times-Italic", label="&epsilon;"];
+s2708 -> s2709 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'using'", arrowhead = normal];
+s2709 -> s2710 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s2710 -> s2711 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<resource_acquisition>", arrowhead = normal];
+s2711 -> s2712 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s2712 -> s2713 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<embedded_statement>", arrowhead = normal];
+s2713 -> s485 [fontname="Times-Italic", label="&epsilon;"];
+}

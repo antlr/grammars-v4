@@ -1,0 +1,38 @@
+digraph ATN {
+rankdir=LR;
+s535[fontsize=11, label="535", shape=doublecircle, fixedsize=true, width=.6];
+s2951[fontsize=11,label="2951", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2952[fontsize=11,label="2952", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2953[fontsize=11,label="{&rarr;\n2953\nd=279|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2954[fontsize=11,label="&larr;\n2954", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2955[fontsize=11,label="2955", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2956[fontsize=11,label="2956", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2957[fontsize=11,label="{&rarr;\n2957\nd=280|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2958[fontsize=11,label="&larr;\n2958", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2959[fontsize=11,label="2959", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2960[fontsize=11,label="2960", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2961[fontsize=11,label="2961", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2962[fontsize=11,label="{&rarr;\n2962\nd=281|{<p0>|<p1>|<p2>|<p3>|<p4>}}", shape=record, fixedsize=false, peripheries=1];
+s2963[fontsize=11,label="&larr;\n2963", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s534[fontsize=11,label="534", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s534 -> s2962 [fontname="Times-Italic", label="&epsilon;"];
+s2962:p0 -> s2951 [fontname="Times-Italic", label="&epsilon;"];
+s2962:p1 -> s2955 [fontname="Times-Italic", label="&epsilon;"];
+s2962:p2 -> s2959 [fontname="Times-Italic", label="&epsilon;"];
+s2962:p3 -> s2960 [fontname="Times-Italic", label="&epsilon;"];
+s2962:p4 -> s2961 [fontname="Times-Italic", label="&epsilon;"];
+s2951 -> s2953 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<class_type>", arrowhead = normal];
+s2955 -> s2957 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'class'", arrowhead = normal];
+s2959 -> s2963 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'struct'", arrowhead = normal];
+s2960 -> s2963 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'notnull'", arrowhead = normal];
+s2961 -> s2963 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'unmanaged'", arrowhead = normal];
+s2953:p0 -> s2952 [fontname="Times-Italic", label="&epsilon;"];
+s2953:p1 -> s2954 [fontname="Times-Italic", label="&epsilon;"];
+s2957:p0 -> s2956 [fontname="Times-Italic", label="&epsilon;"];
+s2957:p1 -> s2958 [fontname="Times-Italic", label="&epsilon;"];
+s2963 -> s535 [fontname="Times-Italic", label="&epsilon;"];
+s2952 -> s2954 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<nullable_type_annotation>", arrowhead = normal];
+s2954 -> s2963 [fontname="Times-Italic", label="&epsilon;"];
+s2956 -> s2958 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<nullable_type_annotation>", arrowhead = normal];
+s2958 -> s2963 [fontname="Times-Italic", label="&epsilon;"];
+}

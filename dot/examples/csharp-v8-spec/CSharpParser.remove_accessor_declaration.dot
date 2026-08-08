@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s629[fontsize=11, label="629", shape=doublecircle, fixedsize=true, width=.6];
+s628[fontsize=11,label="628", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3432[fontsize=11,label="3432", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3433[fontsize=11,label="{&rarr;\n3433\nd=351|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3434[fontsize=11,label="&larr;\n3434", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3435[fontsize=11,label="3435", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3436[fontsize=11,label="3436", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3437[fontsize=11,label="3437", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s628 -> s3433 [fontname="Times-Italic", label="&epsilon;"];
+s3433:p0 -> s3432 [fontname="Times-Italic", label="&epsilon;"];
+s3433:p1 -> s3434 [fontname="Times-Italic", label="&epsilon;"];
+s3432 -> s3434 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attributes>", arrowhead = normal];
+s3434 -> s3435 [fontname="Times-Italic", label="&epsilon;"];
+s3435 -> s3436 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'remove'", arrowhead = normal];
+s3436 -> s3437 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<block>", arrowhead = normal];
+s3437 -> s629 [fontname="Times-Italic", label="&epsilon;"];
+}

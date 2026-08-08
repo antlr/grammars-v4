@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s23[fontsize=11, label="23", shape=doublecircle, fixedsize=true, width=.6];
+s400[fontsize=11,label="400*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s22[fontsize=11,label="22", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s393[fontsize=11,label="393", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s394[fontsize=11,label="394", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s395[fontsize=11,label="395", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s396[fontsize=11,label="&rarr;\n396*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s397[fontsize=11,label="&larr;\n397", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s398[fontsize=11,label="{398*\nd=23|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s399[fontsize=11,label="399", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s22 -> s393 [fontname="Times-Italic", label="&epsilon;"];
+s393 -> s398 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<typeType>", arrowhead = normal];
+s398:p0 -> s396 [fontname="Times-Italic", label="&epsilon;"];
+s398:p1 -> s399 [fontname="Times-Italic", label="&epsilon;"];
+s396 -> s394 [fontname="Times-Italic", label="&epsilon;"];
+s399 -> s23 [fontname="Times-Italic", label="&epsilon;"];
+s394 -> s395 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'&'", arrowhead = normal];
+s395 -> s397 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<typeType>", arrowhead = normal];
+s397 -> s400 [fontname="Times-Italic", label="&epsilon;"];
+s400 -> s398 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

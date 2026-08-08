@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s715[fontsize=11, label="715", shape=doublecircle, fixedsize=true, width=.6];
+s3952[fontsize=11,label="3952", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3953[fontsize=11,label="{&rarr;\n3953\nd=424|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3954[fontsize=11,label="&larr;\n3954", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s714[fontsize=11,label="714", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3949[fontsize=11,label="3949", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3950[fontsize=11,label="3950", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3951[fontsize=11,label="3951", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s714 -> s3953 [fontname="Times-Italic", label="&epsilon;"];
+s3953:p0 -> s3949 [fontname="Times-Italic", label="&epsilon;"];
+s3953:p1 -> s3951 [fontname="Times-Italic", label="&epsilon;"];
+s3949 -> s3950 [fontsize=11, fontname="Courier", arrowsize=.7, label = "':'", arrowhead = normal];
+s3951 -> s3952 [fontsize=11, fontname="Courier", arrowsize=.7, label = "':'", arrowhead = normal];
+s3950 -> s3954 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<integral_type>", arrowhead = normal];
+s3952 -> s3954 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<integral_type_name>", arrowhead = normal];
+s3954 -> s715 [fontname="Times-Italic", label="&epsilon;"];
+}
