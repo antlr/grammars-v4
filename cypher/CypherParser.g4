@@ -462,6 +462,7 @@ symbol
     | ANY
     | NONE
     | SINGLE
+    | END
     ;
 
 reservedWord
@@ -512,7 +513,6 @@ reservedWord
     | WHEN
     | THEN
     | ELSE
-    | END
     | MANDATORY
     | SCALAR
     | OF
