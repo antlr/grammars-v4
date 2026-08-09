@@ -1,4 +1,4 @@
-/* FROM https://github.com/antlr/grammars-v4/blob/master/java/java20/Java20Lexer.g4 */
+/* FROM https://github.com/antlr/grammars-v4/blob/master/java/java20/Java20Parser.g4 */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
 // $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
