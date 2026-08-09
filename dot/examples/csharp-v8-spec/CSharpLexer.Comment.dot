@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s328[fontsize=11, label="328", shape=doublecircle, fixedsize=true, width=.6];
+s327[fontsize=11,label="327", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1399[fontsize=11,label="1399", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1400[fontsize=11,label="1400", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1401[fontsize=11,label="{&rarr;\n1401\nd=6|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1402[fontsize=11,label="&larr;\n1402", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1403[fontsize=11,label="1403", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1404[fontsize=11,label="1404", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s327 -> s1401 [fontname="Times-Italic", label="&epsilon;"];
+s1401:p0 -> s1399 [fontname="Times-Italic", label="&epsilon;"];
+s1401:p1 -> s1400 [fontname="Times-Italic", label="&epsilon;"];
+s1399 -> s1402 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Single_Line_Comment>", arrowhead = normal];
+s1400 -> s1402 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Delimited_Comment>", arrowhead = normal];
+s1402 -> s1403 [fontname="Times-Italic", label="&epsilon;"];
+s1403 -> s1404 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_161:2", arrowhead = normal];
+s1404 -> s328 [fontname="Times-Italic", label="&epsilon;"];
+}

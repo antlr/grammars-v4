@@ -173,7 +173,7 @@ postfixExpression
     : (primaryExpression | '__extension__'? '(' typeName ')' '{' initializerList? ','? '}')
       (
         '[' expression ']'
-        | '(' argumentExpressionList? ')'
+        | '(' argumentExpressionList ')'
         | ('.' | '->') Identifier
         | '++'
         | '--'
@@ -183,6 +183,7 @@ postfixExpression
 // ISO C: argument-expression-list (6.5.3.1)
 argumentExpressionList
     : assignmentExpression (',' assignmentExpression)*
+    |
     ;
 
 // ISO C: compound-literal (6.5.3.1) - No ANTLR4 rule

@@ -1,0 +1,30 @@
+digraph ATN {
+rankdir=LR;
+s641[fontsize=11, label="641", shape=doublecircle, fixedsize=true, width=.6];
+s640[fontsize=11,label="640", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3520[fontsize=11,label="&rarr;\n3520+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3521[fontsize=11,label="&larr;\n3521", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3522[fontsize=11,label="{3522+\nd=362|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3523[fontsize=11,label="3523", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3524[fontsize=11,label="3524", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3525[fontsize=11,label="3525", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3526[fontsize=11,label="3526", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3516[fontsize=11,label="3516", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3517[fontsize=11,label="{&rarr;\n3517\nd=361|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s3518[fontsize=11,label="&larr;\n3518", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s3519[fontsize=11,label="3519", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s640 -> s3517 [fontname="Times-Italic", label="&epsilon;"];
+s3517:p0 -> s3516 [fontname="Times-Italic", label="&epsilon;"];
+s3517:p1 -> s3518 [fontname="Times-Italic", label="&epsilon;"];
+s3516 -> s3518 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<attributes>", arrowhead = normal];
+s3518 -> s3520 [fontname="Times-Italic", label="&epsilon;"];
+s3520 -> s3519 [fontname="Times-Italic", label="&epsilon;"];
+s3519 -> s3521 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<operator_modifier>", arrowhead = normal];
+s3521 -> s3522 [fontname="Times-Italic", label="&epsilon;"];
+s3522:p0 -> s3520 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s3522:p1 -> s3523 [fontname="Times-Italic", label="&epsilon;"];
+s3523 -> s3524 [fontname="Times-Italic", label="&epsilon;"];
+s3524 -> s3525 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<operator_declarator>", arrowhead = normal];
+s3525 -> s3526 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<operator_body>", arrowhead = normal];
+s3526 -> s641 [fontname="Times-Italic", label="&epsilon;"];
+}

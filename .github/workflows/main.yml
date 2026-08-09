@@ -70,7 +70,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5.6.0
+      uses: actions/setup-java@v5.7.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -81,7 +81,7 @@ jobs:
         javac --version
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1.7.2
+      uses: dart-lang/setup-dart@v1.8.0
     - name: Test Dart
       if: ${{ matrix.language == 'Dart' }}
       run: |
@@ -217,7 +217,7 @@ jobs:
         dotnet --list-runtimes
         dotnet --list-sdks
     - name: Install Java
-      uses: actions/setup-java@v5.6.0
+      uses: actions/setup-java@v5.7.0
       with:
         java-version: '11'
         distribution: 'zulu'
@@ -276,7 +276,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK
-      uses: actions/setup-java@v5.6.0
+      uses: actions/setup-java@v5.7.0
       with:
         distribution: 'zulu'
         java-version: '17'

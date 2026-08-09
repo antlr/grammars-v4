@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s432[fontsize=11, label="432", shape=doublecircle, fixedsize=true, width=.6];
+s1811[fontsize=11,label="1811", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1812[fontsize=11,label="&rarr;\n1812+", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1813[fontsize=11,label="&larr;\n1813", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1814[fontsize=11,label="{1814+\nd=60|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1815[fontsize=11,label="1815", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1816[fontsize=11,label="1816", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1817[fontsize=11,label="1817", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s431[fontsize=11,label="431", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s431 -> s1812 [fontname="Times-Italic", label="&epsilon;"];
+s1812 -> s1811 [fontname="Times-Italic", label="&epsilon;"];
+s1811 -> s1813 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<Interpolated_Regular_String_Element>", arrowhead = normal];
+s1813 -> s1814 [fontname="Times-Italic", label="&epsilon;"];
+s1814:p0 -> s1812 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+s1814:p1 -> s1815 [fontname="Times-Italic", label="&epsilon;"];
+s1815 -> s1816 [fontname="Times-Italic", label="&epsilon;"];
+s1816 -> s1817 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_213:7", arrowhead = normal];
+s1817 -> s432 [fontname="Times-Italic", label="&epsilon;"];
+}

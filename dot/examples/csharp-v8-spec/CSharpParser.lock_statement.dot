@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s483[fontsize=11, label="483", shape=doublecircle, fixedsize=true, width=.6];
+s2704[fontsize=11,label="2704", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s482[fontsize=11,label="482", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2699[fontsize=11,label="2699", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2700[fontsize=11,label="2700", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2701[fontsize=11,label="2701", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2702[fontsize=11,label="2702", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2703[fontsize=11,label="2703", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s482 -> s2699 [fontname="Times-Italic", label="&epsilon;"];
+s2699 -> s2700 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'lock'", arrowhead = normal];
+s2700 -> s2701 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s2701 -> s2702 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<expression>", arrowhead = normal];
+s2702 -> s2703 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s2703 -> s2704 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<embedded_statement>", arrowhead = normal];
+s2704 -> s483 [fontname="Times-Italic", label="&epsilon;"];
+}

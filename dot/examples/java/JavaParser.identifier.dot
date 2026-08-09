@@ -1,0 +1,10 @@
+digraph ATN {
+rankdir=LR;
+s165[fontsize=11, label="165", shape=doublecircle, fixedsize=true, width=.6];
+s1154[fontsize=11,label="1154", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1155[fontsize=11,label="1155", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s164[fontsize=11,label="164", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s164 -> s1154 [fontname="Times-Italic", label="&epsilon;"];
+s1154 -> s1155 [fontsize=11, fontname="Courier", arrowsize=.7, label = "{'exports', 'module', 'open', 'opens', 'permits', 'provides', 'record', 'requires', 'sealed', 'to', 'transitive', 'uses', 'var', 'when', 'with', 'yield', IDENTIFIER}", arrowhead = normal];
+s1155 -> s165 [fontname="Times-Italic", label="&epsilon;"];
+}

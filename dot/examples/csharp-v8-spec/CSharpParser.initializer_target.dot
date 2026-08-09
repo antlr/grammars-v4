@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s195[fontsize=11, label="195", shape=doublecircle, fixedsize=true, width=.6];
+s1536[fontsize=11,label="1536", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1537[fontsize=11,label="1537", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s194[fontsize=11,label="194", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1538[fontsize=11,label="1538", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1539[fontsize=11,label="1539", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1540[fontsize=11,label="1540", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1541[fontsize=11,label="{&rarr;\n1541\nd=106|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1542[fontsize=11,label="&larr;\n1542", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s194 -> s1541 [fontname="Times-Italic", label="&epsilon;"];
+s1541:p0 -> s1536 [fontname="Times-Italic", label="&epsilon;"];
+s1541:p1 -> s1537 [fontname="Times-Italic", label="&epsilon;"];
+s1536 -> s1542 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s1537 -> s1538 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'['", arrowhead = normal];
+s1542 -> s195 [fontname="Times-Italic", label="&epsilon;"];
+s1538 -> s1539 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<argument_list>", arrowhead = normal];
+s1539 -> s1540 [fontsize=11, fontname="Courier", arrowsize=.7, label = "']'", arrowhead = normal];
+s1540 -> s1542 [fontname="Times-Italic", label="&epsilon;"];
+}

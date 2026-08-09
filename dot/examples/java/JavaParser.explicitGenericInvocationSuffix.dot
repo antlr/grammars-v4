@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s255[fontsize=11, label="255", shape=doublecircle, fixedsize=true, width=.6];
+s1830[fontsize=11,label="1830", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1831[fontsize=11,label="1831", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1832[fontsize=11,label="1832", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1833[fontsize=11,label="1833", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1834[fontsize=11,label="1834", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1835[fontsize=11,label="{&rarr;\n1835\nd=229|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1836[fontsize=11,label="&larr;\n1836", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s254[fontsize=11,label="254", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s254 -> s1835 [fontname="Times-Italic", label="&epsilon;"];
+s1835:p0 -> s1830 [fontname="Times-Italic", label="&epsilon;"];
+s1835:p1 -> s1832 [fontname="Times-Italic", label="&epsilon;"];
+s1830 -> s1831 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'super'", arrowhead = normal];
+s1832 -> s1833 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<identifier>", arrowhead = normal];
+s1831 -> s1836 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<superSuffix>", arrowhead = normal];
+s1833 -> s1834 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<arguments>", arrowhead = normal];
+s1836 -> s255 [fontname="Times-Italic", label="&epsilon;"];
+s1834 -> s1836 [fontname="Times-Italic", label="&epsilon;"];
+}

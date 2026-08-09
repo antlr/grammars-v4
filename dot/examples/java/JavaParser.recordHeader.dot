@@ -1,0 +1,19 @@
+digraph ATN {
+rankdir=LR;
+s151[fontsize=11, label="151", shape=doublecircle, fixedsize=true, width=.6];
+s150[fontsize=11,label="150", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1078[fontsize=11,label="1078", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1079[fontsize=11,label="1079", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1080[fontsize=11,label="{&rarr;\n1080\nd=126|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1081[fontsize=11,label="&larr;\n1081", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1082[fontsize=11,label="1082", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1083[fontsize=11,label="1083", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s150 -> s1078 [fontname="Times-Italic", label="&epsilon;"];
+s1078 -> s1080 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'('", arrowhead = normal];
+s1080:p0 -> s1079 [fontname="Times-Italic", label="&epsilon;"];
+s1080:p1 -> s1081 [fontname="Times-Italic", label="&epsilon;"];
+s1079 -> s1081 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<recordComponentList>", arrowhead = normal];
+s1081 -> s1082 [fontname="Times-Italic", label="&epsilon;"];
+s1082 -> s1083 [fontsize=11, fontname="Courier", arrowsize=.7, label = "')'", arrowhead = normal];
+s1083 -> s151 [fontname="Times-Italic", label="&epsilon;"];
+}

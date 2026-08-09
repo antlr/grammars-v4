@@ -1,0 +1,23 @@
+digraph ATN {
+rankdir=LR;
+s7[fontsize=11, label="7", shape=doublecircle, fixedsize=true, width=.6];
+s805[fontsize=11,label="805", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s6[fontsize=11,label="6", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s806[fontsize=11,label="&rarr;\n806*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s807[fontsize=11,label="&larr;\n807", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s808[fontsize=11,label="{808*\nd=2|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s809[fontsize=11,label="809", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s810[fontsize=11,label="810*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s811[fontsize=11,label="811", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s812[fontsize=11,label="812", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s6 -> s808 [fontname="Times-Italic", label="&epsilon;"];
+s808:p0 -> s806 [fontname="Times-Italic", label="&epsilon;"];
+s808:p1 -> s809 [fontname="Times-Italic", label="&epsilon;"];
+s806 -> s805 [fontname="Times-Italic", label="&epsilon;"];
+s809 -> s811 [fontname="Times-Italic", label="&epsilon;"];
+s805 -> s807 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<input_element>", arrowhead = normal];
+s811 -> s812 [fontsize=11, fontname="Courier", arrowsize=.7, label = "New_Line", arrowhead = normal];
+s807 -> s810 [fontname="Times-Italic", label="&epsilon;"];
+s812 -> s7 [fontname="Times-Italic", label="&epsilon;"];
+s810 -> s808 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}
