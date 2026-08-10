@@ -69,7 +69,3 @@ public abstract class PlSqlLexerBase extends Lexer
         return c == ' ' || c == '\t' || c == '\r';
     }
 }
-
-
-
-
