@@ -47,9 +47,12 @@ script_unit
 // Separator between units (and optional terminator after the last one).
 // SEMICOLON is always valid; bare '/' only after a SQL unit — the predicate
 // rejects '/' after a PL/SQL block, yielding useful diagnostic.
+// isSolidusSeparator() checks that '/' is on its own line (SQL*Plus separator
+// vs division operator).
 terminator
-    : SEMICOLON SQLPLUS_EXECUTE?
-    | {isLastUnitSql()}? SQLPLUS_EXECUTE
+    : SEMICOLON
+    | SEMICOLON {isSolidusSeparator()}? SOLIDUS
+    | {isLastUnitSql() && isSolidusSeparator()}? SOLIDUS
     ;
 
 plsql_unit
@@ -64,7 +67,7 @@ plsql_unit
 
 // SQL/DDL statements. A trailing terminator is optional (the last unit in a
 // script may omit it); when present it is matched by the `terminator` rule,
-// which accepts SEMICOLON, SQLPLUS_EXECUTE, or both.
+// which accepts SEMICOLON, SOLIDUS, or both.
 sql_unit
     : alter_analytic_view
     | alter_attribute_dimension

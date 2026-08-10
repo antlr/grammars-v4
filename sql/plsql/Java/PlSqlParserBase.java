@@ -23,7 +23,33 @@ public abstract class PlSqlParserBase extends Parser
 
     public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
     public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
-    public boolean isLastUnitSql() { return !_lastUnitWasPlsql; }
+    public boolean isLastUnitSql()   { return !_lastUnitWasPlsql; }
+    public boolean isLastUnitPlsql() { return _lastUnitWasPlsql; }
+
+    /**
+     * Parser-level predicate: distinguishes SOLIDUS as a SQL*Plus separator
+     * (on its own line) from SOLIDUS as a division operator (inside an expression).
+     */
+    public boolean isSolidusSeparator()
+    {
+        Token solidus = _input.LT(1);
+        if (solidus == null || solidus.getType() != PlSqlParser.SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.getLine();
+
+        // Look-behind: previous significant token must be on a different line.
+        Token prev = _input.LT(-1);
+        if (prev != null && prev.getType() != Token.EOF && prev.getLine() == solidusLine)
+            return false;
+
+        // Look-ahead: next significant token must be on a different line or EOF.
+        Token next = _input.LT(2);
+        if (next != null && next.getType() != Token.EOF && next.getLine() == solidusLine)
+            return false;
+
+        return true;
+    }
 
     public boolean isVersion12() {
         return _isVersion12;
@@ -79,3 +105,4 @@ public abstract class PlSqlParserBase extends Parser
         return true;
     }
 }
+
