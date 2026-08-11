@@ -25,7 +25,6 @@ func init() {
 
 func (p *PlSqlParserBase) reset() {
     p._lastUnitWasPlsql = false
-    p.BaseParser.Reset()
 }
 
 func (p *PlSqlParserBase) setLastUnitPlsql() { p._lastUnitWasPlsql = true }

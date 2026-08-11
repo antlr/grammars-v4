@@ -1,4 +1,4 @@
-import { Parser, TokenStream, TokenConstants } from "antlr4";
+import { Parser, TokenStream, Token } from "antlr4";
 import PlSqlLexer from './PlSqlLexer.js';
 
 export default abstract class PlSqlParserBase extends Parser {
@@ -37,11 +37,11 @@ export default abstract class PlSqlParserBase extends Parser {
     const solidusLine = solidus!.line;
 
     const prev = stream.LT(-1);
-    if (prev != null && prev!.type !== TokenConstants.EOF && prev!.line === solidusLine)
+    if (prev != null && prev!.type !== Token.EOF && prev!.line === solidusLine)
       return false;
 
     const next = stream.LT(2);
-    if (next != null && next!.type !== TokenConstants.EOF && next!.line === solidusLine)
+    if (next != null && next!.type !== Token.EOF && next!.line === solidusLine)
       return false;
 
     return true;

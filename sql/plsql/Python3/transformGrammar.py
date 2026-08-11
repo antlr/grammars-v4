@@ -20,6 +20,10 @@ def fix(file_path):
     for x in input_file:
         if 'this.' in x:
             x = x.replace('this.', 'self.')
+        if '&&' in x:
+            x = x.replace('&&', ' and ')
+        if '||' in x:
+            x = x.replace('||', ' or ')
         output_file.write(x)
         output_file.flush()
 
