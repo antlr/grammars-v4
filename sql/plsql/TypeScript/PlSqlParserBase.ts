@@ -101,4 +101,3 @@ export default abstract class PlSqlParserBase extends Parser {
   }
 
 }
-
