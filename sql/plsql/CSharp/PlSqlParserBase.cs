@@ -42,11 +42,11 @@ public abstract class PlSqlParserBase : Parser
         int solidusLine = solidus.Line;
 
         var prev = stream.LT(-1);
-        if (prev != null && prev.Type != Token.Eof && prev.Line == solidusLine)
+        if (prev != null && prev.Type != TokenConstants.EOF && prev.Line == solidusLine)
             return false;
 
         var next = stream.LT(2);
-        if (next != null && next.Type != Token.Eof && next.Line == solidusLine)
+        if (next != null && next.Type != TokenConstants.EOF && next.Line == solidusLine)
             return false;
 
         return true;

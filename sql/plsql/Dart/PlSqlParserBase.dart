@@ -16,9 +16,9 @@ abstract class PlSqlParserBase extends Parser
     }
 
     @override
-    void reset() {
+    void reset([bool resetInput = true]) {
         _lastUnitWasPlsql = false;
-        super.reset();
+        super.reset(resetInput);
     }
 
     void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
@@ -32,7 +32,7 @@ abstract class PlSqlParserBase extends Parser
         if (solidus == null || solidus!.type != PlSqlLexer.TOKEN_SOLIDUS)
             return false;
 
-        int solidusLine = solidus.line;
+        int solidusLine = solidus!.line;
 
         var prev = stream.LT(-1);
         if (prev != null && prev!.type != Token.EOF && prev.line == solidusLine)
