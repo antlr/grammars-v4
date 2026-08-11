@@ -10,6 +10,8 @@ public abstract class PlSqlParserBase : Parser
     private bool _isVersion11 = true;
     private bool _isVersion12 = true;
 
+    private bool _lastUnitWasPlsql = false;
+
     protected PlSqlParserBase(ITokenStream input)
         : base(input)
     {
@@ -17,6 +19,37 @@ public abstract class PlSqlParserBase : Parser
 
     public PlSqlParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput) : this(input)
     {
+    }
+
+    public override void Reset()
+    {
+        _lastUnitWasPlsql = false;
+        base.Reset();
+    }
+
+    public void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    public void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    public bool isLastUnitSql()    { return !_lastUnitWasPlsql; }
+    public bool isLastUnitPlsql()  { return _lastUnitWasPlsql; }
+
+    public bool isSolidusSeparator()
+    {
+        var stream = (CommonTokenStream)InputStream;
+        var solidus = stream.LT(1);
+        if (solidus == null || solidus.Type != PlSqlParser.SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.Line;
+
+        var prev = stream.LT(-1);
+        if (prev != null && prev.Type != TokenConstants.Eof && prev.Line == solidusLine)
+            return false;
+
+        var next = stream.LT(2);
+        if (next != null && next.Type != TokenConstants.Eof && next.Line == solidusLine)
+            return false;
+
+        return true;
     }
 
     public bool isVersion10() => _isVersion10;

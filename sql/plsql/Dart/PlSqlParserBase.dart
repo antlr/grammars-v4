@@ -9,8 +9,40 @@ abstract class PlSqlParserBase extends Parser
     bool _isVersion11 = true;
     bool _isVersion10 = true;
 
+    bool _lastUnitWasPlsql = false;
+
     PlSqlParserBase(TokenStream input) : super(input)
     {
+    }
+
+    @override
+    void reset() {
+        _lastUnitWasPlsql = false;
+        super.reset();
+    }
+
+    void setLastUnitPlsql() { _lastUnitWasPlsql = true; }
+    void setLastUnitSql()   { _lastUnitWasPlsql = false; }
+    bool isLastUnitSql()    { return !_lastUnitWasPlsql; }
+    bool isLastUnitPlsql()  { return _lastUnitWasPlsql; }
+
+    bool isSolidusSeparator() {
+        var stream = tokenStream as CommonTokenStream;
+        var solidus = stream.LT(1);
+        if (solidus == null || solidus!.type != PlSqlLexer.TOKEN_SOLIDUS)
+            return false;
+
+        int solidusLine = solidus.line;
+
+        var prev = stream.LT(-1);
+        if (prev != null && prev!.type != TokenConstants.EOF && prev.line == solidusLine)
+            return false;
+
+        var next = stream.LT(2);
+        if (next != null && next!.type != TokenConstants.EOF && next.line == solidusLine)
+            return false;
+
+        return true;
     }
 
     bool isVersion12() {
