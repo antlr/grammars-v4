@@ -31,17 +31,17 @@ options {
 // Insert here @header for C++ parser.
 
 sql_script
-    : (sql_plus_command SEMICOLON?)*
-      (script_unit (terminator script_unit)* terminator?)?
-      EOF
+    : (sql_plus_command SEMICOLON?)* (
+        script_unit (terminator script_unit)* terminator?
+    )? EOF
     ;
 
 // Actions set a flag for the `terminator` predicate: bare '/' is accepted only
 // after a SQL unit; a PL/SQL unit requires a preceding SEMICOLON.
 script_unit
-    : plsql_unit {setLastUnitPlsql();}
-    | sql_unit {setLastUnitSql();}
-    | sql_plus_command {setLastUnitSql();}
+    : plsql_unit {this.setLastUnitPlsql();}
+    | sql_unit {this.setLastUnitSql();}
+    | sql_plus_command {this.setLastUnitSql();}
     ;
 
 // Separator between units (and optional terminator after the last one).
@@ -51,8 +51,8 @@ script_unit
 // vs division operator).
 terminator
     : SEMICOLON
-    | SEMICOLON {isSolidusSeparator()}? SOLIDUS
-    | {isLastUnitSql() && isSolidusSeparator()}? SOLIDUS
+    | SEMICOLON {this.isSolidusSeparator()}? SOLIDUS
+    | {this.isLastUnitSql() && this.isSolidusSeparator()}? SOLIDUS
     ;
 
 plsql_unit
