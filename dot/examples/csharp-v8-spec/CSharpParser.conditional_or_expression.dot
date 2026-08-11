@@ -1,0 +1,29 @@
+digraph ATN {
+rankdir=LR;
+s299[fontsize=11, label="299", shape=doublecircle, fixedsize=true, width=.6];
+s2023[fontsize=11,label="2023", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2024[fontsize=11,label="2024", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2025[fontsize=11,label="2025", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s298[fontsize=11,label="298", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2026[fontsize=11,label="2026", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2027[fontsize=11,label="2027", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2028[fontsize=11,label="2028", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2029[fontsize=11,label="&rarr;\n2029*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2030[fontsize=11,label="&larr;\n2030", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2031[fontsize=11,label="{2031*\nd=162|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s2032[fontsize=11,label="2032", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2033[fontsize=11,label="2033*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s298 -> s2023 [fontname="Times-Italic", label="&epsilon;"];
+s2023 -> s2024 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_149:-1", arrowhead = normal];
+s2024 -> s2025 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<conditional_and_expression[0]>", arrowhead = normal];
+s2025 -> s2031 [fontname="Times-Italic", label="&epsilon;"];
+s2031:p0 -> s2029 [fontname="Times-Italic", label="&epsilon;"];
+s2031:p1 -> s2032 [fontname="Times-Italic", label="&epsilon;"];
+s2029 -> s2026 [fontname="Times-Italic", label="&epsilon;"];
+s2032 -> s299 [fontname="Times-Italic", label="&epsilon;"];
+s2026 -> s2027 [fontsize=11, fontname="Courier", arrowsize=.7, label = "1 >= _p", arrowhead = normal];
+s2027 -> s2028 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'||'", arrowhead = normal];
+s2028 -> s2030 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<conditional_and_expression[0]>", arrowhead = normal];
+s2030 -> s2033 [fontname="Times-Italic", label="&epsilon;"];
+s2033 -> s2031 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

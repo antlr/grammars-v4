@@ -1,0 +1,26 @@
+digraph ATN {
+rankdir=LR;
+s208[fontsize=11, label="208", shape=doublecircle, fixedsize=true, width=.6];
+s993[fontsize=11,label="993", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s994[fontsize=11,label="994", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s995[fontsize=11,label="995", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s996[fontsize=11,label="996", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s997[fontsize=11,label="997", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s998[fontsize=11,label="998", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s999[fontsize=11,label="999", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1000[fontsize=11,label="1000", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1001[fontsize=11,label="1001", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1002[fontsize=11,label="1002", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s207[fontsize=11,label="207", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s207 -> s993 [fontname="Times-Italic", label="&epsilon;"];
+s993 -> s994 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'_'", arrowhead = normal];
+s994 -> s995 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'_'", arrowhead = normal];
+s995 -> s996 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'m'", arrowhead = normal];
+s996 -> s997 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'a'", arrowhead = normal];
+s997 -> s998 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'k'", arrowhead = normal];
+s998 -> s999 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s999 -> s1000 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'r'", arrowhead = normal];
+s1000 -> s1001 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s1001 -> s1002 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'f'", arrowhead = normal];
+s1002 -> s208 [fontname="Times-Italic", label="&epsilon;"];
+}

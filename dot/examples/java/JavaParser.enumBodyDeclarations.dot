@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s31[fontsize=11, label="31", shape=doublecircle, fixedsize=true, width=.6];
+s440[fontsize=11,label="440", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s441[fontsize=11,label="441", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s442[fontsize=11,label="&rarr;\n442*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s443[fontsize=11,label="&larr;\n443", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s444[fontsize=11,label="{444*\nd=32|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s445[fontsize=11,label="445", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s30[fontsize=11,label="30", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s446[fontsize=11,label="446*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s30 -> s440 [fontname="Times-Italic", label="&epsilon;"];
+s440 -> s444 [fontsize=11, fontname="Courier", arrowsize=.7, label = "';'", arrowhead = normal];
+s444:p0 -> s442 [fontname="Times-Italic", label="&epsilon;"];
+s444:p1 -> s445 [fontname="Times-Italic", label="&epsilon;"];
+s442 -> s441 [fontname="Times-Italic", label="&epsilon;"];
+s445 -> s31 [fontname="Times-Italic", label="&epsilon;"];
+s441 -> s443 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<classBodyDeclaration>", arrowhead = normal];
+s443 -> s446 [fontname="Times-Italic", label="&epsilon;"];
+s446 -> s444 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

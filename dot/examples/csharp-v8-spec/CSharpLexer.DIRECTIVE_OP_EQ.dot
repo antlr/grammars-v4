@@ -1,0 +1,18 @@
+digraph ATN {
+rankdir=LR;
+s510[fontsize=11, label="510", shape=doublecircle, fixedsize=true, width=.6];
+s2256[fontsize=11,label="2256", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2257[fontsize=11,label="2257", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2258[fontsize=11,label="2258", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2259[fontsize=11,label="2259", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2260[fontsize=11,label="2260", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s509[fontsize=11,label="509", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2255[fontsize=11,label="2255", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s509 -> s2255 [fontname="Times-Italic", label="&epsilon;"];
+s2255 -> s2256 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'='", arrowhead = normal];
+s2256 -> s2257 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'='", arrowhead = normal];
+s2257 -> s2258 [fontname="Times-Italic", label="&epsilon;"];
+s2258 -> s2259 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_252:16", arrowhead = normal];
+s2259 -> s2260 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_252:26", arrowhead = normal];
+s2260 -> s510 [fontname="Times-Italic", label="&epsilon;"];
+}

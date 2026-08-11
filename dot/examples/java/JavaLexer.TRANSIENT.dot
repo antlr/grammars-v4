@@ -1,0 +1,26 @@
+digraph ATN {
+rankdir=LR;
+s114[fontsize=11, label="114", shape=doublecircle, fixedsize=true, width=.6];
+s113[fontsize=11,label="113", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s658[fontsize=11,label="658", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s659[fontsize=11,label="659", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s660[fontsize=11,label="660", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s661[fontsize=11,label="661", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s662[fontsize=11,label="662", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s663[fontsize=11,label="663", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s664[fontsize=11,label="664", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s665[fontsize=11,label="665", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s666[fontsize=11,label="666", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s667[fontsize=11,label="667", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s113 -> s658 [fontname="Times-Italic", label="&epsilon;"];
+s658 -> s659 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'t'", arrowhead = normal];
+s659 -> s660 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'r'", arrowhead = normal];
+s660 -> s661 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'a'", arrowhead = normal];
+s661 -> s662 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'n'", arrowhead = normal];
+s662 -> s663 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'s'", arrowhead = normal];
+s663 -> s664 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'i'", arrowhead = normal];
+s664 -> s665 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s665 -> s666 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'n'", arrowhead = normal];
+s666 -> s667 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'t'", arrowhead = normal];
+s667 -> s114 [fontname="Times-Italic", label="&epsilon;"];
+}

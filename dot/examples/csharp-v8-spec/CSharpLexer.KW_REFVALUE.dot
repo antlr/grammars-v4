@@ -1,0 +1,28 @@
+digraph ATN {
+rankdir=LR;
+s246[fontsize=11, label="246", shape=doublecircle, fixedsize=true, width=.6];
+s1135[fontsize=11,label="1135", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1136[fontsize=11,label="1136", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1137[fontsize=11,label="1137", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1138[fontsize=11,label="1138", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1139[fontsize=11,label="1139", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1140[fontsize=11,label="1140", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s245[fontsize=11,label="245", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1141[fontsize=11,label="1141", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1142[fontsize=11,label="1142", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1143[fontsize=11,label="1143", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1144[fontsize=11,label="1144", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1145[fontsize=11,label="1145", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s245 -> s1135 [fontname="Times-Italic", label="&epsilon;"];
+s1135 -> s1136 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'_'", arrowhead = normal];
+s1136 -> s1137 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'_'", arrowhead = normal];
+s1137 -> s1138 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'r'", arrowhead = normal];
+s1138 -> s1139 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s1139 -> s1140 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'f'", arrowhead = normal];
+s1140 -> s1141 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'v'", arrowhead = normal];
+s1141 -> s1142 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'a'", arrowhead = normal];
+s1142 -> s1143 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'l'", arrowhead = normal];
+s1143 -> s1144 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'u'", arrowhead = normal];
+s1144 -> s1145 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'e'", arrowhead = normal];
+s1145 -> s246 [fontname="Times-Italic", label="&epsilon;"];
+}

@@ -1,0 +1,29 @@
+digraph ATN {
+rankdir=LR;
+s291[fontsize=11, label="291", shape=doublecircle, fixedsize=true, width=.6];
+s1984[fontsize=11,label="1984", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1985[fontsize=11,label="&rarr;\n1985*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s290[fontsize=11,label="290", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1986[fontsize=11,label="&larr;\n1986", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1987[fontsize=11,label="{1987*\nd=158|{<p0>|<p1>}}", shape=record, fixedsize=false, peripheries=1];
+s1988[fontsize=11,label="1988", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1989[fontsize=11,label="1989*", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1979[fontsize=11,label="1979", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1980[fontsize=11,label="1980", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1981[fontsize=11,label="1981", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1982[fontsize=11,label="1982", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s1983[fontsize=11,label="1983", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s290 -> s1979 [fontname="Times-Italic", label="&epsilon;"];
+s1979 -> s1980 [fontsize=11, fontname="Courier", arrowsize=.7, label = "action_145:-1", arrowhead = normal];
+s1980 -> s1981 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<equality_expression[0]>", arrowhead = normal];
+s1981 -> s1987 [fontname="Times-Italic", label="&epsilon;"];
+s1987:p0 -> s1985 [fontname="Times-Italic", label="&epsilon;"];
+s1987:p1 -> s1988 [fontname="Times-Italic", label="&epsilon;"];
+s1985 -> s1982 [fontname="Times-Italic", label="&epsilon;"];
+s1988 -> s291 [fontname="Times-Italic", label="&epsilon;"];
+s1982 -> s1983 [fontsize=11, fontname="Courier", arrowsize=.7, label = "1 >= _p", arrowhead = normal];
+s1983 -> s1984 [fontsize=11, fontname="Courier", arrowsize=.7, label = "'&'", arrowhead = normal];
+s1984 -> s1986 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<equality_expression[0]>", arrowhead = normal];
+s1986 -> s1989 [fontname="Times-Italic", label="&epsilon;"];
+s1989 -> s1987 [fontname="Times-Italic", label="&epsilon;", style="dashed"];
+}

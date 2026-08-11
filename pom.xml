@@ -363,6 +363,7 @@
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>sysml-v2</module>
 				<module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
@@ -403,13 +404,17 @@
 				<module>wln</module>
 				<module>wren</module>
 				<module>xml</module>
-				<module>xpath</module>
+				<module>xpath/xpath1</module>
+				<module>xpath/xpath20</module>
+				<module>xpath/xpath31</module>
+				<module>xpath/xpath4</module>
 				<module>xsd-regex</module>
 				<module>xyz</module>
 				<module>yara</module>
 				<module>yini</module>
 				<module>z</module>
 				<module>zig</module>
+				<module>xquery/xquery4</module>
 			</modules>
 		</profile>
 		<profile>

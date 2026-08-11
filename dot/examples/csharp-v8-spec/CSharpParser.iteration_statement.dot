@@ -1,0 +1,21 @@
+digraph ATN {
+rankdir=LR;
+s435[fontsize=11, label="435", shape=doublecircle, fixedsize=true, width=.6];
+s2512[fontsize=11,label="2512", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2513[fontsize=11,label="{&rarr;\n2513\nd=222|{<p0>|<p1>|<p2>|<p3>}}", shape=record, fixedsize=false, peripheries=1];
+s434[fontsize=11,label="434", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2514[fontsize=11,label="&larr;\n2514", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2509[fontsize=11,label="2509", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2510[fontsize=11,label="2510", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s2511[fontsize=11,label="2511", shape=circle, fixedsize=true, width=.55, peripheries=1];
+s434 -> s2513 [fontname="Times-Italic", label="&epsilon;"];
+s2513:p0 -> s2509 [fontname="Times-Italic", label="&epsilon;"];
+s2513:p1 -> s2510 [fontname="Times-Italic", label="&epsilon;"];
+s2513:p2 -> s2511 [fontname="Times-Italic", label="&epsilon;"];
+s2513:p3 -> s2512 [fontname="Times-Italic", label="&epsilon;"];
+s2509 -> s2514 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<while_statement>", arrowhead = normal];
+s2510 -> s2514 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<do_statement>", arrowhead = normal];
+s2511 -> s2514 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<for_statement>", arrowhead = normal];
+s2512 -> s2514 [fontsize=11, fontname="Courier", arrowsize=.7, label = "<foreach_statement>", arrowhead = normal];
+s2514 -> s435 [fontname="Times-Italic", label="&epsilon;"];
+}
