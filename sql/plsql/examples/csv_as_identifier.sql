@@ -1,0 +1,7 @@
+DECLARE
+  csv VARCHAR2(100);
+BEGIN
+  NULL;
+END;
+/
+SELECT * FROM dual csv;
