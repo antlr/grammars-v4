@@ -7888,6 +7888,7 @@ regular_id
     | VALUE
     | COVAR_
     | DATE_FORMAT
+    | CSV
     ;
 
 non_reserved_keywords_in_18c
