@@ -8,7 +8,7 @@ do
 	# Find rules that contain top-level empty alts.
 	# Note, not complete because the alt may be not empty, but could derive empty.
 	dotnet trash parse -l $dir/*.g4 2>/dev/null > save.pt
-	cat save.pt | dotnet trash xgrep ' //parserRuleSpec[./ruleBlock/ruleAltList/labeledAlt/alternative[count(./*) = 0]]/RULE_REF/text()' > rules.txt
+	cat save.pt | dotnet trash xpath ' //parserRuleSpec[./ruleBlock/ruleAltList/labeledAlt/alternative[count(./*) = 0]]/RULE_REF/text()' > rules.txt
 	# Find locations of use that an operator applied to it.
 	for r in `cat rules.txt`
 	do
