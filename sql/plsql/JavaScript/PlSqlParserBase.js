@@ -6,12 +6,43 @@ export default class PlSqlParserBase extends antlr4.Parser {
   _isVersion10;
   _isVersion11;
   _isVersion12;
+  _lastUnitWasPlsql;
 
   constructor(input) {
     super(input);
     this._isVersion10 = true;
     this._isVersion11 = true;
     this._isVersion12 = true;
+    this._lastUnitWasPlsql = false;
+  }
+
+  reset() {
+    this._lastUnitWasPlsql = false;
+    super.reset();
+  }
+
+  setLastUnitPlsql() { this._lastUnitWasPlsql = true; }
+  setLastUnitSql()   { this._lastUnitWasPlsql = false; }
+  isLastUnitSql()    { return !this._lastUnitWasPlsql; }
+  isLastUnitPlsql()  { return this._lastUnitWasPlsql; }
+
+  isSolidusSeparator() {
+    const stream = this.getTokenStream();
+    const solidus = stream.LT(1);
+    if (solidus == null || solidus.type !== PlSqlLexer.SOLIDUS)
+      return false;
+
+    const solidusLine = solidus.line;
+
+    const prev = stream.LT(-1);
+    if (prev != null && prev.type !== antlr4.Token.EOF && prev.line === solidusLine)
+      return false;
+
+    const next = stream.LT(2);
+    if (next != null && next.type !== antlr4.Token.EOF && next.line === solidusLine)
+      return false;
+
+    return true;
   }
 
   isVersion10() {

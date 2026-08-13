@@ -10,6 +10,7 @@ type PlSqlParserBase struct {
     _isVersion12 bool
     _isVersion11 bool
     _isVersion10 bool
+    _lastUnitWasPlsql bool
 }
 
 var StaticConfig PlSqlParserBase
@@ -20,6 +21,37 @@ func init() {
         _isVersion11: true,
 	    _isVersion10: true,
     }
+}
+
+func (p *PlSqlParserBase) reset() {
+    p._lastUnitWasPlsql = false
+}
+
+func (p *PlSqlParserBase) setLastUnitPlsql() { p._lastUnitWasPlsql = true }
+func (p *PlSqlParserBase) setLastUnitSql()   { p._lastUnitWasPlsql = false }
+func (p *PlSqlParserBase) isLastUnitSql() bool    { return !p._lastUnitWasPlsql }
+func (p *PlSqlParserBase) isLastUnitPlsql() bool  { return p._lastUnitWasPlsql }
+
+func (p *PlSqlParserBase) isSolidusSeparator() bool {
+    stream := p.GetTokenStream().(*antlr.CommonTokenStream)
+    solidus := stream.LT(1)
+    if solidus == nil || solidus.GetTokenType() != PlSqlParserSOLIDUS {
+        return false
+    }
+
+    solidusLine := solidus.GetLine()
+
+    prev := stream.LT(-1)
+    if prev != nil && prev.GetTokenType() != antlr.TokenEOF && prev.GetLine() == solidusLine {
+        return false
+    }
+
+    next := stream.LT(2)
+    if next != nil && next.GetTokenType() != antlr.TokenEOF && next.GetLine() == solidusLine {
+        return false
+    }
+
+    return true
 }
 
 func (p *PlSqlParserBase) isVersion12() bool {
