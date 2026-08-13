@@ -1646,9 +1646,10 @@ index_expr
     ;
 
 index_properties
-    : ( (global_partitioned_index | local_partitioned_index | index_attributes)+
+    : (
+        (global_partitioned_index | local_partitioned_index | index_attributes)+
         | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
-    )*
+    )?
     ;
 
 domain_index_clause
