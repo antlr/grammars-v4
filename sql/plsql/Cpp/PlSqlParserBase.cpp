@@ -1,6 +1,25 @@
 #include "PlSqlParserBase.h"
 #include "PlSqlParser.h"
 
+bool PlSqlParserBase::isSolidusSeparator() {
+    auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
+    auto* solidus = stream->LT(1);
+    if (solidus == nullptr || solidus->getType() != PlSqlParser::SOLIDUS)
+        return false;
+
+    size_t solidusLine = solidus->getLine();
+
+    auto* prev = stream->LT(-1);
+    if (prev != nullptr && prev->getType() != antlr4::Token::EOF && prev->getLine() == solidusLine)
+        return false;
+
+    auto* next = stream->LT(2);
+    if (next != nullptr && next->getType() != antlr4::Token::EOF && next->getLine() == solidusLine)
+        return false;
+
+    return true;
+}
+
 bool PlSqlParserBase::IsNotNumericFunction() {
     auto* stream = dynamic_cast<antlr4::CommonTokenStream*>(getTokenStream());
     auto* lt1 = stream->LT(1);
