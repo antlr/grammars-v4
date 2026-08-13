@@ -31,7 +31,7 @@ options {
 */
 
 queryList
-    : module_ ('%%%' module_?)* EOF
+    : module_ ((';'|'%%%') module_?)* EOF
     ;
 
 // Start of official Spec EBNF translation.
@@ -859,11 +859,11 @@ module_
     ;
 
 moduleDecl
-    : 'module' 'namespace' NCName EQ uriLiteral ';'
+    : 'module' 'namespace' QName EQ uriLiteral ';'
     ;
 
 moduleImport
-    : 'import' 'module' ('namespace' NCName EQ)? uriLiteral ('at' uriLiteral ( ',' uriLiteral)*)?
+    : 'import' 'module' ('namespace' QName EQ)? uriLiteral ('at' uriLiteral ( ',' uriLiteral)*)?
     ;
 
 multiplicativeExpr
@@ -1149,7 +1149,7 @@ schemaImport
     ;
 
 schemaPrefix
-    : 'namespace' NCName EQ
+    : 'namespace' QName EQ
     | 'fixed'? 'default' 'element' 'namespace'
     ;
 
