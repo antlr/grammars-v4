@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.tree.*;
 public class Test {
 
     static boolean tee = false;
+    static String output_dir = null;
     static boolean show_profile = false;
     static boolean show_tree = false;
     static boolean show_tokens = false;
@@ -71,6 +72,11 @@ public class Test {
             }
             else if (args[i].equals("-tee"))
             {
+                tee = true;
+            }
+            else if (args[i].equals("-o"))
+            {
+                output_dir = args[++i];
                 tee = true;
             }
             else if (args[i].equals("-encoding"))
@@ -191,9 +197,21 @@ public class Test {
         }
         var tokens = new CommonTokenStream(lexer);
         <parser_name> parser = new <parser_name>(tokens);
+        String out_name = input_name;
+        if (output_dir != null) {
+            String absPath = new File(input_name).getAbsolutePath();
+            // Strip drive letter (Windows, e.g. "C:") then leading separators.
+            // Avoid backslash literals to prevent StringTemplate escaping issues.
+            int si = 0;
+            if (absPath.length() >= 2 && absPath.charAt(1) == ':') si = 2;
+            while (si \< absPath.length() && (absPath.charAt(si) == '/' || absPath.charAt(si) == File.separatorChar)) si++;
+            String rootless = absPath.substring(si);
+            out_name = new File(output_dir, rootless).getPath();
+            new File(out_name).getParentFile().mkdirs();
+        }
         PrintStream output = null;
         try {
-            output = tee ? new PrintStream(new File(input_name + ".errors")) : System.out;
+            output = tee ? new PrintStream(new File(out_name + ".errors")) : System.out;
         } catch (NullPointerException e) {
             output = System.err;
         } catch (FileNotFoundException e2) {
@@ -240,7 +258,7 @@ public class Test {
             {
                 PrintWriter treef = null;
                 try {
-                    treef = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(input_name + ".tree")), StandardCharsets.UTF_8), true);
+                    treef = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(out_name + ".tree")), StandardCharsets.UTF_8), true);
                     //treef = new PrintStream(new File(input_name + ".tree"));
                 } catch (NullPointerException e) {
                     treef = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);;

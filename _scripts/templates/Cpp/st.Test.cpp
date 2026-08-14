@@ -5,6 +5,7 @@
 #include \<string>
 #include \<chrono>
 #include \<atomic>
+#include \<filesystem>
 #include \<vector>
 #include "ANTLRInputStream.h"
 #include "ErrorListener.h"
@@ -43,6 +44,7 @@ std::string formatDurationSeconds(uint64_t duration) {
 }
 
 bool tee = false;
+std::string output_dir = "";
 bool show_tree = false;
 bool show_tokens = false;
 bool show_trace = false;
@@ -60,6 +62,14 @@ double first_file_parse_seconds = 0;
 
 void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
 {
+    std::string out_name = input_name;
+    if (!output_dir.empty()) {
+        auto abs = std::filesystem::absolute(input_name);
+        auto root = abs.root_path();
+        auto rootless = std::filesystem::relative(abs, root);
+        out_name = (std::filesystem::path(output_dir) / rootless).string();
+        std::filesystem::create_directories(std::filesystem::path(out_name).parent_path());
+    }
     antlr4::Lexer* lexer = new <lexer_name>(str);
     if (show_tokens)
     {
@@ -77,7 +87,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
     auto tokens = new antlr4::CommonTokenStream(lexer);
     auto* parser = new <parser_name>(tokens);
     std::ostream* output = tee
-        ? new std::ofstream(input_name + ".errors")
+        ? new std::ofstream(out_name + ".errors")
         : &std::cerr;
     auto listener_lexer = new ErrorListener(quiet, tee, output);
     auto listener_parser = new ErrorListener(quiet, tee, output);
@@ -117,7 +127,7 @@ void DoParse(antlr4::CharStream* str, std::string input_name, int row_number)
         if (tee)
         {
             try {
-                auto fn = input_name + ".tree";
+                auto fn = out_name + ".tree";
                 auto out = new std::ofstream(fn);
                 (*out) \<\< tree->toStringTree(parser);
                 delete out;
@@ -188,6 +198,11 @@ int TryParse(std::vector\<std::string>& args)
         }
         else if (args[i] == "-tee")
         {
+            tee = true;
+        }
+        else if (args[i] == "-o")
+        {
+            output_dir = args[++i];
             tee = true;
         }
         else if (args[i] == "-x")

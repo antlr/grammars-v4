@@ -49,6 +49,7 @@ class NamedCharStream extends CharStream {
 
 
 var tee = false;
+var output_dir = "";
 var show_tree = false;
 var show_tokens = false;
 var show_trace = false;
@@ -89,6 +90,11 @@ void main(List\<String> args) async {
         }
         else if (args[i] == "-tee")
         {
+            tee = true;
+        }
+        else if (args[i] == "-o")
+        {
+            output_dir = args[++i];
             tee = true;
         }
         else if (args[i] == "-x")
@@ -197,6 +203,18 @@ Future\<void> ParseFilename(String input, int row_number) async
 
 Future\<void> DoParse(CharStream str, String input_name, int row_number) async
 {
+    String out_name = input_name;
+    if (output_dir != "") {
+        String absPath = File(input_name).absolute.path;
+        // Strip drive letter (e.g. "C:") then leading separators (/ or \).
+        // Use char codes to avoid backslash literals in the template.
+        int si = 0;
+        if (absPath.length >= 2 && absPath.codeUnitAt(1) == 58) si = 2; // 58 = ':'
+        while (si \< absPath.length && (absPath.codeUnitAt(si) == 47 || absPath.codeUnitAt(si) == 92)) si++; // 47='/' 92='\'
+        String rootless = absPath.substring(si);
+        out_name = output_dir + '/' + rootless;
+        await Directory(File(out_name).parent.path).create(recursive: true);
+    }
     if (binary) str = new BinaryCharStream(str);
     <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
     }>
@@ -219,7 +237,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     IOSink output;
     if (tee)
     {
-        output =  File(input_name + ".errors").openWrite();
+        output =  File(out_name + ".errors").openWrite();
     }
     else
     {
@@ -263,7 +281,7 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
         if (tee)
         {
             try {
-                final fn = input_name + ".tree";
+                final fn = out_name + ".tree";
                 final File file = File(fn);
                 await file.writeAsString(tree.toStringTree(parser: parser));
             } catch (e) {

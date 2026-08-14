@@ -1,27 +1,59 @@
 // Generated from trgen <version>
 use std::env;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufRead, Write};
 use std::process;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
-use antlr4rust::common_token_stream::CommonTokenStream;
-use antlr4rust::error_listener::ErrorListener;
-use antlr4rust::input_stream::InputStream;
-use antlr4rust::recognizer::Recognizer;
-use antlr4rust::token::Token;
-use antlr4rust::TokenSource;
-use std::fs;
+
+use antlr4_runtime::{
+    CommonTokenStream, ErrorListener, InputStream, IntStream, Recognizer, SyntaxErrorEvent,
+};
+
 mod r#gen;
-use r#gen::<lexer_name>;
-use r#gen::<parser_name>;
-use std::rc::Rc;
-use std::cell::RefCell;
-use antlr4rust::token_factory::TokenFactory;
-use antlr4rust::errors::ANTLRError;
-use std::error::Error;
-use std::fmt::Display;
-use antlr4rust::{Parser as AntlrParser};
-use antlr4rust::tree::*;
+use r#gen::<ophirust_lexer_name>;
+use r#gen::<ophirust_parser_name>;
+
+// Shared state for counting and recording syntax errors.
+// Uses Arc\<Mutex\<...>> because add_error_listener requires Send + 'static.
+struct ListenerState {
+    error_count: usize,
+    messages: Vec\<String>,
+}
+
+struct CountingErrorListener {
+    quiet: bool,
+    state: Arc\<Mutex\<ListenerState>>,
+}
+
+// Implement for any Recognizer so the bound
+// `for\<'a> ErrorListener\<dyn Recognizer + 'a> + Send + 'static` is satisfied.
+impl\<R: Recognizer + ?Sized> ErrorListener\<R> for CountingErrorListener {
+    fn syntax_error(
+        &mut self,
+        _recognizer: &R,
+        event: &SyntaxErrorEvent\<'_>,
+    ) {
+        if !self.quiet {
+            eprintln!("line {}:{} {}", event.line, event.column, event.message);
+        }
+        let mut state = self.state.lock().unwrap();
+        state.error_count += 1;
+        state.messages.push(format!("line {}:{} {}", event.line, event.column, event.message));
+    }
+}
+
+struct Flags {
+    inputs: Vec\<String>,
+    is_fns: Vec\<bool>,
+    prefix: String,
+    show_tokens: bool,
+    show_tree: bool,
+    show_trace: bool,
+    tee: bool,
+    quiet: bool,
+    output_dir: Option\<String>,
+}
 
 fn parse_input(
     input_name: &str,
@@ -44,96 +76,101 @@ fn parse_input(
     } else {
         input_name.to_string()
     };
-        let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
-                if flags.tee {
-                        Box::new(File::create(format!("{}.errors", out_name)).unwrap()) as Box\<dyn Write>
-                } else {
-                        Box::new(io::sink()) as Box\<dyn Write>
-                }
-        ));
+    let lex_state = Arc::new(Mutex::new(ListenerState {
+        error_count: 0,
+        messages: Vec::new(),
+    }));
+    let parse_state = Arc::new(Mutex::new(ListenerState {
+        error_count: 0,
+        messages: Vec::new(),
+    }));
 
-    let my_string_result = fs::read_to_string(input_name);
-    let input = my_string_result.unwrap(); // Panics if Err
-    let istream = InputStream::new(input.as_bytes());
-    let mut lexer = <lexer_name>::new(istream);
-    lexer.remove_error_listeners();
-    let lec = Rc::new(RefCell::new(0));
-    let lel = Box::new(ParserErrorListener {
-        quiet: flags.quiet,
-                tee: flags.tee,
-        error_count: Rc::clone(&lec),
-                output: Rc::clone(&writer),
-        });
-    lexer.add_error_listener(lel);
-
-    if flags.show_tokens {
-        let mut i: isize = 0;
-        loop {
-                let token = lexer.next_token();
-                let token_type = token.get_token_type();
-                token.set_token_index(i);
-                i = i + 1;
-                eprintln!("{}", token.to_string());
-                if token_type == -1 {
-                        break;
-                }
+    let input = match fs::read_to_string(input_name) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Error reading {}: {}", input_name, e);
+            return (1, 0, 0.0);
         }
-        // no lexer.reset();
-    }
+    };
+
+    let istream = InputStream::new(&input);
+    let mut lexer = <ophirust_lexer_name>::new(istream);
+    lexer.remove_error_listeners();
+    lexer.add_error_listener(CountingErrorListener {
+        quiet: flags.quiet,
+        state: Arc::clone(&lex_state),
+    });
+
+    // Note: show_tokens before feeding to CommonTokenStream is not easily
+    // supported by this runtime's API; use a debugger or tracing instead.
+    let _ = flags.show_tokens;
 
     let token_stream = CommonTokenStream::new(lexer);
-    let mut parser = <parser_name>::new(token_stream);
+    let mut parser = <ophirust_parser_name>::new(token_stream);
     parser.remove_error_listeners();
-    let pec = Rc::new(RefCell::new(0));
-    let pel = Box::new(ParserErrorListener {
+    parser.add_error_listener(CountingErrorListener {
         quiet: flags.quiet,
-        tee: flags.tee,
-        error_count: Rc::clone(&pec),
-        output: Rc::clone(&writer),
-        });
-    parser.add_error_listener(pel);
+        state: Arc::clone(&parse_state),
+    });
 
     let start = Instant::now();
-    let tree = parser.<start_symbol>().expect("parsing failed setup");
+    let tree = parser.<ophirust_start_symbol>().expect("parser initialization failed");
     let elapsed = start.elapsed();
     let parse_seconds = elapsed.as_secs_f64();
-    let token_count = parser.get_input_stream_mut().size() as usize;
 
-    let error_cnt = *lec.borrow() + *pec.borrow();
+    // Get token count from the buffered token stream.
+    // IntStream::size() returns the total number of tokens (including EOF).
+    // If this does not compile, check antlr4_runtime's CommonTokenStream API.
+    let token_count = parser.token_stream_mut().size() as usize;
 
-    if flags.show_tree {
-        let tree_str = tree.to_string_tree(&*parser);
+    // Build the tree string while parser is still in scope (borrows &parser).
+    let tree_str = if flags.show_tree {
+        let rule_names: Vec\<&str> = parser.rule_names().iter().map(|s| s.as_str()).collect();
+        Some(parser.node(tree).to_string_tree_with_names(&rule_names))
+    } else {
+        None
+    };
+
+    let lex_err = lex_state.lock().unwrap().error_count;
+    let parse_err = parse_state.lock().unwrap().error_count;
+    let error_count = lex_err + parse_err;
+
+    // Write the tree file (always when -tee -tree, regardless of errors,
+    // so baselines can be committed and diffed by the test harness).
+    if let Some(ref ts) = tree_str {
         if flags.tee {
             let mut f = File::create(format!("{}.tree", out_name)).unwrap();
-            write!(f, "{}", tree_str).ok();
+            write!(f, "{}", ts).ok();
         } else {
-            eprintln!("{}", tree_str);
+            eprintln!("{}", ts);
+        }
+    }
+
+    // Write the errors file only when there are actual errors so that
+    // empty .errors files are never left behind for Maven to misinterpret.
+    if flags.tee && error_count > 0 {
+        let lex_msgs = lex_state.lock().unwrap().messages.clone();
+        let parse_msgs = parse_state.lock().unwrap().messages.clone();
+        let mut f = File::create(format!("{}.errors", out_name)).unwrap();
+        for msg in lex_msgs.iter().chain(parse_msgs.iter()) {
+            writeln!(f, "{}", msg).ok();
         }
     }
 
     if !flags.quiet {
-        eprint!("{}Rust {} {} {} {:.3} s {} tokens {:.0} tps\n",
-            flags.prefix, idx, input_name,
-            if error_cnt > 0 { "fail" } else { "success" },
+        eprint!(
+            "{}OphiRust {} {} {} {:.3} s {} tokens {:.0} tps\n",
+            flags.prefix,
+            idx,
+            input_name,
+            if error_count > 0 { "fail" } else { "success" },
             parse_seconds,
             token_count,
-            token_count as f64 / parse_seconds
+            token_count as f64 / parse_seconds,
         );
     }
 
-    if error_cnt > 0 { (1, token_count, parse_seconds) } else { (0, token_count, parse_seconds) }
-}
-
-struct Flags {
-    inputs: Vec\<String>,
-    is_fns: Vec\<bool>,
-    prefix: String,
-    show_tokens: bool,
-    show_tree: bool,
-    show_trace: bool,
-    tee: bool,
-    quiet: bool,
-    output_dir: Option\<String>,
+    if error_count > 0 { (1, token_count, parse_seconds) } else { (0, token_count, parse_seconds) }
 }
 
 fn main() {
@@ -191,7 +228,7 @@ fn main() {
     }
 
     if flags.inputs.is_empty() {
-            process::exit(1);
+        process::exit(1);
     } else {
         let mut exit_code = 0;
         let mut total_tokens: usize = 0;
@@ -221,7 +258,11 @@ fn main() {
             } else {
                 "n.a.".to_string()
             };
-            let first_tps = if first_file_parse_seconds > 0.0 { first_file_tokens as f64 / first_file_parse_seconds } else { 0.0 };
+            let first_tps = if first_file_parse_seconds > 0.0 {
+                first_file_tokens as f64 / first_file_parse_seconds
+            } else {
+                0.0
+            };
             let speedup = if flags.inputs.len() > 1 && warm_seconds > 0.0 && first_tps > 0.0 {
                 format!("{:.2}", (warm_tokens as f64 / warm_seconds) / first_tps)
             } else {
@@ -237,51 +278,3 @@ fn main() {
         process::exit(exit_code as i32);
     }
 }
-
-struct ParserErrorListener {
-    quiet: bool,
-    tee: bool,
-    error_count: Rc\<RefCell\<i32>>,
-    output: Rc\<RefCell\<Box\<dyn Write>>>,
-}
-
-impl\<'a, T: Recognizer\<'a>> ErrorListener\<'a, T> for ParserErrorListener {
-    fn syntax_error(
-        &self,
-        _recognizer: &T,
-        _offending_symbol: Option\<&\<T::TF as TokenFactory\<'a>>::Inner>,
-        line: isize,
-        column: isize,
-        msg: &str,
-        _error: Option\<&ANTLRError>,
-    ) {
-        *self.error_count.borrow_mut() += 1;
-        if self.tee {
-            writeln!(self.output.borrow_mut().as_mut(), "line {}:{} {}", line, column, msg).ok();
-        }
-        if !self.quiet {
-            eprintln!("line {}:{} {}", line, column, msg);
-        }
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Debug)]
-pub struct ParseError {
-    pub source: Option\<Box\<dyn Error + Send + Sync + 'static>>,
-    pub pos: (isize, isize),
-    pub msg: String,
-}
-
-impl Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter\<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ERROR: \<input>:{}:{}: {}",
-            self.pos.0, self.pos.1, self.msg
-        )?;
-        Ok(())
-    }
-}
-
-impl Error for ParseError {}

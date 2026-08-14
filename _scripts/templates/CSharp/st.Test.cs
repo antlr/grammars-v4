@@ -190,7 +190,7 @@ public class Program
     static int string_instance = 0;
     static string prefix = "";
     static bool quiet = false;
-    static bool earley = false;
+    static string output_dir = null;
     static int limit = 0; // 0 = unlimited
     static bool count_ambig = false;
     static long total_ambig_count = 0;
@@ -266,6 +266,11 @@ public class Program
             {
                 tee = true;
             }
+            else if (args[i] == "-o")
+            {
+                output_dir = args[++i];
+                tee = true;
+            }
             else if (args[i] == "-encoding")
             {
                 ++i;
@@ -292,11 +297,6 @@ public class Program
             else if (args[i] == "-trace")
             {
                 show_trace = true;
-            }
-            else if (args[i] == "-earley")
-            {
-                earley = true;
-                show_tree = false;
             }
             else if (args[i] == "--limit" || args[i].StartsWith("--limit="))
             {
@@ -439,7 +439,17 @@ public class Program
             tokens = new CommonTokenStream(lexer);
         }
         var parser = new MyParser(tokens);
-        var output = tee ? new StreamWriter(input_name + ".errors") : System.Console.Error;
+        string out_name;
+        if (output_dir != null) {
+            var abs = System.IO.Path.GetFullPath(input_name);
+            var root = System.IO.Path.GetPathRoot(abs) ?? "";
+            var rootless = abs.Substring(root.Length);
+            out_name = System.IO.Path.Combine(output_dir, rootless);
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(out_name) ?? output_dir);
+        } else {
+            out_name = input_name;
+        }
+        var output = tee ? new StreamWriter(out_name + ".errors") : System.Console.Error;
         var listener_lexer = new ErrorListener\<int>(quiet, tee, output);
         var listener_parser = new ErrorListener\<IToken>(quiet, tee, output);
         lexer.RemoveErrorListeners();
@@ -491,7 +501,7 @@ public class Program
         {
             if (tee)
             {
-                System.IO.File.WriteAllText(input_name + ".tree", tree.ToStringTree(parser));
+                System.IO.File.WriteAllText(out_name + ".tree", tree.ToStringTree(parser));
             } else {
                 System.Console.Error.WriteLine(tree.ToStringTree(parser));
             }
@@ -542,24 +552,6 @@ public class Program
         {
             var ambig_suffix = count_ambig ? " ambig " + (ambig_count_listener?.ambiguity_count ?? 0) : "";
             System.Console.Error.WriteLine(prefix + "CSharp " + row_number + " " + input_name + " " + result + " " + parse_seconds + " s " + token_count + " tokens " + (long)(token_count / parse_seconds) + " tps" + ambig_suffix);
-        }
-
-        if (earley) {
-            var epsilon_remover = new EpsilonRemover(parser);
-            var new_atn = epsilon_remover.Convert_ENFA_to_NFA();
-
-            lexer.Reset();
-            parser.Reset();
-
-            int start = parser.RuleNames.Select((value, index) => new { value, index })
-                .Where(pair => (pair.value == StartSymbol))
-                .Select(pair => pair.index).First();
-
-            MyATN atn = new_atn;
-            DateTime ebefore = DateTime.Now;
-            var accepted = EarleyATN.EarleyAtnRecognizer.ParseToTree(parser, new_atn, parser.TokenStream, start);
-            DateTime eafter = DateTime.Now;
-            Console.Error.WriteLine((accepted ? "ACCEPT" : "REJECT") + " " + (eafter - ebefore).TotalSeconds);
         }
 
         if (tee) output.Close();

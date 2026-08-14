@@ -63,6 +63,7 @@ class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/
 }
 
 $tee = false;
+$output_dir = "";
 $show_profile = false;
 $show_tree = false;
 $show_tokens = false;
@@ -80,6 +81,7 @@ $first_file_parse_seconds = 0;
 
 function main($argv) : void {
     global $tee;
+    global $output_dir;
     global $show_profile;
     global $show_tree;
     global $show_tokens;
@@ -104,6 +106,9 @@ function main($argv) : void {
             array_push($inputs, $argv[++$i]);
             array_push($is_fns, false);
         } else if ($argv[$i] == "-tee") {
+            $tee = true;
+        } else if ($argv[$i] == "-o") {
+            $output_dir = $argv[++$i];
             $tee = true;
         } else if ($argv[$i] == "-x") {
             while($f = fgets(STDIN)){
@@ -181,6 +186,7 @@ function ParseFilename($input, $row_number) {
 
 function DoParse($str, $input_name, $row_number) {
     global $tee;
+    global $output_dir;
     global $show_tree;
     global $show_tokens;
     global $show_trace;
@@ -193,6 +199,20 @@ function DoParse($str, $input_name, $row_number) {
     global $total_parse_seconds;
     global $first_file_tokens;
     global $first_file_parse_seconds;
+    $out_name = $input_name;
+    if ($output_dir != "") {
+        $abs_path = realpath($input_name);
+        if ($abs_path === false) $abs_path = $input_name;
+        // Strip drive letter then leading separators using ord() to avoid
+        // backslash literals (StringTemplate collapses \\ to \ in output).
+        $rootless = preg_replace('/^[A-Za-z]:/', '', $abs_path);
+        while (strlen($rootless) > 0 && (ord($rootless[0]) == 47 || ord($rootless[0]) == 92)) {
+            $rootless = substr($rootless, 1);
+        }
+        $out_name = $output_dir . '/' . $rootless;
+        $dir = dirname($out_name);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+    }
     $lexer = new <lexer_name>($str);
     if ($show_tokens) {
         for ($i=0;  ; $i++) {
@@ -207,7 +227,7 @@ function DoParse($str, $input_name, $row_number) {
     }
 
     if ( $tee ) {
-        $output = fopen($input_name . ".errors", "w");
+        $output = fopen($out_name . ".errors", "w");
     } else {
         $output = STDERR;
     }
@@ -245,7 +265,7 @@ function DoParse($str, $input_name, $row_number) {
     }
     if ($show_tree) {
         if ($tee) {
-            $handle = fopen($input_name . ".tree", "w");
+            $handle = fopen($out_name . ".tree", "w");
             fprintf($handle, "%s", $tree->toStringTree($parser->getRuleNames()));
             fclose($handle);
         } else {
