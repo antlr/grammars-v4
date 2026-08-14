@@ -25,6 +25,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 lexer grammar  awkLexer;
 
+// Insert @header for lexer.
+
 options { superClass = awkLexerBase; }
 
 Minus: '-';
