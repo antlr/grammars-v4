@@ -99,7 +99,7 @@ singlePartQ
     ;
 
 multiPartQ
-    : readingStatement* (updatingStatement* withSt)+ singlePartQ
+    : readingStatement* ((readingStatement | updatingStatement)* withSt)+ singlePartQ
     ;
 
 matchSt
@@ -204,11 +204,11 @@ andExpression
     ;
 
 notExpression
-    : NOT? comparisonExpression
+    : NOT* comparisonExpression
     ;
 
 comparisonExpression
-    : addSubExpression (comparisonSigns addSubExpression)*
+    : stringListNullExpression (comparisonSigns stringListNullExpression)*
     ;
 
 comparisonSigns
@@ -218,6 +218,14 @@ comparisonSigns
     | GT
     | LT
     | NOT_EQUAL
+    ;
+
+stringListNullExpression
+    : addSubExpression (stringExpression | inExpression | nullExpression)?
+    ;
+
+inExpression
+    : IN addSubExpression
     ;
 
 addSubExpression
@@ -237,16 +245,15 @@ unaryAddSubExpression
     ;
 
 atomicExpression
-    : propertyOrLabelExpression (stringExpression | listExpression | nullExpression)*
+    : propertyOrLabelExpression (listExpression)*
     ;
 
 listExpression
-    : IN propertyOrLabelExpression
-    | LBRACK (expression? RANGE expression? | expression) RBRACK
+    : LBRACK (expression? RANGE expression? | expression) RBRACK
     ;
 
 stringExpression
-    : stringExpPrefix propertyOrLabelExpression
+    : stringExpPrefix addSubExpression
     ;
 
 stringExpPrefix
@@ -309,11 +316,11 @@ nodePattern
     ;
 
 atom
-    : literal
+    : listComprehension
+    | literal
     | parameter
     | caseExpression
     | countAll
-    | listComprehension
     | patternComprehension
     | filterWith
     | relationshipsChainPattern
@@ -455,6 +462,7 @@ symbol
     | ANY
     | NONE
     | SINGLE
+    | END
     ;
 
 reservedWord
@@ -505,7 +513,6 @@ reservedWord
     | WHEN
     | THEN
     | ELSE
-    | END
     | MANDATORY
     | SCALAR
     | OF
