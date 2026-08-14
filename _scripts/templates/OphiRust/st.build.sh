@@ -11,6 +11,7 @@ GRAMMARS=""
 GRAMMARS="$GRAMMARS <x.GrammarFileNameTarget>"
 }>
 antlr4-rust-gen $GRAMMARS --lib . --out-dir src/gen
+ls -R src/
 
 if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 

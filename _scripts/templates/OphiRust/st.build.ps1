@@ -13,6 +13,7 @@ $(& antlr4-rust-gen @grammars --lib . --out-dir src/gen ; $compile_exit_code = $
 if ($compile_exit_code -ne 0) {
     exit $compile_exit_code
 }
+Get-ChildItem -Recurse src/ | Write-Host
 
 if (Test-Path -Path transformGrammar.py -PathType Leaf) {
     $(& python3 transformGrammar.py ) 2>&1 | Write-Host
