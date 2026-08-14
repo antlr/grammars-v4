@@ -977,6 +977,7 @@ alter_type
         compile_type_clause
         | replace_type_clause
         | alter_method_spec
+        | alter_attribute_definition
         | alter_collection_clauses
         | modifier_clause
         | overriding_subprogram_spec
@@ -999,6 +1000,11 @@ alter_method_spec
 
 alter_method_element
     : (ADD | DROP) (map_order_function_spec | subprogram_spec)
+    ;
+
+alter_attribute_definition
+    : (ADD | MODIFY) ATTRIBUTE (identifier type_spec? | '(' identifier type_spec (',' identifier type_spec)* ')')
+    | DROP ATTRIBUTE (identifier | '(' identifier (',' identifier)* ')')
     ;
 
 alter_collection_clauses
