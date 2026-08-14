@@ -380,7 +380,7 @@ do
     if [ "$filter" == "agnostic" ]
     then
         # Test whether the grammars have actions.
-        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
+        count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(actionBlock | argActionBlock)' | dotnet trash text -c`
         if [ "$count" == "0" ]
         then
             echo "no actions => skipping $testname."
@@ -458,7 +458,7 @@ do
         speedup_stat=$( compute_stats "${run_speedup[@]}")
         ambig_stat=$(   compute_stats "${run_ambig[@]}" | sed 's/ ± 0$//')
 
-	action_count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xgrep ' //(element | lexerElement)/actionBlock' | dotnet trash text -c | sed 's/^[^:]*://'`
+	action_count=`dotnet trash parse -t ANTLRv4 *.g4 2> /dev/null | dotnet trash xpath ' //(element | lexerElement)/actionBlock' | dotnet trash text -c | sed 's/^[^:]*://'`
 	action_sum=$(printf '%s\n' $action_count | awk '{s+=$1} END {print s+0}')
 
         table_rows+=("| ${testname} | ${pt_stat} | ${ot_stat} | ${tt_stat} | ${tps_stat} | ${warm_tps_stat} | ${speedup_stat} | ${ambig_stat} | ${action_sum} |")
