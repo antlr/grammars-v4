@@ -153,6 +153,8 @@ jobs:
         npm run build
     - name: Test Rust
       run: rustup --version
+    - name: Install antlr-rust-codegen
+      run: cargo install antlr-rust-codegen --version 0.31.0 --bin antlr4-rust-gen
     - name: Test
       shell: pwsh
       run: |
