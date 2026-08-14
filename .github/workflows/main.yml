@@ -154,7 +154,9 @@ jobs:
     - name: Test Rust
       run: rustup --version
     - name: Install antlr4-rust-gen
-      run: cargo install --locked antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
+      run: |
+        git clone --depth 1 --branch v0.33.1 https://github.com/ophi-dev/antlr-rust-runtime /tmp/antlr-rust-runtime
+        cargo install --locked --path /tmp/antlr-rust-runtime/crates/antlr-rust-codegen --bin antlr4-rust-gen
     - name: Test
       shell: pwsh
       run: |
@@ -253,10 +255,6 @@ jobs:
       shell: bash
       run: |
         dotnet trash --help
-    - name: Test Rust
-      run: rustup --version
-    - name: Install antlr-rust-codegen
-      run: cargo install --locked antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
     - name: Test
       shell: bash
       run: |
