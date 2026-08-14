@@ -2604,7 +2604,7 @@ REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
 INQUIRY_DIRECTIVE: '$$' (SIMPLE_LETTER | '_')+;
 
-SPACES: [ \t\r\n]+ -> channel(HIDDEN);
+SPACES: [ \t\r\n\u3000]+ -> channel(HIDDEN);
 
 // Fragment rules
 
