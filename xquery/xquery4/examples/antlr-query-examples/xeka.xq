@@ -1,0 +1,1 @@
+/ancestor::(initialClause|intermediateClause|returnClause|expr)[last()]

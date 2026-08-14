@@ -31,12 +31,44 @@ options {
 // Insert here @header for C++ parser.
 
 sql_script
-    : (sql_plus_command  SEMICOLON?)* (
-        (sql_plus_command | unit_statement) (SEMICOLON '/'? (sql_plus_command | unit_statement))* SEMICOLON? '/'?
-    ) EOF
+    : (sql_plus_command SEMICOLON?)* (
+        script_unit (terminator script_unit)* terminator?
+    )? EOF
     ;
 
-unit_statement
+// Actions set a flag for the `terminator` predicate: bare '/' is accepted only
+// after a SQL unit; a PL/SQL unit requires a preceding SEMICOLON.
+script_unit
+    : plsql_unit {this.setLastUnitPlsql();}
+    | sql_unit {this.setLastUnitSql();}
+    | sql_plus_command {this.setLastUnitSql();}
+    ;
+
+// Separator between units (and optional terminator after the last one).
+// SEMICOLON is always valid; bare '/' only after a SQL unit — the predicate
+// rejects '/' after a PL/SQL block, yielding useful diagnostic.
+// isSolidusSeparator() checks that '/' is on its own line (SQL*Plus separator
+// vs division operator).
+terminator
+    : SEMICOLON
+    | SEMICOLON {this.isSolidusSeparator()}? SOLIDUS
+    | {this.isLastUnitSql() && this.isSolidusSeparator()}? SOLIDUS
+    ;
+
+plsql_unit
+    : anonymous_block
+    | create_function_body
+    | create_procedure_body
+    | create_package
+    | create_package_body
+    | create_trigger
+    | create_type_body
+    ;
+
+// SQL/DDL statements. A trailing terminator is optional (the last unit in a
+// script may omit it); when present it is matched by the `terminator` rule,
+// which accepts SEMICOLON, SOLIDUS, or both.
+sql_unit
     : alter_analytic_view
     | alter_attribute_dimension
     | alter_audit_policy
@@ -74,7 +106,6 @@ unit_statement
     | alter_type
     | alter_user
     | alter_view
-    | anonymous_block
     | call_statement
     | create_analytic_view
     | create_attribute_dimension
@@ -90,7 +121,6 @@ unit_statement
     | create_diskgroup
     | create_edition
     | create_flashback_archive
-    | create_function_body
     | create_hierarchy
     | create_index
     | create_inmemory_join_group
@@ -102,10 +132,7 @@ unit_statement
     | create_materialized_zonemap
     | create_operator
     | create_outline
-    | create_package
-    | create_package_body
     | create_pmem_filestore
-    | create_procedure_body
     | create_profile
     | create_restore_point
     | create_role
@@ -116,8 +143,7 @@ unit_statement
     | create_table
     | create_tablespace
     | create_tablespace_set
-    | create_trigger
-    | create_type
+    | create_type_spec
     | create_user
     | create_view
     | drop_analytic_view
@@ -986,7 +1012,17 @@ dependent_exceptions_part
     ;
 
 create_type
-    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE (type_definition | type_body)
+    : create_type_spec | create_type_body
+    ;
+
+// Type spec (SQL, no END) — semicolon optional, solidus valid as terminator
+create_type_spec
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_definition
+    ;
+
+// Type body (PL/SQL, has END) — requires semicolon, solidus optional after
+create_type_body
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TYPE type_body
     ;
 
 // Create Type Specific Clauses
