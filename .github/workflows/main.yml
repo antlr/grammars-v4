@@ -153,8 +153,8 @@ jobs:
         npm run build
     - name: Test Rust
       run: rustup --version
-    - name: Install antlr-rust-codegen
-      run: cargo install antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
+    - name: Install antlr4-rust-gen
+      run: cargo install --locked antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
     - name: Test
       shell: pwsh
       run: |
@@ -256,7 +256,7 @@ jobs:
     - name: Test Rust
       run: rustup --version
     - name: Install antlr-rust-codegen
-      run: cargo install antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
+      run: cargo install --locked antlr-rust-codegen --version 0.33.1 --bin antlr4-rust-gen
     - name: Test
       shell: bash
       run: |

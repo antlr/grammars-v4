@@ -8,4 +8,4 @@ name = "test"
 path = "src/main.rs"
 
 [dependencies]
-antlr-rust-runtime = "0.32.0"
+antlr-rust-runtime = "0.33.1"

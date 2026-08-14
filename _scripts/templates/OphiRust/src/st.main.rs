@@ -10,6 +10,7 @@ use antlr4_runtime::{
     CommonTokenStream, ErrorListener, InputStream, IntStream, Recognizer, SyntaxErrorEvent,
 };
 
+mod lexer_base;
 mod r#gen;
 use r#gen::<ophirust_lexer_name>;
 use r#gen::<ophirust_parser_name>;
@@ -94,7 +95,7 @@ fn parse_input(
     };
 
     let istream = InputStream::new(&input);
-    let mut lexer = <ophirust_lexer_name>::new(istream);
+    let mut lexer = <ophirust_lexer_name>::with_hooks(istream, lexer_base::LexerBase::new());
     lexer.remove_error_listeners();
     lexer.add_error_listener(CountingErrorListener {
         quiet: flags.quiet,

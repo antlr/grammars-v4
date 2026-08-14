@@ -4,17 +4,17 @@ use crate::r#gen::awk_lexer::{
     BUILTIN_FUNC_NAME, CHANNEL_DEFAULT_TOKEN_CHANNEL, DECR, INCR, NUMBER, RB, RP, STRING, WORD,
 };
 
-pub struct AwkLexerBase {
+pub struct LexerBase {
     after_expr: bool,
 }
 
-impl AwkLexerBase {
+impl LexerBase {
     pub fn new() -> Self {
         Self { after_expr: false }
     }
 }
 
-impl SemanticHooks for AwkLexerBase {
+impl SemanticHooks for LexerBase {
     const ENABLES_LEXER_LIFECYCLE: bool = true;
 
     fn lexer_sempred<I>(
