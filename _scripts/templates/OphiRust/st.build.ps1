@@ -25,4 +25,7 @@ $env:RUSTFLAGS = "-C link-arg=/STACK:16777216"
 <endif>
 
 $(& cargo b --release ; $compile_exit_code = $LASTEXITCODE) | Write-Host
+
+Get-ChildItem -Recurse src/ | Write-Host
+
 exit $compile_exit_code
