@@ -24,8 +24,29 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 grammar awk;
 
+@lexer::members {
+    private bool _afterExpr = false;
+
+    public override Antlr4.Runtime.IToken NextToken()
+    {
+        var token = base.NextToken();
+        if (token.Channel == 0) // DEFAULT_CHANNEL
+        {
+            _afterExpr = token.Type == WORD
+                      || token.Type == NUMBER
+                      || token.Type == STRING
+                      || token.Type == BUILTIN_FUNC_NAME
+                      || token.Type == INCR
+                      || token.Type == DECR
+                      || token.Text == ")"
+                      || token.Text == "]";
+        }
+        return token;
+    }
+}
+
 program
-    : item_list item? EOF
+    : newline_opt item_list item? EOF
     ;
 
 item_list
@@ -44,7 +65,7 @@ param_list_opt
     ;
 
 param_list
-    : name (',' name)*
+    : name (',' newline_opt name)*
     ;
 
 pattern
@@ -114,6 +135,7 @@ simple_statement_opt
 
 simple_statement
     : DELETE name '[' expr_list ']'
+    | DELETE name
     | expr
     | print_statement
     ;
@@ -460,11 +482,17 @@ SUB_ASSIGN
     ;
 
 COMMENT
-    : '#' .*? NEWLINE -> channel(HIDDEN)
+    : '#' ~[\r\n]* -> channel(HIDDEN)
     ;
 
 ERE
-    : '/' (~[/\\\r\n] | ESCAPE_SEQUENCE)* '/'
+    : {!_afterExpr}? '/' ERE_BODY* '/'
+    ;
+
+fragment ERE_BODY
+    : ~[/\\\r\n\u005B]
+    | ESCAPE_SEQUENCE
+    | '[' '^'? ']'? (~[\]\\\r\n] | ESCAPE_SEQUENCE)* ']'
     ;
 
 ESC_NEWLINE
@@ -511,7 +539,8 @@ fragment EXPONENT_PART
     ;
 
 fragment FLOAT_CONSTANT
-    : DIGIT_SEQUENCE '.' DIGIT_SEQUENCE EXPONENT_PART?
+    : DIGIT_SEQUENCE '.' DIGIT_SEQUENCE? EXPONENT_PART?
+    | '.' DIGIT_SEQUENCE EXPONENT_PART?
     | DIGIT_SEQUENCE EXPONENT_PART
     ;
 

@@ -1,0 +1,329 @@
+2020-07-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	By fiat, we use bison for $(YACC). Trying to accommodate
+	different versions didn't work.
+
+	* makefile: Significant cleanup. Replace all ytab* references
+	with awkgram.tab.* and simplify definition of YACC.
+	* .gitignore: Remove ytab* references.
+	* b.c, lex.c, maketab.c, parse.c, run.c: Replace include of ytab.h
+	with awkgram.tab.h.
+	* lib.c, main.c, tran.c: Remove include of ytab.h, wasn't needed.
+
+2020-01-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* run.c (openfile): Set the close-on-exec flag for file
+	and pipe redirections that aren't stdin/stdout/stderr.
+
+2020-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Minor fixes.
+	* b.c (replace_repeat): Turn init_q back into an int.
+	* lex.c (string): Use \a instead of \007.
+	* tran.c (catstr): Use snprintf instead of sprintf.
+
+2020-01-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* tran.c (syminit, arginit, envinit): Free sval member before
+	setting it. Thanks to valgrind.
+	* b.c: Small formatting cleanups in several routines.
+
+2019-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* b.c (replace_repeat): Fix a bug whereby a{0,3} could match
+	four a's.  Thanks to Anonymous AWK fan <awkfan77@mailfence.com>
+	for the report. Also, minor code formatting cleanups.
+	* testdir/T.int-expr: New file.
+
+2019-12-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README: Renamed to ...
+	* README.md: ... this. Cleaned up some as well,
+	including moving to Markdown.
+
+2019-11-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* test/T.chem: Use $oldawk instead of hardwiring 'awk'.
+	* test/T.lilly: Remove gawk warnings from output, improves
+	portability.
+
+2019-10-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* b.c (fnematch): Change type of pbuf from unsigned char to char.
+	* proto.h (fnematch): Ditto.
+
+2019-10-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* lib.c (readrec): Allow RS a regular expression. Imported
+	the code from the NetBSD awk.
+	* b.c (fnematch): New function for implementing the feature.
+	* awk.1: Updated.
+	* main.c (version): Updated.
+
+2019-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* makefile: Revise to take into account there is no more awktest.tar,
+	add targets 'check' and 'test', and also 'testclean' to clean up
+	after test run.  Have 'clean' and 'cleaner' depend upon 'testclean'.
+
+2019-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* testdir: Extracted from awktest.tar and added to Git.
+	* awktest.tar: Removed.
+
+2019-06-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.1: Fix a typo, minor edits.
+
+2019-06-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* b.c (relex): Count parentheses and treat umatched right paren
+	as a literal character.
+	* awktest.tar (testdir/T.re): Added a test case.
+	* main.c (version): Updated.
+
+2019-05-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* lib.c (isclvar): Remove check for additional '=' after
+	first one. No longer needed.
+
+2019-01-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (version): Updated.
+
+2019-01-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* run.c (awkgetline): Check for numeric value in all getline
+	variants. See the numeric-getline.* files in bugs-fixed directory.
+
+2018-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* REGRESS: Check for existence of a.out. If not there, run
+	make.  Enable core dumps for T.arnold system status test
+	to work on MacOS X.
+
+2018-08-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awktest.tar (testdir/T.expr): Fix test for unary plus.
+
+2018-08-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* REGRESS: Extract tests if necessary, set PATH to include '.'.
+	* regdir/beebe.tar (Makefile): Fix longwrds test to prefix
+	sort with LC_ALL=C.
+	* awktest.tar: Updated from fixed test suite, directory
+	it extracts is now called 'testdir' to match what's in top-level
+	REGRESS script.
+	* regdir: Removed, as Brian wants to keep the test suite in
+	the tar file.
+
+2018-08-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* FIXES, lib.c, run.c, makefile, main.c: Merge from Brian's tree.
+	* REGRESS: New file, from Brian.
+	* awktest.tar: Restored from Brian's tree.
+
+2018-08-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkgram.y (UPLUS): New token. In the grammar, call op1()
+	with it.
+	* maketab.c (proc): Add entry for UPLUS.
+	* run.c (arith): Handle UPLUS.
+	* main.c (version): Updated.
+	* bugs-fixed/unary-plus.awk, bugs-fixed/unary-plus.bad,
+	bugs-fixed/unary-plus.ok: New files.
+
+2018-08-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* TODO: Updated.
+	* awk.1: Improve use of macros, add some additional explanation
+	in a few places, alphabetize list of variables.
+
+2018-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h (Cell): Add new field `fmt' to track xFMT value used
+	for a string conversion.
+	[CONVC, CONVO]: New flag macros.
+	* bugs-fixed/README: Updated.
+	* bugs-fixed/string-conv.awk, bugs-fixed/string-conv.bad,
+	bugs-fixed/string-conv.ok: New files.
+	* main.c (version): Updated.
+	* proto.h (flags2str): Add declaration.
+	* tran.c (setfval): Clear CONVC and CONVO flags and set vp->fmt
+	to NULL.
+	(setsval): Ditto. Add large comment and new code to manage
+	correct conversion of number to string based on various flags
+	and the value of vp->fmt. The idea is to not convert again
+	if xFMT is the same as before and we're doing the same conversion.
+	Otherwise, clear the old flags, set the new, and reconvert.
+	(flags2str): New function. For debug prints and for use from a debugger.
+
+2018-08-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix filename conflicts in regdir where the only difference was
+	in letter case. This caused problems on Windows systems.
+
+	* regdir/Compare.T1: Renamed from regdir/Compare.T.
+	* regdir/t.delete0: Renamed from regdir/t.delete.
+	* regdir/t.getline1: Renamed from regdir/t.getline.
+	* regdir/t.redir1: Renamed from regdir/t.redir.
+	* regdir/t.split1: Renamed from regdir/t.split.
+	* regdir/t.sub0: Renamed from regdir/t.sub.
+	* regdir/REGRESS: Adjusted.
+
+2018-08-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	With scalpel, tweasers, magnifying glass and bated breath,
+	borrow code from the NetBSD version of nawk to fix the years-old
+	bug whereby decrementing the value of NF did not change the
+	record.
+
+	* lib.c (fldbld): Set donerec to 1 when done.
+	(setlastfld): New function.
+	* proto.h (setlastfld): Add declaration.
+	* run.c (copycell): Make code smarter about flags (from NetBSD code).
+	* tran.c (setfree): New function.
+	* tran.c (setfval): Normalize negative zero to positive zero.
+	If setting NF, clear donerec and call setlastfld().
+	(setsval): Remove call to save_old_OFS().  If setting OFS, call
+	recbld(). If setting NF, clear donerec and call setlastfld().
+
+	As part of the process, revert OFS-related changes of 2018-05-22:
+
+	* awk.h (saveOFS, saveOFSlen, save_old_OFS): Remove declarations.
+	* lib.c (recbld): Use *OFS instead of saveOFS.
+	* run.c (saveOFS, saveOFSlen, save_old_OFS): Remove.
+	* tran.c (syminit): Remove initialization of saveOFS and saveOFSlen.
+
+	General stuff that goes along with all this:
+
+	* bugs-fixed/README: Updated.
+	* bugs-fixed/decr-NF.awk, bugs-fixed/decr-NF.bad,
+	bugs-fixed/decr-NF.ok: New files.
+	* main.c (version): Updated.
+	* regdir/README.TESTS: Fix awk book title.
+	* regdir/T.misc: Revise test to match fixed code.
+	* run.c (format): Increase size of buffer used for %a test. (Unrelated
+	to NF or OFS, but fixes a compiler complaint.)
+
+2018-06-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regdir/beebe.tar: Fix longwrds.ok so that the test will pass.
+	The file was incorrectly sorted.
+
+2018-06-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regdir/T.lilly: Fix the bug again in the second instance
+	of the code. Thanks to BWK for pointing this out.
+
+2018-05-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regdir/T.lilly: Fix a syntax error and ordering bug
+	in creating the 'foo' file.
+
+2018-05-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.1: Remove standalone 'awk' at the top of file, it messed up
+	the formatting. Arrange built-in variable list in alphabetical
+	order.
+
+2018-05-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (version): Add my email address and a date so that
+	users can tell this isn't straight BWK awk.
+	* README.md: Minor updates.
+	* TODO: Updated.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Add POSIX-required formats %a and %A.
+
+	* run.c (format): Check for %a support in C library. If there,
+	allow %a and %A as valid formats.
+	* TODO: Updated.
+	* bugs-fixed/README: Updated.
+	* bugs-fixed/a-format.awk, bugs-fixed/a-format.bad,
+	bugs-fixed/a-format.ok: New files.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* FIXES: Restored a line from a much earlier version that
+	apparently got lost when the dates were reordered.
+	* TODO: Updated.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.md: New file.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regdir/echo.c, regdir/time.c: Minor fixes to compile without
+	warning on current GCC / Linux.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* TODO: New file.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* makefile (gitadd, gitpush): Remove these targets. They
+	should not be automated and were incorrect for things that
+	would be done regularly.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix nawk so that [[:blank:]] only matches space and tab instead
+	of any whitespace character, originally made May 10, 2018.
+	See bugs-fixed/space.awk.
+
+	This appears to have been a thinko on Brian's part.
+
+	* b.c (charclasses): Use xisblank() function for [[:blank:]].
+	* bugs-fixed/README: Updated.
+	* bugs-fixed/space.awk, bugs-fixed/space.bad,
+	bugs-fixed/space.ok: New files.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* .gitignore: New file.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix nawk to provide reasonable exit status for system(),
+	a la gawk, originally made March 12, 2016. See
+	bugs-fixed/system-status.awk.
+
+	* run.c (bltin): For FSYSTEM, use the macros defined for wait(2)
+	to produce a reasonable exit value, instead of doing a floating-point
+	division by 256.
+	* awk.1: Document the return status values.
+	* bugs-fixed/README: Updated.
+	* bugs-fixed/system-status.awk, bugs-fixed/system-status.bad,
+	bugs-fixed/system-status.ok: New files.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Bug fix with respect to rebuilding a record, originally
+	made August 19, 2014. See bugs-fixed/ofs-rebuild.awk.
+
+	* awk.h (saveOFS, saveOFSlen): Declare new variables.
+	* lib.c (recbld): Use them when rebuilding the record.
+	* run.c (saveOFS, saveOFSlen): Define new variables.
+	(save_old_OFS): New function to save OFS aside.
+	* tran.c (syminit): Initialize saveOFS and saveOFSlen.
+	(setsval): If setting a field, call save_old_OFS().
+	* bugs-fixed/README, bugs-fixed/ofs-rebuild.awk,
+	bugs-fixed/ofs-rebuild.bad, bugs-fixed/ofs-rebuild.ok: New files.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* makefile (YACC): Use bison.
+
+2018-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog: Created.
+	* regdir: Created. Based on contents of awktest.a.
+	* .gitattributes: Created, to preserve CR LF in regdir/t.crlf.
+	* awktest.a: Removed.
+	* regdir/T.gawk, regdir/T.latin1: Updated from awktest.tar.
+	* awktest.tar: Removed.
