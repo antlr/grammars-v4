@@ -116,10 +116,10 @@ simpleStatement
     | showCreateProcedureStatement
     | showCreateFunctionStatement
     | showCreateTriggerStatement
-    | showCreateProcedureStatusStatement
-    | showCreateFunctionStatusStatement
-    | showCreateProcedureCodeStatement
-    | showCreateFunctionCodeStatement
+    | showProcedureStatusStatement
+    | showFunctionStatusStatement
+    | showProcedureCodeStatement
+    | showFunctionCodeStatement
     | showCreateEventStatement
     | showCreateUserStatement
     | resourceGroupManagement
@@ -152,7 +152,7 @@ alterStatement
     ;
 
 alterDatabase
-    : DATABASE_SYMBOL schemaRef alterDatabaseOption+
+    : DATABASE_SYMBOL schemaRef? alterDatabaseOption+
     ;
 
 alterDatabaseOption
@@ -399,13 +399,13 @@ viewCheckOption
 
 alterInstanceStatement
     : INSTANCE_SYMBOL ROTATE_SYMBOL textOrIdentifier MASTER_SYMBOL KEY_SYMBOL
-    | {this.isServerVersionGe80024()}? (
+    | {this.isServerVersionGe80024()}? INSTANCE_SYMBOL (
         RELOAD_SYMBOL TLS_SYMBOL (
             NO_SYMBOL ROLLBACK_SYMBOL ON_SYMBOL ERROR_SYMBOL
             | FOR_SYMBOL CHANNEL_SYMBOL identifier (
                 NO_SYMBOL ROLLBACK_SYMBOL ON_SYMBOL ERROR_SYMBOL
             )?
-        )
+        )?
         | (ENABLE_SYMBOL | DISABLE_SYMBOL) identifier identifier
         | RELOAD_SYMBOL KEYRING_SYMBOL
     )
@@ -676,7 +676,7 @@ tsOptionEncryption
     ;
 
 tsOptionEngineAttribute
-    : ENGINE_SYMBOL EQUAL_OPERATOR? jsonAttribute
+    : ENGINE_ATTRIBUTE_SYMBOL EQUAL_OPERATOR? jsonAttribute
     ;
 
 createView
@@ -732,10 +732,10 @@ createSpatialReference
     ;
 
 srsAttribute
-    : NAME_SYMBOL TEXT_SYMBOL textStringNoLinebreak
-    | DEFINITION_SYMBOL TEXT_SYMBOL textStringNoLinebreak
+    : NAME_SYMBOL textStringNoLinebreak
+    | DEFINITION_SYMBOL textStringNoLinebreak
     | ORGANIZATION_SYMBOL textStringNoLinebreak IDENTIFIED_SYMBOL BY_SYMBOL real_ulonglong_number
-    | DESCRIPTION_SYMBOL TEXT_SYMBOL textStringNoLinebreak
+    | DESCRIPTION_SYMBOL textStringNoLinebreak
     ;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1016,7 +1016,7 @@ loadDataFileTargetList
     ;
 
 fieldOrVariableList
-    : (columnRef | AT_SIGN_SYMBOL textOrIdentifier | AT_AT_SIGN_SYMBOL) (
+    : (columnRef | AT_SIGN_SYMBOL textOrIdentifier | AT_TEXT_SUFFIX | AT_AT_SIGN_SYMBOL) (
         COMMA_SYMBOL (
             columnRef
             | AT_SIGN_SYMBOL textOrIdentifier
@@ -1469,7 +1469,7 @@ transactionOrLockingStatement
     ;
 
 transactionStatement
-    : START_SYMBOL TRANSACTION_SYMBOL startTransactionOptionList*
+    : START_SYMBOL TRANSACTION_SYMBOL (startTransactionOptionList (COMMA_SYMBOL startTransactionOptionList)*)?
     | COMMIT_SYMBOL WORK_SYMBOL? (AND_SYMBOL NO_SYMBOL? CHAIN_SYMBOL)? (
         NO_SYMBOL? RELEASE_SYMBOL
     )?
@@ -1868,7 +1868,8 @@ replicaThreadOption
     ;
 
 groupReplication
-    : (START_SYMBOL groupReplicationStartOptions? | STOP_SYMBOL) GROUP_REPLICATION_SYMBOL
+    : START_SYMBOL GROUP_REPLICATION_SYMBOL groupReplicationStartOptions?
+    | STOP_SYMBOL GROUP_REPLICATION_SYMBOL
     ;
 
 groupReplicationStartOptions
@@ -2124,7 +2125,7 @@ withRoles
     ;
 
 grantAs
-    : AS_SYMBOL USER_SYMBOL withRoles?
+    : AS_SYMBOL user withRoles?
     ;
 
 versionedRequireClause
@@ -2561,20 +2562,20 @@ showCreateTriggerStatement
     : SHOW_SYMBOL CREATE_SYMBOL TRIGGER_SYMBOL triggerRef
     ;
 
-showCreateProcedureStatusStatement
-    : SHOW_SYMBOL CREATE_SYMBOL PROCEDURE_SYMBOL STATUS_SYMBOL likeOrWhere?
+showProcedureStatusStatement
+    : SHOW_SYMBOL PROCEDURE_SYMBOL STATUS_SYMBOL likeOrWhere?
     ;
 
-showCreateFunctionStatusStatement
-    : SHOW_SYMBOL CREATE_SYMBOL FUNCTION_SYMBOL STATUS_SYMBOL likeOrWhere?
+showFunctionStatusStatement
+    : SHOW_SYMBOL FUNCTION_SYMBOL STATUS_SYMBOL likeOrWhere?
     ;
 
-showCreateProcedureCodeStatement
-    : SHOW_SYMBOL CREATE_SYMBOL PROCEDURE_SYMBOL CODE_SYMBOL procedureRef
+showProcedureCodeStatement
+    : SHOW_SYMBOL PROCEDURE_SYMBOL CODE_SYMBOL procedureRef
     ;
 
-showCreateFunctionCodeStatement
-    : SHOW_SYMBOL CREATE_SYMBOL FUNCTION_SYMBOL CODE_SYMBOL functionRef
+showFunctionCodeStatement
+    : SHOW_SYMBOL FUNCTION_SYMBOL CODE_SYMBOL functionRef
     ;
 
 showCreateEventStatement
@@ -2743,7 +2744,7 @@ vcpuNumOrRange
     ;
 
 resourceGroupPriority
-    : THREAD_PRIORITY_SYMBOL equal? INT_NUMBER
+    : THREAD_PRIORITY_SYMBOL equal? MINUS_OPERATOR? INT_NUMBER
     ;
 
 resourceGroupEnableDisable
@@ -4014,7 +4015,7 @@ ifExists
     ;
 
 ifExistsIdentifier
-    : ifExists persistedVariableIdentifier
+    : ifExists? persistedVariableIdentifier
     ;
 
 persistedVariableIdentifier
