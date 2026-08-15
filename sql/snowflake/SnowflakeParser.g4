@@ -4364,6 +4364,7 @@ expr
     | expr OR expr  //bool operation
     | arr_literal
     //    | expr time_zone
+    | EXISTS LR_BRACKET subquery RR_BRACKET // EXISTS as a boolean expression (e.g. row access policy body)
     | expr over_clause
     | cast_expr
     | expr COLON_COLON data_type // Cast also
