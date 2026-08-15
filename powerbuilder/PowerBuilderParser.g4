@@ -305,7 +305,7 @@ statement
     | sql_statement
     | sql_commit_statement
     | open_cursor_statement
-    | prepare_sql_stateent
+    | prepare_sql_statement
     | declare_cursor_statement
     | close_cursor_statement
     | fetch_into_statement
@@ -432,7 +432,7 @@ fetch_into_statement
     : FETCH (variable_name INTO bind_param | identifier USING DESCRIPTOR? identifier) SEMI?
     ;
 
-prepare_sql_stateent
+prepare_sql_statement
     : PREPARE variable_name FROM bind_param USING (SQLCA | identifier_name) SEMI
     ;
 
