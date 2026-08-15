@@ -4100,6 +4100,7 @@ non_reserved_words
     | EVENT
     | EXCHANGE
     | EXCLUDE
+    | EXCLUDING
     | EXECUTION
     | EXPIRY_DATE
     | EXPR
@@ -4499,9 +4500,15 @@ asc_desc
     ;
 
 over_clause
-    : OVER '(' partition_by order_by_expr? ')'
+    : OVER '(' window_partition_by order_by_expr? ')'
     | OVER '(' order_by_expr ')'
     | OVER '(' ')'
+    ;
+
+// Kept separate from partition_by, the unrelated file-layout clause of COPY INTO <location>,
+// CREATE EXTERNAL TABLE and MATCH_RECOGNIZE, none of which accept EXCLUDING.
+window_partition_by
+    : PARTITION BY EXCLUDING? expr_list
     ;
 
 function_call
