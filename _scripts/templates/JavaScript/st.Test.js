@@ -1,6 +1,7 @@
 // Generated from trgen <version>
 
 import antlr4 from 'antlr4';
+import path from 'path';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
 import BinaryCharStream from './BinaryCharStream.js';
@@ -47,6 +48,7 @@ class MyErrorListener extends antlr4.error.ErrorListener {
 }
 
 var tee = false;
+var output_dir = '';
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
@@ -84,6 +86,10 @@ function main() {
                 is_fns.push(false);
                 break;
             case '-tee':
+                tee = true;
+                break;
+            case '-o':
+                output_dir = process.argv[++i];
                 tee = true;
                 break;
             case '-encoding':
@@ -178,13 +184,20 @@ function ParseFilename(input, row_number) {
 }
 
 function DoParse(str, input_name, row_number) {
+    var out_name = input_name;
+    if (output_dir) {
+        const absPath = path.resolve(input_name);
+        const rootless = absPath.slice(path.parse(absPath).root.length);
+        out_name = path.join(output_dir, rootless);
+        fs.mkdirsSync(path.dirname(out_name));
+    }
     if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    var output = tee ? fs.openSync(input_name + ".errors", 'w') : 1;
+    var output = tee ? fs.openSync(out_name + ".errors", 'w') : 1;
     var listener_parser = new MyErrorListener(quiet, tee, output);
     var listener_lexer = new MyErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
@@ -226,7 +239,7 @@ function DoParse(str, input_name, row_number) {
     }
     if (show_tree) {
         if (tee) {
-            fs.writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames));
+            fs.writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames));
         } else {
             console.error(tree.toStringTree(parser.ruleNames));
         }

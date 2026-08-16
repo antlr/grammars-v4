@@ -1,0 +1,330 @@
+{ Syntax for the programming language Oberon.
+
+  This ixml grammar was derived from Niklaus Wirth's 
+  syntax description for Oberon, mostly automatically but
+  partly by hand.  
+
+  Manual changes made in Oberon.1.ixml:
+
+  - Case inconsistencies in the original have been repaired
+    (hexDigit/hexdigit, Case/case).
+  - FieldList has been changed to allow a field list to be empty.
+    This follows the grammar of 1996 and allows the last field list in 
+    a record type to be followed by a semicolon, which matches the 
+    practice in the source code for the compiler.  The grammar of 
+    2013 requires a field list to be non-empty, which has the effect
+    of making a semicolon before the final END of a record definition
+    into a syntactic error.  
+  - Definitions have been supplied for character and letter.
+  - The definition of string has been changed to specify double not
+    single quotes, to match what is actually present in the 
+    source code.
+  - Literals used with multiple meanings have been distinguished
+    (MUL/STAR, EQUALS/EQL).
+  - For literals used as operators or which are otherwise semantically
+    required, their nonterminals have been marked non-hidden
+    (though the actual literal is still suppressed).  (So in 
+    "1+2" the output will have an empty 'PLUS' element.)
+  - The rules for digit and hexDigit have been reformulated.
+  - The rules for real and ScaleFactor have been adjusted to 
+    remove the automatically added references to 's'.
+
+  Further changes made in this version:
+
+  - In IfStatement, CaseStatement, WhileStatement, and
+    RepeatStatement, some occurrences of 'expression' and
+    'StatementSequence' have been replaced by the new nonterminals
+    'Condition', 'Then-Statements', and 'Else-Statements' to make the
+    abstract structure clearer in the XML (although it remains
+    dependent on the sequence of elements).
+
+  - Names have been given to make it simpler to distinguish the
+    different kinds of qualifiers (field-references, array subscripts,
+    type guards, and pointer dereferencing).
+
+  - The rules for ident, integer, real, and string have been adjusted
+    to ensure that comments following these tokens appear outside, not
+    inside, the corresponding element.  (References to ident have been
+    replaced by references to _ident_, which is defined as ident
+    followed by whitespace, and similarly for integer and string; real
+    is simpler.)
+
+  - The expression subgrammar has been modified so that most 
+    elements are used as containers only if they have more than one
+    child.  So a number may be represented as <integer>42</integer>
+    and not as <expression><SimpleExpression><term><factor><number>
+    <integer>42</integer></number></factor></term></SimpleExpression>
+    </expression>.  As with the preceding item, this involves making
+    new nonterminals by adding _ at the beginning and end of the 
+    base name.    
+
+  - The rule for designator has been revised to eliminate ambiguity.
+
+    As written, it allows a qualified identifer (e.g. A or A.B) to be
+    followed optionally by one or more selector (such as .C), so that
+    A.B can be either a qualified identifier with no selectors (then A
+    is a module name and B an identifier in that module) or a simple
+    identifier followed by a field reference.  The ambiguity is
+    resolved in practice by looking up the identifiers involved to see
+    if they are the names of imported modules or fields.
+
+    To eliminate the ambiguity, designator has been rewritten to allow
+    either a double identifier followed optionally by selectors, or a
+    single identifier also followed optionally by selectors, with the
+    proviso that the first selector must not be a field reference.
+
+  - The rule for selector has also been revised to eliminate an
+    ambiguity between type guards and actual parameters on procedure
+    calls.  To eliminate the ambiguity, type guards are assumed to
+    apply to an immediately following field reference or dereference,
+    and the change is to require that a type guard in fact be followed
+    by a further selector.  This is at least consistent with the
+    examples of type guards given in the documentation.
+
+  - The rule for factor has been revised to eliminate the references to
+    the keywords NIL, TRUE, and FALSE.  In a system with no upstream
+    lexer, these references make the grammar ambiguous, since each of
+    these keywords also matches the rule for identifiers.  The problem
+    does not arise for other keywords.
+ 
+}
+
+              module = s?, MODULE, _ident_, SEMI, 
+                       ImportList?, DeclarationSequence, 
+                       (BEGIN, StatementSequence)?, 
+                       END, _ident_, DOT.
+
+              -digit = ["0" - "9"].
+           -hexDigit = -digit | ["A" - "F"].
+            -_ident_ = ident, s?.
+	       ident = -letter, (-letter | -digit)*.
+           qualident = (_ident_, DOT)?, _ident_.
+            identdef = _ident_, STAR?.
+          -_integer_ = integer, s?.
+             integer = -digit, -digit*
+	             | -digit, hexDigit*, "H"
+		     .
+                real = -digit, -digit*, ".", -digit*, ScaleFactor?.
+         ScaleFactor = ["ED"], ["+-"]?, -digit, -digit*.
+              number = _integer_ | real, s?.
+            -_string_ = string, s?
+	             | CharConstant, s?
+		     .
+              string = -'"', -character*, -'"'.
+        CharConstant = -digit, -hexDigit*, HEXMARK.
+    ConstDeclaration = identdef, EQUALS, ConstExpression.
+     ConstExpression = _expression_.
+     TypeDeclaration = identdef, EQUALS, StrucType.
+           StrucType = ArrayType
+	             | RecordType
+		     | PointerType
+		     | ProcedureType
+		     .
+                type = qualident
+		     | StrucType
+		     .
+           ArrayType = ARRAY, length, (COMMA, length)*, OF, type.
+              length = ConstExpression.
+          RecordType = RECORD, (LPAR, BaseType, RPAR)?,
+	               FieldListSequence?,
+		       END.
+            BaseType = qualident.
+   FieldListSequence = FieldList, (SEMI, FieldList)*.
+           FieldList = (IdentList, COLON, type)?.
+           IdentList = identdef, (COMMA, identdef)*.
+         PointerType = POINTER, TO, type.
+       ProcedureType = PROCEDURE, FormalParameters?.
+ VariableDeclaration = IdentList, COLON, type. 
+       -_expression_ = expression | _SimpleExpression_.
+          expression = _SimpleExpression_, relation, _SimpleExpression_.
+            relation = EQL | NEQ | LSS | LEQ | GTR | GEQ | IN | IS.
+ -_SimpleExpression_ = SimpleExpression | _term_.
+    SimpleExpression = (PLUS | MINUS), _term_
+    		     | (PLUS | MINUS)?, _term_, (AddOperator, _term_)+.
+         AddOperator = PLUS | MINUS | OR.
+             -_term_ = term | _factor_.
+                term = _factor_, (MulOperator, _factor_)+.
+         MulOperator = MUL | SLASH | DIV | MOD | AND.
+           -_factor_ = factor
+	             | number
+	             | _string_
+		   { | NIL | TRUE | FALSE } { parse these keywords as identifiers }
+		     | set
+		     | designator
+		     | LPAR, _expression_, RPAR
+		     .
+              factor = designator, ActualParameters
+		     | NEGATION, -_factor_
+		     .
+        { designator = qualident, (selector)*. }
+          designator = double-ident, selector*
+	  	     | single-ident, (non-field-selector, selector*)?
+		     .
+       -single-ident = _ident_.
+        double-ident = _ident_, DOT, _ident_.
+           -selector = field-ref
+	             | -non-field-selector
+		     .
+ -non-field-selector = subscript
+		     | UP
+		     | typeguard, (field-ref | UP)
+		     .
+	   field-ref = DOT, _ident_.
+	   subscript = LBRKT, ExpList, RBRKT.
+	   typeguard = LPAR, qualident, RPAR.
+                 set = LBRACE, (element, (COMMA, element)*)?, RBRACE.
+             element = _expression_, (DOTDOT, _expression_)?.
+             ExpList = _expression_, (COMMA, _expression_)*.
+    ActualParameters = LPAR, ExpList?, RPAR.
+           statement = ( assignment
+	               | ProcedureCall
+		       | IfStatement
+		       | CaseStatement
+		       | WhileStatement
+		       | RepeatStatement
+		       | ForStatement
+		       )?
+		     .
+          assignment = designator, GETS, _expression_.
+       ProcedureCall = designator, (ActualParameters)?.
+   StatementSequence = statement, (SEMI, statement)*.
+         IfStatement = IF, Condition,
+	               THEN, Then-Statements,
+		       (ELSIF, Condition, THEN, Then-Statements)*,
+		       (ELSE, Else-Statements)?,
+		       END.
+           Condition = -_expression_.
+     Then-Statements = -StatementSequence.
+     Else-Statements = -StatementSequence.
+	   
+       CaseStatement = CASE, _expression_,
+                       OF, Case, (VBAR, Case)*,
+		       END.
+                Case = CaseLabelList, COLON, Then-Statements.
+       CaseLabelList = LabelRange, (COMMA, LabelRange)*.
+          LabelRange = label, (DOTDOT, label)?.
+               label = _integer_ | _string_ | _ident_.
+      WhileStatement = WHILE, Condition,
+                       DO, Do-Statements,
+		       (ELSIF, Condition,
+		       DO, Then-Statements)*,
+		       END.
+       Do-Statements = StatementSequence.
+     RepeatStatement = REPEAT, StatementSequence, UNTIL, Condition.
+        ForStatement = FOR, _ident_, GETS, _expression_,
+	               TO, _expression_,
+		       (BY, ConstExpression)?,
+		       DO, StatementSequence,
+		       END.
+ProcedureDeclaration = ProcedureHeading, SEMI, ProcedureBody, _ident_.
+    ProcedureHeading = PROCEDURE, identdef, (FormalParameters)?.
+       ProcedureBody = DeclarationSequence,
+                       (BEGIN, StatementSequence)?,
+		       (RETURN, _expression_)?,
+		       END.
+ DeclarationSequence = (CONST, (ConstDeclaration, SEMI)*)?,
+                       (TYPE, (TypeDeclaration, SEMI)*)?,
+		       (VAR, (VariableDeclaration, SEMI)*)?,
+		       (ProcedureDeclaration, SEMI)*.
+    FormalParameters = LPAR, (FPSection, (SEMI, FPSection)*)?, RPAR, (COLON, qualident)?.
+           FPSection = (CONST | VAR)?, _ident_, (COMMA, _ident_)*, COLON, FormalType.
+          FormalType = (ARRAY, OF)?, qualident.
+          ImportList = IMPORT, import, (COMMA, import)*, SEMI.
+              import = _ident_, (GETS, _ident_)?.
+
+{*  Rules added in translation, to simplify whitespace handling *}
+                  -s = (-[Zs; #9; #A; #D] | comment)+.
+
+             comment = -"(*", comment-body, -"*)".
+        comment-body = comment-chars, ((comment++comment-chars), comment-chars?)?.
+      -comment-chars = (cc1; cc2; cc3)+, star*, lpar* | star+, lpar* | lpar+.
+                -cc1 = not-star-or-lpar.
+                -cc2 = lpar+, not-star-or-lpar.
+  	        -cc3 = star+, lpar+, not-star-or-lpar
+                     | star+, not-star-or-lrpar.
+   -not-star-or-lpar = ~["*("].
+  -not-star-or-lrpar = ~["(*)"].
+               -lpar = "(".
+               -star = "*".
+
+{*  Rules added in translation, to fill gaps *}
+character = ~['"'].
+letter = [L].
+
+{* Operators (not hidden) *}
+{ Relations (on simple expressions) }
+ EQL = -"=", s?.
+ NEQ = -"#", s?.
+ LSS = -"<", s?.
+ LEQ = -"<=", s?.
+ GTR = -">", s?.
+ GEQ = -">=", s?.
+ IN = -"IN", s?.
+ IS = -"IS", s?.
+
+{ Arithmetic and logic operators }
+PLUS = -"+", s?.
+MINUS = -"-", s?.
+OR = -"OR", s?.
+MUL = -"*", s?.
+SLASH = -"/", s?.
+DIV = -"DIV", s?.
+MOD = -"MOD", s?.
+AND = -"&", s?.
+NEGATION = -"~", s?.
+
+{ Other operators, non-redundant keywords }
+STAR = -"*", s? { when not used as multiplication operator }.
+UP = -"^", s?.
+RETURN = -"RETURN", s?.
+TRUE = -"TRUE", s?.
+FALSE = -"FALSE", s?.
+NIL = -"NIL", s?.
+
+{ HEXMARK is handled specially. Literal X, not 
+  the nonterminal, and no trailing space. }
+-HEXMARK = "X".
+
+{* Delimiters (hidden) *}
+-LPAR = -"(", s?.
+-RPAR = -")", s?.
+-COMMA = -",", s?.
+-DOT = -".", s?.
+-DOTDOT = -"..", s?.
+-COLON = -":", s?.
+-GETS = -":=", s?.
+-SEMI = -";", s?.
+-EQUALS = -"=", s? { distinct from EQL operator }.
+-LBRKT = -"[", s?.
+-RBRKT = -"]", s?.
+-LBRACE = -"{", s?.
+-VBAR = -"|", s?.
+-RBRACE = -"}", s?.
+
+{* Keywords *}
+-ARRAY = -"ARRAY", s?.
+-BEGIN = -"BEGIN", s?.
+-BY = -"BY", s?.
+-CASE = -"CASE", s?.
+-CONST = -"CONST", s?.
+-DO = -"DO", s?.
+-ELSE = -"ELSE", s?.
+-ELSIF = -"ELSIF", s?.
+-END = -"END", s?.
+-FOR = -"FOR", s?.
+-IF = -"IF", s?.
+-IMPORT = -"IMPORT", s?.
+-MODULE = -"MODULE", s?.
+-OF = -"OF", s?.
+-POINTER = -"POINTER", s?.
+-PROCEDURE = -"PROCEDURE", s?.
+-RECORD = -"RECORD", s?.
+-REPEAT = -"REPEAT", s?.
+-THEN = -"THEN", s?.
+-TO = -"TO", s?.
+-TYPE = -"TYPE", s?.
+-UNTIL = -"UNTIL", s?.
+-VAR = -"VAR", s?.
+-WHILE = -"WHILE", s?.
+
+

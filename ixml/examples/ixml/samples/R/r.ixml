@@ -1,0 +1,351 @@
+prog : _ , expr_or_assign ** prog_separator , _
+.
+
+prog_separator
+: _ , semicolon , _
+; newline
+.
+
+-exprlist
+: expr_or_assign
+; exprlist , _ , semicolon , _ , expr_or_assign
+; exprlist , _ , semicolon
+; exprlist , newline , expr_or_assign
+; exprlist , newline
+.
+
+-expr_or_assign : expr ; equal_assign
+.
+
+equal_assign : expr , _ , eq_assign , _ , expr_or_assign
+.
+
+expr : expr_18
+.
+
+-expr_18
+: expr_16 , _ , question , _ , expr_16
+; question , _ , expr_16
+; expr_16
+.
+
+-expr_16
+: expr_15 , _ , left_assign , _ , expr_16
+; expr_15
+.
+
+-expr_15
+: expr_15 , _ , right_assign , _ , expr_14
+; expr_14
+.
+
+-expr_14
+: expr_14 , _ , tilda , _ , expr_13
+; tilda , expr_13
+; expr_13
+.
+
+-expr_13
+: expr_13 , _ , (or1 ; or2) , _ , expr_12
+; expr_12
+.
+
+-expr_12
+: expr_12 , _ , (and1 ; and2) , _ , expr_11
+; expr_11
+.
+
+-expr_11
+: not , _ , expr_10
+; expr_10
+.
+
+-expr_10
+: expr_9 , _ , compare , _ , expr_9
+; expr_9
+.
+
+-expr_9
+: expr_9 , _ , plus_minus , _ , expr_8
+; expr_8 .
+
+-expr_8
+: expr_8 , _ , times_divide , _ , expr_7
+; expr_7
+.
+
+-expr_7
+: expr_7 , _ , special , _ , expr_6
+; expr_6
+.
+
+-expr_6
+: expr_6 , _ , seq , _ , expr_5
+; expr_5
+.
+
+-expr_5
+: plus_minus , _ , expr_4
+; expr_4
+.
+
+-expr_4
+: expr_2 , _ , power , _ , expr_4
+; expr_2
+.
+
+-expr_2
+: function_definition
+; if , _ , ifcond , _ , expr_or_assign
+; if , _ , ifcond , _ , expr_or_assign , _ , else , _ , expr_or_assign
+; for , _ , forcond , _ , expr_or_assign
+; while , _ , cond , _ , expr_or_assign
+; repeat , _ , expr_or_assign
+; function_call
+; extract2_call
+; extract_call
+; block_expr
+; lpar , _ , expr_or_assign , _ , rpar
+; expr_0
+.
+
+function_definition
+: function , _ , lpar , _ , rpar , _ , expr_or_assign
+; function , _ , lpar , _ , formlist , _ , rpar , _ , expr_or_assign
+.
+
+function_call
+: bcns_expr , _ , lpar , _ , rpar
+; bcns_expr , _ , lpar , _ , sublist , _ , rpar
+.
+
+extract_call
+: bcns_expr , _ , lsbr , _ , ( sublist , _  )? , rsbr
+.
+
+extract2_call
+: bcns_expr , _ , dlsbr , _ , ( sublist , _ )? , drsbr
+.
+
+block_expr
+: lcbr , _ , rcbr
+; lcbr , _ , exprlist , _ , rcbr
+.
+
+{ bracketed compound or naked simple expression }
+bcns_expr
+: lpar, _ , expr , _, rpar
+; -expr_2 { was `expr_0`, but that fails on `f(x)[i]` }
+.
+
+-expr_0
+: bool ; num_const ; num
+; str_const
+; null_const
+; symbol
+; module_identifier , _ , ns_get , _ , symbol
+; module_identifier , _ , ns_get , _ , str_const
+; module_identifier , _ , ns_get_int , _ , symbol
+; module_identifier , _ , ns_get_int , _ , str_const
+; expr , _ , dollar , _ , symbol
+; expr , _ , dollar , _ , str_const
+; expr , _ , at , _ , symbol
+; expr , _ , at , _ , str_const
+; next
+; break
+.
+
+module_identifier
+: symbol
+; str_const
+.
+
+formlist
+: ( symbol , ( _ , eq_assign , _ , expr )? ) ++ ( _ , comma , _ )
+.
+
+sublist
+: sub ++ ( _ , comma , _ ) , ( _ , comma , _ )?
+.
+
+sub
+: expr
+; symbol , _ , eq_assign
+; symbol , _ , eq_assign , _ , expr
+; str_const , _ , eq_assign
+; str_const , _ , eq_assign , _ , expr
+; null_const , _ , eq_assign
+; null_const , _ , eq_assign , _ , expr
+.
+
+cond : lpar , _ , expr , _ , rpar
+.
+ifcond : lpar , _ , expr , _ , rpar
+.
+forcond : lpar ,  _ , symbol , __ , in , __ , expr , _ , rpar
+.
+
+eq_assign : '='
+.
+
+question : '?'
+.
+
+left_assign : '=' ; '<-' ; '<<-' ; #2190
+.
+
+right_assign : '->' ; '->>'
+.
+
+tilda : '~'
+.
+
+or1 : '|'
+.
+
+or2 : '||'
+.
+
+and1 : '&'
+.
+
+and2 : '&&'
+.
+
+not : '!'
+.
+
+compare : '<' ; '>' ; '<=' ; '>=' ; '==' ; '!='
+.
+
+plus_minus : '+' ; '-'
+.
+
+times_divide : '*' ; '/'
+.
+
+special
+: '%' , ~['%']* , '%'
+; '|>'
+.
+
+seq : ':'
+.
+
+power : '^'
+.
+
+function : 'function'
+.
+
+if : 'if'
+.
+
+else : 'else'
+.
+
+for : 'for'
+.
+
+in : 'in'
+.
+
+while : 'while'
+.
+
+repeat : 'repeat'
+.
+
+next : 'next'
+.
+
+break : 'break'
+.
+
+symbol : -id
+.
+
+ns_get : '::'
+.
+ns_get_int : ':::'
+.
+dollar : '$'
+.
+at : '@'
+.
+
+id
+: ['a'-'z';'A'-'Z'], ['a'-'z';'A'-'Z';'0'-'9';'.';'_']*
+; '.' , ( ['a'-'z';'A'-'Z';'.';'_'], ['a'-'z';'A'-'Z';'0'-'9';'.';'_']* )?
+.
+
+lpar : '('
+.
+rpar : ')'
+.
+
+lsbr : '['
+.
+rsbr : ']'
+.
+
+dlsbr : '[['
+.
+drsbr : ']', _ , ']'
+.
+
+lcbr : '{'
+.
+rcbr : '}'
+.
+
+null_const : 'NULL'
+.
+
+bool : 'TRUE' ; 'FALSE'
+.
+
+num_const : 'NA' ; 'Inf' ; 'NaN' ; 'NA_integer_' ; 'NA_real_' ; 'NA_character_' ; 'NA_complex_'
+.
+-num : integerLiteral; decimalLiteral; doubleLiteral
+.
+integerLiteral : -digits
+.
+decimalLiteral
+: '.', -digits
+; -digits, '.', ['0'-'9']*
+.
+doubleLiteral : ( '.', -digits ; -digits, ( '.', ['0'-'9']* )? ), ['e'; 'E'], -digits
+.
+digits :  ['0'-'9']+
+.
+
+str_const : -char
+.
+char
+: '"', ('\"';~['"'])*, '"'
+; "'",("\'";~["'"])*, "'"
+.
+
+comment : '#' , ~[#a;#d]*
+.
+
+-__
+: [" ";#9;#a;#d]+
+; [" ";#9]* , comment , [#a;#d]+ , _
+.
+
+-_
+: [" ";#9;#a;#d]*
+; [" ";#9]* , comment , [#a;#d]+ , _
+.
+
+comma : ','
+.
+
+semicolon : ';'
+.
+
+newline
+: ( [" ";#9]* , comment? , [#a;#d]+ ) , newline?
+.

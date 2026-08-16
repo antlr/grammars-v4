@@ -234,6 +234,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
+				<module>ixml</module>
 				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
