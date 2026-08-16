@@ -1,0 +1,129 @@
+{ The grammar notation defined by RFC 5234, "Augmented BNF for Syntax
+Specifications: ABNF", ed. D. Crocker and P. Overell, January 2008.
+
+The nonterminals used here are those of RFC 5234, but some definitions
+have been reformulated to use ixml idioms.  The definition of ABNF has
+no analogue to ixml marks for guiding XML serialization; the marks
+used here have been supplied by the transcriber.
+
+Transcribed into ixml by C. M. Sperberg-McQueen, February 2022.
+Updated by Norm Tovey-Walsh to incorporate errata, July 2023. }
+
+rulelist      = (rule | (WSP*, c-nl))+.
+
+rule          = rulename, defined-as, elements, c-nl.
+                     { continues if next line starts 
+                       with white space }
+
+rulename      = ALPHA, (ALPHA | DIGIT | "-")*.
+
+defined-as    = c-wsp*, ("=" | "=/"), c-wsp*.
+                     {  basic rules definition and 
+                        incremental alternatives }
+
+elements      = alternation, WSP*.
+
+c-wsp         = WSP | (c-nl, WSP).
+
+c-nl          = comment | CRLF.  { comment or newline }
+
+comment       = ";", (WSP | VCHAR)*, CRLF.
+
+alternation   = concatenation ** (c-wsp*, "/", c-wsp*).
+
+concatenation = repetition ** (c-wsp+).
+
+repetition    = repeat?, element.
+
+repeat        = DIGIT+ | (DIGIT*, "*", DIGIT*).
+
+element       = rulename | group | option 
+              | char-val | num-val | prose-val.
+
+group         = "(", c-wsp*, alternation, c-wsp*, ")".
+
+option        = "[", c-wsp*, alternation, c-wsp*, "]".
+
+char-val      = DQUOTE, [#20 - #21; #23 - #7E]*, DQUOTE.
+                     { quoted string of SP and VCHAR 
+                       without DQUOTE }
+
+num-val       = "%", (bin-val | dec-val | hex-val).
+
+bin-val       = "b", BIT+, ((".", BIT+)+ | ("-", BIT+))?.
+                     { series of concatenated bit values
+                       or single ONEOF range }
+
+dec-val       = "d", DIGIT+, ((".", DIGIT+)+ | ("-", DIGIT+))?.
+
+hex-val       = "x", HEXDIG+, ((".", HEXDIG+)+ | ("-", HEXDIG+))?.
+
+prose-val     = "<", [#20 - #3D; #3F - #7E]*, ">".
+                     { bracketed string of SP and VCHAR
+                       without angles
+                       prose description, to be used as
+                       last resort }
+
+{ 'Core rules' from Appendix B, intended for re-use. }
+
+ALPHA         = ["A"-"Z"; "a"-"z"]. { #41-#5A; #61-#7A }
+
+BIT           = "0"; "1".
+
+CR            = #0D. { carriage return }
+
+CRLF          = CR, LF { Internet standard newline }
+              | LF .   { Extension: support single LF convention for newlines }
+
+DIGIT         = ["0"-"9"]. { #30 - #39 }
+
+DQUOTE        = #22. { (Double Quote) }
+
+HEXDIG        = DIGIT; ["A"-"F"].
+
+HTAB	      = #09. { horizontal tab }
+
+LF	      = #0A. { linefeed }
+
+SP            = #20.
+
+VCHAR         = [#21 - #7E]. { visible (printing) characters }
+
+WSP           = SP | HTAB. { white space }
+
+{ Included in Appendix B for reuse elsewhere, but not used
+by ABNF itself: }
+
+{
+
+CHAR          = [#01 - #7F].  
+                     { Any 7-bit US-ASCII chracter, 
+                       excluding NUL }
+		       
+CTL           = [#00 - #1F; #7F]. { controls }
+		       
+LWSP	      = (WSP | CRLF, WSP)*.
+                     { Use of this linear-white-space rule
+                       permits lines containing only white
+                       space that are no longer legal in
+                       mail headers and have caused 
+                       interoperability problems in other
+                       contexts.
+                       Do not use when defining mail
+                       headers and use with caution in 
+                       other contexts. }
+
+OCTET         = [#00 - #FF]. { 8 bits of data }
+
+}
+
+
+{ Notes:
+
+- As noted in the comments, this grammar has been reported ambiguous
+  in a couple of places.
+
+- ABNF nonterminals are case-insensitive unless specified using
+  numeric values for the characters.
+
+}

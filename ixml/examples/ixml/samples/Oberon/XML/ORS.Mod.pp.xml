@@ -1,0 +1,3695 @@
+<module name="ORS">
+   <comment>
+      <comment-body> NW 19.9.93 / 15.3.2017  Scanner in Oberon-07</comment-body>
+   </comment>
+   <ImportList>
+      <import>
+         <ident>SYSTEM</ident>
+      </import>
+      <import>
+         <ident>Texts</ident>
+      </import>
+      <import>
+         <ident>Oberon</ident>
+      </import>
+      <comment>
+         <comment-body> Oberon Scanner does lexical analysis. Input is Oberon-Text, output is
+  sequence of symbols, i.e identifiers, numbers, strings, and special symbols.
+  Recognises all Oberon keywords and skips comments. The keywords are
+  recorded in a table.
+  Get(sym) delivers next symbol from input text with Reader R.
+  Mark(msg) records error and delivers error message with Writer W.
+  If Get delivers ident, then the identifier (a string) is in variable id, if int or char
+  in ival, if real in rval, and if string in str (and slen) </comment-body>
+      </comment>
+   </ImportList>
+   <DeclarationSequence>
+      <ConstDeclaration>
+         <identdef ident="IdLen" visible="*"/>
+         <integer>32</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="NKW"/>
+         <integer>34</integer>
+      </ConstDeclaration>
+      <comment>
+         <comment-body>nof keywords</comment-body>
+      </comment>
+      <ConstDeclaration>
+         <identdef ident="maxExp"/>
+         <integer>38</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="stringBufSize"/>
+         <integer>256</integer>
+      </ConstDeclaration>
+      <comment>
+         <comment-body>lexical symbols</comment-body>
+      </comment>
+      <ConstDeclaration>
+         <identdef ident="null"/>
+         <integer>0</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="times" visible="*"/>
+         <integer>1</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="rdiv" visible="*"/>
+         <integer>2</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="div" visible="*"/>
+         <integer>3</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="mod" visible="*"/>
+         <integer>4</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="and" visible="*"/>
+         <integer>5</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="plus" visible="*"/>
+         <integer>6</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="minus" visible="*"/>
+         <integer>7</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="or" visible="*"/>
+         <integer>8</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="eql" visible="*"/>
+         <integer>9</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="neq" visible="*"/>
+         <integer>10</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="lss" visible="*"/>
+         <integer>11</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="leq" visible="*"/>
+         <integer>12</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="gtr" visible="*"/>
+         <integer>13</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="geq" visible="*"/>
+         <integer>14</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="in" visible="*"/>
+         <integer>15</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="is" visible="*"/>
+         <integer>16</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="arrow" visible="*"/>
+         <integer>17</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="period" visible="*"/>
+         <integer>18</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="char" visible="*"/>
+         <integer>20</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="int" visible="*"/>
+         <integer>21</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="real" visible="*"/>
+         <integer>22</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="false" visible="*"/>
+         <integer>23</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="true" visible="*"/>
+         <integer>24</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="nil" visible="*"/>
+         <integer>25</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="string" visible="*"/>
+         <integer>26</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="not" visible="*"/>
+         <integer>27</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="lparen" visible="*"/>
+         <integer>28</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="lbrak" visible="*"/>
+         <integer>29</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="lbrace" visible="*"/>
+         <integer>30</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="ident" visible="*"/>
+         <integer>31</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="if" visible="*"/>
+         <integer>32</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="while" visible="*"/>
+         <integer>34</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="repeat" visible="*"/>
+         <integer>35</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="case" visible="*"/>
+         <integer>36</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="for" visible="*"/>
+         <integer>37</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="comma" visible="*"/>
+         <integer>40</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="colon" visible="*"/>
+         <integer>41</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="becomes" visible="*"/>
+         <integer>42</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="upto" visible="*"/>
+         <integer>43</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="rparen" visible="*"/>
+         <integer>44</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="rbrak" visible="*"/>
+         <integer>45</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="rbrace" visible="*"/>
+         <integer>46</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="then" visible="*"/>
+         <integer>47</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="of" visible="*"/>
+         <integer>48</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="do" visible="*"/>
+         <integer>49</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="to" visible="*"/>
+         <integer>50</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="by" visible="*"/>
+         <integer>51</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="semicolon" visible="*"/>
+         <integer>52</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="end" visible="*"/>
+         <integer>53</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="bar" visible="*"/>
+         <integer>54</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="else" visible="*"/>
+         <integer>55</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="elsif" visible="*"/>
+         <integer>56</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="until" visible="*"/>
+         <integer>57</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="return" visible="*"/>
+         <integer>58</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="array" visible="*"/>
+         <integer>60</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="record" visible="*"/>
+         <integer>61</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="pointer" visible="*"/>
+         <integer>62</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="const" visible="*"/>
+         <integer>63</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="type" visible="*"/>
+         <integer>64</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="var" visible="*"/>
+         <integer>65</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="procedure" visible="*"/>
+         <integer>66</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="begin" visible="*"/>
+         <integer>67</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="import" visible="*"/>
+         <integer>68</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="module" visible="*"/>
+         <integer>69</integer>
+      </ConstDeclaration>
+      <ConstDeclaration>
+         <identdef ident="eot"/>
+         <integer>70</integer>
+      </ConstDeclaration>
+      <TypeDeclaration>
+         <identdef ident="Ident" visible="*"/>
+         <StrucType>
+            <ArrayType>
+               <length>
+                  <designator ident="IdLen"/>
+               </length>
+               <type>
+                  <qualident ident="CHAR"/>
+               </type>
+            </ArrayType>
+         </StrucType>
+      </TypeDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="ival" visible="*"/>
+            <identdef ident="slen" visible="*"/>
+         </IdentList>
+         <type>
+            <qualident ident="LONGINT"/>
+         </type>
+      </VariableDeclaration>
+      <comment>
+         <comment-body>results of Get</comment-body>
+      </comment>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="rval" visible="*"/>
+         </IdentList>
+         <type>
+            <qualident ident="REAL"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="id" visible="*"/>
+         </IdentList>
+         <type>
+            <qualident ident="Ident"/>
+         </type>
+      </VariableDeclaration>
+      <comment>
+         <comment-body>for identifiers</comment-body>
+      </comment>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="str" visible="*"/>
+         </IdentList>
+         <type>
+            <StrucType>
+               <ArrayType>
+                  <length>
+                     <designator ident="stringBufSize"/>
+                  </length>
+                  <type>
+                     <qualident ident="CHAR"/>
+                  </type>
+               </ArrayType>
+            </StrucType>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="errcnt" visible="*"/>
+         </IdentList>
+         <type>
+            <qualident ident="INTEGER"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="ch"/>
+         </IdentList>
+         <type>
+            <qualident ident="CHAR"/>
+         </type>
+      </VariableDeclaration>
+      <comment>
+         <comment-body>last character read</comment-body>
+      </comment>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="errpos"/>
+         </IdentList>
+         <type>
+            <qualident ident="LONGINT"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="R"/>
+         </IdentList>
+         <type>
+            <qualident qualifier="Texts" ident="Reader"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="W"/>
+         </IdentList>
+         <type>
+            <qualident qualifier="Texts" ident="Writer"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="k"/>
+         </IdentList>
+         <type>
+            <qualident ident="INTEGER"/>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="KWX"/>
+         </IdentList>
+         <type>
+            <StrucType>
+               <ArrayType>
+                  <length>
+                     <integer>10</integer>
+                  </length>
+                  <type>
+                     <qualident ident="INTEGER"/>
+                  </type>
+               </ArrayType>
+            </StrucType>
+         </type>
+      </VariableDeclaration>
+      <VariableDeclaration>
+         <IdentList>
+            <identdef ident="keyTab"/>
+         </IdentList>
+         <type>
+            <StrucType>
+               <ArrayType>
+                  <length>
+                     <designator ident="NKW"/>
+                  </length>
+                  <type>
+                     <StrucType>
+                        <RecordType>
+                           <FieldListSequence>
+                              <FieldList>
+                                 <IdentList>
+                                    <identdef ident="sym"/>
+                                 </IdentList>
+                                 <type>
+                                    <qualident ident="INTEGER"/>
+                                 </type>
+                              </FieldList>
+                              <FieldList>
+                                 <IdentList>
+                                    <identdef ident="id"/>
+                                 </IdentList>
+                                 <type>
+                                    <StrucType>
+                                       <ArrayType>
+                                          <length>
+                                             <integer>12</integer>
+                                          </length>
+                                          <type>
+                                             <qualident ident="CHAR"/>
+                                          </type>
+                                       </ArrayType>
+                                    </StrucType>
+                                 </type>
+                              </FieldList>
+                           </FieldListSequence>
+                        </RecordType>
+                     </StrucType>
+                  </type>
+               </ArrayType>
+            </StrucType>
+         </type>
+      </VariableDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="CopyId" visible="*"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>ident</ident>
+                  <FormalType>
+                     <qualident ident="Ident"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="ident"/>
+                  <designator ident="id"/>
+               </assignment>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>CopyId</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Pos" visible="*"/>
+            <FormalParameters>
+               <qualident ident="LONGINT"/>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence/>
+            <RETURN/>
+            <SimpleExpression>
+               <factor>
+                  <designator left="Texts" right="Pos"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                  </ActualParameters>
+               </factor>
+               <MINUS/>
+               <integer>1</integer>
+            </SimpleExpression>
+         </ProcedureBody>
+         <ident>Pos</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Mark" visible="*"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>msg</ident>
+                  <FormalType>
+                     <qualident ident="CHAR"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="p"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="LONGINT"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="p"/>
+                  <factor>
+                     <designator ident="Pos"/>
+                     <ActualParameters/>
+                  </factor>
+               </assignment>
+               <IfStatement>
+                  <Condition>
+                     <term>
+                        <expression>
+                           <designator ident="p"/>
+                           <GTR/>
+                           <designator ident="errpos"/>
+                        </expression>
+                        <AND/>
+                        <expression>
+                           <designator ident="errcnt"/>
+                           <LSS/>
+                           <integer>25</integer>
+                        </expression>
+                     </term>
+                  </Condition>
+                  <Then-Statements>
+                     <ProcedureCall>
+                        <designator left="Texts" right="WriteLn"/>
+                        <ActualParameters>
+                           <designator ident="W"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <ProcedureCall>
+                        <designator left="Texts" right="WriteString"/>
+                        <ActualParameters>
+                           <designator ident="W"/>
+                           <string>  pos </string>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <ProcedureCall>
+                        <designator left="Texts" right="WriteInt"/>
+                        <ActualParameters>
+                           <designator ident="W"/>
+                           <designator ident="p"/>
+                           <integer>1</integer>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Write"/>
+                        <ActualParameters>
+                           <designator ident="W"/>
+                           <string> </string>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <ProcedureCall>
+                        <designator left="Texts" right="WriteString"/>
+                        <ActualParameters>
+                           <designator ident="W"/>
+                           <designator ident="msg"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Append"/>
+                        <ActualParameters>
+                           <designator left="Oberon" right="Log"/>
+                           <designator left="W" right="buf"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </Then-Statements>
+               </IfStatement>
+               <ProcedureCall>
+                  <designator ident="INC"/>
+                  <ActualParameters>
+                     <designator ident="errcnt"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <assignment>
+                  <designator ident="errpos"/>
+                  <SimpleExpression>
+                     <designator ident="p"/>
+                     <PLUS/>
+                     <integer>4</integer>
+                  </SimpleExpression>
+               </assignment>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>Mark</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Identifier"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>sym</ident>
+                  <FormalType>
+                     <qualident ident="INTEGER"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="i"/>
+                     <identdef ident="k"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="INTEGER"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="i"/>
+                  <integer>0</integer>
+               </assignment>
+               <RepeatStatement>
+                  <StatementSequence>
+                     <IfStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="i"/>
+                              <LSS/>
+                              <SimpleExpression>
+                                 <designator ident="IdLen"/>
+                                 <MINUS/>
+                                 <integer>1</integer>
+                              </SimpleExpression>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="id">
+                                 <subscript>
+                                    <designator ident="i"/>
+                                 </subscript>
+                              </designator>
+                              <designator ident="ch"/>
+                           </assignment>
+                           <ProcedureCall>
+                              <designator ident="INC"/>
+                              <ActualParameters>
+                                 <designator ident="i"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Then-Statements>
+                     </IfStatement>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Read"/>
+                        <ActualParameters>
+                           <designator ident="R"/>
+                           <designator ident="ch"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </StatementSequence>
+                  <Condition>
+                     <SimpleExpression>
+                        <expression>
+                           <designator ident="ch"/>
+                           <LSS/>
+                           <string>0</string>
+                        </expression>
+                        <OR/>
+                        <term>
+                           <expression>
+                              <designator ident="ch"/>
+                              <GTR/>
+                              <string>9</string>
+                           </expression>
+                           <AND/>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>A</string>
+                           </expression>
+                        </term>
+                        <OR/>
+                        <term>
+                           <expression>
+                              <designator ident="ch"/>
+                              <GTR/>
+                              <string>Z</string>
+                           </expression>
+                           <AND/>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>a</string>
+                           </expression>
+                        </term>
+                        <OR/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <GTR/>
+                           <string>z</string>
+                        </expression>
+                     </SimpleExpression>
+                  </Condition>
+               </RepeatStatement>
+               <assignment>
+                  <designator ident="id">
+                     <subscript>
+                        <designator ident="i"/>
+                     </subscript>
+                  </designator>
+                  <CharConstant>0X</CharConstant>
+               </assignment>
+               <IfStatement>
+                  <Condition>
+                     <expression>
+                        <designator ident="i"/>
+                        <LSS/>
+                        <integer>10</integer>
+                     </expression>
+                  </Condition>
+                  <Then-Statements>
+                     <assignment>
+                        <designator ident="k"/>
+                        <designator ident="KWX">
+                           <subscript>
+                              <SimpleExpression>
+                                 <designator ident="i"/>
+                                 <MINUS/>
+                                 <integer>1</integer>
+                              </SimpleExpression>
+                           </subscript>
+                        </designator>
+                     </assignment>
+                     <comment>
+                        <comment-body>search for keyword</comment-body>
+                     </comment>
+                     <WhileStatement>
+                        <Condition>
+                           <term>
+                              <expression>
+                                 <designator ident="id"/>
+                                 <NEQ/>
+                                 <designator ident="keyTab">
+                                    <subscript>
+                                       <designator ident="k"/>
+                                    </subscript>
+                                    <field-ref ident="id"/>
+                                 </designator>
+                              </expression>
+                              <AND/>
+                              <expression>
+                                 <designator ident="k"/>
+                                 <LSS/>
+                                 <designator ident="KWX">
+                                    <subscript>
+                                       <designator ident="i"/>
+                                    </subscript>
+                                 </designator>
+                              </expression>
+                           </term>
+                        </Condition>
+                        <Do-Statements>
+                           <StatementSequence>
+                              <ProcedureCall>
+                                 <designator ident="INC"/>
+                                 <ActualParameters>
+                                    <designator ident="k"/>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </StatementSequence>
+                        </Do-Statements>
+                     </WhileStatement>
+                     <IfStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="k"/>
+                              <LSS/>
+                              <designator ident="KWX">
+                                 <subscript>
+                                    <designator ident="i"/>
+                                 </subscript>
+                              </designator>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="keyTab">
+                                 <subscript>
+                                    <designator ident="k"/>
+                                 </subscript>
+                                 <field-ref ident="sym"/>
+                              </designator>
+                           </assignment>
+                        </Then-Statements>
+                        <Else-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="ident"/>
+                           </assignment>
+                        </Else-Statements>
+                     </IfStatement>
+                  </Then-Statements>
+                  <Else-Statements>
+                     <assignment>
+                        <designator ident="sym"/>
+                        <designator ident="ident"/>
+                     </assignment>
+                  </Else-Statements>
+               </IfStatement>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>Identifier</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="String"/>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="i"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="INTEGER"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="i"/>
+                  <integer>0</integer>
+               </assignment>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <WhileStatement>
+                  <Condition>
+                     <term>
+                        <factor>
+                           <NEGATION/>
+                           <designator left="R" right="eot"/>
+                        </factor>
+                        <AND/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <NEQ/>
+                           <CharConstant>22X</CharConstant>
+                        </expression>
+                     </term>
+                  </Condition>
+                  <Do-Statements>
+                     <StatementSequence>
+                        <IfStatement>
+                           <Condition>
+                              <expression>
+                                 <designator ident="ch"/>
+                                 <GEQ/>
+                                 <string> </string>
+                              </expression>
+                           </Condition>
+                           <Then-Statements>
+                              <IfStatement>
+                                 <Condition>
+                                    <expression>
+                                       <designator ident="i"/>
+                                       <LSS/>
+                                       <SimpleExpression>
+                                          <designator ident="stringBufSize"/>
+                                          <MINUS/>
+                                          <integer>1</integer>
+                                       </SimpleExpression>
+                                    </expression>
+                                 </Condition>
+                                 <Then-Statements>
+                                    <assignment>
+                                       <designator ident="str">
+                                          <subscript>
+                                             <designator ident="i"/>
+                                          </subscript>
+                                       </designator>
+                                       <designator ident="ch"/>
+                                    </assignment>
+                                    <ProcedureCall>
+                                       <designator ident="INC"/>
+                                       <ActualParameters>
+                                          <designator ident="i"/>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                 </Then-Statements>
+                                 <Else-Statements>
+                                    <ProcedureCall>
+                                       <designator ident="Mark"/>
+                                       <ActualParameters>
+                                          <string>string too long</string>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                 </Else-Statements>
+                              </IfStatement>
+                           </Then-Statements>
+                        </IfStatement>
+                        <ProcedureCall>
+                           <designator left="Texts" right="Read"/>
+                           <ActualParameters>
+                              <designator ident="R"/>
+                              <designator ident="ch"/>
+                           </ActualParameters>
+                        </ProcedureCall>
+                     </StatementSequence>
+                  </Do-Statements>
+               </WhileStatement>
+               <assignment>
+                  <designator ident="str">
+                     <subscript>
+                        <designator ident="i"/>
+                     </subscript>
+                  </designator>
+                  <CharConstant>0X</CharConstant>
+               </assignment>
+               <ProcedureCall>
+                  <designator ident="INC"/>
+                  <ActualParameters>
+                     <designator ident="i"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <assignment>
+                  <designator ident="slen"/>
+                  <designator ident="i"/>
+               </assignment>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>String</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="HexString"/>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="i"/>
+                     <identdef ident="m"/>
+                     <identdef ident="n"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="INTEGER"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="i"/>
+                  <integer>0</integer>
+               </assignment>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <WhileStatement>
+                  <Condition>
+                     <term>
+                        <factor>
+                           <NEGATION/>
+                           <designator left="R" right="eot"/>
+                        </factor>
+                        <AND/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <NEQ/>
+                           <string>$</string>
+                        </expression>
+                     </term>
+                  </Condition>
+                  <Do-Statements>
+                     <StatementSequence>
+                        <WhileStatement>
+                           <Condition>
+                              <term>
+                                 <factor>
+                                    <NEGATION/>
+                                    <designator left="R" right="eot"/>
+                                 </factor>
+                                 <AND/>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LEQ/>
+                                    <string> </string>
+                                 </expression>
+                              </term>
+                           </Condition>
+                           <Do-Statements>
+                              <StatementSequence>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                              </StatementSequence>
+                           </Do-Statements>
+                        </WhileStatement>
+                        <comment>
+                           <comment-body>skip</comment-body>
+                        </comment>
+                        <IfStatement>
+                           <Condition>
+                              <term>
+                                 <expression>
+                                    <string>0</string>
+                                    <LEQ/>
+                                    <designator ident="ch"/>
+                                 </expression>
+                                 <AND/>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LEQ/>
+                                    <string>9</string>
+                                 </expression>
+                              </term>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="m"/>
+                                 <SimpleExpression>
+                                    <factor>
+                                       <designator ident="ORD"/>
+                                       <ActualParameters>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </factor>
+                                    <MINUS/>
+                                    <integer>30H</integer>
+                                 </SimpleExpression>
+                              </assignment>
+                           </Then-Statements>
+                           <Condition>
+                              <term>
+                                 <expression>
+                                    <string>A</string>
+                                    <LEQ/>
+                                    <designator ident="ch"/>
+                                 </expression>
+                                 <AND/>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LEQ/>
+                                    <string>F</string>
+                                 </expression>
+                              </term>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="m"/>
+                                 <SimpleExpression>
+                                    <factor>
+                                       <designator ident="ORD"/>
+                                       <ActualParameters>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </factor>
+                                    <MINUS/>
+                                    <integer>37H</integer>
+                                 </SimpleExpression>
+                              </assignment>
+                           </Then-Statements>
+                           <Else-Statements>
+                              <assignment>
+                                 <designator ident="m"/>
+                                 <integer>0</integer>
+                              </assignment>
+                              <ProcedureCall>
+                                 <designator ident="Mark"/>
+                                 <ActualParameters>
+                                    <string>hexdig expected</string>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </Else-Statements>
+                        </IfStatement>
+                        <ProcedureCall>
+                           <designator left="Texts" right="Read"/>
+                           <ActualParameters>
+                              <designator ident="R"/>
+                              <designator ident="ch"/>
+                           </ActualParameters>
+                        </ProcedureCall>
+                        <IfStatement>
+                           <Condition>
+                              <term>
+                                 <expression>
+                                    <string>0</string>
+                                    <LEQ/>
+                                    <designator ident="ch"/>
+                                 </expression>
+                                 <AND/>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LEQ/>
+                                    <string>9</string>
+                                 </expression>
+                              </term>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="n"/>
+                                 <SimpleExpression>
+                                    <factor>
+                                       <designator ident="ORD"/>
+                                       <ActualParameters>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </factor>
+                                    <MINUS/>
+                                    <integer>30H</integer>
+                                 </SimpleExpression>
+                              </assignment>
+                           </Then-Statements>
+                           <Condition>
+                              <term>
+                                 <expression>
+                                    <string>A</string>
+                                    <LEQ/>
+                                    <designator ident="ch"/>
+                                 </expression>
+                                 <AND/>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LEQ/>
+                                    <string>F</string>
+                                 </expression>
+                              </term>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="n"/>
+                                 <SimpleExpression>
+                                    <factor>
+                                       <designator ident="ORD"/>
+                                       <ActualParameters>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </factor>
+                                    <MINUS/>
+                                    <integer>37H</integer>
+                                 </SimpleExpression>
+                              </assignment>
+                           </Then-Statements>
+                           <Else-Statements>
+                              <assignment>
+                                 <designator ident="n"/>
+                                 <integer>0</integer>
+                              </assignment>
+                              <ProcedureCall>
+                                 <designator ident="Mark"/>
+                                 <ActualParameters>
+                                    <string>hexdig expected</string>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </Else-Statements>
+                        </IfStatement>
+                        <IfStatement>
+                           <Condition>
+                              <expression>
+                                 <designator ident="i"/>
+                                 <LSS/>
+                                 <designator ident="stringBufSize"/>
+                              </expression>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="str">
+                                    <subscript>
+                                       <designator ident="i"/>
+                                    </subscript>
+                                 </designator>
+                                 <factor>
+                                    <designator ident="CHR"/>
+                                    <ActualParameters>
+                                       <SimpleExpression>
+                                          <term>
+                                             <designator ident="m"/>
+                                             <MUL/>
+                                             <integer>10H</integer>
+                                          </term>
+                                          <PLUS/>
+                                          <designator ident="n"/>
+                                       </SimpleExpression>
+                                    </ActualParameters>
+                                 </factor>
+                              </assignment>
+                              <ProcedureCall>
+                                 <designator ident="INC"/>
+                                 <ActualParameters>
+                                    <designator ident="i"/>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </Then-Statements>
+                           <Else-Statements>
+                              <ProcedureCall>
+                                 <designator ident="Mark"/>
+                                 <ActualParameters>
+                                    <string>string too long</string>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </Else-Statements>
+                        </IfStatement>
+                        <ProcedureCall>
+                           <designator left="Texts" right="Read"/>
+                           <ActualParameters>
+                              <designator ident="R"/>
+                              <designator ident="ch"/>
+                           </ActualParameters>
+                        </ProcedureCall>
+                     </StatementSequence>
+                  </Do-Statements>
+               </WhileStatement>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <assignment>
+                  <designator ident="slen"/>
+                  <designator ident="i">
+                     <comment>
+                        <comment-body>no 0X appended!</comment-body>
+                     </comment>
+                  </designator>
+               </assignment>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>HexString</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Ten"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>e</ident>
+                  <FormalType>
+                     <qualident ident="LONGINT"/>
+                  </FormalType>
+               </FPSection>
+               <qualident ident="REAL"/>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="x"/>
+                     <identdef ident="t"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="REAL"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="x"/>
+                  <real>1.0</real>
+               </assignment>
+               <assignment>
+                  <designator ident="t"/>
+                  <real>10.0</real>
+               </assignment>
+               <WhileStatement>
+                  <Condition>
+                     <expression>
+                        <designator ident="e"/>
+                        <GTR/>
+                        <integer>0</integer>
+                     </expression>
+                  </Condition>
+                  <Do-Statements>
+                     <StatementSequence>
+                        <IfStatement>
+                           <Condition>
+                              <factor>
+                                 <designator ident="ODD"/>
+                                 <ActualParameters>
+                                    <designator ident="e"/>
+                                 </ActualParameters>
+                              </factor>
+                           </Condition>
+                           <Then-Statements>
+                              <assignment>
+                                 <designator ident="x"/>
+                                 <term>
+                                    <designator ident="t"/>
+                                    <MUL/>
+                                    <designator ident="x"/>
+                                 </term>
+                              </assignment>
+                           </Then-Statements>
+                        </IfStatement>
+                        <assignment>
+                           <designator ident="t"/>
+                           <term>
+                              <designator ident="t"/>
+                              <MUL/>
+                              <designator ident="t"/>
+                           </term>
+                        </assignment>
+                        <assignment>
+                           <designator ident="e"/>
+                           <term>
+                              <designator ident="e"/>
+                              <DIV/>
+                              <integer>2</integer>
+                           </term>
+                        </assignment>
+                     </StatementSequence>
+                  </Do-Statements>
+               </WhileStatement>
+            </StatementSequence>
+            <RETURN/>
+            <designator ident="x"/>
+         </ProcedureBody>
+         <ident>Ten</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Number"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>sym</ident>
+                  <FormalType>
+                     <qualident ident="INTEGER"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence>
+               <ConstDeclaration>
+                  <identdef ident="max"/>
+                  <integer>2147483647</integer>
+                  <comment>
+                     <comment-body>2^31 - 1</comment-body>
+                  </comment>
+               </ConstDeclaration>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="i"/>
+                     <identdef ident="k"/>
+                     <identdef ident="e"/>
+                     <identdef ident="n"/>
+                     <identdef ident="s"/>
+                     <identdef ident="h"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="LONGINT"/>
+                  </type>
+               </VariableDeclaration>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="x"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="REAL"/>
+                  </type>
+               </VariableDeclaration>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="d"/>
+                  </IdentList>
+                  <type>
+                     <StrucType>
+                        <ArrayType>
+                           <length>
+                              <integer>16</integer>
+                           </length>
+                           <type>
+                              <qualident ident="INTEGER"/>
+                           </type>
+                        </ArrayType>
+                     </StrucType>
+                  </type>
+               </VariableDeclaration>
+               <VariableDeclaration>
+                  <IdentList>
+                     <identdef ident="negE"/>
+                  </IdentList>
+                  <type>
+                     <qualident ident="BOOLEAN"/>
+                  </type>
+               </VariableDeclaration>
+            </DeclarationSequence>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="ival"/>
+                  <integer>0</integer>
+               </assignment>
+               <assignment>
+                  <designator ident="i"/>
+                  <integer>0</integer>
+               </assignment>
+               <assignment>
+                  <designator ident="n"/>
+                  <integer>0</integer>
+               </assignment>
+               <assignment>
+                  <designator ident="k"/>
+                  <integer>0</integer>
+               </assignment>
+               <RepeatStatement>
+                  <StatementSequence>
+                     <IfStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="n"/>
+                              <LSS/>
+                              <integer>16</integer>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="d">
+                                 <subscript>
+                                    <designator ident="n"/>
+                                 </subscript>
+                              </designator>
+                              <SimpleExpression>
+                                 <factor>
+                                    <designator ident="ORD"/>
+                                    <ActualParameters>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </factor>
+                                 <MINUS/>
+                                 <integer>30H</integer>
+                              </SimpleExpression>
+                           </assignment>
+                           <ProcedureCall>
+                              <designator ident="INC"/>
+                              <ActualParameters>
+                                 <designator ident="n"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Then-Statements>
+                        <Else-Statements>
+                           <ProcedureCall>
+                              <designator ident="Mark"/>
+                              <ActualParameters>
+                                 <string>too many digits</string>
+                              </ActualParameters>
+                           </ProcedureCall>
+                           <assignment>
+                              <designator ident="n"/>
+                              <integer>0</integer>
+                           </assignment>
+                        </Else-Statements>
+                     </IfStatement>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Read"/>
+                        <ActualParameters>
+                           <designator ident="R"/>
+                           <designator ident="ch"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </StatementSequence>
+                  <Condition>
+                     <SimpleExpression>
+                        <expression>
+                           <designator ident="ch"/>
+                           <LSS/>
+                           <string>0</string>
+                        </expression>
+                        <OR/>
+                        <term>
+                           <expression>
+                              <designator ident="ch"/>
+                              <GTR/>
+                              <string>9</string>
+                           </expression>
+                           <AND/>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>A</string>
+                           </expression>
+                        </term>
+                        <OR/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <GTR/>
+                           <string>F</string>
+                        </expression>
+                     </SimpleExpression>
+                  </Condition>
+               </RepeatStatement>
+               <IfStatement>
+                  <Condition>
+                     <SimpleExpression>
+                        <expression>
+                           <designator ident="ch"/>
+                           <EQL/>
+                           <string>H</string>
+                        </expression>
+                        <OR/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <EQL/>
+                           <string>R</string>
+                        </expression>
+                        <OR/>
+                        <expression>
+                           <designator ident="ch"/>
+                           <EQL/>
+                           <string>X</string>
+                        </expression>
+                     </SimpleExpression>
+                  </Condition>
+                  <comment>
+                     <comment-body>hex</comment-body>
+                  </comment>
+                  <Then-Statements>
+                     <RepeatStatement>
+                        <StatementSequence>
+                           <assignment>
+                              <designator ident="h"/>
+                              <designator ident="d">
+                                 <subscript>
+                                    <designator ident="i"/>
+                                 </subscript>
+                              </designator>
+                           </assignment>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="h"/>
+                                    <GEQ/>
+                                    <integer>10</integer>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="h"/>
+                                    <SimpleExpression>
+                                       <designator ident="h"/>
+                                       <MINUS/>
+                                       <integer>7</integer>
+                                    </SimpleExpression>
+                                 </assignment>
+                              </Then-Statements>
+                           </IfStatement>
+                           <assignment>
+                              <designator ident="k"/>
+                              <SimpleExpression>
+                                 <term>
+                                    <designator ident="k"/>
+                                    <MUL/>
+                                    <integer>10H</integer>
+                                 </term>
+                                 <PLUS/>
+                                 <designator ident="h"/>
+                              </SimpleExpression>
+                           </assignment>
+                           <ProcedureCall>
+                              <designator ident="INC"/>
+                              <ActualParameters>
+                                 <designator ident="i"/>
+                                 <comment>
+                                    <comment-body>no overflow check</comment-body>
+                                 </comment>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </StatementSequence>
+                        <Condition>
+                           <expression>
+                              <designator ident="i"/>
+                              <EQL/>
+                              <designator ident="n"/>
+                           </expression>
+                        </Condition>
+                     </RepeatStatement>
+                     <IfStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <EQL/>
+                              <string>X</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="char"/>
+                           </assignment>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="k"/>
+                                    <LSS/>
+                                    <integer>100H</integer>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="ival"/>
+                                    <designator ident="k"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Else-Statements>
+                                 <ProcedureCall>
+                                    <designator ident="Mark"/>
+                                    <ActualParameters>
+                                       <string>illegal value</string>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <assignment>
+                                    <designator ident="ival"/>
+                                    <integer>0</integer>
+                                 </assignment>
+                              </Else-Statements>
+                           </IfStatement>
+                        </Then-Statements>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <EQL/>
+                              <string>R</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="real"/>
+                           </assignment>
+                           <assignment>
+                              <designator ident="rval"/>
+                              <factor>
+                                 <designator left="SYSTEM" right="VAL"/>
+                                 <ActualParameters>
+                                    <designator ident="REAL"/>
+                                    <designator ident="k"/>
+                                 </ActualParameters>
+                              </factor>
+                           </assignment>
+                        </Then-Statements>
+                        <Else-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="int"/>
+                           </assignment>
+                           <assignment>
+                              <designator ident="ival"/>
+                              <designator ident="k"/>
+                           </assignment>
+                        </Else-Statements>
+                     </IfStatement>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Read"/>
+                        <ActualParameters>
+                           <designator ident="R"/>
+                           <designator ident="ch"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </Then-Statements>
+                  <Condition>
+                     <expression>
+                        <designator ident="ch"/>
+                        <EQL/>
+                        <string>.</string>
+                     </expression>
+                  </Condition>
+                  <Then-Statements>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Read"/>
+                        <ActualParameters>
+                           <designator ident="R"/>
+                           <designator ident="ch"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                     <IfStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <EQL/>
+                              <string>.</string>
+                           </expression>
+                        </Condition>
+                        <comment>
+                           <comment-body>double dot</comment-body>
+                        </comment>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="ch"/>
+                              <CharConstant>7FX</CharConstant>
+                           </assignment>
+                           <comment>
+                              <comment-body>decimal integer</comment-body>
+                           </comment>
+                           <RepeatStatement>
+                              <StatementSequence>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="d">
+                                             <subscript>
+                                                <designator ident="i"/>
+                                             </subscript>
+                                          </designator>
+                                          <LSS/>
+                                          <integer>10</integer>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <IfStatement>
+                                          <Condition>
+                                             <expression>
+                                                <designator ident="k"/>
+                                                <LEQ/>
+                                                <term>
+                                                   <SimpleExpression>
+                                                      <designator ident="max"/>
+                                                      <MINUS/>
+                                                      <designator ident="d">
+                                                         <subscript>
+                                                            <designator ident="i"/>
+                                                         </subscript>
+                                                      </designator>
+                                                   </SimpleExpression>
+                                                   <DIV/>
+                                                   <integer>10</integer>
+                                                </term>
+                                             </expression>
+                                          </Condition>
+                                          <Then-Statements>
+                                             <assignment>
+                                                <designator ident="k"/>
+                                                <SimpleExpression>
+                                                   <term>
+                                                      <designator ident="k"/>
+                                                      <MUL/>
+                                                      <integer>10</integer>
+                                                   </term>
+                                                   <PLUS/>
+                                                   <designator ident="d">
+                                                      <subscript>
+                                                         <designator ident="i"/>
+                                                      </subscript>
+                                                   </designator>
+                                                </SimpleExpression>
+                                             </assignment>
+                                          </Then-Statements>
+                                          <Else-Statements>
+                                             <ProcedureCall>
+                                                <designator ident="Mark"/>
+                                                <ActualParameters>
+                                                   <string>too large</string>
+                                                </ActualParameters>
+                                             </ProcedureCall>
+                                             <assignment>
+                                                <designator ident="k"/>
+                                                <integer>0</integer>
+                                             </assignment>
+                                          </Else-Statements>
+                                       </IfStatement>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <ProcedureCall>
+                                          <designator ident="Mark"/>
+                                          <ActualParameters>
+                                             <string>bad integer</string>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                    </Else-Statements>
+                                 </IfStatement>
+                                 <ProcedureCall>
+                                    <designator ident="INC"/>
+                                    <ActualParameters>
+                                       <designator ident="i"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                              </StatementSequence>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="i"/>
+                                    <EQL/>
+                                    <designator ident="n"/>
+                                 </expression>
+                              </Condition>
+                           </RepeatStatement>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="int"/>
+                           </assignment>
+                           <assignment>
+                              <designator ident="ival"/>
+                              <designator ident="k"/>
+                           </assignment>
+                        </Then-Statements>
+                        <comment>
+                           <comment-body>real number</comment-body>
+                        </comment>
+                        <Else-Statements>
+                           <assignment>
+                              <designator ident="x"/>
+                              <real>0.0</real>
+                           </assignment>
+                           <assignment>
+                              <designator ident="e"/>
+                              <integer>0</integer>
+                           </assignment>
+                           <RepeatStatement>
+                              <comment>
+                                 <comment-body>integer part</comment-body>
+                              </comment>
+                              <StatementSequence>
+                                 <assignment>
+                                    <designator ident="x"/>
+                                    <SimpleExpression>
+                                       <term>
+                                          <designator ident="x"/>
+                                          <MUL/>
+                                          <real>10.0</real>
+                                       </term>
+                                       <PLUS/>
+                                       <factor>
+                                          <designator ident="FLT"/>
+                                          <ActualParameters>
+                                             <designator ident="d">
+                                                <subscript>
+                                                   <designator ident="i"/>
+                                                </subscript>
+                                             </designator>
+                                          </ActualParameters>
+                                       </factor>
+                                    </SimpleExpression>
+                                 </assignment>
+                                 <ProcedureCall>
+                                    <designator ident="INC"/>
+                                    <ActualParameters>
+                                       <designator ident="i"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                              </StatementSequence>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="i"/>
+                                    <EQL/>
+                                    <designator ident="n"/>
+                                 </expression>
+                              </Condition>
+                           </RepeatStatement>
+                           <WhileStatement>
+                              <Condition>
+                                 <term>
+                                    <expression>
+                                       <designator ident="ch"/>
+                                       <GEQ/>
+                                       <string>0</string>
+                                    </expression>
+                                    <AND/>
+                                    <expression>
+                                       <designator ident="ch"/>
+                                       <LEQ/>
+                                       <string>9</string>
+                                    </expression>
+                                 </term>
+                              </Condition>
+                              <comment>
+                                 <comment-body>fraction</comment-body>
+                              </comment>
+                              <Do-Statements>
+                                 <StatementSequence>
+                                    <assignment>
+                                       <designator ident="x"/>
+                                       <SimpleExpression>
+                                          <term>
+                                             <designator ident="x"/>
+                                             <MUL/>
+                                             <real>10.0</real>
+                                          </term>
+                                          <PLUS/>
+                                          <factor>
+                                             <designator ident="FLT"/>
+                                             <ActualParameters>
+                                                <SimpleExpression>
+                                                   <factor>
+                                                      <designator ident="ORD"/>
+                                                      <ActualParameters>
+                                                         <designator ident="ch"/>
+                                                      </ActualParameters>
+                                                   </factor>
+                                                   <MINUS/>
+                                                   <integer>30H</integer>
+                                                </SimpleExpression>
+                                             </ActualParameters>
+                                          </factor>
+                                       </SimpleExpression>
+                                    </assignment>
+                                    <ProcedureCall>
+                                       <designator ident="DEC"/>
+                                       <ActualParameters>
+                                          <designator ident="e"/>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                    <ProcedureCall>
+                                       <designator left="Texts" right="Read"/>
+                                       <ActualParameters>
+                                          <designator ident="R"/>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                 </StatementSequence>
+                              </Do-Statements>
+                           </WhileStatement>
+                           <IfStatement>
+                              <Condition>
+                                 <SimpleExpression>
+                                    <expression>
+                                       <designator ident="ch"/>
+                                       <EQL/>
+                                       <string>E</string>
+                                    </expression>
+                                    <OR/>
+                                    <expression>
+                                       <designator ident="ch"/>
+                                       <EQL/>
+                                       <string>D</string>
+                                    </expression>
+                                 </SimpleExpression>
+                              </Condition>
+                              <comment>
+                                 <comment-body>scale factor</comment-body>
+                              </comment>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <assignment>
+                                    <designator ident="s"/>
+                                    <integer>0</integer>
+                                 </assignment>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>-</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <assignment>
+                                          <designator ident="negE"/>
+                                          <designator ident="TRUE"/>
+                                       </assignment>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="negE"/>
+                                          <designator ident="FALSE"/>
+                                       </assignment>
+                                       <IfStatement>
+                                          <Condition>
+                                             <expression>
+                                                <designator ident="ch"/>
+                                                <EQL/>
+                                                <string>+</string>
+                                             </expression>
+                                          </Condition>
+                                          <Then-Statements>
+                                             <ProcedureCall>
+                                                <designator left="Texts" right="Read"/>
+                                                <ActualParameters>
+                                                   <designator ident="R"/>
+                                                   <designator ident="ch"/>
+                                                </ActualParameters>
+                                             </ProcedureCall>
+                                          </Then-Statements>
+                                       </IfStatement>
+                                    </Else-Statements>
+                                 </IfStatement>
+                                 <IfStatement>
+                                    <Condition>
+                                       <term>
+                                          <expression>
+                                             <designator ident="ch"/>
+                                             <GEQ/>
+                                             <string>0</string>
+                                          </expression>
+                                          <AND/>
+                                          <expression>
+                                             <designator ident="ch"/>
+                                             <LEQ/>
+                                             <string>9</string>
+                                          </expression>
+                                       </term>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <RepeatStatement>
+                                          <StatementSequence>
+                                             <assignment>
+                                                <designator ident="s"/>
+                                                <SimpleExpression>
+                                                   <term>
+                                                      <designator ident="s"/>
+                                                      <MUL/>
+                                                      <integer>10</integer>
+                                                   </term>
+                                                   <PLUS/>
+                                                   <factor>
+                                                      <designator ident="ORD"/>
+                                                      <ActualParameters>
+                                                         <designator ident="ch"/>
+                                                      </ActualParameters>
+                                                   </factor>
+                                                   <MINUS/>
+                                                   <integer>30H</integer>
+                                                </SimpleExpression>
+                                             </assignment>
+                                             <ProcedureCall>
+                                                <designator left="Texts" right="Read"/>
+                                                <ActualParameters>
+                                                   <designator ident="R"/>
+                                                   <designator ident="ch"/>
+                                                </ActualParameters>
+                                             </ProcedureCall>
+                                          </StatementSequence>
+                                          <Condition>
+                                             <SimpleExpression>
+                                                <expression>
+                                                   <designator ident="ch"/>
+                                                   <LSS/>
+                                                   <string>0</string>
+                                                </expression>
+                                                <OR/>
+                                                <expression>
+                                                   <designator ident="ch"/>
+                                                   <GTR/>
+                                                   <string>9</string>
+                                                </expression>
+                                             </SimpleExpression>
+                                          </Condition>
+                                       </RepeatStatement>
+                                       <IfStatement>
+                                          <Condition>
+                                             <designator ident="negE"/>
+                                          </Condition>
+                                          <Then-Statements>
+                                             <assignment>
+                                                <designator ident="e"/>
+                                                <SimpleExpression>
+                                                   <designator ident="e"/>
+                                                   <MINUS/>
+                                                   <designator ident="s"/>
+                                                </SimpleExpression>
+                                             </assignment>
+                                          </Then-Statements>
+                                          <Else-Statements>
+                                             <assignment>
+                                                <designator ident="e"/>
+                                                <SimpleExpression>
+                                                   <designator ident="e"/>
+                                                   <PLUS/>
+                                                   <designator ident="s"/>
+                                                </SimpleExpression>
+                                             </assignment>
+                                          </Else-Statements>
+                                       </IfStatement>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <ProcedureCall>
+                                          <designator ident="Mark"/>
+                                          <ActualParameters>
+                                             <string>digit?</string>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                           </IfStatement>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="e"/>
+                                    <LSS/>
+                                    <integer>0</integer>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="e"/>
+                                          <GEQ/>
+                                          <SimpleExpression>
+                                             <MINUS/>
+                                             <designator ident="maxExp"/>
+                                          </SimpleExpression>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <assignment>
+                                          <designator ident="x"/>
+                                          <term>
+                                             <designator ident="x"/>
+                                             <SLASH/>
+                                             <factor>
+                                                <designator ident="Ten"/>
+                                                <ActualParameters>
+                                                   <SimpleExpression>
+                                                      <MINUS/>
+                                                      <designator ident="e"/>
+                                                   </SimpleExpression>
+                                                </ActualParameters>
+                                             </factor>
+                                          </term>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="x"/>
+                                          <real>0.0</real>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="e"/>
+                                    <GTR/>
+                                    <integer>0</integer>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="e"/>
+                                          <LEQ/>
+                                          <designator ident="maxExp"/>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <assignment>
+                                          <designator ident="x"/>
+                                          <term>
+                                             <factor>
+                                                <designator ident="Ten"/>
+                                                <ActualParameters>
+                                                   <designator ident="e"/>
+                                                </ActualParameters>
+                                             </factor>
+                                             <MUL/>
+                                             <designator ident="x"/>
+                                          </term>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="x"/>
+                                          <real>0.0</real>
+                                       </assignment>
+                                       <ProcedureCall>
+                                          <designator ident="Mark"/>
+                                          <ActualParameters>
+                                             <string>too large</string>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                           </IfStatement>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="real"/>
+                           </assignment>
+                           <assignment>
+                              <designator ident="rval"/>
+                              <designator ident="x"/>
+                           </assignment>
+                        </Else-Statements>
+                     </IfStatement>
+                  </Then-Statements>
+                  <comment>
+                     <comment-body>decimal integer</comment-body>
+                  </comment>
+                  <Else-Statements>
+                     <RepeatStatement>
+                        <StatementSequence>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="d">
+                                       <subscript>
+                                          <designator ident="i"/>
+                                       </subscript>
+                                    </designator>
+                                    <LSS/>
+                                    <integer>10</integer>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="k"/>
+                                          <LEQ/>
+                                          <term>
+                                             <SimpleExpression>
+                                                <designator ident="max"/>
+                                                <MINUS/>
+                                                <designator ident="d">
+                                                   <subscript>
+                                                      <designator ident="i"/>
+                                                   </subscript>
+                                                </designator>
+                                             </SimpleExpression>
+                                             <DIV/>
+                                             <integer>10</integer>
+                                          </term>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <assignment>
+                                          <designator ident="k"/>
+                                          <SimpleExpression>
+                                             <term>
+                                                <designator ident="k"/>
+                                                <MUL/>
+                                                <integer>10</integer>
+                                             </term>
+                                             <PLUS/>
+                                             <designator ident="d">
+                                                <subscript>
+                                                   <designator ident="i"/>
+                                                </subscript>
+                                             </designator>
+                                          </SimpleExpression>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <ProcedureCall>
+                                          <designator ident="Mark"/>
+                                          <ActualParameters>
+                                             <string>too large</string>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="k"/>
+                                          <integer>0</integer>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <Else-Statements>
+                                 <ProcedureCall>
+                                    <designator ident="Mark"/>
+                                    <ActualParameters>
+                                       <string>bad integer</string>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                              </Else-Statements>
+                           </IfStatement>
+                           <ProcedureCall>
+                              <designator ident="INC"/>
+                              <ActualParameters>
+                                 <designator ident="i"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </StatementSequence>
+                        <Condition>
+                           <expression>
+                              <designator ident="i"/>
+                              <EQL/>
+                              <designator ident="n"/>
+                           </expression>
+                        </Condition>
+                     </RepeatStatement>
+                     <assignment>
+                        <designator ident="sym"/>
+                        <designator ident="int"/>
+                     </assignment>
+                     <assignment>
+                        <designator ident="ival"/>
+                        <designator ident="k"/>
+                     </assignment>
+                  </Else-Statements>
+               </IfStatement>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>Number</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="comment"/>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <RepeatStatement>
+                  <StatementSequence>
+                     <WhileStatement>
+                        <Condition>
+                           <term>
+                              <factor>
+                                 <NEGATION/>
+                                 <designator left="R" right="eot"/>
+                              </factor>
+                              <AND/>
+                              <expression>
+                                 <designator ident="ch"/>
+                                 <NEQ/>
+                                 <string>*</string>
+                              </expression>
+                           </term>
+                        </Condition>
+                        <Do-Statements>
+                           <StatementSequence>
+                              <IfStatement>
+                                 <Condition>
+                                    <expression>
+                                       <designator ident="ch"/>
+                                       <EQL/>
+                                       <string>(</string>
+                                    </expression>
+                                 </Condition>
+                                 <Then-Statements>
+                                    <ProcedureCall>
+                                       <designator left="Texts" right="Read"/>
+                                       <ActualParameters>
+                                          <designator ident="R"/>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                    <IfStatement>
+                                       <Condition>
+                                          <expression>
+                                             <designator ident="ch"/>
+                                             <EQL/>
+                                             <string>*</string>
+                                          </expression>
+                                       </Condition>
+                                       <Then-Statements>
+                                          <ProcedureCall>
+                                             <designator ident="comment"/>
+                                          </ProcedureCall>
+                                       </Then-Statements>
+                                    </IfStatement>
+                                 </Then-Statements>
+                                 <Else-Statements>
+                                    <ProcedureCall>
+                                       <designator left="Texts" right="Read"/>
+                                       <ActualParameters>
+                                          <designator ident="R"/>
+                                          <designator ident="ch"/>
+                                       </ActualParameters>
+                                    </ProcedureCall>
+                                 </Else-Statements>
+                              </IfStatement>
+                           </StatementSequence>
+                        </Do-Statements>
+                     </WhileStatement>
+                     <WhileStatement>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <EQL/>
+                              <string>*</string>
+                           </expression>
+                        </Condition>
+                        <Do-Statements>
+                           <StatementSequence>
+                              <ProcedureCall>
+                                 <designator left="Texts" right="Read"/>
+                                 <ActualParameters>
+                                    <designator ident="R"/>
+                                    <designator ident="ch"/>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </StatementSequence>
+                        </Do-Statements>
+                     </WhileStatement>
+                  </StatementSequence>
+                  <Condition>
+                     <SimpleExpression>
+                        <expression>
+                           <designator ident="ch"/>
+                           <EQL/>
+                           <string>)</string>
+                        </expression>
+                        <OR/>
+                        <designator left="R" right="eot"/>
+                     </SimpleExpression>
+                  </Condition>
+               </RepeatStatement>
+               <IfStatement>
+                  <Condition>
+                     <factor>
+                        <NEGATION/>
+                        <designator left="R" right="eot"/>
+                     </factor>
+                  </Condition>
+                  <Then-Statements>
+                     <ProcedureCall>
+                        <designator left="Texts" right="Read"/>
+                        <ActualParameters>
+                           <designator ident="R"/>
+                           <designator ident="ch"/>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </Then-Statements>
+                  <Else-Statements>
+                     <ProcedureCall>
+                        <designator ident="Mark"/>
+                        <ActualParameters>
+                           <string>unterminated comment</string>
+                        </ActualParameters>
+                     </ProcedureCall>
+                  </Else-Statements>
+               </IfStatement>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>comment</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Get" visible="*"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>sym</ident>
+                  <FormalType>
+                     <qualident ident="INTEGER"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence>
+               <RepeatStatement>
+                  <StatementSequence>
+                     <WhileStatement>
+                        <Condition>
+                           <term>
+                              <factor>
+                                 <NEGATION/>
+                                 <designator left="R" right="eot"/>
+                              </factor>
+                              <AND/>
+                              <expression>
+                                 <designator ident="ch"/>
+                                 <LEQ/>
+                                 <string> </string>
+                              </expression>
+                           </term>
+                        </Condition>
+                        <Do-Statements>
+                           <StatementSequence>
+                              <ProcedureCall>
+                                 <designator left="Texts" right="Read"/>
+                                 <ActualParameters>
+                                    <designator ident="R"/>
+                                    <designator ident="ch"/>
+                                 </ActualParameters>
+                              </ProcedureCall>
+                           </StatementSequence>
+                        </Do-Statements>
+                     </WhileStatement>
+                     <IfStatement>
+                        <Condition>
+                           <designator left="R" right="eot"/>
+                        </Condition>
+                        <Then-Statements>
+                           <assignment>
+                              <designator ident="sym"/>
+                              <designator ident="eot"/>
+                           </assignment>
+                        </Then-Statements>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>A</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LSS/>
+                                    <string>0</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <CharConstant>22X</CharConstant>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator ident="String"/>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="string"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>#</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="neq"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>$</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator ident="HexString"/>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="string"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>&amp;</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="and"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>(</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <IfStatement>
+                                          <Condition>
+                                             <expression>
+                                                <designator ident="ch"/>
+                                                <EQL/>
+                                                <string>*</string>
+                                             </expression>
+                                          </Condition>
+                                          <Then-Statements>
+                                             <assignment>
+                                                <designator ident="sym"/>
+                                                <designator ident="null"/>
+                                             </assignment>
+                                             <ProcedureCall>
+                                                <designator ident="comment"/>
+                                             </ProcedureCall>
+                                          </Then-Statements>
+                                          <Else-Statements>
+                                             <assignment>
+                                                <designator ident="sym"/>
+                                                <designator ident="lparen"/>
+                                             </assignment>
+                                          </Else-Statements>
+                                       </IfStatement>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>)</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="rparen"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>*</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="times"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>+</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="plus"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>,</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="comma"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>-</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="minus"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>.</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <IfStatement>
+                                          <Condition>
+                                             <expression>
+                                                <designator ident="ch"/>
+                                                <EQL/>
+                                                <string>.</string>
+                                             </expression>
+                                          </Condition>
+                                          <Then-Statements>
+                                             <ProcedureCall>
+                                                <designator left="Texts" right="Read"/>
+                                                <ActualParameters>
+                                                   <designator ident="R"/>
+                                                   <designator ident="ch"/>
+                                                </ActualParameters>
+                                             </ProcedureCall>
+                                             <assignment>
+                                                <designator ident="sym"/>
+                                                <designator ident="upto"/>
+                                             </assignment>
+                                          </Then-Statements>
+                                          <Else-Statements>
+                                             <assignment>
+                                                <designator ident="sym"/>
+                                                <designator ident="period"/>
+                                             </assignment>
+                                          </Else-Statements>
+                                       </IfStatement>
+                                    </Then-Statements>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>/</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="rdiv"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <comment>
+                                          <comment-body> ! % ' </comment-body>
+                                       </comment>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="null"/>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <LSS/>
+                                    <string>:</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator ident="Number"/>
+                                    <ActualParameters>
+                                       <designator ident="sym"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>:</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>=</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="becomes"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="colon"/>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>;</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="semicolon"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>&lt;</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>=</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="leq"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="lss"/>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>=</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="eql"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>></string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <IfStatement>
+                                    <Condition>
+                                       <expression>
+                                          <designator ident="ch"/>
+                                          <EQL/>
+                                          <string>=</string>
+                                       </expression>
+                                    </Condition>
+                                    <Then-Statements>
+                                       <ProcedureCall>
+                                          <designator left="Texts" right="Read"/>
+                                          <ActualParameters>
+                                             <designator ident="R"/>
+                                             <designator ident="ch"/>
+                                          </ActualParameters>
+                                       </ProcedureCall>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="geq"/>
+                                       </assignment>
+                                    </Then-Statements>
+                                    <Else-Statements>
+                                       <assignment>
+                                          <designator ident="sym"/>
+                                          <designator ident="gtr"/>
+                                       </assignment>
+                                    </Else-Statements>
+                                 </IfStatement>
+                              </Then-Statements>
+                              <comment>
+                                 <comment-body> ? @ </comment-body>
+                              </comment>
+                              <Else-Statements>
+                                 <ProcedureCall>
+                                    <designator left="Texts" right="Read"/>
+                                    <ActualParameters>
+                                       <designator ident="R"/>
+                                       <designator ident="ch"/>
+                                    </ActualParameters>
+                                 </ProcedureCall>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="null"/>
+                                 </assignment>
+                              </Else-Statements>
+                           </IfStatement>
+                        </Then-Statements>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>[</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <ProcedureCall>
+                              <designator ident="Identifier"/>
+                              <ActualParameters>
+                                 <designator ident="sym"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Then-Statements>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>a</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>[</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="lbrak"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>]</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="rbrak"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>^</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="arrow"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <comment>
+                                 <comment-body> _ ` </comment-body>
+                              </comment>
+                              <Else-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="null"/>
+                                 </assignment>
+                              </Else-Statements>
+                           </IfStatement>
+                           <ProcedureCall>
+                              <designator left="Texts" right="Read"/>
+                              <ActualParameters>
+                                 <designator ident="R"/>
+                                 <designator ident="ch"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Then-Statements>
+                        <Condition>
+                           <expression>
+                              <designator ident="ch"/>
+                              <LSS/>
+                              <string>{</string>
+                           </expression>
+                        </Condition>
+                        <Then-Statements>
+                           <ProcedureCall>
+                              <designator ident="Identifier"/>
+                              <ActualParameters>
+                                 <designator ident="sym"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Then-Statements>
+                        <Else-Statements>
+                           <IfStatement>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>{</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="lbrace"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>}</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="rbrace"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>|</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="bar"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <string>~</string>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="not"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Condition>
+                                 <expression>
+                                    <designator ident="ch"/>
+                                    <EQL/>
+                                    <CharConstant>7FX</CharConstant>
+                                 </expression>
+                              </Condition>
+                              <Then-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="upto"/>
+                                 </assignment>
+                              </Then-Statements>
+                              <Else-Statements>
+                                 <assignment>
+                                    <designator ident="sym"/>
+                                    <designator ident="null"/>
+                                 </assignment>
+                              </Else-Statements>
+                           </IfStatement>
+                           <ProcedureCall>
+                              <designator left="Texts" right="Read"/>
+                              <ActualParameters>
+                                 <designator ident="R"/>
+                                 <designator ident="ch"/>
+                              </ActualParameters>
+                           </ProcedureCall>
+                        </Else-Statements>
+                     </IfStatement>
+                  </StatementSequence>
+                  <Condition>
+                     <expression>
+                        <designator ident="sym"/>
+                        <NEQ/>
+                        <designator ident="null"/>
+                     </expression>
+                  </Condition>
+               </RepeatStatement>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>Get</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="Init" visible="*"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>T</ident>
+                  <FormalType>
+                     <qualident qualifier="Texts" ident="Text"/>
+                  </FormalType>
+               </FPSection>
+               <FPSection>
+                  <ident>pos</ident>
+                  <FormalType>
+                     <qualident ident="LONGINT"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="errpos"/>
+                  <designator ident="pos"/>
+               </assignment>
+               <assignment>
+                  <designator ident="errcnt"/>
+                  <integer>0</integer>
+               </assignment>
+               <ProcedureCall>
+                  <designator left="Texts" right="OpenReader"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="T"/>
+                     <designator ident="pos"/>
+                  </ActualParameters>
+               </ProcedureCall>
+               <ProcedureCall>
+                  <designator left="Texts" right="Read"/>
+                  <ActualParameters>
+                     <designator ident="R"/>
+                     <designator ident="ch"/>
+                  </ActualParameters>
+               </ProcedureCall>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>Init</ident>
+      </ProcedureDeclaration>
+      <ProcedureDeclaration>
+         <ProcedureHeading>
+            <identdef ident="EnterKW"/>
+            <FormalParameters>
+               <FPSection>
+                  <ident>sym</ident>
+                  <FormalType>
+                     <qualident ident="INTEGER"/>
+                  </FormalType>
+               </FPSection>
+               <FPSection>
+                  <ident>name</ident>
+                  <FormalType>
+                     <qualident ident="CHAR"/>
+                  </FormalType>
+               </FPSection>
+            </FormalParameters>
+         </ProcedureHeading>
+         <ProcedureBody>
+            <DeclarationSequence/>
+            <StatementSequence>
+               <assignment>
+                  <designator ident="keyTab">
+                     <subscript>
+                        <designator ident="k"/>
+                     </subscript>
+                     <field-ref ident="id"/>
+                  </designator>
+                  <designator ident="name"/>
+               </assignment>
+               <assignment>
+                  <designator ident="keyTab">
+                     <subscript>
+                        <designator ident="k"/>
+                     </subscript>
+                     <field-ref ident="sym"/>
+                  </designator>
+                  <designator ident="sym"/>
+               </assignment>
+               <ProcedureCall>
+                  <designator ident="INC"/>
+                  <ActualParameters>
+                     <designator ident="k"/>
+                  </ActualParameters>
+               </ProcedureCall>
+            </StatementSequence>
+         </ProcedureBody>
+         <ident>EnterKW</ident>
+      </ProcedureDeclaration>
+   </DeclarationSequence>
+   <StatementSequence>
+      <ProcedureCall>
+         <designator left="Texts" right="OpenWriter"/>
+         <ActualParameters>
+            <designator ident="W"/>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="k"/>
+         <integer>0</integer>
+      </assignment>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>0</integer>
+            </subscript>
+         </designator>
+         <integer>0</integer>
+      </assignment>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>1</integer>
+            </subscript>
+         </designator>
+         <integer>0</integer>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="if"/>
+            <string>IF</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="do"/>
+            <string>DO</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="of"/>
+            <string>OF</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="or"/>
+            <string>OR</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="to"/>
+            <string>TO</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="in"/>
+            <string>IN</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="is"/>
+            <string>IS</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="by"/>
+            <string>BY</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>2</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="end"/>
+            <string>END</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="nil"/>
+            <string>NIL</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="var"/>
+            <string>VAR</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="div"/>
+            <string>DIV</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="mod"/>
+            <string>MOD</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="for"/>
+            <string>FOR</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>3</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="else"/>
+            <string>ELSE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="then"/>
+            <string>THEN</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="true"/>
+            <string>TRUE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="type"/>
+            <string>TYPE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="case"/>
+            <string>CASE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>4</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="elsif"/>
+            <string>ELSIF</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="false"/>
+            <string>FALSE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="array"/>
+            <string>ARRAY</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="begin"/>
+            <string>BEGIN</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="const"/>
+            <string>CONST</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="until"/>
+            <string>UNTIL</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="while"/>
+            <string>WHILE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>5</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="record"/>
+            <string>RECORD</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="repeat"/>
+            <string>REPEAT</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="return"/>
+            <string>RETURN</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="import"/>
+            <string>IMPORT</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="module"/>
+            <string>MODULE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>6</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="pointer"/>
+            <string>POINTER</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>7</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>8</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+      <ProcedureCall>
+         <designator ident="EnterKW"/>
+         <ActualParameters>
+            <designator ident="procedure"/>
+            <string>PROCEDURE</string>
+         </ActualParameters>
+      </ProcedureCall>
+      <assignment>
+         <designator ident="KWX">
+            <subscript>
+               <integer>9</integer>
+            </subscript>
+         </designator>
+         <designator ident="k"/>
+      </assignment>
+   </StatementSequence>
+   <END_MODULE name="ORS"/>
+</module>

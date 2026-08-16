@@ -153,6 +153,17 @@ jobs:
         npm run build
     - name: Test Rust
       run: rustup --version
+    - name: Cache antlr4-rust-gen
+      id: cache-antlr4-rust-gen
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/bin/antlr4-rust-gen
+        key: antlr4-rust-gen-v0.33.1-${{ runner.os }}-${{ runner.arch }}
+    - name: Install antlr4-rust-gen
+      if: steps.cache-antlr4-rust-gen.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 --branch v0.33.1 https://github.com/ophi-dev/antlr-rust-runtime /tmp/antlr-rust-runtime
+        cargo install --locked --path /tmp/antlr-rust-runtime/crates/antlr-rust-codegen --bin antlr4-rust-gen
     - name: Test
       shell: pwsh
       run: |
@@ -251,8 +262,6 @@ jobs:
       shell: bash
       run: |
         dotnet trash --help
-    - name: Test Rust
-      run: rustup --version
     - name: Test
       shell: bash
       run: |

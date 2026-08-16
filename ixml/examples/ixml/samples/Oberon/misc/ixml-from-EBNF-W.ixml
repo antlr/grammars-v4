@@ -1,0 +1,31 @@
+{ Grammar for EBNF, using ixml names.  
+
+  Adapted from the EBNF-W.ixml grammar in this directory.
+
+  Revisions:
+  2022-06-22 : CMSMcQ : make file, to help automate conversion of 
+                        Oberon grammar.  Rename nonterminals using ixml
+                        names; adjust definition and use of strings;
+                        add marks.
+
+}
+
+ixml:  S?, rule**S, S?.
+rule: name, S?, -"=", S?, -alts, S?, -".".
+alts: alt++(S?, -"|", S?).
+alt: term++S.
+-term: factor; option; repeat0.
+-factor: nonterminal; literal; -"(", S?, alts, S?, -")".
+option: -"[", S?, alts, S?, -"]".
+repeat0: -"{", S?, alts, S?, -"}".
+
+nonterminal: name.
+literal: string.
+@name: letter, (letter; digit)*.
+@string: -'"', character*, -'"'.
+-letter: [L].
+-digit: [Nd].
+
+{ Wirth does not define character or whitespace. }
+-character: ~['"'].
+-S: -[" "; #09; #0A; #0D]+.

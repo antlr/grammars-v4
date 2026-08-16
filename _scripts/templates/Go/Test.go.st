@@ -5,6 +5,7 @@ import (
     "fmt"
     "os"
     "io"
+    "path/filepath"
     "time"
     "strconv"
     "bufio"
@@ -66,6 +67,7 @@ var string_instance = 0
 var prefix = ""
 var quiet = false
 var tee = false
+var output_dir = ""
 var binary = <binary>
 var total_tokens int64 = 0
 var total_parse_seconds float64 = 0
@@ -86,6 +88,10 @@ func main() {
             inputs = append(inputs, os.Args[i])
             is_fns = append(is_fns, false)
         } else if os.Args[i] == "-tee" {
+            tee = true
+        } else if os.Args[i] == "-o" {
+            i = i + 1
+            output_dir = os.Args[i]
             tee = true
         } else if os.Args[i] == "-x" {
             scanner := bufio.NewScanner(os.Stdin)
@@ -181,6 +187,17 @@ func ParseFilename(input string, row_number int) {
 }
 
 func DoParse(str antlr.CharStream, input_name string, row_number int) {
+    out_name := input_name
+    if output_dir != "" {
+        absPath, _ := filepath.Abs(input_name)
+        vol := filepath.VolumeName(absPath)
+        rel := absPath[len(vol):]
+        for len(rel) > 0 && (rel[0] == '/' || rel[0] == filepath.Separator) {
+            rel = rel[1:]
+        }
+        out_name = filepath.Join(output_dir, rel)
+        os.MkdirAll(filepath.Dir(out_name), 0755)
+    }
     if binary {
         str = NewBinaryCharStream(str)
     }
@@ -206,7 +223,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
         output *os.File
     )
     if tee {
-        output, _ = os.Create(input_name + ".errors")
+        output, _ = os.Create(out_name + ".errors")
     }
 
     lexerErrors := NewCustomErrorListener(quiet, tee, output)
@@ -243,7 +260,7 @@ func DoParse(str antlr.CharStream, input_name string, row_number int) {
     if show_tree {
         ss := tree.ToStringTree(parser.RuleNames, parser)
         if tee {
-            f, _ := os.Create(input_name + ".tree")
+            f, _ := os.Create(out_name + ".tree")
             f.Write([]byte(ss))
             f.Close()
         } else {

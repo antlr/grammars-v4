@@ -1,0 +1,63 @@
+<literal-name-map>
+  <p>This document contains a list of literal strings paired with
+  identifiers.  If it is passed to the Gingersnap transform
+  inject-whitespace.xsl, then when a literal matching one of the
+  strings given here is encountered in the input grammar, it will be
+  replaced by a reference to the specified nonterminal, and a rule for
+  that nonterminal will be added to the grammar.</p>
+  <p>Note that the transform assumes that if a literal can be cast as
+  an NCName, then that NCName should be used.  So from "MODULE" in the
+  input grammar we get a rule of the form MODULE = -"MODULE", s?.  
+  For that reason, many literals in the Oberon grammar are not in fact
+  listed here.</p>
+  
+  <p>Revisions:
+  2022-06-22 : CMSMcQ : first version
+  </p>
+
+  <map string="#" nonterminal="NEQ"/>
+  <map string="&amp;" nonterminal="AND"/>
+  <map string="(" nonterminal="LPAR"/>
+  <map string=")" nonterminal="RPAR"/>
+  <map string="*" nonterminal="STAR"/>
+  <map string="+" nonterminal="PLUS"/>
+  <map string="," nonterminal="COMMA"/>
+  <map string="-" nonterminal="MINUS"/>
+  <map string="." nonterminal="DOT"/>
+  <map string=".." nonterminal="DOTDOT"/>
+  <map string="/" nonterminal="SLASH"/>
+  <map string="0" nonterminal="D-0"/>
+  <map string="1" nonterminal="D-1"/>
+  <map string="2" nonterminal="D-2"/>
+  <map string="3" nonterminal="D-3"/>
+  <map string="4" nonterminal="D-4"/>
+  <map string="5" nonterminal="D-5"/>
+  <map string="6" nonterminal="D-6"/>
+  <map string="7" nonterminal="D-7"/>
+  <map string="8" nonterminal="D-8"/>
+  <map string="9" nonterminal="D-9"/>
+  <map string=":" nonterminal="COLON"/>
+  <map string=":=" nonterminal="GETS"/>
+  <map string=";" nonterminal="SEMI"/>
+  <map string="&lt;" nonterminal="LSS"/>
+  <map string="&lt;=" nonterminal="LEQ"/>
+  <map string="=" nonterminal="EQUALS"/>
+  <map string=">" nonterminal="GTR"/>
+  <map string=">=" nonterminal="GEQ"/>
+  <map string="A" nonterminal="D-A"/>
+  <map string="B" nonterminal="D-B"/>
+  <map string="C" nonterminal="D-C"/>
+  <map string="D" nonterminal="D-D"/>
+  <map string="E" nonterminal="D-E"/>
+  <map string="F" nonterminal="D-F"/>
+  <map string="H" nonterminal="HEXINT"/>
+  <map string="X" nonterminal="HEXCHAR"/>
+  <map string="[" nonterminal="LBRKT"/>
+  <map string="]" nonterminal="RBRKT"/>
+  <map string="^" nonterminal="UP"/>
+  <map string="{" nonterminal="LBRACE"/>
+  <map string="|" nonterminal="VBAR"/>
+  <map string="}" nonterminal="RBRACE"/>
+  <map string="~" nonterminal="NEGATION"/>
+
+</literal-name-map>
