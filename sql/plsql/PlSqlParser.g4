@@ -869,7 +869,7 @@ alter_trigger
     ;
 
 create_trigger
-    : CREATE (OR REPLACE)? TRIGGER trigger_name (
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? TRIGGER trigger_name (
         simple_dml_trigger
         | compound_dml_trigger
         | non_dml_trigger
