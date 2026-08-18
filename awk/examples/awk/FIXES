@@ -1,0 +1,172 @@
+/****************************************************************
+Copyright (C) Lucent Technologies 1997
+All Rights Reserved
+
+Permission to use, copy, modify, and distribute this software and
+its documentation for any purpose and without fee is hereby
+granted, provided that the above copyright notice appear in all
+copies and that both that the copyright notice and this
+permission notice and warranty disclaimer appear in supporting
+documentation, and that the name Lucent Technologies or any of
+its entities not be used in advertising or publicity pertaining
+to distribution of the software without specific, written prior
+permission.
+
+LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
+IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+THIS SOFTWARE.
+****************************************************************/
+
+This file lists all bug fixes, changes, etc., made since the 
+second edition of the AWK book was published in September 2023.
+
+Apr 26, 2026
+	regex fixes: limit the repetition count to 255 like
+	POSIX does to prevent signed integer overflow.
+	prevent a crash when the repetition is the first atom parsed
+	Thanks to Renaud Allard an Todd Miller.
+
+Dec 24, 2025
+	Previously changed and broken rand() implementation
+	restored in run.c with a variant thanks to Henry Spencer.
+
+Aug 04, 2025
+	Fix a syntax issue with /= that caused constants to
+	turn into variables [eg. 42 /= 7]. Thanks to Arnold
+	Robbins.
+
+Jan 14, 2025
+	Fix incorrect error line number issues. unput has
+	no business managing lineno. Thanks to Ozan Yigit.
+
+Jan 05, 2025
+	Fix hex detection in is_valid_number.
+	Fix indirect field specification with non-numeric string
+	eg. $("foo") in indirect. This is not illegal.
+	Thanks to Arnold Robbins.
+
+Jan 01, 2025
+	Fixed openfile to not try to read from a directory.
+	Thanks to Arnold Robbins.
+
+Jul 28, 2024
+	Fixed readcsvrec resize segfault when reading csv records longer
+	than 8k. Thanks to Ozan Yigit.
+	mktime() added to bsd-features branch. Thanks to Todd Miller.
+
+Jun 23, 2024
+	Fix signal for system-status test. Thanks to Tim van der Molen.
+	Rewrite if-else chain as switch. Thanks to Andrew Sukach.
+
+May 27, 2024
+	Spelling fixes and removal of unneeded prototypes and extern.
+	Thanks to Jonathan Gray.
+
+May 4, 2024
+	Fixed a use-after-free bug with ARGV for "delete ARGV".
+	Also ENVtab is no longer global. Thanks to Benjamin Sturz
+	for spotting the ARGV issue and	Todd Miller for the fix. 
+
+May 3, 2024:
+	Remove warnings when compiling with g++. Thanks to Arnold Robbins.
+
+Apr 22, 2024:
+	Fixed regex engine gototab reallocation issue that was
+	Introduced during the Nov 24 rewrite. Thanks to Arnold Robbins.
+	Fixed a scan bug in split in the case the separator is a single
+	character. Thanks to Oguz Ismail for spotting the issue.
+
+Mar 10, 2024:
+	Fixed use-after-free bug in fnematch due to adjbuf invalidating
+	the pointers to buf. Thanks to github user caffe3 for spotting
+	the issue and providing a fix, and to Miguel Pineiro Jr.
+	for the alternative fix.
+	MAX_UTF_BYTES in fnematch has been replaced with awk_mb_cur_max.
+	thanks to Miguel Pineiro Jr.
+
+Jan 22, 2024:
+	Restore the ability to compile with g++. Thanks to
+	Arnold Robbins.
+
+Dec 24, 2023:
+	Matchop dereference after free problem fix when the first
+	argument is a function call. Thanks to Oguz Ismail Uysal.
+	Fix inconsistent handling of --csv and FS set in the
+	command line. Thanks to Wilbert van der Poel.
+	Casting changes to int for is* functions. 
+
+Nov 27, 2023:
+	Fix exit status of system on MacOS. Update to REGRESS.
+	Thanks to Arnold Robbins. 
+	Fix inconsistent handling of -F and --csv, and loss of csv
+	mode when FS is set. 
+	
+Nov 24, 2023:
+        Fix issue #199: gototab improvements to dynamically resize the
+        table, qsort and bsearch to improve the lookup speed as the
+        table gets larger for multibyte input. Thanks to Arnold Robbins.
+
+Nov 23, 2023:
+	Fix Issue #169, related to escape sequences in strings.
+	Thanks to Github user rajeevvp.
+	Fix Issue #147, reported by Github user drawkula, and fixed
+	by Miguel Pineiro Jr.
+
+Nov 20, 2023:
+	Rewrite of fnematch to fix a number of issues, including
+	extraneous output, out-of-bounds access, number of bytes
+	to push back after a failed match etc.
+	Thanks to Miguel Pineiro Jr.
+
+Nov 15, 2023:
+	Man page edit, regression test fixes. Thanks to Arnold Robbins
+	Consolidation of sub and gsub into dosub, removing duplicate
+	code. Thanks to Miguel Pineiro Jr.
+	gcc replaced with cc everywhere.
+
+Oct 30, 2023:
+	Multiple fixes and a minor code cleanup.
+	Disabled utf-8 for non-multibyte locales, such as C or POSIX.
+	Fixed a bad char * cast that causes incorrect results on big-endian
+	systems. Also fixed an out-of-bounds read for empty CCL.
+	Fixed a buffer overflow in substr with utf-8 strings.
+	Many thanks to Todd C Miller.
+
+Sep 24, 2023:
+	fnematch and getrune have been overhauled to solve issues around
+	unicode FS and RS. Also fixed gsub null match issue with unicode.
+	Big thanks to Arnold Robbins.
+
+Sep 12, 2023:
+	Fixed a length error in u8_byte2char that set RSTART to
+	incorrect (cannot happen) value for EOL match(str, /$/).
+
+
+-----------------------------------------------------------------
+
+[This entry is a summary, not a precise list of changes.]
+
+	Added --csv option to enable processing of comma-separated
+	values inputs.  When --csv is enabled, fields are separated
+	by commas, fields may be quoted with " double quotes, fields
+	may contain embedded newlines.
+
+	If no explicit separator argument is provided, split() uses
+	the setting of --csv to determine how fields are split.
+
+	Strings may now contain UTF-8 code points (not necessarily
+	characters).  Functions that operate on characters, like
+	length, substr, index, match, etc., use UTF-8, so the length
+	of a string of 3 emojis is 3, not 12 as it would be if bytes
+	were counted.
+
+	Regular expressions are processed as UTF-8.
+
+	Unicode literals can be written as \u followed by one
+	to eight hexadecimal digits.  These may appear in strings and
+	regular expressions.

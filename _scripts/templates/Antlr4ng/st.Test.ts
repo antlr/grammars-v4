@@ -18,11 +18,13 @@ import { Trees } from 'antlr4ng';
 import { escapeWhitespace } from 'antlr4ng';
 import { readFileSync } from 'fs';
 import { writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { openSync } from 'fs';
 import { readSync } from 'fs';
 import { writeSync } from 'fs';
 import { closeSync } from 'fs';
 import { readFile } from 'fs/promises'
+import { join as pathJoin, dirname as pathDirname, resolve as pathResolve, parse as pathParse } from 'path';
 import { isToken } from 'antlr4ng';
 import { BinaryCharStream } from './BinaryCharStream.js';
 import { ErrorListener } from './ErrorListener.js';
@@ -47,6 +49,7 @@ function getChar() {
 }
 
 var tee = false;
+var output_dir = '';
 var show_profile = false;
 var show_tree = false;
 var show_tokens = false;
@@ -84,6 +87,10 @@ function main() {
                 is_fns.push(false);
                 break;
             case '-tee':
+                tee = true;
+                break;
+            case '-o':
+                output_dir = process.argv[++i];
                 tee = true;
                 break;
             case '-encoding':
@@ -180,13 +187,20 @@ function ParseFilename(input: string, row_number: number) {
 }
 
 function DoParse(str: CharStream, input_name: string, row_number: number) {
+    let out_name = input_name;
+    if (output_dir) {
+        const absPath = pathResolve(input_name);
+        const rootless = absPath.slice(pathParse(absPath).root.length);
+        out_name = pathJoin(output_dir, rootless);
+        mkdirSync(pathDirname(out_name), { recursive: true });
+    }
     if (binary) str = new BinaryCharStream(str);
     const lexer = new <lexer_name>(str);
     const tokens = new CommonTokenStream(lexer);
     const parser = new <parser_name>(tokens);
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
-    var output = tee ? openSync(input_name + ".errors", 'w') : 1;
+    var output = tee ? openSync(out_name + ".errors", 'w') : 1;
     var listener_parser = new ErrorListener(quiet, tee, output);
     var listener_lexer = new ErrorListener(quiet, tee, output);
     parser.addErrorListener(listener_parser);
@@ -227,7 +241,7 @@ function DoParse(str: CharStream, input_name: string, row_number: number) {
     }
     if (show_tree) {
         if (tee) {
-            writeFileSync(input_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
+            writeFileSync(out_name + ".tree", tree.toStringTree(parser.ruleNames, parser));
         } else {
             console.error(tree.toStringTree(parser.ruleNames, parser));
         }

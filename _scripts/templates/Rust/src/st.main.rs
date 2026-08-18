@@ -28,9 +28,25 @@ fn parse_input(
     idx: i32,
     flags: &Flags,
 ) -> (usize, usize, f64) {
+    let out_name: String = if let Some(ref odir) = flags.output_dir {
+        let abs = std::fs::canonicalize(input_name)
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default().join(input_name));
+        let rootless: std::path::PathBuf = abs.components()
+            .filter(|c| !matches!(c,
+                std::path::Component::Prefix(_) |
+                std::path::Component::RootDir))
+            .collect();
+        let p = std::path::Path::new(odir).join(rootless);
+        if let Some(parent) = p.parent() {
+            std::fs::create_dir_all(parent).ok();
+        }
+        p.to_string_lossy().into_owned()
+    } else {
+        input_name.to_string()
+    };
         let writer: Rc\<RefCell\<Box\<dyn Write>>> = Rc::new(RefCell::new(
                 if flags.tee {
-                        Box::new(File::create(format!("{}.errors", input_name)).unwrap()) as Box\<dyn Write>
+                        Box::new(File::create(format!("{}.errors", out_name)).unwrap()) as Box\<dyn Write>
                 } else {
                         Box::new(io::sink()) as Box\<dyn Write>
                 }
@@ -88,7 +104,7 @@ fn parse_input(
     if flags.show_tree {
         let tree_str = tree.to_string_tree(&*parser);
         if flags.tee {
-            let mut f = File::create(format!("{}.tree", input_name)).unwrap();
+            let mut f = File::create(format!("{}.tree", out_name)).unwrap();
             write!(f, "{}", tree_str).ok();
         } else {
             eprintln!("{}", tree_str);
@@ -117,6 +133,7 @@ struct Flags {
     show_trace: bool,
     tee: bool,
     quiet: bool,
+    output_dir: Option\<String>,
 }
 
 fn main() {
@@ -129,6 +146,7 @@ fn main() {
         show_trace: false,
         tee: false,
         quiet: false,
+        output_dir: None,
     };
 
     let args: Vec\<String> = env::args().collect();
@@ -147,6 +165,11 @@ fn main() {
                 flags.is_fns.push(false);
             }
             "-tee" => flags.tee = true,
+            "-o" => {
+                i += 1;
+                flags.output_dir = Some(args[i].clone());
+                flags.tee = true;
+            }
             "-q" => flags.quiet = true,
             "-trace" => flags.show_trace = true,
             "-x" => {
