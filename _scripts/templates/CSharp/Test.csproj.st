@@ -23,7 +23,7 @@
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
   \</PropertyGroup>
-  \<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" >
+  \<PropertyGroup>
     \<NoWarn>1701;1702;3021\</NoWarn>
   \</PropertyGroup>
   \<PropertyGroup>

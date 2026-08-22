@@ -22,7 +22,7 @@ esac
 # Get a list of test files from the test directory. Do not include any
 # .errors or .tree files. Pay close attention to remove only file names
 # that end with the suffix .errors or .tree.
-files2=`dotnet trash glob '../<example_files_unix>' | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+files2=`dotnet trash glob <glob_args_unix> | tr -d '\r' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 files=()
 for f in $files2
 do
@@ -96,7 +96,7 @@ fi
 # Execute trquery parse tree validation.
 echo "Checking any trquery parse tree assertions..."
 assertions_err=0
-for file in `dotnet trash glob '../<example_files_unix>' | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
+for file in `dotnet trash glob <glob_args_unix> | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 do
     trq=$file.trq
     if [ -f "$trq" ]
