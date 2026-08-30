@@ -89,8 +89,13 @@ public abstract class CSharpParserBase : Parser
 
     public void BeginVariableDeclaration()
     {
-        // The 'type' rule is the last child matched in the current rule context so far.
-        _pendingVarType = Context.GetChild(Context.ChildCount - 1).GetText();
+        // The 'type' rule is the last child matched so far.  After left-factoring
+        // (typed_member_declaration), type_ lives in the parent context; fall back
+        // to the parent when the current context has no children yet.
+        IParseTree ctx = (IParseTree)Context;
+        if (ctx.ChildCount == 0 && ctx.Parent != null)
+            ctx = (IParseTree)ctx.Parent;
+        _pendingVarType = ctx.GetChild(ctx.ChildCount - 1).GetText();
     }
 
     // Shared by variable_declarator (fields) and explicitly_typed_local_variable_declarator.
@@ -550,6 +555,253 @@ return;
 
     public bool IsClassBaseInterfaceList() => ClassBaseTypeCheck(true);
     public bool IsClassBaseClassType()     => ClassBaseTypeCheck(false);
+
+    //--------------------------------------------------------------------------------------
+    // type_parameter_constraints disambiguation
+    //
+    // Alt 1 (primary_constraint) and alt 2 (secondary_constraints) are structurally
+    // identical for type-name-based constraints: class_type and interface_type both
+    // reduce to type_name.  Without a predicate ANTLR falls back to LL(*), which
+    // speculatively parses the full type_argument_list (including type_ with its own
+    // predicates) for every constraint — O(n) work per token of generic arity.
+    //
+    // IsPrimaryConstraintAhead() inspects LT(1) only — no lookahead into '<':
+    //   • keyword-only primary forms (class/struct/notnull/unmanaged) → true
+    //   • object / string → true  (always class types)
+    //   • known type parameter or known interface type → false (secondary)
+    //   • unknown identifier → true  (open-world: assume class type)
+
+    public bool IsPrimaryConstraintAhead()
+    {
+        IToken t = ((CommonTokenStream)InputStream).LT(1);
+        if (t == null) return false;
+        switch (t.Type)
+        {
+            case CSharpLexer.KW_CLASS:
+            case CSharpLexer.KW_STRUCT:
+            case CSharpLexer.KW_NOTNULL:
+            case CSharpLexer.KW_UNMANAGED:
+            case CSharpLexer.KW_OBJECT:
+            case CSharpLexer.KW_STRING:
+                return true;
+        }
+        CSharpSymbol sym = SymTable.CurrentScope.LookupChain(t.Text);
+        if (sym == null) return true;  // unknown — default to class type (primary)
+        if (sym.Kind == CSharpSymbolKind.TypeParameter) return false;
+        if (sym.Kind != CSharpSymbolKind.Type) return true;
+        CSharpTypeSymbol ts = sym as CSharpTypeSymbol;
+        if (ts == null) return true;
+        return ts.TypeKind != CSharpTypeKind.Interface;
+    }
+
+    public bool IsSecondaryConstraintAhead() => !IsPrimaryConstraintAhead();
+
+    //--------------------------------------------------------------------------------------
+    // class_member_declaration / struct_member_declaration / interface_member_declaration
+    // disambiguation: method vs property vs field
+    //
+    // All three share the token prefix:
+    //   attributes? modifiers* [ref [readonly]] return_type member_name
+    // The discriminating token (  '(' = method,  '{'/'=>' = property,  ';'/',''=' = field )
+    // only appears AFTER the member name.  For a return type like B<A<T>,A<T>> that
+    // pushes the '(' out to token #16, causing k=16 LL(*) ATN exploration.
+    //
+    // IsMethodMemberDeclarationAhead() does a single linear forward scan — no ATN
+    // simulation — tracking angle-bracket depth to skip the return type, then the
+    // member name, then returning true iff '(' or '<' (generic method) follows.
+
+    public bool IsMethodMemberDeclarationAhead()
+    {
+        var ts = (CommonTokenStream)InputStream;
+        int i  = 1;
+
+        // 1. Skip attribute sections  [ ... ]
+        while (ts.LT(i).Type == CSharpLexer.TK_LBRACK)
+            i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LBRACK, CSharpLexer.TK_RBRACK);
+
+        // 2. Skip member modifier keywords
+        while (IsMemberModifierForScan(ts.LT(i).Type))
+            i++;
+
+        // 3. Skip optional 'partial'  (allowed in method_modifiers)
+        if (ts.LT(i).Type == CSharpLexer.KW_PARTIAL)
+            i++;
+
+        // 4. Skip optional ref_kind: 'ref' ['readonly']
+        if (ts.LT(i).Type == CSharpLexer.KW_REF)
+        {
+            i++;
+            if (ts.LT(i).Type == CSharpLexer.KW_READONLY)
+                i++;
+        }
+
+        // 5. Skip the return type
+        i = ScanSkipType(ts, i);
+        int afterType = i;
+
+        // 6. Skip the member name (possibly interface-qualified)
+        i = ScanSkipMemberName(ts, i);
+
+        // If no member-name token was consumed, the single identifier was the
+        // constructor/type name — not a method-style return type.
+        if (i == afterType) return false;
+
+        // 7. It's a method if followed by '(' (parameter list) or '<' (type-parameter list)
+        int tt = ts.LT(i).Type;
+        return tt == CSharpLexer.TK_LPAREN || tt == CSharpLexer.TK_LT;
+    }
+
+    // All token types that can appear as member modifier keywords.
+    private static bool IsMemberModifierForScan(int tt)
+    {
+        switch (tt)
+        {
+            case CSharpLexer.KW_NEW:       case CSharpLexer.KW_PUBLIC:
+            case CSharpLexer.KW_PROTECTED: case CSharpLexer.KW_INTERNAL:
+            case CSharpLexer.KW_PRIVATE:   case CSharpLexer.KW_STATIC:
+            case CSharpLexer.KW_VIRTUAL:   case CSharpLexer.KW_SEALED:
+            case CSharpLexer.KW_OVERRIDE:  case CSharpLexer.KW_ABSTRACT:
+            case CSharpLexer.KW_EXTERN:    case CSharpLexer.KW_READONLY:
+            case CSharpLexer.KW_ASYNC:     case CSharpLexer.KW_UNSAFE:
+            case CSharpLexer.KW_VOLATILE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Skip a return-type token sequence and return the index of the first token after it.
+    // Handles: void, predefined-type keywords, identifiers, generic args '<...>',
+    //          qualified names 'A.B.C', array ranks '[]'/'[,]', nullable '?',
+    //          pointer '*', and tuple return types '(...)'.
+    private static int ScanSkipType(CommonTokenStream ts, int i)
+    {
+        int tt = ts.LT(i).Type;
+
+        if (tt == CSharpLexer.KW_VOID)
+            return i + 1;
+
+        // Tuple return type: '(' type, type, ... ')'
+        if (tt == CSharpLexer.TK_LPAREN)
+        {
+            i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LPAREN, CSharpLexer.TK_RPAREN);
+            if (ts.LT(i).Type == CSharpLexer.TK_QMARK) i++;
+            return i;
+        }
+
+        if (!IsTypeNameTokenForScan(tt)) return i;
+        i++; // consume the base type token (identifier or predefined keyword)
+
+        // Skip optional generic arguments '<...>'
+        if (ts.LT(i).Type == CSharpLexer.TK_LT)
+            i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LT, CSharpLexer.TK_GT);
+
+        // Skip qualified name continuations: '.' identifier ['<...>']
+        while (ts.LT(i).Type == CSharpLexer.TK_DOT)
+        {
+            i++; // '.'
+            if (IsTypeNameTokenForScan(ts.LT(i).Type)) i++;
+            if (ts.LT(i).Type == CSharpLexer.TK_LT)
+                i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LT, CSharpLexer.TK_GT);
+        }
+
+        // Skip array rank specifiers: '[' ','* ']'
+        while (ts.LT(i).Type == CSharpLexer.TK_LBRACK)
+            i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LBRACK, CSharpLexer.TK_RBRACK);
+
+        // Skip nullable annotation '?'
+        if (ts.LT(i).Type == CSharpLexer.TK_QMARK) i++;
+
+        // Skip pointer stars '*'
+        while (ts.LT(i).Type == CSharpLexer.ASTERISK) i++;
+
+        return i;
+    }
+
+    // Skip a member name (identifier, optionally interface-qualified: IFoo<T>.Name).
+    private static int ScanSkipMemberName(CommonTokenStream ts, int i)
+    {
+        if (!IsIdentTokenForScan(ts.LT(i).Type)) return i;
+        i++;
+        // Optional generic args on the interface part: IFoo<T>.Name
+        if (ts.LT(i).Type == CSharpLexer.TK_LT)
+            i = ScanSkipBalanced(ts, i, CSharpLexer.TK_LT, CSharpLexer.TK_GT);
+        // Optional '.' identifier for the qualified member name
+        if (ts.LT(i).Type == CSharpLexer.TK_DOT)
+        {
+            i++;
+            if (IsIdentTokenForScan(ts.LT(i).Type)) i++;
+        }
+        return i;
+    }
+
+    // Skip a balanced open/close bracket pair, returning the index just after the
+    // closing bracket.  Nesting is tracked so inner pairs are handled correctly.
+    // NOTE: for '<'/'>' this works because the lexer has no '>>' token — right_shift
+    // in this grammar is two consecutive '>' tokens.
+    private static int ScanSkipBalanced(CommonTokenStream ts, int i, int open, int close)
+    {
+        int depth = 1;
+        i++; // skip the opening bracket
+        while (depth > 0)
+        {
+            int tt = ts.LT(i++).Type;
+            if (tt == TokenConstants.EOF) break;
+            if      (tt == open)  depth++;
+            else if (tt == close) depth--;
+        }
+        return i;
+    }
+
+    // Tokens that can begin or continue a type name (identifier or predefined type keyword).
+    private static bool IsTypeNameTokenForScan(int tt)
+    {
+        switch (tt)
+        {
+            case CSharpLexer.Simple_Identifier:
+            case CSharpLexer.KW_BOOL:    case CSharpLexer.KW_BYTE:
+            case CSharpLexer.KW_CHAR:    case CSharpLexer.KW_DECIMAL:
+            case CSharpLexer.KW_DOUBLE:  case CSharpLexer.KW_FLOAT:
+            case CSharpLexer.KW_INT:     case CSharpLexer.KW_LONG:
+            case CSharpLexer.KW_OBJECT:  case CSharpLexer.KW_SBYTE:
+            case CSharpLexer.KW_SHORT:   case CSharpLexer.KW_STRING:
+            case CSharpLexer.KW_UINT:    case CSharpLexer.KW_ULONG:
+            case CSharpLexer.KW_USHORT:  case CSharpLexer.KW_DYNAMIC:
+            // Contextual keywords that can appear as type names
+            case CSharpLexer.KW_VAR:     case CSharpLexer.KW_NAMEOF:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Tokens that can be identifier-like (Simple_Identifier or any contextual keyword)
+    // and therefore can appear as a member name.
+    private static bool IsIdentTokenForScan(int tt)
+    {
+        if (tt == CSharpLexer.Simple_Identifier) return true;
+        switch (tt)
+        {
+            case CSharpLexer.KW_ADD:        case CSharpLexer.KW_ALIAS:
+            case CSharpLexer.KW_ASCENDING:  case CSharpLexer.KW_ASYNC:
+            case CSharpLexer.KW_AWAIT:      case CSharpLexer.KW_BY:
+            case CSharpLexer.KW_DESCENDING: case CSharpLexer.KW_DYNAMIC:
+            case CSharpLexer.KW_EQUALS:     case CSharpLexer.KW_FROM:
+            case CSharpLexer.KW_GET:        case CSharpLexer.KW_GLOBAL:
+            case CSharpLexer.KW_GROUP:      case CSharpLexer.KW_INTO:
+            case CSharpLexer.KW_JOIN:       case CSharpLexer.KW_LET:
+            case CSharpLexer.KW_NAMEOF:     case CSharpLexer.KW_NOTNULL:
+            case CSharpLexer.KW_ON:         case CSharpLexer.KW_ORDERBY:
+            case CSharpLexer.KW_PARTIAL:    case CSharpLexer.KW_REMOVE:
+            case CSharpLexer.KW_SELECT:     case CSharpLexer.KW_SET:
+            case CSharpLexer.KW_UNMANAGED:  case CSharpLexer.KW_VALUE:
+            case CSharpLexer.KW_VAR:        case CSharpLexer.KW_WHEN:
+            case CSharpLexer.KW_WHERE:      case CSharpLexer.KW_YIELD:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     // True when LT(1) is NOT a known type parameter and NOT a known value type.
     // Unambiguous reference-type openers (dynamic, object, string, '[') always return true.
