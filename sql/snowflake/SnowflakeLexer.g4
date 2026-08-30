@@ -327,6 +327,7 @@ ESCAPE_UNENCLOSED_FIELD          : 'ESCAPE_UNENCLOSED_FIELD';
 EVENT                            : 'EVENT';
 EXCEPT                           : 'EXCEPT';
 EXCLUDE                          : 'EXCLUDE';
+EXCLUDING                        : 'EXCLUDING';
 EXCHANGE                         : 'EXCHANGE';
 EXECUTE                          : 'EXEC' 'UTE'?;
 EXECUTION                        : 'EXECUTION';
