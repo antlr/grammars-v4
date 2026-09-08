@@ -163,6 +163,7 @@ FUNCTION options {
     | 'quantile_over_time'
     | 'stddev_over_time'
     | 'stdvar_over_time'
+    | 'mad_over_time'
     | 'last_over_time'
     | 'present_over_time'
     | 'acos'
