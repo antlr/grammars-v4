@@ -155,7 +155,7 @@ jobs:
       run: rustup --version
     - name: Cache antlr4-rust-gen
       id: cache-antlr4-rust-gen
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/.cargo/bin/antlr4-rust-gen
         key: antlr4-rust-gen-v0.33.1-${{ runner.os }}-${{ runner.arch }}
