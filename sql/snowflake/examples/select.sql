@@ -172,3 +172,6 @@ SELECT * FROM t PIVOT(SUM(amount) FOR quarter IN (
 WITH LOCATION as ( SELECT 1 as LOCATION)
 SELECT LOCATION.LOCATION as LOCATION
 FROM LOCATION;
+
+SELECT COUNT(accounts.account_id) FROM accounts;
+SELECT accounts.name FROM db1.public.accounts AS accounts WHERE accounts.id > 0;
