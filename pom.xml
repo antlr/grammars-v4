@@ -365,6 +365,7 @@
 				<module>swift-fin</module>
 				<module>sysml-v2</module>
 				<module>szf</module>
+                <module>tablegen</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
