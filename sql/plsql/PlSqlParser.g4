@@ -6524,7 +6524,11 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions_ ')' | collection_expression)
+    : VALUES (
+        REGULAR_ID
+        | '(' expressions_ ')' (COMMA '(' expressions_ ')')*
+        | collection_expression
+    )
     ;
 
 merge_statement
