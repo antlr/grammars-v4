@@ -33,17 +33,17 @@ root
 //# *** Top level ***
 //ContainerMembers <- container_doc_comment? ContainerDeclaration* (ContainerField COMMA)* (ContainerField / ContainerDeclaration*)
 container_members
-    : Container_doc_comment? container_declaration* (container_field ',')* (container_field | container_declaration*)
+    : Container_doc_comment* (container_declaration | container_field ','?)*
     ;
 //ContainerDeclaration <- TestDecl / ComptimeDecl / doc_comment? KEYWORD_pub? Decl
 container_declaration
     : test_decl
     | comptime_decl
-    | Doc_comment? PUB? decl
+    | Doc_comment* PUB? decl
     ;
 //TestDecl <- KEYWORD_test (STRINGLITERALSINGLE / IDENTIFIER)? Block
 test_decl
-    : TEST (STRINGLITERAL | IDENTIFIER) block
+    : TEST (STRINGLITERAL | MULTILINESTRING+ | IDENTIFIER)? block
     ;
 //ComptimeDecl <- KEYWORD_comptime Block
 comptime_decl
@@ -53,8 +53,8 @@ comptime_decl
 //    <- (KEYWORD_export / KEYWORD_extern STRINGLITERALSINGLE? / KEYWORD_inline / KEYWORD_noinline)? FnProto (SEMICOLON / Block)
 //     / (KEYWORD_export / KEYWORD_extern STRINGLITERALSINGLE?)? KEYWORD_threadlocal? GlobalVarDecl
 decl
-    : (EXPORT | EXTERN STRINGLITERAL? | INLINE | NOINLINE)? fn_proto (';' | block)
-    | (EXPORT | EXTERN STRINGLITERAL)? THREADLOCAL? global_var_decl
+    : (EXPORT | EXTERN (STRINGLITERAL | MULTILINESTRING+)? | INLINE | NOINLINE)? fn_proto (';' | block)
+    | (EXPORT | EXTERN (STRINGLITERAL | MULTILINESTRING+)?)? THREADLOCAL? global_var_decl
     ;
 //FnProto <- KEYWORD_fn IDENTIFIER? LPAREN ParamDeclList RPAREN ByteAlign? AddrSpace? LinkSection? CallConv? EXCLAMATIONMARK? TypeExpr
 fn_proto
@@ -70,7 +70,7 @@ global_var_decl
     ;
 //ContainerField <- doc_comment? KEYWORD_comptime? !KEYWORD_fn (IDENTIFIER COLON)? TypeExpr ByteAlign? (EQUAL Expr)?
 container_field
-    : Doc_comment? COMPTIME? (IDENTIFIER ':')? type_expr byte_align? ('=' expr)?
+    : Doc_comment* COMPTIME? (IDENTIFIER ':')? type_expr byte_align? ('=' expr)?
     ;
 //Statement
 //    <- KEYWORD_comptime ComptimeStatement
@@ -97,6 +97,8 @@ statement
 comptime_statement
     : block_expr
     | var_decl_expr_statement
+    | labeled_statement
+    | if_statement
     ;
 //IfStatement
 //    <- IfPrefix BlockExpr ( KEYWORD_else Payload? Statement )?
@@ -287,7 +289,7 @@ primary_type_expr
     : BUILTINIDENTIFIER fn_call_arguments
     | CHAR_LITERAL
     | container_decl
-    | '.' IDENTIFIER
+    | '.' (IDENTIFIER | keyword)
     | '.' init_list
     | error_set_decl
     | FLOAT
@@ -302,6 +304,7 @@ primary_type_expr
     | ANYFRAME
     | UNREACHABLE
     | STRINGLITERAL
+    | MULTILINESTRING+
     ;
 // ContainerDecl <- (KEYWORD_extern / KEYWORD_packed)? ContainerDeclAuto
 container_decl
@@ -355,7 +358,7 @@ asm_output
     ;
 //AsmOutputItem <- LBRACKET IDENTIFIER RBRACKET STRINGLITERAL LPAREN (MINUSRARROW TypeExpr / IDENTIFIER) RPAREN
 asm_output_item
-    : '[' IDENTIFIER ']' STRINGLITERAL '(' ('>' type_expr | IDENTIFIER) ')'
+    : '[' IDENTIFIER ']' (STRINGLITERAL | MULTILINESTRING+) '(' ('->' type_expr | IDENTIFIER) ')'
     ;
 //AsmInput <- COLON AsmInputList AsmClobbers?
 asm_input
@@ -363,7 +366,7 @@ asm_input
     ;
 //AsmInputItem <- LBRACKET IDENTIFIER RBRACKET STRINGLITERAL LPAREN Expr RPAREN
 asm_input_item
-    : '[' IDENTIFIER ']' STRINGLITERAL '(' expr ')'
+    : '[' IDENTIFIER ']' (STRINGLITERAL | MULTILINESTRING+) '(' expr ')'
     ;
 //AsmClobbers <- COLON Expr
 asm_clobbers
@@ -380,7 +383,7 @@ block_label
     ;
 //FieldInit <- DOT IDENTIFIER EQUAL Expr
 field_init
-    : '.' IDENTIFIER '=' expr
+    : '.' (IDENTIFIER | keyword) '=' expr
     ;
 //WhileContinueExpr <- COLON LPAREN AssignExpr RPAREN
 while_continue_expr
@@ -403,7 +406,7 @@ call_conv
 //    <- doc_comment? (KEYWORD_noalias / KEYWORD_comptime)? (IDENTIFIER COLON)? ParamType
 //     / DOT3
 param_decl
-    : Doc_comment? (NOALIAS | COMPTIME)? (IDENTIFIER ':')? param_type
+    : Doc_comment* (NOALIAS | COMPTIME)? (IDENTIFIER ':')? param_type
     | '...'
     ;
 //ParamType
@@ -424,7 +427,7 @@ while_prefix
     ;
 //ForPrefix <- KEYWORD_for LPAREN ForArgumentsList RPAREN PtrListPayload
 for_prefix
-    : FOR '(' for_arguments_list ')' ptr_list_payload
+    : FOR '(' for_arguments_list ')' ptr_list_payload?
     ;
 //# Payloads
 //Payload <- PIPE IDENTIFIER PIPE
@@ -603,8 +606,8 @@ prefix_op
 prefix_type_op
     : '?'
     | ANYFRAME '->'
-    | slice_type_start
-    | ptr_type_start
+    | slice_type_start (byte_align | addr_space | CONST | VOLATILE | ALLOWZERO)*
+    | ptr_type_start (byte_align | addr_space | CONST | VOLATILE | ALLOWZERO)*
     | array_type_start
     ;
 //SuffixOp
@@ -613,11 +616,12 @@ prefix_type_op
 //     / DOTASTERISK
 //     / DOTQUESTIONMARK
 suffix_op
-    : '[' expr ('..' (expr? (':' expr)?)?)? ']'
-    | DOT IDENTIFIER
+    : '[' expr ('..' expr? (':' expr)?)? ']'
+    | '.' (IDENTIFIER | keyword)
     | '.*'
     | '.?'
     ;
+
 //FnCallArguments <- LPAREN ExprList RPAREN
 fn_call_arguments
     : '(' expr_list ')'
@@ -635,7 +639,7 @@ slice_type_start
 ptr_type_start
     : '*'
     | '**'
-    | '[' '*' (LETTERC | ':' expr)? ']'
+    | '[' '*' (IDENTIFIER | ':' expr)? ']'
     ;
 //ArrayTypeStart <- LBRACKET Expr (COLON Expr)? RBRACKET
 array_type_start
@@ -660,16 +664,16 @@ container_decl_type
 //# Alignment
 //ByteAlign <- KEYWORD_align LPAREN Expr RPAREN
 byte_align
-    : ALIGN '(' expr ')'
+    : ALIGN LPAREN expr ( COLON expr COLON expr )? RPAREN
     ;
 //# Lists
 //IdentifierList <- (doc_comment? IDENTIFIER COMMA)* (doc_comment? IDENTIFIER)?
 identifier_list
-    : (Doc_comment? IDENTIFIER ',')* (Doc_comment? IDENTIFIER)?
+    : (Doc_comment* IDENTIFIER ',')* (Doc_comment* IDENTIFIER)?
     ;
 //SwitchProngList <- (SwitchProng COMMA)* SwitchProng?
 switch_prong_list
-    : (switch_prong ',')* switch_prong?
+    : (switch_prong ',')*
     ;
 //AsmOutputList <- (AsmOutputItem COMMA)* AsmOutputItem?
 asm_output_list
@@ -687,3 +691,13 @@ param_decl_list
 expr_list
     : (expr ',')* expr?
     ;
+
+keyword
+    : ADDRSPACE | ALIGN | ALLOWZERO | AND | ANYFRAME | ANYTYPE | ASM | BREAK
+    | CALLCONV | CATCH | COMPTIME | CONST | CONTINUE | DEFER | ELSE | ENUM
+    | ERRDEFER | ERROR | EXPORT | EXTERN | FN | FOR | IF | INLINE | LINKSECTION
+    | NOALIAS | NOINLINE | NOSUSPEND | OPAQUE | OR | ORELSE | PACKED | PUB
+    | RESUME | RETURN | STRUCT | SUSPEND | SWITCH | TEST | THREADLOCAL | TRY
+    | UNION | UNREACHABLE | VAR | VOLATILE | WHILE
+    ;
+
