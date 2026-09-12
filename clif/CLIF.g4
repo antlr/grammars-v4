@@ -42,6 +42,8 @@
 
 grammar CLIF;
 
+start: cltext* EOF;
+
 //A.2.3.1 Term sequence
 termseq
     : (term | SEQMARK)*
@@ -125,7 +127,7 @@ commentsent
 
 //A.2.3.10 Module
 module
-    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext? CLOSE
+    : OPEN 'cl-module' interpretablename (OPEN 'cl-excludes' name* CLOSE)? cltext* CLOSE
     ;
 
 //A.2.3.11 Phrase
