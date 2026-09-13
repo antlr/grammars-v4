@@ -42,7 +42,7 @@
 
 grammar CLIF;
 
-start_: cltext* EOF;
+start_: cltext* EOF; // underscore required for Antlr4 renaming.
 
 //A.2.3.1 Term sequence
 termseq
