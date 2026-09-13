@@ -42,7 +42,7 @@
 
 grammar CLIF;
 
-start: cltext* EOF;
+start_: cltext* EOF;
 
 //A.2.3.1 Term sequence
 termseq
@@ -138,18 +138,18 @@ phrase
     | OPEN 'cl-comment' ENCLOSEDNAME cltext? CLOSE
     ;
 
-text
+text_
     : phrase+
     ;
 
 cltext
     : module
     | namedtext
-    | text
+    | text_
     ;
 
 namedtext
-    : OPEN 'cl-text' interpretablename text? CLOSE
+    : OPEN 'cl-text' interpretablename text_? CLOSE
     ;
 
 //A.2.2.2 Delimiters
