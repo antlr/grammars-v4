@@ -187,7 +187,12 @@ abstract class CSharpParserBase extends Parser {
     }
 
     void BeginVariableDeclaration() {
-        final ctx = context!;
+        // After left-factoring (typed_member_declaration), type_ lives in the
+        // parent context; fall back to parent when current context has no children.
+        var ctx = context!;
+        if (ctx.childCount == 0 && ctx.parent is ParserRuleContext) {
+            ctx = ctx.parent as ParserRuleContext;
+        }
         _pendingVarType = ctx.getChild(ctx.childCount - 1)!.text!;
     }
 
@@ -282,6 +287,21 @@ abstract class CSharpParserBase extends Parser {
 
     bool IsClassBaseInterfaceList() => _classBaseTypeCheck(true);
     bool IsClassBaseClassType()     => _classBaseTypeCheck(false);
+
+    bool IsPrimaryConstraintAhead() {
+        final tok = (inputStream as TokenStream).LT(1);
+        if (tok == null) return false;
+        if (tok.type == CSharpLexer.TOKEN_KW_CLASS || tok.type == CSharpLexer.TOKEN_KW_STRUCT ||
+            tok.type == CSharpLexer.TOKEN_KW_NOTNULL || tok.type == CSharpLexer.TOKEN_KW_UNMANAGED ||
+            tok.type == CSharpLexer.TOKEN_KW_OBJECT || tok.type == CSharpLexer.TOKEN_KW_STRING)
+            return true;
+        final sym = symTable.currentScope.lookupChain(tok.text ?? '');
+        if (sym == null) return true;
+        if (sym.kind == CSharpSymbolKind.typeParameter) return false;
+        if (sym.kind != CSharpSymbolKind.type_) return true;
+        return sym.typeKind != CSharpTypeKind.interface_;
+    }
+    bool IsSecondaryConstraintAhead() => !IsPrimaryConstraintAhead();
 
     // Speculative parse not easily supported in Dart; use token-lookahead heuristic.
     // A declaration pattern starts with a type name (identifier or keyword) followed
