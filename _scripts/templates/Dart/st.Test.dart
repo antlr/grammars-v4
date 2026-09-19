@@ -61,6 +61,8 @@ var error_code = 0;
 var string_instance = 0;
 var prefix = "";
 var quiet = false;
+var perf = false;
+var per_file = false;
 var total_tokens = 0;
 var total_parse_seconds = 0.0;
 var first_file_tokens = 0;
@@ -115,6 +117,14 @@ void main(List\<String> args) async {
         {
             quiet = true;
         }
+        else if (args[i] == "--perf")
+        {
+            perf = true;
+        }
+        else if (args[i] == "--per-file")
+        {
+            per_file = true;
+        }
         else if (args[i] == "-trace")
         {
             show_trace = true;
@@ -147,6 +157,9 @@ void main(List\<String> args) async {
         s.stop();
         var et = s.elapsedMilliseconds / 1000.0;
         if (!quiet) {
+            if (!perf) {
+                stderr.writeln(prefix + "TT: " + et.toString());
+            } else {
             var warm_tokens = total_tokens - first_file_tokens;
             var warm_seconds = total_parse_seconds - first_file_parse_seconds;
             var warm_tps = (inputs.length > 1 && warm_seconds > 0)
@@ -159,9 +172,10 @@ void main(List\<String> args) async {
             stderr.writeln(prefix + "PT: " + total_parse_seconds.toString());
             stderr.writeln(prefix + "OT: " + (et - total_parse_seconds).toString());
             stderr.writeln(prefix + "TT: " + et.toString());
-            stderr.writeln(prefix + "TPS: " + (total_parse_seconds > 0 ? (total_tokens / total_parse_seconds).round().toString() : "0"));
-            stderr.writeln(prefix + "Post-warmup TPS: " + warm_tps);
+            stderr.writeln(prefix + "PR: " + (total_parse_seconds > 0 ? (total_tokens / total_parse_seconds).round().toString() : "0"));
+            stderr.writeln(prefix + "Post-warmup PR: " + warm_tps);
             stderr.writeln(prefix + "Post-warmup speed up: " + speedup);
+            }
         }
     }
     exit(error_code);
@@ -206,12 +220,12 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
     String out_name = input_name;
     if (output_dir != "") {
         String absPath = File(input_name).absolute.path;
-        // Strip drive letter (e.g. "C:") then leading separators (/ or \).
-        // Use char codes to avoid backslash literals in the template.
-        int si = 0;
-        if (absPath.length >= 2 && absPath.codeUnitAt(1) == 58) si = 2; // 58 = ':'
-        while (si \< absPath.length && (absPath.codeUnitAt(si) == 47 || absPath.codeUnitAt(si) == 92)) si++; // 47='/' 92='\'
-        String rootless = absPath.substring(si);
+        String root = Directory('../<example_dir_unix>').absolute.path;
+        String rootPrefix = root.endsWith(Platform.pathSeparator)
+            ? root : root + Platform.pathSeparator;
+        String rootless = absPath.startsWith(rootPrefix)
+            ? absPath.substring(rootPrefix.length)
+            : absPath.split(Platform.pathSeparator).last;
         out_name = output_dir + '/' + rootless;
         await Directory(File(out_name).parent.path).create(recursive: true);
     }
@@ -292,9 +306,9 @@ Future\<void> DoParse(CharStream str, String input_name, int row_number) async
             stderr.writeln(tree.toStringTree(parser: parser));
         }
     }
-    if (!quiet)
+    if (!quiet && per_file)
     {
-        stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString() + " s " + token_count.toString() + " tokens " + (et > 0 ? (token_count / et).round().toString() : "0") + " tps");
+        stderr.writeln(prefix + "Dart " + row_number.toString() + " " + input_name + " " + result + " " + et.toString() + " s " + token_count.toString() + " tokens " + (et > 0 ? (token_count / et).round().toString() : "0") + " pr");
     }
     if (tee)
     {
