@@ -1,1 +1,3 @@
-assert count(//functionDefinition/declarator/directDeclarator/Identifier[text() = "diff_filespec_size"]) = 1, "Declaration for diff_filespec_size is not being parsed correctly.";
+if (count(//functionDefinition/declarator/directDeclarator/Identifier[text() = "diff_filespec_size"]) = 1)
+then ""
+else "Declaration for diff_filespec_size is not being parsed correctly."

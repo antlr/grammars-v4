@@ -92,24 +92,27 @@ then
     fi
 fi
 
-# Validate parse trees via trquery assertions.
-# Execute trquery parse tree validation.
-echo "Checking any trquery parse tree assertions..."
+# Validate parse trees via XQuery assertions.
+echo "Checking any XQuery parse tree assertions..."
 assertions_err=0
 for file in `dotnet trash glob <glob_args_unix> | grep -v '[.]errors$' | grep -v '[.]tree$' | grep -v '[.]trq$'`
 do
     trq=$file.trq
     if [ -f "$trq" ]
     then
-        dotnet trash parse $file | dotnet trash query -c $trq
+        assertion_output=$(dotnet trash parse "$file" | dotnet trash xquery -q "$trq")
         xxx=$?
         if [ "$xxx" -ne 0 ]
         then
             assertions_err=$xxx
+        elif [ -n "$assertion_output" ]
+        then
+            echo "$trq: $assertion_output"
+            assertions_err=1
         fi
     fi
 done
-echo "Finished checking parse tree assertions."
+echo "Finished checking XQuery parse tree assertions."
 
 old=`pwd`
 cd ..
