@@ -1,2 +1,5 @@
-assert count(//functioncall) = 1, "Miscount of 'functioncalls' nodes.";
-assert count(//stat) = 1, "Miscount of 'stat' nodes.";
+if (count(//functioncall) != 1)
+then "Miscount of 'functioncall' nodes."
+else if (count(//stat) != 1)
+then "Miscount of 'stat' nodes."
+else ""

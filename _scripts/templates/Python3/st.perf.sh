@@ -104,10 +104,10 @@ fi
 # Loop from 1 to n and execute the body of the loop each time
 if [[ "$type" == "group" ]]
 then
-    echo "${files[1]}" | dotnet trash wdog python3 Test.py -x -prefix group > /dev/null 2>&1
+    echo "${files[1]}" | dotnet trash wdog python3 Test.py -x --perf --per-file -prefix group > /dev/null 2>&1
     for ((i=1; i\<=n; i++))
     do
-        echo "${files[*]}" | dotnet trash wdog python3 Test.py -x -prefix group >> parse.txt 2>&1
+        echo "${files[*]}" | dotnet trash wdog python3 Test.py -x --perf --per-file -prefix group >> parse.txt 2>&1
         xxx="$?"
         if [ "$xxx" -ne 0 ]
         then

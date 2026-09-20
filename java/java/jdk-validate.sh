@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 set -e
 
 cwd=`pwd`
-root=${cwd%examples/*}
+root=${cwd}
 echo $root
 pushd $root
 if [ ! -f desc.xml ]
@@ -13,27 +13,24 @@ then
 fi
 popd
 
-zips=(
-https://github.com/openjdk/jdk/archive/refs/tags/jdk-21-ga.zip
-)
+url=https://github.com/openjdk/jdk/archive/refs/tags/jdk-21-ga.zip
+filename=$(basename "$url")
+name="jdk-${filename%.*}"
 
-for url in ${zips[@]}
-do
+if [[ ! -f jdk-21-ga.zip ]]
+then
 	wget $url
-	filename=$(basename "$url")
-	name="jdk-${filename%.*}"
+fi
+
+if [[ ! -d jdk-jdk-21-ga ]]
+then
 	unzip "$filename" > /dev/null 2>&1
-	pushd $root
-	dotnet trash gen -t CSharp
-	cd Generated-*
-	make
-	for times in 1 2 3
-	do
-		time ( find $cwd/$name/jdk/src -name '*.java' | xargs cygpath -w | bash run.sh -x 2>&1 | grep "Total Time" )
-	done
-	cd ..
-	rm -rf Generated-*
-	popd
-	rm -rf "$filename"
-	rm -rf $name
+fi
+
+dotnet trash gen -t CSharp
+cd Generated-*
+make
+for times in 1 2 3
+do
+	time ( find $cwd/$name/src -name '*.java' | xargs cygpath -w | bash run.sh -x 2>&1 | egrep "^TT:" )
 done
