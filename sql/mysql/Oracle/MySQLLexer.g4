@@ -3131,7 +3131,7 @@ MASTER_PUBLIC_KEY_PATH_SYMBOL
     ;                                                                                     // MYSQL
 
 GET_MASTER_PUBLIC_KEY_SYMBOL
-    : G E T '_' M A S T E R '_' P U B L I C '_' K E Y '_' S Y M                           {this.isServerVersionLt80024()}?
+    : G E T '_' M A S T E R '_' P U B L I C '_' K E Y                                     {this.isServerVersionLt80024()}?
     ;                                                                                     // MYSQL
 
 RESTART_SYMBOL
@@ -3396,7 +3396,7 @@ SOURCE_SSL_CRLPATH_SYMBOL
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_KEY_SYMBOL
-    : S O U R C E '_' S S L '_' C R L P A T H                                             {this.isServerVersionGe80023()}?
+    : S O U R C E '_' S S L '_' K E Y                                                     {this.isServerVersionGe80023()}?
     ;                                                                                     // MYSQL
 
 SOURCE_SSL_VERIFY_SERVER_CERT_SYMBOL
@@ -3464,7 +3464,7 @@ GTID_ONLY_SYMBOL
     ;                                                                                     // MYSQL
 
 INTERSECT_SYMBOL
-    : I N T E R S E C T '_' S Y M B O L                                                   {this.serverVersion >= 80031}?
+    : I N T E R S E C T                                                                   {this.serverVersion >= 80031}?
     ;                                                                                     // SQL-1992-R
 
 BULK_SYMBOL
