@@ -47,3 +47,37 @@ CREATE SEMANTIC VIEW tpch_rev_analysis
   )
 
   COMMENT = 'Semantic view for revenue analysis';
+
+CREATE SEMANTIC VIEW daily_sales_trends
+
+  TABLES (
+    daily_sales AS SALES.PUBLIC.DAILY_SALES
+      PRIMARY KEY (sale_date, channel)
+  )
+
+  DIMENSIONS (
+    daily_sales.date AS sale_date,
+    daily_sales.channel AS channel,
+    daily_sales.year AS YEAR(sale_date)
+  )
+
+  METRICS (
+    daily_sales.total_revenue AS SUM(revenue),
+    -- PARTITION BY EXCLUDING partitions by every dimension requested in the query
+    -- except the listed ones, so this window walks forward in time within channel.
+    daily_sales.revenue_30d_ago AS
+      LAG(daily_sales.total_revenue, 30) OVER (
+        PARTITION BY EXCLUDING daily_sales.date
+        ORDER BY daily_sales.date),
+    daily_sales.revenue_rank AS
+      RANK() OVER (
+        PARTITION BY EXCLUDING daily_sales.date, daily_sales.channel
+        ORDER BY daily_sales.total_revenue DESC),
+    -- An explicit partition list stays valid.
+    daily_sales.running_total AS
+      SUM(daily_sales.total_revenue) OVER (
+        PARTITION BY daily_sales.year
+        ORDER BY daily_sales.date)
+  )
+
+  COMMENT = 'Window function metrics, including PARTITION BY EXCLUDING';
