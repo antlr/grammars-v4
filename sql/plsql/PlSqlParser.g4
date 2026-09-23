@@ -6154,7 +6154,7 @@ explain_statement
     ;
 
 select_only_statement
-    : with_clause? subquery
+    : subquery
     ;
 
 select_statement
@@ -6215,7 +6215,7 @@ add_calc_meas_clause
     ;
 
 subquery
-    : subquery_basic_elements subquery_operation_part*
+    : with_clause? subquery_basic_elements subquery_operation_part*
     ;
 
 subquery_basic_elements
