@@ -6173,7 +6173,7 @@ with_factoring_clause
     ;
 
 subquery_factoring_clause
-    : query_name paren_column_list? AS '(' subquery order_by_clause? ')' search_clause? cycle_clause?
+    : query_name paren_column_list? AS '(' subquery_no_with order_by_clause? ')' search_clause? cycle_clause?
     ;
 
 search_clause
@@ -6218,9 +6218,15 @@ subquery
     : with_clause? subquery_basic_elements subquery_operation_part*
     ;
 
+// A subquery that must not start with (or contain, parenthesized) a WITH clause.
+// Used where Oracle rejects a CTE: inside another CTE definition and as UNION/INTERSECT/MINUS operands.
+subquery_no_with
+    : subquery_basic_elements subquery_operation_part*
+    ;
+
 subquery_basic_elements
     : query_block
-    | '(' subquery ')'
+    | '(' subquery_no_with ')'
     ;
 
 subquery_operation_part
