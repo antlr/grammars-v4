@@ -414,10 +414,6 @@ PLUSPIPEEQUAL
    : '+|='
    ;
 
-LETTERC
-   : 'c'
-   ;
-
 QUESTIONMARK
    : '?'
    ;
@@ -467,19 +463,20 @@ TILDE
    ;
 
 Container_doc_comment
-   : '//!' ~ [\n\r]*
-   ; //-> channel(HIDDEN);
+   : '//!' ~[\r\n]*
+   ;
 
 Doc_comment
-   : '///' ~ [\n\r]*
-   ; //-> channel(HIDDEN);
+   : '///' ~[\r\n]*
+   ;
 
 Line_comment
-   : '//' ~ [/!] ~ [\n\r]* -> channel (HIDDEN)
+   : '//' ~[/!] ~[\r\n]* -> channel (HIDDEN)
    ;
 
 IDENTIFIER
    : Letter LetterOrDigit*
+   | '@"' ( '\\' . | ~[\\"\r\n] )* '"'
    ;
 
 fragment LetterOrDigit
@@ -488,29 +485,39 @@ fragment LetterOrDigit
    ;
 
 fragment Letter
-   : [a-zA-Z$_\-]
-   | ~ [\u0000-\u007F\uD800-\uDBFF]
+   : [a-zA-Z$_]
+   | ~[\u0000-\u007F\uD800-\uDBFF]
    | [\uD800-\uDBFF] [\uDC00-\uDFFF]
    ;
 
 STRINGLITERAL
-   : '"' .*? '"'
+   : '"' ( '\\' . | ~[\\"\r\n] )* '"'
+   ;
+
+MULTILINESTRING
+   : ( '\\\\' ~[\r\n]* ( '\r\n' | '\r' | '\n' )? )+
    ;
 
 CHAR_LITERAL
-   : '\'' .*? '\''
+   : '\'' ( '\\' . | ~[\\'\r\n] )* '\''
    ;
 
 INTEGER
-   : [0-9] ([0-9_]* [0-9])?
+   : '0x' [0-9a-fA-F_]+
+   | '0b' [01_]+
+   | '0o' [0-7_]+
+   | [0-9] [0-9_]*
    ;
 
 FLOAT
-   : [0-9]* '.' [0-9]+ ([eE] [+-]? [0-9]+)?
-   | [0-9]+ [eE] [+-]? [0-9]+
+   : '0x' [0-9a-fA-F_]+ '.' [0-9a-fA-F_]+ ([pP] [+-]? [0-9_]+)?
+   | '0x' [0-9a-fA-F_]+ [pP] [+-]? [0-9_]+
+   | [0-9_]+ '.' [0-9_]+ ([eE] [+-]? [0-9_]+)?
+   | [0-9_]+ [eE] [+-]? [0-9_]+
    ;
 
 BUILTINIDENTIFIER
    : '@' IDENTIFIER
    ;
+
 
