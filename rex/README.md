@@ -23,6 +23,10 @@ also handle the generated `parser/` subdirectory. Rust does not implement
 lexer superclass inheritance, so its transform inlines the same lookahead
 predicate using the generated lexer's `recog` parameter. Transforms are
 idempotent, including Rust's before/after-generation invocation.
+The Rust transform accepts both compact and formatted options blocks and preserves
+unrelated options. From the repository root, run its regression tests with
+`python -m unittest discover -s rex/tests -v`. Test CSharp lexer input replacement
+with `dotnet run --project rex/tests/CSharpInputStream` (.NET 10).
 The shared grammar names the parser rule `context_` to avoid shadowing the
 runtime's `Parser.context` member in Dart and Antlr4ng. Dart needs no grammar
 transformation; Antlr4ng only inserts the lexer header.
