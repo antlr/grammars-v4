@@ -86,11 +86,11 @@ lexicalPrimary
     ;
 
 nameOrString
-    : name context?
-    | StringLiteral context?
+    : name context_?
+    | StringLiteral context_?
     ;
 
-context
+context_
     : CaretName
     ;
 

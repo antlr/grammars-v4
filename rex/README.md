@@ -23,9 +23,9 @@ also handle the generated `parser/` subdirectory. Rust does not implement
 lexer superclass inheritance, so its transform inlines the same lookahead
 predicate using the generated lexer's `recog` parameter. Transforms are
 idempotent, including Rust's before/after-generation invocation.
-Dart and Antlr4ng also rename the `context` parser rule to `context_` in
-their generated copies, to avoid shadowing the runtime's `Parser.context`
-member. The shared grammar and the other targets retain the original name.
+The shared grammar names the parser rule `context_` to avoid shadowing the
+runtime's `Parser.context` member in Dart and Antlr4ng. Dart needs no grammar
+transformation; Antlr4ng only inserts the lexer header.
 
 OphiRust is distinct from the antlr4rust `Rust` target. Its
 `OphiRust/src/lexer_base.rs` supplies the predicate through `SemanticHooks`,
