@@ -326,6 +326,7 @@
 				<module>refal</module>
 				<module>rego</module>
 				<module>restructuredtext</module>
+                                <module>rex</module>			
 				<module>rexx</module>
 				<module>rfc822</module>
 				<module>rfc1035</module>
