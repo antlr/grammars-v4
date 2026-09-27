@@ -1,0 +1,177 @@
+{ THIS GRAMMAR IS ONLY FOR TESTING. IT SHOULD BE THE SAME AS }
+{ iso8601.ixml EXCEPT FOR THE FIRST RULE!                    }
+
+list-of-iso8601 = (iso8601-datetime;comment)++(#d?,#a),(#d?,#a)? .
+-comment = -';', -~[#a;#d]+ .
+
+{ An Invisible XML grammar for ISO 8601(:2004?) dates and times. }
+{ Originally constructed by Norm Tovey-Walsh, 17 April 2022      }
+{ See https://en.wikipedia.org/wiki/ISO_8601 among others        }
+
+-iso8601-datetime = date
+                  ; time
+                  ; datetime
+                  ; duration
+                  ; interval
+                  ; recurrence .
+
+date = calendar-date ; ordinal-date ; week-date .
+
+-time = local-time ; utc-time .
+
+-datetime = local-datetime ; utc-datetime .
+
+local-datetime = -date, -'T', -local-time-no-t .
+utc-datetime = -date, -'T', -utc-time-no-t .
+
+duration = -standard-duration; -alternate-duration .
+
+interval = start-end-interval
+         ; start-plus-duration-interval
+         ; duration-plus-end-interval .
+
+recurrence = repeat-count, -'/', interval .
+
+{ -- Calendar dates -- }
+
+-calendar-date = complete-calendar-date
+                 ; reduced-accuracy-calendar-date
+                 ; expanded-calendar-date .
+
+-complete-calendar-date = year, month, day; year, -'-', month, -'-', day .
+
+-reduced-accuracy-calendar-date = year, -'-', month; year; century .
+
+-expanded-calendar-date = expanded-year, month, day
+                        ; expanded-year, -'-', month, -'-', day
+                        ; expanded-year, -'-', month
+                        ; expanded-year
+                        ; expanded-century .
+
+{ -- Ordinal dates -- }
+
+-ordinal-date = complete-ordinal-date ; expanded-ordinal-date .
+
+-complete-ordinal-date = year, day-of-year
+                       ; year, -'-', day-of-year .
+
+-expanded-ordinal-date = expanded-year, day-of-year
+                       ; expanded-year, -'-', day-of-year .
+                         
+{ -- Week dates -- }
+
+-week-date = complete-week-date
+            ; reduced-accuracy-week-date
+            ; expanded-week-date .
+
+-complete-week-date = year, -'W', week, day-of-week
+                    ; year, -'-W', week, -'-', day-of-week .
+
+-reduced-accuracy-week-date = year, -'W', week
+                            ; year, -'-W', week .
+
+-expanded-week-date = expanded-year, -'W', week, day-of-week
+                    ; expanded-year, -'-W', week, '-', day-of-week
+                    ; expanded-year, -'W', week
+                    ; expanded-year, -'-W', week .
+
+{ -- Local time -- }
+
+local-time = local-time-t ; local-time-no-t .
+
+-local-time-t = local-time-without-utc-t; local-time-with-utc-t .
+-local-time-no-t = local-time-without-utc; local-time-with-utc .
+
+-local-time-without-utc-t = -'T', local-time-without-utc .
+
+-local-time-without-utc = hour, minute, second
+                        ; hour, -':', minute, -':', second
+                        ; hour, minute
+                        ; hour, -':', minute
+                        ; hour
+                        ; fractional-second-local-time
+                        ; fractional-minute-local-time
+                        ; fractional-hour-local-time .
+
+-local-time-with-utc-t = -local-time-without-utc-t, utc-offset .
+-local-time-with-utc = -local-time-without-utc, utc-offset .
+
+-fractional-second-local-time = (hour, minute, second; hour, -':', minute, -':', second),
+                                fraction-sep,
+                                fractional-second .
+
+-fractional-minute-local-time = (hour, minute; hour, -':', minute),
+                                fraction-sep,
+                                fractional-minute .
+
+-fractional-hour-local-time = hour, fraction-sep, fractional-hour .
+
+utc-offset = offset-hour, (-':'?, offset-minute)? .
+
+{ -- UTC time -- }
+
+utc-time = utc-time-t ; utc-time-no-t .
+-utc-time-t = -local-time-without-utc-t, -'Z' .
+-utc-time-no-t = -local-time-without-utc, -'Z' .
+
+{ -- Durations -- }
+
+-standard-duration = -'P', (standard-ymdhs-duration ; standard-week-duration) .
+
+{ N.B. This tecnically allows a standard-ymdhs-duration with no fields. }
+-standard-ymdhs-duration = duration-years?, duration-months?, duration-days?,
+                           (-'T', duration-hours?, duration-minutes?, duration-seconds?)? .
+-standard-week-duration  = duration-weeks .
+
+-alternate-duration = -'P', (alternate-ymd-duration ; alternate-yd-duration) .
+
+-alternate-ymd-duration = year, month, day, -'T', hour, minute, second
+                       ; year, -'-', month, -'-', day, -'T', hour, -':', minute, -':', second .
+-alternate-yd-duration = year, number-of-days, -'T', hour, minute, second
+                      ; year, -'-', number-of-days, -'T', hour, -':', minute, -':', second .
+
+-start-end-interval = (date; datetime), -'/', (date; datetime) .
+-start-plus-duration-interval = (date; datetime), -'/', duration .
+-duration-plus-end-interval = duration, -'/', (date; datetime) .
+
+duration-years = digit+, -'Y' .
+duration-months = digit+, -'M' .
+duration-days = digit+, -'D' .
+duration-hours = digit+, -'H' .
+duration-minutes = digit+, -'M' .
+duration-seconds = digit+, -'S' .
+duration-weeks = digit+, -'W' .
+
+{ -- Recurrence -- }
+
+-repeat-count = -'R-1' ; -'R' ; -'R', repetitions .
+repetitions = digit+ .
+
+{ -- Utility rules -- }
+
+expanded-year = sign, digit+, digit, digit, digit .
+expanded-century = sign, digit+, digit, digit .
+-sign = -'+' ; '-' .
+
+offset-hour = @direction, digit, digit .
+offset-minute = digit, digit .
+direction = '+'; '-' .
+
+year    = digit, digit, digit, digit .
+century = digit, digit .
+month   = digit, digit .
+week    = digit, digit .
+day     = digit, digit .
+hour    = digit, digit .
+minute  = digit, digit .
+second  = digit, digit .
+fractional-second = digit+ .
+fractional-minute = digit+ .
+fractional-hour = digit+ .
+
+day-of-year = digit, digit, digit .
+number-of-days = -day-of-year .
+day-of-week = digit .
+
+-digit = ["0"-"9"] .
+-fraction-sep = -[','; '.'] .
