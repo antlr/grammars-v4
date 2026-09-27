@@ -9,6 +9,9 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
+		<!-- The parent POM copies Java/ into target/generated-sources/copy
+		     and registers that directory with build-helper. This includes
+		     Java/LexerBase.java without adding a duplicate source root. -->
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>

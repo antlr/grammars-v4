@@ -2,8 +2,8 @@ lexer grammar rexLexer;
 
 options { superClass = LexerBase; }
 
-OpenQu : '<?' -> pushMode(EXPLICIT) ;
-CloseQu : '?>' -> popMode ;
+OpenQu : '<?' -> pushMode(PI_TARGET) ;
+CloseQu : '?>' ;
 RuleDef : '::=' ;
 RuleSep : ';' ;
 Sharp : '#' ;
@@ -404,13 +404,18 @@ Whitespace
 
 mode EXPLICIT;
 
+// Reuse the parser's closing token, and restore the mode preceding OpenQu.
+ExplicitCloseQu : '?>' -> type(CloseQu), popMode ;
+
 WS_Space
          : ( Space | SingleLineComment | MultiLineComment )+
 	  ;
 
 DirPIContents
-         : ( [^?\u0009\u000D\u0020\u000A] | '?'+ [^?>] ) ( [^?] | '?'+ [^?>] )* '?'*
+         : ~[?\u0009\u000D\u0020\u000A] ~[?]*
 	 ;
+// A single '?' cannot steal the '?' from the longer '?>' closing token.
+PIQuestion : '?' -> type(DirPIContents) ;
 
 mode SET;
 
@@ -420,3 +425,7 @@ SetCharRange : FCharRange ;
 SetCharCodeRange : FCharCodeRange ;
 CloseSet : ']' -> popMode ;
 
+// Read the processing-instruction target before switching to body text.
+// mode(), rather than pushMode(), preserves the original mode stack entry.
+mode PI_TARGET;
+PITarget : Name -> type(Name), mode(EXPLICIT) ;

@@ -4,22 +4,22 @@ options { tokenVocab = rexLexer; }
 
 grammar_  : prolog syntaxDefinition lexicalDefinition? encore? EOF ;
 prolog   : processingInstruction* ;
-processingInstruction : '<?' name ( WS_Space+ DirPIContents? )? '?>'
+processingInstruction : '<?' name ( WS_Space+ (DirPIContents | WS_Space)* )? CloseQu
           /* ws: explicit */
 	  ;
 syntaxDefinition : syntaxProduction+ ;
 syntaxProduction : name '::=' syntaxChoice option* ;
 syntaxChoice : syntaxSequence ( ( '|' syntaxSequence )+ | ( '/' syntaxSequence )+ )? ;
 syntaxSequence : syntaxItem* ;
-syntaxItem : syntaxPrimary ( '?' | '*' | '+' )? ;
+syntaxItem : syntaxPrimary ( Quest | '*' | '+' )? ;
 syntaxPrimary : nameOrString | '(' syntaxChoice ')' | processingInstruction ;
 lexicalDefinition : '<?TOKENS?>' ( lexicalProduction | preference | delimiter | equivalence )* ;
-lexicalProduction : ( name | '.' ) '?'? '::=' contextChoice option* ;
+lexicalProduction : ( name | '.' ) Quest? '::=' contextChoice option* ;
 contextChoice : contextExpression ( '|' contextExpression )* ;
 lexicalChoice : lexicalSequence ( '|' lexicalSequence )* ;
 contextExpression : lexicalSequence ( '&' lexicalItem )? ;
 lexicalSequence : | lexicalItem ( '-' lexicalItem | lexicalItem* ) ;
-lexicalItem : lexicalPrimary ( '?' | '*' | '+' )? ;
+lexicalItem : lexicalPrimary ( Quest | '*' | '+' )? ;
 lexicalPrimary : ( name | '.' ) | StringLiteral | '(' lexicalChoice ')' | '$' | charCode | charClass ;
 nameOrString : name context? | StringLiteral context? ;
 context  : CaretName ;
@@ -40,4 +40,3 @@ equivalenceCharRange : StringLiteral | '[' ( SetChar | SetCharCode | SetCharRang
 	  ;
 encore : '<?ENCORE?>' processingInstruction* ;
 name : Name | WsLit | ExplicitLit | DefinitionLit ;
-

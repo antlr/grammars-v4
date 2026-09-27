@@ -33,7 +33,19 @@ without rewriting the grammar. The generated driver attaches these hooks
 when constructing the lexer. If lexer rules or predicates are reordered,
 update the `NCNameChar` rule/predicate indices in the hook accordingly.
 After building `Generated-OphiRust`, run `cargo test --release` there to check
-the hook coordinates and lookahead behavior (colon, ordinary input, and EOF).
+the hook coordinates, lookahead behavior (colon, ordinary input, and EOF),
+and processing-instruction tokenization/mode restoration.
+
+Processing instructions use a target-name mode followed by a content mode.
+The `?>` token closes the content mode and restores the previous mode;
+question marks in the body are retained without consuming the terminator.
+`examples/processing-instructions.ebnf` covers empty and nonempty bodies,
+multiline content, inline instructions, and instructions after `<?ENCORE?>`.
+
+Maven inherits Java base-class source registration from the repository's
+parent POM: `Java/` is copied to a generated source root before compilation.
+Run `mvn clean test` in this directory to compile from scratch and test the
+example corpus.
 
 ## Build and test
 

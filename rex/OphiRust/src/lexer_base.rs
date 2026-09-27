@@ -32,7 +32,7 @@ impl SemanticHooks for LexerBase {
 #[cfg(test)]
 mod tests {
     use super::LexerBase;
-    use antlr4_runtime::{CommonTokenStream, InputStream};
+    use antlr4_runtime::{CommonTokenStream, InputStream, Token};
     use crate::r#gen::rex_lexer::{RexLexer, METADATA};
 
     #[test]
@@ -48,5 +48,17 @@ mod tests {
             let first = tokens.tokens().next().unwrap();
             assert_eq!(first.text_or_empty(), expected, "input: {input}");
         }
+    }
+
+    #[test]
+    fn processing_instruction_preserves_questions_and_restores_mode() {
+        let lexer = RexLexer::with_hooks(
+            InputStream::new("<?target body???>Next"), LexerBase::new());
+        let tokens = CommonTokenStream::new(lexer);
+        let text: Vec<_> = tokens.tokens()
+            .filter(|t| t.token_type() != crate::r#gen::rex_lexer::EOF)
+            .map(|t| t.text_or_empty().to_owned())
+            .collect();
+        assert_eq!(text, ["<?", "target", " ", "body", "?", "?", "?>", "Next"]);
     }
 }
