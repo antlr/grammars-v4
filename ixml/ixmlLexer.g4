@@ -25,14 +25,12 @@ VERSION_KW : 'version';
 // tokenised as CODE when they appear as class members inside sets.
 CODE: [A-Z] [a-z]?;
 
-// Names: start with '_' or any Unicode letter; continue with name-follower
-// characters as specified in the iXML grammar (namestart | [- · ‿ ⁀ Nd Mn]).
+// Name segments: dots remain separate tokens so the parser can distinguish
+// a name's dots (including trailing dots) from a rule-terminating dot.
+// Visible whitespace prevents the parser from joining separated segments.
 // '\u002D' = '-', '\u00B7' = '·', '\u203F' = '‿', '\u2040' = '⁀'.
-// Note: '.' (U+002E) is listed as a namefollower in the iXML spec but is
-// omitted here because ANTLR4's maximal-munch tokeniser would otherwise
-// consume the rule-terminating '.' as part of the preceding name token
-// (e.g. "s." would become a single NAME rather than NAME + DOT).
 NAME: [_\p{L}] [_\p{L}\p{Nd}\p{Mn}\u002D\u00B7\u203F\u2040]*;
+NAME_FOLLOWER: [\p{Nd}\p{Mn}\u00B7\u203F\u2040]+;
 
 // Mark / tmark single characters
 AT    : '@';
@@ -65,14 +63,18 @@ HASH: '#' -> pushMode(HEX_MODE);
 // String literals
 // dchar: any non-", non-CR, non-LF character, or escaped ""
 // schar: any non-', non-CR, non-LF character, or escaped ''
-DQUOTE_STRING : '"' (~["\r\n] | '""')* '"';
-SQUOTE_STRING : '\'' (~['\r\n] | '\'\'')* '\'';
+// Single decoded characters have distinct token types for range endpoints.
+// These rules precede STRING so equal-length matches prefer CHAR.
+DQUOTE_CHAR   : '"' (~["\r\n] | '""') '"';
+SQUOTE_CHAR   : '\'' (~['\r\n] | '\'\'') '\'';
+DQUOTE_STRING : '"' (~["\r\n] | '""')+ '"';
+SQUOTE_STRING : '\'' (~['\r\n] | '\'\'')+ '\'';
 
-// Whitespace — sent to hidden channel (handles 's' and 'RS' transparently)
-WS: [\p{Zs}\t\r\n]+ -> channel(HIDDEN);
+// Keep separators on the default channel for the parser's s and rs rules.
+WS: [\p{Zs}\t\r\n]+;
 
 // Comments with support for nesting: '{' (COMMENT | non-brace-char)* '}'
-COMMENT: '{' (COMMENT | ~[{}])* '}' -> channel(HIDDEN);
+COMMENT: '{' (COMMENT | ~[{}])* '}';
 
 // ── HEX_MODE ─────────────────────────────────────────────────────────────────
 // Entered after '#'; consumes one or more hex digits then returns to the

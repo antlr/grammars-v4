@@ -9,14 +9,13 @@
  * Notes on the translation:
  *   - ANTLR4 reserved words 'rule', 'from', 'class', 'string'
  *     are renamed with a trailing underscore.
- *   - 's' (optional whitespace) and 'rs' (required separation)
- *     are empty parser rules: WS and COMMENT go to HIDDEN channel,
- *     so all separation is handled transparently by the lexer.
- *   - 'comment', 'cchar', 'dchar', 'schar', 'whitespace_' are
- *     likewise stubs — the real work is done in the lexer.
+ *   - 's' and 'rs' consume visible WS/COMMENT tokens, so required
+ *     separation is enforced rather than discarded by the lexer.
+ *   - 'cchar', 'dchar', and 'schar' are stubs; their characters
+ *     are bundled into comment/string tokens by the lexer.
  *   - Nested comments are supported via the COMMENT lexer rule.
- *   - '.' is omitted from NAME (see ixmlLexer.g4) and '#' uses
- *     HEX_MODE so hex letters never merge into surrounding NAMEs.
+ *   - Names are assembled from adjacent segments and dots in parser
+ *     context. '#' uses HEX_MODE to separate encoded characters.
  */
 
 // $antlr-format alignColons hanging, alignSemicolons hanging, alignTrailingComments true, allowShortBlocksOnASingleLine true
@@ -97,10 +96,8 @@ nonterminal
     ;
 
 name
-    : NAME
-    | 'ixml'
-    | 'version'
-    | CODE
+    : (NAME | 'ixml' | 'version' | CODE)
+      (NAME | 'ixml' | 'version' | CODE | NAME_FOLLOWER | '-' | '.')*
     ;
 
 terminal_
@@ -123,7 +120,9 @@ tmark
     ;
 
 string_
-    : DQUOTE_STRING
+    : DQUOTE_CHAR
+    | SQUOTE_CHAR
+    | DQUOTE_STRING
     | SQUOTE_STRING
     ;
 
@@ -181,12 +180,10 @@ to_
     : character
     ;
 
-// The iXML spec constrains character to exactly one dchar/schar,
-// but DQUOTE_STRING/SQUOTE_STRING may contain multiple characters;
-// single-character validation is a semantic (not syntactic) concern.
+// CHAR tokens contain exactly one decoded character, including doubled quotes.
 character
-    : DQUOTE_STRING
-    | SQUOTE_STRING
+    : DQUOTE_CHAR
+    | SQUOTE_CHAR
     | HASH hex
     ;
 
@@ -202,18 +199,17 @@ insertion
     : '+' s (string_ | HASH hex) s
     ;
 
-// These rules mirror iXML spec names. Their content is handled by
-// the lexer (WS → HIDDEN, COMMENT → HIDDEN).
+// Required separation must remain distinguishable from optional spacing.
 s
-    : // (whitespace | comment)*
+    : (whitespace_ | comment)*
     ;
 
 rs
-    : // (whitespace | comment)+  — required separation, lexer-enforced
+    : (whitespace_ | comment)+
     ;
 
 comment
-    : // '{' (cchar | comment)* '}'  — see COMMENT lexer rule
+    : COMMENT
     ;
 
 cchar
@@ -221,5 +217,5 @@ cchar
     ;
 
 whitespace_
-    : // [\p{Zs}\t\r\n]  — see WS lexer rule
+    : WS
     ;

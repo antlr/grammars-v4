@@ -43,7 +43,7 @@
 					<grammarName>ixml</grammarName>
 					<packageName></packageName>
 					<testFileExtension>.ixml</testFileExtension>
-					<exampleFiles></exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

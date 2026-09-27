@@ -49,19 +49,31 @@ Parser rule names mirror those of the
 | `class_` | `class` | renamed: avoids Java keyword |
 | `code` | `code` | Unicode category code (e.g. `L`, `Zs`) |
 | `insertion` | `insertion` | `+"…"` or `+#hex` |
-| `s` | `s` | optional whitespace (stub; lexer-handled) |
-| `rs` | `RS` | required separation (stub; lexer-handled) |
-| `comment` | `comment` | stub; COMMENT lexer rule handles nesting |
+| `s` | `s` | zero or more whitespace/comment tokens |
+| `rs` | `RS` | one or more whitespace/comment tokens |
+| `comment` | `comment` | consumes a COMMENT token; lexer handles nesting |
 | `cchar` | `cchar` | stub; part of COMMENT lexer rule |
-| `whitespace_` | `whitespace` | stub; WS lexer rule |
+| `whitespace_` | `whitespace` | consumes a WS token |
 
 ### Whitespace and comments
 
 The iXML spec defines whitespace (`s`) and required separation (`RS`) as
-grammar rules. In this ANTLR4 grammar they are empty stubs: the `WS` lexer
-rule sends all Unicode Zs characters, tabs, and newlines to the hidden
-channel, and the `COMMENT` lexer rule handles `{ … }` comments (including
-nesting) and also sends them to the hidden channel.
+grammar rules. `WS` and `COMMENT` stay on the default token channel so the
+parser can enforce required separation between rules and between prolog
+keywords. Comments, including nested comments, count as separation. Optional
+spacing remains optional everywhere the specification uses `s`.
+
+### Dots in names and quoted characters
+
+Names are assembled from adjacent name-segment tokens and punctuation. Dots
+are separate tokens: parser context distinguishes the dots in `a.b` or a
+trailing-dot name `a.` from the rule terminator. Visible separators prevent
+accidental joining of names across whitespace or comments. No target-specific
+actions or predicates are required.
+
+Quoted strings must contain at least one decoded character. Single-character
+quoted tokens (including a doubled quote escape) are distinguished from longer
+strings, so range endpoints accept exactly one character syntactically.
 
 ### Unicode
 
@@ -74,3 +86,21 @@ space separators.
 
 `examples/ixml.ixml` is the self-describing iXML grammar from the
 specification — the grammar for iXML written in iXML notation.
+
+## Regression tests
+
+With Java, Javac, Python 3, and an ANTLR complete JAR available:
+
+```sh
+python tests/run-tests.py /path/to/antlr4-4.13.2-complete.jar
+```
+
+This generates and compiles a Java parser in a temporary directory, exercises
+valid and invalid grammar syntax, checks dotted names in the parse tree, and
+parses the supported `.ixml` samples recursively. Both lexer and parser errors
+are counted. As in `desc.xml`, the experimental `XPath.decorated.ixml` sample
+is excluded because it contains non-iXML annotations.
+
+The Maven test plugin is configured to scan `examples/` with the `.ixml`
+extension filter. Its expected-error sidecar checks rejection of the annotated
+XPath sample instead of treating that experimental syntax as valid iXML.
