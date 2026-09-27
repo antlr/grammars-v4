@@ -42,6 +42,15 @@ question marks in the body are retained without consuming the terminator.
 `examples/processing-instructions.ebnf` covers empty and nonempty bodies,
 multiline content, inline instructions, and instructions after `<?ENCORE?>`.
 
+`examples/comments-options-unicode.ebnf` covers comments, whitespace directives,
+`#x` character classes and equivalences, and delimiter declarations. Whitespace
+directives are retained as `option` nodes, not discarded as ordinary comments.
+The delimiter operator is two literal backslashes, as in the
+[upstream REx grammar](https://github.com/GuntherRademacher/rex-parser-generator/blob/main/rex/src/parser/EbnfParser.ebnf);
+REx quoted strings do not interpret backslash escapes.
+The Maven tests in `src/test/java/RexReviewTest.java` also assert token boundaries,
+option nodes, and rejection of malformed directives and delimiters.
+
 Maven inherits Java base-class source registration from the repository's
 parent POM: `Java/` is copied to a generated source root before compilation.
 Run `mvn clean test` in this directory to compile from scratch and test the

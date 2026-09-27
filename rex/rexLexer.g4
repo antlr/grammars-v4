@@ -31,7 +31,7 @@ Minus                    : '-';
 OpenSet                  : '['  -> pushMode(SET);
 OpenNotSet               : '[^' -> pushMode(SET);
 Dollar                   : '$';
-OpenMLComment            : '/*';
+OpenMLComment            : '/*' -> pushMode(COMMENT), more;
 CloseMLComment           : '*/';
 Colon                    : ':';
 GtGt                     : '>>';
@@ -388,16 +388,16 @@ fragment FCharCode      : '\\u' [0-9a-fA-F]+;
 fragment FChar          : ~[ \u0009\u000A\u000D\u0023\u005D];
 fragment FCharRange     : FChar '-' FChar;
 fragment FCharCodeRange : FCharCode '-' FCharCode;
-SingleLineComment       : '//' ~[\u000A]* [\u000A]?;
-//MultiLineComment
-//         : '/*' ( ( .* - ( .* '*/' .* ) ) - ( Space* 'ws' Space* ':' .* ) ) '*/'
-//	 ;
-MultiLineComment: '/*' .*? '*/';
+fragment SingleLineComment : '//' ~[\u000A]* [\u000A]?;
+fragment MultiLineComment: '/*' .*? '*/';
 //EquivalenceLookAhead
 //         : &( '[' ( Char | CharCode | CharRange | CharCodeRange ) ']' Whitespace? '==' )
 //	 ;
-Whitespace: ( Space | SingleLineComment | MultiLineComment)+ -> skip
+Whitespace: ( Space | SingleLineComment)+ -> skip
 /* ws: definition */;
+
+// Longer than OpenMLComment: reserve ws directives instead of skipping them.
+OptionStart: '/*' Space* 'ws' Space* ':' -> pushMode(OPTION);
 
 mode EXPLICIT;
 
@@ -416,9 +416,24 @@ SetChar          : ~']';
 SetCharCode      : FCharCode;
 SetCharRange     : FCharRange;
 SetCharCodeRange : FCharCodeRange;
+SetUnicode      : Unicode;
+SetUnicodeRange : Unicode '-' Unicode;
 CloseSet         : ']' -> popMode;
 
 // Read the processing-instruction target before switching to body text.
 // mode(), rather than pushMode(), preserves the original mode stack entry.
 mode PI_TARGET;
 PITarget: Name -> type(Name), mode(EXPLICIT);
+
+mode OPTION;
+OptionSpace: Space -> type(WS_Space);
+OptionExplicit: 'explicit' -> type(ExplicitLit);
+OptionDefinition: 'definition' -> type(DefinitionLit);
+OptionClose: '*/' -> type(CloseMLComment), popMode;
+
+mode COMMENT;
+CommentClose: '*/' -> popMode, skip;
+CommentText: ~[*]+ -> more;
+CommentStar: '*' -> more;
+// Do not silently accept an unterminated comment at end of input.
+CommentEOF: EOF -> type(OpenMLComment), popMode;

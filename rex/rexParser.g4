@@ -38,7 +38,7 @@ syntaxSequence
     ;
 
 syntaxItem
-    : syntaxPrimary (Quest | '*' | '+')?
+    : syntaxPrimary (Quest | Star | '+')?
     ;
 
 syntaxPrimary
@@ -73,7 +73,7 @@ lexicalSequence
     ;
 
 lexicalItem
-    : lexicalPrimary (Quest | '*' | '+')?
+    : lexicalPrimary (Quest | Star | '+')?
     ;
 
 lexicalPrimary
@@ -104,12 +104,12 @@ unicode
     ;
 
 charClass
-    : ('[' | '[^') (SetChar | SetCharCode | SetCharRange | SetCharCodeRange)+ ']'
+    : ('[' | '[^') (SetChar | SetCharCode | SetCharRange | SetCharCodeRange | SetUnicode | SetUnicodeRange)+ ']'
     /* ws: explicit */
     ;
 
 option
-    : '/*' WS_Space* name 'ws' ':' WS_Space* ('explicit' | 'definition') WS_Space* '*/'
+    : OptionStart WS_Space* (ExplicitLit | DefinitionLit) WS_Space* CloseMLComment
     /* ws: explicit */
     ;
 
@@ -127,7 +127,7 @@ equivalence
 
 equivalenceCharRange
     : StringLiteral
-    | '[' (SetChar | SetCharCode | SetCharRange | SetCharCodeRange) ']'
+    | '[' (SetChar | SetCharCode | SetCharRange | SetCharCodeRange | SetUnicode | SetUnicodeRange) ']'
     /* ws: explicit */
     ;
 
