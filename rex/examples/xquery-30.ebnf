@@ -1,0 +1,711 @@
+XQuery   ::= Module EOF
+Module   ::= VersionDecl? ( LibraryModule | MainModule )
+VersionDecl
+         ::= 'xquery' ( 'encoding' StringLiteral | 'version' StringLiteral ( 'encoding' StringLiteral )? ) Separator
+MainModule
+         ::= Prolog QueryBody
+LibraryModule
+         ::= ModuleDecl Prolog
+ModuleDecl
+         ::= 'module' 'namespace' NCName '=' URILiteral Separator
+Prolog   ::= ( ( DefaultNamespaceDecl | Setter | NamespaceDecl | Import ) Separator )* ( ( ContextItemDecl | AnnotatedDecl | OptionDecl ) Separator )*
+Separator
+         ::= ';'
+Setter   ::= BoundarySpaceDecl
+           | DefaultCollationDecl
+           | BaseURIDecl
+           | ConstructionDecl
+           | OrderingModeDecl
+           | EmptyOrderDecl
+           | CopyNamespacesDecl
+           | DecimalFormatDecl
+BoundarySpaceDecl
+         ::= 'declare' 'boundary-space' ( 'preserve' | 'strip' )
+DefaultCollationDecl
+         ::= 'declare' 'default' 'collation' URILiteral
+BaseURIDecl
+         ::= 'declare' 'base-uri' URILiteral
+ConstructionDecl
+         ::= 'declare' 'construction' ( 'strip' | 'preserve' )
+OrderingModeDecl
+         ::= 'declare' 'ordering' ( 'ordered' | 'unordered' )
+EmptyOrderDecl
+         ::= 'declare' 'default' 'order' 'empty' ( 'greatest' | 'least' )
+CopyNamespacesDecl
+         ::= 'declare' 'copy-namespaces' PreserveMode ',' InheritMode
+PreserveMode
+         ::= 'preserve'
+           | 'no-preserve'
+InheritMode
+         ::= 'inherit'
+           | 'no-inherit'
+DecimalFormatDecl
+         ::= 'declare' ( 'decimal-format' EQName | 'default' 'decimal-format' ) ( DFPropertyName '=' StringLiteral )*
+DFPropertyName
+         ::= 'decimal-separator'
+           | 'grouping-separator'
+           | 'infinity'
+           | 'minus-sign'
+           | 'NaN'
+           | 'percent'
+           | 'per-mille'
+           | 'zero-digit'
+           | 'digit'
+           | 'pattern-separator'
+Import   ::= SchemaImport
+           | ModuleImport
+SchemaImport
+         ::= 'import' 'schema' SchemaPrefix? URILiteral ( 'at' URILiteral ( ',' URILiteral )* )?
+SchemaPrefix
+         ::= 'namespace' NCName '='
+           | 'default' 'element' 'namespace'
+ModuleImport
+         ::= 'import' 'module' ( 'namespace' NCName '=' )? URILiteral ( 'at' URILiteral ( ',' URILiteral )* )?
+NamespaceDecl
+         ::= 'declare' 'namespace' NCName '=' URILiteral
+DefaultNamespaceDecl
+         ::= 'declare' 'default' ( 'element' | 'function' ) 'namespace' URILiteral
+AnnotatedDecl
+         ::= 'declare' Annotation* ( VarDecl | FunctionDecl )
+Annotation
+         ::= '%' EQName ( '(' Literal ( ',' Literal )* ')' )?
+VarDecl  ::= 'variable' '$' VarName TypeDeclaration? ( ':=' VarValue | 'external' ( ':=' VarDefaultValue )? )
+VarValue ::= ExprSingle
+VarDefaultValue
+         ::= ExprSingle
+ContextItemDecl
+         ::= 'declare' 'context' 'item' ( 'as' ItemType )? ( ':=' VarValue | 'external' ( ':=' VarDefaultValue )? )
+FunctionDecl
+         ::= 'function' EQName '(' ParamList? ')' ( 'as' SequenceType )? ( FunctionBody | 'external' )
+ParamList
+         ::= Param ( ',' Param )*
+Param    ::= '$' EQName TypeDeclaration?
+FunctionBody
+         ::= EnclosedExpr
+EnclosedExpr
+         ::= '{' Expr '}'
+OptionDecl
+         ::= 'declare' 'option' EQName StringLiteral
+QueryBody
+         ::= Expr
+Expr     ::= ExprSingle ( ',' ExprSingle )*
+ExprSingle
+         ::= FLWORExpr
+           | QuantifiedExpr
+           | SwitchExpr
+           | TypeswitchExpr
+           | IfExpr
+           | TryCatchExpr
+           | OrExpr
+FLWORExpr
+         ::= InitialClause IntermediateClause* ReturnClause
+InitialClause
+         ::= ForClause
+           | LetClause
+           | WindowClause
+IntermediateClause
+         ::= InitialClause
+           | WhereClause
+           | GroupByClause
+           | OrderByClause
+           | CountClause
+ForClause
+         ::= 'for' ForBinding ( ',' ForBinding )*
+ForBinding
+         ::= '$' VarName TypeDeclaration? AllowingEmpty? PositionalVar? 'in' ExprSingle
+AllowingEmpty
+         ::= 'allowing' 'empty'
+PositionalVar
+         ::= 'at' '$' VarName
+LetClause
+         ::= 'let' LetBinding ( ',' LetBinding )*
+LetBinding
+         ::= '$' VarName TypeDeclaration? ':=' ExprSingle
+WindowClause
+         ::= 'for' ( TumblingWindowClause | SlidingWindowClause )
+TumblingWindowClause
+         ::= 'tumbling' 'window' '$' VarName TypeDeclaration? 'in' ExprSingle WindowStartCondition WindowEndCondition?
+SlidingWindowClause
+         ::= 'sliding' 'window' '$' VarName TypeDeclaration? 'in' ExprSingle WindowStartCondition WindowEndCondition
+WindowStartCondition
+         ::= 'start' WindowVars 'when' ExprSingle
+WindowEndCondition
+         ::= 'only'? 'end' WindowVars 'when' ExprSingle
+WindowVars
+         ::= ( '$' CurrentItem )? PositionalVar? ( 'previous' '$' PreviousItem )? ( 'next' '$' NextItem )?
+CurrentItem
+         ::= EQName
+PreviousItem
+         ::= EQName
+NextItem ::= EQName
+CountClause
+         ::= 'count' '$' VarName
+WhereClause
+         ::= 'where' ExprSingle
+GroupByClause
+         ::= 'group' 'by' GroupingSpecList
+GroupingSpecList
+         ::= GroupingSpec ( ',' GroupingSpec )*
+GroupingSpec
+         ::= GroupingVariable ( TypeDeclaration? ':=' ExprSingle )? ( 'collation' URILiteral )?
+GroupingVariable
+         ::= '$' VarName
+OrderByClause
+         ::= ( 'order' 'by' | 'stable' 'order' 'by' ) OrderSpecList
+OrderSpecList
+         ::= OrderSpec ( ',' OrderSpec )*
+OrderSpec
+         ::= ExprSingle OrderModifier
+OrderModifier
+         ::= ( 'ascending' | 'descending' )? ( 'empty' ( 'greatest' | 'least' ) )? ( 'collation' URILiteral )?
+ReturnClause
+         ::= 'return' ExprSingle
+QuantifiedExpr
+         ::= ( 'some' | 'every' ) '$' VarName TypeDeclaration? 'in' ExprSingle ( ',' '$' VarName TypeDeclaration? 'in' ExprSingle )* 'satisfies' ExprSingle
+SwitchExpr
+         ::= 'switch' '(' Expr ')' SwitchCaseClause+ 'default' 'return' ExprSingle
+SwitchCaseClause
+         ::= ( 'case' SwitchCaseOperand )+ 'return' ExprSingle
+SwitchCaseOperand
+         ::= ExprSingle
+TypeswitchExpr
+         ::= 'typeswitch' '(' Expr ')' CaseClause+ 'default' ( '$' VarName )? 'return' ExprSingle
+CaseClause
+         ::= 'case' ( '$' VarName 'as' )? SequenceTypeUnion 'return' ExprSingle
+SequenceTypeUnion
+         ::= SequenceType ( '|' SequenceType )*
+IfExpr   ::= 'if' '(' Expr ')' 'then' ExprSingle 'else' ExprSingle
+TryCatchExpr
+         ::= TryClause CatchClause+
+TryClause
+         ::= 'try' '{' TryTargetExpr '}'
+TryTargetExpr
+         ::= Expr
+CatchClause
+         ::= 'catch' CatchErrorList '{' Expr '}'
+CatchErrorList
+         ::= NameTest ( '|' NameTest )*
+OrExpr   ::= AndExpr ( 'or' AndExpr )*
+AndExpr  ::= ComparisonExpr ( 'and' ComparisonExpr )*
+ComparisonExpr
+         ::= StringConcatExpr ( ( ValueComp | GeneralComp | NodeComp ) StringConcatExpr )?
+StringConcatExpr
+         ::= RangeExpr ( '||' RangeExpr )*
+RangeExpr
+         ::= AdditiveExpr ( 'to' AdditiveExpr )?
+AdditiveExpr
+         ::= MultiplicativeExpr ( ( '+' | '-' ) MultiplicativeExpr )*
+MultiplicativeExpr
+         ::= UnionExpr ( ( '*' | 'div' | 'idiv' | 'mod' ) UnionExpr )*
+UnionExpr
+         ::= IntersectExceptExpr ( ( 'union' | '|' ) IntersectExceptExpr )*
+IntersectExceptExpr
+         ::= InstanceofExpr ( ( 'intersect' | 'except' ) InstanceofExpr )*
+InstanceofExpr
+         ::= TreatExpr ( 'instance' 'of' SequenceType )?
+TreatExpr
+         ::= CastableExpr ( 'treat' 'as' SequenceType )?
+CastableExpr
+         ::= CastExpr ( 'castable' 'as' SingleType )?
+CastExpr ::= UnaryExpr ( 'cast' 'as' SingleType )?
+UnaryExpr
+         ::= ( '-' | '+' )* ValueExpr
+ValueExpr
+         ::= ValidateExpr
+           | ExtensionExpr
+           | SimpleMapExpr
+GeneralComp
+         ::= '='
+           | '!='
+           | '<'
+           | '<='
+           | '>'
+           | '>='
+ValueComp
+         ::= 'eq'
+           | 'ne'
+           | 'lt'
+           | 'le'
+           | 'gt'
+           | 'ge'
+NodeComp ::= 'is'
+           | '<<'
+           | '>>'
+ValidateExpr
+         ::= 'validate' ( ValidationMode | 'type' TypeName )? '{' Expr '}'
+ValidationMode
+         ::= 'lax'
+           | 'strict'
+ExtensionExpr
+         ::= Pragma+ '{' Expr? '}'
+Pragma   ::= '(#' S? EQName ( S PragmaContents )? '#)'
+          /* ws: explicit */
+SimpleMapExpr
+         ::= PathExpr ( '!' PathExpr )*
+PathExpr ::= '/' ( RelativePathExpr / )
+           | '//' RelativePathExpr
+           | RelativePathExpr
+RelativePathExpr
+         ::= StepExpr ( ( '/' | '//' ) StepExpr )*
+StepExpr ::= PostfixExpr
+           | AxisStep
+AxisStep ::= ( ReverseStep | ForwardStep ) PredicateList
+ForwardStep
+         ::= ForwardAxis NodeTest
+           | AbbrevForwardStep
+ForwardAxis
+         ::= 'child' '::'
+           | 'descendant' '::'
+           | 'attribute' '::'
+           | 'self' '::'
+           | 'descendant-or-self' '::'
+           | 'following-sibling' '::'
+           | 'following' '::'
+AbbrevForwardStep
+         ::= '@'? NodeTest
+ReverseStep
+         ::= ReverseAxis NodeTest
+           | AbbrevReverseStep
+ReverseAxis
+         ::= 'parent' '::'
+           | 'ancestor' '::'
+           | 'preceding-sibling' '::'
+           | 'preceding' '::'
+           | 'ancestor-or-self' '::'
+AbbrevReverseStep
+         ::= '..'
+NodeTest ::= KindTest
+           | NameTest
+NameTest ::= EQName
+           | Wildcard
+PostfixExpr
+         ::= PrimaryExpr ( Predicate | ArgumentList )*
+ArgumentList
+         ::= '(' ( Argument ( ',' Argument )* )? ')'
+PredicateList
+         ::= Predicate*
+Predicate
+         ::= '[' Expr ']'
+PrimaryExpr
+         ::= Literal
+           | VarRef
+           | ParenthesizedExpr
+           | ContextItemExpr
+           | FunctionCall
+           | OrderedExpr
+           | UnorderedExpr
+           | Constructor
+           | FunctionItemExpr
+Literal  ::= NumericLiteral
+           | StringLiteral
+NumericLiteral
+         ::= IntegerLiteral
+           | DecimalLiteral
+           | DoubleLiteral
+VarRef   ::= '$' VarName
+VarName  ::= EQName
+ParenthesizedExpr
+         ::= '(' Expr? ')'
+ContextItemExpr
+         ::= '.'
+OrderedExpr
+         ::= 'ordered' '{' Expr '}'
+UnorderedExpr
+         ::= 'unordered' '{' Expr '}'
+FunctionCall
+         ::= FunctionEQName ArgumentList
+Argument ::= ExprSingle
+           | ArgumentPlaceholder
+ArgumentPlaceholder
+         ::= '?'
+Constructor
+         ::= DirectConstructor
+           | ComputedConstructor
+DirectConstructor
+         ::= DirElemConstructor
+           | DirCommentConstructor
+           | DirPIConstructor
+DirElemConstructor
+         ::= '<' QName DirAttributeList ( '/>' | '>' DirElemContent* '</' QName S? '>' )
+          /* ws: explicit */
+DirAttributeList
+         ::= ( S ( QName S? '=' S? DirAttributeValue )? )*
+          /* ws: explicit */
+DirAttributeValue
+         ::= '"' ( EscapeQuot | QuotAttrValueContent )* '"'
+           | "'" ( EscapeApos | AposAttrValueContent )* "'"
+          /* ws: explicit */
+QuotAttrValueContent
+         ::= QuotAttrContentChar
+           | CommonContent
+AposAttrValueContent
+         ::= AposAttrContentChar
+           | CommonContent
+DirElemContent
+         ::= DirectConstructor
+           | CDataSection
+           | CommonContent
+           | ElementContentChar
+CommonContent
+         ::= PredefinedEntityRef
+           | CharRef
+           | '{{'
+           | '}}'
+           | EnclosedExpr
+DirCommentConstructor
+         ::= '<!--' DirCommentContents '-->'
+          /* ws: explicit */
+DirPIConstructor
+         ::= '<?' PITarget ( S DirPIContents )? '?>'
+          /* ws: explicit */
+CDataSection
+         ::= '<![CDATA[' CDataSectionContents ']]>'
+          /* ws: explicit */
+ComputedConstructor
+         ::= CompDocConstructor
+           | CompElemConstructor
+           | CompAttrConstructor
+           | CompNamespaceConstructor
+           | CompTextConstructor
+           | CompCommentConstructor
+           | CompPIConstructor
+CompDocConstructor
+         ::= 'document' '{' Expr '}'
+CompElemConstructor
+         ::= 'element' ( EQName | '{' Expr '}' ) '{' ContentExpr? '}'
+ContentExpr
+         ::= Expr
+CompAttrConstructor
+         ::= 'attribute' ( EQName | '{' Expr '}' ) '{' Expr? '}'
+CompNamespaceConstructor
+         ::= 'namespace' ( Prefix | '{' PrefixExpr '}' ) '{' URIExpr '}'
+Prefix   ::= NCName
+PrefixExpr
+         ::= Expr
+URIExpr  ::= Expr
+CompTextConstructor
+         ::= 'text' '{' Expr '}'
+CompCommentConstructor
+         ::= 'comment' '{' Expr '}'
+CompPIConstructor
+         ::= 'processing-instruction' ( NCName | '{' Expr '}' ) '{' Expr? '}'
+FunctionItemExpr
+         ::= NamedFunctionRef
+           | InlineFunctionExpr
+NamedFunctionRef
+         ::= EQName '#' IntegerLiteral
+InlineFunctionExpr
+         ::= Annotation* 'function' '(' ParamList? ')' ( 'as' SequenceType )? FunctionBody
+SingleType
+         ::= SimpleTypeName '?'?
+TypeDeclaration
+         ::= 'as' SequenceType
+SequenceType
+         ::= 'empty-sequence' '(' ')'
+           | ItemType ( OccurrenceIndicator / )
+OccurrenceIndicator
+         ::= '?'
+           | '*'
+           | '+'
+ItemType ::= KindTest
+           | 'item' '(' ')'
+           | FunctionTest
+           | AtomicOrUnionType
+           | ParenthesizedItemType
+AtomicOrUnionType
+         ::= EQName
+KindTest ::= DocumentTest
+           | ElementTest
+           | AttributeTest
+           | SchemaElementTest
+           | SchemaAttributeTest
+           | PITest
+           | CommentTest
+           | TextTest
+           | NamespaceNodeTest
+           | AnyKindTest
+AnyKindTest
+         ::= 'node' '(' ')'
+DocumentTest
+         ::= 'document-node' '(' ( ElementTest | SchemaElementTest )? ')'
+TextTest ::= 'text' '(' ')'
+CommentTest
+         ::= 'comment' '(' ')'
+NamespaceNodeTest
+         ::= 'namespace-node' '(' ')'
+PITest   ::= 'processing-instruction' '(' ( NCName | StringLiteral )? ')'
+AttributeTest
+         ::= 'attribute' '(' ( AttribNameOrWildcard ( ',' TypeName )? )? ')'
+AttribNameOrWildcard
+         ::= AttributeName
+           | '*'
+SchemaAttributeTest
+         ::= 'schema-attribute' '(' AttributeDeclaration ')'
+AttributeDeclaration
+         ::= AttributeName
+ElementTest
+         ::= 'element' '(' ( ElementNameOrWildcard ( ',' TypeName '?'? )? )? ')'
+ElementNameOrWildcard
+         ::= ElementName
+           | '*'
+SchemaElementTest
+         ::= 'schema-element' '(' ElementDeclaration ')'
+ElementDeclaration
+         ::= ElementName
+AttributeName
+         ::= EQName
+ElementName
+         ::= EQName
+SimpleTypeName
+         ::= TypeName
+TypeName ::= EQName
+FunctionTest
+         ::= Annotation* ( AnyFunctionTest | TypedFunctionTest )
+AnyFunctionTest
+         ::= 'function' '(' '*' ')'
+TypedFunctionTest
+         ::= 'function' '(' ( SequenceType ( ',' SequenceType )* )? ')' 'as' SequenceType
+ParenthesizedItemType
+         ::= '(' ItemType ')'
+URILiteral
+         ::= StringLiteral
+EQName   ::= QName
+           | URIQualifiedName
+FunctionEQName
+         ::= FunctionName
+           | URIQualifiedName
+QName    ::= FunctionName
+           | 'attribute'
+           | 'comment'
+           | 'document-node'
+           | 'element'
+           | 'empty-sequence'
+           | 'function'
+           | 'if'
+           | 'item'
+           | 'namespace-node'
+           | 'node'
+           | 'processing-instruction'
+           | 'schema-attribute'
+           | 'schema-element'
+           | 'switch'
+           | 'text'
+           | 'typeswitch'
+FunctionName
+         ::= QName^Token
+           | 'ancestor'
+           | 'ancestor-or-self'
+           | 'and'
+           | 'ascending'
+           | 'case'
+           | 'cast'
+           | 'castable'
+           | 'child'
+           | 'collation'
+           | 'count'
+           | 'declare'
+           | 'default'
+           | 'descendant'
+           | 'descendant-or-self'
+           | 'descending'
+           | 'div'
+           | 'document'
+           | 'else'
+           | 'empty'
+           | 'end'
+           | 'eq'
+           | 'every'
+           | 'except'
+           | 'following'
+           | 'following-sibling'
+           | 'for'
+           | 'ge'
+           | 'group'
+           | 'gt'
+           | 'idiv'
+           | 'import'
+           | 'instance'
+           | 'intersect'
+           | 'is'
+           | 'le'
+           | 'let'
+           | 'lt'
+           | 'mod'
+           | 'module'
+           | 'namespace'
+           | 'ne'
+           | 'only'
+           | 'or'
+           | 'order'
+           | 'ordered'
+           | 'parent'
+           | 'preceding'
+           | 'preceding-sibling'
+           | 'return'
+           | 'satisfies'
+           | 'self'
+           | 'some'
+           | 'stable'
+           | 'start'
+           | 'to'
+           | 'treat'
+           | 'try'
+           | 'union'
+           | 'unordered'
+           | 'validate'
+           | 'where'
+           | 'xquery'
+NCName   ::= NCName^Token
+           | 'and'
+           | 'ascending'
+           | 'case'
+           | 'cast'
+           | 'castable'
+           | 'collation'
+           | 'count'
+           | 'default'
+           | 'descending'
+           | 'div'
+           | 'else'
+           | 'empty'
+           | 'end'
+           | 'eq'
+           | 'except'
+           | 'for'
+           | 'ge'
+           | 'group'
+           | 'gt'
+           | 'idiv'
+           | 'instance'
+           | 'intersect'
+           | 'is'
+           | 'le'
+           | 'let'
+           | 'lt'
+           | 'mod'
+           | 'ne'
+           | 'only'
+           | 'or'
+           | 'order'
+           | 'return'
+           | 'satisfies'
+           | 'stable'
+           | 'start'
+           | 'to'
+           | 'treat'
+           | 'union'
+           | 'where'
+Whitespace
+         ::= S^WS
+           | Comment
+          /* ws: definition */
+Comment  ::= '(:' ( CommentContents | Comment )* ':)'
+          /* ws: explicit */
+
+<?TOKENS?>
+
+IntegerLiteral
+         ::= Digits
+DecimalLiteral
+         ::= '.' Digits
+           | Digits '.' [0-9]*
+DoubleLiteral
+         ::= ( '.' Digits | Digits ( '.' [0-9]* )? ) [eE] [+#x2D]? Digits
+StringLiteral
+         ::= '"' ( PredefinedEntityRef | CharRef | EscapeQuot | [^"&] )* '"'
+           | "'" ( PredefinedEntityRef | CharRef | EscapeApos | [^'&] )* "'"
+URIQualifiedName
+         ::= BracedURILiteral NCName
+BracedURILiteral
+         ::= 'Q' '{' ( PredefinedEntityRef | CharRef | [^&{}] )* '}'
+PredefinedEntityRef
+         ::= '&' ( 'lt' | 'gt' | 'amp' | 'quot' | 'apos' ) ';'
+EscapeQuot
+         ::= '""'
+EscapeApos
+         ::= "''"
+ElementContentChar
+         ::= Char - [{}<&]
+QuotAttrContentChar
+         ::= Char - ["{}<&]
+AposAttrContentChar
+         ::= Char - ['{}<&]
+PITarget ::= NCName - ( ( 'X' | 'x' ) ( 'M' | 'm' ) ( 'L' | 'l' ) )
+NameStartChar
+         ::= ':'
+           | [A-Z]
+           | '_'
+           | [a-z]
+           | [#x00C0-#x00D6]
+           | [#x00D8-#x00F6]
+           | [#x00F8-#x02FF]
+           | [#x0370-#x037D]
+           | [#x037F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFFFD]
+           | [#x10000-#xEFFFF]
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #x00B7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]
+Name     ::= NameStartChar NameChar*
+CharRef  ::= '&#' [0-9]+ ';'
+           | '&#x' [0-9a-fA-F]+ ';'
+NCName   ::= Name - ( Char* ':' Char* )
+QName    ::= PrefixedName
+           | UnprefixedName
+PrefixedName
+         ::= Prefix ':' LocalPart
+UnprefixedName
+         ::= LocalPart
+Prefix   ::= NCName
+LocalPart
+         ::= NCName
+S        ::= ( #x0020 | #x0009 | #x000D | #x000A )+
+Char     ::= #x0009
+           | #x000A
+           | #x000D
+           | [#x0020-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+Digits   ::= [0-9]+
+CommentContents
+         ::= ( ( Char+ - ( Char* ( '(:' | ':)' ) Char* ) ) - ( Char* '(' ) ) &':'
+           | ( Char+ - ( Char* ( '(:' | ':)' ) Char* ) ) &'('
+PragmaContents
+         ::= ( Char* - ( Char* '#)' Char* ) ) &'#'
+Wildcard ::= '*'
+           | NCName ':' '*'
+           | '*' ':' NCName
+           | BracedURILiteral '*'
+DirCommentContents
+         ::= ( Char - '-' | '-' ( Char - '-' ) )*
+DirPIContents
+         ::= ( Char* - ( Char* '?>' Char* ) ) &'?'
+CDataSectionContents
+         ::= ( Char* - ( Char* ']]>' Char* ) ) &']]'
+EOF      ::= $
+NonNCNameChar
+         ::= $
+           | ':'
+           | Char - NameChar
+DelimitingChar
+         ::= NonNCNameChar
+           | '-'
+           | '.'
+DelimitingChar
+          \\ DecimalLiteral DoubleLiteral IntegerLiteral
+NonNCNameChar
+          \\ URIQualifiedName NCName^Token QName^Token 'NaN' 'allowing' 'ancestor' 'ancestor-or-self' 'and' 'as' 'ascending' 'at' 'attribute' 'base-uri' 'boundary-space' 'by' 'case' 'cast' 'castable' 'catch' 'child' 'collation' 'comment' 'construction' 'context' 'copy-namespaces' 'count' 'decimal-format' 'decimal-separator' 'declare' 'default' 'descendant' 'descendant-or-self' 'descending' 'digit' 'div' 'document' 'document-node' 'element' 'else' 'empty' 'empty-sequence' 'encoding' 'end' 'eq' 'every' 'except' 'external' 'following' 'following-sibling' 'for' 'function' 'ge' 'greatest' 'group' 'grouping-separator' 'gt' 'idiv' 'if' 'import' 'in' 'infinity' 'inherit' 'instance' 'intersect' 'is' 'item' 'lax' 'le' 'least' 'let' 'lt' 'minus-sign' 'mod' 'module' 'namespace' 'namespace-node' 'ne' 'next' 'no-inherit' 'no-preserve' 'node' 'of' 'only' 'option' 'or' 'order' 'ordered' 'ordering' 'parent' 'pattern-separator' 'per-mille' 'percent' 'preceding' 'preceding-sibling' 'preserve' 'previous' 'processing-instruction' 'return' 'satisfies' 'schema' 'schema-attribute' 'schema-element' 'self' 'sliding' 'some' 'stable' 'start' 'strict' 'strip' 'switch' 'text' 'then' 'to' 'treat' 'try' 'tumbling' 'type' 'typeswitch' 'union' 'unordered' 'validate' 'variable' 'version' 'when' 'where' 'window' 'xquery' 'zero-digit'
+'*'       << Wildcard
+NCName^Token
+          << 'and' 'ascending' 'case' 'cast' 'castable' 'collation' 'count' 'default' 'descending' 'div' 'else' 'empty' 'end' 'eq' 'except' 'for' 'ge' 'group' 'gt' 'idiv' 'instance' 'intersect' 'is' 'le' 'let' 'lt' 'mod' 'ne' 'only' 'or' 'order' 'return' 'satisfies' 'stable' 'start' 'to' 'treat' 'union' 'where'
+QName^Token
+          << 'ancestor' 'ancestor-or-self' 'and' 'ascending' 'attribute' 'case' 'cast' 'castable' 'child' 'collation' 'comment' 'count' 'declare' 'default' 'descendant' 'descendant-or-self' 'descending' 'div' 'document' 'document-node' 'element' 'else' 'empty' 'empty-sequence' 'end' 'eq' 'every' 'except' 'following' 'following-sibling' 'for' 'function' 'ge' 'group' 'gt' 'idiv' 'if' 'import' 'instance' 'intersect' 'is' 'item' 'le' 'let' 'lt' 'mod' 'module' 'namespace' 'namespace-node' 'ne' 'node' 'only' 'or' 'order' 'ordered' 'parent' 'preceding' 'preceding-sibling' 'processing-instruction' 'return' 'satisfies' 'schema-attribute' 'schema-element' 'self' 'some' 'stable' 'start' 'switch' 'text' 'to' 'treat' 'try' 'typeswitch' 'union' 'unordered' 'validate' 'where' 'xquery'
