@@ -2,4 +2,5 @@
 <desc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../_scripts/desc.xsd">
    <antlr-version>^4.13.0</antlr-version>
    <targets>Cpp;CSharp;Go;Java;JavaScript;Python3</targets>
+   <entry-point>program<entry-point>
 </desc>
