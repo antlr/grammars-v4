@@ -48,3 +48,11 @@ select
     )).getClobVal()
 from
     dual;
+
+
+-- https://stackoverflow.com/questions/26465260/the-mystic-getclobval
+-- Parentheses are required to disambiguate a method call from attribute access
+select
+    (xml).getClobVal()
+from
+    akadmin;
