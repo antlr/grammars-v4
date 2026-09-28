@@ -41,3 +41,10 @@ FROM warehouses;
 
 SELECT XMLROOT ( XMLType('<poid>143598</poid>'), VERSION '1.0', STANDALONE YES).extract('//text()').getClobVal()
            AS "XMLROOT" FROM DUAL;
+
+select
+    (xmlelement(
+        "element", xmlattributes('test' AS "xmlns")
+    )).getClobVal()
+from
+    dual;
