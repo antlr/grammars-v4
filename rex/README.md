@@ -24,12 +24,7 @@ lexer superclass inheritance, so its transform inlines the same lookahead
 predicate using the generated lexer's `recog` parameter. Transforms are
 idempotent, including Rust's before/after-generation invocation.
 The Rust transform accepts both compact and formatted options blocks and preserves
-unrelated options. From the repository root, run its regression tests with
-`python -m unittest discover -s rex/tests -v`. Test CSharp lexer input replacement
-with `dotnet run --project rex/tests/CSharpInputStream` (.NET 10).
-The shared grammar names the parser rule `context_` to avoid shadowing the
-runtime's `Parser.context` member in Dart and Antlr4ng. Dart needs no grammar
-transformation; Antlr4ng only inserts the lexer header.
+unrelated options.
 
 OphiRust is distinct from the antlr4rust `Rust` target. Its
 `OphiRust/src/lexer_base.rs` supplies the predicate through `SemanticHooks`,
@@ -60,21 +55,3 @@ parent POM: `Java/` is copied to a generated source root before compilation.
 Run `mvn clean test` in this directory to compile from scratch and test the
 example corpus.
 
-## Build and test
-
-With Trash and the selected target toolchain installed, for example:
-
-```sh
-dotnet trash gen -t Java
-cd Generated-Java
-bash build.sh
-bash run.sh ../examples/*.ebnf
-```
-
-Replace `Java` with another target from the list above. Antlr4ng uses the
-antlr4ng TypeScript runtime; it is distinct from the `TypeScript` target.
-For the repository's standard test harness, run from this directory:
-
-```powershell
-pwsh ../_scripts/test.ps1 -target Java
-```
