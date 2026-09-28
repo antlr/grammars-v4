@@ -17,7 +17,7 @@ prolog
     ;
 
 processingInstruction
-    : '<?' name (WS_Space+ (DirPIContents | WS_Space)*)? CloseQu
+    : OpenQu name (WS_Space+ (DirPIContents | WS_Space)*)? CloseQu
     /* ws: explicit */
     ;
 
@@ -64,7 +64,7 @@ lexicalChoice
     ;
 
 contextExpression
-    : lexicalSequence ('&' lexicalItem)?
+    : lexicalSequence ('&' lexicalSequence)?
     ;
 
 lexicalSequence
