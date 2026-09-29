@@ -4319,7 +4319,11 @@ aliased_column_list
     ;
 
 column_list_with_comment
-    : column_name (COMMENT string)? (COMMA column_name (COMMENT string)?)*
+    : view_column_element (COMMA view_column_element)*
+    ;
+
+view_column_element
+    : column_name with_masking_policy? with_tags? (COMMENT string)?
     ;
 
 object_name
