@@ -1,3 +1,5 @@
+declare
+    l_res integer;
 begin
     $if true $then
         dbms_output.put_line(1);
@@ -38,4 +40,16 @@ begin
     $elsif true $then
     $else
     $end
+
+    select 1
+    into l_res
+    from dual
+    order by
+     $if true $then
+      1
+     $else
+      2
+     $end
+     ;
+
 end;

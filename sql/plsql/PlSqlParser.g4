@@ -6786,6 +6786,14 @@ unary_expression_core
     | standard_function
     | {this.IsNotNumericFunction()}? atom
     | implicit_cursor_expression
+    | selection_directive_expression
+    ;
+
+// https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/conditional-compilation1.html
+selection_directive_expression
+    : DOLLAR_IF condition DOLLAR_THEN expression (
+        DOLLAR_ELSIF condition DOLLAR_THEN expression
+    )* (DOLLAR_ELSE expression)? DOLLAR_END
     ;
 
 // https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-optimization-and-tuning.html#GUID-DAF46F06-EF3F-4B1A-A518-5238B80C69FA
