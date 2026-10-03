@@ -1,4 +1,3 @@
-package org.antlr.parser.st4;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
@@ -17,14 +16,14 @@ public abstract class LexerAdaptor extends Lexer {
 	// look for "{ args ID (',' ID)* '|' ..."
 	public boolean startsSubTemplate() {
 		subtemplateDepth++;
-		return false;
+		return true;
 	}
 
 	// if last RBrace, continue with mode Outside
 	public boolean endsSubTemplate() {
 		if (subtemplateDepth > 0) {
 			subtemplateDepth--;
-			mode(1); // STLexer.Inside
+			mode(STLexer.Inside);
 		}
 		return true;
 	}
@@ -35,25 +34,26 @@ public abstract class LexerAdaptor extends Lexer {
 	}
 
 	public boolean isLDelim() {
-		return lDelim == _input.LA(1);
+		// The wildcard has already consumed the candidate delimiter.
+		return lDelim == _input.LA(-1);
 	}
 
 	public boolean isRDelim() {
-		return rDelim == _input.LA(1);
+		return rDelim == _input.LA(-1);
 	}
 
 	public boolean isLTmplComment() {
-		return isLDelim() && _input.LA(2) == '!';
+		return isLDelim() && _input.LA(1) == '!';
 	}
 
 	public boolean isRTmplComment() {
-		return isRDelim() && _input.LA(-1) == '!';
+		return isRDelim() && _input.LA(-2) == '!';
 	}
 
 	public boolean adjText() {
-		int c1 = _input.LA(1);
+		int c1 = _input.LA(-1);
 		if (c1 == '\\') {
-			int c2 = _input.LA(2);
+			int c2 = _input.LA(1);
 			if (c2 == '\\') {
 				_input.consume(); // convert \\ to \
 			} else if (c2 == lDelim || c2 == '}') {
