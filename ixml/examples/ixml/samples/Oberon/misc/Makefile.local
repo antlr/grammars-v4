@@ -1,0 +1,14 @@
+### Makefile.local: provides system-dependent definitions of
+### XSLT and the location of some stylesheets.
+
+### IXML:  invokes an ixml processor with arguments input, grammar, output.
+IXML=~/bin/coffeepot.sh
+
+### XSLT:  invokes an XSLT processor with arguments input, stylesheet, output.
+XSLT=~/bin/saxon-he-wrapper.sh
+
+### GINGERSNAP:  location of stylesheets from the Gingersnap repository
+GINGERSNAP=../../../../Gingersnap/src/
+
+### SPECGRAMMAR:  location of ixml.xml
+SPECGRAMMAR=../../../ixml.xml

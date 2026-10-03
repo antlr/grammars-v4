@@ -1,0 +1,145 @@
+{ ixml grammar for IRIs
+  Transcribed from ABNF extracted from Sec. 2.2 of RFC 3987.
+  Retrieved 11 June 2022 from
+  https://datatracker.ietf.org/doc/html/rfc3987#section-2.2
+}
+
+   IRI            = scheme, -":", ihier-part, 
+                    (-"?", iquery)?, (-"#", ifragment)?.
+
+   ihier-part     = -"//", iauthority, ipath-abempty
+                  | ipath-absolute
+                  | ipath-rootless
+                  | ipath-empty
+		  .
+
+   IRI-reference  = IRI | irelative-ref.
+
+   absolute-IRI   = scheme, -":", ihier-part, (-"?", iquery)?.
+
+   irelative-ref  = irelative-part, (-"?", iquery)?, (-"#", ifragment)?.
+
+   irelative-part = -"//", iauthority, ipath-abempty
+                  | ipath-absolute
+                  | ipath-noscheme
+                  | ipath-empty
+		  .
+
+   iauthority     = (iuserinfo, -"@")?, ihost, (-":", port)?.
+   iuserinfo      = (iunreserved | pct-encoded | sub-delims | ":")*.
+   ihost          = IP-literal | IPv4address | ireg-name.
+
+   ireg-name      = (iunreserved | pct-encoded | sub-delims)*.
+
+   ipath          = ipath-abempty   { begins with "/" or is empty }
+                  | ipath-absolute  { begins with "/" but not "//" }
+                  | ipath-noscheme  { begins with a non-colon segment }
+                  | ipath-rootless  { begins with a segment }
+                  | ipath-empty     { zero characters }
+                  .
+
+   ipath-abempty  = (-"/", isegment)*.
+   ipath-absolute = -"/", (isegment-nz, (-"/", isegment)*)?.
+   ipath-noscheme = isegment-nz-nc, (-"/", isegment)*.
+   ipath-rootless = isegment-nz, (-"/", isegment)*.
+   ipath-empty    = {}.
+
+   isegment       = ipchar*.
+   isegment-nz    = ipchar+.
+   isegment-nz-nc = (iunreserved | pct-encoded | sub-delims | "@")+.
+                    { non-zero-length segment without any colon ":" }
+
+   ipchar         = iunreserved | pct-encoded | sub-delims | [":@"].
+
+   iquery         = (ipchar | iprivate | "/" | "?")*.
+
+   ifragment      = (ipchar | "/" | "?")*.
+
+   iunreserved    = ALPHA | DIGIT | "-" | "." | "_" | "~" | ucschar.
+
+   ucschar        = [ #A0-#D7FF | #F900-#FDCF | #FDF0-#FFEF
+                  | #10000-#1FFFD | #20000-#2FFFD | #30000-#3FFFD
+                  | #40000-#4FFFD | #50000-#5FFFD | #60000-#6FFFD
+                  | #70000-#7FFFD | #80000-#8FFFD | #90000-#9FFFD
+                  | #A0000-#AFFFD | #B0000-#BFFFD | #C0000-#CFFFD
+                  | #D0000-#DFFFD | #E1000-#EFFFD ].
+
+   iprivate       = [#E000-#F8FF | #F0000-#FFFFD | #100000-#10FFFD].
+
+{
+   Some productions are ambiguous.  The "first-match-wins" (a.k.a.
+   "greedy") algorithm applies.  For details, see [RFC3986].
+}
+
+{
+   The following rules are the same as those in [RFC3986]:
+}
+
+   scheme        = ALPHA, (ALPHA | DIGIT | ["+-."])*.
+
+   port          = DIGIT*.
+
+   IP-literal    = -"[", (IPv6address | IPvFuture), "]".
+
+   IPvFuture     = -"v", HEXDIG+, ".",  (unreserved | sub-delims | ":")+.
+
+   IPv6address   =                h16x6, ls32
+                 |          "::", h16x5, ls32
+                 | h16x0-1, "::", h16x4, ls32
+                 | h16x0-2, "::", h16x3, ls32
+                 | h16x0-3, "::", h16x2, ls32
+                 | h16x0-4, "::", h16x1, ls32
+                 | h16x0-5, "::",        ls32
+                 | h16x0-6, "::",        h16
+                 | h16x0-7, "::".
+
+   -h16x6        = h16, ":", h16, ":", h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x5        = h16, ":", h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x4        = h16, ":", h16, ":", h16, ":", h16, ":".
+   -h16x3        = h16, ":", h16, ":", h16, ":".
+   -h16x2        = h16, ":", h16, ":".
+   -h16x1        = h16, ":".
+
+   -h16x0-7      = h16x0-6 | h16x6, h16.
+   -h16x0-6      = h16x0-5 | h16x5, h16.
+   -h16x0-5      = h16x0-4 | h16x4, h16.
+   -h16x0-4      = h16x0-3 | h16x3, h16.
+   -h16x0-3      = h16x0-2 | h16x2, h16.
+   -h16x0-2      = h16x0-1 | h16x1, h16.
+   -h16x0-1      = h16?.
+   
+   -h16          = HEXDIG, (HEXDIG, (HEXDIG, HEXDIG?)?)?.
+   -ls32         = (h16, ":", h16) | IPv4address.
+   IPv4address   = dec-octet, ".", dec-octet, ".", dec-octet, ".", dec-octet.
+
+   -dec-octet    = DIGIT                 { 0-9 }
+                 | [#31 - #39], DIGIT    { 10-99 }
+                 | "1", DIGIT, DIGIT     { 100-199 }
+                 | "2", [#30-#34], DIGIT { 200-249 }
+                 | "25", [#30-#35]       { 250-255 }
+                 .
+
+
+   pct-encoded   = "%", HEXDIG, HEXDIG.
+
+   -unreserved   = ALPHA | DIGIT | "-" | "." | "_" | "~".
+   reserved      = gen-delims | sub-delims.
+   gen-delims    = ":" | "|" | "?" | "#" | "[" | "]" | "@".
+   sub-delims    = "!" | "$" | "&" | "'" | "(" | ")"
+                 | "*" | "+" | "," | ";" | "=".
+
+{ Rules brought in from RFC 2234 }
+
+-ALPHA         = ["A"-"Z"; "a"-"z"]. { #41-#5A; #61-#7A }
+
+CR            = #0D. { carriage return }
+
+-DIGIT         = ["0"-"9"]. { #30 - #39 }
+
+DQUOTE        = #22. { (Double Quote) }
+
+-HEXDIG       = DIGIT; ["A"-"F"].
+
+LF	      = #0A. { linefeed }
+
+SP            = #20.
